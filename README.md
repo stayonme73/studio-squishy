@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Studio Squishy
 
-## Getting Started
+A separate, web-first workspace experience hosted by Squishy.
 
-First, run the development server:
+**This project is independent from [StayOnMeVoice](https://github.com) (Personal Squishy app).**
+
+## MVP Scope
+
+### In scope
+
+- Studio entrance experience
+- Semi-realistic warm industrial Studio environment (CSS scaffold first)
+- Original Squishy greeting visitors as a host
+- Whiteboard wall (visual only)
+- Builder workspace
+- Strategy room
+
+### Out of scope (MVP)
+
+- File storage
+- Vaults
+- Payments
+- User accounts
+- Supabase implementation
+- Changes to Personal Squishy / StayOnMeVoice
+
+## Tech stack
+
+- [Next.js](https://nextjs.org) 16 (App Router)
+- TypeScript
+- Tailwind CSS
+- Deployed on [Vercel](https://vercel.com)
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Routes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route     | Purpose                          |
+| --------- | -------------------------------- |
+| `/`       | Entrance — narrative welcome     |
+| `/studio` | Main Studio environment          |
 
-## Learn More
+## Environment variables
 
-To learn more about Next.js, take a look at the following resources:
+Copy `.env.example` to `.env.local`. Only `NEXT_PUBLIC_SITE_URL` is used in MVP.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Supabase variables are documented but **not installed or configured** during MVP.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project structure
 
-## Deploy on Vercel
+```
+src/
+├── app/              # Routes
+├── components/       # UI (entrance, studio, ui)
+├── config/           # Site config and design tokens
+├── lib/              # Utilities and future Supabase clients
+└── types/            # Shared TypeScript types
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Connected to Vercel. Pushes to `main` deploy to production; pull requests receive preview URLs.
