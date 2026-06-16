@@ -93,7 +93,8 @@ export function welcomeHallFraming(viewport: {
   height: number;
 }): WelcomeHallFraming {
   const { width, height } = viewport;
-  if (width > 0 && height > width && width <= 768) {
+  /* All portrait viewports — contain keeps right-foreground kiosk on-screen (e.g. 820×1180). */
+  if (width > 0 && height > width) {
     return welcomeHallScene.framing.portrait;
   }
   return welcomeHallScene.framing.default;
