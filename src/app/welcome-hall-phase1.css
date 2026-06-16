@@ -1,0 +1,70 @@
+/* Welcome Hall V2 - plate + full-kiosk tap target (CTA baked in art). */
+
+.welcome-hall-phase1 .welcome-hall-plate {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  background: #2e2d2b;
+}
+
+.welcome-hall-phase1 .welcome-hall-plate-crop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.welcome-hall-phase1 .welcome-hall-plate-art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* 16:9 plate on 16:9 desktop — center cover, no side bars */
+  object-position: 50% 50%;
+  user-select: none;
+  pointer-events: none;
+  filter: none;
+}
+
+.welcome-hall-phase1 .welcome-hall-plate-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.welcome-hall-phase1 .welcome-hall-plate-ui > button {
+  pointer-events: auto;
+}
+
+/* Invisible hotspot - entire kiosk body + screen */
+.hall-kiosk-hotspot {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 4;
+  opacity: 0;
+}
+
+.hall-kiosk-hotspot:hover,
+.hall-kiosk-hotspot:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.hall-kiosk-hotspot:focus-visible {
+  outline: 3px solid rgba(100, 180, 255, 0.85);
+  outline-offset: 2px;
+  opacity: 1;
+}

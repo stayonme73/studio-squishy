@@ -1,0 +1,296 @@
+/* Welcome Hall — LOCKED scene image + interaction pass */
+
+.welcome-hall-static {
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  max-width: none;
+  background: #2e2d2b;
+}
+
+.welcome-hall-frame {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  width: min(100vw, calc(100dvh * 3 / 2));
+  max-height: 100dvh;
+}
+
+.welcome-hall-static-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  user-select: none;
+  pointer-events: none;
+  filter: saturate(0.94) contrast(1.03) brightness(0.98);
+  transform-origin: 50% 16%;
+}
+
+.welcome-hall-interactions {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+/* --- Studio Guide hotspot (kiosk box in artwork) --- */
+
+.hall-guide-hotspot {
+  position: absolute;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 3;
+  pointer-events: auto;
+}
+
+.hall-guide-hotspot:hover,
+.hall-guide-hotspot:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+.hall-guide-hotspot:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.2);
+  outline-offset: 2px;
+}
+
+/* --- View Ahead transition (Draft Room entrance) --- */
+
+.welcome-hall-frame--transitioning .welcome-hall-static-image {
+  animation: hall-view-ahead-zoom 1.4s ease-in forwards;
+}
+
+.welcome-hall-frame--transitioning .welcome-hall-interactions {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+@keyframes hall-view-ahead-zoom {
+  0% {
+    transform: scale(1);
+    filter: saturate(0.94) contrast(1.03) brightness(0.98);
+  }
+  70% {
+    transform: scale(3.8);
+    filter: saturate(1) contrast(1.05) brightness(1.05);
+  }
+  100% {
+    transform: scale(4.5);
+    opacity: 0;
+    filter: brightness(1.15);
+  }
+}
+
+.hall-view-ahead-transition {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hall-view-ahead-transition-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 16%, rgba(255, 200, 120, 0.55) 0%, rgba(10, 10, 10, 0.95) 55%);
+  animation: hall-view-ahead-fade 1.4s ease-in forwards;
+}
+
+@keyframes hall-view-ahead-fade {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* --- Studio Guide dialog --- */
+
+.hall-guide-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(10, 10, 10, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.hall-guide-dialog {
+  width: min(100%, 26rem);
+  margin: 0;
+  padding: 1.25rem 1.35rem 1rem;
+  border: 1px solid rgba(0, 180, 170, 0.35);
+  border-radius: 6px;
+  background: linear-gradient(168deg, #fff9f0 0%, #ebe4da 100%);
+  color: #2c3e50;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+}
+
+.hall-guide-welcome {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.hall-guide-prompt {
+  margin: 0.35rem 0 0.85rem;
+  font-size: 0.9375rem;
+  opacity: 0.85;
+}
+
+.hall-guide-options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.hall-guide-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba(44, 62, 80, 0.12);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.55);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.hall-guide-option:hover:not(:disabled) {
+  border-color: rgba(0, 128, 128, 0.45);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.hall-guide-option--disabled,
+.hall-guide-option:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.hall-guide-option-icon {
+  flex-shrink: 0;
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.hall-guide-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+
+.hall-guide-option-label {
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.hall-guide-option-desc {
+  font-size: 0.8125rem;
+  opacity: 0.78;
+  line-height: 1.35;
+}
+
+.hall-guide-close {
+  margin-top: 0.85rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #008080;
+  cursor: pointer;
+}
+
+.hall-guide-close:hover {
+  opacity: 0.8;
+}
+
+/* --- Legacy transition placeholders (superseded by draft-room.css) --- */
+
+.draft-room-legacy,
+.intake-room-legacy {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 2rem;
+  background: linear-gradient(180deg, #f5c878 0%, #5a88b8 35%, #2a2724 100%);
+  color: #fff;
+}
+
+.draft-room-legacy-inner,
+.intake-room-inner {
+  max-width: 28rem;
+  padding: 1.5rem;
+  border-radius: 6px;
+  background: rgba(26, 26, 26, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.draft-room-eyebrow,
+.intake-room-eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #5ee8df;
+}
+
+.draft-room-title,
+.intake-room-title {
+  margin: 0.35rem 0 0;
+  font-size: 1.625rem;
+  font-weight: 700;
+}
+
+.draft-room-body,
+.intake-room-body {
+  margin: 0.65rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  opacity: 0.9;
+}
+
+.draft-room-back,
+.intake-room-back {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #5ee8df;
+  text-decoration: none;
+}
+
+.draft-room-back:hover,
+.intake-room-back:hover {
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-hall-frame--transitioning .welcome-hall-static-image,
+  .hall-view-ahead-transition-glow {
+    animation: none !important;
+  }
+
+  .welcome-hall-frame--transitioning .welcome-hall-static-image {
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+}
