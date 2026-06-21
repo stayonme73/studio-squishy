@@ -1946,12 +1946,23 @@ body:has(.sb--v4) {
 /* Responsive */
 
 @media (max-width: 960px) {
+  body:has(.sb--v4) {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
+    max-height: none;
+  }
+
   .sb {
     grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    overflow: visible;
   }
 
   .sb-main {
-    overflow: auto;
+    overflow: visible;
   }
 
   .sb-grid {
@@ -1959,26 +1970,33 @@ body:has(.sb--v4) {
   }
 
   .sb-sidebar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 0.65rem 0.85rem;
-    padding: 0.7rem 0.85rem 0.75rem;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    height: auto;
+    max-height: none;
     overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--sb-denim) 18%, transparent);
   }
 
   .sb-nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    flex: 1;
-    justify-content: flex-end;
-    gap: 0.2rem 0.35rem;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    flex: none;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 0.1rem;
+  }
+
+  .sb-nav__item {
+    width: 100%;
   }
 
   .sb-sidebar-lower {
-    flex: 1 1 100%;
-    align-items: center;
-    container-type: size;
+    flex: none;
+    width: 100%;
+    align-items: stretch;
   }
 
   .sb-idea-wall {
@@ -4610,6 +4628,104 @@ body:has(.sb--v4) {
 
   .sb-record-drawer__panel {
     width: min(100%, 36rem);
+  }
+}
+
+/* Mobile — readable stacked board (V4 journey) */
+
+@media (max-width: 768px) {
+  .sb--v4 .sb-main {
+    padding: 0.55rem 0.65rem 1.1rem;
+  }
+
+  .sb--v4 .sb-board-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sb-grid-gap);
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-grid.sb-grid--v4 {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sb-grid-gap);
+    grid-column: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-board-note-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sb-grid-gap);
+    grid-column: auto;
+    grid-template-rows: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-card--current,
+  .sb--v4 .sb-card--progress,
+  .sb--v4 .sb-card--deliverables,
+  .sb--v4 .sb-card--account,
+  .sb--v4 .sb-card--studio-note {
+    grid-column: auto;
+    grid-row: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-current-campaign__metric {
+    grid-template-columns: 1fr;
+    gap: 0.12rem;
+  }
+
+  .sb--v4 .sb-activity__body {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
+  .sb--v4 .sb-account__row {
+    grid-template-columns: 1fr;
+    gap: 0.12rem;
+  }
+
+  .sb--v4 .sb-deliverables-progress__head {
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+  }
+
+  .sb--v4 .sb-studio-note-panel,
+  .sb--v4 .sb-studio-note-letter,
+  .sb--v4 .sb-studio-note-letter__fit {
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-idea-wall {
+    max-height: none;
+  }
+
+  .sb--v4 .sb-idea-wall__art {
+    width: min(100%, 10.5rem);
+    margin-inline: auto;
+  }
+
+  .sb--v4 .sb-header-v3__title {
+    font-size: clamp(1.45rem, 7vw, 1.85rem);
+  }
+
+  .sb--v4 .sb-ticker__message {
+    font-size: 0.68rem;
+    letter-spacing: 0.035em;
+  }
+
+  .sb-record-drawer__panel {
+    width: 100%;
+    min-width: 0;
   }
 }
 
