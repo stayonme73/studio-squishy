@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useLayoutEffect, useState } from "react";
 
+import { welcomeHallInteraction } from "@/config/welcome-hall-interaction";
 import { welcomeHallPhase1 } from "@/config/welcome-hall-phase1";
 import {
   sceneRectToCoverPercent,
@@ -18,6 +19,7 @@ import {
 export default function WelcomeHallWelcomeScene() {
   const router = useRouter();
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
+  const [transitioning, setTransitioning] = useState(false);
   const { cta } = welcomeHallPhase1;
   const framing = welcomeHallFraming(viewport);
   const toOverlayPercent = (rect: typeof welcomeHallScene.kioskTapTarget) =>
@@ -36,13 +38,18 @@ export default function WelcomeHallWelcomeScene() {
     return () => window.removeEventListener("resize", syncViewport);
   }, []);
 
-  const goToDraftRoom = useCallback(() => {
-    router.push(`${welcomeHallPhase1.routeToDraftRoom}?from=hall`);
+  const goToStudioGuide = useCallback(() => {
+    setTransitioning(true);
+    window.setTimeout(() => {
+      router.push(welcomeHallPhase1.routeToStudioGuidePrototype);
+    }, welcomeHallInteraction.transitionMs);
   }, [router]);
 
   return (
     <div className="welcome-hall-static welcome-hall-phase1" aria-label="Welcome Hall">
-      <div className="welcome-hall-plate">
+      <div
+        className={`welcome-hall-plate${transitioning ? " welcome-hall-plate--transitioning" : ""}`}
+      >
         <div className="welcome-hall-plate-crop">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -61,9 +68,16 @@ export default function WelcomeHallWelcomeScene() {
               type="button"
               className="hall-kiosk-hotspot"
               aria-label={cta.kioskLabel}
-              onClick={goToDraftRoom}
+              onClick={goToStudioGuide}
+              disabled={transitioning}
               style={kioskHitArea}
             />
+
+            {transitioning && (
+              <div className="hall-view-ahead-transition" aria-hidden>
+                <div className="hall-view-ahead-transition-glow" />
+              </div>
+            )}
           </div>
         </div>
       </div>

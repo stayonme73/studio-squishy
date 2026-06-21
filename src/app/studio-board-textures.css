@@ -1,0 +1,225 @@
+@import "./board-family-materials.css";
+
+.btx {
+  --btx-font: var(--font-studio-board-sans), "Segoe UI", system-ui, sans-serif;
+  --btx-font-script: var(--font-studio-board-script), "Segoe Script", cursive;
+
+  min-height: 100%;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  font-family: var(--btx-font);
+  color: var(--board-family-text);
+  background: var(--board-family-cream);
+}
+
+.btx-header {
+  max-width: 52rem;
+  margin: 0 auto 1.75rem;
+  text-align: center;
+}
+
+.btx-header h1 {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.btx-header p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--board-family-text-soft);
+}
+
+.btx-back {
+  display: inline-flex;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--board-family-primary);
+  text-decoration: none;
+}
+
+.btx-back:hover {
+  color: var(--board-family-primary-deep);
+}
+
+.btx-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.85rem, 2vw, 1.35rem);
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.btx-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.btx-col__head {
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(86, 123, 109, 0.06);
+  border: 1px solid rgba(86, 123, 109, 0.1);
+}
+
+.btx-col__label {
+  margin: 0 0 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--board-family-primary-deep);
+}
+
+.btx-col__title {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.btx-col__feel {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--board-family-text-soft);
+}
+
+.btx-swatches {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btx-swatches h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--board-family-text-soft);
+}
+
+/* Mini campaign tile */
+.btx-campaign {
+  padding: 0.85rem 0.9rem 0.95rem;
+}
+
+.btx-campaign__badge {
+  display: inline-block;
+  margin: 0 0 0.5rem;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--board-family-text);
+  background: rgba(216, 167, 61, 0.22);
+  border-radius: 2px;
+}
+
+.btx-campaign__name {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.btx-campaign__progress {
+  margin: 0 0 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--board-family-primary-deep);
+}
+
+.btx-campaign__status-label {
+  margin: 0 0 0.15rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--board-family-text-soft);
+}
+
+.btx-campaign__status {
+  margin: 0 0 0.65rem;
+  padding-bottom: 0.45rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(86, 123, 109, 0.14);
+}
+
+.btx-campaign__cta {
+  display: inline-flex;
+  padding: 0.42rem 0.7rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--board-family-primary);
+  border-radius: 3px;
+}
+
+/* Mini philosophy card */
+.btx-philosophy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 9.5rem;
+  padding: 0.85rem 0.85rem 2.35rem;
+  text-align: center;
+}
+
+.btx-philosophy__label {
+  margin: 0;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--board-family-text-soft);
+}
+
+.btx-philosophy__quote {
+  margin: 0;
+  font-family: var(--btx-font-script);
+  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+  font-weight: 600;
+  line-height: 1.28;
+}
+
+.btx-philosophy__heart {
+  position: absolute;
+  left: 50%;
+  bottom: 0.55rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  transform: translateX(-50%);
+  color: rgba(45, 45, 45, 0.48);
+}
+
+.btx-footnote {
+  max-width: 52rem;
+  margin: 1.75rem auto 0;
+  padding: 0.85rem 1rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--board-family-text-soft);
+  text-align: center;
+  border-radius: 8px;
+  background: rgba(255, 251, 245, 0.65);
+  border: 1px solid var(--board-family-tile-border);
+}
+
+@media (max-width: 56rem) {
+  .btx-grid {
+    grid-template-columns: 1fr;
+  }
+}

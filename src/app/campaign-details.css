@@ -1,0 +1,613 @@
+/* Campaign Details — Board Family campaign record (layout + section styles) */
+
+/* Page shell, header, cards, buttons: utility-design-system.css */
+
+.cd-grid {
+  --cd-teal: var(--utility-primary);
+  --cd-teal-deep: var(--utility-primary-deep);
+  --cd-gold: var(--board-family-mustard);
+  --cd-text: var(--utility-text);
+  --cd-text-muted: var(--utility-text-muted);
+}
+
+.cd-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.cd-overview,
+.cd-intake {
+  margin: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.cd-overview__row,
+.cd-intake__row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 9rem) 1fr;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+.cd-overview__label,
+.cd-intake__label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cd-text-muted);
+}
+
+.cd-overview__value,
+.cd-intake__value {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+/* Vision Summary */
+
+.cd-vision__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.cd-vision__header .utility-card__title {
+  margin-bottom: 0;
+}
+
+.cd-copy-brief {
+  flex-shrink: 0;
+}
+
+.cd-vision {
+  display: grid;
+  gap: 1rem;
+}
+
+.cd-vision__section {
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(26, 37, 40, 0.08);
+}
+
+.cd-vision__section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.cd-vision__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cd-text);
+}
+
+.cd-vision__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  background: rgba(0, 128, 128, 0.12);
+}
+
+.cd-vision__answers {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.cd-vision__label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--cd-text-muted);
+}
+
+.cd-vision__value {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.cd-vision__value--empty,
+.cd-vision__empty {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--cd-text-muted);
+  font-style: italic;
+}
+
+/* Revision Tracker */
+
+.cd-revisions {
+  margin: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.cd-revisions__row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 9rem) 1fr;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+.cd-revisions__label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cd-text-muted);
+}
+
+.cd-revisions__value {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.cd-revisions__value--highlight {
+  color: var(--cd-text);
+}
+
+/* Package includes */
+
+.cd-package-list {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.cd-package-list__item {
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+/* Timeline */
+
+.cd-timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.cd-timeline__item {
+  display: grid;
+  grid-template-columns: minmax(7rem, 9rem) 1fr;
+  gap: 0.75rem;
+  align-items: baseline;
+  font-size: 0.9rem;
+}
+
+.cd-timeline__date {
+  color: var(--cd-text-muted);
+  font-weight: 600;
+}
+
+.cd-timeline__label {
+  color: var(--cd-text);
+}
+
+/* Deliverables remaining */
+
+.cd-deliverables-remaining {
+  margin: 0 0 0.85rem;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.cd-deliverables-remaining__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.cd-deliverables-remaining__label {
+  color: var(--cd-text-muted);
+}
+
+.cd-deliverables-remaining__count {
+  font-weight: 600;
+  color: var(--cd-text);
+}
+
+/* FAQ & Policies */
+
+.cd-faq__philosophy {
+  margin: 0 0 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(26, 37, 40, 0.1);
+}
+
+.cd-faq__philosophy-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--cd-text);
+}
+
+.cd-faq {
+  margin: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.cd-faq__question {
+  margin: 0 0 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--cd-text);
+}
+
+.cd-faq__answer {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--cd-text-muted);
+}
+
+.cd-policy-blocks__p {
+  margin: 0 0 0.45rem;
+}
+
+.cd-policy-blocks__p:last-child {
+  margin-bottom: 0;
+}
+
+.cd-policy-blocks__list-wrap {
+  margin: 0 0 0.45rem;
+}
+
+.cd-policy-blocks__list-intro {
+  margin: 0 0 0.25rem;
+}
+
+.cd-policy-blocks__list {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.cd-policy-blocks__list-item {
+  line-height: 1.45;
+}
+
+.cd-policies {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.cd-policies__title {
+  margin: 0 0 0.25rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--cd-text);
+}
+
+.cd-policies__body {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--cd-text-muted);
+}
+
+.cd-footer__hint {
+  margin: 0 0 0.35rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--cd-text-muted);
+}
+
+.cd-help-link--empty {
+  margin-top: 1rem;
+}
+
+.sb-help-link {
+  margin-top: 0.35rem;
+}
+
+.cd-prompt {
+  margin: 0 0 0.55rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--cd-text-muted);
+}
+
+.cd-quote {
+  margin: 0;
+  padding: 0.85rem 0.95rem;
+  border-left: 3px solid var(--cd-gold);
+  border-radius: 0 0.35rem 0.35rem 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  background: rgba(229, 158, 0, 0.08);
+}
+
+/* Deliverables preview */
+
+.cd-deliverables__waiting,
+.cd-deliverables__ready {
+  padding: 0.35rem 0;
+}
+
+.cd-deliverables__message {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.cd-deliverables__hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  color: var(--cd-text-muted);
+}
+
+.cd-deliverables__links {
+  margin: 0.65rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.cd-deliverables__link {
+  display: inline-flex;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--cd-text);
+  text-decoration: none;
+}
+
+.cd-deliverables__link:hover {
+  color: var(--cd-text);
+}
+
+.cd-deliverables__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.1rem;
+  border-radius: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #fff;
+  background: var(--cd-teal-deep);
+}
+
+.cd-deliverables__cta:hover {
+  background: var(--cd-teal);
+}
+
+/* Studio updates */
+
+.cd-updates__hint {
+  margin: -0.35rem 0 0.75rem;
+  font-size: 0.82rem;
+  color: var(--cd-text-muted);
+}
+
+.cd-updates {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.cd-updates__item {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0.55rem;
+  align-items: baseline;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.cd-updates__date {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--cd-text);
+  white-space: nowrap;
+}
+
+.cd-updates__text {
+  color: var(--cd-text);
+}
+
+.cd-updates__empty {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--cd-text-muted);
+}
+
+/* Campaign Journey — hero vertical stepper */
+
+.cd-card--journey {
+  padding: 1.25rem 1.35rem 1.35rem;
+  background: var(--board-family-tile);
+}
+
+.cd-card__title--journey {
+  margin-bottom: 0.35rem;
+}
+
+.cd-journey__lead {
+  margin: 0 0 1rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--cd-text-muted);
+}
+
+.cd-journey {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.cd-journey__step {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: start;
+  position: relative;
+}
+
+.cd-journey__step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 0.62rem;
+  top: calc(1.25rem + 0.12rem);
+  bottom: -0.55rem;
+  width: 2px;
+  transform: translateX(-50%);
+  background: rgba(86, 123, 109, 0.18);
+}
+
+.cd-journey__step--complete:not(:last-child)::after {
+  background: var(--cd-teal);
+}
+
+.cd-journey__dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.08rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(86, 123, 109, 0.22);
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+  color: transparent;
+  background: var(--board-family-field);
+}
+
+.cd-journey__step--complete .cd-journey__dot {
+  color: #fff;
+  background: var(--cd-teal);
+  border-color: var(--cd-teal);
+}
+
+.cd-journey__step--current .cd-journey__dot {
+  color: var(--cd-gold);
+  background: var(--board-family-field);
+  border: 3px solid var(--cd-gold);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--cd-gold) 18%, transparent);
+}
+
+.cd-journey__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.cd-journey__label {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--cd-text-muted);
+}
+
+.cd-journey__step--current .cd-journey__label {
+  color: var(--cd-text);
+}
+
+.cd-journey__step--complete .cd-journey__label {
+  color: var(--cd-text);
+}
+
+.cd-journey__hint {
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--cd-text-muted);
+}
+
+@media (min-width: 48rem) {
+  .cd-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "overview vision"
+      "revisions package"
+      "journey journey"
+      "timeline timeline"
+      "deliverables deliverables"
+      "updates updates"
+      "footer footer";
+  }
+
+  .cd-card--overview {
+    grid-area: overview;
+  }
+
+  .cd-card--vision {
+    grid-area: vision;
+  }
+
+  .cd-card--revisions {
+    grid-area: revisions;
+  }
+
+  .cd-card--package {
+    grid-area: package;
+  }
+
+  .cd-card--journey {
+    grid-area: journey;
+  }
+
+  .cd-card--timeline {
+    grid-area: timeline;
+  }
+
+  .cd-card--deliverables {
+    grid-area: deliverables;
+  }
+
+  .cd-card--updates {
+    grid-area: updates;
+  }
+
+  .cd-card--footer {
+    grid-area: footer;
+  }
+
+  .cd-journey {
+    max-width: 32rem;
+  }
+}

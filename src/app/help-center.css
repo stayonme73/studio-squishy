@@ -1,0 +1,184 @@
+/* Studio Help Center — reference desk content styles */
+
+/* Page shell, header, cards, buttons: utility-design-system.css */
+
+.hc-toc {
+  max-width: var(--utility-content-max);
+  margin: 0 auto var(--utility-card-gap);
+}
+
+.hc-toc__title {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--utility-text-muted);
+}
+
+.hc-toc__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1rem;
+}
+
+.hc-toc__link {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--utility-text);
+  text-decoration: none;
+  text-decoration-color: color-mix(in srgb, var(--utility-brass) 65%, transparent);
+}
+
+.hc-toc__link:hover {
+  color: var(--utility-text);
+  text-decoration: underline;
+  text-decoration-color: var(--utility-brass);
+}
+
+/* —— Section headings (Studio Philosophy, FAQ, Policies) —— */
+
+.hc-grid .utility-card__title {
+  margin: 0 0 1rem;
+  padding-bottom: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--studio-denim);
+  border-bottom: 1px solid color-mix(in srgb, var(--studio-denim) 20%, transparent);
+}
+
+.hc-card--philosophy .utility-card__title {
+  margin: calc(var(--utility-card-pad) * -1) calc(var(--utility-card-pad) * -1) 1.15rem;
+  padding: 0.9rem var(--utility-card-pad) 0.7rem;
+  font-size: 0.84rem;
+  background: color-mix(in srgb, var(--studio-denim) 7%, var(--studio-paper) 93%);
+  border-bottom: 1px solid color-mix(in srgb, var(--studio-denim) 26%, transparent);
+}
+
+/* —— Philosophy —— */
+
+.hc-philosophy__question {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.32;
+  color: var(--utility-text);
+}
+
+.hc-body {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.68;
+  color: color-mix(in srgb, var(--utility-text-muted) 88%, var(--utility-text) 12%);
+}
+
+/* —— FAQ groups —— */
+
+.hc-faq-group {
+  margin-bottom: 1.35rem;
+}
+
+.hc-faq-group:last-child {
+  margin-bottom: 0;
+}
+
+.hc-faq-group__title {
+  margin: 0 0 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #6a8f5c;
+}
+
+.hc-faq {
+  margin: 0;
+  display: grid;
+  gap: 1.05rem;
+}
+
+.hc-faq__item {
+  padding: 0.15rem 0 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--studio-ink) 8%, transparent);
+  scroll-margin-top: 1rem;
+}
+
+.hc-faq__item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.hc-faq__question {
+  margin: 0.55rem 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  line-height: 1.32;
+  color: var(--utility-text);
+}
+
+.hc-faq__item:first-child .hc-faq__question {
+  margin-top: 0;
+}
+
+.hc-faq__answer {
+  margin: 0;
+  padding-top: 0.1rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.68;
+  color: color-mix(in srgb, var(--utility-text-muted) 88%, var(--utility-text) 12%);
+}
+
+/* —— Policies —— */
+
+.hc-policies {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.hc-policies__item {
+  scroll-margin-top: 1rem;
+}
+
+.hc-policies__title {
+  margin: 0 0 0.45rem;
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.35;
+  color: var(--utility-primary-deep);
+}
+
+.hc-footer__hint {
+  margin: 0 0 0.65rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--utility-text-muted);
+}
+
+.hc-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+}
+
+.hc-footer__link {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--utility-text);
+  text-decoration: none;
+  text-decoration-color: color-mix(in srgb, var(--utility-brass) 65%, transparent);
+}
+
+.hc-footer__link:hover {
+  color: var(--utility-text);
+  text-decoration: underline;
+  text-decoration-color: var(--utility-brass);
+}

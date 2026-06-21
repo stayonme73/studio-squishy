@@ -1,0 +1,121 @@
+/* Campaign Journey Map — contextual progress nav (Details / Review / Delivery) */
+
+.cjm {
+  width: min(100%, 15.5rem);
+  padding: 0.65rem 0.75rem 0.7rem;
+  border-radius: 10px;
+}
+
+/* Utility pages — standard card surface only (no bf-material texture layers) */
+.cjm--utility {
+  background: var(--utility-paper-cream);
+  border: 1px solid var(--utility-border);
+  box-shadow: var(--utility-shadow);
+}
+
+.cjm__title {
+  margin: 0 0 0.45rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--utility-text-muted);
+}
+
+.cjm__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cjm__item {
+  margin: 0;
+}
+
+.cjm__link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.32rem 0.2rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--utility-text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+a.cjm__link:hover,
+a.cjm__link:focus-visible {
+  color: var(--utility-text);
+  background: color-mix(in srgb, var(--utility-text) 6%, transparent);
+  outline: none;
+}
+
+.cjm__link--disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.cjm__item--current .cjm__link {
+  color: var(--utility-text);
+  font-weight: 600;
+}
+
+.cjm__item--complete .cjm__link {
+  color: var(--utility-text);
+}
+
+.cjm__marker {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 0.95rem;
+  height: 0.95rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cjm__marker--complete {
+  color: var(--utility-brass);
+}
+
+.cjm__marker--current {
+  border-radius: 50%;
+  border: 2px solid var(--utility-primary);
+  background: color-mix(in srgb, var(--utility-primary) 12%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--utility-primary) 8%, transparent);
+}
+
+.cjm__marker--upcoming {
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--utility-text) 22%, transparent);
+  background: var(--utility-paper-cream);
+}
+
+.cjm__label {
+  min-width: 0;
+}
+
+@media (min-width: 48rem) {
+  .cjm {
+    width: min(100%, 17rem);
+  }
+}
+
+@media (max-width: 40rem) {
+  .utility-header__meta {
+    flex-direction: column;
+  }
+
+  .cjm {
+    width: 100%;
+    max-width: none;
+  }
+}

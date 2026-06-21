@@ -68,3 +68,70 @@
   outline-offset: 2px;
   opacity: 1;
 }
+
+/* View Ahead — zoom toward Draft Room doorway before Studio Guide prototype */
+.welcome-hall-plate--transitioning .welcome-hall-plate-art {
+  animation: hall-phase1-view-ahead-zoom 1.4s ease-in forwards;
+  transform-origin: 38% 42%;
+}
+
+.welcome-hall-plate--transitioning .welcome-hall-plate-ui > button {
+  pointer-events: none;
+}
+
+.welcome-hall-plate--transitioning .hall-view-ahead-transition {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.welcome-hall-plate--transitioning .hall-view-ahead-transition-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 38% 42%,
+    rgba(255, 210, 140, 0.55) 0%,
+    rgba(10, 10, 10, 0.95) 58%
+  );
+  animation: hall-phase1-view-ahead-fade 1.4s ease-in forwards;
+}
+
+@keyframes hall-phase1-view-ahead-zoom {
+  0% {
+    transform: scale(1);
+    filter: none;
+  }
+  70% {
+    transform: scale(2.8);
+    filter: saturate(1.05) contrast(1.04) brightness(1.04);
+  }
+  100% {
+    transform: scale(3.4);
+    opacity: 0;
+    filter: brightness(1.12);
+  }
+}
+
+@keyframes hall-phase1-view-ahead-fade {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-hall-plate--transitioning .welcome-hall-plate-art,
+  .welcome-hall-plate--transitioning .hall-view-ahead-transition-glow {
+    animation: none;
+  }
+
+  .welcome-hall-plate--transitioning .welcome-hall-plate-art {
+    opacity: 0;
+  }
+}

@@ -1,4 +1,6 @@
-# Studio Squishy
+# The Studio
+
+> **Product name:** The Studio · **Repository name:** `studio-squishy` (technical identifier until post–Phase 1 rename).
 
 A separate, web-first workspace experience hosted by Squishy.
 

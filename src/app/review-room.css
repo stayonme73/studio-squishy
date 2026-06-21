@@ -1,0 +1,71 @@
+/* Review Room — concept selection layout */
+
+/* Page shell, header, cards, buttons: utility-design-system.css */
+
+.rr-options {
+  --rr-teal: var(--utility-primary);
+  --rr-teal-deep: var(--utility-primary-deep);
+  --rr-gold: var(--board-family-mustard);
+  --rr-text-muted: var(--utility-text-muted);
+}
+
+@media (min-width: 48rem) {
+  .rr-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.rr-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.rr-card__badge {
+  display: inline-flex;
+  align-self: flex-start;
+  width: 1.65rem;
+  height: 1.65rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--rr-teal);
+}
+
+.rr-card__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.rr-card__tagline {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rr-gold);
+}
+
+.rr-card__body {
+  margin: 0;
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--rr-text-muted);
+}
+
+.rr-card__selected {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--utility-text);
+}
+
+.rr-card__cta {
+  align-self: flex-start;
+  margin-top: 0.35rem;
+}

@@ -1,0 +1,103 @@
+/**
+ * Board Family — texture material swatches (exploration only).
+ * Apply via .bf-material-paper | .bf-material-vellum | .bf-material-cork
+ */
+
+.bf-material {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--board-family-tile-radius);
+  isolation: isolate;
+}
+
+.bf-material > * {
+  position: relative;
+  z-index: 1;
+}
+
+.bf-material::before,
+.bf-material::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Option 3 baseline — Premium Paper */
+.bf-material-paper {
+  background-color: var(--board-family-tile);
+  border: 1px solid var(--board-family-tile-border);
+  box-shadow: var(--board-family-tile-shadow);
+}
+
+.bf-material-paper::before {
+  z-index: 0;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.62' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+}
+
+.bf-material-paper::after {
+  z-index: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 250, 242, 0.14);
+}
+
+/* Option 1 — Vellum (architectural, elegant) */
+.bf-material-vellum {
+  background: linear-gradient(
+    165deg,
+    var(--board-family-tile) 0%,
+    color-mix(in srgb, var(--board-family-tile) 55%, var(--board-family-cream) 45%) 52%,
+    var(--board-family-field) 100%
+  );
+  border: 1px solid #d4c8b6;
+  box-shadow:
+    0 2px 9px rgba(45, 45, 45, 0.04),
+    inset 0 0 0 1px rgba(255, 250, 242, 0.28);
+}
+
+.bf-material-vellum::before {
+  z-index: 0;
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+  background-image:
+    linear-gradient(90deg, rgba(86, 123, 109, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(86, 123, 109, 0.025) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  background-size:
+    18px 18px,
+    18px 18px,
+    200px 200px;
+}
+
+.bf-material-vellum::after {
+  z-index: 0;
+  background: linear-gradient(180deg, rgba(255, 250, 242, 0.2) 0%, transparent 38%);
+}
+
+/* Option 2 — Refined cork (warm creative, no pinholes) */
+.bf-material-cork {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--studio-paper) 92%, var(--studio-parchment) 8%) 0%,
+    var(--studio-paper) 100%
+  );
+  border: 1px solid var(--board-family-tile-border-strong);
+  box-shadow: var(--board-family-tile-shadow);
+}
+
+.bf-material-cork::before {
+  z-index: 0;
+  opacity: 0.055;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.45 0 0 0 0.55 0.38 0 0 0 0.42 0.28 0 0 0 0.34 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)' opacity='0.9'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+.bf-material-cork::after {
+  z-index: 0;
+  background: radial-gradient(circle at 18% 12%, rgba(255, 248, 236, 0.55), transparent 42%);
+  box-shadow: inset 0 1px 0 rgba(255, 250, 242, 0.42);
+}

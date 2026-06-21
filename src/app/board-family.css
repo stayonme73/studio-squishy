@@ -1,0 +1,45 @@
+/**
+ * Studio Board Family — shared crayon tokens.
+ * Surface materials: board-family-materials.css
+ * @see docs/studio-board-family-crayon.md
+ */
+
+:root {
+  /** Locked owner palette — Studio Paper approved */
+  --studio-paper: #ebe2d4;
+  --studio-ink: #2e2b28;
+  --studio-denim: #2c3e50;
+  --studio-brass: #b08d57;
+  --studio-muted: color-mix(in srgb, var(--studio-ink) 56%, transparent);
+
+  /** Legacy aliases — map to approved tokens */
+  --studio-parchment: var(--studio-paper);
+  --studio-steel: var(--studio-muted);
+
+  /** Board family — aliases locked tokens */
+  --board-family-cream: var(--studio-paper);
+  --board-family-tile: var(--studio-paper);
+  --board-family-field: color-mix(in srgb, var(--studio-paper) 86%, var(--studio-ink) 14%);
+  --board-family-tile-border: color-mix(in srgb, var(--studio-ink) 14%, transparent);
+  --board-family-tile-border-strong: color-mix(in srgb, var(--studio-ink) 22%, transparent);
+  --board-family-tile-radius: 10px;
+  --board-family-tile-shadow: 0 2px 10px rgba(46, 43, 40, 0.06);
+  --board-family-tile-shadow-strong:
+    0 3px 16px rgba(46, 43, 40, 0.09),
+    0 1px 3px rgba(46, 43, 40, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  --board-family-primary: var(--studio-denim);
+  --board-family-primary-deep: color-mix(in srgb, var(--studio-denim) 88%, #000 12%);
+  --board-family-terracotta: var(--studio-brass);
+  --board-family-mustard: var(--studio-brass);
+  --board-family-text: var(--studio-ink);
+  --board-family-text-muted: var(--studio-muted);
+  --board-family-text-soft: var(--studio-muted);
+
+  --board-tint-denim: var(--studio-denim);
+  --board-tint-ochre: var(--studio-brass);
+  --board-tint-sage: var(--studio-muted);
+  --board-tint-linen: var(--studio-paper);
+  /** @deprecated use --board-tint-denim */
+  --board-tint-eucalyptus: var(--studio-denim);
+}
