@@ -6,6 +6,8 @@ import DeliverablesScene from "@/components/deliverables/DeliverablesScene";
 
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
+import "../mobile-route-fixes.css";
+
 
 
 /** Final Delivery — campaign deliverables handoff (Phase 1). */

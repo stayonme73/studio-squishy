@@ -1,6 +1,7 @@
 import StudioGuidePlateScene from "@/components/studio-guide-prototype/StudioGuidePlateScene";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 import "../studio-guide-prototype.css";
+import "../mobile-route-fixes.css";
 
 type Props = {
   searchParams: Promise<{ debug?: string }>;

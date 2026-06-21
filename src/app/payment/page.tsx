@@ -3,6 +3,8 @@ import { parsePaymentPackageId } from "@/config/payment";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
+import "../mobile-route-fixes.css";
+
 type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };

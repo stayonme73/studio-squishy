@@ -6,6 +6,8 @@ import ReviewRoomScene from "@/components/review-room/ReviewRoomScene";
 
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
+import "../mobile-route-fixes.css";
+
 
 
 /** Review Room — campaign concept selection (Phase 1). */

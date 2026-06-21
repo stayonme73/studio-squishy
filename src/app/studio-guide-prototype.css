@@ -1242,3 +1242,116 @@
     transition: none;
   }
 }
+
+/* —— Mobile portrait — must remain last (route CSS loads after globals) —— */
+
+@media screen and (max-width: 1024px) {
+  main.journey-shell:has(.sg-proto) {
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    min-height: 100dvh;
+  }
+
+  .journey-shell:has(.sg-proto) {
+    overflow: auto;
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+  }
+
+  .journey-shell:has(.sg-proto--expanded) {
+    overflow: hidden;
+  }
+
+  .sg-proto {
+    overflow: visible;
+    height: auto;
+    min-height: 100dvh;
+    width: 100%;
+  }
+
+  .sg-proto-proposal-scene {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    width: 100%;
+    transform: none;
+    padding:
+      calc(0.35rem + env(safe-area-inset-top, 0px))
+      0.5rem
+      calc(0.35rem + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in srgb, var(--sg-denim) 18%, transparent);
+    pointer-events: auto;
+  }
+
+  .sg-proto-proposal {
+    width: 100%;
+    max-height: calc(
+      100dvh - 0.7rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+    );
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sg-proto-proposal-body {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    gap: 1.1rem;
+    padding: 0.9rem 0.85rem 1rem;
+    max-height: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    min-width: 0;
+  }
+
+  .sg-proto-proposal-identity {
+    order: 1;
+  }
+
+  .sg-proto-proposal-deliverables {
+    order: 2;
+  }
+
+  .sg-proto-proposal-margin-notes {
+    order: 3;
+  }
+
+  .sg-proto-proposal-policies {
+    order: 4;
+  }
+
+  .sg-proto-proposal-cta {
+    order: 5;
+    margin: 0;
+    padding: 1rem;
+    border-radius: 6px;
+  }
+
+  .sg-proto-proposal-deliverable-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sg-proto-proposal-title {
+    font-size: clamp(1.35rem, 7vw, 1.85rem);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+  }
+
+  .sg-proto-proposal-close,
+  .sg-proto-proposal-cta-button {
+    min-height: 2.85rem;
+  }
+
+  .sg-proto-proposal-coffee-ring {
+    display: none;
+  }
+
+  .sg-proto-art {
+    transform: scale(0.9);
+    transform-origin: 50% 72%;
+  }
+}

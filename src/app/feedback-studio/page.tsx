@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import FeedbackStudioScene from "@/components/feedback-studio/FeedbackStudioScene";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
+import "../mobile-route-fixes.css";
+
 /** Feedback Studio — concept review workspace. */
 export default function FeedbackStudioPage() {
   return (

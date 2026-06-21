@@ -420,3 +420,32 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* —— Mobile portrait — single column checkout —— */
+
+@media screen and (max-width: 1024px) {
+  main.journey-shell:has(.pay-shell) {
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    min-height: 100dvh;
+  }
+
+  .pay-checkout-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .pay-paper-card {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .pay-form-row {
+    grid-template-columns: 1fr !important;
+  }
+}

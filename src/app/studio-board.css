@@ -5331,3 +5331,147 @@ body:has(.sb--v4) {
   margin-bottom: 0.75rem;
 }
 
+/* —— Mobile portrait — must remain last (route CSS loads after globals) —— */
+
+@media screen and (max-width: 1024px) {
+  body:has(.sb--v4) {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
+    max-height: none;
+  }
+
+  main.journey-shell:has(.sb--v4) {
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    min-height: 100dvh;
+  }
+
+  .sb.sb--v4 {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .sb--v4 .sb-sidebar {
+    flex: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none;
+    overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--sb-denim) 18%, transparent);
+    padding: 0.65rem 0.75rem 0.55rem;
+    gap: 0.35rem;
+  }
+
+  .sb--v4 .sb-brand {
+    flex: 1 1 100%;
+  }
+
+  .sb--v4 .sb-nav {
+    flex: 1 1 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .sb--v4 .sb-nav__item {
+    flex: 1 1 calc(50% - 0.25rem);
+    width: auto;
+    min-height: 2.75rem;
+  }
+
+  .sb--v4 .sb-sidebar-lower {
+    display: none;
+  }
+
+  .sb--v4 .sb-main {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible;
+    padding: 0.75rem 0.85rem 1.35rem;
+  }
+
+  .sb--v4 .sb-board-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    width: 100% !important;
+    min-height: auto;
+    overflow: visible;
+    gap: 0.75rem;
+  }
+
+  .sb--v4 .sb-board-layout > .sb-card {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--current {
+    order: 1;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--progress {
+    order: 2;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--deliverables {
+    order: 3;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--package {
+    order: 4;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--studio-note {
+    order: 5;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--account-secondary {
+    order: 6;
+  }
+
+  .sb--v4 .sb-progress-panel__fit,
+  .sb--v4 .sb-studio-note-letter__fit {
+    transform: none !important;
+    width: 100% !important;
+  }
+
+  .sb--v4 .sb-header-v3__review-cta,
+  .sb--v4 .sb-journey__cta,
+  .sb--v4 .sb-progress-timeline__cta {
+    width: 100%;
+    max-width: 100%;
+    min-height: 2.85rem;
+  }
+
+  .sb-record-drawer {
+    justify-content: stretch;
+  }
+
+  .sb-record-drawer__panel {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    border-left: none;
+  }
+}

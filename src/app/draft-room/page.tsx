@@ -3,6 +3,7 @@ import DraftRoomScene from "@/components/draft-room/DraftRoomScene";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 import "../draft-room-intake.css";
+import "../mobile-route-fixes.css";
 
 type Props = {
   searchParams: Promise<{ package?: string; from?: string; begin?: string; edit?: string }>;

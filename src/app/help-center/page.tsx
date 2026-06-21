@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import HelpCenterScene from "@/components/help-center/HelpCenterScene";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
+import "../mobile-route-fixes.css";
+
 /** Studio Help Center — philosophy, FAQ, and policies. */
 export default function HelpCenterPage() {
   return (
