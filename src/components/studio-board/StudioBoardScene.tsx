@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import AccountPackageCard from "@/components/studio-board/AccountPackageCard";
 import CampaignBriefActions from "@/components/campaign-details/CampaignBriefActions";
+import CampaignNextAction from "@/components/studio-board/CampaignNextAction";
 import CampaignProgressPanel from "@/components/studio-board/CampaignProgressPanel";
 import CampaignRecordDrawer from "@/components/studio-board/CampaignRecordDrawer";
 import DeliverablesProgress from "@/components/studio-board/DeliverablesProgress";
@@ -249,7 +250,12 @@ export default function StudioBoardScene() {
           <NavItem href={routes.campaignDetails} icon="record" accent="record">
             {sidebar.campaignRecord}
           </NavItem>
-          <NavItem href={routes.feedbackStudio} icon="review" accent="review">
+          <NavItem
+            href={routes.feedbackStudio}
+            icon="review"
+            accent="review"
+            active={view.hasCampaign && view.status === "READY_FOR_REVIEW"}
+          >
             {sidebar.reviewRoom}
           </NavItem>
           <NavItem href={routes.deliverables} icon="delivery" accent="delivery">
@@ -331,6 +337,16 @@ export default function StudioBoardScene() {
                     onViewBrief={() => setRecordOpen(true)}
                     className="sb-current-campaign__brief-actions"
                     layout="stack"
+                  />
+                ) : null}
+
+                {view.hasCampaign ? (
+                  <CampaignNextAction
+                    campaign={campaign}
+                    hasCampaign={view.hasCampaign}
+                    status={view.status}
+                    nextUpdateLabel={view.headerSnapshot?.nextUpdate ?? null}
+                    studioGuideHref={studioGuideHref}
                   />
                 ) : null}
 

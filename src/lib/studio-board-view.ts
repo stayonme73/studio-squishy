@@ -265,9 +265,9 @@ const whatHappensNextSentences: Record<CampaignStatus, string> = {
 
   PAYMENT_RECEIVED: "The Studio is preparing to begin your campaign.",
 
-  BUILDING_CONCEPTS: "The Studio is building campaign concepts.",
+  BUILDING_CONCEPTS: "The Studio is building your campaign concepts. Check back here for your review invitation.",
 
-  READY_FOR_REVIEW: "Your concepts are ready for review.",
+  READY_FOR_REVIEW: "Your concepts are ready — review them and choose your direction.",
 
   DELIVERED: "Your package is ready to download.",
 
@@ -535,6 +535,8 @@ export type BoardCampaignActionId =
 
   | "chooseDirection"
 
+  | "choosePackage"
+
   | "downloadPackage"
 
   | "viewDeliverables";
@@ -563,6 +565,8 @@ export function resolveBoardCampaignActions(
 
   hasCampaign: boolean,
 
+  options?: { studioGuideHref?: string },
+
 ): BoardCampaignAction[] {
 
   if (!hasCampaign || !status) return [];
@@ -574,6 +578,26 @@ export function resolveBoardCampaignActions(
 
 
   switch (status) {
+
+    case "DRAFT_RECEIVED":
+
+      if (!options?.studioGuideHref) return [];
+
+      return [
+
+        {
+
+          id: "choosePackage",
+
+          label: copy.reviewConcepts,
+
+          href: options.studioGuideHref,
+
+          isPrimary: true,
+
+        },
+
+      ];
 
     case "READY_FOR_REVIEW":
 

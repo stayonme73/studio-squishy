@@ -264,7 +264,7 @@ export const studioBoard = {
     READY_FOR_REVIEW: {
       statusLabel: "Ready for Review",
       nextUpdateLabel: "When you review",
-      campaignProgressLabel: "Awaiting Your Feedback",
+      campaignProgressLabel: "Concepts Ready For Review",
       headerSubline: "Your concepts are ready — the Studio needs your feedback.",
       campaignDescription: "Your campaign concepts are ready. The Studio needs your feedback.",
       estimatedCompletion: "Review when ready",
@@ -367,16 +367,29 @@ export const studioBoard = {
     openCampaign: "Open Campaign",
     openCampaignCta: "OPEN CAMPAIGN",
     openCampaignRecord: "Open Campaign Record",
-    reviewConcepts: "Review Concepts",
+    reviewConcepts: "Review My Concepts",
     chooseDirection: "Choose Direction",
     downloadPackage: "Download Package",
     viewDeliverables: "View Deliverables",
     waitingOnStudio: "Waiting on Studio",
+    nextUpdatePrefix: "Next update:",
     reviewCampaigns: "Review Campaigns",
     viewDeliverablesLegacy: "View Deliverables",
     viewDeliverablesCta: "VIEW DELIVERABLES",
     unavailableHint: "Available when your campaign reaches this stage.",
     noActionsHint: "No actions available yet.",
+  },
+
+  nextAction: {
+    conceptsReadyLabel: "Concepts Ready For Review",
+    reviewMyConcepts: "Review My Concepts",
+    choosePackage: "Choose Your Package",
+    buildingConceptsLabel: "Building Concepts In Progress",
+    buildingConceptsHint:
+      "The Studio team is creating your campaign directions. Your Studio Board will update when concepts are ready for review.",
+    paymentReceivedLabel: "Campaign Queued",
+    paymentReceivedHint:
+      "Payment is confirmed. The Studio will begin concept development and notify you here when review is ready.",
   },
 
   activityFeed: {

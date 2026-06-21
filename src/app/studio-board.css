@@ -2758,6 +2758,48 @@ body:has(.sb--v4) {
   margin-top: 0.85rem;
 }
 
+.sb-next-action {
+  margin-top: 0.9rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--sb-denim) 6%, white);
+  border: 1px solid color-mix(in srgb, var(--sb-gold) 45%, transparent);
+}
+
+.sb-next-action--waiting {
+  background: color-mix(in srgb, var(--sb-cream) 88%, white);
+}
+
+.sb-next-action__status {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sb-denim);
+}
+
+.sb-next-action__lead {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--sb-denim);
+}
+
+.sb-next-action__hint,
+.sb-next-action__eta {
+  margin: 0.45rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--sb-denim) 72%, transparent);
+}
+
+.sb-next-action__cta {
+  margin-top: 0.65rem;
+  width: 100%;
+  justify-content: center;
+}
+
 .campaign-brief-actions {
   display: flex;
   flex-wrap: wrap;

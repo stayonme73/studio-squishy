@@ -14,7 +14,11 @@ import {
 
 function shouldAdvanceConceptsForPath(pathname: string | null) {
   if (!pathname) return false;
-  return pathname.includes("/feedback-studio") || pathname.includes("/review-room");
+  return (
+    pathname.includes("/studio-board") ||
+    pathname.includes("/feedback-studio") ||
+    pathname.includes("/review-room")
+  );
 }
 
 export function useCurrentCampaign() {
