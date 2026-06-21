@@ -16,6 +16,8 @@ type Props = {
   showView?: boolean;
   className?: string;
   layout?: "row" | "stack";
+  /** Primary button styling for the main record access action. */
+  prominent?: boolean;
 };
 
 /** View / edit campaign brief — intake editable until concepting begins. */
@@ -25,14 +27,19 @@ export default function CampaignBriefActions({
   showView = true,
   className = "",
   layout = "row",
+  prominent = false,
 }: Props) {
   if (!campaign || !resolveVisionData(campaign)) return null;
 
   const editable = isIntakeEditable(campaign.campaignStatus);
   const editHref = draftRoomEditHref(campaign.packageId);
+  const viewButtonClass = prominent
+    ? "utility-btn utility-btn--primary campaign-brief-actions__view"
+    : "utility-btn utility-btn--secondary";
   const rootClass = [
     "campaign-brief-actions",
     layout === "stack" ? "campaign-brief-actions--stack" : "",
+    prominent ? "campaign-brief-actions--prominent" : "",
     className,
   ]
     .filter(Boolean)
@@ -42,12 +49,12 @@ export default function CampaignBriefActions({
     <div className={rootClass}>
       {showView ? (
         onViewBrief ? (
-          <button type="button" className="utility-btn utility-btn--secondary" onClick={onViewBrief}>
-            {campaignBrief.viewLabel}
+          <button type="button" className={viewButtonClass} onClick={onViewBrief}>
+            {prominent ? campaignBrief.openRecordLabel : campaignBrief.viewLabel}
           </button>
         ) : (
-          <Link href={routes.campaignDetails} className="utility-btn utility-btn--secondary">
-            {campaignBrief.viewLabel}
+          <Link href={routes.campaignDetails} className={viewButtonClass}>
+            {prominent ? campaignBrief.openRecordLabel : campaignBrief.viewLabel}
           </Link>
         )
       ) : null}

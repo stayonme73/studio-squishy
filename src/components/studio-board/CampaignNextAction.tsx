@@ -34,12 +34,13 @@ export default function CampaignNextAction({
 
   if (primary && status === "READY_FOR_REVIEW") {
     return (
-      <div className="sb-next-action" role="status" aria-live="polite">
+      <div className="sb-next-action sb-next-action--review" role="status" aria-live="polite">
         <p className="sb-next-action__status">{nextCopy.conceptsReadyLabel}</p>
         <p className="sb-next-action__lead">{resolveWhatHappensNextSentence(campaign)}</p>
         <Link href={primary.href} className="utility-btn utility-btn--primary sb-next-action__cta">
           {nextCopy.reviewMyConcepts}
         </Link>
+        <p className="sb-next-action__hint">{nextCopy.reviewConceptsHint}</p>
       </div>
     );
   }
@@ -47,9 +48,10 @@ export default function CampaignNextAction({
   if (primary && status === "DELIVERED") {
     return (
       <div className="sb-next-action" role="status">
+        <p className="sb-next-action__status">{nextCopy.packageReadyLabel}</p>
         <p className="sb-next-action__lead">{resolveWhatHappensNextSentence(campaign)}</p>
         <Link href={primary.href} className="utility-btn utility-btn--primary sb-next-action__cta">
-          {primary.label}
+          {nextCopy.openFinalDelivery}
         </Link>
       </div>
     );

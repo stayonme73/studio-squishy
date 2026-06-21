@@ -87,17 +87,14 @@ export type StudioBoardView = {
 
 
 function campaignHeadline(name: string) {
-
   const base = formatCampaignTitle(name)
-
     .replace(/\s+campaign$/i, "")
-
     .trim();
 
   if (!base) return "Your Campaign";
+  if (base.includes(":")) return base;
 
   return base.replace(/\b\w+/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
-
 }
 
 
@@ -122,6 +119,7 @@ export type CampaignProgressStep = {
   state: CampaignProgressStepState;
   detail: string | null;
   href: string | null;
+  actionLabel?: string;
 };
 
 export type BoardHeaderSnapshot = {
@@ -180,7 +178,7 @@ function resolveProgressStepDetail(
   if (state === "current") {
     if (stageId === "BUILDING_CONCEPTS") return "In Progress";
     if (stageId === "DRAFT_RECEIVED") return "Awaiting payment";
-    if (stageId === "READY_FOR_REVIEW") return "Awaiting your review";
+    if (stageId === "READY_FOR_REVIEW") return studioBoard.nextAction.conceptsReadyLabel;
     if (stageId === "PAYMENT_RECEIVED") return "Queued";
     if (stageId === "DELIVERED") return "Complete";
     return null;
@@ -234,6 +232,12 @@ export function resolveCampaignProgressSteps(campaign: CampaignRecord | null): C
       state,
       detail: resolveProgressStepDetail(stage.id, state, campaign),
       href: resolveProgressStepHref(stage.id, state),
+      actionLabel:
+        state === "current" && stage.id === "READY_FOR_REVIEW"
+          ? studioBoard.nextAction.reviewMyConcepts
+          : state === "current" && stage.id === "DELIVERED"
+            ? studioBoard.nextAction.openFinalDelivery
+            : undefined,
     };
   });
 }

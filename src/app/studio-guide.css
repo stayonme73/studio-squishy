@@ -1314,3 +1314,24 @@ body:has(.studio-guide) {
     min-height: 2.85rem;
   }
 }
+
+.guide-compare {
+  max-width: min(72rem, 100%);
+  margin: 1.25rem auto 0;
+  padding: 1rem 1.1rem;
+}
+
+.guide-compare__help {
+  margin: 0.85rem 0 0;
+  font-size: 0.82rem;
+}
+
+.guide-compare__link {
+  font-weight: 600;
+  color: var(--studio-denim);
+  text-decoration: none;
+}
+
+.guide-compare__link:hover {
+  text-decoration: underline;
+}

@@ -72,8 +72,9 @@ export const FEEDBACK_SECTION_IDS: FeedbackSectionId[] = [
 ];
 
 export const feedbackStudio = {
-  pageTitle: "Feedback Studio",
-  eyebrow: "FEEDBACK STUDIO",
+  pageTitle: "Review Room",
+  pageSubtitle: "Feedback Studio",
+  eyebrow: "REVIEW ROOM",
   backLabel: "Back to Studio Board",
   pickerTitle: "Choose a campaign direction",
   pickerLead:

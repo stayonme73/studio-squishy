@@ -60,7 +60,7 @@ export default function FeedbackStudioScene() {
 
   function handleSelect(optionTitle: string) {
     selectCampaignOption(optionTitle);
-    router.push(studioBoard.routes.studioBoard);
+    router.push(studioBoard.routes.deliverables);
   }
 
   if (!ready) {
@@ -123,7 +123,7 @@ export default function FeedbackStudioScene() {
             backHref={pickerHref}
             activeNav="review-room"
             title={feedbackStudio.pageTitle}
-            lead={`Reviewing ${activeConcept.directionLabel} — ${activeConcept.tagline}`}
+            lead={`${feedbackStudio.pageSubtitle} — Reviewing ${activeConcept.directionLabel} · ${activeConcept.tagline}`}
           />
 
           <FeedbackStudioConceptReview
@@ -149,7 +149,7 @@ export default function FeedbackStudioScene() {
           backHref={studioBoard.routes.studioBoard}
           activeNav="review-room"
           title={feedbackStudio.pageTitle}
-          lead={feedbackStudio.pickerTitle}
+          lead={`${feedbackStudio.pageSubtitle} — ${feedbackStudio.pickerTitle}`}
           aside={
             <CampaignJourneyMap
               activeStep="review-room"

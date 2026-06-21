@@ -1,0 +1,153 @@
+/**
+ * Mobile journey — readable type, thumb targets, no horizontal scroll.
+ * Applies across utility pages + shared controls.
+ */
+
+@media (max-width: 48rem) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+
+  input,
+  select,
+  textarea,
+  .utility-btn {
+    font-size: max(1rem, 16px);
+  }
+
+  .utility-btn {
+    min-height: 2.75rem;
+    padding: 0.85rem 1.15rem;
+  }
+
+  .utility-page {
+    padding: 1rem 1rem 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  .utility-content,
+  .utility-header,
+  .utility-shell {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .utility-shell {
+    padding: 1.25rem 1rem;
+  }
+
+  .utility-card {
+    padding: 1rem 1.05rem;
+  }
+
+  .utility-topbar {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .utility-topbar__start,
+  .utility-topbar__title,
+  .utility-topbar__end {
+    justify-self: stretch;
+    text-align: left;
+  }
+
+  .utility-topbar__title {
+    text-align: center;
+    font-size: clamp(1.15rem, 5vw, 1.35rem);
+  }
+
+  .utility-header__meta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .journey-shell {
+    min-height: 100dvh;
+    height: auto;
+    max-height: none;
+    overflow-x: hidden;
+  }
+
+  .journey-shell:has(.sb--v4) {
+    overflow-y: auto;
+  }
+
+  .hc-section__title {
+    font-size: 1.05rem;
+  }
+
+  .hc-section__body,
+  .hc-faq__answer,
+  .hc-link-list__item {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .hc-faq__question {
+    font-size: 1rem;
+    padding: 0.85rem 0;
+  }
+
+  .pkg-compare__table {
+    min-width: 34rem;
+    font-size: 0.875rem;
+  }
+
+  .pkg-compare__pkg-head {
+    font-size: 0.8125rem;
+  }
+
+  .pay-checkout-grid,
+  .pay-paper-card__body {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .pay-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .fs-page__title {
+    font-size: clamp(1.25rem, 5.5vw, 1.5rem);
+  }
+
+  .fs-concept-card__title,
+  .rr-concept-card__title {
+    font-size: 1.05rem;
+  }
+
+  .fs-concept-card__body,
+  .rr-concept-card__body {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .hall-kiosk-secondary {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .hall-kiosk-secondary__prompt {
+    font-size: 0.72rem;
+  }
+
+  .hall-kiosk-secondary__link {
+    font-size: 0.8125rem;
+  }
+
+  .guide-sidebar-card {
+    min-height: 3rem;
+  }
+
+  .guide-sidebar-card__label {
+    font-size: 0.9375rem;
+  }
+}

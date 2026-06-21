@@ -6,6 +6,7 @@ import { ensureCampaignConceptsOnRecord } from "@/lib/campaign-concepts";
 import {
   mergeVisionData,
   normalizeDraftIntakeFormValues,
+  resolveCampaignCustomerName,
   resolveDraftIntakeProject,
   visionDataHasContent,
 } from "@/lib/campaign-vision";
@@ -203,7 +204,9 @@ export function createCampaignFromIntake(payload: DraftIntakePayload): CampaignR
 
   return {
     campaignId: crypto.randomUUID(),
-    campaignName: campaignNameFromProject(resolveDraftIntakeProject(vision) || payload.project),
+    campaignName: campaignNameFromProject(
+      resolveCampaignCustomerName(vision) || resolveDraftIntakeProject(vision) || payload.project,
+    ),
     campaignStatus: "DRAFT_RECEIVED",
     campaignDescription: content.campaignDescription,
     estimatedCompletion: content.estimatedCompletion,
@@ -334,7 +337,9 @@ export function upsertCampaignFromIntake(payload: DraftIntakePayload) {
     let updated: CampaignRecord = {
       ...existing,
       campaignName: campaignNameFromProject(
-        resolveDraftIntakeProject(visionDataFromPayload(payload)) || payload.project,
+        resolveCampaignCustomerName(visionDataFromPayload(payload)) ||
+          resolveDraftIntakeProject(visionDataFromPayload(payload)) ||
+          payload.project,
       ),
       packageId: payload.packageId,
       packageLabel: payload.packageLabel,

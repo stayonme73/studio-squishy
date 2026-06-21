@@ -153,8 +153,8 @@ export const studioBoard = {
     {
       id: "READY_FOR_REVIEW" as const,
       label: "Ready For Review",
-      boardLabel: "Review Room",
-      hint: "You'll review and choose.",
+      boardLabel: "Concepts Ready For Review",
+      hint: "Review and choose your direction.",
     },
     {
       id: "DELIVERED" as const,
@@ -383,13 +383,16 @@ export const studioBoard = {
   nextAction: {
     conceptsReadyLabel: "Concepts Ready For Review",
     reviewMyConcepts: "Review My Concepts",
+    reviewConceptsHint: "Tap the button to open Review Room and choose your campaign direction.",
     choosePackage: "Choose Your Package",
     buildingConceptsLabel: "Building Concepts In Progress",
     buildingConceptsHint:
       "The Studio team is creating your campaign directions. Your Studio Board will update when concepts are ready for review.",
     paymentReceivedLabel: "Campaign Queued",
     paymentReceivedHint:
-      "Payment is confirmed. The Studio will begin concept development and notify you here when review is ready.",
+      "Payment is confirmed. The Studio will begin concept development. Check your Studio Board for status updates.",
+    packageReadyLabel: "Your Package Is Ready",
+    openFinalDelivery: "Open Final Delivery",
   },
 
   activityFeed: {
@@ -422,6 +425,7 @@ export const studioBoard = {
 
   campaignBrief: {
     viewLabel: "View Campaign Brief",
+    openRecordLabel: "Open Campaign Record",
     editLabel: "Edit Campaign Brief",
     editableHint: "Review or update your answers before campaign development begins.",
     lockedMessage:
@@ -437,7 +441,16 @@ export const studioBoard = {
 
   progressCard: {
     heading: "Campaign Progress",
+    journeyHeading: "Your Campaign Journey",
     timelineHeading: "Recent Updates",
+  },
+
+  packageSummary: {
+    heading: "Your Selected Package",
+    emptyHint: "Package details appear once you choose a plan.",
+    compareLink: "Compare all packages",
+    revisionLine: (rounds: number) =>
+      `${rounds} Revision Round${rounds === 1 ? "" : "s"} Included`,
   },
 
   inspirationTicker: {

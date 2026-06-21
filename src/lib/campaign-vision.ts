@@ -1,8 +1,10 @@
 import {
+  draftRoom,
   EMPTY_DRAFT_INTAKE_FORM,
   formatProjectValue,
   type DraftIntakeFormValues,
   type DraftIntakePayload,
+  type DraftIntakeProjectStarterId,
 } from "@/config/draft-room";
 
 /** Resolved campaign / project label from wizard fields. */
@@ -12,6 +14,30 @@ export function resolveDraftIntakeProject(values: DraftIntakeFormValues): string
     return formatProjectValue(values.projectStarter, values.projectDetail).trim();
   }
   return "";
+}
+
+function isBareStarterLabel(project: string, starter: DraftIntakeProjectStarterId | ""): boolean {
+  if (!starter || starter === "other") return false;
+  const chip = draftRoom.intakeForm.sections.project.starterChips.find((entry) => entry.id === starter);
+  if (!chip) return false;
+  return project.trim().toLowerCase() === chip.label.toLowerCase();
+}
+
+/** Customer-facing campaign name — prefer specific detail over generic chip labels. */
+export function resolveCampaignCustomerName(values: DraftIntakeFormValues): string {
+  const normalized = normalizeDraftIntakeFormValues(values);
+  const project = resolveDraftIntakeProject(normalized);
+
+  if (normalized.projectDetail.trim() && normalized.projectStarter) {
+    return formatProjectValue(normalized.projectStarter, normalized.projectDetail).trim();
+  }
+
+  if (project && !isBareStarterLabel(project, normalized.projectStarter)) {
+    return project;
+  }
+
+  if (normalized.business.trim()) return normalized.business.trim();
+  return project;
 }
 
 export function normalizeDraftIntakeFormValues(

@@ -14,6 +14,7 @@ import { readLastDraftIntake } from "@/lib/draft-intake";
 import {
   mergeVisionData,
   normalizeDraftIntakeFormValues,
+  resolveCampaignCustomerName,
   resolveDraftIntakeProject,
 } from "@/lib/campaign-vision";
 
@@ -79,8 +80,14 @@ export function resolveVisionData(campaign: CampaignRecord): DraftIntakeFormValu
 
 /** Short campaign label for board cards — project only, not the full intake blob. */
 export function resolveCampaignDisplayName(campaign: CampaignRecord): string {
+  const vision = resolveVisionData(campaign);
+  if (vision) {
+    const name = resolveCampaignCustomerName(vision);
+    if (name) return name;
+  }
+
   if (campaign.visionData) {
-    const project = resolveDraftIntakeProject(
+    const project = resolveCampaignCustomerName(
       normalizeDraftIntakeFormValues({
         ...EMPTY_DRAFT_INTAKE_FORM,
         ...campaign.visionData,
@@ -88,9 +95,6 @@ export function resolveCampaignDisplayName(campaign: CampaignRecord): string {
     );
     if (project) return project;
   }
-
-  const vision = resolveVisionData(campaign);
-  if (vision?.project) return vision.project;
 
   const name = campaign.campaignName.trim();
   if (!name) return name;

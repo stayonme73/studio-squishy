@@ -1963,6 +1963,10 @@ body:has(.sb--v4) {
 
   .sb-main {
     overflow: visible;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.75rem 0.85rem 1rem;
+    box-sizing: border-box;
   }
 
   .sb-grid {
@@ -2766,6 +2770,17 @@ body:has(.sb--v4) {
   border: 1px solid color-mix(in srgb, var(--sb-gold) 45%, transparent);
 }
 
+.sb-next-action--review {
+  background: color-mix(in srgb, var(--sb-teal) 12%, white);
+  border: 2px solid color-mix(in srgb, var(--sb-teal) 55%, var(--sb-gold) 45%);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--sb-teal) 18%, transparent);
+}
+
+.sb-next-action--review .sb-next-action__cta {
+  font-size: 0.88rem;
+  padding: 0.85rem 1.15rem;
+}
+
 .sb-next-action--waiting {
   background: color-mix(in srgb, var(--sb-cream) 88%, white);
 }
@@ -3072,6 +3087,15 @@ body:has(.sb--v4) {
   padding: 0 0.1rem;
 }
 
+.sb-header-v3__review-cta {
+  grid-column: 3;
+  justify-self: end;
+  width: 100%;
+  max-width: 16rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .sb-ticker {
   position: relative;
   display: flex;
@@ -3218,17 +3242,97 @@ body:has(.sb--v4) {
   overflow: hidden;
 }
 
-/* —— Studio Board V4 — four panels + dedicated note column —— */
+/* —— Studio Board V4 — three-column board + side stack —— */
 
 .sb-board-layout {
   display: grid;
   flex: 1;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--sb-grid-gap);
   min-height: 0;
   overflow: hidden;
 }
 
+.sb-board-layout .sb-card--current {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.sb-board-layout .sb-card--progress {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.sb-board-layout .sb-card--deliverables {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.sb-board-layout .sb-card--package {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.sb-board-layout .sb-card--studio-note {
+  grid-column: 3;
+  grid-row: 1;
+  padding: var(--sb-tile-padding-y) var(--sb-tile-padding-x);
+}
+
+.sb-board-layout .sb-card--account-secondary {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.sb-board-layout .sb-card--current,
+.sb-board-layout .sb-card--progress,
+.sb-board-layout .sb-card--deliverables,
+.sb-board-layout .sb-card--package,
+.sb-board-layout .sb-card--studio-note,
+.sb-board-layout .sb-card--account-secondary {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sb-board-layout .sb-card--account-secondary .sb-account__list {
+  gap: 0.35rem;
+}
+
+.sb-board-layout .sb-card--account-secondary .sb-account__row {
+  gap: 0.1rem;
+}
+
+.sb-board-layout .sb-card--account-secondary .sb-account__label,
+.sb-board-layout .sb-card--account-secondary .sb-account__value {
+  font-size: 0.72rem;
+}
+
+.sb-board-side-column {
+  display: flex;
+  flex-direction: column;
+  grid-column: 3;
+  grid-row: 1 / 3;
+  gap: var(--sb-grid-gap);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sb-board-side-column .sb-card--studio-note {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--sb-tile-padding-y) var(--sb-tile-padding-x);
+}
+
+.sb-board-side-column .sb-card--account-secondary {
+  flex: 0 0 auto;
+  max-height: min(38%, 14rem);
+  padding: calc(var(--sb-tile-padding-y) * 0.85) var(--sb-tile-padding-x);
+}
+
+/* Legacy nested grid — kept for older markup references */
 .sb-grid--v4 {
   display: grid;
   grid-column: 1 / 3;
@@ -3273,7 +3377,7 @@ body:has(.sb--v4) {
   display: grid;
   grid-column: 3;
   grid-row: 1;
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--sb-grid-gap);
   min-height: 0;
   overflow: hidden;
@@ -3795,6 +3899,17 @@ body:has(.sb--v4) {
   text-decoration-color: var(--sb-gold);
 }
 
+.sb-deliverables-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.sb-deliverables-progress__cta {
+  align-self: flex-start;
+  margin-top: 0.15rem;
+}
+
 .sb--v3 .sb-card--current,
 .sb--v4 .sb-card--current {
   box-shadow:
@@ -4203,12 +4318,23 @@ body:has(.sb--v4) {
 }
 
 .sb--v3 .sb-card--deliverables,
-.sb--v4 .sb-card--deliverables {
+.sb--v4 .sb-card--deliverables,
+.sb--v4 .sb-card--package {
   padding-bottom: calc(var(--sb-tile-padding-y) + 1.75rem);
 }
 
+.sb--v4 .sb-card--package .sb-package-summary {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
 .sb--v3 .sb-card--account,
-.sb--v4 .sb-card--account {
+.sb--v4 .sb-card--account,
+.sb--v4 .sb-card--account-secondary {
   padding-top: calc(var(--sb-tile-padding-y) + 0.15rem);
   padding-inline: calc(var(--sb-tile-padding-x) + 0.1rem);
   padding-bottom: calc(var(--sb-tile-padding-y) + 1.75rem);
@@ -4651,7 +4777,28 @@ body:has(.sb--v4) {
 
   .sb-board-layout {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
     overflow: visible;
+  }
+
+  .sb-board-layout .sb-card--current,
+  .sb-board-layout .sb-card--progress,
+  .sb-board-layout .sb-card--deliverables,
+  .sb-board-layout .sb-card--package,
+  .sb-board-layout .sb-card--studio-note,
+  .sb-board-layout .sb-card--account-secondary {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .sb-board-side-column {
+    grid-column: 1;
+    grid-row: auto;
+    overflow: visible;
+  }
+
+  .sb-board-side-column .sb-card--account-secondary {
+    max-height: none;
   }
 
   .sb-grid--v4 {
@@ -4697,6 +4844,13 @@ body:has(.sb--v4) {
     grid-column: 1;
   }
 
+  .sb-header-v3__review-cta {
+    grid-column: 1;
+    justify-self: stretch;
+    max-width: none;
+    margin-top: 0.35rem;
+  }
+
   .sb-ticker {
     grid-column: 1;
     max-width: none;
@@ -4720,8 +4874,21 @@ body:has(.sb--v4) {
 /* Mobile — readable stacked board (V4 journey) */
 
 @media (max-width: 768px) {
+  .sb {
+    --sb-type-xs: 0.8125rem;
+    --sb-type-sm: 0.9375rem;
+    --sb-type-base: 1rem;
+    --sb-type-md: 1.0625rem;
+    --sb-type-lg: 1.2rem;
+    --sb-type-display: 1.35rem;
+    --sb-tile-padding-y: 1rem;
+    --sb-tile-padding-x: 1rem;
+    --sb-grid-gap: 0.75rem;
+  }
+
   .sb--v4 .sb-main {
-    padding: 0.55rem 0.65rem 1.1rem;
+    padding: 0.75rem 0.85rem 1.35rem;
+    overflow-x: hidden;
   }
 
   .sb--v4 .sb-board-layout {
@@ -4730,6 +4897,23 @@ body:has(.sb--v4) {
     gap: var(--sb-grid-gap);
     min-height: auto;
     overflow: visible;
+    width: 100%;
+  }
+
+  .sb--v4 .sb-board-layout > .sb-card,
+  .sb--v4 .sb-board-side-column .sb-card {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sb--v4 .sb-board-side-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sb-grid-gap);
+    min-height: auto;
+    overflow: visible;
+    width: 100%;
   }
 
   .sb--v4 .sb-grid.sb-grid--v4 {
@@ -4756,7 +4940,9 @@ body:has(.sb--v4) {
   .sb--v4 .sb-card--current,
   .sb--v4 .sb-card--progress,
   .sb--v4 .sb-card--deliverables,
+  .sb--v4 .sb-card--package,
   .sb--v4 .sb-card--account,
+  .sb--v4 .sb-card--account-secondary,
   .sb--v4 .sb-card--studio-note {
     grid-column: auto;
     grid-row: auto;
@@ -4764,9 +4950,140 @@ body:has(.sb--v4) {
     overflow: visible;
   }
 
+  .sb--v4 .sb-sidebar {
+    padding: 0.85rem 0.85rem 0.65rem;
+  }
+
+  .sb--v4 .sb-nav__item {
+    min-height: 2.75rem;
+    padding: 0.55rem 0.65rem;
+    font-size: 0.9375rem;
+  }
+
+  .sb--v4 .sb-nav__icon {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .sb--v4 .sb-nav__action-hint {
+    font-size: 0.75rem;
+  }
+
+  .sb--v4 .sb-header-v3__title {
+    font-size: clamp(1.5rem, 7vw, 1.95rem);
+  }
+
+  .sb--v4 .sb-header-v3__greeting {
+    font-size: 1rem;
+  }
+
+  .sb--v4 .sb-header-v3__review-cta {
+    min-height: 2.75rem;
+    font-size: 0.875rem;
+  }
+
+  .sb--v4 .sb-current-campaign__name {
+    font-size: clamp(1.25rem, 5.5vw, 1.55rem);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .sb--v4 .sb-current-campaign__metrics {
+    gap: 0.55rem;
+  }
+
   .sb--v4 .sb-current-campaign__metric {
     grid-template-columns: 1fr;
-    gap: 0.12rem;
+    gap: 0.15rem;
+    font-size: 0.9375rem;
+  }
+
+  .sb--v4 .sb-next-action__status {
+    font-size: 0.8125rem;
+  }
+
+  .sb--v4 .sb-next-action__lead,
+  .sb--v4 .sb-next-action__hint {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .sb--v4 .sb-next-action__cta {
+    min-height: 2.85rem;
+    font-size: 0.875rem;
+  }
+
+  .sb--v4 .sb-card__tab {
+    font-size: 0.8125rem;
+    letter-spacing: 0.1em;
+  }
+
+  .sb--v4 .sb-progress-panel__body {
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-progress-panel__fit,
+  .sb--v4 .sb-studio-note-letter__fit {
+    transform: none;
+    width: 100%;
+  }
+
+  .sb--v4 .sb-progress-panel__timeline-heading {
+    font-size: 0.75rem;
+  }
+
+  .sb--v4 .sb-progress-panel__update-date {
+    font-size: 0.75rem;
+  }
+
+  .sb--v4 .sb-progress-panel__update {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+
+  .sb--v4 .sb-progress-timeline__label,
+  .sb--v4 .sb-journey__label {
+    font-size: 0.9375rem;
+  }
+
+  .sb--v4 .sb-progress-timeline__detail,
+  .sb--v4 .sb-journey__detail {
+    font-size: 0.875rem;
+  }
+
+  .sb--v4 .sb-progress-timeline__cta,
+  .sb--v4 .sb-journey__cta {
+    min-height: 2.75rem;
+    width: 100%;
+    font-size: 0.875rem;
+  }
+
+  .sb--v4 .sb-deliverables-progress__label,
+  .sb--v4 .sb-deliverables-progress__count {
+    font-size: 0.875rem;
+  }
+
+  .sb--v4 .sb-deliverables-progress__cta {
+    min-height: 2.75rem;
+    width: 100%;
+  }
+
+  .sb--v4 .sb-package-summary__package {
+    font-size: 1.125rem;
+  }
+
+  .sb--v4 .sb-package-summary__item {
+    font-size: 0.9375rem;
+  }
+
+  .sb--v4 .sb-account__label,
+  .sb--v4 .sb-account__value {
+    font-size: 0.875rem;
+  }
+
+  .sb--v4 .sb-board-side-column .sb-card--account-secondary .sb-account__label,
+  .sb--v4 .sb-board-side-column .sb-card--account-secondary .sb-account__value {
+    font-size: 0.875rem;
   }
 
   .sb--v4 .sb-activity__body {
@@ -4776,7 +5093,7 @@ body:has(.sb--v4) {
 
   .sb--v4 .sb-account__row {
     grid-template-columns: 1fr;
-    gap: 0.12rem;
+    gap: 0.15rem;
   }
 
   .sb--v4 .sb-deliverables-progress__head {
@@ -4791,6 +5108,11 @@ body:has(.sb--v4) {
     overflow: visible;
   }
 
+  .sb--v4 .sb-studio-note-letter__body {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
   .sb--v4 .sb-idea-wall {
     max-height: none;
   }
@@ -4800,18 +5122,205 @@ body:has(.sb--v4) {
     margin-inline: auto;
   }
 
-  .sb--v4 .sb-header-v3__title {
-    font-size: clamp(1.45rem, 7vw, 1.85rem);
-  }
-
   .sb--v4 .sb-ticker__message {
-    font-size: 0.68rem;
+    font-size: 0.8125rem;
     letter-spacing: 0.035em;
   }
 
   .sb-record-drawer__panel {
     width: 100%;
     min-width: 0;
+    max-width: 100%;
   }
+
+  .campaign-brief-actions__cta {
+    min-height: 2.75rem;
+    width: 100%;
+  }
+}
+
+/* —— Customer journey roadmap —— */
+
+.sb-journey {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.sb-journey__step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.sb-journey__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+
+.sb-journey__marker {
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.1rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.sb-journey__marker--complete {
+  background: color-mix(in srgb, var(--sb-denim) 18%, white);
+  color: var(--sb-denim);
+}
+
+.sb-journey__marker--current {
+  border: 2px solid var(--sb-gold);
+  background: white;
+}
+
+.sb-journey__marker--upcoming {
+  border: 1px solid color-mix(in srgb, var(--sb-text) 20%, transparent);
+  background: transparent;
+}
+
+.sb-journey__label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--sb-text);
+}
+
+.sb-journey__detail {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.72rem;
+  color: var(--sb-text-muted);
+}
+
+.sb-journey__step--current .sb-journey__label {
+  color: var(--sb-denim);
+}
+
+.sb-journey__step--upcoming .sb-journey__label {
+  color: var(--sb-text-muted);
+}
+
+.sb-journey__cta {
+  margin-left: 1.65rem;
+  width: calc(100% - 1.65rem);
+  justify-content: center;
+  font-size: 0.78rem;
+}
+
+.sb-progress-panel__pipeline {
+  margin-top: 0.85rem;
+}
+
+.sb-progress-panel__pipeline-summary {
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sb-text-muted);
+}
+
+.sb-progress-timeline__cta {
+  margin: 0.35rem 0 0 2rem;
+  width: calc(100% - 2rem);
+  justify-content: center;
+  font-size: 0.72rem;
+}
+
+/* —— Package summary —— */
+
+.sb-package-summary {
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--sb-denim) 12%, transparent);
+}
+
+.sb-package-summary__package {
+  margin: 0 0 0.55rem;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--sb-denim);
+}
+
+.sb-package-summary__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sb-package-summary__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--sb-text);
+}
+
+.sb-package-summary__check {
+  flex-shrink: 0;
+  color: var(--sb-denim);
+  font-weight: 800;
+}
+
+.sb-package-summary__empty,
+.sb-package-summary__link {
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.sb-package-summary__link {
+  display: inline-block;
+  margin-top: 0.55rem;
+  font-weight: 600;
+  color: var(--sb-denim);
+  text-decoration: none;
+}
+
+.sb-package-summary__link:hover {
+  text-decoration: underline;
+}
+
+/* —— Nav action hints —— */
+
+.sb-nav__label-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.sb-nav__item--action .sb-nav__action-hint {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sb-gold);
+}
+
+.campaign-brief-actions--prominent .campaign-brief-actions__view {
+  width: 100%;
+  justify-content: center;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.campaign-brief-actions--prominent {
+  margin-bottom: 0.75rem;
 }
 

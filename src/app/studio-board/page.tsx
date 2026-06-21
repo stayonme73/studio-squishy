@@ -3,6 +3,8 @@ import { Caveat, Inter } from "next/font/google";
 
 import StudioBoardScene from "@/components/studio-board/StudioBoardScene";
 
+import "../studio-board.css";
+
 /** Script accent for sidebar brand “the” only. */
 const caveat = Caveat({
   subsets: ["latin"],

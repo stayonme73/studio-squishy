@@ -10,9 +10,7 @@ import CampaignNextAction from "@/components/studio-board/CampaignNextAction";
 import CampaignProgressPanel from "@/components/studio-board/CampaignProgressPanel";
 import CampaignRecordDrawer from "@/components/studio-board/CampaignRecordDrawer";
 import DeliverablesProgress from "@/components/studio-board/DeliverablesProgress";
-import IdeaWall from "@/components/studio-board/IdeaWall";
-import InspirationTicker from "@/components/studio-board/InspirationTicker";
-import StudioCreativeWall from "@/components/studio-board/StudioCreativeWall";
+import PackageSummaryPanel from "@/components/studio-board/PackageSummaryPanel";
 import StudioNotePanel from "@/components/studio-board/StudioNotePanel";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
 import HelpCenterLink from "@/components/shared/HelpCenterLink";
@@ -25,9 +23,9 @@ import {
   type GreetingPeriod,
 } from "@/lib/studio-board-view";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
+import { statusNeedsReviewAction } from "@/lib/customer-journey";
 
 const {
-  assets,
   sidebar,
   userName,
   empty: emptyCopy,
@@ -133,17 +131,22 @@ function NavItem({
   accent,
   icon,
   children,
+  actionHint,
+  onClick,
 }: {
   href?: string;
   active?: boolean;
   accent?: SidebarNavAccent;
   icon: SidebarIconName;
   children: ReactNode;
+  actionHint?: string;
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
   const className = [
     "sb-nav__item",
     active ? "sb-nav__item--active" : "sb-nav__item--link",
     accent ? `sb-nav__item--accent-${accent}` : "",
+    actionHint ? "sb-nav__item--action" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -152,13 +155,16 @@ function NavItem({
       <span className="sb-nav__icon" aria-hidden>
         <SidebarIcon name={icon} />
       </span>
-      <span className="sb-nav__label">{children}</span>
+      <span className="sb-nav__label-wrap">
+        <span className="sb-nav__label">{children}</span>
+        {actionHint ? <span className="sb-nav__action-hint">{actionHint}</span> : null}
+      </span>
     </>
   );
 
   if (href) {
     return (
-      <Link href={href} className={className}>
+      <Link href={href} className={className} onClick={onClick}>
         {content}
       </Link>
     );
@@ -235,19 +241,21 @@ export default function StudioBoardScene() {
           <NavItem href={routes.welcomeHall} icon="hall">
             {sidebar.welcomeHall}
           </NavItem>
-          <NavItem active accent="board" icon="board">
-            {sidebar.studioBoard}
-          </NavItem>
-          <NavItem href={draftRoomHref} icon="new">
-            {sidebar.newCampaign}
-          </NavItem>
           <NavItem href={studioGuideHref} icon="guide">
             {sidebar.studioGuide}
           </NavItem>
-          <NavItem href={routes.helpCenter} icon="help" accent="help">
-            {sidebar.helpCenter}
+          <NavItem active accent="board" icon="board">
+            {sidebar.studioBoard}
           </NavItem>
-          <NavItem href={routes.campaignDetails} icon="record" accent="record">
+          <NavItem
+            href={routes.studioBoard}
+            icon="record"
+            accent="record"
+            onClick={(event) => {
+              event.preventDefault();
+              setRecordOpen(true);
+            }}
+          >
             {sidebar.campaignRecord}
           </NavItem>
           <NavItem
@@ -255,16 +263,34 @@ export default function StudioBoardScene() {
             icon="review"
             accent="review"
             active={view.hasCampaign && view.status === "READY_FOR_REVIEW"}
+            actionHint={
+              statusNeedsReviewAction(view.status)
+                ? studioBoard.nextAction.reviewMyConcepts
+                : undefined
+            }
           >
             {sidebar.reviewRoom}
           </NavItem>
-          <NavItem href={routes.deliverables} icon="delivery" accent="delivery">
+          <NavItem
+            href={routes.deliverables}
+            icon="delivery"
+            accent="delivery"
+            active={view.hasCampaign && view.status === "DELIVERED"}
+            actionHint={
+              view.status === "DELIVERED" ? studioBoard.nextAction.openFinalDelivery : undefined
+            }
+          >
             {sidebar.finalDelivery}
+          </NavItem>
+          <NavItem href={routes.helpCenter} icon="help" accent="help">
+            {sidebar.helpCenter}
+          </NavItem>
+          <NavItem href={draftRoomHref} icon="new">
+            {sidebar.newCampaign}
           </NavItem>
         </nav>
 
         <div className="sb-sidebar-lower">
-          <IdeaWall />
           <StudioBoardDevStatus placement="sidebar" />
         </div>
       </aside>
@@ -282,118 +308,125 @@ export default function StudioBoardScene() {
                 <p className="sb-header-v3__greeting sb-header-v3__greeting--loading" aria-busy="true" />
               )}
             </div>
-            <InspirationTicker />
+            {view.hasCampaign && statusNeedsReviewAction(view.status) ? (
+              <Link
+                href={routes.feedbackStudio}
+                className="utility-btn utility-btn--primary sb-header-v3__review-cta"
+              >
+                {studioBoard.nextAction.reviewMyConcepts}
+              </Link>
+            ) : null}
           </div>
         </header>
 
         <div className="sb-board-layout">
-          <div className="sb-grid sb-grid--v4">
-            <article
-              className="sb-card sb-card--current bf-material bf-material-paper"
-              aria-labelledby="sb-current-campaign-title"
-            >
-              <p className="sb-card__tab">{currentCampaignCopy.heading}</p>
-              <div className="sb-current-campaign" aria-live="polite">
-                <h2
-                  id="sb-current-campaign-title"
-                  className={`sb-current-campaign__name${view.hasCampaign ? "" : " sb-current-campaign__name--empty"}`}
-                >
-                  {view.hasCampaign ? view.campaignTitle : emptyCopy.campaignNamePlaceholder}
-                </h2>
-
-                {view.hasCampaign ? (
-                  <div className="sb-current-campaign__metrics">
-                    {view.packageLabel ? (
-                      <CampaignMetric label={currentCampaignCopy.package} value={view.packageLabel} />
-                    ) : null}
-                    <CampaignMetric label={currentCampaignCopy.status} value={view.statusLabel} />
-                    {view.campaignProgressLabel ? (
-                      <CampaignMetric
-                        label={currentCampaignCopy.campaignStage}
-                        value={view.campaignProgressLabel}
-                      />
-                    ) : null}
-                    <CampaignMetric
-                      label={currentCampaignCopy.campaignsRemaining}
-                      value={account.campaignsRemaining}
-                    />
-                    <CampaignMetric
-                      label={currentCampaignCopy.emailsRemaining}
-                      value={account.emailsRemaining}
-                    />
-                    <CampaignMetric label={currentCampaignCopy.smsRemaining} value={account.smsRemaining} />
-                    <CampaignMetric
-                      label={currentCampaignCopy.revisionsRemaining}
-                      value={account.revisionsRemaining}
-                    />
-                  </div>
-                ) : (
-                  <p className="sb-current-campaign__empty">{emptyCopy.campaignDescription}</p>
-                )}
-
-                {view.hasCampaign && campaign ? (
-                  <CampaignBriefActions
-                    campaign={campaign}
-                    onViewBrief={() => setRecordOpen(true)}
-                    className="sb-current-campaign__brief-actions"
-                    layout="stack"
-                  />
-                ) : null}
-
-                {view.hasCampaign ? (
-                  <CampaignNextAction
-                    campaign={campaign}
-                    hasCampaign={view.hasCampaign}
-                    status={view.status}
-                    nextUpdateLabel={view.headerSnapshot?.nextUpdate ?? null}
-                    studioGuideHref={studioGuideHref}
-                  />
-                ) : null}
-
-                {view.hasCampaign &&
-                (view.status === "DRAFT_RECEIVED" || view.status === "PAYMENT_RECEIVED") ? (
-                  <HelpCenterLink
-                    label={helpCenter.boardLinks.awaitingPayment.label}
-                    anchor={helpCenter.boardLinks.awaitingPayment.anchor}
-                    from="studio-board"
-                    className="sb-help-link"
-                  />
-                ) : null}
-
-                {!view.hasCampaign ? (
-                  <Link href={draftRoomHref} className="utility-btn utility-btn--primary sb-current-campaign__record">
-                    {emptyCopy.primaryCta}
-                  </Link>
-                ) : null}
-              </div>
-            </article>
-
-            <article className="sb-card sb-card--progress bf-material bf-material-paper">
-              <CampaignProgressPanel steps={view.progressSteps} timeline={view.activityFeed} />
-            </article>
-
-            <article
-              className="sb-card sb-card--deliverables bf-material bf-material-paper"
-              aria-labelledby="sb-deliverables-title"
-            >
-              <p className="sb-card__tab">{deliverablesCardCopy.heading}</p>
-              <h2 id="sb-deliverables-title" className="sr-only">
-                {deliverablesCardCopy.heading}
+          <article
+            className="sb-card sb-card--current bf-material bf-material-paper"
+            aria-labelledby="sb-current-campaign-title"
+          >
+            <p className="sb-card__tab">{currentCampaignCopy.heading}</p>
+            <div className="sb-current-campaign" aria-live="polite">
+              <h2
+                id="sb-current-campaign-title"
+                className={`sb-current-campaign__name${view.hasCampaign ? "" : " sb-current-campaign__name--empty"}`}
+              >
+                {view.hasCampaign ? view.campaignTitle : emptyCopy.campaignNamePlaceholder}
               </h2>
-              <DeliverablesProgress items={view.deliverablesProgress} campaignStatus={view.status} />
-            </article>
 
-            <article className="sb-card sb-card--account bf-material bf-material-paper">
-              <AccountPackageCard account={account} />
-            </article>
-          </div>
+              {view.hasCampaign && campaign ? (
+                <CampaignBriefActions
+                  campaign={campaign}
+                  onViewBrief={() => setRecordOpen(true)}
+                  className="sb-current-campaign__brief-actions"
+                  layout="stack"
+                  prominent
+                />
+              ) : null}
 
-          <aside className="sb-board-note-column" aria-label="Studio communication">
-            <article className="sb-card sb-card--studio-note bf-material bf-material-paper">
-              <StudioNotePanel note={view.studioNote} />
-            </article>
-            <StudioCreativeWall src={assets.creativeWall} />
-          </aside>
+              {view.hasCampaign ? (
+                <CampaignNextAction
+                  campaign={campaign}
+                  hasCampaign={view.hasCampaign}
+                  status={view.status}
+                  nextUpdateLabel={view.headerSnapshot?.nextUpdate ?? null}
+                  studioGuideHref={studioGuideHref}
+                />
+              ) : null}
+
+              {view.hasCampaign ? (
+                <div className="sb-current-campaign__metrics">
+                  {view.packageLabel ? (
+                    <CampaignMetric label={currentCampaignCopy.package} value={view.packageLabel} />
+                  ) : null}
+                  <CampaignMetric label={currentCampaignCopy.status} value={view.statusLabel} />
+                  {view.campaignProgressLabel ? (
+                    <CampaignMetric
+                      label={currentCampaignCopy.campaignStage}
+                      value={view.campaignProgressLabel}
+                    />
+                  ) : null}
+                  <CampaignMetric
+                    label={currentCampaignCopy.campaignsRemaining}
+                    value={account.campaignsRemaining}
+                  />
+                  <CampaignMetric
+                    label={currentCampaignCopy.emailsRemaining}
+                    value={account.emailsRemaining}
+                  />
+                  <CampaignMetric label={currentCampaignCopy.smsRemaining} value={account.smsRemaining} />
+                  <CampaignMetric
+                    label={currentCampaignCopy.revisionsRemaining}
+                    value={account.revisionsRemaining}
+                  />
+                </div>
+              ) : (
+                <p className="sb-current-campaign__empty">{emptyCopy.campaignDescription}</p>
+              )}
+
+              {view.hasCampaign &&
+              (view.status === "DRAFT_RECEIVED" || view.status === "PAYMENT_RECEIVED") ? (
+                <HelpCenterLink
+                  label={helpCenter.boardLinks.awaitingPayment.label}
+                  anchor={helpCenter.boardLinks.awaitingPayment.anchor}
+                  from="studio-board"
+                  className="sb-help-link"
+                />
+              ) : null}
+
+              {!view.hasCampaign ? (
+                <Link href={draftRoomHref} className="utility-btn utility-btn--primary sb-current-campaign__record">
+                  {emptyCopy.primaryCta}
+                </Link>
+              ) : null}
+            </div>
+          </article>
+
+          <article className="sb-card sb-card--progress bf-material bf-material-paper">
+            <CampaignProgressPanel campaign={campaign} steps={view.progressSteps} timeline={view.activityFeed} />
+          </article>
+
+          <article
+            className="sb-card sb-card--deliverables bf-material bf-material-paper"
+            aria-labelledby="sb-deliverables-title"
+          >
+            <p className="sb-card__tab">{deliverablesCardCopy.heading}</p>
+            <h2 id="sb-deliverables-title" className="sr-only">
+              {deliverablesCardCopy.heading}
+            </h2>
+            <DeliverablesProgress items={view.deliverablesProgress} campaignStatus={view.status} />
+          </article>
+
+          <article className="sb-card sb-card--package bf-material bf-material-paper">
+            <PackageSummaryPanel campaign={campaign} />
+          </article>
+
+          <article className="sb-card sb-card--studio-note bf-material bf-material-paper">
+            <StudioNotePanel note={view.studioNote} />
+          </article>
+
+          <article className="sb-card sb-card--account sb-card--account-secondary bf-material bf-material-paper">
+            <AccountPackageCard account={account} />
+          </article>
         </div>
       </div>
 

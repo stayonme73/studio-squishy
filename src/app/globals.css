@@ -12,10 +12,12 @@
 @import "./studio-canvas.css";
 @import "./campaign-details.css";
 @import "./help-center.css";
+@import "./package-comparison.css";
 @import "./payment.css";
 @import "./review-room.css";
 @import "./deliverables.css";
 @import "./feedback-studio.css";
+@import "./mobile-journey.css";
 @import "./owner-qa.css";
 
 :root {

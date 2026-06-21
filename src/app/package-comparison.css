@@ -1,0 +1,78 @@
+/* Package comparison table — Help Center + Studio Guide */
+
+.pkg-compare__title {
+  margin: 0 0 0.55rem;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--utility-text);
+}
+
+.pkg-compare__lead,
+.pkg-compare__note {
+  margin: 0 0 0.85rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--utility-text-muted);
+}
+
+.pkg-compare__note {
+  margin-top: 0.85rem;
+  margin-bottom: 0;
+  font-size: 0.82rem;
+}
+
+.pkg-compare__scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pkg-compare__table {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.pkg-compare__feature-head,
+.pkg-compare__pkg-head,
+.pkg-compare__feature,
+.pkg-compare__cell {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--studio-denim) 16%, transparent);
+  vertical-align: top;
+  text-align: left;
+}
+
+.pkg-compare__pkg-head {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--studio-denim) 8%, var(--studio-paper) 92%);
+  color: var(--studio-denim);
+}
+
+.pkg-compare__feature-head,
+.pkg-compare__feature {
+  font-weight: 700;
+  color: var(--utility-text);
+  background: color-mix(in srgb, var(--studio-paper) 96%, var(--studio-denim) 4%);
+}
+
+.pkg-compare__cell {
+  color: var(--utility-text-muted);
+}
+
+.pkg-compare__feature {
+  min-width: 9rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .pkg-compare__table {
+    min-width: 36rem;
+    font-size: 0.78rem;
+  }
+}

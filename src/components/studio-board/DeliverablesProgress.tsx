@@ -25,42 +25,49 @@ export default function DeliverablesProgress({ items, campaignStatus }: Props) {
   }
 
   return (
-    <ul className="sb-deliverables-progress" aria-label={copy.heading}>
-      {items.map((item) => {
-        const ratio = item.total > 0 ? item.delivered / item.total : 0;
-        const percent = Math.round(Math.min(1, Math.max(0, ratio)) * 100);
-        const isComplete = item.total > 0 && item.delivered >= item.total;
+    <div className="sb-deliverables-progress-wrap">
+      <ul className="sb-deliverables-progress" aria-label={copy.heading}>
+        {items.map((item) => {
+          const ratio = item.total > 0 ? item.delivered / item.total : 0;
+          const percent = Math.round(Math.min(1, Math.max(0, ratio)) * 100);
+          const isComplete = item.total > 0 && item.delivered >= item.total;
 
-        return (
-          <li key={item.id} className="sb-deliverables-progress__item">
-            <div className="sb-deliverables-progress__head">
-              <span className="sb-deliverables-progress__label">{item.label}</span>
-              <span
-                className={`sb-deliverables-progress__count${
-                  isComplete ? " sb-deliverables-progress__count--complete" : ""
-                }`}
+          return (
+            <li key={item.id} className="sb-deliverables-progress__item">
+              <div className="sb-deliverables-progress__head">
+                <span className="sb-deliverables-progress__label">{item.label}</span>
+                <span
+                  className={`sb-deliverables-progress__count${
+                    isComplete ? " sb-deliverables-progress__count--complete" : ""
+                  }`}
+                >
+                  {progressLabel(item)}
+                </span>
+              </div>
+              <div
+                className="sb-deliverables-progress__track"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={item.total}
+                aria-valuenow={item.delivered}
+                aria-label={`${item.label} progress`}
               >
-                {progressLabel(item)}
-              </span>
-            </div>
-            <div
-              className="sb-deliverables-progress__track"
-              role="progressbar"
-              aria-valuemin={0}
-              aria-valuemax={item.total}
-              aria-valuenow={item.delivered}
-              aria-label={`${item.label} progress`}
-            >
-              <div className="sb-deliverables-progress__fill" style={{ width: `${percent}%` }} />
-            </div>
-            {downloadsAvailable && isComplete ? (
-              <Link href={routes.deliverables} className="sb-deliverables-progress__download">
-                Download →
-              </Link>
-            ) : null}
-          </li>
-        );
-      })}
-    </ul>
+                <div className="sb-deliverables-progress__fill" style={{ width: `${percent}%` }} />
+              </div>
+              {downloadsAvailable && isComplete ? (
+                <Link href={routes.deliverables} className="sb-deliverables-progress__download">
+                  Download →
+                </Link>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
+      {downloadsAvailable ? (
+        <Link href={routes.deliverables} className="utility-btn utility-btn--primary sb-deliverables-progress__cta">
+          Open Final Delivery →
+        </Link>
+      ) : null}
+    </div>
   );
 }

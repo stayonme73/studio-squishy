@@ -29,7 +29,7 @@ export default function ReviewRoomScene() {
 
   function handleSelect(optionTitle: string) {
     selectCampaignOption(optionTitle);
-    router.push(studioBoard.routes.studioBoard);
+    router.push(studioBoard.routes.deliverables);
   }
 
   if (!ready) {

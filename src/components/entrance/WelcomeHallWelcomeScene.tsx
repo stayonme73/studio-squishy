@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useLayoutEffect, useState } from "react";
 
@@ -64,14 +65,27 @@ export default function WelcomeHallWelcomeScene() {
           />
 
           <div className="welcome-hall-plate-ui">
-            <button
-              type="button"
-              className="hall-kiosk-hotspot"
-              aria-label={cta.kioskLabel}
-              onClick={goToStudioGuide}
-              disabled={transitioning}
-              style={kioskHitArea}
-            />
+            <div className="hall-kiosk-stack" style={kioskHitArea}>
+              <button
+                type="button"
+                className="hall-kiosk-hotspot"
+                aria-label={cta.kioskLabel}
+                onClick={goToStudioGuide}
+                disabled={transitioning}
+              />
+
+              <p className="hall-kiosk-secondary">
+                <span className="hall-kiosk-secondary__prompt">{cta.returningPrompt}</span>
+                <Link
+                  href={cta.returningHref}
+                  className="hall-kiosk-secondary__link"
+                  tabIndex={transitioning ? -1 : 0}
+                  aria-hidden={transitioning}
+                >
+                  {cta.returningLink}
+                </Link>
+              </p>
+            </div>
 
             {transitioning && (
               <div className="hall-view-ahead-transition" aria-hidden>

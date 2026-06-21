@@ -12,6 +12,9 @@ export const welcomeHallPhase1 = {
     /** Primary — kiosk only. Screen overlay shows LET'S GET STARTED until V2 plate ships. */
     kioskLabel: "Let's get started — begin your draft in the Draft Room",
     kioskHeadline: "LET'S GET STARTED",
+    returningPrompt: "Already have a campaign?",
+    returningLink: "Open Studio Board →",
+    returningHref: "/studio-board",
   },
 
   /** Production intro plate — restore after Studio Guide interaction lock. */

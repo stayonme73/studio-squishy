@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
 import PolicyContentBlocks from "@/components/shared/PolicyContentBlocks";
+import PackageComparisonTable from "@/components/shared/PackageComparisonTable";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
@@ -60,6 +61,28 @@ export default function HelpCenterScene() {
         </nav>
 
         <div className="utility-grid hc-grid">
+          <section
+            id="about"
+            className="utility-card hc-card--about"
+            aria-labelledby="hc-about-title"
+          >
+            <h2 id="hc-about-title" className="utility-card__title">
+              {copy.sections.about}
+            </h2>
+            <PolicyContentBlocks blocks={view.about.blocks} className="hc-body" />
+          </section>
+
+          <section
+            id="packages"
+            className="utility-card hc-card--packages"
+            aria-labelledby="hc-packages-title"
+          >
+            <h2 id="hc-packages-title" className="utility-card__title">
+              {copy.sections.packages}
+            </h2>
+            <PackageComparisonTable showTitle={false} />
+          </section>
+
           <section
             id="philosophy"
             className="utility-card hc-card--philosophy"

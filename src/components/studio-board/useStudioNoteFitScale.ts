@@ -17,6 +17,11 @@ export function useStudioNoteFitScale(
     if (!panel || !measure) return undefined;
 
     const fit = () => {
+      if (window.matchMedia("(max-width: 48rem)").matches) {
+        setScale(1);
+        return;
+      }
+
       const styles = getComputedStyle(panel);
       const padY =
         Number.parseFloat(styles.paddingTop) + Number.parseFloat(styles.paddingBottom);

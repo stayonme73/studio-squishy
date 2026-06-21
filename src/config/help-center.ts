@@ -35,12 +35,16 @@ export const helpCenter = {
   toc: {
     title: "On this page",
     items: [
+      { id: "about", label: "About The Studio" },
+      { id: "packages", label: "Compare Packages" },
       { id: "philosophy", label: "Studio Philosophy" },
       { id: "faq", label: studioPolicies.faq.title },
       { id: "policies", label: studioPolicies.policies.title },
     ] as const,
   },
   sections: {
+    about: studioPolicies.aboutTheStudio.title,
+    packages: "Compare Packages",
     philosophy: "Studio Philosophy",
     faq: studioPolicies.faq.title,
     policies: studioPolicies.policies.title,
@@ -49,7 +53,7 @@ export const helpCenter = {
     {
       id: "getting-started",
       label: "Getting started",
-      faqIds: ["after-payment", "campaign-timeline"] as const,
+      faqIds: ["after-payment", "campaign-timeline", "email-notifications"] as const,
     },
     {
       id: "payments-packages",
@@ -133,6 +137,10 @@ export const helpCenter = {
     awaitingPayment: {
       label: "Payment & package policies",
       anchor: helpCenterAnchor("policies"),
+    },
+    packageComparison: {
+      label: "Compare SPARK, MOMENTUM & GROWTH",
+      anchor: "packages",
     },
   },
 } as const;

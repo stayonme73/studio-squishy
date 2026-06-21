@@ -17,6 +17,48 @@ export type PolicyItem = {
 };
 
 export const studioPolicies = {
+  aboutTheStudio: {
+    title: "About The Studio",
+    blocks: [
+      {
+        kind: "p",
+        text: "The Studio helps small business owners turn ideas, services, products, promotions, and events into ready-to-use marketing campaigns.",
+      },
+      {
+        kind: "p",
+        text: "You share your vision through intake. The Studio organizes that direction and creates campaign concepts, social posts, emails, SMS copy, calendars, and supporting materials based on the package you choose.",
+      },
+      {
+        kind: "ul",
+        intro: "The Studio is for owners who want clear marketing materials without building everything from scratch.",
+        items: [
+          "Launching a promotion, product, event, or new offer",
+          "Getting consistent monthly marketing support",
+          "Building a long-term marketing rhythm with strategic guidance",
+        ] as const,
+      },
+      {
+        kind: "ul",
+        intro: "What you receive:",
+        items: [
+          "Campaign concepts to review and choose from",
+          "Written marketing materials ready for your channels",
+          "A clear package scope so you know what is included",
+          "Status updates through your Studio Board",
+        ] as const,
+      },
+      {
+        kind: "ul",
+        intro: "What The Studio is not:",
+        items: [
+          "An ad-buying or media placement service",
+          "A social media management or posting service",
+          "An email or SMS sending platform",
+          "A guarantee of sales, leads, or business growth",
+        ] as const,
+      },
+    ] as const,
+  },
   faq: {
     title: "Frequently Asked Questions",
     philosophy: {
@@ -205,6 +247,24 @@ export const studioPolicies = {
           {
             kind: "ul",
             items: ["revisions included", "revisions used", "revisions remaining"] as const,
+          },
+        ] as const,
+      },
+      {
+        id: "email-notifications",
+        question: "WILL I RECEIVE EMAIL UPDATES?",
+        blocks: [
+          {
+            kind: "p",
+            text: "In this version of The Studio, campaign progress is shown inside your Studio Board — not through automated email notifications.",
+          },
+          {
+            kind: "p",
+            text: "After payment and intake, return to your Studio Board to see status updates, review concepts, and open Final Delivery when your package is ready.",
+          },
+          {
+            kind: "p",
+            text: "If you received an email or link from a test or external tool, use it only as a reminder to sign in. Your official next step is always shown on the Studio Board.",
           },
         ] as const,
       },

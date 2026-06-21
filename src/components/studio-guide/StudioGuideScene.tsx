@@ -3,11 +3,15 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+import Link from "next/link";
+
+import PackageComparisonTable from "@/components/shared/PackageComparisonTable";
 import HelpMeChooseModal from "@/components/studio-guide/HelpMeChooseModal";
 import PackageDetailPanel from "@/components/studio-guide/PackageDetailPanel";
 import PackageSelectorSidebar from "@/components/studio-guide/PackageSelectorSidebar";
 import StudioGuideFooter from "@/components/studio-guide/StudioGuideFooter";
 import { paymentHref, studioGuide, type StudioGuidePackageId } from "@/config/studio-guide";
+import { helpCenterHref } from "@/config/help-center";
 import { packageIndexForId } from "@/lib/recommendPackage";
 
 /**
@@ -55,6 +59,15 @@ export default function StudioGuideScene() {
         />
         <PackageDetailPanel packageIndex={packageIndex} onCtaClick={goToPayment} />
       </div>
+
+      <section className="guide-compare utility-card" aria-labelledby="guide-compare-title">
+        <PackageComparisonTable />
+        <p className="guide-compare__help">
+          <Link href={helpCenterHref("packages", "studio-board")} className="guide-compare__link">
+            Full package details in Help Center →
+          </Link>
+        </p>
+      </section>
 
       <StudioGuideFooter />
 
