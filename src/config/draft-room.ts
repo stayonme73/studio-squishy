@@ -344,6 +344,8 @@ export const draftRoom = {
     studioGuide: "Continue to Studio Guide",
     studioBoard: "Continue to Studio Board",
     reviewAnswers: "Review your answers",
+    viewCampaignBrief: "View Campaign Brief",
+    editCampaignBrief: "Edit Campaign Brief",
     acknowledgment:
       "I have reviewed my responses and understand campaign concepts will be based on the information I provided.",
     resubmitLabel: "Update & continue",

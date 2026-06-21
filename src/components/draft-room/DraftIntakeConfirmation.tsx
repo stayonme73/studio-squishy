@@ -9,11 +9,12 @@ import { readCurrentCampaign } from "@/lib/studio-board-campaign";
 
 type Props = {
   packageId?: StudioGuidePackageId;
-  onReviewAnswers: () => void;
+  onViewBrief: () => void;
+  onEditBrief: () => void;
 };
 
 /** Post-submit thank-you — user chooses next step or reviews answers. */
-export default function DraftIntakeConfirmation({ packageId, onReviewAnswers }: Props) {
+export default function DraftIntakeConfirmation({ packageId, onViewBrief, onEditBrief }: Props) {
   const { confirmation, routes } = draftRoom;
   const [acknowledged, setAcknowledged] = useState(false);
 
@@ -57,12 +58,21 @@ export default function DraftIntakeConfirmation({ packageId, onReviewAnswers }: 
       </div>
 
       <div className="dri-confirmation-footer">
-        <div className="dri-intake-nav dri-intake-nav--confirmation">
+        <div className="dri-intake-nav dri-intake-nav--confirmation dri-intake-nav--brief-actions">
           <div className="dri-intake-nav__back">
-            <button type="button" className="utility-btn utility-btn--secondary" onClick={onReviewAnswers}>
-              {confirmation.reviewAnswers}
+            <button type="button" className="utility-btn utility-btn--secondary" onClick={onViewBrief}>
+              {confirmation.viewCampaignBrief}
             </button>
           </div>
+          <div className="dri-intake-nav__continue">
+            <button type="button" className="utility-btn utility-btn--secondary" onClick={onEditBrief}>
+              {confirmation.editCampaignBrief}
+            </button>
+          </div>
+        </div>
+
+        <div className="dri-intake-nav dri-intake-nav--confirmation">
+          <div className="dri-intake-nav__back dri-intake-nav__spacer" aria-hidden="true" />
           <div className="dri-intake-nav__continue">
             <Link
               href={continueHref}

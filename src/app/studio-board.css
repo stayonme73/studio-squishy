@@ -2738,7 +2738,51 @@ body:has(.sb--v4) {
 }
 
 .sb-record-drawer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
   margin-bottom: 1rem;
+}
+
+.sb-record-drawer__locked {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.85rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--utility-text-muted);
+  background: color-mix(in srgb, var(--sb-denim) 8%, white);
+  border-radius: 6px;
+}
+
+.sb-current-campaign__brief-actions {
+  margin-top: 0.85rem;
+}
+
+.campaign-brief-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.campaign-brief-actions--stack {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.campaign-brief-actions__locked {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--utility-text-muted);
+}
+
+.campaign-brief-actions__hint {
+  flex: 1 1 100%;
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--utility-text-muted);
 }
 
 .sb-record-drawer__empty {

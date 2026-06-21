@@ -403,7 +403,18 @@ export const studioBoard = {
     drawerTitle: "Campaign Record",
     closeLabel: "Close",
     submittedHint: "Read-only archive of what you submitted to the Studio.",
+    editableHint: "Review or update your intake answers before campaign development begins.",
     emptyHint: "Your intake answers appear here once you submit the Draft Room form.",
+  },
+
+  campaignBrief: {
+    viewLabel: "View Campaign Brief",
+    editLabel: "Edit Campaign Brief",
+    editableHint: "Review or update your answers before campaign development begins.",
+    lockedMessage:
+      "Campaign development has begun. Intake responses are now locked. Additional changes should be submitted through the review and feedback process.",
+    lockedTitle: "Intake locked",
+    editReturnLabel: "Return to Studio Board",
   },
 
   deliverablesCard: {

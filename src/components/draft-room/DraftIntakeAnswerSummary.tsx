@@ -8,6 +8,7 @@ import { intakeDesignSystem } from "@/config/intake-design-system";
 type Props = {
   values: DraftIntakeFormValues;
   onEditStep: (step: number) => void;
+  readOnly?: boolean;
 };
 
 function sectionIsEmpty(
@@ -18,16 +19,23 @@ function sectionIsEmpty(
 }
 
 /** Scrollable list of every answer — clients see responses before submit or after. */
-export default function DraftIntakeAnswerSummary({ values, onEditStep }: Props) {
+export default function DraftIntakeAnswerSummary({
+  values,
+  onEditStep,
+  readOnly = false,
+}: Props) {
   const { review } = draftRoom.intakeForm;
   const sections = draftRoomIntakeAnswerSummary(values);
   const visionStep = intakeDesignSystem.layout.visionStep;
+  const supportCopy = readOnly
+    ? "Everything you shared with The Studio is listed below."
+    : review.support;
 
   return (
     <div className="dri-step-content dri-step-content--summary">
       <p className="dri-eyebrow">{review.eyebrow}</p>
       <h3 className="dri-prompt">{review.prompt}</h3>
-      <p className="dri-support">{review.support}</p>
+      <p className="dri-support">{supportCopy}</p>
 
       <div className="dri-summary" role="list" aria-label="Your answers">
         {sections.map((section) => {
@@ -45,13 +53,15 @@ export default function DraftIntakeAnswerSummary({ values, onEditStep }: Props) 
                   <span className="dri-summary-num">{section.step}</span>
                   {section.eyebrow}
                 </p>
-                <button
-                  type="button"
-                  className="dri-summary-edit"
-                  onClick={() => onEditStep(section.step)}
-                >
-                  {review.editLabel}
-                </button>
+                {!readOnly ? (
+                  <button
+                    type="button"
+                    className="dri-summary-edit"
+                    onClick={() => onEditStep(section.step)}
+                  >
+                    {review.editLabel}
+                  </button>
+                ) : null}
               </div>
 
               {empty ? (

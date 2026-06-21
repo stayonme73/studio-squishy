@@ -68,6 +68,10 @@
   flex-shrink: 0;
 }
 
+.cd-vision__brief-actions {
+  margin-bottom: 1rem;
+}
+
 .cd-vision {
   display: grid;
   gap: 1rem;

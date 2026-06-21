@@ -5,7 +5,7 @@ import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 import "../draft-room-intake.css";
 
 type Props = {
-  searchParams: Promise<{ package?: string; from?: string; begin?: string }>;
+  searchParams: Promise<{ package?: string; from?: string; begin?: string; edit?: string }>;
 };
 
 const PACKAGE_IDS = ["spark", "momentum", "growth"] as const;
@@ -19,7 +19,7 @@ function parsePackageId(value?: string): StudioGuidePackageId | undefined {
 
 /** Draft Room — intro plate, or clipboard wizard when ?begin=1. */
 export default async function DraftRoomPage({ searchParams }: Props) {
-  const { package: packageId, begin } = await searchParams;
+  const { package: packageId, begin, edit } = await searchParams;
   const pkg = parsePackageId(packageId);
   const isWizard = begin === "1";
 
@@ -28,7 +28,7 @@ export default async function DraftRoomPage({ searchParams }: Props) {
       className={`${utilityPageFontClassName} journey-shell flex h-[100dvh] min-h-0 flex-1 flex-col overflow-hidden`}
     >
       {isWizard ? (
-        <DraftRoomIntakeScene packageId={pkg} />
+        <DraftRoomIntakeScene packageId={pkg} editMode={edit === "1"} />
       ) : (
         <DraftRoomScene packageId={pkg} />
       )}

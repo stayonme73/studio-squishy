@@ -3,6 +3,7 @@ import { getPackageRevisionRounds, getStudioGuidePackage, type StudioGuidePackag
 import { readLastDraftIntake } from "@/lib/draft-intake";
 import { ensureCampaignConceptsOnRecord } from "@/lib/campaign-concepts";
 import { visionDataFromPayload } from "@/lib/campaign-record";
+import { isIntakeEditable } from "@/lib/intake-edit";
 import {
   CAMPAIGN_STATUSES,
   studioBoard,
@@ -287,10 +288,25 @@ export function clearCampaignState() {
   dispatchCampaignUpdated();
 }
 
+export class IntakeLockedError extends Error {
+  constructor() {
+    super("INTAKE_LOCKED");
+    this.name = "IntakeLockedError";
+  }
+}
+
 export function upsertCampaignFromIntake(payload: DraftIntakePayload) {
   const existing = readCurrentCampaign();
-  if (existing?.paymentReceivedAt) {
-    const now = new Date().toISOString();
+
+  if (existing) {
+    if (!isIntakeEditable(existing.campaignStatus)) {
+      throw new IntakeLockedError();
+    }
+
+    const wasIntakeIncomplete = !intakeComplete(existing);
+    const resubmitting = Boolean(existing.visionSubmittedAt || existing.intake?.submittedAt);
+    const now = payload.submittedAt;
+
     let updated: CampaignRecord = {
       ...existing,
       campaignName: campaignNameFromProject(payload.project),
@@ -301,12 +317,23 @@ export function upsertCampaignFromIntake(payload: DraftIntakePayload) {
       visionSubmittedAt: payload.submittedAt,
       revisionRoundsIncluded:
         existing.revisionRoundsIncluded ?? getPackageRevisionRounds(payload.packageId),
-      studioNotes: existing.studioNotes ?? [],
       updatedAt: now,
     };
 
-    updated = enterBuildingConcepts(updated);
-    updated = pushStudioNote(updated, "Vision Intake received.");
+    if (
+      existing.paymentReceivedAt &&
+      wasIntakeIncomplete &&
+      intakeComplete(updated) &&
+      !resubmitting
+    ) {
+      updated = enterBuildingConcepts(updated);
+      updated = pushStudioNote(updated, "Vision Intake received.");
+    } else {
+      updated = pushStudioNote(
+        updated,
+        resubmitting ? "Vision Intake updated." : "Vision Intake received.",
+      );
+    }
 
     return persistCampaign(updated);
   }

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import AccountPackageCard from "@/components/studio-board/AccountPackageCard";
+import CampaignBriefActions from "@/components/campaign-details/CampaignBriefActions";
 import CampaignProgressPanel from "@/components/studio-board/CampaignProgressPanel";
 import CampaignRecordDrawer from "@/components/studio-board/CampaignRecordDrawer";
 import DeliverablesProgress from "@/components/studio-board/DeliverablesProgress";
@@ -323,6 +324,15 @@ export default function StudioBoardScene() {
                 ) : (
                   <p className="sb-current-campaign__empty">{emptyCopy.campaignDescription}</p>
                 )}
+
+                {view.hasCampaign && campaign ? (
+                  <CampaignBriefActions
+                    campaign={campaign}
+                    onViewBrief={() => setRecordOpen(true)}
+                    className="sb-current-campaign__brief-actions"
+                    layout="stack"
+                  />
+                ) : null}
 
                 {view.hasCampaign &&
                 (view.status === "DRAFT_RECEIVED" || view.status === "PAYMENT_RECEIVED") ? (

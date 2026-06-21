@@ -25,6 +25,8 @@ type Props = {
   onStepChange?: (step: number) => void;
   submitError?: string | null;
   reviewingAfterSubmit?: boolean;
+  readOnlyReview?: boolean;
+  onReturnToConfirmation?: () => void;
 };
 
 function OptionalLabel() {
@@ -376,6 +378,8 @@ export default function DraftIntakeForm({
   onStepChange,
   submitError,
   reviewingAfterSubmit = false,
+  readOnlyReview = false,
+  onReturnToConfirmation,
 }: Props) {
   const { intakeForm, confirmation } = draftRoom;
   const { introduction, sections, totalSteps, review } = intakeForm;
@@ -762,7 +766,11 @@ export default function DraftIntakeForm({
 
       case DRAFT_INTAKE_REVIEW_STEP:
         return (
-          <DraftIntakeAnswerSummary values={values} onEditStep={handleEditFromSummary} />
+          <DraftIntakeAnswerSummary
+            values={values}
+            onEditStep={handleEditFromSummary}
+            readOnly={readOnlyReview}
+          />
         );
 
       default:
@@ -778,8 +786,11 @@ export default function DraftIntakeForm({
     >
       <IntakeProgress step={step} totalSteps={totalSteps} />
 
-      {reviewingAfterSubmit && isReviewStep ? (
+      {reviewingAfterSubmit && isReviewStep && !readOnlyReview ? (
         <p className="dri-review-banner">{confirmation.reviewBanner}</p>
+      ) : null}
+      {readOnlyReview && isReviewStep ? (
+        <p className="dri-review-banner dri-review-banner--view">{confirmation.viewCampaignBrief}</p>
       ) : null}
       {editingFromReview ? (
         <p className="dri-review-banner dri-review-banner--editing">{review.editingBanner}</p>
@@ -829,6 +840,14 @@ export default function DraftIntakeForm({
                   : isLastQuestionStep
                     ? "Review answers"
                     : "Continue"}
+              </button>
+            ) : readOnlyReview && onReturnToConfirmation ? (
+              <button
+                type="button"
+                className="utility-btn utility-btn--primary"
+                onClick={onReturnToConfirmation}
+              >
+                Back to confirmation
               </button>
             ) : (
               <button

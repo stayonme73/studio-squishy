@@ -149,6 +149,66 @@
   cursor: default;
 }
 
+/* --- Table callout — primary folder wayfinding on the drafting table --- */
+
+.sg-proto-table-callout {
+  position: absolute;
+  z-index: 6;
+  transform: translate(-50%, -100%);
+  max-width: min(18rem, 42vw);
+  padding: 0.55rem 0.85rem 0.65rem;
+  text-align: center;
+  pointer-events: none;
+  color: var(--sg-denim);
+  background: color-mix(in srgb, var(--sg-cream) 92%, white);
+  border: 1.5px solid color-mix(in srgb, var(--sg-yellow) 55%, var(--sg-denim) 45%);
+  border-radius: 6px;
+  box-shadow:
+    0 0.35rem 0.9rem rgba(44, 62, 80, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  animation: sg-proto-table-callout-in 0.55s ease-out 0.35s both;
+}
+
+.sg-proto-table-callout::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.55rem;
+  width: 2px;
+  height: 0.55rem;
+  transform: translateX(-50%);
+  background: color-mix(in srgb, var(--sg-yellow) 70%, var(--sg-denim) 30%);
+  border-radius: 1px;
+}
+
+@keyframes sg-proto-table-callout-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% + 0.35rem));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
+}
+
+.sg-proto-table-callout__eyebrow {
+  margin: 0;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--sg-coral) 72%, var(--sg-denim) 28%);
+}
+
+.sg-proto-table-callout__label {
+  margin: 0.2rem 0 0;
+  font-size: clamp(0.82rem, 1.55vw, 0.98rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+}
+
 /* --- V4 folder approval fill — LOCKED layout ---
  * Name: 2-line wrap, centered, no ellipsis. Stamp + date: flex-shrink 0, bottom-pinned.
  * Fill box size from signaturePlateMeasurements.fill — not hard-coded here.
@@ -418,6 +478,12 @@
   to {
     opacity: 1;
   }
+}
+
+.sg-proto--expanded .sg-proto-table-callout {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 .sg-proto--expanded .sg-proto-footer {
@@ -1140,6 +1206,15 @@
     padding-inline: 0.4rem;
   }
 
+  .sg-proto-table-callout {
+    max-width: min(16rem, 78vw);
+    padding: 0.5rem 0.7rem 0.58rem;
+  }
+
+  .sg-proto-table-callout__label {
+    font-size: clamp(0.78rem, 3.6vw, 0.92rem);
+  }
+
   .sg-proto-proposal-body {
     padding: 0.85rem 0.7rem 0.95rem 0.9rem;
     gap: 1rem;
@@ -1150,6 +1225,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sg-proto--enter .sg-proto-stage,
+  .sg-proto-table-callout,
   .sg-proto-proposal-scene,
   .sg-proto-expand-backdrop,
   .sg-proto-desk-approval-slip,

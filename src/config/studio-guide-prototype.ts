@@ -66,6 +66,12 @@ export const studioGuidePrototype = {
     growth: { x: 975, y: 480, width: 248, height: 268 },
   } satisfies Record<StudioGuidePackageId, StudioGuidePrototypeRect>,
 
+  /** Table callout — centered above folder row on V4 plate (percent of native plate). */
+  tableCallout: {
+    left: 53.1,
+    top: 41.5,
+  } as const,
+
   accents: {
     spark: { spine: "#f9d134", ink: "#2c3e50" },
     momentum: { spine: "#d94e2b", ink: "#2c3e50" },
@@ -76,7 +82,8 @@ export const studioGuidePrototype = {
     banner: "Interaction prototype — V1 content lock · Plate V4",
     expandClose: "Fold Closed",
     selectedStatus: (label: string) => `${label} — client approved`,
-    exploreHint: "Tap a folder on the table to explore packages.",
+    exploreHintEyebrow: "Start Here",
+    exploreHint: "Tap a Folder to Explore Packages",
     paymentCta: "Continue to Payment",
     paymentNote: "Next: confirm your package and complete payment.",
   },

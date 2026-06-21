@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import CopyCampaignBriefButton from "@/components/campaign-details/CopyCampaignBriefButton";
+import CampaignBriefActions from "@/components/campaign-details/CampaignBriefActions";
 import CampaignJourneyHero from "@/components/campaign-details/CampaignJourneyHero";
 import CampaignVisionSummary from "@/components/campaign-details/CampaignVisionSummary";
 import HelpCenterLink from "@/components/shared/HelpCenterLink";
@@ -157,6 +158,14 @@ export default function CampaignDetailsScene() {
             </h2>
             {campaign ? <CopyCampaignBriefButton campaign={campaign} /> : null}
           </div>
+          {campaign ? (
+            <CampaignBriefActions
+              campaign={campaign}
+              showView={false}
+              layout="stack"
+              className="cd-vision__brief-actions"
+            />
+          ) : null}
           <CampaignVisionSummary sections={view.visionSummary} />
           {campaignLinks.visionSummary.map((link) => (
             <HelpCenterLink

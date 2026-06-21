@@ -37,7 +37,7 @@ export default function StudioGuidePlateScene({ debug = false, enter = true }: P
   const [selectedId, setSelectedId] = useState<StudioGuidePackageId | null>(null);
   const [approved, setApproved] = useState(false);
 
-  const { plate, bookletHits, copy } = studioGuidePrototype;
+  const { plate, bookletHits, tableCallout, copy } = studioGuidePrototype;
 
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -128,6 +128,23 @@ export default function StudioGuidePlateScene({ debug = false, enter = true }: P
         />
 
         <div className="sg-proto-ui">
+          {!approved && !expandedId ? (
+            <div
+              className="sg-proto-table-callout"
+              style={
+                {
+                  left: `${tableCallout.left}%`,
+                  top: `${tableCallout.top}%`,
+                } as CSSProperties
+              }
+              role="status"
+              aria-live="polite"
+            >
+              <p className="sg-proto-table-callout__eyebrow">{copy.exploreHintEyebrow}</p>
+              <p className="sg-proto-table-callout__label">{copy.exploreHint}</p>
+            </div>
+          ) : null}
+
           {PACKAGE_ORDER.map((id) => {
             const pkg = getStudioGuideV1Package(id);
             const isExpanded = expandedId === id;
@@ -190,19 +207,15 @@ export default function StudioGuidePlateScene({ debug = false, enter = true }: P
         </div>
       </div>
 
-      <footer className="sg-proto-footer">
-        {approved && selectedLabel ? (
-          <>
-            <p className="sg-proto-footer-status">{copy.selectedStatus(selectedLabel)}</p>
-            <p className="sg-proto-footer-note">{copy.paymentNote}</p>
-            <button type="button" className="sg-proto-footer-pay" onClick={goToPayment}>
-              {copy.paymentCta}
-            </button>
-          </>
-        ) : (
-          <p className="sg-proto-footer-hint">{copy.exploreHint}</p>
-        )}
-      </footer>
+      {approved && selectedLabel ? (
+        <footer className="sg-proto-footer">
+          <p className="sg-proto-footer-status">{copy.selectedStatus(selectedLabel)}</p>
+          <p className="sg-proto-footer-note">{copy.paymentNote}</p>
+          <button type="button" className="sg-proto-footer-pay" onClick={goToPayment}>
+            {copy.paymentCta}
+          </button>
+        </footer>
+      ) : null}
     </div>
   );
 }

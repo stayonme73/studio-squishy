@@ -1,6 +1,8 @@
 import type { DraftIntakePayload } from "@/config/draft-room";
 import { upsertCampaignFromIntake } from "@/lib/studio-board-campaign";
 
+export { IntakeLockedError } from "@/lib/studio-board-campaign";
+
 const STORAGE_KEY = "studio-squishy:last-draft";
 
 /** Persist locally until API wiring — Studio Board can read this later. */
