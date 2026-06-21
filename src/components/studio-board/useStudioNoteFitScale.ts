@@ -17,7 +17,7 @@ export function useStudioNoteFitScale(
     if (!panel || !measure) return undefined;
 
     const fit = () => {
-      if (window.matchMedia("(max-width: 48rem)").matches) {
+      if (window.matchMedia("(max-width: 63.99rem)").matches) {
         setScale(1);
         return;
       }

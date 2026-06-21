@@ -1,9 +1,9 @@
 /**
- * Mobile journey — readable type, thumb targets, no horizontal scroll.
- * Applies across utility pages + shared controls.
+ * Mobile journey — single-column layouts, readable type, thumb targets.
+ * Breakpoint 63.99rem (~1024px) catches landscape phones and small tablets.
  */
 
-@media (max-width: 48rem) {
+@media (max-width: 63.99rem) {
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
@@ -80,6 +80,373 @@
     overflow-y: auto;
   }
 
+  /* —— Issue 1: Studio Guide package detail — single column —— */
+
+  .journey-shell:has(.sg-proto) {
+    overflow: auto;
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+  }
+
+  .journey-shell:has(.sg-proto--expanded) {
+    overflow: hidden;
+  }
+
+  .sg-proto {
+    overflow: visible;
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  .sg-proto-proposal-scene {
+    position: fixed;
+    inset: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    z-index: 20;
+    width: 100%;
+    transform: none;
+    padding:
+      calc(0.35rem + env(safe-area-inset-top, 0px))
+      0.5rem
+      calc(0.35rem + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in srgb, var(--sg-denim, #2c3e50) 18%, transparent);
+    pointer-events: auto;
+  }
+
+  .sg-proto-proposal {
+    width: 100%;
+    max-height: calc(
+      100dvh - 0.7rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
+    );
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sg-proto-proposal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding: 0.9rem 0.85rem 1rem;
+    max-height: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    min-width: 0;
+  }
+
+  .sg-proto-proposal-identity {
+    order: 1;
+  }
+
+  .sg-proto-proposal-deliverables {
+    order: 2;
+  }
+
+  .sg-proto-proposal-margin-notes {
+    order: 3;
+    padding: 0.75rem 0.65rem;
+  }
+
+  .sg-proto-proposal-policies {
+    order: 4;
+  }
+
+  .sg-proto-proposal-cta {
+    order: 5;
+    margin: 0;
+    padding: 1rem;
+    border-radius: 6px;
+  }
+
+  .sg-proto-proposal-title {
+    font-size: clamp(1.35rem, 7vw, 1.85rem);
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .sg-proto-proposal-deliverable-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sg-proto-proposal-deliverable {
+    grid-template-columns: 1.1rem minmax(0, 1fr);
+  }
+
+  .sg-proto-proposal-close,
+  .sg-proto-proposal-cta-button {
+    min-height: 2.85rem;
+    font-size: 0.875rem;
+  }
+
+  .sg-proto-proposal-coffee-ring {
+    display: none;
+  }
+
+  /* Issue 7 (optional): zoom desk out so all three folders fit */
+  .sg-proto-art {
+    transform: scale(0.92);
+    transform-origin: 50% 72%;
+  }
+
+  /* —— Issue 2: Payment — vertical stack —— */
+
+  .pay-checkout-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .pay-paper-card__body {
+    padding: 1.5rem 1rem 1.15rem 1.15rem;
+  }
+
+  .pay-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* —— Issue 4: Studio Board — single column, no shrink-to-fit —— */
+
+  body:has(.sb--v4) {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
+    max-height: none;
+  }
+
+  .sb {
+    --sb-type-xs: 0.8125rem;
+    --sb-type-sm: 0.9375rem;
+    --sb-type-base: 1rem;
+    --sb-type-md: 1.0625rem;
+    --sb-type-lg: 1.2rem;
+    --sb-type-display: 1.35rem;
+    --sb-tile-padding-y: 1rem;
+    --sb-tile-padding-x: 1rem;
+    --sb-grid-gap: 0.75rem;
+
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .sb-main {
+    overflow: visible;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.75rem 0.85rem 1.35rem;
+    box-sizing: border-box;
+  }
+
+  .sb-sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    border-right: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--sb-denim) 18%, transparent);
+    padding: 0.65rem 0.75rem 0.55rem;
+    gap: 0.35rem;
+  }
+
+  .sb-brand {
+    flex: 1 1 100%;
+  }
+
+  .sb-nav {
+    flex: 1 1 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .sb-nav__item {
+    flex: 1 1 calc(50% - 0.25rem);
+    width: auto;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.55rem;
+    font-size: 0.8125rem;
+  }
+
+  .sb-sidebar-lower {
+    display: none;
+  }
+
+  .sb-board-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sb-grid-gap);
+    min-height: auto;
+    overflow: visible;
+    width: 100%;
+  }
+
+  .sb-board-layout .sb-card--current {
+    order: 1;
+  }
+
+  .sb-board-layout .sb-card--progress {
+    order: 2;
+  }
+
+  .sb-board-layout .sb-card--deliverables {
+    order: 3;
+  }
+
+  .sb-board-layout .sb-card--package {
+    order: 4;
+  }
+
+  .sb-board-layout .sb-card--studio-note {
+    order: 5;
+  }
+
+  .sb-board-layout .sb-card--account-secondary {
+    order: 6;
+  }
+
+  .sb-board-layout > .sb-card,
+  .sb-board-layout .sb-card {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+    overflow: visible;
+    box-sizing: border-box;
+  }
+
+  .sb-header-v3__row {
+    grid-template-columns: 1fr;
+  }
+
+  .sb-header-v3__review-cta {
+    grid-column: 1;
+    justify-self: stretch;
+    max-width: none;
+    width: 100%;
+    min-height: 2.85rem;
+    margin-top: 0.35rem;
+  }
+
+  .sb-progress-panel__body {
+    overflow: visible;
+  }
+
+  .sb-progress-panel__fit,
+  .sb-studio-note-letter__fit {
+    transform: none;
+    width: 100%;
+  }
+
+  .sb-journey__cta,
+  .sb-progress-timeline__cta {
+    margin-left: 0;
+    width: 100%;
+    min-height: 2.85rem;
+  }
+
+  .sb-journey__step {
+    gap: 0.55rem;
+  }
+
+  /* —— Issue 5: Campaign Record — full-screen panel —— */
+
+  .sb-record-drawer {
+    justify-content: stretch;
+  }
+
+  .sb-record-drawer__panel {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    border-left: none;
+  }
+
+  .campaign-brief-actions__cta {
+    min-height: 2.75rem;
+    width: 100%;
+  }
+
+  /* —— Issue 6: Review Room / Feedback Studio cards — stack —— */
+
+  .utility-grid.rr-options,
+  .fs-picker__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rr-card__title,
+  .fs-direction-card__title {
+    font-size: 1.05rem;
+  }
+
+  .rr-card__body,
+  .fs-direction-card__hero {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .rr-card__cta,
+  .fs-direction-card__actions .utility-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* —— Issue 3: Intake modal — content-height panel —— */
+
+  .dri-intake-float {
+    align-items: flex-start;
+    justify-content: center;
+    padding:
+      calc(0.45rem + env(safe-area-inset-top, 0px))
+      0.55rem
+      calc(0.55rem + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dri-intake-shell {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: calc(100dvh - 1rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    padding: 0.85rem 0.85rem 0.75rem;
+  }
+
+  .dri-form-body {
+    flex: 0 1 auto;
+    padding: 0.15rem 0 0.25rem;
+  }
+
+  .dri-form-footer {
+    flex: 0 0 auto;
+    gap: 0.35rem;
+    padding-top: 0.5rem;
+    margin-top: 0;
+  }
+
+  .dri-intake-nav__spacer {
+    display: none;
+  }
+
+  .dri-intake-nav {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .dri-intake-nav__continue {
+    grid-column: 1;
+  }
+
+  /* —— Help Center / misc —— */
+
   .hc-section__title {
     font-size: 1.05rem;
   }
@@ -101,53 +468,32 @@
     font-size: 0.875rem;
   }
 
-  .pkg-compare__pkg-head {
-    font-size: 0.8125rem;
-  }
-
-  .pay-checkout-grid,
-  .pay-paper-card__body {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .pay-form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .fs-page__title {
-    font-size: clamp(1.25rem, 5.5vw, 1.5rem);
-  }
-
-  .fs-concept-card__title,
-  .rr-concept-card__title {
-    font-size: 1.05rem;
-  }
-
-  .fs-concept-card__body,
-  .rr-concept-card__body {
-    font-size: 0.9375rem;
-    line-height: 1.55;
-  }
-
   .hall-kiosk-secondary {
-    font-size: 0.75rem;
-    padding: 0.5rem 0.65rem;
+    position: absolute;
+    left: 50%;
+    bottom: max(0.35rem, env(safe-area-inset-bottom, 0px));
+    z-index: 6;
+    width: min(calc(100% - 1rem), 18rem);
+    padding: 0.55rem 0.75rem;
+    font-size: 0.8125rem;
+    transform: translateX(-50%);
+    box-shadow: 0 3px 12px rgba(26, 26, 26, 0.18);
   }
 
   .hall-kiosk-secondary__prompt {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
   }
 
   .hall-kiosk-secondary__link {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.15rem 0.25rem;
   }
 
   .guide-sidebar-card {
     min-height: 3rem;
-  }
-
-  .guide-sidebar-card__label {
-    font-size: 0.9375rem;
   }
 }

@@ -9,7 +9,7 @@
   --rr-text-muted: var(--utility-text-muted);
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 64rem) {
   .rr-options {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

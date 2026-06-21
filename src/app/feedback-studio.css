@@ -95,7 +95,7 @@
   gap: var(--utility-card-gap);
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 64rem) {
   .fs-picker__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

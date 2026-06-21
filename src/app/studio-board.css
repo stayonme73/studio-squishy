@@ -4866,8 +4866,15 @@ body:has(.sb--v4) {
     grid-row: auto;
   }
 
+  .sb-record-drawer {
+    justify-content: stretch;
+  }
+
   .sb-record-drawer__panel {
-    width: min(100%, 36rem);
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    border-left: none;
   }
 }
 

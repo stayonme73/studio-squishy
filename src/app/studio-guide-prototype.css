@@ -1079,7 +1079,7 @@
 
 /* --- Responsive --- */
 
-@media (max-width: 960px) {
+@media (max-width: 63.99rem) {
   .journey-shell:has(.sg-proto) {
     overflow: auto;
     height: auto;
