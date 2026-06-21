@@ -768,7 +768,11 @@ export function draftRoomIntakeAnswerSummary(values: DraftIntakeFormValues): Dra
   ];
 
   return [
-    { step: 1, eyebrow: sections.project.eyebrow, entries: [{ value: summaryText(values.project, empty) }] },
+    { step: 1, eyebrow: sections.project.eyebrow, entries: [{ value: summaryText(
+      values.project.trim() ||
+        (values.projectStarter ? formatProjectValue(values.projectStarter, values.projectDetail) : ""),
+      empty,
+    ) }] },
     { step: 2, eyebrow: sections.business.eyebrow, entries: [{ value: summaryText(values.business, empty) }] },
     { step: 3, eyebrow: sections.audience.eyebrow, entries: audienceEntries },
     { step: 4, eyebrow: sections.goal.eyebrow, entries: goalEntries },

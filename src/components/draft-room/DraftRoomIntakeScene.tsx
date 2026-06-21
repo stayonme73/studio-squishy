@@ -1,10 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import DraftIntakeConfirmation from "@/components/draft-room/DraftIntakeConfirmation";
 import DraftIntakeForm from "@/components/draft-room/DraftIntakeForm";
-import DraftIntakeLockedNotice from "@/components/draft-room/DraftIntakeLockedNotice";
 import {
   draftRoom,
   DRAFT_INTAKE_REVIEW_STEP,
@@ -16,6 +16,7 @@ import {
   type DraftIntakeFormValues,
 } from "@/config/draft-room";
 import { studioGuide, type StudioGuidePackageId } from "@/config/studio-guide";
+import { studioBoard } from "@/config/studio-board";
 import { resolveVisionData } from "@/lib/campaign-record";
 import { submitDraftIntake } from "@/lib/draft-intake";
 import { isIntakeEditable } from "@/lib/intake-edit";
@@ -28,6 +29,7 @@ type Props = {
 
 /** Draft Room intake — shared card shell for wizard steps and confirmation. */
 export default function DraftRoomIntakeScene({ packageId, editMode = false }: Props) {
+  const router = useRouter();
   const stageRef = useRef<HTMLDivElement>(null);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [values, setValues] = useState<DraftIntakeFormValues>(EMPTY_DRAFT_INTAKE_FORM);
@@ -36,7 +38,6 @@ export default function DraftRoomIntakeScene({ packageId, editMode = false }: Pr
   const [confirmed, setConfirmed] = useState(false);
   const [reviewingAfterSubmit, setReviewingAfterSubmit] = useState(editMode);
   const [readOnlyReview, setReadOnlyReview] = useState(false);
-  const [intakeLocked, setIntakeLocked] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { intakePlateNativeSize, intakeClipboardPaperRect } = draftRoom.layout;
@@ -79,7 +80,7 @@ export default function DraftRoomIntakeScene({ packageId, editMode = false }: Pr
     if (!campaign) return;
 
     if (editMode && !isIntakeEditable(campaign.campaignStatus)) {
-      setIntakeLocked(true);
+      router.replace(studioBoard.routes.studioBoard);
       return;
     }
 
@@ -87,7 +88,7 @@ export default function DraftRoomIntakeScene({ packageId, editMode = false }: Pr
     if (vision) {
       setValues(vision);
     }
-  }, [editMode]);
+  }, [editMode, router]);
 
   const handleViewFromConfirmation = useCallback(() => {
     setConfirmed(false);
@@ -139,8 +140,7 @@ export default function DraftRoomIntakeScene({ packageId, editMode = false }: Pr
         setConfirmed(true);
       } catch (error) {
         if (error instanceof IntakeLockedError) {
-          setIntakeLocked(true);
-          setSubmitError(null);
+          router.replace(studioBoard.routes.studioBoard);
         } else {
           setSubmitError("Something went wrong saving your direction. Please try again.");
         }
@@ -148,7 +148,7 @@ export default function DraftRoomIntakeScene({ packageId, editMode = false }: Pr
         setSubmitting(false);
       }
     },
-    [packageId, submitting, values],
+    [packageId, router, submitting, values],
   );
 
   return (
@@ -185,13 +185,6 @@ export default function DraftRoomIntakeScene({ packageId, editMode = false }: Pr
                 onViewBrief={handleViewFromConfirmation}
                 onEditBrief={handleEditFromConfirmation}
               />
-            </div>
-          </>
-        ) : intakeLocked ? (
-          <>
-            <div className="dri-wizard-scrim" aria-hidden="true" />
-            <div className="dri-intake-float">
-              <DraftIntakeLockedNotice />
             </div>
           </>
         ) : (

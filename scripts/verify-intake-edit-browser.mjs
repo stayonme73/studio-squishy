@@ -122,26 +122,22 @@ async function main() {
       fail(6, "Campaign Record Edit link missing");
     }
 
-    // 4 + 5: Locked at Building Concepts with message
+    // 4 + 5: Locked at Building Concepts redirects to Studio Board
     await seed(page, buildCampaign("BUILDING_CONCEPTS"));
     await page.goto(`${BASE}/draft-room?begin=1&edit=1&package=momentum`);
-    await page.waitForSelector(".dri-locked-shell", { timeout: 15000 });
-    const lockedText = await page.locator(".dri-step-content--locked").textContent();
-    if (lockedText?.includes(lockedMsg)) {
-      pass(4, "Edit route blocked at Building Concepts");
-      pass(5, "Locked message shown on edit route");
+    await page.waitForURL("**/studio-board**", { timeout: 15000 });
+    if (page.url().includes("/studio-board")) {
+      pass(4, "Edit route redirects to Studio Board at Building Concepts");
     } else {
-      fail(4, "Locked shell missing at Building Concepts");
-      fail(5, "Locked message not shown clearly");
+      fail(4, `Expected Studio Board redirect, got ${page.url()}`);
     }
 
-    await page.goto(`${BASE}/studio-board`);
     await page.waitForSelector(".campaign-brief-actions__locked", { timeout: 15000 });
     const boardLocked = await page.locator(".campaign-brief-actions__locked").textContent();
     if (boardLocked?.includes(lockedMsg)) {
-      pass(5, "Locked message shown on Studio Board");
+      pass(5, "Locked message shown on Studio Board after redirect");
     } else {
-      fail(5, "Studio Board locked message missing");
+      fail(5, "Studio Board locked message missing after redirect");
     }
 
     // 3: Resubmit preserves campaignId + payment

@@ -72,16 +72,17 @@ if (
   fail(3, "Upsert may not preserve campaign identity on edit");
 }
 
-// 4. Intake locks at Building Concepts
+// 4. Intake locks at Building Concepts — redirect to Studio Board
 if (
   intakeEdit.includes('"DRAFT_RECEIVED", "PAYMENT_RECEIVED"') &&
   intakeEdit.includes("isIntakeEditable") &&
   campaignTs.includes("throw new IntakeLockedError()") &&
-  !intakeEdit.includes("BUILDING_CONCEPTS")
+  !intakeEdit.includes("BUILDING_CONCEPTS") &&
+  draftScene.includes("router.replace(studioBoard.routes.studioBoard)")
 ) {
-  pass(4, "Only DRAFT_RECEIVED and PAYMENT_RECEIVED are editable");
+  pass(4, "Locked intake redirects to Studio Board instead of stop screen");
 } else {
-  fail(4, "Lock statuses misconfigured");
+  fail(4, "Lock redirect misconfigured");
 }
 
 // 5. Locked message appears clearly

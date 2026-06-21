@@ -1,7 +1,14 @@
 import type { DraftIntakePayload } from "@/config/draft-room";
+import { EMPTY_DRAFT_INTAKE_FORM } from "@/config/draft-room";
 import { getPackageRevisionRounds, getStudioGuidePackage, type StudioGuidePackageId, type DeliverableQuotaId } from "@/config/studio-guide";
 import { readLastDraftIntake } from "@/lib/draft-intake";
 import { ensureCampaignConceptsOnRecord } from "@/lib/campaign-concepts";
+import {
+  mergeVisionData,
+  normalizeDraftIntakeFormValues,
+  resolveDraftIntakeProject,
+  visionDataHasContent,
+} from "@/lib/campaign-vision";
 import { visionDataFromPayload } from "@/lib/campaign-record";
 import { isIntakeEditable } from "@/lib/intake-edit";
 import {
@@ -112,26 +119,41 @@ function intakeFromDraft(draft: DraftIntakePayload): CampaignIntakeSnapshot {
   };
 }
 
-function intakeNeedsHydration(campaign: CampaignRecord) {
-  const intake = campaign.intake;
-  const intakeEmpty =
-    !intake ||
-    (!intake.idea.trim() && !intake.audience.trim() && !intake.action.trim() && !intake.deadline.trim());
-  return intakeEmpty || !campaign.visionData;
-}
-
 /** Backfill intake + vision data on campaigns saved before full persistence shipped. */
 export function hydrateCampaignIntake(): CampaignRecord | null {
   const campaign = readCurrentCampaign();
-  if (!campaign || !intakeNeedsHydration(campaign)) return campaign;
+  if (!campaign) return campaign;
 
   const draft = readLastDraftIntake();
-  if (!draft?.project.trim()) return campaign;
+  if (!draft) return campaign;
+
+  const recordVision = campaign.visionData
+    ? normalizeDraftIntakeFormValues({
+        ...EMPTY_DRAFT_INTAKE_FORM,
+        ...campaign.visionData,
+      })
+    : null;
+
+  const draftVision = visionDataFromPayload(draft);
+  if (!visionDataHasContent(draftVision) && !draft.idea.trim()) return campaign;
+
+  const visionData = recordVision
+    ? mergeVisionData(recordVision, draftVision)
+    : draftVision;
+
+  if (
+    recordVision &&
+    visionDataHasContent(recordVision) &&
+    campaign.intake?.submittedAt &&
+    JSON.stringify(visionData) === JSON.stringify(recordVision)
+  ) {
+    return campaign;
+  }
 
   const updated: CampaignRecord = {
     ...campaign,
     intake: intakeFromDraft(draft),
-    visionData: campaign.visionData ?? visionDataFromPayload(draft),
+    visionData,
     visionSubmittedAt: campaign.visionSubmittedAt ?? draft.submittedAt,
     revisionRoundsIncluded:
       campaign.revisionRoundsIncluded ?? getPackageRevisionRounds(draft.packageId),
@@ -177,9 +199,11 @@ export function createCampaignFromIntake(payload: DraftIntakePayload): CampaignR
   const content = studioBoard.statusContent.DRAFT_RECEIVED;
   const now = new Date().toISOString();
 
+  const vision = visionDataFromPayload(payload);
+
   return {
     campaignId: crypto.randomUUID(),
-    campaignName: campaignNameFromProject(payload.project),
+    campaignName: campaignNameFromProject(resolveDraftIntakeProject(vision) || payload.project),
     campaignStatus: "DRAFT_RECEIVED",
     campaignDescription: content.campaignDescription,
     estimatedCompletion: content.estimatedCompletion,
@@ -192,7 +216,7 @@ export function createCampaignFromIntake(payload: DraftIntakePayload): CampaignR
       deadline: payload.deadline.trim(),
       submittedAt: payload.submittedAt,
     },
-    visionData: visionDataFromPayload(payload),
+    visionData: vision,
     visionSubmittedAt: payload.submittedAt,
     paymentReceivedAt: null,
     targetCompletionDate: null,
@@ -309,11 +333,22 @@ export function upsertCampaignFromIntake(payload: DraftIntakePayload) {
 
     let updated: CampaignRecord = {
       ...existing,
-      campaignName: campaignNameFromProject(payload.project),
+      campaignName: campaignNameFromProject(
+        resolveDraftIntakeProject(visionDataFromPayload(payload)) || payload.project,
+      ),
       packageId: payload.packageId,
       packageLabel: payload.packageLabel,
       intake: intakeFromDraft(payload),
-      visionData: visionDataFromPayload(payload),
+      visionData: (() => {
+        const nextVision = visionDataFromPayload(payload);
+        const existingVision = existing.visionData
+          ? normalizeDraftIntakeFormValues({
+              ...EMPTY_DRAFT_INTAKE_FORM,
+              ...existing.visionData,
+            })
+          : null;
+        return existingVision ? mergeVisionData(nextVision, existingVision) : nextVision;
+      })(),
       visionSubmittedAt: payload.submittedAt,
       revisionRoundsIncluded:
         existing.revisionRoundsIncluded ?? getPackageRevisionRounds(payload.packageId),

@@ -11,6 +11,11 @@ import {
   type StudioUpdate,
 } from "@/config/studio-board";
 import { readLastDraftIntake } from "@/lib/draft-intake";
+import {
+  mergeVisionData,
+  normalizeDraftIntakeFormValues,
+  resolveDraftIntakeProject,
+} from "@/lib/campaign-vision";
 
 const { statusContent } = studioBoard;
 
@@ -46,24 +51,46 @@ export function visionDataFromPayload(payload: DraftIntakePayload): DraftIntakeF
     submittedAt: _submittedAt,
     ...visionData
   } = payload;
-  return visionData;
+  return normalizeDraftIntakeFormValues({
+    ...EMPTY_DRAFT_INTAKE_FORM,
+    ...visionData,
+  });
 }
 
 export function resolveVisionData(campaign: CampaignRecord): DraftIntakeFormValues | null {
-  if (campaign.visionData) {
-    return { ...EMPTY_DRAFT_INTAKE_FORM, ...campaign.visionData };
-  }
+  const fromRecord = campaign.visionData
+    ? normalizeDraftIntakeFormValues({
+        ...EMPTY_DRAFT_INTAKE_FORM,
+        ...campaign.visionData,
+      })
+    : null;
 
   const draft = readLastDraftIntake();
-  if (!draft) return null;
+  const fromDraft = draft ? visionDataFromPayload(draft) : null;
 
-  return visionDataFromPayload(draft);
+  if (fromRecord && fromDraft) {
+    return mergeVisionData(fromRecord, fromDraft);
+  }
+
+  const resolved = fromRecord ?? fromDraft;
+  if (!resolved) return null;
+  return normalizeDraftIntakeFormValues(resolved);
 }
 
 /** Short campaign label for board cards — project only, not the full intake blob. */
 export function resolveCampaignDisplayName(campaign: CampaignRecord): string {
-  const project = campaign.visionData?.project?.trim();
-  if (project) return project;
+  if (campaign.visionData) {
+    const project = resolveDraftIntakeProject(
+      normalizeDraftIntakeFormValues({
+        ...EMPTY_DRAFT_INTAKE_FORM,
+        ...campaign.visionData,
+      }),
+    );
+    if (project) return project;
+  }
+
+  const vision = resolveVisionData(campaign);
+  if (vision?.project) return vision.project;
 
   const name = campaign.campaignName.trim();
   if (!name) return name;

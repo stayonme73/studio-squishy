@@ -1,4 +1,6 @@
 import type { DraftIntakePayload } from "@/config/draft-room";
+import { EMPTY_DRAFT_INTAKE_FORM } from "@/config/draft-room";
+import { normalizeDraftIntakePayload } from "@/lib/campaign-vision";
 import { upsertCampaignFromIntake } from "@/lib/studio-board-campaign";
 
 export { IntakeLockedError } from "@/lib/studio-board-campaign";
@@ -16,7 +18,7 @@ export function readLastDraftIntake(): DraftIntakePayload | null {
   const raw = window.localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
   try {
-    return JSON.parse(raw) as DraftIntakePayload;
+    return normalizeDraftIntakePayload(JSON.parse(raw) as DraftIntakePayload);
   } catch {
     return null;
   }
@@ -26,7 +28,8 @@ export function readLastDraftIntake(): DraftIntakePayload | null {
  * Submit intake — local save now; replace body with fetch() when API is ready.
  */
 export async function submitDraftIntake(payload: DraftIntakePayload): Promise<void> {
-  saveDraftIntakeLocally(payload);
-  upsertCampaignFromIntake(payload);
+  const normalized = normalizeDraftIntakePayload(payload);
+  saveDraftIntakeLocally(normalized);
+  upsertCampaignFromIntake(normalized);
   // TODO: POST to intake API / email service
 }
