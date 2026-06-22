@@ -19,6 +19,7 @@
 @import "./feedback-studio.css";
 @import "./mobile-journey.css";
 @import "./owner-qa.css";
+@import "./studio-kitchen.css";
 
 :root {
   --background: var(--board-family-cream);

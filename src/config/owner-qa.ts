@@ -74,6 +74,8 @@ export const ownerQa = {
 
     { label: "Help Center", href: studioBoard.routes.helpCenter },
 
+    { label: "Studio Kitchen", href: studioBoard.routes.studioKitchen },
+
   ] satisfies OwnerQaPage[],
 
 

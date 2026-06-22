@@ -103,6 +103,7 @@ export const studioBoard = {
     deliverables: "/deliverables",
     campaignDetails: "/studio-board?record=open",
     welcomeHall: "/",
+    studioKitchen: "/studio-kitchen",
   },
 
   empty: {
