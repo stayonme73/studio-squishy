@@ -1,6 +1,7 @@
 import Link from "next/link";
 
-import StudioKitchenBucketBadge from "@/components/studio-kitchen/StudioKitchenBucketBadge";
+import StudioKitchenFileBucketBadge from "@/components/studio-kitchen/StudioKitchenFileBucketBadge";
+import StudioKitchenFolderActions from "@/components/studio-kitchen/StudioKitchenFolderActions";
 import StudioKitchenClientContactBlock from "@/components/studio-kitchen/StudioKitchenClientContactBlock";
 import StudioKitchenDeliverablesCell from "@/components/studio-kitchen/StudioKitchenDeliverablesCell";
 import StudioKitchenPriorityBadge from "@/components/studio-kitchen/StudioKitchenPriorityBadge";
@@ -13,10 +14,10 @@ import {
   type KitchenCampaign,
   type KitchenStageId,
 } from "@/config/studio-kitchen";
+import type { KitchenFolderView } from "@/lib/studio-kitchen-file-room-view";
 import {
   formatKitchenDaysInStage,
   formatKitchenWaitingDays,
-  type KitchenCampaignWithBucket,
   type KitchenStageRow,
 } from "@/lib/studio-kitchen-view";
 
@@ -159,19 +160,24 @@ export default function StudioKitchenWorkflowTimeline({ campaign, stages }: Prop
   );
 }
 
-export function StudioKitchenCampaignMeta({ campaign }: { campaign: KitchenCampaignWithBucket }) {
+export function StudioKitchenCampaignMeta({ campaign }: { campaign: KitchenFolderView }) {
   const { detail, table } = studioKitchen;
-  const clientDelayed = kitchenIsClientDelayed(campaign);
+  const bucketId = campaign.placement.homeBucketId;
 
   return (
     <section className="sk-campaign-meta utility-card" aria-label="Campaign overview">
       <div className="sk-campaign-meta__badges">
         <StudioKitchenPriorityBadge priority={campaign.priority} />
-        <StudioKitchenBucketBadge bucketId={campaign.bucketId} />
-        {clientDelayed ? (
+        <StudioKitchenFileBucketBadge bucketId={bucketId} />
+        {campaign.placement.folderLocation === "tray" ? (
           <span className="sk-badge sk-badge--client-delayed">{table.clientDelayedBadge}</span>
         ) : null}
+        {campaign.showReturnedToQueue ? (
+          <span className="sk-folder__returned sk-folder__returned--inline">{studioKitchen.fileRoom.returnedToQueueLabel}</span>
+        ) : null}
       </div>
+
+      <StudioKitchenFolderActions bucketId={bucketId} />
 
       <dl className="sk-campaign-meta__grid">
         <div>

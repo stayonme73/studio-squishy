@@ -66,6 +66,12 @@ export const welcomeHallScene = {
   framing: {
     default: { x: 0.5, y: 0.5, fit: "cover" as const },
     portrait: { x: 0.5, y: 0.5, fit: "contain" as const },
+    /** Phone — full room establishing shot (step 1), top-aligned */
+    mobileEstablish: { x: 0.5, y: 0, fit: "contain" as const },
+    /** Phone — kiosk focus (step 2): draft table + kiosk, cover fill */
+    mobileKiosk: { x: 0.84, y: 0.60, fit: "cover" as const },
+    /** @deprecated use mobileKiosk — cover crop fallback */
+    mobilePortrait: { x: 0.86, y: 0.54, fit: "cover" as const },
   },
 } as const;
 
@@ -93,7 +99,6 @@ export function welcomeHallFraming(viewport: {
   height: number;
 }): WelcomeHallFraming {
   const { width, height } = viewport;
-  /* All portrait viewports — contain keeps right-foreground kiosk on-screen (e.g. 820×1180). */
   if (width > 0 && height > width) {
     return welcomeHallScene.framing.portrait;
   }

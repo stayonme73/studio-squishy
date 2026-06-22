@@ -23,7 +23,7 @@ const inter = Inter({
 export default function StudioBoardPage() {
   return (
     <main
-      className={`${inter.variable} ${caveat.variable} journey-shell flex h-[100dvh] max-h-[100dvh] min-h-0 flex-1 flex-col overflow-hidden bg-[var(--board-family-cream)]`}
+      className={`${inter.variable} ${caveat.variable} journey-shell flex min-h-[100dvh] flex-1 flex-col bg-[var(--board-family-cream)]`}
     >
       <Suspense>
         <StudioBoardScene />

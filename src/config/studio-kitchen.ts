@@ -184,7 +184,7 @@ export const studioKitchen = {
     lead:
       "Workflow control center — see every campaign, who owns the next step, and what needs attention.",
     phaseNote:
-      "V4 — digital file room. Open folder → perform action → move folder. Phase 1 layout only.",
+      "V5 — one folder, one bucket. Open folder → perform action → move folder. History holds completed stages.",
     backLabel: "← Studio Board",
     backHref: "/studio-board",
     dashboardBackLabel: "← All Campaigns",
@@ -201,6 +201,9 @@ export const studioKitchen = {
     trayLabel: "Exception Tray",
     returnedToQueueLabel: "RETURNED TO QUEUE",
     openFolderLabel: "Open Folder",
+    actionCenterLabel: "Folder Actions",
+    movesToLabel: "When complete →",
+    historyNote: "Completed stages appear in Workflow History and Audit Trail only — not in active buckets.",
   },
 
   buckets: {

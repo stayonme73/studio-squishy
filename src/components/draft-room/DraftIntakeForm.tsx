@@ -411,7 +411,17 @@ export default function DraftIntakeForm({
   const stepValid = isDraftIntakeStepValid(step, values);
   const isReviewStep = step === DRAFT_INTAKE_REVIEW_STEP;
   const isVisionStep = step === sections.vision.number;
-  const scrollFormBody = isVisionStep || isReviewStep;
+  const [mobileFormScroll, setMobileFormScroll] = useState(false);
+
+  useLayoutEffect(() => {
+    const mq = window.matchMedia("(max-width: 1024px)");
+    const sync = () => setMobileFormScroll(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const scrollFormBody = mobileFormScroll || isVisionStep || isReviewStep;
   const isLastQuestionStep = step === totalSteps;
   const isLastStep = isReviewStep;
 

@@ -84,6 +84,7 @@ export const studioGuidePrototype = {
     selectedStatus: (label: string) => `${label} — client approved`,
     exploreHintEyebrow: "Start Here",
     exploreHint: "Tap a Folder to Explore Packages",
+    exploreHintMobile: "Select a package below",
     paymentCta: "Continue to Payment",
     paymentNote: "Next: confirm your package and complete payment.",
   },

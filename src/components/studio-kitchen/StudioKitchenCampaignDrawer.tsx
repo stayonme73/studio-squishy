@@ -1,28 +1,29 @@
 import Link from "next/link";
 
 import StudioKitchenAuditTrail from "@/components/studio-kitchen/StudioKitchenAuditTrail";
-import StudioKitchenBucketBadge from "@/components/studio-kitchen/StudioKitchenBucketBadge";
 import StudioKitchenDeliverablesCell from "@/components/studio-kitchen/StudioKitchenDeliverablesCell";
+import StudioKitchenFileBucketBadge from "@/components/studio-kitchen/StudioKitchenFileBucketBadge";
+import StudioKitchenFolderActions from "@/components/studio-kitchen/StudioKitchenFolderActions";
 import StudioKitchenOwnerNotes from "@/components/studio-kitchen/StudioKitchenOwnerNotes";
 import StudioKitchenPriorityBadge from "@/components/studio-kitchen/StudioKitchenPriorityBadge";
 import {
   kitchenCampaignHref,
   kitchenFormatRevisionStatus,
-  kitchenIsClientDelayed,
-  kitchenStageTitle,
   studioKitchen,
-  type KitchenCampaign,
 } from "@/config/studio-kitchen";
-import { formatKitchenDaysInStage, type KitchenCampaignWithBucket } from "@/lib/studio-kitchen-view";
+import { kitchenBucketMoveToLabel, kitchenFileBucketLabel } from "@/config/studio-kitchen-file-room";
+import { formatKitchenDaysInStage } from "@/lib/studio-kitchen-view";
+import type { KitchenFolderView } from "@/lib/studio-kitchen-file-room-view";
 
 type Props = {
-  campaign: KitchenCampaignWithBucket;
+  folder: KitchenFolderView;
   onClose: () => void;
 };
 
-export default function StudioKitchenCampaignDrawer({ campaign, onClose }: Props) {
-  const { drawer, detail } = studioKitchen;
-  const clientDelayed = kitchenIsClientDelayed(campaign);
+export default function StudioKitchenCampaignDrawer({ folder, onClose }: Props) {
+  const { drawer, detail, fileRoom } = studioKitchen;
+  const bucketId = folder.placement.homeBucketId;
+  const movesTo = kitchenBucketMoveToLabel(bucketId);
 
   return (
     <div className="sk-drawer-root" role="presentation">
@@ -37,10 +38,10 @@ export default function StudioKitchenCampaignDrawer({ campaign, onClose }: Props
           <div>
             <p className="sk-drawer__eyebrow">{drawer.title}</p>
             <h2 id="sk-drawer-title" className="sk-drawer__title">
-              {campaign.campaignName}
+              {folder.campaignName}
             </h2>
             <p className="sk-drawer__sub">
-              {campaign.folderNumber} · {campaign.clientName} · {kitchenStageTitle(campaign.currentStageId)}
+              {folder.folderNumber} · {folder.clientName} · {kitchenFileBucketLabel(bucketId)}
             </p>
           </div>
           <button type="button" className="sk-drawer__close utility-btn utility-btn--secondary" onClick={onClose}>
@@ -50,37 +51,40 @@ export default function StudioKitchenCampaignDrawer({ campaign, onClose }: Props
 
         <div className="sk-drawer__body">
           <div className="sk-drawer__meta">
-            <StudioKitchenPriorityBadge priority={campaign.priority} />
-            <StudioKitchenBucketBadge bucketId={campaign.bucketId} />
-            {clientDelayed ? (
+            <StudioKitchenPriorityBadge priority={folder.priority} />
+            <StudioKitchenFileBucketBadge bucketId={bucketId} />
+            {folder.placement.folderLocation === "tray" ? (
               <span className="sk-badge sk-badge--client-delayed">{studioKitchen.table.clientDelayedBadge}</span>
             ) : null}
+            {folder.showReturnedToQueue ? (
+              <span className="sk-folder__returned sk-folder__returned--inline">{fileRoom.returnedToQueueLabel}</span>
+            ) : null}
           </div>
+
+          {movesTo ? (
+            <p className="sk-drawer__moves">
+              {fileRoom.movesToLabel} <strong>{movesTo}</strong>
+            </p>
+          ) : null}
+
+          <StudioKitchenFolderActions bucketId={bucketId} />
 
           <dl className="sk-drawer__facts">
             <div>
               <dt>{detail.nextActionLabel}</dt>
-              <dd>{campaign.nextAction}</dd>
+              <dd>{folder.nextAction}</dd>
             </div>
             <div>
               <dt>{detail.waitingLabel}</dt>
-              <dd>{campaign.waitingOn}</dd>
+              <dd>{folder.waitingOn}</dd>
             </div>
             <div>
               <dt>{detail.revisionStatusLabel}</dt>
-              <dd>{kitchenFormatRevisionStatus(campaign)}</dd>
-            </div>
-            <div>
-              <dt>{detail.stageEnteredLabel}</dt>
-              <dd>
-                {campaign.stageEnteredAt.date}
-                <br />
-                {campaign.stageEnteredAt.time}
-              </dd>
+              <dd>{kitchenFormatRevisionStatus(folder)}</dd>
             </div>
             <div>
               <dt>{detail.daysLabel}</dt>
-              <dd>{formatKitchenDaysInStage(campaign.daysInStage)}</dd>
+              <dd>{formatKitchenDaysInStage(folder.daysInStage)}</dd>
             </div>
           </dl>
 
@@ -88,23 +92,17 @@ export default function StudioKitchenCampaignDrawer({ campaign, onClose }: Props
             <h3 id="sk-drawer-deliverables" className="sk-drawer__section-title">
               {detail.deliverablesTitle}
             </h3>
-            <StudioKitchenDeliverablesCell deliverables={campaign.deliverables} />
+            <StudioKitchenDeliverablesCell deliverables={folder.deliverables} />
           </section>
 
-          {campaign.ownerNotes.length > 0 ? (
-            <StudioKitchenOwnerNotes notes={campaign.ownerNotes} />
-          ) : null}
+          {folder.ownerNotes.length > 0 ? <StudioKitchenOwnerNotes notes={folder.ownerNotes} /> : null}
 
-          <StudioKitchenAuditTrail
-            events={campaign.auditTrail}
-            title={drawer.auditTitle}
-            id="sk-drawer-audit"
-          />
+          <StudioKitchenAuditTrail events={folder.auditTrail} title={drawer.auditTitle} id="sk-drawer-audit" />
         </div>
 
         <footer className="sk-drawer__foot">
           <Link
-            href={kitchenCampaignHref(campaign.id)}
+            href={kitchenCampaignHref(folder.id)}
             className="utility-btn utility-btn--primary sk-drawer__full-link"
             onClick={onClose}
           >

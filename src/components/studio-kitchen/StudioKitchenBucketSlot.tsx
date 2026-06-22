@@ -1,4 +1,6 @@
 import StudioKitchenFolderCard from "@/components/studio-kitchen/StudioKitchenFolderCard";
+import StudioKitchenFolderActions from "@/components/studio-kitchen/StudioKitchenFolderActions";
+import { kitchenBucketMoveToLabel, kitchenFileBucketDefinition } from "@/config/studio-kitchen-file-room";
 import { studioKitchen } from "@/config/studio-kitchen";
 import type { KitchenBucketSlotView } from "@/lib/studio-kitchen-file-room-view";
 
@@ -9,6 +11,8 @@ type Props = {
 
 export default function StudioKitchenBucketSlot({ slot, onOpenFolder }: Props) {
   const { fileRoom } = studioKitchen;
+  const def = kitchenFileBucketDefinition(slot.bucketId);
+  const movesTo = kitchenBucketMoveToLabel(slot.bucketId);
 
   return (
     <div
@@ -17,11 +21,20 @@ export default function StudioKitchenBucketSlot({ slot, onOpenFolder }: Props) {
       data-alert={slot.alertLevel}
     >
       <header className="sk-bucket-slot__head">
-        <h3 className="sk-bucket-slot__title">{slot.label}</h3>
+        <div>
+          <h3 className="sk-bucket-slot__title">{slot.label}</h3>
+          {def ? <p className="sk-bucket-slot__summary">{def.summary}</p> : null}
+        </div>
         {slot.folders.length > 0 ? (
           <span className="sk-bucket-slot__count">{slot.folders.length}</span>
         ) : null}
       </header>
+
+      {movesTo ? (
+        <p className="sk-bucket-slot__moves">
+          {fileRoom.movesToLabel} <strong>{movesTo}</strong>
+        </p>
+      ) : null}
 
       <div className="sk-bucket-slot__queue" aria-label={`${slot.label} ${fileRoom.queueLabel}`}>
         {slot.folders.length === 0 ? (
@@ -69,6 +82,8 @@ export default function StudioKitchenBucketSlot({ slot, onOpenFolder }: Props) {
           )}
         </div>
       ) : null}
+
+      <StudioKitchenFolderActions bucketId={slot.bucketId} compact />
     </div>
   );
 }

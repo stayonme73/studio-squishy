@@ -75,6 +75,11 @@ export default function DraftRoomIntakeScene({ packageId, editMode = false }: Pr
     return draftRoomClampPanelToViewport(base, stageSize).height;
   }, [intakeClipboardPaperRect, stageSize, intakePlateNativeSize]);
 
+  const isMobileViewport = stageSize.width > 0 && stageSize.width <= 1024;
+  const stageStyle = isMobileViewport
+    ? undefined
+    : ({ "--dri-panel-height": panelHeight } as React.CSSProperties);
+
   useEffect(() => {
     const campaign = readCurrentCampaignHydrated();
     if (!campaign) return;
@@ -159,7 +164,7 @@ export default function DraftRoomIntakeScene({ packageId, editMode = false }: Pr
       <div
         ref={stageRef}
         className="dri-stage"
-        style={{ "--dri-panel-height": panelHeight } as React.CSSProperties}
+        style={stageStyle}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

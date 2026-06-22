@@ -10,8 +10,9 @@ import StudioKitchenWorkflowTimeline, {
   StudioKitchenCampaignMeta,
 } from "@/components/studio-kitchen/StudioKitchenWorkflowTimeline";
 import { kitchenStageTitle, studioKitchen } from "@/config/studio-kitchen";
-import { buildKitchenDetailView } from "@/lib/studio-kitchen-view";
+import { kitchenFileBucketLabel } from "@/config/studio-kitchen-file-room";
 import { getKitchenFolder } from "@/lib/studio-kitchen-file-room-view";
+import { buildKitchenDetailView } from "@/lib/studio-kitchen-view";
 
 type Props = {
   campaignId: string;
@@ -46,12 +47,12 @@ export default function StudioKitchenDetailScene({ campaignId }: Props) {
         title={folder.campaignName}
         backHref={studioKitchen.route}
         backLabel={studioKitchen.page.dashboardBackLabel}
-        lead={`${folder.folderNumber} · ${folder.clientName} · ${kitchenStageTitle(folder.currentStageId)} · ${folder.nextAction}`}
+        lead={`${folder.folderNumber} · ${folder.clientName} · ${folder.placement.homeBucketId ? kitchenFileBucketLabel(folder.placement.homeBucketId) : kitchenStageTitle(folder.currentStageId)} · ${folder.nextAction}`}
       />
 
       <div className="sk-detail">
-        <StudioKitchenCampaignMeta campaign={view.campaign} />
-        <StudioKitchenWorkflowTimeline campaign={view.campaign} stages={view.stages} />
+        <StudioKitchenCampaignMeta campaign={folder} />
+        <StudioKitchenWorkflowTimeline campaign={folder} stages={view.stages} />
         <StudioKitchenOwnerNotes notes={folder.ownerNotes} />
         <StudioKitchenAuditTrail events={folder.auditTrail} />
       </div>

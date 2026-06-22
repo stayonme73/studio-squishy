@@ -142,17 +142,17 @@ export function buildKitchenPriorityAlerts(buckets: KitchenBucketSlotView[]): Ki
     });
   }
 
-  const readyForProduction = buckets.find((b) => b.bucketId === "ready-for-production");
-  if (readyForProduction && readyForProduction.folders.length > 0) {
+  const productionReady = buckets.find((b) => b.bucketId === "production-ready");
+  if (productionReady && productionReady.folders.length > 0) {
     alerts.push({
-      id: "ready-for-production",
+      id: "production-ready",
       message: formatPriorityAlert(
-        readyForProduction.folders.length,
-        "Campaign Ready For Production",
-        "Campaigns Ready For Production",
+        productionReady.folders.length,
+        "Campaign Production Ready",
+        "Campaigns Production Ready",
       ),
-      level: readyForProduction.alertLevel,
-      bucketId: "ready-for-production",
+      level: productionReady.alertLevel,
+      bucketId: "production-ready",
     });
   }
 
@@ -170,17 +170,17 @@ export function buildKitchenPriorityAlerts(buckets: KitchenBucketSlotView[]): Ki
     });
   }
 
-  const finalDelivery = buckets.find((b) => b.bucketId === "final-delivery-ready");
+  const finalDelivery = buckets.find((b) => b.bucketId === "final-delivery");
   if (finalDelivery && finalDelivery.folders.length > 0) {
     alerts.push({
-      id: "final-delivery-ready",
+      id: "final-delivery",
       message: formatPriorityAlert(
         finalDelivery.folders.length,
         "Final Delivery Ready",
         "Final Deliveries Ready",
       ),
       level: finalDelivery.alertLevel,
-      bucketId: "final-delivery-ready",
+      bucketId: "final-delivery",
     });
   }
 

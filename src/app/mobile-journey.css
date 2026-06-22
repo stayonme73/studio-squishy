@@ -292,19 +292,19 @@
     order: 1;
   }
 
-  .sb-board-layout .sb-card--progress {
+  .sb-board-layout .sb-card--studio-note {
     order: 2;
   }
 
-  .sb-board-layout .sb-card--deliverables {
+  .sb-board-layout .sb-card--progress {
     order: 3;
   }
 
-  .sb-board-layout .sb-card--package {
+  .sb-board-layout .sb-card--deliverables {
     order: 4;
   }
 
-  .sb-board-layout .sb-card--studio-note {
+  .sb-board-layout .sb-card--package {
     order: 5;
   }
 

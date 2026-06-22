@@ -107,9 +107,11 @@ export default function StudioGuidePlateScene({ debug = false, enter = true }: P
     router.push(`${paymentHref(selectedId)}&from=prototype`);
   };
 
+  const showMobileFolderPicker = stageSize.width > 0 && stageSize.width <= 1024;
+
   return (
     <div
-      className={`sg-proto${enter ? " sg-proto--enter" : ""}${expandedId ? " sg-proto--expanded" : ""}${approved ? " sg-proto--approved" : ""}`}
+      className={`sg-proto${enter ? " sg-proto--enter" : ""}${expandedId ? " sg-proto--expanded" : ""}${approved ? " sg-proto--approved" : ""}${showMobileFolderPicker && !approved && !expandedId ? " sg-proto--mobile-picker" : ""}`}
       aria-label="Studio Guide — Draft Room"
     >
       <p className="sg-proto-banner" role="status">
@@ -128,7 +130,7 @@ export default function StudioGuidePlateScene({ debug = false, enter = true }: P
         />
 
         <div className="sg-proto-ui">
-          {!approved && !expandedId ? (
+          {!approved && !expandedId && !showMobileFolderPicker ? (
             <div
               className="sg-proto-table-callout"
               style={
@@ -215,6 +217,57 @@ export default function StudioGuidePlateScene({ debug = false, enter = true }: P
             {copy.paymentCta}
           </button>
         </footer>
+      ) : null}
+
+      {showMobileFolderPicker && !approved && !expandedId ? (
+        <>
+          <div className="sg-proto-mobile-wayfind" role="status" aria-live="polite">
+            <p className="sg-proto-mobile-wayfind__eyebrow">{copy.exploreHintEyebrow}</p>
+            <p className="sg-proto-mobile-wayfind__label">{copy.exploreHintMobile}</p>
+            <svg
+              className="sg-proto-mobile-arrow"
+              viewBox="0 0 48 72"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                d="M24 4 L24 52 M12 40 L24 56 L36 40"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M24 58 L24 68 M16 60 L24 68 L32 60"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.55"
+              />
+            </svg>
+          </div>
+          <div className="sg-proto-mobile-folders" role="toolbar" aria-label="Choose a package folder">
+          {PACKAGE_ORDER.map((id) => {
+            const pkg = getStudioGuideV1Package(id);
+            const accent = studioGuidePrototype.accents[id];
+            return (
+              <button
+                key={id}
+                type="button"
+                className={`sg-proto-mobile-folder sg-proto-mobile-folder--${id}`}
+                style={{ "--sg-proto-spine": accent.spine } as CSSProperties}
+                onClick={() => handleBookletClick(id)}
+              >
+                <span className="sg-proto-mobile-folder__label">{pkg?.label ?? id}</span>
+                <span className="sg-proto-mobile-folder__tagline">{pkg?.tagline}</span>
+              </button>
+            );
+          })}
+        </div>
+        </>
       ) : null}
     </div>
   );

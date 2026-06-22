@@ -8,11 +8,8 @@ import StudioKitchenCampaignDrawer from "@/components/studio-kitchen/StudioKitch
 import StudioKitchenCampaignTable from "@/components/studio-kitchen/StudioKitchenCampaignTable";
 import StudioKitchenHeader from "@/components/studio-kitchen/StudioKitchenHeader";
 import { studioKitchen } from "@/config/studio-kitchen";
-import {
-  buildKitchenDashboardView,
-  getKitchenCampaign,
-  withKitchenBucket,
-} from "@/lib/studio-kitchen-view";
+import { getKitchenFolder } from "@/lib/studio-kitchen-file-room-view";
+import { buildKitchenDashboardView } from "@/lib/studio-kitchen-view";
 
 const { page } = studioKitchen;
 
@@ -21,10 +18,9 @@ export default function StudioKitchenDashboardScene() {
   const view = useMemo(() => buildKitchenDashboardView(), []);
   const [drawerCampaignId, setDrawerCampaignId] = useState<string | null>(null);
 
-  const drawerCampaign = useMemo(() => {
+  const drawerFolder = useMemo(() => {
     if (!drawerCampaignId) return null;
-    const campaign = getKitchenCampaign(drawerCampaignId);
-    return campaign ? withKitchenBucket(campaign) : null;
+    return getKitchenFolder(drawerCampaignId);
   }, [drawerCampaignId]);
 
   const handleOpenCampaign = useCallback((campaignId: string) => {
@@ -54,8 +50,8 @@ export default function StudioKitchenDashboardScene() {
         <StudioKitchenCampaignTable tableGroups={view.tableGroups} onOpenCampaign={handleOpenCampaign} />
       </div>
 
-      {drawerCampaign ? (
-        <StudioKitchenCampaignDrawer campaign={drawerCampaign} onClose={handleCloseDrawer} />
+      {drawerFolder ? (
+        <StudioKitchenCampaignDrawer folder={drawerFolder} onClose={handleCloseDrawer} />
       ) : null}
     </div>
   );
