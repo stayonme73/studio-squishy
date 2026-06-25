@@ -346,16 +346,18 @@
     height: 100dvh;
     min-height: 100dvh;
     max-height: 100dvh;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     background: #3a3835;
   }
 
   .welcome-hall-phase1 .welcome-hall-plate-crop--mobile {
     position: relative !important;
     inset: auto !important;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     width: 100%;
-    min-height: 0;
+    min-height: clamp(11rem, 38vh, calc(100vw * 622 / 1024));
     height: auto;
     overflow: hidden;
     display: flex;
@@ -372,10 +374,10 @@
   .welcome-hall-phase1 .welcome-hall-plate-crop--mobile .welcome-hall-plate-art {
     position: relative;
     inset: auto;
-    flex: 0 1 auto;
+    flex: 0 0 auto;
     width: 100%;
     height: auto;
-    max-height: 100%;
+    max-height: none;
     aspect-ratio: 1024 / 622;
     object-fit: contain !important;
     object-position: 50% 0% !important;

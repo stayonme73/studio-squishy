@@ -2,14 +2,15 @@
  * Measure title text bounding boxes on discovery-studio-plate-v1.png
  * Run: node scripts/measure-discovery-titles.mjs
  *
- * Script titles sit in the lower half of each card (below icon/number).
- * Skips full-width divider rows and the right-side "Not completed" status column.
+ * Titles sit on the handwritten row (below icon/number, above question copy).
+ * Scans upper and lower bands per tile because row-3 titles sit high while
+ * rows 1–2 titles sit lower in the hit rect. Skips full-width divider rows.
  */
 import sharp from "sharp";
 
 const PLATE = "public/business-discovery-studio/discovery-studio-plate-v1.png";
 const BADGE_SIZE = 14;
-const BADGE_GAP = 4;
+const BADGE_GAP = 7;
 
 const tileHits = {
   "your-business": { x: 244, y: 162, width: 188, height: 98 },
@@ -54,50 +55,77 @@ function isLight(r, g, b, a) {
   return lum > 165 && r > 140 && g > 140 && b > 140;
 }
 
-function measureTitle(hit, lightText = false) {
-  const isTitlePixel = lightText ? isLight : isDark;
-  const yStart = hit.y + Math.round(hit.height * 0.5);
-  const yEnd = hit.y + Math.round(hit.height * 0.88);
+function scanRows(hit, yStart, yEnd, isTitlePixel) {
   const xStart = hit.x + 12;
-  const statusCutoff = hit.x + Math.round(hit.width * 0.78);
+  const statusCutoff = hit.x + Math.round(hit.width * 0.72);
   const scanWidth = statusCutoff - xStart;
+  const rows = [];
 
-  let bestY = 0;
-  let bestCount = 0;
   for (let y = yStart; y <= yEnd; y++) {
+    let minX = Infinity;
+    let maxX = -Infinity;
     let count = 0;
-    for (let x = xStart; x < statusCutoff; x++) {
-      const i = (y * width + x) * channels;
-      if (isTitlePixel(data[i], data[i + 1], data[i + 2], data[i + 3])) count++;
-    }
-    if (count / scanWidth > 0.45) continue;
-    if (count > bestCount) {
-      bestCount = count;
-      bestY = y;
-    }
-  }
-
-  if (bestCount === 0) return null;
-
-  let minX = Infinity;
-  let maxX = -Infinity;
-  let sumY = 0;
-  let pixelCount = 0;
-
-  for (let y = bestY - 3; y <= bestY + 3; y++) {
-    let rowFill = 0;
-    for (let x = xStart; x < statusCutoff; x++) {
-      const i = (y * width + x) * channels;
-      if (isTitlePixel(data[i], data[i + 1], data[i + 2], data[i + 3])) rowFill++;
-    }
-    if (rowFill / scanWidth > 0.45) continue;
-
     for (let x = xStart; x < statusCutoff; x++) {
       const i = (y * width + x) * channels;
       if (isTitlePixel(data[i], data[i + 1], data[i + 2], data[i + 3])) {
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x);
-        sumY += y;
+        count++;
+      }
+    }
+    rows.push({
+      y,
+      minX,
+      maxX,
+      count,
+      fill: count / scanWidth,
+      span: maxX - minX,
+    });
+  }
+
+  return { rows, xStart, statusCutoff, scanWidth };
+}
+
+function measureBand(hit, yStart, yEnd, lightText) {
+  const isTitlePixel = lightText ? isLight : isDark;
+  const { rows, xStart, statusCutoff, scanWidth } = scanRows(
+    hit,
+    yStart,
+    yEnd,
+    isTitlePixel,
+  );
+
+  const candidates = rows.filter((row) => {
+    if (lightText) {
+      return row.count >= 40 && row.fill >= 0.55 && row.span >= 80;
+    }
+    return (
+      row.count >= 10 &&
+      row.fill >= 0.1 &&
+      row.fill <= 0.38 &&
+      row.span >= 38 &&
+      row.span <= scanWidth * 0.88
+    );
+  });
+
+  if (!candidates.length) return null;
+
+  candidates.sort((a, b) => b.maxX - a.maxX || b.span - a.span);
+  const seed = candidates[0];
+
+  let maxX = -Infinity;
+  let sumY = 0;
+  let pixelCount = 0;
+
+  for (const row of rows) {
+    if (row.y < seed.y - 6 || row.y > seed.y + 6) continue;
+    if (!lightText && row.fill >= 0.42) continue;
+
+    for (let x = xStart; x < statusCutoff; x++) {
+      const i = (row.y * width + x) * channels;
+      if (isTitlePixel(data[i], data[i + 1], data[i + 2], data[i + 3])) {
+        maxX = Math.max(maxX, x);
+        sumY += row.y;
         pixelCount++;
       }
     }
@@ -106,15 +134,32 @@ function measureTitle(hit, lightText = false) {
   if (pixelCount === 0) return null;
 
   const titleCenterY = Math.round(sumY / pixelCount);
-  const badgeX = maxX + BADGE_GAP;
-  const badgeY = titleCenterY - Math.round(BADGE_SIZE / 2);
-
   return {
-    bestY,
-    titleBox: { left: minX, right: maxX, centerY: titleCenterY },
-    badge: { x: badgeX, y: badgeY, size: BADGE_SIZE },
-    darkPixels: pixelCount,
+    titleBox: { right: maxX, centerY: titleCenterY, minX: seed.minX },
+    badge: {
+      x: maxX + BADGE_GAP,
+      y: titleCenterY - Math.round(BADGE_SIZE / 2),
+      size: BADGE_SIZE,
+    },
   };
+}
+
+function measureTitle(hit, lightText = false) {
+  const yPad = 8;
+  const yBottom = hit.y + hit.height - 6;
+  const yMid = hit.y + Math.round(hit.height * 0.52);
+
+  const upper = measureBand(hit, hit.y + yPad, yMid, lightText);
+  const lower = measureBand(hit, yMid + 1, yBottom, lightText);
+
+  if (!upper) return lower;
+  if (!lower) return upper;
+
+  if (Math.abs(upper.titleBox.right - lower.titleBox.right) <= 15) {
+    return upper.titleBox.minX <= lower.titleBox.minX ? upper : lower;
+  }
+
+  return upper.titleBox.right >= lower.titleBox.right ? upper : lower;
 }
 
 console.log(`Plate: ${width}x${height}\n`);

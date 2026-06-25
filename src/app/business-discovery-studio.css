@@ -133,7 +133,14 @@
   }
 }
 
-/* --- Completed tile — baked art only, plate-anchored ✓ badge --- */
+/* --- Completed tile — plate-anchored ✓ overlay (one badge per tile) --- */
+
+.business-discovery-studio .bds-done-badges {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
 
 .business-discovery-studio .bds-tile-done-badge {
   position: absolute;

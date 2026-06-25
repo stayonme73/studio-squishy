@@ -119,16 +119,18 @@
     height: 100dvh !important;
     min-height: 100dvh !important;
     max-height: 100dvh !important;
-    overflow: hidden !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
     background: #3a3835;
   }
 
   .welcome-hall-phase1 .welcome-hall-plate-crop--mobile {
     position: relative !important;
     inset: auto !important;
-    flex: 1 1 auto !important;
+    flex: 0 0 auto !important;
     width: 100% !important;
-    min-height: 0 !important;
+    min-height: clamp(11rem, 38vh, calc(100vw * 622 / 1024)) !important;
     height: auto !important;
     overflow: hidden;
     display: flex;
@@ -146,9 +148,10 @@
     position: relative !important;
     inset: auto !important;
     display: block !important;
+    flex: 0 0 auto !important;
     width: 100% !important;
     height: auto !important;
-    max-height: 100% !important;
+    max-height: none !important;
     aspect-ratio: 1024 / 622;
     object-fit: contain !important;
     object-position: 50% 0% !important;
@@ -186,7 +189,8 @@
     height: 100dvh !important;
     min-height: 100dvh !important;
     max-height: 100dvh !important;
-    overflow: hidden !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
   }
 
   /* —— Studio Guide —— */

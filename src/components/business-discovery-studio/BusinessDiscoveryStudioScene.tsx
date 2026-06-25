@@ -20,6 +20,7 @@ import {
 } from "@/config/business-discovery-studio";
 
 import DiscoverySheetCard from "./DiscoverySheetCard";
+import DiscoveryTileDoneBadge from "./DiscoveryTileDoneBadge";
 
 type Props = {
   debug?: boolean;
@@ -42,7 +43,6 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     alt,
     nativeSize,
     tileHits,
-    tileDoneBadges,
     tileLabels,
     plateFraming,
     discoveryExpandedRect,
@@ -51,6 +51,11 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   const allFormComplete = DISCOVERY_FORM_TILE_IDS.every(
     (id) => Boolean(answers[id]?.trim()),
   );
+
+  const isTileComplete = (id: DiscoveryTileId) => Boolean(answers[id]?.trim());
+
+  const showDoneBadge = (id: DiscoveryTileId) =>
+    isTileComplete(id) && activeTileId !== id;
 
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -87,19 +92,6 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     () => sceneRectToCoverPercent(discoveryExpandedRect, stageSize, plateFraming),
     [discoveryExpandedRect, plateFraming, stageSize],
   );
-
-  const doneBadgeStyles = useMemo(() => {
-    const map = {} as Record<DiscoveryTileId, CSSProperties>;
-    for (const id of DISCOVERY_TILE_ORDER) {
-      const badge = tileDoneBadges[id];
-      map[id] = sceneRectToCoverPercent(
-        { x: badge.x, y: badge.y, width: badge.size, height: badge.size },
-        stageSize,
-        plateFraming,
-      );
-    }
-    return map;
-  }, [plateFraming, stageSize, tileDoneBadges]);
 
   useLayoutEffect(() => {
     if (sheetPhase !== "expanding") return;
@@ -201,7 +193,6 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
         <div className="bds-ui">
           {DISCOVERY_TILE_ORDER.map((id) => {
             const isActive = activeTileId === id;
-            const isComplete = Boolean(answers[id]?.trim());
             const isSubmitLocked = id === "submit-project" && !allFormComplete;
             const sheetOpenElsewhere = activeTileId !== null && !isActive;
 
@@ -211,7 +202,6 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
                 className={[
                   "bds-tile-layer",
                   isActive ? "bds-tile-layer--active" : "",
-                  isComplete ? "bds-tile-layer--complete" : "",
                   isSubmitLocked ? "bds-tile-layer--locked" : "",
                 ]
                   .filter(Boolean)
@@ -240,27 +230,39 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
             );
           })}
 
-          {DISCOVERY_TILE_ORDER.map((id) => {
-            const isActive = activeTileId === id;
-            const isComplete = Boolean(answers[id]?.trim());
-            if (isActive || !isComplete) return null;
-
-            return (
-              <span
-                key={`done-${id}`}
-                className={[
-                  "bds-tile-done-badge",
-                  id === "submit-project" ? "bds-tile-done-badge--submit" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                style={doneBadgeStyles[id]}
-                aria-hidden="true"
-              >
-                ✓
-              </span>
-            );
-          })}
+          {/* Plate-anchored ✓ badges — one explicit render path per tile, no tile-local coords */}
+          <div className="bds-done-badges" aria-hidden="true">
+            {showDoneBadge("your-business") && (
+              <DiscoveryTileDoneBadge tileId="your-business" stageSize={stageSize} />
+            )}
+            {showDoneBadge("your-situation") && (
+              <DiscoveryTileDoneBadge tileId="your-situation" stageSize={stageSize} />
+            )}
+            {showDoneBadge("your-challenge") && (
+              <DiscoveryTileDoneBadge tileId="your-challenge" stageSize={stageSize} />
+            )}
+            {showDoneBadge("your-current-tools") && (
+              <DiscoveryTileDoneBadge tileId="your-current-tools" stageSize={stageSize} />
+            )}
+            {showDoneBadge("your-focus") && (
+              <DiscoveryTileDoneBadge tileId="your-focus" stageSize={stageSize} />
+            )}
+            {showDoneBadge("success-looks-like") && (
+              <DiscoveryTileDoneBadge tileId="success-looks-like" stageSize={stageSize} />
+            )}
+            {showDoneBadge("whats-slowing-you-down") && (
+              <DiscoveryTileDoneBadge
+                tileId="whats-slowing-you-down"
+                stageSize={stageSize}
+              />
+            )}
+            {showDoneBadge("anything-else") && (
+              <DiscoveryTileDoneBadge tileId="anything-else" stageSize={stageSize} />
+            )}
+            {showDoneBadge("submit-project") && (
+              <DiscoveryTileDoneBadge tileId="submit-project" stageSize={stageSize} />
+            )}
+          </div>
 
           {activeTileId && activeConfig && sheetLayerStyle && (
             <div
