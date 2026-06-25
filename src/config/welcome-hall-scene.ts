@@ -1,5 +1,6 @@
 /**
  * Welcome Hall — RUNTIME scene asset (V2 tower-free plate).
+ * 🔒 Studio Lobby Complete — no redesign without explicit approval
  *
  * LOCKED v31 — approved by Tagia (Creative Director), 2026-06-14.
  * Archived final: public/welcome-hall/welcome-hall-v2-final-locked.png
@@ -11,7 +12,7 @@
  *   - verified navigation failure
  * All other changes require explicit Tagia approval.
  *
- * Plate v31 cache ?v=31 — 1920x1080 founder art; kiosk right foreground.
+ * Plate v4 cache ?v=1 — 1024x622 lobby art; kiosk left foreground.
  * Tower rotation dormant — enable TOWER_ROTATION_ENABLED for Phase 2 only.
  *
  * @see docs/illustration/welcome-hall-locked.md
@@ -26,10 +27,10 @@ export type SceneRect = {
 };
 
 export const welcomeHallScene = {
-  src: "/welcome-hall/welcome-hall-scene-v3.2.png?v=31",
-  alt: "Welcome Hall — Team Studio entrance",
-  aspectRatio: "1920 / 1080" as const,
-  nativeSize: { width: 1920, height: 1080 } as const,
+  src: "/welcome-hall/welcome-hall-scene-v4.png?v=1",
+  alt: "Studio Lobby — Team Studio entrance",
+  aspectRatio: "1024 / 622" as const,
+  nativeSize: { width: 1024, height: 622 } as const,
 
   /** Legacy kiosk hotspot — v2 interactive scene only */
   guideHotspot: {
@@ -40,15 +41,15 @@ export const welcomeHallScene = {
   },
 
   /**
-   * Full kiosk tap target — native pixels on plate v31 (1920×1080).
-   * Entire black kiosk body + screen + baked tap button.
-   * Calibrated via grid overlay (_verify-hotspots-v31.png).
+   * Full kiosk tap target — native pixels on plate v4 (1024×622).
+   * Left foreground kiosk body + screen + baked tap button.
+   * Calibrated via _verify-hotspots-v4.png (approximate — refine with ?debug=1).
    */
   kioskTapTarget: {
-    x: 1440,
-    y: 502,
-    width: 394,
-    height: 537,
+    x: 86,
+    y: 238,
+    width: 292,
+    height: 368,
   } satisfies SceneRect,
 
   /**
@@ -101,6 +102,10 @@ export function welcomeHallFraming(viewport: {
   const { width, height } = viewport;
   if (width > 0 && height > width) {
     return welcomeHallScene.framing.portrait;
+  }
+  /* Match desktop object-position: 50% 48% in welcome-hall-phase1.css */
+  if (width >= 1025) {
+    return { ...welcomeHallScene.framing.default, y: 0.48 };
   }
   return welcomeHallScene.framing.default;
 }

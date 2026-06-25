@@ -111,198 +111,82 @@
 
   /* —— Welcome Hall —— */
   .welcome-hall-phase1 .welcome-hall-plate {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
     width: 100%;
     max-width: 100vw;
-    overflow: hidden;
-    background: #2e2d2b;
-  }
-
-  .welcome-hall-phase1--mobile.welcome-hall-phase1--establish .welcome-hall-plate {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    height: auto !important;
+    height: 100dvh !important;
     min-height: 100dvh !important;
-    max-height: none !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
     background: #3a3835;
   }
 
-  .welcome-hall-phase1--mobile.welcome-hall-phase1--establish .welcome-hall-plate-crop--establish {
-    position: relative !important;
-    inset: auto !important;
-    top: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    left: auto !important;
-    flex: 0 0 auto !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: hidden;
-  }
-
-  .welcome-hall-phase1--mobile.welcome-hall-phase1--establish .welcome-hall-plate-art {
-    position: relative !important;
-    inset: auto !important;
-    top: auto !important;
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    max-height: none !important;
-    aspect-ratio: 1920 / 1080;
-    object-fit: contain !important;
-    object-position: 50% 0 !important;
-    transform: scale(1.1) !important;
-    transform-origin: 50% 0 !important;
-  }
-
-  .welcome-hall-phase1--mobile.welcome-hall-phase1--establish .hall-establish-dock {
-    position: relative !important;
-    flex: 0 0 auto !important;
-    z-index: 2;
-    width: 100%;
-    margin-top: 0;
-  }
-
-  main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.welcome-hall-phase1--establish) {
-    height: auto !important;
-    min-height: 100dvh !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-  }
-
-  /* Returning customers — bottom-left on kiosk step only */
-  .welcome-hall-phase1--kiosk .hall-kiosk-secondary--dock {
-    display: none !important;
-  }
-
-  /* Kiosk step — tall art crop, hint bar + returning strip below */
-  .welcome-hall-phase1--mobile.welcome-hall-phase1--kiosk .welcome-hall-plate {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    height: auto !important;
-    min-height: 100dvh !important;
-    max-height: none !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    background: #3a3835;
-  }
-
-  .welcome-hall-phase1--mobile.welcome-hall-phase1--kiosk .welcome-hall-plate-crop--kiosk {
+  .welcome-hall-phase1 .welcome-hall-plate-crop--mobile {
     position: relative !important;
     inset: auto !important;
     flex: 1 1 auto !important;
     width: 100% !important;
-    min-height: min(78dvh, calc(100dvh - 9.5rem)) !important;
+    min-height: 0 !important;
     height: auto !important;
-    max-height: none !important;
     overflow: hidden;
-  }
-
-  .welcome-hall-phase1--mobile.welcome-hall-phase1--kiosk
-    .welcome-hall-plate-crop--kiosk
-    .welcome-hall-plate-art {
-    position: absolute !important;
-    inset: 0 !important;
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    object-position: 84% 60% !important;
-    transform: none !important;
-    transform-origin: 84% 60% !important;
-    transition: none !important;
-  }
-
-  .welcome-hall-phase1--mobile.welcome-hall-phase1--kiosk .hall-kiosk-stack--mobile {
-    position: absolute !important;
-    z-index: 4;
-    pointer-events: none;
-  }
-
-  .welcome-hall-phase1--mobile.welcome-hall-phase1--kiosk .hall-kiosk-stack--mobile > * {
-    pointer-events: auto;
-  }
-
-  .hall-kiosk-dock {
-    position: relative !important;
-    flex: 0 0 auto !important;
-    z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
-    width: 100%;
+    align-items: center;
+    justify-content: flex-start;
     padding:
-      0.55rem 0.7rem
-      calc(0.65rem + env(safe-area-inset-bottom, 0px));
+      clamp(0.85rem, 3.5vh, 1.45rem)
+      0
+      clamp(1rem, 4.5vh, 1.85rem);
+    box-sizing: border-box;
+  }
+
+  .welcome-hall-phase1 .welcome-hall-plate-crop--mobile .welcome-hall-plate-art {
+    position: relative !important;
+    inset: auto !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 100% !important;
+    aspect-ratio: 1024 / 622;
+    object-fit: contain !important;
+    object-position: 50% 0% !important;
+    transform: none !important;
+  }
+
+  .welcome-hall-phase1 .hall-mobile-dock {
+    display: flex !important;
+    position: relative !important;
+    flex: 0 0 auto !important;
+    flex-direction: column !important;
+    gap: 0.55rem !important;
+    z-index: 2;
+    width: 100%;
+    margin-top: 0;
+    padding:
+      0.5rem 0.75rem 0;
     background: #3a3835;
     box-sizing: border-box;
-    animation: hall-kiosk-dock-in 0.45s ease-out 0.1s both;
   }
 
-  @keyframes hall-kiosk-dock-in {
-    from {
-      opacity: 0;
-      transform: translateY(0.4rem);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .welcome-hall-phase1 .hall-mobile-studio-nav {
+    display: block !important;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-top: 0.55rem;
+    border-top: 1px solid color-mix(in srgb, var(--board-family-cream, #f3ede3) 12%, transparent);
   }
 
-  .hall-kiosk-hint-bar {
-    width: 100%;
-    margin: 0;
-    padding: 0.7rem 0.85rem;
-    text-align: center;
-    color: var(--studio-denim, #2c3e50);
-    background: color-mix(in srgb, var(--board-family-cream, #f3ede3) 94%, white);
-    border: 1px solid color-mix(in srgb, var(--studio-denim, #2c3e50) 14%, transparent);
-    border-radius: 0;
-    box-shadow: 0 2px 10px rgba(26, 26, 26, 0.12);
-    box-sizing: border-box;
+  .welcome-hall-phase1 .hall-mobile-studio-nav__list {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
   }
 
-  .hall-kiosk-hint-bar__headline {
-    margin: 0;
-    font-family: var(--font-geist-sans, system-ui, sans-serif);
-    font-size: clamp(0.95rem, 4.2vw, 1.15rem);
-    font-weight: 800;
-    line-height: 1.25;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  .hall-kiosk-hint-bar__detail {
-    margin: 0.28rem 0 0;
-    font-family: var(--font-geist-sans, system-ui, sans-serif);
-    font-size: clamp(0.78rem, 3.4vw, 0.88rem);
-    font-weight: 600;
-    line-height: 1.35;
-    letter-spacing: 0.02em;
-  }
-
-  main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.welcome-hall-phase1--kiosk) {
-    height: auto !important;
+  main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.welcome-hall-phase1) {
+    height: 100dvh !important;
     min-height: 100dvh !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-  }
-
-  .hall-kiosk-secondary--dock .hall-kiosk-secondary__prompt {
-    font-size: 0.62rem;
-    line-height: 1.3;
-  }
-
-  .hall-kiosk-secondary--dock .hall-kiosk-secondary__link {
-    font-size: 0.78rem;
-    min-height: 2.35rem;
-    justify-content: flex-start;
-    padding: 0.1rem 0;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
   }
 
   /* —— Studio Guide —— */

@@ -1,0 +1,241 @@
+.decision-learner {
+  --dl-bg: #f4f4f5;
+  --dl-panel: #ffffff;
+  --dl-border: #d4d4d8;
+  --dl-text: #18181b;
+  --dl-muted: #71717a;
+  --dl-accent: #2563eb;
+  --dl-good: #15803d;
+  --dl-bad: #b91c1c;
+  min-height: 100dvh;
+  background: var(--dl-bg);
+  color: var(--dl-text);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.decision-learner__header {
+  border-bottom: 1px solid var(--dl-border);
+  background: var(--dl-panel);
+  padding: 1rem 1.25rem;
+}
+
+.decision-learner__header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.decision-learner__header p {
+  margin: 0.35rem 0 0;
+  color: var(--dl-muted);
+  font-size: 0.875rem;
+}
+
+.decision-learner__main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.decision-learner__panel {
+  background: var(--dl-panel);
+  border: 1px solid var(--dl-border);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.decision-learner__panel h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.decision-learner__panel p.help {
+  margin: -0.35rem 0 0.75rem;
+  color: var(--dl-muted);
+  font-size: 0.8125rem;
+}
+
+.decision-learner label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+}
+
+.decision-learner textarea,
+.decision-learner input[type="text"] {
+  width: 100%;
+  border: 1px solid var(--dl-border);
+  border-radius: 6px;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+  font-size: 0.875rem;
+  background: #fff;
+}
+
+.decision-learner textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.decision-learner textarea.tall {
+  min-height: 220px;
+}
+
+.decision-learner .field {
+  margin-bottom: 0.75rem;
+}
+
+.decision-learner .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.decision-learner button {
+  border: 1px solid var(--dl-border);
+  background: #fff;
+  color: var(--dl-text);
+  border-radius: 6px;
+  padding: 0.45rem 0.75rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.decision-learner button.primary {
+  background: var(--dl-accent);
+  border-color: var(--dl-accent);
+  color: #fff;
+}
+
+.decision-learner button.good {
+  background: var(--dl-good);
+  border-color: var(--dl-good);
+  color: #fff;
+}
+
+.decision-learner button.bad {
+  background: var(--dl-bad);
+  border-color: var(--dl-bad);
+  color: #fff;
+}
+
+.decision-learner button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.decision-learner .status {
+  font-size: 0.8125rem;
+  color: var(--dl-muted);
+}
+
+.decision-learner .status.error {
+  color: var(--dl-bad);
+}
+
+.decision-learner .case-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.decision-learner .case-card {
+  border: 1px solid var(--dl-border);
+  border-radius: 6px;
+  padding: 0.75rem;
+  background: #fafafa;
+}
+
+.decision-learner .case-card__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--dl-muted);
+  margin-bottom: 0.5rem;
+}
+
+.decision-learner .case-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.decision-learner .case-card p {
+  margin: 0 0 0.35rem;
+  font-size: 0.8125rem;
+  white-space: pre-wrap;
+}
+
+.decision-learner .prediction {
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--dl-border);
+  padding-top: 0.75rem;
+}
+
+.decision-learner .prediction ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.8125rem;
+}
+
+.decision-learner .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.decision-learner .stat {
+  border: 1px solid var(--dl-border);
+  border-radius: 6px;
+  padding: 0.65rem;
+  background: #fafafa;
+}
+
+.decision-learner .stat strong {
+  display: block;
+  font-size: 1.25rem;
+}
+
+.decision-learner .stat span {
+  font-size: 0.75rem;
+  color: var(--dl-muted);
+}
+
+.decision-learner .history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.decision-learner .history-table th,
+.decision-learner .history-table td {
+  border-bottom: 1px solid var(--dl-border);
+  padding: 0.4rem 0.35rem;
+  text-align: left;
+}
+
+.decision-learner .tag {
+  display: inline-block;
+  font-size: 0.6875rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  background: #e4e4e7;
+}
+
+.decision-learner .tag.good {
+  background: #dcfce7;
+  color: var(--dl-good);
+}
+
+.decision-learner .tag.bad {
+  background: #fee2e2;
+  color: var(--dl-bad);
+}

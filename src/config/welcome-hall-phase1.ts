@@ -1,7 +1,11 @@
 /**
  * Welcome Hall Phase 1 — V2 (kiosk → Draft Room intake).
+ * 🔒 Studio Lobby Complete — no redesign without explicit approval
  * @see docs/illustration/welcome-hall-locked.md
  */
+
+import { helpCenterAnchor } from "@/config/help-center";
+import { studioBoard } from "@/config/studio-board";
 
 export const welcomeHallPhase1 = {
   status: "v2" as const,
@@ -9,36 +13,50 @@ export const welcomeHallPhase1 = {
   journey: ["welcome-hall", "kiosk", "draft-room"] as const,
 
   cta: {
-    /** Primary — kiosk only. Screen overlay shows LET'S GET STARTED until V2 plate ships. */
-    kioskLabel: "Let's get started — begin your draft in the Draft Room",
+    /** Primary — entire kiosk routes to Business Discovery Studio. */
+    kioskLabel: "Let's get started — enter Business Discovery Studio.",
     kioskHeadline: "LET'S GET STARTED",
-    returningPrompt: "Already have a campaign?",
-    returningLink: "Open Studio Board →",
-    returningHref: "/studio-board",
+    kioskScreenLabel: "HOW CAN WE HELP?",
   },
 
-  /** Mobile portrait — step 1 establishing shot before kiosk focus. */
+  /** Mobile portrait — single screen: heading, tagline, CTA. */
   mobileEstablish: {
-    eyebrow: "Welcome",
-    title: "Welcome to The Studio",
-    lead:
-      "You are entering Team Studio's Welcome Hall — the starting point for every campaign we create together.",
-    journeyHeading: "What happens next",
-    journeySteps: [
-      "Tap Step Inside to enter the hall.",
-      "On the kiosk, tap Let's Get Started.",
-      "Choose your package — Spark, Momentum, or Growth.",
-    ] as const,
-    continueLabel: "Step Inside",
-    continueHint: "Next: the kiosk in the Welcome Hall",
-    kioskHint: "Let's Get Started",
-    kioskHintDetail: "Tap the kiosk screen to continue",
-    returningPrompt: "Already have a campaign?",
-    returningLink: "Open Studio Board →",
+    heading: "THE STUDIO",
+    tagline:
+      "Tell us about your business. Together, we'll build what's next.",
+    ctaLabel: "LET'S GET STARTED",
   },
 
-  /** Production intro plate — restore after Studio Guide interaction lock. */
+  /** Mobile portrait — secondary links in gray dock below hero card. */
+  mobileStudioNav: {
+    ariaLabel: "Studio navigation",
+    heading: "Need Something Else?",
+    items: [
+      {
+        label: "Client Login",
+        href: studioBoard.routes.account,
+        title:
+          "Access your Studio Board, projects, reviews, and deliverables.",
+      },
+      {
+        label: "Our Services",
+        href: `${studioBoard.routes.helpCenter}#packages`,
+      },
+      {
+        label: "FAQ",
+        href: `${studioBoard.routes.helpCenter}#${helpCenterAnchor("faq")}`,
+      },
+      {
+        label: "Contact The Studio",
+        href: `${studioBoard.routes.helpCenter}#about`,
+      },
+    ],
+  },
+
+  /** Welcome Hall kiosk → Business Discovery Studio (package discovery). */
+  routeToBusinessDiscoveryStudio: "/business-discovery-studio",
+  /** @deprecated use routeToBusinessDiscoveryStudio */
   routeToDraftRoom: "/draft-room",
-  /** Interaction validation — Welcome Hall kiosk during prototype pass. */
-  routeToStudioGuidePrototype: "/studio-guide-prototype",
+  /** @deprecated use routeToBusinessDiscoveryStudio */
+  routeToStudioGuidePrototype: "/business-discovery-studio",
 } as const;

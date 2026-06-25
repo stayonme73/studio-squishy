@@ -37,6 +37,19 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local prototype data
+/data/
+
+# QA / calibration artifacts (not production assets)
+public/welcome-hall/_debug-*
+public/welcome-hall/_verify-*
+public/welcome-hall/_test_*
+tmp-*
+tmp-tile-crops/
+build-out.txt
+scripts/__pycache__/
+src/app/_test-*.css
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
