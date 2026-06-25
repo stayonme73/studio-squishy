@@ -1,0 +1,141 @@
+.ds-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--utility-card-gap);
+}
+
+.ds-approval-badge {
+  margin: 0;
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--utility-nav-accent-active) 88%, #000 12%);
+  background: color-mix(in srgb, var(--utility-nav-accent-active) 14%, var(--utility-cream));
+  border: 1px solid color-mix(in srgb, var(--utility-nav-accent-active) 35%, transparent);
+}
+
+.ds-warnings__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ds-warnings__item {
+  padding: 0.75rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  color: var(--utility-text);
+  background: color-mix(in srgb, #c47a2c 10%, var(--utility-cream));
+  border: 1px solid color-mix(in srgb, #c47a2c 28%, transparent);
+}
+
+.ds-services__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1rem;
+}
+
+.ds-service {
+  padding-top: 1rem;
+  border-top: 1px solid var(--utility-border);
+}
+
+.ds-service:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.ds-service__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.45rem;
+}
+
+.ds-service__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--utility-text);
+}
+
+.ds-service__badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--utility-primary);
+}
+
+.ds-service__explanation {
+  margin: 0 0 0.85rem;
+  line-height: 1.55;
+  color: var(--utility-text-muted);
+}
+
+.ds-service__block {
+  margin-bottom: 0.85rem;
+}
+
+.ds-service__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--utility-text-muted);
+}
+
+.ds-deliverables {
+  margin: 0;
+  padding-left: 1.1rem;
+  line-height: 1.5;
+}
+
+.ds-service__meta {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.ds-service__meta dt {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--utility-text-muted);
+}
+
+.ds-service__meta dd {
+  margin: 0.15rem 0 0;
+  font-weight: 600;
+  color: var(--utility-text);
+}
+
+.ds-summary-grid {
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.ds-summary-value {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.ds-next-step__body {
+  margin: 0 0 1rem;
+  line-height: 1.55;
+  color: var(--utility-text-muted);
+}
+
+.ds-muted {
+  margin: 0;
+  color: var(--utility-text-muted);
+}
