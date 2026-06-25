@@ -200,8 +200,8 @@ export const businessDiscoveryStudio = {
     "submit-project": "Submit Project",
   } satisfies Record<DiscoveryTileId, string>,
 
-  /** Cover-fill framing — matches object-fit: cover on the plate art. */
-  plateFraming: { x: 0.5, y: 0.5, fit: "cover" as const },
+  /** Contain framing — matches object-fit: contain so the full plate fits in the viewport. */
+  plateFraming: { x: 0.5, y: 0.5, fit: "contain" as const },
 
   /**
    * Expanded card rect on the drafting table (native plate pixels).

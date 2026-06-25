@@ -1,17 +1,20 @@
 /* Business Discovery Studio — plate + invisible tile hotspots */
 
 .business-discovery-studio .bds-scene {
+  position: relative;
   flex: 1 1 auto;
+  align-self: stretch;
   width: 100%;
   height: 100%;
   min-height: 0;
+  overflow: hidden;
 }
 
 .business-discovery-studio .bds-plate {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 100dvh;
+  min-height: 0;
   overflow: hidden;
   background: #2e2d2b;
 }
@@ -22,7 +25,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: 50% 50%;
   user-select: none;
   pointer-events: none;
@@ -75,6 +78,7 @@
 }
 
 @media (min-width: 1025px) {
+  main.flex.h-\[100dvh\].flex-1.flex-col:has(.business-discovery-studio),
   main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.business-discovery-studio) {
     height: 100dvh;
     min-height: 100dvh;
@@ -85,10 +89,13 @@
   }
 
   .business-discovery-studio .bds-scene {
+    width: 100%;
     height: 100%;
+    min-height: 0;
   }
 
   .business-discovery-studio .bds-plate {
+    width: 100%;
     height: 100%;
     min-height: 0;
   }
@@ -491,6 +498,16 @@
 
 .business-discovery-studio .bds-tile-layer {
   container-type: size;
+}
+
+@media screen and (max-width: 1024px) {
+  .business-discovery-studio .bds-scene {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
