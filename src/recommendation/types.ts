@@ -6,6 +6,7 @@
 
 import type {
   DiscoveryMappingRule,
+  DiscoverySignalKind,
   ServiceBillingModel,
   ServiceCatalogEntry,
   ServiceDeliverable,
@@ -41,15 +42,25 @@ export type MatchedDiscoveryRule = {
   matchedValue: string;
 };
 
+/** Why a service was recommended — one entry per matched discovery rule. */
+export type RecommendationReason = {
+  signal: DiscoverySignalKind;
+  value: string;
+  weight: number;
+  /** Internal explanation — not customer-facing copy. */
+  detail: string;
+};
+
 /** One ranked service candidate from the engine. */
 export type ServiceRecommendation = {
   serviceId: ServiceId;
   score: number;
   matchedRules: readonly MatchedDiscoveryRule[];
+  reasons: readonly RecommendationReason[];
   rank: number;
 };
 
-/** Internal rationale for ranking — not customer-facing copy. */
+/** Internal aggregate rationale — not customer-facing copy. */
 export type RecommendationRationale = {
   summary: string;
   matchedSignals: readonly string[];
@@ -61,7 +72,7 @@ export type DeliverablesSummaryItem = {
   totalQuantity: number;
 };
 
-export type PricingSummaryItem = {
+export type InvestmentLineItem = {
   serviceId: ServiceId;
   display: string;
   amountUsd: number;
@@ -69,9 +80,39 @@ export type PricingSummaryItem = {
 };
 
 /** Aggregated pricing across recommended services. */
-export type PricingSummary = {
-  items: readonly PricingSummaryItem[];
+export type EstimatedInvestment = {
+  items: readonly InvestmentLineItem[];
   totalAmountUsd: number;
+  /** True when any recommended service has quoted or unknown pricing. */
+  hasQuotedItems: boolean;
+};
+
+export type TimelineLineItem = {
+  serviceId: ServiceId;
+  customerLabel: string;
+  businessDays: number;
+};
+
+/** Production timeline aggregated from recommended services. */
+export type EstimatedTimeline = {
+  items: readonly TimelineLineItem[];
+  /** Longest business-day estimate across recommended services. */
+  totalBusinessDays: number;
+  /** Label from the service driving the longest timeline (ties broken by serviceId). */
+  customerLabel: string;
+};
+
+export type RecommendationWarningKind =
+  | "missing-discovery-answer"
+  | "inactive-service-match"
+  | "unmet-dependency"
+  | "low-confidence-match"
+  | "no-recommendations";
+
+export type RecommendationWarning = {
+  kind: RecommendationWarningKind;
+  message: string;
+  serviceId?: ServiceId;
 };
 
 /**
@@ -85,7 +126,11 @@ export type RecommendationResult = {
   primaryServiceId: ServiceId | null;
   rationale: RecommendationRationale;
   deliverablesSummary: readonly DeliverablesSummaryItem[];
-  pricingSummary: PricingSummary;
+  estimatedInvestment: EstimatedInvestment;
+  estimatedTimeline: EstimatedTimeline;
+  warnings: readonly RecommendationWarning[];
+  /** True when human review is advised before checkout or campaign start. */
+  requiresApproval: boolean;
   generatedAt: string;
   engineVersion: string;
 };

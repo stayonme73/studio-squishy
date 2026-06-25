@@ -10,13 +10,18 @@ export type {
   DiscoveryBrief,
   DiscoveryBriefAnswers,
   DiscoveryFormTileId,
+  EstimatedInvestment,
+  EstimatedTimeline,
+  InvestmentLineItem,
   MatchedDiscoveryRule,
-  PricingSummary,
-  PricingSummaryItem,
   RecommendationCatalogInput,
   RecommendationRationale,
+  RecommendationReason,
   RecommendationResult,
+  RecommendationWarning,
+  RecommendationWarningKind,
   ServiceRecommendation,
+  TimelineLineItem,
 } from "@/recommendation/types";
 
 export {
