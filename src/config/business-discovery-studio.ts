@@ -248,6 +248,11 @@ const _refBadgeY = _refFace.y + 8;
 export const DONE_BADGE_RIGHT_PAD = _refPaintedRight - DONE_BADGE_SIZE - _refBadgeX;
 export const DONE_BADGE_TOP_PAD = _refBadgeY - _refFace.y;
 
+/** Per-tile done-badge nudge (native plate px) — only where painted art diverges from card 1. */
+export const DISCOVERY_BADGE_OFFSET: Partial<Record<DiscoveryTileId, { dy: number }>> = {
+  "your-situation": { dy: 4 },
+};
+
 export type DiscoveryTileDerivedGeometry = {
   face: SceneRect;
   doneBadge: DoneBadgeAnchor;
@@ -264,7 +269,7 @@ export function discoveryTileDerivedGeometry(
     face,
     doneBadge: {
       x: paintedRight - DONE_BADGE_SIZE - DONE_BADGE_RIGHT_PAD,
-      y: face.y + DONE_BADGE_TOP_PAD,
+      y: face.y + DONE_BADGE_TOP_PAD + (DISCOVERY_BADGE_OFFSET[tileId]?.dy ?? 0),
       size: DONE_BADGE_SIZE,
     },
     statusCover: {
