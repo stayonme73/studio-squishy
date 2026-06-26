@@ -223,15 +223,17 @@ export default function DiscoverySheetCard({
     >
       <div className="bds-sheet__paper">
         <p className="bds-sheet__title">{config.title}</p>
-        {isChipField(config.fieldType) ? (
-          <p className="bds-sheet__question" id={questionId}>
-            {config.question}
-          </p>
-        ) : (
-          <label className="bds-sheet__question" htmlFor={questionId}>
-            {config.question}
-          </label>
-        )}
+        {config.fieldType !== "submit" && config.question ? (
+          isChipField(config.fieldType) ? (
+            <p className="bds-sheet__question" id={questionId}>
+              {config.question}
+            </p>
+          ) : (
+            <label className="bds-sheet__question" htmlFor={questionId}>
+              {config.question}
+            </label>
+          )
+        ) : null}
 
         <div className="bds-sheet__body">
           {config.fieldType === "text" && (

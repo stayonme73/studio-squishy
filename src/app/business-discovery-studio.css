@@ -142,16 +142,15 @@
   pointer-events: none;
 }
 
-.business-discovery-studio .bds-tile-layer {
-  position: absolute;
-  pointer-events: none;
+/* Full-tile hit target — button carries plate geometry (kiosk pattern). */
+.business-discovery-studio .bds-ui > .bds-tile-layer {
+  pointer-events: auto;
 }
 
-.business-discovery-studio .bds-tile-hit {
+.business-discovery-studio .bds-tile-layer.bds-tile-hit {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  display: block;
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
   border: none;
@@ -161,6 +160,7 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   border-radius: 2px;
+  z-index: 1;
 }
 
 .business-discovery-studio .bds-tile-hit:hover {
@@ -372,19 +372,19 @@
 .business-discovery-studio .bds-sheet__title {
   margin: 0;
   flex: 0 0 auto;
-  font-size: clamp(9px, 24cqh, 13px);
-  font-weight: 600;
+  font-size: clamp(20px, 5.5cqh, 24px);
+  font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--studio-denim, #2c3e50);
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .business-discovery-studio .bds-sheet__question {
   margin: 0;
   flex: 0 0 auto;
-  font-size: clamp(7px, 18cqh, 10px);
-  line-height: 1.25;
-  color: color-mix(in srgb, var(--studio-denim, #2c3e50) 78%, #1a1a1a);
+  font-size: clamp(15px, 4cqh, 17px);
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--studio-matte-black, #1a1a1a) 82%, var(--studio-denim, #2c3e50));
 }
 
 .business-discovery-studio .bds-sheet__body {
@@ -400,25 +400,32 @@
   width: 100%;
   min-height: 0;
   margin: 0;
-  padding: 5% 6%;
-  border: 1px solid color-mix(in srgb, var(--studio-denim, #2c3e50) 18%, transparent);
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--studio-denim, #2c3e50) 38%, transparent);
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.88);
   font: inherit;
-  font-size: clamp(7px, 17cqh, 10px);
-  line-height: 1.25;
+  font-size: clamp(16px, 4cqh, 18px);
+  line-height: 1.35;
   color: var(--studio-matte-black, #1a1a1a);
   box-shadow: inset 0 1px 2px rgba(26, 26, 26, 0.06);
 }
 
+.business-discovery-studio .bds-sheet__input::placeholder,
+.business-discovery-studio .bds-sheet__textarea::placeholder {
+  color: color-mix(in srgb, var(--studio-matte-black, #1a1a1a) 48%, transparent);
+  opacity: 1;
+}
+
 .business-discovery-studio .bds-sheet__input {
   flex: 0 0 auto;
+  min-height: 40px;
 }
 
 .business-discovery-studio .bds-sheet__textarea {
   flex: 1 1 auto;
   resize: none;
-  min-height: 18cqh;
+  min-height: max(80px, 18cqh);
 }
 
 .business-discovery-studio .bds-sheet__select-wrap {
@@ -430,16 +437,16 @@
   display: block;
   width: 100%;
   flex: 0 0 auto;
-  height: clamp(26px, 22cqh, 38px);
-  min-height: clamp(26px, 22cqh, 38px);
-  max-height: clamp(26px, 22cqh, 38px);
+  height: clamp(40px, 10cqh, 48px);
+  min-height: clamp(40px, 10cqh, 48px);
+  max-height: clamp(40px, 10cqh, 48px);
   margin: 0;
   padding: 0 8% 0 6%;
-  border: 1px solid color-mix(in srgb, var(--studio-denim, #2c3e50) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--studio-denim, #2c3e50) 38%, transparent);
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.88);
   font: inherit;
-  font-size: clamp(7px, 17cqh, 10px);
+  font-size: clamp(16px, 4cqh, 18px);
   line-height: normal;
   color: var(--studio-matte-black, #1a1a1a);
   box-shadow: inset 0 1px 2px rgba(26, 26, 26, 0.06);
@@ -525,9 +532,9 @@
 .business-discovery-studio .bds-sheet__submit-note {
   margin: 0;
   flex: 0 0 auto;
-  font-size: clamp(7px, 16cqh, 10px);
-  line-height: 1.3;
-  color: color-mix(in srgb, var(--studio-denim, #2c3e50) 70%, #1a1a1a);
+  font-size: clamp(15px, 3.5cqh, 17px);
+  line-height: 1.4;
+  color: #4a4a4a;
 }
 
 /** Reserved for future post-submission explanation copy (config.postSubmissionNote). */
@@ -535,9 +542,9 @@
   margin: 0;
   flex: 1 1 auto;
   min-height: 0;
-  font-size: clamp(7px, 16cqh, 10px);
-  line-height: 1.3;
-  color: color-mix(in srgb, var(--studio-denim, #2c3e50) 62%, #1a1a1a);
+  font-size: clamp(15px, 3.5cqh, 17px);
+  line-height: 1.4;
+  color: #4a4a4a;
 }
 
 .business-discovery-studio .bds-sheet__post-submit-note:empty {
@@ -555,13 +562,14 @@
 
 .business-discovery-studio .bds-sheet__btn {
   margin: 0;
-  padding: 5% 10%;
+  padding: 8px 14px;
   border-radius: 2px;
   border: 1px solid transparent;
   font: inherit;
-  font-size: clamp(7px, 17cqh, 10px);
+  font-size: clamp(15px, 3.8cqh, 16px);
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.2;
+  min-height: 44px;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -573,16 +581,25 @@
   min-height: 0;
 }
 
+.business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__title {
+  font-size: clamp(22px, 5.5cqh, 24px);
+}
+
+.business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__question {
+  font-size: clamp(15px, 4cqh, 17px);
+}
+
 .business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__textarea {
   flex: 1 1 auto;
-  min-height: 0;
-  padding: 8px 10px;
-  font-size: clamp(10px, 2.4cqh, 13px);
+  min-height: max(100px, 22cqh);
+  padding: 10px 12px;
+  font-size: clamp(16px, 4cqh, 18px);
 }
 
 .business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__input:not(.bds-sheet__input--other) {
-  padding: 6px 10px;
-  font-size: clamp(10px, 2.4cqh, 13px);
+  padding: 10px 12px;
+  font-size: clamp(16px, 4cqh, 18px);
+  min-height: 44px;
 }
 
 .business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__chip-grid {
@@ -600,16 +617,24 @@
 }
 
 .business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__select {
-  height: clamp(28px, 7cqh, 34px);
-  min-height: clamp(28px, 7cqh, 34px);
-  max-height: clamp(28px, 7cqh, 34px);
-  padding: 0 28px 0 10px;
-  font-size: clamp(10px, 2.4cqh, 13px);
+  height: clamp(44px, 10cqh, 48px);
+  min-height: clamp(44px, 10cqh, 48px);
+  max-height: clamp(44px, 10cqh, 48px);
+  padding: 0 28px 0 12px;
+  font-size: clamp(16px, 4cqh, 18px);
 }
 
 .business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__submit-note {
   flex: 1 1 auto;
-  font-size: clamp(10px, 2.4cqh, 13px);
+  font-size: clamp(15px, 3.5cqh, 17px);
+  line-height: 1.4;
+  color: #4a4a4a;
+}
+
+.business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__post-submit-note {
+  font-size: clamp(15px, 3.5cqh, 17px);
+  line-height: 1.4;
+  color: #4a4a4a;
 }
 
 .business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__actions {
@@ -619,12 +644,12 @@
 }
 
 .business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__btn {
-  padding: 5px 14px;
-  font-size: clamp(9px, 2.1cqh, 11px);
+  padding: 10px 16px;
+  font-size: clamp(15px, 3.8cqh, 17px);
   font-weight: 600;
   line-height: 1.2;
-  min-height: 28px;
-  max-height: 32px;
+  min-height: 44px;
+  max-height: none;
 }
 
 .business-discovery-studio .bds-sheet__btn--primary {
@@ -646,10 +671,6 @@
   background: transparent;
   color: color-mix(in srgb, var(--studio-denim, #2c3e50) 75%, #1a1a1a);
   border-color: color-mix(in srgb, var(--studio-denim, #2c3e50) 22%, transparent);
-}
-
-.business-discovery-studio .bds-tile-layer {
-  container-type: size;
 }
 
 @media screen and (max-width: 1024px) {

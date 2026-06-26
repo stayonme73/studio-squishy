@@ -177,7 +177,7 @@ export const discoveryTileConfig: Record<DiscoveryTileId, DiscoveryTileConfig> =
   },
   "submit-project": {
     title: "Ready to build your Studio Plan?",
-    question: "Ready to build your Studio Plan?",
+    question: "",
     description:
       "We've gathered everything we need to recommend the Studio Services that best fit your business. Submit when you're ready to continue.",
     fieldType: "submit",
