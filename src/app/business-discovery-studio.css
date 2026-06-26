@@ -72,15 +72,11 @@
 
 .business-discovery-studio .bds-scene--split {
   --bds-board-margin: clamp(4px, 0.5vmin, 10px);
-  --bds-split-gap: clamp(4px, 0.5vw, 10px);
-  --bds-split-panel: clamp(18rem, 28vw, 22rem);
-  --bds-board-zone: calc(
-    100vw - var(--bds-split-panel) - var(--bds-split-gap) - 2 * var(--bds-board-margin)
-  );
+  --bds-split-gap: clamp(8px, 1vw, 16px);
   display: grid;
-  /* Column 1: board priority; column 2: fixed narrow summary panel */
-  grid-template-columns: minmax(0, 1fr) var(--bds-split-panel);
-  align-items: center;
+  /* Column 1: board intrinsic width; column 2: all remaining space for the panel */
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: stretch;
   justify-items: stretch;
   gap: var(--bds-split-gap);
   padding: var(--bds-board-margin);
@@ -97,8 +93,8 @@
   justify-self: start;
   align-self: center;
   flex: none;
-  width: 100%;
-  max-width: var(--bds-board-zone);
+  width: max-content;
+  max-width: none;
   min-width: 0;
   z-index: 2;
   transform: translateX(0);
@@ -169,10 +165,7 @@
 }
 
 .business-discovery-studio .bds-scene--split .bds-plate-canvas {
-  width: min(
-    var(--bds-board-zone),
-    calc((100dvh - 2 * var(--bds-board-margin)) * 1024 / 682)
-  );
+  /* Keep pre-submit contain-fit — board does not shrink for the panel */
   transition: width 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
