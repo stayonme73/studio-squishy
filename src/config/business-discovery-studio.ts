@@ -250,7 +250,7 @@ export const DONE_BADGE_TOP_PAD = _refBadgeY - _refFace.y;
 
 /** Per-tile done-badge nudge (native plate px) — only where painted art diverges from card 1. */
 export const DISCOVERY_BADGE_OFFSET: Partial<Record<DiscoveryTileId, { dy: number }>> = {
-  "your-situation": { dy: 4 },
+  "your-situation": { dy: 7 },
 };
 
 export type DiscoveryTileDerivedGeometry = {
