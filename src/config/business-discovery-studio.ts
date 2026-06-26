@@ -68,6 +68,11 @@ export type DiscoveryTileConfig = {
   otherLabel?: string;
   /** Placeholder for the Other text input (multiselect-other). */
   otherPlaceholder?: string;
+  /**
+   * Customer-facing copy shown after submission (future wiring).
+   * Empty string reserves the slot without changing submit behavior.
+   */
+  postSubmissionNote?: string;
 };
 
 export const discoveryTileConfig: Record<DiscoveryTileId, DiscoveryTileConfig> = {
@@ -171,6 +176,8 @@ export const discoveryTileConfig: Record<DiscoveryTileId, DiscoveryTileConfig> =
     title: "Submit Project",
     question: "Ready to send your discovery brief?",
     fieldType: "submit",
+    // Future: post-submission explanation shown after customer submits.
+    postSubmissionNote: "",
   },
 };
 
@@ -207,7 +214,7 @@ export const DISCOVERY_TILE_GEOMETRY = {
   "submit-project": { x: 580, y: 420, width: 199, height: 121 },
 } satisfies Record<DiscoveryTileId, SceneRect>;
 
-const STATUS_COVER_SIZE = 20;
+const STATUS_COVER_SIZE = 12;
 
 /** Next tile in the same row — its left edge marks the painted right edge of the current tile. */
 const TILE_ROW_NEIGHBOR_RIGHT: Partial<Record<DiscoveryTileId, DiscoveryTileId>> = {
@@ -287,8 +294,8 @@ export function discoveryTileDerivedGeometry(
       size: DONE_BADGE_SIZE,
     },
     statusCover: {
-      x: face.x + Math.round(face.width * 0.22),
-      y: face.y + face.height - 26,
+      x: paintedRight - STATUS_COVER_SIZE - 8,
+      y: face.y + face.height - STATUS_COVER_SIZE - 10,
       width: STATUS_COVER_SIZE,
       height: STATUS_COVER_SIZE,
     },
@@ -331,9 +338,9 @@ export const businessDiscoveryStudio = {
    */
   discoveryExpandedRect: {
     x: 172,
-    y: 190,
+    y: 178,
     width: 680,
-    height: 300,
+    height: 328,
   } satisfies SceneRect,
 } as const;
 

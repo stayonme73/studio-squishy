@@ -298,6 +298,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
               >
                 <DiscoverySheetCard
                   key={activeTileId}
+                  tileId={activeTileId}
                   config={activeConfig}
                   initialValue={answers[activeTileId] ?? ""}
                   onChange={handleAnswerChange}

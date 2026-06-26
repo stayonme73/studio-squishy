@@ -157,6 +157,7 @@
   background: #f5f0e8;
   box-shadow: 0 0 0 1px #f5f0e8;
   pointer-events: none;
+  /* Sized in plate px via inline % — keep circle tight to baked status dot only */
 }
 
 .business-discovery-studio .bds-tile-done-badge {
@@ -254,7 +255,7 @@
   inset: 0;
   display: flex;
   flex-direction: column;
-  gap: 4cqh;
+  gap: clamp(3px, 1.4cqh, 7px);
   padding: 8% 9%;
   border-radius: 2px;
   background: linear-gradient(
@@ -360,8 +361,7 @@
   align-content: flex-start;
   gap: 3% 2.5%;
   min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
+  overflow: visible;
 }
 
 .business-discovery-studio .bds-sheet__chip {
@@ -418,10 +418,24 @@
 
 .business-discovery-studio .bds-sheet__submit-note {
   margin: 0;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   font-size: clamp(7px, 16cqh, 10px);
   line-height: 1.3;
   color: color-mix(in srgb, var(--studio-denim, #2c3e50) 70%, #1a1a1a);
+}
+
+/** Reserved for future post-submission explanation copy (config.postSubmissionNote). */
+.business-discovery-studio .bds-sheet__post-submit-note {
+  margin: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  font-size: clamp(7px, 16cqh, 10px);
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--studio-denim, #2c3e50) 62%, #1a1a1a);
+}
+
+.business-discovery-studio .bds-sheet__post-submit-note:empty {
+  display: none;
 }
 
 .business-discovery-studio .bds-sheet__actions {
@@ -466,14 +480,37 @@
 }
 
 .business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__chip-grid {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
-  gap: 6px 8px;
+  gap: 4px 6px;
+  overflow: visible;
 }
 
 .business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__chip {
-  padding: 4px 8px;
-  font-size: clamp(9px, 2.2cqh, 11px);
+  padding: 3px 7px;
+  font-size: clamp(8px, 2cqh, 10px);
+  line-height: 1.15;
+}
+
+/* Dense chip cards — all options visible without scroll on desktop/tablet */
+.business-discovery-studio .bds-sheet[data-tile-id="your-challenge"] .bds-sheet__chip,
+.business-discovery-studio .bds-sheet[data-tile-id="your-focus"] .bds-sheet__chip {
+  padding: 2px 6px;
+  font-size: clamp(8px, 1.9cqh, 10px);
+}
+
+.business-discovery-studio .bds-sheet[data-tile-id="your-current-tools"] .bds-sheet__chip-grid,
+.business-discovery-studio .bds-sheet[data-tile-id="success-looks-like"] .bds-sheet__chip-grid,
+.business-discovery-studio .bds-sheet[data-tile-id="whats-slowing-you-down"] .bds-sheet__chip-grid {
+  gap: 3px 5px;
+}
+
+.business-discovery-studio .bds-sheet[data-tile-id="your-current-tools"] .bds-sheet__chip,
+.business-discovery-studio .bds-sheet[data-tile-id="success-looks-like"] .bds-sheet__chip,
+.business-discovery-studio .bds-sheet[data-tile-id="whats-slowing-you-down"] .bds-sheet__chip {
+  padding: 2px 5px;
+  font-size: clamp(7px, 1.75cqh, 9px);
+  line-height: 1.12;
 }
 
 .business-discovery-studio .bds-sheet-layer--expanded .bds-sheet__select {

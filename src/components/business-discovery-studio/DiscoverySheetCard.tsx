@@ -2,9 +2,10 @@
 
 import { useEffect, useId, useState, type FormEvent } from "react";
 
-import type { DiscoveryTileConfig } from "@/config/business-discovery-studio";
+import type { DiscoveryTileConfig, DiscoveryTileId } from "@/config/business-discovery-studio";
 
 type Props = {
+  tileId: DiscoveryTileId;
   config: DiscoveryTileConfig;
   initialValue?: string;
   onChange: (value: string) => void;
@@ -91,6 +92,7 @@ function isChipField(fieldType: DiscoveryTileConfig["fieldType"]): boolean {
 }
 
 export default function DiscoverySheetCard({
+  tileId,
   config,
   initialValue = "",
   onChange,
@@ -215,6 +217,7 @@ export default function DiscoverySheetCard({
   return (
     <form
       className="bds-sheet"
+      data-tile-id={tileId}
       onSubmit={handleSubmit}
       aria-label={config.title}
     >
@@ -365,9 +368,14 @@ export default function DiscoverySheetCard({
           )}
 
           {config.fieldType === "submit" && (
-            <p className="bds-sheet__submit-note">
-              All discovery tiles are complete. Submit when you&apos;re ready.
-            </p>
+            <>
+              <p className="bds-sheet__submit-note">
+                All discovery tiles are complete. Submit when you&apos;re ready.
+              </p>
+              {config.postSubmissionNote !== undefined && (
+                <p className="bds-sheet__post-submit-note">{config.postSubmissionNote}</p>
+              )}
+            </>
           )}
         </div>
 
