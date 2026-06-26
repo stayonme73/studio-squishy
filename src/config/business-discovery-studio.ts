@@ -51,8 +51,12 @@ export type DiscoveryFieldType =
   | "text"
   | "textarea"
   | "select"
+  | "multiselect"
   | "multiselect-other"
   | "submit";
+
+/** How a tile's answer may be used by downstream automation (not wired yet). */
+export type DiscoveryRecommendationUse = "standard" | "human-review-only";
 
 export type DiscoveryTileConfig = {
   title: string;
@@ -60,6 +64,13 @@ export type DiscoveryTileConfig = {
   fieldType: DiscoveryFieldType;
   options?: readonly string[];
   placeholder?: string;
+  /** When false, tile is not required to unlock Submit. Defaults to true. */
+  required?: boolean;
+  /**
+   * Recommendation Engine must not interpret free-form text from this tile.
+   * `human-review-only` = collected for staff review; no automatic scoring.
+   */
+  recommendationUse?: DiscoveryRecommendationUse;
   /** Label for the custom "Other" chip (multiselect-other). Defaults to "Other". */
   otherLabel?: string;
   /** Placeholder for the Other text input (multiselect-other). */
@@ -101,7 +112,7 @@ export const discoveryTileConfig: Record<DiscoveryTileId, DiscoveryTileConfig> =
   "your-current-tools": {
     title: "Your Current Tools",
     question: "What tools or platforms do you use today?",
-    fieldType: "multiselect-other",
+    fieldType: "multiselect",
     options: [
       "Website / landing page",
       "CRM (HubSpot, Salesforce, etc.)",
@@ -113,32 +124,55 @@ export const discoveryTileConfig: Record<DiscoveryTileId, DiscoveryTileConfig> =
       "Project management",
       "None yet / starting from scratch",
     ],
-    otherLabel: "Other",
-    otherPlaceholder: "Other tools or platforms…",
   },
   "your-focus": {
     title: "Your Focus",
     question: "What should we focus on first?",
-    fieldType: "text",
-    placeholder: "Top priority",
+    fieldType: "select",
+    options: [
+      "Brand & identity",
+      "Marketing & growth",
+      "Operations & systems",
+      "Customer experience",
+      "Content & creative",
+      "Sales & conversion",
+    ],
   },
   "success-looks-like": {
     title: "Success Looks Like",
     question: "What does success look like for this project?",
-    fieldType: "textarea",
-    placeholder: "Outcomes, metrics, milestones…",
+    fieldType: "multiselect",
+    options: [
+      "More leads or customers",
+      "Stronger brand recognition",
+      "Better engagement online",
+      "Streamlined operations",
+      "Increased revenue",
+      "Launching something new",
+      "Saving time on marketing",
+    ],
   },
   "whats-slowing-you-down": {
     title: "What's Slowing You Down?",
     question: "What's getting in the way?",
-    fieldType: "textarea",
-    placeholder: "Blockers, friction, gaps…",
+    fieldType: "multiselect",
+    options: [
+      "Lack of clarity or direction",
+      "Limited time or resources",
+      "Outdated tools or technology",
+      "Inconsistent messaging",
+      "Low visibility or reach",
+      "Team capacity gaps",
+      "Budget constraints",
+    ],
   },
   "anything-else": {
     title: "Anything Else?",
     question: "Anything else we should know?",
     fieldType: "textarea",
     placeholder: "Context, constraints, notes…",
+    required: false,
+    recommendationUse: "human-review-only",
   },
   "submit-project": {
     title: "Submit Project",
@@ -146,6 +180,11 @@ export const discoveryTileConfig: Record<DiscoveryTileId, DiscoveryTileConfig> =
     fieldType: "submit",
   },
 };
+
+/** Tiles that must be answered before Submit unlocks (excludes optional prompts). */
+export const DISCOVERY_REQUIRED_TILE_IDS = DISCOVERY_FORM_TILE_IDS.filter(
+  (id) => discoveryTileConfig[id].required !== false,
+);
 
 export type BusinessDiscoveryFraming = {
   x: number;

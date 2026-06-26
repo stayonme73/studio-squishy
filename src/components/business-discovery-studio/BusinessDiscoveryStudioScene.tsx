@@ -11,13 +11,18 @@ import {
 } from "react";
 
 import {
-  DISCOVERY_FORM_TILE_IDS,
+  DISCOVERY_REQUIRED_TILE_IDS,
   DISCOVERY_TILE_ORDER,
   businessDiscoveryStudio,
   discoveryTileConfig,
   sceneRectToCoverPercent,
   type DiscoveryTileId,
 } from "@/config/business-discovery-studio";
+import {
+  readDiscoveryAnswers,
+  saveDiscoveryAnswers,
+  type DiscoveryAnswers,
+} from "@/lib/business-discovery-session";
 
 import DiscoverySheetCard from "./DiscoverySheetCard";
 import DiscoveryTileDoneBadge from "./DiscoveryTileDoneBadge";
@@ -30,13 +35,11 @@ type SheetPhase = "expanding" | "active" | "shrinking";
 
 export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
-  const pendingSaveRef = useRef<string | null>(null);
+  const openSnapshotRef = useRef<string>("");
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [activeTileId, setActiveTileId] = useState<DiscoveryTileId | null>(null);
   const [sheetPhase, setSheetPhase] = useState<SheetPhase | null>(null);
-  const [answers, setAnswers] = useState<Partial<Record<DiscoveryTileId, string>>>(
-    {},
-  );
+  const [answers, setAnswers] = useState<DiscoveryAnswers>({});
 
   const {
     src,
@@ -48,8 +51,12 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     discoveryExpandedRect,
   } = businessDiscoveryStudio;
 
-  const allFormComplete = DISCOVERY_FORM_TILE_IDS.every(
-    (id) => Boolean(answers[id]?.trim()),
+  useLayoutEffect(() => {
+    setAnswers(readDiscoveryAnswers());
+  }, []);
+
+  const allRequiredComplete = DISCOVERY_REQUIRED_TILE_IDS.every((id) =>
+    Boolean(answers[id]?.trim()),
   );
 
   const isTileComplete = (id: DiscoveryTileId) => Boolean(answers[id]?.trim());
@@ -109,17 +116,10 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   }, [sheetPhase]);
 
   const finishShrink = useCallback(() => {
-    const tileId = activeTileId;
-    const savedValue = pendingSaveRef.current;
-    pendingSaveRef.current = null;
-
-    if (tileId && savedValue !== null) {
-      setAnswers((prev) => ({ ...prev, [tileId]: savedValue }));
-    }
-
     setActiveTileId(null);
     setSheetPhase(null);
-  }, [activeTileId]);
+    openSnapshotRef.current = "";
+  }, []);
 
   const handleSheetTransitionEnd = useCallback(
     (event: TransitionEvent<HTMLDivElement>) => {
@@ -132,17 +132,16 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
 
   const handleTileClick = (id: DiscoveryTileId) => {
     if (activeTileId) return;
-    if (id === "submit-project" && !allFormComplete) return;
-    pendingSaveRef.current = null;
+    if (id === "submit-project" && !allRequiredComplete) return;
+    openSnapshotRef.current = answers[id] ?? "";
     setActiveTileId(id);
     setSheetPhase("expanding");
   };
 
-  const beginShrink = (saveValue: string | null) => {
+  const beginShrink = () => {
     if (!activeTileId || sheetPhase === "shrinking") return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    pendingSaveRef.current = saveValue;
 
     if (reduced) {
       finishShrink();
@@ -152,13 +151,33 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     setSheetPhase("shrinking");
   };
 
-  const handleSave = (value: string) => {
-    beginShrink(value);
+  const handleAnswerChange = useCallback(
+    (value: string) => {
+      if (!activeTileId) return;
+      setAnswers((prev) => {
+        const next = { ...prev, [activeTileId]: value };
+        saveDiscoveryAnswers(next);
+        return next;
+      });
+    },
+    [activeTileId],
+  );
+
+  const handleDone = () => {
+    beginShrink();
   };
 
-  const handleCancel = () => {
-    beginShrink(null);
-  };
+  const handleCancel = useCallback(() => {
+    if (!activeTileId) return;
+    const tileId = activeTileId;
+    const snapshot = openSnapshotRef.current;
+    setAnswers((prev) => {
+      const next = { ...prev, [tileId]: snapshot };
+      saveDiscoveryAnswers(next);
+      return next;
+    });
+    beginShrink();
+  }, [activeTileId]);
 
   const activeConfig = activeTileId ? discoveryTileConfig[activeTileId] : null;
   const sheetExpanded = sheetPhase === "active";
@@ -193,7 +212,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
         <div className="bds-ui">
           {DISCOVERY_TILE_ORDER.map((id) => {
             const isActive = activeTileId === id;
-            const isSubmitLocked = id === "submit-project" && !allFormComplete;
+            const isSubmitLocked = id === "submit-project" && !allRequiredComplete;
             const sheetOpenElsewhere = activeTileId !== null && !isActive;
 
             return (
@@ -277,9 +296,11 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
               onTransitionEnd={handleSheetTransitionEnd}
             >
               <DiscoverySheetCard
+                key={activeTileId}
                 config={activeConfig}
                 initialValue={answers[activeTileId] ?? ""}
-                onSave={handleSave}
+                onChange={handleAnswerChange}
+                onDone={handleDone}
                 onCancel={handleCancel}
                 expanded={sheetExpanded}
               />
