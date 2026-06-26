@@ -25,6 +25,8 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Production allocation rules
 - Customer choice rules
 - Discovery room badge offsets (`DISCOVERY_BADGE_OFFSET` in `src/config/business-discovery-studio.ts`) — do not modify without Tagia approval
+
+**Browser zoom standard:** If a customer has to change their browser zoom to use The Studio, it's a bug.
 <!-- END:studio-architecture-rules -->
 
 <!-- BEGIN:customer-journey-lock -->

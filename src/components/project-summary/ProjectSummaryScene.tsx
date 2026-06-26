@@ -105,7 +105,6 @@ export default function ProjectSummaryScene({
             onSwap={onSwap}
             onAdd={onAdd}
             onApprove={onConfirm}
-            showApprove={false}
           />
         </div>
         <div className="ps-confirm">

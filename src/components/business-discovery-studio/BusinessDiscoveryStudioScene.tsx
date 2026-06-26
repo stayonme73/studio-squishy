@@ -16,7 +16,6 @@ import {
   DISCOVERY_REQUIRED_TILE_IDS,
   DISCOVERY_TILE_ORDER,
   businessDiscoveryStudio,
-  discoveryPlateContainSize,
   discoveryTileConfig,
   plateRectToOverlayPercent,
   type DiscoveryTileId,
@@ -43,9 +42,7 @@ type SheetPhase = "expanding" | "active" | "shrinking";
 
 export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   const router = useRouter();
-  const plateRef = useRef<HTMLDivElement>(null);
   const openSnapshotRef = useRef<string>("");
-  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [activeTileId, setActiveTileId] = useState<DiscoveryTileId | null>(null);
   const [sheetPhase, setSheetPhase] = useState<SheetPhase | null>(null);
   const [answers, setAnswers] = useState<DiscoveryAnswers>({});
@@ -90,25 +87,6 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     isTileComplete(id) &&
     activeTileId !== id;
 
-  useLayoutEffect(() => {
-    const plate = plateRef.current;
-    if (!plate) return;
-
-    const sync = () => {
-      const { width, height } = plate.getBoundingClientRect();
-      setCanvasSize(discoveryPlateContainSize({ width, height }, nativeSize));
-    };
-
-    sync();
-    const observer = new ResizeObserver(sync);
-    observer.observe(plate);
-    window.addEventListener("resize", sync);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", sync);
-    };
-  }, [nativeSize]);
-
   const hitStyles = useMemo(() => {
     const map = {} as Record<DiscoveryTileId, CSSProperties>;
     for (const id of DISCOVERY_TILE_ORDER) {
@@ -121,14 +99,6 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     () => plateRectToOverlayPercent(discoveryExpandedRect),
     [discoveryExpandedRect],
   );
-
-  const canvasStyle = useMemo((): CSSProperties | undefined => {
-    if (canvasSize.width <= 0 || canvasSize.height <= 0) return undefined;
-    return {
-      width: `${canvasSize.width}px`,
-      height: `${canvasSize.height}px`,
-    };
-  }, [canvasSize.height, canvasSize.width]);
 
   useLayoutEffect(() => {
     if (sheetPhase !== "expanding") return;
@@ -235,7 +205,6 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   return (
     <div className="bds-scene" aria-label={customerJourneyStepName("project-discovery")}>
       <div
-        ref={plateRef}
         className={[
           "bds-plate",
           activeTileId ? "bds-plate--sheet-open" : "",
@@ -243,7 +212,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
           .filter(Boolean)
           .join(" ")}
       >
-        <div className="bds-plate-canvas" style={canvasStyle}>
+        <div className="bds-plate-canvas">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
