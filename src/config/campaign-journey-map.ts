@@ -1,5 +1,6 @@
 import type { CampaignStatus } from "@/config/studio-board";
 import { studioBoard } from "@/config/studio-board";
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 
 export type CampaignJourneyStepId = "campaign-details" | "review-room" | "deliverables";
 
@@ -8,17 +9,17 @@ export const campaignJourneyMap = {
   steps: [
     {
       id: "campaign-details" as const,
-      label: "Campaign Record",
+      label: customerJourneyStepName("project-record"),
       href: studioBoard.routes.campaignDetails,
     },
     {
       id: "review-room" as const,
-      label: "Review Room",
+      label: customerJourneyStepName("review-room"),
       href: studioBoard.routes.feedbackStudio,
     },
     {
       id: "deliverables" as const,
-      label: "Final Delivery",
+      label: customerJourneyStepName("final-delivery"),
       href: studioBoard.routes.deliverables,
     },
   ],

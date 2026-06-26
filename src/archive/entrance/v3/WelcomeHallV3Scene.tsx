@@ -3,10 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-import ShowroomTower from "@/components/entrance/v3/ShowroomTower";
-import ShowroomWall from "@/components/entrance/v3/ShowroomWall";
-import StudioGuideKiosk from "@/components/entrance/v3/StudioGuideKiosk";
-import StudioGuideDialog from "@/components/entrance/StudioGuideDialog";
+import ShowroomTower from "@/archive/entrance/v3/ShowroomTower";
+import ShowroomWall from "@/archive/entrance/v3/ShowroomWall";
+import StudioGuideKiosk from "@/archive/entrance/v3/StudioGuideKiosk";
+import StudioGuideDialog from "@/archive/entrance/StudioGuideDialog";
 import { welcomeHallInteraction } from "@/config/welcome-hall-interaction";
 import { welcomeHallScene } from "@/config/welcome-hall-scene";
 import { welcomeHallV3 } from "@/config/welcome-hall-v3-direction";

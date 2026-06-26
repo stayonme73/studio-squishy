@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-import StudioGuideDialog from "@/components/entrance/StudioGuideDialog";
+import StudioGuideDialog from "@/archive/entrance/StudioGuideDialog";
 import { welcomeHallInteraction } from "@/config/welcome-hall-interaction";
 import { welcomeHallScene } from "@/config/welcome-hall-scene";
 

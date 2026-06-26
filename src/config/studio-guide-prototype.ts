@@ -19,6 +19,7 @@
  */
 
 import type { StudioGuidePackageId } from "@/config/studio-guide";
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import { welcomeHallInteraction } from "@/config/welcome-hall-interaction";
 
 /** Stress-test name for signature fill QA — long names, hyphen, two-line wrap. */
@@ -85,7 +86,7 @@ export const studioGuidePrototype = {
     exploreHintEyebrow: "Start Here",
     exploreHint: "Tap a Folder to Explore Packages",
     exploreHintMobile: "Select a package below",
-    paymentCta: "Continue to Payment",
+    paymentCta: `Continue to ${customerJourneyStepName("secure-checkout")}`,
     paymentNote: "Next: confirm your package and complete payment.",
   },
 

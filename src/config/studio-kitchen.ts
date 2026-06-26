@@ -3,6 +3,7 @@
  * Layout + workflow visualization only — no automation, email, or AI wiring.
  */
 
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import { kitchenCampaignSeed } from "@/config/studio-kitchen-campaigns";
 import { KITCHEN_CLIENT_DELAY_DAYS } from "@/config/studio-kitchen-campaigns";
 import type { KitchenExceptionTrayId, KitchenFileBucketId } from "@/config/studio-kitchen-file-room";
@@ -123,7 +124,7 @@ export const kitchenStageDefinitions: KitchenStageDefinition[] = [
     id: "new-campaign",
     title: "New Campaign",
     summary: "Fresh intake — campaign record needed.",
-    action: { label: "Open Campaign Record", href: "/studio-board?record=open" },
+    action: { label: `Open ${customerJourneyStepName("project-record")}`, href: "/studio-board?record=open" },
   },
   {
     id: "needs-directions",

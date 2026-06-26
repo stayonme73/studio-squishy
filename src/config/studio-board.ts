@@ -1,5 +1,6 @@
 /** Studio Board V3 — customer command center (LOCKED consolidation). */
 
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import type { DraftIntakeFormValues } from "@/config/draft-room";
 import type { FeedbackConceptPreview } from "@/config/feedback-studio";
 import type { DeliverableQuotaId, StudioGuidePackageId } from "@/config/studio-guide";
@@ -118,9 +119,13 @@ export const studioBoard = {
     feedbackStudio: "/feedback-studio",
     deliverables: "/deliverables",
     campaignDetails: "/studio-board?record=open",
-    welcomeHall: "/",
+    welcomeHall: "/studio-lobby",
+    studioLobby: "/studio-lobby",
+    projectDiscovery: "/business-discovery-studio",
     studioKitchen: "/studio-kitchen",
-    studioPlanReview: "/studio-plan-review",
+    projectSummary: "/project-summary",
+    /** @deprecated use projectSummary — redirect preserved at /studio-plan-review */
+    studioPlanReview: "/project-summary",
   },
 
   empty: {
@@ -154,7 +159,7 @@ export const studioBoard = {
       id: "DISCOVERY_COMPLETE" as const,
       label: "Discovery Complete",
       boardLabel: "Discovery Complete",
-      hint: "Review your Studio Plan next.",
+      hint: "Review your Project Summary next.",
     },
     {
       id: "DRAFT_RECEIVED" as const,
@@ -197,31 +202,31 @@ export const studioBoard = {
   statusContent: {
     DISCOVERY_COMPLETE: {
       statusLabel: "Discovery Complete",
-      nextUpdateLabel: "After Studio Plan approval",
-      campaignProgressLabel: "Awaiting Studio Plan Review",
-      headerSubline: "Discovery received — review your recommended Studio Plan to continue.",
+      nextUpdateLabel: "After Project Summary approval",
+      campaignProgressLabel: "Awaiting Project Summary",
+      headerSubline: "Discovery received — review your Project Summary to continue.",
       campaignDescription:
-        "Discovery complete. Review and approve your Studio Plan before payment.",
-      estimatedCompletion: "Review your Studio Plan",
-      studioNoteFollowUp: "Review your recommended Studio Plan when you're ready.",
+        "Discovery complete. Review and confirm your Project Summary before production begins.",
+      estimatedCompletion: "Review your Project Summary",
+      studioNoteFollowUp: "Review your Project Summary when you're ready.",
       studioNoteBoard: {
         letterLines: [
           "We received your discovery answers — thank you.",
-          "Review your recommended Studio Plan and approve when you're ready.",
-          "Complete payment after approval to begin production.",
+          "Review your Project Summary and confirm when you're ready.",
+          "We'll begin production once you approve your plan.",
           "Thank you for trusting The Studio.",
           "— The Studio Team ♥",
         ],
       },
       studioUpdates: [{ date: "Today", message: "Discovery received." }],
       whatHappensNextSteps: [
-        "Review your recommended Studio Plan.",
-        "Approve your services.",
-        "Complete payment.",
+        "Review what we heard from your discovery answers.",
+        "Confirm your recommended services.",
+        "Make changes if needed before production begins.",
         "The Studio begins your campaign.",
       ],
-      primaryCta: "REVIEW STUDIO PLAN",
-      primaryRoute: "studioPlanReview" as const,
+      primaryCta: "OPEN PROJECT SUMMARY",
+      primaryRoute: "projectSummary" as const,
     },
     DRAFT_RECEIVED: {
       statusLabel: "Intake Complete",
@@ -385,14 +390,14 @@ export const studioBoard = {
   },
 
   sidebar: {
-    welcomeHall: "Welcome Hall",
-    studioBoard: "Studio Board",
+    welcomeHall: customerJourneyStepName("studio-lobby"),
+    studioBoard: customerJourneyStepName("studio-board"),
     newCampaign: "New Campaign",
-    campaignRecord: "Campaign Record",
-    reviewRoom: "Review Room",
-    finalDelivery: "Final Delivery",
-    helpCenter: "Help Center",
-    studioGuide: "Studio Guide",
+    campaignRecord: customerJourneyStepName("project-record"),
+    reviewRoom: customerJourneyStepName("review-room"),
+    finalDelivery: customerJourneyStepName("final-delivery"),
+    helpCenter: customerJourneyStepName("help-center"),
+    studioGuide: customerJourneyStepName("studio-guide"),
     pastCampaigns: "Past Campaigns",
     account: "My Account",
     managePlan: "Manage Plan",
@@ -418,7 +423,7 @@ export const studioBoard = {
     lastUpdated: "Last Updated",
     openCampaign: "Open Campaign",
     openCampaignCta: "OPEN CAMPAIGN",
-    openCampaignRecord: "Open Campaign Record",
+    openCampaignRecord: `Open ${customerJourneyStepName("project-record")}`,
     reviewConcepts: "Review My Concepts",
     chooseDirection: "Choose Direction",
     downloadPackage: "Download Package",
@@ -468,7 +473,7 @@ export const studioBoard = {
   },
 
   campaignRecord: {
-    drawerTitle: "Campaign Record",
+    drawerTitle: customerJourneyStepName("project-record"),
     closeLabel: "Close",
     submittedHint: "Read-only archive of what you submitted to the Studio.",
     editableHint: "Review or update your intake answers before campaign development begins.",
@@ -477,7 +482,7 @@ export const studioBoard = {
 
   campaignBrief: {
     viewLabel: "View Campaign Brief",
-    openRecordLabel: "Open Campaign Record",
+    openRecordLabel: `Open ${customerJourneyStepName("project-record")}`,
     editLabel: "Edit Campaign Brief",
     editableHint: "Review or update your answers before campaign development begins.",
     lockedMessage:

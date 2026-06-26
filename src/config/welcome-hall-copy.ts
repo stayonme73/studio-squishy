@@ -1,10 +1,13 @@
 /**
  * Welcome Hall copy — FINAL ART DIRECTION (LOCKED)
+ * Customer-facing room name: Studio Lobby (@see customer-journey-v1)
  * @see welcome-hall-direction.ts
  */
 
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
+
 export const welcomeHallCopy = {
-  hallName: "Welcome Hall",
+  hallName: customerJourneyStepName("studio-lobby"),
 
   leftWall: {
     message: "Every project starts with an idea.",

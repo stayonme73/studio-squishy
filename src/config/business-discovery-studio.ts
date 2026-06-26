@@ -1,9 +1,12 @@
 /**
  * Business Discovery Studio — plate + invisible tile hotspots.
+ * Customer-facing room name: Project Discovery (@see customer-journey-v1)
  * Plate art: public/business-discovery-studio/discovery-studio-plate-v1.png (1024×682)
  *
  * Hit rects calibrated on native plate pixels — verify alignment with ?debug=1.
  */
+
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 
 export type SceneRect = {
   x: number;
@@ -312,7 +315,7 @@ export const discoveryTileGeometry = Object.fromEntries(
 
 export const businessDiscoveryStudio = {
   src: "/business-discovery-studio/discovery-studio-plate-v1.png?v=1",
-  alt: "Business Discovery Studio — drafting table workspace",
+  alt: `${customerJourneyStepName("project-discovery")} — drafting table workspace`,
   nativeSize: { width: 1024, height: 682 } as const,
 
   /** Tap targets — same rects as painted card faces in DISCOVERY_TILE_GEOMETRY. */

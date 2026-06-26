@@ -29,6 +29,7 @@ import {
 } from "@/lib/business-discovery-session";
 import { submitDiscoveryCampaign } from "@/lib/studio-board-campaign";
 import { studioBoard } from "@/config/studio-board";
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 
 import DiscoverySheetCard from "./DiscoverySheetCard";
 import DiscoveryTileDoneBadge from "./DiscoveryTileDoneBadge";
@@ -205,9 +206,9 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     beginShrink();
   };
 
-  const continueToStudioPlanReview = useCallback(() => {
+  const continueToProjectSummary = useCallback(() => {
     setShowDiscoveryReceived(false);
-    router.push(studioBoard.routes.studioPlanReview);
+    router.push(studioBoard.routes.projectSummary);
   }, [router]);
 
   const handleCancel = useCallback(() => {
@@ -232,7 +233,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
         : undefined;
 
   return (
-    <div className="bds-scene" aria-label="Business Discovery Studio">
+    <div className="bds-scene" aria-label={customerJourneyStepName("project-discovery")}>
       <div
         ref={plateRef}
         className={[
@@ -338,12 +339,12 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
               Discovery Received
             </h2>
             <p className="bds-discovery-received__body">
-              Thank you — we&apos;ve saved your answers. Review your recommended Studio Plan next.
+              Thank you — we&apos;ve saved your answers. Review your Project Summary next.
             </p>
             <button
               type="button"
               className="bds-sheet__btn bds-sheet__btn--primary"
-              onClick={continueToStudioPlanReview}
+              onClick={continueToProjectSummary}
             >
               Continue
             </button>

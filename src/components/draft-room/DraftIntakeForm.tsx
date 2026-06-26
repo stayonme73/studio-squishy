@@ -2,6 +2,7 @@
 
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
+import TellUsWhatsOnYourMindIntro from "@/archive/draft-room/TellUsWhatsOnYourMindIntro";
 import DraftIntakeAnswerSummary from "@/components/draft-room/DraftIntakeAnswerSummary";
 import IntakeVisionAccents from "@/components/draft-room/IntakeVisionAccents";
 import {
@@ -483,46 +484,7 @@ export default function DraftIntakeForm({
   const renderStep = () => {
     switch (step) {
       case 0:
-        return (
-          <div className="dri-step-content dri-step-content--intro">
-            <p className="dri-eyebrow">{introduction.eyebrow}</p>
-            <h2 className="dri-title">{introduction.title}</h2>
-            <div className="dri-intro-leads" aria-hidden>
-              {introduction.leads.map((line) => (
-                <p key={line} className="dri-intro-lead">
-                  {line}
-                </p>
-              ))}
-            </div>
-            {introduction.paragraphs.map((paragraph) => (
-              <p key={paragraph} className="dri-body">
-                {paragraph}
-              </p>
-            ))}
-            <div className="dri-intro-starters" aria-hidden>
-              <p className="dri-intro-starters-label">
-                <svg className="dri-intro-spark" viewBox="0 0 16 16" aria-hidden>
-                  <path
-                    d="M8 2.5v11M4.5 8h7"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                {introduction.ideaStartersLabel}
-              </p>
-              <div className="dri-intro-starter-cards">
-                {introduction.ideaStarters.map((idea) => (
-                  <span key={idea} className="dri-intro-starter">
-                    {idea}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <p className="dri-intro-closing">{introduction.closingNote}</p>
-          </div>
-        );
+        return <TellUsWhatsOnYourMindIntro introduction={introduction} />;
 
       case 1:
         return (

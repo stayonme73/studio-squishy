@@ -5,6 +5,7 @@
  */
 
 import { helpCenterAnchor } from "@/config/help-center";
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import { studioBoard } from "@/config/studio-board";
 
 export const welcomeHallPhase1 = {
@@ -13,8 +14,8 @@ export const welcomeHallPhase1 = {
   journey: ["welcome-hall", "kiosk", "draft-room"] as const,
 
   cta: {
-    /** Primary — entire kiosk routes to Business Discovery Studio. */
-    kioskLabel: "Let's get started — enter Business Discovery Studio.",
+    /** Primary — entire kiosk routes to Project Discovery. */
+    kioskLabel: `Let's get started — enter ${customerJourneyStepName("project-discovery")}.`,
     kioskHeadline: "LET'S GET STARTED",
     kioskScreenLabel: "HOW CAN WE HELP?",
   },

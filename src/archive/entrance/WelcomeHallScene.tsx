@@ -1,10 +1,10 @@
 import Link from "next/link";
 
-import ArtPrism from "@/components/entrance/ArtPrism";
-import CorridorWorkspace from "@/components/entrance/CorridorWorkspace";
-import EndPortal from "@/components/entrance/EndPortal";
-import StudioDepthWall from "@/components/entrance/StudioDepthWall";
-import WelcomeWall from "@/components/entrance/WelcomeWall";
+import ArtPrism from "@/archive/entrance/ArtPrism";
+import CorridorWorkspace from "@/archive/entrance/CorridorWorkspace";
+import EndPortal from "@/archive/entrance/EndPortal";
+import StudioDepthWall from "@/archive/entrance/StudioDepthWall";
+import WelcomeWall from "@/archive/entrance/WelcomeWall";
 import WeatherPortal from "@/components/environment/WeatherPortal";
 import { siteConfig } from "@/config/site";
 
