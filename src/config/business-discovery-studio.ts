@@ -68,6 +68,8 @@ export type DiscoveryTileConfig = {
   otherLabel?: string;
   /** Placeholder for the Other text input (multiselect-other). */
   otherPlaceholder?: string;
+  /** Customer-facing body copy for submit tiles. */
+  description?: string;
   /**
    * Customer-facing copy shown after submission (future wiring).
    * Empty string reserves the slot without changing submit behavior.
@@ -91,7 +93,6 @@ export const discoveryTileConfig: Record<DiscoveryTileId, DiscoveryTileConfig> =
       "Growing an existing business",
       "Pivoting or rebranding",
       "Scaling operations",
-      "Other",
     ],
   },
   "your-challenge": {
@@ -104,7 +105,6 @@ export const discoveryTileConfig: Record<DiscoveryTileId, DiscoveryTileConfig> =
       "Operations and efficiency",
       "Technology and tools",
       "Team and hiring",
-      "Other",
     ],
   },
   "your-current-tools": {
@@ -173,10 +173,11 @@ export const discoveryTileConfig: Record<DiscoveryTileId, DiscoveryTileConfig> =
     recommendationUse: "human-review-only",
   },
   "submit-project": {
-    title: "Submit Project",
-    question: "Ready to send your discovery brief?",
+    title: "Ready to build your Studio Plan?",
+    question: "Ready to build your Studio Plan?",
+    description:
+      "We've gathered everything we need to recommend the Studio Services that best fit your business. Submit when you're ready to continue.",
     fieldType: "submit",
-    // Future: post-submission explanation shown after customer submits.
     postSubmissionNote: "",
   },
 };

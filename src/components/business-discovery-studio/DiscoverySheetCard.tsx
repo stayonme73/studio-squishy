@@ -369,12 +369,12 @@ export default function DiscoverySheetCard({
 
           {config.fieldType === "submit" && (
             <>
-              <p className="bds-sheet__submit-note">
-                All discovery tiles are complete. Submit when you&apos;re ready.
-              </p>
-              {config.postSubmissionNote !== undefined && (
+              {config.description ? (
+                <p className="bds-sheet__submit-note">{config.description}</p>
+              ) : null}
+              {config.postSubmissionNote !== undefined && config.postSubmissionNote ? (
                 <p className="bds-sheet__post-submit-note">{config.postSubmissionNote}</p>
-              )}
+              ) : null}
             </>
           )}
         </div>
