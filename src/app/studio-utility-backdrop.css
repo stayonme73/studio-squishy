@@ -1,0 +1,77 @@
+/**
+ * Studio Lobby backdrop for utility pages — matches Discovery split tint.
+ * @see business-discovery-studio.css .bds-scene__backdrop
+ */
+
+:root {
+  --studio-utility-backdrop-image: url("/welcome-hall/welcome-hall-scene-v4.png?v=1");
+  --studio-utility-backdrop-blur: blur(20px) brightness(0.62) saturate(0.88);
+  --studio-utility-backdrop-tint: color-mix(in srgb, #2e2d2b 42%, transparent);
+  --studio-utility-backdrop-fallback: #2e2d2b;
+}
+
+.journey-shell:has(.studio-utility-scene),
+body:has(.studio-utility-scene) {
+  background: var(--studio-utility-backdrop-fallback);
+}
+
+.studio-utility-scene {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.studio-utility-scene__content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.studio-utility-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.studio-utility-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--studio-utility-backdrop-image) center center / cover no-repeat;
+  filter: var(--studio-utility-backdrop-blur);
+  transform: scale(1.08);
+}
+
+.studio-utility-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--studio-utility-backdrop-tint);
+}
+
+.studio-utility-scene .utility-page {
+  background: transparent;
+}
+
+/* Minimal card lift — background treatment only, not a card redesign */
+.studio-utility-scene .utility-card {
+  border-color: color-mix(in srgb, var(--studio-ink) 18%, transparent);
+  box-shadow:
+    0 2px 12px rgba(46, 43, 40, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.45) inset;
+}
+
+.studio-utility-scene .pay-paper-card {
+  border-color: rgba(44, 62, 80, 0.28);
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.55) inset,
+    0 16px 32px rgba(44, 62, 80, 0.18),
+    0 6px 14px rgba(44, 62, 80, 0.1);
+}
