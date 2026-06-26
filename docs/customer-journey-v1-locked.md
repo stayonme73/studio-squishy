@@ -46,6 +46,7 @@ Do **not** delete — move to `src/archive/` and document here.
 |--------------|----------|
 | `/welcome-hall` | `/studio-lobby` |
 | `/project-discovery` | `/business-discovery-studio` |
+| `/business_discovery_studio` | `/business-discovery-studio` |
 | `/studio-guide` | `/studio-guide-prototype` |
 | `/campaign-details` | `/studio-board?record=open` |
 | `/draft-room/begin` | `/business-discovery-studio` |

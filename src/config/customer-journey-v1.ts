@@ -42,7 +42,7 @@ export const customerJourneyV1 = {
       name: "Project Discovery",
       formerName: "Discovery Room",
       route: "/business-discovery-studio",
-      routeAliases: ["/project-discovery"] as const,
+      routeAliases: ["/project-discovery", "/business_discovery_studio"] as const,
     },
     {
       order: 5,

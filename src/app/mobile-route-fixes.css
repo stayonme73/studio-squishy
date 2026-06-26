@@ -23,6 +23,15 @@
     overflow-y: auto !important;
   }
 
+  /* Project Discovery — full-viewport plate; do not collapse to height:auto */
+  main.journey-shell:has(.business-discovery-studio),
+  main.flex.min-h-0.flex-1.flex-col:has(.business-discovery-studio) {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    min-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
   input,
   select,
   textarea,
