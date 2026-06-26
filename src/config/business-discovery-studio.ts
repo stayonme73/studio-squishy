@@ -196,15 +196,15 @@ export type DoneBadgeAnchor = {
 
 /** Painted card faces on the plate — single geometry source for hits, badges, covers. */
 export const DISCOVERY_TILE_GEOMETRY = {
-  "your-business": { x: 244, y: 176, width: 161, height: 86 },
-  "your-situation": { x: 415, y: 175, width: 165, height: 87 },
-  "your-challenge": { x: 591, y: 174, width: 168, height: 88 },
-  "your-current-tools": { x: 223, y: 250, width: 175, height: 92 },
-  "your-focus": { x: 409, y: 250, width: 178, height: 92 },
-  "success-looks-like": { x: 598, y: 250, width: 182, height: 92 },
-  "whats-slowing-you-down": { x: 220, y: 345, width: 171, height: 120 },
-  "anything-else": { x: 402, y: 345, width: 192, height: 120 },
-  "submit-project": { x: 606, y: 345, width: 174, height: 74 },
+  "your-business": { x: 221, y: 163, width: 174, height: 124 },
+  "your-situation": { x: 395, y: 152, width: 189, height: 135 },
+  "your-challenge": { x: 580, y: 174, width: 199, height: 113 },
+  "your-current-tools": { x: 221, y: 297, width: 174, height: 121 },
+  "your-focus": { x: 395, y: 297, width: 189, height: 122 },
+  "success-looks-like": { x: 580, y: 296, width: 199, height: 123 },
+  "whats-slowing-you-down": { x: 221, y: 429, width: 174, height: 112 },
+  "anything-else": { x: 395, y: 430, width: 189, height: 111 },
+  "submit-project": { x: 580, y: 420, width: 199, height: 121 },
 } satisfies Record<DiscoveryTileId, SceneRect>;
 
 const DONE_BADGE_INSET = 4;

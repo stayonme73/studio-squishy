@@ -13,15 +13,15 @@ const BADGE_SIZE = 14;
 const BADGE_GAP = 7;
 
 const tileHits = {
-  "your-business": { x: 244, y: 162, width: 188, height: 98 },
-  "your-situation": { x: 418, y: 158, width: 188, height: 98 },
-  "your-challenge": { x: 592, y: 164, width: 188, height: 98 },
-  "your-current-tools": { x: 244, y: 268, width: 188, height: 98 },
-  "your-focus": { x: 418, y: 264, width: 188, height: 98 },
-  "success-looks-like": { x: 592, y: 270, width: 188, height: 98 },
-  "whats-slowing-you-down": { x: 244, y: 374, width: 188, height: 98 },
-  "anything-else": { x: 418, y: 370, width: 188, height: 98 },
-  "submit-project": { x: 592, y: 376, width: 188, height: 98 },
+  "your-business": { x: 221, y: 163, width: 174, height: 124 },
+  "your-situation": { x: 395, y: 152, width: 189, height: 135 },
+  "your-challenge": { x: 580, y: 174, width: 199, height: 113 },
+  "your-current-tools": { x: 221, y: 297, width: 174, height: 121 },
+  "your-focus": { x: 395, y: 297, width: 189, height: 122 },
+  "success-looks-like": { x: 580, y: 296, width: 199, height: 123 },
+  "whats-slowing-you-down": { x: 221, y: 429, width: 174, height: 112 },
+  "anything-else": { x: 395, y: 430, width: 189, height: 111 },
+  "submit-project": { x: 580, y: 420, width: 199, height: 121 },
 };
 
 const tileLabels = {
