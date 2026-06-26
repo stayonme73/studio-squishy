@@ -234,79 +234,52 @@ export const businessDiscoveryStudio = {
 /** Done ✓ badge size on native plate pixels — verify with ?debug=1. */
 export const DONE_BADGE_SIZE = 14;
 
-/** Padding from the visible card right edge to the badge (native px). */
-const DONE_BADGE_RIGHT_PADDING = 8;
-
-/** Gutter between painted card faces within a row (native px). */
-const PAINTED_CARD_COLUMN_GUTTER = 8;
-
-/** Rightmost column — no next tile; painted width comes from column spacing. */
-const RIGHT_COLUMN_TILES: ReadonlySet<DiscoveryTileId> = new Set([
-  "your-challenge",
-  "success-looks-like",
-  "submit-project",
-]);
-
-/** Next tile in the same row — its left edge minus gutter marks the painted right edge. */
-const TILE_ROW_NEIGHBOR_RIGHT: Partial<Record<DiscoveryTileId, DiscoveryTileId>> = {
-  "your-business": "your-situation",
-  "your-situation": "your-challenge",
-  "your-current-tools": "your-focus",
-  "your-focus": "success-looks-like",
-  "whats-slowing-you-down": "anything-else",
-  "anything-else": "submit-project",
+export type DoneBadgeAnchor = {
+  x: number;
+  y: number;
+  size: number;
 };
 
-/** Painted card face width — gap between column hit left edges (e.g. 418 − 244 = 174). */
-export function paintedCardWidth(
-  hits: Record<DiscoveryTileId, SceneRect> = businessDiscoveryStudio.tileHits,
-): number {
-  return hits["your-situation"].x - hits["your-business"].x;
-}
+/**
+ * Top-right ✓ badge per tile (native plate pixels) — calibrated on painted card faces.
+ * Row 2–3 column pitch differs from row 1; do not derive from a single column width.
+ * Rendered on bds-done-badges via sceneRectToCoverPercent — verify with ?debug=1.
+ */
+export const tileDoneBadges = {
+  "your-business": { x: 381, y: 172, size: DONE_BADGE_SIZE },
+  "your-situation": { x: 561, y: 168, size: DONE_BADGE_SIZE },
+  "your-challenge": { x: 721, y: 174, size: DONE_BADGE_SIZE },
+  "your-current-tools": { x: 373, y: 278, size: DONE_BADGE_SIZE },
+  "your-focus": { x: 569, y: 274, size: DONE_BADGE_SIZE },
+  "success-looks-like": { x: 725, y: 280, size: DONE_BADGE_SIZE },
+  "whats-slowing-you-down": { x: 366, y: 384, size: DONE_BADGE_SIZE },
+  "anything-else": { x: 575, y: 380, size: DONE_BADGE_SIZE },
+  "submit-project": { x: 690, y: 386, size: DONE_BADGE_SIZE },
+} satisfies Record<DiscoveryTileId, DoneBadgeAnchor>;
 
 /**
- * Painted card face right edge in native plate pixels.
- * Hit rects are wider than painted faces and bleed into column gutters; anchor badges
- * to the face edge rather than hit.x + hit.width.
+ * Baked "Not completed" status circle on the plate — masked when a tile is complete
+ * so only the single runtime top-right ✓ remains visible.
  */
-export function paintedCardRightEdgeX(
-  tileId: DiscoveryTileId,
-  hits: Record<DiscoveryTileId, SceneRect> = businessDiscoveryStudio.tileHits,
-): number {
-  const hit = hits[tileId];
+export const tileStatusCoverRects = {
+  "your-business": { x: 368, y: 233, width: 20, height: 20 },
+  "your-situation": { x: 548, y: 230, width: 20, height: 20 },
+  "your-challenge": { x: 724, y: 225, width: 20, height: 20 },
+  "your-current-tools": { x: 389, y: 329, width: 20, height: 20 },
+  "your-focus": { x: 552, y: 331, width: 20, height: 20 },
+  "success-looks-like": { x: 706, y: 331, width: 20, height: 20 },
+  "whats-slowing-you-down": { x: 389, y: 443, width: 20, height: 20 },
+  "anything-else": { x: 589, y: 435, width: 20, height: 20 },
+  "submit-project": { x: 706, y: 435, width: 20, height: 20 },
+} satisfies Record<DiscoveryTileId, SceneRect>;
 
-  if (RIGHT_COLUMN_TILES.has(tileId)) {
-    return hit.x + paintedCardWidth(hits);
-  }
-
-  const nextId = TILE_ROW_NEIGHBOR_RIGHT[tileId];
-  if (nextId && hits[nextId]) {
-    return hits[nextId].x - PAINTED_CARD_COLUMN_GUTTER;
-  }
-
-  return hit.x + hit.width;
-}
-
-/**
- * Plate-space badge square for overlay positioning — one rect per tile, derived from
- * each tile hit so every checkmark sits at the same relative top-right inset.
- * Rendered on bds-done-badges via sceneRectToCoverPercent.
- */
+/** Plate-space badge square for overlay positioning — one rect per tile, explicit coords. */
 export function doneBadgePlateRect(
   tileId: DiscoveryTileId,
-  hits: Record<DiscoveryTileId, SceneRect> = businessDiscoveryStudio.tileHits,
-  size = DONE_BADGE_SIZE,
+  badges: Record<DiscoveryTileId, DoneBadgeAnchor> = tileDoneBadges,
 ): SceneRect {
-  const hit = hits[tileId];
-  const insetY = Math.round(hit.height * 0.12);
-  const paintedRight = paintedCardRightEdgeX(tileId, hits);
-
-  return {
-    x: paintedRight - size - DONE_BADGE_RIGHT_PADDING,
-    y: hit.y + insetY,
-    width: size,
-    height: size,
-  };
+  const badge = badges[tileId];
+  return { x: badge.x, y: badge.y, width: badge.size, height: badge.size };
 }
 
 export function sceneRectToPercent(

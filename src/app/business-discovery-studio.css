@@ -142,6 +142,15 @@
   pointer-events: none;
 }
 
+.business-discovery-studio .bds-tile-status-cover {
+  position: absolute;
+  z-index: 2;
+  border-radius: 50%;
+  background: #f5f0e8;
+  box-shadow: 0 0 0 1px #f5f0e8;
+  pointer-events: none;
+}
+
 .business-discovery-studio .bds-tile-done-badge {
   position: absolute;
   z-index: 3;
@@ -151,6 +160,8 @@
   box-sizing: border-box;
   overflow: hidden;
   flex-shrink: 0;
+  aspect-ratio: 1;
+  height: auto;
   border-radius: 50%;
   background: rgba(0, 128, 128, 0.88);
   color: #fff;

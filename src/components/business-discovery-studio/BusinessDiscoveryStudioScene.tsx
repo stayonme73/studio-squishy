@@ -27,6 +27,7 @@ import {
 
 import DiscoverySheetCard from "./DiscoverySheetCard";
 import DiscoveryTileDoneBadge from "./DiscoveryTileDoneBadge";
+import DiscoveryTileStatusCover from "./DiscoveryTileStatusCover";
 
 type Props = {
   debug?: boolean;
@@ -265,10 +266,13 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
             );
           })}
 
-          {/* Plate-anchored ✓ badges — one badge per validated completed tile */}
+          {/* Plate overlays — hide baked status circles, then one ✓ per completed tile */}
           <div className="bds-done-badges" aria-hidden="true">
             {DISCOVERY_TILE_ORDER.filter(showDoneBadge).map((id) => (
-              <DiscoveryTileDoneBadge key={id} tileId={id} stageSize={stageSize} />
+              <DiscoveryTileStatusCover key={`cover-${id}`} tileId={id} stageSize={stageSize} />
+            ))}
+            {DISCOVERY_TILE_ORDER.filter(showDoneBadge).map((id) => (
+              <DiscoveryTileDoneBadge key={`badge-${id}`} tileId={id} stageSize={stageSize} />
             ))}
           </div>
 
