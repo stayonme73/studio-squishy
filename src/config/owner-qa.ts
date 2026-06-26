@@ -2,7 +2,7 @@
 
  * Owner QA — lean dev nav for the live product journey.
 
- * Shown when dev tools are enabled (@see OwnerQaRoot, isDevToolsEnabled).
+ * Shown in local development (@see OwnerQaRoot).
 
  */
 
