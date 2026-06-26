@@ -256,36 +256,29 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
               const sheetOpenElsewhere = activeTileId !== null && !isActive;
 
               return (
-                <div
+                <button
                   key={id}
+                  type="button"
                   className={[
                     "bds-tile-layer",
+                    "bds-tile-hit",
                     isActive ? "bds-tile-layer--active" : "",
                     isSubmitLocked ? "bds-tile-layer--locked" : "",
+                    debug ? "bds-tile-hit--debug" : "",
+                    isActive ? "bds-tile-hit--hidden" : "",
+                    sheetOpenElsewhere ? "bds-tile-hit--blocked" : "",
+                    isSubmitLocked ? "bds-tile-hit--locked" : "",
                   ]
                     .filter(Boolean)
                     .join(" ")}
                   style={hitStyles[id]}
+                  aria-label={tileLabels[id]}
+                  aria-disabled={isSubmitLocked || sheetOpenElsewhere || undefined}
+                  tabIndex={sheetOpenElsewhere ? -1 : undefined}
+                  onClick={() => handleTileClick(id)}
                 >
                   {isActive && <div className="bds-tile-fade" aria-hidden="true" />}
-
-                  <button
-                    type="button"
-                    className={[
-                      "bds-tile-hit",
-                      debug ? "bds-tile-hit--debug" : "",
-                      isActive ? "bds-tile-hit--hidden" : "",
-                      sheetOpenElsewhere ? "bds-tile-hit--blocked" : "",
-                      isSubmitLocked ? "bds-tile-hit--locked" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                    aria-label={tileLabels[id]}
-                    aria-disabled={isSubmitLocked || sheetOpenElsewhere}
-                    disabled={isSubmitLocked || sheetOpenElsewhere}
-                    onClick={() => handleTileClick(id)}
-                  />
-                </div>
+                </button>
               );
             })}
 
