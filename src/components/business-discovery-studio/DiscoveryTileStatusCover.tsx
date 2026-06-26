@@ -3,7 +3,7 @@
 import { useMemo, type CSSProperties } from "react";
 
 import {
-  sceneRectToPercent,
+  plateRectToOverlayPercent,
   tileStatusCoverRects,
   type DiscoveryTileId,
 } from "@/config/business-discovery-studio";
@@ -15,7 +15,7 @@ type Props = {
 /** Hides the baked bottom status circle when a discovery tile is complete. */
 export default function DiscoveryTileStatusCover({ tileId }: Props) {
   const style = useMemo(
-    (): CSSProperties => sceneRectToPercent(tileStatusCoverRects[tileId]),
+    (): CSSProperties => plateRectToOverlayPercent(tileStatusCoverRects[tileId]),
     [tileId],
   );
 

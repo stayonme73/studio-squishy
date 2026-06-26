@@ -4,7 +4,7 @@ import { useMemo, type CSSProperties } from "react";
 
 import {
   doneBadgePlateRect,
-  sceneRectToPercent,
+  plateRectToOverlayPercent,
   type DiscoveryTileId,
 } from "@/config/business-discovery-studio";
 
@@ -14,7 +14,7 @@ type Props = {
 
 /** Single ✓ badge anchored to native plate pixels for one discovery tile. */
 export default function DiscoveryTileDoneBadge({ tileId }: Props) {
-  const style = useMemo((): CSSProperties => sceneRectToPercent(doneBadgePlateRect(tileId)), [tileId]);
+  const style = useMemo((): CSSProperties => plateRectToOverlayPercent(doneBadgePlateRect(tileId)), [tileId]);
 
   return (
     <span

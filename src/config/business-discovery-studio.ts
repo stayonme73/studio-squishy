@@ -196,15 +196,15 @@ export type DoneBadgeAnchor = {
 
 /** Painted card faces on the plate — single geometry source for hits, badges, covers. */
 export const DISCOVERY_TILE_GEOMETRY = {
-  "your-business": { x: 244, y: 176, width: 161, height: 89 },
-  "your-situation": { x: 415, y: 152, width: 165, height: 113 },
-  "your-challenge": { x: 591, y: 175, width: 168, height: 90 },
-  "your-current-tools": { x: 224, y: 245, width: 174, height: 120 },
-  "your-focus": { x: 409, y: 245, width: 178, height: 120 },
-  "success-looks-like": { x: 598, y: 245, width: 182, height: 120 },
-  "whats-slowing-you-down": { x: 220, y: 345, width: 171, height: 125 },
-  "anything-else": { x: 403, y: 345, width: 191, height: 125 },
-  "submit-project": { x: 606, y: 345, width: 174, height: 125 },
+  "your-business": { x: 244, y: 176, width: 161, height: 86 },
+  "your-situation": { x: 415, y: 175, width: 165, height: 87 },
+  "your-challenge": { x: 591, y: 174, width: 168, height: 88 },
+  "your-current-tools": { x: 223, y: 250, width: 175, height: 92 },
+  "your-focus": { x: 409, y: 250, width: 178, height: 92 },
+  "success-looks-like": { x: 598, y: 250, width: 182, height: 92 },
+  "whats-slowing-you-down": { x: 220, y: 345, width: 171, height: 120 },
+  "anything-else": { x: 402, y: 345, width: 192, height: 120 },
+  "submit-project": { x: 606, y: 345, width: 174, height: 74 },
 } satisfies Record<DiscoveryTileId, SceneRect>;
 
 const DONE_BADGE_INSET = 4;
@@ -309,6 +309,24 @@ export function sceneRectToPercent(
     top: `${(rect.y / native.height) * 100}%`,
     width: `${(rect.width / native.width) * 100}%`,
     height: `${(rect.height / native.height) * 100}%`,
+  };
+}
+
+/** Map native plate-pixel rect to overlay % inside bds-plate-canvas (1024×682 space). */
+export const plateRectToOverlayPercent = sceneRectToPercent;
+
+/** Contain-fit plate render size for a viewport — same math as object-fit: contain. */
+export function discoveryPlateContainSize(
+  viewport: { width: number; height: number },
+  native = businessDiscoveryStudio.nativeSize,
+) {
+  const { width: vw, height: vh } = viewport;
+  if (vw <= 0 || vh <= 0) return { width: 0, height: 0 };
+
+  const scale = Math.min(vw / native.width, vh / native.height);
+  return {
+    width: native.width * scale,
+    height: native.height * scale,
   };
 }
 
