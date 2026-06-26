@@ -249,37 +249,13 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
             );
           })}
 
-          {/* Plate-anchored ✓ badges — one explicit render path per tile, no tile-local coords */}
+          {/* Plate-anchored ✓ badges — single overlay, one badge per completed tile */}
           <div className="bds-done-badges" aria-hidden="true">
-            {showDoneBadge("your-business") && (
-              <DiscoveryTileDoneBadge tileId="your-business" stageSize={stageSize} />
-            )}
-            {showDoneBadge("your-situation") && (
-              <DiscoveryTileDoneBadge tileId="your-situation" stageSize={stageSize} />
-            )}
-            {showDoneBadge("your-challenge") && (
-              <DiscoveryTileDoneBadge tileId="your-challenge" stageSize={stageSize} />
-            )}
-            {showDoneBadge("your-current-tools") && (
-              <DiscoveryTileDoneBadge tileId="your-current-tools" stageSize={stageSize} />
-            )}
-            {showDoneBadge("your-focus") && (
-              <DiscoveryTileDoneBadge tileId="your-focus" stageSize={stageSize} />
-            )}
-            {showDoneBadge("success-looks-like") && (
-              <DiscoveryTileDoneBadge tileId="success-looks-like" stageSize={stageSize} />
-            )}
-            {showDoneBadge("whats-slowing-you-down") && (
-              <DiscoveryTileDoneBadge
-                tileId="whats-slowing-you-down"
-                stageSize={stageSize}
-              />
-            )}
-            {showDoneBadge("anything-else") && (
-              <DiscoveryTileDoneBadge tileId="anything-else" stageSize={stageSize} />
-            )}
-            {showDoneBadge("submit-project") && (
-              <DiscoveryTileDoneBadge tileId="submit-project" stageSize={stageSize} />
+            {DISCOVERY_TILE_ORDER.map(
+              (id) =>
+                showDoneBadge(id) && (
+                  <DiscoveryTileDoneBadge key={id} tileId={id} stageSize={stageSize} />
+                ),
             )}
           </div>
 

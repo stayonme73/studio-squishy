@@ -12,13 +12,6 @@ export type SceneRect = {
   height: number;
 };
 
-/** Done checkmark badge anchor on native plate pixels — verify with ?debug=1. */
-export type DoneBadgeAnchor = {
-  x: number;
-  y: number;
-  size: number;
-};
-
 export type DiscoveryTileId =
   | "your-business"
   | "your-situation"
@@ -210,22 +203,6 @@ export const businessDiscoveryStudio = {
     "submit-project": { x: 592, y: 376, width: 188, height: 98 },
   } satisfies Record<DiscoveryTileId, SceneRect>,
 
-  /**
-   * Inline ✓ badge per tile (native plate pixels) — immediately right of baked title.
-   * x/y = top-left of badge square; y aligned to title cap-height center.
-   * Rendered on bds-done-badges overlay via sceneRectToCoverPercent — verify with ?debug=1.
-   */
-  tileDoneBadges: {
-    "your-business": { x: 363, y: 224, size: 14 },
-    "your-situation": { x: 546, y: 224, size: 14 },
-    "your-challenge": { x: 733, y: 223, size: 14 },
-    "your-current-tools": { x: 336, y: 347, size: 14 },
-    "your-focus": { x: 538, y: 346, size: 14 },
-    "success-looks-like": { x: 733, y: 348, size: 14 },
-    "whats-slowing-you-down": { x: 338, y: 382, size: 14 },
-    "anything-else": { x: 568, y: 383, size: 14 },
-    "submit-project": { x: 733, y: 380, size: 14 },
-  } satisfies Record<DiscoveryTileId, DoneBadgeAnchor>,
 
   tileLabels: {
     "your-business": "Your Business",
@@ -254,13 +231,28 @@ export const businessDiscoveryStudio = {
   } satisfies SceneRect,
 } as const;
 
-/** Plate-space badge square for overlay positioning (one rect per tile, no derivation). */
+/** Done ✓ badge size on native plate pixels — verify with ?debug=1. */
+export const DONE_BADGE_SIZE = 14;
+
+/**
+ * Plate-space badge square for overlay positioning — one rect per tile, derived from
+ * each tile hit so every checkmark sits at the same relative top-right inset.
+ * Rendered on bds-done-badges via sceneRectToCoverPercent.
+ */
 export function doneBadgePlateRect(
   tileId: DiscoveryTileId,
-  badges: Record<DiscoveryTileId, DoneBadgeAnchor> = businessDiscoveryStudio.tileDoneBadges,
+  hits: Record<DiscoveryTileId, SceneRect> = businessDiscoveryStudio.tileHits,
+  size = DONE_BADGE_SIZE,
 ): SceneRect {
-  const badge = badges[tileId];
-  return { x: badge.x, y: badge.y, width: badge.size, height: badge.size };
+  const hit = hits[tileId];
+  const insetX = Math.round(hit.width * 0.08);
+  const insetY = Math.round(hit.height * 0.12);
+  return {
+    x: hit.x + hit.width - size - insetX,
+    y: hit.y + insetY,
+    width: size,
+    height: size,
+  };
 }
 
 export function sceneRectToPercent(

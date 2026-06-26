@@ -30,6 +30,7 @@ export default function DiscoveryTileDoneBadge({ tileId, stageSize }: Props) {
         .filter(Boolean)
         .join(" ")}
       style={style}
+      data-tile-id={tileId}
       aria-hidden="true"
     >
       ✓
