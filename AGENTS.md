@@ -58,6 +58,8 @@ Customer-facing room names and routes are frozen in `src/config/customer-journey
 | Help Center | `/help-center` |
 
 Legacy paths redirect via `next.config.ts` and thin redirect pages. Internal folder names (e.g. `business-discovery-studio`, `studio-plan-review`) may differ from customer names.
+
+**Planned checkout panel (NOT implemented):** Future flow keeps Studio Plan visible on the left while a right-panel phase slot swaps Reviewing → Summary → slide-out Secure Checkout on the same workspace — see `docs/studio-plan-slide-out-checkout-v1-planned.md`. The `/payment` route stays active until that pattern ships; do not remove or replace it during layout prep.
 <!-- END:customer-journey-lock -->
 
 <!-- BEGIN:customer-journey-v1 -->

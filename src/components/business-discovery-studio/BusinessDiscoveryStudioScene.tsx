@@ -30,10 +30,12 @@ import {
 import { submitDiscoveryCampaign } from "@/lib/studio-board-campaign";
 import { studioBoard } from "@/config/studio-board";
 import { customerJourneyStepName } from "@/config/customer-journey-v1";
+import type { PanelPhase } from "@/project-summary";
 
 import DiscoveryReviewingPanel from "./DiscoveryReviewingPanel";
 import DiscoverySheetCard from "./DiscoverySheetCard";
 import DiscoverySummaryPlaceholder from "./DiscoverySummaryPlaceholder";
+import StudioPlanContextSkeleton from "./StudioPlanContextSkeleton";
 import DiscoveryTileDoneBadge from "./DiscoveryTileDoneBadge";
 import DiscoveryTileStatusCover from "./DiscoveryTileStatusCover";
 
@@ -41,8 +43,6 @@ import DiscoveryTileStatusCover from "./DiscoveryTileStatusCover";
 const REVIEWING_SUBMISSION_MS = 4200;
 /** Split grid / board slide transition — lock layout after this settles. */
 const SPLIT_TRANSITION_MS = 520;
-
-type RightPanelPhase = "reviewing" | "summary";
 
 type Props = {
   debug?: boolean;
@@ -58,7 +58,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   const [answers, setAnswers] = useState<DiscoveryAnswers>({});
   const [splitLayoutActive, setSplitLayoutActive] = useState(false);
   const [splitLayoutSettled, setSplitLayoutSettled] = useState(false);
-  const [rightPanelPhase, setRightPanelPhase] = useState<RightPanelPhase | null>(null);
+  const [rightPanelPhase, setRightPanelPhase] = useState<PanelPhase | null>(null);
 
   const {
     src,
@@ -253,10 +253,12 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     >
       <div className="bds-scene__backdrop" aria-hidden="true" />
       <div className="bds-scene__board">
+        {splitLayoutActive ? <StudioPlanContextSkeleton /> : null}
         <div
           className={[
             "bds-plate",
             activeTileId ? "bds-plate--sheet-open" : "",
+            splitLayoutActive ? "bds-plate--split-context" : "",
           ]
             .filter(Boolean)
             .join(" ")}
@@ -346,12 +348,19 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
       </div>
 
       {splitLayoutActive && rightPanelPhase ? (
-        <div className="bds-scene__panel" aria-live="polite">
-          {rightPanelPhase === "reviewing" ? (
-            <DiscoveryReviewingPanel />
-          ) : (
-            <DiscoverySummaryPlaceholder onContinue={continueToProjectSummary} />
-          )}
+        <div
+          className="bds-scene__panel"
+          style={{ "--bds-panel-phase": rightPanelPhase } as CSSProperties}
+          data-panel-phase={rightPanelPhase}
+          aria-live="polite"
+        >
+          <div className="bds-scene__panel-phase-slot">
+            {rightPanelPhase === "reviewing" ? (
+              <DiscoveryReviewingPanel />
+            ) : rightPanelPhase === "summary" ? (
+              <DiscoverySummaryPlaceholder onContinue={continueToProjectSummary} />
+            ) : null}
+          </div>
         </div>
       ) : null}
     </div>

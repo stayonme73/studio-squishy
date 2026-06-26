@@ -70,6 +70,22 @@ Studio Review is **not** shown in production builds.
 4. **Do not change** `DISCOVERY_BADGE_OFFSET`, recommendation engine, or catalog business rules as part of journey lock work.
 5. Update this doc when adding to the archive.
 
+## Planned evolution (not active — layout prep only)
+
+**Doc:** `docs/studio-plan-slide-out-checkout-v1-planned.md`
+
+A future journey simplification keeps the customer on **one workspace** after Project Discovery submit: Studio Plan context stays visible on the left while the right panel phases through Reviewing → Recommendations → **slide-out Secure Checkout** (card, billing, agreement, Pay Now). After payment, the panel closes and the customer continues to Studio Board.
+
+**Future simplified path (when implemented and approved):**
+
+Studio Lobby → Studio Guide → Project Discovery → Studio Plan → Slide-out Secure Checkout → Studio Board
+
+Until that ships:
+
+- **Secure Checkout** at `/payment` remains the active checkout route — do not remove or replace it during prep work.
+- Project Summary (`/project-summary`) and the in-discovery split panel continue as the post-discovery bridge.
+- No payment integration, Stripe wiring, or checkout panel UI until Tagia approves implementation.
+
 ## What this lock does *not* change
 
 - Internal TypeScript names (`CampaignRecord`, `business-discovery-studio`, etc.)

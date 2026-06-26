@@ -87,6 +87,8 @@ body:has(.business-discovery-studio) {
   --bds-board-margin: clamp(4px, 0.5vmin, 10px);
   --bds-split-gap: clamp(4px, 0.5vw, 10px);
   --bds-split-panel: clamp(18rem, 28vw, 22rem);
+  /* Future checkout form target width — same column, no reflow when phase → checkout */
+  --bds-panel-phase: summary;
   --bds-board-zone: calc(
     100vw - var(--bds-split-panel) - var(--bds-split-gap) - 2 * var(--bds-board-margin)
   );
@@ -115,6 +117,10 @@ body:has(.business-discovery-studio) {
   min-width: 0;
   z-index: 2;
   transform: translateX(0);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(6px, 1vh, 12px);
 }
 
 /** One-shot board slide — explicit entering class avoids @starting-style re-firing on re-renders. */
@@ -159,6 +165,122 @@ body:has(.business-discovery-studio) {
   width: 100%;
   min-width: 0;
   min-height: 0;
+}
+
+/** Phase slot — fixed footprint so reviewing | summary | checkout swap without reflow. */
+.business-discovery-studio .bds-scene__panel-phase-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: min(28rem, calc(100dvh - 2 * var(--bds-board-margin)));
+  overflow: hidden;
+}
+
+.business-discovery-studio .bds-scene__panel-phase-slot > * {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* --- Left column: Studio Plan context (stable post-submit) --- */
+
+.business-discovery-studio .bds-plan-context {
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  padding: clamp(0.85rem, 1.8vh, 1.15rem) clamp(1rem, 2vw, 1.35rem);
+  border-radius: 12px;
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--board-family-cream, #f3ede3) 92%, white) 0%,
+    color-mix(in srgb, var(--board-family-cream, #f3ede3) 78%, #ebe2d4) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--studio-denim, #2c3e50) 14%, transparent);
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 16%),
+    0 1px 0 rgb(255 255 255 / 50%) inset;
+}
+
+.business-discovery-studio .bds-plan-context__eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--studio-teal, #008080) 72%, var(--studio-denim, #2c3e50));
+}
+
+.business-discovery-studio .bds-plan-context__section + .bds-plan-context__section {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--studio-denim, #2c3e50) 8%, transparent);
+}
+
+.business-discovery-studio .bds-plan-context__title {
+  margin: 0 0 0.45rem;
+  font-size: clamp(0.8125rem, 1.5vh, 0.9375rem);
+  font-weight: 600;
+  color: var(--studio-denim, #2c3e50);
+}
+
+.business-discovery-studio .bds-plan-context__skeleton-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.business-discovery-studio .bds-plan-context__skeleton-line {
+  display: block;
+  height: 0.5rem;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--studio-denim, #2c3e50) 10%, transparent);
+}
+
+.business-discovery-studio .bds-plan-context__skeleton-line--wide {
+  width: 92%;
+}
+
+.business-discovery-studio .bds-plan-context__skeleton-line--medium {
+  width: 72%;
+}
+
+.business-discovery-studio .bds-plan-context__skeleton-line--short {
+  width: 48%;
+}
+
+.business-discovery-studio .bds-plan-context__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--studio-denim, #2c3e50) 10%, transparent);
+}
+
+.business-discovery-studio .bds-plan-context__total-label {
+  font-size: clamp(0.8125rem, 1.5vh, 0.9375rem);
+  font-weight: 600;
+  color: var(--studio-denim, #2c3e50);
+}
+
+.business-discovery-studio .bds-scene--split .bds-plate--split-context {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.business-discovery-studio .bds-scene--split .bds-plate--split-context .bds-plate-canvas {
+  width: min(
+    var(--bds-board-zone),
+    calc((100dvh - 2 * var(--bds-board-margin) - 7rem) * 1024 / 682)
+  );
 }
 
 @keyframes bds-split-panel-in {
