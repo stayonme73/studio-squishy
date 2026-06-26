@@ -59,7 +59,7 @@
   position: absolute;
   inset: -10%;
   background: url("/welcome-hall/welcome-hall-scene-v4.png?v=1") center / cover no-repeat;
-  filter: blur(28px) brightness(0.52) saturate(0.82);
+  filter: blur(20px) brightness(0.62) saturate(0.88);
   transform: scale(1.1);
 }
 
@@ -67,7 +67,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: color-mix(in srgb, #2e2d2b 58%, transparent);
+  background: color-mix(in srgb, #2e2d2b 42%, transparent);
 }
 
 .business-discovery-studio .bds-scene--split .bds-scene__backdrop {
