@@ -24,6 +24,74 @@
   overflow: hidden;
 }
 
+/* --- Split layout: board left, panel right (post-submit) --- */
+
+.business-discovery-studio .bds-scene__board {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  transition:
+    flex-basis 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: scale(1);
+  transform-origin: center center;
+}
+
+.business-discovery-studio .bds-scene--split {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: clamp(12px, 1.8vw, 28px);
+}
+
+.business-discovery-studio .bds-scene--split .bds-scene__board {
+  flex: 0 0 48%;
+  max-width: 48%;
+  transform: scale(0.88);
+  transform-origin: center center;
+}
+
+.business-discovery-studio .bds-scene__panel {
+  flex: 1 1 52%;
+  min-width: min(480px, 100%);
+  max-width: 52%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(24px);
+  animation: bds-split-panel-in 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes bds-split-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.business-discovery-studio .bds-scene--split .bds-plate-canvas {
+  width: min(
+    100%,
+    calc((100dvh - 2 * var(--bds-board-margin)) * var(--bds-plate-w) / var(--bds-plate-h))
+  );
+  height: min(
+    calc(100dvh - 2 * var(--bds-board-margin)),
+    calc(100% * var(--bds-plate-h) / var(--bds-plate-w))
+  );
+}
+
 .business-discovery-studio .bds-plate {
   position: relative;
   display: flex;
@@ -646,16 +714,13 @@
   color: color-mix(in srgb, var(--studio-denim, #2c3e50) 72%, #1a1a1a);
 }
 
-/* --- Post-submit reviewing panel (right-side empty space) --- */
+/* --- Post-submit reviewing panel (split-layout right column) --- */
 
 .business-discovery-studio .bds-reviewing-panel {
-  position: absolute;
-  z-index: 10;
-  top: 50%;
-  right: var(--bds-board-margin);
-  transform: translateY(-50%);
-  width: min(18rem, calc((100vw - 1024px) * 0.55 + 10rem));
-  max-width: calc(100vw - 2 * var(--bds-board-margin));
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 36rem;
   pointer-events: none;
   animation: bds-reviewing-panel-in 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -663,17 +728,17 @@
 @keyframes bds-reviewing-panel-in {
   from {
     opacity: 0;
-    transform: translateY(calc(-50% + 12px));
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: translateY(-50%);
+    transform: translateY(0);
   }
 }
 
 .business-discovery-studio .bds-reviewing-panel__inner {
-  padding: 1.15rem 1.25rem 1.25rem;
-  border-radius: 10px;
+  padding: clamp(1.25rem, 2.5vh, 1.75rem) clamp(1.35rem, 2.8vw, 2rem);
+  border-radius: 12px;
   background: linear-gradient(
     165deg,
     color-mix(in srgb, var(--board-family-cream, #f3ede3) 94%, white) 0%,
@@ -843,7 +908,7 @@
 
 .business-discovery-studio .bds-reviewing-panel__title {
   margin: 0 0 0.45rem;
-  font-size: 1.05rem;
+  font-size: clamp(1.05rem, 2.2vh, 1.35rem);
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--studio-denim, #2c3e50);
@@ -852,7 +917,7 @@
 
 .business-discovery-studio .bds-reviewing-panel__message {
   margin: 0 0 0.75rem;
-  font-size: 0.8125rem;
+  font-size: clamp(0.8125rem, 1.6vh, 0.9375rem);
   line-height: 1.45;
   color: color-mix(in srgb, var(--studio-denim, #2c3e50) 68%, #1a1a1a);
 }
@@ -860,7 +925,7 @@
 .business-discovery-studio .bds-reviewing-panel__status {
   margin: 0;
   min-height: 1.25em;
-  font-size: 0.8125rem;
+  font-size: clamp(0.8125rem, 1.6vh, 0.9375rem);
   font-weight: 500;
   line-height: 1.35;
   color: color-mix(in srgb, var(--studio-teal, #008080) 78%, var(--studio-denim, #2c3e50));
@@ -882,27 +947,133 @@
   }
 }
 
-@media screen and (max-width: 1499px) {
-  .business-discovery-studio .bds-reviewing-panel {
-    top: auto;
-    right: var(--bds-board-margin);
-    bottom: var(--bds-board-margin);
-    left: var(--bds-board-margin);
-    width: auto;
-    max-width: none;
-    transform: none;
-    animation-name: bds-reviewing-panel-in-mobile;
+@media screen and (max-width: 1279px) {
+  .business-discovery-studio .bds-scene--split {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: clamp(8px, 1.5vh, 16px);
+    overflow-y: auto;
   }
 
-  @keyframes bds-reviewing-panel-in-mobile {
-    from {
-      opacity: 0;
-      transform: translateY(16px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .business-discovery-studio .bds-scene--split .bds-scene__board {
+    flex: 0 0 auto;
+    max-width: 100%;
+    width: 100%;
+    transform: scale(0.92);
+  }
+
+  .business-discovery-studio .bds-scene__panel {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    padding-bottom: var(--bds-board-margin);
+  }
+
+  .business-discovery-studio .bds-scene--split .bds-plate-canvas {
+    width: min(
+      calc(100vw - 2 * var(--bds-board-margin)),
+      calc((50dvh - var(--bds-board-margin)) * var(--bds-plate-w) / var(--bds-plate-h))
+    );
+    height: min(
+      calc(50dvh - var(--bds-board-margin)),
+      calc((100vw - 2 * var(--bds-board-margin)) * var(--bds-plate-h) / var(--bds-plate-w))
+    );
+  }
+}
+
+/* --- Summary placeholder panel (post-reviewing, same split column) --- */
+
+.business-discovery-studio .bds-summary-panel {
+  position: relative;
+  width: 100%;
+  max-width: 36rem;
+  animation: bds-split-panel-in 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.business-discovery-studio .bds-summary-panel__inner {
+  padding: clamp(1.35rem, 2.8vh, 2rem) clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: 12px;
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--board-family-cream, #f3ede3) 94%, white) 0%,
+    color-mix(in srgb, var(--board-family-cream, #f3ede3) 82%, #ebe2d4) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--studio-denim, #2c3e50) 14%, transparent);
+  box-shadow:
+    0 10px 32px rgb(0 0 0 / 22%),
+    0 1px 0 rgb(255 255 255 / 55%) inset;
+}
+
+.business-discovery-studio .bds-summary-panel__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--studio-teal, #008080) 72%, var(--studio-denim, #2c3e50));
+}
+
+.business-discovery-studio .bds-summary-panel__title {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.15rem, 2.4vh, 1.5rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--studio-denim, #2c3e50);
+  line-height: 1.25;
+}
+
+.business-discovery-studio .bds-summary-panel__body {
+  margin: 0 0 1.25rem;
+  font-size: clamp(0.8125rem, 1.6vh, 0.9375rem);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--studio-denim, #2c3e50) 68%, #1a1a1a);
+}
+
+.business-discovery-studio .bds-summary-panel__placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 0 0 1.35rem;
+  padding: 1rem 1.1rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--studio-denim, #2c3e50) 4%, rgba(255, 255, 255, 0.45));
+  border: 1px dashed color-mix(in srgb, var(--studio-denim, #2c3e50) 16%, transparent);
+}
+
+.business-discovery-studio .bds-summary-panel__placeholder-line {
+  height: 0.55rem;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--studio-denim, #2c3e50) 10%, transparent);
+}
+
+.business-discovery-studio .bds-summary-panel__placeholder-line--wide {
+  width: 88%;
+}
+
+.business-discovery-studio .bds-summary-panel__placeholder-line--short {
+  width: 52%;
+}
+
+.business-discovery-studio .bds-summary-panel__continue {
+  width: 100%;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .business-discovery-studio .bds-scene__board,
+  .business-discovery-studio .bds-scene__panel,
+  .business-discovery-studio .bds-summary-panel {
+    transition: none;
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+
+  .business-discovery-studio .bds-scene--split .bds-scene__board {
+    transform: scale(0.88);
   }
 }
 

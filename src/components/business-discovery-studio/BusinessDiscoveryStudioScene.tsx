@@ -33,11 +33,14 @@ import { customerJourneyStepName } from "@/config/customer-journey-v1";
 
 import DiscoveryReviewingPanel from "./DiscoveryReviewingPanel";
 import DiscoverySheetCard from "./DiscoverySheetCard";
+import DiscoverySummaryPlaceholder from "./DiscoverySummaryPlaceholder";
 import DiscoveryTileDoneBadge from "./DiscoveryTileDoneBadge";
 import DiscoveryTileStatusCover from "./DiscoveryTileStatusCover";
 
-/** Duration before transitioning to post-submit confirmation. */
+/** Duration before transitioning reviewing panel → summary placeholder. */
 const REVIEWING_SUBMISSION_MS = 4200;
+
+type RightPanelPhase = "reviewing" | "summary";
 
 type Props = {
   debug?: boolean;
@@ -51,8 +54,8 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   const [activeTileId, setActiveTileId] = useState<DiscoveryTileId | null>(null);
   const [sheetPhase, setSheetPhase] = useState<SheetPhase | null>(null);
   const [answers, setAnswers] = useState<DiscoveryAnswers>({});
-  const [reviewingSubmission, setReviewingSubmission] = useState(false);
-  const [showDiscoveryReceived, setShowDiscoveryReceived] = useState(false);
+  const [splitLayoutActive, setSplitLayoutActive] = useState(false);
+  const [rightPanelPhase, setRightPanelPhase] = useState<RightPanelPhase | null>(null);
 
   const {
     src,
@@ -176,23 +179,22 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
       saveDiscoveryAnswers(finalAnswers);
       submitDiscoveryCampaign(finalAnswers);
       beginShrink();
-      setReviewingSubmission(true);
+      setSplitLayoutActive(true);
+      setRightPanelPhase("reviewing");
       return;
     }
     beginShrink();
   };
 
   useEffect(() => {
-    if (!reviewingSubmission) return;
+    if (rightPanelPhase !== "reviewing") return;
     const timer = window.setTimeout(() => {
-      setReviewingSubmission(false);
-      setShowDiscoveryReceived(true);
+      setRightPanelPhase("summary");
     }, REVIEWING_SUBMISSION_MS);
     return () => window.clearTimeout(timer);
-  }, [reviewingSubmission]);
+  }, [rightPanelPhase]);
 
   const continueToProjectSummary = useCallback(() => {
-    setShowDiscoveryReceived(false);
     router.push(studioBoard.routes.projectSummary);
   }, [router]);
 
@@ -218,7 +220,16 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
         : undefined;
 
   return (
-    <div className="bds-scene" aria-label={customerJourneyStepName("project-discovery")}>
+    <div
+      className={[
+        "bds-scene",
+        splitLayoutActive ? "bds-scene--split" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      aria-label={customerJourneyStepName("project-discovery")}
+    >
+      <div className="bds-scene__board">
       <div
         className={[
           "bds-plate",
@@ -315,26 +326,15 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
           </div>
         </div>
       </div>
+      </div>
 
-      {reviewingSubmission ? <DiscoveryReviewingPanel /> : null}
-
-      {showDiscoveryReceived ? (
-        <div className="bds-discovery-received" role="dialog" aria-modal="true" aria-labelledby="bds-discovery-received-title">
-          <div className="bds-discovery-received__panel">
-            <h2 id="bds-discovery-received-title" className="bds-discovery-received__title">
-              Discovery Received
-            </h2>
-            <p className="bds-discovery-received__body">
-              Thank you — we&apos;ve saved your answers. Review your Project Summary next.
-            </p>
-            <button
-              type="button"
-              className="bds-sheet__btn bds-sheet__btn--primary"
-              onClick={continueToProjectSummary}
-            >
-              Continue
-            </button>
-          </div>
+      {splitLayoutActive && rightPanelPhase ? (
+        <div className="bds-scene__panel" aria-live="polite">
+          {rightPanelPhase === "reviewing" ? (
+            <DiscoveryReviewingPanel />
+          ) : (
+            <DiscoverySummaryPlaceholder onContinue={continueToProjectSummary} />
+          )}
         </div>
       ) : null}
     </div>
