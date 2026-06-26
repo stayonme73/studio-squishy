@@ -237,6 +237,46 @@ export const DONE_BADGE_SIZE = 14;
 /** Padding from the visible card right edge to the badge (native px). */
 const DONE_BADGE_RIGHT_PADDING = 8;
 
+/** Next tile in the same row — left edge marks the painted right edge of the current tile. */
+const TILE_ROW_NEIGHBOR_RIGHT: Partial<Record<DiscoveryTileId, DiscoveryTileId>> = {
+  "your-business": "your-situation",
+  "your-situation": "your-challenge",
+  "your-current-tools": "your-focus",
+  "your-focus": "success-looks-like",
+  "whats-slowing-you-down": "anything-else",
+  "anything-else": "submit-project",
+};
+
+/** Left neighbor in the same row — used to infer painted width for rightmost column tiles. */
+const TILE_ROW_NEIGHBOR_LEFT: Partial<Record<DiscoveryTileId, DiscoveryTileId>> = {
+  "your-challenge": "your-situation",
+  "success-looks-like": "your-focus",
+  "submit-project": "anything-else",
+};
+
+/**
+ * Painted card face right edge in native plate pixels.
+ * Hit rects are wider than painted faces and bleed into column gutters; anchor badges
+ * to the face edge (next tile's left minus pad) rather than hit.x + hit.width.
+ */
+export function paintedCardRightEdgeX(
+  tileId: DiscoveryTileId,
+  hits: Record<DiscoveryTileId, SceneRect> = businessDiscoveryStudio.tileHits,
+): number {
+  const nextId = TILE_ROW_NEIGHBOR_RIGHT[tileId];
+  if (nextId && hits[nextId]) {
+    return hits[nextId].x;
+  }
+
+  const leftId = TILE_ROW_NEIGHBOR_LEFT[tileId];
+  const hit = hits[tileId];
+  if (leftId && hits[leftId]) {
+    return hit.x + (hit.x - hits[leftId].x);
+  }
+
+  return hit.x + hit.width;
+}
+
 /**
  * Plate-space badge square for overlay positioning — one rect per tile, derived from
  * each tile hit so every checkmark sits at the same relative top-right inset.
@@ -249,32 +289,10 @@ export function doneBadgePlateRect(
 ): SceneRect {
   const hit = hits[tileId];
   const insetY = Math.round(hit.height * 0.12);
+  const paintedRight = paintedCardRightEdgeX(tileId, hits);
 
-  // Card 1 hit rect extends past the painted card edge into the column gap; anchor
-  // to the next tile's left edge so the full circle stays on the card face.
-  if (tileId === "your-business") {
-    const visualRight = hits["your-situation"].x;
-    return {
-      x: visualRight - size - DONE_BADGE_RIGHT_PADDING,
-      y: hit.y + insetY,
-      width: size,
-      height: size,
-    };
-  }
-
-  if (tileId === "your-situation") {
-    const visualRight = hits["your-challenge"].x;
-    return {
-      x: visualRight - size - DONE_BADGE_RIGHT_PADDING,
-      y: hit.y + insetY,
-      width: size,
-      height: size,
-    };
-  }
-
-  const insetX = Math.round(hit.width * 0.08);
   return {
-    x: hit.x + hit.width - size - insetX,
+    x: paintedRight - size - DONE_BADGE_RIGHT_PADDING,
     y: hit.y + insetY,
     width: size,
     height: size,
