@@ -28,6 +28,7 @@ function RecommendedServiceName({ service }: { service: DiscoverySummaryServiceI
 }
 
 /** Project Summary — heard + Our Recommendation + Customize Your Studio Plan (presentation only). */
+/** Decision-page proposal aesthetic — see docs/decision-page-visual-language-v1.md */
 export default function ProjectSummaryScene({
   heard,
   summary,

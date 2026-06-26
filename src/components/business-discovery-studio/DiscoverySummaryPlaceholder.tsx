@@ -13,7 +13,7 @@ type Props = {
 export default function DiscoverySummaryPlaceholder({ onContinue }: Props) {
   return (
     <aside
-      className="bds-summary-panel"
+      className="bds-summary-panel bds-summary-panel--proposal"
       aria-labelledby="bds-summary-recommend-title"
       aria-describedby="bds-summary-customize-lead"
     >

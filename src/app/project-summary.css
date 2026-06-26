@@ -1,0 +1,214 @@
+/**
+ * Project Summary — decision-page proposal aesthetic.
+ * Creative pages (Discovery, Review Room): warm, textured.
+ * Decision pages (Project Summary, Secure Checkout): clean, high contrast.
+ * @see docs/decision-page-visual-language-v1.md
+ */
+
+.project-summary-page {
+  --ps-eucalyptus: #2e5e4e;
+  --ps-eucalyptus-deep: color-mix(in srgb, #2e5e4e 88%, #000 12%);
+  --ps-charcoal: #2b2b2b;
+  --ps-charcoal-muted: color-mix(in srgb, #2b2b2b 72%, #6b6b6b);
+  --ps-card: #ffffff;
+  --ps-card-alt: #f8f9fa;
+  --ps-accent-warm: #c47a2c;
+  --ps-accent-gold: #daa520;
+  --ps-accent-coral: #e07a5f;
+
+  --utility-primary: var(--ps-eucalyptus);
+  --utility-primary-deep: var(--ps-eucalyptus-deep);
+  --utility-text: var(--ps-charcoal);
+  --utility-text-muted: var(--ps-charcoal-muted);
+  --utility-card: var(--ps-card);
+  --utility-cream: transparent;
+  --utility-border: color-mix(in srgb, var(--ps-charcoal) 12%, transparent);
+  --utility-shadow:
+    0 1px 2px rgba(43, 43, 43, 0.04),
+    0 4px 16px rgba(43, 43, 43, 0.08),
+    0 12px 32px rgba(43, 43, 43, 0.06);
+  --utility-card-gap: 1.35rem;
+  --utility-card-pad: clamp(1.35rem, 2.5vw, 1.75rem);
+}
+
+/* Header readability over frosted lobby backdrop */
+.project-summary-page .utility-topbar__title {
+  color: var(--ps-charcoal);
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.85);
+}
+
+.project-summary-page .utility-lead {
+  color: var(--ps-charcoal-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.project-summary-page .utility-topbar__help,
+.project-summary-page .utility-topbar__back {
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.7);
+}
+
+/* Proposal cards — white, elevated */
+.project-summary-page .utility-card {
+  background: var(--ps-card);
+  border-color: color-mix(in srgb, var(--ps-charcoal) 10%, transparent);
+  box-shadow: var(--utility-shadow);
+}
+
+.project-summary-page .utility-card__title {
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: var(--ps-eucalyptus);
+  margin-bottom: 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--ps-eucalyptus) 18%, transparent);
+}
+
+/* Section spacing */
+.project-summary-page .ps-content {
+  gap: var(--utility-card-gap);
+}
+
+.project-summary-page .ps-section {
+  scroll-margin-top: 1.25rem;
+}
+
+/* Heard section */
+.project-summary-page .ps-heard__label {
+  color: var(--ps-charcoal-muted);
+  font-size: 0.78rem;
+}
+
+.project-summary-page .ps-heard__value {
+  color: var(--ps-charcoal);
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+
+.project-summary-page .ps-heard__list {
+  gap: 1.1rem;
+}
+
+/* Recommendation section */
+.project-summary-page .ps-recommend__lead {
+  font-size: 1.02rem;
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+.project-summary-page .ps-recommend__service-list {
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+
+.project-summary-page .ps-recommend__service-name {
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.45;
+  padding-left: 0.35rem;
+  border-left: 3px solid var(--ps-accent-warm);
+}
+
+.project-summary-page .ps-recommend__why-label {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ps-eucalyptus);
+  margin-top: 1.1rem;
+}
+
+.project-summary-page .ps-recommend__why-body {
+  color: var(--ps-charcoal);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.project-summary-page .ps-recommend__total {
+  margin-top: 1.1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--utility-border);
+  font-size: 1.1rem;
+  color: var(--ps-eucalyptus);
+}
+
+.project-summary-page .ps-warnings li {
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  background: color-mix(in srgb, var(--ps-accent-gold) 12%, var(--ps-card));
+  border: 1px solid color-mix(in srgb, var(--ps-accent-warm) 28%, transparent);
+}
+
+/* Customize section */
+.project-summary-page .ps-changes__lead {
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--ps-charcoal);
+  margin-bottom: 1rem;
+}
+
+.project-summary-page .ps-changes__powers-intro,
+.project-summary-page .ps-changes__auto-update {
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.project-summary-page .ps-changes__powers {
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.project-summary-page .ps-changes__powers li {
+  line-height: 1.5;
+}
+
+.project-summary-page .ps-changes__powers li::marker {
+  color: var(--ps-accent-coral);
+}
+
+/* Plan review within proposal */
+.project-summary-page .spr-service__title,
+.project-summary-page .spr-menu__title {
+  color: var(--ps-charcoal);
+}
+
+.project-summary-page .spr-cost__value {
+  color: var(--ps-eucalyptus);
+  font-size: 1.35rem;
+}
+
+/* Buttons — eucalyptus primary, white secondary */
+.project-summary-page .utility-btn--primary {
+  background: var(--ps-eucalyptus);
+  border-color: var(--ps-eucalyptus);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--ps-eucalyptus) 32%, transparent);
+}
+
+.project-summary-page .utility-btn--primary:hover {
+  background: var(--ps-eucalyptus-deep);
+  border-color: var(--ps-eucalyptus-deep);
+}
+
+.project-summary-page .utility-btn--secondary,
+.project-summary-page .utility-btn--ghost {
+  color: var(--ps-charcoal);
+  background: #ffffff;
+  border: 1.5px solid color-mix(in srgb, var(--ps-charcoal) 28%, transparent);
+}
+
+.project-summary-page .utility-btn--secondary:hover,
+.project-summary-page .utility-btn--ghost:hover {
+  background: var(--ps-card-alt);
+  border-color: color-mix(in srgb, var(--ps-charcoal) 42%, transparent);
+}
+
+.project-summary-page .utility-text-link,
+.project-summary-page .utility-topbar__help {
+  text-decoration-color: color-mix(in srgb, var(--ps-accent-warm) 55%, transparent);
+}
+
+.project-summary-page .utility-text-link:hover,
+.project-summary-page .utility-topbar__help:hover {
+  text-decoration-color: var(--ps-accent-warm);
+}

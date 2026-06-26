@@ -3,6 +3,7 @@
  * Customer-facing bridge after Project Discovery — presentation only.
  *
  * Copy structure locked: docs/recommendation-not-direction-v1-locked.md
+ * Visual language: docs/decision-page-visual-language-v1.md (proposal, not Discovery corkboard)
  */
 
 export const PROJECT_SUMMARY_LABELS = {

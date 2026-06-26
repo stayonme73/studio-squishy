@@ -28,6 +28,8 @@ These routes sit between Project Discovery and Secure Checkout — not numbered 
 
 Architecture: Catalog → Recommendation Engine → Project Summary / Studio Plan Review → Secure Checkout → Project Record.
 
+**Visual language:** Decision pages (Project Summary, Secure Checkout) use clean proposal styling — see [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md). Creative pages (Discovery, Review Room) keep warm textured aesthetics.
+
 ## Removed from active flow (archived)
 
 Do **not** delete — move to `src/archive/` and document here.

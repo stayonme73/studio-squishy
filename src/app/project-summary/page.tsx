@@ -9,6 +9,7 @@ import { studioBoard } from "@/config/studio-board";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 import "../discovery-summary.css";
+import "../project-summary.css";
 import "../studio-plan-review.css";
 import "../mobile-route-fixes.css";
 
@@ -26,7 +27,10 @@ export default function ProjectSummaryPage() {
         <StudioUtilityBackdrop />
         <div className="studio-utility-scene__content">
           <UtilityPageFrame navId="studio-board">
-            <div className="utility-page" aria-label={PROJECT_SUMMARY_LABELS.pageTitle}>
+            <div
+              className="utility-page project-summary-page"
+              aria-label={PROJECT_SUMMARY_LABELS.pageTitle}
+            >
               <UtilityPageHeader
                 backHref={studioBoard.routes.projectDiscovery}
                 activeNav="studio-board"
