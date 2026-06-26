@@ -260,7 +260,7 @@ export const DISCOVERY_BADGE_OFFSET: Partial<Record<DiscoveryTileId, DiscoveryBa
   "your-situation": { dx: -2, dy: 8 },
   "your-challenge": { dx: -6, dy: -16 },
   "your-current-tools": { dx: -4, dy: 0 },
-  "success-looks-like": { dx: 8, dy: 1 },
+  "success-looks-like": { dx: 12, dy: 1 },
   "whats-slowing-you-down": { dx: -12, dy: 0 },
   "anything-else": { dx: 4, dy: 0 },
 };
