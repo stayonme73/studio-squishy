@@ -253,16 +253,18 @@ export type DiscoveryBadgeOffset = {
   dy?: number;
 };
 
-/** Per-tile done-badge nudge (native plate px) — only where painted art diverges from card 1. */
+/**
+ * Per-tile done-badge nudge (native plate px) — only where painted art diverges from card 1.
+ * Tagia-approved positions — do not change without explicit approval.
+ */
 export const DISCOVERY_BADGE_OFFSET: Partial<Record<DiscoveryTileId, DiscoveryBadgeOffset>> = {
-  // dy:-3 aligns badge.y=168 with card 2 — do not change without Tagia approval
-  "your-business": { dx: 8, dy: -3 },
-  "your-situation": { dx: -2, dy: 8 },
-  "your-challenge": { dx: -6, dy: -16 },
-  "your-current-tools": { dx: -4, dy: 0 },
-  "success-looks-like": { dx: 12, dy: 1 },
-  "whats-slowing-you-down": { dx: -12, dy: 0 },
-  "anything-else": { dx: 4, dy: 0 },
+  "your-business": { dx: 8, dy: -3 }, // approved, locked
+  "your-situation": { dx: -2, dy: 8 }, // approved, locked
+  "your-challenge": { dx: -6, dy: -16 }, // approved, locked
+  "your-current-tools": { dx: -4, dy: 0 }, // approved, locked
+  "success-looks-like": { dx: 12, dy: 1 }, // approved, locked
+  "whats-slowing-you-down": { dx: -12, dy: 0 }, // approved, locked
+  "anything-else": { dx: 4, dy: 0 }, // approved, locked
 };
 
 export type DiscoveryTileDerivedGeometry = {

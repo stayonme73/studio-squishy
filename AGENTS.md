@@ -24,4 +24,5 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Recommendation philosophy
 - Production allocation rules
 - Customer choice rules
+- Discovery room badge offsets (`DISCOVERY_BADGE_OFFSET` in `src/config/business-discovery-studio.ts`) — do not modify without Tagia approval
 <!-- END:studio-architecture-rules -->
