@@ -234,6 +234,9 @@ export const businessDiscoveryStudio = {
 /** Done ✓ badge size on native plate pixels — verify with ?debug=1. */
 export const DONE_BADGE_SIZE = 14;
 
+/** Padding from the visible card right edge to the badge (native px). */
+const DONE_BADGE_RIGHT_PADDING = 8;
+
 /**
  * Plate-space badge square for overlay positioning — one rect per tile, derived from
  * each tile hit so every checkmark sits at the same relative top-right inset.
@@ -245,8 +248,21 @@ export function doneBadgePlateRect(
   size = DONE_BADGE_SIZE,
 ): SceneRect {
   const hit = hits[tileId];
-  const insetX = Math.round(hit.width * 0.08);
   const insetY = Math.round(hit.height * 0.12);
+
+  // Card 1 hit rect extends past the painted card edge into the column gap; anchor
+  // to the next tile's left edge so the full circle stays on the card face.
+  if (tileId === "your-business") {
+    const visualRight = hits["your-situation"].x;
+    return {
+      x: visualRight - size - DONE_BADGE_RIGHT_PADDING,
+      y: hit.y + insetY,
+      width: size,
+      height: size,
+    };
+  }
+
+  const insetX = Math.round(hit.width * 0.08);
   return {
     x: hit.x + hit.width - size - insetX,
     y: hit.y + insetY,
