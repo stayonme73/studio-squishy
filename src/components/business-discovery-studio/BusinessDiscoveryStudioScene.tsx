@@ -231,15 +231,15 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     >
       <div className="bds-scene__backdrop" aria-hidden="true" />
       <div className="bds-scene__board">
-      <div
-        className={[
-          "bds-plate",
-          activeTileId ? "bds-plate--sheet-open" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-      >
-        <div className="bds-plate-canvas">
+        <div
+          className={[
+            "bds-plate",
+            activeTileId ? "bds-plate--sheet-open" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <div className="bds-plate-canvas">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
@@ -319,7 +319,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
             )}
           </div>
         </div>
-      </div>
+        </div>
       </div>
 
       {splitLayoutActive && rightPanelPhase ? (
