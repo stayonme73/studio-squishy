@@ -262,6 +262,16 @@ export function doneBadgePlateRect(
     };
   }
 
+  if (tileId === "your-situation") {
+    const visualRight = hits["your-challenge"].x;
+    return {
+      x: visualRight - size - DONE_BADGE_RIGHT_PADDING,
+      y: hit.y + insetY,
+      width: size,
+      height: size,
+    };
+  }
+
   const insetX = Math.round(hit.width * 0.08);
   return {
     x: hit.x + hit.width - size - insetX,
