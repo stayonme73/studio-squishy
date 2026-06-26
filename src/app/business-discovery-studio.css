@@ -236,7 +236,8 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   border-radius: 2px;
-  z-index: 1;
+  /* Above done-badge overlays so the full geometry rect receives clicks. */
+  z-index: 4;
 }
 
 .business-discovery-studio .bds-tile-hit:hover {
@@ -334,6 +335,12 @@
   /* Sized in plate px via inline % — keep circle tight to baked status dot only */
 }
 
+/** Submit tile face is dark — match cover to card, not cream form tiles. */
+.business-discovery-studio .bds-tile-status-cover[data-tile-id="submit-project"] {
+  background: #2a2928;
+  box-shadow: 0 0 0 1px #2a2928;
+}
+
 .business-discovery-studio .bds-tile-done-badge {
   position: absolute;
   z-index: 3;
@@ -379,9 +386,10 @@
   opacity: 0.35;
 }
 
-/* Submit tile stays full artwork when locked — no wash-out hue overlay */
+/* Submit tile — locked cursor only; no semi-transparent wash over dark artwork. */
 .business-discovery-studio .bds-tile-hit--locked[data-tile-id="submit-project"] {
   opacity: 1;
+  background: transparent;
 }
 
 .business-discovery-studio .bds-tile-hit--locked:hover {
