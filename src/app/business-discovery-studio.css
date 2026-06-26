@@ -4,8 +4,11 @@
   --bds-plate-w: 1024;
   --bds-plate-h: 682;
   --bds-board-margin: clamp(8px, 2vmin, 28px);
-  /* Match plate edge — avoids cream body flash if layout is still settling */
-  background: #2e2d2b;
+  /* Lobby fallback while backdrop image loads — blurred layer sits on top in .bds-scene */
+  background:
+    color-mix(in srgb, #2e2d2b 30%, transparent),
+    url("/welcome-hall/welcome-hall-scene-v4.png?v=1") center / cover no-repeat,
+    #2e2d2b;
 }
 
 .business-discovery-studio .bds-scene {
@@ -46,8 +49,7 @@
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
-  opacity: 0;
-  transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 1;
 }
 
 .business-discovery-studio .bds-scene__backdrop::before {
@@ -66,8 +68,9 @@
   background: color-mix(in srgb, #2e2d2b 42%, transparent);
 }
 
-.business-discovery-studio .bds-scene--split .bds-scene__backdrop {
-  opacity: 1;
+/* Pre-submit: lighter tint so lobby reads through margins behind the centered board */
+.business-discovery-studio .bds-scene:not(.bds-scene--split) .bds-scene__backdrop::after {
+  background: color-mix(in srgb, #2e2d2b 30%, transparent);
 }
 
 .business-discovery-studio .bds-scene--split {
