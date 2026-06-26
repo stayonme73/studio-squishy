@@ -256,6 +256,7 @@ export type DiscoveryBadgeOffset = {
 /** Per-tile done-badge nudge (native plate px) — only where painted art diverges from card 1. */
 export const DISCOVERY_BADGE_OFFSET: Partial<Record<DiscoveryTileId, DiscoveryBadgeOffset>> = {
   "your-situation": { dx: -2, dy: 8 },
+  "your-challenge": { dx: -2, dy: 8 },
 };
 
 export type DiscoveryTileDerivedGeometry = {
