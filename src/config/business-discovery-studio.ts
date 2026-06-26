@@ -237,7 +237,17 @@ export const DONE_BADGE_SIZE = 14;
 /** Padding from the visible card right edge to the badge (native px). */
 const DONE_BADGE_RIGHT_PADDING = 8;
 
-/** Next tile in the same row — left edge marks the painted right edge of the current tile. */
+/** Gutter between painted card faces within a row (native px). */
+const PAINTED_CARD_COLUMN_GUTTER = 8;
+
+/** Rightmost column — no next tile; painted width comes from column spacing. */
+const RIGHT_COLUMN_TILES: ReadonlySet<DiscoveryTileId> = new Set([
+  "your-challenge",
+  "success-looks-like",
+  "submit-project",
+]);
+
+/** Next tile in the same row — its left edge minus gutter marks the painted right edge. */
 const TILE_ROW_NEIGHBOR_RIGHT: Partial<Record<DiscoveryTileId, DiscoveryTileId>> = {
   "your-business": "your-situation",
   "your-situation": "your-challenge",
@@ -247,31 +257,31 @@ const TILE_ROW_NEIGHBOR_RIGHT: Partial<Record<DiscoveryTileId, DiscoveryTileId>>
   "anything-else": "submit-project",
 };
 
-/** Left neighbor in the same row — used to infer painted width for rightmost column tiles. */
-const TILE_ROW_NEIGHBOR_LEFT: Partial<Record<DiscoveryTileId, DiscoveryTileId>> = {
-  "your-challenge": "your-situation",
-  "success-looks-like": "your-focus",
-  "submit-project": "anything-else",
-};
+/** Painted card face width — gap between column hit left edges (e.g. 418 − 244 = 174). */
+export function paintedCardWidth(
+  hits: Record<DiscoveryTileId, SceneRect> = businessDiscoveryStudio.tileHits,
+): number {
+  return hits["your-situation"].x - hits["your-business"].x;
+}
 
 /**
  * Painted card face right edge in native plate pixels.
  * Hit rects are wider than painted faces and bleed into column gutters; anchor badges
- * to the face edge (next tile's left minus pad) rather than hit.x + hit.width.
+ * to the face edge rather than hit.x + hit.width.
  */
 export function paintedCardRightEdgeX(
   tileId: DiscoveryTileId,
   hits: Record<DiscoveryTileId, SceneRect> = businessDiscoveryStudio.tileHits,
 ): number {
-  const nextId = TILE_ROW_NEIGHBOR_RIGHT[tileId];
-  if (nextId && hits[nextId]) {
-    return hits[nextId].x;
+  const hit = hits[tileId];
+
+  if (RIGHT_COLUMN_TILES.has(tileId)) {
+    return hit.x + paintedCardWidth(hits);
   }
 
-  const leftId = TILE_ROW_NEIGHBOR_LEFT[tileId];
-  const hit = hits[tileId];
-  if (leftId && hits[leftId]) {
-    return hit.x + (hit.x - hits[leftId].x);
+  const nextId = TILE_ROW_NEIGHBOR_RIGHT[tileId];
+  if (nextId && hits[nextId]) {
+    return hits[nextId].x - PAINTED_CARD_COLUMN_GUTTER;
   }
 
   return hit.x + hit.width;
