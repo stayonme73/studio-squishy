@@ -257,6 +257,14 @@ export const tileDoneBadges = {
   "submit-project": { x: 690, y: 386, size: DONE_BADGE_SIZE },
 } satisfies Record<DiscoveryTileId, DoneBadgeAnchor>;
 
+/** Live tuning: only tiles listed here show done badges. Add next tile when Tagia approves previous. */
+export const DISCOVERY_BADGE_ENABLED_TILES: DiscoveryTileId[] = ["your-business"];
+
+/** Manual plate-pixel offsets from paintedCardRightEdgeX formula — tune with Tagia live */
+export const DISCOVERY_BADGE_OFFSET: Partial<Record<DiscoveryTileId, { dx: number; dy: number }>> = {
+  "your-business": { dx: 0, dy: 0 },
+};
+
 /**
  * Baked "Not completed" status circle on the plate — masked when a tile is complete
  * so only the single runtime top-right ✓ remains visible.
@@ -279,7 +287,13 @@ export function doneBadgePlateRect(
   badges: Record<DiscoveryTileId, DoneBadgeAnchor> = tileDoneBadges,
 ): SceneRect {
   const badge = badges[tileId];
-  return { x: badge.x, y: badge.y, width: badge.size, height: badge.size };
+  const offset = DISCOVERY_BADGE_OFFSET[tileId];
+  return {
+    x: badge.x + (offset?.dx ?? 0),
+    y: badge.y + (offset?.dy ?? 0),
+    width: badge.size,
+    height: badge.size,
+  };
 }
 
 export function sceneRectToPercent(

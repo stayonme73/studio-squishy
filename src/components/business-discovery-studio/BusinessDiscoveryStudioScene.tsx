@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import {
+  DISCOVERY_BADGE_ENABLED_TILES,
   DISCOVERY_REQUIRED_TILE_IDS,
   DISCOVERY_TILE_ORDER,
   businessDiscoveryStudio,
@@ -79,7 +80,9 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   );
 
   const showDoneBadge = (id: DiscoveryTileId) =>
-    isTileComplete(id) && activeTileId !== id;
+    DISCOVERY_BADGE_ENABLED_TILES.includes(id) &&
+    isTileComplete(id) &&
+    activeTileId !== id;
 
   useLayoutEffect(() => {
     const stage = stageRef.current;
