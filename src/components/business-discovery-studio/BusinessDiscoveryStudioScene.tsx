@@ -9,6 +9,7 @@ import {
   type CSSProperties,
   type TransitionEvent,
 } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   DISCOVERY_FORM_TILE_IDS,
@@ -26,6 +27,8 @@ import {
   saveDiscoveryAnswers,
   type DiscoveryAnswers,
 } from "@/lib/business-discovery-session";
+import { submitDiscoveryCampaign } from "@/lib/studio-board-campaign";
+import { studioBoard } from "@/config/studio-board";
 
 import DiscoverySheetCard from "./DiscoverySheetCard";
 import DiscoveryTileDoneBadge from "./DiscoveryTileDoneBadge";
@@ -38,12 +41,14 @@ type Props = {
 type SheetPhase = "expanding" | "active" | "shrinking";
 
 export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
+  const router = useRouter();
   const plateRef = useRef<HTMLDivElement>(null);
   const openSnapshotRef = useRef<string>("");
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const [activeTileId, setActiveTileId] = useState<DiscoveryTileId | null>(null);
   const [sheetPhase, setSheetPhase] = useState<SheetPhase | null>(null);
   const [answers, setAnswers] = useState<DiscoveryAnswers>({});
+  const [showDiscoveryReceived, setShowDiscoveryReceived] = useState(false);
 
   const {
     src,
@@ -188,8 +193,22 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   );
 
   const handleDone = () => {
+    if (activeTileId === "submit-project") {
+      const finalAnswers = { ...answers, "submit-project": "submitted" };
+      setAnswers(finalAnswers);
+      saveDiscoveryAnswers(finalAnswers);
+      submitDiscoveryCampaign(finalAnswers);
+      beginShrink();
+      setShowDiscoveryReceived(true);
+      return;
+    }
     beginShrink();
   };
+
+  const continueToStudioPlanReview = useCallback(() => {
+    setShowDiscoveryReceived(false);
+    router.push(studioBoard.routes.studioPlanReview);
+  }, [router]);
 
   const handleCancel = useCallback(() => {
     if (!activeTileId) return;
@@ -311,6 +330,26 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
           </div>
         </div>
       </div>
+
+      {showDiscoveryReceived ? (
+        <div className="bds-discovery-received" role="dialog" aria-modal="true" aria-labelledby="bds-discovery-received-title">
+          <div className="bds-discovery-received__panel">
+            <h2 id="bds-discovery-received-title" className="bds-discovery-received__title">
+              Discovery Received
+            </h2>
+            <p className="bds-discovery-received__body">
+              Thank you — we&apos;ve saved your answers. Review your recommended Studio Plan next.
+            </p>
+            <button
+              type="button"
+              className="bds-sheet__btn bds-sheet__btn--primary"
+              onClick={continueToStudioPlanReview}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import {
 
 /** Dev-only query param → campaign status (Phase 1 testing). */
 export const DEV_STATUS_QUERY_MAP: Record<string, CampaignStatus> = {
+  discovery: "DISCOVERY_COMPLETE",
   intake: "DRAFT_RECEIVED",
   draft: "DRAFT_RECEIVED",
   payment: "PAYMENT_RECEIVED",
@@ -15,6 +16,7 @@ export const DEV_STATUS_QUERY_MAP: Record<string, CampaignStatus> = {
 
 export const DEV_STATUS_OPTIONS = CAMPAIGN_STATUSES.map((status) => {
   const labels: Record<CampaignStatus, string> = {
+    DISCOVERY_COMPLETE: "Discovery Complete",
     DRAFT_RECEIVED: "Intake Complete",
     PAYMENT_RECEIVED: "Payment Received",
     BUILDING_CONCEPTS: "Building Concepts",
@@ -23,6 +25,7 @@ export const DEV_STATUS_OPTIONS = CAMPAIGN_STATUSES.map((status) => {
   };
 
   const params: Record<CampaignStatus, string> = {
+    DISCOVERY_COMPLETE: "discovery",
     DRAFT_RECEIVED: "intake",
     PAYMENT_RECEIVED: "payment",
     BUILDING_CONCEPTS: "concepts",

@@ -1,7 +1,8 @@
 import type { DraftIntakePayload } from "@/config/draft-room";
 import { EMPTY_DRAFT_INTAKE_FORM } from "@/config/draft-room";
 import { getPackageRevisionRounds, getStudioGuidePackage, type StudioGuidePackageId, type DeliverableQuotaId } from "@/config/studio-guide";
-import { clearDiscoveryAnswers } from "@/lib/business-discovery-session";
+import { clearDiscoveryAnswers, type DiscoveryAnswers } from "@/lib/business-discovery-session";
+import { discoveryBriefFromAnswers } from "@/lib/discovery-brief";
 import { readLastDraftIntake } from "@/lib/draft-intake";
 import { ensureCampaignConceptsOnRecord } from "@/lib/campaign-concepts";
 import {
@@ -16,10 +17,13 @@ import { isIntakeEditable } from "@/lib/intake-edit";
 import {
   CAMPAIGN_STATUSES,
   studioBoard,
+  type ApprovedStudioPlan,
   type CampaignIntakeSnapshot,
   type CampaignRecord,
   type CampaignStatus,
 } from "@/config/studio-board";
+import { allocateSelectedServices, computeAdditionalCostUsd } from "@/studio-plan-review";
+import type { ServiceId } from "@/catalog/types";
 
 const { statusContent } = studioBoard;
 
@@ -231,6 +235,65 @@ export function createCampaignFromIntake(payload: DraftIntakePayload): CampaignR
     createdAt: now,
     updatedAt: now,
   };
+}
+
+export function createCampaignFromDiscovery(answers: DiscoveryAnswers): CampaignRecord {
+  const content = studioBoard.statusContent.DISCOVERY_COMPLETE;
+  const now = new Date().toISOString();
+  const brief = discoveryBriefFromAnswers(answers);
+  const businessName = brief.answers["your-business"]?.trim();
+  const defaultPackageId = studioBoard.membership.packageId;
+  const pkg = getStudioGuidePackage(defaultPackageId);
+
+  return {
+    campaignId: crypto.randomUUID(),
+    campaignName: campaignNameFromProject(businessName ?? "New Campaign"),
+    campaignStatus: "DISCOVERY_COMPLETE",
+    campaignDescription: content.campaignDescription,
+    estimatedCompletion: content.estimatedCompletion,
+    packageId: defaultPackageId,
+    packageLabel: pkg?.label ?? defaultPackageId,
+    discoveryAnswers: brief.answers,
+    discoverySubmittedAt: now,
+    paymentReceivedAt: null,
+    targetCompletionDate: null,
+    revisionRoundsIncluded: getPackageRevisionRounds(defaultPackageId),
+    revisionRoundsUsed: 0,
+    deliverablesDelivered: {},
+    studioNotes: [...content.studioUpdates],
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+export function submitDiscoveryCampaign(answers: DiscoveryAnswers): CampaignRecord {
+  return persistCampaign(createCampaignFromDiscovery(answers));
+}
+
+export function saveApprovedStudioPlan(
+  selectedServiceIds: readonly ServiceId[],
+): CampaignRecord | null {
+  const campaign = readCurrentCampaign();
+  if (!campaign) return null;
+
+  const { includedServiceIds, additionalServiceIds } = allocateSelectedServices(selectedServiceIds);
+  const { amountUsd } = computeAdditionalCostUsd(additionalServiceIds);
+  const now = new Date().toISOString();
+
+  const approvedStudioPlan: ApprovedStudioPlan = {
+    includedServiceIds,
+    additionalServiceIds,
+    additionalCostUsd: amountUsd,
+    approvedAt: now,
+  };
+
+  const updated: CampaignRecord = {
+    ...campaign,
+    approvedStudioPlan,
+    updatedAt: now,
+  };
+
+  return persistCampaign(updated);
 }
 
 export function markPaymentReceived(

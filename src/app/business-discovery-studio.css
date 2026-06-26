@@ -585,3 +585,33 @@
     animation: none;
   }
 }
+
+.business-discovery-studio .bds-discovery-received {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 45%);
+}
+
+.business-discovery-studio .bds-discovery-received__panel {
+  width: min(100%, 24rem);
+  padding: 1.25rem 1.35rem;
+  border-radius: 12px;
+  background: var(--utility-cream, #faf6ef);
+  border: 1px solid color-mix(in srgb, var(--studio-denim, #2c3e50) 18%, transparent);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 18%);
+}
+
+.business-discovery-studio .bds-discovery-received__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.business-discovery-studio .bds-discovery-received__body {
+  margin: 0 0 1rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--studio-denim, #2c3e50) 72%, #1a1a1a);
+}

@@ -175,6 +175,7 @@ export function resolveActivityFeed(campaign: CampaignRecord | null): ActivityFe
   };
 
   pushIso(campaign.visionSubmittedAt ?? campaign.createdAt, "Intake received");
+  pushIso(campaign.discoverySubmittedAt, "Discovery received");
   pushIso(campaign.paymentReceivedAt, "Payment received");
 
   if (campaign.selectedCampaignOption) {

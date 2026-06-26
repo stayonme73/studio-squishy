@@ -3,8 +3,11 @@
 import type { DraftIntakeFormValues } from "@/config/draft-room";
 import type { FeedbackConceptPreview } from "@/config/feedback-studio";
 import type { DeliverableQuotaId, StudioGuidePackageId } from "@/config/studio-guide";
+import type { DiscoveryBriefAnswers } from "@/recommendation/types";
+import type { ServiceId } from "@/catalog/types";
 
 export const CAMPAIGN_STATUSES = [
+  "DISCOVERY_COMPLETE",
   "DRAFT_RECEIVED",
   "PAYMENT_RECEIVED",
   "BUILDING_CONCEPTS",
@@ -36,6 +39,14 @@ export type CampaignIntakeSnapshot = {
 
 export type DeliverablesDelivered = Partial<Record<DeliverableQuotaId, number>>;
 
+/** Customer-approved Studio Plan — saved after Studio Plan Review. */
+export type ApprovedStudioPlan = {
+  includedServiceIds: readonly ServiceId[];
+  additionalServiceIds: readonly ServiceId[];
+  additionalCostUsd: number;
+  approvedAt: string;
+};
+
 export type CampaignRecord = {
   campaignId: string;
   campaignName: string;
@@ -48,6 +59,11 @@ export type CampaignRecord = {
   intake?: CampaignIntakeSnapshot;
   /** Full Draft Room answers — single source for Vision Summary */
   visionData?: DraftIntakeFormValues;
+  /** Business Discovery Studio tile answers */
+  discoveryAnswers?: DiscoveryBriefAnswers;
+  discoverySubmittedAt?: string;
+  /** Studio Plan Review output — required before payment in the discovery flow */
+  approvedStudioPlan?: ApprovedStudioPlan;
   visionSubmittedAt?: string;
   /** Campaign directions — generated from visionData or supplied by content engine */
   concepts?: FeedbackConceptPreview[];
@@ -104,6 +120,7 @@ export const studioBoard = {
     campaignDetails: "/studio-board?record=open",
     welcomeHall: "/",
     studioKitchen: "/studio-kitchen",
+    studioPlanReview: "/studio-plan-review",
   },
 
   empty: {
@@ -133,6 +150,12 @@ export const studioBoard = {
   } as const,
 
   journeyStages: [
+    {
+      id: "DISCOVERY_COMPLETE" as const,
+      label: "Discovery Complete",
+      boardLabel: "Discovery Complete",
+      hint: "Review your Studio Plan next.",
+    },
     {
       id: "DRAFT_RECEIVED" as const,
       label: "Intake Complete",
@@ -172,6 +195,34 @@ export const studioBoard = {
   },
 
   statusContent: {
+    DISCOVERY_COMPLETE: {
+      statusLabel: "Discovery Complete",
+      nextUpdateLabel: "After Studio Plan approval",
+      campaignProgressLabel: "Awaiting Studio Plan Review",
+      headerSubline: "Discovery received — review your recommended Studio Plan to continue.",
+      campaignDescription:
+        "Discovery complete. Review and approve your Studio Plan before payment.",
+      estimatedCompletion: "Review your Studio Plan",
+      studioNoteFollowUp: "Review your recommended Studio Plan when you're ready.",
+      studioNoteBoard: {
+        letterLines: [
+          "We received your discovery answers — thank you.",
+          "Review your recommended Studio Plan and approve when you're ready.",
+          "Complete payment after approval to begin production.",
+          "Thank you for trusting The Studio.",
+          "— The Studio Team ♥",
+        ],
+      },
+      studioUpdates: [{ date: "Today", message: "Discovery received." }],
+      whatHappensNextSteps: [
+        "Review your recommended Studio Plan.",
+        "Approve your services.",
+        "Complete payment.",
+        "The Studio begins your campaign.",
+      ],
+      primaryCta: "REVIEW STUDIO PLAN",
+      primaryRoute: "studioPlanReview" as const,
+    },
     DRAFT_RECEIVED: {
       statusLabel: "Intake Complete",
       nextUpdateLabel: "After payment",
