@@ -261,7 +261,7 @@ export const DISCOVERY_BADGE_OFFSET: Partial<Record<DiscoveryTileId, DiscoveryBa
   "your-challenge": { dx: -6, dy: -16 },
   "your-current-tools": { dx: -4, dy: 0 },
   "success-looks-like": { dx: 4, dy: 1 },
-  "whats-slowing-you-down": { dx: -4 },
+  "whats-slowing-you-down": { dx: -4, dy: -132 },
 };
 
 export type DiscoveryTileDerivedGeometry = {
