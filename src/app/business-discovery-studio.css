@@ -4,7 +4,6 @@
   --bds-plate-w: 1024;
   --bds-plate-h: 682;
   --bds-board-margin: clamp(8px, 2vmin, 28px);
-  --bds-split-panel: clamp(24rem, 40vw, 44%);
   /* Match plate edge — avoids cream body flash if layout is still settling */
   background: #2e2d2b;
 }
@@ -74,10 +73,12 @@
 .business-discovery-studio .bds-scene--split {
   --bds-board-margin: clamp(4px, 0.5vmin, 10px);
   --bds-split-gap: clamp(4px, 0.5vw, 10px);
+  --bds-split-panel: clamp(18rem, 28vw, 22rem);
   --bds-board-zone: calc(
     100vw - var(--bds-split-panel) - var(--bds-split-gap) - 2 * var(--bds-board-margin)
   );
   display: grid;
+  /* Column 1: board priority; column 2: fixed narrow summary panel */
   grid-template-columns: minmax(0, 1fr) var(--bds-split-panel);
   align-items: center;
   justify-items: stretch;
@@ -93,7 +94,7 @@
 .business-discovery-studio .bds-scene--split .bds-scene__board {
   grid-column: 1;
   grid-row: 1;
-  justify-self: center;
+  justify-self: start;
   align-self: center;
   flex: none;
   width: 100%;
@@ -106,7 +107,8 @@
 @supports (transition-behavior: allow-discrete) {
   .business-discovery-studio .bds-scene--split .bds-scene__board {
     @starting-style {
-      transform: translateX(calc(0.5 * (var(--bds-split-panel) + var(--bds-split-gap))));
+      /* Slide from centered pre-submit position into column 1 */
+      transform: translateX(calc((100vw - 100%) / 2 - var(--bds-board-margin)));
     }
   }
 }
@@ -382,6 +384,11 @@
 .business-discovery-studio .bds-tile-hit--locked {
   cursor: not-allowed;
   opacity: 0.35;
+}
+
+/* Submit tile stays full artwork when locked — no wash-out hue overlay */
+.business-discovery-studio .bds-tile-hit--locked[data-tile-id="submit-project"] {
+  opacity: 1;
 }
 
 .business-discovery-studio .bds-tile-hit--locked:hover {

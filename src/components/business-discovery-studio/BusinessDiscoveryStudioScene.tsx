@@ -96,6 +96,9 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     isTileComplete(id) &&
     activeTileId !== id;
 
+  const showStatusCover = (id: DiscoveryTileId) =>
+    id === "submit-project" || showDoneBadge(id);
+
   const hitStyles = useMemo(() => {
     const map = {} as Record<DiscoveryTileId, CSSProperties>;
     for (const id of DISCOVERY_TILE_ORDER) {
@@ -273,6 +276,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
                     .filter(Boolean)
                     .join(" ")}
                   style={hitStyles[id]}
+                  data-tile-id={id}
                   aria-label={tileLabels[id]}
                   aria-disabled={isSubmitLocked || sheetOpenElsewhere || undefined}
                   tabIndex={sheetOpenElsewhere ? -1 : undefined}
@@ -285,7 +289,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
 
             {/* Plate overlays — hide baked status circles, then one ✓ per completed tile */}
             <div className="bds-done-badges" aria-hidden="true">
-              {DISCOVERY_TILE_ORDER.filter(showDoneBadge).map((id) => (
+              {DISCOVERY_TILE_ORDER.filter(showStatusCover).map((id) => (
                 <DiscoveryTileStatusCover key={`cover-${id}`} tileId={id} />
               ))}
               {DISCOVERY_TILE_ORDER.filter(showDoneBadge).map((id) => (
