@@ -1,5 +1,6 @@
 import { studioPolicies } from "@/config/policies";
 import { studioBoard } from "@/config/studio-board";
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 
 export type HelpCenterFrom = "campaign-details" | "studio-board" | "payment";
 
@@ -19,7 +20,7 @@ export function helpCenterHref(anchor?: string, from?: HelpCenterFrom) {
 }
 
 export const helpCenter = {
-  pageTitle: "Help Center",
+  pageTitle: customerJourneyStepName("help-center"),
   eyebrow: "Studio Help",
   lead: "Studio rules, policies, and answers — your reference desk for how The Studio works.",
   routes: {
@@ -30,7 +31,7 @@ export const helpCenter = {
   backLabels: {
     studioBoard: "Back to Studio Board",
     campaignDetails: "Back to Campaign Details",
-    payment: "Back to Payment",
+    payment: `Back to ${customerJourneyStepName("secure-checkout")}`,
   },
   toc: {
     title: "On this page",
@@ -80,8 +81,8 @@ export const helpCenter = {
     campaignHint:
       "Questions about your active campaign? Check your Campaign Details for status and progress.",
     studioBoardLabel: "Studio Board",
-    campaignDetailsLabel: "Campaign Record",
-    helpCenterLabel: "Help Center",
+    campaignDetailsLabel: customerJourneyStepName("project-record"),
+    helpCenterLabel: customerJourneyStepName("help-center"),
   },
   /** Contextual links from Campaign Details — href built at render time */
   campaignLinks: {

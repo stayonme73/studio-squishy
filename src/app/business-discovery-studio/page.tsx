@@ -7,7 +7,7 @@ type Props = {
   searchParams: Promise<{ debug?: string }>;
 };
 
-/** Business Discovery Studio V2 — drafting-table discovery workspace. */
+/** Project Discovery — drafting-table discovery workspace. */
 export default async function BusinessDiscoveryStudioPage({ searchParams }: Props) {
   const { debug } = await searchParams;
   const showDebug = debug === "1";

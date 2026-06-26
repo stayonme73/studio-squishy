@@ -29,6 +29,7 @@ import {
 } from "@/lib/business-discovery-session";
 import { submitDiscoveryCampaign } from "@/lib/studio-board-campaign";
 import { studioBoard } from "@/config/studio-board";
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 
 import DiscoverySheetCard from "./DiscoverySheetCard";
 import DiscoveryTileDoneBadge from "./DiscoveryTileDoneBadge";
@@ -232,7 +233,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
         : undefined;
 
   return (
-    <div className="bds-scene" aria-label="Business Discovery Studio">
+    <div className="bds-scene" aria-label={customerJourneyStepName("project-discovery")}>
       <div
         ref={plateRef}
         className={[

@@ -1,9 +1,10 @@
 import type { StudioGuidePackageId } from "@/config/studio-guide";
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
 
 export const payment = {
   brand: "THE STUDIO",
-  title: "Complete Your Order",
+  title: customerJourneyStepName("secure-checkout"),
   sections: {
     summary: "Project Summary",
     form: "Secure Payment",

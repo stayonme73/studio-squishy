@@ -26,3 +26,25 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Customer choice rules
 - Discovery room badge offsets (`DISCOVERY_BADGE_OFFSET` in `src/config/business-discovery-studio.ts`) — do not modify without Tagia approval
 <!-- END:studio-architecture-rules -->
+
+<!-- BEGIN:customer-journey-v1 -->
+# Customer Journey V1 — locked terminology
+
+**Doc:** `docs/customer-journey-v1-locked.md` · **Config:** `src/config/customer-journey-v1.ts`
+
+Use these **customer-facing** names in UI copy, navigation, and metadata. Internal module names (e.g. `business-discovery-studio`, `CampaignRecord`) may differ.
+
+| Step | Customer name | Former name | Route |
+|------|---------------|-------------|-------|
+| 1 | Studio Lobby | Welcome Hall | `/` |
+| 2 | Studio Guide | Studio Guide | `/studio-guide-prototype` |
+| 3 | Secure Checkout | Payment | `/payment` |
+| 4 | Project Discovery | Discovery Room | `/business-discovery-studio` |
+| 5 | Studio Board | Studio Board | `/studio-board` |
+| 6 | Project Record | Campaign Record | `/studio-board?record=open` |
+| 7 | Review Room | Review Room | `/review-room` |
+| 8 | Final Delivery | Final Delivery | `/deliverables` |
+| 9 | Help Center | Help Center | `/help-center` |
+
+Deprecated flows live under `src/archive/` — do not delete. **Studio Review** (`OwnerQaPanel`) is dev-only (`NODE_ENV === "development"`).
+<!-- END:customer-journey-v1 -->

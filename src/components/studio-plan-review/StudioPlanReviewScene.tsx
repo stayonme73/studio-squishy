@@ -10,6 +10,8 @@ type Props = {
   onSwap: (fromId: ServiceId, toId: ServiceId) => void;
   onAdd: (serviceId: ServiceId) => void;
   onApprove: () => void;
+  /** Hide approve CTA when a parent page owns confirmation (e.g. Project Summary WIP). */
+  showApprove?: boolean;
 };
 
 function PlanServiceRow({
@@ -69,6 +71,7 @@ export default function StudioPlanReviewScene({
   onSwap,
   onAdd,
   onApprove,
+  showApprove = true,
 }: Props) {
   return (
     <div className="spr-content utility-content">
@@ -180,16 +183,18 @@ export default function StudioPlanReviewScene({
         <p className="spr-cost__value">{model.additionalCost.display}</p>
       </section>
 
-      <div className="spr-approve">
-        <button
-          type="button"
-          className="utility-btn utility-btn--primary"
-          disabled={!model.canApprove}
-          onClick={onApprove}
-        >
-          {model.labels.approvePlan}
-        </button>
-      </div>
+      {showApprove ? (
+        <div className="spr-approve">
+          <button
+            type="button"
+            className="utility-btn utility-btn--primary"
+            disabled={!model.canApprove}
+            onClick={onApprove}
+          >
+            {model.labels.approvePlan}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

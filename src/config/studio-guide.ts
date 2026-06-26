@@ -3,8 +3,10 @@
  * Self-service only — no discovery calls or booking links.
  */
 
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
+
 export const studioGuide = {
-  title: "Studio Guide",
+  title: customerJourneyStepName("studio-guide"),
   subtitle: "Which package fits you?",
   headerLine: "Three paths. One goal—your growth.",
   routeToDraftRoom: "/draft-room",
@@ -16,7 +18,7 @@ export const studioGuide = {
   },
 
   footer: {
-    backLabel: "Back to Welcome Hall",
+    backLabel: `Back to ${customerJourneyStepName("studio-lobby")}`,
     backHref: "/",
   },
 

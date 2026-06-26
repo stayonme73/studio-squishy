@@ -1,5 +1,6 @@
 /** Draft Room — intake copy and routes (LOCKED V1). */
 
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
 
 export const draftRoom = {
@@ -329,7 +330,7 @@ export const draftRoom = {
   },
 
   cta: "Explore Studio Experiences →",
-  backLabel: "Back to Welcome Hall",
+  backLabel: `Back to ${customerJourneyStepName("studio-lobby")}`,
     submitHint: "When you're ready, submit from the review screen.",
 
   confirmation: {
@@ -340,8 +341,8 @@ export const draftRoom = {
     policyLine:
       "The Studio does not begin creative production until your package is selected and payment is received. No concepts, deliverables, revisions, or production work starts before then.",
     packagePrompt: "Next step:\nchoose the package that best fits your project.",
-    welcomeHall: "Return to Welcome Hall",
-    studioGuide: "Continue to Studio Guide",
+    welcomeHall: `Return to ${customerJourneyStepName("studio-lobby")}`,
+    studioGuide: `Continue to ${customerJourneyStepName("studio-guide")}`,
     studioBoard: "Continue to Studio Board",
     reviewAnswers: "Review your answers",
     viewCampaignBrief: "View Campaign Brief",

@@ -1,6 +1,7 @@
 /** Studio Board V3 — customer command center (LOCKED consolidation). */
 
 import type { DraftIntakeFormValues } from "@/config/draft-room";
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import type { FeedbackConceptPreview } from "@/config/feedback-studio";
 import type { DeliverableQuotaId, StudioGuidePackageId } from "@/config/studio-guide";
 import type { DiscoveryBriefAnswers } from "@/recommendation/types";
@@ -385,14 +386,14 @@ export const studioBoard = {
   },
 
   sidebar: {
-    welcomeHall: "Welcome Hall",
-    studioBoard: "Studio Board",
+    welcomeHall: customerJourneyStepName("studio-lobby"),
+    studioBoard: customerJourneyStepName("studio-board"),
     newCampaign: "New Campaign",
-    campaignRecord: "Campaign Record",
-    reviewRoom: "Review Room",
-    finalDelivery: "Final Delivery",
-    helpCenter: "Help Center",
-    studioGuide: "Studio Guide",
+    campaignRecord: customerJourneyStepName("project-record"),
+    reviewRoom: customerJourneyStepName("review-room"),
+    finalDelivery: customerJourneyStepName("final-delivery"),
+    helpCenter: customerJourneyStepName("help-center"),
+    studioGuide: customerJourneyStepName("studio-guide"),
     pastCampaigns: "Past Campaigns",
     account: "My Account",
     managePlan: "Manage Plan",
@@ -418,7 +419,7 @@ export const studioBoard = {
     lastUpdated: "Last Updated",
     openCampaign: "Open Campaign",
     openCampaignCta: "OPEN CAMPAIGN",
-    openCampaignRecord: "Open Campaign Record",
+    openCampaignRecord: `Open ${customerJourneyStepName("project-record")}`,
     reviewConcepts: "Review My Concepts",
     chooseDirection: "Choose Direction",
     downloadPackage: "Download Package",
@@ -468,7 +469,7 @@ export const studioBoard = {
   },
 
   campaignRecord: {
-    drawerTitle: "Campaign Record",
+    drawerTitle: customerJourneyStepName("project-record"),
     closeLabel: "Close",
     submittedHint: "Read-only archive of what you submitted to the Studio.",
     editableHint: "Review or update your intake answers before campaign development begins.",
@@ -477,7 +478,7 @@ export const studioBoard = {
 
   campaignBrief: {
     viewLabel: "View Campaign Brief",
-    openRecordLabel: "Open Campaign Record",
+    openRecordLabel: `Open ${customerJourneyStepName("project-record")}`,
     editLabel: "Edit Campaign Brief",
     editableHint: "Review or update your answers before campaign development begins.",
     lockedMessage:
