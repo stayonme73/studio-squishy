@@ -4,6 +4,7 @@
   --bds-plate-w: 1024;
   --bds-plate-h: 682;
   --bds-board-margin: clamp(8px, 2vmin, 28px);
+  --bds-split-panel: clamp(20rem, 36vw, 40%);
   /* Match plate edge — avoids cream body flash if layout is still settling */
   background: #2e2d2b;
 }
@@ -74,8 +75,8 @@
   --bds-board-margin: clamp(4px, 0.5vmin, 10px);
   --bds-split-gap: clamp(8px, 1vw, 16px);
   display: grid;
-  /* Column 1: board intrinsic width; column 2: all remaining space for the panel */
-  grid-template-columns: max-content minmax(0, 1fr);
+  /* Column 1: board intrinsic width; column 2: capped panel width */
+  grid-template-columns: max-content var(--bds-split-panel);
   align-items: stretch;
   justify-items: stretch;
   gap: var(--bds-split-gap);
