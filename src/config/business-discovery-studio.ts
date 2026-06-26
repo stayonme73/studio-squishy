@@ -207,9 +207,46 @@ export const DISCOVERY_TILE_GEOMETRY = {
   "submit-project": { x: 580, y: 420, width: 199, height: 121 },
 } satisfies Record<DiscoveryTileId, SceneRect>;
 
-const DONE_BADGE_INSET = 4;
-const DONE_BADGE_TOP_INSET = 8;
 const STATUS_COVER_SIZE = 20;
+
+/** Next tile in the same row — its left edge marks the painted right edge of the current tile. */
+const TILE_ROW_NEIGHBOR_RIGHT: Partial<Record<DiscoveryTileId, DiscoveryTileId>> = {
+  "your-business": "your-situation",
+  "your-situation": "your-challenge",
+  "your-current-tools": "your-focus",
+  "your-focus": "success-looks-like",
+  "whats-slowing-you-down": "anything-else",
+  "anything-else": "submit-project",
+};
+
+const TILE_ROW_NEIGHBOR_LEFT: Partial<Record<DiscoveryTileId, DiscoveryTileId>> = {
+  "your-challenge": "your-situation",
+  "success-looks-like": "your-focus",
+  "submit-project": "anything-else",
+};
+
+/** Painted card-face right edge — hit rects can bleed into column gutters. */
+function discoveryTilePaintedRightEdgeX(tileId: DiscoveryTileId): number {
+  const nextId = TILE_ROW_NEIGHBOR_RIGHT[tileId];
+  if (nextId) return DISCOVERY_TILE_GEOMETRY[nextId].x;
+
+  const prevId = TILE_ROW_NEIGHBOR_LEFT[tileId];
+  const face = DISCOVERY_TILE_GEOMETRY[tileId];
+  if (prevId) return face.x + (face.x - DISCOVERY_TILE_GEOMETRY[prevId].x);
+
+  return face.x + face.width;
+}
+
+const DONE_BADGE_REFERENCE_TILE: DiscoveryTileId = "your-business";
+const _refFace = DISCOVERY_TILE_GEOMETRY[DONE_BADGE_REFERENCE_TILE];
+const _refPaintedRight = discoveryTilePaintedRightEdgeX(DONE_BADGE_REFERENCE_TILE);
+/** Approved card 1 anchor on the painted face (native plate px). */
+const _refBadgeX = _refFace.x + _refFace.width - DONE_BADGE_SIZE - 4;
+const _refBadgeY = _refFace.y + 8;
+
+/** Uniform inset from painted card-face top-right — derived from card 1. */
+export const DONE_BADGE_RIGHT_PAD = _refPaintedRight - DONE_BADGE_SIZE - _refBadgeX;
+export const DONE_BADGE_TOP_PAD = _refBadgeY - _refFace.y;
 
 export type DiscoveryTileDerivedGeometry = {
   face: SceneRect;
@@ -219,13 +256,15 @@ export type DiscoveryTileDerivedGeometry = {
 
 /** Derive overlay anchors from painted card face — one source, three consumers. */
 export function discoveryTileDerivedGeometry(
+  tileId: DiscoveryTileId,
   face: SceneRect,
 ): DiscoveryTileDerivedGeometry {
+  const paintedRight = discoveryTilePaintedRightEdgeX(tileId);
   return {
     face,
     doneBadge: {
-      x: face.x + face.width - DONE_BADGE_SIZE - DONE_BADGE_INSET,
-      y: face.y + DONE_BADGE_TOP_INSET,
+      x: paintedRight - DONE_BADGE_SIZE - DONE_BADGE_RIGHT_PAD,
+      y: face.y + DONE_BADGE_TOP_PAD,
       size: DONE_BADGE_SIZE,
     },
     statusCover: {
@@ -238,7 +277,10 @@ export function discoveryTileDerivedGeometry(
 }
 
 export const discoveryTileGeometry = Object.fromEntries(
-  DISCOVERY_TILE_ORDER.map((id) => [id, discoveryTileDerivedGeometry(DISCOVERY_TILE_GEOMETRY[id])]),
+  DISCOVERY_TILE_ORDER.map((id) => [
+    id,
+    discoveryTileDerivedGeometry(id, DISCOVERY_TILE_GEOMETRY[id]),
+  ]),
 ) as Record<DiscoveryTileId, DiscoveryTileDerivedGeometry>;
 
 export const businessDiscoveryStudio = {
