@@ -33,3 +33,9 @@ export function saveDiscoveryAnswers(answers: DiscoveryAnswers): void {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(answers));
 }
+
+/** Dev reset — drop saved discovery answers from this browser. */
+export function clearDiscoveryAnswers(): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(STORAGE_KEY);
+}

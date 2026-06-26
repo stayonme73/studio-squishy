@@ -1,6 +1,7 @@
 import type { DraftIntakePayload } from "@/config/draft-room";
 import { EMPTY_DRAFT_INTAKE_FORM } from "@/config/draft-room";
 import { getPackageRevisionRounds, getStudioGuidePackage, type StudioGuidePackageId, type DeliverableQuotaId } from "@/config/studio-guide";
+import { clearDiscoveryAnswers } from "@/lib/business-discovery-session";
 import { readLastDraftIntake } from "@/lib/draft-intake";
 import { ensureCampaignConceptsOnRecord } from "@/lib/campaign-concepts";
 import {
@@ -307,11 +308,12 @@ export function completeCampaignReviewIfReady(): CampaignRecord | null {
   return finalizeCampaignDelivery(campaign);
 }
 
-/** Dev/testing — clear saved campaign + draft intake from this browser. */
+/** Dev/testing — clear saved campaign, draft intake, and discovery answers from this browser. */
 export function clearCampaignState() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(CAMPAIGN_KEY);
   window.localStorage.removeItem(DRAFT_KEY);
+  clearDiscoveryAnswers();
   dispatchCampaignUpdated();
 }
 

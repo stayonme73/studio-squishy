@@ -52,9 +52,23 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     discoveryExpandedRect,
   } = businessDiscoveryStudio;
 
-  useLayoutEffect(() => {
+  const reloadAnswers = useCallback(() => {
     setAnswers(readDiscoveryAnswers());
+    setActiveTileId(null);
+    setSheetPhase(null);
+    openSnapshotRef.current = "";
   }, []);
+
+  useLayoutEffect(() => {
+    reloadAnswers();
+  }, [reloadAnswers]);
+
+  useLayoutEffect(() => {
+    const onCampaignUpdated = () => reloadAnswers();
+    window.addEventListener("studio-squishy:campaign-updated", onCampaignUpdated);
+    return () =>
+      window.removeEventListener("studio-squishy:campaign-updated", onCampaignUpdated);
+  }, [reloadAnswers]);
 
   const isTileComplete = (id: DiscoveryTileId) =>
     isDiscoveryTileAnswerComplete(id, answers[id]);
