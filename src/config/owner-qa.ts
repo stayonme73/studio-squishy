@@ -9,7 +9,7 @@
 
 
 import { studioBoard, type CampaignStatus } from "@/config/studio-board";
-import { customerJourneyStepName, customerJourneyStepRoute } from "@/config/customer-journey-v1";
+import { customerJourneyStepName, customerJourneyStepRoute, projectDiscoveryHref } from "@/config/customer-journey-v1";
 
 import type { StudioGuidePackageId } from "@/config/studio-guide";
 
@@ -95,7 +95,7 @@ export const ownerQa = {
 
       description: "Paid — intake wizard next",
 
-      href: `/draft-room?begin=1&package=${PACKAGE}`,
+      href: projectDiscoveryHref(PACKAGE),
 
       seed: { kind: "paid-awaiting-intake", packageId: PACKAGE },
 

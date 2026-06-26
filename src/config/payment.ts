@@ -1,5 +1,5 @@
 import type { StudioGuidePackageId } from "@/config/studio-guide";
-import { customerJourneyStepName } from "@/config/customer-journey-v1";
+import { customerJourneyStepName, projectDiscoveryHref } from "@/config/customer-journey-v1";
 import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
 
 export const payment = {
@@ -71,7 +71,7 @@ export function paymentWorkflowStepIcon(state: PaymentWorkflowStepState): string
 }
 
 export function paymentIntakeHref(packageId: StudioGuidePackageId): string {
-  return `/draft-room?begin=1&package=${packageId}`;
+  return projectDiscoveryHref(packageId);
 }
 
 const PACKAGE_IDS = ["spark", "momentum", "growth"] as const;

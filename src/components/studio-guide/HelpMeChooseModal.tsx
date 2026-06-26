@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import {
-  draftRoomHref,
+  paymentHref,
   packageStartCta,
   studioGuide,
   type StudioGuidePackageId,
@@ -73,9 +73,9 @@ export default function HelpMeChooseModal({ open, onClose, onRecommended }: Prop
     finishQuestionnaire(next);
   };
 
-  const goToDraftRoom = () => {
+  const goToPayment = () => {
     if (!recommendedId) return;
-    router.push(draftRoomHref(recommendedId));
+    router.push(paymentHref(recommendedId));
     handleClose();
   };
 
@@ -103,7 +103,7 @@ export default function HelpMeChooseModal({ open, onClose, onRecommended }: Prop
               {recommendedPkg.label}
             </h2>
             <p className="guide-modal-result-copy">{recommendedPkg.recommendationCopy}</p>
-            <button type="button" className="guide-detail-cta" onClick={goToDraftRoom}>
+            <button type="button" className="guide-detail-cta" onClick={goToPayment}>
               <span className="guide-detail-cta-label">{packageStartCta(recommendedPkg.id)}</span>
             </button>
           </div>

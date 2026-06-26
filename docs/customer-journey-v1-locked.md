@@ -34,7 +34,9 @@ Do **not** delete — move to `src/archive/` and document here.
 | Item | Former role | Archive location |
 |------|-------------|------------------|
 | Complete Your Order | Three-column payment page title + layout | `src/archive/payment/CompleteYourOrderCheckoutScene.tsx` — active `/payment` re-exports |
-| Tell us what's on your mind | Standalone intake opening | `src/archive/draft-room/TellUsWhatsOnYourMindIntro.tsx` — opening in Project Discovery |
+| Tell us what's on your mind | Standalone intake opening | `src/archive/draft-room/` — opening in Project Discovery |
+| Draft Room begin page | Standalone intake wizard at `/draft-room?begin=1` | `src/archive/draft-room/DraftRoomIntakeScene.tsx` and related components |
+| Draft Room intro plate | Illustrated room before intake | `src/archive/draft-room/DraftRoomScene.tsx` |
 | Welcome Hall V3 showroom | Interactive lobby prototype | `src/archive/entrance/` |
 | Welcome Hall interactive / IMAGE 1 scenes | Pre-V2 lobby prototypes | `src/archive/entrance/` |
 
@@ -46,8 +48,9 @@ Do **not** delete — move to `src/archive/` and document here.
 | `/project-discovery` | `/business-discovery-studio` |
 | `/studio-guide` | `/studio-guide-prototype` |
 | `/campaign-details` | `/studio-board?record=open` |
-| `/draft-room/begin` | `/draft-room?begin=1` |
-| `/intake` | `/draft-room` |
+| `/draft-room/begin` | `/business-discovery-studio` |
+| `/draft-room` | `/business-discovery-studio` |
+| `/intake` | `/business-discovery-studio` |
 
 ## Dev-only tools
 

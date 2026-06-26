@@ -56,8 +56,8 @@ export const welcomeHallPhase1 = {
 
   /** Welcome Hall kiosk → Business Discovery Studio (package discovery). */
   routeToBusinessDiscoveryStudio: "/business-discovery-studio",
-  /** @deprecated use routeToBusinessDiscoveryStudio */
-  routeToDraftRoom: "/draft-room",
+  /** @deprecated use routeToBusinessDiscoveryStudio — legacy URL redirects */
+  routeToDraftRoom: "/business-discovery-studio",
   /** @deprecated use routeToBusinessDiscoveryStudio */
   routeToStudioGuidePrototype: "/business-discovery-studio",
 } as const;

@@ -1,6 +1,6 @@
 /** Draft Room — intake copy and routes (LOCKED V1). */
 
-import { customerJourneyStepName } from "@/config/customer-journey-v1";
+import { customerJourneyStepName, projectDiscoveryHref } from "@/config/customer-journey-v1";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
 
 export const draftRoom = {
@@ -357,10 +357,13 @@ export const draftRoom = {
 
   routes: {
     welcomeHall: "/studio-lobby",
+    /** @deprecated legacy URL — redirects to Project Discovery */
     draftRoom: "/draft-room",
+    /** @deprecated legacy URL — redirects to Project Discovery */
     begin: "/draft-room/begin",
     studioGuide: "/studio-guide-prototype",
     studioBoard: "/studio-board",
+    projectDiscovery: "/business-discovery-studio",
   },
 } as const;
 
@@ -382,8 +385,7 @@ export function draftRoomIntakeReviewSteps() {
 }
 
 export function draftRoomBeginHref(packageId?: StudioGuidePackageId): string {
-  if (!packageId) return `${draftRoom.routes.draftRoom}?begin=1`;
-  return `${draftRoom.routes.draftRoom}?begin=1&package=${packageId}`;
+  return projectDiscoveryHref(packageId);
 }
 
 export type DraftRoomSceneRect = { x: number; y: number; width: number; height: number };

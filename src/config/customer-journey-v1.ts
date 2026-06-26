@@ -89,6 +89,11 @@ export const customerJourneyV1 = {
       name: "Tell us what's on your mind",
       note: "Standalone intake opening — opening copy lives in Project Discovery",
     },
+    {
+      id: "draft-room-begin",
+      name: "Draft Room begin page",
+      note: "Standalone intake at /draft-room?begin=1 — archived; opening in Project Discovery",
+    },
   ] as const,
 
   /** Dev-only — hidden when NODE_ENV !== development (@see OwnerQaRoot) */
@@ -110,4 +115,15 @@ export function customerJourneyStepName(id: CustomerJourneyStepId): string {
 export function customerJourneyStepRoute(id: CustomerJourneyStepId): string {
   const step = customerJourneyV1.steps.find((item) => item.id === id);
   return step?.route ?? "/";
+}
+
+const PACKAGE_IDS = ["spark", "momentum", "growth"] as const;
+
+/** Project Discovery href — optional package query preserved for journey handoff. */
+export function projectDiscoveryHref(packageId?: string): string {
+  const base = customerJourneyStepRoute("project-discovery");
+  if (!packageId || !PACKAGE_IDS.includes(packageId as (typeof PACKAGE_IDS)[number])) {
+    return base;
+  }
+  return `${base}?package=${packageId}`;
 }

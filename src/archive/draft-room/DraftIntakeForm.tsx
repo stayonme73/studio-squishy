@@ -3,8 +3,8 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import TellUsWhatsOnYourMindIntro from "@/archive/draft-room/TellUsWhatsOnYourMindIntro";
-import DraftIntakeAnswerSummary from "@/components/draft-room/DraftIntakeAnswerSummary";
-import IntakeVisionAccents from "@/components/draft-room/IntakeVisionAccents";
+import DraftIntakeAnswerSummary from "@/archive/draft-room/DraftIntakeAnswerSummary";
+import IntakeVisionAccents from "@/archive/draft-room/IntakeVisionAccents";
 import {
   draftRoom,
   DRAFT_INTAKE_REVIEW_STEP,

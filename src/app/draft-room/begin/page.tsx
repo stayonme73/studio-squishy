@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
 
+import { projectDiscoveryHref } from "@/config/customer-journey-v1";
+
 type Props = {
   searchParams: Promise<{ package?: string }>;
 };
 
-/** Legacy — redirects to /draft-room?begin=1 */
+/** Legacy — redirects to Project Discovery (package preserved). */
 export default async function DraftRoomBeginPage({ searchParams }: Props) {
   const { package: packageId } = await searchParams;
-  const query = packageId ? `?begin=1&package=${packageId}` : "?begin=1";
-  redirect(`/draft-room${query}`);
+  redirect(projectDiscoveryHref(packageId));
 }

@@ -2,6 +2,7 @@
 
 import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import type { DraftIntakeFormValues } from "@/config/draft-room";
+import { projectDiscoveryHref } from "@/config/customer-journey-v1";
 import type { FeedbackConceptPreview } from "@/config/feedback-studio";
 import type { DeliverableQuotaId, StudioGuidePackageId } from "@/config/studio-guide";
 import type { DiscoveryBriefAnswers } from "@/recommendation/types";
@@ -109,7 +110,8 @@ export const studioBoard = {
 
   routes: {
     studioBoard: "/studio-board",
-    newCampaign: "/draft-room?package=momentum",
+    newCampaign: "/business-discovery-studio?package=momentum",
+    /** @deprecated legacy URL — redirects to Project Discovery */
     draftRoom: "/draft-room",
     pastCampaigns: "/past-campaigns",
     account: "/account",
@@ -662,7 +664,7 @@ export type StudioBoardPrimaryRoute =
 export function studioBoardDraftRoomHref(
   packageId: MembershipRecord["packageId"] = studioBoard.membership.packageId,
 ) {
-  return `/draft-room?package=${packageId}`;
+  return projectDiscoveryHref(packageId);
 }
 
 export function studioBoardStudioGuideHref(

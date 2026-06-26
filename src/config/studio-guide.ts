@@ -3,13 +3,13 @@
  * Self-service only — no discovery calls or booking links.
  */
 
-import { customerJourneyStepName } from "@/config/customer-journey-v1";
+import { customerJourneyStepName, projectDiscoveryHref } from "@/config/customer-journey-v1";
 
 export const studioGuide = {
   title: customerJourneyStepName("studio-guide"),
   subtitle: "Which package fits you?",
   headerLine: "Three paths. One goal—your growth.",
-  routeToDraftRoom: "/draft-room",
+  routeToProjectDiscovery: "/business-discovery-studio",
 
   helpCard: {
     title: "NEED HELP CHOOSING?",
@@ -265,7 +265,7 @@ export function packageStartCta(packageId: StudioGuidePackageId) {
 }
 
 export function draftRoomHref(packageId: StudioGuidePackageId) {
-  return `${studioGuide.routeToDraftRoom}?package=${packageId}`;
+  return projectDiscoveryHref(packageId);
 }
 
 export function paymentHref(packageId: StudioGuidePackageId) {

@@ -32,8 +32,9 @@ export const welcomeHallInteraction = {
     triggeredBy: "startDrafting" as const,
   },
   routes: {
-    draftRoom: "/draft-room",
-    intake: "/intake",
+    /** @deprecated legacy URLs — redirect to Project Discovery */
+    draftRoom: "/business-discovery-studio",
+    intake: "/business-discovery-studio",
   },
   transitionMs: 1400,
 } as const;

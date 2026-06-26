@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
-import DraftIntakeConfirmation from "@/components/draft-room/DraftIntakeConfirmation";
-import DraftIntakeForm from "@/components/draft-room/DraftIntakeForm";
+import DraftIntakeConfirmation from "@/archive/draft-room/DraftIntakeConfirmation";
+import DraftIntakeForm from "@/archive/draft-room/DraftIntakeForm";
 import {
   draftRoom,
   DRAFT_INTAKE_REVIEW_STEP,
