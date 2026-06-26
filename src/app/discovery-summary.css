@@ -139,3 +139,9 @@
   margin: 0;
   color: var(--utility-text-muted);
 }
+
+.ds-additional-services__note {
+  margin: 0 0 1rem;
+  line-height: 1.55;
+  color: var(--utility-text-muted);
+}

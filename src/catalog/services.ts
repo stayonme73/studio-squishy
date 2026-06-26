@@ -26,6 +26,7 @@ type V1ServiceSeed = {
   category: ServiceCategoryId;
   serviceClass: ServiceClass;
   customerReceives?: string;
+  internalProductionNotes?: string;
 };
 
 function v1Service(seed: V1ServiceSeed): StudioServiceEntry {
@@ -36,10 +37,11 @@ function v1Service(seed: V1ServiceSeed): StudioServiceEntry {
     category: seed.category,
     serviceClass: seed.serviceClass,
     customerReceives: seed.customerReceives,
+    internalProductionNotes: seed.internalProductionNotes,
     dependencies: [],
-    canSubstitute: false,
-    addOnEligible: false,
-    upgradeEligible: false,
+    canSubstitute: true,
+    addOnEligible: true,
+    upgradeEligible: true,
     deliveryFormats: [],
     minimumCustomerRequirements: [],
     recommendedCustomerRequirements: [],
@@ -117,7 +119,10 @@ const V1_SERVICES: readonly StudioServiceEntry[] = [
     name: "Landing Pages & Web Content",
     category: "landing-pages-web-content",
     serviceClass: "signature",
-    customerReceives: "Not full website development.",
+    customerReceives:
+      "Landing page copy and web content for marketing campaigns — not full website development, hosting, or ongoing site management.",
+    internalProductionNotes:
+      "LP-001 does not include website hosting, full website development, maintenance, DNS, or platform management.",
   }),
   v1Service({
     id: "mo-001",
