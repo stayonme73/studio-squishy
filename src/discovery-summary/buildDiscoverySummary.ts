@@ -4,6 +4,7 @@
  */
 
 import { getServiceById } from "@/catalog/accessors";
+import { CUSTOMER_SECTION_LABELS } from "@/catalog/production-allocation";
 import type { ServiceId } from "@/catalog/types";
 import { studioNeeds } from "@/config/studio-services";
 import type {
@@ -40,6 +41,8 @@ const CUSTOMER_WARNING_MESSAGES: Record<
     "This is our best match from what you shared so far — a quick review before checkout is recommended.",
   "no-recommendations": () =>
     "We couldn't match your answers to a specific package yet — update your discovery answers or reach out for help.",
+  "outside-studio-services": () =>
+    "This request may be outside our current Studio Services.",
 };
 
 function needLabel(value: string): string {
@@ -136,7 +139,7 @@ function buildTimelineSummary(timeline: EstimatedTimeline) {
 }
 
 function buildNextStep(result: RecommendationResult): DiscoverySummaryNextStep {
-  if (result.recommendations.length === 0) {
+  if (result.includedRecommendations.length === 0) {
     return {
       headline: "Let's find the right fit",
       body: "We couldn't match your answers to a specific package yet. Update your discovery answers or reach out and we'll help you choose.",
@@ -189,7 +192,8 @@ function buildServiceItem(
   const timelineEntry = timelineByServiceId.get(recommendation.serviceId);
 
   const title = service?.name ?? recommendation.serviceId;
-  const customerDescription = service?.customerDescription ?? "";
+  const customerDescription =
+    service?.customerDescription ?? service?.customerReceives ?? recommendation.serviceId;
   const explanation = buildServiceExplanation(customerDescription, recommendation.reasons);
 
   return {
@@ -218,14 +222,20 @@ export function buildDiscoverySummary(result: RecommendationResult): DiscoverySu
   const investmentByServiceId = indexByServiceId(result.estimatedInvestment.items);
   const timelineByServiceId = indexByServiceId(result.estimatedTimeline.items);
 
-  const recommendedServices = result.recommendations.map((recommendation) =>
-    buildServiceItem(
-      recommendation,
-      deliverablesByServiceId,
-      investmentByServiceId,
-      timelineByServiceId,
-    ),
-  );
+  const mapRecommendations = (
+    recommendations: RecommendationResult["includedRecommendations"],
+  ) =>
+    recommendations.map((recommendation) =>
+      buildServiceItem(
+        recommendation,
+        deliverablesByServiceId,
+        investmentByServiceId,
+        timelineByServiceId,
+      ),
+    );
+
+  const recommendedServices = mapRecommendations(result.includedRecommendations);
+  const additionalStudioServices = mapRecommendations(result.additionalStudioServices);
 
   const warnings = result.warnings
     .map(mapWarning)
@@ -233,6 +243,8 @@ export function buildDiscoverySummary(result: RecommendationResult): DiscoverySu
 
   return {
     recommendedServices,
+    additionalStudioServices,
+    sectionLabels: CUSTOMER_SECTION_LABELS,
     primaryServiceId: result.primaryServiceId,
     totalInvestment: buildTotalInvestment(result.estimatedInvestment),
     estimatedTimeline: buildTimelineSummary(result.estimatedTimeline),

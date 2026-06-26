@@ -51,6 +51,20 @@ export {
 export { SERVICE_CATALOG } from "@/catalog/services";
 
 export {
+  CORE_MAX_INCLUDED,
+  CUSTOMER_SECTION_LABELS,
+  ESSENTIAL_MAX_INCLUDED,
+  OUTSIDE_STUDIO_SERVICES_MESSAGE,
+  PRODUCTION_ALLOCATION_LIMITS,
+  SERVICE_CLASS_BY_ID,
+  SIGNATURE_MAX_INCLUDED,
+  addingBeyondIncludedAllocation,
+  classifyServiceSubstitution,
+  substitutionRequiresUpgrade,
+} from "@/catalog/production-allocation";
+export type { SubstitutionSwapKind, CustomerSectionLabels } from "@/catalog/production-allocation";
+
+export {
   getActiveServices,
   getAddOnEligibleServices,
   getDiscoveryRulesForService,

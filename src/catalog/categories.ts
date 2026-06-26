@@ -78,6 +78,11 @@ export const SERVICE_CATEGORIES: readonly ServiceCategoryDefinition[] = [
     description: "Performance review, iteration, and optimization passes.",
   },
   {
+    id: "marketing-optimization",
+    name: "Marketing Optimization",
+    description: "Marketing performance review and optimization passes.",
+  },
+  {
     id: "marketing-assets",
     name: "Marketing Assets",
     description: "Reusable collateral and asset libraries.",

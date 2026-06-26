@@ -27,40 +27,19 @@ function validateV2Fields(service: StudioServiceEntry, ids: ReadonlySet<ServiceI
     );
   }
 
-  if (!service.customerProblemSolved?.trim()) {
-    throw new ServiceCatalogValidationError(
-      `Service "${service.id}" is missing customerProblemSolved.`,
-    );
-  }
-
-  if (!service.customerReceives?.trim()) {
-    throw new ServiceCatalogValidationError(
-      `Service "${service.id}" is missing customerReceives.`,
-    );
-  }
-
   if (!service.serviceClass) {
     throw new ServiceCatalogValidationError(`Service "${service.id}" is missing serviceClass.`);
   }
 
-  if (service.includedRevisionRounds < 0) {
+  const revisionRounds = service.includedRevisionRounds ?? 0;
+  if (revisionRounds < 0) {
     throw new ServiceCatalogValidationError(
       `Service "${service.id}" has invalid includedRevisionRounds.`,
     );
   }
 
-  if (service.deliveryFormats.length === 0) {
-    throw new ServiceCatalogValidationError(`Service "${service.id}" has no deliveryFormats.`);
-  }
-
   if (!service.serviceStatus) {
     throw new ServiceCatalogValidationError(`Service "${service.id}" is missing serviceStatus.`);
-  }
-
-  if (service.discoveryTriggers.length === 0 && service.discoveryMapping.length === 0) {
-    throw new ServiceCatalogValidationError(
-      `Service "${service.id}" has no discoveryTriggers or discoveryMapping.`,
-    );
   }
 
   if (Array.isArray(service.canSubstitute)) {
@@ -83,14 +62,6 @@ export function validateServiceCatalog(services: readonly ServiceCatalogEntry[])
     }
     if (!service.name?.trim()) {
       throw new ServiceCatalogValidationError(`Service "${service.id}" is missing name.`);
-    }
-    if (!service.customerDescription?.trim()) {
-      throw new ServiceCatalogValidationError(
-        `Service "${service.id}" is missing customerDescription.`,
-      );
-    }
-    if (service.deliverables.length === 0) {
-      throw new ServiceCatalogValidationError(`Service "${service.id}" has no deliverables.`);
     }
     if (ids.has(service.id)) {
       throw new ServiceCatalogValidationError(`Duplicate service id: ${service.id}`);

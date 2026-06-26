@@ -107,7 +107,8 @@ export type RecommendationWarningKind =
   | "inactive-service-match"
   | "unmet-dependency"
   | "low-confidence-match"
-  | "no-recommendations";
+  | "no-recommendations"
+  | "outside-studio-services";
 
 export type RecommendationWarning = {
   kind: RecommendationWarningKind;
@@ -121,8 +122,13 @@ export type RecommendationWarning = {
  */
 export type RecommendationResult = {
   brief: DiscoveryBrief;
+  /** All scored services ranked by match strength. */
   recommendations: readonly ServiceRecommendation[];
-  /** Highest-ranked service with a positive score, if any. */
+  /** Services automatically included within production allocation limits. */
+  includedRecommendations: readonly ServiceRecommendation[];
+  /** Scored services beyond included limits — available as paid add-ons. */
+  additionalStudioServices: readonly ServiceRecommendation[];
+  /** Highest-ranked included service with a positive score, if any. */
   primaryServiceId: ServiceId | null;
   rationale: RecommendationRationale;
   deliverablesSummary: readonly DeliverablesSummaryItem[];

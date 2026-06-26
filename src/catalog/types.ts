@@ -30,6 +30,7 @@ export type ServiceCategoryId =
   | "landing-pages-web-content"
   | "planning-strategy"
   | "review-optimization"
+  | "marketing-optimization"
   | "marketing-assets"
   | "add-on-services";
 
@@ -49,6 +50,19 @@ export type StudioServiceStatus = "active" | "planned" | "beta" | "retired";
 export type ServiceCatalogStatus = "active" | "inactive";
 
 export type ServiceId =
+  | "bf-001"
+  | "bf-002"
+  | "cp-001"
+  | "sm-001"
+  | "em-001"
+  | "sms-001"
+  | "cc-001"
+  | "cc-002"
+  | "vp-001"
+  | "ap-001"
+  | "lp-001"
+  | "mo-001"
+  | "ma-001"
   | "spark"
   | "momentum"
   | "growth"
@@ -153,9 +167,9 @@ export type StudioServiceEntry = {
   name: string;
   category: ServiceCategoryId;
   /** What customer problem this service solves — internal definition; surface via Discovery Summary copy. */
-  customerProblemSolved: string;
+  customerProblemSolved?: string;
   /** What the customer receives — deliverable-oriented summary for ops and future engines. */
-  customerReceives: string;
+  customerReceives?: string;
   /** Internal service class — never customer-facing. */
   serviceClass: ServiceClass;
   /**
@@ -166,7 +180,7 @@ export type StudioServiceEntry = {
   /** Future-facing discovery signals — mirrors discoveryMapping until engine migration. */
   discoveryTriggers: readonly DiscoveryTrigger[];
   dependencies: readonly ServiceId[];
-  includedRevisionRounds: number;
+  includedRevisionRounds?: number;
   /** Whether this service can substitute for another, or which service IDs it may replace. */
   canSubstitute: boolean | readonly ServiceId[];
   addOnEligible: boolean;
@@ -181,12 +195,12 @@ export type StudioServiceEntry = {
   // --- v1 fields retained for Recommendation Engine and payment integration ---
 
   /** Legacy customer-facing description — kept for engine and summary compat. */
-  customerDescription: string;
+  customerDescription?: string;
   internalDescription?: string;
-  deliverables: readonly ServiceDeliverable[];
-  pricing: ServicePricing;
-  estimatedProductionTime: ServiceProductionTime;
-  productionEffort: ServiceProductionEffort;
+  deliverables?: readonly ServiceDeliverable[];
+  pricing?: ServicePricing;
+  estimatedProductionTime?: ServiceProductionTime;
+  productionEffort?: ServiceProductionEffort;
   /** v1 engine reads this field — keep in sync with discoveryTriggers. */
   discoveryMapping: readonly DiscoveryMappingRule[];
   productionNotes?: string;

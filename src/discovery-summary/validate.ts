@@ -22,7 +22,19 @@ export function validateDiscoverySummaryModel(model: DiscoverySummaryModel): voi
     );
   }
 
-  for (const service of model.recommendedServices) {
+  if (!Array.isArray(model.additionalStudioServices)) {
+    throw new DiscoverySummaryValidationError(
+      "Discovery summary model must include additionalStudioServices.",
+    );
+  }
+
+  if (!model.sectionLabels?.includedRecommendations?.trim()) {
+    throw new DiscoverySummaryValidationError(
+      "Discovery summary model must include sectionLabels.",
+    );
+  }
+
+  for (const service of [...model.recommendedServices, ...model.additionalStudioServices]) {
     if (!service.serviceId?.trim()) {
       throw new DiscoverySummaryValidationError("Each recommended service must include serviceId.");
     }

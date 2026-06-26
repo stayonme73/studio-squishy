@@ -5,6 +5,7 @@
 
 import type { ServiceBillingModel, ServiceId } from "@/catalog/types";
 import type { RecommendationWarningKind } from "@/recommendation/types";
+import type { CustomerSectionLabels } from "@/catalog/production-allocation";
 
 export type DiscoverySummaryDeliverable = {
   label: string;
@@ -56,6 +57,8 @@ export type DiscoverySummaryWarning = {
  */
 export type DiscoverySummaryModel = {
   recommendedServices: readonly DiscoverySummaryServiceItem[];
+  additionalStudioServices: readonly DiscoverySummaryServiceItem[];
+  sectionLabels: CustomerSectionLabels;
   primaryServiceId: ServiceId | null;
   totalInvestment: DiscoverySummaryTotalInvestment;
   estimatedTimeline: DiscoverySummaryTimeline;

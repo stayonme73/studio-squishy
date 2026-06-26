@@ -1,10 +1,16 @@
 /**
  * Studio Service Catalog — authoritative service definitions.
- * Source: studio-guide-v1-lock (packages), studio-services (add-ons / needs mapping).
+ * V1 Studio Services per locked spec; legacy packages retained as retired for reference.
  * Do not duplicate this data in UI components or page configs.
  */
 
-import type { DiscoveryMappingRule, StudioServiceEntry } from "@/catalog/types";
+import type {
+  DiscoveryMappingRule,
+  ServiceCategoryId,
+  ServiceClass,
+  ServiceId,
+  StudioServiceEntry,
+} from "@/catalog/types";
 import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
 import { validateServiceCatalog } from "@/catalog/validate";
 
@@ -14,7 +20,122 @@ function withDiscoverySync(
   return { discoveryMapping: mapping, discoveryTriggers: mapping };
 }
 
-export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
+type V1ServiceSeed = {
+  id: ServiceId;
+  name: string;
+  category: ServiceCategoryId;
+  serviceClass: ServiceClass;
+  customerReceives?: string;
+};
+
+function v1Service(seed: V1ServiceSeed): StudioServiceEntry {
+  return {
+    schemaVersion: CATALOG_SCHEMA_VERSION,
+    id: seed.id,
+    name: seed.name,
+    category: seed.category,
+    serviceClass: seed.serviceClass,
+    customerReceives: seed.customerReceives,
+    dependencies: [],
+    canSubstitute: false,
+    addOnEligible: false,
+    upgradeEligible: false,
+    deliveryFormats: [],
+    minimumCustomerRequirements: [],
+    recommendedCustomerRequirements: [],
+    serviceStatus: "active",
+    status: "active",
+    discoveryTriggers: [],
+    discoveryMapping: [],
+    deliverables: [],
+  };
+}
+
+const V1_SERVICES: readonly StudioServiceEntry[] = [
+  v1Service({
+    id: "bf-001",
+    name: "Brand Identity Refresh",
+    category: "brand-foundation",
+    serviceClass: "signature",
+  }),
+  v1Service({
+    id: "bf-002",
+    name: "Brand Messaging",
+    category: "brand-foundation",
+    serviceClass: "signature",
+  }),
+  v1Service({
+    id: "cp-001",
+    name: "Marketing Campaign",
+    category: "campaign-services",
+    serviceClass: "signature",
+  }),
+  v1Service({
+    id: "sm-001",
+    name: "Social Media Marketing",
+    category: "social-media",
+    serviceClass: "signature",
+  }),
+  v1Service({
+    id: "em-001",
+    name: "Email Marketing",
+    category: "email-marketing",
+    serviceClass: "core",
+  }),
+  v1Service({
+    id: "sms-001",
+    name: "SMS Marketing",
+    category: "sms-marketing",
+    serviceClass: "core",
+  }),
+  v1Service({
+    id: "cc-001",
+    name: "Marketing Copywriting",
+    category: "content-copywriting",
+    serviceClass: "signature",
+  }),
+  v1Service({
+    id: "cc-002",
+    name: "Content Writing",
+    category: "content-copywriting",
+    serviceClass: "core",
+  }),
+  v1Service({
+    id: "vp-001",
+    name: "Marketing Video Production",
+    category: "video-production",
+    serviceClass: "signature",
+  }),
+  v1Service({
+    id: "ap-001",
+    name: "AI Voice Over Production",
+    category: "audio-production",
+    serviceClass: "core",
+  }),
+  v1Service({
+    id: "lp-001",
+    name: "Landing Pages & Web Content",
+    category: "landing-pages-web-content",
+    serviceClass: "signature",
+    customerReceives: "Not full website development.",
+  }),
+  v1Service({
+    id: "mo-001",
+    name: "Marketing Optimization",
+    category: "marketing-optimization",
+    serviceClass: "core",
+  }),
+  v1Service({
+    id: "ma-001",
+    name: "Marketing Assets",
+    category: "marketing-assets",
+    serviceClass: "essential",
+    customerReceives:
+      "Examples include brochures, flyers, rack cards, menus, business cards, posters, presentation materials, and similar finished marketing assets.",
+  }),
+];
+
+const LEGACY_RETIRED_SERVICES: readonly StudioServiceEntry[] = [
   {
     schemaVersion: CATALOG_SCHEMA_VERSION,
     id: "spark",
@@ -44,7 +165,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
       "Approved channels for email and SMS",
     ],
     internalProductionNotes: "1 revision round included. Full refund before work begins.",
-    serviceStatus: "active",
+    serviceStatus: "retired",
     customerDescription:
       "One-time campaign package for testing a promotion, product, event, or offer before investing in a larger marketing system.",
     internalDescription:
@@ -71,7 +192,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
       { signal: "focus-keyword", value: "first campaign", tileId: "your-focus", weight: 2 },
     ]),
     productionNotes: "1 revision round included. Full refund before work begins.",
-    status: "active",
+    status: "inactive",
   },
   {
     schemaVersion: CATALOG_SCHEMA_VERSION,
@@ -102,7 +223,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
       "Monthly campaign theme or focus",
     ],
     internalProductionNotes: "1 revision round per monthly cycle. Refund before monthly work begins.",
-    serviceStatus: "active",
+    serviceStatus: "retired",
     customerDescription:
       "Monthly marketing support for businesses that want consistent visibility and regular content creation.",
     internalDescription:
@@ -130,7 +251,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
       { signal: "focus-keyword", value: "monthly", tileId: "your-focus", weight: 2 },
     ]),
     productionNotes: "1 revision round per monthly cycle. Refund before monthly work begins.",
-    status: "active",
+    status: "inactive",
   },
   {
     schemaVersion: CATALOG_SCHEMA_VERSION,
@@ -163,7 +284,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
     ],
     internalProductionNotes:
       "3 revision rounds included. Quarterly strategy session scheduled by ops.",
-    serviceStatus: "active",
+    serviceStatus: "retired",
     customerDescription:
       "Done-with-you partnership for businesses ready to build a complete marketing system instead of one-off campaigns.",
     internalDescription:
@@ -194,7 +315,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
       { signal: "focus-keyword", value: "system", tileId: "your-focus", weight: 2 },
     ]),
     productionNotes: "3 revision rounds included. Quarterly strategy session scheduled by ops.",
-    status: "active",
+    status: "inactive",
   },
   {
     schemaVersion: CATALOG_SCHEMA_VERSION,
@@ -213,7 +334,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
     minimumCustomerRequirements: ["Active SPARK or compatible base package"],
     recommendedCustomerRequirements: ["Email platform access for deployment"],
     internalProductionNotes: "Price TBD — placeholder until payment integration reads catalog.",
-    serviceStatus: "planned",
+    serviceStatus: "retired",
     customerDescription: "Expanded email campaign copy beyond your base package.",
     internalDescription: "Add-on — promotes email-campaign deliverable when customer opts in.",
     deliverables: [{ id: "email-campaign", label: "Email Campaign", quantity: 1 }],
@@ -247,7 +368,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
     deliveryFormats: ["sms-messages"],
     minimumCustomerRequirements: ["Active SPARK or compatible base package", "SMS opt-in compliance"],
     recommendedCustomerRequirements: ["SMS platform or provider configured"],
-    serviceStatus: "planned",
+    serviceStatus: "retired",
     customerDescription: "SMS messaging copy to reach customers on mobile.",
     internalDescription: "Add-on — promotes sms-messaging deliverable when customer opts in.",
     deliverables: [{ id: "sms-messaging", label: "SMS Messaging", quantity: 1 }],
@@ -279,7 +400,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
     deliveryFormats: ["workflow-documentation"],
     minimumCustomerRequirements: ["Active MOMENTUM or compatible recurring package"],
     recommendedCustomerRequirements: ["Internal team roles defined for campaign execution"],
-    serviceStatus: "planned",
+    serviceStatus: "retired",
     customerDescription: "Campaign planning and workflow documentation for your team.",
     internalDescription: "Add-on — promotes campaign-planning deliverable.",
     deliverables: [{ id: "campaign-planning", label: "Campaign Planning", quantity: 1 }],
@@ -312,7 +433,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
     deliveryFormats: ["follow-up-sequence", "email-sequence", "sms-messages"],
     minimumCustomerRequirements: ["Active SPARK or compatible base package"],
     recommendedCustomerRequirements: ["Lead capture or CRM workflow in place"],
-    serviceStatus: "planned",
+    serviceStatus: "retired",
     customerDescription: "Follow-up messaging sequences to nurture leads and customers.",
     internalDescription: "Add-on — cross-channel follow-up copy bundle.",
     deliverables: [
@@ -348,7 +469,7 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
     minimumCustomerRequirements: ["Completed or active SPARK campaign"],
     recommendedCustomerRequirements: ["Interest in recurring monthly marketing"],
     internalProductionNotes: "Bridge add-on — signals upgrade path toward MOMENTUM.",
-    serviceStatus: "planned",
+    serviceStatus: "retired",
     customerDescription: "Ongoing Studio support beyond a one-time campaign.",
     internalDescription: "Bridge add-on — signals upgrade path toward MOMENTUM.",
     deliverables: [{ id: "marketing-calendar", label: "Marketing Calendar", quantity: 1 }],
@@ -365,6 +486,11 @@ export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
     ]),
     status: "inactive",
   },
+] as const;
+
+export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
+  ...V1_SERVICES,
+  ...LEGACY_RETIRED_SERVICES,
 ] as const;
 
 validateServiceCatalog(SERVICE_CATALOG);

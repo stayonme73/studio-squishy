@@ -1,12 +1,18 @@
 /**
  * Recommendation Engine — pure scoring against catalog discoveryMapping rules.
  * Catalog defines WHAT; this module decides WHICH services fit the discovery brief.
+ * Production allocation limits are enforced after scoring via central catalog config.
  */
 
 import { getActiveServices, getServiceCatalog } from "@/catalog/accessors";
+import {
+  OUTSIDE_STUDIO_SERVICES_MESSAGE,
+  PRODUCTION_ALLOCATION_LIMITS,
+} from "@/catalog/production-allocation";
 import type {
   DiscoveryMappingRule,
   ServiceCatalogEntry,
+  ServiceClass,
   ServiceId,
 } from "@/catalog/types";
 import type {
@@ -25,7 +31,7 @@ import type {
 } from "@/recommendation/types";
 import { validateDiscoveryBrief } from "@/recommendation/validate";
 
-export const RECOMMENDATION_ENGINE_VERSION = "1.0.0";
+export const RECOMMENDATION_ENGINE_VERSION = "1.1.0";
 
 const DEFAULT_RULE_WEIGHT = 1;
 const LOW_CONFIDENCE_MAX_SCORE = 1;
@@ -39,6 +45,13 @@ const KEY_DISCOVERY_TILES: readonly DiscoveryFormTileId[] = [
   CHALLENGE_TILE,
   FOCUS_TILE,
 ];
+
+type ScoredService = {
+  serviceId: ServiceId;
+  score: number;
+  matchedRules: MatchedDiscoveryRule[];
+  service: ServiceCatalogEntry;
+};
 
 function tileAnswer(brief: DiscoveryBrief, tileId: DiscoveryFormTileId): string | undefined {
   return brief.answers[tileId]?.trim() || undefined;
@@ -125,23 +138,64 @@ function buildReasons(matchedRules: readonly MatchedDiscoveryRule[]): Recommenda
   });
 }
 
-function buildDeliverablesSummary(
-  services: readonly ServiceCatalogEntry[],
-): DeliverablesSummaryItem[] {
-  return services.map((service) => ({
-    serviceId: service.id,
-    deliverables: service.deliverables,
-    totalQuantity: service.deliverables.reduce((sum, item) => sum + item.quantity, 0),
+function toServiceRecommendations(scored: readonly ScoredService[]): ServiceRecommendation[] {
+  return scored.map((entry, index) => ({
+    serviceId: entry.serviceId,
+    score: entry.score,
+    matchedRules: entry.matchedRules,
+    reasons: buildReasons(entry.matchedRules),
+    rank: index + 1,
   }));
 }
 
+function applyProductionAllocation(scored: readonly ScoredService[]): {
+  included: ScoredService[];
+  additional: ScoredService[];
+} {
+  const classCounts: Record<ServiceClass, number> = {
+    signature: 0,
+    core: 0,
+    essential: 0,
+  };
+  const included: ScoredService[] = [];
+  const additional: ScoredService[] = [];
+
+  for (const entry of scored) {
+    const serviceClass = entry.service.serviceClass;
+    const limit = PRODUCTION_ALLOCATION_LIMITS[serviceClass];
+
+    if (classCounts[serviceClass] < limit) {
+      classCounts[serviceClass]++;
+      included.push(entry);
+    } else {
+      additional.push(entry);
+    }
+  }
+
+  return { included, additional };
+}
+
+function buildDeliverablesSummary(
+  services: readonly ServiceCatalogEntry[],
+): DeliverablesSummaryItem[] {
+  return services
+    .filter((service) => (service.deliverables?.length ?? 0) > 0)
+    .map((service) => ({
+      serviceId: service.id,
+      deliverables: service.deliverables ?? [],
+      totalQuantity: (service.deliverables ?? []).reduce((sum, item) => sum + item.quantity, 0),
+    }));
+}
+
 function buildEstimatedInvestment(services: readonly ServiceCatalogEntry[]): EstimatedInvestment {
-  const items = services.map((service) => ({
-    serviceId: service.id,
-    display: service.pricing.display,
-    amountUsd: service.pricing.amountUsd,
-    billing: service.pricing.billing,
-  }));
+  const items = services
+    .filter((service) => service.pricing !== undefined)
+    .map((service) => ({
+      serviceId: service.id,
+      display: service.pricing!.display,
+      amountUsd: service.pricing!.amountUsd,
+      billing: service.pricing!.billing,
+    }));
 
   return {
     items,
@@ -160,10 +214,11 @@ function compareTimelineItems(
 
 function buildEstimatedTimeline(services: readonly ServiceCatalogEntry[]): EstimatedTimeline {
   const items = services
+    .filter((service) => service.estimatedProductionTime !== undefined)
     .map((service) => ({
       serviceId: service.id,
-      customerLabel: service.estimatedProductionTime.customerLabel,
-      businessDays: service.estimatedProductionTime.businessDays,
+      customerLabel: service.estimatedProductionTime!.customerLabel,
+      businessDays: service.estimatedProductionTime!.businessDays,
     }))
     .sort(compareTimelineItems);
 
@@ -279,23 +334,52 @@ function buildLowConfidenceWarning(
   return null;
 }
 
+function buildOutsideStudioServicesWarning(
+  recommendations: readonly ServiceRecommendation[],
+): RecommendationWarning | null {
+  if (recommendations.length === 0) {
+    return {
+      kind: "outside-studio-services",
+      message: OUTSIDE_STUDIO_SERVICES_MESSAGE,
+    };
+  }
+
+  const top = recommendations[0];
+  const runnerUp = recommendations[1];
+  const isLowConfidence = top.score <= LOW_CONFIDENCE_MAX_SCORE;
+  const isTie = runnerUp !== undefined && runnerUp.score === top.score;
+
+  if (isLowConfidence || isTie) {
+    return {
+      kind: "outside-studio-services",
+      message: OUTSIDE_STUDIO_SERVICES_MESSAGE,
+      serviceId: top.serviceId,
+    };
+  }
+
+  return null;
+}
+
 function buildWarnings(
   brief: DiscoveryBrief,
   recommendations: readonly ServiceRecommendation[],
-  recommendedServices: readonly ServiceCatalogEntry[],
+  includedServices: readonly ServiceCatalogEntry[],
   fullCatalog: readonly ServiceCatalogEntry[],
 ): RecommendationWarning[] {
   const warnings: RecommendationWarning[] = [
     ...buildMissingAnswerWarnings(brief),
     ...buildInactiveServiceWarnings(brief, fullCatalog),
     ...buildDependencyWarnings(
-      new Set(recommendedServices.map((service) => service.id)),
-      recommendedServices,
+      new Set(includedServices.map((service) => service.id)),
+      includedServices,
     ),
   ];
 
   const lowConfidence = buildLowConfidenceWarning(recommendations);
   if (lowConfidence) warnings.push(lowConfidence);
+
+  const outsideStudioServices = buildOutsideStudioServicesWarning(recommendations);
+  if (outsideStudioServices) warnings.push(outsideStudioServices);
 
   if (recommendations.length === 0) {
     warnings.push({
@@ -312,16 +396,18 @@ function buildWarnings(
 }
 
 function computeRequiresApproval(
-  recommendations: readonly ServiceRecommendation[],
+  includedRecommendations: readonly ServiceRecommendation[],
   warnings: readonly RecommendationWarning[],
   investment: EstimatedInvestment,
 ): boolean {
-  if (recommendations.length === 0) return true;
+  if (includedRecommendations.length === 0) return true;
   if (investment.hasQuotedItems) return true;
 
   return warnings.some(
     (warning) =>
-      warning.kind === "unmet-dependency" || warning.kind === "low-confidence-match",
+      warning.kind === "unmet-dependency" ||
+      warning.kind === "low-confidence-match" ||
+      warning.kind === "outside-studio-services",
   );
 }
 
@@ -338,7 +424,7 @@ export function recommendFromDiscovery(
   const services = catalog ?? getActiveServices();
   const fullCatalog = catalog ?? getServiceCatalog();
 
-  const scored = services
+  const scored: ScoredService[] = services
     .map((service) => {
       const { score, matchedRules } = scoreService(service, brief);
       return { serviceId: service.id, score, matchedRules, service };
@@ -346,30 +432,33 @@ export function recommendFromDiscovery(
     .filter((entry) => entry.score > 0)
     .sort(compareRecommendations);
 
-  const recommendations: ServiceRecommendation[] = scored.map((entry, index) => ({
-    serviceId: entry.serviceId,
-    score: entry.score,
-    matchedRules: entry.matchedRules,
-    reasons: buildReasons(entry.matchedRules),
-    rank: index + 1,
-  }));
+  const recommendations = toServiceRecommendations(scored);
+  const { included, additional } = applyProductionAllocation(scored);
+  const includedRecommendations = toServiceRecommendations(included);
+  const additionalStudioServices = toServiceRecommendations(additional);
 
-  const recommendedServices = scored.map((entry) => entry.service);
-  const primaryServiceId = recommendations[0]?.serviceId ?? null;
-  const estimatedInvestment = buildEstimatedInvestment(recommendedServices);
-  const estimatedTimeline = buildEstimatedTimeline(recommendedServices);
-  const warnings = buildWarnings(brief, recommendations, recommendedServices, fullCatalog);
+  const includedServiceEntries = included.map((entry) => entry.service);
+  const primaryServiceId = includedRecommendations[0]?.serviceId ?? null;
+  const estimatedInvestment = buildEstimatedInvestment(includedServiceEntries);
+  const estimatedTimeline = buildEstimatedTimeline(includedServiceEntries);
+  const warnings = buildWarnings(brief, recommendations, includedServiceEntries, fullCatalog);
 
   return {
     brief,
     recommendations,
+    includedRecommendations,
+    additionalStudioServices,
     primaryServiceId,
     rationale: buildRationale(recommendations),
-    deliverablesSummary: buildDeliverablesSummary(recommendedServices),
+    deliverablesSummary: buildDeliverablesSummary(includedServiceEntries),
     estimatedInvestment,
     estimatedTimeline,
     warnings,
-    requiresApproval: computeRequiresApproval(recommendations, warnings, estimatedInvestment),
+    requiresApproval: computeRequiresApproval(
+      includedRecommendations,
+      warnings,
+      estimatedInvestment,
+    ),
     generatedAt: new Date().toISOString(),
     engineVersion: RECOMMENDATION_ENGINE_VERSION,
   };
