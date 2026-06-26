@@ -72,11 +72,15 @@
 
 .business-discovery-studio .bds-scene--split {
   --bds-board-margin: clamp(4px, 0.5vmin, 10px);
-  --bds-split-gap: clamp(8px, 1vw, 16px);
+  --bds-split-gap: clamp(4px, 0.5vw, 10px);
+  --bds-split-panel: clamp(18rem, 28vw, 22rem);
+  --bds-board-zone: calc(
+    100vw - var(--bds-split-panel) - var(--bds-split-gap) - 2 * var(--bds-board-margin)
+  );
   display: grid;
-  /* Column 1: board intrinsic width; column 2: all remaining space for the panel */
-  grid-template-columns: max-content minmax(0, 1fr);
-  align-items: stretch;
+  /* Column 1: board priority; column 2: fixed narrow summary panel */
+  grid-template-columns: minmax(0, 1fr) var(--bds-split-panel);
+  align-items: center;
   justify-items: stretch;
   gap: var(--bds-split-gap);
   padding: var(--bds-board-margin);
@@ -93,8 +97,8 @@
   justify-self: start;
   align-self: center;
   flex: none;
-  width: max-content;
-  max-width: none;
+  width: 100%;
+  max-width: var(--bds-board-zone);
   min-width: 0;
   z-index: 2;
   transform: translateX(0);
@@ -133,11 +137,11 @@
   grid-row: 1;
   z-index: 1;
   width: 100%;
-  max-width: none;
+  max-width: var(--bds-split-panel);
   height: 100%;
   max-height: none;
   align-self: stretch;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
 }
 
 .business-discovery-studio .bds-scene--split .bds-scene__panel > * {
@@ -165,7 +169,10 @@
 }
 
 .business-discovery-studio .bds-scene--split .bds-plate-canvas {
-  /* Keep pre-submit contain-fit — board does not shrink for the panel */
+  width: min(
+    var(--bds-board-zone),
+    calc((100dvh - 2 * var(--bds-board-margin)) * 1024 / 682)
+  );
   transition: width 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
