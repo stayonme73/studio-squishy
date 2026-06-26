@@ -11,7 +11,7 @@ import {
 } from "@/lib/owner-qa-campaign";
 import { clearCampaignState } from "@/lib/studio-board-campaign";
 
-/** Development-only owner nav — pages + journey presets. */
+/** Development-only owner nav — journey presets + utility shortcuts. */
 export default function OwnerQaPanel() {
   const router = useRouter();
   const panelId = useId();
@@ -76,22 +76,6 @@ export default function OwnerQaPanel() {
           <p className="owner-qa__hint">Jump the product journey. Development only.</p>
 
           <section className="owner-qa__section">
-            <h2 className="owner-qa__section-title">Pages</h2>
-            <div className="owner-qa__links">
-              {ownerQa.pages.map((page) => (
-                <Link
-                  key={page.href}
-                  href={page.href}
-                  className="owner-qa__link"
-                  onClick={closePanel}
-                >
-                  {page.label}
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          <section className="owner-qa__section">
             <h2 className="owner-qa__section-title">Journey</h2>
             <div className="owner-qa__presets">
               {ownerQa.journeyPresets.map((preset) => (
@@ -106,6 +90,22 @@ export default function OwnerQaPanel() {
                     <span className="owner-qa__preset-desc">{preset.description}</span>
                   ) : null}
                 </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="owner-qa__section">
+            <h2 className="owner-qa__section-title">Shortcuts</h2>
+            <div className="owner-qa__links">
+              {ownerQa.shortcuts.map((page) => (
+                <Link
+                  key={page.href}
+                  href={page.href}
+                  className="owner-qa__link"
+                  onClick={closePanel}
+                >
+                  {page.label}
+                </Link>
               ))}
             </div>
           </section>

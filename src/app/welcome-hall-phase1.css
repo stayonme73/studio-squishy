@@ -20,6 +20,21 @@
   overflow: hidden;
 }
 
+/** Desktop — sized plate canvas shares native 1024×622 space with kiosk hotspot. */
+.welcome-hall-phase1 .welcome-hall-plate-canvas {
+  position: absolute;
+  overflow: hidden;
+}
+
+.welcome-hall-phase1 .welcome-hall-plate-canvas .welcome-hall-plate-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  object-position: 50% 50%;
+}
+
 .welcome-hall-phase1 .welcome-hall-plate-art {
   position: absolute;
   inset: 0;

@@ -13,11 +13,13 @@ import {
 
 import { welcomeHallPhase1 } from "@/config/welcome-hall-phase1";
 import {
-  sceneRectToCoverPercent,
   sceneRectToPercent,
   welcomeHallFraming,
+  welcomeHallPlateCoverLayout,
   welcomeHallScene,
 } from "@/config/welcome-hall-scene";
+
+const DESKTOP_KIOSK_MIN_WIDTH = 1025;
 
 function KioskHotspot({
   style,
@@ -64,37 +66,65 @@ function KioskHotspot({
 }
 
 /**
- * Studio Lobby — desktop: full kiosk tap target; mobile: art + single CTA dock.
+ * Studio Lobby — desktop: plate-canvas kiosk tap target; mobile: art + single CTA dock.
  */
 export default function WelcomeHallWelcomeScene() {
   const router = useRouter();
+  const plateRef = useRef<HTMLDivElement>(null);
   const [showDebug, setShowDebug] = useState(false);
   const transitioningRef = useRef(false);
-  const [viewport, setViewport] = useState({ width: 0, height: 0 });
+  const [plateSize, setPlateSize] = useState({ width: 0, height: 0 });
   const [transitioning, setTransitioning] = useState(false);
   const { cta, mobileEstablish, mobileStudioNav } = welcomeHallPhase1;
 
-  const framing = useMemo(() => welcomeHallFraming(viewport), [viewport]);
+  const isDesktopKiosk = plateSize.width >= DESKTOP_KIOSK_MIN_WIDTH;
 
-  const toOverlayPercent = useCallback(
-    (rect: typeof welcomeHallScene.kioskTapTarget) =>
-      viewport.width > 0
-        ? sceneRectToCoverPercent(rect, viewport, framing)
-        : sceneRectToPercent(rect),
-    [framing, viewport],
+  const framing = useMemo(() => welcomeHallFraming(plateSize), [plateSize]);
+
+  const coverLayout = useMemo(
+    () => welcomeHallPlateCoverLayout(plateSize, framing),
+    [framing, plateSize],
   );
 
-  const kioskHitArea = toOverlayPercent(welcomeHallScene.kioskTapTarget);
+  const kioskHitArea = useMemo(
+    () =>
+      isDesktopKiosk && coverLayout.width > 0
+        ? sceneRectToPercent(welcomeHallScene.kioskTapTarget)
+        : undefined,
+    [coverLayout.width, isDesktopKiosk],
+  );
+
+  const canvasStyle = useMemo((): CSSProperties | undefined => {
+    if (!isDesktopKiosk || coverLayout.width <= 0 || coverLayout.height <= 0) {
+      return undefined;
+    }
+    return {
+      width: `${coverLayout.width}px`,
+      height: `${coverLayout.height}px`,
+      left: `${coverLayout.offsetX}px`,
+      top: `${coverLayout.offsetY}px`,
+    };
+  }, [coverLayout, isDesktopKiosk]);
 
   useLayoutEffect(() => {
-    const syncViewport = () => {
-      setViewport({ width: window.innerWidth, height: window.innerHeight });
+    const plate = plateRef.current;
+    if (!plate) return;
+
+    const syncPlateSize = () => {
+      const { width, height } = plate.getBoundingClientRect();
+      setPlateSize({ width, height });
     };
 
-    syncViewport();
+    syncPlateSize();
     setShowDebug(new URLSearchParams(window.location.search).get("debug") === "1");
-    window.addEventListener("resize", syncViewport);
-    return () => window.removeEventListener("resize", syncViewport);
+
+    const observer = new ResizeObserver(syncPlateSize);
+    observer.observe(plate);
+    window.addEventListener("resize", syncPlateSize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", syncPlateSize);
+    };
   }, []);
 
   const goToBusinessDiscoveryStudio = useCallback(() => {
@@ -174,19 +204,26 @@ export default function WelcomeHallWelcomeScene() {
 
   return (
     <div className={rootClassName} aria-label="Studio Lobby">
-      <div className={plateClassName}>
-        <div className="welcome-hall-plate-crop welcome-hall-plate-crop--mobile">
-          {plateArt}
-
-          <KioskHotspot
-            style={kioskHitArea}
-            label={cta.kioskLabel}
-            href={kioskRoute}
-            disabled={transitioning}
-            debug={showDebug}
-            onActivate={goToBusinessDiscoveryStudio}
-          />
-        </div>
+      <div ref={plateRef} className={plateClassName}>
+        {isDesktopKiosk ? (
+          <div className="welcome-hall-plate-crop">
+            <div className="welcome-hall-plate-canvas" style={canvasStyle}>
+              {plateArt}
+              <KioskHotspot
+                style={kioskHitArea}
+                label={cta.kioskLabel}
+                href={kioskRoute}
+                disabled={transitioning}
+                debug={showDebug}
+                onActivate={goToBusinessDiscoveryStudio}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="welcome-hall-plate-crop welcome-hall-plate-crop--mobile">
+            {plateArt}
+          </div>
+        )}
 
         {!transitioning ? mobileDock : null}
         {transitioning ? transitionGlow : null}

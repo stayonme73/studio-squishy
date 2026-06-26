@@ -156,6 +156,29 @@ export function sceneRectToCoverPercent(
   };
 }
 
+/** Cover-fit plate canvas size + offset — matches object-fit:cover + object-position framing. */
+export function welcomeHallPlateCoverLayout(
+  viewport: { width: number; height: number },
+  framing = welcomeHallFraming(viewport),
+  native = welcomeHallScene.nativeSize,
+) {
+  const { width: vw, height: vh } = viewport;
+  const { width: iw, height: ih } = native;
+  if (vw <= 0 || vh <= 0) {
+    return { width: 0, height: 0, offsetX: 0, offsetY: 0 };
+  }
+
+  const scale = Math.max(vw / iw, vh / ih);
+  const width = iw * scale;
+  const height = ih * scale;
+  return {
+    width,
+    height,
+    offsetX: (vw - width) * framing.x,
+    offsetY: (vh - height) * framing.y,
+  };
+}
+
 /** Native Y range visible at viewport top/bottom after cover/contain framing. */
 export function welcomeHallVisibleYRange(
   viewport: { width: number; height: number },

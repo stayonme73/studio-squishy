@@ -2,7 +2,7 @@
 
  * Owner QA — lean dev nav for the live product journey.
 
- * Shown in development only (@see OwnerQaRoot).
+ * Shown when dev tools are enabled (@see OwnerQaRoot, isDevToolsEnabled).
 
  */
 
@@ -14,12 +14,9 @@ import type { StudioGuidePackageId } from "@/config/studio-guide";
 
 
 
-export type OwnerQaPage = {
-
+export type OwnerQaShortcut = {
   label: string;
-
   href: string;
-
 };
 
 
@@ -55,28 +52,12 @@ const PACKAGE = "momentum" as const;
 
 
 export const ownerQa = {
-
-  pages: [
-
+  /** Non-journey utility pages — not duplicated in journeyPresets. */
+  shortcuts: [
     { label: "Welcome Hall", href: studioBoard.routes.welcomeHall },
-
-    { label: "Studio Guide", href: studioBoard.routes.studioGuide },
-
-    { label: "Draft Room", href: `/draft-room?package=${PACKAGE}` },
-
-    { label: "Payment", href: `/payment?package=${PACKAGE}` },
-
-    { label: "Studio Board", href: studioBoard.routes.studioBoard },
-
-    { label: "Feedback Studio", href: studioBoard.routes.feedbackStudio },
-
-    { label: "Final Delivery", href: "/deliverables?preview=delivered" },
-
     { label: "Help Center", href: studioBoard.routes.helpCenter },
-
     { label: "Studio Kitchen", href: studioBoard.routes.studioKitchen },
-
-  ] satisfies OwnerQaPage[],
+  ] satisfies OwnerQaShortcut[],
 
 
 
