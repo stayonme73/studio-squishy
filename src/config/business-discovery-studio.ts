@@ -185,23 +185,71 @@ export type BusinessDiscoveryFraming = {
   fit: "cover" | "contain";
 };
 
+/** Done ✓ badge size on native plate pixels. */
+export const DONE_BADGE_SIZE = 14;
+
+export type DoneBadgeAnchor = {
+  x: number;
+  y: number;
+  size: number;
+};
+
+/** Painted card faces on the plate — single geometry source for hits, badges, covers. */
+export const DISCOVERY_TILE_GEOMETRY = {
+  "your-business": { x: 244, y: 176, width: 161, height: 89 },
+  "your-situation": { x: 415, y: 152, width: 165, height: 113 },
+  "your-challenge": { x: 591, y: 175, width: 168, height: 90 },
+  "your-current-tools": { x: 224, y: 245, width: 174, height: 120 },
+  "your-focus": { x: 409, y: 245, width: 178, height: 120 },
+  "success-looks-like": { x: 598, y: 245, width: 182, height: 120 },
+  "whats-slowing-you-down": { x: 220, y: 345, width: 171, height: 125 },
+  "anything-else": { x: 403, y: 345, width: 191, height: 125 },
+  "submit-project": { x: 606, y: 345, width: 174, height: 125 },
+} satisfies Record<DiscoveryTileId, SceneRect>;
+
+const DONE_BADGE_INSET = 4;
+const DONE_BADGE_TOP_INSET = 8;
+const STATUS_COVER_SIZE = 20;
+
+export type DiscoveryTileDerivedGeometry = {
+  face: SceneRect;
+  doneBadge: DoneBadgeAnchor;
+  statusCover: SceneRect;
+};
+
+/** Derive overlay anchors from painted card face — one source, three consumers. */
+export function discoveryTileDerivedGeometry(
+  face: SceneRect,
+): DiscoveryTileDerivedGeometry {
+  return {
+    face,
+    doneBadge: {
+      x: face.x + face.width - DONE_BADGE_SIZE - DONE_BADGE_INSET,
+      y: face.y + DONE_BADGE_TOP_INSET,
+      size: DONE_BADGE_SIZE,
+    },
+    statusCover: {
+      x: face.x + Math.round(face.width * 0.22),
+      y: face.y + face.height - 26,
+      width: STATUS_COVER_SIZE,
+      height: STATUS_COVER_SIZE,
+    },
+  };
+}
+
+export const discoveryTileGeometry = Object.fromEntries(
+  DISCOVERY_TILE_ORDER.map((id) => [id, discoveryTileDerivedGeometry(DISCOVERY_TILE_GEOMETRY[id])]),
+) as Record<DiscoveryTileId, DiscoveryTileDerivedGeometry>;
+
 export const businessDiscoveryStudio = {
   src: "/business-discovery-studio/discovery-studio-plate-v1.png?v=1",
   alt: "Business Discovery Studio — drafting table workspace",
   nativeSize: { width: 1024, height: 682 } as const,
 
-  /** Baked tile faces on plate — tap targets; use ?debug=1 to verify. */
-  tileHits: {
-    "your-business": { x: 244, y: 162, width: 188, height: 98 },
-    "your-situation": { x: 418, y: 158, width: 188, height: 98 },
-    "your-challenge": { x: 592, y: 164, width: 188, height: 98 },
-    "your-current-tools": { x: 244, y: 268, width: 188, height: 98 },
-    "your-focus": { x: 418, y: 264, width: 188, height: 98 },
-    "success-looks-like": { x: 592, y: 270, width: 188, height: 98 },
-    "whats-slowing-you-down": { x: 244, y: 374, width: 188, height: 98 },
-    "anything-else": { x: 418, y: 370, width: 188, height: 98 },
-    "submit-project": { x: 592, y: 376, width: 188, height: 98 },
-  } satisfies Record<DiscoveryTileId, SceneRect>,
+  /** Tap targets — same rects as painted card faces in DISCOVERY_TILE_GEOMETRY. */
+  tileHits: Object.fromEntries(
+    DISCOVERY_TILE_ORDER.map((id) => [id, DISCOVERY_TILE_GEOMETRY[id]]),
+  ) as Record<DiscoveryTileId, SceneRect>,
 
 
   tileLabels: {
@@ -216,9 +264,6 @@ export const businessDiscoveryStudio = {
     "submit-project": "Submit Project",
   } satisfies Record<DiscoveryTileId, string>,
 
-  /** Contain framing — matches object-fit: contain so the full plate fits in the viewport. */
-  plateFraming: { x: 0.5, y: 0.5, fit: "contain" as const },
-
   /**
    * Expanded card rect on the drafting table (native plate pixels).
    * ~66% plate width, centered over the tile grid — comfortable fill area.
@@ -231,66 +276,25 @@ export const businessDiscoveryStudio = {
   } satisfies SceneRect,
 } as const;
 
-/** Done ✓ badge size on native plate pixels — verify with ?debug=1. */
-export const DONE_BADGE_SIZE = 14;
-
-export type DoneBadgeAnchor = {
-  x: number;
-  y: number;
-  size: number;
-};
-
-/**
- * Top-right ✓ badge per tile (native plate pixels) — calibrated on painted card faces.
- * Row 2–3 column pitch differs from row 1; do not derive from a single column width.
- * Rendered on bds-done-badges via sceneRectToCoverPercent — verify with ?debug=1.
- */
-export const tileDoneBadges = {
-  "your-business": { x: 381, y: 172, size: DONE_BADGE_SIZE },
-  "your-situation": { x: 561, y: 168, size: DONE_BADGE_SIZE },
-  "your-challenge": { x: 721, y: 174, size: DONE_BADGE_SIZE },
-  "your-current-tools": { x: 373, y: 278, size: DONE_BADGE_SIZE },
-  "your-focus": { x: 569, y: 274, size: DONE_BADGE_SIZE },
-  "success-looks-like": { x: 725, y: 280, size: DONE_BADGE_SIZE },
-  "whats-slowing-you-down": { x: 366, y: 384, size: DONE_BADGE_SIZE },
-  "anything-else": { x: 575, y: 380, size: DONE_BADGE_SIZE },
-  "submit-project": { x: 690, y: 386, size: DONE_BADGE_SIZE },
-} satisfies Record<DiscoveryTileId, DoneBadgeAnchor>;
-
-/** Live tuning: only tiles listed here show done badges. Add next tile when Tagia approves previous. */
-export const DISCOVERY_BADGE_ENABLED_TILES: DiscoveryTileId[] = ["your-business"];
-
-/** Manual plate-pixel offsets from paintedCardRightEdgeX formula — tune with Tagia live */
-export const DISCOVERY_BADGE_OFFSET: Partial<Record<DiscoveryTileId, { dx: number; dy: number }>> = {
-  "your-business": { dx: 0, dy: 0 },
-};
+/** Top-right ✓ badge per tile — derived from DISCOVERY_TILE_GEOMETRY card faces. */
+export const tileDoneBadges = Object.fromEntries(
+  DISCOVERY_TILE_ORDER.map((id) => [id, discoveryTileGeometry[id].doneBadge]),
+) as Record<DiscoveryTileId, DoneBadgeAnchor>;
 
 /**
  * Baked "Not completed" status circle on the plate — masked when a tile is complete
  * so only the single runtime top-right ✓ remains visible.
  */
-export const tileStatusCoverRects = {
-  "your-business": { x: 368, y: 233, width: 20, height: 20 },
-  "your-situation": { x: 548, y: 230, width: 20, height: 20 },
-  "your-challenge": { x: 724, y: 225, width: 20, height: 20 },
-  "your-current-tools": { x: 389, y: 329, width: 20, height: 20 },
-  "your-focus": { x: 552, y: 331, width: 20, height: 20 },
-  "success-looks-like": { x: 706, y: 331, width: 20, height: 20 },
-  "whats-slowing-you-down": { x: 389, y: 443, width: 20, height: 20 },
-  "anything-else": { x: 589, y: 435, width: 20, height: 20 },
-  "submit-project": { x: 706, y: 435, width: 20, height: 20 },
-} satisfies Record<DiscoveryTileId, SceneRect>;
+export const tileStatusCoverRects = Object.fromEntries(
+  DISCOVERY_TILE_ORDER.map((id) => [id, discoveryTileGeometry[id].statusCover]),
+) as Record<DiscoveryTileId, SceneRect>;
 
-/** Plate-space badge square for overlay positioning — one rect per tile, explicit coords. */
-export function doneBadgePlateRect(
-  tileId: DiscoveryTileId,
-  badges: Record<DiscoveryTileId, DoneBadgeAnchor> = tileDoneBadges,
-): SceneRect {
-  const badge = badges[tileId];
-  const offset = DISCOVERY_BADGE_OFFSET[tileId];
+/** Plate-space badge square for overlay positioning. */
+export function doneBadgePlateRect(tileId: DiscoveryTileId): SceneRect {
+  const badge = tileDoneBadges[tileId];
   return {
-    x: badge.x + (offset?.dx ?? 0),
-    y: badge.y + (offset?.dy ?? 0),
+    x: badge.x,
+    y: badge.y,
     width: badge.size,
     height: badge.size,
   };
@@ -308,11 +312,11 @@ export function sceneRectToPercent(
   };
 }
 
-/** Cover-fill overlay mapping — same math as Studio Guide folder hotspots. */
+/** Cover-fill overlay mapping — legacy; prefer sceneRectToPercent inside bds-plate-canvas. */
 export function sceneRectToCoverPercent(
   rect: SceneRect,
   viewport: { width: number; height: number },
-  framing: BusinessDiscoveryFraming = businessDiscoveryStudio.plateFraming,
+  framing: BusinessDiscoveryFraming = { x: 0.5, y: 0.5, fit: "contain" },
   native = businessDiscoveryStudio.nativeSize,
 ) {
   const { width: iw, height: ih } = native;

@@ -12,11 +12,27 @@
 
 .business-discovery-studio .bds-plate {
   position: relative;
+  display: grid;
+  place-items: center;
+  container-type: size;
   width: 100%;
   height: 100%;
   min-height: 0;
   overflow: hidden;
   background: #2e2d2b;
+}
+
+/**
+ * Object-fit:contain box for the native plate — overlays share this coordinate space.
+ * width/height min() pair matches CSS contain sizing for 1024×682 art.
+ */
+.business-discovery-studio .bds-plate-canvas {
+  position: relative;
+  aspect-ratio: 1024 / 682;
+  width: min(100cqw, calc(100cqh * 1024 / 682));
+  height: min(100cqh, calc(100cqw * 682 / 1024));
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .business-discovery-studio .bds-plate-art {
@@ -25,8 +41,6 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: 50% 50%;
   user-select: none;
   pointer-events: none;
 }

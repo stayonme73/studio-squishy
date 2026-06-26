@@ -3,23 +3,18 @@
 import { useMemo, type CSSProperties } from "react";
 
 import {
-  businessDiscoveryStudio,
   doneBadgePlateRect,
-  sceneRectToCoverPercent,
+  sceneRectToPercent,
   type DiscoveryTileId,
 } from "@/config/business-discovery-studio";
 
 type Props = {
   tileId: DiscoveryTileId;
-  stageSize: { width: number; height: number };
 };
 
 /** Single ✓ badge anchored to native plate pixels for one discovery tile. */
-export default function DiscoveryTileDoneBadge({ tileId, stageSize }: Props) {
-  const style = useMemo((): CSSProperties => {
-    const rect = doneBadgePlateRect(tileId);
-    return sceneRectToCoverPercent(rect, stageSize, businessDiscoveryStudio.plateFraming);
-  }, [tileId, stageSize]);
+export default function DiscoveryTileDoneBadge({ tileId }: Props) {
+  const style = useMemo((): CSSProperties => sceneRectToPercent(doneBadgePlateRect(tileId)), [tileId]);
 
   return (
     <span

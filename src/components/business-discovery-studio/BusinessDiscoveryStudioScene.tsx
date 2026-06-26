@@ -11,12 +11,12 @@ import {
 } from "react";
 
 import {
-  DISCOVERY_BADGE_ENABLED_TILES,
+  DISCOVERY_FORM_TILE_IDS,
   DISCOVERY_REQUIRED_TILE_IDS,
   DISCOVERY_TILE_ORDER,
   businessDiscoveryStudio,
   discoveryTileConfig,
-  sceneRectToCoverPercent,
+  sceneRectToPercent,
   type DiscoveryTileId,
 } from "@/config/business-discovery-studio";
 import { isDiscoveryTileAnswerComplete } from "@/lib/business-discovery-completion";
@@ -37,9 +37,7 @@ type Props = {
 type SheetPhase = "expanding" | "active" | "shrinking";
 
 export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
-  const stageRef = useRef<HTMLDivElement>(null);
   const openSnapshotRef = useRef<string>("");
-  const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [activeTileId, setActiveTileId] = useState<DiscoveryTileId | null>(null);
   const [sheetPhase, setSheetPhase] = useState<SheetPhase | null>(null);
   const [answers, setAnswers] = useState<DiscoveryAnswers>({});
@@ -50,7 +48,6 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     nativeSize,
     tileHits,
     tileLabels,
-    plateFraming,
     discoveryExpandedRect,
   } = businessDiscoveryStudio;
 
@@ -80,44 +77,21 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   );
 
   const showDoneBadge = (id: DiscoveryTileId) =>
-    DISCOVERY_BADGE_ENABLED_TILES.includes(id) &&
+    DISCOVERY_FORM_TILE_IDS.includes(id as (typeof DISCOVERY_FORM_TILE_IDS)[number]) &&
     isTileComplete(id) &&
     activeTileId !== id;
-
-  useLayoutEffect(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-
-    const sync = () => {
-      const { width, height } = stage.getBoundingClientRect();
-      setStageSize({ width, height });
-    };
-
-    sync();
-    const observer = new ResizeObserver(sync);
-    observer.observe(stage);
-    window.addEventListener("resize", sync);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", sync);
-    };
-  }, []);
 
   const hitStyles = useMemo(() => {
     const map = {} as Record<DiscoveryTileId, CSSProperties>;
     for (const id of DISCOVERY_TILE_ORDER) {
-      map[id] = sceneRectToCoverPercent(
-        tileHits[id],
-        stageSize,
-        plateFraming,
-      );
+      map[id] = sceneRectToPercent(tileHits[id]);
     }
     return map;
-  }, [plateFraming, stageSize, tileHits]);
+  }, [tileHits]);
 
   const expandedStyle = useMemo(
-    () => sceneRectToCoverPercent(discoveryExpandedRect, stageSize, plateFraming),
-    [discoveryExpandedRect, plateFraming, stageSize],
+    () => sceneRectToPercent(discoveryExpandedRect),
+    [discoveryExpandedRect],
   );
 
   useLayoutEffect(() => {
@@ -211,7 +185,6 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   return (
     <div className="bds-scene" aria-label="Business Discovery Studio">
       <div
-        ref={stageRef}
         className={[
           "bds-plate",
           activeTileId ? "bds-plate--sheet-open" : "",
@@ -219,89 +192,91 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
           .filter(Boolean)
           .join(" ")}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={src}
-          alt={alt}
-          width={nativeSize.width}
-          height={nativeSize.height}
-          className="bds-plate-art"
-          draggable={false}
-        />
+        <div className="bds-plate-canvas">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt={alt}
+            width={nativeSize.width}
+            height={nativeSize.height}
+            className="bds-plate-art"
+            draggable={false}
+          />
 
-        <div className="bds-ui">
-          {DISCOVERY_TILE_ORDER.map((id) => {
-            const isActive = activeTileId === id;
-            const isSubmitLocked = id === "submit-project" && !allRequiredComplete;
-            const sheetOpenElsewhere = activeTileId !== null && !isActive;
+          <div className="bds-ui">
+            {DISCOVERY_TILE_ORDER.map((id) => {
+              const isActive = activeTileId === id;
+              const isSubmitLocked = id === "submit-project" && !allRequiredComplete;
+              const sheetOpenElsewhere = activeTileId !== null && !isActive;
 
-            return (
-              <div
-                key={id}
-                className={[
-                  "bds-tile-layer",
-                  isActive ? "bds-tile-layer--active" : "",
-                  isSubmitLocked ? "bds-tile-layer--locked" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                style={hitStyles[id]}
-              >
-                {isActive && <div className="bds-tile-fade" aria-hidden="true" />}
-
-                <button
-                  type="button"
+              return (
+                <div
+                  key={id}
                   className={[
-                    "bds-tile-hit",
-                    debug ? "bds-tile-hit--debug" : "",
-                    isActive ? "bds-tile-hit--hidden" : "",
-                    sheetOpenElsewhere ? "bds-tile-hit--blocked" : "",
-                    isSubmitLocked ? "bds-tile-hit--locked" : "",
+                    "bds-tile-layer",
+                    isActive ? "bds-tile-layer--active" : "",
+                    isSubmitLocked ? "bds-tile-layer--locked" : "",
                   ]
                     .filter(Boolean)
                     .join(" ")}
-                  aria-label={tileLabels[id]}
-                  aria-disabled={isSubmitLocked || sheetOpenElsewhere}
-                  disabled={isSubmitLocked || sheetOpenElsewhere}
-                  onClick={() => handleTileClick(id)}
+                  style={hitStyles[id]}
+                >
+                  {isActive && <div className="bds-tile-fade" aria-hidden="true" />}
+
+                  <button
+                    type="button"
+                    className={[
+                      "bds-tile-hit",
+                      debug ? "bds-tile-hit--debug" : "",
+                      isActive ? "bds-tile-hit--hidden" : "",
+                      sheetOpenElsewhere ? "bds-tile-hit--blocked" : "",
+                      isSubmitLocked ? "bds-tile-hit--locked" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    aria-label={tileLabels[id]}
+                    aria-disabled={isSubmitLocked || sheetOpenElsewhere}
+                    disabled={isSubmitLocked || sheetOpenElsewhere}
+                    onClick={() => handleTileClick(id)}
+                  />
+                </div>
+              );
+            })}
+
+            {/* Plate overlays — hide baked status circles, then one ✓ per completed tile */}
+            <div className="bds-done-badges" aria-hidden="true">
+              {DISCOVERY_TILE_ORDER.filter(showDoneBadge).map((id) => (
+                <DiscoveryTileStatusCover key={`cover-${id}`} tileId={id} />
+              ))}
+              {DISCOVERY_TILE_ORDER.filter(showDoneBadge).map((id) => (
+                <DiscoveryTileDoneBadge key={`badge-${id}`} tileId={id} />
+              ))}
+            </div>
+
+            {activeTileId && activeConfig && sheetLayerStyle && (
+              <div
+                className={[
+                  "bds-sheet-layer",
+                  sheetExpanded ? "bds-sheet-layer--expanded" : "",
+                  sheetPhase === "shrinking" ? "bds-sheet-layer--shrinking" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                style={sheetLayerStyle}
+                onTransitionEnd={handleSheetTransitionEnd}
+              >
+                <DiscoverySheetCard
+                  key={activeTileId}
+                  config={activeConfig}
+                  initialValue={answers[activeTileId] ?? ""}
+                  onChange={handleAnswerChange}
+                  onDone={handleDone}
+                  onCancel={handleCancel}
+                  expanded={sheetExpanded}
                 />
               </div>
-            );
-          })}
-
-          {/* Plate overlays — hide baked status circles, then one ✓ per completed tile */}
-          <div className="bds-done-badges" aria-hidden="true">
-            {DISCOVERY_TILE_ORDER.filter(showDoneBadge).map((id) => (
-              <DiscoveryTileStatusCover key={`cover-${id}`} tileId={id} stageSize={stageSize} />
-            ))}
-            {DISCOVERY_TILE_ORDER.filter(showDoneBadge).map((id) => (
-              <DiscoveryTileDoneBadge key={`badge-${id}`} tileId={id} stageSize={stageSize} />
-            ))}
+            )}
           </div>
-
-          {activeTileId && activeConfig && sheetLayerStyle && (
-            <div
-              className={[
-                "bds-sheet-layer",
-                sheetExpanded ? "bds-sheet-layer--expanded" : "",
-                sheetPhase === "shrinking" ? "bds-sheet-layer--shrinking" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              style={sheetLayerStyle}
-              onTransitionEnd={handleSheetTransitionEnd}
-            >
-              <DiscoverySheetCard
-                key={activeTileId}
-                config={activeConfig}
-                initialValue={answers[activeTileId] ?? ""}
-                onChange={handleAnswerChange}
-                onDone={handleDone}
-                onCancel={handleCancel}
-                expanded={sheetExpanded}
-              />
-            </div>
-          )}
         </div>
       </div>
     </div>
