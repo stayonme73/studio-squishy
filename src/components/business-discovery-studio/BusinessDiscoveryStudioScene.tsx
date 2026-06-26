@@ -39,6 +39,8 @@ import DiscoveryTileStatusCover from "./DiscoveryTileStatusCover";
 
 /** Duration before transitioning reviewing panel → summary placeholder. */
 const REVIEWING_SUBMISSION_MS = 4200;
+/** Split grid / board slide transition — lock layout after this settles. */
+const SPLIT_TRANSITION_MS = 520;
 
 type RightPanelPhase = "reviewing" | "summary";
 
@@ -55,6 +57,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   const [sheetPhase, setSheetPhase] = useState<SheetPhase | null>(null);
   const [answers, setAnswers] = useState<DiscoveryAnswers>({});
   const [splitLayoutActive, setSplitLayoutActive] = useState(false);
+  const [splitLayoutSettled, setSplitLayoutSettled] = useState(false);
   const [rightPanelPhase, setRightPanelPhase] = useState<RightPanelPhase | null>(null);
 
   const {
@@ -190,6 +193,20 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   };
 
   useEffect(() => {
+    if (!splitLayoutActive) {
+      setSplitLayoutSettled(false);
+      return;
+    }
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setSplitLayoutSettled(true);
+      return;
+    }
+    const timer = window.setTimeout(() => setSplitLayoutSettled(true), SPLIT_TRANSITION_MS);
+    return () => window.clearTimeout(timer);
+  }, [splitLayoutActive]);
+
+  useEffect(() => {
     if (rightPanelPhase !== "reviewing") return;
     const timer = window.setTimeout(() => {
       setRightPanelPhase("summary");
@@ -227,6 +244,8 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
       className={[
         "bds-scene",
         splitLayoutActive ? "bds-scene--split" : "",
+        splitLayoutActive && !splitLayoutSettled ? "bds-scene--split-entering" : "",
+        splitLayoutSettled ? "bds-scene--split-settled" : "",
       ]
         .filter(Boolean)
         .join(" ")}
