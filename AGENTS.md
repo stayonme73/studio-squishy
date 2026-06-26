@@ -11,12 +11,17 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 **No business logic in UI components.** Components render data they receive. They do not decide what services to recommend, what deliverables exist, or how pricing is calculated. Keep business rules in the Service Catalog and Recommendation Engine; keep customer-facing presentation copy in the Discovery Summary Model.
 
-**Faithful implementation.** From this point forward, faithfully implement the architecture already designed. If a business rule appears missing, ask before creating one — do not invent business rules independently.
+**Faithful implementation.** Faithfully implement the architecture already designed. If a business rule appears missing, ask before creating one — do not invent business rules independently.
 
-**Architecture freeze.** After the Service Catalog foundation (schema v2), freeze the architecture:
+**Business rule freeze.** Do **not** freeze software architecture — caching, performance, DB indexing, API shape, maintainability, testing, and scalability should continue to evolve as needed.
 
-- No more renaming things
-- No more changing terminology
-- No more moving fields around
-- Changes only when a real customer exposed a flaw, or the business genuinely evolved
+Do **freeze business rules** unless validated by real customer experience or an intentional business decision:
+
+- Studio Services
+- Customer terminology
+- Production classes (Signature / Core / Essential)
+- Discovery philosophy
+- Recommendation philosophy
+- Production allocation rules
+- Customer choice rules
 <!-- END:studio-architecture-rules -->
