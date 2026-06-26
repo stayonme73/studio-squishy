@@ -4,6 +4,8 @@
   --bds-plate-w: 1024;
   --bds-plate-h: 682;
   --bds-board-margin: clamp(8px, 2vmin, 28px);
+  --bds-split-board: 38%;
+  --bds-split-panel: 62%;
   /* Match plate edge — avoids cream body flash if layout is still settling */
   background: #2e2d2b;
 }
@@ -42,24 +44,61 @@
   transform-origin: center center;
 }
 
+.business-discovery-studio .bds-scene__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.business-discovery-studio .bds-scene__backdrop::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  background: url("/welcome-hall/welcome-hall-scene-v4.png?v=1") center / cover no-repeat;
+  filter: blur(28px) brightness(0.52) saturate(0.82);
+  transform: scale(1.1);
+}
+
+.business-discovery-studio .bds-scene__backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, #2e2d2b 58%, transparent);
+}
+
+.business-discovery-studio .bds-scene--split .bds-scene__backdrop {
+  opacity: 1;
+}
+
 .business-discovery-studio .bds-scene--split {
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  gap: clamp(12px, 1.8vw, 28px);
+  gap: clamp(6px, 0.75vw, 14px);
+  padding: var(--bds-board-margin) clamp(6px, 0.9vw, 14px);
 }
 
 .business-discovery-studio .bds-scene--split .bds-scene__board {
-  flex: 0 0 48%;
-  max-width: 48%;
-  transform: scale(0.88);
+  flex: 0 0 var(--bds-split-board);
+  max-width: var(--bds-split-board);
+  transform: scale(0.84);
   transform-origin: center center;
 }
 
+.business-discovery-studio .bds-scene__board,
 .business-discovery-studio .bds-scene__panel {
-  flex: 1 1 52%;
+  position: relative;
+  z-index: 1;
+}
+
+.business-discovery-studio .bds-scene__panel {
+  flex: 0 0 var(--bds-split-panel);
   min-width: min(480px, 100%);
-  max-width: 52%;
+  max-width: var(--bds-split-panel);
   height: 100%;
   min-height: 0;
   display: flex;
@@ -1082,7 +1121,7 @@
   }
 
   .business-discovery-studio .bds-scene--split .bds-scene__board {
-    transform: scale(0.88);
+    transform: scale(0.84);
   }
 }
 

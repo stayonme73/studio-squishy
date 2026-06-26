@@ -229,6 +229,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
         .join(" ")}
       aria-label={customerJourneyStepName("project-discovery")}
     >
+      <div className="bds-scene__backdrop" aria-hidden="true" />
       <div className="bds-scene__board">
       <div
         className={[
