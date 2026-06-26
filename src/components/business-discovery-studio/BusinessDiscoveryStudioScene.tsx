@@ -18,6 +18,7 @@ import {
   sceneRectToCoverPercent,
   type DiscoveryTileId,
 } from "@/config/business-discovery-studio";
+import { isDiscoveryTileAnswerComplete } from "@/lib/business-discovery-completion";
 import {
   readDiscoveryAnswers,
   saveDiscoveryAnswers,
@@ -55,11 +56,12 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     setAnswers(readDiscoveryAnswers());
   }, []);
 
-  const allRequiredComplete = DISCOVERY_REQUIRED_TILE_IDS.every((id) =>
-    Boolean(answers[id]?.trim()),
-  );
+  const isTileComplete = (id: DiscoveryTileId) =>
+    isDiscoveryTileAnswerComplete(id, answers[id]);
 
-  const isTileComplete = (id: DiscoveryTileId) => Boolean(answers[id]?.trim());
+  const allRequiredComplete = DISCOVERY_REQUIRED_TILE_IDS.every((id) =>
+    isTileComplete(id),
+  );
 
   const showDoneBadge = (id: DiscoveryTileId) =>
     isTileComplete(id) && activeTileId !== id;
@@ -249,14 +251,11 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
             );
           })}
 
-          {/* Plate-anchored ✓ badges — single overlay, one badge per completed tile */}
+          {/* Plate-anchored ✓ badges — one badge per validated completed tile */}
           <div className="bds-done-badges" aria-hidden="true">
-            {DISCOVERY_TILE_ORDER.map(
-              (id) =>
-                showDoneBadge(id) && (
-                  <DiscoveryTileDoneBadge key={id} tileId={id} stageSize={stageSize} />
-                ),
-            )}
+            {DISCOVERY_TILE_ORDER.filter(showDoneBadge).map((id) => (
+              <DiscoveryTileDoneBadge key={id} tileId={id} stageSize={stageSize} />
+            ))}
           </div>
 
           {activeTileId && activeConfig && sheetLayerStyle && (
