@@ -4,11 +4,17 @@
   --bds-plate-w: 1024;
   --bds-plate-h: 682;
   --bds-board-margin: clamp(8px, 2vmin, 28px);
+  width: 100%;
+  max-width: none;
   /* Lobby fallback while backdrop image loads — blurred layer sits on top in .bds-scene */
   background:
     color-mix(in srgb, #2e2d2b 30%, transparent),
     url("/welcome-hall/welcome-hall-scene-v4.png?v=1") center / cover no-repeat,
     #2e2d2b;
+}
+
+body:has(.business-discovery-studio) {
+  background: #2e2d2b;
 }
 
 .business-discovery-studio .bds-scene {
@@ -44,8 +50,10 @@
 }
 
 .business-discovery-studio .bds-scene__backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
@@ -55,10 +63,12 @@
 .business-discovery-studio .bds-scene__backdrop::before {
   content: "";
   position: absolute;
-  inset: -10%;
-  background: url("/welcome-hall/welcome-hall-scene-v4.png?v=1") center / cover no-repeat;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: url("/welcome-hall/welcome-hall-scene-v4.png?v=1") center center / cover no-repeat;
   filter: blur(20px) brightness(0.62) saturate(0.88);
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .business-discovery-studio .bds-scene__backdrop::after {
@@ -203,7 +213,8 @@
   min-height: 0;
   min-width: 0;
   overflow: hidden;
-  background: #2e2d2b;
+  /* Transparent — lobby backdrop fills letterbox gutters beside the contain-fit canvas. */
+  background: transparent;
 }
 
 /**
@@ -285,6 +296,8 @@
 @media (min-width: 1025px) {
   main.business-discovery-studio.journey-shell,
   main.journey-shell.business-discovery-studio {
+    width: 100%;
+    max-width: none;
     height: 100dvh;
     min-height: 100dvh;
     max-height: 100dvh;
