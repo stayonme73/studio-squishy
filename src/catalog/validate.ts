@@ -3,12 +3,74 @@
  * Runs at module load to catch duplicate IDs and broken dependency refs early.
  */
 
-import type { ServiceCatalogEntry, ServiceId } from "@/catalog/types";
+import { getServiceCategoryById } from "@/catalog/categories";
+import type { ServiceCatalogEntry, ServiceId, StudioServiceEntry } from "@/catalog/types";
+import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
 
 export class ServiceCatalogValidationError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ServiceCatalogValidationError";
+  }
+}
+
+function validateV2Fields(service: StudioServiceEntry, ids: ReadonlySet<ServiceId>): void {
+  if (service.schemaVersion !== CATALOG_SCHEMA_VERSION) {
+    throw new ServiceCatalogValidationError(
+      `Service "${service.id}" has unsupported schemaVersion: ${String(service.schemaVersion)}.`,
+    );
+  }
+
+  if (!getServiceCategoryById(service.category)) {
+    throw new ServiceCatalogValidationError(
+      `Service "${service.id}" references unknown category "${service.category}".`,
+    );
+  }
+
+  if (!service.customerProblemSolved?.trim()) {
+    throw new ServiceCatalogValidationError(
+      `Service "${service.id}" is missing customerProblemSolved.`,
+    );
+  }
+
+  if (!service.customerReceives?.trim()) {
+    throw new ServiceCatalogValidationError(
+      `Service "${service.id}" is missing customerReceives.`,
+    );
+  }
+
+  if (!service.serviceClass) {
+    throw new ServiceCatalogValidationError(`Service "${service.id}" is missing serviceClass.`);
+  }
+
+  if (service.includedRevisionRounds < 0) {
+    throw new ServiceCatalogValidationError(
+      `Service "${service.id}" has invalid includedRevisionRounds.`,
+    );
+  }
+
+  if (service.deliveryFormats.length === 0) {
+    throw new ServiceCatalogValidationError(`Service "${service.id}" has no deliveryFormats.`);
+  }
+
+  if (!service.serviceStatus) {
+    throw new ServiceCatalogValidationError(`Service "${service.id}" is missing serviceStatus.`);
+  }
+
+  if (service.discoveryTriggers.length === 0 && service.discoveryMapping.length === 0) {
+    throw new ServiceCatalogValidationError(
+      `Service "${service.id}" has no discoveryTriggers or discoveryMapping.`,
+    );
+  }
+
+  if (Array.isArray(service.canSubstitute)) {
+    for (const substituteId of service.canSubstitute) {
+      if (!ids.has(substituteId)) {
+        throw new ServiceCatalogValidationError(
+          `Service "${service.id}" canSubstitute references unknown service "${substituteId}".`,
+        );
+      }
+    }
   }
 }
 
@@ -34,6 +96,10 @@ export function validateServiceCatalog(services: readonly ServiceCatalogEntry[])
       throw new ServiceCatalogValidationError(`Duplicate service id: ${service.id}`);
     }
     ids.add(service.id);
+  }
+
+  for (const service of services) {
+    validateV2Fields(service, ids);
   }
 
   for (const service of services) {

@@ -3,14 +3,26 @@
  *
  * Architecture: Catalog → Recommendation Engine → Discovery Summary → Payment → Campaign Record
  * Import from `@/catalog` only; do not reach into submodules from UI.
+ *
+ * Schema v2 adds StudioServiceEntry with category, service class, discovery triggers,
+ * requirements, and governance fields. ServiceCatalogEntry remains an alias for engine compat.
  */
 
+export {
+  CATALOG_SCHEMA_VERSION,
+} from "@/catalog/types";
+
 export type {
+  CatalogSchemaVersion,
+  DeliveryFormatId,
   DiscoveryMappingRule,
   DiscoverySignalKind,
+  DiscoveryTrigger,
   ServiceBillingModel,
   ServiceCatalogEntry,
   ServiceCatalogStatus,
+  ServiceCategoryId,
+  ServiceClass,
   ServiceDeliverable,
   ServiceId,
   ServicePricing,
@@ -18,19 +30,42 @@ export type {
   ServiceProductionEffortTier,
   ServiceProductionTime,
   StudioNeedId,
+  StudioServiceEntry,
+  StudioServiceStatus,
 } from "@/catalog/types";
+
+export {
+  getServiceCategories,
+  getServiceCategoryById,
+  isServiceCategoryId,
+  SERVICE_CATEGORIES,
+} from "@/catalog/categories";
+export type { ServiceCategoryDefinition } from "@/catalog/categories";
+
+export {
+  effortTierToServiceClass,
+  getDiscoveryMappingForEngine,
+  serviceStatusToCatalogStatus,
+} from "@/catalog/compat";
 
 export { SERVICE_CATALOG } from "@/catalog/services";
 
 export {
   getActiveServices,
+  getAddOnEligibleServices,
   getDiscoveryRulesForService,
+  getDiscoveryTriggersForService,
   getServiceById,
   getServiceCatalog,
   getServiceDependencies,
   getServiceIds,
+  getServicesByCategory,
+  getServicesByServiceClass,
+  getServicesByServiceStatus,
   getServicesByStatus,
   getServicesForNeed,
+  getStudioServices,
+  getUpgradeEligibleServices,
   isServiceId,
 } from "@/catalog/accessors";
 
