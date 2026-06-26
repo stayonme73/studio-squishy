@@ -169,6 +169,49 @@
   gap: 1rem;
 }
 
+.ps-recommend__lead,
+.ps-recommend__why-body,
+.ps-changes__powers-intro,
+.ps-changes__auto-update {
+  margin: 0;
+  color: var(--utility-text);
+}
+
+.ps-recommend__lead {
+  margin-bottom: 0.75rem;
+}
+
+.ps-recommend__service-list,
+.ps-changes__powers {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.ps-recommend__service-name {
+  margin: 0;
+}
+
+.ps-recommend__why-label {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ps-recommend__why-body {
+  color: var(--utility-text-muted);
+}
+
+.ps-changes__powers-intro {
+  margin-bottom: 0.35rem;
+}
+
+.ps-changes__auto-update {
+  margin-bottom: 0.75rem;
+  color: var(--utility-text-muted);
+}
+
 .ps-recommend__title {
   margin: 0 0 0.35rem;
   font-size: 1.05rem;

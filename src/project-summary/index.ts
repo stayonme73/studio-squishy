@@ -7,6 +7,6 @@
 
 export type { DiscoveryAnswerHeardItem } from "@/project-summary/types";
 
-export { PROJECT_SUMMARY_LABELS } from "@/project-summary/types";
+export { PROJECT_SUMMARY_LABELS, PROJECT_SUMMARY_MOCK } from "@/project-summary/types";
 
 export { buildDiscoveryAnswersHeard } from "@/project-summary/buildDiscoveryAnswersHeard";

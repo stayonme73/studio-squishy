@@ -2,6 +2,9 @@
  * Recommendation Engine — pure scoring against catalog discoveryMapping rules.
  * Catalog defines WHAT; this module decides WHICH services fit the discovery brief.
  * Production allocation limits are enforced after scoring via central catalog config.
+ *
+ * Locked principle: Recommendation, Not Direction — docs/recommendation-not-direction-v1-locked.md
+ * The Studio recommends. The client decides. This module returns suggestions only; it never forces purchase.
  */
 
 import { getActiveServices, getServiceCatalog } from "@/catalog/accessors";

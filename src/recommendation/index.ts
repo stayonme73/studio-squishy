@@ -3,6 +3,8 @@
  *
  * Architecture: Catalog → Recommendation Engine → Discovery Summary → Payment → Campaign Record
  * Import from `@/recommendation` only; do not reach into submodules from UI.
+ *
+ * Principles (locked): RECOMMENDATION_PRINCIPLES.md · docs/recommendation-not-direction-v1-locked.md
  */
 
 export type {

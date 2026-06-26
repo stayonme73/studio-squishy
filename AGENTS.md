@@ -21,13 +21,23 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Customer terminology
 - Production classes (Signature / Core / Essential)
 - Discovery philosophy
-- Recommendation philosophy
+- Recommendation philosophy — **Recommendation, Not Direction** (`docs/recommendation-not-direction-v1-locked.md`, `src/recommendation/RECOMMENDATION_PRINCIPLES.md`) — *The Studio recommends. The client decides.*
 - Production allocation rules
 - Customer choice rules
 - Discovery room badge offsets (`DISCOVERY_BADGE_OFFSET` in `src/config/business-discovery-studio.ts`) — do not modify without Tagia approval
 
 **Browser zoom standard:** If a customer has to change their browser zoom to use The Studio, it's a bug.
 <!-- END:studio-architecture-rules -->
+
+<!-- BEGIN:recommendation-not-direction-lock -->
+# Recommendation — locked principle
+
+**Doc:** `docs/recommendation-not-direction-v1-locked.md` · **Engine:** `src/recommendation/RECOMMENDATION_PRINCIPLES.md`
+
+**The Studio recommends. The client decides.**
+
+The Recommendation Engine guides; it never forces purchase of recommended services. Clients may accept, remove, substitute, add, or build a custom plan from approved catalog services. Project Summary copy uses **Our Recommendation** + **Customize Your Studio Plan** sections — see locked doc for verbatim structure.
+<!-- END:recommendation-not-direction-lock -->
 
 <!-- BEGIN:customer-journey-lock -->
 # Customer journey — locked names

@@ -22,10 +22,11 @@
 
 These routes sit between Project Discovery and Secure Checkout — not numbered journey rooms:
 
+- **Project Summary** — `/project-summary` — post-discovery bridge; presents **Our Recommendation** and **Customize Your Studio Plan** under the locked [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) principle (*The Studio recommends. The client decides.*)
 - **Studio Plan Review** — `/studio-plan-review`
 - **Discovery Summary** (prototype/dev) — `/discovery-summary`
 
-Architecture: Catalog → Recommendation Engine → Studio Plan Review → Secure Checkout → Project Record.
+Architecture: Catalog → Recommendation Engine → Project Summary / Studio Plan Review → Secure Checkout → Project Record.
 
 ## Removed from active flow (archived)
 

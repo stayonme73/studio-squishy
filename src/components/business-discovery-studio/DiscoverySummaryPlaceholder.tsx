@@ -1,32 +1,55 @@
 "use client";
 
+import {
+  PROJECT_SUMMARY_LABELS,
+  PROJECT_SUMMARY_MOCK,
+} from "@/project-summary";
+
 type Props = {
   onContinue: () => void;
 };
 
-/** Minimal Studio Plan shell — full recommendation content comes in a later milestone. */
+/** Project Summary shell in split panel — mock recommendation structure until Discovery Mapping is wired. */
 export default function DiscoverySummaryPlaceholder({ onContinue }: Props) {
   return (
     <aside
       className="bds-summary-panel"
-      aria-labelledby="bds-summary-title"
-      aria-describedby="bds-summary-body"
+      aria-labelledby="bds-summary-recommend-title"
+      aria-describedby="bds-summary-customize-lead"
     >
       <div className="bds-summary-panel__inner">
         <p className="bds-summary-panel__eyebrow">Your Studio Plan</p>
-        <h2 id="bds-summary-title" className="bds-summary-panel__title">
-          Project Summary
-        </h2>
-        <p id="bds-summary-body" className="bds-summary-panel__body">
-          We&apos;ve reviewed your discovery answers. Your personalized Studio Plan and service
-          recommendations will appear here.
-        </p>
-        <div className="bds-summary-panel__placeholder" aria-hidden="true">
-          <div className="bds-summary-panel__placeholder-line bds-summary-panel__placeholder-line--wide" />
-          <div className="bds-summary-panel__placeholder-line" />
-          <div className="bds-summary-panel__placeholder-line" />
-          <div className="bds-summary-panel__placeholder-line bds-summary-panel__placeholder-line--short" />
-        </div>
+
+        <section className="bds-summary-panel__section" aria-labelledby="bds-summary-recommend-title">
+          <h2 id="bds-summary-recommend-title" className="bds-summary-panel__title">
+            {PROJECT_SUMMARY_LABELS.recommendTitle}
+          </h2>
+          <p className="bds-summary-panel__body">{PROJECT_SUMMARY_LABELS.recommendLead}</p>
+          <ul className="bds-summary-panel__service-list">
+            {PROJECT_SUMMARY_MOCK.services.map((service) => (
+              <li key={service}>{service}</li>
+            ))}
+          </ul>
+          <h3 className="bds-summary-panel__subtitle">{PROJECT_SUMMARY_LABELS.recommendWhyLabel}</h3>
+          <p className="bds-summary-panel__body">{PROJECT_SUMMARY_MOCK.whyRationale}</p>
+        </section>
+
+        <section className="bds-summary-panel__section" aria-labelledby="bds-summary-customize-title">
+          <h2 id="bds-summary-customize-title" className="bds-summary-panel__title">
+            {PROJECT_SUMMARY_LABELS.changesTitle}
+          </h2>
+          <p id="bds-summary-customize-lead" className="bds-summary-panel__body">
+            {PROJECT_SUMMARY_LABELS.changesLead}
+          </p>
+          <p className="bds-summary-panel__body">{PROJECT_SUMMARY_LABELS.changesPowersIntro}</p>
+          <ul className="bds-summary-panel__powers-list">
+            {PROJECT_SUMMARY_LABELS.changesPowers.map((power) => (
+              <li key={power}>{power}</li>
+            ))}
+          </ul>
+          <p className="bds-summary-panel__body">{PROJECT_SUMMARY_LABELS.changesAutoUpdate}</p>
+        </section>
+
         <button
           type="button"
           className="bds-sheet__btn bds-sheet__btn--primary bds-summary-panel__continue"
