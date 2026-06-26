@@ -2,6 +2,7 @@
 
 import {
   useCallback,
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -30,9 +31,13 @@ import { submitDiscoveryCampaign } from "@/lib/studio-board-campaign";
 import { studioBoard } from "@/config/studio-board";
 import { customerJourneyStepName } from "@/config/customer-journey-v1";
 
+import DiscoveryReviewingPanel from "./DiscoveryReviewingPanel";
 import DiscoverySheetCard from "./DiscoverySheetCard";
 import DiscoveryTileDoneBadge from "./DiscoveryTileDoneBadge";
 import DiscoveryTileStatusCover from "./DiscoveryTileStatusCover";
+
+/** Duration before transitioning to post-submit confirmation. */
+const REVIEWING_SUBMISSION_MS = 4200;
 
 type Props = {
   debug?: boolean;
@@ -46,6 +51,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   const [activeTileId, setActiveTileId] = useState<DiscoveryTileId | null>(null);
   const [sheetPhase, setSheetPhase] = useState<SheetPhase | null>(null);
   const [answers, setAnswers] = useState<DiscoveryAnswers>({});
+  const [reviewingSubmission, setReviewingSubmission] = useState(false);
   const [showDiscoveryReceived, setShowDiscoveryReceived] = useState(false);
 
   const {
@@ -170,11 +176,20 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
       saveDiscoveryAnswers(finalAnswers);
       submitDiscoveryCampaign(finalAnswers);
       beginShrink();
-      setShowDiscoveryReceived(true);
+      setReviewingSubmission(true);
       return;
     }
     beginShrink();
   };
+
+  useEffect(() => {
+    if (!reviewingSubmission) return;
+    const timer = window.setTimeout(() => {
+      setReviewingSubmission(false);
+      setShowDiscoveryReceived(true);
+    }, REVIEWING_SUBMISSION_MS);
+    return () => window.clearTimeout(timer);
+  }, [reviewingSubmission]);
 
   const continueToProjectSummary = useCallback(() => {
     setShowDiscoveryReceived(false);
@@ -300,6 +315,8 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
           </div>
         </div>
       </div>
+
+      {reviewingSubmission ? <DiscoveryReviewingPanel /> : null}
 
       {showDiscoveryReceived ? (
         <div className="bds-discovery-received" role="dialog" aria-modal="true" aria-labelledby="bds-discovery-received-title">
