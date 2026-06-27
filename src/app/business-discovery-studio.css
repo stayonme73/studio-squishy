@@ -114,13 +114,13 @@ body:has(.business-discovery-studio) {
   flex: none;
   width: 100%;
   max-width: var(--bds-board-zone);
+  min-height: 0;
   min-width: 0;
   z-index: 2;
   transform: translateX(0);
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: clamp(6px, 1vh, 12px);
+  align-items: center;
+  justify-content: center;
 }
 
 /** One-shot board slide — explicit entering class avoids @starting-style re-firing on re-renders. */
@@ -268,19 +268,6 @@ body:has(.business-discovery-studio) {
   font-size: clamp(0.8125rem, 1.5vh, 0.9375rem);
   font-weight: 600;
   color: var(--studio-denim, #2c3e50);
-}
-
-.business-discovery-studio .bds-scene--split .bds-plate--split-context {
-  flex: 1 1 auto;
-  min-height: 0;
-  min-width: 0;
-}
-
-.business-discovery-studio .bds-scene--split .bds-plate--split-context .bds-plate-canvas {
-  width: min(
-    var(--bds-board-zone),
-    calc((100dvh - 2 * var(--bds-board-margin) - 7rem) * 1024 / 682)
-  );
 }
 
 @keyframes bds-split-panel-in {

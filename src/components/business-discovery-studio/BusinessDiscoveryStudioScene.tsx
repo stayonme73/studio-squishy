@@ -35,7 +35,6 @@ import type { PanelPhase } from "@/project-summary";
 import DiscoveryReviewingPanel from "./DiscoveryReviewingPanel";
 import DiscoverySheetCard from "./DiscoverySheetCard";
 import DiscoverySummaryPlaceholder from "./DiscoverySummaryPlaceholder";
-import StudioPlanContextSkeleton from "./StudioPlanContextSkeleton";
 import DiscoveryTileDoneBadge from "./DiscoveryTileDoneBadge";
 import DiscoveryTileStatusCover from "./DiscoveryTileStatusCover";
 
@@ -253,12 +252,10 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     >
       <div className="bds-scene__backdrop" aria-hidden="true" />
       <div className="bds-scene__board">
-        {splitLayoutActive ? <StudioPlanContextSkeleton /> : null}
         <div
           className={[
             "bds-plate",
             activeTileId ? "bds-plate--sheet-open" : "",
-            splitLayoutActive ? "bds-plate--split-context" : "",
           ]
             .filter(Boolean)
             .join(" ")}
