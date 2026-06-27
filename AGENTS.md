@@ -28,6 +28,8 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Discovery room badge offsets (`DISCOVERY_BADGE_OFFSET` in `src/config/business-discovery-studio.ts`) — do not modify without Tagia approval
 
 **Browser zoom standard:** If a customer has to change their browser zoom to use The Studio, it's a bug.
+
+**Build order (locked — work priority):** Finish the customer-facing journey before wiring Discovery Mapping or Recommendation Engine scoring. Philosophy docs are locked; UI with mock data is fine. Do **not** implement scoring, mapping, or engine wiring until Project Summary polish, slide-out Secure Checkout, and end-to-end journey verification (Discovery → Project Summary → payment) are complete. See `docs/customer-journey-v1-locked.md` (Build order) · `docs/discovery-mapping-v1-planned.md` (PAUSED).
 <!-- END:studio-architecture-rules -->
 
 <!-- BEGIN:recommendation-not-direction-lock -->

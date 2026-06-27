@@ -4,6 +4,19 @@
 
 **Code reference:** `src/config/customer-journey-v1.ts`
 
+## Build order (locked)
+
+**Status:** Locked build sequence — finish the customer experience before wiring intelligence. Philosophy docs are locked; UI with mock data is acceptable until step 4.
+
+| # | Work item | Notes |
+|---|-----------|-------|
+| 1 | Finish Project Summary polish | Locked copy structure; mock data OK |
+| 2 | Build Secure Checkout experience (slide-out panel) | See [studio-plan-slide-out-checkout-v1-planned.md](studio-plan-slide-out-checkout-v1-planned.md) |
+| 3 | Verify complete customer journey | Discovery → Project Summary → payment |
+| 4 | Begin Discovery Mapping and Recommendation Engine wiring | **Deferred** until 1–3 complete |
+
+**Paused (do not wire yet):** Discovery Mapping, Recommendation Engine scoring/mapping, and Discovery Summary engine integration. The Recommendation Engine should support a finished customer experience — not define it prematurely. See [discovery-mapping-v1-planned.md](discovery-mapping-v1-planned.md).
+
 ## Active journey (9 steps)
 
 | # | Customer name | Former name | Route | Notes |

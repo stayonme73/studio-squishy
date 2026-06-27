@@ -1,5 +1,9 @@
 # Recommendation Engine — principles (locked)
 
+## Implementation status
+
+**Philosophy locked; wiring paused.** Do not implement Discovery Mapping, scoring, or engine-to-UI wiring until the customer journey is complete (Project Summary polish → slide-out Secure Checkout → journey verification). Mock data in Project Summary demonstrates the per-service Why? pattern until step 4. See `docs/customer-journey-v1-locked.md` (Build order) · `docs/discovery-mapping-v1-planned.md`.
+
 **Locked docs:**
 - [Recommendation, Not Direction](../../docs/recommendation-not-direction-v1-locked.md) — customer choice
 - [Recommendation Engine Philosophy V1](../../docs/recommendation-engine-philosophy-v1-locked.md) — engine output, flow, traceability

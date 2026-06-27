@@ -6,6 +6,10 @@
 
 **Related locks:** [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) · [Customer Journey V1](customer-journey-v1-locked.md)
 
+## Implementation status
+
+**Philosophy locked; engine wiring deferred.** Discovery Mapping and Recommendation Engine integration begin **after** Project Summary polish, slide-out Secure Checkout, and end-to-end journey verification (Discovery → Project Summary → payment). Until then, Project Summary may use mock data that follows this doc's copy structure and per-service Why? pattern. See [Customer Journey V1 — Build order](customer-journey-v1-locked.md#build-order-locked) · [Discovery Mapping (planned, PAUSED)](discovery-mapping-v1-planned.md).
+
 ---
 
 ## Core principle (unchanged)
@@ -189,7 +193,7 @@ Our recommendations are based entirely on the information you shared during Disc
 
 ## What this lock does *not* change
 
-- Discovery Mapping rule content or scoring weights (implementation continues separately — empty OK for now)
+- Discovery Mapping rule content or scoring weights (wiring **paused** until build order step 4 — see [Build order](customer-journey-v1-locked.md#build-order-locked))
 - Service Catalog entries, pricing, or production allocation limits
 - Discovery room badge offsets (`DISCOVERY_BADGE_OFFSET`)
 - Discovery board UI or split-layout CSS mechanics
