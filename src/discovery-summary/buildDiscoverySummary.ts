@@ -39,10 +39,6 @@ const CUSTOMER_WARNING_MESSAGES: Record<
     "Some recommended services work best as a combined package — we'll confirm the full scope before checkout.",
   "low-confidence-match": () =>
     "This is our best match from what you shared so far — a quick review before checkout is recommended.",
-  "no-recommendations": () =>
-    "We couldn't match your answers to a specific package yet — update your discovery answers or reach out for help.",
-  "outside-studio-services": () =>
-    "This request may be outside our current Studio Services.",
 };
 
 function needLabel(value: string): string {

@@ -106,9 +106,7 @@ export type RecommendationWarningKind =
   | "missing-discovery-answer"
   | "inactive-service-match"
   | "unmet-dependency"
-  | "low-confidence-match"
-  | "no-recommendations"
-  | "outside-studio-services";
+  | "low-confidence-match";
 
 export type RecommendationWarning = {
   kind: RecommendationWarningKind;

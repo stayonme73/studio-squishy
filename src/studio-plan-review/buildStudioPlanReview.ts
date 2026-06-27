@@ -22,10 +22,6 @@ import {
 const CUSTOMER_WARNING_MESSAGES: Partial<
   Record<RecommendationResult["warnings"][number]["kind"], string>
 > = {
-  "no-recommendations":
-    "We couldn't match your answers to specific Studio Services yet — you can still add services from the menu below.",
-  "outside-studio-services":
-    "This request may be outside our current Studio Services — review the menu or update your discovery answers.",
   "low-confidence-match":
     "This is our best match from what you shared so far — review your plan before approving.",
 };

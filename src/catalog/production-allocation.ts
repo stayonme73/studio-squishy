@@ -74,7 +74,3 @@ export const CUSTOMER_SECTION_LABELS = {
 } as const;
 
 export type CustomerSectionLabels = typeof CUSTOMER_SECTION_LABELS;
-
-/** Safety rule message when discovery cannot map to approved Studio Services. */
-export const OUTSIDE_STUDIO_SERVICES_MESSAGE =
-  "This request may be outside our current Studio Services." as const;

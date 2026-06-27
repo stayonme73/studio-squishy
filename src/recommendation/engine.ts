@@ -9,7 +9,6 @@
 
 import { getActiveServices, getServiceCatalog } from "@/catalog/accessors";
 import {
-  OUTSIDE_STUDIO_SERVICES_MESSAGE,
   PRODUCTION_ALLOCATION_LIMITS,
 } from "@/catalog/production-allocation";
 import type {
@@ -343,32 +342,6 @@ function buildLowConfidenceWarning(
   return null;
 }
 
-function buildOutsideStudioServicesWarning(
-  recommendations: readonly ServiceRecommendation[],
-): RecommendationWarning | null {
-  if (recommendations.length === 0) {
-    return {
-      kind: "outside-studio-services",
-      message: OUTSIDE_STUDIO_SERVICES_MESSAGE,
-    };
-  }
-
-  const top = recommendations[0];
-  const runnerUp = recommendations[1];
-  const isLowConfidence = top.score <= LOW_CONFIDENCE_MAX_SCORE;
-  const isTie = runnerUp !== undefined && runnerUp.score === top.score;
-
-  if (isLowConfidence || isTie) {
-    return {
-      kind: "outside-studio-services",
-      message: OUTSIDE_STUDIO_SERVICES_MESSAGE,
-      serviceId: top.serviceId,
-    };
-  }
-
-  return null;
-}
-
 function buildWarnings(
   brief: DiscoveryBrief,
   recommendations: readonly ServiceRecommendation[],
@@ -386,16 +359,6 @@ function buildWarnings(
 
   const lowConfidence = buildLowConfidenceWarning(recommendations);
   if (lowConfidence) warnings.push(lowConfidence);
-
-  const outsideStudioServices = buildOutsideStudioServicesWarning(recommendations);
-  if (outsideStudioServices) warnings.push(outsideStudioServices);
-
-  if (recommendations.length === 0) {
-    warnings.push({
-      kind: "no-recommendations",
-      message: "No catalog discovery rules matched the brief.",
-    });
-  }
 
   return warnings.sort((a, b) => {
     const kindCompare = a.kind.localeCompare(b.kind);
@@ -415,8 +378,7 @@ function computeRequiresApproval(
   return warnings.some(
     (warning) =>
       warning.kind === "unmet-dependency" ||
-      warning.kind === "low-confidence-match" ||
-      warning.kind === "outside-studio-services",
+      warning.kind === "low-confidence-match",
   );
 }
 
