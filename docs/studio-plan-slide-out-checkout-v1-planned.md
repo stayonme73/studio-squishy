@@ -2,7 +2,7 @@
 
 **Status:** NOT IMPLEMENTED — layout prep only. Do not build checkout UI, Stripe integration, or payment flows from this doc until Tagia approves implementation.
 
-**Related:** `docs/customer-journey-v1-locked.md` (Planned evolution) · `AGENTS.md` (checkout panel pattern note)
+**Related:** `docs/customer-journey-v1-locked.md` (Planned evolution) · `docs/recommendation-engine-philosophy-v1-locked.md` (6-step flow) · `AGENTS.md` (checkout panel pattern note)
 
 ---
 
@@ -35,10 +35,10 @@ Studio Lobby → Studio Guide → Project Discovery → Studio Plan → Slide-ou
 │  (always visible, stable column)│  (fixed width ~22rem, no layout reflow)    │
 │                                 │                                            │
 │  Your Studio Plan               │  ┌─ Phase A (current) ─────────────────┐   │
-│  ─────────────────              │  │ Reviewing → Recommendations        │   │
-│  Services                       │  │ (Our Recommendation + Customize)   │   │
+│  ─────────────────              │  │ Reviewing → Studio Recommendation  │   │
+│  Services                       │  │ (Our Recommendation + optional     │   │
+│    • [service]                  │  │  packages + Customize + Disclaimer)│   │
 │    • [service]                  │  └────────────────────────────────────┘   │
-│    • [service]                  │                                            │
 │  Included / Additional          │  ┌─ Phase B (FUTURE — not built) ─────┐   │
 │  Total: $____                   │  │ 🔒 Secure Checkout                   │   │
 │                                 │  │ Review your Studio Plan and          │   │
@@ -72,7 +72,7 @@ The slide-out checkout keeps the Studio Plan visible on the left while payment h
 | Phase | ID | Status | Right panel content |
 |-------|-----|--------|---------------------|
 | Reviewing | `reviewing` | Implemented | Animated “Reviewing your goals…” state |
-| Summary | `summary` | Implemented (placeholder) | Our Recommendation + Customize Your Studio Plan |
+| Summary | `summary` | Implemented (placeholder) | Our Recommendation + Prefer a bundled option? + Customize + Disclaimer |
 | Checkout | `checkout` | **NOT IMPLEMENTED** | Secure Checkout form (card, billing, agreement, Pay Now) |
 
 CSS custom property for future wiring: `--bds-panel-phase: reviewing | summary | checkout`
@@ -85,6 +85,7 @@ Type reference: `PanelPhase` in `src/project-summary/types.ts`
 
 - `/payment` route and Secure Checkout page remain active
 - Recommendation Engine, Service Catalog, Discovery Summary business rules
+- [Recommendation Engine Philosophy V1](recommendation-engine-philosophy-v1-locked.md) — approve-before-pay; disclaimer before checkout
 - Recommendation, Not Direction copy structure
 - No Stripe, payment form, or slide-out checkout UI in this prep pass
 

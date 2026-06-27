@@ -99,16 +99,108 @@
 }
 
 .project-summary-page .ps-recommend__service-list {
-  gap: 0.5rem;
+  gap: 1rem;
   margin-bottom: 1.1rem;
+}
+
+.project-summary-page .ps-recommend__service-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-left: 0.35rem;
+  border-left: 3px solid var(--ps-accent-warm);
 }
 
 .project-summary-page .ps-recommend__service-name {
   font-size: 1.02rem;
   font-weight: 600;
   line-height: 1.45;
-  padding-left: 0.35rem;
-  border-left: 3px solid var(--ps-accent-warm);
+}
+
+.project-summary-page .ps-recommend__service-why {
+  margin-top: 0.15rem;
+}
+
+.project-summary-page .ps-recommend__service-why .ps-recommend__why-label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ps-eucalyptus);
+  margin-top: 0;
+  display: inline;
+}
+
+.project-summary-page .ps-recommend__service-why .ps-recommend__why-body {
+  display: inline;
+  font-size: 0.98rem;
+  margin-left: 0.25rem;
+}
+
+.project-summary-page .ps-packages__lead {
+  font-size: 1.02rem;
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+.project-summary-page .ps-packages__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.85rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.project-summary-page .ps-packages__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: var(--ps-card-alt);
+  border: 1px solid var(--utility-border);
+}
+
+.project-summary-page .ps-packages__name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ps-eucalyptus);
+  margin: 0;
+}
+
+.project-summary-page .ps-packages__tagline {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ps-charcoal-muted);
+  margin: 0;
+  flex: 1;
+}
+
+.project-summary-page .ps-packages__price {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ps-charcoal);
+  margin: 0;
+}
+
+.project-summary-page .ps-packages__select {
+  margin-top: 0.35rem;
+  width: 100%;
+}
+
+.project-summary-page .ps-disclaimer__body {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--ps-charcoal-muted);
+  margin-bottom: 1.1rem;
+}
+
+.project-summary-page .ps-approve__total {
+  margin-top: 0.5rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--utility-border);
+  font-size: 1.1rem;
+  color: var(--ps-eucalyptus);
+  margin-bottom: 1rem;
 }
 
 .project-summary-page .ps-recommend__why-label {

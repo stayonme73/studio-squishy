@@ -5,7 +5,12 @@
  * Import from `@/project-summary` only; do not reach into submodules from UI.
  */
 
-export type { DiscoveryAnswerHeardItem, PanelPhase } from "@/project-summary/types";
+export type {
+  DiscoveryAnswerHeardItem,
+  PanelPhase,
+  ProjectSummaryMockPackage,
+  ProjectSummaryMockService,
+} from "@/project-summary/types";
 
 export { PROJECT_SUMMARY_LABELS, PROJECT_SUMMARY_MOCK } from "@/project-summary/types";
 

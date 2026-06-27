@@ -22,6 +22,7 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Production classes (Signature / Core / Essential)
 - Discovery philosophy
 - Recommendation philosophy — **Recommendation, Not Direction** (`docs/recommendation-not-direction-v1-locked.md`, `src/recommendation/RECOMMENDATION_PRINCIPLES.md`) — *The Studio recommends. The client decides.*
+- Recommendation Engine philosophy — **service-first, traceable Why?, packages as optional shortcuts** (`docs/recommendation-engine-philosophy-v1-locked.md`) — locked post-discovery flow and Project Summary structure
 - Production allocation rules
 - Customer choice rules
 - Discovery room badge offsets (`DISCOVERY_BADGE_OFFSET` in `src/config/business-discovery-studio.ts`) — do not modify without Tagia approval
@@ -32,11 +33,11 @@ Do **freeze business rules** unless validated by real customer experience or an 
 <!-- BEGIN:recommendation-not-direction-lock -->
 # Recommendation — locked principle
 
-**Doc:** `docs/recommendation-not-direction-v1-locked.md` · **Engine:** `src/recommendation/RECOMMENDATION_PRINCIPLES.md`
+**Docs:** `docs/recommendation-not-direction-v1-locked.md` · `docs/recommendation-engine-philosophy-v1-locked.md` · **Engine:** `src/recommendation/RECOMMENDATION_PRINCIPLES.md`
 
 **The Studio recommends. The client decides.**
 
-The Recommendation Engine guides; it never forces purchase of recommended services. Clients may accept, remove, substitute, add, or build a custom plan from approved catalog services. Project Summary copy uses **Our Recommendation** + **Customize Your Studio Plan** sections — see locked doc for verbatim structure.
+The Recommendation Engine listens to Discovery answers and recommends **individual services** with traceable per-service Why? — not a package tier as primary output. Spark / Momentum / Growth are optional bundled shortcuts in Project Summary. The engine guides; it never forces purchase. Clients may accept, remove, substitute, add, or build a custom plan from approved catalog services. Project Summary copy: **Our Recommendation** → **Prefer a bundled option?** → **Customize Your Studio Plan** → **Disclaimer** → **Approve** — see locked docs for verbatim structure.
 <!-- END:recommendation-not-direction-lock -->
 
 <!-- BEGIN:customer-journey-lock -->

@@ -10,6 +10,7 @@ import {
   PROJECT_SUMMARY_LABELS,
   PROJECT_SUMMARY_MOCK,
   type DiscoveryAnswerHeardItem,
+  type ProjectSummaryMockService,
 } from "@/project-summary";
 
 type Props = {
@@ -23,11 +24,34 @@ type Props = {
   onConfirm: () => void;
 };
 
-function RecommendedServiceName({ service }: { service: DiscoverySummaryServiceItem }) {
-  return <li className="ps-recommend__service-name">{service.title}</li>;
+function RecommendedServiceRow({
+  name,
+  why,
+}: {
+  name: string;
+  why: string;
+}) {
+  return (
+    <li className="ps-recommend__service-row">
+      <span className="ps-recommend__service-name" aria-hidden="true">
+        ✅
+      </span>{" "}
+      <span className="ps-recommend__service-name">{name}</span>
+      <div className="ps-recommend__service-why">
+        <span className="ps-recommend__why-label">{PROJECT_SUMMARY_LABELS.recommendWhyLabel}</span>
+        <p className="ps-recommend__why-body">{why}</p>
+      </div>
+    </li>
+  );
 }
 
-/** Project Summary — heard + Our Recommendation + Customize Your Studio Plan (presentation only). */
+function RecommendedServiceFromSummary({ service }: { service: DiscoverySummaryServiceItem }) {
+  return (
+    <RecommendedServiceRow name={service.title} why={service.explanation} />
+  );
+}
+
+/** Project Summary — heard + recommendation + packages + customize + disclaimer + approve (presentation only). */
 /** Decision-page proposal aesthetic — see docs/decision-page-visual-language-v1.md */
 export default function ProjectSummaryScene({
   heard,
@@ -40,9 +64,7 @@ export default function ProjectSummaryScene({
   onConfirm,
 }: Props) {
   const hasRecommendations = summary.recommendedServices.length > 0;
-  const whyRationale = hasRecommendations
-    ? summary.recommendedServices[0]?.explanation || PROJECT_SUMMARY_MOCK.whyRationale
-    : PROJECT_SUMMARY_MOCK.whyRationale;
+  const mockServices: readonly ProjectSummaryMockService[] = PROJECT_SUMMARY_MOCK.services;
 
   return (
     <div className="ps-content utility-content">
@@ -79,21 +101,31 @@ export default function ProjectSummaryScene({
         <ul className="ps-recommend__service-list">
           {hasRecommendations
             ? summary.recommendedServices.map((service) => (
-                <RecommendedServiceName key={service.serviceId} service={service} />
+                <RecommendedServiceFromSummary key={service.serviceId} service={service} />
               ))
-            : PROJECT_SUMMARY_MOCK.services.map((service) => (
-                <li key={service} className="ps-recommend__service-name">
-                  {service}
-                </li>
+            : mockServices.map((service) => (
+                <RecommendedServiceRow key={service.name} name={service.name} why={service.why} />
               ))}
         </ul>
-        <h3 className="ps-recommend__why-label">{PROJECT_SUMMARY_LABELS.recommendWhyLabel}</h3>
-        <p className="ps-recommend__why-body">{whyRationale}</p>
-        {hasRecommendations && summary.totalInvestment.display ? (
-          <p className="ps-recommend__total">
-            Estimated investment: {summary.totalInvestment.display}
-          </p>
-        ) : null}
+      </section>
+
+      <section className="utility-card ps-section" aria-labelledby="ps-packages-title">
+        <h2 id="ps-packages-title" className="utility-card__title">
+          {PROJECT_SUMMARY_LABELS.packagesTitle}
+        </h2>
+        <p className="ps-packages__lead">{PROJECT_SUMMARY_LABELS.packagesLead}</p>
+        <ul className="ps-packages__grid" aria-label={PROJECT_SUMMARY_LABELS.packagesSelectLabel}>
+          {PROJECT_SUMMARY_MOCK.packages.map((pkg) => (
+            <li key={pkg.id} className="ps-packages__card">
+              <p className="ps-packages__name">{pkg.name}</p>
+              <p className="ps-packages__tagline">{pkg.tagline}</p>
+              <p className="ps-packages__price">{pkg.priceLabel}</p>
+              <button type="button" className="utility-btn utility-btn--secondary ps-packages__select" disabled>
+                {PROJECT_SUMMARY_LABELS.packagesSelectLabel}
+              </button>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="utility-card ps-section" aria-labelledby="ps-changes-title">
@@ -120,6 +152,19 @@ export default function ProjectSummaryScene({
             onApprove={onConfirm}
           />
         </div>
+      </section>
+
+      <section className="utility-card ps-section" aria-labelledby="ps-disclaimer-title">
+        <h2 id="ps-disclaimer-title" className="utility-card__title">
+          {PROJECT_SUMMARY_LABELS.disclaimerTitle}
+        </h2>
+        <p className="ps-disclaimer__body">{PROJECT_SUMMARY_LABELS.disclaimerBody}</p>
+        <p className="ps-approve__total">
+          {PROJECT_SUMMARY_LABELS.totalInvestmentLabel}:{" "}
+          {hasRecommendations && summary.totalInvestment.display
+            ? summary.totalInvestment.display
+            : PROJECT_SUMMARY_LABELS.totalInvestmentPlaceholder}
+        </p>
         <div className="ps-confirm">
           <button
             type="button"

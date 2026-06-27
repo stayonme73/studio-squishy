@@ -22,9 +22,18 @@
 
 These routes sit between Project Discovery and Secure Checkout — not numbered journey rooms:
 
-- **Project Summary** — `/project-summary` — post-discovery bridge; presents **Our Recommendation** and **Customize Your Studio Plan** under the locked [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) principle (*The Studio recommends. The client decides.*)
+- **Project Summary** — `/project-summary` — post-discovery bridge; presents the locked [Recommendation Engine Philosophy](recommendation-engine-philosophy-v1-locked.md) flow: **Our Recommendation** (per-service Why?) → **Prefer a bundled option?** (optional Spark / Momentum / Growth shortcuts) → **Customize Your Studio Plan** → **Disclaimer** → **Approve** — under [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) (*The Studio recommends. The client decides.*)
 - **Studio Plan Review** — `/studio-plan-review`
 - **Discovery Summary** (prototype/dev) — `/discovery-summary`
+
+**Post-discovery micro-flow (not separate journey steps):**
+
+1. Discovery — client answers
+2. Studio reviews — split-panel animation (implemented)
+3. Studio Recommendation — services + per-service Why?
+4. Optional Studio Packages — bundled shortcuts (optional)
+5. Customize — remove / add / replace
+6. Approve — disclaimer + total → Secure Checkout
 
 Architecture: Catalog → Recommendation Engine → Project Summary / Studio Plan Review → Secure Checkout → Project Record.
 
