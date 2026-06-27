@@ -182,12 +182,14 @@ export default function ProjectSummaryScene({
         <ul className="ps-packages__grid" aria-label={PROJECT_SUMMARY_LABELS.packagesSelectLabel}>
           {PROJECT_SUMMARY_MOCK.packages.map((pkg) => (
             <li key={pkg.id} className="ps-packages__card">
-              <p className="ps-packages__name">
-                <span aria-hidden="true">{pkg.emoji} </span>
-                {pkg.name}
-              </p>
-              <p className="ps-packages__tagline">{pkg.tagline}</p>
-              <p className="ps-packages__description">{pkg.description}</p>
+              <div className="ps-packages__intro">
+                <p className="ps-packages__name">
+                  <span aria-hidden="true">{pkg.emoji} </span>
+                  {pkg.name}
+                </p>
+                <p className="ps-packages__tagline">{pkg.tagline}</p>
+                <p className="ps-packages__description">{pkg.description}</p>
+              </div>
               <div className="ps-packages__includes-block">
                 <p className="ps-packages__includes-label">
                   {PROJECT_SUMMARY_LABELS.packagesIncludesLabel}

@@ -280,6 +280,7 @@
 .project-summary-page .ps-packages__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  align-items: stretch;
   gap: 0.85rem;
   list-style: none;
   padding: 0;
@@ -290,10 +291,18 @@
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
+  height: 100%;
   padding: 1rem;
   border-radius: 10px;
   background: var(--ps-card-alt);
   border: 1px solid var(--utility-border);
+}
+
+.project-summary-page .ps-packages__intro {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.45rem;
 }
 
 .project-summary-page .ps-packages__name {
@@ -316,11 +325,10 @@
   line-height: 1.5;
   color: var(--ps-charcoal-muted);
   margin: 0;
-  flex: 1;
 }
 
 .project-summary-page .ps-packages__includes-block {
-  margin-top: 0.15rem;
+  flex-shrink: 0;
 }
 
 .project-summary-page .ps-packages__includes-label {
@@ -353,7 +361,7 @@
 }
 
 .project-summary-page .ps-packages__select {
-  margin-top: 0.35rem;
+  margin-top: auto;
   width: 100%;
 }
 
