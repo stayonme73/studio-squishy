@@ -1,12 +1,29 @@
-# Studio Plan + Slide-out Secure Checkout — Planned (V1)
+# Studio Plan + Slide-out Secure Checkout — Implemented (V1 partial)
 
-**Status:** NOT IMPLEMENTED — layout prep only. Do not build checkout UI, Stripe integration, or payment flows from this doc until Tagia approves implementation.
+**Status:** IMPLEMENTED on Project Summary (`/project-summary`) — inline checkout after approve. Discovery split-panel slide-out checkout remains **NOT IMPLEMENTED**.
 
 **Related:** `docs/customer-journey-v1-locked.md` (Planned evolution) · `docs/recommendation-engine-philosophy-v1-locked.md` (6-step flow) · `AGENTS.md` (checkout panel pattern note)
 
 ---
 
-## Vision (verbatim intent)
+## What shipped
+
+After the client clicks **Approve Studio Plan** on Project Summary:
+
+1. `saveApprovedStudioPlan()` persists the approved plan to campaign storage.
+2. The page transitions to checkout phase (`?phase=checkout`) **without navigating away** from `/project-summary`.
+3. The existing three-column Secure Checkout layout renders inline via shared `SecureCheckoutGrid`.
+4. Header copy updates to Secure Checkout (`Complete Your Studio Plan`).
+5. Back returns to Project Summary (summary phase).
+6. `/payment` route unchanged — renders the same shared checkout component for direct links and bookmarks.
+
+**Shared component:** `src/components/payment/SecureCheckoutGrid.tsx` (used by `/payment` and Project Summary).
+
+**Workflow:** Discovery → Studio Review → Project Summary → Approve → Secure Checkout (inline) → Payment → Vision Intake
+
+---
+
+## Vision (original — discovery split panel)
 
 **Flow on ONE workspace (no jarring page changes):**
 
@@ -21,11 +38,25 @@
 
 Studio Lobby → Studio Guide → Project Discovery → Studio Plan → Slide-out Secure Checkout → Studio Board
 
-(No separate `/payment` page in future — but **do not** remove or replace the payment page until this is implemented and approved.)
+---
+
+## ASCII layout diagram (Project Summary — shipped)
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Project Summary header → Secure Checkout header (same route, phase swap)    │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  THREE-COLUMN CHECKOUT (SecureCheckoutGrid)                                  │
+│  ┌─────────────────┬──────────────────────┬─────────────────────────────┐    │
+│  │ Your Studio Plan│ Secure Payment       │ What Happens Next           │    │
+│  │ (approved plan) │ contact + card form  │ Payment → Vision Intake → … │    │
+│  └─────────────────┴──────────────────────┴─────────────────────────────┘    │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## ASCII layout diagram
+## ASCII layout diagram (Discovery split — still planned)
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -52,57 +83,31 @@ Studio Lobby → Studio Guide → Project Discovery → Studio Plan → Slide-ou
 
 ---
 
-## Why this design
-
-**Context never lost.** Today, confirming a plan often means leaving the discovery workspace for a separate payment page. The customer loses sight of their Studio Plan — services, customizations, and total — at the moment they decide to purchase.
-
-The slide-out checkout keeps the Studio Plan visible on the left while payment happens in the right panel on the same workspace. No full-page navigation, no jarring context switch. After Pay Now succeeds, the checkout panel closes and the customer lands on Studio Board with continuity preserved.
-
----
-
-## Checkout panel header (future copy)
-
-- 🔒 Secure Checkout
-- "Review your Studio Plan and complete your purchase."
-
----
-
 ## Panel phases
 
-| Phase | ID | Status | Right panel content |
-|-------|-----|--------|---------------------|
-| Reviewing | `reviewing` | Implemented | Animated “Reviewing your goals…” state |
-| Summary | `summary` | Implemented (placeholder) | Our Recommendation + Prefer a bundled option? + Customize + Disclaimer |
-| Checkout | `checkout` | **NOT IMPLEMENTED** | Secure Checkout form (card, billing, agreement, Pay Now) |
+| Phase | ID | Status | Location |
+|-------|-----|--------|----------|
+| Reviewing | `reviewing` | Implemented | Discovery split panel |
+| Summary | `summary` | Implemented | Project Summary default phase |
+| Checkout | `checkout` | **Implemented** | Project Summary (`?phase=checkout`); Discovery split **NOT IMPLEMENTED** |
 
-CSS custom property for future wiring: `--bds-panel-phase: reviewing | summary | checkout`
+CSS custom property for discovery split wiring: `--bds-panel-phase: reviewing | summary | checkout`
 
 Type reference: `PanelPhase` in `src/project-summary/types.ts`
 
 ---
 
-## What stays unchanged until implementation
+## What stays unchanged
 
-- `/payment` route and Secure Checkout page remain active
+- `/payment` route and Secure Checkout page remain active (fallback / bookmarks)
 - Recommendation Engine, Service Catalog, Discovery Summary business rules
-- [Recommendation Engine Philosophy V1](recommendation-engine-philosophy-v1-locked.md) — approve-before-pay; disclaimer before checkout
 - Recommendation, Not Direction copy structure
-- No Stripe, payment form, or slide-out checkout UI in this prep pass
+- No Stripe integration in this pass (sandbox + form UI only)
 
 ---
 
-## Layout prep (this branch)
+## Not shipped (future)
 
-Minimal structure only — no payment integration:
-
-- Right panel `bds-scene__panel-phase-slot` supports phase content swapping without reflow
-- Left column `bds-plan-context` skeleton reserved for Studio Plan (services / total placeholders)
-- Panel width `--bds-split-panel: clamp(18rem, 28vw, 22rem)` verified adequate for future checkout form
-
----
-
-## Implementation gate
-
-Tagia: *"I wouldn't tell Scout to build this yet."*
-
-Do not implement Phase B (checkout panel) until explicitly requested after layout prep and journey docs are reviewed.
+- Discovery split-panel slide-out checkout (left plan context + right checkout panel)
+- Stripe live payment processing
+- Post-payment auto-close panel → Studio Board (currently routes to Vision Intake per existing payment flow)

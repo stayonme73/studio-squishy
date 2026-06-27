@@ -489,3 +489,31 @@
 .project-summary-page .utility-topbar__help:hover {
   text-decoration-color: var(--ps-coral);
 }
+
+/* Inline Secure Checkout — replaces summary content after approve */
+.project-summary-page--checkout {
+  animation: ps-checkout-enter 0.35s ease-out;
+}
+
+@keyframes ps-checkout-enter {
+  from {
+    opacity: 0;
+    transform: translateX(1.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.ps-checkout-panel {
+  width: 100%;
+}
+
+.project-summary-page--checkout .pay-shell {
+  max-width: min(98vw, 88rem);
+  margin-inline: auto;
+  padding: 0.5rem 0 1.5rem;
+}
+

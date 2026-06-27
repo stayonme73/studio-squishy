@@ -11,8 +11,8 @@
 | # | Work item | Notes |
 |---|-----------|-------|
 | 1 | Finish Project Summary polish | Locked copy structure; mock data OK |
-| 2 | Build Secure Checkout experience (slide-out panel) | See [studio-plan-slide-out-checkout-v1-planned.md](studio-plan-slide-out-checkout-v1-planned.md) |
-| 3 | Verify complete customer journey | Discovery → Project Summary → payment |
+| 2 | Secure Checkout on Project Summary | **Done** — inline checkout after Approve via `SecureCheckoutGrid`; `/payment` fallback kept |
+| 3 | Verify complete customer journey | Discovery → Project Summary → payment → Vision Intake |
 | 4 | Begin Discovery Mapping and Recommendation Engine wiring | **Deferred** until 1–3 complete |
 
 **Paused (do not wire yet):** Discovery Mapping, Recommendation Engine scoring/mapping, and Discovery Summary engine integration. The Recommendation Engine should support a finished customer experience — not define it prematurely. See [discovery-mapping-v1-planned.md](discovery-mapping-v1-planned.md).
@@ -35,7 +35,7 @@
 
 These routes sit between Project Discovery and Secure Checkout — not numbered journey rooms:
 
-- **Project Summary** — `/project-summary` — post-discovery bridge; presents the locked [Recommendation Engine Philosophy](recommendation-engine-philosophy-v1-locked.md) flow: **Our Recommendation** (per-service Why?) → **Prefer a bundled option?** (optional Spark / Momentum / Growth shortcuts) → **Customize Your Studio Plan** → **Disclaimer** → **Approve** — under [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) (*The Studio recommends. The client decides.*)
+- **Project Summary** — `/project-summary` — post-discovery bridge; presents the locked [Recommendation Engine Philosophy](recommendation-engine-philosophy-v1-locked.md) flow: **Our Recommendation** (per-service Why?) → **Prefer a bundled option?** (optional Spark / Momentum / Growth shortcuts) → **Customize Your Studio Plan** → **Disclaimer** → **Approve** → **inline Secure Checkout** (`?phase=checkout`) — under [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) (*The Studio recommends. The client decides.*)
 - **Studio Plan Review** — `/studio-plan-review`
 - **Discovery Summary** (prototype/dev) — `/discovery-summary`
 
@@ -44,8 +44,8 @@ These routes sit between Project Discovery and Secure Checkout — not numbered 
 1. Discovery — client answers
 2. Studio reviews — split-panel animation (implemented)
 3. **Discovery split preview** — recommended service names only + CTA to Project Summary — see [discovery-split-preview-v1-locked.md](discovery-split-preview-v1-locked.md)
-4. **Project Summary** — per-service Why?, optional packages, customize, pricing, disclaimer, approve
-5. Secure Checkout — payment
+4. **Project Summary** — per-service Why?, optional packages, customize, pricing, disclaimer, approve → inline Secure Checkout
+5. Secure Checkout — payment (also at `/payment` for direct links)
 
 Steps 3–5 are screen roles, not numbered journey rooms. The split preview must not duplicate Project Summary detail.
 
@@ -59,7 +59,7 @@ Do **not** delete — move to `src/archive/` and document here.
 
 | Item | Former role | Archive location |
 |------|-------------|------------------|
-| Complete Your Order | Three-column payment page title + layout | `src/archive/payment/CompleteYourOrderCheckoutScene.tsx` — active `/payment` re-exports |
+| Complete Your Order | Three-column payment page title + layout | `src/archive/payment/CompleteYourOrderCheckoutScene.tsx` — shared grid in `src/components/payment/SecureCheckoutGrid.tsx`; `/payment` + Project Summary reuse |
 | Tell us what's on your mind | Standalone intake opening | `src/archive/draft-room/` — opening in Project Discovery |
 | Draft Room begin page | Standalone intake wizard at `/draft-room?begin=1` | `src/archive/draft-room/DraftRoomIntakeScene.tsx` and related components |
 | Draft Room intro plate | Illustrated room before intake | `src/archive/draft-room/DraftRoomScene.tsx` |
@@ -95,21 +95,21 @@ Studio Review is **not** shown in production builds.
 4. **Do not change** `DISCOVERY_BADGE_OFFSET`, recommendation engine, or catalog business rules as part of journey lock work.
 5. Update this doc when adding to the archive.
 
-## Planned evolution (not active — layout prep only)
+## Planned evolution (Discovery split slide-out — not shipped)
 
 **Doc:** `docs/studio-plan-slide-out-checkout-v1-planned.md`
 
 A future journey simplification keeps the customer on **one workspace** after Project Discovery submit: Studio Plan context stays visible on the left while the right panel phases through Reviewing → Recommendations → **slide-out Secure Checkout** (card, billing, agreement, Pay Now). After payment, the panel closes and the customer continues to Studio Board.
 
-**Future simplified path (when implemented and approved):**
+**Future simplified path (when Discovery split checkout ships):**
 
 Studio Lobby → Studio Guide → Project Discovery → Studio Plan → Slide-out Secure Checkout → Studio Board
 
-Until that ships:
+**Shipped (Project Summary):**
 
-- **Secure Checkout** at `/payment` remains the active checkout route — do not remove or replace it during prep work.
-- Project Summary (`/project-summary`) and the in-discovery split panel continue as the post-discovery bridge — split panel is preview-only; full detail on Project Summary — see [discovery-split-preview-v1-locked.md](discovery-split-preview-v1-locked.md).
-- No payment integration, Stripe wiring, or checkout panel UI until Tagia approves implementation.
+- Approve on `/project-summary` transitions to inline three-column Secure Checkout on the same route (`?phase=checkout`) via shared `SecureCheckoutGrid`.
+- **Secure Checkout** at `/payment` remains active for bookmarks and direct links.
+- Discovery split-panel checkout UI is still **not implemented**.
 
 ## What this lock does *not* change
 

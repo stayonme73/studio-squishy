@@ -46,13 +46,13 @@ export const payment = {
     badge: "Test only",
   },
   whatsNext: {
-    intro: "After payment we'll:",
     steps: [
-      "Send your receipt",
-      "Open your Studio Project",
-      "Unlock your Vision Intake",
-      "Begin planning your campaign",
-      "Deliver first concepts within 7 business days",
+      { label: "Payment received", marker: "check" },
+      { label: "Vision Intake", marker: "arrow" },
+      { label: "Creative Production Begins", marker: "arrow" },
+      { label: "First Concepts (Within 7 Business Days)", marker: "arrow" },
+      { label: "Review Room", marker: "arrow" },
+      { label: "Final Delivery", marker: "arrow" },
     ] as const,
   },
   secureNote:

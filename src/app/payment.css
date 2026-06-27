@@ -429,6 +429,22 @@
   color: var(--pay-charcoal);
 }
 
+.pay-next-steps__marker {
+  flex-shrink: 0;
+  width: 1.1rem;
+  font-weight: 700;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.pay-next-steps__marker--check {
+  color: var(--pay-eucalyptus);
+}
+
+.pay-next-steps__marker--arrow {
+  color: var(--pay-coral);
+}
+
 .pay-next-secure {
   margin: 1rem 0 0;
   font-size: 0.82rem;
