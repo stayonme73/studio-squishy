@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import ProjectSummaryScene from "@/components/project-summary/ProjectSummaryScene";
@@ -13,6 +13,7 @@ import {
   saveApprovedStudioPlan,
 } from "@/lib/studio-board-campaign";
 import { recommendFromDiscovery } from "@/recommendation";
+import type { DiscoveryBriefAnswers } from "@/recommendation/types";
 import { buildDiscoveryAnswersHeard } from "@/project-summary";
 import {
   addServiceToPlan,
@@ -27,11 +28,21 @@ import type { ServiceId } from "@/catalog/types";
 /** Assembles Project Summary data and handlers — UI renders ProjectSummaryScene only. */
 export default function ProjectSummaryPageClient() {
   const router = useRouter();
-  const campaign = readCurrentCampaignHydrated();
-  const briefAnswers = useMemo(
-    () => resolveDiscoveryBriefAnswers(campaign?.discoveryAnswers, readDiscoveryAnswers()),
-    [campaign?.discoveryAnswers],
-  );
+  const [briefAnswers, setBriefAnswers] = useState<DiscoveryBriefAnswers>({});
+
+  useLayoutEffect(() => {
+    const campaign = readCurrentCampaignHydrated();
+    const answers = resolveDiscoveryBriefAnswers(
+      campaign?.discoveryAnswers,
+      readDiscoveryAnswers(),
+    );
+    setBriefAnswers(answers);
+    const recommendation = recommendFromDiscovery({ answers });
+    setPlanState(
+      initialPlanState(recommendation.recommendations.map((entry) => entry.serviceId)),
+    );
+  }, []);
+
   const heard = useMemo(() => buildDiscoveryAnswersHeard(briefAnswers), [briefAnswers]);
   const recommendation = useMemo(
     () => recommendFromDiscovery({ answers: briefAnswers }),
@@ -39,9 +50,7 @@ export default function ProjectSummaryPageClient() {
   );
   const summary = useMemo(() => buildDiscoverySummary(recommendation), [recommendation]);
 
-  const [planState, setPlanState] = useState<StudioPlanState>(() =>
-    initialPlanState(recommendation.recommendations.map((entry) => entry.serviceId)),
-  );
+  const [planState, setPlanState] = useState<StudioPlanState>(() => initialPlanState([]));
 
   const plan = useMemo(
     () => buildStudioPlanReview(recommendation, planState),
