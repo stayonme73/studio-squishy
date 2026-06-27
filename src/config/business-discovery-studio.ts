@@ -218,7 +218,7 @@ export const DISCOVERY_TILE_GEOMETRY = {
   "submit-project": { x: 580, y: 420, width: 199, height: 121 },
 } satisfies Record<DiscoveryTileId, SceneRect>;
 
-const STATUS_COVER_SIZE = 12;
+const STATUS_COVER_SIZE = 24;
 
 /** Next tile in the same row — its left edge marks the painted right edge of the current tile. */
 const TILE_ROW_NEIGHBOR_RIGHT: Partial<Record<DiscoveryTileId, DiscoveryTileId>> = {
@@ -264,9 +264,9 @@ export type DiscoveryStatusCoverOffset = {
   dy?: number;
 };
 
-/** Card 1 baked ○ top-left on the painted face (native plate px). */
-const _refStatusCoverX = _refFace.x;
-const _refStatusCoverY = _refFace.y + _refFace.height - STATUS_COVER_SIZE - 7;
+/** Card 1 baked ○ cover top-left on the painted face (native plate px). */
+const _refStatusCoverX = _refFace.x + 55;
+const _refStatusCoverY = _refFace.y + _refFace.height - STATUS_COVER_SIZE - 13;
 
 /** Uniform inset from painted card-face bottom-left — derived from card 1. */
 export const STATUS_COVER_LEFT_PAD = _refStatusCoverX - _refFace.x;
@@ -280,14 +280,14 @@ export const STATUS_COVER_BOTTOM_PAD =
 export const DISCOVERY_STATUS_COVER_OFFSET: Partial<
   Record<DiscoveryTileId, DiscoveryStatusCoverOffset>
 > = {
-  "your-situation": { dy: 7 },
-  "your-challenge": { dx: 4, dy: -13 },
-  "your-current-tools": { dx: 41 },
-  "your-focus": { dy: 7 },
-  "success-looks-like": { dx: 14, dy: 7 },
-  "whats-slowing-you-down": { dx: 2, dy: -13 },
-  "anything-else": { dx: 52, dy: 5 },
-  "submit-project": { dx: 23, dy: -6 },
+  "your-situation": { dx: -52, dy: 9 },
+  "your-challenge": { dx: -52, dy: 8 },
+  "your-current-tools": { dx: 3, dy: 4 },
+  "your-focus": { dx: -15, dy: 2 },
+  "success-looks-like": { dx: -52, dy: 10 },
+  "whats-slowing-you-down": { dx: -1, dy: -15 },
+  "anything-else": { dx: 3, dy: 0 },
+  "submit-project": { dx: -42, dy: 9 },
 };
 
 export type DiscoveryBadgeOffset = {
@@ -337,7 +337,7 @@ export function discoveryTileDerivedGeometry(
         face.y +
         face.height -
         STATUS_COVER_SIZE -
-        STATUS_COVER_BOTTOM_PAD +
+        STATUS_COVER_BOTTOM_PAD -
         (DISCOVERY_STATUS_COVER_OFFSET[tileId]?.dy ?? 0),
       width: STATUS_COVER_SIZE,
       height: STATUS_COVER_SIZE,
