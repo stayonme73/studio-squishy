@@ -260,10 +260,16 @@ function buildRationale(
 }
 
 function buildMissingAnswerWarnings(brief: DiscoveryBrief): RecommendationWarning[] {
-  return KEY_DISCOVERY_TILES.filter((tile) => !tileAnswer(brief, tile)).map((tile) => ({
-    kind: "missing-discovery-answer",
-    message: `Discovery tile "${tile}" has no answer — rule matches may be incomplete.`,
-  }));
+  const missingTiles = KEY_DISCOVERY_TILES.filter((tile) => !tileAnswer(brief, tile));
+  if (missingTiles.length === 0) return [];
+
+  const tileList = missingTiles.map((tile) => `"${tile}"`).join(", ");
+  return [
+    {
+      kind: "missing-discovery-answer",
+      message: `Discovery tile(s) ${tileList} have no answer — rule matches may be incomplete.`,
+    },
+  ];
 }
 
 function buildInactiveServiceWarnings(
