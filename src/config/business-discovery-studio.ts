@@ -265,8 +265,8 @@ export type DiscoveryStatusCoverOffset = {
 };
 
 /** Card 1 baked ○ cover top-left on the painted face (native plate px). */
-const _refStatusCoverX = _refFace.x + 55;
-const _refStatusCoverY = _refFace.y + _refFace.height - STATUS_COVER_SIZE - 13;
+const _refStatusCoverX = _refFace.x + 60;
+const _refStatusCoverY = _refFace.y + _refFace.height - STATUS_COVER_SIZE - 8;
 
 /** Uniform inset from painted card-face bottom-left — derived from card 1. */
 export const STATUS_COVER_LEFT_PAD = _refStatusCoverX - _refFace.x;

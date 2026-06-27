@@ -467,19 +467,52 @@ body:has(.business-discovery-studio) {
 }
 
 .business-discovery-studio .bds-tile-status-cover {
+  --bds-status-cover-tone: #c8b098;
   position: absolute;
   z-index: 2;
   border-radius: 50%;
-  background: #f5f0e8;
-  box-shadow: 0 0 0 1px #f5f0e8;
+  background: var(--bds-status-cover-tone);
+  box-shadow: 0 0 2px 1px var(--bds-status-cover-tone);
   pointer-events: none;
-  /* Sized in plate px via inline % — keep circle tight to baked status dot only */
+  /* Sized in plate px via inline % — dot-sized mask, plate-matched tone */
+}
+
+/** Per-tile cream sampled from card face near baked ○ — blends at a glance. */
+.business-discovery-studio .bds-tile-status-cover[data-tile-id="your-business"] {
+  --bds-status-cover-tone: #bfa78c;
+}
+
+.business-discovery-studio .bds-tile-status-cover[data-tile-id="your-situation"] {
+  --bds-status-cover-tone: #d0bca4;
+}
+
+.business-discovery-studio .bds-tile-status-cover[data-tile-id="your-challenge"] {
+  --bds-status-cover-tone: #c5ac8f;
+}
+
+.business-discovery-studio .bds-tile-status-cover[data-tile-id="your-current-tools"] {
+  --bds-status-cover-tone: #a78e72;
+}
+
+.business-discovery-studio .bds-tile-status-cover[data-tile-id="your-focus"] {
+  --bds-status-cover-tone: #dbc2aa;
+}
+
+.business-discovery-studio .bds-tile-status-cover[data-tile-id="success-looks-like"] {
+  --bds-status-cover-tone: #d2b89d;
+}
+
+.business-discovery-studio .bds-tile-status-cover[data-tile-id="whats-slowing-you-down"] {
+  --bds-status-cover-tone: #c6ab90;
+}
+
+.business-discovery-studio .bds-tile-status-cover[data-tile-id="anything-else"] {
+  --bds-status-cover-tone: #a78d72;
 }
 
 /** Submit tile face is dark — match cover to card, not cream form tiles. */
 .business-discovery-studio .bds-tile-status-cover[data-tile-id="submit-project"] {
-  background: #2a2928;
-  box-shadow: 0 0 0 1px #2a2928;
+  --bds-status-cover-tone: #2a2928;
 }
 
 .business-discovery-studio .bds-tile-done-badge {
