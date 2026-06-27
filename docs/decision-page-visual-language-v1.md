@@ -26,6 +26,10 @@ Discovery is a creative workspace. Project Summary is a professional proposal. S
 
 - `src/app/project-summary.css` — Project Summary page scope
 - `src/app/studio-utility-backdrop.css` — shared utility backdrop overlay
-- `src/app/business-discovery-studio.css` — `.bds-summary-panel--proposal` split-panel shell
+- `src/app/business-discovery-studio.css` — `.bds-summary-panel--preview` split-panel teaser (proposal tokens; not full Project Summary)
 
 Discovery board tan/paper styling is unchanged.
+
+## Discovery split preview (not Project Summary)
+
+The in-discovery split panel is a **preview teaser** only — service names + CTA. Full Why?, packages, customize, pricing, disclaimer, and approve live on Project Summary. Locked: [discovery-split-preview-v1-locked.md](discovery-split-preview-v1-locked.md).

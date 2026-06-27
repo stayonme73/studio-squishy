@@ -22,6 +22,7 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Production classes (Signature / Core / Essential)
 - Discovery philosophy
 - Recommendation philosophy — **Recommendation, Not Direction** (`docs/recommendation-not-direction-v1-locked.md`, `src/recommendation/RECOMMENDATION_PRINCIPLES.md`) — *The Studio recommends. The client decides.*
+- Discovery split preview — in-discovery split panel is teaser-only (service list + CTA); full Why?, packages, customize, pricing, disclaimer, and approve on Project Summary (`docs/discovery-split-preview-v1-locked.md`)
 - Recommendation Engine philosophy — **service-first, traceable Why?, packages as optional shortcuts** (`docs/recommendation-engine-philosophy-v1-locked.md`) — locked post-discovery flow and Project Summary structure
 - Production allocation rules
 - Customer choice rules

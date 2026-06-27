@@ -7,6 +7,21 @@
  * Visual language: docs/decision-page-visual-language-v1.md (proposal, not Discovery corkboard)
  */
 
+/**
+ * Discovery split-panel preview — teaser only ("Did The Studio understand me?").
+ * Full Why?, packages, customize, pricing, disclaimer, and approve live on Project Summary.
+ * Locked: docs/discovery-split-preview-v1-locked.md
+ */
+export const DISCOVERY_SPLIT_PREVIEW_LABELS = {
+  eyebrow: "Your Studio Plan",
+  recommendLead: "Based on your Discovery, here's what we recommend:",
+  preparedBody:
+    "We've prepared a personalized Studio Plan based on your Discovery responses.",
+  nextStepBody:
+    "Review your recommendations, adjust your plan, and approve everything before payment.",
+  cta: "Review My Studio Plan →",
+} as const;
+
 export const PROJECT_SUMMARY_LABELS = {
   pageTitle: "Project Summary",
   pageLead:

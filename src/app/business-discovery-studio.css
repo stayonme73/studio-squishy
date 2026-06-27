@@ -1374,21 +1374,15 @@ body:has(.business-discovery-studio) {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.business-discovery-studio .bds-summary-panel__subtitle {
-  margin: 1rem 0 0.35rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.business-discovery-studio .bds-summary-panel__service-list,
-.business-discovery-studio .bds-summary-panel__powers-list {
+.business-discovery-studio .bds-summary-panel__service-list {
   margin: 0.5rem 0 0;
-  padding-left: 1.15rem;
+  padding-left: 0;
+  list-style: none;
   display: grid;
-  gap: 0.35rem;
+  gap: 0.45rem;
 }
 
-/* Proposal aesthetic — split-panel summary matches Project Summary decision page */
+/* Proposal aesthetic — split-panel preview teaser (not full Project Summary) */
 .business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__inner {
   background: #ffffff;
   border: 1px solid color-mix(in srgb, #2b2b2b 10%, transparent);
@@ -1400,21 +1394,6 @@ body:has(.business-discovery-studio) {
 
 .business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__eyebrow {
   color: color-mix(in srgb, #2e5e4e 85%, #2b2b2b);
-}
-
-.business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__title {
-  font-size: clamp(1.15rem, 2.4vh, 1.45rem);
-  font-weight: 700;
-  color: #2e5e4e;
-  letter-spacing: 0.02em;
-  padding-bottom: 0.55rem;
-  border-bottom: 2px solid color-mix(in srgb, #2e5e4e 18%, transparent);
-}
-
-.business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__subtitle {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #2e5e4e;
 }
 
 .business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__body {
@@ -1429,60 +1408,20 @@ body:has(.business-discovery-studio) {
   padding-top: 1.35rem;
 }
 
-.business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__service-list li {
+.business-discovery-studio .bds-summary-panel--preview .bds-summary-panel__lead {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.business-discovery-studio .bds-summary-panel--preview .bds-summary-panel__service-list li {
   font-weight: 600;
   line-height: 1.45;
   padding-left: 0.35rem;
   border-left: 3px solid #c47a2c;
 }
 
-.business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__service-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-weight: 600;
-  line-height: 1.45;
-  padding-left: 0.35rem;
-  border-left: 3px solid #c47a2c;
-}
-
-.business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__service-why {
-  font-weight: 400;
-  font-size: 0.88rem;
-  line-height: 1.5;
-  color: color-mix(in srgb, #2b2b2b 72%, #6b6b6b);
-}
-
-.business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__packages {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__package-card {
-  padding: 0.75rem;
-  border-radius: 8px;
-  background: #f8f9fa;
-  border: 1px solid color-mix(in srgb, #2b2b2b 10%, transparent);
-}
-
-.business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__package-name {
-  font-weight: 700;
-  color: #2e5e4e;
-  margin: 0 0 0.25rem;
-}
-
-.business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__package-price {
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin: 0.35rem 0 0;
-}
-
-.business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__powers-list li::marker {
-  color: #e07a5f;
+.business-discovery-studio .bds-summary-panel--preview .bds-summary-panel__next-step {
+  margin-bottom: 1.5rem;
 }
 
 .business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__continue {

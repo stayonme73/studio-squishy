@@ -43,10 +43,11 @@ These routes sit between Project Discovery and Secure Checkout — not numbered 
 
 1. Discovery — client answers
 2. Studio reviews — split-panel animation (implemented)
-3. Studio Recommendation — services + per-service Why?
-4. Optional Studio Packages — bundled shortcuts (optional)
-5. Customize — remove / add / replace
-6. Approve — disclaimer + total → Secure Checkout
+3. **Discovery split preview** — recommended service names only + CTA to Project Summary — see [discovery-split-preview-v1-locked.md](discovery-split-preview-v1-locked.md)
+4. **Project Summary** — per-service Why?, optional packages, customize, pricing, disclaimer, approve
+5. Secure Checkout — payment
+
+Steps 3–5 are screen roles, not numbered journey rooms. The split preview must not duplicate Project Summary detail.
 
 Architecture: Catalog → Recommendation Engine → Project Summary / Studio Plan Review → Secure Checkout → Project Record.
 
@@ -107,7 +108,7 @@ Studio Lobby → Studio Guide → Project Discovery → Studio Plan → Slide-ou
 Until that ships:
 
 - **Secure Checkout** at `/payment` remains the active checkout route — do not remove or replace it during prep work.
-- Project Summary (`/project-summary`) and the in-discovery split panel continue as the post-discovery bridge.
+- Project Summary (`/project-summary`) and the in-discovery split panel continue as the post-discovery bridge — split panel is preview-only; full detail on Project Summary — see [discovery-split-preview-v1-locked.md](discovery-split-preview-v1-locked.md).
 - No payment integration, Stripe wiring, or checkout panel UI until Tagia approves implementation.
 
 ## What this lock does *not* change

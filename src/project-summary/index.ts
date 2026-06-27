@@ -12,6 +12,10 @@ export type {
   ProjectSummaryMockService,
 } from "@/project-summary/types";
 
-export { PROJECT_SUMMARY_LABELS, PROJECT_SUMMARY_MOCK } from "@/project-summary/types";
+export {
+  DISCOVERY_SPLIT_PREVIEW_LABELS,
+  PROJECT_SUMMARY_LABELS,
+  PROJECT_SUMMARY_MOCK,
+} from "@/project-summary/types";
 
 export { buildDiscoveryAnswersHeard } from "@/project-summary/buildDiscoveryAnswersHeard";
