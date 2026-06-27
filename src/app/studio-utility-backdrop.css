@@ -5,6 +5,18 @@
  */
 
 :root {
+  /* Decision / utility palette — @see docs/the-studio-design-system-v1.md */
+  --studio-mushroom: #e8e2d8;
+  --studio-ivory: #f7f4ee;
+  --studio-denim: #355c7d;
+  --studio-denim-deep: color-mix(in srgb, #355c7d 88%, #000 12%);
+  --studio-eucalyptus: #456b5a;
+  --studio-eucalyptus-deep: color-mix(in srgb, #456b5a 88%, #000 12%);
+  --studio-coral: #d56b4d;
+  --studio-herb-gold: #c7a64a;
+  --studio-charcoal: #2f3437;
+  --studio-charcoal-muted: color-mix(in srgb, #2f3437 72%, #6b6b6b);
+
   --studio-utility-backdrop-image: url("/welcome-hall/welcome-hall-scene-v4.png?v=1");
   --studio-utility-backdrop-blur: blur(20px) brightness(0.72) saturate(0.9);
   /* Light charcoal veil — lobby visible, text readable (was 42%) */

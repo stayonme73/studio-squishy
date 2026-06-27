@@ -6,41 +6,41 @@
  */
 
 .project-summary-page {
-  --ps-eucalyptus: #2e5e4e;
-  --ps-eucalyptus-deep: color-mix(in srgb, #2e5e4e 88%, #000 12%);
-  --ps-charcoal: #2b2b2b;
-  --ps-charcoal-muted: color-mix(in srgb, #2b2b2b 72%, #6b6b6b);
-  --ps-card: #ffffff;
-  --ps-card-alt: #f8f9fa;
-  --ps-accent-warm: #c47a2c;
-  --ps-accent-gold: #daa520;
-  --ps-accent-coral: #e07a5f;
+  --ps-mushroom: var(--studio-mushroom);
+  --ps-ivory: var(--studio-ivory);
+  --ps-denim: var(--studio-denim);
+  --ps-denim-deep: var(--studio-denim-deep);
+  --ps-eucalyptus: var(--studio-eucalyptus);
+  --ps-eucalyptus-deep: var(--studio-eucalyptus-deep);
+  --ps-coral: var(--studio-coral);
+  --ps-herb-gold: var(--studio-herb-gold);
+  --ps-charcoal: var(--studio-charcoal);
+  --ps-charcoal-muted: var(--studio-charcoal-muted);
+  --ps-card: var(--ps-ivory);
+  --ps-card-alt: color-mix(in srgb, var(--ps-mushroom) 55%, var(--ps-ivory));
 
-  --utility-primary: var(--ps-eucalyptus);
-  --utility-primary-deep: var(--ps-eucalyptus-deep);
+  --utility-primary: var(--ps-denim);
+  --utility-primary-deep: var(--ps-denim-deep);
   --utility-text: var(--ps-charcoal);
   --utility-text-muted: var(--ps-charcoal-muted);
   --utility-card: var(--ps-card);
-  --utility-cream: transparent;
-  --utility-border: color-mix(in srgb, var(--ps-charcoal) 12%, transparent);
+  --utility-cream: var(--ps-mushroom);
+  --utility-border: color-mix(in srgb, var(--ps-denim) 12%, transparent);
   --utility-shadow:
-    0 1px 2px rgba(43, 43, 43, 0.04),
-    0 4px 16px rgba(43, 43, 43, 0.08),
-    0 12px 32px rgba(43, 43, 43, 0.06);
+    0 1px 2px rgba(47, 52, 55, 0.04),
+    0 4px 16px rgba(47, 52, 55, 0.08),
+    0 12px 32px rgba(47, 52, 55, 0.06);
   --utility-card-gap: 1.35rem;
   --utility-card-pad: clamp(1.35rem, 2.5vw, 1.75rem);
 }
 
 /* Dedicated header band — solid surface, no blur behind nav copy */
 .project-summary-header-band {
-  --ps-charcoal: #2b2b2b;
-  --ps-charcoal-muted: color-mix(in srgb, #2b2b2b 72%, #6b6b6b);
-
-  background: color-mix(in srgb, #ffffff 96%, #f8f9fa);
+  background: color-mix(in srgb, var(--ps-ivory) 96%, var(--ps-mushroom));
   border-bottom: 1px solid color-mix(in srgb, var(--ps-charcoal) 10%, transparent);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.85) inset,
-    0 6px 24px rgba(43, 43, 43, 0.05);
+    0 6px 24px rgba(47, 52, 55, 0.05);
   padding: clamp(1rem, 2.5vw, 1.35rem) var(--utility-page-pad);
 }
 
@@ -53,7 +53,7 @@
 }
 
 .project-summary-header-band .utility-topbar__title {
-  color: var(--ps-charcoal);
+  color: var(--ps-denim);
 }
 
 .project-summary-header-band .utility-header__meta {
@@ -80,10 +80,10 @@
   padding-top: clamp(1rem, 2vw, 1.35rem);
 }
 
-/* Proposal cards — white, elevated */
+/* Proposal cards — ivory on mushroom backdrop */
 .project-summary-page .utility-card {
   background: var(--ps-card);
-  border-color: color-mix(in srgb, var(--ps-charcoal) 10%, transparent);
+  border-color: color-mix(in srgb, var(--ps-denim) 10%, transparent);
   box-shadow: var(--utility-shadow);
 }
 
@@ -109,32 +109,29 @@
 
 /* Hero recommendation — primary focus */
 .project-summary-page .ps-section--hero {
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, #ffffff 92%, var(--ps-eucalyptus) 8%) 0%,
-    var(--ps-card) 100%
-  );
-  border-color: color-mix(in srgb, var(--ps-eucalyptus) 22%, transparent);
-  box-shadow:
-    var(--utility-shadow),
-    0 0 0 1px color-mix(in srgb, var(--ps-eucalyptus) 8%, transparent);
+  background: var(--ps-card);
+  border-color: color-mix(in srgb, var(--ps-denim) 14%, transparent);
+  border-left: 3px solid var(--ps-coral);
+  box-shadow: var(--utility-shadow);
 }
 
 .project-summary-page .ps-section--hero .utility-card__title {
   font-size: clamp(1.15rem, 2.4vw, 1.35rem);
-  color: var(--ps-charcoal);
+  padding-left: 0.55rem;
+  border-left: 3px solid var(--ps-coral);
   border-bottom-color: color-mix(in srgb, var(--ps-eucalyptus) 28%, transparent);
 }
 
 .project-summary-page .ps-section--hero .ps-recommend__service-row {
-  border-left-width: 4px;
+  border-left-width: 3px;
+  border-left-color: var(--ps-coral);
 }
 
 /* Discovery reference — de-emphasized, collapsed by default */
 .project-summary-page .ps-section--reference {
   background: var(--ps-card-alt);
-  border-color: color-mix(in srgb, var(--ps-charcoal) 8%, transparent);
-  box-shadow: 0 1px 2px rgba(43, 43, 43, 0.03);
+  border-color: color-mix(in srgb, var(--ps-denim) 8%, transparent);
+  box-shadow: 0 1px 2px rgba(47, 52, 55, 0.03);
   padding: clamp(1rem, 2vw, 1.25rem) var(--utility-card-pad);
 }
 
@@ -178,7 +175,7 @@
   cursor: pointer;
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--ps-eucalyptus);
+  color: var(--ps-denim);
   list-style: none;
   display: inline-flex;
   align-items: center;
@@ -195,7 +192,7 @@
   display: inline-block;
   width: 1rem;
   font-weight: 700;
-  color: var(--ps-eucalyptus);
+  color: var(--ps-coral);
 }
 
 .project-summary-page .ps-heard__details[open] .ps-heard__expand::before {
@@ -247,7 +244,7 @@
   flex-direction: column;
   gap: 0.35rem;
   padding-left: 0.35rem;
-  border-left: 3px solid var(--ps-accent-warm);
+  border-left: 3px solid var(--ps-coral);
 }
 
 .project-summary-page .ps-recommend__service-name {
@@ -317,7 +314,7 @@
 .project-summary-page .ps-packages__price {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--ps-charcoal);
+  color: var(--ps-herb-gold);
   margin: 0;
 }
 
@@ -368,8 +365,8 @@
   padding: 0.65rem 0.85rem;
   border-radius: 8px;
   font-size: 0.92rem;
-  background: color-mix(in srgb, var(--ps-accent-gold) 12%, var(--ps-card));
-  border: 1px solid color-mix(in srgb, var(--ps-accent-warm) 28%, transparent);
+  background: color-mix(in srgb, var(--ps-herb-gold) 12%, var(--ps-card));
+  border: 1px solid color-mix(in srgb, var(--ps-coral) 28%, transparent);
 }
 
 /* Customize section */
@@ -396,7 +393,7 @@
 }
 
 .project-summary-page .ps-changes__powers li::marker {
-  color: var(--ps-accent-coral);
+  color: var(--ps-coral);
 }
 
 /* Plan review within proposal */
@@ -410,37 +407,43 @@
   font-size: 1.35rem;
 }
 
-/* Buttons — eucalyptus primary, white secondary */
+/* Buttons — denim primary, ivory secondary */
 .project-summary-page .utility-btn--primary {
-  background: var(--ps-eucalyptus);
-  border-color: var(--ps-eucalyptus);
-  box-shadow: 0 2px 10px color-mix(in srgb, var(--ps-eucalyptus) 32%, transparent);
+  background: var(--ps-denim);
+  border-color: var(--ps-denim);
+  box-shadow:
+    0 2px 10px color-mix(in srgb, var(--ps-denim) 32%, transparent),
+    0 0 0 0 color-mix(in srgb, var(--ps-coral) 0%, transparent);
 }
 
 .project-summary-page .utility-btn--primary:hover {
-  background: var(--ps-eucalyptus-deep);
-  border-color: var(--ps-eucalyptus-deep);
+  background: var(--ps-denim-deep);
+  border-color: var(--ps-denim-deep);
+  box-shadow:
+    0 2px 12px color-mix(in srgb, var(--ps-denim) 38%, transparent),
+    0 0 18px color-mix(in srgb, var(--ps-coral) 12%, transparent);
 }
 
 .project-summary-page .utility-btn--secondary,
 .project-summary-page .utility-btn--ghost {
-  color: var(--ps-charcoal);
-  background: #ffffff;
-  border: 1.5px solid color-mix(in srgb, var(--ps-charcoal) 28%, transparent);
+  color: var(--ps-denim);
+  background: var(--ps-ivory);
+  border: 1.5px solid color-mix(in srgb, var(--ps-denim) 28%, transparent);
 }
 
 .project-summary-page .utility-btn--secondary:hover,
 .project-summary-page .utility-btn--ghost:hover {
   background: var(--ps-card-alt);
-  border-color: color-mix(in srgb, var(--ps-charcoal) 42%, transparent);
+  border-color: color-mix(in srgb, var(--ps-denim) 42%, transparent);
 }
 
 .project-summary-page .utility-text-link,
 .project-summary-page .utility-topbar__help {
-  text-decoration-color: color-mix(in srgb, var(--ps-accent-warm) 55%, transparent);
+  color: var(--ps-denim);
+  text-decoration-color: color-mix(in srgb, var(--ps-coral) 45%, transparent);
 }
 
 .project-summary-page .utility-text-link:hover,
 .project-summary-page .utility-topbar__help:hover {
-  text-decoration-color: var(--ps-accent-warm);
+  text-decoration-color: var(--ps-coral);
 }

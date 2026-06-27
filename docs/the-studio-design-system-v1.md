@@ -18,28 +18,37 @@
 
 | Token | Purpose | Use for | Think |
 |-------|---------|---------|-------|
-| 🍄 Mushroom | Surfaces | Forms, cards, utility pages, paper, background panels | Premium stationery |
-| 👖 Denim Blue | Information | Page titles, section headings, nav, secondary buttons, downloads, links | Guidance |
-| 🌲 Eucalyptus | Action | Primary buttons, Continue, Confirm, Approve, Success | "Go." |
-| 🪸 Coral | Attention | Feedback, notes, warnings, revisions | "Notice this." |
-| ✨ Heritage Gold | Celebration | Milestones, completion, premium touches, highlights — **never** large background fills | "You've reached something important." |
+| 🍄 Mushroom | Surfaces | Backgrounds, paper surfaces, cards | Premium stationery |
+| 🧊 Ivory | Elevated surfaces | Cards, forms, pop-outs on Mushroom | Lifted paper |
+| 👖 Denim Blue | Information & action | **Page titles**, **primary buttons**, navigation, links | Guidance + go |
+| 🌲 Eucalyptus | Structure & success | **Section headings**, checkmarks, progress, success states | "This section." |
+| 🪸 Coral | Accent only | Callouts, active badges, icons, thin left borders, list markers — **not** dominant backgrounds | Warm hierarchy |
+| ✨ Herb Gold | Celebration | Premium banners, completed status, pricing highlights, milestones | "You've reached something important." |
 
-### Documented hex values (from existing CSS)
+### Documented hex values (locked palette)
 
-Where values exist in code today, document them here. Gaps are **TBD** until a page ships — do not invent random values.
+| Token | Name | Hex | Role |
+|-------|------|-----|------|
+| Mushroom | Warm Mushroom | `#E8E2D8` | Backgrounds, paper surfaces |
+| Ivory | Warm Ivory | `#F7F4EE` | Elevated cards, forms, pop-outs |
+| Denim Blue | Denim | `#355C7D` | Page titles, primary buttons, nav, links |
+| Eucalyptus | Eucalyptus Green | `#456B5A` | Section headings, success, checkmarks, progress |
+| Coral | Coral | `#D56B4D` | Accent only — borders, markers, highlights |
+| Herb Gold | Herb Gold | `#C7A64A` | Premium banners, pricing, celebration |
+| Charcoal | Body text | `#2F3437` | Primary body copy on decision pages |
 
-| Token | Name | Documented value | Source |
-|-------|------|------------------|--------|
-| Mushroom | Paper / card surfaces | `#FFFFFF`, `#F8F9FA` on decision pages; `#EFE8DE` (`--utility-paper-cream` / `--studio-paper`) on legacy utility pages; **`#E8E2D8` Soft Mushroom** and **`#F7F4EE` Warm Ivory** cards on Secure Checkout | `project-summary.css`, `utility-design-system.css`, `payment.css` |
-| Denim Blue | Information text & nav | `#2c3e50` (`--studio-denim`); **`#355C7D`** on Secure Checkout | `globals.css`, `payment.css` |
-| Denim Blue | Primary body text (decision pages) | `#2b2b2b` (`--ps-charcoal`); **`#2F3437` Charcoal** on Secure Checkout | `project-summary.css`, `payment.css` |
-| Eucalyptus | Action & section headers | `#2e5e4e` (`--ps-eucalyptus`); **`#456B5A`** on Secure Checkout | `project-summary.css`, `decision-page-visual-language-v1.md`, `payment.css` |
-| Eucalyptus deep | Primary hover | `color-mix(in srgb, #2e5e4e 88%, #000 12%)`; **`color-mix(in srgb, #456B5A 88%, #000 12%)`** on Secure Checkout | `project-summary.css`, `payment.css` |
-| Coral | Attention / list markers | `#e07a5f` (`--ps-accent-coral`); `#ff7f50` (`--studio-coral` in globals); **`#D56B4D`** on Secure Checkout | `project-summary.css`, `globals.css`, `payment.css` |
-| Heritage Gold | Celebration / warm accent | `#daa520` (`--ps-accent-gold`, `--studio-golden-yellow`); warm orange `#c47a2c` (`--ps-accent-warm`) for list markers; **`#C7A64A` Herb Gold** (status / pin accent) on Secure Checkout | `project-summary.css`, `globals.css`, `payment.css` |
-| Mushroom (nav active) | Progress / current location | `#6a8f5c` (`--utility-nav-accent-active`) | `utility-design-system.css` |
+**CSS source:** `:root` tokens in `src/app/studio-utility-backdrop.css` (`--studio-mushroom`, `--studio-ivory`, `--studio-denim`, etc.) — consumed by Project Summary, Secure Checkout, and Discovery split panels.
 
-**Note:** Mushroom naming in product language maps to *surfaces* — white/elevated cards on decision pages, cream paper on older utility shells. Consolidate into one token set in code later.
+**Foundation:** Mushroom / Ivory / Denim / Eucalyptus. Coral sprinkled for warmth and hierarchy — not loud.
+
+### Legacy aliases (being phased out)
+
+| Old token | Was used for | Replaced by |
+|-----------|--------------|-------------|
+| `#2e5e4e` / `#2b2b2b` | Project Summary eucalyptus / charcoal | `#456B5A` / `#2F3437` |
+| `#2c3e50` (`--studio-denim` in globals) | Legacy denim | `#355C7D` on decision pages |
+| `#c47a2c` warm orange | List markers | `#D56B4D` Coral |
+| `#daa520` | Heritage Gold | `#C7A64A` Herb Gold |
 
 ---
 
@@ -47,11 +56,12 @@ Where values exist in code today, document them here. Gaps are **TBD** until a p
 
 ### Role map (locked)
 
-- **Mushroom** — backgrounds customers read against: cards, forms, paper panels. Not decorative fills.
-- **Denim Blue** — titles, subtitles, navigation, secondary actions, links, downloads. Guides the eye; does not mean "click here" unless styled as a control.
-- **Eucalyptus** — the one "go" color: primary buttons, approve, confirm, success states, section titles on decision pages.
-- **Coral** — feedback that needs attention: warnings, revision notes, bullet markers for "notice this" lists.
-- **Heritage Gold** — celebration only: milestones, completion badges, subtle highlights. Never a page background or large panel fill.
+- **Mushroom** — page-level backgrounds customers read against; warm paper base beneath cards.
+- **Ivory** — elevated cards, forms, pop-outs on Mushroom or frosted lobby backdrop.
+- **Denim Blue** — page titles, primary buttons, navigation, links. Guides the eye and carries primary actions.
+- **Eucalyptus** — section headings, checkmarks, progress, success states. Structures content; does not replace primary buttons.
+- **Coral** — accent only: thin left borders on service lists, bullet markers, subtle CTA glow, active badges. Never a dominant background fill.
+- **Herb Gold** — celebration only: pricing highlights, completion badges, premium banners. Never a page background or large panel fill.
 
 ### Backdrop (decision / utility pages)
 
@@ -73,7 +83,8 @@ Cards carry elevation; backdrop stays visible below header band on decision page
 |------|------|--------|
 | Primary font | Inter — `--utility-font` / `--font-studio-board-sans` stack | `utility-design-system.css` |
 | Page title (utility top bar) | Inter, uppercase, `clamp(1.85rem, 3.1vw, 2.35rem)`, weight 700, letter-spacing `0.04em` | `utility-design-system.css` |
-| Section title (Project Summary cards) | `clamp(1.05rem, 2vw, 1.2rem)`, weight 700, Eucalyptus `#2e5e4e`, bottom border | `project-summary.css` |
+| Section title (Project Summary cards) | `clamp(1.05rem, 2vw, 1.2rem)`, weight 700, Eucalyptus `#456B5A`, bottom border | `project-summary.css` |
+| Page title (utility top bar) | Inter, uppercase, Denim `#355C7D` | `project-summary.css`, `payment.css` |
 | Body (decision pages) | ~`1rem` / `1.02rem`, line-height `1.55`–`1.6`, charcoal `#2b2b2b` | `project-summary.css` |
 | Muted secondary | `color-mix(in srgb, #2b2b2b 72%, #6b6b6b)` | `project-summary.css` |
 | Eyebrow / small label | `0.75rem`, uppercase, semibold, letter-spacing `0.06em` | `business-discovery-studio.css` (split preview) |
@@ -99,7 +110,7 @@ Cards carry elevation; backdrop stays visible below header band on decision page
 | Context | Value | Source |
 |---------|-------|--------|
 | Project Summary cards | `0 1px 2px rgba(43,43,43,0.04), 0 4px 16px rgba(43,43,43,0.08), 0 12px 32px rgba(43,43,43,0.06)` (`--utility-shadow`) | `project-summary.css` |
-| Primary button | `0 2px 10px color-mix(in srgb, #2e5e4e 32%, transparent)` | `project-summary.css` |
+| Primary button | `0 2px 10px color-mix(in srgb, #355C7D 32%, transparent)` | `project-summary.css`, `payment.css` |
 | Header band | `0 1px 0 rgba(255,255,255,0.85) inset, 0 6px 24px rgba(43,43,43,0.05)` | `project-summary.css` |
 | Utility scene cards | `0 2px 12px rgba(46,43,40,0.1), 0 1px 0 rgba(255,255,255,0.45) inset` | `studio-utility-backdrop.css` |
 
@@ -109,27 +120,27 @@ Cards carry elevation; backdrop stays visible below header band on decision page
 
 ## Buttons
 
-### Primary (Eucalyptus — Action)
+### Primary (Denim Blue — Action)
 
-- Background `#2e5e4e`, white text
+- Background `#355C7D`, white text
 - Uppercase semibold, letter-spacing ~`0.04em`
 - Padding ~`0.65rem–0.75rem` × `1.25rem`
 - Radius `8px`
-- Hover: eucalyptus deep mix
+- Hover: denim deep mix; optional subtle coral glow on Project Summary approve
 - **One primary per screen** where possible
 
-Code: `.utility-btn--primary`, `.bds-summary-panel--proposal .bds-summary-panel__continue`
+Code: `.utility-btn--primary`, `.bds-summary-panel--proposal .bds-summary-panel__continue`, `.pay-submit`
 
-### Secondary (Denim / charcoal outline — Information)
+### Secondary (Denim outline — Information)
 
-- White background, charcoal border `1.5px solid color-mix(in srgb, #2b2b2b 28%, transparent)`
-- Charcoal text; hover lifts to `#f8f9fa` surface
+- Ivory background, denim border `1.5px solid color-mix(in srgb, #355C7D 28%, transparent)`
+- Denim text; hover lifts to Mushroom-tinted surface
 
 Code: `.utility-btn--secondary`, `.utility-btn--ghost` in `project-summary.css`
 
 ### Text links
 
-- Denim/charcoal text; warm underline accent on hover (`--ps-accent-warm`)
+- Denim text; coral underline accent on hover
 
 **TBD:** Danger/destructive pattern (legacy Terracotta `#C85A3D` in `studio-utility-design-system.md` — reconcile on next utility pass).
 
@@ -140,7 +151,7 @@ Code: `.utility-btn--secondary`, `.utility-btn--ghost` in `project-summary.css`
 **TBD** as a formal icon set. Current patterns:
 
 - Checkmarks for recommended services (✓) in split preview — names only, no Why?
-- List markers use warm accent border-left (`#c47a2c`) on service rows — `project-summary.css`, split preview
+- List markers and service rows use coral left border (`#D56B4D`) — `project-summary.css`, split preview
 
 Do not introduce ad-hoc emoji in production UI beyond locked copy patterns.
 
@@ -207,11 +218,11 @@ Active/progress accent: Mushroom green `#6a8f5c` (`--utility-nav-accent-active`)
 
 | Status | Role | Documented treatment |
 |--------|------|-------------------|
-| Success / approved / complete | Eucalyptus | Primary buttons, cost totals, section headers |
-| Information / neutral | Denim + charcoal body | Default text and nav |
-| Warning / attention | Coral + Heritage Gold mix | Warning list items: gold-tint background, warm border — `project-summary.css` `.ps-warnings` |
+| Success / approved / complete | Eucalyptus | Section headers, cost totals, checkmarks, progress status |
+| Information / neutral | Denim + charcoal body | Page titles, nav, links, body text |
+| Warning / attention | Coral + Herb Gold mix | Warning list items: gold-tint background, coral border — `project-summary.css` `.ps-warnings` |
 | Revision / feedback | Coral markers | Bullet `::marker` on customize powers list |
-| Celebration / milestone | Heritage Gold | Subtle highlights only — **TBD** for Final Delivery completion UI |
+| Celebration / milestone | Herb Gold | Pricing highlights, pin accents — Secure Checkout |
 
 ---
 
@@ -232,13 +243,13 @@ Discovery board keeps corkboard/warm styling; split preview uses proposal tokens
 | File | Role |
 |------|------|
 | `src/app/project-summary.css` | Decision-page tokens and components |
-| `src/app/studio-utility-backdrop.css` | Shared lobby backdrop |
+| `src/app/studio-utility-backdrop.css` | Shared lobby backdrop + `:root` palette tokens |
 | `src/app/utility-design-system.css` | Legacy utility shell |
 | `src/app/business-discovery-studio.css` | Split preview panel (proposal subset) |
 | `src/app/payment.css` | Secure Checkout — utility pages palette and three-column pinboard |
 | `docs/decision-page-visual-language-v1.md` | Project Summary / checkout proposal notes |
 
-**Future:** Extract locked tokens from this doc into shared CSS custom properties — not in scope for v1 documentation pass.
+**Future:** Palette tokens live in `studio-utility-backdrop.css`; page CSS maps local aliases. Broader migration of legacy utility pages is out of scope for this pass.
 
 ---
 
