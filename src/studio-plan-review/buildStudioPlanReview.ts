@@ -2,11 +2,13 @@
  * Studio Plan Review — maps RecommendationResult + plan state to customer-facing view model.
  */
 
-import { getServiceById } from "@/catalog/accessors";
+import { getDerivedServicePricing, getServiceById } from "@/catalog/accessors";
+import { validateExecutionAddOnsInPlan } from "@/catalog/validate";
+import { SERVICE_CATALOG } from "@/catalog/services";
 import type { ServiceId } from "@/catalog/types";
+import { computePlanPricingTotals, formatUsdFromCents } from "@/lib/plan-pricing";
 import type { RecommendationResult } from "@/recommendation/types";
 import {
-  allocateSelectedServices,
   computeAdditionalCostUsd,
   getAvailableServicesToAdd,
   getSameClassSwapCandidates,
@@ -16,6 +18,7 @@ import {
   STUDIO_PLAN_REVIEW_LABELS,
   type StudioPlanReviewCostSummary,
   type StudioPlanReviewModel,
+  type StudioPlanReviewPlanTotals,
   type StudioPlanReviewServiceItem,
 } from "@/studio-plan-review/types";
 
@@ -35,25 +38,26 @@ function formatUsd(amount: number): string {
 }
 
 function buildCostSummary(additionalServiceIds: readonly ServiceId[]): StudioPlanReviewCostSummary {
-  const { amountUsd, hasQuotedItems } = computeAdditionalCostUsd(additionalServiceIds);
+  const { amountUsd } = computeAdditionalCostUsd(additionalServiceIds);
 
   if (additionalServiceIds.length === 0) {
     return { display: formatUsd(0), amountUsd: 0, hasQuotedItems: false };
   }
 
-  if (hasQuotedItems && amountUsd === 0) {
-    return { display: "Quoted at checkout", amountUsd: 0, hasQuotedItems: true };
-  }
-
-  if (hasQuotedItems) {
-    return {
-      display: `${formatUsd(amountUsd)} plus quoted items`,
-      amountUsd,
-      hasQuotedItems: true,
-    };
-  }
-
   return { display: formatUsd(amountUsd), amountUsd, hasQuotedItems: false };
+}
+
+function buildPlanTotals(selectedServiceIds: readonly ServiceId[]): StudioPlanReviewPlanTotals {
+  const totals = computePlanPricingTotals(selectedServiceIds);
+
+  return {
+    oneTimeSubtotalDisplay: formatUsdFromCents(totals.oneTimeSubtotalCents),
+    monthlySubtotalDisplay: formatUsdFromCents(totals.monthlySubtotalCents),
+    amountDueTodayDisplay: formatUsdFromCents(totals.amountDueTodayCents),
+    oneTimeSubtotalCents: totals.oneTimeSubtotalCents,
+    monthlySubtotalCents: totals.monthlySubtotalCents,
+    amountDueTodayCents: totals.amountDueTodayCents,
+  };
 }
 
 function buildServiceItem(
@@ -63,6 +67,8 @@ function buildServiceItem(
 ): StudioPlanReviewServiceItem | null {
   const service = getServiceById(serviceId);
   if (!service) return null;
+
+  const pricing = getDerivedServicePricing(serviceId);
 
   const swapCandidates = getSameClassSwapCandidates(serviceId, selectedIds)
     .map((candidateId) => {
@@ -75,8 +81,8 @@ function buildServiceItem(
   return {
     serviceId,
     title: service.name,
-    pricingDisplay: service.pricing?.display ?? "Quoted at checkout",
-    amountUsd: service.pricing?.amountUsd ?? 0,
+    pricingDisplay: pricing?.display ?? formatUsd(0),
+    amountUsd: pricing?.amountUsd ?? 0,
     isIncluded,
     swapCandidates,
   };
@@ -106,27 +112,29 @@ export function buildStudioPlanReview(
   planState: StudioPlanState,
 ): StudioPlanReviewModel {
   const recommendedServiceIds = result.recommendations.map((entry) => entry.serviceId);
-  const { includedServiceIds, additionalServiceIds } = allocateSelectedServices(
-    planState.selectedServiceIds,
-  );
-
   const recommendedSet = new Set(recommendedServiceIds);
-  const includedServices = mapServiceIds(includedServiceIds, true, planState.selectedServiceIds);
-  const additionalStudioServices = mapServiceIds(
-    additionalServiceIds.filter((id) => recommendedSet.has(id)),
-    false,
-    planState.selectedServiceIds,
-  );
-  const addedToPlanServices = mapServiceIds(
-    additionalServiceIds.filter((id) => !recommendedSet.has(id)),
-    false,
-    planState.selectedServiceIds,
-  );
+  const selectedIds = planState.selectedServiceIds;
+
+  // Customer-facing grouping: all recommended services stay "Included" regardless of
+  // internal production allocation. Only client-added services appear as additional.
+  const displayIncludedIds = selectedIds.filter((id) => recommendedSet.has(id));
+  const manuallyAddedIds = selectedIds.filter((id) => !recommendedSet.has(id));
+
+  const includedServices = mapServiceIds(displayIncludedIds, true, selectedIds);
+  const additionalStudioServices = mapServiceIds(manuallyAddedIds, false, selectedIds);
+  const addedToPlanServices: StudioPlanReviewServiceItem[] = [];
   const availableToAdd = mapServiceIds(
     getAvailableServicesToAdd(planState.selectedServiceIds),
     false,
     planState.selectedServiceIds,
   );
+
+  const planValidation = validateExecutionAddOnsInPlan(
+    planState.selectedServiceIds,
+    SERVICE_CATALOG,
+  );
+  const hasServices = planState.selectedServiceIds.length > 0;
+  const planValid = hasServices && planValidation.valid;
 
   const warnings = buildWarnings(result);
   const emptyStateMessage =
@@ -136,14 +144,17 @@ export function buildStudioPlanReview(
 
   return {
     labels: STUDIO_PLAN_REVIEW_LABELS,
+    selectedServiceIds: planState.selectedServiceIds,
     recommendedServiceIds,
     includedServices,
     additionalStudioServices,
     addedToPlanServices,
     availableToAdd,
-    additionalCost: buildCostSummary(additionalServiceIds),
+    additionalCost: buildCostSummary(manuallyAddedIds),
+    planTotals: buildPlanTotals(planState.selectedServiceIds),
     warnings,
-    canApprove: planState.selectedServiceIds.length > 0,
+    canApprove: planValid,
+    planValid,
     emptyStateMessage,
   };
 }

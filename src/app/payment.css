@@ -150,9 +150,9 @@
 .pay-paper-card__title {
   margin: 0 0 1rem;
   padding-bottom: 0.65rem;
-  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  font-size: var(--type-section-title);
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
   text-transform: none;
   color: var(--pay-eucalyptus);
   border-bottom: 2px solid color-mix(in srgb, var(--pay-eucalyptus) 18%, transparent);
@@ -190,7 +190,7 @@
   display: flex;
   align-items: flex-start;
   gap: 0.4rem;
-  font-size: 0.9375rem;
+  font-size: var(--type-helper);
   line-height: 1.45;
   color: var(--pay-charcoal);
 }
@@ -207,11 +207,65 @@
   margin-top: 1rem;
 }
 
+.pay-summary-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.pay-summary-total-row + .pay-summary-total-row {
+  margin-top: 0.65rem;
+}
+
+.pay-summary-total-row--due {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid color-mix(in srgb, var(--pay-charcoal) 12%, transparent);
+}
+
+.pay-summary-total-label {
+  margin: 0;
+  font-size: var(--type-helper);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--pay-charcoal);
+}
+
+.pay-summary-total-row--due .pay-summary-total-label {
+  font-weight: 700;
+}
+
+.pay-summary-total-row .pay-summary-price {
+  margin: 0;
+  flex-shrink: 0;
+  text-align: right;
+  font-size: var(--type-price-inline);
+}
+
+.pay-summary-total-row--due .pay-summary-price {
+  font-size: var(--type-price-total);
+}
+
+.pay-summary-disclosure-note {
+  margin: 0.75rem 0 0;
+  font-size: max(0.875rem, var(--type-helper));
+  line-height: 1.45;
+  color: var(--pay-charcoal-muted, color-mix(in srgb, var(--pay-charcoal) 72%, transparent));
+}
+
 .pay-summary-price {
   margin: 0.35rem 0 0;
-  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  font-size: var(--type-price-total);
   font-weight: 700;
   color: var(--pay-eucalyptus);
+}
+
+.pay-summary-line-price {
+  font-size: var(--type-price-inline);
+  font-weight: 700;
+  color: var(--pay-charcoal);
 }
 
 .pay-form {
@@ -268,21 +322,46 @@
   border-color: var(--pay-coral);
 }
 
-.pay-terms {
+.pay-acknowledgment {
+  margin-top: 0.75rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid color-mix(in srgb, var(--pay-charcoal) 12%, transparent);
+}
+
+.pay-acknowledgment__heading {
+  margin: 0 0 0.65rem;
+  font-size: var(--type-section-title);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--pay-charcoal);
+}
+
+.pay-acknowledgment__body {
+  margin: 0 0 0.75rem;
+  font-size: var(--type-helper);
+  line-height: 1.55;
+  color: var(--pay-charcoal);
+}
+
+.pay-acknowledgment__body:last-of-type {
+  margin-bottom: 1rem;
+}
+
+.pay-acknowledgment__checkbox {
   display: flex;
   align-items: flex-start;
-  gap: 0.55rem;
-  margin-top: 0.2rem;
-  font-size: 0.875rem;
-  line-height: 1.45;
+  gap: 0.65rem;
+  font-size: var(--type-helper);
+  font-weight: 600;
+  line-height: 1.5;
   color: var(--pay-charcoal);
   cursor: pointer;
 }
 
-.pay-terms input {
-  width: 1rem;
-  height: 1rem;
-  margin: 0.15rem 0 0;
+.pay-acknowledgment__checkbox input {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0.2rem 0 0;
   accent-color: var(--pay-eucalyptus);
   flex-shrink: 0;
 }
@@ -295,7 +374,7 @@
   border-radius: 8px;
   background: color-mix(in srgb, var(--pay-eucalyptus) 12%, #ffffff 88%);
   color: color-mix(in srgb, var(--pay-eucalyptus-deep) 78%, #fff 22%);
-  font-size: 0.82rem;
+  font-size: var(--type-button);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -368,7 +447,7 @@
 
 .pay-sandbox__hint {
   margin: 0 0 0.55rem;
-  font-size: 0.78rem;
+  font-size: var(--type-helper);
   line-height: 1.45;
   color: var(--pay-charcoal-muted);
   text-align: left;
@@ -406,7 +485,7 @@
 
 .pay-next-intro {
   margin: 0 0 0.6rem;
-  font-size: 0.9375rem;
+  font-size: var(--type-helper);
   line-height: 1.45;
   color: var(--pay-charcoal);
 }
@@ -424,7 +503,7 @@
   display: flex;
   align-items: flex-start;
   gap: 0.45rem;
-  font-size: 0.9375rem;
+  font-size: var(--type-helper);
   line-height: 1.45;
   color: var(--pay-charcoal);
 }
@@ -447,20 +526,36 @@
 
 .pay-next-secure {
   margin: 1rem 0 0;
-  font-size: 0.82rem;
+  font-size: var(--type-helper);
   line-height: 1.5;
   color: var(--pay-charcoal-muted);
 }
 
 .pay-disclaimer {
-  margin: 0.15rem 0 0;
-  padding: 0.65rem 0.75rem;
+  margin: 0.35rem 0 0;
+  padding: 0.85rem 0.95rem;
   border-radius: 8px;
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: var(--pay-charcoal-muted);
   background: color-mix(in srgb, var(--pay-mushroom) 55%, var(--pay-ivory));
   border: 1px solid color-mix(in srgb, var(--pay-denim) 10%, transparent);
+}
+
+.pay-disclaimer__heading {
+  margin: 0 0 0.55rem;
+  font-size: var(--type-section-title);
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--pay-charcoal);
+}
+
+.pay-disclaimer__line {
+  margin: 0;
+  font-size: var(--type-helper);
+  line-height: 1.6;
+  color: var(--pay-charcoal-muted);
+}
+
+.pay-disclaimer__line + .pay-disclaimer__line {
+  margin-top: 0.45rem;
 }
 
 .pay-checkout-grid--embedded {

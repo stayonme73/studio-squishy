@@ -8,6 +8,7 @@
  */
 
 import { getActiveServices, getServiceCatalog } from "@/catalog/accessors";
+import { getStructuredDeliverablesForEngine } from "@/catalog/compat";
 import {
   PRODUCTION_ALLOCATION_LIMITS,
 } from "@/catalog/production-allocation";
@@ -30,13 +31,26 @@ import type {
   RecommendationResult,
   RecommendationWarning,
   ServiceRecommendation,
+  TimelineLineItem,
 } from "@/recommendation/types";
+import {
+  briefIndicatesRecurringWorkload,
+  briefIndicatesStartingFresh,
+  parseDiscoveryMultiselectSelections,
+} from "@/lib/discovery-brief";
 import { validateDiscoveryBrief } from "@/recommendation/validate";
 
-export const RECOMMENDATION_ENGINE_VERSION = "1.1.0";
+export const RECOMMENDATION_ENGINE_VERSION = "1.2.0";
 
 const DEFAULT_RULE_WEIGHT = 1;
 const LOW_CONFIDENCE_MAX_SCORE = 1;
+const FOUNDATION_SERVICE_IDS: readonly ServiceId[] = [
+  "bf-001",
+  "bf-002",
+  "cp-001",
+  "sm-001",
+];
+const FOUNDATION_FALLBACK_SCORE = 12;
 
 const SITUATION_TILE: DiscoveryFormTileId = "your-situation";
 const CHALLENGE_TILE: DiscoveryFormTileId = "your-challenge";
@@ -96,6 +110,12 @@ export function matchDiscoveryRule(
       const keyword = rule.value.toLowerCase();
       return focus.includes(keyword) ? rule.value : null;
     }
+    case "tools": {
+      const toolsTile = rule.tileId ?? "your-current-tools";
+      const selections = parseDiscoveryMultiselectSelections(toolsTile, brief.answers);
+      if (selections.length === 0 && !tileAnswer(brief, toolsTile)) return null;
+      return selections.includes(rule.value) ? rule.value : null;
+    }
     default:
       return null;
   }
@@ -126,6 +146,58 @@ function compareRecommendations(
 ): number {
   if (b.score !== a.score) return b.score - a.score;
   return a.serviceId.localeCompare(b.serviceId);
+}
+
+function isFoundationServiceId(serviceId: ServiceId): boolean {
+  return FOUNDATION_SERVICE_IDS.includes(serviceId);
+}
+
+function compareWithFoundationPriority(a: ScoredService, b: ScoredService): number {
+  const aFoundation = isFoundationServiceId(a.serviceId);
+  const bFoundation = isFoundationServiceId(b.serviceId);
+  if (aFoundation !== bFoundation) return aFoundation ? -1 : 1;
+  return compareRecommendations(a, b);
+}
+
+function toServiceBillingModel(
+  billingType: ServiceCatalogEntry["billingType"],
+): "one-time" | "monthly" {
+  return billingType === "monthly" ? "monthly" : "one-time";
+}
+
+function oneTimeServiceTimelineLabel(service: ServiceCatalogEntry): string {
+  const first = service.firstReviewWindow.label;
+  const final = service.finalDeliveryWindow?.label;
+  if (final) {
+    return `First review ${first.toLowerCase()}; final delivery ${final.toLowerCase()}`;
+  }
+  return first;
+}
+
+function monthlyServiceTimelineLabel(service: ServiceCatalogEntry): string {
+  return service.monthlyCycleWindow?.label ?? service.firstReviewWindow.label;
+}
+
+function serviceTimelineBusinessDays(service: ServiceCatalogEntry): number {
+  if (service.billingType === "monthly") {
+    return service.firstReviewWindow.maxDays;
+  }
+  return service.finalDeliveryWindow?.maxDays ?? service.firstReviewWindow.maxDays;
+}
+
+function buildServiceTimelineItem(service: ServiceCatalogEntry): TimelineLineItem {
+  const billing = toServiceBillingModel(service.billingType);
+  const customerLabel =
+    billing === "monthly"
+      ? monthlyServiceTimelineLabel(service)
+      : oneTimeServiceTimelineLabel(service);
+
+  return {
+    serviceId: service.id,
+    customerLabel,
+    businessDays: serviceTimelineBusinessDays(service),
+    billing,
+  };
 }
 
 function buildReasons(matchedRules: readonly MatchedDiscoveryRule[]): RecommendationReason[] {
@@ -181,12 +253,15 @@ function buildDeliverablesSummary(
   services: readonly ServiceCatalogEntry[],
 ): DeliverablesSummaryItem[] {
   return services
-    .filter((service) => (service.deliverables?.length ?? 0) > 0)
-    .map((service) => ({
-      serviceId: service.id,
-      deliverables: service.deliverables ?? [],
-      totalQuantity: (service.deliverables ?? []).reduce((sum, item) => sum + item.quantity, 0),
-    }));
+    .filter((service) => getStructuredDeliverablesForEngine(service).length > 0)
+    .map((service) => {
+      const deliverables = getStructuredDeliverablesForEngine(service);
+      return {
+        serviceId: service.id,
+        deliverables,
+        totalQuantity: deliverables.reduce((sum, item) => sum + item.quantity, 0),
+      };
+    });
 }
 
 function buildEstimatedInvestment(services: readonly ServiceCatalogEntry[]): EstimatedInvestment {
@@ -215,22 +290,33 @@ function compareTimelineItems(
 }
 
 function buildEstimatedTimeline(services: readonly ServiceCatalogEntry[]): EstimatedTimeline {
-  const items = services
-    .filter((service) => service.estimatedProductionTime !== undefined)
-    .map((service) => ({
-      serviceId: service.id,
-      customerLabel: service.estimatedProductionTime!.customerLabel,
-      businessDays: service.estimatedProductionTime!.businessDays,
-    }))
-    .sort(compareTimelineItems);
+  const items = services.map(buildServiceTimelineItem).sort(compareTimelineItems);
 
+  const oneTimeItems = items.filter((item) => item.billing === "one-time");
+  const monthlyItems = items.filter((item) => item.billing === "monthly");
+
+  const longestOneTime = oneTimeItems[0];
+  const longestMonthly = monthlyItems[0];
   const longest = items[0];
-  const totalBusinessDays = longest?.businessDays ?? 0;
+
+  const oneTimeLabel = longestOneTime?.customerLabel;
+  const monthlyLabel = longestMonthly?.customerLabel;
+
+  let customerLabel = "";
+  if (oneTimeLabel && monthlyLabel) {
+    customerLabel = `One-time projects: ${oneTimeLabel}. Ongoing monthly: ${monthlyLabel}`;
+  } else if (monthlyLabel) {
+    customerLabel = monthlyLabel;
+  } else {
+    customerLabel = oneTimeLabel ?? "";
+  }
 
   return {
     items,
-    totalBusinessDays,
-    customerLabel: longest?.customerLabel ?? "",
+    totalBusinessDays: longest?.businessDays ?? 0,
+    customerLabel,
+    oneTimeLabel,
+    monthlyLabel,
   };
 }
 
@@ -342,6 +428,97 @@ function buildLowConfidenceWarning(
   return null;
 }
 
+function getScoringPool(
+  catalog: readonly ServiceCatalogEntry[],
+  brief: DiscoveryBrief,
+): ServiceCatalogEntry[] {
+  const allowMonthly = briefIndicatesRecurringWorkload(brief);
+
+  return catalog.filter((service) => {
+    if (service.status !== "active") return false;
+    if (!service.isRecommendable) return false;
+    if (service.isExecutionAddOn) return false;
+    if (!allowMonthly && service.billingType === "monthly") return false;
+    return true;
+  });
+}
+
+function shouldIncludeSocialFoundation(brief: DiscoveryBrief): boolean {
+  const needs = brief.selectedNeeds ?? [];
+  if (needs.includes("create-content") || needs.includes("get-more-customers")) {
+    return true;
+  }
+  if (brief.answers["your-challenge"] === "Marketing and visibility") return true;
+  const focus = brief.answers["your-focus"] ?? "";
+  return focus.includes("Content") || focus.includes("Marketing");
+}
+
+function applyFoundationFallback(
+  scored: ScoredService[],
+  brief: DiscoveryBrief,
+  scoringPool: readonly ServiceCatalogEntry[],
+): ScoredService[] {
+  if (!briefIndicatesStartingFresh(brief)) return scored;
+
+  const byId = new Map(scored.map((entry) => [entry.serviceId, entry]));
+  const poolById = new Map(scoringPool.map((service) => [service.id, service]));
+
+  for (const serviceId of FOUNDATION_SERVICE_IDS) {
+    if (serviceId === "sm-001" && !shouldIncludeSocialFoundation(brief)) continue;
+
+    const service = poolById.get(serviceId);
+    if (!service) continue;
+
+    const existing = byId.get(serviceId);
+    if (existing) {
+      if (existing.score < FOUNDATION_FALLBACK_SCORE) {
+        existing.score = FOUNDATION_FALLBACK_SCORE;
+      }
+      continue;
+    }
+
+    byId.set(serviceId, {
+      serviceId,
+      score: FOUNDATION_FALLBACK_SCORE,
+      matchedRules: [
+        {
+          serviceId,
+          rule: { signal: "situation", value: "Starting fresh", weight: FOUNDATION_FALLBACK_SCORE },
+          matchedValue: "Starting fresh",
+        },
+      ],
+      service,
+    });
+  }
+
+  return [...byId.values()].sort(compareWithFoundationPriority);
+}
+
+function buildMaterialsAndAccessWarnings(
+  services: readonly ServiceCatalogEntry[],
+): RecommendationWarning[] {
+  const warnings: RecommendationWarning[] = [];
+
+  for (const service of services) {
+    if (service.requiresClientMaterials) {
+      warnings.push({
+        kind: "requires-client-materials",
+        message: `"${service.name}" requires client-provided materials before production can begin.`,
+        serviceId: service.id,
+      });
+    }
+    if (service.requiresClientAccess) {
+      warnings.push({
+        kind: "requires-client-access",
+        message: `"${service.name}" may require connected platform access if managed execution is selected.`,
+        serviceId: service.id,
+      });
+    }
+  }
+
+  return warnings;
+}
+
 function buildWarnings(
   brief: DiscoveryBrief,
   recommendations: readonly ServiceRecommendation[],
@@ -355,6 +532,7 @@ function buildWarnings(
       new Set(includedServices.map((service) => service.id)),
       includedServices,
     ),
+    ...buildMaterialsAndAccessWarnings(includedServices),
   ];
 
   const lowConfidence = buildLowConfidenceWarning(recommendations);
@@ -392,10 +570,10 @@ export function recommendFromDiscovery(
 ): RecommendationResult {
   validateDiscoveryBrief(brief);
 
-  const services = catalog ?? getActiveServices();
   const fullCatalog = catalog ?? getServiceCatalog();
+  const scoringPool = getScoringPool(catalog ?? getActiveServices(), brief);
 
-  const scored: ScoredService[] = services
+  let scored: ScoredService[] = scoringPool
     .map((service) => {
       const { score, matchedRules } = scoreService(service, brief);
       return { serviceId: service.id, score, matchedRules, service };
@@ -403,15 +581,31 @@ export function recommendFromDiscovery(
     .filter((entry) => entry.score > 0)
     .sort(compareRecommendations);
 
+  scored = applyFoundationFallback(scored, brief, scoringPool);
+
+  if (briefIndicatesStartingFresh(brief)) {
+    const slowing = parseDiscoveryMultiselectSelections("whats-slowing-you-down", brief.answers);
+    const allowOptimization =
+      brief.answers["your-challenge"] === "Technology and tools" ||
+      slowing.includes("Outdated tools or technology");
+
+    scored = scored.filter(
+      (entry) =>
+        isFoundationServiceId(entry.serviceId) ||
+        (allowOptimization && entry.serviceId === "mo-001"),
+    );
+  }
+
   const recommendations = toServiceRecommendations(scored);
   const { included, additional } = applyProductionAllocation(scored);
   const includedRecommendations = toServiceRecommendations(included);
   const additionalStudioServices = toServiceRecommendations(additional);
 
+  const allRecommendedEntries = scored.map((entry) => entry.service);
   const includedServiceEntries = included.map((entry) => entry.service);
   const primaryServiceId = includedRecommendations[0]?.serviceId ?? null;
   const estimatedInvestment = buildEstimatedInvestment(includedServiceEntries);
-  const estimatedTimeline = buildEstimatedTimeline(includedServiceEntries);
+  const estimatedTimeline = buildEstimatedTimeline(allRecommendedEntries);
   const warnings = buildWarnings(brief, recommendations, includedServiceEntries, fullCatalog);
 
   return {
@@ -421,7 +615,7 @@ export function recommendFromDiscovery(
     additionalStudioServices,
     primaryServiceId,
     rationale: buildRationale(recommendations),
-    deliverablesSummary: buildDeliverablesSummary(includedServiceEntries),
+    deliverablesSummary: buildDeliverablesSummary(allRecommendedEntries),
     estimatedInvestment,
     estimatedTimeline,
     warnings,

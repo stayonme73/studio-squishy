@@ -32,10 +32,10 @@ export const DISCOVERY_SPLIT_PREVIEW_LABELS = {
 
 export const PROJECT_SUMMARY_LABELS = {
   pageTitle: "Project Summary",
-  pageLeadLines: [
-    "The Studio reviewed your Discovery answers.",
-    "Review your personalized Studio Plan before continuing.",
-  ],
+  pageLead:
+    "Review your Studio Plan, make any changes, then approve your exact services and pricing.",
+  backLabel: "← Back to Discovery",
+  helpCenterLabel: "Help Center",
   heardTitle: "Discovery Summary",
   heardReferenceLead: "Supporting evidence for our recommendations.",
   heardExpandLabel: "View all Discovery answers",
@@ -43,6 +43,7 @@ export const PROJECT_SUMMARY_LABELS = {
   recommendTitle: "Our Recommendation",
   recommendLead: "Based on what you shared, we recommend starting with:",
   recommendWhyLabel: "Why?",
+  recommendTimelineLabel: "Estimated timeline",
   packagesTitle: "Prefer a bundled option?",
   packagesLead:
     "Studio Bundles are fixed offerings — contents cannot be added, removed, or customized. Choose one below, or customize your personalized Studio Plan instead.",
@@ -59,19 +60,17 @@ export const PROJECT_SUMMARY_LABELS = {
     "Add additional Studio Services",
   ],
   changesAutoUpdate: "Your Studio Plan will update automatically as you make changes.",
-  disclaimerTitle: "Before you approve",
-  disclaimerBody:
-    "Our recommendations are based entirely on the information you shared during Discovery. They are intended to help you make informed decisions, not to guarantee business results. You're free to adjust your Studio Plan before approving it.",
+  disclaimerTitle: "About your recommendations",
+  disclaimerBodyLines: [
+    "Your Studio Plan is based on what you shared in Discovery.",
+    "You can adjust your selections before payment.",
+    "Recommendations are guidance, not a guarantee of results.",
+  ],
   totalInvestmentLabel: "Estimated total investment",
   totalInvestmentPlaceholder: "Total updates as you customize your plan.",
   editDiscovery: "Edit Discovery Answers",
   confirmPlan: "Approve and continue to checkout",
 } as const;
-
-export type ProjectSummaryMockService = {
-  name: string;
-  why: string;
-};
 
 export type ProjectSummaryMockPackage = {
   id: "spark" | "momentum" | "growth";
@@ -85,27 +84,8 @@ export type ProjectSummaryMockPackage = {
   billingLabel: "One-Time Investment" | "Monthly Plan";
 };
 
-/** Placeholder services + per-service Why? until Discovery Mapping wires traceable copy. */
-export const PROJECT_SUMMARY_MOCK = {
-  services: [
-    {
-      name: "Brand Identity Refresh",
-      why: "You told us you're building your brand from the ground up — a refreshed identity gives you a consistent look before anything goes live.",
-    },
-    {
-      name: "Brand Messaging",
-      why: "You selected Better Branding — clear messaging helps customers understand what you offer from day one.",
-    },
-    {
-      name: "Marketing Campaign",
-      why: "You want to get more customers — a structured campaign turns your new brand into outreach that drives awareness.",
-    },
-    {
-      name: "Social Media Marketing",
-      why: "You selected Get More Customers — social channels are where many of your prospects already spend time.",
-    },
-  ] satisfies readonly ProjectSummaryMockService[],
-  packages: [
+/** Placeholder Studio Bundles — out of scope for Slice 4; bundles remain mock until wired. */
+export const PROJECT_SUMMARY_MOCK_PACKAGES: readonly ProjectSummaryMockPackage[] = [
     {
       id: "spark",
       name: "Spark",
@@ -161,8 +141,7 @@ export const PROJECT_SUMMARY_MOCK = {
       priceDisplay: "$799/month",
       billingLabel: "Monthly Plan",
     },
-  ] satisfies readonly ProjectSummaryMockPackage[],
-} as const;
+] as const;
 
 export type DiscoveryAnswerHeardItem = {
   label: string;

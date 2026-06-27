@@ -28,6 +28,7 @@ import {
   type DiscoveryAnswers,
 } from "@/lib/business-discovery-session";
 import { submitDiscoveryCampaign } from "@/lib/studio-board-campaign";
+import { runDiscoveryRecommendation } from "@/lib/run-discovery-recommendation";
 import { studioBoard } from "@/config/studio-board";
 import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import type { PanelPhase } from "@/project-summary";
@@ -58,6 +59,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   const [splitLayoutActive, setSplitLayoutActive] = useState(false);
   const [splitLayoutSettled, setSplitLayoutSettled] = useState(false);
   const [rightPanelPhase, setRightPanelPhase] = useState<PanelPhase | null>(null);
+  const [discoveryPreviewServices, setDiscoveryPreviewServices] = useState<readonly string[]>([]);
 
   const {
     src,
@@ -183,6 +185,8 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
       setAnswers(finalAnswers);
       saveDiscoveryAnswers(finalAnswers);
       submitDiscoveryCampaign(finalAnswers);
+      const { summary } = runDiscoveryRecommendation(finalAnswers);
+      setDiscoveryPreviewServices(summary.recommendedServices.map((service) => service.title));
       beginShrink();
       setSplitLayoutActive(true);
       setRightPanelPhase("reviewing");
@@ -355,7 +359,10 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
             {rightPanelPhase === "reviewing" ? (
               <DiscoveryReviewingPanel />
             ) : rightPanelPhase === "summary" ? (
-              <DiscoverySummaryPlaceholder onContinue={continueToProjectSummary} />
+              <DiscoverySummaryPlaceholder
+                serviceNames={discoveryPreviewServices}
+                onContinue={continueToProjectSummary}
+              />
             ) : null}
           </div>
         </div>

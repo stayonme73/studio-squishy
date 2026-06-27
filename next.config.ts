@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       { source: "/draft-room/begin", destination: "/business-discovery-studio", permanent: false },
       { source: "/draft-room", destination: "/business-discovery-studio", permanent: false },
       { source: "/intake", destination: "/business-discovery-studio", permanent: false },
+      { source: "/studio-plan-review", destination: "/project-summary", permanent: false },
     ];
   },
 };

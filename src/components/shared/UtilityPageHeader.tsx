@@ -16,9 +16,17 @@ type Props = {
   leadLines?: readonly string[];
   aside?: ReactNode;
   helpCenterFrom?: "campaign-details" | "studio-board" | "payment";
+  /** Override default "← Back" label. */
+  backLabel?: string;
+  /** Text link instead of rounded secondary button. */
+  backVariant?: "button" | "link";
+  /** Override default Help Center link label. */
+  helpLabel?: string;
+  /** Stacked nav row + title block (Project Summary orientation strip). */
+  layout?: "default" | "orientation";
 };
 
-/** Approved utility top bar: Back | Title | Help Center. */
+/** Approved utility top bar: Back | Title | Help Center (default) or orientation strip. */
 export default function UtilityPageHeader({
   backHref,
   activeNav,
@@ -27,9 +35,18 @@ export default function UtilityPageHeader({
   leadLines,
   aside,
   helpCenterFrom,
+  backLabel,
+  backVariant = "button",
+  helpLabel,
+  layout = "default",
 }: Props) {
   const showSecondaryNav = utilityPageUsesSecondaryNav(activeNav);
   const onHelpCenter = activeNav === "help-center";
+  const isOrientation = layout === "orientation";
+  const backClassName =
+    backVariant === "link"
+      ? "utility-topbar__back utility-topbar__back--link"
+      : "utility-btn utility-btn--secondary utility-topbar__back";
   const leadCopy =
     leadLines && leadLines.length > 0
       ? leadLines.map((line) => (
@@ -43,25 +60,60 @@ export default function UtilityPageHeader({
           )
         : null;
 
+  const backLink = (
+    <Link href={backHref} className={backClassName}>
+      {backLabel ?? "← Back"}
+    </Link>
+  );
+
+  const helpLink = onHelpCenter ? (
+    <Link href={studioBoard.routes.studioBoard} className="utility-topbar__help">
+      Studio Board →
+    </Link>
+  ) : (
+    <Link href={helpCenterHref(undefined, helpCenterFrom)} className="utility-topbar__help">
+      {helpLabel ?? "Help Center →"}
+    </Link>
+  );
+
+  if (isOrientation) {
+    return (
+      <header className="utility-header">
+        <div className="utility-topbar utility-topbar--orientation">
+          <nav className="utility-topbar__nav" aria-label="Page navigation">
+            {backLink}
+            {helpLink}
+          </nav>
+          <div className="utility-topbar__intro">
+            <h1 className="utility-topbar__title">{title}</h1>
+            {leadCopy}
+          </div>
+        </div>
+
+        {showSecondaryNav ? (
+          <div className="utility-subnav">
+            <UtilityNav activeId={activeNav} />
+          </div>
+        ) : null}
+
+        {aside ? (
+          <div className="utility-header__meta">
+            <div className="utility-header__aside">{aside}</div>
+          </div>
+        ) : null}
+      </header>
+    );
+  }
+
   return (
     <header className="utility-header">
       <div className="utility-topbar">
         <div className="utility-topbar__start">
-          <Link href={backHref} className="utility-btn utility-btn--secondary utility-topbar__back">
-            ← Back
-          </Link>
+          {backLink}
         </div>
         <h1 className="utility-topbar__title">{title}</h1>
         <div className="utility-topbar__end">
-          {onHelpCenter ? (
-            <Link href={studioBoard.routes.studioBoard} className="utility-topbar__help">
-              Studio Board →
-            </Link>
-          ) : (
-            <Link href={helpCenterHref(undefined, helpCenterFrom)} className="utility-topbar__help">
-              Help Center →
-            </Link>
-          )}
+          {helpLink}
         </div>
       </div>
 

@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "seed:decision-learner": "node scripts/seed-decision-learner.mjs"
   },
   "dependencies": {
@@ -24,6 +26,7 @@
     "playwright": "^1.61.0",
     "sharp": "^0.35.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

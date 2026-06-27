@@ -105,7 +105,26 @@ export default function DiscoverySummary({ model }: Props) {
           <h2 id="ds-investment-title" className="utility-card__title">
             Estimated investment
           </h2>
-          <p className="ds-summary-value">{model.totalInvestment.display}</p>
+          {model.recommendedServices.length === 0 ? (
+            <p className="ds-summary-value">{model.totalInvestment.display}</p>
+          ) : (
+            <dl className="ds-investment__totals">
+              <div className="ds-investment__total-row">
+                <dt>One-time</dt>
+                <dd>{model.totalInvestment.oneTimeSubtotalDisplay}</dd>
+              </div>
+              {model.totalInvestment.monthlySubtotalCents > 0 ? (
+                <div className="ds-investment__total-row">
+                  <dt>Monthly</dt>
+                  <dd>{model.totalInvestment.monthlySubtotalDisplay}/month</dd>
+                </div>
+              ) : null}
+              <div className="ds-investment__total-row ds-investment__total-row--due">
+                <dt>Due today</dt>
+                <dd>{model.totalInvestment.amountDueTodayDisplay}</dd>
+              </div>
+            </dl>
+          )}
         </section>
 
         <section className="utility-card" aria-labelledby="ds-timeline-title">

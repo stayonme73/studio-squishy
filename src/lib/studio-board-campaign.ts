@@ -17,11 +17,15 @@ import { isIntakeEditable } from "@/lib/intake-edit";
 import {
   CAMPAIGN_STATUSES,
   studioBoard,
+  type ApprovalAcknowledgment,
   type ApprovedStudioPlan,
   type CampaignIntakeSnapshot,
   type CampaignRecord,
   type CampaignStatus,
 } from "@/config/studio-board";
+import { SERVICE_CATALOG } from "@/catalog/services";
+import { validateExecutionAddOnsInPlan } from "@/catalog/validate";
+import { buildServiceScopeSnapshot, computePlanPricingTotals } from "@/lib/plan-pricing";
 import { allocateSelectedServices, computeAdditionalCostUsd } from "@/studio-plan-review";
 import type { ServiceId } from "@/catalog/types";
 
@@ -272,19 +276,37 @@ export function submitDiscoveryCampaign(answers: DiscoveryAnswers): CampaignReco
 
 export function saveApprovedStudioPlan(
   selectedServiceIds: readonly ServiceId[],
+  acknowledgment?: ApprovalAcknowledgment,
 ): CampaignRecord | null {
   const campaign = readCurrentCampaign();
   if (!campaign) return null;
 
+  const validation = validateExecutionAddOnsInPlan(selectedServiceIds, SERVICE_CATALOG);
+  if (!validation.valid) return null;
+
   const { includedServiceIds, additionalServiceIds } = allocateSelectedServices(selectedServiceIds);
   const { amountUsd } = computeAdditionalCostUsd(additionalServiceIds);
+  const pricing = computePlanPricingTotals(selectedServiceIds);
+  const lineItems = buildServiceScopeSnapshot(selectedServiceIds);
   const now = new Date().toISOString();
 
   const approvedStudioPlan: ApprovedStudioPlan = {
+    selectedServiceIds: [...selectedServiceIds],
     includedServiceIds,
     additionalServiceIds,
     additionalCostUsd: amountUsd,
+    oneTimeTotalCents: pricing.oneTimeSubtotalCents,
+    monthlyTotalCents: pricing.monthlySubtotalCents,
+    amountDueTodayCents: pricing.amountDueTodayCents,
+    lineItems,
     approvedAt: now,
+    ...(acknowledgment
+      ? {
+          acknowledgmentVersion: acknowledgment.acknowledgmentVersion,
+          acknowledgmentText: acknowledgment.acknowledgmentText,
+          acknowledgedAt: acknowledgment.acknowledgedAt,
+        }
+      : {}),
   };
 
   const updated: CampaignRecord = {

@@ -58,6 +58,7 @@ export default function StudioPlanReviewPageClient() {
   }
 
   function handleApprove() {
+    if (!model.planValid) return;
     const saved = saveApprovedStudioPlan(planState.selectedServiceIds);
     if (!saved) return;
     const packageId = saved.packageId ?? studioBoard.membership.packageId;

@@ -5,6 +5,7 @@
 
 import { getActiveServices, getServiceById } from "@/catalog/accessors";
 import { PRODUCTION_ALLOCATION_LIMITS } from "@/catalog/production-allocation";
+import { canAttachExecutionAddOn } from "@/catalog/validate";
 import type { ServiceClass, ServiceId } from "@/catalog/types";
 
 export type StudioPlanState = {
@@ -45,14 +46,36 @@ export function allocateSelectedServices(selectedIds: readonly ServiceId[]): Pla
   return { includedServiceIds, additionalServiceIds };
 }
 
+function pruneOrphanedExecutionAddOns(selectedIds: readonly ServiceId[]): ServiceId[] {
+  const services = getActiveServices();
+  return selectedIds.filter((id) => {
+    const service = getServiceById(id);
+    if (!service?.isExecutionAddOn) return true;
+    return canAttachExecutionAddOn(id, selectedIds, services);
+  });
+}
+
 export function removeServiceFromPlan(state: StudioPlanState, serviceId: ServiceId): StudioPlanState {
-  return {
-    selectedServiceIds: state.selectedServiceIds.filter((id) => id !== serviceId),
-  };
+  const without = state.selectedServiceIds.filter((id) => id !== serviceId);
+  return { selectedServiceIds: pruneOrphanedExecutionAddOns(without) };
 }
 
 export function addServiceToPlan(state: StudioPlanState, serviceId: ServiceId): StudioPlanState {
   if (state.selectedServiceIds.includes(serviceId)) return state;
+
+  const service = getServiceById(serviceId);
+  if (!service) return state;
+
+  const activeServices = getActiveServices();
+
+  if (service.isExecutionAddOn) {
+    if (!canAttachExecutionAddOn(serviceId, state.selectedServiceIds, activeServices)) {
+      return state;
+    }
+  } else if (!service.isAddable) {
+    return state;
+  }
+
   return { selectedServiceIds: [...state.selectedServiceIds, serviceId] };
 }
 
@@ -70,9 +93,9 @@ export function swapServiceInPlan(
 ): StudioPlanState {
   if (!canSwapServices(fromId, toId)) return state;
   if (state.selectedServiceIds.includes(toId)) return state;
-  return {
-    selectedServiceIds: state.selectedServiceIds.map((id) => (id === fromId ? toId : id)),
-  };
+
+  const swapped = state.selectedServiceIds.map((id) => (id === fromId ? toId : id));
+  return { selectedServiceIds: pruneOrphanedExecutionAddOns(swapped) };
 }
 
 export function getSameClassSwapCandidates(
@@ -95,30 +118,32 @@ export function getSameClassSwapCandidates(
 
 export function getAvailableServicesToAdd(selectedIds: readonly ServiceId[]): ServiceId[] {
   const selected = new Set(selectedIds);
-  return getActiveServices()
-    .filter((service) => !selected.has(service.id))
+  const activeServices = getActiveServices();
+
+  return activeServices
+    .filter((service) => {
+      if (selected.has(service.id)) return false;
+      if (service.isExecutionAddOn) {
+        return canAttachExecutionAddOn(service.id, selectedIds, activeServices);
+      }
+      return service.isAddable;
+    })
     .map((service) => service.id);
 }
 
+/** Overflow-only additional cost (services beyond allocation limits) — backward compat. */
 export function computeAdditionalCostUsd(additionalServiceIds: readonly ServiceId[]): {
   amountUsd: number;
   hasQuotedItems: boolean;
 } {
   let amountUsd = 0;
-  let hasQuotedItems = false;
 
   for (const serviceId of additionalServiceIds) {
-    const service = getServiceById(serviceId);
-    const pricing = service?.pricing;
-    if (!pricing) {
-      hasQuotedItems = true;
-      continue;
+    const pricing = getServiceById(serviceId)?.pricing;
+    if (pricing) {
+      amountUsd += pricing.amountUsd;
     }
-    if (pricing.amountUsd === 0) {
-      hasQuotedItems = true;
-    }
-    amountUsd += pricing.amountUsd;
   }
 
-  return { amountUsd, hasQuotedItems };
+  return { amountUsd, hasQuotedItems: false };
 }

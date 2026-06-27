@@ -6,7 +6,54 @@ import { projectDiscoveryHref } from "@/config/customer-journey-v1";
 import type { FeedbackConceptPreview } from "@/config/feedback-studio";
 import type { DeliverableQuotaId, StudioGuidePackageId } from "@/config/studio-guide";
 import type { DiscoveryBriefAnswers } from "@/recommendation/types";
-import type { ServiceId } from "@/catalog/types";
+import type { BillingType, ServiceFamilyId, ServiceId } from "@/catalog/types";
+
+/** Immutable scope snapshot for one approved SKU — post-approval reads this, not live catalog. */
+export type ApprovedStudioPlanLineItem = {
+  skuId: ServiceId;
+  serviceName: string;
+  billingType: BillingType;
+  exactPriceCents: number;
+  priceDisplay: string;
+  deliverables: readonly string[];
+  exclusions: readonly string[];
+  timingWindowLabel: string;
+  revisionRule: string;
+  clientResponsibilities: readonly string[];
+  executionResponsibility: string;
+  parentSkuId?: ServiceId;
+  parentFamilyId?: ServiceFamilyId;
+  /** @deprecated use skuId — retained for backward-compat reads */
+  serviceId?: ServiceId;
+  /** @deprecated use serviceName */
+  name?: string;
+  /** @deprecated use exactPriceCents */
+  priceCents?: number;
+};
+
+export type ApprovalAcknowledgment = {
+  acknowledgmentVersion: string;
+  acknowledgmentText: string;
+  acknowledgedAt: string;
+};
+
+/** Customer-approved Studio Plan — saved after Studio Plan Review. */
+export type ApprovedStudioPlan = {
+  /** Ordered selection — base SKUs + execution add-ons. */
+  selectedServiceIds: readonly ServiceId[];
+  includedServiceIds: readonly ServiceId[];
+  additionalServiceIds: readonly ServiceId[];
+  /** Overflow-only — services beyond allocation limits (backward compat). */
+  additionalCostUsd: number;
+  oneTimeTotalCents: number;
+  monthlyTotalCents: number;
+  amountDueTodayCents: number;
+  lineItems: readonly ApprovedStudioPlanLineItem[];
+  approvedAt: string;
+  acknowledgmentVersion?: string;
+  acknowledgmentText?: string;
+  acknowledgedAt?: string;
+};
 
 export const CAMPAIGN_STATUSES = [
   "DISCOVERY_COMPLETE",
@@ -40,14 +87,6 @@ export type CampaignIntakeSnapshot = {
 };
 
 export type DeliverablesDelivered = Partial<Record<DeliverableQuotaId, number>>;
-
-/** Customer-approved Studio Plan — saved after Studio Plan Review. */
-export type ApprovedStudioPlan = {
-  includedServiceIds: readonly ServiceId[];
-  additionalServiceIds: readonly ServiceId[];
-  additionalCostUsd: number;
-  approvedAt: string;
-};
 
 export type CampaignRecord = {
   campaignId: string;

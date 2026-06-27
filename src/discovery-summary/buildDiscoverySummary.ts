@@ -3,16 +3,13 @@
  * Reads engine output and catalog copy; does not re-score or re-match discovery rules.
  */
 
-import { getServiceById } from "@/catalog/accessors";
+import { getDerivedServicePricing, getServiceById, getServicePriceCents } from "@/catalog/accessors";
 import { CUSTOMER_SECTION_LABELS } from "@/catalog/production-allocation";
 import type { ServiceId } from "@/catalog/types";
-import { studioNeeds } from "@/config/studio-services";
+import { buildCustomerWhyExplanation } from "@/discovery-summary/recommendation-copy";
+import { computePlanPricingTotals, formatUsdFromCents } from "@/lib/plan-pricing";
 import type {
   DeliverablesSummaryItem,
-  EstimatedInvestment,
-  EstimatedTimeline,
-  InvestmentLineItem,
-  RecommendationReason,
   RecommendationResult,
   RecommendationWarning,
   RecommendationWarningKind,
@@ -24,9 +21,8 @@ import type {
   DiscoverySummaryServiceItem,
   DiscoverySummaryTotalInvestment,
   DiscoverySummaryWarning,
+  DiscoverySummaryInvestment,
 } from "@/discovery-summary/types";
-
-const NEED_LABEL_BY_ID = new Map(studioNeeds.map((need) => [need.id, need.label]));
 
 const CUSTOMER_WARNING_MESSAGES: Record<
   RecommendationWarningKind,
@@ -39,103 +35,73 @@ const CUSTOMER_WARNING_MESSAGES: Record<
     "Some recommended services work best as a combined package — we'll confirm the full scope before checkout.",
   "low-confidence-match": () =>
     "This is our best match from what you shared so far — a quick review before checkout is recommended.",
+  "requires-client-materials": (warning) => warning.message,
+  "requires-client-access": (warning) => warning.message,
 };
 
-function needLabel(value: string): string {
-  return NEED_LABEL_BY_ID.get(value as (typeof studioNeeds)[number]["id"]) ?? formatKebabLabel(value);
+function buildServiceInvestment(serviceId: ServiceId): DiscoverySummaryInvestment {
+  const pricing = getDerivedServicePricing(serviceId);
+  const service = getServiceById(serviceId);
+  const billing = pricing?.billing ?? (service?.billingType === "monthly" ? "monthly" : "one-time");
+  const amountUsd = pricing?.amountUsd ?? getServicePriceCents(serviceId) / 100;
+  const display =
+    pricing?.display ??
+    (billing === "monthly"
+      ? `${formatUsdFromCents(getServicePriceCents(serviceId))}/month`
+      : formatUsdFromCents(getServicePriceCents(serviceId)));
+
+  return { display, amountUsd, billing };
 }
 
-function formatKebabLabel(value: string): string {
-  return value
-    .split("-")
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
-function reasonPhrase(reason: RecommendationReason): string {
-  switch (reason.signal) {
-    case "need":
-      return `You selected "${needLabel(reason.value)}" as a goal.`;
-    case "situation":
-      return `Your situation — "${reason.value}" — aligns with this service.`;
-    case "challenge":
-      return `You identified "${reason.value}" as a challenge we can address.`;
-    case "focus-keyword":
-      return `Your focus on "${reason.value}" points here.`;
-  }
-}
-
-function buildServiceExplanation(
-  customerDescription: string,
-  reasons: readonly RecommendationReason[],
-): string {
-  const reasonCopy = [...reasons]
-    .sort((a, b) => b.weight - a.weight)
-    .map(reasonPhrase)
-    .filter((phrase, index, phrases) => phrases.indexOf(phrase) === index);
-
-  if (reasonCopy.length === 0) {
-    return customerDescription;
+function buildTotalInvestment(serviceIds: readonly ServiceId[]): DiscoverySummaryTotalInvestment {
+  if (serviceIds.length === 0) {
+    return {
+      display: "No investment estimate",
+      amountUsd: 0,
+      hasQuotedItems: false,
+      oneTimeSubtotalDisplay: formatUsdFromCents(0),
+      monthlySubtotalDisplay: formatUsdFromCents(0),
+      amountDueTodayDisplay: formatUsdFromCents(0),
+      monthlySubtotalCents: 0,
+    };
   }
 
-  return `${customerDescription} ${reasonCopy.join(" ")}`.trim();
-}
+  const totals = computePlanPricingTotals(serviceIds);
+  const oneTimeSubtotalDisplay = formatUsdFromCents(totals.oneTimeSubtotalCents);
+  const monthlySubtotalDisplay = formatUsdFromCents(totals.monthlySubtotalCents);
+  const amountDueTodayDisplay = formatUsdFromCents(totals.amountDueTodayCents);
 
-function formatUsd(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-function buildTotalInvestmentDisplay(investment: EstimatedInvestment): string {
-  if (investment.items.length === 0) {
-    return "No investment estimate";
+  let display: string;
+  if (totals.monthlySubtotalCents > 0 && totals.oneTimeSubtotalCents > 0) {
+    display = `${amountDueTodayDisplay} due today; ${monthlySubtotalDisplay}/month ongoing`;
+  } else if (totals.monthlySubtotalCents > 0) {
+    display = `${monthlySubtotalDisplay}/month`;
+  } else {
+    display = oneTimeSubtotalDisplay;
   }
 
-  const allQuoted = investment.items.every((item) => item.amountUsd === 0);
-  if (allQuoted) {
-    return "Quoted at checkout";
-  }
-
-  const hasMonthly = investment.items.some((item) => item.billing === "monthly");
-  const hasOneTime = investment.items.some((item) => item.billing === "one-time");
-  const total = formatUsd(investment.totalAmountUsd);
-
-  if (hasMonthly && hasOneTime) {
-    return investment.hasQuotedItems
-      ? `${total} plus quoted items (mix of one-time and monthly)`
-      : `${total} (mix of one-time and monthly)`;
-  }
-
-  if (hasMonthly) {
-    return investment.hasQuotedItems
-      ? `${total} per month plus quoted items`
-      : `${total} per month`;
-  }
-
-  return investment.hasQuotedItems ? `${total} plus quoted items` : total;
-}
-
-function buildTotalInvestment(investment: EstimatedInvestment): DiscoverySummaryTotalInvestment {
   return {
-    display: buildTotalInvestmentDisplay(investment),
-    amountUsd: investment.totalAmountUsd,
-    hasQuotedItems: investment.hasQuotedItems,
+    display,
+    amountUsd: totals.amountDueTodayCents / 100,
+    hasQuotedItems: false,
+    oneTimeSubtotalDisplay,
+    monthlySubtotalDisplay,
+    amountDueTodayDisplay,
+    monthlySubtotalCents: totals.monthlySubtotalCents,
   };
 }
 
-function buildTimelineSummary(timeline: EstimatedTimeline) {
+function buildTimelineSummary(timeline: RecommendationResult["estimatedTimeline"]) {
   return {
     customerLabel: timeline.customerLabel,
     totalBusinessDays: timeline.totalBusinessDays,
+    oneTimeLabel: timeline.oneTimeLabel,
+    monthlyLabel: timeline.monthlyLabel,
   };
 }
 
 function buildNextStep(result: RecommendationResult): DiscoverySummaryNextStep {
-  if (result.includedRecommendations.length === 0) {
+  if (result.recommendations.length === 0) {
     return {
       headline: "Let's find the right fit",
       body: "We couldn't match your answers to a specific package yet. Update your discovery answers or reach out and we'll help you choose.",
@@ -178,19 +144,20 @@ function indexByServiceId<T extends { serviceId: ServiceId }>(
 
 function buildServiceItem(
   recommendation: RecommendationResult["recommendations"][number],
+  brief: RecommendationResult["brief"],
   deliverablesByServiceId: Map<ServiceId, DeliverablesSummaryItem>,
-  investmentByServiceId: Map<ServiceId, InvestmentLineItem>,
   timelineByServiceId: Map<ServiceId, TimelineLineItem>,
 ): DiscoverySummaryServiceItem {
   const service = getServiceById(recommendation.serviceId);
   const deliverablesEntry = deliverablesByServiceId.get(recommendation.serviceId);
-  const investmentEntry = investmentByServiceId.get(recommendation.serviceId);
   const timelineEntry = timelineByServiceId.get(recommendation.serviceId);
 
   const title = service?.name ?? recommendation.serviceId;
   const customerDescription =
-    service?.customerDescription ?? service?.customerReceives ?? recommendation.serviceId;
-  const explanation = buildServiceExplanation(customerDescription, recommendation.reasons);
+    service?.customerDescription ?? service?.customerReceives ?? "";
+  const explanation =
+    buildCustomerWhyExplanation(recommendation.serviceId, brief, customerDescription) ||
+    title;
 
   return {
     serviceId: recommendation.serviceId,
@@ -201,11 +168,7 @@ function buildServiceItem(
       label: item.label,
       quantity: item.quantity,
     })),
-    investment: {
-      display: investmentEntry?.display ?? "Quoted at checkout",
-      amountUsd: investmentEntry?.amountUsd ?? 0,
-      billing: investmentEntry?.billing ?? "one-time",
-    },
+    investment: buildServiceInvestment(recommendation.serviceId),
     timelineLabel: timelineEntry?.customerLabel ?? "",
   };
 }
@@ -215,23 +178,18 @@ function buildServiceItem(
  */
 export function buildDiscoverySummary(result: RecommendationResult): DiscoverySummaryModel {
   const deliverablesByServiceId = indexByServiceId(result.deliverablesSummary);
-  const investmentByServiceId = indexByServiceId(result.estimatedInvestment.items);
   const timelineByServiceId = indexByServiceId(result.estimatedTimeline.items);
+  const allRecommendedServiceIds = result.recommendations.map((entry) => entry.serviceId);
 
   const mapRecommendations = (
-    recommendations: RecommendationResult["includedRecommendations"],
+    recommendations: RecommendationResult["recommendations"],
   ) =>
     recommendations.map((recommendation) =>
-      buildServiceItem(
-        recommendation,
-        deliverablesByServiceId,
-        investmentByServiceId,
-        timelineByServiceId,
-      ),
+      buildServiceItem(recommendation, result.brief, deliverablesByServiceId, timelineByServiceId),
     );
 
-  const recommendedServices = mapRecommendations(result.includedRecommendations);
-  const additionalStudioServices = mapRecommendations(result.additionalStudioServices);
+  const recommendedServices = mapRecommendations(result.recommendations);
+  const additionalStudioServices: DiscoverySummaryServiceItem[] = [];
 
   const warnings = result.warnings
     .map(mapWarning)
@@ -242,7 +200,7 @@ export function buildDiscoverySummary(result: RecommendationResult): DiscoverySu
     additionalStudioServices,
     sectionLabels: CUSTOMER_SECTION_LABELS,
     primaryServiceId: result.primaryServiceId,
-    totalInvestment: buildTotalInvestment(result.estimatedInvestment),
+    totalInvestment: buildTotalInvestment(allRecommendedServiceIds),
     estimatedTimeline: buildTimelineSummary(result.estimatedTimeline),
     nextStep: buildNextStep(result),
     warnings,

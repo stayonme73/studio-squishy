@@ -9,13 +9,12 @@ export type {
   DiscoveryAnswerHeardItem,
   PanelPhase,
   ProjectSummaryMockPackage,
-  ProjectSummaryMockService,
 } from "@/project-summary/types";
 
 export {
   DISCOVERY_SPLIT_PREVIEW_LABELS,
   PROJECT_SUMMARY_LABELS,
-  PROJECT_SUMMARY_MOCK,
+  PROJECT_SUMMARY_MOCK_PACKAGES,
 } from "@/project-summary/types";
 
 export { buildDiscoveryAnswersHeard } from "@/project-summary/buildDiscoveryAnswersHeard";

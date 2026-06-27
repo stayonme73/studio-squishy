@@ -8,13 +8,12 @@ import StudioPlanReviewScene from "@/components/studio-plan-review/StudioPlanRev
 import { SecureCheckoutGrid } from "@/components/payment/PaymentCheckoutScene";
 import type { StudioPlanReviewModel } from "@/studio-plan-review";
 import type { ServiceId } from "@/catalog/types";
+import type { ApprovalAcknowledgment } from "@/config/studio-board";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
 import { buildPaymentPlanSummaryFromPlan } from "@/lib/payment-plan-summary";
 import {
   PROJECT_SUMMARY_LABELS,
-  PROJECT_SUMMARY_MOCK,
   type DiscoveryAnswerHeardItem,
-  type ProjectSummaryMockService,
 } from "@/project-summary";
 
 type Props = {
@@ -26,7 +25,9 @@ type Props = {
   onRemove: (serviceId: ServiceId) => void;
   onSwap: (fromId: ServiceId, toId: ServiceId) => void;
   onAdd: (serviceId: ServiceId) => void;
-  onSavePlanBeforePayment: () => boolean;
+  onSavePlanBeforePayment: (acknowledgment: ApprovalAcknowledgment) => boolean;
+  onOpenServiceGuide: (serviceId: ServiceId) => void;
+  onViewPlanDetails: () => void;
 };
 
 const HEARD_HIGHLIGHT_COUNT = 2;
@@ -139,9 +140,10 @@ export default function ProjectSummaryScene({
   onSwap,
   onAdd,
   onSavePlanBeforePayment,
+  onOpenServiceGuide,
+  onViewPlanDetails,
 }: Props) {
   const hasRecommendations = summary.recommendedServices.length > 0;
-  const mockServices: readonly ProjectSummaryMockService[] = PROJECT_SUMMARY_MOCK.services;
   const livePlanSummary = useMemo(() => buildPaymentPlanSummaryFromPlan(plan), [plan]);
 
   return (
@@ -163,14 +165,22 @@ export default function ProjectSummaryScene({
             </ul>
           ) : null}
           <ul className="ps-recommend__service-list">
-            {hasRecommendations
-              ? summary.recommendedServices.map((service) => (
-                  <RecommendedServiceFromSummary key={service.serviceId} service={service} />
-                ))
-              : mockServices.map((service) => (
-                  <RecommendedServiceRow key={service.name} name={service.name} why={service.why} />
-                ))}
+            {hasRecommendations ? (
+              summary.recommendedServices.map((service) => (
+                <RecommendedServiceFromSummary key={service.serviceId} service={service} />
+              ))
+            ) : (
+              <li className="ps-muted">{PROJECT_SUMMARY_LABELS.recommendLead}</li>
+            )}
           </ul>
+          {summary.estimatedTimeline.customerLabel ? (
+            <div className="ps-recommend__timeline">
+              <span className="ps-recommend__timeline-label">
+                {PROJECT_SUMMARY_LABELS.recommendTimelineLabel}
+              </span>
+              <p className="ps-recommend__timeline-body">{summary.estimatedTimeline.customerLabel}</p>
+            </div>
+          ) : null}
         </section>
 
         <DiscoverySummarySection heard={heard} editDiscoveryHref={editDiscoveryHref} />
@@ -196,52 +206,20 @@ export default function ProjectSummaryScene({
               onRemove={onRemove}
               onSwap={onSwap}
               onAdd={onAdd}
-              onApprove={onSavePlanBeforePayment}
+              onApprove={() => onSavePlanBeforePayment({
+                acknowledgmentVersion: "",
+                acknowledgmentText: "",
+                acknowledgedAt: new Date().toISOString(),
+              })}
               hideApprove
+              onOpenServiceGuide={onOpenServiceGuide}
             />
           </div>
         </section>
       </div>
 
       <div className="ps-workspace__col ps-workspace__col--right">
-        <section
-          className="utility-card ps-section"
-          aria-labelledby="ps-packages-title"
-        >
-          <h2 id="ps-packages-title" className="utility-card__title">
-            {PROJECT_SUMMARY_LABELS.packagesTitle}
-          </h2>
-          <p className="ps-packages__lead">{PROJECT_SUMMARY_LABELS.packagesLead}</p>
-          <ul className="ps-packages__grid" aria-label={PROJECT_SUMMARY_LABELS.packagesSelectLabel}>
-            {PROJECT_SUMMARY_MOCK.packages.map((pkg) => (
-              <li key={pkg.id} className="ps-packages__card">
-                <div className="ps-packages__intro">
-                  <p className="ps-packages__name">
-                    <span aria-hidden="true">{pkg.emoji} </span>
-                    {pkg.name}
-                  </p>
-                  <p className="ps-packages__tagline">{pkg.tagline}</p>
-                  <p className="ps-packages__description">{pkg.description}</p>
-                </div>
-                <div className="ps-packages__includes-block">
-                  <p className="ps-packages__includes-label">
-                    {PROJECT_SUMMARY_LABELS.packagesIncludesLabel}
-                  </p>
-                  <ul className="ps-packages__includes">
-                    {pkg.includes.map((service) => (
-                      <li key={service}>{service}</li>
-                    ))}
-                  </ul>
-                </div>
-                <p className="ps-packages__price">{pkg.priceDisplay}</p>
-                <p className="ps-packages__billing">{pkg.billingLabel}</p>
-                <button type="button" className="utility-btn utility-btn--secondary ps-packages__select" disabled>
-                  {PROJECT_SUMMARY_LABELS.packagesSelectLabel}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
+        {/* Bundles archived — see src/archive/project-summary/ProjectSummaryBundlesSection.tsx */}
 
         <section
           className="utility-card ps-section ps-workspace__col--checkout payment-page"
@@ -255,8 +233,13 @@ export default function ProjectSummaryScene({
               layout="embedded"
               packageId={packageId}
               planSummary={livePlanSummary}
-              disclaimerText={PROJECT_SUMMARY_LABELS.disclaimerBody}
+              recommendationNotice={{
+                title: PROJECT_SUMMARY_LABELS.disclaimerTitle,
+                lines: PROJECT_SUMMARY_LABELS.disclaimerBodyLines,
+              }}
               onBeforePayment={onSavePlanBeforePayment}
+              onOpenServiceGuide={onOpenServiceGuide}
+              onViewPlanDetails={onViewPlanDetails}
             />
           </div>
         </section>

@@ -32,11 +32,17 @@ export type DiscoverySummaryTotalInvestment = {
   display: string;
   amountUsd: number;
   hasQuotedItems: boolean;
+  oneTimeSubtotalDisplay: string;
+  monthlySubtotalDisplay: string;
+  amountDueTodayDisplay: string;
+  monthlySubtotalCents: number;
 };
 
 export type DiscoverySummaryTimeline = {
   customerLabel: string;
   totalBusinessDays: number;
+  oneTimeLabel?: string;
+  monthlyLabel?: string;
 };
 
 export type DiscoverySummaryNextStep = {

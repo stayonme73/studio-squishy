@@ -1,163 +1,195 @@
-import { getServiceById } from "@/catalog/accessors";
-import type { StudioGuidePackageId } from "@/config/studio-guide";
-import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
+import type { BillingType, ServiceId } from "@/catalog/types";
+import type { ApprovedStudioPlanLineItem } from "@/config/studio-board";
 import { readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
-import { PROJECT_SUMMARY_MOCK } from "@/project-summary";
+import {
+  buildPlanLineItems,
+  computePlanPricingTotals,
+  formatUsdFromCents,
+} from "@/lib/plan-pricing";
 import type { StudioPlanReviewModel } from "@/studio-plan-review";
 
-export type PaymentPlanSummarySource = "storage" | "mock";
+export type PaymentPlanSummarySource = "storage" | "empty";
+
+export type PaymentPlanLineItem = {
+  serviceId: ServiceId;
+  name: string;
+  priceDisplay: string;
+  priceCents: number;
+  billingType: BillingType;
+};
 
 export type PaymentPlanSummary = {
+  lineItems: readonly PaymentPlanLineItem[];
   services: readonly string[];
-  investmentLabel: "Estimated Investment" | "Monthly Total";
+  oneTimeSubtotalCents: number;
+  monthlySubtotalCents: number;
+  amountDueTodayCents: number;
+  oneTimeSubtotalDisplay: string;
+  monthlySubtotalDisplay: string;
+  amountDueTodayDisplay: string;
+  investmentLabel: "Estimated Investment" | "Monthly Total" | "Amount Due Today";
   investmentDisplay: string;
   source: PaymentPlanSummarySource;
 };
 
-const MOCK_INVESTMENT = "$1,596";
-
-function formatUsd(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(amount);
+function resolveApprovedServiceIds(
+  approved: NonNullable<ReturnType<typeof readCurrentCampaignHydrated>>["approvedStudioPlan"],
+): ServiceId[] {
+  if (!approved) return [];
+  if (approved.selectedServiceIds?.length) {
+    return [...approved.selectedServiceIds];
+  }
+  return [...approved.includedServiceIds, ...approved.additionalServiceIds];
 }
 
-function isMonthlyPackage(packageId: StudioGuidePackageId): boolean {
-  const pkg = getStudioGuideV1Package(packageId);
-  return pkg?.price.toLowerCase().includes("per month") ?? false;
+function buildSummaryFromServiceIds(
+  serviceIds: readonly ServiceId[],
+  source: PaymentPlanSummarySource,
+): PaymentPlanSummary {
+  const totals = computePlanPricingTotals(serviceIds);
+  const lineItems = totals.lineItems.map((line) => ({
+    serviceId: line.serviceId,
+    name: line.name,
+    priceDisplay: line.priceDisplay,
+    priceCents: line.priceCents,
+    billingType: line.billingType,
+  }));
+  const services = lineItems.map((line) => line.name);
+
+  const hasMonthly = totals.monthlySubtotalCents > 0;
+  const hasOneTime = totals.oneTimeSubtotalCents > 0;
+
+  let investmentLabel: PaymentPlanSummary["investmentLabel"] = "Amount Due Today";
+  let investmentDisplay = formatUsdFromCents(totals.amountDueTodayCents);
+
+  if (hasMonthly && !hasOneTime) {
+    investmentLabel = "Monthly Total";
+    investmentDisplay = `${formatUsdFromCents(totals.monthlySubtotalCents)}/month`;
+  } else if (hasOneTime) {
+    investmentLabel = "Amount Due Today";
+    investmentDisplay = formatUsdFromCents(totals.amountDueTodayCents);
+  }
+
+  return {
+    lineItems,
+    services,
+    oneTimeSubtotalCents: totals.oneTimeSubtotalCents,
+    monthlySubtotalCents: totals.monthlySubtotalCents,
+    amountDueTodayCents: totals.amountDueTodayCents,
+    oneTimeSubtotalDisplay: formatUsdFromCents(totals.oneTimeSubtotalCents),
+    monthlySubtotalDisplay: formatUsdFromCents(totals.monthlySubtotalCents),
+    amountDueTodayDisplay: formatUsdFromCents(totals.amountDueTodayCents),
+    investmentLabel,
+    investmentDisplay,
+    source,
+  };
 }
 
-function monthlyDisplayFromPackage(packageId: StudioGuidePackageId): string {
-  const pkg = getStudioGuideV1Package(packageId);
-  if (!pkg) return "$499/month";
-  return pkg.price.replace(/\sper month$/i, "/month");
+function normalizeLineItem(line: ApprovedStudioPlanLineItem): PaymentPlanLineItem {
+  const skuId = line.skuId ?? line.serviceId!;
+  const name = line.serviceName ?? line.name!;
+  const priceCents = line.exactPriceCents ?? line.priceCents ?? 0;
+
+  return {
+    serviceId: skuId,
+    name,
+    priceDisplay: line.priceDisplay,
+    priceCents,
+    billingType: line.billingType,
+  };
+}
+
+function buildSummaryFromLineItemSnapshot(
+  approved: NonNullable<ReturnType<typeof readCurrentCampaignHydrated>>["approvedStudioPlan"],
+): PaymentPlanSummary | null {
+  if (!approved?.lineItems?.length) return null;
+
+  const lineItems: PaymentPlanLineItem[] = approved.lineItems.map((line) => normalizeLineItem(line));
+
+  const services = lineItems.map((line) => line.name);
+  const hasMonthly = approved.monthlyTotalCents > 0;
+  const hasOneTime = approved.oneTimeTotalCents > 0;
+
+  let investmentLabel: PaymentPlanSummary["investmentLabel"] = "Amount Due Today";
+  let investmentDisplay = formatUsdFromCents(approved.amountDueTodayCents);
+
+  if (hasMonthly && !hasOneTime) {
+    investmentLabel = "Monthly Total";
+    investmentDisplay = `${formatUsdFromCents(approved.monthlyTotalCents)}/month`;
+  } else if (hasOneTime) {
+    investmentLabel = "Amount Due Today";
+    investmentDisplay = formatUsdFromCents(approved.amountDueTodayCents);
+  }
+
+  return {
+    lineItems,
+    services,
+    oneTimeSubtotalCents: approved.oneTimeTotalCents,
+    monthlySubtotalCents: approved.monthlyTotalCents,
+    amountDueTodayCents: approved.amountDueTodayCents,
+    oneTimeSubtotalDisplay: formatUsdFromCents(approved.oneTimeTotalCents),
+    monthlySubtotalDisplay: formatUsdFromCents(approved.monthlyTotalCents),
+    amountDueTodayDisplay: formatUsdFromCents(approved.amountDueTodayCents),
+    investmentLabel,
+    investmentDisplay,
+    source: "storage",
+  };
 }
 
 /**
- * Left-panel Studio Plan summary — reads approved plan from campaign storage when present,
- * otherwise falls back to Project Summary mock services and placeholder investment.
+ * Left-panel Studio Plan summary — reads approved plan from campaign storage when present.
  */
-export function buildPaymentPlanSummary(
-  packageId?: StudioGuidePackageId,
-): PaymentPlanSummary {
+export function buildPaymentPlanSummary(): PaymentPlanSummary {
   const campaign = readCurrentCampaignHydrated();
   const approved = campaign?.approvedStudioPlan;
 
   if (approved) {
-    const allIds = [...approved.includedServiceIds, ...approved.additionalServiceIds];
-    const services = allIds
-      .map((id) => getServiceById(id)?.name)
-      .filter((name): name is string => Boolean(name));
+    const snapshot = buildSummaryFromLineItemSnapshot(approved);
+    if (snapshot) return snapshot;
 
-    if (services.length > 0) {
-      const effectivePackageId = packageId ?? campaign?.packageId;
-      if (effectivePackageId && isMonthlyPackage(effectivePackageId)) {
-        return {
-          services,
-          investmentLabel: "Monthly Total",
-          investmentDisplay: monthlyDisplayFromPackage(effectivePackageId),
-          source: "storage",
-        };
-      }
-
-      let totalUsd = 0;
-      for (const id of allIds) {
-        totalUsd += getServiceById(id)?.pricing?.amountUsd ?? 0;
-      }
-
-      if (totalUsd > 0) {
-        return {
-          services,
-          investmentLabel: "Estimated Investment",
-          investmentDisplay: formatUsd(totalUsd),
-          source: "storage",
-        };
-      }
-
-      if (approved.additionalCostUsd > 0) {
-        return {
-          services,
-          investmentLabel: "Estimated Investment",
-          investmentDisplay: formatUsd(approved.additionalCostUsd),
-          source: "storage",
-        };
-      }
-
-      return {
-        services,
-        investmentLabel: "Estimated Investment",
-        investmentDisplay: MOCK_INVESTMENT,
-        source: "storage",
-      };
+    const serviceIds = resolveApprovedServiceIds(approved);
+    if (serviceIds.length > 0) {
+      return buildSummaryFromServiceIds(serviceIds, "storage");
     }
   }
 
   return {
-    services: PROJECT_SUMMARY_MOCK.services.map((service) => service.name),
-    investmentLabel: "Estimated Investment",
-    investmentDisplay: MOCK_INVESTMENT,
-    source: "mock",
+    lineItems: [],
+    services: [],
+    oneTimeSubtotalCents: 0,
+    monthlySubtotalCents: 0,
+    amountDueTodayCents: 0,
+    oneTimeSubtotalDisplay: formatUsdFromCents(0),
+    monthlySubtotalDisplay: formatUsdFromCents(0),
+    amountDueTodayDisplay: formatUsdFromCents(0),
+    investmentLabel: "Amount Due Today",
+    investmentDisplay: "Total updates as you customize your plan.",
+    source: "empty",
   };
-}
-
-function collectPlanServices(plan: StudioPlanReviewModel): StudioPlanReviewModel["includedServices"] {
-  return [
-    ...plan.includedServices,
-    ...plan.additionalStudioServices,
-    ...plan.addedToPlanServices,
-  ];
 }
 
 /**
  * Live Studio Plan summary for inline checkout — reflects current customize selections.
+ * Uses only plan.selectedServiceIds; recommendations never appear unless explicitly selected.
  */
 export function buildPaymentPlanSummaryFromPlan(plan: StudioPlanReviewModel): PaymentPlanSummary {
-  const allServices = collectPlanServices(plan);
-  const services = allServices.map((service) => service.title);
-
-  if (services.length === 0) {
+  if (plan.selectedServiceIds.length === 0) {
     return {
-      services: PROJECT_SUMMARY_MOCK.services.map((service) => service.name),
-      investmentLabel: "Estimated Investment",
+      lineItems: [],
+      services: [],
+      oneTimeSubtotalCents: 0,
+      monthlySubtotalCents: 0,
+      amountDueTodayCents: 0,
+      oneTimeSubtotalDisplay: formatUsdFromCents(0),
+      monthlySubtotalDisplay: formatUsdFromCents(0),
+      amountDueTodayDisplay: formatUsdFromCents(0),
+      investmentLabel: "Amount Due Today",
       investmentDisplay: "Total updates as you customize your plan.",
-      source: "mock",
+      source: "empty",
     };
   }
-
-  let totalUsd = 0;
-  let hasQuotedItems = false;
-  for (const service of allServices) {
-    if (service.amountUsd > 0) {
-      totalUsd += service.amountUsd;
-    } else if (service.pricingDisplay.toLowerCase().includes("quoted")) {
-      hasQuotedItems = true;
-    }
-  }
-
-  if (hasQuotedItems && totalUsd === 0) {
-    return {
-      services,
-      investmentLabel: "Estimated Investment",
-      investmentDisplay: "Quoted at checkout",
-      source: "mock",
-    };
-  }
-
-  if (hasQuotedItems) {
-    return {
-      services,
-      investmentLabel: "Estimated Investment",
-      investmentDisplay: `${formatUsd(totalUsd)} plus quoted items`,
-      source: "mock",
-    };
-  }
-
-  return {
-    services,
-    investmentLabel: "Estimated Investment",
-    investmentDisplay: totalUsd > 0 ? formatUsd(totalUsd) : plan.additionalCost.display,
-    source: "mock",
-  };
+  return buildSummaryFromServiceIds([...plan.selectedServiceIds], "storage");
 }
+
+/** Re-export for consumers that need line items without full summary wrapper. */
+export { buildPlanLineItems, computePlanPricingTotals };

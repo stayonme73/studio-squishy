@@ -13,22 +13,38 @@ export {
 } from "@/catalog/types";
 
 export type {
+  BillingType,
   CatalogSchemaVersion,
   DeliveryFormatId,
+  DeliveryMapping,
+  DeliveryMappingItem,
   DiscoveryMappingRule,
   DiscoverySignalKind,
   DiscoveryTrigger,
+  ExecutionAddOnFamilyId,
+  ExecutionAddOnServiceId,
+  ExecutionChannel,
+  ExecutionMode,
+  FulfillmentMode,
+  LaunchStatus,
+  MonthlyCycleWindow,
+  MonthlyServiceId,
+  OneTimeServiceId,
+  ProductionLane,
   ServiceBillingModel,
   ServiceCatalogEntry,
   ServiceCatalogStatus,
   ServiceCategoryId,
   ServiceClass,
   ServiceDeliverable,
+  ServiceFamilyId,
+  ServiceGuideFaqItem,
   ServiceId,
   ServicePricing,
   ServiceProductionEffort,
   ServiceProductionEffortTier,
   ServiceProductionTime,
+  ServiceTimingWindow,
   StudioNeedId,
   StudioServiceEntry,
   StudioServiceStatus,
@@ -43,8 +59,16 @@ export {
 export type { ServiceCategoryDefinition } from "@/catalog/categories";
 
 export {
+  billingTypeToServiceBillingModel,
+  deriveCompatibilityPricing,
   effortTierToServiceClass,
+  executionAddOnFamilyId,
+  executionAddOnId,
   getDiscoveryMappingForEngine,
+  getPriceCentsFromService,
+  getStructuredDeliverablesForEngine,
+  LEGACY_SERVICE_ID_ALIASES,
+  resolveLegacyServiceId,
   serviceStatusToCatalogStatus,
 } from "@/catalog/compat";
 
@@ -64,15 +88,19 @@ export {
 export type { SubstitutionSwapKind, CustomerSectionLabels } from "@/catalog/production-allocation";
 
 export {
+  getActiveLaunchServices,
   getActiveServices,
   getAddOnEligibleServices,
+  getDerivedServicePricing,
   getDiscoveryRulesForService,
   getDiscoveryTriggersForService,
   getServiceById,
   getServiceCatalog,
   getServiceDependencies,
   getServiceIds,
+  getServicePriceCents,
   getServicesByCategory,
+  getServicesByFamily,
   getServicesByServiceClass,
   getServicesByServiceStatus,
   getServicesByStatus,
@@ -80,6 +108,14 @@ export {
   getStudioServices,
   getUpgradeEligibleServices,
   isServiceId,
+  sumPriceCentsForServices,
 } from "@/catalog/accessors";
 
-export { ServiceCatalogValidationError, validateServiceCatalog } from "@/catalog/validate";
+export {
+  ServiceCatalogValidationError,
+  canAttachExecutionAddOn,
+  getActivePurchasableServices,
+  validateExecutionAddOnsInPlan,
+  validateServiceCatalog,
+} from "@/catalog/validate";
+export type { ExecutionAddOnPlanValidationResult } from "@/catalog/validate";

@@ -4,19 +4,18 @@ import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import ProjectSummaryScene from "@/components/project-summary/ProjectSummaryScene";
+import ServiceGuidePanel from "@/components/service-guide/ServiceGuidePanel";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import StudioUtilityBackdrop from "@/components/shared/StudioUtilityBackdrop";
-import { studioBoard } from "@/config/studio-board";
-import { buildDiscoverySummary } from "@/discovery-summary";
-import { resolveDiscoveryBriefAnswers } from "@/lib/discovery-brief";
+import { studioBoard, type ApprovalAcknowledgment } from "@/config/studio-board";
+import { resolveDiscoveryBrief } from "@/lib/discovery-brief";
 import { readDiscoveryAnswers } from "@/lib/business-discovery-session";
+import { runDiscoveryRecommendation } from "@/lib/run-discovery-recommendation";
 import {
   readCurrentCampaignHydrated,
   saveApprovedStudioPlan,
 } from "@/lib/studio-board-campaign";
-import { recommendFromDiscovery } from "@/recommendation";
-import type { DiscoveryBriefAnswers } from "@/recommendation/types";
 import { buildDiscoveryAnswersHeard, PROJECT_SUMMARY_LABELS } from "@/project-summary";
 import {
   addServiceToPlan,
@@ -26,24 +25,44 @@ import {
   swapServiceInPlan,
   type StudioPlanState,
 } from "@/studio-plan-review";
+import { getRecommendedServiceIds } from "@/recommendation";
+import type { DiscoveryBrief } from "@/recommendation/types";
 import type { ServiceId } from "@/catalog/types";
+import { buildServiceGuide } from "@/service-guide";
+
+function resolveInitialPlanState(
+  recommendedServiceIds: readonly ServiceId[],
+  approvedSelectedIds: readonly ServiceId[] | undefined,
+): StudioPlanState {
+  if (approvedSelectedIds?.length) {
+    return { selectedServiceIds: [...approvedSelectedIds] };
+  }
+  return initialPlanState(recommendedServiceIds);
+}
 
 /** Project Summary — single wide workspace with inline Secure Checkout. */
 export default function ProjectSummaryWorkspace() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [briefAnswers, setBriefAnswers] = useState<DiscoveryBriefAnswers>({});
+  const [brief, setBrief] = useState<DiscoveryBrief>({ answers: {} });
 
   useLayoutEffect(() => {
     const campaign = readCurrentCampaignHydrated();
-    const answers = resolveDiscoveryBriefAnswers(
-      campaign?.discoveryAnswers,
-      readDiscoveryAnswers(),
-    );
-    setBriefAnswers(answers);
-    const recommendation = recommendFromDiscovery({ answers });
+    const sessionAnswers = readDiscoveryAnswers();
+    const resolvedBrief = resolveDiscoveryBrief(campaign?.discoveryAnswers, sessionAnswers);
+    setBrief(resolvedBrief);
+    const { recommendation } = runDiscoveryRecommendation({
+      ...sessionAnswers,
+      ...resolvedBrief.answers,
+    });
+    const approved = campaign?.approvedStudioPlan;
+    const approvedIds =
+      approved?.selectedServiceIds ??
+      (approved
+        ? [...approved.includedServiceIds, ...approved.additionalServiceIds]
+        : undefined);
     setPlanState(
-      initialPlanState(recommendation.recommendations.map((entry) => entry.serviceId)),
+      resolveInitialPlanState(getRecommendedServiceIds(recommendation), approvedIds),
     );
   }, []);
 
@@ -53,14 +72,34 @@ export default function ProjectSummaryWorkspace() {
     }
   }, [router, searchParams]);
 
-  const heard = useMemo(() => buildDiscoveryAnswersHeard(briefAnswers), [briefAnswers]);
-  const recommendation = useMemo(
-    () => recommendFromDiscovery({ answers: briefAnswers }),
-    [briefAnswers],
+  const pipeline = useMemo(
+    () => runDiscoveryRecommendation({ ...brief.answers }),
+    [brief],
   );
-  const summary = useMemo(() => buildDiscoverySummary(recommendation), [recommendation]);
+  const { recommendation, summary } = pipeline;
+  const heard = useMemo(() => buildDiscoveryAnswersHeard(brief.answers), [brief.answers]);
 
   const [planState, setPlanState] = useState<StudioPlanState>(() => initialPlanState([]));
+  const [serviceGuideOpen, setServiceGuideOpen] = useState(false);
+  const [activeGuideServiceId, setActiveGuideServiceId] = useState<ServiceId | null>(null);
+
+  const activeGuide = useMemo(
+    () => (activeGuideServiceId ? buildServiceGuide(activeGuideServiceId) : null),
+    [activeGuideServiceId],
+  );
+
+  function handleOpenServiceGuide(serviceId: ServiceId) {
+    setActiveGuideServiceId(serviceId);
+    setServiceGuideOpen(true);
+  }
+
+  function handleCloseServiceGuide() {
+    setServiceGuideOpen(false);
+  }
+
+  function handleViewPlanDetails() {
+    document.getElementById("ps-changes-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   const plan = useMemo(
     () => buildStudioPlanReview(recommendation, planState),
@@ -81,9 +120,9 @@ export default function ProjectSummaryWorkspace() {
     setPlanState((current) => addServiceToPlan(current, serviceId));
   }
 
-  function handleSavePlanBeforePayment(): boolean {
-    if (!plan.canApprove) return false;
-    return saveApprovedStudioPlan(planState.selectedServiceIds) !== null;
+  function handleSavePlanBeforePayment(acknowledgment: ApprovalAcknowledgment): boolean {
+    if (!plan.planValid) return false;
+    return saveApprovedStudioPlan(planState.selectedServiceIds, acknowledgment) !== null;
   }
 
   return (
@@ -93,8 +132,12 @@ export default function ProjectSummaryWorkspace() {
           backHref={studioBoard.routes.projectDiscovery}
           activeNav="studio-board"
           title={PROJECT_SUMMARY_LABELS.pageTitle}
-          leadLines={PROJECT_SUMMARY_LABELS.pageLeadLines}
+          lead={PROJECT_SUMMARY_LABELS.pageLead}
+          backLabel={PROJECT_SUMMARY_LABELS.backLabel}
+          backVariant="link"
+          helpLabel={PROJECT_SUMMARY_LABELS.helpCenterLabel}
           helpCenterFrom="studio-board"
+          layout="orientation"
         />
       </div>
       <div className="studio-utility-scene__body">
@@ -112,11 +155,18 @@ export default function ProjectSummaryWorkspace() {
                 onSwap={handleSwap}
                 onAdd={handleAdd}
                 onSavePlanBeforePayment={handleSavePlanBeforePayment}
+                onOpenServiceGuide={handleOpenServiceGuide}
+                onViewPlanDetails={handleViewPlanDetails}
               />
             </div>
           </UtilityPageFrame>
         </div>
       </div>
+      <ServiceGuidePanel
+        open={serviceGuideOpen}
+        guide={activeGuide}
+        onClose={handleCloseServiceGuide}
+      />
     </div>
   );
 }

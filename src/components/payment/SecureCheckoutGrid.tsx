@@ -3,7 +3,13 @@
 import { type FormEvent, type ReactNode, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import type { ServiceId } from "@/catalog/types";
+import type { ApprovalAcknowledgment } from "@/config/studio-board";
 import { payment, paymentIntakeHref } from "@/config/payment";
+import {
+  ACKNOWLEDGMENT_VERSION,
+  APPROVAL_ACKNOWLEDGMENT_TEXT,
+} from "@/config/service-guide";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
 import {
   buildPaymentPlanSummary,
@@ -18,12 +24,19 @@ type Props = {
   onPaymentComplete?: (packageId: StudioGuidePackageId | undefined) => void;
   /** `embedded` — summary + form only (Project Summary second row). `full` — three columns. */
   layout?: "full" | "embedded";
-  /** Live plan summary from customize column; overrides storage-backed summary when set. */
+  /** Live plan summary from customize column; overrides storage/mock summary when set. */
   planSummary?: PaymentPlanSummary;
-  /** Disclaimer copy shown above the Pay button (embedded layout). */
-  disclaimerText?: string;
+  /** Recommendation notice above the Pay button (embedded Project Summary checkout). */
+  recommendationNotice?: {
+    title: string;
+    lines: readonly string[];
+  };
   /** Persist approved plan before payment; return false to block checkout. */
-  onBeforePayment?: () => boolean;
+  onBeforePayment?: (acknowledgment: ApprovalAcknowledgment) => boolean;
+  /** Open Service Guide for a checkout line item SKU. */
+  onOpenServiceGuide?: (serviceId: ServiceId) => void;
+  /** Scroll or navigate to selected plan details (embedded checkout). */
+  onViewPlanDetails?: () => void;
 };
 
 function SummaryCheckIcon() {
@@ -82,19 +95,30 @@ export default function SecureCheckoutGrid({
   onPaymentComplete,
   layout = "full",
   planSummary: planSummaryProp,
-  disclaimerText,
+  recommendationNotice,
   onBeforePayment,
+  onOpenServiceGuide,
+  onViewPlanDetails,
 }: Props) {
   const router = useRouter();
   const packageId = resolvePackageId(packageIdProp);
-  const storedPlanSummary = useMemo(() => buildPaymentPlanSummary(packageId), [packageId]);
+  const storedPlanSummary = useMemo(() => buildPaymentPlanSummary(), []);
   const planSummary = planSummaryProp ?? storedPlanSummary;
   const [termsAccepted, setTermsAccepted] = useState(false);
   const showSandbox = isPaymentSandboxAvailable();
   const isEmbedded = layout === "embedded";
 
+  function buildAcknowledgment(): ApprovalAcknowledgment {
+    return {
+      acknowledgmentVersion: ACKNOWLEDGMENT_VERSION,
+      acknowledgmentText: APPROVAL_ACKNOWLEDGMENT_TEXT,
+      acknowledgedAt: new Date().toISOString(),
+    };
+  }
+
   function completeCheckout() {
-    if (onBeforePayment && !onBeforePayment()) return;
+    const acknowledgment = buildAcknowledgment();
+    if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
     markPaymentReceived(packageId);
     if (onPaymentComplete) {
       onPaymentComplete(packageId);
@@ -110,7 +134,8 @@ export default function SecureCheckoutGrid({
   }
 
   function handleSandboxPayment() {
-    if (onBeforePayment && !onBeforePayment()) return;
+    const acknowledgment = buildAcknowledgment();
+    if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
     simulateSandboxPayment(packageId);
     if (onPaymentComplete) {
       onPaymentComplete(packageId);
@@ -119,23 +144,55 @@ export default function SecureCheckoutGrid({
     router.push(paymentIntakeHref(packageId));
   }
 
+  const showMonthlySubtotal = planSummary.monthlySubtotalCents > 0;
+  const showOneTimeSubtotal =
+    planSummary.oneTimeSubtotalCents > 0 || planSummary.lineItems.some((line) => line.billingType === "one_time");
+
   return (
     <div className={`pay-shell${isEmbedded ? " pay-shell--embedded" : ""}`}>
       <div className={`pay-checkout-grid${isEmbedded ? " pay-checkout-grid--embedded" : ""}`}>
         <PaperCard title={payment.sections.summary} className="pay-paper-card--summary">
           <p className="pay-summary-includes-label">{payment.summary.recommendedServicesLabel}</p>
           <ul className="pay-summary-includes-list">
-            {planSummary.services.map((item) => (
-              <li key={item}>
+            {planSummary.lineItems.map((item) => (
+              <li key={item.serviceId}>
                 <SummaryCheckIcon />
-                <span>{item}</span>
+                <span>
+                  {onOpenServiceGuide ? (
+                    <button
+                      type="button"
+                      className="pay-summary-line-guide"
+                      onClick={() => onOpenServiceGuide(item.serviceId)}
+                    >
+                      {item.name}
+                    </button>
+                  ) : (
+                    item.name
+                  )}
+                  <span className="pay-summary-line-price"> — {item.priceDisplay}</span>
+                </span>
               </li>
             ))}
           </ul>
 
           <div className="pay-summary-investment">
-            <p className="pay-summary-includes-label">{planSummary.investmentLabel}</p>
-            <p className="pay-summary-price">{planSummary.investmentDisplay}</p>
+            {showOneTimeSubtotal ? (
+              <div className="pay-summary-total-row">
+                <p className="pay-summary-total-label">{payment.summary.oneTimeSubtotalLabel}</p>
+                <p className="pay-summary-price">{planSummary.oneTimeSubtotalDisplay}</p>
+              </div>
+            ) : null}
+            {showMonthlySubtotal ? (
+              <div className="pay-summary-total-row">
+                <p className="pay-summary-total-label">{payment.summary.monthlySubtotalLabel}</p>
+                <p className="pay-summary-price">{planSummary.monthlySubtotalDisplay}/month</p>
+              </div>
+            ) : null}
+            <div className="pay-summary-total-row pay-summary-total-row--due">
+              <p className="pay-summary-total-label">{payment.summary.amountDueTodayLabel}</p>
+              <p className="pay-summary-price">{planSummary.amountDueTodayDisplay}</p>
+            </div>
+            <p className="pay-summary-disclosure-note">{payment.summary.cardProcessingDisclosureNote}</p>
           </div>
         </PaperCard>
 
@@ -196,18 +253,43 @@ export default function SecureCheckoutGrid({
               <span>{payment.form.zipCode}</span>
               <input type="text" name="zipCode" inputMode="numeric" autoComplete="postal-code" required />
             </label>
-            {disclaimerText ? (
-              <p className="pay-disclaimer">{disclaimerText}</p>
+            {recommendationNotice ? (
+              <div className="pay-disclaimer" role="note">
+                <h3 className="pay-disclaimer__heading">{recommendationNotice.title}</h3>
+                {recommendationNotice.lines.map((line) => (
+                  <p key={line} className="pay-disclaimer__line">
+                    {line}
+                  </p>
+                ))}
+              </div>
             ) : null}
-            <label className="pay-terms">
-              <input
-                type="checkbox"
-                name="terms"
-                checked={termsAccepted}
-                onChange={(event) => setTermsAccepted(event.target.checked)}
-              />
-              <span>{payment.form.termsLabel}</span>
-            </label>
+            <section
+              className="pay-acknowledgment"
+              aria-labelledby="pay-acknowledgment-heading"
+            >
+              {onViewPlanDetails ? (
+                <button type="button" className="pay-plan-details-link" onClick={onViewPlanDetails}>
+                  {payment.form.viewPlanDetailsLabel}
+                </button>
+              ) : null}
+              <h3 id="pay-acknowledgment-heading" className="pay-acknowledgment__heading">
+                {payment.form.acknowledgmentHeading}
+              </h3>
+              {payment.form.acknowledgmentBody.map((paragraph) => (
+                <p key={paragraph} className="pay-acknowledgment__body">
+                  {paragraph}
+                </p>
+              ))}
+              <label className="pay-acknowledgment__checkbox">
+                <input
+                  type="checkbox"
+                  name="terms"
+                  checked={termsAccepted}
+                  onChange={(event) => setTermsAccepted(event.target.checked)}
+                />
+                <span>{payment.form.termsLabel}</span>
+              </label>
+            </section>
             <button type="submit" className="pay-submit" disabled={!termsAccepted}>
               {payment.form.submitLabel}
             </button>

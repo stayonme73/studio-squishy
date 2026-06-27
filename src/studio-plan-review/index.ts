@@ -8,6 +8,7 @@
 export type {
   StudioPlanReviewCostSummary,
   StudioPlanReviewModel,
+  StudioPlanReviewPlanTotals,
   StudioPlanReviewServiceItem,
 } from "@/studio-plan-review/types";
 

@@ -14,7 +14,8 @@ export const STUDIO_PLAN_REVIEW_LABELS = {
   approvePlan: "Approve Studio Plan",
   removeService: "Remove",
   swapService: "Swap",
-  addService: "Add to Plan",
+  addService: "+ Add to plan",
+  viewDetails: "View Details",
 } as const;
 
 export type StudioPlanReviewSwapOption = {
@@ -37,18 +38,30 @@ export type StudioPlanReviewCostSummary = {
   hasQuotedItems: boolean;
 };
 
+export type StudioPlanReviewPlanTotals = {
+  oneTimeSubtotalDisplay: string;
+  monthlySubtotalDisplay: string;
+  amountDueTodayDisplay: string;
+  oneTimeSubtotalCents: number;
+  monthlySubtotalCents: number;
+  amountDueTodayCents: number;
+};
+
 /**
  * Customer-readable Studio Plan Review — consumed by Studio Plan Review UI.
  */
 export type StudioPlanReviewModel = {
   labels: typeof STUDIO_PLAN_REVIEW_LABELS;
+  selectedServiceIds: readonly ServiceId[];
   recommendedServiceIds: readonly ServiceId[];
   includedServices: readonly StudioPlanReviewServiceItem[];
   additionalStudioServices: readonly StudioPlanReviewServiceItem[];
   addedToPlanServices: readonly StudioPlanReviewServiceItem[];
   availableToAdd: readonly StudioPlanReviewServiceItem[];
   additionalCost: StudioPlanReviewCostSummary;
+  planTotals: StudioPlanReviewPlanTotals;
   warnings: readonly string[];
   canApprove: boolean;
+  planValid: boolean;
   emptyStateMessage: string | null;
 };

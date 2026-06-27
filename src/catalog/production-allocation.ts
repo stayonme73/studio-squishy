@@ -17,21 +17,30 @@ export const PRODUCTION_ALLOCATION_LIMITS: Readonly<Record<ServiceClass, number>
   essential: ESSENTIAL_MAX_INCLUDED,
 };
 
-/** Locked V1 service class assignments — keyed by catalog service ID. */
+/** Locked service class assignments — keyed by catalog service ID (v2 launch + legacy). */
 export const SERVICE_CLASS_BY_ID: Readonly<Partial<Record<ServiceId, ServiceClass>>> = {
   "bf-001": "signature",
   "bf-002": "signature",
   "cp-001": "signature",
+  "cp-001-monthly": "signature",
   "sm-001": "signature",
+  "sm-001-monthly": "signature",
   "cc-001": "signature",
+  "cc-001-monthly": "signature",
   "vp-001": "signature",
+  "vp-001-monthly": "signature",
   "lp-001": "signature",
   "em-001": "core",
+  "em-001-monthly": "core",
   "sms-001": "core",
+  "sms-001-monthly": "core",
   "cc-002": "core",
+  "cc-002-monthly": "core",
   "ap-001": "core",
   "mo-001": "core",
+  "mo-001-monthly": "core",
   "ma-001": "essential",
+  "ma-001-monthly": "essential",
 };
 
 export type SubstitutionSwapKind = "same-class" | "upgrade" | "downgrade";

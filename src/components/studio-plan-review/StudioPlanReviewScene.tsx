@@ -3,6 +3,7 @@ import type {
   StudioPlanReviewServiceItem,
 } from "@/studio-plan-review";
 import type { ServiceId } from "@/catalog/types";
+import { payment } from "@/config/payment";
 
 type Props = {
   model: StudioPlanReviewModel;
@@ -12,21 +13,36 @@ type Props = {
   onApprove: () => void;
   /** Hide approve CTA — used when checkout is always visible on Project Summary. */
   hideApprove?: boolean;
+  onOpenServiceGuide?: (serviceId: ServiceId) => void;
 };
 
 function PlanServiceRow({
   service,
   onRemove,
   onSwap,
+  onOpenServiceGuide,
 }: {
   service: StudioPlanReviewServiceItem;
   onRemove: (serviceId: ServiceId) => void;
   onSwap: (fromId: ServiceId, toId: ServiceId) => void;
+  onOpenServiceGuide?: (serviceId: ServiceId) => void;
 }) {
   return (
     <li className="spr-service">
       <div className="spr-service__header">
-        <h3 className="spr-service__title">{service.title}</h3>
+        <h3 className="spr-service__title">
+          {onOpenServiceGuide ? (
+            <button
+              type="button"
+              className="spr-service__title-btn"
+              onClick={() => onOpenServiceGuide(service.serviceId)}
+            >
+              {service.title}
+            </button>
+          ) : (
+            service.title
+          )}
+        </h3>
         <span className="spr-service__price">{service.pricingDisplay}</span>
       </div>
       <div className="spr-service__actions">
@@ -72,6 +88,7 @@ export default function StudioPlanReviewScene({
   onAdd,
   onApprove,
   hideApprove = false,
+  onOpenServiceGuide,
 }: Props) {
   return (
     <div className="spr-content utility-content">
@@ -107,6 +124,7 @@ export default function StudioPlanReviewScene({
                 service={service}
                 onRemove={onRemove}
                 onSwap={onSwap}
+                onOpenServiceGuide={onOpenServiceGuide}
               />
             ))}
           </ul>
@@ -125,6 +143,7 @@ export default function StudioPlanReviewScene({
                 service={service}
                 onRemove={onRemove}
                 onSwap={onSwap}
+                onOpenServiceGuide={onOpenServiceGuide}
               />
             ))}
           </ul>
@@ -143,6 +162,7 @@ export default function StudioPlanReviewScene({
                 service={service}
                 onRemove={onRemove}
                 onSwap={onSwap}
+                onOpenServiceGuide={onOpenServiceGuide}
               />
             ))}
           </ul>
@@ -159,17 +179,40 @@ export default function StudioPlanReviewScene({
           <ul className="spr-menu__list">
             {model.availableToAdd.map((service) => (
               <li key={service.serviceId} className="spr-menu__item">
-                <div>
-                  <p className="spr-menu__title">{service.title}</p>
+                <div className="spr-menu__info">
+                  <p className="spr-menu__title">
+                    {onOpenServiceGuide ? (
+                      <button
+                        type="button"
+                        className="spr-menu__title-btn"
+                        onClick={() => onOpenServiceGuide(service.serviceId)}
+                      >
+                        {service.title}
+                      </button>
+                    ) : (
+                      service.title
+                    )}
+                  </p>
                   <p className="spr-menu__price">{service.pricingDisplay}</p>
                 </div>
-                <button
-                  type="button"
-                  className="utility-btn utility-btn--ghost spr-menu__btn"
-                  onClick={() => onAdd(service.serviceId)}
-                >
-                  {model.labels.addService}
-                </button>
+                <div className="spr-menu__actions">
+                  {onOpenServiceGuide ? (
+                    <button
+                      type="button"
+                      className="spr-menu__btn spr-menu__btn--details"
+                      onClick={() => onOpenServiceGuide(service.serviceId)}
+                    >
+                      {model.labels.viewDetails}
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="utility-btn utility-btn--primary spr-menu__btn spr-menu__btn--add"
+                    onClick={() => onAdd(service.serviceId)}
+                  >
+                    {model.labels.addService}
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -178,9 +221,25 @@ export default function StudioPlanReviewScene({
 
       <section className="utility-card spr-section spr-cost" aria-labelledby="spr-cost-title">
         <h2 id="spr-cost-title" className="utility-card__title">
-          {model.labels.additionalCost}
+          Plan Totals
         </h2>
-        <p className="spr-cost__value">{model.additionalCost.display}</p>
+        <dl className="spr-cost__totals">
+          <div className="spr-cost__total-row">
+            <dt>{payment.summary.oneTimeSubtotalLabel}</dt>
+            <dd>{model.planTotals.oneTimeSubtotalDisplay}</dd>
+          </div>
+          {model.planTotals.monthlySubtotalCents > 0 ? (
+            <div className="spr-cost__total-row">
+              <dt>{payment.summary.monthlySubtotalLabel}</dt>
+              <dd>{model.planTotals.monthlySubtotalDisplay}/month</dd>
+            </div>
+          ) : null}
+          <div className="spr-cost__total-row spr-cost__total-row--due">
+            <dt>{payment.summary.amountDueTodayLabel}</dt>
+            <dd>{model.planTotals.amountDueTodayDisplay}</dd>
+          </div>
+        </dl>
+        <p className="spr-cost__disclosure-note">{payment.summary.cardProcessingDisclosureNote}</p>
       </section>
 
       {!hideApprove ? (

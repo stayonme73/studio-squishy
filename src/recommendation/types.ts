@@ -91,6 +91,7 @@ export type TimelineLineItem = {
   serviceId: ServiceId;
   customerLabel: string;
   businessDays: number;
+  billing: ServiceBillingModel;
 };
 
 /** Production timeline aggregated from recommended services. */
@@ -98,15 +99,21 @@ export type EstimatedTimeline = {
   items: readonly TimelineLineItem[];
   /** Longest business-day estimate across recommended services. */
   totalBusinessDays: number;
-  /** Label from the service driving the longest timeline (ties broken by serviceId). */
+  /** Customer-facing summary — one-time, monthly, or mixed when both billing types apply. */
   customerLabel: string;
+  /** Longest one-time project window when one-time services are recommended. */
+  oneTimeLabel?: string;
+  /** Monthly cycle timing when monthly services are recommended. */
+  monthlyLabel?: string;
 };
 
 export type RecommendationWarningKind =
   | "missing-discovery-answer"
   | "inactive-service-match"
   | "unmet-dependency"
-  | "low-confidence-match";
+  | "low-confidence-match"
+  | "requires-client-materials"
+  | "requires-client-access";
 
 export type RecommendationWarning = {
   kind: RecommendationWarningKind;

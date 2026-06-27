@@ -1392,6 +1392,7 @@ body:has(.business-discovery-studio) {
     0 1px 2px rgba(47, 52, 55, 0.04),
     0 4px 16px rgba(47, 52, 55, 0.08),
     0 12px 32px rgba(47, 52, 55, 0.06);
+  font-family: var(--utility-font);
 }
 
 .business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__eyebrow {
@@ -1399,7 +1400,7 @@ body:has(.business-discovery-studio) {
 }
 
 .business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__body {
-  font-size: clamp(0.875rem, 1.6vh, 0.98rem);
+  font-size: var(--type-helper);
   line-height: 1.55;
   color: var(--studio-charcoal);
 }
@@ -1418,9 +1419,10 @@ body:has(.business-discovery-studio) {
 .business-discovery-studio .bds-summary-panel--preview .bds-summary-panel__section-title {
   margin: 0 0 0.65rem;
   padding-left: 0.55rem;
-  font-size: clamp(0.875rem, 1.6vh, 0.98rem);
+  font-size: var(--type-section-title);
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  text-transform: none;
   color: var(--studio-eucalyptus);
   border-left: 3px solid var(--studio-coral);
 }
@@ -1442,7 +1444,7 @@ body:has(.business-discovery-studio) {
   padding-left: 1.15rem;
   display: grid;
   gap: 0.35rem;
-  font-size: clamp(0.8125rem, 1.5vh, 0.9375rem);
+  font-size: var(--type-helper);
   line-height: 1.5;
   color: var(--studio-charcoal);
 }

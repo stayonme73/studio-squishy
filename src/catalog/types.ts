@@ -34,6 +34,22 @@ export type ServiceCategoryId =
   | "marketing-assets"
   | "add-on-services";
 
+/** v2 service family slugs — group one-time, monthly, and execution variants. */
+export type ServiceFamilyId =
+  | "brand_identity"
+  | "brand_messaging"
+  | "campaign"
+  | "social_media"
+  | "email_marketing"
+  | "sms_marketing"
+  | "marketing_copywriting"
+  | "content_writing"
+  | "marketing_video"
+  | "ai_voice_over"
+  | "landing_page_content"
+  | "marketing_optimization"
+  | "marketing_assets";
+
 /**
  * Internal service class — replaces legacy Heavy/Medium/Light terminology.
  * Never surface Signature / Core / Essential in customer-facing copy.
@@ -49,7 +65,62 @@ export type StudioServiceStatus = "active" | "planned" | "beta" | "retired";
  */
 export type ServiceCatalogStatus = "active" | "inactive";
 
-export type ServiceId =
+/** Canonical billing type for v2 catalog SKUs. */
+export type BillingType = "one_time" | "monthly";
+
+/** Production lane from locked catalog doc §2. */
+export type ProductionLane =
+  | "quick_turn"
+  | "standard_build"
+  | "complex_build"
+  | "ongoing_monthly";
+
+/** Customer-facing review or delivery window — business days unless noted. */
+export type ServiceTimingWindow = {
+  minDays: number;
+  maxDays: number;
+  /** Verbatim or condensed customer-facing label from approved catalog. */
+  label: string;
+};
+
+/** Monthly recurring production window — no fixed final delivery. */
+export type MonthlyCycleWindow = {
+  label: string;
+};
+
+/** How execution responsibility is described for checkout / Service Guide. */
+export type ExecutionMode =
+  | "creation_delivery"
+  | "strategy_direction"
+  | "managed_execution_when_selected";
+
+/** Launch rollout status — distinct from legacy serviceStatus for governance. */
+export type LaunchStatus = "active" | "planned" | "retired";
+
+export type FulfillmentMode = "project" | "monthly_cycle";
+
+export type ExecutionChannel = "social" | "email" | "sms";
+
+export type DeliveryMappingItem = {
+  key: string;
+  quantity: number;
+  unit: string;
+};
+
+/** Catalog metadata for fulfillment — not wired to Campaign Record in slice 1. */
+export type DeliveryMapping = {
+  fulfillmentMode: FulfillmentMode;
+  items: readonly DeliveryMappingItem[];
+  executionChannel?: ExecutionChannel;
+};
+
+export type ServiceGuideFaqItem = {
+  question: string;
+  answer: string;
+};
+
+/** One-time base service IDs preserved from v1. */
+export type OneTimeServiceId =
   | "bf-001"
   | "bf-002"
   | "cp-001"
@@ -62,7 +133,34 @@ export type ServiceId =
   | "ap-001"
   | "lp-001"
   | "mo-001"
-  | "ma-001"
+  | "ma-001";
+
+/** Monthly variant IDs — `<family-base-id>-monthly`. */
+export type MonthlyServiceId =
+  | "cp-001-monthly"
+  | "sm-001-monthly"
+  | "em-001-monthly"
+  | "sms-001-monthly"
+  | "cc-001-monthly"
+  | "cc-002-monthly"
+  | "vp-001-monthly"
+  | "mo-001-monthly"
+  | "ma-001-monthly";
+
+/** Service families with priced execution add-on SKUs. */
+export type ExecutionAddOnFamilyId = "social_media" | "email_marketing" | "sms_marketing";
+
+/** Execution add-on IDs — `<family-id>-execution` or `<family-id>-execution-monthly`. */
+export type ExecutionAddOnServiceId =
+  | "social_media-execution"
+  | "social_media-execution-monthly"
+  | "email_marketing-execution"
+  | "email_marketing-execution-monthly"
+  | "sms_marketing-execution"
+  | "sms_marketing-execution-monthly";
+
+/** Retired package and add-on IDs kept for campaign / localStorage reads. */
+export type LegacyRetiredServiceId =
   | "spark"
   | "momentum"
   | "growth"
@@ -71,6 +169,12 @@ export type ServiceId =
   | "business-workflow"
   | "customer-follow-up"
   | "monthly-support";
+
+export type ServiceId =
+  | OneTimeServiceId
+  | MonthlyServiceId
+  | ExecutionAddOnServiceId
+  | LegacyRetiredServiceId;
 
 export type ServiceBillingModel = "one-time" | "monthly";
 
@@ -133,7 +237,8 @@ export type DiscoverySignalKind =
   | "need"
   | "situation"
   | "challenge"
-  | "focus-keyword";
+  | "focus-keyword"
+  | "tools";
 
 export type DiscoveryMappingRule = {
   signal: DiscoverySignalKind;
@@ -142,6 +247,7 @@ export type DiscoveryMappingRule = {
    * - need: StudioNeedId
    * - situation / challenge: exact option text from discovery tile
    * - focus-keyword: case-insensitive substring in your-focus
+   * - tools: exact option label from your-current-tools multiselect
    */
   value: string;
   /** Optional discovery tile that must be answered for this rule to apply. */
@@ -163,6 +269,8 @@ export type DiscoveryTrigger = DiscoveryMappingRule;
 export type StudioServiceEntry = {
   schemaVersion: CatalogSchemaVersion;
   id: ServiceId;
+  /** v2 family slug — groups one-time, monthly, and execution variants. */
+  familyId: ServiceFamilyId;
   /** Studio Service Name — internal catalog label. */
   name: string;
   category: ServiceCategoryId;
@@ -192,12 +300,44 @@ export type StudioServiceEntry = {
   sopReference?: string;
   serviceStatus: StudioServiceStatus;
 
+  // --- v2 launch SKU fields (required for active purchasable services) ---
+
+  billingType: BillingType;
+  /** Canonical price in USD cents — authoritative for all pricing derivation. */
+  priceCents: number;
+  productionLane: ProductionLane;
+  firstReviewWindow: ServiceTimingWindow;
+  /** Present for one-time / project fulfillment SKUs. */
+  finalDeliveryWindow?: ServiceTimingWindow;
+  /** Present for monthly recurring SKUs. */
+  monthlyCycleWindow?: MonthlyCycleWindow;
+  purpose: string;
+  deliverables: readonly string[];
+  exclusions: readonly string[];
+  revisionRule: string;
+  clientResponsibilities: readonly string[];
+  executionMode: ExecutionMode;
+  requiresClientAccess: boolean;
+  requiresClientMaterials: boolean;
+  isRecommendable: boolean;
+  isAddable: boolean;
+  launchStatus: LaunchStatus;
+  serviceGuideFaq: readonly ServiceGuideFaqItem[];
+  deliveryMapping: DeliveryMapping;
+
+  /** True for execution add-on SKUs that require a matching base family in the plan. */
+  isExecutionAddOn?: boolean;
+  /** Parent families eligible for this execution add-on — required when isExecutionAddOn is true. */
+  eligibleParentFamilyIds?: readonly ServiceFamilyId[];
+
   // --- v1 fields retained for Recommendation Engine and payment integration ---
 
   /** Legacy customer-facing description — kept for engine and summary compat. */
   customerDescription?: string;
   internalDescription?: string;
-  deliverables?: readonly ServiceDeliverable[];
+  /** Legacy structured deliverables — optional; v2 uses string[] deliverables. */
+  legacyDeliverables?: readonly ServiceDeliverable[];
+  /** @deprecated Derive via compat helpers from priceCents — do not author in active seeds. */
   pricing?: ServicePricing;
   estimatedProductionTime?: ServiceProductionTime;
   productionEffort?: ServiceProductionEffort;

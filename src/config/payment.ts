@@ -18,7 +18,12 @@ export const payment = {
     next: "What Happens Next",
   },
   summary: {
-    recommendedServicesLabel: "Recommended Services",
+    recommendedServicesLabel: "YOUR SELECTED SERVICES",
+    oneTimeSubtotalLabel: "One-Time Subtotal",
+    monthlySubtotalLabel: "Monthly Subtotal",
+    amountDueTodayLabel: "Amount Due Today",
+    cardProcessingDisclosureNote:
+      "A credit-card processing fee may apply. Any applicable fee and your final total are shown before payment.",
     investmentLabel: "Estimated Investment",
     monthlyTotalLabel: "Monthly Total",
     includesLabel: "Includes:",
@@ -34,8 +39,13 @@ export const payment = {
     expDate: "Exp Date",
     cvv: "CVV",
     zipCode: "ZIP Code",
-    termsLabel:
-      "I have reviewed my Studio Plan, understand the selected services and pricing, and agree to proceed with payment.",
+    acknowledgmentHeading: "Before you pay",
+    acknowledgmentBody: [
+      "Please confirm that you reviewed your Studio Plan, including what is included, pricing, timing, and what you are responsible for.",
+      "The Studio creates the approved marketing work. Results such as sales, leads, and bookings are not guaranteed.",
+    ] as const,
+    termsLabel: "I reviewed my Studio Plan and agree to proceed with payment.",
+    viewPlanDetailsLabel: "View your selected plan details above",
     submitLabel: "Complete Payment",
   },
   /** Local dev or NEXT_PUBLIC_PAYMENT_SANDBOX=1 (Vercel Preview only — not Production). */

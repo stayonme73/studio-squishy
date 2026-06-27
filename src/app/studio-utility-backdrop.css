@@ -48,6 +48,14 @@ body:has(.studio-utility-scene) {
   flex-shrink: 0;
 }
 
+/* Project Summary orientation strip — never inherit frosted-scene text wash */
+.studio-utility-scene--header-band .project-summary-header-band .utility-topbar__title,
+.studio-utility-scene--header-band .project-summary-header-band .utility-topbar__help,
+.studio-utility-scene--header-band .project-summary-header-band .utility-topbar__back--link,
+.studio-utility-scene--header-band .project-summary-header-band .utility-lead {
+  text-shadow: none;
+}
+
 .studio-utility-scene__body {
   position: relative;
   flex: 1;
@@ -98,16 +106,16 @@ body:has(.studio-utility-scene) {
   background: transparent;
 }
 
-/* Header readability over frosted backdrop (Help Center, Project Summary, etc.) */
-.studio-utility-scene .utility-topbar__title {
+/* Header readability over frosted backdrop (Help Center, etc.) — not header-band pages */
+.studio-utility-scene:not(.studio-utility-scene--header-band) .utility-topbar__title {
   text-shadow: 0 1px 12px rgba(255, 255, 255, 0.8);
 }
 
-.studio-utility-scene .utility-lead {
+.studio-utility-scene:not(.studio-utility-scene--header-band) .utility-lead {
   color: color-mix(in srgb, var(--studio-ink) 78%, #6b6b6b);
 }
 
-.studio-utility-scene .utility-topbar__help {
+.studio-utility-scene:not(.studio-utility-scene--header-band) .utility-topbar__help {
   text-shadow: 0 1px 8px rgba(255, 255, 255, 0.65);
 }
 

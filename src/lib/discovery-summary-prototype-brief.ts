@@ -9,7 +9,7 @@ export const prototypeDiscoveryBrief: DiscoveryBrief = {
     "your-business": "Acme Coffee Co.",
     "your-situation": "Starting fresh",
     "your-challenge": "Lack of clarity or direction",
-    "your-focus": "test our first campaign",
+    "your-focus": "Marketing & growth",
     "success-looks-like": "A clear launch plan and assets we can run this month.",
   },
   selectedNeeds: ["get-more-customers"],

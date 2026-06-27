@@ -1,17 +1,14 @@
 "use client";
 
-import {
-  DISCOVERY_SPLIT_PREVIEW_LABELS,
-  PROJECT_SUMMARY_MOCK,
-} from "@/project-summary";
+import { DISCOVERY_SPLIT_PREVIEW_LABELS } from "@/project-summary";
 
 type Props = {
+  serviceNames: readonly string[];
   onContinue: () => void;
 };
 
 /** Discovery split-panel preview — service list + CTA only; full detail on Project Summary. */
-export default function DiscoverySummaryPlaceholder({ onContinue }: Props) {
-  const serviceNames = PROJECT_SUMMARY_MOCK.services.map((service) => service.name);
+export default function DiscoverySummaryPlaceholder({ serviceNames, onContinue }: Props) {
   const labels = DISCOVERY_SPLIT_PREVIEW_LABELS;
 
   return (
@@ -33,11 +30,17 @@ export default function DiscoverySummaryPlaceholder({ onContinue }: Props) {
           <h3 id="bds-split-preview-services" className="bds-summary-panel__section-title">
             {labels.servicesTitle}
           </h3>
-          <ul className="bds-summary-panel__service-list">
-            {serviceNames.map((name) => (
-              <li key={name}>✓ {name}</li>
-            ))}
-          </ul>
+          {serviceNames.length > 0 ? (
+            <ul className="bds-summary-panel__service-list">
+              {serviceNames.map((name) => (
+                <li key={name}>✓ {name}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="bds-summary-panel__body">
+              We&apos;re preparing your recommended services — review your full Studio Plan for details.
+            </p>
+          )}
         </section>
 
         <section
