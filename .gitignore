@@ -44,6 +44,7 @@ yarn-error.log*
 public/welcome-hall/_debug-*
 public/welcome-hall/_verify-*
 public/welcome-hall/_test_*
+tmp/
 tmp-*
 tmp-tile-crops/
 build-out.txt
