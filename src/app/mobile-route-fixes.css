@@ -68,7 +68,7 @@
     max-width: 100%;
   }
 
-  .project-summary-page .ps-workspace__row {
+  .project-summary-page .ps-workspace {
     grid-template-columns: 1fr !important;
   }
 

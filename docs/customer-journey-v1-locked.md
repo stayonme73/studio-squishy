@@ -35,7 +35,7 @@
 
 These routes sit between Project Discovery and Secure Checkout — not numbered journey rooms:
 
-- **Project Summary** — `/project-summary` — post-discovery bridge; presents the locked [Recommendation Engine Philosophy](recommendation-engine-philosophy-v1-locked.md) flow as a **wide workspace**: **Our Recommendation** + **Studio Bundles** (top row) → **Customize Your Studio Plan** + **Secure Checkout** (second row) → **Here's What We Heard** (bottom reference) — disclaimer near Pay button; no separate Approve step — under [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) (*The Studio recommends. The client decides.*)
+- **Project Summary** — `/project-summary` — post-discovery bridge; presents the locked [Recommendation Engine Philosophy](recommendation-engine-philosophy-v1-locked.md) flow as a **wide workspace** with two columns — **left:** **Our Recommendation** → **Discovery Summary** (collapsible reference) → **Customize Your Studio Plan**; **right:** **Studio Bundles** → **Secure Checkout** (embedded, disclaimer near Pay) — no separate Approve step — under [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) (*The Studio recommends. The client decides.*)
 - **Studio Plan Review** — `/studio-plan-review`
 - **Discovery Summary** (prototype/dev) — `/discovery-summary`
 

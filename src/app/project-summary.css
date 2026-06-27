@@ -80,28 +80,20 @@
   padding-top: clamp(1rem, 2vw, 1.35rem);
 }
 
-/* Wide workspace — two columns per row on desktop */
+/* Wide workspace — two columns: left = why we recommend; right = how you buy */
 .project-summary-page .ps-workspace {
   max-width: min(98vw, 88rem);
-  display: flex;
-  flex-direction: column;
-  gap: var(--utility-card-gap);
-}
-
-.project-summary-page .ps-workspace__row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--utility-card-gap);
-  align-items: stretch;
-}
-
-.project-summary-page .ps-workspace__row--full {
-  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
 }
 
 .project-summary-page .ps-workspace__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--utility-card-gap);
   min-width: 0;
-  height: 100%;
 }
 
 .project-summary-page .ps-workspace__col--checkout {
@@ -575,7 +567,7 @@
 }
 
 @media (max-width: 63.99rem) {
-  .project-summary-page .ps-workspace__row {
+  .project-summary-page .ps-workspace {
     grid-template-columns: 1fr;
   }
 

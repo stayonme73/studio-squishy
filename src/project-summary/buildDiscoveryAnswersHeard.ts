@@ -9,7 +9,7 @@ import {
 import type { DiscoveryBriefAnswers } from "@/recommendation/types";
 import type { DiscoveryAnswerHeardItem } from "@/project-summary/types";
 
-/** Ordered discovery answers for the "Here's what we heard" section. */
+/** Ordered discovery answers for the Discovery Summary section. */
 export function buildDiscoveryAnswersHeard(
   answers: DiscoveryBriefAnswers,
 ): readonly DiscoveryAnswerHeardItem[] {

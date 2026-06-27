@@ -69,7 +69,7 @@ function RecommendedServiceFromSummary({ service }: { service: DiscoverySummaryS
   );
 }
 
-function DiscoveryReferenceSection({
+function DiscoverySummarySection({
   heard,
   editDiscoveryHref,
 }: {
@@ -82,10 +82,10 @@ function DiscoveryReferenceSection({
 
   return (
     <section
-      className="utility-card ps-section ps-section--reference ps-workspace__row ps-workspace__row--full"
-      aria-labelledby="ps-heard-title"
+      className="utility-card ps-section ps-section--reference"
+      aria-labelledby="ps-discovery-summary-title"
     >
-      <h2 id="ps-heard-title" className="utility-card__title utility-card__title--compact">
+      <h2 id="ps-discovery-summary-title" className="utility-card__title utility-card__title--compact">
         {PROJECT_SUMMARY_LABELS.heardTitle}
       </h2>
       <p className="ps-heard__reference-lead">{PROJECT_SUMMARY_LABELS.heardReferenceLead}</p>
@@ -127,7 +127,7 @@ function DiscoveryReferenceSection({
   );
 }
 
-/** Project Summary — wide workspace: recommend + bundles | customize + checkout | heard reference. */
+/** Project Summary — wide workspace: left = why we recommend; right = how you buy. */
 /** Decision-page proposal aesthetic — see docs/decision-page-visual-language-v1.md */
 export default function ProjectSummaryScene({
   heard,
@@ -146,9 +146,9 @@ export default function ProjectSummaryScene({
 
   return (
     <div className="ps-content ps-workspace utility-content">
-      <div className="ps-workspace__row ps-workspace__row--top">
+      <div className="ps-workspace__col ps-workspace__col--left">
         <section
-          className="utility-card ps-section ps-section--hero ps-workspace__col"
+          className="utility-card ps-section ps-section--hero"
           aria-labelledby="ps-recommend-title"
         >
           <h2 id="ps-recommend-title" className="utility-card__title">
@@ -173,8 +173,39 @@ export default function ProjectSummaryScene({
           </ul>
         </section>
 
+        <DiscoverySummarySection heard={heard} editDiscoveryHref={editDiscoveryHref} />
+
         <section
-          className="utility-card ps-section ps-workspace__col"
+          className="utility-card ps-section"
+          aria-labelledby="ps-changes-title"
+        >
+          <h2 id="ps-changes-title" className="utility-card__title">
+            {PROJECT_SUMMARY_LABELS.changesTitle}
+          </h2>
+          <p className="ps-changes__lead">{PROJECT_SUMMARY_LABELS.changesLead}</p>
+          <p className="ps-changes__powers-intro">{PROJECT_SUMMARY_LABELS.changesPowersIntro}</p>
+          <ul className="ps-changes__powers">
+            {PROJECT_SUMMARY_LABELS.changesPowers.map((power) => (
+              <li key={power}>{power}</li>
+            ))}
+          </ul>
+          <p className="ps-changes__auto-update">{PROJECT_SUMMARY_LABELS.changesAutoUpdate}</p>
+          <div className="ps-plan-review">
+            <StudioPlanReviewScene
+              model={plan}
+              onRemove={onRemove}
+              onSwap={onSwap}
+              onAdd={onAdd}
+              onApprove={onSavePlanBeforePayment}
+              hideApprove
+            />
+          </div>
+        </section>
+      </div>
+
+      <div className="ps-workspace__col ps-workspace__col--right">
+        <section
+          className="utility-card ps-section"
           aria-labelledby="ps-packages-title"
         >
           <h2 id="ps-packages-title" className="utility-card__title">
@@ -211,38 +242,9 @@ export default function ProjectSummaryScene({
             ))}
           </ul>
         </section>
-      </div>
-
-      <div className="ps-workspace__row ps-workspace__row--middle">
-        <section
-          className="utility-card ps-section ps-workspace__col"
-          aria-labelledby="ps-changes-title"
-        >
-          <h2 id="ps-changes-title" className="utility-card__title">
-            {PROJECT_SUMMARY_LABELS.changesTitle}
-          </h2>
-          <p className="ps-changes__lead">{PROJECT_SUMMARY_LABELS.changesLead}</p>
-          <p className="ps-changes__powers-intro">{PROJECT_SUMMARY_LABELS.changesPowersIntro}</p>
-          <ul className="ps-changes__powers">
-            {PROJECT_SUMMARY_LABELS.changesPowers.map((power) => (
-              <li key={power}>{power}</li>
-            ))}
-          </ul>
-          <p className="ps-changes__auto-update">{PROJECT_SUMMARY_LABELS.changesAutoUpdate}</p>
-          <div className="ps-plan-review">
-            <StudioPlanReviewScene
-              model={plan}
-              onRemove={onRemove}
-              onSwap={onSwap}
-              onAdd={onAdd}
-              onApprove={onSavePlanBeforePayment}
-              hideApprove
-            />
-          </div>
-        </section>
 
         <section
-          className="utility-card ps-section ps-workspace__col ps-workspace__col--checkout payment-page"
+          className="utility-card ps-section ps-workspace__col--checkout payment-page"
           aria-labelledby="ps-checkout-title"
         >
           <h2 id="ps-checkout-title" className="utility-card__title">
@@ -259,8 +261,6 @@ export default function ProjectSummaryScene({
           </div>
         </section>
       </div>
-
-      <DiscoveryReferenceSection heard={heard} editDiscoveryHref={editDiscoveryHref} />
     </div>
   );
 }
