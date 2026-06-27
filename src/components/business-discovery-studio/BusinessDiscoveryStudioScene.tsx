@@ -98,9 +98,8 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     isTileComplete(id) &&
     activeTileId !== id;
 
-  /** Form tiles: teal ✓ only — runtime cream covers misaligned vs baked ○ on plate art. */
-  const showStatusCover = (id: DiscoveryTileId) =>
-    id === "submit-project" && isTileComplete(id);
+  /** Form tiles: teal ✓ only. Submit: dark cover masks baked ○ on the dark face. */
+  const showStatusCover = (id: DiscoveryTileId) => id === "submit-project";
 
   const hitStyles = useMemo(() => {
     const map = {} as Record<DiscoveryTileId, CSSProperties>;

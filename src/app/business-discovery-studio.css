@@ -374,7 +374,7 @@ body:has(.business-discovery-studio) {
   z-index: 4;
 }
 
-.business-discovery-studio .bds-tile-hit:hover {
+.business-discovery-studio .bds-tile-hit:hover:not([data-tile-id="submit-project"]) {
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -550,15 +550,27 @@ body:has(.business-discovery-studio) {
   pointer-events: none;
 }
 
-.business-discovery-studio .bds-tile-hit--locked {
+.business-discovery-studio .bds-tile-hit--locked:not([data-tile-id="submit-project"]) {
   cursor: not-allowed;
   opacity: 0.35;
 }
 
 /* Submit tile — locked cursor only; no semi-transparent wash over dark artwork. */
 .business-discovery-studio .bds-tile-hit--locked[data-tile-id="submit-project"] {
+  cursor: not-allowed;
+}
+
+.business-discovery-studio .bds-tile-hit--locked[data-tile-id="submit-project"],
+.business-discovery-studio .bds-tile-hit[data-tile-id="submit-project"] {
   opacity: 1;
   background: transparent;
+}
+
+.business-discovery-studio .bds-tile-hit[data-tile-id="submit-project"]:hover,
+.business-discovery-studio .bds-tile-hit[data-tile-id="submit-project"]:focus-visible,
+.business-discovery-studio .bds-tile-hit[data-tile-id="submit-project"]:active {
+  background: transparent;
+  opacity: 1;
 }
 
 .business-discovery-studio .bds-tile-hit--locked:hover {
