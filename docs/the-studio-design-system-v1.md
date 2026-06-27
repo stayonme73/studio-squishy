@@ -30,13 +30,13 @@ Where values exist in code today, document them here. Gaps are **TBD** until a p
 
 | Token | Name | Documented value | Source |
 |-------|------|------------------|--------|
-| Mushroom | Paper / card surfaces | `#FFFFFF`, `#F8F9FA` on decision pages; `#EFE8DE` (`--utility-paper-cream` / `--studio-paper`) on legacy utility pages | `project-summary.css`, `utility-design-system.css` |
-| Denim Blue | Information text & nav | `#2c3e50` (`--studio-denim`) | `globals.css` |
-| Denim Blue | Primary body text (decision pages) | `#2b2b2b` (`--ps-charcoal`) | `project-summary.css` |
-| Eucalyptus | Action & section headers | `#2e5e4e` (`--ps-eucalyptus`) | `project-summary.css`, `decision-page-visual-language-v1.md` |
-| Eucalyptus deep | Primary hover | `color-mix(in srgb, #2e5e4e 88%, #000 12%)` | `project-summary.css` |
-| Coral | Attention / list markers | `#e07a5f` (`--ps-accent-coral`); `#ff7f50` (`--studio-coral` in globals) | `project-summary.css`, `globals.css` |
-| Heritage Gold | Celebration / warm accent | `#daa520` (`--ps-accent-gold`, `--studio-golden-yellow`); warm orange `#c47a2c` (`--ps-accent-warm`) for list markers | `project-summary.css`, `globals.css` |
+| Mushroom | Paper / card surfaces | `#FFFFFF`, `#F8F9FA` on decision pages; `#EFE8DE` (`--utility-paper-cream` / `--studio-paper`) on legacy utility pages; **`#E8E2D8` Soft Mushroom** and **`#F7F4EE` Warm Ivory** cards on Secure Checkout | `project-summary.css`, `utility-design-system.css`, `payment.css` |
+| Denim Blue | Information text & nav | `#2c3e50` (`--studio-denim`); **`#355C7D`** on Secure Checkout | `globals.css`, `payment.css` |
+| Denim Blue | Primary body text (decision pages) | `#2b2b2b` (`--ps-charcoal`); **`#2F3437` Charcoal** on Secure Checkout | `project-summary.css`, `payment.css` |
+| Eucalyptus | Action & section headers | `#2e5e4e` (`--ps-eucalyptus`); **`#456B5A`** on Secure Checkout | `project-summary.css`, `decision-page-visual-language-v1.md`, `payment.css` |
+| Eucalyptus deep | Primary hover | `color-mix(in srgb, #2e5e4e 88%, #000 12%)`; **`color-mix(in srgb, #456B5A 88%, #000 12%)`** on Secure Checkout | `project-summary.css`, `payment.css` |
+| Coral | Attention / list markers | `#e07a5f` (`--ps-accent-coral`); `#ff7f50` (`--studio-coral` in globals); **`#D56B4D`** on Secure Checkout | `project-summary.css`, `globals.css`, `payment.css` |
+| Heritage Gold | Celebration / warm accent | `#daa520` (`--ps-accent-gold`, `--studio-golden-yellow`); warm orange `#c47a2c` (`--ps-accent-warm`) for list markers; **`#C7A64A` Herb Gold** (status / pin accent) on Secure Checkout | `project-summary.css`, `globals.css`, `payment.css` |
 | Mushroom (nav active) | Progress / current location | `#6a8f5c` (`--utility-nav-accent-active`) | `utility-design-system.css` |
 
 **Note:** Mushroom naming in product language maps to *surfaces* — white/elevated cards on decision pages, cream paper on older utility shells. Consolidate into one token set in code later.
@@ -234,7 +234,7 @@ Discovery board keeps corkboard/warm styling; split preview uses proposal tokens
 | `src/app/project-summary.css` | Decision-page tokens and components |
 | `src/app/studio-utility-backdrop.css` | Shared lobby backdrop |
 | `src/app/utility-design-system.css` | Legacy utility shell |
-| `src/app/business-discovery-studio.css` | Split preview panel (proposal subset) |
+| `src/app/payment.css` | Secure Checkout — utility pages palette and three-column pinboard |
 | `docs/decision-page-visual-language-v1.md` | Project Summary / checkout proposal notes |
 
 **Future:** Extract locked tokens from this doc into shared CSS custom properties — not in scope for v1 documentation pass.

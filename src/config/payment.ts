@@ -4,13 +4,23 @@ import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
 
 export const payment = {
   brand: "THE STUDIO",
+  /** Customer-facing page title — not the journey step name. */
+  pageTitle: "Complete Your Studio Plan",
+  pageLeadLines: [
+    "Your recommendations have been approved.",
+    "Complete payment to begin your project.",
+  ] as const,
+  /** @deprecated use pageTitle */
   title: customerJourneyStepName("secure-checkout"),
   sections: {
-    summary: "Project Summary",
+    summary: "Your Studio Plan",
     form: "Secure Payment",
-    next: "What's Next?",
+    next: "What Happens Next",
   },
   summary: {
+    recommendedServicesLabel: "Recommended Services",
+    investmentLabel: "Estimated Investment",
+    monthlyTotalLabel: "Monthly Total",
     includesLabel: "Includes:",
     timelineLabel: "Timeline",
     notesLabel: "Studio Notes",
@@ -24,7 +34,8 @@ export const payment = {
     expDate: "Exp Date",
     cvv: "CVV",
     zipCode: "ZIP Code",
-    termsLabel: "I have reviewed this package and agree to proceed with payment.",
+    termsLabel:
+      "I have reviewed my Studio Plan, understand the selected services and pricing, and agree to proceed with payment.",
     submitLabel: "Complete Payment",
   },
   /** Local dev or NEXT_PUBLIC_PAYMENT_SANDBOX=1 (Vercel Preview only — not Production). */
@@ -35,10 +46,17 @@ export const payment = {
     badge: "Test only",
   },
   whatsNext: {
-    currentStepLabel: "Current Step",
-    steps: ["Payment", "Intake Form", "Team Review", "Campaign Begins"] as const,
+    intro: "After payment we'll:",
+    steps: [
+      "Send your receipt",
+      "Open your Studio Project",
+      "Unlock your Vision Intake",
+      "Begin planning your campaign",
+      "Deliver first concepts within 7 business days",
+    ] as const,
   },
-  secureNote: "Secure · Private · Encrypted",
+  secureNote:
+    "Payment is securely encrypted. Work begins after payment and completion of your Vision Intake.",
   routes: {
     studioBoard: "/studio-board",
     studioGuide: "/studio-guide-prototype",

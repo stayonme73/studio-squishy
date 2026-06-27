@@ -6,21 +6,13 @@
  * @see docs/customer-journey-v1-locked.md
  */
 
-import { type CSSProperties, type FormEvent, type ReactNode, useState } from "react";
+import { type FormEvent, type ReactNode, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
-import {
-  payment,
-  paymentIntakeHref,
-  paymentPackageAccents,
-  paymentSummaryIncludes,
-  paymentTimelineLabel,
-  paymentWorkflowStepIcon,
-  paymentWorkflowStepState,
-} from "@/config/payment";
+import { payment, paymentIntakeHref } from "@/config/payment";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
 import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
+import { buildPaymentPlanSummary } from "@/lib/payment-plan-summary";
 import { isPaymentSandboxAvailable, simulateSandboxPayment } from "@/lib/payment-sandbox";
 import { markPaymentReceived } from "@/lib/studio-board-campaign";
 
@@ -29,21 +21,9 @@ type Props = {
   fromPrototype?: boolean;
 };
 
-function SummaryCheckIcon({
-  className,
-  style,
-}: {
-  className?: string;
-  style?: CSSProperties;
-}) {
+function SummaryCheckIcon() {
   return (
-    <svg
-      className={className}
-      style={style}
-      viewBox="0 0 16 16"
-      aria-hidden
-      focusable="false"
-    >
+    <svg className="pay-summary-check" viewBox="0 0 16 16" aria-hidden focusable="false">
       <path
         d="M2.5 8.2 L5.8 11.5 L13.5 4.2"
         fill="none"
@@ -57,22 +37,17 @@ function SummaryCheckIcon({
 }
 
 function PaperCard({
-  packageId,
   title,
   children,
   className = "",
 }: {
-  packageId: StudioGuidePackageId;
   title: string;
   children: ReactNode;
   className?: string;
 }) {
-  const accent = paymentPackageAccents[packageId];
-
   return (
     <section
       className={`pay-paper-card ${className}`.trim()}
-      style={{ "--pay-spine": accent.spine } as CSSProperties}
       aria-labelledby={`pay-card-${title.replace(/\s+/g, "-").toLowerCase()}`}
     >
       <div className="pay-paper-card__pin" aria-hidden />
@@ -91,13 +66,11 @@ function PaperCard({
   );
 }
 
-/** Archived three-panel checkout — customer-facing title is Secure Checkout. */
-export default function CompleteYourOrderCheckoutScene({ packageId, fromPrototype }: Props) {
+/** Archived three-panel checkout — Studio Plan approved, payment to begin project. */
+export default function CompleteYourOrderCheckoutScene({ packageId }: Props) {
   const router = useRouter();
   const pkg = getStudioGuideV1Package(packageId);
-  const accent = paymentPackageAccents[packageId];
-  const includes = paymentSummaryIncludes(packageId);
-  const timeline = paymentTimelineLabel(packageId);
+  const planSummary = useMemo(() => buildPaymentPlanSummary(packageId), [packageId]);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const showSandbox = isPaymentSandboxAvailable();
 
@@ -120,40 +93,27 @@ export default function CompleteYourOrderCheckoutScene({ packageId, fromPrototyp
   }
 
   return (
-    <div className="utility-page" aria-label="Secure Checkout">
-      <UtilityPageHeader
-        backHref={fromPrototype ? payment.routes.studioGuidePrototype : payment.routes.studioGuide}
-        activeNav="payment"
-        title={payment.title}
-        helpCenterFrom="payment"
-      />
-
+    <div className="utility-page payment-page" aria-label={payment.pageTitle}>
       <div className="utility-shell pay-shell">
         <div className="pay-checkout-grid">
-          <PaperCard packageId={packageId} title={payment.sections.summary} className="pay-paper-card--summary">
-            <p className="pay-summary-package">{pkg.label}</p>
-            <p className="pay-summary-tagline">{pkg.tagline}</p>
-            <p className="pay-summary-price">{pkg.price}</p>
+          <PaperCard title={payment.sections.summary} className="pay-paper-card--summary">
+            <p className="pay-summary-includes-label">{payment.summary.recommendedServicesLabel}</p>
+            <ul className="pay-summary-includes-list">
+              {planSummary.services.map((item) => (
+                <li key={item}>
+                  <SummaryCheckIcon />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
 
-            <div className="pay-summary-includes">
-              <p className="pay-summary-includes-label">{payment.summary.includesLabel}</p>
-              <ul className="pay-summary-includes-list">
-                {includes.map((item) => (
-                  <li key={item}>
-                    <SummaryCheckIcon className="pay-summary-check" style={{ color: accent.check }} />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+            <div className="pay-summary-investment">
+              <p className="pay-summary-includes-label">{planSummary.investmentLabel}</p>
+              <p className="pay-summary-price">{planSummary.investmentDisplay}</p>
             </div>
-
-            <p className="pay-summary-timeline">
-              <span className="pay-label">{payment.summary.timelineLabel}</span>
-              {timeline}
-            </p>
           </PaperCard>
 
-          <PaperCard packageId={packageId} title={payment.sections.form} className="pay-paper-card--form">
+          <PaperCard title={payment.sections.form} className="pay-paper-card--form">
             <form className="pay-form" onSubmit={handleSubmit}>
               <label className="pay-field">
                 <span>{payment.form.fullName}</span>
@@ -241,24 +201,16 @@ export default function CompleteYourOrderCheckoutScene({ packageId, fromPrototyp
             </form>
           </PaperCard>
 
-          <PaperCard packageId={packageId} title={payment.sections.next} className="pay-paper-card--next">
-            <p className="pay-next-current-label">{payment.whatsNext.currentStepLabel}</p>
-            <ol className="pay-next-steps">
-              {payment.whatsNext.steps.map((step, index) => {
-                const state = paymentWorkflowStepState(index, payment.workflowStepIndex.payment);
-                return (
-                  <li
-                    key={step}
-                    className={`pay-next-steps__item pay-next-steps__item--${state}`}
-                  >
-                    <span className="pay-next-step-icon" aria-hidden="true">
-                      {paymentWorkflowStepIcon(state)}
-                    </span>
-                    <span>{step}</span>
-                  </li>
-                );
-              })}
-            </ol>
+          <PaperCard title={payment.sections.next} className="pay-paper-card--next">
+            <p className="pay-next-intro">{payment.whatsNext.intro}</p>
+            <ul className="pay-next-steps">
+              {payment.whatsNext.steps.map((step) => (
+                <li key={step} className="pay-next-steps__item">
+                  <SummaryCheckIcon />
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ul>
             <p className="pay-next-secure">{payment.secureNote}</p>
           </PaperCard>
         </div>
