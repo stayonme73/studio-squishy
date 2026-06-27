@@ -24,6 +24,19 @@ type Props = {
   onConfirm: () => void;
 };
 
+const HEARD_HIGHLIGHT_COUNT = 2;
+const HEARD_HIGHLIGHT_MAX_CHARS = 48;
+
+function truncateHeardValue(value: string, maxChars = HEARD_HIGHLIGHT_MAX_CHARS): string {
+  const trimmed = value.trim();
+  if (trimmed.length <= maxChars) return trimmed;
+  return `${trimmed.slice(0, maxChars - 1).trimEnd()}…`;
+}
+
+function formatHeardHighlight(item: DiscoveryAnswerHeardItem): string {
+  return `${item.label}: ${truncateHeardValue(item.value)}`;
+}
+
 function RecommendedServiceRow({
   name,
   why,
@@ -51,7 +64,65 @@ function RecommendedServiceFromSummary({ service }: { service: DiscoverySummaryS
   );
 }
 
-/** Project Summary — heard + recommendation + packages + customize + disclaimer + approve (presentation only). */
+function DiscoveryReferenceSection({
+  heard,
+  editDiscoveryHref,
+}: {
+  heard: readonly DiscoveryAnswerHeardItem[];
+  editDiscoveryHref: string;
+}) {
+  const highlights = heard.slice(0, HEARD_HIGHLIGHT_COUNT).map(formatHeardHighlight);
+  const answerCountLabel =
+    heard.length === 1 ? "1 answer from Discovery" : `${heard.length} answers from Discovery`;
+
+  return (
+    <section
+      className="utility-card ps-section ps-section--reference"
+      aria-labelledby="ps-heard-title"
+    >
+      <h2 id="ps-heard-title" className="utility-card__title utility-card__title--compact">
+        {PROJECT_SUMMARY_LABELS.heardTitle}
+      </h2>
+      <p className="ps-heard__reference-lead">{PROJECT_SUMMARY_LABELS.heardReferenceLead}</p>
+      {heard.length === 0 ? (
+        <p className="ps-muted">{PROJECT_SUMMARY_LABELS.heardEmpty}</p>
+      ) : (
+        <>
+          <p className="ps-heard__summary">
+            <span className="ps-heard__summary-count">{answerCountLabel}</span>
+            {highlights.length > 0 ? (
+              <>
+                <span className="ps-heard__summary-sep" aria-hidden="true">
+                  {" "}
+                  —{" "}
+                </span>
+                <span className="ps-heard__summary-highlights">{highlights.join(" · ")}</span>
+              </>
+            ) : null}
+          </p>
+          <details className="ps-heard__details">
+            <summary className="ps-heard__expand">{PROJECT_SUMMARY_LABELS.heardExpandLabel}</summary>
+            <dl className="ps-heard__list">
+              {heard.map((item) => (
+                <div key={item.label} className="ps-heard__row">
+                  <dt className="ps-heard__label">{item.label}</dt>
+                  <dd className="ps-heard__value">{item.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </details>
+        </>
+      )}
+      <div className="ps-heard__actions">
+        <Link href={editDiscoveryHref} className="utility-btn utility-btn--ghost ps-edit-link">
+          {PROJECT_SUMMARY_LABELS.editDiscovery}
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+/** Project Summary — recommendation + packages + customize + heard reference + disclaimer + approve. */
 /** Decision-page proposal aesthetic — see docs/decision-page-visual-language-v1.md */
 export default function ProjectSummaryScene({
   heard,
@@ -65,28 +136,17 @@ export default function ProjectSummaryScene({
 }: Props) {
   const hasRecommendations = summary.recommendedServices.length > 0;
   const mockServices: readonly ProjectSummaryMockService[] = PROJECT_SUMMARY_MOCK.services;
+  const totalInvestmentDisplay =
+    hasRecommendations && summary.totalInvestment.display
+      ? summary.totalInvestment.display
+      : null;
 
   return (
     <div className="ps-content utility-content">
-      <section className="utility-card ps-section" aria-labelledby="ps-heard-title">
-        <h2 id="ps-heard-title" className="utility-card__title">
-          {PROJECT_SUMMARY_LABELS.heardTitle}
-        </h2>
-        {heard.length === 0 ? (
-          <p className="ps-muted">{PROJECT_SUMMARY_LABELS.heardEmpty}</p>
-        ) : (
-          <dl className="ps-heard__list">
-            {heard.map((item) => (
-              <div key={item.label} className="ps-heard__row">
-                <dt className="ps-heard__label">{item.label}</dt>
-                <dd className="ps-heard__value">{item.value}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-      </section>
-
-      <section className="utility-card ps-section" aria-labelledby="ps-recommend-title">
+      <section
+        className="utility-card ps-section ps-section--hero"
+        aria-labelledby="ps-recommend-title"
+      >
         <h2 id="ps-recommend-title" className="utility-card__title">
           {PROJECT_SUMMARY_LABELS.recommendTitle}
         </h2>
@@ -107,6 +167,11 @@ export default function ProjectSummaryScene({
                 <RecommendedServiceRow key={service.name} name={service.name} why={service.why} />
               ))}
         </ul>
+        {totalInvestmentDisplay ? (
+          <p className="ps-recommend__total">
+            {PROJECT_SUMMARY_LABELS.totalInvestmentLabel}: {totalInvestmentDisplay}
+          </p>
+        ) : null}
       </section>
 
       <section className="utility-card ps-section" aria-labelledby="ps-packages-title">
@@ -140,9 +205,6 @@ export default function ProjectSummaryScene({
           ))}
         </ul>
         <p className="ps-changes__auto-update">{PROJECT_SUMMARY_LABELS.changesAutoUpdate}</p>
-        <Link href={editDiscoveryHref} className="utility-btn utility-btn--ghost ps-edit-link">
-          {PROJECT_SUMMARY_LABELS.editDiscovery}
-        </Link>
         <div className="ps-plan-review">
           <StudioPlanReviewScene
             model={plan}
@@ -154,6 +216,8 @@ export default function ProjectSummaryScene({
         </div>
       </section>
 
+      <DiscoveryReferenceSection heard={heard} editDiscoveryHref={editDiscoveryHref} />
+
       <section className="utility-card ps-section" aria-labelledby="ps-disclaimer-title">
         <h2 id="ps-disclaimer-title" className="utility-card__title">
           {PROJECT_SUMMARY_LABELS.disclaimerTitle}
@@ -161,9 +225,7 @@ export default function ProjectSummaryScene({
         <p className="ps-disclaimer__body">{PROJECT_SUMMARY_LABELS.disclaimerBody}</p>
         <p className="ps-approve__total">
           {PROJECT_SUMMARY_LABELS.totalInvestmentLabel}:{" "}
-          {hasRecommendations && summary.totalInvestment.display
-            ? summary.totalInvestment.display
-            : PROJECT_SUMMARY_LABELS.totalInvestmentPlaceholder}
+          {totalInvestmentDisplay ?? PROJECT_SUMMARY_LABELS.totalInvestmentPlaceholder}
         </p>
         <div className="ps-confirm">
           <button

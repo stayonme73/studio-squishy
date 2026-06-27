@@ -36,6 +36,8 @@ export const PROJECT_SUMMARY_LABELS = {
     "Review your personalized Studio Plan before continuing.",
   ],
   heardTitle: "Here's what we heard",
+  heardReferenceLead: "Your Discovery answers, for reference.",
+  heardExpandLabel: "View all Discovery answers",
   heardEmpty: "No discovery answers saved yet.",
   recommendTitle: "Our Recommendation",
   recommendLead: "Based on what you shared, we recommend starting with:",
@@ -59,7 +61,7 @@ export const PROJECT_SUMMARY_LABELS = {
     "Our recommendations are based entirely on the information you shared during Discovery. They are intended to help you make informed decisions, not to guarantee business results. You're free to adjust your Studio Plan before approving it.",
   totalInvestmentLabel: "Estimated total investment",
   totalInvestmentPlaceholder: "Total updates as you customize your plan.",
-  editDiscovery: "Edit discovery answers",
+  editDiscovery: "Edit Discovery Answers",
   confirmPlan: "Approve and continue to checkout",
 } as const;
 
