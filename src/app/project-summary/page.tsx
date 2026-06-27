@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   title: PROJECT_SUMMARY_LABELS.pageTitle,
 };
 
-/** Project Summary — bridge after Project Discovery; inline Secure Checkout after approve. */
+/** Project Summary — bridge after Project Discovery; wide workspace with inline Secure Checkout. */
 export default function ProjectSummaryPage() {
   return (
     <main

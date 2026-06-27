@@ -1,6 +1,6 @@
-# Studio Plan + Slide-out Secure Checkout — Implemented (V1 partial)
+# Studio Plan + Wide Workspace Secure Checkout — Implemented (V1 partial)
 
-**Status:** IMPLEMENTED on Project Summary (`/project-summary`) — inline checkout after approve. Discovery split-panel slide-out checkout remains **NOT IMPLEMENTED**.
+**Status:** IMPLEMENTED on Project Summary (`/project-summary`) — wide horizontal workspace with checkout always visible in the second row. Discovery split-panel slide-out checkout remains **NOT IMPLEMENTED**.
 
 **Related:** `docs/customer-journey-v1-locked.md` (Planned evolution) · `docs/recommendation-engine-philosophy-v1-locked.md` (6-step flow) · `AGENTS.md` (checkout panel pattern note)
 
@@ -8,18 +8,21 @@
 
 ## What shipped
 
-After the client clicks **Approve Studio Plan** on Project Summary:
+Project Summary is a **single continuous workspace** — no approve-then-reveal phase swap:
 
-1. `saveApprovedStudioPlan()` persists the approved plan to campaign storage.
-2. The page transitions to checkout phase (`?phase=checkout`) **without navigating away** from `/project-summary`.
-3. The existing three-column Secure Checkout layout renders inline via shared `SecureCheckoutGrid`.
-4. Header copy updates to Secure Checkout (`Complete Your Studio Plan`).
-5. Back returns to Project Summary (summary phase).
-6. `/payment` route unchanged — renders the same shared checkout component for direct links and bookmarks.
+1. **Top row (2 columns):** Our Recommendation (left) · Studio Bundles — Spark / Momentum / Growth (right)
+2. **Second row (2 columns):** Customize Your Studio Plan with live pricing (left) · Secure Checkout — plan summary, payment form, disclaimer, Pay (right)
+3. **Bottom row (full width):** Here's What We Heard — de-emphasized reference + Edit Discovery Answers
 
-**Shared component:** `src/components/payment/SecureCheckoutGrid.tsx` (used by `/payment` and Project Summary).
+**Live pricing:** Customize selections feed `buildPaymentPlanSummaryFromPlan()` into embedded `SecureCheckoutGrid` via `planSummary` prop — checkout total updates as services change.
 
-**Workflow:** Discovery → Studio Review → Project Summary → Approve → Secure Checkout (inline) → Payment → Vision Intake
+**Payment:** `saveApprovedStudioPlan()` runs on Pay (via `onBeforePayment`), not on a separate Approve step.
+
+**Legacy URL:** `?phase=checkout` redirects to `/project-summary` (checkout is always visible).
+
+**Shared component:** `src/components/payment/SecureCheckoutGrid.tsx` — `layout="embedded"` on Project Summary; `layout="full"` on `/payment`.
+
+**Workflow:** Discovery → Project Summary (recommend · bundle · customize · pay) → Vision Intake
 
 ---
 
@@ -44,13 +47,15 @@ Studio Lobby → Studio Guide → Project Discovery → Studio Plan → Slide-ou
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│  Project Summary header → Secure Checkout header (same route, phase swap)    │
-├──────────────────────────────────────────────────────────────────────────────┤
-│  THREE-COLUMN CHECKOUT (SecureCheckoutGrid)                                  │
-│  ┌─────────────────┬──────────────────────┬─────────────────────────────┐    │
-│  │ Your Studio Plan│ Secure Payment       │ What Happens Next           │    │
-│  │ (approved plan) │ contact + card form  │ Payment → Vision Intake → … │    │
-│  └─────────────────┴──────────────────────┴─────────────────────────────┘    │
+│  Project Summary header (unchanged — stays on summary copy)                │
+├──────────────────────────────────┬───────────────────────────────────────────┤
+│  Our Recommendation              │  Prefer a bundled option?                 │
+│  services + brief Why? each      │  Spark $299 · Momentum $499/mo · Growth   │
+├──────────────────────────────────┼───────────────────────────────────────────┤
+│  Customize Your Studio Plan      │  Secure Checkout (embedded)               │
+│  add/remove · live total         │  plan summary · form · disclaimer · Pay   │
+├──────────────────────────────────┴───────────────────────────────────────────┤
+│  Here's What We Heard — collapsed reference · Edit Discovery Answers         │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -88,8 +93,8 @@ Studio Lobby → Studio Guide → Project Discovery → Studio Plan → Slide-ou
 | Phase | ID | Status | Location |
 |-------|-----|--------|----------|
 | Reviewing | `reviewing` | Implemented | Discovery split panel |
-| Summary | `summary` | Implemented | Project Summary default phase |
-| Checkout | `checkout` | **Implemented** | Project Summary (`?phase=checkout`); Discovery split **NOT IMPLEMENTED** |
+| Summary | `summary` | Implemented | Project Summary default (wide workspace) |
+| Checkout | `checkout` | **Always visible** | Project Summary second row (embedded grid); Discovery split **NOT IMPLEMENTED** |
 
 CSS custom property for discovery split wiring: `--bds-panel-phase: reviewing | summary | checkout`
 

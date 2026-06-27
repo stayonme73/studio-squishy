@@ -4,11 +4,9 @@ import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import ProjectSummaryScene from "@/components/project-summary/ProjectSummaryScene";
-import { SecureCheckoutGrid } from "@/components/payment/PaymentCheckoutScene";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import StudioUtilityBackdrop from "@/components/shared/StudioUtilityBackdrop";
-import { payment } from "@/config/payment";
 import { studioBoard } from "@/config/studio-board";
 import { buildDiscoverySummary } from "@/discovery-summary";
 import { resolveDiscoveryBriefAnswers } from "@/lib/discovery-brief";
@@ -30,15 +28,10 @@ import {
 } from "@/studio-plan-review";
 import type { ServiceId } from "@/catalog/types";
 
-export type ProjectSummaryPhase = "summary" | "checkout";
-
-/** Project Summary workspace — summary phase then inline Secure Checkout after approve. */
+/** Project Summary — single wide workspace with inline Secure Checkout. */
 export default function ProjectSummaryWorkspace() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [phase, setPhase] = useState<ProjectSummaryPhase>(() =>
-    searchParams.get("phase") === "checkout" ? "checkout" : "summary",
-  );
   const [briefAnswers, setBriefAnswers] = useState<DiscoveryBriefAnswers>({});
 
   useLayoutEffect(() => {
@@ -55,8 +48,10 @@ export default function ProjectSummaryWorkspace() {
   }, []);
 
   useEffect(() => {
-    setPhase(searchParams.get("phase") === "checkout" ? "checkout" : "summary");
-  }, [searchParams]);
+    if (searchParams.get("phase") === "checkout") {
+      router.replace(studioBoard.routes.projectSummary, { scroll: false });
+    }
+  }, [router, searchParams]);
 
   const heard = useMemo(() => buildDiscoveryAnswersHeard(briefAnswers), [briefAnswers]);
   const recommendation = useMemo(
@@ -86,72 +81,42 @@ export default function ProjectSummaryWorkspace() {
     setPlanState((current) => addServiceToPlan(current, serviceId));
   }
 
-  function enterCheckoutPhase() {
-    setPhase("checkout");
-    router.replace(`${studioBoard.routes.projectSummary}?phase=checkout`, { scroll: false });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  function handleSavePlanBeforePayment(): boolean {
+    if (!plan.canApprove) return false;
+    return saveApprovedStudioPlan(planState.selectedServiceIds) !== null;
   }
-
-  function handleConfirm() {
-    const saved = saveApprovedStudioPlan(planState.selectedServiceIds);
-    if (!saved) return;
-    enterCheckoutPhase();
-  }
-
-  const isCheckout = phase === "checkout";
-  const headerTitle = isCheckout ? payment.pageTitle : PROJECT_SUMMARY_LABELS.pageTitle;
-  const headerLeadLines = isCheckout ? payment.pageLeadLines : PROJECT_SUMMARY_LABELS.pageLeadLines;
-  const backHref = isCheckout ? studioBoard.routes.projectSummary : studioBoard.routes.projectDiscovery;
-  const activeNav = isCheckout ? ("payment" as const) : ("studio-board" as const);
-  const pageLabel = isCheckout ? payment.pageTitle : PROJECT_SUMMARY_LABELS.pageTitle;
 
   return (
-    <>
-      <div className="studio-utility-scene studio-utility-scene--header-band">
-        <div
-          className={`studio-utility-header-band ${
-            isCheckout ? "payment-header-band" : "project-summary-header-band"
-          }`}
-        >
-          <UtilityPageHeader
-            backHref={backHref}
-            activeNav={activeNav}
-            title={headerTitle}
-            leadLines={headerLeadLines}
-            helpCenterFrom={isCheckout ? "payment" : "studio-board"}
-          />
-        </div>
-        <div className="studio-utility-scene__body">
-          <StudioUtilityBackdrop placement="below-header" />
-          <div className="studio-utility-scene__content">
-            <UtilityPageFrame navId={activeNav}>
-              <div
-                className={`utility-page project-summary-page${
-                  isCheckout ? " project-summary-page--checkout payment-page" : ""
-                }`}
-                aria-label={pageLabel}
-              >
-                {isCheckout ? (
-                  <div className="ps-checkout-panel" aria-label={payment.pageTitle}>
-                    <SecureCheckoutGrid packageId={packageId} />
-                  </div>
-                ) : (
-                  <ProjectSummaryScene
-                    heard={heard}
-                    summary={summary}
-                    plan={plan}
-                    editDiscoveryHref={studioBoard.routes.projectDiscovery}
-                    onRemove={handleRemove}
-                    onSwap={handleSwap}
-                    onAdd={handleAdd}
-                    onConfirm={handleConfirm}
-                  />
-                )}
-              </div>
-            </UtilityPageFrame>
-          </div>
+    <div className="studio-utility-scene studio-utility-scene--header-band">
+      <div className="studio-utility-header-band project-summary-header-band">
+        <UtilityPageHeader
+          backHref={studioBoard.routes.projectDiscovery}
+          activeNav="studio-board"
+          title={PROJECT_SUMMARY_LABELS.pageTitle}
+          leadLines={PROJECT_SUMMARY_LABELS.pageLeadLines}
+          helpCenterFrom="studio-board"
+        />
+      </div>
+      <div className="studio-utility-scene__body">
+        <StudioUtilityBackdrop placement="below-header" />
+        <div className="studio-utility-scene__content">
+          <UtilityPageFrame navId="studio-board">
+            <div className="utility-page project-summary-page" aria-label={PROJECT_SUMMARY_LABELS.pageTitle}>
+              <ProjectSummaryScene
+                heard={heard}
+                summary={summary}
+                plan={plan}
+                packageId={packageId}
+                editDiscoveryHref={studioBoard.routes.projectDiscovery}
+                onRemove={handleRemove}
+                onSwap={handleSwap}
+                onAdd={handleAdd}
+                onSavePlanBeforePayment={handleSavePlanBeforePayment}
+              />
+            </div>
+          </UtilityPageFrame>
         </div>
       </div>
-    </>
+    </div>
   );
 }

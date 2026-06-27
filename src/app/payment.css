@@ -452,8 +452,32 @@
   color: var(--pay-charcoal-muted);
 }
 
+.pay-disclaimer {
+  margin: 0.15rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--pay-charcoal-muted);
+  background: color-mix(in srgb, var(--pay-mushroom) 55%, var(--pay-ivory));
+  border: 1px solid color-mix(in srgb, var(--pay-denim) 10%, transparent);
+}
+
+.pay-checkout-grid--embedded {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+}
+
+.pay-shell--embedded {
+  max-width: none;
+  padding: 0;
+}
+
 @media (max-width: 63.99rem) {
   .pay-checkout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pay-checkout-grid--embedded {
     grid-template-columns: 1fr;
   }
 

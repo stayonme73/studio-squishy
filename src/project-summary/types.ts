@@ -45,7 +45,8 @@ export const PROJECT_SUMMARY_LABELS = {
   recommendWhyLabel: "Why?",
   packagesTitle: "Prefer a bundled option?",
   packagesLead:
-    "Studio Bundles are fixed offerings — contents cannot be added, removed, or customized. Choose one below, or continue with your personalized Studio Plan above and customize it in the next section.",
+    "Studio Bundles are fixed offerings — contents cannot be added, removed, or customized. Choose one below, or customize your personalized Studio Plan in the next row.",
+  checkoutTitle: "Secure Checkout",
   packagesIncludesLabel: "Includes:",
   packagesSelectLabel: "Select bundle",
   changesTitle: "Customize Your Studio Plan",
@@ -79,6 +80,8 @@ export type ProjectSummaryMockPackage = {
   tagline: string;
   description: string;
   includes: readonly string[];
+  /** Customer-facing price — Herb Gold in UI */
+  priceDisplay: string;
   billingLabel: "One-Time Investment" | "Monthly Plan";
 };
 
@@ -116,6 +119,7 @@ export const PROJECT_SUMMARY_MOCK = {
         "Marketing Campaign",
         "Social Media Marketing",
       ],
+      priceDisplay: "$299 One-Time",
       billingLabel: "One-Time Investment",
     },
     {
@@ -133,6 +137,7 @@ export const PROJECT_SUMMARY_MOCK = {
         "Marketing Campaign",
         "Marketing Copywriting",
       ],
+      priceDisplay: "$499/month",
       billingLabel: "Monthly Plan",
     },
     {
@@ -153,6 +158,7 @@ export const PROJECT_SUMMARY_MOCK = {
         "Marketing Optimization",
         "Marketing Assets",
       ],
+      priceDisplay: "$799/month",
       billingLabel: "Monthly Plan",
     },
   ] satisfies readonly ProjectSummaryMockPackage[],

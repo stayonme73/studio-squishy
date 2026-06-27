@@ -33,7 +33,7 @@ Do **freeze business rules** unless validated by real customer experience or an 
 
 **Visual design:** Before making visual decisions on new customer-facing pages, read [docs/the-studio-design-system-v1.md](docs/the-studio-design-system-v1.md) and [docs/decision-page-visual-language-v1.md](docs/decision-page-visual-language-v1.md). Every color has one job — match documented roles; note gaps as TBD rather than inventing palette values.
 
-**Build order (locked — work priority):** Finish the customer-facing journey before wiring Discovery Mapping or Recommendation Engine scoring. Philosophy docs are locked; UI with mock data is fine. Do **not** implement scoring, mapping, or engine wiring until end-to-end journey verification (Discovery → Project Summary → payment → Vision Intake) is complete. **Project Summary inline Secure Checkout** is implemented (`SecureCheckoutGrid` on `/project-summary?phase=checkout`); Discovery split-panel slide-out remains planned. See `docs/customer-journey-v1-locked.md` (Build order) · `docs/studio-plan-slide-out-checkout-v1-planned.md` · `docs/discovery-mapping-v1-planned.md` (PAUSED).
+**Build order (locked — work priority):** Finish the customer-facing journey before wiring Discovery Mapping or Recommendation Engine scoring. Philosophy docs are locked; UI with mock data is fine. Do **not** implement scoring, mapping, or engine wiring until end-to-end journey verification (Discovery → Project Summary → payment → Vision Intake) is complete. **Project Summary wide workspace Secure Checkout** is implemented (embedded `SecureCheckoutGrid` in row 2); Discovery split-panel slide-out remains planned. See `docs/customer-journey-v1-locked.md` (Build order) · `docs/studio-plan-slide-out-checkout-v1-planned.md` · `docs/discovery-mapping-v1-planned.md` (PAUSED).
 <!-- END:studio-architecture-rules -->
 
 <!-- BEGIN:recommendation-not-direction-lock -->
@@ -66,7 +66,7 @@ Customer-facing room names and routes are frozen in `src/config/customer-journey
 
 Legacy paths redirect via `next.config.ts` and thin redirect pages. Internal folder names (e.g. `business-discovery-studio`, `studio-plan-review`) may differ from customer names.
 
-**Checkout on Project Summary (implemented):** After Approve on `/project-summary`, the page transitions to inline Secure Checkout (`?phase=checkout`) via shared `SecureCheckoutGrid` — no navigation to Studio Board. The `/payment` route remains active for direct links. Discovery split-panel slide-out checkout is still planned — see `docs/studio-plan-slide-out-checkout-v1-planned.md`.
+**Checkout on Project Summary (implemented):** `/project-summary` is a wide workspace — customize (row 2 left) and embedded Secure Checkout (row 2 right) are always visible via shared `SecureCheckoutGrid` (`layout="embedded"`). No Approve step or `?phase=checkout` swap. The `/payment` route remains active for direct links. Discovery split-panel slide-out checkout is still planned — see `docs/studio-plan-slide-out-checkout-v1-planned.md`.
 <!-- END:customer-journey-lock -->
 
 <!-- BEGIN:customer-journey-v1 -->

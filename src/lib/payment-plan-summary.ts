@@ -3,6 +3,7 @@ import type { StudioGuidePackageId } from "@/config/studio-guide";
 import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
 import { readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 import { PROJECT_SUMMARY_MOCK } from "@/project-summary";
+import type { StudioPlanReviewModel } from "@/studio-plan-review";
 
 export type PaymentPlanSummarySource = "storage" | "mock";
 
@@ -97,6 +98,66 @@ export function buildPaymentPlanSummary(
     services: PROJECT_SUMMARY_MOCK.services.map((service) => service.name),
     investmentLabel: "Estimated Investment",
     investmentDisplay: MOCK_INVESTMENT,
+    source: "mock",
+  };
+}
+
+function collectPlanServices(plan: StudioPlanReviewModel): StudioPlanReviewModel["includedServices"] {
+  return [
+    ...plan.includedServices,
+    ...plan.additionalStudioServices,
+    ...plan.addedToPlanServices,
+  ];
+}
+
+/**
+ * Live Studio Plan summary for inline checkout — reflects current customize selections.
+ */
+export function buildPaymentPlanSummaryFromPlan(plan: StudioPlanReviewModel): PaymentPlanSummary {
+  const allServices = collectPlanServices(plan);
+  const services = allServices.map((service) => service.title);
+
+  if (services.length === 0) {
+    return {
+      services: PROJECT_SUMMARY_MOCK.services.map((service) => service.name),
+      investmentLabel: "Estimated Investment",
+      investmentDisplay: "Total updates as you customize your plan.",
+      source: "mock",
+    };
+  }
+
+  let totalUsd = 0;
+  let hasQuotedItems = false;
+  for (const service of allServices) {
+    if (service.amountUsd > 0) {
+      totalUsd += service.amountUsd;
+    } else if (service.pricingDisplay.toLowerCase().includes("quoted")) {
+      hasQuotedItems = true;
+    }
+  }
+
+  if (hasQuotedItems && totalUsd === 0) {
+    return {
+      services,
+      investmentLabel: "Estimated Investment",
+      investmentDisplay: "Quoted at checkout",
+      source: "mock",
+    };
+  }
+
+  if (hasQuotedItems) {
+    return {
+      services,
+      investmentLabel: "Estimated Investment",
+      investmentDisplay: `${formatUsd(totalUsd)} plus quoted items`,
+      source: "mock",
+    };
+  }
+
+  return {
+    services,
+    investmentLabel: "Estimated Investment",
+    investmentDisplay: totalUsd > 0 ? formatUsd(totalUsd) : plan.additionalCost.display,
     source: "mock",
   };
 }

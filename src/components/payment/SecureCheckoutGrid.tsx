@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 
 import { payment, paymentIntakeHref } from "@/config/payment";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
-import { buildPaymentPlanSummary } from "@/lib/payment-plan-summary";
+import {
+  buildPaymentPlanSummary,
+  type PaymentPlanSummary,
+} from "@/lib/payment-plan-summary";
 import { isPaymentSandboxAvailable, simulateSandboxPayment } from "@/lib/payment-sandbox";
 import { readCurrentCampaignHydrated, markPaymentReceived } from "@/lib/studio-board-campaign";
 
@@ -13,6 +16,14 @@ type Props = {
   packageId?: StudioGuidePackageId;
   /** When set, runs after payment instead of default Vision Intake navigation. */
   onPaymentComplete?: (packageId: StudioGuidePackageId | undefined) => void;
+  /** `embedded` — summary + form only (Project Summary second row). `full` — three columns. */
+  layout?: "full" | "embedded";
+  /** Live plan summary from customize column; overrides storage-backed summary when set. */
+  planSummary?: PaymentPlanSummary;
+  /** Disclaimer copy shown above the Pay button (embedded layout). */
+  disclaimerText?: string;
+  /** Persist approved plan before payment; return false to block checkout. */
+  onBeforePayment?: () => boolean;
 };
 
 function SummaryCheckIcon() {
@@ -66,14 +77,24 @@ function resolvePackageId(packageId?: StudioGuidePackageId): StudioGuidePackageI
 }
 
 /** Three-column Secure Checkout — Studio Plan summary, payment form, what happens next. */
-export default function SecureCheckoutGrid({ packageId: packageIdProp, onPaymentComplete }: Props) {
+export default function SecureCheckoutGrid({
+  packageId: packageIdProp,
+  onPaymentComplete,
+  layout = "full",
+  planSummary: planSummaryProp,
+  disclaimerText,
+  onBeforePayment,
+}: Props) {
   const router = useRouter();
   const packageId = resolvePackageId(packageIdProp);
-  const planSummary = useMemo(() => buildPaymentPlanSummary(packageId), [packageId]);
+  const storedPlanSummary = useMemo(() => buildPaymentPlanSummary(packageId), [packageId]);
+  const planSummary = planSummaryProp ?? storedPlanSummary;
   const [termsAccepted, setTermsAccepted] = useState(false);
   const showSandbox = isPaymentSandboxAvailable();
+  const isEmbedded = layout === "embedded";
 
   function completeCheckout() {
+    if (onBeforePayment && !onBeforePayment()) return;
     markPaymentReceived(packageId);
     if (onPaymentComplete) {
       onPaymentComplete(packageId);
@@ -89,6 +110,7 @@ export default function SecureCheckoutGrid({ packageId: packageIdProp, onPayment
   }
 
   function handleSandboxPayment() {
+    if (onBeforePayment && !onBeforePayment()) return;
     simulateSandboxPayment(packageId);
     if (onPaymentComplete) {
       onPaymentComplete(packageId);
@@ -98,8 +120,8 @@ export default function SecureCheckoutGrid({ packageId: packageIdProp, onPayment
   }
 
   return (
-    <div className="pay-shell">
-      <div className="pay-checkout-grid">
+    <div className={`pay-shell${isEmbedded ? " pay-shell--embedded" : ""}`}>
+      <div className={`pay-checkout-grid${isEmbedded ? " pay-checkout-grid--embedded" : ""}`}>
         <PaperCard title={payment.sections.summary} className="pay-paper-card--summary">
           <p className="pay-summary-includes-label">{payment.summary.recommendedServicesLabel}</p>
           <ul className="pay-summary-includes-list">
@@ -174,6 +196,9 @@ export default function SecureCheckoutGrid({ packageId: packageIdProp, onPayment
               <span>{payment.form.zipCode}</span>
               <input type="text" name="zipCode" inputMode="numeric" autoComplete="postal-code" required />
             </label>
+            {disclaimerText ? (
+              <p className="pay-disclaimer">{disclaimerText}</p>
+            ) : null}
             <label className="pay-terms">
               <input
                 type="checkbox"
@@ -201,22 +226,24 @@ export default function SecureCheckoutGrid({ packageId: packageIdProp, onPayment
           </form>
         </PaperCard>
 
-        <PaperCard title={payment.sections.next} className="pay-paper-card--next">
-          <ul className="pay-next-steps" aria-label="What happens next">
-            {payment.whatsNext.steps.map((step) => (
-              <li key={step.label} className="pay-next-steps__item">
-                <span
-                  className={`pay-next-steps__marker pay-next-steps__marker--${step.marker}`}
-                  aria-hidden="true"
-                >
-                  {step.marker === "check" ? "✓" : "↓"}
-                </span>
-                <span>{step.label}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="pay-next-secure">{payment.secureNote}</p>
-        </PaperCard>
+        {isEmbedded ? null : (
+          <PaperCard title={payment.sections.next} className="pay-paper-card--next">
+            <ul className="pay-next-steps" aria-label="What happens next">
+              {payment.whatsNext.steps.map((step) => (
+                <li key={step.label} className="pay-next-steps__item">
+                  <span
+                    className={`pay-next-steps__marker pay-next-steps__marker--${step.marker}`}
+                    aria-hidden="true"
+                  >
+                    {step.marker === "check" ? "✓" : "↓"}
+                  </span>
+                  <span>{step.label}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="pay-next-secure">{payment.secureNote}</p>
+          </PaperCard>
+        )}
       </div>
     </div>
   );

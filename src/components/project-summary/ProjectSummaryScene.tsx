@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 
 import type { DiscoverySummaryModel, DiscoverySummaryServiceItem } from "@/discovery-summary";
 import StudioPlanReviewScene from "@/components/studio-plan-review/StudioPlanReviewScene";
+import { SecureCheckoutGrid } from "@/components/payment/PaymentCheckoutScene";
 import type { StudioPlanReviewModel } from "@/studio-plan-review";
 import type { ServiceId } from "@/catalog/types";
+import type { StudioGuidePackageId } from "@/config/studio-guide";
+import { buildPaymentPlanSummaryFromPlan } from "@/lib/payment-plan-summary";
 import {
   PROJECT_SUMMARY_LABELS,
   PROJECT_SUMMARY_MOCK,
@@ -18,10 +22,11 @@ type Props = {
   summary: DiscoverySummaryModel;
   plan: StudioPlanReviewModel;
   editDiscoveryHref: string;
+  packageId?: StudioGuidePackageId;
   onRemove: (serviceId: ServiceId) => void;
   onSwap: (fromId: ServiceId, toId: ServiceId) => void;
   onAdd: (serviceId: ServiceId) => void;
-  onConfirm: () => void;
+  onSavePlanBeforePayment: () => boolean;
 };
 
 const HEARD_HIGHLIGHT_COUNT = 2;
@@ -77,7 +82,7 @@ function DiscoveryReferenceSection({
 
   return (
     <section
-      className="utility-card ps-section ps-section--reference"
+      className="utility-card ps-section ps-section--reference ps-workspace__row ps-workspace__row--full"
       aria-labelledby="ps-heard-title"
     >
       <h2 id="ps-heard-title" className="utility-card__title utility-card__title--compact">
@@ -122,138 +127,140 @@ function DiscoveryReferenceSection({
   );
 }
 
-/** Project Summary — recommendation + packages + customize + heard reference + disclaimer + approve. */
+/** Project Summary — wide workspace: recommend + bundles | customize + checkout | heard reference. */
 /** Decision-page proposal aesthetic — see docs/decision-page-visual-language-v1.md */
 export default function ProjectSummaryScene({
   heard,
   summary,
   plan,
   editDiscoveryHref,
+  packageId,
   onRemove,
   onSwap,
   onAdd,
-  onConfirm,
+  onSavePlanBeforePayment,
 }: Props) {
   const hasRecommendations = summary.recommendedServices.length > 0;
   const mockServices: readonly ProjectSummaryMockService[] = PROJECT_SUMMARY_MOCK.services;
-  const totalInvestmentDisplay =
-    hasRecommendations && summary.totalInvestment.display
-      ? summary.totalInvestment.display
-      : null;
+  const livePlanSummary = useMemo(() => buildPaymentPlanSummaryFromPlan(plan), [plan]);
 
   return (
-    <div className="ps-content utility-content">
-      <section
-        className="utility-card ps-section ps-section--hero"
-        aria-labelledby="ps-recommend-title"
-      >
-        <h2 id="ps-recommend-title" className="utility-card__title">
-          {PROJECT_SUMMARY_LABELS.recommendTitle}
-        </h2>
-        <p className="ps-recommend__lead">{PROJECT_SUMMARY_LABELS.recommendLead}</p>
-        {summary.warnings.length > 0 ? (
-          <ul className="ps-warnings" aria-label="Recommendation notices">
-            {summary.warnings.map((warning) => (
-              <li key={`${warning.kind}-${warning.serviceId ?? "global"}`}>{warning.message}</li>
+    <div className="ps-content ps-workspace utility-content">
+      <div className="ps-workspace__row ps-workspace__row--top">
+        <section
+          className="utility-card ps-section ps-section--hero ps-workspace__col"
+          aria-labelledby="ps-recommend-title"
+        >
+          <h2 id="ps-recommend-title" className="utility-card__title">
+            {PROJECT_SUMMARY_LABELS.recommendTitle}
+          </h2>
+          <p className="ps-recommend__lead">{PROJECT_SUMMARY_LABELS.recommendLead}</p>
+          {summary.warnings.length > 0 ? (
+            <ul className="ps-warnings" aria-label="Recommendation notices">
+              {summary.warnings.map((warning) => (
+                <li key={`${warning.kind}-${warning.serviceId ?? "global"}`}>{warning.message}</li>
+              ))}
+            </ul>
+          ) : null}
+          <ul className="ps-recommend__service-list">
+            {hasRecommendations
+              ? summary.recommendedServices.map((service) => (
+                  <RecommendedServiceFromSummary key={service.serviceId} service={service} />
+                ))
+              : mockServices.map((service) => (
+                  <RecommendedServiceRow key={service.name} name={service.name} why={service.why} />
+                ))}
+          </ul>
+        </section>
+
+        <section
+          className="utility-card ps-section ps-workspace__col"
+          aria-labelledby="ps-packages-title"
+        >
+          <h2 id="ps-packages-title" className="utility-card__title">
+            {PROJECT_SUMMARY_LABELS.packagesTitle}
+          </h2>
+          <p className="ps-packages__lead">{PROJECT_SUMMARY_LABELS.packagesLead}</p>
+          <ul className="ps-packages__grid" aria-label={PROJECT_SUMMARY_LABELS.packagesSelectLabel}>
+            {PROJECT_SUMMARY_MOCK.packages.map((pkg) => (
+              <li key={pkg.id} className="ps-packages__card">
+                <div className="ps-packages__intro">
+                  <p className="ps-packages__name">
+                    <span aria-hidden="true">{pkg.emoji} </span>
+                    {pkg.name}
+                  </p>
+                  <p className="ps-packages__tagline">{pkg.tagline}</p>
+                  <p className="ps-packages__description">{pkg.description}</p>
+                </div>
+                <div className="ps-packages__includes-block">
+                  <p className="ps-packages__includes-label">
+                    {PROJECT_SUMMARY_LABELS.packagesIncludesLabel}
+                  </p>
+                  <ul className="ps-packages__includes">
+                    {pkg.includes.map((service) => (
+                      <li key={service}>{service}</li>
+                    ))}
+                  </ul>
+                </div>
+                <p className="ps-packages__price">{pkg.priceDisplay}</p>
+                <p className="ps-packages__billing">{pkg.billingLabel}</p>
+                <button type="button" className="utility-btn utility-btn--secondary ps-packages__select" disabled>
+                  {PROJECT_SUMMARY_LABELS.packagesSelectLabel}
+                </button>
+              </li>
             ))}
           </ul>
-        ) : null}
-        <ul className="ps-recommend__service-list">
-          {hasRecommendations
-            ? summary.recommendedServices.map((service) => (
-                <RecommendedServiceFromSummary key={service.serviceId} service={service} />
-              ))
-            : mockServices.map((service) => (
-                <RecommendedServiceRow key={service.name} name={service.name} why={service.why} />
-              ))}
-        </ul>
-        {totalInvestmentDisplay ? (
-          <p className="ps-recommend__total">
-            {PROJECT_SUMMARY_LABELS.totalInvestmentLabel}: {totalInvestmentDisplay}
-          </p>
-        ) : null}
-      </section>
+        </section>
+      </div>
 
-      <section className="utility-card ps-section" aria-labelledby="ps-packages-title">
-        <h2 id="ps-packages-title" className="utility-card__title">
-          {PROJECT_SUMMARY_LABELS.packagesTitle}
-        </h2>
-        <p className="ps-packages__lead">{PROJECT_SUMMARY_LABELS.packagesLead}</p>
-        <ul className="ps-packages__grid" aria-label={PROJECT_SUMMARY_LABELS.packagesSelectLabel}>
-          {PROJECT_SUMMARY_MOCK.packages.map((pkg) => (
-            <li key={pkg.id} className="ps-packages__card">
-              <div className="ps-packages__intro">
-                <p className="ps-packages__name">
-                  <span aria-hidden="true">{pkg.emoji} </span>
-                  {pkg.name}
-                </p>
-                <p className="ps-packages__tagline">{pkg.tagline}</p>
-                <p className="ps-packages__description">{pkg.description}</p>
-              </div>
-              <div className="ps-packages__includes-block">
-                <p className="ps-packages__includes-label">
-                  {PROJECT_SUMMARY_LABELS.packagesIncludesLabel}
-                </p>
-                <ul className="ps-packages__includes">
-                  {pkg.includes.map((service) => (
-                    <li key={service}>{service}</li>
-                  ))}
-                </ul>
-              </div>
-              <p className="ps-packages__billing">{pkg.billingLabel}</p>
-              <button type="button" className="utility-btn utility-btn--secondary ps-packages__select" disabled>
-                {PROJECT_SUMMARY_LABELS.packagesSelectLabel}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <div className="ps-workspace__row ps-workspace__row--middle">
+        <section
+          className="utility-card ps-section ps-workspace__col"
+          aria-labelledby="ps-changes-title"
+        >
+          <h2 id="ps-changes-title" className="utility-card__title">
+            {PROJECT_SUMMARY_LABELS.changesTitle}
+          </h2>
+          <p className="ps-changes__lead">{PROJECT_SUMMARY_LABELS.changesLead}</p>
+          <p className="ps-changes__powers-intro">{PROJECT_SUMMARY_LABELS.changesPowersIntro}</p>
+          <ul className="ps-changes__powers">
+            {PROJECT_SUMMARY_LABELS.changesPowers.map((power) => (
+              <li key={power}>{power}</li>
+            ))}
+          </ul>
+          <p className="ps-changes__auto-update">{PROJECT_SUMMARY_LABELS.changesAutoUpdate}</p>
+          <div className="ps-plan-review">
+            <StudioPlanReviewScene
+              model={plan}
+              onRemove={onRemove}
+              onSwap={onSwap}
+              onAdd={onAdd}
+              onApprove={onSavePlanBeforePayment}
+              hideApprove
+            />
+          </div>
+        </section>
 
-      <section className="utility-card ps-section" aria-labelledby="ps-changes-title">
-        <h2 id="ps-changes-title" className="utility-card__title">
-          {PROJECT_SUMMARY_LABELS.changesTitle}
-        </h2>
-        <p className="ps-changes__lead">{PROJECT_SUMMARY_LABELS.changesLead}</p>
-        <p className="ps-changes__powers-intro">{PROJECT_SUMMARY_LABELS.changesPowersIntro}</p>
-        <ul className="ps-changes__powers">
-          {PROJECT_SUMMARY_LABELS.changesPowers.map((power) => (
-            <li key={power}>{power}</li>
-          ))}
-        </ul>
-        <p className="ps-changes__auto-update">{PROJECT_SUMMARY_LABELS.changesAutoUpdate}</p>
-        <div className="ps-plan-review">
-          <StudioPlanReviewScene
-            model={plan}
-            onRemove={onRemove}
-            onSwap={onSwap}
-            onAdd={onAdd}
-            onApprove={onConfirm}
-          />
-        </div>
-      </section>
+        <section
+          className="utility-card ps-section ps-workspace__col ps-workspace__col--checkout payment-page"
+          aria-labelledby="ps-checkout-title"
+        >
+          <h2 id="ps-checkout-title" className="utility-card__title">
+            {PROJECT_SUMMARY_LABELS.checkoutTitle}
+          </h2>
+          <div className="ps-checkout-embedded">
+            <SecureCheckoutGrid
+              layout="embedded"
+              packageId={packageId}
+              planSummary={livePlanSummary}
+              disclaimerText={PROJECT_SUMMARY_LABELS.disclaimerBody}
+              onBeforePayment={onSavePlanBeforePayment}
+            />
+          </div>
+        </section>
+      </div>
 
       <DiscoveryReferenceSection heard={heard} editDiscoveryHref={editDiscoveryHref} />
-
-      <section className="utility-card ps-section" aria-labelledby="ps-disclaimer-title">
-        <h2 id="ps-disclaimer-title" className="utility-card__title">
-          {PROJECT_SUMMARY_LABELS.disclaimerTitle}
-        </h2>
-        <p className="ps-disclaimer__body">{PROJECT_SUMMARY_LABELS.disclaimerBody}</p>
-        <p className="ps-approve__total">
-          {PROJECT_SUMMARY_LABELS.totalInvestmentLabel}:{" "}
-          {totalInvestmentDisplay ?? PROJECT_SUMMARY_LABELS.totalInvestmentPlaceholder}
-        </p>
-        <div className="ps-confirm">
-          <button
-            type="button"
-            className="utility-btn utility-btn--primary"
-            disabled={!plan.canApprove}
-            onClick={onConfirm}
-          >
-            {PROJECT_SUMMARY_LABELS.confirmPlan}
-          </button>
-        </div>
-      </section>
     </div>
   );
 }
