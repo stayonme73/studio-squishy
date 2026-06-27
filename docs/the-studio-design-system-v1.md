@@ -234,6 +234,7 @@ Discovery board keeps corkboard/warm styling; split preview uses proposal tokens
 | `src/app/project-summary.css` | Decision-page tokens and components |
 | `src/app/studio-utility-backdrop.css` | Shared lobby backdrop |
 | `src/app/utility-design-system.css` | Legacy utility shell |
+| `src/app/business-discovery-studio.css` | Split preview panel (proposal subset) |
 | `src/app/payment.css` | Secure Checkout — utility pages palette and three-column pinboard |
 | `docs/decision-page-visual-language-v1.md` | Project Summary / checkout proposal notes |
 
