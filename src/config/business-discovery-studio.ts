@@ -259,6 +259,37 @@ const _refBadgeY = _refFace.y + 8;
 export const DONE_BADGE_RIGHT_PAD = _refPaintedRight - DONE_BADGE_SIZE - _refBadgeX;
 export const DONE_BADGE_TOP_PAD = _refBadgeY - _refFace.y;
 
+export type DiscoveryStatusCoverOffset = {
+  dx?: number;
+  dy?: number;
+};
+
+/** Card 1 baked ○ top-left on the painted face (native plate px). */
+const _refStatusCoverX = _refFace.x;
+const _refStatusCoverY = _refFace.y + _refFace.height - STATUS_COVER_SIZE - 7;
+
+/** Uniform inset from painted card-face bottom-left — derived from card 1. */
+export const STATUS_COVER_LEFT_PAD = _refStatusCoverX - _refFace.x;
+export const STATUS_COVER_BOTTOM_PAD =
+  _refFace.y + _refFace.height - STATUS_COVER_SIZE - _refStatusCoverY;
+
+/**
+ * Per-tile status-cover nudge (native plate px) — only where baked ○ art diverges from card 1.
+ * Separate from DISCOVERY_BADGE_OFFSET (top-right ✓).
+ */
+export const DISCOVERY_STATUS_COVER_OFFSET: Partial<
+  Record<DiscoveryTileId, DiscoveryStatusCoverOffset>
+> = {
+  "your-situation": { dy: 7 },
+  "your-challenge": { dx: 4, dy: -13 },
+  "your-current-tools": { dx: 41 },
+  "your-focus": { dy: 7 },
+  "success-looks-like": { dx: 14, dy: 7 },
+  "whats-slowing-you-down": { dx: 2, dy: -13 },
+  "anything-else": { dx: 52, dy: 5 },
+  "submit-project": { dx: 23, dy: -6 },
+};
+
 export type DiscoveryBadgeOffset = {
   dx?: number;
   dy?: number;
@@ -298,8 +329,16 @@ export function discoveryTileDerivedGeometry(
       size: DONE_BADGE_SIZE,
     },
     statusCover: {
-      x: paintedRight - STATUS_COVER_SIZE - 8,
-      y: face.y + face.height - STATUS_COVER_SIZE - 10,
+      x:
+        face.x +
+        STATUS_COVER_LEFT_PAD +
+        (DISCOVERY_STATUS_COVER_OFFSET[tileId]?.dx ?? 0),
+      y:
+        face.y +
+        face.height -
+        STATUS_COVER_SIZE -
+        STATUS_COVER_BOTTOM_PAD +
+        (DISCOVERY_STATUS_COVER_OFFSET[tileId]?.dy ?? 0),
       width: STATUS_COVER_SIZE,
       height: STATUS_COVER_SIZE,
     },
