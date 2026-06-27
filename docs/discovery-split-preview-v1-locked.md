@@ -6,29 +6,52 @@
 
 ## Purpose
 
-After Project Discovery submit, the split-screen right column answers: **"Did The Studio understand me?"** / **"We listened."**
+After Project Discovery submit, the split-screen right column answers one question: **"Here's what we prepared."**
 
-It is a confidence moment — not the decision page. Customers see a simple recommended service list and one CTA to open the full Studio Plan on Project Summary.
+It is a reassurance moment — not the decision page. Customers see a short intro, recommended service names only, a Next Step outline, and one CTA to open the full Studio Plan on Project Summary.
+
+Preview is **not** the full report. One job: reassure — *"We've reviewed your Discovery and prepared your Studio Plan."*
+
+## One screen, one question
+
+| Screen | Route / location | Question it answers |
+|--------|------------------|---------------------|
+| Project Discovery | `/business-discovery-studio` | Tell us about your business. |
+| Studio Plan Preview | In-discovery split panel (phase `summary`) | Here's what we prepared. |
+| Project Summary | `/project-summary` | Review, customize, approve, and understand the investment. |
+| Secure Checkout | `/payment` | Complete your purchase. |
+
+If a screen answers the next screen's question, it carries too much responsibility.
 
 ## Screen roles (post-discovery)
 
 | Screen | Route / location | Purpose | Content |
 |--------|------------------|---------|---------|
-| Discovery Split Preview | In-discovery split panel (phase `summary`) | Preview — "We listened" | Service names only + CTA |
+| Discovery Split Preview | In-discovery split panel (phase `summary`) | Preview — "Here's what we prepared" | Intro + service names only + Next Step bullets + CTA |
 | Project Summary | `/project-summary` | Detail + customer choice | Why?, packages, customize, pricing, disclaimer, approve |
 | Secure Checkout | `/payment` | Official payment | Card, billing, agreement, Pay Now |
 
 ## Split panel content (locked)
 
 ```
-Your Studio Plan
-Based on your Discovery, here's what we recommend:
+YOUR STUDIO PLAN
+(small label)
 
-✅ [recommended services — names only]
+Studio Plan Preview
 
-We've prepared a personalized Studio Plan based on your Discovery responses.
+We've reviewed your Discovery and prepared a personalized Studio Plan based on what you shared.
 
-Review your recommendations, adjust your plan, and approve everything before payment.
+Recommended Services
+
+✓ [recommended services — names only]
+
+Next Step
+
+Review your complete Studio Plan to:
+• See why each service was recommended
+• Adjust your Studio Plan
+• View pricing and your estimated investment
+• Approve your Studio Plan before payment
 
 [Review My Studio Plan →]
 ```
@@ -50,7 +73,7 @@ Those belong on **Project Summary** only — see [recommendation-engine-philosop
 
 ## Visual language
 
-Uses proposal tokens (clean card, eucalyptus headers) within the Discovery split column — see [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md). Discovery board on the left keeps warm creative workspace styling.
+Uses proposal tokens (clean card, eucalyptus headers) within the Discovery split column — see [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md) and [the-studio-design-system-v1.md](the-studio-design-system-v1.md). Discovery board on the left keeps warm creative workspace styling.
 
 **Project Summary header:** Full decision page uses a dedicated header band (nav + subtitle on solid surface; lobby blur below) — not the split panel. See header band rule in [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md).
 
@@ -58,3 +81,4 @@ Uses proposal tokens (clean card, eucalyptus headers) within the Discovery split
 
 - [customer-journey-v1-locked.md](customer-journey-v1-locked.md) — post-discovery micro-flow
 - [recommendation-not-direction-v1-locked.md](recommendation-not-direction-v1-locked.md) — customer choice on Project Summary
+- [the-studio-design-system-v1.md](the-studio-design-system-v1.md) — color roles and shared patterns

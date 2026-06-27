@@ -2,6 +2,8 @@
 
 **Status:** Approved for Project Summary and shared utility backdrop tuning.
 
+**Design system:** Color roles, typography, spacing, and component patterns are documented in [the-studio-design-system-v1.md](the-studio-design-system-v1.md). This doc covers decision-page *aesthetic* and Project Summary specifics.
+
 ## Principle
 
 | Page type | Aesthetic | Examples |

@@ -30,6 +30,8 @@ Do **freeze business rules** unless validated by real customer experience or an 
 
 **Browser zoom standard:** If a customer has to change their browser zoom to use The Studio, it's a bug.
 
+**Visual design:** Before making visual decisions on new customer-facing pages, read [docs/the-studio-design-system-v1.md](docs/the-studio-design-system-v1.md) and [docs/decision-page-visual-language-v1.md](docs/decision-page-visual-language-v1.md). Every color has one job — match documented roles; note gaps as TBD rather than inventing palette values.
+
 **Build order (locked — work priority):** Finish the customer-facing journey before wiring Discovery Mapping or Recommendation Engine scoring. Philosophy docs are locked; UI with mock data is fine. Do **not** implement scoring, mapping, or engine wiring until Project Summary polish, slide-out Secure Checkout, and end-to-end journey verification (Discovery → Project Summary → payment) are complete. See `docs/customer-journey-v1-locked.md` (Build order) · `docs/discovery-mapping-v1-planned.md` (PAUSED).
 <!-- END:studio-architecture-rules -->
 

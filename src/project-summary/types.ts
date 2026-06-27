@@ -8,17 +8,24 @@
  */
 
 /**
- * Discovery split-panel preview — teaser only ("Did The Studio understand me?").
+ * Discovery split-panel preview — teaser only ("Here's what we prepared.").
  * Full Why?, packages, customize, pricing, disclaimer, and approve live on Project Summary.
  * Locked: docs/discovery-split-preview-v1-locked.md
  */
 export const DISCOVERY_SPLIT_PREVIEW_LABELS = {
   eyebrow: "Your Studio Plan",
-  recommendLead: "Based on your Discovery, here's what we recommend:",
-  preparedBody:
-    "We've prepared a personalized Studio Plan based on your Discovery responses.",
-  nextStepBody:
-    "Review your recommendations, adjust your plan, and approve everything before payment.",
+  title: "Studio Plan Preview",
+  introBody:
+    "We've reviewed your Discovery and prepared a personalized Studio Plan based on what you shared.",
+  servicesTitle: "Recommended Services",
+  nextStepTitle: "Next Step",
+  nextStepLead: "Review your complete Studio Plan to:",
+  nextStepBullets: [
+    "See why each service was recommended",
+    "Adjust your Studio Plan",
+    "View pricing and your estimated investment",
+    "Approve your Studio Plan before payment",
+  ],
   cta: "Review My Studio Plan →",
 } as const;
 

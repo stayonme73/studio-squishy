@@ -1413,6 +1413,14 @@ body:has(.business-discovery-studio) {
   margin-bottom: 0.75rem;
 }
 
+.business-discovery-studio .bds-summary-panel--preview .bds-summary-panel__section-title {
+  margin: 0 0 0.65rem;
+  font-size: clamp(0.875rem, 1.6vh, 0.98rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #2e5e4e;
+}
+
 .business-discovery-studio .bds-summary-panel--preview .bds-summary-panel__service-list li {
   font-weight: 600;
   line-height: 1.45;
@@ -1420,8 +1428,22 @@ body:has(.business-discovery-studio) {
   border-left: 3px solid #c47a2c;
 }
 
-.business-discovery-studio .bds-summary-panel--preview .bds-summary-panel__next-step {
-  margin-bottom: 1.5rem;
+.business-discovery-studio .bds-summary-panel--preview .bds-summary-panel__next-step-lead {
+  margin-bottom: 0.5rem;
+}
+
+.business-discovery-studio .bds-summary-panel--preview .bds-summary-panel__next-step-list {
+  margin: 0 0 1.5rem;
+  padding-left: 1.15rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: clamp(0.8125rem, 1.5vh, 0.9375rem);
+  line-height: 1.5;
+  color: #2b2b2b;
+}
+
+.business-discovery-studio .bds-summary-panel--preview .bds-summary-panel__next-step-list li::marker {
+  color: #c47a2c;
 }
 
 .business-discovery-studio .bds-summary-panel--proposal .bds-summary-panel__continue {
