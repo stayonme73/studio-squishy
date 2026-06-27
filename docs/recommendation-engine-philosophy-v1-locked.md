@@ -4,7 +4,7 @@
 
 **Code reference:** `src/recommendation/RECOMMENDATION_PRINCIPLES.md` · `src/project-summary/types.ts` (`PROJECT_SUMMARY_LABELS`, `PROJECT_SUMMARY_MOCK`)
 
-**Related locks:** [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) · [Customer Journey V1](customer-journey-v1-locked.md)
+**Related locks:** [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) · [Studio Bundles V1](studio-bundles-v1-locked.md) · [Customer Journey V1](customer-journey-v1-locked.md)
 
 ## Implementation status
 
@@ -29,7 +29,7 @@ See [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) f
 | One collective rationale for a tier | **Per-service "Why?"** traceable to something the client said |
 | Client steered toward a bundle | Client **decides** — accept, remove, substitute, add, or pick an optional bundle shortcut |
 
-**Packages (Spark / Momentum / Growth) are optional bundled shortcuts** — not the primary recommendation. They appear **after** service recommendations as a convenience for clients who prefer a pre-built bundle.
+**Studio Bundles (Spark / Momentum / Growth) are optional fixed offerings** — not the primary recommendation. They appear **after** service recommendations as pre-built shortcuts. Bundle contents cannot be added to, removed from, or customized. See [Studio Bundles V1](studio-bundles-v1-locked.md).
 
 ---
 
@@ -42,7 +42,7 @@ These steps describe the customer experience after Project Discovery submit. Ste
 | **1. Discovery** | Project Discovery | Client answers service-connected questions |
 | **2. Studio reviews** | Split-panel animation | Light bulbs, "Reviewing your goals…" — already implemented |
 | **3. Studio Recommendation** | Our Recommendation | Services listed with ✅; **individual Why? per service** tied to client answers |
-| **4. Optional Studio Packages** | Prefer a bundled option? | Spark / Momentum / Growth cards as **shortcuts** — optional, not required |
+| **4. Optional Studio Bundles** | Prefer a bundled option? | Spark / Momentum / Growth **fixed** bundle cards — optional, not customizable |
 | **5. Customize** | Customize Your Studio Plan | Remove / add / replace services; total updates automatically |
 | **6. Approve** | Confirm plan | Recommended services, optional package selection, total investment, disclaimer, approve → Secure Checkout |
 
@@ -82,29 +82,28 @@ Two valid client paths through Project Summary — both preserve customer choice
 
 **Default path.** The engine never requires Path B.
 
-### Path B — Optional bundle shortcut
+### Path B — Optional fixed bundle
 
 1. Client completes Discovery
 2. Studio Recommendation shows individual services + per-service Why?
 3. Client sees **Prefer a bundled option?** and selects Spark, Momentum, or Growth
-4. Bundle pre-fills or adjusts the Studio Plan (shortcut — not a replacement for service transparency)
-5. Client may still customize before approve
-6. Client approves → Secure Checkout
+4. Fixed bundle contents apply — no add, remove, or customize within the bundle
+5. Client approves the bundle as-is → Secure Checkout
 
-**Packages do not replace service recommendations.** They are a convenience layer after the service list. A client may ignore packages entirely and stay on Path A.
+**Bundles do not replace service recommendations.** They are fixed shortcuts after the service list. A client may ignore bundles entirely, stay on Path A with a **Custom Studio Plan**, and customize in the next section. See [Studio Bundles V1](studio-bundles-v1-locked.md).
 
 ---
 
-## Package repositioning
+## Studio Bundles repositioning
 
 | Context | Role of Spark / Momentum / Growth |
 |---------|-----------------------------------|
-| **Studio Guide** | Compare packages — marketing / education |
-| **Project Discovery** | **Not recommended** — no package pressure during intake |
-| **Project Summary** | **Optional** — "Prefer a bundled option?" section after Our Recommendation |
-| **Recommendation Engine** | Does **not** output a package tier as primary result; may suggest a bundle shortcut when mapping rules support it (future) |
+| **Studio Guide** | Compare packages — marketing / education (deliverable quotas; separate from bundle service lists) |
+| **Project Discovery** | **Not recommended** — no bundle pressure during intake |
+| **Project Summary** | **Optional** — "Prefer a bundled option?" section after Our Recommendation; fixed bundle cards |
+| **Recommendation Engine** | Does **not** output a bundle as primary result; may suggest a bundle when mapping rules support it (wiring paused) |
 
-Studio Packages are **bundled shortcuts**, not the brain of Discovery. The brain recommends services from what the client shared.
+Studio Bundles are **fixed optional shortcuts**, not the brain of Discovery. The brain recommends services from what the client shared. Personalized solutions use **Custom Studio Plan** — see [Studio Bundles V1](studio-bundles-v1-locked.md).
 
 ---
 
@@ -122,8 +121,8 @@ Present sections in this order:
 ### 2. Prefer a bundled option? (optional)
 
 - **Title:** Prefer a bundled option?
-- **Lead:** If you'd rather start from a pre-built bundle, choose one below. You can still customize your plan afterward.
-- **Cards:** Spark · Momentum · Growth (structure / placeholder until bundle mapping wired)
+- **Lead:** Studio Bundles are fixed offerings — contents cannot be added, removed, or customized. Choose one below, or continue with your personalized Studio Plan above and customize it in the next section.
+- **Cards:** Spark · Momentum · Growth — tagline, description, **Includes** service list, One-Time Investment or Monthly Plan label (locked copy in [Studio Bundles V1](studio-bundles-v1-locked.md))
 
 ### 3. Customize Your Studio Plan
 
@@ -165,9 +164,9 @@ Based on what you shared, we recommend starting with:
 
 **Prefer a bundled option?**
 
-If you'd rather start from a pre-built bundle, choose one below. You can still customize your plan afterward.
+Studio Bundles are fixed offerings — contents cannot be added, removed, or customized. Choose one below, or continue with your personalized Studio Plan above and customize it in the next section.
 
-- Spark · Momentum · Growth *(placeholder cards)*
+- Spark · Momentum · Growth *(fixed bundle cards — see [Studio Bundles V1](studio-bundles-v1-locked.md))*
 
 **Customize Your Studio Plan**
 
@@ -183,7 +182,8 @@ Our recommendations are based entirely on the information you shared during Disc
 
 | Layer | Role under this philosophy |
 |-------|----------------------------|
-| Service Catalog | Defines approved Studio Services and optional package bundles |
+| Service Catalog | Defines approved Studio Services |
+| Studio Bundles V1 | Fixed Spark / Momentum / Growth offerings — optional shortcuts, not customizable |
 | Recommendation Engine | Listens to Discovery answers; recommends **services** with traceable rationale — packages secondary |
 | Discovery Summary Model | Maps engine output to per-service Why? copy and investment labels |
 | Project Summary | Presents Our Recommendation → Optional Packages → Customize → Disclaimer → Approve |
@@ -204,6 +204,7 @@ Our recommendations are based entirely on the information you shared during Disc
 
 ## Related locks
 
+- [Studio Bundles V1](studio-bundles-v1-locked.md) — fixed bundle copy and rules
 - [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) — customer choice principle
 - [Customer Journey V1](customer-journey-v1-locked.md) — Studio Recommendation step in post-discovery path
 - [Studio Plan slide-out checkout (planned)](studio-plan-slide-out-checkout-v1-planned.md) — approve-before-pay on one workspace

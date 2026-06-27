@@ -3,6 +3,7 @@
  * Customer-facing bridge after Project Discovery — presentation only.
  *
  * Copy structure locked: docs/recommendation-engine-philosophy-v1-locked.md
+ * Studio Bundles locked: docs/studio-bundles-v1-locked.md
  * Customer choice locked: docs/recommendation-not-direction-v1-locked.md
  * Visual language: docs/decision-page-visual-language-v1.md (proposal, not Discovery corkboard)
  */
@@ -44,7 +45,8 @@ export const PROJECT_SUMMARY_LABELS = {
   recommendWhyLabel: "Why?",
   packagesTitle: "Prefer a bundled option?",
   packagesLead:
-    "If you'd rather start from a pre-built bundle, choose one below. You can still customize your plan afterward.",
+    "Studio Bundles are fixed offerings — contents cannot be added, removed, or customized. Choose one below, or continue with your personalized Studio Plan above and customize it in the next section.",
+  packagesIncludesLabel: "Includes:",
   packagesSelectLabel: "Select bundle",
   changesTitle: "Customize Your Studio Plan",
   changesLead: "These are recommendations, not requirements.",
@@ -73,8 +75,11 @@ export type ProjectSummaryMockService = {
 export type ProjectSummaryMockPackage = {
   id: "spark" | "momentum" | "growth";
   name: string;
+  emoji: string;
   tagline: string;
-  priceLabel: string;
+  description: string;
+  includes: readonly string[];
+  billingLabel: "One-Time Investment" | "Monthly Plan";
 };
 
 /** Placeholder services + per-service Why? until Discovery Mapping wires traceable copy. */
@@ -101,20 +106,54 @@ export const PROJECT_SUMMARY_MOCK = {
     {
       id: "spark",
       name: "Spark",
-      tagline: "A focused start — ideal for a single campaign or launch.",
-      priceLabel: "From $150",
+      emoji: "⚡",
+      tagline: "Best for businesses just getting started.",
+      description:
+        "Perfect for launching a new business, product, or service with a strong foundation.",
+      includes: [
+        "Brand Identity Refresh",
+        "Brand Messaging",
+        "Marketing Campaign",
+        "Social Media Marketing",
+      ],
+      billingLabel: "One-Time Investment",
     },
     {
       id: "momentum",
       name: "Momentum",
-      tagline: "Ongoing creative support to keep your marketing moving.",
-      priceLabel: "From $350/mo",
+      emoji: "🚀",
+      tagline: "Best for established businesses that need ongoing creative support.",
+      description:
+        "Designed for business owners who want to free up time while maintaining a consistent marketing presence.",
+      includes: [
+        "Social Media Marketing",
+        "Email Marketing",
+        "SMS Marketing",
+        "Marketing Calendar",
+        "Marketing Campaign",
+        "Marketing Copywriting",
+      ],
+      billingLabel: "Monthly Plan",
     },
     {
       id: "growth",
       name: "Growth",
-      tagline: "Full partnership for brands ready to scale.",
-      priceLabel: "From $650/mo",
+      emoji: "📈",
+      tagline: "Best for businesses focused on growth.",
+      description:
+        "For businesses ready to increase visibility, expand their reach, and accelerate growth through a more comprehensive marketing partnership.",
+      includes: [
+        "Marketing Campaign",
+        "Social Media Marketing",
+        "Email Marketing",
+        "SMS Marketing",
+        "Marketing Calendar",
+        "Marketing Copywriting",
+        "Marketing Video Production",
+        "Marketing Optimization",
+        "Marketing Assets",
+      ],
+      billingLabel: "Monthly Plan",
     },
   ] satisfies readonly ProjectSummaryMockPackage[],
 } as const;

@@ -23,7 +23,8 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Discovery philosophy
 - Recommendation philosophy — **Recommendation, Not Direction** (`docs/recommendation-not-direction-v1-locked.md`, `src/recommendation/RECOMMENDATION_PRINCIPLES.md`) — *The Studio recommends. The client decides.*
 - Discovery split preview — in-discovery split panel is teaser-only (service list + CTA); full Why?, packages, customize, pricing, disclaimer, and approve on Project Summary (`docs/discovery-split-preview-v1-locked.md`)
-- Recommendation Engine philosophy — **service-first, traceable Why?, packages as optional shortcuts** (`docs/recommendation-engine-philosophy-v1-locked.md`) — locked post-discovery flow and Project Summary structure
+- Recommendation Engine philosophy — **service-first, traceable Why?, bundles as optional shortcuts** (`docs/recommendation-engine-philosophy-v1-locked.md`) — locked post-discovery flow and Project Summary structure
+- Studio Bundles — **fixed offerings** Spark / Momentum / Growth (`docs/studio-bundles-v1-locked.md`) — bundle contents not customizable; personalized solutions use Custom Studio Plan
 - Production allocation rules
 - Customer choice rules
 - Discovery room badge offsets (`DISCOVERY_BADGE_OFFSET` in `src/config/business-discovery-studio.ts`) — do not modify without Tagia approval
@@ -42,7 +43,7 @@ Do **freeze business rules** unless validated by real customer experience or an 
 
 **The Studio recommends. The client decides.**
 
-The Recommendation Engine listens to Discovery answers and recommends **individual services** with traceable per-service Why? — not a package tier as primary output. Spark / Momentum / Growth are optional bundled shortcuts in Project Summary. The engine guides; it never forces purchase. Clients may accept, remove, substitute, add, or build a custom plan from approved catalog services. Project Summary copy: **Our Recommendation** → **Prefer a bundled option?** → **Customize Your Studio Plan** → **Disclaimer** → **Approve** — see locked docs for verbatim structure.
+The Recommendation Engine listens to Discovery answers and recommends **individual services** with traceable per-service Why? — not a package tier as primary output. Spark / Momentum / Growth are optional **fixed** Studio Bundles in Project Summary (not customizable). The engine guides; it never forces purchase. Clients may accept, remove, substitute, add, or build a custom plan from approved catalog services. Project Summary copy: **Our Recommendation** → **Prefer a bundled option?** → **Customize Your Studio Plan** → **Disclaimer** → **Approve** — see locked docs for verbatim structure.
 <!-- END:recommendation-not-direction-lock -->
 
 <!-- BEGIN:customer-journey-lock -->

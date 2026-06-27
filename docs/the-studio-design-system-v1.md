@@ -99,7 +99,7 @@ Cards carry elevation; backdrop stays visible below header band on decision page
 | Element | Value | Source |
 |---------|-------|--------|
 | Utility / primary buttons | `8px` | `project-summary.css`, `utility-design-system.css` |
-| Cards (utility) | `10px` | `utility-design-system.css`, package cards in `project-summary.css` |
+| Cards (utility) | `10px` | `utility-design-system.css`, Studio Bundle cards in `project-summary.css` (tagline, includes list, billing label — see [Studio Bundles V1](studio-bundles-v1-locked.md)) |
 | Split preview panel inner | `12px` | `business-discovery-studio.css` |
 | Warning / note chips | `8px` | `project-summary.css` |
 

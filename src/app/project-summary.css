@@ -279,7 +279,7 @@
 
 .project-summary-page .ps-packages__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
   gap: 0.85rem;
   list-style: none;
   padding: 0;
@@ -306,12 +306,46 @@
 .project-summary-page .ps-packages__tagline {
   font-size: 0.92rem;
   line-height: 1.5;
+  font-weight: 600;
+  color: var(--ps-charcoal-muted);
+  margin: 0;
+}
+
+.project-summary-page .ps-packages__description {
+  font-size: 0.88rem;
+  line-height: 1.5;
   color: var(--ps-charcoal-muted);
   margin: 0;
   flex: 1;
 }
 
-.project-summary-page .ps-packages__price {
+.project-summary-page .ps-packages__includes-block {
+  margin-top: 0.15rem;
+}
+
+.project-summary-page .ps-packages__includes-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ps-eucalyptus);
+  margin: 0 0 0.35rem;
+}
+
+.project-summary-page .ps-packages__includes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ps-charcoal-muted);
+}
+
+.project-summary-page .ps-packages__includes li + li {
+  margin-top: 0.2rem;
+}
+
+.project-summary-page .ps-packages__billing {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--ps-herb-gold);
