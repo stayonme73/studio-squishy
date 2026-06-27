@@ -98,8 +98,9 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
     isTileComplete(id) &&
     activeTileId !== id;
 
+  /** Form tiles: teal ✓ only — runtime cream covers misaligned vs baked ○ on plate art. */
   const showStatusCover = (id: DiscoveryTileId) =>
-    id === "submit-project" || showDoneBadge(id);
+    id === "submit-project" && isTileComplete(id);
 
   const hitStyles = useMemo(() => {
     const map = {} as Record<DiscoveryTileId, CSSProperties>;
@@ -305,7 +306,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
               );
             })}
 
-            {/* Plate overlays — hide baked status circles, then one ✓ per completed tile */}
+            {/* Plate overlays — submit status mask; form tiles use ✓ only */}
             <div className="bds-done-badges" aria-hidden="true">
               {DISCOVERY_TILE_ORDER.filter(showStatusCover).map((id) => (
                 <DiscoveryTileStatusCover key={`cover-${id}`} tileId={id} />
