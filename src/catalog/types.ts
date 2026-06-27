@@ -94,8 +94,17 @@ export type ExecutionMode =
   | "strategy_direction"
   | "managed_execution_when_selected";
 
-/** Launch rollout status — distinct from legacy serviceStatus for governance. */
-export type LaunchStatus = "active" | "planned" | "retired";
+/**
+ * Launch rollout availability — distinct from legacy serviceStatus for governance.
+ * - `active` (green): visible, recommendable, purchasable
+ * - `limited` (yellow): in catalog, hidden from clients and recommendation
+ * - `paused` (red): in catalog, hidden from clients and recommendation
+ * - `retired`: legacy packages kept for campaign reads only
+ */
+export type LaunchStatus = "active" | "limited" | "paused" | "retired";
+
+/** Client-facing green / yellow / red rollout states for v2 launch SKUs. */
+export type LaunchAvailability = "active" | "limited" | "paused";
 
 export type FulfillmentMode = "project" | "monthly_cycle";
 

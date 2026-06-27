@@ -33,23 +33,31 @@ function includedIds(answers: DiscoveryAnswers): ServiceId[] {
   return recommendFromDiscovery(brief).includedRecommendations.map((entry) => entry.serviceId);
 }
 
-const FOUNDATION_IDS = ["bf-001", "bf-002", "cp-001", "sm-001"] as const;
+const DEFAULT_FOUNDATION_IDS = ["bf-001", "sm-001", "ma-001"] as const;
 
 describe("recommendFromDiscovery — Slice 4 closeout", () => {
-  it("starting fresh → foundation SKUs bf-001, bf-002, cp-001, sm-001 (not copy/assets/email/sms primary)", () => {
+  it("starting fresh → 3 default green foundation SKUs only (not yellow/red legacy)", () => {
     const result = recommendFromDiscovery(buildDiscoveryBrief(answersFor({})));
     const ids = result.recommendations.map((entry) => entry.serviceId);
 
-    for (const foundationId of FOUNDATION_IDS) {
-      expect(ids).toContain(foundationId);
-    }
+    expect(ids).toEqual([...DEFAULT_FOUNDATION_IDS]);
 
-    const supporting = ["cc-001", "ma-001", "em-001", "sms-001"] as const;
-    for (const serviceId of supporting) {
+    const hidden = ["bf-002", "cp-001", "sms-001", "mo-001", "em-001", "cc-001", "ap-001"] as const;
+    for (const serviceId of hidden) {
       expect(ids).not.toContain(serviceId);
     }
 
     expect(ids.every((id) => !getServiceById(id)?.isExecutionAddOn)).toBe(true);
+  });
+
+  it("starting fresh with email tools → includes em-001", () => {
+    const ids = recommendedIds(
+      answersFor({
+        "your-current-tools": "Email marketing",
+      }),
+    );
+    expect(ids).toEqual(expect.arrayContaining([...DEFAULT_FOUNDATION_IDS, "em-001"]));
+    expect(ids).toHaveLength(4);
   });
 
   it("all scored recommendations visible in summary — not hidden in additional", () => {
@@ -91,7 +99,7 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
     expect(result.estimatedTimeline.customerLabel).toContain("Ongoing monthly:");
   });
 
-  it("technology/tools challenge + no tools strengthens foundation; outdated tools → mo-001", () => {
+  it("technology/tools challenge keeps 3-service default foundation; limited mo-001 stays hidden", () => {
     const foundationResult = recommendFromDiscovery(
       buildDiscoveryBrief(
         answersFor({
@@ -101,10 +109,8 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
       ),
     );
     const foundationIds = foundationResult.recommendations.map((entry) => entry.serviceId);
-    for (const foundationId of FOUNDATION_IDS) {
-      expect(foundationIds).toContain(foundationId);
-    }
-    expect(foundationIds).not.toContain("em-001");
+    expect(foundationIds).toEqual([...DEFAULT_FOUNDATION_IDS]);
+    expect(foundationIds).not.toContain("mo-001");
     expect(foundationIds).not.toContain("sms-001");
 
     const outdatedResult = recommendFromDiscovery(
@@ -117,7 +123,7 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
         }),
       ),
     );
-    expect(outdatedResult.recommendations.map((entry) => entry.serviceId)).toContain("mo-001");
+    expect(outdatedResult.recommendations.map((entry) => entry.serviceId)).not.toContain("mo-001");
   });
 
   it("growing WITHOUT recurring signals → one-time recommendations, not monthly auto", () => {
@@ -172,13 +178,12 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
     expect(summary.estimatedTimeline.customerLabel.toLowerCase()).toContain("final delivery");
   });
 
-  it("starting fresh → all 4 foundation SKUs sync to initial plan and checkout totals", () => {
+  it("starting fresh → 3 default SKUs sync to initial plan and checkout totals ($1,385)", () => {
     const answers = answersFor({});
     const recommendation = recommendFromDiscovery(buildDiscoveryBrief(answers));
     const recommendedIds = getRecommendedServiceIds(recommendation);
 
-    expect(recommendedIds).toEqual(expect.arrayContaining([...FOUNDATION_IDS]));
-    expect(recommendedIds).toHaveLength(FOUNDATION_IDS.length);
+    expect(recommendedIds).toEqual([...DEFAULT_FOUNDATION_IDS]);
 
     const planState = initialPlanState(recommendedIds);
     expect(planState.selectedServiceIds).toEqual(recommendedIds);
@@ -192,8 +197,8 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
     expect(plan.planTotals.amountDueTodayCents).toBe(
       computePlanPricingTotals(recommendedIds).amountDueTodayCents,
     );
-    expect(plan.planTotals.amountDueTodayCents).toBe(238000);
-    expect(plan.planTotals.amountDueTodayDisplay).toBe("$2,380");
+    expect(plan.planTotals.amountDueTodayCents).toBe(138500);
+    expect(plan.planTotals.amountDueTodayDisplay).toBe("$1,385");
   });
 
   it("starting fresh Why? copy avoids service IDs and rule traces", () => {
@@ -203,5 +208,26 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
       expect(service.explanation).not.toMatch(/\b[a-z]{2}-\d{3}\b/i);
       expect(service.explanation.toLowerCase()).not.toContain("aligns with");
     }
+  });
+
+  it("email tools Why? copy uses natural language for Email Campaign Build", () => {
+    const { summary } = runDiscoveryRecommendation(
+      answersFor({ "your-current-tools": "Email marketing" }),
+    );
+    const email = summary.recommendedServices.find((service) => service.serviceId === "em-001");
+    expect(email?.explanation).toBe(
+      "Email gives you a direct way to reach customers with updates, offers, or announcements.",
+    );
+    expect(email?.explanation).not.toBe("Email Campaign Build");
+  });
+
+  it("does not surface platform access warning without execution add-on selected", () => {
+    const { summary, recommendation } = runDiscoveryRecommendation(
+      answersFor({ "your-current-tools": "Email marketing" }),
+    );
+    expect(recommendation.recommendations.map((entry) => entry.serviceId)).toContain("em-001");
+    expect(summary.warnings.some((warning) => warning.kind === "requires-client-access")).toBe(
+      false,
+    );
   });
 });

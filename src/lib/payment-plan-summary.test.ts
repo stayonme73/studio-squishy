@@ -73,12 +73,12 @@ describe("plan-pricing", () => {
     expect(formatUsdFromCents(49500)).toBe("$495");
   });
 
-  it("starting fresh foundation total is 238000 cents ($2,380)", () => {
-    const foundationIds = ["bf-001", "bf-002", "cp-001", "sm-001"] as const;
+  it("starting fresh default foundation total is 138500 cents ($1,385)", () => {
+    const foundationIds = ["bf-001", "sm-001", "ma-001"] as const;
     const totals = computePlanPricingTotals([...foundationIds]);
-    expect(totals.oneTimeSubtotalCents).toBe(238000);
-    expect(totals.amountDueTodayCents).toBe(238000);
-    expect(formatUsdFromCents(totals.amountDueTodayCents)).toBe("$2,380");
+    expect(totals.oneTimeSubtotalCents).toBe(138500);
+    expect(totals.amountDueTodayCents).toBe(138500);
+    expect(formatUsdFromCents(totals.amountDueTodayCents)).toBe("$1,385");
   });
 });
 

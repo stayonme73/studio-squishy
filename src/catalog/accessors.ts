@@ -88,7 +88,9 @@ export function getUpgradeEligibleServices(): StudioServiceEntry[] {
 }
 
 export function getActiveServices(): StudioServiceEntry[] {
-  return getServicesByStatus("active");
+  return SERVICE_CATALOG.filter(
+    (service) => service.status === "active" && service.launchStatus === "active",
+  ).map(withDerivedPricing);
 }
 
 export function getActiveLaunchServices(): StudioServiceEntry[] {
@@ -97,6 +99,17 @@ export function getActiveLaunchServices(): StudioServiceEntry[] {
       service.serviceStatus === "active" &&
       service.launchStatus === "active" &&
       service.status === "active",
+  ).map(withDerivedPricing);
+}
+
+/** Recommendable green SKUs — excludes execution add-ons and non-active launch status. */
+export function getRecommendableActiveServices(): StudioServiceEntry[] {
+  return SERVICE_CATALOG.filter(
+    (service) =>
+      service.launchStatus === "active" &&
+      service.status === "active" &&
+      service.isRecommendable &&
+      !service.isExecutionAddOn,
   ).map(withDerivedPricing);
 }
 

@@ -7,7 +7,7 @@
  * The Studio recommends. The client decides. This module returns suggestions only; it never forces purchase.
  */
 
-import { getActiveServices, getServiceCatalog } from "@/catalog/accessors";
+import { getRecommendableActiveServices, getServiceCatalog } from "@/catalog/accessors";
 import { getStructuredDeliverablesForEngine } from "@/catalog/compat";
 import {
   PRODUCTION_ALLOCATION_LIMITS,
@@ -44,11 +44,15 @@ export const RECOMMENDATION_ENGINE_VERSION = "1.2.0";
 
 const DEFAULT_RULE_WEIGHT = 1;
 const LOW_CONFIDENCE_MAX_SCORE = 1;
-const FOUNDATION_SERVICE_IDS: readonly ServiceId[] = [
-  "bf-001",
-  "bf-002",
-  "cp-001",
-  "sm-001",
+/** Starting-fresh default — always recommended when situation is Starting fresh. */
+const DEFAULT_FOUNDATION_SERVICE_IDS: readonly ServiceId[] = ["bf-001", "sm-001", "ma-001"];
+/** Green SKUs recommended only when Discovery signals support them. */
+const CONDITIONAL_GREEN_SERVICE_IDS: readonly ServiceId[] = [
+  "em-001",
+  "em-001-monthly",
+  "cc-001",
+  "ap-001",
+  "sm-001-monthly",
 ];
 const FOUNDATION_FALLBACK_SCORE = 12;
 
@@ -148,14 +152,29 @@ function compareRecommendations(
   return a.serviceId.localeCompare(b.serviceId);
 }
 
-function isFoundationServiceId(serviceId: ServiceId): boolean {
-  return FOUNDATION_SERVICE_IDS.includes(serviceId);
+function isDefaultFoundationServiceId(serviceId: ServiceId): boolean {
+  return DEFAULT_FOUNDATION_SERVICE_IDS.includes(serviceId);
+}
+
+function isStartingFreshEligibleServiceId(serviceId: ServiceId): boolean {
+  return (
+    isDefaultFoundationServiceId(serviceId) ||
+    CONDITIONAL_GREEN_SERVICE_IDS.includes(serviceId)
+  );
+}
+
+function foundationSortIndex(serviceId: ServiceId): number {
+  const index = DEFAULT_FOUNDATION_SERVICE_IDS.indexOf(serviceId);
+  return index === -1 ? DEFAULT_FOUNDATION_SERVICE_IDS.length : index;
 }
 
 function compareWithFoundationPriority(a: ScoredService, b: ScoredService): number {
-  const aFoundation = isFoundationServiceId(a.serviceId);
-  const bFoundation = isFoundationServiceId(b.serviceId);
+  const aFoundation = isDefaultFoundationServiceId(a.serviceId);
+  const bFoundation = isDefaultFoundationServiceId(b.serviceId);
   if (aFoundation !== bFoundation) return aFoundation ? -1 : 1;
+  if (aFoundation && bFoundation && a.score === b.score) {
+    return foundationSortIndex(a.serviceId) - foundationSortIndex(b.serviceId);
+  }
   return compareRecommendations(a, b);
 }
 
@@ -436,21 +455,12 @@ function getScoringPool(
 
   return catalog.filter((service) => {
     if (service.status !== "active") return false;
+    if (service.launchStatus !== "active") return false;
     if (!service.isRecommendable) return false;
     if (service.isExecutionAddOn) return false;
     if (!allowMonthly && service.billingType === "monthly") return false;
     return true;
   });
-}
-
-function shouldIncludeSocialFoundation(brief: DiscoveryBrief): boolean {
-  const needs = brief.selectedNeeds ?? [];
-  if (needs.includes("create-content") || needs.includes("get-more-customers")) {
-    return true;
-  }
-  if (brief.answers["your-challenge"] === "Marketing and visibility") return true;
-  const focus = brief.answers["your-focus"] ?? "";
-  return focus.includes("Content") || focus.includes("Marketing");
 }
 
 function applyFoundationFallback(
@@ -463,9 +473,7 @@ function applyFoundationFallback(
   const byId = new Map(scored.map((entry) => [entry.serviceId, entry]));
   const poolById = new Map(scoringPool.map((service) => [service.id, service]));
 
-  for (const serviceId of FOUNDATION_SERVICE_IDS) {
-    if (serviceId === "sm-001" && !shouldIncludeSocialFoundation(brief)) continue;
-
+  for (const serviceId of DEFAULT_FOUNDATION_SERVICE_IDS) {
     const service = poolById.get(serviceId);
     if (!service) continue;
 
@@ -507,7 +515,7 @@ function buildMaterialsAndAccessWarnings(
         serviceId: service.id,
       });
     }
-    if (service.requiresClientAccess) {
+    if (service.requiresClientAccess && service.isExecutionAddOn) {
       warnings.push({
         kind: "requires-client-access",
         message: `"${service.name}" may require connected platform access if managed execution is selected.`,
@@ -571,7 +579,7 @@ export function recommendFromDiscovery(
   validateDiscoveryBrief(brief);
 
   const fullCatalog = catalog ?? getServiceCatalog();
-  const scoringPool = getScoringPool(catalog ?? getActiveServices(), brief);
+  const scoringPool = getScoringPool(catalog ?? getRecommendableActiveServices(), brief);
 
   let scored: ScoredService[] = scoringPool
     .map((service) => {
@@ -584,16 +592,7 @@ export function recommendFromDiscovery(
   scored = applyFoundationFallback(scored, brief, scoringPool);
 
   if (briefIndicatesStartingFresh(brief)) {
-    const slowing = parseDiscoveryMultiselectSelections("whats-slowing-you-down", brief.answers);
-    const allowOptimization =
-      brief.answers["your-challenge"] === "Technology and tools" ||
-      slowing.includes("Outdated tools or technology");
-
-    scored = scored.filter(
-      (entry) =>
-        isFoundationServiceId(entry.serviceId) ||
-        (allowOptimization && entry.serviceId === "mo-001"),
-    );
+    scored = scored.filter((entry) => isStartingFreshEligibleServiceId(entry.serviceId));
   }
 
   const recommendations = toServiceRecommendations(scored);

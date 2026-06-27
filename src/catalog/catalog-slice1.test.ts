@@ -33,9 +33,9 @@ describe("catalog slice 1 — v2 launch SKUs", () => {
     expect(() => validateServiceCatalog(SERVICE_CATALOG)).not.toThrow();
   });
 
-  it("seeds exactly 28 active launch SKUs (22 base + 6 execution add-ons)", () => {
+  it("seeds exactly 8 active launch SKUs (green services only)", () => {
     const active = getActiveLaunchServices();
-    expect(active).toHaveLength(28);
+    expect(active).toHaveLength(8);
   });
 
   it("every active purchasable SKU has priceCents > 0", () => {
@@ -96,36 +96,16 @@ describe("catalog slice 1 — v2 launch SKUs", () => {
     });
   });
 
-  it("all 28 active launch SKUs have approved priceCents", () => {
+  it("all 8 active launch SKUs have approved priceCents", () => {
     const expectedPrices: Record<string, number> = {
       "bf-001": 49500,
-      "bf-002": 59500,
-      "cp-001": 89500,
-      "cp-001-monthly": 34900,
       "sm-001": 39500,
       "sm-001-monthly": 34900,
       "em-001": 32500,
       "em-001-monthly": 22500,
-      "sms-001": 17500,
-      "sms-001-monthly": 14900,
       "cc-001": 22500,
-      "cc-001-monthly": 24900,
-      "cc-002": 42500,
-      "cc-002-monthly": 59500,
-      "vp-001": 79500,
-      "vp-001-monthly": 99500,
-      "ap-001": 17500,
-      "lp-001": 89500,
-      "mo-001": 39500,
-      "mo-001-monthly": 34900,
       "ma-001": 49500,
-      "ma-001-monthly": 44900,
-      "social_media-execution": 10000,
-      "social_media-execution-monthly": 15000,
-      "email_marketing-execution": 7500,
-      "email_marketing-execution-monthly": 10000,
-      "sms_marketing-execution": 5000,
-      "sms_marketing-execution-monthly": 7500,
+      "ap-001": 17500,
     };
 
     const active = getActiveLaunchServices();
@@ -137,9 +117,9 @@ describe("catalog slice 1 — v2 launch SKUs", () => {
     }
   });
 
-  it("starting fresh foundation total is 238000 cents ($2,380)", () => {
-    const foundationIds = ["bf-001", "bf-002", "cp-001", "sm-001"] as const;
-    expect(sumPriceCentsForServices([...foundationIds])).toBe(238000);
+  it("starting fresh default foundation total is 138500 cents ($1,385)", () => {
+    const foundationIds = ["bf-001", "sm-001", "ma-001"] as const;
+    expect(sumPriceCentsForServices([...foundationIds])).toBe(138500);
   });
 
   it("legacy IDs resolve through alias map", () => {
@@ -199,12 +179,13 @@ describe("catalog execution add-ons", () => {
     expect(executionAddOnId("sms_marketing", "monthly")).toBe("sms_marketing-execution-monthly");
   });
 
-  it("execution add-ons are not recommendable or addable alone", () => {
+  it("execution add-ons remain in catalog but are hidden from Add to Plan", () => {
     for (const id of EXECUTION_ADDON_IDS) {
       const service = getServiceById(id)!;
       expect(service.isExecutionAddOn).toBe(true);
       expect(service.isRecommendable).toBe(false);
       expect(service.isAddable).toBe(false);
+      expect(service.launchStatus).toBe("limited");
       expect(service.eligibleParentFamilyIds?.length).toBeGreaterThan(0);
     }
   });

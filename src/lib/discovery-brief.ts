@@ -36,6 +36,11 @@ const FOCUS_NEED_MAP: Readonly<Record<string, readonly StudioNeedId[]>> = {
   "Sales & conversion": ["get-more-customers", "improve-communication"],
 };
 
+const TOOLS_NEED_MAP: Readonly<Record<string, readonly StudioNeedId[]>> = {
+  "Email marketing": ["improve-communication"],
+  "CRM (HubSpot, Salesforce, etc.)": ["better-customer-experience"],
+};
+
 const RECURRING_SUCCESS_OPTIONS = new Set(["Saving time on marketing"]);
 const RECURRING_SLOWING_OPTIONS = new Set(["Limited time or resources"]);
 
@@ -102,6 +107,7 @@ export function deriveSelectedNeeds(answers: DiscoveryBriefAnswers): StudioNeedI
     SLOWING_NEED_MAP,
     needs,
   );
+  collectNeedsFromMap(parseToolsSelections(answers), TOOLS_NEED_MAP, needs);
 
   const focus = answers["your-focus"];
   if (focus) {

@@ -11,31 +11,31 @@ import {
 } from "@/studio-plan-review/planState";
 
 describe("planState — execution add-ons", () => {
-  it("getAvailableServicesToAdd excludes execution add-ons without a matching parent", () => {
+  it("getAvailableServicesToAdd excludes hidden execution add-ons without a matching parent", () => {
     const available = getAvailableServicesToAdd(["bf-001"]);
     expect(available).not.toContain("social_media-execution");
     expect(available).toContain("em-001");
   });
 
-  it("getAvailableServicesToAdd includes execution add-ons when parent family matches", () => {
+  it("getAvailableServicesToAdd keeps execution add-ons hidden even when parent family matches", () => {
     const available = getAvailableServicesToAdd(["sm-001"]);
-    expect(available).toContain("social_media-execution");
+    expect(available).not.toContain("social_media-execution");
     expect(available).not.toContain("social_media-execution-monthly");
   });
 
-  it("addServiceToPlan rejects execution add-on without parent", () => {
+  it("addServiceToPlan rejects hidden execution add-on without parent", () => {
     const state = initialPlanState(["bf-001"]);
     const next = addServiceToPlan(state, "social_media-execution");
     expect(next.selectedServiceIds).toEqual(["bf-001"]);
   });
 
-  it("addServiceToPlan attaches execution add-on when parent is present", () => {
+  it("addServiceToPlan rejects hidden execution add-on even when parent is present", () => {
     const state = initialPlanState(["sm-001"]);
     const next = addServiceToPlan(state, "social_media-execution");
-    expect(next.selectedServiceIds).toEqual(["sm-001", "social_media-execution"]);
+    expect(next.selectedServiceIds).toEqual(["sm-001"]);
   });
 
-  it("removeServiceFromPlan cascades orphaned execution add-ons", () => {
+  it("removeServiceFromPlan cascades orphaned execution add-ons when present in saved state", () => {
     const state: StudioPlanState = {
       selectedServiceIds: ["sm-001", "social_media-execution"] as ServiceId[],
     };
@@ -43,7 +43,7 @@ describe("planState — execution add-ons", () => {
     expect(next.selectedServiceIds).toEqual([]);
   });
 
-  it("swapServiceInPlan removes incompatible execution add-ons", () => {
+  it("swapServiceInPlan removes incompatible execution add-ons from saved state", () => {
     const state: StudioPlanState = {
       selectedServiceIds: ["sm-001", "social_media-execution"] as ServiceId[],
     };

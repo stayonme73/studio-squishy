@@ -33,6 +33,14 @@ describe("deriveSelectedNeeds", () => {
     });
     expect(brief.selectedNeeds).toContain("get-more-customers");
   });
+
+  it("derives improve-communication when Email marketing is selected in tools", () => {
+    const brief = buildDiscoveryBrief({
+      ...BASE_ANSWERS,
+      "your-current-tools": "Email marketing",
+    });
+    expect(brief.selectedNeeds).toContain("improve-communication");
+  });
 });
 
 describe("briefIndicatesRecurringWorkload", () => {

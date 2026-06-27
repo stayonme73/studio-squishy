@@ -9,6 +9,7 @@ import type {
   DeliveryMapping,
   DiscoveryMappingRule,
   ExecutionMode,
+  LaunchStatus,
   MonthlyCycleWindow,
   ProductionLane,
   ServiceCategoryId,
@@ -60,6 +61,54 @@ const COMPLEX_FINAL: ServiceTimingWindow = {
 
 const REVISION_ONE_TIME = "One consolidated revision round.";
 const REVISION_MONTHLY = "One consolidated revision round across the monthly batch.";
+
+/** Green / yellow / red rollout — only `active` SKUs are client-visible. */
+const LAUNCH_STATUS_BY_ID: Readonly<Record<ServiceId, LaunchStatus>> = {
+  // Green — active (8)
+  "bf-001": "active",
+  "sm-001": "active",
+  "sm-001-monthly": "active",
+  "em-001": "active",
+  "em-001-monthly": "active",
+  "cc-001": "active",
+  "ma-001": "active",
+  "ap-001": "active",
+  // Yellow — limited (11)
+  "bf-002": "limited",
+  "cp-001": "limited",
+  "mo-001": "limited",
+  "ma-001-monthly": "limited",
+  "mo-001-monthly": "limited",
+  "social_media-execution": "limited",
+  "social_media-execution-monthly": "limited",
+  "email_marketing-execution": "limited",
+  "email_marketing-execution-monthly": "limited",
+  "sms_marketing-execution": "limited",
+  "sms_marketing-execution-monthly": "limited",
+  // Red — paused (9)
+  "cp-001-monthly": "paused",
+  "sms-001": "paused",
+  "sms-001-monthly": "paused",
+  "cc-001-monthly": "paused",
+  "cc-002": "paused",
+  "cc-002-monthly": "paused",
+  "vp-001": "paused",
+  "vp-001-monthly": "paused",
+  "lp-001": "paused",
+  // Legacy retired packages
+  spark: "retired",
+  momentum: "retired",
+  growth: "retired",
+  "email-marketing": "retired",
+  "sms-campaign": "retired",
+  "business-workflow": "retired",
+  "customer-follow-up": "retired",
+  "monthly-support": "retired",
+};
+
+function resolveLaunchStatus(id: ServiceId): LaunchStatus {
+  return LAUNCH_STATUS_BY_ID[id];
+}
 
 type V2ServiceSeed = {
   id: ServiceId;
@@ -237,6 +286,60 @@ const DM_FOCUS_ONGOING: DiscoveryMappingRule = {
   tileId: "your-focus",
   weight: 2,
 };
+const DM_TOOLS_EMAIL: DiscoveryMappingRule = {
+  signal: "tools",
+  value: "Email marketing",
+  tileId: "your-current-tools",
+  weight: 3,
+};
+const DM_TOOLS_CRM: DiscoveryMappingRule = {
+  signal: "tools",
+  value: "CRM (HubSpot, Salesforce, etc.)",
+  tileId: "your-current-tools",
+  weight: 2,
+};
+const DM_SUCCESS_ENGAGEMENT: DiscoveryMappingRule = {
+  signal: "tools",
+  value: "Better engagement online",
+  tileId: "success-looks-like",
+  weight: 2,
+};
+const DM_SUCCESS_SAVING_TIME: DiscoveryMappingRule = {
+  signal: "tools",
+  value: "Saving time on marketing",
+  tileId: "success-looks-like",
+  weight: 2,
+};
+const DM_SLOWING_INCONSISTENT: DiscoveryMappingRule = {
+  signal: "tools",
+  value: "Inconsistent messaging",
+  tileId: "whats-slowing-you-down",
+  weight: 2,
+};
+const DM_ANYTHING_VIDEO: DiscoveryMappingRule = {
+  signal: "focus-keyword",
+  value: "video",
+  tileId: "anything-else",
+  weight: 2,
+};
+const DM_ANYTHING_AUDIO: DiscoveryMappingRule = {
+  signal: "focus-keyword",
+  value: "audio",
+  tileId: "anything-else",
+  weight: 2,
+};
+const DM_ANYTHING_VOICE: DiscoveryMappingRule = {
+  signal: "focus-keyword",
+  value: "voice",
+  tileId: "anything-else",
+  weight: 2,
+};
+const DM_ANYTHING_NARRATION: DiscoveryMappingRule = {
+  signal: "focus-keyword",
+  value: "narration",
+  tileId: "anything-else",
+  weight: 2,
+};
 
 const REVISION_EXECUTION =
   "No separate revision round — executes materials approved through the matching parent service.";
@@ -300,7 +403,7 @@ function v2ExecutionAddOn(seed: V2ExecutionAddOnSeed): StudioServiceEntry {
     requiresClientMaterials: false,
     isRecommendable: false,
     isAddable: false,
-    launchStatus: "active",
+    launchStatus: resolveLaunchStatus(seed.id),
     serviceGuideFaq: [],
     deliveryMapping: {
       fulfillmentMode,
@@ -350,7 +453,7 @@ function v2Service(seed: V2ServiceSeed): StudioServiceEntry {
     requiresClientMaterials: seed.requiresClientMaterials,
     isRecommendable: seed.isRecommendable,
     isAddable: seed.isAddable,
-    launchStatus: "active",
+    launchStatus: resolveLaunchStatus(seed.id),
     serviceGuideFaq: [],
     deliveryMapping: seed.deliveryMapping,
     ...withDiscoverySync(seed.discoveryMapping ?? []),
@@ -795,14 +898,9 @@ const V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "marketing_email", quantity: 2, unit: "emails" }],
     },
     discoveryMapping: [
-      DM_SITUATION_GROWING,
-      DM_NEED_CUSTOMERS,
-      DM_NEED_COMMUNICATION,
-      DM_NEED_EXPERIENCE,
-      DM_CHALLENGE_VISIBILITY,
+      DM_TOOLS_EMAIL,
+      DM_TOOLS_CRM,
       DM_FOCUS_CUSTOMER,
-      DM_FOCUS_MARKETING,
-      DM_FOCUS_SALES,
     ],
   }),
   v2Service({
@@ -854,13 +952,8 @@ const V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "marketing_email", quantity: 2, unit: "emails" }],
     },
     discoveryMapping: [
-      DM_SITUATION_GROWING,
-      DM_SITUATION_SCALING,
-      DM_NEED_COMMUNICATION,
-      DM_NEED_WORKFLOW,
-      DM_NEED_EXPERIENCE,
-      DM_CHALLENGE_VISIBILITY,
-      DM_FOCUS_CUSTOMER,
+      DM_TOOLS_EMAIL,
+      DM_SUCCESS_SAVING_TIME,
       DM_FOCUS_ONGOING,
       DM_FOCUS_CONSISTENT,
     ],
@@ -1024,14 +1117,9 @@ const V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "short_form_copy_asset", quantity: 3, unit: "assets" }],
     },
     discoveryMapping: [
-      DM_SITUATION_GROWING,
-      DM_NEED_CUSTOMERS,
-      DM_NEED_CONTENT,
-      DM_CHALLENGE_VISIBILITY,
-      DM_CHALLENGE_CLARITY,
-      DM_FOCUS_MARKETING,
-      DM_FOCUS_SALES,
       DM_FOCUS_CONTENT,
+      DM_SUCCESS_ENGAGEMENT,
+      DM_SLOWING_INCONSISTENT,
     ],
   }),
   v2Service({
@@ -1367,11 +1455,12 @@ const V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "ai_voice_over_track", quantity: 1, unit: "audio" }],
     },
     discoveryMapping: [
-      DM_SITUATION_STARTING,
-      DM_SITUATION_GROWING,
-      DM_NEED_CONTENT,
       DM_FOCUS_CONTENT,
       { signal: "focus-keyword", value: "video", tileId: "your-focus", weight: 2 },
+      DM_ANYTHING_VIDEO,
+      DM_ANYTHING_AUDIO,
+      DM_ANYTHING_VOICE,
+      DM_ANYTHING_NARRATION,
     ],
   }),
   v2Service({
