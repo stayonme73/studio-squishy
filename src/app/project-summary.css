@@ -31,21 +31,53 @@
   --utility-card-pad: clamp(1.35rem, 2.5vw, 1.75rem);
 }
 
-/* Header readability over frosted lobby backdrop */
-.project-summary-page .utility-topbar__title {
-  color: var(--ps-charcoal);
-  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.85);
+/* Dedicated header band — solid surface, no blur behind nav copy */
+.project-summary-header-band {
+  --ps-charcoal: #2b2b2b;
+  --ps-charcoal-muted: color-mix(in srgb, #2b2b2b 72%, #6b6b6b);
+
+  background: color-mix(in srgb, #ffffff 96%, #f8f9fa);
+  border-bottom: 1px solid color-mix(in srgb, var(--ps-charcoal) 10%, transparent);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 6px 24px rgba(43, 43, 43, 0.05);
+  padding: clamp(1rem, 2.5vw, 1.35rem) var(--utility-page-pad);
 }
 
-.project-summary-page .utility-lead {
+.project-summary-header-band .utility-header {
+  margin-bottom: 0;
+}
+
+.project-summary-header-band .utility-topbar {
+  margin-bottom: 0.65rem;
+}
+
+.project-summary-header-band .utility-topbar__title {
+  color: var(--ps-charcoal);
+}
+
+.project-summary-header-band .utility-header__meta {
+  justify-content: center;
+  text-align: center;
+}
+
+.project-summary-header-band .utility-header__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+.project-summary-header-band .utility-lead {
   color: var(--ps-charcoal-muted);
   font-size: 1.05rem;
-  line-height: 1.6;
+  line-height: 1.55;
+  max-width: none;
 }
 
-.project-summary-page .utility-topbar__help,
-.project-summary-page .utility-topbar__back {
-  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.7);
+.project-summary-page {
+  padding-top: clamp(1rem, 2vw, 1.35rem);
 }
 
 /* Proposal cards — white, elevated */

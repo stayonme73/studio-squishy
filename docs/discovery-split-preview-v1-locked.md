@@ -52,6 +52,8 @@ Those belong on **Project Summary** only — see [recommendation-engine-philosop
 
 Uses proposal tokens (clean card, eucalyptus headers) within the Discovery split column — see [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md). Discovery board on the left keeps warm creative workspace styling.
 
+**Project Summary header:** Full decision page uses a dedicated header band (nav + subtitle on solid surface; lobby blur below) — not the split panel. See header band rule in [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md).
+
 ## Related docs
 
 - [customer-journey-v1-locked.md](customer-journey-v1-locked.md) — post-discovery micro-flow

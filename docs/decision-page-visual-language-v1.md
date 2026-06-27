@@ -20,7 +20,17 @@ Discovery is a creative workspace. Project Summary is a professional proposal. S
 - **Primary button:** Eucalyptus green
 - **Secondary button:** White with charcoal border
 - **Accents:** Warm orange, gold, coral (subtle — list markers, warnings, links)
-- **Backdrop:** Blurred Studio Lobby + light charcoal tint (~25%) — lobby stays visible; cards carry elevation
+- **Backdrop:** Blurred Studio Lobby + light charcoal tint (~25%) — lobby stays visible below the header band; cards carry elevation
+
+## Header band (decision pages)
+
+Project Summary (and future slide-out Secure Checkout) use a **dedicated header band** across the top:
+
+- Solid or lightly translucent white surface — title, subtitle, Back, and Help Center always readable
+- Blurred Studio Lobby begins **below** the band (not behind header text)
+- Subtitle is two lines: context (“The Studio reviewed your Discovery answers.”) + review CTA
+
+Code: `studio-utility-scene--header-band` · `studio-utility-header-band` · `StudioUtilityBackdrop` `placement="below-header"` · `project-summary-header-band` in `project-summary.css`
 
 ## Code references
 

@@ -24,8 +24,10 @@ export const DISCOVERY_SPLIT_PREVIEW_LABELS = {
 
 export const PROJECT_SUMMARY_LABELS = {
   pageTitle: "Project Summary",
-  pageLead:
-    "The Studio reviewed your discovery answers. Confirm your plan before production begins.",
+  pageLeadLines: [
+    "The Studio reviewed your Discovery answers.",
+    "Review your personalized Studio Plan before continuing.",
+  ],
   heardTitle: "Here's what we heard",
   heardEmpty: "No discovery answers saved yet.",
   recommendTitle: "Our Recommendation",

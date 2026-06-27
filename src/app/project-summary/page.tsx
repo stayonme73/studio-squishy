@@ -23,24 +23,28 @@ export default function ProjectSummaryPage() {
     <main
       className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden`}
     >
-      <div className="studio-utility-scene">
-        <StudioUtilityBackdrop />
-        <div className="studio-utility-scene__content">
-          <UtilityPageFrame navId="studio-board">
-            <div
-              className="utility-page project-summary-page"
-              aria-label={PROJECT_SUMMARY_LABELS.pageTitle}
-            >
-              <UtilityPageHeader
-                backHref={studioBoard.routes.projectDiscovery}
-                activeNav="studio-board"
-                title={PROJECT_SUMMARY_LABELS.pageTitle}
-                lead={PROJECT_SUMMARY_LABELS.pageLead}
-                helpCenterFrom="studio-board"
-              />
-              <ProjectSummaryPageClient />
-            </div>
-          </UtilityPageFrame>
+      <div className="studio-utility-scene studio-utility-scene--header-band">
+        <div className="studio-utility-header-band project-summary-header-band">
+          <UtilityPageHeader
+            backHref={studioBoard.routes.projectDiscovery}
+            activeNav="studio-board"
+            title={PROJECT_SUMMARY_LABELS.pageTitle}
+            leadLines={PROJECT_SUMMARY_LABELS.pageLeadLines}
+            helpCenterFrom="studio-board"
+          />
+        </div>
+        <div className="studio-utility-scene__body">
+          <StudioUtilityBackdrop placement="below-header" />
+          <div className="studio-utility-scene__content">
+            <UtilityPageFrame navId="studio-board">
+              <div
+                className="utility-page project-summary-page"
+                aria-label={PROJECT_SUMMARY_LABELS.pageTitle}
+              >
+                <ProjectSummaryPageClient />
+              </div>
+            </UtilityPageFrame>
+          </div>
         </div>
       </div>
     </main>

@@ -13,6 +13,7 @@ type Props = {
   activeNav: UtilityNavId;
   title: string;
   lead?: string;
+  leadLines?: readonly string[];
   aside?: ReactNode;
   helpCenterFrom?: "campaign-details" | "studio-board" | "payment";
 };
@@ -23,11 +24,24 @@ export default function UtilityPageHeader({
   activeNav,
   title,
   lead,
+  leadLines,
   aside,
   helpCenterFrom,
 }: Props) {
   const showSecondaryNav = utilityPageUsesSecondaryNav(activeNav);
   const onHelpCenter = activeNav === "help-center";
+  const leadCopy =
+    leadLines && leadLines.length > 0
+      ? leadLines.map((line) => (
+          <p key={line} className="utility-lead">
+            {line}
+          </p>
+        ))
+      : lead
+        ? (
+            <p className="utility-lead">{lead}</p>
+          )
+        : null;
 
   return (
     <header className="utility-header">
@@ -57,9 +71,9 @@ export default function UtilityPageHeader({
         </div>
       ) : null}
 
-      {lead || aside ? (
+      {leadCopy || aside ? (
         <div className="utility-header__meta">
-          <div className="utility-header__copy">{lead ? <p className="utility-lead">{lead}</p> : null}</div>
+          <div className="utility-header__copy">{leadCopy}</div>
           {aside ? <div className="utility-header__aside">{aside}</div> : null}
         </div>
       ) : null}

@@ -25,6 +25,25 @@ body:has(.studio-utility-scene) {
   flex-direction: column;
 }
 
+/* Decision pages with dedicated header band — lobby blur starts below nav copy */
+.studio-utility-scene--header-band {
+  overflow: hidden;
+}
+
+.studio-utility-header-band {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.studio-utility-scene__body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .studio-utility-scene__content {
   position: relative;
   z-index: 1;
@@ -40,6 +59,11 @@ body:has(.studio-utility-scene) {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+}
+
+.studio-utility-backdrop--below-header {
+  position: absolute;
+  inset: 0;
 }
 
 .studio-utility-backdrop::before {
