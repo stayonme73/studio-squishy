@@ -218,7 +218,7 @@ export const DISCOVERY_TILE_GEOMETRY = {
   "submit-project": { x: 580, y: 420, width: 199, height: 121 },
 } satisfies Record<DiscoveryTileId, SceneRect>;
 
-const STATUS_COVER_SIZE = 24;
+const STATUS_COVER_SIZE = 15;
 
 /** Next tile in the same row — its left edge marks the painted right edge of the current tile. */
 const TILE_ROW_NEIGHBOR_RIGHT: Partial<Record<DiscoveryTileId, DiscoveryTileId>> = {
