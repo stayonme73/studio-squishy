@@ -45,7 +45,7 @@ export const ownerQa = {
     {
       id: "project-summary-checkout",
       label: "Project Summary + Checkout",
-      description: "Green services · $1,385 · embedded checkout",
+      description: "Green services · $1,215 · embedded checkout",
       href: studioBoard.routes.projectSummary,
       seed: "project-summary-checkout",
     },
@@ -108,4 +108,4 @@ export const ownerQa = {
     },
   ] satisfies OwnerQaShortcut[],
 } as const;
-
+

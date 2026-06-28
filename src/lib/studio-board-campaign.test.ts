@@ -6,6 +6,7 @@ import {
   APPROVAL_ACKNOWLEDGMENT_TEXT,
 } from "@/config/service-guide";
 import {
+  createCampaignFromDiscovery,
   readCurrentCampaign,
   saveApprovedStudioPlan,
   saveCurrentCampaign,
@@ -13,6 +14,7 @@ import {
   markPaymentReceived,
   hydrateCampaignIntake,
 } from "@/lib/studio-board-campaign";
+import { CUSTOM_STUDIO_PLAN_LABEL, CUSTOM_STUDIO_PLAN_PACKAGE_ID } from "@/lib/approved-plan-display";
 import { EMPTY_PROJECT_DETAILS_FORM } from "@/config/project-details";
 
 const CAMPAIGN_KEY = "studio-squishy:current-campaign";
@@ -37,6 +39,20 @@ function mockCampaign(overrides: Partial<CampaignRecord> = {}): CampaignRecord {
     ...overrides,
   };
 }
+
+describe("createCampaignFromDiscovery", () => {
+  it("does not assign default momentum bundle tier", () => {
+    const campaign = createCampaignFromDiscovery({
+      "your-business": "Tagia Bakery",
+      "your-focus": "Promote an offer, event, or launch",
+    });
+    expect(campaign.packageId).toBe(CUSTOM_STUDIO_PLAN_PACKAGE_ID);
+    expect(campaign.packageId).not.toBe("momentum");
+    expect(campaign.packageId).not.toBe("spark");
+    expect(campaign.packageLabel).toBe("");
+    expect(campaign.campaignStatus).toBe("DISCOVERY_COMPLETE");
+  });
+});
 
 describe("saveApprovedStudioPlan", () => {
   beforeEach(() => {
@@ -76,6 +92,8 @@ describe("saveApprovedStudioPlan", () => {
     expect(saved.acknowledgmentText).toBe(APPROVAL_ACKNOWLEDGMENT_TEXT);
     expect(saved.acknowledgedAt).toBe(acknowledgment.acknowledgedAt);
     expect(saved.approvedAt).toBeTruthy();
+    expect(readCurrentCampaign()?.packageId).toBe(CUSTOM_STUDIO_PLAN_PACKAGE_ID);
+    expect(readCurrentCampaign()?.packageLabel).toBe(CUSTOM_STUDIO_PLAN_LABEL);
 
     expect(saved.lineItems).toHaveLength(2);
     const brandLine = saved.lineItems[0];
@@ -182,14 +200,15 @@ describe("submitProjectDetails", () => {
     const result = markPaymentReceived("momentum");
     expect(result?.campaignStatus).toBe("PAYMENT_RECEIVED");
     expect(result?.projectDetailsSubmittedAt).toBeUndefined();
-    expect(result?.packageId).toBe("momentum");
+    expect(result?.packageId).toBe(CUSTOM_STUDIO_PLAN_PACKAGE_ID);
+    expect(result?.packageLabel).toBe(CUSTOM_STUDIO_PLAN_LABEL);
   });
 
-  it("markPaymentReceived does not overwrite package when approved plan exists", () => {
+  it("markPaymentReceived preserves custom studio plan when approved plan exists", () => {
     saveCurrentCampaign(
       mockCampaign({
-        packageId: "spark",
-        packageLabel: "Spark Plan",
+        packageId: CUSTOM_STUDIO_PLAN_PACKAGE_ID,
+        packageLabel: CUSTOM_STUDIO_PLAN_LABEL,
         approvedStudioPlan: {
           selectedServiceIds: ["bf-001"],
           includedServiceIds: ["bf-001"],
@@ -205,8 +224,8 @@ describe("submitProjectDetails", () => {
     );
 
     const result = markPaymentReceived("momentum");
-    expect(result?.packageId).toBe("spark");
-    expect(result?.packageLabel).toBe("Spark Plan");
+    expect(result?.packageId).toBe(CUSTOM_STUDIO_PLAN_PACKAGE_ID);
+    expect(result?.packageLabel).toBe(CUSTOM_STUDIO_PLAN_LABEL);
   });
 });
 

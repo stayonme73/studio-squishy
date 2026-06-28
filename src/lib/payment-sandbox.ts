@@ -20,7 +20,7 @@ export function isPaymentSandboxAvailable(): boolean {
  * No Stripe or card fields required.
  */
 export function simulateSandboxPayment(
-  packageId: StudioGuidePackageId,
+  packageId?: StudioGuidePackageId,
 ): CampaignRecord | null {
   return markPaymentReceived(packageId);
 }

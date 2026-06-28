@@ -38,8 +38,8 @@ describe("owner-qa menu config", () => {
 
   it("seeds a believable Green custom plan total for checkout steps", () => {
     const plan = buildOwnerQaGreenApprovedPlan();
-    expect(plan.selectedServiceIds).toEqual(["bf-001", "sm-001", "ma-001"]);
-    expect(plan.amountDueTodayCents).toBe(138_500);
+    expect(plan.selectedServiceIds).toEqual(["bf-001", "sm-001", "em-001"]);
+    expect(plan.amountDueTodayCents).toBe(121_500);
   });
 });
 
@@ -145,7 +145,7 @@ describe("owner-qa hard reset", () => {
       expect(campaign.campaignStatus).toBe("PAYMENT_RECEIVED");
       expect(campaign.paymentReceivedAt).toBeTruthy();
       expect(campaign.projectDetailsSubmittedAt).toBeUndefined();
-      expect(campaign.approvedStudioPlan?.amountDueTodayCents).toBe(138_500);
+      expect(campaign.approvedStudioPlan?.amountDueTodayCents).toBe(121_500);
     } finally {
       Object.defineProperty(globalThis, "window", {
         configurable: true,

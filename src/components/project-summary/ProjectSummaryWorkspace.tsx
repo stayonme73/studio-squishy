@@ -22,6 +22,7 @@ import {
 } from "@/lib/studio-board-campaign";
 import type { CampaignRecord } from "@/config/studio-board";
 import { buildDiscoveryAnswersHeard, PROJECT_SUMMARY_LABELS } from "@/project-summary";
+import { resolveBundlePackageId } from "@/lib/approved-plan-display";
 import {
   addServiceToPlan,
   buildStudioPlanReview,
@@ -138,7 +139,7 @@ export default function ProjectSummaryWorkspace() {
     [recommendation, planState],
   );
 
-  const packageId = readCurrentCampaignHydrated()?.packageId;
+  const packageId = resolveBundlePackageId(readCurrentCampaignHydrated()?.packageId);
 
   function handleRemove(serviceId: ServiceId) {
     setPlanState((current) => removeServiceFromPlan(current, serviceId));

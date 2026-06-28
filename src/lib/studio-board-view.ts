@@ -283,7 +283,7 @@ const whatHappensNextSentences: Record<CampaignStatus, string> = {
 
 export function resolveWhatHappensNextSentence(campaign: CampaignRecord | null): string {
 
-  if (!campaign) return "Start a campaign in the Draft Room to begin.";
+  if (!campaign) return "Start a campaign in Project Discovery to begin.";
 
   return whatHappensNextSentences[campaign.campaignStatus];
 
@@ -339,7 +339,7 @@ export function resolveStudioBoardView(campaign: CampaignRecord | null): StudioB
 
       whatHappensNextSteps: [
 
-        "Start a campaign in the Draft Room.",
+        "Start a campaign in Project Discovery.",
 
         "We review your request.",
 

@@ -11,6 +11,7 @@ import type {
   ApprovedStudioPlanLineItem,
   CampaignRecord,
 } from "@/config/studio-board";
+import { campaignUsesCustomStudioPlan } from "@/lib/approved-plan-display";
 
 export type DeliverableSectionId =
   | "brand-direction-assets"
@@ -245,9 +246,12 @@ export function resolveLegacyDeliverableScope(
 export function resolveDeliverableScopeFromCampaign(
   campaign: CampaignRecord,
 ): DeliverableScopeSection[] {
-  const lineItems = campaign.approvedStudioPlan?.lineItems;
-  if (lineItems?.length) {
-    return resolveDeliverableScopeFromPlan(campaign.approvedStudioPlan!);
+  const approved = campaign.approvedStudioPlan;
+  if (approved?.lineItems?.length) {
+    return resolveDeliverableScopeFromPlan(approved);
+  }
+  if (approved || campaignUsesCustomStudioPlan(campaign)) {
+    return [];
   }
   return resolveLegacyDeliverableScope(campaign);
 }

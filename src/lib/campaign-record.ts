@@ -7,6 +7,7 @@ import {
 import {
   resolveCampaignRevisionRounds,
   resolveClientFacingServiceName,
+  campaignUsesCustomStudioPlan,
 } from "@/lib/approved-plan-display";
 import {
   studioBoard,
@@ -141,6 +142,10 @@ export function resolveDeliverablesRemaining(
         remaining: Math.max(0, 1 - count),
       };
     });
+  }
+
+  if (approved || campaignUsesCustomStudioPlan(campaign)) {
+    return [];
   }
 
   const quotas = getPackageDeliverableQuotas(campaign.packageId);

@@ -2,6 +2,7 @@ import type { ServiceId } from "@/catalog/types";
 import type { ProjectDetailsRecord } from "@/config/project-details";
 import {
   studioBoard,
+  CUSTOM_STUDIO_PLAN_PACKAGE_ID,
   type ApprovedStudioPlan,
   type CampaignRecord,
   type CampaignStatus,
@@ -20,7 +21,7 @@ const { statusContent } = studioBoard;
 /** Dev-only flag — restores Discovery split-panel summary after Owner QA navigation. */
 export const OWNER_QA_DISCOVERY_PREVIEW_KEY = "studio-squishy:owner-qa-discovery-panel";
 
-export const OWNER_QA_GREEN_SERVICE_IDS = ["bf-001", "sm-001", "ma-001"] as const satisfies readonly ServiceId[];
+export const OWNER_QA_GREEN_SERVICE_IDS = ["bf-001", "sm-001", "em-001"] as const satisfies readonly ServiceId[];
 
 const BUSINESS_DELIM = "\n---\n";
 
@@ -180,8 +181,8 @@ function buildOwnerQaCampaign(overrides: Partial<CampaignRecord> = {}): Campaign
     campaignStatus: status,
     campaignDescription: content.campaignDescription,
     estimatedCompletion: content.estimatedCompletion,
-    packageId: "spark",
-    packageLabel: "Spark Plan",
+    packageId: CUSTOM_STUDIO_PLAN_PACKAGE_ID,
+    packageLabel: "",
     discoveryAnswers,
     discoverySubmittedAt: now,
     approvedStudioPlan,

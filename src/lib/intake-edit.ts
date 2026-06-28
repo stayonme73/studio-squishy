@@ -1,6 +1,6 @@
 import type { StudioGuidePackageId } from "@/config/studio-guide";
 import { projectDetailsHref } from "@/config/project-details";
-import type { CampaignStatus } from "@/config/studio-board";
+import type { CampaignPackageId, CampaignStatus } from "@/config/studio-board";
 
 /** Statuses where customers may review and edit intake answers. */
 export const INTAKE_EDITABLE_STATUSES = ["DRAFT_RECEIVED", "PAYMENT_RECEIVED"] as const satisfies readonly CampaignStatus[];
@@ -12,10 +12,10 @@ export function isIntakeEditable(status: CampaignStatus | null | undefined): sta
   return (INTAKE_EDITABLE_STATUSES as readonly string[]).includes(status);
 }
 
-export function draftRoomEditHref(packageId?: StudioGuidePackageId): string {
+export function draftRoomEditHref(packageId?: CampaignPackageId): string {
   return projectDetailsHref(packageId);
 }
 
-export function projectDetailsEditHref(packageId?: StudioGuidePackageId): string {
+export function projectDetailsEditHref(packageId?: CampaignPackageId): string {
   return projectDetailsHref(packageId);
 }

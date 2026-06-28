@@ -1,16 +1,39 @@
 import { getServiceById } from "@/catalog/accessors";
 import { SERVICE_CATEGORIES } from "@/catalog/categories";
 import type { ServiceId } from "@/catalog/types";
-import type {
-  ApprovedStudioPlan,
-  ApprovedStudioPlanLineItem,
-  CampaignRecord,
+import {
+  studioBoard,
+  CUSTOM_STUDIO_PLAN_PACKAGE_ID,
+  type ApprovedStudioPlan,
+  type ApprovedStudioPlanLineItem,
+  type CampaignRecord,
+  type CustomStudioPlanPackageId,
 } from "@/config/studio-board";
-import { getPackageIncludes, getPackageRevisionRounds } from "@/config/studio-guide";
-import { studioBoard } from "@/config/studio-board";
+import { getPackageIncludes, getPackageRevisionRounds, type StudioGuidePackageId } from "@/config/studio-guide";
 import { formatUsdFromCents } from "@/lib/plan-pricing";
 
 export const CUSTOM_STUDIO_PLAN_LABEL = "Custom Studio Plan";
+
+export { CUSTOM_STUDIO_PLAN_PACKAGE_ID };
+export type { CustomStudioPlanPackageId };
+
+export function isCustomStudioPlanPackageId(
+  packageId: string | undefined,
+): packageId is CustomStudioPlanPackageId {
+  return packageId === CUSTOM_STUDIO_PLAN_PACKAGE_ID;
+}
+
+export function campaignUsesCustomStudioPlan(campaign: CampaignRecord): boolean {
+  return Boolean(campaign.approvedStudioPlan) || isCustomStudioPlanPackageId(campaign.packageId);
+}
+
+/** Bundle tier id only — undefined for discovery custom plans. */
+export function resolveBundlePackageId(
+  packageId: CampaignRecord["packageId"] | undefined,
+): StudioGuidePackageId | undefined {
+  if (!packageId || isCustomStudioPlanPackageId(packageId)) return undefined;
+  return packageId;
+}
 
 const INTERNAL_CATEGORY_NAMES = new Set(SERVICE_CATEGORIES.map((category) => category.name));
 
@@ -83,8 +106,11 @@ export function campaignHasApprovedStudioPlan(
 /** Package panel + record drawer — approved plan line items first, bundle includes as fallback. */
 export function resolveCampaignPlanIncludes(campaign: CampaignRecord): readonly string[] {
   const approved = campaign.approvedStudioPlan;
-  if (approved?.lineItems?.length) {
+  if (approved) {
     return resolveApprovedPlanServiceNames(approved);
+  }
+  if (campaignUsesCustomStudioPlan(campaign)) {
+    return [];
   }
   return getPackageIncludes(campaign.packageId);
 }
@@ -105,7 +131,11 @@ export function resolveCampaignAmountPaidDisplay(campaign: CampaignRecord): stri
     }
     return formatUsdFromCents(approved.oneTimeTotalCents);
   }
-  return studioBoard.packagePrices[campaign.packageId] ?? studioBoard.membership.packagePrice;
+  if (approved || campaignUsesCustomStudioPlan(campaign)) {
+    return studioBoard.accountPackage.pendingValue;
+  }
+  return studioBoard.packagePrices[campaign.packageId as keyof typeof studioBoard.packagePrices] ??
+    studioBoard.membership.packagePrice;
 }
 
 export function resolveCampaignBillingTypeLabel(campaign: CampaignRecord): string {
@@ -117,7 +147,7 @@ export function resolveCampaignBillingTypeLabel(campaign: CampaignRecord): strin
   if (approved?.monthlyTotalCents && approved.oneTimeTotalCents) {
     return `${copy.billingOneTime} + ${copy.billingMonthly}`;
   }
-  if (approved) return copy.billingOneTime;
+  if (approved || campaignUsesCustomStudioPlan(campaign)) return copy.billingOneTime;
   return campaign.packageId === "spark" ? copy.billingOneTime : copy.billingMonthly;
 }
 
@@ -139,5 +169,6 @@ export function resolveCampaignRevisionRounds(campaign: CampaignRecord): number 
   if (campaign.approvedStudioPlan) {
     return resolveApprovedPlanRevisionRounds(campaign.approvedStudioPlan);
   }
+  if (campaignUsesCustomStudioPlan(campaign)) return 1;
   return getPackageRevisionRounds(campaign.packageId);
 }

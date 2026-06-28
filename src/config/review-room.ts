@@ -14,7 +14,7 @@ export const reviewRoom = {
   },
   noCampaign: {
     title: "No campaign yet",
-    body: "Start a campaign from the Draft Room to review concepts here.",
+    body: "Start a campaign in Project Discovery to review concepts here.",
     cta: "Go to Studio Board",
   },
   options: [

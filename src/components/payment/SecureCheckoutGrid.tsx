@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 import type { ServiceId } from "@/catalog/types";
 import type { ApprovalAcknowledgment } from "@/config/studio-board";
 import { payment, paymentIntakeHref } from "@/config/payment";
+import { projectDetailsHref } from "@/config/project-details";
 import {
   ACKNOWLEDGMENT_VERSION,
   APPROVAL_ACKNOWLEDGMENT_TEXT,
 } from "@/config/service-guide";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
+import { resolveBundlePackageId } from "@/lib/approved-plan-display";
 import {
   buildPaymentPlanSummary,
   type PaymentPlanSummary,
@@ -84,9 +86,11 @@ function PaperCard({
   );
 }
 
-function resolvePackageId(packageId?: StudioGuidePackageId): StudioGuidePackageId {
-  if (packageId) return packageId;
-  return readCurrentCampaignHydrated()?.packageId ?? "spark";
+function resolveCheckoutPackageId(
+  packageIdProp?: StudioGuidePackageId,
+): StudioGuidePackageId | undefined {
+  if (packageIdProp) return packageIdProp;
+  return resolveBundlePackageId(readCurrentCampaignHydrated()?.packageId);
 }
 
 /** Three-column Secure Checkout — Studio Plan summary, payment form, what happens next. */
@@ -101,7 +105,7 @@ export default function SecureCheckoutGrid({
   onViewPlanDetails,
 }: Props) {
   const router = useRouter();
-  const packageId = resolvePackageId(packageIdProp);
+  const checkoutPackageId = resolveCheckoutPackageId(packageIdProp);
   const storedPlanSummary = useMemo(() => buildPaymentPlanSummary(), []);
   const planSummary = planSummaryProp ?? storedPlanSummary;
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -119,12 +123,12 @@ export default function SecureCheckoutGrid({
   function completeCheckout() {
     const acknowledgment = buildAcknowledgment();
     if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
-    markPaymentReceived(packageId);
+    markPaymentReceived(checkoutPackageId);
     if (onPaymentComplete) {
-      onPaymentComplete(packageId);
+      onPaymentComplete(checkoutPackageId);
       return;
     }
-    router.push(paymentIntakeHref(packageId));
+    router.push(checkoutPackageId ? paymentIntakeHref(checkoutPackageId) : projectDetailsHref());
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -136,12 +140,12 @@ export default function SecureCheckoutGrid({
   function handleSandboxPayment() {
     const acknowledgment = buildAcknowledgment();
     if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
-    simulateSandboxPayment(packageId);
+    simulateSandboxPayment(checkoutPackageId);
     if (onPaymentComplete) {
-      onPaymentComplete(packageId);
+      onPaymentComplete(checkoutPackageId);
       return;
     }
-    router.push(paymentIntakeHref(packageId));
+    router.push(checkoutPackageId ? paymentIntakeHref(checkoutPackageId) : projectDetailsHref());
   }
 
   const showMonthlySubtotal = planSummary.monthlySubtotalCents > 0;

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import StudioPlanReviewScene from "@/components/studio-plan-review/StudioPlanReviewScene";
 import { studioBoard } from "@/config/studio-board";
 import { paymentHref } from "@/config/payment";
+import { resolveBundlePackageId } from "@/lib/approved-plan-display";
 import { resolveDiscoveryBriefAnswers } from "@/lib/discovery-brief";
 import { readDiscoveryAnswers } from "@/lib/business-discovery-session";
 import {
@@ -61,8 +62,9 @@ export default function StudioPlanReviewPageClient() {
     if (!model.planValid) return;
     const saved = saveApprovedStudioPlan(planState.selectedServiceIds);
     if (!saved) return;
-    const packageId = saved.packageId ?? studioBoard.membership.packageId;
-    router.push(`${paymentHref(packageId)}&from=studio-plan-review`);
+    const bundlePackageId =
+      resolveBundlePackageId(saved.packageId) ?? studioBoard.membership.packageId;
+    router.push(`${paymentHref(bundlePackageId)}&from=studio-plan-review`);
   }
 
   return (

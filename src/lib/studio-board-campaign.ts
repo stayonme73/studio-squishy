@@ -28,6 +28,8 @@ import { SERVICE_CATALOG } from "@/catalog/services";
 import { validateExecutionAddOnsInPlan } from "@/catalog/validate";
 import { buildServiceScopeSnapshot, computePlanPricingTotals } from "@/lib/plan-pricing";
 import {
+  CUSTOM_STUDIO_PLAN_LABEL,
+  CUSTOM_STUDIO_PLAN_PACKAGE_ID,
   resolveApprovedPlanRevisionRounds,
   resolveCampaignRevisionRounds,
 } from "@/lib/approved-plan-display";
@@ -261,8 +263,6 @@ export function createCampaignFromDiscovery(answers: DiscoveryAnswers): Campaign
   const now = new Date().toISOString();
   const brief = discoveryBriefFromAnswers(answers);
   const businessName = businessNameFromAnswer(brief.answers["your-business"]);
-  const defaultPackageId = studioBoard.membership.packageId;
-  const pkg = getStudioGuidePackage(defaultPackageId);
 
   return {
     campaignId: crypto.randomUUID(),
@@ -270,13 +270,14 @@ export function createCampaignFromDiscovery(answers: DiscoveryAnswers): Campaign
     campaignStatus: "DISCOVERY_COMPLETE",
     campaignDescription: content.campaignDescription,
     estimatedCompletion: content.estimatedCompletion,
-    packageId: defaultPackageId,
-    packageLabel: pkg?.label ?? defaultPackageId,
+    // Discovery flow — custom Studio Plan on Project Summary, not a bundle tier.
+    packageId: CUSTOM_STUDIO_PLAN_PACKAGE_ID,
+    packageLabel: "",
     discoveryAnswers: brief.answers,
     discoverySubmittedAt: now,
     paymentReceivedAt: null,
     targetCompletionDate: null,
-    revisionRoundsIncluded: getPackageRevisionRounds(defaultPackageId),
+    revisionRoundsIncluded: 1,
     revisionRoundsUsed: 0,
     deliverablesDelivered: {},
     studioNotes: [...content.studioUpdates],
@@ -327,6 +328,8 @@ export function saveApprovedStudioPlan(
   const updated: CampaignRecord = {
     ...campaign,
     approvedStudioPlan,
+    packageId: CUSTOM_STUDIO_PLAN_PACKAGE_ID,
+    packageLabel: CUSTOM_STUDIO_PLAN_LABEL,
     revisionRoundsIncluded: resolveApprovedPlanRevisionRounds(approvedStudioPlan),
     updatedAt: now,
   };
@@ -389,6 +392,12 @@ export function markPaymentReceived(
       packageLabel: pkg?.label ?? campaign.packageLabel,
       revisionRoundsIncluded:
         campaign.revisionRoundsIncluded ?? getPackageRevisionRounds(pkg?.id ?? campaign.packageId),
+    };
+  } else {
+    updated = {
+      ...updated,
+      packageId: CUSTOM_STUDIO_PLAN_PACKAGE_ID,
+      packageLabel: CUSTOM_STUDIO_PLAN_LABEL,
     };
   }
 

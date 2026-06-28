@@ -89,6 +89,13 @@ export type CampaignIntakeSnapshot = {
 
 export type DeliverablesDelivered = Partial<Record<DeliverableQuotaId, number>>;
 
+/** Neutral package id — not Spark/Momentum/Growth; discovery-first custom plans use this. */
+export const CUSTOM_STUDIO_PLAN_PACKAGE_ID = "custom-studio-plan" as const;
+
+export type CustomStudioPlanPackageId = typeof CUSTOM_STUDIO_PLAN_PACKAGE_ID;
+
+export type CampaignPackageId = StudioGuidePackageId | CustomStudioPlanPackageId;
+
 export type CampaignRecord = {
   campaignId: string;
   campaignName: string;
@@ -96,7 +103,7 @@ export type CampaignRecord = {
   campaignDescription: string;
   estimatedCompletion: string;
   selectedCampaignOption?: string;
-  packageId: StudioGuidePackageId;
+  packageId: CampaignPackageId;
   packageLabel: string;
   intake?: CampaignIntakeSnapshot;
   /** Full Draft Room answers — single source for Vision Summary */
@@ -126,7 +133,7 @@ export type CampaignRecord = {
 
 export type MembershipRecord = {
   packageType: string;
-  packageId: StudioGuidePackageId;
+  packageId: CampaignPackageId;
   campaignsRemaining: number;
   campaignsTotal: number;
   emailsRemaining: number;
@@ -432,7 +439,7 @@ export const studioBoard = {
   bottomBar: {
     headline: "Need something else marketed?",
     subline: "The Studio is here to help you grow.",
-    ariaLabel: "Start a new campaign in the Draft Room",
+    ariaLabel: "Start a new campaign in Project Discovery",
   },
 
   sidebar: {
@@ -672,7 +679,7 @@ export const studioBoard = {
     copyCampaignBriefSuccess: "Campaign Brief Copied",
     empty: {
       title: "No campaign yet",
-      body: "Start a campaign from the Draft Room to see your details here.",
+      body: "Start a campaign in Project Discovery to see your details here.",
       cta: "Go to Studio Board",
     },
   },
