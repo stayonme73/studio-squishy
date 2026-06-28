@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { GET as getFileRoom } from "@/app/file-room/route";
 import type { CampaignRecord } from "@/config/studio-board";
 import { CUSTOM_STUDIO_PLAN_PACKAGE_ID } from "@/config/studio-board";
 
@@ -30,6 +29,13 @@ function requestUrl(input: RequestInfo | URL): string {
   if (typeof input === "string") return input;
   if (input instanceof URL) return input.href;
   return input.url;
+}
+
+function makeNextRequest(pathname: string, cookie?: string) {
+  return {
+    nextUrl: new URL(`http://localhost${pathname}`),
+    headers: new Headers(cookie ? { Cookie: cookie } : {}),
+  } as import("next/server").NextRequest;
 }
 
 describe("syncCampaignToServer auth guard", () => {
@@ -82,12 +88,13 @@ describe("syncCampaignToServer auth guard", () => {
     expect(urls).toEqual([expect.stringContaining("/api/campaigns/current")]);
   });
 
-  it("GET /file-room remains 401 after sync without login", async () => {
+  it("file-room remains protected after sync without login", async () => {
     vi.stubEnv("NODE_ENV", "development");
     await syncCampaignToServer(minimalCampaign(campaignId));
 
-    const fileRoomRes = await getFileRoom(new Request("http://localhost/file-room"));
-    expect(fileRoomRes.status).toBe(401);
+    const { handleProtectedRoutes } = await import("../../../proxy");
+    const fileRoomRes = await handleProtectedRoutes(makeNextRequest("/file-room"));
+    expect(fileRoomRes?.status).toBe(401);
 
     const status = readCampaignSyncStatus();
     expect(status?.state).toBe("error");
@@ -113,8 +120,9 @@ describe("syncCampaignToServer auth guard", () => {
       );
       expect(authCalls).toHaveLength(0);
 
-      const fileRoomRes = await getFileRoom(new Request("http://localhost/file-room"));
-      expect(fileRoomRes.status).toBe(401);
+      const { handleProtectedRoutes } = await import("../../../proxy");
+      const fileRoomRes = await handleProtectedRoutes(makeNextRequest("/file-room"));
+      expect(fileRoomRes?.status).toBe(401);
     },
   );
 });

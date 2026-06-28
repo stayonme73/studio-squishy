@@ -1,13 +1,26 @@
 import { describe, expect, it } from "vitest";
 
 import type { ServerCampaignEnvelope, StudioUser } from "./types";
-import { canListAllCampaigns, canReadCampaign, canSyncCurrentCampaign } from "./access";
+import {
+  canListAllCampaigns,
+  canReadCampaign,
+  canSyncCurrentCampaign,
+  filterCampaignsForUser,
+  isBrowsableCampaignId,
+} from "./access";
 
 const owner: StudioUser = {
   id: "owner-1",
   email: "owner@local.dev",
   displayName: "Owner",
   roles: ["owner"],
+};
+
+const staff: StudioUser = {
+  id: "staff-dev",
+  email: "staff@local.dev",
+  displayName: "Staff",
+  roles: ["staff"],
 };
 
 const client: StudioUser = {
@@ -36,16 +49,49 @@ const envelope: ServerCampaignEnvelope = {
   syncVersion: 1,
 };
 
+const assignments = {
+  staffByUserId: {
+    "staff-dev": ["campaign-b"],
+  },
+};
+
 describe("campaign access", () => {
-  it("allows owner/staff to list and read any campaign", () => {
+  it("owner can list all and read any non-fixture campaign", () => {
     expect(canListAllCampaigns(owner)).toBe(true);
-    expect(canReadCampaign(owner, "campaign-b")).toBe(true);
+    expect(canReadCampaign(owner, "campaign-b", undefined, assignments)).toBe(true);
+  });
+
+  it("staff cannot list all; reads only assigned campaigns", () => {
+    expect(canListAllCampaigns(staff)).toBe(false);
+    expect(canReadCampaign(staff, "campaign-b", undefined, assignments)).toBe(true);
+    expect(canReadCampaign(staff, "campaign-a", envelope, assignments)).toBe(false);
   });
 
   it("restricts client reads to their campaign", () => {
     expect(canListAllCampaigns(client)).toBe(false);
     expect(canReadCampaign(client, "campaign-a", envelope)).toBe(true);
     expect(canReadCampaign(client, "campaign-b", envelope)).toBe(false);
+  });
+
+  it("blocks fixture campaigns from browse paths", () => {
+    expect(isBrowsableCampaignId("owner-qa-dev")).toBe(false);
+    expect(isBrowsableCampaignId("test-abc")).toBe(false);
+    expect(canReadCampaign(owner, "owner-qa-dev", undefined, assignments)).toBe(false);
+  });
+
+  it("filterCampaignsForUser hides fixtures and applies staff assignments", () => {
+    const envelopes = [
+      envelope,
+      { ...envelope, campaignId: "campaign-b", record: { ...envelope.record, campaignId: "campaign-b" } },
+      { ...envelope, campaignId: "owner-qa-dev", record: { ...envelope.record, campaignId: "owner-qa-dev" } },
+    ];
+    expect(filterCampaignsForUser(envelopes, owner, assignments).map((e) => e.campaignId)).toEqual([
+      "campaign-a",
+      "campaign-b",
+    ]);
+    expect(filterCampaignsForUser(envelopes, staff, assignments).map((e) => e.campaignId)).toEqual([
+      "campaign-b",
+    ]);
   });
 
   it("allows client sync on current campaign route", () => {

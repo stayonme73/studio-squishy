@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  experimental: {
+    authInterrupts: true,
+  },
   async redirects() {
     return [
       { source: "/project-discovery", destination: "/business-discovery-studio", permanent: false },

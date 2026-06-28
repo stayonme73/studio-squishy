@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { isStaffOrOwner } from "@/lib/auth/roles";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
 
-export async function middleware(request: NextRequest) {
+export async function handleProtectedRoutes(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/file-room")) {
@@ -33,6 +33,8 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
+export default handleProtectedRoutes;
+
 export const config = {
-  matcher: ["/file-room", "/file-room/:path*", "/api/campaigns", "/api/campaigns/:path*"],
+  matcher: ["/file-room", "/file-room/(.*)", "/api/campaigns", "/api/campaigns/(.*)"],
 };
