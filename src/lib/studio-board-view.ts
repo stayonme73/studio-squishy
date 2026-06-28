@@ -1,4 +1,11 @@
 import { studioBoard, campaignStatusIndex, type CampaignRecord, type CampaignStatus, type StudioUpdate } from "@/config/studio-board";
+import {
+  CUSTOM_STUDIO_PLAN_LABEL,
+  resolveCampaignAmountPaidDisplay,
+  resolveCampaignBillingTypeLabel,
+  resolveCampaignPlanLabel,
+  resolveCampaignRevisionRounds,
+} from "@/lib/approved-plan-display";
 
 import {
 
@@ -188,7 +195,11 @@ function resolveProgressStepDetail(
 
   switch (stageId) {
     case "DRAFT_RECEIVED":
-      return formatBoardDate(campaign.visionSubmittedAt ?? campaign.createdAt);
+      return formatBoardDate(
+        campaign.projectDetailsSubmittedAt ??
+          campaign.visionSubmittedAt ??
+          campaign.createdAt,
+      );
     case "PAYMENT_RECEIVED":
       return formatBoardDate(campaign.paymentReceivedAt);
     case "BUILDING_CONCEPTS":
@@ -381,7 +392,9 @@ export function resolveStudioBoardView(campaign: CampaignRecord | null): StudioB
 
     campaignTitle: campaignHeadline(resolveCampaignDisplayName(campaign)),
 
-    packageLabel: campaign.packageLabel,
+    packageLabel: campaign.approvedStudioPlan
+      ? resolveCampaignPlanLabel(campaign)
+      : campaign.packageLabel,
 
     campaignProgressLabel: content.campaignProgressLabel,
 
@@ -487,6 +500,22 @@ export function resolveMembershipSnapshot(
 
     };
 
+  }
+
+
+
+  if (campaign.approvedStudioPlan) {
+    return {
+      isActive: true,
+      emptyHint: base.emptyHint,
+      packageType: CUSTOM_STUDIO_PLAN_LABEL,
+      campaignsRemaining: 0,
+      campaignsTotal: 0,
+      campaignsUsed: 0,
+      emailsRemaining: 0,
+      smsRemaining: 0,
+      renewalDate: base.renewalDate,
+    };
   }
 
 
@@ -814,20 +843,25 @@ export function resolveAccountPackageView(campaign: CampaignRecord | null): Acco
   const paid =
     campaign.campaignStatus !== "DRAFT_RECEIVED" && Boolean(campaign.paymentReceivedAt);
   const revisionTracker = resolveRevisionTracker(campaign);
+  const usesApprovedPlan = Boolean(campaign.approvedStudioPlan);
 
   return {
     isActive: true,
     emptyHint: copy.emptyHint,
-    packagePurchased: campaign.packageLabel,
-    packagePrice: packagePrices[campaign.packageId] ?? membership.packagePrice,
+    packagePurchased: resolveCampaignPlanLabel(campaign),
+    packagePrice: resolveCampaignAmountPaidDisplay(campaign),
     paymentStatus: paid ? copy.paidInFull : copy.paymentPending,
     paymentDate: paid ? formatPaymentDate(campaign.paymentReceivedAt) : null,
-    billingType: resolveBillingType(campaign.packageId),
-    renewalDisplay: resolveRenewalDisplay(campaign.packageId, membership.renewalDate),
-    campaignsRemaining: membership.campaignsRemaining,
-    emailsRemaining: membership.emailsRemaining,
-    smsRemaining: membership.smsRemaining,
-    revisionsRemaining: revisionTracker.remaining,
+    billingType: resolveCampaignBillingTypeLabel(campaign),
+    renewalDisplay: usesApprovedPlan
+      ? copy.renewalNotApplicable
+      : resolveRenewalDisplay(campaign.packageId, membership.renewalDate),
+    campaignsRemaining: usesApprovedPlan ? 0 : membership.campaignsRemaining,
+    emailsRemaining: usesApprovedPlan ? 0 : membership.emailsRemaining,
+    smsRemaining: usesApprovedPlan ? 0 : membership.smsRemaining,
+    revisionsRemaining: usesApprovedPlan
+      ? resolveCampaignRevisionRounds(campaign)
+      : revisionTracker.remaining,
   };
 }
 

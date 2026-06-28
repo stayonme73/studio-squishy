@@ -2,6 +2,7 @@
 
 import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import type { DraftIntakeFormValues } from "@/config/draft-room";
+import type { ProjectDetailsRecord } from "@/config/project-details";
 import { projectDiscoveryHref } from "@/config/customer-journey-v1";
 import type { FeedbackConceptPreview } from "@/config/feedback-studio";
 import type { DeliverableQuotaId, StudioGuidePackageId } from "@/config/studio-guide";
@@ -105,6 +106,9 @@ export type CampaignRecord = {
   discoverySubmittedAt?: string;
   /** Studio Plan Review output — required before payment in the discovery flow */
   approvedStudioPlan?: ApprovedStudioPlan;
+  /** Post-payment Project Details intake — green services only (V1) */
+  projectDetails?: ProjectDetailsRecord;
+  projectDetailsSubmittedAt?: string;
   visionSubmittedAt?: string;
   /** Campaign directions — generated from visionData or supplied by content engine */
   concepts?: FeedbackConceptPreview[];
@@ -165,6 +169,7 @@ export const studioBoard = {
     projectDiscovery: "/business-discovery-studio",
     studioKitchen: "/studio-kitchen",
     projectSummary: "/project-summary",
+    projectDetails: "/project-details",
     /** @deprecated use projectSummary — redirect preserved at /studio-plan-review */
     studioPlanReview: "/project-summary",
   },
@@ -204,9 +209,9 @@ export const studioBoard = {
     },
     {
       id: "DRAFT_RECEIVED" as const,
-      label: "Intake Complete",
-      boardLabel: "Intake Complete",
-      hint: "Vision saved — package next.",
+      label: "Project Details Complete",
+      boardLabel: "Project Details Complete",
+      hint: "Project Details saved — package next.",
     },
     {
       id: "PAYMENT_RECEIVED" as const,
@@ -488,7 +493,10 @@ export const studioBoard = {
       "The Studio team is creating your campaign directions. Your Studio Board will update when concepts are ready for review.",
     paymentReceivedLabel: "Campaign Queued",
     paymentReceivedHint:
-      "Payment is confirmed. The Studio will begin concept development. Check your Studio Board for status updates.",
+      "Payment is confirmed. Share your Project Details so we can begin production.",
+    completeProjectDetails: "Complete Project Details",
+    completeProjectDetailsHint:
+      "Tell us what we need to complete the services in your approved Studio Plan.",
     packageReadyLabel: "Your Package Is Ready",
     openFinalDelivery: "Open Final Delivery",
   },
@@ -544,8 +552,8 @@ export const studioBoard = {
   },
 
   packageSummary: {
-    heading: "Your Selected Package",
-    emptyHint: "Package details appear once you choose a plan.",
+    heading: "Your Studio Plan",
+    emptyHint: "Plan details appear once you choose a Studio Plan.",
     compareLink: "Compare all packages",
     revisionLine: (rounds: number) =>
       `${rounds} Revision Round${rounds === 1 ? "" : "s"} Included`,

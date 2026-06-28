@@ -1,5 +1,5 @@
 import type { StudioGuidePackageId } from "@/config/studio-guide";
-import { projectDiscoveryHref } from "@/config/customer-journey-v1";
+import { projectDetailsHref } from "@/config/project-details";
 import type { CampaignStatus } from "@/config/studio-board";
 
 /** Statuses where customers may review and edit intake answers. */
@@ -13,5 +13,9 @@ export function isIntakeEditable(status: CampaignStatus | null | undefined): sta
 }
 
 export function draftRoomEditHref(packageId?: StudioGuidePackageId): string {
-  return projectDiscoveryHref(packageId);
+  return projectDetailsHref(packageId);
+}
+
+export function projectDetailsEditHref(packageId?: StudioGuidePackageId): string {
+  return projectDetailsHref(packageId);
 }

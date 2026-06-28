@@ -95,9 +95,27 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
               {campaignBrief.lockedMessage}
             </p>
           ) : null}
+          {view.hasProjectDetailsSummary ? (
+            <div className="sb-record-drawer__project-details">
+              <h3 className="sb-record-drawer__section-title">Project Details</h3>
+              {view.projectDetailsSummary.map((section) => (
+                <article key={section.title} className="cd-vision__section">
+                  <p className="cd-vision__eyebrow">{section.title}</p>
+                  <div className="cd-vision__answers">
+                    {section.items.map((item) => (
+                      <div key={`${section.title}-${item.label}`} className="cd-vision__answer">
+                        <p className="cd-vision__label">{item.label}</p>
+                        <p className="cd-vision__value">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : null}
           {view.hasVisionSummary ? (
             <CampaignVisionSummary sections={view.visionSummary} />
-          ) : (
+          ) : view.hasProjectDetailsSummary ? null : (
             <p className="sb-record-drawer__empty">{copy.emptyHint}</p>
           )}
         </div>

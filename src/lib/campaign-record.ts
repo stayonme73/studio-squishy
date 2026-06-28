@@ -5,6 +5,7 @@ import {
   getPackageRevisionRounds,
   type DeliverableQuotaId,
 } from "@/config/studio-guide";
+import { resolveClientFacingServiceName } from "@/lib/approved-plan-display";
 import {
   studioBoard,
   type CampaignRecord,
@@ -119,6 +120,23 @@ export function resolveLastStudioNote(campaign: CampaignRecord | null): StudioUp
 export function resolveDeliverablesRemaining(
   campaign: CampaignRecord,
 ): DeliverableRemainingItem[] {
+  const approved = campaign.approvedStudioPlan;
+  if (approved?.lineItems?.length) {
+    const delivered = campaign.deliverablesDelivered ?? {};
+    return approved.lineItems.map((line) => {
+      const skuId = (line.skuId ?? line.serviceId!) as DeliverableQuotaId;
+      const label = resolveClientFacingServiceName(line.skuId ?? line.serviceId!, line);
+      const count = delivered[skuId] ?? 0;
+      return {
+        id: skuId,
+        label,
+        total: 1,
+        delivered: count,
+        remaining: Math.max(0, 1 - count),
+      };
+    });
+  }
+
   const quotas = getPackageDeliverableQuotas(campaign.packageId);
   const delivered = campaign.deliverablesDelivered ?? {};
 
@@ -177,6 +195,7 @@ export function resolveActivityFeed(campaign: CampaignRecord | null): ActivityFe
   pushIso(campaign.visionSubmittedAt ?? campaign.createdAt, "Intake received");
   pushIso(campaign.discoverySubmittedAt, "Discovery received");
   pushIso(campaign.paymentReceivedAt, "Payment received");
+  pushIso(campaign.projectDetailsSubmittedAt, "Project Details received");
 
   if (campaign.selectedCampaignOption) {
     pushIso(campaign.updatedAt, "Direction selected");

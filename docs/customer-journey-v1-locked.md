@@ -12,7 +12,7 @@
 |---|-----------|-------|
 | 1 | Finish Project Summary polish | Locked copy structure; mock data OK |
 | 2 | Secure Checkout on Project Summary | **Done** — wide workspace with checkout always visible in row 2 via embedded `SecureCheckoutGrid`; `/payment` fallback kept |
-| 3 | Verify complete customer journey | Discovery → Project Summary → payment → Vision Intake |
+| 3 | Verify complete customer journey | Discovery → Project Summary → Payment → Project Details → Studio Board |
 | 4 | Begin Discovery Mapping and Recommendation Engine wiring | **Deferred** until 1–3 complete |
 
 **Paused (do not wire yet):** Discovery Mapping, Recommendation Engine scoring/mapping, and Discovery Summary engine integration. The Recommendation Engine should support a finished customer experience — not define it prematurely. See [discovery-mapping-v1-planned.md](discovery-mapping-v1-planned.md).
@@ -46,10 +46,11 @@ These routes sit between Project Discovery and Secure Checkout — not numbered 
 3. **Discovery split preview** — recommended service names only + CTA to Project Summary — see [discovery-split-preview-v1-locked.md](discovery-split-preview-v1-locked.md)
 4. **Project Summary** — per-service Why?, optional packages, customize with live pricing, Secure Checkout inline (same page)
 5. Secure Checkout — payment (also at `/payment` for direct links)
+6. **Project Details** — `/project-details` — post-payment intake for green services (materials + service-specific details)
 
 Steps 3–5 are screen roles, not numbered journey rooms. The split preview must not duplicate Project Summary detail.
 
-Architecture: Catalog → Recommendation Engine → Project Summary / Studio Plan Review → Secure Checkout → Project Record.
+Architecture: Catalog → Recommendation Engine → Project Summary / Studio Plan Review → Secure Checkout → Project Details → Project Record.
 
 **Visual language:** Decision pages (Project Summary, Secure Checkout) use clean proposal styling — see [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md). Creative pages (Discovery, Review Room) keep warm textured aesthetics.
 

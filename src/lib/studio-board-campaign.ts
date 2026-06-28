@@ -29,6 +29,8 @@ import { validateExecutionAddOnsInPlan } from "@/catalog/validate";
 import { buildServiceScopeSnapshot, computePlanPricingTotals } from "@/lib/plan-pricing";
 import { allocateSelectedServices, computeAdditionalCostUsd } from "@/studio-plan-review";
 import type { ServiceId } from "@/catalog/types";
+import type { ProjectDetailsRecord } from "@/config/project-details";
+import { clearProjectDetailsDraft } from "@/lib/project-details-session";
 
 const { statusContent } = studioBoard;
 
@@ -56,10 +58,16 @@ function pushStudioNote(campaign: CampaignRecord, message: string, date = "Today
 
 function intakeComplete(campaign: CampaignRecord): boolean {
   return Boolean(
-    campaign.visionSubmittedAt ||
+    campaign.projectDetailsSubmittedAt ||
+      campaign.visionSubmittedAt ||
       campaign.intake?.submittedAt ||
       campaign.intake?.idea?.trim(),
   );
+}
+
+export function isIntakeComplete(campaign: CampaignRecord | null | undefined): boolean {
+  if (!campaign) return false;
+  return intakeComplete(campaign);
 }
 
 function enterBuildingConcepts(campaign: CampaignRecord): CampaignRecord {
@@ -315,6 +323,30 @@ export function saveApprovedStudioPlan(
     approvedStudioPlan,
     updatedAt: now,
   };
+
+  return persistCampaign(updated);
+}
+
+export function submitProjectDetails(
+  projectDetails: ProjectDetailsRecord,
+): CampaignRecord | null {
+  const existing = readCurrentCampaign();
+  if (!existing) return null;
+  if (!existing.paymentReceivedAt) return null;
+  if (!existing.approvedStudioPlan) return null;
+  if (existing.projectDetailsSubmittedAt) return existing;
+
+  const now = projectDetails.submittedAt ?? new Date().toISOString();
+  let updated: CampaignRecord = {
+    ...existing,
+    projectDetails: { ...projectDetails, submittedAt: now },
+    projectDetailsSubmittedAt: now,
+    updatedAt: now,
+  };
+
+  updated = enterBuildingConcepts(updated);
+  updated = pushStudioNote(updated, "Project Details received.");
+  clearProjectDetailsDraft(existing.campaignId);
 
   return persistCampaign(updated);
 }

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 
+import { projectDetailsEditHref } from "@/lib/intake-edit";
+import { isIntakeComplete } from "@/lib/studio-board-campaign";
 import { studioBoard, type CampaignStatus } from "@/config/studio-board";
 import {
   resolveBoardCampaignActions,
@@ -64,6 +66,26 @@ export default function CampaignNextAction({
         <Link href={primary.href} className="utility-btn utility-btn--primary sb-next-action__cta">
           {nextCopy.choosePackage}
         </Link>
+      </div>
+    );
+  }
+
+  if (status === "PAYMENT_RECEIVED" && campaign && !isIntakeComplete(campaign)) {
+    return (
+      <div className="sb-next-action" role="status" aria-live="polite">
+        <p className="sb-next-action__status">{nextCopy.paymentReceivedLabel}</p>
+        <p className="sb-next-action__lead">{nextCopy.completeProjectDetailsHint}</p>
+        <Link
+          href={projectDetailsEditHref(campaign.packageId)}
+          className="utility-btn utility-btn--primary sb-next-action__cta"
+        >
+          {nextCopy.completeProjectDetails}
+        </Link>
+        {nextUpdateLabel ? (
+          <p className="sb-next-action__eta">
+            {copy.nextUpdatePrefix} {nextUpdateLabel}
+          </p>
+        ) : null}
       </div>
     );
   }

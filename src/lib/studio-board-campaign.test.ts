@@ -9,7 +9,10 @@ import {
   readCurrentCampaign,
   saveApprovedStudioPlan,
   saveCurrentCampaign,
+  submitProjectDetails,
+  markPaymentReceived,
 } from "@/lib/studio-board-campaign";
+import { EMPTY_PROJECT_DETAILS_FORM } from "@/config/project-details";
 
 const CAMPAIGN_KEY = "studio-squishy:current-campaign";
 
@@ -101,5 +104,82 @@ describe("saveApprovedStudioPlan", () => {
     const result = saveApprovedStudioPlan(["social_media-execution"]);
     expect(result).toBeNull();
     expect(window.localStorage.getItem(CAMPAIGN_KEY)).toBe(before);
+  });
+});
+
+describe("submitProjectDetails", () => {
+  beforeEach(() => {
+    vi.stubGlobal("window", {
+      localStorage: {
+        store: {} as Record<string, string>,
+        getItem(key: string) {
+          return this.store[key] ?? null;
+        },
+        setItem(key: string, value: string) {
+          this.store[key] = value;
+        },
+        removeItem(key: string) {
+          delete this.store[key];
+        },
+      },
+      dispatchEvent: vi.fn(),
+    });
+  });
+
+  it("transitions paid campaign to BUILDING_CONCEPTS", () => {
+    const now = new Date().toISOString();
+    saveCurrentCampaign(
+      mockCampaign({
+        campaignStatus: "PAYMENT_RECEIVED",
+        paymentReceivedAt: now,
+        approvedStudioPlan: {
+          selectedServiceIds: ["bf-001"],
+          includedServiceIds: ["bf-001"],
+          additionalServiceIds: [],
+          additionalCostUsd: 0,
+          oneTimeTotalCents: 49500,
+          monthlyTotalCents: 0,
+          amountDueTodayCents: 49500,
+          lineItems: [],
+          approvedAt: now,
+        },
+      }),
+    );
+
+    const result = submitProjectDetails({
+      form: {
+        ...EMPTY_PROJECT_DETAILS_FORM,
+        primaryApproverName: "Tagia",
+        primaryApproverEmail: "tagia@example.com",
+      },
+      files: [],
+      submittedAt: now,
+    });
+
+    expect(result?.campaignStatus).toBe("BUILDING_CONCEPTS");
+    expect(result?.projectDetailsSubmittedAt).toBe(now);
+  });
+
+  it("markPaymentReceived stays PAYMENT_RECEIVED when project details incomplete", () => {
+    saveCurrentCampaign(
+      mockCampaign({
+        campaignStatus: "DISCOVERY_COMPLETE",
+        approvedStudioPlan: {
+          selectedServiceIds: ["bf-001"],
+          includedServiceIds: ["bf-001"],
+          additionalServiceIds: [],
+          additionalCostUsd: 0,
+          oneTimeTotalCents: 49500,
+          monthlyTotalCents: 0,
+          amountDueTodayCents: 49500,
+          lineItems: [],
+          approvedAt: new Date().toISOString(),
+        },
+      }),
+    );
+
+    const result = markPaymentReceived("momentum");
+    expect(result?.campaignStatus).toBe("PAYMENT_RECEIVED");
+    expect(result?.projectDetailsSubmittedAt).toBeUndefined();
   });
 });

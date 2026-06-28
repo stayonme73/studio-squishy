@@ -119,6 +119,15 @@ export function customerJourneyStepRoute(id: CustomerJourneyStepId): string {
 
 const PACKAGE_IDS = ["spark", "momentum", "growth"] as const;
 
+/** Post-payment Project Details intake — optional package query for journey handoff. */
+export function projectDetailsJourneyHref(packageId?: string): string {
+  const base = "/project-details";
+  if (!packageId || !PACKAGE_IDS.includes(packageId as (typeof PACKAGE_IDS)[number])) {
+    return base;
+  }
+  return `${base}?package=${packageId}`;
+}
+
 /** Project Discovery href — optional package query preserved for journey handoff. */
 export function projectDiscoveryHref(packageId?: string): string {
   const base = customerJourneyStepRoute("project-discovery");

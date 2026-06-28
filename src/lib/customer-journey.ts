@@ -26,22 +26,32 @@ export function resolveCustomerJourneySteps(
 ): readonly CustomerJourneyStep[] {
   if (!campaign) {
     return [
-      { id: "intake", label: "Intake Complete", state: "upcoming" },
       { id: "payment", label: "Payment Received", state: "upcoming" },
+      { id: "intake", label: "Project Details Complete", state: "upcoming" },
+      { id: "building", label: "Building Concepts", state: "upcoming" },
       { id: "review", label: "Review Concepts", state: "upcoming" },
       { id: "direction", label: "Choose Direction", state: "upcoming" },
       { id: "delivery", label: "Final Delivery", state: "upcoming" },
     ];
   }
 
-  const intakeDone = Boolean(campaign.visionSubmittedAt || campaign.intake?.submittedAt);
+  const intakeDone = Boolean(
+    campaign.projectDetailsSubmittedAt ||
+      campaign.visionSubmittedAt ||
+      campaign.intake?.submittedAt,
+  );
   const paymentDone = Boolean(campaign.paymentReceivedAt);
   const directionChosen = Boolean(campaign.selectedCampaignOption);
   const delivered = campaign.campaignStatus === "DELIVERED";
+  const buildingDone =
+    campaign.campaignStatus === "READY_FOR_REVIEW" ||
+    campaign.campaignStatus === "DELIVERED" ||
+    directionChosen;
 
   const milestones: Milestone[] = [
-    { id: "intake", label: "Intake Complete", complete: intakeDone },
     { id: "payment", label: "Payment Received", complete: paymentDone },
+    { id: "intake", label: "Project Details Complete", complete: intakeDone },
+    { id: "building", label: "Building Concepts", complete: buildingDone },
     {
       id: "review",
       label: "Review Concepts",

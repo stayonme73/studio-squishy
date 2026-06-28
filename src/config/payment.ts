@@ -1,5 +1,6 @@
 import type { StudioGuidePackageId } from "@/config/studio-guide";
-import { customerJourneyStepName, projectDiscoveryHref } from "@/config/customer-journey-v1";
+import { customerJourneyStepName } from "@/config/customer-journey-v1";
+import { projectDetailsHref } from "@/config/project-details";
 import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
 
 export const payment = {
@@ -58,7 +59,7 @@ export const payment = {
   whatsNext: {
     steps: [
       { label: "Payment received", marker: "check" },
-      { label: "Vision Intake", marker: "arrow" },
+      { label: "Project Details", marker: "arrow" },
       { label: "Creative Production Begins", marker: "arrow" },
       { label: "First Concepts (Within 7 Business Days)", marker: "arrow" },
       { label: "Review Room", marker: "arrow" },
@@ -66,7 +67,9 @@ export const payment = {
     ] as const,
   },
   secureNote:
-    "Payment is securely encrypted. Work begins after payment and completion of your Vision Intake.",
+    "Payment is securely encrypted. After payment, you'll share the details and materials we need to complete your approved Studio Plan.",
+  intakeExplanation:
+    "After payment, you'll share the details and materials we need to complete your approved Studio Plan.",
   routes: {
     studioBoard: "/studio-board",
     studioGuide: "/studio-guide-prototype",
@@ -99,7 +102,7 @@ export function paymentWorkflowStepIcon(state: PaymentWorkflowStepState): string
 }
 
 export function paymentIntakeHref(packageId: StudioGuidePackageId): string {
-  return projectDiscoveryHref(packageId);
+  return projectDetailsHref(packageId);
 }
 
 const PACKAGE_IDS = ["spark", "momentum", "growth"] as const;

@@ -1,7 +1,12 @@
 import Link from "next/link";
 
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
-import { getPackageIncludes, getPackageRevisionRounds } from "@/config/studio-guide";
+import {
+  campaignHasApprovedStudioPlan,
+  resolveCampaignPlanIncludes,
+  resolveCampaignPlanLabel,
+  resolveCampaignRevisionRounds,
+} from "@/lib/approved-plan-display";
 import { helpCenterHref } from "@/config/help-center";
 
 const { packageSummary: copy } = studioBoard;
@@ -23,15 +28,17 @@ export default function PackageSummaryPanel({ campaign }: Props) {
     );
   }
 
-  const includes = getPackageIncludes(campaign.packageId);
-  const revisions = getPackageRevisionRounds(campaign.packageId);
+  const includes = resolveCampaignPlanIncludes(campaign);
+  const revisions = resolveCampaignRevisionRounds(campaign);
+  const planLabel = resolveCampaignPlanLabel(campaign);
+  const showCompareLink = !campaignHasApprovedStudioPlan(campaign);
 
   return (
     <section className="sb-package-summary" aria-labelledby="sb-package-summary-title">
       <p id="sb-package-summary-title" className="sb-card__tab">
         {copy.heading}
       </p>
-      <p className="sb-package-summary__package">{campaign.packageLabel}</p>
+      <p className="sb-package-summary__package">{planLabel}</p>
       <ul className="sb-package-summary__list">
         {includes.map((item) => (
           <li key={item} className="sb-package-summary__item">
@@ -48,9 +55,11 @@ export default function PackageSummaryPanel({ campaign }: Props) {
           {copy.revisionLine(revisions)}
         </li>
       </ul>
-      <Link href={helpCenterHref("packages", "studio-board")} className="sb-package-summary__link">
-        {copy.compareLink} →
-      </Link>
+      {showCompareLink ? (
+        <Link href={helpCenterHref("packages", "studio-board")} className="sb-package-summary__link">
+          {copy.compareLink} →
+        </Link>
+      ) : null}
     </section>
   );
 }
