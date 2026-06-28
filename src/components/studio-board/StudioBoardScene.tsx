@@ -365,15 +365,22 @@ export default function StudioBoardScene() {
                       value={view.campaignProgressLabel}
                     />
                   ) : null}
-                  <CampaignMetric
-                    label={currentCampaignCopy.campaignsRemaining}
-                    value={account.campaignsRemaining}
-                  />
-                  <CampaignMetric
-                    label={currentCampaignCopy.emailsRemaining}
-                    value={account.emailsRemaining}
-                  />
-                  <CampaignMetric label={currentCampaignCopy.smsRemaining} value={account.smsRemaining} />
+                  {!campaign?.approvedStudioPlan ? (
+                    <>
+                      <CampaignMetric
+                        label={currentCampaignCopy.campaignsRemaining}
+                        value={account.campaignsRemaining}
+                      />
+                      <CampaignMetric
+                        label={currentCampaignCopy.emailsRemaining}
+                        value={account.emailsRemaining}
+                      />
+                      <CampaignMetric
+                        label={currentCampaignCopy.smsRemaining}
+                        value={account.smsRemaining}
+                      />
+                    </>
+                  ) : null}
                   <CampaignMetric
                     label={currentCampaignCopy.revisionsRemaining}
                     value={account.revisionsRemaining}
