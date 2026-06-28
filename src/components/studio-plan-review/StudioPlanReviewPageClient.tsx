@@ -12,7 +12,7 @@ import {
   readCurrentCampaignHydrated,
   saveApprovedStudioPlan,
 } from "@/lib/studio-board-campaign";
-import { recommendFromDiscovery } from "@/recommendation";
+import { recommendFromDiscovery, getRecommendedServiceIds } from "@/recommendation";
 import {
   addServiceToPlan,
   buildStudioPlanReview,
@@ -37,7 +37,7 @@ export default function StudioPlanReviewPageClient() {
   );
 
   const [planState, setPlanState] = useState<StudioPlanState>(() =>
-    initialPlanState(recommendation.recommendations.map((entry) => entry.serviceId)),
+    initialPlanState(getRecommendedServiceIds(recommendation)),
   );
 
   const model = useMemo(

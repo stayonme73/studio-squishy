@@ -1669,7 +1669,7 @@ const V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
   v2Service({
     id: "ma-001",
     familyId: "marketing_assets",
-    name: "Marketing Asset Pack",
+    name: "Promotion Pack",
     category: "marketing-assets",
     serviceClass: "essential",
     billingType: "one_time",

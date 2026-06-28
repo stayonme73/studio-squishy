@@ -4,11 +4,16 @@ import { DISCOVERY_SPLIT_PREVIEW_LABELS } from "@/project-summary";
 
 type Props = {
   serviceNames: readonly string[];
+  considerNextNames?: readonly string[];
   onContinue: () => void;
 };
 
 /** Discovery split-panel preview — service list + CTA only; full detail on Project Summary. */
-export default function DiscoverySummaryPlaceholder({ serviceNames, onContinue }: Props) {
+export default function DiscoverySummaryPlaceholder({
+  serviceNames,
+  considerNextNames = [],
+  onContinue,
+}: Props) {
   const labels = DISCOVERY_SPLIT_PREVIEW_LABELS;
 
   return (
@@ -42,6 +47,22 @@ export default function DiscoverySummaryPlaceholder({ serviceNames, onContinue }
             </p>
           )}
         </section>
+
+        {considerNextNames.length > 0 ? (
+          <section
+            className="bds-summary-panel__section"
+            aria-labelledby="bds-split-preview-consider"
+          >
+            <h3 id="bds-split-preview-consider" className="bds-summary-panel__section-title">
+              {labels.considerNextTitle}
+            </h3>
+            <ul className="bds-summary-panel__service-list bds-summary-panel__service-list--consider">
+              {considerNextNames.map((name) => (
+                <li key={name}>{name}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         <section
           className="bds-summary-panel__section"

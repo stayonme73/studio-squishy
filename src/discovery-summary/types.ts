@@ -28,6 +28,8 @@ export type DiscoverySummaryServiceItem = {
   timelineLabel: string;
 };
 
+export type DiscoverySummaryConsiderNextItem = DiscoverySummaryServiceItem;
+
 export type DiscoverySummaryTotalInvestment = {
   display: string;
   amountUsd: number;
@@ -63,6 +65,7 @@ export type DiscoverySummaryWarning = {
  */
 export type DiscoverySummaryModel = {
   recommendedServices: readonly DiscoverySummaryServiceItem[];
+  considerNextServices: readonly DiscoverySummaryConsiderNextItem[];
   additionalStudioServices: readonly DiscoverySummaryServiceItem[];
   sectionLabels: CustomerSectionLabels;
   primaryServiceId: ServiceId | null;

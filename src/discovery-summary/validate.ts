@@ -28,6 +28,12 @@ export function validateDiscoverySummaryModel(model: DiscoverySummaryModel): voi
     );
   }
 
+  if (!Array.isArray(model.considerNextServices)) {
+    throw new DiscoverySummaryValidationError(
+      "Discovery summary model must include considerNextServices.",
+    );
+  }
+
   if (!model.sectionLabels?.includedRecommendations?.trim()) {
     throw new DiscoverySummaryValidationError(
       "Discovery summary model must include sectionLabels.",

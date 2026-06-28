@@ -131,6 +131,55 @@ export default function StudioPlanReviewScene({
         )}
       </section>
 
+      {model.considerNextServices.length > 0 ? (
+        <section className="utility-card spr-section" aria-labelledby="spr-consider-title">
+          <h2 id="spr-consider-title" className="utility-card__title">
+            {model.labels.considerNext}
+          </h2>
+          <ul className="spr-menu__list">
+            {model.considerNextServices.map((service) => (
+              <li key={service.serviceId} className="spr-menu__item">
+                <div className="spr-menu__info">
+                  <p className="spr-menu__title">
+                    {onOpenServiceGuide ? (
+                      <button
+                        type="button"
+                        className="spr-menu__title-btn"
+                        onClick={() => onOpenServiceGuide(service.serviceId)}
+                      >
+                        {service.title}
+                      </button>
+                    ) : (
+                      service.title
+                    )}
+                  </p>
+                  <p className="spr-menu__price">{service.pricingDisplay}</p>
+                  <p className="spr-menu__explanation">{service.explanation}</p>
+                </div>
+                <div className="spr-menu__actions">
+                  {onOpenServiceGuide ? (
+                    <button
+                      type="button"
+                      className="spr-menu__btn spr-menu__btn--details"
+                      onClick={() => onOpenServiceGuide(service.serviceId)}
+                    >
+                      {model.labels.viewDetails}
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="utility-btn utility-btn--primary spr-menu__btn spr-menu__btn--add"
+                    onClick={() => onAdd(service.serviceId)}
+                  >
+                    {model.labels.addService}
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {model.additionalStudioServices.length > 0 ? (
         <section className="utility-card spr-section" aria-labelledby="spr-additional-title">
           <h2 id="spr-additional-title" className="utility-card__title">

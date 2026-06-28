@@ -60,6 +60,9 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   const [splitLayoutSettled, setSplitLayoutSettled] = useState(false);
   const [rightPanelPhase, setRightPanelPhase] = useState<PanelPhase | null>(null);
   const [discoveryPreviewServices, setDiscoveryPreviewServices] = useState<readonly string[]>([]);
+  const [discoveryConsiderNextServices, setDiscoveryConsiderNextServices] = useState<
+    readonly string[]
+  >([]);
 
   const {
     src,
@@ -187,6 +190,9 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
       submitDiscoveryCampaign(finalAnswers);
       const { summary } = runDiscoveryRecommendation(finalAnswers);
       setDiscoveryPreviewServices(summary.recommendedServices.map((service) => service.title));
+      setDiscoveryConsiderNextServices(
+        summary.considerNextServices.map((service) => service.title),
+      );
       beginShrink();
       setSplitLayoutActive(true);
       setRightPanelPhase("reviewing");
@@ -361,6 +367,7 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
             ) : rightPanelPhase === "summary" ? (
               <DiscoverySummaryPlaceholder
                 serviceNames={discoveryPreviewServices}
+                considerNextNames={discoveryConsiderNextServices}
                 onContinue={continueToProjectSummary}
               />
             ) : null}

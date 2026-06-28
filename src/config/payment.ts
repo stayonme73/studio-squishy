@@ -23,7 +23,7 @@ export const payment = {
     monthlySubtotalLabel: "Monthly Subtotal",
     amountDueTodayLabel: "Amount Due Today",
     cardProcessingDisclosureNote:
-      "A credit-card processing fee may apply. Any applicable fee and your final total are shown before payment.",
+      "A credit-card processing fee may apply. Any applicable fee and your final total will be shown before payment.",
     investmentLabel: "Estimated Investment",
     monthlyTotalLabel: "Monthly Total",
     includesLabel: "Includes:",

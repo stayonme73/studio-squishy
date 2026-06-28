@@ -6,6 +6,7 @@ import { getDerivedServicePricing, getServiceById } from "@/catalog/accessors";
 import { validateExecutionAddOnsInPlan } from "@/catalog/validate";
 import { SERVICE_CATALOG } from "@/catalog/services";
 import type { ServiceId } from "@/catalog/types";
+import { buildCustomerWhyExplanation } from "@/discovery-summary/recommendation-copy";
 import { computePlanPricingTotals, formatUsdFromCents } from "@/lib/plan-pricing";
 import type { RecommendationResult } from "@/recommendation/types";
 import {
@@ -16,6 +17,7 @@ import {
 } from "@/studio-plan-review/planState";
 import {
   STUDIO_PLAN_REVIEW_LABELS,
+  type StudioPlanReviewConsiderNextItem,
   type StudioPlanReviewCostSummary,
   type StudioPlanReviewModel,
   type StudioPlanReviewPlanTotals,
@@ -104,6 +106,37 @@ function buildWarnings(result: RecommendationResult): string[] {
     .filter((message): message is string => Boolean(message));
 }
 
+function buildConsiderNextItem(
+  recommendation: RecommendationResult["considerNextRecommendations"][number],
+  brief: RecommendationResult["brief"],
+  selectedIds: readonly ServiceId[],
+): StudioPlanReviewConsiderNextItem | null {
+  const service = getServiceById(recommendation.serviceId);
+  if (!service) return null;
+
+  const pricing = getDerivedServicePricing(recommendation.serviceId);
+  const customerDescription = service.customerDescription ?? service.customerReceives ?? "";
+  const explanation =
+    buildCustomerWhyExplanation(recommendation.serviceId, brief, customerDescription) ||
+    service.name;
+
+  return {
+    serviceId: recommendation.serviceId,
+    title: service.name,
+    pricingDisplay: pricing?.display ?? formatUsd(0),
+    amountUsd: pricing?.amountUsd ?? 0,
+    isIncluded: false,
+    explanation,
+    swapCandidates: getSameClassSwapCandidates(recommendation.serviceId, selectedIds)
+      .map((candidateId) => {
+        const candidate = getServiceById(candidateId);
+        if (!candidate) return null;
+        return { serviceId: candidateId, title: candidate.name };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null),
+  };
+}
+
 /**
  * Transform recommendation output and current plan state into a StudioPlanReviewModel.
  */
@@ -112,19 +145,30 @@ export function buildStudioPlanReview(
   planState: StudioPlanState,
 ): StudioPlanReviewModel {
   const recommendedServiceIds = result.recommendations.map((entry) => entry.serviceId);
+  const considerNextIds = new Set(
+    result.considerNextRecommendations.map((entry) => entry.serviceId),
+  );
   const recommendedSet = new Set(recommendedServiceIds);
   const selectedIds = planState.selectedServiceIds;
 
   // Customer-facing grouping: all recommended services stay "Included" regardless of
   // internal production allocation. Only client-added services appear as additional.
   const displayIncludedIds = selectedIds.filter((id) => recommendedSet.has(id));
-  const manuallyAddedIds = selectedIds.filter((id) => !recommendedSet.has(id));
+  const manuallyAddedIds = selectedIds.filter(
+    (id) => !recommendedSet.has(id) && !considerNextIds.has(id),
+  );
 
   const includedServices = mapServiceIds(displayIncludedIds, true, selectedIds);
+  const considerNextServices = result.considerNextRecommendations
+    .filter((entry) => !selectedIds.includes(entry.serviceId))
+    .map((entry) => buildConsiderNextItem(entry, result.brief, selectedIds))
+    .filter((item): item is StudioPlanReviewConsiderNextItem => item !== null);
   const additionalStudioServices = mapServiceIds(manuallyAddedIds, false, selectedIds);
   const addedToPlanServices: StudioPlanReviewServiceItem[] = [];
   const availableToAdd = mapServiceIds(
-    getAvailableServicesToAdd(planState.selectedServiceIds),
+    getAvailableServicesToAdd(planState.selectedServiceIds).filter(
+      (serviceId) => !considerNextIds.has(serviceId),
+    ),
     false,
     planState.selectedServiceIds,
   );
@@ -147,6 +191,7 @@ export function buildStudioPlanReview(
     selectedServiceIds: planState.selectedServiceIds,
     recommendedServiceIds,
     includedServices,
+    considerNextServices,
     additionalStudioServices,
     addedToPlanServices,
     availableToAdd,

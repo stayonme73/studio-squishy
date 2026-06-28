@@ -50,24 +50,37 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
     expect(ids.every((id) => !getServiceById(id)?.isExecutionAddOn)).toBe(true);
   });
 
-  it("starting fresh with email tools → includes em-001", () => {
-    const ids = recommendedIds(
-      answersFor({
-        "your-current-tools": "Email list or email platform",
-      }),
+  it("starting fresh with email tools → em-001 in consider next, not auto-selected", () => {
+    const result = recommendFromDiscovery(
+      buildDiscoveryBrief(
+        answersFor({
+          "your-current-tools": "Email list or email platform",
+        }),
+      ),
     );
-    expect(ids).toEqual(expect.arrayContaining([...DEFAULT_FOUNDATION_IDS, "em-001"]));
-    expect(ids).toHaveLength(4);
+    const ids = result.recommendations.map((entry) => entry.serviceId);
+    const considerNextIds = result.considerNextRecommendations.map((entry) => entry.serviceId);
+
+    expect(ids).toEqual([...DEFAULT_FOUNDATION_IDS]);
+    expect(considerNextIds).toContain("em-001");
+    expect(ids).not.toContain("em-001");
   });
 
-  it("all scored recommendations visible in summary — not hidden in additional", () => {
-    const { recommendation, summary } = runDiscoveryRecommendation(answersFor({}));
+  it("all scored recommendations visible in summary — consider next separate from recommended", () => {
+    const { recommendation, summary } = runDiscoveryRecommendation(
+      answersFor({ "your-current-tools": "Email list or email platform" }),
+    );
     const engineIds = recommendation.recommendations.map((entry) => entry.serviceId);
     const summaryIds = summary.recommendedServices.map((service) => service.serviceId);
+    const considerNextIds = summary.considerNextServices.map((service) => service.serviceId);
 
     expect(summaryIds).toEqual(engineIds);
+    expect(considerNextIds).toEqual(
+      recommendation.considerNextRecommendations.map((entry) => entry.serviceId),
+    );
     expect(summary.additionalStudioServices).toHaveLength(0);
-    expect(engineIds.length).toBeGreaterThan(1);
+    expect(engineIds).toHaveLength(3);
+    expect(considerNextIds.length).toBeGreaterThan(0);
   });
 
   it("timeline derives from catalog windows for one-time foundation services", () => {
@@ -196,6 +209,7 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
     const plan = buildStudioPlanReview(recommendation, planState);
     expect(plan.selectedServiceIds).toEqual(recommendedIds);
     expect(plan.includedServices.map((service) => service.serviceId)).toEqual(recommendedIds);
+    expect(plan.considerNextServices.map((service) => service.serviceId)).toEqual([]);
     expect(plan.additionalStudioServices).toHaveLength(0);
     expect(plan.addedToPlanServices).toHaveLength(0);
     expect(plan.additionalCost.amountUsd).toBe(0);
@@ -215,11 +229,11 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
     }
   });
 
-  it("email tools Why? copy uses natural language for Email Campaign Build", () => {
+  it("email tools Why? copy uses natural language for Email Campaign Build in consider next", () => {
     const { summary } = runDiscoveryRecommendation(
       answersFor({ "your-current-tools": "Email list or email platform" }),
     );
-    const email = summary.recommendedServices.find((service) => service.serviceId === "em-001");
+    const email = summary.considerNextServices.find((service) => service.serviceId === "em-001");
     expect(email?.explanation).toBe(
       "Email gives you a direct way to reach customers with updates, offers, or announcements.",
     );
@@ -230,7 +244,9 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
     const { summary, recommendation } = runDiscoveryRecommendation(
       answersFor({ "your-current-tools": "Email list or email platform" }),
     );
-    expect(recommendation.recommendations.map((entry) => entry.serviceId)).toContain("em-001");
+    expect(recommendation.considerNextRecommendations.map((entry) => entry.serviceId)).toContain(
+      "em-001",
+    );
     expect(summary.warnings.some((warning) => warning.kind === "requires-client-access")).toBe(
       false,
     );

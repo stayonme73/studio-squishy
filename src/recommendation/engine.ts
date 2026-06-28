@@ -44,10 +44,14 @@ export const RECOMMENDATION_ENGINE_VERSION = "1.2.0";
 
 const DEFAULT_RULE_WEIGHT = 1;
 const LOW_CONFIDENCE_MAX_SCORE = 1;
-/** Starting-fresh default — always recommended when situation is Starting fresh. */
-const DEFAULT_FOUNDATION_SERVICE_IDS: readonly ServiceId[] = ["bf-001", "sm-001", "ma-001"];
-/** Green SKUs recommended only when Discovery signals support them. */
-const CONDITIONAL_GREEN_SERVICE_IDS: readonly ServiceId[] = [
+/** Starting-fresh default — auto-selected foundation trio. */
+export const STARTING_FRESH_FOUNDATION_SERVICE_IDS: readonly ServiceId[] = [
+  "bf-001",
+  "sm-001",
+  "ma-001",
+];
+/** Green SKUs surfaced as Consider next for starting fresh — not auto-selected. */
+export const STARTING_FRESH_CONSIDER_NEXT_SERVICE_IDS: readonly ServiceId[] = [
   "em-001",
   "em-001-monthly",
   "cc-001",
@@ -153,19 +157,20 @@ function compareRecommendations(
 }
 
 function isDefaultFoundationServiceId(serviceId: ServiceId): boolean {
-  return DEFAULT_FOUNDATION_SERVICE_IDS.includes(serviceId);
+  return STARTING_FRESH_FOUNDATION_SERVICE_IDS.includes(serviceId);
+}
+
+function isStartingFreshConsiderNextServiceId(serviceId: ServiceId): boolean {
+  return STARTING_FRESH_CONSIDER_NEXT_SERVICE_IDS.includes(serviceId);
 }
 
 function isStartingFreshEligibleServiceId(serviceId: ServiceId): boolean {
-  return (
-    isDefaultFoundationServiceId(serviceId) ||
-    CONDITIONAL_GREEN_SERVICE_IDS.includes(serviceId)
-  );
+  return isDefaultFoundationServiceId(serviceId) || isStartingFreshConsiderNextServiceId(serviceId);
 }
 
 function foundationSortIndex(serviceId: ServiceId): number {
-  const index = DEFAULT_FOUNDATION_SERVICE_IDS.indexOf(serviceId);
-  return index === -1 ? DEFAULT_FOUNDATION_SERVICE_IDS.length : index;
+  const index = STARTING_FRESH_FOUNDATION_SERVICE_IDS.indexOf(serviceId);
+  return index === -1 ? STARTING_FRESH_FOUNDATION_SERVICE_IDS.length : index;
 }
 
 function compareWithFoundationPriority(a: ScoredService, b: ScoredService): number {
@@ -473,7 +478,7 @@ function applyFoundationFallback(
   const byId = new Map(scored.map((entry) => [entry.serviceId, entry]));
   const poolById = new Map(scoringPool.map((service) => [service.id, service]));
 
-  for (const serviceId of DEFAULT_FOUNDATION_SERVICE_IDS) {
+  for (const serviceId of STARTING_FRESH_FOUNDATION_SERVICE_IDS) {
     const service = poolById.get(serviceId);
     if (!service) continue;
 
@@ -506,15 +511,23 @@ function buildMaterialsAndAccessWarnings(
   services: readonly ServiceCatalogEntry[],
 ): RecommendationWarning[] {
   const warnings: RecommendationWarning[] = [];
+  const materialsServices = services.filter((service) => service.requiresClientMaterials);
+
+  if (materialsServices.length === 1) {
+    warnings.push({
+      kind: "requires-client-materials",
+      message: `"${materialsServices[0].name}" requires client-provided materials before production can begin.`,
+      serviceId: materialsServices[0].id,
+    });
+  } else if (materialsServices.length > 1) {
+    warnings.push({
+      kind: "requires-client-materials",
+      message:
+        "Selected services may require client-provided materials before production can begin.",
+    });
+  }
 
   for (const service of services) {
-    if (service.requiresClientMaterials) {
-      warnings.push({
-        kind: "requires-client-materials",
-        message: `"${service.name}" requires client-provided materials before production can begin.`,
-        serviceId: service.id,
-      });
-    }
     if (service.requiresClientAccess && service.isExecutionAddOn) {
       warnings.push({
         kind: "requires-client-access",
@@ -595,16 +608,28 @@ export function recommendFromDiscovery(
     scored = scored.filter((entry) => isStartingFreshEligibleServiceId(entry.serviceId));
   }
 
-  const recommendations = toServiceRecommendations(scored);
-  const { included, additional } = applyProductionAllocation(scored);
+  let primaryScored = scored;
+  let considerNextScored: ScoredService[] = [];
+
+  if (briefIndicatesStartingFresh(brief)) {
+    primaryScored = scored
+      .filter((entry) => isDefaultFoundationServiceId(entry.serviceId))
+      .sort(compareWithFoundationPriority);
+    considerNextScored = scored.filter((entry) =>
+      isStartingFreshConsiderNextServiceId(entry.serviceId),
+    );
+  }
+
+  const recommendations = toServiceRecommendations(primaryScored);
+  const considerNextRecommendations = toServiceRecommendations(considerNextScored);
+  const { included, additional } = applyProductionAllocation(primaryScored);
   const includedRecommendations = toServiceRecommendations(included);
   const additionalStudioServices = toServiceRecommendations(additional);
 
-  const allRecommendedEntries = scored.map((entry) => entry.service);
   const includedServiceEntries = included.map((entry) => entry.service);
   const primaryServiceId = includedRecommendations[0]?.serviceId ?? null;
   const estimatedInvestment = buildEstimatedInvestment(includedServiceEntries);
-  const estimatedTimeline = buildEstimatedTimeline(allRecommendedEntries);
+  const estimatedTimeline = buildEstimatedTimeline(includedServiceEntries);
   const warnings = buildWarnings(brief, recommendations, includedServiceEntries, fullCatalog);
 
   return {
@@ -612,9 +637,10 @@ export function recommendFromDiscovery(
     recommendations,
     includedRecommendations,
     additionalStudioServices,
+    considerNextRecommendations,
     primaryServiceId,
     rationale: buildRationale(recommendations),
-    deliverablesSummary: buildDeliverablesSummary(allRecommendedEntries),
+    deliverablesSummary: buildDeliverablesSummary(includedServiceEntries),
     estimatedInvestment,
     estimatedTimeline,
     warnings,

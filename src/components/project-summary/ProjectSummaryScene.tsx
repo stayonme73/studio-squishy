@@ -64,6 +64,31 @@ function RecommendedServiceRow({
   );
 }
 
+function ConsiderNextServiceRow({
+  service,
+  onAdd,
+}: {
+  service: DiscoverySummaryServiceItem;
+  onAdd: (serviceId: ServiceId) => void;
+}) {
+  return (
+    <li className="ps-recommend__service-row ps-recommend__service-row--consider">
+      <span className="ps-recommend__service-name">{service.title}</span>
+      <div className="ps-recommend__service-why">
+        <span className="ps-recommend__why-label">{PROJECT_SUMMARY_LABELS.recommendWhyLabel}</span>
+        <p className="ps-recommend__why-body">{service.explanation}</p>
+      </div>
+      <button
+        type="button"
+        className="utility-btn utility-btn--ghost ps-consider__add"
+        onClick={() => onAdd(service.serviceId)}
+      >
+        Add to Plan
+      </button>
+    </li>
+  );
+}
+
 function RecommendedServiceFromSummary({ service }: { service: DiscoverySummaryServiceItem }) {
   return (
     <RecommendedServiceRow name={service.title} why={service.explanation} />
@@ -179,6 +204,19 @@ export default function ProjectSummaryScene({
                 {PROJECT_SUMMARY_LABELS.recommendTimelineLabel}
               </span>
               <p className="ps-recommend__timeline-body">{summary.estimatedTimeline.customerLabel}</p>
+            </div>
+          ) : null}
+          {summary.considerNextServices.length > 0 ? (
+            <div className="ps-recommend__consider">
+              <h3 className="ps-recommend__consider-title">
+                {PROJECT_SUMMARY_LABELS.considerNextTitle}
+              </h3>
+              <p className="ps-recommend__consider-lead">{PROJECT_SUMMARY_LABELS.considerNextLead}</p>
+              <ul className="ps-recommend__service-list ps-recommend__service-list--consider">
+                {summary.considerNextServices.map((service) => (
+                  <ConsiderNextServiceRow key={service.serviceId} service={service} onAdd={onAdd} />
+                ))}
+              </ul>
             </div>
           ) : null}
         </section>

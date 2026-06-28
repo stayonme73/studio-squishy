@@ -32,7 +32,7 @@ export {
   RECOMMENDATION_ENGINE_VERSION,
 } from "@/recommendation/engine";
 
-export { getRecommendedServiceIds } from "@/recommendation/selectors";
+export { getRecommendedServiceIds, getConsiderNextServiceIds } from "@/recommendation/selectors";
 
 export {
   DiscoveryBriefValidationError,

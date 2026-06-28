@@ -28,6 +28,7 @@ function mockRecommendation(
     additionalStudioServices: additional.map((serviceId, index) =>
       toRec(serviceId, included.length + index + 1),
     ),
+    considerNextRecommendations: [],
     primaryServiceId: included[0] ?? null,
     rationale: { summary: "Test", matchedSignals: [] },
     deliverablesSummary: [],
@@ -65,29 +66,22 @@ describe("buildDiscoverySummary — active catalog pricing", () => {
     expect(() => validateDiscoverySummaryModel(summary)).not.toThrow();
   });
 
-  it("totals match plan-pricing for all recommended services", () => {
+  it("totals match plan-pricing for auto-selected services only", () => {
     const included = ["bf-001", "sm-001-monthly"] as ServiceId[];
-    const all = [...included, "cc-001"] as ServiceId[];
+    const considerNext = ["cc-001"] as ServiceId[];
     const result = mockRecommendation(included, []);
-    result.recommendations = all.map((serviceId, index) => ({
+    result.considerNextRecommendations = considerNext.map((serviceId, index) => ({
       serviceId,
       score: 1,
       matchedRules: [],
       reasons: [],
       rank: index + 1,
     }));
-    result.includedRecommendations = included.map((serviceId, index) => ({
-      serviceId,
-      score: 1,
-      matchedRules: [],
-      reasons: [],
-      rank: index + 1,
-    }));
-    result.additionalStudioServices = [];
     const summary = buildDiscoverySummary(result);
-    const totals = computePlanPricingTotals(all);
+    const totals = computePlanPricingTotals(included);
 
-    expect(summary.recommendedServices.map((s) => s.serviceId)).toEqual(all);
+    expect(summary.recommendedServices.map((s) => s.serviceId)).toEqual(included);
+    expect(summary.considerNextServices.map((s) => s.serviceId)).toEqual(considerNext);
     expect(summary.totalInvestment.oneTimeSubtotalDisplay).toBe(
       formatUsdFromCents(totals.oneTimeSubtotalCents),
     );
@@ -117,11 +111,12 @@ describe("buildDiscoverySummary — active catalog pricing", () => {
     expect(summary.recommendedServices[0].investment.display).not.toContain("Quoted");
     expect(summary.totalInvestment.hasQuotedItems).toBe(false);
 
-    const allIds = recommendation.recommendations.map((entry) => entry.serviceId);
-    const totals = computePlanPricingTotals(allIds);
+    const autoSelectedIds = recommendation.recommendations.map((entry) => entry.serviceId);
+    const totals = computePlanPricingTotals(autoSelectedIds);
     expect(summary.totalInvestment.amountDueTodayDisplay).toBe(
       formatUsdFromCents(totals.amountDueTodayCents),
     );
+    expect(summary.totalInvestment.amountDueTodayDisplay).toBe("$1,385");
   });
 
   it("starting fresh Why? copy is plain language without service IDs or rule traces", () => {

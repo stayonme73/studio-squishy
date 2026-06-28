@@ -7,6 +7,7 @@
 
 export type {
   DiscoverySummaryDeliverable,
+  DiscoverySummaryConsiderNextItem,
   DiscoverySummaryInvestment,
   DiscoverySummaryModel,
   DiscoverySummaryNextStep,

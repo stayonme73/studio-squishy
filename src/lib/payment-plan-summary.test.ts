@@ -32,6 +32,7 @@ function mockRecommendation(serviceIds: ServiceId[]): RecommendationResult {
     })),
     includedRecommendations: [],
     additionalStudioServices: [],
+    considerNextRecommendations: [],
     primaryServiceId: serviceIds[0] ?? null,
     rationale: { summary: "Test", matchedSignals: [] },
     deliverablesSummary: [],
@@ -85,7 +86,7 @@ describe("plan-pricing", () => {
 describe("card processing disclosure", () => {
   it("exposes the card processing disclosure note in payment config", () => {
     expect(payment.summary.cardProcessingDisclosureNote).toBe(
-      "A credit-card processing fee may apply. Any applicable fee and your final total are shown before payment.",
+      "A credit-card processing fee may apply. Any applicable fee and your final total will be shown before payment.",
     );
   });
 });

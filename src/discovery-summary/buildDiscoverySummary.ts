@@ -179,7 +179,6 @@ function buildServiceItem(
 export function buildDiscoverySummary(result: RecommendationResult): DiscoverySummaryModel {
   const deliverablesByServiceId = indexByServiceId(result.deliverablesSummary);
   const timelineByServiceId = indexByServiceId(result.estimatedTimeline.items);
-  const allRecommendedServiceIds = result.recommendations.map((entry) => entry.serviceId);
 
   const mapRecommendations = (
     recommendations: RecommendationResult["recommendations"],
@@ -189,18 +188,22 @@ export function buildDiscoverySummary(result: RecommendationResult): DiscoverySu
     );
 
   const recommendedServices = mapRecommendations(result.recommendations);
+  const considerNextServices = mapRecommendations(result.considerNextRecommendations);
   const additionalStudioServices: DiscoverySummaryServiceItem[] = [];
 
   const warnings = result.warnings
     .map(mapWarning)
     .filter((warning): warning is DiscoverySummaryWarning => warning !== null);
 
+  const autoSelectedServiceIds = result.recommendations.map((entry) => entry.serviceId);
+
   return {
     recommendedServices,
+    considerNextServices,
     additionalStudioServices,
     sectionLabels: CUSTOMER_SECTION_LABELS,
     primaryServiceId: result.primaryServiceId,
-    totalInvestment: buildTotalInvestment(allRecommendedServiceIds),
+    totalInvestment: buildTotalInvestment(autoSelectedServiceIds),
     estimatedTimeline: buildTimelineSummary(result.estimatedTimeline),
     nextStep: buildNextStep(result),
     warnings,

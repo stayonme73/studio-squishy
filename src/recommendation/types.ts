@@ -133,6 +133,11 @@ export type RecommendationResult = {
   includedRecommendations: readonly ServiceRecommendation[];
   /** Scored services beyond included limits — available as paid add-ons. */
   additionalStudioServices: readonly ServiceRecommendation[];
+  /**
+   * Starting-fresh conditional greens — surfaced as "Consider next", not auto-selected.
+   * Empty for non-starting-fresh briefs.
+   */
+  considerNextRecommendations: readonly ServiceRecommendation[];
   /** Highest-ranked included service with a positive score, if any. */
   primaryServiceId: ServiceId | null;
   rationale: RecommendationRationale;

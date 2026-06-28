@@ -19,6 +19,7 @@ export const DISCOVERY_SPLIT_PREVIEW_LABELS = {
   introBody:
     "We've reviewed your Discovery and prepared a personalized Studio Plan based on what you shared.",
   servicesTitle: "Recommended Services",
+  considerNextTitle: "Consider next",
   nextStepTitle: "Next Step",
   nextStepLead: "Review your complete Studio Plan to:",
   nextStepBullets: [
@@ -44,6 +45,8 @@ export const PROJECT_SUMMARY_LABELS = {
   recommendLead: "Based on what you shared, we recommend starting with:",
   recommendWhyLabel: "Why?",
   recommendTimelineLabel: "Estimated timeline",
+  considerNextTitle: "Consider next",
+  considerNextLead: "Based on your answers, these may be worth adding when you are ready:",
   packagesTitle: "Prefer a bundled option?",
   packagesLead:
     "Studio Bundles are fixed offerings — contents cannot be added, removed, or customized. Choose one below, or customize your personalized Studio Plan instead.",
