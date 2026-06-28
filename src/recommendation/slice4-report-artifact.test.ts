@@ -12,11 +12,11 @@ import type { DiscoveryAnswers } from "@/lib/business-discovery-session";
 const STARTING_FRESH: DiscoveryAnswers = {
   "your-business": "Test Co",
   "your-situation": "Starting fresh",
-  "your-challenge": "Lack of clarity or direction",
+  "your-challenge": "I am not sure what to say about my business",
   "your-current-tools": "None yet / starting from scratch",
-  "your-focus": "Marketing & growth",
-  "success-looks-like": "More leads or customers, Launching something new",
-  "whats-slowing-you-down": "Low visibility or reach",
+  "your-focus": "Promote an offer, event, or launch",
+  "success-looks-like": "A successful launch, event, sale, or promotion",
+  "whats-slowing-you-down": "I am not visible enough online",
 };
 
 describe("Slice 4 closeout report artifact", () => {
@@ -30,18 +30,20 @@ describe("Slice 4 closeout report artifact", () => {
     const mixedResult = recommendFromDiscovery(
       buildDiscoveryBrief({
         ...STARTING_FRESH,
-        "your-situation": "Growing an existing business",
-        "your-challenge": "Marketing and visibility",
-        "your-focus": "Content & creative",
-        "success-looks-like": "Saving time on marketing, Better engagement online",
-        "whats-slowing-you-down": "Limited time or resources, Low visibility or reach",
+        "your-situation": "Trying to stay visible more consistently",
+        "your-challenge": "I need help promoting something",
+        "your-focus": "Create social media content",
+        "success-looks-like":
+          "Spending less time creating and posting marketing, More consistent social media visibility",
+        "whats-slowing-you-down":
+          "I do not have time to create or post content, I am not visible enough online",
       }),
     );
 
     const techResult = recommendFromDiscovery(
       buildDiscoveryBrief({
         ...STARTING_FRESH,
-        "your-challenge": "Technology and tools",
+        "your-challenge": "My business does not look polished or consistent",
       }),
     );
 

@@ -105,11 +105,11 @@ describe("buildDiscoverySummary — active catalog pricing", () => {
     const { summary, recommendation } = runDiscoveryRecommendation({
       "your-business": "Acme Coffee Co.",
       "your-situation": "Starting fresh",
-      "your-challenge": "Lack of clarity or direction",
+      "your-challenge": "I am not sure what to say about my business",
       "your-current-tools": "None yet / starting from scratch",
-      "your-focus": "Marketing & growth",
-      "success-looks-like": "More leads or customers, Launching something new",
-      "whats-slowing-you-down": "Low visibility or reach",
+      "your-focus": "Promote an offer, event, or launch",
+      "success-looks-like": "A successful launch, event, sale, or promotion",
+      "whats-slowing-you-down": "I am not visible enough online",
     });
 
     expect(recommendation.includedRecommendations.length).toBeGreaterThan(0);
@@ -128,11 +128,11 @@ describe("buildDiscoverySummary — active catalog pricing", () => {
     const { summary } = runDiscoveryRecommendation({
       "your-business": "Acme Coffee Co.",
       "your-situation": "Starting fresh",
-      "your-challenge": "Lack of clarity or direction",
+      "your-challenge": "I am not sure what to say about my business",
       "your-current-tools": "None yet / starting from scratch",
-      "your-focus": "Marketing & growth",
-      "success-looks-like": "More leads or customers, Launching something new",
-      "whats-slowing-you-down": "Low visibility or reach",
+      "your-focus": "Promote an offer, event, or launch",
+      "success-looks-like": "A successful launch, event, sale, or promotion",
+      "whats-slowing-you-down": "I am not visible enough online",
     });
 
     for (const service of summary.recommendedServices) {

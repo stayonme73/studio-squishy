@@ -147,37 +147,37 @@ const DM_SITUATION_STARTING: DiscoveryMappingRule = {
 };
 const DM_SITUATION_GROWING: DiscoveryMappingRule = {
   signal: "situation",
-  value: "Growing an existing business",
+  value: "Trying to stay visible more consistently",
   weight: 1,
 };
 const DM_SITUATION_PIVOTING: DiscoveryMappingRule = {
   signal: "situation",
-  value: "Pivoting or rebranding",
+  value: "Refreshing how my business looks",
   weight: 2,
 };
 const DM_SITUATION_SCALING: DiscoveryMappingRule = {
   signal: "situation",
-  value: "Scaling operations",
+  value: "Promoting an offer, event, sale, or launch",
   weight: 2,
 };
 const DM_CHALLENGE_CLARITY: DiscoveryMappingRule = {
   signal: "challenge",
-  value: "Lack of clarity or direction",
+  value: "I am not sure what to say about my business",
   weight: 2,
 };
 const DM_CHALLENGE_VISIBILITY: DiscoveryMappingRule = {
   signal: "challenge",
-  value: "Marketing and visibility",
+  value: "I need help promoting something",
   weight: 2,
 };
 const DM_CHALLENGE_OPS: DiscoveryMappingRule = {
   signal: "challenge",
-  value: "Operations and efficiency",
+  value: "I do not have time to create marketing content",
   weight: 1,
 };
 const DM_CHALLENGE_TEAM: DiscoveryMappingRule = {
   signal: "challenge",
-  value: "Team and hiring",
+  value: "I am not showing up consistently online",
   weight: 1,
 };
 const DM_NEED_CUSTOMERS: DiscoveryMappingRule = {
@@ -265,7 +265,7 @@ const DM_FOCUS_CONSISTENT: DiscoveryMappingRule = {
 };
 const DM_CHALLENGE_TECHNOLOGY: DiscoveryMappingRule = {
   signal: "challenge",
-  value: "Technology and tools",
+  value: "My business does not look polished or consistent",
   weight: 2,
 };
 const DM_TOOLS_NONE: DiscoveryMappingRule = {
@@ -276,7 +276,7 @@ const DM_TOOLS_NONE: DiscoveryMappingRule = {
 };
 const DM_TOOLS_OUTDATED: DiscoveryMappingRule = {
   signal: "tools",
-  value: "Outdated tools or technology",
+  value: "My branding looks inconsistent",
   tileId: "whats-slowing-you-down",
   weight: 2,
 };
@@ -288,7 +288,7 @@ const DM_FOCUS_ONGOING: DiscoveryMappingRule = {
 };
 const DM_TOOLS_EMAIL: DiscoveryMappingRule = {
   signal: "tools",
-  value: "Email marketing",
+  value: "Email list or email platform",
   tileId: "your-current-tools",
   weight: 3,
 };
@@ -300,19 +300,19 @@ const DM_TOOLS_CRM: DiscoveryMappingRule = {
 };
 const DM_SUCCESS_ENGAGEMENT: DiscoveryMappingRule = {
   signal: "tools",
-  value: "Better engagement online",
+  value: "More consistent social media visibility",
   tileId: "success-looks-like",
   weight: 2,
 };
 const DM_SUCCESS_SAVING_TIME: DiscoveryMappingRule = {
   signal: "tools",
-  value: "Saving time on marketing",
+  value: "Spending less time creating and posting marketing",
   tileId: "success-looks-like",
   weight: 2,
 };
 const DM_SLOWING_INCONSISTENT: DiscoveryMappingRule = {
   signal: "tools",
-  value: "Inconsistent messaging",
+  value: "My branding looks inconsistent",
   tileId: "whats-slowing-you-down",
   weight: 2,
 };

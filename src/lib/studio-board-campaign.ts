@@ -3,6 +3,7 @@ import { EMPTY_DRAFT_INTAKE_FORM } from "@/config/draft-room";
 import { getPackageRevisionRounds, getStudioGuidePackage, type StudioGuidePackageId, type DeliverableQuotaId } from "@/config/studio-guide";
 import { clearDiscoveryAnswers, type DiscoveryAnswers } from "@/lib/business-discovery-session";
 import { discoveryBriefFromAnswers } from "@/lib/discovery-brief";
+import { businessNameFromAnswer } from "@/lib/business-discovery-completion";
 import { readLastDraftIntake } from "@/lib/draft-intake";
 import { ensureCampaignConceptsOnRecord } from "@/lib/campaign-concepts";
 import {
@@ -245,7 +246,7 @@ export function createCampaignFromDiscovery(answers: DiscoveryAnswers): Campaign
   const content = studioBoard.statusContent.DISCOVERY_COMPLETE;
   const now = new Date().toISOString();
   const brief = discoveryBriefFromAnswers(answers);
-  const businessName = brief.answers["your-business"]?.trim();
+  const businessName = businessNameFromAnswer(brief.answers["your-business"]);
   const defaultPackageId = studioBoard.membership.packageId;
   const pkg = getStudioGuidePackage(defaultPackageId);
 

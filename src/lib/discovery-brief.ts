@@ -8,41 +8,42 @@ import { parseMultiselect } from "@/lib/business-discovery-completion";
 import type { DiscoveryBrief, DiscoveryBriefAnswers } from "@/recommendation/types";
 
 const SUCCESS_NEED_MAP: Readonly<Record<string, readonly StudioNeedId[]>> = {
-  "More leads or customers": ["get-more-customers"],
-  "Stronger brand recognition": ["better-branding"],
-  "Better engagement online": ["create-content", "better-customer-experience"],
-  "Streamlined operations": ["better-business-systems", "workflow-improvements"],
-  "Increased revenue": ["get-more-customers"],
-  "Launching something new": ["get-more-customers", "better-branding"],
-  "Saving time on marketing": ["workflow-improvements", "create-content"],
+  "A stronger, more polished brand presence": ["better-branding"],
+  "More consistent social media visibility": ["create-content", "better-customer-experience"],
+  "A successful launch, event, sale, or promotion": ["get-more-customers", "better-branding"],
+  "Better-looking promotional materials": ["create-content", "better-branding"],
+  "Reaching customers by email": ["improve-communication"],
+  "Spending less time creating and posting marketing": ["workflow-improvements", "create-content"],
 };
 
 const SLOWING_NEED_MAP: Readonly<Record<string, readonly StudioNeedId[]>> = {
-  "Lack of clarity or direction": ["better-branding"],
-  "Limited time or resources": ["workflow-improvements"],
-  "Outdated tools or technology": ["better-business-systems"],
-  "Inconsistent messaging": ["better-branding", "improve-communication"],
-  "Low visibility or reach": ["get-more-customers", "create-content"],
-  "Team capacity gaps": ["workflow-improvements", "better-business-systems"],
-  "Budget constraints": [],
+  "I do not have time to create or post content": ["workflow-improvements"],
+  "My branding looks inconsistent": ["better-branding", "improve-communication"],
+  "I am unclear on what to promote or say": ["better-branding"],
+  "I do not have enough marketing materials": ["create-content"],
+  "I am not visible enough online": ["get-more-customers", "create-content"],
+  "I have a limited marketing budget": [],
 };
 
 const FOCUS_NEED_MAP: Readonly<Record<string, readonly StudioNeedId[]>> = {
-  "Brand & identity": ["better-branding"],
-  "Marketing & growth": ["get-more-customers"],
-  "Operations & systems": ["better-business-systems", "workflow-improvements"],
-  "Customer experience": ["better-customer-experience", "improve-communication"],
-  "Content & creative": ["create-content"],
-  "Sales & conversion": ["get-more-customers", "improve-communication"],
+  "Refresh my brand look": ["better-branding"],
+  "Create social media content": ["create-content"],
+  "Promote an offer, event, or launch": ["get-more-customers"],
+  "Reach customers by email": ["improve-communication"],
+  "Get polished promotional graphics": ["create-content", "better-branding"],
+  "Save time on marketing": ["workflow-improvements", "create-content"],
 };
 
 const TOOLS_NEED_MAP: Readonly<Record<string, readonly StudioNeedId[]>> = {
-  "Email marketing": ["improve-communication"],
-  "CRM (HubSpot, Salesforce, etc.)": ["better-customer-experience"],
+  "Email list or email platform": ["improve-communication"],
 };
 
-const RECURRING_SUCCESS_OPTIONS = new Set(["Saving time on marketing"]);
-const RECURRING_SLOWING_OPTIONS = new Set(["Limited time or resources"]);
+const RECURRING_SUCCESS_OPTIONS = new Set([
+  "Spending less time creating and posting marketing",
+]);
+const RECURRING_SLOWING_OPTIONS = new Set([
+  "I do not have time to create or post content",
+]);
 
 function toBriefAnswers(answers: DiscoveryAnswers): DiscoveryBriefAnswers {
   const briefAnswers: DiscoveryBriefAnswers = {};

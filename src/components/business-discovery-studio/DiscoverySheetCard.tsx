@@ -3,6 +3,10 @@
 import { useEffect, useId, useState, type FormEvent } from "react";
 
 import type { DiscoveryTileConfig, DiscoveryTileId } from "@/config/business-discovery-studio";
+import {
+  formatBusinessTileAnswer,
+  parseBusinessTileAnswer,
+} from "@/lib/business-discovery-completion";
 
 type Props = {
   tileId: DiscoveryTileId;
@@ -101,6 +105,12 @@ export default function DiscoverySheetCard({
   expanded = true,
 }: Props) {
   const [value, setValue] = useState(initialValue);
+  const [businessName, setBusinessName] = useState(() =>
+    config.secondaryQuestion ? parseBusinessTileAnswer(initialValue).name : initialValue,
+  );
+  const [businessOffer, setBusinessOffer] = useState(() =>
+    config.secondaryQuestion ? parseBusinessTileAnswer(initialValue).offer : "",
+  );
   const [multiselect, setMultiselect] = useState<string[]>(() =>
     config.fieldType === "multiselect" && config.options
       ? parseMultiselect(initialValue, config.options)
@@ -116,11 +126,17 @@ export default function DiscoverySheetCard({
       : { selected: [], otherSelected: false, otherText: "" },
   );
   const questionId = useId();
+  const secondaryQuestionId = useId();
   const otherInputId = useId();
   const otherLabel = config.otherLabel ?? DEFAULT_OTHER_LABEL;
 
   useEffect(() => {
     setValue(initialValue);
+    if (config.secondaryQuestion) {
+      const parsed = parseBusinessTileAnswer(initialValue);
+      setBusinessName(parsed.name);
+      setBusinessOffer(parsed.offer);
+    }
     if (config.fieldType === "multiselect" && config.options) {
       setMultiselect(parseMultiselect(initialValue, config.options));
     }
@@ -133,15 +149,31 @@ export default function DiscoverySheetCard({
         ),
       );
     }
-  }, [initialValue, config.title, config.fieldType, config.options, config.otherLabel]);
+  }, [initialValue, config.title, config.fieldType, config.options, config.otherLabel, config.secondaryQuestion]);
 
   const emitChange = (next: string) => {
     setValue(next);
     onChange(next);
   };
 
+  const emitBusinessChange = (name: string, offer: string) => {
+    const next = formatBusinessTileAnswer(name, offer);
+    setValue(next);
+    onChange(next);
+  };
+
   const handleTextChange = (next: string) => {
     emitChange(next);
+  };
+
+  const handleBusinessNameChange = (name: string) => {
+    setBusinessName(name);
+    emitBusinessChange(name, businessOffer);
+  };
+
+  const handleBusinessOfferChange = (offer: string) => {
+    setBusinessOffer(offer);
+    emitBusinessChange(businessName, offer);
   };
 
   const handleSelectChip = (option: string) => {
@@ -212,7 +244,9 @@ export default function DiscoverySheetCard({
             ? !isMultiselectValid(multiselect)
             : config.fieldType === "multiselect-other"
               ? !isMultiselectOtherValid(multiselectOther)
-              : !value.trim();
+              : config.fieldType === "text" && config.secondaryQuestion
+                ? !businessName.trim() || !businessOffer.trim()
+                : !value.trim();
 
   return (
     <form
@@ -236,7 +270,32 @@ export default function DiscoverySheetCard({
         ) : null}
 
         <div className="bds-sheet__body">
-          {config.fieldType === "text" && (
+          {config.fieldType === "text" && config.secondaryQuestion && (
+            <>
+              <input
+                id={questionId}
+                className="bds-sheet__input"
+                type="text"
+                value={businessName}
+                onChange={(event) => handleBusinessNameChange(event.target.value)}
+                placeholder={config.placeholder}
+                autoFocus={expanded}
+              />
+              <label className="bds-sheet__question" htmlFor={secondaryQuestionId}>
+                {config.secondaryQuestion}
+              </label>
+              <input
+                id={secondaryQuestionId}
+                className="bds-sheet__input"
+                type="text"
+                value={businessOffer}
+                onChange={(event) => handleBusinessOfferChange(event.target.value)}
+                placeholder={config.secondaryPlaceholder}
+              />
+            </>
+          )}
+
+          {config.fieldType === "text" && !config.secondaryQuestion && (
             <input
               id={questionId}
               className="bds-sheet__input"

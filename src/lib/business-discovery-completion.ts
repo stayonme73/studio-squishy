@@ -5,6 +5,28 @@ import {
 
 const DEFAULT_OTHER_LABEL = "Other";
 
+/** Separates business name and offer description in the your-business tile value. */
+export const BUSINESS_OFFER_DELIMITER = "\n---\n";
+
+export function parseBusinessTileAnswer(raw: string): { name: string; offer: string } {
+  const value = raw.trim();
+  if (!value) return { name: "", offer: "" };
+  const idx = value.indexOf(BUSINESS_OFFER_DELIMITER);
+  if (idx === -1) return { name: value, offer: "" };
+  return {
+    name: value.slice(0, idx).trim(),
+    offer: value.slice(idx + BUSINESS_OFFER_DELIMITER.length).trim(),
+  };
+}
+
+export function formatBusinessTileAnswer(name: string, offer: string): string {
+  return `${name.trim()}${BUSINESS_OFFER_DELIMITER}${offer.trim()}`;
+}
+
+export function businessNameFromAnswer(raw: string | undefined): string {
+  return parseBusinessTileAnswer(coerceDiscoveryAnswerValue(raw)).name;
+}
+
 export function parseMultiselect(
   value: string,
   options: readonly string[],
@@ -97,6 +119,11 @@ export function isDiscoveryTileAnswerComplete(
       return isMultiselectOtherValid(state);
     }
     case "text":
+      if (config.secondaryQuestion) {
+        const { name, offer } = parseBusinessTileAnswer(value);
+        return name.length > 0 && offer.length > 0;
+      }
+      return value.trim().length > 0;
     case "textarea":
       return value.trim().length > 0;
     default:

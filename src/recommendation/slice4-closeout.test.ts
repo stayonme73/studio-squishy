@@ -14,11 +14,11 @@ function answersFor(overrides: Partial<DiscoveryAnswers>): DiscoveryAnswers {
   return {
     "your-business": "Test Co",
     "your-situation": "Starting fresh",
-    "your-challenge": "Lack of clarity or direction",
+    "your-challenge": "I am not sure what to say about my business",
     "your-current-tools": "None yet / starting from scratch",
-    "your-focus": "Marketing & growth",
-    "success-looks-like": "More leads or customers, Launching something new",
-    "whats-slowing-you-down": "Low visibility or reach",
+    "your-focus": "Promote an offer, event, or launch",
+    "success-looks-like": "A successful launch, event, sale, or promotion",
+    "whats-slowing-you-down": "I am not visible enough online",
     ...overrides,
   };
 }
@@ -53,7 +53,7 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
   it("starting fresh with email tools → includes em-001", () => {
     const ids = recommendedIds(
       answersFor({
-        "your-current-tools": "Email marketing",
+        "your-current-tools": "Email list or email platform",
       }),
     );
     expect(ids).toEqual(expect.arrayContaining([...DEFAULT_FOUNDATION_IDS, "em-001"]));
@@ -84,11 +84,13 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
     const result = recommendFromDiscovery(
       buildDiscoveryBrief(
         answersFor({
-          "your-situation": "Growing an existing business",
-          "your-challenge": "Marketing and visibility",
-          "your-focus": "Content & creative",
-          "success-looks-like": "Saving time on marketing, Better engagement online",
-          "whats-slowing-you-down": "Limited time or resources, Low visibility or reach",
+          "your-situation": "Trying to stay visible more consistently",
+          "your-challenge": "I need help promoting something",
+          "your-focus": "Create social media content",
+          "success-looks-like":
+            "Spending less time creating and posting marketing, More consistent social media visibility",
+          "whats-slowing-you-down":
+            "I do not have time to create or post content, I am not visible enough online",
         }),
       ),
     );
@@ -103,7 +105,7 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
     const foundationResult = recommendFromDiscovery(
       buildDiscoveryBrief(
         answersFor({
-          "your-challenge": "Technology and tools",
+          "your-challenge": "My business does not look polished or consistent",
           "your-current-tools": "None yet / starting from scratch",
         }),
       ),
@@ -116,10 +118,11 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
     const outdatedResult = recommendFromDiscovery(
       buildDiscoveryBrief(
         answersFor({
-          "your-situation": "Growing an existing business",
-          "your-challenge": "Technology and tools",
-          "your-current-tools": "Website / landing page, Email marketing",
-          "whats-slowing-you-down": "Outdated tools or technology, Low visibility or reach",
+          "your-situation": "Trying to stay visible more consistently",
+          "your-challenge": "My business does not look polished or consistent",
+          "your-current-tools": "Website, Email list or email platform",
+          "whats-slowing-you-down":
+            "My branding looks inconsistent, I am not visible enough online",
         }),
       ),
     );
@@ -129,11 +132,11 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
   it("growing WITHOUT recurring signals → one-time recommendations, not monthly auto", () => {
     const ids = includedIds(
       answersFor({
-        "your-situation": "Growing an existing business",
-        "your-challenge": "Marketing and visibility",
-        "your-focus": "Marketing & growth",
-        "success-looks-like": "More leads or customers",
-        "whats-slowing-you-down": "Low visibility or reach",
+        "your-situation": "Trying to stay visible more consistently",
+        "your-challenge": "I need help promoting something",
+        "your-focus": "Promote an offer, event, or launch",
+        "success-looks-like": "A successful launch, event, sale, or promotion",
+        "whats-slowing-you-down": "I am not visible enough online",
       }),
     );
 
@@ -145,11 +148,13 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
   it("growing WITH recurring/limited time → includes monthly variants", () => {
     const ids = includedIds(
       answersFor({
-        "your-situation": "Growing an existing business",
-        "your-challenge": "Marketing and visibility",
-        "your-focus": "Content & creative",
-        "success-looks-like": "Saving time on marketing, Better engagement online",
-        "whats-slowing-you-down": "Limited time or resources, Low visibility or reach",
+        "your-situation": "Trying to stay visible more consistently",
+        "your-challenge": "I need help promoting something",
+        "your-focus": "Create social media content",
+        "success-looks-like":
+          "Spending less time creating and posting marketing, More consistent social media visibility",
+        "whats-slowing-you-down":
+          "I do not have time to create or post content, I am not visible enough online",
       }),
     );
 
@@ -212,7 +217,7 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
 
   it("email tools Why? copy uses natural language for Email Campaign Build", () => {
     const { summary } = runDiscoveryRecommendation(
-      answersFor({ "your-current-tools": "Email marketing" }),
+      answersFor({ "your-current-tools": "Email list or email platform" }),
     );
     const email = summary.recommendedServices.find((service) => service.serviceId === "em-001");
     expect(email?.explanation).toBe(
@@ -223,7 +228,7 @@ describe("recommendFromDiscovery — Slice 4 closeout", () => {
 
   it("does not surface platform access warning without execution add-on selected", () => {
     const { summary, recommendation } = runDiscoveryRecommendation(
-      answersFor({ "your-current-tools": "Email marketing" }),
+      answersFor({ "your-current-tools": "Email list or email platform" }),
     );
     expect(recommendation.recommendations.map((entry) => entry.serviceId)).toContain("em-001");
     expect(summary.warnings.some((warning) => warning.kind === "requires-client-access")).toBe(

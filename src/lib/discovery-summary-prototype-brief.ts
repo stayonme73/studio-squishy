@@ -8,8 +8,8 @@ export const prototypeDiscoveryBrief: DiscoveryBrief = {
   answers: {
     "your-business": "Acme Coffee Co.",
     "your-situation": "Starting fresh",
-    "your-challenge": "Lack of clarity or direction",
-    "your-focus": "Marketing & growth",
+    "your-challenge": "I am not sure what to say about my business",
+    "your-focus": "Promote an offer, event, or launch",
     "success-looks-like": "A clear launch plan and assets we can run this month.",
   },
   selectedNeeds: ["get-more-customers"],

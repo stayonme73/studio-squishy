@@ -10,11 +10,11 @@ import type { DiscoveryAnswers } from "@/lib/business-discovery-session";
 const BASE_ANSWERS: DiscoveryAnswers = {
   "your-business": "Test Co",
   "your-situation": "Starting fresh",
-  "your-challenge": "Lack of clarity or direction",
+  "your-challenge": "I am not sure what to say about my business",
   "your-current-tools": "None yet / starting from scratch",
-  "your-focus": "Brand & identity",
-  "success-looks-like": "Stronger brand recognition",
-  "whats-slowing-you-down": "Inconsistent messaging",
+  "your-focus": "Refresh my brand look",
+  "success-looks-like": "A stronger, more polished brand presence",
+  "whats-slowing-you-down": "My branding looks inconsistent",
 };
 
 describe("deriveSelectedNeeds", () => {
@@ -27,17 +27,17 @@ describe("deriveSelectedNeeds", () => {
   it("derives get-more-customers from success and focus tiles", () => {
     const brief = buildDiscoveryBrief({
       ...BASE_ANSWERS,
-      "your-focus": "Marketing & growth",
-      "success-looks-like": "More leads or customers",
-      "whats-slowing-you-down": "Low visibility or reach",
+      "your-focus": "Promote an offer, event, or launch",
+      "success-looks-like": "A successful launch, event, sale, or promotion",
+      "whats-slowing-you-down": "I am not visible enough online",
     });
     expect(brief.selectedNeeds).toContain("get-more-customers");
   });
 
-  it("derives improve-communication when Email marketing is selected in tools", () => {
+  it("derives improve-communication when email channel is selected in tools", () => {
     const brief = buildDiscoveryBrief({
       ...BASE_ANSWERS,
-      "your-current-tools": "Email marketing",
+      "your-current-tools": "Email list or email platform",
     });
     expect(brief.selectedNeeds).toContain("improve-communication");
   });
@@ -47,19 +47,19 @@ describe("briefIndicatesRecurringWorkload", () => {
   it("is false for growing without recurring tile signals", () => {
     const brief = buildDiscoveryBrief({
       ...BASE_ANSWERS,
-      "your-situation": "Growing an existing business",
-      "success-looks-like": "More leads or customers",
-      "whats-slowing-you-down": "Low visibility or reach",
+      "your-situation": "Trying to stay visible more consistently",
+      "success-looks-like": "A successful launch, event, sale, or promotion",
+      "whats-slowing-you-down": "I am not visible enough online",
     });
     expect(briefIndicatesRecurringWorkload(brief)).toBe(false);
   });
 
-  it("is true when saving time on marketing is selected", () => {
+  it("is true when spending less time on marketing is selected", () => {
     const brief = buildDiscoveryBrief({
       ...BASE_ANSWERS,
-      "your-situation": "Growing an existing business",
-      "success-looks-like": "Saving time on marketing",
-      "whats-slowing-you-down": "Limited time or resources",
+      "your-situation": "Trying to stay visible more consistently",
+      "success-looks-like": "Spending less time creating and posting marketing",
+      "whats-slowing-you-down": "I do not have time to create or post content",
     });
     expect(briefIndicatesRecurringWorkload(brief)).toBe(true);
   });
