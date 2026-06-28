@@ -1,5 +1,5 @@
 /**
- * Measure title text bounding boxes on discovery-studio-plate-v1.png
+ * Measure title text bounding boxes on discovery-studio-plate-v2.png
  * Run: node scripts/measure-discovery-titles.mjs
  *
  * Titles sit on the handwritten row (below icon/number, above question copy).
@@ -8,7 +8,7 @@
  */
 import sharp from "sharp";
 
-const PLATE = "public/business-discovery-studio/discovery-studio-plate-v1.png";
+const PLATE = "public/business-discovery-studio/discovery-studio-plate-v2.png";
 const BADGE_SIZE = 14;
 const BADGE_GAP = 7;
 

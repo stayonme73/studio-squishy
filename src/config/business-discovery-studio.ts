@@ -1,7 +1,7 @@
 /**
  * Business Discovery Studio — plate + invisible tile hotspots.
  * Customer-facing room name: Project Discovery (@see customer-journey-v1)
- * Plate art: public/business-discovery-studio/discovery-studio-plate-v1.png (1024×682)
+ * Plate art: public/business-discovery-studio/discovery-studio-plate-v2.png (1024×682)
  *
  * Hit rects calibrated on native plate pixels — verify alignment with ?debug=1.
  */
@@ -164,7 +164,6 @@ export const discoveryTileConfig: Record<DiscoveryTileId, DiscoveryTileConfig> =
       "I am unclear on what to promote or say",
       "I do not have enough marketing materials",
       "I am not visible enough online",
-      "I have a limited marketing budget",
     ],
   },
   "anything-else": {
@@ -353,7 +352,7 @@ export const discoveryTileGeometry = Object.fromEntries(
 ) as Record<DiscoveryTileId, DiscoveryTileDerivedGeometry>;
 
 export const businessDiscoveryStudio = {
-  src: "/business-discovery-studio/discovery-studio-plate-v1.png?v=1",
+  src: "/business-discovery-studio/discovery-studio-plate-v2.png?v=2",
   alt: `${customerJourneyStepName("project-discovery")} — drafting table workspace`,
   nativeSize: { width: 1024, height: 682 } as const,
 

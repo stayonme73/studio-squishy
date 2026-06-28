@@ -22,7 +22,6 @@ const SLOWING_NEED_MAP: Readonly<Record<string, readonly StudioNeedId[]>> = {
   "I am unclear on what to promote or say": ["better-branding"],
   "I do not have enough marketing materials": ["create-content"],
   "I am not visible enough online": ["get-more-customers", "create-content"],
-  "I have a limited marketing budget": [],
 };
 
 const FOCUS_NEED_MAP: Readonly<Record<string, readonly StudioNeedId[]>> = {

@@ -8,8 +8,17 @@ const DEFAULT_OTHER_LABEL = "Other";
 /** Separates business name and offer description in the your-business tile value. */
 export const BUSINESS_OFFER_DELIMITER = "\n---\n";
 
+/** Strip delimiter artifacts from legacy or partial stored values. */
+function sanitizeBusinessTileRaw(raw: string): string {
+  return raw
+    .replace(/\n---\n/g, BUSINESS_OFFER_DELIMITER)
+    .replace(/\n---\s*$/g, "")
+    .replace(/^\s*---\n/g, "")
+    .trim();
+}
+
 export function parseBusinessTileAnswer(raw: string): { name: string; offer: string } {
-  const value = raw.trim();
+  const value = sanitizeBusinessTileRaw(coerceDiscoveryAnswerValue(raw));
   if (!value) return { name: "", offer: "" };
   const idx = value.indexOf(BUSINESS_OFFER_DELIMITER);
   if (idx === -1) return { name: value, offer: "" };
@@ -20,7 +29,18 @@ export function parseBusinessTileAnswer(raw: string): { name: string; offer: str
 }
 
 export function formatBusinessTileAnswer(name: string, offer: string): string {
-  return `${name.trim()}${BUSINESS_OFFER_DELIMITER}${offer.trim()}`;
+  const trimmedName = name.trim();
+  const trimmedOffer = offer.trim();
+  if (!trimmedOffer) return trimmedName;
+  return `${trimmedName}${BUSINESS_OFFER_DELIMITER}${trimmedOffer}`;
+}
+
+/** Customer-facing single-line business answer — no storage delimiter. */
+export function formatBusinessTileAnswerForDisplay(raw: string): string {
+  const { name, offer } = parseBusinessTileAnswer(raw);
+  if (!name) return "";
+  if (!offer) return name;
+  return `${name} — ${offer}`;
 }
 
 export function businessNameFromAnswer(raw: string | undefined): string {

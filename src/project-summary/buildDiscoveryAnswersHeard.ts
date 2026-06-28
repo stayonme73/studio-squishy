@@ -6,6 +6,7 @@ import {
   businessDiscoveryStudio,
   DISCOVERY_FORM_TILE_IDS,
 } from "@/config/business-discovery-studio";
+import { formatBusinessTileAnswerForDisplay } from "@/lib/business-discovery-completion";
 import type { DiscoveryBriefAnswers } from "@/recommendation/types";
 import type { DiscoveryAnswerHeardItem } from "@/project-summary/types";
 
@@ -15,6 +16,9 @@ export function buildDiscoveryAnswersHeard(
 ): readonly DiscoveryAnswerHeardItem[] {
   return DISCOVERY_FORM_TILE_IDS.filter((id) => answers[id]?.trim()).map((id) => ({
     label: businessDiscoveryStudio.tileLabels[id],
-    value: answers[id]!.trim(),
+    value:
+      id === "your-business"
+        ? formatBusinessTileAnswerForDisplay(answers[id]!)
+        : answers[id]!.trim(),
   }));
 }

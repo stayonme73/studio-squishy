@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 
 import type { DiscoveryTileConfig, DiscoveryTileId } from "@/config/business-discovery-studio";
 import {
@@ -129,6 +129,17 @@ export default function DiscoverySheetCard({
   const secondaryQuestionId = useId();
   const otherInputId = useId();
   const otherLabel = config.otherLabel ?? DEFAULT_OTHER_LABEL;
+  const sanitizedOnMountRef = useRef(false);
+
+  useEffect(() => {
+    if (!config.secondaryQuestion || sanitizedOnMountRef.current) return;
+    sanitizedOnMountRef.current = true;
+    const parsed = parseBusinessTileAnswer(initialValue);
+    const cleaned = formatBusinessTileAnswer(parsed.name, parsed.offer);
+    if (cleaned !== initialValue) {
+      onChange(cleaned);
+    }
+  }, [config.secondaryQuestion, initialValue, onChange]);
 
   useEffect(() => {
     setValue(initialValue);

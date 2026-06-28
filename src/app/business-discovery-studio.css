@@ -762,29 +762,55 @@ body:has(.business-discovery-studio) {
   text-align: left;
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55);
   transition:
-    background 120ms ease,
-    border-color 120ms ease,
-    box-shadow 120ms ease;
-}
-
-.business-discovery-studio .bds-sheet__chip:hover {
-  background: rgba(255, 255, 255, 0.96);
-  border-color: color-mix(in srgb, var(--studio-denim, #2c3e50) 40%, transparent);
+    background 80ms ease,
+    border-color 80ms ease,
+    box-shadow 80ms ease,
+    transform 80ms ease;
 }
 
 .business-discovery-studio .bds-sheet__chip:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--studio-teal, #008080) 55%, white);
-  outline-offset: 1px;
+  outline-offset: 2px;
 }
 
+/* Selected = state-driven fill — must persist without hover or focus ring. */
 .business-discovery-studio .bds-sheet__chip--selected {
-  background: color-mix(in srgb, var(--studio-teal, #008080) 24%, #faf6ef);
-  border-color: color-mix(in srgb, var(--studio-teal, #008080) 58%, transparent);
+  background: color-mix(in srgb, var(--studio-teal, #008080) 58%, var(--board-family-cream, #f3ede3));
+  border-color: color-mix(in srgb, var(--studio-teal, #008080) 78%, var(--studio-denim, #2c3e50));
   box-shadow:
     inset 0 1px 2px rgba(26, 26, 26, 0.08),
-    0 0 0 1px color-mix(in srgb, var(--studio-teal, #008080) 28%, transparent);
+    inset 0 0 0 1px color-mix(in srgb, var(--studio-teal, #008080) 24%, transparent);
   color: var(--studio-matte-black, #1a1a1a);
-  font-weight: 600;
+  font-weight: 700;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .business-discovery-studio .bds-sheet__chip:not(.bds-sheet__chip--selected):hover {
+    background: rgba(255, 255, 255, 0.96);
+    border-color: color-mix(in srgb, var(--studio-denim, #2c3e50) 44%, transparent);
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.55),
+      0 0 0 1px color-mix(in srgb, var(--studio-denim, #2c3e50) 18%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .business-discovery-studio .bds-sheet__chip--selected:hover {
+    background: color-mix(in srgb, var(--studio-teal, #008080) 62%, var(--board-family-cream, #f3ede3));
+    border-color: color-mix(in srgb, var(--studio-teal, #008080) 82%, var(--studio-denim, #2c3e50));
+    box-shadow:
+      inset 0 1px 2px rgba(26, 26, 26, 0.1),
+      inset 0 0 0 1px color-mix(in srgb, var(--studio-teal, #008080) 28%, transparent);
+    transform: translateY(-1px);
+  }
+}
+
+.business-discovery-studio .bds-sheet__chip--selected:active {
+  background: color-mix(in srgb, var(--studio-teal, #008080) 68%, var(--board-family-cream, #f3ede3));
+  border-color: color-mix(in srgb, var(--studio-teal, #008080) 88%, var(--studio-denim, #2c3e50));
+  box-shadow:
+    inset 0 2px 4px rgba(26, 26, 26, 0.14),
+    inset 0 0 0 1px color-mix(in srgb, var(--studio-teal, #008080) 32%, transparent);
+  transform: scale(0.98);
 }
 
 .business-discovery-studio .bds-sheet__input--other {
