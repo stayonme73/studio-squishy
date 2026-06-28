@@ -1,5 +1,6 @@
 import type { BillingType, ServiceId } from "@/catalog/types";
 import type { ApprovedStudioPlanLineItem } from "@/config/studio-board";
+import { readProjectSummaryPlanDraft } from "@/lib/project-summary-plan-draft";
 import { readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 import {
   buildPlanLineItems,
@@ -137,11 +138,26 @@ function buildSummaryFromLineItemSnapshot(
 }
 
 /**
- * Left-panel Studio Plan summary — reads approved plan from campaign storage when present.
+ * Left-panel Studio Plan summary — pre-payment reads live draft; post-payment uses frozen approval.
  */
 export function buildPaymentPlanSummary(): PaymentPlanSummary {
   const campaign = readCurrentCampaignHydrated();
   const approved = campaign?.approvedStudioPlan;
+
+  if (campaign?.paymentReceivedAt && approved) {
+    const snapshot = buildSummaryFromLineItemSnapshot(approved);
+    if (snapshot) return snapshot;
+
+    const serviceIds = resolveApprovedServiceIds(approved);
+    if (serviceIds.length > 0) {
+      return buildSummaryFromServiceIds(serviceIds, "storage");
+    }
+  }
+
+  const draft = readProjectSummaryPlanDraft(campaign?.campaignId);
+  if (draft?.selectedServiceIds.length) {
+    return buildSummaryFromServiceIds(draft.selectedServiceIds, "storage");
+  }
 
   if (approved) {
     const snapshot = buildSummaryFromLineItemSnapshot(approved);

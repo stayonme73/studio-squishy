@@ -151,19 +151,14 @@ export function buildStudioPlanReview(
   const recommendedSet = new Set(recommendedServiceIds);
   const selectedIds = planState.selectedServiceIds;
 
-  // Customer-facing grouping: all recommended services stay "Included" regardless of
-  // internal production allocation. Only client-added services appear as additional.
-  const displayIncludedIds = selectedIds.filter((id) => recommendedSet.has(id));
-  const manuallyAddedIds = selectedIds.filter(
-    (id) => !recommendedSet.has(id) && !considerNextIds.has(id),
-  );
-
-  const includedServices = mapServiceIds(displayIncludedIds, true, selectedIds);
+  // Included Services = every service currently in the live plan (recommended, Consider Next, swapped, manual).
+  const includedServices = mapServiceIds(selectedIds, true, selectedIds);
+  const clientAddedIds = selectedIds.filter((id) => !recommendedSet.has(id));
   const considerNextServices = result.considerNextRecommendations
     .filter((entry) => !selectedIds.includes(entry.serviceId))
     .map((entry) => buildConsiderNextItem(entry, result.brief, selectedIds))
     .filter((item): item is StudioPlanReviewConsiderNextItem => item !== null);
-  const additionalStudioServices = mapServiceIds(manuallyAddedIds, false, selectedIds);
+  const additionalStudioServices: StudioPlanReviewServiceItem[] = [];
   const addedToPlanServices: StudioPlanReviewServiceItem[] = [];
   const availableToAdd = mapServiceIds(
     getAvailableServicesToAdd(planState.selectedServiceIds).filter(
@@ -195,7 +190,7 @@ export function buildStudioPlanReview(
     additionalStudioServices,
     addedToPlanServices,
     availableToAdd,
-    additionalCost: buildCostSummary(manuallyAddedIds),
+    additionalCost: buildCostSummary(clientAddedIds),
     planTotals: buildPlanTotals(planState.selectedServiceIds),
     warnings,
     canApprove: planValid,

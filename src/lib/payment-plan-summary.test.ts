@@ -17,7 +17,14 @@ import {
   saveApprovedStudioPlan,
   saveCurrentCampaign,
 } from "@/lib/studio-board-campaign";
-import { buildStudioPlanReview, initialPlanState } from "@/studio-plan-review";
+import { saveProjectSummaryPlanDraft } from "@/lib/project-summary-plan-draft";
+import {
+  addServiceToPlan,
+  buildStudioPlanReview,
+  initialPlanState,
+  removeServiceFromPlan,
+  swapServiceInPlan,
+} from "@/studio-plan-review";
 import type { RecommendationResult } from "@/recommendation/types";
 
 function mockRecommendation(serviceIds: ServiceId[]): RecommendationResult {
@@ -122,6 +129,60 @@ describe("buildPaymentPlanSummaryFromPlan", () => {
     expect(summary.amountDueTodayDisplay).toBe("$0");
     expect(summary.source).toBe("empty");
   });
+
+  it("matches planTotals after removing a one-time service", () => {
+    const recommendation = mockRecommendation(["bf-001", "em-001"] as ServiceId[]);
+    const planState = removeServiceFromPlan(initialPlanState(["bf-001", "em-001"] as ServiceId[]), "em-001");
+    const plan = buildStudioPlanReview(recommendation, planState);
+    const summary = buildPaymentPlanSummaryFromPlan(plan);
+
+    expect(summary.lineItems.map((line) => line.serviceId)).toEqual(["bf-001"]);
+    expect(summary.oneTimeSubtotalCents).toBe(plan.planTotals.oneTimeSubtotalCents);
+    expect(summary.amountDueTodayCents).toBe(plan.planTotals.amountDueTodayCents);
+    expect(summary.monthlySubtotalCents).toBe(plan.planTotals.monthlySubtotalCents);
+  });
+
+  it("matches planTotals after removing a monthly service", () => {
+    const recommendation = mockRecommendation(["bf-001", "sm-001-monthly"] as ServiceId[]);
+    const planState = removeServiceFromPlan(
+      initialPlanState(["bf-001", "sm-001-monthly"] as ServiceId[]),
+      "sm-001-monthly",
+    );
+    const plan = buildStudioPlanReview(recommendation, planState);
+    const summary = buildPaymentPlanSummaryFromPlan(plan);
+
+    expect(summary.lineItems.map((line) => line.serviceId)).toEqual(["bf-001"]);
+    expect(summary.monthlySubtotalCents).toBe(0);
+    expect(summary.amountDueTodayCents).toBe(plan.planTotals.amountDueTodayCents);
+    expect(summary.amountDueTodayCents).toBe(summary.oneTimeSubtotalCents);
+  });
+
+  it("adds monthly consider-next service to monthly subtotal only", () => {
+    const recommendation = mockRecommendation(["bf-001"] as ServiceId[]);
+    const planState = addServiceToPlan(initialPlanState(["bf-001"] as ServiceId[]), "sm-001-monthly");
+    const plan = buildStudioPlanReview(recommendation, planState);
+    const summary = buildPaymentPlanSummaryFromPlan(plan);
+
+    expect(summary.monthlySubtotalCents).toBe(plan.planTotals.monthlySubtotalCents);
+    expect(summary.monthlySubtotalCents).toBeGreaterThan(0);
+    expect(summary.amountDueTodayCents).toBe(plan.planTotals.amountDueTodayCents);
+    expect(summary.amountDueTodayCents).toBe(summary.oneTimeSubtotalCents);
+  });
+
+  it("matches planTotals after swapping a selected service", () => {
+    const recommendation = mockRecommendation(["bf-001", "sm-001"] as ServiceId[]);
+    const planState = swapServiceInPlan(
+      initialPlanState(["bf-001", "sm-001"] as ServiceId[]),
+      "sm-001",
+      "bf-002",
+    );
+    const plan = buildStudioPlanReview(recommendation, planState);
+    const summary = buildPaymentPlanSummaryFromPlan(plan);
+
+    expect(summary.lineItems.map((line) => line.serviceId)).toEqual(["bf-001", "bf-002"]);
+    expect(summary.oneTimeSubtotalCents).toBe(plan.planTotals.oneTimeSubtotalCents);
+    expect(summary.amountDueTodayCents).toBe(plan.planTotals.amountDueTodayCents);
+  });
 });
 
 function mockCampaign(): CampaignRecord {
@@ -187,5 +248,37 @@ describe("buildPaymentPlanSummary", () => {
     expect(summary.amountDueTodayCents).toBe(999);
     expect(summary.lineItems[0].priceCents).toBe(999);
     expect(summary.source).toBe("storage");
+  });
+
+  it("reads the same pre-payment draft as Project Summary embedded checkout", () => {
+    saveProjectSummaryPlanDraft(["bf-001", "sm-001-monthly"] as ServiceId[]);
+
+    const fromPlan = buildPaymentPlanSummaryFromPlan(
+      buildStudioPlanReview(mockRecommendation(["bf-001"] as ServiceId[]), {
+        selectedServiceIds: ["bf-001", "sm-001-monthly"] as ServiceId[],
+      }),
+    );
+    const fromPaymentRoute = buildPaymentPlanSummary();
+
+    expect(fromPaymentRoute.lineItems.map((line) => line.serviceId)).toEqual(
+      fromPlan.lineItems.map((line) => line.serviceId),
+    );
+    expect(fromPaymentRoute.oneTimeSubtotalCents).toBe(fromPlan.oneTimeSubtotalCents);
+    expect(fromPaymentRoute.monthlySubtotalCents).toBe(fromPlan.monthlySubtotalCents);
+    expect(fromPaymentRoute.amountDueTodayCents).toBe(fromPlan.amountDueTodayCents);
+  });
+
+  it("prefers frozen approved totals after payment over draft", () => {
+    saveProjectSummaryPlanDraft(["bf-001"] as ServiceId[]);
+    saveApprovedStudioPlan(["bf-001", "em-001"] as ServiceId[]);
+    const campaign = readCurrentCampaign()!;
+    saveCurrentCampaign({
+      ...campaign,
+      paymentReceivedAt: new Date().toISOString(),
+    });
+
+    const summary = buildPaymentPlanSummary();
+    expect(summary.lineItems.map((line) => line.serviceId)).toEqual(["bf-001", "em-001"]);
+    expect(summary.amountDueTodayCents).toBe(49500 + 32500);
   });
 });

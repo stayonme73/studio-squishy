@@ -15,6 +15,7 @@ import {
   PROJECT_SUMMARY_LABELS,
   type DiscoveryAnswerHeardItem,
 } from "@/project-summary";
+import { filterConsiderNextServices } from "@/project-summary/filterConsiderNextServices";
 
 type Props = {
   heard: readonly DiscoveryAnswerHeardItem[];
@@ -46,20 +47,47 @@ function formatHeardHighlight(item: DiscoveryAnswerHeardItem): string {
 function RecommendedServiceRow({
   name,
   why,
+  isSelected,
+  serviceId,
+  onAdd,
 }: {
   name: string;
   why: string;
+  isSelected: boolean;
+  serviceId: ServiceId;
+  onAdd: (serviceId: ServiceId) => void;
 }) {
   return (
-    <li className="ps-recommend__service-row">
-      <span className="ps-recommend__service-name" aria-hidden="true">
-        ✅
-      </span>{" "}
-      <span className="ps-recommend__service-name">{name}</span>
+    <li
+      className={
+        isSelected
+          ? "ps-recommend__service-row"
+          : "ps-recommend__service-row ps-recommend__service-row--consider"
+      }
+    >
+      {isSelected ? (
+        <>
+          <span className="ps-recommend__service-name" aria-hidden="true">
+            ✅
+          </span>{" "}
+          <span className="ps-recommend__service-name">{name}</span>
+        </>
+      ) : (
+        <span className="ps-recommend__service-name">{name}</span>
+      )}
       <div className="ps-recommend__service-why">
         <span className="ps-recommend__why-label">{PROJECT_SUMMARY_LABELS.recommendWhyLabel}</span>
         <p className="ps-recommend__why-body">{why}</p>
       </div>
+      {!isSelected ? (
+        <button
+          type="button"
+          className="utility-btn utility-btn--ghost ps-consider__add"
+          onClick={() => onAdd(serviceId)}
+        >
+          Add to Plan
+        </button>
+      ) : null}
     </li>
   );
 }
@@ -89,9 +117,23 @@ function ConsiderNextServiceRow({
   );
 }
 
-function RecommendedServiceFromSummary({ service }: { service: DiscoverySummaryServiceItem }) {
+function RecommendedServiceFromSummary({
+  service,
+  isSelected,
+  onAdd,
+}: {
+  service: DiscoverySummaryServiceItem;
+  isSelected: boolean;
+  onAdd: (serviceId: ServiceId) => void;
+}) {
   return (
-    <RecommendedServiceRow name={service.title} why={service.explanation} />
+    <RecommendedServiceRow
+      name={service.title}
+      why={service.explanation}
+      isSelected={isSelected}
+      serviceId={service.serviceId}
+      onAdd={onAdd}
+    />
   );
 }
 
@@ -169,7 +211,15 @@ export default function ProjectSummaryScene({
   onViewPlanDetails,
 }: Props) {
   const hasRecommendations = summary.recommendedServices.length > 0;
+  const selectedServiceSet = useMemo(
+    () => new Set(plan.selectedServiceIds),
+    [plan.selectedServiceIds],
+  );
   const livePlanSummary = useMemo(() => buildPaymentPlanSummaryFromPlan(plan), [plan]);
+  const visibleConsiderNext = useMemo(
+    () => filterConsiderNextServices(summary.considerNextServices, plan.selectedServiceIds),
+    [summary.considerNextServices, plan.selectedServiceIds],
+  );
 
   return (
     <div className="ps-content ps-workspace utility-content">
@@ -192,7 +242,12 @@ export default function ProjectSummaryScene({
           <ul className="ps-recommend__service-list">
             {hasRecommendations ? (
               summary.recommendedServices.map((service) => (
-                <RecommendedServiceFromSummary key={service.serviceId} service={service} />
+                <RecommendedServiceFromSummary
+                  key={service.serviceId}
+                  service={service}
+                  isSelected={selectedServiceSet.has(service.serviceId)}
+                  onAdd={onAdd}
+                />
               ))
             ) : (
               <li className="ps-muted">{PROJECT_SUMMARY_LABELS.recommendLead}</li>
@@ -206,14 +261,14 @@ export default function ProjectSummaryScene({
               <p className="ps-recommend__timeline-body">{summary.estimatedTimeline.customerLabel}</p>
             </div>
           ) : null}
-          {summary.considerNextServices.length > 0 ? (
+          {visibleConsiderNext.length > 0 ? (
             <div className="ps-recommend__consider">
               <h3 className="ps-recommend__consider-title">
                 {PROJECT_SUMMARY_LABELS.considerNextTitle}
               </h3>
               <p className="ps-recommend__consider-lead">{PROJECT_SUMMARY_LABELS.considerNextLead}</p>
               <ul className="ps-recommend__service-list ps-recommend__service-list--consider">
-                {summary.considerNextServices.map((service) => (
+                {visibleConsiderNext.map((service) => (
                   <ConsiderNextServiceRow key={service.serviceId} service={service} onAdd={onAdd} />
                 ))}
               </ul>

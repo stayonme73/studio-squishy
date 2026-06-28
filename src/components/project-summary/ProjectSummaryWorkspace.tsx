@@ -13,9 +13,14 @@ import { resolveDiscoveryBrief } from "@/lib/discovery-brief";
 import { readDiscoveryAnswers } from "@/lib/business-discovery-session";
 import { runDiscoveryRecommendation } from "@/lib/run-discovery-recommendation";
 import {
+  readProjectSummaryPlanDraft,
+  saveProjectSummaryPlanDraft,
+} from "@/lib/project-summary-plan-draft";
+import {
   readCurrentCampaignHydrated,
   saveApprovedStudioPlan,
 } from "@/lib/studio-board-campaign";
+import type { CampaignRecord } from "@/config/studio-board";
 import { buildDiscoveryAnswersHeard, PROJECT_SUMMARY_LABELS } from "@/project-summary";
 import {
   addServiceToPlan,
@@ -30,13 +35,37 @@ import type { DiscoveryBrief } from "@/recommendation/types";
 import type { ServiceId } from "@/catalog/types";
 import { buildServiceGuide } from "@/service-guide";
 
+function resolveApprovedSelectedIds(
+  campaign: CampaignRecord | null,
+): readonly ServiceId[] | undefined {
+  const approved = campaign?.approvedStudioPlan;
+  if (!approved) return undefined;
+  if (approved.selectedServiceIds?.length) {
+    return approved.selectedServiceIds;
+  }
+  const legacy = [...approved.includedServiceIds, ...approved.additionalServiceIds];
+  return legacy.length > 0 ? legacy : undefined;
+}
+
 function resolveInitialPlanState(
   recommendedServiceIds: readonly ServiceId[],
-  approvedSelectedIds: readonly ServiceId[] | undefined,
+  campaign: CampaignRecord | null,
 ): StudioPlanState {
+  const approvedSelectedIds = resolveApprovedSelectedIds(campaign);
+  const draft = readProjectSummaryPlanDraft(campaign?.campaignId);
+
+  if (campaign?.paymentReceivedAt && approvedSelectedIds?.length) {
+    return { selectedServiceIds: [...approvedSelectedIds] };
+  }
+
+  if (draft?.selectedServiceIds.length) {
+    return { selectedServiceIds: [...draft.selectedServiceIds] };
+  }
+
   if (approvedSelectedIds?.length) {
     return { selectedServiceIds: [...approvedSelectedIds] };
   }
+
   return initialPlanState(recommendedServiceIds);
 }
 
@@ -45,6 +74,7 @@ export default function ProjectSummaryWorkspace() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [brief, setBrief] = useState<DiscoveryBrief>({ answers: {} });
+  const [planInitialized, setPlanInitialized] = useState(false);
 
   useLayoutEffect(() => {
     const campaign = readCurrentCampaignHydrated();
@@ -55,15 +85,10 @@ export default function ProjectSummaryWorkspace() {
       ...sessionAnswers,
       ...resolvedBrief.answers,
     });
-    const approved = campaign?.approvedStudioPlan;
-    const approvedIds =
-      approved?.selectedServiceIds ??
-      (approved
-        ? [...approved.includedServiceIds, ...approved.additionalServiceIds]
-        : undefined);
     setPlanState(
-      resolveInitialPlanState(getRecommendedServiceIds(recommendation), approvedIds),
+      resolveInitialPlanState(getRecommendedServiceIds(recommendation), campaign),
     );
+    setPlanInitialized(true);
   }, []);
 
   useEffect(() => {
@@ -80,6 +105,13 @@ export default function ProjectSummaryWorkspace() {
   const heard = useMemo(() => buildDiscoveryAnswersHeard(brief.answers), [brief.answers]);
 
   const [planState, setPlanState] = useState<StudioPlanState>(() => initialPlanState([]));
+  const campaignId = readCurrentCampaignHydrated()?.campaignId;
+
+  useEffect(() => {
+    if (!planInitialized) return;
+    saveProjectSummaryPlanDraft(planState.selectedServiceIds, campaignId);
+  }, [planInitialized, planState, campaignId]);
+
   const [serviceGuideOpen, setServiceGuideOpen] = useState(false);
   const [activeGuideServiceId, setActiveGuideServiceId] = useState<ServiceId | null>(null);
 

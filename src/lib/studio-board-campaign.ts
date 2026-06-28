@@ -31,6 +31,7 @@ import { allocateSelectedServices, computeAdditionalCostUsd } from "@/studio-pla
 import type { ServiceId } from "@/catalog/types";
 import type { ProjectDetailsRecord } from "@/config/project-details";
 import { clearProjectDetailsDraft } from "@/lib/project-details-session";
+import { clearProjectSummaryPlanDraft } from "@/lib/project-summary-plan-draft";
 
 const { statusContent } = studioBoard;
 
@@ -351,6 +352,10 @@ export function submitProjectDetails(
   return persistCampaign(updated);
 }
 
+function clearPrePaymentPlanDraft(campaign: CampaignRecord | null) {
+  clearProjectSummaryPlanDraft(campaign?.campaignId);
+}
+
 export function markPaymentReceived(
   packageId?: StudioGuidePackageId,
 ): CampaignRecord | null {
@@ -383,6 +388,7 @@ export function markPaymentReceived(
     updated = pushStudioNote(updated, "Payment received.");
   }
 
+  clearPrePaymentPlanDraft(campaign);
   return persistCampaign(updated);
 }
 
@@ -429,8 +435,11 @@ export function completeCampaignReviewIfReady(): CampaignRecord | null {
 /** Dev/testing — clear saved campaign, draft intake, and discovery answers from this browser. */
 export function clearCampaignState() {
   if (typeof window === "undefined") return;
+  const campaignId = readCurrentCampaign()?.campaignId;
   window.localStorage.removeItem(CAMPAIGN_KEY);
   window.localStorage.removeItem(DRAFT_KEY);
+  clearProjectSummaryPlanDraft(campaignId);
+  clearProjectSummaryPlanDraft();
   clearDiscoveryAnswers();
   dispatchCampaignUpdated();
 }
