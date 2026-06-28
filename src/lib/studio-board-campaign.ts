@@ -38,6 +38,7 @@ import type { ServiceId } from "@/catalog/types";
 import type { ProjectDetailsRecord } from "@/config/project-details";
 import { clearProjectDetailsDraft } from "@/lib/project-details-session";
 import { clearProjectSummaryPlanDraft } from "@/lib/project-summary-plan-draft";
+import { syncCampaignToServer } from "@/lib/campaign-store/sync-client";
 
 const { statusContent } = studioBoard;
 
@@ -84,6 +85,7 @@ function enterBuildingConcepts(campaign: CampaignRecord): CampaignRecord {
 function persistCampaign(campaign: CampaignRecord): CampaignRecord {
   saveCurrentCampaign(campaign);
   dispatchCampaignUpdated();
+  void syncCampaignToServer(campaign);
   return campaign;
 }
 
@@ -374,6 +376,7 @@ export function markPaymentReceived(
     const created = createCampaignFromPayment(packageId);
     saveCurrentCampaign(created);
     dispatchCampaignUpdated();
+    void syncCampaignToServer(created);
     return created;
   }
 

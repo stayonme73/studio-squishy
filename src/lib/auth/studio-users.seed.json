@@ -1,0 +1,9 @@
+[
+  {
+    "id": "tagia",
+    "email": "tagia@local.dev",
+    "password": "dev-only",
+    "displayName": "Tagia",
+    "roles": ["owner", "client"]
+  }
+]
