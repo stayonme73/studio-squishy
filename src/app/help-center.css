@@ -1,6 +1,7 @@
-/* Studio Help Center — reference desk content styles */
-
-/* Page shell, header, cards, buttons: utility-design-system.css */
+/* Help Center — lobby backdrop scene; cards use shared utility tokens */
+.hc-grid .utility-card {
+  background: var(--studio-utility-card-surface-bright, #ffffff);
+}
 
 .hc-toc {
   max-width: var(--utility-content-max);

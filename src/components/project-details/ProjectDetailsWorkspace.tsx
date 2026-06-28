@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import ProjectDetailsPrefillPanel from "@/components/project-details/ProjectDetailsPrefillPanel";
 import ProjectDetailsWizard from "@/components/project-details/ProjectDetailsWizard";
 import StudioUtilityBackdrop from "@/components/shared/StudioUtilityBackdrop";
-import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import { projectDetails, resolveApprovedGreenServiceIds, type ProjectDetailsFormValues, type ProjectDetailsUploadedFile } from "@/config/project-details";
 import { studioBoard } from "@/config/studio-board";
@@ -58,8 +57,8 @@ export default function ProjectDetailsWorkspace() {
   if (!ready || !campaign) return null;
 
   return (
-    <div className={`project-details-page ${utilityPageFontClassName}`}>
-      <div className="project-details-header-band">
+    <div className={`project-details-page studio-utility-scene studio-utility-scene--header-band ${utilityPageFontClassName}`}>
+      <div className="studio-utility-header-band project-details-header-band">
         <UtilityPageHeader
           backHref={studioBoard.routes.studioBoard}
           backLabel="← Studio Board"
@@ -70,22 +69,23 @@ export default function ProjectDetailsWorkspace() {
         />
       </div>
 
-      <StudioUtilityBackdrop placement="below-header" />
-
-      <UtilityPageFrame navId="payment">
-        <div className="pd-workspace utility-content">
-          <ProjectDetailsPrefillPanel prefill={prefill} />
-          <ProjectDetailsWizard
-            campaignId={campaign.campaignId}
-            serviceIds={serviceIds}
-            approvedStudioPlan={campaign.approvedStudioPlan}
-            initialForm={draft?.form}
-            initialFiles={draft?.files}
-            onSubmit={handleSubmit}
-            submitting={submitting}
-          />
+      <div className="studio-utility-scene__body">
+        <StudioUtilityBackdrop placement="below-header" />
+        <div className="studio-utility-scene__content">
+          <div className="utility-page pd-workspace utility-content">
+            <ProjectDetailsPrefillPanel prefill={prefill} />
+            <ProjectDetailsWizard
+              campaignId={campaign.campaignId}
+              serviceIds={serviceIds}
+              approvedStudioPlan={campaign.approvedStudioPlan}
+              initialForm={draft?.form}
+              initialFiles={draft?.files}
+              onSubmit={handleSubmit}
+              submitting={submitting}
+            />
+          </div>
         </div>
-      </UtilityPageFrame>
+      </div>
     </div>
   );
 }

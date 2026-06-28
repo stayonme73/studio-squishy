@@ -18,10 +18,14 @@
   --studio-charcoal-muted: color-mix(in srgb, #2f3437 72%, #6b6b6b);
 
   --studio-utility-backdrop-image: url("/welcome-hall/welcome-hall-scene-v4.png?v=1");
-  --studio-utility-backdrop-blur: blur(20px) brightness(0.72) saturate(0.9);
-  /* Light charcoal veil — lobby visible, text readable (was 42%) */
-  --studio-utility-backdrop-tint: color-mix(in srgb, #2e2d2b 25%, transparent);
+  /* Left-weighted — thinking-man mural stays recognizable on the left */
+  --studio-utility-backdrop-position: 18% center;
+  --studio-utility-backdrop-blur: blur(16px) brightness(0.78) saturate(0.92);
+  /* Light charcoal veil — lobby visible, cards readable */
+  --studio-utility-backdrop-tint: color-mix(in srgb, #2e2d2b 20%, transparent);
   --studio-utility-backdrop-fallback: #3a3937;
+  --studio-utility-card-surface: #f7f4ee;
+  --studio-utility-card-surface-bright: #ffffff;
 }
 
 .journey-shell:has(.studio-utility-scene),
@@ -90,9 +94,9 @@ body:has(.studio-utility-scene) {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--studio-utility-backdrop-image) center center / cover no-repeat;
+  background: var(--studio-utility-backdrop-image) var(--studio-utility-backdrop-position) / cover no-repeat;
   filter: var(--studio-utility-backdrop-blur);
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
 .studio-utility-backdrop::after {
@@ -119,12 +123,19 @@ body:has(.studio-utility-scene) {
   text-shadow: 0 1px 8px rgba(255, 255, 255, 0.65);
 }
 
-/* Minimal card lift — background treatment only, not a card redesign */
+/* Brighter working cards over frosted lobby */
 .studio-utility-scene .utility-card {
-  border-color: color-mix(in srgb, var(--studio-ink) 18%, transparent);
+  background: var(--studio-utility-card-surface-bright);
+  border-color: color-mix(in srgb, var(--studio-charcoal) 14%, transparent);
   box-shadow:
-    0 2px 12px rgba(46, 43, 40, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.45) inset;
+    0 1px 2px rgba(47, 52, 55, 0.04),
+    0 4px 16px rgba(47, 52, 55, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.55) inset;
+}
+
+.studio-utility-scene .utility-page {
+  --utility-cream: transparent;
+  --utility-card: var(--studio-utility-card-surface-bright);
 }
 
 .studio-utility-scene .pay-paper-card {

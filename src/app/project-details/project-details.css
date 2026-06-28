@@ -13,7 +13,8 @@
   --utility-primary: var(--pd-denim);
   --utility-text: var(--pd-charcoal);
   --utility-text-muted: var(--pd-charcoal-muted);
-  --utility-card: var(--pd-ivory);
+  --utility-card: var(--studio-utility-card-surface-bright, #ffffff);
+  --utility-cream: transparent;
   --utility-border: color-mix(in srgb, var(--pd-denim) 12%, transparent);
   --utility-page-pad: clamp(0.75rem, 1.25vw, 1.25rem);
   min-height: 100dvh;
@@ -24,6 +25,9 @@
 .project-details-header-band {
   background: color-mix(in srgb, var(--pd-ivory) 96%, var(--pd-mushroom));
   border-bottom: 1px solid color-mix(in srgb, var(--pd-charcoal) 10%, transparent);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 6px 24px rgba(47, 52, 55, 0.05);
   padding: clamp(0.85rem, 2vw, 1.15rem) var(--utility-page-pad);
 }
 
@@ -33,6 +37,7 @@
   gap: var(--utility-card-gap, 1.35rem);
   align-items: start;
   padding-block: clamp(1rem, 2vw, 1.5rem);
+  background: transparent;
 }
 
 .pd-prefill__heading {

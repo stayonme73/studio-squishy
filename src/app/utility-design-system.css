@@ -64,6 +64,10 @@
   background: transparent;
 }
 
+.studio-utility-scene .utility-page {
+  background: transparent;
+}
+
 .utility-content {
   max-width: var(--utility-content-max);
   margin: 0 auto;

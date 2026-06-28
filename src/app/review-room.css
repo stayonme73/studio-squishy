@@ -1,6 +1,9 @@
-/* Review Room — concept selection layout */
+/* Review Room — concept selection layout; lobby backdrop via UtilityPageFrame */
 
-/* Page shell, header, cards, buttons: utility-design-system.css */
+.utility-page:has(.rr-options) {
+  --utility-cream: transparent;
+  --utility-card: var(--studio-utility-card-surface-bright, #ffffff);
+}
 
 .rr-options {
   --rr-teal: var(--utility-primary);

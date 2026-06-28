@@ -23,8 +23,8 @@
   --utility-primary-deep: var(--ps-denim-deep);
   --utility-text: var(--ps-charcoal);
   --utility-text-muted: var(--ps-charcoal-muted);
-  --utility-card: var(--ps-card);
-  --utility-cream: var(--ps-mushroom);
+  --utility-card: var(--ps-ivory);
+  --utility-cream: transparent;
   --utility-border: color-mix(in srgb, var(--ps-denim) 12%, transparent);
   --utility-shadow:
     0 1px 2px rgba(47, 52, 55, 0.04),

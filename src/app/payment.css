@@ -19,10 +19,11 @@
   --utility-text: var(--pay-charcoal);
   --utility-text-muted: var(--pay-charcoal-muted);
   --utility-card: var(--pay-ivory);
-  --utility-cream: var(--pay-mushroom);
+  --utility-cream: transparent;
   --utility-border: color-mix(in srgb, var(--pay-denim) 18%, transparent);
 
   padding-top: clamp(1rem, 2vw, 1.35rem);
+  background: transparent;
 }
 
 /* Header band — solid surface, lobby blur below */

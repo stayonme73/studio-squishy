@@ -18,7 +18,7 @@ export default function ReviewRoomPage() {
 
     <main
 
-      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden bg-[var(--board-family-cream)]`}
+      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden`}
 
     >
 

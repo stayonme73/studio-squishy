@@ -1,6 +1,8 @@
-/* Final Delivery — celebration page + deliverables content */
+/* Final Delivery — celebration page + deliverables content; lobby backdrop via UtilityPageFrame */
 
-/* Page shell, header, buttons: utility-design-system.css */
+.utility-page--delivery {
+  --utility-cream: transparent;
+}
 
 .utility-page {
   /* Studio candle + cat-sign palette — no pastels */
@@ -427,7 +429,7 @@
 }
 
 /* —— Margin atmosphere (chalk + script walls) —— */
-.studio-canvas:has(.utility-page--delivery) {
+.studio-utility-scene:has(.utility-page--delivery) {
   overflow-x: clip;
 }
 

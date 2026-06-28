@@ -1,6 +1,7 @@
 /**
  * Studio Utility Page Design System — approved implementation tokens.
- * @see docs/studio-utility-design-system.md
+ * @see docs/the-studio-design-system-v1.md
+ * @see docs/studio-backdrop-placement-guide.md
  */
 
 import { studioBoard } from "@/config/studio-board";
@@ -22,13 +23,13 @@ export const studioUtilityDesignSystem = {
     body: "1rem",
   },
   colors: {
-    eucalyptus: "#2e5e4e",
-    eucalyptusDeep: "#2e5e4e",
+    eucalyptus: "#456b5a",
+    eucalyptusDeep: "#3d5a4d",
     eucalyptusMuted: "#5a7a6e",
-    paperCream: "#efe8de",
+    paperCream: "#e8e2d8",
     sage: "#a7b89a",
-    terracotta: "#c85a3d",
-    charcoal: "#2b2b2b",
+    terracotta: "#d56b4d",
+    charcoal: "#2f3437",
   },
   card: {
     radius: "10px",
@@ -47,22 +48,31 @@ export const studioUtilityDesignSystem = {
     cardGap: "1rem",
   },
   assets: {
-    backdrop: "/studio-utility/studio-utility-backdrop.png",
+    backdrop: "/welcome-hall/welcome-hall-scene-v4.png",
   },
 } as const;
 
-/** Pages that receive the Studio utility backdrop per placement guide. */
+/** In-scope utility routes — blurred Studio Lobby backdrop (Priority 2). */
+const UTILITY_BACKDROP_NAV_IDS = new Set<UtilityNavId>([
+  "help-center",
+  "review-room",
+  "deliverables",
+  "payment",
+]);
+
+/** Route paths that receive the lobby backdrop (documentation / guards). */
 export const studioUtilityBackdropRoutes = new Set<string>([
-  studioBoard.routes.campaignDetails,
+  "/project-summary",
   studioBoard.routes.helpCenter,
-  studioBoard.routes.reviewRoom,
+  studioBoard.routes.feedbackStudio,
   studioBoard.routes.deliverables,
-  studioBoard.routes.pastCampaigns,
-  studioBoard.routes.account,
+  "/payment",
+  "/project-details",
+  studioBoard.routes.campaignDetails,
 ]);
 
 export function utilityPageUsesBackdrop(navId: UtilityNavId): boolean {
-  return navId !== "studio-board";
+  return UTILITY_BACKDROP_NAV_IDS.has(navId);
 }
 
 export function utilityPageUsesSecondaryNav(navId: UtilityNavId): boolean {

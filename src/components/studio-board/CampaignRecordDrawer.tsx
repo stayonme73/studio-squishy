@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import CopyCampaignBriefButton from "@/components/campaign-details/CopyCampaignBriefButton";
 import CampaignVisionSummary from "@/components/campaign-details/CampaignVisionSummary";
+import StudioUtilityBackdrop from "@/components/shared/StudioUtilityBackdrop";
 import { studioBoard } from "@/config/studio-board";
 import { resolveCampaignDetailsView } from "@/lib/campaign-details-view";
 import { draftRoomEditHref, isIntakeEditable } from "@/lib/intake-edit";
@@ -47,6 +48,7 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
 
   return (
     <div className="sb-record-drawer" role="presentation">
+      <StudioUtilityBackdrop />
       <button
         type="button"
         className="sb-record-drawer__backdrop"

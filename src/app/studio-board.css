@@ -2676,21 +2676,22 @@ body:has(.sb--v4) {
 .sb-record-drawer__backdrop {
   position: absolute;
   inset: 0;
+  z-index: 1;
   border: none;
-  background: color-mix(in srgb, var(--studio-ink) 42%, transparent);
+  background: transparent;
   cursor: pointer;
 }
 
 .sb-record-drawer__panel {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   width: min(48vw, 42rem);
   min-width: min(100%, 20rem);
   max-width: 100%;
   height: 100%;
-  background: var(--studio-paper);
+  background: var(--studio-utility-card-surface-bright, #ffffff);
   border-left: 1px solid var(--board-family-tile-border-strong);
   box-shadow: -8px 0 28px rgba(46, 43, 40, 0.12);
   outline: none;
