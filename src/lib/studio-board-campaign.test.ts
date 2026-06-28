@@ -11,6 +11,7 @@ import {
   saveCurrentCampaign,
   submitProjectDetails,
   markPaymentReceived,
+  hydrateCampaignIntake,
 } from "@/lib/studio-board-campaign";
 import { EMPTY_PROJECT_DETAILS_FORM } from "@/config/project-details";
 
@@ -181,5 +182,89 @@ describe("submitProjectDetails", () => {
     const result = markPaymentReceived("momentum");
     expect(result?.campaignStatus).toBe("PAYMENT_RECEIVED");
     expect(result?.projectDetailsSubmittedAt).toBeUndefined();
+    expect(result?.packageId).toBe("momentum");
+  });
+
+  it("markPaymentReceived does not overwrite package when approved plan exists", () => {
+    saveCurrentCampaign(
+      mockCampaign({
+        packageId: "spark",
+        packageLabel: "Spark Plan",
+        approvedStudioPlan: {
+          selectedServiceIds: ["bf-001"],
+          includedServiceIds: ["bf-001"],
+          additionalServiceIds: [],
+          additionalCostUsd: 0,
+          oneTimeTotalCents: 49500,
+          monthlyTotalCents: 0,
+          amountDueTodayCents: 49500,
+          lineItems: [],
+          approvedAt: new Date().toISOString(),
+        },
+      }),
+    );
+
+    const result = markPaymentReceived("momentum");
+    expect(result?.packageId).toBe("spark");
+    expect(result?.packageLabel).toBe("Spark Plan");
+  });
+});
+
+describe("hydrateCampaignIntake", () => {
+  const DRAFT_KEY = "studio-squishy:last-draft";
+
+  beforeEach(() => {
+    vi.stubGlobal("window", {
+      localStorage: {
+        store: {} as Record<string, string>,
+        getItem(key: string) {
+          return this.store[key] ?? null;
+        },
+        setItem(key: string, value: string) {
+          this.store[key] = value;
+        },
+        removeItem(key: string) {
+          delete this.store[key];
+        },
+      },
+      dispatchEvent: vi.fn(),
+    });
+  });
+
+  it("skips stale last-draft hydration when approved studio plan exists", () => {
+    saveCurrentCampaign(
+      mockCampaign({
+        approvedStudioPlan: {
+          selectedServiceIds: ["bf-001"],
+          includedServiceIds: ["bf-001"],
+          additionalServiceIds: [],
+          additionalCostUsd: 0,
+          oneTimeTotalCents: 49500,
+          monthlyTotalCents: 0,
+          amountDueTodayCents: 49500,
+          lineItems: [],
+          approvedAt: new Date().toISOString(),
+        },
+      }),
+    );
+
+    window.localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({
+        idea: "stale idea",
+        audience: "stale audience",
+        action: "stale action",
+        deadline: "stale deadline",
+        packageId: "momentum",
+        packageLabel: "Momentum Plan",
+        submittedAt: new Date().toISOString(),
+        project: "Stale Project",
+        business: "Stale Business",
+      }),
+    );
+
+    const result = hydrateCampaignIntake();
+    expect(result?.intake?.idea).toBeUndefined();
+    expect(result?.visionData).toBeUndefined();
   });
 });

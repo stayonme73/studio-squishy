@@ -121,8 +121,23 @@ export function resolveCampaignBillingTypeLabel(campaign: CampaignRecord): strin
   return campaign.packageId === "spark" ? copy.billingOneTime : copy.billingMonthly;
 }
 
+function parseRevisionRoundsFromRule(rule: string): number {
+  const match = rule.match(/(\d+)/);
+  return match ? Number.parseInt(match[1], 10) : 1;
+}
+
+/** Revision rounds from frozen approved-plan line items — not live catalog or package tiers. */
+export function resolveApprovedPlanRevisionRounds(approved: ApprovedStudioPlan): number {
+  if (!approved.lineItems.length) return 1;
+  return Math.min(
+    ...approved.lineItems.map((line) => parseRevisionRoundsFromRule(line.revisionRule)),
+  );
+}
+
 export function resolveCampaignRevisionRounds(campaign: CampaignRecord): number {
   if (campaign.revisionRoundsIncluded != null) return campaign.revisionRoundsIncluded;
-  if (campaign.approvedStudioPlan) return 1;
+  if (campaign.approvedStudioPlan) {
+    return resolveApprovedPlanRevisionRounds(campaign.approvedStudioPlan);
+  }
   return getPackageRevisionRounds(campaign.packageId);
 }

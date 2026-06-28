@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
-import { resolveVisionData } from "@/lib/campaign-record";
+import { hasCampaignCreativeBrief } from "@/lib/campaign-brief-source";
 import { draftRoomEditHref, isIntakeEditable } from "@/lib/intake-edit";
 
 const { campaignBrief, routes } = studioBoard;
@@ -29,7 +29,7 @@ export default function CampaignBriefActions({
   layout = "row",
   prominent = false,
 }: Props) {
-  if (!campaign || !resolveVisionData(campaign)) return null;
+  if (!campaign || !hasCampaignCreativeBrief(campaign)) return null;
 
   const editable = isIntakeEditable(campaign.campaignStatus);
   const editHref = draftRoomEditHref(campaign.packageId);

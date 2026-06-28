@@ -31,7 +31,7 @@ export default function ProjectDetailsWorkspace() {
       return;
     }
     if (current.projectDetailsSubmittedAt || isIntakeComplete(current)) {
-      router.replace(studioBoard.routes.studioBoard);
+      router.replace(studioBoard.routes.campaignDetails);
       return;
     }
     setCampaign(current);

@@ -11,7 +11,9 @@ import {
   resolveCampaignPlanIncludes,
   resolveCampaignPlanLabel,
   resolveCampaignAmountPaidDisplay,
+  resolveCampaignRevisionRounds,
 } from "@/lib/approved-plan-display";
+import { resolveRevisionTracker } from "@/lib/campaign-record";
 import { buildProjectDetailsPrefill } from "@/lib/project-details-prefill";
 import { resolveActivityFeed } from "@/lib/campaign-record";
 import { resolveCustomerJourneySteps } from "@/lib/customer-journey";
@@ -183,5 +185,19 @@ describe("Project Details + Studio Board integration", () => {
     expect(steps.find((step) => step.id === "review")?.state).toBe("upcoming");
     expect(steps.find((step) => step.id === "direction")?.state).toBe("upcoming");
     expect(steps.find((step) => step.id === "delivery")?.state).toBe("upcoming");
+  });
+
+  it("uses frozen approved plan revision terms instead of package fallback", () => {
+    const campaign = mockPaidCampaign({
+      packageId: "growth",
+      packageLabel: "Growth Plan",
+      revisionRoundsIncluded: undefined,
+    });
+
+    expect(resolveCampaignRevisionRounds(campaign)).toBe(1);
+    expect(resolveRevisionTracker(campaign).included).toBe(1);
+    expect(resolveCampaignPlanIncludes(campaign).some((item) => item.includes("Momentum"))).toBe(
+      false,
+    );
   });
 });

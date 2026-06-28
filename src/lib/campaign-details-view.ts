@@ -87,6 +87,8 @@ function resolveIntake(campaign: CampaignRecord): CampaignIntakeSnapshot | undef
 
   if (hasStored) return stored;
 
+  if (campaign.approvedStudioPlan) return stored;
+
   const draft = readLastDraftIntake();
   if (!draft) return stored;
 

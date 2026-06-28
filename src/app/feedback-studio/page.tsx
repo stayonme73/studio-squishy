@@ -9,7 +9,7 @@ import "../mobile-route-fixes.css";
 export default function FeedbackStudioPage() {
   return (
     <main
-      className={`${utilityPageFontClassName} journey-shell flex h-[100dvh] max-h-[100dvh] min-h-0 flex-1 flex-col overflow-hidden bg-[var(--utility-paper-cream)]`}
+      className={`${utilityPageFontClassName} journey-shell flex h-[100dvh] max-h-[100dvh] min-h-0 flex-1 flex-col overflow-hidden`}
     >
       <Suspense
         fallback={

@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import type { CampaignRecord } from "@/config/studio-board";
 import { studioBoard } from "@/config/studio-board";
 import {
@@ -44,19 +42,13 @@ export default function CampaignJourneyRoadmap({ campaign }: Props) {
             <StepMarker state={step.state} />
             <div className="sb-journey__copy">
               <span className="sb-journey__label">{step.label}</span>
-              {step.state === "current" && !step.actionLabel ? (
-                <span className="sb-journey__detail">In progress</span>
+          {step.state === "current" && !step.actionLabel ? (
+                <span className="sb-journey__detail">
+                  {step.id === "review" ? studioBoard.nextAction.conceptsReadyLabel : "In progress"}
+                </span>
               ) : null}
             </div>
           </div>
-          {step.state === "current" && step.actionLabel && step.actionHref ? (
-            <Link
-              href={step.actionHref}
-              className="utility-btn utility-btn--primary sb-journey__cta"
-            >
-              {step.actionLabel}
-            </Link>
-          ) : null}
         </li>
       ))}
     </ol>

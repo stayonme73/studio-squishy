@@ -212,14 +212,9 @@ function resolveProgressStepDetail(
 }
 
 function resolveProgressStepHref(
-  stageId: CampaignStatus,
-  state: CampaignProgressStepState,
+  _stageId: CampaignStatus,
+  _state: CampaignProgressStepState,
 ): string | null {
-  if (state === "upcoming") return null;
-
-  const { routes } = studioBoard;
-  if (stageId === "READY_FOR_REVIEW") return routes.feedbackStudio;
-  if (stageId === "DELIVERED") return routes.deliverables;
   return null;
 }
 
@@ -243,12 +238,6 @@ export function resolveCampaignProgressSteps(campaign: CampaignRecord | null): C
       state,
       detail: resolveProgressStepDetail(stage.id, state, campaign),
       href: resolveProgressStepHref(stage.id, state),
-      actionLabel:
-        state === "current" && stage.id === "READY_FOR_REVIEW"
-          ? studioBoard.nextAction.reviewMyConcepts
-          : state === "current" && stage.id === "DELIVERED"
-            ? studioBoard.nextAction.openFinalDelivery
-            : undefined,
     };
   });
 }

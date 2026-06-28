@@ -27,6 +27,10 @@ import {
 import { SERVICE_CATALOG } from "@/catalog/services";
 import { validateExecutionAddOnsInPlan } from "@/catalog/validate";
 import { buildServiceScopeSnapshot, computePlanPricingTotals } from "@/lib/plan-pricing";
+import {
+  resolveApprovedPlanRevisionRounds,
+  resolveCampaignRevisionRounds,
+} from "@/lib/approved-plan-display";
 import { allocateSelectedServices, computeAdditionalCostUsd } from "@/studio-plan-review";
 import type { ServiceId } from "@/catalog/types";
 import type { ProjectDetailsRecord } from "@/config/project-details";
@@ -143,6 +147,7 @@ function intakeFromDraft(draft: DraftIntakePayload): CampaignIntakeSnapshot {
 export function hydrateCampaignIntake(): CampaignRecord | null {
   const campaign = readCurrentCampaign();
   if (!campaign) return campaign;
+  if (campaign.approvedStudioPlan) return campaign;
 
   const draft = readLastDraftIntake();
   if (!draft) return campaign;
@@ -322,6 +327,7 @@ export function saveApprovedStudioPlan(
   const updated: CampaignRecord = {
     ...campaign,
     approvedStudioPlan,
+    revisionRoundsIncluded: resolveApprovedPlanRevisionRounds(approvedStudioPlan),
     updatedAt: now,
   };
 
@@ -368,17 +374,23 @@ export function markPaymentReceived(
     return created;
   }
 
-  const pkg = packageId ? getStudioGuidePackage(packageId) : null;
+  const pkg = packageId && !campaign.approvedStudioPlan ? getStudioGuidePackage(packageId) : null;
   const now = new Date().toISOString();
   let updated: CampaignRecord = {
     ...campaign,
     paymentReceivedAt: now,
-    packageId: pkg?.id ?? campaign.packageId,
-    packageLabel: pkg?.label ?? campaign.packageLabel,
-    revisionRoundsIncluded:
-      campaign.revisionRoundsIncluded ?? getPackageRevisionRounds(pkg?.id ?? campaign.packageId),
     updatedAt: now,
   };
+
+  if (!campaign.approvedStudioPlan) {
+    updated = {
+      ...updated,
+      packageId: pkg?.id ?? campaign.packageId,
+      packageLabel: pkg?.label ?? campaign.packageLabel,
+      revisionRoundsIncluded:
+        campaign.revisionRoundsIncluded ?? getPackageRevisionRounds(pkg?.id ?? campaign.packageId),
+    };
+  }
 
   if (intakeComplete(updated)) {
     updated = enterBuildingConcepts(updated);
@@ -515,8 +527,7 @@ export function recordRevisionRoundUsed(): CampaignRecord | null {
   const campaign = readCurrentCampaign();
   if (!campaign) return null;
 
-  const included =
-    campaign.revisionRoundsIncluded ?? getPackageRevisionRounds(campaign.packageId);
+  const included = resolveCampaignRevisionRounds(campaign);
   const used = campaign.revisionRoundsUsed ?? 0;
   if (used >= included) return campaign;
 

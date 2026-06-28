@@ -1,36 +1,6 @@
-import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
-
-
-import ReviewRoomScene from "@/components/review-room/ReviewRoomScene";
-
-import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
-
-import "../mobile-route-fixes.css";
-
-
-
-/** Review Room — campaign concept selection (Phase 1). */
-
+/** Review Room — compatibility redirect to Feedback Studio (canonical review surface). */
 export default function ReviewRoomPage() {
-
-  return (
-
-    <main
-
-      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden`}
-
-    >
-
-      <Suspense fallback={<div className="utility-page utility-shell utility-shell--loading" aria-busy="true" />}>
-
-        <ReviewRoomScene />
-
-      </Suspense>
-
-    </main>
-
-  );
-
+  redirect("/feedback-studio");
 }
-

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { type CSSProperties, useRef } from "react";
 
 import CampaignJourneyRoadmap from "@/components/studio-board/CampaignJourneyRoadmap";
@@ -53,18 +52,7 @@ function ProgressBody({ campaign, steps, recentUpdates }: ProgressBodyProps) {
                 key={step.id}
                 className={`sb-progress-timeline__step sb-progress-timeline__step--${step.state}`}
               >
-                {step.href ? (
-                  <Link href={step.href} className="sb-progress-timeline__link">
-                    {stepCopy}
-                  </Link>
-                ) : (
-                  stepCopy
-                )}
-                {step.state === "current" && step.actionLabel && step.href ? (
-                  <Link href={step.href} className="utility-btn utility-btn--primary sb-progress-timeline__cta">
-                    {step.actionLabel}
-                  </Link>
-                ) : null}
+                {stepCopy}
               </li>
             );
           })}

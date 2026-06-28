@@ -1,41 +1,11 @@
-import { draftRoom, type DraftIntakeFormValues } from "@/config/draft-room";
 import type { FeedbackConceptPreview } from "@/config/feedback-studio";
 import type { CampaignRecord } from "@/config/studio-board";
-import { resolveVisionData } from "@/lib/campaign-record";
+import {
+  hasCampaignCreativeBrief,
+  resolveCampaignCreativeBrief,
+  resolveConceptGenerationStamp,
+} from "@/lib/campaign-brief-source";
 import { readCurrentCampaign, saveCurrentCampaign } from "@/lib/studio-board-campaign";
-
-const { sections } = draftRoom.intakeForm;
-
-type CampaignBrief = {
-  projectName: string;
-  business: string;
-  audience: string;
-  goals: string;
-  personality: string;
-  colors: string;
-  coreMessage: string;
-  toneGuidance: string;
-  desiredOutcome: string;
-  successMetric: string;
-  avoidNotes: string;
-  inspiration: string;
-  timing: string;
-};
-
-function labelFor<T extends { id: string; label: string }>(options: readonly T[], id: string) {
-  return options.find((option) => option.id === id)?.label ?? id;
-}
-
-function joinLabels<T extends { id: string; label: string }>(
-  options: readonly T[],
-  ids: readonly string[],
-) {
-  return ids.map((id) => labelFor(options, id)).join(", ");
-}
-
-function joinParts(parts: readonly string[]) {
-  return parts.map((part) => part.trim()).filter(Boolean).join(" · ");
-}
 
 function truncate(text: string, max: number) {
   const trimmed = text.trim();
@@ -50,78 +20,12 @@ function firstPhrase(text: string, max = 72) {
   return truncate(phrase, max);
 }
 
-function extractBrief(campaign: CampaignRecord): CampaignBrief | null {
-  const vision = resolveVisionData(campaign);
-  if (!vision) return null;
-
-  const projectName =
-    campaign.campaignName.trim() ||
-    vision.project.trim() ||
-    (vision.projectStarter
-      ? joinParts([
-          labelFor(sections.project.starterChips, vision.projectStarter),
-          vision.projectDetail.trim(),
-        ])
-      : "");
-
-  if (!projectName && !vision.business.trim()) return null;
-
-  const audience = joinParts([
-    vision.audienceFit ? labelFor(sections.audience.options, vision.audienceFit) : "",
-    vision.audienceNotes.trim(),
-  ]);
-
-  const goals = joinParts([
-    vision.goalSelections.length > 0
-      ? joinLabels(sections.goal.options, vision.goalSelections)
-      : "",
-    vision.goalNotes.trim(),
-  ]);
-
-  const personality = joinParts([
-    vision.brandPersonalitySelections.length > 0
-      ? joinLabels(sections.brandPersonality.options, vision.brandPersonalitySelections)
-      : "",
-    vision.brandPersonalityNotes.trim(),
-  ]);
-
-  const colors = joinParts([
-    vision.brandHasColors === "yes" && vision.brandColorList.trim()
-      ? vision.brandColorList.trim()
-      : "",
-    vision.brandColorSelections.length > 0
-      ? joinLabels(sections.brandColors.directionOptions, vision.brandColorSelections)
-      : "",
-    vision.brandColorNotes.trim(),
-  ]);
-
-  const toneGuidance = joinParts([
-    vision.visionFeel.trim(),
-    vision.visionRemember.trim(),
-    vision.message.trim(),
-  ]);
-
-  return {
-    projectName: projectName || "Your campaign",
-    business: vision.business.trim(),
-    audience: audience || campaign.intake?.audience || "your audience",
-    goals: goals || campaign.intake?.action || "your campaign goals",
-    personality: personality || "your brand personality",
-    colors: colors || "your brand palette",
-    coreMessage: vision.message.trim() || vision.visionRemember.trim() || vision.business.trim(),
-    toneGuidance: toneGuidance || "the tone you described in intake",
-    desiredOutcome: vision.visionDesired.trim() || vision.goalNotes.trim() || goals,
-    successMetric: vision.visionSuccess.trim(),
-    avoidNotes: joinParts([vision.visionAvoid.trim(), vision.inspirationDislike.trim()]),
-    inspiration: joinParts([vision.inspirationLike.trim(), vision.inspirationDislike.trim()]),
-    timing: vision.anythingElse.trim() || campaign.intake?.deadline || "",
-  };
-}
-
 function shouldRegenerateConcepts(campaign: CampaignRecord) {
-  if (!campaign.visionSubmittedAt && !campaign.visionData) return true;
+  if (!hasCampaignCreativeBrief(campaign)) return true;
   if (!campaign.concepts || campaign.concepts.length !== 3) return true;
-  return campaign.conceptsGeneratedAt !== campaign.visionSubmittedAt;
+  const stamp = resolveConceptGenerationStamp(campaign);
+  if (!stamp) return true;
+  return campaign.conceptsGeneratedAt !== stamp;
 }
 
 function persistConcepts(
@@ -131,7 +35,7 @@ function persistConcepts(
   const updated: CampaignRecord = {
     ...campaign,
     concepts: [...concepts],
-    conceptsGeneratedAt: campaign.visionSubmittedAt ?? new Date().toISOString(),
+    conceptsGeneratedAt: resolveConceptGenerationStamp(campaign) ?? new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
   saveCurrentCampaign(updated);
@@ -145,7 +49,7 @@ function persistConcepts(
 export function generateCampaignConceptsFromBrief(
   campaign: CampaignRecord,
 ): FeedbackConceptPreview[] | null {
-  const brief = extractBrief(campaign);
+  const brief = resolveCampaignCreativeBrief(campaign);
   if (!brief) return null;
 
   const { projectName, business, audience, goals, personality, colors } = brief;
@@ -322,6 +226,5 @@ export function setCampaignConcepts(concepts: readonly FeedbackConceptPreview[])
 }
 
 export function hasCampaignBrief(campaign: CampaignRecord | null): boolean {
-  if (!campaign) return false;
-  return extractBrief(campaign) !== null;
+  return hasCampaignCreativeBrief(campaign);
 }

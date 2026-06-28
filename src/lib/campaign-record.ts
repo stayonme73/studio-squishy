@@ -2,10 +2,12 @@ import type { DraftIntakeFormValues, DraftIntakePayload } from "@/config/draft-r
 import { EMPTY_DRAFT_INTAKE_FORM } from "@/config/draft-room";
 import {
   getPackageDeliverableQuotas,
-  getPackageRevisionRounds,
   type DeliverableQuotaId,
 } from "@/config/studio-guide";
-import { resolveClientFacingServiceName } from "@/lib/approved-plan-display";
+import {
+  resolveCampaignRevisionRounds,
+  resolveClientFacingServiceName,
+} from "@/lib/approved-plan-display";
 import {
   studioBoard,
   type CampaignRecord,
@@ -66,6 +68,10 @@ export function resolveVisionData(campaign: CampaignRecord): DraftIntakeFormValu
         ...campaign.visionData,
       })
     : null;
+
+  if (campaign.approvedStudioPlan) {
+    return fromRecord;
+  }
 
   const draft = readLastDraftIntake();
   const fromDraft = draft ? visionDataFromPayload(draft) : null;
@@ -254,8 +260,7 @@ function normalizeActivityMessage(message: string): string {
 }
 
 export function resolveRevisionTracker(campaign: CampaignRecord): RevisionTrackerView {
-  const included =
-    campaign.revisionRoundsIncluded ?? getPackageRevisionRounds(campaign.packageId);
+  const included = resolveCampaignRevisionRounds(campaign);
   const used = campaign.revisionRoundsUsed ?? 0;
   return {
     included,

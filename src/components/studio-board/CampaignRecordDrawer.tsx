@@ -5,13 +5,12 @@ import { useCallback, useEffect, useRef } from "react";
 
 import CopyCampaignBriefButton from "@/components/campaign-details/CopyCampaignBriefButton";
 import CampaignVisionSummary from "@/components/campaign-details/CampaignVisionSummary";
-import StudioUtilityBackdrop from "@/components/shared/StudioUtilityBackdrop";
 import { studioBoard } from "@/config/studio-board";
 import { resolveCampaignDetailsView } from "@/lib/campaign-details-view";
 import { draftRoomEditHref, isIntakeEditable } from "@/lib/intake-edit";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 
-const { campaignRecord: copy, campaignBrief } = studioBoard;
+const { campaignRecord: copy, campaignBrief, campaignDetails: detailsCopy } = studioBoard;
 
 type Props = {
   open: boolean;
@@ -48,7 +47,6 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
 
   return (
     <div className="sb-record-drawer" role="presentation">
-      <StudioUtilityBackdrop />
       <button
         type="button"
         className="sb-record-drawer__backdrop"
@@ -97,6 +95,20 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
               {campaignBrief.lockedMessage}
             </p>
           ) : null}
+          {view.packageIncludes.length > 0 ? (
+            <div className="sb-record-drawer__studio-plan">
+              <h3 className="sb-record-drawer__section-title">
+                {campaign?.approvedStudioPlan ? view.campaignType : detailsCopy.sections.packageDetails}
+              </h3>
+              <ul className="cd-package-list">
+                {view.packageIncludes.map((item) => (
+                  <li key={item} className="cd-package-list__item">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           {view.hasProjectDetailsSummary ? (
             <div className="sb-record-drawer__project-details">
               <h3 className="sb-record-drawer__section-title">Project Details</h3>
@@ -117,9 +129,31 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
           ) : null}
           {view.hasVisionSummary ? (
             <CampaignVisionSummary sections={view.visionSummary} />
-          ) : view.hasProjectDetailsSummary ? null : (
+          ) : view.hasProjectDetailsSummary || view.packageIncludes.length > 0 ? null : (
             <p className="sb-record-drawer__empty">{copy.emptyHint}</p>
           )}
+          {view.deliverables.ready ? (
+            <div className="sb-record-drawer__deliverables">
+              <h3 className="sb-record-drawer__section-title">{detailsCopy.sections.deliverables}</h3>
+              <div className="cd-deliverables__ready">
+                {view.deliverables.message ? (
+                  <p className="cd-deliverables__message">{view.deliverables.message}</p>
+                ) : null}
+                <ul className="cd-deliverables__links">
+                  {view.deliverables.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className={link.primary ? "cd-deliverables__cta" : "cd-deliverables__link"}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ) : null}
         </div>
       </aside>
     </div>

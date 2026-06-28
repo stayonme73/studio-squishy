@@ -23,7 +23,6 @@ import {
   type GreetingPeriod,
 } from "@/lib/studio-board-view";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
-import { statusNeedsReviewAction } from "@/lib/customer-journey";
 
 const {
   sidebar,
@@ -241,9 +240,6 @@ export default function StudioBoardScene() {
           <NavItem href={routes.welcomeHall} icon="hall">
             {sidebar.welcomeHall}
           </NavItem>
-          <NavItem href={studioGuideHref} icon="guide">
-            {sidebar.studioGuide}
-          </NavItem>
           <NavItem active accent="board" icon="board">
             {sidebar.studioBoard}
           </NavItem>
@@ -263,11 +259,6 @@ export default function StudioBoardScene() {
             icon="review"
             accent="review"
             active={view.hasCampaign && view.status === "READY_FOR_REVIEW"}
-            actionHint={
-              statusNeedsReviewAction(view.status)
-                ? studioBoard.nextAction.reviewMyConcepts
-                : undefined
-            }
           >
             {sidebar.reviewRoom}
           </NavItem>
@@ -276,9 +267,6 @@ export default function StudioBoardScene() {
             icon="delivery"
             accent="delivery"
             active={view.hasCampaign && view.status === "DELIVERED"}
-            actionHint={
-              view.status === "DELIVERED" ? studioBoard.nextAction.openFinalDelivery : undefined
-            }
           >
             {sidebar.finalDelivery}
           </NavItem>
@@ -308,14 +296,6 @@ export default function StudioBoardScene() {
                 <p className="sb-header-v3__greeting sb-header-v3__greeting--loading" aria-busy="true" />
               )}
             </div>
-            {view.hasCampaign && statusNeedsReviewAction(view.status) ? (
-              <Link
-                href={routes.feedbackStudio}
-                className="utility-btn utility-btn--primary sb-header-v3__review-cta"
-              >
-                {studioBoard.nextAction.reviewMyConcepts}
-              </Link>
-            ) : null}
           </div>
         </header>
 

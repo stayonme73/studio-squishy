@@ -160,7 +160,7 @@ export const studioBoard = {
     account: "/account",
     helpCenter: "/help-center",
     studioGuide: "/studio-guide-prototype",
-    reviewRoom: "/review-room",
+    reviewRoom: "/feedback-studio",
     feedbackStudio: "/feedback-studio",
     deliverables: "/deliverables",
     campaignDetails: "/studio-board?record=open",
@@ -526,7 +526,7 @@ export const studioBoard = {
     closeLabel: "Close",
     submittedHint: "Read-only archive of what you submitted to the Studio.",
     editableHint: "Review or update your intake answers before campaign development begins.",
-    emptyHint: "Your intake answers appear here once you submit the Draft Room form.",
+    emptyHint: "Your submitted Discovery and Project Details appear here once your campaign begins.",
   },
 
   campaignBrief: {

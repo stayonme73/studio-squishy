@@ -1,4 +1,4 @@
-import { studioBoard, type CampaignRecord } from "@/config/studio-board";
+import { type CampaignRecord } from "@/config/studio-board";
 
 export type CustomerJourneyStepState = "complete" | "current" | "upcoming";
 
@@ -9,8 +9,6 @@ export type CustomerJourneyStep = {
   actionLabel?: string;
   actionHref?: string;
 };
-
-const { routes, nextAction: nextCopy } = studioBoard;
 
 type Milestone = {
   id: string;
@@ -56,9 +54,6 @@ export function resolveCustomerJourneySteps(
       id: "review",
       label: "Review Concepts",
       complete: directionChosen || delivered,
-      ...(campaign.campaignStatus === "READY_FOR_REVIEW" && !directionChosen
-        ? { actionLabel: nextCopy.reviewMyConcepts, actionHref: routes.feedbackStudio }
-        : {}),
     },
     {
       id: "direction",
@@ -68,10 +63,7 @@ export function resolveCustomerJourneySteps(
     {
       id: "delivery",
       label: "Final Delivery",
-      complete: false,
-      ...(delivered
-        ? { actionLabel: nextCopy.openFinalDelivery, actionHref: routes.deliverables }
-        : {}),
+      complete: delivered,
     },
   ];
 
