@@ -27,6 +27,9 @@ import {
   saveDiscoveryAnswers,
   type DiscoveryAnswers,
 } from "@/lib/business-discovery-session";
+import {
+  OWNER_QA_DISCOVERY_PREVIEW_KEY,
+} from "@/lib/owner-qa-campaign";
 import { submitDiscoveryCampaign } from "@/lib/studio-board-campaign";
 import { runDiscoveryRecommendation } from "@/lib/run-discovery-recommendation";
 import { studioBoard } from "@/config/studio-board";
@@ -83,6 +86,29 @@ export default function BusinessDiscoveryStudioScene({ debug = false }: Props) {
   useLayoutEffect(() => {
     reloadAnswers();
   }, [reloadAnswers]);
+
+  useLayoutEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+
+    const queued = window.localStorage.getItem(OWNER_QA_DISCOVERY_PREVIEW_KEY);
+    if (queued !== "summary") return;
+
+    window.localStorage.removeItem(OWNER_QA_DISCOVERY_PREVIEW_KEY);
+    const stored = readDiscoveryAnswers();
+    const previewReady = DISCOVERY_REQUIRED_TILE_IDS.every((id) =>
+      isDiscoveryTileAnswerComplete(id, stored[id]),
+    );
+    if (!previewReady) return;
+
+    const { summary } = runDiscoveryRecommendation(stored);
+    setDiscoveryPreviewServices(summary.recommendedServices.map((service) => service.title));
+    setDiscoveryConsiderNextServices(
+      summary.considerNextServices.map((service) => service.title),
+    );
+    setSplitLayoutActive(true);
+    setSplitLayoutSettled(true);
+    setRightPanelPhase("summary");
+  }, []);
 
   useLayoutEffect(() => {
     const onCampaignUpdated = () => reloadAnswers();

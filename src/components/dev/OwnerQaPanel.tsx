@@ -1,22 +1,23 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
-import { ownerQa, type OwnerQaJourneySeed } from "@/config/owner-qa";
+import { ownerQa } from "@/config/owner-qa";
+import { studioBoard } from "@/config/studio-board";
 import {
-  applyOwnerQaPaidAwaitingIntake,
-  applyOwnerQaStatus,
+  applyOwnerQaJourneySeed,
+  resetOwnerQaCampaignState,
 } from "@/lib/owner-qa-campaign";
-import { clearCampaignState } from "@/lib/studio-board-campaign";
 
 /** Development-only owner nav — journey presets + utility shortcuts. */
 export default function OwnerQaPanel() {
   const router = useRouter();
   const panelId = useId();
+  const confirmId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [confirmResetOpen, setConfirmResetOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -24,11 +25,17 @@ export default function OwnerQaPanel() {
     function handlePointerDown(event: MouseEvent) {
       if (!rootRef.current?.contains(event.target as Node)) {
         setOpen(false);
+        setConfirmResetOpen(false);
       }
     }
 
     function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key !== "Escape") return;
+      if (confirmResetOpen) {
+        setConfirmResetOpen(false);
+        return;
+      }
+      setOpen(false);
     }
 
     document.addEventListener("mousedown", handlePointerDown);
@@ -37,34 +44,32 @@ export default function OwnerQaPanel() {
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [open]);
+  }, [open, confirmResetOpen]);
 
   function closePanel() {
     setOpen(false);
+    setConfirmResetOpen(false);
   }
 
-  function applySeed(seed: OwnerQaJourneySeed) {
-    if (seed.kind === "reset") {
-      clearCampaignState();
-      return;
-    }
-    if (seed.kind === "paid-awaiting-intake") {
-      applyOwnerQaPaidAwaitingIntake(seed.packageId);
-      return;
-    }
-    applyOwnerQaStatus(seed.status);
-  }
-
-  function handleJourney(href: string, seed: OwnerQaJourneySeed) {
-    applySeed(seed);
+  function handleJourney(href: string, seed: (typeof ownerQa.journeyPresets)[number]["seed"]) {
+    applyOwnerQaJourneySeed(seed);
     closePanel();
     router.push(href);
     router.refresh();
   }
 
-  function handleReset() {
-    clearCampaignState();
+  function handleResetRequest() {
+    setConfirmResetOpen(true);
+  }
+
+  function handleResetCancel() {
+    setConfirmResetOpen(false);
+  }
+
+  function handleResetConfirm() {
+    resetOwnerQaCampaignState();
     closePanel();
+    router.push(studioBoard.routes.studioLobby);
     router.refresh();
   }
 
@@ -97,28 +102,52 @@ export default function OwnerQaPanel() {
           <section className="owner-qa__section">
             <h2 className="owner-qa__section-title">Shortcuts</h2>
             <div className="owner-qa__links">
-              {ownerQa.shortcuts.map((page) => (
-                <Link
-                  key={page.href}
-                  href={page.href}
-                  className="owner-qa__link"
-                  onClick={closePanel}
-                >
-                  {page.label}
-                </Link>
-              ))}
+              {ownerQa.shortcuts.map((shortcut) =>
+                shortcut.kind === "reset" ? (
+                  <button
+                    key={shortcut.id}
+                    type="button"
+                    className="owner-qa__action owner-qa__action--danger"
+                    onClick={handleResetRequest}
+                    aria-expanded={confirmResetOpen}
+                    aria-controls={confirmId}
+                  >
+                    {shortcut.label}
+                  </button>
+                ) : null,
+              )}
             </div>
           </section>
 
-          <section className="owner-qa__section">
-            <button
-              type="button"
-              className="owner-qa__action owner-qa__action--danger owner-qa__action--wide"
-              onClick={handleReset}
+          {confirmResetOpen ? (
+            <div
+              id={confirmId}
+              className="owner-qa__confirm"
+              role="alertdialog"
+              aria-labelledby={`${confirmId}-title`}
+              aria-describedby={`${confirmId}-desc`}
             >
-              Reset campaign
-            </button>
-          </section>
+              <p id={`${confirmId}-title`} className="owner-qa__confirm-title">
+                Reset campaign?
+              </p>
+              <p id={`${confirmId}-desc`} className="owner-qa__confirm-desc">
+                Clears discovery answers, approved plan, payment state, project details, uploads,
+                and all other campaign data in this browser. You will return to a clean Studio Lobby.
+              </p>
+              <div className="owner-qa__confirm-actions">
+                <button type="button" className="owner-qa__action" onClick={handleResetCancel}>
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="owner-qa__action owner-qa__action--danger"
+                  onClick={handleResetConfirm}
+                >
+                  Reset campaign
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
 

@@ -175,6 +175,34 @@
   background: rgba(139, 58, 42, 0.08);
 }
 
+.owner-qa__confirm {
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid rgba(139, 58, 42, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 252, 250, 0.98);
+}
+
+.owner-qa__confirm-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #8b3a2a;
+}
+
+.owner-qa__confirm-desc {
+  margin: 0 0 0.55rem;
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: #5a7a6e;
+}
+
+.owner-qa__confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+}
+
 .owner-qa__action--wide {
   grid-column: 1 / -1;
 }
