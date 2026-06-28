@@ -1,10 +1,15 @@
 /** Feedback Studio — section ids, session types, copy. */
 
 import type { ReviewRoomOptionId } from "@/config/review-room";
+import type { DeliverableSectionId } from "@/lib/deliverable-scope";
 
 export type FeedbackConceptId = ReviewRoomOptionId;
 
-export type FeedbackSectionId = "hero" | "social" | "email" | "sms" | "rationale";
+export type FeedbackSectionId =
+  | DeliverableSectionId
+  | "hero"
+  | "rationale"
+  | `fallback:${string}`;
 
 export type StickyNoteColorId = "yellow" | "blue" | "coral";
 
@@ -23,17 +28,17 @@ export type FeedbackConceptPreview = {
     subhead: string;
     accent: "warm" | "bold" | "premium";
   };
-  social: {
+  social?: {
     platform: string;
     body: string;
     cta: string;
   };
-  email: {
+  email?: {
     subject: string;
     preheader: string;
     body: string;
   };
-  sms: {
+  sms?: {
     body: string;
   };
 };
@@ -56,7 +61,7 @@ export type FeedbackVoiceNote = {
 export type FeedbackSession = {
   conceptId: FeedbackConceptId;
   campaignId: string;
-  sectionStatuses: Record<FeedbackSectionId, SectionReviewStatus>;
+  sectionStatuses: Partial<Record<FeedbackSectionId, SectionReviewStatus>>;
   stickyNotes: FeedbackStickyNote[];
   voiceNotes: FeedbackVoiceNote[];
   drawSections: FeedbackSectionId[];
@@ -70,6 +75,8 @@ export const FEEDBACK_SECTION_IDS: FeedbackSectionId[] = [
   "sms",
   "rationale",
 ];
+
+export const FEEDBACK_REVIEW_ONLY_SECTION_IDS = ["hero", "rationale"] as const satisfies readonly FeedbackSectionId[];
 
 export const feedbackStudio = {
   pageTitle: "Review Room",
@@ -99,7 +106,19 @@ export const feedbackStudio = {
     email: "Email",
     sms: "SMS",
     rationale: "Why this direction",
-  } satisfies Record<FeedbackSectionId, string>,
+    "brand-direction-assets": "Brand Direction & Assets",
+    "brand-messaging": "Brand Messaging",
+    "campaign-strategy-launch": "Campaign Strategy & Launch Plan",
+    "campaign-strategy-monthly": "Campaign Strategy & Monthly Support",
+    "marketing-copy": "Marketing Copy",
+    "written-content": "Written Content",
+    video: "Video",
+    audio: "Audio / Voice-Over",
+    "landing-page": "Landing Page Content & Creative Direction",
+    optimization: "Optimization Review",
+    "marketing-assets": "Marketing Assets",
+    calendar: "Marketing Calendar",
+  } satisfies Partial<Record<FeedbackSectionId, string>>,
 
   sectionStatus: {
     approved: "Approved",
@@ -175,20 +194,33 @@ export function isFeedbackConceptId(value: string | null | undefined): value is 
 export function createEmptyFeedbackSession(
   campaignId: string,
   conceptId: FeedbackConceptId,
+  visibleSectionIds?: readonly FeedbackSectionId[],
 ): FeedbackSession {
+  const sections = visibleSectionIds ?? FEEDBACK_SECTION_IDS;
+  const sectionStatuses = Object.fromEntries(
+    sections.map((sectionId) => [sectionId, "neutral" as SectionReviewStatus]),
+  ) as Partial<Record<FeedbackSectionId, SectionReviewStatus>>;
+
   return {
     conceptId,
     campaignId,
-    sectionStatuses: {
-      hero: "neutral",
-      social: "neutral",
-      email: "neutral",
-      sms: "neutral",
-      rationale: "neutral",
-    },
+    sectionStatuses,
     stickyNotes: [],
     voiceNotes: [],
     drawSections: [],
     submittedAt: null,
   };
+}
+
+export function resolveFeedbackSectionLabel(
+  sectionId: FeedbackSectionId,
+  labels?: Record<string, string>,
+): string {
+  if (labels?.[sectionId]) return labels[sectionId];
+  const known = feedbackStudio.previewSections[sectionId as keyof typeof feedbackStudio.previewSections];
+  if (known) return known;
+  if (sectionId.startsWith("fallback:")) {
+    return sectionId.slice("fallback:".length);
+  }
+  return sectionId;
 }

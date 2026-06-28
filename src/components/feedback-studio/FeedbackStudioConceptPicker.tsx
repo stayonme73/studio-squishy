@@ -3,12 +3,15 @@ import Link from "next/link";
 import type { FeedbackConceptPreview } from "@/config/feedback-studio";
 import { feedbackStudio } from "@/config/feedback-studio";
 import { studioBoard } from "@/config/studio-board";
+import { resolvePickerScopeChips } from "@/lib/deliverable-scope";
+import type { DeliverableScopeSection } from "@/lib/deliverable-scope";
 
 type Props = {
   concepts: readonly FeedbackConceptPreview[];
   campaignTitle: string;
   selectedOptionTitle: string | null;
   conceptHref: (id: FeedbackConceptPreview["id"]) => string;
+  scopeSections: readonly DeliverableScopeSection[];
 };
 
 function conceptOptionTitle(concept: FeedbackConceptPreview) {
@@ -21,7 +24,9 @@ export default function FeedbackStudioConceptPicker({
   campaignTitle,
   selectedOptionTitle,
   conceptHref,
+  scopeSections,
 }: Props) {
+  const scopeChips = resolvePickerScopeChips(scopeSections);
   return (
     <div className="fs-picker">
       <header className="fs-picker__intro">
@@ -56,9 +61,15 @@ export default function FeedbackStudioConceptPicker({
               <p className="fs-direction-card__summary">{concept.summary}</p>
 
               <div className="fs-direction-card__previews" aria-label="Preview samples">
-                <span className="fs-direction-card__chip">Social</span>
-                <span className="fs-direction-card__chip">Email</span>
-                <span className="fs-direction-card__chip">SMS</span>
+                {scopeChips.length > 0 ? (
+                  scopeChips.map((chip) => (
+                    <span key={chip} className="fs-direction-card__chip">
+                      {chip}
+                    </span>
+                  ))
+                ) : (
+                  <span className="fs-direction-card__chip">Direction preview</span>
+                )}
               </div>
 
               <div className="fs-direction-card__actions">

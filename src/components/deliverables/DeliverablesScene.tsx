@@ -115,7 +115,13 @@ export default function DeliverablesScene() {
           backHref={routes.studioBoard}
           activeNav="deliverables"
           title={deliverables.pageTitle}
-          lead={isReady ? undefined : deliverables.pageSubtitle}
+          lead={
+            isReady
+              ? undefined
+              : view.state === "no-campaign"
+                ? empty.noCampaignSubtitle
+                : deliverables.pageSubtitle
+          }
         />
 
       {!isReady ? (
@@ -170,6 +176,31 @@ export default function DeliverablesScene() {
             <p className="fd-deliverables__subtitle">{sections.subheading}</p>
 
             <div className="fd-deliverables__grid">
+              {pkg.scopeSections.map((section) => (
+                <article key={section.sectionId} className="fd-block fd-block--scope">
+                  <header className="fd-block__head">
+                    <div className="fd-block__head-main">
+                      <h3>{section.title}</h3>
+                    </div>
+                    <SectionDownloadButton
+                      filename={`${section.sectionId}.txt`}
+                      content={section.deliverables.join("\n\n")}
+                    />
+                  </header>
+                  <div className="fd-block__body">
+                    <div className="fd-block__items">
+                      {section.deliverables.map((item, index) => (
+                        <div key={`${section.sectionId}-${index}`} className="fd-item">
+                          <p className="fd-item__text">{item}</p>
+                          <CopyButton text={item} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </article>
+              ))}
+
+              {pkg.socialPosts.length > 0 ? (
               <article className="fd-block fd-block--social">
                 <header className="fd-block__head fd-block__head--social">
                   <div className="fd-block__head-main">
@@ -198,7 +229,9 @@ export default function DeliverablesScene() {
                   </div>
                 </div>
               </article>
+              ) : null}
 
+              {pkg.emails.length > 0 ? (
               <article className="fd-block fd-block--email">
                 <header className="fd-block__head fd-block__head--email">
                   <div className="fd-block__head-main">
@@ -230,7 +263,9 @@ export default function DeliverablesScene() {
                   </div>
                 </div>
               </article>
+              ) : null}
 
+              {pkg.smsMessages.length > 0 ? (
               <article className="fd-block fd-block--sms">
                 <header className="fd-block__head fd-block__head--sms">
                   <div className="fd-block__head-main">
@@ -258,7 +293,9 @@ export default function DeliverablesScene() {
                   </div>
                 </div>
               </article>
+              ) : null}
 
+              {pkg.videoScripts.length > 0 ? (
               <article className="fd-block fd-block--video">
                 <header className="fd-block__head fd-block__head--video">
                   <div className="fd-block__head-main">
@@ -292,7 +329,9 @@ export default function DeliverablesScene() {
                   </div>
                 </div>
               </article>
+              ) : null}
 
+              {pkg.calendar.length > 0 ? (
               <article className="fd-block fd-block--calendar">
                 <header className="fd-block__head fd-block__head--calendar">
                   <div className="fd-block__head-main">
@@ -325,6 +364,7 @@ export default function DeliverablesScene() {
                   </div>
                 </div>
               </article>
+              ) : null}
             </div>
           </section>
 

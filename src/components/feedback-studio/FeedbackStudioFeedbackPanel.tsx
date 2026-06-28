@@ -9,11 +9,13 @@ import type {
   SectionReviewStatus,
   StickyNoteColorId,
 } from "@/config/feedback-studio";
-import { FEEDBACK_SECTION_IDS, feedbackStudio } from "@/config/feedback-studio";
+import { feedbackStudio, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
 
 type Props = {
   focusedSection: FeedbackSectionId;
   focusedSectionLabel: string;
+  visibleSectionIds: readonly FeedbackSectionId[];
+  sectionLabels: Record<string, string>;
   activeTool: FeedbackTool;
   stickyColor: StickyNoteColorId;
   stickyDraft: string;
@@ -41,6 +43,8 @@ type Props = {
 
 export default function FeedbackStudioFeedbackPanel({
   focusedSectionLabel,
+  visibleSectionIds,
+  sectionLabels,
   activeTool,
   stickyColor,
   stickyDraft,
@@ -194,6 +198,8 @@ export default function FeedbackStudioFeedbackPanel({
         stickyNotes={session.stickyNotes}
         voiceNotes={session.voiceNotes}
         sectionStatuses={session.sectionStatuses}
+        visibleSectionIds={visibleSectionIds}
+        sectionLabels={sectionLabels}
       />
 
       <button
@@ -212,14 +218,22 @@ function FeedbackActivityList({
   stickyNotes,
   voiceNotes,
   sectionStatuses,
+  visibleSectionIds,
+  sectionLabels,
 }: {
   stickyNotes: FeedbackStickyNote[];
   voiceNotes: FeedbackVoiceNote[];
-  sectionStatuses: Record<FeedbackSectionId, SectionReviewStatus>;
+  sectionStatuses: Partial<Record<FeedbackSectionId, SectionReviewStatus>>;
+  visibleSectionIds: readonly FeedbackSectionId[];
+  sectionLabels: Record<string, string>;
 }) {
-  const { previewSections, sectionStatus } = feedbackStudio;
+  const { sectionStatus } = feedbackStudio;
+  const scopedStickyNotes = stickyNotes.filter((note) => visibleSectionIds.includes(note.sectionId));
+  const scopedVoiceNotes = voiceNotes.filter((note) => visibleSectionIds.includes(note.sectionId));
   const hasActivity =
-    stickyNotes.length > 0 || voiceNotes.length > 0 || Object.values(sectionStatuses).some((s) => s !== "neutral");
+    scopedStickyNotes.length > 0 ||
+    scopedVoiceNotes.length > 0 ||
+    visibleSectionIds.some((sectionId) => sectionStatuses[sectionId] !== "neutral" && sectionStatuses[sectionId]);
 
   if (!hasActivity) return null;
 
@@ -227,23 +241,23 @@ function FeedbackActivityList({
     <div className="fs-feedback-panel__activity">
       <p className="fs-feedback-panel__group-title">{feedbackStudio.feedbackPanel.toolGroups.log}</p>
       <ul className="fs-feedback-panel__activity-list">
-        {FEEDBACK_SECTION_IDS.map((sectionId) => {
+        {visibleSectionIds.map((sectionId) => {
           const status = sectionStatuses[sectionId];
-          if (status === "neutral") return null;
+          if (!status || status === "neutral") return null;
           return (
             <li key={`status-${sectionId}`} className={`fs-activity-item fs-activity-item--${status}`}>
-              {previewSections[sectionId]} — {sectionStatus[status]}
+              {resolveFeedbackSectionLabel(sectionId, sectionLabels)} — {sectionStatus[status]}
             </li>
           );
         })}
-        {stickyNotes.map((note) => (
+        {scopedStickyNotes.map((note) => (
           <li key={note.id} className={`fs-activity-item fs-activity-item--sticky fs-activity-item--${note.color}`}>
-            {previewSections[note.sectionId]}: {note.text}
+            {resolveFeedbackSectionLabel(note.sectionId, sectionLabels)}: {note.text}
           </li>
         ))}
-        {voiceNotes.map((note) => (
+        {scopedVoiceNotes.map((note) => (
           <li key={note.id} className="fs-activity-item fs-activity-item--voice">
-            {previewSections[note.sectionId]} — voice ({note.durationSec}s)
+            {resolveFeedbackSectionLabel(note.sectionId, sectionLabels)} — voice ({note.durationSec}s)
           </li>
         ))}
       </ul>

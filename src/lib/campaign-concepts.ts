@@ -5,6 +5,10 @@ import {
   resolveCampaignCreativeBrief,
   resolveConceptGenerationStamp,
 } from "@/lib/campaign-brief-source";
+import {
+  resolveDeliverableScopeFromCampaign,
+  scopeHasChannelSections,
+} from "@/lib/deliverable-scope";
 import { readCurrentCampaign, saveCurrentCampaign } from "@/lib/studio-board-campaign";
 
 function truncate(text: string, max: number) {
@@ -74,7 +78,10 @@ export function generateCampaignConceptsFromBrief(
     ? ` We will avoid ${truncate(brief.avoidNotes, 90).toLowerCase()}.`
     : "";
 
-  return [
+  const scope = resolveDeliverableScopeFromCampaign(campaign);
+  const channels = scopeHasChannelSections(scope);
+
+  const baseConcepts = [
     {
       id: "A",
       directionLabel: "Direction A",
@@ -92,25 +99,37 @@ export function generateCampaignConceptsFromBrief(
         subhead: timingLine,
         accent: "warm",
       },
-      social: {
-        platform: "Instagram",
-        body: truncate(
-          `${projectName} is almost here. ${brief.desiredOutcome || `We built this for ${audience.toLowerCase()}.`} ${brief.coreMessage ? firstPhrase(brief.coreMessage, 100) : ""}`.trim(),
-          220,
-        ),
-        cta: "Learn more",
-      },
-      email: {
-        subject: truncate(`${projectName} — you're invited in`, 72),
-        preheader: truncate(firstPhrase(brief.desiredOutcome || goals, 80), 90),
-        body: truncate(
-          `Hi there — we're shaping ${projectName} around what you shared: ${brief.toneGuidance.toLowerCase()} for ${audience.toLowerCase()}. ${brief.successMetric ? `Success looks like: ${brief.successMetric}.` : ""}`.trim(),
-          320,
-        ),
-      },
-      sms: {
-        body: truncate(`${projectName} update — crafted for ${audienceShort || "you"}. Details inside. Reply STOP to opt out.`, 140),
-      },
+      ...(channels.social
+        ? {
+            social: {
+              platform: "Instagram",
+              body: truncate(
+                `${projectName} is almost here. ${brief.desiredOutcome || `We built this for ${audience.toLowerCase()}.`} ${brief.coreMessage ? firstPhrase(brief.coreMessage, 100) : ""}`.trim(),
+                220,
+              ),
+              cta: "Learn more",
+            },
+          }
+        : {}),
+      ...(channels.email
+        ? {
+            email: {
+              subject: truncate(`${projectName} — you're invited in`, 72),
+              preheader: truncate(firstPhrase(brief.desiredOutcome || goals, 80), 90),
+              body: truncate(
+                `Hi there — we're shaping ${projectName} around what you shared: ${brief.toneGuidance.toLowerCase()} for ${audience.toLowerCase()}. ${brief.successMetric ? `Success looks like: ${brief.successMetric}.` : ""}`.trim(),
+                320,
+              ),
+            },
+          }
+        : {}),
+      ...(channels.sms
+        ? {
+            sms: {
+              body: truncate(`${projectName} update — crafted for ${audienceShort || "you"}. Details inside. Reply STOP to opt out.`, 140),
+            },
+          }
+        : {}),
     },
     {
       id: "B",
@@ -129,25 +148,37 @@ export function generateCampaignConceptsFromBrief(
         subhead: truncate(brief.successMetric || timingLine, 64),
         accent: "bold",
       },
-      social: {
-        platform: "Facebook",
-        body: truncate(
-          `${projectName.toUpperCase()} — ${goalShort.toUpperCase()}. ${brief.desiredOutcome || `Built for ${audience}.`} Tag someone who needs to see this.`,
-          220,
-        ),
-        cta: "Take action",
-      },
-      email: {
-        subject: truncate(`${projectName} — ${goalShort}`, 72),
-        preheader: truncate(brief.successMetric || brief.desiredOutcome, 90),
-        body: truncate(
-          `This is the bold read on ${projectName}: ${goals}. ${brief.coreMessage ? firstPhrase(brief.coreMessage, 120) : ""}`.trim(),
-          320,
-        ),
-      },
-      sms: {
-        body: truncate(`${projectName}: ${goalShort}. Tap for details → [link] Reply STOP to opt out.`, 140),
-      },
+      ...(channels.social
+        ? {
+            social: {
+              platform: "Facebook",
+              body: truncate(
+                `${projectName.toUpperCase()} — ${goalShort.toUpperCase()}. ${brief.desiredOutcome || `Built for ${audience}.`} Tag someone who needs to see this.`,
+                220,
+              ),
+              cta: "Take action",
+            },
+          }
+        : {}),
+      ...(channels.email
+        ? {
+            email: {
+              subject: truncate(`${projectName} — ${goalShort}`, 72),
+              preheader: truncate(brief.successMetric || brief.desiredOutcome, 90),
+              body: truncate(
+                `This is the bold read on ${projectName}: ${goals}. ${brief.coreMessage ? firstPhrase(brief.coreMessage, 120) : ""}`.trim(),
+                320,
+              ),
+            },
+          }
+        : {}),
+      ...(channels.sms
+        ? {
+            sms: {
+              body: truncate(`${projectName}: ${goalShort}. Tap for details → [link] Reply STOP to opt out.`, 140),
+            },
+          }
+        : {}),
     },
     {
       id: "C",
@@ -166,27 +197,41 @@ export function generateCampaignConceptsFromBrief(
         subhead: truncate(brief.desiredOutcome || timingLine, 64),
         accent: "premium",
       },
-      social: {
-        platform: "LinkedIn",
-        body: truncate(
-          `Introducing ${projectName}. ${businessShort ? `${businessShort}. ` : ""}${brief.desiredOutcome || `Designed for ${audience.toLowerCase()}.`}`.trim(),
-          220,
-        ),
-        cta: "View details",
-      },
-      email: {
-        subject: truncate(`${projectName} — a considered approach`, 72),
-        preheader: truncate(firstPhrase(brief.toneGuidance, 80), 90),
-        body: truncate(
-          `Thank you for the clarity in your intake. ${projectName} is presented with ${personality.toLowerCase()} tone, ${colors.toLowerCase()}, and messaging shaped around ${goals.toLowerCase()}.`,
-          320,
-        ),
-      },
-      sms: {
-        body: truncate(`${projectName} preview is ready. View your direction: [link]`, 140),
-      },
+      ...(channels.social
+        ? {
+            social: {
+              platform: "LinkedIn",
+              body: truncate(
+                `Introducing ${projectName}. ${businessShort ? `${businessShort}. ` : ""}${brief.desiredOutcome || `Designed for ${audience.toLowerCase()}.`}`.trim(),
+                220,
+              ),
+              cta: "View details",
+            },
+          }
+        : {}),
+      ...(channels.email
+        ? {
+            email: {
+              subject: truncate(`${projectName} — a considered approach`, 72),
+              preheader: truncate(firstPhrase(brief.toneGuidance, 80), 90),
+              body: truncate(
+                `Thank you for the clarity in your intake. ${projectName} is presented with ${personality.toLowerCase()} tone, ${colors.toLowerCase()}, and messaging shaped around ${goals.toLowerCase()}.`,
+                320,
+              ),
+            },
+          }
+        : {}),
+      ...(channels.sms
+        ? {
+            sms: {
+              body: truncate(`${projectName} preview is ready. View your direction: [link]`, 140),
+            },
+          }
+        : {}),
     },
-  ];
+  ] satisfies FeedbackConceptPreview[];
+
+  return baseConcepts;
 }
 
 /** Generate (if needed) and save concepts on the live campaign record. */

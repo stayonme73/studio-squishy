@@ -1,5 +1,8 @@
 /** Final Delivery V1 — copy, assets, and mock deliverable templates. */
 
+import type { DeliverableScopeSection } from "@/lib/deliverable-scope";
+import { scopeIncludesSection } from "@/lib/deliverable-scope";
+
 export const deliverables = {
   pageTitle: "Final Delivery",
   eyebrow: "Your Campaign",
@@ -133,6 +136,8 @@ export const deliverables = {
   empty: {
     preparing: "The Studio team is preparing your final deliverables.",
     preparingHint: "Check back soon — you'll be notified when your package is ready.",
+    noCampaignSubtitle:
+      "Your completed marketing files will appear here when a campaign is ready for delivery.",
     noCampaign: "Start a campaign to receive deliverables from The Studio.",
     cta: "Go to Studio Board",
   },
@@ -168,10 +173,16 @@ export type CampaignDeliverablesPackage = {
   smsMessages: DeliverableSms[];
   videoScripts: DeliverableVideoScript[];
   calendar: DeliverableCalendarWeek[];
+  scopeSections: ScopeDeliverableBlock[];
 };
 
-/** Phase 1 mock package — captions/subjects/scripts only (no image prompts). */
-export function buildDeliverablesPackage(campaignName: string): CampaignDeliverablesPackage {
+export type ScopeDeliverableBlock = {
+  sectionId: string;
+  title: string;
+  deliverables: readonly string[];
+};
+
+function buildFullMockDeliverablesPackage(campaignName: string): Omit<CampaignDeliverablesPackage, "scopeSections"> {
   const name = campaignName.trim() || "your campaign";
 
   return {
@@ -265,5 +276,48 @@ export function buildDeliverablesPackage(campaignName: string): CampaignDelivera
         items: ["Monitor engagement", "Adjust as needed", "Celebrate wins! 🎉"],
       },
     ],
+  };
+}
+
+/** Phase 1 mock package — scoped to frozen approved plan sections. */
+export function buildDeliverablesPackage(
+  campaignName: string,
+  scope?: readonly DeliverableScopeSection[],
+): CampaignDeliverablesPackage {
+  const full = buildFullMockDeliverablesPackage(campaignName);
+
+  if (!scope?.length) {
+    return {
+      socialPosts: [],
+      emails: [],
+      smsMessages: [],
+      videoScripts: [],
+      calendar: [],
+      scopeSections: [],
+    };
+  }
+
+  const scopeSections: ScopeDeliverableBlock[] = scope
+    .filter(
+      (section) =>
+        section.sectionId !== "social" &&
+        section.sectionId !== "email" &&
+        section.sectionId !== "sms" &&
+        section.sectionId !== "video" &&
+        section.sectionId !== "calendar",
+    )
+    .map((section) => ({
+      sectionId: String(section.sectionId),
+      title: section.title,
+      deliverables: section.deliverables,
+    }));
+
+  return {
+    socialPosts: scopeIncludesSection(scope, "social") ? full.socialPosts : [],
+    emails: scopeIncludesSection(scope, "email") ? full.emails : [],
+    smsMessages: scopeIncludesSection(scope, "sms") ? full.smsMessages : [],
+    videoScripts: scopeIncludesSection(scope, "video") ? full.videoScripts : [],
+    calendar: scopeIncludesSection(scope, "calendar") ? full.calendar : [],
+    scopeSections,
   };
 }

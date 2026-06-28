@@ -8,7 +8,8 @@ import type {
   FeedbackTool,
   SectionReviewStatus,
 } from "@/config/feedback-studio";
-import { feedbackStudio } from "@/config/feedback-studio";
+import { feedbackStudio, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
+import type { DeliverableScopeSection } from "@/lib/deliverable-scope";
 
 import FeedbackStudioDrawLayer from "./FeedbackStudioDrawLayer";
 
@@ -16,6 +17,9 @@ type Props = {
   concept: FeedbackConceptPreview;
   campaignTitle: string;
   focusedSection: FeedbackSectionId;
+  visibleSectionIds: readonly FeedbackSectionId[];
+  sectionLabels: Record<string, string>;
+  scopeSections: readonly DeliverableScopeSection[];
   activeTool: FeedbackTool;
   erasing: boolean;
   session: FeedbackSession;
@@ -27,13 +31,22 @@ export default function FeedbackStudioConceptPreview({
   concept,
   campaignTitle,
   focusedSection,
+  visibleSectionIds,
+  sectionLabels,
+  scopeSections,
   activeTool,
   erasing,
   session,
   onFocusSection,
   onDrawStroke,
 }: Props) {
-  const { previewSections: labels } = feedbackStudio;
+  const nonChannelScopeSections = scopeSections.filter(
+    (section) =>
+      section.sectionId !== "social" &&
+      section.sectionId !== "email" &&
+      section.sectionId !== "sms" &&
+      section.sectionId !== "calendar",
+  );
 
   return (
     <div className="fs-preview fs-preview--workspace">
@@ -45,91 +58,122 @@ export default function FeedbackStudioConceptPreview({
         <p className="fs-preview__summary">{concept.summary}</p>
       </header>
 
-      <PreviewSection
-        sectionId="hero"
-        label={labels.hero}
-        focused={focusedSection === "hero"}
-        status={session.sectionStatuses.hero}
-        large
-        onFocus={() => onFocusSection("hero")}
-        drawActive={activeTool === "draw" && focusedSection === "hero"}
-        erasing={erasing}
-        onDrawStroke={() => onDrawStroke("hero")}
-        stickies={session.stickyNotes.filter((n) => n.sectionId === "hero")}
-      >
-        <div className={`fs-mock fs-mock--hero fs-mock--${concept.hero.accent} fs-mock--large`}>
-          <p className="fs-mock__headline">{concept.hero.headline}</p>
-          <p className="fs-mock__subhead">{concept.hero.subhead}</p>
-          <div className="fs-mock__hero-art" aria-hidden />
-        </div>
-      </PreviewSection>
+      {visibleSectionIds.includes("hero") ? (
+        <PreviewSection
+          sectionId="hero"
+          label={resolveFeedbackSectionLabel("hero", sectionLabels)}
+          focused={focusedSection === "hero"}
+          status={session.sectionStatuses.hero ?? "neutral"}
+          large
+          onFocus={() => onFocusSection("hero")}
+          drawActive={activeTool === "draw" && focusedSection === "hero"}
+          erasing={erasing}
+          onDrawStroke={() => onDrawStroke("hero")}
+          stickies={session.stickyNotes.filter((n) => n.sectionId === "hero")}
+        >
+          <div className={`fs-mock fs-mock--hero fs-mock--${concept.hero.accent} fs-mock--large`}>
+            <p className="fs-mock__headline">{concept.hero.headline}</p>
+            <p className="fs-mock__subhead">{concept.hero.subhead}</p>
+            <div className="fs-mock__hero-art" aria-hidden />
+          </div>
+        </PreviewSection>
+      ) : null}
 
-      <PreviewSection
-        sectionId="social"
-        label={labels.social}
-        focused={focusedSection === "social"}
-        status={session.sectionStatuses.social}
-        onFocus={() => onFocusSection("social")}
-        drawActive={activeTool === "draw" && focusedSection === "social"}
-        erasing={erasing}
-        onDrawStroke={() => onDrawStroke("social")}
-        stickies={session.stickyNotes.filter((n) => n.sectionId === "social")}
-      >
-        <article className="fs-mock fs-mock--social">
-          <p className="fs-mock__channel">{concept.social.platform}</p>
-          <p className="fs-mock__body">{concept.social.body}</p>
-          <p className="fs-mock__cta">{concept.social.cta}</p>
-        </article>
-      </PreviewSection>
+      {nonChannelScopeSections.map((section) => (
+        <PreviewSection
+          key={section.sectionId}
+          sectionId={section.sectionId as FeedbackSectionId}
+          label={section.title}
+          focused={focusedSection === section.sectionId}
+          status={session.sectionStatuses[section.sectionId as FeedbackSectionId] ?? "neutral"}
+          onFocus={() => onFocusSection(section.sectionId as FeedbackSectionId)}
+          drawActive={activeTool === "draw" && focusedSection === section.sectionId}
+          erasing={erasing}
+          onDrawStroke={() => onDrawStroke(section.sectionId as FeedbackSectionId)}
+          stickies={session.stickyNotes.filter((n) => n.sectionId === section.sectionId)}
+        >
+          <ul className="fs-preview__deliverable-list">
+            {section.deliverables.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </PreviewSection>
+      ))}
 
-      <PreviewSection
-        sectionId="email"
-        label={labels.email}
-        focused={focusedSection === "email"}
-        status={session.sectionStatuses.email}
-        onFocus={() => onFocusSection("email")}
-        drawActive={activeTool === "draw" && focusedSection === "email"}
-        erasing={erasing}
-        onDrawStroke={() => onDrawStroke("email")}
-        stickies={session.stickyNotes.filter((n) => n.sectionId === "email")}
-      >
-        <article className="fs-mock fs-mock--email">
-          <p className="fs-mock__email-subject">{concept.email.subject}</p>
-          <p className="fs-mock__email-pre">{concept.email.preheader}</p>
-          <p className="fs-mock__body">{concept.email.body}</p>
-        </article>
-      </PreviewSection>
+      {visibleSectionIds.includes("social") && concept.social ? (
+        <PreviewSection
+          sectionId="social"
+          label={resolveFeedbackSectionLabel("social", sectionLabels)}
+          focused={focusedSection === "social"}
+          status={session.sectionStatuses.social ?? "neutral"}
+          onFocus={() => onFocusSection("social")}
+          drawActive={activeTool === "draw" && focusedSection === "social"}
+          erasing={erasing}
+          onDrawStroke={() => onDrawStroke("social")}
+          stickies={session.stickyNotes.filter((n) => n.sectionId === "social")}
+        >
+          <article className="fs-mock fs-mock--social">
+            <p className="fs-mock__channel">{concept.social.platform}</p>
+            <p className="fs-mock__body">{concept.social.body}</p>
+            <p className="fs-mock__cta">{concept.social.cta}</p>
+          </article>
+        </PreviewSection>
+      ) : null}
 
-      <PreviewSection
-        sectionId="sms"
-        label={labels.sms}
-        focused={focusedSection === "sms"}
-        status={session.sectionStatuses.sms}
-        onFocus={() => onFocusSection("sms")}
-        drawActive={activeTool === "draw" && focusedSection === "sms"}
-        erasing={erasing}
-        onDrawStroke={() => onDrawStroke("sms")}
-        stickies={session.stickyNotes.filter((n) => n.sectionId === "sms")}
-      >
-        <article className="fs-mock fs-mock--sms">
-          <p className="fs-mock__sms-bubble">{concept.sms.body}</p>
-        </article>
-      </PreviewSection>
+      {visibleSectionIds.includes("email") && concept.email ? (
+        <PreviewSection
+          sectionId="email"
+          label={resolveFeedbackSectionLabel("email", sectionLabels)}
+          focused={focusedSection === "email"}
+          status={session.sectionStatuses.email ?? "neutral"}
+          onFocus={() => onFocusSection("email")}
+          drawActive={activeTool === "draw" && focusedSection === "email"}
+          erasing={erasing}
+          onDrawStroke={() => onDrawStroke("email")}
+          stickies={session.stickyNotes.filter((n) => n.sectionId === "email")}
+        >
+          <article className="fs-mock fs-mock--email">
+            <p className="fs-mock__email-subject">{concept.email.subject}</p>
+            <p className="fs-mock__email-pre">{concept.email.preheader}</p>
+            <p className="fs-mock__body">{concept.email.body}</p>
+          </article>
+        </PreviewSection>
+      ) : null}
 
-      <PreviewSection
-        sectionId="rationale"
-        label={labels.rationale}
-        focused={focusedSection === "rationale"}
-        status={session.sectionStatuses.rationale}
-        onFocus={() => onFocusSection("rationale")}
-        drawActive={activeTool === "draw" && focusedSection === "rationale"}
-        erasing={erasing}
-        onDrawStroke={() => onDrawStroke("rationale")}
-        stickies={session.stickyNotes.filter((n) => n.sectionId === "rationale")}
-        rationale
-      >
-        <p className="fs-preview__rationale">{concept.whyChosen}</p>
-      </PreviewSection>
+      {visibleSectionIds.includes("sms") && concept.sms ? (
+        <PreviewSection
+          sectionId="sms"
+          label={resolveFeedbackSectionLabel("sms", sectionLabels)}
+          focused={focusedSection === "sms"}
+          status={session.sectionStatuses.sms ?? "neutral"}
+          onFocus={() => onFocusSection("sms")}
+          drawActive={activeTool === "draw" && focusedSection === "sms"}
+          erasing={erasing}
+          onDrawStroke={() => onDrawStroke("sms")}
+          stickies={session.stickyNotes.filter((n) => n.sectionId === "sms")}
+        >
+          <article className="fs-mock fs-mock--sms">
+            <p className="fs-mock__sms-bubble">{concept.sms.body}</p>
+          </article>
+        </PreviewSection>
+      ) : null}
+
+      {visibleSectionIds.includes("rationale") ? (
+        <PreviewSection
+          sectionId="rationale"
+          label={resolveFeedbackSectionLabel("rationale", sectionLabels)}
+          focused={focusedSection === "rationale"}
+          status={session.sectionStatuses.rationale ?? "neutral"}
+          onFocus={() => onFocusSection("rationale")}
+          drawActive={activeTool === "draw" && focusedSection === "rationale"}
+          erasing={erasing}
+          onDrawStroke={() => onDrawStroke("rationale")}
+          stickies={session.stickyNotes.filter((n) => n.sectionId === "rationale")}
+          rationale
+        >
+          <p className="fs-preview__rationale">{concept.whyChosen}</p>
+        </PreviewSection>
+      ) : null}
     </div>
   );
 }

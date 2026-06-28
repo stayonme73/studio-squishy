@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import FeedbackStudioConceptPreview from "@/components/feedback-studio/FeedbackStudioConceptPreview";
 import FeedbackStudioFeedbackPanel from "@/components/feedback-studio/FeedbackStudioFeedbackPanel";
@@ -14,8 +14,14 @@ import type {
   FeedbackTool,
   StickyNoteColorId,
 } from "@/config/feedback-studio";
-import { feedbackStudio } from "@/config/feedback-studio";
+import { feedbackStudio, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
 import { studioBoard } from "@/config/studio-board";
+import {
+  resolveDeliverableScopeFromCampaign,
+  resolveReviewSectionIds,
+  resolveReviewSectionLabels,
+} from "@/lib/deliverable-scope";
+import type { CampaignRecord } from "@/config/studio-board";
 import {
   loadFeedbackSession,
   saveFeedbackSession,
@@ -25,6 +31,7 @@ import { completeCampaignReviewIfReady } from "@/lib/studio-board-campaign";
 
 type Props = {
   concept: FeedbackConceptPreview;
+  campaign: CampaignRecord;
   campaignTitle: string;
   campaignId: string;
   pickerHref: string;
@@ -36,6 +43,7 @@ type Props = {
 /** Interactive review workspace — preview + feedback tools. */
 export default function FeedbackStudioReviewWorkspace({
   concept,
+  campaign,
   campaignTitle,
   campaignId,
   pickerHref,
@@ -43,8 +51,23 @@ export default function FeedbackStudioReviewWorkspace({
   selectedOptionTitle,
   onSelect,
 }: Props) {
+  const scopeSections = useMemo(
+    () => resolveDeliverableScopeFromCampaign(campaign),
+    [campaign],
+  );
+  const visibleSectionIds = useMemo(
+    () => resolveReviewSectionIds(scopeSections) as FeedbackSectionId[],
+    [scopeSections],
+  );
+  const sectionLabels = useMemo(
+    () => resolveReviewSectionLabels(scopeSections),
+    [scopeSections],
+  );
+
   const [session, setSession] = useState<FeedbackSession | null>(null);
-  const [focusedSection, setFocusedSection] = useState<FeedbackSectionId>("hero");
+  const [focusedSection, setFocusedSection] = useState<FeedbackSectionId>(
+    visibleSectionIds[0] ?? "hero",
+  );
   const [activeTool, setActiveTool] = useState<FeedbackTool>("none");
   const [stickyOpen, setStickyOpen] = useState(false);
   const [stickyColor, setStickyColor] = useState<StickyNoteColorId>("yellow");
@@ -60,8 +83,9 @@ export default function FeedbackStudioReviewWorkspace({
   const noticeTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    setSession(loadFeedbackSession(campaignId, concept.id));
-  }, [campaignId, concept.id]);
+    setSession(loadFeedbackSession(campaignId, concept.id, visibleSectionIds));
+    setFocusedSection(visibleSectionIds[0] ?? "hero");
+  }, [campaignId, concept.id, visibleSectionIds]);
 
   useEffect(() => {
     return () => {
@@ -83,7 +107,7 @@ export default function FeedbackStudioReviewWorkspace({
     [],
   );
 
-  const focusedSectionLabel = feedbackStudio.previewSections[focusedSection];
+  const focusedSectionLabel = resolveFeedbackSectionLabel(focusedSection, sectionLabels);
   const submitted = Boolean(session?.submittedAt);
   const optionTitle = conceptOptionTitle(concept);
   const isSelected = selectedOptionTitle === optionTitle;
@@ -223,6 +247,9 @@ export default function FeedbackStudioReviewWorkspace({
             concept={concept}
             campaignTitle={campaignTitle}
             focusedSection={focusedSection}
+            visibleSectionIds={visibleSectionIds}
+            sectionLabels={sectionLabels}
+            scopeSections={scopeSections}
             activeTool={activeTool}
             erasing={erasing}
             session={session}
@@ -250,6 +277,8 @@ export default function FeedbackStudioReviewWorkspace({
           <FeedbackStudioFeedbackPanel
             focusedSection={focusedSection}
             focusedSectionLabel={focusedSectionLabel}
+            visibleSectionIds={visibleSectionIds}
+            sectionLabels={sectionLabels}
             activeTool={activeTool}
             stickyColor={stickyColor}
             stickyDraft={stickyDraft}

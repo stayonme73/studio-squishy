@@ -20,6 +20,7 @@ import {
 } from "@/config/feedback-studio";
 import { studioBoard } from "@/config/studio-board";
 import { resolveCampaignConcepts } from "@/lib/campaign-concepts";
+import { resolveDeliverableScopeFromCampaign } from "@/lib/deliverable-scope";
 import {
   resolveFeedbackCampaignTitle,
   resolveFeedbackRevisionStatus,
@@ -35,6 +36,10 @@ export default function FeedbackStudioScene() {
 
   const conceptParam = searchParams.get("concept");
   const concepts = useMemo(() => resolveCampaignConcepts(campaign), [campaign]);
+  const scopeSections = useMemo(
+    () => (campaign ? resolveDeliverableScopeFromCampaign(campaign) : []),
+    [campaign],
+  );
   const activeConcept =
     isFeedbackConceptId(conceptParam) && concepts.length > 0
       ? getFeedbackConcept(conceptParam, concepts)
@@ -128,6 +133,7 @@ export default function FeedbackStudioScene() {
 
           <FeedbackStudioConceptReview
             concept={activeConcept}
+            campaign={campaign}
             campaignTitle={campaignTitle}
             campaignId={campaign.campaignId}
             pickerHref={pickerHref}
@@ -168,6 +174,7 @@ export default function FeedbackStudioScene() {
           campaignTitle={campaignTitle}
           selectedOptionTitle={selectedOption}
           conceptHref={conceptHref}
+          scopeSections={scopeSections}
         />
 
         <StudioBoardDevStatus placement="sidebar" />

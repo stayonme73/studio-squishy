@@ -4,6 +4,7 @@ import {
   deliverables,
   type CampaignDeliverablesPackage,
 } from "@/config/deliverables";
+import { resolveDeliverableScopeFromCampaign } from "@/lib/deliverable-scope";
 
 export type DeliverablesPageState = "no-campaign" | "preparing" | "ready";
 
@@ -45,15 +46,20 @@ export function resolveDeliverablesView(
     showGreetingName: false,
   };
 
-  const previewName = campaign?.campaignName ?? "Summer Product Launch";
   if (options?.previewDelivered) {
+    const lineItems = campaign?.approvedStudioPlan?.lineItems;
+    if (!campaign || !lineItems?.length) {
+      return { ...base, state: "no-campaign" };
+    }
+
+    const scope = resolveDeliverableScopeFromCampaign(campaign);
     return {
       state: "ready",
-      campaignName: previewName,
-      selectedOption: campaign?.selectedCampaignOption ?? "Option B (Balanced)",
-      completionDate: formatCompletionDate(campaign?.updatedAt ?? new Date().toISOString()),
+      campaignName: campaign.campaignName,
+      selectedOption: campaign.selectedCampaignOption ?? selectedOptionLabel(campaign),
+      completionDate: formatCompletionDate(campaign.updatedAt),
       statusLabel: deliverables.summary.statusDelivered,
-      package: buildDeliverablesPackage(previewName),
+      package: buildDeliverablesPackage(campaign.campaignName, scope),
       showGreetingName: true,
     };
   }
@@ -70,13 +76,15 @@ export function resolveDeliverablesView(
     };
   }
 
+  const scope = resolveDeliverableScopeFromCampaign(campaign);
+
   return {
     state: "ready",
     campaignName: campaign.campaignName,
     selectedOption: selectedOptionLabel(campaign),
     completionDate: formatCompletionDate(campaign.updatedAt),
     statusLabel: deliverables.summary.statusDelivered,
-    package: buildDeliverablesPackage(campaign.campaignName),
+    package: buildDeliverablesPackage(campaign.campaignName, scope),
     showGreetingName: true,
   };
 }
