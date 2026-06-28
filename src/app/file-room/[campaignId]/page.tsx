@@ -9,6 +9,8 @@ import {
 import { loadFileRoomCampaign } from "@/lib/file-room/load-campaign";
 import { resolveFileRoomCampaignView } from "@/lib/file-room-view";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
+import { resolveFileRoomMaterialsView } from "@/lib/materials/materials-view";
+import { getOrInitializeMaterials } from "@/lib/materials/store";
 
 type FileRoomCampaignPageProps = {
   params: Promise<{ campaignId: string }>;
@@ -40,7 +42,12 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
     );
   }
 
-  const view = resolveFileRoomCampaignView(result.envelope);
+  const materialsEnvelope = await getOrInitializeMaterials(
+    campaignId,
+    result.envelope.record,
+  );
+  const materialsView = resolveFileRoomMaterialsView(materialsEnvelope);
+  const view = resolveFileRoomCampaignView(result.envelope, materialsView);
 
   return (
     <>

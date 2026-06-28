@@ -3,6 +3,7 @@ import Link from "next/link";
 import { fileRoom, FILE_ROOM_ROUTE } from "@/config/file-room";
 import type { FileRoomCampaignView } from "@/lib/file-room-view";
 
+import FileRoomMaterialsSection from "./FileRoomMaterialsSection";
 import FileRoomSectionCard from "./FileRoomSectionCard";
 import FileRoomStatusRail from "./FileRoomStatusRail";
 import FileRoomSyncBadge from "./FileRoomSyncBadge";
@@ -107,6 +108,8 @@ export default function FileRoomCampaignScene({ view }: FileRoomCampaignScenePro
               ))}
             </FileRoomSectionCard>
           ) : null}
+
+          <FileRoomMaterialsSection materials={view.materials} />
 
           {view.projectDetailsSections.length > 0 ? (
             <FileRoomSectionCard title="Project Details">

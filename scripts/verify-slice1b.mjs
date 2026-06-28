@@ -15,6 +15,7 @@ import path from "node:path";
 
 const BASE = process.env.VERIFY_BASE_URL ?? "http://localhost:3000";
 const CAMPAIGNS_DIR = path.join(process.cwd(), "data", "campaigns");
+const MATERIALS_DIR = path.join(process.cwd(), "data", "campaign-materials");
 const ASSIGNMENTS_PATH = path.join(process.cwd(), "data", "campaign-assignments.json");
 const USERS_PATH = path.join(process.cwd(), "data", "studio-users.json");
 const FIXTURE_IDS = new Set(["owner-qa-dev"]);
@@ -24,8 +25,8 @@ const OWNER_LOGIN = { email: "tagia@local.dev", password: "dev-only" };
 const STAFF_LOGIN = { email: "staff@local.dev", password: "dev-only" };
 
 /** @typedef {{ pass: boolean; evidence: string[] }} StepResult */
-/** @type {{ A: Record<string, StepResult>; B: Record<string, StepResult>; C: Record<string, StepResult>; D: Record<string, StepResult>; meta: Record<string, string> }} */
-const report = { A: {}, B: {}, C: {}, D: {}, meta: {} };
+/** @type {{ A: Record<string, StepResult>; B: Record<string, StepResult>; C: Record<string, StepResult>; D: Record<string, StepResult>; E: Record<string, StepResult>; meta: Record<string, string> }} */
+const report = { A: {}, B: {}, C: {}, D: {}, E: {}, meta: {} };
 
 class CookieJar {
   /** @type {Map<string, string>} */
@@ -175,12 +176,14 @@ async function runStep(section, label, fn) {
 
 async function clearNonFixtureCampaignFiles() {
   await mkdir(CAMPAIGNS_DIR, { recursive: true });
+  await mkdir(MATERIALS_DIR, { recursive: true });
   const files = await readdir(CAMPAIGNS_DIR).catch(() => []);
   for (const file of files) {
     if (!file.endsWith(".json")) continue;
     const id = file.slice(0, -5);
     if (isFixtureCampaignId(id) && process.env.ALLOW_FIXTURE_SYNC !== "1") continue;
     await rm(path.join(CAMPAIGNS_DIR, file), { force: true });
+    await rm(path.join(MATERIALS_DIR, `${id}.json`), { force: true });
   }
 }
 
@@ -404,7 +407,7 @@ function printReport() {
   console.log(`Test campaignId: ${report.meta.testCampaignId ?? "n/a"}`);
   console.log("");
 
-  for (const section of ["A", "B", "C", "D"]) {
+  for (const section of ["A", "B", "C", "D", "E"]) {
     console.log(`--- Section ${section} ---`);
     for (const [label, result] of Object.entries(report[section])) {
       const icon = result.pass ? "PASS" : "FAIL";
@@ -414,12 +417,61 @@ function printReport() {
     console.log("");
   }
 
-  const allPass = ["A", "B", "C", "D"].every((s) =>
+  const allPass = ["A", "B", "C", "D", "E"].every((s) =>
     Object.values(report[s]).every((r) => r.pass),
   );
   console.log(allPass ? "OVERALL: PASS" : "OVERALL: FAIL");
   console.log("=".repeat(72));
   return allPass;
+}
+
+async function sectionE() {
+  jar.clear();
+  const campaignId = report.meta.testCampaignId;
+  const otherCampaignId = report.meta.otherCampaignId;
+  if (!campaignId) throw new Error("Missing test campaignId from section B");
+
+  await runStep("E", "materials GET returns 401 without session", async (evidence) => {
+    const res = await fetchApi(`/api/campaigns/${campaignId}/materials`);
+    evidence.push(`GET materials → HTTP ${res.status}`);
+    if (res.status !== 401) throw new Error(`Expected 401, got ${res.status}`);
+  });
+
+  await runStep("E", "owner GET materials initializes ledger with blocking count", async (evidence) => {
+    await login(OWNER_LOGIN);
+    const res = await fetchApi(`/api/campaigns/${campaignId}/materials`);
+    evidence.push(`GET materials → HTTP ${res.status}`);
+    if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
+    if (!res.json?.materials?.campaignId) throw new Error("Missing materials payload");
+    if (typeof res.json.blockingRequiredCount !== "number") {
+      throw new Error("Missing blockingRequiredCount");
+    }
+    evidence.push(`blockingRequiredCount=${res.json.blockingRequiredCount}`);
+    evidence.push(`items=${res.json.materials.items?.length ?? 0}`);
+  });
+
+  await runStep("E", "owner detail shows Materials ledger section", async (evidence) => {
+    const res = await fetchApi(`/file-room/${campaignId}`);
+    evidence.push(`GET detail → HTTP ${res.status}`);
+    if (!res.text.includes("Materials ledger")) {
+      throw new Error("Missing Materials ledger section in File Room detail");
+    }
+  });
+
+  await runStep("E", "staff forbidden on unassigned campaign materials", async (evidence) => {
+    jar.clear();
+    await ensureStaffSeedUser();
+    await login(STAFF_LOGIN);
+    const res = await fetchApi(`/api/campaigns/${otherCampaignId}/materials`);
+    evidence.push(`GET unassigned materials → HTTP ${res.status}`);
+    if (res.status !== 403) throw new Error(`Expected 403, got ${res.status}`);
+  });
+
+  await runStep("E", "staff can read assigned campaign materials", async (evidence) => {
+    const res = await fetchApi(`/api/campaigns/${campaignId}/materials`);
+    evidence.push(`GET assigned materials → HTTP ${res.status}`);
+    if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
+  });
 }
 
 async function main() {
@@ -436,6 +488,7 @@ async function main() {
   await sectionB();
   await sectionC();
   await sectionD();
+  await sectionE();
 
   const pass = printReport();
   await mkdir(path.join(process.cwd(), "tmp"), { recursive: true });

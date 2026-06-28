@@ -1,0 +1,53 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  countBlockingRequiredMaterials,
+  isBlockingMaterialItem,
+  resolveFileRoomMaterialsView,
+} from "./materials-view";
+import type { CampaignMaterialItem } from "./types";
+
+function item(overrides: Partial<CampaignMaterialItem>): CampaignMaterialItem {
+  return {
+    id: "item-1",
+    category: "logo-brand",
+    requirementLevel: "required",
+    reviewStatus: "missing",
+    contentKind: "file-metadata",
+    label: "Logo files",
+    reason: "Brand Foundation",
+    relatedServiceIds: ["bf-001"],
+    uploadStatus: "none",
+    ...overrides,
+  };
+}
+
+describe("materials-view", () => {
+  it("groups items by category with status labels", () => {
+    const view = resolveFileRoomMaterialsView({
+      campaignId: "c-1",
+      items: [
+        item({ id: "a", category: "logo-brand" }),
+        item({ id: "b", category: "url-link", requirementLevel: "optional" }),
+      ],
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      version: 1,
+    });
+
+    expect(view.groups).toHaveLength(2);
+    expect(view.groups[0]?.categoryLabel.length).toBeGreaterThan(0);
+    expect(view.isEmpty).toBe(false);
+  });
+
+  it("counts only required missing/requested/needs_clarification as blocking", () => {
+    expect(
+      countBlockingRequiredMaterials([
+        item({ reviewStatus: "missing" }),
+        item({ reviewStatus: "submitted" }),
+        item({ requirementLevel: "optional", reviewStatus: "missing" }),
+        item({ reviewStatus: "needs_clarification" }),
+      ]),
+    ).toBe(2);
+    expect(isBlockingMaterialItem(item({ reviewStatus: "not_needed" }))).toBe(false);
+  });
+});

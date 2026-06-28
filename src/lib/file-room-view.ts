@@ -29,6 +29,7 @@ import {
   resolveCampaignProgressSteps,
   type CampaignProgressStep,
 } from "@/lib/studio-board-view";
+import type { FileRoomMaterialsView } from "@/lib/materials/materials-view";
 
 const { statusContent } = studioBoard;
 
@@ -88,6 +89,7 @@ export type FileRoomCampaignView = {
   progressSteps: readonly CampaignProgressStep[];
   sync: FileRoomSyncMeta;
   health: FileRoomRecordHealth;
+  materials: FileRoomMaterialsView;
 };
 
 function buildProjectDetailsSummary(
@@ -205,6 +207,7 @@ export function resolveFileRoomListItemView(
 
 export function resolveFileRoomCampaignView(
   envelope: ServerCampaignEnvelope,
+  materials: FileRoomMaterialsView,
 ): FileRoomCampaignView {
   const { record } = envelope;
   const content = statusContent[record.campaignStatus];
@@ -233,5 +236,6 @@ export function resolveFileRoomCampaignView(
       sourcePath: "data/campaigns/",
     },
     health: resolveRecordHealth(record),
+    materials,
   };
 }

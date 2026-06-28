@@ -7,6 +7,7 @@ import {
   resolveFileRoomCampaignView,
   resolveFileRoomListItemView,
 } from "./file-room-view";
+import { resolveFileRoomMaterialsView } from "@/lib/materials/materials-view";
 
 const now = "2026-06-01T12:00:00.000Z";
 
@@ -78,6 +79,13 @@ function buildEnvelope(overrides: Partial<ServerCampaignEnvelope["record"]> = {}
 }
 
 describe("file-room-view", () => {
+  const emptyMaterials = resolveFileRoomMaterialsView({
+    campaignId: "live-campaign-1",
+    items: [],
+    updatedAt: now,
+    version: 1,
+  });
+
   it("builds list item from server envelope only", () => {
     const view = resolveFileRoomListItemView(buildEnvelope());
     expect(view.campaignName).toBe("Acme Launch");
@@ -86,7 +94,7 @@ describe("file-room-view", () => {
   });
 
   it("includes frozen plan services and approved direction", () => {
-    const view = resolveFileRoomCampaignView(buildEnvelope());
+    const view = resolveFileRoomCampaignView(buildEnvelope(), emptyMaterials);
     expect(view.planIncludes.some((name) => name.length > 0)).toBe(true);
     expect(view.approvedDirection).toBe("Option A — Bold");
     expect(view.deliverableScope[0]?.deliverables).toContain("Brand guide PDF");
@@ -100,6 +108,7 @@ describe("file-room-view", () => {
         paymentReceivedAt: null,
         projectDetailsSubmittedAt: undefined,
       }),
+      emptyMaterials,
     );
     expect(view.health.isPartial).toBe(true);
     expect(view.health.missing).toContain("Discovery");
@@ -114,6 +123,7 @@ describe("file-room-view", () => {
         projectDetails: undefined,
         projectDetailsSubmittedAt: undefined,
       }),
+      emptyMaterials,
     );
     expect(view.visionSummary).toEqual([]);
     expect(view.projectDetailsSections).toEqual([]);
