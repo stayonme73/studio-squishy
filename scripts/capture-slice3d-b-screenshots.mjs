@@ -9,7 +9,7 @@ import path from "node:path";
 import { chromium } from "playwright";
 
 const BASE = process.env.VERIFY_BASE_URL ?? "http://localhost:3000";
-const OUT_DIR = path.join(process.cwd(), "scripts", "screenshots", "slice3d-b");
+const OUT_DIR = path.resolve("tmp/slice3d-b-screenshots");
 const CAMPAIGNS_DIR = path.join(process.cwd(), "data", "campaigns");
 const TASKS_DIR = path.join(process.cwd(), "data", "campaign-tasks");
 const ASSIGNMENTS_PATH = path.join(process.cwd(), "data", "campaign-assignments.json");
