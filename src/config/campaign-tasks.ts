@@ -1,17 +1,48 @@
 import type {
+  ProductionRole,
   ProductionTaskFamilyId,
   TaskEffectiveStatus,
   TaskPhase,
 } from "@/lib/campaign-tasks/types";
 
-/** Production task plan — File Room read-only section (Slice 3a). */
+/** Production task plan — File Room section (Slice 3b-b-b controls). */
 
 export type TaskDisplayStatus = "not_ready" | "ready" | "blocked";
 
 export const campaignTasksConfig = {
   sectionTitle: "Production task plan",
   sectionLead:
-    "Server-generated tasks from the approved Studio Plan. Read-only in Slice 3a — no assignment or status updates.",
+    "Server-generated tasks from the approved Studio Plan. Claim, hand off, and reassign work inline when you are authorized.",
+  claimLabel: "Claim",
+  releaseLabel: "Release claim",
+  submitHandoffLabel: "Submit handoff",
+  reassignLabel: "Reassign",
+  confirmSubmitLabel: "Confirm submit",
+  confirmReleaseLabel: "Confirm release",
+  confirmReassignLabel: "Confirm reassign",
+  cancelLabel: "Cancel",
+  claimedByLabel: "Claimed by",
+  handoffHistoryLabel: "Handoffs",
+  conflictMessage: "This task was updated elsewhere. Refreshing to the latest state.",
+  updateFailedMessage: "Update failed. Try again.",
+  forbiddenActionMessage: "You don't have permission for this action.",
+  reassignStaffLabel: "Assign to",
+  reassignRoleLabel: "Role",
+  reassignRiskLabels: {
+    changesPriority: "Changes priority",
+    changesDeadlineCommitment: "Changes deadline commitment",
+    changesClientFacingScope: "Changes client-facing scope",
+    createsMaterialRisk: "Creates material risk",
+  },
+  productionRoleLabels: {
+    producer_dispatcher: "Producer / dispatcher",
+    strategy: "Strategy",
+    copy: "Copy",
+    creative_production: "Creative production",
+    qa: "QA",
+    owner: "Owner",
+    client_input: "Client input",
+  } satisfies Record<ProductionRole, string>,
   emptyTitle: "No production tasks yet",
   emptyBody: "Tasks appear once an approved Studio Plan is on the server record.",
   familyLabels: {

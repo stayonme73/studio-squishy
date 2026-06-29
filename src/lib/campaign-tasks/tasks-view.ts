@@ -5,10 +5,21 @@ import {
   toDisplayStatus,
   type TaskDisplayStatus,
 } from "@/config/campaign-tasks";
+import type { StudioUser } from "@/lib/campaign-store/types";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 
+import {
+  claimVersionForTask,
+  resolveLatestHandoffForTask,
+  resolveReassignRolesForFamily,
+  resolveTaskPermissions,
+} from "./file-room-controls";
+import type { FileRoomTaskPermissions } from "./file-room-controls-types";
+import { taskRequiredRole } from "./capabilities";
 import type {
   CampaignTaskItem,
   CampaignTasksRecord,
+  ProductionRole,
   ProductionTaskFamilyId,
   TaskEffectiveStatus,
   TaskWorkflowState,
@@ -24,9 +35,24 @@ export type FileRoomTaskRow = {
   effectiveStatus: TaskEffectiveStatus;
   workflowState: TaskWorkflowState;
   serviceName: string;
+  familyId: ProductionTaskFamilyId;
+  responsibleRole: ProductionRole;
+  assignedRole?: ProductionRole;
   blockedReason: string | null;
   cycleLabel: string | null;
   dependsOnCount: number;
+  claimedByUserId?: string;
+  claimedByDisplayName?: string;
+  claimVersion: string | null;
+  permissions: FileRoomTaskPermissions;
+  reassignRoles: readonly ProductionRole[];
+  handoffHistoryCount: number;
+  latestHandoffSummary: string | null;
+};
+
+export type ResolveFileRoomProductionTasksOptions = {
+  user?: StudioUser;
+  assignments?: CampaignAssignmentsFile;
 };
 
 export type FileRoomTaskGroup = {
@@ -46,10 +72,24 @@ export type FileRoomProductionTasksView = {
   notReadyCount: number;
 };
 
-function toRow(task: CampaignTaskItem): FileRoomTaskRow {
+function toRow(
+  task: CampaignTaskItem,
+  options: ResolveFileRoomProductionTasksOptions,
+  handoffs: CampaignTasksRecord["handoffs"],
+): FileRoomTaskRow {
   const effectiveStatus = task.status;
   const displayStatus = toDisplayStatus(effectiveStatus);
   const workflowState = task.workflowState ?? "unstarted";
+  const handoffMeta = resolveLatestHandoffForTask(handoffs, task.id);
+  const permissions =
+    options.user && options.assignments
+      ? resolveTaskPermissions(options.user, task, options.assignments)
+      : {
+          canClaim: false,
+          canRelease: false,
+          canSubmitHandoff: false,
+          canReassign: false,
+        };
 
   return {
     id: task.id,
@@ -60,9 +100,19 @@ function toRow(task: CampaignTaskItem): FileRoomTaskRow {
     effectiveStatus,
     workflowState,
     serviceName: task.serviceName,
+    familyId: task.familyId,
+    responsibleRole: taskRequiredRole(task),
+    assignedRole: task.assignedRole,
     blockedReason: task.blockedReason ?? null,
     cycleLabel: task.cycleLabel ?? null,
     dependsOnCount: task.dependsOn.length,
+    claimedByUserId: task.claimedByUserId,
+    claimedByDisplayName: task.claimedByDisplayName,
+    claimVersion: claimVersionForTask(task),
+    permissions,
+    reassignRoles: resolveReassignRolesForFamily(task.familyId),
+    handoffHistoryCount: handoffMeta.count,
+    latestHandoffSummary: handoffMeta.latestSummary,
   };
 }
 
@@ -72,14 +122,15 @@ function countByDisplayBucket(rows: readonly FileRoomTaskRow[], bucket: TaskDisp
 
 export function resolveFileRoomProductionTasksView(
   record: CampaignTasksRecord,
+  options: ResolveFileRoomProductionTasksOptions = {},
 ): FileRoomProductionTasksView {
-  const rows = record.tasks.map(toRow);
+  const rows = record.tasks.map((task) => toRow(task, options, record.handoffs));
   const groupMap = new Map<string, FileRoomTaskGroup>();
 
   for (const task of record.tasks) {
     const key = `${task.familyId}:${task.serviceName}`;
     const existing = groupMap.get(key);
-    const row = toRow(task);
+    const row = toRow(task, options, record.handoffs);
     if (existing) {
       existing.tasks = [...existing.tasks, row];
       continue;
@@ -106,7 +157,7 @@ export function resolveFileRoomProductionTasksView(
 }
 
 export function resolveProductionTasksApiPayload(record: CampaignTasksRecord) {
-  const rows = record.tasks.map(toRow);
+  const rows = record.tasks.map((task) => toRow(task, {}, record.handoffs));
 
   return {
     tasks: record.tasks.map((task) => ({

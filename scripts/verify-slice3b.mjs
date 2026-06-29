@@ -1,5 +1,5 @@
 /**
- * Slice 3b-b-a — Task PATCH API verification (Section II only)
+ * Slice 3b — Task PATCH API (Section II) + File Room controls UI (Section III)
  *
  * Prerequisites:
  *   - Dev server on localhost:3000
@@ -11,6 +11,7 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { chromium } from "playwright";
 
 const BASE = process.env.VERIFY_BASE_URL ?? "http://localhost:3000";
 const CAMPAIGNS_DIR = path.join(process.cwd(), "data", "campaigns");
@@ -24,8 +25,8 @@ const OWNER_LOGIN = { email: "tagia@local.dev", password: "dev-only" };
 const STAFF_LOGIN = { email: "staff@local.dev", password: "dev-only" };
 const CLIENT_LOGIN = { email: "client@local.dev", password: "dev-only" };
 
-/** @type {{ II: Record<string, { pass: boolean; evidence: string[] }>; meta: Record<string, string> }} */
-const report = { II: {}, meta: {} };
+/** @type {{ II: Record<string, { pass: boolean; evidence: string[] }>; III: Record<string, { pass: boolean; evidence: string[] }>; meta: Record<string, string> }} */
+const report = { II: {}, III: {}, meta: {} };
 
 class CookieJar {
   /** @type {Map<string, string>} */
@@ -445,6 +446,168 @@ async function sectionII(campaignId) {
   });
 }
 
+/** @param {{ email: string; password: string }} credentials */
+async function loginPage(page, credentials) {
+  const res = await page.request.post(`${BASE}/api/auth/login`, { data: credentials });
+  if (!res.ok()) throw new Error(`Playwright login failed for ${credentials.email}: ${res.status()}`);
+}
+
+async function resetCopyTaskForUi(campaignId) {
+  const tasksPath = path.join(TASKS_DIR, `${campaignId}.json`);
+  const raw = await readFile(tasksPath, "utf8");
+  const envelope = JSON.parse(raw);
+  for (const task of envelope.tasks ?? []) {
+    if (task.id === "sm-001:strategy_content_direction") {
+      task.workflowState = "complete";
+      task.status = "complete";
+    }
+    if (task.id === "sm-001:copy") {
+      task.workflowState = "unstarted";
+      task.status = "ready";
+      delete task.claimedByUserId;
+      delete task.claimedByDisplayName;
+      delete task.claimedAt;
+    }
+  }
+  await writeFile(tasksPath, JSON.stringify(envelope, null, 2), "utf8");
+}
+
+async function sectionIII(campaignId) {
+  await resetCopyTaskForUi(campaignId);
+  await assignStaff(campaignId);
+
+  const browser = await chromium.launch();
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1200 } });
+
+  try {
+    await runStep("III", "staff sees Claim on ready copy task", async (evidence) => {
+      await loginPage(page, STAFF_LOGIN);
+      await page.goto(`${BASE}/file-room/${campaignId}`, { waitUntil: "networkidle" });
+      const section = page.locator(".utility-card", { hasText: "Production task plan" });
+      await section.waitFor({ timeout: 20000 });
+      const copyRow = section.locator(".fr-tasks-row", { hasText: "Copy" }).first();
+      await copyRow.waitFor({ timeout: 10000 });
+      const statusText = await copyRow.locator(".fr-tasks-row__status").innerText();
+      evidence.push(`status=${statusText}`);
+      if (!/ready/i.test(statusText)) throw new Error(`Expected Ready status, got ${statusText}`);
+      const claimBtn = copyRow.getByRole("button", { name: "Claim" });
+      if (!(await claimBtn.isVisible())) throw new Error("Claim button not visible");
+      evidence.push("Claim button visible");
+    });
+
+    await runStep("III", "click Claim shows in progress and claimant", async (evidence) => {
+      const section = page.locator(".utility-card", { hasText: "Production task plan" });
+      const copyRow = section.locator(".fr-tasks-row", { hasText: "Copy" }).first();
+      await copyRow.getByRole("button", { name: "Claim" }).click();
+      await page.waitForTimeout(800);
+      await page.reload({ waitUntil: "networkidle" });
+      const refreshed = page.locator(".utility-card", { hasText: "Production task plan" });
+      const row = refreshed.locator(".fr-tasks-row", { hasText: "Copy" }).first();
+      const statusText = await row.locator(".fr-tasks-row__status").innerText();
+      const rowText = await row.innerText();
+      evidence.push(`status=${statusText}`);
+      if (!/in progress/i.test(statusText)) throw new Error(`Expected In progress, got ${statusText}`);
+      if (!/Claimed by/i.test(rowText)) throw new Error("Missing Claimed by line");
+      evidence.push("Claimed by line visible");
+    });
+
+    await runStep("III", "submit handoff without fields surfaces error", async (evidence) => {
+      const section = page.locator(".utility-card", { hasText: "Production task plan" });
+      const copyRow = section.locator(".fr-tasks-row", { hasText: "Copy" }).first();
+      await copyRow.getByRole("button", { name: "Submit handoff" }).click();
+      await copyRow.getByRole("button", { name: "Confirm submit" }).click();
+      const alert = copyRow.locator("[role='alert']");
+      await alert.waitFor({ timeout: 10000 });
+      const message = await alert.innerText();
+      evidence.push(`alert=${message.slice(0, 80)}`);
+      if (!message.trim()) throw new Error("Expected validation error message");
+    });
+
+    await runStep("III", "valid handoff clears claim and shows Ready for QA", async (evidence) => {
+      const section = page.locator(".utility-card", { hasText: "Production task plan" });
+      const copyRow = section.locator(".fr-tasks-row", { hasText: "Copy" }).first();
+      await copyRow.locator("textarea").nth(0).fill("Draft complete.");
+      await copyRow.locator("textarea").nth(1).fill("Approved direction.");
+      await copyRow.locator("textarea").nth(2).fill("QA review.");
+      await copyRow.getByRole("button", { name: "Confirm submit" }).click();
+      await page.waitForTimeout(800);
+      await page.reload({ waitUntil: "networkidle" });
+      const refreshed = page.locator(".utility-card", { hasText: "Production task plan" });
+      const row = refreshed.locator(".fr-tasks-row", { hasText: "Copy" }).first();
+      const statusText = await row.locator(".fr-tasks-row__status").innerText();
+      const rowText = await row.innerText();
+      evidence.push(`status=${statusText}`);
+      if (!/ready for qa/i.test(statusText)) {
+        throw new Error(`Expected Ready for QA, got ${statusText}`);
+      }
+      if (/Claimed by/i.test(rowText)) throw new Error("Claim line should be cleared");
+      if (!/Handoffs:/i.test(rowText)) throw new Error("Expected handoff history line");
+      evidence.push("Handoff history visible");
+    });
+
+    await runStep("III", "409 conflict shows message after stale action", async (evidence) => {
+      await resetCopyTaskForUi(campaignId);
+      await page.reload({ waitUntil: "networkidle" });
+      const section = page.locator(".utility-card", { hasText: "Production task plan" });
+      const copyRow = section.locator(".fr-tasks-row", { hasText: "Copy" }).first();
+      await copyRow.getByRole("button", { name: "Claim" }).click();
+      await page.waitForTimeout(800);
+
+      const tasksPath = path.join(TASKS_DIR, `${campaignId}.json`);
+      const raw = await readFile(tasksPath, "utf8");
+      const envelope = JSON.parse(raw);
+      for (const task of envelope.tasks ?? []) {
+        if (task.id === "sm-001:copy") {
+          task.claimedAt = "1999-01-01T00:00:00.000Z";
+        }
+      }
+      await writeFile(tasksPath, JSON.stringify(envelope, null, 2), "utf8");
+
+      await copyRow.getByRole("button", { name: "Release claim" }).click();
+      await copyRow.locator("textarea").nth(0).fill("Releasing.");
+      await copyRow.locator("textarea").nth(1).fill("Context.");
+      await copyRow.locator("textarea").nth(2).fill("Next.");
+      await copyRow.getByRole("button", { name: "Confirm release" }).click();
+      const alert = copyRow.locator("[role='alert']");
+      await alert.waitFor({ timeout: 10000 });
+      const message = await alert.innerText();
+      evidence.push(`alert=${message.slice(0, 80)}`);
+      if (!/changed/i.test(message)) throw new Error(`Expected conflict message, got ${message}`);
+    });
+
+    await runStep("III", "producer sees Reassign control", async (evidence) => {
+      await resetCopyTaskForUi(campaignId);
+      await page.reload({ waitUntil: "networkidle" });
+      const section = page.locator(".utility-card", { hasText: "Production task plan" });
+      const copyRow = section.locator(".fr-tasks-row", { hasText: "Copy" }).first();
+      await copyRow.getByRole("button", { name: "Claim" }).click();
+      await page.waitForTimeout(800);
+      await page.reload({ waitUntil: "networkidle" });
+      const refreshed = page.locator(".utility-card", { hasText: "Production task plan" });
+      const row = refreshed.locator(".fr-tasks-row", { hasText: "Copy" }).first();
+      const reassignBtn = row.getByRole("button", { name: "Reassign" });
+      if (!(await reassignBtn.isVisible())) throw new Error("Reassign button not visible for producer staff");
+      await reassignBtn.click();
+      const staffSelect = row.locator("select").first();
+      if (!(await staffSelect.isVisible())) throw new Error("Staff select not visible");
+      evidence.push("Reassign panel opened with staff select");
+    });
+
+    await runStep("III", "client cannot access file-room layout", async (evidence) => {
+      await loginPage(page, CLIENT_LOGIN);
+      const res = await page.goto(`${BASE}/file-room/${campaignId}`, { waitUntil: "commit" });
+      evidence.push(`GET file-room → HTTP ${res?.status() ?? "n/a"}`);
+      const bodyText = await page.locator("body").innerText();
+      if (/Production task plan/i.test(bodyText)) {
+        throw new Error("Client should not see production task plan");
+      }
+      evidence.push("Client blocked from File Room content");
+    });
+  } finally {
+    await browser.close();
+  }
+}
+
 function printReport() {
   let pass = true;
   for (const [section, steps] of Object.entries(report)) {
@@ -491,6 +654,7 @@ async function main() {
   await assignStaff(campaignId);
 
   await sectionII(campaignId);
+  await sectionIII(campaignId);
 
   const pass = printReport();
   await mkdir(path.join(process.cwd(), "tmp"), { recursive: true });

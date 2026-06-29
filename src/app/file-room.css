@@ -529,3 +529,63 @@
   color: var(--utility-text-muted);
   font-size: var(--type-helper);
 }
+
+.fr-tasks-controls {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--utility-border);
+}
+
+.fr-tasks-controls__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.fr-tasks-handoff {
+  margin-top: 0.65rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.fr-tasks-handoff__field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.fr-tasks-handoff__textarea,
+.fr-tasks-handoff__select {
+  width: 100%;
+  font: inherit;
+  font-size: var(--type-body);
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--utility-border);
+  border-radius: 0.35rem;
+  background: var(--utility-card);
+}
+
+.fr-tasks-handoff__reassign {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.fr-tasks-handoff__flags {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.fr-tasks-handoff__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--type-helper);
+}
+
+.fr-tasks-handoff__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}

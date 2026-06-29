@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { fileRoom, FILE_ROOM_ROUTE } from "@/config/file-room";
+import type { FileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room-controls-types";
 import type { FileRoomCampaignView } from "@/lib/file-room-view";
 
 import FileRoomMaterialsSection from "./FileRoomMaterialsSection";
@@ -13,12 +14,14 @@ type FileRoomCampaignSceneProps = {
   view: FileRoomCampaignView;
   campaignId: string;
   canReviewMaterials: boolean;
+  operatorContext: FileRoomTaskOperatorContext;
 };
 
 export default function FileRoomCampaignScene({
   view,
   campaignId,
   canReviewMaterials,
+  operatorContext,
 }: FileRoomCampaignSceneProps) {
   return (
     <>
@@ -122,7 +125,11 @@ export default function FileRoomCampaignScene({
             canReview={canReviewMaterials}
           />
 
-          <FileRoomProductionTasksSection productionTasks={view.productionTasks} />
+          <FileRoomProductionTasksSection
+            campaignId={campaignId}
+            productionTasks={view.productionTasks}
+            operatorContext={operatorContext}
+          />
 
           {view.projectDetailsSections.length > 0 ? (
             <FileRoomSectionCard title="Project Details">

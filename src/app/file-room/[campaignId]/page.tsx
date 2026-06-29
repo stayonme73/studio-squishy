@@ -6,15 +6,17 @@ import {
   FileRoomForbiddenState,
   FileRoomNotFoundState,
 } from "@/components/file-room/FileRoomStatePanels";
-import { loadFileRoomCampaign } from "@/lib/file-room/load-campaign";
-import { resolveFileRoomCampaignView } from "@/lib/file-room-view";
+import { listStudioUsers, toPublicUser } from "@/lib/auth/users";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
+import { resolveFileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room-controls";
+import { resolveFileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
+import { getOrGenerateTasks } from "@/lib/campaign-tasks/store";
+import { loadFileRoomCampaign } from "@/lib/file-room/load-campaign";
+import { readCampaignAssignments } from "@/lib/file-room/assignments";
+import { resolveFileRoomCampaignView } from "@/lib/file-room-view";
 import { canReviewMaterials } from "@/lib/materials/access";
 import { resolveFileRoomMaterialsView } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
-import { getOrGenerateTasks } from "@/lib/campaign-tasks/store";
-import { resolveFileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
-import { readCampaignAssignments } from "@/lib/file-room/assignments";
 
 type FileRoomCampaignPageProps = {
   params: Promise<{ campaignId: string }>;
@@ -51,9 +53,23 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
     result.envelope.record,
   );
   const tasksEnvelope = await getOrGenerateTasks(campaignId, result.envelope.record);
-  const assignments = await readCampaignAssignments();
+  const [assignments, studioUsers] = await Promise.all([
+    readCampaignAssignments(),
+    listStudioUsers(),
+  ]);
+  const publicUsers = studioUsers.map(toPublicUser);
+  const operatorContext = resolveFileRoomTaskOperatorContext(
+    user,
+    campaignId,
+    result.envelope,
+    assignments,
+    publicUsers,
+  );
   const materialsView = resolveFileRoomMaterialsView(materialsEnvelope);
-  const productionTasksView = resolveFileRoomProductionTasksView(tasksEnvelope);
+  const productionTasksView = resolveFileRoomProductionTasksView(tasksEnvelope, {
+    user,
+    assignments,
+  });
   const view = resolveFileRoomCampaignView(result.envelope, materialsView, productionTasksView);
   const canReview = canReviewMaterials(user, campaignId, result.envelope, assignments);
 
@@ -64,6 +80,7 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
         view={view}
         campaignId={campaignId}
         canReviewMaterials={canReview}
+        operatorContext={operatorContext}
       />
     </>
   );
