@@ -457,7 +457,7 @@ async function main() {
 
   await runStep("8. approve_client_request deferred (501)", async (evidence) => {
     jar.clear();
-    await login(PRODUCER_LOGIN);
+    await login(OWNER_LOGIN);
     const raise = await fetchApi(`/api/campaigns/${campaignId}/tasks`, {
       method: "PATCH",
       json: {
@@ -467,11 +467,11 @@ async function main() {
         clientRequestDraft: { exactClientOnlyItem: "Vector logo file" },
       },
     });
+    evidence.push(`owner raise client_request → HTTP ${raise.status}`);
+    if (raise.status !== 200) throw new Error(JSON.stringify(raise.json));
     clientRequestExceptionId = raise.json.exceptionRecords?.find(
       (entry) => entry.kind === "client_request",
     )?.id;
-    jar.clear();
-    await login(OWNER_LOGIN);
     const res = await fetchApi(`/api/campaigns/${campaignId}/tasks`, {
       method: "PATCH",
       json: {

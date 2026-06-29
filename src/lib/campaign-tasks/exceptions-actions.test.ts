@@ -208,7 +208,7 @@ describe("exceptions-actions", () => {
         title: "Need logo",
         clientRequestDraft: { exactClientOnlyItem: "Vector logo" },
       },
-      producer,
+      owner,
       assignments,
     );
     if (!raised.ok) throw new Error("raise failed");

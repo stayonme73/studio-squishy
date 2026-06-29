@@ -2,8 +2,10 @@ import Link from "next/link";
 
 import { fileRoom, FILE_ROOM_ROUTE } from "@/config/file-room";
 import type { FileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room-controls-types";
+import type { FileRoomExceptionOperatorContext } from "@/lib/campaign-tasks/exceptions-view";
 import type { FileRoomCampaignView } from "@/lib/file-room-view";
 
+import FileRoomExceptionsSection from "./FileRoomExceptionsSection";
 import FileRoomMaterialsSection from "./FileRoomMaterialsSection";
 import FileRoomProductionTasksSection from "./FileRoomProductionTasksSection";
 import FileRoomSectionCard from "./FileRoomSectionCard";
@@ -15,6 +17,8 @@ type FileRoomCampaignSceneProps = {
   campaignId: string;
   canReviewMaterials: boolean;
   operatorContext: FileRoomTaskOperatorContext;
+  exceptionOperatorContext: FileRoomExceptionOperatorContext;
+  showExceptions: boolean;
 };
 
 export default function FileRoomCampaignScene({
@@ -22,6 +26,8 @@ export default function FileRoomCampaignScene({
   campaignId,
   canReviewMaterials,
   operatorContext,
+  exceptionOperatorContext,
+  showExceptions,
 }: FileRoomCampaignSceneProps) {
   return (
     <>
@@ -129,7 +135,17 @@ export default function FileRoomCampaignScene({
             campaignId={campaignId}
             productionTasks={view.productionTasks}
             operatorContext={operatorContext}
+            showExceptionBadges={showExceptions}
           />
+
+          {showExceptions ? (
+            <FileRoomExceptionsSection
+              campaignId={campaignId}
+              exceptions={view.exceptions}
+              tasks={view.productionTasks.tasks}
+              operatorContext={exceptionOperatorContext}
+            />
+          ) : null}
 
           {view.projectDetailsSections.length > 0 ? (
             <FileRoomSectionCard title="Project Details">

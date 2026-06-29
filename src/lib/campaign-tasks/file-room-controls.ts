@@ -1,4 +1,5 @@
 import type { StudioUser } from "@/lib/campaign-store/types";
+import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { ServerCampaignEnvelope } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments";
@@ -63,6 +64,43 @@ export type FileRoomExceptionPermissions = {
   canResolve: boolean;
   canApproveClientRequest: boolean;
 };
+
+export type ExceptionAssignCandidate = {
+  userId: string;
+  displayName: string;
+  isOwner: boolean;
+};
+
+export function resolveAssignCandidatesForException(
+  campaignId: string,
+  assignments: CampaignAssignmentsFile,
+  users: readonly StudioUser[],
+): ExceptionAssignCandidate[] {
+  const candidates: ExceptionAssignCandidate[] = [];
+
+  for (const user of users) {
+    if (isOwnerUser(user)) {
+      candidates.push({
+        userId: user.id,
+        displayName: user.displayName,
+        isOwner: true,
+      });
+      continue;
+    }
+    if (!user.roles.includes("staff")) continue;
+    if (!isStaffAssignedToCampaign(assignments, user.id, campaignId)) continue;
+    candidates.push({
+      userId: user.id,
+      displayName: user.displayName,
+      isOwner: false,
+    });
+  }
+
+  return candidates.sort((a, b) => {
+    if (a.isOwner !== b.isOwner) return a.isOwner ? -1 : 1;
+    return a.displayName.localeCompare(b.displayName);
+  });
+}
 
 export function resolveExceptionPermissions(
   user: StudioUser,

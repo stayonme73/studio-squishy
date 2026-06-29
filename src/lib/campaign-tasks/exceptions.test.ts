@@ -5,6 +5,7 @@ import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 
 import {
   canApproveClientRequest,
+  canRaiseExceptionKind,
   canResolveException,
   initialStatusForKind,
   isOpenExceptionStatus,
@@ -112,5 +113,12 @@ describe("exception permissions", () => {
     expect(canApproveClientRequest(owner, record)).toBe(true);
     expect(canApproveClientRequest(producer, record)).toBe(false);
     expect(canApproveClientRequest(qaStaff, record)).toBe(false);
+  });
+
+  it("only owner or producer can raise client_request", () => {
+    expect(canRaiseExceptionKind(owner, assignments, "client_request")).toBe(true);
+    expect(canRaiseExceptionKind(producer, assignments, "client_request")).toBe(true);
+    expect(canRaiseExceptionKind(qaStaff, assignments, "client_request")).toBe(false);
+    expect(canRaiseExceptionKind(qaStaff, assignments, "deadline_risk")).toBe(true);
   });
 });

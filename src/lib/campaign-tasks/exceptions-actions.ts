@@ -11,6 +11,7 @@ import {
   canApproveClientRequest,
   canAssignException,
   canRaiseException,
+  canRaiseExceptionKind,
   canResolveException,
   exceptionActorRole,
   findExceptionById,
@@ -113,6 +114,10 @@ export function applyRaiseException(
   const validation = validateRaiseException(payload);
   if (!validation.ok) {
     return { ok: false, error: validation.error, status: 400 };
+  }
+
+  if (!canRaiseExceptionKind(user, assignments, validation.payload.kind)) {
+    return { ok: false, error: "Forbidden", status: 403 };
   }
 
   if (payload.taskId) {

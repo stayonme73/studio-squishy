@@ -31,6 +31,7 @@ import {
 } from "@/lib/studio-board-view";
 import type { FileRoomMaterialsView } from "@/lib/materials/materials-view";
 import type { FileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
+import type { FileRoomExceptionsView } from "@/lib/campaign-tasks/exceptions-view";
 
 const { statusContent } = studioBoard;
 
@@ -92,6 +93,7 @@ export type FileRoomCampaignView = {
   health: FileRoomRecordHealth;
   materials: FileRoomMaterialsView;
   productionTasks: FileRoomProductionTasksView;
+  exceptions: FileRoomExceptionsView;
 };
 
 function buildProjectDetailsSummary(
@@ -211,6 +213,7 @@ export function resolveFileRoomCampaignView(
   envelope: ServerCampaignEnvelope,
   materials: FileRoomMaterialsView,
   productionTasks: FileRoomProductionTasksView,
+  exceptions: FileRoomExceptionsView,
 ): FileRoomCampaignView {
   const { record } = envelope;
   const content = statusContent[record.campaignStatus];
@@ -241,5 +244,6 @@ export function resolveFileRoomCampaignView(
     health: resolveRecordHealth(record),
     materials,
     productionTasks,
+    exceptions,
   };
 }

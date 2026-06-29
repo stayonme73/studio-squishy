@@ -8,8 +8,14 @@ import {
 } from "@/components/file-room/FileRoomStatePanels";
 import { listStudioUsers, toPublicUser } from "@/lib/auth/users";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
-import { resolveFileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room-controls";
+import { isInternalUser } from "@/lib/campaign-store/access";
+import { resolveFileRoomTaskOperatorContext, resolveAssignCandidatesForException } from "@/lib/campaign-tasks/file-room-controls";
 import { resolveFileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
+import {
+  resolveFileRoomExceptionsView,
+  resolveFileRoomExceptionOperatorContext,
+  resolveOpenExceptionCountByTaskId,
+} from "@/lib/campaign-tasks/exceptions-view";
 import { getOrGenerateTasks } from "@/lib/campaign-tasks/store";
 import { loadFileRoomCampaign } from "@/lib/file-room/load-campaign";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
@@ -66,11 +72,36 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
     publicUsers,
   );
   const materialsView = resolveFileRoomMaterialsView(materialsEnvelope);
+  const openExceptionCountByTaskId = resolveOpenExceptionCountByTaskId(
+    tasksEnvelope.exceptionRecords,
+  );
   const productionTasksView = resolveFileRoomProductionTasksView(tasksEnvelope, {
     user,
     assignments,
+    openExceptionCountByTaskId,
   });
-  const view = resolveFileRoomCampaignView(result.envelope, materialsView, productionTasksView);
+  const exceptionsView = resolveFileRoomExceptionsView(
+    tasksEnvelope.exceptionRecords,
+    tasksEnvelope.tasks,
+    { user, assignments },
+  );
+  const view = resolveFileRoomCampaignView(
+    result.envelope,
+    materialsView,
+    productionTasksView,
+    exceptionsView,
+  );
+  const assignCandidates = resolveAssignCandidatesForException(
+    campaignId,
+    assignments,
+    publicUsers,
+  );
+  const exceptionOperatorContext = resolveFileRoomExceptionOperatorContext(
+    user,
+    campaignId,
+    assignments,
+    assignCandidates,
+  );
   const canReview = canReviewMaterials(user, campaignId, result.envelope, assignments);
 
   return (
@@ -81,6 +112,8 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
         campaignId={campaignId}
         canReviewMaterials={canReview}
         operatorContext={operatorContext}
+        exceptionOperatorContext={exceptionOperatorContext}
+        showExceptions={isInternalUser(user)}
       />
     </>
   );

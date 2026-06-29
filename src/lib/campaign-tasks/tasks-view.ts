@@ -60,11 +60,13 @@ export type FileRoomTaskRow = {
   qaSummary: FileRoomTaskQaSummary;
   qaHistory: readonly FileRoomQaHistoryEntry[];
   latestQaHistory: FileRoomQaHistoryEntry | null;
+  openExceptionCount: number;
 };
 
 export type ResolveFileRoomProductionTasksOptions = {
   user?: StudioUser;
   assignments?: CampaignAssignmentsFile;
+  openExceptionCountByTaskId?: ReadonlyMap<string, number>;
 };
 
 export type FileRoomTaskGroup = {
@@ -136,6 +138,7 @@ function toRow(
     qaSummary,
     qaHistory,
     latestQaHistory,
+    openExceptionCount: options.openExceptionCountByTaskId?.get(task.id) ?? 0,
   };
 }
 

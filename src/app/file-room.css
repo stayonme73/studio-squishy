@@ -650,3 +650,188 @@
 .fr-qa-history__item {
   margin: 0.15rem 0;
 }
+
+.fr-tasks-row__exception-badge {
+  display: inline-block;
+  font-size: var(--type-helper);
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--utility-accent, #5b4fc7) 40%, var(--utility-border));
+  color: var(--utility-accent, #5b4fc7);
+  text-decoration: none;
+  background: color-mix(in srgb, var(--utility-accent, #5b4fc7) 8%, white);
+}
+
+.fr-tasks-row__exception-badge:hover {
+  background: color-mix(in srgb, var(--utility-accent, #5b4fc7) 14%, white);
+}
+
+.fr-exceptions__lead {
+  margin: 0 0 0.75rem;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-exceptions__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.fr-exceptions__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.fr-exceptions__filter {
+  font: inherit;
+  font-size: var(--type-helper);
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--utility-border);
+  border-radius: 999px;
+  background: var(--utility-card);
+  cursor: pointer;
+}
+
+.fr-exceptions__filter--active {
+  border-color: var(--utility-accent, #5b4fc7);
+  background: color-mix(in srgb, var(--utility-accent, #5b4fc7) 12%, white);
+}
+
+.fr-exceptions__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.fr-exceptions__empty-title {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+}
+
+.fr-exceptions__empty-body {
+  margin: 0;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-exceptions__error {
+  margin: 0.65rem 0 0;
+  color: var(--utility-danger, #b42318);
+  font-size: var(--type-helper);
+}
+
+.fr-exception-row {
+  padding: 0.75rem;
+  border: 1px solid var(--utility-border);
+  border-radius: 0.45rem;
+  background: var(--utility-card);
+}
+
+.fr-exception-row__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.fr-exception-row__kind {
+  font-weight: 600;
+}
+
+.fr-exception-row__status {
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-exception-row__title {
+  margin: 0.35rem 0 0;
+  font-weight: 500;
+}
+
+.fr-exception-row__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.fr-exception-badge {
+  font-size: var(--type-helper);
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--utility-border);
+}
+
+.fr-exception-badge--owner {
+  border-color: color-mix(in srgb, var(--utility-accent, #5b4fc7) 40%, var(--utility-border));
+  color: var(--utility-accent, #5b4fc7);
+}
+
+.fr-exception-badge--qa {
+  color: var(--utility-text-muted);
+}
+
+.fr-exception-row__meta {
+  margin: 0.35rem 0 0;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-exception-row__next-action {
+  margin: 0.45rem 0 0;
+  font-size: var(--type-helper);
+}
+
+.fr-exception-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+}
+
+.fr-exception-row__panel {
+  margin-top: 0.55rem;
+}
+
+.fr-exception-panel {
+  margin: 0.65rem 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.fr-exception-panel__field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.fr-exception-panel__input,
+.fr-exception-panel__select,
+.fr-exception-panel__textarea {
+  width: 100%;
+  font: inherit;
+  font-size: var(--type-body);
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--utility-border);
+  border-radius: 0.35rem;
+  background: var(--utility-card);
+}
+
+.fr-exception-panel__disclaimer {
+  margin: 0;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-exception-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}

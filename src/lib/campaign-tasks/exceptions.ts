@@ -178,6 +178,19 @@ export function canRaiseException(
   return (assignments.staffCapabilities?.[user.id]?.length ?? 0) > 0;
 }
 
+/** Client-request exceptions may only be raised by Owner or Producer. */
+export function canRaiseExceptionKind(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+  kind: CampaignExceptionKind,
+): boolean {
+  if (!canRaiseException(user, assignments)) return false;
+  if (kind === "client_request") {
+    return isOwnerUser(user) || userIsProducer(user, assignments);
+  }
+  return true;
+}
+
 export function canAssignException(
   user: StudioUser,
   assignments: CampaignAssignmentsFile,

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { campaignTasksConfig, formatBlockedReasonDisplay } from "@/config/campaign-tasks";
+import { campaignExceptionsConfig } from "@/config/campaign-exceptions";
 import type { FileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room-controls-types";
 import type { FileRoomQaHistoryEntry } from "@/lib/campaign-tasks/file-room-controls";
 import type { TasksPatchBody } from "@/lib/campaign-tasks/actions";
@@ -23,6 +24,7 @@ type FileRoomProductionTasksSectionProps = {
   campaignId: string;
   productionTasks: FileRoomProductionTasksView;
   operatorContext: FileRoomTaskOperatorContext;
+  showExceptionBadges?: boolean;
 };
 
 function formatQaHistoryLine(entry: FileRoomQaHistoryEntry): string {
@@ -38,11 +40,13 @@ function TaskRow({
   task,
   canOperate,
   operatorContext,
+  showExceptionBadges,
 }: {
   campaignId: string;
   task: FileRoomTaskRow;
   canOperate: boolean;
   operatorContext: FileRoomTaskOperatorContext;
+  showExceptionBadges: boolean;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -424,6 +428,14 @@ function TaskRow({
         <p className="fr-tasks-row__block-reason">{localBlockedReason}</p>
       ) : null}
 
+      {showExceptionBadges && task.openExceptionCount > 0 ? (
+        <p className="fr-tasks-row__meta">
+          <a className="fr-tasks-row__exception-badge" href="#file-room-exceptions">
+            {campaignExceptionsConfig.openExceptionBadge(task.openExceptionCount)}
+          </a>
+        </p>
+      ) : null}
+
       {showHandoffControls ? (
         <div className="fr-tasks-controls">
           <div className="fr-tasks-controls__actions">
@@ -528,6 +540,7 @@ export default function FileRoomProductionTasksSection({
   campaignId,
   productionTasks,
   operatorContext,
+  showExceptionBadges = true,
 }: FileRoomProductionTasksSectionProps) {
   if (productionTasks.isEmpty) {
     return (
@@ -571,6 +584,7 @@ export default function FileRoomProductionTasksSection({
                 task={task}
                 canOperate={operatorContext.canOperate}
                 operatorContext={operatorContext}
+                showExceptionBadges={showExceptionBadges}
               />
             ))}
           </ul>
