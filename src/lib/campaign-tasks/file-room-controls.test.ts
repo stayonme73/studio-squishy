@@ -134,6 +134,27 @@ describe("resolveTaskPermissions", () => {
     expect(permissions.canClaim).toBe(false);
     expect(permissions.canSubmitHandoff).toBe(false);
   });
+
+  it("allows QA staff QA actions on ready_for_qa tasks", () => {
+    const permissions = resolveTaskPermissions(
+      qaStaff,
+      copyTask({ workflowState: "ready_for_qa", status: "ready_for_qa" }),
+      assignments,
+    );
+    expect(permissions.canQaPass).toBe(true);
+    expect(permissions.canQaFail).toBe(true);
+    expect(permissions.canQaBlock).toBe(true);
+    expect(permissions.canClaim).toBe(false);
+  });
+
+  it("forbids copy staff QA actions", () => {
+    const permissions = resolveTaskPermissions(
+      copyStaff,
+      copyTask({ workflowState: "ready_for_qa", status: "ready_for_qa" }),
+      assignments,
+    );
+    expect(permissions.canQaPass).toBe(false);
+  });
 });
 
 describe("resolveReassignCandidatesForTask", () => {

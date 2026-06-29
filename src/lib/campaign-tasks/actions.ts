@@ -23,12 +23,29 @@ import {
   validateReassignmentReason,
 } from "./handoffs";
 import { applyStatusesWithWorkflow } from "./plan-change";
+import {
+  appendQaRecord,
+  applyFormalQaFailCascade,
+  buildDeliveryPrepContext,
+  buildQaRecord,
+  isFormalQaTask,
+  isQaCapableUser,
+  qaActorRole,
+  validateQaBlock,
+  validateQaFail,
+  validateQaPass,
+  workflowBlockedReasonForMissingClientFact,
+  workflowBlockedReasonForQaBlock,
+} from "./qa";
 import { canTransitionWorkflow } from "./transitions";
 import { resolveEffectiveTaskStatus } from "./workflow";
 import type {
   CampaignTaskItem,
   HandoffPayload,
   ProductionRole,
+  QaBlockCategory,
+  QaFailCategory,
+  QaRecord,
   ReassignmentFlags,
   ServerTasksEnvelope,
   TaskWorkflowState,
@@ -81,6 +98,32 @@ export type TasksPatchBody =
       handoff: HandoffPayload;
       reason?: string;
       reassignmentFlags?: ReassignmentFlags;
+    }
+  | {
+      action: "qa_pass";
+      taskId: string;
+      from: "ready_for_qa";
+      claimVersion: string | null;
+      checks: string[];
+      notes?: string;
+    }
+  | {
+      action: "qa_fail";
+      taskId: string;
+      from: "ready_for_qa";
+      claimVersion: string | null;
+      category: QaFailCategory;
+      notes?: string;
+      missingFactDescription?: string;
+      missingFactReason?: string;
+    }
+  | {
+      action: "qa_block";
+      taskId: string;
+      from: "ready_for_qa";
+      claimVersion: string | null;
+      category: QaBlockCategory;
+      notes?: string;
     };
 
 export type TaskActionContext = {
@@ -194,7 +237,12 @@ function transitionTask(
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
   context: TaskActionContext,
-  options: { effectiveStatusReady?: boolean } = {},
+  options: {
+    effectiveStatusReady?: boolean;
+    authorizedQaFailReopen?: boolean;
+    qaDisposition?: import("./types").QaDisposition;
+    actorRoleOverride?: ProductionRole;
+  } = {},
 ): TaskActionResult {
   const task = envelope.tasks.find((entry) => entry.id === taskId);
   if (!task) {
@@ -207,12 +255,18 @@ function transitionTask(
       taskId,
       from,
       to,
-      actorRole: actorRoleForUser(user, assignments, task),
+      actorRole: options.actorRoleOverride ?? actorRoleForUser(user, assignments, task),
+      qaDisposition: options.qaDisposition,
+      authorizedQaFailReopen: options.authorizedQaFailReopen,
     },
     task,
     {
       effectiveStatusReady: options.effectiveStatusReady,
       allTasks: envelope.tasks,
+      deliveryPrepContext:
+        task.phase === "delivery_prep"
+          ? buildDeliveryPrepContext(context.campaign, envelope)
+          : undefined,
     },
   );
 
@@ -511,6 +565,273 @@ export function applyReassign(
   );
 }
 
+function appendEnvelopeQaRecord(
+  envelope: ServerTasksEnvelope,
+  record: QaRecord,
+): ServerTasksEnvelope {
+  return {
+    ...envelope,
+    qaRecords: appendQaRecord(envelope.qaRecords, record),
+    version: 4,
+  };
+}
+
+function applyQaStateUpdates(
+  envelope: ServerTasksEnvelope,
+  updates: Map<string, (task: CampaignTaskItem) => CampaignTaskItem>,
+  context: TaskActionContext,
+): { envelope: ServerTasksEnvelope } | { error: string; status: number } {
+  const nextTasks = envelope.tasks.map((task) => {
+    const updater = updates.get(task.id);
+    return updater ? updater(task) : task;
+  });
+  const withStatuses = applyStatusesWithWorkflow(nextTasks, context.campaign, context.materials);
+  const now = new Date().toISOString();
+  return {
+    envelope: {
+      ...envelope,
+      tasks: withStatuses,
+      updatedAt: now,
+      syncedAt: now,
+      version: 4,
+    },
+  };
+}
+
+function assertQaAuthorized(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): TaskActionResult | null {
+  if (!isQaCapableUser(user, assignments)) {
+    return { ok: false, error: "Forbidden", status: 403 };
+  }
+  return null;
+}
+
+export function applyQaPass(
+  envelope: ServerTasksEnvelope,
+  body: Extract<TasksPatchBody, { action: "qa_pass" }>,
+  user: StudioUser,
+  context: TaskActionContext,
+): TaskActionResult {
+  const forbidden = assertQaAuthorized(user, context.assignments);
+  if (forbidden) return forbidden;
+
+  const task = envelope.tasks.find((entry) => entry.id === body.taskId);
+  if (!task) return { ok: false, error: "Task not found.", status: 404 };
+
+  const concurrency = assertConcurrency(task, body.from, body.claimVersion);
+  if (concurrency) return concurrency;
+
+  const deliveryPrepContext =
+    task.phase === "delivery_prep"
+      ? buildDeliveryPrepContext(context.campaign, envelope)
+      : undefined;
+
+  const validation = validateQaPass(task, body.checks, envelope.tasks, deliveryPrepContext);
+  if (!validation.ok) {
+    return { ok: false, error: validation.error, status: 400 };
+  }
+
+  const actorRole = qaActorRole(user, context.assignments);
+  const transitioned = transitionTask(
+    envelope,
+    body.taskId,
+    "complete",
+    user,
+    context.assignments,
+    context,
+    {
+      qaDisposition: "approve_next_stage",
+      actorRoleOverride: actorRole,
+    },
+  );
+  if (!transitioned.ok) return transitioned;
+
+  const record = buildQaRecord({
+    campaignId: envelope.campaignId,
+    taskId: body.taskId,
+    user,
+    actorRole,
+    action: "qa_pass",
+    checks: body.checks,
+    notes: body.notes,
+  });
+
+  const withRecord = appendEnvelopeQaRecord(transitioned.envelope, record);
+  const updatedTask = withRecord.tasks.find((entry) => entry.id === body.taskId);
+  if (!updatedTask) {
+    return { ok: false, error: "Task not found after QA pass.", status: 500 };
+  }
+
+  return { ok: true, envelope: withRecord, task: updatedTask };
+}
+
+export function applyQaFail(
+  envelope: ServerTasksEnvelope,
+  body: Extract<TasksPatchBody, { action: "qa_fail" }>,
+  user: StudioUser,
+  context: TaskActionContext,
+): TaskActionResult {
+  const forbidden = assertQaAuthorized(user, context.assignments);
+  if (forbidden) return forbidden;
+
+  const task = envelope.tasks.find((entry) => entry.id === body.taskId);
+  if (!task) return { ok: false, error: "Task not found.", status: 404 };
+
+  const concurrency = assertConcurrency(task, body.from, body.claimVersion);
+  if (concurrency) return concurrency;
+
+  const validation = validateQaFail(
+    task,
+    body.category,
+    envelope.tasks,
+    body.missingFactDescription,
+    body.missingFactReason,
+  );
+  if (!validation.ok) {
+    return { ok: false, error: validation.error, status: 400 };
+  }
+
+  const { routedTask } = validation;
+  const actorRole = qaActorRole(user, context.assignments);
+  const updates = new Map<string, (task: CampaignTaskItem) => CampaignTaskItem>();
+
+  if (body.category === "production_correction") {
+    const reopenFromComplete = routedTask.workflowState === "complete";
+    if (reopenFromComplete) {
+      const reopenCheck = canTransitionWorkflow(
+        {
+          taskId: routedTask.id,
+          from: "complete",
+          to: "needs_revision",
+          actorRole,
+          qaDisposition: "return_failed_check",
+          authorizedQaFailReopen: true,
+        },
+        routedTask,
+      );
+      if (!reopenCheck.ok) {
+        return { ok: false, error: reopenCheck.reason, status: 400 };
+      }
+    }
+
+    updates.set(routedTask.id, (current) => ({
+      ...current,
+      workflowState: "needs_revision",
+      workflowBlockedReason: undefined,
+      claimedByUserId: undefined,
+      claimedByDisplayName: undefined,
+      claimedAt: undefined,
+    }));
+  } else if (body.category === "missing_client_fact") {
+    const blockedReason = workflowBlockedReasonForMissingClientFact(body.missingFactDescription!);
+    updates.set(routedTask.id, (current) => ({
+      ...current,
+      workflowState: "blocked",
+      workflowBlockedReason: blockedReason,
+    }));
+  }
+
+  let workingEnvelope = envelope;
+
+  if (body.category === "production_correction" && isFormalQaTask(task)) {
+    const cascade = applyFormalQaFailCascade(workingEnvelope.tasks, task);
+    workingEnvelope = { ...workingEnvelope, tasks: cascade.tasks };
+  }
+
+  const applied = applyQaStateUpdates(workingEnvelope, updates, context);
+  if ("error" in applied) {
+    return { ok: false, error: applied.error, status: applied.status };
+  }
+
+  const record = buildQaRecord({
+    campaignId: envelope.campaignId,
+    taskId: body.taskId,
+    user,
+    actorRole,
+    action: "qa_fail",
+    category: body.category,
+    notes: body.notes,
+    routedTaskId: routedTask.id,
+    missingFactDescription: body.missingFactDescription,
+    missingFactReason: body.missingFactReason,
+  });
+
+  const withRecord = appendEnvelopeQaRecord(applied.envelope, record);
+  const updatedTask = withRecord.tasks.find((entry) => entry.id === body.taskId);
+  if (!updatedTask) {
+    return { ok: false, error: "Task not found after QA fail.", status: 500 };
+  }
+
+  return { ok: true, envelope: withRecord, task: updatedTask };
+}
+
+export function applyQaBlock(
+  envelope: ServerTasksEnvelope,
+  body: Extract<TasksPatchBody, { action: "qa_block" }>,
+  user: StudioUser,
+  context: TaskActionContext,
+): TaskActionResult {
+  const forbidden = assertQaAuthorized(user, context.assignments);
+  if (forbidden) return forbidden;
+
+  const task = envelope.tasks.find((entry) => entry.id === body.taskId);
+  if (!task) return { ok: false, error: "Task not found.", status: 404 };
+
+  const concurrency = assertConcurrency(task, body.from, body.claimVersion);
+  if (concurrency) return concurrency;
+
+  const validation = validateQaBlock(task, body.category);
+  if (!validation.ok) {
+    return { ok: false, error: validation.error, status: 400 };
+  }
+
+  const actorRole = qaActorRole(user, context.assignments);
+  const blockedReason = workflowBlockedReasonForQaBlock(body.category);
+  const transitioned = transitionTask(
+    envelope,
+    body.taskId,
+    "blocked",
+    user,
+    context.assignments,
+    context,
+    { qaDisposition: "mark_blocked", actorRoleOverride: actorRole },
+  );
+  if (!transitioned.ok) return transitioned;
+
+  const updates = new Map<string, (task: CampaignTaskItem) => CampaignTaskItem>();
+  updates.set(body.taskId, (current) => ({
+    ...current,
+    workflowState: "blocked",
+    workflowBlockedReason: blockedReason,
+  }));
+
+  const applied = applyQaStateUpdates(transitioned.envelope, updates, context);
+  if ("error" in applied) {
+    return { ok: false, error: applied.error, status: applied.status };
+  }
+
+  const record = buildQaRecord({
+    campaignId: envelope.campaignId,
+    taskId: body.taskId,
+    user,
+    actorRole,
+    action: "qa_block",
+    category: body.category,
+    notes: body.notes,
+    routedTaskId: body.taskId,
+  });
+
+  const withRecord = appendEnvelopeQaRecord(applied.envelope, record);
+  const updatedTask = withRecord.tasks.find((entry) => entry.id === body.taskId);
+  if (!updatedTask) {
+    return { ok: false, error: "Task not found after QA block.", status: 500 };
+  }
+
+  return { ok: true, envelope: withRecord, task: updatedTask };
+}
+
 export function applyTaskPatch(
   envelope: ServerTasksEnvelope,
   body: TasksPatchBody,
@@ -526,6 +847,12 @@ export function applyTaskPatch(
       return applyReleaseClaim(envelope, body, user, context);
     case "reassign":
       return applyReassign(envelope, body, user, context);
+    case "qa_pass":
+      return applyQaPass(envelope, body, user, context);
+    case "qa_fail":
+      return applyQaFail(envelope, body, user, context);
+    case "qa_block":
+      return applyQaBlock(envelope, body, user, context);
     default:
       return { ok: false, error: "Unknown action", status: 400 };
   }

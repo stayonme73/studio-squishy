@@ -34,7 +34,7 @@ export function isActiveWorkflowState(state: TaskWorkflowState): boolean {
 }
 
 function isQaActor(role: ProductionRole): boolean {
-  return role === "qa";
+  return role === "qa" || role === "owner";
 }
 
 function isOwnerOrPlanChange(role: ProductionRole): boolean {
@@ -128,6 +128,10 @@ function rejectsQaScopeExpansion(
   return false;
 }
 
+function hasComplianceHold(task: CampaignTaskItem): boolean {
+  return (task.workflowBlockedReason ?? "").includes("compliance_hold");
+}
+
 function hasOwnerEscalation(task: CampaignTaskItem): boolean {
   return (task.workflowBlockedReason ?? "").includes("owner_escalation");
 }
@@ -148,6 +152,20 @@ export function canTransitionWorkflow(
     return { ok: false, reason: "Transition from state does not match task." };
   }
 
+  if (isTerminalWorkflowState(from) && !request.authorizedQaFailReopen) {
+    return { ok: false, reason: `Terminal state ${from} cannot transition.` };
+  }
+
+  if (from === "complete" && to === "needs_revision") {
+    if (!request.authorizedQaFailReopen || !isQaActor(actorRole)) {
+      return { ok: false, reason: "Completed work may only reopen via authorized QA fail." };
+    }
+    if (qaDisposition !== "return_failed_check") {
+      return { ok: false, reason: "QA disposition must be return_failed_check." };
+    }
+    return { ok: true };
+  }
+
   if (isTerminalWorkflowState(from)) {
     return { ok: false, reason: `Terminal state ${from} cannot transition.` };
   }
@@ -156,8 +174,12 @@ export function canTransitionWorkflow(
     return { ok: false, reason: "QA may not expand scope or change client direction." };
   }
 
-  if (hasOwnerEscalation(task) && actorRole === "qa") {
+  if (hasOwnerEscalation(task) && isQaActor(actorRole)) {
     return { ok: false, reason: "QA may not override Owner escalation." };
+  }
+
+  if (hasComplianceHold(task) && isQaActor(actorRole)) {
+    return { ok: false, reason: "QA may not override compliance hold." };
   }
 
   switch (`${from}->${to}`) {

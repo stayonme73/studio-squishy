@@ -157,8 +157,10 @@ export type CampaignTasksRecord = {
   planChangePendingOwnerApproval?: boolean;
   /** Append-only handoff ledger — never edit or remove entries. */
   handoffs?: TaskHandoffRecord[];
+  /** Append-only QA ledger — never edit or remove entries (schema v4). */
+  qaRecords?: QaRecord[];
   updatedAt: string;
-  /** Envelope schema version — 3 adds claims + handoffs. */
+  /** Envelope schema version — 4 adds qaRecords. */
   version: number;
 };
 
@@ -172,11 +174,37 @@ export type TaskReadinessContext = {
   projectDetailsSubmitted: boolean;
 };
 
-/** QA authority dispositions — validation types only in Slice 3b-a. */
+/** QA authority dispositions — used by transition guards and QA PATCH actions. */
 export type QaDisposition =
   | "approve_next_stage"
   | "return_failed_check"
   | "mark_blocked";
+
+export type QaAction = "qa_pass" | "qa_fail" | "qa_block";
+
+export type QaFailCategory =
+  | "production_correction"
+  | "missing_client_fact"
+  | "scope_change";
+
+export type QaBlockCategory = "compliance_concern" | "direction_disagreement";
+
+export type QaRecord = {
+  id: string;
+  taskId: string;
+  campaignId: string;
+  createdAt: string;
+  actorUserId: string;
+  actorDisplayName: string;
+  actorRole: ProductionRole;
+  action: QaAction;
+  category?: QaFailCategory | QaBlockCategory;
+  checks?: readonly string[];
+  notes?: string;
+  routedTaskId?: string;
+  missingFactDescription?: string;
+  missingFactReason?: string;
+};
 
 export type WorkflowTransitionRequest = {
   taskId: string;
@@ -184,4 +212,6 @@ export type WorkflowTransitionRequest = {
   to: TaskWorkflowState;
   actorRole: ProductionRole;
   qaDisposition?: QaDisposition;
+  /** Authorized reopen of completed upstream work via qa_fail only. */
+  authorizedQaFailReopen?: boolean;
 };

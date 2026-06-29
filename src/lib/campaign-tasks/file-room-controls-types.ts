@@ -5,6 +5,9 @@ export type FileRoomTaskPermissions = {
   canRelease: boolean;
   canSubmitHandoff: boolean;
   canReassign: boolean;
+  canQaPass: boolean;
+  canQaFail: boolean;
+  canQaBlock: boolean;
 };
 
 export type FileRoomTaskOperator = {

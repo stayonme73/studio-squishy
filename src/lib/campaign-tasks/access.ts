@@ -9,6 +9,7 @@ import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments";
 
 import {
   canClaimTask,
+  canPerformQa,
   canReassignTask,
   canReleaseClaim,
   canSubmitHandoff,
@@ -77,6 +78,13 @@ export function canUserReassignTask(
   assignments: CampaignAssignmentsFile,
 ): boolean {
   return canReassignTask(user, assignments);
+}
+
+export function canUserPerformQa(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  return canPerformQa(user, assignments);
 }
 
 export function isProductionProducer(

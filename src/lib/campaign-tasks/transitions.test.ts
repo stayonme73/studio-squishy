@@ -180,6 +180,68 @@ describe("canTransitionWorkflow", () => {
     expect(result.ok).toBe(true);
   });
 
+  it("rejects complete → needs_revision without authorized QA fail", () => {
+    const complete = task({
+      id: "sm-001:copy",
+      phase: "copy",
+      workflowState: "complete",
+      dependsOn: [],
+    });
+    const result = canTransitionWorkflow(
+      request({
+        taskId: complete.id,
+        from: "complete",
+        to: "needs_revision",
+        actorRole: "qa",
+        qaDisposition: "return_failed_check",
+      }),
+      complete,
+    );
+    expect(result.ok).toBe(false);
+  });
+
+  it("allows authorized QA fail reopen complete → needs_revision", () => {
+    const complete = task({
+      id: "sm-001:creative",
+      phase: "creative",
+      workflowState: "complete",
+      dependsOn: [],
+    });
+    const result = canTransitionWorkflow(
+      request({
+        taskId: complete.id,
+        from: "complete",
+        to: "needs_revision",
+        actorRole: "owner",
+        qaDisposition: "return_failed_check",
+        authorizedQaFailReopen: true,
+      }),
+      complete,
+    );
+    expect(result.ok).toBe(true);
+  });
+
+  it("rejects QA pass on compliance hold", () => {
+    const blocked = task({
+      id: "sm-001:copy",
+      phase: "copy",
+      workflowState: "ready_for_qa",
+      workflowBlockedReason: "compliance_hold",
+      dependsOn: [],
+    });
+    const result = canTransitionWorkflow(
+      request({
+        taskId: blocked.id,
+        from: "ready_for_qa",
+        to: "complete",
+        actorRole: "qa",
+        qaDisposition: "approve_next_stage",
+      }),
+      blocked,
+    );
+    expect(result.ok).toBe(false);
+  });
+
   it("rejects QA transition that implies scope expansion", () => {
     const qaReady = task({
       id: "sm-001:copy",

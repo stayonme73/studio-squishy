@@ -8,6 +8,7 @@ import {
   canUserReassignTask,
   canUserReleaseClaim,
   canUserSubmitHandoff,
+  canUserPerformQa,
   canOperateProductionTasks,
   canReadProductionTasks,
   isProductionProducer,
@@ -161,5 +162,23 @@ describe("reassign permissions", () => {
 describe("isProductionProducer", () => {
   it("treats owner as producer", () => {
     expect(isProductionProducer(owner, assignments)).toBe(true);
+  });
+});
+
+describe("canUserPerformQa", () => {
+  it("allows QA-capable staff and owner", () => {
+    const qaStaff: StudioUser = {
+      id: "staff-qa",
+      email: "qa@local.dev",
+      displayName: "QA",
+      roles: ["staff"],
+    };
+    const qaAssignments: CampaignAssignmentsFile = {
+      staffByUserId: { "staff-qa": ["campaign-1"] },
+      staffCapabilities: { "staff-qa": ["qa"] },
+    };
+    expect(canUserPerformQa(owner, assignments)).toBe(true);
+    expect(canUserPerformQa(qaStaff, qaAssignments)).toBe(true);
+    expect(canUserPerformQa(copyStaff, assignments)).toBe(false);
   });
 });

@@ -24,16 +24,18 @@ function teamPayload(
   user: import("@/lib/campaign-store/types").StudioUser,
   assignments: Awaited<ReturnType<typeof readCampaignAssignments>>,
 ) {
-  const payload = resolveProductionTasksApiPayload(saved);
+  const payload = resolveProductionTasksApiPayload(saved, { includeQaSummary: true });
   return {
     ...payload,
     handoffs: saved.handoffs ?? [],
+    qaRecords: saved.qaRecords ?? [],
     tasks: payload.tasks.map((task) => ({
       ...task,
       claimVersion: task.claimedAt ?? null,
     })),
     operator: resolveOperatorPayload(user, assignments),
     syncedAt: saved.syncedAt,
+    version: saved.version ?? 4,
   };
 }
 

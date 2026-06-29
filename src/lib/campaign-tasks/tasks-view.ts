@@ -16,11 +16,13 @@ import {
 } from "./file-room-controls";
 import type { FileRoomTaskPermissions } from "./file-room-controls-types";
 import { taskRequiredRole } from "./capabilities";
+import { qaRecordsForTask, resolveQaSummary } from "./qa";
 import type {
   CampaignTaskItem,
   CampaignTasksRecord,
   ProductionRole,
   ProductionTaskFamilyId,
+  QaRecord,
   TaskEffectiveStatus,
   TaskWorkflowState,
 } from "./types";
@@ -48,6 +50,8 @@ export type FileRoomTaskRow = {
   reassignRoles: readonly ProductionRole[];
   handoffHistoryCount: number;
   latestHandoffSummary: string | null;
+  qaRecordCount: number;
+  latestQaAction: QaRecord["action"] | null;
 };
 
 export type ResolveFileRoomProductionTasksOptions = {
@@ -76,11 +80,13 @@ function toRow(
   task: CampaignTaskItem,
   options: ResolveFileRoomProductionTasksOptions,
   handoffs: CampaignTasksRecord["handoffs"],
+  qaRecords: CampaignTasksRecord["qaRecords"],
 ): FileRoomTaskRow {
   const effectiveStatus = task.status;
   const displayStatus = toDisplayStatus(effectiveStatus);
   const workflowState = task.workflowState ?? "unstarted";
   const handoffMeta = resolveLatestHandoffForTask(handoffs, task.id);
+  const taskQaRecords = qaRecordsForTask(qaRecords, task.id);
   const permissions =
     options.user && options.assignments
       ? resolveTaskPermissions(options.user, task, options.assignments)
@@ -89,6 +95,9 @@ function toRow(
           canRelease: false,
           canSubmitHandoff: false,
           canReassign: false,
+          canQaPass: false,
+          canQaFail: false,
+          canQaBlock: false,
         };
 
   return {
@@ -113,6 +122,9 @@ function toRow(
     reassignRoles: resolveReassignRolesForFamily(task.familyId),
     handoffHistoryCount: handoffMeta.count,
     latestHandoffSummary: handoffMeta.latestSummary,
+    qaRecordCount: taskQaRecords.length,
+    latestQaAction:
+      taskQaRecords.length > 0 ? taskQaRecords[taskQaRecords.length - 1].action : null,
   };
 }
 
@@ -124,13 +136,13 @@ export function resolveFileRoomProductionTasksView(
   record: CampaignTasksRecord,
   options: ResolveFileRoomProductionTasksOptions = {},
 ): FileRoomProductionTasksView {
-  const rows = record.tasks.map((task) => toRow(task, options, record.handoffs));
+  const rows = record.tasks.map((task) => toRow(task, options, record.handoffs, record.qaRecords));
   const groupMap = new Map<string, FileRoomTaskGroup>();
 
   for (const task of record.tasks) {
     const key = `${task.familyId}:${task.serviceName}`;
     const existing = groupMap.get(key);
-    const row = toRow(task, options, record.handoffs);
+    const row = toRow(task, options, record.handoffs, record.qaRecords);
     if (existing) {
       existing.tasks = [...existing.tasks, row];
       continue;
@@ -156,10 +168,13 @@ export function resolveFileRoomProductionTasksView(
   };
 }
 
-export function resolveProductionTasksApiPayload(record: CampaignTasksRecord) {
-  const rows = record.tasks.map((task) => toRow(task, {}, record.handoffs));
+export function resolveProductionTasksApiPayload(
+  record: CampaignTasksRecord,
+  options: { includeQaSummary?: boolean } = {},
+) {
+  const rows = record.tasks.map((task) => toRow(task, {}, record.handoffs, record.qaRecords));
 
-  return {
+  const payload = {
     tasks: record.tasks.map((task) => ({
       ...task,
       effectiveStatus: task.status,
@@ -191,4 +206,13 @@ export function resolveProductionTasksApiPayload(record: CampaignTasksRecord) {
       ),
     },
   };
+
+  if (options.includeQaSummary) {
+    return {
+      ...payload,
+      qaSummary: resolveQaSummary(record.qaRecords),
+    };
+  }
+
+  return payload;
 }

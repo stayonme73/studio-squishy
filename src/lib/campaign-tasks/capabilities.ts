@@ -145,6 +145,14 @@ export function canReleaseClaim(
   return task.claimedByUserId === user.id;
 }
 
+export function canPerformQa(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  if (isOwnerUser(user)) return true;
+  return userCanPerformRole(user, "qa", assignments);
+}
+
 export function canReassignTask(user: StudioUser, assignments: CampaignAssignmentsFile): boolean {
   return userIsProducer(user, assignments);
 }

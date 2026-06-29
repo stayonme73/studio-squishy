@@ -7,6 +7,7 @@ import { canOperateProductionTasks } from "./access";
 import { resolveOperatorPayload } from "./actions";
 import {
   canClaimTask,
+  canPerformQa,
   canReassignTask,
   canReleaseClaim,
   canSubmitHandoff as userCanSubmitHandoff,
@@ -15,6 +16,7 @@ import {
   isUserCapableForTaskFamily,
   userProductionRoles,
 } from "./capabilities";
+import { isQaBlockedReason } from "./qa";
 import type {
   CampaignTaskItem,
   ProductionRole,
@@ -67,7 +69,20 @@ export function resolveTaskPermissions(
   const canReassign =
     REASSIGNABLE_WORKFLOW.includes(workflow) && canReassignTask(user, assignments);
 
-  return { canClaim, canRelease, canSubmitHandoff, canReassign };
+  const canQa =
+    workflow === "ready_for_qa" &&
+    canPerformQa(user, assignments) &&
+    !isQaBlockedReason(task);
+
+  return {
+    canClaim,
+    canRelease,
+    canSubmitHandoff,
+    canReassign,
+    canQaPass: canQa,
+    canQaFail: canQa,
+    canQaBlock: canQa,
+  };
 }
 
 export function resolveReassignRolesForFamily(

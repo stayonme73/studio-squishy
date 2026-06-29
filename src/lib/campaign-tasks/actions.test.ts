@@ -6,10 +6,12 @@ import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 
 import {
   applyClaim,
+  applyQaPass,
   applyReassign,
   applyReleaseClaim,
   applySubmitForHandoff,
 } from "./actions";
+import { requiredChecksForPhase } from "./qa-checklists";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "./types";
 
 const now = "2026-06-28T12:00:00.000Z";
@@ -28,14 +30,23 @@ const producerStaff: StudioUser = {
   roles: ["staff"],
 };
 
+const qaStaff: StudioUser = {
+  id: "staff-qa",
+  email: "qa@local.dev",
+  displayName: "QA Staff",
+  roles: ["staff"],
+};
+
 const assignments: CampaignAssignmentsFile = {
   staffByUserId: {
     "staff-copy": ["campaign-1"],
     "staff-producer": ["campaign-1"],
+    "staff-qa": ["campaign-1"],
   },
   staffCapabilities: {
     "staff-copy": ["copy"],
     "staff-producer": ["producer_dispatcher", "copy"],
+    "staff-qa": ["qa"],
   },
 };
 
