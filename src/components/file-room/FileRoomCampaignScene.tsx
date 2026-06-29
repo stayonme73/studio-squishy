@@ -4,6 +4,7 @@ import { fileRoom, FILE_ROOM_ROUTE } from "@/config/file-room";
 import type { FileRoomCampaignView } from "@/lib/file-room-view";
 
 import FileRoomMaterialsSection from "./FileRoomMaterialsSection";
+import FileRoomProductionTasksSection from "./FileRoomProductionTasksSection";
 import FileRoomSectionCard from "./FileRoomSectionCard";
 import FileRoomStatusRail from "./FileRoomStatusRail";
 import FileRoomSyncBadge from "./FileRoomSyncBadge";
@@ -120,6 +121,8 @@ export default function FileRoomCampaignScene({
             materials={view.materials}
             canReview={canReviewMaterials}
           />
+
+          <FileRoomProductionTasksSection productionTasks={view.productionTasks} />
 
           {view.projectDetailsSections.length > 0 ? (
             <FileRoomSectionCard title="Project Details">

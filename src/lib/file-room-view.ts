@@ -30,6 +30,7 @@ import {
   type CampaignProgressStep,
 } from "@/lib/studio-board-view";
 import type { FileRoomMaterialsView } from "@/lib/materials/materials-view";
+import type { FileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
 
 const { statusContent } = studioBoard;
 
@@ -90,6 +91,7 @@ export type FileRoomCampaignView = {
   sync: FileRoomSyncMeta;
   health: FileRoomRecordHealth;
   materials: FileRoomMaterialsView;
+  productionTasks: FileRoomProductionTasksView;
 };
 
 function buildProjectDetailsSummary(
@@ -208,6 +210,7 @@ export function resolveFileRoomListItemView(
 export function resolveFileRoomCampaignView(
   envelope: ServerCampaignEnvelope,
   materials: FileRoomMaterialsView,
+  productionTasks: FileRoomProductionTasksView,
 ): FileRoomCampaignView {
   const { record } = envelope;
   const content = statusContent[record.campaignStatus];
@@ -237,5 +240,6 @@ export function resolveFileRoomCampaignView(
     },
     health: resolveRecordHealth(record),
     materials,
+    productionTasks,
   };
 }

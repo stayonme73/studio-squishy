@@ -12,6 +12,8 @@ import { readSessionFromCookieHeader } from "@/lib/auth/session";
 import { canReviewMaterials } from "@/lib/materials/access";
 import { resolveFileRoomMaterialsView } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
+import { getOrGenerateTasks } from "@/lib/campaign-tasks/store";
+import { resolveFileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 
 type FileRoomCampaignPageProps = {
@@ -48,9 +50,11 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
     campaignId,
     result.envelope.record,
   );
+  const tasksEnvelope = await getOrGenerateTasks(campaignId, result.envelope.record);
   const assignments = await readCampaignAssignments();
   const materialsView = resolveFileRoomMaterialsView(materialsEnvelope);
-  const view = resolveFileRoomCampaignView(result.envelope, materialsView);
+  const productionTasksView = resolveFileRoomProductionTasksView(tasksEnvelope);
+  const view = resolveFileRoomCampaignView(result.envelope, materialsView, productionTasksView);
   const canReview = canReviewMaterials(user, campaignId, result.envelope, assignments);
 
   return (

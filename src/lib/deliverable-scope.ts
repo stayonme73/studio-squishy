@@ -146,10 +146,17 @@ function lineSkuId(line: ApprovedStudioPlanLineItem): ServiceId {
   return (line.skuId ?? line.serviceId!) as ServiceId;
 }
 
-function isExecutionLineItem(line: ApprovedStudioPlanLineItem): boolean {
+export function isExecutionLineItem(line: ApprovedStudioPlanLineItem): boolean {
   const skuId = lineSkuId(line);
   if (EXECUTION_SKU_IDS.has(skuId)) return true;
   return Boolean(getServiceById(skuId)?.isExecutionAddOn);
+}
+
+/** Approved plan line items that produce deliverables — excludes execution add-ons. */
+export function filterProductionPlanLineItems(
+  plan: ApprovedStudioPlan,
+): ApprovedStudioPlanLineItem[] {
+  return plan.lineItems.filter((line) => !isExecutionLineItem(line));
 }
 
 function resolveSectionForLineItem(
