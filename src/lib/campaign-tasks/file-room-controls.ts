@@ -16,11 +16,14 @@ import {
   isUserCapableForTaskFamily,
   userProductionRoles,
 } from "./capabilities";
-import { isQaBlockedReason } from "./qa";
+import { isQaBlockedReason, qaRecordsForTask } from "./qa";
+import { campaignTasksConfig } from "@/config/campaign-tasks";
+
 import type {
   CampaignTaskItem,
   ProductionRole,
   ProductionTaskFamilyId,
+  QaRecord,
   TaskHandoffRecord,
   TaskWorkflowState,
 } from "./types";
@@ -157,6 +160,78 @@ export function resolveLatestHandoffForTask(
   return {
     count: taskHandoffs.length,
     latestSummary: latest.completedSummary,
+  };
+}
+
+export type FileRoomQaHistoryEntry = {
+  id: string;
+  action: QaRecord["action"];
+  actionLabel: string;
+  categoryLabel: string | null;
+  actorDisplayName: string;
+  createdAt: string;
+  notesPreview: string | null;
+};
+
+export type FileRoomTaskQaSummary = {
+  total: number;
+  passes: number;
+  fails: number;
+  blocks: number;
+};
+
+function qaCategoryLabel(record: QaRecord): string | null {
+  if (!record.category) return null;
+  if (record.category === "scope_change") return null;
+  if (record.action === "qa_block") {
+    return (
+      campaignTasksConfig.qaBlockCategoryLabels[record.category as "compliance_concern" | "direction_disagreement"] ??
+      record.category
+    );
+  }
+  if (record.category === "production_correction" || record.category === "missing_client_fact") {
+    return campaignTasksConfig.qaFailCategoryLabels[record.category];
+  }
+  return record.category;
+}
+
+function toQaHistoryEntry(record: QaRecord): FileRoomQaHistoryEntry {
+  return {
+    id: record.id,
+    action: record.action,
+    actionLabel: campaignTasksConfig.qaActionLabels[record.action],
+    categoryLabel: qaCategoryLabel(record),
+    actorDisplayName: record.actorDisplayName,
+    createdAt: record.createdAt,
+    notesPreview: record.notes?.trim() || record.missingFactDescription?.trim() || null,
+  };
+}
+
+export function resolveQaHistoryForTask(
+  qaRecords: readonly QaRecord[] | undefined,
+  taskId: string,
+): readonly FileRoomQaHistoryEntry[] {
+  return qaRecordsForTask(qaRecords, taskId).map(toQaHistoryEntry);
+}
+
+export function resolveLatestQaHistoryForTask(
+  qaRecords: readonly QaRecord[] | undefined,
+  taskId: string,
+): FileRoomQaHistoryEntry | null {
+  const history = resolveQaHistoryForTask(qaRecords, taskId);
+  return history.length > 0 ? history[history.length - 1] : null;
+}
+
+export function resolveQaSummaryForTask(
+  qaRecords: readonly QaRecord[] | undefined,
+  taskId: string,
+): FileRoomTaskQaSummary {
+  const records = qaRecordsForTask(qaRecords, taskId);
+  return {
+    total: records.length,
+    passes: records.filter((entry) => entry.action === "qa_pass").length,
+    fails: records.filter((entry) => entry.action === "qa_fail").length,
+    blocks: records.filter((entry) => entry.action === "qa_block").length,
   };
 }
 

@@ -1,6 +1,15 @@
 import type { TaskPhase } from "./types";
 
-/** Required checklist item ids per task phase — QA pass must include all for the phase. */
+/** Universal QA checks — required on every family panel before phase-specific additions. */
+export const UNIVERSAL_QA_CHECKS = [
+  "scope_match",
+  "factual_accuracy",
+  "direction_match",
+  "usability",
+  "client_safe_packaging",
+] as const;
+
+/** Phase-specific checklist item ids — appended after universal checks. */
 export const QA_CHECKLIST_BY_PHASE: Record<TaskPhase, readonly string[]> = {
   strategy: ["strategy_alignment", "scope_clarity"],
   strategy_content_direction: ["direction_alignment", "brand_fit"],
@@ -14,7 +23,8 @@ export const QA_CHECKLIST_BY_PHASE: Record<TaskPhase, readonly string[]> = {
 };
 
 export function requiredChecksForPhase(phase: TaskPhase): readonly string[] {
-  return QA_CHECKLIST_BY_PHASE[phase] ?? [];
+  const phaseChecks = QA_CHECKLIST_BY_PHASE[phase] ?? [];
+  return [...UNIVERSAL_QA_CHECKS, ...phaseChecks];
 }
 
 export function validateChecklistForPhase(

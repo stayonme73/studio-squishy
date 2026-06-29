@@ -1,6 +1,7 @@
 import {
   campaignTasksConfig,
   effectiveStatusLabel,
+  formatBlockedReasonDisplay,
   taskPhaseLabel,
   toDisplayStatus,
   type TaskDisplayStatus,
@@ -11,25 +12,31 @@ import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 import {
   claimVersionForTask,
   resolveLatestHandoffForTask,
+  resolveLatestQaHistoryForTask,
+  resolveQaHistoryForTask,
+  resolveQaSummaryForTask,
   resolveReassignRolesForFamily,
   resolveTaskPermissions,
+  type FileRoomQaHistoryEntry,
+  type FileRoomTaskQaSummary,
 } from "./file-room-controls";
 import type { FileRoomTaskPermissions } from "./file-room-controls-types";
 import { taskRequiredRole } from "./capabilities";
-import { qaRecordsForTask, resolveQaSummary } from "./qa";
+import { resolveQaSummary } from "./qa";
 import type {
   CampaignTaskItem,
   CampaignTasksRecord,
   ProductionRole,
   ProductionTaskFamilyId,
-  QaRecord,
   TaskEffectiveStatus,
+  TaskPhase,
   TaskWorkflowState,
 } from "./types";
 
 export type FileRoomTaskRow = {
   id: string;
   title: string;
+  phase: TaskPhase;
   phaseLabel: string;
   /** Display bucket for unchanged File Room UI (not_ready | ready | blocked). */
   status: TaskDisplayStatus;
@@ -50,8 +57,9 @@ export type FileRoomTaskRow = {
   reassignRoles: readonly ProductionRole[];
   handoffHistoryCount: number;
   latestHandoffSummary: string | null;
-  qaRecordCount: number;
-  latestQaAction: QaRecord["action"] | null;
+  qaSummary: FileRoomTaskQaSummary;
+  qaHistory: readonly FileRoomQaHistoryEntry[];
+  latestQaHistory: FileRoomQaHistoryEntry | null;
 };
 
 export type ResolveFileRoomProductionTasksOptions = {
@@ -86,7 +94,9 @@ function toRow(
   const displayStatus = toDisplayStatus(effectiveStatus);
   const workflowState = task.workflowState ?? "unstarted";
   const handoffMeta = resolveLatestHandoffForTask(handoffs, task.id);
-  const taskQaRecords = qaRecordsForTask(qaRecords, task.id);
+  const qaSummary = resolveQaSummaryForTask(qaRecords, task.id);
+  const qaHistory = resolveQaHistoryForTask(qaRecords, task.id);
+  const latestQaHistory = resolveLatestQaHistoryForTask(qaRecords, task.id);
   const permissions =
     options.user && options.assignments
       ? resolveTaskPermissions(options.user, task, options.assignments)
@@ -103,6 +113,7 @@ function toRow(
   return {
     id: task.id,
     title: task.title,
+    phase: task.phase,
     phaseLabel: taskPhaseLabel(task.phase),
     status: displayStatus,
     statusLabel: effectiveStatusLabel(effectiveStatus),
@@ -112,7 +123,7 @@ function toRow(
     familyId: task.familyId,
     responsibleRole: taskRequiredRole(task),
     assignedRole: task.assignedRole,
-    blockedReason: task.blockedReason ?? null,
+    blockedReason: formatBlockedReasonDisplay(task.blockedReason),
     cycleLabel: task.cycleLabel ?? null,
     dependsOnCount: task.dependsOn.length,
     claimedByUserId: task.claimedByUserId,
@@ -122,9 +133,9 @@ function toRow(
     reassignRoles: resolveReassignRolesForFamily(task.familyId),
     handoffHistoryCount: handoffMeta.count,
     latestHandoffSummary: handoffMeta.latestSummary,
-    qaRecordCount: taskQaRecords.length,
-    latestQaAction:
-      taskQaRecords.length > 0 ? taskQaRecords[taskQaRecords.length - 1].action : null,
+    qaSummary,
+    qaHistory,
+    latestQaHistory,
   };
 }
 

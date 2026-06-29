@@ -4,10 +4,13 @@ import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 
 import {
+  resolveLatestQaHistoryForTask,
+  resolveQaHistoryForTask,
+  resolveQaSummaryForTask,
   resolveReassignCandidatesForTask,
   resolveTaskPermissions,
 } from "./file-room-controls";
-import type { CampaignTaskItem } from "./types";
+import type { CampaignTaskItem, QaRecord } from "./types";
 
 const copyStaff: StudioUser = {
   id: "staff-copy",
@@ -154,6 +157,52 @@ describe("resolveTaskPermissions", () => {
       assignments,
     );
     expect(permissions.canQaPass).toBe(false);
+  });
+});
+
+describe("resolveQaHistoryForTask", () => {
+  const qaRecords: QaRecord[] = [
+    {
+      id: "qa-1",
+      taskId: "sm-001:copy",
+      campaignId: "campaign-1",
+      createdAt: "2026-06-28T12:00:00.000Z",
+      actorUserId: "staff-qa",
+      actorDisplayName: "QA Staff",
+      actorRole: "qa",
+      action: "qa_pass",
+      checks: ["copy_accuracy"],
+    },
+    {
+      id: "qa-2",
+      taskId: "sm-001:copy",
+      campaignId: "campaign-1",
+      createdAt: "2026-06-28T13:00:00.000Z",
+      actorUserId: "staff-qa",
+      actorDisplayName: "QA Staff",
+      actorRole: "qa",
+      action: "qa_fail",
+      category: "production_correction",
+      notes: "Fix headline",
+      routedTaskId: "sm-001:copy",
+    },
+  ];
+
+  it("maps QA records to read-only history entries", () => {
+    const history = resolveQaHistoryForTask(qaRecords, "sm-001:copy");
+    expect(history).toHaveLength(2);
+    expect(history[1]?.actionLabel).toBe("Failed");
+    expect(history[1]?.categoryLabel).toBe("Production correction");
+  });
+
+  it("summarizes QA counts per task", () => {
+    const summary = resolveQaSummaryForTask(qaRecords, "sm-001:copy");
+    expect(summary).toEqual({ total: 2, passes: 1, fails: 1, blocks: 0 });
+  });
+
+  it("returns latest QA history entry", () => {
+    const latest = resolveLatestQaHistoryForTask(qaRecords, "sm-001:copy");
+    expect(latest?.action).toBe("qa_fail");
   });
 });
 

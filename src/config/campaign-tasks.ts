@@ -1,6 +1,9 @@
 import type {
   ProductionRole,
   ProductionTaskFamilyId,
+  QaAction,
+  QaBlockCategory,
+  QaFailCategory,
   TaskEffectiveStatus,
   TaskPhase,
 } from "@/lib/campaign-tasks/types";
@@ -91,6 +94,65 @@ export const campaignTasksConfig = {
     internalNotes: "Internal notes (team only)",
     reassignmentReason: "Reassignment reason",
   },
+  qaReviewLabel: "QA review",
+  qaPassLabel: "Pass QA",
+  qaFailLabel: "Fail QA",
+  qaBlockLabel: "Block",
+  qaHistoryLabel: "QA history",
+  qaNotesLabel: "QA notes",
+  qaCategoryLabel: "Disposition category",
+  requiredCorrectionLabel: "Required correction",
+  missingFactDescriptionLabel: "Missing client fact",
+  missingFactReasonLabel: "Why this blocks production",
+  scopeChangeHelperText:
+    "Scope-changing feedback requires an exception workflow — not available in QA review.",
+  scopeChangeRejectMessage:
+    "Scope-changing feedback requires an exception, not QA revision.",
+  qaActionLabels: {
+    qa_pass: "Passed",
+    qa_fail: "Failed",
+    qa_block: "Blocked",
+  } satisfies Record<QaAction, string>,
+  qaFailCategoryLabels: {
+    production_correction: "Production correction",
+    missing_client_fact: "Missing client fact",
+  } satisfies Record<Exclude<QaFailCategory, "scope_change">, string>,
+  qaBlockCategoryLabels: {
+    compliance_concern: "Compliance concern",
+    direction_disagreement: "Direction disagreement",
+  } satisfies Record<QaBlockCategory, string>,
+  workflowBlockedReasonLabels: {
+    compliance_hold: "Compliance hold — Owner review required",
+    owner_escalation: "Direction hold — Owner review required",
+    plan_change: "Plan change — Owner review required",
+  },
+  qaChecklistLabels: {
+    scope_match: "Approved scope and quantity match",
+    factual_accuracy: "Facts, links, dates, names, and offers are accurate",
+    direction_match: "Work matches approved direction and brand context",
+    usability: "Work is usable and internally consistent",
+    client_safe_packaging: "Client-facing package is clean with no internal-only content",
+    strategy_alignment: "Strategy aligns with approved plan",
+    scope_clarity: "Scope is clear and bounded",
+    direction_alignment: "Direction matches approved brief",
+    brand_fit: "Brand fit verified",
+    review_complete: "Review is complete",
+    recommendations_clear: "Recommendations are clear",
+    copy_accuracy: "Copy accuracy verified",
+    brand_voice: "Brand voice consistent",
+    grammar: "Grammar and spelling checked",
+    visual_quality: "Visual quality meets standards",
+    brand_alignment: "Brand alignment verified",
+    specs_met: "Specs met",
+    production_quality: "Production quality verified",
+    deliverable_complete: "Deliverable complete",
+    production_complete: "Production complete",
+    deliverable_specs: "Deliverable specs verified",
+    client_requirements: "Client requirements met",
+    package_complete: "Package complete",
+    fingerprint_match: "Plan fingerprint matches",
+    no_internal_leaks: "No internal-only content in package",
+  },
 } as const;
 
 /** Map effective status to the three display buckets used by File Room UI. */
@@ -123,4 +185,36 @@ export function taskStatusLabel(status: TaskDisplayStatus): string {
 
 export function taskPhaseLabel(phase: TaskPhase): string {
   return campaignTasksConfig.phaseLabels[phase];
+}
+
+const WORKFLOW_BLOCKED_TOKENS = Object.keys(
+  campaignTasksConfig.workflowBlockedReasonLabels,
+) as (keyof typeof campaignTasksConfig.workflowBlockedReasonLabels)[];
+
+/** Map internal workflow tokens to customer-facing File Room labels. */
+export function formatBlockedReasonDisplay(reason: string | null | undefined): string | null {
+  if (!reason) return null;
+  const trimmed = reason.trim();
+  if (!trimmed) return null;
+
+  const exact =
+    campaignTasksConfig.workflowBlockedReasonLabels[
+      trimmed as keyof typeof campaignTasksConfig.workflowBlockedReasonLabels
+    ];
+  if (exact) return exact;
+
+  for (const token of WORKFLOW_BLOCKED_TOKENS) {
+    if (trimmed.includes(token)) {
+      return campaignTasksConfig.workflowBlockedReasonLabels[token];
+    }
+  }
+
+  if (trimmed.startsWith("missing_client_fact:")) {
+    const detail = trimmed.slice("missing_client_fact:".length).trim();
+    return detail
+      ? `Missing client fact — ${detail}`
+      : "Missing client fact — Owner input required";
+  }
+
+  return trimmed;
 }
