@@ -1,5 +1,17 @@
 import type { ServiceFamilyId, ServiceId } from "@/catalog/types";
 
+import type {
+  CampaignExceptionEvent,
+  CampaignExceptionRecord,
+} from "./exceptions-types";
+
+export type {
+  CampaignExceptionEvent,
+  CampaignExceptionRecord,
+  CampaignExceptionStatus,
+  CampaignExceptionKind,
+} from "./exceptions-types";
+
 export type TaskPhase =
   | "strategy"
   | "strategy_content_direction"
@@ -159,8 +171,12 @@ export type CampaignTasksRecord = {
   handoffs?: TaskHandoffRecord[];
   /** Append-only QA ledger — never edit or remove entries (schema v4). */
   qaRecords?: QaRecord[];
+  /** Exception entities — status may update; entries are never removed (schema v5). */
+  exceptionRecords?: CampaignExceptionRecord[];
+  /** Append-only exception audit trail (schema v5). */
+  exceptionEvents?: CampaignExceptionEvent[];
   updatedAt: string;
-  /** Envelope schema version — 4 adds qaRecords. */
+  /** Envelope schema version — 5 adds exceptionRecords and exceptionEvents. */
   version: number;
 };
 

@@ -37,9 +37,21 @@ import {
   workflowBlockedReasonForMissingClientFact,
   workflowBlockedReasonForQaBlock,
 } from "./qa";
+import {
+  applyApproveClientRequest,
+  applyAssignException,
+  applyRaiseException,
+  applyResolveException,
+} from "./exceptions-actions";
+import {
+  bridgeExceptionsAfterQaBlock,
+  bridgeExceptionsAfterQaFail,
+} from "./exceptions-bridge";
 import { canTransitionWorkflow } from "./transitions";
+import type { CampaignExceptionKind, CampaignExceptionClientRequestDraft } from "./exceptions-types";
 import { resolveEffectiveTaskStatus } from "./workflow";
 import type {
+  CampaignExceptionRecord,
   CampaignTaskItem,
   HandoffPayload,
   ProductionRole,
@@ -52,7 +64,12 @@ import type {
 } from "./types";
 
 export type TaskActionResult =
-  | { ok: true; envelope: ServerTasksEnvelope; task: CampaignTaskItem }
+  | {
+      ok: true;
+      envelope: ServerTasksEnvelope;
+      task?: CampaignTaskItem;
+      exception?: CampaignExceptionRecord;
+    }
   | {
       ok: false;
       error: string;
@@ -124,6 +141,29 @@ export type TasksPatchBody =
       claimVersion: string | null;
       category: QaBlockCategory;
       notes?: string;
+    }
+  | {
+      action: "raise_exception";
+      kind: CampaignExceptionKind;
+      title: string;
+      description?: string;
+      taskId?: string;
+      clientRequestDraft?: CampaignExceptionClientRequestDraft;
+    }
+  | {
+      action: "assign_exception";
+      exceptionId: string;
+      assignToUserId: string;
+      notes?: string;
+    }
+  | {
+      action: "resolve_exception";
+      exceptionId: string;
+      resolutionNotes?: string;
+    }
+  | {
+      action: "approve_client_request";
+      exceptionId: string;
     };
 
 export type TaskActionContext = {
@@ -572,7 +612,7 @@ function appendEnvelopeQaRecord(
   return {
     ...envelope,
     qaRecords: appendQaRecord(envelope.qaRecords, record),
-    version: 4,
+    version: 5,
   };
 }
 
@@ -593,7 +633,7 @@ function applyQaStateUpdates(
       tasks: withStatuses,
       updatedAt: now,
       syncedAt: now,
-      version: 4,
+      version: 5,
     },
   };
 }
@@ -759,12 +799,21 @@ export function applyQaFail(
   });
 
   const withRecord = appendEnvelopeQaRecord(applied.envelope, record);
-  const updatedTask = withRecord.tasks.find((entry) => entry.id === body.taskId);
+  const bridged = bridgeExceptionsAfterQaFail(
+    withRecord,
+    record,
+    body.category,
+    routedTask.id,
+    context.campaign,
+    user,
+    context.assignments,
+  );
+  const updatedTask = bridged.tasks.find((entry) => entry.id === body.taskId);
   if (!updatedTask) {
     return { ok: false, error: "Task not found after QA fail.", status: 500 };
   }
 
-  return { ok: true, envelope: withRecord, task: updatedTask };
+  return { ok: true, envelope: bridged, task: updatedTask };
 }
 
 export function applyQaBlock(
@@ -824,12 +873,19 @@ export function applyQaBlock(
   });
 
   const withRecord = appendEnvelopeQaRecord(applied.envelope, record);
-  const updatedTask = withRecord.tasks.find((entry) => entry.id === body.taskId);
+  const bridged = bridgeExceptionsAfterQaBlock(
+    withRecord,
+    record,
+    body.category,
+    user,
+    context.assignments,
+  );
+  const updatedTask = bridged.tasks.find((entry) => entry.id === body.taskId);
   if (!updatedTask) {
     return { ok: false, error: "Task not found after QA block.", status: 500 };
   }
 
-  return { ok: true, envelope: withRecord, task: updatedTask };
+  return { ok: true, envelope: bridged, task: updatedTask };
 }
 
 export function applyTaskPatch(
@@ -853,6 +909,33 @@ export function applyTaskPatch(
       return applyQaFail(envelope, body, user, context);
     case "qa_block":
       return applyQaBlock(envelope, body, user, context);
+    case "raise_exception": {
+      const result = applyRaiseException(envelope, body, user, context.assignments);
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "assign_exception": {
+      if (!context.targetUser) {
+        return { ok: false, error: "Target user not found.", status: 404 };
+      }
+      const result = applyAssignException(
+        envelope,
+        body,
+        user,
+        context.assignments,
+        context.targetUser,
+      );
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "resolve_exception": {
+      const result = applyResolveException(envelope, body, user, context.assignments);
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "approve_client_request": {
+      return applyApproveClientRequest(envelope, body, user, context.assignments);
+    }
     default:
       return { ok: false, error: "Unknown action", status: 400 };
   }

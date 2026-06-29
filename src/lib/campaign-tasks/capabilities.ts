@@ -156,3 +156,10 @@ export function canPerformQa(
 export function canReassignTask(user: StudioUser, assignments: CampaignAssignmentsFile): boolean {
   return userIsProducer(user, assignments);
 }
+
+export {
+  canAssignException,
+  canRaiseException,
+  canResolveException,
+  canApproveClientRequest,
+} from "./exceptions";

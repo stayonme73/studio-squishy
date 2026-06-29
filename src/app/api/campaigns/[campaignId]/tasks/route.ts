@@ -29,13 +29,15 @@ function teamPayload(
     ...payload,
     handoffs: saved.handoffs ?? [],
     qaRecords: saved.qaRecords ?? [],
+    exceptionRecords: saved.exceptionRecords ?? [],
+    exceptionEvents: saved.exceptionEvents ?? [],
     tasks: payload.tasks.map((task) => ({
       ...task,
       claimVersion: task.claimedAt ?? null,
     })),
     operator: resolveOperatorPayload(user, assignments),
     syncedAt: saved.syncedAt,
-    version: saved.version ?? 4,
+    version: saved.version ?? 5,
   };
 }
 
@@ -101,8 +103,10 @@ export async function PATCH(request: Request, context: RouteContext) {
   ]);
 
   let targetUser;
-  if (body.action === "reassign") {
-    const userRecord = await findUserById(body.toUserId);
+  if (body.action === "reassign" || body.action === "assign_exception") {
+    const toUserId =
+      body.action === "reassign" ? body.toUserId : body.assignToUserId;
+    const userRecord = await findUserById(toUserId);
     targetUser = userRecord ? toPublicUser(userRecord) : undefined;
   }
 

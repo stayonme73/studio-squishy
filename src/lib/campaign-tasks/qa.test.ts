@@ -167,7 +167,7 @@ describe("applyQaPass", () => {
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.task.workflowState).toBe("complete");
+      expect(result.task!.workflowState).toBe("complete");
       expect(result.envelope.qaRecords).toHaveLength(1);
       expect(result.envelope.qaRecords?.[0].action).toBe("qa_pass");
     }

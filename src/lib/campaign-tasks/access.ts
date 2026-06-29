@@ -14,8 +14,12 @@ import {
   canReleaseClaim,
   canSubmitHandoff,
   userIsProducer,
+  canAssignException,
+  canRaiseException,
+  canResolveException,
+  canApproveClientRequest,
 } from "./capabilities";
-import type { CampaignTaskItem } from "./types";
+import type { CampaignExceptionRecord, CampaignTaskItem } from "./types";
 
 /** Owner and assigned staff may read production tasks — clients are excluded (Slice 3a). */
 export function canReadProductionTasks(
@@ -45,7 +49,7 @@ export function canOperateProductionTasks(
   assignments?: CampaignAssignmentsFile | null,
 ): boolean {
   if (!user) return false;
-  if (user.roles.includes("client")) return false;
+  if (user.roles.includes("client") && !isOwnerUser(user)) return false;
   return canReadProductionTasks(user, campaignId, _envelope, assignments);
 }
 
@@ -92,4 +96,33 @@ export function isProductionProducer(
   assignments: CampaignAssignmentsFile,
 ): boolean {
   return userIsProducer(user, assignments);
+}
+
+export function canUserRaiseException(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  return canRaiseException(user, assignments);
+}
+
+export function canUserAssignException(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  return canAssignException(user, assignments);
+}
+
+export function canUserResolveException(
+  user: StudioUser,
+  exception: CampaignExceptionRecord,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  return canResolveException(user, exception, assignments);
+}
+
+export function canUserApproveClientRequest(
+  user: StudioUser,
+  exception: CampaignExceptionRecord,
+): boolean {
+  return canApproveClientRequest(user, exception);
 }

@@ -11,6 +11,10 @@ import {
   canReassignTask,
   canReleaseClaim,
   canSubmitHandoff as userCanSubmitHandoff,
+  canRaiseException,
+  canAssignException,
+  canResolveException,
+  canApproveClientRequest,
   FAMILY_CAPABLE_ROLES,
   isRoleCapableForTaskFamily,
   isUserCapableForTaskFamily,
@@ -20,6 +24,7 @@ import { isQaBlockedReason, qaRecordsForTask } from "./qa";
 import { campaignTasksConfig } from "@/config/campaign-tasks";
 
 import type {
+  CampaignExceptionRecord,
   CampaignTaskItem,
   ProductionRole,
   ProductionTaskFamilyId,
@@ -50,6 +55,26 @@ const REASSIGNABLE_WORKFLOW: readonly TaskWorkflowState[] = [
 
 function claimVersionForTask(task: CampaignTaskItem): string | null {
   return task.claimedAt ?? null;
+}
+
+export type FileRoomExceptionPermissions = {
+  canRaise: boolean;
+  canAssign: boolean;
+  canResolve: boolean;
+  canApproveClientRequest: boolean;
+};
+
+export function resolveExceptionPermissions(
+  user: StudioUser,
+  exception: CampaignExceptionRecord,
+  assignments: CampaignAssignmentsFile,
+): FileRoomExceptionPermissions {
+  return {
+    canRaise: canRaiseException(user, assignments),
+    canAssign: canAssignException(user, assignments),
+    canResolve: canResolveException(user, exception, assignments),
+    canApproveClientRequest: canApproveClientRequest(user, exception),
+  };
 }
 
 export function resolveTaskPermissions(

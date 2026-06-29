@@ -151,9 +151,9 @@ describe("applyClaim", () => {
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.task.workflowState).toBe("in_progress");
-      expect(result.task.claimedByUserId).toBe(copyStaff.id);
-      expect(result.task.claimedAt).toBeTruthy();
+      expect(result.task!.workflowState).toBe("in_progress");
+      expect(result.task!.claimedByUserId).toBe(copyStaff.id);
+      expect(result.task!.claimedAt).toBeTruthy();
     }
   });
 
@@ -231,8 +231,8 @@ describe("applySubmitForHandoff", () => {
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.task.workflowState).toBe("ready_for_qa");
-      expect(result.task.claimedByUserId).toBeUndefined();
+      expect(result.task!.workflowState).toBe("ready_for_qa");
+      expect(result.task!.claimedByUserId).toBeUndefined();
       expect(result.envelope.handoffs).toHaveLength(1);
       expect(result.envelope.handoffs?.[0].action).toBe("submit_for_handoff");
     }
@@ -299,7 +299,7 @@ describe("applyReleaseClaim", () => {
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.task.workflowState).toBe("unstarted");
+      expect(result.task!.workflowState).toBe("unstarted");
       expect(result.envelope.handoffs).toHaveLength(1);
     }
 
@@ -349,7 +349,7 @@ describe("applyReassign", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.envelope.handoffs?.[0].action).toBe("reassign");
-      expect(result.task.claimedByUserId).toBe(copyStaff.id);
+      expect(result.task!.claimedByUserId).toBe(copyStaff.id);
     }
   });
 
