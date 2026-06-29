@@ -207,6 +207,9 @@ export function canTransitionWorkflow(
     case "needs_revision->in_progress":
       return { ok: true };
 
+    case "in_progress->unstarted":
+      return { ok: true };
+
     case "blocked->in_progress":
       if (actorRole !== "producer_dispatcher" && actorRole !== "owner") {
         return { ok: false, reason: "Only producer or owner may clear a block." };

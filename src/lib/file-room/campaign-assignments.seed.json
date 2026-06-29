@@ -2,5 +2,8 @@
   "_comment": "Development-only staff campaign assignments (Slice 1b bridge). Copied to data/campaign-assignments.json when missing or empty. staff-dev is assigned to the Slice 1b Verification Campaign in data/campaigns/ — owner-only campaigns stay unassigned.",
   "staffByUserId": {
     "staff-dev": ["6babd2a8-7a5f-4009-b4ab-69dd2587a059"]
+  },
+  "staffCapabilities": {
+    "staff-dev": ["copy", "creative_production", "producer_dispatcher"]
   }
 }

@@ -1,0 +1,562 @@
+import type { CampaignRecord } from "@/config/studio-board";
+import type { StudioUser } from "@/lib/campaign-store/types";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignMaterialItem } from "@/lib/materials/types";
+
+import {
+  canClaimTask,
+  canReassignTask,
+  canReleaseClaim,
+  canSubmitHandoff,
+  isRoleCapableForTaskFamily,
+  isUserCapableForTaskFamily,
+  taskRequiredRole,
+  userCanPerformRole,
+  userIsProducer,
+  userProductionRoles,
+} from "./capabilities";
+import { buildReadinessContext } from "./readiness";
+import {
+  appendHandoff,
+  buildHandoffRecord,
+  validateHandoffPayload,
+  validateReassignmentReason,
+} from "./handoffs";
+import { applyStatusesWithWorkflow } from "./plan-change";
+import { canTransitionWorkflow } from "./transitions";
+import { resolveEffectiveTaskStatus } from "./workflow";
+import type {
+  CampaignTaskItem,
+  HandoffPayload,
+  ProductionRole,
+  ReassignmentFlags,
+  ServerTasksEnvelope,
+  TaskWorkflowState,
+} from "./types";
+
+export type TaskActionResult =
+  | { ok: true; envelope: ServerTasksEnvelope; task: CampaignTaskItem }
+  | {
+      ok: false;
+      error: string;
+      status: number;
+      conflict?: TaskConflictSnapshot;
+    };
+
+export type TaskConflictSnapshot = {
+  taskId: string;
+  workflowState: TaskWorkflowState;
+  claimVersion: string | null;
+  task: CampaignTaskItem;
+};
+
+export type TasksPatchBody =
+  | {
+      action: "claim";
+      taskId: string;
+      from: "unstarted" | "needs_revision";
+      claimVersion: string | null;
+    }
+  | {
+      action: "submit_for_handoff";
+      taskId: string;
+      from: "in_progress";
+      claimVersion: string | null;
+      handoff: HandoffPayload;
+    }
+  | {
+      action: "release_claim";
+      taskId: string;
+      from: "in_progress";
+      claimVersion: string | null;
+      handoff: HandoffPayload;
+    }
+  | {
+      action: "reassign";
+      taskId: string;
+      from: TaskWorkflowState;
+      claimVersion: string | null;
+      toUserId: string;
+      toRole: ProductionRole;
+      handoff: HandoffPayload;
+      reason?: string;
+      reassignmentFlags?: ReassignmentFlags;
+    };
+
+export type TaskActionContext = {
+  campaign: CampaignRecord;
+  materials: readonly CampaignMaterialItem[];
+  assignments: CampaignAssignmentsFile;
+  targetUser?: StudioUser;
+};
+
+function claimVersionForTask(task: CampaignTaskItem): string | null {
+  return task.claimedAt ?? null;
+}
+
+function conflictSnapshot(task: CampaignTaskItem): TaskConflictSnapshot {
+  return {
+    taskId: task.id,
+    workflowState: task.workflowState ?? "unstarted",
+    claimVersion: claimVersionForTask(task),
+    task,
+  };
+}
+
+function actorRoleForUser(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+  task: CampaignTaskItem,
+): ProductionRole {
+  if (userIsProducer(user, assignments)) return "producer_dispatcher";
+  return taskRequiredRole(task);
+}
+
+function assertConcurrency(
+  task: CampaignTaskItem,
+  from: TaskWorkflowState,
+  claimVersion: string | null | undefined,
+): TaskActionResult | null {
+  const currentState = task.workflowState ?? "unstarted";
+  if (currentState !== from) {
+    return {
+      ok: false,
+      error: "Task state has changed.",
+      status: 409,
+      conflict: conflictSnapshot(task),
+    };
+  }
+
+  const expectedClaim = claimVersion ?? null;
+  const currentClaim = claimVersionForTask(task);
+  if (expectedClaim !== currentClaim) {
+    return {
+      ok: false,
+      error: "Task claim has changed.",
+      status: 409,
+      conflict: conflictSnapshot(task),
+    };
+  }
+
+  return null;
+}
+
+function updateTaskInEnvelope(
+  envelope: ServerTasksEnvelope,
+  taskId: string,
+  updater: (task: CampaignTaskItem) => CampaignTaskItem,
+  context: TaskActionContext,
+): { envelope: ServerTasksEnvelope; task: CampaignTaskItem } | { error: string; status: number } {
+  const index = envelope.tasks.findIndex((task) => task.id === taskId);
+  if (index === -1) {
+    return { error: "Task not found.", status: 404 };
+  }
+
+  const nextTasks = [...envelope.tasks];
+  nextTasks[index] = updater(nextTasks[index]);
+  const withStatuses = applyStatusesWithWorkflow(nextTasks, context.campaign, context.materials);
+  const task = withStatuses[index];
+  const now = new Date().toISOString();
+
+  return {
+    envelope: {
+      ...envelope,
+      tasks: withStatuses,
+      updatedAt: now,
+      syncedAt: now,
+    },
+    task,
+  };
+}
+
+function clearClaim(task: CampaignTaskItem): CampaignTaskItem {
+  return {
+    ...task,
+    claimedByUserId: undefined,
+    claimedByDisplayName: undefined,
+    claimedAt: undefined,
+  };
+}
+
+function setClaim(task: CampaignTaskItem, user: StudioUser): CampaignTaskItem {
+  return {
+    ...task,
+    claimedByUserId: user.id,
+    claimedByDisplayName: user.displayName,
+    claimedAt: new Date().toISOString(),
+  };
+}
+
+function transitionTask(
+  envelope: ServerTasksEnvelope,
+  taskId: string,
+  to: TaskWorkflowState,
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+  context: TaskActionContext,
+  options: { effectiveStatusReady?: boolean } = {},
+): TaskActionResult {
+  const task = envelope.tasks.find((entry) => entry.id === taskId);
+  if (!task) {
+    return { ok: false, error: "Task not found.", status: 404 };
+  }
+
+  const from = task.workflowState ?? "unstarted";
+  const transitionCheck = canTransitionWorkflow(
+    {
+      taskId,
+      from,
+      to,
+      actorRole: actorRoleForUser(user, assignments, task),
+    },
+    task,
+    {
+      effectiveStatusReady: options.effectiveStatusReady,
+      allTasks: envelope.tasks,
+    },
+  );
+
+  if (!transitionCheck.ok) {
+    return { ok: false, error: transitionCheck.reason, status: 400 };
+  }
+
+  const updated = updateTaskInEnvelope(
+    envelope,
+    taskId,
+    (current) => ({ ...current, workflowState: to }),
+    context,
+  );
+
+  if ("error" in updated) {
+    return { ok: false, error: updated.error, status: updated.status };
+  }
+
+  return { ok: true, envelope: updated.envelope, task: updated.task };
+}
+
+function appendTaskHandoff(
+  envelope: ServerTasksEnvelope,
+  record: ReturnType<typeof buildHandoffRecord>,
+  taskId: string,
+  context: TaskActionContext,
+  taskUpdater: (task: CampaignTaskItem) => CampaignTaskItem,
+): TaskActionResult {
+  let handoffs: ReturnType<typeof appendHandoff>;
+  try {
+    handoffs = appendHandoff(envelope.handoffs, record);
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Handoff append failed.",
+      status: 400,
+    };
+  }
+
+  const withHandoffs: ServerTasksEnvelope = { ...envelope, handoffs };
+  const updated = updateTaskInEnvelope(withHandoffs, taskId, taskUpdater, context);
+  if ("error" in updated) {
+    return { ok: false, error: updated.error, status: updated.status };
+  }
+
+  const taskWithHandoff = {
+    ...updated.task,
+    lastHandoffId: record.id,
+  };
+  const tasks = updated.envelope.tasks.map((entry) =>
+    entry.id === taskId ? taskWithHandoff : entry,
+  );
+
+  return {
+    ok: true,
+    envelope: { ...updated.envelope, tasks },
+    task: taskWithHandoff,
+  };
+}
+
+export function applyClaim(
+  envelope: ServerTasksEnvelope,
+  body: Extract<TasksPatchBody, { action: "claim" }>,
+  user: StudioUser,
+  context: TaskActionContext,
+): TaskActionResult {
+  const task = envelope.tasks.find((entry) => entry.id === body.taskId);
+  if (!task) return { ok: false, error: "Task not found.", status: 404 };
+
+  const concurrency = assertConcurrency(task, body.from, body.claimVersion);
+  if (concurrency) return concurrency;
+
+  if (!canClaimTask(user, task, context.assignments)) {
+    return { ok: false, error: "Forbidden", status: 403 };
+  }
+
+  if (task.claimedByUserId && task.claimedByUserId !== user.id) {
+    return { ok: false, error: "Task is already claimed by another user.", status: 400 };
+  }
+
+  const readiness = buildReadinessContext(context.campaign);
+  const effective = resolveEffectiveTaskStatus(task, readiness, envelope.tasks);
+  const transitioned = transitionTask(
+    envelope,
+    body.taskId,
+    "in_progress",
+    user,
+    context.assignments,
+    context,
+    { effectiveStatusReady: effective.status === "ready" || body.from === "needs_revision" },
+  );
+  if (!transitioned.ok) return transitioned;
+
+  const claimed = updateTaskInEnvelope(
+    transitioned.envelope,
+    body.taskId,
+    (current) => setClaim(current, user),
+    context,
+  );
+  if ("error" in claimed) {
+    return { ok: false, error: claimed.error, status: claimed.status };
+  }
+
+  return { ok: true, envelope: claimed.envelope, task: claimed.task };
+}
+
+export function applySubmitForHandoff(
+  envelope: ServerTasksEnvelope,
+  body: Extract<TasksPatchBody, { action: "submit_for_handoff" }>,
+  user: StudioUser,
+  context: TaskActionContext,
+): TaskActionResult {
+  const task = envelope.tasks.find((entry) => entry.id === body.taskId);
+  if (!task) return { ok: false, error: "Task not found.", status: 404 };
+
+  const concurrency = assertConcurrency(task, body.from, body.claimVersion);
+  if (concurrency) return concurrency;
+
+  if (!canSubmitHandoff(user, task, context.assignments)) {
+    return { ok: false, error: "Forbidden", status: 403 };
+  }
+
+  const handoffValidation = validateHandoffPayload(body.handoff);
+  if (!handoffValidation.ok) {
+    return { ok: false, error: handoffValidation.error, status: 400 };
+  }
+
+  const transitioned = transitionTask(
+    envelope,
+    body.taskId,
+    "ready_for_qa",
+    user,
+    context.assignments,
+    context,
+  );
+  if (!transitioned.ok) return transitioned;
+
+  const record = buildHandoffRecord({
+    campaignId: envelope.campaignId,
+    taskId: body.taskId,
+    fromUserId: user.id,
+    fromDisplayName: user.displayName,
+    fromRole: actorRoleForUser(user, context.assignments, task),
+    toRole: "qa",
+    fromState: body.from,
+    toState: "ready_for_qa",
+    action: "submit_for_handoff",
+    payload: handoffValidation.payload,
+  });
+
+  return appendTaskHandoff(transitioned.envelope, record, body.taskId, context, clearClaim);
+}
+
+export function applyReleaseClaim(
+  envelope: ServerTasksEnvelope,
+  body: Extract<TasksPatchBody, { action: "release_claim" }>,
+  user: StudioUser,
+  context: TaskActionContext,
+): TaskActionResult {
+  const task = envelope.tasks.find((entry) => entry.id === body.taskId);
+  if (!task) return { ok: false, error: "Task not found.", status: 404 };
+
+  const concurrency = assertConcurrency(task, body.from, body.claimVersion);
+  if (concurrency) return concurrency;
+
+  if (!canReleaseClaim(user, task, context.assignments)) {
+    return { ok: false, error: "Forbidden", status: 403 };
+  }
+
+  const handoffValidation = validateHandoffPayload(body.handoff);
+  if (!handoffValidation.ok) {
+    return { ok: false, error: handoffValidation.error, status: 400 };
+  }
+
+  const transitioned = transitionTask(
+    envelope,
+    body.taskId,
+    "unstarted",
+    user,
+    context.assignments,
+    context,
+  );
+  if (!transitioned.ok) return transitioned;
+
+  const record = buildHandoffRecord({
+    campaignId: envelope.campaignId,
+    taskId: body.taskId,
+    fromUserId: user.id,
+    fromDisplayName: user.displayName,
+    fromRole: actorRoleForUser(user, context.assignments, task),
+    toRole: "producer_dispatcher",
+    fromState: body.from,
+    toState: "unstarted",
+    action: "release_claim",
+    payload: handoffValidation.payload,
+  });
+
+  return appendTaskHandoff(transitioned.envelope, record, body.taskId, context, clearClaim);
+}
+
+export function applyReassign(
+  envelope: ServerTasksEnvelope,
+  body: Extract<TasksPatchBody, { action: "reassign" }>,
+  user: StudioUser,
+  context: TaskActionContext,
+): TaskActionResult {
+  const task = envelope.tasks.find((entry) => entry.id === body.taskId);
+  if (!task) return { ok: false, error: "Task not found.", status: 404 };
+
+  const concurrency = assertConcurrency(task, body.from, body.claimVersion);
+  if (concurrency) return concurrency;
+
+  if (!canReassignTask(user, context.assignments)) {
+    return { ok: false, error: "Forbidden", status: 403 };
+  }
+
+  if (!isRoleCapableForTaskFamily(task.familyId, body.toRole)) {
+    return {
+      ok: false,
+      error: "Target role is not capable for this task family.",
+      status: 400,
+    };
+  }
+
+  if (!context.targetUser) {
+    return { ok: false, error: "Target user not found.", status: 404 };
+  }
+
+  if (!isUserCapableForTaskFamily(context.targetUser, task, body.toRole, context.assignments)) {
+    return {
+      ok: false,
+      error: "Target user does not have the required capability for this task family.",
+      status: 400,
+    };
+  }
+
+  const reasonError = validateReassignmentReason(body.reassignmentFlags, body.reason);
+  if (reasonError) {
+    return { ok: false, error: reasonError, status: 400 };
+  }
+
+  const handoffValidation = validateHandoffPayload(body.handoff);
+  if (!handoffValidation.ok) {
+    return { ok: false, error: handoffValidation.error, status: 400 };
+  }
+
+  const fromState = task.workflowState ?? "unstarted";
+  const toState: TaskWorkflowState = "in_progress";
+
+  if (fromState !== "in_progress" && fromState !== "unstarted" && fromState !== "needs_revision") {
+    return { ok: false, error: "Task cannot be reassigned from its current state.", status: 400 };
+  }
+
+  let workingEnvelope = envelope;
+  if (fromState !== "in_progress") {
+    const readiness = buildReadinessContext(context.campaign);
+    const effective = resolveEffectiveTaskStatus(task, readiness, envelope.tasks);
+    const transitioned = transitionTask(
+      envelope,
+      body.taskId,
+      "in_progress",
+      user,
+      context.assignments,
+      context,
+      { effectiveStatusReady: effective.status === "ready" || fromState === "needs_revision" },
+    );
+    if (!transitioned.ok) return transitioned;
+    workingEnvelope = transitioned.envelope;
+  }
+
+  const record = buildHandoffRecord({
+    campaignId: envelope.campaignId,
+    taskId: body.taskId,
+    fromUserId: user.id,
+    fromDisplayName: user.displayName,
+    fromRole: "producer_dispatcher",
+    toRole: body.toRole,
+    fromState,
+    toState,
+    action: "reassign",
+    payload: handoffValidation.payload,
+    reassignmentReason: body.reason,
+    reassignmentFlags: body.reassignmentFlags,
+  });
+
+  return appendTaskHandoff(
+    workingEnvelope,
+    record,
+    body.taskId,
+    context,
+    (current) => ({
+      ...setClaim(current, context.targetUser!),
+      assignedRole: body.toRole,
+      workflowState: "in_progress",
+    }),
+  );
+}
+
+export function applyTaskPatch(
+  envelope: ServerTasksEnvelope,
+  body: TasksPatchBody,
+  user: StudioUser,
+  context: TaskActionContext,
+): TaskActionResult {
+  switch (body.action) {
+    case "claim":
+      return applyClaim(envelope, body, user, context);
+    case "submit_for_handoff":
+      return applySubmitForHandoff(envelope, body, user, context);
+    case "release_claim":
+      return applyReleaseClaim(envelope, body, user, context);
+    case "reassign":
+      return applyReassign(envelope, body, user, context);
+    default:
+      return { ok: false, error: "Unknown action", status: 400 };
+  }
+}
+
+export function resolveOperatorPayload(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+) {
+  return {
+    userId: user.id,
+    capabilities: [...userProductionRoles(user, assignments)],
+    canReassign: canReassignTask(user, assignments),
+  };
+}
+
+export function isTasksTeamAudience(user: StudioUser): boolean {
+  return user.roles.includes("owner") || user.roles.includes("staff");
+}
+
+export function claimVersionLabel(task: CampaignTaskItem): string | null {
+  return claimVersionForTask(task);
+}
+
+export function userHasOperateCapability(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  if (userIsProducer(user, assignments)) return true;
+  return userProductionRoles(user, assignments).length > 0;
+}
+
+// re-export for access tests
+export { userCanPerformRole };

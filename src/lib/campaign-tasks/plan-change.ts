@@ -13,7 +13,7 @@ import type {
   TaskWorkflowState,
 } from "./types";
 
-export const CAMPAIGN_TASKS_SCHEMA_VERSION = 2;
+export const CAMPAIGN_TASKS_SCHEMA_VERSION = 3;
 
 export type MergePlanChangeOptions = {
   ownerApproved?: boolean;
@@ -109,6 +109,7 @@ export function mergePlanChangeTasks(
   return {
     ...existing,
     tasks: [...mergedById.values()],
+    handoffs: existing.handoffs ?? [],
     planFingerprint: freshGenerated.planFingerprint,
     planVersion: previousVersion + 1,
     frozenPlanSnapshots: snapshots,
@@ -151,6 +152,7 @@ export function normalizeLegacyRecord(record: ServerTasksEnvelope): ServerTasksE
     version: record.version ?? CAMPAIGN_TASKS_SCHEMA_VERSION,
     planVersion: record.planVersion ?? 1,
     frozenPlanSnapshots: record.frozenPlanSnapshots ?? [],
+    handoffs: record.handoffs ?? [],
     tasks: record.tasks.map(normalizeLegacyTask),
   };
 }

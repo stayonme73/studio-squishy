@@ -47,6 +47,18 @@ describe("campaign assignments", () => {
     expect(assignments.staffByUserId["staff-dev"]).toEqual(["campaign-a"]);
   });
 
+  it("normalizes staff capabilities", async () => {
+    await writeCampaignAssignments({
+      staffByUserId: { "staff-dev": ["campaign-a"] },
+      staffCapabilities: { "staff-dev": ["copy", "copy", "creative_production"] },
+    });
+    const assignments = await readCampaignAssignments();
+    expect(assignments.staffCapabilities?.["staff-dev"]).toEqual([
+      "copy",
+      "creative_production",
+    ]);
+  });
+
   it("backfills empty runtime file from dev seed", async () => {
     await fs.writeFile(ASSIGNMENTS_PATH, JSON.stringify({ staffByUserId: {} }, null, 2), "utf8");
     const assignments = await readCampaignAssignments();

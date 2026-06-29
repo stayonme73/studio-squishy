@@ -50,6 +50,16 @@ export const campaignTasksConfig = {
     qa: "QA",
     delivery_prep: "Delivery prep",
   } satisfies Record<TaskPhase, string>,
+  handoffFieldLabels: {
+    completedSummary: "Completed summary",
+    sourceContext: "Source / context",
+    nextSteps: "Next steps",
+    openQuestions: "Open questions",
+    risks: "Risks",
+    workRef: "Work reference",
+    internalNotes: "Internal notes (team only)",
+    reassignmentReason: "Reassignment reason",
+  },
 } as const;
 
 /** Map effective status to the three display buckets used by File Room UI. */

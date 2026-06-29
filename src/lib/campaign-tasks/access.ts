@@ -7,6 +7,15 @@ import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/ty
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments";
 
+import {
+  canClaimTask,
+  canReassignTask,
+  canReleaseClaim,
+  canSubmitHandoff,
+  userIsProducer,
+} from "./capabilities";
+import type { CampaignTaskItem } from "./types";
+
 /** Owner and assigned staff may read production tasks — clients are excluded (Slice 3a). */
 export function canReadProductionTasks(
   user: StudioUser | null,
@@ -25,4 +34,54 @@ export function canReadProductionTasks(
   }
 
   return false;
+}
+
+/** Clients are forbidden — owner and assigned staff may PATCH task workflow (Slice 3b-b-a). */
+export function canOperateProductionTasks(
+  user: StudioUser | null,
+  campaignId: string,
+  _envelope?: ServerCampaignEnvelope | null,
+  assignments?: CampaignAssignmentsFile | null,
+): boolean {
+  if (!user) return false;
+  if (user.roles.includes("client")) return false;
+  return canReadProductionTasks(user, campaignId, _envelope, assignments);
+}
+
+export function canUserClaimTask(
+  user: StudioUser,
+  task: CampaignTaskItem,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  return canClaimTask(user, task, assignments);
+}
+
+export function canUserSubmitHandoff(
+  user: StudioUser,
+  task: CampaignTaskItem,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  return canSubmitHandoff(user, task, assignments);
+}
+
+export function canUserReleaseClaim(
+  user: StudioUser,
+  task: CampaignTaskItem,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  return canReleaseClaim(user, task, assignments);
+}
+
+export function canUserReassignTask(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  return canReassignTask(user, assignments);
+}
+
+export function isProductionProducer(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): boolean {
+  return userIsProducer(user, assignments);
 }

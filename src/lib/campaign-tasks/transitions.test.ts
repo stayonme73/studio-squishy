@@ -240,6 +240,25 @@ describe("canTransitionWorkflow", () => {
     expect(result.ok).toBe(false);
   });
 
+  it("allows in_progress → unstarted for release_claim", () => {
+    const active = task({
+      id: "sm-001:copy",
+      phase: "copy",
+      workflowState: "in_progress",
+      dependsOn: [],
+    });
+    const result = canTransitionWorkflow(
+      request({
+        taskId: active.id,
+        from: "in_progress",
+        to: "unstarted",
+        actorRole: "copy",
+      }),
+      active,
+    );
+    expect(result.ok).toBe(true);
+  });
+
   it("allows owner plan-change cancel: in_progress → cancelled", () => {
     const active = task({
       id: "sm-001:copy",

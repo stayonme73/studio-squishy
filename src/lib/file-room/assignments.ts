@@ -7,14 +7,30 @@ const ASSIGNMENTS_PATH = path.join(process.cwd(), "data", "campaign-assignments.
 
 export type CampaignAssignmentsFile = {
   staffByUserId: Record<string, readonly string[]>;
+  /** Production roles each staff user may perform (Slice 3b-b-a). */
+  staffCapabilities?: Record<string, readonly string[]>;
 };
+
+function normalizeCapabilities(
+  raw: CampaignAssignmentsFile["staffCapabilities"] | undefined,
+): CampaignAssignmentsFile["staffCapabilities"] {
+  if (!raw) return undefined;
+  const staffCapabilities: Record<string, readonly string[]> = {};
+  for (const [userId, roles] of Object.entries(raw)) {
+    staffCapabilities[userId] = [...new Set(roles.filter(Boolean))];
+  }
+  return staffCapabilities;
+}
 
 function normalizeAssignments(raw: CampaignAssignmentsFile): CampaignAssignmentsFile {
   const staffByUserId: Record<string, readonly string[]> = {};
   for (const [userId, campaignIds] of Object.entries(raw.staffByUserId ?? {})) {
     staffByUserId[userId] = [...new Set(campaignIds.filter(Boolean))];
   }
-  return { staffByUserId };
+  return {
+    staffByUserId,
+    staffCapabilities: normalizeCapabilities(raw.staffCapabilities),
+  };
 }
 
 function seedAssignmentsPayload(): CampaignAssignmentsFile {

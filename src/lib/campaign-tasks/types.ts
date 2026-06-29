@@ -83,6 +83,63 @@ export type CampaignTaskItem = {
   revisionIndex?: number;
 
   workflowBlockedReason?: string;
+
+  /** Active claim — one claimant at a time; `claimedAt` is the optimistic concurrency token. */
+  claimedByUserId?: string;
+  claimedByDisplayName?: string;
+  claimedAt?: string;
+  /** Producer override when role differs from template default. */
+  assignedRole?: ProductionRole;
+  lastHandoffId?: string;
+};
+
+export type TaskHandoffAction = "submit_for_handoff" | "release_claim" | "reassign";
+
+export type TaskHandoffRecord = {
+  id: string;
+  taskId: string;
+  campaignId: string;
+  createdAt: string;
+  fromUserId: string;
+  fromDisplayName: string;
+  fromRole: ProductionRole;
+  toRole: ProductionRole;
+  transition: {
+    from: TaskWorkflowState;
+    to: TaskWorkflowState;
+  };
+  completedSummary: string;
+  sourceContext: string;
+  nextSteps: string;
+  openQuestions?: string;
+  risks?: string;
+  workRef?: string;
+  internalNotes?: string;
+  action: TaskHandoffAction;
+  reassignmentReason?: string;
+  reassignmentFlags?: {
+    changesPriority?: boolean;
+    changesDeadlineCommitment?: boolean;
+    changesClientFacingScope?: boolean;
+    createsMaterialRisk?: boolean;
+  };
+};
+
+export type HandoffPayload = {
+  completedSummary: string;
+  sourceContext: string;
+  nextSteps: string;
+  openQuestions?: string;
+  risks?: string;
+  workRef?: string;
+  internalNotes?: string;
+};
+
+export type ReassignmentFlags = {
+  changesPriority?: boolean;
+  changesDeadlineCommitment?: boolean;
+  changesClientFacingScope?: boolean;
+  createsMaterialRisk?: boolean;
 };
 
 export type FrozenPlanSnapshot = {
@@ -98,8 +155,10 @@ export type CampaignTasksRecord = {
   planVersion?: number;
   frozenPlanSnapshots?: FrozenPlanSnapshot[];
   planChangePendingOwnerApproval?: boolean;
+  /** Append-only handoff ledger — never edit or remove entries. */
+  handoffs?: TaskHandoffRecord[];
   updatedAt: string;
-  /** Envelope schema version — 2 adds workflow fields. */
+  /** Envelope schema version — 3 adds claims + handoffs. */
   version: number;
 };
 
