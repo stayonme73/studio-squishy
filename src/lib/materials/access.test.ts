@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
 
-import { canReadMaterials } from "./access";
+import { canReadMaterials, canReviewMaterials, canSubmitMaterials } from "./access";
 
 const owner: StudioUser = {
   id: "owner-1",
@@ -61,5 +61,19 @@ describe("materials access", () => {
 
   it("blocks fixture campaigns", () => {
     expect(canReadMaterials(owner, "owner-qa-dev", undefined, assignments)).toBe(false);
+  });
+
+  it("allows client submit only on own campaign", () => {
+    expect(canSubmitMaterials(client, "campaign-a", envelope)).toBe(true);
+    expect(canSubmitMaterials(client, "campaign-b", envelope)).toBe(false);
+    expect(canSubmitMaterials(owner, "campaign-a", envelope)).toBe(false);
+    expect(canSubmitMaterials(staff, "campaign-b", undefined)).toBe(false);
+  });
+
+  it("allows owner and assigned staff to review materials", () => {
+    expect(canReviewMaterials(owner, "campaign-b", undefined, assignments)).toBe(true);
+    expect(canReviewMaterials(staff, "campaign-b", undefined, assignments)).toBe(true);
+    expect(canReviewMaterials(staff, "campaign-a", envelope, assignments)).toBe(false);
+    expect(canReviewMaterials(client, "campaign-a", envelope)).toBe(false);
   });
 });

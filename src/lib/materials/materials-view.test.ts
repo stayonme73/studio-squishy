@@ -4,6 +4,7 @@ import {
   countBlockingRequiredMaterials,
   isBlockingMaterialItem,
   resolveFileRoomMaterialsView,
+  resolveMaterialsApiPayload,
 } from "./materials-view";
 import type { CampaignMaterialItem } from "./types";
 
@@ -49,5 +50,26 @@ describe("materials-view", () => {
       ]),
     ).toBe(2);
     expect(isBlockingMaterialItem(item({ reviewStatus: "not_needed" }))).toBe(false);
+  });
+
+  it("client API payload omits internal ledger fields and team notes", () => {
+    const record = {
+      campaignId: "c-1",
+      items: [
+        item({
+          reviewStatus: "needs_clarification",
+          teamNote: "Internal: need vector format",
+          reviewedBy: { role: "owner" as const, userId: "owner-1" },
+        }),
+      ],
+      updatedAt: "2026-01-01T00:00:00.000Z",
+      version: 1,
+    };
+
+    const payload = resolveMaterialsApiPayload(record, "client");
+    expect(payload.materials).toBeUndefined();
+    expect(payload.consolidatedRequests?.[0]?.statusLabel).toBe("Needs your update");
+    expect(payload.consolidatedRequests?.[0]).not.toHaveProperty("teamNote");
+    expect(JSON.stringify(payload)).not.toContain("Internal: need vector format");
   });
 });

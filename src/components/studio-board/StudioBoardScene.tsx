@@ -10,6 +10,7 @@ import CampaignNextAction from "@/components/studio-board/CampaignNextAction";
 import CampaignProgressPanel from "@/components/studio-board/CampaignProgressPanel";
 import CampaignRecordDrawer from "@/components/studio-board/CampaignRecordDrawer";
 import DeliverablesProgress from "@/components/studio-board/DeliverablesProgress";
+import MaterialsIntakePanel from "@/components/materials/MaterialsIntakePanel";
 import PackageSummaryPanel from "@/components/studio-board/PackageSummaryPanel";
 import StudioNotePanel from "@/components/studio-board/StudioNotePanel";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
@@ -407,6 +408,7 @@ export default function StudioBoardScene() {
             <PackageSummaryPanel campaign={campaign} />
           </article>
 
+          {campaign ? <MaterialsIntakePanel campaign={campaign} /> : null}
 
           <article className="sb-card sb-card--studio-note bf-material bf-material-paper">
             <StudioNotePanel note={view.studioNote} />

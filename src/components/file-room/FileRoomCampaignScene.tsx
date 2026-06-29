@@ -10,9 +10,15 @@ import FileRoomSyncBadge from "./FileRoomSyncBadge";
 
 type FileRoomCampaignSceneProps = {
   view: FileRoomCampaignView;
+  campaignId: string;
+  canReviewMaterials: boolean;
 };
 
-export default function FileRoomCampaignScene({ view }: FileRoomCampaignSceneProps) {
+export default function FileRoomCampaignScene({
+  view,
+  campaignId,
+  canReviewMaterials,
+}: FileRoomCampaignSceneProps) {
   return (
     <>
       <Link className="fr-back-link" href={FILE_ROOM_ROUTE}>
@@ -109,7 +115,11 @@ export default function FileRoomCampaignScene({ view }: FileRoomCampaignScenePro
             </FileRoomSectionCard>
           ) : null}
 
-          <FileRoomMaterialsSection materials={view.materials} />
+          <FileRoomMaterialsSection
+            campaignId={campaignId}
+            materials={view.materials}
+            canReview={canReviewMaterials}
+          />
 
           {view.projectDetailsSections.length > 0 ? (
             <FileRoomSectionCard title="Project Details">

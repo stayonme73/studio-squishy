@@ -350,6 +350,19 @@
   background: color-mix(in srgb, var(--utility-card) 92%, var(--utility-border));
 }
 
+@media (min-width: 960px) {
+  .fr-materials-row {
+    padding: 0.9rem 1.1rem;
+  }
+
+  .fr-materials-row__label {
+    font-size: var(--type-body);
+  }
+
+  .fr-materials-review__textarea {
+    min-height: 4.5rem;
+  }
+}
 
 .fr-materials-row__head {
   display: flex;
@@ -393,4 +406,33 @@
   font-size: var(--type-helper);
   color: var(--utility-text-muted);
   font-style: italic;
+}
+
+.fr-materials-review {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--utility-border);
+  display: grid;
+  gap: 0.55rem;
+}
+
+.fr-materials-review__note {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.fr-materials-review__textarea {
+  width: 100%;
+  border: 1px solid var(--utility-border);
+  border-radius: 0.35rem;
+  padding: 0.45rem 0.55rem;
+  font: inherit;
+  font-size: var(--type-body);
+  background: var(--utility-card);
+}
+
+.fr-materials-review__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
 }

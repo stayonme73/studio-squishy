@@ -116,6 +116,11 @@ export type CampaignRecord = {
   /** Post-payment Project Details intake — green services only (V1) */
   projectDetails?: ProjectDetailsRecord;
   projectDetailsSubmittedAt?: string;
+  /** Denormalized materials blocking count — updated when materials ledger changes (Slice 2c). */
+  materialsSummary?: {
+    blockingRequiredCount: number;
+    updatedAt: string;
+  };
   visionSubmittedAt?: string;
   /** Campaign directions — generated from visionData or supplied by content engine */
   concepts?: FeedbackConceptPreview[];

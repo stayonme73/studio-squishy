@@ -1,5 +1,9 @@
 import { materialCategoryLabel, materialStatusLabel, materialsConfig } from "@/config/materials";
 
+import {
+  resolveConsolidatedClientRequests,
+  resolveOptionalClientRequests,
+} from "./client-requests";
 import type {
   CampaignMaterialItem,
   CampaignMaterialsRecord,
@@ -102,12 +106,25 @@ export function resolveFileRoomMaterialsView(
   };
 }
 
-export function resolveMaterialsApiPayload(record: CampaignMaterialsRecord): {
-  materials: CampaignMaterialsRecord;
+export function resolveMaterialsApiPayload(
+  record: CampaignMaterialsRecord,
+  audience: "client" | "team" = "team",
+): {
+  materials?: CampaignMaterialsRecord;
   blockingRequiredCount: number;
+  consolidatedRequests?: ReturnType<typeof resolveConsolidatedClientRequests>;
+  optionalRequests?: ReturnType<typeof resolveOptionalClientRequests>;
 } {
+  const blockingRequiredCount = countBlockingRequiredMaterials(record.items);
+  if (audience === "client") {
+    return {
+      blockingRequiredCount,
+      consolidatedRequests: resolveConsolidatedClientRequests(record),
+      optionalRequests: resolveOptionalClientRequests(record),
+    };
+  }
   return {
     materials: record,
-    blockingRequiredCount: countBlockingRequiredMaterials(record.items),
+    blockingRequiredCount,
   };
 }

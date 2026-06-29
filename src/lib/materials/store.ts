@@ -4,8 +4,10 @@ import path from "path";
 import type { CampaignRecord } from "@/config/studio-board";
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
 
+import { syncMaterialsSummaryOnCampaign } from "./campaign-summary";
 import { migrateFromProjectDetails } from "./migrate-from-project-details";
-import type { ServerMaterialsEnvelope } from "./types";
+import { countBlockingRequiredMaterials } from "./materials-view";
+import type { CampaignMaterialItem, ServerMaterialsEnvelope } from "./types";
 
 const MATERIALS_DIR = path.join(process.cwd(), "data", "campaign-materials");
 
@@ -42,6 +44,16 @@ function toEnvelope(record: ReturnType<typeof migrateFromProjectDetails>): Serve
   return { ...record, syncedAt: now };
 }
 
+async function ensureCampaignMaterialsSummary(
+  campaignId: string,
+  items: readonly CampaignMaterialItem[],
+): Promise<void> {
+  const campaignEnvelope = await readCampaignEnvelope(campaignId);
+  if (!campaignEnvelope?.record.materialsSummary) {
+    await syncMaterialsSummaryOnCampaign(campaignId, countBlockingRequiredMaterials(items));
+  }
+}
+
 /**
  * Read materials for a campaign. On first access, migrate from campaign record + project details.
  */
@@ -50,7 +62,10 @@ export async function getOrInitializeMaterials(
   campaign?: CampaignRecord,
 ): Promise<ServerMaterialsEnvelope> {
   const existing = await readMaterialsEnvelope(campaignId);
-  if (existing) return existing;
+  if (existing) {
+    await ensureCampaignMaterialsSummary(campaignId, existing.items);
+    return existing;
+  }
 
   let record = campaign;
   if (!record) {
@@ -62,5 +77,7 @@ export async function getOrInitializeMaterials(
   }
 
   const migrated = migrateFromProjectDetails(record);
-  return writeMaterialsEnvelope(toEnvelope(migrated));
+  const envelope = await writeMaterialsEnvelope(toEnvelope(migrated));
+  await syncMaterialsSummaryOnCampaign(campaignId, countBlockingRequiredMaterials(envelope.items));
+  return envelope;
 }

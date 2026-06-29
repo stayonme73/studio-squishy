@@ -165,7 +165,7 @@ function buildProjectDetailsSummary(
   const sections: ProjectDetailsSummarySection[] = [];
 
   const pushSection = (title: string, items: { label: string; value: string }[]) => {
-    const filled = items.filter((item) => item.value.trim());
+    const filled = items.filter((item) => item.value?.trim());
     if (filled.length) sections.push({ title, items: filled });
   };
 
