@@ -14,6 +14,9 @@ import {
   applyClientSubmitItem,
   applyTeamReview,
 } from "@/lib/materials/actions";
+import { applyExceptionStatusOnClientMaterialSubmit } from "@/lib/materials/promotion";
+import { resolveUnderlyingItemIdsForConsolidated } from "@/lib/materials/client-requests";
+import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
 import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
 import { syncMaterialsSummaryOnCampaign } from "@/lib/materials/campaign-summary";
 import { resolveMaterialsApiPayload } from "@/lib/materials/materials-view";
@@ -102,6 +105,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     | ReturnType<typeof applyClientSubmitConsolidated>
     | ReturnType<typeof applyClientSubmitItem>
     | ReturnType<typeof applyTeamReview>;
+  let submittedItemIds: string[] = [];
 
   switch (body.action) {
     case "client_submit_consolidated": {
@@ -111,6 +115,9 @@ export async function PATCH(request: Request, context: RouteContext) {
       if (!body.consolidatedItemId || !body.payload) {
         return NextResponse.json({ error: "consolidatedItemId and payload are required" }, { status: 400 });
       }
+      submittedItemIds = [
+        ...resolveUnderlyingItemIdsForConsolidated(materialsEnvelope, body.consolidatedItemId),
+      ];
       result = applyClientSubmitConsolidated(
         materialsEnvelope,
         body.consolidatedItemId,
@@ -127,6 +134,7 @@ export async function PATCH(request: Request, context: RouteContext) {
         return NextResponse.json({ error: "itemId and payload are required" }, { status: 400 });
       }
       result = applyClientSubmitItem(materialsEnvelope, body.itemId, body.payload, user);
+      if (result.ok) submittedItemIds = [body.itemId];
       break;
     }
     case "team_review": {
@@ -154,6 +162,15 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const saved = await writeMaterialsEnvelope(result.envelope);
+
+  if (submittedItemIds.length > 0) {
+    const tasksEnvelope = await getOrGenerateTasks(campaignId, campaignEnvelope.record);
+    const updatedTasks = applyExceptionStatusOnClientMaterialSubmit(tasksEnvelope, submittedItemIds);
+    if (updatedTasks !== tasksEnvelope) {
+      await writeTasksEnvelope(updatedTasks);
+    }
+  }
+
   const audience = isMaterialsTeamAudience(user, campaignId, campaignEnvelope, assignments)
     ? "team"
     : "client";

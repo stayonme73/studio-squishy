@@ -1,5 +1,4 @@
 import type { CampaignRecord } from "@/config/studio-board";
-import { campaignExceptionsConfig } from "@/config/campaign-exceptions";
 import { resolveCampaignRevisionRounds } from "@/lib/approved-plan-display";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
@@ -10,9 +9,11 @@ import {
   buildExceptionRecord,
   canApproveClientRequest,
   canAssignException,
+  canDeclinePromotion,
   canRaiseException,
   canRaiseExceptionKind,
   canResolveException,
+  canResolvePromotedException,
   exceptionActorRole,
   findExceptionById,
   upsertExceptionRecord,
@@ -23,10 +24,17 @@ import type {
   AssignExceptionPayload,
   ApproveClientRequestPayload,
   CampaignExceptionRecord,
+  DeclinePromotionPayload,
   RaiseExceptionPayload,
   ResolveExceptionPayload,
 } from "./exceptions-types";
 import { CAMPAIGN_TASKS_SCHEMA_VERSION } from "./plan-change";
+import {
+  applyPromotionToMaterials,
+  contentKindForCategory,
+  validateApproveClientRequestPayload,
+} from "@/lib/materials/promotion";
+import type { CampaignMaterialItem, ServerMaterialsEnvelope } from "@/lib/materials/types";
 import type { CampaignTaskItem, QaBlockCategory, QaFailCategory, QaRecord, ServerTasksEnvelope } from "./types";
 
 export type ExceptionActionResult =
@@ -34,6 +42,7 @@ export type ExceptionActionResult =
       ok: true;
       envelope: ServerTasksEnvelope;
       exception: CampaignExceptionRecord;
+      materialsEnvelope?: ServerMaterialsEnvelope;
     }
   | { ok: false; error: string; status: number };
 
@@ -213,14 +222,23 @@ export function applyResolveException(
   payload: ResolveExceptionPayload,
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
+  materials: readonly CampaignMaterialItem[] = [],
 ): ExceptionActionResult {
   const existing = findExceptionById(envelope.exceptionRecords, payload.exceptionId);
   if (!existing) {
     return { ok: false, error: "Exception not found.", status: 404 };
   }
 
-  if (!canResolveException(user, existing, assignments)) {
+  if (!canResolveException(user, existing, assignments, materials)) {
     return { ok: false, error: "Forbidden", status: 403 };
+  }
+
+  if (!canResolvePromotedException(existing, materials)) {
+    return {
+      ok: false,
+      error: "Linked materials must be approved for use before resolving this exception.",
+      status: 400,
+    };
   }
 
   const actorRole = exceptionActorRole(user, assignments);
@@ -262,6 +280,7 @@ export function applyApproveClientRequest(
   payload: ApproveClientRequestPayload,
   user: StudioUser,
   _assignments: CampaignAssignmentsFile,
+  materialsEnvelope: ServerMaterialsEnvelope,
 ): ExceptionActionResult {
   const existing = findExceptionById(envelope.exceptionRecords, payload.exceptionId);
   if (!existing) {
@@ -272,10 +291,105 @@ export function applyApproveClientRequest(
     return { ok: false, error: "Forbidden", status: 403 };
   }
 
+  const validation = validateApproveClientRequestPayload(payload);
+  if (!validation.ok) {
+    return { ok: false, error: validation.error, status: 400 };
+  }
+
+  const approvedPayload = validation.payload;
+  const now = new Date().toISOString();
+  const actorRole = exceptionActorRole(user, _assignments);
+  const contentKind =
+    approvedPayload.contentKind ?? contentKindForCategory(approvedPayload.category);
+
+  const { envelope: nextMaterials, materialItemIds } = applyPromotionToMaterials(
+    materialsEnvelope,
+    existing,
+    { ...approvedPayload, contentKind },
+    now,
+  );
+
+  const consolidatedRequestId = `${approvedPayload.category}:${contentKind}`;
+  const updated: CampaignExceptionRecord = {
+    ...existing,
+    status: "waiting_client",
+    updatedAt: now,
+    promotion: {
+      approvedAt: now,
+      approvedByUserId: user.id,
+      approvedByDisplayName: user.displayName,
+      materialItemIds,
+      consolidatedRequestId,
+      clientFacingLabel: approvedPayload.clientFacingLabel,
+      clientFacingPrompt: approvedPayload.clientFacingPrompt,
+      whyNeeded: approvedPayload.whyNeeded,
+      category: approvedPayload.category,
+      contentKind,
+      requirementLevel: approvedPayload.requirementLevel,
+    },
+  };
+
+  const event = buildExceptionEvent({
+    exceptionId: updated.id,
+    campaignId: envelope.campaignId,
+    user,
+    actorRole,
+    action: "approved_client_request",
+    statusAfter: "waiting_client",
+    notes: approvedPayload.whyNeeded,
+  });
+
+  const records = upsertExceptionRecord(envelope.exceptionRecords, updated);
+  const events = appendExceptionEvent(envelope.exceptionEvents, event);
+
   return {
-    ok: false,
-    error: campaignExceptionsConfig.deferredClientPromotionMessage,
-    status: 501,
+    ok: true,
+    envelope: withExceptionEnvelope(envelope, records, events),
+    exception: updated,
+    materialsEnvelope: nextMaterials,
+  };
+}
+
+export function applyDeclinePromotion(
+  envelope: ServerTasksEnvelope,
+  payload: DeclinePromotionPayload,
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): ExceptionActionResult {
+  const existing = findExceptionById(envelope.exceptionRecords, payload.exceptionId);
+  if (!existing) {
+    return { ok: false, error: "Exception not found.", status: 404 };
+  }
+
+  if (!canDeclinePromotion(user, existing)) {
+    return { ok: false, error: "Forbidden", status: 403 };
+  }
+
+  const actorRole = exceptionActorRole(user, assignments);
+  const now = new Date().toISOString();
+  const updated: CampaignExceptionRecord = {
+    ...existing,
+    status: "waiting_internal",
+    updatedAt: now,
+  };
+
+  const event = buildExceptionEvent({
+    exceptionId: updated.id,
+    campaignId: envelope.campaignId,
+    user,
+    actorRole,
+    action: "declined_promotion",
+    statusAfter: "waiting_internal",
+    notes: payload.notes,
+  });
+
+  const records = upsertExceptionRecord(envelope.exceptionRecords, updated);
+  const events = appendExceptionEvent(envelope.exceptionEvents, event);
+
+  return {
+    ok: true,
+    envelope: withExceptionEnvelope(envelope, records, events),
+    exception: updated,
   };
 }
 

@@ -70,8 +70,12 @@ describe("exceptions validation and status", () => {
     expect(initialStatusForKind("revision_exhausted")).toBe("waiting_owner");
   });
 
-  it("missing_client_fact starts waiting_client", () => {
-    expect(initialStatusForKind("missing_client_fact")).toBe("waiting_client");
+  it("missing_client_fact starts waiting_owner", () => {
+    expect(initialStatusForKind("missing_client_fact")).toBe("waiting_owner");
+  });
+
+  it("client_request starts waiting_owner", () => {
+    expect(initialStatusForKind("client_request")).toBe("waiting_owner");
   });
 
   it("routine_internal starts open", () => {
@@ -108,11 +112,16 @@ describe("exception permissions", () => {
     ).toBe(true);
   });
 
-  it("only owner can approve client_request", () => {
-    const record = exception({ kind: "client_request", status: "waiting_owner" });
-    expect(canApproveClientRequest(owner, record)).toBe(true);
-    expect(canApproveClientRequest(producer, record)).toBe(false);
-    expect(canApproveClientRequest(qaStaff, record)).toBe(false);
+  it("only owner can approve promotable exceptions in waiting_owner", () => {
+    const clientReq = exception({ kind: "client_request", status: "waiting_owner" });
+    const missingFact = exception({ kind: "missing_client_fact", status: "waiting_owner" });
+    const compliance = exception({ kind: "compliance_hold", status: "waiting_owner" });
+
+    expect(canApproveClientRequest(owner, clientReq)).toBe(true);
+    expect(canApproveClientRequest(owner, missingFact)).toBe(true);
+    expect(canApproveClientRequest(owner, compliance)).toBe(false);
+    expect(canApproveClientRequest(producer, clientReq)).toBe(false);
+    expect(canApproveClientRequest(qaStaff, clientReq)).toBe(false);
   });
 
   it("only owner or producer can raise client_request", () => {

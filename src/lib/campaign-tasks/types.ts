@@ -176,7 +176,7 @@ export type CampaignTasksRecord = {
   /** Append-only exception audit trail (schema v5). */
   exceptionEvents?: CampaignExceptionEvent[];
   updatedAt: string;
-  /** Envelope schema version — 5 adds exceptionRecords and exceptionEvents. */
+  /** Envelope schema version — 6 adds exception promotion records. */
   version: number;
 };
 

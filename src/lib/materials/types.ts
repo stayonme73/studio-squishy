@@ -38,6 +38,12 @@ export type CampaignMaterialItem = {
   label: string;
   reason: string;
   relatedServiceIds: readonly ServiceId[];
+  /** Linked exception when promoted from File Room (Slice 3d-c). */
+  sourceExceptionId?: string;
+  promotionApprovedAt?: string;
+  clientFacingLabel?: string;
+  clientFacingPrompt?: string;
+  whyNeeded?: string;
   fileName?: string;
   mimeType?: string;
   sizeBytes?: number;

@@ -98,7 +98,7 @@ export function resolveNextRequiredAction(record: CampaignExceptionRecord): stri
     return nextActionLabels.ownerReview;
   }
 
-  if (record.status === "waiting_client" || record.kind === "missing_client_fact") {
+  if (record.status === "waiting_client") {
     return nextActionLabels.waitingClient;
   }
 

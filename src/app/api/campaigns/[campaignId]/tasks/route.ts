@@ -11,7 +11,9 @@ import {
 import { canOperateProductionTasks, canReadProductionTasks } from "@/lib/campaign-tasks/access";
 import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
 import { resolveProductionTasksApiPayload } from "@/lib/campaign-tasks/tasks-view";
-import { getOrInitializeMaterials } from "@/lib/materials/store";
+import { syncMaterialsSummaryOnCampaign } from "@/lib/materials/campaign-summary";
+import { countBlockingRequiredMaterials } from "@/lib/materials/materials-view";
+import { getOrInitializeMaterials, writeMaterialsEnvelope } from "@/lib/materials/store";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { findUserById, toPublicUser } from "@/lib/auth/users";
 
@@ -113,6 +115,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   const result = applyTaskPatch(tasksEnvelope, body, user, {
     campaign: campaignEnvelope.record,
     materials: materialsEnvelope.items,
+    materialsEnvelope,
     assignments,
     targetUser,
   });
@@ -137,5 +140,14 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const saved = await writeTasksEnvelope(result.envelope);
+
+  if (result.materialsEnvelope) {
+    const savedMaterials = await writeMaterialsEnvelope(result.materialsEnvelope);
+    await syncMaterialsSummaryOnCampaign(
+      campaignId,
+      countBlockingRequiredMaterials(savedMaterials.items),
+    );
+  }
+
   return NextResponse.json(teamPayload(saved, user, assignments));
 }

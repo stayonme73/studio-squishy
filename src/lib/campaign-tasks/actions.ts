@@ -1,7 +1,8 @@
+import type { ServiceId } from "@/catalog/types";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
-import type { CampaignMaterialItem } from "@/lib/materials/types";
+import type { CampaignMaterialItem, MaterialCategory, MaterialContentKind, MaterialRequirementLevel, ServerMaterialsEnvelope } from "@/lib/materials/types";
 
 import {
   canClaimTask,
@@ -40,6 +41,7 @@ import {
 import {
   applyApproveClientRequest,
   applyAssignException,
+  applyDeclinePromotion,
   applyRaiseException,
   applyResolveException,
 } from "./exceptions-actions";
@@ -69,6 +71,7 @@ export type TaskActionResult =
       envelope: ServerTasksEnvelope;
       task?: CampaignTaskItem;
       exception?: CampaignExceptionRecord;
+      materialsEnvelope?: ServerMaterialsEnvelope;
     }
   | {
       ok: false;
@@ -164,11 +167,25 @@ export type TasksPatchBody =
   | {
       action: "approve_client_request";
       exceptionId: string;
+      category: MaterialCategory;
+      contentKind?: MaterialContentKind;
+      clientFacingLabel: string;
+      clientFacingPrompt: string;
+      whyNeeded: string;
+      requirementLevel: MaterialRequirementLevel;
+      relatedServiceIds?: readonly ServiceId[];
+      existingMaterialItemIds?: readonly string[];
+    }
+  | {
+      action: "decline_promotion";
+      exceptionId: string;
+      notes?: string;
     };
 
 export type TaskActionContext = {
   campaign: CampaignRecord;
   materials: readonly CampaignMaterialItem[];
+  materialsEnvelope?: ServerMaterialsEnvelope;
   assignments: CampaignAssignmentsFile;
   targetUser?: StudioUser;
 };
@@ -929,12 +946,39 @@ export function applyTaskPatch(
       return { ok: true, envelope: result.envelope, exception: result.exception };
     }
     case "resolve_exception": {
-      const result = applyResolveException(envelope, body, user, context.assignments);
+      const result = applyResolveException(
+        envelope,
+        body,
+        user,
+        context.assignments,
+        context.materials,
+      );
       if (!result.ok) return result;
       return { ok: true, envelope: result.envelope, exception: result.exception };
     }
     case "approve_client_request": {
-      return applyApproveClientRequest(envelope, body, user, context.assignments);
+      if (!context.materialsEnvelope) {
+        return { ok: false, error: "Materials envelope is required.", status: 500 };
+      }
+      const result = applyApproveClientRequest(
+        envelope,
+        body,
+        user,
+        context.assignments,
+        context.materialsEnvelope,
+      );
+      if (!result.ok) return result;
+      return {
+        ok: true,
+        envelope: result.envelope,
+        exception: result.exception,
+        materialsEnvelope: result.materialsEnvelope,
+      };
+    }
+    case "decline_promotion": {
+      const result = applyDeclinePromotion(envelope, body, user, context.assignments);
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
     }
     default:
       return { ok: false, error: "Unknown action", status: 400 };

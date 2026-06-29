@@ -1,15 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import type { CampaignRecord } from "@/config/studio-board";
+import type { ServiceId } from "@/catalog/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 
 import {
   applyApproveClientRequest,
+  applyDeclinePromotion,
   applyRaiseException,
   applyResolveException,
 } from "./exceptions-actions";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "./types";
+import type { ServerMaterialsEnvelope } from "@/lib/materials/types";
 
 const now = "2026-06-29T12:00:00.000Z";
 
@@ -45,46 +47,6 @@ const assignments: CampaignAssignmentsFile = {
   },
 };
 
-const campaign: CampaignRecord = {
-  campaignId: "campaign-1",
-  campaignName: "Test",
-  campaignStatus: "BUILDING_CONCEPTS",
-  campaignDescription: "Test",
-  estimatedCompletion: "Soon",
-  packageId: "custom-studio-plan",
-  packageLabel: "Custom Studio Plan",
-  approvedStudioPlan: {
-    selectedServiceIds: ["sm-001"],
-    includedServiceIds: ["sm-001"],
-    additionalServiceIds: [],
-    additionalCostUsd: 0,
-    oneTimeTotalCents: 50000,
-    monthlyTotalCents: 0,
-    amountDueTodayCents: 50000,
-    lineItems: [
-      {
-        skuId: "sm-001",
-        serviceName: "Social",
-        billingType: "one_time",
-        exactPriceCents: 50000,
-        priceDisplay: "$500",
-        deliverables: [],
-        exclusions: [],
-        timingWindowLabel: "2 weeks",
-        revisionRule: "1 round",
-        clientResponsibilities: [],
-        executionResponsibility: "studio",
-      },
-    ],
-    approvedAt: now,
-  },
-  projectDetailsSubmittedAt: now,
-  paymentReceivedAt: now,
-  selectedCampaignOption: "Option A",
-  createdAt: now,
-  updatedAt: now,
-};
-
 function blockedCopyTask(): CampaignTaskItem {
   return {
     id: "sm-001:copy",
@@ -107,13 +69,45 @@ function envelope(tasks: CampaignTaskItem[] = []): ServerTasksEnvelope {
     tasks,
     planFingerprint: "fp",
     updatedAt: now,
-    version: 5,
+    version: 6,
     syncedAt: now,
     exceptionRecords: [],
     exceptionEvents: [],
     qaRecords: [],
   };
 }
+
+function materialsEnvelope(): ServerMaterialsEnvelope {
+  return {
+    campaignId: "campaign-1",
+    items: [
+      {
+        id: "logo-brand-sm-001-slot",
+        category: "logo-brand",
+        requirementLevel: "required",
+        reviewStatus: "missing",
+        contentKind: "file-metadata",
+        label: "Logo & brand assets",
+        reason: "Social",
+        relatedServiceIds: ["sm-001"],
+        uploadStatus: "none",
+      },
+    ],
+    updatedAt: now,
+    version: 1,
+    syncedAt: now,
+  };
+}
+
+const approveBody = {
+  exceptionId: "",
+  category: "logo-brand" as const,
+  clientFacingLabel: "Logo file",
+  clientFacingPrompt: "Please send your logo file",
+  whyNeeded: "Needed for Social",
+  requirementLevel: "required" as const,
+  relatedServiceIds: ["sm-001"] as const satisfies readonly ServiceId[],
+};
 
 describe("exceptions-actions", () => {
   it("raise_exception appends record and event", () => {
@@ -200,7 +194,7 @@ describe("exceptions-actions", () => {
     expect(task?.workflowState).not.toBe("complete");
   });
 
-  it("approve_client_request returns 501 deferred", () => {
+  it("owner approves client_request and writes materials ledger", () => {
     const raised = applyRaiseException(
       envelope(),
       {
@@ -214,13 +208,123 @@ describe("exceptions-actions", () => {
     if (!raised.ok) throw new Error("raise failed");
     const approved = applyApproveClientRequest(
       raised.envelope,
-      { exceptionId: raised.exception.id },
+      { ...approveBody, exceptionId: raised.exception.id },
+      owner,
+      assignments,
+      materialsEnvelope(),
+    );
+    expect(approved.ok).toBe(true);
+    if (!approved.ok) return;
+    expect(approved.exception.status).toBe("waiting_client");
+    expect(approved.exception.promotion?.materialItemIds.length).toBeGreaterThan(0);
+    expect(approved.materialsEnvelope?.items.some((item) => item.reviewStatus === "requested")).toBe(
+      true,
+    );
+    expect(approved.envelope.exceptionEvents?.some((event) => event.action === "approved_client_request")).toBe(
+      true,
+    );
+  });
+
+  it("producer cannot approve client_request", () => {
+    const raised = applyRaiseException(
+      envelope(),
+      {
+        kind: "client_request",
+        title: "Need logo",
+        clientRequestDraft: { exactClientOnlyItem: "Vector logo" },
+      },
       owner,
       assignments,
     );
+    if (!raised.ok) throw new Error("raise failed");
+    const approved = applyApproveClientRequest(
+      raised.envelope,
+      { ...approveBody, exceptionId: raised.exception.id },
+      producer,
+      assignments,
+      materialsEnvelope(),
+    );
     expect(approved.ok).toBe(false);
     if (approved.ok) return;
-    expect(approved.status).toBe(501);
+    expect(approved.status).toBe(403);
+  });
+
+  it("compliance_hold approve returns 403", () => {
+    const raised = applyRaiseException(
+      envelope([blockedCopyTask()]),
+      {
+        kind: "compliance_hold",
+        title: "Compliance",
+        taskId: "sm-001:copy",
+      },
+      owner,
+      assignments,
+    );
+    if (!raised.ok) throw new Error("raise failed");
+    const approved = applyApproveClientRequest(
+      raised.envelope,
+      { ...approveBody, exceptionId: raised.exception.id },
+      owner,
+      assignments,
+      materialsEnvelope(),
+    );
+    expect(approved.ok).toBe(false);
+    if (approved.ok) return;
+    expect(approved.status).toBe(403);
+  });
+
+  it("cannot resolve promoted exception before materials approved", () => {
+    const raised = applyRaiseException(
+      envelope(),
+      {
+        kind: "client_request",
+        title: "Need logo",
+        clientRequestDraft: { exactClientOnlyItem: "Vector logo" },
+      },
+      owner,
+      assignments,
+    );
+    if (!raised.ok) throw new Error("raise failed");
+    const approved = applyApproveClientRequest(
+      raised.envelope,
+      { ...approveBody, exceptionId: raised.exception.id },
+      owner,
+      assignments,
+      materialsEnvelope(),
+    );
+    if (!approved.ok) throw new Error("approve failed");
+
+    const resolved = applyResolveException(
+      approved.envelope,
+      { exceptionId: approved.exception.id },
+      owner,
+      assignments,
+      approved.materialsEnvelope?.items ?? [],
+    );
+    expect(resolved.ok).toBe(false);
+    if (resolved.ok) return;
+    expect(resolved.status).toBe(403);
+  });
+
+  it("owner can decline missing_client_fact promotion", () => {
+    const raised = applyRaiseException(
+      envelope(),
+      { kind: "missing_client_fact", title: "Brand hex codes" },
+      producer,
+      assignments,
+    );
+    if (!raised.ok) throw new Error("raise failed");
+    expect(raised.exception.status).toBe("waiting_owner");
+
+    const declined = applyDeclinePromotion(
+      raised.envelope,
+      { exceptionId: raised.exception.id, notes: "Team will source internally" },
+      owner,
+      assignments,
+    );
+    expect(declined.ok).toBe(true);
+    if (!declined.ok) return;
+    expect(declined.exception.status).toBe("waiting_internal");
   });
 
   it("qa staff can raise exceptions", () => {

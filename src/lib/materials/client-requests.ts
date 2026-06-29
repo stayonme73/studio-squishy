@@ -68,12 +68,22 @@ export function parseConsolidatedRequestId(
   return { category, contentKind };
 }
 
-function clientRequestLabel(category: MaterialCategory, contentKind: MaterialContentKind): string {
+function clientRequestLabel(
+  category: MaterialCategory,
+  contentKind: MaterialContentKind,
+  item?: CampaignMaterialItem,
+): string {
+  if (item?.clientFacingLabel?.trim()) return item.clientFacingLabel.trim();
   const key = `${category}:${contentKind}` as keyof typeof materialsConfig.clientRequestLabels;
   return materialsConfig.clientRequestLabels[key] ?? materialCategoryLabel(category);
 }
 
-function clientRequestPrompt(category: MaterialCategory, contentKind: MaterialContentKind): string {
+function clientRequestPrompt(
+  category: MaterialCategory,
+  contentKind: MaterialContentKind,
+  item?: CampaignMaterialItem,
+): string {
+  if (item?.clientFacingPrompt?.trim()) return item.clientFacingPrompt.trim();
   const key = `${category}:${contentKind}` as keyof typeof materialsConfig.clientRequestPrompts;
   return materialsConfig.clientRequestPrompts[key] ?? `Please send your ${clientRequestLabel(category, contentKind).toLowerCase()}`;
 }
@@ -137,9 +147,9 @@ export function resolveConsolidatedClientRequests(
         id,
         category: first.category,
         contentKind: first.contentKind,
-        label: clientRequestLabel(first.category, first.contentKind),
-        prompt: clientRequestPrompt(first.category, first.contentKind),
-        reason: formatServiceReason(serviceNames),
+        label: clientRequestLabel(first.category, first.contentKind, first),
+        prompt: clientRequestPrompt(first.category, first.contentKind, first),
+        reason: first.whyNeeded?.trim() || formatServiceReason(serviceNames),
         relatedServiceIds,
         underlyingItemIds: groupItems.map((item) => item.id),
         reviewStatus,

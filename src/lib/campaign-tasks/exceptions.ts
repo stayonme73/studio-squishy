@@ -8,6 +8,8 @@ import {
   exceptionKindProducerResolvable,
   exceptionKindRequiresOwner,
 } from "@/config/campaign-exceptions";
+import { isPromotableExceptionKind } from "./exceptions-types";
+import type { CampaignMaterialItem } from "@/lib/materials/types";
 import { userIsProducer } from "./capabilities";
 import type {
   CampaignExceptionEvent,
@@ -29,7 +31,8 @@ export function isOpenExceptionStatus(status: CampaignExceptionStatus): boolean 
 
 export function initialStatusForKind(kind: CampaignExceptionKind): CampaignExceptionStatus {
   if (exceptionKindRequiresOwner(kind)) return "waiting_owner";
-  if (kind === "missing_client_fact" || kind === "client_request") return "waiting_client";
+  if (kind === "missing_client_fact") return "waiting_owner";
+  if (kind === "client_request") return "waiting_owner";
   return "open";
 }
 
@@ -199,18 +202,36 @@ export function canAssignException(
   return userIsProducer(user, assignments);
 }
 
+export function canResolvePromotedException(
+  exception: CampaignExceptionRecord,
+  materials: readonly CampaignMaterialItem[],
+): boolean {
+  if (!exception.promotion) return true;
+  const linked = materials.filter((item) =>
+    exception.promotion!.materialItemIds.includes(item.id),
+  );
+  if (linked.length === 0) return false;
+  return linked.every((item) => item.reviewStatus === "approved_for_use");
+}
+
 export function canResolveException(
   user: StudioUser,
   record: CampaignExceptionRecord,
   assignments: CampaignAssignmentsFile,
+  materials: readonly CampaignMaterialItem[] = [],
 ): boolean {
   if (!isOpenExceptionStatus(record.status)) return false;
+
+  if (record.promotion && !canResolvePromotedException(record, materials)) {
+    return false;
+  }
 
   if (exceptionKindRequiresOwner(record.kind)) {
     return isOwnerUser(user);
   }
 
   if (record.kind === "missing_client_fact") {
+    if (record.promotion) return isOwnerUser(user) || userIsProducer(user, assignments);
     return isOwnerUser(user) || userIsProducer(user, assignments);
   }
 
@@ -221,12 +242,28 @@ export function canResolveException(
   return isOwnerUser(user);
 }
 
+export const APPROVABLE_EXCEPTION_STATUSES: readonly CampaignExceptionStatus[] = [
+  "open",
+  "waiting_owner",
+] as const;
+
 export function canApproveClientRequest(
   user: StudioUser,
   record: CampaignExceptionRecord,
 ): boolean {
-  if (record.kind !== "client_request") return false;
-  if (!isOpenExceptionStatus(record.status)) return false;
+  if (!isPromotableExceptionKind(record.kind)) return false;
+  if (!APPROVABLE_EXCEPTION_STATUSES.includes(record.status)) return false;
+  if (record.promotion) return false;
+  return isOwnerUser(user);
+}
+
+export function canDeclinePromotion(
+  user: StudioUser,
+  record: CampaignExceptionRecord,
+): boolean {
+  if (record.kind !== "missing_client_fact") return false;
+  if (!APPROVABLE_EXCEPTION_STATUSES.includes(record.status)) return false;
+  if (record.promotion) return false;
   return isOwnerUser(user);
 }
 

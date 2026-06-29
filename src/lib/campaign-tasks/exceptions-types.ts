@@ -1,4 +1,11 @@
+import type {
+  MaterialCategory,
+  MaterialContentKind,
+  MaterialRequirementLevel,
+} from "@/lib/materials/types";
+
 import type { ProductionRole } from "./types";
+import type { ServiceId } from "@/catalog/types";
 
 /** Current disposition of an exception — updated by new events, never rewritten in history. */
 export type CampaignExceptionStatus =
@@ -25,7 +32,32 @@ export type CampaignExceptionEventAction =
   | "assigned"
   | "resolved"
   | "cancelled"
-  | "approve_client_request_deferred";
+  | "approved_client_request"
+  | "declined_promotion"
+  | "client_material_submitted";
+
+export type CampaignExceptionPromotion = {
+  approvedAt: string;
+  approvedByUserId: string;
+  approvedByDisplayName: string;
+  materialItemIds: readonly string[];
+  consolidatedRequestId: string;
+  clientFacingLabel: string;
+  clientFacingPrompt: string;
+  whyNeeded: string;
+  category: MaterialCategory;
+  contentKind: MaterialContentKind;
+  requirementLevel: MaterialRequirementLevel;
+};
+
+export const PROMOTABLE_EXCEPTION_KINDS: readonly CampaignExceptionKind[] = [
+  "missing_client_fact",
+  "client_request",
+] as const;
+
+export function isPromotableExceptionKind(kind: CampaignExceptionKind): boolean {
+  return PROMOTABLE_EXCEPTION_KINDS.includes(kind);
+}
 
 export type CampaignExceptionClientRequestDraft = {
   whyTeamCannotSolveInternally?: string;
@@ -68,6 +100,8 @@ export type CampaignExceptionRecord = {
   assignedToUserId?: string;
   assignedToDisplayName?: string;
   clientRequestDraft?: CampaignExceptionClientRequestDraft;
+  /** Set when Owner approves client-material promotion (schema v6). */
+  promotion?: CampaignExceptionPromotion;
   resolutionNotes?: string;
   resolvedAt?: string;
   resolvedByUserId?: string;
@@ -95,4 +129,17 @@ export type ResolveExceptionPayload = {
 
 export type ApproveClientRequestPayload = {
   exceptionId: string;
+  category: MaterialCategory;
+  contentKind?: MaterialContentKind;
+  clientFacingLabel: string;
+  clientFacingPrompt: string;
+  whyNeeded: string;
+  requirementLevel: MaterialRequirementLevel;
+  relatedServiceIds?: readonly ServiceId[];
+  existingMaterialItemIds?: readonly string[];
+};
+
+export type DeclinePromotionPayload = {
+  exceptionId: string;
+  notes?: string;
 };

@@ -455,7 +455,7 @@ async function main() {
     if (res.status !== 200) throw new Error(JSON.stringify(res.json));
   });
 
-  await runStep("8. approve_client_request deferred (501)", async (evidence) => {
+  await runStep("8. approve_client_request promotes to materials (200)", async (evidence) => {
     jar.clear();
     await login(OWNER_LOGIN);
     const raise = await fetchApi(`/api/campaigns/${campaignId}/tasks`, {
@@ -477,11 +477,35 @@ async function main() {
       json: {
         action: "approve_client_request",
         exceptionId: clientRequestExceptionId,
+        category: "logo-brand",
+        clientFacingLabel: "Logo file",
+        clientFacingPrompt: "Please send your logo file",
+        whyNeeded: "Needed for Social Media Launch Set",
+        requirementLevel: "required",
+        relatedServiceIds: ["sm-001"],
       },
     });
     evidence.push(`PATCH approve_client_request → HTTP ${res.status}`);
-    if (res.status !== 501) throw new Error("Expected 501 deferred");
-    if (!res.json.error?.includes("3d-c")) throw new Error("Missing deferred message");
+    if (res.status !== 200) throw new Error(JSON.stringify(res.json));
+    const promoted = res.json.exceptionRecords?.find((entry) => entry.id === clientRequestExceptionId);
+    if (promoted?.status !== "waiting_client") throw new Error("Expected waiting_client after approve");
+    if (!promoted?.promotion?.materialItemIds?.length) throw new Error("Missing promotion record");
+    jar.clear();
+    await login(PRODUCER_LOGIN);
+    const denied = await fetchApi(`/api/campaigns/${campaignId}/tasks`, {
+      method: "PATCH",
+      json: {
+        action: "approve_client_request",
+        exceptionId: clientRequestExceptionId,
+        category: "logo-brand",
+        clientFacingLabel: "Logo file",
+        clientFacingPrompt: "Please send your logo file",
+        whyNeeded: "Needed for Social Media Launch Set",
+        requirementLevel: "required",
+      },
+    });
+    evidence.push(`producer approve retry → HTTP ${denied.status}`);
+    if (denied.status !== 403) throw new Error("Producer should not approve");
   });
 
   await runStep("9. qa_fail missing_client_fact auto-bridges exception", async (evidence) => {

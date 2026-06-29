@@ -4,6 +4,7 @@ import {
   resolveConsolidatedClientRequests,
   resolveOptionalClientRequests,
 } from "./client-requests";
+import { filterClientVisibleItems } from "./promotion";
 import type {
   CampaignMaterialItem,
   CampaignMaterialsRecord,
@@ -117,10 +118,14 @@ export function resolveMaterialsApiPayload(
 } {
   const blockingRequiredCount = countBlockingRequiredMaterials(record.items);
   if (audience === "client") {
+    const clientRecord = {
+      ...record,
+      items: filterClientVisibleItems(record.items),
+    };
     return {
-      blockingRequiredCount,
-      consolidatedRequests: resolveConsolidatedClientRequests(record),
-      optionalRequests: resolveOptionalClientRequests(record),
+      blockingRequiredCount: countBlockingRequiredMaterials(clientRecord.items),
+      consolidatedRequests: resolveConsolidatedClientRequests(clientRecord),
+      optionalRequests: resolveOptionalClientRequests(clientRecord),
     };
   }
   return {
