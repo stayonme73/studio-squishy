@@ -20,7 +20,7 @@ export default async function FileRoomLayout({ children }: { children: React.Rea
     <main
       className={`${utilityPageFontClassName} fr-layout flex min-h-[100dvh] flex-1 flex-col overflow-hidden`}
     >
-      <div className="utility-page utility-content">{children}</div>
+      <div className="utility-page fr-page">{children}</div>
     </main>
   );
 }

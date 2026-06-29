@@ -442,6 +442,12 @@ export const studioBoard = {
     ariaLabel: "Start a new campaign in Project Discovery",
   },
 
+  /** Sidebar logo lockup — neutral Studio branding (no bundle tier names). */
+  brand: {
+    theLabel: "the",
+    nameLabel: "STUDIO",
+  },
+
   sidebar: {
     welcomeHall: customerJourneyStepName("studio-lobby"),
     studioBoard: customerJourneyStepName("studio-board"),

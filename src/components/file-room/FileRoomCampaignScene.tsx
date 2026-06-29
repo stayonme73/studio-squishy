@@ -33,7 +33,7 @@ export default function FileRoomCampaignScene({ view }: FileRoomCampaignScenePro
       <div className="fr-detail-grid">
         <div className="fr-detail-grid__main">
           <FileRoomSectionCard title="Campaign identity">
-            <ul className="fr-kv-list">
+            <ul className="fr-kv-list fr-kv-list--split">
               <li className="fr-kv-list__row">
                 <span className="fr-kv-list__label">Campaign</span>
                 <p className="fr-kv-list__value">{view.campaignName}</p>

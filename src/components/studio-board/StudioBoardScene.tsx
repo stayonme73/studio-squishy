@@ -25,6 +25,7 @@ import {
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 
 const {
+  brand,
   sidebar,
   userName,
   empty: emptyCopy,
@@ -209,7 +210,7 @@ export default function StudioBoardScene() {
     <div className="sb sb--v4" aria-label="Studio Board" aria-busy={!ready}>
       <aside className="sb-sidebar">
         <div className="sb-brand">
-          <p className="sb-brand__the">the</p>
+          <p className="sb-brand__the">{brand.theLabel}</p>
           <div className="sb-brand__lockup">
             <span className="sb-brand__icon" aria-hidden>
               <svg viewBox="0 0 32 32" fill="none">
@@ -230,8 +231,7 @@ export default function StudioBoardScene() {
               </svg>
             </span>
             <div className="sb-brand__stack">
-              <p className="sb-brand__name">STUDIO</p>
-              <p className="sb-brand__by">BY SPARK</p>
+              <p className="sb-brand__name">{brand.nameLabel}</p>
             </div>
           </div>
         </div>
@@ -406,6 +406,7 @@ export default function StudioBoardScene() {
           <article className="sb-card sb-card--package bf-material bf-material-paper">
             <PackageSummaryPanel campaign={campaign} />
           </article>
+
 
           <article className="sb-card sb-card--studio-note bf-material bf-material-paper">
             <StudioNotePanel note={view.studioNote} />
