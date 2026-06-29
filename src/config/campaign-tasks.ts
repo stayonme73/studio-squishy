@@ -1,6 +1,12 @@
-import type { ProductionTaskFamilyId, TaskPhase, TaskStatus } from "@/lib/campaign-tasks/types";
+import type {
+  ProductionTaskFamilyId,
+  TaskEffectiveStatus,
+  TaskPhase,
+} from "@/lib/campaign-tasks/types";
 
 /** Production task plan — File Room read-only section (Slice 3a). */
+
+export type TaskDisplayStatus = "not_ready" | "ready" | "blocked";
 
 export const campaignTasksConfig = {
   sectionTitle: "Production task plan",
@@ -18,11 +24,21 @@ export const campaignTasksConfig = {
     optimization: "Optimization",
     marketing_assets: "Marketing Assets",
   } satisfies Record<ProductionTaskFamilyId, string>,
-  statusLabels: {
+  displayStatusLabels: {
     not_ready: "Not ready",
     ready: "Ready",
     blocked: "Blocked",
-  } satisfies Record<TaskStatus, string>,
+  } satisfies Record<TaskDisplayStatus, string>,
+  effectiveStatusLabels: {
+    not_ready: "Not ready",
+    ready: "Ready",
+    in_progress: "In progress",
+    ready_for_qa: "Ready for QA",
+    needs_revision: "Needs revision",
+    blocked: "Blocked",
+    complete: "Complete",
+    cancelled: "Cancelled",
+  } satisfies Record<TaskEffectiveStatus, string>,
   phaseLabels: {
     strategy: "Strategy",
     strategy_content_direction: "Content direction",
@@ -36,8 +52,32 @@ export const campaignTasksConfig = {
   } satisfies Record<TaskPhase, string>,
 } as const;
 
-export function taskStatusLabel(status: TaskStatus): string {
-  return campaignTasksConfig.statusLabels[status];
+/** Map effective status to the three display buckets used by File Room UI. */
+export function toDisplayStatus(status: TaskEffectiveStatus): TaskDisplayStatus {
+  switch (status) {
+    case "not_ready":
+    case "needs_revision":
+      return "not_ready";
+    case "ready":
+    case "in_progress":
+    case "ready_for_qa":
+    case "complete":
+      return "ready";
+    case "blocked":
+    case "cancelled":
+      return "blocked";
+    default:
+      return "not_ready";
+  }
+}
+
+export function effectiveStatusLabel(status: TaskEffectiveStatus): string {
+  return campaignTasksConfig.effectiveStatusLabels[status];
+}
+
+/** @deprecated Use effectiveStatusLabel — maps display bucket for legacy UI. */
+export function taskStatusLabel(status: TaskDisplayStatus): string {
+  return campaignTasksConfig.displayStatusLabels[status];
 }
 
 export function taskPhaseLabel(phase: TaskPhase): string {

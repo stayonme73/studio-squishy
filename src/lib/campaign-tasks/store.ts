@@ -6,7 +6,11 @@ import { readCampaignEnvelope } from "@/lib/campaign-store/store";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 
 import { regenerateIfPlanChanged } from "./generate";
-import type { ServerTasksEnvelope } from "./types";
+import {
+  isLegacyWorkflowDefaultOnlyChange,
+  normalizeLegacyRecord,
+} from "./plan-change";
+import type { CampaignTasksRecord, ServerTasksEnvelope } from "./types";
 
 const TASKS_DIR = path.join(process.cwd(), "data", "campaign-tasks");
 
@@ -23,7 +27,8 @@ export async function readTasksEnvelope(
 ): Promise<ServerTasksEnvelope | null> {
   try {
     const raw = await fs.readFile(tasksPath(campaignId), "utf8");
-    return JSON.parse(raw) as ServerTasksEnvelope;
+    const parsed = JSON.parse(raw) as ServerTasksEnvelope;
+    return normalizeLegacyRecord(parsed);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
     throw error;
@@ -38,7 +43,7 @@ export async function writeTasksEnvelope(
   return envelope;
 }
 
-function toEnvelope(record: ReturnType<typeof regenerateIfPlanChanged>): ServerTasksEnvelope {
+function toEnvelope(record: CampaignTasksRecord): ServerTasksEnvelope {
   const now = new Date().toISOString();
   return { ...record, syncedAt: now };
 }
@@ -72,7 +77,8 @@ export async function getOrGenerateTasks(
   const shouldPersist =
     !existing ||
     existing.planFingerprint !== generated.planFingerprint ||
-    JSON.stringify(existing.tasks) !== JSON.stringify(generated.tasks);
+    (JSON.stringify(existing.tasks) !== JSON.stringify(generated.tasks) &&
+      !isLegacyWorkflowDefaultOnlyChange(existing, generated));
 
   if (shouldPersist) {
     return writeTasksEnvelope(envelope);

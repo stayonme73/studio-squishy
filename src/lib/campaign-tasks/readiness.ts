@@ -1,10 +1,18 @@
-import type { CampaignRecord } from "@/config/studio-board";
-
+import { upstreamDependenciesPending } from "./dependencies";
 import { DIRECTION_GATED_FAMILIES } from "./families";
 import { CAMPAIGN_LEVEL_TASKS } from "./templates";
-import type { CampaignTaskItem, TaskReadinessContext, TaskStatus } from "./types";
+import type { CampaignTaskItem, TaskReadiness, TaskReadinessContext } from "./types";
 
-export function buildReadinessContext(campaign: CampaignRecord): TaskReadinessContext {
+export type ReadinessResolution = {
+  readiness: TaskReadiness;
+  blockedReason?: string;
+};
+
+export function buildReadinessContext(campaign: {
+  approvedStudioPlan?: { lineItems: readonly unknown[] } | null;
+  selectedCampaignOption?: string | null;
+  projectDetailsSubmittedAt?: string | null;
+}): TaskReadinessContext {
   return {
     hasApprovedPlan: Boolean(campaign.approvedStudioPlan?.lineItems.length),
     directionApproved: Boolean(campaign.selectedCampaignOption?.trim()),
@@ -16,38 +24,63 @@ export function taskRequiresDirection(task: CampaignTaskItem): boolean {
   return DIRECTION_GATED_FAMILIES.has(task.familyId);
 }
 
-/** Slice 3a — upstream pipeline steps are never complete, so tasks with deps stay not_ready. */
-export function upstreamDependenciesPending(task: CampaignTaskItem): boolean {
-  return task.dependsOn.length > 0;
+export function resolveBaseReadiness(
+  task: CampaignTaskItem,
+  context: TaskReadinessContext,
+  allTasks: readonly CampaignTaskItem[],
+): TaskReadiness {
+  if (!context.hasApprovedPlan) {
+    return "gates_pending";
+  }
+
+  if (upstreamDependenciesPending(task, allTasks)) {
+    return "gates_pending";
+  }
+
+  if (taskRequiresDirection(task) && !context.directionApproved) {
+    return "gates_pending";
+  }
+
+  const needsProjectDetails = task.id !== CAMPAIGN_LEVEL_TASKS.producerKickoff.id;
+  if (!context.projectDetailsSubmitted && needsProjectDetails) {
+    return "gates_pending";
+  }
+
+  return "eligible";
 }
+
+export function resolveReadinessLayer(
+  task: CampaignTaskItem,
+  context: TaskReadinessContext,
+  allTasks: readonly CampaignTaskItem[],
+  materialBlockedReason?: string,
+): ReadinessResolution {
+  const base = resolveBaseReadiness(task, context, allTasks);
+  if (base === "gates_pending") {
+    return { readiness: "gates_pending" };
+  }
+  if (materialBlockedReason) {
+    return { readiness: "material_blocked", blockedReason: materialBlockedReason };
+  }
+  return { readiness: "eligible" };
+}
+
+/** @deprecated Use resolveBaseReadiness — kept for tests migrating from 3a. */
+export type LegacyTaskStatus = "not_ready" | "ready" | "blocked";
 
 export function resolveBaseTaskStatus(
   task: CampaignTaskItem,
   context: TaskReadinessContext,
-): TaskStatus {
-  if (!context.hasApprovedPlan) return "not_ready";
-
-  if (upstreamDependenciesPending(task)) {
-    return "not_ready";
-  }
-
-  if (taskRequiresDirection(task) && !context.directionApproved) {
-    return "not_ready";
-  }
-
-  const needsProjectDetails =
-    task.id !== CAMPAIGN_LEVEL_TASKS.producerKickoff.id;
-  if (!context.projectDetailsSubmitted && needsProjectDetails) {
-    return "not_ready";
-  }
-
-  return "ready";
+  allTasks: readonly CampaignTaskItem[] = [],
+): LegacyTaskStatus {
+  const readiness = resolveBaseReadiness(task, context, allTasks);
+  return readiness === "eligible" ? "ready" : "not_ready";
 }
 
 export function applyMaterialBlock(
-  status: TaskStatus,
+  status: LegacyTaskStatus,
   blockedReason: string | undefined,
-): { status: TaskStatus; blockedReason?: string } {
+): { status: LegacyTaskStatus; blockedReason?: string } {
   if (status !== "ready") {
     return { status, blockedReason: undefined };
   }

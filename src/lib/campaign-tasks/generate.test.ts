@@ -8,6 +8,7 @@ import type { CampaignMaterialItem } from "@/lib/materials/types";
 import { canReadProductionTasks } from "./access";
 import { isBrandCreativeTask, isEmailCopyTask, resolveBlockingMaterialsForTask } from "./blocking";
 import { computePlanFingerprint, generateCampaignTasks, regenerateIfPlanChanged } from "./generate";
+import { applyStatusesWithWorkflow } from "./plan-change";
 
 const now = "2026-06-28T12:00:00.000Z";
 
@@ -155,6 +156,43 @@ describe("generateCampaignTasks", () => {
   it("computePlanFingerprint is stable for same SKUs", () => {
     const plan = buildPlan(["bf-001", "sm-001"]);
     expect(computePlanFingerprint(plan)).toBe(computePlanFingerprint(plan));
+  });
+
+  it("initializes workflowState unstarted and responsibleRole on every task", () => {
+    const record = generateCampaignTasks(
+      campaignWithPlan(["sm-001"], { selectedCampaignOption: "Option A" }),
+    );
+    expect(record.tasks.length).toBeGreaterThan(0);
+    for (const task of record.tasks) {
+      expect(task.workflowState).toBe("unstarted");
+      expect(task.responsibleRole).toBeTruthy();
+    }
+  });
+
+  it("first pipeline task ready when gates pass; dependent tasks not_ready", () => {
+    const record = generateCampaignTasks(
+      campaignWithPlan(["sm-001"], { selectedCampaignOption: "Option A" }),
+    );
+    const first = record.tasks.find((task) => task.id === "sm-001:strategy_content_direction");
+    const second = record.tasks.find((task) => task.id === "sm-001:copy");
+    expect(first?.status).toBe("ready");
+    expect(second?.status).toBe("not_ready");
+  });
+
+  it("simulated upstream complete unlocks next pipeline task to ready", () => {
+    const campaign = campaignWithPlan(["sm-001"], { selectedCampaignOption: "Option A" });
+    const record = generateCampaignTasks(campaign);
+    const withUpstreamComplete = {
+      ...record,
+      tasks: record.tasks.map((task) =>
+        task.id === "sm-001:strategy_content_direction"
+          ? { ...task, workflowState: "complete" as const }
+          : task,
+      ),
+    };
+    const refreshed = applyStatusesWithWorkflow(withUpstreamComplete.tasks, campaign, []);
+    const copy = refreshed.find((task) => task.id === "sm-001:copy");
+    expect(copy?.status).toBe("ready");
   });
 });
 

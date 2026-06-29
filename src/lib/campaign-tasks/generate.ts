@@ -4,18 +4,20 @@ import type { ApprovedStudioPlan, ApprovedStudioPlanLineItem, CampaignRecord } f
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 
-import { resolveBlockedReason } from "./blocking";
 import { resolveProductionFamilyId } from "./families";
 import {
-  applyMaterialBlock,
-  buildReadinessContext,
-  resolveBaseTaskStatus,
-} from "./readiness";
+  CAMPAIGN_TASKS_SCHEMA_VERSION,
+  applyStatusesWithWorkflow,
+  mergePlanChangeTasks,
+  normalizeLegacyTask,
+} from "./plan-change";
+import { resolveResponsibleRole } from "./roles";
 import {
   CAMPAIGN_LEVEL_TASKS,
   FAMILY_TASK_PIPELINES,
   type TaskBlueprint,
 } from "./templates";
+import { DEFAULT_WORKFLOW_STATE } from "./workflow";
 import type { CampaignTaskItem, CampaignTasksRecord, ProductionTaskFamilyId } from "./types";
 
 const CURRENT_CYCLE_LABEL = "Current cycle";
@@ -50,8 +52,7 @@ function buildPipelineTasks(
     const blueprint = pipeline[index];
     const id = taskIdFor(serviceId, blueprint.phase);
     const prevId = index > 0 ? taskIdFor(serviceId, pipeline[index - 1].phase) : undefined;
-
-    tasks.push({
+    const task: CampaignTaskItem = {
       id,
       title: `${serviceName} — ${blueprint.titleSuffix}`,
       phase: blueprint.phase,
@@ -62,7 +63,12 @@ function buildPipelineTasks(
       serviceName,
       dependsOn: prevId ? [prevId] : [],
       cycleLabel,
-    });
+      workflowState: DEFAULT_WORKFLOW_STATE,
+      responsibleRole: undefined,
+    };
+    task.responsibleRole = resolveResponsibleRole(task);
+
+    tasks.push(task);
   }
 
   return tasks;
@@ -93,7 +99,7 @@ function buildCampaignLevelTasks(
   const tasks: CampaignTaskItem[] = [];
 
   if (shouldIncludeCampaignKickoff(lines)) {
-    tasks.push({
+    const kickoff: CampaignTaskItem = {
       id: CAMPAIGN_LEVEL_TASKS.producerKickoff.id,
       title: CAMPAIGN_LEVEL_TASKS.producerKickoff.title,
       phase: CAMPAIGN_LEVEL_TASKS.producerKickoff.phase,
@@ -103,11 +109,14 @@ function buildCampaignLevelTasks(
       catalogFamilyId: "campaign",
       serviceName: "Campaign",
       dependsOn: [],
-    });
+      workflowState: DEFAULT_WORKFLOW_STATE,
+    };
+    kickoff.responsibleRole = resolveResponsibleRole(kickoff);
+    tasks.push(kickoff);
   }
 
   if (shouldIncludeFinalAssembly(lines)) {
-    tasks.push({
+    const assembly: CampaignTaskItem = {
       id: CAMPAIGN_LEVEL_TASKS.finalPackageAssembly.id,
       title: CAMPAIGN_LEVEL_TASKS.finalPackageAssembly.title,
       phase: CAMPAIGN_LEVEL_TASKS.finalPackageAssembly.phase,
@@ -117,25 +126,13 @@ function buildCampaignLevelTasks(
       catalogFamilyId: "campaign",
       serviceName: "Campaign",
       dependsOn: deliveryPrepTaskIds,
-    });
+      workflowState: DEFAULT_WORKFLOW_STATE,
+    };
+    assembly.responsibleRole = resolveResponsibleRole(assembly);
+    tasks.push(assembly);
   }
 
   return tasks;
-}
-
-function applyStatuses(
-  tasks: CampaignTaskItem[],
-  campaign: CampaignRecord,
-  materials: readonly CampaignMaterialItem[],
-): CampaignTaskItem[] {
-  const context = buildReadinessContext(campaign);
-
-  return tasks.map((task) => {
-    const baseStatus = resolveBaseTaskStatus(task, context);
-    const blockedReason = resolveBlockedReason(task, materials);
-    const { status, blockedReason: reason } = applyMaterialBlock(baseStatus, blockedReason);
-    return { ...task, status, blockedReason: reason };
-  });
 }
 
 /** Generate production tasks from frozen plan — excludes execution add-ons. */
@@ -151,8 +148,10 @@ export function generateCampaignTasks(
       campaignId: campaign.campaignId,
       tasks: [],
       planFingerprint: "",
+      planVersion: 1,
+      frozenPlanSnapshots: [],
       updatedAt: now,
-      version: 1,
+      version: CAMPAIGN_TASKS_SCHEMA_VERSION,
     };
   }
 
@@ -174,14 +173,16 @@ export function generateCampaignTasks(
 
   const campaignTasks = buildCampaignLevelTasks(productionLines, deliveryPrepIds);
   const allTasks = [...campaignTasks, ...pipelineTasks];
-  const tasksWithStatus = applyStatuses(allTasks, campaign, materials);
+  const tasksWithStatus = applyStatusesWithWorkflow(allTasks, campaign, materials);
 
   return {
     campaignId: campaign.campaignId,
     tasks: tasksWithStatus,
     planFingerprint: computePlanFingerprint(plan),
+    planVersion: 1,
+    frozenPlanSnapshots: [],
     updatedAt: now,
-    version: 1,
+    version: CAMPAIGN_TASKS_SCHEMA_VERSION,
   };
 }
 
@@ -194,9 +195,24 @@ export function regenerateIfPlanChanged(
   const fingerprint = plan ? computePlanFingerprint(plan) : "";
 
   if (existing && existing.planFingerprint === fingerprint && existing.tasks.length > 0) {
-    const refreshed = applyStatuses(existing.tasks, campaign, materials);
+    const normalizedTasks = existing.tasks.map(normalizeLegacyTask);
+    const refreshed = applyStatusesWithWorkflow(normalizedTasks, campaign, materials);
     return {
       ...existing,
+      tasks: refreshed,
+      planVersion: existing.planVersion ?? 1,
+      frozenPlanSnapshots: existing.frozenPlanSnapshots ?? [],
+      version: existing.version ?? CAMPAIGN_TASKS_SCHEMA_VERSION,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  if (existing && existing.tasks.length > 0) {
+    const fresh = generateCampaignTasks(campaign, materials);
+    const merged = mergePlanChangeTasks(existing, fresh);
+    const refreshed = applyStatusesWithWorkflow(merged.tasks, campaign, materials);
+    return {
+      ...merged,
       tasks: refreshed,
       updatedAt: new Date().toISOString(),
     };
