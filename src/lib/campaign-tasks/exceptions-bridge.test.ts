@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -7,6 +7,7 @@ import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 import { applyQaBlock, applyQaFail } from "./actions";
 import { bridgeExceptionsAfterQaBlock } from "./exceptions-bridge";
 import { buildQaRecord, qaActorRole } from "./qa";
+import { buildKitchenCopyStageFixture } from "./kitchen-test-fixtures";
 import type { CampaignTaskItem, QaRecord, ServerTasksEnvelope } from "./types";
 
 const now = "2026-06-29T12:00:00.000Z";
@@ -101,10 +102,13 @@ function envelope(tasks: CampaignTaskItem[], qaRecords: QaRecord[] = []): Server
   };
 }
 
+const kitchenCopyFixture = buildKitchenCopyStageFixture(campaign, qaStaff, now);
+
 const actionContext = {
   campaign,
   materials: [],
   assignments,
+  production: kitchenCopyFixture.production,
 };
 
 describe("exceptions-bridge", () => {
@@ -140,6 +144,7 @@ describe("exceptions-bridge", () => {
         category: "missing_client_fact",
         missingFactDescription: "Brand hex codes",
         missingFactReason: "Cannot finalize palette",
+        workVersionId: kitchenCopyFixture.copyWorkVersionId,
       },
       qaStaff,
       actionContext,
@@ -198,6 +203,7 @@ describe("exceptions-bridge", () => {
         from: "ready_for_qa",
         claimVersion: null,
         category: "production_correction",
+        workVersionId: kitchenCopyFixture.copyWorkVersionId,
       },
       qaStaff,
       actionContext,

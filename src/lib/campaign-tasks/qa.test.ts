@@ -17,6 +17,10 @@ import {
   SCOPE_CHANGE_REJECT_MESSAGE,
   validateQaFailCategory,
 } from "./qa";
+import {
+  buildKitchenCopyStageFixture,
+  buildKitchenCreativeStageFixture,
+} from "./kitchen-test-fixtures";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "./types";
 
 const now = "2026-06-29T12:00:00.000Z";
@@ -126,6 +130,11 @@ function envelope(tasks: CampaignTaskItem[]): ServerTasksEnvelope {
 
 const context = { campaign, materials: [], assignments };
 
+const kitchenCopyFixture = buildKitchenCopyStageFixture(campaign, copyStaff, now);
+const kitchenCreativeFixture = buildKitchenCreativeStageFixture(campaign, copyStaff, now);
+const kitchenContext = { ...context, production: kitchenCopyFixture.production };
+const kitchenCreativeContext = { ...context, production: kitchenCreativeFixture.production };
+
 const copyChecks = [...requiredChecksForPhase("copy")];
 
 describe("routeQaFailTarget", () => {
@@ -165,9 +174,10 @@ describe("applyQaPass", () => {
         from: "ready_for_qa",
         claimVersion: null,
         checks: copyChecks,
+        workVersionId: kitchenCopyFixture.copyWorkVersionId,
       },
       qaStaff,
-      context,
+      kitchenContext,
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -187,9 +197,10 @@ describe("applyQaPass", () => {
         from: "ready_for_qa",
         claimVersion: null,
         checks: copyChecks,
+        workVersionId: kitchenCopyFixture.copyWorkVersionId,
       },
       owner,
-      context,
+      kitchenContext,
     );
     expect(result.ok).toBe(true);
   });
@@ -206,10 +217,11 @@ describe("applyQaFail", () => {
         from: "ready_for_qa",
         claimVersion: null,
         category: "production_correction",
+        workVersionId: kitchenCopyFixture.copyWorkVersionId,
         notes: "Fix headline.",
       },
       qaStaff,
-      context,
+      kitchenContext,
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -261,9 +273,10 @@ describe("applyQaFail", () => {
         from: "ready_for_qa",
         claimVersion: null,
         category: "production_correction",
+        workVersionId: kitchenCreativeFixture.creativeWorkVersionId,
       },
       qaStaff,
-      context,
+      kitchenCreativeContext,
     );
 
     expect(result.ok).toBe(true);
@@ -297,11 +310,12 @@ describe("applyQaFail", () => {
         from: "ready_for_qa",
         claimVersion: null,
         category: "missing_client_fact",
+        workVersionId: kitchenCopyFixture.copyWorkVersionId,
         missingFactDescription: "Brand hex codes",
         missingFactReason: "Cannot verify palette without client values.",
       },
       qaStaff,
-      context,
+      kitchenContext,
     );
     expect(result.ok).toBe(true);
     if (result.ok) {

@@ -6,9 +6,15 @@ import {
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments";
+import { taskRequiredRole, userCanPerformRole } from "@/lib/campaign-tasks/capabilities";
 import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
 
-import { isKitchenV1ProductionTask } from "./validation";
+import {
+  findWorkUnitForTask,
+  isKitchenV1ProductionTask,
+  validateWorkUnitCanMutate,
+} from "./validation";
+import type { ServerProductionEnvelope } from "./types";
 
 /** Owner and assigned staff may read production work — clients excluded (Kitchen V1 internal). */
 export function canReadProductionWork(
@@ -38,14 +44,61 @@ export function canOperateProductionWork(
   return canReadProductionWork(user, campaignId, envelope, assignments);
 }
 
+const EDITABLE_WORKFLOW = new Set(["in_progress", "needs_revision"]);
+
+/**
+ * Kitchen production body editing — role + claim + stage + assignment gate.
+ * Owner may override. Producer does NOT get edit override (dispatch only).
+ */
 export function canEditKitchenWorkForTask(
   user: StudioUser,
   task: CampaignTaskItem,
   assignments: CampaignAssignmentsFile,
   campaignId: string,
+  productionEnvelope?: ServerProductionEnvelope | null,
 ): boolean {
   if (!isKitchenV1ProductionTask(task)) return false;
+  if (!canOperateProductionWork(user, campaignId, undefined, assignments)) return false;
+
   if (isOwnerUser(user)) return true;
-  if (!isStaffUser(user)) return false;
-  return isStaffAssignedToCampaign(assignments, user.id, campaignId);
+
+  const requiredRole = taskRequiredRole(task);
+  if (!userCanPerformRole(user, requiredRole, assignments)) return false;
+
+  const workflow = task.workflowState ?? "unstarted";
+  if (!EDITABLE_WORKFLOW.has(workflow)) return false;
+
+  if (task.claimedByUserId !== user.id) return false;
+
+  if (!productionEnvelope) return false;
+
+  const unit = findWorkUnitForTask(productionEnvelope, task);
+  if (!unit) return false;
+
+  const mutable = validateWorkUnitCanMutate(unit);
+  if (!mutable.ok) return false;
+
+  if (unit.currentTaskId !== task.id) return false;
+
+  return true;
+}
+
+export function resolveKitchenWorkEditByTaskId(
+  user: StudioUser,
+  tasks: readonly CampaignTaskItem[],
+  assignments: CampaignAssignmentsFile,
+  campaignId: string,
+  productionEnvelope: ServerProductionEnvelope,
+): Record<string, boolean> {
+  const map: Record<string, boolean> = {};
+  for (const task of tasks) {
+    map[task.id] = canEditKitchenWorkForTask(
+      user,
+      task,
+      assignments,
+      campaignId,
+      productionEnvelope,
+    );
+  }
+  return map;
 }

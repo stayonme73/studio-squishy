@@ -22,6 +22,7 @@ type FileRoomCampaignSceneProps = {
   showExceptions: boolean;
   productionEnvelope: ServerProductionEnvelope;
   studioUser: import("@/lib/campaign-store/types").StudioUser;
+  canEditWorkByTaskId?: Readonly<Record<string, boolean>>;
 };
 
 export default function FileRoomCampaignScene({
@@ -33,6 +34,7 @@ export default function FileRoomCampaignScene({
   showExceptions,
   productionEnvelope,
   studioUser,
+  canEditWorkByTaskId,
 }: FileRoomCampaignSceneProps) {
   return (
     <>
@@ -143,6 +145,7 @@ export default function FileRoomCampaignScene({
             showExceptionBadges={showExceptions}
             productionEnvelope={productionEnvelope}
             studioUser={studioUser}
+            canEditWorkByTaskId={canEditWorkByTaskId}
           />
 
           {showExceptions ? (

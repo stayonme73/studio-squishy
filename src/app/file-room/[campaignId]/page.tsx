@@ -24,6 +24,7 @@ import { canReviewMaterials } from "@/lib/materials/access";
 import { resolveFileRoomMaterialsView } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 import { getOrInitializeProduction } from "@/lib/campaign-production/store";
+import { resolveKitchenWorkEditByTaskId } from "@/lib/campaign-production/access";
 
 type FileRoomCampaignPageProps = {
   params: Promise<{ campaignId: string }>;
@@ -113,10 +114,17 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
     assignCandidates,
   );
   const canReview = canReviewMaterials(user, campaignId, result.envelope, assignments);
+  const canEditWorkByTaskId = resolveKitchenWorkEditByTaskId(
+    user,
+    tasksEnvelope.tasks,
+    assignments,
+    campaignId,
+    productionEnvelope,
+  );
 
   return (
     <>
-      <FileRoomHeader user={user} campaignName={view.campaignName} />
+      <FileRoomHeader user={user} campaignName={view.campaignName} campaignId={campaignId} showCopyOfficeLink />
       <FileRoomCampaignScene
         view={view}
         campaignId={campaignId}
@@ -126,6 +134,7 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
         showExceptions={isInternalUser(user)}
         productionEnvelope={productionEnvelope}
         studioUser={user}
+        canEditWorkByTaskId={canEditWorkByTaskId}
       />
     </>
   );

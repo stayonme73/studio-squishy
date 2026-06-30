@@ -1,7 +1,14 @@
 import { campaignProductionConfig } from "@/config/campaign-production";
 import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
 
-import { findWorkUnitForTask, isKitchenV1ProductionPhase, isKitchenV1ProductionTask } from "./validation";
+import { resolveDefaultVersionReason } from "./actions";
+import {
+  currentVersionForTask,
+  findWorkUnitForTask,
+  isKitchenV1ProductionPhase,
+  isKitchenV1ProductionTask,
+} from "./validation";
+import type { ProductionVersionReason } from "./types";
 import type {
   ProductionVersion,
   ProductionWorkUnit,
@@ -32,7 +39,15 @@ export type FileRoomProductionWorkPanelView = {
   blockedMessage: string | null;
   versions: readonly FileRoomProductionVersionRow[];
   stageLabel: string;
+  nextVersionReason: ProductionVersionReason;
 };
+
+export function resolveVersionSaveReason(
+  envelope: ServerProductionEnvelope,
+  task: CampaignTaskItem,
+): ProductionVersionReason {
+  return resolveDefaultVersionReason(envelope, task);
+}
 
 function bodyPreview(body: string): string {
   const trimmed = body.trim();
@@ -84,6 +99,7 @@ export function resolveFileRoomProductionWorkPanelView(
     blockedMessage: null,
     versions: [],
     stageLabel: "",
+    nextVersionReason: "initial",
   };
 
   if (!envelope || !isKitchenV1ProductionTask(task)) {
@@ -130,6 +146,7 @@ export function resolveFileRoomProductionWorkPanelView(
     stageLabel: isKitchenV1ProductionPhase(task.phase)
       ? campaignProductionConfig.stageLabels[task.phase]
       : "",
+    nextVersionReason: resolveVersionSaveReason(envelope, task),
   };
 }
 

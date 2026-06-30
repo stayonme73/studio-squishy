@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -12,6 +12,7 @@ import {
   applySubmitForHandoff,
 } from "./actions";
 import { requiredChecksForPhase } from "./qa-checklists";
+import { buildKitchenCopyStageFixture } from "./kitchen-test-fixtures";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "./types";
 
 const now = "2026-06-28T12:00:00.000Z";
@@ -93,7 +94,7 @@ const campaign: CampaignRecord = {
 function copyTask(overrides: Partial<CampaignTaskItem> = {}): CampaignTaskItem {
   return {
     id: "sm-001:copy",
-    title: "Social — Copy",
+    title: "Social â€” Copy",
     phase: "copy",
     status: "ready",
     relatedServiceIds: ["sm-001"],
@@ -130,6 +131,12 @@ const context = {
   campaign,
   materials: [],
   assignments,
+};
+const kitchenCopyFixture = buildKitchenCopyStageFixture(campaign, copyStaff, now);
+const kitchenContext = { ...context, production: kitchenCopyFixture.production };
+const handoffWithWorkVersion = {
+  ...handoff,
+  workVersionId: kitchenCopyFixture.copyWorkVersionId,
 };
 
 describe("applyClaim", () => {
@@ -177,7 +184,7 @@ describe("applyClaim", () => {
         taskId: claimed.id,
         from: "in_progress",
         claimVersion: "2026-01-01T00:00:00.000Z",
-        handoff,
+        handoff: handoffWithWorkVersion,
       },
       otherCopyStaff,
       {
@@ -224,10 +231,10 @@ describe("applySubmitForHandoff", () => {
         taskId: claimed.id,
         from: "in_progress",
         claimVersion: "2026-01-01T00:00:00.000Z",
-        handoff,
+        handoff: handoffWithWorkVersion,
       },
       copyStaff,
-      context,
+      kitchenContext,
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -292,10 +299,10 @@ describe("applyReleaseClaim", () => {
         taskId: claimed.id,
         from: "in_progress",
         claimVersion: "2026-01-02T00:00:00.000Z",
-        handoff,
+        handoff: handoffWithWorkVersion,
       },
       copyStaff,
-      { ...context, assignments },
+      { ...kitchenContext, assignments },
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -311,10 +318,10 @@ describe("applyReleaseClaim", () => {
         taskId: claimed.id,
         from: "in_progress",
         claimVersion: "2026-01-02T00:00:00.000Z",
-        handoff,
+        handoff: handoffWithWorkVersion,
       },
       copyStaff,
-      context,
+      kitchenContext,
     );
     expect(second.ok).toBe(true);
     if (second.ok) {
@@ -341,10 +348,10 @@ describe("applyReassign", () => {
         claimVersion: "2026-01-01T00:00:00.000Z",
         toUserId: copyStaff.id,
         toRole: "copy",
-        handoff,
+        handoff: handoffWithWorkVersion,
       },
       producerStaff,
-      { ...context, targetUser: copyStaff },
+      { ...kitchenContext, targetUser: copyStaff },
     );
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -389,10 +396,10 @@ describe("applyReassign", () => {
         claimVersion: null,
         toUserId: copyStaff.id,
         toRole: "strategy",
-        handoff,
+        handoff: handoffWithWorkVersion,
       },
       producerStaff,
-      { ...context, targetUser: copyStaff },
+      { ...kitchenContext, targetUser: copyStaff },
     );
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.status).toBe(400);

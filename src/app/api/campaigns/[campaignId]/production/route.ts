@@ -8,6 +8,7 @@ import {
   type ProductionActionResult,
 } from "@/lib/campaign-production/actions";
 import {
+  canEditKitchenWorkForTask,
   canOperateProductionWork,
   canReadProductionWork,
 } from "@/lib/campaign-production/access";
@@ -100,6 +101,12 @@ export async function PATCH(request: Request, context: RouteContext) {
   const task = tasksEnvelope.tasks.find((entry) => entry.id === body.taskId);
   if (!task) {
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
+  }
+
+  if (
+    !canEditKitchenWorkForTask(user, task, assignments, campaignId, productionEnvelope)
+  ) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   let result: ProductionActionResult;

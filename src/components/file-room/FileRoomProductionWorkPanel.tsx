@@ -37,7 +37,7 @@ export default function FileRoomProductionWorkPanel({
           action: "create_version",
           taskId,
           body,
-          reason: view.currentVersionId ? "internal_revision" : "initial",
+          reason: view.nextVersionReason,
         }),
       });
       const json = (await res.json()) as {

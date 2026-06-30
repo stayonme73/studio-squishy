@@ -25,6 +25,19 @@ export type ProductionActionResult =
   | { ok: true; envelope: ServerProductionEnvelope; version?: ProductionVersion; workUnit?: ProductionWorkUnit }
   | { ok: false; error: string; status: number };
 
+/** `initial` is first version for the task stage — not first in the whole work unit. */
+export function resolveDefaultVersionReason(
+  envelope: ServerProductionEnvelope,
+  task: CampaignTaskItem,
+): ProductionVersionReason {
+  const current = currentVersionForTask(envelope, task);
+  if (!current) {
+    return task.workflowState === "needs_revision" ? "qa_revision" : "initial";
+  }
+  if (task.workflowState === "needs_revision") return "qa_revision";
+  return "internal_revision";
+}
+
 function nextStage(stage: KitchenV1ProductionPhase): KitchenV1ProductionPhase | null {
   const index = KITCHEN_V1_PRODUCTION_PHASES.indexOf(stage);
   if (index < 0 || index >= KITCHEN_V1_PRODUCTION_PHASES.length - 1) return null;
@@ -100,8 +113,7 @@ export function applyCreateVersion(
     return { ok: false, error: bodyValidation.error, status: 400 };
   }
 
-  const current = currentVersionForTask(envelope, task);
-  const defaultReason: ProductionVersionReason = current ? "internal_revision" : "initial";
+  const defaultReason = resolveDefaultVersionReason(envelope, task);
   const reasonValidation = validateVersionReason(body.reason ?? defaultReason);
   if (!reasonValidation.ok) {
     return { ok: false, error: reasonValidation.error, status: 400 };

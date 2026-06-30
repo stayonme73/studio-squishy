@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { campaignTasksConfig, formatBlockedReasonDisplay } from "@/config/campaign-tasks";
 import { campaignExceptionsConfig } from "@/config/campaign-exceptions";
+import { teamOffices } from "@/config/team-offices";
 import { resolveFileRoomProductionWorkPanelView } from "@/lib/campaign-production/production-view";
 import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 import type { FileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room-controls-types";
@@ -24,12 +25,21 @@ import FileRoomTaskHandoffPanel, {
   type HandoffPanelMode,
 } from "./FileRoomTaskHandoffPanel";
 
+export type FileRoomProductionOfficeMode = {
+  readOnly: boolean;
+  hideQaActions: boolean;
+  submitLabel?: string;
+  singleTask?: FileRoomTaskRow;
+};
+
 type FileRoomProductionTasksSectionProps = {
   campaignId: string;
   productionTasks: FileRoomProductionTasksView;
   operatorContext: FileRoomTaskOperatorContext;
   showExceptionBadges?: boolean;
   productionEnvelope: ServerProductionEnvelope;
+  canEditWorkByTaskId?: Readonly<Record<string, boolean>>;
+  officeMode?: FileRoomProductionOfficeMode;
 };
 
 function formatQaHistoryLine(entry: FileRoomQaHistoryEntry): string {
@@ -48,6 +58,8 @@ function TaskRow({
   showExceptionBadges,
   productionEnvelope,
   studioUser,
+  canEditWorkByTaskId,
+  officeMode,
 }: {
   campaignId: string;
   task: FileRoomTaskRow;
@@ -56,6 +68,8 @@ function TaskRow({
   showExceptionBadges: boolean;
   productionEnvelope: ServerProductionEnvelope;
   studioUser: import("@/lib/campaign-store/types").StudioUser;
+  canEditWorkByTaskId?: Readonly<Record<string, boolean>>;
+  officeMode?: FileRoomProductionOfficeMode;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -94,10 +108,14 @@ function TaskRow({
     };
   }, [task]);
 
+  const officeReadOnly = officeMode?.readOnly ?? false;
+
+  const canEditWork = (canEditWorkByTaskId?.[task.id] ?? false) && !officeReadOnly;
+
   const productionWorkView = resolveFileRoomProductionWorkPanelView(
     localProductionEnvelope,
     kitchenTask,
-    canOperate,
+    canEditWork,
   );
 
   useEffect(() => {
@@ -149,6 +167,7 @@ function TaskRow({
 
   const showHandoffControls =
     canOperate &&
+    !officeReadOnly &&
     localWorkflow !== "ready_for_qa" &&
     (task.permissions.canClaim ||
       task.permissions.canRelease ||
@@ -156,9 +175,16 @@ function TaskRow({
       task.permissions.canReassign);
 
   const showQaControls =
+    !officeMode?.hideQaActions &&
     canOperate &&
     localWorkflow === "ready_for_qa" &&
     (task.permissions.canQaPass || task.permissions.canQaFail || task.permissions.canQaBlock);
+
+  const showOfficeQaStatus =
+    officeMode?.hideQaActions &&
+    (localWorkflow === "ready_for_qa" ||
+      localWorkflow === "needs_revision" ||
+      localQaSummary.total > 0);
 
   const showQaHistory = localQaSummary.total > 0;
 
@@ -474,6 +500,12 @@ function TaskRow({
         <p className="fr-tasks-row__block-reason">{localBlockedReason}</p>
       ) : null}
 
+      {officeReadOnly ? (
+        <p className="fr-tasks-row__meta" role="status">
+          {teamOffices.wrongRoleReadOnlyLabel}
+        </p>
+      ) : null}
+
       {productionWorkView.visible ? (
         <FileRoomProductionWorkPanel
           campaignId={campaignId}
@@ -490,9 +522,7 @@ function TaskRow({
                 workUnitId: unit.id,
                 taskId: task.id,
                 stage: task.phase as "strategy_content_direction" | "copy" | "creative",
-                reason: (productionWorkView.currentVersionId
-                  ? "internal_revision"
-                  : "initial") as import("@/lib/campaign-production/types").ProductionVersionReason,
+                reason: productionWorkView.nextVersionReason,
                 contentKind: "plain_text" as const,
                 body: savedBody,
                 createdAt: now,
@@ -550,7 +580,7 @@ function TaskRow({
                 disabled={busy || panelMode !== null}
                 onClick={() => openHandoffPanel("submit")}
               >
-                {campaignTasksConfig.submitHandoffLabel}
+                {officeMode?.submitLabel ?? campaignTasksConfig.submitHandoffLabel}
               </button>
             ) : null}
             {task.permissions.canRelease ? (
@@ -586,6 +616,20 @@ function TaskRow({
               onConfirm={confirmHandoffPanel}
               onCancel={closeHandoffPanel}
             />
+          ) : null}
+        </div>
+      ) : null}
+
+      {showOfficeQaStatus ? (
+        <div className="fr-office-qa-status" aria-label={teamOffices.qaStatusLabel}>
+          {localWorkflow === "ready_for_qa" ? (
+            <p className="fr-tasks-row__meta">{teamOffices.waitingForQaLabel}</p>
+          ) : null}
+          {showQaHistory ? (
+            <p className="fr-tasks-row__meta">
+              {teamOffices.qaStatusLabel}: {localQaSummary.total}
+              {localLatestQa ? ` · ${formatQaHistoryLine(localLatestQa)}` : ""}
+            </p>
           ) : null}
         </div>
       ) : null}
@@ -637,9 +681,31 @@ export default function FileRoomProductionTasksSection({
   showExceptionBadges = true,
   productionEnvelope,
   studioUser,
+  canEditWorkByTaskId,
+  officeMode,
 }: FileRoomProductionTasksSectionProps & {
   studioUser: import("@/lib/campaign-store/types").StudioUser;
 }) {
+  if (officeMode?.singleTask) {
+    return (
+      <FileRoomSectionCard title={teamOffices.activeWorkTitle}>
+        <ul className="fr-tasks-list">
+          <TaskRow
+            campaignId={campaignId}
+            task={officeMode.singleTask}
+            canOperate={operatorContext.canOperate}
+            operatorContext={operatorContext}
+            showExceptionBadges={showExceptionBadges}
+            productionEnvelope={productionEnvelope}
+            studioUser={studioUser}
+            canEditWorkByTaskId={canEditWorkByTaskId}
+            officeMode={officeMode}
+          />
+        </ul>
+      </FileRoomSectionCard>
+    );
+  }
+
   if (productionTasks.isEmpty) {
     return (
       <FileRoomSectionCard title={campaignTasksConfig.sectionTitle}>
@@ -685,6 +751,7 @@ export default function FileRoomProductionTasksSection({
                 showExceptionBadges={showExceptionBadges}
                 productionEnvelope={productionEnvelope}
                 studioUser={studioUser}
+                canEditWorkByTaskId={canEditWorkByTaskId}
               />
             ))}
           </ul>
