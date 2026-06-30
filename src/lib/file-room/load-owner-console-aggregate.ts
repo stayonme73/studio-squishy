@@ -7,6 +7,11 @@ import {
   shouldIncludeCampaignInOwnerConsoleAggregate,
   type OwnerConsoleCampaignBundle,
 } from "@/lib/campaign-tasks/owner-console-view";
+import {
+  resolveOwnerConsoleScanView,
+  resolveWaitingOwnerExceptionIds,
+  type OwnerConsoleScanView,
+} from "@/lib/campaign-tasks/owner-console-scan-view";
 import { resolveOwnerConsoleAccess } from "@/lib/campaign-tasks/owner-console-access";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
@@ -17,6 +22,7 @@ export type OwnerConsoleAggregateResult =
   | {
       kind: "ok";
       view: ReturnType<typeof resolveOwnerConsoleView>;
+      scan: OwnerConsoleScanView;
       refreshedAt: string;
     };
 
@@ -79,9 +85,17 @@ export async function loadOwnerConsoleAggregate(
     assignCandidatesByCampaign,
   );
 
+  const scan = resolveOwnerConsoleScanView(
+    bundles,
+    user,
+    assignments,
+    resolveWaitingOwnerExceptionIds(view.waitingOnOwner),
+  );
+
   return {
     kind: "ok",
     view,
+    scan,
     refreshedAt: new Date().toISOString(),
   };
 }

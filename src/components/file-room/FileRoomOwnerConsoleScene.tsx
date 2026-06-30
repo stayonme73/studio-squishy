@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { fileRoom, FILE_ROOM_ROUTE } from "@/config/file-room";
 import { ownerConsole, ownerConsoleCampaignRoute } from "@/config/owner-console";
+import type { OwnerConsoleScanView } from "@/lib/campaign-tasks/owner-console-scan-view";
 import type {
   OwnerConsoleCampaignContext,
   OwnerConsoleDecisionCard,
@@ -23,8 +24,8 @@ import { useOwnerConsoleActions } from "./useOwnerConsoleActions";
 
 type FileRoomOwnerConsoleSceneProps = {
   view: OwnerConsoleView;
+  scan: OwnerConsoleScanView;
   refreshedAt: string;
-  scan?: import("@/lib/campaign-tasks/owner-console-scan-view").OwnerConsoleScanView;
 };
 
 function campaignContextById(
@@ -35,8 +36,8 @@ function campaignContextById(
 
 export default function FileRoomOwnerConsoleScene({
   view,
-  refreshedAt,
   scan,
+  refreshedAt,
 }: FileRoomOwnerConsoleSceneProps) {
   const contexts = useMemo(() => campaignContextById(view.campaigns), [view.campaigns]);
   const actions = useOwnerConsoleActions();
@@ -175,7 +176,7 @@ export default function FileRoomOwnerConsoleScene({
         </div>
       )}
 
-      {scan ? <FileRoomOwnerConsoleScanSection scan={scan} /> : null}
+      <FileRoomOwnerConsoleScanSection scan={scan} />
 
       <p className="fr-owner-console-footer">
         <Link href={FILE_ROOM_ROUTE}>← {ownerConsole.allCampaignsLink}</Link>

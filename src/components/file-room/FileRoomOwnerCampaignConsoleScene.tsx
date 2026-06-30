@@ -15,6 +15,7 @@ import {
   FileRoomOwnerConsoleDecisionDetail,
   FileRoomOwnerConsoleDecisionPanels,
 } from "./FileRoomOwnerConsolePanels";
+import FileRoomOwnerConsoleScanSection from "./FileRoomOwnerConsoleScanSection";
 import FileRoomOwnerDecisionCard from "./FileRoomOwnerDecisionCard";
 import FileRoomSectionCard from "./FileRoomSectionCard";
 import { useOwnerConsoleActions } from "./useOwnerConsoleActions";
@@ -169,6 +170,8 @@ export default function FileRoomOwnerCampaignConsoleScene({
           </div>
         </div>
       )}
+
+      <FileRoomOwnerConsoleScanSection scan={view.scan} />
 
       <p className="fr-owner-console-footer">
         <Link href={OWNER_CONSOLE_ROUTE}>← {ownerConsole.backToStudioQueue}</Link>

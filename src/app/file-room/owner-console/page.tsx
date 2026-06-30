@@ -25,7 +25,7 @@ export default async function OwnerConsolePage() {
   return (
     <>
       <FileRoomHeader user={user} showOwnerConsoleLink={false} />
-      <FileRoomOwnerConsoleScene view={result.view} refreshedAt={result.refreshedAt} />
+      <FileRoomOwnerConsoleScene view={result.view} scan={result.scan} refreshedAt={result.refreshedAt} />
     </>
   );
 }
