@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import FileRoomProductionTasksSection from "@/components/file-room/FileRoomProductionTasksSection";
 import FileRoomSectionCard from "@/components/file-room/FileRoomSectionCard";
-import { OfficeContextRail, OfficeQueuePanel } from "@/components/team-offices/CopyOfficePanels";
+import { OfficeContextRail, OfficeQueuePanel } from "@/components/team-offices/TeamOfficePanels";
 import {
   teamOfficeRoleLabels,
   teamOffices,
@@ -25,6 +25,7 @@ type FileRoomOfficeSceneProps = {
   productionEnvelope: ServerProductionEnvelope;
   studioUser: StudioUser;
   canEditWorkByTaskId: Readonly<Record<string, boolean>>;
+  mode?: "production" | "qa";
 };
 
 export default function FileRoomOfficeScene({
@@ -38,8 +39,10 @@ export default function FileRoomOfficeScene({
   productionEnvelope,
   studioUser,
   canEditWorkByTaskId,
+  mode = "production",
 }: FileRoomOfficeSceneProps) {
   const officeLabel = teamOfficeRoleLabels[officeSlug];
+  const isQaMode = mode === "qa";
 
   return (
     <>
@@ -49,7 +52,7 @@ export default function FileRoomOfficeScene({
 
       <header className="fr-office-header">
         <h2 className="fr-office-header__title">{officeLabel} Office</h2>
-        <p className="fr-header__meta">{teamOffices.copyOfficeLead}</p>
+        <p className="fr-header__meta">{teamOffices.officeLeads[officeSlug]}</p>
       </header>
 
       <div className="fr-office-grid">
@@ -74,20 +77,20 @@ export default function FileRoomOfficeScene({
               studioUser={studioUser}
               canEditWorkByTaskId={canEditWorkByTaskId}
               officeMode={{
-                readOnly: selectedTask.isReadOnly,
-                hideQaActions: true,
+                readOnly: isQaMode ? true : selectedTask.isReadOnly,
+                hideQaActions: !isQaMode,
                 submitLabel: "Submit to QA",
                 singleTask: selectedTask,
               }}
             />
           ) : (
             <FileRoomSectionCard title={teamOffices.activeWorkTitle}>
-              <p className="fr-tasks-empty__body">{teamOffices.queueEmpty}</p>
+              <p className="fr-tasks-empty__body">{teamOffices.queueEmpty[officeSlug]}</p>
             </FileRoomSectionCard>
           )}
         </div>
 
-        <OfficeContextRail context={contextRail} campaignId={campaignId} />
+        {!isQaMode ? <OfficeContextRail context={contextRail} campaignId={campaignId} /> : null}
       </div>
     </>
   );

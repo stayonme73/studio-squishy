@@ -8,9 +8,12 @@ import type { FileRoomTaskRow } from "@/lib/campaign-tasks/tasks-view";
 
 import {
   filterOfficeQueueTasks,
+  filterQaOfficeQueueTasks,
   isOfficeTaskReadOnly,
+  resolveOfficeDownstreamStatus,
   resolveOfficeSelectedTask,
   resolveOfficeStrategyContext,
+  resolveProducerDispatchView,
 } from "./office-view";
 
 const now = "2026-06-30T12:00:00.000Z";
@@ -275,6 +278,147 @@ describe("office-view", () => {
 
     expect(context.visible).toBe(true);
     expect(context.currentBody).toBe("Direction notes");
+  });
+
+  it("filters default strategy queue to strategy-role tasks only", () => {
+    const view = {
+      tasks: [
+        row("sm-001:strategy_content_direction", "strategy"),
+        row("sm-001:copy", "copy"),
+        row("sm-001:creative", "creative_production"),
+      ],
+      groups: [],
+      isEmpty: false,
+      planFingerprint: "fp",
+      readyCount: 0,
+      blockedCount: 0,
+      notReadyCount: 0,
+    };
+
+    const queue = filterOfficeQueueTasks(view, "strategy", {
+      userId: "staff-1",
+      canEditForTask: () => true,
+    });
+
+    expect(queue.tasks.map((task) => task.id)).toEqual(["sm-001:strategy_content_direction"]);
+  });
+
+  it("filters creative queue to creative_production tasks only", () => {
+    const view = {
+      tasks: [
+        row("sm-001:strategy_content_direction", "strategy"),
+        row("sm-001:copy", "copy"),
+        row("sm-001:creative", "creative_production"),
+      ],
+      groups: [],
+      isEmpty: false,
+      planFingerprint: "fp",
+      readyCount: 0,
+      blockedCount: 0,
+      notReadyCount: 0,
+    };
+
+    const queue = filterOfficeQueueTasks(view, "creative_production", {
+      userId: "staff-1",
+      canEditForTask: () => true,
+    });
+
+    expect(queue.tasks.map((task) => task.id)).toEqual(["sm-001:creative"]);
+  });
+
+  it("filters QA queue to ready_for_qa and formal qa tasks", () => {
+    const view = {
+      tasks: [
+        row("sm-001:copy", "copy", { workflowState: "ready_for_qa", statusLabel: "Ready for QA" }),
+        row("sm-001:creative", "creative_production", { workflowState: "in_progress" }),
+        row("sm-001:qa", "qa", {
+          workflowState: "unstarted",
+          effectiveStatus: "ready",
+          statusLabel: "Ready",
+        }),
+      ],
+      groups: [],
+      isEmpty: false,
+      planFingerprint: "fp",
+      readyCount: 0,
+      blockedCount: 0,
+      notReadyCount: 0,
+    };
+
+    const queue = filterQaOfficeQueueTasks(view, { canEditForTask: () => false });
+    expect(queue.tasks.map((task) => task.id).sort()).toEqual(["sm-001:copy", "sm-001:qa"]);
+  });
+
+  it("resolves strategy downstream as copy task", () => {
+    const downstream = resolveOfficeDownstreamStatus(
+      {
+        tasks: [
+          {
+            id: "sm-001:copy",
+            title: "Copy",
+            phase: "copy",
+            status: "not_ready",
+            relatedServiceIds: ["sm-001"],
+            familyId: "social",
+            catalogFamilyId: "social_media",
+            serviceName: "Social",
+            dependsOn: [],
+            workflowState: "unstarted",
+          },
+        ],
+        handoffs: [],
+        qaRecords: [],
+        planFingerprint: "fp",
+        campaignId: "campaign-1",
+        version: 1,
+        updatedAt: now,
+      },
+      "strategy",
+    );
+
+    expect(downstream.visible).toBe(true);
+    expect(downstream.taskTitle).toBe("Copy");
+  });
+
+  it("builds producer dispatch buckets", () => {
+    const view = {
+      tasks: [
+        row("sm-001:copy", "copy", {
+          effectiveStatus: "blocked",
+          workflowState: "blocked",
+          statusLabel: "Blocked",
+        }),
+        row("sm-001:creative", "creative_production", {
+          workflowState: "ready_for_qa",
+          statusLabel: "Ready for QA",
+        }),
+        row("sm-001:strategy_content_direction", "strategy", {
+          workflowState: "unstarted",
+          effectiveStatus: "ready",
+          status: "ready",
+          statusLabel: "Ready",
+        }),
+      ],
+      groups: [],
+      isEmpty: false,
+      planFingerprint: "fp",
+      readyCount: 0,
+      blockedCount: 0,
+      notReadyCount: 0,
+    };
+
+    const dispatch = resolveProducerDispatchView(view, [], 2, {
+      "sm-001:copy": "Copy",
+      "sm-001:creative": "Creative",
+      "sm-001:strategy_content_direction": "Strategy",
+    });
+
+    expect(dispatch.openExceptionCount).toBe(2);
+    expect(dispatch.buckets.map((bucket) => bucket.key)).toEqual([
+      "blocked",
+      "ready_for_qa",
+      "unclaimed_ready",
+    ]);
   });
 });
 

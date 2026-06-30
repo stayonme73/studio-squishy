@@ -1,6 +1,6 @@
 import type { ProductionRole } from "@/lib/campaign-tasks/types";
 
-/** Team Office route slugs — exact ProductionRole values (V1: copy only). */
+/** Team Office route slugs — exact ProductionRole values. */
 export const TEAM_OFFICE_ROLE_SLUGS = [
   "producer_dispatcher",
   "strategy",
@@ -11,27 +11,64 @@ export const TEAM_OFFICE_ROLE_SLUGS = [
 
 export type TeamOfficeRoleSlug = (typeof TEAM_OFFICE_ROLE_SLUGS)[number];
 
-/** Offices implemented in V1 — all other slugs return not-built. */
-export const TEAM_OFFICE_V1_LIVE_SLUGS: readonly TeamOfficeRoleSlug[] = ["copy"];
+/** Offices implemented in V1. */
+export const TEAM_OFFICE_V1_LIVE_SLUGS: readonly TeamOfficeRoleSlug[] = [
+  "strategy",
+  "copy",
+  "creative_production",
+  "qa",
+  "producer_dispatcher",
+];
 
 export const teamOffices = {
-  copyOfficeTitle: "Copy Office",
-  copyOfficeLead: "Copy production queue for this campaign.",
   notBuiltTitle: "Office not available",
-  notBuiltBody: "This team office is not built yet. Use File Room or Copy Office for Kitchen V1.",
+  notBuiltBody: "This team office is not built yet. Use File Room for Kitchen V1.",
   wrongRoleReadOnlyLabel: "Read-only — this work belongs to another production role.",
   waitingForQaLabel: "Waiting for QA review in File Room.",
   qaStatusLabel: "QA status",
   strategyContextTitle: "Strategy context",
   strategyContextEmpty: "No strategy direction saved yet.",
+  copyContextTitle: "Copy draft",
+  copyContextEmpty: "No copy draft saved yet.",
+  discoverySnippetTitle: "Discovery",
+  discoverySnippetEmpty: "No discovery answers on file.",
   downstreamTitle: "Downstream status",
-  downstreamEmpty: "Creative stage not started.",
-  queueTitle: "Copy queue",
-  queueEmpty: "No copy tasks in this campaign.",
+  downstreamCopyEmpty: "Copy stage not started.",
+  downstreamCreativeEmpty: "Creative stage not started.",
   activeWorkTitle: "Active work",
   contextRailTitle: "Campaign context",
   backToCampaignLabel: "Campaign detail",
-  openCopyOfficeLabel: "Copy Office",
+  producerDispatchTitle: "Dispatch board",
+  producerHandoffFeedTitle: "Recent handoffs",
+  producerHandoffFeedEmpty: "No handoffs recorded yet.",
+  producerExceptionsTitle: "Open exceptions",
+  producerBlockedTitle: "Blocked",
+  producerStalledTitle: "Stalled",
+  producerReadyForQaTitle: "Ready for QA",
+  producerNeedsRevisionTitle: "Needs revision",
+  producerUnclaimedReadyTitle: "Unclaimed ready",
+  producerDispatchEmpty: "No dispatch items for this campaign.",
+  officeLeads: {
+    strategy: "Strategy production queue for this campaign.",
+    copy: "Copy production queue for this campaign.",
+    creative_production: "Creative production queue for this campaign.",
+    qa: "QA review queue for this campaign.",
+    producer_dispatcher: "Producer dispatch view for this campaign.",
+  } satisfies Record<TeamOfficeRoleSlug, string>,
+  queueTitles: {
+    strategy: "Strategy queue",
+    copy: "Copy queue",
+    creative_production: "Creative queue",
+    qa: "QA queue",
+    producer_dispatcher: "Dispatch queue",
+  } satisfies Record<TeamOfficeRoleSlug, string>,
+  queueEmpty: {
+    strategy: "No strategy tasks in this campaign.",
+    copy: "No copy tasks in this campaign.",
+    creative_production: "No creative tasks in this campaign.",
+    qa: "No tasks awaiting QA in this campaign.",
+    producer_dispatcher: "No dispatch items in this campaign.",
+  } satisfies Record<TeamOfficeRoleSlug, string>,
 } as const;
 
 export function isTeamOfficeRoleSlug(value: string): value is TeamOfficeRoleSlug {

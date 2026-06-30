@@ -12,6 +12,11 @@ const KITCHEN_PHASE_ORDER: KitchenV1ProductionPhase[] = [
   "creative",
 ];
 
+export type KitchenStrategyFixture = {
+  production: ServerProductionEnvelope;
+  strategyWorkVersionId: string;
+};
+
 export type KitchenCopyFixture = {
   production: ServerProductionEnvelope;
   copyWorkVersionId: string;
@@ -77,6 +82,34 @@ function passStage(
     throw new Error(`fixture: QA pass for ${phase}: ${pinned.error}`);
   }
   return pinned.envelope;
+}
+
+/** Production store at strategy stage with a current strategy work version. */
+export function buildKitchenStrategyStageFixture(
+  campaign: CampaignRecord,
+  user: StudioUser,
+  syncedAt: string,
+): KitchenStrategyFixture {
+  const strategyTask = kitchenTask("strategy_content_direction", {
+    workflowState: "in_progress",
+    status: "in_progress",
+  });
+  const strategyVersion = applyCreateVersion(
+    syncedProduction(campaign, syncedAt),
+    strategyTask,
+    { body: "Strategy direction draft" },
+    user,
+  );
+  if (!strategyVersion.ok || !strategyVersion.version) {
+    throw new Error(
+      `fixture: strategy version: ${!strategyVersion.ok ? strategyVersion.error : "no version"}`,
+    );
+  }
+
+  return {
+    production: strategyVersion.envelope,
+    strategyWorkVersionId: strategyVersion.version.id,
+  };
 }
 
 /** Production store at copy stage with a current copy work version. */

@@ -124,7 +124,12 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
 
   return (
     <>
-      <FileRoomHeader user={user} campaignName={view.campaignName} campaignId={campaignId} showCopyOfficeLink />
+      <FileRoomHeader
+        user={user}
+        campaignName={view.campaignName}
+        campaignId={campaignId}
+        assignments={assignments}
+      />
       <FileRoomCampaignScene
         view={view}
         campaignId={campaignId}

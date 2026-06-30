@@ -3,14 +3,17 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { teamOffices } from "@/config/team-offices";
+import {
+  teamOffices,
+  type TeamOfficeRoleSlug,
+} from "@/config/team-offices";
 import type { OfficeContextRailView, OfficeQueueTaskRow } from "@/lib/campaign-tasks/office-view";
 
 import FileRoomSectionCard from "@/components/file-room/FileRoomSectionCard";
 
 type OfficeQueuePanelProps = {
   campaignId: string;
-  officeSlug: string;
+  officeSlug: TeamOfficeRoleSlug;
   tasks: readonly OfficeQueueTaskRow[];
   selectedTaskId: string | null;
   isEmpty: boolean;
@@ -23,16 +26,19 @@ export function OfficeQueuePanel({
   selectedTaskId,
   isEmpty,
 }: OfficeQueuePanelProps) {
+  const title = teamOffices.queueTitles[officeSlug];
+  const emptyBody = teamOffices.queueEmpty[officeSlug];
+
   if (isEmpty) {
     return (
-      <FileRoomSectionCard title={teamOffices.queueTitle}>
-        <p className="fr-tasks-empty__body">{teamOffices.queueEmpty}</p>
+      <FileRoomSectionCard title={title}>
+        <p className="fr-tasks-empty__body">{emptyBody}</p>
       </FileRoomSectionCard>
     );
   }
 
   return (
-    <FileRoomSectionCard title={teamOffices.queueTitle}>
+    <FileRoomSectionCard title={title}>
       <ul className="fr-office-queue">
         {tasks.map((task) => {
           const isSelected = task.id === selectedTaskId;
@@ -62,8 +68,21 @@ type OfficeContextRailProps = {
   campaignId: string;
 };
 
+function ReadonlyBody({ body, emptyLabel }: { body: string; emptyLabel: string }) {
+  if (body) {
+    return <pre className="fr-production-work__readonly">{body}</pre>;
+  }
+  return <p className="fr-tasks-row__meta">{emptyLabel}</p>;
+}
+
 export function OfficeContextRail({ context, campaignId }: OfficeContextRailProps) {
   const router = useRouter();
+  const role = context.officeRole;
+
+  const showDiscovery = role === "strategy";
+  const showStrategyContext = role === "copy" || role === "creative_production";
+  const showCopyContext = role === "creative_production";
+  const showDownstream = role === "strategy" || role === "copy";
 
   return (
     <aside className="fr-office-rail" aria-label={teamOffices.contextRailTitle}>
@@ -106,32 +125,74 @@ export function OfficeContextRail({ context, campaignId }: OfficeContextRailProp
           </div>
         ) : null}
 
-        <div className="fr-scope-group">
-          <p className="fr-scope-group__name">{teamOffices.strategyContextTitle}</p>
-          {context.strategyContext.visible ? (
-            <>
-              <p className="fr-tasks-row__meta">{context.strategyContext.taskTitle}</p>
-              {context.strategyContext.currentBody ? (
-                <pre className="fr-production-work__readonly">{context.strategyContext.currentBody}</pre>
-              ) : (
-                <p className="fr-tasks-row__meta">{teamOffices.strategyContextEmpty}</p>
-              )}
-            </>
-          ) : (
-            <p className="fr-tasks-row__meta">{teamOffices.strategyContextEmpty}</p>
-          )}
-        </div>
+        {showDiscovery ? (
+          <div className="fr-scope-group">
+            <p className="fr-scope-group__name">{teamOffices.discoverySnippetTitle}</p>
+            {context.discoverySnippet.length > 0 ? (
+              <ul className="fr-kv-list">
+                {context.discoverySnippet.map((item) => (
+                  <li key={item.label} className="fr-kv-list__row">
+                    <span className="fr-kv-list__label">{item.label}</span>
+                    <p className="fr-kv-list__value">{item.value}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="fr-tasks-row__meta">{teamOffices.discoverySnippetEmpty}</p>
+            )}
+          </div>
+        ) : null}
 
-        <div className="fr-scope-group">
-          <p className="fr-scope-group__name">{teamOffices.downstreamTitle}</p>
-          {context.downstreamStatus.visible ? (
-            <p className="fr-tasks-row__meta">
-              {context.downstreamStatus.taskTitle} · {context.downstreamStatus.statusLabel}
-            </p>
-          ) : (
-            <p className="fr-tasks-row__meta">{teamOffices.downstreamEmpty}</p>
-          )}
-        </div>
+        {showStrategyContext ? (
+          <div className="fr-scope-group">
+            <p className="fr-scope-group__name">{teamOffices.strategyContextTitle}</p>
+            {context.strategyContext.visible ? (
+              <>
+                <p className="fr-tasks-row__meta">{context.strategyContext.taskTitle}</p>
+                <ReadonlyBody
+                  body={context.strategyContext.currentBody}
+                  emptyLabel={teamOffices.strategyContextEmpty}
+                />
+              </>
+            ) : (
+              <p className="fr-tasks-row__meta">{teamOffices.strategyContextEmpty}</p>
+            )}
+          </div>
+        ) : null}
+
+        {showCopyContext ? (
+          <div className="fr-scope-group">
+            <p className="fr-scope-group__name">{teamOffices.copyContextTitle}</p>
+            {context.copyContext.visible ? (
+              <>
+                <p className="fr-tasks-row__meta">{context.copyContext.taskTitle}</p>
+                <ReadonlyBody
+                  body={context.copyContext.currentBody}
+                  emptyLabel={teamOffices.copyContextEmpty}
+                />
+              </>
+            ) : (
+              <p className="fr-tasks-row__meta">{teamOffices.copyContextEmpty}</p>
+            )}
+          </div>
+        ) : null}
+
+        {showDownstream ? (
+          <div className="fr-scope-group">
+            <p className="fr-scope-group__name">{teamOffices.downstreamTitle}</p>
+            {context.downstreamStatus.visible ? (
+              <p className="fr-tasks-row__meta">
+                {context.downstreamStatus.taskTitle} · {context.downstreamStatus.statusLabel}
+              </p>
+            ) : (
+              <p className="fr-tasks-row__meta">
+                {role === "strategy"
+                  ? teamOffices.downstreamCopyEmpty
+                  : teamOffices.downstreamCreativeEmpty}
+              </p>
+            )}
+          </div>
+        ) : null}
 
         <p className="fr-tasks-row__meta">
           <button

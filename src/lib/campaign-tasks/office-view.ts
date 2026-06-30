@@ -7,14 +7,16 @@ import {
   findWorkUnitForTask,
   isKitchenV1ProductionPhase,
 } from "@/lib/campaign-production/validation";
-import type { FileRoomCampaignView } from "@/lib/file-room-view";
+import type { FileRoomCampaignView, FileRoomDiscoveryItem } from "@/lib/file-room-view";
 
 import { taskRequiredRole } from "./capabilities";
+import { isFormalQaTask } from "./qa";
 import type { FileRoomQaHistoryEntry, FileRoomTaskQaSummary } from "./file-room-controls";
 import type {
   CampaignTaskItem,
   CampaignTasksRecord,
   ProductionRole,
+  TaskHandoffRecord,
   TaskWorkflowState,
 } from "./types";
 import type { FileRoomProductionTasksView, FileRoomTaskRow } from "./tasks-view";
@@ -40,6 +42,14 @@ export type OfficeStrategyContextView = {
   currentVersionId: string | null;
 };
 
+export type OfficeCopyContextView = {
+  visible: boolean;
+  taskTitle: string;
+  stageLabel: string;
+  currentBody: string;
+  currentVersionId: string | null;
+};
+
 export type OfficeDownstreamStatusView = {
   visible: boolean;
   taskTitle: string;
@@ -57,11 +67,14 @@ export type OfficeQaStatusView = {
 };
 
 export type OfficeContextRailView = {
+  officeRole: ProductionRole;
   campaignName: string;
   planIncludes: readonly string[];
   deliverableScope: FileRoomCampaignView["deliverableScope"];
   materialsCount: number;
+  discoverySnippet: readonly FileRoomDiscoveryItem[];
   strategyContext: OfficeStrategyContextView;
+  copyContext: OfficeCopyContextView;
   downstreamStatus: OfficeDownstreamStatusView;
 };
 
@@ -73,6 +86,30 @@ export type OfficeSceneView = {
   qaStatus: OfficeQaStatusView;
   contextRail: OfficeContextRailView;
 };
+
+export type ProducerHandoffFeedEntry = {
+  id: string;
+  taskTitle: string;
+  fromRole: string;
+  toRole: string;
+  summary: string;
+  createdAt: string;
+};
+
+export type ProducerDispatchBucket = {
+  key: string;
+  title: string;
+  tasks: readonly OfficeQueueTaskRow[];
+};
+
+export type ProducerDispatchView = {
+  buckets: readonly ProducerDispatchBucket[];
+  recentHandoffs: readonly ProducerHandoffFeedEntry[];
+  openExceptionCount: number;
+  isEmpty: boolean;
+};
+
+const DISCOVERY_SNIPPET_LIMIT = 4;
 
 function kitchenTaskFromRow(row: FileRoomTaskRow): CampaignTaskItem {
   const serviceId = row.id.split(":")[0] ?? "sm-001";
@@ -93,7 +130,7 @@ function kitchenTaskFromRow(row: FileRoomTaskRow): CampaignTaskItem {
   };
 }
 
-function isCopyOfficeTask(row: FileRoomTaskRow, officeRole: ProductionRole): boolean {
+function isOfficeRoleTask(row: FileRoomTaskRow, officeRole: ProductionRole): boolean {
   return taskRequiredRole(kitchenTaskFromRow(row)) === officeRole;
 }
 
@@ -101,12 +138,31 @@ function isActiveOfficeQueueTask(row: FileRoomTaskRow): boolean {
   return row.effectiveStatus !== "complete" && row.effectiveStatus !== "cancelled";
 }
 
+function isQaOfficeQueueTask(row: FileRoomTaskRow): boolean {
+  const task = kitchenTaskFromRow(row);
+  if (isFormalQaTask(task)) return isActiveOfficeQueueTask(row);
+  return row.workflowState === "ready_for_qa" && isActiveOfficeQueueTask(row);
+}
+
+function toOfficeQueueRow(
+  row: FileRoomTaskRow,
+  officeRole: ProductionRole,
+  canEditForTask: (task: CampaignTaskItem) => boolean,
+  matchRole: (row: FileRoomTaskRow, role: ProductionRole) => boolean,
+): OfficeQueueTaskRow {
+  const task = kitchenTaskFromRow(row);
+  const isWrongRole = !matchRole(row, officeRole);
+  const isReadOnly = isOfficeTaskReadOnly(row, officeRole, canEditForTask(task), matchRole);
+  return { ...row, isWrongRole, isReadOnly };
+}
+
 export function isOfficeTaskReadOnly(
   row: FileRoomTaskRow,
   officeRole: ProductionRole,
   canEditTask: boolean,
+  matchRole: (row: FileRoomTaskRow, role: ProductionRole) => boolean = isOfficeRoleTask,
 ): boolean {
-  if (!isCopyOfficeTask(row, officeRole)) return true;
+  if (!matchRole(row, officeRole)) return true;
   return !canEditTask;
 }
 
@@ -120,7 +176,7 @@ export function filterOfficeQueueTasks(
   },
 ): OfficeQueueView {
   const defaultQueue = productionTasks.tasks.filter(
-    (row) => isCopyOfficeTask(row, officeRole) && isActiveOfficeQueueTask(row),
+    (row) => isOfficeRoleTask(row, officeRole) && isActiveOfficeQueueTask(row),
   );
 
   let queueRows = defaultQueue;
@@ -131,18 +187,112 @@ export function filterOfficeQueueTasks(
     }
   }
 
-  const tasks: OfficeQueueTaskRow[] = queueRows.map((row) => {
-    const task = kitchenTaskFromRow(row);
-    const isWrongRole = !isCopyOfficeTask(row, officeRole);
-    const isReadOnly = isOfficeTaskReadOnly(row, officeRole, options.canEditForTask(task));
-    return { ...row, isWrongRole, isReadOnly };
-  });
+  const tasks: OfficeQueueTaskRow[] = queueRows.map((row) =>
+    toOfficeQueueRow(row, officeRole, options.canEditForTask, isOfficeRoleTask),
+  );
 
   return {
     officeRole,
     tasks,
     isEmpty: tasks.length === 0,
   };
+}
+
+export function filterQaOfficeQueueTasks(
+  productionTasks: FileRoomProductionTasksView,
+  options: {
+    canEditForTask: (task: CampaignTaskItem) => boolean;
+    deepLinkTaskId?: string | null;
+  },
+): OfficeQueueView {
+  const officeRole: ProductionRole = "qa";
+  const defaultQueue = productionTasks.tasks.filter(isQaOfficeQueueTask);
+
+  let queueRows = defaultQueue;
+  if (options.deepLinkTaskId) {
+    const deepLinked = productionTasks.tasks.find((row) => row.id === options.deepLinkTaskId);
+    if (deepLinked && !queueRows.some((row) => row.id === deepLinked.id)) {
+      queueRows = [...queueRows, deepLinked];
+    }
+  }
+
+  const tasks: OfficeQueueTaskRow[] = queueRows.map((row) =>
+    toOfficeQueueRow(row, officeRole, options.canEditForTask, () => true),
+  );
+
+  return {
+    officeRole,
+    tasks,
+    isEmpty: tasks.length === 0,
+  };
+}
+
+export function resolveProducerDispatchView(
+  productionTasks: FileRoomProductionTasksView,
+  handoffs: readonly TaskHandoffRecord[],
+  openExceptionCount: number,
+  taskTitleById: Readonly<Record<string, string>>,
+): ProducerDispatchView {
+  const activeRows = productionTasks.tasks.filter(isActiveOfficeQueueTask);
+  const toRow = (row: FileRoomTaskRow): OfficeQueueTaskRow => ({
+    ...row,
+    isWrongRole: false,
+    isReadOnly: true,
+  });
+
+  const blocked = activeRows.filter(
+    (row) => row.effectiveStatus === "blocked" || row.workflowState === "blocked",
+  );
+  const stalled = activeRows.filter(
+    (row) =>
+      row.workflowState === "in_progress" &&
+      row.effectiveStatus !== "blocked" &&
+      row.openExceptionCount > 0,
+  );
+  const readyForQa = activeRows.filter((row) => row.workflowState === "ready_for_qa");
+  const needsRevision = activeRows.filter((row) => row.workflowState === "needs_revision");
+  const unclaimedReady = activeRows.filter(
+    (row) => row.workflowState === "unstarted" && row.effectiveStatus === "ready",
+  );
+
+  const buckets: ProducerDispatchBucket[] = [
+    { key: "blocked", title: teamOffices.producerBlockedTitle, tasks: blocked.map(toRow) },
+    { key: "stalled", title: teamOffices.producerStalledTitle, tasks: stalled.map(toRow) },
+    {
+      key: "ready_for_qa",
+      title: teamOffices.producerReadyForQaTitle,
+      tasks: readyForQa.map(toRow),
+    },
+    {
+      key: "needs_revision",
+      title: teamOffices.producerNeedsRevisionTitle,
+      tasks: needsRevision.map(toRow),
+    },
+    {
+      key: "unclaimed_ready",
+      title: teamOffices.producerUnclaimedReadyTitle,
+      tasks: unclaimedReady.map(toRow),
+    },
+  ].filter((bucket) => bucket.tasks.length > 0);
+
+  const recentHandoffs: ProducerHandoffFeedEntry[] = [...handoffs]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 10)
+    .map((handoff) => ({
+      id: handoff.id,
+      taskTitle: taskTitleById[handoff.taskId] ?? handoff.taskId,
+      fromRole: handoff.fromRole,
+      toRole: handoff.toRole,
+      summary: handoff.completedSummary,
+      createdAt: handoff.createdAt,
+    }));
+
+  const isEmpty =
+    buckets.every((bucket) => bucket.tasks.length === 0) &&
+    recentHandoffs.length === 0 &&
+    openExceptionCount === 0;
+
+  return { buckets, recentHandoffs, openExceptionCount, isEmpty };
 }
 
 export function resolveOfficeSelectedTask(
@@ -187,26 +337,77 @@ export function resolveOfficeStrategyContext(
   };
 }
 
-export function resolveOfficeDownstreamStatus(
+export function resolveOfficeCopyContext(
+  productionEnvelope: ServerProductionEnvelope | null | undefined,
   tasksRecord: CampaignTasksRecord,
   serviceId = "sm-001",
-): OfficeDownstreamStatusView {
-  const creativeTask = tasksRecord.tasks.find((task) => task.id === `${serviceId}:creative`);
+): OfficeCopyContextView {
+  const copyTask = tasksRecord.tasks.find(
+    (task) => task.id === `${serviceId}:copy` && isKitchenV1ProductionPhase(task.phase),
+  );
 
-  if (!creativeTask) {
+  if (!copyTask || !productionEnvelope) {
     return {
       visible: false,
       taskTitle: "",
-      statusLabel: teamOffices.downstreamEmpty,
+      stageLabel: campaignProductionConfig.stageLabels.copy,
+      currentBody: "",
+      currentVersionId: null,
+    };
+  }
+
+  const version = currentVersionForTask(productionEnvelope, copyTask);
+
+  return {
+    visible: true,
+    taskTitle: copyTask.title,
+    stageLabel: campaignProductionConfig.stageLabels.copy,
+    currentBody: version?.body ?? "",
+    currentVersionId: version?.id ?? null,
+  };
+}
+
+export function resolveOfficeDownstreamStatus(
+  tasksRecord: CampaignTasksRecord,
+  officeRole: ProductionRole,
+  serviceId = "sm-001",
+): OfficeDownstreamStatusView {
+  const downstreamTaskId =
+    officeRole === "strategy"
+      ? `${serviceId}:copy`
+      : officeRole === "copy"
+        ? `${serviceId}:creative`
+        : null;
+
+  if (!downstreamTaskId) {
+    return {
+      visible: false,
+      taskTitle: "",
+      statusLabel: teamOffices.downstreamCreativeEmpty,
+      workflowState: "unstarted",
+    };
+  }
+
+  const downstreamTask = tasksRecord.tasks.find((task) => task.id === downstreamTaskId);
+  const emptyLabel =
+    officeRole === "strategy"
+      ? teamOffices.downstreamCopyEmpty
+      : teamOffices.downstreamCreativeEmpty;
+
+  if (!downstreamTask) {
+    return {
+      visible: false,
+      taskTitle: "",
+      statusLabel: emptyLabel,
       workflowState: "unstarted",
     };
   }
 
   return {
     visible: true,
-    taskTitle: creativeTask.title,
-    statusLabel: campaignTasksConfig.effectiveStatusLabels[creativeTask.status],
-    workflowState: creativeTask.workflowState ?? "unstarted",
+    taskTitle: downstreamTask.title,
+    statusLabel: campaignTasksConfig.effectiveStatusLabels[downstreamTask.status],
+    workflowState: downstreamTask.workflowState ?? "unstarted",
   };
 }
 
@@ -242,8 +443,10 @@ export function resolveOfficeContextRail(
   campaignView: FileRoomCampaignView,
   productionEnvelope: ServerProductionEnvelope,
   tasksRecord: CampaignTasksRecord,
+  officeRole: ProductionRole,
 ): OfficeContextRailView {
   return {
+    officeRole,
     campaignName: campaignView.campaignName,
     planIncludes: campaignView.planIncludes,
     deliverableScope: campaignView.deliverableScope,
@@ -251,8 +454,10 @@ export function resolveOfficeContextRail(
       (count, group) => count + group.items.length,
       0,
     ),
+    discoverySnippet: campaignView.discoveryItems.slice(0, DISCOVERY_SNIPPET_LIMIT),
     strategyContext: resolveOfficeStrategyContext(productionEnvelope, tasksRecord),
-    downstreamStatus: resolveOfficeDownstreamStatus(tasksRecord),
+    copyContext: resolveOfficeCopyContext(productionEnvelope, tasksRecord),
+    downstreamStatus: resolveOfficeDownstreamStatus(tasksRecord, officeRole),
   };
 }
 

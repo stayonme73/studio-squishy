@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import FileRoomHeader from "@/components/file-room/FileRoomHeader";
 import FileRoomOfficeScene from "@/components/file-room/FileRoomOfficeScene";
+import FileRoomProducerOfficeScene from "@/components/file-room/FileRoomProducerOfficeScene";
 import {
   FileRoomForbiddenState,
   FileRoomNotFoundState,
@@ -21,8 +22,10 @@ import { resolveFileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-ro
 import { resolveTeamOfficeAccess } from "@/lib/campaign-tasks/office-access";
 import {
   filterOfficeQueueTasks,
+  filterQaOfficeQueueTasks,
   resolveOfficeContextRail,
   resolveOfficeSelectedTask,
+  resolveProducerDispatchView,
 } from "@/lib/campaign-tasks/office-view";
 import { resolveFileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
 import { getOrGenerateTasks } from "@/lib/campaign-tasks/store";
@@ -128,14 +131,6 @@ export default async function FileRoomOfficePage({ params, searchParams }: FileR
   const canEditForTask = (task: import("@/lib/campaign-tasks/types").CampaignTaskItem) =>
     canEditKitchenWorkForTask(user, task, assignments, campaignId, productionEnvelope);
 
-  const queue = filterOfficeQueueTasks(productionTasksView, access.officeRole, {
-    userId: user.id,
-    canEditForTask,
-    deepLinkTaskId: deepLinkTaskId ?? null,
-  });
-
-  const selectedTask = resolveOfficeSelectedTask(queue, deepLinkTaskId ?? null);
-
   const materialsView = resolveFileRoomMaterialsView(materialsEnvelope);
   const exceptionsView = resolveFileRoomExceptionsView(
     tasksEnvelope.exceptionRecords,
@@ -154,11 +149,67 @@ export default async function FileRoomOfficePage({ params, searchParams }: FileR
     campaignView,
     productionEnvelope,
     tasksEnvelope,
+    access.officeRole,
   );
+
+  const header = (
+    <FileRoomHeader
+      user={user}
+      campaignName={campaignView.campaignName}
+      campaignId={campaignId}
+      assignments={assignments}
+    />
+  );
+
+  if (role === "producer_dispatcher") {
+    const taskTitleById = Object.fromEntries(
+      tasksEnvelope.tasks.map((task) => [task.id, task.title]),
+    );
+    const dispatch = resolveProducerDispatchView(
+      productionTasksView,
+      tasksEnvelope.handoffs ?? [],
+      exceptionsView.openCount,
+      taskTitleById,
+    );
+
+    const allDispatchTasks = dispatch.buckets.flatMap((bucket) => bucket.tasks);
+    const selectedTask =
+      allDispatchTasks.find((task) => task.id === deepLinkTaskId) ?? allDispatchTasks[0] ?? null;
+
+    return (
+      <>
+        {header}
+        <FileRoomProducerOfficeScene
+          campaignId={campaignId}
+          dispatch={dispatch}
+          selectedTask={selectedTask}
+          productionTasks={productionTasksView}
+          operatorContext={operatorContext}
+          productionEnvelope={productionEnvelope}
+          studioUser={user}
+          canEditWorkByTaskId={canEditWorkByTaskId}
+        />
+      </>
+    );
+  }
+
+  const queue =
+    role === "qa"
+      ? filterQaOfficeQueueTasks(productionTasksView, {
+          canEditForTask,
+          deepLinkTaskId: deepLinkTaskId ?? null,
+        })
+      : filterOfficeQueueTasks(productionTasksView, access.officeRole, {
+          userId: user.id,
+          canEditForTask,
+          deepLinkTaskId: deepLinkTaskId ?? null,
+        });
+
+  const selectedTask = resolveOfficeSelectedTask(queue, deepLinkTaskId ?? null);
 
   return (
     <>
-      <FileRoomHeader user={user} campaignName={campaignView.campaignName} />
+      {header}
       <FileRoomOfficeScene
         campaignId={campaignId}
         officeSlug={role}
@@ -170,6 +221,7 @@ export default async function FileRoomOfficePage({ params, searchParams }: FileR
         productionEnvelope={productionEnvelope}
         studioUser={user}
         canEditWorkByTaskId={canEditWorkByTaskId}
+        mode={role === "qa" ? "qa" : "production"}
       />
     </>
   );
