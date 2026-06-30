@@ -60,7 +60,12 @@ export default function FileRoomOwnerConsoleReassignPanel({
 
   const handleConfirm = () => {
     if (!canSubmit || !form.toRole) return;
-    const handoff = {
+    const handoff: {
+      completedSummary: string;
+      sourceContext: string;
+      nextSteps: string;
+      workVersionId?: string;
+    } = {
       completedSummary: form.completedSummary.trim(),
       sourceContext: form.sourceContext.trim(),
       nextSteps: form.nextSteps.trim(),
