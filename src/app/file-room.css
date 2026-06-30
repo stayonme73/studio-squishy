@@ -548,6 +548,22 @@
   gap: 0.55rem;
 }
 
+.fr-tasks-handoff__context {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--utility-border);
+  border-radius: var(--utility-radius, 0.35rem);
+  background: color-mix(in srgb, var(--utility-text-muted) 6%, transparent);
+}
+
+.fr-tasks-handoff__context-heading {
+  margin: 0 0 0.45rem;
+  font-size: var(--type-helper);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--utility-text-muted);
+}
+
 .fr-tasks-handoff__field {
   display: grid;
   gap: 0.25rem;
@@ -1157,6 +1173,13 @@
   display: block;
   font-weight: 600;
   font-size: var(--type-body, 0.9375rem);
+}
+
+.fr-owner-console-queue__differentiator {
+  display: block;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+  margin-top: 0.15rem;
 }
 
 .fr-owner-console-queue__meta {

@@ -27,6 +27,9 @@ export default function FileRoomOwnerDecisionCard({
       >
         <span className="fr-owner-console-queue__campaign">{card.campaignName}</span>
         <span className="fr-owner-console-queue__title">{card.row.title}</span>
+        {card.queueDifferentiator ? (
+          <span className="fr-owner-console-queue__differentiator">{card.queueDifferentiator}</span>
+        ) : null}
         <span className="fr-owner-console-queue__meta">
           {card.row.kindLabel} · {card.ageLabel}
         </span>

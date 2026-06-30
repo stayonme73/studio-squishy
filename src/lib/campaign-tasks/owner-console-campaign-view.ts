@@ -1,5 +1,6 @@
 import { FILE_ROOM_ROUTE } from "@/config/file-room";
 import { ownerConsole } from "@/config/owner-console";
+import { campaignTasksConfig } from "@/config/campaign-tasks";
 import {
   officeRoleFromSlug,
   teamOfficePath,
@@ -20,6 +21,7 @@ import {
   resolveFileRoomExceptionOperatorContext,
   resolveFileRoomExceptionsView,
   resolveOpenExceptionCountByTaskId,
+  type FileRoomExceptionRow,
 } from "./exceptions-view";
 import {
   resolveAssignCandidatesForException,
@@ -36,6 +38,8 @@ import {
 } from "./owner-console-scan-view";
 import {
   resolveOwnerConsoleView,
+  resolveOwnerConsoleReassignReason,
+  shouldOfferOwnerConsoleReassign,
   type OwnerConsoleCampaignBundle,
   type OwnerConsoleDecisionCard,
 } from "./owner-console-view";
@@ -66,6 +70,10 @@ export type OwnerConsoleProductionSummary = {
 export type OwnerConsoleReassignContext = {
   taskId: string;
   taskTitle: string;
+  requiredRole: import("./types").ProductionRole;
+  requiredRoleLabel: string;
+  claimedByDisplayName: string | null;
+  reassignReason: string;
   canReassign: boolean;
   reassignRoles: readonly import("./types").ProductionRole[];
   candidates: ReturnType<typeof resolveReassignCandidatesForTask>;
@@ -168,6 +176,7 @@ function resolveReassignContext(
   assignments: CampaignAssignmentsFile,
   users: readonly StudioUser[],
   linkedTask: FileRoomTaskRow | null,
+  exceptionRow: FileRoomExceptionRow | null,
   productionEnvelope: ServerProductionEnvelope,
   tasks: readonly import("./types").CampaignTaskItem[],
 ): OwnerConsoleReassignContext | null {
@@ -187,6 +196,12 @@ function resolveReassignContext(
     claimedByUserId: linkedTask.claimedByUserId,
   } as import("./types").CampaignTaskItem, assignments);
 
+  const canReassign = shouldOfferOwnerConsoleReassign(
+    exceptionRow,
+    linkedTask,
+    permissions.canReassign,
+  );
+
   const candidates = resolveReassignCandidatesForTask(
     {
       id: linkedTask.id,
@@ -202,7 +217,11 @@ function resolveReassignContext(
   return {
     taskId: linkedTask.id,
     taskTitle: linkedTask.title,
-    canReassign: permissions.canReassign,
+    requiredRole: linkedTask.responsibleRole,
+    requiredRoleLabel: campaignTasksConfig.productionRoleLabels[linkedTask.responsibleRole],
+    claimedByDisplayName: linkedTask.claimedByDisplayName ?? null,
+    reassignReason: resolveOwnerConsoleReassignReason(linkedTask),
+    canReassign,
     reassignRoles: resolveReassignRolesForFamily(linkedTask.familyId),
     candidates,
     claimVersion: linkedTask.claimVersion,
@@ -303,6 +322,7 @@ export function resolveOwnerConsoleCampaignDetailView(
       assignments,
       users,
       linkedTask,
+      selectedCard?.row ?? null,
       productionEnvelope,
       tasksEnvelope.tasks,
     ),

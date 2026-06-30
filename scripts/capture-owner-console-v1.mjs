@@ -5,8 +5,7 @@
  * Usage: node scripts/capture-owner-console-v1.mjs
  */
 
-import { randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { chromium } from "playwright";
 
@@ -14,6 +13,15 @@ const BASE = process.env.VERIFY_BASE_URL ?? "http://localhost:3000";
 const OUT_DIR = path.join(process.cwd(), "tmp", "owner-console-v1-screenshots");
 const ASSIGNMENTS_PATH = path.join(process.cwd(), "data", "campaign-assignments.json");
 const STAFF_STRATEGY_ID = "staff-strategy-capture";
+/** Fixed id — reruns overwrite one demo campaign instead of stacking duplicates. */
+const CAPTURE_CAMPAIGN_ID = "owner-console-v1-capture";
+
+const DATA_DIRS = [
+  path.join(process.cwd(), "data", "campaigns"),
+  path.join(process.cwd(), "data", "campaign-tasks"),
+  path.join(process.cwd(), "data", "campaign-materials"),
+  path.join(process.cwd(), "data", "campaign-production"),
+];
 
 const OWNER_LOGIN = { email: "tagia@local.dev", password: "dev-only" };
 const VIEWPORT_LAPTOP = { width: 1440, height: 900 };
@@ -142,12 +150,33 @@ async function assignStaff(campaignId) {
   } catch {
     /* fresh */
   }
+  assignments.staffByUserId = assignments.staffByUserId ?? {};
+  assignments.staffCapabilities = assignments.staffCapabilities ?? {};
   assignments.staffByUserId[STAFF_STRATEGY_ID] = [campaignId];
   assignments.staffCapabilities[STAFF_STRATEGY_ID] = ["strategy"];
   await writeFile(ASSIGNMENTS_PATH, JSON.stringify(assignments, null, 2));
 }
 
+/** Remove stale owner-console-v1-* demo files so studio queue stays clean. */
+async function cleanupStaleCaptureCampaigns(keepCampaignId) {
+  for (const dir of DATA_DIRS) {
+    let files = [];
+    try {
+      files = await readdir(dir);
+    } catch {
+      continue;
+    }
+    for (const file of files) {
+      if (!file.startsWith("owner-console-v1-") || !file.endsWith(".json")) continue;
+      const campaignId = file.slice(0, -".json".length);
+      if (campaignId === keepCampaignId) continue;
+      await unlink(path.join(dir, file));
+    }
+  }
+}
+
 async function seed(campaignId) {
+  await cleanupStaleCaptureCampaigns(campaignId);
   await loginApi(OWNER_LOGIN);
   await fetchApi("/api/campaigns/current", {
     method: "PATCH",
@@ -188,7 +217,7 @@ async function captureFrPage(page, filePath) {
 
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
-  const campaignId = `owner-console-v1-${randomUUID().slice(0, 8)}`;
+  const campaignId = CAPTURE_CAMPAIGN_ID;
   await seed(campaignId);
 
   const tasks = await fetchApi(`/api/campaigns/${campaignId}/tasks`);
@@ -242,16 +271,19 @@ async function main() {
     await captureFrPage(scanPage, OUT.scanBuckets);
     await scanCtx.close();
 
-    // Reassign panel on drill-down
+    // Reassign panel on drill-down — select claim review (linked copy task)
     const reassignCtx = await browser.newContext({ viewport: VIEWPORT_LAPTOP });
     await loginBrowserContext(reassignCtx, OWNER_LOGIN);
     const reassignPage = await reassignCtx.newPage();
-    await reassignPage.goto(drillUrl, { waitUntil: "networkidle", timeout: 60000 });
+    const claimReviewId =
+      tasks.json?.exceptionRecords?.find((e) => e.title.includes("Claim review"))?.id ?? exceptionId;
+    const reassignUrl = `${BASE}/file-room/${campaignId}/owner-console?item=${encodeURIComponent(claimReviewId)}`;
+    await reassignPage.goto(reassignUrl, { waitUntil: "networkidle", timeout: 60000 });
     await reassignPage.waitForSelector(".fr-owner-console-actions", { timeout: 30000 });
     const reassignBtn = reassignPage.locator("button", { hasText: "Reassign linked task" });
     if (await reassignBtn.count()) {
       await reassignBtn.first().click();
-      await reassignPage.waitForSelector(".fr-tasks-handoff", { timeout: 15000 });
+      await reassignPage.waitForSelector(".fr-tasks-handoff__context", { timeout: 15000 });
       const panel = reassignPage.locator(".fr-owner-console-grid__detail");
       await panel.screenshot({ path: OUT.reassignPanel });
     }

@@ -59,6 +59,12 @@ export const ownerConsole = {
   reassignSectionTitle: "Reassign task",
   reassignLead:
     "Send stuck work to the right AI role without opening multiple offices. Uses existing task reassign.",
+  reassignContextTitle: "Current assignment",
+  reassignTaskIdLabel: "Task ID",
+  reassignRequiredRoleLabel: "Required role",
+  reassignClaimantLabel: "Current claimant",
+  reassignUnclaimedLabel: "Unclaimed",
+  reassignWhyLabel: "Why reassign",
   reassignTaskLabel: "Reassign linked task",
   reassignSuccessHint: "Task reassigned — assignee can continue in their Team Office.",
   scanSectionTitle: "Scan",

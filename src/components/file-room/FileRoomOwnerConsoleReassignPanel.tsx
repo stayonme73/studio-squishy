@@ -89,9 +89,35 @@ export default function FileRoomOwnerConsoleReassignPanel({
   return (
     <div className="fr-tasks-handoff">
       <p className="fr-header__meta">{ownerConsole.reassignLead}</p>
-      <p className="fr-tasks-row__meta">
-        {reassign.taskTitle} · {campaignTasksConfig.reassignLabel}
-      </p>
+
+      <section className="fr-tasks-handoff__context" aria-label={ownerConsole.reassignContextTitle}>
+        <h4 className="fr-tasks-handoff__context-heading">{ownerConsole.reassignContextTitle}</h4>
+        <ul className="fr-kv-list">
+          <li className="fr-kv-list__row">
+            <span className="fr-kv-list__label">Task</span>
+            <p className="fr-kv-list__value">
+              {reassign.taskTitle}
+              <span className="fr-tasks-row__meta"> · {reassign.taskId}</span>
+            </p>
+          </li>
+          <li className="fr-kv-list__row">
+            <span className="fr-kv-list__label">{ownerConsole.reassignRequiredRoleLabel}</span>
+            <p className="fr-kv-list__value">{reassign.requiredRoleLabel}</p>
+          </li>
+          <li className="fr-kv-list__row">
+            <span className="fr-kv-list__label">{ownerConsole.reassignClaimantLabel}</span>
+            <p className="fr-kv-list__value">
+              {reassign.claimedByDisplayName ?? ownerConsole.reassignUnclaimedLabel}
+            </p>
+          </li>
+          {reassign.reassignReason ? (
+            <li className="fr-kv-list__row">
+              <span className="fr-kv-list__label">{ownerConsole.reassignWhyLabel}</span>
+              <p className="fr-kv-list__value">{reassign.reassignReason}</p>
+            </li>
+          ) : null}
+        </ul>
+      </section>
 
       <label className="fr-tasks-handoff__field">
         <span className="fr-tasks-row__meta">{campaignTasksConfig.reassignStaffLabel}</span>

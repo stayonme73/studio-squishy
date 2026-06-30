@@ -4,11 +4,17 @@ import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/ty
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 
 import {
+  dedupeOwnerConsoleWaitingCards,
+  isOwnerExceptionBlockingReassign,
   resolveAvailableOwnerActions,
+  resolveOwnerConsoleReassignReason,
   resolveOwnerConsoleView,
+  shouldOfferOwnerConsoleReassign,
   shouldIncludeCampaignInOwnerConsoleAggregate,
   type OwnerConsoleCampaignBundle,
+  type OwnerConsoleDecisionCard,
 } from "./owner-console-view";
+import type { FileRoomExceptionRow } from "./exceptions-view";
 import type { CampaignExceptionRecord } from "./exceptions-types";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "./types";
 
@@ -219,5 +225,155 @@ describe("owner-console-view", () => {
     delivered.record.campaignStatus = "DELIVERED";
     expect(shouldIncludeCampaignInOwnerConsoleAggregate(delivered, false)).toBe(false);
     expect(shouldIncludeCampaignInOwnerConsoleAggregate(delivered, true)).toBe(true);
+  });
+
+  it("dedupes same campaign task and kind to one waiting card", () => {
+    const bundles = [
+      bundle("campaign-1", "Alpha Co", [
+        exception({ id: "exc-old", updatedAt: "2026-06-20T10:00:00.000Z" }),
+        exception({ id: "exc-new", updatedAt: "2026-06-29T11:00:00.000Z" }),
+      ]),
+    ];
+
+    const view = resolveOwnerConsoleView(bundles, owner, assignments, {});
+    expect(view.waitingCount).toBe(1);
+    expect(view.waitingOnOwner[0]?.id).toBe("exc-new");
+  });
+
+  it("adds campaign suffix when queue titles collide across campaigns", () => {
+    const bundles = [
+      bundle("campaign-1", "Same Name", [exception({ id: "exc-a" })]),
+      bundle("campaign-2", "Same Name", [
+        exception({
+          id: "exc-b",
+          campaignId: "campaign-2",
+          updatedAt: "2026-06-28T10:00:00.000Z",
+        }),
+      ]),
+    ];
+
+    const view = resolveOwnerConsoleView(bundles, owner, assignments, {});
+    expect(view.waitingCount).toBe(2);
+    expect(view.waitingOnOwner.every((card) => card.queueDifferentiator.includes("Same Name"))).toBe(
+      true,
+    );
+    expect(
+      view.waitingOnOwner.every((card) => card.queueDifferentiator.includes(card.campaignId.slice(-8))),
+    ).toBe(true);
+  });
+
+  it("dedupeOwnerConsoleWaitingCards keeps newest by updatedAt", () => {
+    const card = (id: string, updatedAt: string): OwnerConsoleDecisionCard =>
+      ({
+        id,
+        campaignId: "campaign-1",
+        campaignName: "Alpha",
+        businessLabel: "Alpha LLC",
+        queueDifferentiator: "",
+        updatedAt,
+        ageLabel: updatedAt,
+        whatHappened: "",
+        whyOwner: "",
+        recommendedNextAction: "",
+        impactIfNoAction: "",
+        whereWorkGoesAfter: "",
+        availableActions: [],
+        row: {
+          id,
+          kind: "compliance_hold",
+          kindLabel: "Compliance hold",
+          taskId: "sm-001:copy",
+        } as OwnerConsoleDecisionCard["row"],
+      }) as OwnerConsoleDecisionCard;
+
+    const deduped = dedupeOwnerConsoleWaitingCards([
+      card("exc-old", "2026-06-20T10:00:00.000Z"),
+      card("exc-new", "2026-06-29T11:00:00.000Z"),
+    ]);
+    expect(deduped.map((entry) => entry.id)).toEqual(["exc-new"]);
+  });
+
+  it("does not offer reassign when compliance_hold blocks linked task", () => {
+    const view = resolveOwnerConsoleView(
+      [bundle("campaign-1", "Alpha Co", [exception()])],
+      owner,
+      assignments,
+      {},
+    );
+    const row = view.waitingOnOwner[0]!.row;
+
+    expect(isOwnerExceptionBlockingReassign(row)).toBe(true);
+    expect(
+      shouldOfferOwnerConsoleReassign(
+        row,
+        {
+          effectiveStatus: "blocked",
+          workflowState: "blocked",
+          blockedReason: "compliance_hold: Unverified claim",
+          claimedByUserId: undefined,
+        },
+        true,
+      ),
+    ).toBe(false);
+  });
+
+  it("offers reassign for needs_revision unclaimed when owner blocker is not routing", () => {
+    const bundles = [
+      bundle("campaign-1", "Alpha Co", [
+        exception({
+          kind: "revision_exhausted",
+          title: "Revision allowance exhausted",
+          description: "Client round limit reached",
+        }),
+      ]),
+    ];
+    const view = resolveOwnerConsoleView(bundles, owner, assignments, {});
+    const row = view.waitingOnOwner[0]!.row;
+
+    expect(isOwnerExceptionBlockingReassign(row)).toBe(false);
+    expect(
+      shouldOfferOwnerConsoleReassign(
+        row,
+        {
+          effectiveStatus: "needs_revision",
+          workflowState: "needs_revision",
+          blockedReason: null,
+          claimedByUserId: undefined,
+        },
+        true,
+      ),
+    ).toBe(true);
+
+    const reason = resolveOwnerConsoleReassignReason({
+      workflowState: "needs_revision",
+      effectiveStatus: "needs_revision",
+      responsibleRole: "copy",
+      claimedByUserId: undefined,
+    });
+    expect(reason).toContain("unclaimed");
+    expect(reason).toContain("Copy");
+    expect(reason).not.toContain("Revision allowance exhausted");
+  });
+
+  it("blocks reassign for promotable exceptions awaiting owner approval", () => {
+    const row = {
+      kind: "missing_client_fact",
+      ownerReviewRequired: true,
+      promotion: { showApprovalPanel: true, showPromotedSummary: false },
+    } as FileRoomExceptionRow;
+
+    expect(isOwnerExceptionBlockingReassign(row)).toBe(true);
+    expect(
+      shouldOfferOwnerConsoleReassign(
+        row,
+        {
+          effectiveStatus: "blocked",
+          workflowState: "blocked",
+          blockedReason: "missing_client_fact",
+          claimedByUserId: undefined,
+        },
+        true,
+      ),
+    ).toBe(false);
   });
 });

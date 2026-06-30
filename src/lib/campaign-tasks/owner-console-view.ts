@@ -2,6 +2,7 @@ import {
   campaignExceptionsConfig,
   exceptionKindRequiresOwner,
 } from "@/config/campaign-exceptions";
+import { campaignTasksConfig } from "@/config/campaign-tasks";
 import {
   ownerConsole,
   ownerConsoleImpactByKind,
@@ -21,7 +22,9 @@ import {
   type FileRoomExceptionRow,
 } from "./exceptions-view";
 import { isPromotableExceptionRow } from "./exceptions-promotion-view";
-import type { CampaignExceptionRecord } from "./exceptions-types";
+import type { CampaignExceptionRecord, CampaignExceptionKind } from "./exceptions-types";
+import { isTaskWorkflowBlocked } from "./office-task-controls";
+import type { FileRoomTaskRow } from "./tasks-view";
 import {
   resolveAssignCandidatesForException,
   type ExceptionAssignCandidate,
@@ -41,6 +44,8 @@ export type OwnerConsoleDecisionCard = {
   campaignId: string;
   campaignName: string;
   businessLabel: string;
+  /** Compact queue line — linked task, kind, campaign suffix when titles collide. */
+  queueDifferentiator: string;
   updatedAt: string;
   ageLabel: string;
   whatHappened: string;
@@ -126,6 +131,99 @@ function resolveWhyOwner(record: CampaignExceptionRecord): string {
   return `${kindLabel} — ${ownerConsole.ownerHeldWhySuffix}`;
 }
 
+/** Owner-held kinds where routing to another role cannot clear the blocker. */
+const OWNER_REASSIGN_BLOCKER_KINDS = new Set<CampaignExceptionKind>([
+  "compliance_hold",
+  "direction_disagreement",
+  "scope_change",
+]);
+
+function isTaskBlockedByUnsolvableOwnerDecision(
+  task: Pick<FileRoomTaskRow, "effectiveStatus" | "workflowState" | "blockedReason">,
+): boolean {
+  if (!isTaskWorkflowBlocked(task)) return false;
+
+  const token = (task.blockedReason ?? "").toLowerCase();
+  return (
+    token.includes("compliance_hold") ||
+    token.includes("compliance hold") ||
+    token.includes("direction") ||
+    token.includes("plan_change") ||
+    token.includes("plan change") ||
+    token.includes("scope_change") ||
+    token.includes("scope change") ||
+    token.includes("missing_client_fact") ||
+    token.includes("missing client fact") ||
+    token.includes("owner_escalation")
+  );
+}
+
+function canReassignAdvanceLinkedTask(
+  task: Pick<FileRoomTaskRow, "workflowState" | "effectiveStatus">,
+): boolean {
+  if (task.workflowState === "needs_revision") return true;
+  if (task.workflowState === "unstarted" && task.effectiveStatus === "ready") return true;
+  if (task.workflowState === "in_progress" && !isTaskWorkflowBlocked(task)) return true;
+  return false;
+}
+
+export function isOwnerExceptionBlockingReassign(row: FileRoomExceptionRow): boolean {
+  if (isPromotableExceptionRow(row.kind) && row.ownerReviewRequired) {
+    return true;
+  }
+  if (OWNER_REASSIGN_BLOCKER_KINDS.has(row.kind) && row.ownerReviewRequired) {
+    return true;
+  }
+  return false;
+}
+
+export function shouldOfferOwnerConsoleReassign(
+  exceptionRow: FileRoomExceptionRow | null,
+  linkedTask: Pick<
+    FileRoomTaskRow,
+    "effectiveStatus" | "workflowState" | "blockedReason" | "claimedByUserId"
+  > | null,
+  canReassignPermission: boolean,
+): boolean {
+  if (!canReassignPermission || !linkedTask) return false;
+  if (exceptionRow && isOwnerExceptionBlockingReassign(exceptionRow)) return false;
+  if (isTaskBlockedByUnsolvableOwnerDecision(linkedTask)) return false;
+  return canReassignAdvanceLinkedTask(linkedTask);
+}
+
+export function resolveOwnerConsoleReassignReason(
+  linkedTask: Pick<
+    FileRoomTaskRow,
+    "workflowState" | "effectiveStatus" | "responsibleRole" | "claimedByUserId"
+  >,
+): string {
+  const roleLabel = campaignTasksConfig.productionRoleLabels[linkedTask.responsibleRole];
+  const unclaimed = !linkedTask.claimedByUserId;
+
+  if (linkedTask.workflowState === "needs_revision") {
+    if (unclaimed) {
+      return `Task unclaimed and ready for ${roleLabel} role — needs revision after QA feedback.`;
+    }
+    return `Needs revision after QA fail — route to available ${roleLabel} staff.`;
+  }
+
+  if (linkedTask.workflowState === "unstarted" && linkedTask.effectiveStatus === "ready") {
+    if (unclaimed) {
+      return `Task unclaimed and ready for ${roleLabel} role.`;
+    }
+    return `Ready work — route to available ${roleLabel} staff.`;
+  }
+
+  if (linkedTask.workflowState === "in_progress") {
+    if (unclaimed) {
+      return `Stalled in progress — route to available ${roleLabel} staff.`;
+    }
+    return `Stalled in progress — reassign to refresh ownership in ${roleLabel} role.`;
+  }
+
+  return `Incorrect routing — reassign to capable ${roleLabel} role.`;
+}
+
 export function resolveAvailableOwnerActions(
   row: FileRoomExceptionRow,
 ): readonly OwnerConsoleActionDescriptor[] {
@@ -174,6 +272,70 @@ export function resolveAvailableOwnerActions(
   return actions;
 }
 
+function waitingCardDedupKey(card: OwnerConsoleDecisionCard): string {
+  return `${card.campaignId}:${card.row.taskId ?? ""}:${card.row.kind}`;
+}
+
+/** Collapse duplicate open exceptions — same campaign, linked task, and kind. */
+export function dedupeOwnerConsoleWaitingCards(
+  cards: readonly OwnerConsoleDecisionCard[],
+): OwnerConsoleDecisionCard[] {
+  const bestByKey = new Map<string, OwnerConsoleDecisionCard>();
+  for (const card of cards) {
+    const key = waitingCardDedupKey(card);
+    const existing = bestByKey.get(key);
+    if (!existing || card.updatedAt.localeCompare(existing.updatedAt) > 0) {
+      bestByKey.set(key, card);
+    }
+  }
+  return [...bestByKey.values()];
+}
+
+function visualQueueFingerprint(card: OwnerConsoleDecisionCard): string {
+  return `${card.campaignName}\0${card.row.title}\0${card.row.kind}`;
+}
+
+function resolveQueueDifferentiator(
+  card: OwnerConsoleDecisionCard,
+  collisionCount: number,
+): string {
+  const parts: string[] = [];
+
+  if (card.row.taskTitle) {
+    parts.push(card.row.taskTitle);
+  } else if (card.row.taskId) {
+    parts.push(card.row.taskId);
+  }
+
+  parts.push(card.row.kindLabel);
+
+  if (collisionCount > 1) {
+    parts.push(`${card.campaignName} · ${card.campaignId.slice(-8)}`);
+  } else if (card.businessLabel && card.businessLabel !== card.campaignName) {
+    parts.push(card.businessLabel);
+  }
+
+  return parts.join(" · ");
+}
+
+function applyQueueDifferentiators(
+  cards: OwnerConsoleDecisionCard[],
+): OwnerConsoleDecisionCard[] {
+  const fingerprintCounts = new Map<string, number>();
+  for (const card of cards) {
+    const fingerprint = visualQueueFingerprint(card);
+    fingerprintCounts.set(fingerprint, (fingerprintCounts.get(fingerprint) ?? 0) + 1);
+  }
+
+  return cards.map((card) => ({
+    ...card,
+    queueDifferentiator: resolveQueueDifferentiator(
+      card,
+      fingerprintCounts.get(visualQueueFingerprint(card)) ?? 1,
+    ),
+  }));
+}
+
 function sortWaitingCards(cards: OwnerConsoleDecisionCard[]): OwnerConsoleDecisionCard[] {
   return cards.sort((a, b) => {
     if (a.row.isAutoCreatedFromQa !== b.row.isAutoCreatedFromQa) {
@@ -205,6 +367,7 @@ function toDecisionCard(
     campaignId: listItem.campaignId,
     campaignName: listItem.campaignName,
     businessLabel: listItem.businessLabel,
+    queueDifferentiator: "",
     updatedAt: record.updatedAt,
     ageLabel: formatAgeLabel(record.updatedAt),
     whatHappened: resolveWhatHappened(record, qaRecords),
@@ -270,14 +433,16 @@ export function resolveOwnerConsoleView(
     }
   }
 
-  const sorted = sortWaitingCards(waitingCards);
-  const campaignsWithWaiting = new Set(sorted.map((card) => card.campaignId));
+  const deduped = applyQueueDifferentiators(
+    sortWaitingCards(dedupeOwnerConsoleWaitingCards(waitingCards)),
+  );
+  const campaignsWithWaiting = new Set(deduped.map((card) => card.campaignId));
 
   return {
-    waitingOnOwner: sorted,
-    waitingCount: sorted.length,
+    waitingOnOwner: deduped,
+    waitingCount: deduped.length,
     campaignCount: campaignsWithWaiting.size,
-    isEmpty: sorted.length === 0,
+    isEmpty: deduped.length === 0,
     campaigns: campaignContexts.filter((ctx) => campaignsWithWaiting.has(ctx.campaignId)),
   };
 }
