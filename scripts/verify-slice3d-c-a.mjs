@@ -343,7 +343,18 @@ async function main() {
     const consolidated = materials.json.consolidatedRequests ?? [];
     const logo = consolidated.find((r) => r.id === "logo-brand:file-metadata");
     evidence.push(`consolidated logo requests: ${consolidated.length}`);
-    if (!logo || logo.underlyingItemIds.length < 2) throw new Error("Expected one consolidated logo request");
+    if (!logo) throw new Error("Expected one consolidated logo request");
+    if (logo.underlyingItemIds || logo.relatedServiceIds) {
+      throw new Error("Client payload must not expose internal mapping ids");
+    }
+    jar.clear();
+    await login(OWNER_LOGIN);
+    const teamMaterials = await fetchApi(`/api/campaigns/${campaignId}/materials`);
+    const promoted = (teamMaterials.json.materials?.items ?? []).filter(
+      (item) => item.sourceExceptionId === exceptionId,
+    );
+    evidence.push(`team promoted logo slots: ${promoted.length}`);
+    if (promoted.length < 2) throw new Error("Expected consolidated logo spanning multiple slots");
   });
 
   await runStep("3. producer cannot approve", async (evidence) => {

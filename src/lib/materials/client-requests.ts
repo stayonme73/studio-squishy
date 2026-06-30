@@ -1,6 +1,12 @@
+import type { ApprovedStudioPlanLineItem } from "@/config/studio-board";
 import { clientMaterialStatusLabel, materialCategoryLabel, materialsConfig } from "@/config/materials";
 
-import { isBlockingMaterialItem } from "./materials-view";
+import {
+  clientFacingPromotionKey,
+  filterClientConsolidationItems,
+  isClientVisibleMaterialItem,
+  winningClientFacingKeyForBucket,
+} from "./promotion";
 import type {
   CampaignMaterialItem,
   CampaignMaterialsRecord,
@@ -19,6 +25,27 @@ const MATERIAL_CATEGORIES = new Set<MaterialCategory>([
   "other",
 ]);
 
+const CLIENT_INTAKE_STATUSES = new Set<MaterialReviewStatus>([
+  "missing",
+  "requested",
+  "needs_clarification",
+  "submitted",
+]);
+
+const CLIENT_SUBMIT_STATUSES = new Set<MaterialReviewStatus>([
+  "missing",
+  "requested",
+  "needs_clarification",
+]);
+
+const OPTIONAL_INTAKE_STATUSES = new Set<MaterialReviewStatus>([
+  "missing",
+  "requested",
+  "needs_clarification",
+  "submitted",
+]);
+
+/** Internal consolidation shape — may include server-only fields. */
 export type ConsolidatedClientRequest = {
   id: string;
   category: MaterialCategory;
@@ -30,7 +57,23 @@ export type ConsolidatedClientRequest = {
   underlyingItemIds: readonly string[];
   reviewStatus: MaterialReviewStatus;
   statusLabel: string;
-  isBlocking: true;
+  isBlocking: boolean;
+  isPendingReview: boolean;
+  canSubmit: boolean;
+};
+
+/** Client API payload — no internal IDs or mapping fields (Slice 3d-c-c L4). */
+export type ClientConsolidatedRequest = {
+  id: string;
+  category: MaterialCategory;
+  contentKind: MaterialContentKind;
+  label: string;
+  prompt: string;
+  reason: string;
+  reviewStatus: MaterialReviewStatus;
+  statusLabel: string;
+  canSubmit: boolean;
+  isPendingReview: boolean;
 };
 
 export type OptionalClientRequest = {
@@ -42,13 +85,30 @@ export type OptionalClientRequest = {
   reason: string;
   reviewStatus: MaterialReviewStatus;
   statusLabel: string;
+  canSubmit: boolean;
+  isPendingReview: boolean;
 };
 
-const BLOCKING_STATUSES = new Set<MaterialReviewStatus>([
-  "missing",
-  "requested",
-  "needs_clarification",
-]);
+/** Client API payload for optional rows (Slice 3d-c-c L4). */
+export type ClientOptionalRequest = {
+  id: string;
+  category: MaterialCategory;
+  contentKind: MaterialContentKind;
+  label: string;
+  reason: string;
+  reviewStatus: MaterialReviewStatus;
+  statusLabel: string;
+  canSubmit: boolean;
+  isPendingReview: boolean;
+};
+
+export function isClientIntakeMaterialItem(item: CampaignMaterialItem): boolean {
+  return item.requirementLevel === "required" && CLIENT_INTAKE_STATUSES.has(item.reviewStatus);
+}
+
+export function canClientSubmitMaterialItem(item: CampaignMaterialItem): boolean {
+  return CLIENT_SUBMIT_STATUSES.has(item.reviewStatus);
+}
 
 export function consolidatedRequestId(
   category: MaterialCategory,
@@ -88,18 +148,50 @@ function clientRequestPrompt(
   return materialsConfig.clientRequestPrompts[key] ?? `Please send your ${clientRequestLabel(category, contentKind).toLowerCase()}`;
 }
 
-function worstBlockingStatus(
+function consolidatedReviewStatus(
   statuses: readonly MaterialReviewStatus[],
 ): MaterialReviewStatus {
   const priority: MaterialReviewStatus[] = [
     "needs_clarification",
     "requested",
     "missing",
+    "submitted",
   ];
   for (const status of priority) {
     if (statuses.includes(status)) return status;
   }
-  return "missing";
+  return "submitted";
+}
+
+export function buildApprovedServiceNameLookup(
+  lineItems: readonly ApprovedStudioPlanLineItem[] | undefined,
+): Map<string, string> {
+  const lookup = new Map<string, string>();
+  for (const lineItem of lineItems ?? []) {
+    const serviceName = lineItem.serviceName?.trim();
+    if (lineItem.skuId && serviceName) {
+      lookup.set(lineItem.skuId, serviceName);
+    }
+  }
+  return lookup;
+}
+
+function slotReasonServiceNames(items: readonly CampaignMaterialItem[]): string[] {
+  return [...new Set(items.flatMap((item) => (item.reason?.trim() ? [item.reason.trim()] : [])))];
+}
+
+function resolveClientReasonServiceNames(
+  relatedServiceIds: readonly string[],
+  serviceNameById: ReadonlyMap<string, string> | undefined,
+  fallbackItems: readonly CampaignMaterialItem[],
+): string[] {
+  if (serviceNameById && serviceNameById.size > 0 && relatedServiceIds.length > 0) {
+    const fromPlan = relatedServiceIds
+      .map((serviceId) => serviceNameById.get(serviceId))
+      .filter((name): name is string => Boolean(name?.trim()));
+    if (fromPlan.length > 0) return [...new Set(fromPlan)];
+  }
+  return slotReasonServiceNames(fallbackItems);
 }
 
 function formatServiceReason(serviceNames: readonly string[]): string {
@@ -111,37 +203,79 @@ function formatServiceReason(serviceNames: readonly string[]): string {
   return `Needed for ${head}, and ${unique[unique.length - 1]}`;
 }
 
-function groupBlockingItems(
+function formatServiceNameList(serviceNames: readonly string[]): string {
+  const unique = [...new Set(serviceNames.filter(Boolean))];
+  if (unique.length === 0) return "your approved Studio Plan services";
+  if (unique.length === 1) return unique[0]!;
+  if (unique.length === 2) return `${unique[0]} and ${unique[1]}`;
+  const head = unique.slice(0, -1).join(", ");
+  return `${head}, and ${unique[unique.length - 1]}`;
+}
+
+function bucketItemsForConsolidatedId(
+  record: CampaignMaterialsRecord,
+  consolidatedItemId: string,
+): CampaignMaterialItem[] {
+  const parsed = parseConsolidatedRequestId(consolidatedItemId);
+  if (!parsed) return [];
+
+  return record.items.filter(
+    (item) =>
+      isClientVisibleMaterialItem(item) &&
+      item.category === parsed.category &&
+      item.contentKind === parsed.contentKind,
+  );
+}
+
+function groupClientIntakeItems(
   items: readonly CampaignMaterialItem[],
 ): Map<string, CampaignMaterialItem[]> {
+  const visible = filterClientConsolidationItems(items);
   const groups = new Map<string, CampaignMaterialItem[]>();
-  for (const item of items) {
-    if (!isBlockingMaterialItem(item)) continue;
+
+  for (const item of visible) {
+    if (!isClientIntakeMaterialItem(item)) continue;
     const key = consolidatedRequestId(item.category, item.contentKind);
     const bucket = groups.get(key) ?? [];
     bucket.push(item);
     groups.set(key, bucket);
   }
+
   return groups;
+}
+
+export function countClientIntakeMaterials(items: readonly CampaignMaterialItem[]): number {
+  return filterClientConsolidationItems(items).filter(isClientIntakeMaterialItem).length;
 }
 
 export function resolveConsolidatedClientRequests(
   record: CampaignMaterialsRecord,
+  serviceNameById?: ReadonlyMap<string, string>,
 ): ConsolidatedClientRequest[] {
-  const groups = groupBlockingItems(record.items);
+  const groups = groupClientIntakeItems(record.items);
 
   return [...groups.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([id, groupItems]) => {
-      const first = groupItems[0]!;
-      const serviceNames = groupItems.flatMap((item) =>
-        item.reason ? [item.reason] : [],
-      );
-      const relatedServiceIds = [
-        ...new Set(groupItems.flatMap((item) => [...item.relatedServiceIds])),
-      ];
+      const winnerKey = winningClientFacingKeyForBucket(groupItems);
+      const visibleItems = groupItems.filter((item) => {
+        if (!winnerKey) return true;
+        if (!item.promotionApprovedAt) return true;
+        return clientFacingPromotionKey(item) === winnerKey;
+      });
 
-      const reviewStatus = worstBlockingStatus(groupItems.map((item) => item.reviewStatus));
+      const first = visibleItems[0] ?? groupItems[0]!;
+      const relatedServiceIds = [
+        ...new Set(visibleItems.flatMap((item) => [...item.relatedServiceIds])),
+      ];
+      const serviceNames = resolveClientReasonServiceNames(
+        relatedServiceIds,
+        serviceNameById,
+        visibleItems,
+      );
+
+      const reviewStatus = consolidatedReviewStatus(visibleItems.map((item) => item.reviewStatus));
+      const canSubmit = visibleItems.some(canClientSubmitMaterialItem);
 
       return {
         id,
@@ -149,50 +283,97 @@ export function resolveConsolidatedClientRequests(
         contentKind: first.contentKind,
         label: clientRequestLabel(first.category, first.contentKind, first),
         prompt: clientRequestPrompt(first.category, first.contentKind, first),
-        reason: first.whyNeeded?.trim() || formatServiceReason(serviceNames),
+        reason: formatServiceReason(serviceNames),
         relatedServiceIds,
-        underlyingItemIds: groupItems.map((item) => item.id),
+        underlyingItemIds: visibleItems.map((item) => item.id),
         reviewStatus,
         statusLabel: clientMaterialStatusLabel(reviewStatus),
-        isBlocking: true as const,
+        isBlocking: canSubmit,
+        isPendingReview: reviewStatus === "submitted",
+        canSubmit,
       };
     });
 }
 
+export function sanitizeClientConsolidatedRequests(
+  requests: readonly ConsolidatedClientRequest[],
+): ClientConsolidatedRequest[] {
+  return requests.map((request) => ({
+    id: request.id,
+    category: request.category,
+    contentKind: request.contentKind,
+    label: request.label,
+    prompt: request.prompt,
+    reason: request.reason,
+    reviewStatus: request.reviewStatus,
+    statusLabel: request.statusLabel,
+    canSubmit: request.canSubmit,
+    isPendingReview: request.isPendingReview,
+  }));
+}
+
 export function resolveOptionalClientRequests(
   record: CampaignMaterialsRecord,
+  serviceNameById?: ReadonlyMap<string, string>,
 ): OptionalClientRequest[] {
   return record.items
     .filter(
       (item) =>
+        isClientVisibleMaterialItem(item) &&
         item.requirementLevel === "optional" &&
-        BLOCKING_STATUSES.has(item.reviewStatus),
+        OPTIONAL_INTAKE_STATUSES.has(item.reviewStatus),
     )
-    .map((item) => ({
-      id: item.id,
-      itemId: item.id,
-      category: item.category,
-      contentKind: item.contentKind,
-      label: item.label,
-      reason: item.reason,
-      reviewStatus: item.reviewStatus,
-      statusLabel: clientMaterialStatusLabel(item.reviewStatus),
-    }));
+    .map((item) => {
+      const canSubmit = canClientSubmitMaterialItem(item);
+      const serviceNames = resolveClientReasonServiceNames(
+        item.relatedServiceIds,
+        serviceNameById,
+        [item],
+      );
+      return {
+        id: item.id,
+        itemId: item.id,
+        category: item.category,
+        contentKind: item.contentKind,
+        label: item.label,
+        reason: formatServiceNameList(serviceNames),
+        reviewStatus: item.reviewStatus,
+        statusLabel: clientMaterialStatusLabel(item.reviewStatus),
+        canSubmit,
+        isPendingReview: item.reviewStatus === "submitted",
+      };
+    });
+}
+
+export function sanitizeClientOptionalRequests(
+  requests: readonly OptionalClientRequest[],
+): ClientOptionalRequest[] {
+  return requests.map((request) => ({
+    id: request.id,
+    category: request.category,
+    contentKind: request.contentKind,
+    label: request.label,
+    reason: request.reason,
+    reviewStatus: request.reviewStatus,
+    statusLabel: request.statusLabel,
+    canSubmit: request.canSubmit,
+    isPendingReview: request.isPendingReview,
+  }));
 }
 
 export function resolveUnderlyingItemIdsForConsolidated(
   record: CampaignMaterialsRecord,
   consolidatedItemId: string,
 ): readonly string[] {
-  const parsed = parseConsolidatedRequestId(consolidatedItemId);
-  if (!parsed) return [];
+  const bucketItems = bucketItemsForConsolidatedId(record, consolidatedItemId);
+  const winnerKey = winningClientFacingKeyForBucket(bucketItems);
 
-  return record.items
-    .filter(
-      (item) =>
-        isBlockingMaterialItem(item) &&
-        item.category === parsed.category &&
-        item.contentKind === parsed.contentKind,
-    )
+  return bucketItems
+    .filter((item) => {
+      if (!canClientSubmitMaterialItem(item)) return false;
+      if (!winnerKey) return true;
+      if (!item.promotionApprovedAt) return true;
+      return clientFacingPromotionKey(item) === winnerKey;
+    })
     .map((item) => item.id);
 }

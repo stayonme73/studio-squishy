@@ -7,6 +7,8 @@ import type { StudioUser } from "@/lib/campaign-store/types";
 import {
   applyExceptionStatusOnClientMaterialSubmit,
   applyPromotionToMaterials,
+  filterClientConsolidationItems,
+  isClientConsolidationWinner,
   isClientVisibleMaterialItem,
   validateApproveClientRequestPayload,
 } from "./promotion";
@@ -146,6 +148,54 @@ describe("materials promotion", () => {
     );
     expect(payload.consolidatedRequests).toHaveLength(1);
     expect(payload.consolidatedRequests?.[0]?.label).toBe("Logo file");
+  });
+
+  it("first approved promotion wins when same-bucket labels conflict (L3)", () => {
+    const firstApprovedAt = "2026-06-29T10:00:00.000Z";
+    const secondApprovedAt = "2026-06-29T11:00:00.000Z";
+    const items = [
+      sampleItem({
+        id: "logo-first",
+        sourceExceptionId: "exc-first",
+        promotionApprovedAt: firstApprovedAt,
+        reviewStatus: "requested",
+        clientFacingLabel: "Logo file",
+        clientFacingPrompt: "Please send your logo file",
+      }),
+      sampleItem({
+        id: "logo-conflict",
+        sourceExceptionId: "exc-second",
+        promotionApprovedAt: secondApprovedAt,
+        reviewStatus: "requested",
+        clientFacingLabel: "Vector logo",
+        clientFacingPrompt: "Please send a vector logo",
+      }),
+    ];
+
+    expect(isClientConsolidationWinner(items[0]!, items)).toBe(true);
+    expect(isClientConsolidationWinner(items[1]!, items)).toBe(false);
+
+    const clientVisible = filterClientConsolidationItems(items);
+    expect(clientVisible.map((item) => item.id)).toEqual(["logo-first"]);
+
+    const consolidated = resolveConsolidatedClientRequests({
+      campaignId: "campaign-1",
+      items: clientVisible,
+      updatedAt: now,
+      version: 1,
+    });
+    expect(consolidated).toHaveLength(1);
+    expect(consolidated[0]?.label).toBe("Logo file");
+    expect(consolidated[0]?.underlyingItemIds).toEqual(["logo-first"]);
+
+    const payload = resolveMaterialsApiPayload(
+      { campaignId: "c-1", items, updatedAt: now, version: 1 },
+      "client",
+    );
+    expect(payload.consolidatedRequests).toHaveLength(1);
+    expect(payload.consolidatedRequests?.[0]?.label).toBe("Logo file");
+    expect(JSON.stringify(payload)).not.toContain("exc-second");
+    expect(JSON.stringify(payload)).not.toContain("Vector logo");
   });
 
   it("rejects secret-like client-facing wording", () => {

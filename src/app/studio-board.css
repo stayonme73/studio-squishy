@@ -5550,6 +5550,25 @@ body:has(.sb--v4) {
   flex: 1 1 auto;
 }
 
+.sb-materials-intake__status-stack {
+  flex: 0 0 auto;
+  max-width: min(100%, 16rem);
+  display: grid;
+  gap: 0.35rem;
+  justify-items: end;
+  text-align: right;
+}
+
+.sb-materials-intake__status-stack .sb-materials-intake__pending {
+  margin: 0;
+  font-size: var(--sb-type-sm);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--sb-text-muted);
+  line-height: 1.45;
+}
+
 .sb-materials-intake__status {
   flex: 0 0 auto;
   font-size: var(--sb-type-xs);

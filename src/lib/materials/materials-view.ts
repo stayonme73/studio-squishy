@@ -1,8 +1,14 @@
 import { materialCategoryLabel, materialStatusLabel, materialsConfig } from "@/config/materials";
 
+import type { CampaignRecord } from "@/config/studio-board";
+
 import {
+  buildApprovedServiceNameLookup,
+  countClientIntakeMaterials,
   resolveConsolidatedClientRequests,
   resolveOptionalClientRequests,
+  sanitizeClientConsolidatedRequests,
+  sanitizeClientOptionalRequests,
 } from "./client-requests";
 import { filterClientVisibleItems } from "./promotion";
 import type {
@@ -110,11 +116,13 @@ export function resolveFileRoomMaterialsView(
 export function resolveMaterialsApiPayload(
   record: CampaignMaterialsRecord,
   audience: "client" | "team" = "team",
+  campaign?: CampaignRecord,
 ): {
   materials?: CampaignMaterialsRecord;
   blockingRequiredCount: number;
-  consolidatedRequests?: ReturnType<typeof resolveConsolidatedClientRequests>;
-  optionalRequests?: ReturnType<typeof resolveOptionalClientRequests>;
+  clientIntakeCount?: number;
+  consolidatedRequests?: ReturnType<typeof sanitizeClientConsolidatedRequests>;
+  optionalRequests?: ReturnType<typeof sanitizeClientOptionalRequests>;
 } {
   const blockingRequiredCount = countBlockingRequiredMaterials(record.items);
   if (audience === "client") {
@@ -122,10 +130,15 @@ export function resolveMaterialsApiPayload(
       ...record,
       items: filterClientVisibleItems(record.items),
     };
+    const serviceNameById = buildApprovedServiceNameLookup(campaign?.approvedStudioPlan?.lineItems);
+    const consolidated = resolveConsolidatedClientRequests(clientRecord, serviceNameById);
     return {
       blockingRequiredCount: countBlockingRequiredMaterials(clientRecord.items),
-      consolidatedRequests: resolveConsolidatedClientRequests(clientRecord),
-      optionalRequests: resolveOptionalClientRequests(clientRecord),
+      clientIntakeCount: countClientIntakeMaterials(clientRecord.items),
+      consolidatedRequests: sanitizeClientConsolidatedRequests(consolidated),
+      optionalRequests: sanitizeClientOptionalRequests(
+        resolveOptionalClientRequests(clientRecord, serviceNameById),
+      ),
     };
   }
   return {

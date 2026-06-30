@@ -63,6 +63,55 @@ export function filterClientVisibleItems(
   return items.filter(isClientVisibleMaterialItem);
 }
 
+export function clientFacingPromotionKey(item: CampaignMaterialItem): string | null {
+  const label = item.clientFacingLabel?.trim() || item.label?.trim();
+  if (!label) return null;
+  const prompt = item.clientFacingPrompt?.trim() ?? "";
+  return `${label}\0${prompt}`;
+}
+
+/** Earliest approved promotion in a category:contentKind bucket wins for client consolidation (L3). */
+export function winningClientFacingKeyForBucket(
+  items: readonly CampaignMaterialItem[],
+): string | null {
+  const promoted = items
+    .filter((item) => item.promotionApprovedAt && clientFacingPromotionKey(item))
+    .sort((a, b) => a.promotionApprovedAt!.localeCompare(b.promotionApprovedAt!));
+
+  if (promoted.length === 0) return null;
+  return clientFacingPromotionKey(promoted[0]!);
+}
+
+export function isClientConsolidationWinner(
+  item: CampaignMaterialItem,
+  bucketItems: readonly CampaignMaterialItem[],
+): boolean {
+  const winnerKey = winningClientFacingKeyForBucket(bucketItems);
+  if (!winnerKey) return true;
+  if (!item.promotionApprovedAt) return true;
+  return clientFacingPromotionKey(item) === winnerKey;
+}
+
+/** Client-visible items eligible for Studio Board consolidation — hides later conflicting promotions (L3). */
+export function filterClientConsolidationItems(
+  items: readonly CampaignMaterialItem[],
+): CampaignMaterialItem[] {
+  const visible = filterClientVisibleItems(items);
+  const buckets = new Map<string, CampaignMaterialItem[]>();
+
+  for (const item of visible) {
+    const key = `${item.category}:${item.contentKind}`;
+    const bucket = buckets.get(key) ?? [];
+    bucket.push(item);
+    buckets.set(key, bucket);
+  }
+
+  return visible.filter((item) => {
+    const bucket = buckets.get(`${item.category}:${item.contentKind}`) ?? [];
+    return isClientConsolidationWinner(item, bucket);
+  });
+}
+
 function validateClientFacingField(
   value: string | undefined,
   fieldName: string,

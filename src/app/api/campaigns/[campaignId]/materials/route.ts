@@ -67,7 +67,7 @@ export async function GET(request: Request, context: RouteContext) {
   const audience = isMaterialsTeamAudience(user, campaignId, campaignEnvelope, assignments)
     ? "team"
     : "client";
-  const payload = resolveMaterialsApiPayload(materialsEnvelope, audience);
+  const payload = resolveMaterialsApiPayload(materialsEnvelope, audience, campaignEnvelope.record);
 
   return NextResponse.json({
     ...payload,
@@ -174,7 +174,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   const audience = isMaterialsTeamAudience(user, campaignId, campaignEnvelope, assignments)
     ? "team"
     : "client";
-  const payload = resolveMaterialsApiPayload(saved, audience);
+  const payload = resolveMaterialsApiPayload(saved, audience, campaignEnvelope.record);
   await syncMaterialsSummaryOnCampaign(campaignId, payload.blockingRequiredCount);
 
   return NextResponse.json({

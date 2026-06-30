@@ -3,10 +3,13 @@ import { describe, expect, it } from "vitest";
 import type { ApprovedStudioPlanLineItem, CampaignRecord } from "@/config/studio-board";
 
 import {
+  buildApprovedServiceNameLookup,
   consolidatedRequestId,
+  countClientIntakeMaterials,
   resolveConsolidatedClientRequests,
   resolveOptionalClientRequests,
   resolveUnderlyingItemIdsForConsolidated,
+  sanitizeClientConsolidatedRequests,
 } from "./client-requests";
 import { buildMaterialsRecordFromCampaign } from "./migrate-from-project-details";
 import type { CampaignMaterialItem } from "./types";
@@ -84,6 +87,42 @@ describe("resolveConsolidatedClientRequests", () => {
     expect(logoRequest?.prompt).toMatch(/logo file/i);
   });
 
+  it("uses approved plan service names instead of promotion whyNeeded or slot labels", () => {
+    const serviceNameById = buildApprovedServiceNameLookup([
+      lineItem("sm-001", "Social Media Launch Set"),
+      lineItem("bf-001", "Brand Identity Refresh"),
+    ]);
+
+    const record = {
+      campaignId: "c-plan-names",
+      items: [
+        {
+          id: "logo-sm",
+          category: "logo-brand" as const,
+          requirementLevel: "required" as const,
+          reviewStatus: "requested" as const,
+          contentKind: "file-metadata" as const,
+          label: "Logo file",
+          reason: "Needed for Social Media Launch Set and Brand Foundation",
+          whyNeeded: "Needed for Social Media Launch Set and Brand Foundation",
+          relatedServiceIds: ["sm-001", "bf-001"] as const,
+          uploadStatus: "none" as const,
+          promotionApprovedAt: now,
+          clientFacingLabel: "Logo file",
+          clientFacingPrompt: "Please send your logo file",
+        },
+      ],
+      updatedAt: now,
+      version: 1,
+    };
+
+    const consolidated = resolveConsolidatedClientRequests(record, serviceNameById);
+    expect(consolidated[0]?.reason).toBe(
+      "Needed for Social Media Launch Set and Brand Identity Refresh",
+    );
+    expect(consolidated[0]?.reason).not.toContain("Brand Foundation");
+  });
+
   it("maps consolidated submit back to all underlying blocking slots", () => {
     const items: CampaignMaterialItem[] = [
       {
@@ -159,5 +198,64 @@ describe("resolveOptionalClientRequests", () => {
 
     expect(resolveOptionalClientRequests(record)).toHaveLength(1);
     expect(resolveOptionalClientRequests(record)[0]?.itemId).toBe("opt-1");
+  });
+});
+
+describe("client intake visibility (Slice 3d-c-c)", () => {
+  it("keeps submitted required items in consolidated client requests", () => {
+    const record = {
+      campaignId: "c-submitted",
+      items: [
+        {
+          id: "logo-submitted",
+          category: "logo-brand" as const,
+          requirementLevel: "required" as const,
+          reviewStatus: "submitted" as const,
+          contentKind: "file-metadata" as const,
+          label: "Logo file",
+          reason: "Brand Foundation",
+          relatedServiceIds: ["bf-001"] as const,
+          uploadStatus: "metadata_only" as const,
+          clientFacingLabel: "Logo file",
+          clientFacingPrompt: "Please send your logo file",
+        },
+      ],
+      updatedAt: now,
+      version: 1,
+    };
+
+    const consolidated = resolveConsolidatedClientRequests(record);
+    expect(consolidated).toHaveLength(1);
+    expect(consolidated[0]?.reviewStatus).toBe("submitted");
+    expect(consolidated[0]?.statusLabel).toBe("Received — under review");
+    expect(consolidated[0]?.canSubmit).toBe(false);
+    expect(consolidated[0]?.isPendingReview).toBe(true);
+    expect(countClientIntakeMaterials(record.items)).toBe(1);
+  });
+
+  it("strips internal ids from sanitized client payload", () => {
+    const record = {
+      campaignId: "c-sanitize",
+      items: [
+        {
+          id: "logo-brand-bf-001-slot",
+          category: "logo-brand" as const,
+          requirementLevel: "required" as const,
+          reviewStatus: "missing" as const,
+          contentKind: "file-metadata" as const,
+          label: "Logo & brand assets",
+          reason: "Brand Foundation",
+          relatedServiceIds: ["bf-001"] as const,
+          uploadStatus: "none" as const,
+        },
+      ],
+      updatedAt: now,
+      version: 1,
+    };
+
+    const sanitized = sanitizeClientConsolidatedRequests(resolveConsolidatedClientRequests(record));
+    expect(sanitized[0]).not.toHaveProperty("relatedServiceIds");
+    expect(sanitized[0]).not.toHaveProperty("underlyingItemIds");
+    expect(JSON.stringify(sanitized)).not.toContain("bf-001");
   });
 });

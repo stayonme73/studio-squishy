@@ -42,6 +42,8 @@ export const materialsConfig = {
   } satisfies Record<MaterialReviewStatus, string>,
   clientNeedsClarificationBody:
     "Our team reviewed what you sent and needs an updated version. Please send revised details below.",
+  clientUnderReviewBody:
+    "We received this and our team is reviewing it. No further action is needed right now.",
   requirementLabels: {
     required: "Required",
     optional: "Optional",

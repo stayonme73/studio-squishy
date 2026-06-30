@@ -5,16 +5,17 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { materialsConfig } from "@/config/materials";
 import type { CampaignRecord } from "@/config/studio-board";
 import type {
-  ConsolidatedClientRequest,
-  OptionalClientRequest,
+  ClientConsolidatedRequest,
+  ClientOptionalRequest,
 } from "@/lib/materials/client-requests";
 import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
 import type { MaterialContentKind } from "@/lib/materials/types";
 
 type MaterialsClientResponse = {
   blockingRequiredCount: number;
-  consolidatedRequests?: ConsolidatedClientRequest[];
-  optionalRequests?: OptionalClientRequest[];
+  clientIntakeCount?: number;
+  consolidatedRequests?: ClientConsolidatedRequest[];
+  optionalRequests?: ClientOptionalRequest[];
   syncedAt?: string;
   error?: string;
 };
@@ -120,18 +121,33 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
     }
   }, [campaign.campaignId]);
 
+  const paidCampaign = Boolean(campaign.paymentReceivedAt);
+
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    if (paidCampaign) void refresh();
+  }, [paidCampaign, refresh]);
 
   const consolidated = data?.consolidatedRequests ?? [];
   const optional = data?.optionalRequests ?? [];
-  const blockingCount = data?.blockingRequiredCount ?? campaign.materialsSummary?.blockingRequiredCount ?? 0;
+  const blockingCount =
+    data?.blockingRequiredCount ?? campaign.materialsSummary?.blockingRequiredCount ?? 0;
+  const intakeCount = data?.clientIntakeCount ?? blockingCount;
 
   const showPanel = useMemo(() => {
     if (campaign.projectDetailsSubmittedAt) return true;
-    return blockingCount > 0;
-  }, [blockingCount, campaign.projectDetailsSubmittedAt]);
+    if (intakeCount > 0) return true;
+    if (consolidated.length > 0 || optional.length > 0) return true;
+    if (paidCampaign && loading) return true;
+    return false;
+  }, [
+    blockingCount,
+    campaign.projectDetailsSubmittedAt,
+    consolidated.length,
+    intakeCount,
+    loading,
+    optional.length,
+    paidCampaign,
+  ]);
 
   const updateDraft = (id: string, field: keyof ClientSubmitPayload, value: string) => {
     setDrafts((current) => ({
@@ -140,7 +156,7 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
     }));
   };
 
-  const submitConsolidated = async (request: ConsolidatedClientRequest) => {
+  const submitConsolidated = async (request: ClientConsolidatedRequest) => {
     setSubmittingId(request.id);
     setError(null);
     setSuccessId(null);
@@ -166,8 +182,8 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
     }
   };
 
-  const submitOptional = async (request: OptionalClientRequest) => {
-    setSubmittingId(request.itemId);
+  const submitOptional = async (request: ClientOptionalRequest) => {
+    setSubmittingId(request.id);
     setError(null);
     setSuccessId(null);
     try {
@@ -176,14 +192,14 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "client_submit",
-          itemId: request.itemId,
-          payload: drafts[request.itemId] ?? {},
+          itemId: request.id,
+          payload: drafts[request.id] ?? {},
         }),
       });
       const json = (await res.json()) as MaterialsClientResponse;
       if (!res.ok) throw new Error(json.error ?? `Submit failed (${res.status})`);
       setData(json);
-      setSuccessId(request.itemId);
+      setSuccessId(request.id);
       window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Submit failed.");
@@ -228,49 +244,66 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
           <>
             <p className="sb-materials-intake__lead">{materialsConfig.intakePanelBody}</p>
             <ul className="sb-materials-intake__list">
-              {consolidated.map((request) => (
-                <li key={request.id} className="sb-materials-intake__item">
-                  <div className="sb-materials-intake__item-head">
-                    <div className="sb-materials-intake__item-title-row">
-                      <p className="sb-materials-intake__prompt">{request.prompt}</p>
-                      <span
-                        className={`sb-materials-intake__status${
-                          request.reviewStatus === "needs_clarification"
-                            ? " sb-materials-intake__status--action"
-                            : ""
-                        }`}
-                      >
-                        {request.statusLabel}
-                      </span>
+              {consolidated.map((request) => {
+                return (
+                  <li key={request.id} className="sb-materials-intake__item">
+                    <div className="sb-materials-intake__item-head">
+                      <div className="sb-materials-intake__item-title-row">
+                        <p className="sb-materials-intake__prompt">{request.prompt}</p>
+                        {request.isPendingReview ? (
+                          <div className="sb-materials-intake__status-stack">
+                            <span className="sb-materials-intake__status sb-materials-intake__status--pending">
+                              {request.statusLabel}
+                            </span>
+                            <p className="sb-materials-intake__pending" role="status">
+                              {materialsConfig.clientUnderReviewBody}
+                            </p>
+                          </div>
+                        ) : (
+                          <span
+                            className={`sb-materials-intake__status${
+                              request.reviewStatus === "needs_clarification"
+                                ? " sb-materials-intake__status--action"
+                                : ""
+                            }`}
+                          >
+                            {request.statusLabel}
+                          </span>
+                        )}
+                      </div>
+                      <p className="sb-materials-intake__reason">{request.reason}</p>
+                      {request.reviewStatus === "needs_clarification" ? (
+                        <p className="sb-materials-intake__clarify" role="status">
+                          {materialsConfig.clientNeedsClarificationBody}
+                        </p>
+                      ) : null}
                     </div>
-                    <p className="sb-materials-intake__reason">{request.reason}</p>
-                    {request.reviewStatus === "needs_clarification" ? (
-                      <p className="sb-materials-intake__clarify" role="status">
-                        {materialsConfig.clientNeedsClarificationBody}
-                      </p>
+                    {request.canSubmit ? (
+                      <>
+                        <SubmitFields
+                          contentKind={request.contentKind}
+                          values={drafts[request.id] ?? {}}
+                          onChange={(field, value) => updateDraft(request.id, field, value)}
+                          disabled={submittingId === request.id}
+                        />
+                        <button
+                          type="button"
+                          className="utility-btn utility-btn--primary sb-materials-intake__submit"
+                          disabled={submittingId === request.id}
+                          onClick={() => void submitConsolidated(request)}
+                        >
+                          {materialsConfig.clientSubmitLabel}
+                        </button>
+                        {successId === request.id ? (
+                          <p className="sb-materials-intake__success" role="status">
+                            {materialsConfig.clientSubmitSuccess}
+                          </p>
+                        ) : null}
+                      </>
                     ) : null}
-                  </div>
-                  <SubmitFields
-                    contentKind={request.contentKind}
-                    values={drafts[request.id] ?? {}}
-                    onChange={(field, value) => updateDraft(request.id, field, value)}
-                    disabled={submittingId === request.id}
-                  />
-                  <button
-                    type="button"
-                    className="utility-btn utility-btn--primary sb-materials-intake__submit"
-                    disabled={submittingId === request.id}
-                    onClick={() => void submitConsolidated(request)}
-                  >
-                    {materialsConfig.clientSubmitLabel}
-                  </button>
-                  {successId === request.id ? (
-                    <p className="sb-materials-intake__success" role="status">
-                      {materialsConfig.clientSubmitSuccess}
-                    </p>
-                  ) : null}
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           </>
         ) : null}
@@ -288,19 +321,30 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
             {showOptional ? (
               <ul className="sb-materials-intake__list">
                 {optional.map((request) => (
-                  <li key={request.itemId} className="sb-materials-intake__item">
+                  <li key={request.id} className="sb-materials-intake__item">
                     <div className="sb-materials-intake__item-head">
                       <div className="sb-materials-intake__item-title-row">
                         <p className="sb-materials-intake__prompt">{request.label}</p>
-                        <span
-                          className={`sb-materials-intake__status${
-                            request.reviewStatus === "needs_clarification"
-                              ? " sb-materials-intake__status--action"
-                              : ""
-                          }`}
-                        >
-                          {request.statusLabel}
-                        </span>
+                        {request.isPendingReview ? (
+                          <div className="sb-materials-intake__status-stack">
+                            <span className="sb-materials-intake__status sb-materials-intake__status--pending">
+                              {request.statusLabel}
+                            </span>
+                            <p className="sb-materials-intake__pending" role="status">
+                              {materialsConfig.clientUnderReviewBody}
+                            </p>
+                          </div>
+                        ) : (
+                          <span
+                            className={`sb-materials-intake__status${
+                              request.reviewStatus === "needs_clarification"
+                                ? " sb-materials-intake__status--action"
+                                : ""
+                            }`}
+                          >
+                            {request.statusLabel}
+                          </span>
+                        )}
                       </div>
                       <p className="sb-materials-intake__reason">Needed for {request.reason}</p>
                       {request.reviewStatus === "needs_clarification" ? (
@@ -309,20 +353,24 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
                         </p>
                       ) : null}
                     </div>
-                    <SubmitFields
-                      contentKind={request.contentKind}
-                      values={drafts[request.itemId] ?? {}}
-                      onChange={(field, value) => updateDraft(request.itemId, field, value)}
-                      disabled={submittingId === request.itemId}
-                    />
-                    <button
-                      type="button"
-                      className="utility-btn sb-materials-intake__submit"
-                      disabled={submittingId === request.itemId}
-                      onClick={() => void submitOptional(request)}
-                    >
-                      {materialsConfig.clientSubmitLabel}
-                    </button>
+                    {request.canSubmit ? (
+                      <>
+                        <SubmitFields
+                          contentKind={request.contentKind}
+                          values={drafts[request.id] ?? {}}
+                          onChange={(field, value) => updateDraft(request.id, field, value)}
+                          disabled={submittingId === request.id}
+                        />
+                        <button
+                          type="button"
+                          className="utility-btn sb-materials-intake__submit"
+                          disabled={submittingId === request.id}
+                          onClick={() => void submitOptional(request)}
+                        >
+                          {materialsConfig.clientSubmitLabel}
+                        </button>
+                      </>
+                    ) : null}
                   </li>
                 ))}
               </ul>
