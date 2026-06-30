@@ -1245,3 +1245,115 @@
   margin: 1.25rem 0 0;
   font-size: var(--type-helper);
 }
+
+.fr-owner-console-scan {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.fr-owner-console-scan__bucket {
+  border: 1px solid var(--utility-border);
+  border-radius: var(--utility-radius, 0.35rem);
+  padding: 0.55rem 0.75rem;
+}
+
+.fr-owner-console-scan__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.fr-owner-console-scan__title {
+  font-size: var(--type-body, 0.9375rem);
+}
+
+.fr-owner-console-scan__count {
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-owner-console-scan__description {
+  margin: 0.35rem 0 0.5rem;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-owner-console-scan__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.fr-owner-console-scan__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0;
+  border-top: 1px solid var(--utility-border);
+}
+
+.fr-owner-console-scan__item:first-child {
+  border-top: none;
+}
+
+.fr-owner-console-scan__item-campaign {
+  display: block;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-owner-console-scan__item-title {
+  display: block;
+  font-weight: 600;
+  font-size: var(--type-body, 0.9375rem);
+}
+
+.fr-owner-console-scan__item-meta {
+  display: block;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-owner-console-context {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.fr-owner-console-context__block {
+  margin: 0;
+}
+
+.fr-owner-console-context__heading {
+  margin: 0 0 0.35rem;
+  font-size: var(--type-helper);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--utility-text-muted);
+}
+
+@media (min-width: 1100px) {
+  .fr-owner-console-grid--campaign {
+    grid-template-columns: minmax(14rem, 20rem) minmax(0, 1fr) minmax(16rem, 22rem);
+  }
+
+  .fr-owner-console-grid--campaign .fr-owner-console-grid__context {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+}
+
+@media (max-width: 719px) {
+  .fr-owner-console-scan__item .utility-btn {
+    width: 100%;
+    min-height: 2.75rem;
+  }
+}

@@ -1,62 +1,48 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { fileRoom, FILE_ROOM_ROUTE } from "@/config/file-room";
-import { ownerConsole, ownerConsoleCampaignRoute } from "@/config/owner-console";
-import type {
-  OwnerConsoleCampaignContext,
-  OwnerConsoleDecisionCard,
-  OwnerConsoleView,
-} from "@/lib/campaign-tasks/owner-console-view";
+import { ownerConsole, OWNER_CONSOLE_ROUTE, ownerConsoleCampaignRoute } from "@/config/owner-console";
+import type { OwnerConsoleCampaignDetailView } from "@/lib/campaign-tasks/owner-console-campaign-view";
+import type { OwnerConsoleDecisionCard } from "@/lib/campaign-tasks/owner-console-view";
 
 import {
   FileRoomOwnerConsoleActionBar,
+  FileRoomOwnerConsoleContextRail,
   FileRoomOwnerConsoleDecisionDetail,
   FileRoomOwnerConsoleDecisionPanels,
 } from "./FileRoomOwnerConsolePanels";
-import FileRoomOwnerConsoleScanSection from "./FileRoomOwnerConsoleScanSection";
 import FileRoomOwnerDecisionCard from "./FileRoomOwnerDecisionCard";
 import FileRoomSectionCard from "./FileRoomSectionCard";
 import { useOwnerConsoleActions } from "./useOwnerConsoleActions";
 
-type FileRoomOwnerConsoleSceneProps = {
-  view: OwnerConsoleView;
+type FileRoomOwnerCampaignConsoleSceneProps = {
+  view: OwnerConsoleCampaignDetailView;
   refreshedAt: string;
-  scan?: import("@/lib/campaign-tasks/owner-console-scan-view").OwnerConsoleScanView;
 };
 
-function campaignContextById(
-  campaigns: readonly OwnerConsoleCampaignContext[],
-): Record<string, OwnerConsoleCampaignContext> {
-  return Object.fromEntries(campaigns.map((entry) => [entry.campaignId, entry]));
-}
-
-export default function FileRoomOwnerConsoleScene({
+export default function FileRoomOwnerCampaignConsoleScene({
   view,
   refreshedAt,
-  scan,
-}: FileRoomOwnerConsoleSceneProps) {
-  const contexts = useMemo(() => campaignContextById(view.campaigns), [view.campaigns]);
+}: FileRoomOwnerCampaignConsoleSceneProps) {
+  const router = useRouter();
   const actions = useOwnerConsoleActions();
-
-  const [selectedId, setSelectedId] = useState<string | null>(
-    view.waitingOnOwner[0]?.id ?? null,
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(view.selectedItemId);
 
   const selectedCard: OwnerConsoleDecisionCard | null =
-    view.waitingOnOwner.find((card) => card.id === selectedId) ?? null;
+    view.waitingOnOwner.find((card) => card.id === selectedId) ??
+    view.selectedCard ??
+    null;
 
   const selectCard = (card: OwnerConsoleDecisionCard) => {
     actions.setError(null);
     setSelectedId(card.id);
     actions.resetPanels();
+    router.replace(ownerConsoleCampaignRoute(view.campaignId, card.id), { scroll: false });
   };
-
-  const operatorContext = selectedCard
-    ? contexts[selectedCard.campaignId]?.operatorContext
-    : undefined;
 
   const refreshedLabel = new Date(refreshedAt).toLocaleString("en-US", {
     month: "short",
@@ -67,29 +53,31 @@ export default function FileRoomOwnerConsoleScene({
 
   return (
     <>
+      <Link className="fr-back-link" href={OWNER_CONSOLE_ROUTE}>
+        ← {ownerConsole.backToStudioQueue}
+      </Link>
+
       <header className="fr-owner-console-header">
         <div>
-          <h2 className="fr-owner-console-header__title">{ownerConsole.pageTitle}</h2>
-          <p className="fr-header__meta">{ownerConsole.pageLead}</p>
+          <h2 className="fr-owner-console-header__title">{view.campaignName}</h2>
+          <p className="fr-header__meta">
+            {view.businessLabel} · {ownerConsole.campaignDrillDownLead}
+          </p>
         </div>
         <p className="fr-header__meta">
-          {view.waitingCount} waiting · {view.campaignCount} campaign
-          {view.campaignCount === 1 ? "" : "s"} · {ownerConsole.refreshedLabel} {refreshedLabel}
+          {view.waitingOnOwner.length} waiting · {ownerConsole.refreshedLabel} {refreshedLabel}
         </p>
       </header>
 
-      {view.isEmpty ? (
+      {view.waitingOnOwner.length === 0 ? (
         <FileRoomSectionCard title={ownerConsole.waitingSectionTitle}>
           <div className="fr-exceptions__empty">
             <p className="fr-exceptions__empty-title">{ownerConsole.waitingEmptyTitle}</p>
             <p className="fr-exceptions__empty-body">{ownerConsole.waitingEmptyBody}</p>
-            <Link className="fr-back-link" href={FILE_ROOM_ROUTE}>
-              ← {ownerConsole.allCampaignsLink}
-            </Link>
           </div>
         </FileRoomSectionCard>
       ) : (
-        <div className="fr-owner-console-grid">
+        <div className="fr-owner-console-grid fr-owner-console-grid--campaign">
           <div className="fr-owner-console-grid__queue">
             <FileRoomSectionCard title={ownerConsole.waitingSectionTitle}>
               <ul className="fr-owner-console-queue" aria-label="Waiting on Owner">
@@ -108,7 +96,7 @@ export default function FileRoomOwnerConsoleScene({
           </div>
 
           <div className="fr-owner-console-grid__detail">
-            {selectedCard && operatorContext ? (
+            {selectedCard ? (
               <>
                 <FileRoomOwnerConsoleDecisionDetail selectedCard={selectedCard} />
 
@@ -116,12 +104,7 @@ export default function FileRoomOwnerConsoleScene({
                   <FileRoomOwnerConsoleActionBar
                     selectedCard={selectedCard}
                     busy={actions.busy}
-                    showDrillDownLink
-                    drillDownHref={ownerConsoleCampaignRoute(
-                      selectedCard.campaignId,
-                      selectedCard.id,
-                    )}
-                    fileRoomHref={`${FILE_ROOM_ROUTE}/${selectedCard.campaignId}`}
+                    fileRoomHref={view.fileRoomHref}
                     onOpenApprove={() => actions.openApprove(selectedCard)}
                     onOpenResolve={actions.openResolve}
                     onOpenAssign={actions.openAssign}
@@ -132,7 +115,7 @@ export default function FileRoomOwnerConsoleScene({
                   selectedCard={selectedCard}
                   rowPanel={actions.rowPanel}
                   busy={actions.busy}
-                  operatorContext={operatorContext}
+                  operatorContext={view.operatorContext}
                   assignForm={actions.assignForm}
                   resolveForm={actions.resolveForm}
                   approvalForm={actions.approvalForm}
@@ -153,7 +136,7 @@ export default function FileRoomOwnerConsoleScene({
                     actions.approvalForm &&
                     actions.confirmDecline(selectedCard, actions.approvalForm)
                   }
-                  onReassign={(body) => void actions.patchTasks(selectedCard.campaignId, body)}
+                  onReassign={(body) => void actions.patchTasks(view.campaignId, body)}
                   onCancel={actions.resetPanels}
                 />
               </>
@@ -172,13 +155,25 @@ export default function FileRoomOwnerConsoleScene({
               </p>
             ) : null}
           </div>
+
+          <div className="fr-owner-console-grid__context">
+            <FileRoomOwnerConsoleContextRail
+              linkedTask={view.linkedTask}
+              linkedServiceName={view.linkedServiceName}
+              linkedMaterials={view.linkedMaterials}
+              qaHistory={view.qaHistory}
+              productionSummary={view.productionSummary}
+              officeLinks={view.officeLinks}
+              fileRoomHref={view.fileRoomHref}
+            />
+          </div>
         </div>
       )}
 
-      {scan ? <FileRoomOwnerConsoleScanSection scan={scan} /> : null}
-
       <p className="fr-owner-console-footer">
-        <Link href={FILE_ROOM_ROUTE}>← {ownerConsole.allCampaignsLink}</Link>
+        <Link href={OWNER_CONSOLE_ROUTE}>← {ownerConsole.backToStudioQueue}</Link>
+        <span aria-hidden="true"> · </span>
+        <Link href={FILE_ROOM_ROUTE}>{ownerConsole.allCampaignsLink}</Link>
         <span aria-hidden="true"> · </span>
         <span className="fr-header__meta">{fileRoom.listLead}</span>
       </p>

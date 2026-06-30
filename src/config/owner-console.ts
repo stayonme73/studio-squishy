@@ -3,16 +3,12 @@ import type { CampaignExceptionKind } from "@/lib/campaign-tasks/exceptions-type
 /** Studio-wide Owner Console — primary decision desk route. */
 export const OWNER_CONSOLE_ROUTE = "/file-room/owner-console";
 
-/** Campaign drill-down (Slice 2 — not built in Slice 1). */
-export function ownerConsoleCampaignRoute(campaignId: string): string {
-  return `/file-room/${campaignId}/owner-console`;
+/** Campaign drill-down — optional `item` pre-selects an exception. */
+export function ownerConsoleCampaignRoute(campaignId: string, itemId?: string): string {
+  const base = `/file-room/${campaignId}/owner-console`;
+  if (!itemId) return base;
+  return `${base}?item=${encodeURIComponent(itemId)}`;
 }
-
-/**
- * Slice 4 (locked before Owner Console V1 complete): task reassign from console
- * using existing `reassign` PATCH + `resolveReassignCandidatesForTask` — not Slice 1.
- */
-export const OWNER_CONSOLE_SLICE4_LOCKED = "task-reassign" as const;
 
 export const ownerConsole = {
   pageTitle: "Owner Console",
@@ -44,9 +40,56 @@ export const ownerConsole = {
   promotableWhyOwner:
     "Client material requires Owner approval before anything is sent to the client.",
   ownerHeldWhySuffix: "Owner review required before work continues.",
-  slice4Note:
-    "Task reassign from Owner Console is locked for Slice 4 — reuse existing reassign PATCH when built.",
+  campaignDrillDownLead:
+    "Full campaign context for the decision you selected. Act here or jump to File Room / Team Office.",
+  backToStudioQueue: "Owner Console",
+  openCampaignLabel: "Open campaign",
+  fullFileRoomLabel: "Full File Room",
+  contextSectionTitle: "Linked context",
+  linkedTaskTitle: "Linked task",
+  linkedServiceTitle: "Service",
+  materialsTitle: "Materials (read-only)",
+  qaTitle: "QA history",
+  productionTitle: "Production (read-only)",
+  teamOfficeTitle: "Team Office",
+  noLinkedTask: "No task linked to this exception.",
+  noMaterials: "No linked materials for this exception.",
+  noQaHistory: "No QA records for the linked task.",
+  noProduction: "No Kitchen V1 production work saved for this task yet.",
+  reassignSectionTitle: "Reassign task",
+  reassignLead:
+    "Send stuck work to the right AI role without opening multiple offices. Uses existing task reassign.",
+  reassignTaskLabel: "Reassign linked task",
+  reassignSuccessHint: "Task reassigned — assignee can continue in their Team Office.",
+  scanSectionTitle: "Scan",
+  scanSectionLead: "Triage only — no duplicate team actions here. Open drill-down or File Room to act.",
+  scanBuckets: {
+    blocked: {
+      title: "Blocked work",
+      description: "Tasks blocked without an open Owner decision on the same path.",
+    },
+    waiting_client: {
+      title: "Waiting on client",
+      description: "Promoted requests and blocking materials awaiting client response.",
+    },
+    waiting_internal: {
+      title: "Waiting on internal team",
+      description: "Exceptions assigned to staff or held for internal review.",
+    },
+    ready_to_move: {
+      title: "Ready to move",
+      description: "Tasks unblocked and ready for claim, production, or QA.",
+    },
+    recently_resolved: {
+      title: "Recently resolved",
+      description: "Exceptions resolved in the last 14 days.",
+    },
+  },
+  scanEmptyBucket: "Nothing in this bucket.",
 } as const;
+
+export const OWNER_CONSOLE_RECENTLY_RESOLVED_DAYS = 14;
+export const OWNER_CONSOLE_RECENTLY_RESOLVED_MAX = 20;
 
 /** Presentation-only — does not change exception business rules. */
 export const ownerConsoleImpactByKind: Record<CampaignExceptionKind, string> = {
