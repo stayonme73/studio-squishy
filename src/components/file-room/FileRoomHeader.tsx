@@ -1,7 +1,9 @@
 import Link from "next/link";
 
 import type { StudioUser } from "@/lib/campaign-store/types";
+import { isOwnerUser } from "@/lib/campaign-store/access";
 import { fileRoom } from "@/config/file-room";
+import { OWNER_CONSOLE_ROUTE } from "@/config/owner-console";
 import { canEnterTeamOffice } from "@/lib/campaign-tasks/office-access";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 import {
@@ -17,6 +19,8 @@ type FileRoomHeaderProps = {
   campaignName?: string;
   campaignId?: string;
   assignments?: CampaignAssignmentsFile;
+  /** Hide Owner Console link when already on Owner Console. */
+  showOwnerConsoleLink?: boolean;
 };
 
 function resolveOfficeLinks(
@@ -38,15 +42,22 @@ export default function FileRoomHeader({
   campaignName,
   campaignId,
   assignments,
+  showOwnerConsoleLink = true,
 }: FileRoomHeaderProps) {
   const officeLinks =
     campaignId && assignments ? resolveOfficeLinks(user, campaignId, assignments) : [];
+  const ownerConsoleLinkVisible = showOwnerConsoleLink && isOwnerUser(user);
 
   return (
     <header className="fr-header">
       <div>
         <h1 className="fr-header__title">{fileRoom.pageTitle}</h1>
         <p className="fr-header__meta">{campaignName ?? fileRoom.listLead}</p>
+        {ownerConsoleLinkVisible ? (
+          <p className="fr-header__meta">
+            <Link href={OWNER_CONSOLE_ROUTE}>Owner Console</Link>
+          </p>
+        ) : null}
         {officeLinks.length > 0 ? (
           <p className="fr-header__meta">
             {officeLinks.map((link, index) => (
