@@ -4,6 +4,7 @@ import { fileRoom, FILE_ROOM_ROUTE } from "@/config/file-room";
 import type { FileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room-controls-types";
 import type { FileRoomExceptionOperatorContext } from "@/lib/campaign-tasks/exceptions-view";
 import type { FileRoomCampaignView } from "@/lib/file-room-view";
+import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 
 import FileRoomExceptionsSection from "./FileRoomExceptionsSection";
 import FileRoomMaterialsSection from "./FileRoomMaterialsSection";
@@ -19,6 +20,8 @@ type FileRoomCampaignSceneProps = {
   operatorContext: FileRoomTaskOperatorContext;
   exceptionOperatorContext: FileRoomExceptionOperatorContext;
   showExceptions: boolean;
+  productionEnvelope: ServerProductionEnvelope;
+  studioUser: import("@/lib/campaign-store/types").StudioUser;
 };
 
 export default function FileRoomCampaignScene({
@@ -28,6 +31,8 @@ export default function FileRoomCampaignScene({
   operatorContext,
   exceptionOperatorContext,
   showExceptions,
+  productionEnvelope,
+  studioUser,
 }: FileRoomCampaignSceneProps) {
   return (
     <>
@@ -136,6 +141,8 @@ export default function FileRoomCampaignScene({
             productionTasks={view.productionTasks}
             operatorContext={operatorContext}
             showExceptionBadges={showExceptions}
+            productionEnvelope={productionEnvelope}
+            studioUser={studioUser}
           />
 
           {showExceptions ? (

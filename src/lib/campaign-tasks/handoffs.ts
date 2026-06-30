@@ -2,7 +2,10 @@ import { randomUUID } from "node:crypto";
 
 import { payloadContainsSecrets } from "@/lib/materials/payload-validation";
 
+import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
+import { requiresKitchenWorkVersionId, validateWorkVersionIdForTask } from "@/lib/campaign-production/validation";
 import type {
+  CampaignTaskItem,
   HandoffPayload,
   ProductionRole,
   ReassignmentFlags,
@@ -56,6 +59,13 @@ export function validateHandoffPayload(payload: HandoffPayload | undefined): Han
   const nextStepsError = validateRequiredText(payload.nextSteps, "Next steps");
   if (nextStepsError) errors.push(nextStepsError);
 
+  if (payload.workVersionId !== undefined) {
+    const trimmed = payload.workVersionId.trim();
+    if (!trimmed) {
+      errors.push("workVersionId cannot be empty when provided.");
+    }
+  }
+
   for (const [field, label] of [
     [payload.openQuestions, "Open questions"],
     [payload.risks, "Risks"],
@@ -90,9 +100,25 @@ export function validateHandoffPayload(payload: HandoffPayload | undefined): Han
       openQuestions: trimField(payload.openQuestions),
       risks: trimField(payload.risks),
       workRef: trimField(payload.workRef),
+      workVersionId: trimField(payload.workVersionId),
       internalNotes: trimField(payload.internalNotes),
     },
   };
+}
+
+export function validateKitchenHandoffWorkVersion(
+  task: CampaignTaskItem,
+  payload: HandoffPayload,
+  production: ServerProductionEnvelope | undefined,
+): string | null {
+  if (!requiresKitchenWorkVersionId(task)) {
+    return null;
+  }
+  if (!production) {
+    return "Production store not loaded.";
+  }
+  const result = validateWorkVersionIdForTask(production, task, payload.workVersionId);
+  return result.ok ? null : result.error;
 }
 
 export function validateReassignmentReason(
@@ -150,6 +176,7 @@ export function buildHandoffRecord(input: BuildHandoffInput): TaskHandoffRecord 
     openQuestions: input.payload.openQuestions,
     risks: input.payload.risks,
     workRef: input.payload.workRef,
+    workVersionId: input.payload.workVersionId,
     internalNotes: input.payload.internalNotes,
     action: input.action,
     reassignmentReason: input.reassignmentReason?.trim() || undefined,

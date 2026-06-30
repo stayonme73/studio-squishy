@@ -5,12 +5,16 @@ import { useEffect, useMemo, useState } from "react";
 
 import { campaignTasksConfig, formatBlockedReasonDisplay } from "@/config/campaign-tasks";
 import { campaignExceptionsConfig } from "@/config/campaign-exceptions";
+import { resolveFileRoomProductionWorkPanelView } from "@/lib/campaign-production/production-view";
+import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 import type { FileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room-controls-types";
+import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
 import type { FileRoomQaHistoryEntry } from "@/lib/campaign-tasks/file-room-controls";
 import type { TasksPatchBody } from "@/lib/campaign-tasks/actions";
 import type { FileRoomProductionTasksView, FileRoomTaskRow } from "@/lib/campaign-tasks/tasks-view";
 import type { ProductionRole, QaRecord, TaskWorkflowState } from "@/lib/campaign-tasks/types";
 
+import FileRoomProductionWorkPanel from "./FileRoomProductionWorkPanel";
 import FileRoomSectionCard from "./FileRoomSectionCard";
 import FileRoomQaPanel, { emptyQaForm, qaFormChecks, type QaFormState } from "./FileRoomQaPanel";
 import FileRoomTaskHandoffPanel, {
@@ -25,6 +29,7 @@ type FileRoomProductionTasksSectionProps = {
   productionTasks: FileRoomProductionTasksView;
   operatorContext: FileRoomTaskOperatorContext;
   showExceptionBadges?: boolean;
+  productionEnvelope: ServerProductionEnvelope;
 };
 
 function formatQaHistoryLine(entry: FileRoomQaHistoryEntry): string {
@@ -41,12 +46,16 @@ function TaskRow({
   canOperate,
   operatorContext,
   showExceptionBadges,
+  productionEnvelope,
+  studioUser,
 }: {
   campaignId: string;
   task: FileRoomTaskRow;
   canOperate: boolean;
   operatorContext: FileRoomTaskOperatorContext;
   showExceptionBadges: boolean;
+  productionEnvelope: ServerProductionEnvelope;
+  studioUser: import("@/lib/campaign-store/types").StudioUser;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -66,6 +75,40 @@ function TaskRow({
   const [localQaHistory, setLocalQaHistory] = useState(task.qaHistory);
   const [localLatestQa, setLocalLatestQa] = useState(task.latestQaHistory);
   const [localBlockedReason, setLocalBlockedReason] = useState(task.blockedReason);
+  const [localWorkVersionId, setLocalWorkVersionId] = useState<string | null>(null);
+  const [localProductionEnvelope, setLocalProductionEnvelope] =
+    useState<ServerProductionEnvelope>(productionEnvelope);
+
+  const kitchenTask = useMemo((): CampaignTaskItem => {
+    const serviceId = task.id.split(":")[0] ?? "sm-001";
+    return {
+      id: task.id,
+      title: task.title,
+      phase: task.phase,
+      status: task.effectiveStatus,
+      relatedServiceIds: [serviceId as import("@/catalog/types").ServiceId],
+      familyId: task.familyId,
+      catalogFamilyId: "social_media",
+      serviceName: task.serviceName,
+      dependsOn: [],
+    };
+  }, [task]);
+
+  const productionWorkView = resolveFileRoomProductionWorkPanelView(
+    localProductionEnvelope,
+    kitchenTask,
+    canOperate,
+  );
+
+  useEffect(() => {
+    setLocalProductionEnvelope(productionEnvelope);
+  }, [productionEnvelope]);
+
+  useEffect(() => {
+    if (productionWorkView.currentVersionId) {
+      setLocalWorkVersionId(productionWorkView.currentVersionId);
+    }
+  }, [productionWorkView.currentVersionId]);
 
   useEffect(() => {
     setLocalWorkflow(task.workflowState);
@@ -274,7 +317,7 @@ function TaskRow({
     });
 
   const confirmHandoffPanel = () => {
-    const handoff = handoffFormToPayload(form);
+    const handoff = handoffFormToPayload(form, localWorkVersionId ?? undefined);
 
     if (panelMode === "submit") {
       void patchTask({
@@ -325,6 +368,7 @@ function TaskRow({
       claimVersion: localClaimVersion,
       checks: qaFormChecks(qaForm, task.phase),
       notes: qaForm.notes.trim() || undefined,
+      workVersionId: localWorkVersionId ?? undefined,
     });
   };
 
@@ -360,6 +404,7 @@ function TaskRow({
           : undefined,
       missingFactReason:
         qaForm.category === "missing_client_fact" ? qaForm.missingFactReason.trim() : undefined,
+      workVersionId: localWorkVersionId ?? undefined,
     });
   };
 
@@ -378,6 +423,7 @@ function TaskRow({
       claimVersion: localClaimVersion,
       category: qaForm.category,
       notes: qaForm.notes.trim() || undefined,
+      workVersionId: localWorkVersionId ?? undefined,
     });
   };
 
@@ -426,6 +472,54 @@ function TaskRow({
       ) : null}
       {localBlockedReason ? (
         <p className="fr-tasks-row__block-reason">{localBlockedReason}</p>
+      ) : null}
+
+      {productionWorkView.visible ? (
+        <FileRoomProductionWorkPanel
+          campaignId={campaignId}
+          taskId={task.id}
+          view={productionWorkView}
+          onVersionSaved={(versionId, savedBody) => {
+            setLocalWorkVersionId(versionId);
+            setLocalProductionEnvelope((prev) => {
+              const unit = prev.workUnits.find((entry) => entry.id === productionWorkView.workUnitId);
+              if (!unit) return prev;
+              const now = new Date().toISOString();
+              const newVersion = {
+                id: versionId,
+                workUnitId: unit.id,
+                taskId: task.id,
+                stage: task.phase as "strategy_content_direction" | "copy" | "creative",
+                reason: (productionWorkView.currentVersionId
+                  ? "internal_revision"
+                  : "initial") as import("@/lib/campaign-production/types").ProductionVersionReason,
+                contentKind: "plain_text" as const,
+                body: savedBody,
+                createdAt: now,
+                createdByUserId: studioUser.id,
+                createdByDisplayName: studioUser.displayName,
+              };
+              return {
+                ...prev,
+                versions: [...prev.versions, newVersion],
+                workUnits: prev.workUnits.map((entry) =>
+                  entry.id === unit.id
+                    ? {
+                        ...entry,
+                        stageLineage: entry.stageLineage.map((line) =>
+                          line.stage === task.phase
+                            ? { ...line, currentVersionId: versionId }
+                            : line,
+                        ),
+                        updatedAt: now,
+                      }
+                    : entry,
+                ),
+                updatedAt: now,
+              };
+            });
+          }}
+        />
       ) : null}
 
       {showExceptionBadges && task.openExceptionCount > 0 ? (
@@ -541,7 +635,11 @@ export default function FileRoomProductionTasksSection({
   productionTasks,
   operatorContext,
   showExceptionBadges = true,
-}: FileRoomProductionTasksSectionProps) {
+  productionEnvelope,
+  studioUser,
+}: FileRoomProductionTasksSectionProps & {
+  studioUser: import("@/lib/campaign-store/types").StudioUser;
+}) {
   if (productionTasks.isEmpty) {
     return (
       <FileRoomSectionCard title={campaignTasksConfig.sectionTitle}>
@@ -585,6 +683,8 @@ export default function FileRoomProductionTasksSection({
                 canOperate={operatorContext.canOperate}
                 operatorContext={operatorContext}
                 showExceptionBadges={showExceptionBadges}
+                productionEnvelope={productionEnvelope}
+                studioUser={studioUser}
               />
             ))}
           </ul>

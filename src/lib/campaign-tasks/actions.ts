@@ -1,4 +1,7 @@
 import type { ServiceId } from "@/catalog/types";
+import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
+import { applyPinQaToVersion } from "@/lib/campaign-production/actions";
+import { requiresKitchenWorkVersionId, validateOptionalQaBlockWorkVersionId, validateWorkVersionIdForTask } from "@/lib/campaign-production/validation";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
@@ -21,6 +24,7 @@ import {
   appendHandoff,
   buildHandoffRecord,
   validateHandoffPayload,
+  validateKitchenHandoffWorkVersion,
   validateReassignmentReason,
 } from "./handoffs";
 import { applyStatusesWithWorkflow } from "./plan-change";
@@ -72,6 +76,7 @@ export type TaskActionResult =
       task?: CampaignTaskItem;
       exception?: CampaignExceptionRecord;
       materialsEnvelope?: ServerMaterialsEnvelope;
+      productionEnvelope?: ServerProductionEnvelope;
     }
   | {
       ok: false;
@@ -99,14 +104,14 @@ export type TasksPatchBody =
       taskId: string;
       from: "in_progress";
       claimVersion: string | null;
-      handoff: HandoffPayload;
+      handoff: HandoffPayload & { workVersionId?: string };
     }
   | {
       action: "release_claim";
       taskId: string;
       from: "in_progress";
       claimVersion: string | null;
-      handoff: HandoffPayload;
+      handoff: HandoffPayload & { workVersionId?: string };
     }
   | {
       action: "reassign";
@@ -115,7 +120,7 @@ export type TasksPatchBody =
       claimVersion: string | null;
       toUserId: string;
       toRole: ProductionRole;
-      handoff: HandoffPayload;
+      handoff: HandoffPayload & { workVersionId?: string };
       reason?: string;
       reassignmentFlags?: ReassignmentFlags;
     }
@@ -126,6 +131,7 @@ export type TasksPatchBody =
       claimVersion: string | null;
       checks: string[];
       notes?: string;
+      workVersionId?: string;
     }
   | {
       action: "qa_fail";
@@ -136,6 +142,7 @@ export type TasksPatchBody =
       notes?: string;
       missingFactDescription?: string;
       missingFactReason?: string;
+      workVersionId?: string;
     }
   | {
       action: "qa_block";
@@ -144,6 +151,7 @@ export type TasksPatchBody =
       claimVersion: string | null;
       category: QaBlockCategory;
       notes?: string;
+      workVersionId?: string;
     }
   | {
       action: "raise_exception";
@@ -186,6 +194,7 @@ export type TaskActionContext = {
   campaign: CampaignRecord;
   materials: readonly CampaignMaterialItem[];
   materialsEnvelope?: ServerMaterialsEnvelope;
+  production?: ServerProductionEnvelope;
   assignments: CampaignAssignmentsFile;
   targetUser?: StudioUser;
 };
@@ -384,6 +393,38 @@ function appendTaskHandoff(
   };
 }
 
+function validateKitchenQaWorkVersion(
+  task: CampaignTaskItem,
+  workVersionId: string | undefined,
+  production: ServerProductionEnvelope | undefined,
+): { ok: true } | { ok: false; error: string } {
+  if (!requiresKitchenWorkVersionId(task)) {
+    return { ok: true };
+  }
+  if (!production) {
+    return { ok: false, error: "Production store not loaded." };
+  }
+  const result = validateWorkVersionIdForTask(production, task, workVersionId);
+  if (!result.ok) {
+    return result;
+  }
+  return { ok: true };
+}
+
+function pinProductionQa(
+  production: ServerProductionEnvelope | undefined,
+  task: CampaignTaskItem,
+  workVersionId: string | undefined,
+  qaRecordId: string,
+  action: "qa_pass" | "qa_fail",
+): ServerProductionEnvelope | undefined {
+  if (!production || !requiresKitchenWorkVersionId(task) || !workVersionId) {
+    return production;
+  }
+  const pinned = applyPinQaToVersion(production, task, workVersionId, qaRecordId, action);
+  return pinned.ok ? pinned.envelope : production;
+}
+
 export function applyClaim(
   envelope: ServerTasksEnvelope,
   body: Extract<TasksPatchBody, { action: "claim" }>,
@@ -451,6 +492,15 @@ export function applySubmitForHandoff(
     return { ok: false, error: handoffValidation.error, status: 400 };
   }
 
+  const kitchenError = validateKitchenHandoffWorkVersion(
+    task,
+    handoffValidation.payload,
+    context.production,
+  );
+  if (kitchenError) {
+    return { ok: false, error: kitchenError, status: 400 };
+  }
+
   const transitioned = transitionTask(
     envelope,
     body.taskId,
@@ -496,6 +546,15 @@ export function applyReleaseClaim(
   const handoffValidation = validateHandoffPayload(body.handoff);
   if (!handoffValidation.ok) {
     return { ok: false, error: handoffValidation.error, status: 400 };
+  }
+
+  const kitchenError = validateKitchenHandoffWorkVersion(
+    task,
+    handoffValidation.payload,
+    context.production,
+  );
+  if (kitchenError) {
+    return { ok: false, error: kitchenError, status: 400 };
   }
 
   const transitioned = transitionTask(
@@ -568,6 +627,15 @@ export function applyReassign(
   const handoffValidation = validateHandoffPayload(body.handoff);
   if (!handoffValidation.ok) {
     return { ok: false, error: handoffValidation.error, status: 400 };
+  }
+
+  const kitchenError = validateKitchenHandoffWorkVersion(
+    task,
+    handoffValidation.payload,
+    context.production,
+  );
+  if (kitchenError) {
+    return { ok: false, error: kitchenError, status: 400 };
   }
 
   const fromState = task.workflowState ?? "unstarted";
@@ -690,6 +758,11 @@ export function applyQaPass(
     return { ok: false, error: validation.error, status: 400 };
   }
 
+  const kitchenQa = validateKitchenQaWorkVersion(task, body.workVersionId, context.production);
+  if (!kitchenQa.ok) {
+    return { ok: false, error: kitchenQa.error, status: 400 };
+  }
+
   const actorRole = qaActorRole(user, context.assignments);
   const transitioned = transitionTask(
     envelope,
@@ -713,15 +786,23 @@ export function applyQaPass(
     action: "qa_pass",
     checks: body.checks,
     notes: body.notes,
+    workVersionId: body.workVersionId,
   });
 
   const withRecord = appendEnvelopeQaRecord(transitioned.envelope, record);
+  const productionEnvelope = pinProductionQa(
+    context.production,
+    task,
+    body.workVersionId,
+    record.id,
+    "qa_pass",
+  );
   const updatedTask = withRecord.tasks.find((entry) => entry.id === body.taskId);
   if (!updatedTask) {
     return { ok: false, error: "Task not found after QA pass.", status: 500 };
   }
 
-  return { ok: true, envelope: withRecord, task: updatedTask };
+  return { ok: true, envelope: withRecord, task: updatedTask, productionEnvelope };
 }
 
 export function applyQaFail(
@@ -751,6 +832,11 @@ export function applyQaFail(
   }
 
   const { routedTask } = validation;
+  const kitchenQa = validateKitchenQaWorkVersion(routedTask, body.workVersionId, context.production);
+  if (!kitchenQa.ok) {
+    return { ok: false, error: kitchenQa.error, status: 400 };
+  }
+
   const actorRole = qaActorRole(user, context.assignments);
   const updates = new Map<string, (task: CampaignTaskItem) => CampaignTaskItem>();
 
@@ -813,9 +899,17 @@ export function applyQaFail(
     routedTaskId: routedTask.id,
     missingFactDescription: body.missingFactDescription,
     missingFactReason: body.missingFactReason,
+    workVersionId: body.workVersionId,
   });
 
   const withRecord = appendEnvelopeQaRecord(applied.envelope, record);
+  const productionEnvelope = pinProductionQa(
+    context.production,
+    routedTask,
+    body.workVersionId,
+    record.id,
+    "qa_fail",
+  );
   const bridged = bridgeExceptionsAfterQaFail(
     withRecord,
     record,
@@ -830,7 +924,7 @@ export function applyQaFail(
     return { ok: false, error: "Task not found after QA fail.", status: 500 };
   }
 
-  return { ok: true, envelope: bridged, task: updatedTask };
+  return { ok: true, envelope: bridged, task: updatedTask, productionEnvelope };
 }
 
 export function applyQaBlock(
@@ -851,6 +945,22 @@ export function applyQaBlock(
   const validation = validateQaBlock(task, body.category);
   if (!validation.ok) {
     return { ok: false, error: validation.error, status: 400 };
+  }
+
+  let resolvedWorkVersionId = body.workVersionId?.trim() || undefined;
+  if (requiresKitchenWorkVersionId(task) && resolvedWorkVersionId) {
+    if (!context.production) {
+      return { ok: false, error: "Production store not loaded.", status: 400 };
+    }
+    const kitchenQa = validateOptionalQaBlockWorkVersionId(
+      context.production,
+      task,
+      body.workVersionId,
+    );
+    if (!kitchenQa.ok) {
+      return { ok: false, error: kitchenQa.error, status: 400 };
+    }
+    resolvedWorkVersionId = kitchenQa.workVersionId;
   }
 
   const actorRole = qaActorRole(user, context.assignments);
@@ -887,6 +997,7 @@ export function applyQaBlock(
     category: body.category,
     notes: body.notes,
     routedTaskId: body.taskId,
+    workVersionId: resolvedWorkVersionId,
   });
 
   const withRecord = appendEnvelopeQaRecord(applied.envelope, record);

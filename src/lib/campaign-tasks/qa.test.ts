@@ -5,6 +5,10 @@ import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 
 import { applyQaBlock, applyQaFail, applyQaPass } from "./actions";
+import { applyCreateVersion } from "@/lib/campaign-production/actions";
+import { emptyProductionRecord, syncProductionWithPlan } from "@/lib/campaign-production/plan-sync";
+import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
+import { validateOptionalQaBlockWorkVersionId } from "@/lib/campaign-production/validation";
 import { requiredChecksForPhase } from "./qa-checklists";
 import {
   applyFormalQaFailCascade,
@@ -364,6 +368,132 @@ describe("applyQaBlock", () => {
       context,
     );
     expect(passAttempt.ok).toBe(false);
+  });
+
+  it("allows qa_block without workVersionId for pre-version compliance blocks", () => {
+    const copy = task();
+    const result = applyQaBlock(
+      envelope([copy]),
+      {
+        action: "qa_block",
+        taskId: copy.id,
+        from: "ready_for_qa",
+        claimVersion: null,
+        category: "compliance_concern",
+        notes: "Missing client disclosure before reviewable draft",
+      },
+      qaStaff,
+      context,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.envelope.qaRecords?.[0]?.workVersionId).toBeUndefined();
+  });
+
+  it("preserves workVersionId on qa_block when provided and valid", () => {
+    const strategy = task({
+      id: "sm-001:strategy_content_direction",
+      phase: "strategy_content_direction",
+      title: "Social — Content direction",
+      responsibleRole: "strategy",
+      dependsOn: [],
+    });
+    const productionRecord = syncProductionWithPlan(
+      emptyProductionRecord("campaign-1", "sm-001:one_time"),
+      campaign,
+    );
+    let production: ServerProductionEnvelope = { ...productionRecord, syncedAt: now };
+    const created = applyCreateVersion(production, strategy, { body: "Direction draft v1" }, copyStaff);
+    if (!created.ok || !created.version) throw new Error(`setup failed: ${!created.ok ? created.error : "no version"}`);
+    production = created.envelope;
+
+    const result = applyQaBlock(
+      envelope([strategy]),
+      {
+        action: "qa_block",
+        taskId: strategy.id,
+        from: "ready_for_qa",
+        claimVersion: null,
+        category: "compliance_concern",
+        workVersionId: created.version.id,
+      },
+      qaStaff,
+      { ...context, production },
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.envelope.qaRecords?.[0]?.workVersionId).toBe(created.version.id);
+    expect(production.versions[0]?.qaPin).toBeUndefined();
+  });
+
+  it("rejects invalid workVersionId on qa_block without clearing production pins", () => {
+    const copy = task();
+    const productionRecord = syncProductionWithPlan(
+      emptyProductionRecord("campaign-1", "sm-001:one_time"),
+      campaign,
+    );
+    const production: ServerProductionEnvelope = { ...productionRecord, syncedAt: now };
+
+    const result = applyQaBlock(
+      envelope([copy]),
+      {
+        action: "qa_block",
+        taskId: copy.id,
+        from: "ready_for_qa",
+        claimVersion: null,
+        category: "direction_disagreement",
+        workVersionId: "nonexistent-version",
+      },
+      qaStaff,
+      { ...context, production },
+    );
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.status).toBe(400);
+    expect(result.error).toBe("workVersionId not found.");
+  });
+});
+
+describe("validateOptionalQaBlockWorkVersionId", () => {
+  function kitchenProduction(): ServerProductionEnvelope {
+    const record = syncProductionWithPlan(
+      emptyProductionRecord("campaign-1", "sm-001:one_time"),
+      campaign,
+    );
+    return { ...record, syncedAt: now };
+  }
+
+  it("allows missing workVersionId for kitchen tasks", () => {
+    const copy = task();
+    const result = validateOptionalQaBlockWorkVersionId(kitchenProduction(), copy, undefined);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.workVersionId).toBeUndefined();
+  });
+
+  it("accepts non-current version without current-version requirement", () => {
+    const strategy = task({
+      id: "sm-001:strategy_content_direction",
+      phase: "strategy_content_direction",
+      title: "Social — Content direction",
+      responsibleRole: "strategy",
+      dependsOn: [],
+    });
+    let production = kitchenProduction();
+    const first = applyCreateVersion(production, strategy, { body: "V1" }, copyStaff);
+    if (!first.ok || !first.version) throw new Error(`setup failed: ${!first.ok ? first.error : "no version"}`);
+    production = first.envelope;
+    const second = applyCreateVersion(production, strategy, { body: "V2" }, copyStaff);
+    if (!second.ok || !second.version) throw new Error(`setup failed: ${!second.ok ? second.error : "no version"}`);
+
+    const result = validateOptionalQaBlockWorkVersionId(
+      second.envelope,
+      strategy,
+      first.version.id,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.workVersionId).toBe(first.version.id);
   });
 });
 

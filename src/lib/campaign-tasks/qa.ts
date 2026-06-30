@@ -124,6 +124,7 @@ export function buildQaRecord(input: {
   routedTaskId?: string;
   missingFactDescription?: string;
   missingFactReason?: string;
+  workVersionId?: string;
 }): QaRecord {
   return {
     id: randomUUID(),
@@ -140,6 +141,7 @@ export function buildQaRecord(input: {
     routedTaskId: input.routedTaskId,
     missingFactDescription: input.missingFactDescription,
     missingFactReason: input.missingFactReason,
+    workVersionId: input.workVersionId?.trim() || undefined,
   };
 }
 

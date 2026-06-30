@@ -10,6 +10,7 @@ import {
 } from "@/lib/campaign-tasks/actions";
 import { canOperateProductionTasks, canReadProductionTasks } from "@/lib/campaign-tasks/access";
 import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
+import { getOrInitializeProduction, writeProductionEnvelope } from "@/lib/campaign-production/store";
 import { resolveProductionTasksApiPayload } from "@/lib/campaign-tasks/tasks-view";
 import { syncMaterialsSummaryOnCampaign } from "@/lib/materials/campaign-summary";
 import { countBlockingRequiredMaterials } from "@/lib/materials/materials-view";
@@ -99,9 +100,10 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const [tasksEnvelope, materialsEnvelope] = await Promise.all([
+  const [tasksEnvelope, materialsEnvelope, productionEnvelope] = await Promise.all([
     getOrGenerateTasks(campaignId, campaignEnvelope.record),
     getOrInitializeMaterials(campaignId, campaignEnvelope.record),
+    getOrInitializeProduction(campaignId, campaignEnvelope.record),
   ]);
 
   let targetUser;
@@ -118,6 +120,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     campaign: campaignEnvelope.record,
     materials: materialsEnvelope.items,
     materialsEnvelope,
+    production: productionEnvelope,
     assignments,
     targetUser,
   });
@@ -142,6 +145,10 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const saved = await writeTasksEnvelope(result.envelope);
+
+  if (result.productionEnvelope) {
+    await writeProductionEnvelope(result.productionEnvelope);
+  }
 
   if (result.materialsEnvelope) {
     const savedMaterials = await writeMaterialsEnvelope(result.materialsEnvelope);

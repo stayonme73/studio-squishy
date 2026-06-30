@@ -54,7 +54,10 @@ function needsReassignmentReason(flags: ReassignmentFlags): boolean {
   );
 }
 
-export function handoffFormToPayload(form: HandoffFormState): HandoffPayload {
+export function handoffFormToPayload(
+  form: HandoffFormState,
+  workVersionId?: string,
+): HandoffPayload {
   return {
     completedSummary: form.completedSummary,
     sourceContext: form.sourceContext,
@@ -62,6 +65,7 @@ export function handoffFormToPayload(form: HandoffFormState): HandoffPayload {
     openQuestions: form.openQuestions.trim() || undefined,
     risks: form.risks.trim() || undefined,
     workRef: form.workRef.trim() || undefined,
+    workVersionId: workVersionId?.trim() || undefined,
     internalNotes: form.internalNotes.trim() || undefined,
   };
 }

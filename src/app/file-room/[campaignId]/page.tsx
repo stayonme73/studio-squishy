@@ -23,6 +23,7 @@ import { resolveFileRoomCampaignView } from "@/lib/file-room-view";
 import { canReviewMaterials } from "@/lib/materials/access";
 import { resolveFileRoomMaterialsView } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
+import { getOrInitializeProduction } from "@/lib/campaign-production/store";
 
 type FileRoomCampaignPageProps = {
   params: Promise<{ campaignId: string }>;
@@ -55,6 +56,10 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
   }
 
   const materialsEnvelope = await getOrInitializeMaterials(
+    campaignId,
+    result.envelope.record,
+  );
+  const productionEnvelope = await getOrInitializeProduction(
     campaignId,
     result.envelope.record,
   );
@@ -119,6 +124,8 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
         operatorContext={operatorContext}
         exceptionOperatorContext={exceptionOperatorContext}
         showExceptions={isInternalUser(user)}
+        productionEnvelope={productionEnvelope}
+        studioUser={user}
       />
     </>
   );

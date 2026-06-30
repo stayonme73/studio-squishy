@@ -126,6 +126,8 @@ export type TaskHandoffRecord = {
   openQuestions?: string;
   risks?: string;
   workRef?: string;
+  /** Kitchen V1 — pins exact production version on handoff (sm-001 production phases). */
+  workVersionId?: string;
   internalNotes?: string;
   action: TaskHandoffAction;
   reassignmentReason?: string;
@@ -144,6 +146,8 @@ export type HandoffPayload = {
   openQuestions?: string;
   risks?: string;
   workRef?: string;
+  /** Kitchen V1 — required for new sm-001 production phase handoffs. */
+  workVersionId?: string;
   internalNotes?: string;
 };
 
@@ -220,6 +224,8 @@ export type QaRecord = {
   routedTaskId?: string;
   missingFactDescription?: string;
   missingFactReason?: string;
+  /** Kitchen V1 — pins exact production version for QA (sm-001 production phases). */
+  workVersionId?: string;
 };
 
 export type WorkflowTransitionRequest = {
