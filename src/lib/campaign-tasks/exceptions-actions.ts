@@ -10,6 +10,7 @@ import {
   canApproveClientRequest,
   canAssignException,
   canDeclinePromotion,
+  canHoldPromotionReview,
   canRaiseException,
   canRaiseExceptionKind,
   canResolveException,
@@ -173,15 +174,33 @@ export function applyAssignException(
   payload: AssignExceptionPayload,
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
-  assignee: StudioUser,
+  assignee?: StudioUser,
 ): ExceptionActionResult {
-  if (!canAssignException(user, assignments)) {
-    return { ok: false, error: "Forbidden", status: 403 };
-  }
-
   const existing = findExceptionById(envelope.exceptionRecords, payload.exceptionId);
   if (!existing) {
     return { ok: false, error: "Exception not found.", status: 404 };
+  }
+
+  const holdNotes = payload.notes?.trim();
+  const useHoldPath =
+    Boolean(holdNotes) &&
+    canHoldPromotionReview(user, existing, envelope.exceptionEvents) &&
+    (!payload.assignToUserId?.trim() || assignee);
+
+  if (useHoldPath) {
+    return applyHoldPromotionReview(envelope, payload, user, assignments, assignee);
+  }
+
+  if (!payload.assignToUserId?.trim()) {
+    return { ok: false, error: "Assignee is required.", status: 400 };
+  }
+
+  if (!assignee) {
+    return { ok: false, error: "Assignee not found.", status: 404 };
+  }
+
+  if (!canAssignException(user, assignments)) {
+    return { ok: false, error: "Forbidden", status: 403 };
   }
 
   const actorRole = exceptionActorRole(user, assignments);
@@ -287,7 +306,7 @@ export function applyApproveClientRequest(
     return { ok: false, error: "Exception not found.", status: 404 };
   }
 
-  if (!canApproveClientRequest(user, existing)) {
+  if (!canApproveClientRequest(user, existing, envelope.exceptionEvents)) {
     return { ok: false, error: "Forbidden", status: 403 };
   }
 
@@ -361,8 +380,13 @@ export function applyDeclinePromotion(
     return { ok: false, error: "Exception not found.", status: 404 };
   }
 
-  if (!canDeclinePromotion(user, existing)) {
+  if (!canDeclinePromotion(user, existing, envelope.exceptionEvents)) {
     return { ok: false, error: "Forbidden", status: 403 };
+  }
+
+  const notes = payload.notes?.trim();
+  if (!notes) {
+    return { ok: false, error: "Internal reason is required to decline promotion.", status: 400 };
   }
 
   const actorRole = exceptionActorRole(user, assignments);
@@ -380,7 +404,71 @@ export function applyDeclinePromotion(
     actorRole,
     action: "declined_promotion",
     statusAfter: "waiting_internal",
-    notes: payload.notes,
+    notes,
+  });
+
+  const records = upsertExceptionRecord(envelope.exceptionRecords, updated);
+  const events = appendExceptionEvent(envelope.exceptionEvents, event);
+
+  return {
+    ok: true,
+    envelope: withExceptionEnvelope(envelope, records, events),
+    exception: updated,
+  };
+}
+
+export function applyHoldPromotionReview(
+  envelope: ServerTasksEnvelope,
+  payload: AssignExceptionPayload,
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+  assignee?: StudioUser,
+): ExceptionActionResult {
+  const existing = findExceptionById(envelope.exceptionRecords, payload.exceptionId);
+  if (!existing) {
+    return { ok: false, error: "Exception not found.", status: 404 };
+  }
+
+  if (!canHoldPromotionReview(user, existing, envelope.exceptionEvents)) {
+    return { ok: false, error: "Forbidden", status: 403 };
+  }
+
+  const notes = payload.notes?.trim();
+  if (!notes) {
+    return {
+      ok: false,
+      error: "Internal instruction is required to hold for internal review.",
+      status: 400,
+    };
+  }
+
+  const actorRole = exceptionActorRole(user, assignments);
+  const now = new Date().toISOString();
+  const nextStatus: CampaignExceptionRecord["status"] = "waiting_internal";
+  const updated: CampaignExceptionRecord = assignee
+    ? {
+        ...existing,
+        status: nextStatus,
+        assignedToUserId: assignee.id,
+        assignedToDisplayName: assignee.displayName,
+        updatedAt: now,
+      }
+    : {
+        ...existing,
+        status: nextStatus,
+        updatedAt: now,
+      };
+
+  const event = buildExceptionEvent({
+    exceptionId: updated.id,
+    campaignId: envelope.campaignId,
+    user,
+    actorRole,
+    action: "assigned",
+    notes,
+    assignToUserId: assignee?.id,
+    assignToDisplayName: assignee?.displayName,
+    statusAfter: nextStatus,
   });
 
   const records = upsertExceptionRecord(envelope.exceptionRecords, updated);

@@ -219,8 +219,13 @@ export function canResolveException(
   record: CampaignExceptionRecord,
   assignments: CampaignAssignmentsFile,
   materials: readonly CampaignMaterialItem[] = [],
+  events: readonly CampaignExceptionEvent[] | undefined = [],
 ): boolean {
   if (!isOpenExceptionStatus(record.status)) return false;
+
+  if (isPromotableExceptionKind(record.kind) && exceptionPromotionDeclined(record, events)) {
+    return false;
+  }
 
   if (record.promotion && !canResolvePromotedException(record, materials)) {
     return false;
@@ -245,26 +250,49 @@ export function canResolveException(
 export const APPROVABLE_EXCEPTION_STATUSES: readonly CampaignExceptionStatus[] = [
   "open",
   "waiting_owner",
+  "waiting_internal",
 ] as const;
+
+export function exceptionPromotionDeclined(
+  record: CampaignExceptionRecord,
+  events: readonly CampaignExceptionEvent[] | undefined,
+): boolean {
+  return (events ?? []).some(
+    (event) => event.exceptionId === record.id && event.action === "declined_promotion",
+  );
+}
 
 export function canApproveClientRequest(
   user: StudioUser,
   record: CampaignExceptionRecord,
+  events: readonly CampaignExceptionEvent[] | undefined = [],
 ): boolean {
   if (!isPromotableExceptionKind(record.kind)) return false;
   if (!APPROVABLE_EXCEPTION_STATUSES.includes(record.status)) return false;
   if (record.promotion) return false;
+  if (exceptionPromotionDeclined(record, events)) return false;
   return isOwnerUser(user);
 }
 
 export function canDeclinePromotion(
   user: StudioUser,
   record: CampaignExceptionRecord,
+  events: readonly CampaignExceptionEvent[] | undefined = [],
 ): boolean {
-  if (record.kind !== "missing_client_fact") return false;
+  if (!isPromotableExceptionKind(record.kind)) return false;
   if (!APPROVABLE_EXCEPTION_STATUSES.includes(record.status)) return false;
   if (record.promotion) return false;
+  if (exceptionPromotionDeclined(record, events)) return false;
   return isOwnerUser(user);
+}
+
+/** Owner hold for internal review — uses assign_exception; no client materials sent. */
+export function canHoldPromotionReview(
+  user: StudioUser,
+  record: CampaignExceptionRecord,
+  events: readonly CampaignExceptionEvent[] | undefined = [],
+): boolean {
+  return canDeclinePromotion(user, record, events);
 }
 
 export function assignStatusForUser(

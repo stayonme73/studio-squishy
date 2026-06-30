@@ -5,18 +5,24 @@ import type { ReactNode } from "react";
 import { campaignExceptionsConfig } from "@/config/campaign-exceptions";
 import type { FileRoomExceptionRow } from "@/lib/campaign-tasks/exceptions-view";
 
-type PanelMode = "assign" | "resolve" | null;
+import FileRoomExceptionDetailsPanel from "./FileRoomExceptionDetailsPanel";
+
+type PanelMode = "assign" | "resolve" | "approve" | null;
 
 type FileRoomExceptionRowProps = {
   row: FileRoomExceptionRow;
   busy: boolean;
   activePanel: PanelMode;
   isActiveRow: boolean;
+  detailsExpanded: boolean;
+  onToggleDetails: () => void;
   onOpenAssign: () => void;
   onOpenResolve: () => void;
+  onOpenApprove: () => void;
   onClosePanel: () => void;
   assignPanel: ReactNode;
   resolvePanel: ReactNode;
+  approvalPanel: ReactNode;
 };
 
 export default function FileRoomExceptionRowComponent({
@@ -24,15 +30,32 @@ export default function FileRoomExceptionRowComponent({
   busy,
   activePanel,
   isActiveRow,
+  detailsExpanded,
+  onToggleDetails,
   onOpenAssign,
   onOpenResolve,
+  onOpenApprove,
   onClosePanel,
   assignPanel,
   resolvePanel,
+  approvalPanel,
 }: FileRoomExceptionRowProps) {
   const isClosed = row.status === "resolved" || row.status === "cancelled";
-  const showAssign = !isClosed && row.permissions.canAssign && activePanel !== "resolve";
-  const showResolve = !isClosed && row.permissions.canResolve && activePanel !== "assign";
+  const showAssign =
+    !isClosed &&
+    row.permissions.canAssign &&
+    activePanel !== "resolve" &&
+    activePanel !== "approve";
+  const showResolve =
+    !isClosed &&
+    row.permissions.canResolve &&
+    activePanel !== "assign" &&
+    activePanel !== "approve";
+  const showApprove =
+    !isClosed &&
+    row.promotion.showApprovalPanel &&
+    activePanel !== "assign" &&
+    activePanel !== "resolve";
 
   return (
     <li className={`fr-exception-row fr-exception-row--${row.status}`}>
@@ -44,6 +67,11 @@ export default function FileRoomExceptionRowComponent({
       <p className="fr-exception-row__title">{row.title}</p>
 
       <div className="fr-exception-row__badges">
+        {row.sentToClient ? (
+          <span className="fr-exception-badge fr-exception-badge--client">
+            {campaignExceptionsConfig.sentToClientBadge}
+          </span>
+        ) : null}
         {row.ownerReviewRequired ? (
           <span className="fr-exception-badge fr-exception-badge--owner">
             {campaignExceptionsConfig.ownerReviewRequiredLabel}
@@ -52,6 +80,16 @@ export default function FileRoomExceptionRowComponent({
         {row.isAutoCreatedFromQa ? (
           <span className="fr-exception-badge fr-exception-badge--qa">
             {campaignExceptionsConfig.autoCreatedFromQaLabel}
+          </span>
+        ) : null}
+        {row.promotion.promotionDeclined ? (
+          <span className="fr-exception-badge fr-exception-badge--declined">
+            {campaignExceptionsConfig.promotionDeclinedBadge}
+          </span>
+        ) : null}
+        {row.promotion.holdStateLabel && !row.promotion.showApprovalPanel ? (
+          <span className="fr-exception-badge fr-exception-badge--hold">
+            {campaignExceptionsConfig.promotionHoldBadge}
           </span>
         ) : null}
       </div>
@@ -77,8 +115,26 @@ export default function FileRoomExceptionRowComponent({
         <strong>Next:</strong> {row.nextRequiredAction}
       </p>
 
-      {(showAssign || showResolve) && !isActiveRow ? (
+      {row.promotion.showPromotedSummary || row.promotion.showReadOnlyDetails ? (
+        <FileRoomExceptionDetailsPanel
+          row={row}
+          expanded={detailsExpanded}
+          onToggle={onToggleDetails}
+        />
+      ) : null}
+
+      {(showAssign || showResolve || showApprove) && !isActiveRow ? (
         <div className="fr-exception-row__actions">
+          {showApprove ? (
+            <button
+              type="button"
+              className="utility-btn utility-btn--primary"
+              disabled={busy}
+              onClick={onOpenApprove}
+            >
+              {campaignExceptionsConfig.promotionPanelTitle}
+            </button>
+          ) : null}
           {showAssign ? (
             <button
               type="button"
@@ -118,6 +174,10 @@ export default function FileRoomExceptionRowComponent({
             Close
           </button>
         </div>
+      ) : null}
+
+      {isActiveRow && activePanel === "approve" ? (
+        <div className="fr-exception-row__panel">{approvalPanel}</div>
       ) : null}
     </li>
   );

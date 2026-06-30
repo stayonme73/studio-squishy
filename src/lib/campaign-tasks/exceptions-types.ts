@@ -118,7 +118,7 @@ export type RaiseExceptionPayload = {
 
 export type AssignExceptionPayload = {
   exceptionId: string;
-  assignToUserId: string;
+  assignToUserId?: string;
   notes?: string;
 };
 

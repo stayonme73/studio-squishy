@@ -5,7 +5,7 @@ import type {
   CampaignExceptionRecord,
 } from "@/lib/campaign-tasks/exceptions-types";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
-import { containsSecretLikeContent } from "@/lib/materials/payload-validation";
+import { validateClientFacingPromotionField } from "@/lib/materials/client-facing-validation";
 
 import type {
   CampaignMaterialItem,
@@ -67,17 +67,7 @@ function validateClientFacingField(
   value: string | undefined,
   fieldName: string,
 ): { ok: true; value: string } | { ok: false; error: string } {
-  const trimmed = value?.trim();
-  if (!trimmed) {
-    return { ok: false, error: `${fieldName} is required.` };
-  }
-  if (containsSecretLikeContent(trimmed)) {
-    return {
-      ok: false,
-      error: `${fieldName} cannot include passwords, credentials, or secrets.`,
-    };
-  }
-  return { ok: true, value: trimmed };
+  return validateClientFacingPromotionField(value, fieldName);
 }
 
 export function validateApproveClientRequestPayload(
@@ -179,6 +169,58 @@ function findMatchingSlots(
     if (serviceSet.size === 0) return true;
     return item.relatedServiceIds.some((serviceId) => serviceSet.has(serviceId));
   });
+}
+
+export type PromotionSlotPreview = {
+  mode: "attach_existing" | "create_ad_hoc";
+  itemIds: readonly string[];
+  itemLabels: readonly string[];
+  consolidatedRequestId: string;
+};
+
+export function previewPromotionSlotMapping(
+  materialsEnvelope: ServerMaterialsEnvelope,
+  payload: ApproveClientRequestPayload,
+): PromotionSlotPreview {
+  const contentKind = payload.contentKind ?? contentKindForCategory(payload.category);
+  const consolidatedId = `${payload.category}:${contentKind}`;
+
+  const working: CampaignMaterialsRecord = {
+    campaignId: materialsEnvelope.campaignId,
+    items: [...materialsEnvelope.items],
+    updatedAt: materialsEnvelope.updatedAt,
+    version: materialsEnvelope.version,
+  };
+
+  if (payload.existingMaterialItemIds && payload.existingMaterialItemIds.length > 0) {
+    const idSet = new Set(payload.existingMaterialItemIds);
+    const matched = working.items.filter((item) => idSet.has(item.id));
+    return {
+      mode: "attach_existing",
+      itemIds: matched.map((item) => item.id),
+      itemLabels: matched.map((item) => item.label),
+      consolidatedRequestId: consolidatedId,
+    };
+  }
+
+  const matches = findMatchingSlots(working, payload);
+  const unattached = matches.filter((item) => !item.promotionApprovedAt);
+
+  if (unattached.length > 0) {
+    return {
+      mode: "attach_existing",
+      itemIds: unattached.map((item) => item.id),
+      itemLabels: unattached.map((item) => item.label),
+      consolidatedRequestId: consolidatedId,
+    };
+  }
+
+  return {
+    mode: "create_ad_hoc",
+    itemIds: [],
+    itemLabels: [`New ${payload.clientFacingLabel.trim()} slot`],
+    consolidatedRequestId: consolidatedId,
+  };
 }
 
 function createAdHocItem(

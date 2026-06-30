@@ -162,4 +162,6 @@ export {
   canRaiseException,
   canResolveException,
   canApproveClientRequest,
+  canDeclinePromotion,
+  canHoldPromotionReview,
 } from "./exceptions";

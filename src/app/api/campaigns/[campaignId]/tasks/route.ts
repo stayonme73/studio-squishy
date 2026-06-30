@@ -108,8 +108,10 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body.action === "reassign" || body.action === "assign_exception") {
     const toUserId =
       body.action === "reassign" ? body.toUserId : body.assignToUserId;
-    const userRecord = await findUserById(toUserId);
-    targetUser = userRecord ? toPublicUser(userRecord) : undefined;
+    if (toUserId) {
+      const userRecord = await findUserById(toUserId);
+      targetUser = userRecord ? toPublicUser(userRecord) : undefined;
+    }
   }
 
   const result = applyTaskPatch(tasksEnvelope, body, user, {

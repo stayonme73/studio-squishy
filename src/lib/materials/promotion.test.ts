@@ -158,6 +158,26 @@ describe("materials promotion", () => {
     expect(result.error).toMatch(/secret|credential|password/i);
   });
 
+  it("rejects internal-only phrasing in client-facing fields", () => {
+    const result = validateApproveClientRequestPayload({
+      ...approvePayload,
+      whyNeeded: "Internal team must verify before client send",
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toMatch(/internal-only/i);
+  });
+
+  it("rejects blocklisted generic whyNeeded", () => {
+    const result = validateApproveClientRequestPayload({
+      ...approvePayload,
+      whyNeeded: "Needed for your approved Studio Plan services",
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toMatch(/specific/i);
+  });
+
   it("moves promoted exception to waiting_internal on client submit hook", () => {
     const tasksEnvelope = {
       campaignId: "campaign-1",

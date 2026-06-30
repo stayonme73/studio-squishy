@@ -7,7 +7,10 @@ import {
   resolveFileRoomExceptionsView,
   resolveNextRequiredAction,
   resolveOpenExceptionCountByTaskId,
+  resolveOwnerReviewRequired,
   resolveRaiseableExceptionKinds,
+  resolveSentToClientBadge,
+  resolveExceptionStatusLabel,
 } from "./exceptions-view";
 import type { CampaignExceptionRecord } from "./exceptions-types";
 import type { CampaignTaskItem } from "./types";
@@ -127,6 +130,50 @@ describe("exceptions-view", () => {
     expect(resolveNextRequiredAction(exception({ status: "resolved" }))).toContain("Resolved");
   });
 
+  it("shows client-facing copy for promoted exceptions awaiting client", () => {
+    const promoted = exception({
+      kind: "client_request",
+      status: "waiting_client",
+      promotion: {
+        approvedAt: "2026-06-29T12:00:00.000Z",
+        approvedByUserId: owner.id,
+        approvedByDisplayName: owner.displayName,
+        materialItemIds: ["logo-sm"],
+        consolidatedRequestId: "logo-brand:file-metadata",
+        clientFacingLabel: "Logo file",
+        clientFacingPrompt: "Please send your logo file",
+        whyNeeded: "We need your logo file to keep your brand consistent across deliverables.",
+        category: "logo-brand",
+        contentKind: "file-metadata",
+        requirementLevel: "required",
+      },
+    });
+
+    expect(resolveOwnerReviewRequired(promoted)).toBe(false);
+    expect(resolveSentToClientBadge(promoted)).toBe(true);
+    expect(resolveExceptionStatusLabel(promoted)).toBe("Waiting for client response");
+    expect(resolveNextRequiredAction(promoted)).toBe("Client response needed");
+
+    const view = resolveFileRoomExceptionsView([promoted], tasks, {
+      user: owner,
+      assignments,
+    });
+    expect(view.rows[0]?.ownerReviewRequired).toBe(false);
+    expect(view.rows[0]?.sentToClient).toBe(true);
+    expect(view.rows[0]?.statusLabel).toBe("Waiting for client response");
+    expect(view.rows[0]?.nextRequiredAction).toBe("Client response needed");
+  });
+
+  it("still requires owner review for promotable kinds before promotion", () => {
+    const awaitingOwner = exception({
+      kind: "client_request",
+      status: "waiting_owner",
+    });
+    expect(resolveOwnerReviewRequired(awaitingOwner)).toBe(true);
+    expect(resolveSentToClientBadge(awaitingOwner)).toBe(false);
+    expect(resolveNextRequiredAction(awaitingOwner)).toContain("Owner");
+  });
+
   it("tracks open and resolved counts", () => {
     const view = resolveFileRoomExceptionsView(
       [exception(), exception({ id: "exc-2", status: "resolved" })],
@@ -151,6 +198,8 @@ describe("exceptions-view", () => {
       expect(row.permissions.canAssign).toBe(false);
       expect(row.permissions.canResolve).toBe(false);
       expect(row.permissions.canApproveClientRequest).toBe(false);
+      expect(row.permissions.canDeclinePromotion).toBe(false);
+      expect(row.permissions.canHoldPromotionReview).toBe(false);
     }
   });
 });

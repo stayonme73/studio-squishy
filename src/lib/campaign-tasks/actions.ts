@@ -156,7 +156,7 @@ export type TasksPatchBody =
   | {
       action: "assign_exception";
       exceptionId: string;
-      assignToUserId: string;
+      assignToUserId?: string;
       notes?: string;
     }
   | {
@@ -932,9 +932,6 @@ export function applyTaskPatch(
       return { ok: true, envelope: result.envelope, exception: result.exception };
     }
     case "assign_exception": {
-      if (!context.targetUser) {
-        return { ok: false, error: "Target user not found.", status: 404 };
-      }
       const result = applyAssignException(
         envelope,
         body,

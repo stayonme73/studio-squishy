@@ -81,6 +81,18 @@ export const materialsConfig = {
     "factual-confirmation:confirmation": "Please confirm the factual details we need",
     "other:text": "Please share the material we need",
   },
+  /** Client-safe default “why we need this” when no task/service context is available. */
+  clientRequestWhyNeeded: {
+    "logo-brand:file-metadata": "We need your logo file to keep your brand consistent across deliverables.",
+    "photo-video:file-metadata": "We need your photo or video to include in your launch materials.",
+    "document-reference:file-metadata": "We need this document to align production with your references.",
+    "document-reference:text": "We need this reference text to guide copy and design decisions.",
+    "url-link:url": "We need this link to connect your deliverables to the right destination.",
+    "access-instructions:text": "We need platform access details so our team can complete setup work.",
+    "factual-confirmation:confirmation":
+      "We need this confirmation so we can keep your project aligned with your brand and goals.",
+    "other:text": "We need this material to continue work on your project.",
+  },
 } as const;
 
 export function materialCategoryLabel(category: MaterialCategory): string {

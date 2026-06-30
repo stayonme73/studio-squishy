@@ -112,13 +112,15 @@ describe("exception permissions", () => {
     ).toBe(true);
   });
 
-  it("only owner can approve promotable exceptions in waiting_owner", () => {
+  it("only owner can approve promotable exceptions in waiting_owner and waiting_internal", () => {
     const clientReq = exception({ kind: "client_request", status: "waiting_owner" });
     const missingFact = exception({ kind: "missing_client_fact", status: "waiting_owner" });
+    const onHold = exception({ kind: "missing_client_fact", status: "waiting_internal" });
     const compliance = exception({ kind: "compliance_hold", status: "waiting_owner" });
 
     expect(canApproveClientRequest(owner, clientReq)).toBe(true);
     expect(canApproveClientRequest(owner, missingFact)).toBe(true);
+    expect(canApproveClientRequest(owner, onHold)).toBe(true);
     expect(canApproveClientRequest(owner, compliance)).toBe(false);
     expect(canApproveClientRequest(producer, clientReq)).toBe(false);
     expect(canApproveClientRequest(qaStaff, clientReq)).toBe(false);

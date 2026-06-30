@@ -5,6 +5,7 @@ import {
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignMaterialItem } from "@/lib/materials/types";
 
 import {
   canAssignException,
@@ -12,9 +13,15 @@ import {
   canRaiseExceptionKind,
   isOpenExceptionStatus,
 } from "./exceptions";
+import {
+  isPromotableExceptionRow,
+  resolveFileRoomExceptionPromotionPanel,
+  type FileRoomExceptionPromotionPanel,
+} from "./exceptions-promotion-view";
 import type { ExceptionAssignCandidate, FileRoomExceptionPermissions } from "./file-room-controls";
 import { resolveExceptionPermissions } from "./file-room-controls";
 import type {
+  CampaignExceptionEvent,
   CampaignExceptionKind,
   CampaignExceptionRecord,
   CampaignExceptionStatus,
@@ -36,9 +43,11 @@ export type FileRoomExceptionRow = {
   assigneeDisplayName: string | null;
   raisedByDisplayName: string;
   ownerReviewRequired: boolean;
+  sentToClient: boolean;
   isAutoCreatedFromQa: boolean;
   nextRequiredAction: string;
   permissions: FileRoomExceptionPermissions;
+  promotion: FileRoomExceptionPromotionPanel;
   resolvedAt: string | null;
 };
 
@@ -54,6 +63,8 @@ export type ResolveFileRoomExceptionsOptions = {
   user?: StudioUser;
   assignments?: CampaignAssignmentsFile;
   filter?: ExceptionFilter;
+  materials?: readonly CampaignMaterialItem[];
+  events?: readonly CampaignExceptionEvent[];
 };
 
 const ALL_RAISEABLE_KINDS: readonly CampaignExceptionKind[] = [
@@ -67,6 +78,29 @@ const ALL_RAISEABLE_KINDS: readonly CampaignExceptionKind[] = [
   "revision_exhausted",
   "client_request",
 ] as const;
+
+const EMPTY_PROMOTION_PANEL: FileRoomExceptionPromotionPanel = {
+  showApprovalPanel: false,
+  showReadOnlyDetails: false,
+  showPromotedSummary: false,
+  canApprove: false,
+  canDecline: false,
+  canHold: false,
+  promotionDeclined: false,
+  internalContext: null,
+  holdStateLabel: null,
+  defaultWording: {
+    category: "factual-confirmation",
+    contentKind: "confirmation",
+    clientFacingLabel: "",
+    clientFacingPrompt: "",
+    whyNeeded: "",
+    requirementLevel: "required",
+    relatedServiceIds: [],
+  },
+  slotPreview: null,
+  promotedSummary: null,
+};
 
 function taskTitleById(
   tasks: readonly CampaignTaskItem[],
@@ -88,18 +122,53 @@ function reasonPreview(record: CampaignExceptionRecord): string | null {
   return null;
 }
 
+export function isPromotedAwaitingClient(record: CampaignExceptionRecord): boolean {
+  return Boolean(record.promotion) && record.status === "waiting_client";
+}
+
+export function resolveExceptionStatusLabel(record: CampaignExceptionRecord): string {
+  if (isPromotedAwaitingClient(record)) {
+    return campaignExceptionsConfig.promotedWaitingClientStatusLabel;
+  }
+  return campaignExceptionsConfig.statusLabels[record.status];
+}
+
+export function resolveOwnerReviewRequired(record: CampaignExceptionRecord): boolean {
+  if (!isOpenExceptionStatus(record.status)) return false;
+  if (isPromotedAwaitingClient(record)) return false;
+
+  if (isPromotableExceptionRow(record.kind)) {
+    if (record.promotion) return false;
+    return record.status === "waiting_owner" || record.status === "open";
+  }
+
+  return exceptionKindRequiresOwner(record.kind);
+}
+
+export function resolveSentToClientBadge(record: CampaignExceptionRecord): boolean {
+  return isPromotedAwaitingClient(record);
+}
+
 export function resolveNextRequiredAction(record: CampaignExceptionRecord): string {
   const { nextActionLabels } = campaignExceptionsConfig;
 
   if (record.status === "resolved") return nextActionLabels.resolved;
   if (record.status === "cancelled") return nextActionLabels.cancelled;
 
-  if (record.status === "waiting_owner" || exceptionKindRequiresOwner(record.kind)) {
-    return nextActionLabels.ownerReview;
+  if (isPromotedAwaitingClient(record)) {
+    return nextActionLabels.clientResponseNeeded;
   }
 
   if (record.status === "waiting_client") {
     return nextActionLabels.waitingClient;
+  }
+
+  if (isPromotableExceptionRow(record.kind)) {
+    if (!record.promotion && (record.status === "waiting_owner" || record.status === "open")) {
+      return nextActionLabels.ownerReview;
+    }
+  } else if (record.status === "waiting_owner" || exceptionKindRequiresOwner(record.kind)) {
+    return nextActionLabels.ownerReview;
   }
 
   if (record.status === "waiting_internal") {
@@ -139,12 +208,20 @@ function toRow(
 ): FileRoomExceptionRow {
   const permissions =
     options.user && options.assignments
-      ? resolveExceptionPermissions(options.user, record, options.assignments)
+      ? resolveExceptionPermissions(
+          options.user,
+          record,
+          options.assignments,
+          options.events,
+        )
       : {
           canRaise: false,
           canAssign: false,
           canResolve: false,
           canApproveClientRequest: false,
+          canDeclinePromotion: false,
+          canHoldPromotionReview: false,
+          canViewPromotionDetails: false,
         };
 
   const isOpen = isOpenExceptionStatus(record.status);
@@ -155,24 +232,40 @@ function toRow(
         canAssign: false,
         canResolve: false,
         canApproveClientRequest: false,
+        canDeclinePromotion: false,
+        canHoldPromotionReview: false,
       };
+
+  const promotion =
+    options.user && options.assignments
+      ? resolveFileRoomExceptionPromotionPanel(
+          record,
+          options.events,
+          options.materials ?? [],
+          tasks,
+          options.user,
+          options.assignments,
+        )
+      : EMPTY_PROMOTION_PANEL;
 
   return {
     id: record.id,
     kind: record.kind,
     kindLabel: campaignExceptionsConfig.kindLabels[record.kind],
     status: record.status,
-    statusLabel: campaignExceptionsConfig.statusLabels[record.status],
+    statusLabel: resolveExceptionStatusLabel(record),
     title: record.title,
     reasonPreview: reasonPreview(record),
     taskId: record.taskId ?? null,
     taskTitle: taskTitleById(tasks, record.taskId),
     assigneeDisplayName: record.assignedToDisplayName ?? null,
     raisedByDisplayName: record.raisedByDisplayName,
-    ownerReviewRequired: isOpen && exceptionKindRequiresOwner(record.kind),
+    ownerReviewRequired: resolveOwnerReviewRequired(record),
+    sentToClient: resolveSentToClientBadge(record),
     isAutoCreatedFromQa: Boolean(record.qaRecordId),
     nextRequiredAction: resolveNextRequiredAction(record),
     permissions: rowPermissions,
+    promotion,
     resolvedAt: record.resolvedAt ?? null,
   };
 }

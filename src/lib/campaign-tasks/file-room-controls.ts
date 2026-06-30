@@ -16,6 +16,8 @@ import {
   canAssignException,
   canResolveException,
   canApproveClientRequest,
+  canDeclinePromotion,
+  canHoldPromotionReview,
   FAMILY_CAPABLE_ROLES,
   isRoleCapableForTaskFamily,
   isUserCapableForTaskFamily,
@@ -63,6 +65,9 @@ export type FileRoomExceptionPermissions = {
   canAssign: boolean;
   canResolve: boolean;
   canApproveClientRequest: boolean;
+  canDeclinePromotion: boolean;
+  canHoldPromotionReview: boolean;
+  canViewPromotionDetails: boolean;
 };
 
 export type ExceptionAssignCandidate = {
@@ -106,12 +111,19 @@ export function resolveExceptionPermissions(
   user: StudioUser,
   exception: CampaignExceptionRecord,
   assignments: CampaignAssignmentsFile,
+  events: readonly import("./exceptions-types").CampaignExceptionEvent[] = [],
 ): FileRoomExceptionPermissions {
+  const promotable =
+    exception.kind === "missing_client_fact" || exception.kind === "client_request";
+
   return {
     canRaise: canRaiseException(user, assignments),
     canAssign: canAssignException(user, assignments),
-    canResolve: canResolveException(user, exception, assignments),
-    canApproveClientRequest: canApproveClientRequest(user, exception),
+    canResolve: canResolveException(user, exception, assignments, [], events),
+    canApproveClientRequest: canApproveClientRequest(user, exception, events),
+    canDeclinePromotion: canDeclinePromotion(user, exception, events),
+    canHoldPromotionReview: canHoldPromotionReview(user, exception, events),
+    canViewPromotionDetails: promotable && !isOwnerUser(user),
   };
 }
 

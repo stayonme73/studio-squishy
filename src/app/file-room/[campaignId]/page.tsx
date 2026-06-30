@@ -83,7 +83,12 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
   const exceptionsView = resolveFileRoomExceptionsView(
     tasksEnvelope.exceptionRecords,
     tasksEnvelope.tasks,
-    { user, assignments },
+    {
+      user,
+      assignments,
+      materials: materialsEnvelope.items,
+      events: tasksEnvelope.exceptionEvents,
+    },
   );
   const view = resolveFileRoomCampaignView(
     result.envelope,

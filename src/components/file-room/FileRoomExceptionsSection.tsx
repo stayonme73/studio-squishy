@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { campaignExceptionsConfig } from "@/config/campaign-exceptions";
+import { contentKindForCategory } from "@/lib/materials/promotion";
 import type { TasksPatchBody } from "@/lib/campaign-tasks/actions";
 import type { CampaignExceptionStatus } from "@/lib/campaign-tasks/exceptions-types";
 import type {
@@ -17,6 +18,10 @@ import FileRoomExceptionAssignPanel, {
   emptyAssignExceptionForm,
   type AssignExceptionFormState,
 } from "./FileRoomExceptionAssignPanel";
+import FileRoomExceptionOwnerApprovalPanel, {
+  emptyOwnerApprovalForm,
+  type OwnerApprovalFormState,
+} from "./FileRoomExceptionOwnerApprovalPanel";
 import FileRoomExceptionRowComponent from "./FileRoomExceptionRow";
 import FileRoomExceptionRaisePanel, {
   emptyRaiseExceptionForm,
@@ -28,7 +33,7 @@ import FileRoomExceptionResolvePanel, {
 } from "./FileRoomExceptionResolvePanel";
 import FileRoomSectionCard from "./FileRoomSectionCard";
 
-type RowPanelMode = "assign" | "resolve" | null;
+type RowPanelMode = "assign" | "resolve" | "approve" | null;
 
 function isOpenExceptionRowStatus(status: CampaignExceptionStatus): boolean {
   return status !== "resolved" && status !== "cancelled";
@@ -59,11 +64,21 @@ export default function FileRoomExceptionsSection({
   const [resolveForm, setResolveForm] = useState<ResolveExceptionFormState>(
     emptyResolveExceptionForm,
   );
+  const [approvalForm, setApprovalForm] = useState<OwnerApprovalFormState | null>(null);
+  const [detailsExpandedById, setDetailsExpandedById] = useState<Record<string, boolean>>({});
 
   const displayRows =
     filter === "open"
       ? initialExceptions.rows.filter((row) => isOpenExceptionRowStatus(row.status))
       : initialExceptions.rows.filter((row) => !isOpenExceptionRowStatus(row.status));
+
+  const resetRowPanels = () => {
+    setActiveRowId(null);
+    setRowPanel(null);
+    setAssignForm(emptyAssignExceptionForm());
+    setResolveForm(emptyResolveExceptionForm());
+    setApprovalForm(null);
+  };
 
   const patchException = async (body: TasksPatchBody) => {
     setBusy(true);
@@ -82,10 +97,7 @@ export default function FileRoomExceptionsSection({
 
       setRaiseOpen(false);
       setRaiseForm(emptyRaiseExceptionForm());
-      setActiveRowId(null);
-      setRowPanel(null);
-      setAssignForm(emptyAssignExceptionForm());
-      setResolveForm(emptyResolveExceptionForm());
+      resetRowPanels();
       router.refresh();
     } catch (patchError) {
       setError(
@@ -127,12 +139,43 @@ export default function FileRoomExceptionsSection({
     });
   };
 
+  const confirmApprove = (exceptionId: string, form: OwnerApprovalFormState) => {
+    void patchException({
+      action: "approve_client_request",
+      exceptionId,
+      category: form.category,
+      contentKind: contentKindForCategory(form.category),
+      clientFacingLabel: form.clientFacingLabel.trim(),
+      clientFacingPrompt: form.clientFacingPrompt.trim(),
+      whyNeeded: form.whyNeeded.trim(),
+      requirementLevel: "required",
+    });
+  };
+
+  const confirmHold = (exceptionId: string, form: OwnerApprovalFormState) => {
+    void patchException({
+      action: "assign_exception",
+      exceptionId,
+      assignToUserId: form.holdAssignToUserId.trim() || undefined,
+      notes: form.holdInstruction.trim(),
+    });
+  };
+
+  const confirmDecline = (exceptionId: string, form: OwnerApprovalFormState) => {
+    void patchException({
+      action: "decline_promotion",
+      exceptionId,
+      notes: form.declineReason.trim(),
+    });
+  };
+
   const openAssign = (exceptionId: string) => {
     setError(null);
     setRaiseOpen(false);
     setActiveRowId(exceptionId);
     setRowPanel("assign");
     setAssignForm(emptyAssignExceptionForm());
+    setApprovalForm(null);
   };
 
   const openResolve = (exceptionId: string) => {
@@ -141,13 +184,26 @@ export default function FileRoomExceptionsSection({
     setActiveRowId(exceptionId);
     setRowPanel("resolve");
     setResolveForm(emptyResolveExceptionForm());
+    setApprovalForm(null);
+  };
+
+  const openApprove = (row: (typeof displayRows)[number]) => {
+    setError(null);
+    setRaiseOpen(false);
+    setActiveRowId(row.id);
+    setRowPanel("approve");
+    setApprovalForm(emptyOwnerApprovalForm(row.promotion.defaultWording));
   };
 
   const closeRowPanel = () => {
-    setActiveRowId(null);
-    setRowPanel(null);
-    setAssignForm(emptyAssignExceptionForm());
-    setResolveForm(emptyResolveExceptionForm());
+    resetRowPanels();
+  };
+
+  const toggleDetails = (exceptionId: string) => {
+    setDetailsExpandedById((current) => ({
+      ...current,
+      [exceptionId]: !current[exceptionId],
+    }));
   };
 
   const emptyTitle =
@@ -232,8 +288,11 @@ export default function FileRoomExceptionsSection({
                 busy={busy}
                 activePanel={activeRowId === row.id ? rowPanel : null}
                 isActiveRow={activeRowId === row.id}
+                detailsExpanded={Boolean(detailsExpandedById[row.id])}
+                onToggleDetails={() => toggleDetails(row.id)}
                 onOpenAssign={() => openAssign(row.id)}
                 onOpenResolve={() => openResolve(row.id)}
+                onOpenApprove={() => openApprove(row)}
                 onClosePanel={closeRowPanel}
                 assignPanel={
                   <FileRoomExceptionAssignPanel
@@ -253,6 +312,21 @@ export default function FileRoomExceptionsSection({
                     onConfirm={() => confirmResolve(row.id)}
                     onCancel={closeRowPanel}
                   />
+                }
+                approvalPanel={
+                  approvalForm ? (
+                    <FileRoomExceptionOwnerApprovalPanel
+                      row={row}
+                      form={approvalForm}
+                      busy={busy}
+                      operatorContext={operatorContext}
+                      onChange={setApprovalForm}
+                      onApprove={() => confirmApprove(row.id, approvalForm)}
+                      onHold={() => confirmHold(row.id, approvalForm)}
+                      onDecline={() => confirmDecline(row.id, approvalForm)}
+                      onCancel={closeRowPanel}
+                    />
+                  ) : null
                 }
               />
             ))}

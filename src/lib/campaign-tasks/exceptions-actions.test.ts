@@ -327,6 +327,25 @@ describe("exceptions-actions", () => {
     expect(declined.exception.status).toBe("waiting_internal");
   });
 
+  it("decline promotion requires internal reason", () => {
+    const raised = applyRaiseException(
+      envelope(),
+      { kind: "client_request", title: "Need logo", clientRequestDraft: { exactClientOnlyItem: "Logo" } },
+      owner,
+      assignments,
+    );
+    if (!raised.ok) throw new Error("raise failed");
+    const declined = applyDeclinePromotion(
+      raised.envelope,
+      { exceptionId: raised.exception.id },
+      owner,
+      assignments,
+    );
+    expect(declined.ok).toBe(false);
+    if (declined.ok) return;
+    expect(declined.status).toBe(400);
+  });
+
   it("qa staff can raise exceptions", () => {
     const result = applyRaiseException(
       envelope(),
