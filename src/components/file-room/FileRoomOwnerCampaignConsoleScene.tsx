@@ -106,9 +106,11 @@ export default function FileRoomOwnerCampaignConsoleScene({
                     selectedCard={selectedCard}
                     busy={actions.busy}
                     fileRoomHref={view.fileRoomHref}
+                    reassign={view.reassign}
                     onOpenApprove={() => actions.openApprove(selectedCard)}
                     onOpenResolve={actions.openResolve}
                     onOpenAssign={actions.openAssign}
+                    onOpenReassign={actions.openReassign}
                   />
                 ) : null}
 
@@ -120,7 +122,7 @@ export default function FileRoomOwnerCampaignConsoleScene({
                   assignForm={actions.assignForm}
                   resolveForm={actions.resolveForm}
                   approvalForm={actions.approvalForm}
-                  reassign={null}
+                  reassign={view.reassign}
                   onAssignChange={actions.setAssignForm}
                   onResolveChange={actions.setResolveForm}
                   onApprovalChange={actions.setApprovalForm}
