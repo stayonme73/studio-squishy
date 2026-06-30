@@ -60,6 +60,14 @@ export default function FileRoomOwnerConsoleReassignPanel({
 
   const handleConfirm = () => {
     if (!canSubmit || !form.toRole) return;
+    const handoff = {
+      completedSummary: form.completedSummary.trim(),
+      sourceContext: form.sourceContext.trim(),
+      nextSteps: form.nextSteps.trim(),
+    };
+    if (reassign.workVersionId) {
+      handoff.workVersionId = reassign.workVersionId;
+    }
     onConfirm({
       action: "reassign",
       taskId: reassign.taskId,
@@ -67,11 +75,7 @@ export default function FileRoomOwnerConsoleReassignPanel({
       claimVersion: reassign.claimVersion,
       toUserId: form.toUserId,
       toRole: form.toRole,
-      handoff: {
-        completedSummary: form.completedSummary.trim(),
-        sourceContext: form.sourceContext.trim(),
-        nextSteps: form.nextSteps.trim(),
-      },
+      handoff,
       reason: form.reassignmentReason.trim() || undefined,
       reassignmentFlags: form.reassignmentFlags,
     });

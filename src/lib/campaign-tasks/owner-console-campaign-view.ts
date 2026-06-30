@@ -71,6 +71,7 @@ export type OwnerConsoleReassignContext = {
   candidates: ReturnType<typeof resolveReassignCandidatesForTask>;
   claimVersion: string | null;
   workflowState: import("./types").TaskWorkflowState;
+  workVersionId: string | null;
 };
 
 export type OwnerConsoleCampaignDetailView = {
@@ -167,8 +168,15 @@ function resolveReassignContext(
   assignments: CampaignAssignmentsFile,
   users: readonly StudioUser[],
   linkedTask: FileRoomTaskRow | null,
+  productionEnvelope: ServerProductionEnvelope,
+  tasks: readonly import("./types").CampaignTaskItem[],
 ): OwnerConsoleReassignContext | null {
   if (!linkedTask) return null;
+
+  const rawTask = tasks.find((entry) => entry.id === linkedTask.id) ?? null;
+  const productionPanel = rawTask
+    ? resolveFileRoomProductionWorkPanelView(productionEnvelope, rawTask, false)
+    : null;
 
   const permissions = resolveTaskPermissions(user, {
     id: linkedTask.id,
@@ -199,6 +207,7 @@ function resolveReassignContext(
     candidates,
     claimVersion: linkedTask.claimVersion,
     workflowState: linkedTask.workflowState,
+    workVersionId: productionPanel?.currentVersionId ?? null,
   };
 }
 
@@ -294,6 +303,8 @@ export function resolveOwnerConsoleCampaignDetailView(
       assignments,
       users,
       linkedTask,
+      productionEnvelope,
+      tasksEnvelope.tasks,
     ),
     scan,
     isEmpty: consoleView.isEmpty && scan.totalItems === 0,
