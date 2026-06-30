@@ -126,6 +126,8 @@ export default function FileRoomProducerOfficeScene({
               officeMode={{
                 readOnly: true,
                 hideQaActions: true,
+                hideReassign: false,
+                allowHandoffDespiteReadOnly: true,
                 singleTask: selectedTask,
               }}
             />

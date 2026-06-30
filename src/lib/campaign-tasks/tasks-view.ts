@@ -125,7 +125,7 @@ function toRow(
     familyId: task.familyId,
     responsibleRole: taskRequiredRole(task),
     assignedRole: task.assignedRole,
-    blockedReason: formatBlockedReasonDisplay(task.blockedReason),
+    blockedReason: formatBlockedReasonDisplay(task.blockedReason ?? task.workflowBlockedReason),
     cycleLabel: task.cycleLabel ?? null,
     dependsOnCount: task.dependsOn.length,
     claimedByUserId: task.claimedByUserId,

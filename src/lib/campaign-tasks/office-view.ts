@@ -11,6 +11,12 @@ import type { FileRoomCampaignView, FileRoomDiscoveryItem } from "@/lib/file-roo
 
 import { taskRequiredRole } from "./capabilities";
 import { isFormalQaTask } from "./qa";
+import { isTaskWorkflowBlocked } from "./office-task-controls";
+export {
+  isTaskWorkflowBlocked,
+  resolveBlockedTaskGuidance,
+  shouldOfferReassignControl,
+} from "./office-task-controls";
 import type { FileRoomQaHistoryEntry, FileRoomTaskQaSummary } from "./file-room-controls";
 import type {
   CampaignTaskItem,
@@ -26,6 +32,13 @@ export type OfficeQueueTaskRow = FileRoomTaskRow & {
   isWrongRole: boolean;
   /** Work body and handoffs are read-only for the viewer. */
   isReadOnly: boolean;
+  /** QA office queue tier — actionable ready_for_qa vs de-emphasized formal QA. */
+  queueTier?: "primary" | "secondary";
+};
+
+export type QaOfficeQueueView = OfficeQueueView & {
+  primaryTasks: readonly OfficeQueueTaskRow[];
+  secondaryTasks: readonly OfficeQueueTaskRow[];
 };
 
 export type OfficeQueueView = {
@@ -162,6 +175,7 @@ export function isOfficeTaskReadOnly(
   canEditTask: boolean,
   matchRole: (row: FileRoomTaskRow, role: ProductionRole) => boolean = isOfficeRoleTask,
 ): boolean {
+  if (isTaskWorkflowBlocked(row)) return true;
   if (!matchRole(row, officeRole)) return true;
   return !canEditTask;
 }
@@ -198,13 +212,18 @@ export function filterOfficeQueueTasks(
   };
 }
 
+function qaQueueTierForRow(row: FileRoomTaskRow): "primary" | "secondary" {
+  if (row.workflowState === "ready_for_qa") return "primary";
+  return "secondary";
+}
+
 export function filterQaOfficeQueueTasks(
   productionTasks: FileRoomProductionTasksView,
   options: {
     canEditForTask: (task: CampaignTaskItem) => boolean;
     deepLinkTaskId?: string | null;
   },
-): OfficeQueueView {
+): QaOfficeQueueView {
   const officeRole: ProductionRole = "qa";
   const defaultQueue = productionTasks.tasks.filter(isQaOfficeQueueTask);
 
@@ -216,13 +235,24 @@ export function filterQaOfficeQueueTasks(
     }
   }
 
-  const tasks: OfficeQueueTaskRow[] = queueRows.map((row) =>
-    toOfficeQueueRow(row, officeRole, options.canEditForTask, () => true),
-  );
+  const primarySource = queueRows.filter((row) => row.workflowState === "ready_for_qa");
+  const secondarySource = queueRows.filter((row) => row.workflowState !== "ready_for_qa");
+  const orderedRows = [...primarySource, ...secondarySource];
+
+  const toQaRow = (row: FileRoomTaskRow): OfficeQueueTaskRow => ({
+    ...toOfficeQueueRow(row, officeRole, options.canEditForTask, () => true),
+    queueTier: qaQueueTierForRow(row),
+  });
+
+  const primaryTasks = primarySource.map(toQaRow);
+  const secondaryTasks = secondarySource.map(toQaRow);
+  const tasks = orderedRows.map(toQaRow);
 
   return {
     officeRole,
     tasks,
+    primaryTasks,
+    secondaryTasks,
     isEmpty: tasks.length === 0,
   };
 }

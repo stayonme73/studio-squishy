@@ -7,6 +7,7 @@ import { campaignTasksConfig, formatBlockedReasonDisplay } from "@/config/campai
 import { campaignExceptionsConfig } from "@/config/campaign-exceptions";
 import { teamOffices } from "@/config/team-offices";
 import { resolveFileRoomProductionWorkPanelView } from "@/lib/campaign-production/production-view";
+import { resolveBlockedTaskGuidance, isTaskWorkflowBlocked, shouldOfferReassignControl } from "@/lib/campaign-tasks/office-task-controls";
 import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 import type { FileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room-controls-types";
 import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
@@ -28,6 +29,10 @@ import FileRoomTaskHandoffPanel, {
 export type FileRoomProductionOfficeMode = {
   readOnly: boolean;
   hideQaActions: boolean;
+  /** Hide reassign in production offices — producer and File Room full view keep it. */
+  hideReassign?: boolean;
+  /** Producer dispatch: show claim/submit/reassign while work body stays read-only. */
+  allowHandoffDespiteReadOnly?: boolean;
   submitLabel?: string;
   singleTask?: FileRoomTaskRow;
 };
@@ -105,12 +110,19 @@ function TaskRow({
       catalogFamilyId: "social_media",
       serviceName: task.serviceName,
       dependsOn: [],
+      workflowState: task.workflowState,
+      blockedReason: task.blockedReason ?? undefined,
+      responsibleRole: task.responsibleRole,
+      assignedRole: task.assignedRole,
     };
   }, [task]);
 
   const officeReadOnly = officeMode?.readOnly ?? false;
+  const isTaskBlocked = isTaskWorkflowBlocked(task);
+  const blockedGuidance = resolveBlockedTaskGuidance(task);
 
-  const canEditWork = (canEditWorkByTaskId?.[task.id] ?? false) && !officeReadOnly;
+  const canEditWork =
+    (canEditWorkByTaskId?.[task.id] ?? false) && !officeReadOnly && !isTaskBlocked;
 
   const productionWorkView = resolveFileRoomProductionWorkPanelView(
     localProductionEnvelope,
@@ -167,12 +179,13 @@ function TaskRow({
 
   const showHandoffControls =
     canOperate &&
-    !officeReadOnly &&
+    (!officeReadOnly || officeMode?.allowHandoffDespiteReadOnly) &&
+    !isTaskBlocked &&
     localWorkflow !== "ready_for_qa" &&
     (task.permissions.canClaim ||
       task.permissions.canRelease ||
       task.permissions.canSubmitHandoff ||
-      task.permissions.canReassign);
+      shouldOfferReassignControl(task.permissions.canReassign, officeMode));
 
   const showQaControls =
     !officeMode?.hideQaActions &&
@@ -496,11 +509,17 @@ function TaskRow({
           ) : null}
         </div>
       ) : null}
-      {localBlockedReason ? (
+      {localBlockedReason && !blockedGuidance ? (
         <p className="fr-tasks-row__block-reason">{localBlockedReason}</p>
       ) : null}
+      {blockedGuidance ? (
+        <div className="fr-tasks-row__block-guidance" role="status">
+          <p className="fr-tasks-row__block-reason">{blockedGuidance.reason}</p>
+          <p className="fr-tasks-row__meta">{blockedGuidance.nextAction}</p>
+        </div>
+      ) : null}
 
-      {officeReadOnly ? (
+      {officeReadOnly && !isTaskBlocked ? (
         <p className="fr-tasks-row__meta" role="status">
           {teamOffices.wrongRoleReadOnlyLabel}
         </p>
@@ -593,7 +612,7 @@ function TaskRow({
                 {campaignTasksConfig.releaseLabel}
               </button>
             ) : null}
-            {task.permissions.canReassign ? (
+            {shouldOfferReassignControl(task.permissions.canReassign, officeMode) ? (
               <button
                 type="button"
                 className="utility-btn"

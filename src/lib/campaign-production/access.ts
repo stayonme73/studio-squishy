@@ -60,12 +60,14 @@ export function canEditKitchenWorkForTask(
   if (!isKitchenV1ProductionTask(task)) return false;
   if (!canOperateProductionWork(user, campaignId, undefined, assignments)) return false;
 
+  const workflow = task.workflowState ?? "unstarted";
+  if (workflow === "blocked" || task.status === "blocked") return false;
+
   if (isOwnerUser(user)) return true;
 
   const requiredRole = taskRequiredRole(task);
   if (!userCanPerformRole(user, requiredRole, assignments)) return false;
 
-  const workflow = task.workflowState ?? "unstarted";
   if (!EDITABLE_WORKFLOW.has(workflow)) return false;
 
   if (task.claimedByUserId !== user.id) return false;

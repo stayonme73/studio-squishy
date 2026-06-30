@@ -1,4 +1,5 @@
 import { campaignProductionConfig } from "@/config/campaign-production";
+import { formatBlockedReasonDisplay } from "@/config/campaign-tasks";
 import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
 
 import { resolveDefaultVersionReason } from "./actions";
@@ -117,13 +118,21 @@ export function resolveFileRoomProductionWorkPanelView(
     ? envelope.versions.find((version) => version.id === currentVersionId)
     : undefined;
 
+  const isTaskBlocked =
+    task.status === "blocked" || task.workflowState === "blocked";
+
   const isBlocked =
+    isTaskBlocked ||
     unit.status === "blocked_plan_change" ||
     unit.status === "superseded" ||
     unit.currentTaskId !== task.id;
 
   let blockedMessage: string | null = null;
-  if (unit.status === "blocked_plan_change") {
+  if (isTaskBlocked) {
+    blockedMessage =
+      formatBlockedReasonDisplay(task.blockedReason ?? task.workflowBlockedReason) ??
+      campaignProductionConfig.blockedPlanChangeMessage;
+  } else if (unit.status === "blocked_plan_change") {
     blockedMessage = campaignProductionConfig.blockedPlanChangeMessage;
   } else if (unit.status === "superseded") {
     blockedMessage = campaignProductionConfig.supersededMessage;

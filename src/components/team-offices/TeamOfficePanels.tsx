@@ -37,28 +37,58 @@ export function OfficeQueuePanel({
     );
   }
 
+  const isQaOffice = officeSlug === "qa";
+  const primaryTasks = isQaOffice
+    ? tasks.filter((task) => task.queueTier !== "secondary")
+    : tasks;
+  const secondaryTasks = isQaOffice
+    ? tasks.filter((task) => task.queueTier === "secondary")
+    : [];
+
+  const renderQueueItems = (queueTasks: readonly OfficeQueueTaskRow[]) =>
+    queueTasks.map((task) => {
+      const isSelected = task.id === selectedTaskId;
+      const href = `/file-room/${campaignId}/office/${officeSlug}?task=${encodeURIComponent(task.id)}`;
+      const isSecondary = task.queueTier === "secondary";
+      return (
+        <li key={task.id}>
+          <Link
+            className={`fr-office-queue__item${isSelected ? " fr-office-queue__item--selected" : ""}${isSecondary ? " fr-office-queue__item--secondary" : ""}`}
+            href={href}
+          >
+            <span className="fr-office-queue__title">{task.title}</span>
+            <span className="fr-office-queue__meta">{task.statusLabel}</span>
+            {task.isWrongRole ? (
+              <span className="fr-office-queue__badge">Other role</span>
+            ) : null}
+          </Link>
+        </li>
+      );
+    });
+
   return (
     <FileRoomSectionCard title={title}>
-      <ul className="fr-office-queue">
-        {tasks.map((task) => {
-          const isSelected = task.id === selectedTaskId;
-          const href = `/file-room/${campaignId}/office/${officeSlug}?task=${encodeURIComponent(task.id)}`;
-          return (
-            <li key={task.id}>
-              <Link
-                className={`fr-office-queue__item${isSelected ? " fr-office-queue__item--selected" : ""}`}
-                href={href}
-              >
-                <span className="fr-office-queue__title">{task.title}</span>
-                <span className="fr-office-queue__meta">{task.statusLabel}</span>
-                {task.isWrongRole ? (
-                  <span className="fr-office-queue__badge">Other role</span>
-                ) : null}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      {isQaOffice && primaryTasks.length > 0 ? (
+        <div className="fr-office-queue-section">
+          <p className="fr-office-queue-section__title">{teamOffices.qaQueuePrimaryTitle}</p>
+          <ul className="fr-office-queue">{renderQueueItems(primaryTasks)}</ul>
+        </div>
+      ) : null}
+
+      {isQaOffice && secondaryTasks.length > 0 ? (
+        <div className="fr-office-queue-section fr-office-queue-section--secondary">
+          <p className="fr-office-queue-section__title">{teamOffices.qaQueueSecondaryTitle}</p>
+          <ul className="fr-office-queue fr-office-queue--secondary">
+            {renderQueueItems(secondaryTasks)}
+          </ul>
+        </div>
+      ) : null}
+
+      {!isQaOffice ? <ul className="fr-office-queue">{renderQueueItems(tasks)}</ul> : null}
+
+      {isQaOffice && primaryTasks.length === 0 && secondaryTasks.length === 0 ? (
+        <p className="fr-tasks-empty__body">{emptyBody}</p>
+      ) : null}
     </FileRoomSectionCard>
   );
 }

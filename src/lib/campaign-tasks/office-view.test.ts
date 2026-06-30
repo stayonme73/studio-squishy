@@ -10,10 +10,13 @@ import {
   filterOfficeQueueTasks,
   filterQaOfficeQueueTasks,
   isOfficeTaskReadOnly,
+  isTaskWorkflowBlocked,
+  resolveBlockedTaskGuidance,
   resolveOfficeDownstreamStatus,
   resolveOfficeSelectedTask,
   resolveOfficeStrategyContext,
   resolveProducerDispatchView,
+  shouldOfferReassignControl,
 } from "./office-view";
 
 const now = "2026-06-30T12:00:00.000Z";
@@ -346,7 +349,34 @@ describe("office-view", () => {
     };
 
     const queue = filterQaOfficeQueueTasks(view, { canEditForTask: () => false });
-    expect(queue.tasks.map((task) => task.id).sort()).toEqual(["sm-001:copy", "sm-001:qa"]);
+    expect(queue.tasks.map((task) => task.id)).toEqual(["sm-001:copy", "sm-001:qa"]);
+    expect(queue.primaryTasks.map((task) => task.id)).toEqual(["sm-001:copy"]);
+    expect(queue.secondaryTasks.map((task) => task.id)).toEqual(["sm-001:qa"]);
+    expect(queue.tasks[0]?.queueTier).toBe("primary");
+    expect(queue.tasks[1]?.queueTier).toBe("secondary");
+  });
+
+  it("hides reassign in production offices via shouldOfferReassignControl", () => {
+    expect(shouldOfferReassignControl(true)).toBe(true);
+    expect(shouldOfferReassignControl(true, { hideReassign: true })).toBe(false);
+    expect(shouldOfferReassignControl(false, { hideReassign: false })).toBe(false);
+  });
+
+  it("marks blocked tasks read-only and surfaces guidance", () => {
+    const blocked = row("sm-001:creative", "creative_production", {
+      effectiveStatus: "blocked",
+      workflowState: "blocked",
+      status: "blocked",
+      statusLabel: "Blocked",
+    });
+    blocked.blockedReason = "compliance_hold";
+
+    expect(isTaskWorkflowBlocked(blocked)).toBe(true);
+    expect(isOfficeTaskReadOnly(blocked, "creative_production", true)).toBe(true);
+
+    const guidance = resolveBlockedTaskGuidance(blocked);
+    expect(guidance?.reason).toMatch(/compliance/i);
+    expect(guidance?.nextAction).toMatch(/owner review/i);
   });
 
   it("resolves strategy downstream as copy task", () => {

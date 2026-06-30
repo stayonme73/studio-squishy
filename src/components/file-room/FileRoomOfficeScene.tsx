@@ -79,6 +79,7 @@ export default function FileRoomOfficeScene({
               officeMode={{
                 readOnly: isQaMode ? true : selectedTask.isReadOnly,
                 hideQaActions: !isQaMode,
+                hideReassign: true,
                 submitLabel: "Submit to QA",
                 singleTask: selectedTask,
               }}

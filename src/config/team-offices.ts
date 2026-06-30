@@ -48,6 +48,12 @@ export const teamOffices = {
   producerNeedsRevisionTitle: "Needs revision",
   producerUnclaimedReadyTitle: "Unclaimed ready",
   producerDispatchEmpty: "No dispatch items for this campaign.",
+  blockedTaskDefaultReason: "Work is blocked.",
+  blockedTaskNextOwnerReview: "Next: Owner review required",
+  blockedTaskNextProducerReview: "Next: Producer / dispatcher review",
+  blockedTaskNextRoleAction: (roleLabel: string) => `Next: ${roleLabel} resolves blocker`,
+  qaQueuePrimaryTitle: "Ready for QA",
+  qaQueueSecondaryTitle: "Formal QA (not ready)",
   officeLeads: {
     strategy: "Strategy production queue for this campaign.",
     copy: "Copy production queue for this campaign.",

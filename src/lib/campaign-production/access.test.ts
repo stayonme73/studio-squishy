@@ -169,4 +169,31 @@ describe("canEditKitchenWorkForTask", () => {
       ),
     ).toBe(false);
   });
+
+  it("denies owner and staff edit when task workflow is blocked", () => {
+    const envelope = productionEnvelopeFrom(
+      syncProductionWithPlan(emptyProductionRecord("campaign-1", "fp"), campaign),
+    );
+    const unit = envelope.workUnits[0]!;
+    const blockedEnvelope = {
+      ...envelope,
+      workUnits: envelope.workUnits.map((entry) =>
+        entry.id === unit.id
+          ? { ...entry, currentStage: "copy" as const, currentTaskId: "sm-001:copy" }
+          : entry,
+      ),
+    };
+    const blockedCopy = copyTask({
+      status: "blocked",
+      workflowState: "blocked",
+      claimedByUserId: "copy-staff",
+    });
+
+    expect(
+      canEditKitchenWorkForTask(ownerUser, blockedCopy, assignments, "campaign-1", blockedEnvelope),
+    ).toBe(false);
+    expect(
+      canEditKitchenWorkForTask(copyStaff, blockedCopy, assignments, "campaign-1", blockedEnvelope),
+    ).toBe(false);
+  });
 });
