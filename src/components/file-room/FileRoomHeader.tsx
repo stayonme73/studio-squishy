@@ -56,6 +56,8 @@ export default function FileRoomHeader({
         {ownerConsoleLinkVisible ? (
           <p className="fr-header__meta">
             <Link href={OWNER_CONSOLE_ROUTE}>Owner Console</Link>
+            {" · "}
+            <Link href="/file-room/studio-self-test">Studio Self-Test</Link>
           </p>
         ) : null}
         {officeLinks.length > 0 ? (
