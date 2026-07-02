@@ -44,7 +44,11 @@ export default function CampaignJourneyRoadmap({ campaign }: Props) {
               <span className="sb-journey__label">{step.label}</span>
           {step.state === "current" && !step.actionLabel ? (
                 <span className="sb-journey__detail">
-                  {step.id === "review" ? studioBoard.nextAction.conceptsReadyLabel : "In progress"}
+                  {step.id === "building"
+                    ? studioBoard.nextAction.buildingConceptsLabel
+                    : step.id === "review"
+                      ? studioBoard.nextAction.conceptsReadyLabel
+                      : "In progress"}
                 </span>
               ) : null}
             </div>

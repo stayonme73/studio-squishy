@@ -1,13 +1,12 @@
 import RouteMapScene from "@/components/route-map/RouteMapScene";
 
-import "../studio-utility-backdrop.css";
-import "../utility-design-system.css";
+import "../mobile-route-fixes.css";
 import "./route-map.css";
 
-/** Studio Route Map V1 — interactive front door (lane → road → job → payment → intake). */
+/** Studio Route Map V1 — full-viewport immersive front door (no utility header chrome). */
 export default function RouteMapPage() {
   return (
-    <main className="flex min-h-[100dvh] flex-1 flex-col">
+    <main className="route-map-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden">
       <RouteMapScene />
     </main>
   );

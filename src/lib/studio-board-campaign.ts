@@ -105,9 +105,22 @@ function migrateCampaignStatus(status: string): CampaignStatus {
 }
 
 function normalizeCampaignRecord(raw: CampaignRecord): CampaignRecord {
-  const campaignStatus = migrateCampaignStatus(raw.campaignStatus as string);
-  if (campaignStatus === raw.campaignStatus) return raw;
-  return { ...raw, campaignStatus };
+  let campaignStatus = migrateCampaignStatus(raw.campaignStatus as string);
+  let campaign = campaignStatus === raw.campaignStatus ? raw : { ...raw, campaignStatus };
+
+  if (campaign.routeMapContext && campaign.paymentReceivedAt) {
+    if (campaign.routeMapIntakeSubmittedAt && campaign.campaignStatus === "PAYMENT_RECEIVED") {
+      campaign = enterBuildingConcepts(campaign);
+    } else if (
+      !campaign.routeMapIntakeSubmittedAt &&
+      (campaign.campaignStatus === "BUILDING_CONCEPTS" ||
+        campaign.campaignStatus === "READY_FOR_REVIEW")
+    ) {
+      campaign = campaignWithStatus(campaign, "PAYMENT_RECEIVED");
+    }
+  }
+
+  return campaign;
 }
 
 function campaignNameFromProject(project: string) {

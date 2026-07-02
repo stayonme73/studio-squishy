@@ -6,11 +6,15 @@ type Props = {
   job: RouteMapJob;
   onChoose: () => void;
   onBack: () => void;
+  variant?: "inline" | "overlay";
 };
 
-export default function RouteMapJobCard({ job, onChoose, onBack }: Props) {
+export default function RouteMapJobCard({ job, onChoose, onBack, variant = "inline" }: Props) {
   return (
-    <article className="route-map-job-card" aria-labelledby="route-map-job-title">
+    <article
+      className={`route-map-job-card${variant === "overlay" ? " route-map-job-card--overlay" : ""}`}
+      aria-labelledby="route-map-job-title"
+    >
       <button type="button" className="route-map-back-link" onClick={onBack}>
         ← Back to route stops
       </button>

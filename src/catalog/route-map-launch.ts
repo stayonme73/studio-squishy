@@ -127,7 +127,7 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
     priceCents: 65000,
     productionLane: "quick_turn",
     purpose:
-      "For a client who is unclear, scattered, or asking us to look at everything.",
+      "Not sure where to begin? We'll help you choose the right first job.",
     deliverables: [
       "Review what you are trying to do and what you already have",
       "Identify the first paid job that fits",

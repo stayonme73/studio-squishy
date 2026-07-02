@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * @deprecated Archived 2026-07-01 — superseded by RouteMapRoutePanel overlay.
+ * See src/archive/route-map-visual/README.md
+ */
+
 import type { CSSProperties } from "react";
 
 import {
@@ -7,25 +12,15 @@ import {
   getRouteMapRoad,
   getRouteStartJob,
   ROUTE_MAP_V1,
-  type RouteMapIntakeType,
   type RouteMapJob,
   type RouteMapRoadId,
 } from "@/config/route-map-v1";
+import { ROUTE_MAP_STOP_ICONS } from "@/config/route-map-icons";
 
 type Props = {
   roadId: RouteMapRoadId;
-  onSelectJob: (job: RouteMapJob) => void;
+  onSelectJob: (job: RouteMapJob, roadId?: RouteMapRoadId) => void;
   onBack: () => void;
-};
-
-const STOP_ICONS: Record<RouteMapIntakeType, string> = {
-  discovery: "◎",
-  "social-setup": "◉",
-  promotion: "▶",
-  video: "▷",
-  page: "▣",
-  voice: "♫",
-  update: "↻",
 };
 
 function StopTile({
@@ -43,7 +38,7 @@ function StopTile({
         {index + 1}
       </span>
       <span className="route-map-stop__icon" aria-hidden>
-        {STOP_ICONS[job.intakeType]}
+        {ROUTE_MAP_STOP_ICONS[job.intakeType]}
       </span>
       <span className="route-map-stop__body">
         <span className="route-map-stop__name">{job.name}</span>
@@ -76,7 +71,7 @@ function RouteStartOption({
       <p className="route-map-route-start__prompt">{prompt}</p>
       <button type="button" className="route-map-route-start__btn" onClick={onSelect}>
         <span className="route-map-route-start__icon" aria-hidden>
-          {STOP_ICONS[routeStart.intakeType]}
+          {ROUTE_MAP_STOP_ICONS[routeStart.intakeType]}
         </span>
         <span className="route-map-route-start__body">
           <span className="route-map-route-start__name">{routeStart.name}</span>
@@ -101,7 +96,7 @@ export default function RouteMapRoadView({ roadId, onSelectJob, onBack }: Props)
   if (!road) return null;
 
   const handleRouteStart = () => {
-    if (routeStart) onSelectJob(routeStart);
+    if (routeStart) onSelectJob(routeStart, roadId);
   };
 
   if (roadId === "random-exit") {
@@ -118,7 +113,7 @@ export default function RouteMapRoadView({ roadId, onSelectJob, onBack }: Props)
         <ol className="route-map-stops route-map-stops--shelf">
           {jobs.map((job, index) => (
             <li key={job.id}>
-              <StopTile job={job} index={index} onSelect={() => onSelectJob(job)} />
+              <StopTile job={job} index={index} onSelect={() => onSelectJob(job, roadId)} />
             </li>
           ))}
         </ol>

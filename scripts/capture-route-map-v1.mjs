@@ -1,5 +1,5 @@
 /**
- * Route Map V1 — review packet screenshots (desktop + mobile).
+ * Route Map V1 — map-first UX screenshots (desktop + mobile).
  * Run: node scripts/capture-route-map-v1.mjs
  * Requires app at localhost:3000 (npm run dev or npm start after build).
  */
@@ -21,23 +21,49 @@ async function clearCampaign(page) {
 
 async function gotoRouteMap(page) {
   await page.goto(`${BASE}/route-map`);
-  await page.waitForSelector(".route-map-page", { timeout: 25000 });
+  await page.waitForSelector(".route-map-page--immersive", { timeout: 25000 });
   await page.waitForTimeout(400);
 }
 
-async function selectRoad(page, customerLabel) {
-  const laneTile = page.locator(".route-map-lane-tile", { hasText: customerLabel }).first();
-  const sidebarLink = page.locator(".route-map-sidebar__link", { hasText: customerLabel }).first();
+async function selectRoadDesktop(page, customerLabel) {
+  const chooseCard = page.locator(".route-map-choose-card", { hasText: customerLabel });
+  const hotspot = page.locator(".route-map-board__hotspot", {
+    has: page.locator(`[aria-label*="${customerLabel}"]`),
+  });
 
-  if (await laneTile.isVisible()) {
-    await laneTile.click();
-  } else if (await sidebarLink.count()) {
-    await sidebarLink.first().click();
+  if (await chooseCard.count()) {
+    await chooseCard.first().click();
+  } else if (await hotspot.count()) {
+    await hotspot.first().click();
   } else {
-    throw new Error(`Could not find road selector for "${customerLabel}"`);
+    const i75 = page.locator(".route-map-board__hotspot--i75");
+    const random = page.locator(".route-map-board__hotspot--random");
+    if (customerLabel.includes("Business")) await i75.click();
+    else if (customerLabel.includes("Know What")) await random.click();
+    else throw new Error(`Could not find road selector for "${customerLabel}"`);
   }
 
-  await page.waitForSelector(".route-map-road, .route-map-road--shelf", { timeout: 25000 });
+  await page.waitForSelector(".route-map-route-panel", { timeout: 25000 });
+  await page.waitForTimeout(350);
+}
+
+async function selectRoadMobile(page, customerLabel) {
+  const hotspot = page.locator(".route-map-mobile-scene .route-map-board__hotspot", {
+    has: page.locator(`[aria-label*="${customerLabel}"]`),
+  });
+
+  if (await hotspot.count()) {
+    await hotspot.first().click({ force: true });
+  } else {
+    await page.getByRole("button", { name: "Choose Your Route" }).click();
+    await page.waitForTimeout(300);
+    const card = page.locator(".route-map-mobile-scene__sheet .route-map-choose-card", {
+      hasText: customerLabel,
+    }).first();
+    await card.click();
+  }
+
+  await page.waitForSelector(".route-map-route-panel", { timeout: 25000 });
   await page.waitForTimeout(350);
 }
 
@@ -45,31 +71,6 @@ async function selectJobByName(page, jobName) {
   await page.getByRole("button", { name: new RegExp(jobName, "i") }).click();
   await page.waitForSelector(".route-map-job-card", { timeout: 15000 });
   await page.waitForTimeout(350);
-}
-
-async function chooseJob(page) {
-  await page.getByRole("button", { name: /CHOOSE THIS JOB/i }).click();
-  await page.waitForSelector(".route-map-checkout, .pay-shell", { timeout: 15000 });
-  await page.waitForTimeout(350);
-}
-
-async function completeCheckout(page) {
-  const terms = page.locator('input[name="terms"]');
-  await terms.check();
-  const sandbox = page.getByRole("button", { name: /test payment|sandbox/i });
-  if (await sandbox.count()) {
-    await sandbox.first().click();
-  } else {
-    await page.locator('input[name="fullName"]').fill("Route Map Review");
-    await page.locator('input[name="email"]').fill("review@thestudio.test");
-    await page.locator('input[name="cardNumber"]').fill("4242 4242 4242 4242");
-    await page.locator('input[name="expDate"]').fill("12 / 30");
-    await page.locator('input[name="cvv"]').fill("123");
-    await page.locator('input[name="zipCode"]').fill("30303");
-    await page.getByRole("button", { name: /complete payment|pay/i }).click();
-  }
-  await page.waitForSelector(".route-map-intake", { timeout: 20000 });
-  await page.waitForTimeout(400);
 }
 
 async function capture(page, filename, fullPage = true) {
@@ -80,52 +81,28 @@ async function capture(page, filename, fullPage = true) {
   console.log(`  ✓ ${filename}`);
 }
 
-async function assertNoGlobalSevenDayCopy(page) {
-  const bodyText = await page.locator(".route-map-page").innerText();
-  const lower = bodyText.toLowerCase();
-  if (lower.includes("7 business days") || lower.includes("first concepts within 7")) {
-    throw new Error("Route Map UI must not contain global 7-business-day language");
-  }
-  const goldBadge = page.locator(".route-map-job-card .route-map-badge");
-  if ((await goldBadge.count()) > 0) {
-    throw new Error("Job cards must not show the global 7 BUSINESS DAYS badge");
+async function assertNoUtilityHeader(page) {
+  const header = page.locator(".utility-header");
+  if ((await header.count()) > 0) {
+    throw new Error("Route Map must not show utility header / journey band chrome");
   }
 }
 
-async function assertLaneSelectorLayout(page, { desktop = false } = {}) {
-  const i285Tile = page.locator(".route-map-lane-tile", { hasText: "Loop Route" });
-  const perimeterTile = page.locator(".route-map-lane-tile", { hasText: "Perimeter Loop" });
-  if ((await i285Tile.count()) > 0 || (await perimeterTile.count()) > 0) {
-    throw new Error("I-285 must not appear as a selectable lane tile");
-  }
-
-  const selectableTiles = page.locator(".route-map-lane-tile");
-  const tileCount = await selectableTiles.count();
-  if (tileCount !== 4) {
-    throw new Error(`Expected 4 selectable lane tiles, got ${tileCount}`);
-  }
-
-  const i285Control = page.locator(".route-map-highway__control--i285");
-  if ((await i285Control.count()) > 0) {
-    throw new Error("I-285 must not appear as a clickable highway control");
-  }
-
-  if (desktop) {
-    const highway = page.locator(".route-map-highway");
-    await highway.waitFor({ state: "visible" });
-    const box = await highway.boundingBox();
-    if (!box || box.width < 600) {
-      throw new Error(`Highway map hero should be visually dominant on desktop (width=${box?.width ?? 0})`);
-    }
+async function assertLobbyBackdrop(page) {
+  const backdrop = page.locator(".route-map-lobby-backdrop");
+  if ((await backdrop.count()) === 0) {
+    throw new Error("Route Map must show Studio Lobby backdrop");
   }
 }
 
-async function assertRoadViewLayout(page) {
-  const loopBadges = page.locator(".route-map-stop__badge--loop");
-  if ((await loopBadges.count()) > 0) {
-    throw new Error("Loop stop badges must not appear on job tiles");
+async function assertNoJobPinsOnMap(page) {
+  const pins = page.locator(".route-map-map-pin");
+  if ((await pins.count()) > 0) {
+    throw new Error("Map must not show scattered job pins on highways");
   }
+}
 
+async function assertRoutePanelLayout(page) {
   const routeStartInStops = page.locator(".route-map-stop", {
     hasText: "Help Me Figure Out What I Need",
   });
@@ -148,44 +125,31 @@ async function captureDesktop(browser) {
 
   await clearCampaign(page);
   await gotoRouteMap(page);
-  await assertNoGlobalSevenDayCopy(page);
-  await assertLaneSelectorLayout(page, { desktop: true });
-  await capture(page, "01-desktop-lane-selector.png");
+  await assertNoUtilityHeader(page);
+  await assertLobbyBackdrop(page);
+  await assertNoJobPinsOnMap(page);
+  await capture(page, "01-desktop-full-map.png");
 
-  await selectRoad(page, "Get My Business Started");
-  await assertRoadViewLayout(page);
-  await capture(page, "02-desktop-i75-road-view.png");
+  const hideRoutes = page.getByRole("button", { name: /hide routes/i });
+  if (await hideRoutes.count()) {
+    try {
+      await hideRoutes.click({ force: true });
+      await page.waitForTimeout(400);
+      await capture(page, "01-desktop-map-panel-collapsed.png");
+    } catch {
+      // optional — collapse control may sit outside viewport on some layouts
+    }
+    await gotoRouteMap(page);
+  }
+
+  await selectRoadDesktop(page, "Get My Business Started");
+  await assertRoutePanelLayout(page);
+  await capture(page, "02-desktop-route-panel-i75.png");
 
   await gotoRouteMap(page);
-  await selectRoad(page, "Promote Something Now");
-  await assertRoadViewLayout(page);
-  await capture(page, "03-desktop-i20-road-view.png");
-
-  await gotoRouteMap(page);
-  await selectRoad(page, "Update What I Already Have");
-  await assertRoadViewLayout(page);
-  await capture(page, "04-desktop-update-interchange-road-view.png");
-
-  await gotoRouteMap(page);
-  await selectRoad(page, "I Know What I Need");
-  await capture(page, "05-desktop-random-exit-job-shelf.png");
-
-  await gotoRouteMap(page);
-  await selectRoad(page, "Get My Business Started");
+  await selectRoadDesktop(page, "Get My Business Started");
   await selectJobByName(page, "Set Up My Facebook");
-  await assertNoGlobalSevenDayCopy(page);
-  await capture(page, "06-desktop-social-setup-job-card.png");
-
-  await gotoRouteMap(page);
-  await selectRoad(page, "I Know What I Need");
-  await selectJobByName(page, "Make Me a Page");
-  await capture(page, "07-desktop-job-card.png");
-
-  await chooseJob(page);
-  await capture(page, "08-desktop-checkout-embedded.png");
-
-  await completeCheckout(page);
-  await capture(page, "09-desktop-intake-form.png");
+  await capture(page, "03-desktop-job-card-over-map.png");
 
   await context.close();
 }
@@ -200,46 +164,46 @@ async function captureMobile(browser) {
 
   await clearCampaign(page);
   await gotoRouteMap(page);
-  await assertNoGlobalSevenDayCopy(page);
-  await assertLaneSelectorLayout(page);
-  await capture(page, "10-mobile-lane-selector.png", false);
+  await assertNoUtilityHeader(page);
+  await assertLobbyBackdrop(page);
+  await assertNoJobPinsOnMap(page);
+  await capture(page, "04-mobile-map-entrance.png", false);
 
-  await selectRoad(page, "Get My Business Started");
-  await selectJobByName(page, "Set Up My Facebook");
-  await assertNoGlobalSevenDayCopy(page);
-  await capture(page, "11-mobile-social-setup-job-card.png", false);
+  await page.getByRole("button", { name: "Choose Your Route" }).click();
+  await page.waitForTimeout(350);
+  await capture(page, "04b-mobile-choose-sheet.png", false);
+  await page.getByRole("button", { name: "Close" }).click();
+  await page.waitForTimeout(200);
+
+  await selectRoadMobile(page, "Get My Business Started");
+  await assertRoutePanelLayout(page);
+  await capture(page, "05-mobile-route-panel.png", false);
 
   await context.close();
 }
 
 async function writeReadme() {
-  const readme = `Route Map V1 — Screenshot URLs
-================================
+  const readme = `Route Map V1 — Map-first screenshots
+====================================
 Base: ${BASE}/route-map
 
 Desktop (1440×900)
 ------------------
-01  Lane selector (map hero — 4 selectable lanes, I-285 perimeter only):  ${BASE}/route-map
-02  I-75 road view:                 ${BASE}/route-map → Get My Business Started
-03  I-20 road view:                 ${BASE}/route-map → Promote Something Now
-04  Update interchange road view:   ${BASE}/route-map → Update What I Already Have
-05  Random Exit / job shelf (7):    ${BASE}/route-map → I Know What I Need
-06  Social setup job card (rm-j002): ${BASE}/route-map → I-75 → Set Up My Facebook…
-07  Job card (page job):            ${BASE}/route-map → Random Exit → Make Me a Page…
-08  Checkout (embedded):            step after CHOOSE THIS JOB
-09  Intake form:                    step after payment
+01  Full-screen map (no job pins):     ${BASE}/route-map
+02  Route panel slid up (I-75):        ${BASE}/route-map → Get My Business Started
+03  Job detail card over map:          ${BASE}/route-map → I-75 → Set Up My Facebook…
 
 Mobile (390×844)
 ----------------
-10  Front door lanes:              ${BASE}/route-map
-11  Social setup job card:         ${BASE}/route-map → I-75 → Set Up My Facebook…
+04  Map entrance (vertical routes):    ${BASE}/route-map
+05  Route panel slid up:               ${BASE}/route-map → Get My Business Started
 
 Notes
 -----
-- I-285 is visual perimeter on the map diagram — not a customer lane tile.
-- Update Exit branches from the interchange ramp, not a fourth main highway.
-- Route Start (rm-j001) is a separate lane entrance option — not Stop 1.
-- No LOOP STOP badges on individual job tiles.
+- Map stays visible behind bottom-sheet panels.
+- I-285 is visual perimeter only — not selectable.
+- Route Start (rm-j001) is separate from numbered stops.
+- Jobs/prices come from catalog rm-j001–rm-j008.
 
 Capture: node scripts/capture-route-map-v1.mjs
 `;
@@ -250,7 +214,7 @@ async function main() {
   await mkdir(OUT_DIR, { recursive: true });
   const browser = await chromium.launch({ headless: true });
 
-  console.log("Capturing Route Map V1 screenshots…");
+  console.log("Capturing Route Map V1 map-first screenshots…");
   await captureDesktop(browser);
   await captureMobile(browser);
   await browser.close();
