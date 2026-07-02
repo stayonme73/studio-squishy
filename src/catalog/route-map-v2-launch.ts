@@ -84,6 +84,25 @@ const V2_DRAFT_BY_SKU = new Map<string, CatalogV2ServiceEntry>(
   ]),
 );
 
+/** Customer-facing purpose lines for Route Map shelf cards — never scopeRoutingNote or internal routing. */
+const ROUTE_MAP_V2_CUSTOMER_PURPOSE: Record<string, string> = {
+  "v2-rtu-flyer": "One finished single-sided flyer you can print or share online.",
+  "v2-rtu-menu": "One single-page menu with your items and prices, ready to print.",
+  "v2-rtu-service-sheet": "One page listing your services for customers to read.",
+  "v2-rtu-social-posts": "Four social post graphics with captions for one platform.",
+  "v2-rtu-promotion-graphics": "Two branded graphics for one campaign or promotion.",
+  "v2-rtu-email-kit": "Up to two finished emails ready for you to send.",
+  "v2-rtu-sms-kit": "Up to four text messages ready for you to send.",
+  "v2-rtu-voice": "One short voice announcement we write and produce for you.",
+  "v2-rtu-short-video": "One short video edit with captions, ready for you to post.",
+  "v2-addon-post-publish":
+    "We schedule or publish one finished piece on one connected platform for you.",
+};
+
+function customerPurposeForV2Sku(sku: string, draft: CatalogV2ServiceEntry): string {
+  return ROUTE_MAP_V2_CUSTOMER_PURPOSE[sku] ?? draft.clientFacingName;
+}
+
 const SERVICE_CLASS_BY_CATEGORY: Partial<Record<ServiceCategoryId, ServiceClass>> = {
   "marketing-assets": "core",
   "social-media": "core",
@@ -162,7 +181,7 @@ function routeMapV2ServiceFromDraft(
     productionLane: draft.productionLane,
     firstReviewWindow: timing.firstReviewWindow,
     finalDeliveryWindow: timing.finalDeliveryWindow,
-    purpose: draft.scopeRoutingNote ?? draft.clientFacingName,
+    purpose: customerPurposeForV2Sku(draft.sku, draft),
     deliverables,
     exclusions: [...draft.exclusions],
     revisionRule: REVISION_ONE_TIME,

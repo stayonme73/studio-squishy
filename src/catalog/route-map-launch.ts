@@ -164,7 +164,7 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
     purpose: "Social setup for one platform you already control.",
     deliverables: [
       "Profile image, bio/about, links/contact details, cover where applicable",
-      "One first post published",
+      "One first post prepared for you to publish from your account",
     ],
     exclusions: [
       "No account recovery, verification, or old-admin disputes",

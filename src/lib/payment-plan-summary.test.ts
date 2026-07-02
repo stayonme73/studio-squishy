@@ -93,7 +93,7 @@ describe("plan-pricing", () => {
 describe("card processing disclosure", () => {
   it("exposes the card processing disclosure note in payment config", () => {
     expect(payment.summary.cardProcessingDisclosureNote).toBe(
-      "A credit-card processing fee may apply. Any applicable fee and your final total will be shown before payment.",
+      "Taxes and standard processing costs are included in your total.",
     );
   });
 });
