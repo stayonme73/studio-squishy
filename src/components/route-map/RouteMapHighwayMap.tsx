@@ -11,6 +11,8 @@ import type { RouteMapRoadId } from "@/config/route-map-v1";
 type Props = {
   variant?: RouteMapHeroVariant;
   onSelectRoad: (roadId: RouteMapRoadId) => void;
+  /** When false, map art + highway markers only — no hotspot click targets. */
+  interactive?: boolean;
 };
 
 function HotspotMarker({
@@ -51,7 +53,11 @@ function HighwayMarker({ marker }: { marker: RouteMapHighwayMarker }) {
   );
 }
 
-export default function RouteMapHighwayMap({ variant = "desk-scene", onSelectRoad }: Props) {
+export default function RouteMapHighwayMap({
+  variant = "desk-scene",
+  onSelectRoad,
+  interactive = true,
+}: Props) {
   const hero = getRouteMapHeroConfig(variant);
   const isDesk = variant === "desk-scene";
 
@@ -88,11 +94,13 @@ export default function RouteMapHighwayMap({ variant = "desk-scene", onSelectRoa
           ))}
         </div>
 
-        <div className="route-map-hero__hotspots">
-          {hero.controls.map((control) => (
-            <HotspotMarker key={control.roadId} control={control} onSelectRoad={onSelectRoad} />
-          ))}
-        </div>
+        {interactive ? (
+          <div className="route-map-hero__hotspots">
+            {hero.controls.map((control) => (
+              <HotspotMarker key={control.roadId} control={control} onSelectRoad={onSelectRoad} />
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );
