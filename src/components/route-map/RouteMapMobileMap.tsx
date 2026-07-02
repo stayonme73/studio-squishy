@@ -41,7 +41,7 @@ export default function RouteMapMobileMap({ onSelectRoad, onSelectRouteStart }: 
   return (
     <div className="route-map-mobile-scene" role="group" aria-label="Studio Route Map">
       <div className="route-map-mobile-scene__map">
-        <RouteMapHighwayMap variant="cloverleaf" onSelectRoad={handleSelectRoad} />
+        <RouteMapHighwayMap variant="desk-scene" onSelectRoad={handleSelectRoad} />
       </div>
 
       <div className="route-map-mobile-scene__actions">

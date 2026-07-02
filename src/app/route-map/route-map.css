@@ -921,7 +921,13 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 }
 
 .route-map-mobile-scene__map .route-map-hero {
-  width: 100%;
+  width: min(100%, calc((100dvh - 12rem) * (1536 / 1024)));
+  max-height: calc(100dvh - 12rem);
+}
+
+.route-map-mobile-scene__map .route-map-hero--desk {
+  width: min(100%, calc((100dvh - 12rem) * (1536 / 1024)));
+  max-height: calc(100dvh - 12rem);
 }
 
 .route-map-mobile-scene__map .route-map-hero__art {

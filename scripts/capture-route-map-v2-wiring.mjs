@@ -102,13 +102,10 @@ async function captureLanePanels(browser) {
   await assertPanelExcludesJob(page, "Make and Post My Social Media Promotion");
   await capture(page, "04-desktop-random-exit-shelf.png");
 
-  await gotoRouteMap(page);
-  await capture(page, "05-desktop-choose-your-route-panel.png");
-
   await context.close();
 }
 
-async function captureMobileRandomExit(browser) {
+async function captureMobileHighwayLabels(browser) {
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,
@@ -117,21 +114,52 @@ async function captureMobileRandomExit(browser) {
   const page = await context.newPage();
   await clearCampaign(page);
   await gotoRouteMap(page);
-
-  const hotspot = page.locator(".route-map-mobile-scene .route-map-board__hotspot", {
-    has: page.locator('[aria-label*="I Know What I Need"]'),
+  await page.waitForSelector(".route-map-mobile-scene .route-map-highway-marker", {
+    state: "attached",
+    timeout: 15000,
   });
-  if (await hotspot.count()) {
-    await hotspot.first().click({ force: true });
-  } else {
-    await page.getByRole("button", { name: "Choose Your Route" }).click();
-    await page
-      .locator(".route-map-mobile-scene__sheet .route-map-choose-card", { hasText: ROAD_LABELS.random })
-      .first()
-      .click();
-  }
-  await page.waitForSelector(".route-map-route-panel", { timeout: 25000 });
-  await capture(page, "06-mobile-random-exit-shelf.png", false);
+  await page.waitForTimeout(500);
+  await capture(page, "00-mobile-map-highway-labels.png", false);
+  await context.close();
+}
+
+async function openJobCheckout(page, jobName, roadLabel) {
+  await gotoRouteMap(page);
+  await selectRoadDesktop(page, roadLabel);
+  await page.getByRole("button", { name: new RegExp(jobName.slice(0, 24), "i") }).click();
+  await page.waitForSelector(".route-map-job-card", { timeout: 15000 });
+  await page.getByRole("button", { name: /choose this job/i }).click();
+  await page.waitForSelector(".route-map-checkout-addon, .pay-paper-card", { timeout: 15000 });
+  await page.waitForTimeout(350);
+}
+
+async function captureV2PostPublishAddon(browser) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    deviceScaleFactor: 1,
+  });
+  const page = await context.newPage();
+  await clearCampaign(page);
+  await openJobCheckout(page, "Make My Social Media Posts", ROAD_LABELS.random);
+  const addon = page.locator(".route-map-checkout-addon");
+  await addon.waitFor({ timeout: 10000 });
+  await capture(page, "07-v2-job-post-publish-addon.png", false);
+  await context.close();
+}
+
+async function captureV1RmJ002JobFlow(browser) {
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    deviceScaleFactor: 1,
+  });
+  const page = await context.newPage();
+  await clearCampaign(page);
+  await gotoRouteMap(page);
+  await selectRoadDesktop(page, ROAD_LABELS.i75);
+  await page.getByRole("button", { name: /Set Up My Facebook/i }).click();
+  await page.waitForSelector(".route-map-job-card", { timeout: 15000 });
+  await page.waitForTimeout(350);
+  await capture(page, "08-v1-rm-j002-job-flow.png", false);
   await context.close();
 }
 
@@ -268,7 +296,9 @@ async function main() {
 
   console.log("Capturing Route Map V2 wiring screenshots…");
   await captureLanePanels(browser);
-  await captureMobileRandomExit(browser);
+  await captureMobileHighwayLabels(browser);
+  await captureV2PostPublishAddon(browser);
+  await captureV1RmJ002JobFlow(browser);
 
   console.log("Running two-path E2E verification…");
   const results = await runE2E(browser);

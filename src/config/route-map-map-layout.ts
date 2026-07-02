@@ -1,6 +1,6 @@
 /**
  * Route Map — hero art paths, map-frame insets, and hotspot positions.
- * Desk scene (primary) + cloverleaf (mobile fallback).
+ * Desk scene (primary — desktop + mobile). Cloverleaf retained for legacy capture compat.
  * Invisible hotspots overlay baked sign callouts in map art — no HTML labels on map.
  */
 
