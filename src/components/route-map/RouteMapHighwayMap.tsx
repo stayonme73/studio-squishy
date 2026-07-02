@@ -3,6 +3,7 @@
 import {
   getRouteMapHeroConfig,
   type RouteMapHeroVariant,
+  type RouteMapHighwayMarker,
   type RouteMapRoadControl,
 } from "@/config/route-map-map-layout";
 import type { RouteMapRoadId } from "@/config/route-map-v1";
@@ -38,6 +39,18 @@ function HotspotMarker({
   );
 }
 
+function HighwayMarker({ marker }: { marker: RouteMapHighwayMarker }) {
+  return (
+    <span
+      className={`route-map-highway-marker ${marker.className}`}
+      style={{ left: `${marker.left}%`, top: `${marker.top}%` }}
+      aria-hidden
+    >
+      {marker.label}
+    </span>
+  );
+}
+
 export default function RouteMapHighwayMap({ variant = "desk-scene", onSelectRoad }: Props) {
   const hero = getRouteMapHeroConfig(variant);
   const isDesk = variant === "desk-scene";
@@ -69,6 +82,12 @@ export default function RouteMapHighwayMap({ variant = "desk-scene", onSelectRoa
           height: `${hero.mapFrame.height}%`,
         }}
       >
+        <div className="route-map-hero__highway-markers" aria-hidden>
+          {hero.highwayMarkers.map((marker) => (
+            <HighwayMarker key={marker.roadId} marker={marker} />
+          ))}
+        </div>
+
         <div className="route-map-hero__hotspots">
           {hero.controls.map((control) => (
             <HotspotMarker key={control.roadId} control={control} onSelectRoad={onSelectRoad} />

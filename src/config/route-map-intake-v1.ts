@@ -231,6 +231,100 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeType, RouteMapIntake
       { id: "whereLive", label: "Where is it currently live?", type: "text", required: true },
     ],
   },
+  "rtu-marketing": {
+    type: "rtu-marketing",
+    title: "Marketing Asset Intake",
+    lead: "Tell us what to create and how you plan to use the finished files.",
+    fields: [
+      { id: "assetPurpose", label: "What is this for?", type: "textarea", required: true },
+      {
+        id: "mustInclude",
+        label: "Exact text, offer details, dates, prices, or contact info that must appear",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "materials",
+        label: "Logo, photos, colors, brand materials, or examples to use",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "intendedUse",
+        label: "How will you use the finished files?",
+        type: "select",
+        required: true,
+        options: ["Print", "Digital", "Both print and digital"],
+      },
+      { id: "sizeNotes", label: "Required size or format, if known", type: "text" },
+    ],
+  },
+  "email-kit": {
+    type: "email-kit",
+    title: "Email Campaign Kit Intake",
+    lead: "Share one campaign goal — we deliver finished email content files for your platform.",
+    fields: [
+      {
+        id: "campaignGoal",
+        label: "One campaign goal (offer, event, promotion, launch, or follow-up)",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "mustInclude",
+        label: "Exact copy, offer details, dates, links, and required wording",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "callToAction",
+        label: "Call to action for each email",
+        type: "text",
+        required: true,
+      },
+      {
+        id: "materials",
+        label: "Logo, photos, colors, or brand materials",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "compliance",
+        label: "Required disclaimers or compliance wording (you supply)",
+        type: "textarea",
+      },
+    ],
+  },
+  "sms-kit": {
+    type: "sms-kit",
+    title: "Text Message Campaign Kit Intake",
+    lead: "Share one campaign goal — we deliver message copy files for your SMS platform.",
+    fields: [
+      {
+        id: "campaignGoal",
+        label: "One campaign goal (promotion, event, reminder, offer, launch, or follow-up)",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "mustInclude",
+        label: "Exact offer details, dates, links, and required wording",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "callToAction",
+        label: "What should people do when they receive the messages?",
+        type: "text",
+        required: true,
+      },
+      {
+        id: "timingNotes",
+        label: "Any timing preferences for the suggested sequence",
+        type: "textarea",
+      },
+    ],
+  },
 };
 
 export function getRouteMapIntakeSchema(type: RouteMapIntakeType): RouteMapIntakeSchema {

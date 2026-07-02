@@ -179,6 +179,26 @@ export type RouteMapLaunchServiceId =
   | "rm-j007"
   | "rm-j008";
 
+/** Route Map V2 activated ready-to-use shelf SKUs — front-door checkout only. */
+export type RouteMapV2ShelfServiceId =
+  | "v2-rtu-flyer"
+  | "v2-rtu-menu"
+  | "v2-rtu-service-sheet"
+  | "v2-rtu-social-posts"
+  | "v2-rtu-promotion-graphics"
+  | "v2-rtu-email-kit"
+  | "v2-rtu-sms-kit"
+  | "v2-rtu-voice"
+  | "v2-rtu-short-video";
+
+/** Route Map V2 checkout add-on — not a standalone shelf item. */
+export type RouteMapV2AddonServiceId = "v2-addon-post-publish";
+
+export type RouteMapV2ServiceId = RouteMapV2ShelfServiceId | RouteMapV2AddonServiceId;
+
+/** All purchasable Route Map shelf job IDs — V1 legacy + V2 activated RTU. */
+export type RouteMapShelfJobId = RouteMapLaunchServiceId | RouteMapV2ShelfServiceId;
+
 /** Retired package and add-on IDs kept for campaign / localStorage reads. */
 export type LegacyRetiredServiceId =
   | "spark"
@@ -195,6 +215,7 @@ export type ServiceId =
   | MonthlyServiceId
   | ExecutionAddOnServiceId
   | RouteMapLaunchServiceId
+  | RouteMapV2ServiceId
   | LegacyRetiredServiceId;
 
 export type ServiceBillingModel = "one-time" | "monthly";

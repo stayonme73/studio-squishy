@@ -19,6 +19,7 @@ import {
 import { studioBoard } from "@/config/studio-board";
 import {
   buildRouteMapPaymentSummary,
+  isRouteMapPostPublishAddonEligible,
   saveApprovedRouteMapPlan,
   selectRouteMapJob,
   submitRouteMapIntake,
@@ -34,15 +35,23 @@ export default function RouteMapScene() {
   const [step, setStep] = useState<RouteMapStep>("map");
   const [roadId, setRoadId] = useState<RouteMapRoadId | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<RouteMapJobId | null>(null);
+  const [includePostPublishAddon, setIncludePostPublishAddon] = useState(false);
 
   const selectedJob = useMemo(
     () => (selectedJobId ? getRouteMapJob(selectedJobId) : undefined),
     [selectedJobId],
   );
 
+  const postPublishEligible = selectedJob ? isRouteMapPostPublishAddonEligible(selectedJob.id) : false;
+
   const paymentSummary = useMemo(
-    () => (selectedJob ? buildRouteMapPaymentSummary(selectedJob) : undefined),
-    [selectedJob],
+    () =>
+      selectedJob
+        ? buildRouteMapPaymentSummary(selectedJob, {
+            includePostPublishAddon: postPublishEligible && includePostPublishAddon,
+          })
+        : undefined,
+    [selectedJob, postPublishEligible, includePostPublishAddon],
   );
 
   const handleSelectRoad = useCallback((id: RouteMapRoadId) => {
@@ -57,6 +66,7 @@ export default function RouteMapScene() {
       if (!resolvedRoadId) return;
       setRoadId(resolvedRoadId);
       setSelectedJobId(job.id);
+      setIncludePostPublishAddon(false);
       selectRouteMapJob(job.id, resolvedRoadId);
       setStep("job");
     },
@@ -158,12 +168,29 @@ export default function RouteMapScene() {
               <button type="button" className="route-map-back-link" onClick={handleBackToJob}>
                 ← Back to job details
               </button>
+              {postPublishEligible ? (
+                <label className="route-map-checkout-addon">
+                  <input
+                    type="checkbox"
+                    checked={includePostPublishAddon}
+                    onChange={(event) => setIncludePostPublishAddon(event.target.checked)}
+                  />
+                  <span>
+                    Add Post/Publish for Me (+$100) — Studio schedules or publishes on one connected
+                    platform
+                  </span>
+                </label>
+              ) : null}
               <SecureCheckoutGrid
                 layout="embedded"
                 planSummary={paymentSummary}
                 onBeforePayment={(acknowledgment) => {
                   if (!selectedJobId) return false;
-                  return Boolean(saveApprovedRouteMapPlan(selectedJobId, acknowledgment));
+                  return Boolean(
+                    saveApprovedRouteMapPlan(selectedJobId, acknowledgment, {
+                      includePostPublishAddon: postPublishEligible && includePostPublishAddon,
+                    }),
+                  );
                 }}
                 onPaymentComplete={() => {
                   markPaymentReceived();

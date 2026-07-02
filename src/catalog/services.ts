@@ -21,6 +21,7 @@ import type {
 } from "@/catalog/types";
 import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
 import { ROUTE_MAP_LAUNCH_SERVICES } from "@/catalog/route-map-launch";
+import { ROUTE_MAP_V2_ALL_SERVICES } from "@/catalog/route-map-v2-launch";
 import { validateServiceCatalog } from "@/catalog/validate";
 
 function withDiscoverySync(
@@ -108,12 +109,23 @@ const LAUNCH_STATUS_BY_ID: Readonly<Record<ServiceId, LaunchStatus>> = {
   // Route Map V1 launch — limited (front-door checkout only, not Discovery green set)
   "rm-j001": "limited",
   "rm-j002": "limited",
-  "rm-j003": "limited",
-  "rm-j004": "limited",
+  "rm-j003": "retired",
+  "rm-j004": "retired",
   "rm-j005": "limited",
-  "rm-j006": "limited",
+  "rm-j006": "retired",
   "rm-j007": "limited",
   "rm-j008": "limited",
+  // Route Map V2 activated RTU shelf + post/publish add-on
+  "v2-rtu-flyer": "limited",
+  "v2-rtu-menu": "limited",
+  "v2-rtu-service-sheet": "limited",
+  "v2-rtu-social-posts": "limited",
+  "v2-rtu-promotion-graphics": "limited",
+  "v2-rtu-email-kit": "limited",
+  "v2-rtu-sms-kit": "limited",
+  "v2-rtu-voice": "limited",
+  "v2-rtu-short-video": "limited",
+  "v2-addon-post-publish": "limited",
 };
 
 function resolveLaunchStatus(id: ServiceId): LaunchStatus {
@@ -1988,6 +2000,7 @@ const V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
     deliveryItemKey: "sms_scheduling_sending",
   }),
   ...ROUTE_MAP_LAUNCH_SERVICES,
+  ...ROUTE_MAP_V2_ALL_SERVICES,
 ];
 
 const LEGACY_RETIRED_SERVICES: readonly StudioServiceEntry[] = [

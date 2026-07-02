@@ -127,6 +127,28 @@ export const ROUTE_MAP_CLOVERLEAF_CONTROLS: readonly RouteMapRoadControl[] = [
   },
 ];
 
+/** Studio-style highway route markers on map art — subtle labels, not click targets. */
+export type RouteMapHighwayMarker = {
+  roadId: "i75" | "i20" | "i285";
+  label: string;
+  left: number;
+  top: number;
+  className: string;
+};
+
+/** Desk scene marker positions (% within map frame) — aligned to baked road geometry. */
+export const ROUTE_MAP_DESK_HIGHWAY_MARKERS: readonly RouteMapHighwayMarker[] = [
+  { roadId: "i75", label: "I-75", left: 47, top: 28, className: "route-map-highway-marker--i75" },
+  { roadId: "i20", label: "I-20", left: 22, top: 46, className: "route-map-highway-marker--i20" },
+  { roadId: "i285", label: "I-285", left: 78, top: 18, className: "route-map-highway-marker--i285" },
+];
+
+export const ROUTE_MAP_CLOVERLEAF_HIGHWAY_MARKERS: readonly RouteMapHighwayMarker[] = [
+  { roadId: "i75", label: "I-75", left: 46, top: 14, className: "route-map-highway-marker--i75" },
+  { roadId: "i20", label: "I-20", left: 8, top: 44, className: "route-map-highway-marker--i20" },
+  { roadId: "i285", label: "I-285", left: 82, top: 28, className: "route-map-highway-marker--i285" },
+];
+
 /** @deprecated Use ROUTE_MAP_DESK_CONTROLS — kept for capture script compat. */
 export const ROUTE_MAP_ROAD_CONTROLS = ROUTE_MAP_DESK_CONTROLS;
 
@@ -137,6 +159,7 @@ export function getRouteMapHeroConfig(variant: RouteMapHeroVariant) {
       aspect: ROUTE_MAP_CLOVERLEAF_ASPECT,
       mapFrame: { left: 0, top: 0, width: 100, height: 100 },
       controls: ROUTE_MAP_CLOVERLEAF_CONTROLS,
+      highwayMarkers: ROUTE_MAP_CLOVERLEAF_HIGHWAY_MARKERS,
     };
   }
   return {
@@ -144,5 +167,6 @@ export function getRouteMapHeroConfig(variant: RouteMapHeroVariant) {
     aspect: ROUTE_MAP_DESK_SCENE_ASPECT,
     mapFrame: ROUTE_MAP_DESK_MAP_FRAME,
     controls: ROUTE_MAP_DESK_CONTROLS,
+    highwayMarkers: ROUTE_MAP_DESK_HIGHWAY_MARKERS,
   };
 }

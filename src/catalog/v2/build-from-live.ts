@@ -8,6 +8,7 @@ import { SERVICE_CATALOG } from "@/catalog/services";
 import type {
   ExecutionMode,
   LaunchStatus,
+  RouteMapLaunchServiceId,
   ServiceId,
   StudioServiceEntry,
 } from "@/catalog/types";
@@ -15,7 +16,6 @@ import { PROJECT_DETAILS_GREEN_SKU_IDS } from "@/config/project-details";
 import {
   getRouteMapJob,
   isRouteMapJobId,
-  type RouteMapJobId,
 } from "@/config/route-map-v1";
 import type {
   CatalogV2Availability,
@@ -32,7 +32,7 @@ const PROJECT_DETAILS_GREEN = new Set<string>(PROJECT_DETAILS_GREEN_SKU_IDS);
  * Approved Catalog V2 turnaround strings for Route Map jobs.
  * Canonical source — do not derive from ROUTE_MAP_JOB_TIMING in route-map-v1.ts.
  */
-const ROUTE_MAP_V2_TURNAROUND: Readonly<Record<RouteMapJobId, string>> = {
+const ROUTE_MAP_V2_TURNAROUND: Readonly<Record<RouteMapLaunchServiceId, string>> = {
   "rm-j001": "Usually within 1–2 business days after intake is complete.",
   "rm-j007": "Usually within 1–2 business days after intake is complete.",
   "rm-j002": "Usually within 2–3 business days after intake is complete.",
@@ -78,7 +78,7 @@ function turnaroundForService(
   isRouteMapJob: boolean,
 ): string {
   if (isRouteMapJob && isRouteMapJobId(service.id)) {
-    return ROUTE_MAP_V2_TURNAROUND[service.id as RouteMapJobId];
+    return ROUTE_MAP_V2_TURNAROUND[service.id as RouteMapLaunchServiceId];
   }
   return turnaroundFromService(service);
 }
@@ -120,7 +120,7 @@ function intakeTemplateForService(
   if (availability !== "active") return "";
 
   if (isRouteMapJob) {
-    const job = getRouteMapJob(serviceId as RouteMapJobId);
+    const job = getRouteMapJob(serviceId as RouteMapLaunchServiceId);
     return job?.intakeType ?? "";
   }
 
@@ -133,7 +133,7 @@ function intakeTemplateForService(
 export function buildCatalogV2EntryFromLive(service: StudioServiceEntry): CatalogV2ServiceEntry {
   const isRouteMapJob = isRouteMapJobId(service.id);
   const routeMapJob = isRouteMapJob
-    ? getRouteMapJob(service.id as RouteMapJobId)
+    ? getRouteMapJob(service.id as RouteMapLaunchServiceId)
     : undefined;
 
   const routeMapEligible = isRouteMapJob;

@@ -1,14 +1,13 @@
 /**
- * Catalog V2 Activation Map — DRAFT ONLY.
+ * Catalog V2 Activation Map — wired to Route Map shelf, checkout, and intake.
  *
- * Plans how approved Catalog V2 services replace or supplement Route Map V1 jobs (rm-j001–rm-j008).
- * NOT wired to Route Map UI, checkout, intake, or live `@/catalog` consumers.
- * Pending Tagia approval before commit, activation, or any live wiring.
+ * Drives live Route Map job lists per lane + Direct Exit from activation map rows.
+ * V2 RTU prices/scope/turnaround bridged via route-map-v2-launch.ts into live catalog.
  *
  * @see batch1-ready-to-use.ts — Batch 1 launch candidates + held handout
  * @see batch2-ready-to-use.ts — Batch 2 RTU kits + post/publish add-on
- * @see route-map-v1.ts — current road/lane placement for rm-j*
- * @see route-map-launch.ts — current Route Map SKU definitions
+ * @see route-map-v1.ts — shelf builders reading this map
+ * @see route-map-v2-launch.ts — live catalog bridge for activated V2 SKUs
  */
 
 import type { RouteMapRoadId } from "@/config/route-map-v1";

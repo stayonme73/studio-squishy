@@ -335,6 +335,70 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   inset: 0;
 }
 
+/* Subtle Studio-style highway route markers — art overlay, not click targets */
+.route-map-hero__highway-markers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.route-map-highway-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+  color: color-mix(in srgb, #2f3437 88%, #fff);
+  background: color-mix(in srgb, #f4efe6 82%, #fff);
+  border: 1px solid color-mix(in srgb, #2f3437 18%, transparent);
+  box-shadow: 0 1px 4px rgba(46, 43, 40, 0.12);
+  opacity: 0.88;
+  text-transform: uppercase;
+}
+
+.route-map-highway-marker--i75,
+.route-map-highway-marker--i20 {
+  background: color-mix(in srgb, #e8eef3 78%, #fff);
+  border-color: color-mix(in srgb, #1e4f78 22%, transparent);
+  color: color-mix(in srgb, #1e4f78 90%, #2f3437);
+}
+
+.route-map-highway-marker--i285 {
+  background: color-mix(in srgb, #f0e6bc 75%, #fff);
+  border-color: color-mix(in srgb, #b8922f 28%, transparent);
+  color: color-mix(in srgb, #6b5418 88%, #2f3437);
+}
+
+@media (min-width: 768px) {
+  .route-map-highway-marker {
+    font-size: 0.72rem;
+    padding: 0.25rem 0.55rem;
+  }
+}
+
+.route-map-checkout-addon {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--rm-paper, #f4efe6) 88%, #fff);
+  border: 1px solid color-mix(in srgb, #2f3437 12%, transparent);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.route-map-checkout-addon input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
 /* Hotspots — invisible click zones over map callouts */
 .route-map-board__hotspots {
   position: absolute;

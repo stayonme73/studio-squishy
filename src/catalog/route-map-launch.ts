@@ -70,10 +70,13 @@ type RouteMapLaunchSeed = {
   executionMode: ExecutionMode;
   deliveryMapping: DeliveryMapping;
   timingLabel?: string;
+  /** When set, SKU stays in catalog for checkout history but is off the Route Map shelf. */
+  retiredFromRouteMap?: boolean;
 };
 
 function routeMapLaunchService(seed: RouteMapLaunchSeed): StudioServiceEntry {
   const timing = timingWindowsForLane(seed.productionLane);
+  const isRetired = seed.retiredFromRouteMap === true;
   return {
     schemaVersion: CATALOG_SCHEMA_VERSION,
     id: seed.id,
@@ -82,7 +85,9 @@ function routeMapLaunchService(seed: RouteMapLaunchSeed): StudioServiceEntry {
     category: seed.category,
     serviceClass: seed.serviceClass,
     customerReceives: seed.deliverables.join("; "),
-    internalProductionNotes: "Route Map V1 launch SKU — front-door checkout only.",
+    internalProductionNotes: isRetired
+      ? "Route Map V1 launch SKU — retired from shelf; replaced by V2 RTU on activation."
+      : "Route Map V1 launch SKU — front-door checkout only.",
     dependencies: [],
     includedRevisionRounds: 1,
     canSubstitute: false,
@@ -91,8 +96,8 @@ function routeMapLaunchService(seed: RouteMapLaunchSeed): StudioServiceEntry {
     deliveryFormats: [],
     minimumCustomerRequirements: [...seed.clientResponsibilities],
     recommendedCustomerRequirements: [],
-    serviceStatus: "active",
-    status: "active",
+    serviceStatus: isRetired ? "retired" : "active",
+    status: isRetired ? "inactive" : "active",
     billingType: "one_time" satisfies BillingType,
     priceCents: seed.priceCents,
     productionLane: seed.productionLane,
@@ -108,7 +113,7 @@ function routeMapLaunchService(seed: RouteMapLaunchSeed): StudioServiceEntry {
     requiresClientMaterials: true,
     isRecommendable: false,
     isAddable: false,
-    launchStatus: "limited",
+    launchStatus: isRetired ? "retired" : "limited",
     serviceGuideFaq: [],
     deliveryMapping: seed.deliveryMapping,
     discoveryTriggers: [],
@@ -208,6 +213,7 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       executionChannel: "social",
       items: [{ key: "static_social_post", quantity: 3, unit: "posts" }],
     },
+    retiredFromRouteMap: true,
   }),
   routeMapLaunchService({
     id: "rm-j004",
@@ -238,6 +244,7 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       fulfillmentMode: "project",
       items: [{ key: "short_form_video", quantity: 1, unit: "video" }],
     },
+    retiredFromRouteMap: true,
   }),
   routeMapLaunchService({
     id: "rm-j005",
@@ -297,6 +304,7 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       fulfillmentMode: "project",
       items: [{ key: "voice_announcement_post", quantity: 1, unit: "post" }],
     },
+    retiredFromRouteMap: true,
   }),
   routeMapLaunchService({
     id: "rm-j007",

@@ -123,6 +123,8 @@ export type CampaignRecord = {
     jobId: RouteMapJobId;
     roadId: RouteMapRoadId;
     selectedAt: string;
+    /** v2-addon-post-publish included at checkout with eligible parent RTU job. */
+    postPublishAddon?: boolean;
   };
   /** Route Map V1 — post-payment job-specific intake answers. */
   routeMapIntake?: {
