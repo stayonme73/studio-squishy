@@ -64,3 +64,19 @@ export {
   CATALOG_V2_DRAFT,
   CATALOG_V2_DRAFT_META,
 } from "@/catalog/v2/draft-catalog";
+
+export {
+  CATALOG_V2_ACTIVATION_LAUNCH_CANDIDATE_SKUS,
+  CATALOG_V2_ACTIVATION_MAP_DRAFT,
+  CATALOG_V2_ACTIVATION_POST_PUBLISH_PARENT_SKUS,
+  CATALOG_V2_ACTIVATION_RETIRED_ROUTE_MAP_SKUS,
+  getActivationMapEntriesByLane,
+  getActivationMapEntriesByStatus,
+  getActivationMapEntryBySku,
+  getActivationMapShelfEntriesForLane,
+} from "@/catalog/v2/activation-map-draft";
+
+export type {
+  CatalogV2ActivationMapEntry,
+  CatalogV2ActivationStatus,
+} from "@/catalog/v2/activation-map-draft";

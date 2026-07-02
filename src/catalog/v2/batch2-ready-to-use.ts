@@ -166,6 +166,10 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "em-001 Email Campaign Build is $325 for up to two client-ready emails with subject lines and preview text — approved public V1 price for this SKU is $350.",
     priceCents: 35000,
     priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
+    routeMapEligible: true,
+    directExitEligible: true,
+    placement: "both",
+    laneEligibility: ["i20", "random-exit"],
     turnaroundApprovalStatus: "approved",
     clientResponsibilityAfterDelivery: CATALOG_V2_BATCH2_EMAIL_CLIENT_RESPONSIBILITY,
     scopeRoutingNote:
@@ -224,6 +228,10 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "sms-001 SMS Campaign Build is $175 for up to four client-ready SMS messages — approved public V1 price for this SKU is $225.",
     priceCents: 22500,
     priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
+    routeMapEligible: true,
+    directExitEligible: true,
+    placement: "both",
+    laneEligibility: ["i20", "random-exit"],
     turnaroundApprovalStatus: "approved",
     clientResponsibilityAfterDelivery: CATALOG_V2_BATCH2_SMS_CLIENT_RESPONSIBILITY,
     scopeRoutingNote:
