@@ -62,7 +62,12 @@ export type CatalogV2DraftOnlySkuId =
   | "v2-rtu-service-sheet"
   | "v2-rtu-social-posts"
   | "v2-rtu-promotion-graphics"
-  | "v2-rtu-handout";
+  | "v2-rtu-handout"
+  | "v2-rtu-email-kit"
+  | "v2-rtu-sms-kit"
+  | "v2-rtu-voice"
+  | "v2-rtu-short-video"
+  | "v2-addon-post-publish";
 
 /** Live catalog SKU or draft-only proposed SKU. */
 export type CatalogV2SkuId = ServiceId | CatalogV2DraftOnlySkuId;
