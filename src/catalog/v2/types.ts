@@ -53,14 +53,29 @@ export type CatalogV2DeliverableSlot = {
 };
 
 /**
+ * Draft-only SKU IDs — proposed services not yet in live `ServiceId`.
+ * Batch 1 ready-to-use marketing materials shelf (held until approval).
+ */
+export type CatalogV2DraftOnlySkuId =
+  | "v2-rtu-flyer"
+  | "v2-rtu-menu"
+  | "v2-rtu-service-sheet"
+  | "v2-rtu-social-posts"
+  | "v2-rtu-promotion-graphics"
+  | "v2-rtu-handout";
+
+/** Live catalog SKU or draft-only proposed SKU. */
+export type CatalogV2SkuId = ServiceId | CatalogV2DraftOnlySkuId;
+
+/**
  * Full Catalog V2 draft service record.
  * Fields align to production packet requirements for future catalog migration.
  */
 export type CatalogV2ServiceEntry = {
   schemaVersion: CatalogV2DraftSchemaVersion;
 
-  /** Internal ID / SKU — same as live catalog ServiceId. */
-  sku: ServiceId;
+  /** Internal ID / SKU — live ServiceId or draft-only proposed ID. */
+  sku: CatalogV2SkuId;
 
   /** Client-facing service or job name. */
   clientFacingName: string;
@@ -110,8 +125,13 @@ export type CatalogV2ServiceEntry = {
    */
   turnaround: string;
 
-  /** Canonical price in USD cents — copied from live catalog. */
-  priceCents: number;
+  /**
+   * Canonical price in USD cents — copied from live catalog.
+   * `null` for draft-only SKUs with no approved price yet.
+   */
+  priceCents: number | null;
+  /** Set when `priceCents` is null — e.g. "no approved price yet". */
+  priceNote?: string;
   billingType: BillingType;
 
   /**
@@ -133,6 +153,59 @@ export type CatalogV2ServiceEntry = {
 
   /** True for Route Map V1 launch jobs (rm-j001–rm-j008). */
   isRouteMapJob: boolean;
+
+  // --- Draft-only proposed entries (Batch 1+); omitted on live mirrors ---
+
+  /** True when this entry is proposed in V2 draft only — not in live SERVICE_CATALOG. */
+  isDraftOnly?: boolean;
+
+  /** Batch label for shelf rebuild review — e.g. "batch1-ready-to-use". */
+  draftBatch?: string;
+
+  /**
+   * True when proposed for Batch 1 launch shelf review.
+   * False when kept in the draft batch but excluded from the launch candidate set.
+   */
+  batchLaunchCandidate?: boolean;
+
+  /**
+   * Launch-set disposition for draft-batch SKUs — distinct from `availability`.
+   * `held_broad_overlap` — held in draft; excluded from launch (scope/name overlap).
+   */
+  launchSetStatus?: "launch_candidate" | "held_broad_overlap";
+
+  /** Closest live SKU used as scope/price reference during draft authoring. */
+  legacySourceSku?: string;
+
+  /** Legacy price in cents — reference only, not an approved price for this draft SKU. */
+  legacyPriceReferenceCents?: number | null;
+
+  /** Plain-English note on legacy price reference (e.g. bundle vs single-item). */
+  legacyPriceReferenceNote?: string;
+
+  /**
+   * Ready-to-use delivery rule — Studio creates files; client distributes.
+   * Documented on draft-only ready_to_use SKUs pending activation.
+   */
+  deliveryRule?: string;
+
+  /** What the client does after receiving finished files. */
+  clientResponsibilityAfterDelivery?: string;
+
+  /**
+   * Proposed intake fields when activated — TBD until Tagia approves scope.
+   * Held SKUs use `intakeTemplate: ""` until activation.
+   */
+  intakeTemplateFieldsTbd?: readonly string[];
+
+  /** Whether `turnaround` is proposed for approval or locked like Route Map jobs. */
+  turnaroundApprovalStatus?: "proposed" | "approved";
+
+  /**
+   * Business routing note for draft review — when to steer requests to another job
+   * (e.g. rm-j001) instead of stretching this SKU's scope.
+   */
+  scopeRoutingNote?: string;
 };
 
 export type CatalogV2DraftMeta = {
