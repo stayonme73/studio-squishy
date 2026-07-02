@@ -13,9 +13,9 @@ import { CATALOG_V2_DRAFT_SCHEMA_VERSION } from "@/catalog/v2/types";
 
 export const CATALOG_V2_BATCH1_READY_TO_USE_BATCH_ID = "batch1-ready-to-use" as const;
 
-/** Shared working-price note — V2 draft only; not final public price until grouped pricing check. */
-export const CATALOG_V2_BATCH1_WORKING_PRICE_NOTE =
-  "working price in V2 draft — not final public price until grouped Batch 1 pricing check";
+/** Shared price note — approved public V1 price for Batch 1 launch candidates (V2 draft only). */
+export const CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE =
+  "approved public V1 price (Batch 1 ready-to-use)";
 
 /** Shared ready-to-use delivery rule — documented on each Batch 1 record. */
 export const CATALOG_V2_RTU_DELIVERY_RULE =
@@ -87,7 +87,7 @@ function batch1Base(
 }
 
 /**
- * Batch 1 ready-to-use draft entries — held until pricing and scope approved.
+ * Batch 1 ready-to-use draft entries — held (public V1 prices approved; batch not activated).
  * Merged into CATALOG_V2_DRAFT via draft-catalog.ts; isolated from live catalog.
  */
 export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = [
@@ -99,9 +99,9 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacySourceSku: "ma-001",
     legacyPriceReferenceCents: 49500,
     legacyPriceReferenceNote:
-      "ma-001 Promotion Pack is $495 for up to four marketing assets — not a per-flyer price. Working price for this SKU is $300.",
+      "ma-001 Promotion Pack is $495 for up to four marketing assets — not a per-flyer price. Approved public V1 price for this SKU is $300.",
     priceCents: 30000,
-    priceNote: CATALOG_V2_BATCH1_WORKING_PRICE_NOTE,
+    priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
     placement: "both",
@@ -167,7 +167,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacyPriceReferenceNote:
       "ma-001 Promotion Pack is $495 for up to four marketing assets — menus listed as an example asset type, not a dedicated menu SKU.",
     priceCents: 45000,
-    priceNote: CATALOG_V2_BATCH1_WORKING_PRICE_NOTE,
+    priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
     placement: "both",
@@ -232,7 +232,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacyPriceReferenceNote:
       "ma-001 Promotion Pack is $495 for up to four marketing assets — one-page collateral listed as an example asset type, not a dedicated service-sheet SKU.",
     priceCents: 35000,
-    priceNote: CATALOG_V2_BATCH1_WORKING_PRICE_NOTE,
+    priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
     placement: "both",
@@ -297,7 +297,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacyPriceReferenceNote:
       "sm-001 Social Media Launch Set is $395 for up to six static posts plus calendar — this SKU is scoped to four posts with a simple posting order.",
     priceCents: 45000,
-    priceNote: CATALOG_V2_BATCH1_WORKING_PRICE_NOTE,
+    priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
     placement: "both",
@@ -372,7 +372,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacyPriceReferenceNote:
       "ma-001 Promotion Pack is $495 for up to four marketing assets — not a per-graphic price.",
     priceCents: 35000,
-    priceNote: CATALOG_V2_BATCH1_WORKING_PRICE_NOTE,
+    priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
     placement: "both",
