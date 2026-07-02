@@ -13,9 +13,9 @@ import { CATALOG_V2_DRAFT_SCHEMA_VERSION } from "@/catalog/v2/types";
 
 export const CATALOG_V2_BATCH1_READY_TO_USE_BATCH_ID = "batch1-ready-to-use" as const;
 
-/** Shared working-price note — Tagia grouped Batch 1 launch-set prices (not marketplace). */
+/** Shared working-price note — V2 draft only; not final public price until grouped pricing check. */
 export const CATALOG_V2_BATCH1_WORKING_PRICE_NOTE =
-  "working price — held until Batch 1 pricing approved as group";
+  "working price in V2 draft — not final public price until grouped Batch 1 pricing check";
 
 /** Shared ready-to-use delivery rule — documented on each Batch 1 record. */
 export const CATALOG_V2_RTU_DELIVERY_RULE =
