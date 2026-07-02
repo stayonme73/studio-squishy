@@ -168,6 +168,17 @@ export type ExecutionAddOnServiceId =
   | "sms_marketing-execution"
   | "sms_marketing-execution-monthly";
 
+/** Route Map V1 launch job SKUs — front-door checkout only (packet pricing). */
+export type RouteMapLaunchServiceId =
+  | "rm-j001"
+  | "rm-j002"
+  | "rm-j003"
+  | "rm-j004"
+  | "rm-j005"
+  | "rm-j006"
+  | "rm-j007"
+  | "rm-j008";
+
 /** Retired package and add-on IDs kept for campaign / localStorage reads. */
 export type LegacyRetiredServiceId =
   | "spark"
@@ -183,6 +194,7 @@ export type ServiceId =
   | OneTimeServiceId
   | MonthlyServiceId
   | ExecutionAddOnServiceId
+  | RouteMapLaunchServiceId
   | LegacyRetiredServiceId;
 
 export type ServiceBillingModel = "one-time" | "monthly";

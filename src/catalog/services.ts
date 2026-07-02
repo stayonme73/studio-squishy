@@ -20,6 +20,7 @@ import type {
   StudioServiceEntry,
 } from "@/catalog/types";
 import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
+import { ROUTE_MAP_LAUNCH_SERVICES } from "@/catalog/route-map-launch";
 import { validateServiceCatalog } from "@/catalog/validate";
 
 function withDiscoverySync(
@@ -104,6 +105,15 @@ const LAUNCH_STATUS_BY_ID: Readonly<Record<ServiceId, LaunchStatus>> = {
   "business-workflow": "retired",
   "customer-follow-up": "retired",
   "monthly-support": "retired",
+  // Route Map V1 launch — limited (front-door checkout only, not Discovery green set)
+  "rm-j001": "limited",
+  "rm-j002": "limited",
+  "rm-j003": "limited",
+  "rm-j004": "limited",
+  "rm-j005": "limited",
+  "rm-j006": "limited",
+  "rm-j007": "limited",
+  "rm-j008": "limited",
 };
 
 function resolveLaunchStatus(id: ServiceId): LaunchStatus {
@@ -1977,6 +1987,7 @@ const V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
     executionChannel: "sms",
     deliveryItemKey: "sms_scheduling_sending",
   }),
+  ...ROUTE_MAP_LAUNCH_SERVICES,
 ];
 
 const LEGACY_RETIRED_SERVICES: readonly StudioServiceEntry[] = [

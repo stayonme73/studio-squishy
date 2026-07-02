@@ -8,6 +8,8 @@ import type { FeedbackConceptPreview } from "@/config/feedback-studio";
 import type { DeliverableQuotaId, StudioGuidePackageId } from "@/config/studio-guide";
 import type { DiscoveryBriefAnswers } from "@/recommendation/types";
 import type { BillingType, ServiceFamilyId, ServiceId } from "@/catalog/types";
+import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
+import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
 
 /** Immutable scope snapshot for one approved SKU — post-approval reads this, not live catalog. */
 export type ApprovedStudioPlanLineItem = {
@@ -116,6 +118,18 @@ export type CampaignRecord = {
   /** Post-payment Project Details intake — green services only (V1) */
   projectDetails?: ProjectDetailsRecord;
   projectDetailsSubmittedAt?: string;
+  /** Route Map V1 — selected job and road before payment. */
+  routeMapContext?: {
+    jobId: RouteMapJobId;
+    roadId: RouteMapRoadId;
+    selectedAt: string;
+  };
+  /** Route Map V1 — post-payment job-specific intake answers. */
+  routeMapIntake?: {
+    answers: RouteMapIntakeAnswers;
+    submittedAt: string;
+  };
+  routeMapIntakeSubmittedAt?: string;
   /** Denormalized materials blocking count — updated when materials ledger changes (Slice 2c). */
   materialsSummary?: {
     blockingRequiredCount: number;

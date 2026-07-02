@@ -35,6 +35,7 @@ export function resolveCustomerJourneySteps(
 
   const intakeDone = Boolean(
     campaign.projectDetailsSubmittedAt ||
+      campaign.routeMapIntakeSubmittedAt ||
       campaign.visionSubmittedAt ||
       campaign.intake?.submittedAt,
   );

@@ -5,7 +5,6 @@
  */
 
 import { helpCenterAnchor } from "@/config/help-center";
-import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import { studioBoard } from "@/config/studio-board";
 
 export const welcomeHallPhase1 = {
@@ -14,8 +13,8 @@ export const welcomeHallPhase1 = {
   journey: ["welcome-hall", "kiosk", "draft-room"] as const,
 
   cta: {
-    /** Primary — entire kiosk routes to Project Discovery. */
-    kioskLabel: `Let's get started — enter ${customerJourneyStepName("project-discovery")}.`,
+  /** Primary — entire kiosk routes to Studio Route Map. */
+  kioskLabel: "Let's get started — choose your route on the Studio Route Map.",
     kioskHeadline: "LET'S GET STARTED",
     kioskScreenLabel: "HOW CAN WE HELP?",
   },
@@ -54,8 +53,10 @@ export const welcomeHallPhase1 = {
     ],
   },
 
-  /** Welcome Hall kiosk → Business Discovery Studio (package discovery). */
-  routeToBusinessDiscoveryStudio: "/business-discovery-studio",
+  /** Welcome Hall kiosk → Studio Route Map V1 front door. */
+  routeToRouteMap: "/route-map",
+  /** @deprecated use routeToRouteMap — legacy discovery direct link preserved for deep links */
+  routeToBusinessDiscoveryStudio: "/route-map",
   /** @deprecated use routeToBusinessDiscoveryStudio — legacy URL redirects */
   routeToDraftRoom: "/business-discovery-studio",
   /** @deprecated use routeToBusinessDiscoveryStudio */

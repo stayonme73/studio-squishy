@@ -41,6 +41,14 @@ export const SERVICE_CLASS_BY_ID: Readonly<Partial<Record<ServiceId, ServiceClas
   "mo-001-monthly": "core",
   "ma-001": "essential",
   "ma-001-monthly": "essential",
+  "rm-j001": "essential",
+  "rm-j002": "core",
+  "rm-j003": "core",
+  "rm-j004": "signature",
+  "rm-j005": "signature",
+  "rm-j006": "core",
+  "rm-j007": "core",
+  "rm-j008": "core",
 };
 
 export type SubstitutionSwapKind = "same-class" | "upgrade" | "downgrade";

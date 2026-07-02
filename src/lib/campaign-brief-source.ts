@@ -233,8 +233,54 @@ function extractLegacyVisionBrief(vision: DraftIntakeFormValues, campaign: Campa
   };
 }
 
+function extractRouteMapBrief(campaign: CampaignRecord): CampaignCreativeBrief | null {
+  const answers = campaign.routeMapIntake?.answers;
+  if (!answers || !campaign.routeMapIntakeSubmittedAt) return null;
+
+  const businessName = trimField(answers.businessName);
+  const promoting = trimField(answers.promoting ?? answers.pageFor ?? answers.announcing);
+  const whatYouDo = trimField(answers.whatYouDo ?? answers.businessDescription ?? answers.offerDetails);
+  const projectName = businessName || promoting || campaign.campaignName.trim();
+  const business = whatYouDo || promoting || businessName;
+
+  if (!projectName && !business) return null;
+
+  const { approvedServiceNames, scopeDeliverables } = approvedScopeContext(campaign);
+
+  return {
+    projectName: projectName || "Your campaign",
+    business,
+    audience: trimField(answers.targetAudience ?? answers.audience ?? answers.platform) || "your audience",
+    goals:
+      trimField(answers.successLooksLike ?? answers.goal ?? answers.promotionGoal ?? answers.callToAction) ||
+      promoting ||
+      "your campaign goals",
+    personality: trimField(answers.brandVoice ?? answers.voiceTone ?? answers.tone) || "your brand personality",
+    colors: trimField(answers.brandColors ?? answers.colors ?? answers.brandNotes) || "your brand palette",
+    coreMessage:
+      trimField(answers.keyMessage ?? answers.mustInclude ?? answers.mustSay ?? answers.callToAction) ||
+      business,
+    toneGuidance:
+      trimField(answers.voiceStyle ?? answers.styleNotes ?? answers.voiceTone) ||
+      "the direction you shared in Route Map intake",
+    desiredOutcome:
+      trimField(answers.successLooksLike ?? answers.desiredOutcome ?? answers.afterReading) ||
+      trimField(answers.promotionGoal ?? answers.callToAction),
+    successMetric: trimField(answers.successMetric),
+    avoidNotes: trimField(answers.avoid ?? answers.doNotUse ?? answers.remove),
+    inspiration: trimField(answers.inspiration ?? answers.referenceLinks ?? answers.materials),
+    timing: trimField(answers.deadline ?? answers.timing ?? answers.importantDates ?? answers.mustInclude),
+    approvedServiceNames,
+    scopeDeliverables,
+  };
+}
+
 /** Unified creative brief — discovery-first uses Project Details + Discovery; legacy uses vision intake. */
 export function resolveCampaignCreativeBrief(campaign: CampaignRecord): CampaignCreativeBrief | null {
+  if (campaign.routeMapContext) {
+    return extractRouteMapBrief(campaign);
+  }
+
   if (campaignHasApprovedStudioPlan(campaign)) {
     return extractDiscoveryFirstBrief(campaign);
   }
@@ -252,6 +298,7 @@ export function hasCampaignCreativeBrief(campaign: CampaignRecord | null): boole
 /** Stamp concepts should match — Project Details submit wins for discovery-first campaigns. */
 export function resolveConceptGenerationStamp(campaign: CampaignRecord): string | null {
   if (campaign.projectDetailsSubmittedAt) return campaign.projectDetailsSubmittedAt;
+  if (campaign.routeMapIntakeSubmittedAt) return campaign.routeMapIntakeSubmittedAt;
   if (campaign.visionSubmittedAt) return campaign.visionSubmittedAt;
   if (campaign.discoverySubmittedAt) return campaign.discoverySubmittedAt;
   return null;

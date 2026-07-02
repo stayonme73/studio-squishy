@@ -67,6 +67,7 @@ function pushStudioNote(campaign: CampaignRecord, message: string, date = "Today
 function intakeComplete(campaign: CampaignRecord): boolean {
   return Boolean(
     campaign.projectDetailsSubmittedAt ||
+      campaign.routeMapIntakeSubmittedAt ||
       campaign.visionSubmittedAt ||
       campaign.intake?.submittedAt ||
       campaign.intake?.idea?.trim(),
@@ -422,17 +423,15 @@ export function updateCampaignStatus(status: CampaignStatus): CampaignRecord | n
   return persistCampaign(campaignWithStatus(campaign, status));
 }
 
-/** Studio finished concepting — client can enter Review Room / Feedback Studio. */
+/** Ensure concepts exist when campaign is already at review — does not advance status. */
 export function ensureConceptsReadyForReview(): CampaignRecord | null {
   const campaign = readCurrentCampaign();
-  if (!campaign || campaign.campaignStatus !== "BUILDING_CONCEPTS") return campaign;
+  if (!campaign || campaign.campaignStatus !== "READY_FOR_REVIEW") return campaign;
 
   const withConcepts = ensureCampaignConceptsOnRecord(campaign);
   if (!withConcepts?.concepts?.length) return campaign;
 
-  let updated = campaignWithStatus(withConcepts, "READY_FOR_REVIEW");
-  updated = pushStudioNote(updated, "Campaign concepts ready for your review.");
-  return persistCampaign(updated);
+  return persistCampaign(withConcepts);
 }
 
 /** Finalize after review — unlock Final Delivery. */
