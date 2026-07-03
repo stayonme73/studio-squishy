@@ -1,14 +1,25 @@
 import { NextResponse } from "next/server";
 
-import { canReadCampaign, canSyncCurrentCampaign } from "@/lib/campaign-store/access";
+import {
+  canReadCampaign,
+  canSyncCurrentCampaign,
+  isInternalUser,
+} from "@/lib/campaign-store/access";
 import { FixtureCampaignBlockedError } from "@/lib/campaign-store/fixture-guard";
 import {
   readCampaignEnvelope,
   upsertCampaignRecord,
 } from "@/lib/campaign-store/store";
+import { requireClaimableCampaignSync } from "@/lib/campaign-store/server-access";
 import { isNextResponse, requireSession } from "@/lib/auth/require-session";
-import { updateUserCurrentCampaign } from "@/lib/auth/users";
+import {
+  createSessionToken,
+  sessionCookieOptions,
+  SESSION_COOKIE_NAME,
+} from "@/lib/auth/session";
+import { linkClientCampaign, updateUserCurrentCampaign } from "@/lib/auth/users";
 import type { CampaignRecord } from "@/config/studio-board";
+import { logAccessEvent } from "@/lib/security/access-log";
 
 export async function GET(request: Request) {
   const user = await requireSession(request);
@@ -24,7 +35,14 @@ export async function GET(request: Request) {
   }
 
   if (!canReadCampaign(user, envelope.campaignId, envelope)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    logAccessEvent({
+      kind: "access_denied",
+      route: "/api/campaigns/current",
+      user,
+      campaignId: envelope.campaignId,
+      reason: "current_campaign_read_denied",
+    });
+    return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 
   return NextResponse.json({ campaign: envelope });
@@ -45,17 +63,43 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const envelope = await upsertCampaignRecord(record, user.id);
-
-    if (user.currentCampaignId !== record.campaignId) {
-      await updateUserCurrentCampaign(user.id, record.campaignId);
+    if (!isInternalUser(user)) {
+      const claim = await requireClaimableCampaignSync(
+        user,
+        record.campaignId,
+        "/api/campaigns/current",
+      );
+      if (claim instanceof NextResponse) return claim;
     }
 
-    return NextResponse.json({
+    const envelope = await upsertCampaignRecord(record, user.roles.includes("client") ? user.id : undefined);
+    let updatedUser = user;
+
+    if (user.currentCampaignId !== record.campaignId) {
+      updatedUser =
+        (user.roles.includes("client")
+          ? await linkClientCampaign(user.id, record.campaignId)
+          : await updateUserCurrentCampaign(user.id, record.campaignId)) ?? user;
+    } else if (
+      user.roles.includes("client") &&
+      !user.clientCampaignIds?.includes(record.campaignId)
+    ) {
+      updatedUser = (await linkClientCampaign(user.id, record.campaignId)) ?? user;
+    }
+
+    const response = NextResponse.json({
       campaignId: envelope.campaignId,
       syncedAt: envelope.syncedAt,
       syncVersion: envelope.syncVersion,
     });
+    if (updatedUser !== user) {
+      response.cookies.set(
+        SESSION_COOKIE_NAME,
+        await createSessionToken(updatedUser),
+        sessionCookieOptions(),
+      );
+    }
+    return response;
   } catch (error) {
     if (error instanceof FixtureCampaignBlockedError) {
       return NextResponse.json({ error: error.message }, { status: 403 });

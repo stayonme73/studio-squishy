@@ -8,6 +8,7 @@ export type SessionPayload = {
   displayName: string;
   roles: StudioUser["roles"];
   currentCampaignId?: string;
+  clientCampaignIds?: readonly string[];
   issuedAt: number;
 };
 
@@ -82,6 +83,7 @@ export async function createSessionToken(user: StudioUser): Promise<string> {
     displayName: user.displayName,
     roles: [...user.roles],
     currentCampaignId: user.currentCampaignId,
+    clientCampaignIds: user.clientCampaignIds ? [...user.clientCampaignIds] : undefined,
     issuedAt: Date.now(),
   };
   const payloadJson = JSON.stringify(payload);
@@ -111,6 +113,7 @@ export function sessionPayloadToUser(payload: SessionPayload): StudioUser {
     displayName: payload.displayName,
     roles: payload.roles,
     currentCampaignId: payload.currentCampaignId,
+    clientCampaignIds: payload.clientCampaignIds,
   };
 }
 

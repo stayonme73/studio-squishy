@@ -19,6 +19,11 @@ export function isInternalUser(user: StudioUser | null | undefined): boolean {
   return isOwnerUser(user) || isStaffUser(user);
 }
 
+export function isClientUser(user: StudioUser | null | undefined): boolean {
+  if (!user) return false;
+  return user.roles.includes("client") && !isInternalUser(user);
+}
+
 /** Fixture/test campaigns are never browsable via File Room (Slice 1b). */
 export function isBrowsableCampaignId(campaignId: string): boolean {
   return !isFixtureCampaignId(campaignId);
@@ -41,10 +46,25 @@ export function canReadCampaign(
   }
 
   if (user.roles.includes("client")) {
-    if (user.currentCampaignId === campaignId) return true;
-    if (envelope?.campaignId === campaignId && envelope.clientUserId === user.id) return true;
+    if (envelope?.campaignId === campaignId && envelope.clientUserId) {
+      return envelope.clientUserId === user.id;
+    }
+    if (user.clientCampaignIds?.includes(campaignId)) return true;
+    if (!envelope?.clientUserId && user.currentCampaignId === campaignId) return true;
   }
   return false;
+}
+
+export function canClaimClientCampaign(
+  user: StudioUser | null,
+  campaignId: string,
+  envelope?: ServerCampaignEnvelope | null,
+): boolean {
+  if (!user || !user.roles.includes("client")) return false;
+  if (!isBrowsableCampaignId(campaignId)) return false;
+  if (!envelope) return true;
+  if (!envelope.clientUserId) return true;
+  return envelope.clientUserId === user.id;
 }
 
 /** Owner sees all non-fixture campaigns; staff only assigned campaigns. */

@@ -11,6 +11,7 @@ import FeedbackStudioConceptReview from "@/components/feedback-studio/FeedbackSt
 import FeedbackStudioLayout from "@/components/feedback-studio/FeedbackStudioLayout";
 import FeedbackStudioRevisionStatus from "@/components/feedback-studio/FeedbackStudioRevisionStatus";
 import JobReviewWorkspace from "@/components/feedback-studio/JobReviewWorkspace";
+import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import CampaignJourneyMap from "@/components/studio-board/CampaignJourneyMap";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
@@ -35,7 +36,7 @@ import { useCurrentCampaign } from "@/lib/use-current-campaign";
 export default function FeedbackStudioScene() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { campaign, ready } = useCurrentCampaign();
+  const { campaign, ready, accessState } = useCurrentCampaign();
 
   const conceptParam = searchParams.get("concept");
   const jobIdParam = searchParams.get("jobId");
@@ -100,6 +101,14 @@ export default function FeedbackStudioScene() {
         <div className="fs-page utility-page" aria-busy="true">
           <div className="utility-shell utility-shell--loading" />
         </div>
+      </FeedbackStudioLayout>
+    );
+  }
+
+  if (accessState !== "ready") {
+    return (
+      <FeedbackStudioLayout>
+        <ClientAccessStatePanel state={accessState} />
       </FeedbackStudioLayout>
     );
   }

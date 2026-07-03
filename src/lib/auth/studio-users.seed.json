@@ -12,5 +12,21 @@
     "password": "dev-only",
     "displayName": "Staff Dev",
     "roles": ["staff"]
+  },
+  {
+    "id": "client-a",
+    "email": "client-a@local.dev",
+    "password": "dev-only",
+    "displayName": "Client A",
+    "roles": ["client"],
+    "clientCampaignIds": []
+  },
+  {
+    "id": "client-b",
+    "email": "client-b@local.dev",
+    "password": "dev-only",
+    "displayName": "Client B",
+    "roles": ["client"],
+    "clientCampaignIds": []
   }
 ]

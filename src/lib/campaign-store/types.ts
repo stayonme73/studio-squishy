@@ -9,6 +9,8 @@ export type StudioUser = {
   roles: readonly StudioRole[];
   /** Client session — campaign they are actively syncing from this browser. */
   currentCampaignId?: string;
+  /** Durable client ownership — every campaign this client account may open. */
+  clientCampaignIds?: readonly string[];
 };
 
 export type StudioUserRecord = StudioUser & {

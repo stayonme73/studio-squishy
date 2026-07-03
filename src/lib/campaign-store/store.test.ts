@@ -64,6 +64,18 @@ describe("campaign store", () => {
     });
   });
 
+  it("preserves the original client owner on later upserts", async () => {
+    await upsertCampaignRecord(mockRecord(), "client-1");
+
+    const second = await upsertCampaignRecord(
+      mockRecord({ campaignStatus: "PAYMENT_RECEIVED" }),
+      "client-2",
+    );
+
+    expect(second.clientUserId).toBe("client-1");
+    expect((await readCampaignEnvelope(CAMPAIGN_ID))?.clientUserId).toBe("client-1");
+  });
+
   it("blocks fixture campaigns by default", async () => {
     await expect(
       upsertCampaignRecord(mockRecord({ campaignId: "test-campaign" })),

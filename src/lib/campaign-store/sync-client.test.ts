@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import { CUSTOM_STUDIO_PLAN_PACKAGE_ID } from "@/config/studio-board";
+import { SESSION_COOKIE_NAME, createSessionToken } from "@/lib/auth/session";
+import type { StudioUser } from "@/lib/campaign-store/types";
 
 import { readCampaignSyncStatus, syncCampaignToServer } from "./sync-client";
 
@@ -33,9 +35,15 @@ function requestUrl(input: RequestInfo | URL): string {
 
 function makeNextRequest(pathname: string, cookie?: string) {
   return {
+    url: `http://localhost${pathname}`,
     nextUrl: new URL(`http://localhost${pathname}`),
     headers: new Headers(cookie ? { Cookie: cookie } : {}),
   } as import("next/server").NextRequest;
+}
+
+async function sessionCookie(user: StudioUser): Promise<string> {
+  const token = await createSessionToken(user);
+  return `${SESSION_COOKIE_NAME}=${encodeURIComponent(token)}`;
 }
 
 describe("syncCampaignToServer auth guard", () => {
@@ -45,6 +53,7 @@ describe("syncCampaignToServer auth guard", () => {
 
   beforeEach(() => {
     vi.stubEnv("ALLOW_FIXTURE_SYNC", "0");
+    vi.stubEnv("SESSION_SECRET", "test-session-secret-value");
     localStore = {};
     fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = requestUrl(input);
@@ -94,15 +103,18 @@ describe("syncCampaignToServer auth guard", () => {
 
     const { handleProtectedRoutes } = await import("../../../proxy");
     const fileRoomRes = await handleProtectedRoutes(makeNextRequest("/file-room"));
-    expect(fileRoomRes?.status).toBe(401);
+    expect(fileRoomRes?.status).toBe(307);
+    expect(fileRoomRes?.headers.get("location")).toContain("/sign-in");
 
     const kitchenRes = await handleProtectedRoutes(makeNextRequest("/studio-kitchen"));
-    expect(kitchenRes?.status).toBe(401);
+    expect(kitchenRes?.status).toBe(307);
+    expect(kitchenRes?.headers.get("location")).toContain("/sign-in");
 
     const kitchenDetailRes = await handleProtectedRoutes(
       makeNextRequest("/studio-kitchen/demo-campaign"),
     );
-    expect(kitchenDetailRes?.status).toBe(401);
+    expect(kitchenDetailRes?.status).toBe(307);
+    expect(kitchenDetailRes?.headers.get("location")).toContain("/sign-in");
 
     const status = readCampaignSyncStatus();
     expect(status?.state).toBe("error");
@@ -130,7 +142,59 @@ describe("syncCampaignToServer auth guard", () => {
 
       const { handleProtectedRoutes } = await import("../../../proxy");
       const fileRoomRes = await handleProtectedRoutes(makeNextRequest("/file-room"));
-      expect(fileRoomRes?.status).toBe(401);
+      expect(fileRoomRes?.status).toBe(307);
     },
   );
+
+  it("blocks client accounts from staff-only internal routes", async () => {
+    const { handleProtectedRoutes } = await import("../../../proxy");
+    const clientCookie = await sessionCookie({
+      id: "client-1",
+      email: "client@example.com",
+      displayName: "Client",
+      roles: ["client"],
+      clientCampaignIds: ["campaign-a"],
+    });
+
+    const response = await handleProtectedRoutes(makeNextRequest("/file-room", clientCookie));
+    expect(response?.status).toBe(307);
+    expect(response?.headers.get("location")).toContain("/access-denied");
+  });
+
+  it("allows staff accounts into File Room", async () => {
+    const { handleProtectedRoutes } = await import("../../../proxy");
+    const staffCookie = await sessionCookie({
+      id: "staff-dev",
+      email: "staff@local.dev",
+      displayName: "Staff",
+      roles: ["staff"],
+    });
+
+    const response = await handleProtectedRoutes(makeNextRequest("/file-room", staffCookie));
+    expect(response?.status).toBe(200);
+  });
+
+  it("routes unauthenticated client surfaces to sign-in", async () => {
+    const { handleProtectedRoutes } = await import("../../../proxy");
+    const response = await handleProtectedRoutes(makeNextRequest("/studio-board?campaignId=x"));
+
+    expect(response?.status).toBe(307);
+    expect(response?.headers.get("location")).toContain("/sign-in");
+    expect(response?.headers.get("location")).toContain("from=%2Fstudio-board%3FcampaignId%3Dx");
+  });
+
+  it("keeps dev tool APIs staff-only", async () => {
+    const { handleProtectedRoutes } = await import("../../../proxy");
+    const clientCookie = await sessionCookie({
+      id: "client-1",
+      email: "client@example.com",
+      displayName: "Client",
+      roles: ["client"],
+    });
+
+    const response = await handleProtectedRoutes(
+      makeNextRequest("/api/decision-learner/stats", clientCookie),
+    );
+    expect(response?.status).toBe(403);
+  });
 });

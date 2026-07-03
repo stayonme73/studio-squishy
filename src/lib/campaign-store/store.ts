@@ -75,7 +75,7 @@ export async function upsertCampaignRecord(
 
   const envelope: ServerCampaignEnvelope = {
     campaignId: record.campaignId,
-    clientUserId: clientUserId ?? existing?.clientUserId,
+    clientUserId: existing?.clientUserId ?? clientUserId,
     record,
     syncedAt: now,
     syncVersion: (existing?.syncVersion ?? 0) + 1,

@@ -1,26 +1,19 @@
 import { NextResponse } from "next/server";
 
-import { canReadCampaign } from "@/lib/campaign-store/access";
-import { readCampaignEnvelope } from "@/lib/campaign-store/store";
-import { isNextResponse, requireSession } from "@/lib/auth/require-session";
+import { requireReadableCampaign } from "@/lib/campaign-store/server-access";
 
 type RouteContext = {
   params: Promise<{ campaignId: string }>;
 };
 
 export async function GET(request: Request, context: RouteContext) {
-  const user = await requireSession(request);
-  if (isNextResponse(user)) return user;
-
   const { campaignId } = await context.params;
-  const envelope = await readCampaignEnvelope(campaignId);
-  if (!envelope) {
-    return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
-  }
+  const access = await requireReadableCampaign(
+    request,
+    campaignId,
+    `/api/campaigns/${campaignId}`,
+  );
+  if (access instanceof NextResponse) return access;
 
-  if (!canReadCampaign(user, campaignId, envelope)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  return NextResponse.json({ campaign: envelope });
+  return NextResponse.json({ campaign: access.campaignEnvelope });
 }

@@ -15,6 +15,7 @@ import MaterialsIntakePanel from "@/components/materials/MaterialsIntakePanel";
 import PackageSummaryPanel from "@/components/studio-board/PackageSummaryPanel";
 import StudioNotePanel from "@/components/studio-board/StudioNotePanel";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
+import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import HelpCenterLink from "@/components/shared/HelpCenterLink";
 import { helpCenter } from "@/config/help-center";
 import { studioBoard, studioBoardDraftRoomHref, studioBoardStudioGuideHref } from "@/config/studio-board";
@@ -170,7 +171,7 @@ function CampaignMetric({ label, value }: { label: string; value: ReactNode }) {
 /** Studio Board V4 — four primary panels plus dedicated Studio Note column. */
 export default function StudioBoardScene() {
   const searchParams = useSearchParams();
-  const { campaign, ready } = useCurrentCampaign();
+  const { campaign, ready, accessState } = useCurrentCampaign();
   const greetingPeriod = useLiveGreetingPeriod();
   const [recordOpen, setRecordOpen] = useState(false);
   const [productionBriefOpen, setProductionBriefOpen] = useState(false);
@@ -191,6 +192,10 @@ export default function StudioBoardScene() {
       setProductionBriefOpen(true);
     }
   }, [searchParams]);
+
+  if (ready && accessState !== "ready") {
+    return <ClientAccessStatePanel state={accessState} />;
+  }
 
   return (
     <div className="sb sb--v4" aria-label="Studio Board" aria-busy={!ready}>

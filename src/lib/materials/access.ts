@@ -20,8 +20,9 @@ export function canSubmitMaterials(
 ): boolean {
   if (!user) return false;
   if (!user.roles.includes("client")) return false;
-  if (user.currentCampaignId === campaignId) return true;
   if (envelope?.campaignId === campaignId && envelope.clientUserId === user.id) return true;
+  if (user.clientCampaignIds?.includes(campaignId)) return true;
+  if (!envelope?.clientUserId && user.currentCampaignId === campaignId) return true;
   return false;
 }
 

@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import FinalDeliveryAtmosphere from "@/components/deliverables/FinalDeliveryAtmosphere";
+import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
@@ -156,7 +157,7 @@ export default function DeliverablesScene() {
   const searchParams = useSearchParams();
   const previewDelivered =
     searchParams.get("preview") === "delivered" || searchParams.get("room") === "1";
-  const { campaign, ready } = useCurrentCampaign();
+  const { campaign, ready, accessState } = useCurrentCampaign();
   const { delivery: finalDelivery, loading: loadingDelivery } = useFinalDelivery(
     previewDelivered ? undefined : campaign?.campaignId,
   );
@@ -177,6 +178,14 @@ export default function DeliverablesScene() {
         <div className="utility-page" aria-busy="true">
           <div className="utility-shell utility-shell--loading" />
         </div>
+      </UtilityPageFrame>
+    );
+  }
+
+  if (accessState !== "ready") {
+    return (
+      <UtilityPageFrame navId="deliverables">
+        <ClientAccessStatePanel state={accessState} />
       </UtilityPageFrame>
     );
   }

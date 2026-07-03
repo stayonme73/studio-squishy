@@ -269,6 +269,80 @@
   color: var(--utility-text);
 }
 
+.utility-eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--utility-nav-accent-active);
+}
+
+.utility-title {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.85rem, 3.1vw, 2.35rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--utility-primary);
+}
+
+.utility-form {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.35rem;
+  text-align: left;
+}
+
+.utility-field {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--utility-text);
+}
+
+.utility-field input {
+  width: 100%;
+  border: 1px solid var(--utility-border);
+  border-radius: 8px;
+  background: #fff;
+  padding: 0.7rem 0.8rem;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--utility-text);
+}
+
+.utility-field input:focus {
+  outline: 2px solid color-mix(in srgb, var(--utility-primary) 32%, transparent);
+  outline-offset: 2px;
+  border-color: color-mix(in srgb, var(--utility-primary) 45%, transparent);
+}
+
+.utility-error {
+  margin: 0;
+  color: var(--utility-terracotta);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.utility-note {
+  margin: 1rem 0 0;
+  color: var(--utility-text-muted);
+  font-size: 0.92rem;
+}
+
+.utility-note a {
+  color: var(--utility-primary);
+  font-weight: 700;
+}
+
 /* —— Buttons —— */
 
 .utility-btn {

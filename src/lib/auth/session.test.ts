@@ -13,6 +13,7 @@ const user: StudioUser = {
   displayName: "Tagia",
   roles: ["owner", "client"],
   currentCampaignId: "abc",
+  clientCampaignIds: ["abc", "def"],
 };
 
 describe("session signing", () => {
@@ -29,6 +30,7 @@ describe("session signing", () => {
       email: user.email,
       roles: user.roles,
       currentCampaignId: user.currentCampaignId,
+      clientCampaignIds: user.clientCampaignIds,
     });
   });
 

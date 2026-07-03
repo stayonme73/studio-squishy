@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { canReadCampaign } from "@/lib/campaign-store/access";
-import { readCampaignEnvelope } from "@/lib/campaign-store/store";
-import { isNextResponse, requireSession } from "@/lib/auth/require-session";
+import { requireReadableCampaign } from "@/lib/campaign-store/server-access";
 import { getOrGenerateTasks } from "@/lib/campaign-tasks/store";
-import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import {
@@ -19,22 +16,14 @@ type RouteContext = {
 
 /** Client-safe list of jobs ready for Review Room. */
 export async function GET(request: Request, context: RouteContext) {
-  const user = await requireSession(request);
-  if (isNextResponse(user)) return user;
-
   const { campaignId } = await context.params;
-  const [campaignEnvelope, assignments] = await Promise.all([
-    readCampaignEnvelope(campaignId),
-    readCampaignAssignments(),
-  ]);
-
-  if (!campaignEnvelope) {
-    return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
-  }
-
-  if (!canReadCampaign(user, campaignId, campaignEnvelope, assignments)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const access = await requireReadableCampaign(
+    request,
+    campaignId,
+    `/api/campaigns/${campaignId}/review`,
+  );
+  if (access instanceof NextResponse) return access;
+  const { campaignEnvelope } = access;
 
   const [tasksEnvelope, materialsEnvelope] = await Promise.all([
     getOrGenerateTasks(campaignId, campaignEnvelope.record),

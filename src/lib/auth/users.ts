@@ -10,7 +10,18 @@ const USERS_PATH = path.join(process.cwd(), "data", "studio-users.json");
 async function ensureUsersFile(): Promise<void> {
   await fs.mkdir(path.dirname(USERS_PATH), { recursive: true });
   try {
-    await fs.access(USERS_PATH);
+    const raw = await fs.readFile(USERS_PATH, "utf8");
+    const existing = JSON.parse(raw) as StudioUserRecord[];
+    const usersById = new Map(existing.map((user) => [user.id, user]));
+    let changed = false;
+    for (const seedUser of seedUsers as StudioUserRecord[]) {
+      if (usersById.has(seedUser.id)) continue;
+      existing.push(seedUser);
+      changed = true;
+    }
+    if (changed) {
+      await fs.writeFile(USERS_PATH, JSON.stringify(existing, null, 2), "utf8");
+    }
   } catch {
     await fs.writeFile(USERS_PATH, JSON.stringify(seedUsers, null, 2), "utf8");
   }
@@ -58,6 +69,29 @@ export async function updateUserCurrentCampaign(
   users[index] = {
     ...users[index],
     currentCampaignId: campaignId,
+  };
+
+  await fs.writeFile(USERS_PATH, JSON.stringify(users, null, 2), "utf8");
+  return toPublicUser(users[index]);
+}
+
+export async function linkClientCampaign(
+  userId: string,
+  campaignId: string,
+): Promise<StudioUser | null> {
+  const users = await listStudioUsers();
+  const index = users.findIndex((user) => user.id === userId);
+  if (index === -1) return null;
+
+  const existing = users[index].clientCampaignIds ?? [];
+  const clientCampaignIds = existing.includes(campaignId)
+    ? existing
+    : [...existing, campaignId];
+
+  users[index] = {
+    ...users[index],
+    currentCampaignId: campaignId,
+    clientCampaignIds,
   };
 
   await fs.writeFile(USERS_PATH, JSON.stringify(users, null, 2), "utf8");

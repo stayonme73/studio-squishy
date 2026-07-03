@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ServerCampaignEnvelope, StudioUser } from "./types";
 import {
+  canClaimClientCampaign,
   canListAllCampaigns,
   canReadCampaign,
   canSyncCurrentCampaign,
@@ -71,6 +72,44 @@ describe("campaign access", () => {
     expect(canListAllCampaigns(client)).toBe(false);
     expect(canReadCampaign(client, "campaign-a", envelope)).toBe(true);
     expect(canReadCampaign(client, "campaign-b", envelope)).toBe(false);
+  });
+
+  it("allows a client to read every campaign owned by their account", () => {
+    const multiClient: StudioUser = {
+      ...client,
+      currentCampaignId: "campaign-a",
+      clientCampaignIds: ["campaign-a", "campaign-c"],
+    };
+    const campaignC: ServerCampaignEnvelope = {
+      ...envelope,
+      campaignId: "campaign-c",
+      record: { ...envelope.record, campaignId: "campaign-c" },
+    };
+
+    expect(canReadCampaign(multiClient, "campaign-a", envelope)).toBe(true);
+    expect(canReadCampaign(multiClient, "campaign-c", campaignC)).toBe(true);
+    expect(canReadCampaign(multiClient, "campaign-d", {
+      ...envelope,
+      campaignId: "campaign-d",
+      clientUserId: "client-2",
+      record: { ...envelope.record, campaignId: "campaign-d" },
+    })).toBe(false);
+  });
+
+  it("does not let currentCampaignId alone override another client owner", () => {
+    const editedUrlClient: StudioUser = {
+      ...client,
+      currentCampaignId: "campaign-b",
+    };
+    const otherOwned: ServerCampaignEnvelope = {
+      ...envelope,
+      campaignId: "campaign-b",
+      clientUserId: "client-2",
+      record: { ...envelope.record, campaignId: "campaign-b" },
+    };
+
+    expect(canReadCampaign(editedUrlClient, "campaign-b", otherOwned)).toBe(false);
+    expect(canClaimClientCampaign(editedUrlClient, "campaign-b", otherOwned)).toBe(false);
   });
 
   it("blocks fixture campaigns from browse paths", () => {
