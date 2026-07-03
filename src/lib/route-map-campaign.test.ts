@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { getServiceById } from "@/catalog/accessors";
+import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import {
   getJobsForRoad,
   getRouteMapIntakeTypeForSku,
@@ -248,6 +249,9 @@ describe("route-map campaign handoff", () => {
     expect(plan.amountDueTodayCents).toBe(55000);
     expect(plan.lineItems).toHaveLength(2);
     expect(plan.lineItems[1]?.skuId).toBe("v2-addon-post-publish");
+    expect(getServiceById("v2-addon-post-publish")?.isExecutionAddOn).toBe(true);
+    expect(filterProductionPlanLineItems(plan)).toHaveLength(1);
+    expect(filterProductionPlanLineItems(plan)[0]?.skuId).toBe("v2-rtu-social-posts");
   });
 
   it("does not offer post/publish add-on for voice RTU", () => {

@@ -410,9 +410,14 @@ export function applyProductionWorkspacePatch(
         spineStatus: "delivered",
       });
 
-      const allJobs = (envelope.jobRecords ?? []).map((entry) =>
-        entry.jobId === deliveredJob.jobId ? deliveredJob : entry,
+      const productionSkuIds = new Set(
+        filterProductionPlanLineItems(campaign.approvedStudioPlan!).map(
+          (line) => (line.skuId ?? line.serviceId)!,
+        ),
       );
+      const allJobs = (envelope.jobRecords ?? [])
+        .filter((entry) => productionSkuIds.has(entry.skuId))
+        .map((entry) => (entry.jobId === deliveredJob.jobId ? deliveredJob : entry));
       const updatedCampaign = syncCampaignStatusAfterDelivery(campaign, allJobs, occurredAt);
 
       return {

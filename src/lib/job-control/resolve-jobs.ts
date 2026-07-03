@@ -105,7 +105,13 @@ function deriveSpineStatus(
   }
 
   if (persisted?.spineStatus === "waiting_on_client") {
-    return "waiting_on_client";
+    if (isWaitingOnClientForSku(exceptions, materials, skuId, tasks)) {
+      return "waiting_on_client";
+    }
+    if (persisted.productionStartedAt || hasProductionStartedForSku(tasks, skuId)) {
+      return "building_concepts";
+    }
+    return "ready_for_queue";
   }
 
   if (isWaitingOnClientForSku(exceptions, materials, skuId, tasks)) {
@@ -176,6 +182,9 @@ export function buildPurchasedJobRecord(
     intakeComplete,
   );
 
+  const wasWaitingOnClient = persisted?.spineStatus === "waiting_on_client";
+  const leftWaitingTray = wasWaitingOnClient && spineStatus !== "waiting_on_client";
+
   return {
     jobId,
     campaignId: campaign.campaignId,
@@ -190,16 +199,17 @@ export function buildPurchasedJobRecord(
     productionStartedAt:
       persisted?.productionStartedAt ??
       (productionStarted ? now : null),
-    waitingOnClientSince: persisted?.waitingOnClientSince ?? null,
+    waitingOnClientSince:
+      spineStatus === "waiting_on_client" ? persisted?.waitingOnClientSince ?? null : null,
     lastClientResponseAt: persisted?.lastClientResponseAt ?? null,
     lastReminderSentAt: persisted?.lastReminderSentAt ?? null,
-    returnLane: persisted?.returnLane,
+    returnLane: leftWaitingTray ? undefined : persisted?.returnLane,
     ownerApprovalPending: persisted?.ownerApprovalPending ?? null,
     nonRefundable:
       persisted?.nonRefundable ??
       Boolean(productionStarted || persisted?.productionStartedAt),
     refundEligibleAt: persisted?.refundEligibleAt ?? null,
-    laneQueuedAt: persisted?.laneQueuedAt ?? now,
+    laneQueuedAt: leftWaitingTray ? now : persisted?.laneQueuedAt ?? now,
     deliverablePrep: persisted?.deliverablePrep,
     internalNotes: persisted?.internalNotes,
     workingFileRefs: persisted?.workingFileRefs,

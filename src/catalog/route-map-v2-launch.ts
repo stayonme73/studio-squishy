@@ -193,6 +193,7 @@ function routeMapV2ServiceFromDraft(
     requiresClientMaterials: true,
     isRecommendable: false,
     isAddable: Boolean(options.isAddOn),
+    ...(options.isAddOn ? { isExecutionAddOn: true as const } : {}),
     launchStatus: "limited",
     serviceGuideFaq: [],
     deliveryMapping: deliveryMappingFromDraft(draft),

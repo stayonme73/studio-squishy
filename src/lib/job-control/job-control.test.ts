@@ -22,6 +22,7 @@ import {
   shouldMoveJobToWaitingOnClient,
 } from "./waiting-on-client";
 import { resolveOwnerDeskItems } from "./owner-desk";
+import type { PurchasedJobRecord } from "./types";
 
 function lineItem(skuId: string, name: string) {
   return {
@@ -208,6 +209,33 @@ describe("waiting on client policies", () => {
     expect(shouldMoveJobToWaitingOnClient(job, materials, now)).toBe(true);
     const updated = applyWaitingOnClientPolicies([job], materials, now);
     expect(updated[0].spineStatus).toBe("waiting_on_client");
+  });
+
+  it("returns to ready_for_queue when blocking materials are cleared", () => {
+    const job = syncJobRecordsFromCampaign(campaign(), [], [], [])[0];
+    const materials: CampaignMaterialItem[] = [
+      {
+        id: "mat-1",
+        category: "logo-brand",
+        requirementLevel: "required",
+        reviewStatus: "missing",
+        contentKind: "file-metadata",
+        label: "Logo",
+        reason: "Needed",
+        relatedServiceIds: [job.skuId],
+        uploadStatus: "none",
+      },
+    ];
+    const waitingJob: PurchasedJobRecord = {
+      ...job,
+      spineStatus: "waiting_on_client",
+      waitingOnClientSince: "2026-07-01T10:00:00.000Z",
+      returnLane: "quick",
+    };
+    const cleared = syncJobRecordsFromCampaign(campaign(), [], [], [], [waitingJob]);
+    expect(cleared[0].spineStatus).toBe("ready_for_queue");
+    expect(cleared[0].waitingOnClientSince).toBeNull();
+    expect(cleared[0].returnLane).toBeUndefined();
   });
 });
 

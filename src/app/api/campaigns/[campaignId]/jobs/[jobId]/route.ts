@@ -4,12 +4,12 @@ import { readCampaignEnvelope, upsertCampaignRecord } from "@/lib/campaign-store
 import { isNextResponse, requireSession } from "@/lib/auth/require-session";
 import { canOperateProductionTasks, canReadProductionTasks } from "@/lib/campaign-tasks/access";
 import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
+import { getOrInitializeMaterials } from "@/lib/materials/store";
 import { applyProductionWorkspacePatch, type ProductionWorkspacePatchBody } from "@/lib/job-control/production-workspace-actions";
 import { resolveProductionLaneViews } from "@/lib/job-control/capacity";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
 import { resolveFileRoomListItemView } from "@/lib/file-room-view";
-import { getOrInitializeMaterials } from "@/lib/materials/store";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 
@@ -134,10 +134,33 @@ export async function GET(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const tasksEnvelope = await getOrGenerateTasks(campaignId, campaignEnvelope.record);
+  const [tasksEnvelope, materialsEnvelope] = await Promise.all([
+    getOrGenerateTasks(campaignId, campaignEnvelope.record),
+    getOrInitializeMaterials(campaignId, campaignEnvelope.record),
+  ]);
+
+  const synced = syncJobRecordsFromCampaign(
+    campaignEnvelope.record,
+    tasksEnvelope.tasks ?? [],
+    materialsEnvelope.items,
+    tasksEnvelope.exceptionRecords ?? [],
+    tasksEnvelope.jobRecords,
+  );
+  const jobs = applyWaitingOnClientPolicies(synced, materialsEnvelope.items);
+
+  let envelope = tasksEnvelope;
+  const prior = tasksEnvelope.jobRecords ?? [];
+  if (JSON.stringify(prior) !== JSON.stringify(jobs)) {
+    envelope = await writeTasksEnvelope({
+      ...tasksEnvelope,
+      jobRecords: jobs,
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
   return NextResponse.json({
-    jobRecords: tasksEnvelope.jobRecords ?? [],
-    jobActivityEvents: tasksEnvelope.jobActivityEvents ?? [],
-    syncedAt: tasksEnvelope.syncedAt,
+    jobRecords: jobs,
+    jobActivityEvents: envelope.jobActivityEvents ?? [],
+    syncedAt: envelope.syncedAt,
   });
 }
