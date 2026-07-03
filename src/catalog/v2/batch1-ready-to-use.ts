@@ -37,6 +37,7 @@ type Batch1BaseOverrides = {
   turnaroundApprovalStatus?: CatalogV2ServiceEntry["turnaroundApprovalStatus"];
   clientResponsibilityAfterDelivery?: string;
   scopeRoutingNote?: string;
+  intakeTemplate?: CatalogV2ServiceEntry["intakeTemplate"];
 };
 
 function batch1Base(
@@ -107,6 +108,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     placement: "both",
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
+    intakeTemplate: "rtu-flyer",
     clientResponsibilityAfterDelivery:
       "Client handles printing, uploading, posting, emailing, or distributing the finished files through their own printer, platform, or account.",
     scopeRoutingNote:
@@ -173,6 +175,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     placement: "both",
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
+    intakeTemplate: "rtu-menu",
     clientResponsibilityAfterDelivery:
       "Client supplies final approved menu content and is responsible for the accuracy of prices, descriptions, dietary/allergen information, and legal wording.",
     scopeRoutingNote:
@@ -238,6 +241,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     placement: "both",
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
+    intakeTemplate: "rtu-service-sheet",
     clientResponsibilityAfterDelivery:
       "Client supplies final approved content and is responsible for the accuracy of service descriptions, starting prices, contact information, and legal wording.",
     scopeRoutingNote:
@@ -303,6 +307,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     placement: "both",
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
+    intakeTemplate: "rtu-social-posts",
     clientResponsibilityAfterDelivery:
       "Client uploads, posts, schedules, and handles replies, comments, DMs, analytics, and account activity through their own platform.",
     scopeRoutingNote:
@@ -378,6 +383,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     placement: "both",
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
+    intakeTemplate: "rtu-promotion-graphics",
     clientResponsibilityAfterDelivery:
       "Client distributes finished graphics via print, social, email, or other channels through their own printer, platform, or account.",
     scopeRoutingNote:

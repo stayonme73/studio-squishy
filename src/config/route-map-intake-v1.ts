@@ -18,9 +18,52 @@ export type RouteMapIntakeSchema = {
   title: string;
   lead: string;
   fields: readonly RouteMapIntakeField[];
+  /** Shown above fields when Post/Publish add-on was purchased at checkout. */
+  clientResponsibilityNote?: string;
 };
 
 export type RouteMapIntakeAnswers = Record<string, string>;
+
+export type RouteMapIntakeSchemaOptions = {
+  /** When true, append Post/Publish platform/access fields (v2-addon-post-publish). */
+  includePostPublish?: boolean;
+};
+
+const POST_PUBLISH_INTAKE_FIELDS: readonly RouteMapIntakeField[] = [
+  {
+    id: "publishPlatform",
+    label: "Which one connected platform should we publish on?",
+    type: "select",
+    required: true,
+    options: ["Facebook", "Instagram", "TikTok"],
+  },
+  {
+    id: "publishAccess",
+    label: "How will you provide account access for publishing?",
+    type: "text",
+    required: true,
+    placeholder: "Admin invite email, login method, or notes",
+  },
+  {
+    id: "publishTiming",
+    label: "Preferred publish date or time window",
+    type: "text",
+    required: true,
+    placeholder: "e.g. June 15 after 9am, or ASAP after approval",
+  },
+];
+
+const RTU_PRINT_CLIENT_NOTE =
+  "You print and distribute finished files through your own printer or channels unless Post/Publish was added at checkout.";
+
+const RTU_SOCIAL_CLIENT_NOTE =
+  "You upload and post finished files through your own account unless Post/Publish was added at checkout.";
+
+const EMAIL_KIT_CLIENT_NOTE =
+  "You own your audience list, consent, sending account, replies, and opt-outs. The Studio delivers finished email content files only.";
+
+const SMS_KIT_CLIENT_NOTE =
+  "You own your contact list, consent, sending account, replies, and opt-outs. The Studio delivers finished message copy files only.";
 
 export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeType, RouteMapIntakeSchema> = {
   discovery: {
@@ -231,38 +274,208 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeType, RouteMapIntake
       { id: "whereLive", label: "Where is it currently live?", type: "text", required: true },
     ],
   },
-  "rtu-marketing": {
-    type: "rtu-marketing",
-    title: "Marketing Asset Intake",
-    lead: "Tell us what to create and how you plan to use the finished files.",
+  "rtu-flyer": {
+    type: "rtu-flyer",
+    title: "Flyer Intake",
+    lead: "Share only what we need for this one flyer — we deliver finished print and digital files.",
+    clientResponsibilityNote: RTU_PRINT_CLIENT_NOTE,
     fields: [
-      { id: "assetPurpose", label: "What is this for?", type: "textarea", required: true },
+      { id: "flyerPurpose", label: "What is this flyer for?", type: "textarea", required: true },
       {
         id: "mustInclude",
-        label: "Exact text, offer details, dates, prices, or contact info that must appear",
+        label: "Exact text, offer details, dates, prices, location, phone, website, or QR destination",
         type: "textarea",
         required: true,
       },
       {
         id: "materials",
-        label: "Logo, photos, colors, brand materials, or examples to use",
+        label: "Logo, photos, colors, or brand materials",
         type: "textarea",
         required: true,
       },
       {
         id: "intendedUse",
-        label: "How will you use the finished files?",
+        label: "Intended use",
         type: "select",
         required: true,
         options: ["Print", "Digital", "Both print and digital"],
       },
-      { id: "sizeNotes", label: "Required size or format, if known", type: "text" },
+      { id: "sizeNotes", label: "Required flyer size, if known", type: "text" },
+      {
+        id: "disclaimers",
+        label: "Any required wording or disclosures (you supply and verify)",
+        type: "textarea",
+      },
     ],
   },
-  "email-kit": {
-    type: "email-kit",
+  "rtu-menu": {
+    type: "rtu-menu",
+    title: "Menu Intake",
+    lead: "Provide your final menu content — up to 5 sections and 30 items total.",
+    clientResponsibilityNote: RTU_PRINT_CLIENT_NOTE,
+    fields: [
+      { id: "businessName", label: "Business name and type", type: "text", required: true },
+      {
+        id: "sections",
+        label: "Menu sections (up to 5) and section order",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "items",
+        label: "Complete item list with names, descriptions, and prices (up to 30 items total)",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "dietaryLabels",
+        label: "Dietary/allergen labels and required wording (you supply and verify)",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "materials",
+        label: "Logo, photos, colors, or brand materials",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "intendedUse",
+        label: "Intended use",
+        type: "select",
+        required: true,
+        options: ["Print", "Digital", "Both print and digital"],
+      },
+      { id: "sizeNotes", label: "Required menu size, if known", type: "text" },
+      {
+        id: "disclaimers",
+        label: "Any required disclaimers or legal wording (you supply)",
+        type: "textarea",
+      },
+    ],
+  },
+  "rtu-service-sheet": {
+    type: "rtu-service-sheet",
+    title: "Service Sheet Intake",
+    lead: "List up to 10 services with brief descriptions — we design one finished page.",
+    clientResponsibilityNote: RTU_PRINT_CLIENT_NOTE,
+    fields: [
+      {
+        id: "services",
+        label: "Final service names, descriptions, and any starting prices",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "contactDetails",
+        label: "Contact details that must appear",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "wording",
+        label: "Required wording or disclosures (you supply and verify)",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "materials",
+        label: "Logo, photos, and brand materials if available",
+        type: "textarea",
+        required: true,
+      },
+      { id: "sizeNotes", label: "Required size, if known", type: "text" },
+    ],
+  },
+  "rtu-social-posts": {
+    type: "rtu-social-posts",
+    title: "Social Media Posts Intake",
+    lead: "Four post graphics for one platform — share campaign details and materials.",
+    clientResponsibilityNote: RTU_SOCIAL_CLIENT_NOTE,
+    fields: [
+      { id: "postsAbout", label: "What are these posts about?", type: "textarea", required: true },
+      {
+        id: "callToAction",
+        label: "What do people need to know or do? (offer, date, deadline, price, link, phone, or CTA)",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "platform",
+        label: "Which one platform are these for?",
+        type: "select",
+        required: true,
+        options: ["Facebook", "Instagram", "TikTok"],
+      },
+      {
+        id: "materials",
+        label: "Logo, photos, colors, or brand materials",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "wordingHashtags",
+        label: "Any exact wording, required disclosures, or hashtags",
+        type: "textarea",
+      },
+      {
+        id: "mustNotSay",
+        label: "Anything that must not be said or shown",
+        type: "textarea",
+      },
+    ],
+  },
+  "rtu-promotion-graphics": {
+    type: "rtu-promotion-graphics",
+    title: "Campaign Graphics Intake",
+    lead: "Two branded graphics for one campaign — tell us the focus and exact copy.",
+    clientResponsibilityNote: RTU_PRINT_CLIENT_NOTE,
+    fields: [
+      {
+        id: "campaignFocus",
+        label: "Campaign, offer, event, or launch focus",
+        type: "textarea",
+        required: true,
+      },
+      { id: "mustInclude", label: "Exact copy that must appear", type: "textarea", required: true },
+      {
+        id: "dates",
+        label: "Dates, deadlines, or event details",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "callToAction",
+        label: "Call to action, link, phone, or QR destination",
+        type: "text",
+        required: true,
+      },
+      {
+        id: "materials",
+        label: "Logo, photos, colors, or brand materials",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "intendedUse",
+        label: "Intended use",
+        type: "select",
+        required: true,
+        options: ["Print", "Social", "Email", "In-store", "Other"],
+      },
+      { id: "sizeNotes", label: "Required size or format, if known", type: "text" },
+      {
+        id: "disclaimers",
+        label: "Any required wording or disclosures (you supply)",
+        type: "textarea",
+      },
+    ],
+  },
+  "rtu-email-kit": {
+    type: "rtu-email-kit",
     title: "Email Campaign Kit Intake",
-    lead: "Share one campaign goal — we deliver finished email content files for your platform.",
+    lead: "One campaign goal — we deliver up to two finished emails for your platform.",
+    clientResponsibilityNote: EMAIL_KIT_CLIENT_NOTE,
     fields: [
       {
         id: "campaignGoal",
@@ -289,16 +502,36 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeType, RouteMapIntake
         required: true,
       },
       {
+        id: "listConsent",
+        label: "Confirm you own your list and have consent to email this audience",
+        type: "select",
+        required: true,
+        options: ["Yes — I own the list and have consent", "Not yet — I need to set this up first"],
+      },
+      {
+        id: "sendingAccount",
+        label: "Which email platform or sending account will you use?",
+        type: "text",
+        required: true,
+        placeholder: "e.g. Mailchimp, Constant Contact, Gmail",
+      },
+      {
         id: "compliance",
         label: "Required disclaimers or compliance wording (you supply)",
         type: "textarea",
       },
+      {
+        id: "mustNotSay",
+        label: "Anything that must not be said or shown",
+        type: "textarea",
+      },
     ],
   },
-  "sms-kit": {
-    type: "sms-kit",
+  "rtu-sms-kit": {
+    type: "rtu-sms-kit",
     title: "Text Message Campaign Kit Intake",
-    lead: "Share one campaign goal — we deliver message copy files for your SMS platform.",
+    lead: "One campaign goal — we deliver up to four message files for your SMS platform.",
+    clientResponsibilityNote: SMS_KIT_CLIENT_NOTE,
     fields: [
       {
         id: "campaignGoal",
@@ -319,14 +552,147 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeType, RouteMapIntake
         required: true,
       },
       {
+        id: "messageCopy",
+        label: "Exact message copy or talking points for up to four SMS messages",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "listConsent",
+        label: "Confirm you own your contact list and have SMS consent",
+        type: "select",
+        required: true,
+        options: ["Yes — I own the list and have consent", "Not yet — I need to set this up first"],
+      },
+      {
+        id: "sendingAccount",
+        label: "Which SMS platform or sending account will you use?",
+        type: "text",
+        required: true,
+        placeholder: "e.g. Twilio, SimpleTexting, platform name",
+      },
+      {
+        id: "optOutWording",
+        label: "Required opt-out or compliance wording (you supply and verify)",
+        type: "textarea",
+      },
+      {
         id: "timingNotes",
         label: "Any timing preferences for the suggested sequence",
+        type: "textarea",
+      },
+      {
+        id: "mustNotSay",
+        label: "Anything that must not be said or shown",
+        type: "textarea",
+      },
+    ],
+  },
+  "rtu-voice": {
+    type: "rtu-voice",
+    title: "Voice Announcement Intake",
+    lead: "Share approved details — The Studio writes the script and produces the audio.",
+    clientResponsibilityNote:
+      "You upload or distribute the finished audio through your own tools unless Post/Publish was added at checkout.",
+    fields: [
+      {
+        id: "announcementPurpose",
+        label: "Announcement purpose and key message",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "approvedDetails",
+        label: "Approved details, facts, offers, dates, and required wording for The Studio to write the script",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "pronunciationNotes",
+        label: "Pronunciation notes for names, products, and offers",
+        type: "textarea",
+      },
+      {
+        id: "voiceTone",
+        label: "Preferred voice style/tone",
+        type: "select",
+        required: true,
+        options: ["Calm", "Energetic", "Warm", "Direct"],
+      },
+      {
+        id: "language",
+        label: "Language (one language only)",
+        type: "text",
+        required: true,
+        placeholder: "e.g. English",
+      },
+      {
+        id: "mustNotSay",
+        label: "Anything that must not be said",
+        type: "textarea",
+      },
+    ],
+  },
+  "rtu-short-video": {
+    type: "rtu-short-video",
+    title: "Short Video Intake",
+    lead: "One short video up to 45 seconds — share purpose, format, and materials.",
+    clientResponsibilityNote: RTU_SOCIAL_CLIENT_NOTE,
+    fields: [
+      {
+        id: "videoPurpose",
+        label: "Video purpose (campaign, offer, event, service, or promotion focus)",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "format",
+        label: "One format choice",
+        type: "select",
+        required: true,
+        options: ["Vertical", "Square", "Landscape"],
+      },
+      {
+        id: "footageMaterials",
+        label: "Client footage OR approved Studio/stock/AI visuals — photos, logo, and source materials",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "onScreenText",
+        label: "Exact on-screen text, offer details, dates, and CTA",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "brandStyle",
+        label: "Brand colors, fonts, or style references",
+        type: "textarea",
+      },
+      {
+        id: "disclaimers",
+        label: "Any required disclaimers or legal wording (you supply)",
+        type: "textarea",
+      },
+      {
+        id: "mustNotShow",
+        label: "Anything that must not be shown or said",
         type: "textarea",
       },
     ],
   },
 };
 
-export function getRouteMapIntakeSchema(type: RouteMapIntakeType): RouteMapIntakeSchema {
-  return ROUTE_MAP_INTAKE_SCHEMAS[type];
+export function getRouteMapIntakeSchema(
+  type: RouteMapIntakeType,
+  options: RouteMapIntakeSchemaOptions = {},
+): RouteMapIntakeSchema {
+  const base = ROUTE_MAP_INTAKE_SCHEMAS[type];
+  if (!options.includePostPublish) return base;
+
+  return {
+    ...base,
+    fields: [...base.fields, ...POST_PUBLISH_INTAKE_FIELDS],
+    lead: `${base.lead} Post/Publish add-on selected — include platform access details below.`,
+  };
 }

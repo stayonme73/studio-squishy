@@ -35,9 +35,15 @@ export type RouteMapIntakeType =
   | "page"
   | "voice"
   | "update"
-  | "rtu-marketing"
-  | "email-kit"
-  | "sms-kit";
+  | "rtu-flyer"
+  | "rtu-menu"
+  | "rtu-service-sheet"
+  | "rtu-social-posts"
+  | "rtu-promotion-graphics"
+  | "rtu-email-kit"
+  | "rtu-sms-kit"
+  | "rtu-voice"
+  | "rtu-short-video";
 
 export type RouteMapRoad = {
   id: RouteMapRoadId;
@@ -90,18 +96,25 @@ const ROUTE_MAP_PRICE_DISPLAY: Partial<Record<RouteMapLaunchServiceId, string>> 
   "rm-j006": "$400 / platform",
 };
 
-/** V2 RTU intake routing — reuse closest rm-j patterns where scope aligns. */
+/** V2 RTU intake routing — one short service-specific form per activated shelf SKU. */
 const V2_INTAKE_BY_SKU: Record<RouteMapV2ShelfServiceId, RouteMapIntakeType> = {
-  "v2-rtu-flyer": "rtu-marketing",
-  "v2-rtu-menu": "rtu-marketing",
-  "v2-rtu-service-sheet": "rtu-marketing",
-  "v2-rtu-promotion-graphics": "rtu-marketing",
-  "v2-rtu-social-posts": "promotion",
-  "v2-rtu-short-video": "video",
-  "v2-rtu-voice": "voice",
-  "v2-rtu-email-kit": "email-kit",
-  "v2-rtu-sms-kit": "sms-kit",
+  "v2-rtu-flyer": "rtu-flyer",
+  "v2-rtu-menu": "rtu-menu",
+  "v2-rtu-service-sheet": "rtu-service-sheet",
+  "v2-rtu-promotion-graphics": "rtu-promotion-graphics",
+  "v2-rtu-social-posts": "rtu-social-posts",
+  "v2-rtu-short-video": "rtu-short-video",
+  "v2-rtu-voice": "rtu-voice",
+  "v2-rtu-email-kit": "rtu-email-kit",
+  "v2-rtu-sms-kit": "rtu-sms-kit",
 };
+
+export function getRouteMapIntakeTypeForSku(jobId: RouteMapJobId): RouteMapIntakeType | undefined {
+  if (isRouteMapV2ShelfServiceId(jobId)) {
+    return V2_INTAKE_BY_SKU[jobId];
+  }
+  return ROUTE_MAP_JOB_META[jobId as RouteMapLaunchServiceId]?.intakeType;
+}
 
 /** Retired rm-j* → V2 replacement for deep links / legacy redirects. */
 const RETIRED_ROUTE_MAP_REDIRECTS: Partial<Record<RouteMapLaunchServiceId, RouteMapV2ShelfServiceId>> =

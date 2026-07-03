@@ -206,7 +206,11 @@ export default function RouteMapScene() {
 
           {showIntake ? (
             <div className="route-map-world__sheet route-map-world__sheet--intake">
-              <RouteMapIntakeForm job={selectedJob} onSubmit={handleIntakeSubmit} />
+              <RouteMapIntakeForm
+                job={selectedJob}
+                postPublishAddon={postPublishEligible && includePostPublishAddon}
+                onSubmit={handleIntakeSubmit}
+              />
             </div>
           ) : null}
         </div>

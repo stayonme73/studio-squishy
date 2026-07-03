@@ -3,12 +3,14 @@ import { describe, expect, it } from "vitest";
 import { getServiceById } from "@/catalog/accessors";
 import {
   getJobsForRoad,
+  getRouteMapIntakeTypeForSku,
   getRouteMapJob,
   getRouteStartJob,
   getSelectableRouteMapRoads,
   resolveRouteMapShelfJobId,
   ROUTE_MAP_V1,
 } from "@/config/route-map-v1";
+import { getRouteMapIntakeSchema } from "@/config/route-map-intake-v1";
 import {
   buildApprovedPlanFromRouteMapJob,
   buildRouteMapPaymentSummary,
@@ -167,6 +169,67 @@ describe("route-map catalog SKUs", () => {
   });
 });
 
+describe("route-map intake template routing", () => {
+  it("maps each activated V2 RTU SKU to a service-specific short intake", () => {
+    const v2Expectations: Record<string, string> = {
+      "v2-rtu-flyer": "rtu-flyer",
+      "v2-rtu-menu": "rtu-menu",
+      "v2-rtu-service-sheet": "rtu-service-sheet",
+      "v2-rtu-social-posts": "rtu-social-posts",
+      "v2-rtu-promotion-graphics": "rtu-promotion-graphics",
+      "v2-rtu-email-kit": "rtu-email-kit",
+      "v2-rtu-sms-kit": "rtu-sms-kit",
+      "v2-rtu-voice": "rtu-voice",
+      "v2-rtu-short-video": "rtu-short-video",
+    };
+
+    for (const [sku, intakeType] of Object.entries(v2Expectations)) {
+      expect(getRouteMapIntakeTypeForSku(sku as keyof typeof v2Expectations)).toBe(intakeType);
+      expect(getRouteMapJob(sku as keyof typeof v2Expectations)?.intakeType).toBe(intakeType);
+      const schema = getRouteMapIntakeSchema(intakeType as keyof typeof v2Expectations);
+      expect(schema.type).toBe(intakeType);
+      expect(schema.fields.length).toBeGreaterThan(0);
+      expect(schema.fields.length).toBeLessThan(12);
+    }
+  });
+
+  it("keeps Route Start on discovery intake and continuing V1 jobs unchanged", () => {
+    expect(getRouteMapIntakeTypeForSku("rm-j001")).toBe("discovery");
+    expect(getRouteMapJob("rm-j002")?.intakeType).toBe("social-setup");
+    expect(getRouteMapJob("rm-j005")?.intakeType).toBe("page");
+    expect(getRouteMapJob("rm-j007")?.intakeType).toBe("update");
+    expect(getRouteMapJob("rm-j008")?.intakeType).toBe("social-setup");
+  });
+
+  it("redirects retired shelf IDs to V2 intake templates", () => {
+    expect(resolveRouteMapShelfJobId("rm-j003")).toBe("v2-rtu-social-posts");
+    expect(getRouteMapJob("v2-rtu-social-posts")?.intakeType).toBe("rtu-social-posts");
+    expect(resolveRouteMapShelfJobId("rm-j004")).toBe("v2-rtu-short-video");
+    expect(getRouteMapJob("v2-rtu-short-video")?.intakeType).toBe("rtu-short-video");
+    expect(resolveRouteMapShelfJobId("rm-j006")).toBe("v2-rtu-voice");
+    expect(getRouteMapJob("v2-rtu-voice")?.intakeType).toBe("rtu-voice");
+  });
+
+  it("appends Post/Publish fields when add-on purchased at checkout", () => {
+    const base = getRouteMapIntakeSchema("rtu-social-posts");
+    const withAddon = getRouteMapIntakeSchema("rtu-social-posts", { includePostPublish: true });
+    expect(withAddon.fields.length).toBe(base.fields.length + 3);
+    expect(withAddon.fields.some((field) => field.id === "publishPlatform")).toBe(true);
+  });
+
+  it("does not route V2 RTU jobs to project-details or discovery schemas", () => {
+    for (const sku of [
+      "v2-rtu-flyer",
+      "v2-rtu-email-kit",
+      "v2-rtu-sms-kit",
+    ] as const) {
+      const intakeType = getRouteMapJob(sku)?.intakeType;
+      expect(intakeType).not.toBe("discovery");
+      expect(getRouteMapIntakeSchema(intakeType!).title.toLowerCase()).not.toContain("discovery");
+    }
+  });
+});
+
 describe("route-map campaign handoff", () => {
   it("builds approved plan from V2 social posts catalog pricing", () => {
     const job = getRouteMapJob("v2-rtu-social-posts");
@@ -252,7 +315,7 @@ describe("route-map campaign handoff", () => {
       storage.set("studio-squishy:current-campaign", JSON.stringify(campaign));
       const submitted = submitRouteMapIntake(
         {
-          assetPurpose: "Grand opening flyer",
+          flyerPurpose: "Grand opening flyer",
           mustInclude: "June 15 opening, 10% off",
           materials: "Logo PNG attached",
           intendedUse: "Print",
@@ -335,5 +398,134 @@ describe("route-map campaign handoff", () => {
   it("does not expose a creative brief before Route Map intake is submitted", () => {
     const campaign = createCampaignFromRouteMapJob("v2-rtu-social-posts", "random-exit")!;
     expect(hasCampaignCreativeBrief(campaign)).toBe(false);
+  });
+});
+
+describe("route-map intake E2E paths (programmatic)", () => {
+  function mockStorageCampaign(campaign: ReturnType<typeof createCampaignFromRouteMapJob>) {
+    const storage = new Map<string, string>();
+    const originalWindow = globalThis.window;
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {
+        localStorage: {
+          getItem: (key: string) => storage.get(key) ?? null,
+          setItem: (key: string, value: string) => storage.set(key, value),
+          removeItem: (key: string) => storage.delete(key),
+        },
+        dispatchEvent: () => true,
+      },
+    });
+    storage.set("studio-squishy:current-campaign", JSON.stringify(campaign));
+    return () => {
+      Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        value: originalWindow,
+      });
+    };
+  }
+
+  it("path 1: V2 ready-to-use flyer → short intake → Building Concepts", () => {
+    const job = getRouteMapJob("v2-rtu-flyer")!;
+    expect(job.intakeType).toBe("rtu-flyer");
+    const plan = buildApprovedPlanFromRouteMapJob(job);
+    let campaign = createCampaignFromRouteMapJob("v2-rtu-flyer", "random-exit")!;
+    campaign = { ...campaign!, paymentReceivedAt: new Date().toISOString(), approvedStudioPlan: plan };
+    const restore = mockStorageCampaign(campaign);
+    try {
+      const submitted = submitRouteMapIntake({
+        flyerPurpose: "Summer sale",
+        mustInclude: "20% off",
+        materials: "Logo",
+        intendedUse: "Print",
+      });
+      expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
+      expect(getRouteMapIntakeSchema("rtu-flyer").title).toBe("Flyer Intake");
+    } finally {
+      restore();
+    }
+  });
+
+  it("path 2: V2 social posts + Post/Publish add-on → intake with publish fields", () => {
+    const job = getRouteMapJob("v2-rtu-social-posts")!;
+    const plan = buildApprovedPlanFromRouteMapJob(job, { includePostPublishAddon: true });
+    expect(plan.lineItems).toHaveLength(2);
+    let campaign = createCampaignFromRouteMapJob("v2-rtu-social-posts", "i20", {
+      includePostPublishAddon: true,
+    })!;
+    campaign = {
+      ...campaign,
+      paymentReceivedAt: new Date().toISOString(),
+      approvedStudioPlan: plan,
+      routeMapContext: { ...campaign.routeMapContext!, postPublishAddon: true },
+    };
+    const schema = getRouteMapIntakeSchema("rtu-social-posts", { includePostPublish: true });
+    expect(schema.fields.some((f) => f.id === "publishPlatform")).toBe(true);
+    const restore = mockStorageCampaign(campaign);
+    try {
+      const submitted = submitRouteMapIntake({
+        postsAbout: "Launch",
+        callToAction: "Shop",
+        platform: "Instagram",
+        materials: "Photos",
+        publishPlatform: "Instagram",
+        publishAccess: "Invite sent",
+        publishTiming: "ASAP",
+      });
+      expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
+    } finally {
+      restore();
+    }
+  });
+
+  it("path 3: V2 email kit → client-responsibility intake → Building Concepts", () => {
+    const job = getRouteMapJob("v2-rtu-email-kit")!;
+    expect(job.intakeType).toBe("rtu-email-kit");
+    const schema = getRouteMapIntakeSchema("rtu-email-kit");
+    expect(schema.clientResponsibilityNote).toContain("list");
+    let campaign = createCampaignFromRouteMapJob("v2-rtu-email-kit", "i20")!;
+    campaign = {
+      ...campaign!,
+      paymentReceivedAt: new Date().toISOString(),
+      approvedStudioPlan: buildApprovedPlanFromRouteMapJob(job),
+    };
+    const restore = mockStorageCampaign(campaign);
+    try {
+      const submitted = submitRouteMapIntake({
+        campaignGoal: "Promo",
+        mustInclude: "Code SAVE10",
+        callToAction: "Shop",
+        materials: "Logo",
+        listConsent: "Yes — I own the list and have consent",
+        sendingAccount: "Mailchimp",
+      });
+      expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
+    } finally {
+      restore();
+    }
+  });
+
+  it("path 4: continuing V1 rm-j002 → social-setup intake unchanged", () => {
+    const job = getRouteMapJob("rm-j002")!;
+    expect(job.intakeType).toBe("social-setup");
+    let campaign = createCampaignFromRouteMapJob("rm-j002", "i75")!;
+    campaign = {
+      ...campaign!,
+      paymentReceivedAt: new Date().toISOString(),
+      approvedStudioPlan: buildApprovedPlanFromRouteMapJob(job),
+    };
+    const restore = mockStorageCampaign(campaign);
+    try {
+      const submitted = submitRouteMapIntake({
+        platform: "Facebook",
+        businessName: "Acme",
+        profileGoal: "Visibility",
+        accountAccess: "Admin invite",
+      });
+      expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
+      expect(getRouteMapIntakeSchema("social-setup").title).toBe("Social Profile Setup");
+    } finally {
+      restore();
+    }
   });
 });

@@ -6,15 +6,20 @@ import {
   getRouteMapIntakeSchema,
   type RouteMapIntakeAnswers,
 } from "@/config/route-map-intake-v1";
-import { ROUTE_MAP_V1, type RouteMapJob } from "@/config/route-map-v1";
+import type { RouteMapJob } from "@/config/route-map-v1";
 
 type Props = {
   job: RouteMapJob;
+  /** When true, intake includes Post/Publish platform/access fields. */
+  postPublishAddon?: boolean;
   onSubmit: (answers: RouteMapIntakeAnswers) => void;
 };
 
-export default function RouteMapIntakeForm({ job, onSubmit }: Props) {
-  const schema = useMemo(() => getRouteMapIntakeSchema(job.intakeType), [job.intakeType]);
+export default function RouteMapIntakeForm({ job, postPublishAddon = false, onSubmit }: Props) {
+  const schema = useMemo(
+    () => getRouteMapIntakeSchema(job.intakeType, { includePostPublish: postPublishAddon }),
+    [job.intakeType, postPublishAddon],
+  );
   const [answers, setAnswers] = useState<RouteMapIntakeAnswers>(() =>
     Object.fromEntries(schema.fields.map((field) => [field.id, ""])),
   );
@@ -35,7 +40,10 @@ export default function RouteMapIntakeForm({ job, onSubmit }: Props) {
       <h2 id="route-map-intake-title" className="route-map-section-title">
         {schema.title}
       </h2>
-      <p className="route-map-section-lead">{ROUTE_MAP_V1.checkout.intakeLead}</p>
+      <p className="route-map-section-lead">{schema.lead}</p>
+      {schema.clientResponsibilityNote ? (
+        <p className="route-map-section-lead">{schema.clientResponsibilityNote}</p>
+      ) : null}
       <p className="route-map-intake__job">{job.name}</p>
 
       <form className="route-map-intake__form" onSubmit={handleSubmit}>

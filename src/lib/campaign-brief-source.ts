@@ -238,8 +238,23 @@ function extractRouteMapBrief(campaign: CampaignRecord): CampaignCreativeBrief |
   if (!answers || !campaign.routeMapIntakeSubmittedAt) return null;
 
   const businessName = trimField(answers.businessName);
-  const promoting = trimField(answers.promoting ?? answers.pageFor ?? answers.announcing);
-  const whatYouDo = trimField(answers.whatYouDo ?? answers.businessDescription ?? answers.offerDetails);
+  const promoting = trimField(
+    answers.promoting ??
+      answers.pageFor ??
+      answers.announcing ??
+      answers.flyerPurpose ??
+      answers.postsAbout ??
+      answers.campaignFocus ??
+      answers.videoPurpose ??
+      answers.announcementPurpose,
+  );
+  const whatYouDo = trimField(
+    answers.whatYouDo ??
+      answers.businessDescription ??
+      answers.offerDetails ??
+      answers.approvedDetails ??
+      answers.services,
+  );
   const projectName = businessName || promoting || campaign.campaignName.trim();
   const business = whatYouDo || promoting || businessName;
 
@@ -267,7 +282,9 @@ function extractRouteMapBrief(campaign: CampaignRecord): CampaignCreativeBrief |
       trimField(answers.successLooksLike ?? answers.desiredOutcome ?? answers.afterReading) ||
       trimField(answers.promotionGoal ?? answers.callToAction),
     successMetric: trimField(answers.successMetric),
-    avoidNotes: trimField(answers.avoid ?? answers.doNotUse ?? answers.remove),
+    avoidNotes: trimField(
+      answers.avoid ?? answers.doNotUse ?? answers.remove ?? answers.mustNotSay ?? answers.mustNotShow,
+    ),
     inspiration: trimField(answers.inspiration ?? answers.referenceLinks ?? answers.materials),
     timing: trimField(answers.deadline ?? answers.timing ?? answers.importantDates ?? answers.mustInclude),
     approvedServiceNames,

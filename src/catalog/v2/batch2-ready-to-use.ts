@@ -48,6 +48,7 @@ type Batch2BaseOverrides = {
   deliveryType?: CatalogV2ServiceEntry["deliveryType"];
   draftBatch?: string;
   sourceExecutionMode?: CatalogV2ServiceEntry["sourceExecutionMode"];
+  intakeTemplate?: CatalogV2ServiceEntry["intakeTemplate"];
 };
 
 function batch2ReadyToUseBase(
@@ -171,6 +172,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     placement: "both",
     laneEligibility: ["i20", "random-exit"],
     turnaroundApprovalStatus: "approved",
+    intakeTemplate: "rtu-email-kit",
     clientResponsibilityAfterDelivery: CATALOG_V2_BATCH2_EMAIL_CLIENT_RESPONSIBILITY,
     scopeRoutingNote:
       "Automation, segmentation, list building, monthly batches, or more than two emails route to Help Me Figure Out What I Need (rm-j001), not into this SKU.",
@@ -233,6 +235,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     placement: "both",
     laneEligibility: ["i20", "random-exit"],
     turnaroundApprovalStatus: "approved",
+    intakeTemplate: "rtu-sms-kit",
     clientResponsibilityAfterDelivery: CATALOG_V2_BATCH2_SMS_CLIENT_RESPONSIBILITY,
     scopeRoutingNote:
       "MMS, automation, monthly batches, consent setup, or more than four messages route to Help Me Figure Out What I Need (rm-j001), not into this SKU.",
@@ -296,6 +299,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     priceCents: 25000,
     priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
     turnaroundApprovalStatus: "approved",
+    intakeTemplate: "rtu-voice",
     clientResponsibilityAfterDelivery:
       "Client provides approved details and facts for the script and is responsible for pronunciation accuracy, claims, and rights; client uploads, embeds, or distributes the delivered audio file through their own tools.",
     scopeRoutingNote:
@@ -359,6 +363,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     priceCents: 55000,
     priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
     turnaroundApprovalStatus: "approved",
+    intakeTemplate: "rtu-short-video",
     clientResponsibilityAfterDelivery:
       "Client supplies usable organized footage, photos, logo, and source materials when using client visuals; client uploads, posts, or distributes the delivered MP4 through their own platform unless they separately purchase post/publish add-on with this job.",
     scopeRoutingNote:

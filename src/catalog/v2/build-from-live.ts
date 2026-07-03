@@ -9,13 +9,14 @@ import type {
   ExecutionMode,
   LaunchStatus,
   RouteMapLaunchServiceId,
+  RouteMapShelfJobId,
   ServiceId,
   StudioServiceEntry,
 } from "@/catalog/types";
 import { PROJECT_DETAILS_GREEN_SKU_IDS } from "@/config/project-details";
 import {
   getRouteMapJob,
-  isRouteMapJobId,
+  isRouteMapShelfJobId,
 } from "@/config/route-map-v1";
 import type {
   CatalogV2Availability,
@@ -77,8 +78,12 @@ function turnaroundForService(
   service: StudioServiceEntry,
   isRouteMapJob: boolean,
 ): string {
-  if (isRouteMapJob && isRouteMapJobId(service.id)) {
-    return ROUTE_MAP_V2_TURNAROUND[service.id as RouteMapLaunchServiceId];
+  if (isRouteMapJob && isRouteMapShelfJobId(service.id)) {
+    const job = getRouteMapJob(service.id);
+    if (job?.timingLabel) return job.timingLabel;
+    if (service.id in ROUTE_MAP_V2_TURNAROUND) {
+      return ROUTE_MAP_V2_TURNAROUND[service.id as RouteMapLaunchServiceId];
+    }
   }
   return turnaroundFromService(service);
 }
@@ -120,7 +125,7 @@ function intakeTemplateForService(
   if (availability !== "active") return "";
 
   if (isRouteMapJob) {
-    const job = getRouteMapJob(serviceId as RouteMapLaunchServiceId);
+    const job = isRouteMapShelfJobId(serviceId) ? getRouteMapJob(serviceId) : undefined;
     return job?.intakeType ?? "";
   }
 
@@ -131,10 +136,11 @@ function intakeTemplateForService(
 
 /** Build one Catalog V2 draft entry from a live catalog service record. */
 export function buildCatalogV2EntryFromLive(service: StudioServiceEntry): CatalogV2ServiceEntry {
-  const isRouteMapJob = isRouteMapJobId(service.id);
-  const routeMapJob = isRouteMapJob
-    ? getRouteMapJob(service.id as RouteMapLaunchServiceId)
-    : undefined;
+  const shelfJobId: RouteMapShelfJobId | null = isRouteMapShelfJobId(service.id)
+    ? service.id
+    : null;
+  const isRouteMapJob = shelfJobId !== null;
+  const routeMapJob = shelfJobId ? getRouteMapJob(shelfJobId) : undefined;
 
   const routeMapEligible = isRouteMapJob;
   const directExitEligible = routeMapJob?.roads.includes("random-exit") ?? false;
