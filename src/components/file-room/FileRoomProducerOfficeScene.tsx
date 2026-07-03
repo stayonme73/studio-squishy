@@ -14,6 +14,9 @@ import type {
 import type { FileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
 import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
+import type { TeamOfficeWorkPacketView } from "@/lib/job-control/work-packets";
+
+import FileRoomWorkPacketPanel from "./FileRoomWorkPacketPanel";
 
 type FileRoomProducerOfficeSceneProps = {
   campaignId: string;
@@ -24,6 +27,7 @@ type FileRoomProducerOfficeSceneProps = {
   productionEnvelope: ServerProductionEnvelope;
   studioUser: StudioUser;
   canEditWorkByTaskId: Readonly<Record<string, boolean>>;
+  workPacket: TeamOfficeWorkPacketView | null;
 };
 
 export default function FileRoomProducerOfficeScene({
@@ -35,6 +39,7 @@ export default function FileRoomProducerOfficeScene({
   productionEnvelope,
   studioUser,
   canEditWorkByTaskId,
+  workPacket,
 }: FileRoomProducerOfficeSceneProps) {
   const officeLabel = teamOfficeRoleLabels.producer_dispatcher;
 
@@ -115,22 +120,25 @@ export default function FileRoomProducerOfficeScene({
 
         <div className="fr-office-grid__work">
           {selectedTask ? (
-            <FileRoomProductionTasksSection
-              campaignId={campaignId}
-              productionTasks={productionTasks}
-              operatorContext={operatorContext}
-              showExceptionBadges
-              productionEnvelope={productionEnvelope}
-              studioUser={studioUser}
-              canEditWorkByTaskId={canEditWorkByTaskId}
-              officeMode={{
-                readOnly: true,
-                hideQaActions: true,
-                hideReassign: false,
-                allowHandoffDespiteReadOnly: true,
-                singleTask: selectedTask,
-              }}
-            />
+            <>
+              <FileRoomWorkPacketPanel packet={workPacket} />
+              <FileRoomProductionTasksSection
+                campaignId={campaignId}
+                productionTasks={productionTasks}
+                operatorContext={operatorContext}
+                showExceptionBadges
+                productionEnvelope={productionEnvelope}
+                studioUser={studioUser}
+                canEditWorkByTaskId={canEditWorkByTaskId}
+                officeMode={{
+                  readOnly: true,
+                  hideQaActions: true,
+                  hideReassign: false,
+                  allowHandoffDespiteReadOnly: true,
+                  singleTask: selectedTask,
+                }}
+              />
+            </>
           ) : (
             <FileRoomSectionCard title={teamOffices.activeWorkTitle}>
               <p className="fr-tasks-empty__body">{teamOffices.producerDispatchEmpty}</p>

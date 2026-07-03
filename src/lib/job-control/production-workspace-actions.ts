@@ -1,7 +1,7 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
-import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
+import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
 
@@ -19,10 +19,25 @@ import {
   resolveRequiredDeliverableKeys,
 } from "./production-workspace-gates";
 import { parseJobId } from "./lane-map";
-import type { JobActivityActor, JobActivityEvent, PurchasedJobRecord } from "./types";
+import {
+  isJobWorkPacketRole,
+  resolveWorkPacketRolesForJob,
+  resolveWorkPacketTasksForRole,
+  workPacketId,
+} from "./work-packets";
+import type {
+  JobActivityActor,
+  JobActivityEvent,
+  JobWorkPacket,
+  JobWorkPacketFileKind,
+  JobWorkPacketRole,
+  PurchasedJobRecord,
+} from "./types";
 
 export type ProductionWorkspacePatchAction =
   | "start_building_concepts"
+  | "assign_work_packet"
+  | "return_work_packet_file"
   | "mark_deliverable_prepared"
   | "add_internal_note"
   | "add_working_file_ref"
@@ -35,6 +50,16 @@ export type ProductionWorkspacePatchAction =
 
 export type ProductionWorkspacePatchBody =
   | { action: "start_building_concepts" }
+  | { action: "assign_work_packet"; role: JobWorkPacketRole; note?: string }
+  | {
+      action: "return_work_packet_file";
+      packetId: string;
+      fileKind: JobWorkPacketFileKind;
+      label: string;
+      url: string;
+      deliverableKey?: string;
+      note?: string;
+    }
   | { action: "mark_deliverable_prepared"; deliverableKey: string }
   | { action: "add_internal_note"; content: string }
   | { action: "add_working_file_ref"; label: string; url: string }
@@ -98,7 +123,7 @@ function updateJobInEnvelope(
     jobRecords,
     jobActivityEvents: events,
     updatedAt: new Date().toISOString(),
-    version: Math.max(envelope.version ?? 7, 7),
+    version: Math.max(envelope.version ?? 10, 10),
   };
 }
 
@@ -111,6 +136,7 @@ export function applyProductionWorkspacePatch(
   materials: readonly CampaignMaterialItem[],
   laneViews: readonly ProductionLaneView[],
   clientId = `unclaimed-client:${campaign.campaignId}`,
+  tasks: readonly CampaignTaskItem[] = [],
 ): ProductionWorkspacePatchResult {
   const parsed = parseJobId(jobId);
   if (!parsed || parsed.campaignId !== campaign.campaignId) {
@@ -166,6 +192,150 @@ export function applyProductionWorkspacePatch(
         },
       );
       events = envelope.jobActivityEvents ?? [];
+      break;
+    }
+
+    case "assign_work_packet": {
+      if (!isJobWorkPacketRole(body.role)) {
+        return { ok: false, error: "Unknown Team Office role.", status: 400 };
+      }
+
+      const allowedRoles = resolveWorkPacketRolesForJob(tasks, job);
+      if (!allowedRoles.includes(body.role)) {
+        return { ok: false, error: "Role is not part of this job's production pipeline.", status: 400 };
+      }
+
+      const roleTasks = resolveWorkPacketTasksForRole(tasks, job, body.role);
+      const packetId = workPacketId(job.jobId, body.role);
+      const assignment = {
+        id: `assign:${packetId}:${occurredAt}`,
+        assignedAt: occurredAt,
+        assignedBy: actor,
+        role: body.role,
+        note: body.note?.trim() || undefined,
+      };
+      const existingPackets = [...(job.workPackets ?? [])];
+      const existingIndex = existingPackets.findIndex((packet) => packet.id === packetId);
+      const existing = existingPackets[existingIndex];
+      const packet: JobWorkPacket = {
+        id: packetId,
+        jobId: job.jobId,
+        campaignId: job.campaignId,
+        role: body.role,
+        taskIds: roleTasks.map((task) => task.id),
+        status: "assigned",
+        createdAt: existing?.createdAt ?? occurredAt,
+        updatedAt: occurredAt,
+        assignmentEvents: [...(existing?.assignmentEvents ?? []), assignment],
+        returnedFileRefs: existing?.returnedFileRefs ?? [],
+        returnLocation: "production_workspace",
+        ownerApprovalRequired: true,
+      };
+
+      if (existingIndex >= 0) {
+        existingPackets[existingIndex] = packet;
+      } else {
+        existingPackets.push(packet);
+      }
+
+      job = {
+        ...job,
+        workPackets: existingPackets,
+        updatedAt: occurredAt,
+      };
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "work_packet_assigned",
+        occurredAt,
+        actor,
+        reason: `Assigned Work Packet to ${body.role}`,
+        messageRef: packetId,
+      });
+      break;
+    }
+
+    case "return_work_packet_file": {
+      const label = body.label.trim();
+      const url = body.url.trim();
+      if (!label || !url) {
+        return { ok: false, error: "Returned file label and URL are required.", status: 400 };
+      }
+      if (body.fileKind !== "draft" && body.fileKind !== "final") {
+        return { ok: false, error: "Returned file kind must be draft or final.", status: 400 };
+      }
+
+      const packets = [...(job.workPackets ?? [])];
+      const packetIndex = packets.findIndex((packet) => packet.id === body.packetId);
+      if (packetIndex === -1) {
+        return { ok: false, error: "Work Packet not found for this job.", status: 404 };
+      }
+
+      const deliverableDef = body.deliverableKey
+        ? resolveRequiredDeliverableKeys(requiredDeliverables).find(
+            (entry) => entry.key === body.deliverableKey,
+          )
+        : undefined;
+      if (body.deliverableKey && !deliverableDef) {
+        return { ok: false, error: "Unknown deliverable.", status: 400 };
+      }
+
+      const returnedFile = {
+        id: `wpr:${body.packetId}:${occurredAt}`,
+        kind: body.fileKind,
+        label,
+        url,
+        returnedAt: occurredAt,
+        returnedBy: actor,
+        deliverableKey: deliverableDef?.key,
+        deliverableLabel: deliverableDef?.label,
+        note: body.note?.trim() || undefined,
+      };
+      const packet = packets[packetIndex]!;
+      packets[packetIndex] = {
+        ...packet,
+        status: "returned",
+        updatedAt: occurredAt,
+        returnedFileRefs: [...packet.returnedFileRefs, returnedFile],
+      };
+
+      job = {
+        ...job,
+        workPackets: packets,
+        workingFileRefs: [
+          ...(job.workingFileRefs ?? []),
+          {
+            id: `ref:${job.jobId}:work-packet:${occurredAt}`,
+            label: `${body.fileKind === "final" ? "Final" : "Draft"} return: ${label}`,
+            url,
+            addedAt: occurredAt,
+            author: actor,
+          },
+        ],
+        deliverablePrep:
+          body.fileKind === "final" && deliverableDef
+            ? mergeDeliverablePrep(
+                job.deliverablePrep,
+                deliverableDef.key,
+                deliverableDef.label,
+                true,
+                actor,
+                occurredAt,
+              )
+            : job.deliverablePrep,
+        updatedAt: occurredAt,
+      };
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "work_packet_returned",
+        occurredAt,
+        actor,
+        reason: `Returned ${body.fileKind} file: ${label}`,
+        messageRef: returnedFile.id,
+      });
       break;
     }
 

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import type { CampaignRecord } from "@/config/studio-board";
+import type {
+  CampaignTaskItem,
+  ProductionRole,
+  ProductionTaskFamilyId,
+  TaskPhase,
+} from "@/lib/campaign-tasks/types";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 
 import { applyProductionWorkspacePatch } from "./production-workspace-actions";
@@ -30,6 +36,13 @@ function lineItem(skuId: string, name: string) {
     revisionRule: "1 round",
     clientResponsibilities: [],
     executionResponsibility: "Studio",
+  };
+}
+
+function oneDeliverableLineItem(skuId: string, name: string, deliverable: string) {
+  return {
+    ...lineItem(skuId, name),
+    deliverables: [deliverable],
   };
 }
 
@@ -83,11 +96,57 @@ function envelope(job: PurchasedJobRecord): ServerTasksEnvelope {
     tasks: [],
     planFingerprint: "test",
     updatedAt: "2026-07-03T12:00:00.000Z",
-    version: 7,
+    version: 10,
     syncedAt: "2026-07-03T12:00:00.000Z",
     jobRecords: [job],
     jobActivityEvents: [],
   };
+}
+
+function taskForJob(input: {
+  skuId: string;
+  serviceName: string;
+  phase: TaskPhase;
+  familyId: ProductionTaskFamilyId;
+  role: ProductionRole;
+}): CampaignTaskItem {
+  return {
+    id: `${input.skuId}:${input.phase}`,
+    title: `${input.serviceName} — ${input.role}`,
+    phase: input.phase,
+    status: "ready",
+    relatedServiceIds: [input.skuId as never],
+    familyId: input.familyId,
+    catalogFamilyId:
+      input.familyId === "marketing_assets"
+        ? "marketing_assets"
+        : input.familyId === "video_audio"
+          ? "marketing_video"
+          : "social_media",
+    serviceName: input.serviceName,
+    dependsOn: [],
+    workflowState: "in_progress",
+    responsibleRole: input.role,
+    claimedByUserId: "staff-dev",
+    claimedByDisplayName: "Staff",
+    claimedAt: "2026-07-03T12:30:00.000Z",
+  };
+}
+
+function campaignForJob(skuId: string, serviceName: string, deliverable: string): CampaignRecord {
+  return campaign({
+    approvedStudioPlan: {
+      selectedServiceIds: [skuId as never],
+      includedServiceIds: [skuId as never],
+      additionalServiceIds: [],
+      additionalCostUsd: 0,
+      oneTimeTotalCents: 10000,
+      monthlyTotalCents: 0,
+      amountDueTodayCents: 10000,
+      lineItems: [oneDeliverableLineItem(skuId, serviceName, deliverable)],
+      approvedAt: "2026-07-01T09:00:00.000Z",
+    },
+  });
 }
 
 const ownerUser = {
@@ -273,4 +332,124 @@ describe("production workspace handoff actions", () => {
     expect(ref.job.internalNotes).toHaveLength(1);
     expect(ref.job.workingFileRefs).toHaveLength(1);
   });
+});
+
+describe("internal Work Packet handoff", () => {
+  const scenarios: Array<{
+    name: string;
+    skuId: string;
+    serviceName: string;
+    deliverable: string;
+    role: ProductionRole;
+    phase: TaskPhase;
+    familyId: ProductionTaskFamilyId;
+  }> = [
+    {
+      name: "Flyer",
+      skuId: "v2-rtu-flyer",
+      serviceName: "Make Me a Flyer",
+      deliverable: "One finished single-sided flyer design",
+      role: "creative_production",
+      phase: "creative",
+      familyId: "marketing_assets",
+    },
+    {
+      name: "Social Posts",
+      skuId: "sm-001",
+      serviceName: "Social Media Launch Set",
+      deliverable: "Six branded static social posts",
+      role: "strategy",
+      phase: "strategy_content_direction",
+      familyId: "social",
+    },
+    {
+      name: "Short Video",
+      skuId: "v2-rtu-short-video",
+      serviceName: "Make Me a Short Video",
+      deliverable: "One short-form video up to 60 seconds",
+      role: "creative_production",
+      phase: "creative_production",
+      familyId: "video_audio",
+    },
+  ];
+
+  it.each(scenarios)(
+    "$name moves Production Workspace → Work Packet → Team Office return → Owner approval queue",
+    ({ skuId, serviceName, deliverable, role, phase, familyId }) => {
+      const job = baseJob({
+        jobId: buildJobId("camp-pw", skuId as never),
+        skuId: skuId as never,
+        serviceName,
+        spineStatus: "building_concepts",
+      });
+      const env = envelope(job);
+      const campaignRecord = campaignForJob(skuId, serviceName, deliverable);
+      const tasks = [taskForJob({ skuId, serviceName, phase, familyId, role })];
+      const laneViews = resolveProductionLaneViews([
+        { campaignName: "PW Demo", job, tasks },
+      ]);
+
+      const assigned = applyProductionWorkspacePatch(
+        env,
+        campaignRecord,
+        job.jobId,
+        { action: "assign_work_packet", role },
+        staffUser,
+        [],
+        laneViews,
+        undefined,
+        tasks,
+      );
+      expect(assigned.ok).toBe(true);
+      if (!assigned.ok) return;
+      const packet = assigned.job.workPackets?.[0];
+      expect(packet?.role).toBe(role);
+      expect(packet?.assignmentEvents).toHaveLength(1);
+
+      const returned = applyProductionWorkspacePatch(
+        assigned.envelope,
+        campaignRecord,
+        job.jobId,
+        {
+          action: "return_work_packet_file",
+          packetId: packet!.id,
+          fileKind: "final",
+          label: `${serviceName} final`,
+          url: `https://files.local/${skuId}/final`,
+          deliverableKey: "deliverable-0",
+          note: "Returned from Team Office.",
+        },
+        staffUser,
+        [],
+        laneViews,
+        undefined,
+        tasks,
+      );
+      expect(returned.ok).toBe(true);
+      if (!returned.ok) return;
+      expect(returned.job.workPackets?.[0]?.returnedFileRefs).toHaveLength(1);
+      expect(returned.job.deliverablePrep?.[0]?.preparedAt).toBeTruthy();
+      expect(returned.job.workingFileRefs?.[0]?.url).toContain(`/final`);
+
+      const submitted = applyProductionWorkspacePatch(
+        returned.envelope,
+        campaignRecord,
+        job.jobId,
+        { action: "submit_for_owner_approval" },
+        staffUser,
+        [],
+        laneViews,
+        undefined,
+        tasks,
+      );
+      expect(submitted.ok).toBe(true);
+      if (!submitted.ok) return;
+      expect(submitted.job.ownerApprovalPending).toBe("before_review");
+
+      const events = submitted.envelope.jobActivityEvents ?? [];
+      expect(events.some((event) => event.kind === "work_packet_assigned")).toBe(true);
+      expect(events.some((event) => event.kind === "work_packet_returned")).toBe(true);
+      expect(events.some((event) => event.kind === "approval")).toBe(true);
+    },
+  );
 });

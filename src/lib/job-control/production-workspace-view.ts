@@ -2,6 +2,7 @@ import type { CampaignRecord } from "@/config/studio-board";
 import { OWNER_CONTROL_ROOM_SECTION } from "@/config/job-control";
 import { productionWorkspace } from "@/config/production-workspace";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
+import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
 import type { RouteMapProductionBrief } from "@/lib/route-map-production-brief";
@@ -24,6 +25,10 @@ import {
 } from "./final-delivery-gates";
 import type { JobReviewFeedback } from "./review-feedback-types";
 import type { JobActivityEvent, PurchasedJobRecord } from "./types";
+import {
+  resolveJobWorkPacketSummaryView,
+  type JobWorkPacketSummaryView,
+} from "./work-packets";
 
 export type ProductionWorkspaceDeliverableRow = {
   key: string;
@@ -60,6 +65,7 @@ export type ProductionWorkspaceView = {
   workingFileRefs: NonNullable<PurchasedJobRecord["workingFileRefs"]>;
   clientDeliveryFiles: NonNullable<PurchasedJobRecord["clientDeliveryFiles"]>;
   activity: readonly JobActivityEvent[];
+  workPacketSummary: JobWorkPacketSummaryView;
   ownerApprovalPending: PurchasedJobRecord["ownerApprovalPending"];
   /** Client revision feedback — visible to production when job returned from Review Room. */
   clientRevisionFeedback: JobReviewFeedback | null;
@@ -115,6 +121,7 @@ function resolveClientVisibleNotes(campaign: CampaignRecord): string[] {
 export function resolveProductionWorkspaceView(input: {
   campaign: CampaignRecord;
   job: PurchasedJobRecord;
+  tasks: readonly CampaignTaskItem[];
   materials: readonly CampaignMaterialItem[];
   activityEvents: readonly JobActivityEvent[];
   laneViews: readonly ProductionLaneView[];
@@ -192,6 +199,13 @@ export function resolveProductionWorkspaceView(input: {
     workingFileRefs: job.workingFileRefs ?? [],
     clientDeliveryFiles: job.clientDeliveryFiles ?? [],
     activity: jobActivity,
+    workPacketSummary: resolveJobWorkPacketSummaryView({
+      campaign,
+      job,
+      tasks: input.tasks,
+      materials,
+      productionBrief: resolveProductionBriefForJob(campaign, job.skuId),
+    }),
     ownerApprovalPending: job.ownerApprovalPending ?? null,
     clientRevisionFeedback,
     gates: {

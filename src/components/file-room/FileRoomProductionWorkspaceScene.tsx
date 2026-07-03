@@ -40,6 +40,7 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
   const [clientFileType, setClientFileType] = useState("");
   const [clientFileUrl, setClientFileUrl] = useState("");
   const [clientFileInstructions, setClientFileInstructions] = useState("");
+  const [assigningRole, setAssigningRole] = useState<string | null>(null);
 
   const patch = async (body: Record<string, unknown>) => {
     setBusy(true);
@@ -137,6 +138,94 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
                 {productionWorkspace.allPreparedLabel}
               </p>
             ) : null}
+          </FileRoomSectionCard>
+
+          <FileRoomSectionCard title="Work Packet handoff">
+            <p className="fr-control-room__section-lead">
+              Internal-only job packet handoff from Production Workspace into Team Offices.
+            </p>
+            <dl className="fr-kv-list">
+              <div>
+                <dt>Production brief</dt>
+                <dd>
+                  {view.workPacketSummary.productionBriefAvailable
+                    ? "Available"
+                    : "Use approved plan scope"}
+                </dd>
+              </div>
+              <div>
+                <dt>Return location</dt>
+                <dd>{view.workPacketSummary.returnLocationLabel}</dd>
+              </div>
+              <div>
+                <dt>Approval</dt>
+                <dd>{view.workPacketSummary.ownerApprovalRequirement}</dd>
+              </div>
+            </dl>
+
+            {view.workPacketSummary.roleRows.length === 0 ? (
+              <p className="fr-tasks-empty__body">No Team Office roles mapped for this job.</p>
+            ) : (
+              <ul className="fr-production-workspace__deliverables">
+                {view.workPacketSummary.roleRows.map((row) => (
+                  <li key={row.role} className="fr-production-workspace__deliverable">
+                    <div>
+                      <p className="fr-production-workspace__deliverable-label">
+                        {row.roleLabel} · {row.statusLabel}
+                      </p>
+                      <p className="fr-tasks-row__meta">
+                        Next responsible: {row.nextResponsibleLabel}
+                        {row.assignedAt ? ` · Assigned ${formatWhen(row.assignedAt)}` : ""}
+                        {row.returnedAt ? ` · Last return ${formatWhen(row.returnedAt)}` : ""}
+                      </p>
+                      {row.taskTitles.length > 0 ? (
+                        <p className="fr-tasks-row__meta">{row.taskTitles.join(", ")}</p>
+                      ) : null}
+                    </div>
+                    <div className="fr-production-workspace__actions">
+                      <Link className="utility-btn" href={row.officeHref}>
+                        Open office
+                      </Link>
+                      {row.canAssign ? (
+                        <button
+                          type="button"
+                          className="utility-btn utility-btn--primary"
+                          disabled={busy || assigningRole === row.role}
+                          onClick={() => {
+                            setAssigningRole(row.role);
+                            void patch({ action: "assign_work_packet", role: row.role }).finally(() =>
+                              setAssigningRole(null),
+                            );
+                          }}
+                        >
+                          Assign packet
+                        </button>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <div className="fr-scope-group">
+              <p className="fr-scope-group__name">Returned draft/final file refs</p>
+              {view.workPacketSummary.returnedFiles.length === 0 ? (
+                <p className="fr-tasks-row__meta">No returned file references yet.</p>
+              ) : (
+                <ul className="fr-scope-group__list">
+                  {view.workPacketSummary.returnedFiles.map((file) => (
+                    <li key={file.id}>
+                      <a className="fr-back-link" href={file.url} target="_blank" rel="noreferrer">
+                        {file.kind}: {file.label}
+                      </a>
+                      {file.deliverableLabel ? ` · ${file.deliverableLabel}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <p className="fr-tasks-row__meta">{view.workPacketSummary.integrationStatusLabel}</p>
           </FileRoomSectionCard>
 
           {view.clientRevisionFeedback ? (

@@ -35,6 +35,8 @@ import { resolveFileRoomCampaignView } from "@/lib/file-room-view";
 import { resolveFileRoomMaterialsView } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 import { resolveOpenExceptionCountByTaskId, resolveFileRoomExceptionsView } from "@/lib/campaign-tasks/exceptions-view";
+import { resolveRouteMapProductionBrief } from "@/lib/route-map-production-brief";
+import { resolveTeamOfficeWorkPacketView } from "@/lib/job-control/work-packets";
 
 type FileRoomOfficePageProps = {
   params: Promise<{ campaignId: string; role: string }>;
@@ -175,6 +177,27 @@ export default async function FileRoomOfficePage({ params, searchParams }: FileR
     const allDispatchTasks = dispatch.buckets.flatMap((bucket) => bucket.tasks);
     const selectedTask =
       allDispatchTasks.find((task) => task.id === deepLinkTaskId) ?? allDispatchTasks[0] ?? null;
+    const selectedTaskRecord = selectedTask
+      ? tasksEnvelope.tasks.find((task) => task.id === selectedTask.id)
+      : undefined;
+    const selectedSkuId = selectedTaskRecord?.relatedServiceIds[0];
+    const selectedJob = selectedSkuId
+      ? (tasksEnvelope.jobRecords ?? []).find((job) => job.skuId === selectedSkuId)
+      : undefined;
+    const routeMapBrief = resolveRouteMapProductionBrief(result.envelope.record);
+    const selectedJobBrief =
+      selectedJob && routeMapBrief?.skuId === selectedJob.skuId ? routeMapBrief : null;
+    const workPacket =
+      selectedTaskRecord && selectedJob
+        ? resolveTeamOfficeWorkPacketView({
+            campaign: result.envelope.record,
+            job: selectedJob,
+            tasks: tasksEnvelope.tasks,
+            materials: materialsEnvelope.items,
+            productionBrief: selectedJobBrief,
+            selectedTaskId: selectedTaskRecord.id,
+          })
+        : null;
 
     return (
       <>
@@ -188,6 +211,7 @@ export default async function FileRoomOfficePage({ params, searchParams }: FileR
           productionEnvelope={productionEnvelope}
           studioUser={user}
           canEditWorkByTaskId={canEditWorkByTaskId}
+          workPacket={workPacket}
         />
       </>
     );
@@ -206,6 +230,27 @@ export default async function FileRoomOfficePage({ params, searchParams }: FileR
         });
 
   const selectedTask = resolveOfficeSelectedTask(queue, deepLinkTaskId ?? null);
+  const selectedTaskRecord = selectedTask
+    ? tasksEnvelope.tasks.find((task) => task.id === selectedTask.id)
+    : undefined;
+  const selectedSkuId = selectedTaskRecord?.relatedServiceIds[0];
+  const selectedJob = selectedSkuId
+    ? (tasksEnvelope.jobRecords ?? []).find((job) => job.skuId === selectedSkuId)
+    : undefined;
+  const routeMapBrief = resolveRouteMapProductionBrief(result.envelope.record);
+  const selectedJobBrief =
+    selectedJob && routeMapBrief?.skuId === selectedJob.skuId ? routeMapBrief : null;
+  const workPacket =
+    selectedTaskRecord && selectedJob
+      ? resolveTeamOfficeWorkPacketView({
+          campaign: result.envelope.record,
+          job: selectedJob,
+          tasks: tasksEnvelope.tasks,
+          materials: materialsEnvelope.items,
+          productionBrief: selectedJobBrief,
+          selectedTaskId: selectedTaskRecord.id,
+        })
+      : null;
 
   return (
     <>
@@ -221,6 +266,7 @@ export default async function FileRoomOfficePage({ params, searchParams }: FileR
         productionEnvelope={productionEnvelope}
         studioUser={user}
         canEditWorkByTaskId={canEditWorkByTaskId}
+        workPacket={workPacket}
         mode={role === "qa" ? "qa" : "production"}
       />
     </>

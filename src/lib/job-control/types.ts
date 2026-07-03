@@ -67,6 +67,8 @@ export type JobActivityEventKind =
   | "owner_final_release"
   | "client_delivery_file_added"
   | "delivery_completed"
+  | "work_packet_assigned"
+  | "work_packet_returned"
   | "client_communication";
 
 export type JobInternalNote = {
@@ -82,6 +84,53 @@ export type JobWorkingFileRef = {
   url: string;
   addedAt: string;
   author: JobActivityActor;
+};
+
+/** Team Office roles that can receive an internal job Work Packet. */
+export type JobWorkPacketRole =
+  | "producer_dispatcher"
+  | "strategy"
+  | "copy"
+  | "creative_production"
+  | "qa";
+
+export type JobWorkPacketStatus = "assigned" | "returned";
+
+export type JobWorkPacketFileKind = "draft" | "final";
+
+export type JobWorkPacketAssignmentEvent = {
+  id: string;
+  assignedAt: string;
+  assignedBy: JobActivityActor;
+  role: JobWorkPacketRole;
+  note?: string;
+};
+
+export type JobWorkPacketReturnedFileRef = {
+  id: string;
+  kind: JobWorkPacketFileKind;
+  label: string;
+  url: string;
+  returnedAt: string;
+  returnedBy: JobActivityActor;
+  deliverableKey?: string;
+  deliverableLabel?: string;
+  note?: string;
+};
+
+export type JobWorkPacket = {
+  id: string;
+  jobId: string;
+  campaignId: string;
+  role: JobWorkPacketRole;
+  taskIds: readonly string[];
+  status: JobWorkPacketStatus;
+  createdAt: string;
+  updatedAt: string;
+  assignmentEvents: readonly JobWorkPacketAssignmentEvent[];
+  returnedFileRefs: readonly JobWorkPacketReturnedFileRef[];
+  returnLocation: "production_workspace";
+  ownerApprovalRequired: boolean;
 };
 
 export type JobDeliverablePrep = {
@@ -138,6 +187,8 @@ export type PurchasedJobRecord = {
   internalNotes?: readonly JobInternalNote[];
   /** Internal working-file links — never shown to client. */
   workingFileRefs?: readonly JobWorkingFileRef[];
+  /** Internal job Work Packets — Team Office assignment and file-return trail. */
+  workPackets?: readonly JobWorkPacket[];
   /** Client-facing final delivery files — shown in Final Delivery only. */
   clientDeliveryFiles?: readonly JobClientDeliveryFile[];
   deliveredAt?: string | null;

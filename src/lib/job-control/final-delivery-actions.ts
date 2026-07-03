@@ -66,7 +66,7 @@ function updateJobInEnvelope(
     jobRecords,
     jobActivityEvents: events,
     updatedAt: new Date().toISOString(),
-    version: Math.max(envelope.version ?? 7, 7),
+    version: Math.max(envelope.version ?? 10, 10),
   };
 }
 

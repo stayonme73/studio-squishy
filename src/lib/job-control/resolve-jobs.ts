@@ -209,6 +209,7 @@ export function buildPurchasedJobRecord(
     deliverablePrep: persisted?.deliverablePrep,
     internalNotes: persisted?.internalNotes,
     workingFileRefs: persisted?.workingFileRefs,
+    workPackets: persisted?.workPackets,
     clientDeliveryFiles: persisted?.clientDeliveryFiles,
     deliveredAt: persisted?.deliveredAt ?? null,
     clientDeadline: persisted?.clientDeadline ?? null,

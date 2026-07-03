@@ -112,6 +112,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     materials,
     laneViews,
     clientId,
+    tasks,
   );
 
   if (!result.ok) {

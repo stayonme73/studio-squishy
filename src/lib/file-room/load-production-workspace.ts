@@ -105,6 +105,7 @@ export async function loadProductionWorkspace(
   const view = resolveProductionWorkspaceView({
     campaign: result.envelope.record,
     job,
+    tasks,
     materials,
     activityEvents: activity,
     laneViews,

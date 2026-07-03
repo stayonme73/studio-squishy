@@ -192,8 +192,9 @@ export type CampaignTasksRecord = {
   jobReviewFeedback?: import("@/lib/job-control/review-feedback-types").JobReviewFeedback[];
   /** Durable client communication outbox / receipts (schema v9). */
   jobCommunicationRecords?: JobCommunicationRecord[];
+  /** Schema v10 adds internal job Work Packets on PurchasedJobRecord. */
   updatedAt: string;
-  /** Envelope schema version — 9 adds job communication outbox records. */
+  /** Envelope schema version — 10 adds internal job Work Packet records. */
   version: number;
 };
 
