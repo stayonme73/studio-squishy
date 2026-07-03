@@ -90,8 +90,14 @@ function verifyTasks(tasksEnvelope) {
 
   if (!afterSubmit) {
     assert(
-      tasksEnvelope.tasks.some((task) => task.relatedServiceIds.includes(SOCIAL_SKU_ID) && task.status === "blocked"),
-      "Expected a blocked Social Posts task before materials arrive.",
+      tasksEnvelope.tasks.some(
+        (task) =>
+          task.relatedServiceIds.includes(SOCIAL_SKU_ID) &&
+          task.status === "not_ready" &&
+          task.workflowState === "blocked" &&
+          task.workflowBlockedReason,
+      ),
+      "Expected a workflow-blocked Social Posts task before materials arrive.",
     );
   }
 }

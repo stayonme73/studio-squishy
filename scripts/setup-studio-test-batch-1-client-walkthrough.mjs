@@ -250,7 +250,7 @@ function tasksEnvelope() {
         id: `${SOCIAL_JOB.skuId}:strategy_content_direction`,
         title: `${SOCIAL_JOB.serviceName} - Content direction`,
         phase: "strategy_content_direction",
-        status: "blocked",
+        status: "not_ready",
         relatedServiceIds: [SOCIAL_JOB.skuId],
         familyId: SOCIAL_JOB.familyId,
         catalogFamilyId: SOCIAL_JOB.catalogFamilyId,
