@@ -5658,3 +5658,468 @@ body:has(.sb--v4) {
   text-decoration: underline;
   text-underline-offset: 0.12em;
 }
+
+/* Studio Board readability pass V2 — desktop client-facing surfaces */
+@media screen and (min-width: 1025px) {
+  .sb.sb--v4 {
+    --sb-sidebar: clamp(17.75rem, 20.8vw, 20.75rem);
+    --sb-tile-padding-y: 1.18rem;
+    --sb-tile-padding-x: 1.22rem;
+    --sb-grid-gap: 0.85rem;
+    --sb-section-label-gap: 0.85rem;
+    --sb-type-xs: clamp(0.9rem, 0.78vw, 1rem);
+    --sb-type-sm: clamp(1rem, 0.9vw, 1.13rem);
+    --sb-type-base: clamp(1.08rem, 0.98vw, 1.22rem);
+    --sb-type-md: clamp(1.2rem, 1.12vw, 1.38rem);
+    --sb-type-lg: clamp(1.45rem, 1.36vw, 1.72rem);
+    --sb-type-display: clamp(1.72rem, 1.86vw, 2.12rem);
+  }
+
+  .sb--v4 .sb-sidebar {
+    gap: 0.55rem;
+    padding: 0.8rem 0.55rem 0.85rem 0.8rem;
+  }
+
+  .sb--v4 .sb-brand__lockup {
+    gap: 0.58rem;
+  }
+
+  .sb--v4 .sb-brand__icon {
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+
+  .sb--v4 .sb-brand__the {
+    font-size: 1.24rem;
+  }
+
+  .sb--v4 .sb-brand__name {
+    font-size: 1.28rem;
+    line-height: 1.08;
+  }
+
+  .sb--v4 .sb-nav {
+    gap: 0.2rem;
+  }
+
+  .sb--v4 .sb-nav__item {
+    min-height: 2.55rem;
+    gap: 0.62rem;
+    padding: 0.52rem 0.72rem;
+    font-size: 0.98rem;
+    line-height: 1.25;
+    border-radius: 10px;
+  }
+
+  .sb--v4 .sb-nav__icon {
+    width: 1.24rem;
+    height: 1.24rem;
+  }
+
+  .sb--v4 .sb-nav__item--action .sb-nav__action-hint {
+    font-size: 0.76rem;
+    line-height: 1.25;
+  }
+
+  .sb--v4 .sb-main {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  .sb--v4 .sb-header-v3 {
+    margin-bottom: 0.9rem;
+  }
+
+  .sb--v4 .sb-header-v3__copy {
+    gap: 0.65rem 1rem;
+  }
+
+  .sb--v4 .sb-header-v3__title {
+    font-size: var(--sb-type-display);
+    letter-spacing: 0.12em;
+  }
+
+  .sb--v4 .sb-header-v3__greeting {
+    font-size: var(--sb-type-md);
+  }
+
+  .sb--v4 .sb-board-layout {
+    gap: var(--sb-grid-gap);
+  }
+
+  .sb--v4 .sb-card__tab {
+    margin-bottom: 0.82rem;
+    font-size: var(--sb-type-xs);
+    line-height: 1.25;
+    letter-spacing: 0.11em;
+  }
+
+  .sb--v4 .sb-current-campaign {
+    gap: 0.85rem;
+  }
+
+  .sb--v4 .sb-current-campaign__name {
+    font-size: var(--sb-type-lg);
+    line-height: 1.2;
+  }
+
+  .sb--v4 .sb-current-campaign__metrics {
+    gap: 0.58rem;
+  }
+
+  .sb--v4 .sb-current-campaign__metric {
+    grid-template-columns: minmax(7.5rem, 10rem) 1fr;
+    gap: 0.75rem;
+    padding: 0.5rem 0.68rem;
+  }
+
+  .sb--v4 .sb-current-campaign__label {
+    font-size: 0.88rem;
+    line-height: 1.25;
+  }
+
+  .sb--v4 .sb-current-campaign__value,
+  .sb--v4 .sb-current-campaign__empty {
+    font-size: var(--sb-type-sm);
+    line-height: 1.48;
+  }
+
+  .sb--v4 .campaign-brief-actions--prominent .campaign-brief-actions__view,
+  .sb--v4 .utility-btn {
+    min-height: 2.65rem;
+    font-size: 0.94rem;
+  }
+
+  .sb--v4 .campaign-brief-actions__hint,
+  .sb--v4 .campaign-brief-actions__locked {
+    font-size: var(--sb-type-sm);
+    line-height: 1.5;
+  }
+
+  .sb--v4 .sb-next-action {
+    margin-top: 0.95rem;
+    padding: 0.95rem 1rem;
+  }
+
+  .sb--v4 .sb-next-action__status {
+    font-size: 0.92rem;
+    line-height: 1.25;
+  }
+
+  .sb--v4 .sb-next-action__lead,
+  .sb--v4 .sb-next-action__hint,
+  .sb--v4 .sb-next-action__eta {
+    font-size: var(--sb-type-sm);
+    line-height: 1.55;
+  }
+
+  .sb--v4 .sb-progress-panel,
+  .sb--v4 .sb-studio-note-panel {
+    gap: 0.55rem;
+  }
+
+  .sb--v4 .sb-progress-panel__body,
+  .sb--v4 .sb-studio-note-letter {
+    overflow: auto;
+  }
+
+  .sb--v4 .sb-progress-panel__fit,
+  .sb--v4 .sb-studio-note-letter__fit {
+    transform: none;
+    width: 100%;
+  }
+
+  .sb--v4 .sb-journey {
+    gap: 0.8rem;
+  }
+
+  .sb--v4 .sb-journey__row {
+    gap: 0.7rem;
+  }
+
+  .sb--v4 .sb-journey__marker {
+    width: 1.28rem;
+    height: 1.28rem;
+    font-size: 0.78rem;
+  }
+
+  .sb--v4 .sb-journey__label {
+    font-size: var(--sb-type-sm);
+    line-height: 1.35;
+  }
+
+  .sb--v4 .sb-journey__detail {
+    margin-top: 0.18rem;
+    font-size: 0.94rem;
+    line-height: 1.42;
+  }
+
+  .sb--v4 .sb-progress-panel__pipeline {
+    margin-top: 1rem;
+  }
+
+  .sb--v4 .sb-progress-panel__pipeline-summary {
+    font-size: 0.86rem;
+    line-height: 1.3;
+  }
+
+  .sb--v4 .sb-progress-timeline {
+    gap: 0.26rem;
+  }
+
+  .sb--v4 .sb-progress-timeline__step {
+    grid-template-columns: 1.1rem minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.28rem 0.38rem;
+  }
+
+  .sb--v4 .sb-progress-timeline__icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .sb--v4 .sb-progress-timeline__label {
+    font-size: var(--sb-type-sm);
+    line-height: 1.35;
+  }
+
+  .sb--v4 .sb-progress-timeline__detail {
+    font-size: 0.94rem;
+    line-height: 1.42;
+  }
+
+  .sb--v4 .sb-progress-panel__timeline {
+    margin-top: 0.65rem;
+    padding-top: 0.7rem;
+  }
+
+  .sb--v4 .sb-progress-panel__timeline-heading,
+  .sb--v4 .sb-progress-panel__update-date {
+    font-size: 0.88rem;
+    line-height: 1.25;
+  }
+
+  .sb--v4 .sb-progress-panel__updates {
+    gap: 0.48rem;
+  }
+
+  .sb--v4 .sb-progress-panel__update {
+    grid-template-columns: minmax(0, 5.5rem) minmax(0, 1fr);
+    gap: 0.3rem 0.7rem;
+  }
+
+  .sb--v4 .sb-progress-panel__update-message,
+  .sb--v4 .sb-progress-panel__timeline-empty {
+    font-size: var(--sb-type-sm);
+    line-height: 1.5;
+  }
+
+  .sb--v4 .sb-deliverables-progress {
+    gap: 0.9rem;
+  }
+
+  .sb--v4 .sb-deliverables-progress__item {
+    gap: 0.5rem;
+  }
+
+  .sb--v4 .sb-deliverables-progress__head {
+    gap: 0.65rem;
+  }
+
+  .sb--v4 .sb-deliverables-progress__label {
+    font-size: var(--sb-type-sm);
+    line-height: 1.35;
+  }
+
+  .sb--v4 .sb-deliverables-progress__count,
+  .sb--v4 .sb-deliverables-progress__download,
+  .sb--v4 .sb-deliverables-progress__empty {
+    font-size: 0.94rem;
+    line-height: 1.35;
+  }
+
+  .sb--v4 .sb-deliverables-progress__track {
+    height: 0.6rem;
+  }
+
+  .sb--v4 .sb-package-summary__package {
+    font-size: var(--sb-type-md);
+    line-height: 1.25;
+  }
+
+  .sb--v4 .sb-package-summary__list {
+    gap: 0.62rem;
+  }
+
+  .sb--v4 .sb-package-summary__item,
+  .sb--v4 .sb-package-summary__empty,
+  .sb--v4 .sb-package-summary__link {
+    font-size: var(--sb-type-sm);
+    line-height: 1.52;
+  }
+
+  .sb--v4 .sb-studio-note-letter {
+    padding: 0.38rem 0.18rem 0.45rem 0.2rem;
+  }
+
+  .sb--v4 .sb-studio-note-letter__fit {
+    gap: 0.12rem;
+  }
+
+  .sb--v4 .sb-studio-note-letter__date {
+    font-size: 1.08rem;
+  }
+
+  .sb--v4 .sb-studio-note-letter__line--body {
+    margin-bottom: 0.3rem;
+    font-size: var(--sb-type-sm);
+    line-height: 1.58;
+  }
+
+  .sb--v4 .sb-studio-note-letter__line--greeting {
+    font-size: 1.28rem;
+    line-height: 1.2;
+  }
+
+  .sb--v4 .sb-studio-note-letter__line--signoff-lead {
+    font-size: 1.15rem;
+  }
+
+  .sb--v4 .sb-studio-note-letter__line--signoff-signature {
+    font-size: 1.2rem;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--account-secondary .sb-account__list {
+    gap: 0.55rem;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--account-secondary .sb-account__row,
+  .sb--v4 .sb-account__row {
+    grid-template-columns: minmax(7.6rem, 10.25rem) 1fr;
+    gap: 0.65rem;
+    padding: 0.62rem 0.72rem;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--account-secondary .sb-account__label,
+  .sb--v4 .sb-account__label {
+    font-size: 0.88rem;
+    line-height: 1.25;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--account-secondary .sb-account__value,
+  .sb--v4 .sb-account__value,
+  .sb--v4 .sb-account__empty {
+    font-size: var(--sb-type-sm);
+    line-height: 1.42;
+  }
+
+  .sb--v4 .sb-materials-intake {
+    gap: 1.15rem;
+  }
+
+  .sb--v4 .sb-materials-intake__item {
+    padding: 1.1rem;
+  }
+
+  .sb--v4 .sb-materials-intake__lead,
+  .sb--v4 .sb-materials-intake__meta,
+  .sb--v4 .sb-materials-intake__error,
+  .sb--v4 .sb-materials-intake__input {
+    font-size: var(--sb-type-base);
+    line-height: 1.55;
+  }
+
+  .sb--v4 .sb-materials-intake__prompt {
+    font-size: var(--sb-type-md);
+    line-height: 1.4;
+  }
+
+  .sb--v4 .sb-materials-intake__reason,
+  .sb--v4 .sb-materials-intake__clarify,
+  .sb--v4 .sb-materials-intake__pending,
+  .sb--v4 .sb-materials-intake__success,
+  .sb--v4 .sb-materials-intake__toggle {
+    font-size: var(--sb-type-sm);
+    line-height: 1.5;
+  }
+
+  .sb--v4 .sb-materials-intake__status,
+  .sb--v4 .sb-materials-intake__field-label {
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  .sb--v4 .sb-materials-intake__input {
+    padding: 0.72rem 0.78rem;
+  }
+
+  .sb--v4 .sb-record-drawer__panel {
+    width: min(54vw, 47rem);
+    min-width: min(100%, 28rem);
+  }
+
+  .sb--v4 .sb-record-drawer__header {
+    gap: 1rem;
+    padding: 1.25rem 1.35rem 1rem;
+  }
+
+  .sb--v4 .sb-record-drawer__title {
+    font-size: 1.42rem;
+    line-height: 1.2;
+  }
+
+  .sb--v4 .sb-record-drawer__subtitle {
+    font-size: 1.18rem;
+    line-height: 1.35;
+  }
+
+  .sb--v4 .sb-record-drawer__hint,
+  .sb--v4 .sb-record-drawer__locked,
+  .sb--v4 .sb-record-drawer__empty {
+    font-size: 1.05rem;
+    line-height: 1.55;
+  }
+
+  .sb--v4 .sb-record-drawer__close {
+    min-height: 2.5rem;
+    font-size: 0.94rem;
+  }
+
+  .sb--v4 .sb-record-drawer__body {
+    padding: 1.15rem 1.35rem 1.45rem;
+  }
+
+  .sb--v4 .sb-record-drawer__section-title,
+  .sb--v4 .sb-record-drawer .cd-vision__eyebrow {
+    font-size: 0.94rem;
+    line-height: 1.3;
+  }
+
+  .sb--v4 .sb-record-drawer .cd-package-list {
+    gap: 0.55rem;
+  }
+
+  .sb--v4 .sb-record-drawer .cd-package-list__item,
+  .sb--v4 .sb-record-drawer .cd-vision__value,
+  .sb--v4 .sb-record-drawer .cd-vision__empty,
+  .sb--v4 .sb-record-drawer .cd-deliverables__message,
+  .sb--v4 .sb-record-drawer .cd-deliverables__link {
+    font-size: 1.04rem;
+    line-height: 1.58;
+  }
+
+  .sb--v4 .sb-record-drawer .cd-vision__answers {
+    gap: 0.62rem;
+  }
+
+  .sb--v4 .sb-record-drawer .cd-vision__label,
+  .sb--v4 .sb-record-drawer .cd-deliverables__hint {
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
+  .sb--v4 .sb-record-drawer .cd-deliverables__cta {
+    min-height: 2.7rem;
+    padding: 0.72rem 1.18rem;
+    font-size: 0.92rem;
+  }
+}
