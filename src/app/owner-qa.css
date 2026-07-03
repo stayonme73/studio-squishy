@@ -117,6 +117,12 @@
   border-color: rgba(46, 94, 78, 0.28);
 }
 
+.owner-qa__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
 .owner-qa__preset {
   display: flex;
   flex-direction: column;

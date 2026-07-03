@@ -58,6 +58,12 @@ export default function OwnerQaPanel() {
     router.refresh();
   }
 
+  function handleShortcutLink(href: string) {
+    closePanel();
+    router.push(href);
+    router.refresh();
+  }
+
   function handleResetRequest() {
     setConfirmResetOpen(true);
   }
@@ -81,7 +87,7 @@ export default function OwnerQaPanel() {
           <p className="owner-qa__hint">Jump the product journey. Development only.</p>
 
           <section className="owner-qa__section">
-            <h2 className="owner-qa__section-title">Journey</h2>
+            <h2 className="owner-qa__section-title">Active Pages</h2>
             <div className="owner-qa__presets">
               {ownerQa.journeyPresets.map((preset) => (
                 <button
@@ -114,7 +120,19 @@ export default function OwnerQaPanel() {
                   >
                     {shortcut.label}
                   </button>
-                ) : null,
+                ) : (
+                  <button
+                    key={shortcut.id}
+                    type="button"
+                    className="owner-qa__link"
+                    onClick={() => handleShortcutLink(shortcut.href)}
+                  >
+                    <span className="owner-qa__preset-label">{shortcut.label}</span>
+                    {shortcut.description ? (
+                      <span className="owner-qa__preset-desc">{shortcut.description}</span>
+                    ) : null}
+                  </button>
+                ),
               )}
             </div>
           </section>

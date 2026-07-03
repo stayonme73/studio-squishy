@@ -13,13 +13,17 @@ import {
   type DiscoveryAnswers,
 } from "@/lib/business-discovery-session";
 import { buildServiceScopeSnapshot, computePlanPricingTotals } from "@/lib/plan-pricing";
+import { createCampaignFromRouteMapJob } from "@/lib/route-map-campaign";
 import { saveCurrentCampaign } from "@/lib/studio-board-campaign";
 import { discoveryBriefFromAnswers } from "@/lib/discovery-brief";
+import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
 
 const { statusContent } = studioBoard;
 
 /** Dev-only flag — restores Discovery split-panel summary after Owner QA navigation. */
 export const OWNER_QA_DISCOVERY_PREVIEW_KEY = "studio-squishy:owner-qa-discovery-panel";
+const OWNER_QA_CHECKOUT_JOB_ID = "v2-rtu-social-posts" as const satisfies RouteMapJobId;
+const OWNER_QA_CHECKOUT_ROAD_ID = "i20" as const satisfies RouteMapRoadId;
 
 export const OWNER_QA_GREEN_SERVICE_IDS = ["bf-001", "sm-001", "em-001"] as const satisfies readonly ServiceId[];
 
@@ -35,20 +39,10 @@ export const OWNER_QA_DISCOVERY_ANSWERS: DiscoveryAnswers = {
   "whats-slowing-you-down": "I am not visible enough online",
 };
 
-/** Partial discovery — Green-and-Lean tiles in progress, not submitted. */
-export const OWNER_QA_DISCOVERY_IN_PROGRESS: DiscoveryAnswers = {
-  "your-business": OWNER_QA_DISCOVERY_ANSWERS["your-business"],
-  "your-situation": OWNER_QA_DISCOVERY_ANSWERS["your-situation"],
-  "your-challenge": OWNER_QA_DISCOVERY_ANSWERS["your-challenge"],
-};
-
 export type OwnerQaJourneySeedKind =
   | "lobby"
-  | "discovery-in-progress"
-  | "discovery-plan-preview"
-  | "project-summary-checkout"
-  | "project-details"
-  | "studio-board-details-needed"
+  | "route-map"
+  | "payment-checkout-test"
   | "studio-board-building"
   | "project-record"
   | "review-room-ready"
@@ -265,42 +259,17 @@ export function applyOwnerQaJourneySeed(kind: OwnerQaJourneySeedKind): void {
       clearAllOwnerQaBrowserState();
       return;
     }
-    case "discovery-in-progress": {
+    case "route-map": {
       clearAllOwnerQaBrowserState();
-      saveDiscoveryAnswers(OWNER_QA_DISCOVERY_IN_PROGRESS);
-      dispatchCampaignUpdated();
       return;
     }
-    case "discovery-plan-preview": {
-      const submittedAnswers = {
-        ...OWNER_QA_DISCOVERY_ANSWERS,
-        "submit-project": "submitted",
-      };
-      saveDiscoveryAnswers(submittedAnswers);
-      persistCampaign(
-        buildOwnerQaCampaign({
-          campaignStatus: "DISCOVERY_COMPLETE",
-          approvedStudioPlan: undefined,
-          paymentReceivedAt: null,
-        }),
+    case "payment-checkout-test": {
+      clearAllOwnerQaBrowserState();
+      const campaign = createCampaignFromRouteMapJob(
+        OWNER_QA_CHECKOUT_JOB_ID,
+        OWNER_QA_CHECKOUT_ROAD_ID,
       );
-      window.localStorage.setItem(OWNER_QA_DISCOVERY_PREVIEW_KEY, "summary");
-      return;
-    }
-    case "project-summary-checkout": {
-      saveDiscoveryAnswers(OWNER_QA_DISCOVERY_ANSWERS);
-      persistCampaign(
-        buildOwnerQaCampaign({
-          campaignStatus: "DISCOVERY_COMPLETE",
-          paymentReceivedAt: null,
-        }),
-      );
-      return;
-    }
-    case "project-details":
-    case "studio-board-details-needed": {
-      saveDiscoveryAnswers(OWNER_QA_DISCOVERY_ANSWERS);
-      persistCampaign(buildPaidAwaitingProjectDetailsCampaign());
+      if (campaign) persistCampaign(campaign);
       return;
     }
     case "studio-board-building":

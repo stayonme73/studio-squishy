@@ -3,9 +3,16 @@
  * Shown in local development (@see OwnerQaRoot).
  */
 
-import { customerJourneyStepRoute } from "@/config/customer-journey-v1";
+import { FILE_ROOM_ROUTE } from "@/config/file-room";
+import { OWNER_CONSOLE_ROUTE } from "@/config/owner-console";
+import { productionWorkspaceRoute } from "@/config/production-workspace";
 import { studioBoard } from "@/config/studio-board";
+import { teamOfficePath } from "@/config/team-offices";
 import type { OwnerQaJourneySeedKind } from "@/lib/owner-qa-campaign";
+
+const STUDIO_SELF_TEST_CAMPAIGN_ID = "studio-self-test";
+const STUDIO_SELF_TEST_JOB_ID = `${STUDIO_SELF_TEST_CAMPAIGN_ID}:sm-001`;
+const STUDIO_SELF_TEST_TEAM_OFFICE = "strategy";
 
 export type OwnerQaJourneyPreset = {
   id: string;
@@ -16,7 +23,7 @@ export type OwnerQaJourneyPreset = {
 };
 
 export type OwnerQaShortcut =
-  | { id: string; kind: "link"; label: string; href: string }
+  | { id: string; kind: "link"; label: string; href: string; description?: string }
   | { id: string; kind: "reset"; label: string };
 
 export const ownerQa = {
@@ -24,49 +31,28 @@ export const ownerQa = {
     {
       id: "studio-lobby",
       label: "Studio Lobby",
-      description: "Welcome Hall entry state",
+      description: "Clean lobby entry state",
       href: studioBoard.routes.studioLobby,
       seed: "lobby",
     },
     {
-      id: "discovery-room",
-      label: "Discovery Room",
-      description: "Green-and-Lean Discovery in progress",
-      href: customerJourneyStepRoute("project-discovery"),
-      seed: "discovery-in-progress",
+      id: "route-map",
+      label: "Route Map",
+      description: "Current campaign start workspace",
+      href: studioBoard.routes.newCampaign,
+      seed: "route-map",
     },
     {
-      id: "studio-plan-preview",
-      label: "Studio Plan Preview",
-      description: "Discovery split-panel recommendation preview",
-      href: customerJourneyStepRoute("project-discovery"),
-      seed: "discovery-plan-preview",
+      id: "payment-checkout-test",
+      label: "Payment / Checkout test",
+      description: "Route Map job selected · checkout ready",
+      href: "/payment",
+      seed: "payment-checkout-test",
     },
     {
-      id: "project-summary-checkout",
-      label: "Project Summary + Checkout",
-      description: "Green services · $1,215 · embedded checkout",
-      href: studioBoard.routes.projectSummary,
-      seed: "project-summary-checkout",
-    },
-    {
-      id: "project-details",
-      label: "Project Details",
-      description: "Paid · approved Green plan · wizard ready",
-      href: studioBoard.routes.projectDetails,
-      seed: "project-details",
-    },
-    {
-      id: "studio-board-details-needed",
-      label: "Studio Board — Project Details Needed",
-      description: "Paid · PAYMENT_RECEIVED · details not submitted",
-      href: studioBoard.routes.studioBoard,
-      seed: "studio-board-details-needed",
-    },
-    {
-      id: "studio-board-building",
-      label: "Studio Board — Building Concepts",
-      description: "Project Details complete · Custom Studio Plan",
+      id: "studio-board",
+      label: "Studio Board",
+      description: "Campaign in production · Custom Studio Plan",
       href: studioBoard.routes.studioBoard,
       seed: "studio-board-building",
     },
@@ -79,14 +65,14 @@ export const ownerQa = {
     },
     {
       id: "review-room-ready",
-      label: "Review Room — Ready",
+      label: "Review Room",
       description: "Concepts ready for direction choice",
       href: studioBoard.routes.feedbackStudio,
       seed: "review-room-ready",
     },
     {
       id: "final-delivery-complete",
-      label: "Final Delivery — Complete",
+      label: "Final Delivery",
       description: "Campaign delivered",
       href: studioBoard.routes.deliverables,
       seed: "final-delivery-complete",
@@ -101,6 +87,41 @@ export const ownerQa = {
   ] satisfies OwnerQaJourneyPreset[],
 
   shortcuts: [
+    {
+      id: "file-room",
+      kind: "link",
+      label: "File Room",
+      href: FILE_ROOM_ROUTE,
+      description: "Internal campaign list",
+    },
+    {
+      id: "owner-console",
+      kind: "link",
+      label: "Owner Console",
+      href: OWNER_CONSOLE_ROUTE,
+      description: "Owner decision desk",
+    },
+    {
+      id: "production-workspace",
+      kind: "link",
+      label: "Production Workspace",
+      href: productionWorkspaceRoute(STUDIO_SELF_TEST_CAMPAIGN_ID, STUDIO_SELF_TEST_JOB_ID),
+      description: "Studio Self-Test job workspace",
+    },
+    {
+      id: "team-offices",
+      kind: "link",
+      label: "Team Offices",
+      href: teamOfficePath(STUDIO_SELF_TEST_CAMPAIGN_ID, STUDIO_SELF_TEST_TEAM_OFFICE),
+      description: "Strategy office for self-test campaign",
+    },
+    {
+      id: "studio-self-test",
+      kind: "link",
+      label: "Studio Self-Test",
+      href: `${FILE_ROOM_ROUTE}/studio-self-test`,
+      description: "Owner-only test scoreboard",
+    },
     {
       id: "reset-campaign",
       kind: "reset",

@@ -12,27 +12,65 @@ describe("owner-qa menu config", () => {
   it("lists the current Studio journey in order with no legacy routes", () => {
     expect(ownerQa.journeyPresets.map((preset) => preset.id)).toEqual([
       "studio-lobby",
-      "discovery-room",
-      "studio-plan-preview",
-      "project-summary-checkout",
-      "project-details",
-      "studio-board-details-needed",
-      "studio-board-building",
+      "route-map",
+      "payment-checkout-test",
+      "studio-board",
       "project-record",
       "review-room-ready",
       "final-delivery-complete",
       "help-center",
     ]);
 
+    const labels = ownerQa.journeyPresets.map((preset) => preset.label);
+    expect(labels).toEqual([
+      "Studio Lobby",
+      "Route Map",
+      "Payment / Checkout test",
+      "Studio Board",
+      "Project Record",
+      "Review Room",
+      "Final Delivery",
+      "Help Center",
+    ]);
+    expect(labels).not.toContain("Discovery Room");
+    expect(labels).not.toContain("Studio Plan Preview");
+    expect(labels).not.toContain("Project Summary + Checkout");
+    expect(labels).not.toContain("Project Details");
+    const displayText = ownerQa.journeyPresets
+      .flatMap((preset) => [preset.label, preset.description ?? ""])
+      .join("\n");
+    expect(displayText).not.toContain("Discovery Room");
+    expect(displayText).not.toContain("Studio Plan Preview");
+    expect(displayText).not.toContain("Project Summary + Checkout");
+    expect(displayText).not.toContain("Project Details");
+
     const hrefs = ownerQa.journeyPresets.map((preset) => preset.href);
-    expect(hrefs).not.toContain("/payment");
+    expect(hrefs).toContain("/route-map");
+    expect(hrefs).toContain("/payment");
+    expect(hrefs).not.toContain("/business-discovery-studio");
+    expect(hrefs).not.toContain("/project-summary");
+    expect(hrefs).not.toContain("/project-details");
     expect(hrefs).not.toContain("/studio-guide-prototype");
     expect(hrefs).not.toContain("/studio-kitchen");
     expect(hrefs.some((href) => href.includes("package="))).toBe(false);
   });
 
-  it("exposes only Reset Campaign as a shortcut", () => {
-    expect(ownerQa.shortcuts.map((shortcut) => shortcut.label)).toEqual(["Reset Campaign"]);
+  it("exposes active internal shortcuts and Reset Campaign", () => {
+    expect(ownerQa.shortcuts.map((shortcut) => shortcut.label)).toEqual([
+      "File Room",
+      "Owner Console",
+      "Production Workspace",
+      "Team Offices",
+      "Studio Self-Test",
+      "Reset Campaign",
+    ]);
+    expect(ownerQa.shortcuts.filter((shortcut) => shortcut.kind === "link").map((shortcut) => shortcut.href)).toEqual([
+      "/file-room",
+      "/file-room/owner-console",
+      "/file-room/studio-self-test/production/studio-self-test%3Asm-001",
+      "/file-room/studio-self-test/office/strategy",
+      "/file-room/studio-self-test",
+    ]);
     expect(ownerQa.shortcuts.filter((shortcut) => shortcut.kind === "reset")).toHaveLength(1);
   });
 
@@ -119,7 +157,7 @@ describe("owner-qa hard reset", () => {
     }
   });
 
-  it("seeds project-details-needed with paid state and no submitted project details", () => {
+  it("seeds checkout test with a Route Map approved plan", () => {
     const localStorage = createStorage();
     const originalWindow = globalThis.window;
 
@@ -133,19 +171,21 @@ describe("owner-qa hard reset", () => {
     });
 
     try {
-      applyOwnerQaJourneySeed("studio-board-details-needed");
+      applyOwnerQaJourneySeed("payment-checkout-test");
       const raw = localStorage.getItem("studio-squishy:current-campaign");
       expect(raw).toBeTruthy();
       const campaign = JSON.parse(raw!) as {
         campaignStatus: string;
-        projectDetailsSubmittedAt?: string;
         paymentReceivedAt: string | null;
         approvedStudioPlan?: { amountDueTodayCents: number };
+        routeMapContext?: { jobId: string; roadId: string };
       };
-      expect(campaign.campaignStatus).toBe("PAYMENT_RECEIVED");
-      expect(campaign.paymentReceivedAt).toBeTruthy();
-      expect(campaign.projectDetailsSubmittedAt).toBeUndefined();
-      expect(campaign.approvedStudioPlan?.amountDueTodayCents).toBe(121_500);
+      expect(campaign.campaignStatus).toBe("DISCOVERY_COMPLETE");
+      expect(campaign.paymentReceivedAt).toBeNull();
+      expect(campaign.routeMapContext).toEqual(
+        expect.objectContaining({ jobId: "v2-rtu-social-posts", roadId: "i20" }),
+      );
+      expect(campaign.approvedStudioPlan?.amountDueTodayCents).toBeGreaterThan(0);
     } finally {
       Object.defineProperty(globalThis, "window", {
         configurable: true,
