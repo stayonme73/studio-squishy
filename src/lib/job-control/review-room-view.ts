@@ -25,6 +25,7 @@ import {
 } from "./review-room-gates";
 import type { JobActivityEvent, PurchasedJobRecord } from "./types";
 import { isApprovedReviewProofReference } from "@/lib/file-registry/job-files";
+import { resolveClientFacingFileHref } from "@/lib/file-storage/routes";
 
 export type ClientReviewView = {
   jobId: string;
@@ -103,7 +104,13 @@ export function resolveClientReviewView(input: {
           id: ref.id,
           filename: ref.filename,
           fileType: ref.fileType,
-          storageRef: ref.storageRef,
+          accessHref:
+            resolveClientFacingFileHref({
+              registryFileId: ref.id,
+              url: ref.storageRef.provider === "google_shared_drive" ? ref.storageRef.reference : undefined,
+              storageRef: ref.storageRef,
+              purpose: "proof",
+            }) || null,
           versionLabel: ref.versionLabel,
           addedAt: ref.addedAt,
         }));

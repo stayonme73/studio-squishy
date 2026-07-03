@@ -204,7 +204,7 @@ export type PurchasedJobRecord = {
   workingFileRefs?: readonly JobWorkingFileRef[];
   /** Internal job Work Packets — Team Office assignment and file-return trail. */
   workPackets?: readonly JobWorkPacket[];
-  /** Canonical file registry — reference-only Shared Drive metadata, no upload/API connection. */
+  /** Canonical File Room registry — metadata and storage refs only, never public provider links. */
   fileRegistry?: readonly StudioFileReference[];
   /** Client-facing final delivery files — shown in Final Delivery only. */
   clientDeliveryFiles?: readonly JobClientDeliveryFile[];

@@ -1,5 +1,4 @@
 import type { StickyNoteColorId } from "@/config/feedback-studio";
-import type { StudioFileStorageReference } from "@/lib/file-registry/types";
 
 /** Per-deliverable section decision in client Review Room. */
 export type JobReviewSectionDecision = "neutral" | "approved" | "revision" | "skip";
@@ -41,7 +40,7 @@ export type ClientReviewDeliverable = {
     id: string;
     filename: string;
     fileType: string;
-    storageRef: StudioFileStorageReference;
+    accessHref: string | null;
     versionLabel: string;
     addedAt: string;
   }[];

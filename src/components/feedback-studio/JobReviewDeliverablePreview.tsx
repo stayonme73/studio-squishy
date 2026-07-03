@@ -94,8 +94,8 @@ export default function JobReviewDeliverablePreview({
                   <ul>
                     {deliverable.proofFiles.map((file) => (
                       <li key={file.id}>
-                        {file.storageRef.referenceKind === "manual_link" ? (
-                          <a href={file.storageRef.reference} target="_blank" rel="noreferrer">
+                        {file.accessHref ? (
+                          <a href={file.accessHref} target="_blank" rel="noreferrer">
                             {file.filename}
                           </a>
                         ) : (

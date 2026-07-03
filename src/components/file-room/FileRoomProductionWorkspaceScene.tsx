@@ -32,6 +32,11 @@ function formatRegistryToken(value: string): string {
   return value.replace(/_/g, " ");
 }
 
+function formatStorageRefLabel(ref: ProductionWorkspaceView["fileRegistry"][number]): string {
+  if (ref.storageRef.provider === "google_shared_drive") return ref.storageRef.reference;
+  return "Private File Room object";
+}
+
 export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -317,12 +322,12 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
                       {formatRegistryToken(ref.category)} · {formatRegistryToken(ref.visibility)} ·{" "}
                       {formatRegistryToken(ref.status)} · {ref.versionLabel}
                     </span>
-                    {ref.storageRef.referenceKind === "manual_link" ? (
+                    {ref.storageRef.provider === "google_shared_drive" && ref.storageRef.referenceKind === "manual_link" ? (
                       <a className="fr-back-link" href={ref.storageRef.reference} target="_blank" rel="noreferrer">
                         {ref.storageRef.reference}
                       </a>
                     ) : (
-                      <span className="fr-tasks-row__meta">{ref.storageRef.reference}</span>
+                      <span className="fr-tasks-row__meta">{formatStorageRefLabel(ref)}</span>
                     )}
                     <span className="fr-tasks-row__meta">
                       {ref.addedBy.displayName ?? ref.addedBy.role} · {formatWhen(ref.addedAt)} ·{" "}

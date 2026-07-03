@@ -7,6 +7,11 @@ export type StudioFileCategory =
 
 export type StudioFileVisibility = "internal_only" | "client_visible";
 
+export type StudioFileStorageVisibilityState =
+  | "internal-only"
+  | "review-proof"
+  | "client-final";
+
 export type StudioFileStatus =
   | "draft"
   | "approved_for_review"
@@ -20,7 +25,7 @@ export type StudioFileActor = {
   displayName?: string;
 };
 
-export type StudioFileStorageReference = {
+export type StudioFileReferenceOnlyStorageReference = {
   provider: "google_shared_drive";
   connectionStatus: "reference_only";
   referenceKind: "manual_link" | "manual_reference" | "path_hint";
@@ -28,6 +33,26 @@ export type StudioFileStorageReference = {
   displayLabel?: string;
   note?: string;
 };
+
+export type StudioFileSupabaseStorageReference = {
+  provider: "supabase_storage";
+  connectionStatus: "private_object";
+  bucket: string;
+  objectPath: string;
+  visibilityState: StudioFileStorageVisibilityState;
+  originalFilename: string;
+  contentType: string;
+  sizeBytes?: number;
+  checksumSha256?: string;
+  objectVersion?: string;
+  uploadedAt?: string;
+  displayLabel?: string;
+  note?: string;
+};
+
+export type StudioFileStorageReference =
+  | StudioFileReferenceOnlyStorageReference
+  | StudioFileSupabaseStorageReference;
 
 export type StudioFileReference = {
   id: string;

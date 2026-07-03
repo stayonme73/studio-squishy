@@ -4,6 +4,7 @@ import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import { canClientAccessJobDelivery, isJobDeliveredToClient } from "./final-delivery-access";
 import type { JobClientDeliveryFile, PurchasedJobRecord } from "./types";
 import { clientDeliveryFileIsReleased } from "@/lib/file-registry/job-files";
+import { resolveClientFacingFileHref } from "@/lib/file-storage/routes";
 
 export type ClientDeliveryFileView = {
   id: string;
@@ -40,7 +41,12 @@ function formatFileView(file: JobClientDeliveryFile): ClientDeliveryFileView {
     deliverableLabel: file.deliverableLabel,
     fileName: file.fileName,
     fileType: file.fileType,
-    url: file.url,
+    url: resolveClientFacingFileHref({
+      registryFileId: file.registryFileId,
+      url: file.url,
+      storageRef: file.storageRef,
+      purpose: "download",
+    }),
     useInstructions: file.useInstructions ?? null,
     addedAt: file.addedAt,
     versionLabel: file.versionLabel ?? null,

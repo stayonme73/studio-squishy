@@ -1,7 +1,9 @@
 /**
  * Supabase server client — scaffold only.
  *
- * Do NOT install @supabase/supabase-js until post-MVP approval.
+ * File Room private storage may inject a server-only storage client after
+ * Supabase credentials are configured. Do not create browser-visible storage
+ * clients or expose raw storage links.
  *
  * Future usage:
  *   import { createServerClient } from "@supabase/ssr";

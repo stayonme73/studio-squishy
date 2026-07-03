@@ -5,15 +5,17 @@ import type {
   StudioFileCategory,
   StudioFileClientScope,
   StudioFileReference,
+  StudioFileReferenceOnlyStorageReference,
   StudioFileStatus,
   StudioFileStorageReference,
+  StudioFileSupabaseStorageReference,
   StudioFileVisibility,
 } from "./types";
 
 export function createReferenceOnlyStorageRef(input: {
   reference: string;
   displayLabel?: string;
-  referenceKind?: StudioFileStorageReference["referenceKind"];
+  referenceKind?: StudioFileReferenceOnlyStorageReference["referenceKind"];
 }): StudioFileStorageReference {
   const reference = input.reference.trim();
   const looksLikeLink = /^https?:\/\//i.test(reference);
@@ -24,6 +26,18 @@ export function createReferenceOnlyStorageRef(input: {
     reference,
     displayLabel: input.displayLabel?.trim() || undefined,
   };
+}
+
+export function isReferenceOnlyStorageRef(
+  storageRef: StudioFileStorageReference,
+): storageRef is StudioFileReferenceOnlyStorageReference {
+  return storageRef.provider === "google_shared_drive";
+}
+
+export function isSupabasePrivateStorageRef(
+  storageRef: StudioFileStorageReference,
+): storageRef is StudioFileSupabaseStorageReference {
+  return storageRef.provider === "supabase_storage" && storageRef.connectionStatus === "private_object";
 }
 
 export function isApprovedReviewProofReference(ref: StudioFileReference): boolean {

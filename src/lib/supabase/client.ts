@@ -1,7 +1,8 @@
 /**
  * Supabase browser client — scaffold only.
  *
- * Do NOT install @supabase/supabase-js until post-MVP approval.
+ * File Room private storage stays server-controlled. Do not create browser
+ * storage clients unless a direct-upload flow is explicitly approved later.
  *
  * Future usage:
  *   import { createBrowserClient } from "@supabase/ssr";

@@ -141,6 +141,13 @@ function fileRef(overrides: Partial<StudioFileReference> = {}): StudioFileRefere
   };
 }
 
+function referenceOnlyUrl(ref: StudioFileReference): string {
+  if (ref.storageRef.provider !== "google_shared_drive") {
+    throw new Error("Expected reference-only storage ref.");
+  }
+  return ref.storageRef.reference;
+}
+
 describe("File Registry + Shared Drive Reference Layer V1", () => {
   it("production workspace adds internal draft/source references", () => {
     const baseJob = job();
@@ -275,7 +282,7 @@ describe("File Registry + Shared Drive Reference Layer V1", () => {
           deliverableLabel: "Post concepts",
           fileName: released.filename,
           fileType: released.fileType,
-          url: released.storageRef.reference,
+          url: referenceOnlyUrl(released),
           releaseStatus: "released",
           addedAt: NOW,
           addedBy: ownerActor,
@@ -287,7 +294,7 @@ describe("File Registry + Shared Drive Reference Layer V1", () => {
           deliverableLabel: "Caption copy",
           fileName: pending.filename,
           fileType: pending.fileType,
-          url: pending.storageRef.reference,
+          url: referenceOnlyUrl(pending),
           releaseStatus: "pending_release",
           addedAt: NOW,
           addedBy: ownerActor,
