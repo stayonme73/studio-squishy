@@ -16,7 +16,7 @@ export function appendJobActivityEvent(
   events: readonly JobActivityEvent[],
   event: Omit<JobActivityEvent, "id">,
 ): JobActivityEvent[] {
-  const id = eventId(event.kind, `${event.jobId}:${event.occurredAt}`);
+  const id = eventId(event.kind, event.messageRef ?? `${event.jobId}:${event.occurredAt}`);
   if (events.some((entry) => entry.id === id)) return [...events];
   return [...events, { ...event, id }];
 }

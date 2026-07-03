@@ -2,9 +2,13 @@ export type {
   JobSpineStatus,
   ProductionControlLane,
   OwnerDeskReason,
+  JobCommunicationEventType,
+  JobCommunicationChannel,
+  JobCommunicationDeliveryStatus,
   JobActivityEventKind,
   JobActivityActor,
   PurchasedJobRecord,
+  JobCommunicationRecord,
   JobActivityEvent,
 } from "./types";
 
@@ -59,6 +63,17 @@ export {
   sortActivityEvents,
   formatActivityKind,
 } from "./activity-log";
+
+export {
+  JOB_COMMUNICATION_TEMPLATES,
+  enqueueJobCommunicationRecord,
+  markJobCommunicationTestSent,
+  resolveCampaignCommunicationClientId,
+  resolveNeedsCommunicationQueue,
+  syncJobCommunicationRecords,
+  type EnqueueJobCommunicationInput,
+  type NeedsCommunicationQueueItem,
+} from "./communication";
 
 export { resolveOwnerDeskItems, type OwnerDeskItem, type OwnerDeskInput } from "./owner-desk";
 

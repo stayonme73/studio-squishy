@@ -4,7 +4,11 @@ import type {
   CampaignExceptionEvent,
   CampaignExceptionRecord,
 } from "./exceptions-types";
-import type { JobActivityEvent, PurchasedJobRecord } from "@/lib/job-control/types";
+import type {
+  JobActivityEvent,
+  JobCommunicationRecord,
+  PurchasedJobRecord,
+} from "@/lib/job-control/types";
 
 export type {
   CampaignExceptionEvent,
@@ -186,8 +190,10 @@ export type CampaignTasksRecord = {
   jobActivityEvents?: JobActivityEvent[];
   /** Job-scoped client review feedback sessions (schema v8). */
   jobReviewFeedback?: import("@/lib/job-control/review-feedback-types").JobReviewFeedback[];
+  /** Durable client communication outbox / receipts (schema v9). */
+  jobCommunicationRecords?: JobCommunicationRecord[];
   updatedAt: string;
-  /** Envelope schema version — 8 adds job review feedback. */
+  /** Envelope schema version — 9 adds job communication outbox records. */
   version: number;
 };
 

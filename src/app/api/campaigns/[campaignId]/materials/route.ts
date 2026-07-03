@@ -17,6 +17,12 @@ import {
 import { applyExceptionStatusOnClientMaterialSubmit } from "@/lib/materials/promotion";
 import { resolveUnderlyingItemIdsForConsolidated } from "@/lib/materials/client-requests";
 import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
+import {
+  resolveCampaignCommunicationClientId,
+  syncJobCommunicationRecords,
+} from "@/lib/job-control/communication";
+import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
+import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
 import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
 import { syncMaterialsSummaryOnCampaign } from "@/lib/materials/campaign-summary";
 import { resolveMaterialsApiPayload } from "@/lib/materials/materials-view";
@@ -166,9 +172,25 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (submittedItemIds.length > 0) {
     const tasksEnvelope = await getOrGenerateTasks(campaignId, campaignEnvelope.record);
     const updatedTasks = applyExceptionStatusOnClientMaterialSubmit(tasksEnvelope, submittedItemIds);
-    if (updatedTasks !== tasksEnvelope) {
-      await writeTasksEnvelope(updatedTasks);
-    }
+    const synced = syncJobRecordsFromCampaign(
+      campaignEnvelope.record,
+      updatedTasks.tasks ?? [],
+      saved.items,
+      updatedTasks.exceptionRecords ?? [],
+      updatedTasks.jobRecords,
+    );
+    const jobs = applyWaitingOnClientPolicies(synced, saved.items);
+    const communicationSync = syncJobCommunicationRecords({
+      envelope: updatedTasks,
+      campaign: campaignEnvelope.record,
+      clientId: resolveCampaignCommunicationClientId(
+        campaignEnvelope.clientUserId,
+        campaignEnvelope.campaignId,
+      ),
+      jobs,
+      materials: saved.items,
+    });
+    await writeTasksEnvelope(communicationSync.envelope);
   }
 
   const audience = isMaterialsTeamAudience(user, campaignId, campaignEnvelope, assignments)

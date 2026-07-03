@@ -15,11 +15,16 @@ import {
   buildWaitingOnClientTrayItem,
   type WaitingOnClientTrayItem,
 } from "./waiting-on-client";
+import {
+  resolveNeedsCommunicationQueue,
+  type NeedsCommunicationQueueItem,
+} from "./communication";
 import type { JobActivityEvent, PurchasedJobRecord } from "./types";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 
 export type OwnerControlRoomView = {
   ownerDesk: readonly OwnerDeskItem[];
+  needsCommunication: readonly NeedsCommunicationQueueItem[];
   lanes: readonly ProductionLaneView[];
   waitingOnClient: readonly WaitingOnClientTrayItem[];
   activity: readonly JobActivityEvent[];
@@ -36,6 +41,7 @@ export function resolveOwnerControlRoomFromBundle(
   activity: JobActivityEvent[];
   laneInputs: LaneCapacityInput[];
   waitingTray: WaitingOnClientTrayItem[];
+    needsCommunication: NeedsCommunicationQueueItem[];
   deskInput: {
     campaignId: string;
     campaignName: string;
@@ -80,12 +86,16 @@ export function resolveOwnerControlRoomFromBundle(
   const waitingTray = jobs
     .map((job) => buildWaitingOnClientTrayItem(job, listItem.campaignName, materials, nowMs))
     .filter((item): item is WaitingOnClientTrayItem => item !== null);
+  const needsCommunication = resolveNeedsCommunicationQueue(
+    bundle.tasksEnvelope.jobCommunicationRecords,
+  );
 
   return {
     jobs,
     activity,
     laneInputs,
     waitingTray,
+    needsCommunication,
     deskInput: {
       campaignId: listItem.campaignId,
       campaignName: listItem.campaignName,
@@ -104,6 +114,7 @@ export function resolveOwnerControlRoomView(
   const allActivity: JobActivityEvent[] = [];
   const allLaneInputs: LaneCapacityInput[] = [];
   const allWaiting: WaitingOnClientTrayItem[] = [];
+  const allCommunication: NeedsCommunicationQueueItem[] = [];
   const deskInputs: OwnerDeskInput[] = [];
 
   for (const bundle of bundles) {
@@ -112,6 +123,7 @@ export function resolveOwnerControlRoomView(
     allActivity.push(...resolved.activity);
     allLaneInputs.push(...resolved.laneInputs);
     allWaiting.push(...resolved.waitingTray);
+    allCommunication.push(...resolved.needsCommunication);
     deskInputs.push(resolved.deskInput);
   }
 
@@ -122,6 +134,7 @@ export function resolveOwnerControlRoomView(
 
   return {
     ownerDesk,
+    needsCommunication: allCommunication.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
     lanes,
     waitingOnClient: allWaiting,
     activity,

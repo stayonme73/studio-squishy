@@ -7,6 +7,7 @@ import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 
 import { applyJobSpineStatusChange } from "./actions";
 import { appendJobActivityEvent } from "./activity-log";
+import { enqueueJobCommunicationRecord } from "./communication";
 import {
   allRequiredDeliverablesPrepared,
   resolveRequiredDeliverableKeys,
@@ -120,6 +121,7 @@ export function applyReviewRoomPatch(
   body: ReviewRoomPatchBody,
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
+  clientId = `unclaimed-client:${campaign.campaignId}`,
 ): ReviewRoomActionResult {
   const occurredAt = new Date().toISOString();
   const actor = clientActor(user);
@@ -252,6 +254,19 @@ export function applyReviewRoomPatch(
         reason: "Client requested revision",
         spineStatus: "revision_requested",
       });
+      let nextEnvelope = enqueueJobCommunicationRecord(
+        { ...envelope, jobActivityEvents: events },
+        {
+          campaign,
+          clientId,
+          job: currentJob,
+          eventType: "revision_requested",
+          sender: actor,
+          occurredAt,
+          idempotencyKey: occurredAt,
+        },
+      );
+      events = nextEnvelope.jobActivityEvents ?? [];
 
       const updatedCampaign: CampaignRecord = {
         ...campaign,
@@ -259,9 +274,9 @@ export function applyReviewRoomPatch(
         updatedAt: occurredAt,
       };
 
-      let nextEnvelope = upsertJobReviewFeedback(
+      nextEnvelope = upsertJobReviewFeedback(
         {
-          ...envelope,
+          ...nextEnvelope,
           tasks: markTasksNeedsRevision(envelope.tasks ?? [], job.skuId),
         },
         feedback,
@@ -322,6 +337,19 @@ export function applyReviewRoomPatch(
       });
 
       let nextEnvelope = upsertJobReviewFeedback(envelope, feedback);
+      nextEnvelope = enqueueJobCommunicationRecord(
+        { ...nextEnvelope, jobActivityEvents: events },
+        {
+          campaign,
+          clientId,
+          job: currentJob,
+          eventType: "approved_for_delivery",
+          sender: actor,
+          occurredAt,
+          idempotencyKey: occurredAt,
+        },
+      );
+      events = nextEnvelope.jobActivityEvents ?? [];
       nextEnvelope = updateJobInEnvelope(nextEnvelope, currentJob, events);
 
       return { ok: true, envelope: nextEnvelope, job: currentJob, feedback };

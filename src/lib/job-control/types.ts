@@ -24,6 +24,28 @@ export type OwnerDeskReason =
   | "at_risk_job"
   | "heavy_lane_full";
 
+export type JobCommunicationEventType =
+  | "payment_received"
+  | "intake_incomplete_materials_needed"
+  | "reminder_48_hour"
+  | "waiting_on_client_72_hour"
+  | "materials_received_returned_to_queue"
+  | "production_started"
+  | "ready_for_review"
+  | "revision_requested"
+  | "revision_ready_again"
+  | "approved_for_delivery"
+  | "final_delivery_available"
+  | "refund_eligibility_14_day"
+  | "refund_issued";
+
+export type JobCommunicationChannel = "in_app_outbox" | "test_email";
+
+export type JobCommunicationDeliveryStatus =
+  | "pending_owner_send"
+  | "test_sent"
+  | "cancelled";
+
 export type JobActivityEventKind =
   | "payment"
   | "intake"
@@ -44,7 +66,8 @@ export type JobActivityEventKind =
   | "client_delivery_approval"
   | "owner_final_release"
   | "client_delivery_file_added"
-  | "delivery_completed";
+  | "delivery_completed"
+  | "client_communication";
 
 export type JobInternalNote = {
   id: string;
@@ -122,6 +145,28 @@ export type PurchasedJobRecord = {
   updatedAt: string;
 };
 
+export type JobCommunicationRecord = {
+  id: string;
+  campaignId: string;
+  clientId: string;
+  jobId: string;
+  skuId: ServiceId;
+  serviceName: string;
+  eventType: JobCommunicationEventType;
+  templateId: string;
+  channel: JobCommunicationChannel;
+  sender: JobActivityActor;
+  reason: string;
+  messageContent: string;
+  deliveryStatus: JobCommunicationDeliveryStatus;
+  createdAt: string;
+  updatedAt: string;
+  activityEventId: string;
+  testSentAt?: string;
+  testSentBy?: JobActivityActor;
+  testRecipient?: string;
+};
+
 export type JobActivityEvent = {
   id: string;
   campaignId: string;
@@ -133,4 +178,7 @@ export type JobActivityEvent = {
   reason?: string;
   messageContent?: string;
   messageRef?: string;
+  communicationEventType?: JobCommunicationEventType;
+  communicationDeliveryStatus?: JobCommunicationDeliveryStatus;
+  communicationChannel?: JobCommunicationChannel;
 };

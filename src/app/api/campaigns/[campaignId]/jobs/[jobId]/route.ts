@@ -6,6 +6,10 @@ import { canOperateProductionTasks, canReadProductionTasks } from "@/lib/campaig
 import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 import { applyProductionWorkspacePatch, type ProductionWorkspacePatchBody } from "@/lib/job-control/production-workspace-actions";
+import {
+  resolveCampaignCommunicationClientId,
+  syncJobCommunicationRecords,
+} from "@/lib/job-control/communication";
 import { resolveProductionLaneViews } from "@/lib/job-control/capacity";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
@@ -47,7 +51,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   if (
-    (body.action === "owner_final_release" || body.action === "mark_delivered") &&
+    (body.action === "owner_final_release" ||
+      body.action === "mark_delivered" ||
+      body.action === "issue_refund") &&
     !isOwnerUser(user)
   ) {
     return NextResponse.json({ error: "Owner role required." }, { status: 403 });
@@ -70,19 +76,27 @@ export async function PATCH(request: Request, context: RouteContext) {
     tasksEnvelope.jobRecords,
   );
   const jobs = applyWaitingOnClientPolicies(synced, materials);
-  const job = jobs.find((entry) => entry.jobId === jobId);
+  const clientId = resolveCampaignCommunicationClientId(
+    campaignEnvelope.clientUserId,
+    campaignEnvelope.campaignId,
+  );
+  const communicationSync = syncJobCommunicationRecords({
+    envelope: tasksEnvelope,
+    campaign: campaignEnvelope.record,
+    clientId,
+    jobs,
+    materials,
+  });
+  const job = communicationSync.jobs.find((entry) => entry.jobId === jobId);
   if (!job) {
     return NextResponse.json({ error: "Job not found." }, { status: 404 });
   }
 
-  const envelopeWithJobs: typeof tasksEnvelope = {
-    ...tasksEnvelope,
-    jobRecords: jobs,
-  };
+  const envelopeWithJobs: typeof tasksEnvelope = communicationSync.envelope;
 
   const listItem = resolveFileRoomListItemView(campaignEnvelope);
   const laneViews = resolveProductionLaneViews(
-    jobs.map((entry) => ({
+    communicationSync.jobs.map((entry) => ({
       campaignName: listItem.campaignName,
       job: entry,
       tasks,
@@ -97,6 +111,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     user,
     materials,
     laneViews,
+    clientId,
   );
 
   if (!result.ok) {
@@ -147,19 +162,32 @@ export async function GET(request: Request, context: RouteContext) {
     tasksEnvelope.jobRecords,
   );
   const jobs = applyWaitingOnClientPolicies(synced, materialsEnvelope.items);
+  const clientId = resolveCampaignCommunicationClientId(
+    campaignEnvelope.clientUserId,
+    campaignEnvelope.campaignId,
+  );
+  const communicationSync = syncJobCommunicationRecords({
+    envelope: tasksEnvelope,
+    campaign: campaignEnvelope.record,
+    clientId,
+    jobs,
+    materials: materialsEnvelope.items,
+  });
 
-  let envelope = tasksEnvelope;
+  let envelope = communicationSync.envelope;
   const prior = tasksEnvelope.jobRecords ?? [];
-  if (JSON.stringify(prior) !== JSON.stringify(jobs)) {
-    envelope = await writeTasksEnvelope({
-      ...tasksEnvelope,
-      jobRecords: jobs,
-      updatedAt: new Date().toISOString(),
-    });
+  if (
+    JSON.stringify(prior) !== JSON.stringify(communicationSync.jobs) ||
+    JSON.stringify(tasksEnvelope.jobCommunicationRecords ?? []) !==
+      JSON.stringify(envelope.jobCommunicationRecords ?? []) ||
+    JSON.stringify(tasksEnvelope.jobActivityEvents ?? []) !==
+      JSON.stringify(envelope.jobActivityEvents ?? [])
+  ) {
+    envelope = await writeTasksEnvelope(envelope);
   }
 
   return NextResponse.json({
-    jobRecords: jobs,
+    jobRecords: communicationSync.jobs,
     jobActivityEvents: envelope.jobActivityEvents ?? [],
     syncedAt: envelope.syncedAt,
   });

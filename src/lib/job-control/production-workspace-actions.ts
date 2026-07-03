@@ -7,6 +7,7 @@ import type { StudioUser } from "@/lib/campaign-store/types";
 
 import { appendJobActivityEvent } from "./activity-log";
 import { applyJobSpineStatusChange, requestOwnerApprovalBeforeReview } from "./actions";
+import { enqueueJobCommunicationRecord } from "./communication";
 import type { ProductionLaneView } from "./capacity";
 import { addClientDeliveryFile, syncCampaignStatusAfterDelivery } from "./final-delivery-actions";
 import { canMarkJobDelivered, canOwnerFinalRelease } from "./final-delivery-gates";
@@ -29,7 +30,8 @@ export type ProductionWorkspacePatchAction =
   | "submit_for_owner_approval"
   | "owner_approve_for_review"
   | "owner_final_release"
-  | "mark_delivered";
+  | "mark_delivered"
+  | "issue_refund";
 
 export type ProductionWorkspacePatchBody =
   | { action: "start_building_concepts" }
@@ -47,7 +49,8 @@ export type ProductionWorkspacePatchBody =
   | { action: "submit_for_owner_approval" }
   | { action: "owner_approve_for_review" }
   | { action: "owner_final_release" }
-  | { action: "mark_delivered" };
+  | { action: "mark_delivered" }
+  | { action: "issue_refund"; reason: string };
 
 export type ProductionWorkspacePatchResult =
   | { ok: true; envelope: ServerTasksEnvelope; job: PurchasedJobRecord; updatedCampaign?: CampaignRecord }
@@ -107,6 +110,7 @@ export function applyProductionWorkspacePatch(
   user: StudioUser,
   materials: readonly CampaignMaterialItem[],
   laneViews: readonly ProductionLaneView[],
+  clientId = `unclaimed-client:${campaign.campaignId}`,
 ): ProductionWorkspacePatchResult {
   const parsed = parseJobId(jobId);
   if (!parsed || parsed.campaignId !== campaign.campaignId) {
@@ -145,8 +149,23 @@ export function applyProductionWorkspacePatch(
         ...result.job,
         productionStartedAt: job.productionStartedAt ?? occurredAt,
         laneQueuedAt: occurredAt,
+        nonRefundable: true,
+        refundEligibleAt: null,
       };
       events = result.events;
+      envelope = enqueueJobCommunicationRecord(
+        { ...envelope, jobActivityEvents: events },
+        {
+          campaign,
+          clientId,
+          job,
+          eventType: "production_started",
+          sender: actor,
+          occurredAt,
+          idempotencyKey: occurredAt,
+        },
+      );
+      events = envelope.jobActivityEvents ?? [];
       break;
     }
 
@@ -282,6 +301,7 @@ export function applyProductionWorkspacePatch(
         };
       }
 
+      const previousSpineStatus = job.spineStatus;
       job = {
         ...job,
         ownerApprovalPending: null,
@@ -297,6 +317,22 @@ export function applyProductionWorkspacePatch(
       });
       job = result.job;
       events = result.events;
+      envelope = enqueueJobCommunicationRecord(
+        { ...envelope, jobActivityEvents: events },
+        {
+          campaign,
+          clientId,
+          job,
+          eventType:
+            previousSpineStatus === "revision_requested"
+              ? "revision_ready_again"
+              : "ready_for_review",
+          sender: actor,
+          occurredAt,
+          idempotencyKey: occurredAt,
+        },
+      );
+      events = envelope.jobActivityEvents ?? [];
       break;
     }
 
@@ -369,6 +405,19 @@ export function applyProductionWorkspacePatch(
         reason: "Owner approved final release",
         spineStatus: "ready_for_delivery",
       });
+      envelope = enqueueJobCommunicationRecord(
+        { ...envelope, jobActivityEvents: events },
+        {
+          campaign,
+          clientId,
+          job,
+          eventType: "final_delivery_available",
+          sender: actor,
+          occurredAt,
+          idempotencyKey: occurredAt,
+        },
+      );
+      events = envelope.jobActivityEvents ?? [];
       break;
     }
 
@@ -426,6 +475,52 @@ export function applyProductionWorkspacePatch(
         job: deliveredJob,
         updatedCampaign,
       };
+    }
+
+    case "issue_refund": {
+      if (!isOwnerUser(user)) {
+        return { ok: false, error: "Owner role required.", status: 403 };
+      }
+      if (job.productionStartedAt || job.nonRefundable) {
+        return {
+          ok: false,
+          error: "Production has started for this job, so it is nonrefundable.",
+          status: 422,
+        };
+      }
+
+      const reason = body.reason.trim();
+      if (!reason) {
+        return { ok: false, error: "Refund reason is required.", status: 400 };
+      }
+
+      const refundResult = applyJobSpineStatusChange(job, events, {
+        job,
+        nextStatus: "refunded_cancelled",
+        actor,
+        reason,
+        occurredAt,
+      });
+      job = {
+        ...refundResult.job,
+        refundEligibleAt: job.refundEligibleAt ?? occurredAt,
+      };
+      events = refundResult.events;
+      envelope = enqueueJobCommunicationRecord(
+        { ...envelope, jobActivityEvents: events },
+        {
+          campaign,
+          clientId,
+          job,
+          eventType: "refund_issued",
+          sender: actor,
+          occurredAt,
+          idempotencyKey: occurredAt,
+          reason,
+        },
+      );
+      events = envelope.jobActivityEvents ?? [];
+      break;
     }
 
     default:

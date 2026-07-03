@@ -9,6 +9,10 @@ import {
   applyReviewRoomPatch,
   type ReviewRoomPatchBody,
 } from "@/lib/job-control/review-room-actions";
+import {
+  resolveCampaignCommunicationClientId,
+  syncJobCommunicationRecords,
+} from "@/lib/job-control/communication";
 import { canClientAccessJobReview } from "@/lib/job-control/review-room-access";
 import { resolveClientReviewView } from "@/lib/job-control/review-room-view";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
@@ -41,7 +45,28 @@ export async function GET(request: Request, context: RouteContext) {
     tasksEnvelope.jobRecords,
   );
   const jobs = applyWaitingOnClientPolicies(synced, materialsEnvelope.items);
-  const job = jobs.find((entry) => entry.jobId === jobId);
+  const clientId = resolveCampaignCommunicationClientId(
+    campaignEnvelope.clientUserId,
+    campaignEnvelope.campaignId,
+  );
+  const communicationSync = syncJobCommunicationRecords({
+    envelope: tasksEnvelope,
+    campaign: campaignEnvelope.record,
+    clientId,
+    jobs,
+    materials: materialsEnvelope.items,
+  });
+  const envelopeWithCommunications =
+    JSON.stringify(tasksEnvelope.jobCommunicationRecords ?? []) !==
+      JSON.stringify(communicationSync.envelope.jobCommunicationRecords ?? []) ||
+    JSON.stringify(tasksEnvelope.jobActivityEvents ?? []) !==
+      JSON.stringify(communicationSync.envelope.jobActivityEvents ?? []) ||
+    JSON.stringify(tasksEnvelope.jobRecords ?? []) !==
+      JSON.stringify(communicationSync.envelope.jobRecords ?? [])
+      ? await writeTasksEnvelope(communicationSync.envelope)
+      : communicationSync.envelope;
+  const syncedJobs = communicationSync.jobs;
+  const job = syncedJobs.find((entry) => entry.jobId === jobId);
 
   if (!job) {
     return NextResponse.json({ error: "Job not found." }, { status: 404 });
@@ -57,7 +82,7 @@ export async function GET(request: Request, context: RouteContext) {
   const view = resolveClientReviewView({
     campaign: campaignEnvelope.record,
     job,
-    envelope: { ...tasksEnvelope, jobRecords: jobs },
+    envelope: envelopeWithCommunications,
   });
 
   if (!view) {
@@ -98,13 +123,23 @@ export async function PATCH(request: Request, context: RouteContext) {
     tasksEnvelope.jobRecords,
   );
   const jobs = applyWaitingOnClientPolicies(synced, materialsEnvelope.items);
-  const job = jobs.find((entry) => entry.jobId === jobId);
+  const clientId = resolveCampaignCommunicationClientId(
+    campaignEnvelope.clientUserId,
+    campaignEnvelope.campaignId,
+  );
+  const communicationSync = syncJobCommunicationRecords({
+    envelope: tasksEnvelope,
+    campaign: campaignEnvelope.record,
+    clientId,
+    jobs,
+    materials: materialsEnvelope.items,
+  });
+  const envelopeWithJobs = communicationSync.envelope;
+  const job = communicationSync.jobs.find((entry) => entry.jobId === jobId);
 
   if (!job) {
     return NextResponse.json({ error: "Job not found." }, { status: 404 });
   }
-
-  const envelopeWithJobs = { ...tasksEnvelope, jobRecords: jobs };
 
   const result = applyReviewRoomPatch(
     envelopeWithJobs,
@@ -113,6 +148,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     body,
     user,
     assignments,
+    clientId,
   );
 
   if (!result.ok) {

@@ -8,6 +8,12 @@ export const OWNER_CONTROL_ROOM_SECTION = {
   ownerDeskTitle: "Owner Desk",
   ownerDeskLead: "Items requiring your decision or approval before work continues.",
   ownerDeskEmpty: "No decisions waiting — production can proceed without Owner action.",
+  needsCommunicationTitle: "Needs Communication",
+  needsCommunicationLead:
+    "Internal outbox records for client notices. Test-send only — no live email automation.",
+  needsCommunicationEmpty: "No client communication waiting.",
+  needsCommunicationTestSendLabel: "Mark test-sent",
+  needsCommunicationTestSentLabel: "Test sent",
   lanesTitle: "Production lanes",
   lanesLead: "Active capacity by lane. Paid jobs with incomplete intake do not occupy slots.",
   waitingTrayTitle: "Waiting on Client",

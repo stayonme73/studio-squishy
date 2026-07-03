@@ -6,6 +6,7 @@ import type { StudioUser } from "@/lib/campaign-store/types";
 
 import { applyJobSpineStatusChange } from "./actions";
 import { appendJobActivityEvent } from "./activity-log";
+import { enqueueJobCommunicationRecord } from "./communication";
 import {
   canMarkJobDelivered,
   canOwnerFinalRelease,
@@ -95,6 +96,7 @@ export function applyFinalDeliveryPatch(
   job: PurchasedJobRecord,
   body: FinalDeliveryPatchBody,
   user: StudioUser,
+  clientId = `unclaimed-client:${campaign.campaignId}`,
 ): FinalDeliveryPatchResult {
   if (!isOwnerUser(user)) {
     return { ok: false, error: "Owner role required.", status: 403 };
@@ -139,6 +141,19 @@ export function applyFinalDeliveryPatch(
         reason: "Owner approved final release",
         spineStatus: "ready_for_delivery",
       });
+      envelope = enqueueJobCommunicationRecord(
+        { ...envelope, jobActivityEvents: events },
+        {
+          campaign,
+          clientId,
+          job: currentJob,
+          eventType: "final_delivery_available",
+          sender: actor,
+          occurredAt,
+          idempotencyKey: occurredAt,
+        },
+      );
+      events = envelope.jobActivityEvents ?? [];
       break;
     }
 

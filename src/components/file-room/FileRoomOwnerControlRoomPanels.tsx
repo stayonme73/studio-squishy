@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { productionWorkspaceRoute } from "@/config/production-workspace";
 import { OWNER_CONTROL_ROOM_SECTION } from "@/config/job-control";
@@ -38,7 +40,31 @@ function reminderBadge(status: string): string | null {
 }
 
 export default function FileRoomOwnerControlRoomPanels({ controlRoom }: Props) {
-  const { ownerDesk, lanes, waitingOnClient, activity, jobCount } = controlRoom;
+  const { ownerDesk, needsCommunication, lanes, waitingOnClient, activity, jobCount } =
+    controlRoom;
+  const router = useRouter();
+  const [busyCommunicationId, setBusyCommunicationId] = useState<string | null>(null);
+  const [communicationError, setCommunicationError] = useState<string | null>(null);
+
+  const markTestSent = async (campaignId: string, communicationId: string) => {
+    setBusyCommunicationId(communicationId);
+    setCommunicationError(null);
+    try {
+      const res = await fetch(
+        `/api/campaigns/${encodeURIComponent(campaignId)}/communications/${encodeURIComponent(
+          communicationId,
+        )}/test-send`,
+        { method: "PATCH" },
+      );
+      const json = (await res.json()) as { error?: string };
+      if (!res.ok) throw new Error(json.error ?? "Test-send failed");
+      router.refresh();
+    } catch (error) {
+      setCommunicationError(error instanceof Error ? error.message : "Test-send failed");
+    } finally {
+      setBusyCommunicationId(null);
+    }
+  };
 
   return (
     <div className="fr-control-room">
@@ -68,6 +94,56 @@ export default function FileRoomOwnerControlRoomPanels({ controlRoom }: Props) {
                 <Link className="fr-back-link" href={item.drillDownHref}>
                   Open drill-down →
                 </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </FileRoomSectionCard>
+
+      <FileRoomSectionCard title={OWNER_CONTROL_ROOM_SECTION.needsCommunicationTitle}>
+        <p className="fr-control-room__section-lead">
+          {OWNER_CONTROL_ROOM_SECTION.needsCommunicationLead}
+        </p>
+        {communicationError ? (
+          <p className="fr-exceptions__error" role="alert">
+            {communicationError}
+          </p>
+        ) : null}
+        {needsCommunication.length === 0 ? (
+          <p className="fr-tasks-empty__body">
+            {OWNER_CONTROL_ROOM_SECTION.needsCommunicationEmpty}
+          </p>
+        ) : (
+          <ul className="fr-control-room-desk" aria-label="Needs Communication">
+            {needsCommunication.map((item) => (
+              <li key={item.id} className="fr-control-room-desk__item">
+                <div className="fr-control-room-desk__head">
+                  <span className="fr-control-room-desk__reason">{item.eventLabel}</span>
+                  <span className="fr-control-room-desk__meta">
+                    {item.serviceName} · {item.statusLabel}
+                  </span>
+                </div>
+                <p className="fr-control-room-desk__title">{item.reason}</p>
+                <p className="fr-control-room-desk__detail">{item.messageContent}</p>
+                <p className="fr-tasks-row__meta">
+                  Template {item.templateId} · Created {formatWhen(item.createdAt)}
+                </p>
+                {item.testSentAt ? (
+                  <p className="fr-banner" role="status">
+                    {OWNER_CONTROL_ROOM_SECTION.needsCommunicationTestSentLabel}{" "}
+                    {formatWhen(item.testSentAt)}
+                  </p>
+                ) : null}
+                {item.deliveryStatus === "pending_owner_send" ? (
+                  <button
+                    type="button"
+                    className="utility-btn utility-btn--primary"
+                    disabled={busyCommunicationId === item.id}
+                    onClick={() => void markTestSent(item.campaignId, item.id)}
+                  >
+                    {OWNER_CONTROL_ROOM_SECTION.needsCommunicationTestSendLabel}
+                  </button>
+                ) : null}
               </li>
             ))}
           </ul>

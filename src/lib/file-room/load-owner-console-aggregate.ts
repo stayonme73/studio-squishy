@@ -1,6 +1,6 @@
 import { listStudioUsers } from "@/lib/auth/users";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import { getOrGenerateTasks } from "@/lib/campaign-tasks/store";
+import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
 import {
   resolveAssignCandidatesByCampaign,
   resolveOwnerConsoleView,
@@ -18,6 +18,12 @@ import {
   resolveOwnerControlRoomView,
   type OwnerControlRoomView,
 } from "@/lib/job-control/control-room-view";
+import {
+  resolveCampaignCommunicationClientId,
+  syncJobCommunicationRecords,
+} from "@/lib/job-control/communication";
+import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
+import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { loadFileRoomCampaignList } from "@/lib/file-room/load-campaign";
@@ -46,7 +52,7 @@ export async function loadOwnerConsoleAggregate(
     listStudioUsers(),
   ]);
 
-  const rawBundles = await Promise.all(
+  const loadedBundles = await Promise.all(
     campaigns.map(async (envelope): Promise<OwnerConsoleCampaignBundle> => {
       const [tasksEnvelope, materialsEnvelope] = await Promise.all([
         getOrGenerateTasks(envelope.campaignId, envelope.record),
@@ -57,6 +63,41 @@ export async function loadOwnerConsoleAggregate(
         tasksEnvelope,
         materials: materialsEnvelope.items,
       };
+    }),
+  );
+  const rawBundles = await Promise.all(
+    loadedBundles.map(async (bundle): Promise<OwnerConsoleCampaignBundle> => {
+      const synced = syncJobRecordsFromCampaign(
+        bundle.envelope.record,
+        bundle.tasksEnvelope.tasks ?? [],
+        bundle.materials ?? [],
+        bundle.tasksEnvelope.exceptionRecords ?? [],
+        bundle.tasksEnvelope.jobRecords,
+      );
+      const jobs = applyWaitingOnClientPolicies(synced, bundle.materials ?? []);
+      const clientId = resolveCampaignCommunicationClientId(
+        bundle.envelope.clientUserId,
+        bundle.envelope.campaignId,
+      );
+      const communicationSync = syncJobCommunicationRecords({
+        envelope: bundle.tasksEnvelope,
+        campaign: bundle.envelope.record,
+        clientId,
+        jobs,
+        materials: bundle.materials ?? [],
+      });
+      const nextEnvelope = communicationSync.envelope;
+      const changed =
+        JSON.stringify(bundle.tasksEnvelope.jobRecords ?? []) !==
+          JSON.stringify(nextEnvelope.jobRecords ?? []) ||
+        JSON.stringify(bundle.tasksEnvelope.jobCommunicationRecords ?? []) !==
+          JSON.stringify(nextEnvelope.jobCommunicationRecords ?? []) ||
+        JSON.stringify(bundle.tasksEnvelope.jobActivityEvents ?? []) !==
+          JSON.stringify(nextEnvelope.jobActivityEvents ?? []);
+
+      if (!changed) return bundle;
+      const saved = await writeTasksEnvelope(nextEnvelope);
+      return { ...bundle, tasksEnvelope: saved };
     }),
   );
 
