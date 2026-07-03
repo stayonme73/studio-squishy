@@ -34,6 +34,7 @@ import {
   resolveRouteMapClientSummary,
   type RouteMapClientSummary,
 } from "@/lib/route-map-production-brief";
+import type { FinalDeliveryView } from "@/lib/job-control/final-delivery-view";
 
 const { campaignDetails: copy, statusContent } = studioBoard;
 
@@ -107,12 +108,29 @@ function resolveIntake(campaign: CampaignRecord): CampaignIntakeSnapshot | undef
   };
 }
 
-function resolveDeliverables(status: CampaignStatus): DeliverablesPreview {
+function resolveDeliverables(
+  status: CampaignStatus,
+  finalDelivery?: FinalDeliveryView | null,
+): DeliverablesPreview {
   const preparing = {
     ready: false as const,
     message: copy.deliverables.preparing,
     hint: copy.deliverables.preparingHint,
   };
+
+  if (finalDelivery?.state === "ready" && finalDelivery.jobs.some((job) => job.files.length > 0)) {
+    return {
+      ready: true,
+      message: finalDelivery.hasDeliveredJobs ? copy.deliverables.ready : copy.deliverables.preparing,
+      links: [
+        {
+          label: copy.deliverables.viewFinalAssets,
+          href: studioBoard.routes.deliverables,
+          primary: true,
+        },
+      ],
+    };
+  }
 
   if (status === "READY_FOR_REVIEW") {
     return {
@@ -218,6 +236,7 @@ function buildProjectDetailsSummary(
 
 export function resolveCampaignDetailsView(
   campaign: CampaignRecord | null,
+  options?: { finalDelivery?: FinalDeliveryView | null },
 ): CampaignDetailsView {
   if (!campaign) return emptyView;
 
@@ -247,7 +266,7 @@ export function resolveCampaignDetailsView(
     deliverablesRemaining: resolveDeliverablesRemaining(campaign),
     packageIncludes: resolveCampaignPlanIncludes(campaign),
     studioUpdates: resolveCampaignStudioNotes(campaign),
-    deliverables: resolveDeliverables(campaign.campaignStatus),
+    deliverables: resolveDeliverables(campaign.campaignStatus, options?.finalDelivery),
     timeline: resolveCampaignTimeline(campaign),
   };
 }

@@ -141,6 +141,19 @@ export const deliverables = {
     noCampaign: "Start a campaign to receive deliverables from The Studio.",
     cta: "Go to Studio Board",
   },
+
+  jobDelivery: {
+    sectionTitle: "Your Deliverables",
+    sectionSubtitle: "Download your completed files — prepared for your approved scope.",
+    jobLabel: "Service",
+    deliverablesLabel: "Completed deliverables",
+    filesLabel: "Files",
+    downloadLabel: "Download",
+    deliveryDateLabel: "Delivered",
+    fileTypeLabel: "Type",
+    instructionsLabel: "How to use",
+    noFiles: "Files are being prepared for this service.",
+  },
 } as const;
 
 export type DeliverableSocialPost = { id: string; label: string; caption: string };

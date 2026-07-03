@@ -8,6 +8,8 @@ import type { StudioUser } from "@/lib/campaign-store/types";
 import { appendJobActivityEvent } from "./activity-log";
 import { applyJobSpineStatusChange, requestOwnerApprovalBeforeReview } from "./actions";
 import type { ProductionLaneView } from "./capacity";
+import { addClientDeliveryFile, syncCampaignStatusAfterDelivery } from "./final-delivery-actions";
+import { canMarkJobDelivered, canOwnerFinalRelease } from "./final-delivery-gates";
 import {
   canOwnerApproveForReview,
   canSubmitForOwnerApproval,
@@ -23,19 +25,32 @@ export type ProductionWorkspacePatchAction =
   | "mark_deliverable_prepared"
   | "add_internal_note"
   | "add_working_file_ref"
+  | "add_client_delivery_file"
   | "submit_for_owner_approval"
-  | "owner_approve_for_review";
+  | "owner_approve_for_review"
+  | "owner_final_release"
+  | "mark_delivered";
 
 export type ProductionWorkspacePatchBody =
   | { action: "start_building_concepts" }
   | { action: "mark_deliverable_prepared"; deliverableKey: string }
   | { action: "add_internal_note"; content: string }
   | { action: "add_working_file_ref"; label: string; url: string }
+  | {
+      action: "add_client_delivery_file";
+      deliverableKey: string;
+      fileName: string;
+      fileType: string;
+      url: string;
+      useInstructions?: string;
+    }
   | { action: "submit_for_owner_approval" }
-  | { action: "owner_approve_for_review" };
+  | { action: "owner_approve_for_review" }
+  | { action: "owner_final_release" }
+  | { action: "mark_delivered" };
 
 export type ProductionWorkspacePatchResult =
-  | { ok: true; envelope: ServerTasksEnvelope; job: PurchasedJobRecord }
+  | { ok: true; envelope: ServerTasksEnvelope; job: PurchasedJobRecord; updatedCampaign?: CampaignRecord }
   | { ok: false; error: string; status: number };
 
 function actorFromUser(user: StudioUser): JobActivityActor {
@@ -283,6 +298,129 @@ export function applyProductionWorkspacePatch(
       job = result.job;
       events = result.events;
       break;
+    }
+
+    case "add_client_delivery_file": {
+      const def = resolveRequiredDeliverableKeys(requiredDeliverables).find(
+        (entry) => entry.key === body.deliverableKey,
+      );
+      if (!def) {
+        return { ok: false, error: "Unknown deliverable.", status: 400 };
+      }
+
+      const fileName = body.fileName.trim();
+      const fileType = body.fileType.trim();
+      const url = body.url.trim();
+      if (!fileName || !fileType || !url) {
+        return { ok: false, error: "File name, type, and URL are required.", status: 400 };
+      }
+
+      const fileResult = addClientDeliveryFile(job, events, {
+        deliverableKey: def.key,
+        deliverableLabel: def.label,
+        fileName,
+        fileType,
+        url,
+        useInstructions: body.useInstructions,
+        actor,
+        occurredAt,
+      });
+      job = fileResult.job;
+      events = fileResult.events;
+      break;
+    }
+
+    case "owner_final_release": {
+      if (!isOwnerUser(user)) {
+        return { ok: false, error: "Owner approval requires owner role.", status: 403 };
+      }
+
+      const releaseGate = canOwnerFinalRelease(job);
+      if (!releaseGate.allowed) {
+        return {
+          ok: false,
+          error: releaseGate.reasons.map((reason) => reason.message).join(" "),
+          status: 422,
+        };
+      }
+
+      job = {
+        ...job,
+        ownerApprovalPending: null,
+        updatedAt: occurredAt,
+      };
+
+      const releaseResult = applyJobSpineStatusChange(job, events, {
+        job,
+        nextStatus: "ready_for_delivery",
+        actor,
+        reason: "Owner final release — ready for client delivery",
+        occurredAt,
+      });
+      job = releaseResult.job;
+      events = releaseResult.events;
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "owner_final_release",
+        occurredAt,
+        actor,
+        reason: "Owner approved final release",
+        spineStatus: "ready_for_delivery",
+      });
+      break;
+    }
+
+    case "mark_delivered": {
+      if (!isOwnerUser(user)) {
+        return { ok: false, error: "Owner approval requires owner role.", status: 403 };
+      }
+
+      const deliverGate = canMarkJobDelivered(job, requiredDeliverables);
+      if (!deliverGate.allowed) {
+        return {
+          ok: false,
+          error: deliverGate.reasons.map((reason) => reason.message).join(" "),
+          status: 422,
+        };
+      }
+
+      const deliverResult = applyJobSpineStatusChange(job, events, {
+        job,
+        nextStatus: "delivered",
+        actor,
+        reason: "Delivered to client",
+        occurredAt,
+      });
+      const deliveredJob: PurchasedJobRecord = {
+        ...deliverResult.job,
+        deliveredAt: occurredAt,
+      };
+      job = deliveredJob;
+      events = deliverResult.events;
+
+      events = appendJobActivityEvent(events, {
+        campaignId: deliveredJob.campaignId,
+        jobId: deliveredJob.jobId,
+        kind: "delivery_completed",
+        occurredAt,
+        actor,
+        reason: "Job delivered to client",
+        spineStatus: "delivered",
+      });
+
+      const allJobs = (envelope.jobRecords ?? []).map((entry) =>
+        entry.jobId === deliveredJob.jobId ? deliveredJob : entry,
+      );
+      const updatedCampaign = syncCampaignStatusAfterDelivery(campaign, allJobs, occurredAt);
+
+      return {
+        ok: true,
+        envelope: updateJobInEnvelope(envelope, deliveredJob, events),
+        job: deliveredJob,
+        updatedCampaign,
+      };
     }
 
     default:

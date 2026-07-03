@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { readCampaignEnvelope } from "@/lib/campaign-store/store";
+import { readCampaignEnvelope, upsertCampaignRecord } from "@/lib/campaign-store/store";
 import { isNextResponse, requireSession } from "@/lib/auth/require-session";
 import { canOperateProductionTasks, canReadProductionTasks } from "@/lib/campaign-tasks/access";
 import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
@@ -43,6 +43,13 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   if (body.action === "owner_approve_for_review" && !isOwnerUser(user)) {
+    return NextResponse.json({ error: "Owner role required." }, { status: 403 });
+  }
+
+  if (
+    (body.action === "owner_final_release" || body.action === "mark_delivered") &&
+    !isOwnerUser(user)
+  ) {
     return NextResponse.json({ error: "Owner role required." }, { status: 403 });
   }
 
@@ -98,9 +105,14 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const saved = await writeTasksEnvelope(result.envelope);
 
+  if (result.updatedCampaign) {
+    await upsertCampaignRecord(result.updatedCampaign);
+  }
+
   return NextResponse.json({
     job: result.job,
     syncedAt: saved.syncedAt,
+    campaignStatus: result.updatedCampaign?.campaignStatus,
   });
 }
 

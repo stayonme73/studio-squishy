@@ -41,7 +41,10 @@ export type JobActivityEventKind =
   | "deliverable_prepared"
   | "client_review_feedback"
   | "client_revision_request"
-  | "client_delivery_approval";
+  | "client_delivery_approval"
+  | "owner_final_release"
+  | "client_delivery_file_added"
+  | "delivery_completed";
 
 export type JobInternalNote = {
   id: string;
@@ -63,6 +66,19 @@ export type JobDeliverablePrep = {
   label: string;
   preparedAt?: string;
   preparedBy?: JobActivityActor;
+};
+
+/** Client-visible final file — promoted from production prep, never internal working refs. */
+export type JobClientDeliveryFile = {
+  id: string;
+  deliverableKey: string;
+  deliverableLabel: string;
+  fileName: string;
+  fileType: string;
+  url: string;
+  useInstructions?: string;
+  addedAt: string;
+  addedBy: JobActivityActor;
 };
 
 export type JobActivityActor = {
@@ -99,6 +115,9 @@ export type PurchasedJobRecord = {
   internalNotes?: readonly JobInternalNote[];
   /** Internal working-file links — never shown to client. */
   workingFileRefs?: readonly JobWorkingFileRef[];
+  /** Client-facing final delivery files — shown in Final Delivery only. */
+  clientDeliveryFiles?: readonly JobClientDeliveryFile[];
+  deliveredAt?: string | null;
   clientDeadline?: string | null;
   updatedAt: string;
 };

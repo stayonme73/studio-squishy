@@ -13,6 +13,8 @@ const CLIENT_HIDDEN_ACTIVITY_KINDS = new Set<JobActivityEventKind>([
   "internal_note",
   "working_file_ref",
   "deliverable_prepared",
+  "owner_final_release",
+  "client_delivery_file_added",
 ]);
 
 export function filterClientVisibleActivity(

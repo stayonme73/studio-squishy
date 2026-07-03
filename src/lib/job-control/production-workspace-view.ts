@@ -17,6 +17,11 @@ import {
   isDeliverablePrepared,
   resolveRequiredDeliverableKeys,
 } from "./production-workspace-gates";
+import {
+  allRequiredClientDeliveryFilesPresent,
+  canMarkJobDelivered,
+  canOwnerFinalRelease,
+} from "./final-delivery-gates";
 import type { JobReviewFeedback } from "./review-feedback-types";
 import type { JobActivityEvent, PurchasedJobRecord } from "./types";
 
@@ -53,6 +58,7 @@ export type ProductionWorkspaceView = {
   clientVisibleNotes: readonly string[];
   internalNotes: NonNullable<PurchasedJobRecord["internalNotes"]>;
   workingFileRefs: NonNullable<PurchasedJobRecord["workingFileRefs"]>;
+  clientDeliveryFiles: NonNullable<PurchasedJobRecord["clientDeliveryFiles"]>;
   activity: readonly JobActivityEvent[];
   ownerApprovalPending: PurchasedJobRecord["ownerApprovalPending"];
   /** Client revision feedback — visible to production when job returned from Review Room. */
@@ -64,6 +70,11 @@ export type ProductionWorkspaceView = {
     submitBlockedReasons: readonly string[];
     canOwnerApproveForReview: boolean;
     approveBlockedReasons: readonly string[];
+    canOwnerFinalRelease: boolean;
+    finalReleaseBlockedReasons: readonly string[];
+    canMarkDelivered: boolean;
+    markDeliveredBlockedReasons: readonly string[];
+    allClientDeliveryFilesPresent: boolean;
   };
 };
 
@@ -150,6 +161,9 @@ export function resolveProductionWorkspaceView(input: {
   const startGate = canTransitionToBuildingConcepts(job, materials, laneViews);
   const submitGate = canSubmitForOwnerApproval(job, line?.deliverables ?? []);
   const approveGate = canOwnerApproveForReview(job);
+  const finalReleaseGate = canOwnerFinalRelease(job);
+  const deliverGate = canMarkJobDelivered(job, line?.deliverables ?? []);
+  const allClientFiles = allRequiredClientDeliveryFilesPresent(job, line?.deliverables ?? []);
 
   const lane = job.returnLane ?? job.productionLane;
 
@@ -176,6 +190,7 @@ export function resolveProductionWorkspaceView(input: {
     clientVisibleNotes: resolveClientVisibleNotes(campaign),
     internalNotes: job.internalNotes ?? [],
     workingFileRefs: job.workingFileRefs ?? [],
+    clientDeliveryFiles: job.clientDeliveryFiles ?? [],
     activity: jobActivity,
     ownerApprovalPending: job.ownerApprovalPending ?? null,
     clientRevisionFeedback,
@@ -186,6 +201,11 @@ export function resolveProductionWorkspaceView(input: {
       submitBlockedReasons: submitGate.reasons.map((reason) => reason.message),
       canOwnerApproveForReview: approveGate.allowed,
       approveBlockedReasons: approveGate.reasons.map((reason) => reason.message),
+      canOwnerFinalRelease: finalReleaseGate.allowed,
+      finalReleaseBlockedReasons: finalReleaseGate.reasons.map((reason) => reason.message),
+      canMarkDelivered: deliverGate.allowed,
+      markDeliveredBlockedReasons: deliverGate.reasons.map((reason) => reason.message),
+      allClientDeliveryFilesPresent: allClientFiles,
     },
   };
 }

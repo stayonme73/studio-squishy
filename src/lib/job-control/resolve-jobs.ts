@@ -132,6 +132,14 @@ function deriveSpineStatus(
     return "ready_for_review";
   }
 
+  if (persisted?.spineStatus === "approved") {
+    return "approved";
+  }
+
+  if (persisted?.spineStatus === "ready_for_delivery") {
+    return "ready_for_delivery";
+  }
+
   if (campaign.selectedCampaignOption?.trim()) {
     if (campaign.campaignStatus === "DELIVERED") return "delivered";
     if (campaign.campaignStatus === "READY_FOR_REVIEW") return "ready_for_review";
@@ -195,6 +203,8 @@ export function buildPurchasedJobRecord(
     deliverablePrep: persisted?.deliverablePrep,
     internalNotes: persisted?.internalNotes,
     workingFileRefs: persisted?.workingFileRefs,
+    clientDeliveryFiles: persisted?.clientDeliveryFiles,
+    deliveredAt: persisted?.deliveredAt ?? null,
     clientDeadline: persisted?.clientDeadline ?? null,
     updatedAt: now,
   };

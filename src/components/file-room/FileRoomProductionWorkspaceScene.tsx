@@ -35,6 +35,11 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
   const [noteContent, setNoteContent] = useState("");
   const [fileLabel, setFileLabel] = useState("");
   const [fileUrl, setFileUrl] = useState("");
+  const [clientFileDeliverableKey, setClientFileDeliverableKey] = useState("");
+  const [clientFileName, setClientFileName] = useState("");
+  const [clientFileType, setClientFileType] = useState("");
+  const [clientFileUrl, setClientFileUrl] = useState("");
+  const [clientFileInstructions, setClientFileInstructions] = useState("");
 
   const patch = async (body: Record<string, unknown>) => {
     setBusy(true);
@@ -257,6 +262,100 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
               </button>
             </form>
           </FileRoomSectionCard>
+
+          <FileRoomSectionCard title={productionWorkspace.clientDeliveryFilesTitle}>
+            <p className="fr-control-room__section-lead">{productionWorkspace.clientDeliveryFilesLead}</p>
+            {view.clientDeliveryFiles.length === 0 ? (
+              <p className="fr-tasks-empty__body">{productionWorkspace.clientDeliveryFilesEmpty}</p>
+            ) : (
+              <ul className="fr-production-workspace__files">
+                {view.clientDeliveryFiles.map((file) => (
+                  <li key={file.id}>
+                    <span className="fr-production-workspace__deliverable-label">
+                      {file.deliverableLabel}: {file.fileName} ({file.fileType})
+                    </span>
+                    <a className="fr-back-link" href={file.url} target="_blank" rel="noreferrer">
+                      {file.url}
+                    </a>
+                    {file.useInstructions ? (
+                      <p className="fr-tasks-row__meta">{file.useInstructions}</p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <form
+              className="fr-production-workspace__form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void patch({
+                  action: "add_client_delivery_file",
+                  deliverableKey: clientFileDeliverableKey,
+                  fileName: clientFileName,
+                  fileType: clientFileType,
+                  url: clientFileUrl,
+                  useInstructions: clientFileInstructions || undefined,
+                }).then(() => {
+                  setClientFileName("");
+                  setClientFileType("");
+                  setClientFileUrl("");
+                  setClientFileInstructions("");
+                });
+              }}
+            >
+              <select
+                className="fr-production-workspace__input"
+                value={clientFileDeliverableKey}
+                onChange={(event) => setClientFileDeliverableKey(event.target.value)}
+                required
+              >
+                <option value="">Select deliverable…</option>
+                {view.requiredDeliverables.map((row) => (
+                  <option key={row.key} value={row.key}>
+                    {row.label}
+                  </option>
+                ))}
+              </select>
+              <input
+                className="fr-production-workspace__input"
+                value={clientFileName}
+                onChange={(event) => setClientFileName(event.target.value)}
+                placeholder={productionWorkspace.clientFileNamePlaceholder}
+              />
+              <input
+                className="fr-production-workspace__input"
+                value={clientFileType}
+                onChange={(event) => setClientFileType(event.target.value)}
+                placeholder={productionWorkspace.clientFileTypePlaceholder}
+              />
+              <input
+                className="fr-production-workspace__input"
+                value={clientFileUrl}
+                onChange={(event) => setClientFileUrl(event.target.value)}
+                placeholder={productionWorkspace.clientFileUrlPlaceholder}
+              />
+              <textarea
+                className="fr-production-work__textarea"
+                value={clientFileInstructions}
+                onChange={(event) => setClientFileInstructions(event.target.value)}
+                placeholder={productionWorkspace.clientFileInstructionsPlaceholder}
+                rows={2}
+              />
+              <button
+                type="submit"
+                className="utility-btn utility-btn--primary"
+                disabled={
+                  busy ||
+                  !clientFileDeliverableKey ||
+                  !clientFileName.trim() ||
+                  !clientFileType.trim() ||
+                  !clientFileUrl.trim()
+                }
+              >
+                {productionWorkspace.addClientFileLabel}
+              </button>
+            </form>
+          </FileRoomSectionCard>
         </div>
 
         <aside className="fr-production-workspace__aside">
@@ -279,6 +378,12 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
             {view.ownerApprovalPending === "before_review" ? (
               <p className="fr-production-workspace__pending" role="status">
                 Owner Desk — Approval Needed (before review)
+              </p>
+            ) : null}
+
+            {view.ownerApprovalPending === "before_delivery" ? (
+              <p className="fr-production-workspace__pending" role="status">
+                {productionWorkspace.finalReleasePendingLabel}
               </p>
             ) : null}
 
@@ -341,6 +446,41 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
                   onClick={() => void patch({ action: "owner_approve_for_review" })}
                 >
                   {productionWorkspace.ownerApproveLabel}
+                </button>
+              ) : null}
+
+              {isOwner && view.gates.canOwnerFinalRelease ? (
+                <button
+                  type="button"
+                  className="utility-btn utility-btn--primary"
+                  disabled={busy}
+                  onClick={() => void patch({ action: "owner_final_release" })}
+                >
+                  {productionWorkspace.ownerFinalReleaseLabel}
+                </button>
+              ) : null}
+
+              {isOwner && view.spineStatus === "ready_for_delivery" && !view.gates.canMarkDelivered ? (
+                <div className="fr-production-workspace__gate">
+                  <p className="fr-production-workspace__gate-title">
+                    {productionWorkspace.gateBlockedTitle}
+                  </p>
+                  <ul>
+                    {view.gates.markDeliveredBlockedReasons.map((reason) => (
+                      <li key={reason}>{reason}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+
+              {isOwner && view.gates.canMarkDelivered ? (
+                <button
+                  type="button"
+                  className="utility-btn utility-btn--primary"
+                  disabled={busy}
+                  onClick={() => void patch({ action: "mark_delivered" })}
+                >
+                  {productionWorkspace.markDeliveredLabel}
                 </button>
               ) : null}
             </div>

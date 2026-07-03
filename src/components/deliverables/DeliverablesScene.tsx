@@ -14,9 +14,11 @@ import {
 } from "@/config/deliverables";
 import { copyTextToClipboard, downloadTextFile } from "@/lib/copy-download";
 import { resolveDeliverablesView } from "@/lib/deliverables-view";
+import type { ClientJobDeliveryView } from "@/lib/job-control/final-delivery-view";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
+import { useFinalDelivery } from "@/lib/use-final-delivery";
 
-const { summary, hero, sections, categories, footer, empty, routes } = deliverables;
+const { summary, hero, sections, categories, footer, empty, routes, jobDelivery } = deliverables;
 
 function CopyButton({ text, label }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false);
@@ -82,20 +84,94 @@ function buildCalendarDownload(pkg: CampaignDeliverablesPackage) {
     .join("\n\n");
 }
 
+function formatDeliveryWhen(iso: string) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleString(undefined, {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function JobDeliveryGrid({ jobs }: { jobs: readonly ClientJobDeliveryView[] }) {
+  return (
+    <div className="fd-deliverables__grid">
+      {jobs.map((job) => (
+        <article key={job.jobId} className="fd-block fd-block--scope">
+          <header className="fd-block__head">
+            <div className="fd-block__head-main">
+              <h3>{job.serviceName}</h3>
+              {job.deliveredAt ? (
+                <p className="fd-item__meta">
+                  {jobDelivery.deliveryDateLabel}: {formatDeliveryWhen(job.deliveredAt)}
+                </p>
+              ) : null}
+            </div>
+          </header>
+          <div className="fd-block__body">
+            {job.completedDeliverables.length > 0 ? (
+              <div className="fd-block__items">
+                <p className="fd-item__label">{jobDelivery.deliverablesLabel}</p>
+                <ul className="fd-item__list">
+                  {job.completedDeliverables.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {job.files.length > 0 ? (
+              <div className="fd-block__items">
+                {job.files.map((file) => (
+                  <div key={file.id} className="fd-item">
+                    <p className="fd-item__label">{file.deliverableLabel}</p>
+                    <p className="fd-item__meta">
+                      {file.fileName} · {jobDelivery.fileTypeLabel}: {file.fileType}
+                    </p>
+                    {file.useInstructions ? (
+                      <p className="fd-item__text">
+                        <strong>{jobDelivery.instructionsLabel}:</strong> {file.useInstructions}
+                      </p>
+                    ) : null}
+                    <a className="fd-block__download" href={file.url} download={file.fileName}>
+                      {jobDelivery.downloadLabel}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="fd-item__text">{jobDelivery.noFiles}</p>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 /** Final Delivery — V1 deliverables handoff page. */
 export default function DeliverablesScene() {
   const searchParams = useSearchParams();
   const previewDelivered =
     searchParams.get("preview") === "delivered" || searchParams.get("room") === "1";
   const { campaign, ready } = useCurrentCampaign();
+  const { delivery: finalDelivery, loading: loadingDelivery } = useFinalDelivery(
+    previewDelivered ? undefined : campaign?.campaignId,
+  );
 
   const view = useMemo(
-    () => resolveDeliverablesView(campaign, { previewDelivered }),
-    [campaign, previewDelivered],
+    () =>
+      resolveDeliverablesView(campaign, {
+        previewDelivered,
+        finalDelivery: previewDelivered ? null : finalDelivery,
+      }),
+    [campaign, previewDelivered, finalDelivery],
   );
   const pkg = view.package;
 
-  if (!ready) {
+  if (!ready || (!previewDelivered && loadingDelivery && campaign?.campaignId)) {
     return (
       <UtilityPageFrame navId="deliverables">
         <div className="utility-page" aria-busy="true">
@@ -105,7 +181,8 @@ export default function DeliverablesScene() {
     );
   }
 
-  const isReady = view.state === "ready" && pkg;
+  const isReady =
+    view.state === "ready" && (view.useJobDelivery ? Boolean(view.finalDelivery?.jobs.length) : Boolean(pkg));
 
   return (
     <UtilityPageFrame navId="deliverables">
@@ -171,10 +248,15 @@ export default function DeliverablesScene() {
 
           <section className="fd-deliverables" aria-labelledby="fd-deliverables-title">
             <h2 id="fd-deliverables-title" className="fd-deliverables__title">
-              {sections.heading}
+              {view.useJobDelivery ? jobDelivery.sectionTitle : sections.heading}
             </h2>
-            <p className="fd-deliverables__subtitle">{sections.subheading}</p>
+            <p className="fd-deliverables__subtitle">
+              {view.useJobDelivery ? jobDelivery.sectionSubtitle : sections.subheading}
+            </p>
 
+            {view.useJobDelivery && view.finalDelivery ? (
+              <JobDeliveryGrid jobs={view.finalDelivery.jobs} />
+            ) : pkg ? (
             <div className="fd-deliverables__grid">
               {pkg.scopeSections.map((section) => (
                 <article key={section.sectionId} className="fd-block fd-block--scope">
@@ -366,6 +448,7 @@ export default function DeliverablesScene() {
               </article>
               ) : null}
             </div>
+            ) : null}
           </section>
 
           <div className="fd-footer-actions">

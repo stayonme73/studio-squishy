@@ -4,6 +4,7 @@ import {
   deliverables,
   type CampaignDeliverablesPackage,
 } from "@/config/deliverables";
+import type { FinalDeliveryView } from "@/lib/job-control/final-delivery-view";
 import { resolveDeliverableScopeFromCampaign } from "@/lib/deliverable-scope";
 
 export type DeliverablesPageState = "no-campaign" | "preparing" | "ready";
@@ -16,6 +17,9 @@ export type DeliverablesView = {
   statusLabel: string;
   package: CampaignDeliverablesPackage | null;
   showGreetingName: boolean;
+  /** Job-scoped Final Delivery V1 — real files from Production Workspace. */
+  finalDelivery: FinalDeliveryView | null;
+  useJobDelivery: boolean;
 };
 
 function formatCompletionDate(iso: string) {
@@ -35,7 +39,7 @@ function selectedOptionLabel(campaign: CampaignRecord) {
 
 export function resolveDeliverablesView(
   campaign: CampaignRecord | null,
-  options?: { previewDelivered?: boolean },
+  options?: { previewDelivered?: boolean; finalDelivery?: FinalDeliveryView | null },
 ): DeliverablesView {
   const base = {
     campaignName: "—",
@@ -44,7 +48,33 @@ export function resolveDeliverablesView(
     statusLabel: deliverables.summary.statusDelivered,
     package: null as CampaignDeliverablesPackage | null,
     showGreetingName: false,
+    finalDelivery: options?.finalDelivery ?? null,
+    useJobDelivery: false,
   };
+
+  if (options?.finalDelivery?.state === "ready" && options.finalDelivery.jobs.length > 0) {
+    const latestDelivered = options.finalDelivery.jobs
+      .map((job) => job.deliveredAt)
+      .filter(Boolean)
+      .sort()
+      .at(-1);
+
+    return {
+      state: "ready",
+      campaignName: options.finalDelivery.campaignName,
+      selectedOption: campaign?.selectedCampaignOption ?? selectedOptionLabel(campaign ?? ({} as CampaignRecord)),
+      completionDate: latestDelivered
+        ? formatCompletionDate(latestDelivered)
+        : formatCompletionDate(campaign?.updatedAt ?? new Date().toISOString()),
+      statusLabel: options.finalDelivery.allJobsDelivered
+        ? deliverables.summary.statusDelivered
+        : "PARTIALLY DELIVERED",
+      package: null,
+      showGreetingName: true,
+      finalDelivery: options.finalDelivery,
+      useJobDelivery: true,
+    };
+  }
 
   if (options?.previewDelivered) {
     const lineItems = campaign?.approvedStudioPlan?.lineItems;
@@ -61,6 +91,8 @@ export function resolveDeliverablesView(
       statusLabel: deliverables.summary.statusDelivered,
       package: buildDeliverablesPackage(campaign.campaignName, scope),
       showGreetingName: true,
+      finalDelivery: null,
+      useJobDelivery: false,
     };
   }
 
@@ -73,6 +105,7 @@ export function resolveDeliverablesView(
       ...base,
       state: "preparing",
       campaignName: campaign.campaignName,
+      finalDelivery: options?.finalDelivery ?? null,
     };
   }
 
@@ -86,5 +119,7 @@ export function resolveDeliverablesView(
     statusLabel: deliverables.summary.statusDelivered,
     package: buildDeliverablesPackage(campaign.campaignName, scope),
     showGreetingName: true,
+    finalDelivery: options?.finalDelivery ?? null,
+    useJobDelivery: false,
   };
 }

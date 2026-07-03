@@ -10,6 +10,7 @@ import { studioBoard } from "@/config/studio-board";
 import { resolveCampaignDetailsView } from "@/lib/campaign-details-view";
 import { draftRoomEditHref, isIntakeEditable } from "@/lib/intake-edit";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
+import { useFinalDelivery } from "@/lib/use-final-delivery";
 
 const { campaignRecord: copy, campaignBrief, campaignDetails: detailsCopy } = studioBoard;
 
@@ -21,8 +22,9 @@ type Props = {
 /** Read-only archive of customer intake — replaces Campaign Details page. */
 export default function CampaignRecordDrawer({ open, onClose }: Props) {
   const { campaign } = useCurrentCampaign();
+  const { delivery: finalDelivery } = useFinalDelivery(campaign?.campaignId);
   const panelRef = useRef<HTMLElement>(null);
-  const view = resolveCampaignDetailsView(campaign);
+  const view = resolveCampaignDetailsView(campaign, { finalDelivery });
   const intakeEditable = campaign ? isIntakeEditable(campaign.campaignStatus) : false;
   const hintCopy = intakeEditable ? copy.editableHint : copy.submittedHint;
 

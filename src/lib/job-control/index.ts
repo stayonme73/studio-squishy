@@ -100,3 +100,32 @@ export {
   type ProductionWorkspaceDeliverableRow,
   type ProductionWorkspaceMaterialRow,
 } from "./production-workspace-view";
+
+export {
+  canOwnerFinalRelease,
+  canMarkJobDelivered,
+  allRequiredClientDeliveryFilesPresent,
+} from "./final-delivery-gates";
+
+export {
+  applyFinalDeliveryPatch,
+  addClientDeliveryFile,
+  allJobsDelivered,
+  syncCampaignStatusAfterDelivery,
+  type FinalDeliveryPatchBody,
+  type FinalDeliveryPatchResult,
+} from "./final-delivery-actions";
+
+export {
+  canClientAccessJobDelivery,
+  isJobDeliveredToClient,
+} from "./final-delivery-access";
+
+export {
+  resolveFinalDeliveryView,
+  resolveFinalDeliveryBoardSummary,
+  type FinalDeliveryView,
+  type ClientJobDeliveryView,
+  type ClientDeliveryFileView,
+  type FinalDeliveryBoardJobSummary,
+} from "./final-delivery-view";
