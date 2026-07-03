@@ -28,6 +28,8 @@ import { syncMaterialsSummaryOnCampaign } from "@/lib/materials/campaign-summary
 import { resolveMaterialsApiPayload } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials, writeMaterialsEnvelope } from "@/lib/materials/store";
 import type { MaterialReviewStatus } from "@/lib/materials/types";
+import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
 
 type RouteContext = {
   params: Promise<{ campaignId: string }>;
@@ -51,6 +53,26 @@ type MaterialsPatchBody =
       teamNote?: string;
     };
 
+function resolveMaterialsAudience(
+  request: Request,
+  user: StudioUser,
+  campaignId: string,
+  campaignEnvelope: ServerCampaignEnvelope,
+  assignments: CampaignAssignmentsFile,
+): "client" | "team" {
+  const requestedAudience = new URL(request.url).searchParams.get("audience");
+  if (requestedAudience === "client") return "client";
+  return isMaterialsTeamAudience(user, campaignId, campaignEnvelope, assignments)
+    ? "team"
+    : "client";
+}
+
+function disableClientSubmissions<T extends { canSubmit: boolean }>(
+  requests: readonly T[] | undefined,
+): T[] | undefined {
+  return requests?.map((request) => ({ ...request, canSubmit: false }));
+}
+
 export async function GET(request: Request, context: RouteContext) {
   const user = await requireSession(request);
   if (isNextResponse(user)) return user;
@@ -70,13 +92,20 @@ export async function GET(request: Request, context: RouteContext) {
   }
 
   const materialsEnvelope = await getOrInitializeMaterials(campaignId, campaignEnvelope.record);
-  const audience = isMaterialsTeamAudience(user, campaignId, campaignEnvelope, assignments)
-    ? "team"
-    : "client";
+  const audience = resolveMaterialsAudience(request, user, campaignId, campaignEnvelope, assignments);
   const payload = resolveMaterialsApiPayload(materialsEnvelope, audience, campaignEnvelope.record);
+  const canSubmit = canSubmitMaterials(user, campaignId, campaignEnvelope);
 
   return NextResponse.json({
     ...payload,
+    consolidatedRequests:
+      audience === "client" && !canSubmit
+        ? disableClientSubmissions(payload.consolidatedRequests)
+        : payload.consolidatedRequests,
+    optionalRequests:
+      audience === "client" && !canSubmit
+        ? disableClientSubmissions(payload.optionalRequests)
+        : payload.optionalRequests,
     syncedAt: materialsEnvelope.syncedAt,
   });
 }
@@ -193,9 +222,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     await writeTasksEnvelope(communicationSync.envelope);
   }
 
-  const audience = isMaterialsTeamAudience(user, campaignId, campaignEnvelope, assignments)
-    ? "team"
-    : "client";
+  const audience = resolveMaterialsAudience(request, user, campaignId, campaignEnvelope, assignments);
   const payload = resolveMaterialsApiPayload(saved, audience, campaignEnvelope.record);
   await syncMaterialsSummaryOnCampaign(campaignId, payload.blockingRequiredCount);
 

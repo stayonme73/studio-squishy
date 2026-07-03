@@ -102,12 +102,13 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, ClientSubmitPayload>>({});
+  const materialsEndpoint = `/api/campaigns/${encodeURIComponent(campaign.campaignId)}/materials?audience=client`;
 
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/campaigns/${campaign.campaignId}/materials`);
+      const res = await fetch(materialsEndpoint);
       const json = (await res.json()) as MaterialsClientResponse;
       if (!res.ok) {
         throw new Error(json.error ?? `Request failed (${res.status})`);
@@ -119,7 +120,7 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
     } finally {
       setLoading(false);
     }
-  }, [campaign.campaignId]);
+  }, [materialsEndpoint]);
 
   const paidCampaign = Boolean(campaign.paymentReceivedAt);
 
@@ -161,7 +162,7 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
     setError(null);
     setSuccessId(null);
     try {
-      const res = await fetch(`/api/campaigns/${campaign.campaignId}/materials`, {
+      const res = await fetch(materialsEndpoint, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -187,7 +188,7 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
     setError(null);
     setSuccessId(null);
     try {
-      const res = await fetch(`/api/campaigns/${campaign.campaignId}/materials`, {
+      const res = await fetch(materialsEndpoint, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -233,10 +234,17 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
           </p>
         ) : null}
 
-        {!loading && consolidated.length === 0 ? (
+        {!loading && consolidated.length === 0 && blockingCount === 0 ? (
           <p className="sb-materials-intake__meta">
             <strong>{materialsConfig.intakePanelCompleteTitle}</strong>{" "}
             {materialsConfig.intakePanelCompleteBody}
+          </p>
+        ) : null}
+
+        {!loading && consolidated.length === 0 && blockingCount > 0 ? (
+          <p className="sb-materials-intake__meta" role="status">
+            We are syncing the required materials for this campaign. Refresh the Board in a moment
+            if the request list does not appear.
           </p>
         ) : null}
 

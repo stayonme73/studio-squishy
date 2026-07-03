@@ -147,6 +147,19 @@ describe("Project Details + Studio Board integration", () => {
     expect(feed.some((entry) => entry.message === "Project Details received")).toBe(true);
   });
 
+  it("adds a Board activity update when required materials are received", () => {
+    const campaign = mockPaidCampaign({
+      materialsSummary: {
+        blockingRequiredCount: 0,
+        updatedAt: "2026-06-27T13:30:00.000Z",
+      },
+    });
+
+    const feed = resolveActivityFeed(campaign);
+
+    expect(feed[0]?.message).toBe("Required materials received");
+  });
+
   it("shows Project Details Complete as checked after submit, not in progress", () => {
     const paidAwaitingDetails = mockPaidCampaign({
       campaignStatus: "PAYMENT_RECEIVED",

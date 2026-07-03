@@ -207,6 +207,13 @@ export function resolveActivityFeed(campaign: CampaignRecord | null): ActivityFe
   pushIso(campaign.discoverySubmittedAt, "Discovery received");
   pushIso(campaign.paymentReceivedAt, "Payment received");
   pushIso(campaign.projectDetailsSubmittedAt, "Project Details received");
+  if (
+    campaign.materialsSummary?.updatedAt &&
+    campaign.materialsSummary.blockingRequiredCount === 0 &&
+    campaign.projectDetailsSubmittedAt
+  ) {
+    pushIso(campaign.materialsSummary.updatedAt, "Required materials received");
+  }
 
   if (campaign.selectedCampaignOption) {
     pushIso(campaign.updatedAt, "Direction selected");
