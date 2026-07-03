@@ -15,6 +15,7 @@ import {
 } from "@/lib/job-control/communication";
 import { canClientAccessJobReview } from "@/lib/job-control/review-room-access";
 import { resolveClientReviewView } from "@/lib/job-control/review-room-view";
+import { redactJobFileStorageForClient } from "@/lib/file-storage/redact";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 
 type RouteContext = {
@@ -174,7 +175,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   });
 
   return NextResponse.json({
-    job: result.job,
+    job: redactJobFileStorageForClient(result.job),
     feedback: result.feedback,
     review: view,
     syncedAt: saved.syncedAt,

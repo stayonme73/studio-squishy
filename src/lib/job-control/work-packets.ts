@@ -3,6 +3,7 @@ import { teamOfficePath, teamOfficeRoleLabels } from "@/config/team-offices";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import { taskRequiredRole } from "@/lib/campaign-tasks/capabilities";
 import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
+import { redactWorkingFileRefForClient } from "@/lib/file-storage/redact";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 import type { RouteMapProductionBrief } from "@/lib/route-map-production-brief";
 
@@ -222,7 +223,7 @@ export function resolveJobWorkPacketSummaryView(input: {
     requiredDeliverables: deliverables,
     materials: materialRows(job, materials),
     internalNotes: job.internalNotes ?? [],
-    workingFileRefs: job.workingFileRefs ?? [],
+    workingFileRefs: (job.workingFileRefs ?? []).map(redactWorkingFileRefForClient),
     roleRows,
     returnedFiles: returnedFileRows(packets),
     ownerApprovalRequirement: "Owner approval is required before client review.",

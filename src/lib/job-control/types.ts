@@ -71,6 +71,7 @@ export type JobActivityEventKind =
   | "file_visibility_changed"
   | "file_version_updated"
   | "file_released"
+  | "file_download_available"
   | "delivery_completed"
   | "work_packet_assigned"
   | "work_packet_returned"

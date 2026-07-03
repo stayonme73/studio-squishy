@@ -71,7 +71,12 @@ export function isClientMaterialReferenceVisible(
 function appendFileEvent(
   events: readonly JobActivityEvent[],
   ref: StudioFileReference,
-  kind: "file_reference_added" | "file_visibility_changed" | "file_version_updated" | "file_released",
+  kind:
+    | "file_reference_added"
+    | "file_visibility_changed"
+    | "file_version_updated"
+    | "file_released"
+    | "file_download_available",
   actor: JobActivityActor,
   occurredAt: string,
   reason: string,
@@ -248,6 +253,14 @@ export function releaseFinalDeliveryFiles(
       actor,
       occurredAt,
       `Final delivery file released: ${released.filename}`,
+    );
+    nextEvents = appendFileEvent(
+      nextEvents,
+      released,
+      "file_download_available",
+      actor,
+      occurredAt,
+      `Client download available: ${released.filename}`,
     );
     return released;
   });

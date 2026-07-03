@@ -40,10 +40,21 @@ export class SupabaseStorageConfigurationError extends Error {
 export function resolveSupabaseStorageEnv(
   source: Record<string, string | undefined> = process.env,
 ): SupabaseStorageEnv {
+  const envValue = (key: string) => {
+    const value = source[key]?.trim();
+    if (!value) return undefined;
+    if (
+      (value.startsWith("\"") && value.endsWith("\"")) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      return value.slice(1, -1);
+    }
+    return value;
+  };
   return {
-    supabaseUrl: source.NEXT_PUBLIC_SUPABASE_URL,
-    supabaseServiceRoleKey: source.SUPABASE_SERVICE_ROLE_KEY,
-    supabaseStorageBucket: source.SUPABASE_STORAGE_BUCKET,
+    supabaseUrl: envValue("NEXT_PUBLIC_SUPABASE_URL"),
+    supabaseServiceRoleKey: envValue("SUPABASE_SERVICE_ROLE_KEY"),
+    supabaseStorageBucket: envValue("SUPABASE_STORAGE_BUCKET"),
   };
 }
 

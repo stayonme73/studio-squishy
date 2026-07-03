@@ -6,7 +6,8 @@ File Room remains The Studio's only visible internal file system. Supabase Stora
 
 - Code lives in `src/lib/file-storage/`.
 - `FileRoomStorageAdapter` defines private object path construction, storage-ref creation, upload, and download boundaries.
-- `createSupabaseStorageAdapter()` validates configuration and requires an injected server-only storage client. The repo does not install or instantiate `@supabase/supabase-js` yet.
+- `createSupabaseStorageAdapter()` validates configuration and requires an injected server-only storage client.
+- `createServerFileRoomStorageAdapter()` wires File Room to Supabase Storage from route handlers only.
 - `createMockFileRoomStorageAdapter()` is for unit tests only.
 - `StudioFileStorageReference` now supports both existing `google_shared_drive/reference_only` manual refs and `supabase_storage/private_object` refs.
 
@@ -38,12 +39,14 @@ These map onto the existing File Registry fields:
 - Supabase URLs, signed URLs, buckets, and object paths must not be returned to Review Room, Final Delivery, or any client surface.
 - Client downloads go through app-owned File Room endpoints such as `/api/file-room/files/{fileId}/download`.
 - Review proofs go through app-owned proof endpoints such as `/api/file-room/files/{fileId}/proof`.
+- Internal uploads go through `/api/file-room/campaigns/{campaignId}/jobs/{jobId}/files`.
 - `canClientAccessFinalDeliveryFile()` allows clients to retrieve only their own released `client-final` files for jobs currently open in Final Delivery.
+- `canClientAccessReviewProofFile()` allows clients to retrieve only released review proofs while Review Room is open.
 - `canStaffAccessInternalFile()` requires owner role or assigned staff campaign access before internal files can be retrieved.
-- `downloadClientFinalFile()` and `downloadStaffInternalFile()` combine those checks with adapter downloads for future server routes.
-- Future route handlers must run File Room registry/job/campaign access checks before calling the storage adapter.
+- Route handlers run File Room registry/job/campaign access checks before calling the storage adapter.
+- The app streams bytes back from the server response. It does not return public URLs, signed URLs, bucket names, or object paths to browser code.
 
-## Supabase Setup Values Needed Later
+## Supabase Setup Values
 
 Tagia or the deployment owner must provide:
 
@@ -62,8 +65,6 @@ Bucket requirements:
 - Use app-managed File Room authorization, not direct client bucket access.
 
 ## Not Implemented In V1
-
-- No live uploads or downloads are performed without credentials and an injected server-side Supabase client.
 - No public bucket access.
 - No Google Drive workflow.
 - No visible storage browser.

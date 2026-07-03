@@ -19,6 +19,7 @@ const CLIENT_HIDDEN_ACTIVITY_KINDS = new Set<JobActivityEventKind>([
   "file_visibility_changed",
   "file_version_updated",
   "file_released",
+  "file_download_available",
 ]);
 
 export function filterClientVisibleActivity(

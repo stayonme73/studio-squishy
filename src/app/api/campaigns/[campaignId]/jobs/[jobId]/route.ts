@@ -16,6 +16,7 @@ import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-clien
 import { resolveFileRoomListItemView } from "@/lib/file-room-view";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { isOwnerUser } from "@/lib/campaign-store/access";
+import { redactJobFileStorageForClient } from "@/lib/file-storage/redact";
 
 type RouteContext = {
   params: Promise<{ campaignId: string; jobId: string }>;
@@ -126,7 +127,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   return NextResponse.json({
-    job: result.job,
+    job: redactJobFileStorageForClient(result.job),
     syncedAt: saved.syncedAt,
     campaignStatus: result.updatedCampaign?.campaignStatus,
   });
@@ -188,7 +189,7 @@ export async function GET(request: Request, context: RouteContext) {
   }
 
   return NextResponse.json({
-    jobRecords: communicationSync.jobs,
+    jobRecords: communicationSync.jobs.map(redactJobFileStorageForClient),
     jobActivityEvents: envelope.jobActivityEvents ?? [],
     syncedAt: envelope.syncedAt,
   });

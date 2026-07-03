@@ -35,6 +35,26 @@ export async function readTasksEnvelope(
   }
 }
 
+export async function listTasksEnvelopes(): Promise<ServerTasksEnvelope[]> {
+  await ensureTasksDir();
+  let files: string[];
+  try {
+    files = await fs.readdir(TASKS_DIR);
+  } catch {
+    return [];
+  }
+
+  const envelopes: ServerTasksEnvelope[] = [];
+  for (const file of files) {
+    if (!file.endsWith(".json")) continue;
+    const campaignId = file.slice(0, -".json".length);
+    const envelope = await readTasksEnvelope(campaignId);
+    if (envelope) envelopes.push(envelope);
+  }
+
+  return envelopes.sort((a, b) => b.syncedAt.localeCompare(a.syncedAt));
+}
+
 export async function writeTasksEnvelope(
   envelope: ServerTasksEnvelope,
 ): Promise<ServerTasksEnvelope> {

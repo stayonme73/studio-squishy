@@ -3,6 +3,11 @@ import { OWNER_CONTROL_ROOM_SECTION } from "@/config/job-control";
 import { productionWorkspace } from "@/config/production-workspace";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
+import {
+  redactClientDeliveryFileForClient,
+  redactFileReferenceForClient,
+  redactWorkingFileRefForClient,
+} from "@/lib/file-storage/redact";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
 import type { RouteMapProductionBrief } from "@/lib/route-map-production-brief";
@@ -197,9 +202,9 @@ export function resolveProductionWorkspaceView(input: {
     productionBrief: resolveProductionBriefForJob(campaign, job.skuId),
     clientVisibleNotes: resolveClientVisibleNotes(campaign),
     internalNotes: job.internalNotes ?? [],
-    workingFileRefs: job.workingFileRefs ?? [],
-    fileRegistry: job.fileRegistry ?? [],
-    clientDeliveryFiles: job.clientDeliveryFiles ?? [],
+    workingFileRefs: (job.workingFileRefs ?? []).map(redactWorkingFileRefForClient),
+    fileRegistry: (job.fileRegistry ?? []).map(redactFileReferenceForClient),
+    clientDeliveryFiles: (job.clientDeliveryFiles ?? []).map(redactClientDeliveryFileForClient),
     activity: jobActivity,
     workPacketSummary: resolveJobWorkPacketSummaryView({
       campaign,

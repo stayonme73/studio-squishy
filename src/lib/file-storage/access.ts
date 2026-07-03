@@ -4,6 +4,7 @@ import {
   isApprovedReviewProofReference,
   isReleasedFinalDeliveryReference,
 } from "@/lib/file-registry/job-files";
+import { canClientAccessJobReview } from "@/lib/job-control/review-room-access";
 import type { StudioFileReference } from "@/lib/file-registry/types";
 import { canClientAccessJobDelivery } from "@/lib/job-control/final-delivery-access";
 import type { JobClientDeliveryFile, PurchasedJobRecord } from "@/lib/job-control/types";
@@ -51,6 +52,41 @@ export function canClientAccessFinalDeliveryFile(input: {
   }
 
   return allow("Released client-final file.");
+}
+
+export function canClientAccessReviewProofFile(input: {
+  user: StudioUser | null;
+  job: PurchasedJobRecord;
+  file: StudioFileReference;
+}): FileRoomAccessDecision {
+  const { user, job, file } = input;
+  if (!user || !user.roles.includes("client")) return deny("Client role required.");
+  if (!userOwnsCampaign(user, file.campaignId) && user.id !== file.clientId) {
+    return deny("Client does not own this campaign file.");
+  }
+  if (!fileMatchesPurchasedJob(file, job)) return deny("File is not scoped to this purchased job.");
+  if (!canClientAccessJobReview(job)) return deny("Review Room is not open for this job.");
+  if (!isApprovedReviewProofReference(file)) {
+    return deny("Review Room may only retrieve released review proofs.");
+  }
+
+  return allow("Released review proof file.");
+}
+
+export function canInternalAccessFileRoomFile(input: {
+  user: StudioUser | null;
+  job: PurchasedJobRecord;
+  file: StudioFileReference;
+  campaignAccessAllowed?: boolean;
+}): FileRoomAccessDecision {
+  const { user, job, file, campaignAccessAllowed = false } = input;
+  if (!user) return deny("Staff or owner role required.");
+  if (!fileMatchesPurchasedJob(file, job)) return deny("File is not scoped to this purchased job.");
+  if (user.roles.includes("owner")) return allow("Owner may access File Room files.");
+  if (!user.roles.includes("staff")) return deny("Staff or owner role required.");
+  if (!campaignAccessAllowed) return deny("Staff user is not authorized for this campaign.");
+
+  return allow("Assigned staff may access File Room files.");
 }
 
 export function canStaffAccessInternalFile(input: {

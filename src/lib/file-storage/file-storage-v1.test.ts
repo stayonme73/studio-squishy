@@ -9,9 +9,16 @@ import { resolveFinalDeliveryView } from "@/lib/job-control/final-delivery-view"
 import { resolveClientReviewView } from "@/lib/job-control/review-room-view";
 import type { JobActivityActor, PurchasedJobRecord } from "@/lib/job-control/types";
 
-import { canClientAccessFinalDeliveryFile, canStaffAccessInternalFile } from "./access";
+import {
+  canClientAccessFinalDeliveryFile,
+  canClientAccessReviewProofFile,
+  canInternalAccessFileRoomFile,
+  canStaffAccessInternalFile,
+} from "./access";
 import { createMockFileRoomStorageAdapter } from "./mock";
 import { buildFileRoomPrivateObjectPath } from "./paths";
+import { redactJobFileStorageForClient } from "./redact";
+import { safeFileRoomFileResponse } from "./responses";
 import { resolveClientFacingFileHref } from "./routes";
 import { downloadClientFinalFile } from "./server-access";
 import {
@@ -19,6 +26,7 @@ import {
   createSupabaseStorageAdapter,
   SupabaseStorageConfigurationError,
 } from "./supabase";
+import { parseFileRoomUploadFields } from "./upload-server";
 
 const NOW = "2026-07-03T19:00:00.000Z";
 const CLIENT_ID = "client-private-storage";
@@ -340,6 +348,73 @@ describe("File Room Private Storage Adapter V1", () => {
     expect(canStaffAccessInternalFile({ user: ownerUser, job: baseJob, file: internal }).allowed).toBe(true);
   });
 
+  it("allows Review Room clients to access only approved review proofs", () => {
+    const proof = privateFileRef({
+      id: "file:proof",
+      category: "review_proof",
+      filename: "proof.pdf",
+      fileType: "application/pdf",
+      visibility: "client_visible",
+      status: "approved_for_review",
+    });
+    const final = privateFileRef({ id: "file:final" });
+    const reviewJob = job({ spineStatus: "ready_for_review", fileRegistry: [proof, final] });
+
+    expect(canClientAccessReviewProofFile({ user: clientUser, job: reviewJob, file: proof }).allowed).toBe(true);
+    expect(canClientAccessReviewProofFile({ user: clientUser, job: reviewJob, file: final }).allowed).toBe(false);
+    expect(
+      canClientAccessReviewProofFile({
+        user: { ...clientUser, id: "other-client", currentCampaignId: "other-campaign" },
+        job: reviewJob,
+        file: proof,
+      }).allowed,
+    ).toBe(false);
+  });
+
+  it("allows assigned internal users to retrieve any File Room file through app checks", () => {
+    const final = privateFileRef();
+    const baseJob = job({ fileRegistry: [final] });
+
+    expect(
+      canInternalAccessFileRoomFile({
+        user: staffUser,
+        job: baseJob,
+        file: final,
+        campaignAccessAllowed: true,
+      }).allowed,
+    ).toBe(true);
+    expect(
+      canInternalAccessFileRoomFile({
+        user: staffUser,
+        job: baseJob,
+        file: final,
+        campaignAccessAllowed: false,
+      }).allowed,
+    ).toBe(false);
+    expect(canInternalAccessFileRoomFile({ user: clientUser, job: baseJob, file: final }).allowed).toBe(false);
+  });
+
+  it("validates File Room upload category visibility and status without trusting form fields", () => {
+    const form = new FormData();
+    form.set("file", new File(["hello"], "proof.pdf", { type: "application/pdf" }));
+    form.set("category", "review_proof");
+    form.set("visibility", "client_visible");
+    form.set("status", "approved_for_review");
+    form.set("versionLabel", "v2");
+    form.set("deliverableKey", "deliverable-0");
+    form.set("deliverableLabel", "Post concepts");
+
+    const parsed = parseFileRoomUploadFields(form);
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) {
+      expect(parsed.category).toBe("review_proof");
+      expect(parsed.versionLabel).toBe("v2");
+    }
+
+    form.set("visibility", "internal_only");
+    expect(parseFileRoomUploadFields(form)).toMatchObject({ ok: false, status: 422 });
+  });
+
   it("preserves registry and activity behavior when private storage refs are attached", () => {
     const storageRef = privateFileRef({ category: "internal_draft", visibility: "internal_only", status: "draft" }).storageRef;
     const result = addJobFileReference(job(), [], {
@@ -438,6 +513,15 @@ describe("File Room Private Storage Adapter V1", () => {
     expect(JSON.stringify(reviewView)).not.toContain(
       proofFile.storageRef.provider === "supabase_storage" ? proofFile.storageRef.objectPath : "never",
     );
+
+    const uploadResponse = safeFileRoomFileResponse(finalFile);
+    expect(uploadResponse.accessHref).toBe("/api/file-room/files/file%3Afinal/download");
+    expect(JSON.stringify(uploadResponse)).not.toContain("studio-files");
+    expect(JSON.stringify(uploadResponse)).not.toContain(rawObjectPath);
+
+    const redactedJob = redactJobFileStorageForClient(releasedJob);
+    expect(JSON.stringify(redactedJob)).not.toContain("studio-files");
+    expect(JSON.stringify(redactedJob)).not.toContain(rawObjectPath);
   });
 
   it("keeps release activity intact for private final files", () => {
@@ -454,5 +538,6 @@ describe("File Room Private Storage Adapter V1", () => {
 
     expect(releaseResult.job.fileRegistry?.[0]?.status).toBe("released");
     expect(releaseResult.events.map((event) => event.kind)).toContain("file_released");
+    expect(releaseResult.events.map((event) => event.kind)).toContain("file_download_available");
   });
 });
