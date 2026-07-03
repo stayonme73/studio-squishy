@@ -85,7 +85,8 @@ export function resolveProductionLaneViews(
       } else if (
         job.intakeComplete &&
         job.spineStatus !== "waiting_on_client" &&
-        (job.spineStatus === "building_concepts" ||
+        (job.spineStatus === "ready_for_queue" ||
+          job.spineStatus === "building_concepts" ||
           job.spineStatus === "revision_requested" ||
           job.spineStatus === "approved")
       ) {

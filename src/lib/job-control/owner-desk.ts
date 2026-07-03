@@ -1,5 +1,6 @@
 import { ownerConsoleCampaignRoute } from "@/config/owner-console";
 import { OWNER_CONTROL_ROOM_SECTION } from "@/config/job-control";
+import { productionWorkspaceRoute } from "@/config/production-workspace";
 import type { CampaignExceptionRecord } from "@/lib/campaign-tasks/exceptions-types";
 import { isOpenExceptionStatus } from "@/lib/campaign-tasks/exceptions";
 import { resolveOwnerReviewRequired } from "@/lib/campaign-tasks/exceptions-view";
@@ -73,7 +74,7 @@ function deskItemFromApprovalGate(
       serviceName: job.serviceName,
       title: `Review gate — ${job.serviceName}`,
       detail: "Owner approval required before client review.",
-      drillDownHref: ownerConsoleCampaignRoute(job.campaignId),
+      drillDownHref: productionWorkspaceRoute(job.campaignId, job.jobId),
       updatedAt: job.updatedAt,
     };
   }
@@ -107,7 +108,7 @@ function deskItemFromApprovalGate(
       serviceName: job.serviceName,
       title: `Ready for review — ${job.serviceName}`,
       detail: "Concepts ready — approve before client sees review room.",
-      drillDownHref: ownerConsoleCampaignRoute(job.campaignId),
+      drillDownHref: productionWorkspaceRoute(job.campaignId, job.jobId),
       updatedAt: job.updatedAt,
     };
   }

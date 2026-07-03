@@ -120,10 +120,26 @@ function deriveSpineStatus(
     return "revision_requested";
   }
 
+  if (persisted?.spineStatus === "ready_for_queue") {
+    return "ready_for_queue";
+  }
+
+  if (persisted?.spineStatus === "building_concepts") {
+    return "building_concepts";
+  }
+
+  if (persisted?.spineStatus === "ready_for_review") {
+    return "ready_for_review";
+  }
+
   if (campaign.selectedCampaignOption?.trim()) {
     if (campaign.campaignStatus === "DELIVERED") return "delivered";
     if (campaign.campaignStatus === "READY_FOR_REVIEW") return "ready_for_review";
     return "approved";
+  }
+
+  if (!hasProductionStartedForSku(tasks, skuId) && !persisted?.productionStartedAt) {
+    return "ready_for_queue";
   }
 
   return mapCampaignStatusToSpine(campaign.campaignStatus);

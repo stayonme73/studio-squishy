@@ -2,6 +2,7 @@ import type { ServiceId } from "@/catalog/types";
 
 /** Internal job status spine — individual purchased SKU / job level. */
 export type JobSpineStatus =
+  | "ready_for_queue"
   | "building_concepts"
   | "ready_for_review"
   | "revision_requested"
@@ -34,7 +35,32 @@ export type JobActivityEventKind =
   | "review_notice"
   | "approval"
   | "delivery"
-  | "refund";
+  | "refund"
+  | "internal_note"
+  | "working_file_ref"
+  | "deliverable_prepared";
+
+export type JobInternalNote = {
+  id: string;
+  content: string;
+  createdAt: string;
+  author: JobActivityActor;
+};
+
+export type JobWorkingFileRef = {
+  id: string;
+  label: string;
+  url: string;
+  addedAt: string;
+  author: JobActivityActor;
+};
+
+export type JobDeliverablePrep = {
+  deliverableKey: string;
+  label: string;
+  preparedAt?: string;
+  preparedBy?: JobActivityActor;
+};
 
 export type JobActivityActor = {
   role: "owner" | "staff" | "client" | "system";
@@ -64,6 +90,13 @@ export type PurchasedJobRecord = {
   nonRefundable?: boolean;
   refundEligibleAt?: string | null;
   laneQueuedAt?: string;
+  /** Required deliverable prep checklist — internal only. */
+  deliverablePrep?: readonly JobDeliverablePrep[];
+  /** Internal production notes — never shown to client. */
+  internalNotes?: readonly JobInternalNote[];
+  /** Internal working-file links — never shown to client. */
+  workingFileRefs?: readonly JobWorkingFileRef[];
+  clientDeadline?: string | null;
   updatedAt: string;
 };
 

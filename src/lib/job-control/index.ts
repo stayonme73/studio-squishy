@@ -76,3 +76,27 @@ export {
   requestOwnerApprovalBeforeDelivery,
   type SetJobSpineStatusInput,
 } from "./actions";
+
+export {
+  canTransitionToBuildingConcepts,
+  canSubmitForOwnerApproval,
+  canOwnerApproveForReview,
+  allRequiredDeliverablesPrepared,
+  resolveRequiredDeliverableKeys,
+  type GateBlockReason,
+} from "./production-workspace-gates";
+
+export {
+  applyProductionWorkspacePatch,
+  type ProductionWorkspacePatchAction,
+  type ProductionWorkspacePatchBody,
+  type ProductionWorkspacePatchResult,
+} from "./production-workspace-actions";
+
+export {
+  resolveProductionWorkspaceView,
+  productionWorkspacePageTitle,
+  type ProductionWorkspaceView,
+  type ProductionWorkspaceDeliverableRow,
+  type ProductionWorkspaceMaterialRow,
+} from "./production-workspace-view";

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { ownerConsoleCampaignRoute } from "@/config/owner-console";
+import { productionWorkspaceRoute } from "@/config/production-workspace";
 import { OWNER_CONTROL_ROOM_SECTION } from "@/config/job-control";
 import { formatActivityKind } from "@/lib/job-control/activity-log";
 import type { OwnerControlRoomView } from "@/lib/job-control/control-room-view";
@@ -124,9 +124,9 @@ export default function FileRoomOwnerControlRoomPanels({ controlRoom }: Props) {
                         </span>
                         <Link
                           className="fr-back-link"
-                          href={ownerConsoleCampaignRoute(job.campaignId)}
+                          href={productionWorkspaceRoute(job.campaignId, job.jobId)}
                         >
-                          View
+                          Open workspace →
                         </Link>
                       </li>
                     ))}

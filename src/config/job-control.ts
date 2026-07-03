@@ -26,6 +26,7 @@ export const OWNER_CONTROL_ROOM_SECTION = {
     heavy: 1,
   } satisfies Record<ProductionControlLane, number>,
   spineStatusLabels: {
+    ready_for_queue: "Ready for Queue",
     building_concepts: "Building Concepts",
     ready_for_review: "Ready for Review",
     revision_requested: "Revision Requested",
