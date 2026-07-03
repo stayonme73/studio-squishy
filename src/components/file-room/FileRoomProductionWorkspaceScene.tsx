@@ -28,6 +28,10 @@ function formatWhen(iso: string): string {
   });
 }
 
+function formatRegistryToken(value: string): string {
+  return value.replace(/_/g, " ");
+}
+
 export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -300,17 +304,29 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
 
           <FileRoomSectionCard title={productionWorkspace.workingFilesTitle}>
             <p className="fr-control-room__section-lead">{productionWorkspace.workingFilesLead}</p>
-            {view.workingFileRefs.length === 0 ? (
+            {view.fileRegistry.length === 0 ? (
               <p className="fr-tasks-empty__body">{productionWorkspace.workingFilesEmpty}</p>
             ) : (
               <ul className="fr-production-workspace__files">
-                {view.workingFileRefs.map((ref) => (
-                  <li key={ref.id}>
-                    <a className="fr-back-link" href={ref.url} target="_blank" rel="noreferrer">
-                      {ref.label}
-                    </a>
+                {view.fileRegistry.map((ref) => (
+                  <li key={ref.id} className="fr-production-workspace__file-row">
+                    <span className="fr-production-workspace__deliverable-label">
+                      {ref.filename} ({ref.fileType})
+                    </span>
                     <span className="fr-tasks-row__meta">
-                      {ref.author.displayName ?? ref.author.role} · {formatWhen(ref.addedAt)}
+                      {formatRegistryToken(ref.category)} · {formatRegistryToken(ref.visibility)} ·{" "}
+                      {formatRegistryToken(ref.status)} · {ref.versionLabel}
+                    </span>
+                    {ref.storageRef.referenceKind === "manual_link" ? (
+                      <a className="fr-back-link" href={ref.storageRef.reference} target="_blank" rel="noreferrer">
+                        {ref.storageRef.reference}
+                      </a>
+                    ) : (
+                      <span className="fr-tasks-row__meta">{ref.storageRef.reference}</span>
+                    )}
+                    <span className="fr-tasks-row__meta">
+                      {ref.addedBy.displayName ?? ref.addedBy.role} · {formatWhen(ref.addedAt)} ·{" "}
+                      {formatRegistryToken(ref.storageRef.connectionStatus)}
                     </span>
                   </li>
                 ))}

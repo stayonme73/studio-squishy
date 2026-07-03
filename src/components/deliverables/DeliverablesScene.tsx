@@ -130,6 +130,7 @@ function JobDeliveryGrid({ jobs }: { jobs: readonly ClientJobDeliveryView[] }) {
                     <p className="fd-item__label">{file.deliverableLabel}</p>
                     <p className="fd-item__meta">
                       {file.fileName} · {jobDelivery.fileTypeLabel}: {file.fileType}
+                      {file.versionLabel ? ` · ${file.versionLabel}` : ""}
                     </p>
                     {file.useInstructions ? (
                       <p className="fd-item__text">

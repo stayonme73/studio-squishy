@@ -88,6 +88,27 @@ export default function JobReviewDeliverablePreview({
                   })}
                 </p>
               ) : null}
+              {deliverable.proofFiles.length > 0 ? (
+                <div className="fs-proof-refs" aria-label={`${deliverable.label} proof references`}>
+                  <p className="fs-proof-refs__label">Approved proof references</p>
+                  <ul>
+                    {deliverable.proofFiles.map((file) => (
+                      <li key={file.id}>
+                        {file.storageRef.referenceKind === "manual_link" ? (
+                          <a href={file.storageRef.reference} target="_blank" rel="noreferrer">
+                            {file.filename}
+                          </a>
+                        ) : (
+                          <span>{file.filename}</span>
+                        )}
+                        <span>
+                          {file.fileType} · {file.versionLabel}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
               <div className="fs-mock__hero-art fs-mock__hero-art--deliverable" aria-hidden />
             </div>
           </PreviewSection>

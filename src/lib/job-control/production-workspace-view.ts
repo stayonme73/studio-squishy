@@ -63,6 +63,7 @@ export type ProductionWorkspaceView = {
   clientVisibleNotes: readonly string[];
   internalNotes: NonNullable<PurchasedJobRecord["internalNotes"]>;
   workingFileRefs: NonNullable<PurchasedJobRecord["workingFileRefs"]>;
+  fileRegistry: NonNullable<PurchasedJobRecord["fileRegistry"]>;
   clientDeliveryFiles: NonNullable<PurchasedJobRecord["clientDeliveryFiles"]>;
   activity: readonly JobActivityEvent[];
   workPacketSummary: JobWorkPacketSummaryView;
@@ -197,6 +198,7 @@ export function resolveProductionWorkspaceView(input: {
     clientVisibleNotes: resolveClientVisibleNotes(campaign),
     internalNotes: job.internalNotes ?? [],
     workingFileRefs: job.workingFileRefs ?? [],
+    fileRegistry: job.fileRegistry ?? [],
     clientDeliveryFiles: job.clientDeliveryFiles ?? [],
     activity: jobActivity,
     workPacketSummary: resolveJobWorkPacketSummaryView({

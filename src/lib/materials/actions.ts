@@ -1,4 +1,5 @@
 import type { StudioUser } from "@/lib/campaign-store/types";
+import { createReferenceOnlyStorageRef } from "@/lib/file-registry/job-files";
 
 import {
   parseConsolidatedRequestId,
@@ -55,6 +56,13 @@ function applyPayloadToItem(
   if (payload.url?.trim()) patch.url = payload.url.trim();
   if (payload.fileName?.trim()) patch.fileName = payload.fileName.trim();
   if (payload.mimeType?.trim()) patch.mimeType = payload.mimeType.trim();
+  if (item.contentKind === "file-metadata" && payload.fileName?.trim()) {
+    patch.storageRef = createReferenceOnlyStorageRef({
+      reference: payload.url?.trim() || payload.fileName.trim(),
+      displayLabel: payload.fileName.trim(),
+      referenceKind: payload.url?.trim() ? undefined : "path_hint",
+    });
+  }
   if (payload.note?.trim()) {
     patch.text = [patch.text, payload.note.trim()].filter(Boolean).join("\n\n");
   }

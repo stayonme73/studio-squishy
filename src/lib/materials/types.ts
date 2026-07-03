@@ -1,4 +1,5 @@
 import type { ServiceId } from "@/catalog/types";
+import type { StudioFileReference, StudioFileStorageReference } from "@/lib/file-registry/types";
 
 export type MaterialCategory =
   | "logo-brand"
@@ -55,7 +56,9 @@ export type CampaignMaterialItem = {
   reviewedBy?: MaterialSubmittedBy;
   reviewedAt?: string;
   teamNote?: string;
-  storageRef?: null;
+  storageRef?: StudioFileStorageReference | null;
+  /** Reference-only registry entries for client-supplied material files scoped by client/campaign/job. */
+  fileRegistryRefs?: readonly StudioFileReference[];
   uploadStatus: MaterialUploadStatus;
 };
 

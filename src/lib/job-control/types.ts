@@ -1,4 +1,5 @@
 import type { ServiceId } from "@/catalog/types";
+import type { StudioFileReference, StudioFileStorageReference } from "@/lib/file-registry/types";
 
 /** Internal job status spine — individual purchased SKU / job level. */
 export type JobSpineStatus =
@@ -66,6 +67,10 @@ export type JobActivityEventKind =
   | "client_delivery_approval"
   | "owner_final_release"
   | "client_delivery_file_added"
+  | "file_reference_added"
+  | "file_visibility_changed"
+  | "file_version_updated"
+  | "file_released"
   | "delivery_completed"
   | "work_packet_assigned"
   | "work_packet_returned"
@@ -84,6 +89,8 @@ export type JobWorkingFileRef = {
   url: string;
   addedAt: string;
   author: JobActivityActor;
+  registryFileId?: string;
+  storageRef?: StudioFileStorageReference;
 };
 
 /** Team Office roles that can receive an internal job Work Packet. */
@@ -113,6 +120,8 @@ export type JobWorkPacketReturnedFileRef = {
   url: string;
   returnedAt: string;
   returnedBy: JobActivityActor;
+  registryFileId?: string;
+  storageRef?: StudioFileStorageReference;
   deliverableKey?: string;
   deliverableLabel?: string;
   note?: string;
@@ -143,11 +152,17 @@ export type JobDeliverablePrep = {
 /** Client-visible final file — promoted from production prep, never internal working refs. */
 export type JobClientDeliveryFile = {
   id: string;
+  registryFileId?: string;
   deliverableKey: string;
   deliverableLabel: string;
   fileName: string;
   fileType: string;
   url: string;
+  storageRef?: StudioFileStorageReference;
+  versionLabel?: string;
+  visibility?: "client_visible";
+  releaseStatus?: "pending_release" | "released";
+  releasedAt?: string;
   useInstructions?: string;
   addedAt: string;
   addedBy: JobActivityActor;
@@ -189,6 +204,8 @@ export type PurchasedJobRecord = {
   workingFileRefs?: readonly JobWorkingFileRef[];
   /** Internal job Work Packets — Team Office assignment and file-return trail. */
   workPackets?: readonly JobWorkPacket[];
+  /** Canonical file registry — reference-only Shared Drive metadata, no upload/API connection. */
+  fileRegistry?: readonly StudioFileReference[];
   /** Client-facing final delivery files — shown in Final Delivery only. */
   clientDeliveryFiles?: readonly JobClientDeliveryFile[];
   deliveredAt?: string | null;

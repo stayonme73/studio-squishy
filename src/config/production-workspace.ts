@@ -27,9 +27,10 @@ export const productionWorkspace = {
   internalNotesTitle: "Internal notes",
   internalNotesLead: "Staff-only — never visible to the client.",
   internalNotesEmpty: "No internal notes yet.",
-  workingFilesTitle: "Working files",
-  workingFilesLead: "Internal links to working files — not client deliverables.",
-  workingFilesEmpty: "No working file references yet.",
+  workingFilesTitle: "File registry",
+  workingFilesLead:
+    "Reference-only Shared Drive file records for this job. No Google API connection is active in V1.",
+  workingFilesEmpty: "No file registry references yet.",
   notePlaceholder: "Add an internal note…",
   fileLabelPlaceholder: "Label (e.g. Figma board)",
   fileUrlPlaceholder: "https://…",

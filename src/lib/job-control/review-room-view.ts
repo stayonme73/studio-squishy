@@ -24,6 +24,7 @@ import {
   resolveReviewBlockedReasons,
 } from "./review-room-gates";
 import type { JobActivityEvent, PurchasedJobRecord } from "./types";
+import { isApprovedReviewProofReference } from "@/lib/file-registry/job-files";
 
 export type ClientReviewView = {
   jobId: string;
@@ -94,11 +95,24 @@ export function resolveClientReviewView(input: {
     .filter((def) => isDeliverablePrepared(job, def.key))
     .map((def) => {
       const prep = (job.deliverablePrep ?? []).find((entry) => entry.deliverableKey === def.key);
+      const proofFiles = (job.fileRegistry ?? [])
+        .filter(
+          (ref) => ref.deliverableKey === def.key && isApprovedReviewProofReference(ref),
+        )
+        .map((ref) => ({
+          id: ref.id,
+          filename: ref.filename,
+          fileType: ref.fileType,
+          storageRef: ref.storageRef,
+          versionLabel: ref.versionLabel,
+          addedAt: ref.addedAt,
+        }));
       return {
         key: def.key,
         label: def.label,
         prepared: true,
         preparedAt: prep?.preparedAt,
+        proofFiles,
       };
     });
 

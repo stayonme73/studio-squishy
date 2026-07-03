@@ -1,5 +1,6 @@
 import type { PurchasedJobRecord } from "./types";
 import { resolveRequiredDeliverableKeys } from "./production-workspace-gates";
+import { clientDeliveryFileIsReleased } from "@/lib/file-registry/job-files";
 
 export type GateBlockReason = {
   code: string;
@@ -14,7 +15,12 @@ export function allRequiredClientDeliveryFilesPresent(
   const keys = resolveRequiredDeliverableKeys(requiredDeliverables);
   const files = job.clientDeliveryFiles ?? [];
   return keys.every((def) =>
-    files.some((file) => file.deliverableKey === def.key && file.url.trim()),
+    files.some(
+      (file) =>
+        file.deliverableKey === def.key &&
+        file.url.trim() &&
+        clientDeliveryFileIsReleased(job, file),
+    ),
   );
 }
 

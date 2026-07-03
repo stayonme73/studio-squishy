@@ -3,6 +3,11 @@ import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
+import {
+  addJobFileReference,
+  createReferenceOnlyStorageRef,
+  releaseFinalDeliveryFiles,
+} from "@/lib/file-registry/job-files";
 
 import { applyJobSpineStatusChange } from "./actions";
 import { appendJobActivityEvent } from "./activity-log";
@@ -132,6 +137,10 @@ export function applyFinalDeliveryPatch(
       };
       events = statusResult.events;
 
+      const fileReleaseResult = releaseFinalDeliveryFiles(currentJob, events, actor, occurredAt);
+      currentJob = fileReleaseResult.job;
+      events = fileReleaseResult.events;
+
       events = appendJobActivityEvent(events, {
         campaignId: job.campaignId,
         jobId: job.jobId,
@@ -219,6 +228,7 @@ export function addClientDeliveryFile(
   job: PurchasedJobRecord,
   events: readonly JobActivityEvent[],
   input: {
+    clientId?: string;
     deliverableKey: string;
     deliverableLabel: string;
     fileName: string;
@@ -230,25 +240,48 @@ export function addClientDeliveryFile(
   },
 ): { job: PurchasedJobRecord; events: JobActivityEvent[] } {
   const occurredAt = input.occurredAt ?? new Date().toISOString();
+  const storageRef = createReferenceOnlyStorageRef({
+    reference: input.url,
+    displayLabel: input.fileName,
+  });
+  const registryResult = addJobFileReference(job, events, {
+    clientId: input.clientId ?? `unclaimed-client:${job.campaignId}`,
+    category: "final_delivery",
+    filename: input.fileName,
+    fileType: input.fileType,
+    storageRef,
+    visibility: "client_visible",
+    status: "approved_for_release",
+    actor: input.actor,
+    occurredAt,
+    deliverableKey: input.deliverableKey,
+    deliverableLabel: input.deliverableLabel,
+    idPrefix: "final-file",
+  });
   const file: JobClientDeliveryFile = {
     id: `cdf:${job.jobId}:${input.deliverableKey}:${occurredAt}`,
+    registryFileId: registryResult.file.id,
     deliverableKey: input.deliverableKey,
     deliverableLabel: input.deliverableLabel,
     fileName: input.fileName.trim(),
     fileType: input.fileType.trim(),
     url: input.url.trim(),
+    storageRef,
+    versionLabel: registryResult.file.versionLabel,
+    visibility: "client_visible",
+    releaseStatus: "pending_release",
     useInstructions: input.useInstructions?.trim() || undefined,
     addedAt: occurredAt,
     addedBy: input.actor,
   };
 
   const nextJob: PurchasedJobRecord = {
-    ...job,
-    clientDeliveryFiles: [...(job.clientDeliveryFiles ?? []), file],
+    ...registryResult.job,
+    clientDeliveryFiles: [...(registryResult.job.clientDeliveryFiles ?? []), file],
     updatedAt: occurredAt,
   };
 
-  const nextEvents = appendJobActivityEvent(events, {
+  const nextEvents = appendJobActivityEvent(registryResult.events, {
     campaignId: job.campaignId,
     jobId: job.jobId,
     kind: "client_delivery_file_added",

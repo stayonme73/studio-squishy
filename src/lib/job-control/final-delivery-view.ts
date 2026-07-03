@@ -3,6 +3,7 @@ import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 
 import { canClientAccessJobDelivery, isJobDeliveredToClient } from "./final-delivery-access";
 import type { JobClientDeliveryFile, PurchasedJobRecord } from "./types";
+import { clientDeliveryFileIsReleased } from "@/lib/file-registry/job-files";
 
 export type ClientDeliveryFileView = {
   id: string;
@@ -12,6 +13,8 @@ export type ClientDeliveryFileView = {
   url: string;
   useInstructions: string | null;
   addedAt: string;
+  versionLabel: string | null;
+  releasedAt: string | null;
 };
 
 export type ClientJobDeliveryView = {
@@ -40,6 +43,8 @@ function formatFileView(file: JobClientDeliveryFile): ClientDeliveryFileView {
     url: file.url,
     useInstructions: file.useInstructions ?? null,
     addedAt: file.addedAt,
+    versionLabel: file.versionLabel ?? null,
+    releasedAt: file.releasedAt ?? null,
   };
 }
 
@@ -62,7 +67,9 @@ function resolveJobDeliveryView(
 ): ClientJobDeliveryView | null {
   if (!canClientAccessJobDelivery(job)) return null;
 
-  const files = (job.clientDeliveryFiles ?? []).map(formatFileView);
+  const files = (job.clientDeliveryFiles ?? [])
+    .filter((file) => clientDeliveryFileIsReleased(job, file))
+    .map(formatFileView);
   if (files.length === 0 && !isJobDeliveredToClient(job)) return null;
 
   return {

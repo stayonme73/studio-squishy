@@ -1759,6 +1759,13 @@
   font-size: var(--type-body);
 }
 
+.fr-production-workspace__file-row {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.55rem 0;
+  border-top: 1px solid var(--utility-border-subtle, rgba(0, 0, 0, 0.06));
+}
+
 .fr-production-workspace__form {
   display: flex;
   flex-direction: column;

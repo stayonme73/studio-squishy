@@ -4,6 +4,11 @@ import type { CampaignMaterialItem } from "@/lib/materials/types";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
+import {
+  addJobFileReference,
+  createReferenceOnlyStorageRef,
+  releaseFinalDeliveryFiles,
+} from "@/lib/file-registry/job-files";
 
 import { appendJobActivityEvent } from "./activity-log";
 import { applyJobSpineStatusChange, requestOwnerApprovalBeforeReview } from "./actions";
@@ -62,7 +67,12 @@ export type ProductionWorkspacePatchBody =
     }
   | { action: "mark_deliverable_prepared"; deliverableKey: string }
   | { action: "add_internal_note"; content: string }
-  | { action: "add_working_file_ref"; label: string; url: string }
+  | {
+      action: "add_working_file_ref";
+      label: string;
+      url: string;
+      category?: "internal_draft" | "internal_only_source";
+    }
   | {
       action: "add_client_delivery_file";
       deliverableKey: string;
@@ -281,6 +291,27 @@ export function applyProductionWorkspacePatch(
         return { ok: false, error: "Unknown deliverable.", status: 400 };
       }
 
+      const storageRef = createReferenceOnlyStorageRef({
+        reference: url,
+        displayLabel: label,
+      });
+      const registryResult = addJobFileReference(job, events, {
+        clientId,
+        category: "internal_draft",
+        filename: label,
+        fileType: body.fileKind,
+        storageRef,
+        visibility: "internal_only",
+        status: "draft",
+        actor,
+        occurredAt,
+        deliverableKey: deliverableDef?.key,
+        deliverableLabel: deliverableDef?.label,
+        idPrefix: "wpr-file",
+      });
+      job = registryResult.job;
+      events = registryResult.events;
+
       const returnedFile = {
         id: `wpr:${body.packetId}:${occurredAt}`,
         kind: body.fileKind,
@@ -288,6 +319,8 @@ export function applyProductionWorkspacePatch(
         url,
         returnedAt: occurredAt,
         returnedBy: actor,
+        registryFileId: registryResult.file.id,
+        storageRef,
         deliverableKey: deliverableDef?.key,
         deliverableLabel: deliverableDef?.label,
         note: body.note?.trim() || undefined,
@@ -311,6 +344,8 @@ export function applyProductionWorkspacePatch(
             url,
             addedAt: occurredAt,
             author: actor,
+            registryFileId: registryResult.file.id,
+            storageRef,
           },
         ],
         deliverablePrep:
@@ -408,6 +443,27 @@ export function applyProductionWorkspacePatch(
       if (!label || !url) {
         return { ok: false, error: "Label and URL are required.", status: 400 };
       }
+      const category =
+        body.category === "internal_only_source" ? "internal_only_source" : "internal_draft";
+
+      const storageRef = createReferenceOnlyStorageRef({
+        reference: url,
+        displayLabel: label,
+      });
+      const registryResult = addJobFileReference(job, events, {
+        clientId,
+        category,
+        filename: label,
+        fileType: category === "internal_only_source" ? "source reference" : "reference",
+        storageRef,
+        visibility: "internal_only",
+        status: "draft",
+        actor,
+        occurredAt,
+        idPrefix: "working-file",
+      });
+      job = registryResult.job;
+      events = registryResult.events;
 
       const ref = {
         id: `ref:${job.jobId}:${occurredAt}`,
@@ -415,6 +471,8 @@ export function applyProductionWorkspacePatch(
         url,
         addedAt: occurredAt,
         author: actor,
+        registryFileId: registryResult.file.id,
+        storageRef,
       };
 
       job = {
@@ -522,6 +580,7 @@ export function applyProductionWorkspacePatch(
       }
 
       const fileResult = addClientDeliveryFile(job, events, {
+        clientId,
         deliverableKey: def.key,
         deliverableLabel: def.label,
         fileName,
@@ -565,6 +624,10 @@ export function applyProductionWorkspacePatch(
       });
       job = releaseResult.job;
       events = releaseResult.events;
+
+      const fileReleaseResult = releaseFinalDeliveryFiles(job, events, actor, occurredAt);
+      job = fileReleaseResult.job;
+      events = fileReleaseResult.events;
 
       events = appendJobActivityEvent(events, {
         campaignId: job.campaignId,

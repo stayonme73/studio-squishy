@@ -581,6 +581,41 @@
   border: 1px solid color-mix(in srgb, var(--fs-accent, currentColor) 22%, transparent);
 }
 
+.fs-proof-refs {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--utility-primary) 22%, transparent);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--utility-primary) 7%, #fff 93%);
+}
+
+.fs-proof-refs__label {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--utility-primary-deep);
+}
+
+.fs-proof-refs ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fs-proof-refs li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+
 .fs-mock__channel {
   margin: 0 0 0.35rem;
   font-size: 0.68rem;
