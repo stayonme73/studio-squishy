@@ -147,7 +147,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     turnaround: "Usually within 2–3 business days after intake is complete.",
     billingType: "one_time",
     sourceLaunchStatus: "limited",
-    productionLane: "standard_build",
+    productionLane: "quick_turn",
     sourceExecutionMode: "creation_delivery",
     intakeTemplateFieldsTbd: [
       "What is this flyer for?",

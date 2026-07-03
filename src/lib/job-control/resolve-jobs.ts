@@ -114,10 +114,6 @@ function deriveSpineStatus(
     return "ready_for_queue";
   }
 
-  if (isWaitingOnClientForSku(exceptions, materials, skuId, tasks)) {
-    return "waiting_on_client";
-  }
-
   if (!intakeComplete) {
     return mapCampaignStatusToSpine(campaign.campaignStatus);
   }

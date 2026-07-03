@@ -33,11 +33,11 @@ export async function writeCampaignEnvelope(
 ): Promise<ServerCampaignEnvelope> {
   assertCampaignSyncAllowed(envelope.campaignId);
   await ensureCampaignsDir();
-  await fs.writeFile(
-    campaignPath(envelope.campaignId),
-    JSON.stringify(envelope, null, 2),
-    "utf8",
-  );
+  const target = campaignPath(envelope.campaignId);
+  const payload = JSON.stringify(envelope, null, 2);
+  const temp = `${target}.${process.pid}.${Date.now()}.tmp`;
+  await fs.writeFile(temp, payload, "utf8");
+  await fs.rename(temp, target);
   return envelope;
 }
 
