@@ -80,8 +80,9 @@ function deskItemFromApprovalGate(
   }
 
   if (job.ownerApprovalPending === "before_delivery") {
+    const clientApproved = job.spineStatus === "approved";
     return {
-      id: `desk:delivery:${job.jobId}`,
+      id: clientApproved ? `desk:client-approved:${job.jobId}` : `desk:delivery:${job.jobId}`,
       reason: "approval_before_delivery",
       reasonLabel:
         OWNER_CONTROL_ROOM_SECTION.ownerDeskReasonLabels.approval_before_delivery,
@@ -89,8 +90,12 @@ function deskItemFromApprovalGate(
       campaignName,
       jobId: job.jobId,
       serviceName: job.serviceName,
-      title: `Delivery gate — ${job.serviceName}`,
-      detail: "Owner approval required before final delivery.",
+      title: clientApproved
+        ? `Client approved — ${job.serviceName}`
+        : `Delivery gate — ${job.serviceName}`,
+      detail: clientApproved
+        ? "Client approved for delivery — Owner final approval required."
+        : "Owner approval required before final delivery.",
       drillDownHref: ownerConsoleCampaignRoute(job.campaignId),
       updatedAt: job.updatedAt,
     };

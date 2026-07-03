@@ -192,6 +192,10 @@ export function buildPurchasedJobRecord(
       Boolean(productionStarted || persisted?.productionStartedAt),
     refundEligibleAt: persisted?.refundEligibleAt ?? null,
     laneQueuedAt: persisted?.laneQueuedAt ?? now,
+    deliverablePrep: persisted?.deliverablePrep,
+    internalNotes: persisted?.internalNotes,
+    workingFileRefs: persisted?.workingFileRefs,
+    clientDeadline: persisted?.clientDeadline ?? null,
     updatedAt: now,
   };
 }

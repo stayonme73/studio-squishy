@@ -17,6 +17,7 @@ import {
   isDeliverablePrepared,
   resolveRequiredDeliverableKeys,
 } from "./production-workspace-gates";
+import type { JobReviewFeedback } from "./review-feedback-types";
 import type { JobActivityEvent, PurchasedJobRecord } from "./types";
 
 export type ProductionWorkspaceDeliverableRow = {
@@ -54,6 +55,8 @@ export type ProductionWorkspaceView = {
   workingFileRefs: NonNullable<PurchasedJobRecord["workingFileRefs"]>;
   activity: readonly JobActivityEvent[];
   ownerApprovalPending: PurchasedJobRecord["ownerApprovalPending"];
+  /** Client revision feedback — visible to production when job returned from Review Room. */
+  clientRevisionFeedback: JobReviewFeedback | null;
   gates: {
     canStartBuildingConcepts: boolean;
     startBlockedReasons: readonly string[];
@@ -104,8 +107,9 @@ export function resolveProductionWorkspaceView(input: {
   materials: readonly CampaignMaterialItem[];
   activityEvents: readonly JobActivityEvent[];
   laneViews: readonly ProductionLaneView[];
+  jobReviewFeedback?: readonly JobReviewFeedback[];
 }): ProductionWorkspaceView {
-  const { campaign, job, materials, activityEvents, laneViews } = input;
+  const { campaign, job, materials, activityEvents, laneViews, jobReviewFeedback } = input;
   const plan = campaign.approvedStudioPlan;
   const line = plan
     ? filterProductionPlanLineItems(plan).find(
@@ -149,6 +153,10 @@ export function resolveProductionWorkspaceView(input: {
 
   const lane = job.returnLane ?? job.productionLane;
 
+  const revisionFeedback = (jobReviewFeedback ?? []).find((entry) => entry.jobId === job.jobId);
+  const clientRevisionFeedback =
+    revisionFeedback?.submissionType === "revision_requested" ? revisionFeedback : null;
+
   return {
     jobId: job.jobId,
     campaignId: job.campaignId,
@@ -170,6 +178,7 @@ export function resolveProductionWorkspaceView(input: {
     workingFileRefs: job.workingFileRefs ?? [],
     activity: jobActivity,
     ownerApprovalPending: job.ownerApprovalPending ?? null,
+    clientRevisionFeedback,
     gates: {
       canStartBuildingConcepts: startGate.allowed,
       startBlockedReasons: startGate.reasons.map((reason) => reason.message),

@@ -184,8 +184,10 @@ export type CampaignTasksRecord = {
   jobRecords?: PurchasedJobRecord[];
   /** Append-only job activity timeline (schema v7). */
   jobActivityEvents?: JobActivityEvent[];
+  /** Job-scoped client review feedback sessions (schema v8). */
+  jobReviewFeedback?: import("@/lib/job-control/review-feedback-types").JobReviewFeedback[];
   updatedAt: string;
-  /** Envelope schema version — 7 adds job spine + activity log. */
+  /** Envelope schema version — 8 adds job review feedback. */
   version: number;
 };
 

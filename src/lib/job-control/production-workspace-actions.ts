@@ -277,7 +277,7 @@ export function applyProductionWorkspacePatch(
         job,
         nextStatus: "ready_for_review",
         actor,
-        reason: "Owner approved — ready for client review (Review Room not wired)",
+        reason: "Owner approved — ready for client review",
         occurredAt,
       });
       job = result.job;

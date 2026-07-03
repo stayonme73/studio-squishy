@@ -10,6 +10,7 @@ import FeedbackStudioConceptPicker, {
 import FeedbackStudioConceptReview from "@/components/feedback-studio/FeedbackStudioConceptReview";
 import FeedbackStudioLayout from "@/components/feedback-studio/FeedbackStudioLayout";
 import FeedbackStudioRevisionStatus from "@/components/feedback-studio/FeedbackStudioRevisionStatus";
+import JobReviewWorkspace from "@/components/feedback-studio/JobReviewWorkspace";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import CampaignJourneyMap from "@/components/studio-board/CampaignJourneyMap";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
@@ -26,15 +27,28 @@ import {
   resolveFeedbackRevisionStatus,
 } from "@/lib/feedback-studio-view";
 import { selectCampaignOption } from "@/lib/studio-board-campaign";
+import { parseJobId } from "@/lib/job-control/lane-map";
+import { useDiscoverJobReview, useJobReview } from "@/lib/use-job-review";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 
-/** Feedback Studio — concept preview & review workspace. */
+/** Feedback Studio — job-scoped Review Room (V1) + legacy concept review. */
 export default function FeedbackStudioScene() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { campaign, ready } = useCurrentCampaign();
 
   const conceptParam = searchParams.get("concept");
+  const jobIdParam = searchParams.get("jobId");
+  const parsedJob = jobIdParam ? parseJobId(jobIdParam) : null;
+  const effectiveCampaignId = campaign?.campaignId ?? parsedJob?.campaignId;
+
+  const { primaryReview, loading: discoveringJobs } = useDiscoverJobReview(effectiveCampaignId);
+  const activeJobId = jobIdParam ?? primaryReview?.jobId ?? null;
+  const { review, loading: loadingJobReview, setReview } = useJobReview(
+    effectiveCampaignId,
+    activeJobId,
+  );
+
   const concepts = useMemo(() => resolveCampaignConcepts(campaign), [campaign]);
   const scopeSections = useMemo(
     () => (campaign ? resolveDeliverableScopeFromCampaign(campaign) : []),
@@ -46,16 +60,28 @@ export default function FeedbackStudioScene() {
       : null;
 
   const selectedOption = campaign?.selectedCampaignOption ?? null;
-  const isReviewReady =
+  const isConceptReviewReady =
     campaign?.campaignStatus === "READY_FOR_REVIEW" && concepts.length > 0;
   const campaignTitle = resolveFeedbackCampaignTitle(campaign);
   const revisionStatus = resolveFeedbackRevisionStatus(campaign);
 
+  const jobReviewActive = Boolean(review);
   const pageState = useMemo(() => {
+    if (jobReviewActive) return "job-review" as const;
+    if (discoveringJobs || loadingJobReview) return "loading-review" as const;
+    if (!campaign && !effectiveCampaignId) return "no-campaign" as const;
+    if (!campaign && effectiveCampaignId && !jobReviewActive) return "not-ready" as const;
     if (!campaign) return "no-campaign" as const;
-    if (!isReviewReady) return "not-ready" as const;
-    return "ready" as const;
-  }, [campaign, isReviewReady]);
+    if (isConceptReviewReady) return "concept-ready" as const;
+    return "not-ready" as const;
+  }, [
+    campaign,
+    effectiveCampaignId,
+    jobReviewActive,
+    discoveringJobs,
+    loadingJobReview,
+    isConceptReviewReady,
+  ]);
 
   const conceptHref = useCallback((id: string) => {
     return `${studioBoard.routes.feedbackStudio}?concept=${id}`;
@@ -68,7 +94,7 @@ export default function FeedbackStudioScene() {
     router.push(studioBoard.routes.deliverables);
   }
 
-  if (!ready) {
+  if (!ready || pageState === "loading-review") {
     return (
       <FeedbackStudioLayout>
         <div className="fs-page utility-page" aria-busy="true">
@@ -114,6 +140,25 @@ export default function FeedbackStudioScene() {
               {feedbackStudio.backLabel} →
             </Link>
           </div>
+          <StudioBoardDevStatus placement="sidebar" />
+        </div>
+      </FeedbackStudioLayout>
+    );
+  }
+
+  if (pageState === "job-review" && review) {
+    return (
+      <FeedbackStudioLayout>
+        <div className="fs-page utility-page fs-page--review" aria-label="Job review workspace">
+          <UtilityPageHeader
+            backHref={studioBoard.routes.studioBoard}
+            activeNav="review-room"
+            title={feedbackStudio.pageTitle}
+            lead={`${feedbackStudio.pageSubtitle} — ${review.serviceName}`}
+          />
+
+          <JobReviewWorkspace review={review} onReviewUpdated={setReview} />
+
           <StudioBoardDevStatus placement="sidebar" />
         </div>
       </FeedbackStudioLayout>

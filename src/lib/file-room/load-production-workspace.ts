@@ -79,6 +79,7 @@ export async function loadProductionWorkspace(
     materials,
     activityEvents: activity,
     laneViews,
+    jobReviewFeedback: tasksEnvelope.jobReviewFeedback,
   });
 
   return {

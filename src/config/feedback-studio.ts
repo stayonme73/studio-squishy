@@ -13,7 +13,7 @@ export type FeedbackSectionId =
 
 export type StickyNoteColorId = "yellow" | "blue" | "coral";
 
-export type SectionReviewStatus = "neutral" | "approved" | "revision";
+export type SectionReviewStatus = "neutral" | "approved" | "revision" | "skip";
 
 export type FeedbackTool = "none" | "sticky" | "draw" | "voice";
 
@@ -123,6 +123,7 @@ export const feedbackStudio = {
   sectionStatus: {
     approved: "Approved",
     revision: "Revision requested",
+    skip: "Skipped",
     neutral: "Not reviewed",
   },
 
@@ -139,7 +140,12 @@ export const feedbackStudio = {
     drawAnnotation: "Draw Annotation",
     approveSection: "Approve Section",
     requestRevision: "Request Revision",
+    skipSection: "Skip Section",
     submitFeedback: "Submit Feedback",
+    requestRevisionJob: "Request Revision",
+    approveForDelivery: "Approve for Delivery",
+    revisionLimitNotice:
+      "Revision allowance reached — your request has been sent to the Owner Desk for a decision.",
     submitted: "Feedback submitted — thank you.",
     stickyPlaceholder: "Write your note…",
     saveSticky: "Place note",
@@ -156,6 +162,7 @@ export const feedbackStudio = {
       voice: (sec: number) => `Voice note saved (${sec}s)`,
       approve: (section: string) => `${section} approved`,
       revision: (section: string) => `Revision requested — ${section}`,
+      skip: (section: string) => `${section} skipped`,
       draw: "Annotation saved",
       submit: "Feedback submitted — thank you.",
     },
@@ -169,7 +176,17 @@ export const feedbackStudio = {
 
   notReady: {
     title: "Not ready for feedback yet",
-    body: "Your campaign concepts will appear here when the Studio finishes building them.",
+    body: "Your deliverables will appear here when the Studio finishes preparing them for review.",
+  },
+
+  jobReview: {
+    pickerTitle: "Review your deliverables",
+    pickerLead: "Your Studio team prepared deliverables for your review. Open the review workspace to leave feedback.",
+    openReviewCta: "Open review",
+    serviceLabel: "Service",
+    deliverableReady: "Ready for review",
+    submittedRevision: "Revision requested — returning to production.",
+    submittedApproval: "Approved for delivery — awaiting Owner final approval.",
   },
 
   noCampaign: {

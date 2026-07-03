@@ -134,6 +134,38 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
             ) : null}
           </FileRoomSectionCard>
 
+          {view.clientRevisionFeedback ? (
+            <FileRoomSectionCard title={productionWorkspace.clientRevisionFeedbackTitle}>
+              <p className="fr-control-room__section-lead">
+                {productionWorkspace.clientRevisionFeedbackLead}
+              </p>
+              <ul className="fr-production-workspace__notes">
+                {Object.entries(view.clientRevisionFeedback.sectionStatuses).map(([key, status]) =>
+                  status !== "neutral" ? (
+                    <li key={`status-${key}`} className="fr-production-workspace__note">
+                      <strong>{key}</strong> — {status}
+                    </li>
+                  ) : null,
+                )}
+                {view.clientRevisionFeedback.stickyNotes.map((note) => (
+                  <li key={note.id} className="fr-production-workspace__note">
+                    Sticky ({note.color}): {note.text}
+                  </li>
+                ))}
+                {view.clientRevisionFeedback.drawSections.map((key) => (
+                  <li key={`draw-${key}`} className="fr-production-workspace__note">
+                    Annotation on {key}
+                  </li>
+                ))}
+                {view.clientRevisionFeedback.voiceNotes.map((note) => (
+                  <li key={note.id} className="fr-production-workspace__note">
+                    Voice note ({note.durationSec}s) on {note.deliverableKey}
+                  </li>
+                ))}
+              </ul>
+            </FileRoomSectionCard>
+          ) : null}
+
           <FileRoomSectionCard title={productionWorkspace.internalNotesTitle}>
             <p className="fr-control-room__section-lead">{productionWorkspace.internalNotesLead}</p>
             {view.internalNotes.length === 0 ? (

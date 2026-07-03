@@ -43,4 +43,8 @@ export const productionWorkspace = {
   allPreparedLabel: "All deliverables prepared",
   clientNotesTitle: "Client-visible notes",
   clientNotesEmpty: "No client-facing notes on this campaign.",
+  clientRevisionFeedbackTitle: "Client revision feedback",
+  clientRevisionFeedbackLead:
+    "Feedback submitted from Review Room — sticky notes, section decisions, and annotations.",
+  clientRevisionFeedbackEmpty: "No client revision feedback on this job.",
 } as const;

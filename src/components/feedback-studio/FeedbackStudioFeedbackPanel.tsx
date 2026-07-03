@@ -12,6 +12,7 @@ import type {
 import { feedbackStudio, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
 
 type Props = {
+  mode?: "concept" | "job";
   focusedSection: FeedbackSectionId;
   focusedSectionLabel: string;
   visibleSectionIds: readonly FeedbackSectionId[];
@@ -38,10 +39,12 @@ type Props = {
   onVoiceToggle: () => void;
   onApprove: () => void;
   onRevision: () => void;
+  onSkip?: () => void;
   onSubmit: () => void;
 };
 
 export default function FeedbackStudioFeedbackPanel({
+  mode = "concept",
   focusedSectionLabel,
   visibleSectionIds,
   sectionLabels,
@@ -67,6 +70,7 @@ export default function FeedbackStudioFeedbackPanel({
   onVoiceToggle,
   onApprove,
   onRevision,
+  onSkip,
   onSubmit,
 }: Props) {
   const { feedbackPanel: copy, stickyNoteColors } = feedbackStudio;
@@ -131,6 +135,11 @@ export default function FeedbackStudioFeedbackPanel({
           <button type="button" className="fs-feedback-panel__btn fs-feedback-panel__btn--revision" onClick={onRevision}>
             <span aria-hidden>🔄</span> {copy.requestRevision}
           </button>
+          {onSkip ? (
+            <button type="button" className="fs-feedback-panel__btn" onClick={onSkip}>
+              <span aria-hidden>⏭</span> {copy.skipSection}
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -202,14 +211,16 @@ export default function FeedbackStudioFeedbackPanel({
         sectionLabels={sectionLabels}
       />
 
-      <button
-        type="button"
-        className="utility-btn utility-btn--primary fs-feedback-panel__submit"
-        onClick={onSubmit}
-        disabled={submitted}
-      >
-        {copy.submitFeedback}
-      </button>
+      {mode === "concept" ? (
+        <button
+          type="button"
+          className="utility-btn utility-btn--primary fs-feedback-panel__submit"
+          onClick={onSubmit}
+          disabled={submitted}
+        >
+          {copy.submitFeedback}
+        </button>
+      ) : null}
     </aside>
   );
 }

@@ -38,7 +38,10 @@ export type JobActivityEventKind =
   | "refund"
   | "internal_note"
   | "working_file_ref"
-  | "deliverable_prepared";
+  | "deliverable_prepared"
+  | "client_review_feedback"
+  | "client_revision_request"
+  | "client_delivery_approval";
 
 export type JobInternalNote = {
   id: string;
