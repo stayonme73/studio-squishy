@@ -419,16 +419,14 @@ async function ensureUsers() {
   await mkdir(path.dirname(PATHS.users), { recursive: true });
   const users = await readJson(PATHS.users, []);
   const byId = new Map(users.map((user) => [user.id, user]));
-  const existing = byId.get(CLIENT_USER_ID) ?? {};
   byId.set(CLIENT_USER_ID, {
-    password: CLIENT_PASSWORD,
-    ...existing,
     id: CLIENT_USER_ID,
     email: CLIENT_EMAIL,
+    password: CLIENT_PASSWORD,
     displayName: CLIENT_DISPLAY_NAME,
     roles: ["client"],
     currentCampaignId: CAMPAIGN_ID,
-    clientCampaignIds: [...new Set([...(existing.clientCampaignIds ?? []), CAMPAIGN_ID])],
+    clientCampaignIds: [CAMPAIGN_ID],
   });
   await writeFile(PATHS.users, JSON.stringify([...byId.values()], null, 2), "utf8");
 }

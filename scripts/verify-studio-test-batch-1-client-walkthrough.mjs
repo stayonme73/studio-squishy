@@ -12,6 +12,7 @@ import path from "node:path";
 import {
   CAMPAIGN_ID,
   CLIENT_EMAIL,
+  CLIENT_PASSWORD,
   CLIENT_USER_ID,
   REQUIRED_SOCIAL_MATERIALS,
   SOCIAL_JOB_ID,
@@ -132,9 +133,13 @@ function verifyUser(users) {
   const user = users.find((entry) => entry.id === CLIENT_USER_ID);
   assert(user, "Dedicated walkthrough client user missing.");
   assert(user.email === CLIENT_EMAIL, "Dedicated walkthrough client email mismatch.");
+  assert(user.password === CLIENT_PASSWORD, "Dedicated walkthrough client password mismatch.");
   assert(JSON.stringify(user.roles) === JSON.stringify(["client"]), "Dedicated walkthrough user should be client-only.");
   assert(user.currentCampaignId === CAMPAIGN_ID, "Dedicated walkthrough user's current campaign mismatch.");
-  assert(user.clientCampaignIds?.includes(CAMPAIGN_ID), "Dedicated walkthrough user should be linked to the campaign.");
+  assert(
+    JSON.stringify(user.clientCampaignIds) === JSON.stringify([CAMPAIGN_ID]),
+    "Dedicated walkthrough user should only be linked to the walkthrough campaign.",
+  );
 }
 
 function verifySourceBatchStillIntact(sourceCampaign, sourceTasks, sourceMaterials, sourceProduction) {
