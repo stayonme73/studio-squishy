@@ -20,6 +20,7 @@ import {
 } from "@/lib/route-map-campaign";
 import { resolveCustomerJourneySteps } from "@/lib/customer-journey";
 import { hasCampaignCreativeBrief } from "@/lib/campaign-brief-source";
+import { hasRouteMapProductionBrief, resolveRouteMapClientSummary } from "@/lib/route-map-production-brief";
 import { ensureConceptsReadyForReview } from "@/lib/studio-board-campaign";
 
 describe("route-map-v1 config", () => {
@@ -441,6 +442,8 @@ describe("route-map intake E2E paths (programmatic)", () => {
       });
       expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
       expect(getRouteMapIntakeSchema("rtu-flyer").title).toBe("Flyer Intake");
+      expect(resolveRouteMapClientSummary(submitted)).not.toBeNull();
+      expect(hasRouteMapProductionBrief(submitted)).toBe(true);
     } finally {
       restore();
     }
@@ -473,6 +476,7 @@ describe("route-map intake E2E paths (programmatic)", () => {
         publishTiming: "ASAP",
       });
       expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
+      expect(hasRouteMapProductionBrief(submitted)).toBe(true);
     } finally {
       restore();
     }
@@ -500,12 +504,38 @@ describe("route-map intake E2E paths (programmatic)", () => {
         sendingAccount: "Mailchimp",
       });
       expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
+      expect(hasRouteMapProductionBrief(submitted)).toBe(true);
     } finally {
       restore();
     }
   });
 
-  it("path 4: continuing V1 rm-j002 → social-setup intake unchanged", () => {
+  it("path 4: V2 short video → intake → Building Concepts + production brief", () => {
+    const job = getRouteMapJob("v2-rtu-short-video")!;
+    expect(job.intakeType).toBe("rtu-short-video");
+    let campaign = createCampaignFromRouteMapJob("v2-rtu-short-video", "i20")!;
+    campaign = {
+      ...campaign!,
+      paymentReceivedAt: new Date().toISOString(),
+      approvedStudioPlan: buildApprovedPlanFromRouteMapJob(job),
+    };
+    const restore = mockStorageCampaign(campaign);
+    try {
+      const submitted = submitRouteMapIntake({
+        videoPurpose: "Promo reel",
+        format: "Vertical",
+        footageMaterials: "Logo + b-roll",
+        onScreenText: "Book now",
+      });
+      expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
+      expect(hasRouteMapProductionBrief(submitted)).toBe(true);
+      expect(getRouteMapIntakeSchema("rtu-short-video").title).toBe("Short Video Intake");
+    } finally {
+      restore();
+    }
+  });
+
+  it("path 5: continuing V1 rm-j002 → social-setup intake unchanged", () => {
     const job = getRouteMapJob("rm-j002")!;
     expect(job.intakeType).toBe("social-setup");
     let campaign = createCampaignFromRouteMapJob("rm-j002", "i75")!;

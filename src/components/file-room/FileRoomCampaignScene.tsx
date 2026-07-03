@@ -12,10 +12,14 @@ import FileRoomProductionTasksSection from "./FileRoomProductionTasksSection";
 import FileRoomSectionCard from "./FileRoomSectionCard";
 import FileRoomStatusRail from "./FileRoomStatusRail";
 import FileRoomSyncBadge from "./FileRoomSyncBadge";
+import CopyProductionBriefButton from "@/components/campaign-details/CopyProductionBriefButton";
+import { RouteMapProductionBriefPanel } from "@/components/route-map/RouteMapIntakeSummaryPanels";
+import type { CampaignRecord } from "@/config/studio-board";
 
 type FileRoomCampaignSceneProps = {
   view: FileRoomCampaignView;
   campaignId: string;
+  campaignRecord?: CampaignRecord | null;
   canReviewMaterials: boolean;
   operatorContext: FileRoomTaskOperatorContext;
   exceptionOperatorContext: FileRoomExceptionOperatorContext;
@@ -28,6 +32,7 @@ type FileRoomCampaignSceneProps = {
 export default function FileRoomCampaignScene({
   view,
   campaignId,
+  campaignRecord,
   canReviewMaterials,
   operatorContext,
   exceptionOperatorContext,
@@ -178,6 +183,17 @@ export default function FileRoomCampaignScene({
           {view.approvedDirection ? (
             <FileRoomSectionCard title="Approved direction">
               <p className="fr-kv-list__value">{view.approvedDirection}</p>
+            </FileRoomSectionCard>
+          ) : null}
+
+          {view.routeMapProductionBrief ? (
+            <FileRoomSectionCard title="Production brief">
+              {campaignRecord ? (
+                <div style={{ marginBottom: "0.75rem" }}>
+                  <CopyProductionBriefButton campaign={campaignRecord} />
+                </div>
+              ) : null}
+              <RouteMapProductionBriefPanel brief={view.routeMapProductionBrief} />
             </FileRoomSectionCard>
           ) : null}
 

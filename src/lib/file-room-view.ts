@@ -16,6 +16,12 @@ import {
   type CampaignCreativeBrief,
 } from "@/lib/campaign-brief-source";
 import {
+  resolveRouteMapClientSummary,
+  resolveRouteMapProductionBrief,
+  type RouteMapClientSummary,
+  type RouteMapProductionBrief,
+} from "@/lib/route-map-production-brief";
+import {
   resolveCampaignDisplayName,
   resolveVisionData,
 } from "@/lib/campaign-record";
@@ -88,6 +94,8 @@ export type FileRoomCampaignView = {
   deliverableScope: readonly FileRoomDeliverableScopeGroup[];
   approvedDirection: string | null;
   creativeBrief: CampaignCreativeBrief | null;
+  routeMapClientSummary: RouteMapClientSummary | null;
+  routeMapProductionBrief: RouteMapProductionBrief | null;
   progressSteps: readonly CampaignProgressStep[];
   sync: FileRoomSyncMeta;
   health: FileRoomRecordHealth;
@@ -234,6 +242,8 @@ export function resolveFileRoomCampaignView(
     deliverableScope: resolveDeliverableScopeGroups(record),
     approvedDirection: record.selectedCampaignOption?.trim() || null,
     creativeBrief: resolveCampaignCreativeBrief(record),
+    routeMapClientSummary: resolveRouteMapClientSummary(record),
+    routeMapProductionBrief: resolveRouteMapProductionBrief(record),
     progressSteps: resolveCampaignProgressSteps(record),
     sync: {
       campaignId: envelope.campaignId,

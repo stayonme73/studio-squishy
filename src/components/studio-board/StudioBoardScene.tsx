@@ -9,6 +9,7 @@ import CampaignBriefActions from "@/components/campaign-details/CampaignBriefAct
 import CampaignNextAction from "@/components/studio-board/CampaignNextAction";
 import CampaignProgressPanel from "@/components/studio-board/CampaignProgressPanel";
 import CampaignRecordDrawer from "@/components/studio-board/CampaignRecordDrawer";
+import RouteMapProductionBriefDrawer from "@/components/route-map/RouteMapProductionBriefDrawer";
 import DeliverablesProgress from "@/components/studio-board/DeliverablesProgress";
 import MaterialsIntakePanel from "@/components/materials/MaterialsIntakePanel";
 import PackageSummaryPanel from "@/components/studio-board/PackageSummaryPanel";
@@ -189,6 +190,7 @@ export default function StudioBoardScene() {
   const { campaign, ready } = useCurrentCampaign();
   const greetingPeriod = useLiveGreetingPeriod();
   const [recordOpen, setRecordOpen] = useState(false);
+  const [productionBriefOpen, setProductionBriefOpen] = useState(false);
 
   const view = useMemo(() => resolveStudioBoardView(campaign), [campaign]);
   const account = useMemo(() => resolveAccountPackageView(campaign), [campaign]);
@@ -205,6 +207,9 @@ export default function StudioBoardScene() {
 
   useEffect(() => {
     if (searchParams.get("record") === "open") setRecordOpen(true);
+    if (process.env.NODE_ENV === "development" && searchParams.get("productionBrief") === "open") {
+      setProductionBriefOpen(true);
+    }
   }, [searchParams]);
 
   return (
@@ -421,6 +426,11 @@ export default function StudioBoardScene() {
       </div>
 
       <CampaignRecordDrawer open={recordOpen} onClose={() => setRecordOpen(false)} />
+      <RouteMapProductionBriefDrawer
+        campaign={campaign}
+        open={productionBriefOpen}
+        onClose={() => setProductionBriefOpen(false)}
+      />
     </div>
   );
 }

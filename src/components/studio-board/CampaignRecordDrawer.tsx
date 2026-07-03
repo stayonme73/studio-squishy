@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import CopyCampaignBriefButton from "@/components/campaign-details/CopyCampaignBriefButton";
 import CampaignVisionSummary from "@/components/campaign-details/CampaignVisionSummary";
+import { RouteMapClientSummaryPanel } from "@/components/route-map/RouteMapIntakeSummaryPanels";
 import { studioBoard } from "@/config/studio-board";
 import { resolveCampaignDetailsView } from "@/lib/campaign-details-view";
 import { draftRoomEditHref, isIntakeEditable } from "@/lib/intake-edit";
@@ -127,9 +128,14 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
               ))}
             </div>
           ) : null}
+          {view.hasRouteMapClientSummary && view.routeMapClientSummary ? (
+            <RouteMapClientSummaryPanel summary={view.routeMapClientSummary} />
+          ) : null}
           {view.hasVisionSummary ? (
             <CampaignVisionSummary sections={view.visionSummary} />
-          ) : view.hasProjectDetailsSummary || view.packageIncludes.length > 0 ? null : (
+          ) : view.hasRouteMapClientSummary ||
+            view.hasProjectDetailsSummary ||
+            view.packageIncludes.length > 0 ? null : (
             <p className="sb-record-drawer__empty">{copy.emptyHint}</p>
           )}
           {view.deliverables.ready ? (

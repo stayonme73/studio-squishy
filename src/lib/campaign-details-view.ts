@@ -30,6 +30,10 @@ import {
   resolveCampaignPlanIncludes,
   resolveCampaignPlanLabel,
 } from "@/lib/approved-plan-display";
+import {
+  resolveRouteMapClientSummary,
+  type RouteMapClientSummary,
+} from "@/lib/route-map-production-brief";
 
 const { campaignDetails: copy, statusContent } = studioBoard;
 
@@ -58,6 +62,8 @@ export type CampaignDetailsView = {
   hasVisionSummary: boolean;
   projectDetailsSummary: readonly ProjectDetailsSummarySection[];
   hasProjectDetailsSummary: boolean;
+  routeMapClientSummary: RouteMapClientSummary | null;
+  hasRouteMapClientSummary: boolean;
   revisionTracker: RevisionTrackerView | null;
   deliverablesRemaining: DeliverableRemainingItem[];
   packageIncludes: readonly string[];
@@ -144,6 +150,8 @@ const emptyView: CampaignDetailsView = {
   hasVisionSummary: false,
   projectDetailsSummary: [],
   hasProjectDetailsSummary: false,
+  routeMapClientSummary: null,
+  hasRouteMapClientSummary: false,
   revisionTracker: null,
   deliverablesRemaining: [],
   packageIncludes: [],
@@ -219,6 +227,7 @@ export function resolveCampaignDetailsView(
   const hasIntake = Boolean(resolveIntake(campaign));
   const greenServiceIds = resolveApprovedGreenServiceIds(campaign.approvedStudioPlan);
   const projectDetailsSummary = buildProjectDetailsSummary(campaign.projectDetails, greenServiceIds);
+  const routeMapClientSummary = resolveRouteMapClientSummary(campaign);
 
   return {
     hasCampaign: true,
@@ -232,6 +241,8 @@ export function resolveCampaignDetailsView(
     hasVisionSummary: visionSummary.length > 0 || hasIntake,
     projectDetailsSummary,
     hasProjectDetailsSummary: projectDetailsSummary.length > 0,
+    routeMapClientSummary,
+    hasRouteMapClientSummary: routeMapClientSummary !== null,
     revisionTracker: resolveRevisionTracker(campaign),
     deliverablesRemaining: resolveDeliverablesRemaining(campaign),
     packageIncludes: resolveCampaignPlanIncludes(campaign),

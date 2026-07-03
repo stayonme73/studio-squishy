@@ -133,6 +133,7 @@ export default async function FileRoomCampaignPage({ params }: FileRoomCampaignP
       <FileRoomCampaignScene
         view={view}
         campaignId={campaignId}
+        campaignRecord={result.envelope.record}
         canReviewMaterials={canReview}
         operatorContext={operatorContext}
         exceptionOperatorContext={exceptionOperatorContext}
