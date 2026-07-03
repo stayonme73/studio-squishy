@@ -13,6 +13,11 @@ import {
   type OwnerConsoleScanView,
 } from "@/lib/campaign-tasks/owner-console-scan-view";
 import { resolveOwnerConsoleAccess } from "@/lib/campaign-tasks/owner-console-access";
+import {
+  filterBundlesForControlRoom,
+  resolveOwnerControlRoomView,
+  type OwnerControlRoomView,
+} from "@/lib/job-control/control-room-view";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { loadFileRoomCampaignList } from "@/lib/file-room/load-campaign";
@@ -23,6 +28,7 @@ export type OwnerConsoleAggregateResult =
       kind: "ok";
       view: ReturnType<typeof resolveOwnerConsoleView>;
       scan: OwnerConsoleScanView;
+      controlRoom: OwnerControlRoomView;
       refreshedAt: string;
     };
 
@@ -92,10 +98,14 @@ export async function loadOwnerConsoleAggregate(
     resolveWaitingOwnerExceptionIds(view.waitingOnOwner),
   );
 
+  const controlRoomBundles = filterBundlesForControlRoom(rawBundles);
+  const controlRoom = resolveOwnerControlRoomView(controlRoomBundles);
+
   return {
     kind: "ok",
     view,
     scan,
+    controlRoom,
     refreshedAt: new Date().toISOString(),
   };
 }

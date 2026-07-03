@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { fileRoom, FILE_ROOM_ROUTE } from "@/config/file-room";
 import { ownerConsole, ownerConsoleCampaignRoute } from "@/config/owner-console";
 import type { OwnerConsoleScanView } from "@/lib/campaign-tasks/owner-console-scan-view";
+import type { OwnerControlRoomView } from "@/lib/job-control/control-room-view";
 import type {
   OwnerConsoleCampaignContext,
   OwnerConsoleDecisionCard,
@@ -18,6 +19,7 @@ import {
   FileRoomOwnerConsoleDecisionPanels,
 } from "./FileRoomOwnerConsolePanels";
 import FileRoomOwnerConsoleScanSection from "./FileRoomOwnerConsoleScanSection";
+import FileRoomOwnerControlRoomPanels from "./FileRoomOwnerControlRoomPanels";
 import FileRoomOwnerDecisionCard from "./FileRoomOwnerDecisionCard";
 import FileRoomSectionCard from "./FileRoomSectionCard";
 import { useOwnerConsoleActions } from "./useOwnerConsoleActions";
@@ -25,6 +27,7 @@ import { useOwnerConsoleActions } from "./useOwnerConsoleActions";
 type FileRoomOwnerConsoleSceneProps = {
   view: OwnerConsoleView;
   scan: OwnerConsoleScanView;
+  controlRoom: OwnerControlRoomView;
   refreshedAt: string;
 };
 
@@ -37,6 +40,7 @@ function campaignContextById(
 export default function FileRoomOwnerConsoleScene({
   view,
   scan,
+  controlRoom,
   refreshedAt,
 }: FileRoomOwnerConsoleSceneProps) {
   const contexts = useMemo(() => campaignContextById(view.campaigns), [view.campaigns]);
@@ -175,6 +179,8 @@ export default function FileRoomOwnerConsoleScene({
           </div>
         </div>
       )}
+
+      <FileRoomOwnerControlRoomPanels controlRoom={controlRoom} />
 
       <FileRoomOwnerConsoleScanSection scan={scan} />
 

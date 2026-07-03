@@ -4,6 +4,7 @@ import type {
   CampaignExceptionEvent,
   CampaignExceptionRecord,
 } from "./exceptions-types";
+import type { JobActivityEvent, PurchasedJobRecord } from "@/lib/job-control/types";
 
 export type {
   CampaignExceptionEvent,
@@ -179,8 +180,12 @@ export type CampaignTasksRecord = {
   exceptionRecords?: CampaignExceptionRecord[];
   /** Append-only exception audit trail (schema v5). */
   exceptionEvents?: CampaignExceptionEvent[];
+  /** Job-level spine records — one per purchased production SKU (schema v7). */
+  jobRecords?: PurchasedJobRecord[];
+  /** Append-only job activity timeline (schema v7). */
+  jobActivityEvents?: JobActivityEvent[];
   updatedAt: string;
-  /** Envelope schema version — 6 adds exception promotion records. */
+  /** Envelope schema version — 7 adds job spine + activity log. */
   version: number;
 };
 

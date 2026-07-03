@@ -1479,3 +1479,217 @@
   font-size: var(--type-helper);
   color: var(--utility-text-muted);
 }
+
+/* Owner Control Room — job spine (extends Owner Console) */
+.fr-control-room {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.fr-control-room__header {
+  margin-bottom: 0.25rem;
+}
+
+.fr-control-room__title {
+  margin: 0 0 0.35rem;
+  font-size: var(--type-section-title, 1.25rem);
+}
+
+.fr-control-room__section-lead {
+  margin: 0 0 0.75rem;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-control-room-desk {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fr-control-room-desk__item {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--utility-border-subtle, rgba(0, 0, 0, 0.08));
+  border-radius: 0.35rem;
+}
+
+.fr-control-room-desk__reason {
+  display: inline-block;
+  font-size: var(--type-helper);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #b54708;
+}
+
+.fr-control-room-desk__meta {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-control-room-desk__title {
+  margin: 0.5rem 0 0.25rem;
+  font-weight: 600;
+}
+
+.fr-control-room-desk__detail {
+  margin: 0 0 0.5rem;
+  font-size: var(--type-body);
+}
+
+.fr-control-room-lanes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 959px) {
+  .fr-control-room-lanes {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fr-control-room-lane {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--utility-border-subtle, rgba(0, 0, 0, 0.08));
+  border-radius: 0.35rem;
+}
+
+.fr-control-room-lane__head {
+  margin-bottom: 0.75rem;
+}
+
+.fr-control-room-lane__title {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.fr-control-room-lane__capacity {
+  margin: 0;
+  font-size: var(--type-helper);
+  color: var(--utility-text-muted);
+}
+
+.fr-control-room-lane__subtitle {
+  margin: 0 0 0.35rem;
+  font-size: var(--type-helper);
+  font-weight: 600;
+}
+
+.fr-control-room-lane__section {
+  margin-bottom: 0.75rem;
+}
+
+.fr-control-room-lane__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fr-control-room-lane__job {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.45rem 0;
+  border-top: 1px solid var(--utility-border-subtle, rgba(0, 0, 0, 0.06));
+  font-size: var(--type-helper);
+}
+
+.fr-control-room-lane__job-name {
+  font-weight: 500;
+}
+
+.fr-control-room-lane__job-status {
+  color: var(--utility-text-muted);
+}
+
+.fr-control-room-waiting {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fr-control-room-waiting__item {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--utility-border-subtle, rgba(0, 0, 0, 0.08));
+  border-radius: 0.35rem;
+}
+
+.fr-control-room-waiting__badge {
+  margin: 0.35rem 0;
+  font-size: var(--type-helper);
+  font-weight: 600;
+  color: #b54708;
+}
+
+.fr-control-room-waiting__fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem 1rem;
+  margin: 0.5rem 0 0;
+  font-size: var(--type-helper);
+}
+
+.fr-control-room-waiting__fields dt {
+  font-weight: 600;
+  color: var(--utility-text-muted);
+}
+
+.fr-control-room-waiting__fields dd {
+  margin: 0.15rem 0 0;
+}
+
+.fr-control-room-activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--utility-border-subtle, rgba(0, 0, 0, 0.1));
+}
+
+.fr-control-room-activity__item {
+  position: relative;
+  padding: 0.65rem 0 0.65rem 1rem;
+  margin-left: 0.5rem;
+  font-size: var(--type-helper);
+}
+
+.fr-control-room-activity__item::before {
+  content: "";
+  position: absolute;
+  left: -0.55rem;
+  top: 0.95rem;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--utility-text-muted);
+}
+
+.fr-control-room-activity__when {
+  display: block;
+  color: var(--utility-text-muted);
+}
+
+.fr-control-room-activity__kind {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.fr-control-room-activity__actor,
+.fr-control-room-activity__job {
+  color: var(--utility-text-muted);
+}
+
+.fr-control-room-activity__reason,
+.fr-control-room-activity__message {
+  margin: 0.25rem 0 0;
+}
