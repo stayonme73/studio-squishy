@@ -3,7 +3,6 @@
 import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import type { DraftIntakeFormValues } from "@/config/draft-room";
 import type { ProjectDetailsRecord } from "@/config/project-details";
-import { projectDiscoveryHref } from "@/config/customer-journey-v1";
 import type { FeedbackConceptPreview } from "@/config/feedback-studio";
 import type { DeliverableQuotaId, StudioGuidePackageId } from "@/config/studio-guide";
 import type { DiscoveryBriefAnswers } from "@/recommendation/types";
@@ -181,7 +180,7 @@ export const studioBoard = {
 
   routes: {
     studioBoard: "/studio-board",
-    newCampaign: "/business-discovery-studio?package=momentum",
+    newCampaign: "/route-map",
     /** @deprecated legacy URL — redirects to Project Discovery */
     draftRoom: "/draft-room",
     pastCampaigns: "/past-campaigns",
@@ -742,10 +741,9 @@ export const studioBoard = {
 export type StudioBoardPrimaryRoute =
   (typeof studioBoard.statusContent)[CampaignStatus]["primaryRoute"];
 
-export function studioBoardDraftRoomHref(
-  packageId: MembershipRecord["packageId"] = studioBoard.membership.packageId,
-) {
-  return projectDiscoveryHref(packageId);
+/** New Campaign — Route Map V2 is the sole live client entry. */
+export function studioBoardDraftRoomHref() {
+  return studioBoard.routes.newCampaign;
 }
 
 export function studioBoardStudioGuideHref(

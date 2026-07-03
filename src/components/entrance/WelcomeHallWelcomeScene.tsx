@@ -180,12 +180,6 @@ export default function WelcomeHallWelcomeScene() {
               <Link
                 href={item.href}
                 className="hall-mobile-studio-nav__link"
-                title={"title" in item ? item.title : undefined}
-                aria-label={
-                  "title" in item && item.title
-                    ? `${item.label}. ${item.title}`
-                    : undefined
-                }
               >
                 {item.label}
               </Link>

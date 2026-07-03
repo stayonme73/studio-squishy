@@ -88,13 +88,21 @@ describe("syncCampaignToServer auth guard", () => {
     expect(urls).toEqual([expect.stringContaining("/api/campaigns/current")]);
   });
 
-  it("file-room remains protected after sync without login", async () => {
+  it("file-room and studio-kitchen remain protected after sync without login", async () => {
     vi.stubEnv("NODE_ENV", "development");
     await syncCampaignToServer(minimalCampaign(campaignId));
 
     const { handleProtectedRoutes } = await import("../../../proxy");
     const fileRoomRes = await handleProtectedRoutes(makeNextRequest("/file-room"));
     expect(fileRoomRes?.status).toBe(401);
+
+    const kitchenRes = await handleProtectedRoutes(makeNextRequest("/studio-kitchen"));
+    expect(kitchenRes?.status).toBe(401);
+
+    const kitchenDetailRes = await handleProtectedRoutes(
+      makeNextRequest("/studio-kitchen/demo-campaign"),
+    );
+    expect(kitchenDetailRes?.status).toBe(401);
 
     const status = readCampaignSyncStatus();
     expect(status?.state).toBe("error");

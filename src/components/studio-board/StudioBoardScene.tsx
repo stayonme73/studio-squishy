@@ -38,11 +38,9 @@ const {
 } = studioBoard;
 
 type SidebarIconName =
-  | "hall"
   | "board"
   | "new"
   | "help"
-  | "guide"
   | "record"
   | "review"
   | "delivery";
@@ -61,13 +59,6 @@ function useLiveGreetingPeriod() {
 
 function SidebarIcon({ name }: { name: SidebarIconName }) {
   switch (name) {
-    case "hall":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-          <path d="M5 20V9l7-5 7 5v11" strokeLinejoin="round" />
-          <path d="M9 20v-6h6v6" strokeLinejoin="round" />
-        </svg>
-      );
     case "board":
       return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
@@ -90,14 +81,6 @@ function SidebarIcon({ name }: { name: SidebarIconName }) {
           <circle cx="12" cy="12" r="9" />
           <path d="M9.5 9.25a2.75 2.75 0 0 1 4.75 1.75c0 1.75-2.25 2-2.25 3.75" strokeLinecap="round" />
           <circle cx="12" cy="17" r="0.75" fill="currentColor" stroke="none" />
-        </svg>
-      );
-    case "guide":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-          <path d="M5 5.5h5.5v13H5a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1Z" strokeLinejoin="round" />
-          <path d="M10.5 5.5H19a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-8.5" strokeLinejoin="round" />
-          <path d="M8 9h2M8 12.5h2M14 9h3M14 12.5h3" strokeLinecap="round" />
         </svg>
       );
     case "record":
@@ -195,10 +178,7 @@ export default function StudioBoardScene() {
   const view = useMemo(() => resolveStudioBoardView(campaign), [campaign]);
   const account = useMemo(() => resolveAccountPackageView(campaign), [campaign]);
 
-  const draftRoomHref = useMemo(
-    () => studioBoardDraftRoomHref(campaign?.packageId ?? membershipDefaults.packageId),
-    [campaign?.packageId],
-  );
+  const newCampaignHref = studioBoardDraftRoomHref();
 
   const studioGuideHref = useMemo(
     () => studioBoardStudioGuideHref(campaign?.packageId ?? membershipDefaults.packageId),
@@ -243,9 +223,6 @@ export default function StudioBoardScene() {
         </div>
 
         <nav className="sb-nav" aria-label="Studio navigation">
-          <NavItem href={routes.welcomeHall} icon="hall">
-            {sidebar.welcomeHall}
-          </NavItem>
           <NavItem active accent="board" icon="board">
             {sidebar.studioBoard}
           </NavItem>
@@ -279,7 +256,7 @@ export default function StudioBoardScene() {
           <NavItem href={routes.helpCenter} icon="help" accent="help">
             {sidebar.helpCenter}
           </NavItem>
-          <NavItem href={draftRoomHref} icon="new">
+          <NavItem href={newCampaignHref} icon="new">
             {sidebar.newCampaign}
           </NavItem>
         </nav>
@@ -387,7 +364,7 @@ export default function StudioBoardScene() {
               ) : null}
 
               {!view.hasCampaign ? (
-                <Link href={draftRoomHref} className="utility-btn utility-btn--primary sb-current-campaign__record">
+                <Link href={newCampaignHref} className="utility-btn utility-btn--primary sb-current-campaign__record">
                   {emptyCopy.primaryCta}
                 </Link>
               ) : null}

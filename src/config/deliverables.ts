@@ -17,7 +17,7 @@ export const deliverables = {
   routes: {
     studioBoard: "/studio-board",
     campaignDetails: "/studio-board?record=open",
-    reviewRoom: "/review-room",
+    reviewRoom: "/feedback-studio",
     deliverables: "/deliverables",
     draftRoom: "/business-discovery-studio?package=momentum",
   },

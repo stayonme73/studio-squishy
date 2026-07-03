@@ -33,12 +33,6 @@ export const welcomeHallPhase1 = {
     heading: "Need Something Else?",
     items: [
       {
-        label: "Client Login",
-        href: studioBoard.routes.account,
-        title:
-          "Access your Studio Board, projects, reviews, and deliverables.",
-      },
-      {
         label: "Our Services",
         href: `${studioBoard.routes.helpCenter}#packages`,
       },

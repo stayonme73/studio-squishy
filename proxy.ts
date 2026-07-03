@@ -7,7 +7,7 @@ import { readSessionFromCookieHeader } from "@/lib/auth/session";
 export async function handleProtectedRoutes(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/file-room")) {
+  if (pathname.startsWith("/file-room") || pathname.startsWith("/studio-kitchen")) {
     const user = await readSessionFromCookieHeader(request.headers.get("cookie"));
     if (!user || !isStaffOrOwner(user)) {
       return NextResponse.json({ error: "Owner or staff access required" }, { status: 401 });
@@ -36,5 +36,12 @@ export async function handleProtectedRoutes(request: NextRequest) {
 export default handleProtectedRoutes;
 
 export const config = {
-  matcher: ["/file-room", "/file-room/(.*)", "/api/campaigns", "/api/campaigns/(.*)"],
+  matcher: [
+    "/file-room",
+    "/file-room/(.*)",
+    "/studio-kitchen",
+    "/studio-kitchen/(.*)",
+    "/api/campaigns",
+    "/api/campaigns/(.*)",
+  ],
 };

@@ -61,7 +61,8 @@ export const customerJourneyV1 = {
       order: 7,
       id: "review-room",
       name: "Review Room",
-      route: "/review-room",
+      route: "/feedback-studio",
+      routeAliases: ["/review-room"] as const,
     },
     {
       order: 8,
