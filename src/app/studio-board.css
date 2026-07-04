@@ -5461,12 +5461,16 @@ body:has(.sb--v4) {
     order: 4;
   }
 
-  .sb--v4 .sb-board-layout .sb-card--studio-note {
+  .sb--v4 .sb-board-layout .sb-card--materials {
     order: 5;
   }
 
-  .sb--v4 .sb-board-layout .sb-card--account-secondary {
+  .sb--v4 .sb-board-layout .sb-card--studio-note {
     order: 6;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--account-secondary {
+    order: 7;
   }
 
   .sb--v4 .sb-progress-panel__fit,
@@ -6267,6 +6271,13 @@ body:has(.sb--v4) {
     min-height: 0;
   }
 
+  .sb--v4 .sb-board-layout .sb-card--current,
+  .sb--v4 .sb-board-layout .sb-card--progress,
+  .sb--v4 .sb-board-layout .sb-card--studio-note {
+    min-height: clamp(42rem, 72vh, 52rem);
+    overflow: visible;
+  }
+
   .sb--v4 .sb-board-layout .sb-card--package .sb-package-summary,
   .sb--v4 .sb-progress-panel__body,
   .sb--v4 .sb-studio-note-letter,
@@ -6362,6 +6373,11 @@ body:has(.sb--v4) {
     gap: clamp(0.75rem, 0.8vw, 1rem);
   }
 
+  .sb--v4 .sb-materials-intake__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
   .sb--v4 .sb-journey__row,
   .sb--v4 .sb-progress-timeline__step,
   .sb--v4 .sb-deliverables-progress__item {
@@ -6432,7 +6448,7 @@ body:has(.sb--v4) {
   }
 
   .sb--v4 .sb-board-layout {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .sb--v4 .sb-board-layout .sb-card--current {
@@ -6461,13 +6477,13 @@ body:has(.sb--v4) {
   }
 
   .sb--v4 .sb-board-layout .sb-card--studio-note {
-    grid-column: 1;
-    grid-row: 4;
+    grid-column: 3;
+    grid-row: 1;
   }
 
   .sb--v4 .sb-board-layout .sb-card--account-secondary {
-    grid-column: 2;
-    grid-row: 4;
+    grid-column: 3;
+    grid-row: 2;
   }
 }
 
