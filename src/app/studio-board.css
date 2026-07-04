@@ -6197,3 +6197,276 @@ body:has(.sb--v4) {
     font-size: 0.92rem;
   }
 }
+
+/* Client readability baseline V1 — active Studio Board surfaces */
+@media screen and (min-width: 1025px) {
+  .sb.sb--v4 {
+    --sb-type-xs: clamp(0.875rem, 0.82vw, 0.98rem);
+    --sb-type-sm: clamp(1rem, 0.92vw, 1.12rem);
+    --sb-type-base: clamp(1rem, 0.98vw, 1.18rem);
+    --sb-type-md: clamp(1.16rem, 1.08vw, 1.34rem);
+    --sb-type-lg: clamp(1.38rem, 1.28vw, 1.64rem);
+    --sb-type-display: clamp(1.78rem, 1.9vw, 2.22rem);
+    --sb-tile-padding-y: clamp(1.12rem, 1.15vw, 1.45rem);
+    --sb-tile-padding-x: clamp(1.12rem, 1.2vw, 1.5rem);
+    --sb-grid-gap: clamp(0.95rem, 1.05vw, 1.35rem);
+  }
+
+  .sb--v4 .sb-main {
+    padding: clamp(1rem, 1.2vw, 1.35rem);
+  }
+
+  .sb--v4 .sb-header-v3 {
+    margin-bottom: clamp(0.95rem, 1.1vw, 1.25rem);
+  }
+
+  .sb--v4 .sb-board-layout {
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+    align-items: stretch;
+    gap: var(--sb-grid-gap);
+    padding-right: 0.45rem;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--current {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--progress {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--studio-note {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--deliverables {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--package {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--account-secondary {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--materials {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card {
+    min-height: 0;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--package .sb-package-summary,
+  .sb--v4 .sb-progress-panel__body,
+  .sb--v4 .sb-studio-note-letter,
+  .sb--v4 .sb-studio-note-board,
+  .sb--v4 .sb-card--materials {
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-card__tab,
+  .sb--v4 .sb-current-campaign__label,
+  .sb--v4 .sb-account__label,
+  .sb--v4 .sb-progress-panel__timeline-heading,
+  .sb--v4 .sb-progress-panel__update-date,
+  .sb--v4 .sb-progress-panel__pipeline-summary,
+  .sb--v4 .sb-materials-intake__status,
+  .sb--v4 .sb-materials-intake__field-label,
+  .sb--v4 .sb-record-drawer__section-title,
+  .sb--v4 .sb-record-drawer .cd-vision__eyebrow,
+  .sb--v4 .sb-record-drawer .cd-vision__label,
+  .sb--v4 .sb-record-drawer .cd-deliverables__hint {
+    font-size: max(0.875rem, 14px);
+    line-height: 1.35;
+  }
+
+  .sb--v4 .sb-nav__item,
+  .sb--v4 .sb-current-campaign__value,
+  .sb--v4 .sb-current-campaign__empty,
+  .sb--v4 .sb-next-action__lead,
+  .sb--v4 .sb-next-action__hint,
+  .sb--v4 .sb-next-action__eta,
+  .sb--v4 .sb-journey__label,
+  .sb--v4 .sb-journey__detail,
+  .sb--v4 .sb-progress-timeline__label,
+  .sb--v4 .sb-progress-timeline__detail,
+  .sb--v4 .sb-progress-panel__update-message,
+  .sb--v4 .sb-progress-panel__timeline-empty,
+  .sb--v4 .sb-deliverables-progress__label,
+  .sb--v4 .sb-deliverables-progress__count,
+  .sb--v4 .sb-deliverables-progress__download,
+  .sb--v4 .sb-deliverables-progress__empty,
+  .sb--v4 .sb-package-summary__item,
+  .sb--v4 .sb-package-summary__empty,
+  .sb--v4 .sb-package-summary__link,
+  .sb--v4 .sb-account__value,
+  .sb--v4 .sb-account__empty,
+  .sb--v4 .sb-account__usage-label,
+  .sb--v4 .sb-account__renewal-date,
+  .sb--v4 .sb-materials-intake__lead,
+  .sb--v4 .sb-materials-intake__meta,
+  .sb--v4 .sb-materials-intake__error,
+  .sb--v4 .sb-materials-intake__reason,
+  .sb--v4 .sb-materials-intake__clarify,
+  .sb--v4 .sb-materials-intake__pending,
+  .sb--v4 .sb-materials-intake__success,
+  .sb--v4 .sb-materials-intake__toggle,
+  .sb--v4 .sb-materials-intake__input,
+  .sb--v4 .sb-record-drawer__hint,
+  .sb--v4 .sb-record-drawer__locked,
+  .sb--v4 .sb-record-drawer__empty,
+  .sb--v4 .sb-record-drawer .cd-package-list__item,
+  .sb--v4 .sb-record-drawer .cd-vision__value,
+  .sb--v4 .sb-record-drawer .cd-vision__empty,
+  .sb--v4 .sb-record-drawer .cd-deliverables__message,
+  .sb--v4 .sb-record-drawer .cd-deliverables__link {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .sb--v4 .sb-current-campaign__name,
+  .sb--v4 .sb-package-summary__package,
+  .sb--v4 .sb-materials-intake__prompt,
+  .sb--v4 .sb-record-drawer__title {
+    line-height: 1.24;
+  }
+
+  .sb--v4 .sb-current-campaign__metric,
+  .sb--v4 .sb-account__row {
+    grid-template-columns: minmax(8.5rem, 11.5rem) minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 0.7rem 0.8rem;
+  }
+
+  .sb--v4 .sb-next-action {
+    padding: 1rem 1.08rem;
+  }
+
+  .sb--v4 .sb-journey,
+  .sb--v4 .sb-progress-timeline,
+  .sb--v4 .sb-deliverables-progress,
+  .sb--v4 .sb-package-summary__list,
+  .sb--v4 .sb-materials-intake,
+  .sb--v4 .sb-materials-intake__list {
+    gap: clamp(0.75rem, 0.8vw, 1rem);
+  }
+
+  .sb--v4 .sb-journey__row,
+  .sb--v4 .sb-progress-timeline__step,
+  .sb--v4 .sb-deliverables-progress__item {
+    gap: 0.72rem;
+  }
+
+  .sb--v4 .sb-journey__marker,
+  .sb--v4 .sb-journey--board .sb-journey__dot {
+    width: 1.35rem;
+    height: 1.35rem;
+    font-size: 0.875rem;
+  }
+
+  .sb--v4 .sb-studio-note-letter {
+    padding: 0.5rem 0.25rem 0.6rem;
+  }
+
+  .sb--v4 .sb-studio-note-letter__line--body {
+    font-size: 1rem;
+    line-height: 1.62;
+  }
+
+  .sb--v4 .sb-materials-intake__item {
+    padding: clamp(1rem, 1.1vw, 1.3rem);
+  }
+
+  .sb--v4 .sb-materials-intake__fields {
+    gap: 0.85rem;
+  }
+
+  .sb--v4 .sb-materials-intake__input {
+    min-height: 3rem;
+    padding: 0.78rem 0.85rem;
+  }
+
+  .sb--v4 .sb-materials-intake__submit,
+  .sb--v4 .sb-materials-intake__file-button,
+  .sb--v4 .utility-btn,
+  .sb--v4 .campaign-brief-actions--prominent .campaign-brief-actions__view,
+  .sb--v4 .sb-record-drawer__close,
+  .sb--v4 .sb-record-drawer .cd-deliverables__cta {
+    min-height: 2.75rem;
+    font-size: max(0.94rem, 15px);
+    line-height: 1.25;
+  }
+
+  .sb--v4 .sb-record-drawer__panel {
+    width: min(62vw, 58rem);
+    min-width: min(100%, 32rem);
+  }
+
+  .sb--v4 .sb-record-drawer__header {
+    padding: 1.35rem 1.5rem 1.08rem;
+  }
+
+  .sb--v4 .sb-record-drawer__body {
+    padding: 1.25rem 1.5rem 1.6rem;
+  }
+
+  .sb--v4 .sb-record-drawer .cd-vision__answers {
+    gap: 0.8rem;
+  }
+}
+
+@media screen and (min-width: 1025px) and (max-width: 1399px) {
+  .sb.sb--v4 {
+    --sb-sidebar: clamp(16.5rem, 18vw, 18.5rem);
+  }
+
+  .sb--v4 .sb-board-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--current {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--progress {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--deliverables {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--package {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--materials {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--studio-note {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--account-secondary {
+    grid-column: 2;
+    grid-row: 4;
+  }
+}

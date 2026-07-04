@@ -180,7 +180,7 @@ export default function RouteMapScene() {
                 ← Back to job details
               </button>
               <SecureCheckoutGrid
-                layout="embedded"
+                layout="full"
                 planSummary={paymentSummary}
                 onBeforePayment={(acknowledgment) => {
                   if (!selectedJobId) return false;
