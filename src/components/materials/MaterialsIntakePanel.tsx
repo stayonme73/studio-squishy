@@ -20,9 +20,31 @@ type MaterialsClientResponse = {
   error?: string;
 };
 
+type FileSelectionState = {
+  kind: "selected" | "error";
+  fileName?: string;
+  mimeType?: string;
+  previewDataUrl?: string;
+  message: string;
+};
+
 type MaterialsIntakePanelProps = {
   campaign: CampaignRecord;
 };
+
+const MATERIALS_IMAGE_PREVIEW_MAX_BYTES = 5 * 1024 * 1024;
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") resolve(reader.result);
+      else reject(new Error("File preview failed."));
+    };
+    reader.onerror = () => reject(reader.error ?? new Error("File preview failed."));
+    reader.readAsDataURL(file);
+  });
+}
 
 function payloadFieldsForKind(contentKind: MaterialContentKind): Array<keyof ClientSubmitPayload> {
   switch (contentKind) {
@@ -58,16 +80,61 @@ function SubmitFields({
   contentKind,
   values,
   onChange,
+  fileSelection,
+  onFileSelect,
   disabled,
 }: {
   contentKind: MaterialContentKind;
   values: ClientSubmitPayload;
   onChange: (field: keyof ClientSubmitPayload, value: string) => void;
+  fileSelection?: FileSelectionState;
+  onFileSelect: (file: File | null) => void;
   disabled: boolean;
 }) {
   const fields = payloadFieldsForKind(contentKind);
   return (
     <div className="sb-materials-intake__fields">
+      {contentKind === "file-metadata" ? (
+        <div className="sb-materials-intake__file-picker">
+          <label className="utility-btn utility-btn--secondary sb-materials-intake__file-button">
+            <span>Choose file</span>
+            <input
+              className="sb-materials-intake__file-input"
+              type="file"
+              accept="image/png,image/jpeg,.png,.jpg,.jpeg,.pdf,.doc,.docx,.txt,.mp3,.wav,.mp4"
+              disabled={disabled}
+              onChange={(event) => {
+                const file = event.target.files?.[0] ?? null;
+                event.target.value = "";
+                onFileSelect(file);
+              }}
+            />
+          </label>
+          {fileSelection ? (
+            <div
+              className={`sb-materials-intake__file-state sb-materials-intake__file-state--${fileSelection.kind}`}
+              role={fileSelection.kind === "error" ? "alert" : "status"}
+            >
+              {fileSelection.previewDataUrl ? (
+                <span
+                  className="sb-materials-intake__file-thumb"
+                  role="img"
+                  aria-label={`Preview of ${fileSelection.fileName ?? "selected image"}`}
+                  style={{ backgroundImage: `url("${fileSelection.previewDataUrl}")` }}
+                />
+              ) : (
+                <span className="sb-materials-intake__file-thumb sb-materials-intake__file-thumb--file">
+                  File
+                </span>
+              )}
+              <span className="sb-materials-intake__file-copy">
+                <strong>{fileSelection.fileName ?? "File selection"}</strong>
+                <span>{fileSelection.message}</span>
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       {fields.map((field) => (
         <label key={field} className="sb-materials-intake__field">
           <span className="sb-materials-intake__field-label">{fieldLabel(field)}</span>
@@ -102,6 +169,7 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, ClientSubmitPayload>>({});
+  const [fileSelections, setFileSelections] = useState<Record<string, FileSelectionState>>({});
   const materialsEndpoint = `/api/campaigns/${encodeURIComponent(campaign.campaignId)}/materials?audience=client`;
 
   const refresh = useCallback(async () => {
@@ -155,6 +223,63 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
       ...current,
       [id]: { ...current[id], [field]: value },
     }));
+  };
+
+  const selectFile = async (id: string, file: File | null) => {
+    if (!file) return;
+    if (file.size > MATERIALS_IMAGE_PREVIEW_MAX_BYTES) {
+      setFileSelections((current) => ({
+        ...current,
+        [id]: {
+          kind: "error",
+          fileName: file.name,
+          mimeType: file.type || "application/octet-stream",
+          message: "This file is too large. Please choose a file under 5 MB.",
+        },
+      }));
+      return;
+    }
+
+    const mimeType = file.type || "application/octet-stream";
+    updateDraft(id, "fileName", file.name);
+    updateDraft(id, "mimeType", mimeType);
+
+    if (!mimeType.startsWith("image/")) {
+      setFileSelections((current) => ({
+        ...current,
+        [id]: {
+          kind: "selected",
+          fileName: file.name,
+          mimeType,
+          message: "File selected locally. Preview is not available for this file type.",
+        },
+      }));
+      return;
+    }
+
+    try {
+      const previewDataUrl = await readFileAsDataUrl(file);
+      setFileSelections((current) => ({
+        ...current,
+        [id]: {
+          kind: "selected",
+          fileName: file.name,
+          mimeType,
+          previewDataUrl,
+          message: "Image selected locally. Send to Studio when you are ready.",
+        },
+      }));
+    } catch {
+      setFileSelections((current) => ({
+        ...current,
+        [id]: {
+          kind: "error",
+          fileName: file.name,
+          mimeType,
+          message: "We could not preview this image. Please choose another PNG or JPG.",
+        },
+      }));
+    }
   };
 
   const submitConsolidated = async (request: ClientConsolidatedRequest) => {
@@ -292,6 +417,8 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
                           contentKind={request.contentKind}
                           values={drafts[request.id] ?? {}}
                           onChange={(field, value) => updateDraft(request.id, field, value)}
+                          fileSelection={fileSelections[request.id]}
+                          onFileSelect={(file) => void selectFile(request.id, file)}
                           disabled={submittingId === request.id}
                         />
                         <button
@@ -367,6 +494,8 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
                           contentKind={request.contentKind}
                           values={drafts[request.id] ?? {}}
                           onChange={(field, value) => updateDraft(request.id, field, value)}
+                          fileSelection={fileSelections[request.id]}
+                          onFileSelect={(file) => void selectFile(request.id, file)}
                           disabled={submittingId === request.id}
                         />
                         <button
@@ -377,6 +506,11 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
                         >
                           {materialsConfig.clientSubmitLabel}
                         </button>
+                        {successId === request.id ? (
+                          <p className="sb-materials-intake__success" role="status">
+                            {materialsConfig.clientSubmitSuccess}
+                          </p>
+                        ) : null}
                       </>
                     ) : null}
                   </li>
