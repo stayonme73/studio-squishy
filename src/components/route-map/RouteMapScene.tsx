@@ -168,19 +168,6 @@ export default function RouteMapScene() {
               <button type="button" className="route-map-back-link" onClick={handleBackToJob}>
                 ← Back to job details
               </button>
-              {postPublishEligible ? (
-                <label className="route-map-checkout-addon">
-                  <input
-                    type="checkbox"
-                    checked={includePostPublishAddon}
-                    onChange={(event) => setIncludePostPublishAddon(event.target.checked)}
-                  />
-                  <span>
-                    Add Post/Publish for Me (+$100) — Studio schedules or publishes on one connected
-                    platform
-                  </span>
-                </label>
-              ) : null}
               <SecureCheckoutGrid
                 layout="embedded"
                 planSummary={paymentSummary}
@@ -200,6 +187,21 @@ export default function RouteMapScene() {
                   title: selectedJob.name,
                   lines: [selectedJob.purpose],
                 }}
+                paymentDecisionAddon={
+                  postPublishEligible ? (
+                    <label className="route-map-checkout-addon">
+                      <input
+                        type="checkbox"
+                        checked={includePostPublishAddon}
+                        onChange={(event) => setIncludePostPublishAddon(event.target.checked)}
+                      />
+                      <span>
+                        Add Post/Publish for Me (+$100) — Studio schedules or publishes on one connected
+                        platform
+                      </span>
+                    </label>
+                  ) : null
+                }
               />
             </div>
           ) : null}

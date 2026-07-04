@@ -33,6 +33,8 @@ type Props = {
     title: string;
     lines: readonly string[];
   };
+  /** Optional content placed with the final payment decision controls. */
+  paymentDecisionAddon?: ReactNode;
   /** Persist approved plan before payment; return false to block checkout. */
   onBeforePayment?: (acknowledgment: ApprovalAcknowledgment) => boolean;
   /** Open Service Guide for a checkout line item SKU. */
@@ -100,6 +102,7 @@ export default function SecureCheckoutGrid({
   layout = "full",
   planSummary: planSummaryProp,
   recommendationNotice,
+  paymentDecisionAddon,
   onBeforePayment,
   onOpenServiceGuide,
   onViewPlanDetails,
@@ -266,6 +269,9 @@ export default function SecureCheckoutGrid({
                   </p>
                 ))}
               </div>
+            ) : null}
+            {paymentDecisionAddon ? (
+              <div className="pay-decision-addon">{paymentDecisionAddon}</div>
             ) : null}
             <section
               className="pay-acknowledgment"

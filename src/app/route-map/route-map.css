@@ -17,6 +17,8 @@
   --rm-route-panel-w: min(960px, calc(100vw - 48px));
   --rm-job-sheet-w: min(680px, calc(100vw - 48px));
   --rm-job-content-w: 600px;
+  --rm-checkout-sheet-w: min(1380px, calc(100vw - clamp(24px, 5vw, 80px)));
+  --rm-checkout-sheet-h: min(92vh, 860px);
   --rm-route-panel-h: clamp(72vh, 75vh, 78vh);
   background: var(--studio-mushroom);
 }
@@ -164,6 +166,10 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 .route-map-world__sheet--checkout,
 .route-map-world__sheet--intake {
   max-height: min(85vh, 780px);
+}
+
+.route-map-world__sheet--checkout {
+  width: 100%;
 }
 
 .route-map-world__discovery-note {
@@ -384,7 +390,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   display: flex;
   gap: 0.65rem;
   align-items: flex-start;
-  margin: 0 0 1rem;
+  margin: 0;
   padding: 0.75rem 0.85rem;
   border-radius: 8px;
   background: color-mix(in srgb, var(--rm-paper, #f4efe6) 88%, #fff);
@@ -397,6 +403,14 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 .route-map-checkout-addon input {
   margin-top: 0.2rem;
   flex-shrink: 0;
+}
+
+.route-map-world__sheet--checkout .pay-decision-addon {
+  margin: 0.15rem 0 0;
+}
+
+.route-map-world__sheet--checkout .pay-shell {
+  width: 100%;
 }
 
 /* Hotspots — invisible click zones over map callouts */
@@ -2151,6 +2165,76 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     max-height: var(--rm-route-panel-h);
   }
 
+  .route-map-world__sheet--checkout {
+    width: var(--rm-checkout-sheet-w);
+    height: var(--rm-checkout-sheet-h);
+    max-height: var(--rm-checkout-sheet-h);
+  }
+
+  .route-map-world__sheet--checkout .pay-shell {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .route-map-world__sheet--checkout .pay-checkout-grid--embedded {
+    grid-template-columns: minmax(18rem, 0.82fr) minmax(25rem, 1.18fr);
+    height: 100%;
+    min-height: 0;
+  }
+
+  .route-map-world__sheet--checkout .pay-paper-card {
+    min-height: 0;
+  }
+
+  .route-map-world__sheet--checkout .pay-paper-card__body {
+    height: 100%;
+    overflow-y: auto;
+    padding: 1.65rem 1.05rem 1.05rem 1.25rem;
+  }
+
+  .route-map-world__sheet--checkout .pay-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.58rem 0.65rem;
+    align-items: start;
+  }
+
+  .route-map-world__sheet--checkout .pay-form > .pay-field:nth-of-type(5),
+  .route-map-world__sheet--checkout .pay-form > .pay-form-row,
+  .route-map-world__sheet--checkout .pay-form > .pay-disclaimer,
+  .route-map-world__sheet--checkout .pay-form > .pay-decision-addon,
+  .route-map-world__sheet--checkout .pay-form > .pay-acknowledgment,
+  .route-map-world__sheet--checkout .pay-form > .pay-submit,
+  .route-map-world__sheet--checkout .pay-form > .pay-sandbox {
+    grid-column: 1 / -1;
+  }
+
+  .route-map-world__sheet--checkout .pay-field input {
+    padding-block: 0.5rem;
+  }
+
+  .route-map-world__sheet--checkout .pay-disclaimer,
+  .route-map-world__sheet--checkout .pay-acknowledgment {
+    margin-top: 0.25rem;
+  }
+
+  .route-map-world__sheet--checkout .pay-acknowledgment {
+    padding-top: 0.7rem;
+  }
+
+  .route-map-world__sheet--checkout .pay-acknowledgment__heading {
+    margin-bottom: 0.45rem;
+  }
+
+  .route-map-world__sheet--checkout .pay-acknowledgment__body {
+    margin-bottom: 0.55rem;
+    line-height: 1.45;
+  }
+
+  .route-map-world__sheet--checkout .pay-acknowledgment__body:last-of-type {
+    margin-bottom: 0.7rem;
+  }
+
   .route-map-job-card--overlay {
     flex: 1;
     min-height: 0;
@@ -2181,6 +2265,15 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     height: min(88vh, 760px);
     border-radius: 22px 22px 0 0;
     overflow: hidden;
+  }
+
+  .route-map-world__sheet--checkout {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .route-map-world__sheet--checkout .pay-checkout-grid--embedded {
+    gap: 0.85rem;
   }
 
   .route-map-route-panel__scroll {
