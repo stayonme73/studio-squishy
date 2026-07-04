@@ -2180,7 +2180,11 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   font: inherit;
   font-size: clamp(1rem, 1.4vw, 1.08rem);
   line-height: 1.5;
-  resize: vertical;
+  resize: none;
+}
+
+.route-map-social-intake__compact-field textarea {
+  min-height: 6rem;
 }
 
 .route-map-social-intake__compact-field input::placeholder,
@@ -2532,18 +2536,18 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-world__sheet--intake {
-    --rm-social-action-h: 88px;
-    width: min(1720px, calc(100vw - 8px));
-    height: min(100dvh, 1060px);
-    max-height: min(100dvh, 1060px);
-    padding: clamp(12px, 1.4vw, 22px);
+    --rm-social-action-h: 56px;
+    width: min(1720px, calc(100vw - clamp(16px, 3vw, 48px)));
+    height: min(calc(100dvh - clamp(8px, 1.5vh, 20px)), 1080px);
+    max-height: min(calc(100dvh - clamp(8px, 1.5vh, 20px)), 1080px);
+    padding: clamp(10px, 1.1vw, 18px);
     overflow: hidden;
   }
 
   .route-map-social-intake {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
-    gap: clamp(8px, 1vw, 12px);
+    gap: clamp(10px, 1.2dvh, 16px);
     height: 100%;
     min-height: 0;
     padding-bottom: 0;
@@ -2555,50 +2559,50 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-social-intake__eyebrow {
-    margin-bottom: 6px;
-    font-size: clamp(0.9rem, 1vw, 1rem);
+    margin-bottom: 4px;
+    font-size: clamp(0.82rem, 0.92vw, 0.95rem);
     line-height: 1.35;
   }
 
   .route-map-social-intake__title {
-    font-size: clamp(2.25rem, 3vw, 3.15rem);
+    font-size: clamp(2rem, 2.55vw, 2.75rem);
   }
 
   .route-map-social-intake__lead {
     max-width: 82ch;
-    margin-top: 8px;
-    font-size: clamp(1.08rem, 1.2vw, 1.22rem);
-    line-height: 1.58;
+    margin-top: 6px;
+    font-size: clamp(0.98rem, 1.08vw, 1.12rem);
+    line-height: 1.45;
   }
 
   .route-map-social-intake__progress {
-    padding: 14px 16px;
+    padding: 10px 12px;
     border-radius: 14px;
   }
 
   .route-map-social-intake__progress strong {
-    font-size: clamp(1.28rem, 1.5vw, 1.55rem);
+    font-size: clamp(1.12rem, 1.28vw, 1.35rem);
   }
 
   .route-map-social-intake__progress span {
-    font-size: 1rem;
+    font-size: 0.92rem;
   }
 
   .route-map-social-intake__form {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    grid-template-rows: auto auto auto;
-    gap: clamp(10px, 1.2vw, 16px);
+    grid-template-rows: minmax(clamp(20rem, 41dvh, 24rem), 1fr) minmax(clamp(16.2rem, 32dvh, 22rem), 0.88fr) auto;
+    gap: clamp(7px, 0.8vw, 12px);
     height: 100%;
     min-height: 0;
-    align-content: start;
+    align-content: stretch;
   }
 
   .route-map-social-intake__card {
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 12px 14px;
-    min-height: 0;
-    padding: clamp(14px, 1.25vw, 22px);
+    gap: 8px 10px;
+    min-height: 100%;
+    padding: clamp(10px, 0.9vw, 16px);
     border-radius: 18px;
     align-content: start;
   }
@@ -2607,36 +2611,36 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-social-intake__card--action,
   .route-map-social-intake__card--platform {
     grid-column: span 2;
-    min-height: 0;
+    min-height: 100%;
   }
 
   .route-map-social-intake__card--materials {
     grid-column: span 4;
-    min-height: 0;
+    min-height: 100%;
   }
 
   .route-map-social-intake__card--wording {
     grid-column: span 2;
-    min-height: 0;
+    min-height: 100%;
   }
 
   .route-map-social-intake__step {
-    width: 2.35rem;
-    height: 2.35rem;
-    font-size: 1.05rem;
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 1rem;
   }
 
   .route-map-social-intake__card-copy {
-    gap: 6px;
+    gap: 4px;
   }
 
   .route-map-social-intake__card-copy h3 {
-    font-size: clamp(1.24rem, 1.42vw, 1.48rem);
+    font-size: clamp(1.06rem, 1.18vw, 1.28rem);
   }
 
   .route-map-social-intake__card-copy p {
-    font-size: clamp(1rem, 1.06vw, 1.1rem);
-    line-height: 1.5;
+    font-size: clamp(0.86rem, 0.95vw, 0.98rem);
+    line-height: 1.32;
   }
 
   .route-map-social-intake__chips {
@@ -2645,15 +2649,37 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-social-intake__chip {
-    min-height: 38px;
-    padding: 7px 11px;
-    font-size: clamp(0.93rem, 0.98vw, 1.02rem);
+    min-height: 34px;
+    padding: 6px 8px;
+    font-size: clamp(0.82rem, 0.9vw, 0.94rem);
     line-height: 1.18;
   }
 
+  .route-map-social-intake__card--purpose .route-map-social-intake__chips,
+  .route-map-social-intake__card--action .route-map-social-intake__chips,
+  .route-map-social-intake__card--platform .route-map-social-intake__chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .route-map-social-intake__card--materials .route-map-social-intake__chips {
+    flex-wrap: nowrap;
+    gap: 7px;
+  }
+
+  .route-map-social-intake__card--purpose .route-map-social-intake__chip,
+  .route-map-social-intake__card--action .route-map-social-intake__chip,
+  .route-map-social-intake__card--platform .route-map-social-intake__chip {
+    width: 100%;
+    min-height: 34px;
+    align-content: center;
+    border-radius: 14px;
+  }
+
   .route-map-social-intake__chip small {
-    font-size: 0.8rem;
-    line-height: 1.2;
+    font-size: 0.76rem;
+    line-height: 1.15;
   }
 
   .route-map-social-intake__compact-field,
@@ -2664,34 +2690,42 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-social-intake__compact-field {
-    gap: 6px;
+    gap: 5px;
   }
 
   .route-map-social-intake__compact-field span {
-    font-size: clamp(0.94rem, 0.98vw, 1.02rem);
+    font-size: clamp(0.86rem, 0.92vw, 0.98rem);
   }
 
   .route-map-social-intake__compact-field input,
   .route-map-social-intake__compact-field textarea {
-    padding: 9px 11px;
-    font-size: clamp(0.95rem, 1vw, 1.04rem);
+    padding: 7px 9px;
+    font-size: clamp(0.88rem, 0.94vw, 1rem);
     line-height: 1.35;
   }
 
+  .route-map-social-intake__compact-field textarea {
+    min-height: clamp(3rem, 5.6dvh, 4.6rem);
+  }
+
+  .route-map-social-intake__card--purpose .route-map-social-intake__compact-field textarea {
+    min-height: clamp(2.75rem, 5dvh, 3.8rem);
+  }
+
   .route-map-social-intake__upload-row {
-    gap: 11px 14px;
-    padding: 10px;
+    gap: 7px 10px;
+    padding: 7px;
   }
 
   .route-map-social-intake__upload-row p {
-    font-size: 1rem;
-    line-height: 1.42;
+    font-size: 0.92rem;
+    line-height: 1.34;
   }
 
   .route-map-social-intake__upload-row .route-map-secondary-btn {
-    min-height: 44px;
-    padding-inline: 16px;
-    font-size: 0.94rem;
+    min-height: 34px;
+    padding-inline: 12px;
+    font-size: 0.82rem;
   }
 
   .route-map-social-intake__file-state {
@@ -2708,27 +2742,27 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     position: static;
     grid-column: 1 / -1;
     grid-template-columns: minmax(12rem, 1fr) auto auto;
-    min-height: 0;
-    margin-top: clamp(2px, 0.5vw, 6px);
-    padding: 8px 12px;
+    min-height: var(--rm-social-action-h);
+    margin-top: 0;
+    padding: 5px 9px;
     border-radius: 16px;
     box-shadow: 0 -8px 22px rgba(46, 43, 40, 0.12);
   }
 
   .route-map-social-intake__actions .route-map-primary-btn,
   .route-map-social-intake__actions .route-map-secondary-btn {
-    min-height: 40px;
-    padding-inline: 14px;
-    font-size: 0.92rem;
+    min-height: 34px;
+    padding-inline: 10px;
+    font-size: 0.82rem;
     white-space: nowrap;
   }
 
   .route-map-social-intake__save-state strong {
-    font-size: 1rem;
+    font-size: 0.92rem;
   }
 
   .route-map-social-intake__save-state span {
-    font-size: 0.94rem;
+    font-size: 0.84rem;
   }
 
   .route-map-social-intake__next,
@@ -2818,13 +2852,36 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 @media (min-width: 901px) and (max-width: 1200px) {
   .route-map-world__sheet--intake {
     width: min(1160px, calc(100vw - 24px));
-    height: min(100dvh, 1000px);
-    max-height: min(100dvh, 1000px);
+    height: min(calc(100dvh - 20px), 1000px);
+    max-height: min(calc(100dvh - 20px), 1000px);
     padding: clamp(10px, 1.4vw, 18px);
   }
 
   .route-map-social-intake__form {
     grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-rows: minmax(clamp(16rem, 34dvh, 20rem), 0.95fr) minmax(clamp(15.5rem, 33dvh, 21rem), 1fr) auto;
+  }
+
+  .route-map-social-intake__card {
+    padding: clamp(13px, 1.2vw, 18px);
+  }
+
+  .route-map-social-intake__card--platform .route-map-social-intake__chips {
+    gap: 8px;
+  }
+
+  .route-map-social-intake__card--materials .route-map-social-intake__chips {
+    flex-wrap: wrap;
+  }
+
+  .route-map-social-intake__card--platform .route-map-social-intake__chip {
+    min-height: 42px;
+    padding: 8px 9px;
+    font-size: clamp(0.88rem, 0.98vw, 0.96rem);
+  }
+
+  .route-map-social-intake__card--platform .route-map-social-intake__chip small {
+    font-size: 0.76rem;
   }
 
   .route-map-social-intake__card--purpose,
