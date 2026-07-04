@@ -4,16 +4,13 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import AccountPackageCard from "@/components/studio-board/AccountPackageCard";
 import CampaignBriefActions from "@/components/campaign-details/CampaignBriefActions";
 import CampaignNextAction from "@/components/studio-board/CampaignNextAction";
 import CampaignProgressPanel from "@/components/studio-board/CampaignProgressPanel";
 import CampaignRecordDrawer from "@/components/studio-board/CampaignRecordDrawer";
 import RouteMapProductionBriefDrawer from "@/components/route-map/RouteMapProductionBriefDrawer";
-import DeliverablesProgress from "@/components/studio-board/DeliverablesProgress";
-import MaterialsIntakePanel from "@/components/materials/MaterialsIntakePanel";
-import PackageSummaryPanel from "@/components/studio-board/PackageSummaryPanel";
-import StudioNotePanel from "@/components/studio-board/StudioNotePanel";
+import StudioBoardMaterialsWorkflow from "@/components/studio-board/StudioBoardMaterialsWorkflow";
+import ProjectSnapshotPanel from "@/components/studio-board/ProjectSnapshotPanel";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
 import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import HelpCenterLink from "@/components/shared/HelpCenterLink";
@@ -33,7 +30,6 @@ const {
   userName,
   empty: emptyCopy,
   currentCampaign: currentCampaignCopy,
-  deliverablesCard: deliverablesCardCopy,
   membership: membershipDefaults,
   routes,
 } = studioBoard;
@@ -380,30 +376,11 @@ export default function StudioBoardScene() {
             <CampaignProgressPanel campaign={campaign} steps={view.progressSteps} timeline={view.activityFeed} />
           </article>
 
-          <article
-            className="sb-card sb-card--deliverables bf-material bf-material-paper"
-            aria-labelledby="sb-deliverables-title"
-          >
-            <p className="sb-card__tab">{deliverablesCardCopy.heading}</p>
-            <h2 id="sb-deliverables-title" className="sr-only">
-              {deliverablesCardCopy.heading}
-            </h2>
-            <DeliverablesProgress items={view.deliverablesProgress} campaignStatus={view.status} />
+          <article className="sb-card sb-card--project-snapshot bf-material bf-material-paper">
+            <ProjectSnapshotPanel campaign={campaign} view={view} account={account} />
           </article>
 
-          <article className="sb-card sb-card--package bf-material bf-material-paper">
-            <PackageSummaryPanel campaign={campaign} />
-          </article>
-
-          {campaign ? <MaterialsIntakePanel campaign={campaign} /> : null}
-
-          <article className="sb-card sb-card--studio-note bf-material bf-material-paper">
-            <StudioNotePanel note={view.studioNote} />
-          </article>
-
-          <article className="sb-card sb-card--account sb-card--account-secondary bf-material bf-material-paper">
-            <AccountPackageCard account={account} />
-          </article>
+          {campaign ? <StudioBoardMaterialsWorkflow campaign={campaign} /> : null}
         </div>
       </div>
 
