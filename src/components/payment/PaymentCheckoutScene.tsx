@@ -1,8 +1,8 @@
 /**
- * Secure Checkout — re-exports archived three-column checkout.
+ * Secure Checkout — active `/payment` scene.
+ * @see src/components/payment/SecureCheckoutPageScene.tsx
  * @see src/archive/payment/CompleteYourOrderCheckoutScene.tsx
  * @see src/components/payment/SecureCheckoutGrid.tsx
- * @see docs/customer-journey-v1-locked.md
  */
-export { default } from "@/archive/payment/CompleteYourOrderCheckoutScene";
+export { default } from "@/components/payment/SecureCheckoutPageScene";
 export { default as SecureCheckoutGrid } from "@/components/payment/SecureCheckoutGrid";

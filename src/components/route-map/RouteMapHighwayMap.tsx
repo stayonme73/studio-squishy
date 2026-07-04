@@ -63,10 +63,16 @@ export default function RouteMapHighwayMap({
 
   return (
     <div
-      className={`route-map-hero${isDesk ? " route-map-hero--desk" : " route-map-hero--cloverleaf"}`}
+      className={[
+        "route-map-hero",
+        isDesk ? "route-map-hero--desk" : "route-map-hero--cloverleaf",
+        !interactive ? "route-map-hero--display-only" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={{ aspectRatio: hero.aspect }}
       role="group"
-      aria-label="Interactive Studio route map"
+      aria-label={interactive ? "Interactive Studio route map" : "Studio route map"}
     >
       <img
         className="route-map-hero__art"

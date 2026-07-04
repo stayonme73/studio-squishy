@@ -25,10 +25,13 @@
   --rm-route-title: clamp(1.85rem, 2.9vw, 2.2rem);
   --rm-route-lead: clamp(1.12rem, 1.18vw, 1.24rem);
   --rm-route-marker: 0.78rem;
+  --rm-overlay-sheet-w: min(1480px, calc(100vw - clamp(24px, 4vw, 72px)));
+  --rm-overlay-sheet-h: min(calc(100dvh - clamp(10px, 2dvh, 24px)), 980px);
+  --rm-overlay-sheet-pad: clamp(20px, 2vw, 30px);
   --rm-job-sheet-w: min(720px, calc(100vw - 48px));
   --rm-job-content-w: 640px;
-  --rm-checkout-sheet-w: min(1380px, calc(100vw - clamp(24px, 5vw, 80px)));
-  --rm-checkout-sheet-h: min(92vh, 860px);
+  --rm-checkout-sheet-w: min(1480px, calc(100vw - clamp(24px, 4vw, 72px)));
+  --rm-checkout-sheet-h: calc(100dvh - 6px);
   background: var(--studio-mushroom);
 }
 
@@ -139,16 +142,21 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   position: absolute;
   inset: 0;
   z-index: 10;
+  pointer-events: auto;
+  cursor: default;
   background: color-mix(in srgb, var(--rm-graphite) 46%, transparent);
   backdrop-filter: blur(4px);
   animation: route-map-fade-in 180ms ease;
 }
 
-@media (min-width: 901px) {
-  .route-map-world--overlay .route-map-world__map--desktop {
-    pointer-events: none;
-    user-select: none;
-  }
+.route-map-world--overlay .route-map-world__map {
+  pointer-events: none;
+  user-select: none;
+}
+
+.route-map-world--overlay .route-map-workspace__how-wrap,
+.route-map-world--overlay .route-map-workspace__how-wrap .route-map-how-it-works {
+  pointer-events: none;
 }
 
 .route-map-world__sheet {
@@ -593,6 +601,12 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   border-radius: 2px;
 }
 
+.route-map-hero--display-only,
+.route-map-hero--display-only .route-map-hero__map-zone,
+.route-map-hero--display-only .route-map-hero__art {
+  cursor: default;
+}
+
 .route-map-hero__hotspots {
   position: absolute;
   inset: 0;
@@ -762,26 +776,27 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 @media (min-width: 1101px) {
   .route-map-choose-panel__toggle {
     position: absolute;
-    left: -40px;
+    left: -52px;
     top: 50%;
     z-index: 12;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    width: 36px;
-    padding: 10px 6px;
-    border: 1px solid color-mix(in srgb, var(--rm-wood-dark) 22%, transparent);
+    gap: 8px;
+    width: 52px;
+    min-height: 9.5rem;
+    padding: 16px 10px;
+    border: 1px solid color-mix(in srgb, var(--rm-wood-dark) 28%, transparent);
     border-right: 0;
-    border-radius: 8px 0 0 8px;
+    border-radius: 10px 0 0 10px;
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, var(--rm-paper) 96%, #fff),
-      color-mix(in srgb, var(--rm-paper-warm) 88%, var(--studio-mushroom))
+      color-mix(in srgb, var(--rm-paper) 98%, #fff),
+      color-mix(in srgb, var(--rm-paper-warm) 90%, var(--studio-mushroom))
     );
-    color: var(--studio-denim);
-    box-shadow: -4px 2px 14px rgba(46, 43, 40, 0.12);
+    color: var(--studio-charcoal);
+    box-shadow: -5px 3px 18px rgba(46, 43, 40, 0.14);
     cursor: pointer;
     transform: translateY(-50%);
     transition:
@@ -794,29 +809,31 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-choose-panel__toggle:focus-visible {
     background: #fff;
     color: var(--studio-charcoal);
-    box-shadow: -6px 4px 18px rgba(46, 43, 40, 0.16);
+    box-shadow: -7px 5px 22px rgba(46, 43, 40, 0.18);
     outline: none;
   }
 
   .route-map-choose-panel__toggle-icon {
-    font-size: 1.1rem;
+    font-size: 1.35rem;
     font-weight: 800;
     line-height: 1;
+    color: var(--studio-denim);
   }
 
   .route-map-choose-panel__toggle-label {
-    font-size: 0.48rem;
+    font-size: max(0.75rem, 12px);
     font-weight: 800;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    line-height: 1.15;
+    line-height: 1.2;
     text-align: center;
     writing-mode: vertical-rl;
     transform: rotate(180deg);
+    color: var(--studio-charcoal);
   }
 
   .route-map-choose-panel-wrap--collapsed .route-map-choose-panel__toggle {
-    left: -36px;
+    left: -52px;
   }
 }
 
@@ -2125,18 +2142,18 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 .route-map-job-card--overlay {
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 100%;
   border-radius: 14px;
   box-shadow: none;
   background: transparent;
   padding: 0;
   width: 100%;
-  max-width: var(--rm-job-content-w);
+  max-width: none;
   margin-inline: auto;
 }
 
 .route-map-job-card--overlay .route-map-job-card__body {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -2150,13 +2167,9 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
 .route-map-job-card--overlay .route-map-job-card__footer {
   flex-shrink: 0;
-  margin-top: 0;
-  padding-top: 16px;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--studio-ivory) 0%, transparent),
-    var(--studio-ivory) 28%
-  );
+  margin-top: auto;
+  padding-top: clamp(24px, 2.5vw, 36px);
+  background: transparent;
 }
 
 .route-map-job-card__header {
@@ -2182,11 +2195,13 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   gap: 0;
 }
 
-.route-map-job-card__body > section {
+.route-map-job-card__body > section,
+.route-map-job-card__block {
   margin-bottom: 16px;
 }
 
-.route-map-job-card__body > section:last-of-type {
+.route-map-job-card__body > section:last-of-type,
+.route-map-job-card__body > .route-map-job-card__block:last-of-type {
   margin-bottom: 0;
 }
 
@@ -2214,7 +2229,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 }
 
 .route-map-job-card__list--muted {
-  color: var(--studio-charcoal-muted);
+  color: var(--studio-charcoal);
 }
 
 .route-map-job-card__meta {
@@ -2670,11 +2685,6 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     font-size: 1.25rem;
     line-height: 1.7;
     max-width: none;
-  }
-
-  .route-map-job-card--overlay .route-map-job-card__meta {
-    font-size: 1.125rem;
-    line-height: 1.62;
   }
 }
 
@@ -3197,25 +3207,25 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
   .route-map-world__sheet--checkout .pay-paper-card__body {
     height: 100%;
-    overflow-y: auto;
+    overflow: visible;
     padding: 1.65rem 1.05rem 1.05rem 1.25rem;
   }
 
   .route-map-world__sheet--checkout .pay-form {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.58rem 0.65rem;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
   }
 
-  .route-map-world__sheet--checkout .pay-form > .pay-field:nth-of-type(5),
-  .route-map-world__sheet--checkout .pay-form > .pay-form-row,
-  .route-map-world__sheet--checkout .pay-form > .pay-disclaimer,
-  .route-map-world__sheet--checkout .pay-form > .pay-decision-addon,
-  .route-map-world__sheet--checkout .pay-form > .pay-acknowledgment,
-  .route-map-world__sheet--checkout .pay-form > .pay-submit,
-  .route-map-world__sheet--checkout .pay-form > .pay-sandbox {
-    grid-column: 1 / -1;
+  .route-map-world__sheet--checkout .pay-form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .route-map-world__sheet--checkout .pay-sandbox {
+    margin-top: 0.15rem;
+    padding-top: 0.55rem;
   }
 
   .route-map-world__sheet--checkout .pay-field input {
@@ -3253,38 +3263,6 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     align-self: center;
   }
 
-  .route-map-job-card--overlay .route-map-job-card__body {
-    display: grid;
-    grid-template-columns: minmax(12rem, 0.78fr) minmax(0, 1.08fr) minmax(0, 1.14fr);
-    grid-template-areas:
-      "purpose includes exclusions"
-      "meta includes exclusions";
-    gap: clamp(16px, 1.6vw, 22px) clamp(24px, 2.6vw, 38px);
-    flex: 0 1 auto;
-    overflow: visible;
-    overscroll-behavior: auto;
-  }
-
-  .route-map-job-card--overlay .route-map-job-card__body > section {
-    margin-bottom: 0;
-  }
-
-  .route-map-job-card--overlay .route-map-job-card__body > section:first-child {
-    grid-area: purpose;
-  }
-
-  .route-map-job-card--overlay .route-map-job-card__body > section:nth-child(2) {
-    grid-area: includes;
-  }
-
-  .route-map-job-card--overlay .route-map-job-card__body > section:nth-child(3) {
-    grid-area: exclusions;
-  }
-
-  .route-map-job-card--overlay .route-map-job-card__meta {
-    grid-area: meta;
-  }
-
   .route-map-job-card--overlay .route-map-job-card__body > section > p {
     font-size: clamp(1.16rem, 1.24vw, 1.3rem);
     line-height: 1.7;
@@ -3297,19 +3275,6 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
   .route-map-job-card--overlay .route-map-job-card__list li + li {
     margin-top: 0.28rem;
-  }
-
-  .route-map-job-card--overlay .route-map-job-card__meta {
-    display: grid;
-    gap: 10px;
-  }
-
-  .route-map-job-card--overlay .route-map-job-card__meta p {
-    margin-bottom: 0;
-  }
-
-  .route-map-job-card--overlay .route-map-job-card__footer {
-    padding-top: 12px;
   }
 }
 
@@ -3373,17 +3338,64 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 /* Client readability baseline V1 — active Social Posts Route Map screens */
 @media (min-width: 901px) {
   .route-map-world__sheet--job,
-  .route-map-world__sheet--checkout,
   .route-map-world__sheet--intake {
-    height: min(calc(100dvh - clamp(10px, 2dvh, 24px)), 980px);
-    max-height: min(calc(100dvh - clamp(10px, 2dvh, 24px)), 980px);
-    overflow-y: auto;
+    width: var(--rm-overlay-sheet-w);
+    height: var(--rm-overlay-sheet-h);
+    max-height: var(--rm-overlay-sheet-h);
+    overflow: hidden;
     overscroll-behavior: contain;
-    padding: clamp(20px, 2vw, 30px);
+    padding: var(--rm-overlay-sheet-pad);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .route-map-world__sheet--checkout {
+    width: var(--rm-checkout-sheet-w);
+    height: var(--rm-checkout-sheet-h);
+    max-height: var(--rm-checkout-sheet-h);
+    overflow: hidden;
+    overscroll-behavior: none;
+    padding: var(--rm-overlay-sheet-pad);
+    display: flex;
+    flex-direction: column;
   }
 
   .route-map-world__sheet--job {
-    width: min(1320px, calc(100vw - clamp(24px, 4vw, 72px)));
+    overflow: hidden;
+  }
+
+  .route-map-overlay-workspace {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: clamp(20px, 2vw, 28px);
+  }
+
+  .route-map-overlay-workspace__job-detail {
+    flex: 0 0 auto;
+  }
+
+  .route-map-overlay-workspace--checkout .pay-shell,
+  .route-map-overlay-workspace--intake > .route-map-social-intake,
+  .route-map-overlay-workspace--intake > .route-map-intake {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .route-map-overlay-workspace--checkout {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  .route-map-overlay-workspace--intake {
+    overflow: hidden;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake,
+  .route-map-overlay-workspace--intake .route-map-intake {
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .route-map-job-card--overlay {
@@ -3417,17 +3429,27 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
   .route-map-job-card--overlay .route-map-job-card__body {
     display: grid;
-    grid-template-columns: minmax(14rem, 0.76fr) minmax(0, 1.08fr) minmax(0, 1.14fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
     grid-template-areas:
-      "purpose includes exclusions"
-      "meta includes exclusions";
-    gap: clamp(14px, 1.35vw, 20px) clamp(18px, 1.9vw, 28px);
-    flex: none;
-    overflow: visible;
+      "purpose purpose"
+      "includes revision"
+      "exclusions timing";
+    gap: clamp(16px, 1.6vw, 24px) clamp(20px, 2vw, 32px);
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
-  .route-map-job-card--overlay .route-map-job-card__body > section {
+  .route-map-overlay-workspace__job-detail.route-map-job-card__body {
+    flex: none;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__block,
+  .route-map-overlay-workspace__job-detail .route-map-job-card__block {
     margin: 0;
+    min-height: 0;
+    overflow: hidden;
     padding: clamp(15px, 1.3vw, 20px);
     border: 1px solid color-mix(in srgb, var(--studio-charcoal) 10%, transparent);
     border-radius: 16px;
@@ -3437,22 +3459,24 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     box-shadow: 0 3px 14px rgba(46, 43, 40, 0.07);
   }
 
-  .route-map-job-card--overlay .route-map-job-card__body > section:first-child {
+  .route-map-job-card__block--purpose {
     grid-area: purpose;
   }
 
-  .route-map-job-card--overlay .route-map-job-card__body > section:nth-child(2) {
+  .route-map-job-card__block--includes {
     grid-area: includes;
   }
 
-  .route-map-job-card--overlay .route-map-job-card__body > section:nth-child(3) {
+  .route-map-job-card__block--exclusions {
     grid-area: exclusions;
   }
 
-  .route-map-job-card--overlay .route-map-job-card__meta {
-    grid-area: meta;
-    padding-top: clamp(18px, 1.8vw, 24px);
-    border-top: 0;
+  .route-map-job-card__block--revision {
+    grid-area: revision;
+  }
+
+  .route-map-job-card__block--timing {
+    grid-area: timing;
   }
 
   .route-map-job-card--overlay .route-map-job-card__section {
@@ -3461,17 +3485,18 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     line-height: 1.25;
   }
 
-  .route-map-job-card--overlay .route-map-job-card__body > section > p,
-  .route-map-job-card--overlay .route-map-job-card__meta,
-  .route-map-job-card--overlay .route-map-job-card__list {
+  .route-map-job-card--overlay .route-map-job-card__block > p,
+  .route-map-overlay-workspace__job-detail .route-map-job-card__block > p,
+  .route-map-job-card--overlay .route-map-job-card__list,
+  .route-map-overlay-workspace__job-detail .route-map-job-card__list {
     font-size: clamp(1rem, 1.05vw, 1.14rem);
     line-height: 1.5;
   }
 
   .route-map-job-card--overlay .route-map-job-card__footer {
     position: static;
-    margin-top: clamp(14px, 1.5vw, 20px);
-    padding: 0;
+    margin-top: auto;
+    padding-top: clamp(24px, 2.5vw, 36px);
     background: transparent;
   }
 
@@ -3484,7 +3509,10 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-world__sheet--checkout {
-    width: min(1480px, calc(100vw - clamp(28px, 5vw, 88px)));
+    width: var(--rm-checkout-sheet-w);
+    height: var(--rm-checkout-sheet-h);
+    max-height: var(--rm-checkout-sheet-h);
+    overflow: hidden;
   }
 
   .route-map-world__sheet--checkout .pay-shell {
@@ -3494,7 +3522,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-world__sheet--checkout .pay-checkout-grid {
-    grid-template-columns: minmax(17rem, 0.82fr) minmax(28rem, 1.42fr) minmax(17rem, 0.86fr);
+    grid-template-columns: minmax(16rem, 0.82fr) minmax(22rem, 1.18fr) minmax(16rem, 0.82fr);
     gap: clamp(1rem, 1.6vw, 1.45rem);
     align-items: stretch;
     min-height: 100%;
@@ -3512,7 +3540,13 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-world__sheet--checkout .pay-paper-card--form .pay-paper-card__body {
-    padding-bottom: 4.4rem;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: clamp(1.1rem, 1.35vw, 1.35rem);
+  }
+
+  .route-map-world__sheet--checkout .pay-paper-card--form .pay-form {
+    flex: 1 1 auto;
   }
 
   .route-map-world__sheet--checkout .pay-paper-card__title,
@@ -3520,6 +3554,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-world__sheet--checkout .pay-disclaimer__heading {
     font-size: clamp(1.18rem, 1.28vw, 1.4rem);
     line-height: 1.3;
+    color: var(--studio-eucalyptus);
   }
 
   .route-map-world__sheet--checkout .pay-paper-card__title {
@@ -3544,31 +3579,38 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-world__sheet--checkout .route-map-checkout-addon {
     font-size: 1rem;
     line-height: 1.55;
+    color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
   }
 
   .route-map-world__sheet--checkout .pay-field input {
-    min-height: 2.45rem;
-    padding: 0.52rem 0.68rem;
+    min-height: 2.72rem;
+    padding: 0.58rem 0.72rem;
     font-size: 1rem;
   }
 
   .route-map-world__sheet--checkout .pay-form {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.48rem 0.68rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
   }
 
   .route-map-world__sheet--checkout .pay-field {
-    gap: 0.2rem;
+    gap: 0.28rem;
   }
 
   .route-map-world__sheet--checkout .pay-form-row {
-    gap: 0.72rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
   }
 
   .route-map-world__sheet--checkout .pay-submit {
-    min-height: 2.85rem;
+    width: 100%;
+    max-width: none;
+    min-height: 3rem;
+    margin-top: 0.35rem;
     font-size: max(0.94rem, 15px);
+    box-shadow: 0 10px 24px rgba(46, 43, 40, 0.22);
   }
 
   .route-map-world__sheet--checkout .pay-acknowledgment__checkbox input,
@@ -3584,12 +3626,11 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-world__sheet--checkout .pay-disclaimer {
-    display: grid;
-    grid-template-columns: minmax(12rem, max-content) minmax(0, 1fr);
-    gap: 0.45rem 0.7rem;
-    align-items: baseline;
-    margin-top: 0.05rem;
-    padding: 0.62rem 0.72rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-top: 0.15rem;
+    padding: 0.72rem 0.82rem;
   }
 
   .route-map-world__sheet--checkout .pay-disclaimer__heading,
@@ -3598,9 +3639,8 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-world__sheet--checkout .pay-acknowledgment {
-    grid-column: 1 / 2;
-    margin-top: 0.15rem;
-    padding-top: 0.55rem;
+    margin-top: 0.25rem;
+    padding-top: 0.85rem;
   }
 
   .route-map-world__sheet--checkout .pay-acknowledgment__heading {
@@ -3616,24 +3656,11 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     margin-bottom: 0.52rem;
   }
 
-  .route-map-world__sheet--checkout .pay-submit {
-    grid-column: 2 / 3;
-    align-self: end;
-    position: fixed;
-    left: 50%;
-    bottom: clamp(1.8rem, 3.5dvh, 2.6rem);
-    z-index: 35;
-    width: min(17rem, calc(100vw - 3rem));
-    transform: translateX(-50%);
-    margin-top: 0;
-    box-shadow: 0 10px 24px rgba(46, 43, 40, 0.22);
-  }
-
   .route-map-world__sheet--intake {
     --rm-social-action-h: 84px;
-    width: min(1640px, calc(100vw - clamp(24px, 4vw, 72px)));
-    height: min(calc(100dvh - clamp(20px, 4dvh, 48px)), 980px);
-    max-height: min(calc(100dvh - clamp(20px, 4dvh, 48px)), 980px);
+    width: var(--rm-overlay-sheet-w);
+    height: var(--rm-overlay-sheet-h);
+    max-height: var(--rm-overlay-sheet-h);
   }
 
   .route-map-social-intake {
@@ -3805,20 +3832,24 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
 @media (min-width: 901px) and (max-width: 1240px) {
   .route-map-world__sheet--job {
-    height: min(calc(100dvh - 8px), 940px);
-    max-height: min(calc(100dvh - 8px), 940px);
+    height: var(--rm-overlay-sheet-h);
+    max-height: var(--rm-overlay-sheet-h);
   }
 
-  .route-map-job-card--overlay .route-map-job-card__body {
+  .route-map-job-card--overlay .route-map-job-card__body,
+  .route-map-overlay-workspace__job-detail.route-map-job-card__body {
     grid-template-columns: 1fr;
+    grid-template-rows: none;
     grid-template-areas:
       "purpose"
       "includes"
       "exclusions"
-      "meta";
+      "revision"
+      "timing";
+    gap: clamp(16px, 1.6vw, 22px);
   }
 
-  .route-map-job-card--overlay .route-map-job-card__body > section {
+  .route-map-overlay-workspace__job-detail .route-map-job-card__block {
     padding: clamp(15px, 1.6vw, 20px);
   }
 
@@ -3887,8 +3918,19 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-world__sheet--checkout {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
+  }
+
+  .route-map-overlay-workspace__job-detail.route-map-job-card__body {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas:
+      "purpose"
+      "includes"
+      "exclusions"
+      "revision"
+      "timing";
+    gap: 14px;
   }
 
   .route-map-world__sheet--intake {
@@ -4123,24 +4165,18 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-job-card--overlay .route-map-job-card__section {
     font-size: clamp(1.18rem, 1.18vw, 1.34rem);
     line-height: 1.32;
-    color: color-mix(in srgb, var(--studio-eucalyptus) 82%, var(--studio-charcoal));
+    color: var(--studio-eucalyptus);
   }
 
-  .route-map-job-card--overlay .route-map-job-card__body > section > p,
-  .route-map-job-card--overlay .route-map-job-card__meta,
+  .route-map-job-card--overlay .route-map-job-card__block > p,
   .route-map-job-card--overlay .route-map-job-card__list {
     font-size: clamp(1.12rem, 1.12vw, 1.26rem);
     line-height: 1.72;
-    color: var(--studio-charcoal);
+    color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
   }
 
   .route-map-job-card--overlay .route-map-job-card__list--muted {
-    color: color-mix(in srgb, var(--studio-charcoal) 92%, #000);
-  }
-
-  .route-map-job-card--overlay .route-map-job-card__meta strong {
-    color: var(--studio-charcoal);
-    font-weight: 850;
+    color: color-mix(in srgb, var(--studio-charcoal) 94%, #000);
   }
 
   .route-map-primary-btn,
@@ -4155,7 +4191,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-world__sheet--checkout .pay-disclaimer__heading {
     font-size: clamp(1.28rem, 1.36vw, 1.52rem);
     line-height: 1.32;
-    color: var(--studio-charcoal);
+    color: var(--studio-eucalyptus);
   }
 
   .route-map-world__sheet--checkout .pay-summary-includes-label,
@@ -4163,7 +4199,8 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-world__sheet--checkout .pay-summary-total-label {
     font-size: max(1rem, 16px);
     line-height: 1.42;
-    color: color-mix(in srgb, var(--studio-denim) 88%, var(--studio-charcoal));
+    color: color-mix(in srgb, var(--studio-charcoal) 94%, #000);
+    font-weight: 700;
   }
 
   .route-map-world__sheet--checkout .pay-summary-includes-list li,
@@ -4173,16 +4210,18 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-world__sheet--checkout .pay-next-steps__item,
   .route-map-world__sheet--checkout .pay-next-secure,
   .route-map-world__sheet--checkout .pay-disclaimer__line,
-  .route-map-world__sheet--checkout .route-map-checkout-addon {
+  .route-map-world__sheet--checkout .route-map-checkout-addon,
+  .route-map-world__sheet--checkout .pay-summary-line-price,
+  .route-map-world__sheet--checkout .pay-summary-price {
     font-size: clamp(1.06rem, 1.02vw, 1.16rem);
     line-height: 1.68;
-    color: var(--studio-charcoal);
+    color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
   }
 
   .route-map-world__sheet--checkout .pay-summary-disclosure-note,
   .route-map-world__sheet--checkout .pay-next-secure,
   .route-map-world__sheet--checkout .pay-disclaimer__line {
-    color: color-mix(in srgb, var(--studio-charcoal) 88%, #000);
+    color: color-mix(in srgb, var(--studio-charcoal) 92%, #000);
   }
 
   .route-map-world__sheet--checkout .pay-field input {
@@ -4193,7 +4232,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-world__sheet--checkout .pay-form {
-    gap: 0.62rem 0.78rem;
+    gap: 0.65rem;
   }
 
   .route-map-world__sheet--checkout .pay-submit {
@@ -4292,5 +4331,55 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-social-intake__save-state strong {
     font-size: clamp(1.06rem, 1vw, 1.14rem);
     line-height: 1.32;
+  }
+}
+
+/* Secure Checkout — standalone `/payment` (same sheet as Route Map checkout) */
+.payment-secure-checkout-page {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+.payment-secure-checkout-page .route-map-scene-body {
+  height: 100%;
+  min-height: 100%;
+}
+
+.payment-secure-checkout-page .route-map-world--checkout-standalone {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(6px, 1.2vh, 12px);
+  box-sizing: border-box;
+}
+
+@media (min-width: 901px) {
+  .payment-secure-checkout-page .route-map-world--checkout-standalone .route-map-world__sheet--checkout {
+    position: relative;
+    left: auto;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    transform: none;
+    margin: 0 auto;
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .payment-secure-checkout-page .route-map-world--checkout-standalone {
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .payment-secure-checkout-page .route-map-world--checkout-standalone .route-map-world__sheet--checkout {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
   }
 }

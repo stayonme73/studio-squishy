@@ -10,13 +10,11 @@ import type { RouteMapRoadId } from "@/config/route-map-v1";
 type Props = {
   onSelectRoad: (roadId: RouteMapRoadId) => void;
   showChoosePanel: boolean;
-  mapInteractive?: boolean;
 };
 
 export default function RouteMapWorkspace({
   onSelectRoad,
   showChoosePanel,
-  mapInteractive = true,
 }: Props) {
   const choosePanelId = useId();
   const [choosePanelOpen, setChoosePanelOpen] = useState(true);
@@ -39,7 +37,7 @@ export default function RouteMapWorkspace({
           <RouteMapHighwayMap
             variant="desk-scene"
             onSelectRoad={onSelectRoad}
-            interactive={mapInteractive}
+            interactive={false}
           />
         </div>
 

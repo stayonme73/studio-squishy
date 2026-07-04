@@ -1,5 +1,6 @@
 "use client";
 
+import RouteMapJobDetailBlocks from "@/components/route-map/RouteMapJobDetailBlocks";
 import { ROUTE_MAP_V1, type RouteMapJob } from "@/config/route-map-v1";
 
 type Props = {
@@ -26,39 +27,7 @@ export default function RouteMapJobCard({ job, onChoose, onBack, variant = "inli
         <p className="route-map-job-card__price">{job.priceDisplay}</p>
       </header>
 
-      <div className="route-map-job-card__body">
-        <section>
-          <h3 className="route-map-job-card__section">Purpose</h3>
-          <p>{job.purpose}</p>
-        </section>
-
-        <section>
-          <h3 className="route-map-job-card__section">Includes</h3>
-          <ul className="route-map-job-card__list">
-            {job.deliverables.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
-
-        <section>
-          <h3 className="route-map-job-card__section">Exclusions</h3>
-          <ul className="route-map-job-card__list route-map-job-card__list--muted">
-            {job.exclusions.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="route-map-job-card__meta">
-          <p>
-            <strong>Revision:</strong> {job.revisionRule}
-          </p>
-          <p>
-            <strong>Timing:</strong> {job.timingLabel}
-          </p>
-        </section>
-      </div>
+      <RouteMapJobDetailBlocks job={job} />
 
       <footer className="route-map-job-card__footer">
         <button type="button" className="route-map-primary-btn" onClick={onChoose}>

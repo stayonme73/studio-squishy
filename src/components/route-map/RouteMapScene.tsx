@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import SecureCheckoutGrid from "@/components/payment/SecureCheckoutGrid";
 import RouteMapIntakeForm from "@/components/route-map/RouteMapIntakeForm";
 import RouteMapJobCard from "@/components/route-map/RouteMapJobCard";
+import RouteMapJobDetailBlocks from "@/components/route-map/RouteMapJobDetailBlocks";
 import RouteMapMobileMap from "@/components/route-map/RouteMapMobileMap";
 import RouteMapRoutePanel from "@/components/route-map/RouteMapRoutePanel";
 import RouteMapLobbyBackdrop from "@/components/route-map/RouteMapLobbyBackdrop";
@@ -133,18 +134,24 @@ export default function RouteMapScene() {
       <div className="route-map-scene-body">
         <RouteMapLobbyBackdrop />
         <div className={`route-map-world${showOverlay ? " route-map-world--overlay" : ""}`}>
-          <div className="route-map-world__map route-map-world__map--desktop">
+          <div
+            className="route-map-world__map route-map-world__map--desktop"
+            inert={showOverlay ? true : undefined}
+          >
             <RouteMapWorkspace
               onSelectRoad={handleSelectRoad}
               showChoosePanel={step === "map"}
-              mapInteractive={step === "map"}
             />
           </div>
 
-          <div className="route-map-world__map route-map-world__map--mobile">
+          <div
+            className="route-map-world__map route-map-world__map--mobile"
+            inert={showOverlay ? true : undefined}
+          >
             <RouteMapMobileMap
               onSelectRoad={handleSelectRoad}
               onSelectRouteStart={handleSelectJob}
+              showSelector={step === "map"}
             />
           </div>
 
@@ -183,7 +190,8 @@ export default function RouteMapScene() {
               <button type="button" className="route-map-back-link" onClick={handleBackToJob}>
                 ← Back to job details
               </button>
-              <SecureCheckoutGrid
+              <div className="route-map-overlay-workspace route-map-overlay-workspace--checkout">
+                <SecureCheckoutGrid
                 layout="full"
                 planSummary={paymentSummary}
                 onBeforePayment={(acknowledgment) => {
@@ -197,10 +205,6 @@ export default function RouteMapScene() {
                 onPaymentComplete={() => {
                   markPaymentReceived();
                   handlePaymentComplete();
-                }}
-                recommendationNotice={{
-                  title: selectedJob.name,
-                  lines: [selectedJob.purpose],
                 }}
                 paymentDecisionAddon={
                   postPublishEligible ? (
@@ -218,17 +222,24 @@ export default function RouteMapScene() {
                   ) : null
                 }
               />
+              </div>
             </div>
           ) : null}
 
           {showIntake ? (
             <div className="route-map-world__sheet route-map-world__sheet--intake">
-              <RouteMapIntakeForm
+              <div className="route-map-overlay-workspace route-map-overlay-workspace--intake">
+                <RouteMapJobDetailBlocks
+                  job={selectedJob}
+                  className="route-map-overlay-workspace__job-detail"
+                />
+                <RouteMapIntakeForm
                 job={selectedJob}
                 postPublishAddon={postPublishEligible && includePostPublishAddon}
                 onSaveDraft={handleIntakeSaveDraft}
                 onSubmit={handleIntakeSubmit}
               />
+              </div>
             </div>
           ) : null}
         </div>

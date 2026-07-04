@@ -1,18 +1,17 @@
 import PaymentCheckoutScene from "@/components/payment/PaymentCheckoutScene";
-import StudioUtilityBackdrop from "@/components/shared/StudioUtilityBackdrop";
-import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import { payment, parsePaymentPackageId } from "@/config/payment";
 import { studioBoard } from "@/config/studio-board";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 import "../mobile-route-fixes.css";
+import "../route-map/route-map.css";
 
 type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-/** Secure Checkout — Studio Plan payment; three-column pinboard layout. */
+/** Secure Checkout — full-viewport pay sheet; `/payment` direct links. */
 export default async function PaymentPage({ searchParams }: Props) {
   const params = await searchParams;
   const packageId = parsePaymentPackageId(params) ?? ("spark" as StudioGuidePackageId);
@@ -25,27 +24,17 @@ export default async function PaymentPage({ searchParams }: Props) {
       ? payment.routes.studioGuidePrototype
       : payment.routes.studioGuide;
 
+  const backLabel = fromStudioPlanReview
+    ? "← Back to Project Summary"
+    : fromPrototype
+      ? "← Back to Studio Guide"
+      : "← Back to Studio Guide";
+
   return (
     <main
-      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden`}
+      className={`route-map-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden ${utilityPageFontClassName}`}
     >
-      <div className="studio-utility-scene studio-utility-scene--header-band">
-        <div className="studio-utility-header-band payment-header-band">
-          <UtilityPageHeader
-            backHref={backHref}
-            activeNav="payment"
-            title={payment.pageTitle}
-            leadLines={payment.pageLeadLines}
-            helpCenterFrom="payment"
-          />
-        </div>
-        <div className="studio-utility-scene__body">
-          <StudioUtilityBackdrop placement="below-header" />
-          <div className="studio-utility-scene__content">
-            <PaymentCheckoutScene packageId={packageId} fromPrototype={fromPrototype} />
-          </div>
-        </div>
-      </div>
+      <PaymentCheckoutScene packageId={packageId} backHref={backHref} backLabel={backLabel} />
     </main>
   );
 }

@@ -12,9 +12,14 @@ import {
 type Props = {
   onSelectRoad: (roadId: RouteMapRoadId) => void;
   onSelectRouteStart: (job: RouteMapJob, roadId: RouteMapRoadId) => void;
+  showSelector?: boolean;
 };
 
-export default function RouteMapMobileMap({ onSelectRoad, onSelectRouteStart: _onSelectRouteStart }: Props) {
+export default function RouteMapMobileMap({
+  onSelectRoad,
+  onSelectRouteStart: _onSelectRouteStart,
+  showSelector = true,
+}: Props) {
   const choosePanelId = useId();
 
   const handleSelectRoad = useCallback(
@@ -34,9 +39,11 @@ export default function RouteMapMobileMap({ onSelectRoad, onSelectRouteStart: _o
         />
       </div>
 
-      <div className="route-map-mobile-scene__selector">
-        <RouteMapChoosePanel id={choosePanelId} onSelectRoad={handleSelectRoad} />
-      </div>
+      {showSelector ? (
+        <div className="route-map-mobile-scene__selector">
+          <RouteMapChoosePanel id={choosePanelId} onSelectRoad={handleSelectRoad} />
+        </div>
+      ) : null}
     </div>
   );
 }

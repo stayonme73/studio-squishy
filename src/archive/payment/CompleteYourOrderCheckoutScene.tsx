@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * @archived Complete Your Order — three-column payment page (journey v1).
- * Active `/payment` re-exports via `src/components/payment/PaymentCheckoutScene.tsx`.
+ * @archived Complete Your Studio Plan — utility-header payment page (journey v1).
+ * Superseded by `src/components/payment/SecureCheckoutPageScene.tsx` (Route Map checkout parity).
  * Shared grid: `src/components/payment/SecureCheckoutGrid.tsx`
  * @see docs/customer-journey-v1-locked.md
  */

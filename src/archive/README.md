@@ -8,7 +8,7 @@ See `docs/customer-journey-v1-locked.md` for the locked journey and archive poli
 
 | Path | Description |
 |------|-------------|
-| `payment/CompleteYourOrderCheckoutScene.tsx` | Three-column "Complete Your Order" checkout — active `/payment` re-exports via `src/components/payment/PaymentCheckoutScene.tsx` |
+| `payment/CompleteYourOrderCheckoutScene.tsx` | Utility-header "Complete Your Studio Plan" checkout — superseded by `SecureCheckoutPageScene` at `/payment` |
 | `draft-room/TellUsWhatsOnYourMindIntro.tsx` | Standalone intake opening — superseded by Project Discovery opening |
 | `draft-room/DraftRoomScene.tsx` | Draft Room intro plate — removed from active journey |
 | `draft-room/DraftRoomIntakeScene.tsx` | Standalone intake wizard (`?begin=1`) — opening lives in Project Discovery |
