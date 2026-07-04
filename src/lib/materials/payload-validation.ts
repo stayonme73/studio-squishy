@@ -6,6 +6,7 @@ export type ClientSubmitPayload = {
   fileName?: string;
   mimeType?: string;
   note?: string;
+  availability?: "available" | "not_available_yet";
 };
 
 const SECRET_PATTERNS: readonly RegExp[] = [

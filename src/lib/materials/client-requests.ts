@@ -61,6 +61,7 @@ export type ConsolidatedClientRequest = {
   isPendingReview: boolean;
   canSubmit: boolean;
   submittedAt?: string;
+  clientAvailability?: CampaignMaterialItem["clientAvailability"];
 };
 
 /** Client API payload — no internal IDs or mapping fields (Slice 3d-c-c L4). */
@@ -76,6 +77,7 @@ export type ClientConsolidatedRequest = {
   canSubmit: boolean;
   isPendingReview: boolean;
   submittedAt?: string;
+  clientAvailability?: CampaignMaterialItem["clientAvailability"];
 };
 
 export type OptionalClientRequest = {
@@ -90,6 +92,7 @@ export type OptionalClientRequest = {
   canSubmit: boolean;
   isPendingReview: boolean;
   submittedAt?: string;
+  clientAvailability?: CampaignMaterialItem["clientAvailability"];
 };
 
 /** Client API payload for optional rows (Slice 3d-c-c L4). */
@@ -104,6 +107,7 @@ export type ClientOptionalRequest = {
   canSubmit: boolean;
   isPendingReview: boolean;
   submittedAt?: string;
+  clientAvailability?: CampaignMaterialItem["clientAvailability"];
 };
 
 export function isClientIntakeMaterialItem(item: CampaignMaterialItem): boolean {
@@ -224,6 +228,16 @@ function latestSubmittedAt(items: readonly CampaignMaterialItem[]): string | und
     .at(-1);
 }
 
+function clientAvailabilityForItems(
+  items: readonly CampaignMaterialItem[],
+): CampaignMaterialItem["clientAvailability"] {
+  const responded = items.filter((item) => item.reviewStatus === "submitted");
+  if (responded.length === 0) return undefined;
+  return responded.every((item) => item.clientAvailability === "not_available_yet")
+    ? "not_available_yet"
+    : undefined;
+}
+
 function bucketItemsForConsolidatedId(
   record: CampaignMaterialsRecord,
   consolidatedItemId: string,
@@ -304,6 +318,7 @@ export function resolveConsolidatedClientRequests(
         isPendingReview: reviewStatus === "submitted",
         canSubmit,
         submittedAt: latestSubmittedAt(visibleItems),
+        clientAvailability: clientAvailabilityForItems(visibleItems),
       };
     });
 }
@@ -323,6 +338,7 @@ export function sanitizeClientConsolidatedRequests(
     canSubmit: request.canSubmit,
     isPendingReview: request.isPendingReview,
     submittedAt: request.submittedAt,
+    clientAvailability: request.clientAvailability,
   }));
 }
 
@@ -356,6 +372,7 @@ export function resolveOptionalClientRequests(
         canSubmit,
         isPendingReview: item.reviewStatus === "submitted",
         submittedAt: item.submittedAt,
+        clientAvailability: item.clientAvailability,
       };
     });
 }
@@ -374,6 +391,7 @@ export function sanitizeClientOptionalRequests(
     canSubmit: request.canSubmit,
     isPendingReview: request.isPendingReview,
     submittedAt: request.submittedAt,
+    clientAvailability: request.clientAvailability,
   }));
 }
 

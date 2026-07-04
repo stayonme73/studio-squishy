@@ -258,4 +258,32 @@ describe("client intake visibility (Slice 3d-c-c)", () => {
     expect(sanitized[0]).not.toHaveProperty("underlyingItemIds");
     expect(JSON.stringify(sanitized)).not.toContain("bf-001");
   });
+
+  it("exposes client not-available disposition without exposing internal ids", () => {
+    const record = {
+      campaignId: "c-not-available",
+      items: [
+        {
+          id: "goal-slot",
+          category: "factual-confirmation" as const,
+          requirementLevel: "required" as const,
+          reviewStatus: "submitted" as const,
+          contentKind: "text" as const,
+          label: "Campaign goal",
+          reason: "Social Media Launch Set",
+          relatedServiceIds: ["sm-001"] as const,
+          uploadStatus: "none" as const,
+          submittedAt: now,
+          clientAvailability: "not_available_yet" as const,
+        },
+      ],
+      updatedAt: now,
+      version: 1,
+    };
+
+    const sanitized = sanitizeClientConsolidatedRequests(resolveConsolidatedClientRequests(record));
+
+    expect(sanitized[0]?.clientAvailability).toBe("not_available_yet");
+    expect(sanitized[0]).not.toHaveProperty("underlyingItemIds");
+  });
 });

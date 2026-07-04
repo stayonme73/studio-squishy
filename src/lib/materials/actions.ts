@@ -66,6 +66,11 @@ function applyPayloadToItem(
   if (payload.note?.trim()) {
     patch.text = [patch.text, payload.note.trim()].filter(Boolean).join("\n\n");
   }
+  if (payload.availability === "not_available_yet") {
+    patch.clientAvailability = "not_available_yet";
+  } else if (payload.availability === "available") {
+    patch.clientAvailability = undefined;
+  }
 
   if (item.contentKind === "confirmation") {
     patch.confirmedAt = now;

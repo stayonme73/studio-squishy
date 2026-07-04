@@ -6004,6 +6004,12 @@ body:has(.sb--v4) {
   border-color: color-mix(in srgb, var(--sb-gold) 42%, transparent);
 }
 
+.sb-materials-board-status--not-available-yet {
+  color: color-mix(in srgb, var(--sb-text-muted) 88%, var(--sb-text) 12%);
+  background: color-mix(in srgb, var(--sb-text-muted) 10%, #fff 90%);
+  border-color: color-mix(in srgb, var(--sb-text-muted) 28%, transparent);
+}
+
 .sb-materials-action-card {
   display: grid;
   gap: 0.4rem;
@@ -6054,7 +6060,27 @@ body:has(.sb--v4) {
   color: var(--sb-text);
 }
 
-.sb-materials-slideout {
+.sb-card--materials-needed .sb-materials-board-tile {
+  gap: 0.55rem;
+}
+
+.sb-card--materials-needed .sb-materials-action-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  overflow: visible;
+}
+
+.sb-card--materials-needed .sb-materials-action-card {
+  gap: 0.26rem;
+  min-height: 0;
+  padding: 0.56rem 0.62rem;
+}
+
+.sb-card--materials-needed .sb-materials-action-card__detail {
+  -webkit-line-clamp: 1;
+}
+
+.sb-board-slideout {
   position: fixed;
   inset: 0;
   z-index: 60;
@@ -6062,7 +6088,7 @@ body:has(.sb--v4) {
   justify-content: flex-end;
 }
 
-.sb-materials-slideout__backdrop {
+.sb-board-slideout__backdrop {
   position: absolute;
   inset: 0;
   border: 0;
@@ -6070,12 +6096,12 @@ body:has(.sb--v4) {
   cursor: pointer;
 }
 
-.sb-materials-slideout__panel {
+.sb-board-slideout__panel {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
-  width: min(100%, 34rem);
+  width: min(100%, 38rem);
   height: 100%;
   overflow: hidden;
   background: color-mix(in srgb, #fff 38%, var(--board-family-field) 62%);
@@ -6083,16 +6109,22 @@ body:has(.sb--v4) {
   box-shadow: -1rem 0 2.4rem color-mix(in srgb, #1f2528 18%, transparent);
 }
 
-.sb-materials-slideout__header {
+.sb-board-slideout__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.1rem 1.2rem 0.9rem;
+  padding: 1.2rem 1.35rem 1rem;
   border-bottom: var(--sb-field-rule);
 }
 
-.sb-materials-slideout__eyebrow {
+.sb-board-slideout__heading {
+  display: grid;
+  gap: 0.34rem;
+  min-width: 0;
+}
+
+.sb-board-slideout__eyebrow {
   margin: 0 0 0.32rem;
   font-size: var(--sb-type-xs);
   font-weight: 800;
@@ -6101,43 +6133,185 @@ body:has(.sb--v4) {
   color: var(--sb-text-soft);
 }
 
-.sb-materials-slideout__title {
+.sb-board-slideout__title {
   margin: 0;
   font-size: var(--sb-type-lg);
   line-height: 1.2;
   color: var(--sb-text);
 }
 
-.sb-materials-slideout__close {
+.sb-board-slideout__close {
+  display: inline-flex;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.42rem;
+  height: 2.42rem;
   border: var(--sb-field-rule);
   border-radius: 999px;
-  padding: 0.46rem 0.74rem;
   font: inherit;
-  font-size: var(--sb-type-xs);
+  font-size: 1.45rem;
   font-weight: 700;
+  line-height: 1;
   color: var(--sb-text);
   background: var(--studio-paper);
   cursor: pointer;
 }
 
-.sb-materials-slideout__body {
-  display: grid;
-  gap: 0.92rem;
+.sb-board-slideout__body {
+  display: block;
+  flex: 1;
+  min-height: 0;
   overflow: auto;
-  padding: 1rem 1.2rem 1.35rem;
+  padding: 1.15rem 1.35rem 1.45rem;
 }
 
-.sb-materials-slideout__reason {
-  margin: 0;
+.sb-board-slideout__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.78rem;
+  padding: 1rem 1.35rem 1.15rem;
+  border-top: var(--sb-field-rule);
+  background: color-mix(in srgb, var(--board-family-field) 78%, #fff 22%);
+}
+
+.sb-board-slideout__back-link {
+  flex: 0 0 auto;
+  border: 0;
+  padding: 0;
+  font: inherit;
   font-size: var(--sb-type-sm);
-  line-height: 1.5;
+  font-weight: 700;
+  color: var(--sb-denim);
+  background: transparent;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.sb-campaign-goal-panel {
+  display: grid;
+  gap: 1.05rem;
+}
+
+.sb-campaign-goal-panel__intro {
+  margin: 0;
+  font-size: var(--sb-type-base);
+  line-height: 1.55;
   color: var(--sb-text-muted);
 }
 
-.sb-materials-slideout__submit {
-  justify-self: start;
-  margin-top: 0.2rem;
+.sb-campaign-goal-panel__choices {
+  display: grid;
+  gap: 0.7rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.sb-campaign-goal-panel__legend,
+.sb-campaign-goal-panel__field-label {
+  margin: 0;
+  font-size: max(0.875rem, 14px);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: var(--sb-text-soft);
+}
+
+.sb-campaign-goal-panel__bubble-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.52rem;
+}
+
+.sb-campaign-goal-panel__bubble {
+  border: 1px solid color-mix(in srgb, var(--sb-denim) 18%, transparent);
+  border-radius: 999px;
+  padding: 0.62rem 0.84rem;
+  font: inherit;
+  font-size: var(--sb-type-sm);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--sb-text);
+  background: color-mix(in srgb, #fff 52%, var(--board-family-field) 48%);
+  cursor: pointer;
+}
+
+.sb-campaign-goal-panel__bubble:hover,
+.sb-campaign-goal-panel__bubble:focus-visible,
+.sb-campaign-goal-panel__bubble--selected {
+  border-color: color-mix(in srgb, var(--sb-denim) 46%, transparent);
+  outline: none;
+  background: color-mix(in srgb, var(--sb-gold) 20%, #fff 80%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-denim) 13%, transparent);
+}
+
+.sb-campaign-goal-panel__field {
+  display: grid;
+  gap: 0.48rem;
+}
+
+.sb-campaign-goal-panel__input {
+  width: 100%;
+  min-height: 6.2rem;
+  resize: vertical;
+  border: var(--sb-field-rule);
+  border-radius: calc(var(--sb-tile-radius) * 0.5);
+  padding: 0.78rem 0.85rem;
+  font: inherit;
+  font-size: var(--sb-type-base);
+  line-height: 1.5;
+  color: var(--sb-text);
+  background: color-mix(in srgb, #fff 58%, var(--board-family-field) 42%);
+}
+
+.sb-campaign-goal-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.62rem;
+}
+
+.sb-campaign-goal-panel__actions .utility-btn {
+  min-height: 2.6rem;
+}
+
+@media (max-width: 768px) {
+  .sb-card--materials-needed .sb-materials-action-list {
+    grid-template-columns: 1fr;
+  }
+
+  .sb-board-slideout {
+    justify-content: stretch;
+  }
+
+  .sb-board-slideout__panel {
+    width: 100%;
+    border-left: 0;
+  }
+
+  .sb-board-slideout__header,
+  .sb-board-slideout__body,
+  .sb-board-slideout__footer {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .sb-board-slideout__footer,
+  .sb-campaign-goal-panel__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sb-campaign-goal-panel__actions .utility-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* Studio Board readability pass V2 — desktop client-facing surfaces */

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import StudioBoardSlideOutPanel from "@/components/studio-board/StudioBoardSlideOutPanel";
 import { materialsConfig } from "@/config/materials";
 import type { CampaignRecord } from "@/config/studio-board";
 import type {
@@ -18,14 +19,6 @@ type MaterialsClientResponse = {
   optionalRequests?: ClientOptionalRequest[];
   syncedAt?: string;
   error?: string;
-};
-
-type FileSelectionState = {
-  kind: "selected" | "error";
-  fileName?: string;
-  mimeType?: string;
-  previewDataUrl?: string;
-  message: string;
 };
 
 type BoardMaterialStatus = "Still Needed" | "Received" | "Not Available Yet";
@@ -59,48 +52,20 @@ type SocialMaterialDefinition = {
 };
 
 const SOCIAL_POSTS_JOB_ID = "v2-rtu-social-posts";
-const MATERIALS_IMAGE_PREVIEW_MAX_BYTES = 5 * 1024 * 1024;
+const CAMPAIGN_MESSAGE_CARD_ID = "campaign-message";
+const CAMPAIGN_GOAL_UNAVAILABLE_TEXT = "I do not have this yet.";
+const CAMPAIGN_GOAL_OPTIONS = [
+  "Promote an offer",
+  "Get more bookings",
+  "Announce something new",
+  "Remind people about my business",
+  "Share an event",
+  "Build awareness",
+  "Something else",
+] as const;
 
-function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") resolve(reader.result);
-      else reject(new Error("File preview failed."));
-    };
-    reader.onerror = () => reject(reader.error ?? new Error("File preview failed."));
-    reader.readAsDataURL(file);
-  });
-}
-
-function payloadFieldsForKind(contentKind: MaterialContentKind): Array<keyof ClientSubmitPayload> {
-  switch (contentKind) {
-    case "url":
-      return ["url", "note"];
-    case "file-metadata":
-      return ["fileName", "mimeType", "note"];
-    case "confirmation":
-    case "text":
-    default:
-      return ["text", "note"];
-  }
-}
-
-function fieldLabel(field: keyof ClientSubmitPayload): string {
-  switch (field) {
-    case "url":
-      return "URL";
-    case "fileName":
-      return "File name or description";
-    case "mimeType":
-      return "File type (optional)";
-    case "text":
-      return "Details";
-    case "note":
-      return "Note (optional)";
-    default:
-      return field;
-  }
+function statusModifier(status: BoardMaterialStatus): string {
+  return status.toLowerCase().replaceAll(" ", "-");
 }
 
 function formatReceivedStatus(submittedAt: string | undefined): string {
@@ -154,6 +119,7 @@ function isSocialPostsCampaign(campaign: CampaignRecord): boolean {
 }
 
 function requestStatus(request: ClientConsolidatedRequest | ClientOptionalRequest): BoardMaterialStatus {
+  if (request.clientAvailability === "not_available_yet") return "Not Available Yet";
   if (request.isPendingReview || request.reviewStatus === "submitted" || request.reviewStatus === "approved_for_use") {
     return "Received";
   }
@@ -233,7 +199,8 @@ function resolveSocialMaterialDefinitions(campaign: CampaignRecord): SocialMater
       id: "campaign-message",
       label: "Campaign goal/message",
       detail: "Tell us what the posts should help people understand or do.",
-      categories: ["factual-confirmation"],
+      categories: ["factual-confirmation", "document-reference"],
+      contentKinds: ["text", "confirmation"],
       value: valueFor("campaign-goal"),
     },
     {
@@ -291,7 +258,14 @@ function buildSocialActionCards(
 
     if (request) usedRequestIds.add(request.request.id);
 
-    const status = definition.value ? "Received" : request ? requestStatus(request.request) : "Not Available Yet";
+    const status =
+      definition.id === CAMPAIGN_MESSAGE_CARD_ID && request
+        ? requestStatus(request.request)
+        : definition.value
+          ? "Received"
+          : request
+            ? requestStatus(request.request)
+            : "Not Available Yet";
     return {
       id: definition.id,
       label: definition.label,
@@ -317,7 +291,11 @@ function buildGenericActionCards(requests: BoardRequest[]): MaterialActionCard[]
 
 function buildSubmittedRequestItems(requests: BoardRequest[]): ReceivedMaterial[] {
   return requests
-    .filter(({ request }) => request.isPendingReview || request.reviewStatus === "submitted")
+    .filter(
+      ({ request }) =>
+        request.clientAvailability !== "not_available_yet" &&
+        (request.isPendingReview || request.reviewStatus === "submitted"),
+    )
     .map(({ kind, request }) => ({
       id: `submitted:${kind}:${request.id}`,
       label: "prompt" in request ? request.prompt : request.label,
@@ -326,99 +304,14 @@ function buildSubmittedRequestItems(requests: BoardRequest[]): ReceivedMaterial[
     }));
 }
 
-function SubmitFields({
-  contentKind,
-  values,
-  onChange,
-  fileSelection,
-  onFileSelect,
-  disabled,
-}: {
-  contentKind: MaterialContentKind;
-  values: ClientSubmitPayload;
-  onChange: (field: keyof ClientSubmitPayload, value: string) => void;
-  fileSelection?: FileSelectionState;
-  onFileSelect: (file: File | null) => void;
-  disabled: boolean;
-}) {
-  const fields = payloadFieldsForKind(contentKind);
-  return (
-    <div className="sb-materials-intake__fields">
-      {contentKind === "file-metadata" ? (
-        <div className="sb-materials-intake__file-picker">
-          <label className="utility-btn utility-btn--secondary sb-materials-intake__file-button">
-            <span>Choose file</span>
-            <input
-              className="sb-materials-intake__file-input"
-              type="file"
-              accept="image/png,image/jpeg,.png,.jpg,.jpeg,.pdf,.doc,.docx,.txt,.mp3,.wav,.mp4"
-              disabled={disabled}
-              onChange={(event) => {
-                const file = event.target.files?.[0] ?? null;
-                event.target.value = "";
-                onFileSelect(file);
-              }}
-            />
-          </label>
-          {fileSelection ? (
-            <div
-              className={`sb-materials-intake__file-state sb-materials-intake__file-state--${fileSelection.kind}`}
-              role={fileSelection.kind === "error" ? "alert" : "status"}
-            >
-              {fileSelection.previewDataUrl ? (
-                <span
-                  className="sb-materials-intake__file-thumb"
-                  role="img"
-                  aria-label={`Preview of ${fileSelection.fileName ?? "selected image"}`}
-                  style={{ backgroundImage: `url("${fileSelection.previewDataUrl}")` }}
-                />
-              ) : (
-                <span className="sb-materials-intake__file-thumb sb-materials-intake__file-thumb--file">
-                  File
-                </span>
-              )}
-              <span className="sb-materials-intake__file-copy">
-                <strong>{fileSelection.fileName ?? "File selection"}</strong>
-                <span>{fileSelection.message}</span>
-              </span>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-      {fields.map((field) => (
-        <label key={field} className="sb-materials-intake__field">
-          <span className="sb-materials-intake__field-label">{fieldLabel(field)}</span>
-          {field === "text" || field === "note" ? (
-            <textarea
-              className="sb-materials-intake__input"
-              rows={field === "text" ? 4 : 2}
-              value={values[field] ?? ""}
-              disabled={disabled}
-              onChange={(event) => onChange(field, event.target.value)}
-            />
-          ) : (
-            <input
-              className="sb-materials-intake__input"
-              type={field === "url" ? "url" : "text"}
-              value={values[field] ?? ""}
-              disabled={disabled}
-              onChange={(event) => onChange(field, event.target.value)}
-            />
-          )}
-        </label>
-      ))}
-    </div>
-  );
-}
-
 export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: CampaignRecord }) {
   const [data, setData] = useState<MaterialsClientResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
-  const [drafts, setDrafts] = useState<Record<string, ClientSubmitPayload>>({});
-  const [fileSelections, setFileSelections] = useState<Record<string, FileSelectionState>>({});
+  const [campaignGoalSelection, setCampaignGoalSelection] = useState<string>("");
+  const [campaignGoalNote, setCampaignGoalNote] = useState("");
   const materialsEndpoint = `/api/campaigns/${encodeURIComponent(campaign.campaignId)}/materials?audience=client`;
   const paidCampaign = Boolean(campaign.paymentReceivedAt);
   const socialPostsCampaign = isSocialPostsCampaign(campaign);
@@ -450,15 +343,6 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
     return () => window.clearTimeout(timeout);
   }, [paidCampaign, refresh]);
 
-  useEffect(() => {
-    if (!activeCardId) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setActiveCardId(null);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeCardId]);
-
   const requests = useMemo<BoardRequest[]>(() => {
     const consolidated = (data?.consolidatedRequests ?? []).map((request) => ({
       kind: "consolidated" as const,
@@ -488,7 +372,9 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
     [campaign, requests, socialPostsCampaign],
   );
 
-  const activeCard = actionCards.find((card) => card.id === activeCardId && card.request);
+  const activeCard = actionCards.find(
+    (card) => card.id === CAMPAIGN_MESSAGE_CARD_ID && card.id === activeCardId && card.request,
+  );
   const activeRequest = activeCard?.request;
   const activeRequestId = activeRequest?.request.id;
 
@@ -507,86 +393,48 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
     socialPostsCampaign,
   ]);
 
-  const updateDraft = (id: string, field: keyof ClientSubmitPayload, value: string) => {
-    setDrafts((current) => ({
-      ...current,
-      [id]: { ...current[id], [field]: value },
-    }));
+  const campaignGoalCanSubmit = Boolean(campaignGoalSelection || campaignGoalNote.trim());
+
+  const campaignGoalPayload = (
+    availability: NonNullable<ClientSubmitPayload["availability"]>,
+  ): ClientSubmitPayload => {
+    if (availability === "not_available_yet") {
+      return {
+        text: CAMPAIGN_GOAL_UNAVAILABLE_TEXT,
+        availability,
+      };
+    }
+
+    const trimmedNote = campaignGoalNote.trim();
+    return {
+      text: campaignGoalSelection || trimmedNote,
+      note: campaignGoalSelection ? trimmedNote || undefined : undefined,
+      availability,
+    };
   };
 
-  const selectFile = async (id: string, file: File | null) => {
-    if (!file) return;
-    if (file.size > MATERIALS_IMAGE_PREVIEW_MAX_BYTES) {
-      setFileSelections((current) => ({
-        ...current,
-        [id]: {
-          kind: "error",
-          fileName: file.name,
-          mimeType: file.type || "application/octet-stream",
-          message: "This file is too large. Please choose a file under 5 MB.",
-        },
-      }));
-      return;
-    }
+  const closePanel = useCallback(() => setActiveCardId(null), []);
 
-    const mimeType = file.type || "application/octet-stream";
-    updateDraft(id, "fileName", file.name);
-    updateDraft(id, "mimeType", mimeType);
-
-    if (!mimeType.startsWith("image/")) {
-      setFileSelections((current) => ({
-        ...current,
-        [id]: {
-          kind: "selected",
-          fileName: file.name,
-          mimeType,
-          message: "File selected locally. Preview is not available for this file type.",
-        },
-      }));
-      return;
-    }
-
-    try {
-      const previewDataUrl = await readFileAsDataUrl(file);
-      setFileSelections((current) => ({
-        ...current,
-        [id]: {
-          kind: "selected",
-          fileName: file.name,
-          mimeType,
-          previewDataUrl,
-          message: "Image selected locally. Send to Studio when you are ready.",
-        },
-      }));
-    } catch {
-      setFileSelections((current) => ({
-        ...current,
-        [id]: {
-          kind: "error",
-          fileName: file.name,
-          mimeType,
-          message: "We could not preview this image. Please choose another PNG or JPG.",
-        },
-      }));
-    }
-  };
-
-  const submitActiveRequest = async () => {
+  const submitActiveRequest = async (
+    availability: NonNullable<ClientSubmitPayload["availability"]> = "available",
+  ) => {
     if (!activeRequest || !activeRequestId) return;
+    if (availability === "available" && !campaignGoalCanSubmit) return;
     setSubmittingId(activeRequestId);
     setError(null);
     try {
+      const payload = campaignGoalPayload(availability);
       const body =
         activeRequest.kind === "consolidated"
           ? {
               action: "client_submit_consolidated",
               consolidatedItemId: activeRequestId,
-              payload: drafts[activeRequestId] ?? {},
+              payload,
             }
           : {
               action: "client_submit",
               itemId: activeRequestId,
-              payload: drafts[activeRequestId] ?? {},
+              payload,
             };
       const res = await fetch(materialsEndpoint, {
         method: "PATCH",
@@ -597,11 +445,8 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
       if (!res.ok) throw new Error(json.error ?? `Submit failed (${res.status})`);
       setData(json);
       setActiveCardId(null);
-      setDrafts((current) => {
-        const next = { ...current };
-        delete next[activeRequestId];
-        return next;
-      });
+      setCampaignGoalSelection("");
+      setCampaignGoalNote("");
       window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Submit failed.");
@@ -626,9 +471,7 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
                   {item.value ? <span className="sb-materials-board-list__value">{item.value}</span> : null}
                 </span>
                 <span
-                  className={`sb-materials-board-status sb-materials-board-status--${item.status
-                    .toLowerCase()
-                    .replaceAll(" ", "-")}`}
+                  className={`sb-materials-board-status sb-materials-board-status--${statusModifier(item.status)}`}
                 >
                   {item.status}
                 </span>
@@ -654,7 +497,10 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
           {!loading ? (
             <div className="sb-materials-action-list">
               {actionCards.map((card) => {
-                const clickable = card.status === "Still Needed" && Boolean(card.request);
+                const clickable =
+                  card.id === CAMPAIGN_MESSAGE_CARD_ID &&
+                  card.status === "Still Needed" &&
+                  Boolean(card.request);
                 return (
                   <button
                     key={card.id}
@@ -663,14 +509,14 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
                       clickable ? " sb-materials-action-card--clickable" : ""
                     }`}
                     disabled={!clickable}
-                    onClick={() => setActiveCardId(card.id)}
+                    onClick={() => {
+                      if (clickable) setActiveCardId(card.id);
+                    }}
                   >
                     <span className="sb-materials-action-card__head">
                       <span className="sb-materials-action-card__label">{card.label}</span>
                       <span
-                        className={`sb-materials-board-status sb-materials-board-status--${card.status
-                          .toLowerCase()
-                          .replaceAll(" ", "-")}`}
+                        className={`sb-materials-board-status sb-materials-board-status--${statusModifier(card.status)}`}
                       >
                         {card.status}
                       </span>
@@ -692,66 +538,87 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
       </article>
 
       {activeCard && activeRequest && activeRequestId ? (
-        <div
-          className="sb-materials-slideout"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="sb-materials-slideout-title"
-        >
-          <button
-            type="button"
-            className="sb-materials-slideout__backdrop"
-            aria-label="Close material request"
-            onClick={() => setActiveCardId(null)}
-          />
-          <section className="sb-materials-slideout__panel">
-            <header className="sb-materials-slideout__header">
-              <div>
-                <p className="sb-materials-slideout__eyebrow">Material Request</p>
-                <h2 id="sb-materials-slideout-title" className="sb-materials-slideout__title">
-                  {activeCard.label}
-                </h2>
-              </div>
+        <StudioBoardSlideOutPanel
+          title="Tell us what these posts are for"
+          eyebrow="Material Request"
+          onClose={closePanel}
+          footer={
+            <div className="sb-campaign-goal-panel__actions">
               <button
                 type="button"
-                className="sb-materials-slideout__close"
-                onClick={() => setActiveCardId(null)}
+                className="utility-btn utility-btn--secondary"
+                disabled={submittingId === activeRequestId}
+                onClick={closePanel}
               >
-                Close
+                Save and finish later
               </button>
-            </header>
-            <div className="sb-materials-slideout__body">
-              <p className="sb-materials-slideout__reason">{activeCard.detail}</p>
-              {"reviewStatus" in activeRequest.request &&
-              activeRequest.request.reviewStatus === "needs_clarification" ? (
-                <p className="sb-materials-intake__clarify" role="status">
-                  {materialsConfig.clientNeedsClarificationBody}
-                </p>
-              ) : null}
-              {error ? (
-                <p className="sb-materials-board-tile__error" role="alert">
-                  {error}
-                </p>
-              ) : null}
-              <SubmitFields
-                contentKind={activeRequest.request.contentKind}
-                values={drafts[activeRequestId] ?? {}}
-                onChange={(field, value) => updateDraft(activeRequestId, field, value)}
-                fileSelection={fileSelections[activeRequestId]}
-                onFileSelect={(file) => void selectFile(activeRequestId, file)}
-                disabled={submittingId === activeRequestId}
-              />
               <button
                 type="button"
-                className="utility-btn utility-btn--primary sb-materials-slideout__submit"
-                disabled={submittingId === activeRequestId}
-                onClick={() => void submitActiveRequest()}
+                className="utility-btn utility-btn--primary"
+                disabled={submittingId === activeRequestId || !campaignGoalCanSubmit}
+                onClick={() => void submitActiveRequest("available")}
               >
-                {materialsConfig.clientSubmitLabel}
+                Save to Studio
+              </button>
+              <button
+                type="button"
+                className="utility-btn utility-btn--secondary"
+                disabled={submittingId === activeRequestId}
+                onClick={() => void submitActiveRequest("not_available_yet")}
+              >
+                I do not have this yet
               </button>
             </div>
-          </section>
-        </div>
+          }
+        >
+          <div className="sb-campaign-goal-panel">
+            <p className="sb-campaign-goal-panel__intro">
+              Pick the closest goal. You can add a short note if there is a date, offer, or detail we
+              should know before writing.
+            </p>
+            {"reviewStatus" in activeRequest.request &&
+            activeRequest.request.reviewStatus === "needs_clarification" ? (
+              <p className="sb-materials-intake__clarify" role="status">
+                {materialsConfig.clientNeedsClarificationBody}
+              </p>
+            ) : null}
+            {error ? (
+              <p className="sb-materials-board-tile__error" role="alert">
+                {error}
+              </p>
+            ) : null}
+            <fieldset className="sb-campaign-goal-panel__choices">
+              <legend className="sb-campaign-goal-panel__legend">Choose a goal</legend>
+              <div className="sb-campaign-goal-panel__bubble-list">
+                {CAMPAIGN_GOAL_OPTIONS.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    className={`sb-campaign-goal-panel__bubble${
+                      campaignGoalSelection === option ? " sb-campaign-goal-panel__bubble--selected" : ""
+                    }`}
+                    aria-pressed={campaignGoalSelection === option}
+                    disabled={submittingId === activeRequestId}
+                    onClick={() => setCampaignGoalSelection(option)}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <label className="sb-campaign-goal-panel__field">
+              <span className="sb-campaign-goal-panel__field-label">Anything else we should know?</span>
+              <textarea
+                className="sb-campaign-goal-panel__input"
+                rows={3}
+                placeholder="We are promoting a summer special through July 31."
+                value={campaignGoalNote}
+                disabled={submittingId === activeRequestId}
+                onChange={(event) => setCampaignGoalNote(event.target.value)}
+              />
+            </label>
+          </div>
+        </StudioBoardSlideOutPanel>
       ) : null}
     </>
   );

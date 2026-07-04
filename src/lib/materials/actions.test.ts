@@ -84,6 +84,21 @@ describe("materials actions", () => {
     expect(result.status).toBe(400);
   });
 
+  it("preserves client not-available disposition on submit", () => {
+    const result = applyClientSubmitConsolidated(
+      envelope([sampleItem({ id: "a", category: "factual-confirmation", contentKind: "text" })]),
+      "factual-confirmation:text",
+      { text: "I do not have this yet.", availability: "not_available_yet" },
+      client,
+    );
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.envelope.items[0]?.reviewStatus).toBe("submitted");
+    expect(result.envelope.items[0]?.clientAvailability).toBe("not_available_yet");
+    expect(result.envelope.items[0]?.submittedAt).toBeDefined();
+  });
+
   it("blocks consolidated path for optional single-item submit on required blocking slot", () => {
     const result = applyClientSubmitItem(
       envelope([sampleItem()]),

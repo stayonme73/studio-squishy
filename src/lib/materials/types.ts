@@ -50,6 +50,7 @@ export type CampaignMaterialItem = {
   sizeBytes?: number;
   url?: string;
   text?: string;
+  clientAvailability?: "not_available_yet";
   confirmedAt?: string;
   submittedBy?: MaterialSubmittedBy;
   submittedAt?: string;
