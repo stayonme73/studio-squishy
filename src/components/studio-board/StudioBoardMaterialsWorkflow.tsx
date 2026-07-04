@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import StudioBoardSlideOutPanel from "@/components/studio-board/StudioBoardSlideOutPanel";
 import { materialsConfig } from "@/config/materials";
 import type { CampaignRecord } from "@/config/studio-board";
+import { resolveBoardNextStepPanelMessage } from "@/lib/studio-board-client-copy";
 import type {
   ClientConsolidatedRequest,
   ClientOptionalRequest,
@@ -371,6 +372,18 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
     [campaign, requests, socialPostsCampaign],
   );
 
+  const nextStepMessage = useMemo(
+    () =>
+      resolveBoardNextStepPanelMessage({
+        campaign,
+        blockingRequiredCount: data?.blockingRequiredCount ?? 0,
+        stillNeededLabels: actionCards
+          .filter((card) => card.status === "Still Needed")
+          .map((card) => card.label),
+      }),
+    [actionCards, campaign, data?.blockingRequiredCount],
+  );
+
   const activeCard = actionCards.find(
     (card) => card.id === CAMPAIGN_MESSAGE_CARD_ID && card.id === activeCardId && card.request,
   );
@@ -532,7 +545,7 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
       <article className="sb-card sb-card--materials-next sb-materials-tile bf-material bf-material-paper">
         <p className="sb-card__tab">What You Should Do Next</p>
         <div className="sb-materials-board-next">
-          <p>Choose one item to finish. You can save and come back later.</p>
+          <p>{nextStepMessage}</p>
         </div>
       </article>
 

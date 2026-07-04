@@ -265,7 +265,7 @@ function resolveBoardHeaderSnapshot(campaign: CampaignRecord | null): BoardHeade
 
 const whatHappensNextSentences: Record<CampaignStatus, string> = {
 
-  DISCOVERY_COMPLETE: "Review and approve your Studio Plan to continue.",
+  DISCOVERY_COMPLETE: "Review your Project Summary when you're ready to continue.",
 
   DRAFT_RECEIVED: "Choose your package and complete payment to continue.",
 

@@ -237,8 +237,8 @@ export const studioBoard = {
   journeyStages: [
     {
       id: "DISCOVERY_COMPLETE" as const,
-      label: "Discovery Complete",
-      boardLabel: "Discovery Complete",
+      label: "Project Summary Ready",
+      boardLabel: "Project Summary Ready",
       hint: "Review your Project Summary next.",
     },
     {
@@ -281,12 +281,12 @@ export const studioBoard = {
 
   statusContent: {
     DISCOVERY_COMPLETE: {
-      statusLabel: "Discovery Complete",
+      statusLabel: "Project Summary Ready",
       nextUpdateLabel: "After Project Summary approval",
       campaignProgressLabel: "Awaiting Project Summary",
-      headerSubline: "Discovery received — review your Project Summary to continue.",
+      headerSubline: "We received your discovery answers — review your Project Summary to continue.",
       campaignDescription:
-        "Discovery complete. Review and confirm your Project Summary before production begins.",
+        "Your Project Summary is ready. Review and confirm your Studio Plan before production begins.",
       estimatedCompletion: "Review your Project Summary",
       studioNoteFollowUp: "Review your Project Summary when you're ready.",
       studioNoteBoard: {
@@ -298,7 +298,7 @@ export const studioBoard = {
           "— The Studio Team ♥",
         ],
       },
-      studioUpdates: [{ date: "Today", message: "Discovery received." }],
+      studioUpdates: [{ date: "Today", message: "We received your discovery answers." }],
       whatHappensNextSteps: [
         "Review what we heard from your discovery answers.",
         "Confirm your recommended services.",
@@ -340,9 +340,9 @@ export const studioBoard = {
       statusLabel: "Payment Received",
       nextUpdateLabel: "Within 2 business days",
       campaignProgressLabel: "Campaign Queued",
-      headerSubline: "Payment received — your campaign is entering production.",
+      headerSubline: "We received your payment — your campaign is entering production.",
       campaignDescription:
-        "Payment received. The Studio will begin creative work on your campaign.",
+        "We received your payment. The Studio will begin creative work on your campaign.",
       estimatedCompletion: "Approximately 7 business days",
       estimatedFirstConcepts: "June 24",
       studioNoteFollowUp:
@@ -533,7 +533,7 @@ export const studioBoard = {
       "The Studio team is creating your campaign directions. Your Studio Board will update when concepts are ready for review.",
     paymentReceivedLabel: "Campaign Queued",
     paymentReceivedHint:
-      "Payment is confirmed. Share your Project Details so we can begin production.",
+      "We received your payment. Share your Project Details so we can begin production.",
     completeProjectDetails: "Complete Project Details",
     completeProjectDetailsHint:
       "Tell us what we need to complete the services in your approved Studio Plan.",
@@ -729,7 +729,7 @@ export const studioBoard = {
     ] as const,
     statusQuotes: {
       DRAFT_RECEIVED: ["Every great campaign", "starts with a single idea."] as const,
-      PAYMENT_RECEIVED: ["Payment received.", "Production begins."] as const,
+      PAYMENT_RECEIVED: ["We received your payment.", "Production begins."] as const,
       BUILDING_CONCEPTS: ["Progress often begins", "before confidence arrives."] as const,
       READY_FOR_REVIEW: ["Clarity comes through", "refinement."] as const,
       DELIVERED: ["Finished and shared beats", "perfect and hidden."] as const,

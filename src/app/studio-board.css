@@ -6474,7 +6474,7 @@ body:has(.sb--v4) {
 
   .sb--v4 .sb-progress-panel__body,
   .sb--v4 .sb-studio-note-letter {
-    overflow: auto;
+    overflow: visible;
   }
 
   .sb--v4 .sb-progress-panel__fit,
@@ -6795,6 +6795,8 @@ body:has(.sb--v4) {
 
   .sb--v4 .sb-main {
     padding: clamp(1rem, 1.2vw, 1.35rem);
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   .sb--v4 .sb-header-v3 {
@@ -6802,11 +6804,90 @@ body:has(.sb--v4) {
   }
 
   .sb--v4 .sb-board-layout {
-    grid-template-rows: minmax(22rem, 0.88fr) minmax(15rem, 0.52fr);
+    grid-template-rows: max-content max-content;
     grid-auto-rows: unset;
-    align-items: stretch;
+    align-items: start;
     gap: var(--sb-grid-gap);
     padding-right: 0.45rem;
+    flex: 0 0 auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-board-layout .sb-materials-tile,
+  .sb--v4 .sb-board-layout .sb-card--materials-received,
+  .sb--v4 .sb-board-layout .sb-card--materials-needed,
+  .sb--v4 .sb-board-layout .sb-card--materials-next {
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+    height: auto;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-card--materials-received .sb-materials-board-tile,
+  .sb--v4 .sb-card--materials-needed .sb-materials-board-tile {
+    flex: 0 0 auto;
+    min-height: auto;
+  }
+
+  .sb--v4 .sb-materials-board-tile {
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-card--materials-received .sb-materials-board-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-card--materials-received .sb-materials-board-list__item {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: start;
+    gap: 0.35rem 0.45rem;
+    padding: 0.56rem 0.62rem;
+  }
+
+  .sb--v4 .sb-card--materials-received .sb-materials-board-status {
+    justify-self: start;
+  }
+
+  .sb--v4 .sb-card--materials-received .sb-materials-board-list__value {
+    -webkit-line-clamp: 2;
+  }
+
+  .sb--v4 .sb-card--materials-received .sb-materials-board-tile {
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-card--materials-needed .sb-materials-action-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-card--materials-needed .sb-materials-board-tile {
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-card--materials-needed .sb-materials-action-card {
+    min-height: 0;
+    padding: 0.56rem 0.62rem;
+  }
+
+  .sb--v4 .sb-card--progress .sb-journey {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 0.75rem;
+    row-gap: 0.55rem;
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  .sb--v4 .sb-card--progress .sb-journey__step {
+    min-width: 0;
   }
 
   .sb--v4 .sb-board-layout .sb-card--current {
@@ -6863,16 +6944,49 @@ body:has(.sb--v4) {
     min-height: 0;
   }
 
-  .sb--v4 .sb-board-layout .sb-card--current,
-  .sb--v4 .sb-board-layout .sb-card--progress,
-  .sb--v4 .sb-board-layout .sb-card--project-snapshot {
-    min-height: clamp(22rem, 48vh, 34rem);
-    overflow: hidden;
+  .sb--v4 .sb-board-layout .sb-card--materials-received,
+  .sb--v4 .sb-board-layout .sb-card--materials-needed,
+  .sb--v4 .sb-board-layout .sb-card--materials-next {
+    min-height: max-content;
   }
 
-  .sb--v4 .sb-board-layout .sb-materials-tile {
-    min-height: clamp(15rem, 30vh, 23rem);
-    overflow: hidden;
+  .sb--v4 .sb-board-layout .sb-card--current,
+  .sb--v4 .sb-board-layout .sb-card--progress {
+    min-height: max-content;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--project-snapshot {
+    min-height: max-content;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-board-layout .sb-card--current .sb-current-campaign,
+  .sb--v4 .sb-board-layout .sb-card--progress .sb-progress-panel,
+  .sb--v4 .sb-board-layout .sb-card--project-snapshot .sb-project-snapshot {
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-project-snapshot,
+  .sb--v4 .sb-project-snapshot__stack {
+    flex: 0 0 auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-progress-panel {
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-materials-board-list,
+  .sb--v4 .sb-materials-action-list {
+    overflow: visible;
+  }
+
+  .sb--v4 .sb-card--current .sb-current-campaign,
+  .sb--v4 .sb-card--progress .sb-progress-panel {
+    flex: 0 0 auto;
+    min-height: auto;
   }
 
   .sb--v4 .sb-board-layout .sb-card--package .sb-package-summary,

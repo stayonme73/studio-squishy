@@ -9,6 +9,7 @@ import {
   resolveClientFacingServiceName,
   campaignUsesCustomStudioPlan,
 } from "@/lib/approved-plan-display";
+import { toClientFacingActivityMessage } from "@/lib/studio-board-client-copy";
 import {
   studioBoard,
   type CampaignRecord,
@@ -203,32 +204,32 @@ export function resolveActivityFeed(campaign: CampaignRecord | null): ActivityFe
     });
   };
 
-  pushIso(campaign.visionSubmittedAt ?? campaign.createdAt, "Intake received");
-  pushIso(campaign.discoverySubmittedAt, "Discovery received");
-  pushIso(campaign.paymentReceivedAt, "Payment received");
-  pushIso(campaign.projectDetailsSubmittedAt, "Project Details received");
+  pushIso(campaign.visionSubmittedAt ?? campaign.createdAt, "We received your project details");
+  pushIso(campaign.discoverySubmittedAt, "We received your discovery answers");
+  pushIso(campaign.paymentReceivedAt, "We received your payment");
+  pushIso(campaign.projectDetailsSubmittedAt, "We received your project details");
   if (
     campaign.materialsSummary?.updatedAt &&
     campaign.materialsSummary.blockingRequiredCount === 0 &&
     campaign.projectDetailsSubmittedAt
   ) {
-    pushIso(campaign.materialsSummary.updatedAt, "Required materials received");
+    pushIso(campaign.materialsSummary.updatedAt, "Everything we need has been received");
   }
 
   if (campaign.selectedCampaignOption) {
-    pushIso(campaign.updatedAt, "Direction selected");
+    pushIso(campaign.updatedAt, "You chose your campaign direction");
   }
 
   if (campaign.campaignStatus === "BUILDING_CONCEPTS") {
-    pushIso(campaign.updatedAt, "Concept development started");
+    pushIso(campaign.updatedAt, "We're building your concepts");
   }
 
   if (campaign.campaignStatus === "READY_FOR_REVIEW") {
-    pushIso(campaign.updatedAt, "Concepts ready for review");
+    pushIso(campaign.updatedAt, "Your concepts are ready for review");
   }
 
   if (campaign.campaignStatus === "DELIVERED") {
-    pushIso(campaign.updatedAt, "Package delivered");
+    pushIso(campaign.updatedAt, "Your deliverables are ready");
   }
 
   for (const note of resolveCampaignStudioNotes(campaign)) {
@@ -264,11 +265,7 @@ function formatActivityDate(value: string): string {
 }
 
 function normalizeActivityMessage(message: string): string {
-  return message
-    .replace(/\.$/, "")
-    .replace(/^Vision Intake received$/i, "Intake received")
-    .replace(/^Campaign concepts ready for your review\.$/i, "Concepts ready for review")
-    .replace(/^Final package delivered\.$/i, "Package delivered");
+  return toClientFacingActivityMessage(message);
 }
 
 export function resolveRevisionTracker(campaign: CampaignRecord): RevisionTrackerView {

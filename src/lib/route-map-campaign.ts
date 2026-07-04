@@ -204,7 +204,7 @@ export function createCampaignFromRouteMapJob(
     revisionRoundsIncluded: 1,
     revisionRoundsUsed: 0,
     deliverablesDelivered: {},
-    studioNotes: [{ date: "Today", message: `Route Map job selected: ${job.name}.` }],
+    studioNotes: [{ date: "Today", message: `Your project has been created: ${job.name}.` }],
     createdAt: now,
     updatedAt: now,
   };
