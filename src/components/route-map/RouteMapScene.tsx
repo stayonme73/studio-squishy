@@ -132,9 +132,13 @@ export default function RouteMapScene() {
     <div className={`route-map-page route-map-page--immersive ${utilityPageFontClassName}`}>
       <div className="route-map-scene-body">
         <RouteMapLobbyBackdrop />
-        <div className="route-map-world">
+        <div className={`route-map-world${showOverlay ? " route-map-world--overlay" : ""}`}>
           <div className="route-map-world__map route-map-world__map--desktop">
-            <RouteMapWorkspace onSelectRoad={handleSelectRoad} showChoosePanel={step === "map"} />
+            <RouteMapWorkspace
+              onSelectRoad={handleSelectRoad}
+              showChoosePanel={step === "map"}
+              mapInteractive={step === "map"}
+            />
           </div>
 
           <div className="route-map-world__map route-map-world__map--mobile">

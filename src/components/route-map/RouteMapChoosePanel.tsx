@@ -52,10 +52,12 @@ export default function RouteMapChoosePanel({
             <span className="route-map-choose-panel__collapse-label">Hide routes</span>
           </button>
         ) : null}
-        <span className="route-map-choose-panel__bulb" aria-hidden>
-          💡
-        </span>
-        <h2 className="route-map-choose-panel__title">Choose Your Route</h2>
+        <div className="route-map-choose-panel__title-row">
+          <span className="route-map-choose-panel__bulb" aria-hidden>
+            💡
+          </span>
+          <h2 className="route-map-choose-panel__title">Choose Your Route</h2>
+        </div>
         <p className="route-map-choose-panel__lead">
           Pick a lane, select a job, pay, then share intake details.
         </p>

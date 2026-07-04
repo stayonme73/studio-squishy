@@ -1,5 +1,7 @@
 "use client";
 
+import { useSyncExternalStore, type CSSProperties } from "react";
+
 import RouteMapStopCard from "@/components/route-map/RouteMapStopCard";
 import {
   getJobsForRoad,
@@ -58,11 +60,13 @@ function RouteStartOption({
           {ROUTE_MAP_STOP_ICONS[routeStart.intakeType]}
         </span>
         <span className="route-map-route-start__body">
-          <span className="route-map-route-start__name">{routeStart.name}</span>
+          <span className="route-map-route-start__head">
+            <span className="route-map-route-start__name">{routeStart.name}</span>
+            <span className="route-map-route-start__price">{routeStart.priceDisplay}</span>
+          </span>
           <span className="route-map-route-start__desc">{routeStart.purpose}</span>
         </span>
         <span className="route-map-route-start__aside">
-          <span className="route-map-route-start__price">{routeStart.priceDisplay}</span>
           <span className="route-map-route-start__badge">Route Start</span>
           <span className="route-map-route-start__arrow" aria-hidden>
             →
@@ -70,6 +74,26 @@ function RouteStartOption({
         </span>
       </button>
     </div>
+  );
+}
+
+function useRouteGridColumns(): number {
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      const queries = [
+        window.matchMedia("(min-width: 1180px)"),
+        window.matchMedia("(min-width: 1500px)"),
+      ];
+      queries.forEach((query) => query.addEventListener("change", onStoreChange));
+      return () => queries.forEach((query) => query.removeEventListener("change", onStoreChange));
+    },
+    () => {
+      const wide = window.matchMedia("(min-width: 1180px)").matches;
+      const extraWide = window.matchMedia("(min-width: 1500px)").matches;
+      if (!wide) return 2;
+      return extraWide ? 3 : 2;
+    },
+    () => 2,
   );
 }
 
@@ -85,10 +109,21 @@ export default function RouteMapRoutePanel({ roadId, onSelectJob, onClose }: Pro
   };
 
   const isShelf = roadId === "random-exit";
+  const gridColumns = useRouteGridColumns();
+  const panelStyle = {
+    "--rm-grid-cols": String(gridColumns),
+  } as CSSProperties;
 
   return (
     <section
-      className={`route-map-route-panel ${road.accentClass}${isShelf ? " route-map-route-panel--shelf" : ""}`}
+      className={[
+        "route-map-route-panel",
+        road.accentClass,
+        isShelf ? "route-map-route-panel--shelf" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      style={panelStyle}
       aria-labelledby="route-map-panel-title"
       role="dialog"
       aria-modal="true"

@@ -27,14 +27,16 @@ export default function RouteMapStopCard({ job, index, onSelect }: Props) {
       </span>
 
       <span className="route-map-stop__body">
-        <span className="route-map-stop__name">{job.name}</span>
+        <span className="route-map-stop__head">
+          <span className="route-map-stop__name">{job.name}</span>
+          <span className="route-map-stop__price">{job.priceDisplay}</span>
+        </span>
         {job.purpose ? (
           <span className="route-map-stop__desc">{job.purpose}</span>
         ) : null}
       </span>
 
       <span className="route-map-stop__aside">
-        <span className="route-map-stop__price">{job.priceDisplay}</span>
         <span className="route-map-stop__arrow" aria-hidden>
           →
         </span>
