@@ -2531,9 +2531,9 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
   .route-map-world__sheet--intake {
     --rm-social-action-h: 88px;
-    width: min(1720px, calc(100vw - clamp(20px, 2.5vw, 44px)));
-    height: min(96dvh, 980px);
-    max-height: min(96dvh, 980px);
+    width: min(1720px, calc(100vw - 8px));
+    height: min(100dvh, 1020px);
+    max-height: min(100dvh, 1020px);
     padding: clamp(18px, 2vw, 30px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -2589,6 +2589,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     grid-template-rows: auto auto auto;
     gap: clamp(14px, 1.5vw, 20px);
     min-height: 0;
+    align-content: start;
   }
 
   .route-map-social-intake__card {
@@ -2604,14 +2605,17 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-social-intake__card--action,
   .route-map-social-intake__card--platform {
     grid-column: span 2;
+    min-height: 22rem;
   }
 
   .route-map-social-intake__card--materials {
     grid-column: span 4;
+    min-height: 19rem;
   }
 
   .route-map-social-intake__card--wording {
     grid-column: span 2;
+    min-height: 19rem;
   }
 
   .route-map-social-intake__step {
@@ -2699,8 +2703,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-social-intake__actions {
-    position: sticky;
-    bottom: 0;
+    position: static;
     grid-column: 1 / -1;
     grid-template-columns: minmax(12rem, 1fr) auto auto;
     min-height: var(--rm-social-action-h);
@@ -2718,15 +2721,17 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     white-space: nowrap;
   }
 
+  .route-map-social-intake__save-state strong {
+    font-size: 1rem;
+  }
+
   .route-map-social-intake__save-state span {
     font-size: 0.94rem;
   }
 
   .route-map-social-intake__next,
   .route-map-social-intake__job {
-    margin-top: 0;
-    font-size: 1rem;
-    line-height: 1.4;
+    display: none;
   }
 
   .route-map-world__sheet--checkout {
