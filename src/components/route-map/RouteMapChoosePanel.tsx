@@ -59,6 +59,9 @@ export default function RouteMapChoosePanel({
         <p className="route-map-choose-panel__lead">
           Pick a lane, select a job, pay, then share intake details.
         </p>
+        <p className="route-map-choose-panel__orientation">
+          Choose a route on the map or use the guide on the right.
+        </p>
       </header>
 
       <nav className="route-map-choose-panel__nav">

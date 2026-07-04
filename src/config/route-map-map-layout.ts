@@ -139,8 +139,10 @@ export type RouteMapHighwayMarker = {
 /** Desk scene marker positions (% within map frame) — aligned to baked road geometry. */
 export const ROUTE_MAP_DESK_HIGHWAY_MARKERS: readonly RouteMapHighwayMarker[] = [
   { roadId: "i75", label: "I-75", left: 47, top: 28, className: "route-map-highway-marker--i75" },
-  { roadId: "i20", label: "I-20", left: 22, top: 46, className: "route-map-highway-marker--i20" },
-  { roadId: "i285", label: "I-285", left: 78, top: 18, className: "route-map-highway-marker--i285" },
+  /** East-west leg heading toward the sun — not on the loop interchange. */
+  { roadId: "i20", label: "I-20", left: 14, top: 43, className: "route-map-highway-marker--i20" },
+  /** Perimeter loop / cloverleaf ring on map art. */
+  { roadId: "i285", label: "I-285", left: 60, top: 53, className: "route-map-highway-marker--i285" },
 ];
 
 export const ROUTE_MAP_CLOVERLEAF_HIGHWAY_MARKERS: readonly RouteMapHighwayMarker[] = [
