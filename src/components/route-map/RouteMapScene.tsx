@@ -21,6 +21,7 @@ import {
   buildRouteMapPaymentSummary,
   isRouteMapPostPublishAddonEligible,
   saveApprovedRouteMapPlan,
+  saveRouteMapIntakeDraft,
   selectRouteMapJob,
   submitRouteMapIntake,
 } from "@/lib/route-map-campaign";
@@ -107,6 +108,16 @@ export default function RouteMapScene() {
       const updated = submitRouteMapIntake(answers);
       if (!updated) return;
       router.push(`${studioBoard.routes.studioBoard}?record=open`);
+    },
+    [router],
+  );
+
+  const handleIntakeSaveDraft = useCallback(
+    (answers: RouteMapIntakeAnswers) => {
+      const updated = saveRouteMapIntakeDraft(answers);
+      if (!updated) return false;
+      router.push(studioBoard.routes.studioBoard);
+      return true;
     },
     [router],
   );
@@ -211,6 +222,7 @@ export default function RouteMapScene() {
               <RouteMapIntakeForm
                 job={selectedJob}
                 postPublishAddon={postPublishEligible && includePostPublishAddon}
+                onSaveDraft={handleIntakeSaveDraft}
                 onSubmit={handleIntakeSubmit}
               />
             </div>

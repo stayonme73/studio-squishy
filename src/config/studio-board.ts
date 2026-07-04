@@ -130,6 +130,11 @@ export type CampaignRecord = {
     answers: RouteMapIntakeAnswers;
     submittedAt: string;
   };
+  /** Saved client draft for post-payment job-specific intake. Does not complete intake. */
+  routeMapIntakeDraft?: {
+    answers: RouteMapIntakeAnswers;
+    savedAt: string;
+  };
   routeMapIntakeSubmittedAt?: string;
   /** Denormalized materials blocking count — updated when materials ledger changes (Slice 2c). */
   materialsSummary?: {

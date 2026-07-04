@@ -80,7 +80,13 @@ describe("materials-view", () => {
     const payload = resolveMaterialsApiPayload(
       {
         campaignId: "c-2",
-        items: [item({ reviewStatus: "submitted", clientFacingLabel: "Logo file" })],
+        items: [
+          item({
+            reviewStatus: "submitted",
+            clientFacingLabel: "Logo file",
+            submittedAt: "2026-01-02T12:30:00.000Z",
+          }),
+        ],
         updatedAt: "2026-01-01T00:00:00.000Z",
         version: 1,
       },
@@ -91,6 +97,7 @@ describe("materials-view", () => {
     expect(payload.blockingRequiredCount).toBe(0);
     expect(payload.consolidatedRequests).toHaveLength(1);
     expect(payload.consolidatedRequests?.[0]?.statusLabel).toBe("Received — under review");
+    expect(payload.consolidatedRequests?.[0]?.submittedAt).toBe("2026-01-02T12:30:00.000Z");
     expect(payload.consolidatedRequests?.[0]?.canSubmit).toBe(false);
   });
 });

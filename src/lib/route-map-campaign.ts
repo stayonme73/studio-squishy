@@ -273,6 +273,7 @@ export function submitRouteMapIntake(
   let updated: CampaignRecord = {
     ...campaign,
     routeMapIntake: { answers, submittedAt },
+    routeMapIntakeDraft: undefined,
     routeMapIntakeSubmittedAt: submittedAt,
     updatedAt: submittedAt,
   };
@@ -289,4 +290,19 @@ export function submitRouteMapIntake(
   };
 
   return persistRouteMapCampaign(updated);
+}
+
+export function saveRouteMapIntakeDraft(
+  answers: RouteMapIntakeAnswers,
+  savedAt = new Date().toISOString(),
+): CampaignRecord | null {
+  const campaign = readCurrentCampaign();
+  if (!campaign?.paymentReceivedAt || !campaign.approvedStudioPlan) return null;
+  if (campaign.routeMapIntakeSubmittedAt) return campaign;
+
+  return persistRouteMapCampaign({
+    ...campaign,
+    routeMapIntakeDraft: { answers, savedAt },
+    updatedAt: savedAt,
+  });
 }

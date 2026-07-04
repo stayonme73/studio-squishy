@@ -60,6 +60,7 @@ export type ConsolidatedClientRequest = {
   isBlocking: boolean;
   isPendingReview: boolean;
   canSubmit: boolean;
+  submittedAt?: string;
 };
 
 /** Client API payload — no internal IDs or mapping fields (Slice 3d-c-c L4). */
@@ -74,6 +75,7 @@ export type ClientConsolidatedRequest = {
   statusLabel: string;
   canSubmit: boolean;
   isPendingReview: boolean;
+  submittedAt?: string;
 };
 
 export type OptionalClientRequest = {
@@ -87,6 +89,7 @@ export type OptionalClientRequest = {
   statusLabel: string;
   canSubmit: boolean;
   isPendingReview: boolean;
+  submittedAt?: string;
 };
 
 /** Client API payload for optional rows (Slice 3d-c-c L4). */
@@ -100,6 +103,7 @@ export type ClientOptionalRequest = {
   statusLabel: string;
   canSubmit: boolean;
   isPendingReview: boolean;
+  submittedAt?: string;
 };
 
 export function isClientIntakeMaterialItem(item: CampaignMaterialItem): boolean {
@@ -212,6 +216,14 @@ function formatServiceNameList(serviceNames: readonly string[]): string {
   return `${head}, and ${unique[unique.length - 1]}`;
 }
 
+function latestSubmittedAt(items: readonly CampaignMaterialItem[]): string | undefined {
+  return items
+    .map((item) => item.submittedAt)
+    .filter((submittedAt): submittedAt is string => Boolean(submittedAt))
+    .sort()
+    .at(-1);
+}
+
 function bucketItemsForConsolidatedId(
   record: CampaignMaterialsRecord,
   consolidatedItemId: string,
@@ -291,6 +303,7 @@ export function resolveConsolidatedClientRequests(
         isBlocking: canSubmit,
         isPendingReview: reviewStatus === "submitted",
         canSubmit,
+        submittedAt: latestSubmittedAt(visibleItems),
       };
     });
 }
@@ -309,6 +322,7 @@ export function sanitizeClientConsolidatedRequests(
     statusLabel: request.statusLabel,
     canSubmit: request.canSubmit,
     isPendingReview: request.isPendingReview,
+    submittedAt: request.submittedAt,
   }));
 }
 
@@ -341,6 +355,7 @@ export function resolveOptionalClientRequests(
         statusLabel: clientMaterialStatusLabel(item.reviewStatus),
         canSubmit,
         isPendingReview: item.reviewStatus === "submitted",
+        submittedAt: item.submittedAt,
       };
     });
 }
@@ -358,6 +373,7 @@ export function sanitizeClientOptionalRequests(
     statusLabel: request.statusLabel,
     canSubmit: request.canSubmit,
     isPendingReview: request.isPendingReview,
+    submittedAt: request.submittedAt,
   }));
 }
 

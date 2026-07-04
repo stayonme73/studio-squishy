@@ -76,6 +76,18 @@ function fieldLabel(field: keyof ClientSubmitPayload): string {
   }
 }
 
+function formatReceivedStatus(submittedAt: string | undefined): string {
+  if (!submittedAt) return "Received";
+  const parsed = new Date(submittedAt);
+  if (Number.isNaN(parsed.getTime())) return "Received";
+  return `Received ${new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(parsed)}`;
+}
+
 function SubmitFields({
   contentKind,
   values,
@@ -386,7 +398,7 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
                         {request.isPendingReview ? (
                           <div className="sb-materials-intake__status-stack">
                             <span className="sb-materials-intake__status sb-materials-intake__status--pending">
-                              {request.statusLabel}
+                              {formatReceivedStatus(request.submittedAt)}
                             </span>
                             <p className="sb-materials-intake__pending" role="status">
                               {materialsConfig.clientUnderReviewBody}
@@ -463,7 +475,7 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
                         {request.isPendingReview ? (
                           <div className="sb-materials-intake__status-stack">
                             <span className="sb-materials-intake__status sb-materials-intake__status--pending">
-                              {request.statusLabel}
+                              {formatReceivedStatus(request.submittedAt)}
                             </span>
                             <p className="sb-materials-intake__pending" role="status">
                               {materialsConfig.clientUnderReviewBody}
