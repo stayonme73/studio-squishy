@@ -15,8 +15,8 @@
   --rm-random: #6b4c8a;
   --rm-panel-max-h: min(88vh, 760px);
   --rm-route-panel-w: min(960px, calc(100vw - 48px));
-  --rm-job-sheet-w: min(680px, calc(100vw - 48px));
-  --rm-job-content-w: 600px;
+  --rm-job-sheet-w: min(720px, calc(100vw - 48px));
+  --rm-job-content-w: 640px;
   --rm-checkout-sheet-w: min(1380px, calc(100vw - clamp(24px, 5vw, 80px)));
   --rm-checkout-sheet-h: min(92vh, 860px);
   --rm-route-panel-h: clamp(72vh, 75vh, 78vh);
@@ -2525,9 +2525,10 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-world__sheet--job {
-    width: var(--rm-job-sheet-w);
-    max-height: var(--rm-route-panel-h);
-    align-items: center;
+    width: min(1120px, calc(100vw - clamp(32px, 6vw, 96px)));
+    height: min(calc(100dvh - clamp(6px, 1dvh, 12px)), 900px);
+    max-height: min(calc(100dvh - clamp(6px, 1dvh, 12px)), 900px);
+    align-items: stretch;
   }
 
   .route-map-world__sheet--checkout,
@@ -2844,8 +2845,68 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    width: min(100%, var(--rm-job-content-w));
+    width: 100%;
+    max-width: none;
     align-self: center;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__body {
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.78fr) minmax(0, 1.08fr) minmax(0, 1.14fr);
+    grid-template-areas:
+      "purpose includes exclusions"
+      "meta includes exclusions";
+    gap: clamp(16px, 1.6vw, 22px) clamp(24px, 2.6vw, 38px);
+    flex: 0 1 auto;
+    overflow: visible;
+    overscroll-behavior: auto;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__body > section {
+    margin-bottom: 0;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__body > section:first-child {
+    grid-area: purpose;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__body > section:nth-child(2) {
+    grid-area: includes;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__body > section:nth-child(3) {
+    grid-area: exclusions;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__meta {
+    grid-area: meta;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__body > section > p {
+    font-size: clamp(1.16rem, 1.24vw, 1.3rem);
+    line-height: 1.7;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__list {
+    font-size: clamp(1.16rem, 1.24vw, 1.3rem);
+    line-height: 1.72;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__list li + li {
+    margin-top: 0.28rem;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__meta {
+    display: grid;
+    gap: 10px;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__meta p {
+    margin-bottom: 0;
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__footer {
+    padding-top: 12px;
   }
 }
 
