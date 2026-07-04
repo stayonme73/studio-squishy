@@ -2605,7 +2605,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-social-intake__card--action,
   .route-map-social-intake__card--platform {
     grid-column: span 2;
-    min-height: 22rem;
+    min-height: 26rem;
   }
 
   .route-map-social-intake__card--materials {
@@ -2643,8 +2643,8 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-social-intake__chip {
-    min-height: 46px;
-    padding: 10px 14px;
+    min-height: 44px;
+    padding: 9px 13px;
     font-size: clamp(0.98rem, 1.04vw, 1.08rem);
     line-height: 1.2;
   }
