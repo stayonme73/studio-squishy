@@ -1,12 +1,11 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import SecureCheckoutGrid from "@/components/payment/SecureCheckoutGrid";
 import RouteMapIntakeForm from "@/components/route-map/RouteMapIntakeForm";
 import RouteMapJobCard from "@/components/route-map/RouteMapJobCard";
-import RouteMapJobDetailBlocks from "@/components/route-map/RouteMapJobDetailBlocks";
 import RouteMapMobileMap from "@/components/route-map/RouteMapMobileMap";
 import RouteMapRoutePanel from "@/components/route-map/RouteMapRoutePanel";
 import RouteMapLobbyBackdrop from "@/components/route-map/RouteMapLobbyBackdrop";
@@ -27,13 +26,14 @@ import {
   submitRouteMapIntake,
 } from "@/lib/route-map-campaign";
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
-import { markPaymentReceived } from "@/lib/studio-board-campaign";
+import { markPaymentReceived, readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 export type RouteMapStep = "map" | "panel" | "job" | "checkout" | "intake";
 
 export default function RouteMapScene() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<RouteMapStep>("map");
   const [roadId, setRoadId] = useState<RouteMapRoadId | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<RouteMapJobId | null>(null);
@@ -123,6 +123,19 @@ export default function RouteMapScene() {
     [router],
   );
 
+  useEffect(() => {
+    if (searchParams.get("step") !== "intake") return;
+    const campaign = readCurrentCampaignHydrated();
+    const ctx = campaign?.routeMapContext;
+    if (!ctx?.jobId || !ctx.roadId) return;
+    if (!getRouteMapJob(ctx.jobId)) return;
+
+    setRoadId(ctx.roadId);
+    setSelectedJobId(ctx.jobId);
+    setIncludePostPublishAddon(ctx.postPublishAddon === true);
+    setStep("intake");
+  }, [searchParams]);
+
   const showOverlay = step !== "map";
   const showPanel = step === "panel" && roadId;
   const showJob = step === "job" && selectedJob;
@@ -133,7 +146,9 @@ export default function RouteMapScene() {
     <div className={`route-map-page route-map-page--immersive ${utilityPageFontClassName}`}>
       <div className="route-map-scene-body">
         <RouteMapLobbyBackdrop />
-        <div className={`route-map-world${showOverlay ? " route-map-world--overlay" : ""}`}>
+        <div
+          className={`route-map-world${showOverlay ? " route-map-world--overlay" : ""}${showIntake ? " route-map-world--intake" : ""}`}
+        >
           <div
             className="route-map-world__map route-map-world__map--desktop"
             inert={showOverlay ? true : undefined}
@@ -229,10 +244,6 @@ export default function RouteMapScene() {
           {showIntake ? (
             <div className="route-map-world__sheet route-map-world__sheet--intake">
               <div className="route-map-overlay-workspace route-map-overlay-workspace--intake">
-                <RouteMapJobDetailBlocks
-                  job={selectedJob}
-                  className="route-map-overlay-workspace__job-detail"
-                />
                 <RouteMapIntakeForm
                 job={selectedJob}
                 postPublishAddon={postPublishEligible && includePostPublishAddon}

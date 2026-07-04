@@ -56,11 +56,10 @@ const CAMPAIGN_MESSAGE_CARD_ID = "campaign-message";
 const CAMPAIGN_GOAL_UNAVAILABLE_TEXT = "I do not have this yet.";
 const CAMPAIGN_GOAL_OPTIONS = [
   "Promote an offer",
-  "Get more bookings",
   "Announce something new",
-  "Remind people about my business",
   "Share an event",
   "Build awareness",
+  "Encourage bookings or inquiries",
   "Something else",
 ] as const;
 

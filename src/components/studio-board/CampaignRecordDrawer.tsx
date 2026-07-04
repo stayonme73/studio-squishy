@@ -85,7 +85,7 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
               <CopyCampaignBriefButton campaign={campaign} />
               {intakeEditable ? (
                 <Link
-                  href={draftRoomEditHref(campaign.packageId)}
+                  href={draftRoomEditHref(campaign.packageId, campaign)}
                   className="utility-btn utility-btn--secondary"
                 >
                   {campaignBrief.editLabel}

@@ -32,7 +32,7 @@ export default function CampaignBriefActions({
   if (!campaign || !hasCampaignCreativeBrief(campaign)) return null;
 
   const editable = isIntakeEditable(campaign.campaignStatus);
-  const editHref = draftRoomEditHref(campaign.packageId);
+  const editHref = draftRoomEditHref(campaign.packageId, campaign);
   const viewButtonClass = prominent
     ? "utility-btn utility-btn--primary campaign-brief-actions__view"
     : "utility-btn utility-btn--secondary";

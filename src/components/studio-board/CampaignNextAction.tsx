@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { projectDetailsEditHref } from "@/lib/intake-edit";
+import { resolveIntakeEditHref } from "@/lib/intake-edit";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
 import { studioBoard, type CampaignStatus } from "@/config/studio-board";
 import {
@@ -76,7 +76,7 @@ export default function CampaignNextAction({
         <p className="sb-next-action__status">{nextCopy.paymentReceivedLabel}</p>
         <p className="sb-next-action__lead">{nextCopy.completeProjectDetailsHint}</p>
         <Link
-          href={projectDetailsEditHref(campaign.packageId)}
+          href={resolveIntakeEditHref(campaign, campaign.packageId)}
           className="utility-btn utility-btn--primary sb-next-action__cta"
         >
           {nextCopy.completeProjectDetails}

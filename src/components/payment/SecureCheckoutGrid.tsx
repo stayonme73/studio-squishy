@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 
 import type { ServiceId } from "@/catalog/types";
 import type { ApprovalAcknowledgment } from "@/config/studio-board";
-import { payment, paymentIntakeHref } from "@/config/payment";
-import { projectDetailsHref } from "@/config/project-details";
+import { payment } from "@/config/payment";
+import { resolvePostPaymentIntakeHref } from "@/lib/intake-edit";
 import {
   ACKNOWLEDGMENT_VERSION,
   APPROVAL_ACKNOWLEDGMENT_TEXT,
@@ -131,7 +131,7 @@ export default function SecureCheckoutGrid({
       onPaymentComplete(checkoutPackageId);
       return;
     }
-    router.push(checkoutPackageId ? paymentIntakeHref(checkoutPackageId) : projectDetailsHref());
+    router.push(resolvePostPaymentIntakeHref(readCurrentCampaignHydrated(), checkoutPackageId));
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -148,7 +148,7 @@ export default function SecureCheckoutGrid({
       onPaymentComplete(checkoutPackageId);
       return;
     }
-    router.push(checkoutPackageId ? paymentIntakeHref(checkoutPackageId) : projectDetailsHref());
+    router.push(resolvePostPaymentIntakeHref(readCurrentCampaignHydrated(), checkoutPackageId));
   }
 
   const showMonthlySubtotal = planSummary.monthlySubtotalCents > 0;

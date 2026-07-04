@@ -47,32 +47,31 @@ const SOCIAL_POSTS_FILE_PREVIEW_MAX_BYTES = 5 * 1024 * 1024;
 
 const SOCIAL_PURPOSE_OPTIONS: readonly ChoiceOption[] = [
   { label: "Promote an offer", example: "Example: 20% off this weekend." },
-  { label: "Get more bookings", example: "Example: Fill next week's appointment openings." },
   { label: "Announce something new", example: "Example: A new service, product, menu item, or location." },
-  { label: "Remind people about my business", example: "Example: Stay top-of-mind with past customers." },
   { label: "Share an event", example: "Example: Open house, pop-up, workshop, or sale day." },
   { label: "Build awareness", example: "Example: Introduce what you do and who you help." },
+  {
+    label: "Encourage bookings or inquiries",
+    example: "Example: Fill appointment openings or invite people to reach out.",
+  },
   { label: "Something else", example: "Example: Tell us the situation in one or two sentences." },
 ];
 
 const SOCIAL_ACTION_OPTIONS: readonly ChoiceOption[] = [
-  { label: "Call us" },
+  { label: "Visit website" },
   { label: "Book now" },
-  { label: "Visit our website" },
-  { label: "Come in today" },
-  { label: "Send us a message" },
-  { label: "Save this post" },
-  { label: "Just know about it for now" },
+  { label: "Call" },
+  { label: "Send message" },
+  { label: "Visit location" },
+  { label: "Learn more" },
+  { label: "No action needed" },
 ];
 
 const SOCIAL_PLATFORM_OPTIONS: readonly ChoiceOption[] = [
   { label: "Instagram Post", detail: "Square or portrait feed graphic" },
   { label: "Facebook Post", detail: "Feed graphic" },
   { label: "LinkedIn Post", detail: "Feed graphic" },
-  { label: "TikTok Cover", detail: "Vertical cover image" },
-  { label: "YouTube Community Post", detail: "Community feed graphic" },
-  { label: "YouTube Thumbnail", detail: "16:9 thumbnail" },
-  { label: "I am not sure", detail: "We will choose the safest format from your goal." },
+  { label: "I am not sure", detail: "We will choose the safest feed-post format from your goal." },
 ];
 
 const SOCIAL_MATERIAL_OPTIONS: readonly ChoiceOption[] = [
@@ -114,23 +113,25 @@ function selectedPlatformDetail(platform: string): string {
 
 function destinationPlaceholder(action: string): string {
   switch (action) {
-    case "Call us":
+    case "Call":
       return "Phone number to show, if different from your usual number";
     case "Book now":
       return "Booking link or where people should book";
-    case "Visit our website":
+    case "Visit website":
       return "Website page or link";
-    case "Come in today":
-      return "Location, hours, or visit note";
-    case "Send us a message":
+    case "Visit location":
+      return "Address, hours, or visit note";
+    case "Send message":
       return "Where should they message you?";
+    case "Learn more":
+      return "Link or page for more information";
     default:
       return "Link, phone number, location, or next step";
   }
 }
 
 function actionNeedsDestination(action: string): boolean {
-  return Boolean(action && action !== "Save this post" && action !== "Just know about it for now");
+  return Boolean(action && action !== "No action needed");
 }
 
 function buildSocialPostsAnswers(state: SocialPostsIntakeState): RouteMapIntakeAnswers {
@@ -384,7 +385,10 @@ function SocialPostsIntakeForm({
           <p className="route-map-social-intake__step">3</p>
           <div className="route-map-social-intake__card-copy">
             <h3>What platform is this for?</h3>
-            <p>We only need the format. You do not need to give us social account access.</p>
+            <p className="route-map-social-intake__platform-rule">
+              Choose one platform for this set of four posts.
+            </p>
+            <p>You do not need to give us social account access.</p>
           </div>
           <ChoiceBubbles
             options={SOCIAL_PLATFORM_OPTIONS}
@@ -418,7 +422,10 @@ function SocialPostsIntakeForm({
                 }}
               />
             </label>
-            <p>Files stay private to your project File Room. Preview is local before you continue.</p>
+            <p>
+              Files are added privately to your Studio project and visible only to your Studio
+              team.
+            </p>
           </div>
           {fileSelection ? (
             <div
@@ -458,14 +465,17 @@ function SocialPostsIntakeForm({
           <p className="route-map-social-intake__step">5</p>
           <div className="route-map-social-intake__card-copy">
             <h3>Required wording or disclosures</h3>
-            <p>Only add wording that must appear exactly. Leave this blank if there is none.</p>
+            <p>
+              Leave blank unless specific wording, legal language, dates, prices, or contact details
+              must appear exactly.
+            </p>
           </div>
-          <label className="route-map-social-intake__compact-field">
+          <label className="route-map-social-intake__compact-field route-map-social-intake__compact-field--wording">
             <span>Optional exact wording</span>
             <textarea
-              rows={3}
+              rows={2}
               value={state.requiredWording}
-              placeholder="Example: Offer ends July 31. New clients only. Cannot be combined with other offers."
+              placeholder="Example: Offer ends July 31. New clients only."
               onChange={(event) => updateField("requiredWording", event.target.value)}
             />
           </label>
@@ -479,7 +489,7 @@ function SocialPostsIntakeForm({
                 ? "Your work is saved."
                 : saveStatus === "error"
                   ? "We could not save yet. Try again."
-                  : "Choose Save and finish later or continue when ready."}
+                  : "Choose Save Draft or continue when ready."}
             </span>
           </div>
           <button
@@ -488,7 +498,7 @@ function SocialPostsIntakeForm({
             onClick={handleSaveDraft}
             disabled={submitting}
           >
-            SAVE AND FINISH LATER
+            SAVE DRAFT
           </button>
           <button
             type="submit"

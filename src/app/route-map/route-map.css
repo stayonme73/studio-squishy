@@ -27,6 +27,7 @@
   --rm-route-marker: 0.78rem;
   --rm-overlay-sheet-w: min(1480px, calc(100vw - clamp(24px, 4vw, 72px)));
   --rm-overlay-sheet-h: min(calc(100dvh - clamp(10px, 2dvh, 24px)), 980px);
+  --rm-intake-sheet-h: calc(100dvh - clamp(12px, 2vh, 20px));
   --rm-overlay-sheet-pad: clamp(20px, 2vw, 30px);
   --rm-job-sheet-w: min(720px, calc(100vw - 48px));
   --rm-job-content-w: 640px;
@@ -157,6 +158,11 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 .route-map-world--overlay .route-map-workspace__how-wrap,
 .route-map-world--overlay .route-map-workspace__how-wrap .route-map-how-it-works {
   pointer-events: none;
+}
+
+/* Intake uses the full viewport — hide the map footer strip so the sheet can extend down */
+.route-map-world--overlay.route-map-world--intake .route-map-workspace__how-wrap {
+  display: none;
 }
 
 .route-map-world__sheet {
@@ -2303,8 +2309,18 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 .route-map-social-intake {
   width: 100%;
   margin: 0 auto;
-  padding-bottom: calc(var(--rm-social-action-clearance) + env(safe-area-inset-bottom, 0px) + 32px);
+  padding-bottom: 0;
   color: var(--studio-charcoal);
+  --rm-chip-selected-fill: color-mix(in srgb, var(--studio-eucalyptus) 34%, #fff);
+  --rm-chip-selected-border: color-mix(in srgb, var(--studio-eucalyptus) 62%, transparent);
+  --rm-chip-selected-ring: color-mix(in srgb, var(--studio-eucalyptus) 24%, transparent);
+}
+
+.route-map-overlay-workspace--intake .route-map-social-intake {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
 }
 
 .route-map-social-intake__header {
@@ -2373,6 +2389,20 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 .route-map-social-intake__form {
   display: grid;
   gap: clamp(18px, 2.2vw, 26px);
+  min-height: 0;
+}
+
+.route-map-overlay-workspace--intake .route-map-social-intake__form {
+  height: 100%;
+  overflow: hidden;
+  align-content: stretch;
+}
+
+.route-map-overlay-workspace--intake .route-map-social-intake__actions {
+  position: static;
+  grid-column: 1 / -1;
+  margin-top: 0;
+  box-shadow: 0 -8px 22px rgba(46, 43, 40, 0.12);
 }
 
 .route-map-social-intake__card {
@@ -2413,14 +2443,15 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
 .route-map-social-intake__card-copy h3 {
   margin: 0;
-  color: var(--studio-charcoal);
+  color: var(--studio-eucalyptus);
   font-size: clamp(1.28rem, 2.1vw, 1.62rem);
   line-height: 1.18;
+  font-weight: 700;
 }
 
 .route-map-social-intake__card-copy p {
   margin: 0;
-  color: var(--studio-charcoal-muted);
+  color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
   font-size: clamp(1rem, 1.5vw, 1.1rem);
   line-height: 1.5;
 }
@@ -2434,16 +2465,16 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 .route-map-social-intake__chip {
   display: inline-grid;
   gap: 4px;
-  min-height: 50px;
+  min-height: 52px;
   padding: 12px 16px;
   border: 1.5px solid color-mix(in srgb, var(--studio-denim) 24%, transparent);
   border-radius: 999px;
   background: #fff;
-  color: var(--studio-charcoal);
+  color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
   font: inherit;
-  font-size: clamp(0.98rem, 1.35vw, 1.08rem);
+  font-size: clamp(1rem, 1.35vw, 1.1rem);
   font-weight: 750;
-  line-height: 1.2;
+  line-height: 1.28;
   text-align: left;
   cursor: pointer;
   transition:
@@ -2454,10 +2485,10 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 }
 
 .route-map-social-intake__chip small {
-  color: var(--studio-charcoal-muted);
+  color: color-mix(in srgb, var(--studio-charcoal) 88%, #000);
   font-size: 0.88rem;
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 .route-map-social-intake__chip:hover,
@@ -2468,24 +2499,28 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 }
 
 .route-map-social-intake__chip--selected {
-  border-color: var(--studio-denim);
-  background: color-mix(in srgb, var(--studio-denim) 92%, #fff);
-  color: #fff;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--studio-denim) 24%, transparent);
+  border-color: var(--rm-chip-selected-border);
+  background: var(--rm-chip-selected-fill);
+  color: color-mix(in srgb, var(--studio-charcoal) 98%, #000);
+  box-shadow:
+    0 0 0 3px var(--rm-chip-selected-ring),
+    inset 0 0 0 1px color-mix(in srgb, var(--studio-eucalyptus) 22%, transparent);
+  font-weight: 800;
 }
 
 .route-map-social-intake__chip--selected small {
-  color: color-mix(in srgb, #fff 82%, transparent);
+  color: color-mix(in srgb, var(--studio-charcoal) 88%, #000);
 }
 
 .route-map-social-intake__compact-field {
   display: grid;
   gap: 9px;
   max-width: 760px;
+  margin-top: clamp(12px, 1.25vw, 18px);
 }
 
 .route-map-social-intake__compact-field span {
-  color: var(--studio-charcoal);
+  color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
   font-size: clamp(0.98rem, 1.35vw, 1.05rem);
   font-weight: 800;
   line-height: 1.3;
@@ -2507,6 +2542,16 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
 .route-map-social-intake__compact-field textarea {
   min-height: 6rem;
+}
+
+.route-map-social-intake__compact-field--wording textarea {
+  min-height: 3.25rem;
+  max-height: 4.75rem;
+}
+
+.route-map-social-intake__platform-rule {
+  font-weight: 700;
+  color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
 }
 
 .route-map-social-intake__compact-field input::placeholder,
@@ -2634,14 +2679,9 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   line-height: 1.35;
 }
 
-.route-map-social-intake__next {
-  margin-top: 12px;
-}
-
-.route-map-social-intake__job {
-  margin-top: 4px;
-  color: var(--studio-denim);
-  font-weight: 800;
+.route-map-overlay-workspace--intake .route-map-social-intake__next,
+.route-map-overlay-workspace--intake .route-map-social-intake__job {
+  display: none;
 }
 
 @media (min-width: 901px) {
@@ -3006,7 +3046,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     grid-template-rows: minmax(clamp(20rem, 41dvh, 24rem), 1fr) minmax(clamp(16.2rem, 32dvh, 22rem), 0.88fr) auto;
-    gap: clamp(7px, 0.8vw, 12px);
+    gap: clamp(10px, 1vw, 14px);
     height: 100%;
     min-height: 0;
     align-content: stretch;
@@ -3120,6 +3160,11 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
   .route-map-social-intake__compact-field textarea {
     min-height: clamp(3rem, 5.6dvh, 4.6rem);
+  }
+
+  .route-map-social-intake__compact-field--wording textarea {
+    min-height: clamp(2.5rem, 4.2dvh, 3.25rem);
+    max-height: clamp(3.25rem, 5.2dvh, 4rem);
   }
 
   .route-map-social-intake__card--purpose .route-map-social-intake__compact-field textarea {
@@ -3372,15 +3417,12 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     gap: clamp(20px, 2vw, 28px);
   }
 
-  .route-map-overlay-workspace__job-detail {
-    flex: 0 0 auto;
-  }
-
   .route-map-overlay-workspace--checkout .pay-shell,
   .route-map-overlay-workspace--intake > .route-map-social-intake,
   .route-map-overlay-workspace--intake > .route-map-intake {
     flex: 1 1 auto;
     min-height: 0;
+    height: 100%;
   }
 
   .route-map-overlay-workspace--checkout {
@@ -3390,12 +3432,15 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
   .route-map-overlay-workspace--intake {
     overflow: hidden;
+    overscroll-behavior: none;
   }
 
-  .route-map-overlay-workspace--intake .route-map-social-intake,
-  .route-map-overlay-workspace--intake .route-map-intake {
-    overflow-y: auto;
-    overscroll-behavior: contain;
+  .route-map-overlay-workspace--intake .route-map-social-intake__header {
+    margin-bottom: 0;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__lead {
+    margin-top: 6px;
   }
 
   .route-map-job-card--overlay {
@@ -3791,6 +3836,11 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-social-intake__compact-field textarea,
   .route-map-social-intake__card--purpose .route-map-social-intake__compact-field textarea {
     min-height: 5.5rem;
+  }
+
+  .route-map-social-intake__compact-field--wording textarea {
+    min-height: 3.25rem;
+    max-height: 4.5rem;
   }
 
   .route-map-social-intake__upload-row {
@@ -4280,17 +4330,18 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-social-intake__card-copy h3 {
     font-size: clamp(1.28rem, 1.35vw, 1.58rem);
     line-height: 1.28;
-    color: var(--studio-charcoal);
+    color: var(--studio-eucalyptus);
+    font-weight: 700;
   }
 
   .route-map-social-intake__chip,
   .route-map-social-intake__card--purpose .route-map-social-intake__chip,
   .route-map-social-intake__card--action .route-map-social-intake__chip,
   .route-map-social-intake__card--platform .route-map-social-intake__chip {
-    min-height: 2.95rem;
-    font-size: clamp(1.02rem, 1vw, 1.14rem);
-    line-height: 1.32;
-    color: var(--studio-charcoal);
+    min-height: 3rem;
+    font-size: clamp(1.04rem, 1.02vw, 1.16rem);
+    line-height: 1.34;
+    color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
   }
 
   .route-map-social-intake__chip small,
@@ -4301,7 +4352,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-social-intake__chip--selected small {
-    color: #fff;
+    color: color-mix(in srgb, var(--studio-charcoal) 88%, #000);
   }
 
   .route-map-social-intake__compact-field span {
@@ -4381,5 +4432,181 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     height: 100%;
     max-height: 100%;
     border-radius: 0;
+  }
+}
+
+/* Social Posts intake — fill highlighted bottom space; no inner scrollbars on desktop */
+@media (min-width: 901px) {
+  .route-map-world--overlay.route-map-world--intake .route-map-world__sheet--intake {
+    top: clamp(6px, 1vh, 12px);
+    bottom: clamp(6px, 1vh, 12px);
+    left: 50%;
+    right: auto;
+    height: auto;
+    max-height: none;
+    width: min(1720px, calc(100vw - clamp(16px, 3vw, 32px)));
+    transform: translateX(-50%);
+    animation: none;
+    padding: clamp(12px, 1.4vw, 20px);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(10px, 1.5vw, 18px);
+    align-items: center;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__eyebrow {
+    margin-bottom: 4px;
+    font-size: clamp(0.84rem, 0.94vw, 0.98rem);
+    line-height: 1.35;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__title {
+    font-size: clamp(1.72rem, 2.15vw, 2.35rem);
+    line-height: 1.1;
+    color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__lead {
+    margin-top: 6px;
+    font-size: clamp(1rem, 1.08vw, 1.12rem);
+    line-height: 1.48;
+    color: color-mix(in srgb, var(--studio-charcoal) 92%, #000);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__progress {
+    padding: 9px 13px;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__progress strong {
+    font-size: clamp(1.08rem, 1.15vw, 1.22rem);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__progress span {
+    font-size: clamp(0.88rem, 0.94vw, 0.96rem);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__form {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: clamp(10px, 1.1vw, 14px);
+    align-content: stretch;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__card {
+    min-height: 0;
+    height: 100%;
+    padding: clamp(10px, 1vw, 16px);
+    gap: clamp(12px, 1.15vw, 16px) 10px;
+    align-content: start;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__card--purpose,
+  .route-map-overlay-workspace--intake .route-map-social-intake__card--action,
+  .route-map-overlay-workspace--intake .route-map-social-intake__card--platform {
+    grid-column: span 4;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__card--materials {
+    grid-column: span 7;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__card--wording {
+    grid-column: span 5;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__card-copy h3 {
+    font-size: clamp(1.02rem, 1.08vw, 1.18rem);
+    line-height: 1.24;
+    color: var(--studio-eucalyptus);
+    font-weight: 700;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__card-copy p {
+    font-size: clamp(0.88rem, 0.94vw, 0.98rem);
+    line-height: 1.42;
+    color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__step {
+    width: 1.85rem;
+    height: 1.85rem;
+    font-size: 0.88rem;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__chips {
+    gap: 9px;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__chip {
+    min-height: 2.95rem;
+    padding: 0.62rem 0.92rem;
+    font-size: clamp(0.98rem, 1.02vw, 1.08rem);
+    line-height: 1.34;
+    color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__card--platform .route-map-social-intake__chip {
+    min-height: 3.2rem;
+    padding: 0.58rem 0.88rem;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__chip small {
+    font-size: clamp(0.8rem, 0.86vw, 0.9rem);
+    line-height: 1.36;
+    color: color-mix(in srgb, var(--studio-charcoal) 88%, #000);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__compact-field {
+    margin-top: clamp(14px, 1.35vw, 20px);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__compact-field span {
+    color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
+    font-size: clamp(0.9rem, 0.96vw, 1rem);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__compact-field input,
+  .route-map-overlay-workspace--intake .route-map-social-intake__compact-field textarea {
+    min-height: 2.5rem;
+    padding: 0.5rem 0.65rem;
+    font-size: clamp(0.92rem, 0.98vw, 1rem);
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__compact-field textarea {
+    min-height: 2.5rem;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__compact-field--wording textarea {
+    min-height: 2.25rem;
+    max-height: 3.75rem;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__upload-row {
+    margin-top: clamp(12px, 1.25vw, 18px);
+    padding: 0.55rem 0.65rem;
+    gap: 0.45rem;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__upload-row p {
+    font-size: clamp(0.86rem, 0.92vw, 0.96rem);
+    line-height: 1.4;
+    color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__actions {
+    --rm-social-action-h: 72px;
+    min-height: var(--rm-social-action-h);
+    padding: 0.55rem 0.75rem;
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__actions .route-map-primary-btn,
+  .route-map-overlay-workspace--intake .route-map-social-intake__actions .route-map-secondary-btn {
+    min-height: 2.5rem;
+    padding-inline: 0.85rem;
+    font-size: clamp(0.82rem, 0.92vw, 0.94rem);
   }
 }
