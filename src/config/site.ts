@@ -11,9 +11,9 @@ export const siteConfig = {
     home: "/",
     studioGuide: "/studio-guide",
     studio: "/studio",
-    projectDiscovery: "/business-discovery-studio",
-    /** @deprecated legacy URL — redirects to Project Discovery */
-    draftRoom: "/draft-room",
-    intake: "/intake",
+    projectDiscovery: "/route-map",
+    /** @deprecated legacy route — use Route Map */
+    draftRoom: "/route-map",
+    intake: "/route-map",
   },
 } as const;

@@ -50,8 +50,8 @@ export type StudioGuidePlateSignatureMeasurement = {
 
 export const studioGuidePrototype = {
   status: "interaction-validation" as const,
-  route: "/business-discovery-studio",
-  welcomeHallEntryHref: "/business-discovery-studio",
+  route: "/route-map",
+  welcomeHallEntryHref: "/route-map",
   transitionMs: welcomeHallInteraction.transitionMs,
 
   plate: {

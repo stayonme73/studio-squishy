@@ -357,13 +357,13 @@ export const draftRoom = {
 
   routes: {
     welcomeHall: "/studio-lobby",
-    /** @deprecated legacy URL — redirects to Project Discovery */
+    /** @deprecated legacy URL — use Route Map */
     draftRoom: "/draft-room",
-    /** @deprecated legacy URL — redirects to Project Discovery */
+    /** @deprecated legacy URL — use Route Map */
     begin: "/draft-room/begin",
     studioGuide: "/studio-guide-prototype",
     studioBoard: "/studio-board",
-    projectDiscovery: "/business-discovery-studio",
+    projectDiscovery: "/route-map",
   },
 } as const;
 

@@ -51,8 +51,8 @@ export const welcomeHallPhase1 = {
   routeToRouteMap: "/route-map",
   /** @deprecated use routeToRouteMap — legacy discovery direct link preserved for deep links */
   routeToBusinessDiscoveryStudio: "/route-map",
-  /** @deprecated use routeToBusinessDiscoveryStudio — legacy URL redirects */
-  routeToDraftRoom: "/business-discovery-studio",
-  /** @deprecated use routeToBusinessDiscoveryStudio */
-  routeToStudioGuidePrototype: "/business-discovery-studio",
+  /** @deprecated use routeToRouteMap — legacy URL redirects */
+  routeToDraftRoom: "/route-map",
+  /** @deprecated use routeToRouteMap */
+  routeToStudioGuidePrototype: "/route-map",
 } as const;

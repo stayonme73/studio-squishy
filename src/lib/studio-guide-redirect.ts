@@ -6,7 +6,7 @@ import {
 
 const CAMPAIGN_KEY = "studio-squishy:current-campaign";
 
-export const STUDIO_GUIDE_DISCOVERY_HREF = "/business-discovery-studio";
+export const STUDIO_GUIDE_DISCOVERY_HREF = "/route-map";
 export const STUDIO_GUIDE_PROJECT_SUMMARY_HREF = "/project-summary";
 
 export function hasActiveStudioPlanState(

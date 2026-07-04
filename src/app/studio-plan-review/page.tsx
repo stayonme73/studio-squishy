@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const PAGE_COPY = {
   title: STUDIO_PLAN_REVIEW_LABELS.recommendedPlan,
   lead: "Review and adjust your recommended Studio Services before payment.",
-  backHref: "/business-discovery-studio",
+  backHref: "/route-map",
 } as const;
 
 /** Studio Plan Review — customer adjusts services before checkout. */

@@ -41,7 +41,7 @@ export const customerJourneyV1 = {
       id: "project-discovery",
       name: "Project Discovery",
       formerName: "Discovery Room",
-      route: "/business-discovery-studio",
+      route: "/route-map",
       routeAliases: ["/project-discovery", "/business_discovery_studio"] as const,
     },
     {
@@ -129,11 +129,11 @@ export function projectDetailsJourneyHref(packageId?: string): string {
   return `${base}?package=${packageId}`;
 }
 
-/** Project Discovery href — optional package query preserved for journey handoff. */
+/** Project Discovery is retired from active routing; start service selection on Route Map. */
 export function projectDiscoveryHref(packageId?: string): string {
   const base = customerJourneyStepRoute("project-discovery");
   if (!packageId || !PACKAGE_IDS.includes(packageId as (typeof PACKAGE_IDS)[number])) {
     return base;
   }
-  return `${base}?package=${packageId}`;
+  return base;
 }

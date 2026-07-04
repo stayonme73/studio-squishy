@@ -324,7 +324,7 @@ export const ROUTE_MAP_V1 = {
 
   jobs: buildActiveShelfJobs(),
 
-  /** Customer route for Route Start — existing Project Discovery flow. */
+  /** Customer route for Route Start — current Route Map front door. */
   projectDiscoveryRoute: customerJourneyStepRoute("project-discovery"),
 
   checkout: {

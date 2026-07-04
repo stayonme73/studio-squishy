@@ -198,7 +198,7 @@ export const studioBoard = {
     campaignDetails: "/studio-board?record=open",
     welcomeHall: "/studio-lobby",
     studioLobby: "/studio-lobby",
-    projectDiscovery: "/business-discovery-studio",
+    projectDiscovery: "/route-map",
     studioKitchen: "/studio-kitchen",
     projectSummary: "/project-summary",
     projectDetails: "/project-details",

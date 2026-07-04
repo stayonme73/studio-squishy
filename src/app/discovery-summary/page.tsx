@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const PAGE_COPY = {
   title: "Discovery Summary",
   lead: "Your recommended services, deliverables, and investment based on discovery.",
-  backHref: "/business-discovery-studio",
+  backHref: "/route-map",
 } as const;
 
 /** Discovery Summary — customer-facing recommendation view (prototype). */

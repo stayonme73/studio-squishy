@@ -1,29 +1,6 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import BusinessDiscoveryStudioScene from "@/components/business-discovery-studio/BusinessDiscoveryStudioScene";
-import { customerJourneyStepName } from "@/config/customer-journey-v1";
-import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
-import "../mobile-route-fixes.css";
-import "../business-discovery-studio.css";
-
-type Props = {
-  searchParams: Promise<{ debug?: string }>;
-};
-
-export const metadata: Metadata = {
-  title: customerJourneyStepName("project-discovery"),
-};
-
-/** Project Discovery — drafting-table discovery workspace. */
-export default async function BusinessDiscoveryStudioPage({ searchParams }: Props) {
-  const { debug } = await searchParams;
-  const showDebug = debug === "1";
-
-  return (
-    <main
-      className={`${utilityPageFontClassName} business-discovery-studio journey-shell flex h-[100dvh] min-h-0 flex-1 flex-col overflow-hidden`}
-    >
-      <BusinessDiscoveryStudioScene debug={showDebug} />
-    </main>
-  );
+/** Legacy Discovery / Submit Project route — quarantined from the client journey. */
+export default function BusinessDiscoveryStudioPage() {
+  redirect("/route-map");
 }

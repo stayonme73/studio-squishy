@@ -19,7 +19,7 @@ export const deliverables = {
     campaignDetails: "/studio-board?record=open",
     reviewRoom: "/feedback-studio",
     deliverables: "/deliverables",
-    draftRoom: "/business-discovery-studio?package=momentum",
+    draftRoom: "/route-map",
   },
 
   sidebar: {
