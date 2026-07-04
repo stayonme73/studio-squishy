@@ -6470,3 +6470,78 @@ body:has(.sb--v4) {
     grid-row: 4;
   }
 }
+
+/* Client typography + contrast final pass — Project Record drawer only */
+@media screen and (min-width: 1025px) {
+  .sb-record-drawer__backdrop {
+    background: color-mix(in srgb, var(--studio-ink) 26%, transparent);
+  }
+
+  .sb--v4 .sb-record-drawer__panel {
+    color: var(--sb-text);
+  }
+
+  .sb--v4 .sb-record-drawer__title {
+    font-size: clamp(1.62rem, 1.6vw, 1.9rem);
+    line-height: 1.22;
+    color: var(--sb-text);
+  }
+
+  .sb--v4 .sb-record-drawer__subtitle {
+    font-size: clamp(1.28rem, 1.18vw, 1.45rem);
+    line-height: 1.42;
+    color: var(--sb-text);
+  }
+
+  .sb--v4 .sb-record-drawer__hint,
+  .sb--v4 .sb-record-drawer__locked,
+  .sb--v4 .sb-record-drawer__empty {
+    font-size: clamp(1.12rem, 1.04vw, 1.24rem);
+    line-height: 1.68;
+    color: color-mix(in srgb, var(--sb-text) 90%, #000);
+  }
+
+  .sb--v4 .sb-record-drawer__section-title,
+  .sb--v4 .sb-record-drawer .cd-vision__eyebrow,
+  .sb--v4 .sb-record-drawer .cd-vision__label,
+  .sb--v4 .sb-record-drawer .cd-deliverables__hint {
+    font-size: clamp(1rem, 0.96vw, 1.12rem);
+    line-height: 1.48;
+    color: color-mix(in srgb, var(--sb-text) 86%, #000);
+  }
+
+  .sb--v4 .sb-record-drawer .cd-vision__answers,
+  .sb--v4 .sb-record-drawer .cd-package-list,
+  .sb--v4 .sb-record-drawer .cd-deliverables__links {
+    gap: 0.95rem;
+  }
+
+  .sb--v4 .sb-record-drawer .cd-package-list__item,
+  .sb--v4 .sb-record-drawer .cd-vision__value,
+  .sb--v4 .sb-record-drawer .cd-vision__empty,
+  .sb--v4 .sb-record-drawer .cd-deliverables__message,
+  .sb--v4 .sb-record-drawer .cd-deliverables__link {
+    font-size: clamp(1.12rem, 1.04vw, 1.24rem);
+    line-height: 1.68;
+    color: var(--sb-text);
+  }
+
+  .sb--v4 .sb-record-drawer .cd-vision__empty {
+    color: color-mix(in srgb, var(--sb-text) 82%, #000);
+  }
+
+  .sb--v4 .sb-record-drawer .cd-deliverables__message {
+    font-weight: 700;
+  }
+
+  .sb--v4 .sb-record-drawer .cd-deliverables__hint {
+    margin-top: 0.45rem;
+    color: color-mix(in srgb, var(--sb-text) 86%, #000);
+  }
+
+  .sb--v4 .sb-record-drawer__close,
+  .sb--v4 .sb-record-drawer .cd-deliverables__cta {
+    font-size: max(1rem, 16px);
+    line-height: 1.32;
+  }
+}

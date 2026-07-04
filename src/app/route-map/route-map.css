@@ -3672,3 +3672,195 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     width: 100%;
   }
 }
+
+/* Client typography + contrast final pass — active Social Posts screens only */
+@media (min-width: 901px) {
+  .route-map-world__scrim {
+    background: color-mix(in srgb, var(--rm-graphite) 28%, transparent);
+    backdrop-filter: blur(1px);
+  }
+
+  .route-map-lobby-backdrop {
+    --rm-backdrop-blur: 5px;
+  }
+
+  .route-map-world__sheet--job,
+  .route-map-world__sheet--checkout,
+  .route-map-world__sheet--intake {
+    color: var(--studio-charcoal);
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__section {
+    font-size: clamp(1.18rem, 1.18vw, 1.34rem);
+    line-height: 1.32;
+    color: color-mix(in srgb, var(--studio-eucalyptus) 82%, var(--studio-charcoal));
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__body > section > p,
+  .route-map-job-card--overlay .route-map-job-card__meta,
+  .route-map-job-card--overlay .route-map-job-card__list {
+    font-size: clamp(1.12rem, 1.12vw, 1.26rem);
+    line-height: 1.72;
+    color: var(--studio-charcoal);
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__list--muted {
+    color: color-mix(in srgb, var(--studio-charcoal) 92%, #000);
+  }
+
+  .route-map-job-card--overlay .route-map-job-card__meta strong {
+    color: var(--studio-charcoal);
+    font-weight: 850;
+  }
+
+  .route-map-primary-btn,
+  .route-map-secondary-btn,
+  .route-map-back-link {
+    font-size: max(1rem, 16px);
+    line-height: 1.32;
+  }
+
+  .route-map-world__sheet--checkout .pay-paper-card__title,
+  .route-map-world__sheet--checkout .pay-acknowledgment__heading,
+  .route-map-world__sheet--checkout .pay-disclaimer__heading {
+    font-size: clamp(1.28rem, 1.36vw, 1.52rem);
+    line-height: 1.32;
+    color: var(--studio-charcoal);
+  }
+
+  .route-map-world__sheet--checkout .pay-summary-includes-label,
+  .route-map-world__sheet--checkout .pay-field span,
+  .route-map-world__sheet--checkout .pay-summary-total-label {
+    font-size: max(1rem, 16px);
+    line-height: 1.42;
+    color: color-mix(in srgb, var(--studio-denim) 88%, var(--studio-charcoal));
+  }
+
+  .route-map-world__sheet--checkout .pay-summary-includes-list li,
+  .route-map-world__sheet--checkout .pay-summary-disclosure-note,
+  .route-map-world__sheet--checkout .pay-acknowledgment__body,
+  .route-map-world__sheet--checkout .pay-acknowledgment__checkbox,
+  .route-map-world__sheet--checkout .pay-next-steps__item,
+  .route-map-world__sheet--checkout .pay-next-secure,
+  .route-map-world__sheet--checkout .pay-disclaimer__line,
+  .route-map-world__sheet--checkout .route-map-checkout-addon {
+    font-size: clamp(1.06rem, 1.02vw, 1.16rem);
+    line-height: 1.68;
+    color: var(--studio-charcoal);
+  }
+
+  .route-map-world__sheet--checkout .pay-summary-disclosure-note,
+  .route-map-world__sheet--checkout .pay-next-secure,
+  .route-map-world__sheet--checkout .pay-disclaimer__line {
+    color: color-mix(in srgb, var(--studio-charcoal) 88%, #000);
+  }
+
+  .route-map-world__sheet--checkout .pay-field input {
+    min-height: 2.72rem;
+    font-size: clamp(1.06rem, 1vw, 1.14rem);
+    line-height: 1.5;
+    color: var(--studio-charcoal);
+  }
+
+  .route-map-world__sheet--checkout .pay-form {
+    gap: 0.62rem 0.78rem;
+  }
+
+  .route-map-world__sheet--checkout .pay-submit {
+    font-size: max(1rem, 16px);
+    line-height: 1.32;
+    border-color: color-mix(in srgb, var(--studio-denim) 82%, #000);
+    background: var(--studio-denim);
+    color: #fff;
+    opacity: 1;
+    box-shadow: 0 10px 24px rgba(46, 43, 40, 0.24);
+  }
+
+  .route-map-world__sheet--checkout .pay-submit:disabled {
+    background: color-mix(in srgb, var(--studio-denim) 76%, #fff);
+    color: #fff;
+    opacity: 0.92;
+  }
+
+  .route-map-checkout-addon {
+    color: var(--studio-charcoal);
+  }
+
+  .route-map-social-intake__eyebrow,
+  .route-map-social-intake__next,
+  .route-map-social-intake__job,
+  .route-map-social-intake__lead,
+  .route-map-social-intake__progress span,
+  .route-map-social-intake__card-copy p,
+  .route-map-social-intake__upload-row p,
+  .route-map-social-intake__file-state small,
+  .route-map-social-intake__save-state span {
+    color: color-mix(in srgb, var(--studio-charcoal) 88%, #000);
+  }
+
+  .route-map-social-intake__lead,
+  .route-map-social-intake__progress span,
+  .route-map-social-intake__card-copy p,
+  .route-map-social-intake__upload-row p,
+  .route-map-social-intake__file-state small,
+  .route-map-social-intake__save-state span {
+    font-size: clamp(1.04rem, 1.02vw, 1.16rem);
+    line-height: 1.62;
+  }
+
+  .route-map-social-intake__card-copy h3 {
+    font-size: clamp(1.28rem, 1.35vw, 1.58rem);
+    line-height: 1.28;
+    color: var(--studio-charcoal);
+  }
+
+  .route-map-social-intake__chip,
+  .route-map-social-intake__card--purpose .route-map-social-intake__chip,
+  .route-map-social-intake__card--action .route-map-social-intake__chip,
+  .route-map-social-intake__card--platform .route-map-social-intake__chip {
+    min-height: 2.95rem;
+    font-size: clamp(1.02rem, 1vw, 1.14rem);
+    line-height: 1.32;
+    color: var(--studio-charcoal);
+  }
+
+  .route-map-social-intake__chip small,
+  .route-map-social-intake__card--platform .route-map-social-intake__chip small {
+    font-size: clamp(0.95rem, 0.92vw, 1.04rem);
+    line-height: 1.35;
+    color: color-mix(in srgb, var(--studio-charcoal) 86%, #000);
+  }
+
+  .route-map-social-intake__chip--selected small {
+    color: #fff;
+  }
+
+  .route-map-social-intake__compact-field span {
+    font-size: clamp(1.02rem, 1vw, 1.12rem);
+    line-height: 1.38;
+    color: var(--studio-charcoal);
+  }
+
+  .route-map-social-intake__compact-field input,
+  .route-map-social-intake__compact-field textarea {
+    font-size: clamp(1.06rem, 1vw, 1.14rem);
+    line-height: 1.58;
+    color: var(--studio-charcoal);
+  }
+
+  .route-map-social-intake__compact-field input::placeholder,
+  .route-map-social-intake__compact-field textarea::placeholder {
+    color: color-mix(in srgb, var(--studio-charcoal) 62%, transparent);
+  }
+
+  .route-map-social-intake__actions .route-map-primary-btn,
+  .route-map-social-intake__actions .route-map-secondary-btn {
+    font-size: max(1rem, 16px);
+    line-height: 1.32;
+  }
+
+  .route-map-social-intake__save-state strong {
+    font-size: clamp(1.06rem, 1vw, 1.14rem);
+    line-height: 1.32;
+  }
+}
