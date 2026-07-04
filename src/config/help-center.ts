@@ -2,7 +2,7 @@ import { customerJourneyStepName } from "@/config/customer-journey-v1";
 import { studioPolicies } from "@/config/policies";
 import { studioBoard } from "@/config/studio-board";
 
-export type HelpCenterFrom = "campaign-details" | "studio-board" | "payment";
+export type HelpCenterFrom = "campaign-details" | "studio-board" | "payment" | "route-map";
 
 export function helpCenterAnchor(
   section: "philosophy" | "faq" | "policies",
@@ -31,7 +31,8 @@ export const helpCenter = {
   backLabels: {
     studioBoard: "Back to Studio Board",
     campaignDetails: "Back to Campaign Details",
-    payment: `Back to ${customerJourneyStepName("secure-checkout")}`,
+    payment: "Back to Route Map",
+    routeMap: "Back to Route Map",
   },
   toc: {
     title: "On this page",

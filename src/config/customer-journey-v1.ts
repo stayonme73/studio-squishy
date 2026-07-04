@@ -4,6 +4,8 @@
  * @see docs/customer-journey-v1-locked.md
  */
 
+import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
+
 export type CustomerJourneyStep = {
   order: number;
   id: string;
@@ -27,14 +29,16 @@ export const customerJourneyV1 = {
       order: 2,
       id: "studio-guide",
       name: "Studio Guide",
-      route: "/studio-guide-prototype",
+      route: "/route-map",
+      routeAliases: ["/studio-guide-prototype", "/studio-guide"] as const,
     },
     {
       order: 3,
       id: "secure-checkout",
       name: "Secure Checkout",
       formerName: "Payment",
-      route: "/payment",
+      route: "/route-map",
+      routeAliases: ["/payment"] as const,
     },
     {
       order: 4,
@@ -120,13 +124,9 @@ export function customerJourneyStepRoute(id: CustomerJourneyStepId): string {
 
 const PACKAGE_IDS = ["spark", "momentum", "growth"] as const;
 
-/** Post-payment Project Details intake — optional package query for journey handoff. */
-export function projectDetailsJourneyHref(packageId?: string): string {
-  const base = "/project-details";
-  if (!packageId || !PACKAGE_IDS.includes(packageId as (typeof PACKAGE_IDS)[number])) {
-    return base;
-  }
-  return `${base}?package=${packageId}`;
+/** Post-payment intake — quarantined legacy wizard; Route Map service-specific intake is active. */
+export function projectDetailsJourneyHref(_packageId?: string): string {
+  return legacyRouteQuarantineV1.activeIntake;
 }
 
 /** Project Discovery is retired from active routing; start service selection on Route Map. */

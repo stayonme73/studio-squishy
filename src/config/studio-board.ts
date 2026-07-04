@@ -187,11 +187,11 @@ export const studioBoard = {
     studioBoard: "/studio-board",
     newCampaign: "/route-map",
     /** @deprecated legacy URL — redirects to Project Discovery */
-    draftRoom: "/draft-room",
+    draftRoom: "/route-map",
     pastCampaigns: "/past-campaigns",
     account: "/account",
     helpCenter: "/help-center",
-    studioGuide: "/studio-guide-prototype",
+    studioGuide: "/route-map",
     reviewRoom: "/feedback-studio",
     feedbackStudio: "/feedback-studio",
     deliverables: "/deliverables",
@@ -200,10 +200,12 @@ export const studioBoard = {
     studioLobby: "/studio-lobby",
     projectDiscovery: "/route-map",
     studioKitchen: "/studio-kitchen",
-    projectSummary: "/project-summary",
-    projectDetails: "/project-details",
-    /** @deprecated use projectSummary — redirect preserved at /studio-plan-review */
-    studioPlanReview: "/project-summary",
+    /** @deprecated quarantined — redirects to Route Map */
+    projectSummary: "/route-map",
+    /** @deprecated quarantined — use resolveIntakeEditHref / Route Map intake */
+    projectDetails: "/route-map?step=intake",
+    /** @deprecated quarantined — redirects to Route Map */
+    studioPlanReview: "/route-map",
   },
 
   empty: {
@@ -303,8 +305,8 @@ export const studioBoard = {
         "Make changes if needed before production begins.",
         "The Studio begins your campaign.",
       ],
-      primaryCta: "OPEN PROJECT SUMMARY",
-      primaryRoute: "projectSummary" as const,
+      primaryCta: "START A NEW CAMPAIGN",
+      primaryRoute: "newCampaign" as const,
     },
     DRAFT_RECEIVED: {
       statusLabel: "Intake Complete",
@@ -752,9 +754,9 @@ export function studioBoardDraftRoomHref() {
 }
 
 export function studioBoardStudioGuideHref(
-  packageId: MembershipRecord["packageId"] = studioBoard.membership.packageId,
+  _packageId: MembershipRecord["packageId"] = studioBoard.membership.packageId,
 ) {
-  return `${studioBoard.routes.studioGuide}?package=${packageId}`;
+  return studioBoard.routes.newCampaign;
 }
 
 export function studioBoardPrimaryHref(route: StudioBoardPrimaryRoute | "newCampaign") {

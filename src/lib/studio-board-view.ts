@@ -1,4 +1,4 @@
-import { studioBoard, campaignStatusIndex, type CampaignRecord, type CampaignStatus, type StudioUpdate } from "@/config/studio-board";
+import { studioBoard, campaignStatusIndex, studioBoardDraftRoomHref, type CampaignRecord, type CampaignStatus, type StudioUpdate } from "@/config/studio-board";
 import {
   CUSTOM_STUDIO_PLAN_LABEL,
   resolveCampaignAmountPaidDisplay,
@@ -605,8 +605,6 @@ export function resolveBoardCampaignActions(
 
     case "DRAFT_RECEIVED":
 
-      if (!options?.studioGuideHref) return [];
-
       return [
 
         {
@@ -615,7 +613,7 @@ export function resolveBoardCampaignActions(
 
           label: copy.reviewConcepts,
 
-          href: options.studioGuideHref,
+          href: studioBoardDraftRoomHref(),
 
           isPrimary: true,
 

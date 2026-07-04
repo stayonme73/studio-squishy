@@ -4,6 +4,7 @@
  */
 
 import { customerJourneyStepName, projectDiscoveryHref } from "@/config/customer-journey-v1";
+import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
 
 export const studioGuide = {
   title: customerJourneyStepName("studio-guide"),
@@ -268,6 +269,6 @@ export function draftRoomHref(packageId: StudioGuidePackageId) {
   return projectDiscoveryHref(packageId);
 }
 
-export function paymentHref(packageId: StudioGuidePackageId) {
-  return `/payment?package=${packageId}`;
+export function paymentHref(_packageId: StudioGuidePackageId) {
+  return legacyRouteQuarantineV1.activeFrontDoor;
 }

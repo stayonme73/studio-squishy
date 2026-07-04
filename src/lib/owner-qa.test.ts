@@ -46,7 +46,7 @@ describe("owner-qa menu config", () => {
 
     const hrefs = ownerQa.journeyPresets.map((preset) => preset.href);
     expect(hrefs).toContain("/route-map");
-    expect(hrefs).toContain("/payment");
+    expect(hrefs).not.toContain("/payment");
     expect(hrefs).not.toContain("/business-discovery-studio");
     expect(hrefs).not.toContain("/project-summary");
     expect(hrefs).not.toContain("/project-details");

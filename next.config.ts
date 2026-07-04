@@ -7,7 +7,13 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: "/studio-plan-review", destination: "/project-summary", permanent: false },
+      { source: "/studio-plan-review", destination: "/route-map", permanent: false },
+      { source: "/project-summary", destination: "/route-map", permanent: false },
+      { source: "/project-details", destination: "/route-map", permanent: false },
+      { source: "/payment", destination: "/route-map", permanent: false },
+      { source: "/discovery-summary", destination: "/route-map", permanent: false },
+      { source: "/studio-guide", destination: "/route-map", permanent: false },
+      { source: "/studio-guide-prototype", destination: "/route-map", permanent: false },
       { source: "/review-room", destination: "/feedback-studio", permanent: false },
     ];
   },

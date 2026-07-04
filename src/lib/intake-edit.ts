@@ -1,10 +1,15 @@
 import type { StudioGuidePackageId } from "@/config/studio-guide";
-import { projectDetailsHref } from "@/config/project-details";
+import {
+  legacyRouteQuarantineV1,
+  ROUTE_MAP_HREF,
+  ROUTE_MAP_INTAKE_STEP_HREF,
+} from "@/config/legacy-route-quarantine-v1";
 import type { CampaignPackageId, CampaignRecord, CampaignStatus } from "@/config/studio-board";
 import { readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 
 /** Post-payment Route Map intake — opens service-specific materials form in Route Map scene. */
-export const ROUTE_MAP_INTAKE_HREF = "/route-map?step=intake";
+export const ROUTE_MAP_INTAKE_HREF = ROUTE_MAP_INTAKE_STEP_HREF;
+export { ROUTE_MAP_HREF, ROUTE_MAP_INTAKE_STEP_HREF };
 
 /** Statuses where customers may review and edit intake answers. */
 export const INTAKE_EDITABLE_STATUSES = ["DRAFT_RECEIVED", "PAYMENT_RECEIVED"] as const satisfies readonly CampaignStatus[];
@@ -27,10 +32,10 @@ export function routeMapIntakeHref(): string {
 /** Intake edit / post-payment handoff — Route Map jobs stay on Route Map intake. */
 export function resolveIntakeEditHref(
   campaign: CampaignRecord | null | undefined,
-  packageId?: CampaignPackageId,
+  _packageId?: CampaignPackageId,
 ): string {
   if (isRouteMapCampaign(campaign)) return routeMapIntakeHref();
-  return projectDetailsHref(packageId);
+  return legacyRouteQuarantineV1.activeIntake;
 }
 
 export function draftRoomEditHref(

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
-import PolicyContentBlocks from "@/components/shared/PolicyContentBlocks";
+import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
 import PackageComparisonTable from "@/components/shared/PackageComparisonTable";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
@@ -15,7 +15,12 @@ import { resolveHelpCenterView } from "@/lib/help-center-view";
 const copy = helpCenter;
 
 function parseFromParam(value: string | null): HelpCenterFrom | null {
-  if (value === "campaign-details" || value === "studio-board" || value === "payment") {
+  if (
+    value === "campaign-details" ||
+    value === "studio-board" ||
+    value === "payment" ||
+    value === "route-map"
+  ) {
     return value;
   }
   return null;
@@ -30,8 +35,8 @@ export default function HelpCenterScene() {
   const backHref =
     from === "campaign-details"
       ? copy.routes.campaignDetails
-      : from === "payment"
-        ? "/payment"
+      : from === "payment" || from === "route-map"
+        ? legacyRouteQuarantineV1.activeFrontDoor
         : copy.routes.studioBoard;
 
   const faqById = useMemo(() => new Map(view.faq.map((item) => [item.id, item])), [view.faq]);

@@ -357,11 +357,9 @@ export const draftRoom = {
 
   routes: {
     welcomeHall: "/studio-lobby",
-    /** @deprecated legacy URL — use Route Map */
-    draftRoom: "/draft-room",
-    /** @deprecated legacy URL — use Route Map */
-    begin: "/draft-room/begin",
-    studioGuide: "/studio-guide-prototype",
+    draftRoom: "/route-map",
+    begin: "/route-map",
+    studioGuide: "/route-map",
     studioBoard: "/studio-board",
     projectDiscovery: "/route-map",
   },

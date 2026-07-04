@@ -141,7 +141,7 @@ export default function ProjectSnapshotPanel({ campaign, view, account }: Props)
               {plan.revisionLine}
             </li>
           </ul>
-          <Link href={routes.projectSummary} className="sb-project-snapshot__link">
+          <Link href={routes.campaignDetails} className="sb-project-snapshot__link">
             View plan →
           </Link>
         </section>
@@ -152,7 +152,7 @@ export default function ProjectSnapshotPanel({ campaign, view, account }: Props)
           </h2>
           <p className="sb-project-snapshot__primary">{accountSnapshot.summary}</p>
           <p className="sb-project-snapshot__meta">{accountSnapshot.detail}</p>
-          <Link href="/payment" className="sb-project-snapshot__link">
+          <Link href={routes.newCampaign} className="sb-project-snapshot__link">
             View payment details →
           </Link>
         </section>

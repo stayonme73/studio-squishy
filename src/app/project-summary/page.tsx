@@ -1,29 +1,8 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
-import ProjectSummaryWorkspace from "@/components/project-summary/ProjectSummaryWorkspace";
-import { PROJECT_SUMMARY_LABELS } from "@/project-summary";
-import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
+import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
 
-import "../discovery-summary.css";
-import "../project-summary.css";
-import "../studio-plan-review.css";
-import "../payment.css";
-import "../mobile-route-fixes.css";
-
-export const metadata: Metadata = {
-  title: PROJECT_SUMMARY_LABELS.pageTitle,
-};
-
-/** Project Summary — bridge after Project Discovery; wide workspace with inline Secure Checkout. */
-export default function ProjectSummaryPage() {
-  return (
-    <main
-      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden`}
-    >
-      <Suspense fallback={null}>
-        <ProjectSummaryWorkspace />
-      </Suspense>
-    </main>
-  );
+/** Legacy Project Summary — quarantined; Route Map is the active front door. */
+export default function ProjectSummaryLegacyPage() {
+  redirect(legacyRouteQuarantineV1.quarantineTarget);
 }

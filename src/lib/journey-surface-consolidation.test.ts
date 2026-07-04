@@ -99,7 +99,7 @@ describe("studio guide redirect", () => {
     }
   });
 
-  it("redirects to Project Summary when an approved plan exists", () => {
+  it("redirects to Route Map when an approved plan exists", () => {
     const localStorage = createStorage();
     const originalWindow = globalThis.window;
     const campaign = {
@@ -135,7 +135,7 @@ describe("studio guide redirect", () => {
     }
   });
 
-  it("redirects to Project Summary when a project-summary plan draft exists", () => {
+  it("redirects to Route Map when a project-summary plan draft exists", () => {
     const localStorage = createStorage();
     const originalWindow = globalThis.window;
     const campaign = mockReviewCampaign();

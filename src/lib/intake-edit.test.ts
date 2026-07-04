@@ -21,7 +21,7 @@ describe("intake edit routing", () => {
     expect(projectDetailsEditHref(undefined, campaign)).toBe("/route-map?step=intake");
   });
 
-  it("keeps Discovery campaigns on legacy Project Details", () => {
+  it("keeps non–Route Map campaigns on quarantined Route Map intake", () => {
     const campaign = {
       campaignId: "discovery-test",
       campaignStatus: "PAYMENT_RECEIVED",
@@ -29,7 +29,7 @@ describe("intake edit routing", () => {
     } as CampaignRecord;
 
     expect(isRouteMapCampaign(campaign)).toBe(false);
-    expect(resolveIntakeEditHref(campaign, "spark")).toBe("/project-details?package=spark");
-    expect(resolvePostPaymentIntakeHref(campaign, "spark")).toBe("/project-details?package=spark");
+    expect(resolveIntakeEditHref(campaign, "spark")).toBe("/route-map?step=intake");
+    expect(resolvePostPaymentIntakeHref(campaign, "spark")).toBe("/route-map?step=intake");
   });
 });

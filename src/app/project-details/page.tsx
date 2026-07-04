@@ -1,28 +1,8 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
-import ProjectDetailsWorkspace from "@/components/project-details/ProjectDetailsWorkspace";
-import { projectDetails } from "@/config/project-details";
-import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
+import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
 
-import "../project-summary.css";
-import "../payment.css";
-import "../mobile-route-fixes.css";
-import "./project-details.css";
-
-export const metadata: Metadata = {
-  title: projectDetails.pageTitle,
-};
-
-/** Post-payment Project Details — green services intake after Secure Checkout. */
-export default function ProjectDetailsPage() {
-  return (
-    <main
-      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden`}
-    >
-      <Suspense fallback={null}>
-        <ProjectDetailsWorkspace />
-      </Suspense>
-    </main>
-  );
+/** Legacy Project Details wizard — quarantined; use Route Map service-specific intake. */
+export default function ProjectDetailsLegacyPage() {
+  redirect(legacyRouteQuarantineV1.activeIntake);
 }

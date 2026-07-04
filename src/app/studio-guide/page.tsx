@@ -1,7 +1,8 @@
-import StudioGuideLegacyRedirect from "@/components/studio-guide/StudioGuideLegacyRedirect";
-import "../mobile-route-fixes.css";
+import { redirect } from "next/navigation";
 
-/** Legacy route — redirects to Discovery or Project Summary based on plan state. */
-export default function StudioGuidePage() {
-  return <StudioGuideLegacyRedirect />;
+import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
+
+/** Legacy Studio Guide — quarantined; Route Map is the active front door. */
+export default function StudioGuideLegacyPage() {
+  redirect(legacyRouteQuarantineV1.quarantineTarget);
 }

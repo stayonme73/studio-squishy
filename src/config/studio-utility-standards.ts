@@ -4,6 +4,7 @@
  * @see docs/studio-backdrop-placement-guide.md
  */
 
+import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
 import { studioBoard } from "@/config/studio-board";
 
 import type { UtilityNavId } from "./utility-shell";
@@ -62,12 +63,11 @@ const UTILITY_BACKDROP_NAV_IDS = new Set<UtilityNavId>([
 
 /** Route paths that receive the lobby backdrop (documentation / guards). */
 export const studioUtilityBackdropRoutes = new Set<string>([
-  "/project-summary",
+  legacyRouteQuarantineV1.activeFrontDoor,
   studioBoard.routes.helpCenter,
   studioBoard.routes.feedbackStudio,
   studioBoard.routes.deliverables,
-  "/payment",
-  "/project-details",
+  legacyRouteQuarantineV1.activeIntake,
   studioBoard.routes.campaignDetails,
 ]);
 

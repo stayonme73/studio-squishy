@@ -1,6 +1,6 @@
-import type { StudioGuidePackageId } from "@/config/studio-guide";
 import { customerJourneyStepName } from "@/config/customer-journey-v1";
-import { projectDetailsHref } from "@/config/project-details";
+import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
+import type { StudioGuidePackageId } from "@/config/studio-guide";
 import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
 
 export const payment = {
@@ -72,8 +72,8 @@ export const payment = {
     "After payment, you'll share the details and materials we need to complete your approved Studio Plan.",
   routes: {
     studioBoard: "/studio-board",
-    studioGuide: "/studio-guide-prototype",
-    studioGuidePrototype: "/studio-guide-prototype",
+    studioGuide: legacyRouteQuarantineV1.activeFrontDoor,
+    studioGuidePrototype: legacyRouteQuarantineV1.activeFrontDoor,
   },
   /** Onboarding step index on the payment page — Payment is always step 0 here. */
   workflowStepIndex: {
@@ -101,14 +101,14 @@ export function paymentWorkflowStepIcon(state: PaymentWorkflowStepState): string
   return "○";
 }
 
-export function paymentIntakeHref(packageId: StudioGuidePackageId): string {
-  return projectDetailsHref(packageId);
+export function paymentIntakeHref(_packageId: StudioGuidePackageId): string {
+  return legacyRouteQuarantineV1.activeIntake;
 }
 
 const PACKAGE_IDS = ["spark", "momentum", "growth"] as const;
 
-export function paymentHref(packageId: StudioGuidePackageId): string {
-  return `/payment?package=${packageId}`;
+export function paymentHref(_packageId: StudioGuidePackageId): string {
+  return legacyRouteQuarantineV1.activeFrontDoor;
 }
 
 export function parsePaymentPackageId(

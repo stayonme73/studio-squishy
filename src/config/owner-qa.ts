@@ -46,7 +46,7 @@ export const ownerQa = {
       id: "payment-checkout-test",
       label: "Payment / Checkout test",
       description: "Route Map job selected · checkout ready",
-      href: "/payment",
+      href: studioBoard.routes.newCampaign,
       seed: "payment-checkout-test",
     },
     {
