@@ -2536,17 +2536,16 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     width: min(1720px, calc(100vw - 8px));
     height: min(100dvh, 1060px);
     max-height: min(100dvh, 1060px);
-    padding: clamp(18px, 2vw, 30px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    padding: clamp(12px, 1.4vw, 22px);
+    overflow: hidden;
   }
 
   .route-map-social-intake {
     display: grid;
-    grid-template-rows: auto auto auto auto;
-    gap: clamp(12px, 1.4vw, 18px);
-    height: auto;
-    min-height: 100%;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: clamp(8px, 1vw, 12px);
+    height: 100%;
+    min-height: 0;
     padding-bottom: 0;
   }
 
@@ -2589,16 +2588,17 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     grid-template-rows: auto auto auto;
-    gap: clamp(16px, 1.8vw, 24px);
+    gap: clamp(10px, 1.2vw, 16px);
+    height: 100%;
     min-height: 0;
     align-content: start;
   }
 
   .route-map-social-intake__card {
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 16px 18px;
+    gap: 12px 14px;
     min-height: 0;
-    padding: clamp(20px, 1.65vw, 28px);
+    padding: clamp(14px, 1.25vw, 22px);
     border-radius: 18px;
     align-content: start;
   }
@@ -2607,17 +2607,17 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-social-intake__card--action,
   .route-map-social-intake__card--platform {
     grid-column: span 2;
-    min-height: 28rem;
+    min-height: 0;
   }
 
   .route-map-social-intake__card--materials {
     grid-column: span 4;
-    min-height: 21rem;
+    min-height: 0;
   }
 
   .route-map-social-intake__card--wording {
     grid-column: span 2;
-    min-height: 21rem;
+    min-height: 0;
   }
 
   .route-map-social-intake__step {
@@ -2641,19 +2641,19 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
   .route-map-social-intake__chips {
     grid-column: 1 / -1;
-    gap: 10px;
+    gap: 8px;
   }
 
   .route-map-social-intake__chip {
-    min-height: 44px;
-    padding: 9px 13px;
-    font-size: clamp(0.98rem, 1.04vw, 1.08rem);
-    line-height: 1.2;
+    min-height: 38px;
+    padding: 7px 11px;
+    font-size: clamp(0.93rem, 0.98vw, 1.02rem);
+    line-height: 1.18;
   }
 
   .route-map-social-intake__chip small {
-    font-size: 0.84rem;
-    line-height: 1.25;
+    font-size: 0.8rem;
+    line-height: 1.2;
   }
 
   .route-map-social-intake__compact-field,
@@ -2664,23 +2664,23 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-social-intake__compact-field {
-    gap: 8px;
+    gap: 6px;
   }
 
   .route-map-social-intake__compact-field span {
-    font-size: clamp(0.98rem, 1.02vw, 1.08rem);
+    font-size: clamp(0.94rem, 0.98vw, 1.02rem);
   }
 
   .route-map-social-intake__compact-field input,
   .route-map-social-intake__compact-field textarea {
-    padding: 12px 14px;
-    font-size: clamp(1rem, 1.06vw, 1.1rem);
-    line-height: 1.48;
+    padding: 9px 11px;
+    font-size: clamp(0.95rem, 1vw, 1.04rem);
+    line-height: 1.35;
   }
 
   .route-map-social-intake__upload-row {
     gap: 11px 14px;
-    padding: 12px;
+    padding: 10px;
   }
 
   .route-map-social-intake__upload-row p {
@@ -2708,17 +2708,17 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     position: static;
     grid-column: 1 / -1;
     grid-template-columns: minmax(12rem, 1fr) auto auto;
-    min-height: var(--rm-social-action-h);
-    margin-top: clamp(8px, 1vw, 14px);
-    padding: 12px 16px;
+    min-height: 0;
+    margin-top: clamp(2px, 0.5vw, 6px);
+    padding: 8px 12px;
     border-radius: 16px;
     box-shadow: 0 -8px 22px rgba(46, 43, 40, 0.12);
   }
 
   .route-map-social-intake__actions .route-map-primary-btn,
   .route-map-social-intake__actions .route-map-secondary-btn {
-    min-height: 46px;
-    padding-inline: 16px;
+    min-height: 40px;
+    padding-inline: 14px;
     font-size: 0.92rem;
     white-space: nowrap;
   }
@@ -2820,22 +2820,25 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     width: min(1160px, calc(100vw - 24px));
     height: min(100dvh, 1000px);
     max-height: min(100dvh, 1000px);
-    padding: clamp(16px, 2vw, 24px);
+    padding: clamp(10px, 1.4vw, 18px);
   }
 
   .route-map-social-intake__form {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
   .route-map-social-intake__card--purpose,
   .route-map-social-intake__card--action,
-  .route-map-social-intake__card--platform,
-  .route-map-social-intake__card--wording {
+  .route-map-social-intake__card--platform {
     grid-column: span 2;
   }
 
   .route-map-social-intake__card--materials {
-    grid-column: 1 / -1;
+    grid-column: span 4;
+  }
+
+  .route-map-social-intake__card--wording {
+    grid-column: span 2;
   }
 }
 
