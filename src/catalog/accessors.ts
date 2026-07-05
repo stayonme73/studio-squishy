@@ -8,7 +8,7 @@ import {
   getPriceCentsFromService,
   resolveLegacyServiceId,
 } from "@/catalog/compat";
-import { SERVICE_CATALOG } from "@/catalog/services";
+import { SERVICE_CATALOG } from "@/catalog/seeds";
 import type {
   BillingType,
   DiscoveryMappingRule,

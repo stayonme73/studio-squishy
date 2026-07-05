@@ -4,8 +4,8 @@
  * Architecture: Catalog → Recommendation Engine → Discovery Summary → Payment → Campaign Record
  * Import from `@/catalog` only; do not reach into submodules from UI.
  *
- * Schema v2 adds StudioServiceEntry with category, service class, discovery triggers,
- * requirements, and governance fields. ServiceCatalogEntry remains an alias for engine compat.
+ * Schema v3 adds V2-ready optional fields (reviewType, deliveryPackage, pricingDisplayType,
+ * qaChecklist, aiPromptRef). ServiceCatalogEntry remains an alias for engine compat.
  */
 
 export {
@@ -45,11 +45,22 @@ export type {
   ServiceProductionEffort,
   ServiceProductionEffortTier,
   ServiceProductionTime,
+  ServiceQaChecklist,
+  ServiceQaChecklistItemId,
+  ServiceReviewType,
+  ServiceDeliveryPackage,
+  ServicePricingDisplayType,
+  ServiceAiPromptRef,
   ServiceTimingWindow,
   StudioNeedId,
   StudioServiceEntry,
   StudioServiceStatus,
 } from "@/catalog/types";
+
+export {
+  normalizeServiceCatalog,
+  normalizeStudioServiceEntry,
+} from "@/catalog/normalize";
 
 export {
   getServiceCategories,
@@ -73,7 +84,7 @@ export {
   serviceStatusToCatalogStatus,
 } from "@/catalog/compat";
 
-export { SERVICE_CATALOG } from "@/catalog/services";
+export { SERVICE_CATALOG } from "@/catalog/seeds";
 
 export {
   CORE_MAX_INCLUDED,

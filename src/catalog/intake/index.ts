@@ -1,6 +1,6 @@
 /**
- * Route Map intake — compatibility re-export.
- * Canonical source: `@/catalog/intake`.
+ * Studio Service Catalog — intake module public API.
+ * Form schemas for Route Map jobs and V2 RTU shelf SKUs.
  */
 
 export type {
@@ -8,9 +8,9 @@ export type {
   RouteMapIntakeField,
   RouteMapIntakeSchema,
   RouteMapIntakeSchemaOptions,
-} from "@/catalog/intake";
+} from "@/catalog/intake/schemas";
 
 export {
   getRouteMapIntakeSchema,
   ROUTE_MAP_INTAKE_SCHEMAS,
-} from "@/catalog/intake";
+} from "@/catalog/intake/schemas";

@@ -12,7 +12,7 @@ import type { DiscoveryTileId } from "@/config/business-discovery-studio";
 import type { StudioNeedId } from "@/config/studio-services";
 
 /** Current catalog schema version — increment when breaking shape changes occur. */
-export const CATALOG_SCHEMA_VERSION = 2 as const;
+export const CATALOG_SCHEMA_VERSION = 3 as const;
 
 export type CatalogSchemaVersion = typeof CATALOG_SCHEMA_VERSION;
 
@@ -305,8 +305,88 @@ export type DiscoveryMappingRule = {
 export type DiscoveryTrigger = DiscoveryMappingRule;
 
 /**
- * Full Studio Service catalog entry (schema v2).
- * Extends the v1 shape with category, service class, requirements, and governance fields.
+ * How client review and sign-off are modeled for this SKU.
+ * V2-ready — populated by normalize; consumers wire in Phase 3+.
+ */
+export type ServiceReviewType =
+  | "standard_production_review"
+  | "strategy_direction_review"
+  | "ready_to_use_handoff"
+  | "managed_execution_review"
+  | "monthly_batch_review"
+  | "advisory_handoff"
+  | "no_review";
+
+/**
+ * What the customer receives at final delivery — distinct from deliverables list copy.
+ * V2-ready — aligns with Review Room and Final Delivery routing when wired.
+ */
+export type ServiceDeliveryPackage =
+  | "project_deliverables"
+  | "monthly_batch"
+  | "ready_to_use_files"
+  | "execution_handoff"
+  | "advisory_recommendation";
+
+/**
+ * How price is rendered in customer-facing surfaces.
+ * V2-ready — Route Map per-platform labels migrate here from route-map-v1 overrides.
+ */
+export type ServicePricingDisplayType =
+  | "standard"
+  | "per_platform"
+  | "per_month"
+  | "bundle_package"
+  | "addon_line_item"
+  | "quoted_legacy";
+
+/**
+ * QA checklist item IDs — align with `campaignTasksConfig.qaChecklistLabels` keys.
+ * V2-ready — production task plan reads template + items when wired.
+ */
+export type ServiceQaChecklistItemId =
+  | "scope_match"
+  | "factual_accuracy"
+  | "direction_match"
+  | "usability"
+  | "client_safe_packaging"
+  | "strategy_alignment"
+  | "scope_clarity"
+  | "direction_alignment"
+  | "brand_fit"
+  | "review_complete"
+  | "recommendations_clear"
+  | "copy_accuracy"
+  | "brand_voice"
+  | "grammar"
+  | "visual_quality"
+  | "brand_alignment"
+  | "specs_met"
+  | "production_quality"
+  | "deliverable_complete"
+  | "production_complete"
+  | "deliverable_specs"
+  | "client_requirements"
+  | "package_complete"
+  | "fingerprint_match"
+  | "no_internal_leaks";
+
+/** QA checklist template reference — not the checklist UI itself. */
+export type ServiceQaChecklist = {
+  /** Template key for production QA — maps to task-family checklists when wired. */
+  templateKey: string;
+  items: readonly ServiceQaChecklistItemId[];
+};
+
+/** Stable AI prompt template reference — prompt text lives outside the catalog. */
+export type ServiceAiPromptRef = {
+  templateKey: string;
+  version?: string;
+};
+
+/**
+ * Full Studio Service catalog entry (schema v3).
+ * Extends v2 with V2-ready optional fields; normalize fills defaults at export.
  */
 export type StudioServiceEntry = {
   schemaVersion: CatalogSchemaVersion;
@@ -388,6 +468,19 @@ export type StudioServiceEntry = {
   productionNotes?: string;
   /** v1 engine active filter — map from serviceStatus via compat helpers. */
   status: ServiceCatalogStatus;
+
+  // --- v3 V2-ready fields (optional at seed time; normalize fills defaults) ---
+
+  /** Client review / sign-off model for Review Room when wired. */
+  reviewType?: ServiceReviewType;
+  /** Final delivery package shape for Final Delivery when wired. */
+  deliveryPackage?: ServiceDeliveryPackage;
+  /** Customer-facing price display strategy — supersedes route-map local overrides when wired. */
+  pricingDisplayType?: ServicePricingDisplayType;
+  /** Production QA checklist template reference — not wired to File Room yet. */
+  qaChecklist?: ServiceQaChecklist;
+  /** AI production prompt template reference — prompt bodies live outside catalog. */
+  aiPromptRef?: ServiceAiPromptRef;
 };
 
 /**

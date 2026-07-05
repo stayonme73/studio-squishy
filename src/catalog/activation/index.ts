@@ -1,12 +1,12 @@
 /**
- * Catalog V2 activation map — compatibility re-export.
- * Canonical source: `@/catalog/activation`.
+ * Studio Service Catalog — activation map public API.
+ * Route Map shelf placement and V2 RTU rollout disposition.
  */
 
 export type {
   CatalogV2ActivationMapEntry,
   CatalogV2ActivationStatus,
-} from "@/catalog/activation";
+} from "@/catalog/activation/map";
 
 export {
   CATALOG_V2_ACTIVATION_LAUNCH_CANDIDATE_SKUS,
@@ -17,4 +17,4 @@ export {
   getActivationMapEntriesByStatus,
   getActivationMapEntryBySku,
   getActivationMapShelfEntriesForLane,
-} from "@/catalog/activation";
+} from "@/catalog/activation/map";

@@ -24,7 +24,7 @@ import {
   type CampaignRecord,
   type CampaignStatus,
 } from "@/config/studio-board";
-import { SERVICE_CATALOG } from "@/catalog/services";
+import { SERVICE_CATALOG } from "@/catalog";
 import { validateExecutionAddOnsInPlan } from "@/catalog/validate";
 import { buildServiceScopeSnapshot, computePlanPricingTotals } from "@/lib/plan-pricing";
 import {

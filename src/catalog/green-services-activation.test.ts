@@ -5,7 +5,7 @@ import {
   getRecommendableActiveServices,
   getServiceById,
 } from "@/catalog/accessors";
-import { SERVICE_CATALOG } from "@/catalog/services";
+import { SERVICE_CATALOG } from "@/catalog/seeds";
 import { getActivePurchasableServices } from "@/catalog/validate";
 import { buildDiscoveryBrief } from "@/lib/discovery-brief";
 import { recommendFromDiscovery } from "@/recommendation/engine";

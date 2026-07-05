@@ -11,7 +11,7 @@ import {
   getServicePriceCents,
   sumPriceCentsForServices,
 } from "@/catalog/accessors";
-import { SERVICE_CATALOG } from "@/catalog/services";
+import { SERVICE_CATALOG } from "@/catalog/seeds";
 import {
   canAttachExecutionAddOn,
   getActivePurchasableServices,

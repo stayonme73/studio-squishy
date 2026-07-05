@@ -4,7 +4,7 @@
  * Does not modify live catalog or Route Map behavior.
  */
 
-import { SERVICE_CATALOG } from "@/catalog/services";
+import { SERVICE_CATALOG } from "@/catalog/seeds";
 import type {
   ExecutionMode,
   LaunchStatus,

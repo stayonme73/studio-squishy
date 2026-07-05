@@ -4,7 +4,7 @@
 
 import { getDerivedServicePricing, getServiceById } from "@/catalog/accessors";
 import { validateExecutionAddOnsInPlan } from "@/catalog/validate";
-import { SERVICE_CATALOG } from "@/catalog/services";
+import { SERVICE_CATALOG } from "@/catalog";
 import type { ServiceId } from "@/catalog/types";
 import { buildCustomerWhyExplanation } from "@/discovery-summary/recommendation-copy";
 import { computePlanPricingTotals, formatUsdFromCents } from "@/lib/plan-pricing";

@@ -1,7 +1,11 @@
 /**
- * Studio Service Catalog — authoritative service definitions.
- * v2 launch SKUs per approved catalog doc; legacy packages retained as retired for reference.
- * Do not duplicate this data in UI components or page configs.
+ * Studio Service Catalog — raw seed data (temporary location).
+ *
+ * RAW_SERVICE_CATALOG lives here until Phase 3 physical split into seeds/core-services.ts,
+ * seeds/retired.ts, and seeds/bundles.ts. Do not add new permanent service logic here —
+ * new seeds belong in the split files once that work lands.
+ *
+ * Normalized v3 export: `@/catalog/seeds` (SERVICE_CATALOG).
  */
 
 import type {
@@ -22,7 +26,6 @@ import type {
 import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
 import { ROUTE_MAP_LAUNCH_SERVICES } from "@/catalog/route-map-launch";
 import { ROUTE_MAP_V2_ALL_SERVICES } from "@/catalog/route-map-v2-launch";
-import { validateServiceCatalog } from "@/catalog/validate";
 
 function withDiscoverySync(
   mapping: readonly DiscoveryMappingRule[],
@@ -2514,9 +2517,8 @@ const LEGACY_RETIRED_SERVICES: readonly StudioServiceEntry[] = [
   },
 ] as const;
 
-export const SERVICE_CATALOG: readonly StudioServiceEntry[] = [
+/** Temporary raw assembly — normalized at export via `@/catalog/seeds`. */
+export const RAW_SERVICE_CATALOG: readonly StudioServiceEntry[] = [
   ...V2_LAUNCH_SERVICES,
   ...LEGACY_RETIRED_SERVICES,
 ] as const;
-
-validateServiceCatalog(SERVICE_CATALOG);
