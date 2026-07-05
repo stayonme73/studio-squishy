@@ -7,6 +7,7 @@ import { materialsConfig } from "@/config/materials";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import { resolveBoardNextStepPanelMessage } from "@/lib/studio-board-client-copy";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
+import { isSocialPostsCampaign } from "@/lib/route-map-social-posts";
 import type {
   ClientConsolidatedRequest,
   ClientOptionalRequest,
@@ -54,7 +55,6 @@ type SocialMaterialDefinition = {
   value?: string;
 };
 
-const SOCIAL_POSTS_JOB_ID = "v2-rtu-social-posts";
 const CAMPAIGN_MESSAGE_CARD_ID = "campaign-message";
 const CAMPAIGN_GOAL_UNAVAILABLE_TEXT = "I do not have this yet.";
 const CAMPAIGN_GOAL_OPTIONS = [
@@ -135,15 +135,6 @@ function summarizeRouteMapIntake(
     destination: firstText(answers?.callToAction, answers?.destination, answers?.link),
     avoid: firstText(answers?.mustNotSay, answers?.avoid),
   };
-}
-
-function isSocialPostsCampaign(campaign: CampaignRecord): boolean {
-  if (campaign.routeMapContext?.jobId === SOCIAL_POSTS_JOB_ID) return true;
-  return Boolean(
-    campaign.approvedStudioPlan?.lineItems.some(
-      (lineItem) => (lineItem.skuId ?? lineItem.serviceId) === SOCIAL_POSTS_JOB_ID,
-    ),
-  );
 }
 
 function boardRequestStatus(

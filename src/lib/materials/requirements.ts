@@ -16,13 +16,7 @@ const ALL_CATEGORIES: readonly MaterialCategory[] = [
 ];
 
 function responsibilityText(lineItem: ApprovedStudioPlanLineItem): string {
-  const catalog = getServiceById(lineItem.skuId);
-  const parts = [
-    ...lineItem.clientResponsibilities,
-    ...(catalog?.clientResponsibilities ?? []),
-    ...(catalog?.minimumCustomerRequirements ?? []),
-  ];
-  return parts.join(" ").toLowerCase();
+  return lineItem.clientResponsibilities.join(" ").toLowerCase();
 }
 
 function categoryFromResponsibilityText(text: string): MaterialCategory[] {
@@ -112,7 +106,7 @@ function slotKey(category: MaterialCategory, serviceId: ServiceId): string {
 
 /**
  * Derive material slots from the frozen approved plan.
- * Catalog flags are read only at slot creation — post-approval truth is the frozen plan.
+ * Frozen clientResponsibilities drive category inference; catalog flags gate slot creation only.
  */
 export function resolveMaterialSlotsFromCampaign(
   campaign: CampaignRecord,

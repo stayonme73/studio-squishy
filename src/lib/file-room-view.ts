@@ -1,13 +1,7 @@
 import type { DraftIntakeSummarySection } from "@/config/draft-room";
 import { draftRoomIntakeAnswerSummary } from "@/config/draft-room";
 import { discoveryTileConfig } from "@/config/business-discovery-studio";
-import type { ProjectDetailsRecord } from "@/config/project-details";
-import {
-  projectDetails,
-  resolveApprovedGreenServiceIds,
-  resolveProjectDetailsMissingItems,
-} from "@/config/project-details";
-import type { ServiceId } from "@/catalog/types";
+import { resolveApprovedGreenServiceIds } from "@/config/project-details";
 import type { CampaignRecord } from "@/config/studio-board";
 import { studioBoard } from "@/config/studio-board";
 import type { ServerCampaignEnvelope } from "@/lib/campaign-store/types";
@@ -38,6 +32,7 @@ import {
 import type { FileRoomMaterialsView } from "@/lib/materials/materials-view";
 import type { FileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
 import type { FileRoomExceptionsView } from "@/lib/campaign-tasks/exceptions-view";
+import { buildProjectDetailsSummary } from "@/lib/project-details-summary";
 
 const { statusContent } = studioBoard;
 
@@ -103,60 +98,6 @@ export type FileRoomCampaignView = {
   productionTasks: FileRoomProductionTasksView;
   exceptions: FileRoomExceptionsView;
 };
-
-function buildProjectDetailsSummary(
-  record: ProjectDetailsRecord | undefined,
-  serviceIds: readonly ServiceId[],
-): readonly FileRoomProjectDetailsSection[] {
-  if (!record) return [];
-  const { form, files } = record;
-  const sections: FileRoomProjectDetailsSection[] = [];
-
-  const pushSection = (title: string, items: { label: string; value: string | undefined }[]) => {
-    const filled = items
-      .map((item) => ({ label: item.label, value: (item.value ?? "").trim() }))
-      .filter((item) => item.value);
-    if (filled.length) sections.push({ title, items: filled });
-  };
-
-  pushSection(projectDetails.steps["working-on"].title, [
-    { label: projectDetails.fields.workingOn.label, value: form.workingOn },
-    { label: projectDetails.fields.mainOffer.label, value: form.mainOffer },
-    { label: projectDetails.fields.importantDates.label, value: form.importantDates },
-    { label: projectDetails.fields.callToAction.label, value: form.callToAction },
-    { label: projectDetails.fields.destinationLink.label, value: form.destinationLink },
-    { label: projectDetails.fields.mustIncludeExactly.label, value: form.mustIncludeExactly },
-  ]);
-
-  if (files.length) {
-    sections.push({
-      title: projectDetails.steps["brand-materials"].title,
-      items: files.map((file) => ({
-        label: projectDetails.fileCategories[file.category],
-        value: file.fileName,
-      })),
-    });
-  }
-
-  pushSection(projectDetails.steps["approval-contact"].title, [
-    { label: projectDetails.fields.primaryApproverName.label, value: form.primaryApproverName },
-    { label: projectDetails.fields.primaryApproverEmail.label, value: form.primaryApproverEmail },
-    { label: projectDetails.fields.secondaryApproverName.label, value: form.secondaryApproverName },
-    { label: projectDetails.fields.secondaryApproverEmail.label, value: form.secondaryApproverEmail },
-  ]);
-
-  if (serviceIds.length) {
-    const missing = resolveProjectDetailsMissingItems(form, files, serviceIds);
-    if (missing.length) {
-      sections.push({
-        title: "Missing at submission",
-        items: missing.map((item) => ({ label: item.label, value: "Required" })),
-      });
-    }
-  }
-
-  return sections;
-}
 
 function resolveDiscoveryItems(campaign: CampaignRecord): readonly FileRoomDiscoveryItem[] {
   const answers = campaign.discoveryAnswers;
@@ -238,7 +179,11 @@ export function resolveFileRoomCampaignView(
     planIncludes: resolveCampaignPlanIncludes(record),
     discoveryItems: resolveDiscoveryItems(record),
     visionSummary,
-    projectDetailsSections: buildProjectDetailsSummary(record.projectDetails, greenServiceIds),
+    projectDetailsSections: buildProjectDetailsSummary(
+      record.projectDetails,
+      greenServiceIds,
+      "file-room",
+    ),
     deliverableScope: resolveDeliverableScopeGroups(record),
     approvedDirection: record.selectedCampaignOption?.trim() || null,
     creativeBrief: resolveCampaignCreativeBrief(record),

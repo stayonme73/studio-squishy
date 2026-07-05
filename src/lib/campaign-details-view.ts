@@ -1,12 +1,6 @@
 import type { DraftIntakeSummarySection } from "@/config/draft-room";
 import { draftRoomIntakeAnswerSummary } from "@/config/draft-room";
-import type { ProjectDetailsRecord } from "@/config/project-details";
-import {
-  projectDetails,
-  resolveApprovedGreenServiceIds,
-  resolveProjectDetailsMissingItems,
-} from "@/config/project-details";
-import type { ServiceId } from "@/catalog/types";
+import { resolveApprovedGreenServiceIds } from "@/config/project-details";
 import type { CampaignRecord } from "@/config/studio-board";
 import { readLastDraftIntake } from "@/lib/draft-intake";
 import {
@@ -36,12 +30,16 @@ import {
 } from "@/lib/route-map-production-brief";
 import type { FinalDeliveryView } from "@/lib/job-control/final-delivery-view";
 import {
-  RECORD_EMPTY_ANSWER,
-  RECORD_MISSING_SECTION_TITLE,
+  buildProjectDetailsSummary,
+  type ProjectDetailsSummarySection,
+} from "@/lib/project-details-summary";
+import {
   formatRecordFieldValue,
 } from "@/lib/project-record-client-copy";
 
 const { campaignDetails: copy, statusContent } = studioBoard;
+
+export type { ProjectDetailsSummarySection };
 
 export type DeliverablesPreview =
   | { ready: false; message: string; hint: string }
@@ -50,11 +48,6 @@ export type DeliverablesPreview =
       message?: string;
       links: readonly { label: string; href: string; primary?: boolean }[];
     };
-
-export type ProjectDetailsSummarySection = {
-  title: string;
-  items: readonly { label: string; value: string }[];
-};
 
 export type CampaignDetailsView = {
   hasCampaign: boolean;
@@ -187,68 +180,6 @@ const emptyView: CampaignDetailsView = {
   timeline: [],
 };
 
-function buildProjectDetailsSummary(
-  record: ProjectDetailsRecord | undefined,
-  serviceIds: readonly ServiceId[],
-): readonly ProjectDetailsSummarySection[] {
-  if (!record) return [];
-  const { form, files } = record;
-  const sections: ProjectDetailsSummarySection[] = [];
-
-  const pushSection = (title: string, items: { label: string; value: string }[]) => {
-    const filled = items
-      .map((item) => ({
-        label: item.label,
-        value: formatRecordFieldValue(item.value),
-        raw: item.value?.trim() ?? "",
-      }))
-      .filter((item) => item.value !== RECORD_EMPTY_ANSWER || item.raw.length > 0)
-      .map(({ label, value }) => ({ label, value }));
-    if (filled.length) sections.push({ title, items: filled });
-  };
-
-  pushSection(projectDetails.steps["working-on"].title, [
-    { label: projectDetails.fields.workingOn.label, value: form.workingOn },
-    { label: projectDetails.fields.mainOffer.label, value: form.mainOffer },
-    { label: projectDetails.fields.importantDates.label, value: form.importantDates },
-    { label: projectDetails.fields.callToAction.label, value: form.callToAction },
-    { label: projectDetails.fields.destinationLink.label, value: form.destinationLink },
-    { label: projectDetails.fields.mustIncludeExactly.label, value: form.mustIncludeExactly },
-  ]);
-
-  if (files.length) {
-    sections.push({
-      title: projectDetails.steps["brand-materials"].title,
-      items: files.map((file) => ({
-        label: projectDetails.fileCategories[file.category],
-        value: file.fileName,
-      })),
-    });
-  }
-
-  pushSection(projectDetails.steps["approval-contact"].title, [
-    { label: projectDetails.fields.primaryApproverName.label, value: form.primaryApproverName },
-    { label: projectDetails.fields.primaryApproverEmail.label, value: form.primaryApproverEmail },
-    { label: projectDetails.fields.secondaryApproverName.label, value: form.secondaryApproverName },
-    { label: projectDetails.fields.secondaryApproverEmail.label, value: form.secondaryApproverEmail },
-  ]);
-
-  if (serviceIds.length) {
-    const missing = resolveProjectDetailsMissingItems(form, files, serviceIds);
-    if (missing.length) {
-      sections.push({
-        title: RECORD_MISSING_SECTION_TITLE,
-        items: missing.map((item) => ({
-          label: item.label,
-          value: RECORD_EMPTY_ANSWER,
-        })),
-      });
-    }
-  }
-
-  return sections;
-}
-
 function normalizeVisionSummaryForRecord(
   sections: readonly DraftIntakeSummarySection[],
 ): readonly DraftIntakeSummarySection[] {
@@ -285,7 +216,11 @@ export function resolveCampaignDetailsView(
   const visionSummary = normalizeVisionSummaryForRecord(visionRaw);
   const hasIntake = Boolean(resolveIntake(campaign));
   const greenServiceIds = resolveApprovedGreenServiceIds(campaign.approvedStudioPlan);
-  const projectDetailsSummary = buildProjectDetailsSummary(campaign.projectDetails, greenServiceIds);
+  const projectDetailsSummary = buildProjectDetailsSummary(
+    campaign.projectDetails,
+    greenServiceIds,
+    "client-record",
+  );
   const routeMapRaw = resolveRouteMapClientSummary(campaign);
   const routeMapClientSummary = routeMapRaw ? normalizeRouteMapSummaryForRecord(routeMapRaw) : null;
 

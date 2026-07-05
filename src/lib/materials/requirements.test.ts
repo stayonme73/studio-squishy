@@ -133,4 +133,53 @@ describe("resolveMaterialSlotsFromCampaign", () => {
     expect(reasons.has("Brand Foundation")).toBe(true);
     expect(reasons.has("Content Creation")).toBe(true);
   });
+
+  it("derives material categories from frozen clientResponsibilities only", () => {
+    const slots = resolveMaterialSlotsFromCampaign(
+      buildCampaign([
+        {
+          skuId: "bf-001",
+          serviceName: "Brand Foundation",
+          billingType: "one_time",
+          exactPriceCents: 50000,
+          priceDisplay: "$500",
+          deliverables: [],
+          exclusions: [],
+          timingWindowLabel: "2 weeks",
+          revisionRule: "1 round",
+          clientResponsibilities: ["Existing logo files if available"],
+          executionResponsibility: "studio",
+        },
+      ]),
+    );
+
+    expect(slots.some((slot) => slot.category === "logo-brand")).toBe(true);
+  });
+
+  it("does not infer categories from live catalog responsibilities when frozen copy is empty", () => {
+    const slots = resolveMaterialSlotsFromCampaign(
+      buildCampaign([
+        {
+          skuId: "bf-001",
+          serviceName: "Brand Foundation",
+          billingType: "one_time",
+          exactPriceCents: 50000,
+          priceDisplay: "$500",
+          deliverables: [],
+          exclusions: [],
+          timingWindowLabel: "2 weeks",
+          revisionRule: "1 round",
+          clientResponsibilities: [],
+          executionResponsibility: "studio",
+        },
+      ]),
+    );
+
+    expect(slots.some((slot) => slot.category === "logo-brand")).toBe(true);
+    expect(
+      slots
+        .find((slot) => slot.category === "logo-brand")
+        ?.requirementLevel,
+    ).toBe("required");
+  });
 });

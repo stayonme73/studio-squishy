@@ -6,11 +6,13 @@ import {
   resolveCampaignPlanLabel,
   resolveCampaignRevisionRounds,
 } from "@/lib/approved-plan-display";
+import {
+  SOCIAL_POSTS_LABEL,
+  SOCIAL_POSTS_TOTAL,
+  isSocialPostsCampaign,
+  resolveSocialPostsDeliveredCount,
+} from "@/lib/route-map-social-posts";
 import type { AccountPackageView, StudioBoardView } from "@/lib/studio-board-view";
-
-const SOCIAL_POSTS_JOB_ID = "v2-rtu-social-posts";
-const SOCIAL_POSTS_LABEL = "Social Posts";
-const SOCIAL_POSTS_TOTAL = 4;
 
 type Props = {
   campaign: CampaignRecord | null;
@@ -18,22 +20,11 @@ type Props = {
   account: AccountPackageView;
 };
 
-function resolveSocialPostsDelivered(campaign: CampaignRecord | null) {
-  const delivered = campaign?.deliverablesDelivered as Record<string, number> | undefined;
-  return Math.min(SOCIAL_POSTS_TOTAL, Math.max(0, delivered?.[SOCIAL_POSTS_JOB_ID] ?? 0));
-}
-
-function resolveDeliverablesSnapshot(campaign: CampaignRecord | null, view: StudioBoardView) {
-  const hasSocialPostsJob =
-    campaign?.routeMapContext?.jobId === SOCIAL_POSTS_JOB_ID ||
-    campaign?.approvedStudioPlan?.lineItems.some(
-      (line) => (line.skuId ?? line.serviceId) === SOCIAL_POSTS_JOB_ID,
-    );
-
-  if (hasSocialPostsJob || !campaign) {
+function resolveDeliverablesSnapshot(campaign: CampaignRecord, view: StudioBoardView) {
+  if (isSocialPostsCampaign(campaign)) {
     return {
       label: SOCIAL_POSTS_LABEL,
-      delivered: resolveSocialPostsDelivered(campaign),
+      delivered: resolveSocialPostsDeliveredCount(campaign),
       total: SOCIAL_POSTS_TOTAL,
     };
   }
@@ -54,15 +45,7 @@ function resolveDeliverablesSnapshot(campaign: CampaignRecord | null, view: Stud
   };
 }
 
-function resolvePlanSnapshot(campaign: CampaignRecord | null) {
-  if (!campaign) {
-    return {
-      planLabel: "Custom Studio Plan",
-      serviceName: "Make My Social Media Posts",
-      revisionLine: "1 revision round included",
-    };
-  }
-
+function resolvePlanSnapshot(campaign: CampaignRecord) {
   const revisions = resolveCampaignRevisionRounds(campaign);
 
   return {
@@ -88,8 +71,46 @@ function resolveAccountSnapshot(account: AccountPackageView) {
 
 export default function ProjectSnapshotPanel({ campaign, view, account }: Props) {
   const { routes } = studioBoard;
-  const deliverables = resolveDeliverablesSnapshot(campaign, view);
-  const plan = resolvePlanSnapshot(campaign);
+  const emptySnapshot = view.emptyBoardSnapshot;
+
+  if (!view.hasCampaign) {
+    return (
+      <section className="sb-project-snapshot" aria-labelledby="sb-project-snapshot-title">
+        <p id="sb-project-snapshot-title" className="sb-card__tab">
+          PROJECT SNAPSHOT
+        </p>
+
+        <div className="sb-project-snapshot__stack">
+          <section
+            className="sb-project-snapshot__section"
+            aria-labelledby="sb-project-snapshot-deliverables"
+          >
+            <h2 id="sb-project-snapshot-deliverables" className="sb-project-snapshot__heading">
+              Deliverables
+            </h2>
+            <p className="sb-project-snapshot__empty">{emptySnapshot?.deliverables}</p>
+          </section>
+
+          <section className="sb-project-snapshot__section" aria-labelledby="sb-project-snapshot-plan">
+            <h2 id="sb-project-snapshot-plan" className="sb-project-snapshot__heading">
+              Your Studio Plan
+            </h2>
+            <p className="sb-project-snapshot__empty">{emptySnapshot?.plan}</p>
+          </section>
+
+          <section className="sb-project-snapshot__section" aria-labelledby="sb-project-snapshot-account">
+            <h2 id="sb-project-snapshot-account" className="sb-project-snapshot__heading">
+              Account
+            </h2>
+            <p className="sb-project-snapshot__empty">{emptySnapshot?.account}</p>
+          </section>
+        </div>
+      </section>
+    );
+  }
+
+  const deliverables = resolveDeliverablesSnapshot(campaign!, view);
+  const plan = resolvePlanSnapshot(campaign!);
   const accountSnapshot = resolveAccountSnapshot(account);
   const progressPercent =
     deliverables.total > 0
