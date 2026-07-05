@@ -3,12 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
+import {
+  performDevClientTestReset,
+  stripActiveCampaignSearchParams,
+} from "@/lib/dev-reset-client-test-state";
 import { ownerQa } from "@/config/owner-qa";
 import { studioBoard } from "@/config/studio-board";
-import {
-  applyOwnerQaJourneySeed,
-  resetOwnerQaCampaignState,
-} from "@/lib/owner-qa-campaign";
+import { applyOwnerQaJourneySeed } from "@/lib/owner-qa-campaign";
 
 /** Development-only owner nav — journey presets + utility shortcuts. */
 export default function OwnerQaPanel() {
@@ -72,8 +73,8 @@ export default function OwnerQaPanel() {
     setConfirmResetOpen(false);
   }
 
-  function handleResetConfirm() {
-    resetOwnerQaCampaignState();
+  async function handleResetConfirm() {
+    await performDevClientTestReset();
     closePanel();
     router.push(studioBoard.routes.studioLobby);
     router.refresh();

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { studioBoard } from "@/config/studio-board";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 import "../mobile-route-fixes.css";
@@ -18,12 +19,8 @@ export default function AccessDeniedPage() {
             <h1 id="access-denied-title" className="utility-title">
               Access denied
             </h1>
-            <p className="utility-lead">
-              This area is not available for your account. No project details were loaded.
-            </p>
-            <p className="utility-note">
-              If you expected access, contact The Studio from the Help Center.
-            </p>
+            <p className="utility-lead">{studioBoard.clientAccess.denied.message}</p>
+            <p className="utility-note">{studioBoard.clientAccess.denied.note}</p>
             <div className="mt-5 flex flex-wrap justify-center gap-3">
               <Link href="/studio-board" className="utility-btn utility-btn--primary">
                 Studio Board

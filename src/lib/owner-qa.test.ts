@@ -5,7 +5,6 @@ import {
   applyOwnerQaJourneySeed,
   buildOwnerQaGreenApprovedPlan,
   clearAllOwnerQaBrowserState,
-  resetOwnerQaCampaignState,
 } from "@/lib/owner-qa-campaign";
 
 describe("owner-qa menu config", () => {
@@ -145,9 +144,9 @@ describe("owner-qa hard reset", () => {
       expect(sessionStorage.getItem("studio-squishy:test-session")).toBeNull();
       expect(events).toContain("studio-squishy:campaign-updated");
 
-      resetOwnerQaCampaignState();
+      clearAllOwnerQaBrowserState();
       localStorage.setItem("studio-squishy:last-draft", "{}");
-      resetOwnerQaCampaignState();
+      clearAllOwnerQaBrowserState();
       expect(localStorage.getItem("studio-squishy:last-draft")).toBeNull();
     } finally {
       Object.defineProperty(globalThis, "window", {

@@ -1,17 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { DEV_STATUS_OPTIONS } from "@/lib/studio-board-dev-status";
+import {
+  performDevClientTestReset,
+  stripActiveCampaignSearchParams,
+} from "@/lib/dev-reset-client-test-state";
 import { isDevToolsEnabled } from "@/lib/dev-tools-enabled";
-import { clearCampaignState } from "@/lib/studio-board-campaign";
 
 type Placement = "sidebar" | "header";
 
 function StudioBoardDevStatusPanel({ placement }: { placement: Placement }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -38,9 +42,11 @@ function StudioBoardDevStatusPanel({ placement }: { placement: Placement }) {
     };
   }, [open]);
 
-  function handleReset() {
-    clearCampaignState();
-    router.replace(pathname);
+  async function handleReset() {
+    await performDevClientTestReset();
+    const nextQuery = stripActiveCampaignSearchParams(new URLSearchParams(searchParams.toString()));
+    router.replace(`${pathname}${nextQuery}`);
+    router.refresh();
     setOpen(false);
   }
 

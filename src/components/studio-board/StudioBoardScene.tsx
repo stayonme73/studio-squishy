@@ -167,13 +167,14 @@ function CampaignMetric({ label, value }: { label: string; value: ReactNode }) {
 /** Studio Board V4 — four primary panels plus dedicated Studio Note column. */
 export default function StudioBoardScene() {
   const searchParams = useSearchParams();
-  const { campaign, ready, accessState } = useCurrentCampaign();
+  const { campaign, ready, accessState, refresh } = useCurrentCampaign();
   const greetingPeriod = useLiveGreetingPeriod();
   const [recordOpen, setRecordOpen] = useState(false);
   const [productionBriefOpen, setProductionBriefOpen] = useState(false);
 
-  const view = useMemo(() => resolveStudioBoardView(campaign), [campaign]);
-  const account = useMemo(() => resolveAccountPackageView(campaign), [campaign]);
+  const boardCampaign = accessState === "no-active-project" ? null : campaign;
+  const view = useMemo(() => resolveStudioBoardView(boardCampaign), [boardCampaign]);
+  const account = useMemo(() => resolveAccountPackageView(boardCampaign), [boardCampaign]);
 
   const newCampaignHref = studioBoardDraftRoomHref();
 
@@ -189,8 +190,16 @@ export default function StudioBoardScene() {
     }
   }, [searchParams]);
 
-  if (ready && accessState !== "ready") {
+  if (ready && accessState === "auth-required") {
     return <ClientAccessStatePanel state={accessState} />;
+  }
+
+  if (ready && accessState === "denied") {
+    return <ClientAccessStatePanel state={accessState} />;
+  }
+
+  if (ready && accessState === "error") {
+    return <ClientAccessStatePanel state={accessState} onRetry={() => void refresh()} />;
   }
 
   return (
@@ -286,9 +295,9 @@ export default function StudioBoardScene() {
                 {view.hasCampaign ? view.campaignTitle : emptyCopy.campaignNamePlaceholder}
               </h2>
 
-              {view.hasCampaign && campaign ? (
+              {view.hasCampaign && boardCampaign ? (
                 <CampaignBriefActions
-                  campaign={campaign}
+                  campaign={boardCampaign}
                   onViewBrief={() => setRecordOpen(true)}
                   className="sb-current-campaign__brief-actions"
                   layout="stack"
@@ -298,7 +307,7 @@ export default function StudioBoardScene() {
 
               {view.hasCampaign ? (
                 <CampaignNextAction
-                  campaign={campaign}
+                  campaign={boardCampaign}
                   hasCampaign={view.hasCampaign}
                   status={view.status}
                   nextUpdateLabel={view.headerSnapshot?.nextUpdate ?? null}
@@ -318,7 +327,7 @@ export default function StudioBoardScene() {
                       value={view.campaignProgressLabel}
                     />
                   ) : null}
-                  {!campaign?.approvedStudioPlan ? (
+                  {!boardCampaign?.approvedStudioPlan ? (
                     <>
                       <CampaignMetric
                         label={currentCampaignCopy.campaignsRemaining}
@@ -354,28 +363,33 @@ export default function StudioBoardScene() {
               ) : null}
 
               {!view.hasCampaign ? (
-                <Link href={newCampaignHref} className="utility-btn utility-btn--primary sb-current-campaign__record">
-                  {emptyCopy.primaryCta}
-                </Link>
+                <div className="sb-current-campaign__empty-actions">
+                  <Link href={newCampaignHref} className="utility-btn utility-btn--primary sb-current-campaign__record">
+                    {emptyCopy.primaryCta}
+                  </Link>
+                  <Link href={routes.helpCenter} className="utility-btn utility-btn--secondary">
+                    {studioBoard.clientAccess.noActiveProject.secondaryCta}
+                  </Link>
+                </div>
               ) : null}
             </div>
           </article>
 
           <article className="sb-card sb-card--progress bf-material bf-material-paper">
-            <CampaignProgressPanel campaign={campaign} steps={view.progressSteps} timeline={view.activityFeed} />
+            <CampaignProgressPanel campaign={boardCampaign} steps={view.progressSteps} timeline={view.activityFeed} />
           </article>
 
           <article className="sb-card sb-card--project-snapshot bf-material bf-material-paper">
-            <ProjectSnapshotPanel campaign={campaign} view={view} account={account} />
+            <ProjectSnapshotPanel campaign={boardCampaign} view={view} account={account} />
           </article>
 
-          {campaign ? <StudioBoardMaterialsWorkflow campaign={campaign} /> : null}
+          {boardCampaign ? <StudioBoardMaterialsWorkflow campaign={boardCampaign} /> : null}
         </div>
       </div>
 
       <CampaignRecordDrawer open={recordOpen} onClose={() => setRecordOpen(false)} />
       <RouteMapProductionBriefDrawer
-        campaign={campaign}
+        campaign={boardCampaign}
         open={productionBriefOpen}
         onClose={() => setProductionBriefOpen(false)}
       />

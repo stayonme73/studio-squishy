@@ -12,7 +12,12 @@ import {
   updateCampaignStatus,
 } from "@/lib/studio-board-campaign";
 
-export type CurrentCampaignAccessState = "ready" | "auth-required" | "denied" | "error";
+export type CurrentCampaignAccessState =
+  | "ready"
+  | "no-active-project"
+  | "auth-required"
+  | "denied"
+  | "error";
 
 type CampaignEnvelopeResponse = {
   campaign?: {
@@ -77,7 +82,20 @@ export function useCurrentCampaign() {
       const nextCampaign = body.campaign?.record ?? null;
       if (nextCampaign) {
         saveCurrentCampaign(nextCampaign);
-      } else if (!requestedCampaignId && localCampaign) {
+        setCampaign(nextCampaign);
+        setAccessState("ready");
+        setError(null);
+        return;
+      }
+
+      if (!requestedCampaignId && !localCampaign) {
+        setCampaign(null);
+        setAccessState("no-active-project");
+        setError(null);
+        return;
+      }
+
+      if (!requestedCampaignId && localCampaign) {
         const claimResult = await claimLocalCampaign(localCampaign);
         if (claimResult === "claimed") {
           setCampaign(localCampaign);
@@ -126,5 +144,5 @@ export function useCurrentCampaign() {
     updateCampaignStatus(devStatus);
   }, [searchParams]);
 
-  return { campaign, ready, accessState, error };
+  return { campaign, ready, accessState, error, refresh };
 }

@@ -2411,6 +2411,12 @@ body:has(.sb--v4) {
 
 .sb-current-campaign__record {
   align-self: flex-start;
+}
+
+.sb-current-campaign__empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin-top: auto;
 }
 

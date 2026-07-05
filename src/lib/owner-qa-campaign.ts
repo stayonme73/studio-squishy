@@ -295,7 +295,8 @@ export function applyOwnerQaJourneySeed(kind: OwnerQaJourneySeedKind): void {
   }
 }
 
-/** Hard reset — clear all campaign-related browser state. */
-export function resetOwnerQaCampaignState(): void {
-  clearAllOwnerQaBrowserState();
+/** Hard reset — clear browser campaign state and unlink server current campaign (dev only). */
+export async function resetOwnerQaCampaignState() {
+  const { performDevClientTestReset } = await import("@/lib/dev-reset-client-test-state");
+  return performDevClientTestReset();
 }

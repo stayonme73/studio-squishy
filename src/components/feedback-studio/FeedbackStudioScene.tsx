@@ -36,7 +36,7 @@ import { useCurrentCampaign } from "@/lib/use-current-campaign";
 export default function FeedbackStudioScene() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { campaign, ready, accessState } = useCurrentCampaign();
+  const { campaign, ready, accessState, refresh } = useCurrentCampaign();
 
   const conceptParam = searchParams.get("concept");
   const jobIdParam = searchParams.get("jobId");
@@ -108,7 +108,10 @@ export default function FeedbackStudioScene() {
   if (accessState !== "ready") {
     return (
       <FeedbackStudioLayout>
-        <ClientAccessStatePanel state={accessState} />
+        <ClientAccessStatePanel
+          state={accessState}
+          onRetry={accessState === "error" ? () => void refresh() : undefined}
+        />
       </FeedbackStudioLayout>
     );
   }

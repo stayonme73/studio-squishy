@@ -158,7 +158,7 @@ export default function DeliverablesScene() {
   const searchParams = useSearchParams();
   const previewDelivered =
     searchParams.get("preview") === "delivered" || searchParams.get("room") === "1";
-  const { campaign, ready, accessState } = useCurrentCampaign();
+  const { campaign, ready, accessState, refresh } = useCurrentCampaign();
   const { delivery: finalDelivery, loading: loadingDelivery } = useFinalDelivery(
     previewDelivered ? undefined : campaign?.campaignId,
   );
@@ -186,7 +186,10 @@ export default function DeliverablesScene() {
   if (accessState !== "ready") {
     return (
       <UtilityPageFrame navId="deliverables">
-        <ClientAccessStatePanel state={accessState} />
+        <ClientAccessStatePanel
+          state={accessState}
+          onRetry={accessState === "error" ? () => void refresh() : undefined}
+        />
       </UtilityPageFrame>
     );
   }

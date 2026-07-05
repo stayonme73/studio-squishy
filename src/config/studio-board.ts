@@ -210,10 +210,42 @@ export const studioBoard = {
 
   empty: {
     campaignName: "No campaign started yet.",
-    campaignNamePlaceholder: "Your campaign name",
-    campaignDescription: "Start a campaign to begin your Studio journey.",
+    campaignNamePlaceholder: "No Active Project",
+    campaignDescription:
+      "You don't have an active project yet. Start a new project from the Route Map to begin working with The Studio.",
     studioUpdates: [] as const,
-    primaryCta: "START A NEW CAMPAIGN",
+    primaryCta: "START A NEW PROJECT",
+  },
+
+  clientAccess: {
+    noActiveProject: {
+      eyebrow: "Studio Board",
+      title: "No Active Project",
+      message:
+        "You don't have an active project yet. Start a new project from the Route Map to begin working with The Studio.",
+      primaryCta: "START A NEW PROJECT",
+      secondaryCta: "Help Center",
+    },
+    denied: {
+      eyebrow: "Access Control",
+      title: "Access denied",
+      message: "This project isn't available for your account.",
+      note: "If you expected access, contact The Studio from the Help Center.",
+    },
+    loadError: {
+      eyebrow: "Studio Board",
+      title: "We couldn't load your project",
+      message: "Something went wrong while loading your project. Try again.",
+      retryCta: "Try again",
+      secondaryCta: "Help Center",
+    },
+    authRequired: {
+      eyebrow: "Client Access",
+      title: "Sign in required",
+      message: "Sign in with the account connected to this Studio work.",
+      primaryCta: "Sign in",
+      secondaryCta: "Help Center",
+    },
   },
 
   membership: {
