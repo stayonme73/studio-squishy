@@ -5,7 +5,8 @@ import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
-import PackageComparisonTable from "@/components/shared/PackageComparisonTable";
+import HelpCenterQuickPolicyGuide from "@/components/help-center/HelpCenterQuickPolicyGuide";
+import PolicyContentBlocks from "@/components/shared/PolicyContentBlocks";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
@@ -43,7 +44,7 @@ export default function HelpCenterScene() {
 
   return (
     <UtilityPageFrame navId="help-center">
-      <div className="utility-page" aria-label="Studio Help Center">
+      <div className="utility-page utility-page--help-center" aria-label="Studio Help Center">
         <UtilityPageHeader
           backHref={backHref}
           activeNav="help-center"
@@ -67,6 +68,17 @@ export default function HelpCenterScene() {
 
         <div className="utility-grid hc-grid">
           <section
+            id="quick-guide"
+            className="utility-card hc-card--packages"
+            aria-labelledby="hc-quick-guide-title"
+          >
+            <h2 id="hc-quick-guide-title" className="utility-card__title">
+              {copy.sections.quickGuide}
+            </h2>
+            <HelpCenterQuickPolicyGuide />
+          </section>
+
+          <section
             id="about"
             className="utility-card hc-card--about"
             aria-labelledby="hc-about-title"
@@ -75,17 +87,6 @@ export default function HelpCenterScene() {
               {copy.sections.about}
             </h2>
             <PolicyContentBlocks blocks={view.about.blocks} className="hc-body" />
-          </section>
-
-          <section
-            id="packages"
-            className="utility-card hc-card--packages"
-            aria-labelledby="hc-packages-title"
-          >
-            <h2 id="hc-packages-title" className="utility-card__title">
-              {copy.sections.packages}
-            </h2>
-            <PackageComparisonTable showTitle={false} />
           </section>
 
           <section

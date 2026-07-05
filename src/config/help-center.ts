@@ -30,15 +30,15 @@ export const helpCenter = {
   },
   backLabels: {
     studioBoard: "Back to Studio Board",
-    campaignDetails: "Back to Campaign Details",
+    campaignDetails: "Back to Project Record",
     payment: "Back to Route Map",
     routeMap: "Back to Route Map",
   },
   toc: {
     title: "On this page",
     items: [
+      { id: "quick-guide", label: "Quick Policy Guide" },
       { id: "about", label: "About The Studio" },
-      { id: "packages", label: "Compare Packages" },
       { id: "philosophy", label: "Studio Philosophy" },
       { id: "faq", label: studioPolicies.faq.title },
       { id: "policies", label: studioPolicies.policies.title },
@@ -46,25 +46,108 @@ export const helpCenter = {
   },
   sections: {
     about: studioPolicies.aboutTheStudio.title,
-    packages: "Compare Packages",
+    quickGuide: "Quick Policy Guide",
     philosophy: "Studio Philosophy",
     faq: studioPolicies.faq.title,
     policies: studioPolicies.policies.title,
+  },
+  quickPolicyGuide: {
+    title: "Quick Policy Guide",
+    lead: "Scan the situation, see what happens next, then open the detailed policy below.",
+    rows: [
+      {
+        id: "starting-project",
+        situation: "Starting a Project",
+        summary: "Choose services on the Route Map, pay through Secure Checkout, then complete Project Details.",
+        anchor: "faq-after-payment",
+        learnMoreLabel: "What happens after I pay?",
+      },
+      {
+        id: "payment",
+        situation: "Payment",
+        summary: "Per job. Payment is required before work can proceed. Paying alone does not start production.",
+        anchor: "policy-payment-policy",
+        learnMoreLabel: "Payment policy",
+      },
+      {
+        id: "production-begins",
+        situation: "Production Begins",
+        summary: "Per job: payment received, Project Details complete, materials accepted, job moved into production. Then non-refundable.",
+        anchor: "policy-production-policy",
+        learnMoreLabel: "Production policy",
+      },
+      {
+        id: "missing-materials",
+        situation: "Missing Materials",
+        summary: "48-hour reminder, then 72-hour Waiting on Client if required materials are still missing.",
+        anchor: "policy-missing-materials-policy",
+        learnMoreLabel: "Missing materials policy",
+      },
+      {
+        id: "waiting-on-client",
+        situation: "Waiting on Client",
+        summary: "That job pauses until required information or materials are received. Timeline pauses with it.",
+        anchor: "policy-waiting-on-client-policy",
+        learnMoreLabel: "Waiting on Client policy",
+      },
+      {
+        id: "review-room",
+        situation: "Review Room",
+        summary: "Annotate, approve, or request revisions directly on your project.",
+        anchor: "policy-creative-room-policy",
+        learnMoreLabel: "Review Room policy",
+      },
+      {
+        id: "revisions",
+        situation: "Revisions",
+        summary: "Included revisions depend on the service you purchased. See your Project Record.",
+        anchor: "policy-revision-policy",
+        learnMoreLabel: "Revision policy",
+      },
+      {
+        id: "final-delivery",
+        situation: "Final Delivery",
+        summary: "Approved files for the services you purchased, ready to download.",
+        anchor: "policy-final-delivery-policy",
+        learnMoreLabel: "Final delivery policy",
+      },
+      {
+        id: "refunds",
+        situation: "Refunds",
+        summary: "Per job. Refund may be approved before production starts. Non-refundable after production starts on that job.",
+        anchor: "policy-refund-policy",
+        learnMoreLabel: "Refund policy",
+      },
+      {
+        id: "timeline",
+        situation: "Timeline",
+        summary: "Estimates depend on services, materials, and timely client responses.",
+        anchor: "policy-timeline-policy",
+        learnMoreLabel: "Timeline policy",
+      },
+    ] as const,
   },
   faqGroups: [
     {
       id: "getting-started",
       label: "Getting started",
-      faqIds: ["after-payment", "campaign-timeline", "email-notifications"] as const,
+      faqIds: [
+        "monthly-subscription",
+        "multiple-services",
+        "how-studio-creates-project",
+        "after-payment",
+        "campaign-timeline",
+        "email-notifications",
+      ] as const,
     },
     {
-      id: "payments-packages",
-      label: "Payments & packages",
-      faqIds: ["payments-non-refundable", "switch-packages-after-payment"] as const,
+      id: "payments-refunds",
+      label: "Payments & refunds",
+      faqIds: ["payments-refund-eligibility", "deliverable-ownership"] as const,
     },
     {
       id: "vision-revisions",
-      label: "Vision, revisions & Creative Room",
+      label: "Project details, revisions & Review Room",
       faqIds: [
         "change-mind-after-intake",
         "revision-definition",
@@ -80,23 +163,22 @@ export const helpCenter = {
   ] as const,
   footer: {
     campaignHint:
-      "Questions about your active campaign? Check your Campaign Details for status and progress.",
+      "Questions about your active project? Check your Project Record for status and progress.",
     studioBoardLabel: "Studio Board",
     campaignDetailsLabel: customerJourneyStepName("project-record"),
     helpCenterLabel: customerJourneyStepName("help-center"),
   },
-  /** Contextual links from Campaign Details — href built at render time */
   campaignLinks: {
     overviewAwaitingPayment: [
       { label: "Payment policy", anchor: helpCenterAnchor("policies", "payment-policy") },
       {
-        label: "Why are payments non-refundable?",
-        anchor: helpCenterAnchor("faq", "payments-non-refundable"),
+        label: "When can I request a refund?",
+        anchor: helpCenterAnchor("faq", "payments-refund-eligibility"),
       },
     ],
     visionSummary: [
       {
-        label: "Vision responsibility policy",
+        label: "Project responsibility policy",
         anchor: helpCenterAnchor("policies", "vision-responsibility-policy"),
       },
     ],
@@ -109,40 +191,43 @@ export const helpCenter = {
     ],
     packageIncludes: [
       {
-        label: "Can I switch packages?",
-        anchor: helpCenterAnchor("faq", "switch-packages-after-payment"),
+        label: "What counts as a revision?",
+        anchor: helpCenterAnchor("faq", "revision-definition"),
       },
-      {
-        label: "Package lock policy",
-        anchor: helpCenterAnchor("policies", "package-lock-policy"),
-      },
+      { label: "Revision policy", anchor: helpCenterAnchor("policies", "revision-policy") },
     ],
     timeline: [
       {
-        label: "How long will my campaign take?",
+        label: "How long will my project take?",
         anchor: helpCenterAnchor("faq", "campaign-timeline"),
       },
       { label: "Timeline policy", anchor: helpCenterAnchor("policies", "timeline-policy") },
+      {
+        label: "Missing materials policy",
+        anchor: helpCenterAnchor("policies", "missing-materials-policy"),
+      },
     ],
     deliverables: [
       {
         label: "What results should I expect?",
         anchor: helpCenterAnchor("faq", "results-expectations"),
       },
+      {
+        label: "Final delivery policy",
+        anchor: helpCenterAnchor("policies", "final-delivery-policy"),
+      },
     ],
-    pageFooter: [
-      { label: "Studio Help Center", anchor: undefined },
-    ],
+    pageFooter: [{ label: "Studio Help Center", anchor: undefined }],
   },
   boardLinks: {
     sidebar: "Help Center",
     awaitingPayment: {
-      label: "Payment & package policies",
+      label: "Payment & refund policies",
       anchor: helpCenterAnchor("policies"),
     },
-    packageComparison: {
-      label: "Compare SPARK, MOMENTUM & GROWTH",
-      anchor: "packages",
+    quickGuide: {
+      label: "Quick Policy Guide",
+      anchor: "quick-guide",
     },
   },
 } as const;
