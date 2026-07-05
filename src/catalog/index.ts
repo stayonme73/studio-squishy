@@ -51,6 +51,7 @@ export type {
   ServiceDeliveryPackage,
   ServicePricingDisplayType,
   ServiceAiPromptRef,
+  RouteMapIntakeTemplateId,
   ServiceTimingWindow,
   StudioNeedId,
   StudioServiceEntry,
@@ -61,6 +62,12 @@ export {
   normalizeServiceCatalog,
   normalizeStudioServiceEntry,
 } from "@/catalog/normalize";
+
+export {
+  getRouteMapIntakeTemplate,
+  getRouteMapPriceDisplay,
+  getRouteMapTurnaroundLabel,
+} from "@/catalog/route-map-display";
 
 export {
   getServiceCategories,

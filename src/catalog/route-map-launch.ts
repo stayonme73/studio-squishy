@@ -13,10 +13,12 @@ import type {
   ServiceClass,
   ServiceFamilyId,
   ServiceId,
+  ServicePricingDisplayType,
   ServiceTimingWindow,
   StudioServiceEntry,
 } from "@/catalog/types";
 import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
+import type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
 
 const REVISION_ONE_TIME = "One consolidated revision round.";
 
@@ -69,7 +71,10 @@ type RouteMapLaunchSeed = {
   clientResponsibilities: readonly string[];
   executionMode: ExecutionMode;
   deliveryMapping: DeliveryMapping;
-  timingLabel?: string;
+  intakeTemplate: RouteMapIntakeTemplateId;
+  routeMapTurnaroundLabel: string;
+  routeMapPriceDisplay?: string;
+  pricingDisplayType?: ServicePricingDisplayType;
   /** When set, SKU stays in catalog for checkout history but is off the Route Map shelf. */
   retiredFromRouteMap?: boolean;
 };
@@ -118,6 +123,14 @@ function routeMapLaunchService(seed: RouteMapLaunchSeed): StudioServiceEntry {
     deliveryMapping: seed.deliveryMapping,
     discoveryTriggers: [],
     discoveryMapping: [],
+    intakeTemplate: seed.intakeTemplate,
+    routeMapTurnaroundLabel: seed.routeMapTurnaroundLabel,
+    ...(seed.routeMapPriceDisplay
+      ? {
+          routeMapPriceDisplay: seed.routeMapPriceDisplay,
+          pricingDisplayType: seed.pricingDisplayType ?? ("per_platform" as const),
+        }
+      : {}),
   };
 }
 
@@ -152,6 +165,9 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       fulfillmentMode: "project",
       items: [{ key: "route_start_recommendation", quantity: 1, unit: "summary" }],
     },
+    intakeTemplate: "discovery",
+    routeMapTurnaroundLabel:
+      "Route recommendation within 2 business days after intake is complete.",
   }),
   routeMapLaunchService({
     id: "rm-j002",
@@ -183,6 +199,9 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       executionChannel: "social",
       items: [{ key: "social_profile_setup", quantity: 1, unit: "platform" }],
     },
+    intakeTemplate: "social-setup",
+    routeMapTurnaroundLabel: "First draft within 3 business days after intake is complete.",
+    routeMapPriceDisplay: "$400 / platform",
   }),
   routeMapLaunchService({
     id: "rm-j003",
@@ -214,6 +233,9 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "static_social_post", quantity: 3, unit: "posts" }],
     },
     retiredFromRouteMap: true,
+    intakeTemplate: "promotion",
+    routeMapTurnaroundLabel: "First draft within 3 business days after intake is complete.",
+    routeMapPriceDisplay: "$450 / platform",
   }),
   routeMapLaunchService({
     id: "rm-j004",
@@ -245,6 +267,9 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "short_form_video", quantity: 1, unit: "video" }],
     },
     retiredFromRouteMap: true,
+    intakeTemplate: "video",
+    routeMapTurnaroundLabel: "First draft within 5 business days after intake is complete.",
+    routeMapPriceDisplay: "$650 / platform",
   }),
   routeMapLaunchService({
     id: "rm-j005",
@@ -275,6 +300,8 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       fulfillmentMode: "project",
       items: [{ key: "campaign_landing_page", quantity: 1, unit: "page" }],
     },
+    intakeTemplate: "page",
+    routeMapTurnaroundLabel: "First draft within 5 business days after intake is complete.",
   }),
   routeMapLaunchService({
     id: "rm-j006",
@@ -305,6 +332,9 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "voice_announcement_post", quantity: 1, unit: "post" }],
     },
     retiredFromRouteMap: true,
+    intakeTemplate: "voice",
+    routeMapTurnaroundLabel: "First draft within 3 business days after intake is complete.",
+    routeMapPriceDisplay: "$400 / platform",
   }),
   routeMapLaunchService({
     id: "rm-j007",
@@ -336,6 +366,8 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       executionChannel: "social",
       items: [{ key: "promotion_update", quantity: 1, unit: "item" }],
     },
+    intakeTemplate: "update",
+    routeMapTurnaroundLabel: "First draft within 2 business days after intake is complete.",
   }),
   routeMapLaunchService({
     id: "rm-j008",
@@ -370,5 +402,7 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       executionChannel: "social",
       items: [{ key: "profile_update", quantity: 1, unit: "platform" }],
     },
+    intakeTemplate: "social-setup",
+    routeMapTurnaroundLabel: "First draft within 3 business days after intake is complete.",
   }),
 ] as const;

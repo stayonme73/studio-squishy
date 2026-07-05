@@ -4,7 +4,7 @@
  * RouteMapIntakeType remains defined in route-map-v1.ts (shelf routing).
  */
 
-import type { RouteMapIntakeType } from "@/config/route-map-v1";
+import type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
 
 export type RouteMapIntakeField = {
   id: string;
@@ -16,7 +16,7 @@ export type RouteMapIntakeField = {
 };
 
 export type RouteMapIntakeSchema = {
-  type: RouteMapIntakeType;
+  type: RouteMapIntakeTemplateId;
   title: string;
   lead: string;
   fields: readonly RouteMapIntakeField[];
@@ -67,7 +67,7 @@ const EMAIL_KIT_CLIENT_NOTE =
 const SMS_KIT_CLIENT_NOTE =
   "You own your contact list, consent, sending account, replies, and opt-outs. The Studio delivers finished message copy files only.";
 
-export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeType, RouteMapIntakeSchema> = {
+export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMapIntakeSchema> = {
   discovery: {
     type: "discovery",
     title: "Route Start Intake",
@@ -686,7 +686,7 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeType, RouteMapIntake
 };
 
 export function getRouteMapIntakeSchema(
-  type: RouteMapIntakeType,
+  type: RouteMapIntakeTemplateId,
   options: RouteMapIntakeSchemaOptions = {},
 ): RouteMapIntakeSchema {
   const base = ROUTE_MAP_INTAKE_SCHEMAS[type];

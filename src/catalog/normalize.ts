@@ -99,6 +99,7 @@ function deriveDeliveryPackage(service: StudioServiceEntry): ServiceDeliveryPack
 
 function derivePricingDisplayType(service: StudioServiceEntry): ServicePricingDisplayType {
   if (service.pricingDisplayType) return service.pricingDisplayType;
+  if (service.routeMapPriceDisplay?.includes("/ platform")) return "per_platform";
   if (service.isExecutionAddOn) return "addon_line_item";
   if (RETIRED_BUNDLE_IDS.has(service.id)) return "bundle_package";
   if (service.pricing?.display?.toLowerCase().includes("quoted at checkout")) {

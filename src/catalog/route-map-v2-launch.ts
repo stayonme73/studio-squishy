@@ -18,6 +18,7 @@ import type {
   StudioServiceEntry,
 } from "@/catalog/types";
 import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
+import type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
 import {
   CATALOG_V2_ACTIVATION_LAUNCH_CANDIDATE_SKUS,
   CATALOG_V2_ACTIVATION_POST_PUBLISH_PARENT_SKUS,
@@ -83,6 +84,19 @@ const V2_DRAFT_BY_SKU = new Map<string, CatalogV2ServiceEntry>(
     entry,
   ]),
 );
+
+/** Intake template keys for activated V2 RTU shelf SKUs — catalog-owned (Phase 3A). */
+const V2_INTAKE_TEMPLATE_BY_SKU: Record<RouteMapV2ShelfServiceId, RouteMapIntakeTemplateId> = {
+  "v2-rtu-flyer": "rtu-flyer",
+  "v2-rtu-menu": "rtu-menu",
+  "v2-rtu-service-sheet": "rtu-service-sheet",
+  "v2-rtu-promotion-graphics": "rtu-promotion-graphics",
+  "v2-rtu-social-posts": "rtu-social-posts",
+  "v2-rtu-short-video": "rtu-short-video",
+  "v2-rtu-voice": "rtu-voice",
+  "v2-rtu-email-kit": "rtu-email-kit",
+  "v2-rtu-sms-kit": "rtu-sms-kit",
+};
 
 /** Customer-facing purpose lines for Route Map shelf cards — never scopeRoutingNote or internal routing. */
 const ROUTE_MAP_V2_CUSTOMER_PURPOSE: Record<string, string> = {
@@ -199,6 +213,12 @@ function routeMapV2ServiceFromDraft(
     deliveryMapping: deliveryMappingFromDraft(draft),
     discoveryTriggers: [],
     discoveryMapping: [],
+    routeMapTurnaroundLabel: draft.turnaround,
+    ...(!options.isAddOn && V2_INTAKE_TEMPLATE_BY_SKU[draft.sku as RouteMapV2ShelfServiceId]
+      ? {
+          intakeTemplate: V2_INTAKE_TEMPLATE_BY_SKU[draft.sku as RouteMapV2ShelfServiceId],
+        }
+      : {}),
   };
 }
 
@@ -244,5 +264,6 @@ export function isPostPublishAddonEligibleParent(jobId: string): boolean {
 }
 
 export function getRouteMapV2TurnaroundLabel(sku: RouteMapV2ShelfServiceId): string | undefined {
-  return V2_DRAFT_BY_SKU.get(sku)?.turnaround;
+  const draft = V2_DRAFT_BY_SKU.get(sku);
+  return draft?.turnaround;
 }

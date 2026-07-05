@@ -5,6 +5,7 @@
 
 import type { ServiceId } from "@/catalog/types";
 import { getServiceById } from "@/catalog/accessors";
+import { getRouteMapTurnaroundLabel } from "@/catalog/route-map-display";
 import {
   isPostPublishAddonEligibleParent,
   ROUTE_MAP_V2_POST_PUBLISH_ADDON,
@@ -88,7 +89,7 @@ function buildPostPublishAddonLineItem(): ApprovedStudioPlanLineItem {
     priceDisplay: formatUsd(addon.priceCents),
     deliverables: addon.deliverables,
     exclusions: addon.exclusions,
-    timingWindowLabel: "Usually within 1–2 business days after approval and clean access.",
+    timingWindowLabel: getRouteMapTurnaroundLabel(addon),
     revisionRule: addon.revisionRule,
     clientResponsibilities: addon.clientResponsibilities,
     executionResponsibility: EXECUTION_MODE_LABELS.managed_execution_when_selected,

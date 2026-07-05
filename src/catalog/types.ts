@@ -8,6 +8,7 @@
  * - Service class labels: Signature, Core, Essential
  */
 
+import type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
 import type { DiscoveryTileId } from "@/config/business-discovery-studio";
 import type { StudioNeedId } from "@/config/studio-services";
 
@@ -481,6 +482,15 @@ export type StudioServiceEntry = {
   qaChecklist?: ServiceQaChecklist;
   /** AI production prompt template reference — prompt bodies live outside catalog. */
   aiPromptRef?: ServiceAiPromptRef;
+
+  // --- Route Map consumer fields (Phase 3A — seeded on shelf SKUs) ---
+
+  /** Exact customer-facing price label on Route Map shelf and job detail. */
+  routeMapPriceDisplay?: string;
+  /** Exact customer-facing turnaround copy on Route Map job detail. */
+  routeMapTurnaroundLabel?: string;
+  /** Intake form template key — maps to @/catalog/intake schemas. */
+  intakeTemplate?: RouteMapIntakeTemplateId;
 };
 
 /**

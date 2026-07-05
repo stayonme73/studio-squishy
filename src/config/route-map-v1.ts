@@ -7,10 +7,13 @@
 
 import { getServiceById } from "@/catalog/accessors";
 import {
-  getRouteMapV2TurnaroundLabel,
-  isRouteMapV2ShelfServiceId,
-} from "@/catalog/route-map-v2-launch";
-import type { RouteMapLaunchServiceId, RouteMapShelfJobId, RouteMapV2ShelfServiceId } from "@/catalog/types";
+  getRouteMapIntakeTemplate,
+  getRouteMapPriceDisplay,
+  getRouteMapTurnaroundLabel,
+} from "@/catalog/route-map-display";
+import { isRouteMapV2ShelfServiceId } from "@/catalog/route-map-v2-launch";
+import type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
+import type { RouteMapLaunchServiceId, RouteMapShelfJobId, RouteMapV2ShelfServiceId, ServiceId } from "@/catalog/types";
 import {
   CATALOG_V2_ACTIVATION_RETIRED_ROUTE_MAP_SKUS,
   getActivationMapEntryBySku,
@@ -26,24 +29,8 @@ export type RouteMapLaunchJobId = RouteMapLaunchServiceId;
 
 export type RouteMapRoadId = "i75" | "i20" | "i285" | "update" | "random-exit";
 
-/** Job-specific intake types defined in the production packet §5 + V2 RTU extensions. */
-export type RouteMapIntakeType =
-  | "discovery"
-  | "social-setup"
-  | "promotion"
-  | "video"
-  | "page"
-  | "voice"
-  | "update"
-  | "rtu-flyer"
-  | "rtu-menu"
-  | "rtu-service-sheet"
-  | "rtu-social-posts"
-  | "rtu-promotion-graphics"
-  | "rtu-email-kit"
-  | "rtu-sms-kit"
-  | "rtu-voice"
-  | "rtu-short-video";
+/** Job-specific intake types — catalog-owned; alias for RouteMapIntakeTemplateId. */
+export type RouteMapIntakeType = RouteMapIntakeTemplateId;
 
 export type RouteMapRoad = {
   id: RouteMapRoadId;
@@ -76,45 +63,45 @@ export type RouteMapJob = {
   clientResponsibilities: readonly string[];
 };
 
-/** Per-job customer-facing timing — packet + production lane (no global 7-day fallback). */
-const ROUTE_MAP_JOB_TIMING: Record<RouteMapLaunchServiceId, string> = {
-  "rm-j001": "Route recommendation within 2 business days after intake is complete.",
-  "rm-j002": "First draft within 3 business days after intake is complete.",
-  "rm-j003": "First draft within 3 business days after intake is complete.",
-  "rm-j004": "First draft within 5 business days after intake is complete.",
-  "rm-j005": "First draft within 5 business days after intake is complete.",
-  "rm-j006": "First draft within 3 business days after intake is complete.",
-  "rm-j007": "First draft within 2 business days after intake is complete.",
-  "rm-j008": "First draft within 3 business days after intake is complete.",
+type RouteMapJobMeta = {
+  roads: readonly RouteMapRoadId[];
+  isRouteStart: boolean;
 };
 
-/** Per-job packet price labels where catalog cents alone is not sufficient. */
-const ROUTE_MAP_PRICE_DISPLAY: Partial<Record<RouteMapLaunchServiceId, string>> = {
-  "rm-j002": "$400 / platform",
-  "rm-j003": "$450 / platform",
-  "rm-j004": "$650 / platform",
-  "rm-j006": "$400 / platform",
+const ROUTE_MAP_JOB_META: Record<RouteMapLaunchServiceId, RouteMapJobMeta> = {
+  "rm-j001": {
+    roads: ["i75", "i20", "update", "random-exit"],
+    isRouteStart: true,
+  },
+  "rm-j002": {
+    roads: ["i75", "random-exit"],
+    isRouteStart: false,
+  },
+  "rm-j003": {
+    roads: ["i75", "i20", "random-exit"],
+    isRouteStart: false,
+  },
+  "rm-j004": {
+    roads: ["i75", "i20", "random-exit"],
+    isRouteStart: false,
+  },
+  "rm-j005": {
+    roads: ["i75", "i20", "random-exit"],
+    isRouteStart: false,
+  },
+  "rm-j006": {
+    roads: ["i75", "i20", "random-exit"],
+    isRouteStart: false,
+  },
+  "rm-j007": {
+    roads: ["i20", "update", "random-exit"],
+    isRouteStart: false,
+  },
+  "rm-j008": {
+    roads: ["update", "random-exit"],
+    isRouteStart: false,
+  },
 };
-
-/** V2 RTU intake routing — one short service-specific form per activated shelf SKU. */
-const V2_INTAKE_BY_SKU: Record<RouteMapV2ShelfServiceId, RouteMapIntakeType> = {
-  "v2-rtu-flyer": "rtu-flyer",
-  "v2-rtu-menu": "rtu-menu",
-  "v2-rtu-service-sheet": "rtu-service-sheet",
-  "v2-rtu-promotion-graphics": "rtu-promotion-graphics",
-  "v2-rtu-social-posts": "rtu-social-posts",
-  "v2-rtu-short-video": "rtu-short-video",
-  "v2-rtu-voice": "rtu-voice",
-  "v2-rtu-email-kit": "rtu-email-kit",
-  "v2-rtu-sms-kit": "rtu-sms-kit",
-};
-
-export function getRouteMapIntakeTypeForSku(jobId: RouteMapJobId): RouteMapIntakeType | undefined {
-  if (isRouteMapV2ShelfServiceId(jobId)) {
-    return V2_INTAKE_BY_SKU[jobId];
-  }
-  return ROUTE_MAP_JOB_META[jobId as RouteMapLaunchServiceId]?.intakeType;
-}
 
 /** Retired rm-j* → V2 replacement for deep links / legacy redirects. */
 const RETIRED_ROUTE_MAP_REDIRECTS: Partial<Record<RouteMapLaunchServiceId, RouteMapV2ShelfServiceId>> =
@@ -124,84 +111,36 @@ const RETIRED_ROUTE_MAP_REDIRECTS: Partial<Record<RouteMapLaunchServiceId, Route
     "rm-j006": "v2-rtu-voice",
   };
 
-type RouteMapJobMeta = {
-  roads: readonly RouteMapRoadId[];
-  isRouteStart: boolean;
-  intakeType: RouteMapIntakeType;
-};
-
-const ROUTE_MAP_JOB_META: Record<RouteMapLaunchServiceId, RouteMapJobMeta> = {
-  "rm-j001": {
-    roads: ["i75", "i20", "update", "random-exit"],
-    isRouteStart: true,
-    intakeType: "discovery",
-  },
-  "rm-j002": {
-    roads: ["i75", "random-exit"],
-    isRouteStart: false,
-    intakeType: "social-setup",
-  },
-  "rm-j003": {
-    roads: ["i75", "i20", "random-exit"],
-    isRouteStart: false,
-    intakeType: "promotion",
-  },
-  "rm-j004": {
-    roads: ["i75", "i20", "random-exit"],
-    isRouteStart: false,
-    intakeType: "video",
-  },
-  "rm-j005": {
-    roads: ["i75", "i20", "random-exit"],
-    isRouteStart: false,
-    intakeType: "page",
-  },
-  "rm-j006": {
-    roads: ["i75", "i20", "random-exit"],
-    isRouteStart: false,
-    intakeType: "voice",
-  },
-  "rm-j007": {
-    roads: ["i20", "update", "random-exit"],
-    isRouteStart: false,
-    intakeType: "update",
-  },
-  "rm-j008": {
-    roads: ["update", "random-exit"],
-    isRouteStart: false,
-    intakeType: "social-setup",
-  },
-};
+export function getRouteMapIntakeTypeForSku(jobId: RouteMapJobId): RouteMapIntakeType | undefined {
+  const catalog = getServiceById(jobId as ServiceId);
+  if (!catalog) return undefined;
+  return getRouteMapIntakeTemplate(catalog);
+}
 
 const RETIRED_ROUTE_MAP_SKU_SET = new Set<string>(CATALOG_V2_ACTIVATION_RETIRED_ROUTE_MAP_SKUS);
-
-function formatUsd(cents: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(cents / 100);
-}
 
 function buildRouteMapJobFromV1(id: RouteMapLaunchServiceId): RouteMapJob | undefined {
   const catalog = getServiceById(id);
   const meta = ROUTE_MAP_JOB_META[id];
   if (!catalog || !meta) return undefined;
 
+  const intakeType = getRouteMapIntakeTemplate(catalog);
+  if (!intakeType) return undefined;
+
   return {
     id,
     name: catalog.name,
     priceCents: catalog.priceCents,
-    priceDisplay: ROUTE_MAP_PRICE_DISPLAY[id] ?? formatUsd(catalog.priceCents),
+    priceDisplay: getRouteMapPriceDisplay(catalog),
     billingType: "one_time",
     roads: meta.roads,
     isRouteStart: meta.isRouteStart,
-    intakeType: meta.intakeType,
+    intakeType,
     purpose: catalog.purpose,
     deliverables: catalog.deliverables,
     exclusions: catalog.exclusions,
     revisionRule: catalog.revisionRule,
-    timingLabel: ROUTE_MAP_JOB_TIMING[id],
+    timingLabel: getRouteMapTurnaroundLabel(catalog),
     clientResponsibilities: catalog.clientResponsibilities,
   };
 }
@@ -210,6 +149,9 @@ function buildRouteMapJobFromV2(id: RouteMapV2ShelfServiceId): RouteMapJob | und
   const catalog = getServiceById(id);
   if (!catalog) return undefined;
 
+  const intakeType = getRouteMapIntakeTemplate(catalog);
+  if (!intakeType) return undefined;
+
   const activationEntry = getActivationMapEntryBySku(id);
   const roads = activationEntry?.laneEligibility ?? [];
 
@@ -217,19 +159,16 @@ function buildRouteMapJobFromV2(id: RouteMapV2ShelfServiceId): RouteMapJob | und
     id,
     name: catalog.name,
     priceCents: catalog.priceCents,
-    priceDisplay: formatUsd(catalog.priceCents),
+    priceDisplay: getRouteMapPriceDisplay(catalog),
     billingType: "one_time",
     roads,
     isRouteStart: false,
-    intakeType: V2_INTAKE_BY_SKU[id],
+    intakeType,
     purpose: catalog.purpose,
     deliverables: catalog.deliverables,
     exclusions: catalog.exclusions,
     revisionRule: catalog.revisionRule,
-    timingLabel:
-      getRouteMapV2TurnaroundLabel(id) ??
-      catalog.firstReviewWindow?.label ??
-      "Timing varies by job.",
+    timingLabel: getRouteMapTurnaroundLabel(catalog),
     clientResponsibilities: catalog.clientResponsibilities,
   };
 }

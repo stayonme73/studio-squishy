@@ -10,6 +10,8 @@ export type {
   RouteMapIntakeSchemaOptions,
 } from "@/catalog/intake/schemas";
 
+export type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
+
 export {
   getRouteMapIntakeSchema,
   ROUTE_MAP_INTAKE_SCHEMAS,

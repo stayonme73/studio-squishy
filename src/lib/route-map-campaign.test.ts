@@ -169,6 +169,21 @@ describe("route-map catalog SKUs", () => {
     expect(job?.timingLabel).toBe("First draft within 5 business days after intake is complete.");
     expect(ROUTE_MAP_V1.promiseFooter.toLowerCase()).not.toContain("7 business");
   });
+
+  it("reads per-platform price display from catalog — byte-for-byte", () => {
+    expect(getRouteMapJob("rm-j002")?.priceDisplay).toBe("$400 / platform");
+    expect(getRouteMapJob("rm-j003")?.priceDisplay).toBe("$450 / platform");
+    expect(getRouteMapJob("rm-j004")?.priceDisplay).toBe("$650 / platform");
+    expect(getRouteMapJob("rm-j006")?.priceDisplay).toBe("$400 / platform");
+    expect(getRouteMapJob("rm-j008")?.priceDisplay).toBe("$400");
+  });
+
+  it("reads intake template from catalog for active shelf SKUs", () => {
+    expect(getServiceById("rm-j002")?.intakeTemplate).toBe("social-setup");
+    expect(getServiceById("v2-rtu-flyer")?.intakeTemplate).toBe("rtu-flyer");
+    expect(getRouteMapJob("rm-j007")?.intakeType).toBe("update");
+    expect(getRouteMapIntakeTypeForSku("v2-rtu-sms-kit")).toBe("rtu-sms-kit");
+  });
 });
 
 describe("route-map intake template routing", () => {
