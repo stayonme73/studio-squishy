@@ -120,6 +120,31 @@ async function main() {
   await expectNoAccessDeniedCopy(page);
   console.log("PASS  2. /studio-board shows No Active Project, not Access Denied");
 
+  await page.evaluate(() => {
+    localStorage.setItem(
+      "studio-squishy:current-campaign",
+      JSON.stringify({
+        campaignId: "owner-qa-dev",
+        campaignName: "Tagia Bakery Campaign",
+        campaignStatus: "READY_FOR_REVIEW",
+        campaignDescription: "Stale Owner QA seed",
+        estimatedCompletion: "TBD",
+        packageId: "custom-studio-plan",
+        packageLabel: "",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }),
+    );
+  });
+  await page.goto(`${BASE}/studio-board`, { waitUntil: "networkidle", timeout: 60000 });
+  await page.waitForTimeout(3500);
+  const staleLocalNoActive = page.getByRole("heading", { name: /^No Active Project$/i });
+  if (!(await staleLocalNoActive.count())) {
+    throw new Error("Expected stale local Owner QA campaign to show No Active Project on clean /studio-board.");
+  }
+  await expectNoAccessDeniedCopy(page);
+  console.log("PASS  2b. Stale local campaign on clean /studio-board shows No Active Project");
+
   const startProjectLink = page.getByRole("link", { name: /^START A NEW PROJECT$/i });
   if (!(await startProjectLink.count())) {
     throw new Error("Expected START A NEW PROJECT link on Studio Board empty state.");

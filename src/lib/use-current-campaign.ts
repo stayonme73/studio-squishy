@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import type { CampaignRecord } from "@/config/studio-board";
 import { parseDevStatusParam } from "@/lib/studio-board-dev-status";
 import {
+  clearCampaignState,
   hydrateCampaignIntake,
   readCurrentCampaign,
   saveCurrentCampaign,
@@ -66,6 +67,13 @@ export function useCurrentCampaign() {
         return;
       }
       if (response.status === 403) {
+        if (!requestedCampaignId) {
+          clearCampaignState();
+          setCampaign(null);
+          setAccessState("no-active-project");
+          setError(null);
+          return;
+        }
         setCampaign(null);
         setAccessState("denied");
         setError("Access denied.");
@@ -104,9 +112,10 @@ export function useCurrentCampaign() {
           return;
         }
         if (claimResult === "denied") {
+          clearCampaignState();
           setCampaign(null);
-          setAccessState("denied");
-          setError("Access denied.");
+          setAccessState("no-active-project");
+          setError(null);
           return;
         }
         setCampaign(null);
