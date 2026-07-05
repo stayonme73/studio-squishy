@@ -30,8 +30,8 @@ import { CATALOG_V2_DRAFT_SCHEMA_VERSION } from "@/catalog/v2/types";
 const PROJECT_DETAILS_GREEN = new Set<string>(PROJECT_DETAILS_GREEN_SKU_IDS);
 
 /**
- * Approved Catalog V2 turnaround strings for Route Map jobs.
- * Canonical source — do not derive from ROUTE_MAP_JOB_TIMING in route-map-v1.ts.
+ * Canonical V2 draft turnaround strings for Route Map jobs.
+ * Live Route Map reads catalog via `route-map-display` accessors (Phase 3A).
  */
 const ROUTE_MAP_V2_TURNAROUND: Readonly<Record<RouteMapLaunchServiceId, string>> = {
   "rm-j001": "Usually within 1–2 business days after intake is complete.",

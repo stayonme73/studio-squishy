@@ -1,7 +1,7 @@
 /**
  * Studio Route Map V1 — launch job shelf, roads, and intake routing.
  * Shelf jobs driven by Catalog V2 activation map + live catalog (V1 rm-j* + V2 RTU SKUs).
- * Road placement from activation-map-draft.ts; prices/scope/turnaround from Service Catalog.
+ * Road placement from `@/catalog/activation`; prices/scope/turnaround from Service Catalog.
  * @see docs/customer-journey-v1-locked.md — Route Map replaces lobby → Discovery front door.
  */
 
@@ -18,7 +18,7 @@ import {
   CATALOG_V2_ACTIVATION_RETIRED_ROUTE_MAP_SKUS,
   getActivationMapEntryBySku,
   getActivationMapShelfEntriesForLane,
-} from "@/catalog/v2/activation-map-draft";
+} from "@/catalog/activation";
 import { customerJourneyStepRoute } from "@/config/customer-journey-v1";
 
 /** Route Map shelf job IDs — V1 continuing jobs + activated V2 RTU SKUs. */

@@ -120,13 +120,9 @@ export type CatalogV2ServiceEntry = {
   revisionLimit: number | null;
 
   /**
-   * Customer-facing turnaround label — canonical in Catalog V2.
-   * Route Map jobs: explicit approved buffer ranges (e.g. "Usually within 1–2 business days
-   * after intake is complete.") — not derived from route-map-v1.ts timing table.
-   * Other SKUs: derived from live catalog timing windows until separately approved.
-   *
-   * TODO: Route Map UI currently reads ROUTE_MAP_JOB_TIMING in route-map-v1.ts —
-   * migrate Route Map cards to read `turnaround` from catalog.
+   * Customer-facing turnaround label — canonical in Catalog V2 draft.
+   * Route Map jobs: explicit approved buffer ranges in this draft namespace.
+   * Live Route Map shelf reads turnaround via `getRouteMapTurnaroundLabel` (Phase 3A).
    */
   turnaround: string;
 

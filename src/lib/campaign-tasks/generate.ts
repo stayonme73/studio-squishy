@@ -2,6 +2,7 @@ import { getServiceById } from "@/catalog/accessors";
 import type { ServiceFamilyId, ServiceId } from "@/catalog/types";
 import type { ApprovedStudioPlan, ApprovedStudioPlanLineItem, CampaignRecord } from "@/config/studio-board";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
+import { lineSkuId } from "@/lib/approved-plan-line";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 
 import { resolveProductionFamilyId } from "./families";
@@ -22,10 +23,6 @@ import type { CampaignTaskItem, CampaignTasksRecord, ProductionTaskFamilyId } fr
 
 const CURRENT_CYCLE_LABEL = "Current cycle";
 
-function lineSkuId(line: ApprovedStudioPlanLineItem): ServiceId {
-  return (line.skuId ?? line.serviceId!) as ServiceId;
-}
-
 export function computePlanFingerprint(plan: ApprovedStudioPlan): string {
   const parts = filterProductionPlanLineItems(plan)
     .map((line) => `${lineSkuId(line)}:${line.billingType}`)
@@ -43,7 +40,7 @@ function buildPipelineTasks(
   catalogFamilyId: ServiceFamilyId,
   pipeline: readonly TaskBlueprint[],
 ): CampaignTaskItem[] {
-  const serviceId = lineSkuId(line);
+  const serviceId = lineSkuId(line) as ServiceId;
   const serviceName = line.serviceName ?? line.name ?? serviceId;
   const cycleLabel = line.billingType === "monthly" ? CURRENT_CYCLE_LABEL : undefined;
   const tasks: CampaignTaskItem[] = [];
@@ -75,7 +72,7 @@ function buildPipelineTasks(
 }
 
 function resolveCatalogFamilyId(line: ApprovedStudioPlanLineItem): ServiceFamilyId | null {
-  const catalog = getServiceById(lineSkuId(line));
+  const catalog = getServiceById(lineSkuId(line) as ServiceId);
   return catalog?.familyId ?? null;
 }
 
@@ -104,7 +101,7 @@ function buildCampaignLevelTasks(
       title: CAMPAIGN_LEVEL_TASKS.producerKickoff.title,
       phase: CAMPAIGN_LEVEL_TASKS.producerKickoff.phase,
       status: "not_ready",
-      relatedServiceIds: lines.map(lineSkuId),
+      relatedServiceIds: lines.map((line) => lineSkuId(line) as ServiceId),
       familyId: "campaign_launch_monthly",
       catalogFamilyId: "campaign",
       serviceName: "Campaign",
@@ -121,7 +118,7 @@ function buildCampaignLevelTasks(
       title: CAMPAIGN_LEVEL_TASKS.finalPackageAssembly.title,
       phase: CAMPAIGN_LEVEL_TASKS.finalPackageAssembly.phase,
       status: "not_ready",
-      relatedServiceIds: lines.map(lineSkuId),
+      relatedServiceIds: lines.map((line) => lineSkuId(line) as ServiceId),
       familyId: "campaign_launch_monthly",
       catalogFamilyId: "campaign",
       serviceName: "Campaign",

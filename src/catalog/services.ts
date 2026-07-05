@@ -1,9 +1,9 @@
 /**
  * Studio Service Catalog — raw seed data (temporary location).
  *
- * RAW_SERVICE_CATALOG lives here until Phase 3 physical split into seeds/core-services.ts,
- * seeds/retired.ts, and seeds/bundles.ts. Do not add new permanent service logic here —
- * new seeds belong in the split files once that work lands.
+ * RAW_SERVICE_CATALOG lives here until a future physical split into seeds/core-services.ts,
+ * seeds/retired.ts, and seeds/bundles.ts (deferred — Phase 5+). New seeds belong in the
+ * split files once that work lands. Do not add new permanent service logic here.
  *
  * Normalized v3 export: `@/catalog/seeds` (SERVICE_CATALOG).
  */

@@ -1,7 +1,7 @@
 # Studio Service Catalog — Phase 2 (architecture)
 
-**Status:** Implemented locally — not committed unless founder approves.  
-**Scope:** Catalog-only unification. No consumer wiring (Route Map UI overrides, Checkout, Studio Board, Review Room, Final Delivery).
+**Status:** Implemented and committed (`c629f45`); Phases 3–5 extend wiring and hardening.  
+**Scope:** Catalog unification foundation. Consumer wiring completed incrementally in Phases 3A–4.
 
 ## Schema
 
@@ -9,11 +9,11 @@
 - **V2-ready optional fields** (populated at export via `normalizeStudioServiceEntry` even when seeds omit them):
   - `reviewType` — Review Room sign-off model
   - `deliveryPackage` — Final Delivery package shape
-  - `pricingDisplayType` — customer-facing price label strategy (replaces `ROUTE_MAP_PRICE_DISPLAY` local overrides when wired)
-  - `qaChecklist` — production QA template + item IDs (aligns with `campaignTasksConfig.qaChecklistLabels`)
+  - `pricingDisplayType` — customer-facing price label strategy
+  - `qaChecklist` — production QA template + item IDs
   - `aiPromptRef` — stable AI prompt template key (prompt bodies live outside catalog)
 
-Architecture first. Feature richness second — fields exist in schema; Phase 3+ wires consumers.
+Architecture first. Feature richness second — fields exist in schema; consumer wiring is phased.
 
 ## Folder structure
 
@@ -23,19 +23,20 @@ src/catalog/
   normalize.ts          — v3 default derivation at export
   seeds/
     index.ts            — SERVICE_CATALOG assembly + validate
-  services.ts           — raw seed data (RAW_SERVICE_CATALOG)
+  services.ts           — raw seed data (RAW_SERVICE_CATALOG) — monolithic until physical split
   intake/
-    schemas.ts          — Route Map intake forms (absorbed from route-map-intake-v1)
+    schemas.ts          — Route Map intake forms
     index.ts
   activation/
-    map.ts              — V2 activation map (absorbed from v2/activation-map-draft)
+    map.ts              — V2 activation map
     index.ts
   route-map-launch.ts   — V1 rm-j* seeds
-  route-map-v2-launch.ts — V2 RTU seeds
-  v2/                   — draft batches (unchanged behavior)
+  route-map-v2-launch.ts — V2 RTU seeds (bridged from v2 draft batches)
+  route-map-display.ts  — Phase 3A display accessors
+  v2/                   — draft batches (isolated — not merged into live catalog)
 ```
 
-**Compatibility re-exports (no consumer path changes):**
+**Compatibility re-exports (preserve until all consumers migrate):**
 
 - `src/config/route-map-intake-v1.ts` → `@/catalog/intake`
 - `src/catalog/v2/activation-map-draft.ts` → `@/catalog/activation`
@@ -83,40 +84,40 @@ flowchart LR
 ```
 
 - **Production Job** maps to a purchased catalog SKU (or Route Map shelf job) on the Studio Board / File Room task plan.
-- **Deliverable** instances come from catalog `deliverables` + `deliveryMapping.items` — quantity and unit keys for campaign tracking.
-- **Review Room** reads `reviewType` (v3) per service when wired — standard production review vs RTU handoff vs strategy direction.
-- **Final Delivery** reads `deliveryPackage` (v3) — project files, monthly batch, ready-to-use files, execution handoff, or advisory.
+- **Deliverable** instances come from frozen `approvedStudioPlan.lineItems[].deliverables` post-approval.
+- **Review Room** uses frozen deliverables + job file registry — `reviewType` wiring deferred.
+- **Final Delivery** uses job `clientDeliveryFiles` or Phase 1 mock package — `deliveryPackage` wiring deferred.
 
-### Catalog field routing (V2-ready, not wired)
+### Catalog field routing
 
-| Field | Future consumer |
-|-------|-----------------|
-| `reviewType` | Review Room, Studio Board materials workflow |
-| `deliveryPackage` | Final Delivery, deliverables room |
-| `pricingDisplayType` | Route Map shelf, Project Summary, Secure Checkout |
-| `qaChecklist` | File Room QA panel, production task plan |
-| `aiPromptRef` | Internal production AI assist (prompt registry TBD) |
+| Field | Status |
+|-------|--------|
+| `routeMapPriceDisplay` / `getCheckoutPriceDisplay` | **Wired** — Phase 3A/3B |
+| `routeMapTurnaroundLabel` / `getCheckoutTimingLabel` | **Wired** — Phase 3A/3B |
+| `reviewType` | Normalized — not wired to Review Room |
+| `deliveryPackage` | Normalized — not wired to Final Delivery |
+| `pricingDisplayType` | Normalized — partial via seed overrides |
+| `qaChecklist` | Normalized — not wired to File Room QA |
+| `aiPromptRef` | Normalized — prompt registry TBD |
 
-## Phase 2 conflicts preserved (not resolved)
+## Phase 2 conflicts — resolution status
 
-| Layer | Location | Phase 3 action |
-|-------|----------|----------------|
-| Route Map timing labels | `route-map-v1.ts` `ROUTE_MAP_JOB_TIMING` | Migrate to catalog `firstReviewWindow` / dedicated turnaround field |
-| Route Map price display | `route-map-v1.ts` `ROUTE_MAP_PRICE_DISPLAY` | Migrate to catalog `pricingDisplayType` |
-| Materials heuristics | `src/lib/materials/requirements.ts` | Read catalog requirements |
-| Bundle mock | `src/project-summary/types.ts` | Read catalog bundle compositions |
-| V2 draft catalog | `src/catalog/v2/*` | Merge into v3 seeds when Batch 3 activates |
+| Layer | Was | Status |
+|-------|-----|--------|
+| Route Map timing labels | `route-map-v1.ts` `ROUTE_MAP_JOB_TIMING` | **Resolved** — removed; `getRouteMapTurnaroundLabel` / `getCheckoutTimingLabel` (Phase 3A) |
+| Route Map price display | `route-map-v1.ts` `ROUTE_MAP_PRICE_DISPLAY` | **Resolved** — removed; `getRouteMapPriceDisplay` / `getCheckoutPriceDisplay` (Phase 3A) |
+| Materials heuristics | `requirements.ts` regex + catalog flags | **Partial** — frozen responsibilities for copy (3C); heuristics remain |
+| Bundle mock | Studio Guide + archived Project Summary bundles | **Deferred** — bundles not catalog-wired |
+| V2 draft catalog | `src/catalog/v2/*` | **Deferred** — isolated draft; live shelf bridged via `route-map-v2-launch.ts` |
+| Physical seed split | `services.ts` monolith | **Deferred** — `RAW_SERVICE_CATALOG` retained |
 
-## No wiring confirmation
+## Frozen snapshot contract (Phases 3C–4)
 
-Phase 2 does **not** change:
+Post-approval customer-facing surfaces read `approvedStudioPlan.lineItems`, not live catalog:
 
-- Route Map UI behavior
-- Secure Checkout / payment flows
-- Studio Board tiles or activity feed
-- Recommendation Engine scoring
-- Discovery mapping
-- Production task generation
-- Review Room or Final Delivery pages
+- Deliverables, revision rules, timing labels, responsibilities, pricing on Board / Record / Review / Final Delivery
+- `buildServiceScopeSnapshot()` is the only catalog → plan write path at approval
 
-All existing tests for green services, catalog validation, and accessors should pass unchanged.
+## Handoff
+
+See [service-catalog-handoff.md](./service-catalog-handoff.md) for full integration status and test plan.

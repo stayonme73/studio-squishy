@@ -6,7 +6,7 @@
  * - retired legacy packages (via services.ts raw seeds)
  *
  * Normalization applies v3 V2-ready fields at export — seeds may omit them.
- * Consumer wiring (Route Map, Checkout, Studio Board) remains Phase 3+.
+ * Consumer wiring: Route Map + Checkout (3A/3B), Studio Board (3C), Review/Delivery frozen helpers (4).
  */
 
 import { normalizeServiceCatalog } from "@/catalog/normalize";

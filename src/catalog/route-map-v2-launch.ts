@@ -1,6 +1,6 @@
 /**
  * Route Map V2 activated SKUs — live catalog seeds bridged from approved V2 draft records.
- * Shelf placement driven by activation-map-draft.ts; prices/scope/turnaround from V2 batches.
+ * Shelf placement driven by `@/catalog/activation`; prices/scope/turnaround from V2 batches.
  */
 
 import type {
@@ -22,7 +22,7 @@ import type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
 import {
   CATALOG_V2_ACTIVATION_LAUNCH_CANDIDATE_SKUS,
   CATALOG_V2_ACTIVATION_POST_PUBLISH_PARENT_SKUS,
-} from "@/catalog/v2/activation-map-draft";
+} from "@/catalog/activation";
 import { CATALOG_V2_BATCH1_READY_TO_USE } from "@/catalog/v2/batch1-ready-to-use";
 import { CATALOG_V2_BATCH2_READY_TO_USE } from "@/catalog/v2/batch2-ready-to-use";
 import type { CatalogV2ServiceEntry } from "@/catalog/v2/types";

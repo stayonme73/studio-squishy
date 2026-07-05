@@ -2,12 +2,9 @@ import { getServiceById } from "@/catalog/accessors";
 import type { ServiceId } from "@/catalog/types";
 import type { ApprovedStudioPlan } from "@/config/studio-board";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
+import { lineSkuId } from "@/lib/approved-plan-line";
 
 import { KITCHEN_V1_SERVICE_ID } from "./types";
-
-function lineSkuId(line: { skuId?: string; serviceId?: string }): ServiceId {
-  return (line.skuId ?? line.serviceId!) as ServiceId;
-}
 
 /** Resolve stable deliverable keys from catalog deliveryMapping for a service line. */
 export function resolveDeliverableKeysForService(serviceId: ServiceId): readonly string[] {
@@ -20,7 +17,7 @@ export function resolveDeliverableKeysForService(serviceId: ServiceId): readonly
 /** sm-001 line items in the frozen approved plan — first Kitchen V1 slice scope. */
 export function resolveKitchenV1ServiceIds(plan: ApprovedStudioPlan): readonly ServiceId[] {
   return filterProductionPlanLineItems(plan)
-    .map(lineSkuId)
+    .map((line) => lineSkuId(line) as ServiceId)
     .filter((id): id is typeof KITCHEN_V1_SERVICE_ID => id === KITCHEN_V1_SERVICE_ID);
 }
 

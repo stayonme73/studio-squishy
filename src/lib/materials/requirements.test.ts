@@ -182,4 +182,27 @@ describe("resolveMaterialSlotsFromCampaign", () => {
         ?.requirementLevel,
     ).toBe("required");
   });
+
+  it("infers categories from frozen clientResponsibilities not live catalog copy", () => {
+    const slots = resolveMaterialSlotsFromCampaign(
+      buildCampaign([
+        {
+          skuId: "cc-001",
+          serviceName: "Copy Project",
+          billingType: "one_time",
+          exactPriceCents: 30000,
+          priceDisplay: "$300",
+          deliverables: [],
+          exclusions: [],
+          timingWindowLabel: "2 weeks",
+          revisionRule: "1 round",
+          clientResponsibilities: ["Share website url and social profile links"],
+          executionResponsibility: "studio",
+        },
+      ]),
+    );
+
+    expect(slots.some((slot) => slot.category === "url-link")).toBe(true);
+    expect(slots.every((slot) => slot.reason === "Copy Project")).toBe(true);
+  });
 });

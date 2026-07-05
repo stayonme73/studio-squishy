@@ -118,4 +118,22 @@ describe("approved-plan-line helpers", () => {
     expect(requiredDeliverablesForJob(record, job("ma-flyer-v2"))).toEqual(["Print-ready flyer"]);
     expect(requiredDeliverablesForJob(record, job("missing"))).toEqual([]);
   });
+
+  it("lineSkuId matches legacy serviceId fallback used by deliverable-scope consumers", () => {
+    const legacyLine = {
+      serviceId: "sm-001",
+      serviceName: "Legacy Social",
+      billingType: "one_time" as const,
+      exactPriceCents: 30000,
+      priceDisplay: "$300",
+      deliverables: ["Post concepts"],
+      exclusions: [],
+      timingWindowLabel: "3–5 days",
+      revisionRule: "1 round",
+      clientResponsibilities: [],
+      executionResponsibility: "Studio",
+    };
+    expect(lineSkuId(legacyLine)).toBe("sm-001");
+    expect(findProductionPlanLineForJob(campaign([lineItem("sm-001", ["Post concepts"])]), job("sm-001"))).toBeDefined();
+  });
 });

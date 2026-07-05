@@ -3,6 +3,7 @@ import type {
   CampaignRecord,
 } from "@/config/studio-board";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
+import { lineSkuId } from "@/lib/approved-plan-line";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
 import type { CampaignExceptionRecord } from "@/lib/campaign-tasks/exceptions-types";
@@ -16,10 +17,6 @@ import {
   mapCampaignStatusToSpine,
 } from "./status-spine";
 import type { JobSpineStatus, PurchasedJobRecord } from "./types";
-
-function lineSkuId(line: ApprovedStudioPlanLineItem): string {
-  return (line.skuId ?? line.serviceId)!;
-}
 
 export function isJobIntakeComplete(campaign: CampaignRecord): boolean {
   if (campaign.routeMapContext) {

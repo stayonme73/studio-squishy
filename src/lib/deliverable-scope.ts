@@ -12,6 +12,7 @@ import type {
   CampaignRecord,
 } from "@/config/studio-board";
 import { campaignUsesCustomStudioPlan } from "@/lib/approved-plan-display";
+import { lineSkuId } from "@/lib/approved-plan-line";
 
 export type DeliverableSectionId =
   | "brand-direction-assets"
@@ -142,12 +143,8 @@ const LEGACY_QUOTA_SECTION_MAP: Partial<Record<string, DeliverableSectionId>> = 
 
 const CHANNEL_SECTION_IDS = new Set<DeliverableSectionId>(["social", "email", "sms"]);
 
-function lineSkuId(line: ApprovedStudioPlanLineItem): ServiceId {
-  return (line.skuId ?? line.serviceId!) as ServiceId;
-}
-
 export function isExecutionLineItem(line: ApprovedStudioPlanLineItem): boolean {
-  const skuId = lineSkuId(line);
+  const skuId = lineSkuId(line) as ServiceId;
   if (EXECUTION_SKU_IDS.has(skuId)) return true;
   return Boolean(getServiceById(skuId)?.isExecutionAddOn);
 }
@@ -164,7 +161,7 @@ function resolveSectionForLineItem(
 ): DeliverableScopeSection | null {
   if (isExecutionLineItem(line)) return null;
 
-  const skuId = lineSkuId(line);
+  const skuId = lineSkuId(line) as ServiceId;
   const serviceName = line.serviceName ?? line.name ?? skuId;
   const mapped =
     SKU_SECTION_MAP[skuId] ??
