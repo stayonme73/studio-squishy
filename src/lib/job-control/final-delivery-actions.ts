@@ -1,5 +1,5 @@
 import type { CampaignRecord } from "@/config/studio-board";
-import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
+import { requiredDeliverablesForJob } from "@/lib/approved-plan-line";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -39,18 +39,6 @@ function actorFromUser(user: StudioUser): JobActivityActor {
     userId: user.id,
     displayName: user.displayName ?? user.email,
   };
-}
-
-function requiredDeliverablesForJob(
-  campaign: CampaignRecord,
-  job: PurchasedJobRecord,
-): string[] {
-  const plan = campaign.approvedStudioPlan;
-  if (!plan) return [];
-  const line = filterProductionPlanLineItems(plan).find(
-    (item) => (item.skuId ?? item.serviceId) === job.skuId,
-  );
-  return line?.deliverables ? [...line.deliverables] : [];
 }
 
 function updateJobInEnvelope(

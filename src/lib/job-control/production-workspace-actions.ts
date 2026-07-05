@@ -1,4 +1,5 @@
 import type { CampaignRecord } from "@/config/studio-board";
+import { requiredDeliverablesForJob } from "@/lib/approved-plan-line";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
@@ -101,18 +102,6 @@ function actorFromUser(user: StudioUser): JobActivityActor {
 
 function findJobRecord(envelope: ServerTasksEnvelope, jobId: string): PurchasedJobRecord | null {
   return (envelope.jobRecords ?? []).find((entry) => entry.jobId === jobId) ?? null;
-}
-
-function requiredDeliverablesForJob(
-  campaign: CampaignRecord,
-  job: PurchasedJobRecord,
-): string[] {
-  const plan = campaign.approvedStudioPlan;
-  if (!plan) return [];
-  const line = filterProductionPlanLineItems(plan).find(
-    (item) => (item.skuId ?? item.serviceId) === job.skuId,
-  );
-  return line?.deliverables ? [...line.deliverables] : [];
 }
 
 function updateJobInEnvelope(

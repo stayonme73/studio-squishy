@@ -1,5 +1,5 @@
 import type { CampaignRecord } from "@/config/studio-board";
-import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
+import { findProductionPlanLineForJob } from "@/lib/approved-plan-line";
 
 import { canClientAccessJobDelivery, isJobDeliveredToClient } from "./final-delivery-access";
 import type { JobClientDeliveryFile, PurchasedJobRecord } from "./types";
@@ -58,12 +58,7 @@ function completedDeliverablesForJob(
   campaign: CampaignRecord,
   job: PurchasedJobRecord,
 ): string[] {
-  const plan = campaign.approvedStudioPlan;
-  const line = plan
-    ? filterProductionPlanLineItems(plan).find(
-        (item) => (item.skuId ?? item.serviceId) === job.skuId,
-      )
-    : undefined;
+  const line = findProductionPlanLineForJob(campaign, job);
   return line?.deliverables ? [...line.deliverables] : [];
 }
 

@@ -1,9 +1,10 @@
 import type { CampaignRecord } from "@/config/studio-board";
+import { requiredDeliverablesForJob } from "@/lib/approved-plan-line";
+import { resolveCampaignRevisionRounds } from "@/lib/approved-plan-display";
 import { bridgeExceptionFromRevisionExhausted } from "@/lib/campaign-tasks/exceptions-actions";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
-import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 
 import { applyJobSpineStatusChange } from "./actions";
 import { appendJobActivityEvent } from "./activity-log";
@@ -69,23 +70,6 @@ function updateJobInEnvelope(
   };
 }
 
-function lineSkuId(line: { skuId?: string; serviceId?: string }): string {
-  return (line.skuId ?? line.serviceId)!;
-}
-
-function requiredDeliverablesForJob(
-  campaign: CampaignRecord,
-  job: PurchasedJobRecord,
-): readonly string[] {
-  const plan = campaign.approvedStudioPlan;
-  const line = plan
-    ? filterProductionPlanLineItems(plan).find(
-        (item) => lineSkuId(item) === job.skuId,
-      )
-    : undefined;
-  return line?.deliverables ?? [];
-}
-
 function markTasksNeedsRevision(
   tasks: readonly CampaignTaskItem[],
   skuId: string,
@@ -143,7 +127,7 @@ export function applyReviewRoomPatch(
     )
     .map((def) => def.key);
 
-  const revisionRoundsIncluded = campaign.revisionRoundsIncluded ?? 1;
+  const revisionRoundsIncluded = resolveCampaignRevisionRounds(campaign);
   const revisionRoundsUsed = campaign.revisionRoundsUsed ?? 0;
 
   switch (body.action) {

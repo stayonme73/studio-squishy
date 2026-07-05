@@ -256,6 +256,60 @@ describe("review-room actions", () => {
       expect(result.revisionLimitReached).toBe(true);
     }
   });
+
+  it("uses revision rounds from frozen plan when campaign field is unset", () => {
+    const jobRecord = job();
+    const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
+      "deliverable-0",
+      "deliverable-1",
+    ]);
+    feedback.sectionStatuses["deliverable-0"] = "revision";
+
+    const frozenPlanCampaign = campaign({
+      revisionRoundsIncluded: undefined,
+      revisionRoundsUsed: 1,
+      approvedStudioPlan: {
+        selectedServiceIds: ["sm-001"],
+        includedServiceIds: ["sm-001"],
+        additionalServiceIds: [],
+        additionalCostUsd: 0,
+        oneTimeTotalCents: 30000,
+        monthlyTotalCents: 0,
+        amountDueTodayCents: 30000,
+        lineItems: [
+          {
+            skuId: "sm-001",
+            serviceId: "sm-001",
+            serviceName: "Social Launch",
+            billingType: "one_time",
+            exactPriceCents: 30000,
+            priceDisplay: "$300",
+            deliverables: ["Post concepts", "Caption copy"],
+            exclusions: [],
+            timingWindowLabel: "3–5 days",
+            revisionRule: "2 rounds",
+            clientResponsibilities: [],
+            executionResponsibility: "Studio",
+          },
+        ],
+        approvedAt: "2026-07-01T09:00:00.000Z",
+      },
+    });
+
+    const result = applyReviewRoomPatch(
+      envelope(jobRecord),
+      frozenPlanCampaign,
+      jobRecord,
+      { action: "request_revision", feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.updatedCampaign?.revisionRoundsUsed).toBe(2);
+    }
+  });
 });
 
 describe("job record sync preserves deliverable prep", () => {

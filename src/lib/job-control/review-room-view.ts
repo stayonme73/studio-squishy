@@ -1,6 +1,6 @@
 import type { CampaignRecord } from "@/config/studio-board";
+import { findProductionPlanLineForJob } from "@/lib/approved-plan-line";
 import { resolveCampaignRevisionRounds } from "@/lib/approved-plan-display";
-import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 
 import { mergeActivityEvents, deriveBaselineActivityEvents } from "./activity-log";
@@ -43,10 +43,6 @@ export type ClientReviewView = {
   blockedReasons: readonly string[];
 };
 
-function lineSkuId(line: { skuId?: string; serviceId?: string }): string {
-  return (line.skuId ?? line.serviceId)!;
-}
-
 export function findJobReviewFeedback(
   envelope: ServerTasksEnvelope,
   jobId: string,
@@ -84,12 +80,7 @@ export function resolveClientReviewView(input: {
     return null;
   }
 
-  const plan = campaign.approvedStudioPlan;
-  const line = plan
-    ? filterProductionPlanLineItems(plan).find(
-        (item) => lineSkuId(item) === job.skuId,
-      )
-    : undefined;
+  const line = findProductionPlanLineForJob(campaign, job);
 
   const requiredDefs = resolveRequiredDeliverableKeys(line?.deliverables ?? []);
   const deliverables: ClientReviewDeliverable[] = requiredDefs
