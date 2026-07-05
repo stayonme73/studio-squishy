@@ -292,24 +292,28 @@
     order: 1;
   }
 
-  .sb-board-layout .sb-card--studio-note {
+  .sb-board-layout .sb-card--project-snapshot {
     order: 2;
   }
 
-  .sb-board-layout .sb-card--progress {
+  .sb-board-layout .sb-card--studio-note {
     order: 3;
   }
 
-  .sb-board-layout .sb-card--deliverables {
+  .sb-board-layout .sb-card--progress {
     order: 4;
   }
 
-  .sb-board-layout .sb-card--package {
+  .sb-board-layout .sb-card--deliverables {
     order: 5;
   }
 
-  .sb-board-layout .sb-card--account-secondary {
+  .sb-board-layout .sb-card--package {
     order: 6;
+  }
+
+  .sb-board-layout .sb-card--account-secondary {
+    order: 7;
   }
 
   .sb-board-layout > .sb-card,

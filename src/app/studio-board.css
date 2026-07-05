@@ -2774,6 +2774,35 @@ body:has(.sb--v4) {
   border-radius: 6px;
 }
 
+.sb-record-drawer .cd-vision__answers {
+  gap: 0.72rem;
+}
+
+.sb-record-drawer .cd-vision__answer {
+  display: grid;
+  gap: 0.28rem;
+  padding: 0.68rem 0.74rem;
+  border: 1px solid color-mix(in srgb, var(--sb-denim) 14%, transparent);
+  border-radius: calc(var(--sb-tile-radius) * 0.58);
+  background: color-mix(in srgb, var(--studio-paper) 58%, var(--board-family-field) 42%);
+}
+
+.sb-record-drawer .cd-vision__label {
+  margin: 0;
+}
+
+.sb-record-drawer .cd-vision__value {
+  margin: 0;
+}
+
+.sb-record-drawer__actions .utility-btn--primary {
+  order: 0;
+}
+
+.sb-record-drawer__actions .cd-copy-brief {
+  order: 1;
+}
+
 .sb-current-campaign__brief-actions {
   margin-top: 0.85rem;
 }

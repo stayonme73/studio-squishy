@@ -1,16 +1,20 @@
 import type { DraftIntakeSummarySection } from "@/config/draft-room";
 import { draftRoom } from "@/config/draft-room";
+import { RECORD_EMPTY_ANSWER } from "@/lib/project-record-client-copy";
 
 type Props = {
   sections: readonly DraftIntakeSummarySection[];
+  /** Use Project Record empty-answer copy instead of draft-room review labels. */
+  useRecordEmptyCopy?: boolean;
 };
 
 /** Read-only vision summary for Campaign Page — no edit controls. */
-export default function CampaignVisionSummary({ sections }: Props) {
+export default function CampaignVisionSummary({ sections, useRecordEmptyCopy = false }: Props) {
   const { review } = draftRoom.intakeForm;
+  const emptyAnswer = useRecordEmptyCopy ? RECORD_EMPTY_ANSWER : review.emptyAnswer;
 
   if (sections.length === 0) {
-    return <p className="cd-vision__empty">{review.emptyAnswer}</p>;
+    return <p className="cd-vision__empty">{emptyAnswer}</p>;
   }
 
   return (
@@ -27,7 +31,7 @@ export default function CampaignVisionSummary({ sections }: Props) {
                 {entry.label ? <p className="cd-vision__label">{entry.label}</p> : null}
                 <p
                   className={`cd-vision__value${
-                    entry.value === review.emptyAnswer ? " cd-vision__value--empty" : ""
+                    entry.value === emptyAnswer ? " cd-vision__value--empty" : ""
                   }`}
                 >
                   {entry.value}

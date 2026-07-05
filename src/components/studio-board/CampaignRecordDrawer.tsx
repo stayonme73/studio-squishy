@@ -9,6 +9,7 @@ import { RouteMapClientSummaryPanel } from "@/components/route-map/RouteMapIntak
 import { studioBoard } from "@/config/studio-board";
 import { resolveCampaignDetailsView } from "@/lib/campaign-details-view";
 import { draftRoomEditHref, isIntakeEditable } from "@/lib/intake-edit";
+import { isRecordEmptyAnswer } from "@/lib/project-record-client-copy";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 import { useFinalDelivery } from "@/lib/use-final-delivery";
 
@@ -82,20 +83,20 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
         <div className="sb-record-drawer__body">
           {view.hasCampaign && campaign ? (
             <div className="sb-record-drawer__actions">
-              <CopyCampaignBriefButton campaign={campaign} />
               {intakeEditable ? (
                 <Link
                   href={draftRoomEditHref(campaign.packageId, campaign)}
-                  className="utility-btn utility-btn--secondary"
+                  className="utility-btn utility-btn--primary"
                 >
                   {campaignBrief.editLabel}
                 </Link>
               ) : null}
+              <CopyCampaignBriefButton campaign={campaign} />
             </div>
           ) : null}
           {!intakeEditable && view.hasCampaign ? (
             <p className="sb-record-drawer__locked" role="status">
-              {campaignBrief.lockedMessage}
+              {copy.lockedMessage}
             </p>
           ) : null}
           {view.packageIncludes.length > 0 ? (
@@ -122,7 +123,13 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
                     {section.items.map((item) => (
                       <div key={`${section.title}-${item.label}`} className="cd-vision__answer">
                         <p className="cd-vision__label">{item.label}</p>
-                        <p className="cd-vision__value">{item.value}</p>
+                        <p
+                          className={`cd-vision__value${
+                            isRecordEmptyAnswer(item.value) ? " cd-vision__value--empty" : ""
+                          }`}
+                        >
+                          {item.value}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -134,7 +141,7 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
             <RouteMapClientSummaryPanel summary={view.routeMapClientSummary} />
           ) : null}
           {view.hasVisionSummary ? (
-            <CampaignVisionSummary sections={view.visionSummary} />
+            <CampaignVisionSummary sections={view.visionSummary} useRecordEmptyCopy />
           ) : view.hasRouteMapClientSummary ||
             view.hasProjectDetailsSummary ||
             view.packageIncludes.length > 0 ? null : (

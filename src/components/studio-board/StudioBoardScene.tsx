@@ -228,17 +228,6 @@ export default function StudioBoardScene() {
             {sidebar.studioBoard}
           </NavItem>
           <NavItem
-            href={routes.studioBoard}
-            icon="record"
-            accent="record"
-            onClick={(event) => {
-              event.preventDefault();
-              setRecordOpen(true);
-            }}
-          >
-            {sidebar.campaignRecord}
-          </NavItem>
-          <NavItem
             href={routes.feedbackStudio}
             icon="review"
             accent="review"

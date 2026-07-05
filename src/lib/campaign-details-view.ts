@@ -35,6 +35,11 @@ import {
   type RouteMapClientSummary,
 } from "@/lib/route-map-production-brief";
 import type { FinalDeliveryView } from "@/lib/job-control/final-delivery-view";
+import {
+  RECORD_EMPTY_ANSWER,
+  RECORD_MISSING_SECTION_TITLE,
+  formatRecordFieldValue,
+} from "@/lib/project-record-client-copy";
 
 const { campaignDetails: copy, statusContent } = studioBoard;
 
@@ -191,7 +196,14 @@ function buildProjectDetailsSummary(
   const sections: ProjectDetailsSummarySection[] = [];
 
   const pushSection = (title: string, items: { label: string; value: string }[]) => {
-    const filled = items.filter((item) => item.value?.trim());
+    const filled = items
+      .map((item) => ({
+        label: item.label,
+        value: formatRecordFieldValue(item.value),
+        raw: item.value?.trim() ?? "",
+      }))
+      .filter((item) => item.value !== RECORD_EMPTY_ANSWER || item.raw.length > 0)
+      .map(({ label, value }) => ({ label, value }));
     if (filled.length) sections.push({ title, items: filled });
   };
 
@@ -225,13 +237,40 @@ function buildProjectDetailsSummary(
     const missing = resolveProjectDetailsMissingItems(form, files, serviceIds);
     if (missing.length) {
       sections.push({
-        title: "Missing at submission",
-        items: missing.map((item) => ({ label: item.label, value: "Required" })),
+        title: RECORD_MISSING_SECTION_TITLE,
+        items: missing.map((item) => ({
+          label: item.label,
+          value: RECORD_EMPTY_ANSWER,
+        })),
       });
     }
   }
 
   return sections;
+}
+
+function normalizeVisionSummaryForRecord(
+  sections: readonly DraftIntakeSummarySection[],
+): readonly DraftIntakeSummarySection[] {
+  return sections.map((section) => ({
+    ...section,
+    entries: section.entries.map((entry) => ({
+      ...entry,
+      value: formatRecordFieldValue(entry.value),
+    })),
+  }));
+}
+
+function normalizeRouteMapSummaryForRecord(
+  summary: RouteMapClientSummary,
+): RouteMapClientSummary {
+  return {
+    ...summary,
+    items: summary.items.map((item) => ({
+      ...item,
+      value: formatRecordFieldValue(item.value),
+    })),
+  };
 }
 
 export function resolveCampaignDetailsView(
@@ -242,11 +281,13 @@ export function resolveCampaignDetailsView(
 
   const content = statusContent[campaign.campaignStatus];
   const visionData = resolveVisionData(campaign);
-  const visionSummary = visionData ? draftRoomIntakeAnswerSummary(visionData) : [];
+  const visionRaw = visionData ? draftRoomIntakeAnswerSummary(visionData) : [];
+  const visionSummary = normalizeVisionSummaryForRecord(visionRaw);
   const hasIntake = Boolean(resolveIntake(campaign));
   const greenServiceIds = resolveApprovedGreenServiceIds(campaign.approvedStudioPlan);
   const projectDetailsSummary = buildProjectDetailsSummary(campaign.projectDetails, greenServiceIds);
-  const routeMapClientSummary = resolveRouteMapClientSummary(campaign);
+  const routeMapRaw = resolveRouteMapClientSummary(campaign);
+  const routeMapClientSummary = routeMapRaw ? normalizeRouteMapSummaryForRecord(routeMapRaw) : null;
 
   return {
     hasCampaign: true,

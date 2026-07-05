@@ -565,8 +565,10 @@ export const studioBoard = {
     drawerTitle: customerJourneyStepName("project-record"),
     closeLabel: "Close",
     submittedHint: "Read-only archive of what you submitted to the Studio.",
-    editableHint: "Review or update your intake answers before campaign development begins.",
-    emptyHint: "Your submitted Discovery and Project Details appear here once your campaign begins.",
+    editableHint: "Review or update your project details before campaign development begins.",
+    lockedMessage:
+      "Your submitted project details are locked here for reference. For any changes, use Review Room or send feedback to The Studio.",
+    emptyHint: "Your submitted project details appear here once your campaign begins.",
   },
 
   campaignBrief: {
@@ -707,7 +709,7 @@ export const studioBoard = {
       reviewConcepts: "Review Campaign Concepts",
       viewFinalAssets: "VIEW DELIVERABLES",
     },
-    notProvided: "Not provided",
+    notProvided: "Not provided yet",
     copyCampaignBriefLabel: "Copy Campaign Brief",
     copyCampaignBriefSuccess: "Campaign Brief Copied",
     empty: {
