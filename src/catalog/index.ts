@@ -65,6 +65,7 @@ export {
 
 export {
   getCheckoutPriceDisplay,
+  getCheckoutTimingLabel,
   getRouteMapIntakeTemplate,
   getRouteMapPriceDisplay,
   getRouteMapTurnaroundLabel,

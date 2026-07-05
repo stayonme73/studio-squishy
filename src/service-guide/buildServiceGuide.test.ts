@@ -14,7 +14,7 @@ describe("buildServiceGuide", () => {
     expect(guide!.exactPriceCents).toBe(49500);
     expect(guide!.deliverables.length).toBeGreaterThan(0);
     expect(guide!.exclusions.length).toBeGreaterThan(0);
-    expect(guide!.timingWindow.label).toBeTruthy();
+    expect(guide!.timingWindow.label).toBe("12–17 business days");
     expect(guide!.revisionRule).toBeTruthy();
     expect(guide!.clientResponsibilities.length).toBeGreaterThan(0);
     expect(guide!.executionResponsibility).toContain("creates and delivers");
@@ -25,7 +25,9 @@ describe("buildServiceGuide", () => {
     expect(guide).not.toBeNull();
     expect(guide!.billingType).toBe("monthly");
     expect(guide!.priceDisplay.toLowerCase()).toContain("month");
-    expect(guide!.timingWindow.label).toBeTruthy();
+    expect(guide!.timingWindow.label).toBe(
+      "First batch 6–8 business days after direction/materials are complete; later batches follow the monthly production calendar.",
+    );
   });
 
   it("includes parent SKU for execution add-on", () => {

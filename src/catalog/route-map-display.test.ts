@@ -3,10 +3,24 @@ import { describe, expect, it } from "vitest";
 import { getActiveServices, getServiceById } from "@/catalog/accessors";
 import {
   getCheckoutPriceDisplay,
+  getCheckoutTimingLabel,
   getRouteMapIntakeTemplate,
   getRouteMapPriceDisplay,
   getRouteMapTurnaroundLabel,
 } from "@/catalog/route-map-display";
+import { buildServiceScopeSnapshot } from "@/lib/plan-pricing";
+import type { ServiceId } from "@/catalog/types";
+
+const MONTHLY_CYCLE_LABEL =
+  "First batch 6–8 business days after direction/materials are complete; later batches follow the monthly production calendar.";
+
+function legacyDiscoveryTimingLabel(
+  service: NonNullable<ReturnType<typeof getServiceById>>,
+): string {
+  if (service.monthlyCycleWindow?.label) return service.monthlyCycleWindow.label;
+  if (service.finalDeliveryWindow?.label) return service.finalDeliveryWindow.label;
+  return service.firstReviewWindow.label;
+}
 
 describe("route-map-display accessors", () => {
   it("getCheckoutPriceDisplay matches derived pricing for active discovery services", () => {
@@ -18,6 +32,47 @@ describe("route-map-display accessors", () => {
 
   it("getCheckoutPriceDisplay prefers routeMapPriceDisplay when seeded", () => {
     expect(getCheckoutPriceDisplay(getServiceById("rm-j002")!)).toBe("$400 / platform");
+  });
+
+  it("getCheckoutTimingLabel matches legacy discovery timing for active services without overrides", () => {
+    for (const service of getActiveServices()) {
+      if (service.routeMapTurnaroundLabel) continue;
+      expect(getCheckoutTimingLabel(service)).toBe(legacyDiscoveryTimingLabel(service));
+    }
+  });
+
+  it("getCheckoutTimingLabel preserves green foundation timing labels", () => {
+    expect(getCheckoutTimingLabel(getServiceById("bf-001")!)).toBe("12–17 business days");
+    expect(getCheckoutTimingLabel(getServiceById("sm-001")!)).toBe("12–17 business days");
+    expect(getCheckoutTimingLabel(getServiceById("ma-001")!)).toBe("12–17 business days");
+  });
+
+  it("getCheckoutTimingLabel preserves monthly cycle copy for active monthly services", () => {
+    expect(getCheckoutTimingLabel(getServiceById("sm-001-monthly")!)).toBe(MONTHLY_CYCLE_LABEL);
+    expect(getCheckoutTimingLabel(getServiceById("em-001-monthly")!)).toBe(MONTHLY_CYCLE_LABEL);
+  });
+
+  it("getCheckoutTimingLabel matches Route Map seeded turnaround labels", () => {
+    expect(getCheckoutTimingLabel(getServiceById("rm-j001")!)).toBe(
+      getRouteMapTurnaroundLabel(getServiceById("rm-j001")!),
+    );
+    expect(getCheckoutTimingLabel(getServiceById("rm-j005")!)).toBe(
+      "First draft within 5 business days after intake is complete.",
+    );
+  });
+
+  it("buildServiceScopeSnapshot uses getCheckoutTimingLabel for approval snapshots", () => {
+    const foundationIds = ["bf-001", "sm-001", "ma-001"] as const satisfies readonly ServiceId[];
+    const lines = buildServiceScopeSnapshot(foundationIds);
+
+    expect(lines.map((line) => line.timingWindowLabel)).toEqual([
+      "12–17 business days",
+      "12–17 business days",
+      "12–17 business days",
+    ]);
+    expect(buildServiceScopeSnapshot(["sm-001-monthly"])[0].timingWindowLabel).toBe(
+      MONTHLY_CYCLE_LABEL,
+    );
   });
 
   it("returns per-platform price labels from catalog seeds", () => {

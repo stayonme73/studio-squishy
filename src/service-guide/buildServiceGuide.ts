@@ -1,4 +1,5 @@
 import { getDerivedServicePricing, getServiceById } from "@/catalog/accessors";
+import { getCheckoutTimingLabel } from "@/catalog/route-map-display";
 import type { ServiceId } from "@/catalog/types";
 import {
   CLIENT_ACCESS_BOILERPLATE,
@@ -6,12 +7,6 @@ import {
   EXECUTION_MODE_LABELS,
 } from "@/config/service-guide";
 import type { ServiceGuideModel } from "@/service-guide/types";
-
-function resolveTimingWindowLabel(service: NonNullable<ReturnType<typeof getServiceById>>): string {
-  if (service.monthlyCycleWindow?.label) return service.monthlyCycleWindow.label;
-  if (service.finalDeliveryWindow?.label) return service.finalDeliveryWindow.label;
-  return service.firstReviewWindow.label;
-}
 
 function resolveParentSkuId(service: NonNullable<ReturnType<typeof getServiceById>>): ServiceId | undefined {
   if (!service.isExecutionAddOn) return undefined;
@@ -37,7 +32,7 @@ export function buildServiceGuide(serviceId: ServiceId): ServiceGuideModel | nul
     exactPriceCents: service.priceCents,
     deliverables: service.deliverables,
     exclusions: service.exclusions,
-    timingWindow: { label: resolveTimingWindowLabel(service) },
+    timingWindow: { label: getCheckoutTimingLabel(service) },
     revisionRule: service.revisionRule,
     clientResponsibilities: service.clientResponsibilities,
     executionResponsibility: EXECUTION_MODE_LABELS[service.executionMode],

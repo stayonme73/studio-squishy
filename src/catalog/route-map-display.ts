@@ -38,6 +38,23 @@ export function getCheckoutPriceDisplay(service: StudioServiceEntry): string {
   return formatCentsDisplay(getPriceCentsFromService(service), service.billingType);
 }
 
+/**
+ * Customer-facing checkout / approval / Service Guide timing label — unified catalog read path.
+ * Prefers routeMapTurnaroundLabel when seeded; preserves monthly cycle precedence for Discovery SKUs.
+ */
+export function getCheckoutTimingLabel(service: StudioServiceEntry): string {
+  if (service.routeMapTurnaroundLabel) {
+    return service.routeMapTurnaroundLabel;
+  }
+  if (service.monthlyCycleWindow?.label) {
+    return service.monthlyCycleWindow.label;
+  }
+  if (service.finalDeliveryWindow?.label) {
+    return service.finalDeliveryWindow.label;
+  }
+  return service.firstReviewWindow.label;
+}
+
 /** Customer-facing Route Map price label — preserves per-platform overrides when seeded. */
 export function getRouteMapPriceDisplay(service: StudioServiceEntry): string {
   if (service.routeMapPriceDisplay) {

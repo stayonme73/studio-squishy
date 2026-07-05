@@ -7,7 +7,7 @@ import {
   getServicePriceCents,
   resolveLegacyServiceId,
 } from "@/catalog/accessors";
-import { getCheckoutPriceDisplay } from "@/catalog/route-map-display";
+import { getCheckoutPriceDisplay, getCheckoutTimingLabel } from "@/catalog/route-map-display";
 import type { BillingType, ServiceFamilyId, ServiceId } from "@/catalog/types";
 import { EXECUTION_MODE_LABELS } from "@/config/service-guide";
 import type { ApprovedStudioPlanLineItem } from "@/config/studio-board";
@@ -82,12 +82,6 @@ export function computePlanPricingTotals(
   };
 }
 
-function resolveTimingWindowLabel(service: NonNullable<ReturnType<typeof getServiceById>>): string {
-  if (service.monthlyCycleWindow?.label) return service.monthlyCycleWindow.label;
-  if (service.finalDeliveryWindow?.label) return service.finalDeliveryWindow.label;
-  return service.firstReviewWindow.label;
-}
-
 function resolveParentSkuId(service: NonNullable<ReturnType<typeof getServiceById>>): ServiceId | undefined {
   if (!service.isExecutionAddOn) return undefined;
   return service.dependencies[0] ?? undefined;
@@ -115,7 +109,7 @@ export function buildServiceScopeSnapshot(
       priceDisplay: getCheckoutPriceDisplay(service),
       deliverables: [...service.deliverables],
       exclusions: [...service.exclusions],
-      timingWindowLabel: resolveTimingWindowLabel(service),
+      timingWindowLabel: getCheckoutTimingLabel(service),
       revisionRule: service.revisionRule,
       clientResponsibilities: [...service.clientResponsibilities],
       executionResponsibility: EXECUTION_MODE_LABELS[service.executionMode],
