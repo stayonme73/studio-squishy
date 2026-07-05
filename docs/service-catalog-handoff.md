@@ -20,7 +20,7 @@
 | 3B-B | `8a5884e` | Checkout timing via `getCheckoutTimingLabel` |
 | 3C | `642772d` | Studio Board + Project Record — frozen plan authority; materials responsibilities frozen-only |
 | 4 | `22b9b26` | Review Room + Final Delivery — `approved-plan-line` helpers; revision rounds aligned |
-| 5 | *(pending)* | Docs refresh, `lineSkuId` dedupe, test hardening |
+| 5 | `bfa8039` | Finalize Service Catalog handoff docs and hardening |
 
 ## Single source of truth
 
