@@ -204,10 +204,15 @@ export function resolveActivityFeed(campaign: CampaignRecord | null): ActivityFe
     });
   };
 
-  pushIso(campaign.visionSubmittedAt ?? campaign.createdAt, "We received your project details");
   pushIso(campaign.discoverySubmittedAt, "We received your discovery answers");
   pushIso(campaign.paymentReceivedAt, "We received your payment");
-  pushIso(campaign.projectDetailsSubmittedAt, "We received your project details");
+  pushIso(
+    campaign.projectDetailsSubmittedAt ??
+      campaign.routeMapIntakeSubmittedAt ??
+      campaign.visionSubmittedAt ??
+      campaign.intake?.submittedAt,
+    "We received your project details",
+  );
   if (
     campaign.materialsSummary?.updatedAt &&
     campaign.materialsSummary.blockingRequiredCount === 0 &&
@@ -232,12 +237,17 @@ export function resolveActivityFeed(campaign: CampaignRecord | null): ActivityFe
     pushIso(campaign.updatedAt, "Your deliverables are ready");
   }
 
+  const milestoneMessages = new Set(entries.map((entry) => entry.message));
+
   for (const note of resolveCampaignStudioNotes(campaign)) {
+    const message = normalizeActivityMessage(note.message);
+    if (milestoneMessages.has(message)) continue;
     entries.push({
       sortKey: note.date === "Today" ? campaign.updatedAt : note.date,
       date: note.date,
-      message: normalizeActivityMessage(note.message),
+      message,
     });
+    milestoneMessages.add(message);
   }
 
   const seen = new Set<string>();

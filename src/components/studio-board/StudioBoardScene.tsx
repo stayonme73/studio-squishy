@@ -91,15 +91,15 @@ function SidebarIcon({ name }: { name: SidebarIconName }) {
     case "review":
       return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-          <rect x="4" y="5" width="16" height="14" rx="2" />
-          <path d="M8 10h8M8 14h5" strokeLinecap="round" />
+          <path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z" />
+          <circle cx="12" cy="12" r="2.5" />
         </svg>
       );
     case "delivery":
       return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
-          <path d="M4 8h16v10H4V8Z" strokeLinejoin="round" />
-          <path d="M4 12h16M9 8V5h6v3" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" />
+          <path d="M12 12l8-4.5M12 12v9M12 12L4 7.5" />
         </svg>
       );
   }
@@ -164,7 +164,7 @@ function CampaignMetric({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
-/** Studio Board V4 — four primary panels plus dedicated Studio Note column. */
+/** Studio Board V4 — six-panel dashboard; only panel content changes by status. */
 export default function StudioBoardScene() {
   const searchParams = useSearchParams();
   const { campaign, ready, accessState, refresh } = useCurrentCampaign();
@@ -281,7 +281,9 @@ export default function StudioBoardScene() {
           </div>
         </header>
 
-        <div className="sb-board-layout">
+        <div
+          className={`sb-board-layout${view.hasCampaign ? "" : " sb-board-layout--no-campaign"}`}
+        >
           <article
             className="sb-card sb-card--current bf-material bf-material-paper"
             aria-labelledby="sb-current-campaign-title"
@@ -383,7 +385,7 @@ export default function StudioBoardScene() {
             <ProjectSnapshotPanel campaign={boardCampaign} view={view} account={account} />
           </article>
 
-          {boardCampaign ? <StudioBoardMaterialsWorkflow campaign={boardCampaign} /> : null}
+          <StudioBoardMaterialsWorkflow campaign={boardCampaign} hasCampaign={view.hasCampaign} />
         </div>
       </div>
 

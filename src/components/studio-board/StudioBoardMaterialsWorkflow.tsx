@@ -4,8 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import StudioBoardSlideOutPanel from "@/components/studio-board/StudioBoardSlideOutPanel";
 import { materialsConfig } from "@/config/materials";
-import type { CampaignRecord } from "@/config/studio-board";
+import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import { resolveBoardNextStepPanelMessage } from "@/lib/studio-board-client-copy";
+import { isIntakeComplete } from "@/lib/studio-board-campaign";
 import type {
   ClientConsolidatedRequest,
   ClientOptionalRequest,
@@ -22,7 +23,7 @@ type MaterialsClientResponse = {
   error?: string;
 };
 
-type BoardMaterialStatus = "Still Needed" | "Received" | "Not Available Yet";
+type BoardMaterialStatus = "Still Needed" | "Received" | "Optional" | "Not Applicable";
 
 type BoardRequest =
   | { kind: "consolidated"; request: ClientConsolidatedRequest }
@@ -40,13 +41,14 @@ type ReceivedMaterial = {
   id: string;
   label: string;
   value?: string;
-  status: Extract<BoardMaterialStatus, "Received" | "Not Available Yet">;
+  status: Extract<BoardMaterialStatus, "Received" | "Not Applicable">;
 };
 
 type SocialMaterialDefinition = {
   id: string;
   label: string;
   detail: string;
+  receivedDetail: string;
   categories: readonly MaterialCategory[];
   contentKinds?: readonly MaterialContentKind[];
   value?: string;
@@ -65,7 +67,33 @@ const CAMPAIGN_GOAL_OPTIONS = [
 ] as const;
 
 function statusModifier(status: BoardMaterialStatus): string {
+  if (status === "Not Applicable") return "not-applicable";
+  if (status === "Optional") return "optional";
   return status.toLowerCase().replaceAll(" ", "-");
+}
+
+function resolveClientMaterialInstruction(
+  request: ClientConsolidatedRequest | ClientOptionalRequest,
+  status: BoardMaterialStatus,
+): string {
+  if (status === "Received") {
+    return "We received this material and our team is reviewing it.";
+  }
+
+  const key =
+    `${request.category}:${request.contentKind}` as keyof typeof materialsConfig.clientRequestWhyNeeded;
+  return (
+    materialsConfig.clientRequestWhyNeeded[key] ??
+    "Please share the material we need for this project."
+  );
+}
+
+function resolveSocialMaterialInstruction(
+  definition: Pick<SocialMaterialDefinition, "detail" | "receivedDetail">,
+  status: BoardMaterialStatus,
+): string {
+  if (status === "Received") return definition.receivedDetail;
+  return definition.detail;
 }
 
 function formatReceivedStatus(submittedAt: string | undefined): string {
@@ -118,13 +146,21 @@ function isSocialPostsCampaign(campaign: CampaignRecord): boolean {
   );
 }
 
-function requestStatus(request: ClientConsolidatedRequest | ClientOptionalRequest): BoardMaterialStatus {
-  if (request.clientAvailability === "not_available_yet") return "Not Available Yet";
-  if (request.isPendingReview || request.reviewStatus === "submitted" || request.reviewStatus === "approved_for_use") {
+function boardRequestStatus(
+  request: ClientConsolidatedRequest | ClientOptionalRequest,
+  kind: BoardRequest["kind"],
+): BoardMaterialStatus {
+  if (request.clientAvailability === "not_available_yet") return "Not Applicable";
+  if (
+    request.isPendingReview ||
+    request.reviewStatus === "submitted" ||
+    request.reviewStatus === "approved_for_use"
+  ) {
     return "Received";
   }
+  if (kind === "optional" && request.canSubmit) return "Optional";
   if (request.canSubmit) return "Still Needed";
-  return "Not Available Yet";
+  return "Not Applicable";
 }
 
 function shouldHideSocialPostsRequest(request: ClientConsolidatedRequest | ClientOptionalRequest): boolean {
@@ -186,7 +222,7 @@ function resolveReceivedMaterials(campaign: CampaignRecord): ReceivedMaterial[] 
 
   return received.map((item) => ({
     ...item,
-    status: item.value ? "Received" : "Not Available Yet",
+    status: item.value ? "Received" : "Not Applicable",
   }));
 }
 
@@ -198,7 +234,8 @@ function resolveSocialMaterialDefinitions(campaign: CampaignRecord): SocialMater
     {
       id: "campaign-message",
       label: "Campaign goal/message",
-      detail: "Tell us what the posts should help people understand or do.",
+      detail: "Tell us the main message you want these posts to communicate.",
+      receivedDetail: "Campaign message received.",
       categories: ["factual-confirmation", "document-reference"],
       contentKinds: ["text", "confirmation"],
       value: valueFor("campaign-goal"),
@@ -206,14 +243,16 @@ function resolveSocialMaterialDefinitions(campaign: CampaignRecord): SocialMater
     {
       id: "platform-format",
       label: "Platform/format",
-      detail: "Confirm the platform and any size or format notes.",
+      detail: "Tell us where these posts will be published and any size requirements.",
+      receivedDetail: "Platform and format details received.",
       categories: [],
       value: valueFor("platform-format"),
     },
     {
       id: "brand-visuals",
       label: "Brand/logo/visual references",
-      detail: "Share logos, colors, photos, or visual references we should follow.",
+      detail: "Upload your logo, brand assets, or visual examples if available.",
+      receivedDetail: "Brand assets or visual references received.",
       categories: ["logo-brand", "photo-video"],
       contentKinds: ["file-metadata", "text"],
       value: valueFor("brand-materials"),
@@ -221,14 +260,16 @@ function resolveSocialMaterialDefinitions(campaign: CampaignRecord): SocialMater
     {
       id: "destination-cta",
       label: "Destination link / CTA",
-      detail: "Give us the link, phone number, QR destination, or call to action.",
+      detail: "Share the website, landing page, phone number, or call to action these posts should use.",
+      receivedDetail: "Website or landing page received.",
       categories: ["url-link"],
       value: valueFor("destination"),
     },
     {
       id: "required-wording",
       label: "Required wording/disclosures",
-      detail: "Send any exact wording, hashtags, disclaimers, dates, or prices.",
+      detail: "Include any required legal wording, hashtags, or disclosures.",
+      receivedDetail: "Required wording or disclosures received.",
       categories: ["document-reference"],
       contentKinds: ["text", "confirmation", "file-metadata"],
       value: valueFor("exact-wording"),
@@ -236,7 +277,8 @@ function resolveSocialMaterialDefinitions(campaign: CampaignRecord): SocialMater
     {
       id: "avoid",
       label: "Anything to avoid",
-      detail: "Tell us what should not be said, shown, or implied.",
+      detail: "Tell us anything you do not want included in this project.",
+      receivedDetail: "Exclusions or avoid list received.",
       categories: ["other"],
       value: valueFor("avoid"),
     },
@@ -260,16 +302,16 @@ function buildSocialActionCards(
 
     const status =
       definition.id === CAMPAIGN_MESSAGE_CARD_ID && request
-        ? requestStatus(request.request)
+        ? boardRequestStatus(request.request, request.kind)
         : definition.value
           ? "Received"
           : request
-            ? requestStatus(request.request)
-            : "Not Available Yet";
+            ? boardRequestStatus(request.request, request.kind)
+            : "Not Applicable";
     return {
       id: definition.id,
       label: definition.label,
-      detail: request?.request.reason ?? definition.detail,
+      detail: resolveSocialMaterialInstruction(definition, status),
       status,
       request: status === "Still Needed" ? request : undefined,
     };
@@ -278,12 +320,12 @@ function buildSocialActionCards(
 
 function buildGenericActionCards(requests: BoardRequest[]): MaterialActionCard[] {
   return requests.map((request) => {
-    const title = "prompt" in request.request ? request.request.prompt : request.request.label;
+    const status = boardRequestStatus(request.request, request.kind);
     return {
       id: `${request.kind}:${request.request.id}`,
-      label: title,
-      detail: "prompt" in request.request ? request.request.reason : `Needed for ${request.request.reason}`,
-      status: requestStatus(request.request),
+      label: request.request.label,
+      detail: resolveClientMaterialInstruction(request.request, status),
+      status,
       request: request.request.canSubmit ? request : undefined,
     };
   });
@@ -304,7 +346,37 @@ function buildSubmittedRequestItems(requests: BoardRequest[]): ReceivedMaterial[
     }));
 }
 
-export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: CampaignRecord }) {
+function StudioBoardMaterialsEmptyRow() {
+  const emptyMaterials = studioBoard.empty.board.materials;
+
+  return (
+    <>
+      <article className="sb-card sb-card--materials-received sb-materials-tile bf-material bf-material-paper">
+        <p className="sb-card__tab">Materials Received</p>
+        <div className="sb-materials-board-tile">
+          <p className="sb-materials-board-tile__lead">{emptyMaterials.receivedLead}</p>
+          <p className="sb-materials-board-tile__meta">{emptyMaterials.received}</p>
+        </div>
+      </article>
+
+      <article className="sb-card sb-card--materials-needed sb-materials-tile bf-material bf-material-paper">
+        <p className="sb-card__tab">Materials We Still Need</p>
+        <div className="sb-materials-board-tile">
+          <p className="sb-materials-board-tile__meta">{emptyMaterials.stillNeed}</p>
+        </div>
+      </article>
+
+      <article className="sb-card sb-card--materials-next sb-materials-tile bf-material bf-material-paper">
+        <p className="sb-card__tab">What You Should Do Next</p>
+        <div className="sb-materials-board-next">
+          <p>{emptyMaterials.nextStep}</p>
+        </div>
+      </article>
+    </>
+  );
+}
+
+function StudioBoardMaterialsWorkflowActive({ campaign }: { campaign: CampaignRecord }) {
   const [data, setData] = useState<MaterialsClientResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -335,13 +407,13 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
   }, [materialsEndpoint]);
 
   useEffect(() => {
-    if (paidCampaign) {
-      const timeout = window.setTimeout(() => void refresh(), 0);
+    if (!paidCampaign || !isIntakeComplete(campaign)) {
+      const timeout = window.setTimeout(() => setLoading(false), 0);
       return () => window.clearTimeout(timeout);
     }
-    const timeout = window.setTimeout(() => setLoading(false), 0);
+    const timeout = window.setTimeout(() => void refresh(), 0);
     return () => window.clearTimeout(timeout);
-  }, [paidCampaign, refresh]);
+  }, [campaign, paidCampaign, refresh]);
 
   const requests = useMemo<BoardRequest[]>(() => {
     const consolidated = (data?.consolidatedRequests ?? []).map((request) => ({
@@ -390,19 +462,20 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
   const activeRequest = activeCard?.request;
   const activeRequestId = activeRequest?.request.id;
 
+  const intakeComplete = isIntakeComplete(campaign);
+
   const showWorkflow = useMemo(() => {
+    if (!intakeComplete) return false;
     if (socialPostsCampaign) return true;
-    if (campaign.projectDetailsSubmittedAt || campaign.routeMapIntakeSubmittedAt) return true;
     if ((data?.clientIntakeCount ?? data?.blockingRequiredCount ?? 0) > 0) return true;
     return requests.length > 0 || loading;
   }, [
-    campaign.projectDetailsSubmittedAt,
-    campaign.routeMapIntakeSubmittedAt,
+    intakeComplete,
+    socialPostsCampaign,
     data?.blockingRequiredCount,
     data?.clientIntakeCount,
     loading,
     requests.length,
-    socialPostsCampaign,
   ]);
 
   const campaignGoalCanSubmit = Boolean(campaignGoalSelection || campaignGoalNote.trim());
@@ -467,14 +540,14 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
     }
   };
 
-  if (!showWorkflow) return null;
+  const emptyMaterials = studioBoard.empty.board.materials;
 
   return (
     <>
       <article className="sb-card sb-card--materials-received sb-materials-tile bf-material bf-material-paper">
         <p className="sb-card__tab">Materials Received</p>
         <div className="sb-materials-board-tile">
-          <p className="sb-materials-board-tile__lead">What The Studio already has for this project.</p>
+          <p className="sb-materials-board-tile__lead">{emptyMaterials.receivedLead}</p>
           <ul className="sb-materials-board-list">
             {receivedMaterials.map((item) => (
               <li key={item.id} className="sb-materials-board-list__item">
@@ -496,7 +569,7 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
       <article className="sb-card sb-card--materials-needed sb-materials-tile bf-material bf-material-paper">
         <p className="sb-card__tab">Materials We Still Need</p>
         <div className="sb-materials-board-tile">
-          {loading ? (
+          {loading && showWorkflow ? (
             <p className="sb-materials-board-tile__meta" aria-busy="true">
               Loading materials...
             </p>
@@ -506,7 +579,13 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
               {error}
             </p>
           ) : null}
-          {!loading ? (
+          {!loading && !showWorkflow ? (
+            <p className="sb-materials-board-tile__meta">{emptyMaterials.awaitingProjectDetails}</p>
+          ) : null}
+          {!loading && showWorkflow && actionCards.length === 0 ? (
+            <p className="sb-materials-board-tile__meta">{emptyMaterials.stillNeed}</p>
+          ) : null}
+          {!loading && showWorkflow && actionCards.length > 0 ? (
             <div className="sb-materials-action-list">
               {actionCards.map((card) => {
                 const clickable =
@@ -549,7 +628,7 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
         </div>
       </article>
 
-      {activeCard && activeRequest && activeRequestId ? (
+      {showWorkflow && activeCard && activeRequest && activeRequestId ? (
         <StudioBoardSlideOutPanel
           title="Tell us what these posts are for"
           eyebrow="Material Request"
@@ -634,4 +713,19 @@ export default function StudioBoardMaterialsWorkflow({ campaign }: { campaign: C
       ) : null}
     </>
   );
+}
+
+/** Six-panel board — materials row always mounted; panel content changes by campaign state. */
+export default function StudioBoardMaterialsWorkflow({
+  campaign,
+  hasCampaign,
+}: {
+  campaign: CampaignRecord | null;
+  hasCampaign: boolean;
+}) {
+  if (!hasCampaign || !campaign) {
+    return <StudioBoardMaterialsEmptyRow />;
+  }
+
+  return <StudioBoardMaterialsWorkflowActive campaign={campaign} />;
 }

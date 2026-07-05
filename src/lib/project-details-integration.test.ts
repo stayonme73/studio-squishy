@@ -160,6 +160,20 @@ describe("Project Details + Studio Board integration", () => {
     expect(feed[0]?.message).toBe("Required materials received");
   });
 
+  it("does not show project details activity before Project Details are submitted", () => {
+    const campaign = mockPaidCampaign({
+      campaignStatus: "PAYMENT_RECEIVED",
+      projectDetailsSubmittedAt: undefined,
+      projectDetails: undefined,
+      studioNotes: [{ date: "Today", message: "Payment received." }],
+    });
+
+    const feed = resolveActivityFeed(campaign);
+
+    expect(feed.some((entry) => entry.message === "We received your project details")).toBe(false);
+    expect(feed.filter((entry) => entry.message === "We received your payment")).toHaveLength(1);
+  });
+
   it("shows Project Details Complete as checked after submit, not in progress", () => {
     const paidAwaitingDetails = mockPaidCampaign({
       campaignStatus: "PAYMENT_RECEIVED",

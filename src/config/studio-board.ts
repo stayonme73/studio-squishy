@@ -215,6 +215,22 @@ export const studioBoard = {
       "You don't have an active project yet. Start a new project from the Route Map to begin working with The Studio.",
     studioUpdates: [] as const,
     primaryCta: "START A NEW PROJECT",
+    board: {
+      snapshot: {
+        deliverables: "Deliverables appear here once your project begins.",
+        plan: "Plan details appear once you choose a Studio Plan.",
+        account: "Payment and account details appear once you start a campaign.",
+      },
+      materials: {
+        receivedLead: "What The Studio already has for this project.",
+        received: "Submitted materials appear here once your project begins.",
+        stillNeed: "Outstanding material requests appear here during production.",
+        awaitingProjectDetails:
+          "Material requests appear here once your project details are complete.",
+        nextStep:
+          "Start a new project from the Route Map to see your next step here.",
+      },
+    },
   },
 
   clientAccess: {
@@ -228,9 +244,9 @@ export const studioBoard = {
     },
     denied: {
       eyebrow: "Access Control",
-      title: "Access denied",
-      message: "This project isn't available for your account.",
-      note: "If you expected access, contact The Studio from the Help Center.",
+      title: "Access Denied",
+      message: "You don't have permission to access this area or project.",
+      note: "If you believe you should have access, contact The Studio through the Help Center.",
     },
     loadError: {
       eyebrow: "Studio Board",
@@ -628,7 +644,7 @@ export const studioBoard = {
   packageSummary: {
     heading: "Your Studio Plan",
     emptyHint: "Plan details appear once you choose a Studio Plan.",
-    compareLink: "Compare all packages",
+    compareLink: "Quick Policy Guide",
     revisionLine: (rounds: number) =>
       `${rounds} Revision Round${rounds === 1 ? "" : "s"} Included`,
   },
