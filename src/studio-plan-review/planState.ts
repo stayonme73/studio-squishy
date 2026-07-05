@@ -3,7 +3,12 @@
  * Uses catalog production allocation — no duplicated limits in UI.
  */
 
-import { getActiveServices, getServiceById } from "@/catalog/accessors";
+import {
+  getActiveServices,
+  getDerivedServicePricing,
+  getServiceById,
+  getServicePriceCents,
+} from "@/catalog/accessors";
 import { PRODUCTION_ALLOCATION_LIMITS } from "@/catalog/production-allocation";
 import { canAttachExecutionAddOn } from "@/catalog/validate";
 import type { ServiceClass, ServiceId } from "@/catalog/types";
@@ -139,9 +144,11 @@ export function computeAdditionalCostUsd(additionalServiceIds: readonly ServiceI
   let amountUsd = 0;
 
   for (const serviceId of additionalServiceIds) {
-    const pricing = getServiceById(serviceId)?.pricing;
-    if (pricing) {
-      amountUsd += pricing.amountUsd;
+    const derived = getDerivedServicePricing(serviceId);
+    if (derived) {
+      amountUsd += derived.amountUsd;
+    } else {
+      amountUsd += getServicePriceCents(serviceId) / 100;
     }
   }
 

@@ -3,11 +3,11 @@
  */
 
 import {
-  getDerivedServicePricing,
   getServiceById,
   getServicePriceCents,
   resolveLegacyServiceId,
 } from "@/catalog/accessors";
+import { getCheckoutPriceDisplay } from "@/catalog/route-map-display";
 import type { BillingType, ServiceFamilyId, ServiceId } from "@/catalog/types";
 import { EXECUTION_MODE_LABELS } from "@/config/service-guide";
 import type { ApprovedStudioPlanLineItem } from "@/config/studio-board";
@@ -27,16 +27,6 @@ export type PlanPricingTotals = {
   amountDueTodayCents: number;
 };
 
-function formatCentsDisplay(cents: number, billingType: BillingType): string {
-  const amountUsd = cents / 100;
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(amountUsd);
-  return billingType === "monthly" ? `${formatted}/month` : formatted;
-}
-
 export function formatUsdFromCents(cents: number): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -55,14 +45,13 @@ export function buildPlanLineItems(selectedServiceIds: readonly ServiceId[]): Pl
     if (!service) continue;
 
     const priceCents = getServicePriceCents(resolved);
-    const pricing = getDerivedServicePricing(resolved);
 
     lines.push({
       serviceId: service.id,
       name: service.name,
       priceCents,
       billingType: service.billingType,
-      priceDisplay: pricing?.display ?? formatCentsDisplay(priceCents, service.billingType),
+      priceDisplay: getCheckoutPriceDisplay(service),
     });
   }
 
@@ -116,7 +105,6 @@ export function buildServiceScopeSnapshot(
     if (!service) continue;
 
     const priceCents = getServicePriceCents(resolved);
-    const pricing = getDerivedServicePricing(resolved);
     const parentSkuId = resolveParentSkuId(service);
 
     lines.push({
@@ -124,7 +112,7 @@ export function buildServiceScopeSnapshot(
       serviceName: service.name,
       billingType: service.billingType,
       exactPriceCents: priceCents,
-      priceDisplay: pricing?.display ?? formatCentsDisplay(priceCents, service.billingType),
+      priceDisplay: getCheckoutPriceDisplay(service),
       deliverables: [...service.deliverables],
       exclusions: [...service.exclusions],
       timingWindowLabel: resolveTimingWindowLabel(service),

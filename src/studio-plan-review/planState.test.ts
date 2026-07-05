@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { getServiceById } from "@/catalog/accessors";
+import {
+  getDerivedServicePricing,
+  getServiceById,
+  getServicePriceCents,
+} from "@/catalog/accessors";
 import type { ServiceId } from "@/catalog/types";
 import {
   addServiceToPlan,
+  computeAdditionalCostUsd,
   getAvailableServicesToAdd,
   initialPlanState,
   removeServiceFromPlan,
@@ -53,5 +58,20 @@ describe("planState — execution add-ons", () => {
 
     const next = swapServiceInPlan(state, "sm-001", "bf-001");
     expect(next.selectedServiceIds).toEqual(["bf-001"]);
+  });
+});
+
+describe("planState — additional cost", () => {
+  it("computeAdditionalCostUsd uses catalog accessors instead of legacy pricing fields", () => {
+    const additionalIds = ["em-001", "cc-002"] as ServiceId[];
+    const expectedUsd = additionalIds.reduce((sum, serviceId) => {
+      const derived = getDerivedServicePricing(serviceId);
+      return sum + (derived?.amountUsd ?? getServicePriceCents(serviceId) / 100);
+    }, 0);
+
+    expect(computeAdditionalCostUsd(additionalIds)).toEqual({
+      amountUsd: expectedUsd,
+      hasQuotedItems: false,
+    });
   });
 });

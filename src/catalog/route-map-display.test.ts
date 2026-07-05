@@ -1,13 +1,25 @@
 import { describe, expect, it } from "vitest";
 
-import { getServiceById } from "@/catalog/accessors";
+import { getActiveServices, getServiceById } from "@/catalog/accessors";
 import {
+  getCheckoutPriceDisplay,
   getRouteMapIntakeTemplate,
   getRouteMapPriceDisplay,
   getRouteMapTurnaroundLabel,
 } from "@/catalog/route-map-display";
 
 describe("route-map-display accessors", () => {
+  it("getCheckoutPriceDisplay matches derived pricing for active discovery services", () => {
+    for (const service of getActiveServices()) {
+      if (service.routeMapPriceDisplay) continue;
+      expect(getCheckoutPriceDisplay(service)).toBe(getRouteMapPriceDisplay(service));
+    }
+  });
+
+  it("getCheckoutPriceDisplay prefers routeMapPriceDisplay when seeded", () => {
+    expect(getCheckoutPriceDisplay(getServiceById("rm-j002")!)).toBe("$400 / platform");
+  });
+
   it("returns per-platform price labels from catalog seeds", () => {
     const j002 = getServiceById("rm-j002");
     expect(j002).toBeDefined();

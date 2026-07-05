@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { getDerivedServicePricing } from "@/catalog/accessors";
 import type { ServiceId } from "@/catalog/types";
 import {
   addServiceToPlan,
@@ -74,5 +75,17 @@ describe("buildStudioPlanReview — live plan sync", () => {
 
     expect(plan.includedServices.map((service) => service.serviceId)).toEqual(["sm-001", "ma-001"]);
     expect(plan.selectedServiceIds).not.toContain("bf-001");
+  });
+
+  it("pricingDisplay for green foundation services matches catalog-derived labels", () => {
+    const recommendation = mockRecommendation(["bf-001", "sm-001", "ma-001"] as ServiceId[]);
+    const plan = buildStudioPlanReview(
+      recommendation,
+      initialPlanState(["bf-001", "sm-001", "ma-001"] as ServiceId[]),
+    );
+
+    for (const service of plan.includedServices) {
+      expect(service.pricingDisplay).toBe(getDerivedServicePricing(service.serviceId)?.display);
+    }
   });
 });

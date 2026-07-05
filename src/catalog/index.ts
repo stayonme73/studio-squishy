@@ -64,6 +64,7 @@ export {
 } from "@/catalog/normalize";
 
 export {
+  getCheckoutPriceDisplay,
   getRouteMapIntakeTemplate,
   getRouteMapPriceDisplay,
   getRouteMapTurnaroundLabel,

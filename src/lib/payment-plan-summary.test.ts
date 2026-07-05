@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getServiceById } from "@/catalog/accessors";
+import { getActiveServices, getDerivedServicePricing, getServiceById } from "@/catalog/accessors";
 import type { ServiceId } from "@/catalog/types";
 import { payment } from "@/config/payment";
 import type { CampaignRecord } from "@/config/studio-board";
@@ -21,6 +21,7 @@ import { saveProjectSummaryPlanDraft } from "@/lib/project-summary-plan-draft";
 import {
   addServiceToPlan,
   buildStudioPlanReview,
+  computeAdditionalCostUsd,
   initialPlanState,
   removeServiceFromPlan,
   swapServiceInPlan,
@@ -87,6 +88,28 @@ describe("plan-pricing", () => {
     expect(totals.oneTimeSubtotalCents).toBe(138500);
     expect(totals.amountDueTodayCents).toBe(138500);
     expect(formatUsdFromCents(totals.amountDueTodayCents)).toBe("$1,385");
+  });
+
+  it("price display labels match derived catalog pricing for active discovery services", () => {
+    const discoveryIds = getActiveServices()
+      .filter((service) => !service.routeMapPriceDisplay)
+      .map((service) => service.id);
+
+    for (const serviceId of discoveryIds) {
+      const lines = buildPlanLineItems([serviceId]);
+      expect(lines).toHaveLength(1);
+      expect(lines[0].priceDisplay).toBe(getDerivedServicePricing(serviceId)?.display);
+    }
+  });
+
+  it("computeAdditionalCostUsd matches catalog-derived amounts", () => {
+    const additionalIds = ["em-001", "cc-001"] as ServiceId[];
+    const expectedUsd = additionalIds.reduce((sum, serviceId) => {
+      const derived = getDerivedServicePricing(serviceId);
+      return sum + (derived?.amountUsd ?? getServiceById(serviceId)!.priceCents / 100);
+    }, 0);
+
+    expect(computeAdditionalCostUsd(additionalIds).amountUsd).toBe(expectedUsd);
   });
 });
 
