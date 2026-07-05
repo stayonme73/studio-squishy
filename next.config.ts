@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/studio-plan-review", destination: "/route-map", permanent: false },
       { source: "/project-summary", destination: "/route-map", permanent: false },
-      { source: "/project-details", destination: "/route-map", permanent: false },
+      { source: "/project-details", destination: "/route-map?step=intake", permanent: false },
       { source: "/payment", destination: "/route-map", permanent: false },
       { source: "/discovery-summary", destination: "/route-map", permanent: false },
       { source: "/studio-guide", destination: "/route-map", permanent: false },
