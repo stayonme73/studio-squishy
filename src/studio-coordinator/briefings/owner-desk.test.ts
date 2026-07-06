@@ -13,7 +13,13 @@ import {
   resolveOwnerDeskGreetingParts,
   resolveOwnerDeskSummary,
   resolveOwnerComplianceHoldPostDecisionBriefing,
+  resolveOwnerComplaintPostDecisionBriefing,
+  resolveOwnerDeadlinePostDecisionBriefing,
   resolveOwnerDirectionDisagreementPostDecisionBriefing,
+  resolveOwnerHeavyLanePostDecisionBriefing,
+  resolveOwnerRefundPostDecisionBriefing,
+  resolveOwnerRevisionPostDecisionBriefing,
+  resolveOwnerScopePostDecisionBriefing,
   resolveOwnerDeskJobPostDecisionBriefing,
   resolveOwnerPostDecisionBriefing,
 } from "./owner-desk";
@@ -314,5 +320,64 @@ describe("owner-desk briefings", () => {
     );
     expect(hold.destination).toBe("waiting_internal");
     expect(hold.message).toContain("internal direction review");
+  });
+
+  it("deadline — post-decision includes Owner Confirmation", () => {
+    const commit = resolveOwnerDeadlinePostDecisionBriefing("owner_commit_deadline");
+    expect(commit.message).toContain("Timeline committed");
+    expect(commit.message).toContain("Confirmed:");
+  });
+
+  it("revision — post-decision includes Owner Confirmation", () => {
+    const allow = resolveOwnerRevisionPostDecisionBriefing("owner_allow_revision");
+    expect(allow.message).toContain("Extra revision round approved");
+    expect(allow.message).toContain("Confirmed:");
+  });
+
+  it("scope — post-decision includes Owner Confirmation", () => {
+    const approve = resolveOwnerScopePostDecisionBriefing("owner_approve_scope_change");
+    expect(approve.message).toContain("Scope change approved");
+    expect(approve.message).toContain("Confirmed:");
+  });
+
+  it("refund — post-decision includes Owner Confirmation", () => {
+    const approve = resolveOwnerRefundPostDecisionBriefing("owner_approve_refund");
+    expect(approve.message).toContain("Refund approved");
+    expect(approve.message).toContain("Confirmed:");
+  });
+
+  it("complaint — post-decision includes Owner Confirmation", () => {
+    const resolve = resolveOwnerComplaintPostDecisionBriefing("owner_resolve_complaint");
+    expect(resolve.message).toContain("Response approved");
+    expect(resolve.message).toContain("Confirmed:");
+  });
+
+  it("heavy lane — post-decision includes Owner Confirmation", () => {
+    const resolve = resolveOwnerHeavyLanePostDecisionBriefing("owner_resolve_heavy_lane", "wait");
+    expect(resolve.message).toContain("Lane order updated");
+    expect(resolve.message).toContain("Confirmed:");
+  });
+
+  it("refund desk — squishy says on closed folder", () => {
+    const briefing = resolveOwnerDeskBriefing({
+      currentItem: sequentialItem({
+        deskItem: {
+          id: "desk:refund:job-1",
+          reason: "refund_eligible",
+          reasonLabel: "14-day refund eligible",
+          campaignId: "c1",
+          campaignName: "Acme",
+          jobId: "job-1",
+          serviceName: "Social",
+          title: "Refund decision",
+          detail: "Eligible",
+          drillDownHref: "/x",
+          updatedAt: "2026-07-03T12:00:00.000Z",
+        },
+        title: "Refund decision",
+      }),
+      now: NOW,
+    });
+    expect(briefing?.squishySays).toContain("refund decision needs you");
   });
 });

@@ -200,4 +200,42 @@ describe("owner-console-sequential", () => {
     expect(desk.items[0]?.trayId).toBe("needs_my_decision");
     expect(desk.items[0]?.exceptionCard?.row.kind).toBe("direction_disagreement");
   });
+
+  it("ranks refund_eligible before scope change", () => {
+    const refund: OwnerDeskItem = {
+      id: "desk:refund:job-1",
+      reason: "refund_eligible",
+      reasonLabel: "14-day refund eligible",
+      campaignId: "c1",
+      campaignName: "Acme",
+      jobId: "job-1",
+      serviceName: "Social",
+      title: "Refund",
+      detail: "Eligible",
+      drillDownHref: "/x",
+      updatedAt: "2026-06-29T10:00:00.000Z",
+    };
+    expect(resolveDeskUrgencyRank(refund)).toBeLessThan(
+      resolveExceptionUrgencyRank(card({ kind: "scope_change" })),
+    );
+  });
+
+  it("maps client_complaint desk item to needs_my_decision", () => {
+    const complaint: OwnerDeskItem = {
+      id: "desk:complaint:int-1",
+      reason: "client_complaint",
+      reasonLabel: "Client complaint",
+      campaignId: "c1",
+      campaignName: "Acme",
+      jobId: "job-1",
+      serviceName: "Social",
+      title: "Complaint",
+      detail: "Unhappy",
+      drillDownHref: "/x",
+      updatedAt: "2026-06-29T12:00:00.000Z",
+      interactionId: "int-1",
+    };
+    expect(resolveTrayForDeskItem(complaint)).toBe("needs_my_decision");
+    expect(resolveDeskUrgencyRank(complaint)).toBe(8);
+  });
 });

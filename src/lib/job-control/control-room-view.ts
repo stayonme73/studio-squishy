@@ -42,13 +42,14 @@ export function resolveOwnerControlRoomFromBundle(
   laneInputs: LaneCapacityInput[];
   waitingTray: WaitingOnClientTrayItem[];
     needsCommunication: NeedsCommunicationQueueItem[];
-  deskInput: {
-    campaignId: string;
-    campaignName: string;
-    jobs: PurchasedJobRecord[];
-    exceptions: NonNullable<ServerTasksEnvelope["exceptionRecords"]>;
-    laneViews: ProductionLaneView[];
-  };
+    deskInput: {
+      campaignId: string;
+      campaignName: string;
+      jobs: PurchasedJobRecord[];
+      exceptions: NonNullable<ServerTasksEnvelope["exceptionRecords"]>;
+      laneViews: ProductionLaneView[];
+      ownerDecisionInteractions: NonNullable<ServerTasksEnvelope["ownerDecisionInteractions"]>;
+    };
 } {
   const listItem = resolveFileRoomListItemView(bundle.envelope);
   const tasks = bundle.tasksEnvelope.tasks ?? [];
@@ -102,6 +103,7 @@ export function resolveOwnerControlRoomFromBundle(
       jobs,
       exceptions,
       laneViews,
+      ownerDecisionInteractions: bundle.tasksEnvelope.ownerDecisionInteractions ?? [],
     },
   };
 }

@@ -61,7 +61,14 @@ export async function PATCH(request: Request, context: RouteContext) {
       body.action === "owner_ask_team_release_gate" ||
       body.action === "owner_final_release" ||
       body.action === "mark_delivered" ||
-      body.action === "issue_refund") &&
+      body.action === "issue_refund" ||
+      body.action === "owner_approve_refund" ||
+      body.action === "owner_deny_refund" ||
+      body.action === "owner_hold_refund" ||
+      body.action === "owner_ask_team_refund" ||
+      body.action === "owner_ask_client_refund" ||
+      body.action === "owner_resolve_heavy_lane" ||
+      body.action === "owner_assign_heavy_lane") &&
     !isOwnerUser(user)
   ) {
     return NextResponse.json({ error: "Owner role required." }, { status: 403 });

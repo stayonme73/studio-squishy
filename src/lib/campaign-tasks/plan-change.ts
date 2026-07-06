@@ -13,7 +13,7 @@ import type {
   TaskWorkflowState,
 } from "./types";
 
-export const CAMPAIGN_TASKS_SCHEMA_VERSION = 10;
+export const CAMPAIGN_TASKS_SCHEMA_VERSION = 11;
 
 export type MergePlanChangeOptions = {
   ownerApproved?: boolean;

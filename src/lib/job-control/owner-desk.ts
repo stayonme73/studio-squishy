@@ -2,6 +2,7 @@ import { ownerConsoleCampaignRoute } from "@/config/owner-console";
 import { OWNER_CONTROL_ROOM_SECTION } from "@/config/job-control";
 import { productionWorkspaceRoute } from "@/config/production-workspace";
 import type { CampaignExceptionRecord } from "@/lib/campaign-tasks/exceptions-types";
+import type { OwnerDecisionInteractionRecord } from "@/lib/campaign-tasks/owner-decision-interaction-types";
 import { isOpenExceptionStatus } from "@/lib/campaign-tasks/exceptions";
 import { resolveOwnerReviewRequired } from "@/lib/campaign-tasks/exceptions-view";
 
@@ -21,6 +22,7 @@ export type OwnerDeskItem = {
   detail: string;
   drillDownHref: string;
   updatedAt: string;
+  interactionId?: string;
 };
 
 const EXCEPTION_REASON_MAP: Partial<
@@ -104,11 +106,59 @@ function deskItemFromApprovalGate(
   return null;
 }
 
+function deskItemFromRefundEligible(
+  job: PurchasedJobRecord,
+  campaignName: string,
+): OwnerDeskItem | null {
+  if (!job.refundEligibleAt || job.refundOwnerDecisionAt) return null;
+
+  return {
+    id: `desk:refund:${job.jobId}`,
+    reason: "refund_eligible",
+    reasonLabel: OWNER_CONTROL_ROOM_SECTION.ownerDeskReasonLabels.refund_eligible,
+    campaignId: job.campaignId,
+    campaignName,
+    jobId: job.jobId,
+    serviceName: job.serviceName,
+    title: `Refund decision — ${job.serviceName}`,
+    detail: "Policy says this job may be eligible — approval is yours.",
+    drillDownHref: productionWorkspaceRoute(job.campaignId, job.jobId),
+    updatedAt: job.updatedAt,
+  };
+}
+
+function deskItemFromComplaint(
+  interaction: OwnerDecisionInteractionRecord,
+  campaignName: string,
+  job: PurchasedJobRecord | undefined,
+): OwnerDeskItem | null {
+  if (interaction.status !== "waiting_owner") return null;
+
+  return {
+    id: `desk:complaint:${interaction.id}`,
+    reason: "client_complaint",
+    reasonLabel: OWNER_CONTROL_ROOM_SECTION.ownerDeskReasonLabels.client_complaint,
+    campaignId: interaction.campaignId,
+    campaignName,
+    jobId: job?.jobId ?? interaction.jobId ?? `${interaction.campaignId}:unknown`,
+    serviceName: job?.serviceName ?? "Campaign",
+    title: "Client complaint — Owner response required",
+    detail: interaction.clientMessage,
+    drillDownHref: ownerConsoleCampaignRoute(interaction.campaignId),
+    updatedAt: interaction.updatedAt,
+    interactionId: interaction.id,
+  };
+}
+
 function deskItemHeavyLaneFull(
   laneViews: readonly ProductionLaneView[],
   nextUp: LaneJobView | null,
+  jobs: readonly PurchasedJobRecord[],
 ): OwnerDeskItem | null {
   if (!isHeavyLaneFull(laneViews) || !nextUp) return null;
+
+  const nextJob = jobs.find((entry) => entry.jobId === nextUp.jobId);
+  if (nextJob?.heavyLaneOwnerDecision) return null;
 
   return {
     id: `desk:heavy-full:${nextUp.jobId}`,
@@ -131,6 +181,7 @@ export type OwnerDeskInput = {
   jobs: readonly PurchasedJobRecord[];
   exceptions: readonly CampaignExceptionRecord[];
   laneViews: readonly ProductionLaneView[];
+  ownerDecisionInteractions?: readonly OwnerDecisionInteractionRecord[];
 };
 
 export function resolveOwnerDeskItems(inputs: readonly OwnerDeskInput[]): OwnerDeskItem[] {
@@ -155,12 +206,30 @@ export function resolveOwnerDeskItems(inputs: readonly OwnerDeskInput[]): OwnerD
         seen.add(gate.id);
         items.push(gate);
       }
+
+      const refund = deskItemFromRefundEligible(job, input.campaignName);
+      if (refund && !seen.has(refund.id)) {
+        seen.add(refund.id);
+        items.push(refund);
+      }
+    }
+
+    for (const interaction of input.ownerDecisionInteractions ?? []) {
+      const linkedJob = interaction.jobId
+        ? input.jobs.find((job) => job.jobId === interaction.jobId)
+        : input.jobs[0];
+      const complaint = deskItemFromComplaint(interaction, input.campaignName, linkedJob);
+      if (complaint && !seen.has(complaint.id)) {
+        seen.add(complaint.id);
+        items.push(complaint);
+      }
     }
   }
 
   const allLaneViews = inputs.flatMap((entry) => entry.laneViews);
+  const allJobs = inputs.flatMap((entry) => entry.jobs);
   const heavyNext = findHeavyLaneNextUp(allLaneViews);
-  const heavyFull = deskItemHeavyLaneFull(allLaneViews, heavyNext);
+  const heavyFull = deskItemHeavyLaneFull(allLaneViews, heavyNext, allJobs);
   if (heavyFull && !seen.has(heavyFull.id)) {
     items.push(heavyFull);
   }

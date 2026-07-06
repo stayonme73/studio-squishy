@@ -49,6 +49,10 @@ import {
   applyOwnerHoldComplianceHold,
 } from "./compliance-hold-actions";
 import {
+  dispatchOwnerDecisionFolderAction,
+  type OwnerDecisionFolderPatchBody,
+} from "./owner-decision-folder-dispatch";
+import {
   applyOwnerAskTeamDirectionDisagreement,
   applyOwnerAssignDirectionDisagreement,
   applyOwnerConfirmDirectionDisagreement,
@@ -250,7 +254,44 @@ export type TasksPatchBody =
       assignToUserId: string;
       ownerNotes?: string;
       note?: string;
-    };
+    }
+  | OwnerDecisionFolderPatchBody;
+
+const OWNER_DECISION_FOLDER_ACTIONS = new Set<string>([
+  "owner_commit_deadline",
+  "owner_hold_deadline",
+  "owner_ask_team_deadline",
+  "owner_ask_client_deadline",
+  "owner_assign_deadline",
+  "owner_allow_revision",
+  "owner_hold_firm_revision",
+  "owner_hold_revision",
+  "owner_ask_team_revision",
+  "owner_ask_client_revision",
+  "owner_assign_revision",
+  "owner_approve_scope_change",
+  "owner_decline_scope_change",
+  "owner_hold_scope_change",
+  "owner_ask_team_scope_change",
+  "owner_ask_client_info_scope_change",
+  "owner_ask_client_approval_scope_change",
+  "owner_assign_scope_change",
+  "owner_resolve_complaint",
+  "owner_escalate_complaint_refund",
+  "owner_escalate_complaint_scope",
+  "owner_escalate_complaint_revision",
+  "owner_hold_complaint",
+  "owner_ask_team_complaint",
+  "owner_ask_client_complaint",
+  "owner_assign_complaint",
+  "owner_decline_complaint_escalation",
+]);
+
+function isOwnerDecisionFolderPatch(
+  body: TasksPatchBody,
+): body is OwnerDecisionFolderPatchBody {
+  return OWNER_DECISION_FOLDER_ACTIONS.has(body.action);
+}
 
 export type TaskActionContext = {
   campaign: CampaignRecord;
@@ -1240,8 +1281,24 @@ export function applyTaskPatch(
       if (!result.ok) return result;
       return { ok: true, envelope: result.envelope, exception: result.exception };
     }
-    default:
+    default: {
+      if (isOwnerDecisionFolderPatch(body)) {
+        const result = dispatchOwnerDecisionFolderAction(
+          envelope,
+          body,
+          user,
+          context.assignments,
+          context.targetUser,
+        );
+        if (!result.ok) return result;
+        return {
+          ok: true,
+          envelope: result.envelope,
+          exception: "exception" in result ? result.exception : undefined,
+        };
+      }
       return { ok: false, error: "Unknown action", status: 400 };
+    }
   }
 }
 

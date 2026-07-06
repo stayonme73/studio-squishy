@@ -86,6 +86,52 @@ export type OwnerDirectionDisagreementAction =
   | "owner_ask_team_direction_disagreement"
   | "owner_assign_direction_disagreement";
 
+export type OwnerDeadlineDecisionAction =
+  | "owner_commit_deadline"
+  | "owner_hold_deadline"
+  | "owner_ask_team_deadline"
+  | "owner_ask_client_deadline"
+  | "owner_assign_deadline";
+
+export type OwnerRevisionDecisionAction =
+  | "owner_allow_revision"
+  | "owner_hold_firm_revision"
+  | "owner_hold_revision"
+  | "owner_ask_team_revision"
+  | "owner_ask_client_revision"
+  | "owner_assign_revision";
+
+export type OwnerScopeDecisionAction =
+  | "owner_approve_scope_change"
+  | "owner_decline_scope_change"
+  | "owner_hold_scope_change"
+  | "owner_ask_team_scope_change"
+  | "owner_ask_client_info_scope_change"
+  | "owner_ask_client_approval_scope_change"
+  | "owner_assign_scope_change";
+
+export type OwnerRefundDecisionAction =
+  | "owner_approve_refund"
+  | "owner_deny_refund"
+  | "owner_hold_refund"
+  | "owner_ask_team_refund"
+  | "owner_ask_client_refund";
+
+export type OwnerComplaintDecisionAction =
+  | "owner_resolve_complaint"
+  | "owner_escalate_complaint_refund"
+  | "owner_escalate_complaint_scope"
+  | "owner_escalate_complaint_revision"
+  | "owner_hold_complaint"
+  | "owner_ask_team_complaint"
+  | "owner_ask_client_complaint"
+  | "owner_assign_complaint"
+  | "owner_decline_complaint_escalation";
+
+export type OwnerHeavyLaneDecisionAction =
+  | "owner_resolve_heavy_lane"
+  | "owner_assign_heavy_lane";
+
 export type OwnerDeskJobAction =
   | "owner_approve_for_review"
   | "owner_send_back_for_review"
@@ -181,6 +227,12 @@ function resolveSquishySaysForItem(item: OwnerConsoleSequentialItem): string {
       case "deadline_exception":
       case "at_risk_job":
         return "A deadline needs your judgment before the team commits further.";
+      case "refund_eligible":
+        return "A refund decision needs you. Policy says this job may be eligible — approval is yours.";
+      case "client_complaint":
+        return "A client issue needs your judgment before Squishy can respond.";
+      case "heavy_lane_full":
+        return "The heavy lane is full. Your call sets which job runs next.";
       default:
         return `${item.deskItem.reasonLabel}. ${item.deskItem.detail}`;
     }
@@ -479,6 +531,241 @@ export function resolveOwnerDirectionDisagreementPostDecisionBriefing(
       return {
         destination: "waiting_internal",
         message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+      };
+    default:
+      return {
+        destination: "recently_handled",
+        message: `Folder archived. Your decision is recorded and this desk stays clear. ${ownerConfirmationSuffix()}`,
+      };
+  }
+}
+
+export function resolveOwnerDeadlinePostDecisionBriefing(
+  action: OwnerDeadlineDecisionAction,
+): OwnerPostDecisionBriefing {
+  switch (action) {
+    case "owner_commit_deadline":
+      return {
+        destination: "production",
+        message: `Timeline committed. This folder left your desk — production will update dispatch. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_hold_deadline":
+      return {
+        destination: "waiting_internal",
+        message: `Held for scheduling review. This folder left your desk — Producer will follow up internally. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_team_deadline":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the team for schedule options. This folder left your desk. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_client_deadline":
+      return {
+        destination: "waiting_on_client",
+        message: `Routed to the client queue for date confirmation. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_assign_deadline":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+      };
+    default:
+      return {
+        destination: "recently_handled",
+        message: `Folder archived. Your decision is recorded and this desk stays clear. ${ownerConfirmationSuffix()}`,
+      };
+  }
+}
+
+export function resolveOwnerRevisionPostDecisionBriefing(
+  action: OwnerRevisionDecisionAction,
+): OwnerPostDecisionBriefing {
+  switch (action) {
+    case "owner_allow_revision":
+      return {
+        destination: "production",
+        message: `Extra revision round approved. This folder left your desk — production will continue. Squishy will notify the client. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_hold_firm_revision":
+      return {
+        destination: "waiting_on_client",
+        message: `Revision limit held. This folder left your desk — Squishy will send the policy-bound message to the client. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_hold_revision":
+      return {
+        destination: "waiting_internal",
+        message: `Held for internal revision review. This folder left your desk — the team will follow up internally. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_team_revision":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to production for revision assessment. This folder left your desk — the team will act from their office. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_client_revision":
+      return {
+        destination: "waiting_on_client",
+        message: `Routed to the client queue for term confirmation. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_assign_revision":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+      };
+    default:
+      return {
+        destination: "recently_handled",
+        message: `Folder archived. Your decision is recorded and this desk stays clear. ${ownerConfirmationSuffix()}`,
+      };
+  }
+}
+
+export function resolveOwnerScopePostDecisionBriefing(
+  action: OwnerScopeDecisionAction,
+): OwnerPostDecisionBriefing {
+  switch (action) {
+    case "owner_approve_scope_change":
+      return {
+        destination: "production",
+        message: `Scope change approved. This folder left your desk — production will replan and continue. Squishy will notify the client if they requested this change. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_decline_scope_change":
+      return {
+        destination: "recently_handled",
+        message: `Scope change declined. This folder left your desk — work stays within the approved plan. Squishy will send the policy-bound outcome if the client asked. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_hold_scope_change":
+      return {
+        destination: "waiting_internal",
+        message: `Held for internal scope review. This folder left your desk — Producer will follow up internally. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_team_scope_change":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the team for scope analysis. This folder left your desk — they will act from their office. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_client_info_scope_change":
+      return {
+        destination: "waiting_on_client",
+        message: `Routed to the client queue for missing information. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_client_approval_scope_change":
+      return {
+        destination: "waiting_on_client",
+        message: `Routed to the client queue for scope confirmation. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_assign_scope_change":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+      };
+    default:
+      return {
+        destination: "recently_handled",
+        message: `Folder archived. Your decision is recorded and this desk stays clear. ${ownerConfirmationSuffix()}`,
+      };
+  }
+}
+
+export function resolveOwnerRefundPostDecisionBriefing(
+  action: OwnerRefundDecisionAction,
+): OwnerPostDecisionBriefing {
+  switch (action) {
+    case "owner_approve_refund":
+      return {
+        destination: "closed",
+        message: `Refund approved. This folder left your desk — the job is closed and Squishy will notify the client with the approved template. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_deny_refund":
+      return {
+        destination: "production",
+        message: `Refund denied. This folder left your desk — the job continues under policy and Squishy will notify the client. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_hold_refund":
+      return {
+        destination: "waiting_internal",
+        message: `Refund held for internal review. This folder left your desk — Producer will follow up internally. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_team_refund":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the team for payment and materials review. This folder left your desk. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_client_refund":
+      return {
+        destination: "waiting_on_client",
+        message: `Routed to the client queue for documentation. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+      };
+    default:
+      return {
+        destination: "recently_handled",
+        message: `Folder archived. Your decision is recorded and this desk stays clear. ${ownerConfirmationSuffix()}`,
+      };
+  }
+}
+
+export function resolveOwnerComplaintPostDecisionBriefing(
+  action: OwnerComplaintDecisionAction,
+): OwnerPostDecisionBriefing {
+  switch (action) {
+    case "owner_resolve_complaint":
+      return {
+        destination: "recently_handled",
+        message: `Response approved. This folder left your desk — Squishy will send your reply to the client. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_escalate_complaint_refund":
+    case "owner_escalate_complaint_scope":
+    case "owner_escalate_complaint_revision":
+      return {
+        destination: "recently_handled",
+        message: `Handed off to a new decision folder. This complaint folder left your desk — resolve refund, scope, or revision on the next folder. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_hold_complaint":
+      return {
+        destination: "waiting_internal",
+        message: `Held for internal review. This folder left your desk — the team will follow up internally. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_team_complaint":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the team for context. This folder left your desk — they will act from their office. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_client_complaint":
+      return {
+        destination: "waiting_on_client",
+        message: `Routed to the client queue for more information. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_assign_complaint":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_decline_complaint_escalation":
+      return {
+        destination: "recently_handled",
+        message: `Policy-bound response recorded. This folder left your desk — Squishy will notify the client. ${ownerConfirmationSuffix()}`,
+      };
+    default:
+      return {
+        destination: "recently_handled",
+        message: `Folder archived. Your decision is recorded and this desk stays clear. ${ownerConfirmationSuffix()}`,
+      };
+  }
+}
+
+export function resolveOwnerHeavyLanePostDecisionBriefing(
+  action: OwnerHeavyLaneDecisionAction,
+  decision?: "wait" | "bump",
+): OwnerPostDecisionBriefing {
+  switch (action) {
+    case "owner_resolve_heavy_lane":
+      return {
+        destination: "production",
+        message: `Lane order updated (${decision ?? "resolved"}). This folder left your desk — production will dispatch accordingly. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_assign_heavy_lane":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to Producer. This folder left your desk — they will reorder the queue. ${ownerConfirmationSuffix()}`,
       };
     default:
       return {

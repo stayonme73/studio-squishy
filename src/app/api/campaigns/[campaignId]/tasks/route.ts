@@ -34,6 +34,8 @@ function teamPayload(
     qaRecords: saved.qaRecords ?? [],
     exceptionRecords: saved.exceptionRecords ?? [],
     exceptionEvents: saved.exceptionEvents ?? [],
+    jobRecords: saved.jobRecords ?? [],
+    ownerDecisionInteractions: saved.ownerDecisionInteractions ?? [],
     tasks: payload.tasks.map((task) => ({
       ...task,
       claimVersion: task.claimedAt ?? null,
@@ -108,22 +110,20 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   let targetUser;
   if (
-    body.action === "reassign" ||
-    body.action === "assign_exception" ||
-    body.action === "owner_ask_team_compliance_hold" ||
-    body.action === "owner_assign_compliance_hold" ||
-    body.action === "owner_ask_team_direction_disagreement" ||
-    body.action === "owner_assign_direction_disagreement"
+    (body.action === "reassign" ||
+      body.action === "assign_exception" ||
+      body.action === "owner_ask_team_compliance_hold" ||
+      body.action === "owner_assign_compliance_hold" ||
+      body.action === "owner_ask_team_direction_disagreement" ||
+      body.action === "owner_assign_direction_disagreement" ||
+      body.action === "owner_assign_deadline" ||
+      body.action === "owner_assign_revision" ||
+      body.action === "owner_assign_scope_change") &&
+    "assignToUserId" in body &&
+    body.assignToUserId
   ) {
     const toUserId =
-      body.action === "reassign"
-        ? body.toUserId
-        : body.action === "assign_exception"
-          ? body.assignToUserId
-          : body.action === "owner_assign_compliance_hold" ||
-              body.action === "owner_assign_direction_disagreement"
-            ? body.assignToUserId
-            : body.assignToUserId;
+      body.action === "reassign" ? body.toUserId : body.assignToUserId;
     if (toUserId) {
       const userRecord = await findUserById(toUserId);
       targetUser = userRecord ? toPublicUser(userRecord) : undefined;

@@ -50,6 +50,8 @@ export const OWNER_CONTROL_ROOM_SECTION = {
     revision_limit_reached: "Revision limit reached",
     at_risk_job: "At-risk job",
     heavy_lane_full: "Heavy lane full",
+    refund_eligible: "14-day refund eligible",
+    client_complaint: "Client complaint",
   } satisfies Record<OwnerDeskReason, string>,
   activeCountLabel: "Active",
   availableSlotsLabel: "Available",

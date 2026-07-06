@@ -27,6 +27,15 @@ import {
 } from "./production-workspace-gates";
 import { parseJobId } from "./lane-map";
 import {
+  applyOwnerApproveRefund,
+  applyOwnerAskClientRefund,
+  applyOwnerAskTeamRefund,
+  applyOwnerAssignHeavyLane,
+  applyOwnerDenyRefund,
+  applyOwnerHoldRefund,
+  applyOwnerResolveHeavyLane,
+} from "./owner-decision-job-actions";
+import {
   isJobWorkPacketRole,
   resolveWorkPacketRolesForJob,
   resolveWorkPacketTasksForRole,
@@ -60,7 +69,14 @@ export type ProductionWorkspacePatchAction =
   | "owner_ask_team_release_gate"
   | "owner_final_release"
   | "mark_delivered"
-  | "issue_refund";
+  | "issue_refund"
+  | "owner_approve_refund"
+  | "owner_deny_refund"
+  | "owner_hold_refund"
+  | "owner_ask_team_refund"
+  | "owner_ask_client_refund"
+  | "owner_resolve_heavy_lane"
+  | "owner_assign_heavy_lane";
 
 export type ProductionWorkspacePatchBody =
   | { action: "start_building_concepts" }
@@ -101,7 +117,14 @@ export type ProductionWorkspacePatchBody =
   | { action: "owner_ask_team_release_gate"; note: string }
   | { action: "owner_final_release" }
   | { action: "mark_delivered" }
-  | { action: "issue_refund"; reason: string };
+  | { action: "issue_refund"; reason: string }
+  | { action: "owner_approve_refund"; reason: string; ownerNotes?: string }
+  | { action: "owner_deny_refund"; ownerNotes?: string; reason?: string }
+  | { action: "owner_hold_refund"; note: string; ownerNotes?: string }
+  | { action: "owner_ask_team_refund"; note: string; ownerNotes?: string }
+  | { action: "owner_ask_client_refund"; clientMessage: string; ownerNotes?: string }
+  | { action: "owner_resolve_heavy_lane"; decision: "wait" | "bump"; ownerNotes?: string }
+  | { action: "owner_assign_heavy_lane"; note: string; ownerNotes?: string };
 
 export type ProductionWorkspacePatchResult =
   | { ok: true; envelope: ServerTasksEnvelope; job: PurchasedJobRecord; updatedCampaign?: CampaignRecord }
@@ -1123,6 +1146,41 @@ export function applyProductionWorkspacePatch(
       events = envelope.jobActivityEvents ?? [];
       break;
     }
+
+    case "owner_approve_refund":
+      return applyOwnerApproveRefund(
+        envelope,
+        campaign,
+        jobId,
+        { reason: body.reason, ownerNotes: body.ownerNotes },
+        user,
+        clientId,
+      );
+
+    case "owner_deny_refund":
+      return applyOwnerDenyRefund(envelope, jobId, body, user);
+
+    case "owner_hold_refund":
+      return applyOwnerHoldRefund(envelope, jobId, body, user);
+
+    case "owner_ask_team_refund":
+      return applyOwnerAskTeamRefund(envelope, jobId, body, user);
+
+    case "owner_ask_client_refund":
+      return applyOwnerAskClientRefund(
+        envelope,
+        campaign,
+        jobId,
+        body,
+        user,
+        clientId,
+      );
+
+    case "owner_resolve_heavy_lane":
+      return applyOwnerResolveHeavyLane(envelope, jobId, body, user, envelope.tasks);
+
+    case "owner_assign_heavy_lane":
+      return applyOwnerAssignHeavyLane(envelope, jobId, body, user);
 
     default:
       return { ok: false, error: "Unknown action.", status: 400 };

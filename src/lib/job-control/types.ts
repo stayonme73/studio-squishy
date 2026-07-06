@@ -23,7 +23,9 @@ export type OwnerDeskReason =
   | "scope_issue"
   | "revision_limit_reached"
   | "at_risk_job"
-  | "heavy_lane_full";
+  | "heavy_lane_full"
+  | "refund_eligible"
+  | "client_complaint";
 
 export type JobCommunicationEventType =
   | "payment_received"
@@ -196,6 +198,10 @@ export type PurchasedJobRecord = {
   ownerApprovalPending?: "before_review" | "before_delivery" | null;
   nonRefundable?: boolean;
   refundEligibleAt?: string | null;
+  /** Set when Owner acts on refund-eligible desk folder — clears desk item. */
+  refundOwnerDecisionAt?: string | null;
+  /** Owner heavy-lane queue decision — clears heavy-lane desk item for queued job. */
+  heavyLaneOwnerDecision?: "wait" | "bump" | null;
   laneQueuedAt?: string;
   /** Required deliverable prep checklist — internal only. */
   deliverablePrep?: readonly JobDeliverablePrep[];

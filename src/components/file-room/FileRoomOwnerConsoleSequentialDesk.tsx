@@ -24,6 +24,13 @@ import {
 } from "@/studio-coordinator";
 
 import {
+  ComplaintDecisionWorkingSurface,
+  HeavyLaneDecisionWorkingSurface,
+  OwnerDecisionFolderWorkingSurface,
+  RefundDecisionWorkingSurface,
+  resolveOwnerDecisionConfigKey,
+} from "./OwnerDecisionFolderSurfaces";
+import {
   FileRoomOwnerConsoleActionBar,
   FileRoomOwnerConsoleDecisionDetail,
   FileRoomOwnerConsoleDecisionPanels,
@@ -154,7 +161,7 @@ function ClosedFolderCard({
   );
 }
 
-function CoordinatorFolderBrief({
+export function CoordinatorFolderBrief({
   item,
 }: {
   item: OwnerConsoleSequentialItem;
@@ -806,6 +813,60 @@ function DeskWorkingSurface({
   busy: boolean;
   actions: OwnerConsoleActions;
 }) {
+  if (item.deskItem?.reason === "refund_eligible") {
+    return (
+      <RefundDecisionWorkingSurface
+        item={item}
+        busy={busy}
+        onApprove={(reason, ownerNotes) => void actions.confirmApproveRefund(item, reason, ownerNotes)}
+        onDeny={(ownerNotes) => void actions.confirmDenyRefund(item, ownerNotes)}
+        onHold={(note, ownerNotes) => void actions.confirmHoldRefund(item, note, ownerNotes)}
+        onAskTeam={(note, ownerNotes) => void actions.confirmAskTeamRefund(item, note, ownerNotes)}
+        onAskClient={(clientMessage, ownerNotes) =>
+          void actions.confirmAskClientRefund(item, clientMessage, ownerNotes)
+        }
+      />
+    );
+  }
+
+  if (item.deskItem?.reason === "heavy_lane_full") {
+    return (
+      <HeavyLaneDecisionWorkingSurface
+        item={item}
+        busy={busy}
+        onWait={(ownerNotes) => void actions.confirmHeavyLaneWait(item, ownerNotes)}
+        onBump={(ownerNotes) => void actions.confirmHeavyLaneBump(item, ownerNotes)}
+        onAssign={(note, ownerNotes) => void actions.confirmAssignHeavyLane(item, note, ownerNotes)}
+      />
+    );
+  }
+
+  if (item.deskItem?.reason === "client_complaint") {
+    return (
+      <ComplaintDecisionWorkingSurface
+        item={item}
+        busy={busy}
+        onResolve={(clientReply, ownerNotes) =>
+          void actions.confirmResolveComplaint(item, clientReply, ownerNotes)
+        }
+        onEscalateRefund={(ownerNotes) => void actions.confirmEscalateComplaintRefund(item, ownerNotes)}
+        onEscalateScope={(ownerNotes) => void actions.confirmEscalateComplaintScope(item, ownerNotes)}
+        onEscalateRevision={(ownerNotes) =>
+          void actions.confirmEscalateComplaintRevision(item, ownerNotes)
+        }
+        onDecline={(clientReply, ownerNotes) =>
+          void actions.confirmDeclineComplaint(item, clientReply, ownerNotes)
+        }
+        onHold={(note, ownerNotes) => void actions.confirmHoldComplaint(item, note, ownerNotes)}
+        onAskTeam={(note, ownerNotes) => void actions.confirmAskTeamComplaint(item, note, ownerNotes)}
+        onAskClient={(clientMessage, ownerNotes) =>
+          void actions.confirmAskClientComplaint(item, clientMessage, ownerNotes)
+        }
+        onAssign={(ownerNotes, note) => void actions.confirmAssignComplaint(item, ownerNotes, note)}
+      />
+    );
+  }
+
   if (item.deskItem?.reason === "approval_before_review") {
     return (
       <ReviewGateWorkingSurface
@@ -1056,6 +1117,75 @@ export default function FileRoomOwnerConsoleSequentialDesk({
                   }
                   onAssign={(assignToUserId, ownerNotes, note) =>
                     actions.confirmAssignDirectionDisagreement(
+                      selectedCard,
+                      assignToUserId,
+                      ownerNotes,
+                      note,
+                    )
+                  }
+                />
+              ) : selectedCard && operatorContext && resolveOwnerDecisionConfigKey(selectedCard.row.kind) ? (
+                <OwnerDecisionFolderWorkingSurface
+                  item={currentItem}
+                  card={selectedCard}
+                  operatorContext={operatorContext}
+                  configKey={resolveOwnerDecisionConfigKey(selectedCard.row.kind)!}
+                  busy={actions.busy}
+                  onPrimary={(ownerNotes) =>
+                    actions.confirmOwnerDecisionPrimary(selectedCard, ownerNotes)
+                  }
+                  onSecondary={
+                    selectedCard.row.kind === "revision_exhausted" ||
+                    selectedCard.row.kind === "scope_change"
+                      ? (ownerNotes) =>
+                          actions.confirmOwnerDecisionSecondary(selectedCard, ownerNotes)
+                      : undefined
+                  }
+                  onHold={(note, ownerNotes) =>
+                    actions.confirmOwnerDecisionHold(selectedCard, note, ownerNotes)
+                  }
+                  onAskTeam={(note, ownerNotes, assignToUserId) =>
+                    actions.confirmOwnerDecisionAskTeam(
+                      selectedCard,
+                      note,
+                      ownerNotes,
+                      assignToUserId,
+                    )
+                  }
+                  onAskClient={
+                    selectedCard.row.kind === "deadline_commitment" ||
+                    selectedCard.row.kind === "deadline_risk"
+                      ? (clientMessage, ownerNotes) =>
+                          actions.confirmOwnerDecisionAskClient(
+                            selectedCard,
+                            clientMessage,
+                            ownerNotes,
+                          )
+                      : undefined
+                  }
+                  onAskClientInfo={
+                    selectedCard.row.kind === "scope_change"
+                      ? (clientMessage, ownerNotes) =>
+                          actions.confirmOwnerDecisionAskClientInfo(
+                            selectedCard,
+                            clientMessage,
+                            ownerNotes,
+                          )
+                      : undefined
+                  }
+                  onAskClientApproval={
+                    selectedCard.row.kind === "revision_exhausted" ||
+                    selectedCard.row.kind === "scope_change"
+                      ? (clientMessage, ownerNotes) =>
+                          actions.confirmOwnerDecisionAskClientApproval(
+                            selectedCard,
+                            clientMessage,
+                            ownerNotes,
+                          )
+                      : undefined
+                  }
+                  onAssign={(assignToUserId, ownerNotes, note) =>
+                    actions.confirmOwnerDecisionAssign(
                       selectedCard,
                       assignToUserId,
                       ownerNotes,

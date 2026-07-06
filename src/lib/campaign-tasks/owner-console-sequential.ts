@@ -125,6 +125,8 @@ export function resolveDeskUrgencyRank(item: OwnerDeskItem): number {
       return 2;
     case "approval_before_review":
       return 3;
+    case "refund_eligible":
+      return 4;
     case "scope_issue":
       return 5;
     case "revision_limit_reached":
@@ -132,6 +134,8 @@ export function resolveDeskUrgencyRank(item: OwnerDeskItem): number {
     case "deadline_exception":
     case "at_risk_job":
       return 7;
+    case "client_complaint":
+      return 8;
     case "heavy_lane_full":
       return 10;
     default:

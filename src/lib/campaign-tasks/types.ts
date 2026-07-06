@@ -192,9 +192,11 @@ export type CampaignTasksRecord = {
   jobReviewFeedback?: import("@/lib/job-control/review-feedback-types").JobReviewFeedback[];
   /** Durable client communication outbox / receipts (schema v9). */
   jobCommunicationRecords?: JobCommunicationRecord[];
-  /** Schema v10 adds internal job Work Packets on PurchasedJobRecord. */
+  /** Owner decision desk — interaction-backed folders (schema v11). */
+  ownerDecisionInteractions?: import("./owner-decision-interaction-types").OwnerDecisionInteractionRecord[];
+  /** Schema v10 adds internal job Work Packets on PurchasedJobRecord. Schema v11 adds ownerDecisionInteractions. */
   updatedAt: string;
-  /** Envelope schema version — 10 adds internal job Work Packet records. */
+  /** Envelope schema version — 11 adds owner decision interaction records. */
   version: number;
 };
 
