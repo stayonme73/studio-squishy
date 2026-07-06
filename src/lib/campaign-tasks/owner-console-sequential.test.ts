@@ -160,4 +160,24 @@ describe("owner-console-sequential", () => {
     expect(desk.items[1]?.id).toBe("exception:scope");
     expect(desk.trays.find((tray) => tray.id === "ready_to_release")?.count).toBe(1);
   });
+
+  it("places compliance_hold in needs_my_decision tray", () => {
+    const view = {
+      waitingOnOwner: [
+        card({
+          id: "exc-compliance",
+          kind: "compliance_hold",
+          updatedAt: "2026-06-29T12:00:00.000Z",
+        }),
+      ],
+      waitingCount: 1,
+      campaignCount: 1,
+      isEmpty: false,
+      campaigns: [],
+    };
+
+    const desk = resolveOwnerConsoleSequentialDesk(view, emptyControlRoom(), emptyScan());
+    expect(desk.items[0]?.trayId).toBe("needs_my_decision");
+    expect(desk.items[0]?.exceptionCard?.row.kind).toBe("compliance_hold");
+  });
 });

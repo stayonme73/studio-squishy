@@ -107,9 +107,20 @@ export async function PATCH(request: Request, context: RouteContext) {
   ]);
 
   let targetUser;
-  if (body.action === "reassign" || body.action === "assign_exception") {
+  if (
+    body.action === "reassign" ||
+    body.action === "assign_exception" ||
+    body.action === "owner_ask_team_compliance_hold" ||
+    body.action === "owner_assign_compliance_hold"
+  ) {
     const toUserId =
-      body.action === "reassign" ? body.toUserId : body.assignToUserId;
+      body.action === "reassign"
+        ? body.toUserId
+        : body.action === "assign_exception"
+          ? body.assignToUserId
+          : body.action === "owner_assign_compliance_hold"
+            ? body.assignToUserId
+            : body.assignToUserId;
     if (toUserId) {
       const userRecord = await findUserById(toUserId);
       targetUser = userRecord ? toPublicUser(userRecord) : undefined;

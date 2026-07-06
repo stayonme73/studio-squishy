@@ -4,7 +4,7 @@ import {
 } from "@/config/campaign-exceptions";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 
 import {
@@ -142,7 +142,11 @@ export function resolveOwnerReviewRequired(record: CampaignExceptionRecord): boo
     return record.status === "waiting_owner" || record.status === "open";
   }
 
-  return exceptionKindRequiresOwner(record.kind);
+  if (exceptionKindRequiresOwner(record.kind)) {
+    return record.status === "waiting_owner" || record.status === "open";
+  }
+
+  return false;
 }
 
 export function resolveSentToClientBadge(record: CampaignExceptionRecord): boolean {

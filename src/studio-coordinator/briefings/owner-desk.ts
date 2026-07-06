@@ -64,7 +64,17 @@ type OwnerConsoleTaskAction =
   | "resolve_exception"
   | "approve_client_request"
   | "assign_exception"
-  | "decline_promotion";
+  | "decline_promotion"
+  | "owner_clear_compliance_hold"
+  | "owner_hold_compliance_hold"
+  | "owner_ask_team_compliance_hold"
+  | "owner_assign_compliance_hold";
+
+export type OwnerComplianceHoldAction =
+  | "owner_clear_compliance_hold"
+  | "owner_hold_compliance_hold"
+  | "owner_ask_team_compliance_hold"
+  | "owner_assign_compliance_hold";
 
 export type OwnerDeskJobAction =
   | "owner_approve_for_review"
@@ -397,6 +407,42 @@ function destinationForResolve(kind: CampaignExceptionKind): OwnerPostDecisionDe
       return "waiting_internal";
     default:
       return "production";
+  }
+}
+
+function ownerConfirmationSuffix(): string {
+  return "Confirmed: destination assigned, notifications queued, record updated, desk clear.";
+}
+
+export function resolveOwnerComplianceHoldPostDecisionBriefing(
+  action: OwnerComplianceHoldAction,
+): OwnerPostDecisionBriefing {
+  switch (action) {
+    case "owner_clear_compliance_hold":
+      return {
+        destination: "production",
+        message: `Hold cleared. This folder left your desk — production and QA will continue from here. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_hold_compliance_hold":
+      return {
+        destination: "waiting_internal",
+        message: `Held for internal QA review. This folder left your desk — the team will follow up internally. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_team_compliance_hold":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to QA or production for investigation. This folder left your desk. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_assign_compliance_hold":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+      };
+    default:
+      return {
+        destination: "recently_handled",
+        message: `Folder archived. Your decision is recorded and this desk stays clear. ${ownerConfirmationSuffix()}`,
+      };
   }
 }
 

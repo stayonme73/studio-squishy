@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import {
   resolveFileRoomExceptionsView,
@@ -172,6 +172,14 @@ describe("exceptions-view", () => {
     expect(resolveOwnerReviewRequired(awaitingOwner)).toBe(true);
     expect(resolveSentToClientBadge(awaitingOwner)).toBe(false);
     expect(resolveNextRequiredAction(awaitingOwner)).toContain("Owner");
+  });
+
+  it("compliance_hold waiting_internal is off Owner desk", () => {
+    const held = exception({
+      kind: "compliance_hold",
+      status: "waiting_internal",
+    });
+    expect(resolveOwnerReviewRequired(held)).toBe(false);
   });
 
   it("tracks open and resolved counts", () => {

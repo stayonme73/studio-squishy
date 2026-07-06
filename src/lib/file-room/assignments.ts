@@ -1,15 +1,13 @@
 import { promises as fs } from "fs";
 import path from "path";
 
+import type { CampaignAssignmentsFile } from "./assignments-shared";
 import seedAssignments from "./campaign-assignments.seed.json";
 
-const ASSIGNMENTS_PATH = path.join(process.cwd(), "data", "campaign-assignments.json");
+export type { CampaignAssignmentsFile } from "./assignments-shared";
+export { isStaffAssignedToCampaign, staffAssignedCampaignIds } from "./assignments-shared";
 
-export type CampaignAssignmentsFile = {
-  staffByUserId: Record<string, readonly string[]>;
-  /** Production roles each staff user may perform (Slice 3b-b-a). */
-  staffCapabilities?: Record<string, readonly string[]>;
-};
+const ASSIGNMENTS_PATH = path.join(process.cwd(), "data", "campaign-assignments.json");
 
 function normalizeCapabilities(
   raw: CampaignAssignmentsFile["staffCapabilities"] | undefined,
@@ -86,19 +84,4 @@ export async function assignStaffToCampaign(
       [userId]: [campaignId],
     },
   });
-}
-
-export function staffAssignedCampaignIds(
-  assignments: CampaignAssignmentsFile,
-  userId: string,
-): readonly string[] {
-  return assignments.staffByUserId[userId] ?? [];
-}
-
-export function isStaffAssignedToCampaign(
-  assignments: CampaignAssignmentsFile,
-  userId: string,
-  campaignId: string,
-): boolean {
-  return staffAssignedCampaignIds(assignments, userId).includes(campaignId);
 }

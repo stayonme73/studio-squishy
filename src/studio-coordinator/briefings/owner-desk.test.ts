@@ -12,6 +12,7 @@ import {
   resolveOwnerDeskGreeting,
   resolveOwnerDeskGreetingParts,
   resolveOwnerDeskSummary,
+  resolveOwnerComplianceHoldPostDecisionBriefing,
   resolveOwnerDeskJobPostDecisionBriefing,
   resolveOwnerPostDecisionBriefing,
 } from "./owner-desk";
@@ -260,5 +261,29 @@ describe("owner-desk briefings", () => {
     const result = resolveOwnerDeskJobPostDecisionBriefing("owner_send_back_for_release");
     expect(result.destination).toBe("production");
     expect(result.message).toContain("left your desk");
+  });
+
+  it("compliance hold — squishy says on closed folder", () => {
+    const card = decisionCard();
+    card.row.kind = "compliance_hold";
+    const briefing = resolveOwnerDeskBriefing({
+      currentItem: sequentialItem({
+        exceptionCard: card,
+        title: "Compliance hold — unverified claim",
+      }),
+      now: NOW,
+    });
+    expect(briefing?.squishySays).toContain("Compliance needs your review");
+  });
+
+  it("compliance hold — post-decision includes Owner Confirmation", () => {
+    const clear = resolveOwnerComplianceHoldPostDecisionBriefing("owner_clear_compliance_hold");
+    expect(clear.destination).toBe("production");
+    expect(clear.message).toContain("left your desk");
+    expect(clear.message).toContain("Confirmed:");
+
+    const hold = resolveOwnerComplianceHoldPostDecisionBriefing("owner_hold_compliance_hold");
+    expect(hold.destination).toBe("waiting_internal");
+    expect(hold.message).toContain("internal QA review");
   });
 });

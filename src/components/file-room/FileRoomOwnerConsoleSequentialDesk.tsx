@@ -11,6 +11,7 @@ import type {
   OwnerConsoleCampaignContext,
   OwnerConsoleDecisionCard,
 } from "@/lib/campaign-tasks/owner-console-view";
+import type { FileRoomExceptionOperatorContext } from "@/lib/campaign-tasks/exceptions-view";
 import type {
   OwnerConsoleSequentialDeskView,
   OwnerConsoleSequentialItem,
@@ -478,6 +479,165 @@ function ReleaseGateWorkingSurface({
   );
 }
 
+function ComplianceHoldWorkingSurface({
+  item,
+  card,
+  operatorContext,
+  busy,
+  onClear,
+  onHold,
+  onAskTeam,
+  onAssign,
+}: {
+  item: OwnerConsoleSequentialItem;
+  card: OwnerConsoleDecisionCard;
+  operatorContext: FileRoomExceptionOperatorContext;
+  busy: boolean;
+  onClear: (ownerNotes: string) => void;
+  onHold: (note: string, ownerNotes: string) => void;
+  onAskTeam: (note: string, ownerNotes: string, assignToUserId?: string) => void;
+  onAssign: (assignToUserId: string, ownerNotes: string, note: string) => void;
+}) {
+  const [teamNote, setTeamNote] = useState("");
+  const [ownerNotes, setOwnerNotes] = useState("");
+  const [assignToUserId, setAssignToUserId] = useState("");
+
+  useEffect(() => {
+    setTeamNote("");
+    setOwnerNotes("");
+    setAssignToUserId("");
+  }, [item.id]);
+
+  const { complianceHold } = ownerConsole;
+
+  return (
+    <article className="fr-owner-sequential__working-surface">
+      <CoordinatorFolderBrief item={item} />
+      <header className="fr-owner-sequential__working-head">
+        <p className="fr-owner-sequential__working-campaign">{item.campaignName}</p>
+        <h3 className="fr-owner-sequential__working-title">{item.title}</h3>
+        <p className="fr-owner-sequential__working-meta">{item.tabLabel}</p>
+      </header>
+      <dl className="fr-owner-console-card__fields">
+        <div className="fr-owner-console-card__field">
+          <dt>What you decide</dt>
+          <dd>{complianceHold.decisionQuestion}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>What you review</dt>
+          <dd>{complianceHold.whatTagiaReviews}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>{ownerConsole.fieldLabels.whatHappened}</dt>
+          <dd>{card.whatHappened}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>{ownerConsole.fieldLabels.whyOwner}</dt>
+          <dd>{card.whyOwner}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>{ownerConsole.fieldLabels.availableActions}</dt>
+          <dd>
+            <ul className="fr-owner-console-card__action-list">
+              {complianceHold.availableActions.map((action) => (
+                <li key={action.id}>
+                  <strong>{action.label}</strong>
+                  {" — "}
+                  {action.whereAfter}
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      </dl>
+      <div className="fr-owner-sequential__review-gate-notes">
+        <label className="fr-owner-sequential__review-gate-label" htmlFor="compliance-owner-notes">
+          {complianceHold.ownerNotesLabel}
+        </label>
+        <textarea
+          id="compliance-owner-notes"
+          className="fr-owner-sequential__review-gate-textarea"
+          rows={2}
+          value={ownerNotes}
+          disabled={busy}
+          placeholder={complianceHold.ownerNotesPlaceholder}
+          onChange={(event) => setOwnerNotes(event.target.value)}
+        />
+        <label className="fr-owner-sequential__review-gate-label" htmlFor="compliance-team-note">
+          {complianceHold.teamNoteLabel}
+        </label>
+        <textarea
+          id="compliance-team-note"
+          className="fr-owner-sequential__review-gate-textarea"
+          rows={3}
+          value={teamNote}
+          disabled={busy}
+          placeholder={complianceHold.teamNotePlaceholder}
+          onChange={(event) => setTeamNote(event.target.value)}
+        />
+        <label className="fr-owner-sequential__review-gate-label" htmlFor="compliance-assign-to">
+          {complianceHold.assignToLabel}
+        </label>
+        <select
+          id="compliance-assign-to"
+          className="fr-owner-sequential__review-gate-textarea"
+          value={assignToUserId}
+          disabled={busy}
+          onChange={(event) => setAssignToUserId(event.target.value)}
+        >
+          <option value="">Select assignee (optional for Ask team)</option>
+          {operatorContext.assignCandidates.map((candidate) => (
+            <option key={candidate.userId} value={candidate.userId}>
+              {candidate.displayName}
+              {candidate.isOwner ? " (Owner)" : ""}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="fr-owner-console-actions">
+        <button
+          type="button"
+          className="utility-btn utility-btn--primary"
+          disabled={busy}
+          onClick={() => onClear(ownerNotes)}
+        >
+          {complianceHold.clearLabel}
+        </button>
+        <button
+          type="button"
+          className="utility-btn"
+          disabled={busy}
+          onClick={() => onHold(teamNote, ownerNotes)}
+        >
+          {complianceHold.holdLabel}
+        </button>
+        <button
+          type="button"
+          className="utility-btn"
+          disabled={busy}
+          onClick={() => onAskTeam(teamNote, ownerNotes, assignToUserId || undefined)}
+        >
+          {complianceHold.askTeamLabel}
+        </button>
+        <button
+          type="button"
+          className="utility-btn"
+          disabled={busy || !assignToUserId}
+          onClick={() => onAssign(assignToUserId, ownerNotes, teamNote)}
+        >
+          {complianceHold.assignLabel}
+        </button>
+        <Link
+          className="utility-btn"
+          href={ownerConsoleCampaignRoute(card.campaignId, card.id)}
+        >
+          {complianceHold.openFileRoomLabel}
+        </Link>
+      </div>
+    </article>
+  );
+}
+
 function DeskWorkingSurface({
   item,
   busy,
@@ -686,7 +846,36 @@ export default function FileRoomOwnerConsoleSequentialDesk({
                 {ownerConsole.closeFolderLabel}
               </button>
 
-              {selectedCard && operatorContext ? (
+              {selectedCard?.row.kind === "compliance_hold" && operatorContext ? (
+                <ComplianceHoldWorkingSurface
+                  item={currentItem}
+                  card={selectedCard}
+                  operatorContext={operatorContext}
+                  busy={actions.busy}
+                  onClear={(ownerNotes) =>
+                    actions.confirmClearComplianceHold(selectedCard, ownerNotes)
+                  }
+                  onHold={(note, ownerNotes) =>
+                    actions.confirmHoldComplianceHold(selectedCard, note, ownerNotes)
+                  }
+                  onAskTeam={(note, ownerNotes, assignToUserId) =>
+                    actions.confirmAskTeamComplianceHold(
+                      selectedCard,
+                      note,
+                      ownerNotes,
+                      assignToUserId,
+                    )
+                  }
+                  onAssign={(assignToUserId, ownerNotes, note) =>
+                    actions.confirmAssignComplianceHold(
+                      selectedCard,
+                      assignToUserId,
+                      ownerNotes,
+                      note,
+                    )
+                  }
+                />
+              ) : selectedCard && operatorContext ? (
                 <>
                   <CoordinatorFolderBrief item={currentItem} />
                   <FileRoomOwnerConsoleDecisionDetail selectedCard={selectedCard} />

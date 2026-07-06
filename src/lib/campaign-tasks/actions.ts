@@ -4,7 +4,7 @@ import { applyPinQaToVersion } from "@/lib/campaign-production/actions";
 import { requiresKitchenWorkVersionId, validateOptionalQaBlockWorkVersionId, validateWorkVersionIdForTask } from "@/lib/campaign-production/validation";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import type { CampaignMaterialItem, MaterialCategory, MaterialContentKind, MaterialRequirementLevel, ServerMaterialsEnvelope } from "@/lib/materials/types";
 
 import {
@@ -42,6 +42,12 @@ import {
   workflowBlockedReasonForMissingClientFact,
   workflowBlockedReasonForQaBlock,
 } from "./qa";
+import {
+  applyOwnerAskTeamComplianceHold,
+  applyOwnerAssignComplianceHold,
+  applyOwnerClearComplianceHold,
+  applyOwnerHoldComplianceHold,
+} from "./compliance-hold-actions";
 import {
   applyApproveClientRequest,
   applyAssignException,
@@ -188,6 +194,31 @@ export type TasksPatchBody =
       action: "decline_promotion";
       exceptionId: string;
       notes?: string;
+    }
+  | {
+      action: "owner_clear_compliance_hold";
+      exceptionId: string;
+      ownerNotes?: string;
+    }
+  | {
+      action: "owner_hold_compliance_hold";
+      exceptionId: string;
+      note: string;
+      ownerNotes?: string;
+    }
+  | {
+      action: "owner_ask_team_compliance_hold";
+      exceptionId: string;
+      note: string;
+      ownerNotes?: string;
+      assignToUserId?: string;
+    }
+  | {
+      action: "owner_assign_compliance_hold";
+      exceptionId: string;
+      assignToUserId: string;
+      ownerNotes?: string;
+      note?: string;
     };
 
 export type TaskActionContext = {
@@ -1085,6 +1116,51 @@ export function applyTaskPatch(
     }
     case "decline_promotion": {
       const result = applyDeclinePromotion(envelope, body, user, context.assignments);
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "owner_clear_compliance_hold": {
+      const result = applyOwnerClearComplianceHold(
+        envelope,
+        body,
+        user,
+        context.assignments,
+      );
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "owner_hold_compliance_hold": {
+      const result = applyOwnerHoldComplianceHold(
+        envelope,
+        body,
+        user,
+        context.assignments,
+      );
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "owner_ask_team_compliance_hold": {
+      const result = applyOwnerAskTeamComplianceHold(
+        envelope,
+        body,
+        user,
+        context.assignments,
+        context.targetUser,
+      );
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "owner_assign_compliance_hold": {
+      if (!context.targetUser) {
+        return { ok: false, error: "Assignee not found.", status: 404 };
+      }
+      const result = applyOwnerAssignComplianceHold(
+        envelope,
+        body,
+        user,
+        context.assignments,
+        context.targetUser,
+      );
       if (!result.ok) return result;
       return { ok: true, envelope: result.envelope, exception: result.exception };
     }

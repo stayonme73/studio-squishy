@@ -44,9 +44,11 @@ export {
   resolveOwnerDeskGreetingParts,
   resolveOwnerDeskSummary,
   resolveOwnerDeskJobPostDecisionBriefing,
+  resolveOwnerComplianceHoldPostDecisionBriefing,
   resolveOwnerPostDecisionBriefing,
 } from "./briefings/owner-desk";
 export type {
+  OwnerComplianceHoldAction,
   OwnerDeskBriefing,
   OwnerDeskBriefingFacts,
   OwnerDeskBreakdownLine,

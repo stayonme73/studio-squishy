@@ -134,6 +134,56 @@ export const ownerConsole = {
       },
     ],
   },
+  complianceHold: {
+    decisionQuestion: "Is this work cleared to continue, or does it need a different path?",
+    whatTagiaReviews:
+      "Review the QA compliance flag and notes before you clear the hold or send it back for investigation.",
+    ownerNotesLabel: "Owner Notes",
+    ownerNotesPlaceholder:
+      "Your reasoning for this decision — saved to the historical record.",
+    teamNoteLabel: "Note for QA / production",
+    teamNotePlaceholder: "What needs to be verified or investigated?",
+    assignToLabel: "Assign to",
+    confirmClear:
+      "Clear this compliance hold and return work to production? Linked QA blockers will clear when applicable.",
+    confirmHold:
+      "Hold this compliance review for internal follow-up? The folder will leave your desk.",
+    confirmAskTeam:
+      "Send this back to the team with your note? The folder will leave your desk.",
+    confirmAssign:
+      "Assign this compliance hold to the selected team member? The folder will leave your desk.",
+    clearLabel: "Clear / resolve",
+    holdLabel: "Hold",
+    askTeamLabel: "Ask team",
+    assignLabel: "Assign",
+    openFileRoomLabel: "Open File Room",
+    availableActions: [
+      {
+        id: "clear",
+        label: "Clear / resolve",
+        wired: true,
+        whereAfter: "Production — QA continues; folder leaves your desk immediately.",
+      },
+      {
+        id: "hold",
+        label: "Hold",
+        wired: true,
+        whereAfter: "Needs Clarification — internal QA hold; task stays blocked.",
+      },
+      {
+        id: "ask_team",
+        label: "Ask team",
+        wired: true,
+        whereAfter: "Back to QA or production — internal investigation.",
+      },
+      {
+        id: "assign",
+        label: "Assign",
+        wired: true,
+        whereAfter: "Back to assignee — folder leaves your desk.",
+      },
+    ],
+  },
   waitingSectionTitle: "Waiting on you",
   waitingEmptyTitle: "Nothing waiting on you",
   waitingEmptyBody:
