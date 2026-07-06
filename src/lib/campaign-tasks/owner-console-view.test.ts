@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import {
   dedupeOwnerConsoleWaitingCards,
@@ -144,13 +144,12 @@ describe("owner-console-view", () => {
     expect(view.waitingCount).toBe(2);
     expect(view.campaignCount).toBe(2);
     expect(view.waitingOnOwner.map((card) => card.campaignId)).toEqual([
-      "campaign-1",
       "campaign-2",
+      "campaign-1",
     ]);
-    expect(view.waitingOnOwner[0]?.whatHappened).toContain("QA: Claim needs verification");
-    expect(view.waitingOnOwner[0]?.availableActions.some((a) => a.kind === "resolve")).toBe(
-      true,
-    );
+    const alphaCard = view.waitingOnOwner.find((entry) => entry.campaignId === "campaign-1");
+    expect(alphaCard?.whatHappened).toContain("QA: Claim needs verification");
+    expect(alphaCard?.availableActions.some((a) => a.kind === "resolve")).toBe(true);
   });
 
   it("sorts QA-auto-created before other waiting items", () => {

@@ -18,6 +18,7 @@ import type { ProductionLaneView } from "./capacity";
 import { addClientDeliveryFile, syncCampaignStatusAfterDelivery } from "./final-delivery-actions";
 import { canMarkJobDelivered, canOwnerFinalRelease } from "./final-delivery-gates";
 import {
+  canOwnerActOnReviewGate,
   canOwnerApproveForReview,
   canSubmitForOwnerApproval,
   canTransitionToBuildingConcepts,
@@ -50,6 +51,10 @@ export type ProductionWorkspacePatchAction =
   | "add_client_delivery_file"
   | "submit_for_owner_approval"
   | "owner_approve_for_review"
+  | "owner_send_back_for_review"
+  | "owner_hold_review_gate"
+  | "owner_ask_team_review_gate"
+  | "owner_ask_client_review_gate"
   | "owner_final_release"
   | "mark_delivered"
   | "issue_refund";
@@ -84,6 +89,10 @@ export type ProductionWorkspacePatchBody =
     }
   | { action: "submit_for_owner_approval" }
   | { action: "owner_approve_for_review" }
+  | { action: "owner_send_back_for_review"; note: string }
+  | { action: "owner_hold_review_gate"; note: string }
+  | { action: "owner_ask_team_review_gate"; note: string }
+  | { action: "owner_ask_client_review_gate"; clientMessage: string }
   | { action: "owner_final_release" }
   | { action: "mark_delivered" }
   | { action: "issue_refund"; reason: string };
@@ -98,6 +107,81 @@ function actorFromUser(user: StudioUser): JobActivityActor {
     userId: user.id,
     displayName: user.displayName ?? user.email,
   };
+}
+
+function clearOwnerReviewGatePending(
+  job: PurchasedJobRecord,
+  occurredAt: string,
+): PurchasedJobRecord {
+  return {
+    ...job,
+    ownerApprovalPending: null,
+    updatedAt: occurredAt,
+  };
+}
+
+function clearDeliverablePrepFlags(job: PurchasedJobRecord): PurchasedJobRecord {
+  return {
+    ...job,
+    deliverablePrep: (job.deliverablePrep ?? []).map((entry) => ({
+      ...entry,
+      preparedAt: undefined,
+      preparedBy: undefined,
+    })),
+  };
+}
+
+function appendOwnerInternalNote(
+  job: PurchasedJobRecord,
+  events: JobActivityEvent[],
+  actor: JobActivityActor,
+  occurredAt: string,
+  content: string,
+): { job: PurchasedJobRecord; events: JobActivityEvent[] } {
+  const note = {
+    id: `note:${job.jobId}:${occurredAt}`,
+    content,
+    createdAt: occurredAt,
+    author: actor,
+  };
+
+  const updatedJob = {
+    ...job,
+    internalNotes: [...(job.internalNotes ?? []), note],
+    updatedAt: occurredAt,
+  };
+
+  const updatedEvents = appendJobActivityEvent(events, {
+    campaignId: job.campaignId,
+    jobId: job.jobId,
+    kind: "internal_note",
+    occurredAt,
+    actor,
+    reason: "Owner review gate note",
+    messageContent: content,
+  });
+
+  return { job: updatedJob, events: updatedEvents };
+}
+
+function requireOwnerReviewGateAction(
+  job: PurchasedJobRecord,
+  user: StudioUser,
+): { ok: true } | { ok: false; error: string; status: number } {
+  if (!isOwnerUser(user)) {
+    return { ok: false, error: "Owner role required.", status: 403 };
+  }
+
+  const gate = canOwnerActOnReviewGate(job);
+  if (!gate.allowed) {
+    return {
+      ok: false,
+      error: gate.reasons.map((reason) => reason.message).join(" "),
+      status: 422,
+    };
+  }
+
+  return { ok: true };
 }
 
 function findJobRecord(envelope: ServerTasksEnvelope, jobId: string): PurchasedJobRecord | null {
@@ -550,6 +634,163 @@ export function applyProductionWorkspacePatch(
         },
       );
       events = envelope.jobActivityEvents ?? [];
+      break;
+    }
+
+    case "owner_send_back_for_review": {
+      const gateCheck = requireOwnerReviewGateAction(job, user);
+      if (!gateCheck.ok) {
+        return { ok: false, error: gateCheck.error, status: gateCheck.status };
+      }
+
+      const note = body.note.trim();
+      if (!note) {
+        return { ok: false, error: "A note for production is required.", status: 400 };
+      }
+
+      job = clearOwnerReviewGatePending(clearDeliverablePrepFlags(job), occurredAt);
+
+      const spineResult = applyJobSpineStatusChange(job, events, {
+        job,
+        nextStatus: "building_concepts",
+        actor,
+        reason: "Owner sent work back for revision before client review",
+        occurredAt,
+      });
+      job = spineResult.job;
+      events = spineResult.events;
+
+      const noted = appendOwnerInternalNote(
+        job,
+        events,
+        actor,
+        occurredAt,
+        `Owner send-back (pre-review): ${note}`,
+      );
+      job = noted.job;
+      events = noted.events;
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "approval",
+        occurredAt,
+        actor,
+        reason: "Owner sent work back to production before client review",
+      });
+      break;
+    }
+
+    case "owner_hold_review_gate": {
+      const gateCheck = requireOwnerReviewGateAction(job, user);
+      if (!gateCheck.ok) {
+        return { ok: false, error: gateCheck.error, status: gateCheck.status };
+      }
+
+      const note = body.note.trim();
+      if (!note) {
+        return { ok: false, error: "A hold note is required.", status: 400 };
+      }
+
+      job = clearOwnerReviewGatePending(job, occurredAt);
+
+      const noted = appendOwnerInternalNote(
+        job,
+        events,
+        actor,
+        occurredAt,
+        `Owner hold (pre-review): ${note}`,
+      );
+      job = noted.job;
+      events = noted.events;
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "approval",
+        occurredAt,
+        actor,
+        reason: "Owner held review gate for internal clarification",
+      });
+      break;
+    }
+
+    case "owner_ask_team_review_gate": {
+      const gateCheck = requireOwnerReviewGateAction(job, user);
+      if (!gateCheck.ok) {
+        return { ok: false, error: gateCheck.error, status: gateCheck.status };
+      }
+
+      const note = body.note.trim();
+      if (!note) {
+        return { ok: false, error: "A note for the team is required.", status: 400 };
+      }
+
+      job = clearOwnerReviewGatePending(job, occurredAt);
+
+      const noted = appendOwnerInternalNote(
+        job,
+        events,
+        actor,
+        occurredAt,
+        `Owner ask-team (pre-review): ${note}`,
+      );
+      job = noted.job;
+      events = noted.events;
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "approval",
+        occurredAt,
+        actor,
+        reason: "Owner asked the team for follow-up before client review",
+      });
+      break;
+    }
+
+    case "owner_ask_client_review_gate": {
+      const gateCheck = requireOwnerReviewGateAction(job, user);
+      if (!gateCheck.ok) {
+        return { ok: false, error: gateCheck.error, status: gateCheck.status };
+      }
+
+      const clientMessage = body.clientMessage.trim();
+      if (!clientMessage) {
+        return { ok: false, error: "Approved client-facing wording is required.", status: 400 };
+      }
+
+      job = clearOwnerReviewGatePending(job, occurredAt);
+
+      const spineResult = applyJobSpineStatusChange(job, events, {
+        job,
+        nextStatus: "waiting_on_client",
+        actor,
+        reason: "Owner requested client input before review can continue",
+        occurredAt,
+      });
+      job = spineResult.job;
+      events = spineResult.events;
+
+      const noted = appendOwnerInternalNote(
+        job,
+        events,
+        actor,
+        occurredAt,
+        `Owner client ask (approved, pre-review): ${clientMessage}`,
+      );
+      job = noted.job;
+      events = noted.events;
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "client_communication",
+        occurredAt,
+        actor,
+        reason: "Owner requested client input before review",
+        messageContent: clientMessage,
+      });
       break;
     }
 

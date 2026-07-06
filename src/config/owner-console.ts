@@ -12,8 +12,80 @@ export function ownerConsoleCampaignRoute(campaignId: string, itemId?: string): 
 
 export const ownerConsole = {
   pageTitle: "Owner Console",
-  pageLead:
-    "Decisions waiting on you across active campaigns. Act here so production does not stand still.",
+  pageLead: "Your decision desk — one folder at a time.",
+  coordinatorName: "Squishy",
+  squishySaysLabel: "Squishy says:",
+  todaysDeskLabel: "Today's Desk",
+  foldersOnDeskLabel: (count: number) => (count === 1 ? "1 folder" : `${count} folders`),
+  todaysDecisionsLabel: "Today's Decisions",
+  currentFolderLabel: "Current Folder",
+  reviewFolderLabel: "Review Folder",
+  closeFolderLabel: "Close Folder",
+  fileCabinetLabel: "File cabinet",
+  fileCabinetCloseLabel: "Back to desk",
+  jumpToFolderLabel: "Review this folder",
+  emptyDeskTitle: "Your desk is clear",
+  emptyDeskBody:
+    "No decisions need you right now. Check the file cabinet for client awareness or recently handled items.",
+  deskOnlyActionHint: "Open the linked workspace to complete this gate.",
+  openWorkspaceLabel: "Open workspace",
+  reviewGate: {
+    decisionQuestion: "Is this creative ready for the client to see in Review Room?",
+    whatTagiaReviews:
+      "Review concepts, prepared deliverables, and internal production notes. The client cannot open Review Room until you approve.",
+    confirmApproveForReview:
+      "Approve and send this job to the client Review Room? The client will be notified that review is ready.",
+    confirmSendBack:
+      "Send this work back to production? The client will not see it until you approve again.",
+    confirmHold:
+      "Hold this review gate for internal clarification? The folder will leave your desk.",
+    confirmAskTeam:
+      "Send this back to the team with your note? The folder will leave your desk.",
+    confirmAskClient:
+      "Send this approved client message and pause for client response? The folder will leave your desk.",
+    approveForReviewLabel: "Approve for client review",
+    sendBackLabel: "Send back to production",
+    holdLabel: "Hold",
+    askTeamLabel: "Ask team",
+    askClientLabel: "Ask client",
+    teamNoteLabel: "Note for production / team",
+    teamNotePlaceholder: "What needs to change or be clarified before the client can review?",
+    clientMessageLabel: "Approved client-facing message",
+    clientMessagePlaceholder: "Write the exact wording the client should see.",
+    openProductionWorkspaceLabel: "Open Production Workspace",
+    availableActions: [
+      {
+        id: "approve",
+        label: "Approve for client review",
+        wired: true,
+        whereAfter: "Client Review Room — folder leaves your desk immediately.",
+      },
+      {
+        id: "send_back",
+        label: "Send back for revision",
+        wired: true,
+        whereAfter: "Production rework — client does not see this work; folder may return when production resubmits.",
+      },
+      {
+        id: "hold",
+        label: "Hold",
+        wired: true,
+        whereAfter: "Needs Clarification — internal QA hold; stays off the client path.",
+      },
+      {
+        id: "ask_team",
+        label: "Ask team",
+        wired: true,
+        whereAfter: "Back to assignee — internal notes attached.",
+      },
+      {
+        id: "ask_client",
+        label: "Ask client",
+        wired: true,
+        whereAfter: "Waiting on Client — client input requested with your approved wording.",
+      },
+    ],
+  },
   waitingSectionTitle: "Waiting on you",
   waitingEmptyTitle: "Nothing waiting on you",
   waitingEmptyBody:

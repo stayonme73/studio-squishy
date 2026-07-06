@@ -101,40 +101,6 @@ function deskItemFromApprovalGate(
     };
   }
 
-  if (job.spineStatus === "ready_for_review" && !job.ownerApprovalPending) {
-    return {
-      id: `desk:review-auto:${job.jobId}`,
-      reason: "approval_before_review",
-      reasonLabel:
-        OWNER_CONTROL_ROOM_SECTION.ownerDeskReasonLabels.approval_before_review,
-      campaignId: job.campaignId,
-      campaignName,
-      jobId: job.jobId,
-      serviceName: job.serviceName,
-      title: `Ready for review — ${job.serviceName}`,
-      detail: "Concepts ready — approve before client sees review room.",
-      drillDownHref: productionWorkspaceRoute(job.campaignId, job.jobId),
-      updatedAt: job.updatedAt,
-    };
-  }
-
-  if (job.spineStatus === "ready_for_delivery" && !job.ownerApprovalPending) {
-    return {
-      id: `desk:delivery-auto:${job.jobId}`,
-      reason: "approval_before_delivery",
-      reasonLabel:
-        OWNER_CONTROL_ROOM_SECTION.ownerDeskReasonLabels.approval_before_delivery,
-      campaignId: job.campaignId,
-      campaignName,
-      jobId: job.jobId,
-      serviceName: job.serviceName,
-      title: `Ready for delivery — ${job.serviceName}`,
-      detail: "Final package ready — approve before delivery.",
-      drillDownHref: ownerConsoleCampaignRoute(job.campaignId),
-      updatedAt: job.updatedAt,
-    };
-  }
-
   return null;
 }
 

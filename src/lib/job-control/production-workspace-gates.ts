@@ -126,6 +126,12 @@ export function canSubmitForOwnerApproval(
 export function canOwnerApproveForReview(
   job: PurchasedJobRecord,
 ): { allowed: boolean; reasons: GateBlockReason[] } {
+  return canOwnerActOnReviewGate(job);
+}
+
+export function canOwnerActOnReviewGate(
+  job: PurchasedJobRecord,
+): { allowed: boolean; reasons: GateBlockReason[] } {
   const reasons: GateBlockReason[] = [];
 
   if (job.ownerApprovalPending !== "before_review") {

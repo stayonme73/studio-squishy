@@ -5,7 +5,7 @@ import {
   OWNER_CONSOLE_RECENTLY_RESOLVED_MAX,
 } from "@/config/owner-console";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import { resolveFileRoomListItemView } from "@/lib/file-room-view";
 import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
 import type { CampaignMaterialItem } from "@/lib/materials/types";

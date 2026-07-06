@@ -8,6 +8,8 @@ export default defineConfig({
       "src/catalog/**/*.test.ts",
       "src/discovery-summary/**/*.test.ts",
       "src/recommendation/**/*.test.ts",
+      "src/decision-core/**/*.test.ts",
+      "src/studio-coordinator/**/*.test.ts",
       "src/lib/**/*.test.ts",
       "src/service-guide/**/*.test.ts",
       "src/studio-plan-review/**/*.test.ts",

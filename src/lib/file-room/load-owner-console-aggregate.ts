@@ -24,7 +24,7 @@ import {
 } from "@/lib/job-control/communication";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
-import { getOrInitializeMaterials } from "@/lib/materials/store";
+import { readMaterialsEnvelope } from "@/lib/materials/store";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { loadFileRoomCampaignList } from "@/lib/file-room/load-campaign";
 
@@ -54,14 +54,13 @@ export async function loadOwnerConsoleAggregate(
 
   const loadedBundles = await Promise.all(
     campaigns.map(async (envelope): Promise<OwnerConsoleCampaignBundle> => {
-      const [tasksEnvelope, materialsEnvelope] = await Promise.all([
-        getOrGenerateTasks(envelope.campaignId, envelope.record),
-        getOrInitializeMaterials(envelope.campaignId, envelope.record),
-      ]);
+      // Tasks init already loads materials; avoid parallel summary sync on the same campaign file.
+      const tasksEnvelope = await getOrGenerateTasks(envelope.campaignId, envelope.record);
+      const materialsEnvelope = await readMaterialsEnvelope(envelope.campaignId);
       return {
         envelope,
         tasksEnvelope,
-        materials: materialsEnvelope.items,
+        materials: materialsEnvelope?.items ?? [],
       };
     }),
   );

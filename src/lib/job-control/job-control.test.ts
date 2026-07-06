@@ -277,6 +277,48 @@ describe("activity log", () => {
 });
 
 describe("owner desk", () => {
+  it("shows approval_before_review only while Owner approval is pending", () => {
+    const now = "2026-07-03T12:00:00.000Z";
+    const pendingJob = {
+      jobId: "camp-1:sm-001",
+      campaignId: "camp-1",
+      skuId: "sm-001" as const,
+      serviceName: "Social posts",
+      spineStatus: "building_concepts" as const,
+      productionLane: "quick" as const,
+      intakeComplete: true,
+      ownerApprovalPending: "before_review" as const,
+      updatedAt: now,
+    };
+    const approvedJob = {
+      ...pendingJob,
+      spineStatus: "ready_for_review" as const,
+      ownerApprovalPending: null,
+    };
+
+    const pendingDesk = resolveOwnerDeskItems([
+      {
+        campaignId: "camp-1",
+        campaignName: "Demo",
+        jobs: [pendingJob],
+        exceptions: [],
+        laneViews: [],
+      },
+    ]);
+    const approvedDesk = resolveOwnerDeskItems([
+      {
+        campaignId: "camp-1",
+        campaignName: "Demo",
+        jobs: [approvedJob],
+        exceptions: [],
+        laneViews: [],
+      },
+    ]);
+
+    expect(pendingDesk.some((item) => item.reason === "approval_before_review")).toBe(true);
+    expect(approvedDesk.some((item) => item.reason === "approval_before_review")).toBe(false);
+  });
+
   it("includes heavy lane full when at capacity with queued heavy job", () => {
     const now = "2026-07-03T12:00:00.000Z";
     const heavyJob = (id: string) => ({

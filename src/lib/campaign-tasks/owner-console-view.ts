@@ -9,7 +9,7 @@ import {
   ownerConsoleOutcomeByKind,
 } from "@/config/owner-console";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import { resolveFileRoomListItemView } from "@/lib/file-room-view";
 
 import { isOpenExceptionStatus } from "./exceptions";
@@ -23,6 +23,7 @@ import {
 } from "./exceptions-view";
 import { isPromotableExceptionRow } from "./exceptions-promotion-view";
 import type { CampaignExceptionRecord, CampaignExceptionKind } from "./exceptions-types";
+import { sortWaitingCardsByUrgency } from "./owner-console-sequential";
 import { isTaskWorkflowBlocked } from "./office-task-controls";
 import type { FileRoomTaskRow } from "./tasks-view";
 import {
@@ -337,23 +338,7 @@ function applyQueueDifferentiators(
 }
 
 function sortWaitingCards(cards: OwnerConsoleDecisionCard[]): OwnerConsoleDecisionCard[] {
-  return cards.sort((a, b) => {
-    if (a.row.isAutoCreatedFromQa !== b.row.isAutoCreatedFromQa) {
-      return a.row.isAutoCreatedFromQa ? -1 : 1;
-    }
-    if (a.row.status === "waiting_owner" && b.row.status !== "waiting_owner") return -1;
-    if (b.row.status === "waiting_owner" && a.row.status !== "waiting_owner") return 1;
-
-    const aPromotablePending =
-      isPromotableExceptionRow(a.row.kind) && !a.row.promotion.showPromotedSummary;
-    const bPromotablePending =
-      isPromotableExceptionRow(b.row.kind) && !b.row.promotion.showPromotedSummary;
-    if (aPromotablePending !== bPromotablePending) {
-      return aPromotablePending ? -1 : 1;
-    }
-
-    return a.updatedAt.localeCompare(b.updatedAt);
-  });
+  return sortWaitingCardsByUrgency(cards);
 }
 
 function toDecisionCard(

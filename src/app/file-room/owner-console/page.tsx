@@ -17,15 +17,21 @@ export default async function OwnerConsolePage() {
     return (
       <>
         <FileRoomHeader user={user} />
-        <FileRoomForbiddenState />
+        <FileRoomForbiddenState room="owner-console" />
       </>
     );
   }
 
   return (
     <>
-      <FileRoomHeader user={user} showOwnerConsoleLink={false} />
-      <FileRoomOwnerConsoleScene view={result.view} scan={result.scan} controlRoom={result.controlRoom} refreshedAt={result.refreshedAt} />
+      <FileRoomHeader user={user} showOwnerConsoleLink={false} ownerDeskMode />
+      <FileRoomOwnerConsoleScene
+        view={result.view}
+        scan={result.scan}
+        controlRoom={result.controlRoom}
+        refreshedAt={result.refreshedAt}
+        ownerDisplayName={user.displayName}
+      />
     </>
   );
 }

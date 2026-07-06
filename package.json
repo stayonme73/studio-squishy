@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "seed:decision-learner": "node scripts/seed-decision-learner.mjs",
     "seed:studio-self-test": "node scripts/seed-studio-self-test.mjs",
-    "test:studio-self-test": "node scripts/run-studio-self-test.mjs"
+    "test:studio-self-test": "node scripts/run-studio-self-test.mjs",
+    "test:studio-coordinator-self-test": "node scripts/run-studio-coordinator-self-test.mjs"
   },
   "dependencies": {
     "next": "16.2.9",

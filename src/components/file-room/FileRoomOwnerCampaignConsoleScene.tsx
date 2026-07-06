@@ -52,8 +52,20 @@ export default function FileRoomOwnerCampaignConsoleScene({
     minute: "2-digit",
   });
 
+  const shellClassName = [
+    "fr-owner-console-shell",
+    view.waitingOnOwner.length > 0 && selectedCard && actions.rowPanel === null
+      ? "fr-owner-console-shell--dock"
+      : "",
+    view.waitingOnOwner.length > 0 && selectedCard && actions.rowPanel !== null
+      ? "fr-owner-console-shell--panel"
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <>
+    <div className={shellClassName}>
       <Link className="fr-back-link" href={OWNER_CONSOLE_ROUTE}>
         ← {ownerConsole.backToStudioQueue}
       </Link>
@@ -182,6 +194,6 @@ export default function FileRoomOwnerCampaignConsoleScene({
         <span aria-hidden="true"> · </span>
         <span className="fr-header__meta">{fileRoom.listLead}</span>
       </p>
-    </>
+    </div>
   );
 }

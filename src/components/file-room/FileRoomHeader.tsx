@@ -5,7 +5,7 @@ import { isOwnerUser } from "@/lib/campaign-store/access";
 import { fileRoom } from "@/config/file-room";
 import { OWNER_CONSOLE_ROUTE } from "@/config/owner-console";
 import { canEnterTeamOffice } from "@/lib/campaign-tasks/office-access";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import {
   TEAM_OFFICE_V1_LIVE_SLUGS,
   officeRoleFromSlug,
@@ -21,6 +21,8 @@ type FileRoomHeaderProps = {
   assignments?: CampaignAssignmentsFile;
   /** Hide Owner Console link when already on Owner Console. */
   showOwnerConsoleLink?: boolean;
+  /** Owner Console landing — larger type, gold name, hide list lead. */
+  ownerDeskMode?: boolean;
 };
 
 function resolveOfficeLinks(
@@ -43,16 +45,19 @@ export default function FileRoomHeader({
   campaignId,
   assignments,
   showOwnerConsoleLink = true,
+  ownerDeskMode = false,
 }: FileRoomHeaderProps) {
   const officeLinks =
     campaignId && assignments ? resolveOfficeLinks(user, campaignId, assignments) : [];
   const ownerConsoleLinkVisible = showOwnerConsoleLink && isOwnerUser(user);
 
   return (
-    <header className="fr-header">
+    <header className={`fr-header${ownerDeskMode ? " fr-header--owner-desk" : ""}`}>
       <div>
         <h1 className="fr-header__title">{fileRoom.pageTitle}</h1>
-        <p className="fr-header__meta">{campaignName ?? fileRoom.listLead}</p>
+        {ownerDeskMode ? null : (
+          <p className="fr-header__meta">{campaignName ?? fileRoom.listLead}</p>
+        )}
         {ownerConsoleLinkVisible ? (
           <p className="fr-header__meta">
             <Link href={OWNER_CONSOLE_ROUTE}>Owner Console</Link>
@@ -71,8 +76,9 @@ export default function FileRoomHeader({
           </p>
         ) : null}
       </div>
-      <p className="fr-header__meta">
-        {user.displayName} · {user.roles.join(", ")}
+      <p className="fr-header__meta fr-header__owner-meta">
+        <span className="fr-header__owner-name">{user.displayName}</span>
+        <span className="fr-header__owner-roles">{user.roles.join(", ")}</span>
       </p>
     </header>
   );

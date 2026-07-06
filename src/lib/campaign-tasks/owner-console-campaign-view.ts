@@ -11,7 +11,7 @@ import {
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
 import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 import { resolveFileRoomProductionWorkPanelView } from "@/lib/campaign-production/production-view";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import { resolveFileRoomListItemView } from "@/lib/file-room-view";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 

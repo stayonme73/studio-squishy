@@ -317,47 +317,51 @@ export function FileRoomOwnerConsoleActionBar({
   onOpenReassign,
 }: FileRoomOwnerConsoleActionBarProps) {
   return (
-    <div className="fr-owner-console-actions">
-      {selectedCard.row.promotion.showApprovalPanel ? (
-        <button
-          type="button"
-          className="utility-btn utility-btn--primary"
-          disabled={busy}
-          onClick={onOpenApprove}
-        >
-          {campaignExceptionsConfig.promotionPanelTitle}
-        </button>
-      ) : null}
-      {selectedCard.row.permissions.canResolve ? (
-        <button
-          type="button"
-          className="utility-btn utility-btn--primary"
-          disabled={busy}
-          onClick={onOpenResolve}
-        >
-          {campaignExceptionsConfig.resolveLabel}
-        </button>
-      ) : null}
-      {selectedCard.row.permissions.canAssign ? (
-        <button type="button" className="utility-btn" disabled={busy} onClick={onOpenAssign}>
-          {campaignExceptionsConfig.assignLabel}
-        </button>
-      ) : null}
-      {reassign?.canReassign && onOpenReassign ? (
-        <button type="button" className="utility-btn" disabled={busy} onClick={onOpenReassign}>
-          {ownerConsole.reassignTaskLabel}
-        </button>
-      ) : null}
-      {showDrillDownLink && drillDownHref ? (
-        <Link className="utility-btn" href={drillDownHref}>
-          {ownerConsole.openCampaignLabel}
-        </Link>
-      ) : null}
-      {fileRoomHref ? (
-        <Link className="utility-btn" href={fileRoomHref}>
-          {ownerConsole.fullFileRoomLabel}
-        </Link>
-      ) : null}
+    <div className="fr-owner-console-actions-slot">
+      <div className="fr-owner-console-actions-dock">
+        <div className="fr-owner-console-actions">
+          {selectedCard.row.promotion.showApprovalPanel ? (
+            <button
+              type="button"
+              className="utility-btn utility-btn--primary"
+              disabled={busy}
+              onClick={onOpenApprove}
+            >
+              {campaignExceptionsConfig.promotionPanelTitle}
+            </button>
+          ) : null}
+          {selectedCard.row.permissions.canResolve ? (
+            <button
+              type="button"
+              className="utility-btn utility-btn--primary"
+              disabled={busy}
+              onClick={onOpenResolve}
+            >
+              {campaignExceptionsConfig.resolveLabel}
+            </button>
+          ) : null}
+          {selectedCard.row.permissions.canAssign ? (
+            <button type="button" className="utility-btn" disabled={busy} onClick={onOpenAssign}>
+              {campaignExceptionsConfig.assignLabel}
+            </button>
+          ) : null}
+          {reassign?.canReassign && onOpenReassign ? (
+            <button type="button" className="utility-btn" disabled={busy} onClick={onOpenReassign}>
+              {ownerConsole.reassignTaskLabel}
+            </button>
+          ) : null}
+          {showDrillDownLink && drillDownHref ? (
+            <Link className="utility-btn" href={drillDownHref}>
+              {ownerConsole.openCampaignLabel}
+            </Link>
+          ) : null}
+          {fileRoomHref ? (
+            <Link className="utility-btn" href={fileRoomHref}>
+              {ownerConsole.fullFileRoomLabel}
+            </Link>
+          ) : null}
+        </div>
+      </div>
     </div>
   );
 }

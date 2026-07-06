@@ -52,7 +52,11 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   if (
-    (body.action === "owner_final_release" ||
+    (body.action === "owner_send_back_for_review" ||
+      body.action === "owner_hold_review_gate" ||
+      body.action === "owner_ask_team_review_gate" ||
+      body.action === "owner_ask_client_review_gate" ||
+      body.action === "owner_final_release" ||
       body.action === "mark_delivered" ||
       body.action === "issue_refund") &&
     !isOwnerUser(user)
