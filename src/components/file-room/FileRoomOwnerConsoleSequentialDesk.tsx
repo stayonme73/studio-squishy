@@ -357,6 +357,127 @@ function ReviewGateWorkingSurface({
   );
 }
 
+function ReleaseGateWorkingSurface({
+  item,
+  busy,
+  onRelease,
+  onSendBack,
+  onHold,
+  onAskTeam,
+}: {
+  item: OwnerConsoleSequentialItem;
+  busy: boolean;
+  onRelease: () => void;
+  onSendBack: (note: string) => void;
+  onHold: (note: string) => void;
+  onAskTeam: (note: string) => void;
+}) {
+  const desk = item.deskItem;
+  const [teamNote, setTeamNote] = useState("");
+
+  useEffect(() => {
+    setTeamNote("");
+  }, [item.id]);
+
+  if (!desk) return null;
+
+  const { releaseGate } = ownerConsole;
+
+  return (
+    <article className="fr-owner-sequential__working-surface">
+      <CoordinatorFolderBrief item={item} />
+      <header className="fr-owner-sequential__working-head">
+        <p className="fr-owner-sequential__working-campaign">{item.campaignName}</p>
+        <h3 className="fr-owner-sequential__working-title">{item.title}</h3>
+        <p className="fr-owner-sequential__working-meta">{item.tabLabel}</p>
+      </header>
+      <dl className="fr-owner-console-card__fields">
+        <div className="fr-owner-console-card__field">
+          <dt>What you decide</dt>
+          <dd>{releaseGate.decisionQuestion}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>What you review</dt>
+          <dd>{releaseGate.whatTagiaReviews}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>{ownerConsole.fieldLabels.whatHappened}</dt>
+          <dd>{desk.detail}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>{ownerConsole.fieldLabels.whyOwner}</dt>
+          <dd>{desk.reasonLabel}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>{ownerConsole.fieldLabels.availableActions}</dt>
+          <dd>
+            <ul className="fr-owner-console-card__action-list">
+              {releaseGate.availableActions.map((action) => (
+                <li key={action.id}>
+                  <strong>{action.label}</strong>
+                  {" — "}
+                  {action.whereAfter}
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      </dl>
+      <div className="fr-owner-sequential__review-gate-notes">
+        <label className="fr-owner-sequential__review-gate-label" htmlFor="release-gate-team-note">
+          {releaseGate.teamNoteLabel}
+        </label>
+        <textarea
+          id="release-gate-team-note"
+          className="fr-owner-sequential__review-gate-textarea"
+          rows={3}
+          value={teamNote}
+          disabled={busy}
+          placeholder={releaseGate.teamNotePlaceholder}
+          onChange={(event) => setTeamNote(event.target.value)}
+        />
+      </div>
+      <div className="fr-owner-console-actions">
+        <button
+          type="button"
+          className="utility-btn utility-btn--primary"
+          disabled={busy}
+          onClick={onRelease}
+        >
+          {releaseGate.releaseLabel}
+        </button>
+        <button
+          type="button"
+          className="utility-btn"
+          disabled={busy}
+          onClick={() => onSendBack(teamNote)}
+        >
+          {releaseGate.sendBackLabel}
+        </button>
+        <button
+          type="button"
+          className="utility-btn"
+          disabled={busy}
+          onClick={() => onHold(teamNote)}
+        >
+          {releaseGate.holdLabel}
+        </button>
+        <button
+          type="button"
+          className="utility-btn"
+          disabled={busy}
+          onClick={() => onAskTeam(teamNote)}
+        >
+          {releaseGate.askTeamLabel}
+        </button>
+        <Link className="utility-btn" href={desk.drillDownHref}>
+          {releaseGate.openProductionWorkspaceLabel}
+        </Link>
+      </div>
+    </article>
+  );
+}
+
 function DeskWorkingSurface({
   item,
   busy,
@@ -376,6 +497,19 @@ function DeskWorkingSurface({
         onHold={(note) => void actions.confirmHoldReviewGate(item, note)}
         onAskTeam={(note) => void actions.confirmAskTeamReviewGate(item, note)}
         onAskClient={(clientMessage) => void actions.confirmAskClientReviewGate(item, clientMessage)}
+      />
+    );
+  }
+
+  if (item.deskItem?.reason === "approval_before_delivery") {
+    return (
+      <ReleaseGateWorkingSurface
+        item={item}
+        busy={busy}
+        onRelease={() => void actions.confirmReleaseToClient(item)}
+        onSendBack={(note) => void actions.confirmSendBackForRelease(item, note)}
+        onHold={(note) => void actions.confirmHoldReleaseGate(item, note)}
+        onAskTeam={(note) => void actions.confirmAskTeamReleaseGate(item, note)}
       />
     );
   }

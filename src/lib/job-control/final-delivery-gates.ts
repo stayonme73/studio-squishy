@@ -24,7 +24,7 @@ export function allRequiredClientDeliveryFilesPresent(
   );
 }
 
-export function canOwnerFinalRelease(
+export function canOwnerActOnReleaseGate(
   job: PurchasedJobRecord,
 ): { allowed: boolean; reasons: GateBlockReason[] } {
   const reasons: GateBlockReason[] = [];
@@ -44,6 +44,12 @@ export function canOwnerFinalRelease(
   }
 
   return { allowed: reasons.length === 0, reasons };
+}
+
+export function canOwnerFinalRelease(
+  job: PurchasedJobRecord,
+): { allowed: boolean; reasons: GateBlockReason[] } {
+  return canOwnerActOnReleaseGate(job);
 }
 
 export function canMarkJobDelivered(

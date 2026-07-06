@@ -71,7 +71,11 @@ export type OwnerDeskJobAction =
   | "owner_send_back_for_review"
   | "owner_hold_review_gate"
   | "owner_ask_team_review_gate"
-  | "owner_ask_client_review_gate";
+  | "owner_ask_client_review_gate"
+  | "owner_final_release"
+  | "owner_send_back_for_release"
+  | "owner_hold_release_gate"
+  | "owner_ask_team_release_gate";
 
 /** Presentation-only — helps the desk feel manageable, not authoritative scheduling. */
 const ESTIMATED_MINUTES_PER_TRAY: Record<
@@ -149,7 +153,7 @@ function resolveSquishySaysForItem(item: OwnerConsoleSequentialItem): string {
       case "approval_before_review":
         return "Production has finished this campaign. Your approval is required before the client can see it.";
       case "approval_before_delivery":
-        return "Final delivery is ready. Your sign-off sends it to the client.";
+        return "The client approved this package. Your final release is required before they can receive it in Final Delivery.";
       case "revision_limit_reached":
         return "The client reached the revision limit. Your decision unlocks the next step.";
       case "scope_issue":
@@ -203,17 +207,22 @@ function resolveDeskBriefing(input: {
   const total = input.desk.todaysDecisionCount;
 
   const item = input.currentItem;
+  const isReleaseFirst =
+    item.trayId === "ready_to_release" || item.deskItem?.reason === "approval_before_delivery";
+
+  if (isReleaseFirst) {
+    if (releases > 1) {
+      return `${releases} releases are ready. This one is the oldest.`;
+    }
+    return "The first item needs your sign-off before final delivery can go to the client.";
+  }
+
   const isApprovalFirst =
-    item.trayId === "needs_my_approval" ||
-    item.deskItem?.reason === "approval_before_review" ||
-    item.deskItem?.reason === "approval_before_delivery";
+    item.trayId === "needs_my_approval" || item.deskItem?.reason === "approval_before_review";
 
   if (isApprovalFirst) {
     if (approvals > 1) {
       return `${approvals} clients are waiting on Owner approval. This one is the oldest.`;
-    }
-    if (item.deskItem?.reason === "approval_before_delivery") {
-      return "The first item needs your sign-off before final delivery can go to the client.";
     }
     return "The first item needs your approval before the client can review it.";
   }
@@ -424,6 +433,30 @@ export function resolveOwnerDeskJobPostDecisionBriefing(
         destination: "waiting_on_client",
         message:
           "Routed to the client queue. This folder left your desk — Squishy will track the response.",
+      };
+    case "owner_final_release":
+      return {
+        destination: "client",
+        message:
+          "Routed to Final Delivery. This folder left your desk — Squishy will notify the client that delivery is ready.",
+      };
+    case "owner_send_back_for_release":
+      return {
+        destination: "production",
+        message:
+          "Routed back to production for final package revision. This folder left your desk — the client will not see delivery until you release again.",
+      };
+    case "owner_hold_release_gate":
+      return {
+        destination: "waiting_internal",
+        message:
+          "Held for internal final QA clarification. This folder left your desk — production and QA will follow up internally.",
+      };
+    case "owner_ask_team_release_gate":
+      return {
+        destination: "waiting_internal",
+        message:
+          "Routed to the assignee for final QA. This folder left your desk — the team will act from their office.",
       };
     default:
       return {

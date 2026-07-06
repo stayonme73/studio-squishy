@@ -86,6 +86,54 @@ export const ownerConsole = {
       },
     ],
   },
+  releaseGate: {
+    decisionQuestion: "Can the client receive this final delivery?",
+    whatTagiaReviews:
+      "Confirm QA is complete, all deliverables are attached, production is finished, and every client delivery file is client-safe. The client cannot open Final Delivery until you release.",
+    confirmRelease:
+      "Release this package to the client? The client will be notified that Final Delivery is ready.",
+    confirmSendBack:
+      "Send this package back to production? The client will not see Final Delivery until you release again.",
+    confirmHold:
+      "Hold this release for internal clarification? The folder will leave your desk.",
+    confirmAskTeam:
+      "Send this back to the team with your note? The folder will leave your desk.",
+    releaseLabel: "Release to client",
+    sendBackLabel: "Send back to production",
+    holdLabel: "Hold",
+    askTeamLabel: "Ask team",
+    teamNoteLabel: "Note for production / QA",
+    teamNotePlaceholder:
+      "What still needs to be fixed or verified before the client can receive this package?",
+    openProductionWorkspaceLabel: "Open Production Workspace",
+    availableActions: [
+      {
+        id: "release",
+        label: "Release to client",
+        wired: true,
+        whereAfter: "Final Delivery — folder leaves your desk immediately.",
+      },
+      {
+        id: "send_back",
+        label: "Send back for revision",
+        wired: true,
+        whereAfter:
+          "Production rework — client does not see delivery; folder may return when production resubmits.",
+      },
+      {
+        id: "hold",
+        label: "Hold",
+        wired: true,
+        whereAfter: "Needs Clarification — internal final QA hold; stays off the client path.",
+      },
+      {
+        id: "ask_team",
+        label: "Ask team",
+        wired: true,
+        whereAfter: "Back to assignee — internal notes for final QA.",
+      },
+    ],
+  },
   waitingSectionTitle: "Waiting on you",
   waitingEmptyTitle: "Nothing waiting on you",
   waitingEmptyBody:

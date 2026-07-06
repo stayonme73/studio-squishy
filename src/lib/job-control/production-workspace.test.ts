@@ -400,6 +400,79 @@ describe("production workspace handoff actions", () => {
     );
   });
 
+  it("routes owner send-back off the release gate to production rework", () => {
+    const job = baseJob({
+      spineStatus: "approved",
+      ownerApprovalPending: "before_delivery",
+    });
+    const env = envelope(job);
+    const laneViews = resolveProductionLaneViews([
+      { campaignName: "PW Demo", job, tasks: [] },
+    ]);
+
+    const sentBack = applyProductionWorkspacePatch(
+      env,
+      campaign(),
+      job.jobId,
+      { action: "owner_send_back_for_release", note: "Final files need another QA pass." },
+      ownerUser,
+      [],
+      laneViews,
+    );
+
+    expect(sentBack.ok).toBe(true);
+    if (!sentBack.ok) return;
+    expect(sentBack.job.ownerApprovalPending).toBeNull();
+    expect(sentBack.job.spineStatus).toBe("building_concepts");
+    expect(sentBack.job.internalNotes?.some((note) => note.content.includes("pre-delivery"))).toBe(
+      true,
+    );
+  });
+
+  it("routes owner hold and ask-team off the release gate with internal notes", () => {
+    const job = baseJob({
+      spineStatus: "approved",
+      ownerApprovalPending: "before_delivery",
+    });
+    const env = envelope(job);
+    const laneViews = resolveProductionLaneViews([
+      { campaignName: "PW Demo", job, tasks: [] },
+    ]);
+
+    const held = applyProductionWorkspacePatch(
+      env,
+      campaign(),
+      job.jobId,
+      { action: "owner_hold_release_gate", note: "Verify deliverable filenames before release." },
+      ownerUser,
+      [],
+      laneViews,
+    );
+    expect(held.ok).toBe(true);
+    if (!held.ok) return;
+    expect(held.job.ownerApprovalPending).toBeNull();
+    expect(held.job.spineStatus).toBe("approved");
+
+    const askTeam = applyProductionWorkspacePatch(
+      envelope({
+        ...job,
+        ownerApprovalPending: "before_delivery",
+      }),
+      campaign(),
+      job.jobId,
+      { action: "owner_ask_team_release_gate", note: "QA — confirm client-safe export settings." },
+      ownerUser,
+      [],
+      laneViews,
+    );
+    expect(askTeam.ok).toBe(true);
+    if (!askTeam.ok) return;
+    expect(askTeam.job.ownerApprovalPending).toBeNull();
+    expect(askTeam.job.internalNotes?.some((note) => note.content.includes("ask-team"))).toBe(
+      true,
+    );
+  });
+
   it("logs internal notes and working file refs", () => {
     const job = baseJob({ spineStatus: "building_concepts" });
     const env = envelope(job);

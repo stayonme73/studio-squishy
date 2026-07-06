@@ -319,6 +319,48 @@ describe("owner desk", () => {
     expect(approvedDesk.some((item) => item.reason === "approval_before_review")).toBe(false);
   });
 
+  it("shows approval_before_delivery only while final release is pending", () => {
+    const now = "2026-07-03T12:00:00.000Z";
+    const pendingJob = {
+      jobId: "camp-1:sm-001",
+      campaignId: "camp-1",
+      skuId: "sm-001" as const,
+      serviceName: "Social posts",
+      spineStatus: "approved" as const,
+      productionLane: "quick" as const,
+      intakeComplete: true,
+      ownerApprovalPending: "before_delivery" as const,
+      updatedAt: now,
+    };
+    const releasedJob = {
+      ...pendingJob,
+      spineStatus: "ready_for_delivery" as const,
+      ownerApprovalPending: null,
+    };
+
+    const pendingDesk = resolveOwnerDeskItems([
+      {
+        campaignId: "camp-1",
+        campaignName: "Demo",
+        jobs: [pendingJob],
+        exceptions: [],
+        laneViews: [],
+      },
+    ]);
+    const releasedDesk = resolveOwnerDeskItems([
+      {
+        campaignId: "camp-1",
+        campaignName: "Demo",
+        jobs: [releasedJob],
+        exceptions: [],
+        laneViews: [],
+      },
+    ]);
+
+    expect(pendingDesk.some((item) => item.reason === "approval_before_delivery")).toBe(true);
+    expect(releasedDesk.some((item) => item.reason === "approval_before_delivery")).toBe(false);
+  });
+
   it("includes heavy lane full when at capacity with queued heavy job", () => {
     const now = "2026-07-03T12:00:00.000Z";
     const heavyJob = (id: string) => ({

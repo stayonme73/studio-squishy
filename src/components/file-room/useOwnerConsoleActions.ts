@@ -289,6 +289,80 @@ export function useOwnerConsoleActions() {
     }
   };
 
+  const confirmReleaseToClient = async (item: OwnerConsoleSequentialItem) => {
+    await patchReleaseGate(item, "owner_final_release", {});
+  };
+
+  const confirmSendBackForRelease = async (item: OwnerConsoleSequentialItem, note: string) => {
+    if (!note.trim()) {
+      setError("A note for production is required.");
+      return;
+    }
+    if (!confirmIrreversible(ownerConsole.releaseGate.confirmSendBack)) return;
+    await patchReleaseGate(item, "owner_send_back_for_release", { note: note.trim() });
+  };
+
+  const confirmHoldReleaseGate = async (item: OwnerConsoleSequentialItem, note: string) => {
+    if (!note.trim()) {
+      setError("A hold note is required.");
+      return;
+    }
+    if (!confirmIrreversible(ownerConsole.releaseGate.confirmHold)) return;
+    await patchReleaseGate(item, "owner_hold_release_gate", { note: note.trim() });
+  };
+
+  const confirmAskTeamReleaseGate = async (item: OwnerConsoleSequentialItem, note: string) => {
+    if (!note.trim()) {
+      setError("A note for the team is required.");
+      return;
+    }
+    if (!confirmIrreversible(ownerConsole.releaseGate.confirmAskTeam)) return;
+    await patchReleaseGate(item, "owner_ask_team_release_gate", { note: note.trim() });
+  };
+
+  const patchReleaseGate = async (
+    item: OwnerConsoleSequentialItem,
+    action: OwnerDeskJobAction,
+    payload: { note?: string },
+  ) => {
+    const desk = item.deskItem;
+    if (!desk?.jobId || desk.reason !== "approval_before_delivery") return;
+
+    if (action === "owner_final_release") {
+      if (!confirmIrreversible(ownerConsole.releaseGate.confirmRelease)) return;
+    }
+
+    setBusy(true);
+    setError(null);
+    setStatusMessage(null);
+    try {
+      const body =
+        action === "owner_final_release" ? { action } : { action, note: payload.note ?? "" };
+
+      const res = await fetch(
+        `/api/campaigns/${desk.campaignId}/jobs/${encodeURIComponent(desk.jobId)}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        },
+      );
+      const json = (await res.json()) as { error?: string };
+
+      if (!res.ok) {
+        throw new Error(json.error ?? `Job update failed (${res.status})`);
+      }
+
+      resetPanels();
+      setStatusMessage(resolveOwnerDeskJobPostDecisionBriefing(action).message);
+      router.refresh();
+    } catch (patchError) {
+      setError(patchError instanceof Error ? patchError.message : "Job update failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return {
     rowPanel,
     busy,
@@ -316,6 +390,10 @@ export function useOwnerConsoleActions() {
     confirmHoldReviewGate,
     confirmAskTeamReviewGate,
     confirmAskClientReviewGate,
+    confirmReleaseToClient,
+    confirmSendBackForRelease,
+    confirmHoldReleaseGate,
+    confirmAskTeamReleaseGate,
     setError,
   };
 }

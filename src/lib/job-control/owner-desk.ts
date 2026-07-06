@@ -96,7 +96,7 @@ function deskItemFromApprovalGate(
       detail: clientApproved
         ? "Client approved for delivery — Owner final release required before client sees Final Delivery."
         : "Owner approval required before final delivery.",
-      drillDownHref: ownerConsoleCampaignRoute(job.campaignId),
+      drillDownHref: productionWorkspaceRoute(job.campaignId, job.jobId),
       updatedAt: job.updatedAt,
     };
   }

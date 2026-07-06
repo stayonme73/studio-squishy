@@ -248,4 +248,17 @@ describe("owner-desk briefings", () => {
     expect(result.destination).toBe("waiting_on_client");
     expect(result.message).toContain("client queue");
   });
+
+  it("maps owner final release to Final Delivery", () => {
+    const result = resolveOwnerDeskJobPostDecisionBriefing("owner_final_release");
+    expect(result.destination).toBe("client");
+    expect(result.message).toContain("Final Delivery");
+    expect(result.message).toContain("left your desk");
+  });
+
+  it("maps owner send-back for release to production", () => {
+    const result = resolveOwnerDeskJobPostDecisionBriefing("owner_send_back_for_release");
+    expect(result.destination).toBe("production");
+    expect(result.message).toContain("left your desk");
+  });
 });

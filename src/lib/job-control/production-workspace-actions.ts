@@ -16,7 +16,7 @@ import { applyJobSpineStatusChange, requestOwnerApprovalBeforeReview } from "./a
 import { enqueueJobCommunicationRecord } from "./communication";
 import type { ProductionLaneView } from "./capacity";
 import { addClientDeliveryFile, syncCampaignStatusAfterDelivery } from "./final-delivery-actions";
-import { canMarkJobDelivered, canOwnerFinalRelease } from "./final-delivery-gates";
+import { canMarkJobDelivered, canOwnerActOnReleaseGate, canOwnerFinalRelease } from "./final-delivery-gates";
 import {
   canOwnerActOnReviewGate,
   canOwnerApproveForReview,
@@ -55,6 +55,9 @@ export type ProductionWorkspacePatchAction =
   | "owner_hold_review_gate"
   | "owner_ask_team_review_gate"
   | "owner_ask_client_review_gate"
+  | "owner_send_back_for_release"
+  | "owner_hold_release_gate"
+  | "owner_ask_team_release_gate"
   | "owner_final_release"
   | "mark_delivered"
   | "issue_refund";
@@ -93,6 +96,9 @@ export type ProductionWorkspacePatchBody =
   | { action: "owner_hold_review_gate"; note: string }
   | { action: "owner_ask_team_review_gate"; note: string }
   | { action: "owner_ask_client_review_gate"; clientMessage: string }
+  | { action: "owner_send_back_for_release"; note: string }
+  | { action: "owner_hold_release_gate"; note: string }
+  | { action: "owner_ask_team_release_gate"; note: string }
   | { action: "owner_final_release" }
   | { action: "mark_delivered" }
   | { action: "issue_refund"; reason: string };
@@ -162,6 +168,26 @@ function appendOwnerInternalNote(
   });
 
   return { job: updatedJob, events: updatedEvents };
+}
+
+function requireOwnerReleaseGateAction(
+  job: PurchasedJobRecord,
+  user: StudioUser,
+): { ok: true } | { ok: false; error: string; status: number } {
+  if (!isOwnerUser(user)) {
+    return { ok: false, error: "Owner role required.", status: 403 };
+  }
+
+  const gate = canOwnerActOnReleaseGate(job);
+  if (!gate.allowed) {
+    return {
+      ok: false,
+      error: gate.reasons.map((reason) => reason.message).join(" "),
+      status: 422,
+    };
+  }
+
+  return { ok: true };
 }
 
 function requireOwnerReviewGateAction(
@@ -822,6 +848,118 @@ export function applyProductionWorkspacePatch(
       });
       job = fileResult.job;
       events = fileResult.events;
+      break;
+    }
+
+    case "owner_send_back_for_release": {
+      const gateCheck = requireOwnerReleaseGateAction(job, user);
+      if (!gateCheck.ok) {
+        return { ok: false, error: gateCheck.error, status: gateCheck.status };
+      }
+
+      const note = body.note.trim();
+      if (!note) {
+        return { ok: false, error: "A note for production is required.", status: 400 };
+      }
+
+      job = clearOwnerReviewGatePending(job, occurredAt);
+
+      const spineResult = applyJobSpineStatusChange(job, events, {
+        job,
+        nextStatus: "building_concepts",
+        actor,
+        reason: "Owner sent final package back for revision before delivery",
+        occurredAt,
+      });
+      job = spineResult.job;
+      events = spineResult.events;
+
+      const noted = appendOwnerInternalNote(
+        job,
+        events,
+        actor,
+        occurredAt,
+        `Owner send-back (pre-delivery): ${note}`,
+      );
+      job = noted.job;
+      events = noted.events;
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "approval",
+        occurredAt,
+        actor,
+        reason: "Owner sent final package back to production before delivery",
+      });
+      break;
+    }
+
+    case "owner_hold_release_gate": {
+      const gateCheck = requireOwnerReleaseGateAction(job, user);
+      if (!gateCheck.ok) {
+        return { ok: false, error: gateCheck.error, status: gateCheck.status };
+      }
+
+      const note = body.note.trim();
+      if (!note) {
+        return { ok: false, error: "A hold note is required.", status: 400 };
+      }
+
+      job = clearOwnerReviewGatePending(job, occurredAt);
+
+      const noted = appendOwnerInternalNote(
+        job,
+        events,
+        actor,
+        occurredAt,
+        `Owner hold (pre-delivery): ${note}`,
+      );
+      job = noted.job;
+      events = noted.events;
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "approval",
+        occurredAt,
+        actor,
+        reason: "Owner held final release for internal clarification",
+      });
+      break;
+    }
+
+    case "owner_ask_team_release_gate": {
+      const gateCheck = requireOwnerReleaseGateAction(job, user);
+      if (!gateCheck.ok) {
+        return { ok: false, error: gateCheck.error, status: gateCheck.status };
+      }
+
+      const note = body.note.trim();
+      if (!note) {
+        return { ok: false, error: "A note for the team is required.", status: 400 };
+      }
+
+      job = clearOwnerReviewGatePending(job, occurredAt);
+
+      const noted = appendOwnerInternalNote(
+        job,
+        events,
+        actor,
+        occurredAt,
+        `Owner ask-team (pre-delivery): ${note}`,
+      );
+      job = noted.job;
+      events = noted.events;
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "approval",
+        occurredAt,
+        actor,
+        reason: "Owner asked the team for final QA follow-up before delivery",
+      });
       break;
     }
 
