@@ -10,9 +10,11 @@ import type { OwnerConsoleDecisionCard } from "@/lib/campaign-tasks/owner-consol
 import type { OwnerConsoleSequentialItem } from "@/lib/campaign-tasks/owner-console-sequential";
 import {
   resolveOwnerComplianceHoldPostDecisionBriefing,
+  resolveOwnerDirectionDisagreementPostDecisionBriefing,
   resolveOwnerDeskJobPostDecisionBriefing,
   resolveOwnerPostDecisionBriefing,
   type OwnerComplianceHoldAction,
+  type OwnerDirectionDisagreementAction,
   type OwnerDeskJobAction,
 } from "@/studio-coordinator";
 import { contentKindForCategory } from "@/lib/materials/promotion";
@@ -481,6 +483,122 @@ export function useOwnerConsoleActions() {
     });
   };
 
+  const patchDirectionDisagreement = async (
+    card: OwnerConsoleDecisionCard,
+    action: OwnerDirectionDisagreementAction,
+    payload: { note?: string; ownerNotes?: string; assignToUserId?: string },
+  ) => {
+    setBusy(true);
+    setError(null);
+    setStatusMessage(null);
+    try {
+      const body =
+        action === "owner_confirm_direction_disagreement"
+          ? {
+              action,
+              exceptionId: card.id,
+              ownerNotes: payload.ownerNotes?.trim() || undefined,
+            }
+          : action === "owner_assign_direction_disagreement"
+            ? {
+                action,
+                exceptionId: card.id,
+                assignToUserId: payload.assignToUserId ?? "",
+                ownerNotes: payload.ownerNotes?.trim() || undefined,
+                note: payload.note?.trim() || undefined,
+              }
+            : {
+                action,
+                exceptionId: card.id,
+                note: payload.note ?? "",
+                ownerNotes: payload.ownerNotes?.trim() || undefined,
+                assignToUserId: payload.assignToUserId?.trim() || undefined,
+              };
+
+      const res = await fetch(`/api/campaigns/${card.campaignId}/tasks`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const json = (await res.json()) as { error?: string };
+
+      if (!res.ok) {
+        throw new Error(
+          json.error ?? `${campaignExceptionsConfig.updateFailedMessage} (${res.status})`,
+        );
+      }
+
+      resetPanels();
+      setStatusMessage(resolveOwnerDirectionDisagreementPostDecisionBriefing(action).message);
+      router.refresh();
+    } catch (patchError) {
+      setError(
+        patchError instanceof Error
+          ? patchError.message
+          : campaignExceptionsConfig.updateFailedMessage,
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const confirmDirectionDisagreement = (
+    card: OwnerConsoleDecisionCard,
+    ownerNotes: string,
+  ) => {
+    if (!confirmIrreversible(ownerConsole.directionDisagreement.confirmDirection)) return;
+    void patchDirectionDisagreement(card, "owner_confirm_direction_disagreement", { ownerNotes });
+  };
+
+  const confirmHoldDirectionDisagreement = (
+    card: OwnerConsoleDecisionCard,
+    note: string,
+    ownerNotes: string,
+  ) => {
+    if (!note.trim()) {
+      setError("A hold note is required.");
+      return;
+    }
+    if (!confirmIrreversible(ownerConsole.directionDisagreement.confirmHold)) return;
+    void patchDirectionDisagreement(card, "owner_hold_direction_disagreement", { note, ownerNotes });
+  };
+
+  const confirmAskTeamDirectionDisagreement = (
+    card: OwnerConsoleDecisionCard,
+    note: string,
+    ownerNotes: string,
+    assignToUserId?: string,
+  ) => {
+    if (!note.trim()) {
+      setError("A note for the team is required.");
+      return;
+    }
+    if (!confirmIrreversible(ownerConsole.directionDisagreement.confirmAskTeam)) return;
+    void patchDirectionDisagreement(card, "owner_ask_team_direction_disagreement", {
+      note,
+      ownerNotes,
+      assignToUserId,
+    });
+  };
+
+  const confirmAssignDirectionDisagreement = (
+    card: OwnerConsoleDecisionCard,
+    assignToUserId: string,
+    ownerNotes: string,
+    note: string,
+  ) => {
+    if (!assignToUserId.trim()) {
+      setError("Assignee is required.");
+      return;
+    }
+    if (!confirmIrreversible(ownerConsole.directionDisagreement.confirmAssign)) return;
+    void patchDirectionDisagreement(card, "owner_assign_direction_disagreement", {
+      assignToUserId,
+      ownerNotes,
+      note,
+    });
+  };
+
   return {
     rowPanel,
     busy,
@@ -516,6 +634,10 @@ export function useOwnerConsoleActions() {
     confirmHoldComplianceHold,
     confirmAskTeamComplianceHold,
     confirmAssignComplianceHold,
+    confirmDirectionDisagreement,
+    confirmHoldDirectionDisagreement,
+    confirmAskTeamDirectionDisagreement,
+    confirmAssignDirectionDisagreement,
     setError,
   };
 }

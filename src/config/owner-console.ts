@@ -184,6 +184,56 @@ export const ownerConsole = {
       },
     ],
   },
+  directionDisagreement: {
+    decisionQuestion: "Which creative direction stands?",
+    whatTagiaReviews:
+      "Review strategy and production notes before you confirm which direction stands.",
+    ownerNotesLabel: "Owner Notes",
+    ownerNotesPlaceholder:
+      "Your reasoning for this decision — saved to the historical record.",
+    teamNoteLabel: "Note for QA / production",
+    teamNotePlaceholder: "What needs to be reconciled or investigated?",
+    assignToLabel: "Assign to",
+    confirmDirection:
+      "Confirm the creative direction and return work to production? Linked QA blockers will clear when applicable.",
+    confirmHold:
+      "Hold this direction review for internal follow-up? The folder will leave your desk.",
+    confirmAskTeam:
+      "Send this back to the team with your note? The folder will leave your desk.",
+    confirmAssign:
+      "Assign this direction disagreement to the selected team member? The folder will leave your desk.",
+    confirmDirectionLabel: "Confirm direction",
+    holdLabel: "Hold",
+    askTeamLabel: "Ask team",
+    assignLabel: "Assign",
+    openFileRoomLabel: "Open File Room",
+    availableActions: [
+      {
+        id: "confirm",
+        label: "Confirm direction",
+        wired: true,
+        whereAfter: "Production — work continues; folder leaves your desk immediately.",
+      },
+      {
+        id: "hold",
+        label: "Hold",
+        wired: true,
+        whereAfter: "Needs Clarification — internal review; task stays blocked.",
+      },
+      {
+        id: "ask_team",
+        label: "Ask team",
+        wired: true,
+        whereAfter: "Back to QA or production — internal investigation.",
+      },
+      {
+        id: "assign",
+        label: "Assign",
+        wired: true,
+        whereAfter: "Back to assignee — folder leaves your desk.",
+      },
+    ],
+  },
   waitingSectionTitle: "Waiting on you",
   waitingEmptyTitle: "Nothing waiting on you",
   waitingEmptyBody:

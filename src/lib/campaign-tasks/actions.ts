@@ -49,6 +49,12 @@ import {
   applyOwnerHoldComplianceHold,
 } from "./compliance-hold-actions";
 import {
+  applyOwnerAskTeamDirectionDisagreement,
+  applyOwnerAssignDirectionDisagreement,
+  applyOwnerConfirmDirectionDisagreement,
+  applyOwnerHoldDirectionDisagreement,
+} from "./direction-disagreement-actions";
+import {
   applyApproveClientRequest,
   applyAssignException,
   applyDeclinePromotion,
@@ -215,6 +221,31 @@ export type TasksPatchBody =
     }
   | {
       action: "owner_assign_compliance_hold";
+      exceptionId: string;
+      assignToUserId: string;
+      ownerNotes?: string;
+      note?: string;
+    }
+  | {
+      action: "owner_confirm_direction_disagreement";
+      exceptionId: string;
+      ownerNotes?: string;
+    }
+  | {
+      action: "owner_hold_direction_disagreement";
+      exceptionId: string;
+      note: string;
+      ownerNotes?: string;
+    }
+  | {
+      action: "owner_ask_team_direction_disagreement";
+      exceptionId: string;
+      note: string;
+      ownerNotes?: string;
+      assignToUserId?: string;
+    }
+  | {
+      action: "owner_assign_direction_disagreement";
       exceptionId: string;
       assignToUserId: string;
       ownerNotes?: string;
@@ -1155,6 +1186,51 @@ export function applyTaskPatch(
         return { ok: false, error: "Assignee not found.", status: 404 };
       }
       const result = applyOwnerAssignComplianceHold(
+        envelope,
+        body,
+        user,
+        context.assignments,
+        context.targetUser,
+      );
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "owner_confirm_direction_disagreement": {
+      const result = applyOwnerConfirmDirectionDisagreement(
+        envelope,
+        body,
+        user,
+        context.assignments,
+      );
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "owner_hold_direction_disagreement": {
+      const result = applyOwnerHoldDirectionDisagreement(
+        envelope,
+        body,
+        user,
+        context.assignments,
+      );
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "owner_ask_team_direction_disagreement": {
+      const result = applyOwnerAskTeamDirectionDisagreement(
+        envelope,
+        body,
+        user,
+        context.assignments,
+        context.targetUser,
+      );
+      if (!result.ok) return result;
+      return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "owner_assign_direction_disagreement": {
+      if (!context.targetUser) {
+        return { ok: false, error: "Assignee not found.", status: 404 };
+      }
+      const result = applyOwnerAssignDirectionDisagreement(
         envelope,
         body,
         user,

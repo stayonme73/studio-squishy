@@ -111,14 +111,17 @@ export async function PATCH(request: Request, context: RouteContext) {
     body.action === "reassign" ||
     body.action === "assign_exception" ||
     body.action === "owner_ask_team_compliance_hold" ||
-    body.action === "owner_assign_compliance_hold"
+    body.action === "owner_assign_compliance_hold" ||
+    body.action === "owner_ask_team_direction_disagreement" ||
+    body.action === "owner_assign_direction_disagreement"
   ) {
     const toUserId =
       body.action === "reassign"
         ? body.toUserId
         : body.action === "assign_exception"
           ? body.assignToUserId
-          : body.action === "owner_assign_compliance_hold"
+          : body.action === "owner_assign_compliance_hold" ||
+              body.action === "owner_assign_direction_disagreement"
             ? body.assignToUserId
             : body.assignToUserId;
     if (toUserId) {

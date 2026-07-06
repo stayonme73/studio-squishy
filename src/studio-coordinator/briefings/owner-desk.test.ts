@@ -13,6 +13,7 @@ import {
   resolveOwnerDeskGreetingParts,
   resolveOwnerDeskSummary,
   resolveOwnerComplianceHoldPostDecisionBriefing,
+  resolveOwnerDirectionDisagreementPostDecisionBriefing,
   resolveOwnerDeskJobPostDecisionBriefing,
   resolveOwnerPostDecisionBriefing,
 } from "./owner-desk";
@@ -285,5 +286,33 @@ describe("owner-desk briefings", () => {
     const hold = resolveOwnerComplianceHoldPostDecisionBriefing("owner_hold_compliance_hold");
     expect(hold.destination).toBe("waiting_internal");
     expect(hold.message).toContain("internal QA review");
+  });
+
+  it("direction disagreement — squishy says on closed folder", () => {
+    const card = decisionCard();
+    card.row.kind = "direction_disagreement";
+    const briefing = resolveOwnerDeskBriefing({
+      currentItem: sequentialItem({
+        exceptionCard: card,
+        title: "Direction disagreement — strategy vs production",
+      }),
+      now: NOW,
+    });
+    expect(briefing?.squishySays).toContain("Production is paused");
+  });
+
+  it("direction disagreement — post-decision includes Owner Confirmation", () => {
+    const confirm = resolveOwnerDirectionDisagreementPostDecisionBriefing(
+      "owner_confirm_direction_disagreement",
+    );
+    expect(confirm.destination).toBe("production");
+    expect(confirm.message).toContain("Direction confirmed");
+    expect(confirm.message).toContain("Confirmed:");
+
+    const hold = resolveOwnerDirectionDisagreementPostDecisionBriefing(
+      "owner_hold_direction_disagreement",
+    );
+    expect(hold.destination).toBe("waiting_internal");
+    expect(hold.message).toContain("internal direction review");
   });
 });

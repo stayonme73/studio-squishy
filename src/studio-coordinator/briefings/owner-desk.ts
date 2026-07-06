@@ -68,13 +68,23 @@ type OwnerConsoleTaskAction =
   | "owner_clear_compliance_hold"
   | "owner_hold_compliance_hold"
   | "owner_ask_team_compliance_hold"
-  | "owner_assign_compliance_hold";
+  | "owner_assign_compliance_hold"
+  | "owner_confirm_direction_disagreement"
+  | "owner_hold_direction_disagreement"
+  | "owner_ask_team_direction_disagreement"
+  | "owner_assign_direction_disagreement";
 
 export type OwnerComplianceHoldAction =
   | "owner_clear_compliance_hold"
   | "owner_hold_compliance_hold"
   | "owner_ask_team_compliance_hold"
   | "owner_assign_compliance_hold";
+
+export type OwnerDirectionDisagreementAction =
+  | "owner_confirm_direction_disagreement"
+  | "owner_hold_direction_disagreement"
+  | "owner_ask_team_direction_disagreement"
+  | "owner_assign_direction_disagreement";
 
 export type OwnerDeskJobAction =
   | "owner_approve_for_review"
@@ -434,6 +444,38 @@ export function resolveOwnerComplianceHoldPostDecisionBriefing(
         message: `Routed to QA or production for investigation. This folder left your desk. ${ownerConfirmationSuffix()}`,
       };
     case "owner_assign_compliance_hold":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+      };
+    default:
+      return {
+        destination: "recently_handled",
+        message: `Folder archived. Your decision is recorded and this desk stays clear. ${ownerConfirmationSuffix()}`,
+      };
+  }
+}
+
+export function resolveOwnerDirectionDisagreementPostDecisionBriefing(
+  action: OwnerDirectionDisagreementAction,
+): OwnerPostDecisionBriefing {
+  switch (action) {
+    case "owner_confirm_direction_disagreement":
+      return {
+        destination: "production",
+        message: `Direction confirmed. This folder left your desk — production and QA will continue from here. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_hold_direction_disagreement":
+      return {
+        destination: "waiting_internal",
+        message: `Held for internal direction review. This folder left your desk — the team will follow up internally. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_team_direction_disagreement":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to QA or production for direction reconciliation. This folder left your desk. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_assign_direction_disagreement":
       return {
         destination: "waiting_internal",
         message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,

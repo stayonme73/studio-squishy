@@ -638,6 +638,165 @@ function ComplianceHoldWorkingSurface({
   );
 }
 
+function DirectionDisagreementWorkingSurface({
+  item,
+  card,
+  operatorContext,
+  busy,
+  onConfirmDirection,
+  onHold,
+  onAskTeam,
+  onAssign,
+}: {
+  item: OwnerConsoleSequentialItem;
+  card: OwnerConsoleDecisionCard;
+  operatorContext: FileRoomExceptionOperatorContext;
+  busy: boolean;
+  onConfirmDirection: (ownerNotes: string) => void;
+  onHold: (note: string, ownerNotes: string) => void;
+  onAskTeam: (note: string, ownerNotes: string, assignToUserId?: string) => void;
+  onAssign: (assignToUserId: string, ownerNotes: string, note: string) => void;
+}) {
+  const [teamNote, setTeamNote] = useState("");
+  const [ownerNotes, setOwnerNotes] = useState("");
+  const [assignToUserId, setAssignToUserId] = useState("");
+
+  useEffect(() => {
+    setTeamNote("");
+    setOwnerNotes("");
+    setAssignToUserId("");
+  }, [item.id]);
+
+  const { directionDisagreement } = ownerConsole;
+
+  return (
+    <article className="fr-owner-sequential__working-surface">
+      <CoordinatorFolderBrief item={item} />
+      <header className="fr-owner-sequential__working-head">
+        <p className="fr-owner-sequential__working-campaign">{item.campaignName}</p>
+        <h3 className="fr-owner-sequential__working-title">{item.title}</h3>
+        <p className="fr-owner-sequential__working-meta">{item.tabLabel}</p>
+      </header>
+      <dl className="fr-owner-console-card__fields">
+        <div className="fr-owner-console-card__field">
+          <dt>What you decide</dt>
+          <dd>{directionDisagreement.decisionQuestion}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>What you review</dt>
+          <dd>{directionDisagreement.whatTagiaReviews}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>{ownerConsole.fieldLabels.whatHappened}</dt>
+          <dd>{card.whatHappened}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>{ownerConsole.fieldLabels.whyOwner}</dt>
+          <dd>{card.whyOwner}</dd>
+        </div>
+        <div className="fr-owner-console-card__field">
+          <dt>{ownerConsole.fieldLabels.availableActions}</dt>
+          <dd>
+            <ul className="fr-owner-console-card__action-list">
+              {directionDisagreement.availableActions.map((action) => (
+                <li key={action.id}>
+                  <strong>{action.label}</strong>
+                  {" — "}
+                  {action.whereAfter}
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      </dl>
+      <div className="fr-owner-sequential__review-gate-notes">
+        <label className="fr-owner-sequential__review-gate-label" htmlFor="direction-owner-notes">
+          {directionDisagreement.ownerNotesLabel}
+        </label>
+        <textarea
+          id="direction-owner-notes"
+          className="fr-owner-sequential__review-gate-textarea"
+          rows={2}
+          value={ownerNotes}
+          disabled={busy}
+          placeholder={directionDisagreement.ownerNotesPlaceholder}
+          onChange={(event) => setOwnerNotes(event.target.value)}
+        />
+        <label className="fr-owner-sequential__review-gate-label" htmlFor="direction-team-note">
+          {directionDisagreement.teamNoteLabel}
+        </label>
+        <textarea
+          id="direction-team-note"
+          className="fr-owner-sequential__review-gate-textarea"
+          rows={3}
+          value={teamNote}
+          disabled={busy}
+          placeholder={directionDisagreement.teamNotePlaceholder}
+          onChange={(event) => setTeamNote(event.target.value)}
+        />
+        <label className="fr-owner-sequential__review-gate-label" htmlFor="direction-assign-to">
+          {directionDisagreement.assignToLabel}
+        </label>
+        <select
+          id="direction-assign-to"
+          className="fr-owner-sequential__review-gate-textarea"
+          value={assignToUserId}
+          disabled={busy}
+          onChange={(event) => setAssignToUserId(event.target.value)}
+        >
+          <option value="">Select assignee (optional for Ask team)</option>
+          {operatorContext.assignCandidates.map((candidate) => (
+            <option key={candidate.userId} value={candidate.userId}>
+              {candidate.displayName}
+              {candidate.isOwner ? " (Owner)" : ""}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="fr-owner-console-actions">
+        <button
+          type="button"
+          className="utility-btn utility-btn--primary"
+          disabled={busy}
+          onClick={() => onConfirmDirection(ownerNotes)}
+        >
+          {directionDisagreement.confirmDirectionLabel}
+        </button>
+        <button
+          type="button"
+          className="utility-btn"
+          disabled={busy}
+          onClick={() => onHold(teamNote, ownerNotes)}
+        >
+          {directionDisagreement.holdLabel}
+        </button>
+        <button
+          type="button"
+          className="utility-btn"
+          disabled={busy}
+          onClick={() => onAskTeam(teamNote, ownerNotes, assignToUserId || undefined)}
+        >
+          {directionDisagreement.askTeamLabel}
+        </button>
+        <button
+          type="button"
+          className="utility-btn"
+          disabled={busy || !assignToUserId}
+          onClick={() => onAssign(assignToUserId, ownerNotes, teamNote)}
+        >
+          {directionDisagreement.assignLabel}
+        </button>
+        <Link
+          className="utility-btn"
+          href={ownerConsoleCampaignRoute(card.campaignId, card.id)}
+        >
+          {directionDisagreement.openFileRoomLabel}
+        </Link>
+      </div>
+    </article>
+  );
+}
+
 function DeskWorkingSurface({
   item,
   busy,
@@ -868,6 +1027,35 @@ export default function FileRoomOwnerConsoleSequentialDesk({
                   }
                   onAssign={(assignToUserId, ownerNotes, note) =>
                     actions.confirmAssignComplianceHold(
+                      selectedCard,
+                      assignToUserId,
+                      ownerNotes,
+                      note,
+                    )
+                  }
+                />
+              ) : selectedCard?.row.kind === "direction_disagreement" && operatorContext ? (
+                <DirectionDisagreementWorkingSurface
+                  item={currentItem}
+                  card={selectedCard}
+                  operatorContext={operatorContext}
+                  busy={actions.busy}
+                  onConfirmDirection={(ownerNotes) =>
+                    actions.confirmDirectionDisagreement(selectedCard, ownerNotes)
+                  }
+                  onHold={(note, ownerNotes) =>
+                    actions.confirmHoldDirectionDisagreement(selectedCard, note, ownerNotes)
+                  }
+                  onAskTeam={(note, ownerNotes, assignToUserId) =>
+                    actions.confirmAskTeamDirectionDisagreement(
+                      selectedCard,
+                      note,
+                      ownerNotes,
+                      assignToUserId,
+                    )
+                  }
+                  onAssign={(assignToUserId, ownerNotes, note) =>
+                    actions.confirmAssignDirectionDisagreement(
                       selectedCard,
                       assignToUserId,
                       ownerNotes,

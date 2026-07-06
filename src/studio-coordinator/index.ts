@@ -45,10 +45,12 @@ export {
   resolveOwnerDeskSummary,
   resolveOwnerDeskJobPostDecisionBriefing,
   resolveOwnerComplianceHoldPostDecisionBriefing,
+  resolveOwnerDirectionDisagreementPostDecisionBriefing,
   resolveOwnerPostDecisionBriefing,
 } from "./briefings/owner-desk";
 export type {
   OwnerComplianceHoldAction,
+  OwnerDirectionDisagreementAction,
   OwnerDeskBriefing,
   OwnerDeskBriefingFacts,
   OwnerDeskBreakdownLine,
