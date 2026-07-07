@@ -178,6 +178,10 @@ export function coordinateClientEvent(
       message: resolveClientConfidenceMessage({
         determination: outcome.determination,
         humanReviewRequired: outcome.humanReviewRequired,
+        squishyMessage:
+          typeof outcome.payload?.squishyMessage === "string"
+            ? outcome.payload.squishyMessage
+            : undefined,
       }),
       determination: outcome.determination,
       humanReviewRequired: outcome.humanReviewRequired,

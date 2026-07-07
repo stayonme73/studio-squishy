@@ -1,4 +1,5 @@
 import type { CampaignRecord } from "@/config/studio-board";
+import type { RefundRequestSourceChannel } from "@/config/refund-request-channels";
 import type { PlannedEffect } from "@/decision-core";
 import {
   applyApproveClientRequest,
@@ -8,6 +9,7 @@ import {
   applyResolveException,
   bridgeExceptionFromRevisionExhausted,
 } from "@/lib/campaign-tasks/exceptions-actions";
+import { applyClientSubmitRefundRequest } from "@/lib/campaign-tasks/refund-request-actions";
 import type { CampaignExceptionKind } from "@/lib/campaign-tasks/exceptions-types";
 import { INTERACTION_EXCEPTION_MAPPINGS, resolveExceptionKindForEffect } from "./config";
 import { appendJobActivityEvent } from "@/lib/job-control/activity-log";
@@ -197,6 +199,37 @@ export function executeEffects(
           if (patchedJob !== job) {
             nextState.envelope = updateEnvelopeJob(nextState.envelope, patchedJob);
           }
+          executed.push(effect);
+          break;
+        }
+
+        case "submit_refund_request": {
+          const job = resolvePrimaryJob(nextState, context.jobId);
+          if (!job) {
+            errors.push("submit_refund_request: job not found.");
+            skipped.push(effect);
+            break;
+          }
+          const result = applyClientSubmitRefundRequest(
+            nextState.envelope,
+            {
+              jobId: job.jobId,
+              reason: effect.reason,
+              requestedOutcome: effect.requestedOutcome,
+              supportingDetails: effect.supportingDetails,
+              sourceChannel:
+                typeof effect.sourceChannel === "string"
+                  ? (effect.sourceChannel as RefundRequestSourceChannel)
+                  : undefined,
+            },
+            context.user,
+          );
+          if (!result.ok) {
+            errors.push(`submit_refund_request: ${result.error}`);
+            skipped.push(effect);
+            break;
+          }
+          nextState = { ...nextState, envelope: result.envelope };
           executed.push(effect);
           break;
         }

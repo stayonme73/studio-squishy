@@ -74,7 +74,14 @@ export type PlannedEffect =
   | { kind: "raise_exception"; exceptionKind?: string }
   | { kind: "resolve_exception"; note: string }
   | { kind: "task_workflow_block"; reason?: string }
-  | { kind: "record_incoming_interaction"; interactionKind: CustomerInteractionKind };
+  | { kind: "record_incoming_interaction"; interactionKind: CustomerInteractionKind }
+  | {
+      kind: "submit_refund_request";
+      reason: string;
+      requestedOutcome: string;
+      supportingDetails?: string;
+      sourceChannel?: string;
+    };
 
 export type DecisionWarning = {
   code: string;

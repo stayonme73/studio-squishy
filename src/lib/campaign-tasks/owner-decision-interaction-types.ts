@@ -1,8 +1,24 @@
 import type { CustomerInteractionKind } from "@/decision-core";
+import type { RefundRequestSourceChannel } from "@/config/refund-request-channels";
 
 import type { CampaignExceptionStatus } from "./exceptions-types";
 
-/** Owner decision desk — client interaction folders (complaint, etc.). */
+/** Structured client refund intake — required before Owner Desk folder. */
+export type RefundRequestSnapshot = {
+  reason: string;
+  requestedOutcome: string;
+  productionStarted: boolean;
+  receivedConceptsOrFiles: boolean;
+  supportingDetails?: string;
+  sourceChannel?: RefundRequestSourceChannel;
+  policyStatusLabel: string;
+  timelineFacts: string;
+  missingEvidence?: string;
+  recommendedNextAction: string;
+  submittedAt: string;
+};
+
+/** Owner decision desk — client interaction folders (complaint, refund request, etc.). */
 export type OwnerDecisionInteractionRecord = {
   id: string;
   campaignId: string;
@@ -16,4 +32,5 @@ export type OwnerDecisionInteractionRecord = {
   createdAt: string;
   updatedAt: string;
   resolutionNotes?: string;
+  refundSnapshot?: RefundRequestSnapshot;
 };

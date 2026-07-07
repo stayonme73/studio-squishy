@@ -3,6 +3,7 @@ import { OWNER_CONTROL_ROOM_SECTION } from "@/config/job-control";
 import { productionWorkspaceRoute } from "@/config/production-workspace";
 import type { CampaignExceptionRecord } from "@/lib/campaign-tasks/exceptions-types";
 import type { OwnerDecisionInteractionRecord } from "@/lib/campaign-tasks/owner-decision-interaction-types";
+import { isCompleteRefundSnapshot } from "@/lib/campaign-tasks/refund-request-intake";
 import { isOpenExceptionStatus } from "@/lib/campaign-tasks/exceptions";
 import { resolveOwnerReviewRequired } from "@/lib/campaign-tasks/exceptions-view";
 
@@ -23,6 +24,7 @@ export type OwnerDeskItem = {
   drillDownHref: string;
   updatedAt: string;
   interactionId?: string;
+  refundSnapshot?: import("@/lib/campaign-tasks/owner-decision-interaction-types").RefundRequestSnapshot;
 };
 
 const EXCEPTION_REASON_MAP: Partial<
@@ -106,24 +108,32 @@ function deskItemFromApprovalGate(
   return null;
 }
 
-function deskItemFromRefundEligible(
-  job: PurchasedJobRecord,
+function deskItemFromRefundRequest(
+  interaction: OwnerDecisionInteractionRecord,
   campaignName: string,
+  job: PurchasedJobRecord | undefined,
 ): OwnerDeskItem | null {
-  if (!job.refundEligibleAt || job.refundOwnerDecisionAt) return null;
+  if (interaction.interactionKind !== "refund_request") return null;
+  if (interaction.status !== "waiting_owner") return null;
+  if (!isCompleteRefundSnapshot(interaction.refundSnapshot)) return null;
+
+  const snapshot = interaction.refundSnapshot;
+  const serviceName = job?.serviceName ?? "Campaign";
 
   return {
-    id: `desk:refund:${job.jobId}`,
+    id: `desk:refund:${interaction.jobId ?? interaction.id}`,
     reason: "refund_eligible",
     reasonLabel: OWNER_CONTROL_ROOM_SECTION.ownerDeskReasonLabels.refund_eligible,
-    campaignId: job.campaignId,
+    campaignId: interaction.campaignId,
     campaignName,
-    jobId: job.jobId,
-    serviceName: job.serviceName,
-    title: `Refund decision — ${job.serviceName}`,
-    detail: "Policy says this job may be eligible — approval is yours.",
-    drillDownHref: productionWorkspaceRoute(job.campaignId, job.jobId),
-    updatedAt: job.updatedAt,
+    jobId: job?.jobId ?? interaction.jobId ?? `${interaction.campaignId}:unknown`,
+    serviceName,
+    title: `Refund decision — ${serviceName}`,
+    detail: snapshot.reason,
+    drillDownHref: productionWorkspaceRoute(interaction.campaignId, job?.jobId ?? interaction.jobId ?? ""),
+    updatedAt: interaction.updatedAt,
+    interactionId: interaction.id,
+    refundSnapshot: snapshot,
   };
 }
 
@@ -206,18 +216,19 @@ export function resolveOwnerDeskItems(inputs: readonly OwnerDeskInput[]): OwnerD
         seen.add(gate.id);
         items.push(gate);
       }
-
-      const refund = deskItemFromRefundEligible(job, input.campaignName);
-      if (refund && !seen.has(refund.id)) {
-        seen.add(refund.id);
-        items.push(refund);
-      }
     }
 
     for (const interaction of input.ownerDecisionInteractions ?? []) {
       const linkedJob = interaction.jobId
         ? input.jobs.find((job) => job.jobId === interaction.jobId)
         : input.jobs[0];
+
+      const refund = deskItemFromRefundRequest(interaction, input.campaignName, linkedJob);
+      if (refund && !seen.has(refund.id)) {
+        seen.add(refund.id);
+        items.push(refund);
+      }
+
       const complaint = deskItemFromComplaint(interaction, input.campaignName, linkedJob);
       if (complaint && !seen.has(complaint.id)) {
         seen.add(complaint.id);

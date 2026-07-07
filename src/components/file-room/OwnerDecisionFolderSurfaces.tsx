@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { ownerConsole, ownerConsoleCampaignRoute } from "@/config/owner-console";
+import { REFUND_REQUEST_CHANNELS } from "@/config/refund-request-channels";
 import type { OwnerConsoleDecisionCard } from "@/lib/campaign-tasks/owner-console-view";
 import type { OwnerConsoleSequentialItem } from "@/lib/campaign-tasks/owner-console-sequential";
 import type { CampaignExceptionKind } from "@/lib/campaign-tasks/exceptions-types";
@@ -294,6 +295,8 @@ export function RefundDecisionWorkingSurface({
   const [clientMessage, setClientMessage] = useState("");
   const [refundReason, setRefundReason] = useState("");
   const config = ownerConsole.refundDecision;
+  const snapshot = item.deskItem?.refundSnapshot;
+  const labels = config.snapshotLabels;
 
   useEffect(() => {
     setTeamNote("");
@@ -314,10 +317,69 @@ export function RefundDecisionWorkingSurface({
           <dt>What you decide</dt>
           <dd>{config.decisionQuestion}</dd>
         </div>
-        <div className="fr-owner-console-card__field">
-          <dt>What you review</dt>
-          <dd>{config.whatTagiaReviews}</dd>
-        </div>
+        {snapshot ? (
+          <>
+            <div className="fr-owner-console-card__field">
+              <dt>{labels.clientReason}</dt>
+              <dd>{snapshot.reason}</dd>
+            </div>
+            {snapshot.sourceChannel ? (
+              <div className="fr-owner-console-card__field">
+                <dt>{labels.requestChannel}</dt>
+                <dd>{REFUND_REQUEST_CHANNELS[snapshot.sourceChannel].label}</dd>
+              </div>
+            ) : null}
+            <div className="fr-owner-console-card__field">
+              <dt>{labels.requestedOutcome}</dt>
+              <dd>{snapshot.requestedOutcome}</dd>
+            </div>
+            <div className="fr-owner-console-card__field">
+              <dt>{labels.policyStatus}</dt>
+              <dd>{snapshot.policyStatusLabel}</dd>
+            </div>
+            <div className="fr-owner-console-card__field">
+              <dt>{labels.productionStatus}</dt>
+              <dd>
+                {snapshot.productionStarted
+                  ? config.productionStartedYes
+                  : config.productionStartedNo}
+              </dd>
+            </div>
+            <div className="fr-owner-console-card__field">
+              <dt>{labels.conceptsOrFiles}</dt>
+              <dd>
+                {snapshot.receivedConceptsOrFiles
+                  ? config.conceptsReceivedYes
+                  : config.conceptsReceivedNo}
+              </dd>
+            </div>
+            <div className="fr-owner-console-card__field">
+              <dt>{labels.timelineFacts}</dt>
+              <dd>{snapshot.timelineFacts}</dd>
+            </div>
+            {snapshot.missingEvidence ? (
+              <div className="fr-owner-console-card__field">
+                <dt>{labels.missingEvidence}</dt>
+                <dd>{snapshot.missingEvidence}</dd>
+              </div>
+            ) : null}
+            {snapshot.supportingDetails ? (
+              <div className="fr-owner-console-card__field">
+                <dt>{labels.supportingDetails}</dt>
+                <dd>{snapshot.supportingDetails}</dd>
+              </div>
+            ) : null}
+            <div className="fr-owner-console-card__field">
+              <dt>{labels.recommendedNextAction}</dt>
+              <dd>{snapshot.recommendedNextAction}</dd>
+            </div>
+          </>
+        ) : (
+          <div className="fr-owner-console-card__field">
+            <dt>What you review</dt>
+            <dd>{config.whatTagiaReviews}</dd>
+          </div>
+        )}
       </dl>
       <div className="fr-owner-sequential__review-gate-notes">
         <label className="fr-owner-sequential__review-gate-label" htmlFor="refund-reason">

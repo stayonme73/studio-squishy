@@ -175,8 +175,37 @@ const FIXTURES = [
           spineStatus: "waiting_on_client",
           productionLane: "standard",
           refundEligibleAt: NOW,
+          waitingOnClientSince: "2026-06-20T12:00:00.000Z",
           createdAt: NOW,
           updatedAt: NOW,
+        },
+      ],
+      ownerDecisionInteractions: [
+        {
+          id: "interaction-owner-refund-v1",
+          campaignId: "owner-refund-v1",
+          jobId: "owner-refund-v1:sm-001",
+          interactionKind: "refund_request",
+          status: "waiting_owner",
+          clientMessage: "Project stalled — I have not heard back in two weeks.",
+          createdAt: NOW,
+          updatedAt: NOW,
+          refundSnapshot: {
+            reason: "Project stalled — I have not heard back in two weeks.",
+            requestedOutcome: "Full refund and close the job",
+            productionStarted: false,
+            receivedConceptsOrFiles: false,
+            supportingDetails: "Please refund my payment.",
+            policyStatusLabel:
+              "May be eligible per 14-day waiting-on-client policy — Owner approval required.",
+            timelineFacts:
+              "Waiting on client since Jun 20, 2026. Internal refund-eligibility signal recorded Jul 6, 2026.",
+            missingEvidence: "No supporting details from the client.",
+            recommendedNextAction:
+              "Review client reason and timeline, then approve or deny — do not auto-refund.",
+            sourceChannel: "structured_customer_form",
+            submittedAt: NOW,
+          },
         },
       ],
     }),

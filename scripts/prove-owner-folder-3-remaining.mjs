@@ -9,6 +9,15 @@ import { execSync } from "node:child_process";
 const BASE = process.env.VERIFY_BASE_URL ?? "http://localhost:3000";
 const results = [];
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function seedRemainingFixtures() {
+  execSync("node scripts/seed-owner-folder-3-remaining.mjs", { stdio: "inherit" });
+  await sleep(200);
+}
+
 function record(name, pass, detail = "") {
   results.push({ name, pass, detail });
   console.log(`${pass ? "PASS" : "FAIL"} — ${name}${detail ? `: ${detail}` : ""}`);
@@ -40,10 +49,27 @@ async function api(cookie, method, urlPath, body) {
   return { status: res.status, json };
 }
 
-async function proveExceptionFolder(cookie, campaignId, exceptionId, holdAction, resolveAction) {
-  execSync("node scripts/seed-owner-folder-3-remaining.mjs", { stdio: "inherit" });
+async function waitForTasks(cookie, campaignId, predicate, attempts = 12, delayMs = 150) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const response = await api(cookie, "GET", `/api/campaigns/${campaignId}/tasks`);
+    if (response.status === 200 && predicate(response.json)) {
+      return response;
+    }
+    await sleep(delayMs);
+  }
+  return api(cookie, "GET", `/api/campaigns/${campaignId}/tasks`);
+}
 
-  const before = await api(cookie, "GET", `/api/campaigns/${campaignId}/tasks`);
+async function proveExceptionFolder(cookie, campaignId, exceptionId, holdAction, resolveAction) {
+  await seedRemainingFixtures();
+
+  const before = await waitForTasks(
+    cookie,
+    campaignId,
+    (json) =>
+      (json.exceptionRecords ?? []).find((entry) => entry.id === exceptionId)?.status ===
+      "waiting_owner",
+  );
   const excBefore = (before.json.exceptionRecords ?? []).find((e) => e.id === exceptionId);
   record(
     `${campaignId} — seed waiting_owner`,
@@ -62,12 +88,32 @@ async function proveExceptionFolder(cookie, campaignId, exceptionId, holdAction,
     excHeld?.status,
   );
 
-  execSync("node scripts/seed-owner-folder-3-remaining.mjs", { stdio: "inherit" });
+  await seedRemainingFixtures();
+
+  const reseeded = await waitForTasks(
+    cookie,
+    campaignId,
+    (json) =>
+      (json.exceptionRecords ?? []).find((entry) => entry.id === exceptionId)?.status ===
+      "waiting_owner",
+  );
+  const excReseeded = (reseeded.json.exceptionRecords ?? []).find((e) => e.id === exceptionId);
+  record(
+    `${campaignId} — re-seed waiting_owner`,
+    excReseeded?.status === "waiting_owner",
+    excReseeded?.status,
+  );
 
   const resolve = await api(cookie, "PATCH", `/api/campaigns/${campaignId}/tasks`, resolveAction);
   record(`${campaignId} — resolve PATCH`, resolve.status === 200, String(resolve.status));
 
-  const after = await api(cookie, "GET", `/api/campaigns/${campaignId}/tasks`);
+  const after = await waitForTasks(
+    cookie,
+    campaignId,
+    (json) =>
+      (json.exceptionRecords ?? []).find((entry) => entry.id === exceptionId)?.status ===
+      "resolved",
+  );
   const excAfter = (after.json.exceptionRecords ?? []).find((e) => e.id === exceptionId);
   record(
     `${campaignId} — exception resolved`,
@@ -77,7 +123,7 @@ async function proveExceptionFolder(cookie, campaignId, exceptionId, holdAction,
 }
 
 async function main() {
-  execSync("node scripts/seed-owner-folder-3-remaining.mjs", { stdio: "inherit" });
+  await seedRemainingFixtures();
   const ownerCookie = await login("tagia@local.dev");
 
   await proveExceptionFolder(
@@ -131,14 +177,27 @@ async function main() {
     },
   );
 
-  execSync("node scripts/seed-owner-folder-3-remaining.mjs", { stdio: "inherit" });
+  await seedRemainingFixtures();
   const refundBefore = await api(ownerCookie, "GET", `/api/campaigns/owner-refund-v1/tasks`);
   const jobBefore = (refundBefore.json.jobRecords ?? []).find(
     (j) => j.jobId === "owner-refund-v1:sm-001",
   );
   record(
-    "owner-refund-v1 — refund eligible",
+    "owner-refund-v1 — internal eligibility signal",
     jobBefore?.refundEligibleAt && !jobBefore?.refundOwnerDecisionAt,
+  );
+
+  const refundInteraction = (refundBefore.json.ownerDecisionInteractions ?? []).find(
+    (entry) => entry.id === "interaction-owner-refund-v1",
+  );
+  record(
+    "owner-refund-v1 — structured intake on record",
+    Boolean(refundInteraction?.refundSnapshot?.reason && refundInteraction?.refundSnapshot?.requestedOutcome),
+  );
+  record(
+    "owner-refund-v1 — intake source channel recorded",
+    refundInteraction?.refundSnapshot?.sourceChannel === "structured_customer_form",
+    refundInteraction?.refundSnapshot?.sourceChannel,
   );
 
   const denyRefund = await api(
@@ -149,7 +208,15 @@ async function main() {
   );
   record("owner-refund-v1 — deny PATCH", denyRefund.status === 200, String(denyRefund.status));
 
-  const refundAfter = await api(ownerCookie, "GET", `/api/campaigns/owner-refund-v1/tasks`);
+  const refundAfter = await waitForTasks(
+    ownerCookie,
+    "owner-refund-v1",
+    (json) =>
+      Boolean(
+        (json.jobRecords ?? []).find((entry) => entry.jobId === "owner-refund-v1:sm-001")
+          ?.refundOwnerDecisionAt,
+      ),
+  );
   const jobAfter = (refundAfter.json.jobRecords ?? []).find(
     (j) => j.jobId === "owner-refund-v1:sm-001",
   );
@@ -159,7 +226,7 @@ async function main() {
     jobAfter?.refundOwnerDecisionAt,
   );
 
-  execSync("node scripts/seed-owner-folder-3-remaining.mjs", { stdio: "inherit" });
+  await seedRemainingFixtures();
   const complaintResolve = await api(ownerCookie, "PATCH", `/api/campaigns/owner-complaint-v1/tasks`, {
     action: "owner_resolve_complaint",
     interactionId: "interaction-owner-complaint-v1",
@@ -172,7 +239,14 @@ async function main() {
     String(complaintResolve.status),
   );
 
-  const complaintAfter = await api(ownerCookie, "GET", `/api/campaigns/owner-complaint-v1/tasks`);
+  const complaintAfter = await waitForTasks(
+    ownerCookie,
+    "owner-complaint-v1",
+    (json) =>
+      (json.ownerDecisionInteractions ?? []).find(
+        (entry) => entry.id === "interaction-owner-complaint-v1",
+      )?.status === "resolved",
+  );
   const interaction = (complaintAfter.json.ownerDecisionInteractions ?? []).find(
     (e) => e.id === "interaction-owner-complaint-v1",
   );
@@ -182,7 +256,7 @@ async function main() {
     interaction?.status,
   );
 
-  execSync("node scripts/seed-owner-folder-3-remaining.mjs", { stdio: "inherit" });
+  await seedRemainingFixtures();
   const heavyResolve = await api(
     ownerCookie,
     "PATCH",

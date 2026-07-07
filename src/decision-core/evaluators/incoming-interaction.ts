@@ -1,4 +1,5 @@
 import { clientRevisionRoundWouldExceed } from "@/lib/job-control/review-room-gates";
+import { evaluateClientRefundChannelRequest } from "@/lib/campaign-tasks/refund-request-routing";
 
 import type {
   CustomerInteractionKind,
@@ -23,16 +24,74 @@ const EVENT_TO_KIND: Record<IncomingCustomerEventType, CustomerInteractionKind> 
   general_inquiry: "general_inquiry",
 };
 
-const ESCALATION_KINDS = new Set<CustomerInteractionKind>([
-  "scope_request",
-  "refund_request",
-  "complaint",
-]);
+const ESCALATION_KINDS = new Set<CustomerInteractionKind>(["scope_request", "complaint"]);
 
 export function classifyIncomingCustomerEvent(
   eventType: IncomingCustomerEventType,
 ): CustomerInteractionKind {
   return EVENT_TO_KIND[eventType];
+}
+
+function refundOutcomeFromChannelRouting(
+  context: DecisionContext,
+  trigger: { type: "incoming_customer_event"; eventType: IncomingCustomerEventType },
+): DecisionOutcome | null {
+  const facts = context.facts as Record<string, unknown> | undefined;
+  const routing = evaluateClientRefundChannelRequest({
+    eventType: trigger.eventType,
+    message: typeof facts?.message === "string" ? facts.message : undefined,
+    inputMode: facts?.inputMode === "voice" ? "voice" : "text",
+    sourceChannel: facts?.sourceChannel,
+    facts,
+  });
+
+  if (routing.kind === "not_refund") return null;
+
+  const interactionKind: CustomerInteractionKind = "refund_request";
+  const matchedRules = [
+    {
+      ruleId: `decision-core:incoming:refund-channel:${routing.sourceChannel}`,
+      matchedValue: routing.kind,
+      source: "lib/campaign-tasks/refund-request-routing.ts",
+    },
+  ];
+  const effects: DecisionOutcome["effects"] = [
+    { kind: "record_incoming_interaction", interactionKind },
+  ];
+
+  if (routing.kind === "reject_voice" || routing.kind === "intake_required") {
+    return {
+      domain: "customer_interaction",
+      determination: "respond",
+      humanReviewRequired: false,
+      effects,
+      matchedRules,
+      warnings: [],
+      payload: {
+        interactionKind,
+        squishyMessage: routing.squishyMessage,
+        sourceChannel: routing.sourceChannel,
+      },
+    };
+  }
+
+  effects.push({
+    kind: "submit_refund_request",
+    reason: routing.intake.reason,
+    requestedOutcome: routing.intake.requestedOutcome,
+    supportingDetails: routing.intake.supportingDetails,
+    sourceChannel: routing.intake.sourceChannel,
+  });
+
+  return {
+    domain: "customer_interaction",
+    determination: "escalate",
+    humanReviewRequired: true,
+    effects,
+    matchedRules,
+    warnings: [],
+    payload: { interactionKind, sourceChannel: routing.sourceChannel },
+  };
 }
 
 export function evaluateIncomingCustomerInteraction(
@@ -49,6 +108,9 @@ export function evaluateIncomingCustomerInteraction(
       warnings: [{ code: "invalid_trigger", message: "Expected incoming_customer_event trigger." }],
     };
   }
+
+  const refundOutcome = refundOutcomeFromChannelRouting(context, trigger);
+  if (refundOutcome) return refundOutcome;
 
   const interactionKind = classifyIncomingCustomerEvent(trigger.eventType);
   const matchedRules = [

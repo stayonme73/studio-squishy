@@ -3,6 +3,10 @@ import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
+import {
+  resolveRefundRequestInteractionOnOwnerDecision,
+  transitionRefundRequestInteraction,
+} from "@/lib/campaign-tasks/refund-request-actions";
 import { appendJobActivityEvent } from "./activity-log";
 import { applyJobSpineStatusChange } from "./actions";
 import { enqueueJobCommunicationRecord } from "./communication";
@@ -133,7 +137,11 @@ export function applyOwnerApproveRefund(
 
   return {
     ok: true,
-    envelope: updateJobInEnvelope(nextEnvelope, updatedJob, events),
+    envelope: resolveRefundRequestInteractionOnOwnerDecision(
+      updateJobInEnvelope(nextEnvelope, updatedJob, events),
+      job.jobId,
+      reason,
+    ),
     job: updatedJob,
     updatedCampaign: campaign,
   };
@@ -184,7 +192,11 @@ export function applyOwnerDenyRefund(
 
   return {
     ok: true,
-    envelope: updateJobInEnvelope(envelope, updatedJob, events),
+    envelope: resolveRefundRequestInteractionOnOwnerDecision(
+      updateJobInEnvelope(envelope, updatedJob, events),
+      job.jobId,
+      reason,
+    ),
     job: updatedJob,
   };
 }
@@ -219,7 +231,12 @@ export function applyOwnerHoldRefund(
 
   return {
     ok: true,
-    envelope: updateJobInEnvelope(envelope, updatedJob, events),
+    envelope: transitionRefundRequestInteraction(
+      updateJobInEnvelope(envelope, updatedJob, events),
+      job.jobId,
+      "waiting_internal",
+      combined,
+    ),
     job: updatedJob,
   };
 }
@@ -295,7 +312,12 @@ export function applyOwnerAskClientRefund(
 
   return {
     ok: true,
-    envelope: updateJobInEnvelope(nextEnvelope, updatedJob, events),
+    envelope: transitionRefundRequestInteraction(
+      updateJobInEnvelope(nextEnvelope, updatedJob, events),
+      job.jobId,
+      "waiting_client",
+      mergeNotes(payload.ownerNotes, `Owner ask-client (refund): ${clientMessage}`),
+    ),
     job: updatedJob,
   };
 }

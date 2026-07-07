@@ -18,7 +18,11 @@ export const CONFIDENCE_COPY = {
 export function resolveClientConfidenceMessage(input: {
   determination: DecisionDetermination;
   humanReviewRequired: boolean;
+  squishyMessage?: string;
 }): string {
+  if (input.squishyMessage?.trim()) {
+    return input.squishyMessage.trim();
+  }
   if (input.humanReviewRequired || input.determination === "escalate") {
     return CONFIDENCE_COPY.clientReviewing;
   }

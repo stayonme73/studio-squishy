@@ -271,6 +271,49 @@ describe("evaluateIncomingCustomerInteraction", () => {
 
     expect(outcome.determination).toBe("escalate");
   });
+
+  it("starts refund intake when Review Room message mentions refund casually", () => {
+    const outcome = evaluateIncomingCustomerInteraction({
+      domain: "customer_interaction",
+      campaignId: "dc-camp",
+      jobId: "dc-camp:ma-flyer-v2",
+      actor: "client",
+      trigger: { type: "incoming_customer_event", eventType: "revision_message" },
+      occurredAt: NOW,
+      facts: { message: "I want a refund", revisionRoundsUsed: 0, revisionRoundsIncluded: 1 },
+    });
+
+    expect(outcome.determination).toBe("respond");
+    expect(outcome.payload?.interactionKind).toBe("refund_request");
+    expect(outcome.payload?.squishyMessage).toBeTruthy();
+    expect(outcome.effects.some((e) => e.kind === "submit_refund_request")).toBe(false);
+  });
+
+  it("submits refund when structured intake is complete", () => {
+    const outcome = evaluateIncomingCustomerInteraction({
+      domain: "customer_interaction",
+      campaignId: "dc-camp",
+      jobId: "dc-camp:ma-flyer-v2",
+      actor: "client",
+      trigger: { type: "incoming_customer_event", eventType: "refund_request" },
+      occurredAt: NOW,
+      facts: {
+        reason: "Project stalled",
+        requestedOutcome: "Full refund",
+        sourceChannel: "squishy_chat_post_payment",
+      },
+    });
+
+    expect(outcome.determination).toBe("escalate");
+    expect(outcome.humanReviewRequired).toBe(true);
+    const submit = outcome.effects.find((e) => e.kind === "submit_refund_request");
+    expect(submit).toMatchObject({
+      kind: "submit_refund_request",
+      reason: "Project stalled",
+      requestedOutcome: "Full refund",
+      sourceChannel: "squishy_chat_post_payment",
+    });
+  });
 });
 
 describe("evaluateEscalation parity", () => {
