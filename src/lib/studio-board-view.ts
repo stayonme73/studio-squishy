@@ -89,6 +89,23 @@ export type StudioBoardView = {
 
   primaryRoute: (typeof studioBoard.statusContent)[CampaignStatus]["primaryRoute"] | null;
 
+  emptyBoardSnapshot: EmptyBoardSnapshotView | null;
+
+  emptyBoardMaterials: EmptyBoardMaterialsView | null;
+
+};
+
+export type EmptyBoardSnapshotView = {
+  deliverables: string;
+  plan: string;
+  account: string;
+};
+
+export type EmptyBoardMaterialsView = {
+  receivedLead: string;
+  received: string;
+  stillNeed: string;
+  nextStep: string;
 };
 
 
@@ -357,6 +374,10 @@ export function resolveStudioBoardView(campaign: CampaignRecord | null): StudioB
 
       primaryRoute: null,
 
+      emptyBoardSnapshot: empty.board.snapshot,
+
+      emptyBoardMaterials: empty.board.materials,
+
     };
 
   }
@@ -422,6 +443,10 @@ export function resolveStudioBoardView(campaign: CampaignRecord | null): StudioB
     primaryCta: content.primaryCta,
 
     primaryRoute: content.primaryRoute,
+
+    emptyBoardSnapshot: null,
+
+    emptyBoardMaterials: null,
 
   };
 
