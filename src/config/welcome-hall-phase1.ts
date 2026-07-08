@@ -34,7 +34,7 @@ export const welcomeHallPhase1 = {
     items: [
       {
         label: "Our Services",
-        href: `${studioBoard.routes.helpCenter}#packages`,
+        href: `${studioBoard.routes.helpCenter}#quick-guide`,
       },
       {
         label: "FAQ",

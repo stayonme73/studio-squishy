@@ -63,7 +63,7 @@ export default function StudioGuideScene() {
       <section className="guide-compare utility-card" aria-labelledby="guide-compare-title">
         <PackageComparisonTable />
         <p className="guide-compare__help">
-          <Link href={helpCenterHref("packages", "studio-board")} className="guide-compare__link">
+          <Link href={helpCenterHref("quick-guide", "studio-board")} className="guide-compare__link">
             Full package details in Help Center →
           </Link>
         </p>

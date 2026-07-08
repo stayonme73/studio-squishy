@@ -56,7 +56,7 @@ export default function PackageSummaryPanel({ campaign }: Props) {
         </li>
       </ul>
       {showCompareLink ? (
-        <Link href={helpCenterHref("packages", "studio-board")} className="sb-package-summary__link">
+        <Link href={helpCenterHref("quick-guide", "studio-board")} className="sb-package-summary__link">
           {copy.compareLink} →
         </Link>
       ) : null}
