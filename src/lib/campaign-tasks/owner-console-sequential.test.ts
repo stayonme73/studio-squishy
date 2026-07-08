@@ -99,11 +99,11 @@ describe("owner-console-sequential", () => {
     expect(sorted.map((entry) => entry.id)).toEqual(["scope", "compliance"]);
   });
 
-  it("maps promotable exceptions to needs my approval tray", () => {
+  it("maps promotable exceptions away from the Owner approval tray", () => {
     const tray = resolveTrayForException(
       card({ kind: "missing_client_fact", row: { kind: "missing_client_fact" } as FileRoomExceptionRow }),
     );
-    expect(tray).toBe("needs_my_approval");
+    expect(tray).toBe("needs_client");
   });
 
   it("maps delivery desk items to ready to release tray", () => {
@@ -159,6 +159,24 @@ describe("owner-console-sequential", () => {
     expect(desk.items[0]?.id).toBe("desk:delivery:job-1");
     expect(desk.items[1]?.id).toBe("exception:scope");
     expect(desk.trays.find((tray) => tray.id === "ready_to_release")?.count).toBe(1);
+  });
+
+  it("excludes routine client-information exceptions from the active Owner Desk", () => {
+    const view = {
+      waitingOnOwner: [
+        card({ id: "missing-fact", kind: "missing_client_fact" }),
+        card({ id: "scope", kind: "scope_change" }),
+      ],
+      waitingCount: 2,
+      campaignCount: 1,
+      isEmpty: false,
+      campaigns: [],
+    };
+
+    const desk = resolveOwnerConsoleSequentialDesk(view, emptyControlRoom(), emptyScan());
+
+    expect(desk.todaysDecisionCount).toBe(1);
+    expect(desk.items.map((entry) => entry.id)).toEqual(["exception:scope"]);
   });
 
   it("places compliance_hold in needs_my_decision tray", () => {

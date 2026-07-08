@@ -10,6 +10,10 @@ function isPromotableExceptionKind(kind: CampaignExceptionKind): boolean {
   return kind === "missing_client_fact" || kind === "client_request";
 }
 
+function isOwnerDeskExceptionKind(kind: CampaignExceptionKind): boolean {
+  return !isPromotableExceptionKind(kind);
+}
+
 /** Locked responsibility map — tray storage model. */
 export type OwnerConsoleTrayId =
   | "needs_my_decision"
@@ -146,7 +150,7 @@ export function resolveDeskUrgencyRank(item: OwnerDeskItem): number {
 export function resolveTrayForException(card: OwnerConsoleDecisionCard): OwnerConsoleTrayId {
   const { kind } = card.row;
   if (APPROVAL_EXCEPTION_KINDS.has(kind) || isPromotableExceptionKind(kind)) {
-    return "needs_my_approval";
+    return "needs_client";
   }
   if (DECISION_EXCEPTION_KINDS.has(kind)) {
     return "needs_my_decision";
@@ -271,8 +275,11 @@ export function resolveOwnerConsoleSequentialDesk(
   controlRoom: OwnerControlRoomView,
   scan: OwnerConsoleScanView,
 ): OwnerConsoleSequentialDeskView {
-  const exceptionIds = new Set(view.waitingOnOwner.map((card) => card.id));
-  const items: OwnerConsoleSequentialItem[] = view.waitingOnOwner.map(deskItemFromCard);
+  const ownerDecisionCards = view.waitingOnOwner.filter((card) =>
+    isOwnerDeskExceptionKind(card.row.kind),
+  );
+  const exceptionIds = new Set(ownerDecisionCards.map((card) => card.id));
+  const items: OwnerConsoleSequentialItem[] = ownerDecisionCards.map(deskItemFromCard);
 
   for (const desk of controlRoom.ownerDesk) {
     const linkedExceptionId = exceptionIdFromDeskItem(desk);
