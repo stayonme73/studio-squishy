@@ -79,8 +79,9 @@ function deskItemFromApprovalGate(
       campaignName,
       jobId: job.jobId,
       serviceName: job.serviceName,
-      title: `Review gate — ${job.serviceName}`,
-      detail: "Owner approval required before client review.",
+      title: `Owner Support Review — ${job.serviceName}`,
+      detail:
+        "Production requested Owner support before client review because this is an escalation, repeated failure, or business judgment issue.",
       drillDownHref: productionWorkspaceRoute(job.campaignId, job.jobId),
       updatedAt: job.updatedAt,
     };

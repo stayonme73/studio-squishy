@@ -54,7 +54,7 @@ await page.screenshot({
   fullPage: true,
 });
 
-const approveBtn = page.getByRole("button", { name: /Approve for client review/i });
+const approveBtn = page.getByRole("button", { name: /Send to Review Room/i });
 if (await approveBtn.isVisible()) {
   await approveBtn.click();
   await page.waitForTimeout(1500);

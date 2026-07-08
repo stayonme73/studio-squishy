@@ -277,7 +277,7 @@ describe("activity log", () => {
 });
 
 describe("owner desk", () => {
-  it("shows approval_before_review only while Owner approval is pending", () => {
+  it("shows approval_before_review only while Owner support review is pending", () => {
     const now = "2026-07-03T12:00:00.000Z";
     const pendingJob = {
       jobId: "camp-1:sm-001",
@@ -316,6 +316,7 @@ describe("owner desk", () => {
     ]);
 
     expect(pendingDesk.some((item) => item.reason === "approval_before_review")).toBe(true);
+    expect(pendingDesk[0]?.title).toContain("Owner Support Review");
     expect(approvedDesk.some((item) => item.reason === "approval_before_review")).toBe(false);
   });
 

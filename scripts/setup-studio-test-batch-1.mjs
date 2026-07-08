@@ -713,7 +713,7 @@ function setupReport() {
       const checkpoint =
         job.status === "waiting_on_client"
           ? "Client materials before production"
-          : "Owner approval before client review";
+          : "Production submits to Review Room";
       return `| ${job.serviceName} (\`${job.skuId}\`) | ${priceDisplay(job.priceCents)} | ${job.lane} | ${job.status} | ${checkpoint} |`;
     }),
     "",

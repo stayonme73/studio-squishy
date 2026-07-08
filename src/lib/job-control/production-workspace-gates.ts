@@ -102,14 +102,14 @@ export function canSubmitForOwnerApproval(
   if (job.spineStatus !== "building_concepts") {
     reasons.push({
       code: "wrong_status",
-      message: "Job must be Building Concepts to submit for Owner approval.",
+      message: "Job must be Building Concepts to submit to client Review Room.",
     });
   }
 
   if (job.ownerApprovalPending === "before_review") {
     reasons.push({
       code: "already_pending",
-      message: "Owner approval is already pending for this job.",
+      message: "Owner support review is already pending for this job.",
     });
   }
 
@@ -137,7 +137,7 @@ export function canOwnerActOnReviewGate(
   if (job.ownerApprovalPending !== "before_review") {
     reasons.push({
       code: "not_pending",
-      message: "No Owner approval pending for this job.",
+      message: "No Owner support review pending for this job.",
     });
   }
 

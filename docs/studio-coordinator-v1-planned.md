@@ -336,7 +336,7 @@ Squishy is the **narrator of state**, not the owner of state.
 | Coordinator duty | Production touchpoint |
 |------------------|----------------------|
 | After owner “Send Back for Revision” | Spine rewind; assigned role notified via existing assignment model |
-| After owner approval before review | Clear `ownerApprovalPending`; enqueue `ready_for_review` template |
+| After production submits to Review Room | Ensure the client review notice is queued and revision routing remains with Squishy + Decision Core |
 | Lane / capacity | Surface `heavy_lane_full` to Owner Desk — do not silently reorder |
 | Team Office queues | Staff-assigned exceptions — `PRODUCER_RESOLVABLE_KINDS` never on Owner Desk |
 
@@ -436,7 +436,7 @@ Needs Communication outbox — NOT Owner Desk (unless discretion exception fires
 | UI zone | Today | With coordinator |
 |---------|-------|------------------|
 | Greeting | Static copy | Coordinator-generated **briefing line** (deterministic template + facts) |
-| Example | “Good morning, Tagia” | “Good morning, Tagia. **Northwind has waited 1 day for approval before review.**” |
+| Example | “Good morning, Tagia” | “Good morning, Tagia. **Northwind needs Owner support because review has become a scope decision.**” |
 | Current folder | Exception/desk card fields | Same card + **Squishy trace summary** (why Owner, from Core `matchedRules`) |
 | After decision | `router.refresh()` | Coordinator executes effects + confirms destination in status message |
 

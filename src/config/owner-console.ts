@@ -30,33 +30,33 @@ export const ownerConsole = {
   deskOnlyActionHint: "Open the linked workspace to complete this gate.",
   openWorkspaceLabel: "Open workspace",
   reviewGate: {
-    decisionQuestion: "Is this creative ready for the client to see in Review Room?",
+    decisionQuestion: "What Owner support does this creative issue need before client review?",
     whatTagiaReviews:
-      "Review concepts, prepared deliverables, and internal production notes. The client cannot open Review Room until you approve.",
+      "Production owns client-ready creative. Review this only because the team requested support, the client escalated, revisions are failing, or the issue affects scope, money, policy, deadline, or relationship.",
     confirmApproveForReview:
-      "Approve and send this job to the client Review Room? The client will be notified that review is ready.",
+      "Resolve this support review and send the job to the client Review Room? The client will be notified that review is ready.",
     confirmSendBack:
-      "Send this work back to production? The client will not see it until you approve again.",
+      "Send this escalation back to production? The client will not see this version yet.",
     confirmHold:
-      "Hold this review gate for internal clarification? The folder will leave your desk.",
+      "Hold this support review for internal clarification? The folder will leave your desk.",
     confirmAskTeam:
       "Send this back to the team with your note? The folder will leave your desk.",
     confirmAskClient:
       "Send this approved client message and pause for client response? The folder will leave your desk.",
-    approveForReviewLabel: "Approve for client review",
+    approveForReviewLabel: "Send to Review Room",
     sendBackLabel: "Send back to production",
     holdLabel: "Hold",
     askTeamLabel: "Ask team",
     askClientLabel: "Ask client",
     teamNoteLabel: "Note for production / team",
-    teamNotePlaceholder: "What needs to change or be clarified before the client can review?",
+    teamNotePlaceholder: "What support, escalation, or business concern should production address?",
     clientMessageLabel: "Approved client-facing message",
     clientMessagePlaceholder: "Write the exact wording the client should see.",
     openProductionWorkspaceLabel: "Open Production Workspace",
     availableActions: [
       {
         id: "approve",
-        label: "Approve for client review",
+        label: "Send to Review Room",
         wired: true,
         whereAfter: "Client Review Room — folder leaves your desk immediately.",
       },

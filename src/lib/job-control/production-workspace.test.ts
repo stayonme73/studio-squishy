@@ -12,7 +12,6 @@ import type { CampaignMaterialItem } from "@/lib/materials/types";
 import { applyProductionWorkspacePatch } from "./production-workspace-actions";
 import {
   allRequiredDeliverablesPrepared,
-  canOwnerApproveForReview,
   canSubmitForOwnerApproval,
   canTransitionToBuildingConcepts,
   resolveRequiredDeliverableKeys,
@@ -198,7 +197,7 @@ describe("production workspace gates", () => {
     expect(gate.allowed).toBe(true);
   });
 
-  it("blocks Owner approval submit until all deliverables prepared", () => {
+  it("blocks Review Room submit until all deliverables are prepared", () => {
     const job = baseJob({ spineStatus: "building_concepts" });
     const deliverables = ["Concept set", "Final export"];
     expect(canSubmitForOwnerApproval(job, deliverables).allowed).toBe(false);
@@ -225,7 +224,7 @@ describe("production workspace gates", () => {
 });
 
 describe("production workspace handoff actions", () => {
-  it("start → prepare deliverables → submit → owner approve updates spine", () => {
+  it("start → prepare deliverables → submit opens client Review Room", () => {
     const job = baseJob();
     const env = envelope(job);
     const laneViews = resolveProductionLaneViews([
@@ -273,29 +272,14 @@ describe("production workspace handoff actions", () => {
     );
     expect(submitted.ok).toBe(true);
     if (!submitted.ok) return;
-    expect(submitted.job.ownerApprovalPending).toBe("before_review");
-    expect(submitted.job.spineStatus).toBe("building_concepts");
-
-    const approved = applyProductionWorkspacePatch(
-      submitted.envelope,
-      campaign(),
-      job.jobId,
-      { action: "owner_approve_for_review" },
-      ownerUser,
-      [],
-      laneViews,
-    );
-    expect(approved.ok).toBe(true);
-    if (!approved.ok) return;
-    expect(approved.job.spineStatus).toBe("ready_for_review");
-    expect(approved.job.ownerApprovalPending).toBeNull();
-    expect(canOwnerApproveForReview(approved.job).allowed).toBe(false);
+    expect(submitted.job.ownerApprovalPending).toBeNull();
+    expect(submitted.job.spineStatus).toBe("ready_for_review");
     expect(
-      (approved.envelope.jobActivityEvents ?? []).some((event) => event.kind === "status_change"),
+      (submitted.envelope.jobActivityEvents ?? []).some((event) => event.kind === "status_change"),
     ).toBe(true);
   });
 
-  it("routes owner send-back off the review gate to production rework", () => {
+  it("routes owner send-back off support review to production rework", () => {
     const job = baseJob({ spineStatus: "building_concepts" });
     const env = envelope({
       ...job,
@@ -333,7 +317,7 @@ describe("production workspace handoff actions", () => {
     );
   });
 
-  it("routes owner hold and ask-team off the review gate with internal notes", () => {
+  it("routes owner hold and ask-team off support review with internal notes", () => {
     const job = baseJob({ spineStatus: "building_concepts", ownerApprovalPending: "before_review" });
     const env = envelope(job);
     const laneViews = resolveProductionLaneViews([
@@ -371,7 +355,7 @@ describe("production workspace handoff actions", () => {
     );
   });
 
-  it("routes owner ask-client off the review gate to waiting_on_client", () => {
+  it("routes owner ask-client off support review to waiting_on_client", () => {
     const job = baseJob({ spineStatus: "building_concepts", ownerApprovalPending: "before_review" });
     const env = envelope(job);
     const laneViews = resolveProductionLaneViews([
@@ -552,7 +536,7 @@ describe("internal Work Packet handoff", () => {
   ];
 
   it.each(scenarios)(
-    "$name moves Production Workspace → Work Packet → Team Office return → Owner approval queue",
+    "$name moves Production Workspace → Work Packet → Team Office return → client Review Room",
     ({ skuId, serviceName, deliverable, role, phase, familyId }) => {
       const job = baseJob({
         jobId: buildJobId("camp-pw", skuId as never),
@@ -622,7 +606,8 @@ describe("internal Work Packet handoff", () => {
       );
       expect(submitted.ok).toBe(true);
       if (!submitted.ok) return;
-      expect(submitted.job.ownerApprovalPending).toBe("before_review");
+      expect(submitted.job.ownerApprovalPending).toBeNull();
+      expect(submitted.job.spineStatus).toBe("ready_for_review");
 
       const events = submitted.envelope.jobActivityEvents ?? [];
       expect(events.some((event) => event.kind === "work_packet_assigned")).toBe(true);

@@ -58,7 +58,7 @@ async function main() {
     (entry) => entry.jobId === JOB_ID,
   );
   record(
-    "Seed — owner approval pending before review",
+    "Seed — Owner support review pending before client review",
     jobBefore.status === 200 && jobBeforeRecord?.ownerApprovalPending === "before_review",
     jobBeforeRecord?.ownerApprovalPending ?? `HTTP ${jobBefore.status}`,
   );
@@ -80,8 +80,8 @@ async function main() {
   );
   record(
     "Closed folder — why first briefing",
-    bodyText.includes("approval before the client can review") ||
-      bodyText.includes("waiting on Owner approval"),
+    bodyText.includes("Owner support or escalation review") ||
+      bodyText.includes("Production requested Owner support"),
   );
 
   await page.getByRole("button", { name: /Review Folder/i }).click();

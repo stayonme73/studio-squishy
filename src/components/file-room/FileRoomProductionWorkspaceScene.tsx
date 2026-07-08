@@ -487,7 +487,7 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
 
             {view.ownerApprovalPending === "before_review" ? (
               <p className="fr-production-workspace__pending" role="status">
-                Owner Desk — Approval Needed (before review)
+                Owner Desk — Owner Support Review
               </p>
             ) : null}
 

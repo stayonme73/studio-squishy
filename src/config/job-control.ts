@@ -6,7 +6,7 @@ export const OWNER_CONTROL_ROOM_SECTION = {
   pageLead:
     "Job-level production spine — lanes, waiting tray, and decisions across all campaigns.",
   ownerDeskTitle: "Owner Desk",
-  ownerDeskLead: "Items requiring your decision or approval before work continues.",
+  ownerDeskLead: "Items requiring Owner judgment, support, or escalation review before work continues.",
   ownerDeskEmpty: "No decisions waiting — production can proceed without Owner action.",
   needsCommunicationTitle: "Needs Communication",
   needsCommunicationLead:
@@ -43,7 +43,7 @@ export const OWNER_CONTROL_ROOM_SECTION = {
     refunded_cancelled: "Refunded / Cancelled",
   } satisfies Record<JobSpineStatus, string>,
   ownerDeskReasonLabels: {
-    approval_before_review: "Approval before review",
+    approval_before_review: "Owner support review",
     approval_before_delivery: "Approval before final delivery",
     deadline_exception: "Deadline exception",
     scope_issue: "Scope issue",

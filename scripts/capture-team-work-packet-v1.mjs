@@ -260,7 +260,7 @@ async function seed() {
         kind: "approval",
         occurredAt: "2026-07-03T17:25:00.000Z",
         actor: { role: "staff", displayName: "Producer" },
-        reason: "Submitted for Owner approval before client review",
+        reason: "Submitted to client Review Room by production",
       },
     ],
     jobCommunicationRecords: [],

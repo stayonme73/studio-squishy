@@ -217,7 +217,7 @@ function resolveSquishySaysForItem(item: OwnerConsoleSequentialItem): string {
   if (item.deskItem) {
     switch (item.deskItem.reason) {
       case "approval_before_review":
-        return "Production has finished this campaign. Your approval is required before the client can see it.";
+        return "Production requested Owner support before client review because this is no longer a routine creative handoff.";
       case "approval_before_delivery":
         return "The client approved this package. Your final release is required before they can receive it in Final Delivery.";
       case "revision_limit_reached":
@@ -294,9 +294,9 @@ function resolveDeskBriefing(input: {
 
   if (isApprovalFirst) {
     if (approvals > 1) {
-      return `${approvals} clients are waiting on Owner approval. This one is the oldest.`;
+      return `${approvals} support or approval items need you. This one is the oldest.`;
     }
-    return "The first item needs your approval before the client can review it.";
+    return "The first item needs Owner support or escalation review before the next client-visible step.";
   }
 
   if (releases > 0 && item.trayId === "ready_to_release" && decisions === 0 && approvals === 0) {
@@ -783,13 +783,13 @@ export function resolveOwnerDeskJobPostDecisionBriefing(
       return {
         destination: "client",
         message:
-          "Routed to the client Review Room. This folder left your desk — Squishy will notify the client that review is ready.",
+          "Routed to the client Review Room. This support review left your desk — Squishy will notify the client that review is ready.",
       };
     case "owner_send_back_for_review":
       return {
         destination: "production",
         message:
-          "Routed back to production for revision. This folder left your desk — the client will not see this work until you approve again.",
+          "Routed back to production for rework. This support review left your desk — the client will not see this version yet.",
       };
     case "owner_hold_review_gate":
       return {

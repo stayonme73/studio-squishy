@@ -14,7 +14,7 @@ Tagia owns **judgment calls the system cannot safely automate** — even when te
 
 | Responsibility | What it means | Typical trigger |
 |----------------|---------------|-----------------|
-| **Final creative approval** | Client may see work only after Owner clears review/delivery gates. | Job reaches `ready_for_review` or `ready_for_delivery`; `ownerApprovalPending` set. |
+| **Owner support / escalation review** | Tagia reviews creative work only when the team requests support, the client escalates, revisions fail repeatedly, or the issue affects scope, money, policy, deadline, or relationship. | Legacy `ownerApprovalPending: before_review` support path or an exception/interaction requiring business judgment. |
 | **Exceptions** | Blockers that stop linked workflow until Owner resolves, assigns, or approves promotion. | `CampaignExceptionRecord` in `waiting_owner` / owner-held kinds (`OWNER_HELD_EXCEPTION_KINDS`). |
 | **Scope changes** | Deliverable or service changes outside the approved plan. | `scope_change` exception; client asks for work not on the plan. |
 | **Refund / payment-sensitive decisions** | Refunds, cancellations, or goodwill outside template eligibility. | 14-day Waiting on Client eligibility, production-not-started path, complaints, partial refund discretion. |
@@ -55,7 +55,7 @@ The Owner Console organizes stored work into **five trays**. Each tray answers o
 | Tray | Question Tagia asks | Owner action required? |
 |------|---------------------|-------------------------|
 | **Needs My Decision** | What requires my judgment today? | **Yes** — resolve, assign, or choose a non-template path. |
-| **Needs My Approval** | What must I approve before clients or production proceed? | **Yes** — approve, hold, decline, or release. |
+| **Needs My Approval** | What business gate or Owner support item needs me before clients or production proceed? | **Yes** — approve policy/material gates, support escalations, hold, decline, or release. |
 | **Needs Client** | What is blocked on the client, and is policy doing its job? | **No** — monitor only; Squishy sends reminders per rules. |
 | **Ready to Release** | What is finished and waiting for my final release? | **Yes** — final QA / delivery release. |
 | **Recently Handled** | What did I already clear? | **No** — audit and confidence; undo is not assumed. |
@@ -230,7 +230,7 @@ The Owner Console is an **operating system for Tagia’s day**, not organized in
 | **If I do not approve?** | Which path: team, client, deferred Owner, or split (§4.5) — client stays dark unless client path. |
 | **If I need more information?** | Clarification path — team or client; Squishy only if client-facing ask is approved. |
 
-Quick-approval items (promotion wording, review gate, final release) should still show all five — but default the primary action so Tagia can **review and approve in one tap** when nothing is wrong.
+Quick-decision items (promotion wording, Owner support review, final release) should still show all five — but default the primary action so Tagia can **resolve the business judgment in one tap** when nothing is wrong.
 
 ### 5.3 Operational destinations (Decision Core routing vocabulary)
 
@@ -486,7 +486,7 @@ Judgment, escalation, and discretion — work stays blocked until Tagia acts (or
 
 ### 8.2 Needs My Approval
 
-Tagia confirms **wording or gates** before the client sees something or before the next spine step.
+Tagia confirms **wording, business gates, or support escalations** before the next spine step. Routine creative review does not belong here.
 
 **Decision question (tray):** *Is this safe and correct to send to the client or advance to the next gate?*
 
@@ -494,11 +494,11 @@ Tagia confirms **wording or gates** before the client sees something or before t
 |-----------|----------------|-------------------|
 | **Client material promotion** | Team needs a fact/file from client; promotion must be client-safe. | Approve wording, hold internally, or decline. |
 | **Missing client fact (promotable)** | Same as promotion; blocks creative until fact exists. | Promote to client or resolve internally. |
-| **Approval before review** | Concepts ready; client must not see Review Room yet. | Creative ready for client review. |
+| **Owner support review** | Creative work needs Owner support because of escalation, repeated failure, or business judgment. | Support requested before client review. |
 | **Owner client-material review** | Exception panel title today for promotion review. | Same as client material promotion. |
 
 **Exception kinds (code today):** `client_request`, `missing_client_fact` (promotion path).  
-**Job gates (code today):** `ownerApprovalPending: before_review` · desk reason `approval_before_review`.
+**Job gates (legacy/support path):** `ownerApprovalPending: before_review` · desk reason `approval_before_review`, displayed as Owner Support Review.
 
 #### Client material promotion / missing client fact / owner client-material review
 
@@ -510,19 +510,19 @@ Tagia confirms **wording or gates** before the client sees something or before t
 | **Close / Resolve** (internal resolve) | Production | Team | No | Blocker cleared without client ask | Internal resolve logged | No |
 | **Assign** | Back to Team | Assignee | No | Internal follow-up | Assignment logged | Yes |
 
-#### Approval before review (Ready for Review)
+#### Owner support review (Ready for Review)
 
-**What do I decide?** *Is this creative ready for the client to see in Review Room?*
+**What do I decide?** *What Owner support does this creative issue need before client review?*
 
 | Outcome | Moves to | Notified | Squishy comms | Production | Campaign Record | Blocked |
 |---------|----------|----------|---------------|------------|-----------------|---------|
-| **Approve** | Client (Review Room) | Client, production | Yes — `ready_for_review` | Spine advances; `ownerApprovalPending` cleared | Review Room unlocked | No — client turn |
+| **Send to Review Room** | Client (Review Room) | Client, production | Yes — `ready_for_review` | Support review closes; `ownerApprovalPending` cleared | Review Room unlocked | No — client turn |
 | **Send Back for Revision** | Production | Assigned role, Producer | No | Job returns to rework; client does not see | Internal QA hold logged | Yes — production |
 | **Hold** | Needs Clarification | QA, Producer | No | Stays off client path | Internal review hold | Yes |
 | **Ask Team** | Back to Team | Assignee | No | Notes attached | Internal notes | Yes |
 | **Ask Client** | Waiting on Client | Client | Yes — only if approved client-facing question | Paused | Client input requested | Yes |
 
-**If I do not approve:** use **Send Back for Revision** or **Hold** — folder leaves **Needs My Approval**, lands in **Production** or **Needs Clarification**; client does not see work; folder may return when production resubmits.
+**If support is still needed:** use **Send Back for Revision** or **Hold** — folder leaves **Needs My Approval**, lands in **Production** or **Needs Clarification**; client does not see this version; folder returns only if Owner support is requested again.
 
 **If I need more information:** **Hold** or **Ask Team** → **Needs Clarification**; **Ask Client** only when client-facing wording is approved.
 
@@ -638,7 +638,7 @@ Short memory so Tagia trusts the desk is not hiding work.
 | Planned tray | Code / UI today | Gap |
 |--------------|-----------------|-----|
 | Needs My Decision | Owner Console `waitingOnOwner` exceptions (subset) + some Owner Desk reasons | Refund/complaint not fully wired; tray not named; **no outcome routing UI** |
-| Needs My Approval | Promotion panel + `approval_before_review` desk items | Mixed into one queue; **no “if not approve” path surfaced** |
+| Needs My Approval | Promotion panel + legacy/support `approval_before_review` desk items | Mixed into one queue; support/escalation wording must stay clear |
 | Needs Client | Scan `waiting_client` + waiting tray in Control Room | Shown with too much equal weight; auto-escalation not visible |
 | Ready to Release | `approval_before_delivery` desk items | Buried below fold; **no urgency sort** |
 | Recently Handled | Scan `recently_resolved` | Approvals/releases not included; **destination not shown** |

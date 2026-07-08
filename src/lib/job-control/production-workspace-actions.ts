@@ -12,7 +12,7 @@ import {
 } from "@/lib/file-registry/job-files";
 
 import { appendJobActivityEvent } from "./activity-log";
-import { applyJobSpineStatusChange, requestOwnerApprovalBeforeReview } from "./actions";
+import { applyJobSpineStatusChange } from "./actions";
 import { enqueueJobCommunicationRecord } from "./communication";
 import type { ProductionLaneView } from "./capacity";
 import { addClientDeliveryFile, syncCampaignStatusAfterDelivery } from "./final-delivery-actions";
@@ -186,7 +186,7 @@ function appendOwnerInternalNote(
     kind: "internal_note",
     occurredAt,
     actor,
-    reason: "Owner review gate note",
+    reason: "Owner support review note",
     messageContent: content,
   });
 
@@ -625,21 +625,49 @@ export function applyProductionWorkspacePatch(
         };
       }
 
-      job = requestOwnerApprovalBeforeReview(job);
+      const previousSpineStatus = job.spineStatus;
+      const result = applyJobSpineStatusChange(job, events, {
+        job,
+        nextStatus: "ready_for_review",
+        actor,
+        reason: "Production submitted client-ready work to Review Room",
+        occurredAt,
+      });
+      job = {
+        ...result.job,
+        ownerApprovalPending: null,
+      };
+      events = result.events;
+      envelope = enqueueJobCommunicationRecord(
+        { ...envelope, jobActivityEvents: events },
+        {
+          campaign,
+          clientId,
+          job,
+          eventType:
+            previousSpineStatus === "revision_requested"
+              ? "revision_ready_again"
+              : "ready_for_review",
+          sender: actor,
+          occurredAt,
+          idempotencyKey: occurredAt,
+        },
+      );
+      events = envelope.jobActivityEvents ?? [];
       events = appendJobActivityEvent(events, {
         campaignId: job.campaignId,
         jobId: job.jobId,
         kind: "approval",
         occurredAt,
         actor,
-        reason: "Submitted for Owner approval before client review",
+        reason: "Submitted to client Review Room by production",
       });
       break;
     }
 
     case "owner_approve_for_review": {
       if (!isOwnerUser(user)) {
-        return { ok: false, error: "Owner approval requires owner role.", status: 403 };
+        return { ok: false, error: "Owner support review requires owner role.", status: 403 };
       }
 
       const gate = canOwnerApproveForReview(job);
@@ -662,7 +690,7 @@ export function applyProductionWorkspacePatch(
         job,
         nextStatus: "ready_for_review",
         actor,
-        reason: "Owner approved — ready for client review",
+        reason: "Owner support resolved — ready for client review",
         occurredAt,
       });
       job = result.job;
@@ -759,7 +787,7 @@ export function applyProductionWorkspacePatch(
         kind: "approval",
         occurredAt,
         actor,
-        reason: "Owner held review gate for internal clarification",
+        reason: "Owner held support review for internal clarification",
       });
       break;
     }

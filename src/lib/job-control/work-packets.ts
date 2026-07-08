@@ -226,7 +226,8 @@ export function resolveJobWorkPacketSummaryView(input: {
     workingFileRefs: (job.workingFileRefs ?? []).map(redactWorkingFileRefForClient),
     roleRows,
     returnedFiles: returnedFileRows(packets),
-    ownerApprovalRequirement: "Owner approval is required before client review.",
+    ownerApprovalRequirement:
+      "Production is responsible for returning client-ready work; Owner support is only for escalations or business judgment.",
     returnLocationLabel: "Return draft/final file refs to Production Workspace.",
     integrationStatusLabel: "Manual file links only — no external tool connection.",
   };

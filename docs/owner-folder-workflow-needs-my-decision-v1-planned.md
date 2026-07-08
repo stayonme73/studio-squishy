@@ -42,7 +42,7 @@ Production · Waiting on Client · Needs Clarification · Recently Handled · Jo
 | Item | Correct tray |
 |------|----------------|
 | Client material promotion / missing client fact | **Needs My Approval** |
-| Approval before review / before delivery | **Needs My Approval** / **Ready to Release** |
+| Owner support review / final delivery approval | **Needs My Approval** / **Ready to Release** |
 | Waiting on materials, promoted request stale, client in Review Room | **Needs Client** (awareness only) |
 
 ---

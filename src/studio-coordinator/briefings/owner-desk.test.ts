@@ -141,7 +141,7 @@ describe("owner-desk briefings", () => {
       now: NOW,
     });
 
-    expect(parts.briefing).toContain("approval before the client can review");
+    expect(parts.briefing).toContain("Owner support or escalation review");
     expect(parts.briefing).not.toContain("folder waiting on your desk");
   });
 
@@ -190,8 +190,8 @@ describe("owner-desk briefings", () => {
       now: NOW,
     });
 
-    expect(briefing?.squishySays).toContain("Production has finished this campaign");
-    expect(briefing?.squishySays).toContain("before the client can see it");
+    expect(briefing?.squishySays).toContain("Production requested Owner support");
+    expect(briefing?.squishySays).toContain("routine creative handoff");
   });
 
   it("builds greeting with factual decision context", () => {

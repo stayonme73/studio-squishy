@@ -24,7 +24,7 @@ Prove one complete folder loop — **closed → open → decision → destinatio
 | Desk reason | `approval_before_review` |
 | Tray | **Needs My Approval** (`needs_my_approval`) |
 | Gate flag | `ownerApprovalPending: "before_review"` |
-| Title pattern | `Review gate — {serviceName}` |
+| Title pattern | `Owner Support Review — {serviceName}` |
 
 ---
 
@@ -52,15 +52,15 @@ Client Review Room · Production · Needs Clarification · Waiting on Client (by
 
 When multiple approvals exist:
 
-> {N} clients are waiting on Owner approval. This one is the oldest.
+> {N} support or approval items need you. This one is the oldest.
 
 **Squishy says (closed + open folder):**
 
-> Production has finished this campaign. Your approval is required before the client can see it.
+> Production requested Owner support before client review because this is no longer a routine creative handoff.
 
 **Why reached (coordinator panel):**
 
-> Approval before review. Owner approval required before client review.
+> Owner support review. Production requested support, escalation review, or business judgment before client review.
 
 **Coordinator trace:**
 
@@ -78,7 +78,7 @@ When multiple approvals exist:
 
 **Review checklist (Owner Console open folder):**
 
-> Review concepts, prepared deliverables, and internal production notes. The client cannot open Review Room until you approve.
+> Production owns client-ready creative. Review this only because the team requested support, the client escalated, revisions are failing, or the issue affects scope, money, policy, deadline, or relationship.
 
 **Drill-down:** Production Workspace (`/file-room/{campaignId}/production/{jobId}`) for deliverable prep, internal notes, file registry, and activity timeline.
 
@@ -88,7 +88,7 @@ When multiple approvals exist:
 
 | Action | Wired in Owner Console | Where folder goes after |
 |--------|------------------------|-------------------------|
-| **Approve for client review** | Yes | **Client Review Room** — `ownerApprovalPending` cleared; spine `ready_for_review`; Squishy `ready_for_review` comms |
+| **Send to Review Room** | Yes | **Client Review Room** — support review closes; spine `ready_for_review`; Squishy `ready_for_review` comms |
 | **Send back for revision** | Yes | **Production** — spine `building_concepts`; deliverable prep cleared; internal note; client does not see |
 | **Hold** | Yes | **Needs Clarification** — internal note; `ownerApprovalPending` cleared; production continues internally |
 | **Ask team** | Yes | **Back to assignee** — internal note; `ownerApprovalPending` cleared |
@@ -98,13 +98,13 @@ When multiple approvals exist:
 
 ## 4. If she approves
 
-**UI:** Approve for client review → confirm dialog → job PATCH `owner_approve_for_review`.
+**UI:** Send to Review Room → confirm dialog → job PATCH `owner_approve_for_review`.
 
 **System effects (existing mutator):**
 
 - `ownerApprovalPending` → `null`
 - Spine → `ready_for_review`
-- Activity event: Owner approved — ready for client review
+- Activity event: Owner support resolved — ready for client review
 - Communication: `ready_for_review` (or `revision_ready_again` if returning from revision)
 
 **Squishy after (status banner):**
@@ -130,7 +130,7 @@ When multiple approvals exist:
 
 **Squishy after:**
 
-> Routed back to production for revision. This folder left your desk — the client will not see this work until you approve again.
+> Routed back to production for rework. This support review left your desk — the client will not see this version yet.
 
 **Job PATCH:** `owner_send_back_for_review` with required `note`.
 
@@ -159,7 +159,7 @@ When multiple approvals exist:
 | Outcome | Leaves desk? | Next home | Returns to Owner desk when |
 |---------|--------------|-----------|----------------------------|
 | Approve | Yes | Client Review Room | Client approves for delivery → **Ready to Release** |
-| Send back | Yes | Production | Production resubmits for Owner approval |
+| Send back | Yes | Production | Production resubmits only if Owner support is requested again |
 | Hold | Yes | Needs Clarification | Internal resolution or resubmit |
 | Ask team | Yes | Team Office | Assignee resolves or resubmits |
 | Ask client | Yes | Waiting on Client | Response received or stale escalation |
@@ -194,7 +194,7 @@ npx vitest run src/lib/job-control/job-control.test.ts -t "approval_before_revie
 node scripts/prove-owner-folder-review-gate.mjs
 ```
 
-**Manual check:** Login `tagia@local.dev` / `dev-only` → Owner Console → closed folder shows Squishy says → Review Folder → Approve for client review → status banner → desk advances to next folder or clears.
+**Manual check:** Login `tagia@local.dev` / `dev-only` → Owner Console → closed folder shows Squishy says → Review Folder → Send to Review Room → status banner → desk advances to next folder or clears.
 
 ---
 

@@ -1,5 +1,5 @@
 /**
- * Seed Production Workspace V1 demo — job in workspace + Owner approval queue.
+ * Seed Production Workspace V1 demo — job in workspace + Review Room submit path.
  * Usage: node scripts/seed-production-workspace-v1.mjs
  */
 
@@ -102,7 +102,7 @@ const tasksEnvelope = {
       productionLane: "quick",
       intakeComplete: true,
       productionStartedAt: "2026-07-03T10:00:00.000Z",
-      ownerApprovalPending: "before_review",
+      ownerApprovalPending: null,
       clientDeadline: "July 18, 2026",
       deliverablePrep: [
         {
@@ -127,7 +127,7 @@ const tasksEnvelope = {
       internalNotes: [
         {
           id: "note:1",
-          content: "Concept direction approved internally — awaiting Owner gate.",
+          content: "Concept direction prepared internally - ready for Review Room.",
           createdAt: "2026-07-03T15:30:00.000Z",
           author: { role: "staff", displayName: "Producer" },
         },
@@ -175,7 +175,7 @@ const tasksEnvelope = {
       kind: "approval",
       occurredAt: "2026-07-03T16:00:00.000Z",
       actor: { role: "staff", displayName: "Producer" },
-      reason: "Submitted for Owner approval before client review",
+      reason: "Submitted to client Review Room by production",
     },
   ],
   updatedAt: NOW,

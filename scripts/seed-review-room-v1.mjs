@@ -106,8 +106,8 @@ const tasksEnvelope = {
       productionStartedAt: "2026-07-03T10:00:00.000Z",
       ownerApprovalPending: null,
       spineStatusSetAt: NOW,
-      spineStatusSetBy: { role: "owner", displayName: "Tagia" },
-      spineStatusReason: "Owner approved — ready for client review",
+      spineStatusSetBy: { role: "staff", displayName: "Producer" },
+      spineStatusReason: "Production submitted client-ready work to Review Room",
       clientDeadline: "July 18, 2026",
       deliverablePrep: [
         {
@@ -148,9 +148,9 @@ const tasksEnvelope = {
       jobId: JOB_ID,
       kind: "status_change",
       occurredAt: NOW,
-      actor: { role: "owner", displayName: "Tagia" },
+      actor: { role: "staff", displayName: "Producer" },
       spineStatus: "ready_for_review",
-      reason: "Owner approved — ready for client review",
+      reason: "Production submitted client-ready work to Review Room",
     },
   ],
   jobReviewFeedback: [],
