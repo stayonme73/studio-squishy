@@ -1,5 +1,6 @@
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 
+import { hasAcceptedAcceptanceReview } from "./acceptance-review";
 import type { ProductionLaneView } from "./capacity";
 import { blockingMaterialsForSku } from "./resolve-jobs";
 import type { JobDeliverablePrep, PurchasedJobRecord } from "./types";
@@ -65,6 +66,14 @@ export function canTransitionToBuildingConcepts(
     reasons.push({
       code: "intake_incomplete",
       message: "Client intake must be complete before production starts.",
+    });
+  }
+
+  if (!hasAcceptedAcceptanceReview(job)) {
+    reasons.push({
+      code: "acceptance_review_required",
+      message:
+        "Acceptance Review must be documented before production starts. Route unclear scope, timeline, compliance, pricing, policy, or material issues to Squishy and Decision Core first.",
     });
   }
 

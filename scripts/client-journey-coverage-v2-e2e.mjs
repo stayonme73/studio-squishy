@@ -6,11 +6,23 @@
 import { chromium } from "playwright";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import {
+  ROUTE_MAP_E2E_CAMPAIGN_KEY,
+  clickChooseThisJob,
+  clickTestPayment,
+  fillRouteMapIntake,
+  intakeTitleMatches,
+  loginBrowserContext,
+  readRouteMapIntakeTitle,
+  submitRouteMapIntake,
+  waitForRouteMapIntake,
+  waitForStudioBoardRecord,
+} from "./lib/route-map-e2e-shared.mjs";
 
 const BASE = process.env.VERIFY_BASE_URL ?? "http://localhost:3000";
 const OUT_DIR = path.resolve("tmp/client-journey-coverage-v2");
 const REPORT_PATH = path.join(OUT_DIR, "e2e-report.md");
-const CAMPAIGN_KEY = "studio-squishy:current-campaign";
+const CAMPAIGN_KEY = ROUTE_MAP_E2E_CAMPAIGN_KEY;
 const MATERIALS_DIR = path.resolve("data/campaign-materials");
 
 const ROAD = {
@@ -74,7 +86,7 @@ const SCENARIOS = [
       { type: "textarea", value: "June 15–16 · Free coffee with any pastry · 123 Main St · (555) 234-8901" },
       { type: "textarea", value: "Logo PNG, warm cream and brown brand colors, bakery interior photo" },
       { type: "select", value: "Both print and digital" },
-      { type: "text", value: "8.5×11 letter" },
+      { type: "text", value: "8.5Ã—11 letter" },
     ],
     fullJourney: true,
   },
@@ -180,27 +192,7 @@ async function selectRoad(page, customerLabel) {
 }
 
 async function fillIntakeWithPersona(page, scenario) {
-  let fieldIdx = 0;
-  const fields = page.locator(".route-map-intake__field");
-  const count = await fields.count();
-  for (let i = 0; i < count; i += 1) {
-    const spec = scenario.intakeFields[fieldIdx];
-    if (!spec) break;
-    const field = fields.nth(i);
-    const select = field.locator("select");
-    const textarea = field.locator("textarea");
-    const input = field.locator('input[type="text"]');
-    if (spec.type === "select" && (await select.count())) {
-      await select.selectOption({ label: spec.value });
-      fieldIdx += 1;
-    } else if (spec.type === "textarea" && (await textarea.count())) {
-      await textarea.fill(spec.value);
-      fieldIdx += 1;
-    } else if (spec.type === "text" && (await input.count())) {
-      await input.fill(spec.value);
-      fieldIdx += 1;
-    }
-  }
+  await fillRouteMapIntake(page, scenario);
 }
 
 async function waitForCampaignSync(page, campaignId, timeoutMs = 15000) {
@@ -296,7 +288,7 @@ async function runRouteMapCheckout(page, scenario, shotDir, logCaseId = scenario
   await selectRoad(page, scenario.road);
   await page.getByRole("button", { name: new RegExp(scenario.jobName.slice(0, 20), "i") }).click();
   await page.waitForSelector(".route-map-job-card", { timeout: 15000 });
-  await page.getByRole("button", { name: /choose this job/i }).click();
+  await clickChooseThisJob(page);
   await page.waitForSelector(".route-map-checkout-addon, .pay-paper-card--summary", {
     timeout: 15000,
   });
@@ -309,13 +301,11 @@ async function runRouteMapCheckout(page, scenario, shotDir, logCaseId = scenario
   }
   await page.screenshot({ path: path.join(shotDir, `${scenario.screenshotPrefix}-02-checkout.png`), fullPage: true });
 
-  const terms = page.locator('input[name="terms"]');
-  if (await terms.count()) await terms.check();
-  await page.getByRole("button", { name: /test payment|sandbox/i }).first().click();
+  await clickTestPayment(page);
 
-  await page.waitForSelector(".route-map-intake", { timeout: 25000 });
-  const intakeTitle = await page.locator("#route-map-intake-title").innerText();
-  if (intakeTitle !== scenario.intakeTitle) {
+  await waitForRouteMapIntake(page);
+  const intakeTitle = await readRouteMapIntakeTitle(page);
+  if (!intakeTitleMatches(scenario, intakeTitle)) {
     fail(logCaseId, `Intake title expected "${scenario.intakeTitle}", got "${intakeTitle}"`);
   } else {
     pass(logCaseId, `Service-specific intake: ${intakeTitle}`);
@@ -323,9 +313,8 @@ async function runRouteMapCheckout(page, scenario, shotDir, logCaseId = scenario
 
   await fillIntakeWithPersona(page, scenario);
   await page.screenshot({ path: path.join(shotDir, `${scenario.screenshotPrefix}-03-intake.png`), fullPage: true });
-  await page.getByRole("button", { name: /Submit intake/i }).click();
-  await page.waitForURL(/studio-board.*record=open/, { timeout: 25000 });
-  await page.waitForSelector('[data-testid="route-map-client-summary"]', { timeout: 15000 });
+  await submitRouteMapIntake(page, scenario);
+  await waitForStudioBoardRecord(page);
 
   const campaign = await page.evaluate((key) => {
     const raw = localStorage.getItem(key);
@@ -402,6 +391,10 @@ async function runFullProductionPath(ownerCookie, page, scenario, campaignId, jo
   }
 
   if (job?.spineStatus === "ready_for_queue") {
+    const accepted = await jobPatch(ownerCookie, campaignId, jobId, { action: "record_acceptance_review" });
+    if (accepted.status !== 200) {
+      fail(scenario.caseId, `Acceptance Review failed: ${accepted.json.error}`);
+    }
     const start = await jobPatch(ownerCookie, campaignId, jobId, { action: "start_building_concepts" });
     if (start.status !== 200) {
       fail(scenario.caseId, `Start building concepts failed: ${start.json.error}`);
@@ -446,15 +439,11 @@ async function runFullProductionPath(ownerCookie, page, scenario, campaignId, jo
   });
 
   const submit = await jobPatch(ownerCookie, campaignId, jobId, { action: "submit_for_owner_approval" });
-  if (submit.status !== 200) fail(scenario.caseId, `Submit for owner approval failed: ${submit.json.error}`);
-  else pass(scenario.caseId, "Owner Desk — approval before review");
+  if (submit.status !== 200) fail(scenario.caseId, `Submit to Review Room failed: ${submit.json.error}`);
+  else pass(scenario.caseId, "Production submitted client-ready work to Review Room");
 
-  await page.goto(`${BASE}/file-room/owner-console`, { waitUntil: "networkidle" });
-  await page.screenshot({ path: path.join(shotDir, `${scenario.screenshotPrefix}-06-owner-desk.png`), fullPage: true });
-
-  const approveReview = await jobPatch(ownerCookie, campaignId, jobId, { action: "owner_approve_for_review" });
-  if (approveReview.status !== 200) fail(scenario.caseId, `Owner approve for review failed`);
-  else pass(scenario.caseId, "Ready for Review");
+  await page.goto(`${BASE}/feedback-studio?jobId=${encodeURIComponent(jobId)}`, { waitUntil: "networkidle" });
+  await page.screenshot({ path: path.join(shotDir, `${scenario.screenshotPrefix}-06-review-room.png`), fullPage: true });
 
   const jobsRes = await api(ownerCookie, "GET", `/api/campaigns/${campaignId}/jobs/${encodeURIComponent(jobId)}`);
   const activity = jobsRes.json.jobActivityEvents ?? [];
@@ -503,7 +492,7 @@ async function runFullProductionPath(ownerCookie, page, scenario, campaignId, jo
 
   const finalRelease = await jobPatch(ownerCookie, campaignId, jobId, { action: "owner_final_release" });
   if (finalRelease.status !== 200) fail(scenario.caseId, "Owner final release failed");
-  else pass(scenario.caseId, "Owner final release → Ready for Delivery");
+  else pass(scenario.caseId, "Owner final release â†’ Ready for Delivery");
 
   for (let i = 0; i < deliverableKeys.length; i += 1) {
     await jobPatch(ownerCookie, campaignId, jobId, {
@@ -595,7 +584,7 @@ async function runWaitingOnClientCase(ownerCookie, page, shotDir) {
     if (job?.spineStatus !== "waiting_on_client") {
       fail(caseId, `Expected waiting_on_client at 72h+, got ${job?.spineStatus}`);
     } else {
-      pass(caseId, "72h policy → Waiting on Client");
+      pass(caseId, "72h policy â†’ Waiting on Client");
     }
     if (job?.returnLane && job.returnLane !== scenario.expectedLane) {
       fail(caseId, `returnLane expected ${scenario.expectedLane}, got ${job.returnLane}`);
@@ -617,7 +606,7 @@ async function runWaitingOnClientCase(ownerCookie, page, shotDir) {
     if (job?.spineStatus !== "ready_for_queue") {
       fail(caseId, `After materials arrive expected ready_for_queue, got ${job?.spineStatus}`);
     } else {
-      pass(caseId, "Materials cleared → re-queued to correct lane");
+      pass(caseId, "Materials cleared â†’ re-queued to correct lane");
     }
     if (job?.productionLane !== scenario.expectedLane) {
       fail(caseId, `Re-queue lane expected ${scenario.expectedLane}, got ${job?.productionLane}`);
@@ -766,6 +755,10 @@ async function runMultiJobCase(ownerCookie, page, shotDir) {
       pass(caseId, "Email job Waiting on Client while flyer remains unblocked");
     }
 
+    const accepted = await jobPatch(ownerCookie, campaignId, flyerJobId, { action: "record_acceptance_review" });
+    if (accepted.status !== 200) {
+      fail(caseId, `Flyer Acceptance Review blocked: ${accepted.json.error}`);
+    }
     const start = await jobPatch(ownerCookie, campaignId, flyerJobId, { action: "start_building_concepts" });
     if (start.status !== 200) {
       fail(caseId, `Flyer production start blocked: ${start.json.error}`);
@@ -864,16 +857,7 @@ async function main() {
   const ownerCookie = await login(OWNER_LOGIN.email, OWNER_LOGIN.password);
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  await context.addCookies([
-    {
-      name: "studio_session",
-      value: ownerCookie,
-      domain: "localhost",
-      path: "/",
-      httpOnly: true,
-      sameSite: "Lax",
-    },
-  ]);
+  await loginBrowserContext(context, BASE);
   const page = await context.newPage();
 
   for (const scenario of SCENARIOS) {

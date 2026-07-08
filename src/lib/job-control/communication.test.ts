@@ -192,8 +192,21 @@ describe("job communication outbox", () => {
     const [job] = syncJobRecordsFromCampaign(record, [], [], []);
     const lanes = resolveProductionLaneViews([{ campaignName: "Acme Co", job, tasks: [] }]);
 
-    const started = applyProductionWorkspacePatch(
+    const accepted = applyProductionWorkspacePatch(
       envelope([job]),
+      record,
+      job.jobId,
+      { action: "record_acceptance_review" },
+      { id: "owner", email: "owner@example.com", displayName: "Owner", roles: ["owner"] },
+      [],
+      lanes,
+      CLIENT_ID,
+    );
+    expect(accepted.ok).toBe(true);
+    if (!accepted.ok) return;
+
+    const started = applyProductionWorkspacePatch(
+      accepted.envelope,
       record,
       job.jobId,
       { action: "start_building_concepts" },
@@ -265,4 +278,3 @@ describe("job communication outbox", () => {
     expect(sent.envelope.jobActivityEvents?.some((entry) => entry.communicationDeliveryStatus === "test_sent")).toBe(true);
   });
 });
-

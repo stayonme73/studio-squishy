@@ -177,6 +177,27 @@ export type JobActivityActor = {
   displayName?: string;
 };
 
+export type JobAcceptanceReviewStatus = "pending" | "accepted" | "blocked";
+
+export type JobAcceptanceReviewRoute =
+  | "squishy_decision_core"
+  | "production"
+  | "client"
+  | "owner";
+
+export type JobAcceptanceReview = {
+  status: JobAcceptanceReviewStatus;
+  reviewedAt?: string;
+  reviewedBy?: JobActivityActor;
+  clientConfirmed: readonly string[];
+  studioConfirmed: readonly string[];
+  missingMaterials: readonly string[];
+  risks: readonly string[];
+  assumptions: readonly string[];
+  routeTo?: JobAcceptanceReviewRoute;
+  note?: string;
+};
+
 /** Persisted per purchased job — stored on campaign tasks envelope (schema v7). */
 export type PurchasedJobRecord = {
   jobId: string;
@@ -211,6 +232,8 @@ export type PurchasedJobRecord = {
   workingFileRefs?: readonly JobWorkingFileRef[];
   /** Internal job Work Packets — Team Office assignment and file-return trail. */
   workPackets?: readonly JobWorkPacket[];
+  /** Pre-production mutual understanding gate before production starts. */
+  acceptanceReview?: JobAcceptanceReview;
   /** Canonical File Room registry — metadata and storage refs only, never public provider links. */
   fileRegistry?: readonly StudioFileReference[];
   /** Client-facing final delivery files — shown in Final Delivery only. */

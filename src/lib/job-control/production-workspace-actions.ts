@@ -13,6 +13,7 @@ import {
 
 import { appendJobActivityEvent } from "./activity-log";
 import { applyJobSpineStatusChange } from "./actions";
+import { buildAcceptedAcceptanceReview } from "./acceptance-review";
 import { enqueueJobCommunicationRecord } from "./communication";
 import type { ProductionLaneView } from "./capacity";
 import { addClientDeliveryFile, syncCampaignStatusAfterDelivery } from "./final-delivery-actions";
@@ -51,6 +52,7 @@ import type {
 } from "./types";
 
 export type ProductionWorkspacePatchAction =
+  | "record_acceptance_review"
   | "start_building_concepts"
   | "assign_work_packet"
   | "return_work_packet_file"
@@ -79,6 +81,7 @@ export type ProductionWorkspacePatchAction =
   | "owner_assign_heavy_lane";
 
 export type ProductionWorkspacePatchBody =
+  | { action: "record_acceptance_review" }
   | { action: "start_building_concepts" }
   | { action: "assign_work_packet"; role: JobWorkPacketRole; note?: string }
   | {
@@ -286,6 +289,44 @@ export function applyProductionWorkspacePatch(
   const requiredDeliverables = requiredDeliverablesForJob(campaign, job);
 
   switch (body.action) {
+    case "record_acceptance_review": {
+      if (job.spineStatus !== "ready_for_queue") {
+        return {
+          ok: false,
+          error: "Acceptance Review is only available before production starts.",
+          status: 422,
+        };
+      }
+
+      const acceptanceReview = buildAcceptedAcceptanceReview({
+        campaign,
+        job,
+        materials,
+        actor,
+        occurredAt,
+      });
+
+      job = {
+        ...job,
+        acceptanceReview,
+        updatedAt: occurredAt,
+      };
+
+      events = appendJobActivityEvent(events, {
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        kind: "internal_note",
+        occurredAt,
+        actor,
+        reason:
+          acceptanceReview.status === "accepted"
+            ? "Acceptance Review accepted; project may enter production."
+            : "Acceptance Review blocked; route to Squishy and Decision Core before production.",
+        messageContent: acceptanceReview.note,
+      });
+      break;
+    }
+
     case "start_building_concepts": {
       const gate = canTransitionToBuildingConcepts(job, materials, laneViews);
       if (!gate.allowed) {

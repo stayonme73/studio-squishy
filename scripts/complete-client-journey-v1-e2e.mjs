@@ -8,11 +8,23 @@
 import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import {
+  ROUTE_MAP_E2E_CAMPAIGN_KEY,
+  clickChooseThisJob,
+  clickTestPayment,
+  fillRouteMapIntake,
+  intakeTitleMatches,
+  loginBrowserContext,
+  readRouteMapIntakeTitle,
+  submitRouteMapIntake,
+  waitForRouteMapIntake,
+  waitForStudioBoardRecord,
+} from "./lib/route-map-e2e-shared.mjs";
 
 const BASE = process.env.VERIFY_BASE_URL ?? "http://localhost:3000";
 const OUT_DIR = path.resolve("tmp/complete-client-journey-v1");
 const REPORT_PATH = path.join(OUT_DIR, "e2e-report.md");
-const CAMPAIGN_KEY = "studio-squishy:current-campaign";
+const CAMPAIGN_KEY = ROUTE_MAP_E2E_CAMPAIGN_KEY;
 const SKU = "v2-rtu-social-posts";
 
 const PERSONA = {
@@ -117,27 +129,7 @@ async function selectRoad(page, customerLabel) {
 }
 
 async function fillIntakeWithPersona(page) {
-  let fieldIdx = 0;
-  const fields = page.locator(".route-map-intake__field");
-  const count = await fields.count();
-  for (let i = 0; i < count; i += 1) {
-    const spec = PERSONA.intakeFields[fieldIdx];
-    if (!spec) break;
-    const field = fields.nth(i);
-    const select = field.locator("select");
-    const textarea = field.locator("textarea");
-    const input = field.locator('input[type="text"]');
-    if (spec.type === "select" && (await select.count())) {
-      await select.selectOption({ label: spec.value });
-      fieldIdx += 1;
-    } else if (spec.type === "textarea" && (await textarea.count())) {
-      await textarea.fill(spec.value);
-      fieldIdx += 1;
-    } else if (spec.type === "text" && (await input.count())) {
-      await input.fill(spec.value);
-      fieldIdx += 1;
-    }
-  }
+  await fillRouteMapIntake(page, PERSONA);
 }
 
 async function waitForCampaignSync(page, campaignId, timeoutMs = 15000) {
@@ -214,16 +206,7 @@ async function main() {
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  await context.addCookies([
-    {
-      name: "studio_session",
-      value: ownerCookie,
-      domain: "localhost",
-      path: "/",
-      httpOnly: true,
-      sameSite: "Lax",
-    },
-  ]);
+  await loginBrowserContext(context, BASE);
   const page = await context.newPage();
 
   let campaignId = "";
@@ -239,7 +222,7 @@ async function main() {
     await page.waitForSelector(".route-map-job-card", { timeout: 15000 });
     await page.screenshot({ path: path.join(OUT_DIR, "02-job-selected.png"), fullPage: true });
 
-    await page.getByRole("button", { name: /choose this job/i }).click();
+    await clickChooseThisJob(page);
     await page.waitForSelector(".route-map-checkout-addon, .pay-paper-card--summary", {
       timeout: 15000,
     });
@@ -255,23 +238,20 @@ async function main() {
     );
     await page.screenshot({ path: path.join(OUT_DIR, "03-checkout-post-publish.png"), fullPage: true });
 
-    const terms = page.locator('input[name="terms"]');
-    if (await terms.count()) await terms.check();
-    await page.getByRole("button", { name: /test payment|sandbox/i }).first().click();
+    await clickTestPayment(page);
 
-    await page.waitForSelector(".route-map-intake", { timeout: 25000 });
-    const intakeTitle = await page.locator("#route-map-intake-title").innerText();
+    await waitForRouteMapIntake(page);
+    const intakeTitle = await readRouteMapIntakeTitle(page);
     record(
       "Service-specific intake form",
-      intakeTitle === PERSONA.intakeTitle,
+      intakeTitleMatches(PERSONA, intakeTitle),
       intakeTitle,
     );
     await page.screenshot({ path: path.join(OUT_DIR, "04-intake-form.png"), fullPage: true });
 
     await fillIntakeWithPersona(page);
-    await page.getByRole("button", { name: /Submit intake/i }).click();
-    await page.waitForURL(/studio-board.*record=open/, { timeout: 25000 });
-    await page.waitForSelector('[data-testid="route-map-client-summary"]', { timeout: 15000 });
+    await submitRouteMapIntake(page, PERSONA);
+    await waitForStudioBoardRecord(page);
 
     const campaign = await page.evaluate((key) => {
       const raw = localStorage.getItem(key);
@@ -342,6 +322,14 @@ async function main() {
     );
 
     if (job?.spineStatus === "ready_for_queue") {
+      const accepted = await jobPatch(ownerCookie, campaignId, jobId, {
+        action: "record_acceptance_review",
+      });
+      record(
+        "Acceptance Review recorded",
+        accepted.status === 200 && accepted.json.job?.acceptanceReview?.status === "accepted",
+        accepted.json.error ?? accepted.json.job?.acceptanceReview?.status,
+      );
       const start = await jobPatch(ownerCookie, campaignId, jobId, {
         action: "start_building_concepts",
       });
@@ -401,20 +389,16 @@ async function main() {
       action: "submit_for_owner_approval",
     });
     record(
-      "Production → Owner Desk (before review gate)",
-      submit.status === 200 && submit.json.job?.ownerApprovalPending === "before_review",
-      submit.json.error ?? submit.json.job?.ownerApprovalPending,
+      "Production -> Review Room",
+      submit.status === 200 &&
+        submit.json.job?.ownerApprovalPending == null &&
+        submit.json.job?.spineStatus === "ready_for_review",
+      submit.json.error ?? `${submit.json.job?.spineStatus} / ${submit.json.job?.ownerApprovalPending}`,
     );
     job = submit.json.job ?? job;
 
-    await page.goto(`${BASE}/file-room/owner-console`, { waitUntil: "networkidle" });
-    const deskText = await page.locator(".fr-control-room-desk").innerText().catch(() => "");
-    record(
-      "Owner Desk shows approval_before_review",
-      deskText.includes("Review gate") && deskText.includes("Social Media"),
-      deskText.slice(0, 120),
-    );
-    await page.screenshot({ path: path.join(OUT_DIR, "08-owner-desk-review-gate.png"), fullPage: true });
+    await page.goto(`${BASE}/feedback-studio?jobId=${encodeURIComponent(jobId)}`, { waitUntil: "networkidle" });
+    await page.screenshot({ path: path.join(OUT_DIR, "08-review-room.png"), fullPage: true });
 
     await page.goto(
       `${BASE}/file-room/${campaignId}/production/${encodeURIComponent(jobId)}`,
@@ -422,22 +406,12 @@ async function main() {
     );
     await page.screenshot({ path: path.join(OUT_DIR, "09-production-workspace.png"), fullPage: true });
 
-    const approveReview = await jobPatch(ownerCookie, campaignId, jobId, {
-      action: "owner_approve_for_review",
-    });
-    record(
-      "Owner approval → Ready for Review",
-      approveReview.status === 200 && approveReview.json.job?.spineStatus === "ready_for_review",
-      approveReview.json.error ?? approveReview.json.job?.spineStatus,
-    );
-    job = approveReview.json.job ?? job;
-
     const jobsRes = await api(ownerCookie, "GET", `/api/campaigns/${campaignId}/jobs/${encodeURIComponent(jobId)}`);
     const activity = jobsRes.json.jobActivityEvents ?? [];
     const statusEvents = activity.filter((e) => e.kind === "status_change" || e.kind === "approval");
     record(
       "Activity log — timestamped status changes",
-      statusEvents.length >= 3 && statusEvents.every((e) => e.occurredAt),
+      statusEvents.length >= 2 && statusEvents.every((e) => e.occurredAt),
       `${statusEvents.length} status/approval events`,
     );
 

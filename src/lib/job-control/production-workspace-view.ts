@@ -13,6 +13,11 @@ import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
 import type { RouteMapProductionBrief } from "@/lib/route-map-production-brief";
 import { resolveRouteMapProductionBrief } from "@/lib/route-map-production-brief";
 
+import {
+  ACCEPTANCE_REVIEW_CLIENT_CONFIRMATIONS,
+  ACCEPTANCE_REVIEW_PURPOSE,
+  ACCEPTANCE_REVIEW_STUDIO_CONFIRMATIONS,
+} from "./acceptance-review";
 import { sortActivityEvents } from "./activity-log";
 import type { ProductionLaneView } from "./capacity";
 import {
@@ -72,11 +77,16 @@ export type ProductionWorkspaceView = {
   clientDeliveryFiles: NonNullable<PurchasedJobRecord["clientDeliveryFiles"]>;
   activity: readonly JobActivityEvent[];
   workPacketSummary: JobWorkPacketSummaryView;
+  acceptanceReview: PurchasedJobRecord["acceptanceReview"];
+  acceptanceReviewPurpose: string;
+  acceptanceReviewClientConfirmations: readonly string[];
+  acceptanceReviewStudioConfirmations: readonly string[];
   ownerApprovalPending: PurchasedJobRecord["ownerApprovalPending"];
   /** Client revision feedback — visible to production when job returned from Review Room. */
   clientRevisionFeedback: JobReviewFeedback | null;
   gates: {
     canStartBuildingConcepts: boolean;
+    canRecordAcceptanceReview: boolean;
     startBlockedReasons: readonly string[];
     canSubmitForOwnerApproval: boolean;
     submitBlockedReasons: readonly string[];
@@ -213,10 +223,16 @@ export function resolveProductionWorkspaceView(input: {
       materials,
       productionBrief: resolveProductionBriefForJob(campaign, job.skuId),
     }),
+    acceptanceReview: job.acceptanceReview,
+    acceptanceReviewPurpose: ACCEPTANCE_REVIEW_PURPOSE,
+    acceptanceReviewClientConfirmations: ACCEPTANCE_REVIEW_CLIENT_CONFIRMATIONS,
+    acceptanceReviewStudioConfirmations: ACCEPTANCE_REVIEW_STUDIO_CONFIRMATIONS,
     ownerApprovalPending: job.ownerApprovalPending ?? null,
     clientRevisionFeedback,
     gates: {
       canStartBuildingConcepts: startGate.allowed,
+      canRecordAcceptanceReview:
+        job.spineStatus === "ready_for_queue" && job.acceptanceReview?.status !== "accepted",
       startBlockedReasons: startGate.reasons.map((reason) => reason.message),
       canSubmitForOwnerApproval: submitGate.allowed,
       submitBlockedReasons: submitGate.reasons.map((reason) => reason.message),

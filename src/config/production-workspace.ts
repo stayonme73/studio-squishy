@@ -14,6 +14,14 @@ export const productionWorkspace = {
   briefTitle: "Production brief",
   briefEmpty: "No Route Map production brief for this job — scope comes from the approved plan line item.",
   scopeTitle: "Scope",
+  acceptanceReviewTitle: "Acceptance Review",
+  acceptanceReviewLead:
+    "Before production begins, document mutual understanding of service, scope, timeline, responsibilities, risks, and required materials.",
+  acceptanceReviewAcceptedLabel: "Accepted. This project may enter production.",
+  acceptanceReviewBlockedLabel:
+    "Blocked. Squishy and Decision Core must route the unresolved issue before production starts.",
+  acceptanceReviewPendingLabel: "Pending. Production cannot start until this review is recorded.",
+  recordAcceptanceReviewLabel: "Record Acceptance Review",
   deliverablesTitle: "Required deliverables",
   deliverablesLead: "Mark each deliverable prepared before submitting to client Review Room.",
   materialsTitle: "Materials received",

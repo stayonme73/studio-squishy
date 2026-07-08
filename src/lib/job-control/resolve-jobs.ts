@@ -207,6 +207,7 @@ export function buildPurchasedJobRecord(
     internalNotes: persisted?.internalNotes,
     workingFileRefs: persisted?.workingFileRefs,
     workPackets: persisted?.workPackets,
+    acceptanceReview: persisted?.acceptanceReview,
     fileRegistry: persisted?.fileRegistry,
     clientDeliveryFiles: persisted?.clientDeliveryFiles,
     deliveredAt: persisted?.deliveredAt ?? null,

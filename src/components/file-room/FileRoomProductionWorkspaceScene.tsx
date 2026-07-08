@@ -113,6 +113,55 @@ export default function FileRoomProductionWorkspaceScene({ view, isOwner }: Prop
             <p className="fr-kv-list__value">{view.scopeSummary}</p>
           </FileRoomSectionCard>
 
+          <FileRoomSectionCard title={productionWorkspace.acceptanceReviewTitle}>
+            <p className="fr-control-room__section-lead">
+              {view.acceptanceReviewPurpose}
+            </p>
+            <p className="fr-kv-list__value">
+              {view.acceptanceReview?.status === "accepted"
+                ? productionWorkspace.acceptanceReviewAcceptedLabel
+                : view.acceptanceReview?.status === "blocked"
+                  ? productionWorkspace.acceptanceReviewBlockedLabel
+                  : productionWorkspace.acceptanceReviewPendingLabel}
+            </p>
+            {view.acceptanceReview?.missingMaterials.length ? (
+              <div className="fr-production-workspace__gate">
+                <p className="fr-production-workspace__gate-title">Missing materials</p>
+                <ul>
+                  {view.acceptanceReview.missingMaterials.map((label) => (
+                    <li key={label}>{label}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            <div className="fr-production-workspace__gate">
+              <p className="fr-production-workspace__gate-title">Client confirms</p>
+              <ul>
+                {view.acceptanceReviewClientConfirmations.map((confirmation) => (
+                  <li key={confirmation}>{confirmation}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="fr-production-workspace__gate">
+              <p className="fr-production-workspace__gate-title">The Studio confirms</p>
+              <ul>
+                {view.acceptanceReviewStudioConfirmations.map((confirmation) => (
+                  <li key={confirmation}>{confirmation}</li>
+                ))}
+              </ul>
+            </div>
+            {view.gates.canRecordAcceptanceReview ? (
+              <button
+                type="button"
+                className="utility-btn utility-btn--primary"
+                disabled={busy}
+                onClick={() => void patch({ action: "record_acceptance_review" })}
+              >
+                {productionWorkspace.recordAcceptanceReviewLabel}
+              </button>
+            ) : null}
+          </FileRoomSectionCard>
+
           <FileRoomSectionCard title={productionWorkspace.deliverablesTitle}>
             <p className="fr-control-room__section-lead">{productionWorkspace.deliverablesLead}</p>
             {view.requiredDeliverables.length === 0 ? (

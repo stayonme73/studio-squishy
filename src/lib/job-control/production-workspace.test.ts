@@ -89,6 +89,23 @@ function baseJob(overrides: Partial<PurchasedJobRecord> = {}): PurchasedJobRecor
   };
 }
 
+function acceptedJob(overrides: Partial<PurchasedJobRecord> = {}): PurchasedJobRecord {
+  return baseJob({
+    acceptanceReview: {
+      status: "accepted",
+      reviewedAt: "2026-07-03T12:00:00.000Z",
+      reviewedBy: { role: "staff", displayName: "Staff" },
+      clientConfirmed: [],
+      studioConfirmed: [],
+      missingMaterials: [],
+      risks: [],
+      assumptions: [],
+      routeTo: "production",
+    },
+    ...overrides,
+  });
+}
+
 function envelope(job: PurchasedJobRecord): ServerTasksEnvelope {
   return {
     campaignId: "camp-pw",
@@ -164,7 +181,7 @@ const staffUser = {
 
 describe("production workspace gates", () => {
   it("blocks Building Concepts when materials are missing", () => {
-    const job = baseJob();
+    const job = acceptedJob();
     const materials: CampaignMaterialItem[] = [
       {
         id: "mat-1",
@@ -189,12 +206,22 @@ describe("production workspace gates", () => {
   });
 
   it("allows Building Concepts when materials complete and lane has capacity", () => {
-    const job = baseJob();
+    const job = acceptedJob();
     const laneViews = resolveProductionLaneViews([
       { campaignName: "PW Demo", job, tasks: [] },
     ]);
     const gate = canTransitionToBuildingConcepts(job, [], laneViews);
     expect(gate.allowed).toBe(true);
+  });
+
+  it("blocks Building Concepts until Acceptance Review is recorded", () => {
+    const job = baseJob();
+    const laneViews = resolveProductionLaneViews([
+      { campaignName: "PW Demo", job, tasks: [] },
+    ]);
+    const gate = canTransitionToBuildingConcepts(job, [], laneViews);
+    expect(gate.allowed).toBe(false);
+    expect(gate.reasons.some((reason) => reason.code === "acceptance_review_required")).toBe(true);
   });
 
   it("blocks Review Room submit until all deliverables are prepared", () => {
@@ -224,15 +251,28 @@ describe("production workspace gates", () => {
 });
 
 describe("production workspace handoff actions", () => {
-  it("start → prepare deliverables → submit opens client Review Room", () => {
+  it("acceptance review → start → prepare deliverables → submit opens client Review Room", () => {
     const job = baseJob();
     const env = envelope(job);
     const laneViews = resolveProductionLaneViews([
       { campaignName: "PW Demo", job, tasks: [] },
     ]);
 
-    const started = applyProductionWorkspacePatch(
+    const accepted = applyProductionWorkspacePatch(
       env,
+      campaign(),
+      job.jobId,
+      { action: "record_acceptance_review" },
+      staffUser,
+      [],
+      laneViews,
+    );
+    expect(accepted.ok).toBe(true);
+    if (!accepted.ok) return;
+    expect(accepted.job.acceptanceReview?.status).toBe("accepted");
+
+    const started = applyProductionWorkspacePatch(
+      accepted.envelope,
       campaign(),
       job.jobId,
       { action: "start_building_concepts" },
