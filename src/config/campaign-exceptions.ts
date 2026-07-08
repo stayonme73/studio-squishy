@@ -109,7 +109,7 @@ export const campaignExceptionsConfig = {
     scope_change: "Scope change",
     deadline_commitment: "Deadline commitment",
     deadline_risk: "Deadline risk",
-    revision_exhausted: "Revision allowance exhausted",
+    revision_exhausted: "Client boundary review",
     client_request: "Client request",
     routine_internal: "Routine internal",
   } satisfies Record<CampaignExceptionKind, string>,

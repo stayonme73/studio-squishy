@@ -221,7 +221,7 @@ function resolveSquishySaysForItem(item: OwnerConsoleSequentialItem): string {
       case "approval_before_delivery":
         return "The client approved this package. Your final release is required before they can receive it in Final Delivery.";
       case "revision_limit_reached":
-        return "The client reached the revision limit. Your decision unlocks the next step.";
+        return "A client boundary issue needs your business judgment before Squishy can respond.";
       case "scope_issue":
         return "The team needs your scope decision before production can continue.";
       case "deadline_exception":
@@ -241,7 +241,7 @@ function resolveSquishySaysForItem(item: OwnerConsoleSequentialItem): string {
   const kind = item.exceptionCard?.row.kind;
   switch (kind) {
     case "revision_exhausted":
-      return "The client used the last included revision. Your decision unlocks the next step.";
+      return "A legacy revision path now needs business judgment: boundary, scope, goodwill, or client relationship.";
     case "scope_change":
       return "A scope change needs your decision before production can continue.";
     case "client_request":
@@ -584,27 +584,27 @@ export function resolveOwnerRevisionPostDecisionBriefing(
     case "owner_allow_revision":
       return {
         destination: "production",
-        message: `Extra revision round approved. This folder left your desk — production will continue. Squishy will notify the client. ${ownerConfirmationSuffix()}`,
+        message: `Business exception approved. This folder left your desk — production will continue under the approved boundary. Squishy will notify the client. ${ownerConfirmationSuffix()}`,
       };
     case "owner_hold_firm_revision":
       return {
         destination: "waiting_on_client",
-        message: `Revision limit held. This folder left your desk — Squishy will send the policy-bound message to the client. ${ownerConfirmationSuffix()}`,
+        message: `Studio boundary held. This folder left your desk — Squishy will send the policy-bound message to the client. ${ownerConfirmationSuffix()}`,
       };
     case "owner_hold_revision":
       return {
         destination: "waiting_internal",
-        message: `Held for internal revision review. This folder left your desk — the team will follow up internally. ${ownerConfirmationSuffix()}`,
+        message: `Held for internal boundary review. This folder left your desk — the team will follow up internally. ${ownerConfirmationSuffix()}`,
       };
     case "owner_ask_team_revision":
       return {
         destination: "waiting_internal",
-        message: `Routed to production for revision assessment. This folder left your desk — the team will act from their office. ${ownerConfirmationSuffix()}`,
+        message: `Routed to production for boundary or scope assessment. This folder left your desk — the team will act from their office. ${ownerConfirmationSuffix()}`,
       };
     case "owner_ask_client_revision":
       return {
         destination: "waiting_on_client",
-        message: `Routed to the client queue for term confirmation. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the client queue for boundary confirmation. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
       };
     case "owner_assign_revision":
       return {
@@ -717,7 +717,7 @@ export function resolveOwnerComplaintPostDecisionBriefing(
     case "owner_escalate_complaint_revision":
       return {
         destination: "recently_handled",
-        message: `Handed off to a new decision folder. This complaint folder left your desk — resolve refund, scope, or revision on the next folder. ${ownerConfirmationSuffix()}`,
+        message: `Handed off to a new decision folder. This complaint folder left your desk — resolve refund, scope, or boundary review on the next folder. ${ownerConfirmationSuffix()}`,
       };
     case "owner_hold_complaint":
       return {

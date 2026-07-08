@@ -296,31 +296,31 @@ export const ownerConsole = {
     ],
   },
   revisionDecision: {
-    decisionQuestion: "Should this job receive another revision round, and on what terms?",
+    decisionQuestion: "What business boundary should the Studio hold for this client request?",
     whatTagiaReviews:
-      "Included revision rounds are exhausted. Review the client request and production notes before you allow another round or hold firm.",
+      "Routine revision policy has already been handled by Squishy and Decision Core. Review only the business judgment issue: boundary, scope, goodwill, or client relationship.",
     ownerNotesLabel: "Owner Notes",
     ownerNotesPlaceholder:
       "Your reasoning for this decision — saved to the historical record.",
     teamNoteLabel: "Note for production / QA",
-    teamNotePlaceholder: "What effort or scope context should production assess?",
+    teamNotePlaceholder: "What boundary, scope, or relationship context should production assess?",
     clientMessageLabel: "Approved client-facing message",
-    clientMessagePlaceholder: "Write the exact wording for term confirmation.",
+    clientMessagePlaceholder: "Write the exact wording for boundary, scope, or goodwill confirmation.",
     assignToLabel: "Assign to",
     confirmAllow:
-      "Allow an extra revision round and return work to production? The client will be notified.",
+      "Approve this business exception and return work to production? Squishy will notify the client with your approved boundary.",
     confirmHoldFirm:
-      "Hold the revision limit firm and send the policy-bound message to the client?",
+      "Hold the Studio boundary and send the policy-bound message to the client?",
     confirmHold:
-      "Hold this revision review for internal follow-up? The folder will leave your desk.",
+      "Hold this boundary review for internal follow-up? The folder will leave your desk.",
     confirmAskTeam:
       "Send this back to the team with your note? The folder will leave your desk.",
     confirmAskClient:
-      "Send this approved client message and pause for term confirmation? The folder will leave your desk.",
+      "Send this approved client message and pause for boundary confirmation? The folder will leave your desk.",
     confirmAssign:
-      "Assign this revision decision to the selected team member? The folder will leave your desk.",
-    allowLabel: "Allow extra round",
-    holdFirmLabel: "Hold firm",
+      "Assign this boundary decision to the selected team member? The folder will leave your desk.",
+    allowLabel: "Approve exception",
+    holdFirmLabel: "Hold boundary",
     holdLabel: "Hold",
     askTeamLabel: "Ask team",
     askClientLabel: "Ask client — need approval",
@@ -329,13 +329,13 @@ export const ownerConsole = {
     availableActions: [
       {
         id: "allow",
-        label: "Allow extra round",
+        label: "Approve exception",
         wired: true,
-        whereAfter: "Production — revision round opens; folder leaves your desk immediately.",
+        whereAfter: "Production — exception path recorded; folder leaves your desk immediately.",
       },
       {
         id: "hold_firm",
-        label: "Hold firm",
+        label: "Hold boundary",
         wired: true,
         whereAfter: "Waiting on Client or Recently Handled — client informed per policy.",
       },
@@ -343,19 +343,19 @@ export const ownerConsole = {
         id: "hold",
         label: "Hold",
         wired: true,
-        whereAfter: "Needs Clarification — internal revision review.",
+        whereAfter: "Needs Clarification — internal boundary review.",
       },
       {
         id: "ask_team",
         label: "Ask team",
         wired: true,
-        whereAfter: "Back to production — revision assessment.",
+        whereAfter: "Back to production — boundary or scope assessment.",
       },
       {
         id: "ask_client",
         label: "Ask client — need approval",
         wired: true,
-        whereAfter: "Waiting on Client — pending client accept or decline of terms.",
+        whereAfter: "Waiting on Client — pending client accept or decline of boundary terms.",
       },
       {
         id: "assign",
@@ -524,9 +524,9 @@ export const ownerConsole = {
   },
   complaintDecision: {
     decisionQuestion:
-      "What is the Studio response to this complaint — and does it require a separate refund, scope, or revision folder?",
+      "What is the Studio response to this complaint — and does it require a separate refund, scope, or boundary review?",
     whatTagiaReviews:
-      "This is a complaint folder — not a refund folder. If the real issue is refund, scope, or revisions, escalate to a new folder.",
+      "This is a complaint folder — not a refund folder. If the real issue is refund, scope, boundary, goodwill, or client relationship, escalate to that business judgment path.",
     ownerNotesLabel: "Owner Notes",
     ownerNotesPlaceholder:
       "Your reasoning for this decision — saved to the historical record.",
@@ -552,7 +552,7 @@ export const ownerConsole = {
     resolveLabel: "Resolve with reply",
     escalateRefundLabel: "Escalate to refund folder",
     escalateScopeLabel: "Escalate to scope folder",
-    escalateRevisionLabel: "Escalate to revision folder",
+    escalateRevisionLabel: "Escalate to boundary review",
     declineLabel: "Decline escalation",
     holdLabel: "Hold",
     askTeamLabel: "Ask team",
@@ -580,9 +580,9 @@ export const ownerConsole = {
       },
       {
         id: "escalate_revision",
-        label: "Escalate to revision folder",
+        label: "Escalate to boundary review",
         wired: true,
-        whereAfter: "Recently Handled — new revision folder appears on desk.",
+        whereAfter: "Recently Handled — new client boundary folder appears on desk.",
       },
       {
         id: "decline",
@@ -752,7 +752,7 @@ export const ownerConsoleImpactByKind: Record<CampaignExceptionKind, string> = {
   deadline_risk:
     "At-risk deadlines need Owner judgment before the team commits further.",
   revision_exhausted:
-    "Revision allowance is exhausted — further client rounds need Owner approval.",
+    "A legacy revision path has become a business judgment issue: boundary, scope, goodwill, or client relationship.",
   client_request:
     "Client-facing requests cannot go out until Owner approves the promotion wording.",
   routine_internal:
@@ -769,7 +769,7 @@ export const ownerConsoleOutcomeByKind: Record<CampaignExceptionKind, string> = 
   deadline_commitment: "After resolve → Producer updates timeline and dispatch.",
   deadline_risk: "After resolve → team adjusts schedule or scope with Owner guidance.",
   revision_exhausted:
-    "After resolve → Producer and client-facing roles follow approved revision path.",
+    "After resolve → Producer and client-facing roles follow the approved business judgment path.",
   client_request:
     "After approve → client materials queue; after hold → internal assignee verifies.",
   routine_internal: "After resolve or assign → assignee acts in their Team Office.",

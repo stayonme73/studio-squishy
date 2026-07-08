@@ -96,7 +96,7 @@ describe("owner-decision-folder-actions", () => {
     );
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.exception.resolutionNotes).toContain("held revision limit firm");
+    expect(result.exception.resolutionNotes).toContain("held Studio boundary");
   });
 
   it("owner_approve_scope_change resolves scope exception", () => {

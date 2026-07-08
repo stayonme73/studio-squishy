@@ -1,14 +1,13 @@
 /**
- * Studio Coordinator Phase 1 — offline self-test (no UI, no server).
+ * Studio Coordinator Phase 1 â€” offline self-test (no UI, no server).
  *
- * Simulates: client upload → revision → owner resolve → observations → learning candidate.
+ * Simulates: client upload â†’ revision â†’ owner resolve â†’ observations â†’ learning candidate.
  * Run: node scripts/run-studio-coordinator-self-test.mjs
  * Or:  npm run test:studio-coordinator-self-test
  */
 
 import type { CampaignRecord } from "@/config/studio-board";
 import { appendJobActivityEvent } from "@/lib/job-control/activity-log";
-import { bridgeExceptionFromRevisionExhausted } from "@/lib/campaign-tasks/exceptions-actions";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
@@ -174,7 +173,7 @@ function executionState(
 function ownerDeskItems(envelope: ServerTasksEnvelope): string[] {
   return (envelope.exceptionRecords ?? [])
     .filter((record) => record.status === "waiting_owner")
-    .map((record) => `${record.kind} (${record.id.slice(0, 8)}…)`);
+    .map((record) => `${record.kind} (${record.id.slice(0, 8)}â€¦)`);
 }
 
 function step(id: string, label: string, pass: boolean, evidence: string[]): SelfTestStepResult {
@@ -202,7 +201,7 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
     clientId: "client-self-test",
   };
 
-  // ── 1. Client upload (materials) ─────────────────────────────────────────
+  // â”€â”€ 1. Client upload (materials) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const upload = coordinateClientEvent(
     {
       type: "missing_file_upload",
@@ -218,7 +217,7 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
   session = upload.session;
   state = upload.state;
   coordinatorHandled.push(
-    `Client upload → ${upload.outcome.determination} · Core rules: ${upload.outcome.matchedRules.map((r) => r.ruleId).join(", ")}`,
+    `Client upload â†’ ${upload.outcome.determination} Â· Core rules: ${upload.outcome.matchedRules.map((r) => r.ruleId).join(", ")}`,
   );
 
   const uploadActivity = (state.envelope.jobActivityEvents ?? []).some(
@@ -234,7 +233,7 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
     ]),
   );
 
-  // ── 2. Revision request (round available — routine) ────────────────────
+  // â”€â”€ 2. Revision request (round available â€” routine) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const revisionOk = coordinateClientEvent(
     {
       type: "revision_request",
@@ -250,7 +249,7 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
   session = revisionOk.session;
   state = revisionOk.state;
   coordinatorHandled.push(
-    `Revision (round available) → ${revisionOk.outcome.determination} · humanReviewRequired=${revisionOk.outcome.humanReviewRequired}`,
+    `Revision (round available) â†’ ${revisionOk.outcome.determination} Â· humanReviewRequired=${revisionOk.outcome.humanReviewRequired}`,
   );
 
   const revisionActivity = (state.envelope.jobActivityEvents ?? []).some(
@@ -264,11 +263,11 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
     ]),
   );
 
-  // Mark round used — same as review-room path after successful revision
-  campaign = { ...state.campaign, revisionRoundsUsed: 1 };
+  // Move to reserve-round territory for the next revision event.
+  campaign = { ...state.campaign, revisionRoundsUsed: 3 };
   state = { ...state, campaign };
 
-  // ── 3. Repeated confusion → observation (no state change) ───────────────
+  // â”€â”€ 3. Repeated confusion â†’ observation (no state change) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const confusionTimes = [T2, T2, T2];
   for (const occurredAt of confusionTimes) {
     const inquiry = coordinateClientEvent(
@@ -306,9 +305,9 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
     coordinatorHandled.push(`Observation recorded (no decision): ${obs.kind}`);
   }
 
-  // ── 4. Revision exhausted → Owner Desk ─────────────────────────────────
+  // ---- 4. Reserve revision stays with Squishy + Decision Core ----
   const jobsSnapshot = JSON.stringify(state.jobs);
-  const revisionEscalate = coordinateClientEvent(
+  const revisionReserve = coordinateClientEvent(
     {
       type: "revision_request",
       campaignId: CAMPAIGN_ID,
@@ -320,8 +319,8 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
     session,
     exec,
   );
-  session = revisionEscalate.session;
-  state = revisionEscalate.state;
+  session = revisionReserve.session;
+  state = revisionReserve.state;
 
   const ownerItems = ownerDeskItems(state.envelope);
   const revisionException = (state.envelope.exceptionRecords ?? []).find(
@@ -329,40 +328,23 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
   );
 
   coordinatorHandled.push(
-    `Revision (exhausted) → ${revisionEscalate.outcome.determination} · effects: ${revisionEscalate.outcome.effects.map((e) => e.kind).join(", ")}`,
+    `Reserve revision -> ${revisionReserve.outcome.determination} Â· effects: ${revisionReserve.outcome.effects.map((e) => e.kind).join(", ")}`,
   );
-  if (revisionException) {
-    routedToOwner.push(
-      `revision_exhausted · ${revisionException.title} · status=${revisionException.status}`,
-    );
-  }
-
-  // Parity: direct mutator vs coordinator path
-  const directEnvelope = bridgeExceptionFromRevisionExhausted(
-    baseEnvelope(),
-    TASK_ID,
-    baseCampaign({ revisionRoundsUsed: 1 }),
-    COORDINATOR_SYSTEM_USER,
-    coordinatorAssignments,
-  );
-  const directKind = directEnvelope.exceptionRecords?.[0]?.kind;
-  const coordKind = revisionException?.kind;
-  const parityMatch = directKind === coordKind && revisionEscalate.outcome.humanReviewRequired;
   storeStateMatch.push(
-    `revision_exhausted parity: direct=${directKind} coordinator=${coordKind} (${parityMatch ? "match" : "MISMATCH"})`,
+    `reserve revision owner exception: ${revisionException ? "created" : "none"}`,
   );
 
   steps.push(
     step(
-      "revision_exhausted",
-      "Revision limit → Owner Desk via Decision Core + mutator",
-      Boolean(revisionException) &&
-        revisionEscalate.outcome.determination === "escalate" &&
-        parityMatch,
+      "reserve_revision",
+      "Reserve revision handled by Squishy + Decision Core",
+      !revisionException &&
+        revisionReserve.outcome.determination === "respond" &&
+        !revisionReserve.outcome.humanReviewRequired,
       [
-        `determination: ${revisionEscalate.outcome.determination}`,
-        `humanReviewRequired: ${revisionEscalate.outcome.humanReviewRequired}`,
-        `exception: ${revisionException?.kind ?? "missing"}`,
+        `determination: ${revisionReserve.outcome.determination}`,
+        `humanReviewRequired: ${revisionReserve.outcome.humanReviewRequired}`,
+        `exception: ${revisionException?.kind ?? "none"}`,
         `owner desk: ${ownerItems.join("; ") || "(empty)"}`,
         `job state unchanged by observation path: ${JSON.stringify(state.jobs) === jobsSnapshot}`,
         storeStateMatch[storeStateMatch.length - 1] ?? "",
@@ -370,58 +352,19 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
     ),
   );
 
-  // ── 5. Owner approval (resolve) + learning candidate ───────────────────
-  if (!revisionException) {
-    steps.push(
-      step("owner_resolve", "Owner resolves revision_exhausted", false, ["No exception to resolve."]),
-    );
-  } else {
-    const ownerResult = coordinateOwnerOutcome(
-      {
-        campaignId: CAMPAIGN_ID,
-        exceptionId: revisionException.id,
-        action: "resolve_exception",
-        occurredAt: T3,
-        user: owner,
-        assignments: coordinatorAssignments,
-        payload: { resolutionNotes: "Owner approved one additional revision round." },
-      },
-      state,
-      session,
-    );
-    session = ownerResult.session;
-    state = ownerResult.state;
-
-    const resolved = (state.envelope.exceptionRecords ?? []).find(
-      (record) => record.id === revisionException.id,
-    );
-    const candidate = session.learningCandidates[0];
-    const candidateOk =
-      candidate?.status === "pending_review" && ownerResult.summary.learningCandidateRecorded;
-
-    coordinatorHandled.push(`Owner resolve → exception status=${resolved?.status}`);
-    if (candidate) {
-      learningCandidates.push(
-        `${candidate.status}: ${candidate.situationSummary} · outcome=${candidate.ownerOutcome}`,
-      );
-      coordinatorHandled.push(`Learning candidate stored (not applied): ${candidate.id.slice(0, 8)}…`);
-    }
-
-    steps.push(
-      step("owner_resolve", "Owner approval via coordinator + learning candidate", resolved?.status === "resolved" && candidateOk, [
-        `exception status: ${resolved?.status ?? "missing"}`,
-        `learning candidate: ${candidate ? candidate.status : "none"}`,
-        `owner message: ${ownerResult.summary.message}`,
-        `owner desk after resolve: ${ownerDeskItems(state.envelope).length}`,
-      ]),
-    );
-  }
-
-  // ── 6. Decision Core + audit trail ─────────────────────────────────────
+  // ---- 5. Owner approval is skipped for routine reserve revisions ----
+  steps.push(
+    step(
+      "owner_resolve_skipped",
+      "No Owner resolve step for routine reserve revision",
+      !revisionException,
+      ["Routine revisions stay with Squishy + Decision Core."],
+    ),
+  );
+  // â”€â”€ 6. Decision Core + audit trail â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const auditSteps = session.auditLog.map((entry) => entry.step);
   const hasCoreEval = auditSteps.includes("decision_evaluated");
   const hasEffects = auditSteps.includes("effects_executed");
-  const hasOwnerAction = auditSteps.includes("owner_action_executed");
   const matchedRulesLogged = session.auditLog.some(
     (entry) => (entry.outcome?.matchedRules?.length ?? 0) > 0,
   );
@@ -430,7 +373,7 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
     const rules =
       entry.outcome?.matchedRules?.map((rule) => rule.ruleId).join(", ") ?? "";
     auditTrail.push(
-      `${entry.step} · ${entry.summary}${rules ? ` · rules: ${rules}` : ""}`,
+      `${entry.step} Â· ${entry.summary}${rules ? ` Â· rules: ${rules}` : ""}`,
     );
   }
 
@@ -445,15 +388,6 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
         `matched_rules in audit: ${matchedRulesLogged}`,
         `audit entries: ${session.auditLog.length}`,
       ],
-    ),
-  );
-
-  steps.push(
-    step(
-      "owner_audit",
-      "Owner outcome in audit trail",
-      hasOwnerAction,
-      [`owner_action_executed: ${hasOwnerAction}`],
     ),
   );
 
@@ -475,62 +409,62 @@ export function runStudioCoordinatorSelfTest(): SelfTestReport {
 export function formatSelfTestReport(report: SelfTestReport): string {
   const lines: string[] = [
     "",
-    "══════════════════════════════════════════════════════════════",
-    "  Studio Coordinator — Phase 1 Self-Test",
-    "══════════════════════════════════════════════════════════════",
+    "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•",
+    "  Studio Coordinator â€” Phase 1 Self-Test",
+    "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•",
     "",
     `Campaign: ${report.campaignId}`,
     `Result: ${report.ok ? "PASS" : "FAIL"}`,
     "",
-    "── Steps ──────────────────────────────────────────────────────",
+    "â”€â”€ Steps â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€",
   ];
 
   for (const entry of report.steps) {
-    lines.push(`  ${entry.pass ? "✓" : "✗"} ${entry.label}`);
+    lines.push(`  ${entry.pass ? "âœ“" : "âœ—"} ${entry.label}`);
     for (const line of entry.evidence) {
       lines.push(`      ${line}`);
     }
   }
 
-  lines.push("", "── Coordinator handled ────────────────────────────────────────");
+  lines.push("", "â”€â”€ Coordinator handled â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€");
   for (const line of report.coordinatorHandled) {
-    lines.push(`  · ${line}`);
+    lines.push(`  Â· ${line}`);
   }
 
-  lines.push("", "── Routed to Owner Desk ───────────────────────────────────────");
+  lines.push("", "â”€â”€ Routed to Owner Desk â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€");
   if (report.routedToOwner.length === 0) {
     lines.push("  (none in this scenario before owner acted)");
   } else {
     for (const line of report.routedToOwner) {
-      lines.push(`  · ${line}`);
+      lines.push(`  Â· ${line}`);
     }
   }
 
-  lines.push("", "── Store state parity ─────────────────────────────────────────");
+  lines.push("", "â”€â”€ Store state parity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€");
   for (const line of report.storeStateMatch) {
-    lines.push(`  · ${line}`);
+    lines.push(`  Â· ${line}`);
   }
 
-  lines.push("", "── Observations (not decisions) ───────────────────────────────");
+  lines.push("", "â”€â”€ Observations (not decisions) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€");
   for (const line of report.observations) {
-    lines.push(`  · ${line}`);
+    lines.push(`  Â· ${line}`);
   }
 
-  lines.push("", "── Learning candidates (pending review only) ──────────────────");
+  lines.push("", "â”€â”€ Learning candidates (pending review only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€");
   for (const line of report.learningCandidates) {
-    lines.push(`  · ${line}`);
+    lines.push(`  Â· ${line}`);
   }
 
-  lines.push("", "── Audit trail ────────────────────────────────────────────────");
+  lines.push("", "â”€â”€ Audit trail â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€");
   for (const line of report.auditTrail) {
-    lines.push(`  · ${line}`);
+    lines.push(`  Â· ${line}`);
   }
 
   lines.push("");
   return lines.join("\n");
 }
 
-/** Direct upload parity — activity event matches appendJobActivityEvent shape. */
+/** Direct upload parity â€” activity event matches appendJobActivityEvent shape. */
 export function directClientUploadActivity(
   envelope: ServerTasksEnvelope,
   job: PurchasedJobRecord,

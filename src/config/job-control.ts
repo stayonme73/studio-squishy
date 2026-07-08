@@ -47,7 +47,7 @@ export const OWNER_CONTROL_ROOM_SECTION = {
     approval_before_delivery: "Approval before final delivery",
     deadline_exception: "Deadline exception",
     scope_issue: "Scope issue",
-    revision_limit_reached: "Revision limit reached",
+    revision_limit_reached: "Client boundary review",
     at_risk_job: "At-risk job",
     heavy_lane_full: "Heavy lane full",
     refund_eligible: "14-day refund eligible",

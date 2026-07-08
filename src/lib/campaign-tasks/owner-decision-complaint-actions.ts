@@ -118,7 +118,7 @@ function escalateComplaint(
   payload: {
     ownerNotes?: string;
     handoffSuffix: string;
-    kind: "scope_change" | "revision_exhausted";
+    kind: "scope_change";
     title: string;
     description: string;
     taskId?: string;
@@ -298,9 +298,9 @@ export function applyOwnerEscalateComplaintRevision(
     existing,
     {
       ownerNotes: payload.ownerNotes,
-      handoffSuffix: "Owner escalate (complaint → revision folder)",
-      kind: "revision_exhausted",
-      title: "Revision limit — escalated from complaint",
+      handoffSuffix: "Owner escalate (complaint -> client boundary review)",
+      kind: "scope_change",
+      title: "Client Boundary Review - escalated from complaint",
       description: existing.clientMessage,
       taskId: payload.taskId,
     },

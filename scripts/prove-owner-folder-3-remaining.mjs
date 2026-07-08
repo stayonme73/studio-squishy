@@ -156,7 +156,7 @@ async function main() {
     {
       action: "owner_allow_revision",
       exceptionId: "exc-owner-revision-v1",
-      ownerNotes: "One extra round approved.",
+      ownerNotes: "Business exception approved with boundary recorded.",
     },
   );
 

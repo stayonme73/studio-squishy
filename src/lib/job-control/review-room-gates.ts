@@ -6,6 +6,30 @@ export type ReviewGateResult = {
   reasons: string[];
 };
 
+export type ClientRevisionPolicyStage = "included" | "reserve" | "hard_stop";
+
+export const INCLUDED_CLIENT_REVISION_ROUNDS = 3;
+export const RESERVE_CLIENT_REVISION_ROUNDS = 5;
+
+export function resolveClientRevisionPolicyStage(
+  revisionRoundsUsed: number,
+): ClientRevisionPolicyStage {
+  const nextRound = revisionRoundsUsed + 1;
+  if (nextRound <= INCLUDED_CLIENT_REVISION_ROUNDS) return "included";
+  if (nextRound <= RESERVE_CLIENT_REVISION_ROUNDS) return "reserve";
+  return "hard_stop";
+}
+
+export function clientRevisionRoundRequiresReserveHandling(
+  revisionRoundsUsed: number,
+): boolean {
+  return resolveClientRevisionPolicyStage(revisionRoundsUsed) === "reserve";
+}
+
+export function clientRevisionRoundHardStops(revisionRoundsUsed: number): boolean {
+  return resolveClientRevisionPolicyStage(revisionRoundsUsed) === "hard_stop";
+}
+
 export function resolveReviewBlockedReasons(input: {
   job: PurchasedJobRecord;
   feedback: JobReviewFeedback;
@@ -54,8 +78,8 @@ export function canRequestJobRevision(input: {
     reasons.push("Required deliverables must be prepared before submitting.");
   }
 
-  if (input.revisionRoundsUsed >= input.revisionRoundsIncluded) {
-    reasons.push("Revision allowance exhausted — Owner decision required.");
+  if (clientRevisionRoundHardStops(input.revisionRoundsUsed)) {
+    reasons.push("Revision policy has reached the hard stop.");
   }
 
   const hasRevisionSignal = hasClientRevisionIntent(input.feedback);

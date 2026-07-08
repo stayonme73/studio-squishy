@@ -242,7 +242,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "Your Project Record shows the revision allowance for each job, including revisions included, used, and remaining where applicable.",
+            text: "Your Project Record shows the revision policy details for each job, including revisions included, used, and remaining where applicable.",
           },
         ] as const,
       },

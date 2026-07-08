@@ -1,6 +1,7 @@
 /** Feedback Studio — section ids, session types, copy. */
 
 import type { ReviewRoomOptionId } from "@/config/review-room";
+import type { NoActiveProjectCopy } from "@/config/access-control";
 import type { DeliverableSectionId } from "@/lib/deliverable-scope";
 
 export type FeedbackConceptId = ReviewRoomOptionId;
@@ -145,7 +146,7 @@ export const feedbackStudio = {
     requestRevisionJob: "Request Revision",
     approveForDelivery: "Approve for Delivery",
     revisionLimitNotice:
-      "Revision allowance reached — your request has been sent to the Owner Desk for a decision.",
+      "This request needs a business boundary review before Squishy can respond.",
     submitted: "Feedback submitted — thank you.",
     stickyPlaceholder: "Write your note…",
     saveSticky: "Place note",
@@ -193,6 +194,33 @@ export const feedbackStudio = {
     title: "No campaign yet",
     body: "Start a campaign in Project Discovery to review concepts here.",
     cta: "Go to Studio Board",
+  },
+
+  clientAccess: {
+    noActiveProject: {
+      eyebrow: "Review Room",
+      title: "No Active Project",
+      message: "There isn't an active project ready for review.",
+      messageSecondary:
+        "Start a new project from the Route Map, or return when your campaign reaches the Review stage.",
+      footnote: "Approved concepts will appear here when your project reaches the Review stage.",
+      primaryCta: "GO TO ROUTE MAP",
+      secondaryCta: "Help Center",
+      primaryHref: "/route-map",
+      secondaryHref: "/help-center",
+    } satisfies NoActiveProjectCopy,
+    notReady: {
+      eyebrow: "Review Room",
+      title: "Not Ready for Review Yet",
+      message: "Your concepts aren't ready for review yet.",
+      messageSecondary:
+        "The Studio is still preparing your campaign. Check your Studio Board for status — Review Room opens when concepts are ready.",
+      footnote: "Approved concepts will appear here when your project reaches the Review stage.",
+      primaryCta: "GO TO STUDIO BOARD",
+      secondaryCta: "Help Center",
+      primaryHref: "/studio-board",
+      secondaryHref: "/help-center",
+    } satisfies NoActiveProjectCopy,
   },
 } as const;
 

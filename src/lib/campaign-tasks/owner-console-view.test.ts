@@ -321,7 +321,7 @@ describe("owner-console-view", () => {
       bundle("campaign-1", "Alpha Co", [
         exception({
           kind: "revision_exhausted",
-          title: "Revision allowance exhausted",
+          title: "Client Boundary Review",
           description: "Client round limit reached",
         }),
       ]),
@@ -351,7 +351,7 @@ describe("owner-console-view", () => {
     });
     expect(reason).toContain("unclaimed");
     expect(reason).toContain("Copy");
-    expect(reason).not.toContain("Revision allowance exhausted");
+    expect(reason).not.toContain("Client Boundary Review");
   });
 
   it("blocks reassign for promotable exceptions awaiting owner approval", () => {

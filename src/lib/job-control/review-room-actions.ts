@@ -1,10 +1,9 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import { requiredDeliverablesForJob } from "@/lib/approved-plan-line";
 import { resolveCampaignRevisionRounds } from "@/lib/approved-plan-display";
-import { bridgeExceptionFromRevisionExhausted } from "@/lib/campaign-tasks/exceptions-actions";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import { applyJobSpineStatusChange } from "./actions";
 import { appendJobActivityEvent } from "./activity-log";
@@ -17,7 +16,8 @@ import type { JobReviewFeedback } from "./review-feedback-types";
 import {
   canApproveJobForDelivery,
   canRequestJobRevision,
-  clientRevisionRoundWouldExceed,
+  clientRevisionRoundHardStops,
+  clientRevisionRoundRequiresReserveHandling,
 } from "./review-room-gates";
 import { findJobReviewFeedback, upsertJobReviewFeedback } from "./review-room-view";
 import type { JobActivityActor, JobActivityEvent, PurchasedJobRecord } from "./types";
@@ -166,33 +166,19 @@ export function applyReviewRoomPatch(
     }
 
     case "request_revision": {
-      if (clientRevisionRoundWouldExceed(revisionRoundsUsed, revisionRoundsIncluded)) {
-        const taskId =
-          envelope.tasks?.find((task) => task.relatedServiceIds.includes(job.skuId as never))
-            ?.id ?? job.jobId;
-
-        let nextEnvelope = bridgeExceptionFromRevisionExhausted(
-          envelope,
-          taskId,
-          campaign,
-          user,
-          assignments,
-        );
-
+      if (clientRevisionRoundHardStops(revisionRoundsUsed)) {
         events = appendJobActivityEvent(events, {
           campaignId: job.campaignId,
           jobId: job.jobId,
           kind: "client_revision_request",
           occurredAt,
           actor,
-          reason: "Revision limit reached — escalated to Owner Desk",
+          reason: "Revision hard stop reached - Squishy will hold policy unless this becomes a boundary, scope, goodwill, or relationship decision.",
         });
-
-        nextEnvelope = updateJobInEnvelope(nextEnvelope, currentJob, events);
 
         return {
           ok: false,
-          error: "Revision allowance exhausted. Your request has been sent to the Owner Desk.",
+          error: "This job has reached the revision hard stop. Squishy will follow policy unless the request becomes a business judgment issue.",
           status: 422,
           revisionLimitReached: true,
         };
@@ -218,15 +204,20 @@ export function applyReviewRoomPatch(
         submittedAt: occurredAt,
         submissionType: "revision_requested",
       };
+      const isReserveRevision = clientRevisionRoundRequiresReserveHandling(revisionRoundsUsed);
 
       const statusResult = applyJobSpineStatusChange(currentJob, events, {
         job: currentJob,
-        nextStatus: "revision_requested",
+        nextStatus: isReserveRevision ? "ready_for_queue" : "revision_requested",
         actor,
-        reason: "Client requested revision with feedback",
+        reason: isReserveRevision
+          ? "Reserve revision requested with feedback - returned to production queue"
+          : "Client requested revision with feedback",
         occurredAt,
       });
-      currentJob = statusResult.job;
+      currentJob = isReserveRevision
+        ? { ...statusResult.job, laneQueuedAt: occurredAt }
+        : statusResult.job;
       events = statusResult.events;
 
       events = appendJobActivityEvent(events, {
@@ -235,8 +226,10 @@ export function applyReviewRoomPatch(
         kind: "client_revision_request",
         occurredAt,
         actor,
-        reason: "Client requested revision",
-        spineStatus: "revision_requested",
+        reason: isReserveRevision
+          ? "Reserve revision round requested - required questions and delay acknowledgment handled by Squishy and Decision Core"
+          : "Client requested revision",
+        spineStatus: currentJob.spineStatus,
       });
       let nextEnvelope = enqueueJobCommunicationRecord(
         { ...envelope, jobActivityEvents: events },

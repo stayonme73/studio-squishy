@@ -1,4 +1,8 @@
-import { clientRevisionRoundWouldExceed } from "@/lib/job-control/review-room-gates";
+import {
+  clientRevisionRoundHardStops,
+  clientRevisionRoundRequiresReserveHandling,
+  resolveClientRevisionPolicyStage,
+} from "@/lib/job-control/review-room-gates";
 import { evaluateClientRefundChannelRequest } from "@/lib/campaign-tasks/refund-request-routing";
 
 import type {
@@ -48,7 +52,7 @@ function refundOutcomeFromChannelRouting(
   if (routing.kind === "not_refund") return null;
 
   const interactionKind: CustomerInteractionKind = "refund_request";
-  const matchedRules = [
+  const matchedRules: DecisionOutcome["matchedRules"] = [
     {
       ruleId: `decision-core:incoming:refund-channel:${routing.sourceChannel}`,
       matchedValue: routing.kind,
@@ -113,7 +117,7 @@ export function evaluateIncomingCustomerInteraction(
   if (refundOutcome) return refundOutcome;
 
   const interactionKind = classifyIncomingCustomerEvent(trigger.eventType);
-  const matchedRules = [
+  const matchedRules: DecisionOutcome["matchedRules"] = [
     {
       ruleId: `decision-core:incoming:${trigger.eventType}`,
       matchedValue: interactionKind,
@@ -123,30 +127,33 @@ export function evaluateIncomingCustomerInteraction(
 
   let determination: DecisionOutcome["determination"] = "respond";
   let humanReviewRequired = false;
+  let squishyMessage: string | undefined;
   const effects: DecisionOutcome["effects"] = [
     { kind: "record_incoming_interaction", interactionKind },
   ];
 
   if (trigger.eventType === "revision_request" || trigger.eventType === "revision_message") {
     const revisionRoundsUsed = Number(context.facts.revisionRoundsUsed ?? 0);
-    const revisionRoundsIncluded = Number(context.facts.revisionRoundsIncluded ?? 0);
-    const wouldExceed = clientRevisionRoundWouldExceed(
-      revisionRoundsUsed,
-      revisionRoundsIncluded,
-    );
+    const revisionPolicyStage = resolveClientRevisionPolicyStage(revisionRoundsUsed);
 
     matchedRules.push({
-      ruleId: "job-control:review-room-gates:clientRevisionRoundWouldExceed",
-      matchedValue: String(wouldExceed),
+      ruleId: "job-control:review-room-gates:resolveClientRevisionPolicyStage",
+      matchedValue: revisionPolicyStage,
       source: "lib/job-control/review-room-gates.ts",
     });
 
-    if (wouldExceed) {
-      determination = "escalate";
-      humanReviewRequired = true;
+    if (clientRevisionRoundHardStops(revisionRoundsUsed)) {
+      determination = "respond";
+      squishyMessage =
+        "This job has reached the revision hard stop. I will hold the policy unless this becomes a scope, goodwill, boundary, or relationship decision.";
+    } else if (clientRevisionRoundRequiresReserveHandling(revisionRoundsUsed)) {
+      determination = "respond";
+      squishyMessage =
+        "I can handle this as a reserve revision round after the required questions and delay acknowledgment are complete. This job will rejoin the production queue.";
+      effects.push({ kind: "append_activity_event", note: "client_revision_request" });
       effects.push({
-        kind: "raise_exception",
-        exceptionKind: "revision_exhausted",
+        kind: "enqueue_communication",
+        eventType: "revision_requested",
       });
     } else {
       determination = "allow";
@@ -171,6 +178,6 @@ export function evaluateIncomingCustomerInteraction(
     humanReviewRequired,
     effects,
     warnings: [],
-    payload: { interactionKind },
+    payload: { interactionKind, squishyMessage },
   };
 }

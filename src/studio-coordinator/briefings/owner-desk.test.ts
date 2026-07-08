@@ -35,8 +35,8 @@ function sequentialItem(
     urgencyRank: 6,
     campaignId: "camp-1",
     campaignName: "Northwind Studio",
-    title: "Revision allowance exhausted",
-    subtitle: "Revision exhausted",
+    title: "Client Boundary Review",
+    subtitle: "Client boundary review",
     tabLabel: "Decision",
     updatedAt: "2026-07-02T12:00:00.000Z",
     ageLabel: "Jul 2",
@@ -56,18 +56,18 @@ function decisionCard(): OwnerConsoleDecisionCard {
     updatedAt: "2026-07-02T12:00:00.000Z",
     ageLabel: "Jul 2",
     whatHappened: "Client requested another revision.",
-    whyOwner: "Revision exhausted — Owner review required before work continues.",
-    recommendedNextAction: "Review the request and approve or decline the extra round.",
-    impactIfNoAction: "Revision allowance is exhausted.",
-    whereWorkGoesAfter: "After resolve → Producer follows approved revision path.",
+    whyOwner: "Client boundary review — Owner business judgment required before work continues.",
+    recommendedNextAction: "Review the request and approve the exception or hold the Studio boundary.",
+    impactIfNoAction: "Client boundary remains unresolved.",
+    whereWorkGoesAfter: "After resolve → Producer follows approved business judgment path.",
     availableActions: [{ kind: "resolve", label: "Resolve", irreversible: true }],
     row: {
       id: "ex-1",
       kind: "revision_exhausted",
-      kindLabel: "Revision exhausted",
+      kindLabel: "Client boundary review",
       status: "waiting_owner",
       statusLabel: "Waiting on Owner",
-      title: "Revision allowance exhausted",
+      title: "Client Boundary Review",
       reasonPreview: null,
       taskId: "task-1",
       taskTitle: "Creative",
@@ -217,8 +217,8 @@ describe("owner-desk briefings", () => {
       currentItem: sequentialItem({ exceptionCard: decisionCard() }),
       now: NOW,
     });
-    expect(briefing?.whyReached).toContain("Owner review required");
-    expect(briefing?.squishySays).toContain("last included revision");
+    expect(briefing?.whyReached).toContain("Owner business judgment required");
+    expect(briefing?.squishySays).toContain("business judgment");
     expect(briefing?.coordinatorTrace.length).toBeGreaterThan(0);
     expect(resolveCoordinatorTraceForCard(decisionCard())).toContain("Policy:");
   });
@@ -330,7 +330,7 @@ describe("owner-desk briefings", () => {
 
   it("revision — post-decision includes Owner Confirmation", () => {
     const allow = resolveOwnerRevisionPostDecisionBriefing("owner_allow_revision");
-    expect(allow.message).toContain("Extra revision round approved");
+    expect(allow.message).toContain("Business exception approved");
     expect(allow.message).toContain("Confirmed:");
   });
 

@@ -18,7 +18,7 @@ Tagia owns **judgment calls the system cannot safely automate** — even when te
 | **Exceptions** | Blockers that stop linked workflow until Owner resolves, assigns, or approves promotion. | `CampaignExceptionRecord` in `waiting_owner` / owner-held kinds (`OWNER_HELD_EXCEPTION_KINDS`). |
 | **Scope changes** | Deliverable or service changes outside the approved plan. | `scope_change` exception; client asks for work not on the plan. |
 | **Refund / payment-sensitive decisions** | Refunds, cancellations, or goodwill outside template eligibility. | 14-day Waiting on Client eligibility, production-not-started path, complaints, partial refund discretion. |
-| **Revision-limit decisions** | Client wants another round after included revisions are used. | `revision_exhausted` exception; QA bridge from revision policy. |
+| **Client boundary reviews** | A routine revision path has become boundary, scope, goodwill, or client relationship judgment. | Legacy `revision_exhausted` records remain migration-compatible, but new routine revisions stay with Squishy + Decision Core. |
 | **Final QA / release** | Last Owner sign-off before Final Delivery is client-visible. | Client approved in Review Room; `owner_final_release` / `approval_before_delivery`. |
 | **Client issues policy cannot answer** | Ambiguous, emotional, or edge-case messages that need a human Studio voice. | Incoming interaction classified as complaint, refund request, or escalation — not covered by Help Center FAQ/policy auto-reply. |
 
@@ -380,7 +380,7 @@ Trays and items within trays sort by **urgency**, not creation time alone.
 3. Approval before client review (`before_review`).  
 4. Refund / payment-sensitive issue.  
 5. Scope change.  
-6. Revision limit reached.  
+6. Client boundary review.
 7. Deadline risk / deadline commitment.  
 8. Missing client fact / client material promotion.  
 9. Needs Client awareness (no action).  
@@ -405,7 +405,7 @@ Judgment, escalation, and discretion — work stays blocked until Tagia acts (or
 | **Scope change** | Work requested outside approved plan. | Approve change (with plan update) or deny. |
 | **Deadline commitment** | Team or client needs a date Owner must own. | Commit or revise timeline. |
 | **Deadline risk** | Schedule at risk before commitment. | Acknowledge and set path. |
-| **Revision limit reached** | Included rounds exhausted; client wants more. | Allow extra round, bill, or hold firm per policy. |
+| **Client boundary review** | Routine revision policy is complete; the remaining issue is boundary, scope, goodwill, or relationship judgment. | Approve exception, hold boundary, ask team, or ask client with approved wording. |
 | **Refund / cancellation discretion** | Policy says “may be eligible” — not automatic. | Approve refund, deny, or partial goodwill. |
 | **Complaint / non-policy client issue** | Message cannot be answered from Help Center alone. | Studio response + whether to escalate. |
 | **Heavy lane full** | Capacity 1/1; next job queued. | Bump, wait, or re-prioritize. |
@@ -448,14 +448,14 @@ Judgment, escalation, and discretion — work stays blocked until Tagia acts (or
 | **Ask Team** | Needs Clarification | Producer | No | Risk acknowledged | Risk logged | Yes |
 | **Ask Client** | Waiting on Client | Client | Yes — only if date needs client confirm | Paused | Waiting on client | Yes |
 
-#### Revision limit reached
+#### Client boundary review
 
 | Outcome | Moves to | Notified | Squishy comms | Production | Campaign Record | Blocked |
 |---------|----------|----------|---------------|------------|-----------------|---------|
-| **Approve** (extra round) | Production | Production role | Yes — revision allowance outcome | Revision round opens | Revision policy exception logged | No |
-| **Decline** (hold firm) | Waiting on Client or Closed | Client | Yes — firm policy outcome | Paused or complete per policy | Revision denied logged | Depends |
+| **Approve exception** | Production | Production role | Yes — approved boundary outcome | Work continues under approved boundary | Business judgment logged | No |
+| **Hold boundary** | Waiting on Client or Closed | Client | Yes — firm policy outcome | Paused or complete per policy | Boundary held logged | Depends |
 | **Assign** | Back to Team | Producer | No | Internal path | Assignment logged | Yes |
-| **Ask Client** | Waiting on Client | Client | Yes — bill / approve extra round | Paused | Client decision pending | Yes |
+| **Ask Client** | Waiting on Client | Client | Yes — boundary confirmation | Paused | Client decision pending | Yes |
 
 #### Refund / cancellation discretion
 

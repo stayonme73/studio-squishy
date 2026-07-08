@@ -161,7 +161,7 @@ These domains **must** remain rule-based evaluators. They may be *registered* wi
 
 | Domain | Authoritative source today | Decision Core V1 role |
 |--------|---------------------------|------------------------|
-| Revision round limits | Campaign + job revision counters | Deterministic gate; exhaustion → `revision_exhausted` |
+| Revision round policy | Campaign + job revision counters | Deterministic gate handled by Squishy + Decision Core; legacy `revision_exhausted` retained only for migration/business-boundary compatibility |
 | Scope change | `scope_change` exception kind | Owner-held escalation |
 | Direction disagreement | `direction_disagreement` | Owner-held escalation |
 
@@ -324,7 +324,7 @@ Append jobActivityEvent (audit) + update derived client visibility
 | `project_question` | Route to staff or Help Center if pre-production | Usually no |
 | `clarification_request` | Staff response; may link to materials | If blocking production |
 | `missing_file_upload` | Materials ledger update + confirmation effect | No |
-| `revision_message` | Existing revision flow (`client_revision_request`) | If revision limit reached |
+| `revision_message` | Existing revision flow (`client_revision_request`) | Only if it becomes boundary, scope, goodwill, or relationship judgment |
 | `payment_question` | Help Center policy + status snapshot | If dispute |
 | `scope_request` | Scope evaluator; may raise `scope_change` | Yes — owner-held |
 | `refund_request` | Refund eligibility evaluator | Often yes — owner discretion |
@@ -442,7 +442,7 @@ Client visibility:
 | **Blocks work?** | No | Depends on kind | Yes — when `workflowBlockedReason` set |
 | **Decision owner** | Template + event rules | Classification + interaction rules | Exception kind + owner-held rules |
 
-Some paths produce **multiple effects** — e.g. customer `revision_message` when revision limit reached: workflow block, Owner Desk item, activity audit; outgoing client notice only after owner decides.
+Some paths produce **multiple effects** — e.g. customer `revision_message` during reserve or hard-stop handling: workflow state, activity audit, and Squishy communication. Owner Desk involvement is only for reframed boundary, scope, goodwill, or relationship judgment.
 
 ---
 
@@ -510,7 +510,7 @@ Two complementary surfaces exist today. The Decision Core **feeds both from the 
 |---------|----------------|-------------|
 | QA compliance block | `compliance_hold` | Yes |
 | QA direction disagreement | `direction_disagreement` | Yes |
-| Revision rounds exhausted | `revision_exhausted` | Yes |
+| Legacy revision boundary review | `revision_exhausted` | Migration-compatible only; routine revisions do not reach Owner |
 | Scope change raised | `scope_change` | Yes |
 | Client-material promotion | `client_request`, `missing_client_fact` | Promotion requires owner approve/decline |
 | Deadline risk / commitment | `deadline_risk`, `deadline_commitment` | Yes |
@@ -522,7 +522,7 @@ Two complementary surfaces exist today. The Decision Core **feeds both from the 
 |-----------|--------|
 | **Surface** | Owner Control Room (`OWNER_CONTROL_ROOM_SECTION.ownerDeskTitle`) |
 | **Primary input** | `PurchasedJobRecord` gates + open exceptions + lane capacity |
-| **Reasons** | `OwnerDeskReason` — approval gates, scope, revision limit, lane full, etc. |
+| **Reasons** | `OwnerDeskReason` — approval gates, scope, client boundary, lane full, etc. |
 | **Code** | `resolveOwnerDeskItems()` in `owner-desk.ts` |
 
 **Exception kind → desk reason mapping** (existing):
@@ -532,7 +532,7 @@ Two complementary surfaces exist today. The Decision Core **feeds both from the 
 | `scope_change` | `scope_issue` |
 | `deadline_commitment` | `deadline_exception` |
 | `deadline_risk` | `at_risk_job` |
-| `revision_exhausted` | `revision_limit_reached` |
+| `revision_exhausted` | `revision_limit_reached` (legacy; displayed as Client Boundary Review) |
 
 ### Escalation flow (target architecture)
 

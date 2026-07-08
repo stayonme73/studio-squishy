@@ -6,6 +6,8 @@ import { applyReviewRoomPatch } from "@/lib/job-control/review-room-actions";
 import {
   canApproveJobForDelivery,
   canRequestJobRevision,
+  clientRevisionRoundHardStops,
+  clientRevisionRoundRequiresReserveHandling,
   clientRevisionRoundWouldExceed,
 } from "@/lib/job-control/review-room-gates";
 import { canClientAccessJobReview } from "@/lib/job-control/review-room-access";
@@ -143,6 +145,8 @@ describe("review-room gates", () => {
   it("detects revision limit exhaustion", () => {
     expect(clientRevisionRoundWouldExceed(1, 1)).toBe(true);
     expect(clientRevisionRoundWouldExceed(0, 1)).toBe(false);
+    expect(clientRevisionRoundRequiresReserveHandling(3)).toBe(true);
+    expect(clientRevisionRoundHardStops(5)).toBe(true);
   });
 });
 
@@ -234,7 +238,7 @@ describe("review-room actions", () => {
     }
   });
 
-  it("escalates revision limit to owner desk", () => {
+  it("handles reserve revision round without Owner Desk exception", () => {
     const jobRecord = job();
     const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
       "deliverable-0",
@@ -244,7 +248,35 @@ describe("review-room actions", () => {
 
     const result = applyReviewRoomPatch(
       envelope(jobRecord),
-      campaign({ revisionRoundsUsed: 1 }),
+      campaign({ revisionRoundsIncluded: 3, revisionRoundsUsed: 3 }),
+      jobRecord,
+      { action: "request_revision", feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.job.spineStatus).toBe("ready_for_queue");
+      expect(result.job.laneQueuedAt).toBe(result.job.updatedAt);
+      expect(result.envelope.exceptionRecords ?? []).toHaveLength(0);
+      expect(result.envelope.jobActivityEvents?.some((entry) =>
+        entry.reason?.includes("Reserve revision round requested"),
+      )).toBe(true);
+    }
+  });
+
+  it("hard-stops revision after reserve rounds without Owner Desk exception", () => {
+    const jobRecord = job();
+    const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
+      "deliverable-0",
+      "deliverable-1",
+    ]);
+    feedback.sectionStatuses["deliverable-0"] = "revision";
+
+    const result = applyReviewRoomPatch(
+      envelope(jobRecord),
+      campaign({ revisionRoundsIncluded: 3, revisionRoundsUsed: 5 }),
       jobRecord,
       { action: "request_revision", feedback },
       clientUser,
@@ -254,6 +286,7 @@ describe("review-room actions", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.revisionLimitReached).toBe(true);
+      expect(result.error).not.toContain("Owner Desk");
     }
   });
 

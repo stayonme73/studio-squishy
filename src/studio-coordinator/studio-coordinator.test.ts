@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { CampaignExceptionRecord } from "@/lib/campaign-tasks/exceptions-types";
-import { bridgeExceptionFromRevisionExhausted } from "@/lib/campaign-tasks/exceptions-actions";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import { syncJobCommunicationRecords } from "@/lib/job-control/communication";
@@ -183,9 +182,9 @@ describe("studio-coordinator communication parity", () => {
 });
 
 describe("studio-coordinator client escalation parity", () => {
-  it("matches bridgeExceptionFromRevisionExhausted for revision limit", () => {
+  it("handles reserve revision through Squishy without Owner Desk exception", () => {
     const state = executionState({
-      campaign: { revisionRoundsUsed: 1, revisionRoundsIncluded: 1 },
+      campaign: { revisionRoundsUsed: 3, revisionRoundsIncluded: 3 },
       envelope: {
         tasks: [
           {
@@ -204,14 +203,6 @@ describe("studio-coordinator client escalation parity", () => {
       },
     });
 
-    const direct = bridgeExceptionFromRevisionExhausted(
-      state.envelope,
-      "ma-flyer-v2:creative",
-      state.campaign,
-      COORDINATOR_SYSTEM_USER,
-      coordinatorAssignments,
-    );
-
     const coordinated = coordinateClientEvent(
       {
         type: "revision_request",
@@ -229,12 +220,10 @@ describe("studio-coordinator client escalation parity", () => {
       },
     );
 
-    expect(coordinated.outcome.determination).toBe("escalate");
-    expect(coordinated.outcome.humanReviewRequired).toBe(true);
-    expect(coordinated.state.envelope.exceptionRecords?.map((entry) => entry.kind)).toEqual(
-      direct.exceptionRecords?.map((entry) => entry.kind),
-    );
-    expect(coordinated.summary.message).toContain("reviewing");
+    expect(coordinated.outcome.determination).toBe("respond");
+    expect(coordinated.outcome.humanReviewRequired).toBe(false);
+    expect(coordinated.state.envelope.exceptionRecords ?? []).toHaveLength(0);
+    expect(coordinated.summary.message).toContain("reserve revision round");
   });
 
   it("raises scope_change exception for scope_request", () => {

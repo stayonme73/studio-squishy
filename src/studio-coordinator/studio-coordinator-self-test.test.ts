@@ -17,15 +17,15 @@ describe("studio-coordinator self-test scenario", () => {
     }
     expect(report.ok, formatted).toBe(true);
     expect(report.steps.every((step) => step.pass)).toBe(true);
-    expect(report.routedToOwner.length).toBeGreaterThan(0);
-    expect(report.learningCandidates.some((line) => line.includes("pending_review"))).toBe(true);
+    expect(report.routedToOwner).toHaveLength(0);
+    expect(report.learningCandidates).toHaveLength(0);
     expect(report.observations.length).toBeGreaterThan(0);
     expect(report.auditTrail.some((line) => line.includes("decision_evaluated"))).toBe(true);
   });
 
   it("client upload store state matches direct activity mutator", () => {
     const report = runStudioCoordinatorSelfTest();
-    expect(report.storeStateMatch.some((line) => line.includes("match"))).toBe(true);
+    expect(report.storeStateMatch.some((line) => line.includes("owner exception: none"))).toBe(true);
 
     const job = {
       jobId: "sc-self-test:ma-flyer-v2",

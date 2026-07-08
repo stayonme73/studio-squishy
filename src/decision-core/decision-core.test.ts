@@ -229,7 +229,7 @@ describe("evaluateOutgoingCommunicationEvents parity", () => {
 });
 
 describe("evaluateIncomingCustomerInteraction", () => {
-  it("escalates revision when rounds exhausted", () => {
+  it("handles reserve revision without Owner Desk escalation", () => {
     const outcome = evaluateIncomingCustomerInteraction({
       domain: "customer_interaction",
       campaignId: "dc-camp",
@@ -237,12 +237,30 @@ describe("evaluateIncomingCustomerInteraction", () => {
       actor: "client",
       trigger: { type: "incoming_customer_event", eventType: "revision_request" },
       occurredAt: NOW,
-      facts: { revisionRoundsUsed: 1, revisionRoundsIncluded: 1 },
+      facts: { revisionRoundsUsed: 3, revisionRoundsIncluded: 3 },
     });
 
-    expect(outcome.determination).toBe("escalate");
-    expect(outcome.humanReviewRequired).toBe(true);
-    expect(outcome.effects.some((e) => e.kind === "raise_exception")).toBe(true);
+    expect(outcome.determination).toBe("respond");
+    expect(outcome.humanReviewRequired).toBe(false);
+    expect(outcome.effects.some((e) => e.kind === "raise_exception")).toBe(false);
+    expect(outcome.payload?.squishyMessage).toContain("reserve revision round");
+  });
+
+  it("hard-stops revisions after reserve rounds without Owner Desk escalation", () => {
+    const outcome = evaluateIncomingCustomerInteraction({
+      domain: "customer_interaction",
+      campaignId: "dc-camp",
+      jobId: "dc-camp:ma-flyer-v2",
+      actor: "client",
+      trigger: { type: "incoming_customer_event", eventType: "revision_request" },
+      occurredAt: NOW,
+      facts: { revisionRoundsUsed: 5, revisionRoundsIncluded: 3 },
+    });
+
+    expect(outcome.determination).toBe("respond");
+    expect(outcome.humanReviewRequired).toBe(false);
+    expect(outcome.effects.some((e) => e.kind === "raise_exception")).toBe(false);
+    expect(outcome.payload?.squishyMessage).toContain("hard stop");
   });
 
   it("allows revision when rounds remain", () => {
@@ -252,7 +270,7 @@ describe("evaluateIncomingCustomerInteraction", () => {
       actor: "client",
       trigger: { type: "incoming_customer_event", eventType: "revision_request" },
       occurredAt: NOW,
-      facts: { revisionRoundsUsed: 0, revisionRoundsIncluded: 1 },
+      facts: { revisionRoundsUsed: 2, revisionRoundsIncluded: 3 },
     });
 
     expect(outcome.determination).toBe("allow");

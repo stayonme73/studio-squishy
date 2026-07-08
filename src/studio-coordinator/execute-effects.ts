@@ -73,7 +73,7 @@ function resolveRaiseExceptionTitle(
   );
   if (mapped) return mapped.title;
   if (interactionKind === "scope_request") return "Client scope request";
-  if (exceptionKind === "revision_exhausted") return "Revision allowance exhausted";
+  if (exceptionKind === "revision_exhausted") return "Client Boundary Review";
   return "Client escalation";
 }
 

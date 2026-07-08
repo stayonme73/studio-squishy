@@ -55,8 +55,11 @@ function deskItemFromException(
     campaignName,
     jobId: job?.jobId ?? `${record.campaignId}:unknown`,
     serviceName: job?.serviceName ?? "Campaign",
-    title: record.title,
-    detail: record.description ?? record.title,
+    title: record.kind === "revision_exhausted" ? "Client Boundary Review" : record.title,
+    detail:
+      record.kind === "revision_exhausted"
+        ? "A revision request needs business judgment because it has become a boundary, scope, goodwill, or relationship issue."
+        : record.description ?? record.title,
     drillDownHref: ownerConsoleCampaignRoute(record.campaignId, record.id),
     updatedAt: record.updatedAt,
   };

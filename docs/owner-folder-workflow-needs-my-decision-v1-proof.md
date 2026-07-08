@@ -14,7 +14,7 @@
 | Decision type | Campaign | Signal |
 |---------------|----------|--------|
 | Deadline commitment | `owner-deadline-v1` | `exc-owner-deadline-v1` · `deadline_commitment` |
-| Revision limit | `owner-revision-v1` | `exc-owner-revision-v1` · `revision_exhausted` |
+| Client boundary review | `owner-revision-v1` | `exc-owner-revision-v1` · legacy `revision_exhausted` |
 | Scope change | `owner-scope-v1` | `exc-owner-scope-v1` · `scope_change` |
 | Refund / payment | `owner-refund-v1` | Job `owner-refund-v1:sm-001` · `refundEligibleAt` · structured intake required |
 

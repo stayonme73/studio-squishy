@@ -122,7 +122,7 @@ const FIXTURES = [
   },
   {
     campaignId: "owner-revision-v1",
-    name: "Revision Limit Demo",
+    name: "Client Boundary Review Demo",
     tasks: baseTaskEnvelope("owner-revision-v1", {
       exceptionRecords: [
         {
@@ -130,7 +130,7 @@ const FIXTURES = [
           campaignId: "owner-revision-v1",
           kind: "revision_exhausted",
           status: "waiting_owner",
-          title: "Revision limit reached — client requested another round",
+          title: "Client Boundary Review — client request needs business judgment",
           createdAt: NOW,
           updatedAt: NOW,
           raisedByUserId: "staff-producer",

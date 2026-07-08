@@ -150,7 +150,7 @@ export function applyOwnerAllowRevision(
     {
       exceptionId: payload.exceptionId,
       ownerNotes: payload.ownerNotes,
-      resolutionSuffix: "Owner allowed extra revision round",
+      resolutionSuffix: "Owner approved business exception",
     },
     user,
     assignments,
@@ -168,7 +168,7 @@ export function applyOwnerHoldFirmRevision(
     {
       exceptionId: payload.exceptionId,
       ownerNotes: payload.ownerNotes,
-      resolutionSuffix: "Owner held revision limit firm",
+      resolutionSuffix: "Owner held Studio boundary",
     },
     user,
     assignments,
@@ -187,7 +187,7 @@ export function applyOwnerHoldRevision(
     user,
     assignments,
     "revision_exhausted",
-    "Revision limit decision",
+    "Client boundary review",
   );
 }
 
@@ -204,7 +204,7 @@ export function applyOwnerAskTeamRevision(
     user,
     assignments,
     "revision_exhausted",
-    "Revision limit decision",
+    "Client boundary review",
     assignee,
   );
 }
@@ -221,7 +221,7 @@ export function applyOwnerAskClientRevision(
     user,
     assignments,
     "revision_exhausted",
-    "Revision limit decision",
+    "Client boundary review",
   );
 }
 
@@ -243,7 +243,7 @@ export function applyOwnerAssignRevision(
     user,
     assignments,
     "revision_exhausted",
-    "Revision limit decision",
+    "Client boundary review",
     assignee,
   );
 }

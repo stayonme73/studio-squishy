@@ -1,7 +1,7 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import { resolveCampaignRevisionRounds } from "@/lib/approved-plan-display";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import {
   appendExceptionEvent,
@@ -620,8 +620,8 @@ export function bridgeExceptionFromRevisionExhausted(
   const record = buildExceptionRecord({
     campaignId: envelope.campaignId,
     kind: "revision_exhausted",
-    title: "Revision allowance exhausted",
-    description: `Approved plan includes ${allowed} revision round(s). Additional revision requires Owner decision.`,
+    title: "Client Boundary Review",
+    description: `Approved plan includes ${allowed} revision round(s). Any Owner-facing path from here must be handled as boundary, scope, goodwill, or client relationship judgment.`,
     user,
     actorRole,
     taskId,
