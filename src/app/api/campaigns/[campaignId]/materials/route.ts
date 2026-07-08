@@ -29,7 +29,7 @@ import { resolveMaterialsApiPayload } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials, writeMaterialsEnvelope } from "@/lib/materials/store";
 import type { MaterialReviewStatus } from "@/lib/materials/types";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 type RouteContext = {
   params: Promise<{ campaignId: string }>;

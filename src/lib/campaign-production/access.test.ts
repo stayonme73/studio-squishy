@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import { syncProductionWithPlan } from "@/lib/campaign-production/plan-sync";
 import { emptyProductionRecord } from "@/lib/campaign-production/plan-sync";
 import type { CampaignProductionRecord } from "@/lib/campaign-production/types";

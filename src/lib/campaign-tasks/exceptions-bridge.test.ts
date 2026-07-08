@@ -1,8 +1,8 @@
-﻿import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import { applyQaBlock, applyQaFail } from "./actions";
 import { bridgeExceptionsAfterQaBlock } from "./exceptions-bridge";

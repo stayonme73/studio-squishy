@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import { applyQaBlock, applyQaFail, applyQaPass } from "./actions";
 import { applyCreateVersion } from "@/lib/campaign-production/actions";

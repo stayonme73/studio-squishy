@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import { canEditKitchenWorkForTask } from "@/lib/campaign-production/access";
 
 import { buildKitchenCopyStageFixture } from "./kitchen-test-fixtures";

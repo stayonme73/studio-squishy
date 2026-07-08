@@ -1,7 +1,7 @@
 import { hasRole } from "@/lib/auth/roles";
 import { isFixtureCampaignId } from "@/lib/campaign-store/fixture-guard";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
-import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
+import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments-shared";
 
 import type { ServerCampaignEnvelope, StudioUser } from "./types";
 

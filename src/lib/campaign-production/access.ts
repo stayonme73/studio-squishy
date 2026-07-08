@@ -4,8 +4,8 @@ import {
   isStaffUser,
 } from "@/lib/campaign-store/access";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
-import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
+import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments-shared";
 import { taskRequiredRole, userCanPerformRole } from "@/lib/campaign-tasks/capabilities";
 import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
 

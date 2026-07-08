@@ -1,7 +1,7 @@
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
-import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
+import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments-shared";
 import {
   isTeamOfficeRoleSlug,
   isTeamOfficeV1Live,

@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import type { CampaignRecord } from "@/config/studio-board";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import { userCanPerformRole } from "./capabilities";
 import { indexTasksById } from "./dependencies";

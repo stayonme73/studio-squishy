@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { isNextResponse, requireSession } from "@/lib/auth/require-session";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { logAccessEvent } from "@/lib/security/access-log";
 

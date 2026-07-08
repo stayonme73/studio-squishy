@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import type { StudioUser } from "@/lib/campaign-store/types";
 
 import { canEnterTeamOffice, resolveTeamOfficeAccess } from "./office-access";

@@ -3,8 +3,8 @@ import { listTasksEnvelopes } from "@/lib/campaign-tasks/store";
 import { isOwnerUser, isStaffUser } from "@/lib/campaign-store/access";
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
-import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
+import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments-shared";
 import type { StudioFileReference } from "@/lib/file-registry/types";
 import type { JobClientDeliveryFile, PurchasedJobRecord } from "@/lib/job-control/types";
 

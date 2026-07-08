@@ -1,6 +1,6 @@
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import { FAMILY_TASK_PIPELINES } from "./templates";
 import { resolveResponsibleRole } from "./roles";
