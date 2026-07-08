@@ -4,6 +4,7 @@ import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import {
+  applyEscalateComplianceHoldToOwner,
   applyOwnerAskTeamComplianceHold,
   applyOwnerAssignComplianceHold,
   applyOwnerClearComplianceHold,
@@ -193,5 +194,68 @@ describe("compliance hold owner actions", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.status).toBe(403);
+  });
+});
+
+describe("compliance hold escalation to Owner", () => {
+  const producer: StudioUser = {
+    id: "staff-producer",
+    email: "producer@local.dev",
+    displayName: "Producer",
+    roles: ["staff"],
+  };
+  const producerAssignments: CampaignAssignmentsFile = {
+    staffByUserId: { "staff-producer": ["compliance-hold-v1"] },
+    staffCapabilities: { "staff-producer": ["producer_dispatcher"] },
+  };
+
+  it("producer escalates a routine hold to Owner with a stated criterion", () => {
+    const routine = complianceException({ status: "waiting_internal" });
+    const result = applyEscalateComplianceHoldToOwner(
+      envelope(routine),
+      {
+        exceptionId: EXCEPTION_ID,
+        criterion: "unresolved_legal_or_business_risk",
+        note: "Legal has not signed off on the claim language.",
+      },
+      producer,
+      producerAssignments,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.exception.status).toBe("waiting_owner");
+    const event = result.envelope.exceptionEvents?.at(-1);
+    expect(event?.notes).toContain("Unresolved legal or business risk remains");
+    expect(event?.notes).toContain("Legal has not signed off on the claim language.");
+  });
+
+  it("rejects escalation without a stated reason", () => {
+    const routine = complianceException({ status: "waiting_internal" });
+    const result = applyEscalateComplianceHoldToOwner(
+      envelope(routine),
+      { exceptionId: EXCEPTION_ID, criterion: "policy_exception_requested", note: "  " },
+      producer,
+      producerAssignments,
+    );
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.status).toBe(400);
+  });
+
+  it("rejects escalating a hold that is already routed to Owner", () => {
+    const alreadyEscalated = complianceException({ status: "waiting_owner" });
+    const result = applyEscalateComplianceHoldToOwner(
+      envelope(alreadyEscalated),
+      {
+        exceptionId: EXCEPTION_ID,
+        criterion: "refund_scope_deadline_or_relationship_risk",
+        note: "Client threatening to cancel.",
+      },
+      producer,
+      producerAssignments,
+    );
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.status).toBe(422);
   });
 });

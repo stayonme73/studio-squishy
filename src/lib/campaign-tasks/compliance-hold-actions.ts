@@ -34,6 +34,30 @@ export type OwnerAskTeamComplianceHoldPayload = {
   assignToUserId?: string;
 };
 
+/** The only grounds on which a routine compliance hold may reach the Owner Desk. */
+export type ComplianceHoldEscalationCriterion =
+  | "client_refuses_safe_revision"
+  | "policy_exception_requested"
+  | "unresolved_legal_or_business_risk"
+  | "missing_proof_affects_delivery_commitment"
+  | "refund_scope_deadline_or_relationship_risk";
+
+const COMPLIANCE_HOLD_ESCALATION_CRITERION_LABELS: Record<ComplianceHoldEscalationCriterion, string> = {
+  client_refuses_safe_revision: "Client refuses to remove or revise risky content",
+  policy_exception_requested: "Client requests a policy exception",
+  unresolved_legal_or_business_risk: "Unresolved legal or business risk remains",
+  missing_proof_affects_delivery_commitment:
+    "Missing proof or release affects a client delivery commitment",
+  refund_scope_deadline_or_relationship_risk:
+    "Compliance issue creates refund, scope, deadline, or client relationship risk",
+};
+
+export type EscalateComplianceHoldPayload = {
+  exceptionId: string;
+  criterion: ComplianceHoldEscalationCriterion;
+  note: string;
+};
+
 function withExceptionEnvelope(
   envelope: ServerTasksEnvelope,
   records: CampaignExceptionRecord[],
@@ -252,6 +276,82 @@ export function applyOwnerAssignComplianceHold(
     assignToUserId: assignee.id,
     assignToDisplayName: assignee.displayName,
     statusAfter: "waiting_internal",
+  });
+
+  const records = upsertExceptionRecord(envelope.exceptionRecords, updated);
+  const events = appendExceptionEvent(envelope.exceptionEvents, event);
+
+  return {
+    ok: true,
+    envelope: withExceptionEnvelope(envelope, records, events),
+    exception: updated,
+  };
+}
+
+function requireEscalatableComplianceHoldGate(
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+  record: CampaignExceptionRecord,
+): { ok: true } | { ok: false; error: string; status: number } {
+  if (record.kind !== "compliance_hold") {
+    return { ok: false, error: "Exception is not a compliance hold.", status: 422 };
+  }
+  if (!isOpenExceptionStatus(record.status)) {
+    return { ok: false, error: "Exception is not open.", status: 422 };
+  }
+  if (record.status === "waiting_owner") {
+    return { ok: false, error: "Compliance hold is already routed to Owner.", status: 422 };
+  }
+  if (!canAssignException(user, assignments)) {
+    return { ok: false, error: "Forbidden", status: 403 };
+  }
+  return { ok: true };
+}
+
+/**
+ * Routine compliance holds start with QA/Producer. This is the only path onto the Owner
+ * Desk — it requires naming which of the five escalation criteria applies, so every
+ * folder that reaches Tagia carries a stated reason it needed executive judgment.
+ */
+export function applyEscalateComplianceHoldToOwner(
+  envelope: ServerTasksEnvelope,
+  payload: EscalateComplianceHoldPayload,
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): ExceptionActionResult {
+  const existing = findExceptionById(envelope.exceptionRecords, payload.exceptionId);
+  if (!existing) {
+    return { ok: false, error: "Exception not found.", status: 404 };
+  }
+
+  const gate = requireEscalatableComplianceHoldGate(user, assignments, existing);
+  if (!gate.ok) return gate;
+
+  const note = payload.note.trim();
+  if (!note) {
+    return {
+      ok: false,
+      error: "A reason is required to route a compliance hold to the Owner.",
+      status: 400,
+    };
+  }
+
+  const actorRole = exceptionActorRole(user, assignments);
+  const now = new Date().toISOString();
+  const updated: CampaignExceptionRecord = {
+    ...existing,
+    status: "waiting_owner",
+    updatedAt: now,
+  };
+
+  const event = buildExceptionEvent({
+    exceptionId: updated.id,
+    campaignId: envelope.campaignId,
+    user,
+    actorRole,
+    action: "assigned",
+    notes: `Escalated to Owner (compliance): ${COMPLIANCE_HOLD_ESCALATION_CRITERION_LABELS[payload.criterion]} — ${note}`,
+    statusAfter: "waiting_owner",
   });
 
   const records = upsertExceptionRecord(envelope.exceptionRecords, updated);

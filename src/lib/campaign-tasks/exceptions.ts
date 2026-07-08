@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import {
   exceptionKindProducerResolvable,
@@ -30,6 +30,8 @@ export function isOpenExceptionStatus(status: CampaignExceptionStatus): boolean 
 }
 
 export function initialStatusForKind(kind: CampaignExceptionKind): CampaignExceptionStatus {
+  /** Routine compliance holds start with QA/Producer — Owner Desk only after explicit escalation. */
+  if (kind === "compliance_hold") return "waiting_internal";
   if (exceptionKindRequiresOwner(kind)) return "waiting_owner";
   if (kind === "missing_client_fact") return "waiting_owner";
   if (kind === "client_request") return "waiting_owner";
@@ -229,6 +231,14 @@ export function canResolveException(
 
   if (record.promotion && !canResolvePromotedException(record, materials)) {
     return false;
+  }
+
+  /** Compliance hold resolution follows escalation state, not kind alone — waiting_internal is QA/Producer's to resolve. */
+  if (record.kind === "compliance_hold") {
+    if (record.status === "waiting_internal") {
+      return isOwnerUser(user) || userIsProducer(user, assignments);
+    }
+    return isOwnerUser(user);
   }
 
   if (exceptionKindRequiresOwner(record.kind)) {

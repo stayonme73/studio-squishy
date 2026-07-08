@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { ServiceId } from "@/catalog/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import {
   applyApproveClientRequest,
@@ -145,7 +145,7 @@ describe("exceptions-actions", () => {
     expect(resolved.envelope.exceptionEvents).toHaveLength(2);
   });
 
-  it("producer cannot resolve compliance_hold", () => {
+  it("producer can resolve a routine compliance_hold before it is escalated to Owner", () => {
     const raised = applyRaiseException(
       envelope([blockedCopyTask()]),
       {
@@ -157,8 +157,38 @@ describe("exceptions-actions", () => {
       assignments,
     );
     if (!raised.ok) throw new Error("raise failed");
+    expect(raised.exception.status).toBe("waiting_internal");
     const resolved = applyResolveException(
       raised.envelope,
+      { exceptionId: raised.exception.id },
+      producer,
+      assignments,
+    );
+    expect(resolved.ok).toBe(true);
+  });
+
+  it("producer cannot resolve a compliance_hold once escalated to Owner", () => {
+    const raised = applyRaiseException(
+      envelope([blockedCopyTask()]),
+      {
+        kind: "compliance_hold",
+        title: "Compliance",
+        taskId: "sm-001:copy",
+      },
+      owner,
+      assignments,
+    );
+    if (!raised.ok) throw new Error("raise failed");
+    const escalated = {
+      ...raised.envelope,
+      exceptionRecords: raised.envelope.exceptionRecords.map((entry) =>
+        entry.id === raised.exception.id
+          ? { ...entry, status: "waiting_owner" as const }
+          : entry,
+      ),
+    };
+    const resolved = applyResolveException(
+      escalated,
       { exceptionId: raised.exception.id },
       producer,
       assignments,

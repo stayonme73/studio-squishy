@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import {
   canApproveClientRequest,
@@ -65,9 +65,12 @@ function exception(
 
 describe("exceptions validation and status", () => {
   it("owner-held kinds start waiting_owner", () => {
-    expect(initialStatusForKind("compliance_hold")).toBe("waiting_owner");
     expect(initialStatusForKind("scope_change")).toBe("waiting_owner");
     expect(initialStatusForKind("revision_exhausted")).toBe("waiting_owner");
+  });
+
+  it("compliance_hold starts waiting_internal — QA/Producer first, not Owner Desk", () => {
+    expect(initialStatusForKind("compliance_hold")).toBe("waiting_internal");
   });
 
   it("missing_client_fact starts waiting_owner", () => {
@@ -100,15 +103,33 @@ describe("exception permissions", () => {
     ).toBe(true);
   });
 
-  it("producer cannot resolve compliance_hold", () => {
+  it("producer cannot resolve an escalated (waiting_owner) compliance_hold", () => {
     expect(
-      canResolveException(producer, exception({ kind: "compliance_hold" }), assignments),
+      canResolveException(
+        producer,
+        exception({ kind: "compliance_hold", status: "waiting_owner" }),
+        assignments,
+      ),
     ).toBe(false);
   });
 
-  it("owner can resolve compliance_hold", () => {
+  it("owner can resolve an escalated (waiting_owner) compliance_hold", () => {
     expect(
-      canResolveException(owner, exception({ kind: "compliance_hold" }), assignments),
+      canResolveException(
+        owner,
+        exception({ kind: "compliance_hold", status: "waiting_owner" }),
+        assignments,
+      ),
+    ).toBe(true);
+  });
+
+  it("producer can resolve a routine (waiting_internal) compliance_hold before escalation", () => {
+    expect(
+      canResolveException(
+        producer,
+        exception({ kind: "compliance_hold", status: "waiting_internal" }),
+        assignments,
+      ),
     ).toBe(true);
   });
 
