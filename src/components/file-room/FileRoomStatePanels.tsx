@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { AccessControlDeniedCard } from "@/components/shared/AccessControlDeniedPanel";
+import type { AccessControlDeniedRoomId } from "@/config/access-control";
 import { fileRoom, FILE_ROOM_ROUTE } from "@/config/file-room";
 
 type FileRoomEmptyStateProps = {
@@ -30,14 +32,14 @@ export function FileRoomNotFoundState() {
   );
 }
 
-export function FileRoomForbiddenState() {
+export function FileRoomForbiddenState({
+  room = "file-room",
+}: {
+  room?: Exclude<AccessControlDeniedRoomId, "customer">;
+}) {
   return (
-    <div className="fr-state utility-card">
-      <h2 className="fr-state__title">{fileRoom.forbiddenTitle}</h2>
-      <p className="fr-state__body">{fileRoom.forbiddenBody}</p>
-      <Link className="fr-back-link" href={FILE_ROOM_ROUTE}>
-        ← {fileRoom.detailBackLabel}
-      </Link>
+    <div className="utility-access-card-shell utility-access-card-shell--embedded">
+      <AccessControlDeniedCard room={room} titleId="file-room-access-denied-title" />
     </div>
   );
 }

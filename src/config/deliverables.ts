@@ -1,5 +1,6 @@
 /** Final Delivery V1 — copy, assets, and mock deliverable templates. */
 
+import type { NoActiveProjectCopy } from "@/config/access-control";
 import type { DeliverableScopeSection } from "@/lib/deliverable-scope";
 import { scopeIncludesSection } from "@/lib/deliverable-scope";
 
@@ -140,6 +141,31 @@ export const deliverables = {
       "Your completed marketing files will appear here when a campaign is ready for delivery.",
     noCampaign: "Start a campaign to receive deliverables from The Studio.",
     cta: "Go to Studio Board",
+  },
+
+  clientAccess: {
+    noActiveProject: {
+      eyebrow: "Final Delivery",
+      title: "No Deliveries Available",
+      message: "There aren't any completed deliverables ready to download yet.",
+      messageSecondary:
+        "Once your project has been reviewed and approved, your completed files will appear here for download.",
+      primaryCta: "GO TO STUDIO BOARD",
+      secondaryCta: "Help Center",
+      primaryHref: "/studio-board",
+      secondaryHref: "/help-center",
+    } satisfies NoActiveProjectCopy,
+    notReady: {
+      eyebrow: "Final Delivery",
+      title: "Not Ready for Delivery Yet",
+      message: "The Studio team is preparing your final deliverables.",
+      messageSecondary:
+        "Check back soon — your completed files will appear here once your campaign is approved and released.",
+      primaryCta: "GO TO STUDIO BOARD",
+      secondaryCta: "Help Center",
+      primaryHref: "/studio-board",
+      secondaryHref: "/help-center",
+    } satisfies NoActiveProjectCopy,
   },
 
   jobDelivery: {

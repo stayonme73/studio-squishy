@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
 
@@ -12,6 +11,7 @@ import FeedbackStudioLayout from "@/components/feedback-studio/FeedbackStudioLay
 import FeedbackStudioRevisionStatus from "@/components/feedback-studio/FeedbackStudioRevisionStatus";
 import JobReviewWorkspace from "@/components/feedback-studio/JobReviewWorkspace";
 import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
+import NoActiveProjectPanel from "@/components/shared/NoActiveProjectPanel";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import CampaignJourneyMap from "@/components/studio-board/CampaignJourneyMap";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
@@ -108,10 +108,14 @@ export default function FeedbackStudioScene() {
   if (accessState !== "ready") {
     return (
       <FeedbackStudioLayout>
-        <ClientAccessStatePanel
-          state={accessState}
-          onRetry={accessState === "error" ? () => void refresh() : undefined}
-        />
+        {accessState === "no-active-project" ? (
+          <NoActiveProjectPanel copy={feedbackStudio.clientAccess.noActiveProject} />
+        ) : (
+          <ClientAccessStatePanel
+            state={accessState}
+            onRetry={accessState === "error" ? () => void refresh() : undefined}
+          />
+        )}
       </FeedbackStudioLayout>
     );
   }
@@ -119,20 +123,7 @@ export default function FeedbackStudioScene() {
   if (pageState === "no-campaign") {
     return (
       <FeedbackStudioLayout>
-        <div className="fs-page utility-page">
-          <UtilityPageHeader
-            backHref={studioBoard.routes.studioBoard}
-            activeNav="review-room"
-            title={feedbackStudio.noCampaign.title}
-            lead={feedbackStudio.noCampaign.body}
-          />
-          <div className="utility-shell">
-            <Link href={studioBoard.routes.studioBoard} className="utility-btn utility-btn--primary">
-              {feedbackStudio.noCampaign.cta} →
-            </Link>
-          </div>
-          <StudioBoardDevStatus placement="sidebar" />
-        </div>
+        <NoActiveProjectPanel copy={feedbackStudio.clientAccess.noActiveProject} titleId="fs-access-title" />
       </FeedbackStudioLayout>
     );
   }
@@ -140,20 +131,7 @@ export default function FeedbackStudioScene() {
   if (pageState === "not-ready") {
     return (
       <FeedbackStudioLayout>
-        <div className="fs-page utility-page">
-          <UtilityPageHeader
-            backHref={studioBoard.routes.studioBoard}
-            activeNav="review-room"
-            title={feedbackStudio.notReady.title}
-            lead={feedbackStudio.notReady.body}
-          />
-          <div className="utility-shell">
-            <Link href={studioBoard.routes.studioBoard} className="utility-btn utility-btn--primary">
-              {feedbackStudio.backLabel} →
-            </Link>
-          </div>
-          <StudioBoardDevStatus placement="sidebar" />
-        </div>
+        <NoActiveProjectPanel copy={feedbackStudio.clientAccess.notReady} titleId="fs-not-ready-title" />
       </FeedbackStudioLayout>
     );
   }

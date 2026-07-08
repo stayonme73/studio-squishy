@@ -77,7 +77,7 @@ export default async function FileRoomOfficePage({ params, searchParams }: FileR
     return (
       <>
         <FileRoomHeader user={user} />
-        <FileRoomForbiddenState />
+        <FileRoomForbiddenState room="team-offices" />
       </>
     );
   }

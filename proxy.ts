@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 
 import { isStaffOrOwner } from "@/lib/auth/roles";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
+import { resolveAccessDeniedRoomFromPath } from "@/config/access-control";
 import { logAccessEvent } from "@/lib/security/access-log";
 
 function isInternalRoute(pathname: string): boolean {
@@ -29,7 +30,12 @@ function signInRedirect(request: NextRequest) {
 }
 
 function accessDeniedRedirect(request: NextRequest) {
-  return NextResponse.redirect(new URL("/access-denied", request.url));
+  const room = resolveAccessDeniedRoomFromPath(request.nextUrl.pathname);
+  const url = new URL("/access-denied", request.url);
+  if (room !== "customer") {
+    url.searchParams.set("room", room);
+  }
+  return NextResponse.redirect(url);
 }
 
 export async function handleProtectedRoutes(request: NextRequest) {

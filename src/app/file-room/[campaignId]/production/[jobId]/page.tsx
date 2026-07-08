@@ -35,7 +35,7 @@ export default async function ProductionWorkspacePage({ params }: ProductionWork
     return (
       <>
         <FileRoomHeader user={user} />
-        <FileRoomForbiddenState />
+        <FileRoomForbiddenState room="production-workspace" />
       </>
     );
   }

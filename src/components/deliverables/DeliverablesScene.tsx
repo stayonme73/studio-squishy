@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 import FinalDeliveryAtmosphere from "@/components/deliverables/FinalDeliveryAtmosphere";
 import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
+import NoActiveProjectPanel from "@/components/shared/NoActiveProjectPanel";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
@@ -19,7 +20,7 @@ import type { ClientJobDeliveryView } from "@/lib/job-control/final-delivery-vie
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 import { useFinalDelivery } from "@/lib/use-final-delivery";
 
-const { summary, hero, sections, categories, footer, empty, routes, jobDelivery } = deliverables;
+const { summary, hero, sections, categories, footer, routes, jobDelivery } = deliverables;
 
 function CopyButton({ text, label }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false);
@@ -186,10 +187,14 @@ export default function DeliverablesScene() {
   if (accessState !== "ready") {
     return (
       <UtilityPageFrame navId="deliverables">
-        <ClientAccessStatePanel
-          state={accessState}
-          onRetry={accessState === "error" ? () => void refresh() : undefined}
-        />
+        {accessState === "no-active-project" ? (
+          <NoActiveProjectPanel copy={deliverables.clientAccess.noActiveProject} />
+        ) : (
+          <ClientAccessStatePanel
+            state={accessState}
+            onRetry={accessState === "error" ? () => void refresh() : undefined}
+          />
+        )}
       </UtilityPageFrame>
     );
   }
@@ -197,37 +202,28 @@ export default function DeliverablesScene() {
   const isReady =
     view.state === "ready" && (view.useJobDelivery ? Boolean(view.finalDelivery?.jobs.length) : Boolean(pkg));
 
+  if (!isReady) {
+    const accessCopy =
+      view.state === "no-campaign"
+        ? deliverables.clientAccess.noActiveProject
+        : deliverables.clientAccess.notReady;
+
+    return (
+      <UtilityPageFrame navId="deliverables">
+        <NoActiveProjectPanel copy={accessCopy} titleId="fd-access-title" />
+      </UtilityPageFrame>
+    );
+  }
+
   return (
     <UtilityPageFrame navId="deliverables">
-      <div className={`utility-page${isReady ? " utility-page--delivery" : ""}`} aria-label="Final Delivery">
-        {isReady ? <FinalDeliveryAtmosphere /> : null}
+      <div className="utility-page utility-page--delivery" aria-label="Final Delivery">
+        <FinalDeliveryAtmosphere />
         <UtilityPageHeader
           backHref={routes.studioBoard}
           activeNav="deliverables"
           title={deliverables.pageTitle}
-          lead={
-            isReady
-              ? undefined
-              : view.state === "no-campaign"
-                ? empty.noCampaignSubtitle
-                : deliverables.pageSubtitle
-          }
         />
-
-      {!isReady ? (
-        <div className="utility-shell fd-empty">
-          <p className="fd-empty__title">
-            {view.state === "no-campaign" ? empty.noCampaign : empty.preparing}
-          </p>
-          {view.state === "preparing" ? (
-            <p className="fd-empty__hint">{empty.preparingHint}</p>
-          ) : null}
-          <Link href={routes.studioBoard} className="utility-btn utility-btn--primary">
-            {empty.cta} →
-          </Link>
-        </div>
-      ) : (
-        <>
           <section className="fd-hero fd-hero--compact" aria-label="Campaign complete">
             <p className="fd-hero__badge">{hero.badge}</p>
             <h2 className="fd-hero__title">{hero.title}</h2>
@@ -472,8 +468,6 @@ export default function DeliverablesScene() {
               {footer.returnToBoard} →
             </Link>
           </div>
-        </>
-      )}
 
       <StudioBoardDevStatus placement="sidebar" />
       </div>

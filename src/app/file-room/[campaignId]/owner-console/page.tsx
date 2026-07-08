@@ -39,7 +39,7 @@ export default async function OwnerConsoleCampaignPage({
     return (
       <>
         <FileRoomHeader user={user} />
-        <FileRoomForbiddenState />
+        <FileRoomForbiddenState room="owner-console" />
       </>
     );
   }

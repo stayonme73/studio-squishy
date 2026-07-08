@@ -389,6 +389,91 @@ async function seedTaskAndExceptionStates() {
     notes: record.description,
   }));
 
+  const jobId = `${STUDIO_SELF_TEST_CAMPAIGN_ID}:sm-001`;
+  const clientId = "client-self-test";
+  envelope.jobRecords = [
+    {
+      jobId,
+      campaignId: STUDIO_SELF_TEST_CAMPAIGN_ID,
+      skuId: "sm-001",
+      serviceName: "Social Media Launch Set",
+      spineStatus: "building_concepts",
+      productionLane: "quick",
+      intakeComplete: true,
+      productionStartedAt: now,
+      nonRefundable: true,
+      spineStatusSetAt: now,
+      spineStatusSetBy: { role: "system", displayName: "Studio" },
+      spineStatusReason: "Self-test — building concepts after payment and intake",
+      updatedAt: now,
+    },
+  ];
+  envelope.jobActivityEvents = [
+    {
+      id: "activity-self-test-payment",
+      campaignId: STUDIO_SELF_TEST_CAMPAIGN_ID,
+      jobId,
+      kind: "payment",
+      occurredAt: now,
+      actor: { role: "system", displayName: "Studio" },
+      spineStatus: "ready_for_queue",
+      reason: "Payment received for Social Media Launch Set",
+    },
+    {
+      id: "activity-self-test-materials-needed",
+      campaignId: STUDIO_SELF_TEST_CAMPAIGN_ID,
+      jobId,
+      kind: "client_communication",
+      occurredAt: now,
+      actor: { role: "system", displayName: "Studio" },
+      spineStatus: "building_concepts",
+      reason: "Required logo still missing — materials request queued",
+    },
+  ];
+  envelope.jobCommunicationRecords = [
+    {
+      id: "comm-self-test-payment",
+      campaignId: STUDIO_SELF_TEST_CAMPAIGN_ID,
+      clientId,
+      jobId,
+      skuId: "sm-001",
+      serviceName: "Social Media Launch Set",
+      eventType: "payment_received",
+      templateId: "comm.payment_received.v1",
+      channel: "in_app_outbox",
+      sender: { role: "system", displayName: "Studio" },
+      reason: "Payment received",
+      messageContent:
+        "Payment is received for Social Media Launch Set on The Studio Self-Test Campaign. We will keep this job moving as intake and materials are complete.",
+      deliveryStatus: "test_sent",
+      createdAt: now,
+      updatedAt: now,
+      activityEventId: "activity-self-test-payment",
+      testSentAt: now,
+      testSentBy: { role: "owner", displayName: "Tagia" },
+      testRecipient: "studio-self-test@local.dev",
+    },
+    {
+      id: "comm-self-test-materials",
+      campaignId: STUDIO_SELF_TEST_CAMPAIGN_ID,
+      clientId,
+      jobId,
+      skuId: "sm-001",
+      serviceName: "Social Media Launch Set",
+      eventType: "intake_incomplete_materials_needed",
+      templateId: "comm.materials_needed.v1",
+      channel: "in_app_outbox",
+      sender: { role: "system", displayName: "Studio" },
+      reason: "Intake or required materials needed",
+      messageContent:
+        "We need a few required materials before Social Media Launch Set can move forward. Please open Project Details and send the requested items.",
+      deliveryStatus: "pending_owner_send",
+      createdAt: now,
+      updatedAt: now,
+      activityEventId: "activity-self-test-materials-needed",
+    },
+  ];
+
   envelope.version = Math.max(envelope.version ?? 1, 6);
   await writeFile(tasksPath, JSON.stringify(envelope, null, 2), "utf8");
 }

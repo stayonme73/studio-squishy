@@ -120,6 +120,28 @@ async function main() {
   await expectNoAccessDeniedCopy(page);
   console.log("PASS  2. /studio-board shows No Active Project, not Access Denied");
 
+  for (const pattern of [
+    /Social Posts/i,
+    /Custom Studio Plan/i,
+    /Payment Pending/i,
+    /\$2,400/,
+    /Make My Social Media Posts/i,
+  ]) {
+    if (await page.getByText(pattern).count()) {
+      throw new Error(`Expected no stale snapshot copy matching ${pattern} after reset.`);
+    }
+  }
+  if (!(await page.getByText(/^Materials Received$/i).count())) {
+    throw new Error("Expected Materials Received tile after reset.");
+  }
+  if (!(await page.getByText(/^Materials We Still Need$/i).count())) {
+    throw new Error("Expected Materials We Still Need tile after reset.");
+  }
+  if (!(await page.getByText(/^What You Should Do Next$/i).count())) {
+    throw new Error("Expected What You Should Do Next tile after reset.");
+  }
+  console.log("PASS  2c. Empty board keeps clean snapshot and visible bottom row");
+
   await page.evaluate(() => {
     localStorage.setItem(
       "studio-squishy:current-campaign",
@@ -165,9 +187,9 @@ async function main() {
 
   await page.goto(`${BASE}/deliverables`, { waitUntil: "networkidle", timeout: 60000 });
   await page.waitForTimeout(2500);
-  const deliveryNoActive = page.getByRole("heading", { name: /^No Active Project$/i });
+  const deliveryNoActive = page.getByRole("heading", { name: /^No Deliveries Available$/i });
   if (!(await deliveryNoActive.count())) {
-    throw new Error("Expected Final Delivery to show No Active Project when no campaign exists.");
+    throw new Error("Expected Final Delivery to show No Deliveries Available when no campaign exists.");
   }
   await expectNoAccessDeniedCopy(page);
   console.log("PASS  4. Review Room and Final Delivery show correct no-active state");
@@ -209,6 +231,26 @@ async function main() {
     throw new Error("Expected Try again button on load error state.");
   }
   console.log("PASS  6. Server/data failure still says We couldn't load your project");
+
+  await seedCurrentCampaign(context);
+  await page.goto(`${BASE}/studio-board?campaignId=${encodeURIComponent(WALKTHROUGH.campaignId)}`, {
+    waitUntil: "networkidle",
+    timeout: 60000,
+  });
+  await page.waitForTimeout(3500);
+  const activeCampaignHeading = page.getByRole("heading", {
+    name: /Test Batch 1 Social Posts Client Walkthrough/i,
+  });
+  if (!(await activeCampaignHeading.count())) {
+    throw new Error("Expected active campaign board to show campaign title.");
+  }
+  if (!(await page.getByText(/^Social Posts$/i).count())) {
+    throw new Error("Expected active campaign Project Snapshot to show deliverables.");
+  }
+  if (!(await page.getByText(/^Materials Received$/i).count())) {
+    throw new Error("Expected active campaign board to show materials row.");
+  }
+  console.log("PASS  7. Active campaign board still renders populated state");
 
   await browser.close();
   console.log("\nAll dev reset + access-state checks passed.");

@@ -17,7 +17,7 @@ export default async function StudioSelfTestPage() {
     return (
       <>
         <FileRoomHeader user={user} />
-        <FileRoomForbiddenState />
+        <FileRoomForbiddenState room="studio-self-test" />
       </>
     );
   }

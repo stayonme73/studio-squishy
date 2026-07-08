@@ -69,6 +69,8 @@ export const studioUtilityBackdropRoutes = new Set<string>([
   studioBoard.routes.deliverables,
   legacyRouteQuarantineV1.activeIntake,
   studioBoard.routes.campaignDetails,
+  "/file-room",
+  "/access-denied",
 ]);
 
 export function utilityPageUsesBackdrop(navId: UtilityNavId): boolean {
