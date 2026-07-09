@@ -84,6 +84,60 @@
   min-height: 12rem;
 }
 
+/* Access-state cards — same footprint for customer rooms and internal File Room gates. */
+.utility-access-card-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  margin: 0 auto;
+}
+
+.utility-access-card-shell .utility-card {
+  width: min(100%, var(--utility-narrow-max));
+  padding: clamp(1.35rem, 2.8vw, 1.85rem);
+  text-align: center;
+}
+
+.utility-access-card-shell .utility-title {
+  font-size: clamp(1.85rem, 3.1vw, 2.35rem);
+  color: var(--utility-charcoal);
+}
+
+.utility-access-card-shell .utility-lead {
+  font-size: var(--type-page-lead);
+  line-height: 1.55;
+  color: var(--utility-charcoal);
+}
+
+.utility-access-card-shell .utility-note {
+  font-size: max(0.92rem, 14px);
+  line-height: 1.5;
+  color: var(--utility-charcoal);
+}
+
+.utility-page--access {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.fr-page:has(.utility-access-card-shell--embedded) {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.utility-access-card-shell--embedded {
+  min-height: 0;
+}
+
 /* —— Top bar: Back | Title | Help Center —— */
 
 .utility-header {
@@ -240,6 +294,10 @@
   font-size: var(--type-page-lead);
   line-height: 1.55;
   color: var(--utility-text-muted);
+}
+
+.utility-lead + .utility-lead {
+  margin-top: 0.75rem;
 }
 
 /* —— Cards —— */
@@ -402,6 +460,31 @@
 
 .utility-btn--danger:hover {
   background: color-mix(in srgb, var(--utility-terracotta) 8%, transparent);
+}
+
+/* Access-state cards — matched primary/secondary pair (Review Room, Final Delivery, Access Denied). */
+.utility-access-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  width: min(100%, 30rem);
+  margin: 1.25rem auto 0;
+}
+
+.utility-access-actions .utility-btn {
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0.82rem 0.95rem;
+  font-size: max(0.94rem, 15px);
+  line-height: 1.25;
+  text-align: center;
+  white-space: normal;
+}
+
+@media (max-width: 520px) {
+  .utility-access-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 .utility-text-link {

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Caveat, Inter } from "next/font/google";
 
+import StudioUtilityBackdrop from "@/components/shared/StudioUtilityBackdrop";
 import StudioBoardScene from "@/components/studio-board/StudioBoardScene";
 
 import "../studio-board.css";
@@ -23,11 +24,16 @@ const inter = Inter({
 export default function StudioBoardPage() {
   return (
     <main
-      className={`${inter.variable} ${caveat.variable} journey-shell flex min-h-[100dvh] flex-1 flex-col bg-[var(--board-family-cream)]`}
+      className={`${inter.variable} ${caveat.variable} journey-shell flex h-[100dvh] max-h-[100dvh] min-h-0 flex-1 flex-col overflow-hidden`}
     >
-      <Suspense>
-        <StudioBoardScene />
-      </Suspense>
+      <div className="studio-utility-scene studio-utility-scene--studio-board flex min-h-0 flex-1 flex-col overflow-hidden">
+        <StudioUtilityBackdrop />
+        <div className="studio-utility-scene__content">
+          <Suspense>
+            <StudioBoardScene />
+          </Suspense>
+        </div>
+      </div>
     </main>
   );
 }

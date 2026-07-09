@@ -2,6 +2,9 @@
  * Route Map — hero art paths, map-frame insets, and hotspot positions.
  * Desk scene (primary — desktop + mobile). Cloverleaf retained for legacy capture compat.
  * Invisible hotspots overlay baked sign callouts in map art — no HTML labels on map.
+ *
+ * @locked docs/route-map-main-screen-v1-locked.md — map frame insets, desk highway marker
+ * positions, and desk scene asset path. Do not change without Tagia approval.
  */
 
 import type { RouteMapRoadId } from "@/config/route-map-v1";
@@ -139,10 +142,10 @@ export type RouteMapHighwayMarker = {
 /** Desk scene marker positions (% within map frame) — aligned to baked road geometry. */
 export const ROUTE_MAP_DESK_HIGHWAY_MARKERS: readonly RouteMapHighwayMarker[] = [
   { roadId: "i75", label: "I-75", left: 47, top: 28, className: "route-map-highway-marker--i75" },
-  /** East-west leg heading toward the sun — not on the loop interchange. */
-  { roadId: "i20", label: "I-20", left: 14, top: 43, className: "route-map-highway-marker--i20" },
-  /** Perimeter loop / cloverleaf ring on map art. */
-  { roadId: "i285", label: "I-285", left: 60, top: 53, className: "route-map-highway-marker--i285" },
+  /** East-west leg heading toward the sun — centered on the roadway like I-75. */
+  { roadId: "i20", label: "I-20", left: 4, top: 46, className: "route-map-highway-marker--i20" },
+  /** Perimeter loop — centered on the ring segment like I-75 on its lane. */
+  { roadId: "i285", label: "I-285", left: 64, top: 54, className: "route-map-highway-marker--i285" },
 ];
 
 export const ROUTE_MAP_CLOVERLEAF_HIGHWAY_MARKERS: readonly RouteMapHighwayMarker[] = [

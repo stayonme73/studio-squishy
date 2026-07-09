@@ -1,5 +1,35 @@
 /* Studio Board V1 — mockup-faithful CSS layout (no mask overlays) */
 
+/* Lobby backdrop — frosted welcome-hall scene behind dashboard cards */
+.studio-utility-scene--studio-board .studio-utility-scene__content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.studio-utility-scene--studio-board .sb {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  background-color: transparent;
+  background-image: none;
+}
+
+.studio-utility-scene--studio-board .sb-main,
+.studio-utility-scene--studio-board .sb--v4 .sb-main {
+  background: transparent;
+}
+
+.studio-utility-scene--studio-board .sb-sidebar {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--board-family-field) 90%, transparent) 0%,
+    color-mix(in srgb, var(--board-family-field) 78%, transparent) 100%
+  );
+  backdrop-filter: blur(10px);
+}
+
 body:has(.sb--v4) {
   overflow: hidden;
   height: 100dvh;
@@ -2672,6 +2702,7 @@ body:has(.sb--v4) {
 }
 
 .sb-record-drawer {
+  --sb-record-drawer-width: min(48vw, 42rem);
   position: fixed;
   inset: 0;
   z-index: 40;
@@ -2682,6 +2713,7 @@ body:has(.sb--v4) {
 .sb-record-drawer__backdrop {
   position: absolute;
   inset: 0;
+  right: var(--sb-record-drawer-width);
   z-index: 1;
   border: none;
   background: color-mix(in srgb, var(--studio-ink) 42%, transparent);
@@ -2693,12 +2725,19 @@ body:has(.sb--v4) {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  width: min(48vw, 42rem);
+  width: var(--sb-record-drawer-width);
   min-width: min(100%, 20rem);
   max-width: 100%;
   height: 100%;
-  background: var(--studio-paper);
-  border-left: 1px solid var(--board-family-tile-border-strong);
+  color: var(--sb-text);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--board-family-field) 90%, transparent) 0%,
+    color-mix(in srgb, var(--board-family-field) 78%, transparent) 100%
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-left: 1px solid color-mix(in srgb, var(--sb-denim) 18%, transparent);
   box-shadow: -8px 0 28px rgba(46, 43, 40, 0.12);
   outline: none;
 }
@@ -2709,7 +2748,7 @@ body:has(.sb--v4) {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--utility-text-muted);
+  color: var(--sb-text);
 }
 
 .sb-record-drawer__studio-plan,
@@ -2724,7 +2763,7 @@ body:has(.sb--v4) {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 1rem 1.1rem 0.85rem;
-  border-bottom: 1px solid var(--board-family-tile-border);
+  border-bottom: 1px solid color-mix(in srgb, var(--sb-denim) 18%, transparent);
 }
 
 .sb-record-drawer__title {
@@ -2733,21 +2772,21 @@ body:has(.sb--v4) {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--utility-text);
+  color: var(--sb-text);
 }
 
 .sb-record-drawer__subtitle {
   margin: 0 0 0.25rem;
   font-size: 1.08rem;
-  font-weight: 600;
-  color: var(--utility-text);
+  font-weight: 700;
+  color: var(--sb-text);
 }
 
 .sb-record-drawer__hint {
   margin: 0;
   font-size: 0.96rem;
   line-height: 1.4;
-  color: var(--utility-text-muted);
+  color: color-mix(in srgb, var(--sb-text) 88%, #000);
 }
 
 .sb-record-drawer__close {
@@ -2775,8 +2814,9 @@ body:has(.sb--v4) {
   padding: 0.75rem 0.85rem;
   font-size: 1rem;
   line-height: 1.45;
-  color: var(--utility-text-muted);
-  background: color-mix(in srgb, var(--sb-denim) 8%, white);
+  color: color-mix(in srgb, var(--sb-text) 88%, #000);
+  background: color-mix(in srgb, var(--board-family-tile) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sb-denim) 14%, transparent);
   border-radius: 6px;
 }
 
@@ -2790,15 +2830,30 @@ body:has(.sb--v4) {
   padding: 0.68rem 0.74rem;
   border: 1px solid color-mix(in srgb, var(--sb-denim) 14%, transparent);
   border-radius: calc(var(--sb-tile-radius) * 0.58);
-  background: color-mix(in srgb, var(--studio-paper) 58%, var(--board-family-field) 42%);
+  background: color-mix(in srgb, var(--board-family-tile) 78%, transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .sb-record-drawer .cd-vision__label {
   margin: 0;
+  font-weight: 700;
+  color: var(--sb-text);
+}
+
+.sb-record-drawer .cd-vision__eyebrow {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  color: var(--sb-text);
 }
 
 .sb-record-drawer .cd-vision__value {
   margin: 0;
+  color: var(--sb-text);
+}
+
+.sb-record-drawer .cd-package-list__item {
+  color: var(--sb-text);
 }
 
 .sb-record-drawer__actions .utility-btn--primary {
@@ -2897,7 +2952,7 @@ body:has(.sb--v4) {
   margin: 0;
   font-size: 0.92rem;
   line-height: 1.5;
-  color: var(--utility-text-muted);
+  color: color-mix(in srgb, var(--sb-text) 88%, #000);
 }
 
 /* V2 hierarchy — Paper page, Ink field cards, Denim structure, Brass markers */
@@ -3299,11 +3354,11 @@ body:has(.sb--v4) {
   display: grid;
   flex: 1;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: minmax(0, 0.9fr) minmax(12rem, 0.55fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
   gap: var(--sb-grid-gap);
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   padding-right: 0.18rem;
 }
 
@@ -3527,8 +3582,15 @@ body:has(.sb--v4) {
 
 .sb-project-snapshot__meta {
   font-size: var(--sb-type-sm);
+  line-height: 1.45;
   font-weight: 600;
-  line-height: 1.35;
+  color: var(--sb-text-muted);
+}
+
+.sb-project-snapshot__empty {
+  margin: 0;
+  font-size: var(--sb-type-sm);
+  line-height: 1.45;
   color: var(--sb-text-muted);
 }
 
@@ -5060,7 +5122,12 @@ body:has(.sb--v4) {
   }
 
   .sb-record-drawer {
+    --sb-record-drawer-width: 100%;
     justify-content: stretch;
+  }
+
+  .sb-record-drawer__backdrop {
+    right: 0;
   }
 
   .sb-record-drawer__panel {
@@ -5329,6 +5396,14 @@ body:has(.sb--v4) {
   .sb--v4 .sb-ticker__message {
     font-size: 0.8125rem;
     letter-spacing: 0.035em;
+  }
+
+  .sb-record-drawer {
+    --sb-record-drawer-width: 100%;
+  }
+
+  .sb-record-drawer__backdrop {
+    right: 0;
   }
 
   .sb-record-drawer__panel {
@@ -5682,7 +5757,12 @@ body:has(.sb--v4) {
   }
 
   .sb-record-drawer {
+    --sb-record-drawer-width: 100%;
     justify-content: stretch;
+  }
+
+  .sb-record-drawer__backdrop {
+    right: 0;
   }
 
   .sb-record-drawer__panel {
@@ -6000,14 +6080,12 @@ body:has(.sb--v4) {
 
 .sb-materials-board-list__value,
 .sb-materials-action-card__detail {
-  display: -webkit-box;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
   font-size: var(--sb-type-xs);
-  line-height: 1.38;
+  line-height: 1.45;
   color: var(--sb-text-muted);
   overflow-wrap: anywhere;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
 
 .sb-materials-board-status {
@@ -6039,10 +6117,17 @@ body:has(.sb--v4) {
   border-color: color-mix(in srgb, var(--sb-gold) 42%, transparent);
 }
 
+.sb-materials-board-status--not-applicable,
 .sb-materials-board-status--not-available-yet {
   color: color-mix(in srgb, var(--sb-text-muted) 88%, var(--sb-text) 12%);
   background: color-mix(in srgb, var(--sb-text-muted) 10%, #fff 90%);
   border-color: color-mix(in srgb, var(--sb-text-muted) 28%, transparent);
+}
+
+.sb-materials-board-status--optional {
+  color: var(--sb-denim-deep);
+  background: color-mix(in srgb, var(--sb-denim) 10%, #fff 90%);
+  border-color: color-mix(in srgb, var(--sb-denim) 24%, transparent);
 }
 
 .sb-materials-action-card {
@@ -6108,11 +6193,12 @@ body:has(.sb--v4) {
 .sb-card--materials-needed .sb-materials-action-card {
   gap: 0.26rem;
   min-height: 0;
+  height: auto;
   padding: 0.56rem 0.62rem;
 }
 
 .sb-card--materials-needed .sb-materials-action-card__detail {
-  -webkit-line-clamp: 1;
+  overflow: visible;
 }
 
 .sb-board-slideout {
@@ -6509,7 +6595,7 @@ body:has(.sb--v4) {
 
   .sb--v4 .sb-progress-panel__body,
   .sb--v4 .sb-studio-note-letter {
-    overflow: visible;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-progress-panel__fit,
@@ -6742,8 +6828,12 @@ body:has(.sb--v4) {
     padding: 0.72rem 0.78rem;
   }
 
+  .sb--v4 .sb-record-drawer {
+    --sb-record-drawer-width: min(54vw, 47rem);
+  }
+
   .sb--v4 .sb-record-drawer__panel {
-    width: min(54vw, 47rem);
+    width: var(--sb-record-drawer-width);
     min-width: min(100%, 28rem);
   }
 
@@ -6830,8 +6920,7 @@ body:has(.sb--v4) {
 
   .sb--v4 .sb-main {
     padding: clamp(1rem, 1.2vw, 1.35rem);
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-header-v3 {
@@ -6839,15 +6928,22 @@ body:has(.sb--v4) {
   }
 
   .sb--v4 .sb-board-layout {
-    grid-template-rows: max-content max-content;
-    grid-auto-rows: unset;
-    align-items: start;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
     gap: var(--sb-grid-gap);
     padding-right: 0.45rem;
-    flex: 0 0 auto;
-    height: auto;
-    max-height: none;
-    overflow: visible;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .sb--v4 .sb-board-layout > .sb-card,
+  .sb--v4 .sb-board-layout > .sb-materials-tile {
+    align-self: stretch;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-board-layout .sb-materials-tile,
@@ -6856,25 +6952,24 @@ body:has(.sb--v4) {
   .sb--v4 .sb-board-layout .sb-card--materials-next {
     display: flex;
     flex-direction: column;
-    min-height: auto;
-    height: auto;
-    overflow: visible;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-card--materials-received .sb-materials-board-tile,
   .sb--v4 .sb-card--materials-needed .sb-materials-board-tile {
-    flex: 0 0 auto;
-    min-height: auto;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   .sb--v4 .sb-materials-board-tile {
-    overflow: visible;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-card--materials-received .sb-materials-board-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.45rem;
-    overflow: visible;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-card--materials-received .sb-materials-board-list__item {
@@ -6890,25 +6985,26 @@ body:has(.sb--v4) {
   }
 
   .sb--v4 .sb-card--materials-received .sb-materials-board-list__value {
-    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-card--materials-received .sb-materials-board-tile {
-    overflow: visible;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-card--materials-needed .sb-materials-action-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.45rem;
-    overflow: visible;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-card--materials-needed .sb-materials-board-tile {
-    overflow: visible;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-card--materials-needed .sb-materials-action-card {
     min-height: 0;
+    height: auto;
     padding: 0.56rem 0.62rem;
   }
 
@@ -6917,7 +7013,7 @@ body:has(.sb--v4) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 0.75rem;
     row-gap: 0.55rem;
-    flex: 0 0 auto;
+    flex: 1 1 auto;
     min-height: 0;
   }
 
@@ -6979,49 +7075,47 @@ body:has(.sb--v4) {
     min-height: 0;
   }
 
+  .sb--v4 .sb-board-layout .sb-card--current,
+  .sb--v4 .sb-board-layout .sb-card--progress,
+  .sb--v4 .sb-board-layout .sb-card--project-snapshot,
   .sb--v4 .sb-board-layout .sb-card--materials-received,
   .sb--v4 .sb-board-layout .sb-card--materials-needed,
   .sb--v4 .sb-board-layout .sb-card--materials-next {
-    min-height: max-content;
-  }
-
-  .sb--v4 .sb-board-layout .sb-card--current,
-  .sb--v4 .sb-board-layout .sb-card--progress {
-    min-height: max-content;
-    overflow: visible;
-  }
-
-  .sb--v4 .sb-board-layout .sb-card--project-snapshot {
-    min-height: max-content;
-    overflow: visible;
+    min-height: 0;
+    height: auto;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-board-layout .sb-card--current .sb-current-campaign,
   .sb--v4 .sb-board-layout .sb-card--progress .sb-progress-panel,
   .sb--v4 .sb-board-layout .sb-card--project-snapshot .sb-project-snapshot {
-    overflow: visible;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-project-snapshot,
   .sb--v4 .sb-project-snapshot__stack {
-    flex: 0 0 auto;
-    min-height: auto;
-    overflow: visible;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-progress-panel {
-    overflow: visible;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-materials-board-list,
   .sb--v4 .sb-materials-action-list {
-    overflow: visible;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-card--current .sb-current-campaign,
   .sb--v4 .sb-card--progress .sb-progress-panel {
-    flex: 0 0 auto;
-    min-height: auto;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   .sb--v4 .sb-board-layout .sb-card--package .sb-package-summary,
@@ -7029,7 +7123,15 @@ body:has(.sb--v4) {
   .sb--v4 .sb-studio-note-letter,
   .sb--v4 .sb-studio-note-board,
   .sb--v4 .sb-card--materials {
-    overflow: visible;
+    overflow: hidden;
+  }
+
+  .sb--v4 .sb-card--materials-received .sb-materials-board-tile,
+  .sb--v4 .sb-card--materials-needed .sb-materials-board-tile,
+  .sb--v4 .sb-materials-board-next {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sb--v4 .sb-card__tab,
@@ -7241,17 +7343,26 @@ body:has(.sb--v4) {
 
   .sb--v4 .sb-record-drawer__panel {
     color: var(--sb-text);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--board-family-field) 90%, transparent) 0%,
+      color-mix(in srgb, var(--board-family-field) 78%, transparent) 100%
+    );
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .sb--v4 .sb-record-drawer__title {
     font-size: clamp(1.62rem, 1.6vw, 1.9rem);
     line-height: 1.22;
+    font-weight: 700;
     color: var(--sb-text);
   }
 
   .sb--v4 .sb-record-drawer__subtitle {
     font-size: clamp(1.28rem, 1.18vw, 1.45rem);
     line-height: 1.42;
+    font-weight: 700;
     color: var(--sb-text);
   }
 
@@ -7269,7 +7380,8 @@ body:has(.sb--v4) {
   .sb--v4 .sb-record-drawer .cd-deliverables__hint {
     font-size: clamp(1rem, 0.96vw, 1.12rem);
     line-height: 1.48;
-    color: color-mix(in srgb, var(--sb-text) 86%, #000);
+    font-weight: 700;
+    color: var(--sb-text);
   }
 
   .sb--v4 .sb-record-drawer .cd-vision__answers,
@@ -7305,5 +7417,48 @@ body:has(.sb--v4) {
   .sb--v4 .sb-record-drawer .cd-deliverables__cta {
     font-size: max(1rem, 16px);
     line-height: 1.32;
+  }
+
+  /* No Active Project — keep six tiles on a shared 2-row grid; row height follows tallest tile. */
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign {
+    grid-template-rows: auto auto;
+  }
+
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign > .sb-card,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign > .sb-materials-tile {
+    align-self: stretch;
+    min-height: 0;
+  }
+
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--current,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--progress,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--project-snapshot,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--materials-received,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--materials-needed,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--materials-next {
+    min-height: 0;
+    height: auto;
+    overflow: hidden;
+  }
+
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--current .sb-current-campaign,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--progress .sb-progress-panel,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--project-snapshot .sb-project-snapshot {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-project-snapshot,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-project-snapshot__stack {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--materials-received .sb-materials-board-tile,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-card--materials-needed .sb-materials-board-tile,
+  .sb--v4 .sb-board-layout.sb-board-layout--no-campaign .sb-materials-board-next {
+    flex: 1 1 auto;
+    min-height: 0;
   }
 }

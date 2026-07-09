@@ -6,11 +6,24 @@
 import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import {
+  ROUTE_MAP_E2E_CAMPAIGN_KEY,
+  clickChooseThisJob,
+  clickTestPayment,
+  fillRouteMapIntake,
+  intakeTitleMatches,
+  loginBrowserContext,
+  readRouteMapIntakeTitle,
+  submitRouteMapIntake,
+  waitForRouteMapIntake,
+  waitForStudioBoardRecord,
+  isSocialPostsIntake,
+} from "./lib/route-map-e2e-shared.mjs";
 
 const BASE = process.env.VERIFY_BASE_URL ?? "http://localhost:3000";
 const OUT_DIR = path.resolve("tmp/studio-self-test-v1");
 const REPORT_PATH = path.join(OUT_DIR, "e2e-report.md");
-const CAMPAIGN_KEY = "studio-squishy:current-campaign";
+const CAMPAIGN_KEY = ROUTE_MAP_E2E_CAMPAIGN_KEY;
 
 const ROAD = {
   i75: "Get My Business Started",
@@ -158,31 +171,7 @@ async function selectRoad(page, customerLabel) {
 }
 
 async function fillIntakeWithPersona(page, scenario) {
-  let fieldIdx = 0;
-
-  const fields = page.locator(".route-map-intake__field");
-  const count = await fields.count();
-
-  for (let i = 0; i < count; i += 1) {
-    const spec = scenario.intakeFields[fieldIdx];
-    if (!spec) break;
-
-    const field = fields.nth(i);
-    const select = field.locator("select");
-    const textarea = field.locator("textarea");
-    const input = field.locator('input[type="text"]');
-
-    if (spec.type === "select" && (await select.count())) {
-      await select.selectOption({ label: spec.value });
-      fieldIdx += 1;
-    } else if (spec.type === "textarea" && (await textarea.count())) {
-      await textarea.fill(spec.value);
-      fieldIdx += 1;
-    } else if (spec.type === "text" && (await input.count())) {
-      await input.fill(spec.value);
-      fieldIdx += 1;
-    }
-  }
+  await fillRouteMapIntake(page, scenario);
 }
 
 function auditLeaks(clientText, briefText) {
@@ -232,7 +221,7 @@ async function runScenario(page, scenario) {
     checks.routeJob =
       jobCardText.includes(scenario.jobName) && jobCardText.includes(scenario.jobCardPrice);
 
-    await page.getByRole("button", { name: /choose this job/i }).click();
+    await clickChooseThisJob(page);
     await page.waitForSelector(".route-map-checkout-addon, .pay-paper-card--summary", {
       timeout: 15000,
     });
@@ -245,28 +234,23 @@ async function runScenario(page, scenario) {
     const checkoutText = await page.locator(".pay-paper-card--summary").innerText();
     checks.price = checkoutText.includes(scenario.expectedPrice);
 
-    const terms = page.locator('input[name="terms"]');
-    if (await terms.count()) await terms.check();
+    await clickTestPayment(page);
 
-    const sandbox = page.getByRole("button", { name: /test payment|sandbox/i });
-    if (await sandbox.count()) {
-      await sandbox.first().click();
-    } else {
-      throw new Error("Sandbox payment button not found");
-    }
-
-    await page.waitForSelector(".route-map-intake", { timeout: 25000 });
-    const intakeTitle = await page.locator("#route-map-intake-title").innerText();
-    const intakeLead = await page.locator(".route-map-section-lead").first().innerText();
+    await waitForRouteMapIntake(page);
+    const intakeTitle = await readRouteMapIntakeTitle(page);
+    const intakeLead = await page
+      .locator(".route-map-section-lead, .route-map-social-intake__lead")
+      .first()
+      .innerText()
+      .catch(() => "");
     checks.intakeForm =
-      intakeTitle === scenario.intakeTitle &&
+      intakeTitleMatches(scenario, intakeTitle) &&
       !intakeTitle.includes("Project Details") &&
       intakeLead.length > 20;
 
     await fillIntakeWithPersona(page, scenario);
-    await page.getByRole("button", { name: /Submit intake/i }).click();
-    await page.waitForURL(/studio-board.*record=open/, { timeout: 25000 });
-    await page.waitForSelector('[data-testid="route-map-client-summary"]', { timeout: 15000 });
+    await submitRouteMapIntake(page, scenario);
+    await waitForStudioBoardRecord(page);
     await page.waitForFunction(
       (marker) => {
         const el = document.querySelector('[data-testid="route-map-client-summary"]');
@@ -306,10 +290,18 @@ async function runScenario(page, scenario) {
     let briefText = "";
     if ((await productionBrief.count()) > 0) {
       briefText = await productionBrief.innerText();
-      checks.productionBrief =
-        briefText.toLowerCase().includes(scenario.productionMarker.toLowerCase()) &&
-        briefText.includes(scenario.markerValue) &&
-        briefText.toLowerCase().includes(scenario.productionSection.toLowerCase());
+      if (isSocialPostsIntake(scenario)) {
+        checks.productionBrief =
+          briefText.includes(scenario.markerValue) &&
+          briefText.toLowerCase().includes("social posts") &&
+          (briefText.toLowerCase().includes("post / publish") ||
+            briefText.toLowerCase().includes("add-on"));
+      } else {
+        checks.productionBrief =
+          briefText.toLowerCase().includes(scenario.productionMarker.toLowerCase()) &&
+          briefText.includes(scenario.markerValue) &&
+          briefText.toLowerCase().includes(scenario.productionSection.toLowerCase());
+      }
     }
 
     const leakAudit = auditLeaks(clientText, briefText);
@@ -336,7 +328,9 @@ function checkIcon(ok) {
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await loginBrowserContext(context, BASE);
+  const page = await context.newPage();
 
   const results = [];
   for (const scenario of SCENARIOS) {

@@ -1,7 +1,12 @@
 "use client";
 
+import { type CSSProperties } from "react";
+
 import RouteMapJobDetailBlocks from "@/components/route-map/RouteMapJobDetailBlocks";
 import { ROUTE_MAP_V1, type RouteMapJob } from "@/config/route-map-v1";
+import { getRouteMapJobDetailDensity } from "@/lib/route-map-shelf-density";
+
+/** @locked docs/route-map-overlays-v1-locked.md — --rm-job-detail-density inline on overlay variant. */
 
 type Props = {
   job: RouteMapJob;
@@ -11,9 +16,19 @@ type Props = {
 };
 
 export default function RouteMapJobCard({ job, onChoose, onBack, variant = "inline" }: Props) {
+  const detailDensity =
+    variant === "overlay"
+      ? getRouteMapJobDetailDensity(job.deliverables.length, job.exclusions.length)
+      : undefined;
+  const overlayStyle =
+    detailDensity !== undefined
+      ? ({ "--rm-job-detail-density": String(detailDensity) } as CSSProperties)
+      : undefined;
+
   return (
     <article
       className={`route-map-job-card${variant === "overlay" ? " route-map-job-card--overlay" : ""}`}
+      style={overlayStyle}
       aria-labelledby="route-map-job-title"
     >
       <button type="button" className="route-map-back-link" onClick={onBack}>

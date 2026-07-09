@@ -13,6 +13,7 @@ import {
   type RouteMapRoadId,
 } from "@/config/route-map-v1";
 import { ROUTE_MAP_STOP_ICONS } from "@/config/route-map-icons";
+import { getRouteMapShelfDensity } from "@/lib/route-map-shelf-density";
 
 type Props = {
   roadId: RouteMapRoadId;
@@ -81,26 +82,43 @@ function useRouteGridColumns(): number {
   return useSyncExternalStore(
     (onStoreChange) => {
       const queries = [
-        window.matchMedia("(min-width: 1180px)"),
-        window.matchMedia("(min-width: 1500px)"),
+        window.matchMedia("(min-width: 901px)"),
+        window.matchMedia("(min-width: 1280px)"),
       ];
       queries.forEach((query) => query.addEventListener("change", onStoreChange));
-      return () => queries.forEach((query) => query.removeEventListener("change", onStoreChange));
+      window.addEventListener("resize", onStoreChange);
+      return () => {
+        queries.forEach((query) => query.removeEventListener("change", onStoreChange));
+        window.removeEventListener("resize", onStoreChange);
+      };
     },
     () => {
-      const wide = window.matchMedia("(min-width: 1180px)").matches;
-      const extraWide = window.matchMedia("(min-width: 1500px)").matches;
-      if (!wide) return 2;
-      return extraWide ? 3 : 2;
+      if (!window.matchMedia("(min-width: 901px)").matches) return 1;
+      if (!window.matchMedia("(min-width: 1280px)").matches) return 2;
+      return 3;
     },
     () => 2,
   );
 }
 
+function useViewportHeight(): number {
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      window.addEventListener("resize", onStoreChange);
+      return () => window.removeEventListener("resize", onStoreChange);
+    },
+    () => window.innerHeight,
+    () => 900,
+  );
+}
+
+/** @locked docs/route-map-overlays-v1-locked.md — per-lane --rm-shelf-density from job rows + viewport. */
 export default function RouteMapRoutePanel({ roadId, onSelectJob, onClose }: Props) {
   const road = getRouteMapRoad(roadId);
   const jobs = getJobsForRoad(roadId);
   const routeStart = getRouteStartJob();
+  const gridColumns = useRouteGridColumns();
+  const viewportHeight = useViewportHeight();
 
   if (!road) return null;
 
@@ -109,9 +127,12 @@ export default function RouteMapRoutePanel({ roadId, onSelectJob, onClose }: Pro
   };
 
   const isShelf = roadId === "random-exit";
-  const gridColumns = useRouteGridColumns();
+  const shelfDensity = getRouteMapShelfDensity(jobs.length, gridColumns, viewportHeight);
+  const gridRows = Math.ceil(jobs.length / Math.max(1, gridColumns));
   const panelStyle = {
     "--rm-grid-cols": String(gridColumns),
+    "--rm-grid-rows": String(gridRows),
+    "--rm-shelf-density": String(shelfDensity),
   } as CSSProperties;
 
   return (

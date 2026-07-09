@@ -1116,6 +1116,104 @@
   border-top: 1px solid var(--utility-border);
 }
 
+/* File Room — palette + frosted reading bands (all internal pages) */
+.studio-utility-scene--file-room {
+  --fr-owner-desk-denim: var(--studio-denim, #355c7d);
+  --fr-owner-desk-denim-deep: var(--studio-denim-deep, color-mix(in srgb, #355c7d 88%, #000 12%));
+  --fr-owner-desk-eucalyptus: var(--studio-eucalyptus, #456b5a);
+  --fr-owner-desk-coral: var(--studio-coral, #d56b4d);
+  --fr-owner-desk-gold: var(--studio-herb-gold, #c7a64a);
+  --fr-owner-desk-charcoal: var(--studio-charcoal, #2f3437);
+  --fr-owner-desk-frost: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--studio-ivory, #f7f4ee) 90%, #fff 10%) 0%,
+    color-mix(in srgb, var(--utility-paper-cream, #f5f0e6) 86%, #fff 14%) 100%
+  );
+  --fr-owner-desk-frost-read: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--studio-ivory, #f7f4ee) 94%, #fff 6%) 0%,
+    color-mix(in srgb, var(--utility-paper-cream, #f5f0e6) 90%, #fff 10%) 100%
+  );
+  --fr-owner-desk-frost-blur: blur(14px);
+}
+
+.studio-utility-scene--file-room .fr-header,
+.studio-utility-scene--file-room .fr-office-header {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 10px;
+  background: var(--fr-owner-desk-frost);
+  backdrop-filter: var(--fr-owner-desk-frost-blur);
+  -webkit-backdrop-filter: var(--fr-owner-desk-frost-blur);
+  border: 1px solid color-mix(in srgb, var(--fr-owner-desk-denim) 14%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 55%, transparent) inset,
+    0 6px 22px color-mix(in srgb, var(--fr-owner-desk-charcoal) 7%, transparent);
+}
+
+.studio-utility-scene--file-room .fr-header__title {
+  color: var(--fr-owner-desk-denim);
+  text-shadow: none;
+}
+
+.studio-utility-scene--file-room .fr-header__meta,
+.studio-utility-scene--file-room .fr-lead {
+  color: var(--fr-owner-desk-charcoal);
+  text-shadow: none;
+}
+
+.studio-utility-scene--file-room .fr-header__meta a,
+.studio-utility-scene--file-room .fr-back-link {
+  color: var(--fr-owner-desk-denim-deep);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.studio-utility-scene--file-room .fr-header__meta a:hover,
+.studio-utility-scene--file-room .fr-back-link:hover {
+  color: var(--fr-owner-desk-coral);
+  text-decoration: underline;
+}
+
+.studio-utility-scene--file-room .fr-back-link {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.65rem;
+  padding: 0.38rem 0.72rem;
+  border-radius: 8px;
+  background: var(--fr-owner-desk-frost);
+  backdrop-filter: var(--fr-owner-desk-frost-blur);
+  -webkit-backdrop-filter: var(--fr-owner-desk-frost-blur);
+  border: 1px solid color-mix(in srgb, var(--fr-owner-desk-denim) 18%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, #fff 50%, transparent) inset;
+}
+
+.studio-utility-scene--file-room .fr-office-header__title {
+  color: var(--fr-owner-desk-eucalyptus);
+  text-shadow: none;
+}
+
+.studio-utility-scene--file-room .fr-header__owner-roles {
+  display: inline-block;
+  font-size: var(--fr-owner-seq-type-eyebrow, 0.8125rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  padding: 0.3rem 0.68rem;
+  border-radius: 4px;
+  color: color-mix(in srgb, #fff 96%, #f7f4ee 4%);
+  border: 1px solid color-mix(in srgb, var(--fr-owner-desk-denim-deep, #2a4a66) 82%, #1a2838 18%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--fr-owner-desk-denim, #355c7d) 94%, #fff 6%) 0%,
+    var(--fr-owner-desk-denim-deep, #2a4a66) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent),
+    0 2px 6px color-mix(in srgb, var(--fr-owner-desk-denim, #355c7d) 22%, transparent);
+  text-shadow: none;
+}
+
 /* Owner Console — sharper lobby backdrop (studio visible, still readable) */
 .studio-utility-scene--file-room:has(.fr-owner-console-shell) {
   --studio-utility-backdrop-blur: blur(8px) brightness(0.88) saturate(1.02);
@@ -1170,8 +1268,7 @@
   --fr-owner-dock-height: calc(4.85rem + env(safe-area-inset-bottom, 0px));
 }
 
-/* File Room + Owner Console headers — frosted reading bands (pics 4–5) */
-.studio-utility-scene--file-room:has(.fr-owner-console-shell) .fr-header,
+/* Owner Console headers — inherit global file-room reading bands */
 .fr-owner-console-shell .fr-owner-console-header,
 .fr-owner-console-shell .fr-control-room__header {
   padding: 0.7rem 1rem;
@@ -1187,19 +1284,23 @@
 }
 
 .studio-utility-scene--file-room:has(.fr-owner-console-shell) .fr-header__title {
-  color: var(--fr-owner-desk-charcoal);
   font-size: clamp(1.35rem, 1.45vw, 1.65rem);
 }
 
 .studio-utility-scene--file-room:has(.fr-owner-console-shell) .fr-header__meta,
 .fr-owner-console-shell .fr-owner-console-header .fr-header__meta {
-  color: var(--fr-owner-desk-charcoal);
   font-size: clamp(1.15rem, 0.65vw + 1.05rem, 1.4rem);
-  text-shadow: none;
 }
 
 .fr-header--owner-desk {
   align-items: center;
+  width: min(72rem, 100%);
+  margin-inline: auto;
+  flex-shrink: 0;
+  border-color: color-mix(in srgb, var(--fr-owner-desk-charcoal) 10%, transparent);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.52) inset,
+    0 8px 28px rgba(47, 52, 55, 0.09);
 }
 
 .fr-header--owner-desk .fr-header__owner-meta {
@@ -1223,27 +1324,6 @@
   font-size: clamp(1.05rem, 0.55vw + 0.98rem, 1.3rem);
   line-height: 1.2;
   box-shadow: 0 1px 0 color-mix(in srgb, var(--fr-owner-desk-charcoal) 18%, transparent);
-}
-
-.studio-utility-scene--file-room:has(.fr-owner-console-shell) .fr-header__owner-roles {
-  display: inline-block;
-  font-size: var(--fr-owner-seq-type-eyebrow);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: lowercase;
-  padding: 0.3rem 0.68rem;
-  border-radius: 4px;
-  color: color-mix(in srgb, #fff 96%, #f7f4ee 4%);
-  border: 1px solid color-mix(in srgb, var(--fr-owner-desk-denim-deep, #2a4a66) 82%, #1a2838 18%);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--fr-owner-desk-denim, #355c7d) 94%, #fff 6%) 0%,
-    var(--fr-owner-desk-denim-deep, #2a4a66) 100%
-  );
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent),
-    0 2px 6px color-mix(in srgb, var(--fr-owner-desk-denim, #355c7d) 22%, transparent);
-  text-shadow: none;
 }
 
 .fr-owner-console-shell .fr-owner-console-header__title {
@@ -2416,6 +2496,19 @@
   padding-right: 0.25rem;
 }
 
+/* Open folder — ivory reading panel (not raw backdrop wash) */
+.fr-owner-console-shell .fr-owner-sequential__working-scroll {
+  padding: 1rem 1.15rem 1.1rem;
+  border-radius: 10px;
+  background: var(--fr-owner-desk-frost-read);
+  backdrop-filter: var(--fr-owner-desk-frost-blur);
+  -webkit-backdrop-filter: var(--fr-owner-desk-frost-blur);
+  border: 1px solid color-mix(in srgb, var(--fr-owner-desk-denim) 14%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 58%, transparent) inset,
+    0 8px 26px color-mix(in srgb, var(--fr-owner-desk-charcoal) 9%, transparent);
+}
+
 .fr-owner-sequential__close {
   margin-bottom: 0.65rem;
   padding: 0.35rem 0;
@@ -2437,6 +2530,165 @@
   margin: 0.2rem 0;
   font-size: var(--fr-owner-seq-type-title);
   color: var(--fr-owner-desk-denim, var(--studio-denim, #355c7d));
+}
+
+.fr-owner-sequential__working-campaign {
+  margin: 0 0 0.15rem;
+  font-size: var(--fr-owner-seq-type-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--fr-owner-desk-coral, var(--studio-coral, #d56b4d));
+}
+
+.fr-owner-sequential__working-meta {
+  margin: 0.15rem 0 0;
+  font-size: var(--fr-owner-seq-type-label);
+  font-weight: 600;
+  color: var(--fr-owner-desk-gold, var(--studio-herb-gold, #c7a64a));
+}
+
+/* Briefing blocks — one palette role per section */
+.fr-owner-console-shell .fr-owner-sequential__working-surface .fr-owner-console-card__fields {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0 0 0.85rem;
+}
+
+.fr-owner-console-shell .fr-owner-sequential__working-surface .fr-owner-console-card__field {
+  margin: 0;
+  padding: 0.62rem 0.78rem 0.68rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--studio-ivory, #f7f4ee) 92%, #fff 8%);
+  border: 1px solid color-mix(in srgb, var(--fr-owner-desk-charcoal) 7%, transparent);
+  border-left-width: 3px;
+}
+
+.fr-owner-console-shell .fr-owner-sequential__working-surface .fr-owner-console-card__field dt {
+  text-shadow: none;
+}
+
+.fr-owner-console-shell .fr-owner-sequential__working-surface .fr-owner-console-card__field dd {
+  color: var(--fr-owner-desk-charcoal, var(--studio-charcoal, #2f3437));
+  text-shadow: none;
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__fields
+  > .fr-owner-console-card__field:nth-child(1) {
+  border-left-color: var(--fr-owner-desk-denim, var(--studio-denim, #355c7d));
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__fields
+  > .fr-owner-console-card__field:nth-child(1)
+  dt {
+  color: var(--fr-owner-desk-denim, var(--studio-denim, #355c7d));
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__fields
+  > .fr-owner-console-card__field:nth-child(2) {
+  border-left-color: var(--fr-owner-desk-eucalyptus, var(--studio-eucalyptus, #456b5a));
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__fields
+  > .fr-owner-console-card__field:nth-child(2)
+  dt {
+  color: var(--fr-owner-desk-eucalyptus, var(--studio-eucalyptus, #456b5a));
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__fields
+  > .fr-owner-console-card__field:nth-child(3) {
+  border-left-color: var(--fr-owner-desk-coral, var(--studio-coral, #d56b4d));
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__fields
+  > .fr-owner-console-card__field:nth-child(3)
+  dt {
+  color: color-mix(in srgb, var(--fr-owner-desk-coral, #d56b4d) 88%, #8b3a2a 12%);
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__fields
+  > .fr-owner-console-card__field:nth-child(4) {
+  border-left-color: var(--fr-owner-desk-gold, var(--studio-herb-gold, #c7a64a));
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__fields
+  > .fr-owner-console-card__field:nth-child(4)
+  dt {
+  color: color-mix(in srgb, var(--fr-owner-desk-gold, #c7a64a) 82%, #6b5520 18%);
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__fields
+  > .fr-owner-console-card__field:nth-child(5) {
+  border-left-color: var(--fr-owner-desk-denim-deep, #2a4a66);
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__fields
+  > .fr-owner-console-card__field:nth-child(5)
+  dt {
+  color: var(--fr-owner-desk-denim-deep, #2a4a66);
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__action-list {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__action-list
+  li::marker {
+  color: var(--fr-owner-desk-coral, var(--studio-coral, #d56b4d));
+}
+
+.fr-owner-console-shell
+  .fr-owner-sequential__working-surface
+  .fr-owner-console-card__action-list
+  li
+  strong {
+  color: var(--fr-owner-desk-denim, var(--studio-denim, #355c7d));
+}
+
+.fr-owner-console-shell .fr-owner-sequential__working-surface .fr-owner-sequential__coordinator-panel {
+  background: color-mix(in srgb, var(--studio-ivory, #f7f4ee) 88%, var(--fr-owner-desk-denim) 12%);
+  border-color: color-mix(in srgb, var(--fr-owner-desk-denim) 22%, transparent);
+  border-left: 3px solid var(--fr-owner-desk-denim, var(--studio-denim, #355c7d));
+}
+
+.fr-owner-console-shell .fr-owner-sequential__working-surface .fr-owner-sequential__squishy-says-label {
+  color: var(--fr-owner-desk-denim, var(--studio-denim, #355c7d));
+}
+
+.fr-owner-console-shell .fr-owner-sequential__review-gate-label {
+  color: var(--fr-owner-desk-eucalyptus, var(--studio-eucalyptus, #456b5a));
+  text-shadow: none;
+}
+
+.fr-owner-console-shell .fr-owner-sequential__review-gate-textarea {
+  background: color-mix(in srgb, var(--studio-ivory, #f7f4ee) 96%, #fff 4%);
+  border-color: color-mix(in srgb, var(--fr-owner-desk-denim) 18%, transparent);
+  color: var(--fr-owner-desk-charcoal, var(--studio-charcoal, #2f3437));
 }
 
 .fr-owner-sequential__cabinet-panel {

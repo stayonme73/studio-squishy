@@ -1665,3 +1665,9 @@ body {
     font-size: 3.5px;
   }
 }
+
+/* Lobby backdrop — must follow default body cream (import order in this file). */
+body:has(.studio-utility-scene),
+.journey-shell:has(.studio-utility-scene) {
+  background: var(--studio-utility-backdrop-fallback);
+}

@@ -133,6 +133,33 @@ body:has(.studio-utility-scene) {
     0 1px 0 rgba(255, 255, 255, 0.55) inset;
 }
 
+/* Access / empty-state cards — frosted cream veil (Help Center header language) */
+.studio-utility-scene .utility-access-card-shell .utility-card {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--studio-ivory) 76%, transparent) 0%,
+    color-mix(in srgb, var(--utility-paper-cream) 58%, transparent) 100%
+  );
+  backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--studio-charcoal) 10%, transparent);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.52) inset,
+    0 8px 28px rgba(47, 52, 55, 0.09);
+}
+
+.studio-utility-scene .utility-access-card-shell .utility-eyebrow {
+  color: var(--studio-eucalyptus);
+}
+
+.studio-utility-scene .utility-access-card-shell .utility-title,
+.studio-utility-scene .utility-access-card-shell .utility-lead,
+.studio-utility-scene .utility-access-card-shell .utility-note {
+  color: var(--studio-charcoal);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.75),
+    0 1px 12px rgba(255, 255, 255, 0.45);
+}
+
 .studio-utility-scene .utility-page {
   --utility-cream: transparent;
   --utility-card: var(--studio-utility-card-surface-bright);
@@ -144,4 +171,12 @@ body:has(.studio-utility-scene) {
     0 2px 0 rgba(255, 255, 255, 0.55) inset,
     0 16px 32px rgba(44, 62, 80, 0.18),
     0 6px 14px rgba(44, 62, 80, 0.1);
+}
+
+.studio-utility-scene--file-room .fr-page,
+.studio-utility-scene--access-denied .utility-page {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: transparent;
 }

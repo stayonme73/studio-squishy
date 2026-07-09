@@ -1,5 +1,6 @@
 "use client";
 
+import RouteMapInterstateShield from "@/components/route-map/RouteMapInterstateShield";
 import {
   getRouteMapHeroConfig,
   type RouteMapHeroVariant,
@@ -41,6 +42,12 @@ function HotspotMarker({
   );
 }
 
+const HIGHWAY_SHIELD_NUM: Record<RouteMapHighwayMarker["roadId"], string> = {
+  i75: "75",
+  i20: "20",
+  i285: "285",
+};
+
 function HighwayMarker({ marker }: { marker: RouteMapHighwayMarker }) {
   return (
     <span
@@ -48,7 +55,11 @@ function HighwayMarker({ marker }: { marker: RouteMapHighwayMarker }) {
       style={{ left: `${marker.left}%`, top: `${marker.top}%` }}
       aria-hidden
     >
-      {marker.label}
+      <RouteMapInterstateShield
+        number={HIGHWAY_SHIELD_NUM[marker.roadId]}
+        variant={marker.roadId}
+        size="sm"
+      />
     </span>
   );
 }

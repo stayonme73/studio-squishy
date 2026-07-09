@@ -6,11 +6,24 @@
 import { chromium } from "playwright";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import {
+  ROUTE_MAP_E2E_CAMPAIGN_KEY,
+  clickChooseThisJob,
+  clickTestPayment,
+  fillRouteMapIntake,
+  intakeTitleMatches,
+  loginBrowserContext,
+  readRouteMapIntakeTitle,
+  submitRouteMapIntake,
+  waitForRouteMapIntake,
+  waitForStudioBoardRecord,
+  isSocialPostsIntake,
+} from "./lib/route-map-e2e-shared.mjs";
 
 const BASE = process.env.VERIFY_BASE_URL ?? "http://localhost:3000";
 const OUT_DIR = path.resolve("tmp/production-brief-wiring");
 const REPORT_PATH = path.join(OUT_DIR, "e2e-report.md");
-const CAMPAIGN_KEY = "studio-squishy:current-campaign";
+const CAMPAIGN_KEY = ROUTE_MAP_E2E_CAMPAIGN_KEY;
 
 const ROAD = {
   i75: "Get My Business Started",
@@ -90,7 +103,11 @@ async function selectRoad(page, customerLabel) {
   await page.waitForTimeout(350);
 }
 
-async function fillRequiredFields(page) {
+async function fillRequiredFields(page, pathConfig) {
+  if (isSocialPostsIntake(pathConfig)) {
+    await fillRouteMapIntake(page, pathConfig);
+    return;
+  }
   const fields = page.locator(".route-map-intake__field");
   const count = await fields.count();
   for (let i = 0; i < count; i += 1) {
@@ -126,7 +143,7 @@ async function runPath(page, pathConfig) {
     await selectRoad(page, pathConfig.road);
     await page.getByRole("button", { name: new RegExp(pathConfig.jobName.slice(0, 20), "i") }).click();
     await page.waitForSelector(".route-map-job-card", { timeout: 15000 });
-    await page.getByRole("button", { name: /choose this job/i }).click();
+    await clickChooseThisJob(page);
     await page.waitForSelector(".route-map-checkout-addon, .pay-paper-card", { timeout: 15000 });
 
     if (pathConfig.includePostPublish) {
@@ -136,30 +153,26 @@ async function runPath(page, pathConfig) {
 
     result.checkout = true;
 
-    const terms = page.locator('input[name="terms"]');
-    if (await terms.count()) await terms.check();
+    await clickTestPayment(page);
 
-    const sandbox = page.getByRole("button", { name: /test payment|sandbox/i });
-    if (await sandbox.count()) {
-      await sandbox.first().click();
-    } else {
-      throw new Error("Sandbox payment button not found");
-    }
+    await waitForRouteMapIntake(page);
+    const intakeTitle = await readRouteMapIntakeTitle(page);
+    result.intake = intakeTitleMatches(pathConfig, intakeTitle);
 
-    await page.waitForSelector(".route-map-intake", { timeout: 25000 });
-    const intakeTitle = await page.locator("#route-map-intake-title, .route-map-intake h2").first().innerText();
-    result.intake = intakeTitle.includes(pathConfig.intakeTitle.split(" ")[0]);
-
-    await fillRequiredFields(page);
-    await page.getByRole("button", { name: /Submit intake/i }).click();
-    await page.waitForURL(/studio-board.*record=open/, { timeout: 25000 });
-    await page.waitForSelector('[data-testid="route-map-client-summary"]', { timeout: 15000 });
+    await fillRequiredFields(page, pathConfig);
+    await submitRouteMapIntake(page, pathConfig);
+    await waitForStudioBoardRecord(page);
 
     const clientSummary = page.locator('[data-testid="route-map-client-summary"]');
     const clientText = await clientSummary.innerText();
-    result.campaignRecord =
-      clientText.includes("E2E production brief wiring value") &&
-      clientText.toLowerCase().includes(pathConfig.intakeTitle.replace(" Intake", "").toLowerCase());
+    if (isSocialPostsIntake(pathConfig)) {
+      result.campaignRecord =
+        clientText.toLowerCase().includes("social") && clientText.includes("Instagram");
+    } else {
+      result.campaignRecord =
+        clientText.includes("E2E production brief wiring value") &&
+        clientText.toLowerCase().includes(pathConfig.intakeTitle.replace(" Intake", "").toLowerCase());
+    }
 
     const status = await page.evaluate((key) => {
       const raw = localStorage.getItem(key);
@@ -173,7 +186,15 @@ async function runPath(page, pathConfig) {
     result.productionBrief = (await productionBrief.count()) > 0;
     if (result.productionBrief) {
       const briefText = await productionBrief.innerText();
-      if (!briefText.toLowerCase().includes(pathConfig.productionMarker.toLowerCase().split(" ")[0])) {
+      if (isSocialPostsIntake(pathConfig)) {
+        result.productionBrief =
+          briefText.includes("Instagram") &&
+          briefText.toLowerCase().includes("social posts") &&
+          (briefText.toLowerCase().includes("post / publish") ||
+            briefText.toLowerCase().includes("add-on"));
+      } else if (
+        !briefText.toLowerCase().includes(pathConfig.productionMarker.toLowerCase().split(" ")[0])
+      ) {
         result.productionBrief = false;
       }
     }
@@ -187,7 +208,9 @@ async function runPath(page, pathConfig) {
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await loginBrowserContext(context, BASE);
+  const page = await context.newPage();
 
   const results = [];
   for (const pathConfig of PATHS) {
