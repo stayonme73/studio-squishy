@@ -144,7 +144,7 @@ describe("Project Details + Studio Board integration", () => {
     expect(includes.some((item) => item.includes("SMS"))).toBe(false);
     expect(includes.some((item) => item.includes("Video Scripts"))).toBe(false);
     expect(includes.some((item) => item.includes("Marketing Calendar"))).toBe(false);
-    expect(feed.some((entry) => entry.message === "Project Details received")).toBe(true);
+    expect(feed.some((entry) => entry.message === "We received your project details")).toBe(true);
   });
 
   it("adds a Board activity update when required materials are received", () => {
@@ -157,7 +157,7 @@ describe("Project Details + Studio Board integration", () => {
 
     const feed = resolveActivityFeed(campaign);
 
-    expect(feed[0]?.message).toBe("Required materials received");
+    expect(feed[0]?.message).toBe("Everything we need has been received");
   });
 
   it("does not show project details activity before Project Details are submitted", () => {
