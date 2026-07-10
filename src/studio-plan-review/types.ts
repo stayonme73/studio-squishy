@@ -19,6 +19,8 @@ export const STUDIO_PLAN_REVIEW_LABELS = {
   viewDetails: "View Details",
 } as const;
 
+export type StudioPlanReviewLabels = Record<keyof typeof STUDIO_PLAN_REVIEW_LABELS, string>;
+
 export type StudioPlanReviewSwapOption = {
   serviceId: ServiceId;
   title: string;
@@ -56,7 +58,7 @@ export type StudioPlanReviewConsiderNextItem = StudioPlanReviewServiceItem & {
  * Customer-readable Studio Plan Review — consumed by Studio Plan Review UI.
  */
 export type StudioPlanReviewModel = {
-  labels: typeof STUDIO_PLAN_REVIEW_LABELS;
+  labels: StudioPlanReviewLabels;
   selectedServiceIds: readonly ServiceId[];
   recommendedServiceIds: readonly ServiceId[];
   includedServices: readonly StudioPlanReviewServiceItem[];

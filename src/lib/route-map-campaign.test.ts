@@ -10,14 +10,21 @@ import {
   getSelectableRouteMapRoads,
   resolveRouteMapShelfJobId,
   ROUTE_MAP_V1,
+  type RouteMapJobId,
 } from "@/config/route-map-v1";
 import { getRouteMapIntakeSchema } from "@/config/route-map-intake-v1";
 import {
+  addRouteMapServiceToPlan,
+  addServiceToRouteMapPlanState,
   buildApprovedPlanFromRouteMapJob,
+  buildRouteMapPaymentSummaryFromServices,
   buildRouteMapPaymentSummary,
   createCampaignFromRouteMapJob,
   isRouteMapPostPublishAddonEligible,
+  removeRouteMapServiceFromPlan,
   resolveRouteMapRestoredJourney,
+  saveApprovedRouteMapPlan,
+  saveRouteMapPlanState,
   saveRouteMapJourneyStep,
   selectRouteMapJob,
   submitRouteMapIntake,
@@ -26,6 +33,7 @@ import { resolveCustomerJourneySteps } from "@/lib/customer-journey";
 import { hasCampaignCreativeBrief } from "@/lib/campaign-brief-source";
 import { hasRouteMapProductionBrief, resolveRouteMapClientSummary } from "@/lib/route-map-production-brief";
 import { ensureConceptsReadyForReview } from "@/lib/studio-board-campaign";
+import type { ServiceId } from "@/catalog/types";
 
 describe("route-map-v1 config", () => {
   it("defines five roads internally including I-285 perimeter loop", () => {
@@ -350,30 +358,160 @@ describe("route-map campaign handoff", () => {
     });
   });
 
-  it("creates a new campaign when selecting a different Route Map job", () => {
+  it("keeps browsing a different Route Map job in the existing campaign without adding it", () => {
     withMockedBrowserStorage(() => {
       const first = selectRouteMapJob("v2-rtu-flyer", "random-exit");
       expect(first?.campaignId).toBeTruthy();
 
       const second = selectRouteMapJob("v2-rtu-social-posts", "random-exit");
       expect(second?.campaignId).toBeTruthy();
-      expect(second?.campaignId).not.toBe(first?.campaignId);
+      expect(second?.campaignId).toBe(first?.campaignId);
       expect(second?.routeMapContext?.jobId).toBe("v2-rtu-social-posts");
       expect(second?.routeMapContext?.roadId).toBe("random-exit");
+      expect(second?.routeMapContext?.selectedServiceIds).toEqual([]);
     });
   });
 
-  it("creates a new campaign when selecting the same job from a different road", () => {
+  it("keeps browsing the same job from a different road without adding it", () => {
     withMockedBrowserStorage(() => {
       const first = selectRouteMapJob("v2-rtu-flyer", "random-exit");
       expect(first?.campaignId).toBeTruthy();
 
       const second = selectRouteMapJob("v2-rtu-flyer", "update");
       expect(second?.campaignId).toBeTruthy();
-      expect(second?.campaignId).not.toBe(first?.campaignId);
+      expect(second?.campaignId).toBe(first?.campaignId);
       expect(second?.routeMapContext?.jobId).toBe("v2-rtu-flyer");
       expect(second?.routeMapContext?.roadId).toBe("update");
+      expect(second?.routeMapContext?.selectedServiceIds).toEqual([]);
     });
+  });
+
+  it("adds multiple Route Map services from different roads to one campaign plan", () => {
+    withMockedBrowserStorage(() => {
+      const first = addRouteMapServiceToPlan("v2-rtu-flyer", "random-exit");
+      const second = addRouteMapServiceToPlan("v2-rtu-social-posts", "i20");
+
+      expect(first?.campaignId).toBeTruthy();
+      expect(second?.campaignId).toBe(first?.campaignId);
+      expect(second?.routeMapContext?.selectedServiceIds).toEqual([
+        "v2-rtu-flyer",
+        "v2-rtu-social-posts",
+      ]);
+      expect(second?.routeMapContext?.jobId).toBe("v2-rtu-flyer");
+      expect(second?.approvedStudioPlan?.selectedServiceIds).toEqual([
+        "v2-rtu-flyer",
+        "v2-rtu-social-posts",
+      ]);
+    });
+  });
+
+  it("prevents duplicate Route Map services in the Studio Plan", () => {
+    withMockedBrowserStorage(() => {
+      const first = addRouteMapServiceToPlan("v2-rtu-flyer", "random-exit");
+      const second = addRouteMapServiceToPlan("v2-rtu-flyer", "i75");
+
+      expect(second?.campaignId).toBe(first?.campaignId);
+      expect(second?.routeMapContext?.selectedServiceIds).toEqual(["v2-rtu-flyer"]);
+    });
+  });
+
+  it("removes one service while preserving other selected Route Map services", () => {
+    withMockedBrowserStorage(() => {
+      addRouteMapServiceToPlan("v2-rtu-flyer", "random-exit");
+      addRouteMapServiceToPlan("v2-rtu-social-posts", "i20");
+
+      const updated = removeRouteMapServiceFromPlan("v2-rtu-flyer");
+
+      expect(updated?.routeMapContext?.selectedServiceIds).toEqual(["v2-rtu-social-posts"]);
+      expect(updated?.routeMapContext?.jobId).toBe("v2-rtu-social-posts");
+      expect(updated?.approvedStudioPlan?.selectedServiceIds).toEqual(["v2-rtu-social-posts"]);
+    });
+  });
+
+  it("removing the final service leaves a stable empty Route Map plan", () => {
+    withMockedBrowserStorage(() => {
+      addRouteMapServiceToPlan("v2-rtu-flyer", "random-exit");
+
+      const updated = removeRouteMapServiceFromPlan("v2-rtu-flyer");
+
+      expect(updated?.routeMapContext?.selectedServiceIds).toEqual([]);
+      expect(updated?.approvedStudioPlan).toBeUndefined();
+    });
+  });
+
+  it("prunes orphaned execution add-ons when the parent service is removed", () => {
+    withMockedBrowserStorage(() => {
+      addRouteMapServiceToPlan("v2-rtu-social-posts", "i20");
+      const withAddon = addServiceToRouteMapPlanState(
+        { selectedServiceIds: ["v2-rtu-social-posts" as ServiceId] },
+        "v2-addon-post-publish",
+      );
+      saveRouteMapPlanState(withAddon);
+
+      const updated = removeRouteMapServiceFromPlan("v2-rtu-social-posts");
+
+      expect(updated?.routeMapContext?.selectedServiceIds).toEqual([]);
+      expect(updated?.routeMapContext?.postPublishAddon).toBeUndefined();
+    });
+  });
+
+  it("preserves the eligible post/publish add-on when an unrelated service is removed", () => {
+    withMockedBrowserStorage(() => {
+      addRouteMapServiceToPlan("v2-rtu-social-posts", "i20");
+      const withAddon = addServiceToRouteMapPlanState(
+        { selectedServiceIds: ["v2-rtu-social-posts" as ServiceId] },
+        "v2-addon-post-publish",
+      );
+      saveRouteMapPlanState(withAddon);
+      addRouteMapServiceToPlan("v2-rtu-menu", "i75");
+
+      // The add-on's true parent (social-posts) is still selected — only the unrelated
+      // menu job is being removed. The shared catalog rule can't see this addon's real
+      // parent (different families on purpose), so this exercises the Route Map override.
+      const updated = removeRouteMapServiceFromPlan("v2-rtu-menu");
+
+      expect(updated?.routeMapContext?.selectedServiceIds).toEqual([
+        "v2-rtu-social-posts",
+        "v2-addon-post-publish",
+      ]);
+      expect(updated?.routeMapContext?.postPublishAddon).toBe(true);
+      expect(updated?.approvedStudioPlan?.selectedServiceIds).toEqual([
+        "v2-rtu-social-posts",
+        "v2-addon-post-publish",
+      ]);
+
+      // Now remove the true parent — the add-on must still be pruned.
+      const afterParentRemoved = removeRouteMapServiceFromPlan("v2-rtu-social-posts");
+      expect(afterParentRemoved?.routeMapContext?.selectedServiceIds).toEqual([]);
+      expect(afterParentRemoved?.routeMapContext?.postPublishAddon).toBeUndefined();
+    });
+  });
+
+  it("removing the post/publish add-on itself removes only the add-on", () => {
+    withMockedBrowserStorage(() => {
+      addRouteMapServiceToPlan("v2-rtu-social-posts", "i20");
+      const withAddon = addServiceToRouteMapPlanState(
+        { selectedServiceIds: ["v2-rtu-social-posts" as ServiceId] },
+        "v2-addon-post-publish",
+      );
+      saveRouteMapPlanState(withAddon);
+
+      const updated = removeRouteMapServiceFromPlan("v2-addon-post-publish");
+
+      expect(updated?.routeMapContext?.selectedServiceIds).toEqual(["v2-rtu-social-posts"]);
+      expect(updated?.routeMapContext?.postPublishAddon).toBeUndefined();
+    });
+  });
+
+  it("builds Route Map payment totals from every selected service", () => {
+    const summary = buildRouteMapPaymentSummaryFromServices([
+      "v2-rtu-flyer",
+      "v2-rtu-social-posts",
+    ]);
+
+    expect(summary.services).toEqual(["Make Me a Flyer", "Make My Social Media Posts"]);
+    expect(summary.amountDueTodayCents).toBe(75000);
+    expect(summary.amountDueTodayDisplay).toBe("$750");
   });
 
   it("ignores invalid or stale Route Map restoration context", () => {
@@ -404,6 +542,53 @@ describe("route-map campaign handoff", () => {
     ).toBeNull();
   });
 
+  it("restores a valid multi-service Route Map Studio Plan step", () => {
+    const restored = resolveRouteMapRestoredJourney(
+      {
+        jobId: "v2-rtu-flyer",
+        roadId: "random-exit",
+        selectedAt: "2026-07-10T12:00:00.000Z",
+        currentStep: "studio-plan",
+        selectedServiceIds: ["v2-rtu-flyer", "v2-rtu-social-posts"],
+      },
+      null,
+    );
+
+    expect(restored?.step).toBe("studio-plan");
+    expect(restored?.selectedServiceIds).toEqual(["v2-rtu-flyer", "v2-rtu-social-posts"]);
+    expect(restored?.jobId).toBe("v2-rtu-flyer");
+  });
+
+  it("rejects invalid persisted Route Map service lists during restoration", () => {
+    const restored = resolveRouteMapRestoredJourney(
+      {
+        jobId: "v2-rtu-flyer",
+        roadId: "random-exit",
+        selectedAt: "2026-07-10T12:00:00.000Z",
+        currentStep: "studio-plan",
+        selectedServiceIds: ["not-a-route-map-service" as ServiceId],
+      },
+      null,
+    );
+
+    expect(restored).toBeNull();
+  });
+
+  it("restores legacy singular jobId Route Map campaigns as one-service plans", () => {
+    const restored = resolveRouteMapRestoredJourney(
+      {
+        jobId: "v2-rtu-flyer",
+        roadId: "random-exit",
+        selectedAt: "2026-07-10T12:00:00.000Z",
+        currentStep: "checkout",
+      },
+      null,
+    );
+
+    expect(restored?.selectedServiceIds).toEqual(["v2-rtu-flyer"]);
+    expect(restored?.step).toBe("checkout");
+  });
+
   it("lets the intake query restore intake over another persisted Route Map step", () => {
     const restored = resolveRouteMapRestoredJourney(
       {
@@ -419,6 +604,7 @@ describe("route-map campaign handoff", () => {
       step: "intake",
       jobId: "v2-rtu-flyer",
       roadId: "random-exit",
+      selectedServiceIds: ["v2-rtu-flyer"],
       includePostPublishAddon: false,
     });
   });
@@ -545,6 +731,61 @@ describe("route-map campaign handoff", () => {
     const campaign = createCampaignFromRouteMapJob("v2-rtu-social-posts", "random-exit")!;
     expect(hasCampaignCreativeBrief(campaign)).toBe(false);
   });
+
+  it("approves a Route Map plan from a singular legacy job id", () => {
+    withMockedBrowserStorage(() => {
+      selectRouteMapJob("v2-rtu-flyer", "random-exit");
+
+      const updated = saveApprovedRouteMapPlan("v2-rtu-flyer");
+
+      expect(updated?.approvedStudioPlan?.selectedServiceIds).toEqual(["v2-rtu-flyer"]);
+      expect(updated?.routeMapContext?.jobId).toBe("v2-rtu-flyer");
+      expect(updated?.routeMapContext?.currentStep).toBe("checkout");
+    });
+  });
+
+  it("approves a Route Map plan from a multi-service selected list", () => {
+    withMockedBrowserStorage(() => {
+      addRouteMapServiceToPlan("v2-rtu-flyer", "random-exit");
+      addRouteMapServiceToPlan("v2-rtu-social-posts", "i20");
+
+      const updated = saveApprovedRouteMapPlan(["v2-rtu-flyer", "v2-rtu-social-posts"]);
+
+      expect(updated?.approvedStudioPlan?.selectedServiceIds).toEqual([
+        "v2-rtu-flyer",
+        "v2-rtu-social-posts",
+      ]);
+      expect(updated?.approvedStudioPlan?.amountDueTodayCents).toBe(75000);
+      expect(updated?.routeMapContext?.currentStep).toBe("checkout");
+    });
+  });
+
+  it("rejects an empty selected-service list on approval", () => {
+    withMockedBrowserStorage(() => {
+      selectRouteMapJob("v2-rtu-flyer", "random-exit");
+
+      const updated = saveApprovedRouteMapPlan([]);
+
+      expect(updated).toBeNull();
+    });
+  });
+
+  it("rejects an invalid legacy job id on approval", () => {
+    withMockedBrowserStorage(() => {
+      selectRouteMapJob("v2-rtu-flyer", "random-exit");
+
+      const updated = saveApprovedRouteMapPlan("not-a-real-job" as RouteMapJobId);
+
+      expect(updated).toBeNull();
+    });
+  });
+
+  it("returns null when approving with no current campaign", () => {
+    withMockedBrowserStorage(() => {
+      expect(saveApprovedRouteMapPlan("v2-rtu-flyer")).toBeNull();
+      expect(saveApprovedRouteMapPlan(["v2-rtu-flyer"])).toBeNull();
+    });
+  });
 });
 
 describe("route-map intake E2E paths (programmatic)", () => {
@@ -586,6 +827,8 @@ describe("route-map intake E2E paths (programmatic)", () => {
         intendedUse: "Print",
       });
       expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
+      expect(submitted).not.toBeNull();
+      if (!submitted) throw new Error("Expected Route Map intake submission");
       expect(getRouteMapIntakeSchema("rtu-flyer").title).toBe("Flyer Intake");
       expect(resolveRouteMapClientSummary(submitted)).not.toBeNull();
       expect(hasRouteMapProductionBrief(submitted)).toBe(true);

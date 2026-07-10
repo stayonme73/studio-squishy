@@ -97,7 +97,7 @@ export type CustomStudioPlanPackageId = typeof CUSTOM_STUDIO_PLAN_PACKAGE_ID;
 
 export type CampaignPackageId = StudioGuidePackageId | CustomStudioPlanPackageId;
 
-export type RouteMapJourneyStep = "panel" | "job" | "checkout" | "intake";
+export type RouteMapJourneyStep = "panel" | "job" | "studio-plan" | "checkout" | "intake";
 
 export type CampaignRecord = {
   campaignId: string;
@@ -121,6 +121,9 @@ export type CampaignRecord = {
   projectDetailsSubmittedAt?: string;
   /** Route Map V1 — selected job and road before payment. */
   routeMapContext?: {
+    /** Ordered Studio Plan selection. Authoritative for Route Map plan state. */
+    selectedServiceIds?: readonly ServiceId[];
+    /** Legacy/derived first selected Route Map job. Retained for campaign history. */
     jobId: RouteMapJobId;
     roadId: RouteMapRoadId;
     selectedAt: string;

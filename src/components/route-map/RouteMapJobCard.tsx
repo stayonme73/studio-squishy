@@ -12,10 +12,19 @@ type Props = {
   job: RouteMapJob;
   onChoose: () => void;
   onBack: () => void;
+  chooseLabel?: string;
+  chooseDisabled?: boolean;
   variant?: "inline" | "overlay";
 };
 
-export default function RouteMapJobCard({ job, onChoose, onBack, variant = "inline" }: Props) {
+export default function RouteMapJobCard({
+  job,
+  onChoose,
+  onBack,
+  chooseLabel = ROUTE_MAP_V1.chooseJobCta,
+  chooseDisabled = false,
+  variant = "inline",
+}: Props) {
   const detailDensity =
     variant === "overlay"
       ? getRouteMapJobDetailDensity(job.deliverables.length, job.exclusions.length)
@@ -45,8 +54,13 @@ export default function RouteMapJobCard({ job, onChoose, onBack, variant = "inli
       <RouteMapJobDetailBlocks job={job} />
 
       <footer className="route-map-job-card__footer">
-        <button type="button" className="route-map-primary-btn" onClick={onChoose}>
-          {ROUTE_MAP_V1.chooseJobCta}
+        <button
+          type="button"
+          className="route-map-primary-btn"
+          onClick={onChoose}
+          disabled={chooseDisabled}
+        >
+          {chooseLabel}
         </button>
       </footer>
     </article>

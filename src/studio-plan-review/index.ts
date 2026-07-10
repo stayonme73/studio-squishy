@@ -15,6 +15,7 @@ export type {
 export { STUDIO_PLAN_REVIEW_LABELS } from "@/studio-plan-review/types";
 
 export { buildStudioPlanReview } from "@/studio-plan-review/buildStudioPlanReview";
+export { buildRouteMapStudioPlanReview } from "@/studio-plan-review/routeMapStudioPlanReview";
 
 export {
   addServiceToPlan,

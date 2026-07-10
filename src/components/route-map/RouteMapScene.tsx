@@ -10,6 +10,8 @@ import RouteMapMobileMap from "@/components/route-map/RouteMapMobileMap";
 import RouteMapRoutePanel from "@/components/route-map/RouteMapRoutePanel";
 import RouteMapLobbyBackdrop from "@/components/route-map/RouteMapLobbyBackdrop";
 import RouteMapWorkspace from "@/components/route-map/RouteMapWorkspace";
+import StudioPlanReviewScene from "@/components/studio-plan-review/StudioPlanReviewScene";
+import type { ServiceId } from "@/catalog/types";
 import {
   getRouteMapJob,
   type RouteMapJob,
@@ -18,10 +20,15 @@ import {
 } from "@/config/route-map-v1";
 import { studioBoard } from "@/config/studio-board";
 import {
+  addRouteMapServiceToPlan,
+  addServiceToRouteMapPlanState,
+  buildRouteMapPaymentSummaryFromServices,
   buildRouteMapPaymentSummary,
   isRouteMapPostPublishAddonEligible,
+  removeRouteMapServiceFromPlan,
   resolveRouteMapRestoredJourney,
   saveApprovedRouteMapPlan,
+  saveRouteMapPlanState,
   saveRouteMapJourneyStep,
   saveRouteMapIntakeDraft,
   selectRouteMapJob,
@@ -33,6 +40,11 @@ import { readCampaignSyncStatus } from "@/lib/campaign-store/sync-client";
 import { markPaymentReceived, readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 import type { RouteMapJourneyStep } from "@/config/studio-board";
+import {
+  buildRouteMapStudioPlanReview,
+  swapServiceInPlan,
+  type StudioPlanState,
+} from "@/studio-plan-review";
 
 export type RouteMapStep = "map" | RouteMapJourneyStep;
 
@@ -48,6 +60,7 @@ export default function RouteMapScene() {
   const [step, setStep] = useState<RouteMapStep>("map");
   const [roadId, setRoadId] = useState<RouteMapRoadId | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<RouteMapJobId | null>(null);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<ServiceId[]>([]);
   const [includePostPublishAddon, setIncludePostPublishAddon] = useState(false);
   const [syncStatus, setSyncStatus] = useState<CampaignSyncStatus | null>(null);
 
@@ -60,12 +73,24 @@ export default function RouteMapScene() {
 
   const paymentSummary = useMemo(
     () =>
-      selectedJob
-        ? buildRouteMapPaymentSummary(selectedJob, {
-            includePostPublishAddon: postPublishEligible && includePostPublishAddon,
-          })
-        : undefined,
-    [selectedJob, postPublishEligible, includePostPublishAddon],
+      selectedServiceIds.length > 0
+        ? buildRouteMapPaymentSummaryFromServices(selectedServiceIds)
+        : selectedJob
+          ? buildRouteMapPaymentSummary(selectedJob, {
+              includePostPublishAddon: postPublishEligible && includePostPublishAddon,
+            })
+          : undefined,
+    [selectedServiceIds, selectedJob, postPublishEligible, includePostPublishAddon],
+  );
+
+  const planState: StudioPlanState = useMemo(
+    () => ({ selectedServiceIds }),
+    [selectedServiceIds],
+  );
+
+  const studioPlanModel = useMemo(
+    () => buildRouteMapStudioPlanReview(planState),
+    [planState],
   );
 
   const handleSelectRoad = useCallback((id: RouteMapRoadId) => {
@@ -81,19 +106,19 @@ export default function RouteMapScene() {
       setRoadId(resolvedRoadId);
       setSelectedJobId(job.id);
       setIncludePostPublishAddon(false);
-      selectRouteMapJob(job.id, resolvedRoadId);
+      const updated = selectRouteMapJob(job.id, resolvedRoadId);
+      setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? selectedServiceIds)]);
       setStep("job");
     },
-    [roadId],
+    [roadId, selectedServiceIds],
   );
 
   const handleChooseJob = useCallback(() => {
-    if (!selectedJob) return;
-    saveRouteMapJourneyStep("checkout", {
-      includePostPublishAddon: postPublishEligible && includePostPublishAddon,
-    });
-    setStep("checkout");
-  }, [selectedJob, postPublishEligible, includePostPublishAddon]);
+    if (!selectedJob || !roadId) return;
+    const updated = addRouteMapServiceToPlan(selectedJob.id, roadId);
+    setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? selectedServiceIds)]);
+    setStep("studio-plan");
+  }, [selectedJob, roadId, selectedServiceIds]);
 
   const handleBackToMap = useCallback(() => {
     setStep("map");
@@ -102,7 +127,7 @@ export default function RouteMapScene() {
   }, []);
 
   const handleClosePanel = useCallback(() => {
-    if (step === "job" || step === "checkout" || step === "intake") return;
+    if (step === "job" || step === "studio-plan" || step === "checkout" || step === "intake") return;
     handleBackToMap();
   }, [step, handleBackToMap]);
 
@@ -112,12 +137,49 @@ export default function RouteMapScene() {
     setSelectedJobId(null);
   }, []);
 
-  const handleBackToJob = useCallback(() => {
-    saveRouteMapJourneyStep("job", {
-      includePostPublishAddon: postPublishEligible && includePostPublishAddon,
-    });
-    setStep("job");
-  }, [postPublishEligible, includePostPublishAddon]);
+  const handleBackToStudioPlan = useCallback(() => {
+    saveRouteMapJourneyStep("studio-plan");
+    setStep("studio-plan");
+  }, []);
+
+  const handleReturnToBrowsing = useCallback(() => {
+    saveRouteMapJourneyStep("panel");
+    setStep(roadId ? "panel" : "map");
+  }, [roadId]);
+
+  const handleRemoveFromPlan = useCallback(
+    (serviceId: ServiceId) => {
+      const updated = removeRouteMapServiceFromPlan(serviceId);
+      setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? [])]);
+    },
+    [],
+  );
+
+  const handleSwapInPlan = useCallback(
+    (fromId: ServiceId, toId: ServiceId) => {
+      const next = swapServiceInPlan(planState, fromId, toId);
+      const updated = saveRouteMapPlanState(next);
+      setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? next.selectedServiceIds)]);
+    },
+    [planState],
+  );
+
+  const handleAddFromPlan = useCallback(
+    (serviceId: ServiceId) => {
+      const next = addServiceToRouteMapPlanState(planState, serviceId);
+      const updated = saveRouteMapPlanState(next);
+      setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? next.selectedServiceIds)]);
+    },
+    [planState],
+  );
+
+  const handleApprovePlan = useCallback(() => {
+    if (!studioPlanModel.planValid || selectedServiceIds.length === 0) return;
+    const saved = saveApprovedRouteMapPlan(selectedServiceIds);
+    if (!saved) return;
+    saveRouteMapJourneyStep("checkout");
+    setStep("checkout");
+  }, [studioPlanModel.planValid, selectedServiceIds]);
 
   const handlePaymentComplete = useCallback(() => {
     saveRouteMapJourneyStep("intake", {
@@ -145,16 +207,6 @@ export default function RouteMapScene() {
     [router],
   );
 
-  const handlePostPublishAddonChange = useCallback(
-    (checked: boolean) => {
-      setIncludePostPublishAddon(checked);
-      saveRouteMapJourneyStep("checkout", {
-        includePostPublishAddon: postPublishEligible && checked,
-      });
-    },
-    [postPublishEligible],
-  );
-
   useEffect(() => {
     const campaign = readCurrentCampaignHydrated();
     const restoredJourney = resolveRouteMapRestoredJourney(
@@ -165,6 +217,7 @@ export default function RouteMapScene() {
 
     setRoadId(restoredJourney.roadId);
     setSelectedJobId(restoredJourney.jobId);
+    setSelectedServiceIds([...restoredJourney.selectedServiceIds]);
     setIncludePostPublishAddon(restoredJourney.includePostPublishAddon);
     setStep(restoredJourney.step);
   }, [searchParams]);
@@ -184,7 +237,8 @@ export default function RouteMapScene() {
   const showOverlay = step !== "map";
   const showPanel = step === "panel" && roadId;
   const showJob = step === "job" && selectedJob;
-  const showCheckout = step === "checkout" && selectedJob && paymentSummary;
+  const showStudioPlan = step === "studio-plan";
+  const showCheckout = step === "checkout" && selectedServiceIds.length > 0 && paymentSummary;
   const showIntake = step === "intake" && selectedJob;
 
   return (
@@ -246,47 +300,51 @@ export default function RouteMapScene() {
                 job={selectedJob}
                 onChoose={handleChooseJob}
                 onBack={handleBackToPanel}
+                chooseLabel={
+                  selectedServiceIds.includes(selectedJob.id)
+                    ? "Already in Studio Plan"
+                    : "Add to Studio Plan"
+                }
+                chooseDisabled={selectedServiceIds.includes(selectedJob.id)}
                 variant="overlay"
               />
             </div>
           ) : null}
 
+          {showStudioPlan ? (
+            <div className="route-map-world__sheet route-map-world__sheet--checkout">
+              <button type="button" className="route-map-back-link" onClick={handleReturnToBrowsing}>
+                ← Back to Route Map
+              </button>
+              <div className="route-map-overlay-workspace route-map-overlay-workspace--checkout">
+                <StudioPlanReviewScene
+                  model={studioPlanModel}
+                  onRemove={handleRemoveFromPlan}
+                  onSwap={handleSwapInPlan}
+                  onAdd={handleAddFromPlan}
+                  onApprove={handleApprovePlan}
+                />
+              </div>
+            </div>
+          ) : null}
+
           {showCheckout ? (
             <div className="route-map-world__sheet route-map-world__sheet--checkout">
-              <button type="button" className="route-map-back-link" onClick={handleBackToJob}>
-                ← Back to job details
+              <button type="button" className="route-map-back-link" onClick={handleBackToStudioPlan}>
+                ← Back to Studio Plan
               </button>
               <div className="route-map-overlay-workspace route-map-overlay-workspace--checkout">
                 <SecureCheckoutGrid
                 layout="full"
                 planSummary={paymentSummary}
                 onBeforePayment={(acknowledgment) => {
-                  if (!selectedJobId) return false;
-                  return Boolean(
-                    saveApprovedRouteMapPlan(selectedJobId, acknowledgment, {
-                      includePostPublishAddon: postPublishEligible && includePostPublishAddon,
-                    }),
-                  );
+                  if (selectedServiceIds.length === 0) return false;
+                  return Boolean(saveApprovedRouteMapPlan(selectedServiceIds, acknowledgment));
                 }}
                 onPaymentComplete={() => {
                   markPaymentReceived();
                   handlePaymentComplete();
                 }}
-                paymentDecisionAddon={
-                  postPublishEligible ? (
-                    <label className="route-map-checkout-addon">
-                      <input
-                        type="checkbox"
-                        checked={includePostPublishAddon}
-                        onChange={(event) => handlePostPublishAddonChange(event.target.checked)}
-                      />
-                      <span>
-                        Add Post/Publish for Me (+$100) — Studio schedules or publishes on one connected
-                        platform
-                      </span>
-                    </label>
-                  ) : null
-                }
               />
               </div>
             </div>
