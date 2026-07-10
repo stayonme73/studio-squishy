@@ -20,16 +20,27 @@ import { studioBoard } from "@/config/studio-board";
 import {
   buildRouteMapPaymentSummary,
   isRouteMapPostPublishAddonEligible,
+  resolveRouteMapRestoredJourney,
   saveApprovedRouteMapPlan,
+  saveRouteMapJourneyStep,
   saveRouteMapIntakeDraft,
   selectRouteMapJob,
   submitRouteMapIntake,
 } from "@/lib/route-map-campaign";
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
+import { CAMPAIGN_SYNC_EVENT, type CampaignSyncStatus } from "@/lib/campaign-store/types";
+import { readCampaignSyncStatus } from "@/lib/campaign-store/sync-client";
 import { markPaymentReceived, readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
+import type { RouteMapJourneyStep } from "@/config/studio-board";
 
-export type RouteMapStep = "map" | "panel" | "job" | "checkout" | "intake";
+export type RouteMapStep = "map" | RouteMapJourneyStep;
+
+function routeMapSyncStatusLabel(status: CampaignSyncStatus | null): string {
+  if (status?.state === "syncing") return "Saving...";
+  if (status?.state === "error") return "Saved on this device. Sync will retry.";
+  return "All changes saved";
+}
 
 export default function RouteMapScene() {
   const router = useRouter();
@@ -38,6 +49,7 @@ export default function RouteMapScene() {
   const [roadId, setRoadId] = useState<RouteMapRoadId | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<RouteMapJobId | null>(null);
   const [includePostPublishAddon, setIncludePostPublishAddon] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<CampaignSyncStatus | null>(null);
 
   const selectedJob = useMemo(
     () => (selectedJobId ? getRouteMapJob(selectedJobId) : undefined),
@@ -77,8 +89,11 @@ export default function RouteMapScene() {
 
   const handleChooseJob = useCallback(() => {
     if (!selectedJob) return;
+    saveRouteMapJourneyStep("checkout", {
+      includePostPublishAddon: postPublishEligible && includePostPublishAddon,
+    });
     setStep("checkout");
-  }, [selectedJob]);
+  }, [selectedJob, postPublishEligible, includePostPublishAddon]);
 
   const handleBackToMap = useCallback(() => {
     setStep("map");
@@ -92,17 +107,24 @@ export default function RouteMapScene() {
   }, [step, handleBackToMap]);
 
   const handleBackToPanel = useCallback(() => {
+    saveRouteMapJourneyStep("panel");
     setStep("panel");
     setSelectedJobId(null);
   }, []);
 
   const handleBackToJob = useCallback(() => {
+    saveRouteMapJourneyStep("job", {
+      includePostPublishAddon: postPublishEligible && includePostPublishAddon,
+    });
     setStep("job");
-  }, []);
+  }, [postPublishEligible, includePostPublishAddon]);
 
   const handlePaymentComplete = useCallback(() => {
+    saveRouteMapJourneyStep("intake", {
+      includePostPublishAddon: postPublishEligible && includePostPublishAddon,
+    });
     setStep("intake");
-  }, []);
+  }, [postPublishEligible, includePostPublishAddon]);
 
   const handleIntakeSubmit = useCallback(
     (answers: RouteMapIntakeAnswers) => {
@@ -123,18 +145,41 @@ export default function RouteMapScene() {
     [router],
   );
 
-  useEffect(() => {
-    if (searchParams.get("step") !== "intake") return;
-    const campaign = readCurrentCampaignHydrated();
-    const ctx = campaign?.routeMapContext;
-    if (!ctx?.jobId || !ctx.roadId) return;
-    if (!getRouteMapJob(ctx.jobId)) return;
+  const handlePostPublishAddonChange = useCallback(
+    (checked: boolean) => {
+      setIncludePostPublishAddon(checked);
+      saveRouteMapJourneyStep("checkout", {
+        includePostPublishAddon: postPublishEligible && checked,
+      });
+    },
+    [postPublishEligible],
+  );
 
-    setRoadId(ctx.roadId);
-    setSelectedJobId(ctx.jobId);
-    setIncludePostPublishAddon(ctx.postPublishAddon === true);
-    setStep("intake");
+  useEffect(() => {
+    const campaign = readCurrentCampaignHydrated();
+    const restoredJourney = resolveRouteMapRestoredJourney(
+      campaign?.routeMapContext,
+      searchParams.get("step"),
+    );
+    if (!restoredJourney) return;
+
+    setRoadId(restoredJourney.roadId);
+    setSelectedJobId(restoredJourney.jobId);
+    setIncludePostPublishAddon(restoredJourney.includePostPublishAddon);
+    setStep(restoredJourney.step);
   }, [searchParams]);
+
+  useEffect(() => {
+    setSyncStatus(readCampaignSyncStatus());
+
+    function handleSyncStatus(event: Event) {
+      const detail = event instanceof CustomEvent ? (event.detail as CampaignSyncStatus) : null;
+      setSyncStatus(detail ?? readCampaignSyncStatus());
+    }
+
+    window.addEventListener(CAMPAIGN_SYNC_EVENT, handleSyncStatus);
+    return () => window.removeEventListener(CAMPAIGN_SYNC_EVENT, handleSyncStatus);
+  }, []);
 
   const showOverlay = step !== "map";
   const showPanel = step === "panel" && roadId;
@@ -179,6 +224,12 @@ export default function RouteMapScene() {
               }}
               role="presentation"
             />
+          ) : null}
+
+          {showOverlay ? (
+            <div className="route-map-save-status" role="status" aria-live="polite">
+              {routeMapSyncStatusLabel(syncStatus)}
+            </div>
           ) : null}
 
           {showPanel ? (
@@ -227,7 +278,7 @@ export default function RouteMapScene() {
                       <input
                         type="checkbox"
                         checked={includePostPublishAddon}
-                        onChange={(event) => setIncludePostPublishAddon(event.target.checked)}
+                        onChange={(event) => handlePostPublishAddonChange(event.target.checked)}
                       />
                       <span>
                         Add Post/Publish for Me (+$100) — Studio schedules or publishes on one connected

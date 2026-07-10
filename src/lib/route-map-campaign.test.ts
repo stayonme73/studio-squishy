@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { getServiceById } from "@/catalog/accessors";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
@@ -17,6 +17,9 @@ import {
   buildRouteMapPaymentSummary,
   createCampaignFromRouteMapJob,
   isRouteMapPostPublishAddonEligible,
+  resolveRouteMapRestoredJourney,
+  saveRouteMapJourneyStep,
+  selectRouteMapJob,
   submitRouteMapIntake,
 } from "@/lib/route-map-campaign";
 import { resolveCustomerJourneySteps } from "@/lib/customer-journey";
@@ -248,6 +251,41 @@ describe("route-map intake template routing", () => {
 });
 
 describe("route-map campaign handoff", () => {
+  function withMockedBrowserStorage(run: (storage: Map<string, string>) => void) {
+    const storage = new Map<string, string>();
+    const originalWindow = globalThis.window;
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ syncedAt: "2026-07-10T12:00:00.000Z" }),
+    } as Response);
+
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {
+        localStorage: {
+          getItem: (key: string) => storage.get(key) ?? null,
+          setItem: (key: string, value: string) => {
+            storage.set(key, value);
+          },
+          removeItem: (key: string) => {
+            storage.delete(key);
+          },
+        },
+        dispatchEvent: () => true,
+      },
+    });
+
+    try {
+      run(storage);
+    } finally {
+      Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        value: originalWindow,
+      });
+      fetchSpy.mockRestore();
+    }
+  }
+
   it("builds approved plan from V2 social posts catalog pricing", () => {
     const job = getRouteMapJob("v2-rtu-social-posts");
     expect(job).toBeDefined();
@@ -295,6 +333,94 @@ describe("route-map campaign handoff", () => {
     expect(campaign?.campaignName).toBe("Help Me Figure Out What I Need");
     expect(campaign?.approvedStudioPlan?.amountDueTodayCents).toBe(65000);
     expect(campaign?.routeMapContext?.jobId).toBe("rm-j001");
+  });
+
+  it("reuses the active Route Map campaign when selecting the restored job again", () => {
+    withMockedBrowserStorage(() => {
+      const first = selectRouteMapJob("v2-rtu-flyer", "random-exit");
+      expect(first?.campaignId).toBeTruthy();
+
+      const checkout = saveRouteMapJourneyStep("checkout");
+      expect(checkout?.campaignId).toBe(first?.campaignId);
+      expect(checkout?.routeMapContext?.currentStep).toBe("checkout");
+
+      const second = selectRouteMapJob("v2-rtu-flyer", "random-exit");
+      expect(second?.campaignId).toBe(first?.campaignId);
+      expect(second?.routeMapContext?.currentStep).toBe("job");
+    });
+  });
+
+  it("creates a new campaign when selecting a different Route Map job", () => {
+    withMockedBrowserStorage(() => {
+      const first = selectRouteMapJob("v2-rtu-flyer", "random-exit");
+      expect(first?.campaignId).toBeTruthy();
+
+      const second = selectRouteMapJob("v2-rtu-social-posts", "random-exit");
+      expect(second?.campaignId).toBeTruthy();
+      expect(second?.campaignId).not.toBe(first?.campaignId);
+      expect(second?.routeMapContext?.jobId).toBe("v2-rtu-social-posts");
+      expect(second?.routeMapContext?.roadId).toBe("random-exit");
+    });
+  });
+
+  it("creates a new campaign when selecting the same job from a different road", () => {
+    withMockedBrowserStorage(() => {
+      const first = selectRouteMapJob("v2-rtu-flyer", "random-exit");
+      expect(first?.campaignId).toBeTruthy();
+
+      const second = selectRouteMapJob("v2-rtu-flyer", "update");
+      expect(second?.campaignId).toBeTruthy();
+      expect(second?.campaignId).not.toBe(first?.campaignId);
+      expect(second?.routeMapContext?.jobId).toBe("v2-rtu-flyer");
+      expect(second?.routeMapContext?.roadId).toBe("update");
+    });
+  });
+
+  it("ignores invalid or stale Route Map restoration context", () => {
+    const validContext = {
+      jobId: "v2-rtu-flyer",
+      roadId: "random-exit",
+      selectedAt: "2026-07-10T12:00:00.000Z",
+      currentStep: "checkout",
+    } as const;
+
+    expect(
+      resolveRouteMapRestoredJourney(
+        { ...validContext, jobId: "missing-job" as typeof validContext.jobId },
+        null,
+      ),
+    ).toBeNull();
+    expect(
+      resolveRouteMapRestoredJourney(
+        { ...validContext, currentStep: "receipt" as typeof validContext.currentStep },
+        null,
+      ),
+    ).toBeNull();
+    expect(
+      resolveRouteMapRestoredJourney(
+        { ...validContext, roadId: "ghost-road" as typeof validContext.roadId },
+        null,
+      ),
+    ).toBeNull();
+  });
+
+  it("lets the intake query restore intake over another persisted Route Map step", () => {
+    const restored = resolveRouteMapRestoredJourney(
+      {
+        jobId: "v2-rtu-flyer",
+        roadId: "random-exit",
+        selectedAt: "2026-07-10T12:00:00.000Z",
+        currentStep: "checkout",
+      },
+      "intake",
+    );
+
+    expect(restored).toEqual({
+      step: "intake",
+      jobId: "v2-rtu-flyer",
+      roadId: "random-exit",
+      includePostPublishAddon: false,
+    });
   });
 
   it("builds checkout summary display", () => {

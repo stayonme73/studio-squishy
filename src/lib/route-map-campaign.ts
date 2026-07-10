@@ -15,9 +15,11 @@ import type {
   ApprovedStudioPlan,
   ApprovedStudioPlanLineItem,
   CampaignRecord,
+  RouteMapJourneyStep,
 } from "@/config/studio-board";
 import { studioBoard } from "@/config/studio-board";
 import {
+  ROUTE_MAP_V1,
   getRouteMapJob,
   type RouteMapJob,
   type RouteMapJobId,
@@ -42,6 +44,7 @@ export type RouteMapCampaignContext = {
   jobId: RouteMapJobId;
   roadId: RouteMapRoadId;
   selectedAt: string;
+  currentStep?: RouteMapJourneyStep;
   /** When true, v2-addon-post-publish was included at checkout. */
   postPublishAddon?: boolean;
 };
@@ -49,6 +52,40 @@ export type RouteMapCampaignContext = {
 export type RouteMapCheckoutOptions = {
   includePostPublishAddon?: boolean;
 };
+
+export type RouteMapRestoredJourney = {
+  step: RouteMapJourneyStep;
+  jobId: RouteMapJobId;
+  roadId: RouteMapRoadId;
+  includePostPublishAddon: boolean;
+};
+
+function isRouteMapJourneyStep(value: unknown): value is RouteMapJourneyStep {
+  return value === "panel" || value === "job" || value === "checkout" || value === "intake";
+}
+
+function isRouteMapRoadId(value: unknown): value is RouteMapRoadId {
+  return typeof value === "string" && ROUTE_MAP_V1.roads.some((road) => road.id === value);
+}
+
+export function resolveRouteMapRestoredJourney(
+  routeMapContext: Partial<RouteMapCampaignContext> | null | undefined,
+  requestedStep: string | null,
+): RouteMapRestoredJourney | null {
+  if (!routeMapContext?.jobId || !routeMapContext.roadId) return null;
+  if (!getRouteMapJob(routeMapContext.jobId)) return null;
+  if (!isRouteMapRoadId(routeMapContext.roadId)) return null;
+
+  const restoredStep = requestedStep === "intake" ? "intake" : routeMapContext.currentStep ?? "job";
+  if (!isRouteMapJourneyStep(restoredStep)) return null;
+
+  return {
+    step: restoredStep,
+    jobId: routeMapContext.jobId,
+    roadId: routeMapContext.roadId,
+    includePostPublishAddon: routeMapContext.postPublishAddon === true,
+  };
+}
 
 function formatUsd(cents: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -96,6 +133,25 @@ function buildPostPublishAddonLineItem(): ApprovedStudioPlanLineItem {
     serviceId: addon.id,
     name: addon.name,
     priceCents: addon.priceCents,
+  };
+}
+
+function routeMapContextFor(
+  jobId: RouteMapJobId,
+  roadId: RouteMapRoadId,
+  selectedAt: string,
+  currentStep: RouteMapJourneyStep,
+  options: RouteMapCheckoutOptions = {},
+): RouteMapCampaignContext {
+  const postPublishAddon =
+    options.includePostPublishAddon === true && isRouteMapPostPublishAddonEligible(jobId);
+
+  return {
+    jobId,
+    roadId,
+    selectedAt,
+    currentStep,
+    ...(postPublishAddon ? { postPublishAddon: true } : {}),
   };
 }
 
@@ -179,7 +235,7 @@ export function buildRouteMapPaymentSummary(
 export function createCampaignFromRouteMapJob(
   jobId: RouteMapJobId,
   roadId: RouteMapRoadId,
-  options: RouteMapCheckoutOptions = {},
+  options: RouteMapCheckoutOptions & { currentStep?: RouteMapJourneyStep } = {},
 ): CampaignRecord | null {
   const job = getRouteMapJob(jobId);
   if (!job) return null;
@@ -187,8 +243,6 @@ export function createCampaignFromRouteMapJob(
   const content = studioBoard.statusContent.DISCOVERY_COMPLETE;
   const now = new Date().toISOString();
   const approvedStudioPlan = buildApprovedPlanFromRouteMapJob(job, options);
-  const postPublishAddon =
-    options.includePostPublishAddon === true && isRouteMapPostPublishAddonEligible(jobId);
 
   const campaign: CampaignRecord = {
     campaignId: crypto.randomUUID(),
@@ -199,7 +253,13 @@ export function createCampaignFromRouteMapJob(
     packageId: CUSTOM_STUDIO_PLAN_PACKAGE_ID,
     packageLabel: CUSTOM_STUDIO_PLAN_LABEL,
     approvedStudioPlan,
-    routeMapContext: { jobId, roadId, selectedAt: now, ...(postPublishAddon ? { postPublishAddon: true } : {}) },
+    routeMapContext: routeMapContextFor(
+      jobId,
+      roadId,
+      now,
+      options.currentStep ?? "job",
+      options,
+    ),
     paymentReceivedAt: null,
     targetCompletionDate: null,
     revisionRoundsIncluded: 1,
@@ -217,9 +277,46 @@ export function selectRouteMapJob(
   jobId: RouteMapJobId,
   roadId: RouteMapRoadId,
 ): CampaignRecord | null {
+  const existing = readCurrentCampaign();
+  if (existing?.routeMapContext?.jobId === jobId && existing.routeMapContext.roadId === roadId) {
+    const updated: CampaignRecord = {
+      ...existing,
+      routeMapContext: {
+        ...existing.routeMapContext,
+        currentStep: "job",
+      },
+      updatedAt: new Date().toISOString(),
+    };
+    return persistRouteMapCampaign(updated);
+  }
+
   const campaign = createCampaignFromRouteMapJob(jobId, roadId);
   if (!campaign) return null;
   return persistRouteMapCampaign(campaign);
+}
+
+export function saveRouteMapJourneyStep(
+  currentStep: RouteMapJourneyStep,
+  options: RouteMapCheckoutOptions = {},
+): CampaignRecord | null {
+  const campaign = readCurrentCampaign();
+  const ctx = campaign?.routeMapContext;
+  if (!campaign || !ctx) return null;
+
+  const includePostPublishAddon =
+    options.includePostPublishAddon === true && isRouteMapPostPublishAddonEligible(ctx.jobId);
+
+  const updated: CampaignRecord = {
+    ...campaign,
+    routeMapContext: {
+      ...ctx,
+      currentStep,
+      ...(includePostPublishAddon ? { postPublishAddon: true } : { postPublishAddon: undefined }),
+    },
+    updatedAt: new Date().toISOString(),
+  };
+
+  return persistRouteMapCampaign(updated);
 }
 
 export function saveApprovedRouteMapPlan(
@@ -254,7 +351,8 @@ export function saveApprovedRouteMapPlan(
     routeMapContext: campaign.routeMapContext
       ? {
           ...campaign.routeMapContext,
-          ...(postPublishAddon ? { postPublishAddon: true } : {}),
+          currentStep: "checkout",
+          ...(postPublishAddon ? { postPublishAddon: true } : { postPublishAddon: undefined }),
         }
       : campaign.routeMapContext,
     updatedAt: new Date().toISOString(),
@@ -276,6 +374,9 @@ export function submitRouteMapIntake(
     routeMapIntake: { answers, submittedAt },
     routeMapIntakeDraft: undefined,
     routeMapIntakeSubmittedAt: submittedAt,
+    routeMapContext: campaign.routeMapContext
+      ? { ...campaign.routeMapContext, currentStep: "intake" }
+      : campaign.routeMapContext,
     updatedAt: submittedAt,
   };
 
@@ -304,6 +405,9 @@ export function saveRouteMapIntakeDraft(
   return persistRouteMapCampaign({
     ...campaign,
     routeMapIntakeDraft: { answers, savedAt },
+    routeMapContext: campaign.routeMapContext
+      ? { ...campaign.routeMapContext, currentStep: "intake" }
+      : campaign.routeMapContext,
     updatedAt: savedAt,
   });
 }

@@ -97,6 +97,8 @@ export type CustomStudioPlanPackageId = typeof CUSTOM_STUDIO_PLAN_PACKAGE_ID;
 
 export type CampaignPackageId = StudioGuidePackageId | CustomStudioPlanPackageId;
 
+export type RouteMapJourneyStep = "panel" | "job" | "checkout" | "intake";
+
 export type CampaignRecord = {
   campaignId: string;
   campaignName: string;
@@ -122,6 +124,7 @@ export type CampaignRecord = {
     jobId: RouteMapJobId;
     roadId: RouteMapRoadId;
     selectedAt: string;
+    currentStep?: RouteMapJourneyStep;
     /** v2-addon-post-publish included at checkout with eligible parent RTU job. */
     postPublishAddon?: boolean;
   };
