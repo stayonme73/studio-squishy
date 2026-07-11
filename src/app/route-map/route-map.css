@@ -298,6 +298,33 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   line-height: 1.2;
 }
 
+/* Slice 3A — Squishy narration panel. Mirrors .route-map-save-status at the opposite corner;
+   text-only, capped well under half the overlay width so it can never reach the save-status pill. */
+.route-map-squishy {
+  position: absolute;
+  top: clamp(64px, 9vh, 96px);
+  left: clamp(12px, 2vw, 20px);
+  z-index: 24;
+  max-width: min(320px, calc(50vw - 32px));
+  padding: 0.45rem 0.7rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--rm-paper, #f4efe6) 88%, #fff);
+  border: 1px solid color-mix(in srgb, #2f3437 14%, transparent);
+  box-shadow: 0 8px 24px rgba(46, 43, 40, 0.16);
+  color: var(--studio-charcoal, #2f3437);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.route-map-squishy__label {
+  font-weight: 700;
+  margin-right: 0.35em;
+}
+
+.route-map-squishy__text {
+  font-weight: 500;
+}
+
 @keyframes route-map-slide-up {
   from {
     transform: translateY(100%);

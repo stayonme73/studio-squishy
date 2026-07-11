@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import SecureCheckoutGrid from "@/components/payment/SecureCheckoutGrid";
@@ -9,6 +9,7 @@ import RouteMapJobCard from "@/components/route-map/RouteMapJobCard";
 import RouteMapMobileMap from "@/components/route-map/RouteMapMobileMap";
 import RouteMapRoutePanel from "@/components/route-map/RouteMapRoutePanel";
 import RouteMapLobbyBackdrop from "@/components/route-map/RouteMapLobbyBackdrop";
+import RouteMapSquishyPanel from "@/components/route-map/RouteMapSquishyPanel";
 import RouteMapWorkspace from "@/components/route-map/RouteMapWorkspace";
 import StudioPlanReviewScene from "@/components/studio-plan-review/StudioPlanReviewScene";
 import type { ServiceId } from "@/catalog/types";
@@ -39,6 +40,7 @@ import { CAMPAIGN_SYNC_EVENT, type CampaignSyncStatus } from "@/lib/campaign-sto
 import { readCampaignSyncStatus } from "@/lib/campaign-store/sync-client";
 import { markPaymentReceived, readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
+import { resolveSquishyRouteMapMessage } from "@/lib/route-map-squishy";
 import type { RouteMapJourneyStep } from "@/config/studio-board";
 import {
   buildRouteMapStudioPlanReview,
@@ -63,6 +65,10 @@ export default function RouteMapScene() {
   const [selectedServiceIds, setSelectedServiceIds] = useState<ServiceId[]>([]);
   const [includePostPublishAddon, setIncludePostPublishAddon] = useState(false);
   const [syncStatus, setSyncStatus] = useState<CampaignSyncStatus | null>(null);
+  const previousStepRef = useRef<RouteMapStep | null>(null);
+  const previousSelectedServiceIdsRef = useRef<readonly ServiceId[] | null>(null);
+  const justRestoredRef = useRef(false);
+  const hasGreetedRef = useRef(false);
 
   const selectedJob = useMemo(
     () => (selectedJobId ? getRouteMapJob(selectedJobId) : undefined),
@@ -91,6 +97,20 @@ export default function RouteMapScene() {
   const studioPlanModel = useMemo(
     () => buildRouteMapStudioPlanReview(planState),
     [planState],
+  );
+
+  const squishyMessage = useMemo(
+    () =>
+      resolveSquishyRouteMapMessage({
+        step,
+        previousStep: previousStepRef.current,
+        selectedServiceIds,
+        previousSelectedServiceIds: previousSelectedServiceIdsRef.current,
+        selectedJobId: (selectedJobId as ServiceId | null) ?? null,
+        justRestored: justRestoredRef.current,
+        hasGreeted: hasGreetedRef.current,
+      }),
+    [step, selectedServiceIds, selectedJobId],
   );
 
   const handleSelectRoad = useCallback((id: RouteMapRoadId) => {
@@ -215,12 +235,24 @@ export default function RouteMapScene() {
     );
     if (!restoredJourney) return;
 
+    justRestoredRef.current = true;
     setRoadId(restoredJourney.roadId);
     setSelectedJobId(restoredJourney.jobId);
     setSelectedServiceIds([...restoredJourney.selectedServiceIds]);
     setIncludePostPublishAddon(restoredJourney.includePostPublishAddon);
     setStep(restoredJourney.step);
   }, [searchParams]);
+
+  useEffect(() => {
+    if (squishyMessage?.key === "first-arrival") {
+      hasGreetedRef.current = true;
+    }
+    if (squishyMessage?.key === "restored-journey") {
+      justRestoredRef.current = false;
+    }
+    previousStepRef.current = step;
+    previousSelectedServiceIdsRef.current = selectedServiceIds;
+  }, [step, selectedServiceIds, squishyMessage]);
 
   useEffect(() => {
     setSyncStatus(readCampaignSyncStatus());
@@ -285,6 +317,8 @@ export default function RouteMapScene() {
               {routeMapSyncStatusLabel(syncStatus)}
             </div>
           ) : null}
+
+          {showOverlay ? <RouteMapSquishyPanel message={squishyMessage} /> : null}
 
           {showPanel ? (
             <RouteMapRoutePanel
