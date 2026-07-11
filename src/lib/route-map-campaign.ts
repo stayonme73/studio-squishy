@@ -398,6 +398,9 @@ export function addRouteMapServiceToPlan(
   roadId: RouteMapRoadId,
 ): CampaignRecord | null {
   const existing = readCurrentCampaign();
+  // Defensive boundary only — does not evaluate eligibility, price, or schedule impact.
+  // A paid project's approvedStudioPlan must never be altered by the old pre-payment path.
+  if (existing?.paymentReceivedAt) return existing;
   const currentSelected = existing?.routeMapContext
     ? resolveRouteMapSelectedServiceIds(existing.routeMapContext) ?? []
     : [];
@@ -439,6 +442,9 @@ export function removeRouteMapServiceFromPlan(serviceId: ServiceId): CampaignRec
   const campaign = readCurrentCampaign();
   const ctx = campaign?.routeMapContext;
   if (!campaign || !ctx) return null;
+  // Defensive boundary only — does not evaluate refund eligibility or production status.
+  // A paid project's approvedStudioPlan must never be altered by the old pre-payment path.
+  if (campaign.paymentReceivedAt) return null;
 
   const currentSelected = resolveRouteMapSelectedServiceIds(ctx) ?? [];
   const planState = removeServiceFromRouteMapPlanState({ selectedServiceIds: currentSelected }, serviceId);
@@ -522,6 +528,9 @@ export function saveApprovedRouteMapPlan(
 ): CampaignRecord | null {
   const campaign = readCurrentCampaign();
   if (!campaign) return null;
+  // Defensive boundary only — does not evaluate eligibility, price, or schedule impact.
+  // A paid project's approvedStudioPlan must never be overwritten by the old pre-payment path.
+  if (campaign.paymentReceivedAt) return null;
 
   let selectedServiceIds: ServiceId[];
   let basePlan: ApprovedStudioPlan;

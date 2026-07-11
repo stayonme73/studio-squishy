@@ -17,6 +17,8 @@ export type SquishyRouteMapSnapshot = {
   selectedJobId: ServiceId | null;
   justRestored: boolean;
   hasGreeted: boolean;
+  /** True once the current project has been paid — Studio Plan editing is protected. */
+  isPaidProject: boolean;
 };
 
 export type SquishyRouteMapMessageKey =
@@ -25,7 +27,8 @@ export type SquishyRouteMapMessageKey =
   | "already-added"
   | "return-to-browsing"
   | "empty-plan"
-  | "restored-journey";
+  | "restored-journey"
+  | "paid-project-protected";
 
 export type SquishyRouteMapMessage = {
   key: SquishyRouteMapMessageKey;
@@ -40,6 +43,8 @@ export const SQUISHY_ROUTE_MAP_COPY: Record<SquishyRouteMapMessageKey, string> =
   "return-to-browsing": "Your Studio Plan is saved. Let's see whether you need anything else.",
   "empty-plan": "Your Studio Plan is empty right now. Let's add the first service.",
   "restored-journey": "Welcome back. Your Studio Plan is still here, so we can continue where you stopped.",
+  "paid-project-protected":
+    "Your current project is confirmed. Additional services will be reviewed separately so your delivery date stays protected.",
 };
 
 /** Restored-journey copy when the persisted plan has no selected services. Same trigger key. */
@@ -65,6 +70,7 @@ export function resolveSquishyRouteMapMessage(
     selectedJobId,
     justRestored,
     hasGreeted,
+    isPaidProject,
   } = snapshot;
 
   if (justRestored) {
@@ -95,6 +101,12 @@ export function resolveSquishyRouteMapMessage(
   // literally attempt to add it — the trigger is opening that job's detail, not a blocked click.
   if (step === "job" && selectedJobId !== null && selectedServiceIds.includes(selectedJobId)) {
     return squishyMessage("already-added");
+  }
+
+  // Browsing a new job while the current project is already paid — the Add control is disabled,
+  // so Squishy explains why before the customer wonders what happened.
+  if (step === "job" && isPaidProject && selectedJobId !== null) {
+    return squishyMessage("paid-project-protected");
   }
 
   if (step === "studio-plan" && selectedServiceIds.length === 0) {

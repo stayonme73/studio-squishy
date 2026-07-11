@@ -787,6 +787,116 @@ describe("route-map campaign handoff", () => {
       expect(saveApprovedRouteMapPlan(["v2-rtu-flyer"])).toBeNull();
     });
   });
+
+  describe("paid-plan mutation guards (Phase 1 defensive boundary)", () => {
+    const CAMPAIGN_KEY = "studio-squishy:current-campaign";
+
+    function seedPaidCampaign(storage: Map<string, string>) {
+      addRouteMapServiceToPlan("v2-rtu-flyer", "random-exit");
+      const raw = storage.get(CAMPAIGN_KEY);
+      if (!raw) throw new Error("expected a seeded campaign in storage");
+      const campaign = JSON.parse(raw);
+      campaign.paymentReceivedAt = "2026-07-01T12:00:00.000Z";
+      storage.set(CAMPAIGN_KEY, JSON.stringify(campaign));
+      return campaign;
+    }
+
+    it("addRouteMapServiceToPlan refuses to change a paid campaign", () => {
+      withMockedBrowserStorage((storage) => {
+        const paid = seedPaidCampaign(storage);
+        const before = storage.get(CAMPAIGN_KEY);
+
+        const result = addRouteMapServiceToPlan("v2-rtu-menu", "random-exit");
+
+        expect(result?.approvedStudioPlan).toEqual(paid.approvedStudioPlan);
+        expect(result?.routeMapContext?.selectedServiceIds).toEqual(
+          paid.routeMapContext.selectedServiceIds,
+        );
+        expect(storage.get(CAMPAIGN_KEY)).toBe(before);
+      });
+    });
+
+    it("removeRouteMapServiceFromPlan refuses to change a paid campaign", () => {
+      withMockedBrowserStorage((storage) => {
+        seedPaidCampaign(storage);
+        const before = storage.get(CAMPAIGN_KEY);
+
+        const result = removeRouteMapServiceFromPlan("v2-rtu-flyer");
+
+        expect(result).toBeNull();
+        expect(storage.get(CAMPAIGN_KEY)).toBe(before);
+      });
+    });
+
+    it("saveApprovedRouteMapPlan refuses to overwrite a paid campaign", () => {
+      withMockedBrowserStorage((storage) => {
+        seedPaidCampaign(storage);
+        const before = storage.get(CAMPAIGN_KEY);
+
+        const result = saveApprovedRouteMapPlan(["v2-rtu-menu"]);
+
+        expect(result).toBeNull();
+        expect(storage.get(CAMPAIGN_KEY)).toBe(before);
+      });
+    });
+
+    it("keeps approvedStudioPlan byte-for-byte unchanged after every blocked attempt", () => {
+      withMockedBrowserStorage((storage) => {
+        const paid = seedPaidCampaign(storage);
+
+        addRouteMapServiceToPlan("v2-rtu-menu", "random-exit");
+        removeRouteMapServiceFromPlan("v2-rtu-flyer");
+        saveApprovedRouteMapPlan(["v2-rtu-menu"]);
+
+        const after = JSON.parse(storage.get(CAMPAIGN_KEY)!);
+        expect(after.approvedStudioPlan).toEqual(paid.approvedStudioPlan);
+      });
+    });
+
+    it("keeps selectedServiceIds unchanged after every blocked attempt", () => {
+      withMockedBrowserStorage((storage) => {
+        const paid = seedPaidCampaign(storage);
+
+        addRouteMapServiceToPlan("v2-rtu-menu", "random-exit");
+        removeRouteMapServiceFromPlan("v2-rtu-flyer");
+
+        const after = JSON.parse(storage.get(CAMPAIGN_KEY)!);
+        expect(after.routeMapContext.selectedServiceIds).toEqual(
+          paid.routeMapContext.selectedServiceIds,
+        );
+      });
+    });
+
+    it("unpaid campaigns continue to support add, remove, and approve exactly as before", () => {
+      withMockedBrowserStorage(() => {
+        const added = addRouteMapServiceToPlan("v2-rtu-flyer", "random-exit");
+        expect(added?.routeMapContext?.selectedServiceIds).toEqual(["v2-rtu-flyer"]);
+
+        const alsoAdded = addRouteMapServiceToPlan("v2-rtu-menu", "random-exit");
+        expect(alsoAdded?.routeMapContext?.selectedServiceIds).toEqual([
+          "v2-rtu-flyer",
+          "v2-rtu-menu",
+        ]);
+
+        const removed = removeRouteMapServiceFromPlan("v2-rtu-flyer");
+        expect(removed?.routeMapContext?.selectedServiceIds).toEqual(["v2-rtu-menu"]);
+
+        const approved = saveApprovedRouteMapPlan(["v2-rtu-menu"]);
+        expect(approved?.approvedStudioPlan?.selectedServiceIds).toEqual(["v2-rtu-menu"]);
+      });
+    });
+
+    it("the existing paid campaign can still be read and restored normally", () => {
+      withMockedBrowserStorage((storage) => {
+        const paid = seedPaidCampaign(storage);
+
+        const restored = resolveRouteMapRestoredJourney(paid.routeMapContext, null);
+
+        expect(restored?.jobId).toBe("v2-rtu-flyer");
+        expect(restored?.selectedServiceIds).toEqual(paid.routeMapContext.selectedServiceIds);
+      });
+    });
+  });
 });
 
 describe("route-map intake E2E paths (programmatic)", () => {

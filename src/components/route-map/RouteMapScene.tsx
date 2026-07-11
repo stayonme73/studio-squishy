@@ -65,6 +65,8 @@ export default function RouteMapScene() {
   const [selectedServiceIds, setSelectedServiceIds] = useState<ServiceId[]>([]);
   const [includePostPublishAddon, setIncludePostPublishAddon] = useState(false);
   const [syncStatus, setSyncStatus] = useState<CampaignSyncStatus | null>(null);
+  /** True once the current project has been paid — the paid plan is protected from the old pre-payment path. */
+  const [isPaidProject, setIsPaidProject] = useState(false);
   const previousStepRef = useRef<RouteMapStep | null>(null);
   const previousSelectedServiceIdsRef = useRef<readonly ServiceId[] | null>(null);
   const justRestoredRef = useRef(false);
@@ -109,8 +111,9 @@ export default function RouteMapScene() {
         selectedJobId: (selectedJobId as ServiceId | null) ?? null,
         justRestored: justRestoredRef.current,
         hasGreeted: hasGreetedRef.current,
+        isPaidProject,
       }),
-    [step, selectedServiceIds, selectedJobId],
+    [step, selectedServiceIds, selectedJobId, isPaidProject],
   );
 
   const handleSelectRoad = useCallback((id: RouteMapRoadId) => {
@@ -135,10 +138,16 @@ export default function RouteMapScene() {
 
   const handleChooseJob = useCallback(() => {
     if (!selectedJob || !roadId) return;
+    // Defensive boundary — the paid plan is protected; this control is also disabled in the UI below.
+    if (isPaidProject && !selectedServiceIds.includes(selectedJob.id)) return;
     const updated = addRouteMapServiceToPlan(selectedJob.id, roadId);
     setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? selectedServiceIds)]);
+    // Follow-up for the Project Change package: this setStep is unconditional and doesn't verify
+    // the addition actually happened. Not reachable today (the guard above and the guard inside
+    // addRouteMapServiceToPlan both hold), but revisit once Studio Plan becomes payment-aware
+    // through the Decision Core flow.
     setStep("studio-plan");
-  }, [selectedJob, roadId, selectedServiceIds]);
+  }, [selectedJob, roadId, selectedServiceIds, isPaidProject]);
 
   const handleBackToMap = useCallback(() => {
     setStep("map");
@@ -205,6 +214,7 @@ export default function RouteMapScene() {
     saveRouteMapJourneyStep("intake", {
       includePostPublishAddon: postPublishEligible && includePostPublishAddon,
     });
+    setIsPaidProject(true);
     setStep("intake");
   }, [postPublishEligible, includePostPublishAddon]);
 
@@ -229,6 +239,9 @@ export default function RouteMapScene() {
 
   useEffect(() => {
     const campaign = readCurrentCampaignHydrated();
+    if (campaign?.paymentReceivedAt) {
+      setIsPaidProject(true);
+    }
     const restoredJourney = resolveRouteMapRestoredJourney(
       campaign?.routeMapContext,
       searchParams.get("step"),
@@ -337,9 +350,11 @@ export default function RouteMapScene() {
                 chooseLabel={
                   selectedServiceIds.includes(selectedJob.id)
                     ? "Already in Studio Plan"
-                    : "Add to Studio Plan"
+                    : isPaidProject
+                      ? "Reviewed Separately After Payment"
+                      : "Add to Studio Plan"
                 }
-                chooseDisabled={selectedServiceIds.includes(selectedJob.id)}
+                chooseDisabled={selectedServiceIds.includes(selectedJob.id) || isPaidProject}
                 variant="overlay"
               />
             </div>

@@ -21,6 +21,7 @@ function snapshot(overrides: Partial<SquishyRouteMapSnapshot> = {}): SquishyRout
     selectedJobId: null,
     justRestored: false,
     hasGreeted: false,
+    isPaidProject: false,
     ...overrides,
   };
 }
@@ -227,19 +228,65 @@ describe("resolveSquishyRouteMapMessage", () => {
     expect(result).toEqual({ key: "restored-journey", text: SQUISHY_ROUTE_MAP_RESTORED_EMPTY_COPY });
   });
 
-  it("keeps the six-trigger model unchanged", () => {
+  it("keeps the seven-trigger model unchanged", () => {
     const keys = Object.keys(SQUISHY_ROUTE_MAP_COPY) as SquishyRouteMapMessageKey[];
-    expect(keys).toHaveLength(6);
+    expect(keys).toHaveLength(7);
     expect(keys.sort()).toEqual(
       [
         "already-added",
         "empty-plan",
         "first-arrival",
+        "paid-project-protected",
         "restored-journey",
         "return-to-browsing",
         "service-added",
       ].sort(),
     );
+  });
+
+  it("explains the protected project when browsing a new job after payment", () => {
+    const result = resolveSquishyRouteMapMessage(
+      snapshot({
+        previousStep: "panel",
+        step: "job",
+        previousSelectedServiceIds: [FLYER],
+        selectedServiceIds: [FLYER],
+        selectedJobId: SOCIAL,
+        isPaidProject: true,
+      }),
+    );
+    expect(result).toEqual({
+      key: "paid-project-protected",
+      text: SQUISHY_ROUTE_MAP_COPY["paid-project-protected"],
+    });
+  });
+
+  it("still announces already-added, not the paid-project message, for a service already in the paid plan", () => {
+    const result = resolveSquishyRouteMapMessage(
+      snapshot({
+        previousStep: "panel",
+        step: "job",
+        previousSelectedServiceIds: [FLYER],
+        selectedServiceIds: [FLYER],
+        selectedJobId: FLYER,
+        isPaidProject: true,
+      }),
+    );
+    expect(result).toEqual({ key: "already-added", text: SQUISHY_ROUTE_MAP_COPY["already-added"] });
+  });
+
+  it("stays silent about payment protection outside the job-detail step", () => {
+    const result = resolveSquishyRouteMapMessage(
+      snapshot({
+        previousStep: "job",
+        step: "panel",
+        previousSelectedServiceIds: [FLYER],
+        selectedServiceIds: [FLYER],
+        isPaidProject: true,
+      }),
+    );
+    // Falls through to return-to-browsing, not paid-project-protected — that trigger is job-detail only.
+    expect(result?.key).toBe("return-to-browsing");
   });
 
   it("stays silent during ordinary browsing (new step, no matching transition)", () => {
