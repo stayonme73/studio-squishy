@@ -391,7 +391,12 @@ export const ownerConsole = {
       "Send this approved client message and pause for scope confirmation? The folder will leave your desk.",
     confirmAssign:
       "Assign this scope decision to the selected team member? The folder will leave your desk.",
+    confirmApplyProjectChange:
+      "Apply this typed project change to the approved Studio Plan? This updates the live plan.",
     approveLabel: "Approve scope change",
+    applyProjectChangeLabel: "Apply project change",
+    applyKindLabel: "Change type",
+    applyServiceIdLabel: "Catalog service ID",
     declineLabel: "Decline",
     holdLabel: "Hold",
     askTeamLabel: "Ask team",

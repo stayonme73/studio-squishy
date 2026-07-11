@@ -95,6 +95,15 @@ export const SQUISHY_PROJECT_RECORD_GROUNDED_COPY = {
   submittedAwaitingActivity:
     "Your request was submitted to The Studio. Check Project Activity below for confirmation when it appears.",
   nothingSubmitted: "Nothing was submitted.",
+  consentExplanationLead: "The Studio asked for your confirmation on a project change.",
+  consentExplanationFooter:
+    "Confirming does not apply the change yet. The Studio will review next steps after you respond.",
+  consentGranted:
+    "Your confirmation was recorded. The Studio will review next steps.",
+  consentDeclined:
+    "Your response was recorded. This project change will not be applied.",
+  consentGrantLabel: "Confirm this change",
+  consentDeclineLabel: "Decline this change",
   statusUnavailable:
     "I cannot confirm your project status right now. Check Project Status on this page or try again shortly.",
   revisionUnavailable:
@@ -102,6 +111,23 @@ export const SQUISHY_PROJECT_RECORD_GROUNDED_COPY = {
   materialsHandoff: (label: string) =>
     `Use the materials form below to send your ${label.toLowerCase()}. Our team will review it and Project Activity will update when it is received.`,
 } as const;
+
+export type CustomerPendingProjectChangeConsentView = {
+  requestId: string;
+  ownerMessage: string;
+  requestSummary: string;
+};
+
+export function buildProjectChangeConsentExplanation(
+  consent: CustomerPendingProjectChangeConsentView,
+): string {
+  return [
+    SQUISHY_PROJECT_RECORD_GROUNDED_COPY.consentExplanationLead,
+    consent.requestSummary,
+    consent.ownerMessage,
+    SQUISHY_PROJECT_RECORD_GROUNDED_COPY.consentExplanationFooter,
+  ].join(" ");
+}
 
 const SCOPE_CHANGE_PATTERNS = [
   /\badd\b.*\bservice\b/i,

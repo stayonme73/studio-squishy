@@ -255,6 +255,12 @@ export type TasksPatchBody =
       ownerNotes?: string;
       note?: string;
     }
+  | {
+      action: "owner_apply_project_change_scope";
+      exceptionId: string;
+      change: { kind: string; serviceId: string };
+      ownerNotes?: string;
+    }
   | OwnerDecisionFolderPatchBody;
 
 const OWNER_DECISION_FOLDER_ACTIONS = new Set<string>([

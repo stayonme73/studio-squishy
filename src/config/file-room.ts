@@ -20,6 +20,8 @@ export const fileRoom = {
     empty: "No open customer requests for this campaign.",
     classifyInformationUpdate: "Classify — Information Update",
     classifyProjectChange: "Classify — Project Change",
+    escalateLabel: "Escalate to Owner Desk",
+    escalatedLabel: "Escalated to Owner Desk",
     applyLabel: "Apply update",
     rejectLabel: "Reject request",
     rejectReasonLabel: "Reason for customer",

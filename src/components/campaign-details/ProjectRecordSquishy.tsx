@@ -10,8 +10,10 @@ import {
   readOfficialFieldValue,
 } from "@/lib/customer-field-tokens";
 import type { CustomerTimelineItem } from "@/lib/project-activity/types";
+import type { CustomerPendingProjectChangeConsent } from "@/lib/project-activity/customer-view";
 import {
   buildClarifyingQuestion,
+  buildProjectChangeConsentExplanation,
   buildReviewSummary,
   buildReviewSummaryFields,
   buildSubmitTarget,
@@ -38,12 +40,20 @@ type ConversationLine = {
   text: string;
 };
 
-type Phase = "input" | "clarifying" | "review" | "materials" | "awaiting-confirmation" | "done";
+type Phase =
+  | "input"
+  | "clarifying"
+  | "review"
+  | "materials"
+  | "awaiting-confirmation"
+  | "project-change-consent"
+  | "done";
 
 type Props = {
   campaign: CampaignRecord;
   snapshot: ProjectRecordSquishySnapshot;
   activityEvents: readonly CustomerTimelineItem[];
+  pendingProjectChangeConsent: CustomerPendingProjectChangeConsent | null;
   onActivityRefresh: () => Promise<void>;
   onGreeted: () => void;
 };
@@ -64,6 +74,7 @@ export default function ProjectRecordSquishy({
   campaign,
   snapshot,
   activityEvents,
+  pendingProjectChangeConsent,
   onActivityRefresh,
   onGreeted,
 }: Props) {
@@ -79,6 +90,7 @@ export default function ProjectRecordSquishy({
   const [materialKey, setMaterialKey] = useState<MaterialUiKey | null>(null);
   const [submitRequestId, setSubmitRequestId] = useState<string | null>(null);
   const [awaitingActivityCopyShown, setAwaitingActivityCopyShown] = useState(false);
+  const [consentRequestId, setConsentRequestId] = useState<string | null>(null);
   const idempotencyKeyRef = useRef<string>(crypto.randomUUID());
   const submitInFlightRef = useRef(false);
   const activityRefreshAttemptedRef = useRef(false);
@@ -91,6 +103,25 @@ export default function ProjectRecordSquishy({
       }),
     [snapshot, requestJustConfirmed],
   );
+
+  useEffect(() => {
+    if (!pendingProjectChangeConsent) return;
+    if (phase !== "input" && phase !== "project-change-consent") return;
+    if (consentRequestId === pendingProjectChangeConsent.requestId && phase === "project-change-consent") {
+      return;
+    }
+
+    setConsentRequestId(pendingProjectChangeConsent.requestId);
+    setLines([
+      {
+        id: lineId(),
+        speaker: "squishy",
+        text: buildProjectChangeConsentExplanation(pendingProjectChangeConsent),
+      },
+    ]);
+    setPhase("project-change-consent");
+    setError(null);
+  }, [pendingProjectChangeConsent, phase, consentRequestId]);
 
   useEffect(() => {
     if (statusMessage?.key === "first-paid-visit") {
@@ -155,6 +186,7 @@ export default function ProjectRecordSquishy({
     setRequestJustConfirmed(false);
     setSubmitRequestId(null);
     setAwaitingActivityCopyShown(false);
+    setConsentRequestId(null);
     activityRefreshAttemptedRef.current = false;
     setInput("");
     idempotencyKeyRef.current = crypto.randomUUID();
@@ -347,6 +379,47 @@ export default function ProjectRecordSquishy({
     }
   }
 
+  async function handleConsentResponse(response: "granted" | "declined") {
+    if (phase !== "project-change-consent" || !pendingProjectChangeConsent) return;
+    if (submitting || submitInFlightRef.current) return;
+
+    submitInFlightRef.current = true;
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/campaigns/${campaign.campaignId}/project-activity`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "respond_project_change_consent",
+          requestId: pendingProjectChangeConsent.requestId,
+          response,
+        }),
+      });
+      const body = (await res.json()) as { error?: string };
+
+      if (!res.ok) {
+        setError(body.error ?? "Could not record your response.");
+        return;
+      }
+
+      appendSquishy(
+        response === "granted"
+          ? SQUISHY_PROJECT_RECORD_GROUNDED_COPY.consentGranted
+          : SQUISHY_PROJECT_RECORD_GROUNDED_COPY.consentDeclined,
+      );
+      setPhase("done");
+      setConsentRequestId(null);
+      await onActivityRefresh();
+    } catch {
+      setError("Could not record your response.");
+    } finally {
+      setSubmitting(false);
+      submitInFlightRef.current = false;
+    }
+  }
+
   return (
     <section className="utility-card cd-card--squishy" aria-labelledby="cd-squishy-title">
       <h2 id="cd-squishy-title" className="utility-card__title">
@@ -376,6 +449,29 @@ export default function ProjectRecordSquishy({
               )}
             </p>
           ))}
+        </div>
+      ) : null}
+
+      {phase === "project-change-consent" && pendingProjectChangeConsent ? (
+        <div className="cd-squishy__consent">
+          <div className="cd-squishy__actions">
+            <button
+              type="button"
+              className="utility-btn utility-btn--primary"
+              disabled={submitting}
+              onClick={() => void handleConsentResponse("granted")}
+            >
+              {SQUISHY_PROJECT_RECORD_GROUNDED_COPY.consentGrantLabel}
+            </button>
+            <button
+              type="button"
+              className="utility-btn utility-btn--secondary"
+              disabled={submitting}
+              onClick={() => void handleConsentResponse("declined")}
+            >
+              {SQUISHY_PROJECT_RECORD_GROUNDED_COPY.consentDeclineLabel}
+            </button>
+          </div>
         </div>
       ) : null}
 

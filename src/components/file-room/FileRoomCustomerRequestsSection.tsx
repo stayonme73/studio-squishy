@@ -22,6 +22,7 @@ const OPEN_STATUSES = new Set([
   "needs_studio_review",
   "needs_clarification",
   "approved_for_apply",
+  "held",
 ]);
 
 function statusLabel(status: InformationUpdateRequest["status"]): string {
@@ -84,6 +85,10 @@ function RequestRow({
     request.status === "needs_studio_review" ||
     request.status === "needs_clarification";
   const canApply = request.status === "approved_for_apply";
+  const canEscalate =
+    request.status === "held" &&
+    request.classification === "project_change" &&
+    !request.projectChangeExceptionId;
   const canReject = request.status !== "applied" && request.status !== "rejected";
 
   return (
@@ -114,6 +119,11 @@ function RequestRow({
           Classification: {request.classification === "project_change" ? "Project change" : "Information update"}
         </p>
       ) : null}
+      {request.projectChangeExceptionId ? (
+        <p className="fr-customer-request__hint">
+          {fileRoom.customerRequests.escalatedLabel} — exception {request.projectChangeExceptionId.slice(0, 8)}
+        </p>
+      ) : null}
 
       {canClassify ? (
         <div className="fr-customer-request__actions">
@@ -132,6 +142,19 @@ function RequestRow({
             onClick={() => void patchRequest({ action: "classify", classification: "project_change" })}
           >
             {fileRoom.customerRequests.classifyProjectChange}
+          </button>
+        </div>
+      ) : null}
+
+      {canEscalate ? (
+        <div className="fr-customer-request__actions">
+          <button
+            type="button"
+            className="utility-btn utility-btn--primary"
+            disabled={busy}
+            onClick={() => void patchRequest({ action: "escalate" })}
+          >
+            {fileRoom.customerRequests.escalateLabel}
           </button>
         </div>
       ) : null}

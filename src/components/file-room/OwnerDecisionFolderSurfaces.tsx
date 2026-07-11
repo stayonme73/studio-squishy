@@ -41,6 +41,10 @@ type OwnerDecisionFolderWorkingSurfaceProps = {
   onAskClient?: (clientMessage: string, ownerNotes: string) => void;
   onAskClientInfo?: (clientMessage: string, ownerNotes: string) => void;
   onAskClientApproval?: (clientMessage: string, ownerNotes: string) => void;
+  onApplyProjectChange?: (
+    change: { kind: "add_service" | "remove_service"; serviceId: string },
+    ownerNotes: string,
+  ) => void;
   onAssign: (assignToUserId: string, ownerNotes: string, note: string) => void;
 };
 
@@ -57,23 +61,31 @@ export function OwnerDecisionFolderWorkingSurface({
   onAskClient,
   onAskClientInfo,
   onAskClientApproval,
+  onApplyProjectChange,
   onAssign,
 }: OwnerDecisionFolderWorkingSurfaceProps) {
   const [teamNote, setTeamNote] = useState("");
   const [ownerNotes, setOwnerNotes] = useState("");
   const [clientMessage, setClientMessage] = useState("");
   const [assignToUserId, setAssignToUserId] = useState("");
+  const [applyKind, setApplyKind] = useState<"remove_service" | "add_service">("remove_service");
+  const [applyServiceId, setApplyServiceId] = useState("");
 
   useEffect(() => {
     setTeamNote("");
     setOwnerNotes("");
     setClientMessage("");
     setAssignToUserId("");
+    setApplyKind("remove_service");
+    setApplyServiceId("");
   }, [item.id]);
 
   const config = ownerConsole[configKey];
+  const applyReady = Boolean(card.projectChangeApply);
   const primaryLabel =
-    configKey === "deadlineDecision"
+    applyReady && configKey === "scopeDecision"
+      ? ownerConsole.scopeDecision.applyProjectChangeLabel
+      : configKey === "deadlineDecision"
       ? ownerConsole.deadlineDecision.commitLabel
       : configKey === "revisionDecision"
         ? ownerConsole.revisionDecision.allowLabel
@@ -187,16 +199,52 @@ export function OwnerDecisionFolderWorkingSurface({
           ))}
         </select>
       </div>
+      {applyReady && card.projectChangeApply ? (
+        <div className="fr-owner-sequential__review-gate-notes">
+          <p className="fr-owner-sequential__working-meta">
+            Customer consent received for: {card.projectChangeApply.requestSummary}
+          </p>
+          <label className="fr-owner-sequential__review-gate-label" htmlFor="decision-apply-kind">
+            {ownerConsole.scopeDecision.applyKindLabel}
+          </label>
+          <select
+            id="decision-apply-kind"
+            className="fr-owner-sequential__review-gate-textarea"
+            value={applyKind}
+            disabled={busy}
+            onChange={(event) =>
+              setApplyKind(event.target.value as "remove_service" | "add_service")
+            }
+          >
+            <option value="remove_service">Remove service</option>
+            <option value="add_service">Add service</option>
+          </select>
+          <label className="fr-owner-sequential__review-gate-label" htmlFor="decision-apply-service">
+            {ownerConsole.scopeDecision.applyServiceIdLabel}
+          </label>
+          <input
+            id="decision-apply-service"
+            className="fr-owner-sequential__review-gate-textarea"
+            value={applyServiceId}
+            disabled={busy}
+            onChange={(event) => setApplyServiceId(event.target.value)}
+          />
+        </div>
+      ) : null}
       <div className="fr-owner-console-actions">
         <button
           type="button"
           className="utility-btn utility-btn--primary"
           disabled={busy}
-          onClick={() => onPrimary(ownerNotes)}
+          onClick={() =>
+            applyReady && onApplyProjectChange
+              ? onApplyProjectChange({ kind: applyKind, serviceId: applyServiceId.trim() }, ownerNotes)
+              : onPrimary(ownerNotes)
+          }
         >
           {primaryLabel}
         </button>
-        {secondaryLabel && onSecondary ? (
+        {secondaryLabel && onSecondary && !applyReady ? (
           <button
             type="button"
             className="utility-btn"

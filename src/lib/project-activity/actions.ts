@@ -20,6 +20,7 @@ import {
 } from "@/lib/customer-field-tokens";
 
 import { assessSuggestedClassification } from "./classify";
+import { bridgeProjectChangeToOwnerDesk } from "@/lib/project-change/escalate";
 import { getOrInitializeProjectActivity, writeProjectActivityEnvelope } from "./store";
 import type {
   ActivitySourceType,
@@ -29,6 +30,7 @@ import type {
   ProjectActivityEnvelope,
   RequestClassification,
 } from "./types";
+import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 function nowIso() {
   return new Date().toISOString();
@@ -424,6 +426,88 @@ export async function rejectInformationUpdateRequest(params: {
 
   const saved = await writeProjectActivityEnvelope(envelope);
   return { ok: true, request: updated, envelope: saved };
+}
+
+export async function escalateProjectChangeRequest(params: {
+  campaignId: string;
+  requestId: string;
+  user: StudioUser;
+  assignments: CampaignAssignmentsFile;
+  campaign: CampaignRecord;
+}): Promise<
+  | {
+      ok: true;
+      request: InformationUpdateRequest;
+      envelope: ProjectActivityEnvelope;
+      exceptionId: string;
+      alreadyEscalated: boolean;
+    }
+  | { ok: false; error: string; status: number }
+> {
+  let envelope = await getOrInitializeProjectActivity(params.campaignId);
+  const index = envelope.requests.findIndex((r) => r.id === params.requestId);
+  if (index === -1) return { ok: false, error: "Request not found.", status: 404 };
+
+  const current = envelope.requests[index]!;
+  const bridge = await bridgeProjectChangeToOwnerDesk({
+    campaignId: params.campaignId,
+    request: current,
+    user: params.user,
+    assignments: params.assignments,
+    campaign: params.campaign,
+  });
+
+  if (!bridge.ok) return bridge;
+
+  if (
+    bridge.alreadyEscalated &&
+    current.projectChangeExceptionId === bridge.exceptionId &&
+    current.escalatedAt
+  ) {
+    return {
+      ok: true,
+      request: current,
+      envelope,
+      exceptionId: bridge.exceptionId,
+      alreadyEscalated: true,
+    };
+  }
+
+  const linkedAt = current.escalatedAt ?? nowIso();
+  const updated: InformationUpdateRequest = {
+    ...current,
+    projectChangeExceptionId: bridge.exceptionId,
+    escalatedAt: linkedAt,
+  };
+
+  let next: ProjectActivityEnvelope = {
+    ...envelope,
+    requests: envelope.requests.map((r, i) => (i === index ? updated : r)),
+    updatedAt: linkedAt,
+    version: envelope.version + 1,
+  };
+
+  if (!bridge.alreadyEscalated) {
+    next = appendActivityEvent(next, {
+      kind: "project_change_escalated",
+      sourceType: "staff_escalate",
+      sourceId: `${params.requestId}:project_change_escalated`,
+      actor: actorFromUser(params.user),
+      requestId: params.requestId,
+      headline: "Submitted for Studio review",
+      detail: "This request is on the Owner Desk for scope review.",
+      payload: { exceptionId: bridge.exceptionId },
+    });
+  }
+
+  const saved = await writeProjectActivityEnvelope(next);
+  return {
+    ok: true,
+    request: updated,
+    envelope: saved,
+    exceptionId: bridge.exceptionId,
+    alreadyEscalated: bridge.alreadyEscalated,
+  };
 }
 
 export async function appendMaterialActivityEvent(params: {

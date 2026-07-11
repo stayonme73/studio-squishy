@@ -749,6 +749,10 @@ export function useOwnerConsoleActions() {
       return;
     }
     if (kind === "scope_change") {
+      if (card.projectChangeApply) {
+        setError("Use Apply project change with a typed catalog delta.");
+        return;
+      }
       if (!confirmIrreversible(ownerConsole.scopeDecision.confirmApprove)) return;
       void patchOwnerDecisionFolder(
         card,
@@ -757,6 +761,57 @@ export function useOwnerConsoleActions() {
         resolveOwnerScopePostDecisionBriefing,
       );
     }
+  };
+
+  const confirmOwnerApplyProjectChange = (
+    card: OwnerConsoleDecisionCard,
+    change: { kind: "add_service" | "remove_service"; serviceId: string },
+    ownerNotes: string,
+  ) => {
+    if (!card.projectChangeApply) {
+      setError("This scope change is not ready to apply.");
+      return;
+    }
+    if (!change.serviceId.trim()) {
+      setError("A catalog service ID is required.");
+      return;
+    }
+    if (!confirmIrreversible(ownerConsole.scopeDecision.confirmApplyProjectChange)) return;
+
+    setBusy(true);
+    setError(null);
+    setStatusMessage(null);
+    void (async () => {
+      try {
+        const res = await fetch(`/api/campaigns/${card.campaignId}/tasks`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "owner_apply_project_change_scope",
+            exceptionId: card.id,
+            change,
+            ownerNotes: ownerNotes.trim() || undefined,
+          }),
+        });
+        const json = (await res.json()) as { error?: string };
+        if (!res.ok) {
+          throw new Error(
+            json.error ?? `${campaignExceptionsConfig.updateFailedMessage} (${res.status})`,
+          );
+        }
+        resetPanels();
+        setStatusMessage("Project change applied to the approved Studio Plan.");
+        router.refresh();
+      } catch (patchError) {
+        setError(
+          patchError instanceof Error
+            ? patchError.message
+            : campaignExceptionsConfig.updateFailedMessage,
+        );
+      } finally {
+        setBusy(false);
+      }
+    })();
   };
 
   const confirmOwnerDecisionSecondary = (card: OwnerConsoleDecisionCard, ownerNotes: string) => {
@@ -1276,6 +1331,7 @@ export function useOwnerConsoleActions() {
     confirmAskTeamDirectionDisagreement,
     confirmAssignDirectionDisagreement,
     confirmOwnerDecisionPrimary,
+    confirmOwnerApplyProjectChange,
     confirmOwnerDecisionSecondary,
     confirmOwnerDecisionHold,
     confirmOwnerDecisionAskTeam,

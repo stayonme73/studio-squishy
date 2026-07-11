@@ -90,6 +90,7 @@ export default function CampaignDetailsScene() {
   const {
     events: activityEvents,
     pendingCount,
+    pendingProjectChangeConsent,
     loading: activityLoading,
     error: activityError,
     refresh: refreshActivity,
@@ -480,6 +481,7 @@ export default function CampaignDetailsScene() {
             campaign={campaign}
             snapshot={squishySnapshot}
             activityEvents={activityEvents}
+            pendingProjectChangeConsent={pendingProjectChangeConsent}
             onActivityRefresh={refreshActivity}
             onGreeted={() => {
               setSquishyHasGreeted(true);

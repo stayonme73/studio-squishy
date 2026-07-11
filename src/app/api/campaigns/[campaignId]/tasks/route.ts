@@ -17,6 +17,12 @@ import { countBlockingRequiredMaterials } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials, writeMaterialsEnvelope } from "@/lib/materials/store";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { findUserById, toPublicUser } from "@/lib/auth/users";
+import {
+  assertProjectChangeOwnerOrchestrationBody,
+  orchestrateProjectChangeOwnerScopeAction,
+} from "@/lib/project-change/owner-outcome-orchestrator";
+import { orchestrateOwnerApplyProjectChangeScope } from "@/lib/project-change/owner-apply-orchestrator";
+import { parseProjectChangeDelta } from "@/lib/project-change/types";
 
 type RouteContext = {
   params: Promise<{ campaignId: string }>;
@@ -130,14 +136,92 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
   }
 
-  const result = applyTaskPatch(tasksEnvelope, body, user, {
+  const taskContext = {
     campaign: campaignEnvelope.record,
     materials: materialsEnvelope.items,
     materialsEnvelope,
     production: productionEnvelope,
     assignments,
     targetUser,
-  });
+  };
+
+  if (body.action === "owner_apply_project_change_scope") {
+    const change = parseProjectChangeDelta(body.change);
+    if (!change) {
+      return NextResponse.json({ error: "Invalid project change delta." }, { status: 400 });
+    }
+
+    const applied = await orchestrateOwnerApplyProjectChangeScope({
+      campaignId,
+      exceptionId: body.exceptionId,
+      change,
+      user,
+      assignments,
+    });
+
+    if (!applied.ok) {
+      return NextResponse.json(
+        {
+          error: applied.error,
+          paymentRequired: applied.paymentRequired,
+        },
+        { status: applied.status },
+      );
+    }
+
+    const saved = await getOrGenerateTasks(campaignId, campaignEnvelope.record);
+    return NextResponse.json(teamPayload(saved, user, assignments));
+  }
+
+  if (assertProjectChangeOwnerOrchestrationBody(body)) {
+    const orchestrated = await orchestrateProjectChangeOwnerScopeAction({
+      campaignId,
+      exceptionId: body.exceptionId,
+      action: body.action,
+      user,
+      clientMessage: "clientMessage" in body ? body.clientMessage : undefined,
+      tasksEnvelope,
+      taskPatchBody: body,
+      taskContext,
+    });
+
+    if (!orchestrated.ok) {
+      if (orchestrated.status === 409 && orchestrated.conflict) {
+        return NextResponse.json(
+          {
+            error: orchestrated.error,
+            conflict: {
+              ...orchestrated.conflict,
+              task: {
+                ...orchestrated.conflict.task,
+                claimVersion: orchestrated.conflict.claimVersion,
+              },
+            },
+          },
+          { status: 409 },
+        );
+      }
+      return NextResponse.json({ error: orchestrated.error }, { status: orchestrated.status });
+    }
+
+    const saved = orchestrated.taskResult.envelope;
+
+    if (orchestrated.taskResult.productionEnvelope) {
+      await writeProductionEnvelope(orchestrated.taskResult.productionEnvelope);
+    }
+
+    if (orchestrated.taskResult.materialsEnvelope) {
+      const savedMaterials = await writeMaterialsEnvelope(orchestrated.taskResult.materialsEnvelope);
+      await syncMaterialsSummaryOnCampaign(
+        campaignId,
+        countBlockingRequiredMaterials(savedMaterials.items),
+      );
+    }
+
+    return NextResponse.json(teamPayload(saved, user, assignments));
+  }
+
+  const result = applyTaskPatch(tasksEnvelope, body, user, taskContext);
 
   if (!result.ok) {
     if (result.status === 409 && result.conflict) {

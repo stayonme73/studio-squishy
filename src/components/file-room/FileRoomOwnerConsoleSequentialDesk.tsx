@@ -1192,6 +1192,12 @@ export default function FileRoomOwnerConsoleSequentialDesk({
                       note,
                     )
                   }
+                  onApplyProjectChange={
+                    selectedCard.projectChangeApply
+                      ? (change, ownerNotes) =>
+                          actions.confirmOwnerApplyProjectChange(selectedCard, change, ownerNotes)
+                      : undefined
+                  }
                 />
               ) : selectedCard && operatorContext ? (
                 <>

@@ -12,7 +12,8 @@
     "seed:decision-learner": "node scripts/seed-decision-learner.mjs",
     "seed:studio-self-test": "node scripts/seed-studio-self-test.mjs",
     "test:studio-self-test": "node scripts/run-studio-self-test.mjs",
-    "test:studio-coordinator-self-test": "node scripts/run-studio-coordinator-self-test.mjs"
+    "test:studio-coordinator-self-test": "node scripts/run-studio-coordinator-self-test.mjs",
+    "test:package3-certification": "node scripts/run-package3-certification.mjs"
   },
   "dependencies": {
     "next": "16.2.9",

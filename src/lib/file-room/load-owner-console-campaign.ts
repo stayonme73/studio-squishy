@@ -11,6 +11,7 @@ import { getOrGenerateTasks } from "@/lib/campaign-tasks/store";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { loadFileRoomCampaign } from "@/lib/file-room/load-campaign";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
+import { getOrInitializeProjectActivity } from "@/lib/project-activity/store";
 
 export type OwnerConsoleCampaignResult =
   | { kind: "forbidden" }
@@ -35,13 +36,14 @@ export async function loadOwnerConsoleCampaign(
   if (result.kind === "not-found") return { kind: "not-found" };
   if (result.kind === "forbidden") return { kind: "forbidden" };
 
-  const [tasksEnvelope, materialsEnvelope, productionEnvelope, assignments, studioUsers] =
+  const [tasksEnvelope, materialsEnvelope, productionEnvelope, assignments, studioUsers, activityEnvelope] =
     await Promise.all([
       getOrGenerateTasks(campaignId, result.envelope.record),
       getOrInitializeMaterials(campaignId, result.envelope.record),
       getOrInitializeProduction(campaignId, result.envelope.record),
       readCampaignAssignments(),
       listStudioUsers(),
+      getOrInitializeProjectActivity(campaignId),
     ]);
 
   const assignCandidates = resolveAssignCandidatesForException(
@@ -60,6 +62,7 @@ export async function loadOwnerConsoleCampaign(
       assignments,
       assignCandidates,
       selectedItemId,
+      activityEnvelope,
     },
     studioUsers,
   );

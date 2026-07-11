@@ -1,5 +1,6 @@
 import type { FieldChangeToken } from "@/lib/customer-field-tokens";
 import type { RequestTargetKey } from "@/lib/customer-field-tokens";
+import type { ProjectChangeDelta } from "@/lib/project-change/types";
 
 export type CustomerRequestStatus =
   | "request_received"
@@ -12,6 +13,12 @@ export type CustomerRequestStatus =
 
 export type RequestClassification = "information_update" | "project_change" | null;
 
+/** Customer consent for an owner-requested project change approval. */
+export type ProjectChangeConsentStatus = "none" | "pending" | "granted" | "declined";
+
+/** Typed owner outcome on a linked project change request — not derived from copy. */
+export type ProjectChangeOwnerDecision = "approved" | "declined" | "held" | "approval_requested";
+
 export type ActivitySourceType =
   | "information_update_request"
   | "materials_submit"
@@ -19,6 +26,10 @@ export type ActivitySourceType =
   | "staff_apply"
   | "staff_reject"
   | "staff_clarify"
+  | "staff_escalate"
+  | "owner_decision"
+  | "customer_consent"
+  | "system_apply"
   | "system";
 
 export type ProjectActivityAuditEventKind =
@@ -30,6 +41,13 @@ export type ProjectActivityAuditEventKind =
   | "update_rejected"
   | "stale_field_token_conflict"
   | "escalated_to_project_change"
+  | "project_change_escalated"
+  | "owner_decision_recorded"
+  | "customer_approval_requested"
+  | "customer_approval_granted"
+  | "customer_approval_declined"
+  | "project_change_applied"
+  | "project_change_closed"
   | "material_submitted"
   | "material_approved"
   | "material_needs_clarification";
@@ -55,7 +73,23 @@ export type InformationUpdateRequest = {
   appliedAt?: string;
   appliedBy?: string;
   rejectionReason?: string;
+  /** Linked Owner Desk scope_change exception — set when escalation bridge runs. */
+  projectChangeExceptionId?: string;
+  escalatedAt?: string;
+  /** Owner-requested client approval for a classified project change. */
+  consentStatus?: ProjectChangeConsentStatus;
+  consentRequestedAt?: string;
+  consentRespondedAt?: string;
+  ownerDecision?: ProjectChangeOwnerDecision;
+  ownerDecisionAt?: string;
+  /** Typed delta applied to approvedStudioPlan — set when apply completes. */
+  appliedChange?: ProjectChangeDelta;
 };
+
+export type PendingCustomerRequest = Pick<
+  InformationUpdateRequest,
+  "status" | "classification" | "consentStatus"
+>;
 
 export type ProjectActivityAuditEvent = {
   id: string;

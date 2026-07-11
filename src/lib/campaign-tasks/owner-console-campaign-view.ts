@@ -14,6 +14,8 @@ import { resolveFileRoomProductionWorkPanelView } from "@/lib/campaign-productio
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import { resolveFileRoomListItemView } from "@/lib/file-room-view";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
+import type { ProjectActivityEnvelope } from "@/lib/project-activity/types";
+import { resolveProjectChangeOwnerApplySurface } from "@/lib/project-change/owner-apply-surface";
 
 import { canEnterTeamOffice } from "./office-access";
 
@@ -111,7 +113,48 @@ export type OwnerConsoleCampaignLoadInput = {
   assignments: CampaignAssignmentsFile;
   assignCandidates: readonly ExceptionAssignCandidate[];
   selectedItemId: string | null;
+  activityEnvelope?: ProjectActivityEnvelope | null;
 };
+
+function enrichOwnerConsoleDecisionCard(
+  card: OwnerConsoleDecisionCard,
+  activityEnvelope: ProjectActivityEnvelope | null | undefined,
+  tasksEnvelope: ServerTasksEnvelope,
+): OwnerConsoleDecisionCard {
+  if (card.row.kind !== "scope_change" || !activityEnvelope) {
+    return card;
+  }
+
+  const record = tasksEnvelope.exceptionRecords?.find((entry) => entry.id === card.id);
+  if (!record) return card;
+
+  const surface = resolveProjectChangeOwnerApplySurface(
+    activityEnvelope,
+    card.id,
+    record.status,
+  );
+  if (!surface.ready || !surface.requestId) {
+    return card;
+  }
+
+  return {
+    ...card,
+    projectChangeApply: {
+      requestId: surface.requestId,
+      requestSummary: surface.requestSummary ?? "",
+    },
+  };
+}
+
+function enrichOwnerConsoleDecisionCards(
+  cards: readonly OwnerConsoleDecisionCard[],
+  activityEnvelope: ProjectActivityEnvelope | null | undefined,
+  tasksEnvelope: ServerTasksEnvelope,
+): OwnerConsoleDecisionCard[] {
+  return cards.map((card) =>
+    enrichOwnerConsoleDecisionCard(card, activityEnvelope, tasksEnvelope),
+  );
+}
 
 function resolveOfficeLinks(
   user: StudioUser,
@@ -262,7 +305,13 @@ export function resolveOwnerConsoleCampaignDetailView(
     assignCandidatesByCampaign,
   );
 
-  const waitingOwnerIds = resolveWaitingOwnerExceptionIds(consoleView.waitingOnOwner);
+  const waitingOnOwner = enrichOwnerConsoleDecisionCards(
+    consoleView.waitingOnOwner,
+    input.activityEnvelope,
+    tasksEnvelope,
+  );
+
+  const waitingOwnerIds = resolveWaitingOwnerExceptionIds(waitingOnOwner);
   const scan = resolveOwnerConsoleScanView([bundle], user, assignments, waitingOwnerIds);
 
   const listItem = resolveFileRoomListItemView(envelope);
@@ -276,8 +325,8 @@ export function resolveOwnerConsoleCampaignDetailView(
   });
 
   const selectedCard =
-    consoleView.waitingOnOwner.find((card) => card.id === selectedItemId) ??
-    consoleView.waitingOnOwner[0] ??
+    waitingOnOwner.find((card) => card.id === selectedItemId) ??
+    waitingOnOwner[0] ??
     null;
 
   const effectiveSelectedId = selectedCard?.id ?? null;
@@ -299,7 +348,7 @@ export function resolveOwnerConsoleCampaignDetailView(
     campaignId: listItem.campaignId,
     campaignName: listItem.campaignName,
     businessLabel: listItem.businessLabel,
-    waitingOnOwner: consoleView.waitingOnOwner,
+    waitingOnOwner,
     selectedItemId: effectiveSelectedId,
     selectedCard,
     operatorContext,

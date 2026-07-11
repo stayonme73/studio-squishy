@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 
 import type { CustomerTimelineItem } from "@/lib/project-activity/types";
+import type { CustomerPendingProjectChangeConsent } from "@/lib/project-activity/customer-view";
 
 type ActivityResponse = {
   events: CustomerTimelineItem[];
   pendingCount: number;
+  pendingProjectChangeConsent?: CustomerPendingProjectChangeConsent | null;
   syncedAt?: string;
   error?: string;
 };
@@ -14,6 +16,8 @@ type ActivityResponse = {
 export function useProjectActivity(campaignId: string | undefined, paymentReceivedAt: string | null | undefined) {
   const [events, setEvents] = useState<CustomerTimelineItem[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingProjectChangeConsent, setPendingProjectChangeConsent] =
+    useState<CustomerPendingProjectChangeConsent | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,6 +25,7 @@ export function useProjectActivity(campaignId: string | undefined, paymentReceiv
     if (!campaignId || !paymentReceivedAt) {
       setEvents([]);
       setPendingCount(0);
+      setPendingProjectChangeConsent(null);
       return;
     }
     setLoading(true);
@@ -34,6 +39,7 @@ export function useProjectActivity(campaignId: string | undefined, paymentReceiv
       }
       setEvents(body.events ?? []);
       setPendingCount(body.pendingCount ?? 0);
+      setPendingProjectChangeConsent(body.pendingProjectChangeConsent ?? null);
     } catch {
       setError("Could not load project activity.");
     } finally {
@@ -45,5 +51,5 @@ export function useProjectActivity(campaignId: string | undefined, paymentReceiv
     void refresh();
   }, [refresh]);
 
-  return { events, pendingCount, loading, error, refresh };
+  return { events, pendingCount, pendingProjectChangeConsent, loading, error, refresh };
 }

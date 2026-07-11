@@ -56,6 +56,11 @@ export type OwnerConsoleDecisionCard = {
   whereWorkGoesAfter: string;
   availableActions: readonly OwnerConsoleActionDescriptor[];
   row: FileRoomExceptionRow;
+  /** Consented project change ready for Owner Desk typed apply. */
+  projectChangeApply?: {
+    requestId: string;
+    requestSummary: string;
+  };
 };
 
 export type OwnerConsoleCampaignContext = {
