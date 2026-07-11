@@ -46,6 +46,15 @@ export default function RouteMapJobDetailBlocks({ job, className }: Props) {
         <h3 className="route-map-job-card__section">Timing</h3>
         <p>{job.timingLabel}</p>
       </section>
+
+      <section className="route-map-job-card__block route-map-job-card__block--responsibilities">
+        <h3 className="route-map-job-card__section">Client Responsibilities</h3>
+        <ul className="route-map-job-card__list">
+          {job.clientResponsibilities.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

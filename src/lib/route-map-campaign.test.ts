@@ -13,6 +13,7 @@ import {
   type RouteMapJobId,
 } from "@/config/route-map-v1";
 import { getRouteMapIntakeSchema } from "@/config/route-map-intake-v1";
+import { buildRouteMapTimingLabel } from "@/catalog/route-map-shared-copy";
 import {
   addRouteMapServiceToPlan,
   addServiceToRouteMapPlanState,
@@ -177,7 +178,7 @@ describe("route-map catalog SKUs", () => {
 
   it("uses job-specific timing for continuing V1 jobs", () => {
     const job = getRouteMapJob("rm-j005");
-    expect(job?.timingLabel).toBe("First draft within 5 business days after intake is complete.");
+    expect(job?.timingLabel).toBe(buildRouteMapTimingLabel("within 5 business days"));
     expect(ROUTE_MAP_V1.promiseFooter.toLowerCase()).not.toContain("7 business");
   });
 

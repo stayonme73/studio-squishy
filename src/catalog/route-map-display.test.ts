@@ -9,6 +9,7 @@ import {
   getRouteMapTurnaroundLabel,
 } from "@/catalog/route-map-display";
 import { buildServiceScopeSnapshot } from "@/lib/plan-pricing";
+import { buildRouteMapTimingLabel } from "@/catalog/route-map-shared-copy";
 import type { ServiceId } from "@/catalog/types";
 
 const MONTHLY_CYCLE_LABEL =
@@ -57,7 +58,7 @@ describe("route-map-display accessors", () => {
       getRouteMapTurnaroundLabel(getServiceById("rm-j001")!),
     );
     expect(getCheckoutTimingLabel(getServiceById("rm-j005")!)).toBe(
-      "First draft within 5 business days after intake is complete.",
+      buildRouteMapTimingLabel("within 5 business days"),
     );
   });
 
@@ -91,13 +92,13 @@ describe("route-map-display accessors", () => {
 
   it("returns V1 turnaround labels from catalog seeds", () => {
     expect(getRouteMapTurnaroundLabel(getServiceById("rm-j001")!)).toBe(
-      "Route recommendation within 2 business days after intake is complete.",
+      buildRouteMapTimingLabel("within 2 business days"),
     );
     expect(getRouteMapTurnaroundLabel(getServiceById("rm-j005")!)).toBe(
-      "First draft within 5 business days after intake is complete.",
+      buildRouteMapTimingLabel("within 5 business days"),
     );
     expect(getRouteMapTurnaroundLabel(getServiceById("rm-j007")!)).toBe(
-      "First draft within 2 business days after intake is complete.",
+      buildRouteMapTimingLabel("within 2 business days"),
     );
   });
 

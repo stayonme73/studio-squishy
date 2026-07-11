@@ -10,6 +10,7 @@
 
 import type { CatalogV2ServiceEntry } from "@/catalog/v2/types";
 import { CATALOG_V2_DRAFT_SCHEMA_VERSION } from "@/catalog/v2/types";
+import { buildRouteMapTimingLabel } from "@/catalog/route-map-shared-copy";
 
 export const CATALOG_V2_BATCH1_READY_TO_USE_BATCH_ID = "batch1-ready-to-use" as const;
 
@@ -21,8 +22,9 @@ export const CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE =
 export const CATALOG_V2_RTU_DELIVERY_RULE =
   "The Studio creates finished files. Client prints, uploads, sends, schedules, or distributes unless they separately buy a scoped post/publish service.";
 
-export const CATALOG_V2_RTU_CLIENT_RESPONSIBILITY =
-  "Client prints, uploads, posts, sends, schedules, or distributes delivered files using their own tools and accounts.";
+export const CATALOG_V2_RTU_CLIENT_RESPONSIBILITY: readonly string[] = [
+  "Print, upload, post, send, schedule, or distribute delivered files using your own tools and accounts.",
+];
 
 /** Optional per-SKU overrides — defaults apply when omitted (other Batch 1 SKUs unchanged). */
 type Batch1BaseOverrides = {
@@ -35,7 +37,7 @@ type Batch1BaseOverrides = {
   placement?: CatalogV2ServiceEntry["placement"];
   laneEligibility?: CatalogV2ServiceEntry["laneEligibility"];
   turnaroundApprovalStatus?: CatalogV2ServiceEntry["turnaroundApprovalStatus"];
-  clientResponsibilityAfterDelivery?: string;
+  clientResponsibilities?: readonly string[];
   scopeRoutingNote?: string;
   intakeTemplate?: CatalogV2ServiceEntry["intakeTemplate"];
 };
@@ -57,7 +59,7 @@ function batch1Base(
     | "batchLaunchCandidate"
     | "launchSetStatus"
     | "deliveryRule"
-    | "clientResponsibilityAfterDelivery"
+    | "clientResponsibilities"
     | "turnaroundApprovalStatus"
     | "priceCents"
     | "priceNote"
@@ -79,7 +81,7 @@ function batch1Base(
     batchLaunchCandidate: true,
     launchSetStatus: "launch_candidate",
     deliveryRule: CATALOG_V2_RTU_DELIVERY_RULE,
-    clientResponsibilityAfterDelivery: CATALOG_V2_RTU_CLIENT_RESPONSIBILITY,
+    clientResponsibilities: CATALOG_V2_RTU_CLIENT_RESPONSIBILITY,
     turnaroundApprovalStatus: "proposed",
     priceCents: null,
     priceNote: "no approved price yet",
@@ -109,8 +111,10 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-flyer",
-    clientResponsibilityAfterDelivery:
-      "Client handles printing, uploading, posting, emailing, or distributing the finished files through their own printer, platform, or account.",
+    clientResponsibilities: [
+      "Print, upload, post, email, or distribute the finished files yourself",
+      "Use your own printer, platform, or account for distribution",
+    ],
     scopeRoutingNote:
       "Keep complex or unclear flyer requests routed to Help Me Figure Out What I Need (rm-j001) instead of stretching single-flyer scope.",
     includedDeliverables: [
@@ -144,7 +148,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "More than one revision round",
     ],
     revisionLimit: 1,
-    turnaround: "Usually within 2–3 business days after intake is complete.",
+    turnaround: buildRouteMapTimingLabel("within 2–3 business days"),
     billingType: "one_time",
     sourceLaunchStatus: "limited",
     productionLane: "quick_turn",
@@ -176,8 +180,12 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-menu",
-    clientResponsibilityAfterDelivery:
-      "Client supplies final approved menu content and is responsible for the accuracy of prices, descriptions, dietary/allergen information, and legal wording.",
+    clientResponsibilities: [
+      "Provide final, approved menu content",
+      "Confirm prices and item descriptions are accurate",
+      "Confirm dietary and allergen information is accurate",
+      "Confirm any required legal wording is accurate",
+    ],
     scopeRoutingNote:
       "Anything beyond the base scope routes to Help Me Figure Out What I Need (rm-j001), not into this SKU.",
     includedDeliverables: [
@@ -209,7 +217,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "Printing, shipping, vendor coordination, editable source files, photography, custom illustration, posting, or publishing",
     ],
     revisionLimit: 1,
-    turnaround: "Usually within 3–5 business days after intake is complete.",
+    turnaround: buildRouteMapTimingLabel("within 3–5 business days"),
     billingType: "one_time",
     sourceLaunchStatus: "limited",
     productionLane: "standard_build",
@@ -242,8 +250,11 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-service-sheet",
-    clientResponsibilityAfterDelivery:
-      "Client supplies final approved content and is responsible for the accuracy of service descriptions, starting prices, contact information, and legal wording.",
+    clientResponsibilities: [
+      "Provide final, approved service descriptions and content",
+      "Confirm starting prices and contact information are accurate",
+      "Confirm any required legal wording is accurate",
+    ],
     scopeRoutingNote:
       "A client needing a long price list, packages, many service tiers, or a brochure gets routed to Help Me Figure Out What I Need (rm-j001) instead of stretching this job.",
     includedDeliverables: [
@@ -277,7 +288,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "More than one revision round",
     ],
     revisionLimit: 1,
-    turnaround: "Usually within 2–3 business days after intake is complete.",
+    turnaround: buildRouteMapTimingLabel("within 2–3 business days"),
     billingType: "one_time",
     sourceLaunchStatus: "limited",
     productionLane: "standard_build",
@@ -308,8 +319,11 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-social-posts",
-    clientResponsibilityAfterDelivery:
-      "Client uploads, posts, schedules, and handles replies, comments, DMs, analytics, and account activity through their own platform.",
+    clientResponsibilities: [
+      "Upload, post, and schedule the finished graphics yourself",
+      "Handle replies, comments, direct messages, and other account activity",
+      "Use your own platform account",
+    ],
     scopeRoutingNote:
       "Requests for multiple platforms, videos, a full monthly calendar, or ongoing posting should route to Help Me Figure Out What I Need (rm-j001) or a separate future service, not stretch this SKU.",
     includedDeliverables: [
@@ -352,7 +366,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "More than one revision round",
     ],
     revisionLimit: 1,
-    turnaround: "Usually within 3–5 business days after intake is complete.",
+    turnaround: buildRouteMapTimingLabel("within 3–5 business days"),
     billingType: "one_time",
     sourceLaunchStatus: "limited",
     productionLane: "standard_build",
@@ -384,8 +398,10 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-promotion-graphics",
-    clientResponsibilityAfterDelivery:
-      "Client distributes finished graphics via print, social, email, or other channels through their own printer, platform, or account.",
+    clientResponsibilities: [
+      "Distribute the finished graphics yourself through print, social media, email, or other channels",
+      "Use your own printer, platform, or account",
+    ],
     scopeRoutingNote:
       "Multi-campaign packs, large asset bundles, or unclear scope route to Help Me Figure Out What I Need (rm-j001) instead of stretching this SKU.",
     includedDeliverables: [
@@ -394,7 +410,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
         quantity: 2,
         unit: "graphics",
         label:
-          "Two branded campaign graphics for one campaign, event, offer, or launch — one agreed format/use per graphic; same campaign theme; no captions",
+          "branded campaign graphics for one campaign, event, offer, or launch — one agreed format/use per graphic; same campaign theme; no captions",
       },
       {
         key: "campaign_graphic_files",
@@ -418,7 +434,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "More than one revision round",
     ],
     revisionLimit: 1,
-    turnaround: "Usually within 3–5 business days after intake is complete.",
+    turnaround: buildRouteMapTimingLabel("within 3–5 business days"),
     billingType: "one_time",
     sourceLaunchStatus: "limited",
     productionLane: "standard_build",
@@ -450,8 +466,9 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     placement: "both",
     laneEligibility: ["i75", "i20", "update", "random-exit"],
     turnaroundApprovalStatus: "approved",
-    clientResponsibilityAfterDelivery:
+    clientResponsibilities: [
       "Client prints, emails, uploads, or distributes the finished handout through their own tools and is responsible for the accuracy of content, contact information, and legal wording.",
+    ],
     scopeRoutingNote:
       "Multi-page collateral, brochures, or packages route to Help Me Figure Out What I Need (rm-j001) instead of stretching this SKU.",
     includedDeliverables: [

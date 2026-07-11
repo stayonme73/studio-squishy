@@ -26,8 +26,7 @@ import {
 import { CATALOG_V2_BATCH1_READY_TO_USE } from "@/catalog/v2/batch1-ready-to-use";
 import { CATALOG_V2_BATCH2_READY_TO_USE } from "@/catalog/v2/batch2-ready-to-use";
 import type { CatalogV2ServiceEntry } from "@/catalog/v2/types";
-
-const REVISION_ONE_TIME = "One consolidated revision round.";
+import { ROUTE_MAP_REVISION_TEMPLATE } from "@/catalog/route-map-shared-copy";
 
 const QUICK_FIRST: ServiceTimingWindow = {
   minDays: 3,
@@ -184,8 +183,8 @@ function routeMapV2ServiceFromDraft(
     addOnEligible: Boolean(options.isAddOn),
     upgradeEligible: false,
     deliveryFormats: [],
-    minimumCustomerRequirements: draft.clientResponsibilityAfterDelivery
-      ? [draft.clientResponsibilityAfterDelivery]
+    minimumCustomerRequirements: draft.clientResponsibilities
+      ? [...draft.clientResponsibilities]
       : [],
     recommendedCustomerRequirements: [],
     serviceStatus: "active",
@@ -198,10 +197,8 @@ function routeMapV2ServiceFromDraft(
     purpose: customerPurposeForV2Sku(draft.sku, draft),
     deliverables,
     exclusions: [...draft.exclusions],
-    revisionRule: REVISION_ONE_TIME,
-    clientResponsibilities: draft.clientResponsibilityAfterDelivery
-      ? [draft.clientResponsibilityAfterDelivery]
-      : [],
+    revisionRule: ROUTE_MAP_REVISION_TEMPLATE,
+    clientResponsibilities: draft.clientResponsibilities ? [...draft.clientResponsibilities] : [],
     executionMode,
     requiresClientAccess: executionMode === "managed_execution_when_selected",
     requiresClientMaterials: true,

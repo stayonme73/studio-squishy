@@ -190,8 +190,11 @@ export type CatalogV2ServiceEntry = {
    */
   deliveryRule?: string;
 
-  /** What the client does after receiving finished files. */
-  clientResponsibilityAfterDelivery?: string;
+  /**
+   * Plain-English client responsibilities spanning before, during, and after
+   * the project — not limited to post-delivery.
+   */
+  clientResponsibilities?: readonly string[];
 
   /**
    * Proposed intake fields when activated — TBD until Tagia approves scope.

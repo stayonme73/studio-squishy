@@ -73,15 +73,19 @@ const JOBS = [
   },
 ];
 
+function buildTimingLabel(range) {
+  return `Initial delivery: ${range} after you submit your Project Details and we receive all required materials. Delays in providing materials, information, approvals, or feedback may extend the estimated completion date. Before payment, we'll confirm whether your required completion date can be met.`;
+}
+
 const TIMING = {
-  "rm-j001": "Route recommendation within 2 business days after intake is complete.",
-  "rm-j002": "First draft within 3 business days after intake is complete.",
+  "rm-j001": buildTimingLabel("within 2 business days"),
+  "rm-j002": buildTimingLabel("within 3 business days"),
   "rm-j003": "First draft within 3 business days after intake is complete.",
   "rm-j004": "First draft within 5 business days after intake is complete.",
-  "rm-j005": "First draft within 5 business days after intake is complete.",
+  "rm-j005": buildTimingLabel("within 5 business days"),
   "rm-j006": "First draft within 3 business days after intake is complete.",
-  "rm-j007": "First draft within 2 business days after intake is complete.",
-  "rm-j008": "First draft within 3 business days after intake is complete.",
+  "rm-j007": buildTimingLabel("within 2 business days"),
+  "rm-j008": buildTimingLabel("within 3 business days"),
 };
 
 const LEAK_PATTERNS = [

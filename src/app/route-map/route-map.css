@@ -3851,8 +3851,12 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     grid-template-areas:
       "purpose purpose"
       "includes revision"
-      "exclusions timing";
-    gap: clamp(12px, 1.2vw, 18px) clamp(16px, 1.6vw, 24px);
+      "exclusions timing"
+      "responsibilities responsibilities";
+    /* Row-gap reduced from clamp(12px,1.2vw,18px) — see Job Card Clarity spacing
+       fix: the added Client Responsibilities row needed more height than the
+       original gap left available at 1366x768 on content-heavy cards. */
+    gap: clamp(8px, 0.9vw, 12px) clamp(16px, 1.6vw, 24px);
     flex: 0 0 auto;
     min-height: auto;
     overflow: visible;
@@ -3869,7 +3873,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     min-height: auto;
     height: auto;
     overflow: visible;
-    padding: clamp(12px, 1.1vw, 16px);
+    padding: clamp(7px, 0.6vw, 10px);
     border: 1px solid color-mix(in srgb, var(--studio-charcoal) 10%, transparent);
     border-radius: 16px;
     background: var(--rm-frost-card);
@@ -3900,6 +3904,10 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     grid-area: timing;
   }
 
+  .route-map-job-card__block--responsibilities {
+    grid-area: responsibilities;
+  }
+
   .route-map-job-card--overlay .route-map-job-card__block > p,
   .route-map-overlay-workspace__job-detail .route-map-job-card__block > p,
   .route-map-job-card--overlay .route-map-job-card__list,
@@ -3908,9 +3916,13 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     line-height: 1.5;
   }
 
+  /* margin-top reduced from clamp(14px,1.5vw,20px) — Job Card Clarity spacing fix.
+     Paired with the row-gap and content-block padding reductions above so the
+     Client Responsibilities row fits at 1366x768 while keeping the CTA break
+     and content-row gaps visually clear. */
   .route-map-job-card--overlay .route-map-job-card__footer {
     position: static;
-    margin-top: clamp(14px, 1.5vw, 20px);
+    margin-top: clamp(8px, 0.9vw, 12px);
     padding-top: 0;
     background: transparent;
   }
@@ -4278,7 +4290,8 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
       "includes"
       "exclusions"
       "revision"
-      "timing";
+      "timing"
+      "responsibilities";
     gap: clamp(16px, 1.6vw, 22px);
   }
 
@@ -4362,7 +4375,8 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
       "includes"
       "exclusions"
       "revision"
-      "timing";
+      "timing"
+      "responsibilities";
     gap: 14px;
   }
 

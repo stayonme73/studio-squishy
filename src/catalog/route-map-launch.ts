@@ -19,8 +19,10 @@ import type {
 } from "@/catalog/types";
 import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
 import type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
-
-const REVISION_ONE_TIME = "One consolidated revision round.";
+import {
+  ROUTE_MAP_REVISION_TEMPLATE,
+  buildRouteMapTimingLabel,
+} from "@/catalog/route-map-shared-copy";
 
 const QUICK_FIRST: ServiceTimingWindow = {
   minDays: 3,
@@ -154,11 +156,11 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       "No production work included",
       "Not a strategy deck, PDF, or consultation",
     ],
-    revisionRule: "One revision round on the Route Start recommendation summary.",
+    revisionRule: ROUTE_MAP_REVISION_TEMPLATE,
     clientResponsibilities: [
-      "Accurate business context and goals",
-      "Timely responses to clarifying questions",
-      "Approval to proceed with a chosen job",
+      "Provide accurate business context and goals",
+      "Respond promptly to clarifying questions",
+      "Approve the chosen job before we proceed",
     ],
     executionMode: "strategy_direction",
     deliveryMapping: {
@@ -166,8 +168,7 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "route_start_recommendation", quantity: 1, unit: "summary" }],
     },
     intakeTemplate: "discovery",
-    routeMapTurnaroundLabel:
-      "Route recommendation within 2 business days after intake is complete.",
+    routeMapTurnaroundLabel: buildRouteMapTimingLabel("within 2 business days"),
   }),
   routeMapLaunchService({
     id: "rm-j002",
@@ -177,7 +178,8 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
     serviceClass: "core",
     priceCents: 40000,
     productionLane: "quick_turn",
-    purpose: "Social setup for one platform you already control.",
+    purpose:
+      "Social setup for one platform you already control. This service includes one platform. Additional platforms are available for $400 each.",
     deliverables: [
       "Profile image, bio/about, links/contact details, cover where applicable",
       "One first post prepared for you to publish from your account",
@@ -187,11 +189,11 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       "No ads, DMs, comments, or ongoing management",
       "Client must already control the account",
     ],
-    revisionRule: "One revision round on profile setup.",
+    revisionRule: ROUTE_MAP_REVISION_TEMPLATE,
     clientResponsibilities: [
-      "Platform login access or admin invite",
-      "Logo and brand assets",
-      "Accurate business info, links, and hours",
+      "Provide platform login access or send an admin invite",
+      "Provide your logo and brand assets",
+      "Confirm your business information, links, and hours are accurate",
     ],
     executionMode: "managed_execution_when_selected",
     deliveryMapping: {
@@ -200,7 +202,7 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "social_profile_setup", quantity: 1, unit: "platform" }],
     },
     intakeTemplate: "social-setup",
-    routeMapTurnaroundLabel: "First draft within 3 business days after intake is complete.",
+    routeMapTurnaroundLabel: buildRouteMapTimingLabel("within 3 business days"),
     routeMapPriceDisplay: "$400 / platform",
   }),
   routeMapLaunchService({
@@ -289,11 +291,11 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       "No full website, payments, booking system, logins, CRM forms, databases, custom coding, or ongoing maintenance",
       "One page, one purpose, one action",
     ],
-    revisionRule: "One revision round on page content and layout direction.",
+    revisionRule: ROUTE_MAP_REVISION_TEMPLATE,
     clientResponsibilities: [
-      "Accurate offer, pricing, dates, and links",
-      "Brand assets and required legal language",
-      "Approval before publish",
+      "Provide accurate offer details, pricing, dates, and links",
+      "Provide brand assets and any required legal language",
+      "Approve the page before it publishes",
     ],
     executionMode: "creation_delivery",
     deliveryMapping: {
@@ -301,7 +303,7 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "campaign_landing_page", quantity: 1, unit: "page" }],
     },
     intakeTemplate: "page",
-    routeMapTurnaroundLabel: "First draft within 5 business days after intake is complete.",
+    routeMapTurnaroundLabel: buildRouteMapTimingLabel("within 5 business days"),
   }),
   routeMapLaunchService({
     id: "rm-j006",
@@ -351,14 +353,17 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       "Verify it is current",
     ],
     exclusions: [
-      "No broad redesign, new campaign direction, multiple locations, or fix everything",
+      "No broad redesign",
+      "No new campaign direction",
+      "No multiple locations in one job",
+      "No general troubleshooting beyond the named item",
     ],
-    revisionRule: "One revision round on the update.",
+    revisionRule: ROUTE_MAP_REVISION_TEMPLATE,
     clientResponsibilities: [
-      "Link or file for the existing promotion",
-      "Exact changes needed",
-      "Platform access if republishing is included",
-      "Approval before publish",
+      "Provide the link or file for the existing promotion",
+      "Tell us exactly what changes are needed",
+      "Provide platform access if we are republishing it",
+      "Approve the update before it publishes",
     ],
     executionMode: "managed_execution_when_selected",
     deliveryMapping: {
@@ -367,7 +372,7 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "promotion_update", quantity: 1, unit: "item" }],
     },
     intakeTemplate: "update",
-    routeMapTurnaroundLabel: "First draft within 2 business days after intake is complete.",
+    routeMapTurnaroundLabel: buildRouteMapTimingLabel("within 2 business days"),
   }),
   routeMapLaunchService({
     id: "rm-j008",
@@ -390,11 +395,11 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       "Multiple platforms in one job",
       "Account recovery",
     ],
-    revisionRule: "One revision round on profile updates.",
+    revisionRule: ROUTE_MAP_REVISION_TEMPLATE,
     clientResponsibilities: [
-      "Platform login access",
-      "Updated business info and brand assets",
-      "Approval before changes go live",
+      "Provide platform login access",
+      "Provide updated business information and brand assets",
+      "Approve the changes before they go live",
     ],
     executionMode: "managed_execution_when_selected",
     deliveryMapping: {
@@ -403,6 +408,6 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       items: [{ key: "profile_update", quantity: 1, unit: "platform" }],
     },
     intakeTemplate: "social-setup",
-    routeMapTurnaroundLabel: "First draft within 3 business days after intake is complete.",
+    routeMapTurnaroundLabel: buildRouteMapTimingLabel("within 3 business days"),
   }),
 ] as const;

@@ -11,6 +11,7 @@
 
 import type { CatalogV2ServiceEntry } from "@/catalog/v2/types";
 import { CATALOG_V2_DRAFT_SCHEMA_VERSION } from "@/catalog/v2/types";
+import { buildRouteMapTimingLabel } from "@/catalog/route-map-shared-copy";
 
 export const CATALOG_V2_BATCH2_READY_TO_USE_BATCH_ID = "batch2-ready-to-use" as const;
 export const CATALOG_V2_BATCH2_ADDONS_BATCH_ID = "batch2-addons" as const;
@@ -22,16 +23,23 @@ export const CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE = "approved public V1 price 
 export const CATALOG_V2_BATCH2_DELIVERY_RULE =
   "The Studio creates the finished deliverable. The client sends, uploads, prints, posts, or distributes it unless they separately buy a clearly scoped post/publish add-on.";
 
-export const CATALOG_V2_BATCH2_RTU_CLIENT_RESPONSIBILITY =
-  "Client sends, uploads, posts, or distributes delivered files through their own platform, account, or tools unless they separately purchase a scoped post/publish add-on.";
+export const CATALOG_V2_BATCH2_RTU_CLIENT_RESPONSIBILITY: readonly string[] = [
+  "Send, upload, post, or distribute delivered files through your own platform, account, or tools unless you separately purchase a scoped post/publish add-on.",
+];
 
 /** Required email-kit client responsibility — list, consent, sending, and replies stay with client. */
-export const CATALOG_V2_BATCH2_EMAIL_CLIENT_RESPONSIBILITY =
-  "Client is responsible for their own audience/list, consent, sending account, replies, opt-outs, and all customer communication; client sends delivered campaign files through their own email platform.";
+export const CATALOG_V2_BATCH2_EMAIL_CLIENT_RESPONSIBILITY: readonly string[] = [
+  "Provide and maintain your own email list and sending account",
+  "Handle consent, opt-outs, and customer communication",
+  "Send the finished emails through your own email platform",
+];
 
 /** Required SMS-kit client responsibility — list, consent, sending, and replies stay with client. */
-export const CATALOG_V2_BATCH2_SMS_CLIENT_RESPONSIBILITY =
-  "Client is responsible for their own audience/list, consent, sending account, replies, opt-outs, and all customer communication; client sends delivered message files through their own SMS platform.";
+export const CATALOG_V2_BATCH2_SMS_CLIENT_RESPONSIBILITY: readonly string[] = [
+  "Provide and maintain your own contact list and sending account",
+  "Handle consent, opt-outs, and customer communication",
+  "Send the finished messages through your own SMS platform",
+];
 
 type Batch2BaseOverrides = {
   priceCents?: number | null;
@@ -43,7 +51,7 @@ type Batch2BaseOverrides = {
   placement?: CatalogV2ServiceEntry["placement"];
   laneEligibility?: CatalogV2ServiceEntry["laneEligibility"];
   turnaroundApprovalStatus?: CatalogV2ServiceEntry["turnaroundApprovalStatus"];
-  clientResponsibilityAfterDelivery?: string;
+  clientResponsibilities?: readonly string[];
   scopeRoutingNote?: string;
   deliveryType?: CatalogV2ServiceEntry["deliveryType"];
   draftBatch?: string;
@@ -68,7 +76,7 @@ function batch2ReadyToUseBase(
     | "batchLaunchCandidate"
     | "launchSetStatus"
     | "deliveryRule"
-    | "clientResponsibilityAfterDelivery"
+    | "clientResponsibilities"
     | "turnaroundApprovalStatus"
     | "priceCents"
     | "priceNote"
@@ -90,7 +98,7 @@ function batch2ReadyToUseBase(
     batchLaunchCandidate: true,
     launchSetStatus: "launch_candidate",
     deliveryRule: CATALOG_V2_BATCH2_DELIVERY_RULE,
-    clientResponsibilityAfterDelivery: CATALOG_V2_BATCH2_RTU_CLIENT_RESPONSIBILITY,
+    clientResponsibilities: CATALOG_V2_BATCH2_RTU_CLIENT_RESPONSIBILITY,
     turnaroundApprovalStatus: "proposed",
     priceCents: null,
     priceNote: "no approved price yet",
@@ -115,7 +123,7 @@ function batch2PostPublishAddonBase(
     | "batchLaunchCandidate"
     | "launchSetStatus"
     | "deliveryRule"
-    | "clientResponsibilityAfterDelivery"
+    | "clientResponsibilities"
     | "turnaroundApprovalStatus"
     | "priceCents"
     | "priceNote"
@@ -140,8 +148,9 @@ function batch2PostPublishAddonBase(
     launchSetStatus: "held_broad_overlap",
     deliveryRule:
       "Add-on only — schedules or publishes included approved deliverables from an eligible parent social or video job on one connected client-owned platform when purchased together.",
-    clientResponsibilityAfterDelivery:
+    clientResponsibilities: [
       "Client provides connected platform access, timely approval before publish, and remains responsible for account activity, comments, DMs, analytics, and compliance after publish.",
+    ],
     turnaroundApprovalStatus: "proposed",
     priceCents: null,
     priceNote: "no approved price yet",
@@ -173,7 +182,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     laneEligibility: ["i20", "random-exit"],
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-email-kit",
-    clientResponsibilityAfterDelivery: CATALOG_V2_BATCH2_EMAIL_CLIENT_RESPONSIBILITY,
+    clientResponsibilities: CATALOG_V2_BATCH2_EMAIL_CLIENT_RESPONSIBILITY,
     scopeRoutingNote:
       "Automation, segmentation, list building, monthly batches, or more than two emails route to Help Me Figure Out What I Need (rm-j001), not into this SKU.",
     includedDeliverables: [
@@ -205,7 +214,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "More than one revision round",
     ],
     revisionLimit: 1,
-    turnaround: "Usually within 3–5 business days after intake is complete.",
+    turnaround: buildRouteMapTimingLabel("within 3–5 business days"),
     billingType: "one_time",
     sourceLaunchStatus: "active",
     productionLane: "standard_build",
@@ -236,7 +245,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     laneEligibility: ["i20", "random-exit"],
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-sms-kit",
-    clientResponsibilityAfterDelivery: CATALOG_V2_BATCH2_SMS_CLIENT_RESPONSIBILITY,
+    clientResponsibilities: CATALOG_V2_BATCH2_SMS_CLIENT_RESPONSIBILITY,
     scopeRoutingNote:
       "MMS, automation, monthly batches, consent setup, or more than four messages route to Help Me Figure Out What I Need (rm-j001), not into this SKU.",
     includedDeliverables: [
@@ -273,7 +282,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "More than one revision round",
     ],
     revisionLimit: 1,
-    turnaround: "Usually within 2–3 business days after intake is complete.",
+    turnaround: buildRouteMapTimingLabel("within 2–3 business days"),
     billingType: "one_time",
     sourceLaunchStatus: "paused",
     productionLane: "quick_turn",
@@ -300,8 +309,11 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-voice",
-    clientResponsibilityAfterDelivery:
-      "Client provides approved details and facts for the script and is responsible for pronunciation accuracy, claims, and rights; client uploads, embeds, or distributes the delivered audio file through their own tools.",
+    clientResponsibilities: [
+      "Provide approved details and facts for the script",
+      "Confirm pronunciation, claims, and usage rights are accurate",
+      "Upload, embed, or distribute the finished audio yourself",
+    ],
     scopeRoutingNote:
       "Visual/motion pieces, posting, multiple platforms, or scope beyond one short voice track route to Help Me Figure Out What I Need (rm-j001) or rm-j006 patterns, not into this SKU.",
     includedDeliverables: [
@@ -337,7 +349,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "More than one revision round",
     ],
     revisionLimit: 1,
-    turnaround: "Usually within 2–3 business days after intake is complete.",
+    turnaround: buildRouteMapTimingLabel("within 2–3 business days"),
     billingType: "one_time",
     sourceLaunchStatus: "active",
     productionLane: "quick_turn",
@@ -364,8 +376,10 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-short-video",
-    clientResponsibilityAfterDelivery:
-      "Client supplies usable organized footage, photos, logo, and source materials when using client visuals; client uploads, posts, or distributes the delivered MP4 through their own platform unless they separately purchase post/publish add-on with this job.",
+    clientResponsibilities: [
+      "Provide organized, usable footage, photos, logo, and source materials when using your own visuals",
+      "Upload, post, or distribute the finished video yourself unless you add Post/Publish for Me to this job",
+    ],
     scopeRoutingNote:
       "On-site filming, multiple cuts/aspect ratios, videos longer than 45 seconds, paid placement, or posting scope route to Help Me Figure Out What I Need (rm-j001) or rm-j004 patterns, not into this SKU.",
     includedDeliverables: [
@@ -392,13 +406,13 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "Video longer than 45 seconds",
       "Music licensing outside approved tools",
       "Paid ads, placement, or influencer work",
-      "Posting, publishing, or scheduling (unless post/publish add-on purchased with this job)",
+      "Posting, publishing, or scheduling",
       "Ongoing edits or daily content",
       "Performance guarantees",
       "More than one revision round",
     ],
     revisionLimit: 1,
-    turnaround: "Usually within 3–5 business days after intake is complete.",
+    turnaround: buildRouteMapTimingLabel("within 3–5 business days"),
     billingType: "one_time",
     sourceLaunchStatus: "paused",
     productionLane: "complex_build",
