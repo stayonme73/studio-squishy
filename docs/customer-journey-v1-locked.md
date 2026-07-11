@@ -26,7 +26,7 @@
 | 3 | Secure Checkout | Payment | `/payment` | Three-column checkout UI archived; route unchanged |
 | 4 | Project Discovery | Discovery Room | `/business-discovery-studio` | `/project-discovery` alias redirect |
 | 5 | Studio Board | Studio Board | `/studio-board` | |
-| 6 | Project Record | Campaign Record | `/studio-board?record=open` | `/campaign-details` redirects here |
+| 6 | Project Record | Campaign Record | `/campaign-details` | Canonical since Package 1 completion (2026-07-11); `/studio-board?record=open` drawer kept temporarily for compatibility — see `AGENTS.md` |
 | 7 | Review Room | Review Room | `/review-room` | `/feedback-studio` remains production review UI |
 | 8 | Final Delivery | Final Delivery | `/deliverables` | |
 | 9 | Help Center | Help Center | `/help-center` | |
@@ -75,7 +75,6 @@ Do **not** delete — move to `src/archive/` and document here.
 | `/project-discovery` | `/business-discovery-studio` |
 | `/business_discovery_studio` | `/business-discovery-studio` |
 | `/studio-guide` | `/studio-guide-prototype` |
-| `/campaign-details` | `/studio-board?record=open` |
 | `/draft-room/begin` | `/business-discovery-studio` |
 | `/draft-room` | `/business-discovery-studio` |
 | `/intake` | `/business-discovery-studio` |

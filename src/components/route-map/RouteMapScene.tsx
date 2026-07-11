@@ -39,6 +39,7 @@ import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
 import { CAMPAIGN_SYNC_EVENT, type CampaignSyncStatus } from "@/lib/campaign-store/types";
 import { readCampaignSyncStatus } from "@/lib/campaign-store/sync-client";
 import { markPaymentReceived, readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
+import { projectRecordArrivalHref } from "@/lib/project-record-arrival";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 import { resolveSquishyRouteMapMessage } from "@/lib/route-map-squishy";
 import type { RouteMapJourneyStep } from "@/config/studio-board";
@@ -222,7 +223,7 @@ export default function RouteMapScene() {
     (answers: RouteMapIntakeAnswers) => {
       const updated = submitRouteMapIntake(answers);
       if (!updated) return;
-      router.push(`${studioBoard.routes.studioBoard}?record=open`);
+      router.push(projectRecordArrivalHref(studioBoard.routes.campaignDetails));
     },
     [router],
   );

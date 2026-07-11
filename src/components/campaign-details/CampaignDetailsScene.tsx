@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import CopyCampaignBriefButton from "@/components/campaign-details/CopyCampaignBriefButton";
 import CampaignBriefActions from "@/components/campaign-details/CampaignBriefActions";
 import CampaignJourneyHero from "@/components/campaign-details/CampaignJourneyHero";
 import CampaignVisionSummary from "@/components/campaign-details/CampaignVisionSummary";
+import ProjectDetailsSummaryPanel from "@/components/campaign-details/ProjectDetailsSummaryPanel";
+import { RouteMapClientSummaryPanel } from "@/components/route-map/RouteMapIntakeSummaryPanels";
 import HelpCenterLink from "@/components/shared/HelpCenterLink";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
@@ -15,10 +18,22 @@ import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus
 import { helpCenter } from "@/config/help-center";
 import { studioBoard } from "@/config/studio-board";
 import { resolveCampaignDetailsView } from "@/lib/campaign-details-view";
+import {
+  PROJECT_RECORD_ARRIVAL_PARAM,
+  shouldShowProjectRecordArrival,
+} from "@/lib/project-record-arrival";
+import { resolveProjectStatusPanelState } from "@/lib/project-record-status";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
+import { useProjectJobStatus } from "@/lib/use-project-job-status";
 
 const { campaignDetails: copy, routes } = studioBoard;
 const { campaignLinks } = helpCenter;
+
+function formatStatusDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+}
 
 function OverviewRow({ label, value }: { label: string; value: string }) {
   return (
@@ -59,10 +74,32 @@ function StudioUpdatesSection({ updates }: { updates: readonly { date: string; m
 
 /** Campaign Details — campaign record only (reference content lives in Help Center). */
 export default function CampaignDetailsScene() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { campaign, ready } = useCurrentCampaign();
   const view = useMemo(() => resolveCampaignDetailsView(campaign), [campaign]);
   const showPaymentHelp =
     view.status === "DRAFT_RECEIVED" || view.status === "PAYMENT_RECEIVED";
+  // No customer-safe status call before payment — there is nothing to fetch yet.
+  const { jobs: projectJobs, loading: projectJobsLoading, error: projectJobsError } =
+    useProjectJobStatus(campaign?.paymentReceivedAt ? campaign.campaignId : undefined);
+  const statusCopy = copy.projectStatusCopy;
+  const projectStatusState = resolveProjectStatusPanelState({
+    paymentReceivedAt: campaign?.paymentReceivedAt,
+    loading: projectJobsLoading,
+    error: projectJobsError,
+    jobs: projectJobs,
+  });
+
+  const [showArrival, setShowArrival] = useState(false);
+  useEffect(() => {
+    const param = searchParams.get(PROJECT_RECORD_ARRIVAL_PARAM);
+    if (!shouldShowProjectRecordArrival(param, campaign?.paymentReceivedAt)) return;
+    if (!ready) return;
+
+    setShowArrival(true);
+    router.replace(routes.campaignDetails, { scroll: false });
+  }, [searchParams, router, ready, campaign?.paymentReceivedAt]);
 
   if (!ready) {
     return (
@@ -108,6 +145,7 @@ export default function CampaignDetailsScene() {
           backHref={routes.studioBoard}
           activeNav="campaign-details"
           title={copy.pageTitle}
+          lead={copy.lead}
           helpCenterFrom="campaign-details"
           aside={
             <CampaignJourneyMap
@@ -117,6 +155,12 @@ export default function CampaignDetailsScene() {
             />
           }
         />
+
+        {showArrival ? (
+          <div className="cd-arrival" role="status" aria-live="polite">
+            <p className="cd-arrival__message">{copy.arrival.message}</p>
+          </div>
+        ) : null}
 
       <div className="utility-grid cd-grid">
         <section
@@ -149,6 +193,44 @@ export default function CampaignDetailsScene() {
         </section>
 
         <section
+          className="utility-card cd-card--project-status"
+          aria-labelledby="cd-project-status-title"
+        >
+          <h2 id="cd-project-status-title" className="utility-card__title">
+            {copy.sections.projectStatus}
+          </h2>
+          <p className="cd-journey__lead">{statusCopy.lead}</p>
+          {projectStatusState.kind === "pending-payment" ? (
+            <p className="cd-updates__hint">{statusCopy.pendingPayment}</p>
+          ) : projectStatusState.kind === "loading" ? (
+            <p className="cd-updates__hint">{statusCopy.loading}</p>
+          ) : projectStatusState.kind === "error" ? (
+            <p className="cd-updates__hint" role="alert">
+              {statusCopy.error}
+            </p>
+          ) : projectStatusState.kind === "empty" ? (
+            <p className="cd-updates__hint">{statusCopy.empty}</p>
+          ) : (
+            <dl className="cd-overview">
+              {projectStatusState.jobs.map((job) => (
+                <div key={job.jobId} className="cd-overview__row">
+                  <dt className="cd-overview__label">{job.serviceName}</dt>
+                  <dd className="cd-overview__value">
+                    {job.statusLabel}
+                    {job.isWaitingOnClient ? ` — ${statusCopy.waitingOnYou}` : ""}
+                    {job.deliveredAt
+                      ? ` — ${statusCopy.deliveredOn} ${formatStatusDate(job.deliveredAt)}`
+                      : job.clientDeadline
+                        ? ` — ${statusCopy.requiredBy} ${formatStatusDate(job.clientDeadline)}`
+                        : ""}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </section>
+
+        <section
           className="utility-card cd-card--vision"
           aria-labelledby="cd-vision-title"
         >
@@ -176,6 +258,30 @@ export default function CampaignDetailsScene() {
             />
           ))}
         </section>
+
+        {view.hasProjectDetailsSummary ? (
+          <section
+            className="utility-card cd-card--project-details"
+            aria-labelledby="cd-project-details-title"
+          >
+            <h2 id="cd-project-details-title" className="utility-card__title">
+              Project Details
+            </h2>
+            <ProjectDetailsSummaryPanel sections={view.projectDetailsSummary} />
+          </section>
+        ) : null}
+
+        {view.hasRouteMapClientSummary && view.routeMapClientSummary ? (
+          <section
+            className="utility-card cd-card--route-map-summary"
+            aria-labelledby="cd-route-map-summary-title"
+          >
+            <h2 id="cd-route-map-summary-title" className="utility-card__title">
+              What You Told Us
+            </h2>
+            <RouteMapClientSummaryPanel summary={view.routeMapClientSummary} />
+          </section>
+        ) : null}
 
         {view.revisionTracker ? (
           <section

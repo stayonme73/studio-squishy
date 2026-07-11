@@ -1,6 +1,12 @@
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
-/** Campaign Details consolidated into Studio Board Campaign Record drawer. */
+import CampaignDetailsScene from "@/components/campaign-details/CampaignDetailsScene";
+
+/** Project Record — the customer's post-purchase home for managing a paid project. */
 export default function CampaignDetailsPage() {
-  redirect("/studio-board?record=open");
+  return (
+    <Suspense>
+      <CampaignDetailsScene />
+    </Suspense>
+  );
 }

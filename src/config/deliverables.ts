@@ -1,6 +1,7 @@
 /** Final Delivery V1 — copy, assets, and mock deliverable templates. */
 
 import type { NoActiveProjectCopy } from "@/config/access-control";
+import { studioBoard } from "@/config/studio-board";
 import type { DeliverableScopeSection } from "@/lib/deliverable-scope";
 import { scopeIncludesSection } from "@/lib/deliverable-scope";
 
@@ -17,7 +18,7 @@ export const deliverables = {
 
   routes: {
     studioBoard: "/studio-board",
-    campaignDetails: "/studio-board?record=open",
+    campaignDetails: studioBoard.routes.campaignDetails,
     reviewRoom: "/feedback-studio",
     deliverables: "/deliverables",
     draftRoom: "/route-map",

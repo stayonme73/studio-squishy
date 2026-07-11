@@ -8,6 +8,7 @@ import {
   type KitchenAction,
   type KitchenCampaign,
 } from "@/config/studio-kitchen";
+import { studioBoard } from "@/config/studio-board";
 
 export const KITCHEN_FILE_BUCKET_IDS = [
   "intake-received",
@@ -56,7 +57,7 @@ export const kitchenFileBuckets: KitchenFileBucketDefinition[] = [
     ownerAction: true,
     movesTo: "needs-concepts",
     actions: [
-      { label: "Open Campaign Brief", href: "/studio-board?record=open" },
+      { label: "Open Campaign Brief", href: studioBoard.routes.campaignDetails },
       { label: "Copy Campaign Brief", phase1Stub: true },
       { label: "Send to ChatGPT", phase1Stub: true },
     ],

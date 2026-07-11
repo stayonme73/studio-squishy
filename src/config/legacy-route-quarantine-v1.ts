@@ -14,7 +14,12 @@ export const legacyRouteQuarantineV1 = {
   activeFrontDoor: ROUTE_MAP_HREF,
   activeIntake: ROUTE_MAP_INTAKE_STEP_HREF,
   activeStudioBoard: "/studio-board",
-  activeProjectRecord: "/studio-board?record=open",
+  /**
+   * Canonical Project Record is /campaign-details (customerJourneyV1's "project-record" step).
+   * Kept as a literal here, not an import, because customer-journey-v1.ts already imports this
+   * file — importing studio-board.ts back would create a cycle. Keep in sync by hand.
+   */
+  activeProjectRecord: "/campaign-details",
   activeReviewRoom: "/feedback-studio",
   activeFinalDelivery: "/deliverables",
   /** Retired client surfaces — direct navigation redirects here. */

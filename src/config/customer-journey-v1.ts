@@ -59,7 +59,7 @@ export const customerJourneyV1 = {
       id: "project-record",
       name: "Project Record",
       formerName: "Campaign Record",
-      route: "/studio-board?record=open",
+      route: "/campaign-details",
     },
     {
       order: 7,

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import CampaignBriefActions from "@/components/campaign-details/CampaignBriefActions";
@@ -166,6 +166,7 @@ function CampaignMetric({ label, value }: { label: string; value: ReactNode }) {
 
 /** Studio Board V4 — six-panel dashboard; only panel content changes by status. */
 export default function StudioBoardScene() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { campaign, ready, accessState, refresh } = useCurrentCampaign();
   const greetingPeriod = useLiveGreetingPeriod();
@@ -300,7 +301,7 @@ export default function StudioBoardScene() {
               {view.hasCampaign && boardCampaign ? (
                 <CampaignBriefActions
                   campaign={boardCampaign}
-                  onViewBrief={() => setRecordOpen(true)}
+                  onViewBrief={() => router.push(studioBoard.routes.campaignDetails)}
                   className="sb-current-campaign__brief-actions"
                   layout="stack"
                   prominent

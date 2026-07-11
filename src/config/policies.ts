@@ -1,5 +1,7 @@
 /** Studio policies & FAQ — single source for Help Center (and contextual links elsewhere). */
 
+import { studioBoard } from "@/config/studio-board";
+
 export type PolicyContentBlock =
   | { kind: "p"; text: string }
   | { kind: "ul"; intro?: string; items: readonly string[] };
@@ -556,6 +558,6 @@ export const studioPolicies = {
 
   routes: {
     creativeRoom: "/review-room",
-    campaignHistory: "/studio-board?record=open",
+    campaignHistory: studioBoard.routes.campaignDetails,
   },
 } as const;

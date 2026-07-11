@@ -5,11 +5,11 @@ import { useCallback, useEffect, useRef } from "react";
 
 import CopyCampaignBriefButton from "@/components/campaign-details/CopyCampaignBriefButton";
 import CampaignVisionSummary from "@/components/campaign-details/CampaignVisionSummary";
+import ProjectDetailsSummaryPanel from "@/components/campaign-details/ProjectDetailsSummaryPanel";
 import { RouteMapClientSummaryPanel } from "@/components/route-map/RouteMapIntakeSummaryPanels";
 import { studioBoard } from "@/config/studio-board";
 import { resolveCampaignDetailsView } from "@/lib/campaign-details-view";
 import { draftRoomEditHref, isIntakeEditable } from "@/lib/intake-edit";
-import { isRecordEmptyAnswer } from "@/lib/project-record-client-copy";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 import { useFinalDelivery } from "@/lib/use-final-delivery";
 
@@ -20,7 +20,13 @@ type Props = {
   onClose: () => void;
 };
 
-/** Read-only archive of customer intake — replaces Campaign Details page. */
+/**
+ * COMPATIBILITY SURFACE — not the canonical Project Record.
+ * /campaign-details (CampaignDetailsScene) is now the customer's canonical post-purchase home.
+ * This drawer stays temporarily for existing `?record=open` deep links and internal/legacy
+ * access until every caller is migrated (Package 1 completion, see AGENTS.md). Do not add new
+ * customer-facing navigation that opens this drawer — point new links at /campaign-details.
+ */
 export default function CampaignRecordDrawer({ open, onClose }: Props) {
   const { campaign } = useCurrentCampaign();
   const { delivery: finalDelivery } = useFinalDelivery(campaign?.campaignId);
@@ -116,25 +122,7 @@ export default function CampaignRecordDrawer({ open, onClose }: Props) {
           {view.hasProjectDetailsSummary ? (
             <div className="sb-record-drawer__project-details">
               <h3 className="sb-record-drawer__section-title">Project Details</h3>
-              {view.projectDetailsSummary.map((section) => (
-                <article key={section.title} className="cd-vision__section">
-                  <p className="cd-vision__eyebrow">{section.title}</p>
-                  <div className="cd-vision__answers">
-                    {section.items.map((item) => (
-                      <div key={`${section.title}-${item.label}`} className="cd-vision__answer">
-                        <p className="cd-vision__label">{item.label}</p>
-                        <p
-                          className={`cd-vision__value${
-                            isRecordEmptyAnswer(item.value) ? " cd-vision__value--empty" : ""
-                          }`}
-                        >
-                          {item.value}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </article>
-              ))}
+              <ProjectDetailsSummaryPanel sections={view.projectDetailsSummary} />
             </div>
           ) : null}
           {view.hasRouteMapClientSummary && view.routeMapClientSummary ? (

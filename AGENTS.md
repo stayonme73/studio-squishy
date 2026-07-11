@@ -65,7 +65,7 @@ Customer-facing room names and routes are frozen in `src/config/customer-journey
 | Project Summary | `/project-summary` (post-discovery bridge) |
 | Project Details | `/project-details` (post-payment intake) |
 | Studio Board | `/studio-board` |
-| Project Record | `/studio-board?record=open` |
+| Project Record | `/campaign-details` |
 | Review Room | `/review-room` |
 | Final Delivery | `/deliverables` |
 | Help Center | `/help-center` |
@@ -89,7 +89,7 @@ Use these **customer-facing** names in UI copy, navigation, and metadata. Intern
 | 3 | Secure Checkout | Payment | `/payment` |
 | 4 | Project Discovery | Discovery Room | `/business-discovery-studio` |
 | 5 | Studio Board | Studio Board | `/studio-board` |
-| 6 | Project Record | Campaign Record | `/studio-board?record=open` |
+| 6 | Project Record | Campaign Record | `/campaign-details` |
 | 7 | Review Room | Review Room | `/review-room` |
 | 8 | Final Delivery | Final Delivery | `/deliverables` |
 | 9 | Help Center | Help Center | `/help-center` |
