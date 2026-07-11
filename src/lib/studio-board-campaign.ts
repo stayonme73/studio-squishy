@@ -14,6 +14,7 @@ import {
   visionDataHasContent,
 } from "@/lib/campaign-vision";
 import { visionDataFromPayload } from "@/lib/campaign-record";
+import { seedCustomerFieldTokensFromProjectDetails } from "@/lib/customer-field-tokens";
 import { isIntakeEditable } from "@/lib/intake-edit";
 import {
   CAMPAIGN_STATUSES,
@@ -370,6 +371,7 @@ export function submitProjectDetails(
     updatedAt: now,
   };
 
+  updated = seedCustomerFieldTokensFromProjectDetails(updated);
   updated = enterBuildingConcepts(updated);
   updated = pushStudioNote(updated, "Project Details received.");
   clearProjectDetailsDraft(existing.campaignId);

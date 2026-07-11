@@ -30,6 +30,7 @@ type FileSelectionState = {
 
 type MaterialsIntakePanelProps = {
   campaign: CampaignRecord;
+  onSubmitted?: () => void;
 };
 
 const MATERIALS_IMAGE_PREVIEW_MAX_BYTES = 5 * 1024 * 1024;
@@ -173,7 +174,7 @@ function SubmitFields({
   );
 }
 
-export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelProps) {
+export default function MaterialsIntakePanel({ campaign, onSubmitted }: MaterialsIntakePanelProps) {
   const [data, setData] = useState<MaterialsClientResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -313,6 +314,7 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
       setData(json);
       setSuccessId(request.id);
       window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
+      onSubmitted?.();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Submit failed.");
     } finally {
@@ -339,6 +341,7 @@ export default function MaterialsIntakePanel({ campaign }: MaterialsIntakePanelP
       setData(json);
       setSuccessId(request.id);
       window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
+      onSubmitted?.();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Submit failed.");
     } finally {

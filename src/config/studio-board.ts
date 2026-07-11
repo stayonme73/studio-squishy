@@ -158,6 +158,8 @@ export type CampaignRecord = {
   deliverablesDelivered?: DeliverablesDelivered;
   /** Persisted notes; falls back to statusContent when absent */
   studioNotes?: StudioUpdate[];
+  /** Monotonic revision tokens for direct-apply customer fields (Package 2). */
+  customerFieldTokens?: import("@/lib/customer-field-tokens").CustomerFieldTokenMap;
   createdAt: string;
   updatedAt: string;
 };
@@ -741,6 +743,7 @@ export const studioBoard = {
     sections: {
       overview: "Project Overview",
       projectStatus: "Project Status",
+      projectActivity: "Project Activity",
       visionSummary: "Vision Summary",
       revisionTracker: "Revision Tracker",
       packageDetails: "Package Includes",
@@ -760,6 +763,32 @@ export const studioBoard = {
       loading: "Checking your project status...",
       error: "We couldn't load your project status right now. Try refreshing the page.",
       empty: "No purchased services yet.",
+    },
+    informationUpdate: {
+      title: "Information Update",
+      lead: "Request a correction that does not change your services, deliverables, quantity, price, or schedule.",
+      prompt: "What would you like to update?",
+      newValueLabel: "Requested new value",
+      noteLabel: "Additional note (optional)",
+      scopeDisclaimer:
+        "I understand this request is for a lightweight correction and does not change services, deliverables, quantity, price, refund, or schedule.",
+      reviewLabel: "Review request",
+      reviewHint: "Nothing is applied until The Studio reviews and confirms this request.",
+      submitLabel: "Submit request",
+      submittingLabel: "Submitting...",
+      submitLabelMaterials: "Use materials form",
+      requestReceived: "Request received.",
+      backLabel: "Back",
+      activityEmpty: "Project activity will appear here as your project progresses.",
+    },
+    squishy: {
+      title: "Ask Squishy",
+      lead: "Squishy can explain your project status or guide a lightweight information update. Squishy does not apply changes directly.",
+      prompt: "What would you like to know or update?",
+      placeholder: "For example: What is my project status? Can I change my approver email?",
+      askLabel: "Ask Squishy",
+      continueLabel: "Continue",
+      askAnotherLabel: "Ask another question",
     },
     overviewLabels: {
       name: "Campaign Name",

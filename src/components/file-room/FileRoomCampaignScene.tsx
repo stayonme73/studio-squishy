@@ -6,6 +6,7 @@ import type { FileRoomExceptionOperatorContext } from "@/lib/campaign-tasks/exce
 import type { FileRoomCampaignView } from "@/lib/file-room-view";
 import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 
+import FileRoomCustomerRequestsSection from "./FileRoomCustomerRequestsSection";
 import FileRoomExceptionsSection from "./FileRoomExceptionsSection";
 import FileRoomMaterialsSection from "./FileRoomMaterialsSection";
 import FileRoomProductionTasksSection from "./FileRoomProductionTasksSection";
@@ -136,6 +137,11 @@ export default function FileRoomCampaignScene({
               ))}
             </FileRoomSectionCard>
           ) : null}
+
+          <FileRoomCustomerRequestsSection
+            campaignId={campaignId}
+            canReview={canReviewMaterials}
+          />
 
           <FileRoomMaterialsSection
             campaignId={campaignId}

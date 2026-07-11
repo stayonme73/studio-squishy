@@ -28,6 +28,7 @@ import { syncMaterialsSummaryOnCampaign } from "@/lib/materials/campaign-summary
 import { resolveMaterialsApiPayload } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials, writeMaterialsEnvelope } from "@/lib/materials/store";
 import type { MaterialReviewStatus } from "@/lib/materials/types";
+import { appendMaterialActivityEvent } from "@/lib/project-activity/actions";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
@@ -197,6 +198,45 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const saved = await writeMaterialsEnvelope(result.envelope);
+
+  if (body.action === "client_submit" || body.action === "client_submit_consolidated") {
+    const sourceId = `${submittedItemIds.join(",")}:${saved.version}`;
+    await appendMaterialActivityEvent({
+      campaignId,
+      kind: "material_submitted",
+      sourceId,
+      headline: "File information sent",
+      detail: "We received your material submission.",
+      actor: {
+        role: user.roles.includes("client") ? "customer" : "staff",
+        userId: user.id,
+        displayName: user.displayName,
+      },
+    });
+  }
+
+  if (body.action === "team_review") {
+    const kind =
+      body.reviewStatus === "approved_for_use"
+        ? "material_approved"
+        : body.reviewStatus === "needs_clarification"
+          ? "material_needs_clarification"
+          : null;
+    if (kind) {
+      await appendMaterialActivityEvent({
+        campaignId,
+        kind,
+        sourceId: `${body.itemId}:${body.reviewStatus}:${saved.version}`,
+        headline:
+          kind === "material_approved" ? "Material approved" : "Material needs your update",
+        actor: {
+          role: "staff",
+          userId: user.id,
+          displayName: user.displayName,
+        },
+      });
+    }
+  }
 
   if (submittedItemIds.length > 0) {
     const tasksEnvelope = await getOrGenerateTasks(campaignId, campaignEnvelope.record);

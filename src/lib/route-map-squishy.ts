@@ -6,6 +6,7 @@
 
 import type { ServiceId } from "@/catalog/types";
 import type { RouteMapJourneyStep } from "@/config/studio-board";
+import type { SquishyMessage } from "@/lib/squishy/types";
 
 export type RouteMapSquishyStep = "map" | RouteMapJourneyStep;
 
@@ -30,9 +31,8 @@ export type SquishyRouteMapMessageKey =
   | "restored-journey"
   | "paid-project-protected";
 
-export type SquishyRouteMapMessage = {
+export type SquishyRouteMapMessage = SquishyMessage & {
   key: SquishyRouteMapMessageKey;
-  text: string;
 };
 
 export const SQUISHY_ROUTE_MAP_COPY: Record<SquishyRouteMapMessageKey, string> = {

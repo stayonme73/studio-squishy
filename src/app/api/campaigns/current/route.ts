@@ -3,9 +3,11 @@ import { NextResponse } from "next/server";
 import {
   canReadCampaign,
   canSyncCurrentCampaign,
+  isClientUser,
   isInternalUser,
 } from "@/lib/campaign-store/access";
 import { FixtureCampaignBlockedError } from "@/lib/campaign-store/fixture-guard";
+import { mergeCustomerOwnedCampaignSync } from "@/lib/campaign-store/customer-sync-allowlist";
 import {
   readCampaignEnvelope,
   upsertCampaignRecord,
@@ -72,7 +74,15 @@ export async function PATCH(request: Request) {
       if (claim instanceof NextResponse) return claim;
     }
 
-    const envelope = await upsertCampaignRecord(record, user.roles.includes("client") ? user.id : undefined);
+    const existingEnvelope = await readCampaignEnvelope(record.campaignId);
+    const recordToUpsert = isClientUser(user)
+      ? mergeCustomerOwnedCampaignSync(existingEnvelope?.record ?? null, record)
+      : record;
+
+    const envelope = await upsertCampaignRecord(
+      recordToUpsert,
+      user.roles.includes("client") ? user.id : undefined,
+    );
     let updatedUser = user;
 
     if (user.currentCampaignId !== record.campaignId) {

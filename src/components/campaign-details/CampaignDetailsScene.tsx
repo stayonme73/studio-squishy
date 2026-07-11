@@ -10,6 +10,9 @@ import CampaignJourneyHero from "@/components/campaign-details/CampaignJourneyHe
 import CampaignVisionSummary from "@/components/campaign-details/CampaignVisionSummary";
 import ProjectDetailsSummaryPanel from "@/components/campaign-details/ProjectDetailsSummaryPanel";
 import { RouteMapClientSummaryPanel } from "@/components/route-map/RouteMapIntakeSummaryPanels";
+import InformationUpdateEntry from "@/components/campaign-details/InformationUpdateEntry";
+import ProjectRecordSquishy from "@/components/campaign-details/ProjectRecordSquishy";
+import ProjectActivityCard from "@/components/campaign-details/ProjectActivityCard";
 import HelpCenterLink from "@/components/shared/HelpCenterLink";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
@@ -25,6 +28,7 @@ import {
 import { resolveProjectStatusPanelState } from "@/lib/project-record-status";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 import { useProjectJobStatus } from "@/lib/use-project-job-status";
+import { useProjectActivity } from "@/lib/use-project-activity";
 
 const { campaignDetails: copy, routes } = studioBoard;
 const { campaignLinks } = helpCenter;
@@ -83,6 +87,13 @@ export default function CampaignDetailsScene() {
   // No customer-safe status call before payment — there is nothing to fetch yet.
   const { jobs: projectJobs, loading: projectJobsLoading, error: projectJobsError } =
     useProjectJobStatus(campaign?.paymentReceivedAt ? campaign.campaignId : undefined);
+  const {
+    events: activityEvents,
+    pendingCount,
+    loading: activityLoading,
+    error: activityError,
+    refresh: refreshActivity,
+  } = useProjectActivity(campaign?.campaignId, campaign?.paymentReceivedAt);
   const statusCopy = copy.projectStatusCopy;
   const projectStatusState = resolveProjectStatusPanelState({
     paymentReceivedAt: campaign?.paymentReceivedAt,
@@ -92,6 +103,39 @@ export default function CampaignDetailsScene() {
   });
 
   const [showArrival, setShowArrival] = useState(false);
+  const [squishyHasGreeted, setSquishyHasGreeted] = useState(false);
+
+  const squishySnapshot = useMemo(() => {
+    const revision = view.revisionTracker;
+    return {
+      paymentReceivedAt: campaign?.paymentReceivedAt ?? null,
+      justArrived: showArrival,
+      hasGreeted: squishyHasGreeted,
+      campaignStatusLabel: view.statusLabel,
+      pendingRequestCount: pendingCount,
+      revisionDataReady: revision !== null,
+      revisionIncluded: revision?.included ?? 0,
+      revisionUsed: revision?.used ?? 0,
+      revisionRemaining: revision?.remaining ?? 0,
+      projectStatusReady: projectStatusState === "loaded",
+      projectStatusError: Boolean(projectJobsError),
+      blockingMaterialsCount: campaign?.materialsSummary?.blockingRequiredCount ?? 0,
+      waitingOnClientJobCount: projectJobs.filter((job) => job.isWaitingOnClient).length,
+      jobStatusLabels: projectJobs.map((job) => `${job.serviceName} — ${job.statusLabel}`),
+    };
+  }, [
+    campaign?.paymentReceivedAt,
+    campaign?.materialsSummary?.blockingRequiredCount,
+    showArrival,
+    squishyHasGreeted,
+    view.statusLabel,
+    view.revisionTracker,
+    pendingCount,
+    projectJobs,
+    projectJobsError,
+    projectStatusState,
+  ]);
+
   useEffect(() => {
     const param = searchParams.get(PROJECT_RECORD_ARRIVAL_PARAM);
     if (!shouldShowProjectRecordArrival(param, campaign?.paymentReceivedAt)) return;
@@ -430,6 +474,30 @@ export default function CampaignDetailsScene() {
             />
           ))}
         </section>
+
+        {campaign && campaign.paymentReceivedAt ? (
+          <ProjectRecordSquishy
+            campaign={campaign}
+            snapshot={squishySnapshot}
+            activityEvents={activityEvents}
+            onActivityRefresh={refreshActivity}
+            onGreeted={() => {
+              setSquishyHasGreeted(true);
+            }}
+          />
+        ) : null}
+
+        {campaign && campaign.paymentReceivedAt ? (
+          <InformationUpdateEntry campaign={campaign} onSubmitted={() => void refreshActivity()} />
+        ) : null}
+
+        <ProjectActivityCard
+          events={activityEvents}
+          loading={activityLoading}
+          error={activityError}
+          title={copy.sections.projectActivity}
+          emptyCopy={copy.informationUpdate.activityEmpty}
+        />
 
         <StudioUpdatesSection updates={view.studioUpdates} />
 

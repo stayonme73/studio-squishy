@@ -14,6 +14,16 @@ export const fileRoom = {
   syncSourceLabel: "Source",
   syncSourceValue: "data/campaigns/",
   fixtureHiddenNote: "Fixture and test campaigns are hidden from this list.",
+  customerRequests: {
+    title: "Customer requests",
+    loading: "Loading customer requests...",
+    empty: "No open customer requests for this campaign.",
+    classifyInformationUpdate: "Classify — Information Update",
+    classifyProjectChange: "Classify — Project Change",
+    applyLabel: "Apply update",
+    rejectLabel: "Reject request",
+    rejectReasonLabel: "Reason for customer",
+  },
 } as const;
 
 export const FILE_ROOM_ROUTE = "/file-room";
