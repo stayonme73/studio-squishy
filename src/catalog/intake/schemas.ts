@@ -56,10 +56,10 @@ const POST_PUBLISH_INTAKE_FIELDS: readonly RouteMapIntakeField[] = [
 ];
 
 const RTU_PRINT_CLIENT_NOTE =
-  "You print and distribute finished files through your own printer or channels unless Post/Publish was added at checkout.";
+  "You print and distribute finished files through your own printer or channels.";
 
 const RTU_SOCIAL_CLIENT_NOTE =
-  "You upload and post finished files through your own account unless Post/Publish was added at checkout.";
+  "You upload and post finished files through your own account.";
 
 const EMAIL_KIT_CLIENT_NOTE =
   "You own your audience list, consent, sending account, replies, and opt-outs. The Studio delivers finished email content files only.";
@@ -595,7 +595,7 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
     title: "Voice Announcement Intake",
     lead: "Share approved details — The Studio writes the script and produces the audio.",
     clientResponsibilityNote:
-      "You upload or distribute the finished audio through your own tools unless Post/Publish was added at checkout.",
+      "You upload or distribute the finished audio through your own tools.",
     fields: [
       {
         id: "announcementPurpose",
@@ -681,6 +681,27 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
         label: "Anything that must not be shown or said",
         type: "textarea",
       },
+    ],
+  },
+  "rtu-business-card": {
+    type: "rtu-business-card",
+    title: "Business Card Intake",
+    lead: "Share the contact details and brand materials for one finished business card design.",
+    clientResponsibilityNote: RTU_PRINT_CLIENT_NOTE,
+    fields: [
+      { id: "businessName", label: "Business name", type: "text", required: true },
+      { id: "cardNameTitle", label: "Name and title for the card", type: "text", required: true },
+      { id: "phone", label: "Phone number", type: "text", required: true },
+      { id: "email", label: "Email address", type: "text", required: true },
+      { id: "webOrSocial", label: "Website or social link", type: "text" },
+      { id: "address", label: "Business address, if desired", type: "text" },
+      {
+        id: "brandMaterials",
+        label: "Logo and brand colors, if available",
+        type: "textarea",
+        required: true,
+      },
+      { id: "cardSize", label: "Preferred card size, if known", type: "text" },
     ],
   },
 };

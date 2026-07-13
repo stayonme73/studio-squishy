@@ -6,7 +6,7 @@ import {
   getJobsForRoad,
   getRouteMapIntakeTypeForSku,
   getRouteMapJob,
-  getRouteStartJob,
+  getRouteMapGuidance,
   getSelectableRouteMapRoads,
   resolveRouteMapShelfJobId,
   ROUTE_MAP_V1,
@@ -21,9 +21,9 @@ import {
   buildRouteMapPaymentSummaryFromServices,
   buildRouteMapPaymentSummary,
   createCampaignFromRouteMapJob,
-  isRouteMapPostPublishAddonEligible,
   removeRouteMapServiceFromPlan,
   resolveRouteMapRestoredJourney,
+  releaseRouteMapForMapView,
   saveApprovedRouteMapPlan,
   saveRouteMapPlanState,
   saveRouteMapJourneyStep,
@@ -73,7 +73,7 @@ describe("route-map-v1 config", () => {
     expect(ids).not.toContain("rm-j003");
     expect(ids).not.toContain("rm-j004");
     expect(ids).not.toContain("rm-j006");
-    expect(ROUTE_MAP_V1.jobs.length).toBe(13);
+    expect(ROUTE_MAP_V1.jobs.length).toBe(14);
   });
 
   it("I-285 perimeter has no assigned lane jobs — visual loop only", () => {
@@ -103,11 +103,10 @@ describe("route-map-v1 config", () => {
     }
   });
 
-  it("exposes Route Start as separate advisory job", () => {
-    const routeStart = getRouteStartJob();
-    expect(routeStart?.id).toBe("rm-j001");
-    expect(routeStart?.isRouteStart).toBe(true);
-    expect(routeStart?.roads).toEqual(["i75", "i20", "update", "random-exit"]);
+  it("exposes free Squishy guidance instead of a purchasable Route Start job", () => {
+    const guidance = getRouteMapGuidance();
+    expect(guidance.prompt).toBe("Not sure where to start?");
+    expect(guidance.cta).toBe("Let Squishy help you choose the right project.");
   });
 
   it("Random Exit shelf excludes Route Start", () => {
@@ -121,6 +120,8 @@ describe("route-map-v1 config", () => {
     const i20Ids = getJobsForRoad("i20").map((job) => job.id);
     const updateIds = getJobsForRoad("update").map((job) => job.id);
 
+    expect(i75Ids).toHaveLength(10);
+    expect(i75Ids.at(-1)).toBe("v2-rtu-business-card");
     expect(i75Ids).not.toContain("v2-rtu-email-kit");
     expect(i75Ids).not.toContain("v2-rtu-sms-kit");
     expect(updateIds).not.toContain("v2-rtu-email-kit");
@@ -138,7 +139,6 @@ describe("route-map-v1 config", () => {
 describe("route-map catalog SKUs", () => {
   it("maps continuing rm-j* and activated V2 RTU SKUs in Service Catalog", () => {
     for (const id of [
-      "rm-j001",
       "rm-j002",
       "rm-j005",
       "rm-j007",
@@ -162,11 +162,17 @@ describe("route-map catalog SKUs", () => {
     expect(getRouteMapJob("rm-j003")).toBeDefined();
   });
 
-  it("rm-j008 uses updated profile/platform name at $400 on update + random-exit", () => {
+  it("keeps retired rm-j001 in catalog for historical campaign reads only", () => {
+    const catalog = getServiceById("rm-j001");
+    expect(catalog?.launchStatus).toBe("retired");
+    expect(createCampaignFromRouteMapJob("rm-j001", "i75")).toBeNull();
+  });
+
+  it("rm-j008 uses updated profile/platform name at $99 per platform on update + random-exit", () => {
     const job = getRouteMapJob("rm-j008");
     expect(job?.name).toBe("Update My Facebook, Instagram, or TikTok");
-    expect(job?.priceCents).toBe(40000);
-    expect(job?.priceDisplay).toBe("$400");
+    expect(job?.priceCents).toBe(9900);
+    expect(job?.priceDisplay).toBe("$99 / platform");
     expect(job?.roads).toEqual(["update", "random-exit"]);
   });
 
@@ -183,11 +189,11 @@ describe("route-map catalog SKUs", () => {
   });
 
   it("reads per-platform price display from catalog — byte-for-byte", () => {
-    expect(getRouteMapJob("rm-j002")?.priceDisplay).toBe("$400 / platform");
+    expect(getRouteMapJob("rm-j002")?.priceDisplay).toBe("$99 / platform");
     expect(getRouteMapJob("rm-j003")?.priceDisplay).toBe("$450 / platform");
     expect(getRouteMapJob("rm-j004")?.priceDisplay).toBe("$650 / platform");
     expect(getRouteMapJob("rm-j006")?.priceDisplay).toBe("$400 / platform");
-    expect(getRouteMapJob("rm-j008")?.priceDisplay).toBe("$400");
+    expect(getRouteMapJob("rm-j008")?.priceDisplay).toBe("$99 / platform");
   });
 
   it("reads intake template from catalog for active shelf SKUs", () => {
@@ -210,6 +216,7 @@ describe("route-map intake template routing", () => {
       "v2-rtu-sms-kit": "rtu-sms-kit",
       "v2-rtu-voice": "rtu-voice",
       "v2-rtu-short-video": "rtu-short-video",
+      "v2-rtu-business-card": "rtu-business-card",
     };
 
     for (const [sku, intakeType] of Object.entries(v2Expectations)) {
@@ -239,9 +246,10 @@ describe("route-map intake template routing", () => {
     expect(getRouteMapJob("v2-rtu-voice")?.intakeType).toBe("rtu-voice");
   });
 
-  it("appends Post/Publish fields when add-on purchased at checkout", () => {
+  it("supports historical Post/Publish intake schema reads only when explicitly requested", () => {
     const base = getRouteMapIntakeSchema("rtu-social-posts");
     const withAddon = getRouteMapIntakeSchema("rtu-social-posts", { includePostPublish: true });
+    expect(base.fields.some((field) => field.id === "publishPlatform")).toBe(false);
     expect(withAddon.fields.length).toBe(base.fields.length + 3);
     expect(withAddon.fields.some((field) => field.id === "publishPlatform")).toBe(true);
   });
@@ -299,26 +307,17 @@ describe("route-map campaign handoff", () => {
     const job = getRouteMapJob("v2-rtu-social-posts");
     expect(job).toBeDefined();
     const plan = buildApprovedPlanFromRouteMapJob(job!);
-    expect(plan.amountDueTodayCents).toBe(45000);
+    expect(plan.amountDueTodayCents).toBe(9900);
     expect(plan.lineItems[0]?.serviceName).toBe("Make My Social Media Posts");
     expect(plan.lineItems[0]?.skuId).toBe("v2-rtu-social-posts");
   });
 
-  it("adds post/publish add-on line item when requested for eligible parent", () => {
-    const job = getRouteMapJob("v2-rtu-social-posts")!;
-    expect(isRouteMapPostPublishAddonEligible(job.id)).toBe(true);
-    const plan = buildApprovedPlanFromRouteMapJob(job, { includePostPublishAddon: true });
-    expect(plan.amountDueTodayCents).toBe(55000);
-    expect(plan.lineItems).toHaveLength(2);
-    expect(plan.lineItems[1]?.skuId).toBe("v2-addon-post-publish");
-    expect(getServiceById("v2-addon-post-publish")?.isExecutionAddOn).toBe(true);
-    expect(filterProductionPlanLineItems(plan)).toHaveLength(1);
-    expect(filterProductionPlanLineItems(plan)[0]?.skuId).toBe("v2-rtu-social-posts");
-  });
-
-  it("does not offer post/publish add-on for voice RTU", () => {
-    const job = getRouteMapJob("v2-rtu-voice")!;
-    expect(isRouteMapPostPublishAddonEligible(job.id)).toBe(false);
+  it("blocks retired post/publish add-on from new Route Map plans", () => {
+    const withAddon = addServiceToRouteMapPlanState(
+      { selectedServiceIds: ["v2-rtu-social-posts" as ServiceId] },
+      "v2-addon-post-publish",
+    );
+    expect(withAddon.selectedServiceIds).toEqual(["v2-rtu-social-posts"]);
   });
 
   it("creates campaign for continuing V1 job", () => {
@@ -326,22 +325,19 @@ describe("route-map campaign handoff", () => {
     expect(campaign?.campaignName).toBe(
       "Make Me a Page for My Sale, Event, Opening, Service, or Offer",
     );
-    expect(campaign?.approvedStudioPlan?.amountDueTodayCents).toBe(65000);
+    expect(campaign?.approvedStudioPlan?.amountDueTodayCents).toBe(34900);
     expect(campaign?.routeMapContext?.roadId).toBe("i20");
   });
 
   it("creates campaign for V2 RTU job", () => {
     const campaign = createCampaignFromRouteMapJob("v2-rtu-flyer", "random-exit");
     expect(campaign?.campaignName).toBe("Make Me a Flyer");
-    expect(campaign?.approvedStudioPlan?.amountDueTodayCents).toBe(30000);
+    expect(campaign?.approvedStudioPlan?.amountDueTodayCents).toBe(6900);
     expect(campaign?.routeMapContext?.jobId).toBe("v2-rtu-flyer");
   });
 
-  it("creates campaign for Route Start job at $650", () => {
-    const campaign = createCampaignFromRouteMapJob("rm-j001", "i75");
-    expect(campaign?.campaignName).toBe("Help Me Figure Out What I Need");
-    expect(campaign?.approvedStudioPlan?.amountDueTodayCents).toBe(65000);
-    expect(campaign?.routeMapContext?.jobId).toBe("rm-j001");
+  it("blocks new campaigns for retired rm-j001 Route Start commerce", () => {
+    expect(createCampaignFromRouteMapJob("rm-j001", "i75")).toBeNull();
   });
 
   it("reuses the active Route Map campaign when selecting the restored job again", () => {
@@ -356,6 +352,24 @@ describe("route-map campaign handoff", () => {
       const second = selectRouteMapJob("v2-rtu-flyer", "random-exit");
       expect(second?.campaignId).toBe(first?.campaignId);
       expect(second?.routeMapContext?.currentStep).toBe("job");
+    });
+  });
+
+  it("clears in-progress journey step so Route Map can display without redirecting away", () => {
+    withMockedBrowserStorage(() => {
+      addRouteMapServiceToPlan("v2-rtu-flyer", "i75");
+      addRouteMapServiceToPlan("v2-rtu-social-posts", "i75");
+      saveRouteMapJourneyStep("studio-plan");
+
+      const released = releaseRouteMapForMapView();
+      expect(released?.routeMapContext?.currentStep).toBeUndefined();
+      expect(released?.routeMapContext?.selectedServiceIds).toEqual([
+        "v2-rtu-flyer",
+        "v2-rtu-social-posts",
+      ]);
+      expect(
+        resolveRouteMapRestoredJourney(released?.routeMapContext, null),
+      ).toBeNull();
     });
   });
 
@@ -440,70 +454,6 @@ describe("route-map campaign handoff", () => {
     });
   });
 
-  it("prunes orphaned execution add-ons when the parent service is removed", () => {
-    withMockedBrowserStorage(() => {
-      addRouteMapServiceToPlan("v2-rtu-social-posts", "i20");
-      const withAddon = addServiceToRouteMapPlanState(
-        { selectedServiceIds: ["v2-rtu-social-posts" as ServiceId] },
-        "v2-addon-post-publish",
-      );
-      saveRouteMapPlanState(withAddon);
-
-      const updated = removeRouteMapServiceFromPlan("v2-rtu-social-posts");
-
-      expect(updated?.routeMapContext?.selectedServiceIds).toEqual([]);
-      expect(updated?.routeMapContext?.postPublishAddon).toBeUndefined();
-    });
-  });
-
-  it("preserves the eligible post/publish add-on when an unrelated service is removed", () => {
-    withMockedBrowserStorage(() => {
-      addRouteMapServiceToPlan("v2-rtu-social-posts", "i20");
-      const withAddon = addServiceToRouteMapPlanState(
-        { selectedServiceIds: ["v2-rtu-social-posts" as ServiceId] },
-        "v2-addon-post-publish",
-      );
-      saveRouteMapPlanState(withAddon);
-      addRouteMapServiceToPlan("v2-rtu-menu", "i75");
-
-      // The add-on's true parent (social-posts) is still selected — only the unrelated
-      // menu job is being removed. The shared catalog rule can't see this addon's real
-      // parent (different families on purpose), so this exercises the Route Map override.
-      const updated = removeRouteMapServiceFromPlan("v2-rtu-menu");
-
-      expect(updated?.routeMapContext?.selectedServiceIds).toEqual([
-        "v2-rtu-social-posts",
-        "v2-addon-post-publish",
-      ]);
-      expect(updated?.routeMapContext?.postPublishAddon).toBe(true);
-      expect(updated?.approvedStudioPlan?.selectedServiceIds).toEqual([
-        "v2-rtu-social-posts",
-        "v2-addon-post-publish",
-      ]);
-
-      // Now remove the true parent — the add-on must still be pruned.
-      const afterParentRemoved = removeRouteMapServiceFromPlan("v2-rtu-social-posts");
-      expect(afterParentRemoved?.routeMapContext?.selectedServiceIds).toEqual([]);
-      expect(afterParentRemoved?.routeMapContext?.postPublishAddon).toBeUndefined();
-    });
-  });
-
-  it("removing the post/publish add-on itself removes only the add-on", () => {
-    withMockedBrowserStorage(() => {
-      addRouteMapServiceToPlan("v2-rtu-social-posts", "i20");
-      const withAddon = addServiceToRouteMapPlanState(
-        { selectedServiceIds: ["v2-rtu-social-posts" as ServiceId] },
-        "v2-addon-post-publish",
-      );
-      saveRouteMapPlanState(withAddon);
-
-      const updated = removeRouteMapServiceFromPlan("v2-addon-post-publish");
-
-      expect(updated?.routeMapContext?.selectedServiceIds).toEqual(["v2-rtu-social-posts"]);
-      expect(updated?.routeMapContext?.postPublishAddon).toBeUndefined();
-    });
-  });
-
   it("builds Route Map payment totals from every selected service", () => {
     const summary = buildRouteMapPaymentSummaryFromServices([
       "v2-rtu-flyer",
@@ -511,8 +461,8 @@ describe("route-map campaign handoff", () => {
     ]);
 
     expect(summary.services).toEqual(["Make Me a Flyer", "Make My Social Media Posts"]);
-    expect(summary.amountDueTodayCents).toBe(75000);
-    expect(summary.amountDueTodayDisplay).toBe("$750");
+    expect(summary.amountDueTodayCents).toBe(16800);
+    expect(summary.amountDueTodayDisplay).toBe("$168");
   });
 
   it("ignores invalid or stale Route Map restoration context", () => {
@@ -606,14 +556,24 @@ describe("route-map campaign handoff", () => {
       jobId: "v2-rtu-flyer",
       roadId: "random-exit",
       selectedServiceIds: ["v2-rtu-flyer"],
-      includePostPublishAddon: false,
     });
   });
 
   it("builds checkout summary display", () => {
     const job = getRouteMapJob("rm-j007")!;
     const summary = buildRouteMapPaymentSummary(job);
-    expect(summary.amountDueTodayDisplay).toBe("$250");
+    expect(summary.amountDueTodayDisplay).toBe("$69");
+  });
+
+  it("builds I-20 final calibrated prices in multi-service payment summary", () => {
+    const summary = buildRouteMapPaymentSummaryFromServices([
+      "v2-rtu-email-kit",
+      "v2-rtu-sms-kit",
+      "v2-rtu-voice",
+      "rm-j007",
+    ]);
+    expect(summary.amountDueTodayCents).toBe(34600);
+    expect(summary.amountDueTodayDisplay).toBe("$346");
   });
 
   it("lands on Building Concepts after V2 intake — not review-ready", () => {
@@ -756,7 +716,7 @@ describe("route-map campaign handoff", () => {
         "v2-rtu-flyer",
         "v2-rtu-social-posts",
       ]);
-      expect(updated?.approvedStudioPlan?.amountDueTodayCents).toBe(75000);
+      expect(updated?.approvedStudioPlan?.amountDueTodayCents).toBe(16800);
       expect(updated?.routeMapContext?.currentStep).toBe("checkout");
     });
   });
@@ -948,21 +908,18 @@ describe("route-map intake E2E paths (programmatic)", () => {
     }
   });
 
-  it("path 2: V2 social posts + Post/Publish add-on → intake with publish fields", () => {
+  it("path 2: V2 social posts → intake without retired post/publish add-on", () => {
     const job = getRouteMapJob("v2-rtu-social-posts")!;
-    const plan = buildApprovedPlanFromRouteMapJob(job, { includePostPublishAddon: true });
-    expect(plan.lineItems).toHaveLength(2);
-    let campaign = createCampaignFromRouteMapJob("v2-rtu-social-posts", "i20", {
-      includePostPublishAddon: true,
-    })!;
+    const plan = buildApprovedPlanFromRouteMapJob(job);
+    expect(plan.lineItems).toHaveLength(1);
+    let campaign = createCampaignFromRouteMapJob("v2-rtu-social-posts", "i20")!;
     campaign = {
       ...campaign,
       paymentReceivedAt: new Date().toISOString(),
       approvedStudioPlan: plan,
-      routeMapContext: { ...campaign.routeMapContext!, postPublishAddon: true },
     };
-    const schema = getRouteMapIntakeSchema("rtu-social-posts", { includePostPublish: true });
-    expect(schema.fields.some((f) => f.id === "publishPlatform")).toBe(true);
+    const schema = getRouteMapIntakeSchema("rtu-social-posts");
+    expect(schema.fields.some((f) => f.id === "publishPlatform")).toBe(false);
     const restore = mockStorageCampaign(campaign);
     try {
       const submitted = submitRouteMapIntake({
@@ -970,9 +927,6 @@ describe("route-map intake E2E paths (programmatic)", () => {
         callToAction: "Shop",
         platform: "Instagram",
         materials: "Photos",
-        publishPlatform: "Instagram",
-        publishAccess: "Invite sent",
-        publishTiming: "ASAP",
       });
       expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
       expect(hasRouteMapProductionBrief(submitted)).toBe(true);

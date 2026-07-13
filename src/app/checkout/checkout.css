@@ -1,0 +1,421 @@
+/**
+ * Secure Checkout — certified room layout (Project Builder parity).
+ */
+
+main.journey-shell:has(.co-scene) {
+  overflow: visible;
+  min-height: 100dvh;
+  height: auto;
+  max-height: none;
+}
+
+.co-scene {
+  --co-shell-max: 920px;
+  --co-shell-inline: clamp(1.25rem, 2.5vw, 2rem);
+  --co-frost-card: linear-gradient(
+    165deg,
+    color-mix(in srgb, #faf6ef 94%, #fff) 0%,
+    color-mix(in srgb, #f3ece2 88%, transparent) 100%
+  );
+  --utility-primary: var(--studio-eucalyptus);
+  --utility-primary-deep: var(--studio-eucalyptus-deep);
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  overflow: visible;
+  color: var(--studio-charcoal);
+  background: var(--studio-mushroom);
+}
+
+.co-scene .studio-utility-backdrop::before {
+  filter: blur(10px) brightness(0.9) saturate(0.96);
+}
+
+.co-scene .studio-utility-backdrop::after {
+  background: color-mix(in srgb, #2e2d2b 10%, transparent);
+}
+
+.co-scene--loading {
+  min-height: 100dvh;
+}
+
+.co-scene__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.85rem, 1.4vw, 1.1rem);
+  width: 100%;
+  max-width: var(--co-shell-max);
+  min-height: 0;
+  margin-inline: auto;
+  padding-block: clamp(0.75rem, 1.5vw, 1.15rem);
+  padding-inline: var(--co-shell-inline);
+}
+
+.co-header,
+.co-header.co-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.co-header__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, #8a7b68 12%, transparent);
+}
+
+.co-header__nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.co-header__back {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--studio-denim);
+  text-decoration: none;
+}
+
+.co-header__back:hover {
+  color: var(--studio-eucalyptus);
+}
+
+.co-header__edit {
+  min-width: 8.5rem;
+  padding-inline: 1rem;
+  font-weight: 700;
+}
+
+.co-header__sync {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--studio-charcoal);
+  white-space: nowrap;
+}
+
+.co-header__eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--studio-eucalyptus);
+}
+
+.co-header__route {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--studio-charcoal);
+}
+
+.co-header__title {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.65rem, 2.8vw, 2.15rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--studio-denim);
+}
+
+.co-header__lead {
+  margin: 0;
+  max-width: 42rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--studio-charcoal);
+}
+
+.co-header__lead + .co-header__lead {
+  margin-top: 0.25rem;
+}
+
+.pay-shell--stack {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pay-checkout-stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.85rem, 1.4vw, 1.1rem);
+}
+
+.pay-checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.15rem, 1.9vw, 1.45rem);
+}
+
+.co-card {
+  padding: clamp(1rem, 1.6vw, 1.25rem);
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, #8a7b68 14%, transparent);
+  background: var(--co-frost-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    0 10px 28px rgba(62, 52, 44, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.co-card__heading {
+  margin: 0.35rem 0 1rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.55rem;
+  font-size: var(--type-section-title);
+  font-weight: var(--type-section-title-weight, 800);
+  letter-spacing: var(--type-section-title-spacing, 0.04em);
+  line-height: 1.25;
+  color: var(--studio-eucalyptus);
+  border-bottom: 1px solid color-mix(in srgb, var(--studio-eucalyptus) 16%, transparent);
+}
+
+.co-card__subheading {
+  margin: 0.35rem 0 0.55rem;
+  padding-top: 0.15rem;
+  font-size: 0.82rem;
+  font-weight: var(--type-section-title-weight, 800);
+  letter-spacing: var(--type-section-title-spacing, 0.04em);
+  text-transform: uppercase;
+  color: var(--studio-eucalyptus);
+}
+
+.co-deliverables {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.co-deliverable {
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, #8a7b68 12%, transparent);
+}
+
+.co-deliverable:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.co-deliverable__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.co-deliverable__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--studio-charcoal);
+}
+
+.co-deliverable__guide {
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--studio-charcoal);
+  text-align: left;
+  cursor: pointer;
+}
+
+.co-deliverable__guide:hover {
+  color: var(--studio-denim);
+}
+
+.co-deliverable__price {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--studio-denim);
+  white-space: nowrap;
+}
+
+.co-investment {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid color-mix(in srgb, #8a7b68 12%, transparent);
+}
+
+.co-investment__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.45rem;
+  font-size: 0.88rem;
+  color: var(--studio-charcoal-muted);
+}
+
+.co-investment__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--studio-eucalyptus);
+}
+
+.co-investment__total {
+  margin: 0;
+  font-size: clamp(1.35rem, 2vw, 1.65rem);
+  font-weight: 800;
+  color: var(--studio-denim);
+}
+
+.co-investment__note {
+  margin: 0.55rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--studio-charcoal-muted);
+}
+
+.co-card .pay-form {
+  gap: 0.75rem;
+}
+
+.co-next-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.co-next-steps__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.co-next-steps__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--studio-eucalyptus) 12%, #fff);
+  border: 1px solid color-mix(in srgb, var(--studio-eucalyptus) 24%, transparent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--studio-eucalyptus);
+}
+
+.co-next-steps__label {
+  padding-top: 0.15rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--studio-charcoal);
+}
+
+.co-next-steps__reassurance {
+  margin: 0.85rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--studio-charcoal-muted);
+}
+
+.co-payment-security {
+  margin: 0.65rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--studio-charcoal-muted);
+}
+
+.co-payment-reassurance {
+  margin: 0.45rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--studio-charcoal-muted);
+}
+
+.co-card--confirm .pay-sandbox--stack {
+  margin-top: 1.15rem;
+  margin-bottom: 0.35rem;
+  padding: 1rem 1rem 2.5rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, #8a7b68 16%, transparent);
+  background: color-mix(in srgb, #f3ece2 72%, #e8e2d8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.co-card--confirm .pay-sandbox--stack .pay-sandbox__head {
+  margin-bottom: 0.45rem;
+}
+
+.co-card--confirm .pay-sandbox--stack .pay-sandbox__label {
+  color: var(--studio-eucalyptus);
+}
+
+.co-card--confirm .pay-sandbox--stack .pay-sandbox__badge {
+  color: #fff;
+  background: var(--studio-eucalyptus-deep);
+  border: 1px solid color-mix(in srgb, var(--studio-eucalyptus) 35%, transparent);
+}
+
+.co-card--confirm .pay-sandbox--stack .pay-sandbox__hint {
+  color: var(--studio-charcoal-muted);
+}
+
+.co-card--confirm .pay-sandbox--stack .pay-sandbox__btn {
+  color: var(--studio-eucalyptus-deep);
+  background: color-mix(in srgb, var(--studio-eucalyptus) 10%, #fff 90%);
+  border-color: color-mix(in srgb, var(--studio-eucalyptus) 40%, transparent);
+}
+
+.co-card--confirm .pay-sandbox {
+  margin-top: 0.25rem;
+}
+
+.co-card--confirm .co-card__heading:empty {
+  display: none;
+}
+
+.co-card--confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.co-confirm__checkbox {
+  margin: 0;
+}
+
+.co-submit {
+  width: 100%;
+  min-height: 3rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .co-header__top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .co-header__sync {
+    text-align: left;
+  }
+}

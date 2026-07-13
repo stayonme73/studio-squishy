@@ -6,9 +6,9 @@ import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
 
 describe("normalizeStudioServiceEntry", () => {
   it("stamps schema v3 and derives reviewType for representative SKUs", () => {
-    const advisory = normalizeStudioServiceEntry(getServiceById("rm-j001")!);
-    expect(advisory.schemaVersion).toBe(CATALOG_SCHEMA_VERSION);
-    expect(advisory.reviewType).toBe("advisory_handoff");
+    const retiredRouteStart = normalizeStudioServiceEntry(getServiceById("rm-j001")!);
+    expect(retiredRouteStart.schemaVersion).toBe(CATALOG_SCHEMA_VERSION);
+    expect(retiredRouteStart.reviewType).toBe("no_review");
 
     const rtu = normalizeStudioServiceEntry(getServiceById("v2-rtu-flyer")!);
     expect(rtu.reviewType).toBe("ready_to_use_handoff");

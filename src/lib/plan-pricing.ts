@@ -11,6 +11,12 @@ import { getCheckoutPriceDisplay, getCheckoutTimingLabel } from "@/catalog/route
 import type { BillingType, ServiceFamilyId, ServiceId } from "@/catalog/types";
 import { EXECUTION_MODE_LABELS } from "@/config/service-guide";
 import type { ApprovedStudioPlanLineItem } from "@/config/studio-board";
+import type { RouteMapRoadId } from "@/config/route-map-v1";
+import {
+  resolveRouteMapServiceDisplayName,
+  resolveUpdateExitClientResponsibilities,
+  resolveUpdateExitScopeSnapshot,
+} from "@/lib/project-builder-update-exit-copy";
 
 export type PlanServiceLine = {
   serviceId: ServiceId;
@@ -36,7 +42,10 @@ export function formatUsdFromCents(cents: number): string {
 }
 
 /** Build ordered line items from selected SKU IDs — preserves selection order. */
-export function buildPlanLineItems(selectedServiceIds: readonly ServiceId[]): PlanServiceLine[] {
+export function buildPlanLineItems(
+  selectedServiceIds: readonly ServiceId[],
+  roadId?: RouteMapRoadId,
+): PlanServiceLine[] {
   const lines: PlanServiceLine[] = [];
 
   for (const rawId of selectedServiceIds) {
@@ -48,7 +57,7 @@ export function buildPlanLineItems(selectedServiceIds: readonly ServiceId[]): Pl
 
     lines.push({
       serviceId: service.id,
-      name: service.name,
+      name: resolveRouteMapServiceDisplayName(service.id, roadId),
       priceCents,
       billingType: service.billingType,
       priceDisplay: getCheckoutPriceDisplay(service),
@@ -61,8 +70,9 @@ export function buildPlanLineItems(selectedServiceIds: readonly ServiceId[]): Pl
 /** Compute one-time / monthly subtotals and amount due today (one-time only). */
 export function computePlanPricingTotals(
   selectedServiceIds: readonly ServiceId[],
+  roadId?: RouteMapRoadId,
 ): PlanPricingTotals {
-  const lineItems = buildPlanLineItems(selectedServiceIds);
+  const lineItems = buildPlanLineItems(selectedServiceIds, roadId);
   let oneTimeSubtotalCents = 0;
   let monthlySubtotalCents = 0;
 
@@ -90,6 +100,7 @@ function resolveParentSkuId(service: NonNullable<ReturnType<typeof getServiceByI
 /** Build immutable approved-plan line items with full scope snapshot from catalog at approval time. */
 export function buildServiceScopeSnapshot(
   selectedServiceIds: readonly ServiceId[],
+  roadId?: RouteMapRoadId,
 ): ApprovedStudioPlanLineItem[] {
   const lines: ApprovedStudioPlanLineItem[] = [];
 
@@ -100,18 +111,21 @@ export function buildServiceScopeSnapshot(
 
     const priceCents = getServicePriceCents(resolved);
     const parentSkuId = resolveParentSkuId(service);
+    const updateScope = roadId === "update" ? resolveUpdateExitScopeSnapshot(service.id) : null;
 
     lines.push({
       skuId: service.id,
-      serviceName: service.name,
+      serviceName: updateScope?.serviceName ?? resolveRouteMapServiceDisplayName(service.id, roadId),
       billingType: service.billingType,
       exactPriceCents: priceCents,
       priceDisplay: getCheckoutPriceDisplay(service),
-      deliverables: [...service.deliverables],
-      exclusions: [...service.exclusions],
+      deliverables: [...(updateScope?.deliverables ?? service.deliverables)],
+      exclusions: [...(updateScope?.exclusions ?? service.exclusions)],
       timingWindowLabel: getCheckoutTimingLabel(service),
       revisionRule: service.revisionRule,
-      clientResponsibilities: [...service.clientResponsibilities],
+      clientResponsibilities: [
+        ...(resolveUpdateExitClientResponsibilities(service.id) ?? service.clientResponsibilities),
+      ],
       executionResponsibility: EXECUTION_MODE_LABELS[service.executionMode],
       parentSkuId,
       parentFamilyId: service.eligibleParentFamilyIds?.[0] as ServiceFamilyId | undefined,

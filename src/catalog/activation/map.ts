@@ -17,7 +17,6 @@ import {
 } from "@/catalog/v2/batch1-ready-to-use";
 import {
   CATALOG_V2_BATCH2_LAUNCH_CANDIDATE_SKUS,
-  CATALOG_V2_BATCH2_POST_PUBLISH_ELIGIBLE_PARENT_SKUS,
   CATALOG_V2_BATCH2_READY_TO_USE,
 } from "@/catalog/v2/batch2-ready-to-use";
 import type { CatalogV2ServiceEntry } from "@/catalog/v2/types";
@@ -26,9 +25,7 @@ import type { CatalogV2ServiceEntry } from "@/catalog/v2/types";
 export type CatalogV2ActivationStatus =
   | "active_candidate"
   | "held"
-  | "retired_redirect"
-  | "route_start_separate"
-  | "addon_only";
+  | "retired_redirect";
 
 /** One row in the V2 activation plan — V2 SKU, continuing V1 job, or retired redirect. */
 export interface CatalogV2ActivationMapEntry {
@@ -40,8 +37,6 @@ export interface CatalogV2ActivationMapEntry {
   retiredRouteMapSku?: ServiceId;
   laneEligibility: RouteMapRoadId[];
   directExitEligible: boolean;
-  /** True when this parent RTU job may offer v2-addon-post-publish at checkout (draft plan). */
-  postPublishAddonEligible?: boolean;
   notes?: string;
 }
 
@@ -86,18 +81,18 @@ const BATCH2_VOICE_LANES: RouteMapRoadId[] = ["i75", "i20", "random-exit"];
 const BATCH2_SHORT_VIDEO_LANES: RouteMapRoadId[] = ["i75", "i20", "random-exit"];
 
 const BATCH2_EMAIL_SMS_LANE_NOTE =
-  "Default shelf stops: i20 + Random Exit only — not on i75 or update. recommendedAfterRouteStart: true (may surface after rm-j001).";
+  "Default shelf stops: i20 + Random Exit only — not on i75 or update.";
 
-/** rm-j006 voice RTU replacement — audio only; post/publish not bundled (Tagia rule). */
+/** rm-j006 voice RTU replacement — audio only; client distributes finished file. */
 const VOICE_RTU_NOTE =
-  "Replaces rm-j006 creation+post bundle with ready-to-use audio only. Post/publish add-on is NOT eligible for voice — client distributes audio file.";
+  "Replaces rm-j006 creation+post bundle with ready-to-use audio only — internal AI/software voice methods; client distributes the finished audio file.";
 
-/** rm-j003 / rm-j004 bundled post/publish split into RTU parent + optional add-on. */
+/** rm-j003 bundled post/publish replaced by RTU parent — client posts finished files. */
 const SOCIAL_POSTS_REPLACEMENT_NOTE =
-  "Replaces rm-j003. Parent delivers 4 static posts + captions (RTU); client posts unless v2-addon-post-publish purchased with parent.";
+  "Replaces rm-j003. Parent delivers 4 static posts + captions (RTU); client posts finished files through their own account.";
 
 const SHORT_VIDEO_REPLACEMENT_NOTE =
-  "Replaces rm-j004. Parent delivers one short MP4 (RTU); client posts unless v2-addon-post-publish purchased with parent.";
+  "Replaces rm-j004. Parent delivers one short MP4 (RTU) from customer footage or approved Studio assets; client posts finished files through their own account.";
 
 const BATCH2_VOICE_VIDEO_LANE_BACKFILL_NOTE =
   "Batch 2 voice/short-video draft records have empty laneEligibility — lanes proposed here from rm-j parity; backfill draft record on activation.";
@@ -114,7 +109,7 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     status: "active_candidate",
     laneEligibility: lanesFromDraftOrFallback("v2-rtu-flyer", BATCH1_RTU_LANES),
     directExitEligible: directExitFromDraftOrFallback("v2-rtu-flyer", true),
-    notes: "New RTU shelf item — no rm-j replacement. Complex scope routes to rm-j001.",
+    notes: "New RTU shelf item — no rm-j replacement. Complex scope is not included in this SKU.",
   },
   {
     v2Sku: "v2-rtu-menu",
@@ -139,7 +134,6 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     replacesRouteMapSku: "rm-j003",
     laneEligibility: lanesFromDraftOrFallback("v2-rtu-social-posts", BATCH1_RTU_LANES),
     directExitEligible: directExitFromDraftOrFallback("v2-rtu-social-posts", true),
-    postPublishAddonEligible: true,
     notes: SOCIAL_POSTS_REPLACEMENT_NOTE,
   },
   {
@@ -175,7 +169,6 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     replacesRouteMapSku: "rm-j006",
     laneEligibility: lanesFromDraftOrFallback("v2-rtu-voice", BATCH2_VOICE_LANES),
     directExitEligible: directExitFromDraftOrFallback("v2-rtu-voice", true),
-    postPublishAddonEligible: false,
     notes: `${VOICE_RTU_NOTE} ${BATCH2_VOICE_VIDEO_LANE_BACKFILL_NOTE}`,
   },
   {
@@ -185,7 +178,6 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     replacesRouteMapSku: "rm-j004",
     laneEligibility: lanesFromDraftOrFallback("v2-rtu-short-video", BATCH2_SHORT_VIDEO_LANES),
     directExitEligible: directExitFromDraftOrFallback("v2-rtu-short-video", true),
-    postPublishAddonEligible: true,
     notes: `${SHORT_VIDEO_REPLACEMENT_NOTE} ${BATCH2_VOICE_VIDEO_LANE_BACKFILL_NOTE}`,
   },
 
@@ -198,28 +190,6 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     directExitEligible: directExitFromDraftOrFallback("v2-rtu-handout", true),
     notes:
       "Held for scope overlap with flyer/service-sheet/menu — stays in draft catalog; not placed on Route Map shelf until Tagia resolves overlap.",
-  },
-
-  // --- Post/publish add-on (checkout add-on only — not standalone shelf) ---
-  {
-    v2Sku: "v2-addon-post-publish",
-    clientFacingName: "Post/Publish for Me",
-    status: "addon_only",
-    laneEligibility: [],
-    directExitEligible: false,
-    notes:
-      "Add-on only — not on Route Map shelf or Direct Exit alone. Eligible parents: v2-rtu-social-posts, v2-rtu-short-video. Replaces bundled posting scope formerly in rm-j003 and rm-j004.",
-  },
-
-  // --- Route Start — separate from V2 RTU shelf (Tagia rule) ---
-  {
-    routeMapSku: "rm-j001",
-    clientFacingName: "Help Me Figure Out What I Need",
-    status: "route_start_separate",
-    laneEligibility: ["i75", "i20", "update", "random-exit"],
-    directExitEligible: true,
-    notes:
-      "Route Start advisory job — stays rm-j001 on all lanes including Random Exit. Do NOT merge into V2 RTU shelf. V2 RTU scopeRoutingNotes steer overflow here.",
   },
 
   // --- Continuing V1 Route Map jobs (no V2 equivalent — keep until Batch 3) ---
@@ -240,6 +210,15 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     directExitEligible: true,
     notes:
       "Keep live rm-j005 on map — campaign landing page with publish; no V2 equivalent in Batch 1/2. Distinct from v2-rtu-promotion-graphics (static graphics only). Hold until Batch 3.",
+  },
+  {
+    v2Sku: "v2-rtu-business-card",
+    clientFacingName: "Make Me a Business Card",
+    status: "active_candidate",
+    laneEligibility: ["i75"],
+    directExitEligible: false,
+    notes:
+      "I-75 Get My Business Started — tenth shelf stop; completes 2-column desktop grid. Design-only business card; not on other lanes.",
   },
   {
     routeMapSku: "rm-j007",
@@ -270,7 +249,7 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     laneEligibility: ["i75", "i20", "random-exit"],
     directExitEligible: true,
     notes:
-      "Retire from Route Map shelf on V2 activation. Redirect: v2-rtu-social-posts (RTU) + optional v2-addon-post-publish. Legacy SKU may remain in catalog as retired for checkout history.",
+      "Retire from Route Map shelf on V2 activation. Redirect: v2-rtu-social-posts (RTU). Legacy SKU may remain in catalog as retired for checkout history.",
   },
   {
     routeMapSku: "rm-j004",
@@ -281,7 +260,7 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     laneEligibility: ["i75", "i20", "random-exit"],
     directExitEligible: true,
     notes:
-      "Retire from Route Map shelf on V2 activation. Redirect: v2-rtu-short-video (RTU) + optional v2-addon-post-publish.",
+      "Retire from Route Map shelf on V2 activation. Redirect: v2-rtu-short-video (RTU). Legacy SKU may remain in catalog as retired for checkout history.",
   },
   {
     routeMapSku: "rm-j006",
@@ -292,19 +271,16 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     laneEligibility: ["i75", "i20", "random-exit"],
     directExitEligible: true,
     notes:
-      "Retire from Route Map shelf on V2 activation. Redirect: v2-rtu-voice (audio-only RTU). Post/publish add-on NOT offered — client distributes audio.",
+      "Retire from Route Map shelf on V2 activation. Redirect: v2-rtu-voice (audio-only RTU). Client distributes finished audio.",
   },
 ] as const;
 
-/** Approved V2 launch-candidate SKU IDs referenced by this activation map (excludes held handout and add-on). */
+/** Approved V2 launch-candidate SKU IDs referenced by this activation map (excludes held handout). */
 export const CATALOG_V2_ACTIVATION_LAUNCH_CANDIDATE_SKUS = [
   ...CATALOG_V2_BATCH1_LAUNCH_CANDIDATE_SKUS,
   ...CATALOG_V2_BATCH2_LAUNCH_CANDIDATE_SKUS,
+  "v2-rtu-business-card",
 ] as const;
-
-/** Parent SKUs eligible for v2-addon-post-publish per Batch 2 draft + activation plan. */
-export const CATALOG_V2_ACTIVATION_POST_PUBLISH_PARENT_SKUS =
-  CATALOG_V2_BATCH2_POST_PUBLISH_ELIGIBLE_PARENT_SKUS;
 
 /** Route Map V1 jobs slated for retirement when V2 activates. */
 export const CATALOG_V2_ACTIVATION_RETIRED_ROUTE_MAP_SKUS = [
@@ -327,7 +303,7 @@ export function getActivationMapEntriesByStatus(
   return CATALOG_V2_ACTIVATION_MAP_DRAFT.filter((entry) => entry.status === status);
 }
 
-/** Shelf-eligible entries for a lane — active V2 RTU + continuing V1 jobs; excludes Route Start, add-on, held, retired. */
+/** Shelf-eligible entries for a lane — active V2 RTU + continuing V1 jobs; excludes held and retired. */
 export function getActivationMapShelfEntriesForLane(
   lane: RouteMapRoadId,
 ): readonly CatalogV2ActivationMapEntry[] {

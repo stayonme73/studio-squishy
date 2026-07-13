@@ -6,13 +6,11 @@ import RouteMapStopCard from "@/components/route-map/RouteMapStopCard";
 import {
   getJobsForRoad,
   getRouteMapRoad,
-  getRouteStartJob,
   ROUTE_MAP_V1,
   type RouteMapJob,
   type RouteMapRoad,
   type RouteMapRoadId,
 } from "@/config/route-map-v1";
-import { ROUTE_MAP_STOP_ICONS } from "@/config/route-map-icons";
 import { getRouteMapShelfDensity } from "@/lib/route-map-shelf-density";
 
 type Props = {
@@ -34,48 +32,6 @@ function routeMarkerLabel(road: RouteMapRoad): string {
     default:
       return `${road.highwayLabel} · ${road.directionLabel.toUpperCase()}`;
   }
-}
-
-function RouteStartOption({
-  onSelect,
-  variant = "road",
-}: {
-  onSelect: () => void;
-  variant?: "road" | "shelf";
-}) {
-  const routeStart = getRouteStartJob();
-  if (!routeStart) return null;
-
-  const prompt = variant === "shelf" ? "Not sure which job fits?" : null;
-
-  return (
-    <div className="route-map-route-start">
-      {prompt ? <p className="route-map-route-start__prompt">{prompt}</p> : null}
-      <button
-        type="button"
-        className="route-map-route-start__btn"
-        onClick={onSelect}
-        aria-label={`${routeStart.name}, ${routeStart.priceDisplay}, Route Start`}
-      >
-        <span className="route-map-route-start__icon" aria-hidden>
-          {ROUTE_MAP_STOP_ICONS[routeStart.intakeType]}
-        </span>
-        <span className="route-map-route-start__body">
-          <span className="route-map-route-start__head">
-            <span className="route-map-route-start__name">{routeStart.name}</span>
-            <span className="route-map-route-start__price">{routeStart.priceDisplay}</span>
-          </span>
-          <span className="route-map-route-start__desc">{routeStart.purpose}</span>
-        </span>
-        <span className="route-map-route-start__aside">
-          <span className="route-map-route-start__badge">Route Start</span>
-          <span className="route-map-route-start__arrow" aria-hidden>
-            →
-          </span>
-        </span>
-      </button>
-    </div>
-  );
 }
 
 function useRouteGridColumns(): number {
@@ -113,18 +69,17 @@ function useViewportHeight(): number {
 }
 
 /** @locked docs/route-map-overlays-v1-locked.md — per-lane --rm-shelf-density from job rows + viewport. */
-export default function RouteMapRoutePanel({ roadId, onSelectJob, onClose }: Props) {
+export default function RouteMapRoutePanel({
+  roadId,
+  onSelectJob,
+  onClose,
+}: Props) {
   const road = getRouteMapRoad(roadId);
   const jobs = getJobsForRoad(roadId);
-  const routeStart = getRouteStartJob();
   const gridColumns = useRouteGridColumns();
   const viewportHeight = useViewportHeight();
 
   if (!road) return null;
-
-  const handleRouteStart = () => {
-    if (routeStart) onSelectJob(routeStart, roadId);
-  };
 
   const isShelf = roadId === "random-exit";
   const shelfDensity = getRouteMapShelfDensity(jobs.length, gridColumns, viewportHeight);
@@ -180,7 +135,6 @@ export default function RouteMapRoutePanel({ roadId, onSelectJob, onClose }: Pro
           </header>
         )}
 
-        <RouteStartOption onSelect={handleRouteStart} variant={isShelf ? "shelf" : "road"} />
       </div>
 
       <div className="route-map-route-panel__scroll">

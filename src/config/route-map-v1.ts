@@ -20,6 +20,7 @@ import {
   getActivationMapShelfEntriesForLane,
 } from "@/catalog/activation";
 import { customerJourneyStepRoute } from "@/config/customer-journey-v1";
+import { ROUTE_MAP_GUIDANCE } from "@/config/route-map-guidance-v1";
 
 /** Route Map shelf job IDs — V1 continuing jobs + activated V2 RTU SKUs. */
 export type RouteMapJobId = RouteMapShelfJobId;
@@ -263,7 +264,10 @@ export const ROUTE_MAP_V1 = {
 
   jobs: buildActiveShelfJobs(),
 
-  /** Customer route for Route Start — current Route Map front door. */
+  /** Customer route for free Squishy guidance — not a purchasable job. */
+  guidance: ROUTE_MAP_GUIDANCE,
+
+  /** Customer route for legacy discovery intake — historical campaigns only. */
   projectDiscoveryRoute: customerJourneyStepRoute("project-discovery"),
 
   checkout: {
@@ -312,8 +316,13 @@ export function getJobsForRoad(roadId: RouteMapRoadId): readonly RouteMapJob[] {
   return jobs;
 }
 
+export function getRouteMapGuidance(): typeof ROUTE_MAP_GUIDANCE {
+  return ROUTE_MAP_GUIDANCE;
+}
+
+/** @deprecated rm-j001 is retired from commerce — use getRouteMapGuidance() for the free path. */
 export function getRouteStartJob(): RouteMapJob | undefined {
-  return buildRouteMapJobFromV1("rm-j001");
+  return undefined;
 }
 
 export function isRouteMapJobId(value: string): value is RouteMapLaunchServiceId {

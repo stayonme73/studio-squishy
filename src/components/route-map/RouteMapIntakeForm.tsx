@@ -10,8 +10,6 @@ import type { RouteMapJob } from "@/config/route-map-v1";
 
 type Props = {
   job: RouteMapJob;
-  /** When true, intake includes Post/Publish platform/access fields. */
-  postPublishAddon?: boolean;
   onSaveDraft?: (answers: RouteMapIntakeAnswers) => boolean;
   onSubmit: (answers: RouteMapIntakeAnswers) => void;
 };
@@ -519,13 +517,12 @@ function SocialPostsIntakeForm({
 
 export default function RouteMapIntakeForm({
   job,
-  postPublishAddon = false,
   onSaveDraft,
   onSubmit,
 }: Props) {
   const schema = useMemo(
-    () => getRouteMapIntakeSchema(job.intakeType, { includePostPublish: postPublishAddon }),
-    [job.intakeType, postPublishAddon],
+    () => getRouteMapIntakeSchema(job.intakeType),
+    [job.intakeType],
   );
   const [answers, setAnswers] = useState<RouteMapIntakeAnswers>(() =>
     Object.fromEntries(schema.fields.map((field) => [field.id, ""])),

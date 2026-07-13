@@ -1,13 +1,9 @@
 /**
  * Route Map V1 — campaign creation and approved-plan handoff to Secure Checkout.
- * Supports activated V2 RTU shelf SKUs and optional v2-addon-post-publish at checkout.
+ * Supports activated V2 RTU shelf SKUs. Retired commerce SKUs remain readable for history only.
  */
 
 import type { ServiceId } from "@/catalog/types";
-import {
-  isPostPublishAddonEligibleParent,
-  ROUTE_MAP_V2_POST_PUBLISH_ADDON,
-} from "@/catalog/route-map-v2-launch";
 import type {
   ApprovalAcknowledgment,
   ApprovedStudioPlan,
@@ -17,15 +13,18 @@ import type {
 import { studioBoard } from "@/config/studio-board";
 import {
   ROUTE_MAP_V1,
+  getJobsForRoad,
   getRouteMapJob,
   type RouteMapJob,
   type RouteMapJobId,
   type RouteMapRoadId,
 } from "@/config/route-map-v1";
+import { isRouteMapRetiredCommerceSku } from "@/config/route-map-guidance-v1";
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
 import { CUSTOM_STUDIO_PLAN_LABEL, CUSTOM_STUDIO_PLAN_PACKAGE_ID } from "@/lib/approved-plan-display";
 import { syncCampaignToServer } from "@/lib/campaign-store/sync-client";
 import { buildServiceScopeSnapshot, computePlanPricingTotals } from "@/lib/plan-pricing";
+import { resolveRouteMapServiceDisplayName } from "@/lib/project-builder-update-exit-copy";
 import { readCurrentCampaign, saveCurrentCampaign } from "@/lib/studio-board-campaign";
 import {
   addServiceToPlan,
@@ -50,12 +49,10 @@ export type RouteMapCampaignContext = {
   roadId: RouteMapRoadId;
   selectedAt: string;
   currentStep?: RouteMapJourneyStep;
-  /** When true, v2-addon-post-publish was included at checkout. */
-  postPublishAddon?: boolean;
 };
 
 export type RouteMapCheckoutOptions = {
-  includePostPublishAddon?: boolean;
+  roadId?: RouteMapRoadId;
 };
 
 export type RouteMapRestoredJourney = {
@@ -63,7 +60,6 @@ export type RouteMapRestoredJourney = {
   jobId: RouteMapJobId;
   roadId: RouteMapRoadId;
   selectedServiceIds: readonly ServiceId[];
-  includePostPublishAddon: boolean;
 };
 
 function isRouteMapJourneyStep(value: unknown): value is RouteMapJourneyStep {
@@ -80,9 +76,14 @@ function isRouteMapRoadId(value: unknown): value is RouteMapRoadId {
   return typeof value === "string" && ROUTE_MAP_V1.roads.some((road) => road.id === value);
 }
 
-function isRouteMapStudioPlanServiceId(value: unknown): value is ServiceId {
+function isActiveRouteMapPlanServiceId(value: unknown): value is ServiceId {
   if (typeof value !== "string") return false;
-  return Boolean(getRouteMapJob(value as RouteMapJobId) || value === ROUTE_MAP_V2_POST_PUBLISH_ADDON.id);
+  if (isRouteMapRetiredCommerceSku(value)) return false;
+  return Boolean(getRouteMapJob(value as RouteMapJobId));
+}
+
+function filterActiveRouteMapServiceIds(serviceIds: readonly ServiceId[]): ServiceId[] {
+  return dedupeServiceIds(serviceIds.filter((id) => isActiveRouteMapPlanServiceId(id)));
 }
 
 function dedupeServiceIds(serviceIds: readonly ServiceId[]): ServiceId[] {
@@ -104,18 +105,11 @@ export function addServiceToRouteMapPlanState(
   state: StudioPlanState,
   serviceId: ServiceId,
 ): StudioPlanState {
+  if (isRouteMapRetiredCommerceSku(serviceId)) return state;
+
   const sharedPlanState = addServiceToPlan(state, serviceId);
   if (sharedPlanState.selectedServiceIds !== state.selectedServiceIds) return sharedPlanState;
   if (state.selectedServiceIds.includes(serviceId)) return state;
-
-  if (serviceId === ROUTE_MAP_V2_POST_PUBLISH_ADDON.id) {
-    const hasEligibleParent = state.selectedServiceIds.some((selectedId) =>
-      isRouteMapPostPublishAddonEligible(selectedId as RouteMapJobId),
-    );
-    return hasEligibleParent
-      ? { selectedServiceIds: [...state.selectedServiceIds, serviceId] }
-      : state;
-  }
 
   if (getRouteMapJob(serviceId as RouteMapJobId)) {
     return { selectedServiceIds: [...state.selectedServiceIds, serviceId] };
@@ -124,39 +118,11 @@ export function addServiceToRouteMapPlanState(
   return sharedPlanState;
 }
 
-/**
- * Shared `pruneOrphanedExecutionAddOns` (via `removeServiceFromPlan`) relies on
- * `canAttachExecutionAddOn`, which matches by catalog `dependencies`/`eligibleParentFamilyIds`.
- * The Route Map post/publish add-on has neither — its two eligible parents
- * (v2-rtu-social-posts, v2-rtu-short-video) span different families on purpose, so the shared
- * rule can never recognize either as a valid parent and always prunes it. Restore it here when
- * an eligible parent is still selected after the shared removal runs.
- */
 export function removeServiceFromRouteMapPlanState(
   state: StudioPlanState,
   serviceId: ServiceId,
 ): StudioPlanState {
-  const hadAddon = state.selectedServiceIds.includes(ROUTE_MAP_V2_POST_PUBLISH_ADDON.id);
-  const sharedResult = removeServiceFromPlan(state, serviceId);
-
-  if (!hadAddon || serviceId === ROUTE_MAP_V2_POST_PUBLISH_ADDON.id) {
-    return sharedResult;
-  }
-
-  const stillHasEligibleParent = sharedResult.selectedServiceIds.some((id) =>
-    isRouteMapPostPublishAddonEligible(id as RouteMapJobId),
-  );
-  if (!stillHasEligibleParent || sharedResult.selectedServiceIds.includes(ROUTE_MAP_V2_POST_PUBLISH_ADDON.id)) {
-    return sharedResult;
-  }
-
-  const keepIds = new Set(sharedResult.selectedServiceIds);
-  keepIds.add(ROUTE_MAP_V2_POST_PUBLISH_ADDON.id);
-  return {
-    selectedServiceIds: state.selectedServiceIds.filter(
-      (id) => id !== serviceId && keepIds.has(id),
-    ),
-  };
+  return removeServiceFromPlan(state, serviceId);
 }
 
 export function deriveRouteMapJobIdFromSelectedServices(
@@ -177,19 +143,18 @@ export function resolveRouteMapSelectedServiceIds(
 
   if (rawSelectedServiceIds) {
     if (!Array.isArray(rawSelectedServiceIds)) return null;
-    if (rawSelectedServiceIds.some((serviceId) => !isRouteMapStudioPlanServiceId(serviceId))) {
-      return null;
-    }
 
-    return dedupeServiceIds(rawSelectedServiceIds);
+    const hasUnsupportedId = rawSelectedServiceIds.some(
+      (serviceId) =>
+        !isActiveRouteMapPlanServiceId(serviceId) && !isRouteMapRetiredCommerceSku(serviceId),
+    );
+    if (hasUnsupportedId) return null;
+
+    return filterActiveRouteMapServiceIds(rawSelectedServiceIds);
   }
 
-  if (routeMapContext?.jobId && getRouteMapJob(routeMapContext.jobId)) {
-    const selectedServiceIds: ServiceId[] = [routeMapContext.jobId as ServiceId];
-    if (routeMapContext.postPublishAddon === true) {
-      selectedServiceIds.push(ROUTE_MAP_V2_POST_PUBLISH_ADDON.id);
-    }
-    return selectedServiceIds;
+  if (routeMapContext?.jobId && isActiveRouteMapPlanServiceId(routeMapContext.jobId)) {
+    return [routeMapContext.jobId as ServiceId];
   }
 
   return null;
@@ -205,15 +170,14 @@ export function resolveRouteMapRestoredJourney(
   const selectedServiceIds = resolveRouteMapSelectedServiceIds(routeMapContext);
   if (!selectedServiceIds) return null;
 
-  const restoredStep = requestedStep === "intake" ? "intake" : routeMapContext.currentStep ?? "job";
-  if (!isRouteMapJourneyStep(restoredStep)) return null;
+  const restoredStep = requestedStep === "intake" ? "intake" : routeMapContext.currentStep;
+  if (!restoredStep || !isRouteMapJourneyStep(restoredStep)) return null;
 
   return {
     step: restoredStep,
     jobId: routeMapContext.jobId,
     roadId: routeMapContext.roadId,
     selectedServiceIds,
-    includePostPublishAddon: routeMapContext.postPublishAddon === true,
   };
 }
 
@@ -230,15 +194,12 @@ function routeMapContextFor(
   roadId: RouteMapRoadId,
   selectedAt: string,
   currentStep: RouteMapJourneyStep,
-  options: RouteMapCheckoutOptions = {},
+  _options: RouteMapCheckoutOptions = {},
   selectedServiceIds: readonly ServiceId[] = [jobId as ServiceId],
 ): RouteMapCampaignContext {
-  const postPublishAddon =
-    options.includePostPublishAddon === true && isRouteMapPostPublishAddonEligible(jobId);
-  const nextSelectedServiceIds = postPublishAddon
-    ? dedupeServiceIds([...selectedServiceIds, ROUTE_MAP_V2_POST_PUBLISH_ADDON.id])
-    : dedupeServiceIds(selectedServiceIds);
-  const derivedJobId = deriveRouteMapJobIdFromSelectedServices(nextSelectedServiceIds, jobId) ?? jobId;
+  const nextSelectedServiceIds = filterActiveRouteMapServiceIds(selectedServiceIds);
+  const derivedJobId =
+    deriveRouteMapJobIdFromSelectedServices(nextSelectedServiceIds, jobId) ?? jobId;
 
   return {
     selectedServiceIds: nextSelectedServiceIds,
@@ -246,36 +207,28 @@ function routeMapContextFor(
     roadId,
     selectedAt,
     currentStep,
-    ...(postPublishAddon ? { postPublishAddon: true } : {}),
   };
-}
-
-export function isRouteMapPostPublishAddonEligible(jobId: RouteMapJobId): boolean {
-  return isPostPublishAddonEligibleParent(jobId);
 }
 
 export function buildApprovedPlanFromRouteMapJob(
   job: RouteMapJob,
   options: RouteMapCheckoutOptions = {},
 ): ApprovedStudioPlan {
-  const selectedServiceIds: ServiceId[] = [job.id as ServiceId];
-  if (options.includePostPublishAddon === true && isRouteMapPostPublishAddonEligible(job.id)) {
-    selectedServiceIds.push(ROUTE_MAP_V2_POST_PUBLISH_ADDON.id);
-  }
-
-  return buildApprovedPlanFromRouteMapServices(selectedServiceIds);
+  return buildApprovedPlanFromRouteMapServices([job.id as ServiceId], options.roadId);
 }
 
 export function buildApprovedPlanFromRouteMapServices(
   selectedServiceIds: readonly ServiceId[],
+  roadId?: RouteMapRoadId,
 ): ApprovedStudioPlan {
-  const { includedServiceIds, additionalServiceIds } = allocateSelectedServices(selectedServiceIds);
+  const activeServiceIds = filterActiveRouteMapServiceIds(selectedServiceIds);
+  const { includedServiceIds, additionalServiceIds } = allocateSelectedServices(activeServiceIds);
   const additionalCost = computeAdditionalCostUsd(additionalServiceIds);
-  const pricing = computePlanPricingTotals(selectedServiceIds);
-  const lineItems = buildServiceScopeSnapshot(selectedServiceIds);
+  const pricing = computePlanPricingTotals(activeServiceIds, roadId);
+  const lineItems = buildServiceScopeSnapshot(activeServiceIds, roadId);
 
   return {
-    selectedServiceIds: [...selectedServiceIds],
+    selectedServiceIds: activeServiceIds,
     includedServiceIds,
     additionalServiceIds,
     additionalCostUsd: additionalCost.amountUsd,
@@ -287,8 +240,11 @@ export function buildApprovedPlanFromRouteMapServices(
   };
 }
 
-export function buildRouteMapPaymentSummaryFromServices(selectedServiceIds: readonly ServiceId[]) {
-  const totals = computePlanPricingTotals(selectedServiceIds);
+export function buildRouteMapPaymentSummaryFromServices(
+  selectedServiceIds: readonly ServiceId[],
+  roadId?: RouteMapRoadId,
+) {
+  const totals = computePlanPricingTotals(selectedServiceIds, roadId);
 
   return {
     lineItems: totals.lineItems,
@@ -309,11 +265,7 @@ export function buildRouteMapPaymentSummary(
   job: RouteMapJob,
   options: RouteMapCheckoutOptions = {},
 ) {
-  const selectedServiceIds: ServiceId[] = [job.id as ServiceId];
-  if (options.includePostPublishAddon === true && isRouteMapPostPublishAddonEligible(job.id)) {
-    selectedServiceIds.push(ROUTE_MAP_V2_POST_PUBLISH_ADDON.id);
-  }
-  return buildRouteMapPaymentSummaryFromServices(selectedServiceIds);
+  return buildRouteMapPaymentSummaryFromServices([job.id as ServiceId], options.roadId);
 }
 
 export function createCampaignFromRouteMapJob(
@@ -321,16 +273,17 @@ export function createCampaignFromRouteMapJob(
   roadId: RouteMapRoadId,
   options: RouteMapCheckoutOptions & { currentStep?: RouteMapJourneyStep } = {},
 ): CampaignRecord | null {
+  if (isRouteMapRetiredCommerceSku(jobId)) return null;
   const job = getRouteMapJob(jobId);
   if (!job) return null;
 
   const content = studioBoard.statusContent.DISCOVERY_COMPLETE;
   const now = new Date().toISOString();
-  const approvedStudioPlan = buildApprovedPlanFromRouteMapJob(job, options);
+  const approvedStudioPlan = buildApprovedPlanFromRouteMapJob(job, { ...options, roadId });
 
   const campaign: CampaignRecord = {
     campaignId: crypto.randomUUID(),
-    campaignName: job.name,
+    campaignName: resolveRouteMapServiceDisplayName(job.id as ServiceId, roadId),
     campaignStatus: "DISCOVERY_COMPLETE",
     campaignDescription: content.campaignDescription,
     estimatedCompletion: content.estimatedCompletion,
@@ -349,7 +302,12 @@ export function createCampaignFromRouteMapJob(
     revisionRoundsIncluded: 1,
     revisionRoundsUsed: 0,
     deliverablesDelivered: {},
-    studioNotes: [{ date: "Today", message: `Your project has been created: ${job.name}.` }],
+    studioNotes: [
+      {
+        date: "Today",
+        message: `Your project has been created: ${resolveRouteMapServiceDisplayName(job.id as ServiceId, roadId)}.`,
+      },
+    ],
     createdAt: now,
     updatedAt: now,
   };
@@ -357,10 +315,54 @@ export function createCampaignFromRouteMapJob(
   return campaign;
 }
 
+export function selectRouteMapRoad(roadId: RouteMapRoadId): CampaignRecord | null {
+  const existing = readCurrentCampaign();
+  const now = new Date().toISOString();
+  const jobs = getJobsForRoad(roadId);
+  const anchorJobId = jobs[0]?.id;
+  if (!anchorJobId) return null;
+
+  if (existing?.routeMapContext) {
+    const selectedServiceIds = resolveRouteMapSelectedServiceIds(existing.routeMapContext) ?? [];
+
+    return persistRouteMapCampaign({
+      ...existing,
+      approvedStudioPlan:
+        selectedServiceIds.length > 0
+          ? buildApprovedPlanFromRouteMapServices(selectedServiceIds, roadId)
+          : undefined,
+      routeMapContext: {
+        ...existing.routeMapContext,
+        roadId,
+        jobId: deriveRouteMapJobIdFromSelectedServices(selectedServiceIds, anchorJobId) ?? anchorJobId,
+        selectedServiceIds,
+        currentStep: "panel",
+      },
+      updatedAt: now,
+    });
+  }
+
+  const campaign = createCampaignFromRouteMapJob(anchorJobId, roadId, { currentStep: "panel" });
+  if (!campaign) return null;
+
+  return persistRouteMapCampaign({
+    ...campaign,
+    approvedStudioPlan: undefined,
+    routeMapContext: {
+      ...campaign.routeMapContext!,
+      selectedServiceIds: [],
+      jobId: anchorJobId,
+      roadId,
+      currentStep: "panel",
+    },
+  });
+}
+
 export function selectRouteMapJob(
   jobId: RouteMapJobId,
   roadId: RouteMapRoadId,
 ): CampaignRecord | null {
+  if (isRouteMapRetiredCommerceSku(jobId)) return null;
   const existing = readCurrentCampaign();
   if (existing?.routeMapContext) {
     const selectedServiceIds = resolveRouteMapSelectedServiceIds(existing.routeMapContext) ?? [];
@@ -422,7 +424,7 @@ export function addRouteMapServiceToPlan(
 
   const updated: CampaignRecord = {
     ...baseCampaign,
-    campaignName: getRouteMapJob(derivedJobId)?.name ?? baseCampaign.campaignName,
+    campaignName: resolveRouteMapServiceDisplayName(derivedJobId as ServiceId, roadId),
     routeMapContext: routeMapContextFor(
       derivedJobId,
       roadId,
@@ -431,7 +433,7 @@ export function addRouteMapServiceToPlan(
       {},
       nextPlanState.selectedServiceIds,
     ),
-    approvedStudioPlan: buildApprovedPlanFromRouteMapServices(nextPlanState.selectedServiceIds),
+    approvedStudioPlan: buildApprovedPlanFromRouteMapServices(nextPlanState.selectedServiceIds, roadId),
     updatedAt: now,
   };
 
@@ -455,16 +457,13 @@ export function removeRouteMapServiceFromPlan(serviceId: ServiceId): CampaignRec
     ...campaign,
     approvedStudioPlan:
       planState.selectedServiceIds.length > 0
-        ? buildApprovedPlanFromRouteMapServices(planState.selectedServiceIds)
+        ? buildApprovedPlanFromRouteMapServices(planState.selectedServiceIds, ctx.roadId)
         : undefined,
     routeMapContext: {
       ...ctx,
       selectedServiceIds: planState.selectedServiceIds,
       jobId: derivedJobId ?? ctx.jobId,
       currentStep: "studio-plan",
-      postPublishAddon: planState.selectedServiceIds.includes(ROUTE_MAP_V2_POST_PUBLISH_ADDON.id)
-        ? true
-        : undefined,
     },
     updatedAt: now,
   };
@@ -482,43 +481,52 @@ export function saveRouteMapPlanState(planState: StudioPlanState): CampaignRecor
     ...campaign,
     approvedStudioPlan:
       planState.selectedServiceIds.length > 0
-        ? buildApprovedPlanFromRouteMapServices(planState.selectedServiceIds)
+        ? buildApprovedPlanFromRouteMapServices(planState.selectedServiceIds, ctx.roadId)
         : undefined,
     routeMapContext: {
       ...ctx,
       selectedServiceIds: [...planState.selectedServiceIds],
       jobId: derivedJobId ?? ctx.jobId,
       currentStep: "studio-plan",
-      postPublishAddon: planState.selectedServiceIds.includes(ROUTE_MAP_V2_POST_PUBLISH_ADDON.id)
-        ? true
-        : undefined,
     },
     updatedAt: new Date().toISOString(),
   });
 }
 
+/** Clear in-progress journey step so Route Map can display without auto-redirecting away. */
+export function releaseRouteMapForMapView(): CampaignRecord | null {
+  const campaign = readCurrentCampaign();
+  const ctx = campaign?.routeMapContext;
+  if (!campaign || !ctx || !ctx.currentStep) return campaign;
+
+  const { currentStep: _removed, ...routeMapContext } = ctx;
+
+  return persistRouteMapCampaign({
+    ...campaign,
+    routeMapContext,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+/** @deprecated Prefer releaseRouteMapForMapView — kept for existing call sites. */
+export const releaseRouteMapPanelStep = releaseRouteMapForMapView;
+
 export function saveRouteMapJourneyStep(
   currentStep: RouteMapJourneyStep,
-  options: RouteMapCheckoutOptions = {},
+  _options: RouteMapCheckoutOptions = {},
 ): CampaignRecord | null {
   const campaign = readCurrentCampaign();
   const ctx = campaign?.routeMapContext;
   if (!campaign || !ctx) return null;
 
-  const includePostPublishAddon =
-    options.includePostPublishAddon === true && isRouteMapPostPublishAddonEligible(ctx.jobId);
-
-  const updated: CampaignRecord = {
+  return persistRouteMapCampaign({
     ...campaign,
     routeMapContext: {
       ...ctx,
       currentStep,
-      ...(includePostPublishAddon ? { postPublishAddon: true } : { postPublishAddon: undefined }),
     },
     updatedAt: new Date().toISOString(),
-  };
-
-  return persistRouteMapCampaign(updated);
+  });
 }
 
 export function saveApprovedRouteMapPlan(
@@ -538,12 +546,18 @@ export function saveApprovedRouteMapPlan(
   if (isRouteMapServiceIdList(jobIdOrServiceIds)) {
     if (jobIdOrServiceIds.length === 0) return null;
     selectedServiceIds = [...jobIdOrServiceIds];
-    basePlan = buildApprovedPlanFromRouteMapServices(selectedServiceIds);
+    basePlan = buildApprovedPlanFromRouteMapServices(
+      selectedServiceIds,
+      campaign.routeMapContext?.roadId,
+    );
   } else {
     const routeMapJob = getRouteMapJob(jobIdOrServiceIds);
     if (!routeMapJob) return null;
     selectedServiceIds = [jobIdOrServiceIds];
-    basePlan = buildApprovedPlanFromRouteMapJob(routeMapJob, options);
+    basePlan = buildApprovedPlanFromRouteMapJob(routeMapJob, {
+      ...options,
+      roadId: options.roadId ?? campaign.routeMapContext?.roadId,
+    });
   }
 
   const approvedStudioPlan: ApprovedStudioPlan = {
@@ -574,11 +588,6 @@ export function saveApprovedRouteMapPlan(
           selectedServiceIds: approvedStudioPlan.selectedServiceIds,
           jobId: derivedJobId ?? campaign.routeMapContext.jobId,
           currentStep: "checkout",
-          postPublishAddon: approvedStudioPlan.selectedServiceIds.includes(
-            ROUTE_MAP_V2_POST_PUBLISH_ADDON.id,
-          )
-            ? true
-            : undefined,
         }
       : campaign.routeMapContext,
     updatedAt: new Date().toISOString(),

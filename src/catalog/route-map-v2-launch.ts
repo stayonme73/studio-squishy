@@ -8,7 +8,6 @@ import type {
   DeliveryMapping,
   ExecutionMode,
   ProductionLane,
-  RouteMapV2AddonServiceId,
   RouteMapV2ShelfServiceId,
   ServiceCategoryId,
   ServiceClass,
@@ -19,10 +18,7 @@ import type {
 } from "@/catalog/types";
 import { CATALOG_SCHEMA_VERSION } from "@/catalog/types";
 import type { RouteMapIntakeTemplateId } from "@/catalog/intake/types";
-import {
-  CATALOG_V2_ACTIVATION_LAUNCH_CANDIDATE_SKUS,
-  CATALOG_V2_ACTIVATION_POST_PUBLISH_PARENT_SKUS,
-} from "@/catalog/activation";
+import { CATALOG_V2_ACTIVATION_LAUNCH_CANDIDATE_SKUS } from "@/catalog/activation";
 import { CATALOG_V2_BATCH1_READY_TO_USE } from "@/catalog/v2/batch1-ready-to-use";
 import { CATALOG_V2_BATCH2_READY_TO_USE } from "@/catalog/v2/batch2-ready-to-use";
 import type { CatalogV2ServiceEntry } from "@/catalog/v2/types";
@@ -95,21 +91,24 @@ const V2_INTAKE_TEMPLATE_BY_SKU: Record<RouteMapV2ShelfServiceId, RouteMapIntake
   "v2-rtu-voice": "rtu-voice",
   "v2-rtu-email-kit": "rtu-email-kit",
   "v2-rtu-sms-kit": "rtu-sms-kit",
+  "v2-rtu-business-card": "rtu-business-card",
 };
 
 /** Customer-facing purpose lines for Route Map shelf cards — never scopeRoutingNote or internal routing. */
 const ROUTE_MAP_V2_CUSTOMER_PURPOSE: Record<string, string> = {
-  "v2-rtu-flyer": "One finished single-sided flyer you can print or share online.",
-  "v2-rtu-menu": "One single-page menu with your items and prices, ready to print.",
-  "v2-rtu-service-sheet": "One page listing your services for customers to read.",
-  "v2-rtu-social-posts": "Four social post graphics with captions for one platform.",
-  "v2-rtu-promotion-graphics": "Two branded graphics for one campaign or promotion.",
+  "v2-rtu-flyer": "One single-sided flyer in one size — ready to print or share online.",
+  "v2-rtu-menu": "One single-page menu with a defined item limit — ready to print or share.",
+  "v2-rtu-service-sheet": "One page with up to ten services and brief descriptions.",
+  "v2-rtu-social-posts": "Four coordinated static posts for one platform — ready for you to upload.",
+  "v2-rtu-promotion-graphics": "Two coordinated static graphics for one campaign or promotion.",
   "v2-rtu-email-kit": "Up to two finished emails ready for you to send.",
   "v2-rtu-sms-kit": "Up to four text messages ready for you to send.",
-  "v2-rtu-voice": "One short voice announcement we write and produce for you.",
-  "v2-rtu-short-video": "One short video edit with captions, ready for you to post.",
-  "v2-addon-post-publish":
-    "We schedule or publish one finished piece on one connected platform for you.",
+  "v2-rtu-voice":
+    "One short announcement — internal AI or approved Studio software voice only; no outside talent.",
+  "v2-rtu-short-video":
+    "One basic 15–30 second video edited from your footage or approved Studio assets — no filming.",
+  "v2-rtu-business-card":
+    "One double-sided business card design — design only, not printing or shipping.",
 };
 
 function customerPurposeForV2Sku(sku: string, draft: CatalogV2ServiceEntry): string {
@@ -156,7 +155,7 @@ function deliveryMappingFromDraft(entry: CatalogV2ServiceEntry): DeliveryMapping
 
 function routeMapV2ServiceFromDraft(
   draft: CatalogV2ServiceEntry,
-  options: { isAddOn?: boolean } = {},
+  options: { retired?: boolean } = {},
 ): StudioServiceEntry {
   const priceCents = draft.priceCents ?? 0;
   const timing = timingWindowsForLane(draft.productionLane);
@@ -165,6 +164,7 @@ function routeMapV2ServiceFromDraft(
     draft.sourceExecutionMode === "managed_execution_when_selected"
       ? "managed_execution_when_selected"
       : "creation_delivery";
+  const isRetired = options.retired === true;
 
   return {
     schemaVersion: CATALOG_SCHEMA_VERSION,
@@ -174,21 +174,21 @@ function routeMapV2ServiceFromDraft(
     category: draft.category,
     serviceClass: SERVICE_CLASS_BY_CATEGORY[draft.category] ?? "core",
     customerReceives: deliverables.join("; "),
-    internalProductionNotes: options.isAddOn
-      ? "Route Map V2 post/publish add-on — checkout with eligible parent RTU job only."
+    internalProductionNotes: isRetired
+      ? "Retired Route Map SKU — historical campaign reads only."
       : "Route Map V2 activated RTU SKU — front-door checkout only.",
     dependencies: [],
     includedRevisionRounds: draft.revisionLimit ?? 1,
     canSubstitute: false,
-    addOnEligible: Boolean(options.isAddOn),
+    addOnEligible: false,
     upgradeEligible: false,
     deliveryFormats: [],
     minimumCustomerRequirements: draft.clientResponsibilities
       ? [...draft.clientResponsibilities]
       : [],
     recommendedCustomerRequirements: [],
-    serviceStatus: "active",
-    status: "active",
+    serviceStatus: isRetired ? "retired" : "active",
+    status: isRetired ? "inactive" : "active",
     billingType: draft.billingType satisfies BillingType,
     priceCents,
     productionLane: draft.productionLane,
@@ -203,15 +203,14 @@ function routeMapV2ServiceFromDraft(
     requiresClientAccess: executionMode === "managed_execution_when_selected",
     requiresClientMaterials: true,
     isRecommendable: false,
-    isAddable: Boolean(options.isAddOn),
-    ...(options.isAddOn ? { isExecutionAddOn: true as const } : {}),
-    launchStatus: "limited",
+    isAddable: false,
+    launchStatus: isRetired ? "retired" : "limited",
     serviceGuideFaq: [],
     deliveryMapping: deliveryMappingFromDraft(draft),
     discoveryTriggers: [],
     discoveryMapping: [],
     routeMapTurnaroundLabel: draft.turnaround,
-    ...(!options.isAddOn && V2_INTAKE_TEMPLATE_BY_SKU[draft.sku as RouteMapV2ShelfServiceId]
+    ...(!isRetired && V2_INTAKE_TEMPLATE_BY_SKU[draft.sku as RouteMapV2ShelfServiceId]
       ? {
           intakeTemplate: V2_INTAKE_TEMPLATE_BY_SKU[draft.sku as RouteMapV2ShelfServiceId],
         }
@@ -229,34 +228,23 @@ export const ROUTE_MAP_V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] =
     return routeMapV2ServiceFromDraft(draft);
   });
 
-/** Post/publish add-on — not on Route Map shelf; offered at checkout with eligible parents. */
-export const ROUTE_MAP_V2_POST_PUBLISH_ADDON: StudioServiceEntry = (() => {
+/** Retired post/publish add-on — catalog read-only for historical campaigns. */
+export const ROUTE_MAP_V2_RETIRED_POST_PUBLISH_ADDON: StudioServiceEntry = (() => {
   const draft = V2_DRAFT_BY_SKU.get("v2-addon-post-publish");
   if (!draft) {
     throw new Error("Missing V2 draft record for v2-addon-post-publish");
   }
-  return routeMapV2ServiceFromDraft(draft, { isAddOn: true });
+  return routeMapV2ServiceFromDraft(draft, { retired: true });
 })();
 
 export const ROUTE_MAP_V2_ALL_SERVICES: readonly StudioServiceEntry[] = [
   ...ROUTE_MAP_V2_LAUNCH_SERVICES,
-  ROUTE_MAP_V2_POST_PUBLISH_ADDON,
+  ROUTE_MAP_V2_RETIRED_POST_PUBLISH_ADDON,
 ];
 
 export function isRouteMapV2ShelfServiceId(value: string): value is RouteMapV2ShelfServiceId {
   return CATALOG_V2_ACTIVATION_LAUNCH_CANDIDATE_SKUS.includes(
     value as RouteMapV2ShelfServiceId,
-  );
-}
-
-export function isRouteMapV2AddonServiceId(value: string): value is RouteMapV2AddonServiceId {
-  return value === "v2-addon-post-publish";
-}
-
-/** Parent RTU jobs that may offer v2-addon-post-publish at Route Map checkout. */
-export function isPostPublishAddonEligibleParent(jobId: string): boolean {
-  return CATALOG_V2_ACTIVATION_POST_PUBLISH_PARENT_SKUS.includes(
-    jobId as (typeof CATALOG_V2_ACTIVATION_POST_PUBLISH_PARENT_SKUS)[number],
   );
 }
 

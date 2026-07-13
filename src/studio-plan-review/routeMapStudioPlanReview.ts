@@ -4,12 +4,12 @@
 
 import { getDerivedServicePricing, getServiceById } from "@/catalog/accessors";
 import { SERVICE_CATALOG } from "@/catalog";
-import { ROUTE_MAP_V2_POST_PUBLISH_ADDON } from "@/catalog/route-map-v2-launch";
 import { validateExecutionAddOnsInPlan } from "@/catalog/validate";
 import type { ServiceId } from "@/catalog/types";
-import { ROUTE_MAP_V1 } from "@/config/route-map-v1";
+import { ROUTE_MAP_V1, type RouteMapRoadId } from "@/config/route-map-v1";
 import { addServiceToRouteMapPlanState } from "@/lib/route-map-campaign";
 import { computePlanPricingTotals, formatUsdFromCents } from "@/lib/plan-pricing";
+import { resolveRouteMapServiceDisplayName } from "@/lib/project-builder-update-exit-copy";
 import {
   computeAdditionalCostUsd,
   getSameClassSwapCandidates,
@@ -23,10 +23,7 @@ import {
   type StudioPlanReviewServiceItem,
 } from "@/studio-plan-review/types";
 
-const ROUTE_MAP_PLAN_SERVICE_IDS = [
-  ...ROUTE_MAP_V1.jobs.map((job) => job.id as ServiceId),
-  ROUTE_MAP_V2_POST_PUBLISH_ADDON.id,
-] as const;
+const ROUTE_MAP_PLAN_SERVICE_IDS = ROUTE_MAP_V1.jobs.map((job) => job.id as ServiceId);
 
 const ROUTE_MAP_PLAN_SERVICE_SET = new Set<ServiceId>(ROUTE_MAP_PLAN_SERVICE_IDS);
 
@@ -48,8 +45,11 @@ function buildCostSummary(additionalServiceIds: readonly ServiceId[]): StudioPla
   return { display: formatUsd(amountUsd), amountUsd, hasQuotedItems: false };
 }
 
-function buildPlanTotals(selectedServiceIds: readonly ServiceId[]): StudioPlanReviewPlanTotals {
-  const totals = computePlanPricingTotals(selectedServiceIds);
+function buildPlanTotals(
+  selectedServiceIds: readonly ServiceId[],
+  roadId?: RouteMapRoadId,
+): StudioPlanReviewPlanTotals {
+  const totals = computePlanPricingTotals(selectedServiceIds, roadId);
 
   return {
     oneTimeSubtotalDisplay: formatUsdFromCents(totals.oneTimeSubtotalCents),
@@ -65,6 +65,7 @@ function buildServiceItem(
   serviceId: ServiceId,
   isIncluded: boolean,
   selectedIds: readonly ServiceId[],
+  roadId?: RouteMapRoadId,
 ): StudioPlanReviewServiceItem | null {
   const service = getServiceById(serviceId);
   if (!service) return null;
@@ -75,13 +76,16 @@ function buildServiceItem(
     .map((candidateId) => {
       const candidate = getServiceById(candidateId);
       if (!candidate) return null;
-      return { serviceId: candidateId, title: candidate.name };
+      return {
+        serviceId: candidateId,
+        title: resolveRouteMapServiceDisplayName(candidateId, roadId),
+      };
     })
     .filter((item): item is NonNullable<typeof item> => item !== null);
 
   return {
     serviceId,
-    title: service.name,
+    title: resolveRouteMapServiceDisplayName(serviceId, roadId),
     pricingDisplay: pricing?.display ?? formatUsd(0),
     amountUsd: pricing?.amountUsd ?? 0,
     isIncluded,
@@ -93,15 +97,17 @@ function mapServiceIds(
   serviceIds: readonly ServiceId[],
   isIncluded: boolean,
   selectedIds: readonly ServiceId[],
+  roadId?: RouteMapRoadId,
 ): StudioPlanReviewServiceItem[] {
   return serviceIds
     .filter((serviceId) => ROUTE_MAP_PLAN_SERVICE_SET.has(serviceId))
-    .map((serviceId) => buildServiceItem(serviceId, isIncluded, selectedIds))
+    .map((serviceId) => buildServiceItem(serviceId, isIncluded, selectedIds, roadId))
     .filter((item): item is StudioPlanReviewServiceItem => item !== null);
 }
 
 export function buildRouteMapStudioPlanReview(
   planState: StudioPlanState,
+  roadId?: RouteMapRoadId,
 ): StudioPlanReviewModel {
   const selectedIds = planState.selectedServiceIds;
   const availableToAdd = ROUTE_MAP_PLAN_SERVICE_IDS.filter((serviceId) =>
@@ -119,13 +125,13 @@ export function buildRouteMapStudioPlanReview(
     },
     selectedServiceIds: selectedIds,
     recommendedServiceIds: [],
-    includedServices: mapServiceIds(selectedIds, true, selectedIds),
+    includedServices: mapServiceIds(selectedIds, true, selectedIds, roadId),
     considerNextServices: [],
     additionalStudioServices: [],
     addedToPlanServices: [],
-    availableToAdd: mapServiceIds(availableToAdd, false, selectedIds),
+    availableToAdd: mapServiceIds(availableToAdd, false, selectedIds, roadId),
     additionalCost: buildCostSummary([]),
-    planTotals: buildPlanTotals(selectedIds),
+    planTotals: buildPlanTotals(selectedIds, roadId),
     warnings: [],
     canApprove: planValid,
     planValid,

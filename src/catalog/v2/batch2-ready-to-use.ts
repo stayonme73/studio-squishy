@@ -12,6 +12,7 @@
 import type { CatalogV2ServiceEntry } from "@/catalog/v2/types";
 import { CATALOG_V2_DRAFT_SCHEMA_VERSION } from "@/catalog/v2/types";
 import { buildRouteMapTimingLabel } from "@/catalog/route-map-shared-copy";
+import { CATALOG_V2_SCOPE_OVERFLOW_NOTE } from "@/catalog/v2/batch1-ready-to-use";
 
 export const CATALOG_V2_BATCH2_READY_TO_USE_BATCH_ID = "batch2-ready-to-use" as const;
 export const CATALOG_V2_BATCH2_ADDONS_BATCH_ID = "batch2-addons" as const;
@@ -21,10 +22,10 @@ export const CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE = "approved public V1 price 
 
 /** Shared Batch 2 delivery rule — documented on each ready-to-use record. */
 export const CATALOG_V2_BATCH2_DELIVERY_RULE =
-  "The Studio creates the finished deliverable. The client sends, uploads, prints, posts, or distributes it unless they separately buy a clearly scoped post/publish add-on.";
+  "The Studio creates the finished deliverable. You send, upload, print, post, or distribute it through your own platform, account, or tools.";
 
 export const CATALOG_V2_BATCH2_RTU_CLIENT_RESPONSIBILITY: readonly string[] = [
-  "Send, upload, post, or distribute delivered files through your own platform, account, or tools unless you separately purchase a scoped post/publish add-on.",
+  "Send, upload, post, or distribute delivered files through your own platform, account, or tools.",
 ];
 
 /** Required email-kit client responsibility — list, consent, sending, and replies stay with client. */
@@ -173,8 +174,8 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacySourceSku: "em-001",
     legacyPriceReferenceCents: 32500,
     legacyPriceReferenceNote:
-      "em-001 Email Campaign Build is $325 for up to two client-ready emails with subject lines and preview text — approved public V1 price for this SKU is $350.",
-    priceCents: 35000,
+      "em-001 Email Campaign Build is $325 for up to two client-ready emails with subject lines and preview text — approved working launch price for this SKU is $129.",
+    priceCents: 12900,
     priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
@@ -183,8 +184,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-email-kit",
     clientResponsibilities: CATALOG_V2_BATCH2_EMAIL_CLIENT_RESPONSIBILITY,
-    scopeRoutingNote:
-      "Automation, segmentation, list building, monthly batches, or more than two emails route to Help Me Figure Out What I Need (rm-j001), not into this SKU.",
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
     includedDeliverables: [
       {
         key: "marketing_email",
@@ -236,8 +236,8 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacySourceSku: "sms-001",
     legacyPriceReferenceCents: 17500,
     legacyPriceReferenceNote:
-      "sms-001 SMS Campaign Build is $175 for up to four client-ready SMS messages — approved public V1 price for this SKU is $225.",
-    priceCents: 22500,
+      "sms-001 SMS Campaign Build is $175 for up to four client-ready SMS messages — approved working launch price for this SKU is $69.",
+    priceCents: 6900,
     priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
@@ -246,8 +246,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-sms-kit",
     clientResponsibilities: CATALOG_V2_BATCH2_SMS_CLIENT_RESPONSIBILITY,
-    scopeRoutingNote:
-      "MMS, automation, monthly batches, consent setup, or more than four messages route to Help Me Figure Out What I Need (rm-j001), not into this SKU.",
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
     includedDeliverables: [
       {
         key: "sms_message",
@@ -304,8 +303,8 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacySourceSku: "ap-001",
     legacyPriceReferenceCents: 17500,
     legacyPriceReferenceNote:
-      "ap-001 AI Voice Over Production is $175 for one track up to 300 words — approved public V1 price for this SKU is $250.",
-    priceCents: 25000,
+      "ap-001 AI Voice Over Production is $175 for one track up to 300 words — approved working launch price for this SKU is $79.",
+    priceCents: 7900,
     priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-voice",
@@ -314,21 +313,21 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "Confirm pronunciation, claims, and usage rights are accurate",
       "Upload, embed, or distribute the finished audio yourself",
     ],
-    scopeRoutingNote:
-      "Visual/motion pieces, posting, multiple platforms, or scope beyond one short voice track route to Help Me Figure Out What I Need (rm-j001) or rm-j006 patterns, not into this SKU.",
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
     includedDeliverables: [
       {
         key: "voice_script",
         quantity: 1,
         unit: "script",
         label:
-          "Short announcement script written by The Studio from client-approved details and facts (up to 300 words)",
+          "Short announcement script written by The Studio from client-approved details and facts, when needed (up to 300 words)",
       },
       {
-        key: "ai_voice_over_track",
+        key: "voice_audio_track",
         quantity: 1,
         unit: "audio",
-        label: "One AI-generated voice-over track — one approved voice style; one language",
+        label:
+          "One short voice announcement — customer-provided usable audio or an approved internal Studio AI/software voice method; one language",
       },
       {
         key: "voice_audio_file",
@@ -336,14 +335,21 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
         unit: "file",
         label: "Final MP3 or WAV audio file",
       },
+      {
+        key: "qc_review",
+        quantity: 1,
+        unit: "review",
+        label: "Studio quality-control review before delivery",
+      },
     ],
     exclusions: [
+      "Outside voice talent, freelancers, or third-party voice actors",
       "Voice cloning or celebrity/public-figure imitation",
-      "Human voice recording or multiple speakers/voices",
+      "Human voice recording beyond internal Studio AI or software tools",
       "Translations or multiple languages",
       "Music production or advanced audio mixing",
       "Visual, motion, or social post assembly",
-      "Posting, publishing, or scheduling",
+      "Posting, publishing, content management, or scheduling",
       "More than 300 script words",
       "Legal claim review",
       "More than one revision round",
@@ -371,39 +377,45 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacySourceSku: "vp-001",
     legacyPriceReferenceCents: 79500,
     legacyPriceReferenceNote:
-      "vp-001 Marketing Video Project is $795 for one video up to 60 seconds — approved public V1 price for this SKU is $550.",
-    priceCents: 55000,
+      "vp-001 Marketing Video Project is $795 for one video up to 60 seconds — approved working launch price for one basic 15–30 second video is $149.",
+    priceCents: 14900,
     priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-short-video",
     clientResponsibilities: [
       "Provide organized, usable footage, photos, logo, and source materials when using your own visuals",
-      "Upload, post, or distribute the finished video yourself unless you add Post/Publish for Me to this job",
+      "Upload, post, or distribute the finished video yourself through your own account or tools",
     ],
-    scopeRoutingNote:
-      "On-site filming, multiple cuts/aspect ratios, videos longer than 45 seconds, paid placement, or posting scope route to Help Me Figure Out What I Need (rm-j001) or rm-j004 patterns, not into this SKU.",
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
     includedDeliverables: [
       {
         key: "marketing_video",
         quantity: 1,
         unit: "video",
         label:
-          "One short-form video up to 45 seconds — one format only: vertical, square, or landscape; one campaign, offer, event, or promotion focus",
+          "One basic short-form video, 15–30 seconds — one format only: vertical, square, or landscape; one campaign, offer, event, or promotion focus",
       },
       {
         key: "video_mp4",
         quantity: 1,
         unit: "file",
         label:
-          "Final MP4 with basic edit, on-screen captions, and CTA treatment — using client footage or approved Studio/stock/AI visuals",
+          "Final MP4 with basic edit, on-screen captions, and CTA treatment — using customer-provided usable footage or approved Studio assets",
+      },
+      {
+        key: "qc_review",
+        quantity: 1,
+        unit: "review",
+        label: "Studio quality-control review before delivery",
       },
     ],
     exclusions: [
       "On-site filming, drone footage, or talent casting",
+      "Outside freelancers, voice actors, printers, or production vendors",
       "Photography or custom illustration source creation",
       "Advanced custom animation or motion graphics",
       "Multiple aspect ratios, cuts, or versions",
-      "Video longer than 45 seconds",
+      "Video longer than 30 seconds",
       "Music licensing outside approved tools",
       "Paid ads, placement, or influencer work",
       "Posting, publishing, or scheduling",
@@ -435,12 +447,11 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacySourceSku: "social_media-execution",
     legacyPriceReferenceCents: 10000,
     legacyPriceReferenceNote:
-      "social_media-execution Social Scheduling & Publishing is $100 add-on to sm-001 — this V2 add-on applies only to approved social posts or short video parent jobs, not standalone shelf purchase.",
+      "Retired — historical campaign reads only. The Studio no longer offers Post/Publish for Me.",
     priceCents: 10000,
-    priceNote: CATALOG_V2_BATCH2_PUBLIC_V1_PRICE_NOTE,
+    priceNote: "retired — historical records only",
     turnaroundApprovalStatus: "approved",
-    scopeRoutingNote:
-      "Not a standalone ready-to-use shelf item — purchase only with an eligible approved social posts or short video parent job (v2-rtu-social-posts, v2-rtu-short-video). Scope beyond one connected platform or included parent deliverables routes to rm-j001.",
+    scopeRoutingNote: "Retired SKU — not available for new purchases.",
     includedDeliverables: [
       {
         key: "social_scheduling_publishing",
@@ -480,11 +491,8 @@ export const CATALOG_V2_BATCH2_LAUNCH_CANDIDATE_SKUS = [
   "v2-rtu-short-video",
 ] as const;
 
-/** Eligible parent SKUs for v2-addon-post-publish — approved social/video jobs only (draft reference). */
-export const CATALOG_V2_BATCH2_POST_PUBLISH_ELIGIBLE_PARENT_SKUS = [
-  "v2-rtu-social-posts",
-  "v2-rtu-short-video",
-] as const;
+/** @deprecated Post/Publish retired — empty set retained for historical draft references. */
+export const CATALOG_V2_BATCH2_POST_PUBLISH_ELIGIBLE_PARENT_SKUS = [] as const;
 
 /** Batch 2 launch candidate entries — filters out add-on framework SKU. */
 export const CATALOG_V2_BATCH2_LAUNCH_CANDIDATES: readonly CatalogV2ServiceEntry[] =

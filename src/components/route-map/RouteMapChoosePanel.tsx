@@ -1,7 +1,9 @@
 "use client";
 
 import RouteMapInterstateShield from "@/components/route-map/RouteMapInterstateShield";
+import SquishyHelpPrompt from "@/components/route-map/SquishyHelpPrompt";
 import { getSelectableRouteMapRoads, type RouteMapRoadId } from "@/config/route-map-v1";
+import { useSquishyHelpPromptVisibility } from "@/lib/use-squishy-help-prompt-visibility";
 
 type Props = {
   id?: string;
@@ -36,6 +38,7 @@ export default function RouteMapChoosePanel({
   panelOpen = true,
 }: Props) {
   const roads = getSelectableRouteMapRoads();
+  const helpPromptVisible = useSquishyHelpPromptVisibility();
 
   return (
     <aside id={id} className="route-map-choose-panel" aria-label="Choose your route">
@@ -65,6 +68,8 @@ export default function RouteMapChoosePanel({
           Choose a route on the map or use the guide on the right.
         </p>
       </header>
+
+      <SquishyHelpPrompt visible={helpPromptVisible} />
 
       <nav className="route-map-choose-panel__nav">
         {roads.map((road) => (

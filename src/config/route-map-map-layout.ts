@@ -24,64 +24,68 @@ export type RouteMapRoadControl = {
 export type RouteMapHeroVariant = "desk-scene" | "cloverleaf";
 
 export const ROUTE_MAP_ASSETS = {
-  deskScene: "/route-map/studio-route-map-desk-scene.png",
+  deskScene: "/route-map/studio-route-map-hero-v2.png",
   cloverleaf: "/route-map/studio-route-map-cloverleaf.png",
 } as const;
 
-/** Full desk scene — framed map on studio desk (Tagia 1st choice). */
-export const ROUTE_MAP_DESK_SCENE_ASPECT = "1536 / 1024";
+/** Hero v2 — full-bleed aerial interchange, approved 2026-07-09 (Tagia). */
+export const ROUTE_MAP_DESK_SCENE_ASPECT = "1586 / 992";
 
-/** Map frame inset within desk scene (% of scene). */
+/** Map frame inset within scene (% of scene) — hero v2 is full-bleed, no inset. */
 export const ROUTE_MAP_DESK_MAP_FRAME = {
-  left: 16.5,
-  top: 8.5,
-  width: 67,
-  height: 60,
+  left: 0,
+  top: 0,
+  width: 100,
+  height: 100,
 } as const;
 
 /** Cloverleaf map — mobile fallback (Tagia 2nd choice). */
 export const ROUTE_MAP_CLOVERLEAF_ASPECT = "16 / 10";
 
-/** Hotspots aligned to map frame inside desk-scene hero. */
+/**
+ * Hotspots aligned to map frame inside desk-scene hero.
+ * Recalibrated 2026-07-09 for hero v2 (full-bleed aerial interchange) —
+ * each rect bounds the corresponding colored CTA banner baked into the art.
+ */
 export const ROUTE_MAP_DESK_CONTROLS: readonly RouteMapRoadControl[] = [
   {
     roadId: "i75",
     label: "I-75",
     sublabel: "Get My Business Started",
-    left: 40,
-    top: 16,
-    width: 20,
-    height: 72,
+    left: 44.14,
+    top: 16.63,
+    width: 40.98,
+    height: 16.13,
     className: "route-map-board__hotspot--i75",
   },
   {
     roadId: "i20",
     label: "I-20",
     sublabel: "Promote Something Now",
-    left: 8,
-    top: 42,
-    width: 84,
-    height: 14,
+    left: 2.52,
+    top: 52.42,
+    width: 31.53,
+    height: 19.15,
     className: "route-map-board__hotspot--i20",
   },
   {
     roadId: "update",
     label: "Update Exit",
     sublabel: "Update What I Already Have",
-    left: 56,
-    top: 30,
-    width: 24,
-    height: 20,
+    left: 59.27,
+    top: 42.84,
+    width: 39.09,
+    height: 18.15,
     className: "route-map-board__hotspot--update",
   },
   {
     roadId: "random-exit",
     label: "Random Exit",
     sublabel: "I Know What I Need",
-    left: 60,
-    top: 56,
-    width: 26,
-    height: 22,
+    left: 68.41,
+    top: 72.58,
+    width: 29.63,
+    height: 15.63,
     className: "route-map-board__hotspot--random",
   },
 ];
@@ -139,14 +143,13 @@ export type RouteMapHighwayMarker = {
   className: string;
 };
 
-/** Desk scene marker positions (% within map frame) — aligned to baked road geometry. */
-export const ROUTE_MAP_DESK_HIGHWAY_MARKERS: readonly RouteMapHighwayMarker[] = [
-  { roadId: "i75", label: "I-75", left: 47, top: 28, className: "route-map-highway-marker--i75" },
-  /** East-west leg heading toward the sun — centered on the roadway like I-75. */
-  { roadId: "i20", label: "I-20", left: 4, top: 46, className: "route-map-highway-marker--i20" },
-  /** Perimeter loop — centered on the ring segment like I-75 on its lane. */
-  { roadId: "i285", label: "I-285", left: 64, top: 54, className: "route-map-highway-marker--i285" },
-];
+/**
+ * Desk scene marker positions (% within map frame) — aligned to baked road geometry.
+ * Disabled 2026-07-09: hero v2 bakes its own "STUDIO ROUTE" signage into the artwork,
+ * making these decorative INTERSTATE overlay markers duplicate/conflicting noise.
+ * Left empty (not removed) so this can be restored if a future hero variant needs it.
+ */
+export const ROUTE_MAP_DESK_HIGHWAY_MARKERS: readonly RouteMapHighwayMarker[] = [];
 
 export const ROUTE_MAP_CLOVERLEAF_HIGHWAY_MARKERS: readonly RouteMapHighwayMarker[] = [
   { roadId: "i75", label: "I-75", left: 46, top: 14, className: "route-map-highway-marker--i75" },

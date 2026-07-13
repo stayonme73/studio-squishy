@@ -1223,6 +1223,68 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   line-height: 1.42;
 }
 
+/* ── Squishy Help Prompt — quiet reassurance above the route cards ──
+   Intentionally NOT a route card and NOT a panel: one prompt line + one button.
+   Confident customers ignore it. Kept modular (visible/onOpen props on the
+   component) so a future hesitation trigger can gate it without layout change. */
+.route-map-help-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: clamp(10px, 1.4vw, 14px) clamp(12px, 1.6vw, 16px) 0;
+}
+
+.route-map-help-prompt__prompt {
+  margin: 0;
+  font-size: clamp(0.88rem, 1.2vw, 0.96rem);
+  font-weight: 600;
+  color: color-mix(in srgb, var(--studio-charcoal, #2e2b28) 68%, transparent);
+}
+
+.route-map-help-prompt__cta {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--rm-i75, #2f7d4f);
+  font: inherit;
+  font-size: clamp(0.9rem, 1.25vw, 0.98rem);
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: color 140ms ease;
+}
+
+.route-map-help-prompt__cta:hover,
+.route-map-help-prompt__cta:focus-visible {
+  color: color-mix(in srgb, var(--rm-i75, #2f7d4f) 78%, #000);
+  outline: none;
+}
+
+.route-map-help-prompt__message {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--rm-frost-card, rgba(255, 255, 255, 0.7));
+  border: 1px solid color-mix(in srgb, var(--studio-charcoal, #2e2b28) 10%, transparent);
+  font-size: clamp(0.88rem, 1.2vw, 0.96rem);
+  line-height: 1.45;
+  color: var(--studio-charcoal, #2e2b28);
+}
+
+.route-map-help-prompt__squishy-label {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--studio-charcoal, #2e2b28) 58%, transparent);
+}
+
 .route-map-choose-panel__nav {
   display: flex;
   flex-direction: column;

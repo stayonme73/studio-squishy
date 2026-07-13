@@ -19,4 +19,5 @@ export type RouteMapIntakeTemplateId =
   | "rtu-email-kit"
   | "rtu-sms-kit"
   | "rtu-voice"
-  | "rtu-short-video";
+  | "rtu-short-video"
+  | "rtu-business-card";

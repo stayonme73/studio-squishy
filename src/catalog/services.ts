@@ -110,7 +110,7 @@ const LAUNCH_STATUS_BY_ID: Readonly<Record<ServiceId, LaunchStatus>> = {
   "customer-follow-up": "retired",
   "monthly-support": "retired",
   // Route Map V1 launch — limited (front-door checkout only, not Discovery green set)
-  "rm-j001": "limited",
+  "rm-j001": "retired",
   "rm-j002": "limited",
   "rm-j003": "retired",
   "rm-j004": "retired",
@@ -128,7 +128,8 @@ const LAUNCH_STATUS_BY_ID: Readonly<Record<ServiceId, LaunchStatus>> = {
   "v2-rtu-sms-kit": "limited",
   "v2-rtu-voice": "limited",
   "v2-rtu-short-video": "limited",
-  "v2-addon-post-publish": "limited",
+  "v2-rtu-business-card": "limited",
+  "v2-addon-post-publish": "retired",
 };
 
 function resolveLaunchStatus(id: ServiceId): LaunchStatus {

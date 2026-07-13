@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import SecureCheckoutGrid from "@/components/payment/SecureCheckoutGrid";
 import RouteMapIntakeForm from "@/components/route-map/RouteMapIntakeForm";
 import RouteMapJobCard from "@/components/route-map/RouteMapJobCard";
 import RouteMapMobileMap from "@/components/route-map/RouteMapMobileMap";
@@ -11,7 +10,6 @@ import RouteMapRoutePanel from "@/components/route-map/RouteMapRoutePanel";
 import RouteMapLobbyBackdrop from "@/components/route-map/RouteMapLobbyBackdrop";
 import RouteMapSquishyPanel from "@/components/route-map/RouteMapSquishyPanel";
 import RouteMapWorkspace from "@/components/route-map/RouteMapWorkspace";
-import StudioPlanReviewScene from "@/components/studio-plan-review/StudioPlanReviewScene";
 import type { ServiceId } from "@/catalog/types";
 import {
   getRouteMapJob,
@@ -22,39 +20,37 @@ import {
 import { studioBoard } from "@/config/studio-board";
 import {
   addRouteMapServiceToPlan,
-  addServiceToRouteMapPlanState,
-  buildRouteMapPaymentSummaryFromServices,
-  buildRouteMapPaymentSummary,
-  isRouteMapPostPublishAddonEligible,
-  removeRouteMapServiceFromPlan,
   resolveRouteMapRestoredJourney,
-  saveApprovedRouteMapPlan,
-  saveRouteMapPlanState,
+  resolveRouteMapSelectedServiceIds,
   saveRouteMapJourneyStep,
   saveRouteMapIntakeDraft,
   selectRouteMapJob,
+  selectRouteMapRoad,
   submitRouteMapIntake,
 } from "@/lib/route-map-campaign";
+import { campaignSaveStatusLabel } from "@/lib/campaign-save-status-label";
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
 import { CAMPAIGN_SYNC_EVENT, type CampaignSyncStatus } from "@/lib/campaign-store/types";
 import { readCampaignSyncStatus } from "@/lib/campaign-store/sync-client";
-import { markPaymentReceived, readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
+import { readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
+import { projectBuilderHref } from "@/config/project-builder-v1";
 import { projectRecordArrivalHref } from "@/lib/project-record-arrival";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 import { resolveSquishyRouteMapMessage } from "@/lib/route-map-squishy";
 import type { RouteMapJourneyStep } from "@/config/studio-board";
-import {
-  buildRouteMapStudioPlanReview,
-  swapServiceInPlan,
-  type StudioPlanState,
-} from "@/studio-plan-review";
 
 export type RouteMapStep = "map" | RouteMapJourneyStep;
 
-function routeMapSyncStatusLabel(status: CampaignSyncStatus | null): string {
-  if (status?.state === "syncing") return "Saving...";
-  if (status?.state === "error") return "Saved on this device. Sync will retry.";
-  return "All changes saved";
+type IntakeDraftStatus = "unsaved" | "saved" | "error";
+
+function routeMapSyncStatusLabel(
+  status: CampaignSyncStatus | null,
+  intakeDraftStatus: IntakeDraftStatus | null,
+): string {
+  if (intakeDraftStatus === "error") return "Save failed";
+  if (intakeDraftStatus === "unsaved") return "Unsaved draft";
+  if (intakeDraftStatus === "saved") return "Progress saved";
+  return campaignSaveStatusLabel(status);
 }
 
 export default function RouteMapScene() {
@@ -64,8 +60,8 @@ export default function RouteMapScene() {
   const [roadId, setRoadId] = useState<RouteMapRoadId | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<RouteMapJobId | null>(null);
   const [selectedServiceIds, setSelectedServiceIds] = useState<ServiceId[]>([]);
-  const [includePostPublishAddon, setIncludePostPublishAddon] = useState(false);
   const [syncStatus, setSyncStatus] = useState<CampaignSyncStatus | null>(null);
+  const [intakeDraftStatus, setIntakeDraftStatus] = useState<IntakeDraftStatus>("unsaved");
   /** True once the current project has been paid — the paid plan is protected from the old pre-payment path. */
   const [isPaidProject, setIsPaidProject] = useState(false);
   const previousStepRef = useRef<RouteMapStep | null>(null);
@@ -76,30 +72,6 @@ export default function RouteMapScene() {
   const selectedJob = useMemo(
     () => (selectedJobId ? getRouteMapJob(selectedJobId) : undefined),
     [selectedJobId],
-  );
-
-  const postPublishEligible = selectedJob ? isRouteMapPostPublishAddonEligible(selectedJob.id) : false;
-
-  const paymentSummary = useMemo(
-    () =>
-      selectedServiceIds.length > 0
-        ? buildRouteMapPaymentSummaryFromServices(selectedServiceIds)
-        : selectedJob
-          ? buildRouteMapPaymentSummary(selectedJob, {
-              includePostPublishAddon: postPublishEligible && includePostPublishAddon,
-            })
-          : undefined,
-    [selectedServiceIds, selectedJob, postPublishEligible, includePostPublishAddon],
-  );
-
-  const planState: StudioPlanState = useMemo(
-    () => ({ selectedServiceIds }),
-    [selectedServiceIds],
-  );
-
-  const studioPlanModel = useMemo(
-    () => buildRouteMapStudioPlanReview(planState),
-    [planState],
   );
 
   const squishyMessage = useMemo(
@@ -117,11 +89,13 @@ export default function RouteMapScene() {
     [step, selectedServiceIds, selectedJobId, isPaidProject],
   );
 
-  const handleSelectRoad = useCallback((id: RouteMapRoadId) => {
-    setRoadId(id);
-    setSelectedJobId(null);
-    setStep("panel");
-  }, []);
+  const handleSelectRoad = useCallback(
+    (id: RouteMapRoadId) => {
+      selectRouteMapRoad(id);
+      router.push(projectBuilderHref(id));
+    },
+    [router],
+  );
 
   const handleSelectJob = useCallback(
     (job: RouteMapJob, activeRoadId?: RouteMapRoadId) => {
@@ -129,7 +103,6 @@ export default function RouteMapScene() {
       if (!resolvedRoadId) return;
       setRoadId(resolvedRoadId);
       setSelectedJobId(job.id);
-      setIncludePostPublishAddon(false);
       const updated = selectRouteMapJob(job.id, resolvedRoadId);
       setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? selectedServiceIds)]);
       setStep("job");
@@ -143,12 +116,9 @@ export default function RouteMapScene() {
     if (isPaidProject && !selectedServiceIds.includes(selectedJob.id)) return;
     const updated = addRouteMapServiceToPlan(selectedJob.id, roadId);
     setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? selectedServiceIds)]);
-    // Follow-up for the Project Change package: this setStep is unconditional and doesn't verify
-    // the addition actually happened. Not reachable today (the guard above and the guard inside
-    // addRouteMapServiceToPlan both hold), but revisit once Studio Plan becomes payment-aware
-    // through the Decision Core flow.
-    setStep("studio-plan");
-  }, [selectedJob, roadId, selectedServiceIds, isPaidProject]);
+    saveRouteMapJourneyStep("studio-plan");
+    router.push(`${projectBuilderHref(roadId)}&view=studio-plan`);
+  }, [selectedJob, roadId, selectedServiceIds, isPaidProject, router]);
 
   const handleBackToMap = useCallback(() => {
     setStep("map");
@@ -167,58 +137,6 @@ export default function RouteMapScene() {
     setSelectedJobId(null);
   }, []);
 
-  const handleBackToStudioPlan = useCallback(() => {
-    saveRouteMapJourneyStep("studio-plan");
-    setStep("studio-plan");
-  }, []);
-
-  const handleReturnToBrowsing = useCallback(() => {
-    saveRouteMapJourneyStep("panel");
-    setStep(roadId ? "panel" : "map");
-  }, [roadId]);
-
-  const handleRemoveFromPlan = useCallback(
-    (serviceId: ServiceId) => {
-      const updated = removeRouteMapServiceFromPlan(serviceId);
-      setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? [])]);
-    },
-    [],
-  );
-
-  const handleSwapInPlan = useCallback(
-    (fromId: ServiceId, toId: ServiceId) => {
-      const next = swapServiceInPlan(planState, fromId, toId);
-      const updated = saveRouteMapPlanState(next);
-      setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? next.selectedServiceIds)]);
-    },
-    [planState],
-  );
-
-  const handleAddFromPlan = useCallback(
-    (serviceId: ServiceId) => {
-      const next = addServiceToRouteMapPlanState(planState, serviceId);
-      const updated = saveRouteMapPlanState(next);
-      setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? next.selectedServiceIds)]);
-    },
-    [planState],
-  );
-
-  const handleApprovePlan = useCallback(() => {
-    if (!studioPlanModel.planValid || selectedServiceIds.length === 0) return;
-    const saved = saveApprovedRouteMapPlan(selectedServiceIds);
-    if (!saved) return;
-    saveRouteMapJourneyStep("checkout");
-    setStep("checkout");
-  }, [studioPlanModel.planValid, selectedServiceIds]);
-
-  const handlePaymentComplete = useCallback(() => {
-    saveRouteMapJourneyStep("intake", {
-      includePostPublishAddon: postPublishEligible && includePostPublishAddon,
-    });
-    setIsPaidProject(true);
-    setStep("intake");
-  }, [postPublishEligible, includePostPublishAddon]);
-
   const handleIntakeSubmit = useCallback(
     (answers: RouteMapIntakeAnswers) => {
       const updated = submitRouteMapIntake(answers);
@@ -228,15 +146,15 @@ export default function RouteMapScene() {
     [router],
   );
 
-  const handleIntakeSaveDraft = useCallback(
-    (answers: RouteMapIntakeAnswers) => {
-      const updated = saveRouteMapIntakeDraft(answers);
-      if (!updated) return false;
-      router.push(studioBoard.routes.studioBoard);
-      return true;
-    },
-    [router],
-  );
+  const handleIntakeSaveDraft = useCallback((answers: RouteMapIntakeAnswers) => {
+    const updated = saveRouteMapIntakeDraft(answers);
+    if (!updated) {
+      setIntakeDraftStatus("error");
+      return false;
+    }
+    setIntakeDraftStatus("saved");
+    return true;
+  }, []);
 
   useEffect(() => {
     const campaign = readCurrentCampaignHydrated();
@@ -247,15 +165,45 @@ export default function RouteMapScene() {
       campaign?.routeMapContext,
       searchParams.get("step"),
     );
-    if (!restoredJourney) return;
 
-    justRestoredRef.current = true;
-    setRoadId(restoredJourney.roadId);
-    setSelectedJobId(restoredJourney.jobId);
-    setSelectedServiceIds([...restoredJourney.selectedServiceIds]);
-    setIncludePostPublishAddon(restoredJourney.includePostPublishAddon);
-    setStep(restoredJourney.step);
-  }, [searchParams]);
+    if (restoredJourney) {
+      if (
+        restoredJourney.step === "panel" ||
+        restoredJourney.step === "studio-plan" ||
+        restoredJourney.step === "checkout"
+      ) {
+        const href =
+          restoredJourney.step === "studio-plan"
+            ? `${projectBuilderHref(restoredJourney.roadId)}&view=studio-plan`
+            : restoredJourney.step === "checkout"
+              ? "/checkout"
+              : projectBuilderHref(restoredJourney.roadId);
+        router.replace(href);
+        return;
+      }
+
+      justRestoredRef.current = true;
+      setRoadId(restoredJourney.roadId);
+      setSelectedJobId(restoredJourney.jobId);
+      setSelectedServiceIds([...restoredJourney.selectedServiceIds]);
+      setStep(restoredJourney.step);
+      return;
+    }
+
+    const ctx = campaign?.routeMapContext;
+    if (ctx?.roadId) {
+      const persistedSelections = resolveRouteMapSelectedServiceIds(ctx);
+      if (persistedSelections) {
+        setSelectedServiceIds([...persistedSelections]);
+      }
+      if (ctx.jobId) {
+        setSelectedJobId(ctx.jobId);
+        setRoadId(ctx.roadId);
+      }
+    }
+
+    setStep("map");
+  }, [searchParams, router]);
 
   useEffect(() => {
     if (squishyMessage?.key === "first-arrival") {
@@ -283,8 +231,6 @@ export default function RouteMapScene() {
   const showOverlay = step !== "map";
   const showPanel = step === "panel" && roadId;
   const showJob = step === "job" && selectedJob;
-  const showStudioPlan = step === "studio-plan";
-  const showCheckout = step === "checkout" && selectedServiceIds.length > 0 && paymentSummary;
   const showIntake = step === "intake" && selectedJob;
 
   return (
@@ -328,11 +274,11 @@ export default function RouteMapScene() {
 
           {showOverlay ? (
             <div className="route-map-save-status" role="status" aria-live="polite">
-              {routeMapSyncStatusLabel(syncStatus)}
+              {routeMapSyncStatusLabel(syncStatus, showIntake ? intakeDraftStatus : null)}
             </div>
           ) : null}
 
-          {showOverlay ? <RouteMapSquishyPanel message={squishyMessage} /> : null}
+          {showOverlay && !showIntake ? <RouteMapSquishyPanel message={squishyMessage} /> : null}
 
           {showPanel ? (
             <RouteMapRoutePanel
@@ -361,53 +307,14 @@ export default function RouteMapScene() {
             </div>
           ) : null}
 
-          {showStudioPlan ? (
-            <div className="route-map-world__sheet route-map-world__sheet--checkout">
-              <button type="button" className="route-map-back-link" onClick={handleReturnToBrowsing}>
-                ← Back to Route Map
-              </button>
-              <div className="route-map-overlay-workspace route-map-overlay-workspace--checkout">
-                <StudioPlanReviewScene
-                  model={studioPlanModel}
-                  onRemove={handleRemoveFromPlan}
-                  onSwap={handleSwapInPlan}
-                  onAdd={handleAddFromPlan}
-                  onApprove={handleApprovePlan}
-                />
-              </div>
-            </div>
-          ) : null}
-
-          {showCheckout ? (
-            <div className="route-map-world__sheet route-map-world__sheet--checkout">
-              <button type="button" className="route-map-back-link" onClick={handleBackToStudioPlan}>
-                ← Back to Studio Plan
-              </button>
-              <div className="route-map-overlay-workspace route-map-overlay-workspace--checkout">
-                <SecureCheckoutGrid
-                layout="full"
-                planSummary={paymentSummary}
-                onBeforePayment={(acknowledgment) => {
-                  if (selectedServiceIds.length === 0) return false;
-                  return Boolean(saveApprovedRouteMapPlan(selectedServiceIds, acknowledgment));
-                }}
-                onPaymentComplete={() => {
-                  markPaymentReceived();
-                  handlePaymentComplete();
-                }}
-              />
-              </div>
-            </div>
-          ) : null}
-
           {showIntake ? (
             <div className="route-map-world__sheet route-map-world__sheet--intake">
               <div className="route-map-overlay-workspace route-map-overlay-workspace--intake">
                 <RouteMapIntakeForm
                 job={selectedJob}
-                postPublishAddon={postPublishEligible && includePostPublishAddon}
                 onSaveDraft={handleIntakeSaveDraft}
                 onSubmit={handleIntakeSubmit}
+                onDraftStatusChange={setIntakeDraftStatus}
               />
               </div>
             </div>

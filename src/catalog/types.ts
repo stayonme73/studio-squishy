@@ -190,7 +190,8 @@ export type RouteMapV2ShelfServiceId =
   | "v2-rtu-email-kit"
   | "v2-rtu-sms-kit"
   | "v2-rtu-voice"
-  | "v2-rtu-short-video";
+  | "v2-rtu-short-video"
+  | "v2-rtu-business-card";
 
 /** Route Map V2 checkout add-on — not a standalone shelf item. */
 export type RouteMapV2AddonServiceId = "v2-addon-post-publish";

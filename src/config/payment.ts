@@ -6,23 +6,29 @@ import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
 export const payment = {
   brand: "THE STUDIO",
   /** Customer-facing page title — not the journey step name. */
-  pageTitle: "Complete Your Studio Plan",
+  pageTitle: "Review & Checkout",
   pageLeadLines: [
-    "Your recommendations have been approved.",
-    "Complete payment to begin your project.",
+    "You're almost there — complete your secure payment below.",
+    "Project Intake opens immediately after payment so you can provide everything we need to begin your project.",
   ] as const,
+  backToStudioPlanLabel: "← Back to Studio Plan",
+  editProjectLabel: "Edit Project",
   /** @deprecated use pageTitle */
   title: customerJourneyStepName("secure-checkout"),
   sections: {
     summary: "Your Studio Plan",
-    form: "Secure Payment",
+    deliverables: "Selected Deliverables",
+    billing: "Billing Information",
+    payment: "Payment Information",
     next: "What Happens Next",
+    /** @deprecated use billing + payment */
+    form: "Secure Payment",
   },
   summary: {
-    recommendedServicesLabel: "YOUR SELECTED SERVICES",
+    recommendedServicesLabel: "Selected Deliverables",
     oneTimeSubtotalLabel: "One-Time Subtotal",
     monthlySubtotalLabel: "Monthly Subtotal",
-    amountDueTodayLabel: "Amount Due Today",
+    amountDueTodayLabel: "Estimated Investment",
     cardProcessingDisclosureNote:
       "Taxes and standard processing costs are included in your total.",
     investmentLabel: "Estimated Investment",
@@ -45,9 +51,13 @@ export const payment = {
       "Please confirm that you reviewed your Studio Plan, including what is included, pricing, timing, and what you are responsible for.",
       "The Studio creates the approved marketing work. Results such as sales, leads, and bookings are not guaranteed.",
     ] as const,
-    termsLabel: "I reviewed my Studio Plan and agree to proceed with payment.",
+    termsLabel:
+      "I reviewed my Studio Plan and understand production begins after payment and after I submit the required project materials.",
     viewPlanDetailsLabel: "View your selected plan details above",
-    submitLabel: "Complete Payment",
+    submitLabel: "Complete Secure Payment",
+    paymentSecurityNote:
+      "Your payment is encrypted and processed securely. The Studio does not store your payment information.",
+    paymentReassurance: "Your payment is encrypted and processed securely.",
   },
   /** Local dev or NEXT_PUBLIC_PAYMENT_SANDBOX=1 (Vercel Preview only — not Production). */
   sandbox: {
@@ -58,16 +68,17 @@ export const payment = {
   },
   whatsNext: {
     steps: [
-      { label: "Payment received", marker: "check" },
-      { label: "Project Details", marker: "arrow" },
-      { label: "Creative Production Begins", marker: "arrow" },
-      { label: "First Concepts (Within 7 Business Days)", marker: "arrow" },
-      { label: "Review Room", marker: "arrow" },
-      { label: "Final Delivery", marker: "arrow" },
+      { label: "Payment confirmed", marker: "number" },
+      { label: "Project Intake opens", marker: "number" },
+      { label: "You provide your materials", marker: "number" },
+      { label: "We begin production", marker: "number" },
+      { label: "You'll review the work", marker: "number" },
+      { label: "Final delivery", marker: "number" },
     ] as const,
+    emailReassurance: "We'll email you each time your project reaches a new stage.",
   },
   secureNote:
-    "Payment is securely encrypted. After payment, you'll share the details and materials we need to complete your approved Studio Plan.",
+    "Your payment is encrypted and processed securely. The Studio does not store your payment information.",
   intakeExplanation:
     "After payment, you'll share the details and materials we need to complete your approved Studio Plan.",
   routes: {

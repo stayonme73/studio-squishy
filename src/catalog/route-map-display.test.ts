@@ -32,7 +32,7 @@ describe("route-map-display accessors", () => {
   });
 
   it("getCheckoutPriceDisplay prefers routeMapPriceDisplay when seeded", () => {
-    expect(getCheckoutPriceDisplay(getServiceById("rm-j002")!)).toBe("$400 / platform");
+    expect(getCheckoutPriceDisplay(getServiceById("rm-j002")!)).toBe("$99 / platform");
   });
 
   it("getCheckoutTimingLabel matches legacy discovery timing for active services without overrides", () => {
@@ -79,15 +79,20 @@ describe("route-map-display accessors", () => {
   it("returns per-platform price labels from catalog seeds", () => {
     const j002 = getServiceById("rm-j002");
     expect(j002).toBeDefined();
-    expect(getRouteMapPriceDisplay(j002!)).toBe("$400 / platform");
+    expect(getRouteMapPriceDisplay(j002!)).toBe("$99 / platform");
     expect(getRouteMapPriceDisplay(getServiceById("rm-j003")!)).toBe("$450 / platform");
     expect(getRouteMapPriceDisplay(getServiceById("rm-j004")!)).toBe("$650 / platform");
     expect(getRouteMapPriceDisplay(getServiceById("rm-j006")!)).toBe("$400 / platform");
   });
 
   it("formats standard shelf prices without override", () => {
-    expect(getRouteMapPriceDisplay(getServiceById("rm-j008")!)).toBe("$400");
-    expect(getRouteMapPriceDisplay(getServiceById("v2-rtu-flyer")!)).toBe("$300");
+    expect(getRouteMapPriceDisplay(getServiceById("rm-j008")!)).toBe("$99 / platform");
+    expect(getRouteMapPriceDisplay(getServiceById("v2-rtu-flyer")!)).toBe("$69");
+    expect(getRouteMapPriceDisplay(getServiceById("rm-j005")!)).toBe("$349");
+    expect(getRouteMapPriceDisplay(getServiceById("v2-rtu-email-kit")!)).toBe("$129");
+    expect(getRouteMapPriceDisplay(getServiceById("v2-rtu-sms-kit")!)).toBe("$69");
+    expect(getRouteMapPriceDisplay(getServiceById("v2-rtu-voice")!)).toBe("$79");
+    expect(getRouteMapPriceDisplay(getServiceById("rm-j007")!)).toBe("$69");
   });
 
   it("returns V1 turnaround labels from catalog seeds", () => {

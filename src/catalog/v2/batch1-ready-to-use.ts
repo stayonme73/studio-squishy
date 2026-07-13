@@ -18,9 +18,13 @@ export const CATALOG_V2_BATCH1_READY_TO_USE_BATCH_ID = "batch1-ready-to-use" as 
 export const CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE =
   "approved public V1 price (Batch 1 ready-to-use)";
 
+/** Internal scope-overflow note — not customer-facing. */
+export const CATALOG_V2_SCOPE_OVERFLOW_NOTE =
+  "Not included in this SKU. Browse your route or ask Squishy for help choosing a verified service.";
+
 /** Shared ready-to-use delivery rule — documented on each Batch 1 record. */
 export const CATALOG_V2_RTU_DELIVERY_RULE =
-  "The Studio creates finished files. Client prints, uploads, sends, schedules, or distributes unless they separately buy a scoped post/publish service.";
+  "The Studio creates finished files. You print, upload, post, send, schedule, or distribute using your own tools and accounts.";
 
 export const CATALOG_V2_RTU_CLIENT_RESPONSIBILITY: readonly string[] = [
   "Print, upload, post, send, schedule, or distribute delivered files using your own tools and accounts.",
@@ -102,8 +106,8 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacySourceSku: "ma-001",
     legacyPriceReferenceCents: 49500,
     legacyPriceReferenceNote:
-      "ma-001 Promotion Pack is $495 for up to four marketing assets — not a per-flyer price. Approved public V1 price for this SKU is $300.",
-    priceCents: 30000,
+      "ma-001 Promotion Pack is $495 for up to four marketing assets — not a per-flyer price. Approved working launch price for this SKU is $69.",
+    priceCents: 6900,
     priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
@@ -112,12 +116,18 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-flyer",
     clientResponsibilities: [
+      "Final wording, prices, logo, images, and contact details you want on the flyer",
       "Print, upload, post, email, or distribute the finished files yourself",
       "Use your own printer, platform, or account for distribution",
     ],
-    scopeRoutingNote:
-      "Keep complex or unclear flyer requests routed to Help Me Figure Out What I Need (rm-j001) instead of stretching single-flyer scope.",
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
     includedDeliverables: [
+      {
+        key: "design_direction",
+        quantity: 1,
+        unit: "direction",
+        label: "One defined design direction",
+      },
       {
         key: "flyer_design",
         quantity: 1,
@@ -136,15 +146,22 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
         unit: "file",
         label: "Digital PNG or JPG version for sharing online (one agreed size)",
       },
+      {
+        key: "qc_review",
+        quantity: 1,
+        unit: "review",
+        label: "Studio quality-control review before delivery",
+      },
     ],
     exclusions: [
       "Printing, shipping, or printer coordination",
+      "Outside freelancers, voice actors, printers, or production vendors",
       "More than one flyer",
       "Double-sided flyer",
       "Multiple sizes or platform versions",
       "Editable source files",
       "Photography, custom illustration, packaging, signage, website work",
-      "Posting/publishing unless separately purchased",
+      "Posting, publishing, or scheduling",
       "More than one revision round",
     ],
     revisionLimit: 1,
@@ -172,7 +189,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacyPriceReferenceCents: 49500,
     legacyPriceReferenceNote:
       "ma-001 Promotion Pack is $495 for up to four marketing assets — menus listed as an example asset type, not a dedicated menu SKU.",
-    priceCents: 45000,
+    priceCents: 8900,
     priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
@@ -186,15 +203,20 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "Confirm dietary and allergen information is accurate",
       "Confirm any required legal wording is accurate",
     ],
-    scopeRoutingNote:
-      "Anything beyond the base scope routes to Help Me Figure Out What I Need (rm-j001), not into this SKU.",
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
     includedDeliverables: [
+      {
+        key: "design_direction",
+        quantity: 1,
+        unit: "direction",
+        label: "One defined design direction",
+      },
       {
         key: "menu_design",
         quantity: 1,
         unit: "design",
         label:
-          "One finished single-page menu — one agreed size only; up to 5 sections; up to 30 total menu/service items; client provides final item names, descriptions, prices, dietary/allergen labels, and required wording",
+          "One finished single-page menu — one agreed size only; up to 5 sections; up to 30 total items (defined item limit)",
       },
       {
         key: "print_ready_pdf",
@@ -208,10 +230,18 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
         unit: "file",
         label: "One digital PNG or JPG version",
       },
+      {
+        key: "qc_review",
+        quantity: 1,
+        unit: "review",
+        label: "Studio quality-control review before delivery",
+      },
     ],
     exclusions: [
       "Bifold, trifold, booklet, multi-page, or table-service menus",
       "More than 5 sections or 30 items",
+      "Printing, shipping, or physical menu production",
+      "Outside freelancers, voice actors, printers, or production vendors",
       "Price-list cleanup, rewriting, proofreading for business accuracy, or allergen verification",
       "Multiple sizes/versions",
       "Printing, shipping, vendor coordination, editable source files, photography, custom illustration, posting, or publishing",
@@ -242,7 +272,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacyPriceReferenceCents: 49500,
     legacyPriceReferenceNote:
       "ma-001 Promotion Pack is $495 for up to four marketing assets — one-page collateral listed as an example asset type, not a dedicated service-sheet SKU.",
-    priceCents: 35000,
+    priceCents: 7900,
     priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
@@ -255,8 +285,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "Confirm starting prices and contact information are accurate",
       "Confirm any required legal wording is accurate",
     ],
-    scopeRoutingNote:
-      "A client needing a long price list, packages, many service tiers, or a brochure gets routed to Help Me Figure Out What I Need (rm-j001) instead of stretching this job.",
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
     includedDeliverables: [
       {
         key: "service_sheet_design",
@@ -284,6 +313,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "More than 10 services",
       "Double-sided or multi-page collateral",
       "Brochures, catalogs, packages, websites, printing, or posting",
+      "Outside freelancers, voice actors, printers, or production vendors",
       "Editable files",
       "More than one revision round",
     ],
@@ -310,8 +340,8 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacySourceSku: "sm-001",
     legacyPriceReferenceCents: 39500,
     legacyPriceReferenceNote:
-      "sm-001 Social Media Launch Set is $395 for up to six static posts plus calendar — this SKU is scoped to four posts with a simple posting order.",
-    priceCents: 45000,
+      "sm-001 Social Media Launch Set is $395 for up to six static posts plus calendar — approved working launch price for four coordinated static posts is $99.",
+    priceCents: 9900,
     priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
@@ -320,19 +350,19 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     turnaroundApprovalStatus: "approved",
     intakeTemplate: "rtu-social-posts",
     clientResponsibilities: [
+      "Final wording, prices, logo, images, and contact details for the posts",
       "Upload, post, and schedule the finished graphics yourself",
       "Handle replies, comments, direct messages, and other account activity",
       "Use your own platform account",
     ],
-    scopeRoutingNote:
-      "Requests for multiple platforms, videos, a full monthly calendar, or ongoing posting should route to Help Me Figure Out What I Need (rm-j001) or a separate future service, not stretch this SKU.",
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
     includedDeliverables: [
       {
         key: "static_social_post",
         quantity: 4,
         unit: "posts",
         label:
-          "Static social media post graphic — one campaign, offer, event, business focus, or message theme; built for one platform only; one caption for each post",
+          "Four coordinated static post graphics — one campaign, offer, event, business focus, or message theme; built for one platform only; one caption for each post",
       },
       {
         key: "social_post_file",
@@ -356,8 +386,9 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     exclusions: [
       "Video, Reels, motion graphics, Stories, carousels, or animation",
       "More than one platform size/version",
-      "Posting, scheduling, publishing, or account access",
-      "Paid ads",
+      "Posting, scheduling, publishing, content management, or account access",
+      "Paid ads or ad management",
+      "Outside freelancers, voice actors, printers, or production vendors",
       "Photography or filming",
       "Daily content or ongoing management",
       "Comment/DM/community management",
@@ -389,8 +420,8 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     legacySourceSku: "ma-001",
     legacyPriceReferenceCents: 49500,
     legacyPriceReferenceNote:
-      "ma-001 Promotion Pack is $495 for up to four marketing assets — not a per-graphic price.",
-    priceCents: 35000,
+      "ma-001 Promotion Pack is $495 for up to four marketing assets — approved working launch price for two coordinated static graphics is $79.",
+    priceCents: 7900,
     priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
     routeMapEligible: true,
     directExitEligible: true,
@@ -402,15 +433,14 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "Distribute the finished graphics yourself through print, social media, email, or other channels",
       "Use your own printer, platform, or account",
     ],
-    scopeRoutingNote:
-      "Multi-campaign packs, large asset bundles, or unclear scope route to Help Me Figure Out What I Need (rm-j001) instead of stretching this SKU.",
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
     includedDeliverables: [
       {
         key: "campaign_graphic",
         quantity: 2,
         unit: "graphics",
         label:
-          "branded campaign graphics for one campaign, event, offer, or launch — one agreed format/use per graphic; same campaign theme; no captions",
+          "Two coordinated static campaign graphics for one campaign, event, offer, or launch — same campaign theme; one agreed format/use per graphic; no captions",
       },
       {
         key: "campaign_graphic_files",
@@ -429,7 +459,8 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "Photography or custom illustration",
       "Multiple size sets or format versions per graphic",
       "Printing, shipping, or vendor coordination",
-      "Posting, publishing, or scheduling (unless separately purchased)",
+      "Outside freelancers, voice actors, printers, or production vendors",
+      "Posting, publishing, or scheduling",
       "Editable source files",
       "More than one revision round",
     ],
@@ -451,6 +482,88 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     ],
   }),
   batch1Base({
+    sku: "v2-rtu-business-card",
+    clientFacingName: "Make Me a Business Card",
+    category: "marketing-assets",
+    familyId: "marketing_assets",
+    priceCents: 4900,
+    priceNote: CATALOG_V2_BATCH1_PUBLIC_V1_PRICE_NOTE,
+    routeMapEligible: true,
+    directExitEligible: false,
+    placement: "route_map",
+    laneEligibility: ["i75"],
+    turnaroundApprovalStatus: "approved",
+    intakeTemplate: "rtu-business-card",
+    clientResponsibilities: [
+      "Final contact details, wording, logo, and brand colors for the card",
+      "Business name, name and title, phone, email, website or social link, and address if desired",
+    ],
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
+    includedDeliverables: [
+      {
+        key: "design_direction",
+        quantity: 1,
+        unit: "direction",
+        label: "One defined design direction",
+      },
+      {
+        key: "business_card_design",
+        quantity: 1,
+        unit: "design",
+        label: "One double-sided business card design — design only; one person or version; one agreed size",
+      },
+      {
+        key: "card_size",
+        quantity: 1,
+        unit: "size",
+        label: "One agreed card size",
+      },
+      {
+        key: "print_ready_pdf",
+        quantity: 1,
+        unit: "file",
+        label: "Print-ready PDF",
+      },
+      {
+        key: "digital_preview",
+        quantity: 1,
+        unit: "file",
+        label: "Digital PNG or JPG preview",
+      },
+      {
+        key: "qc_review",
+        quantity: 1,
+        unit: "review",
+        label: "Studio quality-control review before delivery",
+      },
+    ],
+    exclusions: [
+      "Printing, shipping, or physical card production",
+      "Outside freelancers, voice actors, printers, or production vendors",
+      "Logo creation",
+      "Custom illustration",
+      "Multiple employee versions",
+      "Multiple card sizes",
+      "Editable source files",
+      "More than one revision round",
+    ],
+    revisionLimit: 1,
+    turnaround: buildRouteMapTimingLabel("within 2–3 business days"),
+    billingType: "one_time",
+    sourceLaunchStatus: "limited",
+    productionLane: "quick_turn",
+    sourceExecutionMode: "creation_delivery",
+    intakeTemplateFieldsTbd: [
+      "Business name",
+      "Name and title for the card",
+      "Phone number and email address",
+      "Website or social link",
+      "Business address, if desired",
+      "Logo and brand colors, if available",
+      "Preferred card size, if known",
+    ],
+  }),
+  batch1Base({
     sku: "v2-rtu-handout",
     clientFacingName: "Make Me a Handout or One-Page PDF",
     batchLaunchCandidate: false,
@@ -469,8 +582,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
     clientResponsibilities: [
       "Client prints, emails, uploads, or distributes the finished handout through their own tools and is responsible for the accuracy of content, contact information, and legal wording.",
     ],
-    scopeRoutingNote:
-      "Multi-page collateral, brochures, or packages route to Help Me Figure Out What I Need (rm-j001) instead of stretching this SKU.",
+    scopeRoutingNote: CATALOG_V2_SCOPE_OVERFLOW_NOTE,
     includedDeliverables: [
       {
         key: "handout_design",
@@ -498,7 +610,7 @@ export const CATALOG_V2_BATCH1_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
       "Food menus with item/price lists (route to menu SKU)",
       "More than one handout",
       "Printing, shipping, or vendor coordination",
-      "Posting, publishing, or scheduling (unless separately purchased)",
+      "Posting, publishing, or scheduling",
       "Editable source files",
       "Photography or custom illustration",
       "More than one revision round",

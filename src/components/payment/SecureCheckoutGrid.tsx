@@ -24,7 +24,7 @@ type Props = {
   packageId?: StudioGuidePackageId;
   /** When set, runs after payment instead of default Vision Intake navigation. */
   onPaymentComplete?: (packageId: StudioGuidePackageId | undefined) => void;
-  /** `embedded` — summary + form only (Project Summary second row). `full` — three columns. */
+  /** `embedded` — legacy two-column sheet. `full` — certified single-column checkout room. */
   layout?: "full" | "embedded";
   /** Live plan summary from customize column; overrides storage/mock summary when set. */
   planSummary?: PaymentPlanSummary;
@@ -88,6 +88,31 @@ function PaperCard({
   );
 }
 
+function CheckoutSection({
+  title,
+  children,
+  className = "",
+}: {
+  title: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  const id = title ? `co-section-${title.replace(/\s+/g, "-").toLowerCase()}` : undefined;
+  return (
+    <section
+      className={`co-card ${className}`.trim()}
+      aria-labelledby={id}
+    >
+      {title ? (
+        <h2 id={id} className="co-card__heading">
+          {title}
+        </h2>
+      ) : null}
+      {children}
+    </section>
+  );
+}
+
 function resolveCheckoutPackageId(
   packageIdProp?: StudioGuidePackageId,
 ): StudioGuidePackageId | undefined {
@@ -95,7 +120,7 @@ function resolveCheckoutPackageId(
   return resolveBundlePackageId(readCurrentCampaignHydrated()?.packageId);
 }
 
-/** Three-column Secure Checkout — Studio Plan summary, payment form, what happens next. */
+/** Secure Checkout — presentation only; payment logic unchanged. */
 export default function SecureCheckoutGrid({
   packageId: packageIdProp,
   onPaymentComplete,
@@ -126,11 +151,11 @@ export default function SecureCheckoutGrid({
   function completeCheckout() {
     const acknowledgment = buildAcknowledgment();
     if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
-    markPaymentReceived(checkoutPackageId);
     if (onPaymentComplete) {
       onPaymentComplete(checkoutPackageId);
       return;
     }
+    markPaymentReceived(checkoutPackageId);
     router.push(resolvePostPaymentIntakeHref(readCurrentCampaignHydrated(), checkoutPackageId));
   }
 
@@ -143,123 +168,270 @@ export default function SecureCheckoutGrid({
   function handleSandboxPayment() {
     const acknowledgment = buildAcknowledgment();
     if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
-    simulateSandboxPayment(checkoutPackageId);
     if (onPaymentComplete) {
       onPaymentComplete(checkoutPackageId);
       return;
     }
+    simulateSandboxPayment(checkoutPackageId);
     router.push(resolvePostPaymentIntakeHref(readCurrentCampaignHydrated(), checkoutPackageId));
   }
 
   const showMonthlySubtotal = planSummary.monthlySubtotalCents > 0;
   const showOneTimeSubtotal =
-    planSummary.oneTimeSubtotalCents > 0 || planSummary.lineItems.some((line) => line.billingType === "one_time");
+    planSummary.oneTimeSubtotalCents > 0 ||
+    planSummary.lineItems.some((line) => line.billingType === "one_time");
+
+  const billingFields = (
+    <>
+      <label className="pay-field">
+        <span>{payment.form.fullName}</span>
+        <input type="text" name="fullName" autoComplete="name" required />
+      </label>
+      <label className="pay-field">
+        <span>{payment.form.businessName}</span>
+        <input type="text" name="businessName" autoComplete="organization" />
+      </label>
+      <label className="pay-field">
+        <span>{payment.form.email}</span>
+        <input type="email" name="email" autoComplete="email" required />
+      </label>
+      <label className="pay-field">
+        <span>{payment.form.phone}</span>
+        <input type="tel" name="phone" autoComplete="tel" />
+      </label>
+    </>
+  );
+
+  const paymentFields = (
+    <>
+      <label className="pay-field">
+        <span>{payment.form.cardNumber}</span>
+        <input
+          type="text"
+          name="cardNumber"
+          inputMode="numeric"
+          autoComplete="cc-number"
+          placeholder="0000 0000 0000 0000"
+          required
+        />
+      </label>
+      <div className="pay-form-row">
+        <label className="pay-field">
+          <span>{payment.form.expDate}</span>
+          <input
+            type="text"
+            name="expDate"
+            inputMode="numeric"
+            autoComplete="cc-exp"
+            placeholder="MM / YY"
+            required
+          />
+        </label>
+        <label className="pay-field">
+          <span>{payment.form.cvv}</span>
+          <input
+            type="text"
+            name="cvv"
+            inputMode="numeric"
+            autoComplete="cc-csc"
+            placeholder="CVV"
+            required
+          />
+        </label>
+      </div>
+      <label className="pay-field">
+        <span>{payment.form.zipCode}</span>
+        <input type="text" name="zipCode" inputMode="numeric" autoComplete="postal-code" required />
+      </label>
+    </>
+  );
+
+  const sandboxPanel = showSandbox ? (
+    <div
+      className={`pay-sandbox${isEmbedded ? "" : " pay-sandbox--stack"}`}
+      aria-label={payment.sandbox.label}
+    >
+      <div className="pay-sandbox__head">
+        <p className="pay-sandbox__label">{payment.sandbox.label}</p>
+        <span className="pay-sandbox__badge">{payment.sandbox.badge}</span>
+      </div>
+      <p className="pay-sandbox__hint">{payment.sandbox.hint}</p>
+      <button type="button" className="pay-sandbox__btn" onClick={handleSandboxPayment}>
+        {payment.sandbox.buttonLabel}
+      </button>
+    </div>
+  ) : null;
+
+  if (isEmbedded) {
+    return (
+      <div className="pay-shell pay-shell--embedded">
+        <div className="pay-checkout-grid pay-checkout-grid--embedded">
+          <PaperCard title={payment.sections.summary} className="pay-paper-card--summary">
+            <p className="pay-summary-includes-label">{payment.summary.recommendedServicesLabel}</p>
+            <ul className="pay-summary-includes-list">
+              {planSummary.lineItems.map((item) => (
+                <li key={item.serviceId}>
+                  <SummaryCheckIcon />
+                  <span>
+                    {onOpenServiceGuide ? (
+                      <button
+                        type="button"
+                        className="pay-summary-line-guide"
+                        onClick={() => onOpenServiceGuide(item.serviceId)}
+                      >
+                        {item.name}
+                      </button>
+                    ) : (
+                      item.name
+                    )}
+                    <span className="pay-summary-line-price"> — {item.priceDisplay}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="pay-summary-investment">
+              {showOneTimeSubtotal ? (
+                <div className="pay-summary-total-row">
+                  <p className="pay-summary-total-label">{payment.summary.oneTimeSubtotalLabel}</p>
+                  <p className="pay-summary-price">{planSummary.oneTimeSubtotalDisplay}</p>
+                </div>
+              ) : null}
+              {showMonthlySubtotal ? (
+                <div className="pay-summary-total-row">
+                  <p className="pay-summary-total-label">{payment.summary.monthlySubtotalLabel}</p>
+                  <p className="pay-summary-price">{planSummary.monthlySubtotalDisplay}/month</p>
+                </div>
+              ) : null}
+              <div className="pay-summary-total-row pay-summary-total-row--due">
+                <p className="pay-summary-total-label">{payment.summary.amountDueTodayLabel}</p>
+                <p className="pay-summary-price">{planSummary.amountDueTodayDisplay}</p>
+              </div>
+              <p className="pay-summary-disclosure-note">{payment.summary.cardProcessingDisclosureNote}</p>
+            </div>
+          </PaperCard>
+
+          <PaperCard title={payment.sections.form} className="pay-paper-card--form">
+            <form className="pay-form" onSubmit={handleSubmit}>
+              {billingFields}
+              {paymentFields}
+              {recommendationNotice ? (
+                <div className="pay-disclaimer" role="note">
+                  <h3 className="pay-disclaimer__heading">{recommendationNotice.title}</h3>
+                  {recommendationNotice.lines.map((line) => (
+                    <p key={line} className="pay-disclaimer__line">
+                      {line}
+                    </p>
+                  ))}
+                </div>
+              ) : null}
+              {paymentDecisionAddon ? (
+                <div className="pay-decision-addon">{paymentDecisionAddon}</div>
+              ) : null}
+              <section className="pay-acknowledgment" aria-labelledby="pay-acknowledgment-heading">
+                {onViewPlanDetails ? (
+                  <button type="button" className="pay-plan-details-link" onClick={onViewPlanDetails}>
+                    {payment.form.viewPlanDetailsLabel}
+                  </button>
+                ) : null}
+                <h3 id="pay-acknowledgment-heading" className="pay-acknowledgment__heading">
+                  {payment.form.acknowledgmentHeading}
+                </h3>
+                {payment.form.acknowledgmentBody.map((paragraph) => (
+                  <p key={paragraph} className="pay-acknowledgment__body">
+                    {paragraph}
+                  </p>
+                ))}
+                <label className="pay-acknowledgment__checkbox">
+                  <input
+                    type="checkbox"
+                    name="terms"
+                    checked={termsAccepted}
+                    onChange={(event) => setTermsAccepted(event.target.checked)}
+                  />
+                  <span>{payment.form.termsLabel}</span>
+                </label>
+              </section>
+              <button type="submit" className="pay-submit" disabled={!termsAccepted}>
+                {payment.form.submitLabel}
+              </button>
+              {sandboxPanel}
+            </form>
+          </PaperCard>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className={`pay-shell${isEmbedded ? " pay-shell--embedded" : ""}`}>
-      <div className={`pay-checkout-grid${isEmbedded ? " pay-checkout-grid--embedded" : ""}`}>
-        <PaperCard title={payment.sections.summary} className="pay-paper-card--summary">
-          <p className="pay-summary-includes-label">{payment.summary.recommendedServicesLabel}</p>
-          <ul className="pay-summary-includes-list">
+    <div className="pay-shell pay-shell--stack">
+      <div className="pay-checkout-stack">
+        <CheckoutSection title={payment.sections.summary}>
+          <h3 className="co-card__subheading">{payment.sections.deliverables}</h3>
+          <ul className="co-deliverables">
             {planSummary.lineItems.map((item) => (
-              <li key={item.serviceId}>
-                <SummaryCheckIcon />
-                <span>
-                  {onOpenServiceGuide ? (
-                    <button
-                      type="button"
-                      className="pay-summary-line-guide"
-                      onClick={() => onOpenServiceGuide(item.serviceId)}
-                    >
-                      {item.name}
-                    </button>
-                  ) : (
-                    item.name
-                  )}
-                  <span className="pay-summary-line-price"> — {item.priceDisplay}</span>
-                </span>
+              <li key={item.serviceId} className="co-deliverable">
+                <div className="co-deliverable__head">
+                  <p className="co-deliverable__title">
+                    {onOpenServiceGuide ? (
+                      <button
+                        type="button"
+                        className="co-deliverable__guide"
+                        onClick={() => onOpenServiceGuide(item.serviceId)}
+                      >
+                        {item.name}
+                      </button>
+                    ) : (
+                      item.name
+                    )}
+                  </p>
+                  <p className="co-deliverable__price">{item.priceDisplay}</p>
+                </div>
               </li>
             ))}
           </ul>
 
-          <div className="pay-summary-investment">
-            {showOneTimeSubtotal ? (
-              <div className="pay-summary-total-row">
-                <p className="pay-summary-total-label">{payment.summary.oneTimeSubtotalLabel}</p>
-                <p className="pay-summary-price">{planSummary.oneTimeSubtotalDisplay}</p>
-              </div>
+          <div className="co-investment">
+            {showOneTimeSubtotal && showMonthlySubtotal ? (
+              <>
+                <div className="co-investment__row">
+                  <span>{payment.summary.oneTimeSubtotalLabel}</span>
+                  <span>{planSummary.oneTimeSubtotalDisplay}</span>
+                </div>
+                <div className="co-investment__row">
+                  <span>{payment.summary.monthlySubtotalLabel}</span>
+                  <span>{planSummary.monthlySubtotalDisplay}/month</span>
+                </div>
+              </>
             ) : null}
-            {showMonthlySubtotal ? (
-              <div className="pay-summary-total-row">
-                <p className="pay-summary-total-label">{payment.summary.monthlySubtotalLabel}</p>
-                <p className="pay-summary-price">{planSummary.monthlySubtotalDisplay}/month</p>
-              </div>
-            ) : null}
-            <div className="pay-summary-total-row pay-summary-total-row--due">
-              <p className="pay-summary-total-label">{payment.summary.amountDueTodayLabel}</p>
-              <p className="pay-summary-price">{planSummary.amountDueTodayDisplay}</p>
-            </div>
-            <p className="pay-summary-disclosure-note">{payment.summary.cardProcessingDisclosureNote}</p>
+            <p className="co-investment__label">{payment.summary.investmentLabel}</p>
+            <p className="co-investment__total">{planSummary.amountDueTodayDisplay}</p>
+            <p className="co-investment__note">{payment.summary.cardProcessingDisclosureNote}</p>
           </div>
-        </PaperCard>
+        </CheckoutSection>
 
-        <PaperCard title={payment.sections.form} className="pay-paper-card--form">
-          <form className="pay-form" onSubmit={handleSubmit}>
-            <label className="pay-field">
-              <span>{payment.form.fullName}</span>
-              <input type="text" name="fullName" autoComplete="name" required />
-            </label>
-            <label className="pay-field">
-              <span>{payment.form.businessName}</span>
-              <input type="text" name="businessName" autoComplete="organization" />
-            </label>
-            <label className="pay-field">
-              <span>{payment.form.email}</span>
-              <input type="email" name="email" autoComplete="email" required />
-            </label>
-            <label className="pay-field">
-              <span>{payment.form.phone}</span>
-              <input type="tel" name="phone" autoComplete="tel" />
-            </label>
-            <label className="pay-field">
-              <span>{payment.form.cardNumber}</span>
-              <input
-                type="text"
-                name="cardNumber"
-                inputMode="numeric"
-                autoComplete="cc-number"
-                placeholder="0000 0000 0000 0000"
-                required
-              />
-            </label>
-            <div className="pay-form-row">
-              <label className="pay-field">
-                <span>{payment.form.expDate}</span>
-                <input
-                  type="text"
-                  name="expDate"
-                  inputMode="numeric"
-                  autoComplete="cc-exp"
-                  placeholder="MM / YY"
-                  required
-                />
-              </label>
-              <label className="pay-field">
-                <span>{payment.form.cvv}</span>
-                <input
-                  type="text"
-                  name="cvv"
-                  inputMode="numeric"
-                  autoComplete="cc-csc"
-                  placeholder="CVV"
-                  required
-                />
-              </label>
-            </div>
-            <label className="pay-field">
-              <span>{payment.form.zipCode}</span>
-              <input type="text" name="zipCode" inputMode="numeric" autoComplete="postal-code" required />
-            </label>
+        <form className="pay-checkout-form" onSubmit={handleSubmit}>
+          <CheckoutSection title={payment.sections.billing}>{billingFields}</CheckoutSection>
+
+          <CheckoutSection title={payment.sections.payment}>
+            {paymentFields}
+            <p className="co-payment-security">{payment.form.paymentSecurityNote}</p>
+          </CheckoutSection>
+
+          <CheckoutSection title={payment.sections.next}>
+            <ol className="co-next-steps" aria-label={payment.sections.next}>
+              {payment.whatsNext.steps.map((step, index) => (
+                <li key={step.label} className="co-next-steps__item">
+                  <span className="co-next-steps__num" aria-hidden="true">
+                    {index + 1}
+                  </span>
+                  <span className="co-next-steps__label">{step.label}</span>
+                </li>
+              ))}
+            </ol>
+            <p className="co-next-steps__reassurance">{payment.whatsNext.emailReassurance}</p>
+          </CheckoutSection>
+
+          <CheckoutSection title="" className="co-card--confirm">
             {recommendationNotice ? (
               <div className="pay-disclaimer" role="note">
                 <h3 className="pay-disclaimer__heading">{recommendationNotice.title}</h3>
@@ -273,69 +445,26 @@ export default function SecureCheckoutGrid({
             {paymentDecisionAddon ? (
               <div className="pay-decision-addon">{paymentDecisionAddon}</div>
             ) : null}
-            <section
-              className="pay-acknowledgment"
-              aria-labelledby="pay-acknowledgment-heading"
+            <label className="pay-acknowledgment__checkbox co-confirm__checkbox">
+              <input
+                type="checkbox"
+                name="terms"
+                checked={termsAccepted}
+                onChange={(event) => setTermsAccepted(event.target.checked)}
+              />
+              <span>{payment.form.termsLabel}</span>
+            </label>
+            <button
+              type="submit"
+              className="utility-btn utility-btn--primary co-submit"
+              disabled={!termsAccepted}
             >
-              {onViewPlanDetails ? (
-                <button type="button" className="pay-plan-details-link" onClick={onViewPlanDetails}>
-                  {payment.form.viewPlanDetailsLabel}
-                </button>
-              ) : null}
-              <h3 id="pay-acknowledgment-heading" className="pay-acknowledgment__heading">
-                {payment.form.acknowledgmentHeading}
-              </h3>
-              {payment.form.acknowledgmentBody.map((paragraph) => (
-                <p key={paragraph} className="pay-acknowledgment__body">
-                  {paragraph}
-                </p>
-              ))}
-              <label className="pay-acknowledgment__checkbox">
-                <input
-                  type="checkbox"
-                  name="terms"
-                  checked={termsAccepted}
-                  onChange={(event) => setTermsAccepted(event.target.checked)}
-                />
-                <span>{payment.form.termsLabel}</span>
-              </label>
-            </section>
-            <button type="submit" className="pay-submit" disabled={!termsAccepted}>
               {payment.form.submitLabel}
             </button>
-            {showSandbox ? (
-              <div className="pay-sandbox" aria-label={payment.sandbox.label}>
-                <div className="pay-sandbox__head">
-                  <p className="pay-sandbox__label">{payment.sandbox.label}</p>
-                  <span className="pay-sandbox__badge">{payment.sandbox.badge}</span>
-                </div>
-                <p className="pay-sandbox__hint">{payment.sandbox.hint}</p>
-                <button type="button" className="pay-sandbox__btn" onClick={handleSandboxPayment}>
-                  {payment.sandbox.buttonLabel}
-                </button>
-              </div>
-            ) : null}
-          </form>
-        </PaperCard>
-
-        {isEmbedded ? null : (
-          <PaperCard title={payment.sections.next} className="pay-paper-card--next">
-            <ul className="pay-next-steps" aria-label="What happens next">
-              {payment.whatsNext.steps.map((step) => (
-                <li key={step.label} className="pay-next-steps__item">
-                  <span
-                    className={`pay-next-steps__marker pay-next-steps__marker--${step.marker}`}
-                    aria-hidden="true"
-                  >
-                    {step.marker === "check" ? "✓" : "↓"}
-                  </span>
-                  <span>{step.label}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="pay-next-secure">{payment.secureNote}</p>
-          </PaperCard>
-        )}
+            <p className="co-payment-reassurance">{payment.form.paymentReassurance}</p>
+            {sandboxPanel}
+          </CheckoutSection>
+        </form>
       </div>
     </div>
   );

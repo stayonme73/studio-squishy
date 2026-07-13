@@ -1,9 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { ROUTE_MAP_V2_POST_PUBLISH_ADDON } from "@/catalog/route-map-v2-launch";
 import { addServiceToRouteMapPlanState } from "@/lib/route-map-campaign";
 import { buildRouteMapStudioPlanReview } from "@/studio-plan-review/routeMapStudioPlanReview";
-import { removeServiceFromPlan } from "@/studio-plan-review/planState";
 import type { ServiceId } from "@/catalog/types";
 
 describe("Route Map Studio Plan Review builder", () => {
@@ -18,7 +16,7 @@ describe("Route Map Studio Plan Review builder", () => {
       "v2-rtu-flyer",
       "v2-rtu-social-posts",
     ]);
-    expect(model.planTotals.amountDueTodayCents).toBe(75000);
+    expect(model.planTotals.amountDueTodayCents).toBe(16800);
     expect(model.canApprove).toBe(true);
   });
 
@@ -33,36 +31,20 @@ describe("Route Map Studio Plan Review builder", () => {
     expect(model.planTotals.amountDueTodayCents).toBe(0);
   });
 
-  it("shows the post/publish add-on only after an eligible parent is selected", () => {
-    const emptyModel = buildRouteMapStudioPlanReview({ selectedServiceIds: [] });
-    expect(emptyModel.availableToAdd.map((service) => service.serviceId)).not.toContain(
-      ROUTE_MAP_V2_POST_PUBLISH_ADDON.id,
-    );
+  it("does not offer retired post/publish or rm-j001 commerce SKUs in availableToAdd", () => {
+    const model = buildRouteMapStudioPlanReview({ selectedServiceIds: [] });
+    const availableIds = model.availableToAdd.map((service) => service.serviceId);
 
-    const selected = addServiceToRouteMapPlanState(
-      { selectedServiceIds: ["v2-rtu-social-posts" as ServiceId] },
-      ROUTE_MAP_V2_POST_PUBLISH_ADDON.id,
-    );
-    const model = buildRouteMapStudioPlanReview(selected);
-
-    expect(model.selectedServiceIds).toEqual([
-      "v2-rtu-social-posts",
-      ROUTE_MAP_V2_POST_PUBLISH_ADDON.id,
-    ]);
-    expect(model.planTotals.amountDueTodayCents).toBe(55000);
+    expect(availableIds).not.toContain("v2-addon-post-publish");
+    expect(availableIds).not.toContain("rm-j001");
   });
 
-  it("reflects orphan add-on pruning from existing planState rules", () => {
-    const withAddon = {
-      selectedServiceIds: [
-        "v2-rtu-social-posts",
-        ROUTE_MAP_V2_POST_PUBLISH_ADDON.id,
-      ] as ServiceId[],
-    };
-    const pruned = removeServiceFromPlan(withAddon, "v2-rtu-social-posts");
-    const model = buildRouteMapStudioPlanReview(pruned);
+  it("ignores attempts to add retired commerce SKUs to the Route Map plan", () => {
+    const blocked = addServiceToRouteMapPlanState(
+      { selectedServiceIds: ["v2-rtu-social-posts" as ServiceId] },
+      "v2-addon-post-publish",
+    );
 
-    expect(model.selectedServiceIds).toEqual([]);
-    expect(model.canApprove).toBe(false);
+    expect(blocked.selectedServiceIds).toEqual(["v2-rtu-social-posts"]);
   });
 });

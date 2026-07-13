@@ -22,7 +22,7 @@ const STEPS = [
   {
     icon: "◎",
     title: "We Get To Work",
-    lead: "We create it, you review it, then we deliver it or post it when included.",
+    lead: "We create it, you review it, then we complete and deliver your finished project.",
   },
 ] as const;
 
