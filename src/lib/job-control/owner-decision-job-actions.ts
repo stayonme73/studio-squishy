@@ -279,7 +279,7 @@ export function applyOwnerAskClientRefund(
     reason: "Owner requested documentation before refund decision",
     occurredAt,
   });
-  let updatedJob = {
+  let updatedJob: PurchasedJobRecord = {
     ...spineResult.job,
     refundOwnerDecisionAt: occurredAt,
   };
