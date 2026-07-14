@@ -3,9 +3,12 @@
  * Shown in local development (@see OwnerQaRoot).
  */
 
+import { customerJourneyStepRoute } from "@/config/customer-journey-v1";
 import { FILE_ROOM_ROUTE } from "@/config/file-room";
 import { OWNER_CONSOLE_ROUTE } from "@/config/owner-console";
 import { productionWorkspaceRoute } from "@/config/production-workspace";
+import { ROUTE_MAP_INTAKE_STEP_HREF } from "@/config/legacy-route-quarantine-v1";
+import { projectBuilderHref } from "@/config/project-builder-v1";
 import { studioBoard } from "@/config/studio-board";
 import { teamOfficePath } from "@/config/team-offices";
 import type { OwnerQaJourneySeedKind } from "@/lib/owner-qa-campaign";
@@ -13,6 +16,7 @@ import type { OwnerQaJourneySeedKind } from "@/lib/owner-qa-campaign";
 const STUDIO_SELF_TEST_CAMPAIGN_ID = "studio-self-test";
 const STUDIO_SELF_TEST_JOB_ID = `${STUDIO_SELF_TEST_CAMPAIGN_ID}:sm-001`;
 const STUDIO_SELF_TEST_TEAM_OFFICE = "strategy";
+const OWNER_QA_BUILDER_ROAD_ID = "i75";
 
 export type OwnerQaJourneyPreset = {
   id: string;
@@ -27,62 +31,79 @@ export type OwnerQaShortcut =
   | { id: string; kind: "reset"; label: string };
 
 export const ownerQa = {
+  panelHint: "Jump through the customer journey. Development only.",
+  customerJourneySectionTitle: "Customer Journey",
+
   journeyPresets: [
     {
       id: "studio-lobby",
       label: "Studio Lobby",
-      description: "Clean lobby entry state",
+      description: "Customer entry experience",
       href: studioBoard.routes.studioLobby,
       seed: "lobby",
     },
     {
       id: "route-map",
       label: "Route Map",
-      description: "Current campaign start workspace",
+      description: "Choose a Studio route",
       href: studioBoard.routes.newCampaign,
       seed: "route-map",
     },
     {
-      id: "payment-checkout-test",
-      label: "Payment / Checkout test",
-      description: "Route Map job selected · checkout ready",
-      href: studioBoard.routes.newCampaign,
-      seed: "payment-checkout-test",
+      id: "project-builder",
+      label: "Project Builder",
+      description: "Build your project",
+      href: projectBuilderHref(OWNER_QA_BUILDER_ROAD_ID),
+      seed: "project-builder",
+    },
+    {
+      id: "studio-plan",
+      label: "Studio Plan",
+      description: "Review your project",
+      href: `${projectBuilderHref(OWNER_QA_BUILDER_ROAD_ID)}&view=studio-plan`,
+      seed: "studio-plan",
+    },
+    {
+      id: "checkout",
+      label: "Checkout",
+      description: "Review and payment",
+      href: customerJourneyStepRoute("secure-checkout"),
+      seed: "checkout",
+    },
+    {
+      id: "project-intake",
+      label: "Project Intake",
+      description: "Submit Project Intake",
+      href: ROUTE_MAP_INTAKE_STEP_HREF,
+      seed: "project-intake",
     },
     {
       id: "studio-board",
       label: "Studio Board",
-      description: "Campaign in production · Custom Studio Plan",
+      description: "Project home after purchase",
       href: studioBoard.routes.studioBoard,
-      seed: "studio-board-building",
+      seed: "studio-board",
     },
     {
-      id: "project-record",
-      label: "Project Record",
-      description: "Campaign record drawer open",
-      href: studioBoard.routes.campaignDetails,
-      seed: "project-record",
+      id: "production",
+      label: "Production",
+      description: "Studio is creating your work",
+      href: studioBoard.routes.studioBoard,
+      seed: "production",
     },
     {
-      id: "review-room-ready",
+      id: "review-room",
       label: "Review Room",
-      description: "Concepts ready for direction choice",
+      description: "Concept review and approvals",
       href: studioBoard.routes.feedbackStudio,
       seed: "review-room-ready",
     },
     {
-      id: "final-delivery-complete",
+      id: "final-delivery",
       label: "Final Delivery",
       description: "Campaign delivered",
       href: studioBoard.routes.deliverables,
-      seed: "final-delivery-complete",
-    },
-    {
-      id: "help-center",
-      label: "Help Center",
-      description: "Customer help entry point",
-      href: studioBoard.routes.helpCenter,
-      seed: "help-center",
+      seed: "final-delivery",
     },
   ] satisfies OwnerQaJourneyPreset[],
 
@@ -123,10 +144,16 @@ export const ownerQa = {
       description: "Owner-only test scoreboard",
     },
     {
+      id: "help-center",
+      kind: "link",
+      label: "Help Center",
+      href: studioBoard.routes.helpCenter,
+      description: "Customer help entry point",
+    },
+    {
       id: "reset-campaign",
       kind: "reset",
       label: "Reset Campaign",
     },
   ] satisfies OwnerQaShortcut[],
 } as const;
-

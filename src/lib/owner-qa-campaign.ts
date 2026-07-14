@@ -13,8 +13,12 @@ import {
   type DiscoveryAnswers,
 } from "@/lib/business-discovery-session";
 import { buildServiceScopeSnapshot, computePlanPricingTotals } from "@/lib/plan-pricing";
-import { createCampaignFromRouteMapJob } from "@/lib/route-map-campaign";
-import { saveCurrentCampaign } from "@/lib/studio-board-campaign";
+import {
+  addRouteMapServiceToPlan,
+  saveApprovedRouteMapPlan,
+  saveRouteMapJourneyStep,
+} from "@/lib/route-map-campaign";
+import { readCurrentCampaign, saveCurrentCampaign } from "@/lib/studio-board-campaign";
 import { discoveryBriefFromAnswers } from "@/lib/discovery-brief";
 import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
 
@@ -39,15 +43,21 @@ export const OWNER_QA_DISCOVERY_ANSWERS: DiscoveryAnswers = {
   "whats-slowing-you-down": "I am not visible enough online",
 };
 
+const OWNER_QA_BUILDER_JOB_ID = "v2-rtu-flyer" as const satisfies RouteMapJobId;
+const OWNER_QA_BUILDER_ROAD_ID = "i75" as const satisfies RouteMapRoadId;
+const OWNER_QA_BUILDER_SECOND_JOB_ID = "v2-rtu-social-posts" as const satisfies RouteMapJobId;
+
 export type OwnerQaJourneySeedKind =
   | "lobby"
   | "route-map"
-  | "payment-checkout-test"
-  | "studio-board-building"
-  | "project-record"
+  | "project-builder"
+  | "studio-plan"
+  | "checkout"
+  | "project-intake"
+  | "studio-board"
+  | "production"
   | "review-room-ready"
-  | "final-delivery-complete"
-  | "help-center";
+  | "final-delivery";
 
 const STUDIO_SQUISHY_PREFIX = "studio-squishy:";
 
@@ -250,6 +260,12 @@ function buildDeliveredCampaign(): CampaignRecord {
   };
 }
 
+function seedOwnerQaProjectBuilderPlan(currentStep: "panel" | "studio-plan") {
+  addRouteMapServiceToPlan(OWNER_QA_BUILDER_JOB_ID, OWNER_QA_BUILDER_ROAD_ID);
+  addRouteMapServiceToPlan(OWNER_QA_BUILDER_SECOND_JOB_ID, OWNER_QA_BUILDER_ROAD_ID);
+  saveRouteMapJourneyStep(currentStep);
+}
+
 /** Apply journey seed — writes localStorage campaign + discovery state before navigation. */
 export function applyOwnerQaJourneySeed(kind: OwnerQaJourneySeedKind): void {
   if (typeof window === "undefined") return;
@@ -263,17 +279,51 @@ export function applyOwnerQaJourneySeed(kind: OwnerQaJourneySeedKind): void {
       clearAllOwnerQaBrowserState();
       return;
     }
-    case "payment-checkout-test": {
+    case "project-builder": {
       clearAllOwnerQaBrowserState();
-      const campaign = createCampaignFromRouteMapJob(
-        OWNER_QA_CHECKOUT_JOB_ID,
-        OWNER_QA_CHECKOUT_ROAD_ID,
-      );
-      if (campaign) persistCampaign(campaign);
+      seedOwnerQaProjectBuilderPlan("panel");
       return;
     }
-    case "studio-board-building":
-    case "project-record": {
+    case "studio-plan": {
+      clearAllOwnerQaBrowserState();
+      seedOwnerQaProjectBuilderPlan("studio-plan");
+      return;
+    }
+    case "checkout": {
+      clearAllOwnerQaBrowserState();
+      addRouteMapServiceToPlan(OWNER_QA_CHECKOUT_JOB_ID, OWNER_QA_CHECKOUT_ROAD_ID);
+      saveApprovedRouteMapPlan([OWNER_QA_CHECKOUT_JOB_ID]);
+      saveRouteMapJourneyStep("checkout");
+      return;
+    }
+    case "project-intake": {
+      clearAllOwnerQaBrowserState();
+      addRouteMapServiceToPlan(OWNER_QA_CHECKOUT_JOB_ID, OWNER_QA_CHECKOUT_ROAD_ID);
+      saveApprovedRouteMapPlan([OWNER_QA_CHECKOUT_JOB_ID]);
+      saveRouteMapJourneyStep("intake");
+      const seeded = readCurrentCampaign();
+      if (!seeded) return;
+      const now = new Date().toISOString();
+      const content = statusContent.PAYMENT_RECEIVED;
+      persistCampaign({
+        ...seeded,
+        campaignStatus: "PAYMENT_RECEIVED",
+        campaignDescription: content.campaignDescription,
+        estimatedCompletion: content.estimatedCompletion,
+        paymentReceivedAt: now,
+        projectDetails: undefined,
+        projectDetailsSubmittedAt: undefined,
+        studioNotes: [{ date: "Today", message: "Payment received." }],
+        updatedAt: now,
+      });
+      return;
+    }
+    case "studio-board": {
+      saveDiscoveryAnswers(OWNER_QA_DISCOVERY_ANSWERS);
+      persistCampaign(buildBuildingConceptsCampaign());
+      return;
+    }
+    case "production": {
       saveDiscoveryAnswers(OWNER_QA_DISCOVERY_ANSWERS);
       persistCampaign(buildBuildingConceptsCampaign());
       return;
@@ -283,13 +333,9 @@ export function applyOwnerQaJourneySeed(kind: OwnerQaJourneySeedKind): void {
       persistCampaign(buildReviewReadyCampaign());
       return;
     }
-    case "final-delivery-complete": {
+    case "final-delivery": {
       saveDiscoveryAnswers(OWNER_QA_DISCOVERY_ANSWERS);
       persistCampaign(buildDeliveredCampaign());
-      return;
-    }
-    case "help-center": {
-      clearAllOwnerQaBrowserState();
       return;
     }
   }

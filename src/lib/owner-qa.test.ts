@@ -8,59 +8,77 @@ import {
 } from "@/lib/owner-qa-campaign";
 
 describe("owner-qa menu config", () => {
-  it("lists the current Studio journey in order with no legacy routes", () => {
+  it("lists the certified customer journey in order with no legacy routes", () => {
     expect(ownerQa.journeyPresets.map((preset) => preset.id)).toEqual([
       "studio-lobby",
       "route-map",
-      "payment-checkout-test",
+      "project-builder",
+      "studio-plan",
+      "checkout",
+      "project-intake",
       "studio-board",
-      "project-record",
-      "review-room-ready",
-      "final-delivery-complete",
-      "help-center",
+      "production",
+      "review-room",
+      "final-delivery",
     ]);
 
     const labels = ownerQa.journeyPresets.map((preset) => preset.label);
     expect(labels).toEqual([
       "Studio Lobby",
       "Route Map",
-      "Payment / Checkout test",
+      "Project Builder",
+      "Studio Plan",
+      "Checkout",
+      "Project Intake",
       "Studio Board",
-      "Project Record",
+      "Production",
       "Review Room",
       "Final Delivery",
-      "Help Center",
     ]);
+    expect(labels).not.toContain("Project Record");
     expect(labels).not.toContain("Discovery Room");
-    expect(labels).not.toContain("Studio Plan Preview");
+    expect(labels).not.toContain("Payment / Checkout test");
     expect(labels).not.toContain("Project Summary + Checkout");
-    expect(labels).not.toContain("Project Details");
     const displayText = ownerQa.journeyPresets
       .flatMap((preset) => [preset.label, preset.description ?? ""])
       .join("\n");
     expect(displayText).not.toContain("Discovery Room");
-    expect(displayText).not.toContain("Studio Plan Preview");
-    expect(displayText).not.toContain("Project Summary + Checkout");
-    expect(displayText).not.toContain("Project Details");
+    expect(displayText).not.toContain("Payment / Checkout test");
+    expect(displayText).not.toContain("Project Record");
+    expect(displayText).not.toContain("Campaign in production");
 
     const hrefs = ownerQa.journeyPresets.map((preset) => preset.href);
     expect(hrefs).toContain("/route-map");
-    expect(hrefs).not.toContain("/payment");
+    expect(hrefs).toContain("/project-builder?road=i75");
+    expect(hrefs).toContain("/project-builder?road=i75&view=studio-plan");
+    expect(hrefs).toContain("/checkout");
+    expect(hrefs).toContain("/route-map?step=intake");
+    expect(hrefs).toContain("/studio-board");
+    expect(hrefs).toContain("/feedback-studio");
+    expect(hrefs).toContain("/deliverables");
+    expect(hrefs).not.toContain("/campaign-details");
+    expect(hrefs).not.toContain("/project-details");
     expect(hrefs).not.toContain("/business-discovery-studio");
     expect(hrefs).not.toContain("/project-summary");
-    expect(hrefs).not.toContain("/project-details");
     expect(hrefs).not.toContain("/studio-guide-prototype");
     expect(hrefs).not.toContain("/studio-kitchen");
+    expect(hrefs.some((href) => href.includes("/file-room"))).toBe(false);
     expect(hrefs.some((href) => href.includes("package="))).toBe(false);
   });
 
-  it("exposes active internal shortcuts and Reset Campaign", () => {
+  it("uses customer journey section copy in the dev panel config", () => {
+    expect(ownerQa.customerJourneySectionTitle).toBe("Customer Journey");
+    expect(ownerQa.panelHint).toBe("Jump through the customer journey. Development only.");
+  });
+
+  it("exposes active internal shortcuts, help, and Reset Campaign", () => {
     expect(ownerQa.shortcuts.map((shortcut) => shortcut.label)).toEqual([
       "File Room",
       "Owner Console",
       "Production Workspace",
       "Team Offices",
       "Studio Self-Test",
+      "Help Center",
       "Reset Campaign",
     ]);
     expect(ownerQa.shortcuts.filter((shortcut) => shortcut.kind === "link").map((shortcut) => shortcut.href)).toEqual([
@@ -69,8 +87,11 @@ describe("owner-qa menu config", () => {
       "/file-room/studio-self-test/production/studio-self-test%3Asm-001",
       "/file-room/studio-self-test/office/strategy",
       "/file-room/studio-self-test",
+      "/help-center",
     ]);
     expect(ownerQa.shortcuts.filter((shortcut) => shortcut.kind === "reset")).toHaveLength(1);
+    expect(ownerQa.shortcuts.map((shortcut) => shortcut.label)).not.toContain("Final Delivery");
+    expect(ownerQa.shortcuts.map((shortcut) => shortcut.label)).not.toContain("Project Record");
   });
 
   it("seeds a believable Green custom plan total for checkout steps", () => {
@@ -156,7 +177,7 @@ describe("owner-qa hard reset", () => {
     }
   });
 
-  it("seeds checkout test with a Route Map approved plan", () => {
+  it("seeds checkout with a Route Map approved plan", () => {
     const localStorage = createStorage();
     const originalWindow = globalThis.window;
 
@@ -170,21 +191,64 @@ describe("owner-qa hard reset", () => {
     });
 
     try {
-      applyOwnerQaJourneySeed("payment-checkout-test");
+      applyOwnerQaJourneySeed("checkout");
       const raw = localStorage.getItem("studio-squishy:current-campaign");
       expect(raw).toBeTruthy();
       const campaign = JSON.parse(raw!) as {
         campaignStatus: string;
         paymentReceivedAt: string | null;
         approvedStudioPlan?: { amountDueTodayCents: number };
-        routeMapContext?: { jobId: string; roadId: string };
+        routeMapContext?: { jobId: string; roadId: string; currentStep: string };
       };
       expect(campaign.campaignStatus).toBe("DISCOVERY_COMPLETE");
       expect(campaign.paymentReceivedAt).toBeNull();
       expect(campaign.routeMapContext).toEqual(
-        expect.objectContaining({ jobId: "v2-rtu-social-posts", roadId: "i20" }),
+        expect.objectContaining({
+          jobId: "v2-rtu-social-posts",
+          roadId: "i20",
+          currentStep: "checkout",
+        }),
       );
       expect(campaign.approvedStudioPlan?.amountDueTodayCents).toBeGreaterThan(0);
+    } finally {
+      Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        value: originalWindow,
+      });
+    }
+  });
+
+  it("seeds project intake with paid Route Map context for current intake", () => {
+    const localStorage = createStorage();
+    const originalWindow = globalThis.window;
+
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {
+        localStorage,
+        sessionStorage: createStorage(),
+        dispatchEvent: () => true,
+      },
+    });
+
+    try {
+      applyOwnerQaJourneySeed("project-intake");
+      const raw = localStorage.getItem("studio-squishy:current-campaign");
+      expect(raw).toBeTruthy();
+      const campaign = JSON.parse(raw!) as {
+        campaignStatus: string;
+        paymentReceivedAt: string | null;
+        routeMapContext?: { jobId: string; roadId: string; currentStep: string };
+      };
+      expect(campaign.campaignStatus).toBe("PAYMENT_RECEIVED");
+      expect(campaign.paymentReceivedAt).toBeTruthy();
+      expect(campaign.routeMapContext).toEqual(
+        expect.objectContaining({
+          jobId: "v2-rtu-social-posts",
+          roadId: "i20",
+          currentStep: "intake",
+        }),
+      );
     } finally {
       Object.defineProperty(globalThis, "window", {
         configurable: true,

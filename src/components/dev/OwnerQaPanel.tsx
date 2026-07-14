@@ -85,10 +85,10 @@ export default function OwnerQaPanel() {
       {open ? (
         <div id={panelId} className="owner-qa__panel" role="dialog" aria-label="Studio Review">
           <p className="owner-qa__title">Studio Review</p>
-          <p className="owner-qa__hint">Jump the product journey. Development only.</p>
+          <p className="owner-qa__hint">{ownerQa.panelHint}</p>
 
           <section className="owner-qa__section">
-            <h2 className="owner-qa__section-title">Active Pages</h2>
+            <h2 className="owner-qa__section-title">{ownerQa.customerJourneySectionTitle}</h2>
             <div className="owner-qa__presets">
               {ownerQa.journeyPresets.map((preset) => (
                 <button
