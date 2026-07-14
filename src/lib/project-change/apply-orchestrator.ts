@@ -1,6 +1,6 @@
 import { isInternalUser } from "@/lib/campaign-store/access";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
-import { readCampaignEnvelope, upsertCampaignRecord, writeCampaignEnvelope } from "@/lib/campaign-store/store";
+import { readCampaignEnvelope, writeCampaignEnvelope } from "@/lib/campaign-store/store";
 import { regenerateIfPlanChanged } from "@/lib/campaign-tasks/generate";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { readTasksEnvelope, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
@@ -25,13 +25,26 @@ export type ApplyOrchestratorPersistence = {
   writeTasks: (envelope: ServerTasksEnvelope) => Promise<ServerTasksEnvelope>;
 };
 
+/**
+ * Apply persistence merge for campaign ownership stamp.
+ * Valid existing non-blank stamps win (first-claim rule, matching campaign-store upsert).
+ * Missing / blank / whitespace existing stamps yield to the already-validated apply-boundary id.
+ */
+export function resolvePersistedApplyClientUserId(
+  existingClientUserId: string | undefined,
+  validatedClientUserId: string,
+): string {
+  const existing = existingClientUserId?.trim();
+  return existing ? existing : validatedClientUserId;
+}
+
 export function createDefaultApplyPersistence(): ApplyOrchestratorPersistence {
   return {
     writeCampaign: async (record, clientUserId) => {
       const existing = await readCampaignEnvelope(record.campaignId);
       return writeCampaignEnvelope({
         campaignId: record.campaignId,
-        clientUserId: existing?.clientUserId ?? clientUserId ?? "",
+        clientUserId: resolvePersistedApplyClientUserId(existing?.clientUserId, clientUserId),
         record,
         syncedAt: new Date().toISOString(),
         syncVersion: (existing?.syncVersion ?? 0) + 1,
@@ -188,6 +201,7 @@ export async function applyApprovedProjectChange(params: {
     activityEnvelope,
     exceptionId,
     exception,
+    clientUserId: campaignEnvelope.clientUserId,
   });
   if (!precondition.ok) {
     return {
@@ -208,6 +222,15 @@ export async function applyApprovedProjectChange(params: {
       request,
       approvedStudioPlan: campaignEnvelope.record.approvedStudioPlan,
       idempotent: true,
+    };
+  }
+
+  const ownerClientUserId = campaignEnvelope.clientUserId?.trim();
+  if (!ownerClientUserId) {
+    return {
+      ok: false,
+      error: "Campaign has no client account on record.",
+      status: 409,
     };
   }
 
@@ -234,6 +257,7 @@ export async function applyApprovedProjectChange(params: {
     campaign: campaignEnvelope.record,
     user: params.user,
     serviceName: planResult.serviceName,
+    clientUserId: ownerClientUserId,
   });
   if (!activityPlan.ok) {
     return { ok: false, error: activityPlan.error, status: activityPlan.status };
@@ -264,7 +288,7 @@ export async function applyApprovedProjectChange(params: {
 
   const persisted = await persistApplyOutcomes({
     campaignBefore,
-    clientUserId: campaignEnvelope.clientUserId,
+    clientUserId: ownerClientUserId,
     campaignAfter: activityPlan.skipWrite ? null : updatedCampaign,
     activityBefore,
     activityAfter: activityPlan.skipWrite ? null : activityPlan.nextEnvelope,

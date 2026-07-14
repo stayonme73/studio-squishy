@@ -57,6 +57,8 @@ export function validateApplyApprovedProjectChangePreconditions(params: {
   activityEnvelope: ProjectActivityEnvelope;
   exceptionId: string;
   exception?: CampaignExceptionRecord;
+  /** Envelope ownership stamp — optional on the campaign store, required to apply. */
+  clientUserId?: string;
 }): { ok: true } | { ok: false; error: string; status: number } {
   if (!isInternalUser(params.user)) {
     return { ok: false, error: "Forbidden", status: 403 };
@@ -64,6 +66,19 @@ export function validateApplyApprovedProjectChangePreconditions(params: {
 
   if (!params.campaign.paymentReceivedAt) {
     return { ok: false, error: "Project changes apply only after payment is confirmed.", status: 403 };
+  }
+
+  const alreadyAppliedMatching =
+    params.request.status === "applied" &&
+    !!params.request.appliedChange &&
+    projectChangeDeltasMatch(params.request.appliedChange, params.change);
+
+  if (!alreadyAppliedMatching && !params.clientUserId?.trim()) {
+    return {
+      ok: false,
+      error: "Campaign has no client account on record.",
+      status: 409,
+    };
   }
 
   if (!params.campaign.approvedStudioPlan) {

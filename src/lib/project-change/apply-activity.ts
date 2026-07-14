@@ -39,6 +39,7 @@ export function planProjectChangeApplyActivitySync(params: {
   campaign: CampaignRecord;
   user: StudioUser;
   serviceName: string;
+  clientUserId?: string;
 }): PlanProjectChangeApplyActivityResult {
   const validation = validateApplyApprovedProjectChangePreconditions({
     user: params.user,
@@ -48,6 +49,7 @@ export function planProjectChangeApplyActivitySync(params: {
     activityEnvelope: params.envelope,
     exceptionId: params.exceptionId,
     exception: params.exception,
+    clientUserId: params.clientUserId,
   });
   if (!validation.ok) {
     return { ok: false, error: validation.error, status: validation.status };

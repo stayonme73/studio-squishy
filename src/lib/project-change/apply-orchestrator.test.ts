@@ -22,7 +22,7 @@ import {
 } from "@/lib/plan-pricing";
 import { allocateSelectedServices, computeAdditionalCostUsd } from "@/studio-plan-review";
 
-import { applyApprovedProjectChange } from "./apply-orchestrator";
+import { applyApprovedProjectChange, createDefaultApplyPersistence, resolvePersistedApplyClientUserId } from "./apply-orchestrator";
 import { orchestrateProjectChangeConsentResponse } from "./consent-orchestrator";
 import { orchestrateProjectChangeOwnerScopeAction } from "./owner-outcome-orchestrator";
 import { orchestrateOwnerApplyProjectChangeScope } from "./owner-apply-orchestrator";
@@ -411,6 +411,85 @@ describe("applyApprovedProjectChange", () => {
     expect(result.status).toBe(403);
   });
 
+  async function stripCampaignClientOwner(
+    campaignId: string,
+    clientUserId?: string,
+  ) {
+    const envelope = (await readCampaignEnvelope(campaignId))!;
+    const rest = { ...envelope };
+    delete rest.clientUserId;
+    return writeCampaignEnvelope({
+      ...rest,
+      ...(clientUserId !== undefined ? { clientUserId } : {}),
+      syncedAt: new Date().toISOString(),
+      syncVersion: envelope.syncVersion + 1,
+    });
+  }
+
+  it("rejects apply when paid campaign has no client owner", async () => {
+    const campaignId = `camp-apply-unclaimed-${Date.now()}`;
+    const { requestId } = await seedApprovedProjectChange(campaignId);
+    const planBefore = (await readCampaignEnvelope(campaignId))!.record.approvedStudioPlan!;
+    const activityBefore = (await readProjectActivityEnvelope(campaignId))!;
+    const tasksBefore = (await readTasksEnvelope(campaignId))!;
+    const requestStatusBefore = activityBefore.requests.find((r) => r.id === requestId)?.status;
+    const exceptionStatusBefore = tasksBefore.exceptionRecords?.[0]?.status;
+
+    await stripCampaignClientOwner(campaignId);
+
+    const result = await applyChange(campaignId, requestId, {
+      kind: "remove_service",
+      serviceId: REMOVE_SERVICE,
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.status).toBe(409);
+    expect(result.error).toBe("Campaign has no client account on record.");
+
+    const after = await readCampaignEnvelope(campaignId);
+    expect(after?.clientUserId).toBeUndefined();
+    expect(after?.record.approvedStudioPlan).toEqual(planBefore);
+
+    const activityAfter = await readProjectActivityEnvelope(campaignId);
+    expect(activityAfter?.requests.find((r) => r.id === requestId)?.status).toBe(requestStatusBefore);
+
+    const tasksAfter = await readTasksEnvelope(campaignId);
+    expect(tasksAfter?.exceptionRecords?.[0]?.status).toBe(exceptionStatusBefore);
+  });
+
+  it("rejects apply when client owner is blank", async () => {
+    const campaignId = `camp-apply-blank-owner-${Date.now()}`;
+    const { requestId } = await seedApprovedProjectChange(campaignId);
+    const planBefore = (await readCampaignEnvelope(campaignId))!.record.approvedStudioPlan!;
+    const activityBefore = (await readProjectActivityEnvelope(campaignId))!;
+    const tasksBefore = (await readTasksEnvelope(campaignId))!;
+    const requestStatusBefore = activityBefore.requests.find((r) => r.id === requestId)?.status;
+    const exceptionStatusBefore = tasksBefore.exceptionRecords?.[0]?.status;
+
+    await stripCampaignClientOwner(campaignId, "   ");
+
+    const result = await applyChange(campaignId, requestId, {
+      kind: "remove_service",
+      serviceId: REMOVE_SERVICE,
+    });
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.status).toBe(409);
+    expect(result.error).toBe("Campaign has no client account on record.");
+
+    const after = await readCampaignEnvelope(campaignId);
+    expect(after?.clientUserId).toBe("   ");
+    expect(after?.record.approvedStudioPlan).toEqual(planBefore);
+    expect(
+      (await readProjectActivityEnvelope(campaignId))?.requests.find((r) => r.id === requestId)?.status,
+    ).toBe(requestStatusBefore);
+    expect((await readTasksEnvelope(campaignId))?.exceptionRecords?.[0]?.status).toBe(
+      exceptionStatusBefore,
+    );
+  });
+
   it("rejects invalid or non-catalog service IDs", async () => {
     const campaignId = `camp-apply-invalid-sku-${Date.now()}`;
     const { requestId } = await seedApprovedProjectChange(campaignId);
@@ -529,5 +608,79 @@ describe("applyApprovedProjectChange", () => {
 
     const campaignAfter = (await readCampaignEnvelope(campaignId))!.record;
     expect(campaignAfter.approvedStudioPlan).toEqual(campaignBefore.approvedStudioPlan);
+  });
+});
+
+describe("resolvePersistedApplyClientUserId", () => {
+  it("uses validated campaign identity when existing identity is missing", () => {
+    expect(resolvePersistedApplyClientUserId(undefined, "client-apply")).toBe("client-apply");
+  });
+
+  it("uses validated campaign identity when existing identity is empty", () => {
+    expect(resolvePersistedApplyClientUserId("", "client-apply")).toBe("client-apply");
+  });
+
+  it("uses validated campaign identity when existing identity is whitespace-only", () => {
+    expect(resolvePersistedApplyClientUserId("   \t", "client-apply")).toBe("client-apply");
+  });
+
+  it("preserves a valid existing client owner over a different validated id", () => {
+    expect(resolvePersistedApplyClientUserId("client-1", "client-2")).toBe("client-1");
+  });
+});
+
+describe("createDefaultApplyPersistence ownership merge", () => {
+  it("persists validated owner when on-disk stamp is missing or blank", async () => {
+    const campaignId = `camp-apply-persist-blank-${Date.now()}`;
+    const record = campaign(campaignId);
+    await upsertCampaignRecord(record, clientUser.id);
+
+    const envelope = (await readCampaignEnvelope(campaignId))!;
+    const rest = { ...envelope };
+    delete rest.clientUserId;
+    await writeCampaignEnvelope({
+      ...rest,
+      clientUserId: "",
+      syncedAt: new Date().toISOString(),
+      syncVersion: envelope.syncVersion + 1,
+    });
+
+    const persistence = createDefaultApplyPersistence();
+    const written = await persistence.writeCampaign(record, clientUser.id);
+    expect(written.clientUserId).toBe(clientUser.id);
+    expect((await readCampaignEnvelope(campaignId))?.clientUserId).toBe(clientUser.id);
+  });
+
+  it("persists validated owner when on-disk stamp is whitespace-only", async () => {
+    const campaignId = `camp-apply-persist-ws-${Date.now()}`;
+    const record = campaign(campaignId);
+    await upsertCampaignRecord(record, clientUser.id);
+
+    const envelope = (await readCampaignEnvelope(campaignId))!;
+    await writeCampaignEnvelope({
+      ...envelope,
+      clientUserId: "  \n",
+      syncedAt: new Date().toISOString(),
+      syncVersion: envelope.syncVersion + 1,
+    });
+
+    const persistence = createDefaultApplyPersistence();
+    const written = await persistence.writeCampaign(record, clientUser.id);
+    expect(written.clientUserId).toBe(clientUser.id);
+    expect((await readCampaignEnvelope(campaignId))?.clientUserId).toBe(clientUser.id);
+  });
+
+  it("preserves a valid existing on-disk owner (first-claim rule)", async () => {
+    const campaignId = `camp-apply-persist-preserve-${Date.now()}`;
+    const record = campaign(campaignId);
+    await upsertCampaignRecord(record, "client-first");
+
+    const persistence = createDefaultApplyPersistence();
+    const written = await persistence.writeCampaign(
+      { ...record, campaignStatus: "READY_FOR_REVIEW" },
+      "client-second",
+    );
+    expect(written.clientUserId).toBe("client-first");
+    expect((await readCampaignEnvelope(campaignId))?.clientUserId).toBe("client-first");
   });
 });
