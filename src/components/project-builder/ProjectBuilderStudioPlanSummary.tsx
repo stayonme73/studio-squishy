@@ -3,14 +3,14 @@
 import { useState } from "react";
 
 import { PROJECT_BUILDER_V1 } from "@/config/project-builder-v1";
+import type { RouteMapJobId } from "@/config/route-map-v1";
 import type { ProjectBuilderStudioPlanSummaryModel } from "@/lib/project-builder-studio-plan-summary";
-import type { ServiceId } from "@/catalog/types";
 
 type Props = {
   model: ProjectBuilderStudioPlanSummaryModel;
   onEditProject: () => void;
   onContinueToCheckout: () => void;
-  onViewScope: (serviceId: ServiceId) => void;
+  onViewScope: (jobId: RouteMapJobId) => void;
 };
 
 /** Project-level Studio Plan summary — concise scope; full details stay in Learn More. */

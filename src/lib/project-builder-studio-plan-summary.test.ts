@@ -1,8 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
+import type { ServiceId } from "@/catalog/types";
+import { isRouteMapShelfJobId, type RouteMapJobId } from "@/config/route-map-v1";
 import {
   buildProjectBuilderStudioPlanSummary,
   consolidateStudioPlanRequirements,
+  resolveProjectBuilderShelfJob,
+  type ProjectBuilderStudioPlanLineItem,
 } from "@/lib/project-builder-studio-plan-summary";
 
 describe("project-builder studio plan summary", () => {
@@ -13,11 +17,32 @@ describe("project-builder studio plan summary", () => {
     expect(model.deliverables).toHaveLength(1);
     expect(model.deliverables[0]?.title).toBe("Update My Flyer");
     expect(model.deliverables[0]?.scopeSummary).toMatch(/existing single-sided flyer/i);
+    expect(model.deliverables[0]?.serviceId).toBe("v2-rtu-flyer");
+    expect(isRouteMapShelfJobId(model.deliverables[0]!.serviceId)).toBe(true);
     expect(model.totalDisplay).toBe("$69");
     expect(model.revisionPolicySummary).toHaveLength(3);
     expect(model.revisionPolicyFull.length).toBeGreaterThan(model.revisionPolicySummary.length);
     expect(model.consolidatedRequirements.some((item) => /wording|logo|approval/i.test(item))).toBe(true);
     expect(model.canContinue).toBe(true);
+  });
+
+  it("BH-PB-1: emits shelf job IDs on deliverable lines (not broad catalog ServiceId)", () => {
+    expectTypeOf<ProjectBuilderStudioPlanLineItem["serviceId"]>().toEqualTypeOf<RouteMapJobId>();
+    expectTypeOf<ProjectBuilderStudioPlanLineItem["serviceId"]>().not.toEqualTypeOf<ServiceId>();
+
+    const model = buildProjectBuilderStudioPlanSummary(["v2-rtu-social-posts"], "i75");
+    expect(model.deliverables[0]?.serviceId).toBe("v2-rtu-social-posts");
+  });
+
+  it("BH-PB-1: drops non-shelf catalog IDs before View Scope can see them", () => {
+    const mixed: ServiceId[] = ["spark", "v2-rtu-flyer", "email-marketing"];
+    expect(resolveProjectBuilderShelfJob("spark")).toBeUndefined();
+    expect(resolveProjectBuilderShelfJob("email-marketing")).toBeUndefined();
+    expect(resolveProjectBuilderShelfJob("v2-rtu-flyer")?.id).toBe("v2-rtu-flyer");
+
+    const model = buildProjectBuilderStudioPlanSummary(mixed, "i75");
+    expect(model.deliverables.map((item) => item.serviceId)).toEqual(["v2-rtu-flyer"]);
+    expect(model.deliverables.every((item) => isRouteMapShelfJobId(item.serviceId))).toBe(true);
   });
 
   it("computes an overall timeline from selected deliverables", () => {

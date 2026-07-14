@@ -1,16 +1,35 @@
 import { ROUTE_MAP_REVISION_DRAWER_ITEMS } from "@/catalog/route-map-shared-copy";
 import type { ServiceId } from "@/catalog/types";
 import { PROJECT_BUILDER_V1 } from "@/config/project-builder-v1";
-import { getRouteMapJob, getRouteMapRoad, type RouteMapRoadId } from "@/config/route-map-v1";
+import {
+  getRouteMapJob,
+  getRouteMapRoad,
+  isRouteMapShelfJobId,
+  type RouteMapJob,
+  type RouteMapJobId,
+  type RouteMapRoadId,
+} from "@/config/route-map-v1";
 import { resolveProjectBuilderJobPresentation } from "@/lib/project-builder-update-exit-copy";
 import { computePlanPricingTotals, formatUsdFromCents } from "@/lib/plan-pricing";
 
+/**
+ * Shelf/detail identity for Studio Plan deliverable lines and View Scope.
+ * Persisted selection stays `ServiceId[]`; this field is narrowed after shelf resolve.
+ */
 export type ProjectBuilderStudioPlanLineItem = {
-  serviceId: ServiceId;
+  serviceId: RouteMapJobId;
   title: string;
   priceDisplay: string;
   scopeSummary: string;
 };
+
+/** Catalog → shelf job boundary: no casts; non-shelf IDs resolve to undefined. */
+export function resolveProjectBuilderShelfJob(
+  serviceId: ServiceId,
+): RouteMapJob | undefined {
+  if (!isRouteMapShelfJobId(serviceId)) return undefined;
+  return getRouteMapJob(serviceId);
+}
 
 export type ProjectBuilderStudioPlanTimelineItem = {
   title: string;
@@ -153,7 +172,7 @@ export function buildProjectBuilderStudioPlanSummary(
   const responsibilityItems: string[] = [];
 
   for (const serviceId of selectedServiceIds) {
-    const job = getRouteMapJob(serviceId);
+    const job = resolveProjectBuilderShelfJob(serviceId);
     if (!job) continue;
 
     const presentation = resolveProjectBuilderJobPresentation(job, roadId);
@@ -162,7 +181,7 @@ export function buildProjectBuilderStudioPlanSummary(
     const parsedRange = parseBusinessDayRange(job.timingLabel);
 
     deliverables.push({
-      serviceId,
+      serviceId: job.id,
       title: presentation.name,
       priceDisplay: lineItem?.priceDisplay ?? job.priceDisplay,
       scopeSummary: presentation.purpose,

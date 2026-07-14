@@ -17,6 +17,7 @@ import {
   getRouteMapJob,
   getRouteMapRoad,
   type RouteMapJob,
+  type RouteMapJobId,
   type RouteMapRoadId,
 } from "@/config/route-map-v1";
 import { CAMPAIGN_SYNC_EVENT, type CampaignSyncStatus } from "@/lib/campaign-store/types";
@@ -179,10 +180,10 @@ export default function ProjectBuilderScene() {
     }
   }, [roadId, router]);
 
-  const handleViewScope = useCallback((serviceId: ServiceId) => {
+  const handleViewScope = useCallback((jobId: RouteMapJobId) => {
     drawerTriggerRef.current =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    setDetailJobId(serviceId);
+    setDetailJobId(jobId);
   }, []);
 
   const handleContinueToCheckout = useCallback(() => {
