@@ -4,41 +4,26 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
 import HelpCenterQuickPolicyGuide from "@/components/help-center/HelpCenterQuickPolicyGuide";
 import PolicyContentBlocks from "@/components/shared/PolicyContentBlocks";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
-import { helpCenter, type HelpCenterFrom } from "@/config/help-center";
+import { helpCenter } from "@/config/help-center";
+import {
+  parseHelpCenterFromParam,
+  resolveHelpCenterBackHref,
+} from "@/lib/help-center-navigation";
 import { resolveHelpCenterView } from "@/lib/help-center-view";
 
 const copy = helpCenter;
-
-function parseFromParam(value: string | null): HelpCenterFrom | null {
-  if (
-    value === "campaign-details" ||
-    value === "studio-board" ||
-    value === "payment" ||
-    value === "route-map"
-  ) {
-    return value;
-  }
-  return null;
-}
 
 /** Studio Help Center — philosophy, FAQ, and policies from policies.ts */
 export default function HelpCenterScene() {
   const searchParams = useSearchParams();
   const view = useMemo(() => resolveHelpCenterView(), []);
-  const from = parseFromParam(searchParams.get("from"));
-
-  const backHref =
-    from === "campaign-details"
-      ? copy.routes.campaignDetails
-      : from === "payment" || from === "route-map"
-        ? legacyRouteQuarantineV1.activeFrontDoor
-        : copy.routes.studioBoard;
+  const from = parseHelpCenterFromParam(searchParams.get("from"));
+  const backHref = resolveHelpCenterBackHref(from);
 
   const faqById = useMemo(() => new Map(view.faq.map((item) => [item.id, item])), [view.faq]);
 
@@ -50,7 +35,6 @@ export default function HelpCenterScene() {
           activeNav="help-center"
           title={copy.pageTitle}
           lead={copy.lead}
-          helpCenterFrom={from ?? "studio-board"}
         />
 
         <nav className="hc-toc utility-card" aria-label="On this page">
