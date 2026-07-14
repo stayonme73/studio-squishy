@@ -7,12 +7,17 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
+    // Default ignores of eslint-config-next ( **/ so nested .next under scratch trees is covered):
+    "**/.next/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Disposable local scratch — already gitignored; not active source (BH-2).
+    "tmp/**",
+    "tmp-*/**",
+    "tmp-tile-crops/**",
   ]),
 ]);
+
 
 export default eslintConfig;
