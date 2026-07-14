@@ -115,9 +115,12 @@ export async function PATCH(request: Request, context: RouteContext) {
   ]);
 
   let targetUser;
-  if (
-    (body.action === "reassign" ||
-      body.action === "assign_exception" ||
+  // reassign → toUserId; assign/ask-team variants → assignToUserId (separate branches).
+  if (body.action === "reassign" && body.toUserId) {
+    const userRecord = await findUserById(body.toUserId);
+    targetUser = userRecord ? toPublicUser(userRecord) : undefined;
+  } else if (
+    (body.action === "assign_exception" ||
       body.action === "owner_ask_team_compliance_hold" ||
       body.action === "owner_assign_compliance_hold" ||
       body.action === "owner_ask_team_direction_disagreement" ||
@@ -128,12 +131,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     "assignToUserId" in body &&
     body.assignToUserId
   ) {
-    const toUserId =
-      body.action === "reassign" ? body.toUserId : body.assignToUserId;
-    if (toUserId) {
-      const userRecord = await findUserById(toUserId);
-      targetUser = userRecord ? toPublicUser(userRecord) : undefined;
-    }
+    const userRecord = await findUserById(body.assignToUserId);
+    targetUser = userRecord ? toPublicUser(userRecord) : undefined;
   }
 
   const taskContext = {

@@ -501,3 +501,6 @@ export type ServiceCatalogEntry = StudioServiceEntry;
 
 /** Typed need reference for discovery rules — re-exported for engine consumers. */
 export type { StudioNeedId };
+
+/** Intake template key — re-exported so `@/catalog` barrel can surface it. */
+export type { RouteMapIntakeTemplateId };

@@ -958,7 +958,6 @@ export default function FileRoomOwnerConsoleSequentialDesk({
         ownerDisplayName,
         desk,
         currentItem,
-        isEmpty: desk.isEmpty,
       }),
     [ownerDisplayName, desk, currentItem],
   );

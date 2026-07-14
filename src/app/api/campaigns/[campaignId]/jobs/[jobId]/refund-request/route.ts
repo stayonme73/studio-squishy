@@ -58,7 +58,7 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }
 
-  await writeTasksEnvelope(campaignId, result.envelope);
+  await writeTasksEnvelope(result.envelope);
   return NextResponse.json({
     ok: true,
     interaction: result.interaction,

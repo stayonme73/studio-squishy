@@ -118,7 +118,7 @@ export default function CampaignDetailsScene() {
       revisionIncluded: revision?.included ?? 0,
       revisionUsed: revision?.used ?? 0,
       revisionRemaining: revision?.remaining ?? 0,
-      projectStatusReady: projectStatusState === "loaded",
+      projectStatusReady: projectStatusState.kind === "loaded",
       projectStatusError: Boolean(projectJobsError),
       blockingMaterialsCount: campaign?.materialsSummary?.blockingRequiredCount ?? 0,
       waitingOnClientJobCount: projectJobs.filter((job) => job.isWaitingOnClient).length,

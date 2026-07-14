@@ -9,7 +9,7 @@ import type { OwnerConsoleDecisionCard } from "@/lib/campaign-tasks/owner-consol
 import type { OwnerConsoleSequentialItem } from "@/lib/campaign-tasks/owner-console-sequential";
 import type { CampaignExceptionKind } from "@/lib/campaign-tasks/exceptions-types";
 
-import type { FileRoomExceptionOperatorContext } from "./FileRoomExceptionAssignPanel";
+import type { FileRoomExceptionOperatorContext } from "@/lib/campaign-tasks/exceptions-view";
 import { CoordinatorFolderBrief } from "./FileRoomOwnerConsoleSequentialDesk";
 
 type DecisionConfigKey = "deadlineDecision" | "revisionDecision" | "scopeDecision";
