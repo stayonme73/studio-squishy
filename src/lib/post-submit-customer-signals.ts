@@ -166,3 +166,23 @@ export function mayShowBuildingConceptsCustomerCopy(
   const mode = resolvePostSubmitCustomerMode(campaign, facts);
   return mode === "pass_through" || mode === "building_concepts_allowed";
 }
+
+/** Package A — paid campaign still waiting on Project Intake. */
+export function isPaidIncompleteIntake(campaign: CampaignRecord): boolean {
+  return Boolean(campaign.paymentReceivedAt) && !isIntakeComplete(campaign);
+}
+
+/**
+ * Package A — journey/progress titles must not say Building Concepts
+ * while customer-facing creative-work copy is still suppressed.
+ */
+export function resolveHonestBuildingStepLabel(
+  campaign: CampaignRecord | null,
+  facts: PostSubmitSignalFacts,
+  defaultLabel: string,
+): string {
+  if (!mayShowBuildingConceptsCustomerCopy(campaign, facts)) {
+    return PROJECT_INTAKE_RECEIVED_STAGE;
+  }
+  return defaultLabel;
+}

@@ -7,7 +7,7 @@ import { resolveCustomerJourneySteps } from "@/lib/customer-journey";
 import { resolveIntakeEditHref } from "@/lib/intake-edit";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
 import { resolveBoardNextStepPanelMessage } from "@/lib/studio-board-client-copy";
-import { resolveCampaignProgressSteps } from "@/lib/studio-board-view";
+import { resolveCampaignProgressSteps, resolveStudioBoardView } from "@/lib/studio-board-view";
 
 /** Package 1b recert — paid incomplete Project Intake Board communication truth. */
 function paidIncompleteIntakeCampaign(): CampaignRecord {
@@ -29,6 +29,7 @@ function paidIncompleteIntakeCampaign(): CampaignRecord {
       roadId: "i20",
       jobId: "v2-rtu-social-posts",
       selectedServiceIds: ["v2-rtu-social-posts"],
+      selectedAt: now,
       currentStep: "intake",
     },
   };
@@ -91,5 +92,13 @@ describe("Package 1b incomplete Project Intake Board cert", () => {
     const intakeProgress = progress.find((step) => step.id === "DRAFT_RECEIVED");
     expect(intakeProgress?.label).toBe("Project Intake");
     expect(intakeProgress?.state).not.toBe("complete");
+  });
+
+  it("keeps Overview Campaign Stage aligned with Waiting on Project Intake", () => {
+    const campaign = paidIncompleteIntakeCampaign();
+    const view = resolveStudioBoardView(campaign);
+    expect(view.campaignProgressLabel).toBe(studioBoard.nextAction.waitingOnProjectIntakeLabel);
+    expect(view.campaignProgressLabel).not.toBe("Campaign Queued");
+    expect(view.statusLabel).toBe("Payment Received");
   });
 });

@@ -6,6 +6,7 @@ import { resolveActivityFeed } from "@/lib/campaign-record";
 import { resolveCustomerJourneySteps } from "@/lib/customer-journey";
 import {
   PROJECT_INTAKE_RECEIVED_LEAD,
+  PROJECT_INTAKE_RECEIVED_STAGE,
   PROJECT_INTAKE_RECEIVED_STATUS,
   mayShowBuildingConceptsCustomerCopy,
   productionGatePassedFromKnownFacts,
@@ -15,7 +16,7 @@ import {
   resolveProductionGatePassedForCampaign,
 } from "@/lib/post-submit-customer-signals";
 import { resolveBoardNextStepPanelMessage } from "@/lib/studio-board-client-copy";
-import { resolveStudioBoardView } from "@/lib/studio-board-view";
+import { resolveCampaignProgressSteps, resolveStudioBoardView } from "@/lib/studio-board-view";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
 
 function postSubmitCampaign(overrides: Partial<CampaignRecord> = {}): CampaignRecord {
@@ -188,6 +189,16 @@ describe("Package 4 post-submit customer signals", () => {
     const building = steps.find((step) => step.id === "building");
     expect(intake?.state).toBe("complete");
     expect(building?.state).toBe("current");
+
+    const progress = resolveCampaignProgressSteps(campaign, {
+      productionGatePassed: false,
+      blockingRequiredCount: 0,
+      movedToProduction: false,
+    });
+    const buildingProgress = progress.find((step) => step.id === "BUILDING_CONCEPTS");
+    expect(buildingProgress?.label).toBe(PROJECT_INTAKE_RECEIVED_STAGE);
+    expect(buildingProgress?.label).not.toBe("Building Concepts");
+    expect(buildingProgress?.detail).toBe(PROJECT_INTAKE_RECEIVED_STATUS);
   });
 
   it("preserves Package 1b incomplete-intake activity truth", () => {

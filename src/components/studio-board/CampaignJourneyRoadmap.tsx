@@ -9,7 +9,9 @@ import {
 import {
   PROJECT_INTAKE_RECEIVED_STATUS,
   mayShowBuildingConceptsCustomerCopy,
+  resolveHonestBuildingStepLabel,
   resolveProductionGatePassedForCampaign,
+  type PostSubmitSignalFacts,
 } from "@/lib/post-submit-customer-signals";
 import type { StudioBoardDisplayFacts } from "@/lib/studio-board-view";
 
@@ -34,27 +36,43 @@ function StepMarker({ state }: { state: CustomerJourneyStep["state"] }) {
   return <span className="sb-journey__marker sb-journey__marker--upcoming" aria-hidden />;
 }
 
+function resolveStepSignalFacts(
+  campaign: CampaignRecord,
+  displayFacts?: StudioBoardDisplayFacts,
+): PostSubmitSignalFacts {
+  const blockingRequiredCount =
+    displayFacts?.blockingRequiredCount ?? campaign.materialsSummary?.blockingRequiredCount ?? 0;
+  const movedToProduction = displayFacts?.movedToProduction ?? false;
+  const productionGatePassed =
+    displayFacts?.productionGatePassed ??
+    resolveProductionGatePassedForCampaign(campaign, {
+      blockingRequiredCount,
+      movedToProduction,
+    });
+  return { productionGatePassed, blockingRequiredCount };
+}
+
+function resolveJourneyStepLabel(
+  step: CustomerJourneyStep,
+  campaign: CampaignRecord | null,
+  displayFacts?: StudioBoardDisplayFacts,
+): string {
+  if (step.id !== "building" || !campaign) return step.label;
+  return resolveHonestBuildingStepLabel(
+    campaign,
+    resolveStepSignalFacts(campaign, displayFacts),
+    step.label,
+  );
+}
+
 function resolveCurrentStepDetail(
   step: CustomerJourneyStep,
   campaign: CampaignRecord | null,
   displayFacts?: StudioBoardDisplayFacts,
 ): string {
   if (step.id === "building" && campaign) {
-    const blockingRequiredCount =
-      displayFacts?.blockingRequiredCount ?? campaign.materialsSummary?.blockingRequiredCount ?? 0;
-    const movedToProduction = displayFacts?.movedToProduction ?? false;
-    const productionGatePassed =
-      displayFacts?.productionGatePassed ??
-      resolveProductionGatePassedForCampaign(campaign, {
-        blockingRequiredCount,
-        movedToProduction,
-      });
-    if (
-      !mayShowBuildingConceptsCustomerCopy(campaign, {
-        productionGatePassed,
-        blockingRequiredCount,
-      })
-    ) {
+    const facts = resolveStepSignalFacts(campaign, displayFacts);
+    if (!mayShowBuildingConceptsCustomerCopy(campaign, facts)) {
       return PROJECT_INTAKE_RECEIVED_STATUS;
     }
     return studioBoard.nextAction.buildingConceptsLabel;
@@ -77,7 +95,9 @@ export default function CampaignJourneyRoadmap({ campaign, displayFacts }: Props
           <div className="sb-journey__row">
             <StepMarker state={step.state} />
             <div className="sb-journey__copy">
-              <span className="sb-journey__label">{step.label}</span>
+              <span className="sb-journey__label">
+                {resolveJourneyStepLabel(step, campaign, displayFacts)}
+              </span>
               {step.state === "current" && !step.actionLabel ? (
                 <span className="sb-journey__detail">
                   {resolveCurrentStepDetail(step, campaign, displayFacts)}

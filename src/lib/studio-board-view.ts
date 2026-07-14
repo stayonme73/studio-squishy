@@ -33,7 +33,9 @@ import {
   PROJECT_INTAKE_RECEIVED_LEAD,
   PROJECT_INTAKE_RECEIVED_STAGE,
   PROJECT_INTAKE_RECEIVED_STATUS,
+  isPaidIncompleteIntake,
   mayShowBuildingConceptsCustomerCopy,
+  resolveHonestBuildingStepLabel,
   resolvePostSubmitCustomerMode,
   resolveProductionGatePassedForCampaign,
   type PostSubmitSignalFacts,
@@ -175,12 +177,19 @@ export function resolveStudioNoteView(
 
   const content = statusContent[campaign.campaignStatus];
   const board = content.studioNoteBoard;
-  const { userName, studioNote: noteCopy } = studioBoard;
+  const { userName, studioNote: noteCopy, nextAction } = studioBoard;
   const greeting = `${noteCopy.greetingPrefix} ${userName},`;
   const facts = resolveBoardDisplayFacts(campaign, displayFacts);
   const mode = resolvePostSubmitCustomerMode(campaign, facts);
-  const bodyLines =
-    mode === "intake_received" || mode === "materials_blocking"
+  const bodyLines = isPaidIncompleteIntake(campaign)
+    ? [
+        "We received your payment.",
+        nextAction.completeProjectDetailsHint,
+        "Production has not begun.",
+        "Thank you for trusting The Studio.",
+        "— The Studio Team ♥",
+      ]
+    : mode === "intake_received" || mode === "materials_blocking"
       ? [
           PROJECT_INTAKE_RECEIVED_LEAD,
           "Your Studio Board will update as the next stage is ready.",
@@ -259,7 +268,12 @@ function resolveProgressStepDetail(
     }
     if (stageId === "DRAFT_RECEIVED") return "Awaiting payment";
     if (stageId === "READY_FOR_REVIEW") return studioBoard.nextAction.conceptsReadyLabel;
-    if (stageId === "PAYMENT_RECEIVED") return "Queued";
+    if (stageId === "PAYMENT_RECEIVED") {
+      if (campaign && isPaidIncompleteIntake(campaign)) {
+        return studioBoard.nextAction.waitingOnProjectIntakeLabel;
+      }
+      return "Queued";
+    }
     if (stageId === "DELIVERED") return "Complete";
     return null;
   }
@@ -315,9 +329,14 @@ export function resolveCampaignProgressSteps(
       state = "upcoming";
     }
 
+    const label =
+      stage.id === "BUILDING_CONCEPTS" && campaign && facts
+        ? resolveHonestBuildingStepLabel(campaign, facts, stage.boardLabel)
+        : stage.boardLabel;
+
     return {
       id: stage.id,
-      label: stage.boardLabel,
+      label,
       state,
       detail: resolveProgressStepDetail(stage.id, state, campaign, facts),
       href: resolveProgressStepHref(stage.id, state),
@@ -379,6 +398,10 @@ export function resolveWhatHappensNextSentence(
 ): string {
 
   if (!campaign) return "Start a campaign in Project Discovery to begin.";
+
+  if (isPaidIncompleteIntake(campaign)) {
+    return studioBoard.nextAction.completeProjectDetailsHint;
+  }
 
   const facts = resolveBoardDisplayFacts(campaign, displayFacts);
   const mode = resolvePostSubmitCustomerMode(campaign, facts);
@@ -480,8 +503,7 @@ export function resolveStudioBoardView(
   const facts = resolveBoardDisplayFacts(campaign, displayFacts);
   const mode = resolvePostSubmitCustomerMode(campaign, facts);
   const suppressBuildingConcepts = mode === "intake_received" || mode === "materials_blocking";
-
-
+  const paidIncompleteIntake = isPaidIncompleteIntake(campaign);
 
   return {
 
@@ -499,13 +521,17 @@ export function resolveStudioBoardView(
 
     campaignProgressLabel: suppressBuildingConcepts
       ? PROJECT_INTAKE_RECEIVED_STAGE
-      : content.campaignProgressLabel,
+      : paidIncompleteIntake
+        ? studioBoard.nextAction.waitingOnProjectIntakeLabel
+        : content.campaignProgressLabel,
 
     statusLabel: suppressBuildingConcepts ? PROJECT_INTAKE_RECEIVED_STATUS : content.statusLabel,
 
     campaignDescription: suppressBuildingConcepts
       ? PROJECT_INTAKE_RECEIVED_LEAD
-      : content.campaignDescription,
+      : paidIncompleteIntake
+        ? studioBoard.nextAction.completeProjectDetailsHint
+        : content.campaignDescription,
 
     estimatedCompletion: content.estimatedCompletion,
 
