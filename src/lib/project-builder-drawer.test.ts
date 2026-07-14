@@ -4,7 +4,6 @@ import { getRouteMapJob } from "@/config/route-map-v1";
 import { expandDrawerTimelineItems } from "@/lib/project-builder-drawer-timing";
 import { resolveProjectBuilderDrawerTagline } from "@/lib/project-builder-drawer-tagline";
 import { expandScannableCopyItems } from "@/lib/project-builder-scannable-copy";
-import { resolveProjectBuilderDrawerSquishyMessage } from "@/lib/project-builder-drawer-squishy";
 
 describe("expandScannableCopyItems", () => {
   it("splits semicolon-delimited deliverables into scan lines", () => {
@@ -44,27 +43,5 @@ describe("resolveProjectBuilderDrawerTagline", () => {
     if (!job) return;
 
     expect(resolveProjectBuilderDrawerTagline(job)).toMatch(/quickly understand everything they offer/i);
-  });
-});
-
-describe("resolveProjectBuilderDrawerSquishyMessage", () => {
-  it("points to the Not Included section below", () => {
-    const job = getRouteMapJob("v2-rtu-service-sheet");
-    expect(job).toBeDefined();
-    if (!job) return;
-    const message = resolveProjectBuilderDrawerSquishyMessage(job, [], [job]);
-    expect(message).toMatch(/Not Included section below/i);
-  });
-
-  it("guides comparison when flyer is already on the route", () => {
-    const flyer = getRouteMapJob("v2-rtu-flyer");
-    const sheet = getRouteMapJob("v2-rtu-service-sheet");
-    expect(flyer).toBeDefined();
-    expect(sheet).toBeDefined();
-    if (!flyer || !sheet) return;
-
-    const message = resolveProjectBuilderDrawerSquishyMessage(sheet, [], [flyer, sheet]);
-    expect(message).toMatch(/deciding between this and a flyer/i);
-    expect(message).toMatch(/Not Included section below/i);
   });
 });

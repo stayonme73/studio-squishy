@@ -1,0 +1,40 @@
+import type { ServiceId } from "@/catalog/types";
+import type { RouteMapJob, RouteMapRoadId } from "@/config/route-map-v1";
+
+/** Presentation-only Squishy guidance for Build Your Project — no catalog scoring. */
+export function resolveProjectBuilderSquishyMessage(
+  roadId: RouteMapRoadId,
+  jobs: readonly RouteMapJob[],
+  selectedServiceIds: readonly ServiceId[],
+): string {
+  const selectedCount = selectedServiceIds.length;
+  const jobIds = new Set(jobs.map((job) => job.id));
+  const hasFlyer = jobIds.has("v2-rtu-flyer");
+  const hasSocial = jobIds.has("v2-rtu-social-posts");
+  const selectedFlyer = selectedServiceIds.includes("v2-rtu-flyer" as ServiceId);
+  const selectedSocial = selectedServiceIds.includes("v2-rtu-social-posts" as ServiceId);
+
+  if (selectedCount === 0) {
+    if (roadId === "i75" && hasFlyer && hasSocial) {
+      return "If you're just getting started, I'd usually recommend a flyer before social media — one clear message first, then visibility.";
+    }
+    if (roadId === "i20") {
+      return "Pick one thing to promote first. A single focused offer usually beats spreading attention across too many services.";
+    }
+    return "Not sure where to start? A flyer or service sheet is usually the simplest first step on this route.";
+  }
+
+  if (selectedCount === 1 && selectedFlyer && hasSocial) {
+    return "A flyer is a solid first step. Social posts work well once you know the message you want to repeat.";
+  }
+
+  if (selectedCount >= 2) {
+    return "This is shaping up nicely. Take your time comparing what's included — you're building the right plan.";
+  }
+
+  if (selectedCount >= 1 && !selectedSocial && hasSocial) {
+    return "You're building a focused plan. Compare what's included before adding another service — overlap is the thing to watch for.";
+  }
+
+  return "You're building a focused plan. Compare what's included before adding another service — overlap is the thing to watch for.";
+}

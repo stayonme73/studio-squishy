@@ -1,0 +1,72 @@
+import type { ServiceId } from "@/catalog/types";
+import type { RouteMapJob } from "@/config/route-map-v1";
+
+function hasJob(routeJobs: readonly RouteMapJob[], id: string): boolean {
+  return routeJobs.some((entry) => entry.id === id);
+}
+
+const NOT_INCLUDED_BELOW = "the Not Included section below";
+
+/** Presentation-only Squishy guidance while a service drawer is open. */
+export function resolveProjectBuilderDrawerSquishyMessage(
+  job: RouteMapJob,
+  selectedServiceIds: readonly ServiceId[],
+  routeJobs: readonly RouteMapJob[],
+): string {
+  const selected = selectedServiceIds.includes(job.id as ServiceId);
+  const hasFlyer = hasJob(routeJobs, "v2-rtu-flyer");
+  const hasServiceSheet = hasJob(routeJobs, "v2-rtu-service-sheet");
+  const hasMenu = hasJob(routeJobs, "v2-rtu-menu");
+
+  if (selected) {
+    switch (job.intakeType) {
+      case "rtu-flyer":
+        return "You've added this flyer. If your goal shifts to listing many services, take another look at Not Included below before changing your plan.";
+      case "rtu-service-sheet":
+        return "This is in your project. If you only need one quick message, scan Not Included below — a flyer may be all you need.";
+      case "rtu-menu":
+        return "You've added this menu. If you're not listing food items and prices, Not Included below will confirm whether this is the right fit.";
+      case "rtu-social-posts":
+        return "This is in your project. Before you add more, decide whether one platform is enough — Not Included below shows what this service does not cover.";
+      default:
+        return "You've already added this service. Review Not Included below once more to confirm it matches what you're trying to accomplish.";
+    }
+  }
+
+  switch (job.intakeType) {
+    case "rtu-flyer":
+      return hasServiceSheet
+        ? `If you're deciding between this and a service sheet, take a look at ${NOT_INCLUDED_BELOW}. That's usually the quickest way to tell which service fits your project.`
+        : `This flyer is designed for one clear message or promotion. Start with ${NOT_INCLUDED_BELOW} — that's the fastest way to know if this is the right service.`;
+    case "rtu-service-sheet":
+      return hasFlyer
+        ? `If you're deciding between this and a flyer, take a look at ${NOT_INCLUDED_BELOW}. That's usually the quickest way to tell which service fits your project.`
+        : `This is great when customers need a quick overview of everything you offer. Scan ${NOT_INCLUDED_BELOW} to avoid choosing the wrong service.`;
+    case "rtu-menu":
+      return hasServiceSheet
+        ? `Menus and service sheets solve different problems. Compare ${NOT_INCLUDED_BELOW} with a service sheet if you're unsure which one fits.`
+        : `Use this when customers need your items and prices on one page. Scan ${NOT_INCLUDED_BELOW} to tell fast if a menu is too much — or too little.`;
+    case "rtu-social-posts":
+      return hasFlyer
+        ? `Social posts work well after you know the message you want to repeat. Check ${NOT_INCLUDED_BELOW}, then decide if this pairs with your flyer.`
+        : `This works when you're ready to show up on one platform. Scan ${NOT_INCLUDED_BELOW} to see what posting, setup, and ongoing work are not part of this service.`;
+    case "rtu-short-video":
+      return `Short video is strongest when you want something people will watch and share quickly. Scan ${NOT_INCLUDED_BELOW} to see what editing, length, and posting do not cover.`;
+    case "rtu-voice":
+      return `Voice announcements work well for one short, polished message. Check ${NOT_INCLUDED_BELOW} if you need writing, multiple versions, or ongoing updates.`;
+    case "rtu-promotion-graphics":
+      return `These graphics are built for one campaign or promotion. If you need a full page or ongoing content, scan ${NOT_INCLUDED_BELOW} for a better fit.`;
+    case "page":
+      return `This page is for one purpose and one action — a sale, event, opening, or offer. Scan ${NOT_INCLUDED_BELOW} to see what a full website or ongoing updates would require.`;
+    case "social-setup":
+      return `This sets up one platform you already control. If you need ongoing posts or campaign graphics, check ${NOT_INCLUDED_BELOW} before you add it.`;
+    case "rtu-email-kit":
+    case "rtu-sms-kit":
+      return `This service covers a defined campaign kit — not ongoing management. Scan ${NOT_INCLUDED_BELOW} to see what setup, sending, and long-term support are outside scope.`;
+    default:
+      if (hasMenu && job.intakeType !== "rtu-menu") {
+        return `Compare this service with what you've already added. Scan ${NOT_INCLUDED_BELOW} to see whether it overlaps or fills a gap.`;
+      }
+      return `Read Included and Not Included together — ${NOT_INCLUDED_BELOW} is usually enough to know if this belongs in your project.`;
+  }
+}

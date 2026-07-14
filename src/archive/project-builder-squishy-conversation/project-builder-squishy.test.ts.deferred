@@ -1,0 +1,27 @@
+import { describe, expect, it } from "vitest";
+
+import { resolveProjectBuilderSquishyMessage } from "@/lib/project-builder-squishy";
+import { getJobsForRoad } from "@/config/route-map-v1";
+
+describe("resolveProjectBuilderSquishyMessage", () => {
+  it("recommends flyer before social on I-75 with no selections", () => {
+    const jobs = getJobsForRoad("i75");
+    const message = resolveProjectBuilderSquishyMessage("i75", jobs, []);
+    expect(message).toMatch(/flyer before social media/i);
+  });
+
+  it("guides toward understanding when selections exist", () => {
+    const jobs = getJobsForRoad("i75");
+    const message = resolveProjectBuilderSquishyMessage("i75", jobs, ["v2-rtu-flyer"]);
+    expect(message).toMatch(/flyer|social|focused|message/i);
+  });
+
+  it("uses conversational guide tone after first add", () => {
+    const jobs = getJobsForRoad("i75");
+    const message = resolveProjectBuilderSquishyMessage("i75", jobs, [
+      "v2-rtu-flyer",
+      "v2-rtu-menu",
+    ]);
+    expect(message).toMatch(/Looking good|shaping up/i);
+  });
+});
