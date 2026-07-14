@@ -5,6 +5,9 @@ import {
   buildRefundRequestSnapshot,
   isRefundIntakeComplete,
   resolveRefundIntakePrompt,
+  resolveRefundPolicyStatusLabel,
+  resolveRefundTimelineFacts,
+  resolveProductionStartedReadOnly,
 } from "./refund-request-intake";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 
@@ -15,9 +18,9 @@ const job: PurchasedJobRecord = {
   serviceName: "Social Media Launch Set",
   spineStatus: "waiting_on_client",
   productionLane: "standard",
+  intakeComplete: true,
   refundEligibleAt: "2026-07-06T12:00:00.000Z",
   waitingOnClientSince: "2026-06-20T12:00:00.000Z",
-  createdAt: "2026-06-01T12:00:00.000Z",
   updatedAt: "2026-07-06T12:00:00.000Z",
 };
 
@@ -43,5 +46,14 @@ describe("refund-request-intake", () => {
     expect(snapshot.receivedConceptsOrFiles).toBe(false);
     expect(snapshot.policyStatusLabel).toContain("May be eligible");
     expect(snapshot.recommendedNextAction).toContain("approve or deny");
+  });
+
+  it("BH-RF-1: timeline facts stay job-grain and omit campaign payment", () => {
+    const facts = resolveRefundTimelineFacts(job);
+    expect(facts).toMatch(/Waiting on client since/i);
+    expect(facts).toMatch(/refund-eligibility signal/i);
+    expect(facts).not.toMatch(/Payment received/i);
+    expect(resolveProductionStartedReadOnly(job)).toBe(false);
+    expect(resolveRefundPolicyStatusLabel(job)).toContain("May be eligible");
   });
 });

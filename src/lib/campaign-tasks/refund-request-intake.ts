@@ -54,6 +54,7 @@ export function resolveRefundPolicyStatusLabel(job: PurchasedJobRecord): string 
   return "Refund review — policy facts recorded; Owner approval required.";
 }
 
+/** Job-grain timeline only — campaign payment truth stays on CampaignRecord. */
 export function resolveRefundTimelineFacts(job: PurchasedJobRecord): string {
   const parts: string[] = [];
   if (job.waitingOnClientSince) {
@@ -64,9 +65,6 @@ export function resolveRefundTimelineFacts(job: PurchasedJobRecord): string {
   }
   if (job.lastClientResponseAt) {
     parts.push(`Last client response ${formatFactDate(job.lastClientResponseAt)}.`);
-  }
-  if (job.paymentReceivedAt) {
-    parts.push(`Payment received ${formatFactDate(job.paymentReceivedAt)}.`);
   }
   return parts.length ? parts.join(" ") : "Timeline facts are on the job activity record.";
 }
