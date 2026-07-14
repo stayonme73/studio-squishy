@@ -239,7 +239,7 @@ export async function classifyInformationUpdateRequest(params: {
     classifiedBy: params.user.id,
   };
 
-  let next = {
+  let next: ProjectActivityEnvelope = {
     ...envelope,
     requests: envelope.requests.map((r, i) => (i === index ? updated : r)),
     updatedAt: classifiedAt,
