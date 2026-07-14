@@ -20,13 +20,13 @@ export default function ProjectBuilderSquishyCompanion({ turns }: Props) {
     const thread = threadRef.current;
     if (!thread) return;
 
-    function syncThreadOverflow() {
+    const syncThreadOverflow = () => {
       const overflows = thread.scrollHeight > thread.clientHeight + 1;
       thread.classList.toggle("pb-studio-conversation__thread--overflow", overflows);
       if (overflows) {
         thread.scrollTop = thread.scrollHeight;
       }
-    }
+    };
 
     syncThreadOverflow();
     const observer = new ResizeObserver(syncThreadOverflow);
