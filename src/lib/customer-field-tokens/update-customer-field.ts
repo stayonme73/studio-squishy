@@ -1,12 +1,8 @@
 import type { CampaignRecord } from "@/config/studio-board";
 
-import {
-  readOfficialFieldValue,
-  writeOfficialFieldValue,
-  type DirectApplyTargetKey,
-} from "./allowlist";
+import { readOfficialFieldValue, writeOfficialFieldValue } from "./allowlist";
 import { valueFingerprint } from "./normalize";
-import type { CustomerFieldTokenMap, FieldChangeToken } from "./types";
+import type { CustomerFieldTokenMap, DirectApplyTargetKey, FieldChangeToken } from "./types";
 
 let authorizedCustomerFieldWrite = false;
 
