@@ -18,4 +18,5 @@ export const ROUTE_MAP_STOP_ICONS: Record<RouteMapIntakeType, string> = {
   "rtu-sms-kit": "☎",
   "rtu-voice": "♫",
   "rtu-short-video": "▷",
+  "rtu-business-card": "▭",
 };
