@@ -28,6 +28,7 @@ import {
   type OwnerRevisionDecisionAction,
   type OwnerScopeDecisionAction,
   type OwnerDeskJobAction,
+  type OwnerPostDecisionBriefing,
 } from "@/studio-coordinator";
 import type { OwnerDecisionFolderPatchBody } from "@/lib/campaign-tasks/owner-decision-folder-dispatch";
 import { contentKindForCategory } from "@/lib/materials/promotion";
@@ -44,6 +45,17 @@ import {
   emptyResolveExceptionForm,
   type ResolveExceptionFormState,
 } from "./FileRoomExceptionResolvePanel";
+
+/** Deadline / revision / scope folder patches that use family briefing resolvers. */
+type OwnerFolderBriefingAction =
+  | OwnerDeadlineDecisionAction
+  | OwnerRevisionDecisionAction
+  | OwnerScopeDecisionAction;
+
+type OwnerFolderBriefingBody = Extract<
+  OwnerDecisionFolderPatchBody,
+  { action: OwnerFolderBriefingAction }
+>;
 
 export type OwnerConsolePanelMode = "assign" | "resolve" | "approve" | "reassign" | null;
 
@@ -612,15 +624,10 @@ export function useOwnerConsoleActions() {
     });
   };
 
-  const patchOwnerDecisionFolder = async (
+  const patchOwnerDecisionFolder = async <B extends OwnerFolderBriefingBody>(
     card: OwnerConsoleDecisionCard,
-    body: OwnerDecisionFolderPatchBody,
-    briefingAction:
-      | OwnerDeadlineDecisionAction
-      | OwnerRevisionDecisionAction
-      | OwnerScopeDecisionAction
-      | OwnerComplaintDecisionAction,
-    briefingResolver: (action: typeof briefingAction) => { message: string },
+    body: B,
+    briefingResolver: (action: B["action"]) => OwnerPostDecisionBriefing,
   ) => {
     setBusy(true);
     setError(null);
@@ -638,7 +645,7 @@ export function useOwnerConsoleActions() {
         );
       }
       resetPanels();
-      setStatusMessage(briefingResolver(briefingAction).message);
+      setStatusMessage(briefingResolver(body.action).message);
       router.refresh();
     } catch (patchError) {
       setError(
@@ -733,7 +740,6 @@ export function useOwnerConsoleActions() {
       void patchOwnerDecisionFolder(
         card,
         { action: "owner_commit_deadline", exceptionId: card.id, ownerNotes },
-        "owner_commit_deadline",
         resolveOwnerDeadlinePostDecisionBriefing,
       );
       return;
@@ -743,7 +749,6 @@ export function useOwnerConsoleActions() {
       void patchOwnerDecisionFolder(
         card,
         { action: "owner_allow_revision", exceptionId: card.id, ownerNotes },
-        "owner_allow_revision",
         resolveOwnerRevisionPostDecisionBriefing,
       );
       return;
@@ -757,7 +762,6 @@ export function useOwnerConsoleActions() {
       void patchOwnerDecisionFolder(
         card,
         { action: "owner_approve_scope_change", exceptionId: card.id, ownerNotes },
-        "owner_approve_scope_change",
         resolveOwnerScopePostDecisionBriefing,
       );
     }
@@ -821,7 +825,6 @@ export function useOwnerConsoleActions() {
       void patchOwnerDecisionFolder(
         card,
         { action: "owner_hold_firm_revision", exceptionId: card.id, ownerNotes },
-        "owner_hold_firm_revision",
         resolveOwnerRevisionPostDecisionBriefing,
       );
       return;
@@ -831,7 +834,6 @@ export function useOwnerConsoleActions() {
       void patchOwnerDecisionFolder(
         card,
         { action: "owner_decline_scope_change", exceptionId: card.id, ownerNotes },
-        "owner_decline_scope_change",
         resolveOwnerScopePostDecisionBriefing,
       );
     }
@@ -852,7 +854,6 @@ export function useOwnerConsoleActions() {
       void patchOwnerDecisionFolder(
         card,
         { action: "owner_hold_deadline", exceptionId: card.id, note, ownerNotes },
-        "owner_hold_deadline",
         resolveOwnerDeadlinePostDecisionBriefing,
       );
     } else if (kind === "revision_exhausted") {
@@ -860,7 +861,6 @@ export function useOwnerConsoleActions() {
       void patchOwnerDecisionFolder(
         card,
         { action: "owner_hold_revision", exceptionId: card.id, note, ownerNotes },
-        "owner_hold_revision",
         resolveOwnerRevisionPostDecisionBriefing,
       );
     } else if (kind === "scope_change") {
@@ -868,7 +868,6 @@ export function useOwnerConsoleActions() {
       void patchOwnerDecisionFolder(
         card,
         { action: "owner_hold_scope_change", exceptionId: card.id, note, ownerNotes },
-        "owner_hold_scope_change",
         resolveOwnerScopePostDecisionBriefing,
       );
     }
@@ -896,7 +895,6 @@ export function useOwnerConsoleActions() {
           ownerNotes,
           assignToUserId,
         },
-        "owner_ask_team_deadline",
         resolveOwnerDeadlinePostDecisionBriefing,
       );
     } else if (kind === "revision_exhausted") {
@@ -910,7 +908,6 @@ export function useOwnerConsoleActions() {
           ownerNotes,
           assignToUserId,
         },
-        "owner_ask_team_revision",
         resolveOwnerRevisionPostDecisionBriefing,
       );
     } else if (kind === "scope_change") {
@@ -924,7 +921,6 @@ export function useOwnerConsoleActions() {
           ownerNotes,
           assignToUserId,
         },
-        "owner_ask_team_scope_change",
         resolveOwnerScopePostDecisionBriefing,
       );
     }
@@ -948,7 +944,6 @@ export function useOwnerConsoleActions() {
         clientMessage,
         ownerNotes,
       },
-      "owner_ask_client_deadline",
       resolveOwnerDeadlinePostDecisionBriefing,
     );
   };
@@ -971,7 +966,6 @@ export function useOwnerConsoleActions() {
         clientMessage,
         ownerNotes,
       },
-      "owner_ask_client_info_scope_change",
       resolveOwnerScopePostDecisionBriefing,
     );
   };
@@ -996,7 +990,6 @@ export function useOwnerConsoleActions() {
           clientMessage,
           ownerNotes,
         },
-        "owner_ask_client_revision",
         resolveOwnerRevisionPostDecisionBriefing,
       );
     } else if (kind === "scope_change") {
@@ -1009,7 +1002,6 @@ export function useOwnerConsoleActions() {
           clientMessage,
           ownerNotes,
         },
-        "owner_ask_client_approval_scope_change",
         resolveOwnerScopePostDecisionBriefing,
       );
     }
@@ -1037,7 +1029,6 @@ export function useOwnerConsoleActions() {
           ownerNotes,
           note,
         },
-        "owner_assign_deadline",
         resolveOwnerDeadlinePostDecisionBriefing,
       );
     } else if (kind === "revision_exhausted") {
@@ -1051,7 +1042,6 @@ export function useOwnerConsoleActions() {
           ownerNotes,
           note,
         },
-        "owner_assign_revision",
         resolveOwnerRevisionPostDecisionBriefing,
       );
     } else if (kind === "scope_change") {
@@ -1065,7 +1055,6 @@ export function useOwnerConsoleActions() {
           ownerNotes,
           note,
         },
-        "owner_assign_scope_change",
         resolveOwnerScopePostDecisionBriefing,
       );
     }
