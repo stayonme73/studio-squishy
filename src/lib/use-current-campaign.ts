@@ -4,6 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import type { CampaignRecord } from "@/config/studio-board";
+import {
+  hasProtectedLocalIntakeDraft,
+  mergeCampaignPreferLocalIntakeDraft,
+} from "@/lib/route-map-intake-continuity";
 import { parseDevStatusParam } from "@/lib/studio-board-dev-status";
 import {
   clearCampaignState,
@@ -68,6 +72,12 @@ export function useCurrentCampaign() {
       }
       if (response.status === 403) {
         if (!requestedCampaignId) {
+          if (hasProtectedLocalIntakeDraft(localCampaign)) {
+            setCampaign(localCampaign);
+            setAccessState("ready");
+            setError(null);
+            return;
+          }
           clearCampaignState();
           setCampaign(null);
           setAccessState("no-active-project");
@@ -89,8 +99,33 @@ export function useCurrentCampaign() {
       const body = (await response.json()) as CampaignEnvelopeResponse;
       const nextCampaign = body.campaign?.record ?? null;
       if (nextCampaign) {
-        saveCurrentCampaign(nextCampaign);
-        setCampaign(nextCampaign);
+        // Package 2: do not discard an in-progress local Intake draft for a different server current.
+        if (
+          localCampaign &&
+          localCampaign.campaignId !== nextCampaign.campaignId &&
+          hasProtectedLocalIntakeDraft(localCampaign)
+        ) {
+          // Surface the local draft immediately so Board is not blank while claim runs.
+          saveCurrentCampaign(localCampaign);
+          setCampaign(localCampaign);
+          setAccessState("ready");
+          setError(null);
+          void claimLocalCampaign(localCampaign).then((claimResult) => {
+            if (claimResult !== "claimed") {
+              console.warn(
+                `[intake-continuity] Kept local Project Intake draft; claim result=${claimResult}`,
+              );
+            }
+          });
+          return;
+        }
+
+        const merged =
+          localCampaign && localCampaign.campaignId === nextCampaign.campaignId
+            ? mergeCampaignPreferLocalIntakeDraft(nextCampaign, localCampaign)
+            : nextCampaign;
+        saveCurrentCampaign(merged);
+        setCampaign(merged);
         setAccessState("ready");
         setError(null);
         return;

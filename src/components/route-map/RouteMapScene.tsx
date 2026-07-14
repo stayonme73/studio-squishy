@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import RouteMapIntakeForm from "@/components/route-map/RouteMapIntakeForm";
@@ -32,12 +33,17 @@ import { campaignSaveStatusLabel } from "@/lib/campaign-save-status-label";
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
 import { CAMPAIGN_SYNC_EVENT, type CampaignSyncStatus } from "@/lib/campaign-store/types";
 import { readCampaignSyncStatus } from "@/lib/campaign-store/sync-client";
-import { readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
+import {
+  INTAKE_CONTINUITY_COPY,
+  resolveIntakeEntrySurface,
+  type IntakeEntrySurface,
+} from "@/lib/route-map-intake-continuity";
+import { isIntakeComplete, readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 import { projectBuilderHref } from "@/config/project-builder-v1";
-import { projectRecordArrivalHref } from "@/lib/project-record-arrival";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 import { resolveSquishyRouteMapMessage } from "@/lib/route-map-squishy";
 import type { RouteMapJourneyStep } from "@/config/studio-board";
+import { customerJourneyStepRoute } from "@/config/customer-journey-v1";
 
 export type RouteMapStep = "map" | RouteMapJourneyStep;
 
@@ -47,10 +53,78 @@ function routeMapSyncStatusLabel(
   status: CampaignSyncStatus | null,
   intakeDraftStatus: IntakeDraftStatus | null,
 ): string {
+  // Honest feedback: never mask a sync/local failure behind Progress saved / Unsaved draft.
   if (intakeDraftStatus === "error") return "Save failed";
+  if (status?.state === "error") return "Save failed";
+  if (status?.state === "syncing") return "Saving…";
   if (intakeDraftStatus === "unsaved") return "Unsaved draft";
   if (intakeDraftStatus === "saved") return "Progress saved";
   return campaignSaveStatusLabel(status);
+}
+
+function IntakeGatePanel({
+  surface,
+}: {
+  surface: Exclude<IntakeEntrySurface, { kind: "form" }>;
+}) {
+  const copy = INTAKE_CONTINUITY_COPY;
+  if (surface.kind === "already-submitted") {
+    return (
+      <section className="route-map-intake-gate" aria-labelledby="route-map-intake-gate-title">
+        <p className="route-map-section-lead">Project Intake</p>
+        <h2 id="route-map-intake-gate-title" className="route-map-section-title">
+          {copy.alreadySubmittedTitle}
+        </h2>
+        <p className="route-map-section-lead">{copy.alreadySubmittedLead}</p>
+        <Link href={studioBoard.routes.studioBoard} className="route-map-primary-btn">
+          {copy.alreadySubmittedCta}
+        </Link>
+      </section>
+    );
+  }
+
+  if (surface.kind === "missing-payment") {
+    return (
+      <section className="route-map-intake-gate" aria-labelledby="route-map-intake-gate-title">
+        <p className="route-map-section-lead">Project Intake</p>
+        <h2 id="route-map-intake-gate-title" className="route-map-section-title">
+          {copy.missingPaymentTitle}
+        </h2>
+        <p className="route-map-section-lead">{copy.missingPaymentLead}</p>
+        <Link href={customerJourneyStepRoute("secure-checkout")} className="route-map-primary-btn">
+          {copy.missingPaymentCta}
+        </Link>
+      </section>
+    );
+  }
+
+  if (surface.kind === "missing-plan") {
+    return (
+      <section className="route-map-intake-gate" aria-labelledby="route-map-intake-gate-title">
+        <p className="route-map-section-lead">Project Intake</p>
+        <h2 id="route-map-intake-gate-title" className="route-map-section-title">
+          {copy.missingPlanTitle}
+        </h2>
+        <p className="route-map-section-lead">{copy.missingPlanLead}</p>
+        <Link href={surface.recoveryHref} className="route-map-primary-btn">
+          {surface.recoveryLabel}
+        </Link>
+      </section>
+    );
+  }
+
+  return (
+    <section className="route-map-intake-gate" aria-labelledby="route-map-intake-gate-title">
+      <p className="route-map-section-lead">Project Intake</p>
+      <h2 id="route-map-intake-gate-title" className="route-map-section-title">
+        {copy.missingContextTitle}
+      </h2>
+      <p className="route-map-section-lead">{copy.missingContextLead}</p>
+      <Link href={surface.recoveryHref} className="route-map-primary-btn">
+        {surface.recoveryLabel}
+      </Link>
+    </section>
+  );
 }
 
 export default function RouteMapScene() {
@@ -62,6 +136,11 @@ export default function RouteMapScene() {
   const [selectedServiceIds, setSelectedServiceIds] = useState<ServiceId[]>([]);
   const [syncStatus, setSyncStatus] = useState<CampaignSyncStatus | null>(null);
   const [intakeDraftStatus, setIntakeDraftStatus] = useState<IntakeDraftStatus>("unsaved");
+  const [intakeGate, setIntakeGate] = useState<Exclude<IntakeEntrySurface, { kind: "form" }> | null>(
+    null,
+  );
+  const [intakeDraftAnswers, setIntakeDraftAnswers] = useState<RouteMapIntakeAnswers | null>(null);
+  const [intakeSubmitError, setIntakeSubmitError] = useState<string | null>(null);
   /** True once the current project has been paid — the paid plan is protected from the old pre-payment path. */
   const [isPaidProject, setIsPaidProject] = useState(false);
   const previousStepRef = useRef<RouteMapStep | null>(null);
@@ -112,7 +191,6 @@ export default function RouteMapScene() {
 
   const handleChooseJob = useCallback(() => {
     if (!selectedJob || !roadId) return;
-    // Defensive boundary — the paid plan is protected; this control is also disabled in the UI below.
     if (isPaidProject && !selectedServiceIds.includes(selectedJob.id)) return;
     const updated = addRouteMapServiceToPlan(selectedJob.id, roadId);
     setSelectedServiceIds([...(updated?.routeMapContext?.selectedServiceIds ?? selectedServiceIds)]);
@@ -124,6 +202,7 @@ export default function RouteMapScene() {
     setStep("map");
     setRoadId(null);
     setSelectedJobId(null);
+    setIntakeGate(null);
   }, []);
 
   const handleClosePanel = useCallback(() => {
@@ -138,15 +217,49 @@ export default function RouteMapScene() {
   }, []);
 
   const handleIntakeSubmit = useCallback(
-    (answers: RouteMapIntakeAnswers) => {
+    (answers: RouteMapIntakeAnswers): boolean => {
+      setIntakeSubmitError(null);
+      const campaign = readCurrentCampaignHydrated();
+      if (isIntakeComplete(campaign)) {
+        setIntakeGate({ kind: "already-submitted" });
+        return false;
+      }
+      if (!campaign?.paymentReceivedAt) {
+        setIntakeGate({ kind: "missing-payment" });
+        return false;
+      }
+      if (!campaign.approvedStudioPlan) {
+        const surface = resolveIntakeEntrySurface(campaign, "intake");
+        if (surface && surface.kind !== "form") setIntakeGate(surface);
+        else {
+          setIntakeGate({
+            kind: "missing-plan",
+            recoveryHref: studioBoard.routes.newCampaign,
+            recoveryLabel: "Return to Route Map",
+          });
+        }
+        return false;
+      }
+
       const updated = submitRouteMapIntake(answers);
-      if (!updated) return;
-      router.push(projectRecordArrivalHref(studioBoard.routes.campaignDetails));
+      if (!updated) {
+        setIntakeDraftStatus("error");
+        setIntakeSubmitError(INTAKE_CONTINUITY_COPY.submitFailed);
+        return false;
+      }
+      router.push(studioBoard.routes.studioBoard);
+      return true;
     },
     [router],
   );
 
   const handleIntakeSaveDraft = useCallback((answers: RouteMapIntakeAnswers) => {
+    const campaign = readCurrentCampaignHydrated();
+    if (isIntakeComplete(campaign)) {
+      setIntakeGate({ kind: "already-submitted" });
+      setIntakeDraftStatus("error");
+      return false;
+    }
     const updated = saveRouteMapIntakeDraft(answers);
     if (!updated) {
       setIntakeDraftStatus("error");
@@ -161,9 +274,33 @@ export default function RouteMapScene() {
     if (campaign?.paymentReceivedAt) {
       setIsPaidProject(true);
     }
+
+    const requestedStep = searchParams.get("step");
+    const intakeSurface = resolveIntakeEntrySurface(campaign, requestedStep);
+    if (intakeSurface) {
+      if (intakeSurface.kind !== "form") {
+        setIntakeGate(intakeSurface);
+        setIntakeDraftAnswers(null);
+        setStep("intake");
+        setSelectedJobId(null);
+        setRoadId(campaign?.routeMapContext?.roadId ?? null);
+        return;
+      }
+
+      setIntakeGate(null);
+      setIntakeDraftAnswers(intakeSurface.draftAnswers);
+      justRestoredRef.current = true;
+      setRoadId(intakeSurface.roadId);
+      setSelectedJobId(intakeSurface.jobId);
+      setSelectedServiceIds([...intakeSurface.selectedServiceIds]);
+      setStep("intake");
+      setIntakeDraftStatus(intakeSurface.draftAnswers ? "saved" : "unsaved");
+      return;
+    }
+
     const restoredJourney = resolveRouteMapRestoredJourney(
       campaign?.routeMapContext,
-      searchParams.get("step"),
+      requestedStep,
     );
 
     if (restoredJourney) {
@@ -183,6 +320,7 @@ export default function RouteMapScene() {
       }
 
       justRestoredRef.current = true;
+      setIntakeGate(null);
       setRoadId(restoredJourney.roadId);
       setSelectedJobId(restoredJourney.jobId);
       setSelectedServiceIds([...restoredJourney.selectedServiceIds]);
@@ -202,6 +340,7 @@ export default function RouteMapScene() {
       }
     }
 
+    setIntakeGate(null);
     setStep("map");
   }, [searchParams, router]);
 
@@ -231,14 +370,17 @@ export default function RouteMapScene() {
   const showOverlay = step !== "map";
   const showPanel = step === "panel" && roadId;
   const showJob = step === "job" && selectedJob;
-  const showIntake = step === "intake" && selectedJob;
+  const showIntakeForm = step === "intake" && selectedJob && !intakeGate;
+  const showIntakeGate = step === "intake" && Boolean(intakeGate);
 
   return (
     <div className={`route-map-page route-map-page--immersive ${utilityPageFontClassName}`}>
       <div className="route-map-scene-body">
         <RouteMapLobbyBackdrop />
         <div
-          className={`route-map-world${showOverlay ? " route-map-world--overlay" : ""}${showIntake ? " route-map-world--intake" : ""}`}
+          className={`route-map-world${showOverlay ? " route-map-world--overlay" : ""}${
+            showIntakeForm || showIntakeGate ? " route-map-world--intake" : ""
+          }`}
         >
           <div
             className="route-map-world__map route-map-world__map--desktop"
@@ -274,11 +416,13 @@ export default function RouteMapScene() {
 
           {showOverlay ? (
             <div className="route-map-save-status" role="status" aria-live="polite">
-              {routeMapSyncStatusLabel(syncStatus, showIntake ? intakeDraftStatus : null)}
+              {routeMapSyncStatusLabel(syncStatus, showIntakeForm ? intakeDraftStatus : null)}
             </div>
           ) : null}
 
-          {showOverlay && !showIntake ? <RouteMapSquishyPanel message={squishyMessage} /> : null}
+          {showOverlay && !showIntakeForm && !showIntakeGate ? (
+            <RouteMapSquishyPanel message={squishyMessage} />
+          ) : null}
 
           {showPanel ? (
             <RouteMapRoutePanel
@@ -307,20 +451,30 @@ export default function RouteMapScene() {
             </div>
           ) : null}
 
-          {showIntake ? (
+          {showIntakeGate && intakeGate ? (
+            <div className="route-map-world__sheet route-map-world__sheet--intake">
+              <div className="route-map-overlay-workspace route-map-overlay-workspace--intake">
+                <IntakeGatePanel surface={intakeGate} />
+              </div>
+            </div>
+          ) : null}
+
+          {showIntakeForm ? (
             <div className="route-map-world__sheet route-map-world__sheet--intake">
               <div className="route-map-overlay-workspace route-map-overlay-workspace--intake">
                 <RouteMapIntakeForm
-                job={selectedJob}
-                onSaveDraft={handleIntakeSaveDraft}
-                onSubmit={handleIntakeSubmit}
-                onDraftStatusChange={setIntakeDraftStatus}
-              />
+                  key={`${selectedJob.id}:${intakeDraftAnswers ? "draft" : "empty"}`}
+                  job={selectedJob}
+                  initialDraftAnswers={intakeDraftAnswers}
+                  onSaveDraft={handleIntakeSaveDraft}
+                  onSubmit={handleIntakeSubmit}
+                  onDraftStatusChange={setIntakeDraftStatus}
+                  submitError={intakeSubmitError}
+                />
               </div>
             </div>
           ) : null}
         </div>
-
       </div>
     </div>
   );

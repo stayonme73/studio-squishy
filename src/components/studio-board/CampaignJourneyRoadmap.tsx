@@ -6,11 +6,18 @@ import {
   resolveCustomerJourneySteps,
   type CustomerJourneyStep,
 } from "@/lib/customer-journey";
+import {
+  PROJECT_INTAKE_RECEIVED_STATUS,
+  mayShowBuildingConceptsCustomerCopy,
+  resolveProductionGatePassedForCampaign,
+} from "@/lib/post-submit-customer-signals";
+import type { StudioBoardDisplayFacts } from "@/lib/studio-board-view";
 
 const { progressCard: copy } = studioBoard;
 
 type Props = {
   campaign: CampaignRecord | null;
+  displayFacts?: StudioBoardDisplayFacts;
 };
 
 function StepMarker({ state }: { state: CustomerJourneyStep["state"] }) {
@@ -27,8 +34,37 @@ function StepMarker({ state }: { state: CustomerJourneyStep["state"] }) {
   return <span className="sb-journey__marker sb-journey__marker--upcoming" aria-hidden />;
 }
 
+function resolveCurrentStepDetail(
+  step: CustomerJourneyStep,
+  campaign: CampaignRecord | null,
+  displayFacts?: StudioBoardDisplayFacts,
+): string {
+  if (step.id === "building" && campaign) {
+    const blockingRequiredCount =
+      displayFacts?.blockingRequiredCount ?? campaign.materialsSummary?.blockingRequiredCount ?? 0;
+    const movedToProduction = displayFacts?.movedToProduction ?? false;
+    const productionGatePassed =
+      displayFacts?.productionGatePassed ??
+      resolveProductionGatePassedForCampaign(campaign, {
+        blockingRequiredCount,
+        movedToProduction,
+      });
+    if (
+      !mayShowBuildingConceptsCustomerCopy(campaign, {
+        productionGatePassed,
+        blockingRequiredCount,
+      })
+    ) {
+      return PROJECT_INTAKE_RECEIVED_STATUS;
+    }
+    return studioBoard.nextAction.buildingConceptsLabel;
+  }
+  if (step.id === "review") return studioBoard.nextAction.conceptsReadyLabel;
+  return "In progress";
+}
+
 /** Customer roadmap — where they are and what to do next. */
-export default function CampaignJourneyRoadmap({ campaign }: Props) {
+export default function CampaignJourneyRoadmap({ campaign, displayFacts }: Props) {
   const steps = resolveCustomerJourneySteps(campaign);
 
   return (
@@ -42,13 +78,9 @@ export default function CampaignJourneyRoadmap({ campaign }: Props) {
             <StepMarker state={step.state} />
             <div className="sb-journey__copy">
               <span className="sb-journey__label">{step.label}</span>
-          {step.state === "current" && !step.actionLabel ? (
+              {step.state === "current" && !step.actionLabel ? (
                 <span className="sb-journey__detail">
-                  {step.id === "building"
-                    ? studioBoard.nextAction.buildingConceptsLabel
-                    : step.id === "review"
-                      ? studioBoard.nextAction.conceptsReadyLabel
-                      : "In progress"}
+                  {resolveCurrentStepDetail(step, campaign, displayFacts)}
                 </span>
               ) : null}
             </div>

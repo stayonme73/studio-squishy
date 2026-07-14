@@ -77,6 +77,33 @@ describe("journey surface consolidation", () => {
     expect(review?.actionLabel).toBeUndefined();
     expect(review?.href).toBeNull();
   });
+
+  it("does not mark Project Intake complete on the production timeline before Intake submit", () => {
+    const now = "2026-07-13T12:00:00.000Z";
+    const paidIncompleteIntake: CampaignRecord = {
+      campaignId: "pkg1b-progress",
+      campaignName: "Social Posts",
+      campaignStatus: "PAYMENT_RECEIVED",
+      campaignDescription: "Paid",
+      estimatedCompletion: "",
+      packageId: "custom-studio-plan",
+      packageLabel: "Custom Studio Plan",
+      paymentReceivedAt: now,
+      projectDetailsSubmittedAt: undefined,
+      deliverablesDelivered: {},
+      studioNotes: [{ date: "Today", message: "Payment received." }],
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const steps = resolveCampaignProgressSteps(paidIncompleteIntake);
+    const intake = steps.find((step) => step.id === "DRAFT_RECEIVED");
+    const payment = steps.find((step) => step.id === "PAYMENT_RECEIVED");
+
+    expect(intake?.label).toBe("Project Intake");
+    expect(intake?.state).not.toBe("complete");
+    expect(payment?.state).toBe("current");
+  });
 });
 
 describe("studio guide redirect", () => {

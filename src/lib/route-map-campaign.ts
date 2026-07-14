@@ -34,8 +34,9 @@ import {
   type StudioPlanState,
 } from "@/studio-plan-review/planState";
 
-function persistRouteMapCampaign(campaign: CampaignRecord): CampaignRecord {
-  saveCurrentCampaign(campaign);
+function persistRouteMapCampaign(campaign: CampaignRecord): CampaignRecord | null {
+  const saved = saveCurrentCampaign(campaign);
+  if (!saved) return null;
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent("studio-squishy:campaign-updated"));
   }
@@ -602,7 +603,8 @@ export function submitRouteMapIntake(
 ): CampaignRecord | null {
   const campaign = readCurrentCampaign();
   if (!campaign?.paymentReceivedAt || !campaign.approvedStudioPlan) return null;
-  if (campaign.routeMapIntakeSubmittedAt) return campaign;
+  // Already submitted — do not treat as a successful new write.
+  if (campaign.routeMapIntakeSubmittedAt) return null;
 
   let updated: CampaignRecord = {
     ...campaign,
@@ -635,7 +637,8 @@ export function saveRouteMapIntakeDraft(
 ): CampaignRecord | null {
   const campaign = readCurrentCampaign();
   if (!campaign?.paymentReceivedAt || !campaign.approvedStudioPlan) return null;
-  if (campaign.routeMapIntakeSubmittedAt) return campaign;
+  // Already submitted — do not report as a successful draft save.
+  if (campaign.routeMapIntakeSubmittedAt) return null;
 
   return persistRouteMapCampaign({
     ...campaign,

@@ -367,7 +367,18 @@ function StudioBoardMaterialsEmptyRow() {
   );
 }
 
-function StudioBoardMaterialsWorkflowActive({ campaign }: { campaign: CampaignRecord }) {
+function StudioBoardMaterialsWorkflowActive({
+  campaign,
+  onMaterialsFactsChange,
+  movedToProduction = false,
+}: {
+  campaign: CampaignRecord;
+  onMaterialsFactsChange?: (facts: {
+    blockingRequiredCount: number;
+    stillNeededLabels: readonly string[];
+  }) => void;
+  movedToProduction?: boolean;
+}) {
   const [data, setData] = useState<MaterialsClientResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -435,17 +446,33 @@ function StudioBoardMaterialsWorkflowActive({ campaign }: { campaign: CampaignRe
     [campaign, requests, socialPostsCampaign],
   );
 
+  const stillNeededLabels = useMemo(
+    () =>
+      actionCards
+        .filter((card) => card.status === "Still Needed")
+        .map((card) => card.label),
+    [actionCards],
+  );
+
+  const blockingRequiredCount = data?.blockingRequiredCount ?? 0;
+
   const nextStepMessage = useMemo(
     () =>
       resolveBoardNextStepPanelMessage({
         campaign,
-        blockingRequiredCount: data?.blockingRequiredCount ?? 0,
-        stillNeededLabels: actionCards
-          .filter((card) => card.status === "Still Needed")
-          .map((card) => card.label),
+        blockingRequiredCount,
+        stillNeededLabels,
+        movedToProduction,
       }),
-    [actionCards, campaign, data?.blockingRequiredCount],
+    [blockingRequiredCount, campaign, movedToProduction, stillNeededLabels],
   );
+
+  useEffect(() => {
+    onMaterialsFactsChange?.({
+      blockingRequiredCount,
+      stillNeededLabels,
+    });
+  }, [blockingRequiredCount, stillNeededLabels, onMaterialsFactsChange]);
 
   const activeCard = actionCards.find(
     (card) => card.id === CAMPAIGN_MESSAGE_CARD_ID && card.id === activeCardId && card.request,
@@ -710,13 +737,26 @@ function StudioBoardMaterialsWorkflowActive({ campaign }: { campaign: CampaignRe
 export default function StudioBoardMaterialsWorkflow({
   campaign,
   hasCampaign,
+  onMaterialsFactsChange,
+  movedToProduction = false,
 }: {
   campaign: CampaignRecord | null;
   hasCampaign: boolean;
+  onMaterialsFactsChange?: (facts: {
+    blockingRequiredCount: number;
+    stillNeededLabels: readonly string[];
+  }) => void;
+  movedToProduction?: boolean;
 }) {
   if (!hasCampaign || !campaign) {
     return <StudioBoardMaterialsEmptyRow />;
   }
 
-  return <StudioBoardMaterialsWorkflowActive campaign={campaign} />;
+  return (
+    <StudioBoardMaterialsWorkflowActive
+      campaign={campaign}
+      onMaterialsFactsChange={onMaterialsFactsChange}
+      movedToProduction={movedToProduction}
+    />
+  );
 }

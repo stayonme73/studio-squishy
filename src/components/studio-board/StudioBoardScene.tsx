@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, useCallback, type ReactNode } from "react";
 
 import CampaignBriefActions from "@/components/campaign-details/CampaignBriefActions";
 import CampaignNextAction from "@/components/studio-board/CampaignNextAction";
@@ -21,6 +21,7 @@ import {
   resolveAccountPackageView,
   resolveStudioBoardView,
   type GreetingPeriod,
+  type StudioBoardDisplayFacts,
 } from "@/lib/studio-board-view";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 
@@ -174,7 +175,73 @@ export default function StudioBoardScene() {
   const [productionBriefOpen, setProductionBriefOpen] = useState(false);
 
   const boardCampaign = accessState === "no-active-project" ? null : campaign;
-  const view = useMemo(() => resolveStudioBoardView(boardCampaign), [boardCampaign]);
+  const [movedToProduction, setMovedToProduction] = useState(false);
+  const [materialsFacts, setMaterialsFacts] = useState<{
+    blockingRequiredCount: number;
+    stillNeededLabels: readonly string[];
+  } | null>(null);
+
+  useEffect(() => {
+    if (!boardCampaign?.campaignId || !boardCampaign.paymentReceivedAt) {
+      setMovedToProduction(false);
+      return;
+    }
+
+    let cancelled = false;
+    void fetch(`/api/campaigns/${encodeURIComponent(boardCampaign.campaignId)}/project-status`)
+      .then(async (response) => {
+        if (!response.ok) return;
+        const payload = (await response.json()) as {
+          jobs?: ReadonlyArray<{ hasProductionStarted?: boolean }>;
+        };
+        if (cancelled) return;
+        setMovedToProduction(Boolean(payload.jobs?.some((job) => job.hasProductionStarted)));
+      })
+      .catch(() => {
+        if (!cancelled) setMovedToProduction(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [boardCampaign?.campaignId, boardCampaign?.paymentReceivedAt]);
+
+  const displayFacts = useMemo<StudioBoardDisplayFacts>(() => {
+    const blockingRequiredCount =
+      materialsFacts?.blockingRequiredCount ??
+      boardCampaign?.materialsSummary?.blockingRequiredCount ??
+      0;
+    return {
+      blockingRequiredCount,
+      movedToProduction,
+      stillNeededLabel: materialsFacts?.stillNeededLabels[0] ?? null,
+    };
+  }, [boardCampaign?.materialsSummary?.blockingRequiredCount, materialsFacts, movedToProduction]);
+
+  const handleMaterialsFactsChange = useCallback(
+    (facts: { blockingRequiredCount: number; stillNeededLabels: readonly string[] }) => {
+      setMaterialsFacts((previous) => {
+        const nextLabels = [...facts.stillNeededLabels];
+        if (
+          previous &&
+          previous.blockingRequiredCount === facts.blockingRequiredCount &&
+          previous.stillNeededLabels.join("\0") === nextLabels.join("\0")
+        ) {
+          return previous;
+        }
+        return {
+          blockingRequiredCount: facts.blockingRequiredCount,
+          stillNeededLabels: nextLabels,
+        };
+      });
+    },
+    [],
+  );
+
+  const view = useMemo(
+    () => resolveStudioBoardView(boardCampaign, displayFacts),
+    [boardCampaign, displayFacts],
+  );
   const account = useMemo(() => resolveAccountPackageView(boardCampaign), [boardCampaign]);
 
   const newCampaignHref = studioBoardDraftRoomHref();
@@ -315,6 +382,7 @@ export default function StudioBoardScene() {
                   status={view.status}
                   nextUpdateLabel={view.headerSnapshot?.nextUpdate ?? null}
                   studioGuideHref={studioGuideHref}
+                  displayFacts={displayFacts}
                 />
               ) : null}
 
@@ -379,14 +447,24 @@ export default function StudioBoardScene() {
           </article>
 
           <article className="sb-card sb-card--progress bf-material bf-material-paper">
-            <CampaignProgressPanel campaign={boardCampaign} steps={view.progressSteps} timeline={view.activityFeed} />
+            <CampaignProgressPanel
+              campaign={boardCampaign}
+              steps={view.progressSteps}
+              timeline={view.activityFeed}
+              displayFacts={displayFacts}
+            />
           </article>
 
           <article className="sb-card sb-card--project-snapshot bf-material bf-material-paper">
             <ProjectSnapshotPanel campaign={boardCampaign} view={view} account={account} />
           </article>
 
-          <StudioBoardMaterialsWorkflow campaign={boardCampaign} hasCampaign={view.hasCampaign} />
+          <StudioBoardMaterialsWorkflow
+            campaign={boardCampaign}
+            hasCampaign={view.hasCampaign}
+            movedToProduction={movedToProduction}
+            onMaterialsFactsChange={handleMaterialsFactsChange}
+          />
         </div>
       </div>
 

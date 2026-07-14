@@ -9,7 +9,7 @@ export const payment = {
   pageTitle: "Review & Checkout",
   pageLeadLines: [
     "You're almost there — complete your secure payment below.",
-    "Project Intake opens immediately after payment so you can provide everything we need to begin your project.",
+    "Project Intake opens immediately after payment so you can share the details and materials The Studio needs for your job.",
   ] as const,
   backToStudioPlanLabel: "← Back to Studio Plan",
   editProjectLabel: "Edit Project",
@@ -52,7 +52,7 @@ export const payment = {
       "The Studio creates the approved marketing work. Results such as sales, leads, and bookings are not guaranteed.",
     ] as const,
     termsLabel:
-      "I reviewed my Studio Plan and understand production begins after payment and after I submit the required project materials.",
+      "I reviewed my Studio Plan and understand that payment and Project Intake are required before work can move forward.",
     viewPlanDetailsLabel: "View your selected plan details above",
     submitLabel: "Complete Secure Payment",
     paymentSecurityNote:
@@ -71,7 +71,7 @@ export const payment = {
       { label: "Payment confirmed", marker: "number" },
       { label: "Project Intake opens", marker: "number" },
       { label: "You provide your materials", marker: "number" },
-      { label: "We begin production", marker: "number" },
+      { label: "Required information is reviewed", marker: "number" },
       { label: "You'll review the work", marker: "number" },
       { label: "Final delivery", marker: "number" },
     ] as const,
@@ -80,7 +80,7 @@ export const payment = {
   secureNote:
     "Your payment is encrypted and processed securely. The Studio does not store your payment information.",
   intakeExplanation:
-    "After payment, you'll share the details and materials we need to complete your approved Studio Plan.",
+    "After payment, Project Intake opens so you can share the details and materials we need for your approved Studio Plan.",
   routes: {
     studioBoard: "/studio-board",
     studioGuide: legacyRouteQuarantineV1.activeFrontDoor,

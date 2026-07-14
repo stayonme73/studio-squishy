@@ -28,8 +28,16 @@ import {
   type DeliverableRemainingItem,
 
 } from "@/lib/campaign-record";
-
-
+import { isIntakeComplete } from "@/lib/studio-board-campaign";
+import {
+  PROJECT_INTAKE_RECEIVED_LEAD,
+  PROJECT_INTAKE_RECEIVED_STAGE,
+  PROJECT_INTAKE_RECEIVED_STATUS,
+  mayShowBuildingConceptsCustomerCopy,
+  resolvePostSubmitCustomerMode,
+  resolveProductionGatePassedForCampaign,
+  type PostSubmitSignalFacts,
+} from "@/lib/post-submit-customer-signals";
 
 const { empty, statusContent, routes, boardHeader } = studioBoard;
 
@@ -157,7 +165,10 @@ export type StudioNoteView = {
   lines: readonly string[];
 };
 
-export function resolveStudioNoteView(campaign: CampaignRecord | null): StudioNoteView | null {
+export function resolveStudioNoteView(
+  campaign: CampaignRecord | null,
+  displayFacts?: StudioBoardDisplayFacts,
+): StudioNoteView | null {
   if (!campaign) return null;
   const note = resolveLastStudioNote(campaign);
   if (!note) return null;
@@ -166,9 +177,20 @@ export function resolveStudioNoteView(campaign: CampaignRecord | null): StudioNo
   const board = content.studioNoteBoard;
   const { userName, studioNote: noteCopy } = studioBoard;
   const greeting = `${noteCopy.greetingPrefix} ${userName},`;
+  const facts = resolveBoardDisplayFacts(campaign, displayFacts);
+  const mode = resolvePostSubmitCustomerMode(campaign, facts);
   const bodyLines =
-    board?.letterLines ??
-    (content.studioNoteFollowUp ? [content.studioNoteFollowUp] : ["Thank you for trusting The Studio.", "— The Studio Team ♥"]);
+    mode === "intake_received" || mode === "materials_blocking"
+      ? [
+          PROJECT_INTAKE_RECEIVED_LEAD,
+          "Your Studio Board will update as the next stage is ready.",
+          "Thank you for trusting The Studio.",
+          "— The Studio Team ♥",
+        ]
+      : board?.letterLines ??
+        (content.studioNoteFollowUp
+          ? [content.studioNoteFollowUp]
+          : ["Thank you for trusting The Studio.", "— The Studio Team ♥"]);
 
   return {
     date: note.date,
@@ -192,15 +214,49 @@ function formatBoardDate(iso: string | null | undefined): string | null {
   return date.toLocaleDateString(undefined, { month: "long", day: "numeric" });
 }
 
+function resolveBoardDisplayFacts(
+  campaign: CampaignRecord,
+  options?: StudioBoardDisplayFacts,
+): PostSubmitSignalFacts {
+  const blockingRequiredCount =
+    options?.blockingRequiredCount ?? campaign.materialsSummary?.blockingRequiredCount ?? 0;
+  const movedToProduction = options?.movedToProduction ?? false;
+  const productionGatePassed =
+    options?.productionGatePassed ??
+    resolveProductionGatePassedForCampaign(campaign, {
+      blockingRequiredCount,
+      movedToProduction,
+    });
+  return {
+    productionGatePassed,
+    blockingRequiredCount,
+    stillNeededLabel: options?.stillNeededLabel ?? null,
+  };
+}
+
+export type StudioBoardDisplayFacts = {
+  blockingRequiredCount?: number;
+  movedToProduction?: boolean;
+  /** Explicit override when caller already evaluated production_trigger. */
+  productionGatePassed?: boolean;
+  stillNeededLabel?: string | null;
+};
+
 function resolveProgressStepDetail(
   stageId: CampaignStatus,
   state: CampaignProgressStepState,
   campaign: CampaignRecord | null,
+  facts?: PostSubmitSignalFacts,
 ): string | null {
   if (state === "upcoming") return null;
 
   if (state === "current") {
-    if (stageId === "BUILDING_CONCEPTS") return "In Progress";
+    if (stageId === "BUILDING_CONCEPTS") {
+      if (campaign && facts && !mayShowBuildingConceptsCustomerCopy(campaign, facts)) {
+        return PROJECT_INTAKE_RECEIVED_STATUS;
+      }
+      return "In Progress";
+    }
     if (stageId === "DRAFT_RECEIVED") return "Awaiting payment";
     if (stageId === "READY_FOR_REVIEW") return studioBoard.nextAction.conceptsReadyLabel;
     if (stageId === "PAYMENT_RECEIVED") return "Queued";
@@ -214,8 +270,9 @@ function resolveProgressStepDetail(
     case "DRAFT_RECEIVED":
       return formatBoardDate(
         campaign.projectDetailsSubmittedAt ??
+          campaign.routeMapIntakeSubmittedAt ??
           campaign.visionSubmittedAt ??
-          campaign.createdAt,
+          campaign.intake?.submittedAt,
       );
     case "PAYMENT_RECEIVED":
       return formatBoardDate(campaign.paymentReceivedAt);
@@ -236,11 +293,15 @@ function resolveProgressStepHref(
 }
 
 /** Journey rail + timeline merged — one vertical progress list with dates. */
-export function resolveCampaignProgressSteps(campaign: CampaignRecord | null): CampaignProgressStep[] {
+export function resolveCampaignProgressSteps(
+  campaign: CampaignRecord | null,
+  displayFacts?: StudioBoardDisplayFacts,
+): CampaignProgressStep[] {
   const activeIndex = campaign ? campaignStatusIndex(campaign.campaignStatus) : -1;
+  const facts = campaign ? resolveBoardDisplayFacts(campaign, displayFacts) : undefined;
 
   return studioBoard.journeyStages.map((stage, index) => {
-    const state: CampaignProgressStepState =
+    let state: CampaignProgressStepState =
       activeIndex < 0
         ? "upcoming"
         : index < activeIndex
@@ -249,17 +310,25 @@ export function resolveCampaignProgressSteps(campaign: CampaignRecord | null): C
             ? "current"
             : "upcoming";
 
+    // Display truth only: Intake step is complete when Intake was actually submitted.
+    if (stage.id === "DRAFT_RECEIVED" && campaign && !isIntakeComplete(campaign) && state === "complete") {
+      state = "upcoming";
+    }
+
     return {
       id: stage.id,
       label: stage.boardLabel,
       state,
-      detail: resolveProgressStepDetail(stage.id, state, campaign),
+      detail: resolveProgressStepDetail(stage.id, state, campaign, facts),
       href: resolveProgressStepHref(stage.id, state),
     };
   });
 }
 
-function resolveBoardHeaderSnapshot(campaign: CampaignRecord | null): BoardHeaderSnapshot {
+function resolveBoardHeaderSnapshot(
+  campaign: CampaignRecord | null,
+  displayFacts?: StudioBoardDisplayFacts,
+): BoardHeaderSnapshot {
   if (!campaign) {
     return {
       statusDisplay: boardHeader.notStarted.toUpperCase(),
@@ -270,9 +339,15 @@ function resolveBoardHeaderSnapshot(campaign: CampaignRecord | null): BoardHeade
 
   const content = statusContent[campaign.campaignStatus];
   const targetDate = formatBoardDate(campaign.targetCompletionDate);
+  const facts = resolveBoardDisplayFacts(campaign, displayFacts);
+  const mode = resolvePostSubmitCustomerMode(campaign, facts);
+  const statusLabel =
+    mode === "intake_received" || mode === "materials_blocking"
+      ? PROJECT_INTAKE_RECEIVED_STATUS
+      : content.statusLabel;
 
   return {
-    statusDisplay: content.statusLabel.toUpperCase(),
+    statusDisplay: statusLabel.toUpperCase(),
     estimatedCompletion: targetDate ?? content.estimatedCompletion,
     nextUpdate: content.nextUpdateLabel ?? boardHeader.pending,
   };
@@ -298,9 +373,18 @@ const whatHappensNextSentences: Record<CampaignStatus, string> = {
 
 
 
-export function resolveWhatHappensNextSentence(campaign: CampaignRecord | null): string {
+export function resolveWhatHappensNextSentence(
+  campaign: CampaignRecord | null,
+  displayFacts?: StudioBoardDisplayFacts,
+): string {
 
   if (!campaign) return "Start a campaign in Project Discovery to begin.";
+
+  const facts = resolveBoardDisplayFacts(campaign, displayFacts);
+  const mode = resolvePostSubmitCustomerMode(campaign, facts);
+  if (mode === "intake_received" || mode === "materials_blocking") {
+    return PROJECT_INTAKE_RECEIVED_LEAD;
+  }
 
   return whatHappensNextSentences[campaign.campaignStatus];
 
@@ -310,7 +394,10 @@ export function resolveWhatHappensNextSentence(campaign: CampaignRecord | null):
 
 /** Live board copy — always derived from current campaignStatus, never stale intake fields. */
 
-export function resolveStudioBoardView(campaign: CampaignRecord | null): StudioBoardView {
+export function resolveStudioBoardView(
+  campaign: CampaignRecord | null,
+  displayFacts?: StudioBoardDisplayFacts,
+): StudioBoardView {
 
   if (!campaign) {
 
@@ -390,6 +477,10 @@ export function resolveStudioBoardView(campaign: CampaignRecord | null): StudioB
 
   const deliverablesProgress = resolveDeliverablesRemaining(campaign);
 
+  const facts = resolveBoardDisplayFacts(campaign, displayFacts);
+  const mode = resolvePostSubmitCustomerMode(campaign, facts);
+  const suppressBuildingConcepts = mode === "intake_received" || mode === "materials_blocking";
+
 
 
   return {
@@ -406,11 +497,15 @@ export function resolveStudioBoardView(campaign: CampaignRecord | null): StudioB
       ? resolveCampaignPlanLabel(campaign)
       : campaign.packageLabel,
 
-    campaignProgressLabel: content.campaignProgressLabel,
+    campaignProgressLabel: suppressBuildingConcepts
+      ? PROJECT_INTAKE_RECEIVED_STAGE
+      : content.campaignProgressLabel,
 
-    statusLabel: content.statusLabel,
+    statusLabel: suppressBuildingConcepts ? PROJECT_INTAKE_RECEIVED_STATUS : content.statusLabel,
 
-    campaignDescription: content.campaignDescription,
+    campaignDescription: suppressBuildingConcepts
+      ? PROJECT_INTAKE_RECEIVED_LEAD
+      : content.campaignDescription,
 
     estimatedCompletion: content.estimatedCompletion,
 
@@ -422,17 +517,19 @@ export function resolveStudioBoardView(campaign: CampaignRecord | null): StudioB
 
     deliverablesProgress,
 
-    activityFeed: resolveActivityFeed(campaign),
+    activityFeed: resolveActivityFeed(campaign, {
+      allowBuildingConceptsActivity: mayShowBuildingConceptsCustomerCopy(campaign, facts),
+    }),
 
     lastStudioNote: resolveLastStudioNote(campaign),
 
-    studioNote: resolveStudioNoteView(campaign),
+    studioNote: resolveStudioNoteView(campaign, displayFacts),
 
-    progressSteps: resolveCampaignProgressSteps(campaign),
+    progressSteps: resolveCampaignProgressSteps(campaign, displayFacts),
 
-    headerSnapshot: resolveBoardHeaderSnapshot(campaign),
+    headerSnapshot: resolveBoardHeaderSnapshot(campaign, displayFacts),
 
-    whatHappensNextSentence: resolveWhatHappensNextSentence(campaign),
+    whatHappensNextSentence: resolveWhatHappensNextSentence(campaign, displayFacts),
 
     whatHappensNextSteps: content.whatHappensNextSteps,
 

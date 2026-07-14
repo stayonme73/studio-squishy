@@ -234,7 +234,7 @@ export const studioBoard = {
         received: "Submitted materials appear here once your project begins.",
         stillNeed: "Outstanding material requests appear here during production.",
         awaitingProjectDetails:
-          "Material requests appear here once your project details are complete.",
+          "Material requests will appear here after you complete Project Intake.",
         nextStep:
           "Start a new project from the Route Map to see your next step here.",
       },
@@ -299,9 +299,9 @@ export const studioBoard = {
     },
     {
       id: "DRAFT_RECEIVED" as const,
-      label: "Project Details Complete",
-      boardLabel: "Project Details Complete",
-      hint: "Project Details saved — package next.",
+      label: "Project Intake",
+      boardLabel: "Project Intake",
+      hint: "Project Intake submitted — package next.",
     },
     {
       id: "PAYMENT_RECEIVED" as const,
@@ -413,7 +413,7 @@ export const studioBoard = {
           "— The Studio Team ♥",
         ],
       },
-      studioUpdates: [{ date: "Today", message: "Vision Intake Received" }],
+      studioUpdates: [{ date: "Today", message: "Payment received." }],
       whatHappensNextSteps: [
         "The Studio reviews your Vision Summary.",
         "We build your campaign concepts.",
@@ -589,10 +589,11 @@ export const studioBoard = {
       "The Studio team is creating your campaign directions. Your Studio Board will update when concepts are ready for review.",
     paymentReceivedLabel: "Campaign Queued",
     paymentReceivedHint:
-      "We received your payment. Share your Project Details so we can begin production.",
-    completeProjectDetails: "Complete Project Details",
+      "We received your payment. Your Studio Board will update as your project progresses.",
+    waitingOnProjectIntakeLabel: "Waiting on Project Intake",
+    completeProjectDetails: "Complete Project Intake",
     completeProjectDetailsHint:
-      "Tell us what we need to complete the services in your approved Studio Plan.",
+      "Tell us what we need for the services in your approved Studio Plan.",
     packageReadyLabel: "Your Package Is Ready",
     openFinalDelivery: "Open Final Delivery",
   },
@@ -623,7 +624,7 @@ export const studioBoard = {
     submittedHint: "Read-only archive of what you submitted to the Studio.",
     editableHint: "Review or update your project details before campaign development begins.",
     lockedMessage:
-      "Your submitted project details are locked here for reference. For any changes, use Review Room or send feedback to The Studio.",
+      "Your Project Intake is submitted and locked for reference. Additional changes should go through Review Room or feedback to The Studio.",
     emptyHint: "Your submitted project details appear here once your campaign begins.",
   },
 
@@ -633,7 +634,7 @@ export const studioBoard = {
     editLabel: "Edit Campaign Brief",
     editableHint: "Review or update your answers before campaign development begins.",
     lockedMessage:
-      "Campaign development has begun. Intake responses are now locked. Additional changes should be submitted through the review and feedback process.",
+      "Your Project Intake is submitted and locked for reference. Additional changes should go through Review Room or feedback to The Studio.",
     lockedTitle: "Intake locked",
     editReturnLabel: "Return to Studio Board",
   },

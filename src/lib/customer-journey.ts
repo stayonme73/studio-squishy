@@ -25,7 +25,7 @@ export function resolveCustomerJourneySteps(
   if (!campaign) {
     return [
       { id: "payment", label: "Payment Received", state: "upcoming" },
-      { id: "intake", label: "Project Details Complete", state: "upcoming" },
+      { id: "intake", label: "Project Intake", state: "upcoming" },
       { id: "building", label: "Building Concepts", state: "upcoming" },
       { id: "review", label: "Review Concepts", state: "upcoming" },
       { id: "direction", label: "Choose Direction", state: "upcoming" },
@@ -49,7 +49,7 @@ export function resolveCustomerJourneySteps(
 
   const milestones: Milestone[] = [
     { id: "payment", label: "Payment Received", complete: paymentDone },
-    { id: "intake", label: "Project Details Complete", complete: intakeDone },
+    { id: "intake", label: "Project Intake", complete: intakeDone },
     { id: "building", label: "Building Concepts", complete: buildingDone },
     {
       id: "review",

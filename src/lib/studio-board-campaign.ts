@@ -147,9 +147,15 @@ export function readCurrentCampaign(): CampaignRecord | null {
   }
 }
 
-export function saveCurrentCampaign(campaign: CampaignRecord) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(CAMPAIGN_KEY, JSON.stringify(campaign));
+/** Persist campaign locally. Returns false when storage is unavailable or full. */
+export function saveCurrentCampaign(campaign: CampaignRecord): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    window.localStorage.setItem(CAMPAIGN_KEY, JSON.stringify(campaign));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function intakeFromDraft(draft: DraftIntakePayload): CampaignIntakeSnapshot {

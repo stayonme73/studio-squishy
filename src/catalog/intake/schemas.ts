@@ -10,9 +10,16 @@ export type RouteMapIntakeField = {
   id: string;
   label: string;
   placeholder?: string;
+  /** Short instructional sentence under the label (complete sentence, not truncated). */
+  hint?: string;
   type: "text" | "textarea" | "select";
   required?: boolean;
   options?: readonly string[];
+  /**
+   * Brand / logo / footage / reference capture — customer describes available
+   * references or states they do not have materials yet. Not a file upload.
+   */
+  role?: "materials";
 };
 
 export type RouteMapIntakeSchema = {
@@ -150,8 +157,11 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "brandNotes",
-        label: "Brand colors, fonts, or assets to use",
+        label: "Brand colors, fonts, or reference notes",
         type: "textarea",
+        role: "materials",
+        hint: "Describe filenames, links, or colors if you have them. You may also say you do not have this yet or will provide it later. Files are not uploaded on this form.",
+        placeholder: "Example: logo named bakery-mark.png, or colors from our website.",
       },
     ],
   },
@@ -184,9 +194,12 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "materials",
-        label: "What photos, logo, footage, or exact wording must we use?",
+        label: "Photos, logo, footage, or exact wording references",
         type: "textarea",
         required: true,
+        role: "materials",
+        hint: "Describe what you have (filenames, links, or notes), or choose that you do not have this yet or will provide it later. Files are not uploaded on this form.",
+        placeholder: "Example: promo-photo.jpg on our phone, or our logo link.",
       },
     ],
   },
@@ -204,7 +217,15 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
         options: ["Facebook", "Instagram", "TikTok"],
       },
       { id: "mustKnow", label: "What must people know or do?", type: "textarea", required: true },
-      { id: "footageNotes", label: "Do you have footage, photos, or examples?", type: "textarea", required: true },
+      {
+        id: "footageNotes",
+        label: "Footage, photos, or example references",
+        type: "textarea",
+        required: true,
+        role: "materials",
+        hint: "Describe filenames, links, or what you can share. If you do not have media yet, choose that option. Files are not uploaded on this form.",
+        placeholder: "Example: phone video named storefront-clip.mp4, or stock we approve later.",
+      },
       {
         id: "aiVoice",
         label: "Should AI voice be included?",
@@ -291,9 +312,12 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "materials",
-        label: "Logo, photos, colors, or brand materials",
+        label: "Logo, photos, colors, or brand references",
         type: "textarea",
         required: true,
+        role: "materials",
+        hint: "Describe filenames, links, or brand notes you have. If you do not have materials yet, say so — do not invent files. Files are not uploaded on this form.",
+        placeholder: "Example: logo named store-mark.png, or brand colors from our site.",
       },
       {
         id: "intendedUse",
@@ -337,9 +361,12 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "materials",
-        label: "Logo, photos, colors, or brand materials",
+        label: "Logo, photos, colors, or brand references",
         type: "textarea",
         required: true,
+        role: "materials",
+        hint: "Describe filenames, links, or brand notes you have. If you do not have materials yet, say so — do not invent files. Files are not uploaded on this form.",
+        placeholder: "Example: logo named cafe-mark.png, or food photos named plate-01.jpg.",
       },
       {
         id: "intendedUse",
@@ -382,17 +409,26 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "materials",
-        label: "Logo, photos, and brand materials if available",
+        label: "Logo, photos, and brand references",
         type: "textarea",
         required: true,
+        role: "materials",
+        hint: "Describe filenames, links, or brand notes you have. If you do not have materials yet, say so — do not invent files. Files are not uploaded on this form.",
+        placeholder: "Example: service-photo.jpg, or logo colors from our website.",
       },
       { id: "sizeNotes", label: "Required size, if known", type: "text" },
     ],
   },
+  /**
+   * INTENTIONAL DIVERGENCE (Package 3 — F2):
+   * Live customer Intake for Social Posts uses SocialPostsIntakeForm (custom UI),
+   * not this catalog schema. This schema supports briefs, tests, and internal modeling.
+   * Changing the live UI or this schema requires inspecting both surfaces.
+   */
   "rtu-social-posts": {
     type: "rtu-social-posts",
     title: "Social Media Posts Intake",
-    lead: "Four post graphics for one platform — share campaign details and materials.",
+    lead: "Four post graphics for one platform — share campaign details and material references.",
     clientResponsibilityNote: RTU_SOCIAL_CLIENT_NOTE,
     fields: [
       { id: "postsAbout", label: "What are these posts about?", type: "textarea", required: true },
@@ -411,9 +447,12 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "materials",
-        label: "Logo, photos, colors, or brand materials",
+        label: "Logo, photos, colors, or brand references",
         type: "textarea",
         required: true,
+        role: "materials",
+        hint: "Catalog-schema modeling only. Live Social Posts Intake uses the custom form. Describe references here for briefs/tests — files are not uploaded.",
+        placeholder: "Example: logo or photo filenames, or later materials.",
       },
       {
         id: "wordingHashtags",
@@ -454,9 +493,12 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "materials",
-        label: "Logo, photos, colors, or brand materials",
+        label: "Logo, photos, colors, or brand references",
         type: "textarea",
         required: true,
+        role: "materials",
+        hint: "Describe filenames, links, or brand notes you have. If you do not have materials yet, say so — do not invent files. Files are not uploaded on this form.",
+        placeholder: "Example: event-hero.jpg, or logo from our Facebook page.",
       },
       {
         id: "intendedUse",
@@ -499,9 +541,12 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "materials",
-        label: "Logo, photos, colors, or brand materials",
+        label: "Logo, photos, colors, or brand references",
         type: "textarea",
         required: true,
+        role: "materials",
+        hint: "Describe filenames, links, or brand notes you have. If you do not have materials yet, say so — do not invent files. Files are not uploaded on this form.",
+        placeholder: "Example: header-logo.png, or product photo filenames.",
       },
       {
         id: "listConsent",
@@ -638,7 +683,7 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
   "rtu-short-video": {
     type: "rtu-short-video",
     title: "Short Video Intake",
-    lead: "One short video up to 45 seconds — share purpose, format, and materials.",
+    lead: "One short video up to 45 seconds — share purpose, format, and media references.",
     clientResponsibilityNote: RTU_SOCIAL_CLIENT_NOTE,
     fields: [
       {
@@ -656,9 +701,12 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "footageMaterials",
-        label: "Client footage OR approved Studio/stock/AI visuals — photos, logo, and source materials",
+        label: "Footage, photos, logo, or approved visual sources",
         type: "textarea",
         required: true,
+        role: "materials",
+        hint: "Describe client footage, photos, logos, or note that Studio/stock/AI visuals are fine once approved. If you do not have media yet, choose that option. Files are not uploaded on this form.",
+        placeholder: "Example: phone clip named patio-tour.mp4, or use Studio-approved stock.",
       },
       {
         id: "onScreenText",
@@ -686,7 +734,7 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
   "rtu-business-card": {
     type: "rtu-business-card",
     title: "Business Card Intake",
-    lead: "Share the contact details and brand materials for one finished business card design.",
+    lead: "Share the contact details and brand references for one finished business card design.",
     clientResponsibilityNote: RTU_PRINT_CLIENT_NOTE,
     fields: [
       { id: "businessName", label: "Business name", type: "text", required: true },
@@ -697,9 +745,12 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       { id: "address", label: "Business address, if desired", type: "text" },
       {
         id: "brandMaterials",
-        label: "Logo and brand colors, if available",
+        label: "Logo and brand color references",
         type: "textarea",
         required: true,
+        role: "materials",
+        hint: "Describe your logo filename, brand colors, or links. If you do not have a logo yet, choose that option. Files are not uploaded on this form.",
+        placeholder: "Example: logo named smith-co.svg, navy and cream colors.",
       },
       { id: "cardSize", label: "Preferred card size, if known", type: "text" },
     ],

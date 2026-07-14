@@ -9,7 +9,8 @@ import {
   resolveClientFacingServiceName,
   campaignUsesCustomStudioPlan,
 } from "@/lib/approved-plan-display";
-import { toClientFacingActivityMessage } from "@/lib/studio-board-client-copy";
+import { toClientFacingActivityMessage, isProjectIntakeReceivedActivityMessage } from "@/lib/studio-board-client-copy";
+import { isIntakeComplete } from "@/lib/studio-board-campaign";
 import {
   studioBoard,
   type CampaignRecord,
@@ -189,10 +190,31 @@ export type ActivityFeedEntry = {
   message: string;
 };
 
+export type ResolveActivityFeedOptions = {
+  /** When false, suppress Building Concepts / creative-work-started activity lines. */
+  allowBuildingConceptsActivity?: boolean;
+};
+
+function isBuildingConceptsActivityMessage(message: string): boolean {
+  const normalized = message.trim().toLowerCase();
+  return (
+    normalized === "we're building your concepts" ||
+    normalized === "concept development started" ||
+    normalized.includes("building your campaign concepts") ||
+    normalized.includes("creative team is building") ||
+    normalized.includes("creative team assigned") ||
+    normalized.includes("campaign development has begun")
+  );
+}
+
 /** Newest activity first — compact business updates for the command center feed. */
-export function resolveActivityFeed(campaign: CampaignRecord | null): ActivityFeedEntry[] {
+export function resolveActivityFeed(
+  campaign: CampaignRecord | null,
+  options: ResolveActivityFeedOptions = {},
+): ActivityFeedEntry[] {
   if (!campaign) return [];
 
+  const allowBuildingConceptsActivity = options.allowBuildingConceptsActivity ?? false;
   const entries: { sortKey: string; date: string; message: string }[] = [];
 
   const pushIso = (iso: string | null | undefined, message: string) => {
@@ -211,7 +233,7 @@ export function resolveActivityFeed(campaign: CampaignRecord | null): ActivityFe
       campaign.routeMapIntakeSubmittedAt ??
       campaign.visionSubmittedAt ??
       campaign.intake?.submittedAt,
-    "We received your project details",
+    "We received your Project Intake",
   );
   if (
     campaign.materialsSummary?.updatedAt &&
@@ -225,7 +247,7 @@ export function resolveActivityFeed(campaign: CampaignRecord | null): ActivityFe
     pushIso(campaign.updatedAt, "You chose your campaign direction");
   }
 
-  if (campaign.campaignStatus === "BUILDING_CONCEPTS") {
+  if (campaign.campaignStatus === "BUILDING_CONCEPTS" && allowBuildingConceptsActivity) {
     pushIso(campaign.updatedAt, "We're building your concepts");
   }
 
@@ -242,6 +264,13 @@ export function resolveActivityFeed(campaign: CampaignRecord | null): ActivityFe
   for (const note of resolveCampaignStudioNotes(campaign)) {
     const message = normalizeActivityMessage(note.message);
     if (milestoneMessages.has(message)) continue;
+    // Do not claim Project Intake from fallback / generic notes before Intake is complete.
+    if (!isIntakeComplete(campaign) && isProjectIntakeReceivedActivityMessage(message)) {
+      continue;
+    }
+    if (!allowBuildingConceptsActivity && isBuildingConceptsActivityMessage(message)) {
+      continue;
+    }
     entries.push({
       sortKey: note.date === "Today" ? campaign.updatedAt : note.date,
       date: note.date,

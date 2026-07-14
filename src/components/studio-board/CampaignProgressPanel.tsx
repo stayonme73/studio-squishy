@@ -5,7 +5,7 @@ import { type CSSProperties, useRef } from "react";
 import CampaignJourneyRoadmap from "@/components/studio-board/CampaignJourneyRoadmap";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import type { ActivityFeedEntry } from "@/lib/campaign-record";
-import type { CampaignProgressStep } from "@/lib/studio-board-view";
+import type { CampaignProgressStep, StudioBoardDisplayFacts } from "@/lib/studio-board-view";
 
 import ProgressStageIcon from "@/components/studio-board/ProgressStageIcon";
 import { useStudioNoteFitScale } from "@/components/studio-board/useStudioNoteFitScale";
@@ -16,18 +16,20 @@ type Props = {
   campaign: CampaignRecord | null;
   steps: readonly CampaignProgressStep[];
   timeline: readonly ActivityFeedEntry[];
+  displayFacts?: StudioBoardDisplayFacts;
 };
 
 type ProgressBodyProps = {
   campaign: CampaignRecord | null;
   steps: readonly CampaignProgressStep[];
   recentUpdates: readonly ActivityFeedEntry[];
+  displayFacts?: StudioBoardDisplayFacts;
 };
 
-function ProgressBody({ campaign, steps, recentUpdates }: ProgressBodyProps) {
+function ProgressBody({ campaign, steps, recentUpdates, displayFacts }: ProgressBodyProps) {
   return (
     <>
-      <CampaignJourneyRoadmap campaign={campaign} />
+      <CampaignJourneyRoadmap campaign={campaign} displayFacts={displayFacts} />
 
       <details className="sb-progress-panel__pipeline">
         <summary className="sb-progress-panel__pipeline-summary">Production status</summary>
@@ -79,11 +81,13 @@ function ProgressBody({ campaign, steps, recentUpdates }: ProgressBodyProps) {
 }
 
 /** Journey stages plus recent timeline updates — scales to fit the card. */
-export default function CampaignProgressPanel({ campaign, steps, timeline }: Props) {
+export default function CampaignProgressPanel({ campaign, steps, timeline, displayFacts }: Props) {
   const recentUpdates = timeline.slice(0, 3);
   const contentKey = [
     steps.map((step) => `${step.id}:${step.state}:${step.detail ?? ""}`).join("|"),
     recentUpdates.map((entry) => `${entry.date}:${entry.message}`).join("|"),
+    displayFacts?.movedToProduction ? "moved" : "waiting",
+    String(displayFacts?.blockingRequiredCount ?? ""),
   ].join("::");
 
   const panelRef = useRef<HTMLDivElement>(null);
@@ -102,11 +106,21 @@ export default function CampaignProgressPanel({ campaign, steps, timeline }: Pro
         style={{ "--sb-progress-fit-scale": fitScale } as CSSProperties}
       >
         <div className="sb-progress-panel__fit">
-          <ProgressBody campaign={campaign} steps={steps} recentUpdates={recentUpdates} />
+          <ProgressBody
+            campaign={campaign}
+            steps={steps}
+            recentUpdates={recentUpdates}
+            displayFacts={displayFacts}
+          />
         </div>
 
         <div ref={measureRef} className="sb-progress-panel__measure" aria-hidden="true">
-          <ProgressBody campaign={campaign} steps={steps} recentUpdates={recentUpdates} />
+          <ProgressBody
+            campaign={campaign}
+            steps={steps}
+            recentUpdates={recentUpdates}
+            displayFacts={displayFacts}
+          />
         </div>
       </div>
     </section>

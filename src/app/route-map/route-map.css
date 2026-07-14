@@ -8,8 +8,8 @@
   --rm-paper-warm: #efe8dc;
   --rm-graphite: #3a3937;
   --rm-terracotta: #c85a3d;
-  --rm-i75: #355c7d;
-  --rm-i20: #456b5a;
+  --rm-i75: #456b5a;
+  --rm-i20: #355c7d;
   --rm-i285: #c7a64a;
   --rm-update: #2d6a4f;
   --rm-random: #6b4c8a;
@@ -85,6 +85,16 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 .route-map-page--immersive .utility-header,
 .route-map-page--immersive .utility-subnav {
   display: none !important;
+}
+
+/* Dev-only Studio Review tool (OwnerQaRoot) sits bottom-left globally; on this
+ * immersive page "How It Works" now reaches close to the bottom edge, so lift
+ * it clear of the customer-facing strip. Scoped to this page only. */
+body:has(.route-map-page--immersive) .owner-qa {
+  bottom: 12px;
+  left: 12px;
+  transform: scale(0.88);
+  transform-origin: bottom left;
 }
 
 /* ── Studio Lobby backdrop (welcome-hall-scene-v4) ── */
@@ -170,8 +180,9 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   transition: filter 180ms ease;
 }
 
-/* Hide orientation strip during decision overlays — intake, shelf, job detail, checkout */
-.route-map-world--overlay .route-map-workspace__how-wrap {
+/* Hide orientation strip + Squishy during decision overlays — intake, shelf, job detail, checkout */
+.route-map-world--overlay .route-map-workspace__lower,
+.route-map-world--overlay .route-map-workspace__intro {
   display: none;
 }
 
@@ -298,6 +309,27 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   line-height: 1.2;
 }
 
+.route-map-intake-gate {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  max-width: 36rem;
+}
+
+.route-map-intake-gate .route-map-primary-btn {
+  justify-self: start;
+  text-decoration: none;
+}
+
+.route-map-social-intake__submit-error,
+.route-map-intake__submit-error {
+  margin: 0;
+  color: #8a1f1f;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
 /* Slice 3A — Squishy narration panel. Mirrors .route-map-save-status at the opposite corner;
    text-only, capped well under half the overlay width so it can never reach the save-status pill. */
 .route-map-squishy {
@@ -364,6 +396,11 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   --rm-desk-aspect: 1.5;
   --rm-layout-scale: 1;
   --rm-how-strip-h: clamp(3.35rem, 5.2vh, 4.5rem);
+  --rm-intro-h: clamp(2.6rem, 5.4vh, 3.6rem);
+  --rm-squishy-col-w: clamp(280px, 23vw, 400px);
+  --rm-squishy-h: clamp(540px, 86vh, 780px);
+  --rm-squishy-gap: clamp(10px, 1.5vw, 22px);
+  --rm-squishy-inset: clamp(16px, 1.6vw, 28px);
   --rm-workspace-pad-y: clamp(8px, 1.2vh, 14px);
   --rm-workspace-pad-x: clamp(12px, 2vw, 24px);
   --rm-main-gap: clamp(10px, 1.2vw, 18px);
@@ -383,7 +420,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     var(--rm-hero-max-w) + var(--rm-main-gap) + var(--rm-choose-panel-w)
   );
   --rm-workspace-band-w: var(--rm-main-flex-w);
-  --rm-hero-area-h: calc(100dvh - var(--rm-how-strip-h) - var(--rm-workspace-pad-y) * 2);
+  --rm-hero-area-h: calc(100dvh - var(--rm-how-strip-h) - var(--rm-intro-h) - var(--rm-workspace-pad-y) * 2);
   --rm-choose-panel-w: min(
     420px,
     32vw,
@@ -446,6 +483,30 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   flex-shrink: 0;
 }
 
+.route-map-workspace__intro {
+  flex-shrink: 0;
+  width: min(100%, var(--rm-workspace-band-w, var(--rm-main-flex-w)));
+  margin: 0 auto;
+  padding-bottom: clamp(2px, 0.5vh, 6px);
+}
+
+.route-map-workspace__title {
+  margin: 0;
+  font-size: clamp(1.3rem, 2.1vw, 1.7rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--studio-ivory);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.route-map-workspace__subtitle {
+  margin: 0.2rem 0 0;
+  font-size: clamp(0.88rem, 1vw, 1rem);
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--studio-ivory) 88%, transparent);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 .route-map-workspace__how-wrap {
   flex-shrink: 0;
   display: flex;
@@ -459,6 +520,32 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   width: 100%;
   max-width: 100%;
   pointer-events: auto;
+}
+
+/* Positioned relative to the full workspace (wider than the centered content
+ * band), so he stands in the margin beside the band rather than sharing
+ * width with How It Works or the Choose Your Route panel. */
+.route-map-squishy-guide {
+  position: absolute;
+  right: var(--rm-squishy-inset);
+  bottom: var(--rm-workspace-pad-y);
+  z-index: 3;
+  height: var(--rm-squishy-h);
+  width: var(--rm-squishy-col-w);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.route-map-squishy-guide__art {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.28));
 }
 
 @media (min-width: 1101px) {
@@ -572,7 +659,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-choose-panel-wrap .route-map-choose-panel__lead {
-    font-size: 0.9rem;
+    font-size: 1rem;
     line-height: 1.35;
     color: color-mix(in srgb, var(--studio-charcoal) 86%, #000);
   }
@@ -662,7 +749,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-workspace__how-wrap {
-    width: min(100%, var(--rm-main-flex-w));
+    width: min(100%, var(--rm-workspace-band-w));
     margin-top: 0;
     transform: none;
   }
@@ -685,7 +772,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     }
 
     .route-map-choose-panel-wrap .route-map-choose-panel__lead {
-      font-size: 0.84rem;
+      font-size: 0.92rem;
       line-height: 1.3;
     }
 
@@ -724,7 +811,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-how-it-works__title {
     margin-bottom: 5px;
     padding-bottom: 5px;
-    font-size: 0.86rem;
+    font-size: 0.96rem;
   }
 
   .route-map-how-it-works__step {
@@ -743,12 +830,12 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-how-it-works__step-title {
-    font-size: 0.76rem;
-    line-height: 1.2;
+    font-size: 0.86rem;
+    line-height: 1.22;
   }
 
   .route-map-how-it-works__step-lead {
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     line-height: 1.32;
     max-width: 11.5em;
   }
@@ -2069,6 +2156,58 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   color: #fff;
 }
 
+/* Studio Route badge — light pill + colored accent, matching the Route Map hero art.
+   Opt-in via the `studio` prop; the classic red/blue interstate shield (used by the
+   hero's decorative highway markers) is unaffected. */
+.route-map-interstate-shield--studio {
+  background: color-mix(in srgb, var(--board-family-cream, #f7f4ee) 96%, #fff);
+  border-color: color-mix(in srgb, var(--studio-charcoal, #2f3437) 12%, transparent);
+}
+
+.route-map-interstate-shield--studio.route-map-interstate-shield--i75 {
+  background: color-mix(in srgb, var(--board-family-cream, #f7f4ee) 96%, #fff);
+  border-color: var(--rm-i75);
+}
+
+.route-map-interstate-shield--studio.route-map-interstate-shield--i20 {
+  background: color-mix(in srgb, var(--board-family-cream, #f7f4ee) 96%, #fff);
+  border-color: var(--rm-i20);
+}
+
+.route-map-interstate-shield--studio.route-map-interstate-shield--i285 {
+  background: color-mix(in srgb, var(--board-family-cream, #f7f4ee) 96%, #fff);
+  border-color: var(--rm-i285);
+}
+
+.route-map-interstate-shield--studio.route-map-interstate-shield--random {
+  background: color-mix(in srgb, var(--board-family-cream, #f7f4ee) 96%, #fff);
+  border-color: var(--rm-random);
+}
+
+.route-map-interstate-shield--studio .route-map-interstate-shield__banner {
+  color: color-mix(in srgb, var(--studio-charcoal, #2f3437) 62%, transparent);
+}
+
+.route-map-interstate-shield--studio.route-map-interstate-shield--i75 .route-map-interstate-shield__banner,
+.route-map-interstate-shield--studio.route-map-interstate-shield--i75 .route-map-interstate-shield__num {
+  color: var(--rm-i75);
+}
+
+.route-map-interstate-shield--studio.route-map-interstate-shield--i20 .route-map-interstate-shield__banner,
+.route-map-interstate-shield--studio.route-map-interstate-shield--i20 .route-map-interstate-shield__num {
+  color: var(--rm-i20);
+}
+
+.route-map-interstate-shield--studio.route-map-interstate-shield--i285 .route-map-interstate-shield__banner,
+.route-map-interstate-shield--studio.route-map-interstate-shield--i285 .route-map-interstate-shield__num {
+  color: var(--rm-i285);
+}
+
+.route-map-interstate-shield--studio.route-map-interstate-shield--random .route-map-interstate-shield__banner,
+.route-map-interstate-shield--studio.route-map-interstate-shield--random .route-map-interstate-shield__num {
+  color: var(--rm-random);
+}
+
 .route-map-exit-sign {
   display: inline-flex;
   flex-direction: column;
@@ -2623,10 +2762,22 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   color: var(--studio-denim);
 }
 
+.route-map-intake .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .route-map-intake__form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   max-width: 640px;
   padding: 16px;
   border-radius: 10px;
@@ -2640,7 +2791,48 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   gap: 6px;
 }
 
+.route-map-intake__field--materials {
+  gap: 8px;
+}
+
 .route-map-intake__label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.55rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--studio-charcoal);
+  line-height: 1.4;
+}
+
+.route-map-intake__req,
+.route-map-intake__opt {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.route-map-intake__req {
+  color: var(--studio-denim);
+}
+
+.route-map-intake__opt {
+  color: var(--studio-charcoal-muted);
+}
+
+.route-map-intake__hint {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--studio-charcoal-muted);
+}
+
+.route-map-intake__sublabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--studio-charcoal);
@@ -2648,7 +2840,10 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
 .route-map-intake__field input,
 .route-map-intake__field select,
-.route-map-intake__field textarea {
+.route-map-intake__field textarea,
+.route-map-intake__sublabel input,
+.route-map-intake__sublabel select,
+.route-map-intake__sublabel textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid color-mix(in srgb, var(--studio-charcoal) 16%, transparent);
@@ -2657,14 +2852,26 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   font: inherit;
 }
 
+.route-map-intake__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.route-map-intake__actions .route-map-primary-btn,
+.route-map-intake__actions .route-map-secondary-btn {
+  flex: 1 1 12rem;
+}
+
 .route-map-social-intake {
   width: 100%;
   margin: 0 auto;
   padding-bottom: 0;
   color: var(--studio-charcoal);
-  --rm-chip-selected-fill: color-mix(in srgb, var(--studio-eucalyptus) 34%, #fff);
-  --rm-chip-selected-border: color-mix(in srgb, var(--studio-eucalyptus) 62%, transparent);
-  --rm-chip-selected-ring: color-mix(in srgb, var(--studio-eucalyptus) 24%, transparent);
+  --rm-chip-selected-fill: color-mix(in srgb, var(--studio-denim) 12%, #fff);
+  --rm-chip-selected-border: color-mix(in srgb, var(--studio-denim) 56%, transparent);
+  --rm-chip-selected-ring: color-mix(in srgb, var(--studio-denim) 18%, transparent);
 }
 
 .route-map-overlay-workspace--intake .route-map-social-intake {
@@ -2721,12 +2928,12 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   padding: 14px 16px;
   border: 1px solid color-mix(in srgb, var(--studio-eucalyptus) 24%, transparent);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--studio-ivory) 82%, #fff);
+  background: color-mix(in srgb, #fff 90%, var(--studio-ivory));
   box-shadow: 0 4px 16px rgba(46, 43, 40, 0.08);
 }
 
 .route-map-social-intake__progress strong {
-  color: var(--studio-denim);
+  color: var(--studio-eucalyptus);
   font-size: clamp(1.28rem, 2vw, 1.55rem);
   line-height: 1.1;
 }
@@ -2744,9 +2951,13 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 }
 
 .route-map-overlay-workspace--intake .route-map-social-intake__form {
-  height: 100%;
-  overflow: hidden;
-  align-content: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  align-content: start;
+  overscroll-behavior: contain;
 }
 
 .route-map-overlay-workspace--intake .route-map-social-intake__actions {
@@ -2761,14 +2972,12 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   grid-template-columns: auto minmax(0, 1fr);
   gap: 18px 20px;
   padding: clamp(20px, 3vw, 30px);
-  border: 1px solid color-mix(in srgb, var(--studio-charcoal) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--studio-charcoal) 14%, transparent);
   border-radius: 18px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, #fff 78%, transparent), transparent),
-    var(--studio-ivory);
+  background: color-mix(in srgb, #fff 94%, var(--studio-ivory));
   box-shadow:
-    0 2px 12px rgba(46, 43, 40, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+    0 3px 16px rgba(46, 43, 40, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .route-map-social-intake__step {
@@ -2780,11 +2989,12 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   height: 2.4rem;
   margin: 0;
   border-radius: 999px;
-  background: var(--studio-denim);
+  background: var(--studio-eucalyptus);
   color: #fff;
   font-size: 1.05rem;
   font-weight: 800;
   line-height: 1;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--studio-eucalyptus) 28%, transparent);
 }
 
 .route-map-social-intake__card-copy {
@@ -2808,6 +3018,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 }
 
 .route-map-social-intake__chips {
+  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -2855,7 +3066,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   color: color-mix(in srgb, var(--studio-charcoal) 98%, #000);
   box-shadow:
     0 0 0 3px var(--rm-chip-selected-ring),
-    inset 0 0 0 1px color-mix(in srgb, var(--studio-eucalyptus) 22%, transparent);
+    inset 0 0 0 1px color-mix(in srgb, var(--studio-denim) 18%, transparent);
   font-weight: 800;
 }
 
@@ -2910,22 +3121,38 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   color: color-mix(in srgb, var(--studio-charcoal) 46%, transparent);
 }
 
-.route-map-social-intake__upload-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 16px;
-  align-items: center;
-  padding: 14px;
-  border: 1px dashed color-mix(in srgb, var(--studio-eucalyptus) 34%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--studio-eucalyptus) 8%, #fff);
+.route-map-social-intake__upload-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 16px;
+  border: 1px dashed color-mix(in srgb, var(--studio-eucalyptus) 42%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--studio-eucalyptus) 11%, #fff);
 }
 
-.route-map-social-intake__upload-row p {
-  flex: 1 1 18rem;
+.route-map-social-intake__upload-heading {
   margin: 0;
+  color: var(--studio-eucalyptus);
+  font-size: clamp(1rem, 1.35vw, 1.08rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.route-map-social-intake__upload-guidance {
+  margin: 0;
+  max-width: 62ch;
+  color: color-mix(in srgb, var(--studio-charcoal) 92%, #000);
+  font-size: clamp(0.98rem, 1.2vw, 1.05rem);
+  line-height: 1.5;
+}
+
+.route-map-social-intake__upload-privacy {
+  margin: 0;
+  max-width: 62ch;
   color: var(--studio-charcoal-muted);
-  font-size: 1rem;
+  font-size: clamp(0.92rem, 1.1vw, 0.98rem);
   line-height: 1.45;
 }
 
@@ -3007,24 +3234,28 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   min-height: var(--rm-social-action-h);
   margin-top: clamp(10px, 1.6vw, 18px);
   padding: 14px clamp(12px, 2vw, 18px);
-  border: 1px solid color-mix(in srgb, var(--studio-charcoal) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--studio-charcoal) 14%, transparent);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--studio-ivory) 94%, #fff);
-  box-shadow: 0 -10px 24px rgba(46, 43, 40, 0.14);
+  background: color-mix(in srgb, var(--studio-ivory) 76%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 -12px 28px rgba(46, 43, 40, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
-.route-map-social-intake__save-state {
+.route-map-social-intake__next-step {
   display: grid;
   gap: 2px;
 }
 
-.route-map-social-intake__save-state strong {
-  color: var(--studio-denim);
+.route-map-social-intake__next-step strong {
+  color: var(--studio-eucalyptus);
   font-size: 1rem;
   line-height: 1.2;
 }
 
-.route-map-social-intake__save-state span {
+.route-map-social-intake__next-step span {
   color: var(--studio-charcoal-muted);
   font-size: 0.95rem;
   line-height: 1.35;
@@ -3523,7 +3754,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-social-intake__compact-field,
-  .route-map-social-intake__upload-row,
+  .route-map-social-intake__upload-panel,
   .route-map-social-intake__file-state {
     grid-column: 1 / -1;
     max-width: none;
@@ -3557,17 +3788,18 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     min-height: clamp(2.75rem, 5dvh, 3.8rem);
   }
 
-  .route-map-social-intake__upload-row {
-    gap: 7px 10px;
-    padding: 7px;
+  .route-map-social-intake__upload-panel {
+    gap: 8px;
+    padding: 10px;
   }
 
-  .route-map-social-intake__upload-row p {
+  .route-map-social-intake__upload-guidance,
+  .route-map-social-intake__upload-privacy {
     font-size: 0.92rem;
     line-height: 1.34;
   }
 
-  .route-map-social-intake__upload-row .route-map-secondary-btn {
+  .route-map-social-intake__upload-panel .route-map-secondary-btn {
     min-height: 34px;
     padding-inline: 12px;
     font-size: 0.82rem;
@@ -3602,11 +3834,11 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     white-space: nowrap;
   }
 
-  .route-map-social-intake__save-state strong {
+  .route-map-social-intake__next-step strong {
     font-size: 0.92rem;
   }
 
-  .route-map-social-intake__save-state span {
+  .route-map-social-intake__next-step span {
     font-size: 0.84rem;
   }
 
@@ -3846,7 +4078,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
   .route-map-overlay-workspace--intake {
     overflow: hidden;
-    overscroll-behavior: none;
+    overscroll-behavior: contain;
   }
 
   .route-map-overlay-workspace--intake .route-map-social-intake__header {
@@ -4234,9 +4466,10 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-social-intake__card-copy p,
-  .route-map-social-intake__upload-row p,
+  .route-map-social-intake__upload-guidance,
+  .route-map-social-intake__upload-privacy,
   .route-map-social-intake__file-state small,
-  .route-map-social-intake__save-state span {
+  .route-map-social-intake__next-step span {
     font-size: max(0.875rem, 14px);
     line-height: 1.5;
   }
@@ -4300,12 +4533,12 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     max-height: 4.5rem;
   }
 
-  .route-map-social-intake__upload-row {
-    gap: 12px 16px;
+  .route-map-social-intake__upload-panel {
+    gap: 12px;
     padding: 0.9rem;
   }
 
-  .route-map-social-intake__upload-row .route-map-secondary-btn {
+  .route-map-social-intake__upload-panel .route-map-secondary-btn {
     min-height: 2.75rem;
     padding-inline: 1rem;
     font-size: max(0.94rem, 15px);
@@ -4332,7 +4565,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     font-size: max(0.94rem, 15px);
   }
 
-  .route-map-social-intake__save-state strong {
+  .route-map-social-intake__next-step strong {
     font-size: 1rem;
   }
 }
@@ -4645,11 +4878,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     border-radius: 12px;
   }
 
-  .route-map-social-intake__upload-row {
-    display: grid;
-  }
-
-  .route-map-social-intake__upload-row .route-map-secondary-btn {
+  .route-map-social-intake__upload-panel .route-map-secondary-btn {
     width: 100%;
   }
 }
@@ -4770,18 +4999,20 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   .route-map-social-intake__lead,
   .route-map-social-intake__progress span,
   .route-map-social-intake__card-copy p,
-  .route-map-social-intake__upload-row p,
+  .route-map-social-intake__upload-guidance,
+  .route-map-social-intake__upload-privacy,
   .route-map-social-intake__file-state small,
-  .route-map-social-intake__save-state span {
+  .route-map-social-intake__next-step span {
     color: color-mix(in srgb, var(--studio-charcoal) 88%, #000);
   }
 
   .route-map-social-intake__lead,
   .route-map-social-intake__progress span,
   .route-map-social-intake__card-copy p,
-  .route-map-social-intake__upload-row p,
+  .route-map-social-intake__upload-guidance,
+  .route-map-social-intake__upload-privacy,
   .route-map-social-intake__file-state small,
-  .route-map-social-intake__save-state span {
+  .route-map-social-intake__next-step span {
     font-size: clamp(1.04rem, 1.02vw, 1.16rem);
     line-height: 1.62;
   }
@@ -4838,7 +5069,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     line-height: 1.32;
   }
 
-  .route-map-social-intake__save-state strong {
+  .route-map-social-intake__next-step strong {
     font-size: clamp(1.06rem, 1vw, 1.14rem);
     line-height: 1.32;
   }
@@ -4904,7 +5135,63 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 }
 
-/* Social Posts intake — fill highlighted bottom space; no inner scrollbars on desktop */
+/* Project Intake — frosted workspace over Studio background (all breakpoints) */
+.route-map-world--overlay.route-map-world--intake .route-map-world__scrim {
+  background: color-mix(in srgb, var(--rm-graphite) 18%, transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.route-map-world--overlay.route-map-world--intake {
+  --rm-intake-frost: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--studio-ivory) 66%, transparent) 0%,
+    color-mix(in srgb, var(--rm-paper-warm) 50%, transparent) 100%
+  );
+  --rm-intake-card: color-mix(in srgb, #fff 97%, var(--studio-ivory));
+  --rm-intake-footer-frost: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--studio-ivory) 78%, transparent) 0%,
+    color-mix(in srgb, #fff 64%, transparent) 100%
+  );
+}
+
+.route-map-world--overlay.route-map-world--intake .route-map-world__sheet--intake {
+  background: var(--rm-intake-frost);
+  backdrop-filter: var(--rm-frost-blur);
+  -webkit-backdrop-filter: var(--rm-frost-blur);
+  border: 1px solid color-mix(in srgb, rgba(255, 255, 255, 0.72) 36%, var(--studio-charcoal) 8%);
+  box-shadow:
+    0 24px 64px rgba(46, 43, 40, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+.route-map-world--overlay.route-map-world--intake .route-map-social-intake__progress,
+.route-map-world--overlay.route-map-world--intake .route-map-social-intake__card {
+  background: var(--rm-intake-card);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.route-map-world--overlay.route-map-world--intake .route-map-social-intake__progress {
+  border-color: color-mix(
+    in srgb,
+    var(--studio-golden-yellow) 16%,
+    var(--studio-eucalyptus) 28%
+  );
+}
+
+.route-map-world--overlay.route-map-world--intake .route-map-social-intake__actions {
+  background: var(--rm-intake-footer-frost);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-color: color-mix(in srgb, var(--studio-charcoal) 14%, transparent);
+  box-shadow:
+    0 -12px 28px rgba(46, 43, 40, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+/* Social Posts intake — natural card height on desktop */
 @media (min-width: 901px) {
   .route-map-world--overlay.route-map-world--intake .route-map-world__sheet--intake {
     top: clamp(6px, 1vh, 12px);
@@ -4958,14 +5245,16 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
 
   .route-map-overlay-workspace--intake .route-map-social-intake__form {
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr) auto;
+    grid-template-rows: none;
+    grid-auto-rows: auto;
     gap: clamp(10px, 1.1vw, 14px);
-    align-content: stretch;
+    align-content: start;
   }
 
   .route-map-overlay-workspace--intake .route-map-social-intake__card {
-    min-height: 0;
-    height: 100%;
+    min-height: auto;
+    height: auto;
+    overflow: visible;
     padding: clamp(10px, 1vw, 16px);
     gap: clamp(12px, 1.15vw, 16px) 10px;
     align-content: start;
@@ -5008,6 +5297,27 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     gap: 9px;
   }
 
+  .route-map-overlay-workspace--intake .route-map-social-intake__card--platform .route-map-social-intake__chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  @media (min-width: 1280px) {
+    .route-map-overlay-workspace--intake .route-map-social-intake__card--platform .route-map-social-intake__chips {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 1279px) {
+    .route-map-overlay-workspace--intake .route-map-social-intake__card--purpose .route-map-social-intake__chips,
+    .route-map-overlay-workspace--intake .route-map-social-intake__card--action .route-map-social-intake__chips {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+  }
+
   .route-map-overlay-workspace--intake .route-map-social-intake__chip {
     min-height: 2.95rem;
     padding: 0.62rem 0.92rem;
@@ -5017,6 +5327,7 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
   }
 
   .route-map-overlay-workspace--intake .route-map-social-intake__card--platform .route-map-social-intake__chip {
+    width: 100%;
     min-height: 3.2rem;
     padding: 0.58rem 0.88rem;
   }
@@ -5054,16 +5365,21 @@ main.flex.min-h-\[100dvh\].flex-1.flex-col:has(.route-map-page--immersive) {
     max-height: 3.75rem;
   }
 
-  .route-map-overlay-workspace--intake .route-map-social-intake__upload-row {
+  .route-map-overlay-workspace--intake .route-map-social-intake__upload-panel {
     margin-top: clamp(12px, 1.25vw, 18px);
-    padding: 0.55rem 0.65rem;
-    gap: 0.45rem;
+    padding: 0.75rem 0.85rem;
+    gap: 0.55rem;
   }
 
-  .route-map-overlay-workspace--intake .route-map-social-intake__upload-row p {
+  .route-map-overlay-workspace--intake .route-map-social-intake__upload-guidance,
+  .route-map-overlay-workspace--intake .route-map-social-intake__upload-privacy {
     font-size: clamp(0.86rem, 0.92vw, 0.96rem);
     line-height: 1.4;
     color: color-mix(in srgb, var(--studio-charcoal) 96%, #000);
+  }
+
+  .route-map-overlay-workspace--intake .route-map-social-intake__upload-privacy {
+    color: var(--studio-charcoal-muted);
   }
 
   .route-map-overlay-workspace--intake .route-map-social-intake__actions {

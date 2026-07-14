@@ -242,10 +242,10 @@ export const ROUTE_MAP_V1 = {
     },
     {
       id: "update",
-      highwayLabel: "Update Exit",
+      highwayLabel: "I-285",
       directionLabel: "Interchange",
       customerLabel: "Update What I Already Have",
-      tagline: "Exit off the loop — refresh one profile or promotion that's already live.",
+      tagline: "Refresh the marketing you already have without starting over.",
       geometry: "interchange",
       accentClass: "rm-road--update",
       selectable: true,
@@ -255,7 +255,7 @@ export const ROUTE_MAP_V1 = {
       highwayLabel: "Random Exit",
       directionLabel: "Shortcut",
       customerLabel: "I Know What I Need",
-      tagline: "Opens the job shelf directly — Route Start only if you are unsure.",
+      tagline: "Opens the job shelf directly — ask Squishy if you are unsure.",
       geometry: "shortcut",
       accentClass: "rm-road--random-exit",
       selectable: true,
@@ -272,8 +272,8 @@ export const ROUTE_MAP_V1 = {
 
   checkout: {
     pageTitle: "Secure Checkout",
-    pageLead: "Complete payment to begin your job.",
-    intakeLead: "After payment, share the details we need to start production.",
+    pageLead: "Complete payment to continue your job.",
+    intakeLead: "After payment, Project Intake opens so you can share the details we need for your job.",
   },
 } as const;
 

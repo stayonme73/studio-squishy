@@ -144,7 +144,7 @@ describe("Project Details + Studio Board integration", () => {
     expect(includes.some((item) => item.includes("SMS"))).toBe(false);
     expect(includes.some((item) => item.includes("Video Scripts"))).toBe(false);
     expect(includes.some((item) => item.includes("Marketing Calendar"))).toBe(false);
-    expect(feed.some((entry) => entry.message === "We received your project details")).toBe(true);
+    expect(feed.some((entry) => entry.message === "We received your Project Intake")).toBe(true);
   });
 
   it("adds a Board activity update when required materials are received", () => {
@@ -170,11 +170,29 @@ describe("Project Details + Studio Board integration", () => {
 
     const feed = resolveActivityFeed(campaign);
 
+    expect(feed.some((entry) => entry.message === "We received your Project Intake")).toBe(false);
     expect(feed.some((entry) => entry.message === "We received your project details")).toBe(false);
     expect(feed.filter((entry) => entry.message === "We received your payment")).toHaveLength(1);
   });
 
-  it("shows Project Details Complete as checked after submit, not in progress", () => {
+  it("does not claim Project Intake from fallback Vision Intake notes before Intake is submitted", () => {
+    const campaign = mockPaidCampaign({
+      campaignStatus: "PAYMENT_RECEIVED",
+      projectDetailsSubmittedAt: undefined,
+      projectDetails: undefined,
+      routeMapIntakeSubmittedAt: undefined,
+      visionSubmittedAt: undefined,
+      intake: undefined,
+      studioNotes: [{ date: "Today", message: "Vision Intake Received" }],
+    });
+
+    const feed = resolveActivityFeed(campaign);
+
+    expect(feed.some((entry) => entry.message === "We received your Project Intake")).toBe(false);
+    expect(feed.some((entry) => entry.message === "We received your project details")).toBe(false);
+  });
+
+  it("shows Project Intake as current when paid but Intake is incomplete", () => {
     const paidAwaitingDetails = mockPaidCampaign({
       campaignStatus: "PAYMENT_RECEIVED",
       projectDetailsSubmittedAt: undefined,
@@ -188,9 +206,9 @@ describe("Project Details + Studio Board integration", () => {
     const awaitingIntake = awaitingSteps.find((step) => step.id === "intake");
     const submittedIntake = submittedSteps.find((step) => step.id === "intake");
 
-    expect(awaitingIntake?.label).toBe("Project Details Complete");
+    expect(awaitingIntake?.label).toBe("Project Intake");
     expect(awaitingIntake?.state).toBe("current");
-    expect(submittedIntake?.label).toBe("Project Details Complete");
+    expect(submittedIntake?.label).toBe("Project Intake");
     expect(submittedIntake?.state).toBe("complete");
   });
 
