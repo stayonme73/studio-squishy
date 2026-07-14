@@ -24,8 +24,20 @@ import {
 } from "@/studio-coordinator";
 
 const CAMPAIGN_ID = "sc-self-test";
-const JOB_ID = `${CAMPAIGN_ID}:ma-flyer-v2`;
-const TASK_ID = "ma-flyer-v2:creative";
+/** Live Route Map flyer SKU — catalog `v2-rtu-flyer` (static snapshot, not a price weather vane). */
+export const SELF_TEST_SERVICE_ID = "v2-rtu-flyer" as const;
+export const SELF_TEST_SERVICE_NAME = "Make Me a Flyer";
+export const SELF_TEST_PRICE_CENTS = 6900;
+export const SELF_TEST_DELIVERABLES = [
+  "One defined design direction",
+  "One finished single-sided flyer design — one agreed size only",
+  "Print-ready PDF",
+  "Digital PNG or JPG version for sharing online (one agreed size)",
+  "Studio quality-control review before delivery",
+] as const;
+export const SELF_TEST_JOB_ID = `${CAMPAIGN_ID}:${SELF_TEST_SERVICE_ID}`;
+const JOB_ID = SELF_TEST_JOB_ID;
+const TASK_ID = `${SELF_TEST_SERVICE_ID}:creative`;
 const T0 = "2026-07-01T10:00:00.000Z";
 const T1 = "2026-07-02T10:00:00.000Z";
 const T2 = "2026-07-03T10:00:00.000Z";
@@ -68,15 +80,15 @@ const owner: StudioUser = {
 
 function lineItem() {
   return {
-    skuId: "ma-flyer-v2",
-    serviceId: "ma-flyer-v2",
-    serviceName: "Flyer",
+    skuId: SELF_TEST_SERVICE_ID,
+    serviceId: SELF_TEST_SERVICE_ID,
+    serviceName: SELF_TEST_SERVICE_NAME,
     billingType: "one_time" as const,
-    exactPriceCents: 10000,
-    priceDisplay: "$100",
-    deliverables: ["Concept set"],
+    exactPriceCents: SELF_TEST_PRICE_CENTS,
+    priceDisplay: "$69",
+    deliverables: [...SELF_TEST_DELIVERABLES],
     exclusions: [],
-    timingWindowLabel: "3-5 days",
+    timingWindowLabel: "within 2–3 business days",
     revisionRule: "1 round",
     clientResponsibilities: [],
     executionResponsibility: "Studio",
@@ -95,13 +107,13 @@ function baseCampaign(overrides: Partial<CampaignRecord> = {}): CampaignRecord {
     paymentReceivedAt: T0,
     projectDetailsSubmittedAt: T0,
     approvedStudioPlan: {
-      selectedServiceIds: ["ma-flyer-v2"],
-      includedServiceIds: ["ma-flyer-v2"],
+      selectedServiceIds: [SELF_TEST_SERVICE_ID],
+      includedServiceIds: [SELF_TEST_SERVICE_ID],
       additionalServiceIds: [],
       additionalCostUsd: 0,
-      oneTimeTotalCents: 10000,
+      oneTimeTotalCents: SELF_TEST_PRICE_CENTS,
       monthlyTotalCents: 0,
-      amountDueTodayCents: 10000,
+      amountDueTodayCents: SELF_TEST_PRICE_CENTS,
       lineItems: [lineItem()],
       approvedAt: T0,
     },
@@ -117,10 +129,11 @@ function baseJob(overrides: Partial<PurchasedJobRecord> = {}): PurchasedJobRecor
   return {
     jobId: JOB_ID,
     campaignId: CAMPAIGN_ID,
-    skuId: "ma-flyer-v2",
-    serviceName: "Flyer",
+    skuId: SELF_TEST_SERVICE_ID,
+    serviceName: SELF_TEST_SERVICE_NAME,
     spineStatus: "ready_for_review",
-    productionLane: "standard",
+    // Catalog productionLane is `quick_turn` → control lane `quick`.
+    productionLane: "quick",
     intakeComplete: true,
     laneQueuedAt: T0,
     updatedAt: T3,
@@ -137,10 +150,10 @@ function baseEnvelope(): ServerTasksEnvelope {
         title: "Creative",
         phase: "creative",
         status: "ready_for_qa",
-        relatedServiceIds: ["ma-flyer-v2"],
-        familyId: "flyer",
+        relatedServiceIds: [SELF_TEST_SERVICE_ID],
+        familyId: "marketing_assets",
         catalogFamilyId: "marketing_assets",
-        serviceName: "Flyer",
+        serviceName: SELF_TEST_SERVICE_NAME,
         dependsOn: [],
         workflowState: "ready_for_qa",
       },
