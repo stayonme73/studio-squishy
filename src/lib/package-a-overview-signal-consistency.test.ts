@@ -96,7 +96,7 @@ describe("Package A — Overview Signal Consistency", () => {
     expect(note?.lines.join(" ")).not.toMatch(/now in production|creative team/i);
 
     expect(studioBoard.nextAction.waitingOnProjectIntakeLabel).toBe("Waiting on Project Intake");
-    expect(studioBoard.campaignBrief.openRecordLabel).toMatch(/Project Record/);
+    expect(studioBoard.campaignBrief.openRecordLabel).toBe("View submitted project details");
   });
 
   it("Scenario 2: Intake submitted before production uses Preparing Next Stage labels", () => {

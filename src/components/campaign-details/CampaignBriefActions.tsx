@@ -16,7 +16,10 @@ type Props = {
   showView?: boolean;
   className?: string;
   layout?: "row" | "stack";
-  /** Primary button styling for the main record access action. */
+  /**
+   * Legacy primary styling. Studio Board Package B keeps the submitted-details
+   * control secondary so Next Action remains the unmistakable Board primary.
+   */
   prominent?: boolean;
 };
 
@@ -35,7 +38,7 @@ export default function CampaignBriefActions({
   const editHref = draftRoomEditHref(campaign.packageId, campaign);
   const viewButtonClass = prominent
     ? "utility-btn utility-btn--primary campaign-brief-actions__view"
-    : "utility-btn utility-btn--secondary";
+    : "utility-btn utility-btn--secondary campaign-brief-actions__view";
   const rootClass = [
     "campaign-brief-actions",
     layout === "stack" ? "campaign-brief-actions--stack" : "",
@@ -50,11 +53,11 @@ export default function CampaignBriefActions({
       {showView ? (
         onViewBrief ? (
           <button type="button" className={viewButtonClass} onClick={onViewBrief}>
-            {prominent ? campaignBrief.openRecordLabel : campaignBrief.viewLabel}
+            {campaignBrief.openRecordLabel}
           </button>
         ) : (
           <Link href={routes.campaignDetails} className={viewButtonClass}>
-            {prominent ? campaignBrief.openRecordLabel : campaignBrief.viewLabel}
+            {campaignBrief.openRecordLabel}
           </Link>
         )
       ) : null}

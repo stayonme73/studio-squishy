@@ -365,16 +365,6 @@ export default function StudioBoardScene() {
                 {view.hasCampaign ? view.campaignTitle : emptyCopy.campaignNamePlaceholder}
               </h2>
 
-              {view.hasCampaign && boardCampaign ? (
-                <CampaignBriefActions
-                  campaign={boardCampaign}
-                  onViewBrief={() => router.push(studioBoard.routes.campaignDetails)}
-                  className="sb-current-campaign__brief-actions"
-                  layout="stack"
-                  prominent
-                />
-              ) : null}
-
               {view.hasCampaign ? (
                 <CampaignNextAction
                   campaign={boardCampaign}
@@ -383,6 +373,15 @@ export default function StudioBoardScene() {
                   nextUpdateLabel={view.headerSnapshot?.nextUpdate ?? null}
                   studioGuideHref={studioGuideHref}
                   displayFacts={displayFacts}
+                />
+              ) : null}
+
+              {view.hasCampaign && boardCampaign ? (
+                <CampaignBriefActions
+                  campaign={boardCampaign}
+                  onViewBrief={() => router.push(studioBoard.routes.campaignDetails)}
+                  className="sb-current-campaign__brief-actions"
+                  layout="stack"
                 />
               ) : null}
 

@@ -630,7 +630,7 @@ export const studioBoard = {
 
   campaignBrief: {
     viewLabel: "View Campaign Brief",
-    openRecordLabel: `Open ${customerJourneyStepName("project-record")}`,
+    openRecordLabel: "View submitted project details",
     editLabel: "Edit Campaign Brief",
     editableHint: "Review or update your answers before campaign development begins.",
     lockedMessage:
@@ -735,11 +735,11 @@ export const studioBoard = {
   campaignDetails: {
     pageTitle: customerJourneyStepName("project-record"),
     eyebrow: "Your Project",
-    lead: "This is where you manage the project you've already started with The Studio.",
+    lead: "Review the project details you submitted to The Studio.",
     backLabel: "Back to Studio Board",
     arrival: {
       message:
-        "Your project is confirmed. Welcome to your Project Record — this is where you can follow progress, review details, and manage what happens next.",
+        "Your project is confirmed. Review the submitted details you shared for your Studio Plan.",
     },
     sections: {
       overview: "Project Overview",

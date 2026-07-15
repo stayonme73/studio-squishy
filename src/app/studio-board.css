@@ -2868,6 +2868,21 @@ body:has(.sb--v4) {
   margin-top: 0.85rem;
 }
 
+/* Package B — submitted-details stays secondary under Next Action (not full-width) */
+.sb-current-campaign__brief-actions.campaign-brief-actions--stack {
+  align-items: flex-start;
+}
+
+.sb-current-campaign__brief-actions .campaign-brief-actions__view {
+  width: fit-content;
+  max-width: 100%;
+  justify-content: center;
+  font-size: 0.84rem;
+  padding: 0.55rem 0.85rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
 .sb-next-action {
   margin-top: 0.9rem;
   padding: 0.75rem 0.85rem;
