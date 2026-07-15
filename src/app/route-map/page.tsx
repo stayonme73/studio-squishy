@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import RouteMapScene from "@/components/route-map/RouteMapScene";
 
 import "../mobile-route-fixes.css";
@@ -7,7 +9,11 @@ import "./route-map.css";
 export default function RouteMapPage() {
   return (
     <main className="route-map-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden">
-      <RouteMapScene />
+      <Suspense
+        fallback={<div className="route-map-scene--loading" aria-busy="true" />}
+      >
+        <RouteMapScene />
+      </Suspense>
     </main>
   );
 }

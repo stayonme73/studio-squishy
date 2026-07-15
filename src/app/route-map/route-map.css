@@ -58,6 +58,14 @@
   background: #2e2d2b;
 }
 
+/* Suspense fallback for useSearchParams (BH-RM-S1) — match immersive shell, not utility cream. */
+.route-map-scene--loading {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 100dvh;
+  background: #2e2d2b;
+}
+
 .route-map-page--immersive .route-map-scene-body {
   position: relative;
   display: flex;
