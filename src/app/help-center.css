@@ -5,6 +5,14 @@
   text-size-adjust: 100%;
 }
 
+/* Mobile cards default hidden; phone media query reveals them */
+.hc-qpg-cards {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .hc-grid .utility-card {
   background: var(--studio-utility-card-surface-bright, #ffffff);
 }
@@ -448,5 +456,139 @@
 
   .utility-page--help-center .hc-card--packages .pkg-compare__pkg-head {
     font-size: max(0.875rem, 14px);
+  }
+}
+
+/*
+ * Phone / real Samsung pass — match DevTools quality without changing desktop.
+ * Breakpoint aligns with pkg-compare mobile table rules (720px).
+ */
+@media screen and (max-width: 720px) {
+  .utility-page--help-center {
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+
+  .utility-page--help-center .utility-header .utility-topbar__title {
+    font-size: clamp(1.35rem, 6.5vw, 1.65rem);
+  }
+
+  .utility-page--help-center .utility-header .utility-lead {
+    font-size: 1.0625rem;
+    line-height: 1.45;
+  }
+
+  .utility-page--help-center .utility-topbar__back,
+  .utility-page--help-center .utility-header .utility-topbar__help {
+    font-size: 0.8125rem;
+  }
+
+  .utility-page--help-center .utility-subnav__link {
+    font-size: 0.875rem;
+    min-width: 0;
+    padding: 0.5rem 0.55rem;
+  }
+
+  .utility-page--help-center .utility-subnav__link--active {
+    font-size: 0.9375rem;
+  }
+
+  .utility-page--help-center .hc-toc__title {
+    font-size: 0.75rem;
+  }
+
+  .utility-page--help-center .hc-toc__link {
+    font-size: 0.9375rem;
+    line-height: 1.35;
+  }
+
+  .utility-page--help-center .hc-grid .utility-card__title,
+  .utility-page--help-center .hc-card--philosophy .utility-card__title {
+    font-size: 0.9375rem;
+    letter-spacing: 0.05em;
+  }
+
+  .utility-page--help-center .hc-body,
+  .utility-page--help-center .hc-faq__answer {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .utility-page--help-center .hc-body .utility-blocks__p,
+  .utility-page--help-center .hc-body .utility-blocks__list-intro,
+  .utility-page--help-center .hc-faq__answer .utility-blocks__p,
+  .utility-page--help-center .hc-faq__answer .utility-blocks__list-intro,
+  .utility-page--help-center .hc-body .utility-blocks__list,
+  .utility-page--help-center .hc-faq__answer .utility-blocks__list {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  .utility-page--help-center .hc-philosophy__question,
+  .utility-page--help-center .hc-faq__question,
+  .utility-page--help-center .hc-policies__title {
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .utility-page--help-center .hc-faq-group__title {
+    font-size: 0.75rem;
+  }
+
+  .utility-page--help-center .hc-footer__hint,
+  .utility-page--help-center .hc-footer__link {
+    font-size: 0.9375rem;
+  }
+
+  .utility-page--help-center .pkg-compare__lead {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  /* Hide horizontal table; show stacked cards */
+  .utility-page--help-center .hc-qpg-table {
+    display: none;
+  }
+
+  .utility-page--help-center .hc-qpg-cards {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .utility-page--help-center .hc-qpg-card {
+    margin: 0;
+    padding: 0.85rem 0.9rem;
+    border: 1px solid color-mix(in srgb, var(--studio-denim) 16%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--studio-paper) 96%, var(--studio-denim) 4%);
+  }
+
+  .utility-page--help-center .hc-qpg-card__situation {
+    margin: 0 0 0.4rem;
+    font-size: 0.9375rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+    color: var(--utility-text);
+  }
+
+  .utility-page--help-center .hc-qpg-card__summary {
+    margin: 0 0 0.65rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--utility-text-muted) 55%, var(--utility-text) 45%);
+    overflow-wrap: break-word;
+  }
+
+  .utility-page--help-center .hc-qpg-card__link {
+    display: inline-block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--utility-text);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--utility-brass) 65%, transparent);
   }
 }

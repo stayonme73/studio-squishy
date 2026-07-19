@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "./welcome-hall.css";
 @import "./welcome-hall-phase1.css";
-@import "./welcome-hall-v3.css";
+/* welcome-hall-v3.css archived with entrance/v3 — not loaded in production */
 @import "./studio-guide.css";
 @import "./draft-room.css";
 @import "./board-family.css";

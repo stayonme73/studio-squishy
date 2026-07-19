@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Comic_Neue, Geist, Geist_Mono } from "next/font/google";
 
 import { siteConfig } from "@/config/site";
 
 import OwnerQaRoot from "@/components/dev/OwnerQaRoot";
+import StudioPresenceRoot from "@/components/studio-presence/StudioPresenceRoot";
 
 import "./globals.css";
 
@@ -15,6 +16,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+/** Squishy Lobby greeting only — rounded friendly face matching approved bubble reference. */
+const comicNeue = Comic_Neue({
+  variable: "--font-squishy-greeting",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -39,10 +47,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${comicNeue.variable} h-full antialiased`}
     >
       <body className="flex min-h-[100dvh] flex-col overflow-x-hidden">
-        {children}
+        <StudioPresenceRoot>
+          {children}
+        </StudioPresenceRoot>
         <OwnerQaRoot />
       </body>
     </html>

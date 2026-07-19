@@ -14,8 +14,10 @@ import ProjectSnapshotPanel from "@/components/studio-board/ProjectSnapshotPanel
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
 import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import HelpCenterLink from "@/components/shared/HelpCenterLink";
+import CustomerSignOutButton from "@/components/auth/CustomerSignOutButton";
 import { helpCenter } from "@/config/help-center";
 import { studioBoard, studioBoardDraftRoomHref, studioBoardStudioGuideHref } from "@/config/studio-board";
+import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import {
   greetingPeriodFromDate,
   resolveAccountPackageView,
@@ -23,6 +25,8 @@ import {
   type GreetingPeriod,
   type StudioBoardDisplayFacts,
 } from "@/lib/studio-board-view";
+import { speakConversationLine } from "@/lib/studio-conversation-speech";
+import { consumeStudioVoiceBoardWelcome } from "@/lib/studio-voice-board-handoff";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 
 const {
@@ -258,6 +262,14 @@ export default function StudioBoardScene() {
     }
   }, [searchParams]);
 
+  /* Voice Board handoff — welcome once after Intake → sign-in → Board. */
+  useEffect(() => {
+    if (!ready) return;
+    if (accessState === "auth-required") return;
+    if (!consumeStudioVoiceBoardWelcome()) return;
+    speakConversationLine(conversationRoomGuideV1.boardArrivalWelcomeVoice);
+  }, [ready, accessState]);
+
   if (ready && accessState === "auth-required") {
     return <ClientAccessStatePanel state={accessState} />;
   }
@@ -326,6 +338,8 @@ export default function StudioBoardScene() {
           <NavItem href={newCampaignHref} icon="new">
             {sidebar.newCampaign}
           </NavItem>
+          {/* Phone: fills the open slot under Help Center; desktop: last sidebar action. */}
+          <CustomerSignOutButton className="sb-sign-out" />
         </nav>
 
         <div className="sb-sidebar-lower">

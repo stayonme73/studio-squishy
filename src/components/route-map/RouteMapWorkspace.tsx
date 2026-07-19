@@ -5,6 +5,7 @@ import { useCallback, useId, useState } from "react";
 import RouteMapChoosePanel from "@/components/route-map/RouteMapChoosePanel";
 import RouteMapHighwayMap from "@/components/route-map/RouteMapHighwayMap";
 import RouteMapHowItWorks from "@/components/route-map/RouteMapHowItWorks";
+import RouteMapSquishyGuide from "@/components/route-map/RouteMapSquishyGuide";
 import type { RouteMapRoadId } from "@/config/route-map-v1";
 
 type Props = {
@@ -32,6 +33,13 @@ export default function RouteMapWorkspace({
 
   return (
     <div className={workspaceClassName} role="group" aria-label="Studio Route Map workspace">
+      <div className="route-map-workspace__intro">
+        <h1 className="route-map-workspace__title">Studio Route Map</h1>
+        <p className="route-map-workspace__subtitle">
+          Pick a route, build your project, and check out — all in one place.
+        </p>
+      </div>
+
       <div className="route-map-workspace__main">
         <div className="route-map-workspace__map-col">
           <RouteMapHighwayMap
@@ -78,6 +86,8 @@ export default function RouteMapWorkspace({
       <div className="route-map-workspace__how-wrap">
         <RouteMapHowItWorks />
       </div>
+
+      <RouteMapSquishyGuide />
     </div>
   );
 }

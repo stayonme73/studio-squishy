@@ -225,7 +225,7 @@ export const ROUTE_MAP_V1 = {
       highwayLabel: "I-20",
       directionLabel: "East / West",
       customerLabel: "Promote Something Now",
-      tagline: "Direct urgent route — get something live fast.",
+      tagline: "Direct urgent route — get ready-to-use promotion assets quickly.",
       geometry: "direct",
       accentClass: "rm-road--i20",
       selectable: true,
@@ -242,7 +242,7 @@ export const ROUTE_MAP_V1 = {
     },
     {
       id: "update",
-      highwayLabel: "I-285",
+      highwayLabel: "I-285 Update",
       directionLabel: "Interchange",
       customerLabel: "Update What I Already Have",
       tagline: "Refresh the marketing you already have without starting over.",
@@ -271,9 +271,9 @@ export const ROUTE_MAP_V1 = {
   projectDiscoveryRoute: customerJourneyStepRoute("project-discovery"),
 
   checkout: {
-    pageTitle: "Secure Checkout",
-    pageLead: "Complete payment to continue your job.",
-    intakeLead: "After payment, Project Intake opens so you can share the details we need for your job.",
+    pageTitle: "Review and Confirm",
+    pageLead: "Review your Studio Plan and confirm to continue to Project Intake.",
+    intakeLead: "After confirmation, Project Intake opens so you can share the details we need for your job.",
   },
 } as const;
 

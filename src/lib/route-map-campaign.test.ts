@@ -121,7 +121,8 @@ describe("route-map-v1 config", () => {
     const updateIds = getJobsForRoad("update").map((job) => job.id);
 
     expect(i75Ids).toHaveLength(10);
-    expect(i75Ids.at(-1)).toBe("v2-rtu-business-card");
+    expect(i75Ids[0]).toBe("v2-rtu-flyer");
+    expect(i75Ids[1]).toBe("v2-rtu-business-card");
     expect(i75Ids).not.toContain("v2-rtu-email-kit");
     expect(i75Ids).not.toContain("v2-rtu-sms-kit");
     expect(updateIds).not.toContain("v2-rtu-email-kit");

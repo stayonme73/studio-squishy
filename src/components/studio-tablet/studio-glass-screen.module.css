@@ -1,0 +1,99 @@
+.glass {
+  --glass-ink: #f7f4ee;
+  --glass-muted: rgba(247, 244, 238, 0.62);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: min(36rem, 100%);
+  min-height: min(28rem, 70dvh);
+  max-height: min(40rem, 78dvh);
+  padding: 1.35rem 1.5rem 1.5rem;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background:
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.05) 38%,
+      rgba(20, 24, 28, 0.55) 100%
+    ),
+    rgba(18, 22, 28, 0.42);
+  box-shadow:
+    0 28px 64px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  color: var(--glass-ink);
+  overflow: hidden;
+}
+
+.sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 32%,
+    transparent 68%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  opacity: 0.7;
+}
+
+.header {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1.1rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--glass-muted);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--glass-ink);
+}
+
+.body {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  font-size: max(16px, 1rem);
+  line-height: 1.45;
+  color: rgba(247, 244, 238, 0.9);
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 0;
+}
+
+.placeholder p {
+  margin: 0;
+  color: var(--glass-muted);
+}
+
+.placeholder strong {
+  color: var(--glass-ink);
+  font-weight: 650;
+}

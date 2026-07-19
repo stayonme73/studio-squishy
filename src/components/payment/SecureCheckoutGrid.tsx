@@ -41,6 +41,8 @@ type Props = {
   onOpenServiceGuide?: (serviceId: ServiceId) => void;
   /** Scroll or navigate to selected plan details (embedded checkout). */
   onViewPlanDetails?: () => void;
+  /** Override submit button label (Conversation Room panel may use “Complete Checkout”). */
+  submitLabel?: string;
 };
 
 function SummaryCheckIcon() {
@@ -131,14 +133,17 @@ export default function SecureCheckoutGrid({
   onBeforePayment,
   onOpenServiceGuide,
   onViewPlanDetails,
+  submitLabel,
 }: Props) {
   const router = useRouter();
   const checkoutPackageId = resolveCheckoutPackageId(packageIdProp);
   const storedPlanSummary = useMemo(() => buildPaymentPlanSummary(), []);
   const planSummary = planSummaryProp ?? storedPlanSummary;
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [completing, setCompleting] = useState(false);
   const showSandbox = isPaymentSandboxAvailable();
   const isEmbedded = layout === "embedded";
+  const confirmLabel = submitLabel ?? payment.form.submitLabel;
 
   function buildAcknowledgment(): ApprovalAcknowledgment {
     return {
@@ -149,8 +154,10 @@ export default function SecureCheckoutGrid({
   }
 
   function completeCheckout() {
+    if (completing) return;
     const acknowledgment = buildAcknowledgment();
     if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
+    setCompleting(true);
     if (onPaymentComplete) {
       onPaymentComplete(checkoutPackageId);
       return;
@@ -161,13 +168,15 @@ export default function SecureCheckoutGrid({
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!termsAccepted) return;
+    if (!termsAccepted || completing) return;
     completeCheckout();
   }
 
   function handleSandboxPayment() {
+    if (completing) return;
     const acknowledgment = buildAcknowledgment();
     if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
+    setCompleting(true);
     if (onPaymentComplete) {
       onPaymentComplete(checkoutPackageId);
       return;
@@ -256,7 +265,12 @@ export default function SecureCheckoutGrid({
         <span className="pay-sandbox__badge">{payment.sandbox.badge}</span>
       </div>
       <p className="pay-sandbox__hint">{payment.sandbox.hint}</p>
-      <button type="button" className="pay-sandbox__btn" onClick={handleSandboxPayment}>
+      <button
+        type="button"
+        className="pay-sandbox__btn"
+        onClick={handleSandboxPayment}
+        disabled={completing}
+      >
         {payment.sandbox.buttonLabel}
       </button>
     </div>
@@ -351,8 +365,12 @@ export default function SecureCheckoutGrid({
                   <span>{payment.form.termsLabel}</span>
                 </label>
               </section>
-              <button type="submit" className="pay-submit" disabled={!termsAccepted}>
-                {payment.form.submitLabel}
+              <button
+                type="submit"
+                className="pay-submit"
+                disabled={!termsAccepted || completing}
+              >
+                {confirmLabel}
               </button>
               {sandboxPanel}
             </form>
@@ -457,9 +475,9 @@ export default function SecureCheckoutGrid({
             <button
               type="submit"
               className="utility-btn utility-btn--primary co-submit"
-              disabled={!termsAccepted}
+              disabled={!termsAccepted || completing}
             >
-              {payment.form.submitLabel}
+              {confirmLabel}
             </button>
             <p className="co-payment-reassurance">{payment.form.paymentReassurance}</p>
             {sandboxPanel}

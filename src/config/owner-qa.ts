@@ -109,6 +109,13 @@ export const ownerQa = {
 
   shortcuts: [
     {
+      id: "conversation-room-discovery",
+      kind: "link",
+      label: "Conversation Room",
+      href: "/studio-conversation-room",
+      description: "Voice tablet — Discovery migration",
+    },
+    {
       id: "file-room",
       kind: "link",
       label: "File Room",

@@ -110,9 +110,14 @@ export default function CheckoutScene() {
                 {payment.editProjectLabel}
               </Link>
             </div>
-            <p className="co-header__sync" role="status" aria-live="polite">
-              {routeMapSyncStatusLabel(syncStatus)}
-            </p>
+            {(() => {
+              const syncLabel = routeMapSyncStatusLabel(syncStatus);
+              return syncLabel ? (
+                <p className="co-header__sync" role="status" aria-live="polite">
+                  {syncLabel}
+                </p>
+              ) : null;
+            })()}
           </div>
 
           <div className="co-header__intro">

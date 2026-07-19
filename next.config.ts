@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  // Phone QR / LAN cert — allow Next.js dev resources from this host.
+  allowedDevOrigins: ["10.1.10.208"],
   experimental: {
     authInterrupts: true,
   },
@@ -15,6 +17,11 @@ const nextConfig: NextConfig = {
       { source: "/studio-guide", destination: "/route-map", permanent: false },
       { source: "/studio-guide-prototype", destination: "/route-map", permanent: false },
       { source: "/review-room", destination: "/feedback-studio", permanent: false },
+      {
+        source: "/studio-tablet",
+        destination: "/studio-conversation-room",
+        permanent: false,
+      },
     ];
   },
 };

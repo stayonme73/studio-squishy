@@ -2,6 +2,8 @@
  * Build Your Project — one continuous two-column workspace.
  */
 
+@import "../../components/project-builder/project-builder-job-details.css";
+
 main.journey-shell:has(.pb-scene) {
   overflow: visible;
   min-height: 100dvh;
@@ -365,6 +367,18 @@ main.journey-shell:has(.pb-scene) {
   max-height: var(--pb-rail-sticky-h);
   min-width: 0;
   overflow: hidden;
+}
+
+.pb-studio-conversation__example-label {
+  flex: 0 0 auto;
+  margin: 0 0 0.35rem;
+  padding: 0 0.1rem;
+  font-family: var(--font-source-sans-3), "Source Sans 3", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(44, 62, 80, 0.72);
 }
 
 .pb-studio-conversation__thread {
@@ -919,94 +933,6 @@ main.journey-shell:has(.pb-scene) {
   font-size: 0.82rem;
   line-height: 1.45;
   color: var(--studio-charcoal-muted);
-}
-
-.pb-drawer-details {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.pb-drawer-details__card {
-  padding: 0.85rem 0.95rem;
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--pb-cream) 88%, #fff);
-  border: 1px solid color-mix(in srgb, #8a7b68 12%, transparent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
-}
-
-.pb-drawer-details__card--purpose {
-  background: color-mix(in srgb, var(--studio-ivory) 92%, #fff);
-}
-
-.pb-drawer-details__block {
-  margin: 0;
-}
-
-.pb-drawer-details__heading {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 0 0 0.55rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--studio-eucalyptus);
-}
-
-.pb-drawer-details__icon {
-  font-size: 0.95rem;
-  line-height: 1;
-}
-
-.pb-drawer-details__prose {
-  margin: 0;
-  font-size: 0.92rem;
-  line-height: 1.6;
-  color: var(--studio-charcoal);
-}
-
-.pb-drawer-details__list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.45rem;
-}
-
-.pb-drawer-details__list li {
-  position: relative;
-  padding-left: 1.35rem;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--studio-charcoal);
-}
-
-.pb-drawer-details__list--includes li::before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  top: 0.05rem;
-  font-weight: 700;
-  color: var(--studio-eucalyptus);
-}
-
-.pb-drawer-details__list--excludes li::before {
-  content: "✗";
-  position: absolute;
-  left: 0;
-  top: 0.05rem;
-  font-weight: 700;
-  color: color-mix(in srgb, var(--studio-charcoal-muted) 88%, #6b5f52);
-}
-
-.pb-drawer-details__list--needs li::before {
-  content: "•";
-  position: absolute;
-  left: 0.15rem;
-  top: 0;
-  font-weight: 700;
-  color: var(--studio-denim);
 }
 
 .pb-drawer__footer {

@@ -247,6 +247,35 @@ body:has(.sb--v4) {
   container-name: sidebar-lower;
 }
 
+.sb-sign-out {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 0.5rem);
+  margin: 0.35rem 0.25rem 0.15rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--studio-ink, #1c2430) 18%, transparent);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--studio-ink, #1c2430);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sb-sign-out:hover,
+.sb-sign-out:focus-visible {
+  background: color-mix(in srgb, var(--studio-ink, #1c2430) 6%, transparent);
+}
+
+.sb-sign-out:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
 .sb-sidebar-scene {
   position: relative;
   flex: 1 1 auto;
@@ -5682,8 +5711,24 @@ body:has(.sb--v4) {
     min-height: 2.75rem;
   }
 
+  /*
+   * Sign out in the open nav slot under Help Center (beside New Campaign).
+   */
   .sb--v4 .sb-sidebar-lower {
     display: none;
+  }
+
+  .sb--v4 .sb-nav .sb-sign-out {
+    display: inline-flex;
+    flex: 1 1 calc(50% - 0.25rem);
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-height: 2.75rem;
+    margin: 0;
+    padding: 0.5rem 0.55rem;
+    font-size: 0.8125rem;
+    white-space: nowrap;
   }
 
   .sb--v4 .sb-main {
@@ -6172,11 +6217,23 @@ body:has(.sb--v4) {
 }
 
 .sb-materials-action-card__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.38rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.45rem 0.55rem;
+  min-width: 0;
+}
+
+.sb-materials-action-card__label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sb-materials-action-card__head .sb-materials-board-status {
+  flex: 0 0 auto;
+  justify-self: end;
+  align-self: start;
+  white-space: nowrap;
 }
 
 .sb-materials-board-next {
@@ -6201,14 +6258,18 @@ body:has(.sb--v4) {
 
 .sb-card--materials-needed .sb-materials-action-list {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
   gap: 0.45rem;
   overflow: visible;
 }
 
 .sb-card--materials-needed .sb-materials-action-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 0.26rem;
+  min-width: 0;
   min-height: 0;
-  height: auto;
+  height: 100%;
   padding: 0.56rem 0.62rem;
 }
 
@@ -7009,6 +7070,7 @@ body:has(.sb--v4) {
 
   .sb--v4 .sb-card--materials-needed .sb-materials-action-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
     gap: 0.45rem;
     overflow: hidden;
   }
@@ -7018,8 +7080,9 @@ body:has(.sb--v4) {
   }
 
   .sb--v4 .sb-card--materials-needed .sb-materials-action-card {
+    min-width: 0;
     min-height: 0;
-    height: auto;
+    height: 100%;
     padding: 0.56rem 0.62rem;
   }
 

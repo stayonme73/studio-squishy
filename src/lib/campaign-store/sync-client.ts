@@ -46,10 +46,10 @@ export async function syncCampaignToServer(record: CampaignRecord): Promise<void
 
   if (isFixtureCampaignId(record.campaignId) && !isFixtureSyncAllowed()) {
     logSyncSkipped(record.campaignId, "fixture campaign blocked (ALLOW_FIXTURE_SYNC not set)");
+    // Local campaign remains the Host-path source of truth — do not surface as Save failed.
     writeCampaignSyncStatus({
       campaignId: record.campaignId,
-      state: "error",
-      lastError: "Fixture campaign sync blocked",
+      state: "idle",
       updatedAt: nowIso(),
     });
     return;
@@ -72,6 +72,16 @@ export async function syncCampaignToServer(record: CampaignRecord): Promise<void
     if (!response.ok) {
       const body = (await response.json().catch(() => ({}))) as { error?: string };
       const message = body.error ?? `HTTP ${response.status}`;
+      // Unsigned Host / customer flow: remote sync is unavailable; local progress already saved.
+      if (response.status === 401 || response.status === 403) {
+        logSyncSkipped(record.campaignId, message);
+        writeCampaignSyncStatus({
+          campaignId: record.campaignId,
+          state: "idle",
+          updatedAt: nowIso(),
+        });
+        return;
+      }
       logSyncFailure(record.campaignId, message);
       writeCampaignSyncStatus({
         campaignId: record.campaignId,

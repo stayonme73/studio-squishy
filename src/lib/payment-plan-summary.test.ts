@@ -116,7 +116,7 @@ describe("plan-pricing", () => {
 describe("card processing disclosure", () => {
   it("exposes the card processing disclosure note in payment config", () => {
     expect(payment.summary.cardProcessingDisclosureNote).toBe(
-      "Taxes and standard processing costs are included in your total.",
+      "Estimated Investment reflects your selected services. Live card processing is not connected in this build.",
     );
   });
 });

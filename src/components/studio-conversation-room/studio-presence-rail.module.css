@@ -1,0 +1,62 @@
+/* Presence rail under Presentation — Activity Bar + Communication Glow. */
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.55rem;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.glowBand {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 1.75rem;
+  pointer-events: none;
+}
+
+.glowBand::before {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0.15rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: radial-gradient(
+    ellipse at center,
+    var(--presence-glow-core, rgba(195, 208, 220, 0.28)) 0%,
+    transparent 72%
+  );
+  filter: blur(6px);
+  opacity: var(--presence-glow-strength, 0.55);
+  transition: opacity 280ms ease, background 280ms ease;
+}
+
+.glowBand[data-bias="studio"] {
+  --presence-glow-core: rgba(210, 175, 95, 0.42);
+  --presence-glow-strength: 0.85;
+}
+
+.glowBand[data-bias="customer"] {
+  --presence-glow-core: rgba(100, 175, 215, 0.4);
+  --presence-glow-strength: 0.8;
+}
+
+.glowBand[data-bias="thinking"] {
+  --presence-glow-core: rgba(150, 140, 210, 0.36);
+  --presence-glow-strength: 0.7;
+}
+
+.glowBand[data-bias="dim"] {
+  --presence-glow-core: rgba(90, 94, 100, 0.18);
+  --presence-glow-strength: 0.35;
+}
+
+.glowBand[data-bias="neutral"] {
+  --presence-glow-core: rgba(199, 166, 74, 0.28);
+  --presence-glow-strength: 0.55;
+}

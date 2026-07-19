@@ -13,7 +13,7 @@ describe("project-builder studio plan summary", () => {
   it("builds a project-level summary with concise scope lines", () => {
     const model = buildProjectBuilderStudioPlanSummary(["v2-rtu-flyer"], "update");
 
-    expect(model.routeLabel).toBe("I-285 · Update What I Already Have");
+    expect(model.routeLabel).toBe("I-285 Update · Update What I Already Have");
     expect(model.deliverables).toHaveLength(1);
     expect(model.deliverables[0]?.title).toBe("Update My Flyer");
     expect(model.deliverables[0]?.scopeSummary).toMatch(/existing single-sided flyer/i);

@@ -11,22 +11,24 @@ export const PROJECT_BUILDER_V1 = {
   pageLead: "Browse the services on your route. Learn what each includes, then add what fits your project.",
   deliverablesHeading: "Services on your route",
   summaryHeading: "Project Summary",
-  selectedCountLabel: "Deliverables",
+  selectedCountLabel: "Services",
   totalLabel: "Estimated Investment",
-  timelineNote: "Timeline reviewed before payment",
+  timelineNote: "Timeline reviewed before checkout",
   reviewStudioPlanCta: "Review Your Studio Plan",
   continueToCheckoutCta: "Continue to Checkout",
-  backToBuilderLabel: "Back to deliverables",
+  backToBuilderLabel: "Back to services",
   backToRouteMapLabel: "Back to Route Map",
   routeContextEyebrow: "Your route",
-  checkoutNotLiveNote: "",
+  checkoutNotLiveNote:
+    "Checkout in this build records your Studio Plan locally and continues you to Project Intake. Card payment processing is not connected yet.",
   emptySelectionHint:
-    "Select at least one deliverable to review your Studio Plan. Timeline is reviewed before payment.",
+    "Select at least one service to review your Studio Plan. Timeline is reviewed before checkout.",
   reviewStudioPlanReadyHint:
-    "Ready to continue? Review your selected deliverables and project total.",
+    "Ready to continue? Review your selected services and project total.",
   squishyLabel: "Squishy",
-  customerLabel: "You",
-  studioConversationLabel: "Studio Conversation",
+  customerLabel: "Example customer",
+  studioConversationLabel: "Example conversation",
+  exampleConversationEyebrow: "Example only — not your conversation",
   squishyWelcome:
     "Open any service below to see exactly what's included. Add what fits — your Project Summary updates as you go.",
   learnMoreCta: "Learn More",
@@ -40,16 +42,16 @@ export const PROJECT_BUILDER_V1 = {
   serviceTimingNote: "Estimated timing for this service",
   studioPlanHeading: "Review Your Studio Plan",
   studioPlanIntro:
-    "Review your selected deliverables before continuing to Checkout. You'll provide your project materials after payment.",
+    "Review your selected services before continuing to Checkout. You'll provide your project materials after checkout confirmation.",
   editProjectCta: "Edit Project",
   viewScopeCta: "View Scope",
-  planDeliverablesHeading: "Selected Deliverables",
+  planDeliverablesHeading: "Selected services",
   planTimelineHeading: "Estimated Timeline",
   planTimelineOverallLabel: "Overall project estimate",
-  planTimelineDeliverablesLabel: "Individual deliverables",
+  planTimelineDeliverablesLabel: "Individual services",
   planRevisionHeading: "Revision Policy",
   planRevisionSummary: [
-    "One revision round is included for each deliverable.",
+    "One revision round is included for each service.",
     "Studio mistakes are corrected at no charge.",
     "Additional requested work follows the Project Change process.",
   ] as const,
@@ -58,7 +60,7 @@ export const PROJECT_BUILDER_V1 = {
   planResponsibilitiesHeading: "We'll Need",
   planResponsibilitiesIntro:
     "You'll provide these after Checkout during Project Intake.",
-  planResponsibilitiesEmpty: "Requirements depend on the deliverables you select.",
+  planResponsibilitiesEmpty: "Requirements depend on the services you select.",
 } as const;
 
 export type ProjectBuilderConversationSpeaker = "squishy" | "customer";
@@ -68,7 +70,7 @@ export type ProjectBuilderConversationTurn = {
   text: string;
 };
 
-/** Static demo thread for layout slice — replace with live turns when conversation ships. */
+/** Static example thread for layout — not a live customer conversation. */
 export const PROJECT_BUILDER_CONVERSATION_DEMO: readonly ProjectBuilderConversationTurn[] = [
   {
     speaker: "squishy",
@@ -80,7 +82,7 @@ export const PROJECT_BUILDER_CONVERSATION_DEMO: readonly ProjectBuilderConversat
   },
   {
     speaker: "squishy",
-    text: "Got it — I'd start with a Flyer and Social Media Posts. One clear message, then visibility.",
+    text: "Got it — I'd start with Make Me a Flyer and Make My Social Media Posts. One clear message, then visibility.",
   },
   {
     speaker: "customer",

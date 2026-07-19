@@ -275,8 +275,20 @@
     font-size: 0.8125rem;
   }
 
+  /* Dev-only strip; Sign out lives in .sb-nav (slot under Help Center). */
   .sb-sidebar-lower {
     display: none;
+  }
+
+  .sb-nav .sb-sign-out {
+    display: inline-flex;
+    flex: 1 1 calc(50% - 0.25rem);
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    margin: 0;
+    min-height: 2.75rem;
+    white-space: nowrap;
   }
 
   .sb-board-layout {

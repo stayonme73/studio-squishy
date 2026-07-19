@@ -17,6 +17,8 @@
   --type-page-title: clamp(1.75rem, 3vw, 2.25rem);
   --type-page-lead: 1.0625rem;
   --type-section-title: clamp(1.125rem, 2vw, 1.25rem);
+  --type-section-title-weight: 800;
+  --type-section-title-spacing: 0.04em;
   --type-panel-title: 1.25rem;
   --type-service-name: 1.0625rem;
   --type-price-inline: 1.0625rem;
@@ -319,12 +321,27 @@
 }
 
 .utility-card__title {
-  margin: 0 0 0.85rem;
+  margin: 0.35rem 0 0.85rem;
+  padding-bottom: 0.45rem;
   font-size: var(--type-section-title);
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-weight: var(--type-section-title-weight);
+  letter-spacing: var(--type-section-title-spacing);
   text-transform: none;
-  color: var(--utility-text);
+  color: var(--studio-eucalyptus);
+  border-bottom: 1px solid color-mix(in srgb, var(--studio-eucalyptus) 16%, transparent);
+}
+
+/* Shared green section titles — Studio Plan, Checkout, Intake, Project Record */
+.studio-section-title {
+  margin: 0.35rem 0 0.85rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.45rem;
+  font-size: var(--type-section-title);
+  font-weight: var(--type-section-title-weight);
+  letter-spacing: var(--type-section-title-spacing);
+  line-height: 1.25;
+  color: var(--studio-eucalyptus);
+  border-bottom: 1px solid color-mix(in srgb, var(--studio-eucalyptus) 16%, transparent);
 }
 
 .utility-eyebrow {

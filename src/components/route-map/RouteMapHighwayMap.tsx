@@ -90,7 +90,7 @@ export default function RouteMapHighwayMap({
         src={hero.src}
         alt={
           isDesk
-            ? "Studio route map — framed Atlanta highway map on a creative workspace desk"
+            ? "Studio Route Map showing a city skyline, highway interchange, and four Studio route options: Get My Business Started, Promote Something Now, Update What I Already Have, and I Know What I Need."
             : "Studio route map — illustrated highway cloverleaf interchange"
         }
         draggable={false}

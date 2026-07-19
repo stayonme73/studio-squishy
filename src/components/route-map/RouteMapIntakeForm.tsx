@@ -30,6 +30,12 @@ type Props = {
   onDraftStatusChange?: (status: "unsaved" | "saved" | "error") => void;
   /** Optional inline submit failure message from the host scene. */
   submitError?: string | null;
+  /**
+   * `stacked` — Host certified form (default).
+   * `cards` — Social Posts–style numbered cards (Conversation Room tablet).
+   * Social Posts always uses its custom card UI.
+   */
+  layout?: "stacked" | "cards";
 };
 
 type ChoiceOption = {
@@ -555,6 +561,23 @@ function SocialPostsIntakeForm({
   );
 }
 
+function isSchemaFieldComplete(
+  field: RouteMapIntakeField,
+  value: string | undefined,
+): boolean {
+  if (field.role === "materials") {
+    const parsed = parseMaterialsPathAnswer(value);
+    return isMaterialsPathAnswerComplete(
+      parsed.availability,
+      parsed.detail,
+      Boolean(field.required),
+    );
+  }
+  const trimmed = String(value ?? "").trim();
+  if (field.required) return trimmed.length > 0;
+  return trimmed.length > 0;
+}
+
 export default function RouteMapIntakeForm({
   job,
   initialDraftAnswers = null,
@@ -562,6 +585,7 @@ export default function RouteMapIntakeForm({
   onSubmit,
   onDraftStatusChange,
   submitError = null,
+  layout = "stacked",
 }: Props) {
   const schema = useMemo(
     () => getRouteMapIntakeSchema(job.intakeType),
@@ -581,6 +605,15 @@ export default function RouteMapIntakeForm({
       Boolean(field.required),
     );
   });
+
+  const requiredFieldsComplete = schema.fields.every((field) => {
+    if (!field.required) return true;
+    return isSchemaFieldComplete(field, answers[field.id]);
+  });
+
+  const completedSectionCount = schema.fields.filter((field) =>
+    isSchemaFieldComplete(field, answers[field.id]),
+  ).length;
 
   function markUnsaved() {
     onDraftStatusChange?.("unsaved");
@@ -616,7 +649,7 @@ export default function RouteMapIntakeForm({
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!materialsFieldsComplete) return;
+    if (!materialsFieldsComplete || !requiredFieldsComplete) return;
     setSubmitting(true);
     const ok = onSubmit(answers);
     if (!ok) setSubmitting(false);
@@ -632,6 +665,182 @@ export default function RouteMapIntakeForm({
         onDraftStatusChange={onDraftStatusChange}
         submitError={submitError}
       />
+    );
+  }
+
+  if (layout === "cards") {
+    return (
+      <section className="route-map-social-intake" aria-labelledby="route-map-intake-title">
+        <div className="route-map-social-intake__header">
+          <div>
+            <p className="route-map-social-intake__eyebrow">
+              Project Intake · {job.name}
+            </p>
+            <h2 id="route-map-intake-title" className="route-map-social-intake__title">
+              {schema.title.replace(/\s*Intake\s*$/i, "").trim() || schema.title}{" "}
+              materials
+            </h2>
+            <p className="route-map-social-intake__lead">
+              {schema.lead} Submitting Project Intake does not start production.
+              {schema.clientResponsibilityNote
+                ? ` ${schema.clientResponsibilityNote}`
+                : ""}
+            </p>
+          </div>
+          <div className="route-map-social-intake__progress" aria-live="polite">
+            <strong>
+              {completedSectionCount} of {schema.fields.length}
+            </strong>
+            <span>sections ready to submit</span>
+          </div>
+        </div>
+
+        <form className="route-map-social-intake__form" onSubmit={handleSubmit}>
+          {schema.fields.map((field, index) => {
+            const step = index + 1;
+            const requiredMark = field.required ? (
+              <span className="route-map-intake__req">Required</span>
+            ) : (
+              <span className="route-map-intake__opt">Optional</span>
+            );
+
+            if (field.role === "materials") {
+              const parsed = parseMaterialsPathAnswer(answers[field.id]);
+              const describeOpen = parsed.availability === INTAKE_MATERIALS_HAVE_NOW;
+              return (
+                <article
+                  key={field.id}
+                  className="route-map-social-intake__card route-map-social-intake__card--materials"
+                >
+                  <p className="route-map-social-intake__step">{step}</p>
+                  <div className="route-map-social-intake__card-copy">
+                    <h3>
+                      {field.label} {requiredMark}
+                    </h3>
+                    <p>
+                      {field.hint ??
+                        "Describe the materials you have, note a file name, or share a link. Not having brand files yet will not block you from continuing."}
+                    </p>
+                  </div>
+                  <ChoiceBubbles
+                    options={INTAKE_MATERIALS_AVAILABILITY_OPTIONS.map((label) => ({
+                      label,
+                    }))}
+                    value={parsed.availability}
+                    onSelect={(label) => handleMaterialsAvailability(field, label)}
+                  />
+                  {describeOpen ? (
+                    <label className="route-map-social-intake__compact-field">
+                      <span>Describe filenames, links, colors, or references</span>
+                      <textarea
+                        required={Boolean(field.required)}
+                        rows={3}
+                        placeholder={field.placeholder}
+                        value={parsed.detail}
+                        onChange={(event) =>
+                          handleMaterialsDetail(field, event.target.value)
+                        }
+                      />
+                    </label>
+                  ) : null}
+                </article>
+              );
+            }
+
+            if (field.type === "select") {
+              return (
+                <article
+                  key={field.id}
+                  className="route-map-social-intake__card"
+                >
+                  <p className="route-map-social-intake__step">{step}</p>
+                  <div className="route-map-social-intake__card-copy">
+                    <h3>
+                      {field.label} {requiredMark}
+                    </h3>
+                    {field.hint ? <p>{field.hint}</p> : null}
+                  </div>
+                  <ChoiceBubbles
+                    options={(field.options ?? []).map((label) => ({ label }))}
+                    value={answers[field.id] ?? ""}
+                    onSelect={(label) => handleChange(field.id, label)}
+                  />
+                </article>
+              );
+            }
+
+            return (
+              <article key={field.id} className="route-map-social-intake__card">
+                <p className="route-map-social-intake__step">{step}</p>
+                <div className="route-map-social-intake__card-copy">
+                  <h3>
+                    {field.label} {requiredMark}
+                  </h3>
+                  {field.hint ? <p>{field.hint}</p> : null}
+                </div>
+                <label className="route-map-social-intake__compact-field">
+                  <span className="sr-only">{field.label}</span>
+                  {field.type === "textarea" ? (
+                    <textarea
+                      required={field.required}
+                      rows={4}
+                      placeholder={field.placeholder}
+                      value={answers[field.id] ?? ""}
+                      onChange={(event) =>
+                        handleChange(field.id, event.target.value)
+                      }
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      required={field.required}
+                      placeholder={field.placeholder}
+                      value={answers[field.id] ?? ""}
+                      onChange={(event) =>
+                        handleChange(field.id, event.target.value)
+                      }
+                    />
+                  )}
+                </label>
+              </article>
+            );
+          })}
+
+          <div className="route-map-social-intake__actions">
+            <div className="route-map-social-intake__next-step">
+              <strong>Next Step</strong>
+              <span>Save your progress or continue to your Studio Board Overview.</span>
+            </div>
+            <button
+              type="button"
+              className="route-map-secondary-btn"
+              onClick={handleSaveDraft}
+              disabled={submitting}
+            >
+              SAVE DRAFT
+            </button>
+            <button
+              type="submit"
+              className="route-map-primary-btn"
+              disabled={
+                submitting || !materialsFieldsComplete || !requiredFieldsComplete
+              }
+            >
+              SAVE &amp; CONTINUE TO YOUR STUDIO BOARD
+            </button>
+          </div>
+          {submitError ? (
+            <p className="route-map-social-intake__submit-error" role="alert">
+              {submitError}
+            </p>
+          ) : null}
+        </form>
+        <p className="route-map-social-intake__next">
+          Next: your Studio Board Overview opens with this job and the details you
+          shared. Submitting Project Intake does not start production.
+        </p>
+        <p className="route-map-social-intake__job">{job.name}</p>
+      </section>
     );
   }
 

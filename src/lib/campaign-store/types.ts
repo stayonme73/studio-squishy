@@ -2,6 +2,16 @@ import type { CampaignRecord } from "@/config/studio-board";
 
 export type StudioRole = "owner" | "staff" | "client";
 
+/**
+ * Seed / account classification — production may only bootstrap staff.
+ * Public customers use account creation (`customer`).
+ */
+export type StudioUserAccountClass =
+  | "staff"
+  | "test"
+  | "migration-only"
+  | "customer";
+
 export type StudioUser = {
   id: string;
   email: string;
@@ -11,11 +21,24 @@ export type StudioUser = {
   currentCampaignId?: string;
   /** Durable client ownership — every campaign this client account may open. */
   clientCampaignIds?: readonly string[];
+  accountClass?: StudioUserAccountClass;
+  /**
+   * Set by Email Verification package. Soft at signup; hard before Board claim.
+   * Absent / null means not verified yet.
+   */
+  emailVerifiedAt?: string | null;
 };
 
 export type StudioUserRecord = StudioUser & {
-  /** Dev-only plaintext password — not for production. */
-  password: string;
+  /**
+   * One-way password hash (`scrypt$…`). Required for new accounts.
+   */
+  passwordHash?: string;
+  /**
+   * Legacy plaintext — development seed migration only.
+   * Never accept for authentication in production.
+   */
+  password?: string;
 };
 
 export type ServerCampaignEnvelope = {

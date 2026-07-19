@@ -4,14 +4,16 @@
     "email": "tagia@local.dev",
     "password": "dev-only",
     "displayName": "Tagia",
-    "roles": ["owner", "client"]
+    "roles": ["owner", "client"],
+    "accountClass": "staff"
   },
   {
     "id": "staff-dev",
     "email": "staff@local.dev",
     "password": "dev-only",
     "displayName": "Staff Dev",
-    "roles": ["staff"]
+    "roles": ["staff"],
+    "accountClass": "staff"
   },
   {
     "id": "client-a",
@@ -19,6 +21,7 @@
     "password": "dev-only",
     "displayName": "Client A",
     "roles": ["client"],
+    "accountClass": "test",
     "clientCampaignIds": []
   },
   {
@@ -27,6 +30,7 @@
     "password": "dev-only",
     "displayName": "Client B",
     "roles": ["client"],
+    "accountClass": "test",
     "clientCampaignIds": []
   }
 ]

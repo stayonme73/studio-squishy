@@ -1,0 +1,1380 @@
+.sheet {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  color: rgba(247, 244, 238, 0.96);
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.78);
+}
+
+.title {
+  margin: 0.35rem 0 0;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.closeBtn {
+  appearance: none;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(180, 195, 210, 0.35);
+  background: rgba(14, 17, 22, 0.45);
+  color: rgba(247, 244, 238, 0.92);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.intro {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: rgba(236, 232, 224, 0.88);
+}
+
+.mapThumb,
+.mapThumbCompact {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 5.5rem;
+  border-radius: 0.65rem;
+  overflow: hidden;
+  border: 1px solid rgba(180, 195, 210, 0.22);
+  background: #1a1f28;
+}
+
+.mapThumbCompact {
+  height: 4.25rem;
+}
+
+.mapFigure {
+  flex: 0 0 auto;
+  margin: 0;
+  width: 100%;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  border: 1px solid rgba(180, 195, 210, 0.28);
+  background: #12161c;
+  aspect-ratio: 1586 / 992;
+  max-height: min(14.5rem, 32vh);
+}
+
+.mapHeroImg,
+.mapThumbImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  opacity: 0.95;
+}
+
+.mapHeroImg {
+  object-fit: contain;
+  background: #0e1218;
+}
+
+/*
+ * Tablet route stage — map is the hero; lanes in a 2×2 grid.
+ * Letterbox / empty bands use Studio charcoal so they read as room, not UI chrome.
+ */
+.sheet[data-surface="tablet"] {
+  --studio-fill: #12161c;
+  gap: 0.35rem;
+  height: 100%;
+  min-height: 0;
+  background: var(--studio-fill);
+}
+
+.sheet[data-surface="tablet"] .header {
+  flex: 0 0 auto;
+  gap: 0.35rem;
+}
+
+.sheet[data-surface="tablet"] .eyebrow {
+  font-size: 0.92rem;
+  letter-spacing: 0.14em;
+}
+
+.sheet[data-surface="tablet"] .title {
+  margin-top: 0.2rem;
+  font-size: clamp(1.55rem, 5cqi, 1.95rem);
+  line-height: 1.15;
+}
+
+.sheet[data-surface="tablet"] .intro {
+  flex: 0 0 auto;
+  margin: 0.25rem 0 0;
+  font-size: clamp(1.02rem, 2.8cqi, 1.18rem);
+  line-height: 1.35;
+  color: rgba(236, 232, 224, 0.92);
+}
+
+.sheet[data-surface="tablet"] .helpLine {
+  flex: 0 0 auto;
+  order: 3;
+  font-size: clamp(1rem, 2.6cqi, 1.12rem);
+  line-height: 1.4;
+}
+
+.sheet[data-surface="tablet"] .helpPrompt {
+  font-size: inherit;
+}
+
+.sheet[data-surface="tablet"] .mapFigure {
+  flex: 1.35 1 0;
+  order: 2;
+  aspect-ratio: auto;
+  max-height: none;
+  min-height: 0;
+  margin-top: 0;
+  border: none;
+  border-radius: 0.55rem;
+  background: var(--studio-fill);
+}
+
+.sheet[data-surface="tablet"] .mapHeroImg {
+  object-fit: contain;
+  object-position: center center;
+  background: var(--studio-fill);
+}
+
+.sheet[data-surface="tablet"] .routeList {
+  flex: 0 1 auto;
+  order: 4;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  overflow: auto;
+  max-height: 46%;
+  min-height: 9.5rem;
+  background: var(--studio-fill);
+}
+
+.sheet[data-surface="tablet"] .routeExpand {
+  flex: none;
+  min-height: 0;
+  height: auto;
+  border: none;
+  border-radius: 0.6rem;
+  background: rgba(28, 34, 44, 0.88);
+}
+
+.sheet[data-surface="tablet"] .routeExpand[data-expanded="true"] {
+  grid-column: 1 / -1;
+  max-height: min(15rem, 40%);
+  overflow: auto;
+  box-shadow: inset 0 0 0 1px rgba(210, 175, 95, 0.4);
+}
+
+.sheet[data-surface="tablet"] .routeCard {
+  min-height: 0;
+  height: auto;
+  align-items: flex-start;
+  padding: 0.85rem 0.9rem;
+  gap: 0.65rem;
+  grid-template-columns: auto 1fr auto;
+  background: transparent;
+}
+
+.sheet[data-surface="tablet"] .routeCard:hover {
+  background: rgba(36, 42, 54, 0.7);
+}
+
+.sheet[data-surface="tablet"] .routeLabel {
+  font-size: clamp(1.02rem, 2.8cqi, 1.15rem);
+  line-height: 1.2;
+}
+
+.sheet[data-surface="tablet"] .routeTagline {
+  font-size: clamp(0.88rem, 2.2cqi, 0.98rem);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sheet[data-surface="tablet"] .routeHighway {
+  min-width: 3.1rem;
+  padding: 0.3rem 0.35rem;
+  font-size: 0.7rem;
+}
+
+.sheet[data-surface="tablet"] .routeArrow {
+  font-size: 1.05rem;
+}
+
+.sheet[data-surface="tablet"] .routeExpandBody {
+  padding: 0 0.9rem 0.85rem;
+}
+
+.sheet[data-surface="tablet"] .routeChooseBtn {
+  padding: 0.6rem 0.85rem;
+  font-size: 0.98rem;
+}
+
+.routeExpand {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.75rem;
+  border: none;
+  background: rgba(28, 34, 44, 0.92);
+  overflow: hidden;
+}
+
+.routeExpand[data-expanded="true"] {
+  box-shadow: inset 0 0 0 1px rgba(210, 175, 95, 0.4);
+}
+
+.routeExpand[data-recommended="true"] {
+  box-shadow: inset 0 0 0 1px rgba(210, 175, 95, 0.55);
+  background: rgba(210, 175, 95, 0.08);
+}
+
+.routeExpand[data-recommended="true"][data-expanded="true"] {
+  box-shadow: inset 0 0 0 1.5px rgba(210, 175, 95, 0.75);
+}
+
+.routeRecommendedBadge {
+  display: inline-flex;
+  align-self: flex-start;
+  margin: 0 0 0.15rem;
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(210, 175, 95, 0.45);
+  background: rgba(210, 175, 95, 0.18);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(236, 220, 180, 0.98);
+}
+
+.routeConfirmRow {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: stretch;
+  padding-top: 0.35rem;
+}
+
+.routeConfirmRow .primary {
+  width: 100%;
+  padding: 0.8rem 1.1rem;
+  font-size: 1.02rem;
+  border-radius: 0.7rem;
+}
+
+.routeConfirmRow .primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.routeExpand .routeCard {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.routeExpand .routeCard:hover {
+  background: rgba(36, 42, 54, 0.96);
+}
+
+.routeExpandBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0 0.9rem 0.9rem;
+  border-top: 1px solid rgba(180, 195, 210, 0.18);
+}
+
+.sheet[data-panel="route-peek"] .routeHighway {
+  display: inline-block;
+  margin: 0 0 0.45rem;
+}
+
+.sheet[data-panel="route-peek"] .routeJobPeek {
+  flex: 1 1 auto;
+  overflow: auto;
+  min-height: 0;
+}
+
+.sheet[data-panel="route-peek"] .actions {
+  margin-top: auto;
+}
+
+.routeExpandHeading {
+  margin: 0.65rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.78);
+}
+
+.routeExpandEmpty {
+  margin: 0.55rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: rgba(210, 206, 198, 0.8);
+}
+
+.routeJobPeek {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.routeJobPeek li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: rgba(236, 232, 224, 0.9);
+}
+
+.routeJobPrice {
+  flex: 0 0 auto;
+  font-weight: 700;
+  color: rgba(210, 175, 95, 0.95);
+  white-space: nowrap;
+}
+
+.routeChooseBtn {
+  appearance: none;
+  align-self: stretch;
+  margin: 0.15rem 0 0;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(210, 175, 95, 0.55);
+  background: rgba(210, 175, 95, 0.22);
+  color: rgba(247, 236, 210, 0.98);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.routeChooseBtn:hover {
+  background: rgba(210, 175, 95, 0.32);
+}
+
+.helpLine {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: rgba(220, 216, 208, 0.82);
+}
+
+.helpPrompt {
+  font-weight: 650;
+  color: rgba(236, 232, 224, 0.94);
+}
+
+.routeList,
+.jobList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.routeCard {
+  appearance: none;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.7rem;
+  border: none;
+  background: rgba(28, 34, 44, 0.92);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.routeCard:hover {
+  background: rgba(36, 42, 54, 0.96);
+}
+
+.routeHighway {
+  flex: 0 0 auto;
+  min-width: 3.4rem;
+  padding: 0.28rem 0.4rem;
+  border-radius: 0.35rem;
+  background: rgba(210, 175, 95, 0.16);
+  border: 1px solid rgba(210, 175, 95, 0.35);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: rgba(236, 220, 180, 0.95);
+}
+
+.routeBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.routeLabel {
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgba(247, 244, 238, 0.96);
+}
+
+.routeTagline {
+  font-size: 0.88rem;
+  line-height: 1.35;
+  color: rgba(210, 206, 198, 0.78);
+}
+
+.routeArrow {
+  font-size: 1.1rem;
+  color: rgba(210, 175, 95, 0.85);
+}
+
+.backLink {
+  appearance: none;
+  align-self: flex-start;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: rgba(210, 175, 95, 0.92);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.builderToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex: 0 0 auto;
+}
+
+.builderSummaryStack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+}
+
+.builderSummary {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: rgba(210, 175, 95, 0.95);
+  text-align: right;
+}
+
+.jobCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(180, 195, 210, 0.28);
+  background: rgba(28, 34, 44, 0.92);
+}
+
+.jobCard[data-selected="true"] {
+  border-color: rgba(210, 175, 95, 0.55);
+  background: rgba(42, 48, 58, 0.98);
+}
+
+.jobTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.jobName {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.jobPrice,
+.jobPriceLarge {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 750;
+  color: rgba(210, 175, 95, 0.95);
+  white-space: nowrap;
+}
+
+.jobPriceLarge {
+  font-size: 1.35rem;
+}
+
+.jobPurpose {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: rgba(210, 206, 198, 0.8);
+}
+
+.jobActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin-top: 0.2rem;
+}
+
+.learnLink {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: rgba(160, 195, 220, 0.95);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.addBtn,
+.removeBtn,
+.primary,
+.secondary {
+  appearance: none;
+  margin: 0;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Build Your Project — readable cards that use the panel. */
+.sheet[data-panel="builder"] {
+  gap: 0.85rem;
+  height: 100%;
+  min-height: 0;
+}
+
+.sheet[data-panel="builder"] .title {
+  font-size: clamp(1.55rem, 3.5vw, 1.9rem);
+}
+
+.sheet[data-panel="builder"] .intro {
+  font-size: 1.12rem;
+  line-height: 1.45;
+}
+
+.sheet[data-panel="builder"] .eyebrow {
+  font-size: 0.85rem;
+}
+
+.sheet[data-panel="builder"] .backLink {
+  font-size: 1.05rem;
+}
+
+.sheet[data-panel="builder"] .jobList {
+  gap: 0.75rem;
+}
+
+.sheet[data-panel="builder"] .jobCard {
+  gap: 0.65rem;
+  padding: 1.1rem 1.15rem;
+  border-radius: 0.85rem;
+}
+
+.sheet[data-panel="builder"] .jobName {
+  font-size: clamp(1.15rem, 2.4vw, 1.35rem);
+  line-height: 1.25;
+}
+
+.sheet[data-panel="builder"] .jobPrice {
+  font-size: clamp(1.15rem, 2.4vw, 1.35rem);
+}
+
+.sheet[data-panel="builder"] .jobPurpose {
+  font-size: clamp(1.02rem, 2vw, 1.12rem);
+  line-height: 1.45;
+  color: rgba(226, 222, 214, 0.9);
+}
+
+.sheet[data-panel="builder"] .learnLink {
+  font-size: 1.05rem;
+}
+
+.sheet[data-panel="builder"] .addBtn,
+.sheet[data-panel="builder"] .removeBtn {
+  padding: 0.65rem 1.1rem;
+  font-size: 1rem;
+}
+
+.expandToggle {
+  appearance: none;
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.15rem 0;
+  border: none;
+  background: none;
+  color: rgba(160, 195, 220, 0.95);
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.jobExpand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(180, 195, 210, 0.22);
+  background: rgba(14, 17, 22, 0.45);
+}
+
+.jobBestFor {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.4;
+  color: rgba(226, 222, 214, 0.9);
+}
+
+.jobBestForLabel {
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  color: rgba(210, 175, 95, 0.9);
+}
+
+.jobExpandHeading {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.85);
+}
+
+.jobExpandList {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.98rem;
+  line-height: 1.4;
+  color: rgba(226, 222, 214, 0.9);
+}
+
+.sheet[data-panel="learnMore"] {
+  height: 100%;
+  min-height: 0;
+  gap: 0.65rem;
+}
+
+.sheet[data-panel="learnMore"] .eyebrow {
+  font-size: 0.9rem;
+}
+
+.sheet[data-panel="learnMore"] .title {
+  font-size: clamp(1.7rem, 3.4vw, 2.15rem);
+}
+
+.sheet[data-panel="learnMore"] .closeBtn {
+  font-size: 0.95rem;
+  padding: 0.55rem 0.85rem;
+}
+
+.sheet[data-panel="learnMore"] .backLink {
+  flex: 0 0 auto;
+  font-size: 1.12rem;
+}
+
+.sheet[data-panel="learnMore"] .jobPriceLarge {
+  font-size: clamp(1.55rem, 3vw, 1.9rem);
+}
+
+.sheet[data-panel="learnMore"] .actions {
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(180, 195, 210, 0.22);
+}
+
+.sheet[data-panel="learnMore"] .primary,
+.sheet[data-panel="learnMore"] .secondary {
+  padding: 0.75rem 1.25rem;
+  font-size: 1.08rem;
+}
+
+/* Frozen chrome — title, Best For, price stay put. */
+.learnMorePinned {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  flex: 0 0 auto;
+}
+
+/* Only the detail cards scroll. */
+.learnMoreScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-right: 0.25rem;
+}
+
+.learnMoreMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+}
+
+.bestFor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.bestForLabel {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.92);
+}
+
+.bestForText {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  color: rgba(247, 244, 238, 0.96);
+}
+
+.scopeNote {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: rgba(220, 216, 208, 0.86);
+}
+
+.learnMoreDoc {
+  flex: 0 0 auto;
+  padding: 1rem 1.1rem;
+  border-radius: 0.85rem;
+  background: #faf6ef;
+  border: 1px solid rgba(138, 123, 104, 0.22);
+}
+
+/* Larger detail copy inside the Conversation Room Learn More panel. */
+.learnMoreDoc :global(.pb-drawer-details) {
+  gap: 0.9rem;
+}
+
+.learnMoreDoc :global(.pb-drawer-details__card) {
+  padding: 1.05rem 1.15rem;
+}
+
+.learnMoreDoc :global(.pb-drawer-details__heading) {
+  font-size: 0.95rem;
+  margin-bottom: 0.65rem;
+}
+
+.learnMoreDoc :global(.pb-drawer-details__prose),
+.learnMoreDoc :global(.pb-drawer-details__list li) {
+  font-size: 1.12rem;
+  line-height: 1.55;
+}
+
+.learnMoreDoc :global(.pb-drawer-details__icon) {
+  font-size: 1.1rem;
+}
+
+.builderFooter {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(180, 195, 210, 0.22);
+}
+
+.builderFooter .primary {
+  padding: 0.75rem 1.25rem;
+  font-size: 1.05rem;
+}
+
+/* Studio Plan — short summary first; details expand below. */
+.sheet[data-panel="plan"] {
+  height: 100%;
+  min-height: 0;
+  gap: 0.65rem;
+}
+
+.sheet[data-panel="plan"] .title {
+  font-size: clamp(1.7rem, 3.4vw, 2.15rem);
+}
+
+.sheet[data-panel="plan"] .intro {
+  font-size: 1.15rem;
+  line-height: 1.45;
+}
+
+.planPinned {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  flex: 0 0 auto;
+}
+
+.planChecklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.planChecklist li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(180, 195, 210, 0.28);
+  background: rgba(28, 34, 44, 0.92);
+}
+
+.planCheckMark {
+  font-size: 1.15rem;
+  font-weight: 750;
+  color: rgba(210, 175, 95, 0.95);
+  line-height: 1.3;
+}
+
+.planCheckLabel {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.88);
+}
+
+.planCheckValue {
+  margin: 0.2rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: rgba(247, 244, 238, 0.96);
+}
+
+.planTimelineNote {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.45;
+  color: rgba(220, 216, 208, 0.86);
+}
+
+.planDetailsToggle {
+  appearance: none;
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.35rem 0;
+  border: none;
+  background: none;
+  color: rgba(160, 195, 220, 0.98);
+  font: inherit;
+  font-size: 1.08rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.planDetailsScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.planExtrasDoc {
+  padding: 0.15rem 0.05rem 0.5rem;
+  color: rgba(247, 244, 238, 0.96);
+}
+
+.planExtrasDoc :global(.pb-plan-summary) {
+  gap: 0.85rem;
+}
+
+.planExtrasDoc :global(.pb-plan-summary__card) {
+  padding: 1.1rem 1.15rem;
+  background: rgba(28, 34, 44, 0.94);
+  border: 1px solid rgba(180, 195, 210, 0.28);
+  box-shadow: none;
+}
+
+.planExtrasDoc :global(.pb-plan-summary__heading) {
+  font-size: 1.05rem;
+  color: rgba(210, 175, 95, 0.92);
+}
+
+.planExtrasDoc :global(.pb-plan-summary__deliverable-title),
+.planExtrasDoc :global(.pb-plan-summary__prose) {
+  font-size: 1.2rem;
+  line-height: 1.4;
+  color: rgba(247, 244, 238, 0.96);
+}
+
+.planExtrasDoc :global(.pb-plan-summary__deliverable-price) {
+  font-size: 1.2rem;
+  color: rgba(210, 175, 95, 0.95);
+}
+
+.planExtrasDoc :global(.pb-plan-summary__deliverable-scope),
+.planExtrasDoc :global(.pb-plan-summary__list li),
+.planExtrasDoc :global(.pb-plan-summary__muted) {
+  font-size: 1.1rem;
+  line-height: 1.45;
+  color: rgba(220, 216, 208, 0.9);
+}
+
+.planExtrasDoc :global(.pb-plan-summary__view-scope),
+.planExtrasDoc :global(.pb-plan-summary__policy-toggle) {
+  font-size: 1.1rem;
+  color: rgba(160, 195, 220, 0.98);
+}
+
+.sheet[data-panel="plan"] .intro {
+  font-size: 1.15rem;
+  line-height: 1.45;
+}
+
+.sheet[data-panel="plan"] .title {
+  font-size: clamp(1.55rem, 3.2vw, 1.9rem);
+}
+
+.sheet[data-panel="checkout"] {
+  gap: 0.75rem;
+}
+
+.sheet[data-panel="checkout"] .title {
+  font-size: clamp(1.55rem, 3.2vw, 1.9rem);
+}
+
+.sheet[data-panel="checkout"] .intro {
+  font-size: 1.12rem;
+  line-height: 1.45;
+}
+
+.checkoutRouteLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(180, 195, 210, 0.28);
+  background: rgba(28, 34, 44, 0.94);
+}
+
+.checkoutRouteEyebrow {
+  font-size: 0.85rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.92);
+}
+
+.checkoutRouteValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: rgba(247, 244, 238, 0.98);
+}
+
+.checkoutScopeDisclosure {
+  margin: 0;
+  padding: 0.85rem 0.95rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(210, 175, 95, 0.35);
+  background: rgba(210, 175, 95, 0.12);
+  font-size: 1.12rem;
+  line-height: 1.45;
+  color: rgba(247, 236, 210, 0.96);
+}
+
+.checkoutHostSurface {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.85rem 0.9rem 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(138, 123, 104, 0.28);
+  background: #faf6ef;
+  color: #2f3437;
+}
+
+.checkoutHostSurface :global(.pay-shell) {
+  width: 100%;
+}
+
+.checkoutHonestyNote {
+  margin: 0.85rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: rgba(70, 74, 78, 0.88);
+}
+
+.sheet[data-panel="intake"] {
+  gap: 0.65rem;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.sheet[data-panel="intake"] .title {
+  font-size: clamp(1.35rem, 2.8vw, 1.65rem);
+}
+
+.sheet[data-panel="intake"] .intro {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.intakeGateLead {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.45;
+  color: rgba(220, 216, 208, 0.9);
+}
+
+.intakeMaterialsNote {
+  margin: 0;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(210, 175, 95, 0.35);
+  background: rgba(210, 175, 95, 0.12);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: rgba(247, 236, 210, 0.96);
+}
+
+.intakeDraftStatus {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: rgba(160, 195, 220, 0.95);
+}
+
+.intakeHostSurface {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0.75rem 0.8rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(138, 123, 104, 0.28);
+  background: #faf6ef;
+  color: #2f3437;
+}
+
+.intakeHostSurface :global(.route-map-intake),
+.intakeHostSurface :global(.route-map-social-intake) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__header) {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.65rem;
+  margin-bottom: 0.65rem;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__eyebrow) {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__title) {
+  font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+  line-height: 1.15;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__lead) {
+  max-width: none;
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__progress) {
+  justify-self: start;
+  padding: 0.55rem 0.7rem;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__progress strong) {
+  font-size: 1.05rem;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__progress span) {
+  font-size: 0.82rem;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__form) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__card) {
+  box-sizing: border-box;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.55rem 0.7rem;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.75rem 0.8rem;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__step) {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.85rem;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__card-copy h3) {
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__card-copy p) {
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__chips) {
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__chip) {
+  max-width: 100%;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.88rem;
+  line-height: 1.3;
+  white-space: normal;
+  text-align: left;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__compact-field) {
+  min-width: 0;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__compact-field input),
+.intakeHostSurface :global(.route-map-social-intake__compact-field textarea) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  font-size: 0.95rem;
+}
+
+.intakeHostSurface :global(.route-map-intake__req),
+.intakeHostSurface :global(.route-map-intake__opt) {
+  font-size: 0.7rem;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__actions) {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.65rem 0 0.15rem;
+  background: linear-gradient(
+    to top,
+    #faf6ef 70%,
+    color-mix(in srgb, #faf6ef 70%, transparent)
+  );
+}
+
+.intakeHostSurface :global(.route-map-social-intake__next-step) {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__next-step strong) {
+  font-size: 0.92rem;
+}
+
+.intakeHostSurface :global(.route-map-social-intake__next-step span) {
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.intakeHostSurface :global(.route-map-secondary-btn),
+.intakeHostSurface :global(.route-map-primary-btn) {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.88rem;
+  line-height: 1.25;
+  white-space: normal;
+  text-align: center;
+}
+
+.intakeSectionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.intakeSectionHeading {
+  margin: 0.25rem 0 0;
+  font-size: 1.02rem;
+  font-weight: 750;
+  color: #2f5d4a;
+}
+
+.intakeSectionLead {
+  margin: 0;
+  font-size: 0.88rem;
+  color: rgba(70, 74, 78, 0.88);
+}
+
+.planError {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.4;
+  color: rgba(240, 180, 160, 0.96);
+}
+
+.planActions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: auto;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(180, 195, 210, 0.22);
+}
+
+.planActions .primary,
+.planActions .secondary {
+  padding: 0.75rem 1.25rem;
+  font-size: 1.05rem;
+}
+
+.planActions .primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.addBtn,
+.primary {
+  border: 1px solid rgba(210, 175, 95, 0.55);
+  background: rgba(210, 175, 95, 0.22);
+  color: rgba(247, 236, 210, 0.98);
+}
+
+.removeBtn,
+.secondary {
+  border: 1px solid rgba(180, 195, 210, 0.35);
+  background: rgba(14, 17, 22, 0.4);
+  color: rgba(236, 232, 224, 0.9);
+}
+
+.detailBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.detailHeading {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.78);
+}
+
+.detailList {
+  margin: 0;
+  padding-left: 1.15rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: rgba(236, 232, 224, 0.88);
+}
+
+.detailText {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: rgba(236, 232, 224, 0.88);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: auto;
+  padding-top: 0.35rem;
+}

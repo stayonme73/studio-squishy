@@ -5,11 +5,11 @@ import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
 
 export const payment = {
   brand: "THE STUDIO",
-  /** Customer-facing page title — not the journey step name. */
-  pageTitle: "Review & Checkout",
+  /** Customer-facing page title — honest for non-live card processing. */
+  pageTitle: "Review and Confirm",
   pageLeadLines: [
-    "You're almost there — complete your secure payment below.",
-    "Project Intake opens immediately after payment so you can share the details and materials The Studio needs for your job.",
+    "Review your Studio Plan, then confirm to continue.",
+    "This build records your plan locally so Project Intake can open next. Card payment processing is not connected yet.",
   ] as const,
   backToStudioPlanLabel: "← Back to Studio Plan",
   editProjectLabel: "Edit Project",
@@ -17,20 +17,20 @@ export const payment = {
   title: customerJourneyStepName("secure-checkout"),
   sections: {
     summary: "Your Studio Plan",
-    deliverables: "Selected Deliverables",
-    billing: "Billing Information",
-    payment: "Payment Information",
+    deliverables: "Selected services",
+    billing: "Contact Information",
+    payment: "Checkout details",
     next: "What Happens Next",
     /** @deprecated use billing + payment */
-    form: "Secure Payment",
+    form: "Checkout",
   },
   summary: {
-    recommendedServicesLabel: "Selected Deliverables",
+    recommendedServicesLabel: "Selected services",
     oneTimeSubtotalLabel: "One-Time Subtotal",
     monthlySubtotalLabel: "Monthly Subtotal",
     amountDueTodayLabel: "Estimated Investment",
     cardProcessingDisclosureNote:
-      "Taxes and standard processing costs are included in your total.",
+      "Estimated Investment reflects your selected services. Live card processing is not connected in this build.",
     investmentLabel: "Estimated Investment",
     monthlyTotalLabel: "Monthly Total",
     includesLabel: "Includes:",
@@ -46,41 +46,43 @@ export const payment = {
     expDate: "Exp Date",
     cvv: "CVV",
     zipCode: "ZIP Code",
-    acknowledgmentHeading: "Before you pay",
+    acknowledgmentHeading: "Before you continue",
     acknowledgmentBody: [
       "Please confirm that you reviewed your Studio Plan, including what is included, pricing, timing, and what you are responsible for.",
       "The Studio creates the approved marketing work. Results such as sales, leads, and bookings are not guaranteed.",
     ] as const,
     termsLabel:
-      "I reviewed my Studio Plan and understand that payment and Project Intake are required before work can move forward.",
+      "I reviewed my Studio Plan and understand that confirming checkout and completing Project Intake are required before work can move forward.",
     viewPlanDetailsLabel: "View your selected plan details above",
-    submitLabel: "Complete Secure Payment",
+    submitLabel: "Confirm and continue to Project Intake",
     paymentSecurityNote:
-      "Your payment is encrypted and processed securely. The Studio does not store your payment information.",
-    paymentReassurance: "Your payment is encrypted and processed securely.",
+      "This checkout step records your Studio Plan on this device so you can continue to Project Intake. Card payment processing is not connected in this build.",
+    paymentReassurance:
+      "Card payment processing is not connected in this build. Confirming continues you to Project Intake.",
   },
   /** Local dev or NEXT_PUBLIC_PAYMENT_SANDBOX=1 (Vercel Preview only — not Production). */
   sandbox: {
     label: "Developer Sandbox",
-    hint: "Simulates a successful payment for journey testing. No card is charged.",
-    buttonLabel: "Test Payment",
+    hint: "Simulates a successful checkout for journey testing. No card is charged.",
+    buttonLabel: "Test continue to Project Intake",
     badge: "Test only",
   },
   whatsNext: {
     steps: [
-      { label: "Payment confirmed", marker: "number" },
+      { label: "Checkout confirmed", marker: "number" },
       { label: "Project Intake opens", marker: "number" },
       { label: "You provide your materials", marker: "number" },
       { label: "Required information is reviewed", marker: "number" },
       { label: "You'll review the work", marker: "number" },
       { label: "Final delivery", marker: "number" },
     ] as const,
-    emailReassurance: "We'll email you each time your project reaches a new stage.",
+    emailReassurance:
+      "You can follow project status on your Studio Board after Project Intake. Automated stage emails are not sent in this build.",
   },
   secureNote:
-    "Your payment is encrypted and processed securely. The Studio does not store your payment information.",
+    "This checkout step records your Studio Plan locally so you can continue to Project Intake. Card payment processing is not connected in this build.",
   intakeExplanation:
-    "After payment, Project Intake opens so you can share the details and materials we need for your approved Studio Plan.",
+    "After you confirm checkout, Project Intake opens so you can share the details and materials we need for your approved Studio Plan.",
   routes: {
     studioBoard: "/studio-board",
     studioGuide: legacyRouteQuarantineV1.activeFrontDoor,

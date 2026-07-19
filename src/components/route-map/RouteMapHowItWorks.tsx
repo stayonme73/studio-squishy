@@ -11,8 +11,8 @@ const STEPS = [
   },
   {
     icon: "▣",
-    title: "Pay & Confirm",
-    lead: "Review your order and pay securely.",
+    title: "Review & Confirm",
+    lead: "Review your Studio Plan and confirm to continue to Project Intake.",
   },
   {
     icon: "▤",

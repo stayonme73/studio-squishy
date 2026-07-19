@@ -1,7 +1,7 @@
 /**
- * Welcome Hall Phase 1 — V2 (kiosk → Draft Room intake).
- * 🔒 Studio Lobby Complete — no redesign without explicit approval
- * @see docs/illustration/welcome-hall-locked.md
+ * Welcome Hall Phase 1 — Studio Lobby (Room 1).
+ * 🔒 LOBBY LOCKED · CLOSED — Tagia 2026-07-17 · docs/studio-lobby-v1-locked.md
+ * No redesign. Next: Route Map.
  */
 
 import { helpCenterAnchor } from "@/config/help-center";
@@ -19,11 +19,20 @@ export const welcomeHallPhase1 = {
     kioskScreenLabel: "HOW CAN WE HELP?",
   },
 
-  /** Mobile portrait — single screen: heading, tagline, CTA. */
+  /**
+   * Lobby / mobile greeting — aligns with locked podium screen copy (2026-07-18).
+   * Podium bakes the full message; mobile dock uses the same lines (CTA separate).
+   */
+  squishyGreeting: "Welcome! Your creative journey begins here.",
+
+  /** Mobile portrait — single screen: heading, greeting, CTA. */
   mobileEstablish: {
     heading: "THE STUDIO",
-    tagline:
-      "Tell us about your business. Together, we'll build what's next.",
+    /**
+     * Matches podium screen — one sentence per line.
+     * Must stay identical to `squishyGreeting` (space-joined).
+     */
+    taglineLines: ["Welcome!", "Your creative journey begins here."] as const,
     ctaLabel: "LET'S GET STARTED",
   },
 

@@ -218,9 +218,14 @@ export default function ProjectBuilderScene() {
                     >
                       {PROJECT_BUILDER_V1.backToRouteMapLabel}
                     </Link>
-                    <p className="pb-header__sync" role="status" aria-live="polite">
-                      {routeMapSyncStatusLabel(syncStatus)}
-                    </p>
+                    {(() => {
+                      const syncLabel = routeMapSyncStatusLabel(syncStatus);
+                      return syncLabel ? (
+                        <p className="pb-header__sync" role="status" aria-live="polite">
+                          {syncLabel}
+                        </p>
+                      ) : null;
+                    })()}
                   </div>
 
                   <div className="pb-header__workspace">

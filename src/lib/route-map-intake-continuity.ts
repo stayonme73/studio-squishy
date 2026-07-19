@@ -229,7 +229,7 @@ export const INTAKE_CONTINUITY_COPY = {
   alreadySubmittedCta: "Return to Studio Board",
   missingPaymentTitle: "Payment is still needed before Project Intake.",
   missingPaymentLead:
-    "Complete Secure Checkout for this project, then Project Intake will open.",
+    "Complete Review and Confirm for this project, then Project Intake will open.",
   missingPaymentCta: "Return to Checkout",
   missingPlanTitle: "Your Studio Plan is not ready for Project Intake yet.",
   missingPlanLead:

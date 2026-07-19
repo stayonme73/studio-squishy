@@ -1,0 +1,224 @@
+/* Voice tablet Discovery workflow — private Workspace content. */
+
+.root {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  height: 100%;
+  padding: 0.85rem 0.9rem 1rem;
+  color: #2f3437;
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  overflow: auto;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #456b5a;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: #355c7d;
+  line-height: 1.25;
+}
+
+.question {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: #2f3437;
+}
+
+.progress {
+  margin: 0;
+  font-size: 0.72rem;
+  color: rgba(47, 52, 55, 0.68);
+}
+
+.actorRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.actorLabel {
+  font-size: 0.7rem;
+  color: rgba(47, 52, 55, 0.7);
+}
+
+.actorBtn {
+  appearance: none;
+  border: 1px solid rgba(53, 92, 125, 0.28);
+  background: #f7f4ee;
+  color: #355c7d;
+  border-radius: 0.4rem;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actorBtn[data-active="true"] {
+  background: #355c7d;
+  border-color: #355c7d;
+  color: #f7f4ee;
+}
+
+.fieldStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.label {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #456b5a;
+}
+
+.input,
+.textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid rgba(53, 92, 125, 0.28);
+  border-radius: 0.45rem;
+  background: #f7f4ee;
+  color: #2f3437;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.55rem 0.65rem;
+}
+
+.textarea {
+  min-height: 5.5rem;
+  resize: vertical;
+}
+
+.chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.chip {
+  appearance: none;
+  text-align: left;
+  border: 1px solid rgba(53, 92, 125, 0.22);
+  background: #f7f4ee;
+  color: #2f3437;
+  border-radius: 0.45rem;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  cursor: pointer;
+}
+
+.chip[data-selected="true"] {
+  border-color: #355c7d;
+  background: color-mix(in srgb, #355c7d 12%, #f7f4ee);
+  box-shadow: inset 3px 0 0 #d56b4d;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: auto;
+  padding-top: 0.35rem;
+}
+
+.btn {
+  appearance: none;
+  border-radius: 0.45rem;
+  border: 1px solid transparent;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  background: #355c7d;
+  color: #f7f4ee;
+}
+
+.btnSecondary {
+  background: transparent;
+  border-color: rgba(53, 92, 125, 0.35);
+  color: #355c7d;
+}
+
+.btnGhost {
+  background: transparent;
+  border-color: transparent;
+  color: rgba(47, 52, 55, 0.75);
+}
+
+.status {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #456b5a;
+}
+
+.error {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #a0452f;
+}
+
+.fieldStack[data-interactive="false"] {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.fieldStack[data-interactive="false"] .chip,
+.fieldStack[data-interactive="false"] .input,
+.fieldStack[data-interactive="false"] .textarea {
+  cursor: default;
+}
+
+/* Presentation Display — customer-driving form on dark glass. */
+.fieldStack[data-surface="presentation"] .label {
+  color: rgba(180, 210, 195, 0.92);
+}
+
+.fieldStack[data-surface="presentation"] .chip {
+  background: rgba(247, 244, 238, 0.1);
+  border-color: rgba(247, 244, 238, 0.22);
+  color: rgba(247, 244, 238, 0.92);
+}
+
+.fieldStack[data-surface="presentation"] .chip[data-selected="true"] {
+  background: rgba(53, 92, 125, 0.45);
+  border-color: rgba(160, 200, 230, 0.65);
+  box-shadow: inset 3px 0 0 #d56b4d;
+}
+
+.fieldStack[data-surface="presentation"] .btnPrimary {
+  background: #c7a64a;
+  color: #1a1e24;
+}
+
+.fieldStack[data-surface="presentation"] .btnSecondary,
+.fieldStack[data-surface="presentation"] .btnGhost {
+  border-color: rgba(247, 244, 238, 0.35);
+  color: rgba(247, 244, 238, 0.9);
+}

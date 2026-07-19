@@ -1,0 +1,73 @@
+.stage {
+  position: fixed;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.face {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 18px rgba(18, 28, 32, 0.2));
+}
+
+.faceFloat {
+  animation: presence-idle-float var(--presence-float-ms, 4200ms) ease-in-out
+    infinite;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.mouthIn {
+  animation: presence-mouth-in 280ms ease-out both;
+}
+
+.eyelid {
+  transition-property: transform;
+  transition-timing-function: ease-in-out;
+  will-change: transform;
+  pointer-events: none;
+}
+
+@keyframes presence-idle-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(var(--presence-float-amp, 5) * -1px));
+  }
+}
+
+@keyframes presence-mouth-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faceFloat {
+    animation: none;
+  }
+
+  .mouthIn {
+    animation: none;
+  }
+
+  .eyelid {
+    transition: none;
+  }
+}

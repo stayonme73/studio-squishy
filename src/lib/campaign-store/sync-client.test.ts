@@ -117,8 +117,8 @@ describe("syncCampaignToServer auth guard", () => {
     expect(kitchenDetailRes?.headers.get("location")).toContain("/sign-in");
 
     const status = readCampaignSyncStatus();
-    expect(status?.state).toBe("error");
-    expect(status?.lastError).toContain("Authentication required");
+    // Remote sync unavailable without session — local campaign remains; do not mark error.
+    expect(status?.state).toBe("idle");
   });
 
   it("does not mint owner/staff session via sync (no /api/auth/* calls)", async () => {

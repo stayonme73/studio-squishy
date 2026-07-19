@@ -67,7 +67,10 @@ export default function ProjectBuilderJobDetailBlocks({ job, roadId }: Props) {
     : resolveProjectBuilderDrawerPurpose(job);
 
   return (
-    <div className="pb-drawer-details" aria-label={`${presentation.name} details`}>
+    <div
+      className="pb-job-details-surface pb-drawer-details"
+      aria-label={`${presentation.name} details`}
+    >
       <section className="pb-drawer-details__card pb-drawer-details__card--purpose">
         <h3 className="pb-drawer-details__heading">{SECTIONS.purpose.label}</h3>
         <p className="pb-drawer-details__prose">{drawerPurpose}</p>

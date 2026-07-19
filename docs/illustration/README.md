@@ -2,8 +2,13 @@
 
 **Mode:** Refinement on locked master plate — room exploration **closed**.
 
+**⚠ July 2026 reconciliation:** the Squishy *character* lock below (`squishy-new-*`, room-bound host) is superseded by [`docs/squishy-character-standards-v1.md`](../squishy-character-standards-v1.md) — new product decision: Squishy has no fixed room. The room/environment content in this index (Weather Portal, master reference plate, etc.) is unaffected and remains a separate, still-open question.
+
 | Document | Purpose |
 | -------- | ------- |
+| [studio-host-character-standard-v1-locked.md](../studio-host-character-standard-v1-locked.md) | **Studio Host Character Standard (LOCKED) — Host Reference Standard** |
+| [studio-lobby-v1-locked.md](../studio-lobby-v1-locked.md) | **Studio Lobby Room 1 — FINAL LOCK** |
+| [squishy-character-standards-v1.md](../squishy-character-standards-v1.md) | **Squishy Character Standards V1 (LOCKED)** |
 | [studio-guide-plate-v3-lock.md](../studio-guide-plate-v3-lock.md) | **Plate V3 — current truth; V2 live, rejected interim closed** |
 | [scout-studio-guide-plate-v3.md](../scout-studio-guide-plate-v3.md) | **Studio Guide Plate V3 — drafting table rebuilt for approval workflow** |
 | [welcome-hall-v3-implementation-plan.md](./welcome-hall-v3-implementation-plan.md) | **Welcome Hall V3 — implementation plan (approved)** |

@@ -1,0 +1,485 @@
+/*
+ * Mobile uses data-layout="room" (full-screen conversation).
+ * Desktop mouse uses data-layout="rail".
+ * Geometry for "room" is also applied inline from visualViewport in TS —
+ * these rules are the CSS fallback, not the sole positioning source.
+ */
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(20, 18, 16, 0.55);
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.scrim[data-dismiss-armed="false"] {
+  cursor: default;
+}
+
+.panel {
+  /* Conversation form column — not the full viewport as one giant row. */
+  --guide-conversation-max: 45rem; /* 720px · target band 680–760 */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  pointer-events: auto;
+  background: #f3ede3;
+  color: #2c3e50;
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  box-shadow: 0 12px 40px rgba(26, 26, 26, 0.28);
+}
+
+/* —— Phone: full-screen conversation room —— */
+.root[data-layout="room"] {
+  display: flex !important;
+  flex-direction: column !important;
+  background: #f3ede3 !important;
+  overflow: hidden !important;
+  transform: none !important;
+}
+
+.root[data-layout="room"] .scrim {
+  display: none !important;
+}
+
+.root[data-layout="room"] .panel {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  border-top: 4px solid #d94e2b !important;
+  box-shadow: none !important;
+  padding: 16px 16px 20px !important;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+  background: #f3ede3 !important;
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* —— Desktop mouse only: left conversation rail —— */
+.root[data-layout="rail"] {
+  pointer-events: none;
+}
+
+.root[data-layout="rail"] .scrim,
+.root[data-layout="rail"] .panel {
+  pointer-events: auto;
+}
+
+.root[data-layout="rail"] .panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(26rem, 38vw);
+  border-right: 1px solid color-mix(in srgb, #2c3e50 14%, transparent);
+  border-radius: 0;
+  padding: 1.1rem 1.15rem 1.25rem;
+  background: color-mix(in srgb, #f3ede3 96%, white);
+  overflow: auto;
+}
+
+.header {
+  /* Full panel width — Close stays top-right of the room, not the form column. */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, #2c3e50 78%, #d94e2b 22%);
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  min-height: 2.5rem;
+  border: 1px solid color-mix(in srgb, #2c3e50 18%, transparent);
+  border-radius: 6px;
+  background: #fff;
+  color: #2c3e50;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-height: 0;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: var(--guide-conversation-max);
+  /* Left-aligned with panel padding so the mic sits near the answer text. */
+  margin-inline: 0;
+  box-sizing: border-box;
+}
+
+/* Touch / room layout on wide viewports: keep the same readable column. */
+.root[data-layout="room"] .body {
+  max-width: min(var(--guide-conversation-max), 100%);
+}
+
+.guideLine {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.muted {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, #2c3e50 82%, transparent);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.label {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.answerField {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, #2c3e50 22%, transparent);
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.answerField[data-listening="true"] {
+  border-color: color-mix(in srgb, #d94e2b 55%, #2c3e50);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #d94e2b 18%, transparent);
+}
+
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 3rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid color-mix(in srgb, #2c3e50 22%, transparent);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 1rem;
+  color: #1a1a1a;
+  background: #fff;
+}
+
+.answerField .input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.answerField[data-voice="true"] .input {
+  padding-right: 3.1rem;
+}
+
+.answerField .input:focus {
+  outline: none;
+}
+
+.answerField:focus-within {
+  border-color: color-mix(in srgb, #2c3e50 45%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #2c3e50 12%, transparent);
+}
+
+.answerField[data-listening="true"]:focus-within {
+  border-color: color-mix(in srgb, #d94e2b 55%, #2c3e50);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #d94e2b 18%, transparent);
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, #2c3e50 72%, transparent);
+}
+
+.fieldError {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: #8a2f1f;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.actions form {
+  display: contents;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.85rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.primary {
+  background: #2c3e50;
+  color: #fff;
+}
+
+.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.secondary {
+  background: transparent;
+  color: #2c3e50;
+  border: 1px solid color-mix(in srgb, #2c3e50 28%, transparent);
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.summaryIntro {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.summaryList {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.summaryRow {
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, #fff 70%, #f3ede3);
+  border: 1px solid color-mix(in srgb, #2c3e50 10%, transparent);
+}
+
+.summaryRow dt {
+  margin: 0 0 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, #2c3e50 70%, transparent);
+}
+
+.summaryRow dd {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.deadlineNote {
+  margin: 0;
+  padding: 0.65rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  background: color-mix(in srgb, #e5a020 16%, #f3ede3);
+  border: 1px solid color-mix(in srgb, #e5a020 35%, transparent);
+}
+
+.voiceBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.1rem;
+}
+
+.voicePrivacy {
+  margin: 0;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  font-weight: 400;
+  color: color-mix(in srgb, #2c3e50 55%, transparent);
+}
+
+.micFieldButton {
+  position: absolute;
+  top: 50%;
+  right: 0.35rem;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #2c3e50;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.micFieldButton:hover {
+  background: color-mix(in srgb, #2c3e50 6%, transparent);
+}
+
+.micFieldButton[data-listening="true"] {
+  color: #d94e2b;
+}
+
+.micFieldButton[data-listening="true"] .micIcon {
+  animation: guideMicPulse 1.2s ease-in-out infinite;
+}
+
+.micFieldButton[data-busy="true"] {
+  color: color-mix(in srgb, #d94e2b 80%, #2c3e50);
+}
+
+.micIcon {
+  display: block;
+}
+
+.voiceStatus {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #2c3e50;
+}
+
+.voiceStatus[data-voice-state="listening"],
+.voiceStatus[data-voice-state="processing"] {
+  color: #b33d1f;
+}
+
+.voiceStatus[data-voice-state="error"],
+.voiceStatus[data-voice-state="unsupported"] {
+  color: #8a2f1f;
+}
+
+.voiceSpinner {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, #2c3e50 25%, transparent);
+  border-top-color: #2c3e50;
+  animation: guideMicSpin 0.8s linear infinite;
+}
+
+.voiceInterim {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: color-mix(in srgb, #2c3e50 70%, transparent);
+}
+
+.voiceInterimLabel {
+  font-weight: 700;
+}
+
+@keyframes guideMicPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.75;
+  }
+}
+
+@keyframes guideMicSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .scrim,
+  .answerField {
+    transition: none;
+  }
+
+  .micFieldButton[data-listening="true"] .micIcon,
+  .voiceSpinner {
+    animation: none;
+  }
+}

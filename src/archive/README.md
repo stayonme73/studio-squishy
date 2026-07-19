@@ -20,6 +20,7 @@ See `docs/customer-journey-v1-locked.md` for the locked journey and archive poli
 | `draft-room/DraftIntakeAnswerSummary.tsx` | Intake review summary step |
 | `draft-room/IntakeVisionAccents.tsx` | Intake vision field accents |
 | `entrance/` | Welcome Hall V3 showroom, interactive scene, IMAGE 1 composition, and orphaned wall components |
+| `welcome-hall/` | Retired Lobby plates + debug overlays — production Lobby is `public/welcome-hall/studio-lobby-scene.png` only |
 | `route-map-visual/` | Superseded Route Map visuals — lane selector, full-page road view, reference board art. Active journey: `RouteMapWorkspace` at `/route-map` |
 
 ## Quarantined routes (redirect only)

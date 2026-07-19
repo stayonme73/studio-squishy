@@ -73,6 +73,7 @@ describe("owner-qa menu config", () => {
 
   it("exposes active internal shortcuts, help, and Reset Campaign", () => {
     expect(ownerQa.shortcuts.map((shortcut) => shortcut.label)).toEqual([
+      "Conversation Room",
       "File Room",
       "Owner Console",
       "Production Workspace",
@@ -82,6 +83,7 @@ describe("owner-qa menu config", () => {
       "Reset Campaign",
     ]);
     expect(ownerQa.shortcuts.filter((shortcut) => shortcut.kind === "link").map((shortcut) => shortcut.href)).toEqual([
+      "/studio-conversation-room",
       "/file-room",
       "/file-room/owner-console",
       "/file-room/studio-self-test/production/studio-self-test%3Asm-001",

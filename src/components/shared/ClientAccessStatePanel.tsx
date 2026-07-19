@@ -40,7 +40,10 @@ export default function ClientAccessStatePanel({ state, onRetry, noActiveProject
             </h1>
             <p className="utility-lead">{content.message}</p>
             <div className="utility-access-actions">
-              <Link href="/sign-in" className="utility-btn utility-btn--primary">
+              <Link
+                href={`/sign-in?from=${encodeURIComponent(routes.studioBoard)}`}
+                className="utility-btn utility-btn--primary"
+              >
                 {content.primaryCta}
               </Link>
               <Link href={routes.helpCenter} className="utility-btn utility-btn--secondary">

@@ -41,8 +41,8 @@ export const customerJourneyV1 = {
     {
       order: 4,
       id: "secure-checkout",
-      name: "Secure Checkout",
-      formerName: "Payment",
+      name: "Review and Confirm",
+      formerName: "Secure Checkout",
       route: "/checkout",
       routeAliases: ["/payment"] as const,
     },

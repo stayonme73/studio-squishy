@@ -1,4 +1,8 @@
 import type { StudioUser } from "@/lib/campaign-store/types";
+import {
+  SESSION_MAX_AGE_MS,
+  SESSION_MAX_AGE_SECONDS,
+} from "@/lib/auth/session-lifetime";
 
 export const SESSION_COOKIE_NAME = "studio_session";
 
@@ -9,6 +13,8 @@ export type SessionPayload = {
   roles: StudioUser["roles"];
   currentCampaignId?: string;
   clientCampaignIds?: readonly string[];
+  /** ISO timestamp or null — truthful soft/hard verification state. */
+  emailVerifiedAt?: string | null;
   issuedAt: number;
 };
 
@@ -84,6 +90,8 @@ export async function createSessionToken(user: StudioUser): Promise<string> {
     roles: [...user.roles],
     currentCampaignId: user.currentCampaignId,
     clientCampaignIds: user.clientCampaignIds ? [...user.clientCampaignIds] : undefined,
+    emailVerifiedAt:
+      user.emailVerifiedAt === undefined ? null : user.emailVerifiedAt,
     issuedAt: Date.now(),
   };
   const payloadJson = JSON.stringify(payload);
@@ -100,7 +108,18 @@ export async function parseSessionToken(token: string): Promise<SessionPayload |
   if (!valid) return null;
 
   try {
-    return JSON.parse(payloadJson) as SessionPayload;
+    const payload = JSON.parse(payloadJson) as SessionPayload;
+    if (
+      typeof payload.issuedAt !== "number" ||
+      !Number.isFinite(payload.issuedAt) ||
+      payload.issuedAt <= 0
+    ) {
+      return null;
+    }
+    if (Date.now() - payload.issuedAt > SESSION_MAX_AGE_MS) {
+      return null;
+    }
+    return payload;
   } catch {
     return null;
   }
@@ -114,10 +133,12 @@ export function sessionPayloadToUser(payload: SessionPayload): StudioUser {
     roles: payload.roles,
     currentCampaignId: payload.currentCampaignId,
     clientCampaignIds: payload.clientCampaignIds,
+    emailVerifiedAt:
+      payload.emailVerifiedAt === undefined ? null : payload.emailVerifiedAt,
   };
 }
 
-export function sessionCookieOptions(maxAgeSeconds = 60 * 60 * 24 * 7) {
+export function sessionCookieOptions(maxAgeSeconds = SESSION_MAX_AGE_SECONDS) {
   return {
     httpOnly: true,
     sameSite: "lax" as const,
@@ -125,6 +146,11 @@ export function sessionCookieOptions(maxAgeSeconds = 60 * 60 * 24 * 7) {
     path: "/",
     maxAge: maxAgeSeconds,
   };
+}
+
+/** Clear the session cookie — same flags as issue, maxAge 0. */
+export function clearSessionCookieOptions() {
+  return sessionCookieOptions(0);
 }
 
 export async function readSessionFromCookieHeader(

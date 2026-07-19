@@ -10,6 +10,17 @@
 
 ---
 
+## ⚠ Reconciliation note — July 2026
+
+**The Squishy character lock on this page is superseded.** A new product decision (July 2026) established that Squishy has no fixed room — he accompanies the customer through the Studio rather than hosting from a desk. This directly supersedes this document's "Squishy composite... host position at executive desk zone" rule and the "no new interpretations or mascots" restriction, both of which assumed a room-bound host character.
+
+- **New canonical character + placement philosophy:** [`docs/squishy-character-standards-v1.md`](../squishy-character-standards-v1.md) — read that document for Squishy's current approved appearance, pose, and placement rules.
+- **This document's room content is not superseded** — the Weather Portal / walnut desk / yellow chair / glass strategy room concept inventoried below may still be relevant as general Studio environment art (e.g. for illustrated backdrops), independent of whether Squishy is composited into it as a fixed host. That's a separate, still-open decision — not resolved by this note.
+- **The "no AI-generated variants / no new interpretations or mascots" restriction is relaxed** specifically for Squishy's character going forward, superseded by the governance rules in the new standards doc (technical prep only, no redraws, one canonical reference).
+- **Founder decision, not a silent overwrite** — this note itself is the explicit reconciliation the new standards doc's governance section requires. Nothing in the original lock below has been deleted; treat the "Squishy (locked)" section beneath as historical record of the prior direction, not current truth.
+
+---
+
 ## Founder approval
 
 **Concept #4 is officially locked** as the master reference for Studio Squishy.
@@ -62,7 +73,9 @@ The room's **composition, emotional tone, Weather Portal, floating walnut desk w
 
 ---
 
-## Squishy (locked)
+## Squishy (locked) — superseded, see reconciliation note above
+
+> This section is historical. Current Squishy rules live in [`docs/squishy-character-standards-v1.md`](../squishy-character-standards-v1.md).
 
 | Rule | Requirement |
 | ---- | ----------- |

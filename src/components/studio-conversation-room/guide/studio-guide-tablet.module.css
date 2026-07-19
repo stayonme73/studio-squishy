@@ -1,0 +1,582 @@
+/* Studio Guide tablet — slate / graphite surface with gold Voice accents. */
+
+.root {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0.15rem 0.1rem;
+  overflow: hidden;
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  color: rgba(236, 232, 224, 0.96);
+  text-align: left;
+  background: transparent;
+}
+
+.main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding-bottom: 0.35rem;
+}
+
+/* Route chooser owns the full tablet glass — no leftover empty band. */
+.root[data-stage="route"] {
+  padding: 0;
+  gap: 0;
+}
+
+.root[data-stage="route"] .main {
+  overflow: hidden;
+  gap: 0;
+  padding: 0;
+}
+
+.root[data-stage="route"] .main > :first-child {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+/* Studio Plan owns the tablet glass — light summary cards scroll inside. */
+.root[data-stage="plan"] {
+  padding: 0;
+  gap: 0;
+}
+
+.root[data-stage="plan"] .main {
+  overflow: hidden;
+  gap: 0;
+  padding: 0;
+}
+
+.root[data-stage="plan"] .main > :first-child {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.planTablet {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  height: 100%;
+  min-height: 0;
+  padding: 0.35rem 0.2rem 0.45rem;
+  overflow: hidden;
+}
+
+.planTabletHeader {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0 0.15rem;
+}
+
+.voiceSays {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.15rem 0 0;
+  padding: 0.55rem 0.15rem 0.35rem;
+}
+
+.voiceSaysLabel {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: rgba(236, 232, 224, 0.9);
+}
+
+.voiceSaysQuote {
+  margin: 0;
+  padding: 0.15rem 0 0.15rem 0.85rem;
+  border-left: 3px solid rgba(210, 175, 95, 0.65);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(247, 244, 238, 0.96);
+}
+
+.beforeCheckout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0.2rem 0 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(180, 195, 210, 0.28);
+  background: rgba(28, 34, 44, 0.92);
+}
+
+.beforeCheckoutHeading {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.9);
+}
+
+.beforeCheckoutList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.beforeCheckoutList li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: start;
+  font-size: 1.02rem;
+  line-height: 1.35;
+  color: rgba(236, 232, 224, 0.92);
+}
+
+.beforeCheckoutMark {
+  font-weight: 750;
+  color: rgba(210, 175, 95, 0.95);
+}
+
+/* Voice-key facts only — large enough to read before checkout. */
+.planVoiceFacts {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.1rem 0.05rem 0.25rem;
+}
+
+.planFactCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(180, 195, 210, 0.28);
+  background: rgba(28, 34, 44, 0.94);
+}
+
+.planFactLabel {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.92);
+}
+
+.planFactValue {
+  margin: 0;
+  font-size: clamp(1.35rem, 4.2cqi, 1.7rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: rgba(247, 244, 238, 0.98);
+}
+
+.planFactValueLarge {
+  margin: 0;
+  font-size: clamp(1.75rem, 5.5cqi, 2.25rem);
+  font-weight: 750;
+  line-height: 1.2;
+  color: rgba(210, 175, 95, 0.98);
+}
+
+.planFactNote {
+  margin: 0.25rem 0 0;
+  font-size: 1.12rem;
+  line-height: 1.4;
+  color: rgba(220, 216, 208, 0.9);
+}
+
+.planServiceList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.planServiceList li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.planServiceName {
+  font-size: clamp(1.25rem, 3.8cqi, 1.55rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: rgba(247, 244, 238, 0.98);
+}
+
+.planServicePrice {
+  flex: 0 0 auto;
+  font-size: clamp(1.25rem, 3.8cqi, 1.55rem);
+  font-weight: 750;
+  color: rgba(210, 175, 95, 0.98);
+}
+
+.planMoreDetailsLink {
+  appearance: none;
+  align-self: flex-start;
+  margin: 0.15rem 0 0;
+  padding: 0.35rem 0;
+  border: none;
+  background: none;
+  color: rgba(160, 195, 220, 0.98);
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.planTabletError {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: rgba(240, 180, 160, 0.96);
+}
+
+.planTabletActions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  padding: 0.35rem 0.15rem 0;
+}
+
+.planTabletBtnPrimary,
+.planTabletBtnSecondary {
+  appearance: none;
+  margin: 0;
+  padding: 0.7rem 1.15rem;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 1.02rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.planTabletBtnPrimary {
+  border: 1px solid rgba(210, 175, 95, 0.55);
+  background: rgba(210, 175, 95, 0.24);
+  color: rgba(247, 236, 210, 0.98);
+}
+
+.planTabletBtnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.planTabletBtnSecondary {
+  border: 1px solid rgba(180, 195, 210, 0.4);
+  background: rgba(14, 17, 22, 0.45);
+  color: rgba(236, 232, 224, 0.94);
+}
+
+/* Project Intake — Social Posts–style cards on the tablet glass. */
+.intakeTablet {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.intakeMaterialsBanner {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(210, 175, 95, 0.35);
+  background: rgba(210, 175, 95, 0.12);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: rgba(247, 236, 210, 0.96);
+}
+
+.intakeDraftCue {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: rgba(160, 195, 220, 0.95);
+}
+
+.intakeHostLink {
+  color: rgba(160, 195, 220, 0.98);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.intakeTabletCards {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 0.15rem 0.1rem 0.35rem;
+}
+
+/* Keep Host social-intake tokens readable on dark tablet glass. */
+.intakeTabletCards :global(.route-map-social-intake) {
+  --studio-charcoal: #1f2a24;
+  --studio-charcoal-muted: #4a5c52;
+  --studio-denim: #2f5d4a;
+  --studio-eucalyptus: #2f5d4a;
+  --studio-ivory: #f4f1ea;
+  color: var(--studio-charcoal);
+}
+
+.intakeTabletCards :global(.route-map-social-intake__form) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.85rem;
+  align-content: start;
+}
+
+.intakeTabletCards :global(.route-map-social-intake__card) {
+  min-height: 0;
+}
+
+.intakeTabletCards :global(.route-map-social-intake__actions) {
+  grid-column: 1 / -1;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.78);
+}
+
+.question {
+  margin: 0;
+  font-size: clamp(1.65rem, 5.4cqi, 2.2rem);
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: rgba(247, 244, 238, 0.98);
+}
+
+.body {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  color: rgba(236, 232, 224, 0.82);
+}
+
+.savedBadge {
+  margin: 0;
+  align-self: flex-start;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(120, 190, 150, 0.45);
+  background: rgba(46, 120, 80, 0.28);
+  font-size: 1.12rem;
+  font-weight: 750;
+  color: rgba(170, 230, 190, 0.98);
+}
+
+.savedIntro {
+  margin: 0.25rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 650;
+  color: rgba(236, 232, 224, 0.78);
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chip {
+  appearance: none;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(180, 195, 210, 0.28);
+  background: rgba(14, 17, 22, 0.45);
+  color: rgba(247, 244, 238, 0.94);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+.chip[data-selected="true"] {
+  border-color: rgba(210, 175, 95, 0.7);
+  background: rgba(210, 175, 95, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(210, 175, 95, 0.22);
+}
+
+.chip:hover {
+  border-color: rgba(160, 200, 220, 0.5);
+}
+
+.hint,
+.navHint {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: rgba(236, 232, 224, 0.48);
+}
+
+.navHint {
+  margin-top: 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 550;
+  color: rgba(236, 232, 224, 0.68);
+}
+
+.error {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgba(240, 150, 140, 0.95);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.15rem;
+}
+
+.btnPrimary,
+.btnSecondary {
+  appearance: none;
+  margin: 0;
+  padding: 0.7rem 1.15rem;
+  border-radius: 0.65rem;
+  font: inherit;
+  font-size: 1.12rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  border: none;
+  background: rgba(210, 175, 95, 0.88);
+  color: #1a1510;
+}
+
+.btnSecondary {
+  border: 1.5px solid rgba(180, 195, 210, 0.35);
+  background: rgba(14, 17, 22, 0.4);
+  color: rgba(220, 230, 240, 0.95);
+}
+
+.linkBtn {
+  appearance: none;
+  align-self: flex-start;
+  margin: 0.15rem 0 0;
+  padding: 0.35rem 0;
+  border: none;
+  background: transparent;
+  color: rgba(160, 200, 220, 0.95);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 650;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.summaryList {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.summaryRow {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 0.7rem;
+  background: rgba(14, 17, 22, 0.48);
+  border: 1px solid rgba(180, 195, 210, 0.2);
+}
+
+.summaryRow dt {
+  margin: 0 0 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.82);
+}
+
+.summaryRow dd {
+  margin: 0;
+  font-size: 1.28rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: rgba(247, 244, 238, 0.98);
+}
+
+.deadlineNote {
+  margin: 0;
+  padding: 0.85rem 1.05rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(210, 175, 95, 0.4);
+  background: rgba(210, 175, 95, 0.12);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  text-wrap: pretty;
+  color: rgba(236, 220, 180, 0.95);
+}
+
+.intakeStatus {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0.15rem 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(180, 195, 210, 0.22);
+  background: rgba(14, 17, 22, 0.35);
+}
+
+.intakeStatusHeading {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(210, 175, 95, 0.85);
+}
+
+.intakeStatusHeading:first-child {
+  margin-top: 0;
+}
+
+.intakeStatusList {
+  margin: 0;
+  padding: 0 0 0 1.1rem;
+  font-size: 1.02rem;
+  line-height: 1.4;
+  color: rgba(236, 232, 224, 0.92);
+}

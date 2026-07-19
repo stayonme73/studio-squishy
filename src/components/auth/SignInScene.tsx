@@ -1,26 +1,24 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
-const SAFE_RETURN_PATHS = new Set([
-  "/studio-board",
-  "/feedback-studio",
-  "/review-room",
-  "/deliverables",
-  "/help-center",
-]);
+import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import { safeReturnPath } from "@/lib/auth/safe-return-path";
+import {
+  peekStudioVoiceBoardHandoffAwaitingSignIn,
+  promoteStudioVoiceBoardHandoffToWelcome,
+} from "@/lib/studio-voice-board-handoff";
 
-function safeReturnPath(value: string | null): string {
-  if (!value) return "/studio-board";
-  const [pathname] = value.split("?");
-  if (SAFE_RETURN_PATHS.has(pathname)) return value;
-  return "/studio-board";
+const SESSION_PROBE_TIMEOUT_MS = 2500;
+
+/** Full navigation — soft router.replace can leave phone/desktop stuck on /sign-in. */
+function goToReturnPath(path: string) {
+  window.location.assign(path);
 }
 
 export default function SignInScene() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = useMemo(
     () => safeReturnPath(searchParams.get("from")),
@@ -30,6 +28,48 @@ export default function SignInScene() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const showBoardHandoff = useMemo(
+    () => peekStudioVoiceBoardHandoffAwaitingSignIn(),
+    [],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+    const timer = window.setTimeout(
+      () => controller.abort(),
+      SESSION_PROBE_TIMEOUT_MS,
+    );
+
+    void fetch("/api/auth/session", {
+      credentials: "include",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (cancelled) return;
+        if (!response.ok) return;
+        const body = (await response.json().catch(() => ({}))) as {
+          user?: { id?: string } | null;
+        };
+        if (body.user?.id) {
+          promoteStudioVoiceBoardHandoffToWelcome();
+          goToReturnPath(returnTo);
+        }
+        // No session / probe failure → keep the form visible (fail closed).
+      })
+      .catch(() => {
+        // Aborted or network error → form stays; do not grant access.
+      })
+      .finally(() => {
+        window.clearTimeout(timer);
+      });
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [returnTo]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,21 +90,24 @@ export default function SignInScene() {
       return;
     }
 
-    router.replace(returnTo);
-    router.refresh();
+    promoteStudioVoiceBoardHandoffToWelcome();
+    goToReturnPath(returnTo);
   }
 
   return (
     <div className="utility-page">
       <div className="utility-shell utility-shell--narrow">
         <section className="utility-card" aria-labelledby="sign-in-title">
-          <p className="utility-eyebrow">Client Access</p>
+          <p className="utility-eyebrow">
+            {showBoardHandoff ? "Studio Voice" : "Client Access"}
+          </p>
           <h1 id="sign-in-title" className="utility-title">
             Sign in to The Studio
           </h1>
           <p className="utility-lead">
-            Use the account connected to your Studio work to open your Board,
-            Review Room, Project Record, and Final Delivery.
+            {showBoardHandoff
+              ? conversationRoomGuideV1.boardHandoffSignInLead
+              : "Use the account connected to your Studio work to open your Board, Review Room, Project Record, and Final Delivery."}
           </p>
 
           <form className="utility-form" onSubmit={handleSubmit}>
@@ -89,11 +132,28 @@ export default function SignInScene() {
               />
             </label>
             {error ? <p className="utility-error" role="alert">{error}</p> : null}
-            <button className="utility-btn utility-btn--primary" type="submit" disabled={submitting}>
+            <button
+              className="utility-btn utility-btn--primary"
+              type="submit"
+              disabled={submitting}
+            >
               {submitting ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
+          <p className="utility-note">
+            New here?{" "}
+            <Link
+              href={
+                returnTo && returnTo !== "/studio-board"
+                  ? `/sign-up?from=${encodeURIComponent(returnTo)}`
+                  : "/sign-up"
+              }
+            >
+              Create an account
+            </Link>
+            .
+          </p>
           <p className="utility-note">
             Need help? <Link href="/help-center">Visit the Help Center</Link>.
           </p>

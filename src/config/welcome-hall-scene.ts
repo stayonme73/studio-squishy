@@ -1,21 +1,22 @@
 /**
- * Welcome Hall — RUNTIME scene asset (V2 tower-free plate).
- * 🔒 Studio Lobby Complete — no redesign without explicit approval
+ * Studio Lobby — Room 1 runtime scene (production).
+ * 🔒 LOBBY ENVIRONMENT LOCKED — Tagia 2026-07-18 (16:9 podium-final plate)
+ * @see docs/studio-lobby-v1-locked.md
+ * Host identity: docs/studio-host-character-standard-v1-locked.md (separate Host Layer — not baked into plate)
  *
- * LOCKED v31 — approved by Tagia (Creative Director), 2026-06-14.
- * Archived final: public/welcome-hall/welcome-hall-v2-final-locked.png
+ * Approved visual baseline. Do not redesign or reinterpret.
+ * Preserve composition, hierarchy, lighting, customer flow, palette, premium feel.
+ * Faithful implementation — not pixel-perfect recreation.
+ *
+ * 16:9 plate matches common desktops — contain framing shows the full Lobby
+ * without dominating blurred side bars.
  *
  * CHANGE POLICY — no visual redesigns, copy rewrites, layout adjustments,
- * mural/kiosk/draft room/lighting changes, or environmental experiments unless:
- *   - verified technical defect
- *   - verified accessibility issue
- *   - verified navigation failure
- * All other changes require explicit Tagia approval.
+ * or hotspot changes unless: verified technical defect, accessibility issue,
+ * navigation failure, or explicit Tagia approval.
  *
- * Plate v4 cache ?v=1 — 1024x622 lobby art; kiosk left foreground.
- * Tower rotation dormant — enable TOWER_ROTATION_ENABLED for Phase 2 only.
+ * Retired plates live under src/archive/welcome-hall/ (not served).
  *
- * @see docs/illustration/welcome-hall-locked.md
  * @see src/config/welcome-hall-tower.ts
  */
 
@@ -27,12 +28,43 @@ export type SceneRect = {
 };
 
 export const welcomeHallScene = {
-  src: "/welcome-hall/welcome-hall-scene-v4.png?v=1",
-  alt: "Studio Lobby — Team Studio entrance",
-  aspectRatio: "1024 / 622" as const,
-  nativeSize: { width: 1024, height: 622 } as const,
+  /**
+   * Production Lobby environment (Host not baked in).
+   * Host Layer is a separate transparent stack — see studio-lobby-host-layer-v1.ts.
+   */
+  src: "/welcome-hall/studio-lobby-environment.png?v=16",
+  alt: "Studio Lobby — welcome podium and Studio interior",
+  aspectRatio: "1920 / 1080" as const,
+  nativeSize: { width: 1920, height: 1080 } as const,
 
-  /** Legacy kiosk hotspot — v2 interactive scene only */
+  /** Full fit — restored original Lobby plate. */
+  plateDisplayScale: 1,
+
+  /**
+   * Podium / kiosk tap target — native pixels on 16:9 plate (1920×1080).
+   * Desktop: plate-canvas % overlay. Mobile: cover-mapped at object-position 48% 50%.
+   * Full visible podium (screen + frame + stand). Verify with ?debug=1.
+   */
+  kioskTapTarget: {
+    x: 55,
+    y: 340,
+    width: 520,
+    height: 700,
+  } satisfies SceneRect,
+
+  /**
+   * Greeting lives on the podium screen (baked). HTML balloon overlay stays off.
+   * Rect retained for reference only.
+   */
+  squishyGreetingOverlayEnabled: false,
+  squishyGreetingBalloon: {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  } satisfies SceneRect,
+
+  /** @deprecated Archive interactive scene only — not used by Room 1 production. */
   guideHotspot: {
     left: "5.5%",
     top: "68%",
@@ -41,38 +73,13 @@ export const welcomeHallScene = {
   },
 
   /**
-   * Full kiosk tap target — native pixels on plate v4 (1024×622).
-   * Left foreground kiosk body + screen + baked tap button.
-   * Calibrated via _verify-hotspots-v4.png (approximate — refine with ?debug=1).
+   * Desktop: cover — full-bleed Lobby (Tagia preference: no side bars).
+   * 16:9 plate fills the viewport; minor top/bottom crop only when the window
+   * aspect differs slightly from 16:9. Portrait mobile uses CSS crop path.
    */
-  kioskTapTarget: {
-    x: 86,
-    y: 238,
-    width: 292,
-    height: 368,
-  } satisfies SceneRect,
-
-  /**
-   * Doorway lintel plate — DRAFT ROOM label baked in art; rect for future overlay.
-   * Native pixels on plate v31 (1920×1080).
-   */
-  wallLabelPlate: {
-    x: 741,
-    y: 139,
-    width: 431,
-    height: 66,
-  } satisfies SceneRect,
-
-  /** Cover on desktop 16:9 — zero crop; portrait uses contain for full-scene kiosk */
   framing: {
-    default: { x: 0.5, y: 0.5, fit: "cover" as const },
+    default: { x: 0.5, y: 0.52, fit: "cover" as const },
     portrait: { x: 0.5, y: 0.5, fit: "contain" as const },
-    /** Phone — full room establishing shot (step 1), top-aligned */
-    mobileEstablish: { x: 0.5, y: 0, fit: "contain" as const },
-    /** Phone — kiosk focus (step 2): draft table + kiosk, cover fill */
-    mobileKiosk: { x: 0.84, y: 0.60, fit: "cover" as const },
-    /** @deprecated use mobileKiosk — cover crop fallback */
-    mobilePortrait: { x: 0.86, y: 0.54, fit: "cover" as const },
   },
 } as const;
 
@@ -103,9 +110,8 @@ export function welcomeHallFraming(viewport: {
   if (width > 0 && height > width) {
     return welcomeHallScene.framing.portrait;
   }
-  /* Match desktop object-position: 50% 48% in welcome-hall-phase1.css */
   if (width >= 1025) {
-    return { ...welcomeHallScene.framing.default, y: 0.48 };
+    return welcomeHallScene.framing.default;
   }
   return welcomeHallScene.framing.default;
 }
@@ -133,9 +139,9 @@ export function sceneRectToCoverPercent(
   }
 
   const scale =
-    framing.fit === "contain"
+    (framing.fit === "contain"
       ? Math.min(vw / iw, vh / ih)
-      : Math.max(vw / iw, vh / ih);
+      : Math.max(vw / iw, vh / ih)) * welcomeHallScene.plateDisplayScale;
   const renderedW = iw * scale;
   const renderedH = ih * scale;
   const marginX = (vw - renderedW) * framing.x;
@@ -156,7 +162,7 @@ export function sceneRectToCoverPercent(
   };
 }
 
-/** Cover-fit plate canvas size + offset — matches object-fit:cover + object-position framing. */
+/** Plate canvas size + offset — matches object-fit cover/contain + object-position framing. */
 export function welcomeHallPlateCoverLayout(
   viewport: { width: number; height: number },
   framing = welcomeHallFraming(viewport),
@@ -168,7 +174,10 @@ export function welcomeHallPlateCoverLayout(
     return { width: 0, height: 0, offsetX: 0, offsetY: 0 };
   }
 
-  const scale = Math.max(vw / iw, vh / ih);
+  const scale =
+    (framing.fit === "contain"
+      ? Math.min(vw / iw, vh / ih)
+      : Math.max(vw / iw, vh / ih)) * welcomeHallScene.plateDisplayScale;
   const width = iw * scale;
   const height = ih * scale;
   return {
@@ -188,9 +197,9 @@ export function welcomeHallVisibleYRange(
   const { width: iw, height: ih } = native;
   const { width: vw, height: vh } = viewport;
   const scale =
-    framing.fit === "contain"
+    (framing.fit === "contain"
       ? Math.min(vw / iw, vh / ih)
-      : Math.max(vw / iw, vh / ih);
+      : Math.max(vw / iw, vh / ih)) * welcomeHallScene.plateDisplayScale;
   const marginY = (vh - ih * scale) * framing.y;
 
   const nativeYAtViewportY = (vy: number) => (vy - marginY) / scale;
@@ -201,10 +210,14 @@ export function welcomeHallVisibleYRange(
   };
 }
 
-/** Internal reference boards — documentation only */
+/**
+ * Historical reference boards — files live under src/archive/welcome-hall/plates/.
+ * Not served; paths are archive-relative for documentation only.
+ */
 export const welcomeHallReferenceAssets = {
-  v32FinalDirection: "/welcome-hall/welcome-hall-v3.2-final-direction.png",
-  v3Concept: "/welcome-hall/welcome-hall-v3-concept-reference.png",
-  readabilityComparison: "/welcome-hall/welcome-hall-v3-readability-comparison.png",
-  kioskHotspotAlignment: "/welcome-hall/welcome-hall-kiosk-hotspot-reference.png",
+  archiveRoot: "src/archive/welcome-hall/plates",
+  v32FinalDirection: "welcome-hall-v3.2-final-direction.png",
+  v3Concept: "welcome-hall-v3-concept-reference.png",
+  readabilityComparison: "welcome-hall-v3-readability-comparison.png",
+  kioskHotspotAlignment: "welcome-hall-kiosk-hotspot-reference.png",
 } as const;

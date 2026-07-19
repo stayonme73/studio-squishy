@@ -17,7 +17,7 @@
   --studio-charcoal: #2f3437;
   --studio-charcoal-muted: color-mix(in srgb, #2f3437 72%, #6b6b6b);
 
-  --studio-utility-backdrop-image: url("/welcome-hall/welcome-hall-scene-v4.png?v=1");
+  --studio-utility-backdrop-image: url("/welcome-hall/studio-utility-backdrop.png?v=1");
   /* Left-weighted — thinking-man mural stays recognizable on the left */
   --studio-utility-backdrop-position: 18% center;
   --studio-utility-backdrop-blur: blur(16px) brightness(0.78) saturate(0.92);

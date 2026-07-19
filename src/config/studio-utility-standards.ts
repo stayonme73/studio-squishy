@@ -49,7 +49,7 @@ export const studioUtilityDesignSystem = {
     cardGap: "1rem",
   },
   assets: {
-    backdrop: "/welcome-hall/welcome-hall-scene-v4.png",
+    backdrop: "/welcome-hall/studio-utility-backdrop.png",
   },
 } as const;
 

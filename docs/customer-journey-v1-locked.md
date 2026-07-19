@@ -1,58 +1,74 @@
 # Customer Journey V1 — Locked
 
-**Status:** Locked — customer-facing names and step order are frozen unless Tagia approves a business change.
-
-**Code reference:** `src/config/customer-journey-v1.ts`
+**Status:** Locked — customer-facing names are frozen unless Tagia approves a business change.  
+**Host Journey certification (2026-07-17):** Conditionally ready → micro-corrections complete — **LOCKED for Studio Tablet package.** Live chain: Route Map → Build Your Project → Studio Plan → **Review and Confirm** → Project Intake → Studio Board (signed-in).  
+**Code reference:** `src/config/customer-journey-v1.ts` · quarantine: `src/config/legacy-route-quarantine-v1.ts` · Host ops: `docs/host-journey-operating-runbook-v1.md`
 
 ## Build order (locked)
 
-**Status:** Locked build sequence — finish the customer experience before wiring intelligence. Philosophy docs are locked; UI with mock data is acceptable until step 4.
+**Status:** Locked build sequence — finish the customer experience before wiring intelligence. Philosophy docs are locked; UI with mock data is acceptable until engine wiring is unpaused.
 
 | # | Work item | Notes |
 |---|-----------|-------|
-| 1 | Finish Project Summary polish | Locked copy structure; mock data OK |
-| 2 | Secure Checkout on Project Summary | **Done** — wide workspace with checkout always visible in row 2 via embedded `SecureCheckoutGrid`; `/payment` fallback kept |
-| 3 | Verify complete customer journey | Discovery → Project Summary → Payment → Project Details → Studio Board |
-| 4 | Begin Discovery Mapping and Recommendation Engine wiring | **Deferred** until 1–3 complete |
+| 1 | Finish live Host commerce path polish | Route Map → Builder → Checkout → Intake → Board |
+| 2 | Secure Checkout honesty + Host runbook | **In progress / Host Journey corrections** — local confirm until processor ships |
+| 3 | Verify complete Host journey | Production-like build + signed-in Board |
+| 4 | Begin Discovery Mapping and Recommendation Engine wiring | **Deferred** until Host path certification |
 
-**Paused (do not wire yet):** Discovery Mapping, Recommendation Engine scoring/mapping, and Discovery Summary engine integration. The Recommendation Engine should support a finished customer experience — not define it prematurely. See [discovery-mapping-v1-planned.md](discovery-mapping-v1-planned.md).
+**Paused (do not wire yet):** Discovery Mapping, Recommendation Engine scoring/mapping, and Discovery Summary engine integration. See [discovery-mapping-v1-planned.md](discovery-mapping-v1-planned.md).
 
-## Active journey (9 steps)
+## Active live commerce path (Host / iPad)
 
-| # | Customer name | Former name | Route | Notes |
-|---|---------------|-------------|-------|-------|
-| 1 | Studio Lobby | Welcome Hall | `/` · `/studio-lobby` | `/welcome-hall` redirects to `/studio-lobby` |
-| 2 | Studio Guide | Studio Guide | `/studio-guide-prototype` | `/studio-guide` redirects here |
-| 3 | Secure Checkout | Payment | `/payment` | Three-column checkout UI archived; route unchanged |
-| 4 | Project Discovery | Discovery Room | `/business-discovery-studio` | `/project-discovery` alias redirect |
-| 5 | Studio Board | Studio Board | `/studio-board` | |
-| 6 | Project Record | Campaign Record | `/campaign-details` | Canonical since Package 1 completion (2026-07-11); `/studio-board?record=open` drawer kept temporarily for compatibility — see `AGENTS.md` |
-| 7 | Review Room | Review Room | `/review-room` | `/feedback-studio` remains production review UI |
-| 8 | Final Delivery | Final Delivery | `/deliverables` | |
-| 9 | Help Center | Help Center | `/help-center` | |
+This is the path Hosts should operate. Quarantined Discovery / Project Summary routes must not be presented as live.
 
-## Post-discovery production path (not separate journey steps)
+| # | Customer name | Route | Notes |
+|---|---------------|-------|-------|
+| 1 | Studio Lobby | `/` · `/studio-lobby` | Entrance; Lobby Guide voice is separate package |
+| 2 | Route Map (Studio Guide front door) | `/route-map` | Sole live front door for new jobs |
+| 3 | Build Your Project | `/project-builder?road=…` | Service selection workspace |
+| 4 | Studio Plan | `/project-builder?…&view=studio-plan` | Review selected services |
+| 5 | Review and Confirm | `/checkout` | Local confirm in this build (heading honest until live payment); `/payment` redirects here |
+| 6 | Project Intake | `/route-map?step=intake` | Requires paid-state campaign |
+| 7 | Studio Board | `/studio-board` | **Auth-gated** — Host must be signed in |
+| 8 | Project Record | `/campaign-details` | Post-board record |
+| 9 | Review Room | `/feedback-studio` · `/review-room` | |
+| 10 | Final Delivery | `/deliverables` | |
+| 11 | Help Center | `/help-center` | |
 
-These routes sit between Project Discovery and Secure Checkout — not numbered journey rooms:
+## Journey step table (config names)
 
-- **Project Summary** — `/project-summary` — post-discovery bridge; presents the locked [Recommendation Engine Philosophy](recommendation-engine-philosophy-v1-locked.md) flow as a **wide workspace** with two columns — **left:** **Our Recommendation** → **Discovery Summary** (collapsible reference) → **Customize Your Studio Plan**; **right:** **Studio Bundles** → **Secure Checkout** (embedded, disclaimer near Pay) — no separate Approve step — under [Recommendation, Not Direction](recommendation-not-direction-v1-locked.md) (*The Studio recommends. The client decides.*)
-- **Studio Plan Review** — `/studio-plan-review`
-- **Discovery Summary** (prototype/dev) — `/discovery-summary`
+Aligned with `customerJourneyV1.steps` — some historical “room” names now resolve to Route Map / Builder:
 
-**Post-discovery micro-flow (not separate journey steps):**
+| # | Customer name | Former name | Route |
+|---|---------------|-------------|-------|
+| 1 | Studio Lobby | Welcome Hall | `/` · `/studio-lobby` |
+| 2 | Studio Guide | Studio Guide | `/route-map` (aliases `/studio-guide-prototype`, `/studio-guide`) |
+| 3 | Build Your Project | — | `/project-builder` |
+| 4 | Review and Confirm | Secure Checkout | `/checkout` (alias `/payment`) |
+| 5 | Project Discovery | Discovery Room | `/route-map` (intake via `?step=intake`) |
+| 6 | Studio Board | Studio Board | `/studio-board` |
+| 7 | Project Record | Campaign Record | `/campaign-details` |
+| 8 | Review Room | Review Room | `/feedback-studio` |
+| 9 | Final Delivery | Final Delivery | `/deliverables` |
+| 10 | Help Center | Help Center | `/help-center` |
 
-1. Discovery — client answers
-2. Studio reviews — split-panel animation (implemented)
-3. **Discovery split preview** — recommended service names only + CTA to Project Summary — see [discovery-split-preview-v1-locked.md](discovery-split-preview-v1-locked.md)
-4. **Project Summary** — per-service Why?, optional packages, customize with live pricing, Secure Checkout inline (same page)
-5. Secure Checkout — payment (also at `/payment` for direct links)
-6. **Project Details** — `/project-details` — post-payment intake for green services (materials + service-specific details)
+## Quarantined surfaces (not live client entry)
 
-Steps 3–5 are screen roles, not numbered journey rooms. The split preview must not duplicate Project Summary detail.
+Direct navigation redirects to Route Map (`legacyRouteQuarantineV1`). Do **not** demo as the Host path:
 
-Architecture: Catalog → Recommendation Engine → Project Summary / Studio Plan Review → Secure Checkout → Project Details → Project Record.
+| Route | Former role |
+|-------|-------------|
+| `/business-discovery-studio` · `/project-discovery` | Discovery Room |
+| `/project-summary` · `/studio-plan-review` · `/discovery-summary` | Post-discovery plan / summary |
+| `/project-details` | Standalone post-payment intake |
+| `/payment` | Standalone payment URL → redirects to `/checkout` |
+| `/studio-guide` | Legacy Guide → Route Map |
 
-**Visual language:** Decision pages (Project Summary, Secure Checkout) use clean proposal styling — see [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md). Creative pages (Discovery, Review Room) keep warm textured aesthetics.
+Architecture intent remains Catalog → Recommendation Engine → plan → checkout → intake → board. **Live UI today** is Route Map shelf + Project Builder + `/checkout` + Route Map intake.
+
+**Checkout honesty (this build):** **Review and Confirm** records the Studio Plan locally and continues to Project Intake. Card payment processing is not connected. Automated stage emails are not sent. The “Secure Checkout” heading returns when live processing ships.
+
+**Visual language:** Decision pages use clean proposal styling — see [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md). Creative pages keep warm textured aesthetics where still live.
 
 ## Removed from active flow (archived)
 
@@ -60,24 +76,23 @@ Do **not** delete — move to `src/archive/` and document here.
 
 | Item | Former role | Archive location |
 |------|-------------|------------------|
-| Complete Your Order | Three-column payment page title + layout | `src/archive/payment/CompleteYourOrderCheckoutScene.tsx` — shared grid in `src/components/payment/SecureCheckoutGrid.tsx`; `/payment` + Project Summary reuse |
-| Tell us what's on your mind | Standalone intake opening | `src/archive/draft-room/` — opening in Project Discovery |
-| Draft Room begin page | Standalone intake wizard at `/draft-room?begin=1` | `src/archive/draft-room/DraftRoomIntakeScene.tsx` and related components |
-| Draft Room intro plate | Illustrated room before intake | `src/archive/draft-room/DraftRoomScene.tsx` |
+| Complete Your Order | Three-column payment page title + layout | `src/archive/payment/CompleteYourOrderCheckoutScene.tsx` — shared grid in `src/components/payment/SecureCheckoutGrid.tsx` |
+| Tell us what's on your mind | Standalone intake opening | `src/archive/draft-room/` |
+| Draft Room begin page | Standalone intake wizard | `src/archive/draft-room/` |
+| Draft Room intro plate | Illustrated room before intake | `src/archive/draft-room/` |
 | Welcome Hall V3 showroom | Interactive lobby prototype | `src/archive/entrance/` |
 | Welcome Hall interactive / IMAGE 1 scenes | Pre-V2 lobby prototypes | `src/archive/entrance/` |
 
 ## Legacy route redirects (public URLs preserved)
 
-| Legacy route | Redirect |
-|--------------|----------|
+| Legacy route | Redirect / quarantine |
+|--------------|------------------------|
 | `/welcome-hall` | `/studio-lobby` |
-| `/project-discovery` | `/business-discovery-studio` |
-| `/business_discovery_studio` | `/business-discovery-studio` |
-| `/studio-guide` | `/studio-guide-prototype` |
-| `/draft-room/begin` | `/business-discovery-studio` |
-| `/draft-room` | `/business-discovery-studio` |
-| `/intake` | `/business-discovery-studio` |
+| `/project-discovery` · `/business_discovery_studio` · `/business-discovery-studio` | Quarantine → `/route-map` |
+| `/studio-guide` · `/studio-guide-prototype` | Route Map front door |
+| `/draft-room` · `/draft-room/begin` · `/intake` | Quarantine → `/route-map` |
+| `/project-summary` · `/studio-plan-review` · `/discovery-summary` · `/project-details` | Quarantine → `/route-map` |
+| `/payment` | `/checkout` (or quarantine front door — see `next.config.ts`) |
 
 ## Dev-only tools
 
@@ -85,7 +100,7 @@ Do **not** delete — move to `src/archive/` and document here.
 |------|--------|---------|
 | **Studio Review** (`OwnerQaPanel`) | `NODE_ENV === "development"` in `OwnerQaRoot` | Journey presets, shortcuts, reset campaign |
 
-Studio Review is **not** shown in production builds.
+Studio Review is **not** shown in production builds (`npm run build` + `npm run start`). Prefer production-like serve for Host projection.
 
 ## Archive policy
 
@@ -99,22 +114,13 @@ Studio Review is **not** shown in production builds.
 
 **Doc:** `docs/studio-plan-slide-out-checkout-v1-planned.md`
 
-A future journey simplification keeps the customer on **one workspace** after Project Discovery submit: Studio Plan context stays visible on the left while the right panel phases through Reviewing → Recommendations → **slide-out Secure Checkout** (card, billing, agreement, Pay Now). After payment, the panel closes and the customer continues to Studio Board.
+A future journey simplification may restore a Discovery → Studio Plan → slide-out Secure Checkout workspace. That path is **not** the live Host chain today.
 
-**Future simplified path (when Discovery split checkout ships):**
-
-Studio Lobby → Studio Guide → Project Discovery → Studio Plan → Slide-out Secure Checkout → Studio Board
-
-**Shipped (Project Summary):**
-
-- Wide horizontal workspace on `/project-summary` — recommend + bundles | customize + embedded Secure Checkout | heard reference.
-- Live plan total in checkout updates as the client customizes services (`buildPaymentPlanSummaryFromPlan`).
-- Plan persists on Pay via `saveApprovedStudioPlan()` — no Approve button or `?phase=checkout` phase swap.
-- **Secure Checkout** at `/payment` remains active for bookmarks and direct links (full three-column grid).
-- Discovery split-panel checkout UI is still **not implemented**.
+**Shipped Host path:** Route Map → Project Builder (+ Studio Plan view) → `/checkout` → Route Map intake → Studio Board (signed in).
 
 ## What this lock does *not* change
 
 - Internal TypeScript names (`CampaignRecord`, `business-discovery-studio`, etc.)
 - Service Catalog, Recommendation Engine, Discovery Summary business logic
 - Discovery room badge offsets
+- Route Map / Lobby visual locks (see AGENTS.md)

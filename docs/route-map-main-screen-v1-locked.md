@@ -113,7 +113,7 @@ Hero v2 is full-bleed (no desk/frame border), so the map frame covers the entire
 | Order | Customer label | Tagline | Badge |
 |---|----------------|---------|-------|
 | 1 | Get My Business Started | Forward route — sequential stops to build your foundation. | STUDIO / 75 — green |
-| 2 | Promote Something Now | Direct urgent route — get something live fast. | STUDIO / 20 — blue |
+| 2 | Promote Something Now | Direct urgent route — get ready-to-use promotion assets quickly. | STUDIO / 20 — blue |
 | 3 | Update What I Already Have | Exit off the loop — refresh one profile or promotion that's already live. | STUDIO / 285 — gold |
 | 4 | I Know What I Need | Opens the job shelf directly — Route Start only if you are unsure. | STUDIO / Direct — purple |
 
@@ -139,7 +139,7 @@ I-285 (Perimeter Loop) is visual-only on the map — not a choose-panel card.
 |---|-------|------|
 | 1 | Pick Your Route | Start with what you need right now. |
 | 2 | Choose a Job | See what is included and choose your service. |
-| 3 | Pay & Confirm | Review your order and pay securely. |
+| 3 | Review & Confirm | Review your Studio Plan and confirm to continue to Project Intake. |
 | 4 | Share the Details | Send the information and materials we need. |
 | 5 | We Get To Work | We create it, you review it, then we complete and deliver your finished project. |
 

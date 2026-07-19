@@ -11,6 +11,11 @@
   background: #2e2d2b;
 }
 
+/* Guide sheet portals to body; also relax clip while open (Samsung overflow trap). */
+.welcome-hall-static.welcome-hall-static--guide-open {
+  overflow: visible;
+}
+
 .welcome-hall-frame {
   position: relative;
   aspect-ratio: 3 / 2;

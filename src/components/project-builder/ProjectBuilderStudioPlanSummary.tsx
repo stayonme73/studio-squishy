@@ -11,6 +11,13 @@ type Props = {
   onEditProject: () => void;
   onContinueToCheckout: () => void;
   onViewScope: (jobId: RouteMapJobId) => void;
+  /** When false, hide Edit / Continue — used inside Conversation Room View Details. */
+  showActions?: boolean;
+  /**
+   * `full` — Host Studio Plan page.
+   * `extras` — Conversation Room slide-out: View Scope, Revision Policy, We'll Need only.
+   */
+  variant?: "full" | "extras";
 };
 
 /** Project-level Studio Plan summary — concise scope; full details stay in Learn More. */
@@ -19,15 +26,20 @@ export default function ProjectBuilderStudioPlanSummary({
   onEditProject,
   onContinueToCheckout,
   onViewScope,
+  showActions = true,
+  variant = "full",
 }: Props) {
   const [revisionDetailsOpen, setRevisionDetailsOpen] = useState(false);
+  const extrasOnly = variant === "extras";
 
   return (
     <div className="pb-plan-summary" aria-label={PROJECT_BUILDER_V1.studioPlanHeading}>
-      <section className="pb-plan-summary__card pb-plan-summary__card--route">
-        <p className="pb-plan-summary__eyebrow">{PROJECT_BUILDER_V1.routeContextEyebrow}</p>
-        <p className="pb-plan-summary__route">{model.routeLabel}</p>
-      </section>
+      {!extrasOnly ? (
+        <section className="pb-plan-summary__card pb-plan-summary__card--route">
+          <p className="pb-plan-summary__eyebrow">{PROJECT_BUILDER_V1.routeContextEyebrow}</p>
+          <p className="pb-plan-summary__route">{model.routeLabel}</p>
+        </section>
+      ) : null}
 
       {model.emptyMessage ? (
         <p className="pb-plan-summary__empty" role="status">
@@ -66,37 +78,41 @@ export default function ProjectBuilderStudioPlanSummary({
         )}
       </section>
 
-      <section className="pb-plan-summary__card pb-plan-summary__card--total" aria-labelledby="pb-plan-total-title">
-        <h3 id="pb-plan-total-title" className="pb-plan-summary__heading">
-          {PROJECT_BUILDER_V1.totalLabel}
-        </h3>
-        <p className="pb-plan-summary__total">{model.totalDisplay}</p>
-      </section>
+      {!extrasOnly ? (
+        <>
+          <section className="pb-plan-summary__card pb-plan-summary__card--total" aria-labelledby="pb-plan-total-title">
+            <h3 id="pb-plan-total-title" className="pb-plan-summary__heading">
+              {PROJECT_BUILDER_V1.totalLabel}
+            </h3>
+            <p className="pb-plan-summary__total">{model.totalDisplay}</p>
+          </section>
 
-      <section className="pb-plan-summary__card" aria-labelledby="pb-plan-timeline-title">
-        <h3 id="pb-plan-timeline-title" className="pb-plan-summary__heading">
-          {PROJECT_BUILDER_V1.planTimelineHeading}
-        </h3>
-        {model.overallTimelineDisplay ? (
-          <div className="pb-plan-summary__timeline-block">
-            <p className="pb-plan-summary__subheading">{PROJECT_BUILDER_V1.planTimelineOverallLabel}</p>
-            <p className="pb-plan-summary__prose">{model.overallTimelineDisplay}</p>
-          </div>
-        ) : null}
-        {model.deliverableTimelines.length > 0 ? (
-          <div className="pb-plan-summary__timeline-block">
-            <p className="pb-plan-summary__subheading">{PROJECT_BUILDER_V1.planTimelineDeliverablesLabel}</p>
-            <ul className="pb-plan-summary__timeline-list">
-              {model.deliverableTimelines.map((item) => (
-                <li key={item.title} className="pb-plan-summary__timeline-row">
-                  <span className="pb-plan-summary__timeline-name">{item.title}</span>
-                  <span className="pb-plan-summary__timeline-value">{item.timingDisplay}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-      </section>
+          <section className="pb-plan-summary__card" aria-labelledby="pb-plan-timeline-title">
+            <h3 id="pb-plan-timeline-title" className="pb-plan-summary__heading">
+              {PROJECT_BUILDER_V1.planTimelineHeading}
+            </h3>
+            {model.overallTimelineDisplay ? (
+              <div className="pb-plan-summary__timeline-block">
+                <p className="pb-plan-summary__subheading">{PROJECT_BUILDER_V1.planTimelineOverallLabel}</p>
+                <p className="pb-plan-summary__prose">{model.overallTimelineDisplay}</p>
+              </div>
+            ) : null}
+            {model.deliverableTimelines.length > 0 ? (
+              <div className="pb-plan-summary__timeline-block">
+                <p className="pb-plan-summary__subheading">{PROJECT_BUILDER_V1.planTimelineDeliverablesLabel}</p>
+                <ul className="pb-plan-summary__timeline-list">
+                  {model.deliverableTimelines.map((item) => (
+                    <li key={item.title} className="pb-plan-summary__timeline-row">
+                      <span className="pb-plan-summary__timeline-name">{item.title}</span>
+                      <span className="pb-plan-summary__timeline-value">{item.timingDisplay}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </section>
+        </>
+      ) : null}
 
       <section className="pb-plan-summary__card" aria-labelledby="pb-plan-revision-title">
         <h3 id="pb-plan-revision-title" className="pb-plan-summary__heading">
@@ -144,23 +160,25 @@ export default function ProjectBuilderStudioPlanSummary({
         )}
       </section>
 
-      <div className="pb-plan-summary__actions">
-        <button
-          type="button"
-          className="utility-btn utility-btn--secondary pb-plan-summary__action pb-plan-summary__action--edit"
-          onClick={onEditProject}
-        >
-          {PROJECT_BUILDER_V1.editProjectCta}
-        </button>
-        <button
-          type="button"
-          className="utility-btn utility-btn--primary pb-plan-summary__action pb-plan-summary__action--primary"
-          disabled={!model.canContinue}
-          onClick={onContinueToCheckout}
-        >
-          {PROJECT_BUILDER_V1.continueToCheckoutCta}
-        </button>
-      </div>
+      {showActions && !extrasOnly ? (
+        <div className="pb-plan-summary__actions">
+          <button
+            type="button"
+            className="utility-btn utility-btn--secondary pb-plan-summary__action pb-plan-summary__action--edit"
+            onClick={onEditProject}
+          >
+            {PROJECT_BUILDER_V1.editProjectCta}
+          </button>
+          <button
+            type="button"
+            className="utility-btn utility-btn--primary pb-plan-summary__action pb-plan-summary__action--primary"
+            disabled={!model.canContinue}
+            onClick={onContinueToCheckout}
+          >
+            {PROJECT_BUILDER_V1.continueToCheckoutCta}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

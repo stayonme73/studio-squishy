@@ -44,6 +44,9 @@ export default function ProjectBuilderSquishyCompanion({ turns }: Props) {
       className="pb-studio-conversation"
       aria-label={PROJECT_BUILDER_V1.studioConversationLabel}
     >
+      <p className="pb-studio-conversation__example-label">
+        {PROJECT_BUILDER_V1.exampleConversationEyebrow}
+      </p>
       <div
         ref={threadRef}
         className="pb-studio-conversation__thread"

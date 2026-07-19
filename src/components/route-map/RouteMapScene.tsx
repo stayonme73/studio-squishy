@@ -11,6 +11,7 @@ import RouteMapRoutePanel from "@/components/route-map/RouteMapRoutePanel";
 import RouteMapLobbyBackdrop from "@/components/route-map/RouteMapLobbyBackdrop";
 import RouteMapSquishyPanel from "@/components/route-map/RouteMapSquishyPanel";
 import RouteMapWorkspace from "@/components/route-map/RouteMapWorkspace";
+import { StudioTablet } from "@/components/studio-tablet";
 import type { ServiceId } from "@/catalog/types";
 import {
   getRouteMapJob,
@@ -53,12 +54,11 @@ function routeMapSyncStatusLabel(
   status: CampaignSyncStatus | null,
   intakeDraftStatus: IntakeDraftStatus | null,
 ): string {
-  // Honest feedback: never mask a sync/local failure behind Progress saved / Unsaved draft.
-  if (intakeDraftStatus === "error") return "Save failed";
-  if (status?.state === "error") return "Save failed";
+  // Host surfaces: never alarm with "Save failed" (local progress remains path of record).
   if (status?.state === "syncing") return "Saving…";
   if (intakeDraftStatus === "unsaved") return "Unsaved draft";
   if (intakeDraftStatus === "saved") return "Progress saved";
+  if (intakeDraftStatus === "error") return "";
   return campaignSaveStatusLabel(status);
 }
 
@@ -414,11 +414,19 @@ export default function RouteMapScene() {
             />
           ) : null}
 
-          {showOverlay ? (
-            <div className="route-map-save-status" role="status" aria-live="polite">
-              {routeMapSyncStatusLabel(syncStatus, showIntakeForm ? intakeDraftStatus : null)}
-            </div>
-          ) : null}
+          {showOverlay
+            ? (() => {
+                const syncLabel = routeMapSyncStatusLabel(
+                  syncStatus,
+                  showIntakeForm ? intakeDraftStatus : null,
+                );
+                return syncLabel ? (
+                  <div className="route-map-save-status" role="status" aria-live="polite">
+                    {syncLabel}
+                  </div>
+                ) : null;
+              })()
+            : null}
 
           {showOverlay && !showIntakeForm && !showIntakeGate ? (
             <RouteMapSquishyPanel message={squishyMessage} />
@@ -454,7 +462,13 @@ export default function RouteMapScene() {
           {showIntakeGate && intakeGate ? (
             <div className="route-map-world__sheet route-map-world__sheet--intake">
               <div className="route-map-overlay-workspace route-map-overlay-workspace--intake">
-                <IntakeGatePanel surface={intakeGate} />
+                <StudioTablet
+                  className="route-map-intake-tablet"
+                  stage="intake"
+                  stageTitle="Project Intake"
+                >
+                  <IntakeGatePanel surface={intakeGate} />
+                </StudioTablet>
               </div>
             </div>
           ) : null}
@@ -462,15 +476,21 @@ export default function RouteMapScene() {
           {showIntakeForm ? (
             <div className="route-map-world__sheet route-map-world__sheet--intake">
               <div className="route-map-overlay-workspace route-map-overlay-workspace--intake">
-                <RouteMapIntakeForm
-                  key={`${selectedJob.id}:${intakeDraftAnswers ? "draft" : "empty"}`}
-                  job={selectedJob}
-                  initialDraftAnswers={intakeDraftAnswers}
-                  onSaveDraft={handleIntakeSaveDraft}
-                  onSubmit={handleIntakeSubmit}
-                  onDraftStatusChange={setIntakeDraftStatus}
-                  submitError={intakeSubmitError}
-                />
+                <StudioTablet
+                  className="route-map-intake-tablet"
+                  stage="intake"
+                  stageTitle="Project Intake"
+                >
+                  <RouteMapIntakeForm
+                    key={`${selectedJob.id}:${intakeDraftAnswers ? "draft" : "empty"}`}
+                    job={selectedJob}
+                    initialDraftAnswers={intakeDraftAnswers}
+                    onSaveDraft={handleIntakeSaveDraft}
+                    onSubmit={handleIntakeSubmit}
+                    onDraftStatusChange={setIntakeDraftStatus}
+                    submitError={intakeSubmitError}
+                  />
+                </StudioTablet>
               </div>
             </div>
           ) : null}

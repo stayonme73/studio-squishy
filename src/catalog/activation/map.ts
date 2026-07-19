@@ -112,6 +112,15 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     notes: "New RTU shelf item — no rm-j replacement. Complex scope is not included in this SKU.",
   },
   {
+    v2Sku: "v2-rtu-business-card",
+    clientFacingName: "Make Me a Business Card",
+    status: "active_candidate",
+    laneEligibility: ["i75"],
+    directExitEligible: false,
+    notes:
+      "I-75 Get My Business Started — early shelf stop for startup foundation (Guidance Pass v1). Design-only business card; not on other lanes.",
+  },
+  {
     v2Sku: "v2-rtu-menu",
     clientFacingName: "Make Me a Menu",
     status: "active_candidate",
@@ -210,15 +219,6 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     directExitEligible: true,
     notes:
       "Keep live rm-j005 on map — campaign landing page with publish; no V2 equivalent in Batch 1/2. Distinct from v2-rtu-promotion-graphics (static graphics only). Hold until Batch 3.",
-  },
-  {
-    v2Sku: "v2-rtu-business-card",
-    clientFacingName: "Make Me a Business Card",
-    status: "active_candidate",
-    laneEligibility: ["i75"],
-    directExitEligible: false,
-    notes:
-      "I-75 Get My Business Started — tenth shelf stop; completes 2-column desktop grid. Design-only business card; not on other lanes.",
   },
   {
     routeMapSku: "rm-j007",
