@@ -4,6 +4,7 @@ import { Comic_Neue, Geist, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
 
 import OwnerQaRoot from "@/components/dev/OwnerQaRoot";
+import ClientSessionTimeoutGuard from "@/components/auth/ClientSessionTimeoutGuard";
 import StudioPresenceRoot from "@/components/studio-presence/StudioPresenceRoot";
 
 import "./globals.css";
@@ -52,6 +53,7 @@ export default function RootLayout({
       <body className="flex min-h-[100dvh] flex-col overflow-x-hidden">
         <StudioPresenceRoot>
           {children}
+          <ClientSessionTimeoutGuard />
         </StudioPresenceRoot>
         <OwnerQaRoot />
       </body>

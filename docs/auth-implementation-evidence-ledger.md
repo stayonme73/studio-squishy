@@ -226,6 +226,8 @@ Password Recovery, Project Claim, and Parking Lot remain blocked until Tagia aut
 | Allowlisted reset links | `buildPasswordResetUrl` → `/reset-password?token=` |
 | Forgot + Reset utility pages; Sign In link | `/forgot-password`, `/reset-password`, Sign In “Forgot password?” |
 | Password Visibility Standard (Show/Hide eye) | `UtilityPasswordField` on Sign In, Sign Up, Reset Password |
+| Client Session Timeout (30m idle / 5m warning + live countdown) | `ClientSessionTimeoutGuard` + `studio-client-session-timeout-v1` |
+| Timeout → clear session → Lobby; working draft preserved | `customerSignOutToLobby` (no draft clear) |
 | Password update stamps `passwordChangedAtMs` | `updatePasswordAfterReset` |
 | Older sessions die (`issuedAt <= passwordChangedAtMs`) | `isIssuedAtInvalidatedByPasswordChange` + `readSessionFromCookieHeader` |
 | No auto-login after reset; clear local cookie | `POST /api/auth/password-reset/confirm` → `signedIn: false` + clear cookie |
@@ -235,7 +237,8 @@ Password Recovery, Project Claim, and Parking Lot remain blocked until Tagia aut
 
 ### Unit tests
 
-`src/lib/auth/password-recovery.test.ts` (+ session stamp same-ms guard) — **PASS** (2026-07-20). Focused suite: 13 tests with `session.test.ts`.
+`src/lib/auth/password-recovery.test.ts` (+ session stamp same-ms guard) — **PASS** (2026-07-20).  
+`src/lib/auth/client-session-timeout.test.ts` — inactivity window + warning copy + cert env overrides.
 
 ### Explicit non-goals (this package)
 
@@ -257,18 +260,21 @@ Password Recovery, Project Claim, and Parking Lot remain blocked until Tagia aut
 7. Unknown email on Forgot still shows the **same** generic message  
 8. Phone + desktop utility pages readable without zoom change  
 9. Show/Hide password eye on Sign In, Sign Up, Reset Password (desktop + phone)  
-10. Packages 1–3 paths still intact; no Claim / Route Protection introduced  
+10. Inactivity: warning → Stay signed in resets; timeout → Lobby signed out; working draft still present  
+11. Packages 1–3 paths still intact; no Claim / Route Protection introduced  
 
 ### Cold certification evidence — 2026-07-20
 
-**Status: owner-certified PASS (desktop + phone functional cert; Password Visibility Standard verified).**
+**Status: owner-certified PASS (desktop + phone). Password Recovery + Client Session Timeout (live countdown) certified. Short cert env overrides removed.**
 
 | Check | Result |
 |-------|--------|
-| Unit / focused tests | **PASS** (2026-07-20) — password-recovery + session |
+| Unit / focused tests | **PASS** (2026-07-20) — password-recovery + session + inactivity |
 | Desktop cold cert | **PASS** — owner |
 | Phone cold cert | **PASS** — owner |
 | Show/Hide password eye | **PASS** — Sign In / Sign Up / Reset |
+| Client Session Timeout | **PASS** — desktop + phone; live countdown in warning |
+| Production defaults | **30 min** idle · **5 min** warning lead (no short overrides in `.env.local`) |
 | Package 4 verdict | **PASS** |
 
 **Next when Tagia authorizes:** Project Claim. Parking Lot remains locked.

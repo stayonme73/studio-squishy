@@ -480,6 +480,84 @@
   font-weight: 700;
 }
 
+/* —— Client session inactivity warning —— */
+
+.utility-session-timeout {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.utility-session-timeout__scrim {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, #1c2430 48%, transparent);
+}
+
+.utility-session-timeout__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 24rem);
+  padding: 1.35rem 1.25rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--utility-border);
+  background: var(--utility-paper, #fff);
+  box-shadow: 0 16px 40px color-mix(in srgb, #1c2430 22%, transparent);
+  text-align: left;
+}
+
+.utility-session-timeout__title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--utility-text);
+}
+
+.utility-session-timeout__body {
+  margin: 0.75rem 0 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--utility-text);
+}
+
+.utility-session-timeout__countdown {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  margin: 1.1rem 0 0;
+  text-align: center;
+}
+
+.utility-session-timeout__countdown-value {
+  font-size: clamp(2.4rem, 8vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--utility-text);
+}
+
+.utility-session-timeout__countdown-unit {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--utility-text-muted);
+}
+
+.utility-session-timeout__actions {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.utility-session-timeout__actions .utility-btn {
+  width: 100%;
+}
+
 /* —— Buttons —— */
 
 .utility-btn {

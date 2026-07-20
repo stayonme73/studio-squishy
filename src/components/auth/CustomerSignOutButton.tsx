@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { clearLobbyEntryVisitState } from "@/config/studio-lobby-entry-v1";
+import { customerSignOutToLobby } from "@/lib/auth/customer-sign-out-client";
 
 type Props = {
   className?: string;
@@ -12,6 +12,7 @@ type Props = {
 /**
  * Customer Sign out — clears the Studio session and returns to the Lobby
  * Entry Film as a signed-out visitor (no Voice, no auto New/Returning).
+ * Does not clear pre-payment working draft storage.
  */
 export default function CustomerSignOutButton({ className }: Props) {
   const router = useRouter();
@@ -20,16 +21,15 @@ export default function CustomerSignOutButton({ className }: Props) {
   async function handleSignOut() {
     setBusy(true);
     try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
+      await customerSignOutToLobby({
+        softNavigate: (path) => {
+          router.replace(path);
+          router.refresh();
+        },
       });
     } catch {
-      // Still navigate — cookie clear may have succeeded server-side.
+      setBusy(false);
     }
-    clearLobbyEntryVisitState();
-    router.replace("/studio-lobby");
-    router.refresh();
   }
 
   return (
