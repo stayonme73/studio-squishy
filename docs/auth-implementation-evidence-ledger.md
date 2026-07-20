@@ -13,7 +13,7 @@
 | 1 | Account Creation Foundation | **Cold-certified PASS** | 2026-07-19 |
 | 2 | Email Verification | **Cold-certified PASS (live-delivery 2026-07-19)** | 2026-07-19 |
 | 3 | Sign-in / Session Hardening | **Cold-certified PASS** | 2026-07-19 |
-| 4 | Password Recovery | Not started | — |
+| 4 | Password Recovery | **Cold-certified PASS** | 2026-07-20 |
 | 5 | Project Claim / Ownership | Not started | — |
 | 6 | Route / Data Protection | Not started | — |
 | 7 | Truthful Intake → Auth → Board Handoff | Not started | — |
@@ -209,3 +209,67 @@ Next package when Tagia authorizes: **Sign-in and Session Hardening**. Parking L
 
 **Verdict: Sign-in and Session Hardening PASS.**  
 Password Recovery, Project Claim, and Parking Lot remain blocked until Tagia authorizes the next package.
+
+---
+
+## Package 4 — Password Recovery (PASS)
+
+### Delivered
+
+| Behavior | Evidence |
+|----------|----------|
+| Hashed reset tokens only (SHA-256); 256-bit entropy | `password-reset-tokens.ts` → `data/password-reset-tokens.json` |
+| Expiry + single-use + one active challenge | TTL `AUTH_PASSWORD_RESET_TOKEN_TTL_MINUTES` (default 60); `usedAt` / `supersededAt` |
+| Generic request response (no enumeration) | `requestPasswordReset` + `POST /api/auth/password-reset/request` |
+| Rate-limited request (account + source) | `auth-rate-limit` scopes `password-reset-account` / `password-reset-source` |
+| Resend via transactional adapter (`password-reset` kind) | `password-recovery.ts` → `sendTransactionalEmail` |
+| Allowlisted reset links | `buildPasswordResetUrl` → `/reset-password?token=` |
+| Forgot + Reset utility pages; Sign In link | `/forgot-password`, `/reset-password`, Sign In “Forgot password?” |
+| Password Visibility Standard (Show/Hide eye) | `UtilityPasswordField` on Sign In, Sign Up, Reset Password |
+| Password update stamps `passwordChangedAtMs` | `updatePasswordAfterReset` |
+| Older sessions die (`issuedAt <= passwordChangedAtMs`) | `isIssuedAtInvalidatedByPasswordChange` + `readSessionFromCookieHeader` |
+| No auto-login after reset; clear local cookie | `POST /api/auth/password-reset/confirm` → `signedIn: false` + clear cookie |
+| Clear recovery for missing / malformed / expired / used / superseded | Reset UI + confirm API error codes |
+| Safe `from=` preserved on auth utility links | Sign In / Forgot / Reset use `safeReturnPath` |
+| No Claim / Route Protection / Lobby / Board work | Explicitly omitted |
+
+### Unit tests
+
+`src/lib/auth/password-recovery.test.ts` (+ session stamp same-ms guard) — **PASS** (2026-07-20). Focused suite: 13 tests with `session.test.ts`.
+
+### Explicit non-goals (this package)
+
+- Signed-in password settings (future Change Password reuses `UtilityPasswordField`)
+- SMS / magic links
+- Project Claim / Board hard gate
+- Route Protection / `/campaign-details` proxy
+- Lobby or Board redesign
+- Parking Lot
+
+### Cold certification checklist (desktop + real phone)
+
+1. Sign In → Forgot password? → enter known email → generic confirmation copy  
+2. Reset email received (Resend configured) with `/reset-password?token=` link  
+3. Valid link sets new password → success → **Sign In** (not auto Board)  
+4. Sign in with **new** password works; **old** password fails  
+5. Session on a second browser/device signed in **before** reset is dead after reset (refresh / Board)  
+6. Used / expired / malformed / missing / superseded links show recovery + request another email  
+7. Unknown email on Forgot still shows the **same** generic message  
+8. Phone + desktop utility pages readable without zoom change  
+9. Show/Hide password eye on Sign In, Sign Up, Reset Password (desktop + phone)  
+10. Packages 1–3 paths still intact; no Claim / Route Protection introduced  
+
+### Cold certification evidence — 2026-07-20
+
+**Status: owner-certified PASS (desktop + phone functional cert; Password Visibility Standard verified).**
+
+| Check | Result |
+|-------|--------|
+| Unit / focused tests | **PASS** (2026-07-20) — password-recovery + session |
+| Desktop cold cert | **PASS** — owner |
+| Phone cold cert | **PASS** — owner |
+| Show/Hide password eye | **PASS** — Sign In / Sign Up / Reset |
+| Package 4 verdict | **PASS** |
+
+**Next when Tagia authorizes:** Project Claim. Parking Lot remains locked.
+

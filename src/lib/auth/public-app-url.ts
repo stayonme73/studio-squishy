@@ -59,3 +59,11 @@ export function buildEmailVerificationUrl(rawToken: string): string | null {
   url.searchParams.set("token", rawToken);
   return url.toString();
 }
+
+export function buildPasswordResetUrl(rawToken: string): string | null {
+  const origin = resolvePublicAppOrigin();
+  if (!origin) return null;
+  const url = new URL("/reset-password", `${origin}/`);
+  url.searchParams.set("token", rawToken);
+  return url.toString();
+}

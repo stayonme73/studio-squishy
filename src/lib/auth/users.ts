@@ -266,6 +266,57 @@ export async function markEmailVerified(
   return toPublicUser(users[index]);
 }
 
+export type UpdatePasswordAfterResetResult =
+  | { ok: true; user: StudioUser; passwordChangedAtMs: number }
+  | {
+      ok: false;
+      code: "invalid_password" | "unknown_user";
+      message: string;
+    };
+
+/**
+ * Password Recovery — replace hash and stamp passwordChangedAtMs so every
+ * older session (issuedAt <= stamp) is rejected on the next read.
+ */
+export async function updatePasswordAfterReset(
+  userId: string,
+  newPassword: string,
+): Promise<UpdatePasswordAfterResetResult> {
+  const passwordError = validateNewPassword(newPassword);
+  if (passwordError) {
+    return {
+      ok: false,
+      code: "invalid_password",
+      message: passwordError,
+    };
+  }
+
+  const users = await listStudioUsers();
+  const index = users.findIndex((user) => user.id === userId);
+  if (index === -1) {
+    return {
+      ok: false,
+      code: "unknown_user",
+      message: "This reset link is not valid. Request a new email to continue.",
+    };
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  const passwordChangedAtMs = Date.now();
+  const { password: _removed, ...rest } = users[index];
+  users[index] = {
+    ...rest,
+    passwordHash,
+    passwordChangedAtMs,
+  };
+  await writeStudioUsers(users);
+  return {
+    ok: true,
+    user: toPublicUser(users[index]),
+    passwordChangedAtMs,
+  };
+}
+
 export async function updateUserCurrentCampaign(
   userId: string,
   campaignId: string | undefined,

@@ -400,6 +400,68 @@
   border-color: color-mix(in srgb, var(--utility-primary) 45%, transparent);
 }
 
+/* Studio Password Visibility Standard — Sign In / Sign Up / Reset / future Change Password */
+.utility-password {
+  position: relative;
+  display: block;
+}
+
+.utility-password__input {
+  width: 100%;
+  border: 1px solid var(--utility-border);
+  border-radius: 8px;
+  background: #fff;
+  padding: 0.7rem 2.75rem 0.7rem 0.8rem;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--utility-text);
+}
+
+.utility-password__input:focus {
+  outline: 2px solid color-mix(in srgb, var(--utility-primary) 32%, transparent);
+  outline-offset: 2px;
+  border-color: color-mix(in srgb, var(--utility-primary) 45%, transparent);
+}
+
+.utility-password__toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--utility-text-muted);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.utility-password__toggle:hover,
+.utility-password__toggle:focus-visible {
+  color: var(--utility-text);
+  background: color-mix(in srgb, var(--utility-text) 6%, transparent);
+  outline: none;
+}
+
+.utility-password__toggle:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--utility-primary) 32%, transparent);
+  outline-offset: 1px;
+}
+
+.utility-password__toggle:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .utility-error {
   margin: 0;
   color: var(--utility-terracotta);

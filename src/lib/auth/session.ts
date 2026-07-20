@@ -1,4 +1,5 @@
 import type { StudioUser } from "@/lib/campaign-store/types";
+import { findUserById } from "@/lib/auth/users";
 import {
   SESSION_MAX_AGE_MS,
   SESSION_MAX_AGE_SECONDS,
@@ -138,6 +139,35 @@ export function sessionPayloadToUser(payload: SessionPayload): StudioUser {
   };
 }
 
+/**
+ * Pure stamp check — sessions issued at or before the password-change ms die.
+ * Inclusive `<=` so a cookie minted in the same millisecond as the reset
+ * cannot survive rounding / same-tick issuance.
+ */
+export function isIssuedAtInvalidatedByPasswordChange(
+  issuedAt: number,
+  passwordChangedAtMs: number | undefined | null,
+): boolean {
+  if (
+    passwordChangedAtMs == null ||
+    !Number.isFinite(passwordChangedAtMs) ||
+    passwordChangedAtMs <= 0
+  ) {
+    return false;
+  }
+  return issuedAt <= passwordChangedAtMs;
+}
+
+async function isSessionInvalidatedByPasswordChange(
+  payload: SessionPayload,
+): Promise<boolean> {
+  const record = await findUserById(payload.userId);
+  return isIssuedAtInvalidatedByPasswordChange(
+    payload.issuedAt,
+    record?.passwordChangedAtMs,
+  );
+}
+
 export function sessionCookieOptions(maxAgeSeconds = SESSION_MAX_AGE_SECONDS) {
   return {
     httpOnly: true,
@@ -166,6 +196,7 @@ export async function readSessionFromCookieHeader(
   const token = decodeURIComponent(match.slice(SESSION_COOKIE_NAME.length + 1));
   const payload = await parseSessionToken(token);
   if (!payload) return null;
+  if (await isSessionInvalidatedByPasswordChange(payload)) return null;
   return sessionPayloadToUser(payload);
 }
 

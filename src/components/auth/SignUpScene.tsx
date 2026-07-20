@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { safeReturnPath } from "@/lib/auth/safe-return-path";
+import UtilityPasswordField from "@/components/auth/UtilityPasswordField";
 
 export default function SignUpScene() {
   const router = useRouter();
@@ -93,18 +94,15 @@ export default function SignUpScene() {
                 required
               />
             </label>
-            <label className="utility-field">
-              <span>Password</span>
-              <input
-                type="password"
-                autoComplete="new-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-                minLength={8}
-                maxLength={128}
-              />
-            </label>
+            <UtilityPasswordField
+              label="Password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              minLength={8}
+              maxLength={128}
+            />
             {error ? (
               <p className="utility-error" role="alert">
                 {error}

@@ -1,10 +1,10 @@
 # Package 2: Production Authentication Inspection v1
 
-**Status:** Inspection complete · Owner path approved · **Email provider APPROVED** · Account Creation **PASS** · Email Verification **PASS** · Sign-in / Session Hardening **PASS** · Next when authorized: **Password Recovery**  
+**Status:** Inspection complete · Owner path approved · **Email provider APPROVED** · Account Creation **PASS** · Email Verification **PASS** · Sign-in / Session Hardening **PASS** · Password Recovery **PASS** · Next when authorized: **Project Claim**  
 **Date:** 2026-07-19  
 **Prerequisite:** Package 1 Intake Reliability v1 cold-certified PASS  
 **Evidence ledger:** `docs/auth-implementation-evidence-ledger.md`  
-**Non-implementation note:** Password Recovery, Project Claim, Route Protection, and Truthful Handoff remain **separate** packages — do not start until Tagia authorizes.
+**Non-implementation note:** Project Claim, Route Protection, and Truthful Handoff remain **separate** packages — do not start until Tagia authorizes.
 
 **Authority / context**
 
@@ -165,13 +165,13 @@ Local campaign + Intake → sign-in → `PATCH /api/campaigns/current` claim set
 | 1 | **Account Creation Foundation** | **Cold-certified PASS (2026-07-19)** |
 | 2 | **Email Verification** | **Cold-certified PASS (2026-07-19)** |
 | 3 | **Sign-in and Session Hardening** | **Cold-certified PASS (2026-07-19)** |
-| 4 | **Password Recovery** | Later |
+| 4 | **Password Recovery** | **PASS** (2026-07-20) |
 | 5 | **Project Claim and Ownership** | Later |
 | 6 | **Route and Data Protection** | Later |
 | 7 | **Truthful Intake → Authentication → Board Handoff** | Later |
 | 8 | **Production Authentication Certification** | Last |
 
-Active road: **Password Recovery** (when Tagia authorizes) → Project Claim → …
+Active road: **Project Claim** (when Tagia authorizes) → …
 
 Parking Lot remains locked (reopen trigger unchanged).
 
@@ -266,4 +266,4 @@ Unsigned journey (local)
     → /studio-board (+ /campaign-details when needed)
 ```
 
-**Verdict:** Owner path approved. Email provider approved (Resend). **Account Creation PASS. Email Verification PASS. Sign-in / Session Hardening PASS (2026-07-19).** Next when authorized: Password Recovery. Project Claim and Parking Lot stay locked.
+**Verdict:** Owner path approved. Email provider approved (Resend). **Account Creation PASS. Email Verification PASS. Sign-in / Session Hardening PASS (2026-07-19). Password Recovery PASS (2026-07-20).** Next when authorized: Project Claim. Parking Lot stays locked.

@@ -15,7 +15,7 @@ Not a business-rule freeze until Tagia explicitly locks it.
 | Checkout | **Cold-certified 2026-07-19** |
 | Project Intake | **Package 1: Intake Reliability v1 cold-certified PASS 2026-07-19** |
 | Board handoff | **Cold-certified 2026-07-19 as guided test** — public launch blocked by seed-only auth |
-| Auth | **Sign-in / Session Hardening PASS** — next: Password Recovery when authorized (`docs/auth-implementation-evidence-ledger.md`) |
+| Auth | **Password Recovery PASS** — next: Project Claim when authorized (`docs/auth-implementation-evidence-ledger.md`) |
 | Lobby entry | **Functional contract LOCKED** (`docs/studio-lobby-entry-split-v1-locked.md`) — next: production film design approval, then implement; no code until design approved |
 
 **Parking Lot (locked):** `docs/parking-lot-locked-until-launch-blockers.md` — reopen only after Intake Reliability → Auth Inspection → Auth Implementation → Truthful Handoff → Post-completion Tablet.

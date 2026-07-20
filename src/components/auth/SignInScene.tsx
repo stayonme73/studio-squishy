@@ -10,6 +10,7 @@ import {
   peekStudioVoiceBoardHandoffAwaitingSignIn,
   promoteStudioVoiceBoardHandoffToWelcome,
 } from "@/lib/studio-voice-board-handoff";
+import UtilityPasswordField from "@/components/auth/UtilityPasswordField";
 
 const SESSION_PROBE_TIMEOUT_MS = 2500;
 
@@ -121,16 +122,24 @@ export default function SignInScene() {
                 required
               />
             </label>
-            <label className="utility-field">
-              <span>Password</span>
-              <input
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-              />
-            </label>
+            <UtilityPasswordField
+              label="Password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+            <p className="utility-note">
+              <Link
+                href={
+                  returnTo && returnTo !== "/studio-board"
+                    ? `/forgot-password?from=${encodeURIComponent(returnTo)}`
+                    : "/forgot-password"
+                }
+              >
+                Forgot password?
+              </Link>
+            </p>
             {error ? <p className="utility-error" role="alert">{error}</p> : null}
             <button
               className="utility-btn utility-btn--primary"

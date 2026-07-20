@@ -39,6 +39,11 @@ export type StudioUserRecord = StudioUser & {
    * Never accept for authentication in production.
    */
   password?: string;
+  /**
+   * Epoch ms when the password last changed (Password Recovery).
+   * Sessions with `issuedAt <= passwordChangedAtMs` are rejected.
+   */
+  passwordChangedAtMs?: number;
 };
 
 export type ServerCampaignEnvelope = {
