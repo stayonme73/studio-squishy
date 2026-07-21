@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 
 import styles from "@/components/studio-conversation-room/guide/studio-guide-comm.module.css";
 import {
@@ -10,13 +10,22 @@ import {
 
 export type StudioGuideCommPanelProps = {
   textDraft: string;
+  /** Changes when the guide question changes — resets the type field. */
+  fieldResetKey: string;
+  /** Placeholder for the current question (e.g. Type your business name). */
+  typePlaceholder: string;
   listening: boolean;
   speechSupported: boolean;
   interimTranscript: string;
   savedPulse: boolean;
   /** When true, Enter / Send advances the guide question. */
   isAnsweringQuestion: boolean;
-  onTextDraftChange: (value: string) => void;
+  /** Preferred name / business name and other emphasized answers. */
+  answerRequired?: boolean;
+  /** Live typing — must only update a ref, never React state. */
+  onTextDraftLive: (value: string) => void;
+  /** Commit before Continue / Send. */
+  onTextDraftFlush: (value: string) => void;
   onStartListening: () => void;
   onStopListening: () => void;
   onContinue: () => void;
@@ -24,27 +33,67 @@ export type StudioGuideCommPanelProps = {
 };
 
 /**
- * Permanent modern speak / type panel — sits beside the tablet, never inside it.
+ * Permanent speak / type panel.
+ * Keep typing side-effect free: no speech cancel, no sibling DOM rewrites per key.
  */
-export default function StudioGuideCommPanel({
+function StudioGuideCommPanel({
   textDraft,
+  fieldResetKey,
+  typePlaceholder,
   listening,
   speechSupported,
   interimTranscript,
   savedPulse,
   isAnsweringQuestion,
-  onTextDraftChange,
+  answerRequired = false,
+  onTextDraftLive,
+  onTextDraftFlush,
   onStartListening,
   onStopListening,
   onContinue,
   onSendMessage,
 }: StudioGuideCommPanelProps) {
   const v = conversationRoomGuideV1;
-  const textRef = useRef<HTMLTextAreaElement | null>(null);
+  const textRef = useRef<HTMLInputElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const sendRef = useRef<HTMLButtonElement | null>(null);
+  const resetKeyRef = useRef(fieldResetKey);
+  const emptyRef = useRef(!textDraft.trim());
+
+  const showRequired = Boolean(answerRequired && isAnsweringQuestion);
+  const placeholder = isAnsweringQuestion
+    ? typePlaceholder
+    : v.askAnythingPlaceholder;
 
   useEffect(() => {
-    if (textDraft) textRef.current?.focus();
-  }, [textDraft]);
+    const node = textRef.current;
+    if (!node) return;
+    if (resetKeyRef.current !== fieldResetKey) {
+      resetKeyRef.current = fieldResetKey;
+      node.value = textDraft;
+      emptyRef.current = !textDraft.trim();
+    }
+    if (sendRef.current) {
+      sendRef.current.disabled = emptyRef.current;
+      sendRef.current.textContent = isAnsweringQuestion
+        ? v.continueLabel
+        : v.sendMessageLabel;
+    }
+    if (wrapRef.current) {
+      wrapRef.current.dataset.required =
+        showRequired && emptyRef.current ? "true" : "false";
+      wrapRef.current.dataset.answering = isAnsweringQuestion
+        ? "true"
+        : "false";
+    }
+  }, [
+    fieldResetKey,
+    textDraft,
+    showRequired,
+    isAnsweringQuestion,
+    v.continueLabel,
+    v.sendMessageLabel,
+  ]);
 
   return (
     <aside
@@ -56,6 +105,7 @@ export default function StudioGuideCommPanel({
         type="button"
         className={styles.speakZone}
         data-active={listening ? "true" : "false"}
+        tabIndex={-1}
         onClick={listening ? onStopListening : onStartListening}
         disabled={!speechSupported && !listening}
         aria-label={listening ? "Stop listening" : v.speakHint}
@@ -90,49 +140,61 @@ export default function StudioGuideCommPanel({
         <span className={styles.answerOrRule} />
       </div>
 
-      <label className={styles.typeBlock}>
-        <span className={styles.typeField}>
-          {!textDraft.trim() ? (
-            <span className={styles.typePlaceholder} aria-hidden="true">
-              <svg
-                className={styles.keyboardIcon}
-                viewBox="0 0 24 24"
-                width="18"
-                height="18"
-                focusable="false"
-              >
-                <path
-                  fill="currentColor"
-                  d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm0 2v10h16V7H4zm2 2h2v2H6V9zm3 0h2v2H9V9zm3 0h2v2h-2V9zm3 0h2v2h-2V9zm3 0h2v2h-2V9zM6 12h2v2H6v-2zm3 0h2v2H9v-2zm3 0h2v2h-2v-2zm3 0h2v2h-2v-2zm3 0h2v2h-2v-2zM8 15h8v2H8v-2z"
-                />
-              </svg>
-              {isAnsweringQuestion ? v.typeLabel : v.askAnythingPlaceholder}
-            </span>
-          ) : null}
-          <textarea
+      <div className={styles.typeBlock}>
+        {showRequired ? (
+          <div className={styles.requiredRow}>
+            <span className={styles.requiredBadge}>{v.answerRequiredLabel}</span>
+            <span className={styles.requiredHint}>{v.typeRequiredEmptyHint}</span>
+          </div>
+        ) : null}
+        <div
+          ref={wrapRef}
+          className={styles.typeField}
+          data-required={showRequired ? "true" : "false"}
+          data-answering={isAnsweringQuestion ? "true" : "false"}
+        >
+          <input
             id={STUDIO_GUIDE_TYPE_FIELD_ID}
             ref={textRef}
             className={styles.typeLine}
-            value={textDraft}
-            onChange={(event) => onTextDraftChange(event.target.value)}
+            type="text"
+            defaultValue={textDraft}
+            placeholder={placeholder}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            onChange={(event) => {
+              const node = event.currentTarget;
+              const next = node.value;
+              const empty = !next.trim();
+              /* Only touch siblings when emptiness flips — rewriting DOM every key stole focus. */
+              if (empty !== emptyRef.current) {
+                emptyRef.current = empty;
+                if (sendRef.current) sendRef.current.disabled = empty;
+                if (wrapRef.current && showRequired) {
+                  wrapRef.current.dataset.required = empty ? "true" : "false";
+                }
+              }
+              onTextDraftLive(next);
+            }}
             onFocus={() => {
               if (listening) onStopListening();
             }}
             onKeyDown={(event) => {
               if (event.key !== "Enter" || event.shiftKey) return;
-              if (!textDraft.trim()) return;
+              const next = textRef.current?.value ?? "";
+              if (!next.trim()) return;
               event.preventDefault();
+              onTextDraftFlush(next);
               if (isAnsweringQuestion) onContinue();
               else onSendMessage();
             }}
-            placeholder=" "
-            aria-label={
-              isAnsweringQuestion ? v.typeLabel : v.askAnythingPlaceholder
-            }
-            rows={3}
+            aria-required={showRequired ? true : undefined}
+            aria-label={placeholder}
           />
-        </span>
-      </label>
+        </div>
+      </div>
 
       {savedPulse ? (
         <p className={styles.savedCue} aria-live="polite">
@@ -140,15 +202,33 @@ export default function StudioGuideCommPanel({
         </p>
       ) : null}
 
-      {textDraft.trim() ? (
-        <button
-          type="button"
-          className={styles.sendBtn}
-          onClick={isAnsweringQuestion ? onContinue : onSendMessage}
-        >
-          {isAnsweringQuestion ? v.continueLabel : v.sendMessageLabel}
-        </button>
-      ) : null}
+      <button
+        ref={sendRef}
+        type="button"
+        className={styles.sendBtn}
+        onClick={() => {
+          const next = textRef.current?.value ?? "";
+          onTextDraftFlush(next);
+          if (!next.trim()) return;
+          if (isAnsweringQuestion) onContinue();
+          else onSendMessage();
+        }}
+      >
+        {isAnsweringQuestion ? v.continueLabel : v.sendMessageLabel}
+      </button>
     </aside>
   );
 }
+
+export default memo(StudioGuideCommPanel, (prev, next) => {
+  return (
+    prev.fieldResetKey === next.fieldResetKey &&
+    prev.typePlaceholder === next.typePlaceholder &&
+    prev.listening === next.listening &&
+    prev.speechSupported === next.speechSupported &&
+    prev.interimTranscript === next.interimTranscript &&
+    prev.savedPulse === next.savedPulse &&
+    prev.isAnsweringQuestion === next.isAnsweringQuestion &&
+    prev.answerRequired === next.answerRequired
+  );
+});

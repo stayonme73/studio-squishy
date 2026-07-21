@@ -50,12 +50,21 @@ export const conversationRoomGuideV1 = {
    */
   routePanelTitle: "Choose Your Route",
   routePanelLead:
-    "I'll recommend the strongest match from what you told me. Confirm it, or choose another route if something else fits better.",
+    "Confirm the recommended route, or choose another that fits better.",
   routeRecommendedBadge: "Recommended",
   routeConfirmCtaPrefix: "Continue with",
   routeConfirmCtaFallback: "Confirm your route",
   routeHelpPrompt: "Not sure where to start?",
   routeHelpCta: "Confirm the recommended route, or pick another that fits better.",
+  /** Activity Panel — peek at a route before confirming on the tablet. */
+  routePeekEyebrow: "Route details",
+  routePeekJobsHeading: "Services on this route",
+  routePeekJobsHint:
+    "Open any service for purpose, what’s included, what we don’t offer, revisions, and timing.",
+  routePeekShowDetails: "Show full details",
+  routePeekHideDetails: "Hide details",
+  routePeekEmptyJobs: "This route opens the job shelf so you can pick what you need.",
+  routePeekConfirmPrefix: "Continue with",
   /**
    * Spoken once when the route panel opens after Review — not ambient.
    * Prefer `routeVoiceBridge(preferredName)` so the name is used once, not every line.
@@ -82,7 +91,11 @@ export const conversationRoomGuideV1 = {
   /** Tablet status — do not duplicate the panel’s “Build Your Project” heading. */
   servicesTabletTitle: "Your project so far",
   servicesTabletOpenPanelCta: "Open service list",
+  /** Always available on the services tablet — do not bury route change in the panel only. */
+  servicesChangeRouteCta: "Change route",
   servicesBackToRoutesLabel: "Back to routes",
+  servicesShowFullDetails: "Show full details",
+  servicesHideFullDetails: "Hide details",
   servicesReviewPlanCta: "Review Studio Plan",
   learnMoreBackLabel: "Back to services",
   learnMoreVoiceOffer: "Would you like to learn more, or add it to your project?",
@@ -117,6 +130,8 @@ export const conversationRoomGuideV1 = {
   studioPlanExtraDetailsLead:
     "Revision policy, what you'll need after checkout, and View Scope for each service.",
   studioPlanEditLabel: "Edit Plan",
+  /** Change the highway without hunting through Edit Plan → Back to routes. */
+  studioPlanChangeRouteLabel: "Change route",
   /** @deprecated Prefer studioPlanConfirmCta — kept for Host/legacy callers. */
   studioPlanLooksGoodLabel: "Looks Good, Continue",
   studioPlanBackLabel: "Back to Studio Plan",
@@ -179,19 +194,42 @@ export const conversationRoomGuideV1 = {
   /** When required fields remain unresolved. */
   intakeTabletNextRequiredRemaining:
     "Complete the remaining required items.",
-  /** When all required fields are satisfied. */
-  intakeTabletNextReady: "Review and continue to your Studio Board.",
-  /** Required satisfied; materials marked none-yet / provide-later. */
-  intakeTabletNextReadyMaterialsLater:
+  /** Signed out — ready to submit. */
+  intakeTabletNextReadySignedOut:
+    "Review and continue to Sign In to open your Studio Board.",
+  intakeTabletNextReadyMaterialsLaterSignedOut:
+    "You marked materials for later. That does not erase your purchase — production starts after they arrive. Review and continue to Sign In to open your Studio Board.",
+  /** Signed in — ready to submit. */
+  intakeTabletNextReadySignedIn: "Review and continue to your Studio Board.",
+  intakeTabletNextReadyMaterialsLaterSignedIn:
     "You marked materials for later. That does not erase your purchase — production starts after they arrive. Review and continue to your Studio Board.",
+  /** @deprecated Prefer auth-specific Next copy — defaults to signed-out truth. */
+  intakeTabletNextReady:
+    "Review and continue to Sign In to open your Studio Board.",
+  intakeTabletNextReadyMaterialsLater:
+    "You marked materials for later. That does not erase your purchase — production starts after they arrive. Review and continue to Sign In to open your Studio Board.",
   intakeTabletLead:
     "Now I'll collect the information our production team needs. Required fields are marked; optional ones can wait.",
   intakeOpenPanelCta: "Continue intake",
   intakeHostFallbackCta: "Open Host Project Intake",
+  /** Form primary CTA — must match real next destination. */
+  intakeSubmitCtaSignedOut: "SAVE & CONTINUE TO SIGN IN",
+  intakeSubmitCtaSignedIn: "SAVE & CONTINUE TO STUDIO BOARD",
+  intakeNextStepBlurbSignedOut:
+    "Complete every required section for all purchased services, then continue to Sign In.",
+  intakeNextStepBlurbSignedIn:
+    "Complete every required section for all purchased services, then continue to Studio Board.",
   /**
-   * Spoken on Intake submit success — before Board auth.
-   * Explains why sign-in happens so it does not feel like a failure.
+   * Spoken on Intake submit when the customer must Sign In first.
    */
+  intakeSubmitSuccessVoiceSignedOut:
+    "Everything required to begin has been collected. Your project has been created. The next step is signing in so you can access your Studio Board, track progress, communicate with the Studio, and receive updates.",
+  /**
+   * Spoken on Intake submit when already signed in — Board next, no Sign In language.
+   */
+  intakeSubmitSuccessVoiceSignedIn:
+    "Everything required to begin has been collected. Your project has been created. Opening your Studio Board so you can track progress, communicate with the Studio, and receive updates.",
+  /** @deprecated Prefer auth-specific Voice — defaults to signed-out truth. */
   intakeSubmitSuccessVoice:
     "Everything required to begin has been collected. Your project has been created. The next step is signing in so you can access your Studio Board, track progress, communicate with the Studio, and receive updates.",
   /** Sign-in banner when Voice hands off after Intake (visual; speech already played). */
@@ -207,6 +245,9 @@ export const conversationRoomGuideV1 = {
   speakHint: "Tap the mic to speak",
   speakSubhint: "or start typing below",
   typeLabel: "Type your answer",
+  /** Shown on required guide answers (preferred name cannot be skipped). */
+  answerRequiredLabel: "Required",
+  typeRequiredEmptyHint: "This answer is required.",
   /** Always-on strip — customer can ask or speak even after guide questions end. */
   communicationLabel: "Talk with the Studio",
   askAnythingPlaceholder: "Ask a question or tell the Studio something",

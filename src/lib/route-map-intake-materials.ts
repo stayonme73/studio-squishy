@@ -31,6 +31,10 @@ export function parseMaterialsPathAnswer(raw: string | undefined): ParsedMateria
   if (value === INTAKE_MATERIALS_PROVIDE_LATER) {
     return { availability: INTAKE_MATERIALS_PROVIDE_LATER, detail: "" };
   }
+  /* Sentinel = chip selected, describe box open, no text yet. */
+  if (value === INTAKE_MATERIALS_HAVE_NOW) {
+    return { availability: INTAKE_MATERIALS_HAVE_NOW, detail: "" };
+  }
   return { availability: INTAKE_MATERIALS_HAVE_NOW, detail: value };
 }
 
@@ -41,7 +45,11 @@ export function buildMaterialsPathAnswer(
 ): string {
   if (availability === INTAKE_MATERIALS_NONE_YET) return INTAKE_MATERIALS_NONE_YET;
   if (availability === INTAKE_MATERIALS_PROVIDE_LATER) return INTAKE_MATERIALS_PROVIDE_LATER;
-  if (availability === INTAKE_MATERIALS_HAVE_NOW) return detail.trim();
+  if (availability === INTAKE_MATERIALS_HAVE_NOW) {
+    const trimmed = detail.trim();
+    /* Keep the chip selected while the customer is still typing the description. */
+    return trimmed.length > 0 ? trimmed : INTAKE_MATERIALS_HAVE_NOW;
+  }
   return "";
 }
 

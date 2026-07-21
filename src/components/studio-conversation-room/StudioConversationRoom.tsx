@@ -122,7 +122,11 @@ export default function StudioConversationRoom({
   const titleId = useId();
   const slideRef = useRef<HTMLElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
+  const onCloseActivityPanelRef = useRef(onCloseActivityPanel);
+  onCloseActivityPanelRef.current = onCloseActivityPanel;
 
+  /* Auto-focus once when a panel opens — never again on parent re-renders
+     (Intake typing was losing the caret every status/autosave update). */
   useEffect(() => {
     if (!panelOpen) return;
 
@@ -141,14 +145,14 @@ export default function StudioConversationRoom({
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       ) ?? root;
 
-    window.setTimeout(() => {
+    const focusTimer = window.setTimeout(() => {
       focusTarget?.focus();
     }, 0);
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         event.preventDefault();
-        onCloseActivityPanel?.();
+        onCloseActivityPanelRef.current?.();
         return;
       }
 
@@ -169,18 +173,17 @@ export default function StudioConversationRoom({
 
     document.addEventListener("keydown", onKeyDown);
     return () => {
+      window.clearTimeout(focusTimer);
       document.removeEventListener("keydown", onKeyDown);
-      const restore =
-        activityPanelReturnFocusRef?.current ?? previouslyFocused.current;
-      restore?.focus?.();
     };
-  }, [
-    panelOpen,
-    slideOpen,
-    activePanel,
-    onCloseActivityPanel,
-    activityPanelReturnFocusRef,
-  ]);
+  }, [activePanel, panelOpen, slideOpen, helpOpen, activityPanelReturnFocusRef]);
+
+  useEffect(() => {
+    if (panelOpen) return;
+    const restore =
+      activityPanelReturnFocusRef?.current ?? previouslyFocused.current;
+    restore?.focus?.();
+  }, [panelOpen, activityPanelReturnFocusRef]);
 
   const roomClassName = [styles.room, className ?? ""].filter(Boolean).join(" ");
   const panelLabel =

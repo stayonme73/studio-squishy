@@ -31,7 +31,8 @@ function roadTagline(roadId: RouteMapRoadId, fallback: string): string {
 
 /**
  * Choose Your Route — map + lane cards on the tablet.
- * Voice may recommend a route; the customer confirms before Build Your Project opens.
+ * All four routes stay in one grid; Recommended is a badge on the card.
+ * Voice may recommend; the customer confirms before Build Your Project opens.
  */
 export default function ConversationRouteChoose({
   onPreviewRoad,
@@ -48,6 +49,63 @@ export default function ConversationRouteChoose({
   const confirmLabel = pendingRoad
     ? `${v.routeConfirmCtaPrefix} ${pendingRoad.customerLabel}`
     : v.routeConfirmCtaFallback;
+
+  const confirmRow = (
+    <div className={styles.routeConfirmRow}>
+      <button
+        type="button"
+        className={styles.primary}
+        disabled={!pendingId}
+        onClick={() => {
+          if (pendingId) onConfirmRoad(pendingId);
+        }}
+      >
+        {confirmLabel}
+      </button>
+    </div>
+  );
+
+  const routeNav = (
+    <nav className={styles.routeList} aria-label="Choose your route">
+      {roads.map((road) => {
+        const active = pendingId === road.id;
+        const recommended = recommendedRoadId === road.id;
+        return (
+          <div
+            key={road.id}
+            className={styles.routeExpand}
+            data-expanded={active ? "true" : "false"}
+            data-recommended={recommended ? "true" : "false"}
+            data-road={road.id}
+          >
+            <button
+              type="button"
+              className={styles.routeCard}
+              aria-pressed={active}
+              aria-haspopup="dialog"
+              aria-label={`${road.customerLabel}. Open route details.`}
+              onClick={() => onPreviewRoad(road.id)}
+            >
+              <span className={styles.routeBody}>
+                {recommended ? (
+                  <span className={styles.routeRecommendedBadge}>
+                    {v.routeRecommendedBadge}
+                  </span>
+                ) : null}
+                <span className={styles.routeLabel}>{road.customerLabel}</span>
+                <span className={styles.routeTagline}>
+                  {roadTagline(road.id, road.tagline)}
+                </span>
+              </span>
+              <span className={styles.routeArrow} aria-hidden>
+                →
+              </span>
+            </button>
+          </div>
+        );
+      })}
+    </nav>
+  );
 
   return (
     <div
@@ -72,6 +130,9 @@ export default function ConversationRouteChoose({
         ) : null}
       </header>
 
+      {/* Tablet: Continue first so the map can stay large below. */}
+      {compact ? confirmRow : null}
+
       <figure className={styles.mapFigure}>
         <img
           src="/route-map/studio-route-map-hero-v2.png"
@@ -80,61 +141,16 @@ export default function ConversationRouteChoose({
         />
       </figure>
 
-      <p className={styles.helpLine}>
-        <span className={styles.helpPrompt}>{v.routeHelpPrompt}</span>{" "}
-        {v.routeHelpCta}
-      </p>
+      {!compact ? (
+        <p className={styles.helpLine}>
+          <span className={styles.helpPrompt}>{v.routeHelpPrompt}</span>{" "}
+          {v.routeHelpCta}
+        </p>
+      ) : null}
 
-      <nav className={styles.routeList} aria-label="Choose your route">
-        {roads.map((road) => {
-          const active = pendingId === road.id;
-          const recommended = recommendedRoadId === road.id;
-          return (
-            <div
-              key={road.id}
-              className={styles.routeExpand}
-              data-expanded={active ? "true" : "false"}
-              data-recommended={recommended ? "true" : "false"}
-              data-road={road.id}
-            >
-              <button
-                type="button"
-                className={styles.routeCard}
-                aria-pressed={active}
-                onClick={() => onPreviewRoad(road.id)}
-              >
-                <span className={styles.routeBody}>
-                  {recommended ? (
-                    <span className={styles.routeRecommendedBadge}>
-                      {v.routeRecommendedBadge}
-                    </span>
-                  ) : null}
-                  <span className={styles.routeLabel}>{road.customerLabel}</span>
-                  <span className={styles.routeTagline}>
-                    {roadTagline(road.id, road.tagline)}
-                  </span>
-                </span>
-                <span className={styles.routeArrow} aria-hidden>
-                  →
-                </span>
-              </button>
-            </div>
-          );
-        })}
-      </nav>
+      {routeNav}
 
-      <div className={styles.routeConfirmRow}>
-        <button
-          type="button"
-          className={styles.primary}
-          disabled={!pendingId}
-          onClick={() => {
-            if (pendingId) onConfirmRoad(pendingId);
-          }}
-        >
-          {confirmLabel}
-        </button>
-      </div>
+      {!compact ? confirmRow : null}
     </div>
   );
 }

@@ -36,6 +36,9 @@ type Props = {
    * Social Posts always uses its custom card UI.
    */
   layout?: "stacked" | "cards";
+  /** Truthful handoff — must match real next destination. */
+  submitCtaLabel: string;
+  nextStepBlurb: string;
 };
 
 type ChoiceOption = {
@@ -219,6 +222,8 @@ function SocialPostsIntakeForm({
   onSubmit,
   onDraftStatusChange,
   submitError,
+  submitCtaLabel,
+  nextStepBlurb,
 }: {
   job: RouteMapJob;
   initialDraftAnswers?: RouteMapIntakeAnswers | null;
@@ -226,6 +231,8 @@ function SocialPostsIntakeForm({
   onSubmit: (answers: RouteMapIntakeAnswers) => boolean;
   onDraftStatusChange?: (status: "unsaved" | "saved" | "error") => void;
   submitError?: string | null;
+  submitCtaLabel: string;
+  nextStepBlurb: string;
 }) {
   const restored = socialPostsStateFromAnswers(initialDraftAnswers);
   const [state, setState] = useState<SocialPostsIntakeState>(restored);
@@ -528,7 +535,7 @@ function SocialPostsIntakeForm({
         <div className="route-map-social-intake__actions">
           <div className="route-map-social-intake__next-step">
             <strong>Next Step</strong>
-            <span>Save your progress or continue to your Studio Board Overview.</span>
+            <span>{nextStepBlurb}</span>
           </div>
           <button
             type="button"
@@ -543,7 +550,7 @@ function SocialPostsIntakeForm({
             className="route-map-primary-btn"
             disabled={!requiredChoicesComplete || submitting}
           >
-            SAVE &amp; CONTINUE TO YOUR STUDIO BOARD
+            {submitCtaLabel}
           </button>
         </div>
         {submitError ? (
@@ -552,10 +559,7 @@ function SocialPostsIntakeForm({
           </p>
         ) : null}
       </form>
-      <p className="route-map-social-intake__next">
-        Next: your Studio Board Overview opens with this Social Posts job and the details you
-        shared. Submitting Project Intake does not start production.
-      </p>
+      <p className="route-map-social-intake__next">{nextStepBlurb}</p>
       <p className="route-map-social-intake__job">{job.name}</p>
     </section>
   );
@@ -586,6 +590,8 @@ export default function RouteMapIntakeForm({
   onDraftStatusChange,
   submitError = null,
   layout = "stacked",
+  submitCtaLabel,
+  nextStepBlurb,
 }: Props) {
   const schema = useMemo(
     () => getRouteMapIntakeSchema(job.intakeType),
@@ -664,6 +670,8 @@ export default function RouteMapIntakeForm({
         onSubmit={onSubmit}
         onDraftStatusChange={onDraftStatusChange}
         submitError={submitError}
+        submitCtaLabel={submitCtaLabel}
+        nextStepBlurb={nextStepBlurb}
       />
     );
   }
@@ -809,7 +817,7 @@ export default function RouteMapIntakeForm({
           <div className="route-map-social-intake__actions">
             <div className="route-map-social-intake__next-step">
               <strong>Next Step</strong>
-              <span>Save your progress or continue to your Studio Board Overview.</span>
+              <span>{nextStepBlurb}</span>
             </div>
             <button
               type="button"
@@ -826,7 +834,7 @@ export default function RouteMapIntakeForm({
                 submitting || !materialsFieldsComplete || !requiredFieldsComplete
               }
             >
-              SAVE &amp; CONTINUE TO YOUR STUDIO BOARD
+              {submitCtaLabel}
             </button>
           </div>
           {submitError ? (
@@ -835,10 +843,7 @@ export default function RouteMapIntakeForm({
             </p>
           ) : null}
         </form>
-        <p className="route-map-social-intake__next">
-          Next: your Studio Board Overview opens with this job and the details you
-          shared. Submitting Project Intake does not start production.
-        </p>
+        <p className="route-map-social-intake__next">{nextStepBlurb}</p>
         <p className="route-map-social-intake__job">{job.name}</p>
       </section>
     );
@@ -959,6 +964,7 @@ export default function RouteMapIntakeForm({
           </p>
         ) : null}
         <div className="route-map-intake__actions">
+          <p className="route-map-intake__next-step">{nextStepBlurb}</p>
           <button
             type="button"
             className="route-map-secondary-btn"
@@ -972,7 +978,7 @@ export default function RouteMapIntakeForm({
             className="route-map-primary-btn"
             disabled={submitting || !materialsFieldsComplete}
           >
-            Submit Project Intake &amp; continue to Studio Board
+            {submitCtaLabel}
           </button>
         </div>
       </form>

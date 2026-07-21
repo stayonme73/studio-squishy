@@ -36,10 +36,12 @@ import {
   type RouteMapJobId,
   type RouteMapRoadId,
 } from "@/config/route-map-v1";
-import { studioBoard } from "@/config/studio-board";
 import {
-  markStudioVoiceBoardHandoffAwaitingSignIn,
-} from "@/lib/studio-voice-board-handoff";
+  completeIntakeHandoff,
+  navigateIntakeHandoff,
+  probeCustomerSessionSignedIn,
+  resolveIntakeHandoffPlan,
+} from "@/lib/studio-intake-handoff";
 import {
   bootConversationProjectDraft,
   bridgeConversationPlanToCampaign,
@@ -182,6 +184,10 @@ export default function ConversationRoomRuntime({
     createEmptyGuideCaptureDraft(),
   );
   const [textDraft, setTextDraft] = useState("");
+  /** Always the latest typed value — Continue must not read a stale render. */
+  const textDraftRef = useRef("");
+  /** Bumps the type-field reset key even when step stays the same (Start New). */
+  const [fieldEpoch, setFieldEpoch] = useState(0);
   const [selectedBubbles, setSelectedBubbles] = useState<string[]>([]);
   const [showDateField, setShowDateField] = useState(false);
   const [correcting, setCorrecting] = useState(false);
@@ -208,6 +214,8 @@ export default function ConversationRoomRuntime({
   /** Live Intake answers for tablet status + post-refresh restore mirror. */
   const [intakeLiveAnswers, setIntakeLiveAnswers] =
     useState<RouteMapIntakeAnswers | null>(null);
+  /** Fail-closed signed-out until session probe succeeds — CTA/tablet stay truthful. */
+  const [intakeHandoffSignedIn, setIntakeHandoffSignedIn] = useState(false);
   const activityReturnFocusRef = useRef<HTMLElement | null>(null);
   /** Suppress stacked “added” lines when the customer taps services quickly. */
   const lastServiceAddSpokenAtRef = useRef(0);
@@ -274,7 +282,8 @@ export default function ConversationRoomRuntime({
     setStage(restoredStage);
     setDraft(hydratedGuide);
     setStep(openStep);
-    setTextDraft(fieldValueForStep(hydratedGuide, openStep));
+    const openField = fieldValueForStep(hydratedGuide, openStep);
+    writeTextDraft(openField);
     setActivePanel(
       restoredStage === "opening" ? "none" : STAGE_DEFAULT_PANEL[restoredStage],
     );
@@ -362,7 +371,7 @@ export default function ConversationRoomRuntime({
     setAskMode(false);
     setShowDateField(false);
     setSelectedBubbles([]);
-    setTextDraft(fieldValueForStep(nextDraft, next));
+    writeTextDraft(fieldValueForStep(nextDraft, next));
     setError(null);
     setInterimTranscript("");
     stopConversationDictation();
@@ -406,13 +415,13 @@ export default function ConversationRoomRuntime({
   function closeActivityPanel() {
     setActivePanel("none");
     setDetailJobId(null);
-    setPreviewRoadId(null);
     dispatch({ type: "close-help" });
   }
 
   function handlePreviewRoad(roadId: RouteMapRoadId) {
-    /* Lane tap only highlights — customer must confirm before the route commits. */
+    /* Highlight on the tablet and open Route details in the Activity Panel. */
     setPreviewRoadId(roadId);
+    openPanel("route");
   }
 
   function handleConfirmRoad(roadId: RouteMapRoadId) {
@@ -424,7 +433,7 @@ export default function ConversationRoomRuntime({
     skipped: boolean;
   } {
     const question = getConversationRoomGuideQuestion(questionStep);
-    const typed = textDraft.trim();
+    const typed = textDraftRef.current.trim();
     if (
       question?.bubbleMode === "multi" &&
       selectedBubbles.length > 0 &&
@@ -535,7 +544,7 @@ export default function ConversationRoomRuntime({
     if (question.opensDateFieldBubble && bubble === question.opensDateFieldBubble) {
       setSelectedBubbles([bubble]);
       setShowDateField(true);
-      setTextDraft("");
+      writeTextDraft("");
       return;
     }
 
@@ -557,7 +566,7 @@ export default function ConversationRoomRuntime({
     if (!isGuideRelativeDeadlineChoice(bubble) || step !== "ask_deadline") {
       /* single-select places wording into the field — customer may edit */
     }
-    setTextDraft(bubble);
+    writeTextDraft(bubble);
     setShowDateField(false);
   }
 
@@ -575,6 +584,16 @@ export default function ConversationRoomRuntime({
       servicesVoiceIntro(road?.customerLabel ?? "your route"),
     );
   }
+
+  const previousStageRef = useRef<ConversationRoomStage | null>(null);
+
+  useEffect(() => {
+    const previous = previousStageRef.current;
+    previousStageRef.current = stage;
+    if (stage !== "services") return;
+    if (previous === "services") return;
+    openPanel("builder");
+  }, [stage]);
 
   function handleOpenLearnMore(jobId: RouteMapJobId) {
     setDetailJobId(jobId);
@@ -646,6 +665,17 @@ export default function ConversationRoomRuntime({
     openPanel("builder");
   }
 
+  function handleChangeRoute() {
+    setPlanBridgeError(null);
+    setDetailJobId(null);
+    const recommended =
+      readRouteRecommendation(projectDraft)?.roadId ??
+      recommendRouteFromProjectNeed(draft.projectNeed);
+    setStageAndPersist("route");
+    closeActivityPanel();
+    setPreviewRoadId(recommended);
+  }
+
   function handleLooksGoodPlan() {
     const route = readSelectedRoute(
       projectDraft ?? bootConversationProjectDraft(draft),
@@ -696,9 +726,12 @@ export default function ConversationRoomRuntime({
   function handleIntakeSubmitSuccess() {
     setStageAndPersist("complete");
     closeActivityPanel();
-    markStudioVoiceBoardHandoffAwaitingSignIn();
-    speakStudioLine(conversationRoomGuideV1.intakeSubmitSuccessVoice);
-    router.push(studioBoard.routes.studioBoard);
+    void (async () => {
+      const plan = await completeIntakeHandoff();
+      setIntakeHandoffSignedIn(plan.auth === "signed-in");
+      speakStudioLine(plan.voiceLine);
+      navigateIntakeHandoff(plan.destination);
+    })();
   }
 
   function handleConfirm() {
@@ -811,9 +844,21 @@ export default function ConversationRoomRuntime({
     setStudioSpeaking(false);
   }
 
-  function handleTextDraftChange(value: string) {
-    if (studioSpeaking) stopStudioSpeech();
+  function handleTextDraftLive(value: string) {
+    /* Ref only — no speech cancel, no setState (both were stealing the caret). */
+    textDraftRef.current = value;
+  }
+
+  function handleTextDraftFlush(value: string) {
+    textDraftRef.current = value;
+    if (error) setError(null);
     setTextDraft(value);
+  }
+
+  function writeTextDraft(value: string) {
+    textDraftRef.current = value;
+    setTextDraft(value);
+    setFieldEpoch((n) => n + 1);
   }
 
   function handleStartListening() {
@@ -832,7 +877,7 @@ export default function ConversationRoomRuntime({
           setError("I did not catch that. Try again, or type your answer.");
           return;
         }
-        setTextDraft(trimmed);
+        writeTextDraft(trimmed);
       },
       onPermissionDenied: () => {
         setListening(false);
@@ -858,14 +903,14 @@ export default function ConversationRoomRuntime({
 
   /** Free-form customer message — available on every screen, including after save. */
   function handleSendMessage() {
-    const trimmed = textDraft.trim();
+    const trimmed = textDraftRef.current.trim();
     if (!trimmed) return;
     setError(null);
     stopConversationDictation();
     setListening(false);
     /* Affordance first — Voice Host reply comes in a later package. */
     pulseSaved();
-    setTextDraft("");
+    writeTextDraft("");
     setInterimTranscript("");
   }
 
@@ -885,7 +930,19 @@ export default function ConversationRoomRuntime({
       if (prev) return prev;
       return readUsableIntakeDraftAnswers(readCurrentCampaignHydrated()) ?? {};
     });
+    let cancelled = false;
+    void probeCustomerSessionSignedIn().then((signedIn) => {
+      if (!cancelled) setIntakeHandoffSignedIn(signedIn);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [stage]);
+
+  const intakeHandoffPlan = useMemo(
+    () => resolveIntakeHandoffPlan(intakeHandoffSignedIn),
+    [intakeHandoffSignedIn],
+  );
 
   const intakeTabletStatus = useMemo(() => {
     if (stage !== "intake" || intakeLiveAnswers === null) return null;
@@ -902,11 +959,11 @@ export default function ConversationRoomRuntime({
         servicesConfirmedLabel: v.intakeTabletServicesConfirmedLabel,
         stillNeededNoneLabel: v.intakeTabletStillNeededNoneLabel,
         nextRequiredRemaining: v.intakeTabletNextRequiredRemaining,
-        nextReady: v.intakeTabletNextReady,
-        nextReadyMaterialsLater: v.intakeTabletNextReadyMaterialsLater,
+        nextReady: intakeHandoffPlan.tabletNextReady,
+        nextReadyMaterialsLater: intakeHandoffPlan.tabletNextReadyMaterialsLater,
       },
     });
-  }, [stage, intakeLiveAnswers, serviceIdsForIntake]);
+  }, [stage, intakeLiveAnswers, serviceIdsForIntake, intakeHandoffPlan]);
 
   if (!ready || !projectDraft) {
     return (
@@ -932,6 +989,11 @@ export default function ConversationRoomRuntime({
   const question = getConversationRoomGuideQuestion(step);
   const isAnsweringQuestion =
     stage === "opening" && Boolean(question) && !correcting && !askMode;
+  /* Preferred name + project need are locked required; business name gets the same highlight while typing. */
+  const answerRequired =
+    isAnsweringQuestion &&
+    question != null &&
+    (question.canSkip === false || question.step === "ask_business_name");
 
   const canChangeAnswer =
     Boolean(draft.projectNeed.trim()) ||
@@ -951,22 +1013,23 @@ export default function ConversationRoomRuntime({
         slidePanel ? (
           <ConversationActivityPanel
             panel={slidePanel}
-            selectedRoadId={selectedRoute?.roadId ?? null}
+            selectedRoadId={
+              selectedRoute?.roadId ?? previewRoadId
+            }
             detailJobId={detailJobId}
             selectedJobIds={selectedJobIds}
             onClose={closeActivityPanel}
+            onConfirmRoute={handleConfirmRoad}
             onBackToRoutes={() => {
-              setDetailJobId(null);
-              const recommended =
-                readRouteRecommendation(projectDraft)?.roadId ??
-                recommendRouteFromProjectNeed(draft.projectNeed);
-              setStageAndPersist("route");
-              closeActivityPanel();
-              setPreviewRoadId(recommended);
+              handleChangeRoute();
             }}
             onOpenLearnMore={handleOpenLearnMore}
             onBackToServices={() => {
               setDetailJobId(null);
+              if (stage === "route") {
+                openPanel("route");
+                return;
+              }
               if (stage === "plan") {
                 openPanel("plan");
                 return;
@@ -986,6 +1049,8 @@ export default function ConversationRoomRuntime({
             }}
             intakePrefillBusinessName={draft.businessName}
             onIntakeAnswersChange={setIntakeLiveAnswers}
+            intakeSubmitCtaLabel={intakeHandoffPlan.submitCtaLabel}
+            intakeNextStepBlurb={intakeHandoffPlan.nextStepBlurb}
             learnMoreBackLabel={
               stage === "plan"
                 ? conversationRoomGuideV1.studioPlanBackLabel
@@ -1014,7 +1079,7 @@ export default function ConversationRoomRuntime({
           onAskQuestion={() => {
             setAskMode(true);
             stopStudioSpeech();
-            setTextDraft("");
+            writeTextDraft("");
           }}
           onReturnToLobby={handleReturnToLobby}
           onCloseConversation={handleReturnToLobby}
@@ -1044,9 +1109,14 @@ export default function ConversationRoomRuntime({
           onCorrectTarget={handleCorrectTarget}
           onOpenStagePanel={() => {
             if (stage === "route" || stage === "plan") return;
+            if (stage === "services") {
+              openPanel("builder");
+              return;
+            }
             const panel = STAGE_DEFAULT_PANEL[stage];
             if (panel !== "none") openPanel(panel);
           }}
+          onChangeRoute={handleChangeRoute}
           onPreviewRoad={handlePreviewRoad}
           onConfirmRoad={handleConfirmRoad}
           previewRoadId={previewRoadId}
@@ -1074,12 +1144,20 @@ export default function ConversationRoomRuntime({
       communication={
         <StudioGuideCommPanel
           textDraft={textDraft}
+          fieldResetKey={`${stage}:${step}:${askMode ? "ask" : "guide"}:${fieldEpoch}`}
+          typePlaceholder={
+            isAnsweringQuestion && question
+              ? question.placeholder
+              : conversationRoomGuideV1.askAnythingPlaceholder
+          }
           listening={listening}
           speechSupported={speechSupported}
           interimTranscript={interimTranscript}
           savedPulse={savedPulse}
           isAnsweringQuestion={isAnsweringQuestion}
-          onTextDraftChange={handleTextDraftChange}
+          answerRequired={answerRequired}
+          onTextDraftLive={handleTextDraftLive}
+          onTextDraftFlush={handleTextDraftFlush}
           onStartListening={handleStartListening}
           onStopListening={handleStopListening}
           onContinue={handleContinue}

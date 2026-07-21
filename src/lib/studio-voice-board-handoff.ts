@@ -98,6 +98,18 @@ export function promoteStudioVoiceBoardHandoffToWelcome(): void {
 }
 
 /**
+ * Signed-in Intake handoff — go straight to Board welcome.
+ * Never leave the passport stuck on awaiting-signin for an authenticated customer.
+ */
+export function markStudioVoiceBoardHandoffAwaitingWelcome(): void {
+  write({
+    version: 1,
+    phase: "awaiting-board-welcome",
+    setAt: new Date().toISOString(),
+  });
+}
+
+/**
  * Board arrival: true once, then clears.
  * Returns false if this was not a Voice handoff arrival.
  */

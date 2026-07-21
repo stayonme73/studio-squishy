@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import ProjectIntakeMultiServiceForm from "@/components/studio-conversation-room/guide/ProjectIntakeMultiServiceForm";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
@@ -28,10 +28,12 @@ import "@/app/route-map/route-map.css";
 
 export type ConversationIntakePanelProps = {
   onClose: () => void;
-  onSubmitSuccess: () => void;
+  onSubmitSuccess: () => void | Promise<void>;
   onRecoverPayment?: () => void;
   prefillBusinessName?: string | null;
   onAnswersChange?: (answers: RouteMapIntakeAnswers) => void;
+  submitCtaLabel: string;
+  nextStepBlurb: string;
 };
 
 type IntakeGate = Exclude<IntakeEntrySurface, { kind: "form" }>;
@@ -72,6 +74,8 @@ export default function ConversationIntakePanel({
   onRecoverPayment,
   prefillBusinessName = null,
   onAnswersChange,
+  submitCtaLabel,
+  nextStepBlurb,
 }: ConversationIntakePanelProps) {
   const v = conversationRoomGuideV1;
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -80,9 +84,19 @@ export default function ConversationIntakePanel({
   >(null);
   const [gateOverride, setGateOverride] = useState<IntakeGate | null>(null);
 
-  const campaign = readCurrentCampaignHydrated();
-  const surface =
-    gateOverride ?? resolveIntakeEntrySurface(campaign, "intake");
+  const [formSurface, setFormSurface] = useState(() =>
+    gateOverride ?? resolveIntakeEntrySurface(readCurrentCampaignHydrated(), "intake"),
+  );
+
+  useEffect(() => {
+    if (gateOverride) {
+      setFormSurface(gateOverride);
+      return;
+    }
+    setFormSurface(resolveIntakeEntrySurface(readCurrentCampaignHydrated(), "intake"));
+  }, [gateOverride]);
+
+  const surface = formSurface;
 
   const handleSaveDraft = useCallback((answers: RouteMapIntakeAnswers) => {
     const current = readCurrentCampaignHydrated();
@@ -251,6 +265,8 @@ export default function ConversationIntakePanel({
           onDraftStatusChange={setDraftStatus}
           onAnswersChange={onAnswersChange}
           submitError={submitError}
+          submitCtaLabel={submitCtaLabel}
+          nextStepBlurb={nextStepBlurb}
         />
       </div>
     </div>

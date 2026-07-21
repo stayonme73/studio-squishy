@@ -33,6 +33,8 @@ export type StudioGuideTabletViewProps = {
   onCorrectTarget: (step: GuideConversationStep) => void;
   /** Re-open the stage’s Activity Panel when it was closed (services+). */
   onOpenStagePanel?: () => void;
+  /** Return to Choose Your Route without hunting through panels. */
+  onChangeRoute?: () => void;
   /** Route stage — tap a lane to preview; confirm commits. */
   onPreviewRoad?: (roadId: RouteMapRoadId) => void;
   onConfirmRoad?: (roadId: RouteMapRoadId) => void;
@@ -77,6 +79,7 @@ export default function StudioGuideTabletView({
   onCorrect,
   onCorrectTarget,
   onOpenStagePanel,
+  onChangeRoute,
   onPreviewRoad,
   onConfirmRoad,
   previewRoadId = null,
@@ -124,11 +127,13 @@ export default function StudioGuideTabletView({
         {isPlanStage &&
         planModel &&
         onEditPlan &&
+        onChangeRoute &&
         onLooksGoodPlan &&
         onOpenPlanExtraDetails ? (
           <ConversationStudioPlanTablet
             model={planModel}
             onEditPlan={onEditPlan}
+            onChangeRoute={onChangeRoute}
             onLooksGood={onLooksGoodPlan}
             onOpenExtraDetails={onOpenPlanExtraDetails}
             bridgeError={planBridgeError}
@@ -149,8 +154,8 @@ export default function StudioGuideTabletView({
                 {selectedServiceCount}.
               </p>
             ) : null}
-            {onOpenStagePanel ? (
-              <div className={styles.actions}>
+            <div className={styles.actions}>
+              {onOpenStagePanel ? (
                 <button
                   type="button"
                   className={styles.btnPrimary}
@@ -158,8 +163,17 @@ export default function StudioGuideTabletView({
                 >
                   {v.servicesTabletOpenPanelCta}
                 </button>
-              </div>
-            ) : null}
+              ) : null}
+              {onChangeRoute ? (
+                <button
+                  type="button"
+                  className={styles.btnSecondary}
+                  onClick={onChangeRoute}
+                >
+                  {v.servicesChangeRouteCta}
+                </button>
+              ) : null}
+            </div>
           </>
         ) : null}
 
@@ -250,7 +264,14 @@ export default function StudioGuideTabletView({
 
         {isAsk && question ? (
           <>
-            <h1 className={styles.question}>{question.question}</h1>
+            <div className={styles.questionHeader}>
+              <h1 className={styles.question}>{question.question}</h1>
+              {!question.canSkip || question.step === "ask_business_name" ? (
+                <p className={styles.requiredBadge} aria-label="Required">
+                  {v.answerRequiredLabel}
+                </p>
+              ) : null}
+            </div>
 
             {question.bubbles.length > 0 ? (
               <div className={styles.chipRow} role="list">

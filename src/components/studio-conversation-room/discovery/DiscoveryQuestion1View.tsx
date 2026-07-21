@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 import styles from "@/components/studio-conversation-room/discovery/discovery-question-1.module.css";
 import {
@@ -63,12 +63,6 @@ export default function DiscoveryQuestion1View({
     record.phase === "processing" ||
     record.phase === "acknowledging";
   const chips = getDiscoveryLiveQuestion(storageKey).exampleChips;
-
-  useEffect(() => {
-    if (textDraft) {
-      textRef.current?.focus();
-    }
-  }, [textDraft]);
 
   return (
     <section

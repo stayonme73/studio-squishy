@@ -19,7 +19,6 @@ import {
   type RouteMapRoadId,
 } from "@/config/route-map-v1";
 import { resolveProjectBuilderDrawerTagline } from "@/lib/project-builder-drawer-tagline";
-import { expandScannableCopyItems } from "@/lib/project-builder-scannable-copy";
 import { buildProjectBuilderStudioPlanSummary } from "@/lib/project-builder-studio-plan-summary";
 import { resolveProjectBuilderJobPresentation } from "@/lib/project-builder-update-exit-copy";
 import type { ServiceId } from "@/catalog/types";
@@ -33,6 +32,8 @@ export type ConversationActivityPanelProps = {
   selectedJobIds: ReadonlySet<RouteMapJobId>;
   onClose: () => void;
   onBackToRoutes: () => void;
+  /** Confirm the peeked route and advance (Route details slide). */
+  onConfirmRoute?: (roadId: RouteMapRoadId) => void;
   onOpenLearnMore: (jobId: RouteMapJobId) => void;
   onBackToServices: () => void;
   onAddJob: (jobId: RouteMapJobId) => void;
@@ -40,10 +41,12 @@ export type ConversationActivityPanelProps = {
   onReviewStudioPlan: () => void;
   onBackToStudioPlan: () => void;
   onCheckoutPaymentComplete: () => void;
-  onIntakeSubmitSuccess: () => void;
+  onIntakeSubmitSuccess: () => void | Promise<void>;
   onRecoverIntakePayment?: () => void;
   intakePrefillBusinessName?: string | null;
   onIntakeAnswersChange?: (answers: RouteMapIntakeAnswers) => void;
+  intakeSubmitCtaLabel: string;
+  intakeNextStepBlurb: string;
   /** Back label when Learn More was opened from Studio Plan vs Builder. */
   learnMoreBackLabel: string;
 };
@@ -56,12 +59,122 @@ function formatEstimate(cents: number): string {
   }).format(cents / 100);
 }
 
+function roadTaglineForPeek(roadId: RouteMapRoadId, fallback: string): string {
+  if (roadId === "random-exit") {
+    return conversationRoomGuideV1.routeDirectTagline;
+  }
+  return fallback;
+}
+
+/** Lowest price first — scan by investment, not catalog order. */
+function jobsSortedByPrice(jobs: readonly RouteMapJob[]): RouteMapJob[] {
+  return [...jobs].sort((a, b) => a.priceCents - b.priceCents);
+}
+
+function RoutePeekView({
+  roadId,
+  onClose,
+  onConfirmRoute,
+}: {
+  roadId: RouteMapRoadId;
+  onClose: () => void;
+  onConfirmRoute: (roadId: RouteMapRoadId) => void;
+}) {
+  const v = conversationRoomGuideV1;
+  const road = getRouteMapRoad(roadId);
+  const jobs = jobsSortedByPrice(getJobsForRoad(roadId));
+  const [expandedIds, setExpandedIds] = useState<ReadonlySet<RouteMapJobId>>(
+    () => new Set(),
+  );
+
+  function toggleExpanded(jobId: RouteMapJobId) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(jobId)) next.delete(jobId);
+      else next.add(jobId);
+      return next;
+    });
+  }
+
+  if (!road) return null;
+
+  return (
+    <div className={styles.sheet} data-panel="route-peek">
+      <header className={styles.header}>
+        <div>
+          <p className={styles.eyebrow}>{v.routePeekEyebrow}</p>
+          <p className={styles.routeHighway}>{road.highwayLabel}</p>
+          <h2 className={styles.title}>{road.customerLabel}</h2>
+          <p className={styles.intro}>
+            {roadTaglineForPeek(roadId, road.tagline)}
+          </p>
+        </div>
+        <button
+          type="button"
+          className={styles.closeBtn}
+          onClick={onClose}
+          aria-label="Close activity panel"
+        >
+          Close
+        </button>
+      </header>
+
+      <h3 className={styles.routeExpandHeading}>{v.routePeekJobsHeading}</h3>
+      <p className={styles.routePeekHint}>{v.routePeekJobsHint}</p>
+      {jobs.length === 0 ? (
+        <p className={styles.routeExpandEmpty}>{v.routePeekEmptyJobs}</p>
+      ) : (
+        <div className={styles.routeJobPeekList}>
+          {jobs.map((job) => {
+            const expanded = expandedIds.has(job.id);
+            return (
+              <article
+                key={job.id}
+                className={styles.routeJobCard}
+                data-expanded={expanded ? "true" : "false"}
+              >
+                <div className={styles.routeJobCardTop}>
+                  <h4 className={styles.routeJobName}>{job.name}</h4>
+                  <p className={styles.routeJobPrice}>{job.priceDisplay}</p>
+                </div>
+                <p className={styles.routeJobPurpose}>{job.purpose}</p>
+                <button
+                  type="button"
+                  className={styles.expandToggle}
+                  aria-expanded={expanded}
+                  onClick={() => toggleExpanded(job.id)}
+                >
+                  {expanded ? `${v.routePeekHideDetails} ▲` : `${v.routePeekShowDetails} ▼`}
+                </button>
+                {expanded ? (
+                  <div className={`${styles.routeJobFullDetails} pb-job-details-surface`}>
+                    <ProjectBuilderJobDetailBlocks job={job} roadId={roadId} />
+                  </div>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={styles.primary}
+          onClick={() => onConfirmRoute(roadId)}
+        >
+          {v.routePeekConfirmPrefix} {road.customerLabel}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ServiceList({
   roadId,
   selectedJobIds,
   onClose,
   onBackToRoutes,
-  onOpenLearnMore,
   onAddJob,
   onRemoveJob,
   onReviewStudioPlan,
@@ -70,14 +183,13 @@ function ServiceList({
   selectedJobIds: ReadonlySet<RouteMapJobId>;
   onClose: () => void;
   onBackToRoutes: () => void;
-  onOpenLearnMore: (jobId: RouteMapJobId) => void;
   onAddJob: (jobId: RouteMapJobId) => void;
   onRemoveJob: (jobId: RouteMapJobId) => void;
   onReviewStudioPlan: () => void;
 }) {
   const v = conversationRoomGuideV1;
   const road = getRouteMapRoad(roadId);
-  const jobs = getJobsForRoad(roadId);
+  const jobs = jobsSortedByPrice(getJobsForRoad(roadId));
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<RouteMapJobId>>(
     () => new Set(),
   );
@@ -136,7 +248,6 @@ function ServiceList({
         {jobs.map((job) => {
           const inProject = selectedJobIds.has(job.id);
           const expanded = expandedIds.has(job.id);
-          const includes = expandScannableCopyItems(job.deliverables);
           const tagline =
             resolveProjectBuilderJobPresentation(job, roadId).tagline ||
             resolveProjectBuilderDrawerTagline(job);
@@ -153,6 +264,12 @@ function ServiceList({
                 <p className={styles.jobPrice}>{job.priceDisplay}</p>
               </div>
               <p className={styles.jobPurpose}>{job.purpose}</p>
+              <p className={styles.jobBestFor}>
+                <span className={styles.jobBestForLabel}>
+                  {PROJECT_BUILDER_V1.bestForLabel}
+                </span>{" "}
+                {tagline}
+              </p>
 
               <button
                 type="button"
@@ -160,38 +277,18 @@ function ServiceList({
                 aria-expanded={expanded}
                 onClick={() => toggleExpanded(job.id)}
               >
-                {expanded ? "Hide key details ▲" : "Show key details ▼"}
+                {expanded
+                  ? `${v.servicesHideFullDetails} ▲`
+                  : `${v.servicesShowFullDetails} ▼`}
               </button>
 
               {expanded ? (
-                <div className={styles.jobExpand}>
-                  <p className={styles.jobBestFor}>
-                    <span className={styles.jobBestForLabel}>
-                      {PROJECT_BUILDER_V1.bestForLabel}
-                    </span>{" "}
-                    {tagline}
-                  </p>
-                  {includes.length > 0 ? (
-                    <>
-                      <p className={styles.jobExpandHeading}>Included</p>
-                      <ul className={styles.jobExpandList}>
-                        {includes.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </>
-                  ) : null}
+                <div className={`${styles.jobExpand} pb-job-details-surface`}>
+                  <ProjectBuilderJobDetailBlocks job={job} roadId={roadId} />
                 </div>
               ) : null}
 
               <div className={styles.jobActions}>
-                <button
-                  type="button"
-                  className={styles.learnLink}
-                  onClick={() => onOpenLearnMore(job.id)}
-                >
-                  {PROJECT_BUILDER_V1.learnMoreCta} →
-                </button>
                 {inProject ? (
                   <button
                     type="button"
@@ -332,6 +429,7 @@ export default function ConversationActivityPanel({
   selectedJobIds,
   onClose,
   onBackToRoutes,
+  onConfirmRoute,
   onOpenLearnMore,
   onBackToServices,
   onAddJob,
@@ -343,8 +441,20 @@ export default function ConversationActivityPanel({
   onRecoverIntakePayment,
   intakePrefillBusinessName = null,
   onIntakeAnswersChange,
+  intakeSubmitCtaLabel,
+  intakeNextStepBlurb,
   learnMoreBackLabel,
 }: ConversationActivityPanelProps) {
+  if (panel === "route" && selectedRoadId && onConfirmRoute) {
+    return (
+      <RoutePeekView
+        roadId={selectedRoadId}
+        onClose={onClose}
+        onConfirmRoute={onConfirmRoute}
+      />
+    );
+  }
+
   if (panel === "builder" && selectedRoadId) {
     return (
       <ServiceList
@@ -352,11 +462,45 @@ export default function ConversationActivityPanel({
         selectedJobIds={selectedJobIds}
         onClose={onClose}
         onBackToRoutes={onBackToRoutes}
-        onOpenLearnMore={onOpenLearnMore}
         onAddJob={onAddJob}
         onRemoveJob={onRemoveJob}
         onReviewStudioPlan={onReviewStudioPlan}
       />
+    );
+  }
+
+  if (panel === "builder" && !selectedRoadId) {
+    return (
+      <div className={styles.sheet} data-panel="builder">
+        <header className={styles.header}>
+          <div>
+            <p className={styles.eyebrow}>Studio Guide</p>
+            <h2 className={styles.title}>
+              {conversationRoomGuideV1.servicesPanelTitle}
+            </h2>
+            <p className={styles.intro}>
+              Choose a route first, then I can show the services for that path.
+            </p>
+          </div>
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label="Close activity panel"
+          >
+            Close
+          </button>
+        </header>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.primary}
+            onClick={onBackToRoutes}
+          >
+            ← {conversationRoomGuideV1.servicesBackToRoutesLabel}
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -413,6 +557,8 @@ export default function ConversationActivityPanel({
         onRecoverPayment={onRecoverIntakePayment}
         prefillBusinessName={intakePrefillBusinessName}
         onAnswersChange={onIntakeAnswersChange}
+        submitCtaLabel={intakeSubmitCtaLabel}
+        nextStepBlurb={intakeNextStepBlurb}
       />
     );
   }

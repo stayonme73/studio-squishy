@@ -8,6 +8,7 @@ import type { ProjectBuilderStudioPlanSummaryModel } from "@/lib/project-builder
 export type ConversationStudioPlanTabletProps = {
   model: ProjectBuilderStudioPlanSummaryModel;
   onEditPlan: () => void;
+  onChangeRoute: () => void;
   onLooksGood: () => void;
   onOpenExtraDetails: () => void;
   bridgeError: string | null;
@@ -25,6 +26,7 @@ function routeCustomerLabel(routeLabel: string): string {
 export default function ConversationStudioPlanTablet({
   model,
   onEditPlan,
+  onChangeRoute,
   onLooksGood,
   onOpenExtraDetails,
   bridgeError,
@@ -118,6 +120,13 @@ export default function ConversationStudioPlanTablet({
       ) : null}
 
       <div className={styles.planTabletActions}>
+        <button
+          type="button"
+          className={styles.planTabletBtnSecondary}
+          onClick={onChangeRoute}
+        >
+          {v.studioPlanChangeRouteLabel}
+        </button>
         <button
           type="button"
           className={styles.planTabletBtnSecondary}

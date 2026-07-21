@@ -195,7 +195,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
         throw new Error(json.error ?? `Request failed (${res.status})`);
       }
       setData(json);
-      window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
+      /* Read-only refresh — do not broadcast campaign-updated (avoids Board reload loops). */
     } catch (fetchError) {
       setError(fetchError instanceof Error ? fetchError.message : "Could not load materials.");
     } finally {

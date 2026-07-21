@@ -20,10 +20,12 @@ import StudioLobbyInvisibleFriendLayer from "@/components/entrance/StudioLobbyIn
 import PresenceAnchor from "@/components/studio-presence/PresenceAnchor";
 import { isStudioGuideConversationEnabled } from "@/config/studio-guide-conversation-v1";
 import {
+  clearLobbyEntryChoiceCookie,
   clearLobbyEntryVisitState,
   readLobbyEntryChoice,
   readLobbyEntryFilmDismissed,
   studioLobbyEntryV1,
+  writeLobbyEntryChoice,
   writeLobbyEntryFilmDismissed,
 } from "@/config/studio-lobby-entry-v1";
 import { PRESENCE_ANCHOR_LOBBY_PODIUM } from "@/config/studio-presence-v1";
@@ -170,17 +172,25 @@ export default function WelcomeHallWelcomeScene({
 
   /** Journey controls + Voice stay gated until New to the Studio. */
   const journeyUnlocked = choseNew;
-  const showEntryFilm = !choseNew && filmOpen;
-  const showReopenFilm = !choseNew && !filmOpen;
+  /**
+   * Front door is hard: until New is chosen, only the film (or reopen) — never the podium.
+   * Returning Client is Sign In on the film — no second Sign In after New.
+   * @see docs/studio-lobby-entry-split-v1-locked.md §6–7
+   */
+  const showEntryFilm = filmOpen;
+  const showReopenFilm = !filmOpen && !choseNew;
+  /** Hard silence while the entry film is up — Voice must not speak over the door. */
+  const voiceAllowed = journeyUnlocked && !filmOpen;
 
   const {
     noteProgress,
     askGuide,
+    announceUnlockFromGesture,
     promptVisible,
     promptCopy,
     onPromptActivate,
   } = useLobbyPodiumGuidance({
-    enabled: journeyUnlocked,
+    enabled: voiceAllowed,
   });
   const { cta, mobileEstablish, mobileStudioNav, squishyGreeting } =
     welcomeHallPhase1;
@@ -267,8 +277,9 @@ export default function WelcomeHallWelcomeScene({
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("lobbyEntry") === "reset") {
-      clearLobbyEntryVisitState();
+    const entryParam = params.get("lobbyEntry");
+
+    const stripEntryParam = () => {
       params.delete("lobbyEntry");
       const next = params.toString();
       window.history.replaceState(
@@ -276,8 +287,19 @@ export default function WelcomeHallWelcomeScene({
         "",
         `${window.location.pathname}${next ? `?${next}` : ""}`,
       );
+    };
+
+    if (entryParam === "reset") {
+      clearLobbyEntryVisitState();
+      stripEntryParam();
       setChoseNew(false);
       setFilmOpen(true);
+    } else if (entryParam === "new" || initialChoseNew) {
+      // Explicit begin-new handoff (phone PE) or intentional client unlock.
+      writeLobbyEntryChoice("new-to-studio");
+      stripEntryParam();
+      setChoseNew(true);
+      setFilmOpen(false);
     } else {
       const choice = readLobbyEntryChoice();
       const dismissed = readLobbyEntryFilmDismissed();
@@ -285,6 +307,8 @@ export default function WelcomeHallWelcomeScene({
         setChoseNew(true);
         setFilmOpen(false);
       } else {
+        // Stale cookie from earlier broken clicks must not skip the film.
+        clearLobbyEntryChoiceCookie();
         setChoseNew(false);
         setFilmOpen(!dismissed);
       }
@@ -299,7 +323,7 @@ export default function WelcomeHallWelcomeScene({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialChoseNew]);
 
   useLayoutEffect(() => {
     const plate = plateRef.current;
@@ -337,7 +361,7 @@ export default function WelcomeHallWelcomeScene({
   }, [router]);
 
   const openGuideOrRouteMap = useCallback(() => {
-    if (!journeyUnlocked) return;
+    if (!journeyUnlocked || filmOpen) return;
     noteProgress();
     if (guideConversationEnabled) {
       const draft = loadGuideDraft();
@@ -348,6 +372,7 @@ export default function WelcomeHallWelcomeScene({
     }
     goToBusinessDiscoveryStudio();
   }, [
+    filmOpen,
     guideConversationEnabled,
     goToBusinessDiscoveryStudio,
     journeyUnlocked,
@@ -359,13 +384,24 @@ export default function WelcomeHallWelcomeScene({
     setFilmOpen(false);
   }, []);
 
+  const handleBeginNew = useCallback(() => {
+    writeLobbyEntryChoice("new-to-studio");
+    writeLobbyEntryFilmDismissed(false);
+    // Speak in this click first — then unlock so the guidance effect preserves it.
+    announceUnlockFromGesture();
+    setChoseNew(true);
+    setFilmOpen(false);
+  }, [announceUnlockFromGesture]);
+
   const handleReopenFilm = useCallback(() => {
     writeLobbyEntryFilmDismissed(false);
     setFilmOpen(true);
   }, []);
 
-  const hostAskGuide = journeyUnlocked ? askGuide : undefined;
-  const journeyControlsDisabled = transitioning || !journeyUnlocked;
+  const hostAskGuide = voiceAllowed ? askGuide : undefined;
+  /** Podium stays dead until New — and while the film is covering the door. */
+  const journeyControlsDisabled =
+    transitioning || !journeyUnlocked || filmOpen;
 
   const plateClassName = [
     "welcome-hall-plate",
@@ -410,7 +446,7 @@ export default function WelcomeHallWelcomeScene({
             tabIndex={journeyControlsDisabled ? -1 : undefined}
             onClick={(event) => {
               event.preventDefault();
-              if (!journeyUnlocked || transitioningRef.current) return;
+              if (!journeyUnlocked || filmOpen || transitioningRef.current) return;
               noteProgress();
               const draft = loadGuideDraft();
               const hasProgress = Boolean(
@@ -429,7 +465,7 @@ export default function WelcomeHallWelcomeScene({
             aria-disabled={journeyControlsDisabled || undefined}
             tabIndex={journeyControlsDisabled ? -1 : undefined}
             onClick={(event) => {
-              if (!journeyUnlocked || transitioningRef.current) {
+              if (!journeyUnlocked || filmOpen || transitioningRef.current) {
                 event.preventDefault();
                 return;
               }
@@ -583,6 +619,7 @@ export default function WelcomeHallWelcomeScene({
           <StudioLobbyEntryFilm
             sessionState={sessionState}
             onClose={handleCloseFilm}
+            onBeginNew={handleBeginNew}
           />
         ) : null}
         {showReopenFilm ? (

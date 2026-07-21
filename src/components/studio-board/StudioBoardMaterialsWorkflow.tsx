@@ -400,7 +400,8 @@ function StudioBoardMaterialsWorkflowActive({
         throw new Error(json.error ?? `Request failed (${res.status})`);
       }
       setData(json);
-      window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
+      /* Do not emit campaign-updated here — that reloads the Board campaign and
+         re-triggers this fetch in a tight loop (Materials We Still Need flicker). */
     } catch (fetchError) {
       setError(fetchError instanceof Error ? fetchError.message : "Could not load materials.");
     } finally {
@@ -408,14 +409,17 @@ function StudioBoardMaterialsWorkflowActive({
     }
   }, [materialsEndpoint]);
 
+  const campaignId = campaign.campaignId;
+  const intakeComplete = isIntakeComplete(campaign);
+
   useEffect(() => {
-    if (!paidCampaign || !isIntakeComplete(campaign)) {
+    if (!paidCampaign || !intakeComplete) {
       const timeout = window.setTimeout(() => setLoading(false), 0);
       return () => window.clearTimeout(timeout);
     }
     const timeout = window.setTimeout(() => void refresh(), 0);
     return () => window.clearTimeout(timeout);
-  }, [campaign, paidCampaign, refresh]);
+  }, [campaignId, paidCampaign, intakeComplete, refresh]);
 
   const requests = useMemo<BoardRequest[]>(() => {
     const consolidated = (data?.consolidatedRequests ?? []).map((request) => ({
@@ -479,8 +483,6 @@ function StudioBoardMaterialsWorkflowActive({
   );
   const activeRequest = activeCard?.request;
   const activeRequestId = activeRequest?.request.id;
-
-  const intakeComplete = isIntakeComplete(campaign);
 
   const showWorkflow = useMemo(() => {
     if (!intakeComplete) return false;

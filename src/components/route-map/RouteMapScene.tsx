@@ -40,6 +40,12 @@ import {
   type IntakeEntrySurface,
 } from "@/lib/route-map-intake-continuity";
 import { isIntakeComplete, readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
+import {
+  completeIntakeHandoff,
+  navigateIntakeHandoff,
+  probeCustomerSessionSignedIn,
+  resolveIntakeHandoffPlan,
+} from "@/lib/studio-intake-handoff";
 import { projectBuilderHref } from "@/config/project-builder-v1";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 import { resolveSquishyRouteMapMessage } from "@/lib/route-map-squishy";
@@ -141,6 +147,8 @@ export default function RouteMapScene() {
   );
   const [intakeDraftAnswers, setIntakeDraftAnswers] = useState<RouteMapIntakeAnswers | null>(null);
   const [intakeSubmitError, setIntakeSubmitError] = useState<string | null>(null);
+  /** Fail-closed signed-out until session probe — Host intake CTA stays truthful. */
+  const [intakeHandoffSignedIn, setIntakeHandoffSignedIn] = useState(false);
   /** True once the current project has been paid — the paid plan is protected from the old pre-payment path. */
   const [isPaidProject, setIsPaidProject] = useState(false);
   const previousStepRef = useRef<RouteMapStep | null>(null);
@@ -216,6 +224,24 @@ export default function RouteMapScene() {
     setSelectedJobId(null);
   }, []);
 
+  const showIntakeForm = step === "intake" && selectedJob && !intakeGate;
+
+  useEffect(() => {
+    if (!showIntakeForm) return;
+    let cancelled = false;
+    void probeCustomerSessionSignedIn().then((signedIn) => {
+      if (!cancelled) setIntakeHandoffSignedIn(signedIn);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [showIntakeForm]);
+
+  const intakeHandoffPlan = useMemo(
+    () => resolveIntakeHandoffPlan(intakeHandoffSignedIn),
+    [intakeHandoffSignedIn],
+  );
+
   const handleIntakeSubmit = useCallback(
     (answers: RouteMapIntakeAnswers): boolean => {
       setIntakeSubmitError(null);
@@ -247,10 +273,14 @@ export default function RouteMapScene() {
         setIntakeSubmitError(INTAKE_CONTINUITY_COPY.submitFailed);
         return false;
       }
-      router.push(studioBoard.routes.studioBoard);
+      void (async () => {
+        const plan = await completeIntakeHandoff();
+        setIntakeHandoffSignedIn(plan.auth === "signed-in");
+        navigateIntakeHandoff(plan.destination);
+      })();
       return true;
     },
-    [router],
+    [],
   );
 
   const handleIntakeSaveDraft = useCallback((answers: RouteMapIntakeAnswers) => {
@@ -370,7 +400,6 @@ export default function RouteMapScene() {
   const showOverlay = step !== "map";
   const showPanel = step === "panel" && roadId;
   const showJob = step === "job" && selectedJob;
-  const showIntakeForm = step === "intake" && selectedJob && !intakeGate;
   const showIntakeGate = step === "intake" && Boolean(intakeGate);
 
   return (
@@ -489,6 +518,8 @@ export default function RouteMapScene() {
                     onSubmit={handleIntakeSubmit}
                     onDraftStatusChange={setIntakeDraftStatus}
                     submitError={intakeSubmitError}
+                    submitCtaLabel={intakeHandoffPlan.submitCtaLabel}
+                    nextStepBlurb={intakeHandoffPlan.nextStepBlurb}
                   />
                 </StudioTablet>
               </div>

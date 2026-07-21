@@ -59,6 +59,8 @@ export function useLobbyPodiumGuidance(options: { enabled: boolean }) {
   const offeringRef = useRef(false);
   const readyRef = useRef(false);
   const lastSpokenAtRef = useRef(0);
+  /** Set by announceUnlockFromGesture before enabled flips true — preserve speech. */
+  const unlockFromGestureRef = useRef(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const remindTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const offerNowRef = useRef<(fromGesture: boolean) => void>(() => {});
@@ -114,9 +116,34 @@ export function useLobbyPodiumGuidance(options: { enabled: boolean }) {
     offerNowRef.current(true);
   }, []);
 
+  /**
+   * Call from New-to-the-Studio click (same user gesture).
+   * Clears stale “visited” so Voice can arm, and speaks while the browser allows it.
+   */
+  const announceUnlockFromGesture = useCallback(() => {
+    clearStudioLobbyVisited();
+    progressedRef.current = false;
+    readyRef.current = true;
+    offeringRef.current = true;
+    unlockFromGestureRef.current = true;
+    lastSpokenAtRef.current = Date.now();
+    setPromptVisible(true);
+    lobbyGuidanceLog("speaking from New unlock gesture");
+    void speakLobbyPodiumGuidance(studioLobbyPodiumGuidanceV1.spokenLine).then(
+      (result) => {
+        offeringRef.current = false;
+        lobbyGuidanceLog(`unlock speak result: ${result}`);
+        if (result !== "started") {
+          lastSpokenAtRef.current = 0;
+        }
+      },
+    );
+  }, []);
+
   const noteProgress = useCallback(() => {
     progressedRef.current = true;
     readyRef.current = false;
+    unlockFromGestureRef.current = false;
     setPromptVisible(false);
     if (timerRef.current != null) {
       clearTimeout(timerRef.current);
@@ -135,11 +162,25 @@ export function useLobbyPodiumGuidance(options: { enabled: boolean }) {
       clearStudioLobbyVisited();
     }
 
-    progressedRef.current = false;
-    offeringRef.current = false;
-    readyRef.current = false;
-    lastSpokenAtRef.current = 0;
-    setPromptVisible(false);
+    const recentUnlockSpeak =
+      lastSpokenAtRef.current > 0 &&
+      Date.now() - lastSpokenAtRef.current < 5000;
+    const fromUnlockGesture =
+      unlockFromGestureRef.current || recentUnlockSpeak;
+    unlockFromGestureRef.current = false;
+
+    if (!fromUnlockGesture) {
+      progressedRef.current = false;
+      offeringRef.current = false;
+      readyRef.current = false;
+      lastSpokenAtRef.current = 0;
+      setPromptVisible(false);
+    } else {
+      /* Keep prompt + speak stamp from New click; do not cancel in-flight TTS. */
+      progressedRef.current = false;
+      readyRef.current = true;
+      setPromptVisible(true);
+    }
     clearRemindLoop();
 
     if (!shouldArmLobbyHesitationGuidance(readStudioLobbyVisited())) {
@@ -147,7 +188,11 @@ export function useLobbyPodiumGuidance(options: { enabled: boolean }) {
       return;
     }
 
-    lobbyGuidanceLog("armed — chrome label + voice");
+    lobbyGuidanceLog(
+      fromUnlockGesture
+        ? "armed after New unlock — preserve gesture speech"
+        : "armed — chrome label + voice",
+    );
 
     try {
       window.speechSynthesis?.getVoices();
@@ -160,7 +205,9 @@ export function useLobbyPodiumGuidance(options: { enabled: boolean }) {
       readyRef.current = true;
       setPromptVisible(true);
       lobbyGuidanceLog("showing chrome label + attempting voice");
-      offerNowRef.current(false);
+      if (lastSpokenAtRef.current === 0) {
+        offerNowRef.current(false);
+      }
 
       remindTimerRef.current = setInterval(() => {
         if (progressedRef.current) {
@@ -171,7 +218,6 @@ export function useLobbyPodiumGuidance(options: { enabled: boolean }) {
       }, studioLobbyPodiumGuidanceV1.speakCooldownMs);
     }, studioLobbyPodiumGuidanceV1.hesitationMs);
 
-    /* One listener only — pointerdown+click was queuing two lines. */
     const onRetryVoice = (event: Event) => {
       if (progressedRef.current) return;
       if (!readyRef.current) return;
@@ -189,13 +235,19 @@ export function useLobbyPodiumGuidance(options: { enabled: boolean }) {
       }
       clearRemindLoop();
       window.removeEventListener("click", onRetryVoice, true);
-      cancelLobbyPodiumGuidanceSpeech();
+      const keepSpeech =
+        lastSpokenAtRef.current > 0 &&
+        Date.now() - lastSpokenAtRef.current < 5000;
+      if (!keepSpeech) {
+        cancelLobbyPodiumGuidanceSpeech();
+      }
     };
   }, [clearRemindLoop, options.enabled]);
 
   return {
     noteProgress,
     askGuide,
+    announceUnlockFromGesture,
     promptVisible,
     promptCopy: studioLobbyPodiumGuidanceV1.hesitationPrompt,
     onPromptActivate: () => {

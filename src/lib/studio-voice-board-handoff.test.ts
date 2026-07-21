@@ -4,6 +4,7 @@ import {
   clearStudioVoiceBoardHandoff,
   consumeStudioVoiceBoardWelcome,
   markStudioVoiceBoardHandoffAwaitingSignIn,
+  markStudioVoiceBoardHandoffAwaitingWelcome,
   peekStudioVoiceBoardHandoffAwaitingSignIn,
   promoteStudioVoiceBoardHandoffToWelcome,
   STUDIO_VOICE_BOARD_HANDOFF_KEY,
@@ -54,5 +55,20 @@ describe("studio-voice-board-handoff", () => {
   it("does not promote or welcome without a handoff", () => {
     promoteStudioVoiceBoardHandoffToWelcome();
     expect(consumeStudioVoiceBoardWelcome()).toBe(false);
+  });
+
+  it("signed-in Intake can stamp Board welcome without Sign In phase", () => {
+    markStudioVoiceBoardHandoffAwaitingWelcome();
+    expect(peekStudioVoiceBoardHandoffAwaitingSignIn()).toBe(false);
+    expect(consumeStudioVoiceBoardWelcome()).toBe(true);
+  });
+
+  it("overwrites stuck awaiting-signin when marking Board welcome", () => {
+    markStudioVoiceBoardHandoffAwaitingSignIn();
+    markStudioVoiceBoardHandoffAwaitingWelcome();
+    expect(peekStudioVoiceBoardHandoffAwaitingSignIn()).toBe(false);
+    expect(JSON.parse(sessionStorage.getItem(STUDIO_VOICE_BOARD_HANDOFF_KEY)!).phase).toBe(
+      "awaiting-board-welcome",
+    );
   });
 });

@@ -1,23 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { studioLobbyEntryV1 } from "@/config/studio-lobby-entry-v1";
+import {
+  studioLobbyEntryV1,
+  writeLobbyEntryChoice,
+} from "@/config/studio-lobby-entry-v1";
 
 export type LobbyEntrySessionState = "checking" | "signed-in" | "signed-out";
 
 type Props = {
   sessionState: LobbyEntrySessionState;
   onClose: () => void;
+  /** Instant unlock when JS attaches — storage + cookie still written for reload. */
+  onBeginNew?: () => void;
 };
 
 /**
  * Frosted Lobby entry film — Design Approved v1.
  * Runtime UI only; does not alter locked Lobby plate art.
  *
- * CTAs are plain links (no preventDefault) so Samsung/phone navigates even when
- * React hydration fails or client handlers never attach.
+ * CTAs stay real hrefs so Samsung/phone navigates when React handlers never
+ * attach. When JS does attach, New unlocks in place (storage + cookie) without
+ * a redirect blink; begin-new remains the no-JS fallback.
  */
-export default function StudioLobbyEntryFilm({ sessionState, onClose }: Props) {
+export default function StudioLobbyEntryFilm({
+  sessionState,
+  onClose,
+  onBeginNew,
+}: Props) {
   const { copy, routes } = studioLobbyEntryV1;
   const returning =
     sessionState === "signed-in" ? copy.returningSignedIn : copy.returningSignedOut;
@@ -52,7 +62,17 @@ export default function StudioLobbyEntryFilm({ sessionState, onClose }: Props) {
             </div>
             <h3 className="lobby-entry-film__choice-title">{copy.newToStudio.title}</h3>
             <p className="lobby-entry-film__choice-desc">{copy.newToStudio.description}</p>
-            <a href={routes.beginNew} className="lobby-entry-film__cta">
+            <a
+              href={routes.beginNew}
+              className="lobby-entry-film__cta"
+              onClick={(event) => {
+                writeLobbyEntryChoice("new-to-studio");
+                if (onBeginNew) {
+                  event.preventDefault();
+                  onBeginNew();
+                }
+              }}
+            >
               <span>{copy.newToStudio.cta}</span>
               <span aria-hidden>→</span>
             </a>

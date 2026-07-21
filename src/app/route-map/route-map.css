@@ -2816,18 +2816,20 @@ body:has(.route-map-page--immersive) .owner-qa {
 
 .route-map-intake__req,
 .route-map-intake__opt {
+  margin-left: 0.35rem;
   font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 800;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .route-map-intake__req {
-  color: var(--studio-denim);
+  color: #e85d04;
 }
 
 .route-map-intake__opt {
   color: var(--studio-charcoal-muted);
+  font-weight: 700;
 }
 
 .route-map-intake__hint {
@@ -2865,6 +2867,14 @@ body:has(.route-map-page--immersive) .owner-qa {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 4px;
+}
+
+.route-map-intake__next-step {
+  flex: 1 1 100%;
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--studio-charcoal);
 }
 
 .route-map-intake__actions .route-map-primary-btn,

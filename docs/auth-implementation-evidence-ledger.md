@@ -16,7 +16,7 @@
 | 4 | Password Recovery | **Cold-certified PASS** | 2026-07-20 |
 | 5 | Project Claim / Ownership | Not started | — |
 | 6 | Route / Data Protection | Not started | — |
-| 7 | Truthful Intake → Auth → Board Handoff | Not started | — |
+| 7 | Truthful Intake → Auth → Board Handoff | **Implementation complete · cold cert pending** | 2026-07-20 |
 | 8 | Production Auth Certification | Not started | — |
 
 ---
@@ -278,4 +278,62 @@ Password Recovery, Project Claim, and Parking Lot remain blocked until Tagia aut
 | Package 4 verdict | **PASS** |
 
 **Next when Tagia authorizes:** Project Claim. Parking Lot remains locked.
+
+---
+
+## Package 7 — Truthful Intake → Auth → Board Handoff (implementation complete; cold cert pending)
+
+**Trim (owner 2026-07-20):** No post-completion tablet blank strip — that stays in the separate Post-completion Tablet State package. This package only tells the truth and sends the customer to the right place.
+
+### Delivered
+
+| Behavior | Evidence |
+|----------|----------|
+| Probe real session before next step | `probeCustomerSessionSignedIn` → `GET /api/auth/session` (fail-closed signed-out) |
+| Signed-out: CTA / tablet / Voice say Sign In | `resolveIntakeHandoffPlan(false)` + guide copy `*SignedOut` |
+| Signed-out passport `awaiting-signin` | `applyIntakeHandoffPassport` → `markStudioVoiceBoardHandoffAwaitingSignIn` |
+| Signed-out navigate `/sign-in?from=/studio-board` | `completeIntakeHandoff` + `navigateIntakeHandoff` (`location.assign`) |
+| Signed-in: CTA / tablet / Voice say Studio Board | `resolveIntakeHandoffPlan(true)` + guide copy `*SignedIn` (no Sign In Voice) |
+| Signed-in passport `awaiting-board-welcome` | `markStudioVoiceBoardHandoffAwaitingWelcome` — clears stuck `awaiting-signin` |
+| Signed-in navigate `/studio-board` | same handoff helpers |
+| Conversation Room Intake submit | `ConversationRoomRuntime.handleIntakeSubmitSuccess` |
+| Host Route Map Intake submit (same contract) | `RouteMapScene.handleIntakeSubmit` → `completeIntakeHandoff` |
+| Board `proxy` remains backup, not primary decision | unchanged proxy gate; handoff chooses destination first |
+| Voice / CTA / tablet / passport / destination aligned | single plan object from `studio-intake-handoff.ts` |
+
+### Unit tests
+
+`src/lib/studio-intake-handoff.test.ts` — signed-in / signed-out plans, passport transitions, probe fail-closed, `completeIntakeHandoff` (shared by Conversation Room + Host Route Map).  
+`src/lib/studio-voice-board-handoff.test.ts` — direct Board-welcome stamp + stuck `awaiting-signin` overwrite.
+
+### Explicit non-goals (this package)
+
+- Post-completion tablet state
+- Project Claim
+- Voice Host / live mic
+- Studio Review migration
+- Parking Lot cleanup
+- Visual redesign
+
+### Cold certification checklist (desktop + real phone)
+
+1. Signed-out Conversation Room: complete Intake → CTA said Sign In → Voice says Sign In → lands on `/sign-in?from=/studio-board` → passport `awaiting-signin`
+2. Signed-in Conversation Room: complete Intake → CTA said Studio Board → Voice says Board (no Sign In) → lands on `/studio-board` → passport consumed as Board welcome
+3. Signed-in with stale `awaiting-signin` passport: submit still promotes to Board welcome (not stuck)
+4. Host Route Map Intake submit: same signed-out / signed-in destinations and CTA truth
+5. Phone + desktop readable without zoom change; no post-completion tablet strip expected
+6. Packages 1–4 paths intact; Claim / Route Protection not introduced
+
+### Cold certification evidence — pending Tagia desktop + phone cert
+
+**Status: implementation complete · stop for owner cert before commit.**
+
+| Check | Result |
+|-------|--------|
+| Unit / focused tests | **PASS** (2026-07-20) — studio-intake-handoff + voice-board-handoff |
+| Desktop cold cert | pending |
+| Phone cold cert | pending |
+| Package 7 verdict | pending |
+
+**Next after Package 7 PASS:** Post-completion Tablet State (separate), then Project Claim when Tagia authorizes. Parking Lot remains locked.
 

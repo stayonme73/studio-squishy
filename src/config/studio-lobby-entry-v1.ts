@@ -61,6 +61,7 @@ export const studioLobbyEntryV1 = {
 
 export type LobbyEntryChoice = "new-to-studio";
 
+/** Session only — a leftover cookie must not unlock the Lobby by itself. */
 export function readLobbyEntryChoice(): LobbyEntryChoice | null {
   if (typeof window === "undefined") return null;
   try {
@@ -68,6 +69,33 @@ export function readLobbyEntryChoice(): LobbyEntryChoice | null {
     return value === "new-to-studio" ? "new-to-studio" : null;
   } catch {
     return null;
+  }
+}
+
+/** Cookie set by begin-new for no-JS phones — not enough alone to unlock on desktop. */
+export function readLobbyEntryChoiceCookie(): LobbyEntryChoice | null {
+  if (typeof document === "undefined") return null;
+  try {
+    const match = document.cookie
+      .split(";")
+      .map((part) => part.trim())
+      .find((part) => part.startsWith(`${LOBBY_ENTRY_CHOICE_COOKIE}=`));
+    if (!match) return null;
+    const value = decodeURIComponent(
+      match.slice(LOBBY_ENTRY_CHOICE_COOKIE.length + 1),
+    );
+    return value === "new-to-studio" ? "new-to-studio" : null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearLobbyEntryChoiceCookie(): void {
+  if (typeof document === "undefined") return;
+  try {
+    document.cookie = `${LOBBY_ENTRY_CHOICE_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
+  } catch {
+    /* ignore */
   }
 }
 
@@ -118,9 +146,5 @@ export function clearLobbyEntryVisitState(): void {
   } catch {
     /* ignore */
   }
-  try {
-    document.cookie = `${LOBBY_ENTRY_CHOICE_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
-  } catch {
-    /* ignore */
-  }
+  clearLobbyEntryChoiceCookie();
 }

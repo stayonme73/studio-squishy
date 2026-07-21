@@ -380,6 +380,32 @@
   color: rgba(247, 244, 238, 0.98);
 }
 
+.questionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.55rem 0.75rem;
+}
+
+.questionHeader .question {
+  flex: 1 1 12rem;
+}
+
+.requiredBadge {
+  flex: 0 0 auto;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 0.92rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ff9f1c;
+}
+
 .body {
   margin: 0;
   font-size: 1.15rem;

@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 
 import type { RouteMapIntakeAnswers, RouteMapIntakeField } from "@/catalog/intake";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
@@ -26,6 +32,9 @@ import type { ServiceId } from "@/catalog/types";
 import "@/app/route-map/route-map.css";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 
+/** Tablet status updates — delayed so typing does not re-render the whole room each key. */
+const INTAKE_LIVE_STATUS_DEBOUNCE_MS = 280;
+
 export type ProjectIntakeMultiServiceFormProps = {
   selectedServiceIds: readonly ServiceId[];
   initialDraftAnswers?: RouteMapIntakeAnswers | null;
@@ -36,7 +45,94 @@ export type ProjectIntakeMultiServiceFormProps = {
   /** Live answer stream for tablet status (every change, including mount). */
   onAnswersChange?: (answers: RouteMapIntakeAnswers) => void;
   submitError?: string | null;
+  /** Truthful handoff — must match real next destination. */
+  submitCtaLabel: string;
+  nextStepBlurb: string;
 };
+
+/**
+ * Uncontrolled while focused — parent re-renders (tablet status / autosave)
+ * must not rewrite the DOM value mid-keystroke.
+ */
+function IntakePlainTextField({
+  value,
+  onChange,
+  multiline = false,
+  required = false,
+  rows = 3,
+  placeholder,
+  autoFocus = false,
+}: {
+  value: string;
+  onChange: (next: string) => void;
+  multiline?: boolean;
+  required?: boolean;
+  rows?: number;
+  placeholder?: string;
+  autoFocus?: boolean;
+}) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const areaRef = useRef<HTMLTextAreaElement | null>(null);
+  const focusedRef = useRef(false);
+  const valueRef = useRef(value);
+  valueRef.current = value;
+
+  useEffect(() => {
+    if (focusedRef.current) return;
+    const node = multiline ? areaRef.current : inputRef.current;
+    if (node && node.value !== value) node.value = value;
+  }, [value, multiline]);
+
+  useEffect(() => {
+    if (!autoFocus) return;
+    const node = multiline ? areaRef.current : inputRef.current;
+    node?.focus();
+  }, [autoFocus, multiline]);
+
+  function handleChange(next: string) {
+    onChange(next);
+  }
+
+  if (multiline) {
+    return (
+      <textarea
+        ref={areaRef}
+        required={required}
+        rows={rows}
+        placeholder={placeholder}
+        defaultValue={value}
+        onFocus={() => {
+          focusedRef.current = true;
+        }}
+        onBlur={() => {
+          focusedRef.current = false;
+          const next = areaRef.current?.value ?? "";
+          if (next !== valueRef.current) onChange(next);
+        }}
+        onChange={(event) => handleChange(event.target.value)}
+      />
+    );
+  }
+
+  return (
+    <input
+      ref={inputRef}
+      type="text"
+      required={required}
+      placeholder={placeholder}
+      defaultValue={value}
+      onFocus={() => {
+        focusedRef.current = true;
+      }}
+      onBlur={() => {
+        focusedRef.current = false;
+        const next = inputRef.current?.value ?? "";
+        if (next !== valueRef.current) onChange(next);
+      }}
+      onChange={(event) => handleChange(event.target.value)}
+    />
+  );
+}
 
 function ChoiceChips({
   options,
@@ -110,12 +206,15 @@ function FieldCard({
         {describeOpen ? (
           <label className="route-map-social-intake__compact-field">
             <span>Describe filenames, links, colors, or references</span>
-            <textarea
+            <IntakePlainTextField
+              key={`${field.id}-describe`}
+              multiline
               required={Boolean(field.required)}
               rows={3}
               placeholder={field.placeholder}
               value={parsed.detail}
-              onChange={(event) => onMaterialsDetail(event.target.value)}
+              onChange={onMaterialsDetail}
+              autoFocus
             />
           </label>
         ) : null}
@@ -153,23 +252,14 @@ function FieldCard({
       </div>
       <label className="route-map-social-intake__compact-field">
         <span className="sr-only">{field.label}</span>
-        {field.type === "textarea" ? (
-          <textarea
-            required={field.required}
-            rows={4}
-            placeholder={field.placeholder}
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-          />
-        ) : (
-          <input
-            type="text"
-            required={field.required}
-            placeholder={field.placeholder}
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-          />
-        )}
+        <IntakePlainTextField
+          multiline={field.type === "textarea"}
+          required={field.required}
+          rows={4}
+          placeholder={field.placeholder}
+          value={value}
+          onChange={onChange}
+        />
       </label>
     </article>
   );
@@ -187,8 +277,9 @@ export default function ProjectIntakeMultiServiceForm({
   onDraftStatusChange,
   onAnswersChange,
   submitError = null,
+  submitCtaLabel,
+  nextStepBlurb,
 }: ProjectIntakeMultiServiceFormProps) {
-  const v = conversationRoomGuideV1;
   const plan: ProjectIntakePlan = useMemo(
     () => buildProjectIntakePlan(selectedServiceIds),
     [selectedServiceIds],
@@ -211,18 +302,26 @@ export default function ProjectIntakeMultiServiceForm({
   const skipAutosaveRef = useRef(true);
 
   useEffect(() => {
-    onAnswersChangeRef.current?.(answers);
     if (skipAutosaveRef.current) {
       skipAutosaveRef.current = false;
+      onAnswersChangeRef.current?.(answers);
       return;
     }
     onDraftStatusChangeRef.current?.("unsaved");
-    if (!onSaveDraftRef.current) return;
-    const timer = window.setTimeout(() => {
+    const statusTimer = window.setTimeout(() => {
+      onAnswersChangeRef.current?.(answers);
+    }, INTAKE_LIVE_STATUS_DEBOUNCE_MS);
+    if (!onSaveDraftRef.current) {
+      return () => window.clearTimeout(statusTimer);
+    }
+    const saveTimer = window.setTimeout(() => {
       const saved = onSaveDraftRef.current?.(answers) ?? false;
       onDraftStatusChangeRef.current?.(saved ? "saved" : "error");
     }, PROJECT_INTAKE_AUTOSAVE_DEBOUNCE_MS);
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(statusTimer);
+      window.clearTimeout(saveTimer);
+    };
   }, [answers]);
 
   const progress = projectIntakeProgressLabel(plan, answers);
@@ -278,7 +377,7 @@ export default function ProjectIntakeMultiServiceForm({
       </div>
 
       <p className={styles.intakeMaterialsNote} role="note">
-        {v.intakeMaterialsDeadlineNote}
+        {conversationRoomGuideV1.intakeMaterialsDeadlineNote}
       </p>
 
       <form className="route-map-social-intake__form" onSubmit={handleSubmit}>
@@ -357,10 +456,7 @@ export default function ProjectIntakeMultiServiceForm({
         <div className="route-map-social-intake__actions">
           <div className="route-map-social-intake__next-step">
             <strong>Next Step</strong>
-            <span>
-              Complete every required section for all purchased services, then
-              continue to Studio Board.
-            </span>
+            <span>{nextStepBlurb}</span>
           </div>
           <button
             type="button"
@@ -375,7 +471,7 @@ export default function ProjectIntakeMultiServiceForm({
             className="route-map-primary-btn"
             disabled={submitting || !ready}
           >
-            SAVE &amp; CONTINUE TO STUDIO BOARD
+            {submitCtaLabel}
           </button>
         </div>
         {submitError ? (

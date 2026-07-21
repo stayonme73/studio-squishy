@@ -117,6 +117,35 @@
   width: 100%;
 }
 
+.requiredRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.65rem;
+  margin: 0 0 0.5rem;
+}
+
+.requiredBadge {
+  display: inline;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 0.92rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ff9f1c;
+}
+
+.requiredHint {
+  font-size: 0.98rem;
+  font-weight: 750;
+  line-height: 1.35;
+  color: #ff9f1c;
+}
+
 .typeField {
   position: relative;
   display: block;
@@ -125,6 +154,23 @@
   border-radius: 0.75rem;
   border: 1px solid rgba(180, 195, 210, 0.42);
   background: rgba(14, 17, 22, 0.45);
+}
+
+.typeHost {
+  display: block;
+  width: 100%;
+}
+
+.typeField[data-answering="true"] {
+  border-color: rgba(210, 175, 95, 0.55);
+}
+
+.typeField[data-required="true"] {
+  border: 2px solid #e85d04;
+  box-shadow:
+    inset 0 0 0 1px rgba(232, 93, 4, 0.45),
+    0 0 0 2px rgba(255, 183, 3, 0.35);
+  background: rgba(80, 28, 8, 0.65);
 }
 
 .typePlaceholder {
@@ -152,18 +198,25 @@
   z-index: 2;
   box-sizing: border-box;
   width: 100%;
-  min-height: 4.25rem;
+  min-height: 3.25rem;
   margin: 0;
   padding: 0.9rem 1rem;
   border: none;
   border-radius: inherit;
   background: transparent;
-  color: rgba(247, 244, 238, 0.96);
+  color: #fff8ec;
+  caret-color: #ffb703;
   font: inherit;
-  font-size: 1.08rem;
+  font-size: 1.12rem;
+  font-weight: 700;
   line-height: 1.45;
   text-align: left;
-  resize: none;
+}
+
+.typeLine::placeholder {
+  color: rgba(247, 244, 238, 0.48);
+  font-weight: 500;
+  opacity: 1;
 }
 
 .typeLine:focus-visible {
@@ -173,6 +226,33 @@
 .typeField:focus-within {
   border-color: rgba(160, 210, 190, 0.65);
   box-shadow: inset 0 0 0 1px rgba(160, 210, 190, 0.12);
+}
+
+.typeField[data-required="true"]:focus-within {
+  border-color: #e85d04;
+  box-shadow:
+    inset 0 0 0 1px rgba(232, 93, 4, 0.5),
+    0 0 0 2px rgba(255, 183, 3, 0.45);
+}
+
+.sendBtn {
+  appearance: none;
+  align-self: stretch;
+  margin: 0;
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 0.65rem;
+  background: rgba(100, 175, 215, 0.28);
+  color: rgba(247, 244, 238, 0.96);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sendBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .savedCue {
@@ -198,19 +278,4 @@
   100% {
     box-shadow: 0 0 0 0 transparent;
   }
-}
-
-.sendBtn {
-  appearance: none;
-  align-self: stretch;
-  margin: 0;
-  padding: 0.7rem 1rem;
-  border: none;
-  border-radius: 0.65rem;
-  background: rgba(100, 175, 215, 0.28);
-  color: rgba(247, 244, 238, 0.96);
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
 }

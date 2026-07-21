@@ -19,9 +19,19 @@ describe("route-map-intake-materials", () => {
       INTAKE_MATERIALS_PROVIDE_LATER,
     );
     expect(buildMaterialsPathAnswer(INTAKE_MATERIALS_HAVE_NOW, " logo.png ")).toBe("logo.png");
+    expect(buildMaterialsPathAnswer(INTAKE_MATERIALS_HAVE_NOW, "")).toBe(
+      INTAKE_MATERIALS_HAVE_NOW,
+    );
+    expect(buildMaterialsPathAnswer(INTAKE_MATERIALS_HAVE_NOW, "   ")).toBe(
+      INTAKE_MATERIALS_HAVE_NOW,
+    );
 
     expect(parseMaterialsPathAnswer(INTAKE_MATERIALS_NONE_YET)).toEqual({
       availability: INTAKE_MATERIALS_NONE_YET,
+      detail: "",
+    });
+    expect(parseMaterialsPathAnswer(INTAKE_MATERIALS_HAVE_NOW)).toEqual({
+      availability: INTAKE_MATERIALS_HAVE_NOW,
       detail: "",
     });
     expect(parseMaterialsPathAnswer("logo.png")).toEqual({
