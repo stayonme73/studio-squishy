@@ -108,7 +108,17 @@ import {
 } from "@/lib/studio-conversation-speech";
 import { clearWorkingDraft } from "@/lib/studio-working-draft";
 import type { WorkingDraftRecord } from "@/lib/studio-working-draft";
-import { consumeStudioVoiceInvite } from "@/lib/studio-voice-invite";
+import {
+  consumeStudioVoiceInvite,
+  type StudioVoiceInviteReason,
+} from "@/lib/studio-voice-invite";
+import type { StudioVoiceNarrationPreference } from "@/config/studio-voice-preference-v1";
+import {
+  isVoiceNarrationEnabled,
+  readVoiceNarrationPreference,
+  writeVoiceNarrationPreference,
+} from "@/lib/studio-voice-preference";
+import VoicePreferenceControls from "@/components/studio-conversation-room/VoicePreferenceControls";
 
 function spokenLineForGuideStep(
   step: GuideConversationStep,
@@ -233,21 +243,71 @@ export default function ConversationRoomRuntime({
     useState<RouteMapIntakeAnswers | null>(null);
   /** Fail-closed signed-out until session probe succeeds — CTA/tablet stay truthful. */
   const [intakeHandoffSignedIn, setIntakeHandoffSignedIn] = useState(false);
+  /** Conversation Room narration only — Lobby Voice is never gated here. */
+  const [voiceNarration, setVoiceNarration] =
+    useState<StudioVoiceNarrationPreference | null>(null);
   const activityReturnFocusRef = useRef<HTMLElement | null>(null);
   /** Suppress stacked “added” lines when the customer taps services quickly. */
   const lastServiceAddSpokenAtRef = useRef(0);
   /** Prevent duplicate payment-success handling on rapid Complete Checkout. */
   const paymentCompleteGuardRef = useRef(false);
+  /**
+   * Lobby/mobile may set an invite before CR preference is chosen.
+   * Hold it until Voice is On — never speak while unset or Off.
+   */
+  const pendingVoiceInviteRef = useRef<{
+    reason: StudioVoiceInviteReason;
+    line: string;
+  } | null>(null);
+  const inviteCleanupRef = useRef<(() => void) | null>(null);
 
   function speakStudioLine(text: string | null | undefined) {
     const line = text?.trim();
     if (!line) return;
+    /* CR narration preference — does not affect Lobby Voice. */
+    if (!isVoiceNarrationEnabled()) return;
     cancelConversationSpeech();
     const started = speakConversationLine(line, {
       onStart: () => setStudioSpeaking(true),
       onEnd: () => setStudioSpeaking(false),
     });
     if (!started) setStudioSpeaking(false);
+  }
+
+  function playConversationInviteLine(line: string) {
+    if (!isVoiceNarrationEnabled()) return;
+    let heard = false;
+    speakConversationLine(line, {
+      onStart: () => {
+        heard = true;
+        setStudioSpeaking(true);
+      },
+      onEnd: () => setStudioSpeaking(false),
+    });
+    const autoplayArm = window.setTimeout(() => {
+      if (heard || !isVoiceNarrationEnabled()) return;
+      const onGesture = () => {
+        if (!isVoiceNarrationEnabled()) return;
+        speakConversationLine(line, {
+          onStart: () => setStudioSpeaking(true),
+          onEnd: () => setStudioSpeaking(false),
+        });
+      };
+      window.addEventListener("pointerdown", onGesture, {
+        once: true,
+        capture: true,
+      });
+      const previous = inviteCleanupRef.current;
+      inviteCleanupRef.current = () => {
+        previous?.();
+        window.removeEventListener("pointerdown", onGesture, true);
+      };
+    }, 900);
+    const previous = inviteCleanupRef.current;
+    inviteCleanupRef.current = () => {
+      previous?.();
+      window.clearTimeout(autoplayArm);
+    };
   }
 
   function speakGuideStep(
@@ -321,34 +381,53 @@ export default function ConversationRoomRuntime({
     setSpeechSupported(getConversationSpeechAvailability().canListen);
     setReady(true);
 
-    /* Speak only if Lobby (or another surface) invited Voice — never on bare load. */
+    const savedPreference = readVoiceNarrationPreference();
+    setVoiceNarration(savedPreference);
+
+    /* Kill any Lobby TTS that continued across navigation — CR is silent until Voice On. */
+    if (savedPreference !== "on") {
+      cancelConversationSpeech();
+    }
+
+    /*
+     * Lobby may already have set an invite (untouched). CR only plays it after
+     * Voice is On — never before the preference choice, never when Off.
+     */
     const invite = consumeStudioVoiceInvite();
-    let inviteTimer = 0;
+    let inviteLine: string | null = null;
     if (invite === "start" && restoredStage === "opening") {
-      inviteTimer = window.setTimeout(() => {
-        const line = spokenLineForGuideStep(openStep, false);
-        if (!line) return;
-        speakConversationLine(line, {
-          onStart: () => setStudioSpeaking(true),
-          onEnd: () => setStudioSpeaking(false),
-        });
-      }, 220);
+      inviteLine = spokenLineForGuideStep(openStep, false);
     } else if (invite === "resume") {
-      inviteTimer = window.setTimeout(() => {
-        const line =
-          restoredStage === "opening"
-            ? spokenLineForGuideStep(openStep, false)
-            : conversationRoomGuideV1.routeVoiceIntro;
-        const welcome = conversationRoomGuideV1.voiceWelcomeBack;
-        speakConversationLine(line ? `${welcome} ${line}` : welcome, {
-          onStart: () => setStudioSpeaking(true),
-          onEnd: () => setStudioSpeaking(false),
-        });
-      }, 220);
+      const line =
+        restoredStage === "opening"
+          ? spokenLineForGuideStep(openStep, false)
+          : conversationRoomGuideV1.routeVoiceIntro;
+      const welcome = conversationRoomGuideV1.voiceWelcomeBack;
+      inviteLine = line ? `${welcome} ${line}` : welcome;
+    }
+
+    if (invite && inviteLine) {
+      if (savedPreference === "on") {
+        const timer = window.setTimeout(() => {
+          playConversationInviteLine(inviteLine!);
+        }, 220);
+        return () => {
+          window.clearTimeout(timer);
+          inviteCleanupRef.current?.();
+          inviteCleanupRef.current = null;
+          stopConversationDictation();
+          cancelConversationSpeech();
+        };
+      }
+      if (savedPreference === null) {
+        pendingVoiceInviteRef.current = { reason: invite, line: inviteLine };
+      }
+      /* savedPreference === "off": discard invite silently */
     }
 
     return () => {
-      if (inviteTimer) window.clearTimeout(inviteTimer);
+      inviteCleanupRef.current?.();
+      inviteCleanupRef.current = null;
       stopConversationDictation();
       cancelConversationSpeech();
     };
@@ -865,6 +944,29 @@ export default function ConversationRoomRuntime({
     setStudioSpeaking(false);
   }
 
+  function handleVoiceNarrationPreference(
+    value: StudioVoiceNarrationPreference,
+  ) {
+    writeVoiceNarrationPreference(value);
+    setVoiceNarration(value);
+    if (value === "off") {
+      pendingVoiceInviteRef.current = null;
+      inviteCleanupRef.current?.();
+      inviteCleanupRef.current = null;
+      stopStudioSpeech();
+      return;
+    }
+    /* Voice On — always speak something from this click (gesture unlocks TTS). */
+    const pending = pendingVoiceInviteRef.current;
+    pendingVoiceInviteRef.current = null;
+    const currentLine = spokenLineForGuideStep(step, correcting);
+    const line = pending?.line?.trim() || currentLine?.trim() || null;
+    if (!line) return;
+    window.setTimeout(() => {
+      playConversationInviteLine(line);
+    }, 80);
+  }
+
   function handleTextDraftLive(value: string) {
     /* Ref only — no speech cancel, no setState (both were stealing the caret). */
     textDraftRef.current = value;
@@ -1115,7 +1217,14 @@ export default function ConversationRoomRuntime({
         />
       }
       workspace={
-        <StudioGuideTabletView
+        <>
+          {voiceNarration === null ? (
+            <VoicePreferenceControls
+              preference={null}
+              onChoose={handleVoiceNarrationPreference}
+            />
+          ) : null}
+          <StudioGuideTabletView
           step={step}
           stage={stage}
           draft={draft}
@@ -1161,9 +1270,17 @@ export default function ConversationRoomRuntime({
           planBridgeError={planBridgeError}
           intakeTabletStatus={intakeTabletStatus}
         />
+        </>
       }
       communication={
-        <StudioGuideCommPanel
+        <>
+          {voiceNarration !== null ? (
+            <VoicePreferenceControls
+              preference={voiceNarration}
+              onChoose={handleVoiceNarrationPreference}
+            />
+          ) : null}
+          <StudioGuideCommPanel
           textDraft={textDraft}
           fieldResetKey={`${stage}:${step}:${askMode ? "ask" : "guide"}:${fieldEpoch}`}
           typePlaceholder={
@@ -1184,6 +1301,7 @@ export default function ConversationRoomRuntime({
           onContinue={handleContinue}
           onSendMessage={handleSendMessage}
         />
+        </>
       }
     />
   );
