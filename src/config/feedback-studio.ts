@@ -206,7 +206,7 @@ export const feedbackStudio = {
       footnote: "Approved concepts will appear here when your project reaches the Review stage.",
       primaryCta: "GO TO ROUTE MAP",
       secondaryCta: "Help Center",
-      primaryHref: "/route-map",
+      primaryHref: "/studio-conversation-room",
       secondaryHref: "/help-center",
     } satisfies NoActiveProjectCopy,
     notReady: {

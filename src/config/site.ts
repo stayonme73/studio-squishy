@@ -9,11 +9,11 @@ export const siteConfig = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   routes: {
     home: "/",
-    studioGuide: "/route-map",
+    studioGuide: "/studio-conversation-room",
     studio: "/studio",
-    projectDiscovery: "/route-map",
+    projectDiscovery: "/studio-conversation-room?stage=intake",
     /** @deprecated legacy route — use Route Map */
-    draftRoom: "/route-map",
-    intake: "/route-map",
+    draftRoom: "/studio-conversation-room?stage=intake",
+    intake: "/studio-conversation-room?stage=intake",
   },
 } as const;

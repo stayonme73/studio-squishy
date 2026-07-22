@@ -1,4 +1,8 @@
 import { ConversationRoomRuntime } from "@/components/studio-conversation-room";
+import {
+  isConversationRoomStage,
+  type ConversationRoomStage,
+} from "@/config/conversation-room-stage-v1";
 import type { VoiceIntent } from "@/lib/studio-conversation-framework";
 
 type StudioConversationRoomPageProps = {
@@ -43,6 +47,19 @@ export default async function StudioConversationRoomPage({
   searchParams,
 }: StudioConversationRoomPageProps) {
   const params = await searchParams;
+  const requestedStage = readParam(params.stage);
+  const requestedLegacyStep = readParam(params.step);
+  const requestedLegacyView = readParam(params.view);
+  const initialStage: ConversationRoomStage | undefined =
+    isConversationRoomStage(requestedStage)
+      ? requestedStage
+      : requestedLegacyStep === "intake"
+        ? "intake"
+        : requestedLegacyStep === "checkout"
+          ? "checkout"
+          : requestedLegacyView === "studio-plan"
+            ? "plan"
+            : undefined;
   const inspectRaw = readParam(params.inspect);
   const inspectHardware = inspectRaw === "1";
   const voiceIntent = resolvePresenceIntent(readParam(params.presence));
@@ -56,6 +73,7 @@ export default async function StudioConversationRoomPage({
     <main>
       <h1 className="sr-only">Studio Conversation Room</h1>
       <ConversationRoomRuntime
+        initialStage={initialStage}
         inspectHardware={inspectHardware}
         voiceIntent={voiceIntent}
         capturedTranscript={capturedTranscript}

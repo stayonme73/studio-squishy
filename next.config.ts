@@ -9,13 +9,16 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: "/studio-plan-review", destination: "/route-map", permanent: false },
-      { source: "/project-summary", destination: "/route-map", permanent: false },
-      { source: "/project-details", destination: "/route-map?step=intake", permanent: false },
-      { source: "/payment", destination: "/checkout", permanent: false },
-      { source: "/discovery-summary", destination: "/route-map", permanent: false },
-      { source: "/studio-guide", destination: "/route-map", permanent: false },
-      { source: "/studio-guide-prototype", destination: "/route-map", permanent: false },
+      { source: "/studio-plan-review", destination: "/studio-conversation-room", permanent: false },
+      { source: "/route-map", destination: "/studio-conversation-room", permanent: false },
+      { source: "/project-builder", destination: "/studio-conversation-room", permanent: false },
+      { source: "/project-summary", destination: "/studio-conversation-room", permanent: false },
+      { source: "/project-details", destination: "/studio-conversation-room?stage=intake", permanent: false },
+      { source: "/checkout", destination: "/studio-conversation-room?stage=checkout", permanent: false },
+      { source: "/payment", destination: "/studio-conversation-room?stage=checkout", permanent: false },
+      { source: "/discovery-summary", destination: "/studio-conversation-room", permanent: false },
+      { source: "/studio-guide", destination: "/studio-conversation-room", permanent: false },
+      { source: "/studio-guide-prototype", destination: "/studio-conversation-room", permanent: false },
       { source: "/review-room", destination: "/feedback-studio", permanent: false },
       {
         source: "/studio-tablet",

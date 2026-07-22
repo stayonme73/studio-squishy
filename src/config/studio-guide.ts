@@ -10,7 +10,7 @@ export const studioGuide = {
   title: customerJourneyStepName("studio-guide"),
   subtitle: "Which package fits you?",
   headerLine: "Three paths. One goal—your growth.",
-  routeToProjectDiscovery: "/route-map",
+  routeToProjectDiscovery: "/studio-conversation-room",
 
   helpCard: {
     title: "NEED HELP CHOOSING?",

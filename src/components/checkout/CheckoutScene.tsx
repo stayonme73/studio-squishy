@@ -40,7 +40,7 @@ export default function CheckoutScene() {
     setRoadId(ctx?.roadId ?? null);
 
     if (ids.length === 0) {
-      router.replace("/route-map");
+      router.replace("/studio-conversation-room");
       return;
     }
 
@@ -71,13 +71,13 @@ export default function CheckoutScene() {
   );
 
   const studioPlanHref =
-    roadId != null ? `${projectBuilderHref(roadId)}&view=studio-plan` : "/route-map";
-  const editProjectHref = roadId != null ? projectBuilderHref(roadId) : "/route-map";
+    roadId != null ? `${projectBuilderHref(roadId)}&view=studio-plan` : "/studio-conversation-room";
+  const editProjectHref = roadId != null ? projectBuilderHref(roadId) : "/studio-conversation-room";
 
   const handlePaymentComplete = useCallback(() => {
     markPaymentReceived();
     saveRouteMapJourneyStep("intake");
-    router.push("/route-map?step=intake");
+    router.push("/studio-conversation-room?stage=intake");
   }, [router]);
 
   if (selectedServiceIds.length === 0 || !planSummary) {

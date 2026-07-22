@@ -193,27 +193,27 @@ export const studioBoard = {
 
   routes: {
     studioBoard: "/studio-board",
-    newCampaign: "/route-map",
+    newCampaign: "/studio-conversation-room",
     /** @deprecated legacy URL — redirects to Project Discovery */
-    draftRoom: "/route-map",
+    draftRoom: "/studio-conversation-room?stage=intake",
     pastCampaigns: "/past-campaigns",
     account: "/account",
     helpCenter: "/help-center",
-    studioGuide: "/route-map",
+    studioGuide: "/studio-conversation-room",
     reviewRoom: "/feedback-studio",
     feedbackStudio: "/feedback-studio",
     deliverables: "/deliverables",
     campaignDetails: "/campaign-details",
     welcomeHall: "/studio-lobby",
     studioLobby: "/studio-lobby",
-    projectDiscovery: "/route-map",
+    projectDiscovery: "/studio-conversation-room?stage=intake",
     studioKitchen: "/studio-kitchen",
     /** @deprecated quarantined — redirects to Route Map */
-    projectSummary: "/route-map",
+    projectSummary: "/studio-conversation-room",
     /** @deprecated quarantined — use resolveIntakeEditHref / Route Map intake */
-    projectDetails: "/route-map?step=intake",
+    projectDetails: "/studio-conversation-room?stage=intake",
     /** @deprecated quarantined — redirects to Route Map */
-    studioPlanReview: "/route-map",
+    studioPlanReview: "/studio-conversation-room",
   },
 
   empty: {

@@ -126,11 +126,27 @@ function spokenLineForGuideStep(
 
 export type ConversationRoomRuntimeProps = {
   initialState?: Partial<ConversationRoomState>;
+  /** Sealed deep links: `?stage=checkout|intake` (and legacy step/view). */
+  initialStage?: ConversationRoomStage;
   voiceIntent?: VoiceIntent;
   capturedTranscript?: string | null;
   inspectHardware?: boolean;
   className?: string;
 };
+
+function resolveBootStage(
+  project: WorkingDraftRecord,
+  requestedStage: ConversationRoomStage | undefined,
+): ConversationRoomStage {
+  const savedStage = readConversationStage(project);
+  if (!requestedStage) return savedStage;
+  if (requestedStage === "checkout" || requestedStage === "intake") {
+    const hasSelectedRoute = readSelectedRoute(project) !== null;
+    const hasSelectedServices = readSelectedServices(project).length > 0;
+    return hasSelectedRoute && hasSelectedServices ? requestedStage : savedStage;
+  }
+  return requestedStage;
+}
 
 function createGuideRoomState(
   initialState?: Partial<ConversationRoomState>,
@@ -166,6 +182,7 @@ function fieldValueForStep(
  */
 export default function ConversationRoomRuntime({
   initialState,
+  initialStage,
   voiceIntent = "idle",
   capturedTranscript = null,
   inspectHardware = false,
@@ -267,7 +284,11 @@ export default function ConversationRoomRuntime({
     const hydratedGuide = guideFromProject.projectNeed.trim()
       ? guideFromProject
       : loadedGuide;
-    const restoredStage = readConversationStage(project);
+    const restoredStage = resolveBootStage(project, initialStage);
+    const bootProject =
+      restoredStage === readConversationStage(project)
+        ? project
+        : persistConversationStage(project, restoredStage);
     const openStep =
       restoredStage === "opening"
         ? resolveGuideOpenStep(
@@ -278,7 +299,7 @@ export default function ConversationRoomRuntime({
           )
         : ("confirmed" as GuideConversationStep);
 
-    setProjectDraft(project);
+    setProjectDraft(bootProject);
     setStage(restoredStage);
     setDraft(hydratedGuide);
     setStep(openStep);

@@ -357,11 +357,11 @@ export const draftRoom = {
 
   routes: {
     welcomeHall: "/studio-lobby",
-    draftRoom: "/route-map",
-    begin: "/route-map",
-    studioGuide: "/route-map",
+    draftRoom: "/studio-conversation-room?stage=intake",
+    begin: "/studio-conversation-room?stage=intake",
+    studioGuide: "/studio-conversation-room",
     studioBoard: "/studio-board",
-    projectDiscovery: "/route-map",
+    projectDiscovery: "/studio-conversation-room",
   },
 } as const;
 

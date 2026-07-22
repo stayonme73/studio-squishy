@@ -21,7 +21,7 @@ export const deliverables = {
     campaignDetails: studioBoard.routes.campaignDetails,
     reviewRoom: "/feedback-studio",
     deliverables: "/deliverables",
-    draftRoom: "/route-map",
+    draftRoom: "/studio-conversation-room?stage=intake",
   },
 
   sidebar: {

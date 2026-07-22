@@ -57,11 +57,11 @@ export const welcomeHallPhase1 = {
   },
 
   /** Welcome Hall kiosk → Studio Route Map V1 front door. */
-  routeToRouteMap: "/route-map",
+  routeToRouteMap: "/studio-conversation-room",
   /** @deprecated use routeToRouteMap — legacy discovery direct link preserved for deep links */
-  routeToBusinessDiscoveryStudio: "/route-map",
+  routeToBusinessDiscoveryStudio: "/studio-conversation-room",
   /** @deprecated use routeToRouteMap — legacy URL redirects */
-  routeToDraftRoom: "/route-map",
+  routeToDraftRoom: "/studio-conversation-room?stage=intake",
   /** @deprecated use routeToRouteMap */
-  routeToStudioGuidePrototype: "/route-map",
+  routeToStudioGuidePrototype: "/studio-conversation-room",
 } as const;

@@ -33,8 +33,8 @@ export const welcomeHallInteraction = {
   },
   routes: {
     /** @deprecated legacy URLs — use Route Map */
-    draftRoom: "/route-map",
-    intake: "/route-map",
+    draftRoom: "/studio-conversation-room?stage=intake",
+    intake: "/studio-conversation-room?stage=intake",
   },
   transitionMs: 1400,
 } as const;
