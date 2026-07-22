@@ -305,6 +305,18 @@
     row-gap: 1rem;
   }
 
+  /*
+   * Phone stack: tablet/question first, then Speak/Type, then Studio Controls.
+   * Do not bury the opening question under the control column.
+   */
+  .surfaceStack {
+    order: 1;
+  }
+
+  .sideRail {
+    order: 2;
+  }
+
   .surfaceStack > :first-child,
   .sideRailBody {
     height: auto;
