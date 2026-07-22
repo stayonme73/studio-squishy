@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -15,12 +13,7 @@ import {
 import StudioLobbyEntryFilm, {
   type LobbyEntrySessionState,
 } from "@/components/entrance/StudioLobbyEntryFilm";
-import StudioLobbyHostLayer from "@/components/entrance/StudioLobbyHostLayer";
-import StudioLobbyInvisibleFriendLayer from "@/components/entrance/StudioLobbyInvisibleFriendLayer";
-import PresenceAnchor from "@/components/studio-presence/PresenceAnchor";
-import { isStudioGuideConversationEnabled } from "@/config/studio-guide-conversation-v1";
 import {
-  clearLobbyEntryChoiceCookie,
   clearLobbyEntryVisitState,
   readLobbyEntryChoice,
   readLobbyEntryFilmDismissed,
@@ -28,33 +21,27 @@ import {
   writeLobbyEntryChoice,
   writeLobbyEntryFilmDismissed,
 } from "@/config/studio-lobby-entry-v1";
-import { PRESENCE_ANCHOR_LOBBY_PODIUM } from "@/config/studio-presence-v1";
-import { welcomeHallPhase1 } from "@/config/welcome-hall-phase1";
 import {
-  sceneRectToCoverPercent,
-  sceneRectToPercent,
   welcomeHallFraming,
   welcomeHallPlateCoverLayout,
   welcomeHallScene,
 } from "@/config/welcome-hall-scene";
+import { cancelLobbyPodiumGuidanceSpeech } from "@/lib/studio-lobby-podium-guidance";
 import { loadGuideDraft } from "@/lib/studio-guide-hard-nav";
 import { setStudioVoiceInvite } from "@/lib/studio-voice-invite";
-import { useLobbyPodiumGuidance } from "@/lib/use-lobby-podium-guidance";
-
-const MOBILE_PLATE_FRAMING = { x: 0.48, y: 0.5, fit: "cover" as const };
 
 const DESKTOP_KIOSK_MIN_WIDTH = 1025;
 
 const SESSION_PROBE_TIMEOUT_MS = 2500;
 
 /** Truthful Lobby session probe — fail closed to signed-out when unknown. */
-async function probeLobbySession(): Promise<LobbyEntrySessionState> {
-  const controller = new AbortController();
-  const timer = window.setTimeout(() => controller.abort(), SESSION_PROBE_TIMEOUT_MS);
+async function probeLobbySession(
+  signal?: AbortSignal,
+): Promise<LobbyEntrySessionState> {
   try {
     const response = await fetch("/api/auth/session", {
       credentials: "include",
-      signal: controller.signal,
+      signal,
     });
     if (!response.ok) return "signed-out";
     const body = (await response.json().catch(() => ({}))) as {
@@ -63,84 +50,18 @@ async function probeLobbySession(): Promise<LobbyEntrySessionState> {
     return body.user?.id ? "signed-in" : "signed-out";
   } catch {
     return "signed-out";
-  } finally {
-    window.clearTimeout(timer);
   }
-}
-function KioskHotspot({
-  style,
-  label,
-  href,
-  disabled,
-  debug,
-  guideMode,
-  onActivate,
-}: {
-  style: CSSProperties | undefined;
-  label: string;
-  href: string;
-  disabled: boolean;
-  debug: boolean;
-  guideMode: boolean;
-  onActivate: () => void;
-}) {
-  if (!style) return null;
-
-  const className = [
-    "hall-kiosk-hotspot",
-    debug ? "hall-kiosk-hotspot--debug" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  /* Guide mode must be a <button>, not a Link — on Samsung, Link href can
-     navigate to Route Map even when preventDefault runs on the click handler. */
-  if (guideMode) {
-    return (
-      <div className="hall-kiosk-stack" style={style}>
-        <button
-          type="button"
-          className={className}
-          aria-label={label}
-          disabled={disabled}
-          onClick={() => {
-            if (disabled) return;
-            onActivate();
-          }}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className="hall-kiosk-stack" style={style}>
-      <Link
-        href={href}
-        className={className}
-        aria-label={label}
-        aria-disabled={disabled || undefined}
-        tabIndex={disabled ? -1 : undefined}
-        onClick={(event) => {
-          if (disabled) {
-            event.preventDefault();
-            return;
-          }
-          event.preventDefault();
-          onActivate();
-        }}
-      />
-    </div>
-  );
 }
 
 /**
- * Studio Lobby — transparent podium hit zone on desktop and mobile; cream dock
- * remains a mobile backup CTA. Entry film gates New vs Returning before Voice
- * or podium start (@see docs/studio-lobby-entry-split-v1-locked.md).
+ * Studio Lobby — lounge plate behind Entry Film (desktop + mobile).
+ * No podium / kiosk. Let’s Get Started → Conversation Room.
  *
- * When NEXT_PUBLIC_STUDIO_GUIDE_CONVERSATION=1, start control opens the
- * Studio Conversation Room (old Lobby Guide overlay is retired).
- * Flag OFF preserves Route Map navigation.
+ * LOBBY VOICE (Tagia 2026-07-21): keep silent. Film welcomes visually.
+ * Do not add a Lobby greeting. Speech begins only after the customer
+ * selects Use Voice guidance in the Conversation Room.
+ *
+ * @see docs/studio-lobby-entry-split-v1-locked.md (film contract)
  */
 export default function WelcomeHallWelcomeScene({
   initialChoseNew = false,
@@ -148,13 +69,9 @@ export default function WelcomeHallWelcomeScene({
   /** From visit cookie — unlocks Lobby in HTML when phone JS never attaches. */
   initialChoseNew?: boolean;
 }) {
-  const router = useRouter();
   const plateRef = useRef<HTMLDivElement>(null);
   const mobileCropRef = useRef<HTMLDivElement>(null);
-  const [showDebug, setShowDebug] = useState(false);
-  const transitioningRef = useRef(false);
   const [plateSize, setPlateSize] = useState({ width: 0, height: 0 });
-  const [mobileCropSize, setMobileCropSize] = useState({ width: 0, height: 0 });
   const [transitioning, setTransitioning] = useState(false);
   /**
    * Film defaults ON for SSR + first paint so phones receive the Entry Film in
@@ -168,32 +85,9 @@ export default function WelcomeHallWelcomeScene({
    */
   const [sessionState, setSessionState] =
     useState<LobbyEntrySessionState>("signed-out");
-  const guideConversationEnabled = isStudioGuideConversationEnabled();
 
-  /** Journey controls + Voice stay gated until New to the Studio. */
-  const journeyUnlocked = choseNew;
-  /**
-   * Front door is hard: until New is chosen, only the film (or reopen) — never the podium.
-   * Returning Client is Sign In on the film — no second Sign In after New.
-   * @see docs/studio-lobby-entry-split-v1-locked.md §6–7
-   */
   const showEntryFilm = filmOpen;
   const showReopenFilm = !filmOpen && !choseNew;
-  /** Hard silence while the entry film is up — Voice must not speak over the door. */
-  const voiceAllowed = journeyUnlocked && !filmOpen;
-
-  const {
-    noteProgress,
-    askGuide,
-    announceUnlockFromGesture,
-    promptVisible,
-    promptCopy,
-    onPromptActivate,
-  } = useLobbyPodiumGuidance({
-    enabled: voiceAllowed,
-  });
-  const { cta, mobileEstablish, mobileStudioNav, squishyGreeting } =
-    welcomeHallPhase1;
 
   const isDesktopKiosk = plateSize.width >= DESKTOP_KIOSK_MIN_WIDTH;
 
@@ -202,35 +96,6 @@ export default function WelcomeHallWelcomeScene({
   const coverLayout = useMemo(
     () => welcomeHallPlateCoverLayout(plateSize, framing),
     [framing, plateSize],
-  );
-
-  const kioskHitArea = useMemo(
-    () =>
-      isDesktopKiosk && coverLayout.width > 0
-        ? sceneRectToPercent(welcomeHallScene.kioskTapTarget)
-        : undefined,
-    [coverLayout.width, isDesktopKiosk],
-  );
-
-  const mobileKioskHitArea = useMemo(() => {
-    if (isDesktopKiosk || mobileCropSize.width <= 0 || mobileCropSize.height <= 0) {
-      return undefined;
-    }
-    return sceneRectToCoverPercent(
-      welcomeHallScene.kioskTapTarget,
-      mobileCropSize,
-      MOBILE_PLATE_FRAMING,
-    );
-  }, [isDesktopKiosk, mobileCropSize]);
-
-  const squishyBalloonArea = useMemo(
-    () =>
-      welcomeHallScene.squishyGreetingOverlayEnabled &&
-      isDesktopKiosk &&
-      coverLayout.width > 0
-        ? sceneRectToPercent(welcomeHallScene.squishyGreetingBalloon)
-        : undefined,
-    [coverLayout.width, isDesktopKiosk],
   );
 
   const canvasStyle = useMemo((): CSSProperties | undefined => {
@@ -244,36 +109,6 @@ export default function WelcomeHallWelcomeScene({
       top: `${coverLayout.offsetY}px`,
     };
   }, [coverLayout, isDesktopKiosk]);
-
-  /** Look-at / dock target — right edge of podium (native plate %). */
-  const presencePodiumAnchor = useMemo(() => {
-    const k = welcomeHallScene.kioskTapTarget;
-    return {
-      x: k.x + k.width - 24,
-      y: k.y + Math.round(k.height * 0.2),
-      width: 20,
-      height: 20,
-    };
-  }, []);
-
-  const presencePodiumAnchorCanvas = useMemo(
-    () => sceneRectToPercent(presencePodiumAnchor),
-    [presencePodiumAnchor],
-  );
-
-  const presencePodiumAnchorMobile = useMemo(() => {
-    if (mobileCropSize.width <= 0 || mobileCropSize.height <= 0) {
-      return undefined;
-    }
-    return sceneRectToCoverPercent(
-      presencePodiumAnchor,
-      mobileCropSize,
-      MOBILE_PLATE_FRAMING,
-    );
-  }, [mobileCropSize, presencePodiumAnchor]);
-
-  /* Conversation Room — replaces the retired Lobby Guide overlay (`?guide=1`). */
-  const mobileGuideHref = "/studio-conversation-room";
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -295,7 +130,6 @@ export default function WelcomeHallWelcomeScene({
       setChoseNew(false);
       setFilmOpen(true);
     } else if (entryParam === "new" || initialChoseNew) {
-      // Explicit begin-new handoff (phone PE) or intentional client unlock.
       writeLobbyEntryChoice("new-to-studio");
       stripEntryParam();
       setChoseNew(true);
@@ -306,78 +140,57 @@ export default function WelcomeHallWelcomeScene({
       if (choice === "new-to-studio") {
         setChoseNew(true);
         setFilmOpen(false);
-      } else {
-        // Stale cookie from earlier broken clicks must not skip the film.
-        clearLobbyEntryChoiceCookie();
-        setChoseNew(false);
-        setFilmOpen(!dismissed);
+      } else if (dismissed) {
+        setFilmOpen(false);
       }
     }
+  }, [initialChoseNew]);
 
+  useEffect(() => {
     let cancelled = false;
+    const controller = new AbortController();
+    const timer = window.setTimeout(
+      () => controller.abort(),
+      SESSION_PROBE_TIMEOUT_MS,
+    );
+
     setSessionState("checking");
-    void probeLobbySession().then((next) => {
-      if (!cancelled) setSessionState(next);
-    });
+    void probeLobbySession(controller.signal)
+      .then((next) => {
+        if (!cancelled) setSessionState(next);
+      })
+      .catch(() => {
+        if (!cancelled) setSessionState("signed-out");
+      })
+      .finally(() => {
+        window.clearTimeout(timer);
+      });
 
     return () => {
       cancelled = true;
+      controller.abort();
+      window.clearTimeout(timer);
     };
-  }, [initialChoseNew]);
+  }, []);
 
   useLayoutEffect(() => {
     const plate = plateRef.current;
     if (!plate) return;
 
     const syncPlateSize = () => {
-      const { width, height } = plate.getBoundingClientRect();
-      setPlateSize({ width, height });
-      const crop = mobileCropRef.current;
-      if (crop) {
-        const cropRect = crop.getBoundingClientRect();
-        setMobileCropSize({ width: cropRect.width, height: cropRect.height });
-      }
+      const rect = plate.getBoundingClientRect();
+      setPlateSize({ width: rect.width, height: rect.height });
     };
 
     syncPlateSize();
-    setShowDebug(new URLSearchParams(window.location.search).get("debug") === "1");
-
     const observer = new ResizeObserver(syncPlateSize);
     observer.observe(plate);
-    const crop = mobileCropRef.current;
-    if (crop) observer.observe(crop);
     window.addEventListener("resize", syncPlateSize);
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", syncPlateSize);
     };
-  }, [isDesktopKiosk]);
-
-  const goToBusinessDiscoveryStudio = useCallback(() => {
-    if (transitioningRef.current) return;
-    transitioningRef.current = true;
-    setTransitioning(true);
-    router.push(welcomeHallPhase1.routeToRouteMap);
-  }, [router]);
-
-  const openGuideOrRouteMap = useCallback(() => {
-    if (!journeyUnlocked || filmOpen) return;
-    noteProgress();
-    if (guideConversationEnabled) {
-      const draft = loadGuideDraft();
-      const hasProgress = Boolean(draft?.projectNeed?.trim() || draft?.confirmedAt);
-      setStudioVoiceInvite(hasProgress ? "resume" : "start");
-      window.location.assign("/studio-conversation-room");
-      return;
-    }
-    goToBusinessDiscoveryStudio();
-  }, [
-    filmOpen,
-    guideConversationEnabled,
-    goToBusinessDiscoveryStudio,
-    journeyUnlocked,
-    noteProgress,
-  ]);
+  }, []);
 
   const handleCloseFilm = useCallback(() => {
     writeLobbyEntryFilmDismissed(true);
@@ -387,32 +200,20 @@ export default function WelcomeHallWelcomeScene({
   const handleBeginNew = useCallback(() => {
     writeLobbyEntryChoice("new-to-studio");
     writeLobbyEntryFilmDismissed(false);
-    // Speak in this click first — then unlock so the guidance effect preserves it.
-    announceUnlockFromGesture();
-    setChoseNew(true);
-    setFilmOpen(false);
-  }, [announceUnlockFromGesture]);
+    /* Lounge front door: do not speak on Let’s Get Started.
+       CR stays silent until the customer picks Voice guidance. */
+    cancelLobbyPodiumGuidanceSpeech();
+    const draft = loadGuideDraft();
+    const hasProgress = Boolean(draft?.projectNeed?.trim() || draft?.confirmedAt);
+    setStudioVoiceInvite(hasProgress ? "resume" : "start");
+    setTransitioning(true);
+    window.location.assign("/studio-conversation-room");
+  }, []);
 
   const handleReopenFilm = useCallback(() => {
     writeLobbyEntryFilmDismissed(false);
     setFilmOpen(true);
   }, []);
-
-  const hostAskGuide = voiceAllowed ? askGuide : undefined;
-  /** Podium stays dead until New — and while the film is covering the door. */
-  const journeyControlsDisabled =
-    transitioning || !journeyUnlocked || filmOpen;
-
-  const plateClassName = [
-    "welcome-hall-plate",
-    transitioning ? " welcome-hall-plate--transitioning" : "",
-  ]
-    .filter(Boolean)
-    .join("");
-
-  const rootClassName = ["welcome-hall-static", "welcome-hall-phase1"].join(" ");
-
-  const kioskRoute = welcomeHallPhase1.routeToRouteMap;
 
   const plateArt = (
     /* eslint-disable-next-line @next/next/no-img-element */
@@ -424,81 +225,20 @@ export default function WelcomeHallWelcomeScene({
     />
   );
 
-  const mobileDock = (
-    <div className="hall-mobile-dock" role="region" aria-labelledby="hall-mobile-heading">
-      <div className="hall-mobile-dock-panel">
-        <h1 id="hall-mobile-heading" className="hall-mobile-dock-panel__heading">
-          {mobileEstablish.heading}
-        </h1>
-        <p className="hall-mobile-dock-panel__tagline">
-          {mobileEstablish.taglineLines.map((line) => (
-            <span key={line} className="hall-mobile-dock-panel__tagline-line">
-              {line}
-            </span>
-          ))}
-        </p>
-        {guideConversationEnabled ? (
-          <a
-            href={mobileGuideHref}
-            className="hall-mobile-dock-panel__cta"
-            data-studio-guide-cta="mobile"
-            aria-disabled={journeyControlsDisabled || undefined}
-            tabIndex={journeyControlsDisabled ? -1 : undefined}
-            onClick={(event) => {
-              event.preventDefault();
-              if (!journeyUnlocked || filmOpen || transitioningRef.current) return;
-              noteProgress();
-              const draft = loadGuideDraft();
-              const hasProgress = Boolean(
-                draft?.projectNeed?.trim() || draft?.confirmedAt,
-              );
-              setStudioVoiceInvite(hasProgress ? "resume" : "start");
-              window.location.assign(mobileGuideHref);
-            }}
-          >
-            {mobileEstablish.ctaLabel}
-          </a>
-        ) : (
-          <Link
-            href={welcomeHallPhase1.routeToRouteMap}
-            className="hall-mobile-dock-panel__cta"
-            aria-disabled={journeyControlsDisabled || undefined}
-            tabIndex={journeyControlsDisabled ? -1 : undefined}
-            onClick={(event) => {
-              if (!journeyUnlocked || filmOpen || transitioningRef.current) {
-                event.preventDefault();
-                return;
-              }
-              noteProgress();
-              transitioningRef.current = true;
-              setTransitioning(true);
-            }}
-          >
-            {mobileEstablish.ctaLabel}
-          </Link>
-        )}
-      </div>
-
-      <nav className="hall-mobile-studio-nav" aria-label={mobileStudioNav.ariaLabel}>
-        <h2 className="hall-mobile-studio-nav__heading">{mobileStudioNav.heading}</h2>
-        <ul className="hall-mobile-studio-nav__list">
-          {mobileStudioNav.items.map((item) => (
-            <li key={item.label} className="hall-mobile-studio-nav__item">
-              <Link href={item.href} className="hall-mobile-studio-nav__link">
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
-  );
-
   const transitionGlow = (
     <div className="hall-view-ahead-transition" aria-hidden>
       <div className="hall-view-ahead-transition-glow" />
     </div>
   );
+
+  const plateClassName = [
+    "welcome-hall-plate",
+    transitioning ? " welcome-hall-plate--transitioning" : "",
+  ]
+    .filter(Boolean)
+    .join("");
+
+  const rootClassName = ["welcome-hall-static", "welcome-hall-phase1"].join(" ");
 
   return (
     <div className={rootClassName} aria-label="Studio Lobby">
@@ -517,49 +257,6 @@ export default function WelcomeHallWelcomeScene({
             </div>
             <div className="welcome-hall-plate-canvas" style={canvasStyle}>
               {plateArt}
-              <StudioLobbyHostLayer
-                layout="canvas"
-                debug={showDebug}
-                onAskGuide={hostAskGuide}
-              />
-              <StudioLobbyInvisibleFriendLayer
-                layout="canvas"
-                debug={showDebug}
-              />
-              <PresenceAnchor
-                id={PRESENCE_ANCHOR_LOBBY_PODIUM}
-                activatePresence
-                style={presencePodiumAnchorCanvas}
-              />
-              {squishyBalloonArea ? (
-                <div
-                  className="hall-squishy-speech"
-                  style={squishyBalloonArea}
-                  role="note"
-                  aria-label={squishyGreeting}
-                >
-                  <p className="hall-squishy-balloon">
-                    {mobileEstablish.taglineLines.map((line) => (
-                      <span key={line} className="hall-squishy-balloon__line">
-                        {line}
-                      </span>
-                    ))}
-                  </p>
-                  <span className="hall-squishy-trail hall-squishy-trail--1" aria-hidden />
-                  <span className="hall-squishy-trail hall-squishy-trail--2" aria-hidden />
-                  <span className="hall-squishy-trail hall-squishy-trail--3" aria-hidden />
-                  <span className="hall-squishy-trail hall-squishy-trail--4" aria-hidden />
-                </div>
-              ) : null}
-              <KioskHotspot
-                style={kioskHitArea}
-                label={cta.kioskLabel}
-                href={kioskRoute}
-                disabled={journeyControlsDisabled}
-                debug={showDebug}
-                guideMode={guideConversationEnabled}
-                onActivate={openGuideOrRouteMap}
-              />
             </div>
           </div>
         ) : (
@@ -568,53 +265,9 @@ export default function WelcomeHallWelcomeScene({
             className="welcome-hall-plate-crop welcome-hall-plate-crop--mobile"
           >
             {plateArt}
-            <StudioLobbyHostLayer
-              layout="cover"
-              viewport={mobileCropSize}
-              framing={MOBILE_PLATE_FRAMING}
-              debug={showDebug}
-              onAskGuide={hostAskGuide}
-            />
-            <StudioLobbyInvisibleFriendLayer
-              layout="cover"
-              viewport={mobileCropSize}
-              framing={MOBILE_PLATE_FRAMING}
-              debug={showDebug}
-            />
-            {presencePodiumAnchorMobile ? (
-              <PresenceAnchor
-                id={PRESENCE_ANCHOR_LOBBY_PODIUM}
-                activatePresence
-                style={presencePodiumAnchorMobile}
-              />
-            ) : null}
-            <KioskHotspot
-              style={mobileKioskHitArea}
-              label={cta.kioskLabel}
-              href={kioskRoute}
-              disabled={journeyControlsDisabled}
-              debug={showDebug}
-              guideMode={guideConversationEnabled}
-              onActivate={openGuideOrRouteMap}
-            />
           </div>
         )}
 
-        {mobileDock}
-        {journeyUnlocked && promptVisible ? (
-          <button
-            type="button"
-            className="hall-hesitation-prompt"
-            onClick={onPromptActivate}
-            aria-label={`${promptCopy.title} ${promptCopy.body}`}
-          >
-            <span className="hall-hesitation-prompt__chrome" aria-hidden />
-            <span className="hall-hesitation-prompt__content">
-              <span className="hall-hesitation-prompt__title">{promptCopy.title}</span>
-              <span className="hall-hesitation-prompt__body">{promptCopy.body}</span>
-            </span>
-          </button>
-        ) : null}
         {showEntryFilm ? (
           <StudioLobbyEntryFilm
             sessionState={sessionState}

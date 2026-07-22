@@ -1,21 +1,8 @@
 /**
  * Studio Lobby — Room 1 runtime scene (production).
- * 🔒 LOBBY ENVIRONMENT LOCKED — Tagia 2026-07-18 (16:9 podium-final plate)
- * @see docs/studio-lobby-v1-locked.md
- * Host identity: docs/studio-host-character-standard-v1-locked.md (separate Host Layer — not baked into plate)
- *
- * Approved visual baseline. Do not redesign or reinterpret.
- * Preserve composition, hierarchy, lighting, customer flow, palette, premium feel.
- * Faithful implementation — not pixel-perfect recreation.
- *
- * 16:9 plate matches common desktops — contain framing shows the full Lobby
- * without dominating blurred side bars.
- *
- * CHANGE POLICY — no visual redesigns, copy rewrites, layout adjustments,
- * or hotspot changes unless: verified technical defect, accessibility issue,
- * navigation failure, or explicit Tagia approval.
- *
- * Retired plates live under src/archive/welcome-hall/ (not served).
+ * Lounge plate (no podium) — Tagia 2026-07-21.
+ * Entry Film is the only start path → Conversation Room.
+ * Host / podium interaction retired for this plate.
  *
  * @see src/config/welcome-hall-tower.ts
  */
@@ -29,32 +16,30 @@ export type SceneRect = {
 
 export const welcomeHallScene = {
   /**
-   * Production Lobby environment (Host not baked in).
-   * Host Layer is a separate transparent stack — see studio-lobby-host-layer-v1.ts.
+   * Lounge Lobby environment — Business Discovery Studio lounge.
+   * No baked kiosk; Entry Film is the customer front door.
    */
-  src: "/welcome-hall/studio-lobby-environment.png?v=16",
-  alt: "Studio Lobby — welcome podium and Studio interior",
-  aspectRatio: "1920 / 1080" as const,
-  nativeSize: { width: 1920, height: 1080 } as const,
+  src: "/welcome-hall/studio-lobby-lounge.png?v=1",
+  alt: "The Studio lounge — Business Discovery Studio interior",
+  aspectRatio: "1024 / 488" as const,
+  nativeSize: { width: 1024, height: 488 } as const,
 
-  /** Full fit — restored original Lobby plate. */
+  /** Full fit — lounge plate. */
   plateDisplayScale: 1,
 
   /**
-   * Podium / kiosk tap target — native pixels on 16:9 plate (1920×1080).
-   * Desktop: plate-canvas % overlay. Mobile: cover-mapped at object-position 48% 50%.
-   * Full visible podium (screen + frame + stand). Verify with ?debug=1.
+   * Podium tap target — unused (no kiosk on lounge plate).
+   * Kept so legacy helpers compile; never rendered as a hotspot.
    */
   kioskTapTarget: {
-    x: 55,
-    y: 340,
-    width: 520,
-    height: 700,
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
   } satisfies SceneRect,
 
   /**
-   * Greeting lives on the podium screen (baked). HTML balloon overlay stays off.
-   * Rect retained for reference only.
+   * Greeting lives on Entry Film / Conversation Room — not a Lobby balloon.
    */
   squishyGreetingOverlayEnabled: false,
   squishyGreetingBalloon: {
@@ -73,13 +58,12 @@ export const welcomeHallScene = {
   },
 
   /**
-   * Desktop: cover — full-bleed Lobby (Tagia preference: no side bars).
-   * 16:9 plate fills the viewport; minor top/bottom crop only when the window
-   * aspect differs slightly from 16:9. Portrait mobile uses CSS crop path.
+   * Desktop: cover — full-bleed lounge (no side bars).
+   * Portrait mobile uses cover with a slight horizontal bias.
    */
   framing: {
-    default: { x: 0.5, y: 0.52, fit: "cover" as const },
-    portrait: { x: 0.5, y: 0.5, fit: "contain" as const },
+    default: { x: 0.5, y: 0.5, fit: "cover" as const },
+    portrait: { x: 0.48, y: 0.5, fit: "cover" as const },
   },
 } as const;
 

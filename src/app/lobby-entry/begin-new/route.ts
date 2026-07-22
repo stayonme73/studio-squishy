@@ -10,8 +10,7 @@ import { browserSafeRedirectUrl } from "@/lib/browser-safe-redirect-url";
  * `lobbyEntry=new` is required so a stale cookie alone cannot unlock.
  */
 export async function GET(request: Request) {
-  const destination = browserSafeRedirectUrl(request, "/");
-  destination.searchParams.set("lobbyEntry", "new");
+  const destination = browserSafeRedirectUrl(request, "/studio-conversation-room");
   const response = NextResponse.redirect(destination);
   response.cookies.set(LOBBY_ENTRY_CHOICE_COOKIE, "new-to-studio", {
     path: "/",

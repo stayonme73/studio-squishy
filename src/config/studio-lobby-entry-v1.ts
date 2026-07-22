@@ -2,6 +2,9 @@
  * Studio Lobby Entry Film v1 — runtime chrome over the locked Lobby.
  * @see docs/studio-lobby-entry-split-v1-locked.md
  * Design reference: docs/illustration/references/studio-lobby-entry-film-v1.png
+ *
+ * Lobby stays silent (Tagia 2026-07-21). Film orients; Voice starts only
+ * after Use Voice guidance in the Conversation Room.
  */
 
 /** Cookie mirrors visit choice so New works when phone JS/hydration fails. */
