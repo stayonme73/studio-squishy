@@ -1,6 +1,7 @@
 /**
- * Truthful Intake → Auth → Board handoff.
- * Session decides Sign In vs Board; passport, Voice, CTA, and navigation stay aligned.
+ * Truthful Intake → Account choice → Board handoff.
+ * Session decides Account handoff vs Board; passport, Voice, CTA, and navigation stay aligned.
+ * Signed-out does not assume new vs returning — Create Account and Sign In are both offered.
  */
 
 import {
@@ -16,6 +17,7 @@ export type IntakeHandoffPlan = {
   auth: IntakeHandoffAuthState;
   /** Absolute path for navigation (hard assign). */
   destination: string;
+  /** Internal passport — awaiting-signin means auth before Board (choice, not Sign-In-only). */
   passport: "awaiting-signin" | "awaiting-board-welcome";
   voiceLine: string;
   submitCtaLabel: string;
@@ -24,7 +26,8 @@ export type IntakeHandoffPlan = {
   tabletNextReadyMaterialsLater: string;
 };
 
-const SIGN_IN_FROM_BOARD = `/sign-in?from=${encodeURIComponent(
+/** Signed-out Intake land — dual-path account choice, not Sign In alone. */
+export const ACCOUNT_HANDOFF_FROM_BOARD = `/account-handoff?from=${encodeURIComponent(
   studioBoard.routes.studioBoard,
 )}`;
 
@@ -46,7 +49,7 @@ export function resolveIntakeHandoffPlan(
   }
   return {
     auth: "signed-out",
-    destination: SIGN_IN_FROM_BOARD,
+    destination: ACCOUNT_HANDOFF_FROM_BOARD,
     passport: "awaiting-signin",
     voiceLine: v.intakeSubmitSuccessVoiceSignedOut,
     submitCtaLabel: v.intakeSubmitCtaSignedOut,

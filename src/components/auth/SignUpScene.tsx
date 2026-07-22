@@ -2,13 +2,22 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import { safeReturnPath } from "@/lib/auth/safe-return-path";
+import { promoteStudioVoiceBoardHandoffToWelcome } from "@/lib/studio-voice-board-handoff";
 import UtilityPasswordField from "@/components/auth/UtilityPasswordField";
 
+/** Full navigation — soft router can leave customers stuck off the Board return. */
+function goToReturnPath(path: string) {
+  window.location.assign(path);
+}
+
+function withFrom(path: string, returnTo: string) {
+  return `${path}?from=${encodeURIComponent(returnTo)}`;
+}
+
 export default function SignUpScene() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const returnTo = useMemo(
     () => safeReturnPath(searchParams.get("from")),
@@ -34,7 +43,7 @@ export default function SignUpScene() {
 
     const body = (await response.json().catch(() => ({}))) as {
       error?: string;
-      verification?: { emailSent?: boolean };
+      user?: { id?: string };
     };
 
     if (!response.ok) {
@@ -43,21 +52,12 @@ export default function SignUpScene() {
       return;
     }
 
-    const pending = new URL("/verify-email/pending", window.location.origin);
-    if (returnTo && returnTo !== "/studio-board") {
-      pending.searchParams.set("from", returnTo);
-    }
-    if (body.verification && body.verification.emailSent === false) {
-      pending.searchParams.set("delivery", "failed");
-    }
-    router.replace(`${pending.pathname}${pending.search}`);
-    router.refresh();
+    /* Signup already set the session cookie — continue to Board without a second password. */
+    promoteStudioVoiceBoardHandoffToWelcome();
+    goToReturnPath(returnTo);
   }
 
-  const signInHref =
-    returnTo && returnTo !== "/studio-board"
-      ? `/sign-in?from=${encodeURIComponent(returnTo)}`
-      : "/sign-in";
+  const signInHref = withFrom("/sign-in", returnTo);
 
   return (
     <div className="utility-page">
@@ -69,7 +69,8 @@ export default function SignUpScene() {
           </h1>
           <p className="utility-lead">
             Create an account to follow your Studio work and receive updates.
-            After you create an account, we will ask you to verify your email.
+            We will also send a verification email — you can open your Studio
+            Board now while that stays soft in the background.
           </p>
 
           <form className="utility-form" onSubmit={handleSubmit}>

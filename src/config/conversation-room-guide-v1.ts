@@ -195,36 +195,36 @@ export const conversationRoomGuideV1 = {
   /** When required fields remain unresolved. */
   intakeTabletNextRequiredRemaining:
     "Complete the remaining required items.",
-  /** Signed out — ready to submit. */
+  /** Signed out — ready to submit (account choice next — not Sign-In-only). */
   intakeTabletNextReadySignedOut:
-    "Review and continue to Sign In to open your Studio Board.",
+    "Review and continue to create an account or sign in to open your Studio Board.",
   intakeTabletNextReadyMaterialsLaterSignedOut:
-    "You marked materials for later. That does not erase your purchase — production starts after they arrive. Review and continue to Sign In to open your Studio Board.",
+    "You marked materials for later. That does not erase your purchase — production starts after they arrive. Review and continue to create an account or sign in to open your Studio Board.",
   /** Signed in — ready to submit. */
   intakeTabletNextReadySignedIn: "Review and continue to your Studio Board.",
   intakeTabletNextReadyMaterialsLaterSignedIn:
     "You marked materials for later. That does not erase your purchase — production starts after they arrive. Review and continue to your Studio Board.",
   /** @deprecated Prefer auth-specific Next copy — defaults to signed-out truth. */
   intakeTabletNextReady:
-    "Review and continue to Sign In to open your Studio Board.",
+    "Review and continue to create an account or sign in to open your Studio Board.",
   intakeTabletNextReadyMaterialsLater:
-    "You marked materials for later. That does not erase your purchase — production starts after they arrive. Review and continue to Sign In to open your Studio Board.",
+    "You marked materials for later. That does not erase your purchase — production starts after they arrive. Review and continue to create an account or sign in to open your Studio Board.",
   intakeTabletLead:
     "Now I'll collect the information our production team needs. Required fields are marked; optional ones can wait.",
   intakeOpenPanelCta: "Continue intake",
   intakeHostFallbackCta: "Open Host Project Intake",
   /** Form primary CTA — must match real next destination. */
-  intakeSubmitCtaSignedOut: "SAVE & CONTINUE TO SIGN IN",
+  intakeSubmitCtaSignedOut: "SAVE & CONTINUE TO YOUR ACCOUNT",
   intakeSubmitCtaSignedIn: "SAVE & CONTINUE TO STUDIO BOARD",
   intakeNextStepBlurbSignedOut:
-    "Complete every required section for all purchased services, then continue to Sign In.",
+    "Complete every required section for all purchased services, then continue to create an account or sign in.",
   intakeNextStepBlurbSignedIn:
     "Complete every required section for all purchased services, then continue to Studio Board.",
   /**
-   * Spoken on Intake submit when the customer must Sign In first.
+   * Spoken on Intake submit when signed out — neutral account choice (Create Account or Sign In).
    */
   intakeSubmitSuccessVoiceSignedOut:
-    "Everything required to begin has been collected. Your project has been created. The next step is signing in so you can access your Studio Board, track progress, communicate with the Studio, and receive updates.",
+    "Everything required to begin has been collected. Your project has been created. Create an account or sign in to open your Studio Board, track progress, communicate with the Studio, and receive updates.",
   /**
    * Spoken on Intake submit when already signed in — Board next, no Sign In language.
    */
@@ -232,8 +232,11 @@ export const conversationRoomGuideV1 = {
     "Everything required to begin has been collected. Your project has been created. Opening your Studio Board so you can track progress, communicate with the Studio, and receive updates.",
   /** @deprecated Prefer auth-specific Voice — defaults to signed-out truth. */
   intakeSubmitSuccessVoice:
-    "Everything required to begin has been collected. Your project has been created. The next step is signing in so you can access your Studio Board, track progress, communicate with the Studio, and receive updates.",
-  /** Sign-in banner when Voice hands off after Intake (visual; speech already played). */
+    "Everything required to begin has been collected. Your project has been created. Create an account or sign in to open your Studio Board, track progress, communicate with the Studio, and receive updates.",
+  /** Account-choice utility after Intake (visual; speech already played). */
+  boardHandoffAccountChoiceLead:
+    "Your project has been created. Create an account or sign in to open your Studio Board, track progress, communicate with the Studio, and receive updates.",
+  /** Sign-in lead when arriving from account choice or legacy handoff (visual). */
   boardHandoffSignInLead:
     "Your project has been created. Sign in to open your Studio Board, track progress, communicate with the Studio, and receive updates.",
   /** Spoken once on first Board arrival after Voice handoff. */

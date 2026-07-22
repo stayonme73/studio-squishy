@@ -4,15 +4,14 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import { safeReturnPath } from "@/lib/auth/safe-return-path";
-import {
-  peekStudioVoiceBoardHandoffAwaitingSignIn,
-  promoteStudioVoiceBoardHandoffToWelcome,
-} from "@/lib/studio-voice-board-handoff";
+import { promoteStudioVoiceBoardHandoffToWelcome } from "@/lib/studio-voice-board-handoff";
 import UtilityPasswordField from "@/components/auth/UtilityPasswordField";
 
 const SESSION_PROBE_TIMEOUT_MS = 2500;
+
+const SIGN_IN_LEAD =
+  "Use the account connected to your Studio work to open your Board, Review Room, Project Record, and Final Delivery.";
 
 /** Full navigation — soft router.replace can leave phone/desktop stuck on /sign-in. */
 function goToReturnPath(path: string) {
@@ -29,10 +28,6 @@ export default function SignInScene() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const showBoardHandoff = useMemo(
-    () => peekStudioVoiceBoardHandoffAwaitingSignIn(),
-    [],
-  );
 
   useEffect(() => {
     let cancelled = false;
@@ -99,17 +94,11 @@ export default function SignInScene() {
     <div className="utility-page">
       <div className="utility-shell utility-shell--narrow">
         <section className="utility-card" aria-labelledby="sign-in-title">
-          <p className="utility-eyebrow">
-            {showBoardHandoff ? "Studio Voice" : "Client Access"}
-          </p>
+          <p className="utility-eyebrow">Client Access</p>
           <h1 id="sign-in-title" className="utility-title">
             Sign in to The Studio
           </h1>
-          <p className="utility-lead">
-            {showBoardHandoff
-              ? conversationRoomGuideV1.boardHandoffSignInLead
-              : "Use the account connected to your Studio work to open your Board, Review Room, Project Record, and Final Delivery."}
-          </p>
+          <p className="utility-lead">{SIGN_IN_LEAD}</p>
 
           <form className="utility-form" onSubmit={handleSubmit}>
             <label className="utility-field">
@@ -130,13 +119,7 @@ export default function SignInScene() {
               required
             />
             <p className="utility-note">
-              <Link
-                href={
-                  returnTo && returnTo !== "/studio-board"
-                    ? `/forgot-password?from=${encodeURIComponent(returnTo)}`
-                    : "/forgot-password"
-                }
-              >
+              <Link href={`/forgot-password?from=${encodeURIComponent(returnTo)}`}>
                 Forgot password?
               </Link>
             </p>
@@ -152,13 +135,7 @@ export default function SignInScene() {
 
           <p className="utility-note">
             New here?{" "}
-            <Link
-              href={
-                returnTo && returnTo !== "/studio-board"
-                  ? `/sign-up?from=${encodeURIComponent(returnTo)}`
-                  : "/sign-up"
-              }
-            >
+            <Link href={`/sign-up?from=${encodeURIComponent(returnTo)}`}>
               Create an account
             </Link>
             .

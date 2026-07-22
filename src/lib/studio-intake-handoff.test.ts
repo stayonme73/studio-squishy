@@ -34,17 +34,18 @@ function memoryStorage(): Storage {
 }
 
 describe("resolveIntakeHandoffPlan — Truthful Handoff", () => {
-  it("signed-out: Sign In CTA, Voice, passport, and destination align", () => {
+  it("signed-out: account-choice CTA, Voice, passport, and destination align", () => {
     const plan = resolveIntakeHandoffPlan(false);
     expect(plan.auth).toBe("signed-out");
     expect(plan.passport).toBe("awaiting-signin");
     expect(plan.destination).toBe(
-      `/sign-in?from=${encodeURIComponent(studioBoard.routes.studioBoard)}`,
+      `/account-handoff?from=${encodeURIComponent(studioBoard.routes.studioBoard)}`,
     );
     expect(plan.submitCtaLabel).toBe(
       conversationRoomGuideV1.intakeSubmitCtaSignedOut,
     );
-    expect(plan.submitCtaLabel).toMatch(/SIGN IN/i);
+    expect(plan.submitCtaLabel).toMatch(/ACCOUNT/i);
+    expect(plan.submitCtaLabel).not.toMatch(/SIGN IN/i);
     expect(plan.submitCtaLabel).not.toMatch(/STUDIO BOARD/i);
     expect(plan.nextStepBlurb).toBe(
       conversationRoomGuideV1.intakeNextStepBlurbSignedOut,
@@ -52,11 +53,13 @@ describe("resolveIntakeHandoffPlan — Truthful Handoff", () => {
     expect(plan.tabletNextReady).toBe(
       conversationRoomGuideV1.intakeTabletNextReadySignedOut,
     );
-    expect(plan.tabletNextReady).toMatch(/Sign In/i);
+    expect(plan.tabletNextReady.toLowerCase()).toMatch(/create an account/);
+    expect(plan.tabletNextReady.toLowerCase()).toMatch(/sign in/);
     expect(plan.voiceLine).toBe(
       conversationRoomGuideV1.intakeSubmitSuccessVoiceSignedOut,
     );
-    expect(plan.voiceLine.toLowerCase()).toMatch(/sign/);
+    expect(plan.voiceLine.toLowerCase()).toMatch(/create an account/);
+    expect(plan.voiceLine.toLowerCase()).toMatch(/sign in/);
   });
 
   it("signed-in: Studio Board CTA, Voice, passport, and destination align", () => {
@@ -149,7 +152,7 @@ describe("completeIntakeHandoff — Conversation Room + Host Route Map contract"
     clearStudioVoiceBoardHandoff();
   });
 
-  it("signed-out completion: passport awaiting-signin + Sign In plan", async () => {
+  it("signed-out completion: passport awaiting-signin + account-choice plan", async () => {
     const plan = await completeIntakeHandoff({
       fetchImpl: vi.fn().mockResolvedValue({
         ok: true,
@@ -157,7 +160,10 @@ describe("completeIntakeHandoff — Conversation Room + Host Route Map contract"
       }),
     });
     expect(plan.auth).toBe("signed-out");
-    expect(plan.destination).toContain("/sign-in");
+    expect(plan.destination).toContain("/account-handoff");
+    expect(plan.destination).toContain(
+      encodeURIComponent(studioBoard.routes.studioBoard),
+    );
     expect(peekStudioVoiceBoardHandoffAwaitingSignIn()).toBe(true);
   });
 
