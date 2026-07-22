@@ -50,12 +50,13 @@ export const conversationRoomGuideV1 = {
    */
   routePanelTitle: "Choose Your Route",
   routePanelLead:
-    "Confirm the recommended route, or choose another that fits better.",
-  routeRecommendedBadge: "Recommended",
+    "Based on what you said you’re working on, this may be a good place to start. You can choose a different path.",
+  routeRecommendedBadge: "Suggested starting point",
   routeConfirmCtaPrefix: "Continue with",
   routeConfirmCtaFallback: "Confirm your route",
   routeHelpPrompt: "Not sure where to start?",
-  routeHelpCta: "Confirm the recommended route, or pick another that fits better.",
+  routeHelpCta:
+    "Based on what you said you’re working on, this may be a good place to start. You can choose a different path.",
   /** Activity Panel — peek at a route before confirming on the tablet. */
   routePeekEyebrow: "Route details",
   routePeekJobsHeading: "Services on this route",
@@ -70,7 +71,7 @@ export const conversationRoomGuideV1 = {
    * Prefer `routeVoiceBridge(preferredName)` so the name is used once, not every line.
    */
   routeVoiceIntro:
-    "Thank you. Now let's choose the best route for your project.",
+    "Thank you. Now let’s choose a route for your project. You can pick any path that fits.",
   voiceNiceToMeetPrefix: "Nice to meet you,",
   /** Conversation Room display override — avoid Squishy name on Direct Route. */
   routeDirectTagline:
@@ -363,7 +364,8 @@ export function voiceNiceToMeet(preferredName: string): string {
 
 /**
  * Review → Route bridge. Uses the preferred name once, then stops repeating it.
- * When a recommendation exists, include it so the customer is not left decoding lanes alone.
+ * When a project-need keyword match exists, offer a suggested starting point only —
+ * not a full recommendation (Tagia launch honesty pass 2026-07-21).
  */
 export function routeVoiceBridge(
   preferredName: string | null | undefined,
@@ -375,10 +377,10 @@ export function routeVoiceBridge(
     : conversationRoomGuideV1.voiceBriefThanks;
   const label = recommendedCustomerLabel?.trim();
   if (label) {
-    return `${thanks} Based on what you told me, ${label} is the strongest match. You can choose another route if something else fits better.`;
+    return `${thanks} Based on what you said you’re working on, ${label} may be a good place to start. You can choose any path that fits better.`;
   }
   return name
-    ? `Thank you, ${name}. Now let's choose the best route for your project.`
+    ? `Thank you, ${name}. Now let’s choose a route for your project. You can pick any path that fits.`
     : conversationRoomGuideV1.routeVoiceIntro;
 }
 
