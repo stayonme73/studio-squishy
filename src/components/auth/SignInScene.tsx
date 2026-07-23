@@ -4,7 +4,8 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { safeReturnPath } from "@/lib/auth/safe-return-path";
+import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import { SAFE_RETURN_PATHS, safeReturnPath } from "@/lib/auth/safe-return-path";
 import { promoteStudioVoiceBoardHandoffToWelcome } from "@/lib/studio-voice-board-handoff";
 import UtilityPasswordField from "@/components/auth/UtilityPasswordField";
 
@@ -13,6 +14,21 @@ const SESSION_PROBE_TIMEOUT_MS = 2500;
 const SIGN_IN_LEAD =
   "Use the account connected to your Studio work to open your Board, Review Room, Project Record, and Final Delivery.";
 
+/**
+ * Project-created lead only when the *requested* allowlisted `from` is Board.
+ * Do not use navigational fallback (`safeReturnPath` defaults to Board).
+ */
+function isExplicitStudioBoardFrom(from: string | null): boolean {
+  if (!from) return false;
+  const [pathname] = from.split("?");
+  return (
+    pathname === "/studio-board" &&
+    pathname.startsWith("/") &&
+    !pathname.startsWith("//") &&
+    SAFE_RETURN_PATHS.has(pathname)
+  );
+}
+
 /** Full navigation — soft router.replace can leave phone/desktop stuck on /sign-in. */
 function goToReturnPath(path: string) {
   window.location.assign(path);
@@ -20,10 +36,11 @@ function goToReturnPath(path: string) {
 
 export default function SignInScene() {
   const searchParams = useSearchParams();
-  const returnTo = useMemo(
-    () => safeReturnPath(searchParams.get("from")),
-    [searchParams],
-  );
+  const fromParam = searchParams.get("from");
+  const returnTo = useMemo(() => safeReturnPath(fromParam), [fromParam]);
+  const lead = isExplicitStudioBoardFrom(fromParam)
+    ? conversationRoomGuideV1.boardHandoffSignInLead
+    : SIGN_IN_LEAD;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +115,7 @@ export default function SignInScene() {
           <h1 id="sign-in-title" className="utility-title">
             Sign in to The Studio
           </h1>
-          <p className="utility-lead">{SIGN_IN_LEAD}</p>
+          <p className="utility-lead">{lead}</p>
 
           <form className="utility-form" onSubmit={handleSubmit}>
             <label className="utility-field">

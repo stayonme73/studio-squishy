@@ -82,6 +82,67 @@ function materialPromptFromLabel(label: string): string {
 const incompleteIntakeNextStep =
   "Finish Project Intake first. Material requests will appear here afterward.";
 
+/** Materials “Still Need” empty states — never treat missing requests as “no materials needed.” */
+export const MATERIALS_STILL_NEED_INCOMPLETE_INTAKE =
+  "Material requests will appear here after you complete Project Intake.";
+
+export const MATERIALS_STILL_NEED_AWAITING_REQUESTS =
+  "No material requests have been posted yet. Check back here for anything the Studio needs.";
+
+export const MATERIALS_STILL_NEED_NONE_CURRENTLY_NEEDED =
+  "No additional materials are currently needed.";
+
+export type MaterialsStillNeedEmptyKind =
+  | "incomplete_intake"
+  | "awaiting_requests"
+  | "none_currently_needed";
+
+export type MaterialsStillNeedEmptyInput = {
+  intakeComplete: boolean;
+  /** Materials client payload finished loading (success or empty). */
+  materialsLoaded: boolean;
+  actionCardCount: number;
+  blockingRequiredCount: number;
+  /**
+   * True only when production has affirmatively started / moved —
+   * not merely “no request rows yet.”
+   */
+  affirmativelyNoMaterialsNeeded: boolean;
+};
+
+/**
+ * Empty copy for Materials We Still Need when there are no action cards to show.
+ * Returns null when the caller should render specific material cards instead.
+ */
+export function resolveMaterialsStillNeedEmptyState(
+  input: MaterialsStillNeedEmptyInput,
+): { kind: MaterialsStillNeedEmptyKind; message: string } | null {
+  if (input.actionCardCount > 0) return null;
+
+  if (!input.intakeComplete) {
+    return {
+      kind: "incomplete_intake",
+      message: MATERIALS_STILL_NEED_INCOMPLETE_INTAKE,
+    };
+  }
+
+  if (
+    input.materialsLoaded &&
+    input.blockingRequiredCount === 0 &&
+    input.affirmativelyNoMaterialsNeeded
+  ) {
+    return {
+      kind: "none_currently_needed",
+      message: MATERIALS_STILL_NEED_NONE_CURRENTLY_NEEDED,
+    };
+  }
+
+  return {
+    kind: "awaiting_requests",
+    message: MATERIALS_STILL_NEED_AWAITING_REQUESTS,
+  };
+}
+
 const statusFallback: Record<CampaignStatus, string> = {
   DISCOVERY_COMPLETE: "Review your Project Summary when you're ready to continue.",
   DRAFT_RECEIVED: "Choose your Studio Plan and complete payment to continue.",

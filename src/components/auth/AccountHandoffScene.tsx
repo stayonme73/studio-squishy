@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import { safeReturnPath } from "@/lib/auth/safe-return-path";
@@ -18,16 +17,20 @@ function withFrom(path: string, returnTo: string) {
   return `${path}?from=${encodeURIComponent(returnTo)}`;
 }
 
+type Props = {
+  /** Server-passed `from` query — keeps SSR and first client markup identical. */
+  fromParam: string | null;
+};
+
 /**
  * Compact utility after Intake — Create Account primary, Sign In secondary.
  * Does not assume new vs returning. Both paths keep allowlisted Board return.
+ *
+ * Initial markup must not read window, storage, passport, or useSearchParams.
+ * Session probe runs only after mount.
  */
-export default function AccountHandoffScene() {
-  const searchParams = useSearchParams();
-  const returnTo = useMemo(
-    () => safeReturnPath(searchParams.get("from")),
-    [searchParams],
-  );
+export default function AccountHandoffScene({ fromParam }: Props) {
+  const returnTo = useMemo(() => safeReturnPath(fromParam), [fromParam]);
 
   useEffect(() => {
     let cancelled = false;

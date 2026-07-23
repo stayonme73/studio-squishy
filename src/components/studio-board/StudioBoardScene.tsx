@@ -27,12 +27,12 @@ import {
 } from "@/lib/studio-board-view";
 import { speakConversationLine } from "@/lib/studio-conversation-speech";
 import { consumeStudioVoiceBoardWelcome } from "@/lib/studio-voice-board-handoff";
+import { resolveBoardHeaderGreeting } from "@/lib/studio-board-customer-greeting";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 
 const {
   brand,
   sidebar,
-  userName,
   empty: emptyCopy,
   currentCampaign: currentCampaignCopy,
   membership: membershipDefaults,
@@ -47,6 +47,7 @@ type SidebarIconName =
   | "review"
   | "delivery";
 
+/** Client-only period — never gates the greeting to an empty shell. */
 function useLiveGreetingPeriod() {
   const [period, setPeriod] = useState<GreetingPeriod | null>(null);
 
@@ -180,10 +181,40 @@ export default function StudioBoardScene() {
 
   const boardCampaign = accessState === "no-active-project" ? null : campaign;
   const [movedToProduction, setMovedToProduction] = useState(false);
+  /** Session greeting — independent of campaign claim/load. */
+  const [customerDisplayName, setCustomerDisplayName] = useState<string | null>(null);
+  const [sessionGreetingResolved, setSessionGreetingResolved] = useState(false);
   const [materialsFacts, setMaterialsFacts] = useState<{
     blockingRequiredCount: number;
     stillNeededLabels: readonly string[];
   } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/auth/session", { credentials: "include" })
+      .then(async (response) => {
+        if (cancelled) return;
+        if (!response.ok) {
+          setCustomerDisplayName(null);
+          return;
+        }
+        const body = (await response.json().catch(() => ({}))) as {
+          user?: { displayName?: string | null } | null;
+        };
+        setCustomerDisplayName(
+          typeof body.user?.displayName === "string" ? body.user.displayName : null,
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setCustomerDisplayName(null);
+      })
+      .finally(() => {
+        if (!cancelled) setSessionGreetingResolved(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!boardCampaign?.campaignId || !boardCampaign.paymentReceivedAt) {
@@ -219,8 +250,14 @@ export default function StudioBoardScene() {
       blockingRequiredCount,
       movedToProduction,
       stillNeededLabel: materialsFacts?.stillNeededLabels[0] ?? null,
+      customerDisplayName,
     };
-  }, [boardCampaign?.materialsSummary?.blockingRequiredCount, materialsFacts, movedToProduction]);
+  }, [
+    boardCampaign?.materialsSummary?.blockingRequiredCount,
+    customerDisplayName,
+    materialsFacts,
+    movedToProduction,
+  ]);
 
   const handleMaterialsFactsChange = useCallback(
     (facts: { blockingRequiredCount: number; stillNeededLabels: readonly string[] }) => {
@@ -261,6 +298,16 @@ export default function StudioBoardScene() {
       setProductionBriefOpen(true);
     }
   }, [searchParams]);
+
+  const headerGreeting = useMemo(
+    () =>
+      resolveBoardHeaderGreeting({
+        displayName: customerDisplayName,
+        greetingPeriod,
+        sessionResolved: sessionGreetingResolved,
+      }),
+    [customerDisplayName, greetingPeriod, sessionGreetingResolved],
+  );
 
   /* Voice Board handoff — welcome once after Intake → sign-in → Board. */
   useEffect(() => {
@@ -352,12 +399,18 @@ export default function StudioBoardScene() {
           <div className="sb-header-v3__row">
             <div className="sb-header-v3__copy">
               <h1 className="sb-header-v3__title">Studio Board</h1>
-              {greetingPeriod ? (
+              {headerGreeting.kind === "named" ? (
                 <p className="sb-header-v3__greeting">
-                  Good {greetingPeriod}, <span className="sb-header-v3__name">{userName}</span>
+                  Good {headerGreeting.period},{" "}
+                  <span className="sb-header-v3__name">{headerGreeting.name}</span>
                 </p>
               ) : (
-                <p className="sb-header-v3__greeting sb-header-v3__greeting--loading" aria-busy="true" />
+                <p
+                  className="sb-header-v3__greeting"
+                  aria-busy={headerGreeting.busy || undefined}
+                >
+                  {headerGreeting.text}
+                </p>
               )}
             </div>
           </div>
@@ -474,7 +527,7 @@ export default function StudioBoardScene() {
 
           <StudioBoardMaterialsWorkflow
             campaign={boardCampaign}
-            hasCampaign={view.hasCampaign}
+            hasCampaign={Boolean(boardCampaign)}
             movedToProduction={movedToProduction}
             onMaterialsFactsChange={handleMaterialsFactsChange}
           />

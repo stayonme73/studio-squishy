@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import StudioBoardSlideOutPanel from "@/components/studio-board/StudioBoardSlideOutPanel";
 import { materialsConfig } from "@/config/materials";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
-import { resolveBoardNextStepPanelMessage } from "@/lib/studio-board-client-copy";
+import { resolveBoardNextStepPanelMessage, resolveMaterialsStillNeedEmptyState } from "@/lib/studio-board-client-copy";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
 import { isSocialPostsCampaign } from "@/lib/route-map-social-posts";
 import type {
@@ -436,19 +436,39 @@ function StudioBoardMaterialsWorkflowActive({
   }, [data?.consolidatedRequests, data?.optionalRequests, socialPostsCampaign]);
 
   const receivedMaterials = useMemo(() => {
-    const base = resolveReceivedMaterials(campaign);
+    if (!intakeComplete) return [];
+    const base = resolveReceivedMaterials(campaign).filter(
+      (item) => item.status === "Received",
+    );
     const submitted = buildSubmittedRequestItems(requests);
     const submittedIds = new Set(base.map((item) => item.label.toLowerCase()));
     return [
       ...base,
       ...submitted.filter((item) => !submittedIds.has(item.label.toLowerCase())),
     ];
-  }, [campaign, requests]);
+  }, [campaign, intakeComplete, requests]);
 
-  const actionCards = useMemo(
-    () => (socialPostsCampaign ? buildSocialActionCards(campaign, requests) : buildGenericActionCards(requests)),
-    [campaign, requests, socialPostsCampaign],
-  );
+  const actionCards = useMemo(() => {
+    if (!intakeComplete) return [];
+    const raw = socialPostsCampaign
+      ? buildSocialActionCards(campaign, requests)
+      : buildGenericActionCards(requests);
+    /*
+     * Do not invent Still Need evaluations when the Studio has not posted
+     * material requests yet — that is the awaiting-requests empty state.
+     * Intake-sourced received values belong in Materials Received, not here.
+     */
+    if (!loading && requests.length === 0) {
+      return [];
+    }
+    return raw;
+  }, [
+    campaign,
+    intakeComplete,
+    loading,
+    requests,
+    socialPostsCampaign,
+  ]);
 
   const stillNeededLabels = useMemo(
     () =>
@@ -497,6 +517,25 @@ function StudioBoardMaterialsWorkflowActive({
     loading,
     requests.length,
   ]);
+
+  const stillNeedEmpty = useMemo(
+    () =>
+      resolveMaterialsStillNeedEmptyState({
+        intakeComplete,
+        materialsLoaded: !loading,
+        actionCardCount: actionCards.length,
+        blockingRequiredCount,
+        affirmativelyNoMaterialsNeeded:
+          Boolean(movedToProduction) && !loading && blockingRequiredCount === 0,
+      }),
+    [
+      actionCards.length,
+      blockingRequiredCount,
+      intakeComplete,
+      loading,
+      movedToProduction,
+    ],
+  );
 
   const campaignGoalCanSubmit = Boolean(campaignGoalSelection || campaignGoalNote.trim());
 
@@ -599,13 +638,10 @@ function StudioBoardMaterialsWorkflowActive({
               {error}
             </p>
           ) : null}
-          {!loading && !showWorkflow ? (
-            <p className="sb-materials-board-tile__meta">{emptyMaterials.awaitingProjectDetails}</p>
+          {!loading && stillNeedEmpty ? (
+            <p className="sb-materials-board-tile__meta">{stillNeedEmpty.message}</p>
           ) : null}
-          {!loading && showWorkflow && actionCards.length === 0 ? (
-            <p className="sb-materials-board-tile__meta">{emptyMaterials.stillNeed}</p>
-          ) : null}
-          {!loading && showWorkflow && actionCards.length > 0 ? (
+          {!loading && actionCards.length > 0 ? (
             <div className="sb-materials-action-list">
               {actionCards.map((card) => {
                 const clickable =

@@ -29,6 +29,7 @@ import {
 
 } from "@/lib/campaign-record";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
+import { resolveStudioNoteGreetingLine } from "@/lib/studio-board-customer-greeting";
 import {
   PROJECT_INTAKE_RECEIVED_LEAD,
   PROJECT_INTAKE_RECEIVED_STAGE,
@@ -177,8 +178,11 @@ export function resolveStudioNoteView(
 
   const content = statusContent[campaign.campaignStatus];
   const board = content.studioNoteBoard;
-  const { userName, studioNote: noteCopy, nextAction } = studioBoard;
-  const greeting = `${noteCopy.greetingPrefix} ${userName},`;
+  const { studioNote: noteCopy, nextAction } = studioBoard;
+  const greeting = resolveStudioNoteGreetingLine(
+    displayFacts?.customerDisplayName,
+    noteCopy.greetingPrefix,
+  );
   const facts = resolveBoardDisplayFacts(campaign, displayFacts);
   const mode = resolvePostSubmitCustomerMode(campaign, facts);
   const bodyLines = isPaidIncompleteIntake(campaign)
@@ -249,6 +253,8 @@ export type StudioBoardDisplayFacts = {
   /** Explicit override when caller already evaluated production_trigger. */
   productionGatePassed?: boolean;
   stillNeededLabel?: string | null;
+  /** Authenticated customer display name — never config userName / Tagia. */
+  customerDisplayName?: string | null;
 };
 
 function resolveProgressStepDetail(

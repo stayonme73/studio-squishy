@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 import AccountHandoffScene from "@/components/auth/AccountHandoffScene";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
@@ -11,21 +9,29 @@ export const metadata = {
     "Create an account or sign in to open your Studio Board and follow your project.",
 };
 
-export default function AccountHandoffPage() {
+type AccountHandoffPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function firstQueryValue(value: string | string[] | undefined): string | null {
+  if (typeof value === "string") return value;
+  if (Array.isArray(value) && typeof value[0] === "string") return value[0];
+  return null;
+}
+
+/**
+ * Server reads `from` and passes it as a prop so the client scene never needs
+ * useSearchParams / Suspense — those were producing Handoff hydration overlays.
+ */
+export default async function AccountHandoffPage({ searchParams }: AccountHandoffPageProps) {
+  const params = await searchParams;
+  const fromParam = firstQueryValue(params.from);
+
   return (
     <main
       className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
-      <Suspense
-        fallback={
-          <div
-            className="utility-page utility-shell utility-shell--loading"
-            aria-busy="true"
-          />
-        }
-      >
-        <AccountHandoffScene />
-      </Suspense>
+      <AccountHandoffScene fromParam={fromParam} />
     </main>
   );
 }

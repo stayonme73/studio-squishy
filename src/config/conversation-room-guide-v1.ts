@@ -224,24 +224,24 @@ export const conversationRoomGuideV1 = {
    * Spoken on Intake submit when signed out — neutral account choice (Create Account or Sign In).
    */
   intakeSubmitSuccessVoiceSignedOut:
-    "Everything required to begin has been collected. Your project has been created. Create an account or sign in to open your Studio Board, track progress, communicate with the Studio, and receive updates.",
+    "Your project is set up. Here is what happens next. Create an account or sign in to open your Studio Board, track progress, and get help in the Help Center when you need it.",
   /**
    * Spoken on Intake submit when already signed in — Board next, no Sign In language.
    */
   intakeSubmitSuccessVoiceSignedIn:
-    "Everything required to begin has been collected. Your project has been created. Opening your Studio Board so you can track progress, communicate with the Studio, and receive updates.",
+    "Your project is set up. Here is what happens next. Opening your Studio Board so you can track progress and see any next steps.",
   /** @deprecated Prefer auth-specific Voice — defaults to signed-out truth. */
   intakeSubmitSuccessVoice:
-    "Everything required to begin has been collected. Your project has been created. Create an account or sign in to open your Studio Board, track progress, communicate with the Studio, and receive updates.",
+    "Your project is set up. Here is what happens next. Create an account or sign in to open your Studio Board, track progress, and get help in the Help Center when you need it.",
   /** Account-choice utility after Intake (visual; speech already played). */
   boardHandoffAccountChoiceLead:
-    "Your project has been created. Create an account or sign in to open your Studio Board, track progress, communicate with the Studio, and receive updates.",
-  /** Sign-in lead when arriving from account choice or legacy handoff (visual). */
+    "Your project has been created. Create an account or sign in to open your Studio Board, track progress, and get help in the Help Center when you need it.",
+  /** Sign-in lead when arriving from account choice with Board return (visual). */
   boardHandoffSignInLead:
-    "Your project has been created. Sign in to open your Studio Board, track progress, communicate with the Studio, and receive updates.",
+    "Your project has been created. Sign in to open your Studio Board, track progress, and get help in the Help Center when you need it.",
   /** Spoken once on first Board arrival after Voice handoff. */
   boardArrivalWelcomeVoice:
-    "You're all set. From here you can follow your project's progress, communicate with the Studio, upload additional materials, and review updates.",
+    "Your project is set up. Here is what happens next. From here you can follow progress, upload materials when the Studio asks, and get help in the Help Center.",
   studioPlanBridgeError:
     "I couldn't open checkout yet. Please try again, or edit your plan and review once more.",
   /** Quiet confirmation — not a spoken “Got it.” every turn. */
