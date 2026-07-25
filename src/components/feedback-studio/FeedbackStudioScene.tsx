@@ -10,6 +10,7 @@ import FeedbackStudioConceptReview from "@/components/feedback-studio/FeedbackSt
 import FeedbackStudioLayout from "@/components/feedback-studio/FeedbackStudioLayout";
 import FeedbackStudioRevisionStatus from "@/components/feedback-studio/FeedbackStudioRevisionStatus";
 import JobReviewWorkspace from "@/components/feedback-studio/JobReviewWorkspace";
+import ReviewDeliveryRoomShell from "@/components/review-delivery/ReviewDeliveryRoomShell";
 import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import NoActiveProjectPanel from "@/components/shared/NoActiveProjectPanel";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
@@ -128,15 +129,8 @@ export default function FeedbackStudioScene() {
     );
   }
 
-  if (pageState === "not-ready") {
-    return (
-      <FeedbackStudioLayout>
-        <NoActiveProjectPanel copy={feedbackStudio.clientAccess.notReady} titleId="fs-not-ready-title" />
-      </FeedbackStudioLayout>
-    );
-  }
-
-  if (pageState === "job-review" && review) {
+  // Explicit authorized review deep link only — bare /feedback-studio uses the shell.
+  if (jobIdParam && pageState === "job-review" && review) {
     return (
       <FeedbackStudioLayout>
         <div className="fs-page utility-page fs-page--review" aria-label="Job review workspace">
@@ -183,37 +177,53 @@ export default function FeedbackStudioScene() {
     );
   }
 
+  if (isConceptReviewReady && campaign) {
+    return (
+      <FeedbackStudioLayout>
+        <div className="fs-page utility-page" aria-label={feedbackStudio.pageTitle}>
+          <UtilityPageHeader
+            backHref={studioBoard.routes.studioBoard}
+            activeNav="review-room"
+            title={feedbackStudio.pageTitle}
+            lead={`${feedbackStudio.pageSubtitle} — ${feedbackStudio.pickerTitle}`}
+            aside={
+              <CampaignJourneyMap
+                activeStep="review-room"
+                status={campaign?.campaignStatus ?? null}
+                hasCampaign
+              />
+            }
+          />
+
+          <div className="fs-page__meta">
+            <FeedbackStudioRevisionStatus status={revisionStatus} />
+          </div>
+
+          <FeedbackStudioConceptPicker
+            concepts={concepts}
+            campaignTitle={campaignTitle}
+            selectedOptionTitle={selectedOption}
+            conceptHref={conceptHref}
+            scopeSections={scopeSections}
+          />
+
+          <StudioBoardDevStatus placement="sidebar" />
+        </div>
+      </FeedbackStudioLayout>
+    );
+  }
+
+  if (campaign) {
+    return (
+      <FeedbackStudioLayout>
+        <ReviewDeliveryRoomShell campaign={campaign} requestedJobId={jobIdParam} />
+      </FeedbackStudioLayout>
+    );
+  }
+
   return (
     <FeedbackStudioLayout>
-      <div className="fs-page utility-page" aria-label={feedbackStudio.pageTitle}>
-        <UtilityPageHeader
-          backHref={studioBoard.routes.studioBoard}
-          activeNav="review-room"
-          title={feedbackStudio.pageTitle}
-          lead={`${feedbackStudio.pageSubtitle} — ${feedbackStudio.pickerTitle}`}
-          aside={
-            <CampaignJourneyMap
-              activeStep="review-room"
-              status={campaign?.campaignStatus ?? null}
-              hasCampaign
-            />
-          }
-        />
-
-        <div className="fs-page__meta">
-          <FeedbackStudioRevisionStatus status={revisionStatus} />
-        </div>
-
-        <FeedbackStudioConceptPicker
-          concepts={concepts}
-          campaignTitle={campaignTitle}
-          selectedOptionTitle={selectedOption}
-          conceptHref={conceptHref}
-          scopeSections={scopeSections}
-        />
-
-        <StudioBoardDevStatus placement="sidebar" />
-      </div>
+      <NoActiveProjectPanel copy={feedbackStudio.clientAccess.noActiveProject} titleId="fs-access-title" />
     </FeedbackStudioLayout>
   );
 }
