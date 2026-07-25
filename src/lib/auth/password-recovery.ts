@@ -136,26 +136,25 @@ export async function requestPasswordReset(options: {
   return { message: PASSWORD_RESET_REQUEST_GENERIC_MESSAGE };
 }
 
+export type PasswordResetTokenFailureCode = Extract<
+  ConsumePasswordResetResult,
+  { ok: false }
+>["code"];
+
+export type ConfirmPasswordResetFailureCode =
+  | PasswordResetTokenFailureCode
+  | "invalid_password"
+  | "mismatch";
+
 export type ConfirmPasswordResetResult =
   | { ok: true; user: StudioUser; passwordChangedAtMs: number }
   | {
       ok: false;
-      code:
-        | ConsumePasswordResetResult extends { ok: false; code: infer C }
-          ? C
-          : never
-        | "invalid_password"
-        | "mismatch";
+      code: ConfirmPasswordResetFailureCode;
       message: string;
     };
 
-const RESET_ERROR_COPY: Record<
-  Exclude<
-    ConsumePasswordResetResult extends { ok: false; code: infer C } ? C : never,
-    never
-  >,
-  string
-> = {
+const RESET_ERROR_COPY: Record<PasswordResetTokenFailureCode, string> = {
   missing:
     "This password reset link is incomplete. Request a new email to continue.",
   malformed:

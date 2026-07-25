@@ -224,7 +224,7 @@ export const studioReviewVoiceTabletMigrationLedger: readonly StudioReviewMigrat
     dataMapping: "purchased project + studio-voice-board-handoff session passport",
     status: "in_progress",
     persistence: "pending",
-    editing: "n/a",
+    editing: "not_applicable",
     attribution: "pending",
     tests: "pending",
     desktop: "pending",

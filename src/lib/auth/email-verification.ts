@@ -183,20 +183,20 @@ export async function resendVerificationEmail(options: {
   };
 }
 
+export type VerifyEmailFailureCode = Extract<
+  ConsumeEmailVerificationResult,
+  { ok: false }
+>["code"];
+
 export type VerifyEmailResult =
   | { ok: true; user: StudioUser }
   | {
       ok: false;
-      code: ConsumeEmailVerificationResult extends { ok: false; code: infer C }
-        ? C
-        : never;
+      code: VerifyEmailFailureCode;
       message: string;
     };
 
-const VERIFY_ERROR_COPY: Record<
-  Exclude<ConsumeEmailVerificationResult extends { ok: false; code: infer C } ? C : never, never>,
-  string
-> = {
+const VERIFY_ERROR_COPY: Record<VerifyEmailFailureCode, string> = {
   missing: "This verification link is incomplete. Request a new email to continue.",
   malformed:
     "This verification link is not valid. Request a new email to continue.",

@@ -4,10 +4,30 @@
  * Never store plaintext or reversible encryption.
  */
 
-import { randomBytes, scrypt as scryptCallback, timingSafeEqual } from "crypto";
-import { promisify } from "util";
+import {
+  randomBytes,
+  scrypt as scryptCallback,
+  timingSafeEqual,
+  type BinaryLike,
+  type ScryptOptions,
+} from "crypto";
 
-const scrypt = promisify(scryptCallback);
+function scryptAsync(
+  password: BinaryLike,
+  salt: BinaryLike,
+  keylen: number,
+  options: ScryptOptions,
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    scryptCallback(password, salt, keylen, options, (error, derivedKey) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(derivedKey);
+    });
+  });
+}
 
 const SCRYPT_N = 16384;
 const SCRYPT_R = 8;
@@ -23,11 +43,11 @@ export function isPasswordHash(value: string | undefined | null): boolean {
 
 export async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(SALT_LEN);
-  const derived = (await scrypt(password, salt, KEY_LEN, {
+  const derived = await scryptAsync(password, salt, KEY_LEN, {
     N: SCRYPT_N,
     r: SCRYPT_R,
     p: SCRYPT_P,
-  })) as Buffer;
+  });
   return [
     HASH_PREFIX,
     String(SCRYPT_N),
@@ -60,11 +80,11 @@ export async function verifyPassword(
   }
   if (salt.length === 0 || expected.length === 0) return false;
 
-  const derived = (await scrypt(password, salt, expected.length, {
+  const derived = await scryptAsync(password, salt, expected.length, {
     N: n,
     r,
     p,
-  })) as Buffer;
+  });
   if (derived.length !== expected.length) return false;
   return timingSafeEqual(derived, expected);
 }

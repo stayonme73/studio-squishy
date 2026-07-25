@@ -8,14 +8,14 @@ import path from "path";
 import {
   consumeEmailVerificationToken,
   issueEmailVerificationToken,
-} from "../src/lib/auth/email-verification-tokens.ts";
-import { verifyEmailWithToken } from "../src/lib/auth/email-verification.ts";
+} from "../src/lib/auth/email-verification-tokens";
+import { verifyEmailWithToken } from "../src/lib/auth/email-verification";
 import {
   createClientAccount,
   findUserByEmail,
   findUserById,
-} from "../src/lib/auth/users.ts";
-import { normalizeEmail } from "../src/lib/auth/email-normalize.ts";
+} from "../src/lib/auth/users";
+import { normalizeEmail } from "../src/lib/auth/email-normalize";
 
 const USERS_PATH = path.join(process.cwd(), "data", "studio-users.json");
 const TOKENS_PATH = path.join(
