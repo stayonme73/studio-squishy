@@ -27,8 +27,7 @@ export function resolveCustomerJourneySteps(
       { id: "payment", label: "Payment Received", state: "upcoming" },
       { id: "intake", label: "Project Intake", state: "upcoming" },
       { id: "building", label: "Building Concepts", state: "upcoming" },
-      { id: "review", label: "Review Concepts", state: "upcoming" },
-      { id: "direction", label: "Choose Direction", state: "upcoming" },
+      { id: "review", label: "Review Room", state: "upcoming" },
       { id: "delivery", label: "Final Delivery", state: "upcoming" },
     ];
   }
@@ -53,12 +52,7 @@ export function resolveCustomerJourneySteps(
     { id: "building", label: "Building Concepts", complete: buildingDone },
     {
       id: "review",
-      label: "Review Concepts",
-      complete: directionChosen || delivered,
-    },
-    {
-      id: "direction",
-      label: "Choose Direction",
+      label: "Review Room",
       complete: directionChosen || delivered,
     },
     {

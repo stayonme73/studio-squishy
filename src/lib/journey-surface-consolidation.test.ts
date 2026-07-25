@@ -60,10 +60,11 @@ function mockReviewCampaign(): CampaignRecord {
 }
 
 describe("journey surface consolidation", () => {
-  it("keeps Review Concepts as status-only in customer journey", () => {
+  it("keeps Review Room as status-only in customer journey", () => {
     const steps = resolveCustomerJourneySteps(mockReviewCampaign());
     const review = steps.find((step) => step.id === "review");
 
+    expect(review?.label).toBe("Review Room");
     expect(review?.state).toBe("current");
     expect(review?.actionLabel).toBeUndefined();
     expect(review?.actionHref).toBeUndefined();

@@ -212,7 +212,7 @@ describe("Project Details + Studio Board integration", () => {
     expect(submittedIntake?.state).toBe("complete");
   });
 
-  it("shows Building Concepts in progress after Project Details submit, not Review Concepts", () => {
+  it("shows Building Concepts in progress after Project Details submit, not Review Room", () => {
     const afterSubmit = mockPaidCampaign();
     const steps = resolveCustomerJourneySteps(afterSubmit);
 
@@ -221,14 +221,12 @@ describe("Project Details + Studio Board integration", () => {
       "intake",
       "building",
       "review",
-      "direction",
       "delivery",
     ]);
     expect(steps.find((step) => step.id === "payment")?.state).toBe("complete");
     expect(steps.find((step) => step.id === "intake")?.state).toBe("complete");
     expect(steps.find((step) => step.id === "building")?.state).toBe("current");
     expect(steps.find((step) => step.id === "review")?.state).toBe("upcoming");
-    expect(steps.find((step) => step.id === "direction")?.state).toBe("upcoming");
     expect(steps.find((step) => step.id === "delivery")?.state).toBe("upcoming");
   });
 

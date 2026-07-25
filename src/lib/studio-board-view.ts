@@ -390,7 +390,7 @@ const whatHappensNextSentences: Record<CampaignStatus, string> = {
 
   BUILDING_CONCEPTS: "The Studio is building your campaign concepts. Check back here for your review invitation.",
 
-  READY_FOR_REVIEW: "Your concepts are ready — review them and choose your direction.",
+  READY_FOR_REVIEW: "Open the Review Room to see what is ready and what happens next.",
 
   DELIVERED: "Your package is ready to download.",
 
@@ -788,18 +788,6 @@ export function resolveBoardCampaignActions(
           href: routes.feedbackStudio,
 
           isPrimary: true,
-
-        },
-
-        {
-
-          id: "chooseDirection",
-
-          label: copy.chooseDirection,
-
-          href: routes.feedbackStudio,
-
-          isPrimary: false,
 
         },
 

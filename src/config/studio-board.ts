@@ -326,8 +326,8 @@ export const studioBoard = {
     {
       id: "READY_FOR_REVIEW" as const,
       label: "Ready For Review",
-      boardLabel: "Concepts Ready For Review",
-      hint: "Review and choose your direction.",
+      boardLabel: "Ready for Review",
+      hint: "Open the Review Room to see what is ready.",
     },
     {
       id: "DELIVERED" as const,
@@ -465,17 +465,17 @@ export const studioBoard = {
     READY_FOR_REVIEW: {
       statusLabel: "Ready for Review",
       nextUpdateLabel: "When you review",
-      campaignProgressLabel: "Concepts Ready For Review",
-      headerSubline: "Your concepts are ready — the Studio needs your feedback.",
-      campaignDescription: "Your campaign concepts are ready. The Studio needs your feedback.",
+      campaignProgressLabel: "Ready for Review",
+      headerSubline: "Work is ready for your review in the Review Room.",
+      campaignDescription: "Your project has work ready for review. Open the Review Room when you have a moment.",
       estimatedCompletion: "Review when ready",
-      studioNoteFollowUp: "Your concepts are ready — review when you have a moment.",
+      studioNoteFollowUp: "Open the Review Room to see what is ready and what happens next.",
       studioNoteBoard: {
         letterLines: [
-          "Your campaign concepts are ready for review.",
+          "Work is ready for your review.",
           "Please open Review Room when you have a moment.",
-          "Estimated first concepts is ready.",
-          "Your next update is immediately after selection.",
+          "Review available work, leave feedback, or request revisions.",
+          "Your next update follows your review.",
           "Thank you for trusting The Studio.",
           "— The Studio Team ♥",
         ],
@@ -483,13 +483,13 @@ export const studioBoard = {
       studioUpdates: [
         { date: "June 14", message: "Intake received." },
         { date: "June 15", message: "Creative team assigned." },
-        { date: "June 16", message: "Concept development started." },
-        { date: "June 18", message: "Campaign concepts ready for your review." },
+        { date: "June 16", message: "Production work started." },
+        { date: "June 18", message: "Work is ready for your review." },
       ],
       whatHappensNextSteps: [
-        "Review your campaign concepts.",
-        "Choose the direction you love.",
-        "We refine your selected campaign.",
+        "Open the Review Room to see what is ready.",
+        "Review available work, leave feedback, or request revisions.",
+        "The Studio continues production after your review.",
         "We deliver your final marketing package.",
       ],
       primaryCta: "OPEN CAMPAIGN",
@@ -574,8 +574,8 @@ export const studioBoard = {
     openCampaign: "Open Campaign",
     openCampaignCta: "OPEN CAMPAIGN",
     openCampaignRecord: `Open ${customerJourneyStepName("project-record")}`,
-    reviewConcepts: "Review My Concepts",
-    chooseDirection: "Choose Direction",
+    reviewConcepts: "Open Review Room",
+    chooseDirection: "Review Work",
     downloadPackage: "Download Package",
     viewDeliverables: "View Deliverables",
     waitingOnStudio: "Waiting on Studio",
@@ -588,9 +588,10 @@ export const studioBoard = {
   },
 
   nextAction: {
-    conceptsReadyLabel: "Concepts Ready For Review",
-    reviewMyConcepts: "Review My Concepts",
-    reviewConceptsHint: "Tap the button to open Review Room and choose your campaign direction.",
+    conceptsReadyLabel: "Ready for Review",
+    reviewMyConcepts: "Open Review Room",
+    reviewConceptsHint:
+      "Open the Review Room to see what is ready and what happens next.",
     choosePackage: "Choose Your Package",
     buildingConceptsLabel: "Building Concepts In Progress",
     buildingConceptsHint:
@@ -816,7 +817,7 @@ export const studioBoard = {
       preparing: "Deliverables are being prepared.",
       preparingHint: "Check back soon.",
       ready: "Your deliverables are ready.",
-      reviewConcepts: "Review Campaign Concepts",
+      reviewConcepts: "Open Review Room",
       viewFinalAssets: "VIEW DELIVERABLES",
     },
     notProvided: "Not provided yet",

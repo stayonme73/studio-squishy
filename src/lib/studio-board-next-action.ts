@@ -163,7 +163,7 @@ export function resolveBoardNextActionPresentation(
         href: primary.href,
       },
       tone: "review",
-      materialsSupportLine: "Your concepts are ready. Open Review Room to choose your direction.",
+      materialsSupportLine: "Open the Review Room to see what is ready and what happens next.",
     });
   }
 
