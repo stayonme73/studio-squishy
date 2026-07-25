@@ -1,7 +1,18 @@
 /**
  * Conversation Room speech adapter — STT + TTS for Discovery Q1 live wire.
  * UI must not import SpeechRecognition constructors directly.
+ *
+ * Launch TTS: free browser speechSynthesis. Preferred / Mark launch pick is
+ * applied when studioBrowserVoiceV1.liveApplyApproved is true.
+ * Voice On/Off consent lives in a separate session key and is never written here.
  */
+
+import {
+  readBrowserVoicesNow,
+  resolveLiveBrowserVoice,
+  waitForBrowserVoices,
+} from "@/lib/studio-browser-voice-preference";
+import { isVoiceNarrationEnabled } from "@/lib/studio-voice-preference";
 
 type BrowserSpeechRecognitionResultLike = {
   isFinal: boolean;
@@ -46,6 +57,19 @@ export type ConversationDictationHandlers = {
 };
 
 let activeRecognition: BrowserSpeechRecognitionLike | null = null;
+
+/** Bumped on cancel or a newer speak request — invalidates deferred speech. */
+let speakRequestId = 0;
+let pendingSpeakCleanup: (() => void) | null = null;
+
+/** Chrome: cancel + speak in the same turn often produces silence. */
+const SPEAK_START_DELAY_MS = 40;
+
+function clearPendingSpeakCleanup(): void {
+  if (!pendingSpeakCleanup) return;
+  pendingSpeakCleanup();
+  pendingSpeakCleanup = null;
+}
 
 function getRecognitionConstructor(): BrowserSpeechRecognitionConstructor | null {
   if (typeof window === "undefined") return null;
@@ -168,7 +192,12 @@ export function startConversationDictation(
   }
 }
 
+/**
+ * Cancel active speech and invalidate any deferred speak waiting for voices.
+ */
 export function cancelConversationSpeech(): void {
+  clearPendingSpeakCleanup();
+  speakRequestId += 1;
   try {
     if (typeof window === "undefined") return;
     window.speechSynthesis?.cancel();
@@ -177,6 +206,74 @@ export function cancelConversationSpeech(): void {
   }
 }
 
+function canStartSpeakRequest(requestId: number): boolean {
+  return requestId === speakRequestId && isVoiceNarrationEnabled();
+}
+
+function speakWithResolvedVoices(
+  synth: SpeechSynthesis,
+  text: string,
+  voices: SpeechSynthesisVoice[],
+  requestId: number,
+  options?: {
+    rate?: number;
+    onStart?: () => void;
+    onEnd?: () => void;
+  },
+): void {
+  if (!canStartSpeakRequest(requestId)) {
+    options?.onEnd?.();
+    return;
+  }
+
+  try {
+    synth.resume();
+  } catch {
+    /* ignore */
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  const preferred = resolveLiveBrowserVoice(voices);
+  if (preferred) {
+    utterance.voice = preferred;
+    if (preferred.lang) utterance.lang = preferred.lang;
+  } else {
+    utterance.lang = "en-US";
+  }
+  utterance.rate = options?.rate ?? 1;
+  utterance.onstart = () => {
+    if (!canStartSpeakRequest(requestId)) return;
+    options?.onStart?.();
+  };
+  utterance.onend = () => options?.onEnd?.();
+  utterance.onerror = () => options?.onEnd?.();
+
+  const start = () => {
+    if (!canStartSpeakRequest(requestId)) {
+      options?.onEnd?.();
+      return;
+    }
+    try {
+      synth.speak(utterance);
+      if (synth.paused) synth.resume();
+    } catch {
+      options?.onEnd?.();
+    }
+  };
+
+  const delayTimer = window.setTimeout(start, SPEAK_START_DELAY_MS);
+  pendingSpeakCleanup = () => {
+    window.clearTimeout(delayTimer);
+  };
+}
+
+/**
+ * Speak a Conversation Room / Board line via free browser TTS.
+ *
+ * When the voice list is empty, waits for `voiceschanged` (bounded) before
+ * resolving Mark / preference and speaking once — never David-first then Mark.
+ * Deferred starts re-check Voice On and request validity.
+ */
 export function speakConversationLine(
   text: string,
   options?: {
@@ -189,13 +286,46 @@ export function speakConversationLine(
     if (typeof window === "undefined") return false;
     const synth = window.speechSynthesis;
     if (!synth || typeof SpeechSynthesisUtterance === "undefined") return false;
-    cancelConversationSpeech();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = options?.rate ?? 1;
-    utterance.onstart = () => options?.onStart?.();
-    utterance.onend = () => options?.onEnd?.();
-    utterance.onerror = () => options?.onEnd?.();
-    synth.speak(utterance);
+
+    clearPendingSpeakCleanup();
+    speakRequestId += 1;
+    const requestId = speakRequestId;
+
+    try {
+      synth.cancel();
+    } catch {
+      /* ignore */
+    }
+
+    if (!isVoiceNarrationEnabled()) {
+      options?.onEnd?.();
+      return false;
+    }
+
+    const immediate = readBrowserVoicesNow(synth);
+    if (immediate.length > 0) {
+      speakWithResolvedVoices(synth, text, immediate, requestId, options);
+      return true;
+    }
+
+    const abort = new AbortController();
+    pendingSpeakCleanup = () => {
+      abort.abort();
+    };
+
+    void waitForBrowserVoices(
+      synth,
+      undefined,
+      abort.signal,
+    ).then((voices) => {
+      if (!canStartSpeakRequest(requestId)) {
+        options?.onEnd?.();
+        return;
+      }
+      pendingSpeakCleanup = null;
+      speakWithResolvedVoices(synth, text, voices, requestId, options);
+    });
+
     return true;
   } catch {
     return false;
