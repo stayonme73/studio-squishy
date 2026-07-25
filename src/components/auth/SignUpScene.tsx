@@ -1,10 +1,8 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
-import { safeReturnPath } from "@/lib/auth/safe-return-path";
 import { promoteStudioVoiceBoardHandoffToWelcome } from "@/lib/studio-voice-board-handoff";
 import UtilityPasswordField from "@/components/auth/UtilityPasswordField";
 
@@ -17,12 +15,12 @@ function withFrom(path: string, returnTo: string) {
   return `${path}?from=${encodeURIComponent(returnTo)}`;
 }
 
-export default function SignUpScene() {
-  const searchParams = useSearchParams();
-  const returnTo = useMemo(
-    () => safeReturnPath(searchParams.get("from")),
-    [searchParams],
-  );
+type Props = {
+  /** Server-allowlisted return path — never read from useSearchParams during render. */
+  returnTo: string;
+};
+
+export default function SignUpScene({ returnTo }: Props) {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -1,11 +1,9 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
-import { SAFE_RETURN_PATHS, safeReturnPath } from "@/lib/auth/safe-return-path";
 import { promoteStudioVoiceBoardHandoffToWelcome } from "@/lib/studio-voice-board-handoff";
 import UtilityPasswordField from "@/components/auth/UtilityPasswordField";
 
@@ -14,31 +12,20 @@ const SESSION_PROBE_TIMEOUT_MS = 2500;
 const SIGN_IN_LEAD =
   "Use the account connected to your Studio work to open your Board, Review Room, Project Record, and Final Delivery.";
 
-/**
- * Project-created lead only when the *requested* allowlisted `from` is Board.
- * Do not use navigational fallback (`safeReturnPath` defaults to Board).
- */
-function isExplicitStudioBoardFrom(from: string | null): boolean {
-  if (!from) return false;
-  const [pathname] = from.split("?");
-  return (
-    pathname === "/studio-board" &&
-    pathname.startsWith("/") &&
-    !pathname.startsWith("//") &&
-    SAFE_RETURN_PATHS.has(pathname)
-  );
-}
-
 /** Full navigation — soft router.replace can leave phone/desktop stuck on /sign-in. */
 function goToReturnPath(path: string) {
   window.location.assign(path);
 }
 
-export default function SignInScene() {
-  const searchParams = useSearchParams();
-  const fromParam = searchParams.get("from");
-  const returnTo = useMemo(() => safeReturnPath(fromParam), [fromParam]);
-  const lead = isExplicitStudioBoardFrom(fromParam)
+type Props = {
+  /** Server-allowlisted return path — never read from useSearchParams during render. */
+  returnTo: string;
+  /** True only when the requested allowlisted `from` was explicitly `/studio-board`. */
+  showProjectCreatedLead: boolean;
+};
+
+export default function SignInScene({ returnTo, showProjectCreatedLead }: Props) {
+  const lead = showProjectCreatedLead
     ? conversationRoomGuideV1.boardHandoffSignInLead
     : SIGN_IN_LEAD;
   const [email, setEmail] = useState("");

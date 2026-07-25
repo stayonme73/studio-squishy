@@ -836,21 +836,57 @@ function StudioBoardMaterialsWorkflowActive({
   );
 }
 
+function StudioBoardMaterialsLookupPendingRow() {
+  const loadingCopy = studioBoard.empty.loading;
+
+  return (
+    <>
+      <article className="sb-card sb-card--materials-received sb-materials-tile bf-material bf-material-paper">
+        <p className="sb-card__tab">Materials Received</p>
+        <div className="sb-materials-board-tile">
+          <p className="sb-materials-board-tile__meta">{loadingCopy.materialsNextStep}</p>
+        </div>
+      </article>
+
+      <article className="sb-card sb-card--materials-needed sb-materials-tile bf-material bf-material-paper">
+        <p className="sb-card__tab">Materials We Still Need</p>
+        <div className="sb-materials-board-tile">
+          <p className="sb-materials-board-tile__meta">{loadingCopy.materialsNextStep}</p>
+        </div>
+      </article>
+
+      <article className="sb-card sb-card--materials-next sb-materials-tile bf-material bf-material-paper">
+        <p className="sb-card__tab">What You Should Do Next</p>
+        <div className="sb-materials-board-next">
+          <p>{loadingCopy.materialsNextStep}</p>
+        </div>
+      </article>
+    </>
+  );
+}
+
 /** Six-panel board — materials row always mounted; panel content changes by campaign state. */
 export default function StudioBoardMaterialsWorkflow({
   campaign,
   hasCampaign,
+  campaignLookupPending = false,
   onMaterialsFactsChange,
   movedToProduction = false,
 }: {
   campaign: CampaignRecord | null;
   hasCampaign: boolean;
+  /** When true, never claim empty-project materials conclusions. */
+  campaignLookupPending?: boolean;
   onMaterialsFactsChange?: (facts: {
     blockingRequiredCount: number;
     stillNeededLabels: readonly string[];
   }) => void;
   movedToProduction?: boolean;
 }) {
+  if (campaignLookupPending) {
+    return <StudioBoardMaterialsLookupPendingRow />;
+  }
+
   if (!hasCampaign || !campaign) {
     return <StudioBoardMaterialsEmptyRow />;
   }

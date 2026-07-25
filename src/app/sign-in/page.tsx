@@ -1,6 +1,8 @@
-import { Suspense } from "react";
-
 import SignInScene from "@/components/auth/SignInScene";
+import {
+  isExplicitStudioBoardFrom,
+  safeReturnPath,
+} from "@/lib/auth/safe-return-path";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 import "../mobile-route-fixes.css";
@@ -9,12 +11,34 @@ export const metadata = {
   title: "Client Sign In",
 };
 
-export default function SignInPage() {
+type SignInPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function firstQueryValue(value: string | string[] | undefined): string | null {
+  if (typeof value === "string") return value;
+  if (Array.isArray(value) && typeof value[0] === "string") return value[0];
+  return null;
+}
+
+/**
+ * Server resolves and allowlists `from` so first markup never depends on
+ * useSearchParams. Dirty utility-backdrop shell is intentionally not used here.
+ */
+export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const params = await searchParams;
+  const fromParam = firstQueryValue(params.from);
+  const returnTo = safeReturnPath(fromParam);
+  const showProjectCreatedLead = isExplicitStudioBoardFrom(fromParam);
+
   return (
-    <main className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}>
-      <Suspense fallback={<div className="utility-page utility-shell utility-shell--loading" aria-busy="true" />}>
-        <SignInScene />
-      </Suspense>
+    <main
+      className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
+    >
+      <SignInScene
+        returnTo={returnTo}
+        showProjectCreatedLead={showProjectCreatedLead}
+      />
     </main>
   );
 }

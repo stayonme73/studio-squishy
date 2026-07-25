@@ -22,3 +22,18 @@ export function safeReturnPath(
   }
   return fallback;
 }
+
+/**
+ * Project-created Sign In lead only when the *requested* allowlisted `from` is Board.
+ * Do not use navigational fallback (`safeReturnPath` defaults to Board).
+ */
+export function isExplicitStudioBoardFrom(from: string | null | undefined): boolean {
+  if (!from) return false;
+  const [pathname] = from.split("?");
+  return (
+    pathname === "/studio-board" &&
+    pathname.startsWith("/") &&
+    !pathname.startsWith("//") &&
+    SAFE_RETURN_PATHS.has(pathname)
+  );
+}

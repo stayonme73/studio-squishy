@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
-import { SAFE_RETURN_PATHS } from "@/lib/auth/safe-return-path";
+import { isExplicitStudioBoardFrom } from "@/lib/auth/safe-return-path";
 import {
   BOARD_NEUTRAL_GREETING,
   resolveBoardCustomerDisplayName,
@@ -20,14 +20,7 @@ const GENERIC_SIGN_IN_LEAD =
 
 /** Mirrors SignInScene — explicit allowlisted Board `from` only, not navigational fallback. */
 function resolveSignInLeadFromFromParam(from: string | null): string {
-  if (!from) return GENERIC_SIGN_IN_LEAD;
-  const [pathname] = from.split("?");
-  const isExplicitBoard =
-    pathname === "/studio-board" &&
-    pathname.startsWith("/") &&
-    !pathname.startsWith("//") &&
-    SAFE_RETURN_PATHS.has(pathname);
-  return isExplicitBoard
+  return isExplicitStudioBoardFrom(from)
     ? conversationRoomGuideV1.boardHandoffSignInLead
     : GENERIC_SIGN_IN_LEAD;
 }

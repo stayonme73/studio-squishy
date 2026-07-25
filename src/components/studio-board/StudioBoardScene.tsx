@@ -179,7 +179,12 @@ export default function StudioBoardScene() {
   const [recordOpen, setRecordOpen] = useState(false);
   const [productionBriefOpen, setProductionBriefOpen] = useState(false);
 
+  /** Campaign lookup unfinished — never claim no project or empty-state conclusions. */
+  const campaignLookupPending = !ready;
   const boardCampaign = accessState === "no-active-project" ? null : campaign;
+  const showNoActiveProject =
+    ready && (accessState === "no-active-project" || !boardCampaign);
+  const loadingCopy = emptyCopy.loading;
   const [movedToProduction, setMovedToProduction] = useState(false);
   /** Session greeting — independent of campaign claim/load. */
   const [customerDisplayName, setCustomerDisplayName] = useState<string | null>(null);
@@ -417,7 +422,9 @@ export default function StudioBoardScene() {
         </header>
 
         <div
-          className={`sb-board-layout${view.hasCampaign ? "" : " sb-board-layout--no-campaign"}`}
+          className={`sb-board-layout${
+            campaignLookupPending || view.hasCampaign ? "" : " sb-board-layout--no-campaign"
+          }`}
         >
           <article
             className="sb-card sb-card--current bf-material bf-material-paper"
@@ -425,109 +432,157 @@ export default function StudioBoardScene() {
           >
             <p className="sb-card__tab">{currentCampaignCopy.heading}</p>
             <div className="sb-current-campaign" aria-live="polite">
-              <h2
-                id="sb-current-campaign-title"
-                className={`sb-current-campaign__name${view.hasCampaign ? "" : " sb-current-campaign__name--empty"}`}
-              >
-                {view.hasCampaign ? view.campaignTitle : emptyCopy.campaignNamePlaceholder}
-              </h2>
+              {campaignLookupPending ? (
+                <>
+                  <h2
+                    id="sb-current-campaign-title"
+                    className="sb-current-campaign__name"
+                  >
+                    {loadingCopy.campaignNamePlaceholder}
+                  </h2>
+                  <p className="sb-current-campaign__empty">{loadingCopy.campaignDescription}</p>
+                </>
+              ) : (
+                <>
+                  <h2
+                    id="sb-current-campaign-title"
+                    className={`sb-current-campaign__name${view.hasCampaign ? "" : " sb-current-campaign__name--empty"}`}
+                  >
+                    {view.hasCampaign
+                      ? view.campaignTitle
+                      : emptyCopy.campaignNamePlaceholder}
+                  </h2>
 
-              {view.hasCampaign ? (
-                <CampaignNextAction
-                  campaign={boardCampaign}
-                  hasCampaign={view.hasCampaign}
-                  status={view.status}
-                  nextUpdateLabel={view.headerSnapshot?.nextUpdate ?? null}
-                  studioGuideHref={studioGuideHref}
-                  displayFacts={displayFacts}
-                />
-              ) : null}
-
-              {view.hasCampaign && boardCampaign ? (
-                <CampaignBriefActions
-                  campaign={boardCampaign}
-                  onViewBrief={() => router.push(studioBoard.routes.campaignDetails)}
-                  className="sb-current-campaign__brief-actions"
-                  layout="stack"
-                />
-              ) : null}
-
-              {view.hasCampaign ? (
-                <div className="sb-current-campaign__metrics">
-                  {view.packageLabel ? (
-                    <CampaignMetric label={currentCampaignCopy.package} value={view.packageLabel} />
-                  ) : null}
-                  <CampaignMetric label={currentCampaignCopy.status} value={view.statusLabel} />
-                  {view.campaignProgressLabel ? (
-                    <CampaignMetric
-                      label={currentCampaignCopy.campaignStage}
-                      value={view.campaignProgressLabel}
+                  {view.hasCampaign ? (
+                    <CampaignNextAction
+                      campaign={boardCampaign}
+                      hasCampaign={view.hasCampaign}
+                      status={view.status}
+                      nextUpdateLabel={view.headerSnapshot?.nextUpdate ?? null}
+                      studioGuideHref={studioGuideHref}
+                      displayFacts={displayFacts}
                     />
                   ) : null}
-                  {!boardCampaign?.approvedStudioPlan ? (
-                    <>
-                      <CampaignMetric
-                        label={currentCampaignCopy.campaignsRemaining}
-                        value={account.campaignsRemaining}
-                      />
-                      <CampaignMetric
-                        label={currentCampaignCopy.emailsRemaining}
-                        value={account.emailsRemaining}
-                      />
-                      <CampaignMetric
-                        label={currentCampaignCopy.smsRemaining}
-                        value={account.smsRemaining}
-                      />
-                    </>
+
+                  {view.hasCampaign && boardCampaign ? (
+                    <CampaignBriefActions
+                      campaign={boardCampaign}
+                      onViewBrief={() => router.push(studioBoard.routes.campaignDetails)}
+                      className="sb-current-campaign__brief-actions"
+                      layout="stack"
+                    />
                   ) : null}
-                  <CampaignMetric
-                    label={currentCampaignCopy.revisionsRemaining}
-                    value={account.revisionsRemaining}
-                  />
-                </div>
-              ) : (
-                <p className="sb-current-campaign__empty">{emptyCopy.campaignDescription}</p>
+
+                  {view.hasCampaign ? (
+                    <div className="sb-current-campaign__metrics">
+                      {view.packageLabel ? (
+                        <CampaignMetric
+                          label={currentCampaignCopy.package}
+                          value={view.packageLabel}
+                        />
+                      ) : null}
+                      <CampaignMetric
+                        label={currentCampaignCopy.status}
+                        value={view.statusLabel}
+                      />
+                      {view.campaignProgressLabel ? (
+                        <CampaignMetric
+                          label={currentCampaignCopy.campaignStage}
+                          value={view.campaignProgressLabel}
+                        />
+                      ) : null}
+                      {!boardCampaign?.approvedStudioPlan ? (
+                        <>
+                          <CampaignMetric
+                            label={currentCampaignCopy.campaignsRemaining}
+                            value={account.campaignsRemaining}
+                          />
+                          <CampaignMetric
+                            label={currentCampaignCopy.emailsRemaining}
+                            value={account.emailsRemaining}
+                          />
+                          <CampaignMetric
+                            label={currentCampaignCopy.smsRemaining}
+                            value={account.smsRemaining}
+                          />
+                        </>
+                      ) : null}
+                      <CampaignMetric
+                        label={currentCampaignCopy.revisionsRemaining}
+                        value={account.revisionsRemaining}
+                      />
+                    </div>
+                  ) : showNoActiveProject ? (
+                    <p className="sb-current-campaign__empty">{emptyCopy.campaignDescription}</p>
+                  ) : null}
+
+                  {view.hasCampaign &&
+                  (view.status === "DRAFT_RECEIVED" ||
+                    view.status === "PAYMENT_RECEIVED") ? (
+                    <HelpCenterLink
+                      label={helpCenter.boardLinks.awaitingPayment.label}
+                      anchor={helpCenter.boardLinks.awaitingPayment.anchor}
+                      from="studio-board"
+                      className="sb-help-link"
+                    />
+                  ) : null}
+
+                  {showNoActiveProject ? (
+                    <div className="sb-current-campaign__empty-actions">
+                      <Link
+                        href={newCampaignHref}
+                        className="utility-btn utility-btn--primary sb-current-campaign__record"
+                      >
+                        {emptyCopy.primaryCta}
+                      </Link>
+                      <Link
+                        href={routes.helpCenter}
+                        className="utility-btn utility-btn--secondary"
+                      >
+                        {studioBoard.clientAccess.noActiveProject.secondaryCta}
+                      </Link>
+                    </div>
+                  ) : null}
+                </>
               )}
-
-              {view.hasCampaign &&
-              (view.status === "DRAFT_RECEIVED" || view.status === "PAYMENT_RECEIVED") ? (
-                <HelpCenterLink
-                  label={helpCenter.boardLinks.awaitingPayment.label}
-                  anchor={helpCenter.boardLinks.awaitingPayment.anchor}
-                  from="studio-board"
-                  className="sb-help-link"
-                />
-              ) : null}
-
-              {!view.hasCampaign ? (
-                <div className="sb-current-campaign__empty-actions">
-                  <Link href={newCampaignHref} className="utility-btn utility-btn--primary sb-current-campaign__record">
-                    {emptyCopy.primaryCta}
-                  </Link>
-                  <Link href={routes.helpCenter} className="utility-btn utility-btn--secondary">
-                    {studioBoard.clientAccess.noActiveProject.secondaryCta}
-                  </Link>
-                </div>
-              ) : null}
             </div>
           </article>
 
           <article className="sb-card sb-card--progress bf-material bf-material-paper">
-            <CampaignProgressPanel
-              campaign={boardCampaign}
-              steps={view.progressSteps}
-              timeline={view.activityFeed}
-              displayFacts={displayFacts}
-            />
+            {campaignLookupPending ? (
+              <>
+                <p className="sb-card__tab">{studioBoard.progressCard.journeyHeading}</p>
+                <p className="sb-progress-panel__timeline-empty">{loadingCopy.progressHint}</p>
+              </>
+            ) : (
+              <CampaignProgressPanel
+                campaign={boardCampaign}
+                steps={view.progressSteps}
+                timeline={view.activityFeed}
+                displayFacts={displayFacts}
+              />
+            )}
           </article>
 
           <article className="sb-card sb-card--project-snapshot bf-material bf-material-paper">
-            <ProjectSnapshotPanel campaign={boardCampaign} view={view} account={account} />
+            {campaignLookupPending ? (
+              <>
+                <p className="sb-card__tab">PROJECT SNAPSHOT</p>
+                <p className="sb-project-snapshot__empty">{loadingCopy.snapshotHint}</p>
+              </>
+            ) : (
+              <ProjectSnapshotPanel
+                campaign={boardCampaign}
+                view={view}
+                account={account}
+              />
+            )}
           </article>
 
           <StudioBoardMaterialsWorkflow
             campaign={boardCampaign}
             hasCampaign={Boolean(boardCampaign)}
+            campaignLookupPending={campaignLookupPending}
             movedToProduction={movedToProduction}
             onMaterialsFactsChange={handleMaterialsFactsChange}
           />

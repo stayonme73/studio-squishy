@@ -220,9 +220,17 @@ export const studioBoard = {
     campaignName: "No campaign started yet.",
     campaignNamePlaceholder: "No Active Project",
     campaignDescription:
-      "You don't have an active project yet. Start a new project from the Route Map to begin working with The Studio.",
+      "You don't have an active project yet. Start a new project in the Conversation Room to begin working with The Studio.",
     studioUpdates: [] as const,
     primaryCta: "START A NEW PROJECT",
+    /** Shown while campaign lookup is still running — never claim no project yet. */
+    loading: {
+      campaignNamePlaceholder: "Loading your project",
+      campaignDescription: "One moment while we open your project on the Studio Board.",
+      materialsNextStep: "Project details will appear here in a moment.",
+      progressHint: "Loading your project progress.",
+      snapshotHint: "Project details will appear here in a moment.",
+    },
     board: {
       snapshot: {
         deliverables: "Deliverables appear here once your project begins.",
@@ -236,7 +244,7 @@ export const studioBoard = {
         awaitingProjectDetails:
           "Material requests will appear here after you complete Project Intake.",
         nextStep:
-          "Start a new project from the Route Map to see your next step here.",
+          "Start a new project in the Conversation Room to see your next step here.",
       },
     },
   },
@@ -246,7 +254,7 @@ export const studioBoard = {
       eyebrow: "Studio Board",
       title: "No Active Project",
       message:
-        "You don't have an active project yet. Start a new project from the Route Map to begin working with The Studio.",
+        "You don't have an active project yet. Start a new project in the Conversation Room to begin working with The Studio.",
       primaryCta: "START A NEW PROJECT",
       secondaryCta: "Help Center",
     },
