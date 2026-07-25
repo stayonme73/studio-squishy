@@ -1,23 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-import { resolveIntakeEditHref } from "@/lib/intake-edit";
-import { isIntakeComplete } from "@/lib/studio-board-campaign";
 import { studioBoard, type CampaignStatus } from "@/config/studio-board";
-import {
-  resolveBoardCampaignActions,
-  resolveWhatHappensNextSentence,
-  type StudioBoardDisplayFacts,
-} from "@/lib/studio-board-view";
-import {
-  resolvePostSubmitCustomerMode,
-  resolvePostSubmitNextActionCopy,
-  resolveProductionGatePassedForCampaign,
-} from "@/lib/post-submit-customer-signals";
 import type { CampaignRecord } from "@/config/studio-board";
+import type { StudioBoardDisplayFacts } from "@/lib/studio-board-view";
+import {
+  BOARD_MATERIALS_ACTIONABLE_EVENT,
+  BOARD_OPEN_MATERIAL_EVENT,
+  resolveBoardNextActionPresentation,
+  type BoardNextActionPresentation,
+} from "@/lib/studio-board-next-action";
 
-const { campaignActions: copy, nextAction: nextCopy } = studioBoard;
+const { campaignActions: copy } = studioBoard;
 
 type Props = {
   campaign: CampaignRecord | null;
@@ -28,123 +24,93 @@ type Props = {
   displayFacts?: StudioBoardDisplayFacts;
 };
 
-/** Primary next step on Studio Board — always tells the customer what to do. */
+/** Primary next step on Studio Board — presentation from next-action SSoT. */
 export default function CampaignNextAction({
   campaign,
   hasCampaign,
   status,
   nextUpdateLabel,
-  studioGuideHref,
   displayFacts,
 }: Props) {
-  if (!hasCampaign || !status) return null;
+  const [actionableMaterialKeys, setActionableMaterialKeys] = useState<readonly string[]>([]);
 
-  const actions = resolveBoardCampaignActions(status, hasCampaign, { studioGuideHref });
-  const primary = actions.find((action) => action.isPrimary);
+  useEffect(() => {
+    const onActionable = (event: Event) => {
+      const detail = (event as CustomEvent<{ keys?: readonly string[] }>).detail;
+      if (!detail?.keys) return;
+      setActionableMaterialKeys([...detail.keys]);
+    };
+    window.addEventListener(BOARD_MATERIALS_ACTIONABLE_EVENT, onActionable);
+    return () => window.removeEventListener(BOARD_MATERIALS_ACTIONABLE_EVENT, onActionable);
+  }, []);
 
-  if (primary && status === "READY_FOR_REVIEW") {
-    return (
-      <div className="sb-next-action sb-next-action--review" role="status" aria-live="polite">
-        <p className="sb-next-action__status">{nextCopy.conceptsReadyLabel}</p>
-        <p className="sb-next-action__lead">{resolveWhatHappensNextSentence(campaign)}</p>
-        <Link href={primary.href} className="utility-btn utility-btn--primary sb-next-action__cta">
-          {nextCopy.reviewMyConcepts}
-        </Link>
-        <p className="sb-next-action__hint">{nextCopy.reviewConceptsHint}</p>
-      </div>
+  if (!hasCampaign || !status || !campaign) return null;
+
+  const presentation = resolveBoardNextActionPresentation({
+    campaign,
+    displayFacts,
+    actionableMaterialKeys,
+    nextUpdateLabel,
+  });
+
+  return <NextActionChrome presentation={presentation} nextUpdateLabel={nextUpdateLabel} />;
+}
+
+function NextActionChrome({
+  presentation,
+  nextUpdateLabel,
+}: {
+  presentation: BoardNextActionPresentation;
+  nextUpdateLabel?: string | null;
+}) {
+  const toneClass =
+    presentation.tone === "review"
+      ? " sb-next-action--review"
+      : presentation.tone === "waiting"
+        ? " sb-next-action--waiting"
+        : "";
+
+  const openMaterial = () => {
+    if (!presentation.action || presentation.action.type !== "open-material") return;
+    window.dispatchEvent(
+      new CustomEvent(BOARD_OPEN_MATERIAL_EVENT, {
+        detail: { materialKey: presentation.action.materialKey },
+      }),
     );
-  }
+  };
 
-  if (primary && status === "DELIVERED") {
-    return (
-      <div className="sb-next-action" role="status">
-        <p className="sb-next-action__status">{nextCopy.packageReadyLabel}</p>
-        <p className="sb-next-action__lead">{resolveWhatHappensNextSentence(campaign)}</p>
-        <Link href={primary.href} className="utility-btn utility-btn--primary sb-next-action__cta">
-          {nextCopy.openFinalDelivery}
-        </Link>
-      </div>
-    );
-  }
-
-  if (primary && status === "DRAFT_RECEIVED") {
-    return (
-      <div className="sb-next-action" role="status">
-        <p className="sb-next-action__lead">{resolveWhatHappensNextSentence(campaign)}</p>
-        <Link href={primary.href} className="utility-btn utility-btn--primary sb-next-action__cta">
-          {nextCopy.choosePackage}
-        </Link>
-      </div>
-    );
-  }
-
-  // Package 1b — paid incomplete Project Intake (do not change).
-  if (status === "PAYMENT_RECEIVED" && campaign && !isIntakeComplete(campaign)) {
-    return (
-      <div className="sb-next-action" role="status" aria-live="polite">
-        <p className="sb-next-action__status">{nextCopy.waitingOnProjectIntakeLabel}</p>
-        <p className="sb-next-action__lead">{nextCopy.completeProjectDetailsHint}</p>
+  return (
+    <div className={`sb-next-action${toneClass}`} role="status" aria-live="polite">
+      {presentation.statusLabel ? (
+        <p className="sb-next-action__status">{presentation.statusLabel}</p>
+      ) : null}
+      <p className="sb-next-action__lead">{presentation.lead}</p>
+      {presentation.action?.type === "navigate" ? (
         <Link
-          href={resolveIntakeEditHref(campaign, campaign.packageId)}
+          href={presentation.action.href}
           className="utility-btn utility-btn--primary sb-next-action__cta"
         >
-          {nextCopy.completeProjectDetails}
+          {presentation.action.label}
         </Link>
-      </div>
-    );
-  }
-
-  if (campaign && (status === "PAYMENT_RECEIVED" || status === "BUILDING_CONCEPTS")) {
-    const blockingRequiredCount =
-      displayFacts?.blockingRequiredCount ?? campaign.materialsSummary?.blockingRequiredCount ?? 0;
-    const movedToProduction = displayFacts?.movedToProduction ?? false;
-    const productionGatePassed =
-      displayFacts?.productionGatePassed ??
-      resolveProductionGatePassedForCampaign(campaign, {
-        blockingRequiredCount,
-        movedToProduction,
-      });
-    const facts = {
-      productionGatePassed,
-      blockingRequiredCount,
-      stillNeededLabel: displayFacts?.stillNeededLabel ?? null,
-    };
-    const mode = resolvePostSubmitCustomerMode(campaign, facts);
-    const honest = resolvePostSubmitNextActionCopy(mode, facts);
-
-    if (honest) {
-      return (
-        <div className="sb-next-action sb-next-action--waiting" role="status" aria-live="polite">
-          <p className="sb-next-action__status">{honest.statusLabel}</p>
-          <p className="sb-next-action__lead">{honest.lead}</p>
-          {honest.hint ? <p className="sb-next-action__hint">{honest.hint}</p> : null}
-        </div>
-      );
-    }
-
-    return (
-      <div className="sb-next-action sb-next-action--waiting" role="status" aria-live="polite">
-        <p className="sb-next-action__status">
-          {status === "BUILDING_CONCEPTS"
-            ? nextCopy.buildingConceptsLabel
-            : nextCopy.paymentReceivedLabel}
+      ) : null}
+      {presentation.action?.type === "open-material" ? (
+        <button
+          type="button"
+          className="utility-btn utility-btn--primary sb-next-action__cta"
+          onClick={openMaterial}
+        >
+          {presentation.action.label}
+        </button>
+      ) : null}
+      {presentation.hint ? <p className="sb-next-action__hint">{presentation.hint}</p> : null}
+      {presentation.tone === "waiting" &&
+      nextUpdateLabel &&
+      presentation.action === null &&
+      !presentation.hint?.includes(copy.nextUpdatePrefix) ? (
+        <p className="sb-next-action__eta">
+          {copy.nextUpdatePrefix} {nextUpdateLabel}
         </p>
-        <p className="sb-next-action__lead">
-          {resolveWhatHappensNextSentence(campaign, displayFacts)}
-        </p>
-        <p className="sb-next-action__hint">
-          {status === "BUILDING_CONCEPTS"
-            ? nextCopy.buildingConceptsHint
-            : nextCopy.paymentReceivedHint}
-        </p>
-        {nextUpdateLabel ? (
-          <p className="sb-next-action__eta">
-            {copy.nextUpdatePrefix} {nextUpdateLabel}
-          </p>
-        ) : null}
-      </div>
-    );
-  }
-
-  return null;
+      ) : null}
+    </div>
+  );
 }

@@ -1,11 +1,5 @@
-import type { CampaignRecord, CampaignStatus } from "@/config/studio-board";
-import {
-  PROJECT_INTAKE_RECEIVED_LEAD,
-  resolvePostSubmitCustomerMode,
-  resolveProductionGatePassedForCampaign,
-  type PostSubmitSignalFacts,
-} from "@/lib/post-submit-customer-signals";
-import { isIntakeComplete } from "@/lib/studio-board-campaign";
+import type { CampaignRecord } from "@/config/studio-board";
+import { resolveMaterialsNextStepSupportLine } from "@/lib/studio-board-next-action";
 
 /** Client-facing activity / studio-note text for Studio Board displays. */
 export function toClientFacingActivityMessage(message: string): string {
@@ -55,32 +49,6 @@ function firstStillNeededLabel(labels: readonly string[]): string | null {
   const label = labels.find((entry) => entry.trim().length > 0)?.trim();
   return label ?? null;
 }
-
-function materialPromptFromLabel(label: string): string {
-  const normalized = label.toLowerCase();
-  if (normalized.includes("destination") || normalized.includes("link / cta")) {
-    return "We still need your destination link.";
-  }
-  if (normalized.includes("brand")) {
-    return "We still need your brand materials.";
-  }
-  if (normalized.includes("platform") || normalized.includes("format")) {
-    return "We still need your platform and format details.";
-  }
-  if (normalized.includes("wording") || normalized.includes("disclosure")) {
-    return "We still need your required wording or disclosures.";
-  }
-  if (normalized.includes("goal") || normalized.includes("message")) {
-    return "We still need your campaign goal.";
-  }
-  if (normalized.includes("avoid")) {
-    return "Tell us anything we should avoid.";
-  }
-  return `We still need your ${label.toLowerCase()}.`;
-}
-
-const incompleteIntakeNextStep =
-  "Finish Project Intake first. Material requests will appear here afterward.";
 
 /** Materials “Still Need” empty states — never treat missing requests as “no materials needed.” */
 export const MATERIALS_STILL_NEED_INCOMPLETE_INTAKE =
@@ -143,30 +111,6 @@ export function resolveMaterialsStillNeedEmptyState(
   };
 }
 
-const statusFallback: Record<CampaignStatus, string> = {
-  DISCOVERY_COMPLETE: "Review your Project Summary when you're ready to continue.",
-  DRAFT_RECEIVED: "Choose your Studio Plan and complete payment to continue.",
-  PAYMENT_RECEIVED: incompleteIntakeNextStep,
-  BUILDING_CONCEPTS: "We're building your concepts.",
-  READY_FOR_REVIEW: "Your concepts are ready. Open Review Room to choose your direction.",
-  DELIVERED: "Your deliverables are ready in Final Delivery.",
-};
-
-function resolveBoardPostSubmitFacts(input: BoardNextStepPanelInput): PostSubmitSignalFacts {
-  const movedToProduction = input.movedToProduction ?? false;
-  const productionGatePassed =
-    input.productionGatePassed ??
-    resolveProductionGatePassedForCampaign(input.campaign, {
-      blockingRequiredCount: input.blockingRequiredCount,
-      movedToProduction,
-    });
-  return {
-    productionGatePassed,
-    blockingRequiredCount: input.blockingRequiredCount,
-    stillNeededLabel: firstStillNeededLabel(input.stillNeededLabels),
-  };
-}
-
 /** True when a client-facing activity line claims Project Intake was already received. */
 export function isProjectIntakeReceivedActivityMessage(message: string): boolean {
   const normalized = message.trim().toLowerCase();
@@ -179,45 +123,15 @@ export function isProjectIntakeReceivedActivityMessage(message: string): boolean
 
 /** Plain-language next step for the Materials row “What You Should Do Next” panel. */
 export function resolveBoardNextStepPanelMessage(input: BoardNextStepPanelInput): string {
-  const { campaign, blockingRequiredCount, stillNeededLabels } = input;
-  const status = campaign.campaignStatus;
-  const stillNeeded = firstStillNeededLabel(stillNeededLabels);
-  const facts = resolveBoardPostSubmitFacts(input);
-  const mode = resolvePostSubmitCustomerMode(campaign, facts);
-
-  if (status === "READY_FOR_REVIEW") {
-    return statusFallback.READY_FOR_REVIEW;
-  }
-
-  if (status === "DELIVERED") {
-    return statusFallback.DELIVERED;
-  }
-
-  // Incomplete Project Intake owns next-step copy until Intake is submitted.
-  if (status === "PAYMENT_RECEIVED" && !isIntakeComplete(campaign)) {
-    return incompleteIntakeNextStep;
-  }
-
-  if (stillNeeded && blockingRequiredCount > 0) {
-    return materialPromptFromLabel(stillNeeded);
-  }
-
-  if (blockingRequiredCount === 0 && isIntakeComplete(campaign)) {
-    if (mode === "building_concepts_allowed" && status === "BUILDING_CONCEPTS") {
-      return "We have everything we need. We're building your concepts now.";
-    }
-    if (mode === "intake_received" || status === "BUILDING_CONCEPTS" || status === "PAYMENT_RECEIVED") {
-      return PROJECT_INTAKE_RECEIVED_LEAD;
-    }
-  }
-
-  if (mode === "intake_received") {
-    return PROJECT_INTAKE_RECEIVED_LEAD;
-  }
-
-  if (status === "BUILDING_CONCEPTS") {
-    return statusFallback.BUILDING_CONCEPTS;
-  }
-
-  return statusFallback[status];
+  const { campaign, blockingRequiredCount, stillNeededLabels, movedToProduction, productionGatePassed } =
+    input;
+  return resolveMaterialsNextStepSupportLine({
+    campaign,
+    displayFacts: {
+      blockingRequiredCount,
+      stillNeededLabel: firstStillNeededLabel(stillNeededLabels),
+      movedToProduction,
+      productionGatePassed,
+    },
+  });
 }

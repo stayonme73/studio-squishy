@@ -47,7 +47,9 @@ describe("Package 1b incomplete Project Intake Board cert", () => {
     expect(next.completeProjectDetailsHint).toBe(
       "Tell us what we need for the services in your approved Studio Plan.",
     );
-    expect(resolveIntakeEditHref(campaign, campaign.packageId)).toBe("/route-map?step=intake");
+    expect(resolveIntakeEditHref(campaign, campaign.packageId)).toBe(
+      "/studio-conversation-room?stage=intake",
+    );
 
     const materialsNext = resolveBoardNextStepPanelMessage({
       campaign,

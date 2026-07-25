@@ -5,7 +5,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import StudioBoardSlideOutPanel from "@/components/studio-board/StudioBoardSlideOutPanel";
 import { materialsConfig } from "@/config/materials";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
-import { resolveBoardNextStepPanelMessage, resolveMaterialsStillNeedEmptyState } from "@/lib/studio-board-client-copy";
+import { resolveMaterialsStillNeedEmptyState } from "@/lib/studio-board-client-copy";
+import { filterReceivedAgainstStillNeeded } from "@/lib/studio-board-materials-honesty";
+import {
+  BOARD_ACTIONABLE_CAMPAIGN_MESSAGE_KEY,
+  BOARD_MATERIALS_ACTIONABLE_EVENT,
+  BOARD_OPEN_MATERIAL_EVENT,
+  resolveMaterialsNextStepSupportLine,
+} from "@/lib/studio-board-next-action";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
 import { isSocialPostsCampaign } from "@/lib/route-map-social-posts";
 import type {
@@ -435,19 +442,6 @@ function StudioBoardMaterialsWorkflowActive({
     return visible.filter(({ request }) => !shouldHideSocialPostsRequest(request));
   }, [data?.consolidatedRequests, data?.optionalRequests, socialPostsCampaign]);
 
-  const receivedMaterials = useMemo(() => {
-    if (!intakeComplete) return [];
-    const base = resolveReceivedMaterials(campaign).filter(
-      (item) => item.status === "Received",
-    );
-    const submitted = buildSubmittedRequestItems(requests);
-    const submittedIds = new Set(base.map((item) => item.label.toLowerCase()));
-    return [
-      ...base,
-      ...submitted.filter((item) => !submittedIds.has(item.label.toLowerCase())),
-    ];
-  }, [campaign, intakeComplete, requests]);
-
   const actionCards = useMemo(() => {
     if (!intakeComplete) return [];
     const raw = socialPostsCampaign
@@ -470,6 +464,21 @@ function StudioBoardMaterialsWorkflowActive({
     socialPostsCampaign,
   ]);
 
+  const receivedMaterials = useMemo(() => {
+    if (!intakeComplete) return [];
+    const base = resolveReceivedMaterials(campaign).filter(
+      (item) => item.status === "Received",
+    );
+    const submitted = buildSubmittedRequestItems(requests);
+    const submittedIds = new Set(base.map((item) => item.label.toLowerCase()));
+    const combined = [
+      ...base,
+      ...submitted.filter((item) => !submittedIds.has(item.label.toLowerCase())),
+    ];
+    /* Still Needed wins — never show the same customer fact as both Received and needed. */
+    return filterReceivedAgainstStillNeeded(combined, actionCards);
+  }, [actionCards, campaign, intakeComplete, requests]);
+
   const stillNeededLabels = useMemo(
     () =>
       actionCards
@@ -480,15 +489,59 @@ function StudioBoardMaterialsWorkflowActive({
 
   const blockingRequiredCount = data?.blockingRequiredCount ?? 0;
 
+  const campaignMessageActionable = useMemo(() => {
+    const card = actionCards.find((entry) => entry.id === CAMPAIGN_MESSAGE_CARD_ID);
+    return Boolean(
+      card &&
+        card.id === CAMPAIGN_MESSAGE_CARD_ID &&
+        card.status === "Still Needed" &&
+        card.request,
+    );
+  }, [actionCards]);
+
+  const actionableMaterialKeys = useMemo(
+    () =>
+      campaignMessageActionable ? ([BOARD_ACTIONABLE_CAMPAIGN_MESSAGE_KEY] as const) : ([] as const),
+    [campaignMessageActionable],
+  );
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent(BOARD_MATERIALS_ACTIONABLE_EVENT, {
+        detail: { keys: [...actionableMaterialKeys] },
+      }),
+    );
+  }, [actionableMaterialKeys]);
+
+  useEffect(() => {
+    const onOpen = (event: Event) => {
+      const detail = (event as CustomEvent<{ materialKey?: string }>).detail;
+      if (detail?.materialKey !== BOARD_ACTIONABLE_CAMPAIGN_MESSAGE_KEY) return;
+      if (!campaignMessageActionable) return;
+      setActiveCardId(CAMPAIGN_MESSAGE_CARD_ID);
+    };
+    window.addEventListener(BOARD_OPEN_MATERIAL_EVENT, onOpen);
+    return () => window.removeEventListener(BOARD_OPEN_MATERIAL_EVENT, onOpen);
+  }, [campaignMessageActionable]);
+
   const nextStepMessage = useMemo(
     () =>
-      resolveBoardNextStepPanelMessage({
+      resolveMaterialsNextStepSupportLine({
         campaign,
-        blockingRequiredCount,
-        stillNeededLabels,
-        movedToProduction,
+        displayFacts: {
+          blockingRequiredCount,
+          stillNeededLabel: stillNeededLabels[0] ?? null,
+          movedToProduction,
+        },
+        actionableMaterialKeys,
       }),
-    [blockingRequiredCount, campaign, movedToProduction, stillNeededLabels],
+    [
+      actionableMaterialKeys,
+      blockingRequiredCount,
+      campaign,
+      movedToProduction,
+      stillNeededLabels,
+    ],
   );
 
   useEffect(() => {
@@ -648,18 +701,13 @@ function StudioBoardMaterialsWorkflowActive({
                   card.id === CAMPAIGN_MESSAGE_CARD_ID &&
                   card.status === "Still Needed" &&
                   Boolean(card.request);
-                return (
-                  <button
-                    key={card.id}
-                    type="button"
-                    className={`sb-materials-action-card${
-                      clickable ? " sb-materials-action-card--clickable" : ""
-                    }`}
-                    disabled={!clickable}
-                    onClick={() => {
-                      if (clickable) setActiveCardId(card.id);
-                    }}
-                  >
+                const className = `sb-materials-action-card${
+                  clickable
+                    ? " sb-materials-action-card--clickable"
+                    : " sb-materials-action-card--readonly"
+                }`;
+                const body = (
+                  <>
                     <span className="sb-materials-action-card__head">
                       <span className="sb-materials-action-card__label">{card.label}</span>
                       <span
@@ -669,7 +717,24 @@ function StudioBoardMaterialsWorkflowActive({
                       </span>
                     </span>
                     <span className="sb-materials-action-card__detail">{card.detail}</span>
-                  </button>
+                  </>
+                );
+                if (clickable) {
+                  return (
+                    <button
+                      key={card.id}
+                      type="button"
+                      className={className}
+                      onClick={() => setActiveCardId(card.id)}
+                    >
+                      {body}
+                    </button>
+                  );
+                }
+                return (
+                  <div key={card.id} className={className} aria-disabled="true">
+                    {body}
+                  </div>
                 );
               })}
             </div>

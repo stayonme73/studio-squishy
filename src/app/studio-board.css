@@ -6204,6 +6204,20 @@ body:has(.sb--v4) {
   cursor: default;
 }
 
+.sb-materials-action-card--readonly {
+  cursor: default;
+  /* Not a control — guidance only. Do not share clickable gold affordance. */
+  background: color-mix(in srgb, var(--studio-paper) 62%, var(--board-family-field) 38%);
+  box-shadow: none;
+}
+
+.sb-materials-action-card--readonly:hover,
+.sb-materials-action-card--readonly:focus {
+  border-color: var(--sb-field-rule);
+  box-shadow: none;
+  outline: none;
+}
+
 .sb-materials-action-card--clickable {
   cursor: pointer;
   background: color-mix(in srgb, var(--sb-gold) 10%, var(--studio-paper) 90%);
