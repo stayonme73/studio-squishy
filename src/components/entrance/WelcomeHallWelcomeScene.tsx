@@ -87,7 +87,8 @@ export default function WelcomeHallWelcomeScene({
     useState<LobbyEntrySessionState>("signed-out");
 
   const showEntryFilm = filmOpen;
-  const showReopenFilm = !filmOpen && !choseNew;
+  /** After film close/dismiss, keep Choose how to begin until journey transition starts. */
+  const showReopenFilm = !filmOpen && !transitioning;
 
   const isDesktopKiosk = plateSize.width >= DESKTOP_KIOSK_MIN_WIDTH;
 
@@ -276,13 +277,16 @@ export default function WelcomeHallWelcomeScene({
           />
         ) : null}
         {showReopenFilm ? (
-          <button
-            type="button"
+          <a
+            href={studioLobbyEntryV1.routes.beginNew}
             className="lobby-entry-reopen"
-            onClick={handleReopenFilm}
+            onClick={(event) => {
+              event.preventDefault();
+              handleReopenFilm();
+            }}
           >
             {studioLobbyEntryV1.copy.reopenFilm}
-          </button>
+          </a>
         ) : null}
         {transitioning ? transitionGlow : null}
       </div>

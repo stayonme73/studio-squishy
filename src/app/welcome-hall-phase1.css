@@ -1291,6 +1291,10 @@
   font-size: clamp(1.05rem, 1.6vw, 1.2rem);
   font-weight: 650;
   letter-spacing: 0.03em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
 }
