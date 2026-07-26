@@ -21,21 +21,23 @@
   --room-pad-x: clamp(0.55rem, 1.2vw, 1rem);
   --room-pad-y: clamp(0.45rem, 1vh, 0.75rem);
   --caption-h: 1.35rem;
-  --presence-h: 3.75rem;
+  /* Leave room for Voice presence rail under the stage (must stay visible). */
+  --presence-h: 4.25rem;
   --room-gap: clamp(0.65rem, 1.2vw, 1rem);
-  /* Wider tablet so long Guide lines (deadline honesty) don’t orphan-wrap. */
-  --portrait-ratio: 1.02;
+  /* Balanced tablet — large enough to read, small enough that presence stays on-screen. */
+  --portrait-ratio: 1.04;
   --max-tablet-height: min(
-    86dvh,
+    82dvh,
     calc(
       100dvh - (2 * var(--room-pad-y)) - var(--caption-h) - var(--presence-h) -
-        1.75rem
+        2.75rem
     )
   );
   /* One Activity Panel width for every slide view (Learn More is the standard). */
   --slide-width: min(54rem, 68vw);
-  --activity-reserve: max(var(--slide-width), 38vw);
-  --side-width: min(19.5rem, 22vw);
+  --activity-reserve: max(var(--slide-width), 34vw);
+  /* Slightly wider so Studio Controls labels stay readable. */
+  --side-width: min(22rem, 25vw);
   --tablet-width: min(
     calc(var(--max-tablet-height) * var(--portrait-ratio)),
     calc(
@@ -48,7 +50,8 @@
   position: relative;
   box-sizing: border-box;
   display: flex;
-  align-items: center;
+  /* Top-align so Voice presence stays in the viewport. */
+  align-items: flex-start;
   /* Flush left — right half is activity territory. */
   justify-content: flex-start;
   width: 100%;
@@ -170,7 +173,8 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  justify-content: flex-start;
+  gap: 0.45rem;
   width: 100%;
   height: var(--max-tablet-height);
   max-height: var(--max-tablet-height);
@@ -183,8 +187,10 @@
 }
 
 .sideNav {
-  flex: 1 1 auto;
+  /* Pack Studio Controls under Speak/Type — no empty stretch at the bottom. */
+  flex: 0 1 auto;
   min-height: 0;
+  max-height: calc(100% - 0.45rem);
   overflow: auto;
 }
 
@@ -302,7 +308,7 @@
 
   .workRow {
     grid-template-columns: 1fr;
-    row-gap: 1rem;
+    row-gap: 0.85rem;
   }
 
   /*
@@ -324,7 +330,7 @@
   }
 
   .sideSpeak {
-    min-height: 14rem;
+    min-height: 12rem;
   }
 
   .roomStage {

@@ -5,11 +5,13 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.55rem;
+  justify-content: flex-start;
+  gap: 0.65rem;
   width: 100%;
-  height: 100%;
+  height: auto;
   min-height: 0;
-  padding: 0.8rem 0.8rem 0.75rem;
+  max-height: 100%;
+  padding: 0.85rem 0.95rem 0.85rem;
   overflow: auto;
   border-radius: 1.05rem;
   border: 1px solid rgba(180, 195, 210, 0.28);
@@ -29,7 +31,7 @@
 
 .eyebrow {
   margin: 0;
-  font-size: 0.66rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -39,12 +41,12 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.42rem;
 }
 
 .sectionLabel {
   margin: 0;
-  font-size: 0.68rem;
+  font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -54,7 +56,7 @@
 .group {
   display: flex;
   flex-direction: column;
-  gap: 0.32rem;
+  gap: 0.4rem;
 }
 
 .divider {
@@ -68,19 +70,20 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4rem 0.5rem;
+  gap: 0.45rem 0.55rem;
   width: 100%;
   margin: 0;
-  padding: 0.55rem 0.65rem;
+  padding: 0.65rem 0.75rem;
   border-radius: 0.6rem;
   border: 1px solid rgba(180, 195, 210, 0.28);
   background: rgba(14, 17, 22, 0.42);
   color: rgba(247, 244, 238, 0.94);
   font: inherit;
-  font-size: 0.84rem;
+  font-size: 0.92rem;
   font-weight: 650;
-  line-height: 1.25;
+  line-height: 1.3;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -102,16 +105,16 @@
 
 .icon {
   flex: 0 0 auto;
-  width: 1.15rem;
+  width: 1.25rem;
   text-align: center;
-  font-size: 0.95rem;
+  font-size: 1.02rem;
   line-height: 1;
 }
 
 .btnHint {
   flex: 1 1 100%;
-  margin-left: 1.65rem;
-  font-size: 0.68rem;
+  margin-left: 1.8rem;
+  font-size: 0.74rem;
   font-weight: 550;
   color: rgba(247, 244, 238, 0.48);
 }

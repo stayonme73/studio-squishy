@@ -1,9 +1,8 @@
 "use client";
 
+import StudioVoicePresenceWave from "@/components/studio-presence/StudioVoicePresenceWave";
 import styles from "@/components/studio-conversation-room/voice-activity-bar.module.css";
 import type { StudioPresenceSnapshot } from "@/lib/studio-conversation-framework";
-
-const SEGMENT_COUNT = 16;
 
 export type VoiceActivityBarProps = {
   presence: StudioPresenceSnapshot;
@@ -12,7 +11,7 @@ export type VoiceActivityBarProps = {
 
 /**
  * Narrow strip under Presentation Display — who is speaking + audio is working.
- * Labels are runtime Presence copy (not Communication Light hardware captions).
+ * Shared Studio Voice presence wave.
  */
 export default function VoiceActivityBar({
   presence,
@@ -32,16 +31,10 @@ export default function VoiceActivityBar({
       aria-live="polite"
       aria-label={presence.activityLabel ?? "Studio quiet"}
     >
-      <div className={styles.row}>
-        <div className={styles.wave} aria-hidden>
-          {Array.from({ length: SEGMENT_COUNT }, (_, index) => (
-            <span key={index} className={styles.seg} />
-          ))}
-        </div>
-        {presence.activityLabel ? (
-          <p className={styles.label}>{presence.activityLabel}</p>
-        ) : null}
-      </div>
+      <StudioVoicePresenceWave
+        activity={presence.activity}
+        hideLabel={!presence.activityLabel}
+      />
 
       {showTranscript ? (
         <p className={styles.transcript}>

@@ -129,6 +129,19 @@ export default function ConversationNavPanel({
             </span>
             {v.closeLabel}
           </button>
+          <button
+            type="button"
+            id="studio-control-review-answers"
+            className={styles.navBtn}
+            data-active={summaryOpen ? "true" : "false"}
+            aria-pressed={summaryOpen}
+            onClick={onToggleSummary}
+          >
+            <span className={styles.icon} aria-hidden="true">
+              📋
+            </span>
+            {v.reviewAnswersLabel}
+          </button>
         </div>
       </section>
 
@@ -154,19 +167,6 @@ export default function ConversationNavPanel({
             </span>
             Help Center
             <span className={styles.btnHint}>Policies &amp; FAQ</span>
-          </button>
-          <button
-            type="button"
-            id="studio-control-review-answers"
-            className={styles.navBtn}
-            data-active={summaryOpen ? "true" : "false"}
-            aria-pressed={summaryOpen}
-            onClick={onToggleSummary}
-          >
-            <span className={styles.icon} aria-hidden="true">
-              📋
-            </span>
-            Review Answers
           </button>
         </div>
       </section>

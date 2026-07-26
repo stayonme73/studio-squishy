@@ -46,7 +46,8 @@ const INTENT_TO_LIGHT: Record<VoiceIntent, StudioCommunicationLightState> = {
   thinking: "thinking",
   unavailable: "unavailable",
   captured: "listening",
-  awaiting: "listening",
+  /* Waiting for the customer — calm light, not a speaking pulse. */
+  awaiting: "idle",
 };
 
 const INTENT_TO_ACTIVITY: Record<VoiceIntent, StudioPresenceActivity> = {
@@ -56,6 +57,10 @@ const INTENT_TO_ACTIVITY: Record<VoiceIntent, StudioPresenceActivity> = {
   thinking: "thinking",
   unavailable: "waiting",
   captured: "captured",
+  /*
+   * Customer’s turn — teal floor cue stays, but the wave is static
+   * (animation only for live mic / Studio speaking).
+   */
   awaiting: "customer-answering",
 };
 
@@ -73,12 +78,14 @@ export function resolveStudioPresence(
     driver === "customer" &&
     input.intent !== "captured" &&
     input.intent !== "thinking" &&
-    input.intent !== "speaking"
+    input.intent !== "speaking" &&
+    input.intent !== "listening"
   ) {
+    /* Customer holds the floor without mic — static cue, not a speaking wave. */
     const activity = "customer-answering" as const;
     return {
       activity,
-      lightState: "listening",
+      lightState: "idle",
       activityLabel: presenceActivityLabel(activity),
       capturedTranscript: transcript,
       capturedConfirmed: false,
