@@ -1,0 +1,518 @@
+# The Studio — Launch Working Protocol
+
+**Status:** Approved by Tagia · Owner working protocol
+**Scope:** How Scout and Chat work every day until launch.
+**Companion document:** the Master Launch List (created separately) is the day-by-day checklist. This document is the rules; that document is the work.
+
+> **Read this file at the start of every thread.** Every new thread suitcase must point here and must carry the current Master Launch List with it.
+
+---
+
+## Locked working principle
+
+We do not measure progress by how much we touched.
+
+We measure progress by how much is **finished, proven, protected, and crossed off**.
+
+---
+
+## 1. One Road at a Time
+
+We work in the approved order.
+
+- One active task or package at a time
+- No parallel construction
+- No silent detours
+- No beginning the next package before the current one is protected
+- New ideas go to the **Parking Lot** unless they pass the launch gate
+
+**Launch gate:**
+
+> Is this required for Tagia to submit, track, review, resolve issues with, and receive a real project successfully?
+
+If no, park it until after launch.
+
+---
+
+## 2. Master Launch List Follows Every Thread
+
+The launch list travels with us thread by thread. It must always show:
+
+- deadline phases
+- completed items crossed out
+- current active item
+- remaining items in order
+- newly discovered required work
+- blocked items
+- **Visual Quality Queue** (see §18)
+- Parking Lot items
+- protected commit or checkpoint for finished work
+- test and certification evidence
+
+Nothing disappears because we changed threads.
+
+---
+
+## 3. Completed Items Stay Visible
+
+We do not erase completed work from the list. Finished items stay crossed out so we can see progress.
+
+Under every completed item, record:
+
+- completion date
+- commit hash
+- push and sync status
+- tests passed
+- certification result
+- important behavior protected
+- anything intentionally deferred
+
+**Example:**
+
+~~Package 7B2: Retire Legacy Concept Review~~
+
+**Completed:**
+
+- Commit: `5b95e121...`
+- Pushed: yes
+- Sync: 0 ahead / 0 behind
+- Package cert: 125/125
+- Review Room regression: 44/44
+- Honest Final Files: 67/67
+- Production build: green
+
+---
+
+## 4. Current Item Must Be Obvious
+
+Only one item is marked:
+
+**CURRENTLY IN PROGRESS**
+
+Under it, show:
+
+- purpose
+- approved boundary
+- files allowed
+- files protected
+- definition of done
+- tests required
+- certification required
+- commit status
+- risks or blockers
+
+No vague "working on Studio stuff."
+
+---
+
+## 5. Definition of Done Before Construction
+
+Before Scout edits anything, we agree on what finished means.
+
+Every package needs:
+
+- exact customer behavior
+- exact file boundary
+- protected systems
+- tests
+- desktop proof
+- phone proof
+- production build result when applicable
+- certification
+- commit and push requirements
+
+A task is not complete because code was written. It is complete when it is:
+
+1. built
+2. tested
+3. certified
+4. reviewed
+5. committed
+6. pushed
+7. synchronized
+8. recorded on the master list
+
+---
+
+## 6. Required Blocker Warning
+
+When Scout and Chat discover something that must be fixed before moving forward, Chat must say plainly:
+
+> Hey Tagia, Scout and I found something we need to fix before moving on.
+
+Then explain:
+
+- what was found
+- why it matters
+- whether the customer can see it
+- whether it blocks the current package
+- the smallest safe fix
+- what will remain untouched
+- how much it changes the launch order
+
+No technical side quest begins over Tagia's head.
+
+---
+
+## 7. No Silent Scope Expansion
+
+Scout must not add:
+
+- extra files
+- cleanup
+- refactors
+- new features
+- copy changes
+- room redesign
+- architecture changes
+- dependency upgrades
+
+without reporting why they are required.
+
+When an extra file becomes necessary:
+
+1. Stop
+2. Explain it
+3. Add it to the package boundary
+4. Receive approval
+5. Continue
+
+**Exception:** a directly affected test may be updated only when it proves the approved behavior, and it must be reported.
+
+---
+
+## 8. Daily Opening Check
+
+At the beginning of each work session, verify:
+
+- repository
+- branch
+- current HEAD
+- ahead / behind
+- staged files
+- dirty files
+- active package
+- last protected commit
+- current tests and certifications
+- unrelated WIP to protect
+- today's definition of done
+
+Then present the carried Master Launch List.
+
+---
+
+## 9. Daily Closing Check
+
+We do not casually stop with mystery work floating loose.
+
+Before ending the day:
+
+- finish the active functional slice
+- run required tests
+- run certification when required
+- inspect the diff
+- protect the work through the approved commit process
+- push when approved
+- confirm 0 ahead / 0 behind
+- confirm nothing unintended was committed
+- record remaining dirty WIP
+- update the master list
+- identify the exact next task
+
+If the entire package cannot be safely completed, create a truthful protected checkpoint **only when approved** and document exactly what remains. Never pretend unfinished work is complete.
+
+---
+
+## 10. Thread Closing Rule
+
+After a task is finished and protected:
+
+1. Report the final commit
+2. Report tests and certifications
+3. Update the master list
+4. State the next item, but do not begin it
+5. Say good night or close the work session
+6. Start a new thread for the next package
+
+One finished room, then close the door.
+
+---
+
+## 11. Pack the Suitcase for Every New Thread
+
+The suitcase must contain:
+
+- Studio launch goal
+- current timeline
+- master launch list
+- latest protected commit
+- branch and sync status
+- completed packages
+- current customer journey
+- locked owner decisions
+- active product principles
+- dirty WIP warnings
+- files that must not be touched
+- current package objective
+- exact next step
+- certification history
+- Visual Quality Queue
+- Parking Lot
+
+### Important locked principles
+
+- Tagia is Customer One
+- no fake recommendation engine
+- finish customer-facing rooms first
+- define Studio Voice before production wiring
+- one unified room for Review, Final, and Delivery
+- slide-out tools panel
+- separate communication panel
+- ask Tagia before physically creating that room
+- team and production follow customer-room completion
+- intensive repeated testing follows production wiring
+- Owner Console follows proven customer and production operation
+
+---
+
+## 12. Scout Must Report Work, Not Repeat Plans
+
+Once construction is approved, Scout must construct.
+
+Scout must not repeatedly return:
+
+- the same inspection
+- the same boundary plan
+- another request for approval
+- a reformatted version of an already approved report
+
+When this happens, Chat sends Scout back with direct execution instructions.
+
+---
+
+## 13. Proof Over Confidence
+
+"Looks good" is not proof.
+
+Required evidence may include:
+
+- targeted unit tests
+- integration tests
+- desktop browser certification
+- phone browser certification
+- 360px overflow checks
+- signed-in and signed-out paths
+- production build
+- production server
+- mutation before-and-after proof
+- artifact paths
+- exact pass/fail totals
+- commit hash
+- upstream synchronization
+
+---
+
+## 14. Protect Unrelated WIP
+
+Before staging or committing:
+
+- inspect every changed file
+- use selective staging for mixed files
+- do not absorb unrelated work
+- do not commit screenshots, reports, `.next`, local data, tokens, or test artifacts
+- do not clean or restore dirty WIP without approval
+- record what remains uncommitted
+
+---
+
+## 15. Deadline Tracking
+
+The master list must show these launch phases:
+
+| Phase | Target |
+|---|---|
+| **August** | Finish customer-facing experience and define Studio Voice |
+| **Early September** | Connect production and the team |
+| **Mid-to-Late September** | Run intensive end-to-end testing |
+| **Late September or Early October** | Run Tagia's Customer-One trial |
+| **Mid-to-Late October** | Controlled external soft opening |
+
+Every package should show:
+
+- target start
+- target completion
+- actual completion
+- schedule impact
+- whether the October backstop is at risk
+
+---
+
+## 16. Newly Discovered Required Work
+
+When Scout finds unfinished or broken work:
+
+- do not hide it
+- do not automatically fix it
+- classify it
+- explain whether it blocks the current package
+- add it to the correct place in the ordered launch list
+- complete it before moving forward only when it is truly required
+
+The list may grow, but it may not become a junk drawer.
+
+---
+
+## 17. Daily Summary Format
+
+### Every workday begins with
+
+1. **Current Checkpoint** — branch · protected tip · ahead / behind · active package
+2. **Launch Timeline** — August · early September · mid-to-late September · Customer-One trial · external soft opening
+3. **Master Launch List** — crossed-off completed work · current item · upcoming items · blockers · Visual Quality Queue · Parking Lot
+4. **Today's Finish Line** — one precise definition of what must be completed and protected before stopping
+
+### Every workday ends with
+
+1. **Completed Today** — behavior · files · tests · certifications · commit · push · sync
+2. **Still Open** — unfinished work · blockers · dirty WIP · Visual Quality Queue updates · risks
+3. **Next Thread** — suitcase summary · next package · exact first action
+
+---
+
+## 18. Visual Quality Queue Rule
+
+Tagia may report visual concerns at any time, including:
+
+- typography
+- fonts
+- colors
+- backgrounds
+- spacing
+- sizing
+- contrast
+- alignment
+- mobile layout
+- desktop layout
+- visual hierarchy
+- consistency
+- anything that feels unfinished or unlike The Studio
+
+You do not have to wait until we are "working on design." Capture it immediately. Do not automatically abandon the current task.
+
+Every visual concern must be recorded in the Master Launch List under the **Visual Quality Queue**.
+
+### Required fields for each entry
+
+- page or room
+- device (desktop, phone, or both)
+- screenshot or clear description
+- exact concern
+- desired outcome
+- priority
+- owner
+- status
+- completion proof after it is fixed
+
+### Priority levels
+
+1. **Blocker** — Fix immediately before continuing when it:
+   - prevents reading
+   - breaks navigation
+   - hides buttons
+   - causes overlap
+   - creates accessibility problems
+   - looks broken or unfinished
+   - makes the customer distrust the page
+
+   This interrupts the current order. Chat must say:
+
+   > Hey Tagia, Scout and I found a visual issue we need to fix before moving on.
+
+2. **Must Fix Before Customer-One Trial** — Important visual problems that do not break the page but would stop Tagia from trusting the experience:
+   - wrong font direction
+   - weak hierarchy
+   - unattractive background
+   - poor room balance
+   - inconsistent buttons
+   - awkward spacing
+   - colors that do not feel like The Studio
+   - desktop and phone looking like different products
+
+3. **Must Fix Before External Soft Opening** — Polish acceptable during internal proofing, but should be corrected before outside customers arrive.
+
+4. **Post-Launch Polish** — Small visual refinements that do not affect clarity, trust, accessibility, or function. These go to the Parking Lot.
+
+### Interrupt rule
+
+A visual issue interrupts the current task only when it:
+
+- blocks customer action
+- harms readability
+- creates an accessibility problem
+- breaks mobile or desktop layout
+- makes the product appear broken
+- creates a serious trust problem
+
+Otherwise, it is captured and completed in the proper order.
+
+The standing decision:
+
+> Does this need to interrupt the active package, or should it be placed in the Visual Quality Queue?
+
+### Fonts, colors, and backgrounds need approval
+
+Scout must not independently decide:
+
+- a new font family
+- brand colors
+- background art
+- room atmosphere
+- major layout changes
+- a different visual style
+
+Scout may inspect and propose options, but Tagia must approve major visual changes before construction.
+
+Visual cleanup should be completed through **narrow, named packages** rather than broad redesign passes.
+
+### How it should appear in the Master Launch List
+
+```text
+VISUAL QUALITY QUEUE
+
+BLOCKERS
+[ ] Conversation Room phone: Continue button below fold
+    Device: phone
+    Issue: customer cannot see required action
+    Status: must fix before current package closes
+
+BEFORE CUSTOMER-ONE TRIAL
+[ ] Studio Board typography hierarchy
+    Device: desktop + phone
+    Issue: headings and project status compete visually
+    Desired outcome: clearer project priority and next action
+    Status: queued
+
+[ ] Lobby background calibration
+    Device: desktop
+    Issue: current background does not feel like approved Studio direction
+    Status: awaiting Tagia visual decision
+
+BEFORE EXTERNAL SOFT OPENING
+[ ] Button spacing consistency across Intake and Board
+    Status: queued
+
+POST-LAUNCH POLISH
+[ ] Minor icon alignment in Help panel
+    Status: parked
+```
+
+---
+
+## Off-list warning convention
+
+If work drifts off this protocol — parallel construction, silent scope expansion, an unapproved file, a skipped certification, starting the next package before the current one is protected, or abandoning the active task for an unapproved visual redesign — it must be flagged immediately and unmistakably at the top of the response, before anything else:
+
+> **⚠️ OFF THE LIST — we are going sideways.**
+> What drifted · why · the smallest correction · what stays untouched.
+
+Chat markdown does not render colored text, so this bold warning banner is the stand-in for red.
