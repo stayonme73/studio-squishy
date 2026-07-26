@@ -212,7 +212,7 @@ export const conversationRoomGuideV1 = {
   intakeTabletLead:
     "Now I'll collect the information our production team needs. Required fields are marked; optional ones can wait.",
   intakeOpenPanelCta: "Continue intake",
-  intakeHostFallbackCta: "Open Host Project Intake",
+  intakeHostFallbackCta: "Open Project Intake",
   /** Form primary CTA — must match real next destination. */
   intakeSubmitCtaSignedOut: "SAVE & CONTINUE TO YOUR ACCOUNT",
   intakeSubmitCtaSignedIn: "SAVE & CONTINUE TO STUDIO BOARD",

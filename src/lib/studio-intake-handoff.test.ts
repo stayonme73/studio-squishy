@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import { CONVERSATION_ROOM_INTAKE_HREF } from "@/config/legacy-route-quarantine-v1";
 import { studioBoard } from "@/config/studio-board";
+import { ROUTE_MAP_INTAKE_STEP_HREF } from "@/lib/intake-edit";
 import {
   applyIntakeHandoffPassport,
   completeIntakeHandoff,
@@ -83,6 +85,20 @@ describe("resolveIntakeHandoffPlan — Truthful Handoff", () => {
       conversationRoomGuideV1.intakeSubmitSuccessVoiceSignedIn,
     );
     expect(plan.voiceLine.toLowerCase()).not.toMatch(/sign in/);
+  });
+});
+
+describe("CR-5B1 — Intake fallback CTA customer truth", () => {
+  it("uses Project Intake wording without Host and keeps the CR intake destination", () => {
+    const cta = conversationRoomGuideV1.intakeHostFallbackCta;
+    expect(cta).toBe("Open Project Intake");
+    expect(cta).not.toMatch(/Host/i);
+    expect(cta).not.toMatch(/Voice Host|Live Host|Studio Host/i);
+    expect(cta).not.toMatch(/begin production|start review|recommend/i);
+    expect(ROUTE_MAP_INTAKE_STEP_HREF).toBe(CONVERSATION_ROOM_INTAKE_HREF);
+    expect(ROUTE_MAP_INTAKE_STEP_HREF).toBe(
+      "/studio-conversation-room?stage=intake",
+    );
   });
 });
 
