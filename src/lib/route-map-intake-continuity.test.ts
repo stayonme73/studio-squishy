@@ -127,7 +127,7 @@ describe("route-map-intake-continuity", () => {
     const surface = resolveIntakeEntrySurface(campaign, "intake");
     expect(surface?.kind).toBe("missing-plan");
     if (surface?.kind === "missing-plan") {
-      expect(surface.recoveryHref).toContain("project-builder");
+      expect(surface.recoveryHref).toBe("/studio-conversation-room?stage=plan");
       expect(surface.recoveryLabel).toBe("Return to Studio Plan");
     }
   });

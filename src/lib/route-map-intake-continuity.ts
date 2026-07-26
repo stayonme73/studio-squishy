@@ -1,7 +1,7 @@
 import type { ServiceId } from "@/catalog/types";
 import type { RouteMapIntakeAnswers, RouteMapIntakeSchema } from "@/config/route-map-intake-v1";
 import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
-import { projectBuilderHref } from "@/config/project-builder-v1";
+import { legacyRouteQuarantineV1 } from "@/config/legacy-route-quarantine-v1";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import { resolveRouteMapRestoredJourney } from "@/lib/route-map-campaign";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
@@ -179,8 +179,8 @@ export function resolveIntakeEntrySurface(
   if (!campaign) {
     return {
       kind: "missing-context",
-      recoveryHref: studioBoard.routes.newCampaign,
-      recoveryLabel: "Return to Route Map",
+      recoveryHref: legacyRouteQuarantineV1.activeFrontDoor,
+      recoveryLabel: "Return to Conversation Room",
     };
   }
 
@@ -193,14 +193,14 @@ export function resolveIntakeEntrySurface(
     if (roadId) {
       return {
         kind: "missing-plan",
-        recoveryHref: `${projectBuilderHref(roadId)}&view=studio-plan`,
+        recoveryHref: "/studio-conversation-room?stage=plan",
         recoveryLabel: "Return to Studio Plan",
       };
     }
     return {
       kind: "missing-plan",
-      recoveryHref: studioBoard.routes.newCampaign,
-      recoveryLabel: "Return to Route Map",
+      recoveryHref: legacyRouteQuarantineV1.activeFrontDoor,
+      recoveryLabel: "Return to Conversation Room",
     };
   }
 
