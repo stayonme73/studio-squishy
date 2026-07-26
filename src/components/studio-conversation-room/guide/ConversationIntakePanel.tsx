@@ -15,6 +15,10 @@ import {
   type IntakeEntrySurface,
 } from "@/lib/route-map-intake-continuity";
 import {
+  intakeBusinessNameCarryForward,
+  recordIntakeAnswerChanges,
+} from "@/lib/conversation-room-draft";
+import {
   saveRouteMapIntakeDraft,
   submitRouteMapIntake,
 } from "@/lib/route-map-campaign";
@@ -98,20 +102,30 @@ export default function ConversationIntakePanel({
 
   const surface = formSurface;
 
-  const handleSaveDraft = useCallback((answers: RouteMapIntakeAnswers) => {
-    const current = readCurrentCampaignHydrated();
-    if (isIntakeComplete(current) || !current?.paymentReceivedAt) {
-      setDraftStatus("error");
-      return false;
-    }
-    const updated = saveRouteMapIntakeDraft(answers);
-    if (!updated) {
-      setDraftStatus("error");
-      return false;
-    }
-    setDraftStatus("saved");
-    return true;
-  }, []);
+  const handleSaveDraft = useCallback(
+    (answers: RouteMapIntakeAnswers) => {
+      const current = readCurrentCampaignHydrated();
+      if (isIntakeComplete(current) || !current?.paymentReceivedAt) {
+        setDraftStatus("error");
+        return false;
+      }
+      const previous = current.routeMapIntakeDraft?.answers ?? null;
+      const updated = saveRouteMapIntakeDraft(answers);
+      if (!updated) {
+        setDraftStatus("error");
+        return false;
+      }
+      /* Campaign stays the answer store; working-draft history records attribution only. */
+      recordIntakeAnswerChanges({
+        previous,
+        next: answers,
+        carryForward: intakeBusinessNameCarryForward(prefillBusinessName),
+      });
+      setDraftStatus("saved");
+      return true;
+    },
+    [prefillBusinessName],
+  );
 
   const handleSubmit = useCallback(
     (answers: RouteMapIntakeAnswers): boolean => {
@@ -139,16 +153,24 @@ export default function ConversationIntakePanel({
         return false;
       }
 
+      const previous = current.routeMapIntakeDraft?.answers ?? null;
+
       const updated = submitRouteMapIntake(answers);
       if (!updated) {
         setDraftStatus("error");
         setSubmitError(INTAKE_CONTINUITY_COPY.submitFailed);
         return false;
       }
+      /* Only attribute after the campaign write succeeds — no false completion history. */
+      recordIntakeAnswerChanges({
+        previous,
+        next: answers,
+        carryForward: intakeBusinessNameCarryForward(prefillBusinessName),
+      });
       onSubmitSuccess();
       return true;
     },
-    [onSubmitSuccess],
+    [onSubmitSuccess, prefillBusinessName],
   );
 
   const draftLabel =

@@ -35,13 +35,22 @@ export function isConversationJourneyComplete(): boolean {
 }
 
 /**
- * Clear local Conversation Room capture after the project lives on the Board.
- * Does not delete the campaign record.
+ * Clear Guide UI / memory only — keep the working draft (including attribution).
+ * Use after Intake handoff so attributed history survives Board navigation.
  */
-export function clearCompletedConversationLocalState(): void {
+export function clearConversationGuideLocals(): void {
   clearGuideUiStep();
   clearGuideMemoryDraft();
   clearGuideCaptureDraft();
+}
+
+/**
+ * Clear local Conversation Room capture for a deliberate fresh start.
+ * Does not delete the campaign record. Prefer clearConversationGuideLocals
+ * on Intake → Board handoff so attribution is not erased.
+ */
+export function clearCompletedConversationLocalState(): void {
+  clearConversationGuideLocals();
   clearWorkingDraft();
 }
 

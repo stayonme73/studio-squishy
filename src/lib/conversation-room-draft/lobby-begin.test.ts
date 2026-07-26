@@ -5,6 +5,7 @@ import { studioWorkingDraftV1 } from "@/config/studio-working-draft-v1";
 import { stageLocation } from "@/config/conversation-room-stage-v1";
 import {
   clearCompletedConversationLocalState,
+  clearConversationGuideLocals,
   isConversationJourneyComplete,
   resolveLobbyConversationBeginInvite,
 } from "./lobby-begin";
@@ -108,5 +109,36 @@ describe("lobby conversation begin", () => {
     clearCompletedConversationLocalState();
     expect(localStorage.getItem(STUDIO_GUIDE_CAPTURE_STORAGE_KEY)).toBeNull();
     expect(localStorage.getItem(studioWorkingDraftV1.storageKey)).toBeNull();
+  });
+
+  it("clearConversationGuideLocals keeps working-draft attribution for handoff", () => {
+    localStorage.setItem(STUDIO_GUIDE_CAPTURE_STORAGE_KEY, "{}");
+    localStorage.setItem(
+      studioWorkingDraftV1.storageKey,
+      JSON.stringify({
+        version: 1,
+        status: "working_draft",
+        editable: true,
+        updatedAt: "2026-07-26T17:00:00.000Z",
+        revision: 2,
+        cursor: {},
+        slices: {},
+        attribution: [
+          {
+            id: "a1",
+            at: "2026-07-26T17:00:00.000Z",
+            actor: "customer",
+            summary: "Customer submitted Project Intake",
+            actionCode: "intake.submitted",
+          },
+        ],
+      }),
+    );
+    clearConversationGuideLocals();
+    expect(localStorage.getItem(STUDIO_GUIDE_CAPTURE_STORAGE_KEY)).toBeNull();
+    const raw = localStorage.getItem(studioWorkingDraftV1.storageKey);
+    expect(raw).toBeTruthy();
+    const draft = JSON.parse(raw!) as { attribution: unknown[] };
+    expect(draft.attribution).toHaveLength(1);
   });
 });

@@ -46,6 +46,7 @@ import {
   bootConversationProjectDraft,
   bridgeConversationPlanToCampaign,
   clearCompletedConversationLocalState,
+  clearConversationGuideLocals,
   guideDraftFromOpening,
   isConversationJourneyComplete,
   openingFromGuideDraft,
@@ -60,6 +61,7 @@ import {
   readRouteRecommendation,
   readSelectedRoute,
   readSelectedServices,
+  recordIntakeSubmission,
   selectedJobIdSet,
 } from "@/lib/conversation-room-draft";
 import type { ServiceId } from "@/catalog/types";
@@ -868,8 +870,23 @@ export default function ConversationRoomRuntime({
     void (async () => {
       const plan = await completeIntakeHandoff();
       setIntakeHandoffSignedIn(plan.auth === "signed-in");
-      /* Project now lives on the Board — do not leave a dead “complete” tablet behind. */
-      clearCompletedConversationLocalState();
+      const campaign = readCurrentCampaignHydrated();
+      const submittedAt =
+        campaign?.routeMapIntakeSubmittedAt ??
+        campaign?.routeMapIntake?.submittedAt ??
+        new Date().toISOString();
+      const submittedAnswers = campaign?.routeMapIntake?.answers ?? {};
+      /* Distinct submission event — only after campaign submit already succeeded in the panel. */
+      recordIntakeSubmission({
+        campaignId: campaign?.campaignId,
+        auth: plan.auth,
+        destination: plan.destination,
+        requiredSatisfied: true,
+        answers: submittedAnswers,
+        submittedAt,
+      });
+      /* Keep attributed working-draft history; clear Guide locals only so Board handoff is clean. */
+      clearConversationGuideLocals();
       speakStudioLine(plan.voiceLine);
       navigateIntakeHandoff(plan.destination);
     })();

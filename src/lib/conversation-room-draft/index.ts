@@ -1,10 +1,18 @@
 export { bridgeConversationPlanToCampaign } from "./bridge-campaign";
 export {
   clearCompletedConversationLocalState,
+  clearConversationGuideLocals,
   isConversationJourneyComplete,
   resolveLobbyConversationBeginInvite,
   type LobbyConversationBeginInvite,
 } from "./lobby-begin";
+export {
+  diffIntakeAnswers,
+  intakeBusinessNameCarryForward,
+  recordIntakeAnswerChanges,
+  recordIntakeSubmission,
+  INTAKE_ATTRIBUTION_ACTION,
+} from "./intake-attribution";
 export { prefillIntakeAnswersFromOpening } from "./prefill-intake";
 
 export {
