@@ -245,7 +245,11 @@
 .slideScrim {
   appearance: none;
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  /* Desktop: leave Speak / Type / Session rail clickable beside the tablet. */
+  left: calc(var(--room-pad-x) + var(--side-width) + var(--room-gap));
   z-index: 118;
   margin: 0;
   padding: 0;
@@ -340,5 +344,38 @@
 
   .slideHost {
     width: min(100vw, 48rem);
+    /* Leave Speak / Type / Session stack reachable under the open panel. */
+    top: 0;
+    bottom: max(14rem, 34dvh);
+    height: auto;
+    max-height: calc(100dvh - max(14rem, 34dvh));
+  }
+
+  /*
+   * Phone stack puts Session under the tablet. When the activity panel is open,
+   * pin Session (not Speak) into the reserved band so Help / Lobby stay clickable.
+   * Speak stays in the stack; burying Session under Speak in a short fixed rail
+   * was the prior failure mode.
+   */
+  .room[data-slide-open="true"] .sideNav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 121;
+    width: 100%;
+    max-height: max(14rem, 34dvh);
+    overflow: auto;
+    padding: 0.35rem var(--room-pad-x) 0.5rem;
+    box-sizing: border-box;
+    background: rgba(14, 17, 22, 0.96);
+  }
+
+  /* Phone stack puts Session controls under the tablet — do not cover them. */
+  .slideScrim {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: max(14rem, 34dvh);
   }
 }
