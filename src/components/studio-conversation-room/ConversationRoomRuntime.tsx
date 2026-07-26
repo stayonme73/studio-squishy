@@ -256,7 +256,7 @@ export default function ConversationRoomRuntime({
   );
   /** Learn More target only — which detail card is open in the panel. */
   const [detailJobId, setDetailJobId] = useState<RouteMapJobId | null>(null);
-  /** Route lane highlighted on the tablet while Build Your Project is open. */
+  /** Route lane highlighted on the tablet while the service chooser is open. */
   const [previewRoadId, setPreviewRoadId] = useState<RouteMapRoadId | null>(
     null,
   );
@@ -848,7 +848,7 @@ export default function ConversationRoomRuntime({
 
   /**
    * Payment success must be explicit (markPaymentReceived) before Intake.
-   * Stay in the Conversation Room — Host `/route-map?step=intake` remains available.
+   * Stay in the Conversation Room. Legacy intake URLs redirect back here.
    */
   function handleCheckoutPaymentComplete() {
     if (paymentCompleteGuardRef.current) return;
@@ -1072,7 +1072,7 @@ export default function ConversationRoomRuntime({
     setError(null);
     stopConversationDictation();
     setListening(false);
-    /* Affordance first — Voice Host reply comes in a later package. */
+    /* Typed note acknowledged — no conversational reply is generated. */
     pulseSaved();
     writeTextDraft("");
     setInterimTranscript("");

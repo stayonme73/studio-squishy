@@ -76,7 +76,7 @@ export const conversationRoomGuideV1 = {
   /** Conversation Room display override — avoid Squishy name on Direct Route. */
   routeDirectTagline:
     "Opens the job shelf directly — ask if you are unsure.",
-  servicesPanelTitle: "Build Your Project",
+  servicesPanelTitle: "Choose Your Services",
   /**
    * Guidance Pass v1 — decision help, not browse-yourself.
    * Logo is not a shelf SKU today; guidance names services that exist.
@@ -89,7 +89,7 @@ export const conversationRoomGuideV1 = {
    * so rapid taps update the project visually without stacking Voice lines.
    */
   servicesAddSpeakCooldownMs: 4500,
-  /** Tablet status — do not duplicate the panel’s “Build Your Project” heading. */
+  /** Tablet status — do not duplicate the panel heading. */
   servicesTabletTitle: "Your project so far",
   servicesTabletOpenPanelCta: "Open service list",
   /** Always available on the services tablet — do not bury route change in the panel only. */
@@ -387,7 +387,7 @@ export function routeVoiceBridge(
     : conversationRoomGuideV1.routeVoiceIntro;
 }
 
-/** Spoken once when Build Your Project opens after a confirmed route. */
+/** Spoken once when the service chooser opens after a confirmed route. */
 export function servicesVoiceIntro(routeCustomerLabel: string): string {
   const route = routeCustomerLabel.trim() || "your route";
   return `You're on ${route}. ${conversationRoomGuideV1.servicesPanelLead}`;

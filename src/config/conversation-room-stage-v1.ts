@@ -1,7 +1,7 @@
 /**
  * Conversation Room — customer desk stage machine + Activity Panel controller.
  * Stages advance the conversation; the Activity Panel is a single view slot.
- * Legacy /route-map and /project-builder pages remain until Voice-tablet cert.
+ * Legacy /route-map and /project-builder URLs redirect into this room.
  *
  * @see docs/studio-conversation-flow-rhythm-v1-locked.md
  * @see docs/studio-working-draft-persistence-v1-locked.md

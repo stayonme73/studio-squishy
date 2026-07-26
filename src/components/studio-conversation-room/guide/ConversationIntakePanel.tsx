@@ -66,7 +66,7 @@ function gateLead(surface: IntakeGate): string {
 
 /**
  * Activity Panel Project Intake — multi-service cards (shared + per service).
- * Host `/route-map?step=intake` remains available until Conversation Room cert.
+ * Legacy intake URLs redirect here for current customer certification.
  */
 export default function ConversationIntakePanel({
   onClose,
@@ -133,7 +133,7 @@ export default function ConversationIntakePanel({
           setGateOverride({
             kind: "missing-plan",
             recoveryHref: studioBoard.routes.newCampaign,
-            recoveryLabel: "Return to Route Map",
+            recoveryLabel: "Return to Conversation Room",
           });
         }
         return false;

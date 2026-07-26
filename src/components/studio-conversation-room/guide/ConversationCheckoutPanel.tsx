@@ -30,8 +30,8 @@ export type ConversationCheckoutPanelProps = {
 };
 
 /**
- * Activity Panel Checkout — reuses Host SecureCheckoutGrid + campaign persistence.
- * Live card processing is not invented here; Host honesty copy stays intact.
+ * Activity Panel Checkout — reuses SecureCheckoutGrid + campaign persistence.
+ * Live card processing is not invented here; sandbox honesty copy stays intact.
  */
 export default function ConversationCheckoutPanel({
   roadId,

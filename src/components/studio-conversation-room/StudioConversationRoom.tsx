@@ -190,7 +190,7 @@ export default function StudioConversationRoom({
     activePanel === "route"
       ? "Choose your route"
       : activePanel === "builder"
-        ? "Build your project"
+        ? "Choose your services"
         : activePanel === "learnMore"
           ? "Learn more"
           : activePanel === "plan"

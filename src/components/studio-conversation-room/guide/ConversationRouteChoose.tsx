@@ -32,7 +32,7 @@ function roadTagline(roadId: RouteMapRoadId, fallback: string): string {
 /**
  * Choose Your Route — map + lane cards on the tablet.
  * All four routes stay in one grid; Recommended is a badge on the card.
- * Voice may recommend; the customer confirms before Build Your Project opens.
+ * Voice may recommend; the customer confirms before the service chooser opens.
  */
 export default function ConversationRouteChoose({
   onPreviewRoad,

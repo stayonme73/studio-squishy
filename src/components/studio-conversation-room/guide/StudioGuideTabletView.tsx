@@ -40,7 +40,7 @@ export type StudioGuideTabletViewProps = {
   onConfirmRoad?: (roadId: RouteMapRoadId) => void;
   previewRoadId?: RouteMapRoadId | null;
   recommendedRoadId?: RouteMapRoadId | null;
-  /** Services stage — tablet shows status, not a duplicate Build Your Project heading. */
+  /** Services stage — tablet shows status, not a duplicate service chooser heading. */
   selectedServiceCount?: number;
   selectedRouteLabel?: string | null;
   /** Plan stage — Studio Plan summary on the tablet. */

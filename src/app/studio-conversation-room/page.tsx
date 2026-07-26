@@ -36,9 +36,8 @@ function resolvePresenceIntent(
 }
 
 /**
- * Studio Conversation Room — Discovery Question 1 live wire.
- * Question: “What are you trying to accomplish?”
- * Remaining Discovery questions stay locked until Q1 certifies.
+ * Studio Conversation Room — live customer journey on one tablet.
+ * Stages: opening → route → services → plan → checkout → intake → complete.
  *
  * Presence demos: `?presence=speaking|awaiting|listening|captured|thinking`
  * Hardware inspect: `?inspect=1`
