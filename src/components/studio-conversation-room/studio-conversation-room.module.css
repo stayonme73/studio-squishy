@@ -241,15 +241,19 @@
   margin-top: 0.1rem;
 }
 
-/* Overlay scrim — panel floats in front; stage stays left underneath. */
+/* Overlay scrim — panel floats in front; active stage stays clear underneath. */
 .slideScrim {
   appearance: none;
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
-  /* Desktop: leave Speak / Type / Session rail clickable beside the tablet. */
-  left: calc(var(--room-pad-x) + var(--side-width) + var(--room-gap));
+  /*
+   * Desktop: leave the full stage (Speak / Type / Session + Presentation tablet)
+   * clickable. Scrim only covers the activity-panel territory to the right.
+   * CR-4R4 cleared the side rail; CR-4R5 also clears the tablet task surface.
+   */
+  left: calc(var(--room-pad-x) + var(--stage-width));
   z-index: 118;
   margin: 0;
   padding: 0;
@@ -344,11 +348,15 @@
 
   .slideHost {
     width: min(100vw, 48rem);
-    /* Leave Speak / Type / Session stack reachable under the open panel. */
-    top: 0;
+    /*
+     * Leave the upper Presentation tablet band clear so Checkout / Intake
+     * tablet CTAs stay reachable. Panel sits between that band and the
+     * Session reserve (CR-4R4). Content scrolls inside the host.
+     */
+    top: min(38dvh, 20rem);
     bottom: max(14rem, 34dvh);
     height: auto;
-    max-height: calc(100dvh - max(14rem, 34dvh));
+    max-height: calc(100dvh - min(38dvh, 20rem) - max(14rem, 34dvh));
   }
 
   /*
@@ -371,11 +379,15 @@
     background: rgba(14, 17, 22, 0.96);
   }
 
-  /* Phone stack puts Session controls under the tablet — do not cover them. */
+  /*
+   * Phone stack is full-width — left-edge geometry cannot clear the tablet.
+   * Match the panel band: dim only between the tablet reserve and Session.
+   * Do not elevate the whole stage (avoids indiscriminate click-through).
+   */
   .slideScrim {
     left: 0;
     right: 0;
-    top: 0;
+    top: min(38dvh, 20rem);
     bottom: max(14rem, 34dvh);
   }
 }
