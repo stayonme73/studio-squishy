@@ -16,13 +16,13 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | `03ee8a7e48beb72a2bf249a9da1d340ebe538bc1` — `docs: lock Studio Voice doctrine` |
+| Protected tip | `02657aa1edc8e73c6b04d9a7ef843509a50dba3a` — CR-4R5 tablet clearance; **CR-4 certified** against this tip |
 | Branch | `fix/discovery-responsive-layout` |
-| Sync | **0 ahead / 0 behind** (verified 2026-07-26) |
-| Current active item | **Conversation Room Completion** — opened; anti-loop gap check complete; plan at `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md` |
+| Sync | **0 ahead / 0 behind** at CR-4 certification (docs evidence commit pending Tagia) |
+| Current active item | **Conversation Room Completion** — **CR-4 CERTIFIED** (CR-5 not started) |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
-| Most recently completed | Studio Voice Definition and Customer-Presence Doctrine |
-| Next three priorities | 1) Conversation Room completion · 2) Customer communication access · 3) Studio Board truth/completeness |
+| Most recently completed | CR-4 — Conversation Room End-to-End Certification (`docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md`) |
+| Next three priorities | 1) CR-5 obsolete-path audit (**not started**) · 2) Customer communication access · 3) Studio Board truth/completeness |
 | Active blockers | Purchased-room Auth — locked **before Customer-One** |
 | Decisions waiting | **1** — Materials dual UX (Board package) |
 | Customer-One readiness | **3 of 23** readiness gates complete |
@@ -108,6 +108,7 @@ Every completed item must show available evidence: commit hash · subject · tes
 - **2026-07-26 — Anti-loop rule locked into protocol + Master List + suitcase.** Voice doctrine draft **not** rewritten. Inherited locks remain inherited. Only open Voice decisions remain V1–V3; Materials dual UX stays Board-only.
 - **2026-07-26 — Conversation Room Completion opened (inspection only, tip `03ee8a7`):** Anti-loop gap check done; plan at `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md`. **Completed behavior found (do not repeat):** stage machine, Voice preference gate, route honesty pass (2026-07-21), Plan+Checkout guidance cert (2026-07-19), working-draft contract, phone layout fix `cc80d94`, checkout sandbox honesty, intake gating, signed-in/out handoff cert, Lobby Entry Film reopen cert, Help shell. **Dirty WIP found (~301+/−315 across 23 files + untracked `lobby-begin.ts`, presence wave):** resume-after-Lobby-return, fresh-start-after-complete, Entry Film return route, draft preserve-on sign-out/timeout, presence rail trim — **all 34 CR unit tests pass on the WIP.** **Genuine gaps:** no end-to-end CR cert script (desktop/phone/360 unproven as a journey), intake answers unattributed, ledger attribution/tests/desktop/mobile gates pending on every row, stale "Discovery Question 1 live wire" comment, send affordance promises dead "Voice Host reply" package, unwired parallel `discovery/` components, phase-gate evaluator unused on live path. **Nothing needs a rewrite.** Proposed order: CR-1 protect WIP → CR-2 truth cleanup → CR-3 intake attribution → CR-4 end-to-end cert → CR-5 obsolete-path hygiene. **Blockers:** none new; Auth-before-Customer-One stands. Decisions CR-D1–CR-D5 added below. No product code changed; nothing committed.
 - **2026-07-26 — CR-D1–CR-D5 answered; plan protected.** Existing CR behavior must be **preserved rather than rebuilt**. **CR-1 is a validation and protection package** — it must not absorb CR-2 through CR-5. **Intake attribution belongs to CR-3.** **End-to-end journey certification belongs to CR-4.** Parallel `discovery/` and phase-gate systems belong to the **CR-5 audit** (archive before delete). Locked genuine gaps: intake answers bypass the attributed working-draft history; no full end-to-end Conversation Room certification exists. Neither justifies rewriting the working stage machine. Voice doctrine evidence commit: `03ee8a7e48beb72a2bf249a9da1d340ebe538bc1`.
+- **2026-07-26 — CR-4 CERTIFIED (evidence checkpoint).** Conversation Room end-to-end certification **PASS** against product tip `02657aa1edc8e73c6b04d9a7ef843509a50dba3a`. Record: `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md`. Harnesses: `scripts/cert-conversation-room-journey.mjs` · `scripts/cert-cr4r-interaction-proof.mjs` · `scripts/cert-cr4r5-tablet-scrim.mjs`. **Protected chain:** CR-1A `d778e7e` · CR-1B `62fa506` · CR-1C `7ad3876` · CR-2 `26f136d` · CR-3 `fb1ad24` · CR-4R1 `5c719ab` · CR-4R2 `3f89c80` · CR-4R3 `318d89d` · CR-4R4 `f0a122c` · CR-4R5 `02657aa`. **Proof:** production build PASS · focused Vitest 100/100 · extra auth/attribution/Lobby 26/26 · CR-4R 49/49 · CR-4R5 51/51 · full journey 105 PASS · Row 25 continuation 17 PASS · **all 30 required rows PASS** (including signed-in Board handoff and signed-out Create Account → same project Board) · desktop 1440 / phone 390 / narrow 360 PASS · Voice On/Off PASS · Intake attribution PASS · Lobby return and fresh-start PASS · no Studio Review customer navigation. **Non-blocking deferrals (not complete):** audible Voice quality · materials dual-UX (Board) · Checkout cancellation unsupported (N/A) · 66 unrelated TypeScript baseline errors · real integrated payment = external-launch gate. **CR-5 not started.** Generated artifacts intentionally not committed.
 
 ### Decisions Needed
 
@@ -146,6 +147,7 @@ Every completed item must show available evidence: commit hash · subject · tes
 | 2026-07-26 | Protect Studio Voice doctrine | Doctrine + Master List protected; Voice crossed off; Conversation Room Completion becomes active | subject `docs: lock Studio Voice doctrine` · full hash in return report · 0/0 expected | Pin full hash on next Master List docs touch if needed · Materials dual UX (Board) · CR package not started | Open Conversation Room Completion in a new thread |
 | 2026-07-26 | Conversation Room Completion — anti-loop gap check | Full stage/area inspection; dirty-WIP map; 34/34 CR unit tests pass on WIP; plan doc written; tip `03ee8a7` pinned | `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md` (uncommitted) · docs-only diff | Tagia: CR-D1–CR-D5 + approve CR-1 (protect dirty WIP) | Await Tagia decisions; then CR-1 selective staging package |
 | 2026-07-26 | Protect CR completion plan + CR-D1–CR-D5 | Five decisions recorded in plan + Master List; real-payment gate added to External Soft-Opening; CR-1–CR-5 order approved | subject `docs: lock Conversation Room completion plan` · full hash in return report · docs-only staging | Materials dual UX (Board) · CR-1 not started | Open CR-1 — validate and protect existing CR WIP |
+| 2026-07-26 | CR-4 end-to-end certification | CR-1A–CR-3 + CR-4R1–R5 protected; CR-4 certified 30/30 rows PASS @ `02657aa`; harnesses + cert record prepared | `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md` · three `scripts/cert-*.mjs` harnesses (generated artifacts excluded) | Materials dual UX (Board) · audible Voice quality · real payment gate · CR-5 not started · 66 unrelated tsc | Tagia approves docs evidence commit; do not begin CR-5 until authorized |
 
 ---
 
@@ -323,29 +325,51 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 
 # Hierarchy B — Current active item
 
-## CURRENTLY IN PROGRESS: Conversation Room Completion
+## Conversation Room Completion — CR-4 CERTIFIED (CR-5 not started)
 
-**Status:** IN PROGRESS — **plan protected 2026-07-26; CR-D1–CR-D5 answered; CR-1 not started**  
-**Plan:** `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md` — completed-work inventory, dirty-WIP map, gap table, anti-rewrite classification, **approved** order CR-1 → CR-5, decisions CR-D1–CR-D5 answered  
-**Locked genuine gaps:** (1) intake answers bypass the attributed working-draft history → **CR-3** · (2) no full end-to-end Conversation Room certification exists → **CR-4**. Neither justifies rewriting the working stage machine.  
-**Approved package order:** CR-1 validate + protect existing WIP → CR-2 truth cleanup → CR-3 intake attribution → CR-4 end-to-end certification → CR-5 obsolete-path dependency + archive-candidate audit. **CR-1 must not absorb CR-2 through CR-5.**  
-**Purpose:** Complete the Conversation Room customer journey without a recommendation engine and without reviving the discontinued Live Host.  
-**Boundary:** Product construction only within an approved Conversation Room package — selective staging around dirty WIP. Follow Voice doctrine. No Package 4 Host. No fake recommendation intelligence.
+**Status:** **CERTIFIED** — CR-4 Conversation Room End-to-End Certification **PASS** with explicit non-blocking deferrals (2026-07-26)
+**Certification record:** `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md`
+**Certified product tip:** `02657aa1edc8e73c6b04d9a7ef843509a50dba3a`
+**Plan:** `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md`
+**Protected package tips:**
 
-**Definition of done (refine with Tagia before construction):**
+| Package | Tip | Subject (short) |
+|---|---|---|
+| CR-1A | `d778e7e` | journey-begin recovery helpers |
+| CR-1B | `62fa506` | restore Conversation Room journey state |
+| CR-1C | `7ad3876` | refine Conversation Room presence |
+| CR-2 | `26f136d` | clean Conversation Room misleading wording |
+| CR-3 | `fb1ad24` | attribute Intake in working-draft history |
+| CR-4R1 | `5c719ab` | guard Conversation Room route draft |
+| CR-4R2 | `3f89c80` | align Intake continuity with Conversation Room |
+| CR-4R3 | `318d89d` | keep Voice preference controls interactive |
+| CR-4R4 | `f0a122c` | keep Session controls clear of activity scrim |
+| CR-4R5 | `02657aa` | keep tablet clear of activity scrim |
 
-- [ ] Customer can complete Discovery → Route → Services → Plan → Checkout → Intake → Board handoff without fake engine
-- [ ] Voice behavior follows locked doctrine (On/Off, silence, orientation)
-- [ ] No Live Host / mascot / hovering character
-- [ ] Desktop and phone proof for the package scope
-- [ ] Dirty WIP selectively protected or left untouched
-- [ ] Tests/certification as Tagia defines for the package
-- [ ] Protected commit
+**CR-4 certification summary:**
 
-**Prerequisites:** Studio Voice doctrine protected  
-**Blocked by:** Substantial Conversation Room dirty WIP (selective staging required)  
-**Unlocks:** Customer communication access; Board truth inputs  
-**Risk if delayed:** Journey remains partial; Host/engine risks if doctrine ignored
+- [x] Production build PASS (sandbox bake-in; clean cert worktree)
+- [x] All **30** required certification rows PASS (0 FAIL · 0 BLOCKED)
+- [x] Complete signed-in Board handoff PASS
+- [x] Complete signed-out Create Account → Studio Board continuation PASS (Row 25; same campaign)
+- [x] Desktop 1440 · phone 390 · narrow phone 360 PASS
+- [x] Voice On · Voice Off PASS
+- [x] Intake attribution PASS
+- [x] Lobby return and fresh-start PASS
+- [x] No Studio Review customer navigation
+- [ ] **CR-5** obsolete-path dependency + archive-candidate audit — **not started**
+
+**Accepted non-blocking deferrals (do not mark complete):**
+
+- Audible Voice quality not certified by `speechSynthesis.speak()` probe
+- Materials dual-UX deferred to Studio Board package
+- Checkout cancellation unsupported → NOT APPLICABLE
+- 66 unrelated repository TypeScript errors outside Conversation Room boundary
+- Real integrated payment remains a mandatory external-launch gate
+
+**Reusable harnesses (committed; regenerate evidence locally):** `scripts/cert-conversation-room-journey.mjs` · `scripts/cert-cr4r-interaction-proof.mjs` · `scripts/cert-cr4r5-tablet-scrim.mjs`
+**Generated artifacts:** intentionally not committed.
+**Next CR package:** CR-5 — **not started**; do not begin until Tagia authorizes.
 
 ### ✅ Previous active item — Studio Voice Definition and Customer-Presence Doctrine (complete)
 
@@ -362,7 +386,7 @@ Evidence: `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md
 
 1. [x] ~~**Protect Master Launch List control-tower rewrite**~~ — `9e823ca` · 0/0
 2. [x] ~~**Studio Voice Definition and Customer-Presence Doctrine**~~ — subject `docs: lock Studio Voice doctrine` · V1/V2/V3 locked · full hash in return report
-3. [ ] **Conversation Room completion without recommendation engine** ← *current* — PARTIAL · dirty WIP collision risk
+3. [x] ~~**Conversation Room completion without recommendation engine**~~ — **CR-4 CERTIFIED** @ `02657aa` · 30/30 rows PASS · CR-5 not started · non-blocking deferrals listed in Hierarchy B
 4. [ ] **Customer communication and follow-up access** — MISSING
 5. [ ] **Studio Board customer truth and completeness** — PARTIAL · carries Materials dual UX decision
 6. [ ] **Purchased-room Auth Route/Data Protection** — MISSING · **LOCKED before Customer-One**
