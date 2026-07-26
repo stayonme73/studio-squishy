@@ -86,8 +86,12 @@ export const studioConversationFrameworkV1 = {
   /**
    * Lobby is an external room — never an internal journey phase.
    * Session snapshot key for Conversation ↔ Lobby round-trip (browser session only).
+   *
+   * Return-to-Lobby always reopens the Entry Film (`lobbyEntry=reset`) so Sign In /
+   * New to the Studio / Returning Client are available again — never bare unlocked Lobby.
    */
   lobbyRoute: "/studio-lobby",
+  lobbyReturnRoute: "/studio-lobby?lobbyEntry=reset",
   sessionStorageKey: "studioConversationSession",
 
   /**

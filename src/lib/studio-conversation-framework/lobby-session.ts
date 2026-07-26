@@ -6,6 +6,7 @@
  * Temporary modes (Help / Review) are closed on exit; only phase + step persist.
  */
 
+import { clearLobbyEntryVisitState } from "@/config/studio-lobby-entry-v1";
 import { studioConversationFrameworkV1 } from "@/config/studio-conversation-framework-v1";
 import {
   createConversationRoomState,
@@ -107,6 +108,7 @@ export function clearConversationSession(
 /**
  * Prepare exit to Lobby: preserve phase/step, persist session snapshot,
  * do not mark cancelled or completed. Lobby remains an external destination.
+ * Reopens the Entry Film so New / Returning (Sign In) are available again.
  */
 export function returnToLobby(
   state: ConversationRoomState,
@@ -117,10 +119,11 @@ export function returnToLobby(
   });
   const snapshot = snapshotConversationSession(nextState);
   persistConversationSession(snapshot, storage);
+  clearLobbyEntryVisitState();
   return {
     state: nextState,
     snapshot,
-    lobbyRoute: studioConversationFrameworkV1.lobbyRoute,
+    lobbyRoute: studioConversationFrameworkV1.lobbyReturnRoute,
   };
 }
 

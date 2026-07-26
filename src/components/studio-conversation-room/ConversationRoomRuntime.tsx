@@ -45,7 +45,9 @@ import {
 import {
   bootConversationProjectDraft,
   bridgeConversationPlanToCampaign,
+  clearCompletedConversationLocalState,
   guideDraftFromOpening,
+  isConversationJourneyComplete,
   openingFromGuideDraft,
   persistAddService,
   persistConversationStage,
@@ -132,6 +134,29 @@ function spokenLineForGuideStep(
     return `${conversationRoomGuideV1.confirmedTitle}. ${conversationRoomGuideV1.confirmedBody}`;
   }
   return null;
+}
+
+/** Resume invite after Lobby return — match the restored stage (never assume route). */
+function spokenLineForResumeStage(
+  stage: ConversationRoomStage,
+): string | null {
+  const v = conversationRoomGuideV1;
+  switch (stage) {
+    case "route":
+      return v.routeVoiceIntro;
+    case "services":
+      return v.servicesPanelLead;
+    case "plan":
+      return v.studioPlanVoiceOrient;
+    case "checkout":
+      return v.checkoutVoiceBridge;
+    case "intake":
+      return v.intakeTabletLead;
+    case "complete":
+      return null;
+    default:
+      return null;
+  }
 }
 
 export type ConversationRoomRuntimeProps = {
@@ -337,14 +362,25 @@ export default function ConversationRoomRuntime({
           : restored.flowStep,
     });
 
-    const loadedGuide = loadGuideDraft() ?? createEmptyGuideCaptureDraft();
+    const forceFreshStart = isConversationJourneyComplete();
+    if (forceFreshStart) {
+      clearCompletedConversationLocalState();
+    }
+
+    const loadedGuide = forceFreshStart
+      ? createEmptyGuideCaptureDraft()
+      : (loadGuideDraft() ?? createEmptyGuideCaptureDraft());
     const project = bootConversationProjectDraft(loadedGuide);
     const openingSlice = readOpeningAnswers(project);
     const guideFromProject = guideDraftFromOpening(openingSlice);
-    const hydratedGuide = guideFromProject.projectNeed.trim()
-      ? guideFromProject
-      : loadedGuide;
-    const restoredStage = resolveBootStage(project, initialStage);
+    const hydratedGuide = forceFreshStart
+      ? loadedGuide
+      : guideFromProject.projectNeed.trim()
+        ? guideFromProject
+        : loadedGuide;
+    const restoredStage = forceFreshStart
+      ? ("opening" as ConversationRoomStage)
+      : resolveBootStage(project, initialStage);
     const bootProject =
       restoredStage === readConversationStage(project)
         ? project
@@ -393,7 +429,10 @@ export default function ConversationRoomRuntime({
      * Lobby may already have set an invite (untouched). CR only plays it after
      * Voice is On — never before the preference choice, never when Off.
      */
-    const invite = consumeStudioVoiceInvite();
+    let invite = consumeStudioVoiceInvite();
+    if (forceFreshStart && invite === "resume") {
+      invite = "start";
+    }
     let inviteLine: string | null = null;
     if (invite === "start" && restoredStage === "opening") {
       inviteLine = spokenLineForGuideStep(openStep, false);
@@ -401,7 +440,7 @@ export default function ConversationRoomRuntime({
       const line =
         restoredStage === "opening"
           ? spokenLineForGuideStep(openStep, false)
-          : conversationRoomGuideV1.routeVoiceIntro;
+          : spokenLineForResumeStage(restoredStage);
       const welcome = conversationRoomGuideV1.voiceWelcomeBack;
       inviteLine = line ? `${welcome} ${line}` : welcome;
     }
@@ -829,6 +868,8 @@ export default function ConversationRoomRuntime({
     void (async () => {
       const plan = await completeIntakeHandoff();
       setIntakeHandoffSignedIn(plan.auth === "signed-in");
+      /* Project now lives on the Board — do not leave a dead “complete” tablet behind. */
+      clearCompletedConversationLocalState();
       speakStudioLine(plan.voiceLine);
       navigateIntakeHandoff(plan.destination);
     })();

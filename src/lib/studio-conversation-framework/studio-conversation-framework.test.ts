@@ -175,7 +175,7 @@ describe("conversation room framework", () => {
     expect(state.review.open).toBe(false);
 
     const exit = returnToLobby(state, storage);
-    expect(exit.lobbyRoute).toBe("/studio-lobby");
+    expect(exit.lobbyRoute).toBe("/studio-lobby?lobbyEntry=reset");
     expect(exit.state.journeyPhase).toBe("intake");
     expect(exit.state.flowStep).toBe("project-scope");
     expect(exit.state.journeyPhase).not.toBe("cancelled");
