@@ -95,6 +95,17 @@ export function clearGuideUiStep(): void {
   }
 }
 
+/** Clear in-memory + session guide draft (Lobby fresh start after completed journey). */
+export function clearGuideMemoryDraft(): void {
+  memoryDraft = null;
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(GUIDE_MEMORY_DRAFT_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 export function persistGuideDraft(draft: GuideCaptureDraftV1): void {
   const normalized = normalizeGuideCaptureDraft(draft);
   memoryDraft = normalized;

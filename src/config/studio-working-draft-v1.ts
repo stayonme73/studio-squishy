@@ -51,6 +51,11 @@ export const WORKING_DRAFT_PRESERVE_ON = [
   "page-refresh",
   "connection-interruption",
   "session-reopen",
+  /** Inactivity timeout / Sign out now — auth ends; draft stays. */
+  "session-timeout",
+  "sign-out",
+  /** Customer signs back in and continues — draft still present. */
+  "sign-in-return",
 ] as const;
 
 export type WorkingDraftPreserveOn = (typeof WORKING_DRAFT_PRESERVE_ON)[number];

@@ -1,4 +1,10 @@
 export { bridgeConversationPlanToCampaign } from "./bridge-campaign";
+export {
+  clearCompletedConversationLocalState,
+  isConversationJourneyComplete,
+  resolveLobbyConversationBeginInvite,
+  type LobbyConversationBeginInvite,
+} from "./lobby-begin";
 export { prefillIntakeAnswersFromOpening } from "./prefill-intake";
 
 export {

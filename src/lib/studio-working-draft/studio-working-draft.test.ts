@@ -28,6 +28,9 @@ describe("pre-payment working draft contract", () => {
     expect(WORKING_DRAFT_PRESERVE_ON).toContain("back");
     expect(WORKING_DRAFT_PRESERVE_ON).toContain("return-to-lobby");
     expect(WORKING_DRAFT_PRESERVE_ON).toContain("page-refresh");
+    expect(WORKING_DRAFT_PRESERVE_ON).toContain("session-timeout");
+    expect(WORKING_DRAFT_PRESERVE_ON).toContain("sign-out");
+    expect(WORKING_DRAFT_PRESERVE_ON).toContain("sign-in-return");
   });
 
   it("lists minimum persisted fields including attribution and conversation location", () => {
