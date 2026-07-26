@@ -136,9 +136,32 @@
   min-height: 0;
 }
 
-.hostSurface > * {
+/* Single child (normal tablet) fills the glass. */
+.hostSurface > *:only-child {
   flex: 1 1 auto;
   min-height: 0;
+}
+
+/*
+ * First-entry Voice preference shares the glass with the tablet.
+ * Preference must stay clickable — do not let the tablet flex-grow over it.
+ */
+.hostSurface > *:not(:only-child):first-child {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 5;
+  min-height: 0;
+}
+
+.hostSurface > *:not(:only-child):last-child {
+  flex: 1 1 auto;
+  min-height: 0;
+  /* Prefer preference hit-targets while both are mounted. */
+  pointer-events: none;
+}
+
+.hostSurface > *:not(:only-child):last-child * {
+  pointer-events: none;
 }
 
 /*
