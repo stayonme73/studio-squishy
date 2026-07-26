@@ -16,6 +16,47 @@ We measure progress by how much is **finished, proven, protected, and crossed of
 
 ---
 
+## Anti-Loop / First-Date Prevention Rule
+
+**Status:** NON-NEGOTIABLE · Tagia locked 2026-07-26  
+**Purpose:** Protect launch time. Do not burn days reopening settled work.
+
+Before Scout acts on **every** future Chat instruction, check:
+
+1. Is this already completed?
+2. Is this already protected by commit?
+3. Is this already tested or certified?
+4. Is this already locked in the Master Launch List, Working Protocol, doctrine, inventory, or package evidence?
+5. Is Chat reopening a settled decision instead of addressing the actual remaining gap?
+
+**If yes to any of the above — stop before repeating the work** and say:
+
+> **Hey Chat — this is repetitive if we re-open work already completed or locks already on the books.**
+
+Then report only:
+
+- what is already finished
+- where it is recorded
+- commit, test, or certification evidence
+- what remains genuinely open
+- the smallest next action
+- whether no action is required
+
+### Locked behaviors
+
+- Inherited locks are **not** re-debated
+- Completed inspections are **not** rerun without a new reason
+- Protected packages are **not** reconstructed
+- Prior test evidence is **reused** unless integration or code changes require a rerun
+- Chat must distinguish a **new gap** from an already completed package
+- Scout must identify repetition **before** acting
+- Tagia should **not** have to step in to stop repeated work
+- Time protection is a **launch requirement**
+
+Do **not** perform the repeated task merely because Chat supplied a long instruction.
+
+---
+
 ## 1. One Road at a Time
 
 We work in the approved order.
@@ -242,6 +283,7 @@ One finished room, then close the door.
 
 The suitcase must contain:
 
+- **ANTI-LOOP RULE:** Before acting, verify whether the requested work is already completed, locked, tested, certified, or protected. If it is, red-flag the repetition, provide the existing evidence, and identify only the genuine remaining gap.
 - Studio launch goal
 - current timeline
 - master launch list
@@ -259,6 +301,20 @@ The suitcase must contain:
 - Visual Quality Queue
 - Parking Lot
 
+### Currently inherited settled locks (carry every thread)
+
+- Live Host discontinued
+- Package 4 Voice Host dead
+- recommendation engine discontinued for launch
+- Lobby silent (Conversation Room Voice does not speak in Lobby)
+- Conversation Room Voice preference before first speech
+- Presence System already established
+- Guidance Doctrine already established
+- page counts locked at **16** current / **15** Customer-One / **14** Lobby intermediate only / **13** later unified room
+- Auth Route/Data Protection required before Customer-One
+- archive before delete
+- important Chat guidance must be recorded in the repo
+
 ### Important locked principles
 
 - Tagia is Customer One
@@ -272,6 +328,7 @@ The suitcase must contain:
 - team and production follow customer-room completion
 - intensive repeated testing follows production wiring
 - Owner Console follows proven customer and production operation
+- **anti-loop rule is non-negotiable**
 
 ---
 

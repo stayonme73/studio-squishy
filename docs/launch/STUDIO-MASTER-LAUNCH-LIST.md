@@ -4,21 +4,28 @@
 
 Completed work stays visible and crossed out with evidence. Only one item is **CURRENTLY IN PROGRESS**.
 
+### Permanent operating checklist
+
+- [x] **Do not repeat actions already completed.** Scout must red-flag repetitive instructions and return existing evidence instead of redoing the work. *(NON-NEGOTIABLE · Tagia 2026-07-26)*
+- [x] Important Chat guidance is recorded in this Communication Notebook or the relevant package document.
+- [x] Built ≠ tested ≠ certified ≠ protected ≠ launch-ready.
+
 ---
 
 ## Daily Snapshot
 
 | Field | Value |
 |---|---|
-| Protected tip | `65f11c6476b7b618d7950e9b2c44948c5e37f39d` — `docs: lock customer-facing room inventory` |
+| Protected tip | `9e823ca5e3f1274b5062c98cb259a5811849e82b` — `docs: expand master launch list into launch control tower` |
 | Branch | `fix/discovery-responsive-layout` |
 | Sync | **0 ahead / 0 behind** |
 | Current active item | **Studio Voice Definition and Customer-Presence Doctrine** |
-| Most recently completed | Customer-Facing Room Inventory (`65f11c6`) |
-| Next three priorities | 1) Studio Voice definition · 2) Conversation Room completion · 3) Customer communication access |
-| Active blockers | Purchased-room Auth Route/Data Protection — locked **before Customer-One** (does **not** block Voice docs) |
-| Decisions waiting | **1** — Materials We Still Need dual UX (Board package) |
-| Customer-One readiness | **3 of 23** readiness gates complete (see § Customer-One Readiness Gate) |
+| Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**draft — awaiting Tagia review**) |
+| Most recently completed | Launch control tower + page-count lock (`9e823ca`) |
+| Next three priorities | 1) Tagia approves Voice doctrine · 2) Protect doctrine docs · 3) Conversation Room completion |
+| Active blockers | Purchased-room Auth — locked **before Customer-One** (does **not** block Voice docs) |
+| Decisions waiting | Materials dual UX (Board) · Voice V1 session-vs-account persistence · Voice V2 Board/Review default quiet · Voice V3 comms Voice class |
+| Customer-One readiness | **3 of 23** readiness gates complete |
 | Last updated | 2026-07-26 |
 
 ---
@@ -80,6 +87,7 @@ Every completed item must show available evidence: commit hash · subject · tes
 - **2026-07-26 — Launch control tower accepted:** Tagia accepts the priority ordering and launch-control structure.
 - **2026-07-26 — OFFICIAL PAGE COUNT LOCK:** Current repository has **16** live customer-facing routed pages. Approved Customer-One target is **15**. **Fourteen** is only a possible intermediate alias-consolidation count (Lobby). **Thirteen** is the later target after the unified Review/Final/Delivery room. Page-count reduction does **not** authorize premature route removal, archiving, or deletion.
 - **2026-07-26 — Archive-before-delete remains locked.** Live Host and recommendation-engine directions remain discontinued.
+- **2026-07-26 — ANTI-LOOP RULE (NON-NEGOTIABLE):** Repeated work wastes critical launch time. Scout must alert Chat before entering a repetition loop. Chat should ask whether a task is already done before assigning it. Tagia should not have to manually stop already-settled work. The rule must travel in every new-thread suitcase (Working Protocol § Anti-Loop + suitcase ANTI-LOOP RULE line).
 
 ### Scout Notes
 
@@ -93,6 +101,9 @@ Every completed item must show available evidence: commit hash · subject · tes
   - Compatibility: keep `/studio-lobby`, `/verify-email/pending`, `/review-room`, and other redirects until replacement paths are verified — page-count milestones are not permission to remove routes early.
 - **Archive caution:** Do not archive redirect shells until replacement live path is verified for bookmarks. Do not delete Host/recommendation code without dependency audit — tests, Owner QA seeds, and dirty WIP still reference Host-era and recommendation-era surfaces.
 - **Recommended next action:** Protect this documentation checkpoint, then begin Studio Voice Definition (docs only) in a new thread.
+- **2026-07-26 — Studio Voice doctrine opened:** Draft at `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md`. Inherits already-locked Host discontinuation, recommendation discontinuation, Lobby silence, CR preference gate, Presence System, Guidance Doctrine, page counts, Auth-before-Customer-One. Newly defines: identity, hovering vs presence, Voice Off journey contract, five channels, authority/escalation matrix, truthfulness vocabulary, a11y multimodal rules, presence-state inventory, full room-by-room Voice matrix. **No product code.** Not complete until Tagia approves. Anti-repetition section lists locks Chat must not re-open as first dates.
+- **Chat guidance recorded:** Studio Voice is a system and representative, not the old Host with a new name. Define behavior before choosing implementation. Silence is intentional. Voice Off must preserve the full journey. Communicate separately with customer, machine, Chat, team, and Tagia. Money, deadlines, complaints, refunds, reputation, and trust require escalation. Every irreversible action needs clear authority and attribution. Doctrine must prevent fake recommendations, fake human presence, fake status, and fake completion.
+- **2026-07-26 — Anti-loop rule locked into protocol + Master List + suitcase.** Voice doctrine draft **not** rewritten. Inherited locks remain inherited. Only open Voice decisions remain V1–V3; Materials dual UX stays Board-only.
 
 ### Decisions Needed
 
@@ -103,7 +114,10 @@ Every completed item must show available evidence: commit hash · subject · tes
 | 3 | Coming-soon URLs | Nav truth | Scaffold routes exist | Park / hide / build | Do not advertise as available | Nav must not advertise unfinished routes; placeholders may remain internal/dev | **answered** | 2026-07-26 |
 | 4 | Ungated internal tooling | Auth audit | `/studio`, `/textures`, `/decision-learner` | Gate now / before soft opening | Include in Auth audit | Must be inaccessible to signed-out and customers; include in Auth audit; no Owner Console expansion | **answered** | 2026-07-26 |
 | 5 | Voice definition scope | Voice package | Prevent invented behavior | Docs-only whole journey | Docs-only; no Package 4 Host | Documentation only; define listed behaviors; no Host, no engine, no redesign, no TTS/STT change | **answered** | 2026-07-26 |
-| 6 | Unified-room design kickoff | Review/Delivery | Room lock | After CR+comms+Board / later | After Voice, CR, comms, Board | After Voice, CR completion, communication access, Board truth; no construction before Tagia layout approval | **answered** | 2026-07-26 |
+| 6 | Unified-room design kickoff | Review/Delivery | Room lock | After Voice, CR, comms, Board | After Voice, CR, comms, Board; no construction before Tagia layout approval | After Voice, CR completion, communication access, Board truth; no construction before Tagia layout approval | **answered** | 2026-07-26 |
+| V1 | Voice On/Off persistence beyond session? | Voice doctrine | Today is sessionStorage only | Session-only through Customer-One · account · device | Keep **session-only** through Customer-One | — | **waiting** | — |
+| V2 | Board/Review/Delivery default Voice quiet? | Voice doctrine | Avoid Host return | Quiet default · brief welcome · room-specific | Quiet default; brief welcome only where already truthful | — | **waiting** | — |
+| V3 | Customer communication Voice class? | Comms construction | Surface missing | Optional · required · text-first + Voice assist | Text-first with Voice assist optional | — | **waiting** | — |
 
 ### Blocker Notes
 
@@ -117,7 +131,8 @@ Every completed item must show available evidence: commit hash · subject · tes
 |---|---|---|---|---|---|
 | 2026-07-26 | Launch process + inventory | Protocol · Master List · Tracker · Inventory accepted/protected | `e68ccbd` · `50915da` · `28bc218` · `65f11c6` · 0/0 | Master List full-priority rewrite | Tagia reviews reordered list; then protect; then Voice docs |
 | 2026-07-26 | Master Launch List control-tower pass | Full priority reorder · discontinued directions · archive policy · verified page counts · readiness gates | Docs only · uncommitted pending Tagia review | Voice not started · Materials dual UX waiting | Protect docs when approved |
-| 2026-07-26 | Page-count lock + protect | Official counts locked: 16 current · 15 Customer-One · 14 Lobby intermediate only · 13 later unified | Documentation checkpoint commit · 0/0 | Studio Voice definition not started | Begin Studio Voice Definition docs in a new thread |
+| 2026-07-26 | Page-count lock + protect | Official counts locked: 16 current · 15 Customer-One · 14 Lobby intermediate only · 13 later unified | `9e823ca` · 0/0 | Studio Voice definition not started | Begin Studio Voice Definition docs |
+| 2026-07-26 | Studio Voice doctrine draft | Doctrine draft written for Tagia review; Master List updated; no product code | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (uncommitted) | Tagia review · V1–V3 Voice decisions · do not mark complete | After approval: protect doctrine, then Conversation Room completion |
 
 ---
 
@@ -297,8 +312,10 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 
 ## CURRENTLY IN PROGRESS: Studio Voice Definition and Customer-Presence Doctrine
 
-**Status:** IN PROGRESS  
-**Boundary:** Documentation and behavior definition only.
+**Status:** IN PROGRESS — **draft ready for Tagia review** (not complete)  
+**Boundary:** Documentation and behavior definition only.  
+**Doctrine path:** `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md`  
+**Opened:** 2026-07-26 · tip `9e823ca`
 
 **Must define:**
 
@@ -325,29 +342,35 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 
 **Definition of done:**
 
-- [ ] Voice identity and role defined
-- [ ] Customer-presence rules defined
-- [ ] Voice On / Off behavior defined
-- [ ] Orientation and silence behavior defined
-- [ ] Escalation boundaries defined
-- [ ] Customer, machine, Chat, team, and Tagia communication defined
-- [ ] Accessibility and control rules defined
-- [ ] Room-by-room Voice dependency matrix completed
-- [ ] No recommendation engine
-- [ ] No product code or room redesign
+- [x] Voice identity and role defined (draft)
+- [x] Customer-presence rules defined (draft)
+- [x] Voice On / Off behavior defined (draft)
+- [x] Orientation and silence behavior defined (draft)
+- [x] Escalation boundaries defined (draft)
+- [x] Customer, machine, Chat, team, and Tagia communication defined (draft)
+- [x] Accessibility and control rules defined (draft)
+- [x] Room-by-room Voice dependency matrix completed (draft)
+- [x] No recommendation engine
+- [x] No product code or room redesign
 - [ ] Tagia review and approval received
 
-**Prerequisites:** Inventory complete (`65f11c6`)  
+**Current implementation facts:** CR Voice preference is sessionStorage-only; Lobby silent for CR Voice; Presence System locked; Package 4 Host discontinued; recommendation engine discontinued for launch; Guidance Pass Plan/Checkout cold-certified; complaint/refund/comms Voice surfaces missing.
+
+**Still open:** Tagia approval · Voice decisions V1–V3 · doctrine commit/push after approval  
+
+**Next action after approval:** Protect doctrine docs → Conversation Room completion (no Host, no fake engine).
+
+**Prerequisites:** Inventory + control tower protected (`65f11c6`, `9e823ca`)  
 **Blocked by:** None for documentation  
 **Unlocks:** Conversation Room completion; later communication / Review / Delivery Voice behavior  
-**Risk if delayed:** Later construction invents Voice behavior
+**Risk if delayed:** Later construction invents Voice behavior / revives Host
 
 ---
 
 # Hierarchy C — Immediate launch-critical work (priority order)
 
-1. [ ] **Protect this Master Launch List control-tower rewrite** — READY TO PROTECT when Tagia approves · docs only
-2. [ ] **Studio Voice Definition and Customer-Presence Doctrine** ← *current*
+1. [x] ~~**Protect Master Launch List control-tower rewrite**~~ — `9e823ca` · 0/0
+2. [ ] **Studio Voice Definition and Customer-Presence Doctrine** ← *current* · draft `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` · awaiting Tagia review
 3. [ ] **Conversation Room completion without recommendation engine** — PARTIAL · dirty WIP collision risk
 4. [ ] **Customer communication and follow-up access** — MISSING
 5. [ ] **Studio Board customer truth and completeness** — PARTIAL · carries Materials dual UX decision
