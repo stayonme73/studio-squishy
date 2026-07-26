@@ -16,10 +16,10 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | *(this protect — full hash in return report; pin on next Master List docs touch if needed)* — `docs: lock Studio Voice doctrine` |
+| Protected tip | `03ee8a7e48beb72a2bf249a9da1d340ebe538bc1` — `docs: lock Studio Voice doctrine` |
 | Branch | `fix/discovery-responsive-layout` |
-| Sync | **0 ahead / 0 behind** (expected after push) |
-| Current active item | **Conversation Room Completion** |
+| Sync | **0 ahead / 0 behind** (verified 2026-07-26) |
+| Current active item | **Conversation Room Completion** — opened; anti-loop gap check complete; plan at `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md` |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
 | Most recently completed | Studio Voice Definition and Customer-Presence Doctrine |
 | Next three priorities | 1) Conversation Room completion · 2) Customer communication access · 3) Studio Board truth/completeness |
@@ -88,6 +88,7 @@ Every completed item must show available evidence: commit hash · subject · tes
 - **2026-07-26 — OFFICIAL PAGE COUNT LOCK:** Current repository has **16** live customer-facing routed pages. Approved Customer-One target is **15**. **Fourteen** is only a possible intermediate alias-consolidation count (Lobby). **Thirteen** is the later target after the unified Review/Final/Delivery room. Page-count reduction does **not** authorize premature route removal, archiving, or deletion.
 - **2026-07-26 — Archive-before-delete remains locked.** Live Host and recommendation-engine directions remain discontinued.
 - **2026-07-26 — ANTI-LOOP RULE (NON-NEGOTIABLE):** Repeated work wastes critical launch time. Scout must alert Chat before entering a repetition loop. Chat should ask whether a task is already done before assigning it. Tagia should not have to manually stop already-settled work. The rule must travel in every new-thread suitcase (Working Protocol § Anti-Loop + suitcase ANTI-LOOP RULE line).
+- **2026-07-26 — Conversation Room decisions CR-D1–CR-D5 answered (LOCKED):** Keep the typed dock and remove dead Host wording. Editable captured speech does not need a redundant confirmation loop — but consequential actions (payment, scope commitment, submission, approval, revision, delivery acceptance, complaint, refund) still require explicit confirmation. Sandbox checkout is acceptable **for Customer-One only**; **real payment is required before external customers** (now an External Soft-Opening gate). Unwired `discovery/` components wait for the CR-5 audit — archive before delete, no deletion without Tagia approval. **The stage machine is the live authority. Do not create or wire a competing phase authority.** Scout's inspection passed the anti-loop test: two real launch gaps found, not a reason to rebuild the Conversation Room.
 - **2026-07-26 — Voice decisions V1/V2/V3 answered (LOCKED):** V1 account persistence with session override (signed-out stays session-only; account persistence is future construction). V2 Board/Review/Delivery quiet by default — reading and decision rooms, not guided tours. V3 communication/complaints/refunds: Voice available on request with restrained escalation guidance; no arguing, defending, refund approval, outcome promises, or minimizing; money/trust matters escalate to Tagia. **Governing principle: Voice guides active construction work, stays quiet during review work, and becomes a careful intake channel during sensitive issues.**
 
 ### Scout Notes
@@ -105,6 +106,8 @@ Every completed item must show available evidence: commit hash · subject · tes
 - **2026-07-26 — Studio Voice doctrine opened:** Draft at `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md`. Inherits already-locked Host discontinuation, recommendation discontinuation, Lobby silence, CR preference gate, Presence System, Guidance Doctrine, page counts, Auth-before-Customer-One. Newly defines: identity, hovering vs presence, Voice Off journey contract, five channels, authority/escalation matrix, truthfulness vocabulary, a11y multimodal rules, presence-state inventory, full room-by-room Voice matrix. **No product code.** Not complete until Tagia approves. Anti-repetition section lists locks Chat must not re-open as first dates.
 - **Chat guidance recorded:** Studio Voice is a system and representative, not the old Host with a new name. Define behavior before choosing implementation. Silence is intentional. Voice Off must preserve the full journey. Communicate separately with customer, machine, Chat, team, and Tagia. Money, deadlines, complaints, refunds, reputation, and trust require escalation. Every irreversible action needs clear authority and attribution. Doctrine must prevent fake recommendations, fake human presence, fake status, and fake completion.
 - **2026-07-26 — Anti-loop rule locked into protocol + Master List + suitcase.** Voice doctrine draft **not** rewritten. Inherited locks remain inherited. Only open Voice decisions remain V1–V3; Materials dual UX stays Board-only.
+- **2026-07-26 — Conversation Room Completion opened (inspection only, tip `03ee8a7`):** Anti-loop gap check done; plan at `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md`. **Completed behavior found (do not repeat):** stage machine, Voice preference gate, route honesty pass (2026-07-21), Plan+Checkout guidance cert (2026-07-19), working-draft contract, phone layout fix `cc80d94`, checkout sandbox honesty, intake gating, signed-in/out handoff cert, Lobby Entry Film reopen cert, Help shell. **Dirty WIP found (~301+/−315 across 23 files + untracked `lobby-begin.ts`, presence wave):** resume-after-Lobby-return, fresh-start-after-complete, Entry Film return route, draft preserve-on sign-out/timeout, presence rail trim — **all 34 CR unit tests pass on the WIP.** **Genuine gaps:** no end-to-end CR cert script (desktop/phone/360 unproven as a journey), intake answers unattributed, ledger attribution/tests/desktop/mobile gates pending on every row, stale "Discovery Question 1 live wire" comment, send affordance promises dead "Voice Host reply" package, unwired parallel `discovery/` components, phase-gate evaluator unused on live path. **Nothing needs a rewrite.** Proposed order: CR-1 protect WIP → CR-2 truth cleanup → CR-3 intake attribution → CR-4 end-to-end cert → CR-5 obsolete-path hygiene. **Blockers:** none new; Auth-before-Customer-One stands. Decisions CR-D1–CR-D5 added below. No product code changed; nothing committed.
+- **2026-07-26 — CR-D1–CR-D5 answered; plan protected.** Existing CR behavior must be **preserved rather than rebuilt**. **CR-1 is a validation and protection package** — it must not absorb CR-2 through CR-5. **Intake attribution belongs to CR-3.** **End-to-end journey certification belongs to CR-4.** Parallel `discovery/` and phase-gate systems belong to the **CR-5 audit** (archive before delete). Locked genuine gaps: intake answers bypass the attributed working-draft history; no full end-to-end Conversation Room certification exists. Neither justifies rewriting the working stage machine. Voice doctrine evidence commit: `03ee8a7e48beb72a2bf249a9da1d340ebe538bc1`.
 
 ### Decisions Needed
 
@@ -119,6 +122,11 @@ Every completed item must show available evidence: commit hash · subject · tes
 | V1 | Voice On/Off persistence beyond session? | Voice doctrine | Today is sessionStorage only | Session-only · account · device | Session-only through Customer-One | **Persist by account, with session override.** Signed-in preference follows across visits; switchable anytime; signed-out stays session-only. Account persistence = future construction, not yet implemented | **answered** | 2026-07-26 |
 | V2 | Board/Review/Delivery default Voice quiet? | Voice doctrine | Avoid Host return | Quiet default · brief welcome · room-specific | Quiet default | **Quiet by default.** Voice speaks only on customer ask, required attention, deadline/materials risk, or review/revision/approval/delivery help. Reading and decision rooms, not guided tours | **answered** | 2026-07-26 |
 | V3 | Customer communication Voice class? | Comms construction | Surface missing | Optional · required · text-first + Voice assist | Text-first with Voice assist | **Available on request, restrained escalation guidance.** Collect facts, explain process, confirm capture, state next step. No arguing, defending, refund approval, outcome promises, or minimizing. Money/refunds/disputes/deadline failures/reputation/trust → Tagia | **answered** | 2026-07-26 |
+| CR-D1 | Typed send promises "Voice Host reply comes in a later package" — dead package | CR truth | Dead-package promise is misleading | Honest copy · hide send · wire reply | Rewrite copy honestly; keep permanent dock; no reply engine | **Keep the permanent typed-input dock. Remove the obsolete Host-reply promise in CR-2 and replace with wording describing current behavior only.** Do not revive Package 4 Voice Host. Do not imply an unavailable conversational response feature is coming during the launch journey | **answered** | 2026-07-26 |
+| CR-D2 | Dictation has no "did I hear you right" confirm loop | CR Voice | Customer edits text manually before Got it | Accept · add confirm loop | Accept — manual review satisfies truthfulness; no new construction | **Accept direct manual correction of speech captured into a visible editable field; no second confirmation loop merely because text came from speech.** Deliberate Continue / Save / submit confirms the edited answer. Captured content stays visible and correctable. **Consequential actions still require explicit confirmation:** payment · service or scope commitment · project submission · approval · revision submission · final delivery acceptance · complaint submission · refund request | **answered** | 2026-07-26 |
+| CR-D3 | Checkout has no failure/cancel/retry (honest sandbox) | CR Checkout | Real processor is a later package | Accept for Customer-One · build retry now | Accept through Customer-One | **Sandbox checkout accepted through Customer-One only** — that trial validates the workflow and does not require charging Tagia. Must clearly and literally identify sandbox/test behavior; must not imply a real payment was processed; must preserve truthful success, failure, cancellation, and handoff states the sandbox supports. **Real, integrated, tested, certified payment path required before controlled external customers** — added to the External Soft-Opening gate. Do not silently carry sandbox checkout into external launch | **answered** | 2026-07-26 |
+| CR-D4 | Unwired parallel `discovery/` components | CR hygiene | Parallel dead-ish build risks confusion | Archive-candidate after audit · leave | Audit + mark archive-candidate in CR-5; no deletion | **Leave physically untouched during CR-1 through CR-4.** Audit in CR-5 Obsolete-Path Hygiene; classify as archive candidates only after dependency inspection; archive before delete; **no deletion without Tagia's explicit approval** | **answered** | 2026-07-26 |
+| CR-D5 | Phase-gate evaluator unused on live stage machine | CR architecture | Two loosely-synced state models | Wire gates · record stage machine as live authority | Record stage machine as live authority; gates stay design reference | **The live stage machine is the authoritative Conversation Room journey** (`opening → route → services → plan → checkout → intake → complete`). Do not wire `evaluateConversationPhaseGate` into the live path merely because it exists. Do not create a second authority system. Classify the parallel phase-gate system for CR-5 dependency audit and possible archiving; preserve untouched if tests, migrations, Owner QA, or dirty WIP still depend on it | **answered** | 2026-07-26 |
 
 ### Blocker Notes
 
@@ -136,6 +144,8 @@ Every completed item must show available evidence: commit hash · subject · tes
 | 2026-07-26 | Studio Voice doctrine draft | Doctrine draft written for Tagia review; Master List updated; no product code | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (uncommitted) | Tagia review · V1–V3 Voice decisions · do not mark complete | After approval: protect doctrine, then Conversation Room completion |
 | 2026-07-26 | Anti-loop rule protected · V1–V3 recorded | Anti-loop rule committed (`f1a8864`); Tagia answered V1/V2/V3; decisions recorded in doctrine §4/§12/§14 and this notebook | `f1a8864` · 0/0 · doctrine updated, still uncommitted | Doctrine protect order from Tagia · Materials dual UX (Board) | Protect Voice doctrine docs, then Conversation Room completion |
 | 2026-07-26 | Protect Studio Voice doctrine | Doctrine + Master List protected; Voice crossed off; Conversation Room Completion becomes active | subject `docs: lock Studio Voice doctrine` · full hash in return report · 0/0 expected | Pin full hash on next Master List docs touch if needed · Materials dual UX (Board) · CR package not started | Open Conversation Room Completion in a new thread |
+| 2026-07-26 | Conversation Room Completion — anti-loop gap check | Full stage/area inspection; dirty-WIP map; 34/34 CR unit tests pass on WIP; plan doc written; tip `03ee8a7` pinned | `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md` (uncommitted) · docs-only diff | Tagia: CR-D1–CR-D5 + approve CR-1 (protect dirty WIP) | Await Tagia decisions; then CR-1 selective staging package |
+| 2026-07-26 | Protect CR completion plan + CR-D1–CR-D5 | Five decisions recorded in plan + Master List; real-payment gate added to External Soft-Opening; CR-1–CR-5 order approved | subject `docs: lock Conversation Room completion plan` · full hash in return report · docs-only staging | Materials dual UX (Board) · CR-1 not started | Open CR-1 — validate and protect existing CR WIP |
 
 ---
 
@@ -315,7 +325,10 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 
 ## CURRENTLY IN PROGRESS: Conversation Room Completion
 
-**Status:** IN PROGRESS — **not started** (opens after Voice doctrine protect)  
+**Status:** IN PROGRESS — **plan protected 2026-07-26; CR-D1–CR-D5 answered; CR-1 not started**  
+**Plan:** `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md` — completed-work inventory, dirty-WIP map, gap table, anti-rewrite classification, **approved** order CR-1 → CR-5, decisions CR-D1–CR-D5 answered  
+**Locked genuine gaps:** (1) intake answers bypass the attributed working-draft history → **CR-3** · (2) no full end-to-end Conversation Room certification exists → **CR-4**. Neither justifies rewriting the working stage machine.  
+**Approved package order:** CR-1 validate + protect existing WIP → CR-2 truth cleanup → CR-3 intake attribution → CR-4 end-to-end certification → CR-5 obsolete-path dependency + archive-candidate audit. **CR-1 must not absorb CR-2 through CR-5.**  
 **Purpose:** Complete the Conversation Room customer journey without a recommendation engine and without reviving the discontinued Live Host.  
 **Boundary:** Product construction only within an approved Conversation Room package — selective staging around dirty WIP. Follow Voice doctrine. No Package 4 Host. No fake recommendation intelligence.
 
@@ -650,6 +663,7 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 May follow Customer One; must precede outside customers.
 
 - [ ] Customer-One defects resolved
+- [ ] **Real, integrated, tested, and certified payment path in place** (CR-D3, 2026-07-26) — sandbox checkout is approved **for Customer-One only** and must not silently carry into external launch
 - [ ] Repeated clean E2E runs
 - [ ] External account isolation verified
 - [ ] Customer data separation verified
@@ -664,7 +678,7 @@ May follow Customer One; must precede outside customers.
 - [ ] Visual Quality Queue blockers resolved
 - [ ] All “Before External Soft Opening” items resolved
 
-**Soft-opening readiness: 0 of 14 gates complete.**
+**Soft-opening readiness: 0 of 15 gates complete.**
 
 ---
 
