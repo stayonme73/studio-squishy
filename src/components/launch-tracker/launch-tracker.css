@@ -1,0 +1,202 @@
+/* Temporary Launch Tracker — owner planning view. Uses existing utility tokens. */
+
+.lt-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+  max-width: 52rem;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0.75rem 0 2rem;
+}
+
+.lt-header {
+  min-width: 0;
+}
+
+.lt-header__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--studio-muted, #6b6560);
+}
+
+.lt-header__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  line-height: 1.2;
+  color: var(--studio-ink, #1f1a17);
+}
+
+.lt-header__lead,
+.lt-header__meta {
+  margin: 0.5rem 0 0;
+  color: var(--studio-muted, #6b6560);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.lt-doc {
+  min-width: 0;
+  overflow-x: auto;
+  padding: 1rem 1.1rem 1.35rem;
+}
+
+.lt-heading {
+  margin: 1.35rem 0 0.55rem;
+  line-height: 1.25;
+  color: var(--studio-ink, #1f1a17);
+  scroll-margin-top: 1rem;
+}
+
+.lt-heading--h1 {
+  font-size: 1.45rem;
+}
+
+.lt-heading--h2 {
+  font-size: 1.2rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(31, 26, 23, 0.12);
+}
+
+.lt-heading--h3 {
+  font-size: 1.05rem;
+}
+
+.lt-heading--h4,
+.lt-heading--h5,
+.lt-heading--h6 {
+  font-size: 1rem;
+}
+
+.lt-heading--notes {
+  color: var(--studio-ink, #1f1a17);
+  background: rgba(184, 134, 11, 0.08);
+  border-left: 3px solid rgba(184, 134, 11, 0.55);
+  padding: 0.35rem 0.65rem;
+  border-radius: 0 0.35rem 0.35rem 0;
+}
+
+.lt-heading--active {
+  background: rgba(46, 125, 110, 0.12);
+  border-left: 3px solid rgba(46, 125, 110, 0.7);
+  padding: 0.45rem 0.7rem;
+  border-radius: 0 0.4rem 0.4rem 0;
+}
+
+.lt-p {
+  margin: 0.45rem 0;
+  line-height: 1.5;
+  color: var(--studio-ink, #1f1a17);
+}
+
+.lt-quote {
+  margin: 0.75rem 0;
+  padding: 0.55rem 0.85rem;
+  border-left: 3px solid rgba(31, 26, 23, 0.2);
+  background: rgba(31, 26, 23, 0.04);
+  border-radius: 0 0.35rem 0.35rem 0;
+}
+
+.lt-quote p {
+  margin: 0.25rem 0;
+}
+
+.lt-list,
+.lt-checklist {
+  margin: 0.45rem 0;
+  padding-left: 1.2rem;
+}
+
+.lt-checklist {
+  list-style: none;
+  padding-left: 0;
+}
+
+.lt-check {
+  display: flex;
+  gap: 0.45rem;
+  align-items: flex-start;
+  margin: 0.35rem 0;
+  line-height: 1.45;
+}
+
+.lt-check__box {
+  flex: 0 0 auto;
+  margin-top: 0.05rem;
+}
+
+.lt-check--done .lt-check__text {
+  opacity: 0.85;
+}
+
+.lt-check--done del {
+  text-decoration: line-through;
+}
+
+.lt-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 0.65rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 18rem;
+}
+
+.lt-table th,
+.lt-table td {
+  border: 1px solid rgba(31, 26, 23, 0.14);
+  padding: 0.4rem 0.55rem;
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+}
+
+.lt-table th {
+  background: rgba(31, 26, 23, 0.05);
+  font-weight: 600;
+}
+
+.lt-hr {
+  border: 0;
+  border-top: 1px solid rgba(31, 26, 23, 0.14);
+  margin: 1.25rem 0;
+}
+
+.lt-code {
+  margin: 0.65rem 0;
+  padding: 0.7rem 0.85rem;
+  overflow-x: auto;
+  background: rgba(31, 26, 23, 0.05);
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.lt-doc a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.lt-doc del {
+  text-decoration: line-through;
+}
+
+@media (max-width: 420px) {
+  .lt-page {
+    padding: 0.5rem 0 1.5rem;
+  }
+
+  .lt-doc {
+    padding: 0.85rem 0.75rem 1.1rem;
+  }
+}

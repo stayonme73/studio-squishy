@@ -62,6 +62,8 @@ export default function FileRoomHeader({
           <p className="fr-header__meta">
             <Link href={OWNER_CONSOLE_ROUTE}>Owner Console</Link>
             {" · "}
+            <Link href="/file-room/launch-tracker">Launch Tracker</Link>
+            {" · "}
             <Link href="/file-room/studio-self-test">Studio Self-Test</Link>
           </p>
         ) : null}
