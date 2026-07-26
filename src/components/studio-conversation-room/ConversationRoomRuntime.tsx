@@ -809,8 +809,9 @@ export default function ConversationRoomRuntime({
   function handleChangeRoute() {
     setPlanBridgeError(null);
     setDetailJobId(null);
+    const base = projectDraft ?? bootConversationProjectDraft(draft);
     const recommended =
-      readRouteRecommendation(projectDraft)?.roadId ??
+      readRouteRecommendation(base)?.roadId ??
       recommendRouteFromProjectNeed(draft.projectNeed);
     setStageAndPersist("route");
     closeActivityPanel();
