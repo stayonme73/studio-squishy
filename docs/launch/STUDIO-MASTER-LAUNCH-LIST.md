@@ -1,8 +1,123 @@
 # The Studio — Master Launch List
 
-**Living checklist.** Carry this document into every new thread alongside [`STUDIO-LAUNCH-WORKING-PROTOCOL.md`](./STUDIO-LAUNCH-WORKING-PROTOCOL.md).
+**Living launch control tower.** Carry with [`STUDIO-LAUNCH-WORKING-PROTOCOL.md`](./STUDIO-LAUNCH-WORKING-PROTOCOL.md) and [`CUSTOMER-FACING-ROOM-INVENTORY.md`](./CUSTOMER-FACING-ROOM-INVENTORY.md). Temporary owner view: `/file-room/launch-tracker`.
 
-Completed work stays crossed out with evidence. Only one item is marked **CURRENTLY IN PROGRESS**.
+Completed work stays visible and crossed out with evidence. Only one item is **CURRENTLY IN PROGRESS**.
+
+---
+
+## Daily Snapshot
+
+| Field | Value |
+|---|---|
+| Protected tip | `65f11c6476b7b618d7950e9b2c44948c5e37f39d` — `docs: lock customer-facing room inventory` |
+| Branch | `fix/discovery-responsive-layout` |
+| Sync | **0 ahead / 0 behind** |
+| Current active item | **Studio Voice Definition and Customer-Presence Doctrine** |
+| Most recently completed | Customer-Facing Room Inventory (`65f11c6`) |
+| Next three priorities | 1) Studio Voice definition · 2) Conversation Room completion · 3) Customer communication access |
+| Active blockers | Purchased-room Auth Route/Data Protection — locked **before Customer-One** (does **not** block Voice docs) |
+| Decisions waiting | **1** — Materials We Still Need dual UX (Board package) |
+| Customer-One readiness | **3 of 23** readiness gates complete (see § Customer-One Readiness Gate) |
+| Last updated | 2026-07-26 |
+
+---
+
+## Status Legend
+
+| Status | Meaning |
+|---|---|
+| **COMPLETE** | Built, verified, accepted, and protected |
+| **COMPLETE WITH LIMITS** | Built and protected, but an explicit dependency or launch condition remains |
+| **READY TO PROTECT** | Finished and reviewed but not committed/pushed |
+| **IN PROGRESS** | Current approved package |
+| **PARTIAL** | Real functionality exists; definition of done not met |
+| **SCAFFOLD** | Shell exists; launch behavior incomplete |
+| **MISSING** | Required surface or behavior does not exist |
+| **BLOCKED** | Cannot safely proceed without correction or owner decision |
+| **DECISION NEEDED** | Waiting for Tagia |
+| **DEFERRED** | Intentionally scheduled later |
+| **PARKED** | Outside launch scope |
+| **OBSOLETE** | No longer part of the live customer path |
+| **DISCONTINUED** | Owner-locked: will not continue building this direction |
+
+### Done vs launch-ready
+
+| Term | Meaning |
+|---|---|
+| **Built** | Implementation exists |
+| **Tested** | Targeted proof passed |
+| **Certified** | Approved launch contract passed |
+| **Protected** | Committed and pushed |
+| **Launch-ready** | Built, tested, certified where required, protected, integrated, truthful, accessible, responsive, and safe for Customer One |
+
+A task may be **complete** but **not launch-ready** if a required dependency remains (for example Auth protection, mobile proof, or Voice definition).
+
+### Completion evidence rule
+
+Every completed item must show available evidence: commit hash · subject · tests · certification · production build · desktop/phone/360 · access-control · owner acceptance · known limits · launch-ready vs technically complete.
+
+- Use **Evidence not yet pinned** when evidence exists but has not been re-verified.
+- Use **No dedicated certification recorded** when no certification exists.
+- Do **not** invent hashes, totals, dates, or proof.
+- Do **not** silently treat an untested feature as complete.
+- A prior package test does **not** automatically certify later integrated behavior.
+
+---
+
+## Communication Notebook
+
+> Temporary owner ↔ Scout notebook. Source of truth is this markdown file. Refresh `/file-room/launch-tracker` after Scout saves.
+
+### Tagia Notes
+
+- **2026-07-26 — Standing rule (locked):** Important Chat guidance must not live only in chat. Send it to Scout and record it here or in the relevant package document.
+- **2026-07-26 — Inventory accepted:** Classifications and completion order accepted. Inventory marked complete.
+- **2026-07-26 — LOCKED:** Purchased-room authentication and data protection must be completed and certified **before Tagia begins the Customer-One trial.** Not Parking Lot. Does not stop Studio Voice definition.
+- **2026-07-26 — Master Launch List must show the full picture** in true priority order: completed, protected, tested, certified, partial, missing, blocked, deferred, parked — with evidence under every completed item. “Built” ≠ “launch-ready.”
+- **2026-07-26 — DISCONTINUED:** Live Host / Voice Host will not continue. Studio Voice remains **without** a mascot or hovering character. Recommendation engine will **not** continue for launch.
+- **2026-07-26 — Legacy pages:** Leave the live customer path; **archive before any deletion.** Tagia wants verified current and intended page counts distinguishing routes, states, overlays, redirects, scaffolds, internal routes, and archive candidates.
+- **2026-07-26 — Launch control tower accepted:** Tagia accepts the priority ordering and launch-control structure.
+- **2026-07-26 — OFFICIAL PAGE COUNT LOCK:** Current repository has **16** live customer-facing routed pages. Approved Customer-One target is **15**. **Fourteen** is only a possible intermediate alias-consolidation count (Lobby). **Thirteen** is the later target after the unified Review/Final/Delivery room. Page-count reduction does **not** authorize premature route removal, archiving, or deletion.
+- **2026-07-26 — Archive-before-delete remains locked.** Live Host and recommendation-engine directions remain discontinued.
+
+### Scout Notes
+
+- **2026-07-26** — Protocol · Master List · Launch Tracker · Inventory protected through `65f11c6`. Tip sync 0/0.
+- **2026-07-26 — Full-list rewrite:** Reordered by launch priority; status legend; Done vs launch-ready; Customer-One and soft-opening gates; discontinued Host/recommendation directions; archive policy; verified page counts from `src/app/**/page.tsx` (53 route files) + inventory.
+- **Route count findings:** Live customer-facing routed pages **16** · CR/Lobby/Review states listed separately · Redirect-only **19** · Scaffolds **3** · Internal-only **15** (includes 3 ungated tooling routes that must enter Auth audit) · Archive candidates **19** (redirect shells first) · Missing approved surfaces **5**.
+- **2026-07-26 — Page-count arithmetic (locked):**
+  - **16 → 15 (Customer-One):** Reclassify `/verify-email/pending` as a verification **state** of `/verify-email` for the approved live-room target (same pattern as Job Review under `/feedback-studio`). It remains a real route file today; Customer-One target does not treat it as a separate journey room.
+  - **15 → 14 (optional intermediate):** Consolidate Lobby aliases — `/studio-lobby` becomes **REDIRECT** to canonical `/`. Not required for Customer-One unless Tagia later changes the launch order.
+  - **14 → 13 (later unified room):** Merge `/feedback-studio` + `/deliverables` into one unified Review/Final/Delivery room after Voice, CR, communication, Board truth, Tagia design approval, construction, and certification.
+  - Compatibility: keep `/studio-lobby`, `/verify-email/pending`, `/review-room`, and other redirects until replacement paths are verified — page-count milestones are not permission to remove routes early.
+- **Archive caution:** Do not archive redirect shells until replacement live path is verified for bookmarks. Do not delete Host/recommendation code without dependency audit — tests, Owner QA seeds, and dirty WIP still reference Host-era and recommendation-era surfaces.
+- **Recommended next action:** Protect this documentation checkpoint, then begin Studio Voice Definition (docs only) in a new thread.
+
+### Decisions Needed
+
+| # | Question | Affected | Why it matters | Options | Scout recommendation | Owner decision | Status | Date |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Auth Route/Data Protection timing | Auth + Board | Purchased rooms ungated | After Board / with Board / earlier if needed | After Board truth; before Customer-One; pull earlier if cert needs it | Schedule after Board truth/completeness; before Customer-One; may pull earlier for cert | **answered** | 2026-07-26 |
+| 2 | Materials We Still Need dual UX | Board truth | CR Intake + Board card both say materials | Keep two-phase / unify copy / merge UI | Identify both; no redesign in inventory | Carry into Board package; no redesign selected yet | **waiting** | — |
+| 3 | Coming-soon URLs | Nav truth | Scaffold routes exist | Park / hide / build | Do not advertise as available | Nav must not advertise unfinished routes; placeholders may remain internal/dev | **answered** | 2026-07-26 |
+| 4 | Ungated internal tooling | Auth audit | `/studio`, `/textures`, `/decision-learner` | Gate now / before soft opening | Include in Auth audit | Must be inaccessible to signed-out and customers; include in Auth audit; no Owner Console expansion | **answered** | 2026-07-26 |
+| 5 | Voice definition scope | Voice package | Prevent invented behavior | Docs-only whole journey | Docs-only; no Package 4 Host | Documentation only; define listed behaviors; no Host, no engine, no redesign, no TTS/STT change | **answered** | 2026-07-26 |
+| 6 | Unified-room design kickoff | Review/Delivery | Room lock | After CR+comms+Board / later | After Voice, CR, comms, Board | After Voice, CR completion, communication access, Board truth; no construction before Tagia layout approval | **answered** | 2026-07-26 |
+
+### Blocker Notes
+
+> Hey Tagia, Scout and I found something we need to fix before moving on.
+
+- **Purchased-room Auth Route/Data Protection** — “Before moving on” = **before Customer-One and before real customers see purchased rooms**, **not** before Studio Voice documentation. Surfaces: Studio Board · Project Record · Review · Job Review · Final Delivery / Deliverables · any purchased-project data route · internal tools customers must not access. Must not enter Parking Lot.
+
+### Daily Progress Notes
+
+| Date | Active task | Work completed | Proof | Still open | Next action |
+|---|---|---|---|---|---|
+| 2026-07-26 | Launch process + inventory | Protocol · Master List · Tracker · Inventory accepted/protected | `e68ccbd` · `50915da` · `28bc218` · `65f11c6` · 0/0 | Master List full-priority rewrite | Tagia reviews reordered list; then protect; then Voice docs |
+| 2026-07-26 | Master Launch List control-tower pass | Full priority reorder · discontinued directions · archive policy · verified page counts · readiness gates | Docs only · uncommitted pending Tagia review | Voice not started · Materials dual UX waiting | Protect docs when approved |
+| 2026-07-26 | Page-count lock + protect | Official counts locked: 16 current · 15 Customer-One · 14 Lobby intermediate only · 13 later unified | Documentation checkpoint commit · 0/0 | Studio Voice definition not started | Begin Studio Voice Definition docs in a new thread |
 
 ---
 
@@ -10,207 +125,209 @@ Completed work stays crossed out with evidence. Only one item is marked **CURREN
 
 - Tagia is **Customer One**
 - Prove The Studio can grow Tagia's business
-- Prove deadlines, quality, communication, review, and delivery **before** outside customers arrive
-
----
+- Prove deadlines, quality, communication, review, and delivery **before** outside customers
 
 ## 2. Launch Gate
 
 > Is this required for Tagia to submit, track, review, resolve issues with, and receive a real project successfully?
 
-If no → **Parking Lot** (§15).
-
----
+If no → **Parking Lot**.
 
 ## 3. Timeline
 
 | Phase | Target |
 |---|---|
 | **August** | Finish customer-facing experience and define Studio Voice |
-| **Early September** | Connect production and the team |
+| **Early September** | Connect production and team |
 | **Mid-to-Late September** | Intensive end-to-end testing |
 | **Late September / Early October** | Tagia Customer-One trial |
 | **Mid-to-Late October** | Controlled external soft opening |
 
-October is the backstop. Every package should note schedule impact.
+---
+
+# Hierarchy A — Protected and completed foundation
+
+Keep crossed out. Evidence beneath each. Separate packages stay separate.
+
+### Customer entry
+
+- [x] ~~**Studio Lobby**~~ — **COMPLETE WITH LIMITS**
+  - Status: Visual V1 **LOCKED** (`docs/studio-lobby-v1-locked.md`)
+  - Limits: Lobby WIP dirty locally; migration Lobby↔CR round-trip cert pending; Lobby `sourceHref` uncommitted
+  - Launch-ready: **not yet** (integration + dirty WIP + Voice round-trip)
+  - Evidence not yet pinned for every Lobby commit; Entry Film commits below
+
+- [x] ~~**Lobby Entry Film + returning-client flow**~~ — **COMPLETE WITH LIMITS**
+  - Commit: `4be13de93c5ebb0230ccc39fb035d89aa8a59d29` — `feat: lock Lobby Entry Film and certify auth spine to Studio Board`
+  - Commit: `e5902a367fe1d2f48c27ca37950221659a546451` — `fix: keep Lobby Entry Film reopen after dismiss`
+  - Certification: live-cert slices referenced in Conversation Room preservation docs (Evidence not fully re-pinned this pass)
+  - Limits: Dirty Lobby WIP; timeout reopens film by design
+  - Launch-ready: **near** for entry; full journey still open
+
+### Account and auth (Packages 1–4)
+
+- [x] ~~**Sign Up / Account Creation Foundation**~~ — **COMPLETE WITH LIMITS**
+  - Auth ledger Package 1: **Cold-certified PASS** (2026-07-19)
+  - Limits: Auth Packages 5–6–8 not started; purchased-room gates missing
+  - Launch-ready: **account creation yes**; **journey protection no**
+
+- [x] ~~**Email Verification**~~ — **COMPLETE**
+  - Auth ledger Package 2: **Cold-certified PASS** + live-delivery PASS 2026-07-19
+  - Launch-ready: **yes for verification path**
+
+- [x] ~~**Sign In / Session Hardening**~~ — **COMPLETE WITH LIMITS**
+  - Auth ledger Package 3: **Cold-certified PASS** (2026-07-19)
+  - Limits: Route/data protection not started
+  - Launch-ready: **sign-in yes**; **purchased rooms no**
+
+- [x] ~~**Password Recovery**~~ — **COMPLETE**
+  - Commit: `2d2be73419e66b7d62a8abc8aad1151b990f754d` — `feat(auth): Password Recovery Package 4 PASS`
+  - Auth ledger Package 4: **Cold-certified PASS** (2026-07-20)
+  - Launch-ready: **yes for recovery path**
+
+- [x] ~~**Password visibility controls**~~ — **COMPLETE WITH LIMITS**
+  - Implementation: `src/components/auth/UtilityPasswordField.tsx` (show/hide password)
+  - Evidence not yet pinned to a dedicated commit subject
+  - No dedicated certification recorded
+  - Launch-ready: **built**; treat as present on auth forms
+
+- [x] ~~**Inactivity timeout**~~ — **COMPLETE WITH LIMITS**
+  - Commit: `17a7a6b4bb40e5afc796a326528d99be8c2d368b` — `feat(auth): add client inactivity timeout with live countdown`
+  - Limits: Timeout files currently dirty WIP; must not absorb into unrelated packages
+  - Launch-ready: **function exists**; re-cert after dirty WIP settles
+
+### Conversation Room foundation
+
+- [x] ~~**Conversation Room framework (hardware + controllers)**~~ — **COMPLETE WITH LIMITS**
+  - Architecture locked: `docs/studio-conversation-framework-v1-locked.md`
+  - Limits: Package 3 visual cert + Tagia commit pending; Package 4 Voice Host **DISCONTINUED**; substantial dirty WIP
+  - Launch-ready: **framework yes**; **full customer journey no**
+
+- [x] ~~**Lobby round-trip state preservation (session snapshot)**~~ — **COMPLETE WITH LIMITS**
+  - Contract: `studioConversationSession` preserves phase/step; working draft required for answers/services
+  - Evidence not yet pinned as a single commit this pass
+  - Limits: Session snapshot alone is insufficient for project data
+  - Launch-ready: **partial** until cross-room proof closes
+
+- [x] ~~**Voice preference before first speech + Voice On/Off persistence**~~ — **COMPLETE WITH LIMITS**
+  - Commit: `b13fe75fc9a77a0f7553dbe0a721075465c63e83` — `feat: gate Conversation Room narration with Voice On/Off`
+  - Commit: `0f35fdb29880f0727b5357e31080cec416e494f7` — `fix: persist Studio browser voice selection`
+  - Limits: Studio Voice doctrine not yet defined; Host character discontinued
+  - Launch-ready: **preference yes**; **Voice doctrine no**
+
+- [x] ~~**Signed-out Intake handoff**~~ — **COMPLETE WITH LIMITS**
+  - Commit: `edb3a9eb301ada87565de6cfad9f825bc36add23` — `feat: lock signed-out Intake handoff to Sign In`
+  - Launch-ready: **handoff path yes**; Auth P6 still required later
+
+- [x] ~~**Signed-in / dual-path account handoff after Intake**~~ — **COMPLETE WITH LIMITS**
+  - Commit: `3e28e17ba54daf5cb486ce1ba5360dbb1d9f1cd4` — `feat: dual-path account handoff after Intake`
+  - Launch-ready: **handoff path yes**; Board auth gate still missing
+
+- [x] ~~**Studio Board welcome handoff**~~ — **COMPLETE WITH LIMITS**
+  - Protected in branch history with Entry Film / auth spine work (`4be13de` family)
+  - Limits: Board customer truth incomplete; no server auth gate
+  - Launch-ready: **no**
+
+### Review and Delivery foundation
+
+- [x] ~~**Package 7A — Review & Delivery Stage Truth Contract**~~ — **COMPLETE**
+  - Commit: `ea81b7df36073ed16d828c3f2b952a4f8b5613c9` — `feat: add Review & Delivery stage truth contract`
+  - Launch-ready: **contract yes**; rooms still separate
+
+- [x] ~~**Package 7B1 — Review Room Stage Shell**~~ — **COMPLETE WITH LIMITS**
+  - Commit: `13baf50a668f1db362ee5d723225b5f1fcc911ac` — `feat: add Review Room stage shell`
+  - Certification: **44/44** (re-verified during 7B2)
+  - Limits: No server auth gate; unified room not built; Voice migration not started
+  - Launch-ready: **shell yes**; **Customer-One room protection no**
+
+- [x] ~~**Package 7B2 — Legacy Concept Review Customer-Path Retirement**~~ — **COMPLETE**
+  - Commit: `5b95e1218d79325a3234c9f5daeb345a5933ad1e` — `fix: retire legacy concept review from customer path`
+  - Package cert: **125/125** · 7B1 regression **44/44** · Honest Final Files **67/67** · production build green · pushed · 0/0 at time
+  - Deferred: legacy concept components retained (deletion parked)
+  - Launch-ready: **retirement yes**
+
+- [x] ~~**Production build type-safety cleanup**~~ — **COMPLETE**
+  - Commit: `41d9ffe7f8b3a5998c99d1f33d468bfe4bf8719f` — `fix: restore production build type safety`
+  - Launch-ready: **build unblock yes**
+
+- [x] ~~**Honest Final Files**~~ — **COMPLETE WITH LIMITS**
+  - Commit: `7d1f9099cca34f85b828fa0990741463b87855b3` — `fix: make final file delivery truthful`
+  - Certification: **67/67** production (`next start`)
+  - Limits: `/deliverables` has no server auth gate; Auth package required before Customer-One
+  - Launch-ready: **truthfulness yes**; **access protection no**
+
+### Help and process
+
+- [x] ~~**Help Center V1**~~ — **COMPLETE**
+  - Locked 2026-07-05 (`docs/help-center-v1-locked.md`)
+  - Commit family includes `5e7180a` — `Lock Help Center V1 policies and founder-approved documentation`
+  - Do not polish without Tagia
+  - Launch-ready: **yes for Help Center page** (CR Help overlay remains scaffold)
+
+- [x] ~~**Studio Launch Working Protocol**~~ — **COMPLETE**
+  - Commit: `e68ccbde4f6b08ae77410f2fec5370a41c06cb1b` — `docs: add Studio launch working protocol`
+
+- [x] ~~**Studio Master Launch List (initial)**~~ — **COMPLETE**
+  - Commit: `50915da9af39cbfad6cd1cd089649271fb37baf1` — `docs: add Studio master launch list`
+  - Note: This control-tower rewrite is a later documentation update (pending protection)
+
+- [x] ~~**Temporary owner Launch Tracker**~~ — **COMPLETE**
+  - Commit: `28bc218d0bf0ef294be69eb8ba24c2be88011bcd` — `feat: add temporary owner launch tracker`
+  - Certification: **18/18** · Unit tests: **11/11** · Production build: pass · Route: `/file-room/launch-tracker` · owner-only
+
+- [x] ~~**Customer-Facing Room Inventory and Gap Classification**~~ — **COMPLETE**
+  - Commit: `65f11c6476b7b618d7950e9b2c44948c5e37f39d` — `docs: lock customer-facing room inventory`
+  - Evidence: `docs/launch/CUSTOMER-FACING-ROOM-INVENTORY.md`
+  - Owner acceptance: 2026-07-26 · no product code changed · classifications accepted
+  - Launch-ready: **documentation complete**
+
+### Also protected (supporting)
+
+- [x] ~~**Seal legacy Host doors into Conversation Room**~~ — **COMPLETE**
+  - Commit: `1d86bea47e8af1dd2a45169e9456da7a696fb439` — `fix: seal legacy Host doors into Conversation Room`
+- [x] ~~**Soften Conversation Room route recommendation copy for honesty**~~ — **COMPLETE WITH LIMITS**
+  - Commit: `fc110ec9d67ef1503fc290fdbcb2666bc885f7ed` — `fix: soften Conversation Room route recommendation copy for honesty`
+  - Limits: Recommendation engine still discontinued for launch; remaining keyword/badge surfaces need audit during CR completion
+
+**Completed-item count (foundation list above):** 24 crossed-off packages/surfaces with evidence or explicit limits.
 
 ---
 
-## 4. Current Repository Checkpoint
+# Hierarchy B — Current active item
 
-| Field | Value |
-|---|---|
-| Repo | `C:\Users\tagia\studio-squishy` |
-| Branch | `fix/discovery-responsive-layout` |
-| Protected tip | `28bc218d0bf0ef294be69eb8ba24c2be88011bcd` |
-| Sync | 0 ahead / 0 behind |
-| Production build | Green |
-| Unrelated dirty WIP | Protected — see §16 |
-| Lobby `sourceHref` | Remains **uncommitted** (`/studio-lobby?lobbyEntry=reset`) |
-| Supporting inventory | `docs/launch/CUSTOMER-FACING-ROOM-INVENTORY.md` (draft — not committed until Tagia approves) |
+## CURRENTLY IN PROGRESS: Studio Voice Definition and Customer-Presence Doctrine
 
----
+**Status:** IN PROGRESS  
+**Boundary:** Documentation and behavior definition only.
 
-## Communication Notebook
+**Must define:**
 
-> Temporary owner ↔ Scout notebook. All notes live in this markdown file. The Launch Tracker page is only a readable view. Refresh the page after Scout saves updates.
+- Voice identity and role (Studio Representative — **not** mascot, Host character, or hovering person)
+- Customer-presence rules
+- Voice On / Voice Off behavior
+- Orientation and silence / waiting behavior
+- Speaking and listening boundaries
+- Customer control
+- Escalation boundaries (money, deadlines, complaints, refunds, reputation, trust)
+- Communication with customer, machine, Chat, team, and Tagia
+- Truthfulness boundaries
+- Handoff behavior
+- Accessibility and control rules
+- Room-by-room Voice dependency matrix (required / optional / absent)
 
-### Tagia Notes
+**Must not:**
 
-Observations, priorities, visual concerns, decisions, or instructions from Tagia.
-
-- **2026-07-26 — Standing rule (locked):** Important Chat guidance must not live only in chat. Send it to Scout and record it in this Communication Notebook or the relevant package document. This covers decisions, priority changes, warnings, blockers, scope limits, definitions, timeline changes, owner instructions, completion evidence, and anything Scout needs to remember in the next thread. Casual conversation does not need logging.
-- **2026-07-26 — Commit separation approved:** Protect the Master Launch List and the temporary Launch Tracker page as two isolated commits (`docs:` then `feat:`), then return immediately to the first launch item: Customer-Facing Room Inventory and Gap Classification.
-- **2026-07-26 — Inventory accepted:** Tagia accepts the Customer-Facing Room Inventory classifications and the recommended completion order. Inventory may be marked complete. Evidence: `docs/launch/CUSTOMER-FACING-ROOM-INVENTORY.md`.
-- **2026-07-26 — LOCKED launch requirement:** **Purchased-room authentication and data protection must be completed and certified before Tagia begins the Customer-One trial.** Affected surfaces: Studio Board, Project Record, Review, Job Review, Final Delivery / Deliverables, and any route exposing purchased-project data. This is a required launch-order insertion. It does **not** stop the Studio Voice definition package. It **must not** move to the Parking Lot and **cannot** slip beyond Customer-One.
-
-### Scout Notes
-
-Progress summaries, technical discoveries, risks, unfinished work found, test findings, questions requiring Tagia's decision, schedule impact, and recommended next action.
-
-- **2026-07-26** — Studio Launch Working Protocol protected (`e68ccbd`). Master Launch List draft includes Communication Notebook. Temporary owner-only Launch Tracker is ready for Tagia review at `/file-room/launch-tracker` (cert 18/18). Updates appear after page refresh; no separate notes database. Recommended next action after Launch Tracker is protected: Customer-Facing Room Inventory and Gap Classification.
-- **2026-07-26 (later)** — Master Launch List protected (`50915da`). Temporary Launch Tracker protected (`28bc218`). Cert 18/18 · unit 11/11 · production build pass · sync 0/0. Route `/file-room/launch-tracker`. Update behavior: Scout edits markdown → Tagia refreshes page. Customer-Facing Room Inventory opened (inspection only). Supporting doc: `docs/launch/CUSTOMER-FACING-ROOM-INVENTORY.md`.
-- **2026-07-26 — Inventory accepted and protected:** Tagia accepted the classifications and completion order. Inventory marked **complete**. Auth Route/Data Protection **locked before Customer-One** (inserted as ordered work item 6). Five Decisions Needed answered (Auth timing · coming-soon URLs · ungated internal tooling · Voice definition scope · unified-room kickoff). **Materials dual UX remains waiting** and is carried into the Studio Board truth/completeness package. No product code changed. Next active item: **Studio Voice Definition and Customer-Presence Doctrine** — documentation only; Package 4 Voice Host remains unauthorized.
-- **2026-07-26 — Inventory discoveries:** Conversation Room is the live front door; Route Map / Project Builder / Checkout / Intake standalone pages are obsolete redirects. Help Center + Lobby locked complete. Review shell + Honest Final Files certified but still separate rooms. Customer complaint/refund UI and two-way communication are **missing**. Auth Packages 5–6–8 not started — purchased rooms lack server auth gates. Substantial CR/Lobby/Owner QA/timeout dirty WIP collision risk. Recommended first construction after inventory approval: **Studio Voice definition** (docs), not room rebuild.
-
-### Decisions Needed
-
-Every entry includes: question · why needed · affected package · smallest options · Scout recommendation · status (`waiting` / `answered`).
-
-1. **Auth route/data protection timing** · Affected: Auth + Board truth · **Status: answered (2026-07-26)** · **Decision:** Schedule Auth Route/Data Protection **after** Studio Board truth/completeness and **before** the Customer-One trial. May be pulled earlier if a preceding package needs safe purchased-room access for certification. **Cannot slip beyond Customer-One.**
-2. **Materials We Still Need dual UX** · Why: CR Intake + Board card both say materials · Affected: Studio Board truth/completeness package · **Status: waiting** · **Handling:** Not resolved during inventory protection. Carried into the Board truth package. Inventory records both locations and the duplication risk without selecting a redesign.
-3. **Coming-soon URLs** (`/account`, `/past-campaigns`, `/creative-room`) · **Status: answered (2026-07-26)** · **Decision:** Customer-facing navigation must not advertise unfinished or scaffold routes as available services. Direct placeholder routes may remain internally for development only if they are not exposed as real customer destinations. The truthfulness audit belongs to the relevant customer-room package.
-4. **Ungated internal tooling URLs** (`/studio`, `/studio-board/textures`, `/decision-learner`) · **Status: answered (2026-07-26)** · **Decision:** Internal tools must remain inaccessible to signed-out and normal customer users. Include these routes in the Auth Route/Data Protection audit. Do not broaden this into a full Owner Console package.
-5. **Voice definition scope** · **Status: answered (2026-07-26)** · **Decision:** The next package is **documentation and behavior definition only**. Must define: customer orientation · availability without hovering · speaking boundaries · listening boundaries · silence and waiting behavior · customer control · escalation rules · communication with customer, machine, Chat, team, and Tagia · truthfulness boundaries · handoff behavior · Voice On / Voice Off behavior · accessibility behavior · where Voice is required, optional, or absent. Must **not**: build Package 4 Voice Host · add a recommendation engine · redesign rooms · change TTS/STT architecture · modify product code unless Tagia separately approves a later construction package.
-6. **Unified-room design kickoff timing** · **Status: answered (2026-07-26)** · **Decision:** Design approval occurs **after** Studio Voice definition, Conversation Room completion, customer communication access, and Studio Board truth/completeness. Do not construct or redesign the unified Review/Final/Delivery room before Tagia approves its physical layout and behavior. Slide-out tools panel and separate communication panel remain locked future requirements.
-
-### Blocker Notes
-
-Use only when work cannot safely continue. Visible warning must begin:
-
-> Hey Tagia, Scout and I found something we need to fix before moving on.
-
-- **2026-07-26 — Hey Tagia, Scout and I found something we need to fix before moving on.**
-  - **What was found:** Purchased customer rooms (Studio Board, Project Record, Review, Job Review, Final Delivery / Deliverables) have no server-side auth gate. Auth Packages 5, 6, and 8 are Not started. Internal tooling routes are also ungated.
-  - **Why it matters:** A signed-out or wrong-user visitor could reach purchased-project data by URL. That breaks submit / track / review / receive trust for Customer One.
-  - **Scope of "before moving on":** This means **before the Customer-One trial and before exposing purchased rooms to real customers** — *not* before the approved Studio Voice documentation package. Voice definition proceeds now.
-  - **Smallest correction:** Auth Route/Data Protection package covering purchased customer rooms plus internal tooling routes. No room redesign, no Owner Console expansion.
-  - **Affected package:** Auth Route/Data Protection (scheduled after Board truth, before Customer-One).
-  - **What remains untouched:** All product code and all dirty WIP — inventory and this checkpoint are documentation only.
-  - **Where work returns:** Studio Voice Definition → Conversation Room completion → communication access → Board truth → **Auth Route/Data Protection** → unified-room design approval.
-
-### Daily Progress Notes
-
-| Date | Active task | Work completed | Proof | Still open | Next action |
-|---|---|---|---|---|---|
-| 2026-07-26 | Launch process documents | Protocol committed and pushed | `e68ccbd` · 0 ahead / 0 behind | Master Launch List draft + Launch Tracker page | Finish and protect Launch Tracker, then begin room inventory |
-| 2026-07-26 | Launch Tracker protection | Master List + Launch Tracker committed and pushed | `50915da` · `28bc218` · cert 18/18 · unit 11/11 · build pass · 0/0 | Room inventory | Open Customer-Facing Room Inventory |
-| 2026-07-26 | Customer-Facing Room Inventory | Inventory draft written; notebook updated; classifications complete for review | `docs/launch/CUSTOMER-FACING-ROOM-INVENTORY.md` (uncommitted) · no product code changed | Tagia review of inventory · lock completion order · answer Decisions Needed | After approval: protect inventory docs, then Studio Voice definition |
-| 2026-07-26 | Inventory acceptance and protection | Tagia accepted classifications and order; Auth protection locked before Customer-One; five decisions answered; inventory marked complete | Inventory + Master List protected as documentation checkpoint · no product code changed | Materials dual UX (waiting, carried to Board package) · Studio Voice definition not started | Begin Studio Voice Definition and Customer-Presence Doctrine in a new thread |
-
----
-
-## 5. Completed and Protected Work
-
-### Customer entry and account
-
-- [x] ~~Lobby entry film and returning-client flow~~
-  - Latest protecting commit: `e5902a367fe1d2f48c27ca37950221659a546451` — `fix: keep Lobby Entry Film reopen after dismiss`
-  - Earlier Lobby commits also in branch history; full commit set not re-enumerated at this checkpoint.
-- [x] ~~Authentication and password recovery~~
-  - Type-safety corrections protected in `41d9ffe` (below).
-- [x] ~~Inactivity timeout~~
-  - Protected in branch history. Commit hash not re-verified at this checkpoint.
-
-### Conversation Room
-
-- [x] ~~Conversation Room framework~~
-  - Protected in branch history. Commit hash not re-verified at this checkpoint.
-- [x] ~~Voice preference before speech~~
-  - Latest protecting commit: `0f35fdb29880f0727b5357e31080cec416e494f7` — `fix: persist Studio browser voice selection`
-- [x] ~~Signed-in and signed-out Intake handoff~~
-  - Protected in branch history. Commit hash not re-verified at this checkpoint.
-- [x] ~~Studio Board handoff~~
-  - Protected in branch history. Commit hash not re-verified at this checkpoint.
-
-### Review and Delivery
-
-- [x] ~~**Package 7A** — Review & Delivery Stage Truth Contract~~
-  - Commit: `ea81b7df36073ed16d828c3f2b952a4f8b5613c9`
-  - Subject: `feat: add Review & Delivery stage truth contract`
-
-- [x] ~~**Package 7B1** — Review Room Stage Shell~~
-  - Commit: `13baf50a668f1db362ee5d723225b5f1fcc911ac`
-  - Subject: `feat: add Review Room stage shell`
-  - Certification: 44/44 (re-verified during 7B2)
-
-- [x] ~~**Production build type-safety cleanup**~~
-  - Commit: `41d9ffe7f8b3a5998c99d1f33d468bfe4bf8719f`
-  - Subject: `fix: restore production build type safety`
-  - Pushed: yes · Sync at time: 0 ahead / 0 behind
-  - Protected: authentication runtime behavior, password hashing parameters, stored hash compatibility, customer messages
-  - Deferred: unrelated Lobby `sourceHref` hunk left uncommitted
-
-- [x] ~~**Honest Final Files**~~
-  - Commit: `7d1f9099cca34f85b828fa0990741463b87855b3`
-  - Subject: `fix: make final file delivery truthful`
-  - Certification: **67/67** production (`certMode: production`, `next start`)
-  - Production build: green
-  - Protected: no generated placeholder packages in production; truthful preparing / partial / delivered-without-files; preview content development-only
-
-- [x] ~~**Package 7B2** — Legacy Concept Review Customer-Path Retirement~~
-  - Commit: `5b95e1218d79325a3234c9f5daeb345a5933ad1e`
-  - Subject: `fix: retire legacy concept review from customer path`
-  - Pushed: yes · Sync: 0 ahead / 0 behind
-  - Package cert: **125/125**
-  - Package 7B1 regression: **44/44**
-  - Honest Final Files: **67/67**
-  - Production build: green
-  - Protected behavior: bare `/feedback-studio` → Review Room shell · `?concept=A|B|C` inert → shell · valid `?jobId=` → job-review workspace · concept + valid `jobId` → job review wins · unknown `jobId` → unavailable-work behavior · `READY_FOR_REVIEW` no longer opens fabricated picker · Board and Project Record no longer promise concept selection · roadmap no longer contains "Choose Direction" · historical concept metadata intact
-  - Deferred: legacy concept components, generator, config, and CSS retained (deletion parked)
-
-### Process
-
-- [x] ~~**Studio Launch Working Protocol**~~
-  - Commit: `e68ccbde4f6b08ae77410f2fec5370a41c06cb1b`
-  - Subject: `docs: add Studio launch working protocol`
-  - Pushed: yes · Sync: 0 ahead / 0 behind
-  - File: `docs/launch/STUDIO-LAUNCH-WORKING-PROTOCOL.md`
-  - Includes Visual Quality Queue and off-list warning convention
-
-- [x] ~~**Studio Master Launch List**~~
-  - Commit: `50915da9af39cbfad6cd1cd089649271fb37baf1`
-  - Subject: `docs: add Studio master launch list`
-  - Pushed: yes · Sync: 0 ahead / 0 behind
-  - File: `docs/launch/STUDIO-MASTER-LAUNCH-LIST.md`
-
-- [x] ~~**Temporary owner Launch Tracker**~~
-  - Commit: `28bc218d0bf0ef294be69eb8ba24c2be88011bcd`
-  - Subject: `feat: add temporary owner launch tracker`
-  - Pushed: yes · Sync: 0 ahead / 0 behind
-  - Route: `/file-room/launch-tracker`
-  - Certification: **18/18** · Unit tests: **11/11** · Production build: pass
-  - Behavior: reads Master Launch List from disk; refresh after markdown edits; owner-only
-
----
-
-## 6. CURRENTLY IN PROGRESS
-
-### ▶ Studio Voice Definition and Customer-Presence Doctrine
-
-**Purpose:** Define how Studio Voice behaves across the customer journey so later room construction is faithful rather than invented.
-
-**Approved boundary:** Documentation and behavior definition only.
-
-**Files allowed:** New Voice definition document under `docs/` + this Master Launch List. No product code unless Tagia separately approves a construction package.
-
-**Files protected:** All product code. All dirty WIP. All locked rooms. Package 4 Voice Host remains unauthorized.
+- Build Package 4 Voice Host (**DISCONTINUED**)
+- Add a recommendation engine (**DISCONTINUED FOR LAUNCH**)
+- Redesign rooms
+- Change TTS/STT architecture
+- Modify product code unless Tagia separately approves a construction package
 
 **Definition of done:**
 
 - [ ] Voice identity and role defined
 - [ ] Customer-presence rules defined
-- [ ] Voice On / Voice Off behavior defined
+- [ ] Voice On / Off behavior defined
 - [ ] Orientation and silence behavior defined
 - [ ] Escalation boundaries defined
 - [ ] Customer, machine, Chat, team, and Tagia communication defined
@@ -220,224 +337,444 @@ Use only when work cannot safely continue. Visible warning must begin:
 - [ ] No product code or room redesign
 - [ ] Tagia review and approval received
 
-**Tests required:** None (documentation only).
-
-**Certification required:** None (documentation only).
-
-**Commit status:** Not started.
-
-**Risks / blockers:** None active. Auth Route/Data Protection is locked before Customer-One but does not block this package.
+**Prerequisites:** Inventory complete (`65f11c6`)  
+**Blocked by:** None for documentation  
+**Unlocks:** Conversation Room completion; later communication / Review / Delivery Voice behavior  
+**Risk if delayed:** Later construction invents Voice behavior
 
 ---
 
-### ✅ Previous active item — Customer-Facing Room Inventory and Gap Classification (complete)
+# Hierarchy C — Immediate launch-critical work (priority order)
 
-- [x] ~~Every customer-facing room listed~~
-- [x] ~~Each classified complete / partial / scaffold / missing / obsolete / internal-only~~
-- [x] ~~Exact completion order locked~~ — accepted by Tagia 2026-07-26
-- [x] ~~Studio Voice definition placed before further room construction where required~~
-- [x] ~~First construction package selected~~ — Studio Voice Definition and Customer-Presence Doctrine
-- [x] ~~No product code changed during inventory~~
+1. [ ] **Protect this Master Launch List control-tower rewrite** — READY TO PROTECT when Tagia approves · docs only
+2. [ ] **Studio Voice Definition and Customer-Presence Doctrine** ← *current*
+3. [ ] **Conversation Room completion without recommendation engine** — PARTIAL · dirty WIP collision risk
+4. [ ] **Customer communication and follow-up access** — MISSING
+5. [ ] **Studio Board customer truth and completeness** — PARTIAL · carries Materials dual UX decision
+6. [ ] **Purchased-room Auth Route/Data Protection** — MISSING · **LOCKED before Customer-One**
+7. [ ] **Unified Review / Final / Delivery design approval** — DEFERRED until after Voice, CR, comms, Board · Tagia approval required
+8. [ ] **Unified Review / Final / Delivery construction** — MISSING · after design approval
+9. [ ] **Revision, approval, final-file, and delivery integration** — PARTIAL across separate rooms
+10. [ ] **Complaint and issue entry** — MISSING customer UI
+11. [ ] **Refund request entry** — MISSING customer UI (API/intake gate exists; Owner Desk internal)
+12. [ ] **Customer update history** — MISSING / Board notes partial
+13. [ ] **Cross-room persistence and recovery proof** — PARTIAL (working-draft contract locked; proof bar open)
+14. [ ] **Desktop, phone, and 360px certification** — PARTIAL by package; full journey not closed
+15. [ ] **Team and production connection** — DEFERRED Early September
+16. [ ] **Repeated full-system testing** — DEFERRED Mid-to-Late September
+17. [ ] **Tagia Customer-One trial** — DEFERRED Late September / Early October
+18. [ ] **Corrections discovered during Customer One** — DEFERRED
+19. [ ] **Controlled external soft opening** — DEFERRED Mid-to-Late October
 
-Evidence: `docs/launch/CUSTOMER-FACING-ROOM-INVENTORY.md` · classifications accepted by Tagia · Auth Route/Data Protection inserted before Customer-One.
+### Auth lock (item 6)
 
----
+Purchased-room authentication and data protection **must** be completed and certified before Customer-One.
 
-## 7. Ordered Customer-Facing Work
+Affected: Studio Board · Project Record · Review · Job Review · Final Delivery · Deliverables · any purchased-project data route · internal tools normal customers must not access.
 
-1. [x] ~~**Customer-facing room inventory and gap classification**~~ — complete 2026-07-26 · evidence `docs/launch/CUSTOMER-FACING-ROOM-INVENTORY.md` · classifications and order accepted by Tagia · no product code changed
-2. [ ] **Studio Voice definition and customer-presence doctrine** ← *current*
-3. [ ] Conversation Room completion without recommendation engine
-4. [ ] Customer communication and follow-up access
-5. [ ] Studio Board customer truth and completeness
-6. [ ] **Auth Route/Data Protection for purchased rooms** — *newly discovered required work; locked before Customer-One*
-7. [ ] Unified Review, Final, and Delivery room **design approval**
-8. [ ] Unified room construction
-9. [ ] Slide-out tool panel
-10. [ ] Separate slide-out communication panel
-11. [ ] Complaints, requests, refunds, and issue entry
-12. [ ] Customer update history
-13. [ ] Cross-room progress preservation
-14. [ ] Desktop and mobile certification
-
-> **Room lock:** Items 7–10 require Tagia's approval before any physical construction of the unified Review, Final, and Delivery room.
-
-> **Auth lock:** Item 6 must be completed and certified **before the Customer-One trial**. It may be pulled earlier if a preceding package needs safe purchased-room access for certification. It must not move to the Parking Lot and cannot slip beyond Customer-One. Scope includes Studio Board, Project Record, Review, Job Review, Final Delivery / Deliverables, any route exposing purchased-project data, and ungated internal tooling routes.
+May be pulled earlier if a preceding package needs safe purchased-room access for certification. **Not Parking Lot.**
 
 ---
 
-## 8. Studio Voice
+# Hierarchy D — Discontinued Product Directions
 
-**Must do:**
+## Live Host / Voice Host — DISCONTINUED
 
-- [ ] Briefly explain where the customer is and what happens next
-- [ ] Remain available without hovering
-- [ ] Customer communication
-- [ ] Machine communication
-- [ ] Chat communication
-- [ ] Team communication
-- [ ] Tagia escalation
+- The Studio will **not** use a live host character
+- The Studio will **not** use a mascot standing in customer rooms
+- The Studio will **not** build Package 4 Voice Host
+- The Studio will **not** create a hovering or constantly present character
+- **Studio Voice remains** as the Studio Representative — not a character or mascot
+- Studio Voice may use communication waves, indicators, controls, or presence signals
+- Studio Voice should orient briefly, remain available, and avoid hovering
+- Host terminology, Host Guide routes, Host components, and Host-era flows → legacy / redirect / internal-only / archive candidates
+- Do **not** delete Host-era code until Tagia approves a later deletion package
 
-**Boundaries:**
+Related protected seal: `1d86bea` — legacy Host doors sealed into Conversation Room.
 
-- No fake recommendation engine
-- No constant narration
-- No forced conversation
-- No pretending to know more than verified data
-- Escalate money, deadlines, complaints, refunds, reputation, and trust issues
+## Recommendation Engine — DISCONTINUED FOR LAUNCH
 
----
+- Live launch journey will **not** include a recommendation engine
+- The Studio will **not** claim intelligent service recommendations from answers when that system does not exist
+- Studio Voice may clarify needs, explain real services, and compare truthful options
+- Customer may select, add, remove, or change services
+- No recommendation badge, route suggestion, or service suggestion may be presented as “intelligent” if it is only a keyword rule or static mapping
+- Existing recommendation-engine code, route badges, keyword maps, concept-picker logic, and experiments → classify live-truthful / internal-only / obsolete / archive candidate / future research
+- Do **not** delete during this documentation pass
+- Advanced recommendation work remains **PARKED** unless Tagia reopens it
 
-## 9. Team and Production
+Related honesty commit: `fc110ec` — softened CR route recommendation copy.
 
-*Phase: Early September.*
+## Other superseded directions (supported by locks / inventory)
 
-- [ ] Roles and permissions
-- [ ] Assignment
-- [ ] Ownership
-- [ ] Deadlines
-- [ ] Internal review
-- [ ] Customer review handoff
-- [ ] Revisions
-- [ ] Release authority
-- [ ] Machine action tracking
-- [ ] Studio Voice coordination
-- [ ] Escalation
-- [ ] Deadline risk
-
----
-
-## 10. Intensive Testing
-
-*Phase: Mid-to-Late September.*
-
-- [ ] Signed in / signed out
-- [ ] Voice On / Voice Off
-- [ ] Desktop / phone / 360px
-- [ ] Missing materials
-- [ ] Multiple jobs
-- [ ] Revisions
-- [ ] Approvals
-- [ ] Partial delivery
-- [ ] Final delivery
-- [ ] Complaint
-- [ ] Refund
-- [ ] Machine failure
-- [ ] Team delay
-- [ ] Interrupted session
-- [ ] Returning customer
-- [ ] Bad job link
-- [ ] Deadline risk
+| Direction | Status | Notes |
+|---|---|---|
+| Mascot / Host-based Lobby behavior | DISCONTINUED | Lobby locked as guide + podium; Host character standard is art identity, not Live Host product |
+| Standalone Route Map journey | OBSOLETE | Redirect → Conversation Room |
+| Standalone Project Builder journey | OBSOLETE | Redirect → Conversation Room |
+| Standalone Checkout / Payment / Intake journeys | OBSOLETE | Redirect → CR stages |
+| Legacy concept picker A/B/C | OBSOLETE | Retired 7B2; components parked |
+| Dual CR phase vs stage models | PARTIAL / consolidation debt | Address during CR completion — do not invent a third model |
+| Advertising scaffold routes as live | DISALLOWED | Coming-soon decision answered |
 
 ---
 
-## 11. Customer-One Trial
+# Hierarchy E — Legacy Page Archive and Retirement Policy
 
-*Phase: Late September / Early October.*
+**Locked rule:** Old pages will **not** be deleted immediately. They will first be removed from the live customer journey and customer navigation, then archived or quarantined until Tagia approves permanent deletion.
 
-- [ ] Real Tagia project
-- [ ] Real deadline
-- [ ] Real team
-- [ ] Real production
-- [ ] Real updates
-- [ ] Real review
-- [ ] Real revisions
-- [ ] Real delivery
-- [ ] Real issue handling
+| Lifecycle | Meaning |
+|---|---|
+| **LIVE** | Current customer journey; truthful; approved navigation |
+| **REDIRECT** | Old URL kept temporarily; sends customers to the correct live destination; not a separate nav room |
+| **INTERNAL-ONLY** | Owner/staff/dev/test/migration; inaccessible to normal customers |
+| **SCAFFOLD** | Incomplete; not advertised |
+| **ARCHIVE CANDIDATE** | Leave approved journey; later move to archive/quarantine; retain for reference |
+| **ARCHIVED** | Physically separated from live route ownership; not exposed as customer route where feasible |
+| **DELETE CANDIDATE** | Archived, proven unnecessary, no remaining dependencies — still needs Tagia approval |
+| **DELETED** | Only after dedicated inspection, proof, backup/checkpoint, and Tagia approval |
 
----
+**Hard rules:**
 
-## 12. Owner Console
-
-**DEFERRED.** Do not begin until all of the following are true:
-
-- [ ] Customer rooms complete
-- [ ] Studio Voice defined
-- [ ] Team and production connected
-- [ ] Testing complete
-- [ ] Customer-One trial reveals actual needs
+1. **Archive first. Delete only after Tagia explicitly approves deletion.**
+2. **Cleanup gate:** Legacy-page archiving occurs only after the replacement live path is verified, tested, and protected.
+3. **Deletion gate:** No legacy page or Host/recommendation code is deleted without a separate dependency audit and Tagia approval.
+4. **Advertisement gate:** No obsolete or scaffold page may be advertised as a working customer destination.
 
 ---
 
-## 13. Visual Quality Queue
+# Hierarchy F — Current Approved Customer Page Count
 
-Rules: [`STUDIO-LAUNCH-WORKING-PROTOCOL.md` §18](./STUDIO-LAUNCH-WORKING-PROTOCOL.md).
+**Do not** count every React component, overlay, or Conversation Room stage as a separate page. Counts verified 2026-07-26 from `src/app/**/page.tsx` (**53** route files total) + accepted inventory.
 
-Each entry: page or room · device · screenshot or description · exact concern · desired outcome · priority · owner · status · completion proof.
+### Official page-count lock (Tagia 2026-07-26)
 
-### Blockers
+| Milestone | Count | Meaning |
+|---|---|---|
+| **Current repository reality** | **16** | Current verified live customer-facing routed pages found in the repository |
+| **Customer-One target** | **15** | Official approved target for the Customer-One trial — **not** 14 or 13 |
+| **Possible intermediate** | **14** | Only if Lobby aliases are consolidated **before** the unified Review/Final/Delivery room. Not the official Customer-One target unless Tagia later changes the launch order and explicitly approves that count |
+| **Later unified-room target** | **13** | After Studio Voice definition · Conversation Room completion · customer communication access · Studio Board truth/completeness · Tagia unified-room design approval · unified-room construction and certification. Not the current count and not the immediate Customer-One target |
 
-`No visual issues entered yet in this document. Tagia may add them at any time.`
+> **Page-count reductions are architectural milestones, not permission to remove or archive routes before their replacement paths are verified, tested, protected, and approved.**
 
-### Before Customer-One Trial
+### Route-list arithmetic (16 → 15 → 14 → 13)
 
-`No visual issues entered yet in this document. Tagia may add them at any time.`
+| Step | From → To | Exact change | Supporting routes |
+|---|---|---|---|
+| Current | **16** | Repository live routed pages | See E1 list below |
+| Customer-One | **16 → 15** | `/verify-email/pending` leaves the **approved live-room target** and is counted as a verification **state** of `/verify-email` (same pattern as Job Review under `/feedback-studio`). The route file may remain until a later consolidation; it is not a separate Customer-One journey room | Remove from target count: `/verify-email/pending` · Keep: `/verify-email` |
+| Optional intermediate | **15 → 14** | Lobby alias consolidation | `/studio-lobby` → **REDIRECT** to canonical `/` · Keep `/` as Lobby |
+| Later unified room | **14 → 13** | Review + Final Delivery become one room | `/feedback-studio` + `/deliverables` → one unified Review/Final/Delivery route |
 
-### Before External Soft Opening
+**Redirect / compatibility dependencies that prevent immediate consolidation:** `/studio-lobby` bookmarks and Lobby Entry Film links · `/verify-email/pending` email deep links · `/review-room` and other Host/commerce redirects · Auth and delivery certs that assert current URLs · dirty WIP on some redirect shells. Do not collapse until owning packages verify replacements.
 
-`No visual issues entered yet in this document. Tagia may add them at any time.`
+### Summary counts (current repository)
 
-### Post-Launch Polish
+| Count type | Number |
+|---|---|
+| Current verified **live customer-facing routed pages** | **16** |
+| Approved **Customer-One** live routed-page target | **15** |
+| Possible intermediate (Lobby alias consolidation only) | **14** |
+| Expected later target after Review/Final/Delivery consolidation | **13** |
+| Current verified **customer-facing states** inside live pages | **14** |
+| Current verified **redirect-only legacy routes** | **19** |
+| Current verified **customer-facing scaffolds** | **3** |
+| Current verified **internal-only routes** | **15** |
+| Current verified **archive candidates** (redirect shells first) | **19** |
+| **Missing** approved customer-facing pages or surfaces | **5** |
 
-`No visual issues entered yet in this document. Tagia may add them at any time.`
+### E1. Live customer-facing routed pages (16)
 
-> Scout must not independently change fonts, brand colors, background art, room atmosphere, major layouts, or visual style. Scout may inspect and propose; Tagia approves before construction.
+| Route | Name | Notes |
+|---|---|---|
+| `/` | Studio Lobby | Canonical entrance |
+| `/studio-lobby` | Studio Lobby | Same scene; live alias |
+| `/studio-conversation-room` | Conversation Room | Live front door for Discovery→Checkout→Intake |
+| `/sign-in` | Sign In | |
+| `/sign-up` | Sign Up | |
+| `/forgot-password` | Forgot Password | |
+| `/reset-password` | Reset Password | |
+| `/verify-email` | Verify Email | |
+| `/verify-email/pending` | Verify Email Pending | |
+| `/account-handoff` | Account Handoff | |
+| `/access-denied` | Access Denied | |
+| `/studio-board` | Studio Board | **No server auth gate** |
+| `/campaign-details` | Project Record | **No server auth gate** |
+| `/feedback-studio` | Review Room | **No server auth gate**; `?jobId=` = Job Review state |
+| `/deliverables` | Final Delivery | **No server auth gate** |
+| `/help-center` | Help Center | Locked complete |
+
+### E2. Customer-facing states inside live pages (14) — not separate pages
+
+Lobby Entry Film · Returning-client choice · Voice preference · CR opening · CR route · CR services · CR plan · CR checkout · CR intake · CR complete · CR Help overlay · Job Review (`?jobId=`) · Board Materials We Still Need card · Session timeout → Lobby film reopen
+
+### E3. Redirect-only legacy routes (19)
+
+`/route-map` · `/project-builder` · `/checkout` · `/payment` · `/intake` · `/draft-room` · `/draft-room/begin` · `/project-details` · `/project-summary` · `/welcome-hall` · `/studio-tablet` · `/studio-guide` · `/studio-guide-prototype` · `/studio-plan-review` · `/discovery-summary` · `/review-room` → `/feedback-studio` · `/business-discovery-studio` · `/business_discovery_studio` · `/project-discovery`
+
+**Handling:** Remain **REDIRECT** temporarily for bookmarks. Hide from customer navigation. Archive candidates after live path proof. Do not delete now.
+
+### E4. Customer-facing scaffolds (3)
+
+`/account` · `/past-campaigns` · `/creative-room` — JourneyComingSoon; must not be advertised as available.
+
+### E5. Internal-only routes (15)
+
+| Route | Gate today |
+|---|---|
+| `/file-room` (+ 7 child pages including launch-tracker, owner-console, studio-self-test, campaign workspaces) | Staff/owner (Launch Tracker owner-only) |
+| `/studio-kitchen` · `/studio-kitchen/[campaignId]` | Staff/owner |
+| `/dev/studio-voice` · `/dev/voice-audition` | Dev `notFound()` outside development |
+| `/studio` · `/studio-board/textures` · `/decision-learner` | **Ungated — must enter Auth audit** |
+
+### E6. Archive candidates (19+)
+
+Primary: the **19 redirect-only** Host/commerce shells. Later: Host-era components, recommendation-era experiments, retired concept-picker UI (already customer-unreachable after 7B2). Physical archive = future approved package only.
+
+### E7. Missing approved customer-facing surfaces (5)
+
+1. Complaint / issue entry  
+2. Refund request entry (customer UI)  
+3. Customer communication / follow-up access  
+4. Customer update history (dedicated truthful surface)  
+5. Unified Review / Final / Delivery room (after design approval)
+
+Final form may be **page or panel** — not decided. Do not inflate page count until Tagia approves form.
+
+### E8. Official Customer-One live routed-page target: 15
+
+**Official Customer-One target = 15.** Do not present 14 or 13 as competing Customer-One targets.
+
+Approved Customer-One live destinations (**15** = current 16 minus `/verify-email/pending` as a separate journey room):
+
+1. `/` — Studio Lobby (canonical)
+2. `/studio-lobby` — Studio Lobby (live alias; optional later collapse to redirect)
+3. `/studio-conversation-room` — Conversation Room
+4. `/sign-in`
+5. `/sign-up`
+6. `/forgot-password`
+7. `/reset-password`
+8. `/verify-email` — Verify Email (`/verify-email/pending` counted as a **state**, not a 16th/separate target room)
+9. `/account-handoff`
+10. `/access-denied`
+11. `/studio-board`
+12. `/campaign-details` — Project Record
+13. `/feedback-studio` — Review Room
+14. `/deliverables` — Final Delivery
+15. `/help-center`
+
+**Arithmetic check:**
+
+| Step | Count | Change |
+|---|---|---|
+| Current repository | **16** | E1 list |
+| Customer-One target | **15** | Drop `/verify-email/pending` from approved live-room target (remains allowable as verify state / deep link until later consolidation) |
+| Optional intermediate | **14** | `/studio-lobby` → REDIRECT to `/` |
+| Later unified room | **13** | `/feedback-studio` + `/deliverables` → one unified room |
+
+If unified-room construction happens **before** Lobby alias collapse: 15 − 1 = **14**, then Lobby collapse → **13**. Order may vary; official Customer-One remains **15**.
+
+Complaint/refund/communication/update history: prefer panels inside Board/Review/Help unless Tagia requires dedicated routes.
+
+### Consolidation principle
+
+- Conversation Room contains Discovery, Route clarification, Services, Plan, Checkout, and Intake as **states in one live room**
+- Standalone Route Map, Project Builder, Checkout, Payment, and Intake are **not** separate live rooms
+- Review, Final, and Delivery become **one unified room** only after Tagia approves design
+- Help overlays and Voice-preference states are **not** separate physical rooms
+- Complaint, refund, and communication may be panels or pages — form not yet approved
 
 ---
 
-## 14. Blockers
+# Hierarchy G — Partial / scaffold / missing (launch-critical)
 
-`No active launch blocker recorded at this checkpoint.`
-
-When a blocker is discovered, Chat must say plainly:
-
-> Hey Tagia, Scout and I found something we need to fix before moving on.
-
-Then explain: what was found · why it matters · whether the customer can see it · whether it blocks the current package · the smallest safe fix · what will remain untouched · how much it changes the launch order.
-
----
-
-## 15. Parking Lot
-
-Not required for launch. Revisit after the soft opening.
-
-- [ ] Advanced recommendation engine
-- [ ] Legacy concept deletion (components, generator, config, CSS)
-- [ ] Broad CSS cleanup
-- [ ] Non-launch automation
-- [ ] Optional dashboard features
-- [ ] Advanced Owner Console features
-- [ ] Route consolidation not required for launch
-- [ ] Unrelated visual polish
-- [ ] Obsolete capture / e2e scripts still expecting the retired concept picker
+| Item | Status | Notes |
+|---|---|---|
+| Conversation Room commerce journey | PARTIAL | Live front door; Voice Host discontinued; no fake engine |
+| Secure Checkout (CR stage) | PARTIAL | Local campaign bridge; not production processor cert |
+| Production Intake / Materials (CR) | PARTIAL | Dual location with Board |
+| Studio Board truth | PARTIAL | Auth missing; Materials dual UX waiting |
+| Project Record | PARTIAL | Stage truth not fully wired |
+| Review + Job Review | PARTIAL / COMPLETE WITH LIMITS | 7B1/7B2 strong; auth missing |
+| Final Delivery | PARTIAL / COMPLETE WITH LIMITS | HFF 67/67; auth missing |
+| Working draft cross-room proof | PARTIAL | Contract locked; Master List proof bar open |
+| CR Help overlay | SCAFFOLD | Links to Help Center |
+| Account / Past Campaigns / Creative Room | SCAFFOLD | Not advertised |
+| Customer communication | MISSING | |
+| Complaint entry | MISSING | |
+| Refund entry UI | MISSING | Backend/Owner exist |
+| Update history | MISSING | |
+| Unified Review/Final/Delivery | MISSING | Design approval first |
+| Auth Project Claim + Route/Data Protection | MISSING | Locked before Customer-One |
 
 ---
 
-## 16. Dirty WIP Protection
+# Hierarchy H — Customer-One Readiness Gate
 
-The following remain modified and **must be preserved**:
+Must be fully satisfied before Tagia begins the Customer-One trial.
 
-- Conversation Room WIP
-- Lobby WIP
-- Owner QA WIP
-- Auth timeout WIP
-- Package files (`package.json`, `package-lock.json`)
-- Test artifacts (`test-artifacts/`)
-- Lobby `sourceHref` → `/studio-lobby?lobbyEntry=reset`
-- All other pre-existing modified files
+| # | Gate | Status |
+|---|---|---|
+| 1 | Customer journey works from Lobby to final delivery | PARTIAL |
+| 2 | No false service promises | PARTIAL |
+| 3 | No recommendation engine pretending to be intelligent | PARTIAL → DISCONTINUED direction recorded; residual surfaces need CR audit |
+| 4 | Purchased routes are protected | **MISSING** — locked before Customer-One |
+| 5 | Project data is protected | **MISSING** |
+| 6 | Progress survives navigation and return | PARTIAL |
+| 7 | Customer can communicate with The Studio | **MISSING** |
+| 8 | Customer can see what is needed | PARTIAL |
+| 9 | Customer can review work | PARTIAL |
+| 10 | Customer can request revisions | PARTIAL |
+| 11 | Customer can approve | PARTIAL |
+| 12 | Customer can report an issue | **MISSING** |
+| 13 | Customer can request a refund | **MISSING** UI |
+| 14 | Deadlines and risks are visible | PARTIAL / Evidence not yet pinned |
+| 15 | Team ownership is visible internally | DEFERRED (team phase) |
+| 16 | Final files are truthful | **COMPLETE** (HFF 67/67) — access gate still #4 |
+| 17 | Mobile and desktop are certified | PARTIAL |
+| 18 | Voice behavior is defined and implemented where required | **MISSING** definition (active package) |
+| 19 | Voice Off works without punishment or broken flow | PARTIAL (preference commits exist) |
+| 20 | Help remains available | **COMPLETE** |
+| 21 | No unfinished route is advertised as complete | PARTIAL (decision answered; audit remains) |
+| 22 | Production build passes | **COMPLETE** (verified during Launch Tracker / recent packages) |
+| 23 | Full E2E testing passes | **MISSING** |
 
-> **Do not clean, restore, stage, commit, or absorb without an approved package boundary.**
+**Customer-One readiness: 3 of 23 gates complete** (#16, #20, #22).
 
 ---
 
-## 17. Daily Update Area
+# Hierarchy I — External Soft-Opening Gate
 
-**Today's Finish Line:** Protect the accepted Customer-Facing Room Inventory as a documentation checkpoint and advance the active item to Studio Voice definition.
+May follow Customer One; must precede outside customers.
 
-**Completed Today:** Protocol · Master Launch List (`50915da`) · Launch Tracker (`28bc218`, cert 18/18) · Customer-Facing Room Inventory written, accepted by Tagia, and marked complete · Auth Route/Data Protection locked before Customer-One · five Decisions Needed answered.
+- [ ] Customer-One defects resolved
+- [ ] Repeated clean E2E runs
+- [ ] External account isolation verified
+- [ ] Customer data separation verified
+- [ ] Team workflow proven
+- [ ] Update and escalation workflow proven
+- [ ] Refund and complaint handling proven
+- [ ] Support ownership defined
+- [ ] Deadline-risk handling proven
+- [ ] Production monitoring adequate for launch
+- [ ] Backup and recovery expectations documented
+- [ ] Launch copy literally truthful
+- [ ] Visual Quality Queue blockers resolved
+- [ ] All “Before External Soft Opening” items resolved
 
-**Still Open:** Materials dual UX decision (waiting — carried into Studio Board truth package) · Studio Voice definition not started · Auth protection package not started.
+**Soft-opening readiness: 0 of 14 gates complete.**
 
-**Next Thread:** Studio Voice Definition and Customer-Presence Doctrine — documentation only. Do not begin Conversation Room construction, Package 4 Voice Host, or room redesign.
+---
 
-**Last Updated:** 2026-07-26
+# Hierarchy J — Testing and Certification Ledger
+
+| Surface / package | Command / artifact (where known) | Result | Date | Commit | Rerun after later integration? |
+|---|---|---|---|---|---|
+| Honest Final Files (production) | `scripts/cert-honest-final-files.mjs` · `test-artifacts/honest-final-files-production/` | **67/67** | 2026-07-25 | `7d1f909` | Yes if delivery/auth changes |
+| Package 7B2 concept retirement | `scripts/cert-legacy-concept-retirement-7b2.mjs` | **125/125** | with `5b95e12` | `5b95e12` | Yes if Review Room changes |
+| Package 7B1 Review shell | `scripts/cert-review-delivery-room-shell.mjs` | **44/44** (re-verified in 7B2) | with 7B2 | `13baf50` | Yes if shell changes |
+| Launch Tracker | `scripts/cert-launch-tracker.mjs` | **18/18** | 2026-07-26 | `28bc218` | Yes if auth/nav changes |
+| Launch Tracker unit | `vitest` `src/lib/launch-tracker/launch-tracker.test.ts` | **11/11** | 2026-07-26 | `28bc218` | Yes if renderer changes |
+| Auth Packages 1–4 | Auth evidence ledger | Cold PASS | 2026-07-19/20 | Package commits + `2d2be73` | Yes after P5–P6 |
+| Production build | `npm run build` | pass | Launch Tracker / inventory era | tip family | Always before protect of product packages |
+| Conversation Room Package 3 visual | — | **No dedicated certification recorded** as closed | — | — | Required before CR “complete” |
+| Full Customer-One E2E | — | **Not started** | — | — | Required before trial |
+| Purchased-room access control | — | **Not started** | — | — | Required before Customer-One |
+
+**Rule:** A prior package test does not automatically certify later integrated behavior.
+
+---
+
+# Hierarchy K — Visual Quality Queue
+
+| Level | Entries |
+|---|---|
+| Blockers | No visual issues entered yet |
+| Before Customer-One Trial | No visual issues entered yet |
+| Before External Soft Opening | No visual issues entered yet |
+| Post-Launch Polish | No visual issues entered yet |
+
+Tagia may add issues anytime. Each entry needs: surface · device · problem · priority · usability vs polish · owner decision · status. Scout must not invent fonts/colors/backgrounds without approval.
+
+---
+
+# Hierarchy L — Obsolete and duplicate paths
+
+| Path / pattern | Classification | Handling |
+|---|---|---|
+| Standalone Route Map | OBSOLETE REDIRECT | Keep redirect; hide from nav; archive later |
+| Standalone Project Builder | OBSOLETE REDIRECT | Same |
+| Standalone Checkout / Payment | OBSOLETE REDIRECT | Same → CR `?stage=checkout` |
+| Standalone Intake / draft-room / project-details | OBSOLETE REDIRECT | Same → CR `?stage=intake` |
+| Host Guide URLs | OBSOLETE REDIRECT | Same; Host direction discontinued |
+| Retired concept picker | OBSOLETE (customer-unreachable) | Components parked; delete only with Tagia approval |
+| Duplicate Materials locations | PARTIAL duplication | Decision waiting — Board package |
+| Dual CR phase/stage models | Consolidation debt | Address in CR completion |
+
+---
+
+# Hierarchy M — Team, testing phases, Owner Console
+
+### Team and production — DEFERRED (Early September)
+
+Roles · permissions · assignment · ownership · deadlines · internal review · customer review handoff · revisions · release authority · machine action tracking · Studio Voice coordination · escalation · deadline risk
+
+### Intensive testing — DEFERRED (Mid-to-Late September)
+
+Signed in/out · Voice On/Off · Desktop/phone/360 · missing materials · multiple jobs · revisions · approvals · partial/final delivery · complaint · refund · machine failure · team delay · interrupted session · returning customer · bad job link · deadline risk
+
+### Customer-One trial — DEFERRED (Late September / Early October)
+
+Real Tagia project · deadline · team · production · updates · review · revisions · delivery · issue handling
+
+### Owner Console — DEFERRED
+
+Deferred until customer rooms complete · Studio Voice defined · team/production connected · testing complete · Customer-One reveals actual needs. Temporary Launch Tracker is **not** the Owner Console.
+
+---
+
+# Hierarchy N — Parking Lot
+
+- Advanced recommendation engine (also **DISCONTINUED FOR LAUNCH**)
+- Legacy concept component deletion
+- Broad CSS cleanup
+- Non-launch automation
+- Optional dashboard features
+- Advanced Owner Console features
+- Route consolidation not required for launch
+- Account / Past Campaigns / Creative Room builds
+- Unrelated visual polish
+- Package 4 Voice Host / Live Host character (**DISCONTINUED** — not merely parked)
+
+---
+
+# Hierarchy O — Dirty WIP Protection
+
+Do **not** clean, restore, stage, commit, absorb, or rewrite without an approved package boundary:
+
+- Conversation Room WIP  
+- Lobby WIP + untracked `MobileStudioEntry`  
+- Owner QA WIP  
+- Auth timeout WIP  
+- Migration ledger + Lobby `sourceHref` (`/studio-lobby?lobbyEntry=reset`)  
+- Package files  
+- Test artifacts  
+- All other pre-existing modifications  
+
+---
+
+## Dependencies quick view (active + near-term)
+
+| Item | Prerequisites | Blocked by | Unlocks | Decision? |
+|---|---|---|---|---|
+| Voice definition | Inventory complete | — | CR completion | Scope answered |
+| CR completion | Voice definition | Dirty WIP staging risk; no Host; no fake engine | Comms, Board truth inputs | — |
+| Customer communication | Voice + CR progress | Missing surface | Customer-One gate #7 | Form page vs panel TBD |
+| Board truth | CR + materials decision | Materials dual UX waiting | Auth package timing | Materials waiting |
+| Auth Route/Data Protection | Board truth (default) | — | Customer-One | Timing answered |
+| Unified room design | Voice, CR, comms, Board | Tagia approval | Construction | Kickoff answered |
+
+---
+
+**Document status:** Control-tower rewrite + official page-count lock accepted by Tagia 2026-07-26 · protecting as documentation checkpoint · **no product code changed** · Studio Voice construction **not started**.

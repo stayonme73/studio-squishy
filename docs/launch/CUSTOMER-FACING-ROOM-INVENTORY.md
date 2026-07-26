@@ -536,4 +536,125 @@ After this inventory is reviewed and protected as documentation:
 
 ---
 
-**Last updated:** 2026-07-26 · Inventory **complete and accepted** · protected as a documentation checkpoint · next active item: Studio Voice Definition and Customer-Presence Doctrine
+---
+
+## U. Discontinued Product Directions (owner-locked 2026-07-26)
+
+### Live Host / Voice Host — DISCONTINUED
+
+- No live host character · no mascot in rooms · no Package 4 Voice Host · no hovering constantly present character
+- **Studio Voice remains** as Studio Representative (not character/mascot)
+- Presence may use waves, indicators, controls — brief orientation, available without hovering
+- Host-era routes/components → redirect / internal-only / archive candidates
+- Do not delete Host-era code until Tagia approves a deletion package
+
+### Recommendation Engine — DISCONTINUED FOR LAUNCH
+
+- No intelligent recommendation claims from answers
+- Voice may clarify needs, explain real services, compare truthful options
+- Customer selects/adds/removes/changes services
+- Keyword/static mappings must not be presented as intelligent recommendations
+- Recommendation-era code → classify; do not delete in this pass
+- Advanced recommendation work remains parked unless Tagia reopens it
+
+### Other superseded directions
+
+Standalone Route Map / Project Builder / Checkout / Payment / Intake · Host Guide URLs · legacy concept picker · advertising scaffolds as live · Live Host Lobby behavior
+
+---
+
+## V. Legacy Page Archive and Retirement Policy
+
+**Archive first. Delete only after Tagia explicitly approves deletion.**
+
+Lifecycle: LIVE → REDIRECT → INTERNAL-ONLY → SCAFFOLD → ARCHIVE CANDIDATE → ARCHIVED → DELETE CANDIDATE → DELETED (Tagia approval required).
+
+Cleanup gate: archive only after replacement live path is verified, tested, and protected.  
+Deletion gate: dependency audit + Tagia approval.  
+Advertisement gate: no obsolete or scaffold page advertised as working.
+
+---
+
+## W. Verified page and route counts (2026-07-26)
+
+Source: `src/app/**/page.tsx` (**53** route files) + this inventory. Numbers are not guesses.
+
+### Official page-count lock (Tagia 2026-07-26)
+
+| Milestone | Count | Meaning |
+|---|---|---|
+| **Current repository reality** | **16** | Current verified live customer-facing routed pages |
+| **Customer-One target** | **15** | Official approved target for the Customer-One trial — **not** 14 or 13 |
+| **Possible intermediate** | **14** | Only if Lobby aliases are consolidated before the unified Review/Final/Delivery room. Not the official Customer-One target unless Tagia later changes the launch order and explicitly approves that count |
+| **Later unified-room target** | **13** | After Voice definition · CR completion · communication access · Board truth · Tagia unified-room design approval · construction and certification |
+
+> **Page-count reductions are architectural milestones, not permission to remove or archive routes before their replacement paths are verified, tested, protected, and approved.**
+
+### Route-list arithmetic (16 → 15 → 14 → 13)
+
+| Step | Change | Routes |
+|---|---|---|
+| **16 → 15** (Customer-One) | `/verify-email/pending` leaves the approved live-room **target** and is counted as a verification **state** of `/verify-email` | Keep `/verify-email` |
+| **15 → 14** (optional intermediate) | Lobby alias consolidation | `/studio-lobby` → REDIRECT to `/` |
+| **14 → 13** (later) | Unified Review/Final/Delivery | `/feedback-studio` + `/deliverables` → one room |
+
+Compatibility blockers for immediate consolidation: Lobby bookmarks · email verify-pending deep links · Host/commerce redirects · certs asserting current URLs · dirty WIP on some redirect shells.
+
+### Summary counts
+
+| Count type | Number |
+|---|---|
+| Live customer-facing routed pages (current) | **16** |
+| Approved Customer-One live routed-page target | **15** |
+| Possible intermediate (Lobby aliases only) | **14** |
+| Later unified-room target | **13** |
+| Customer-facing states inside live pages | **14** |
+| Redirect-only legacy routes | **19** |
+| Customer-facing scaffolds | **3** |
+| Internal-only routes | **15** |
+| Archive candidates (redirect shells first) | **19** |
+| Missing approved customer-facing surfaces | **5** |
+
+### Supporting lists
+
+**Live current (16):** `/` · `/studio-lobby` · `/studio-conversation-room` · `/sign-in` · `/sign-up` · `/forgot-password` · `/reset-password` · `/verify-email` · `/verify-email/pending` · `/account-handoff` · `/access-denied` · `/studio-board` · `/campaign-details` · `/feedback-studio` · `/deliverables` · `/help-center`
+
+**Customer-One target (15):** same as live 16 **except** `/verify-email/pending` is not a separate approved journey room (verification state of `/verify-email`).
+
+**States (14):** Lobby Entry Film · returning-client choice · Voice preference · CR opening/route/services/plan/checkout/intake/complete · CR Help overlay · Job Review (`?jobId=`) · Board Materials card · session-timeout film reopen · *(verify-email pending treated as verify state for target counting)*
+
+**Redirects (19):** `/route-map` · `/project-builder` · `/checkout` · `/payment` · `/intake` · `/draft-room` · `/draft-room/begin` · `/project-details` · `/project-summary` · `/welcome-hall` · `/studio-tablet` · `/studio-guide` · `/studio-guide-prototype` · `/studio-plan-review` · `/discovery-summary` · `/review-room` · `/business-discovery-studio` · `/business_discovery_studio` · `/project-discovery`
+
+**Scaffolds (3):** `/account` · `/past-campaigns` · `/creative-room`
+
+**Internal (15):** File Room family (8) · Studio Kitchen (2) · `/dev/studio-voice` · `/dev/voice-audition` · ungated `/studio` · `/studio-board/textures` · `/decision-learner`
+
+**Missing (5):** complaint entry · refund entry UI · customer communication · update history · unified Review/Final/Delivery
+
+### Proposed archive order (documentation only — not executed)
+
+1. Keep redirects until bookmark migration is proven against Conversation Room / Review Room  
+2. Hide scaffolds from customer navigation (decision answered)  
+3. Gate ungated internal tooling in Auth package  
+4. Later approved package: move Host/commerce redirect shells to archive structure  
+5. Later: Host/recommendation/concept-picker code dependency audit → DELETE CANDIDATE only with Tagia approval  
+
+### Routes that must remain redirects temporarily
+
+All 19 redirect-only legacy routes — bookmark safety and quarantine config.
+
+### Routes that cannot yet be archived and why
+
+- Live 16 — still the customer journey  
+- File Room / Kitchen / Launch Tracker — internal operations  
+- Dirty-WIP-touched redirect shells (`checkout`, `draft-room`, etc.) — selective staging risk; archive package must not absorb unrelated WIP  
+- Concept-picker components — historical/Owner QA fixtures; 7B2 kept them intentionally  
+
+### Deletion dependency / risk
+
+Tests, Owner QA seeds, migration ledger Host URLs, recommendation keyword maps, and dirty CR WIP may still reference Host-era and recommendation-era surfaces. Premature deletion can break cert scripts and developer fixtures.
+
+---
+
+**Last updated:** 2026-07-26 · Inventory complete · page counts locked (16 current · 15 Customer-One · 14 Lobby intermediate only · 13 later unified) · Host/recommendation discontinued · archive-before-delete locked · awaiting control-tower protect · no product code changed · Studio Voice construction not started
+
