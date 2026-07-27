@@ -16,16 +16,16 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | `02657aa1edc8e73c6b04d9a7ef843509a50dba3a` — CR-4R5 tablet clearance; **CR-4 certified** against this tip |
+| Protected tip | `eaf3c2390d4cb5a2e1775ec29615d1c7c86a3dba` — `docs: define legacy discovery UI archive boundary` |
 | Branch | `fix/discovery-responsive-layout` |
-| Sync | **0 ahead / 0 behind** at CR-4 certification (docs evidence commit pending Tagia) |
-| Current active item | **Conversation Room Completion** — **CR-4 CERTIFIED** (CR-5 not started) |
+| Sync | **0 ahead / 0 behind** (verified at MLL truth refresh) |
+| Current active item | **None** — Conversation Room package chain through ARCHIVE-1 boundary is protected; next Hierarchy C item not yet opened |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
-| Most recently completed | CR-4 — Conversation Room End-to-End Certification (`docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md`) |
-| Next three priorities | 1) CR-5 obsolete-path audit (**not started**) · 2) Customer communication access · 3) Studio Board truth/completeness |
+| Most recently completed | ARCHIVE-1 boundary review (`docs/launch/ARCHIVE-1-LEGACY-DISCOVERY-UI-BOUNDARY.md`) · move deferred until after Customer-One |
+| Next three priorities | 1) **Customer communication and follow-up access** — MISSING · 2) Studio Board truth/completeness · 3) Purchased-room Auth (locked before Customer-One) |
 | Active blockers | Purchased-room Auth — locked **before Customer-One** |
 | Decisions waiting | **1** — Materials dual UX (Board package) |
-| Customer-One readiness | **3 of 23** readiness gates complete |
+| Customer-One readiness | **4 of 23** readiness gates complete (#16, #18, #20, #22) |
 | Last updated | 2026-07-26 |
 
 ---
@@ -108,7 +108,12 @@ Every completed item must show available evidence: commit hash · subject · tes
 - **2026-07-26 — Anti-loop rule locked into protocol + Master List + suitcase.** Voice doctrine draft **not** rewritten. Inherited locks remain inherited. Only open Voice decisions remain V1–V3; Materials dual UX stays Board-only.
 - **2026-07-26 — Conversation Room Completion opened (inspection only, tip `03ee8a7`):** Anti-loop gap check done; plan at `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md`. **Completed behavior found (do not repeat):** stage machine, Voice preference gate, route honesty pass (2026-07-21), Plan+Checkout guidance cert (2026-07-19), working-draft contract, phone layout fix `cc80d94`, checkout sandbox honesty, intake gating, signed-in/out handoff cert, Lobby Entry Film reopen cert, Help shell. **Dirty WIP found (~301+/−315 across 23 files + untracked `lobby-begin.ts`, presence wave):** resume-after-Lobby-return, fresh-start-after-complete, Entry Film return route, draft preserve-on sign-out/timeout, presence rail trim — **all 34 CR unit tests pass on the WIP.** **Genuine gaps:** no end-to-end CR cert script (desktop/phone/360 unproven as a journey), intake answers unattributed, ledger attribution/tests/desktop/mobile gates pending on every row, stale "Discovery Question 1 live wire" comment, send affordance promises dead "Voice Host reply" package, unwired parallel `discovery/` components, phase-gate evaluator unused on live path. **Nothing needs a rewrite.** Proposed order: CR-1 protect WIP → CR-2 truth cleanup → CR-3 intake attribution → CR-4 end-to-end cert → CR-5 obsolete-path hygiene. **Blockers:** none new; Auth-before-Customer-One stands. Decisions CR-D1–CR-D5 added below. No product code changed; nothing committed.
 - **2026-07-26 — CR-D1–CR-D5 answered; plan protected.** Existing CR behavior must be **preserved rather than rebuilt**. **CR-1 is a validation and protection package** — it must not absorb CR-2 through CR-5. **Intake attribution belongs to CR-3.** **End-to-end journey certification belongs to CR-4.** Parallel `discovery/` and phase-gate systems belong to the **CR-5 audit** (archive before delete). Locked genuine gaps: intake answers bypass the attributed working-draft history; no full end-to-end Conversation Room certification exists. Neither justifies rewriting the working stage machine. Voice doctrine evidence commit: `03ee8a7e48beb72a2bf249a9da1d340ebe538bc1`.
-- **2026-07-26 — CR-4 CERTIFIED (evidence checkpoint).** Conversation Room end-to-end certification **PASS** against product tip `02657aa1edc8e73c6b04d9a7ef843509a50dba3a`. Record: `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md`. Harnesses: `scripts/cert-conversation-room-journey.mjs` · `scripts/cert-cr4r-interaction-proof.mjs` · `scripts/cert-cr4r5-tablet-scrim.mjs`. **Protected chain:** CR-1A `d778e7e` · CR-1B `62fa506` · CR-1C `7ad3876` · CR-2 `26f136d` · CR-3 `fb1ad24` · CR-4R1 `5c719ab` · CR-4R2 `3f89c80` · CR-4R3 `318d89d` · CR-4R4 `f0a122c` · CR-4R5 `02657aa`. **Proof:** production build PASS · focused Vitest 100/100 · extra auth/attribution/Lobby 26/26 · CR-4R 49/49 · CR-4R5 51/51 · full journey 105 PASS · Row 25 continuation 17 PASS · **all 30 required rows PASS** (including signed-in Board handoff and signed-out Create Account → same project Board) · desktop 1440 / phone 390 / narrow 360 PASS · Voice On/Off PASS · Intake attribution PASS · Lobby return and fresh-start PASS · no Studio Review customer navigation. **Non-blocking deferrals (not complete):** audible Voice quality · materials dual-UX (Board) · Checkout cancellation unsupported (N/A) · 66 unrelated TypeScript baseline errors · real integrated payment = external-launch gate. **CR-5 not started.** Generated artifacts intentionally not committed.
+- **2026-07-26 — CR-4 CERTIFIED (evidence checkpoint).** Conversation Room end-to-end certification **PASS** against product tip `02657aa1edc8e73c6b04d9a7ef843509a50dba3a`. Record: `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md`. Harnesses: `scripts/cert-conversation-room-journey.mjs` · `scripts/cert-cr4r-interaction-proof.mjs` · `scripts/cert-cr4r5-tablet-scrim.mjs`. **Protected chain:** CR-1A `d778e7e` · CR-1B `62fa506` · CR-1C `7ad3876` · CR-2 `26f136d` · CR-3 `fb1ad24` · CR-4R1 `5c719ab` · CR-4R2 `3f89c80` · CR-4R3 `318d89d` · CR-4R4 `f0a122c` · CR-4R5 `02657aa`. **Proof:** production build PASS · focused Vitest 100/100 · extra auth/attribution/Lobby 26/26 · CR-4R 49/49 · CR-4R5 51/51 · full journey 105 PASS · Row 25 continuation 17 PASS · **all 30 required rows PASS** (including signed-in Board handoff and signed-out Create Account → same project Board) · desktop 1440 / phone 390 / narrow 360 PASS · Voice On/Off PASS · Intake attribution PASS · Lobby return and fresh-start PASS · no Studio Review customer navigation. **Non-blocking deferrals (not complete):** audible Voice quality · materials dual-UX (Board) · Checkout cancellation unsupported (N/A) · 66 unrelated TypeScript baseline errors · real integrated payment = external-launch gate. Generated artifacts intentionally not committed. *(Superseded note: earlier drafts said “CR-5 not started”; CR-5 → ARCHIVE-1 boundary are now protected — see following entries.)*
+- **2026-07-26 — CR-5 COMPLETE.** Obsolete-path dependency and archive-candidate audit protected — `c69b669` · `docs: audit Conversation Room obsolete paths` · record `docs/launch/CR-5-OBSOLETE-PATH-DEPENDENCY-AUDIT.md`. Owner decisions CR-5-D1–D3 locked.
+- **2026-07-26 — CR-5B1 COMPLETE.** Host Intake CTA truth repair — `dd8f5a3` · `fix(conversation-room): remove Host wording from Intake CTA`. Customer-visible `Open Host Project Intake` → `Open Project Intake`; destination `/studio-conversation-room?stage=intake` and Link behavior unchanged.
+- **2026-07-26 — CR-5B2 COMPLETE.** Discovery dependency repair — `cd1f631` · `refactor(conversation-room): decouple legacy discovery UI`. Framework owns `DiscoveryPresentationPayload`; migration ledger discovery row corrected; discovery UI remains present and unwired.
+- **2026-07-26 — ARCHIVE-1 BOUNDARY COMPLETE.** Boundary review protected — `eaf3c239` · `docs: define legacy discovery UI archive boundary` · record `docs/launch/ARCHIVE-1-LEGACY-DISCOVERY-UI-BOUNDARY.md`. Option A approved; future destination `src/archive/studio-conversation-discovery-ui/`; **actual archive move deferred until after Customer-One** (early-start only for build/security/truth/dependency obstruction). Directory not created.
+- **2026-07-26 — MLL truth refresh.** Daily Snapshot / Hierarchy B / Hierarchy C / Hierarchy H reconciled to tip `eaf3c239`. Next incomplete Hierarchy C item remains **Customer communication and follow-up access — MISSING** (not started).
 
 ### Decisions Needed
 
@@ -147,7 +152,9 @@ Every completed item must show available evidence: commit hash · subject · tes
 | 2026-07-26 | Protect Studio Voice doctrine | Doctrine + Master List protected; Voice crossed off; Conversation Room Completion becomes active | subject `docs: lock Studio Voice doctrine` · full hash in return report · 0/0 expected | Pin full hash on next Master List docs touch if needed · Materials dual UX (Board) · CR package not started | Open Conversation Room Completion in a new thread |
 | 2026-07-26 | Conversation Room Completion — anti-loop gap check | Full stage/area inspection; dirty-WIP map; 34/34 CR unit tests pass on WIP; plan doc written; tip `03ee8a7` pinned | `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md` (uncommitted) · docs-only diff | Tagia: CR-D1–CR-D5 + approve CR-1 (protect dirty WIP) | Await Tagia decisions; then CR-1 selective staging package |
 | 2026-07-26 | Protect CR completion plan + CR-D1–CR-D5 | Five decisions recorded in plan + Master List; real-payment gate added to External Soft-Opening; CR-1–CR-5 order approved | subject `docs: lock Conversation Room completion plan` · full hash in return report · docs-only staging | Materials dual UX (Board) · CR-1 not started | Open CR-1 — validate and protect existing CR WIP |
-| 2026-07-26 | CR-4 end-to-end certification | CR-1A–CR-3 + CR-4R1–R5 protected; CR-4 certified 30/30 rows PASS @ `02657aa`; harnesses + cert record prepared | `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md` · three `scripts/cert-*.mjs` harnesses (generated artifacts excluded) | Materials dual UX (Board) · audible Voice quality · real payment gate · CR-5 not started · 66 unrelated tsc | Tagia approves docs evidence commit; do not begin CR-5 until authorized |
+| 2026-07-26 | CR-4 end-to-end certification | CR-1A–CR-3 + CR-4R1–R5 protected; CR-4 certified 30/30 rows PASS @ `02657aa`; harnesses + cert record prepared | `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md` · three `scripts/cert-*.mjs` harnesses (generated artifacts excluded) | Materials dual UX (Board) · audible Voice quality · real payment gate · 66 unrelated tsc | CR-5 opened after cert evidence protect |
+| 2026-07-26 | CR-5 → ARCHIVE-1 boundary | CR-5 audit · CR-5B1 CTA · CR-5B2 decoupling · ARCHIVE-1 boundary (move deferred post–Customer-One) | `c69b669` · `dd8f5a3` · `cd1f631` · `eaf3c239` · docs under `docs/launch/` | Materials dual UX (Board) · audible Voice quality · real payment gate · ARCHIVE-1 execute deferred | MLL truth refresh; then open Customer communication when Tagia authorizes |
+| 2026-07-26 | MLL truth refresh | Sync Daily Snapshot / Hierarchies B·C·H to tip `eaf3c239`; correct stale CR-5 / Voice / tip pins | `docs/launch/STUDIO-MASTER-LAUNCH-LIST.md` (this refresh) | Customer communication still MISSING · Auth before Customer-One | Tagia approves refresh commit; do not open Customer communication until authorized |
 
 ---
 
@@ -325,11 +332,12 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 
 # Hierarchy B — Current active item
 
-## Conversation Room Completion — CR-4 CERTIFIED (CR-5 not started)
+## Conversation Room Completion — COMPLETE THROUGH ARCHIVE-1 BOUNDARY
 
-**Status:** **CERTIFIED** — CR-4 Conversation Room End-to-End Certification **PASS** with explicit non-blocking deferrals (2026-07-26)
+**Status:** **COMPLETE WITH LIMITS** — CR-4 certified; CR-5 / CR-5B1 / CR-5B2 / ARCHIVE-1 boundary protected; **archive move deferred until after Customer-One**; no CR construction package currently open
+**Current protected tip:** `eaf3c2390d4cb5a2e1775ec29615d1c7c86a3dba`
 **Certification record:** `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md`
-**Certified product tip:** `02657aa1edc8e73c6b04d9a7ef843509a50dba3a`
+**Certified product tip (CR-4):** `02657aa1edc8e73c6b04d9a7ef843509a50dba3a`
 **Plan:** `docs/launch/CONVERSATION-ROOM-COMPLETION-PLAN.md`
 **Protected package tips:**
 
@@ -345,6 +353,11 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 | CR-4R3 | `318d89d` | keep Voice preference controls interactive |
 | CR-4R4 | `f0a122c` | keep Session controls clear of activity scrim |
 | CR-4R5 | `02657aa` | keep tablet clear of activity scrim |
+| CR-4 cert docs | `79ed2ce` | certify Conversation Room end-to-end |
+| CR-5 | `c69b669` | audit Conversation Room obsolete paths |
+| CR-5B1 | `dd8f5a3` | remove Host wording from Intake CTA |
+| CR-5B2 | `cd1f631` | decouple legacy discovery UI |
+| ARCHIVE-1 boundary | `eaf3c239` | define legacy discovery UI archive boundary |
 
 **CR-4 certification summary:**
 
@@ -357,7 +370,11 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 - [x] Intake attribution PASS
 - [x] Lobby return and fresh-start PASS
 - [x] No Studio Review customer navigation
-- [ ] **CR-5** obsolete-path dependency + archive-candidate audit — **not started**
+- [x] **CR-5** obsolete-path dependency + archive-candidate audit — **COMPLETE** (`c69b669` · `docs/launch/CR-5-OBSOLETE-PATH-DEPENDENCY-AUDIT.md`)
+- [x] **CR-5B1** Host Intake CTA truth repair — **COMPLETE** (`dd8f5a3` · `Open Host Project Intake` → `Open Project Intake`; destination unchanged)
+- [x] **CR-5B2** discovery dependency repair — **COMPLETE** (`cd1f631` · framework owns presentation payload; ledger corrected; discovery UI present/unwired)
+- [x] **ARCHIVE-1 boundary** — **COMPLETE** (`eaf3c239` · Option A · destination `src/archive/studio-conversation-discovery-ui/`)
+- [ ] **ARCHIVE-1 execute** — **DEFERRED until after Customer-One** (do not mark the archive move complete)
 
 **Accepted non-blocking deferrals (do not mark complete):**
 
@@ -366,10 +383,11 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 - Checkout cancellation unsupported → NOT APPLICABLE
 - 66 unrelated repository TypeScript errors outside Conversation Room boundary
 - Real integrated payment remains a mandatory external-launch gate
+- ARCHIVE-1 physical move deferred until after Customer-One
 
 **Reusable harnesses (committed; regenerate evidence locally):** `scripts/cert-conversation-room-journey.mjs` · `scripts/cert-cr4r-interaction-proof.mjs` · `scripts/cert-cr4r5-tablet-scrim.mjs`
 **Generated artifacts:** intentionally not committed.
-**Next CR package:** CR-5 — **not started**; do not begin until Tagia authorizes.
+**Next launch-critical item (Hierarchy C #4 — not started):** Customer communication and follow-up access — MISSING. Do not open until Tagia authorizes.
 
 ### ✅ Previous active item — Studio Voice Definition and Customer-Presence Doctrine (complete)
 
@@ -386,7 +404,7 @@ Evidence: `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md
 
 1. [x] ~~**Protect Master Launch List control-tower rewrite**~~ — `9e823ca` · 0/0
 2. [x] ~~**Studio Voice Definition and Customer-Presence Doctrine**~~ — subject `docs: lock Studio Voice doctrine` · V1/V2/V3 locked · full hash in return report
-3. [x] ~~**Conversation Room completion without recommendation engine**~~ — **CR-4 CERTIFIED** @ `02657aa` · 30/30 rows PASS · CR-5 not started · non-blocking deferrals listed in Hierarchy B
+3. [x] ~~**Conversation Room completion without recommendation engine**~~ — **CR-4 CERTIFIED** @ `02657aa` · 30/30 rows PASS · CR-5 `c69b669` · CR-5B1 `dd8f5a3` · CR-5B2 `cd1f631` · ARCHIVE-1 boundary `eaf3c239` (move deferred post–Customer-One) · non-blocking deferrals listed in Hierarchy B
 4. [ ] **Customer communication and follow-up access** — MISSING
 5. [ ] **Studio Board customer truth and completeness** — PARTIAL · carries Materials dual UX decision
 6. [ ] **Purchased-room Auth Route/Data Protection** — MISSING · **LOCKED before Customer-One**
@@ -629,7 +647,7 @@ Complaint/refund/communication/update history: prefer panels inside Board/Review
 
 | Item | Status | Notes |
 |---|---|---|
-| Conversation Room commerce journey | PARTIAL | Live front door; Voice Host discontinued; no fake engine |
+| Conversation Room commerce journey | COMPLETE WITH LIMITS | CR-4 certified Lobby→Board via CR (`79ed2ce`); Voice Host discontinued; no fake engine; ARCHIVE-1 move deferred; Auth / real payment remain launch limits |
 | Secure Checkout (CR stage) | PARTIAL | Local campaign bridge; not production processor cert |
 | Production Intake / Materials (CR) | PARTIAL | Dual location with Board |
 | Studio Board truth | PARTIAL | Auth missing; Materials dual UX waiting |
@@ -654,12 +672,12 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 
 | # | Gate | Status |
 |---|---|---|
-| 1 | Customer journey works from Lobby to final delivery | PARTIAL |
+| 1 | Customer journey works from Lobby to final delivery | **PARTIAL** — CR-4 certifies Lobby → Conversation Room → Board handoff @ `02657aa` / `79ed2ce`; Review / Final Delivery / full purchased journey not closed by CR-4 |
 | 2 | No false service promises | PARTIAL |
-| 3 | No recommendation engine pretending to be intelligent | PARTIAL → DISCONTINUED direction recorded; residual surfaces need CR audit |
+| 3 | No recommendation engine pretending to be intelligent | **PARTIAL** — direction **DISCONTINUED** (Tagia 2026-07-26); CR-5 residual audit complete (`c69b669`); ARCHIVE-1 boundary parks discovery UI move until after Customer-One (`eaf3c239`); engine archive remains post–Customer-One |
 | 4 | Purchased routes are protected | **MISSING** — locked before Customer-One |
 | 5 | Project data is protected | **MISSING** |
-| 6 | Progress survives navigation and return | PARTIAL |
+| 6 | Progress survives navigation and return | **PARTIAL** — CR-4 Lobby return + fresh-start PASS (`79ed2ce`); full cross-room proof bar still open |
 | 7 | Customer can communicate with The Studio | **MISSING** |
 | 8 | Customer can see what is needed | PARTIAL |
 | 9 | Customer can review work | PARTIAL |
@@ -670,15 +688,15 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 | 14 | Deadlines and risks are visible | PARTIAL / Evidence not yet pinned |
 | 15 | Team ownership is visible internally | DEFERRED (team phase) |
 | 16 | Final files are truthful | **COMPLETE** (HFF 67/67) — access gate still #4 |
-| 17 | Mobile and desktop are certified | PARTIAL |
-| 18 | Voice behavior is defined and implemented where required | **MISSING** definition (active package) |
-| 19 | Voice Off works without punishment or broken flow | PARTIAL (preference commits exist) |
+| 17 | Mobile and desktop are certified | **PARTIAL** — CR journey certified desktop 1440 / phone 390 / narrow 360 (`79ed2ce`); full-system mobile/desktop cert not closed |
+| 18 | Voice behavior is defined and implemented where required | **COMPLETE WITH LIMITS** — Voice = Studio Representative communication system; no Host; Lobby silent; CR asks preference before first speech; Voice On/Off certified in CR-4 (`79ed2ce`); doctrine protected (`docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md`); **audible Voice quality remains non-blocking deferred** (not certified) |
+| 19 | Voice Off works without punishment or broken flow | **COMPLETE WITH LIMITS** — CR-4 Voice Off PASS (`79ed2ce`); account-level preference persistence still future construction (V1) |
 | 20 | Help remains available | **COMPLETE** |
 | 21 | No unfinished route is advertised as complete | PARTIAL (decision answered; audit remains) |
-| 22 | Production build passes | **COMPLETE** (verified during Launch Tracker / recent packages) |
-| 23 | Full E2E testing passes | **MISSING** |
+| 22 | Production build passes | **COMPLETE** (verified during Launch Tracker / recent packages; CR-4 production build PASS) |
+| 23 | Full E2E testing passes | **MISSING** — CR-4 closes Conversation Room E2E only, not full Customer-One E2E |
 
-**Customer-One readiness: 3 of 23 gates complete** (#16, #20, #22).
+**Customer-One readiness: 4 of 23 gates complete** (#16, #18, #20, #22). Gate #19 is COMPLETE WITH LIMITS and not counted in the complete total.
 
 ---
 
@@ -717,7 +735,8 @@ May follow Customer One; must precede outside customers.
 | Launch Tracker unit | `vitest` `src/lib/launch-tracker/launch-tracker.test.ts` | **11/11** | 2026-07-26 | `28bc218` | Yes if renderer changes |
 | Auth Packages 1–4 | Auth evidence ledger | Cold PASS | 2026-07-19/20 | Package commits + `2d2be73` | Yes after P5–P6 |
 | Production build | `npm run build` | pass | Launch Tracker / inventory era | tip family | Always before protect of product packages |
-| Conversation Room Package 3 visual | — | **No dedicated certification recorded** as closed | — | — | Required before CR “complete” |
+| Conversation Room Package 3 visual | — | **Superseded for launch control** by CR-4 end-to-end cert (Package 3 visual cert was never a separate closed record) | — | — | Historical gap; do not reopen as CR rewrite |
+| Conversation Room CR-4 E2E | `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md` · three `scripts/cert-*.mjs` | **30/30 PASS** | 2026-07-26 | product `02657aa` · docs `79ed2ce` | Rerun if CR journey changes |
 | Full Customer-One E2E | — | **Not started** | — | — | Required before trial |
 | Purchased-room access control | — | **Not started** | — | — | Required before Customer-One |
 
@@ -807,13 +826,14 @@ Do **not** clean, restore, stage, commit, absorb, or rewrite without an approved
 
 | Item | Prerequisites | Blocked by | Unlocks | Decision? |
 |---|---|---|---|---|
-| Voice definition | Inventory complete | — | CR completion | Scope answered |
-| CR completion | Voice definition | Dirty WIP staging risk; no Host; no fake engine | Comms, Board truth inputs | — |
-| Customer communication | Voice + CR progress | Missing surface | Customer-One gate #7 | Form page vs panel TBD |
+| Voice definition | Inventory complete | — | CR completion | **COMPLETE** (doctrine protected; audible quality deferred) |
+| CR completion | Voice definition | — | Comms, Board truth inputs | **COMPLETE WITH LIMITS** through ARCHIVE-1 boundary @ `eaf3c239` |
+| Customer communication | Voice + CR complete | Missing surface · **not started** | Customer-One gate #7 | Form page vs panel TBD |
 | Board truth | CR + materials decision | Materials dual UX waiting | Auth package timing | Materials waiting |
 | Auth Route/Data Protection | Board truth (default) | — | Customer-One | Timing answered |
 | Unified room design | Voice, CR, comms, Board | Tagia approval | Construction | Kickoff answered |
+| ARCHIVE-1 execute | After Customer-One (default) | Early-start only if build/security/truth/dependency obstructs | Clean archive of discovery UI | Option A locked · move **not** started |
 
 ---
 
-**Document status:** Control-tower rewrite + official page-count lock accepted by Tagia 2026-07-26 · protecting as documentation checkpoint · **no product code changed** · Studio Voice construction **not started**.
+**Document status:** MLL truth refresh staged against tip `eaf3c239` (2026-07-26) · documentation only · **no product code** · Conversation Room chain through ARCHIVE-1 boundary protected · next Hierarchy C incomplete item = **Customer communication and follow-up access — MISSING** (not started).
