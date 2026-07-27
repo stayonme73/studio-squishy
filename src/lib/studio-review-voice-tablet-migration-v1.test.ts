@@ -31,6 +31,18 @@ describe("studio-review-voice-tablet-migration-v1", () => {
     expect(ids.indexOf("discovery")).toBeLessThan(ids.indexOf("route-map"));
   });
 
+  it("CR-5B2 — discovery ledger does not claim DiscoveryTabletPanel is live", () => {
+    const discovery = getStudioReviewMigrationRow("discovery");
+    expect(discovery).toBeTruthy();
+    expect(discovery!.tabletReplacement).toMatch(/StudioGuideTabletView/);
+    expect(discovery!.tabletReplacement).toMatch(/unwired|not mounted/i);
+    expect(discovery!.tabletReplacement).not.toMatch(
+      /DiscoveryTabletPanel` in Conversation Room Workspace/,
+    );
+    expect(discovery!.notes).toMatch(/ARCHIVE CANDIDATE/i);
+    expect(discovery!.notes).toMatch(/DiscoveryTabletPanel/);
+  });
+
   it("requires passport fields on every ledger row", () => {
     for (const row of studioReviewVoiceTabletMigrationLedger) {
       expect(row.source.length).toBeGreaterThan(0);

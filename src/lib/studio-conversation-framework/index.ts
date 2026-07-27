@@ -58,6 +58,7 @@ export type {
   ConversationRoomState,
   ConversationSessionSnapshot,
   ConversationStateAction,
+  DiscoveryPresentationPayload,
   PresentationSurface,
   VoiceControllerOutput,
 } from "./types";

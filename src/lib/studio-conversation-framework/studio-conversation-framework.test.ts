@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -84,6 +87,28 @@ describe("conversation room framework", () => {
     });
     expect(surface.kind).toBe("discovery");
     expect(surface.discovery?.currentTitle).toBe("Your Situation");
+  });
+
+  it("CR-5B2 — framework sources do not import the discovery presentation lib", () => {
+    const importPattern =
+      /from\s+["']@\/lib\/studio-conversation-discovery(?:\/[^"']*)?["']/;
+    const root = join(
+      process.cwd(),
+      "src/lib/studio-conversation-framework",
+    );
+    for (const file of ["types.ts", "presentation-manager.ts", "index.ts"]) {
+      const src = readFileSync(join(root, file), "utf8");
+      expect(src, file).not.toMatch(importPattern);
+    }
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    expect(runtime).not.toMatch(importPattern);
+    expect(runtime).not.toMatch(/DiscoveryTabletPanel/);
   });
 
   it("advances Navigation Controller along the spine without leaving the room", () => {

@@ -3,10 +3,10 @@
  * Hardware stays empty; everything meaningful is runtime surface.
  */
 
-import type { DiscoveryPresentationPayload } from "@/lib/studio-conversation-discovery";
 import type {
   ConversationControllerOutput,
   ConversationRoomState,
+  DiscoveryPresentationPayload,
   PresentationSurface,
 } from "@/lib/studio-conversation-framework/types";
 

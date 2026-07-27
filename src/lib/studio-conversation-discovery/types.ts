@@ -28,15 +28,13 @@ export type DiscoveryCapturedSummary = {
   summary: string;
 };
 
-export type DiscoveryPresentationPayload = {
-  stageLabel: string;
-  currentTitle: string;
-  currentQuestion: string;
-  currentSummary: string | null;
-  captured: DiscoveryCapturedSummary[];
-  progressLabel: string;
-  discoveryComplete: boolean;
-};
+/**
+ * Compatibility re-export — Presentation payload shape is owned by the
+ * Conversation Framework (CR-5B2) so active framework code does not import
+ * this archive-candidate subsystem. Captured step ids remain tablet-specific
+ * at the builder; the shared payload uses structural string step ids.
+ */
+export type { DiscoveryPresentationPayload } from "@/lib/studio-conversation-framework/types";
 
 export type DiscoveryAnswerActor = WorkingDraftAttributionActor;
 

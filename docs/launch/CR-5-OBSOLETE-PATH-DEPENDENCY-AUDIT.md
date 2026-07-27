@@ -70,10 +70,12 @@ Hey Chat — this is repetitive if we re-open work already completed or locks al
 | Presentation surface shell | `PresentationSurfaceView.tsx` · `presentation-surface.module.css` | **ARCHIVE CANDIDATE** |
 | Driver / Voice Assist chrome | `ConversationDriverControl.tsx` · `VoiceAssistControls.tsx` + CSS modules | **ARCHIVE CANDIDATE** |
 | Q1 draft lib | `src/lib/discovery-question-1/*` | **ARCHIVE CANDIDATE** (config/docs may stay KEEP — INTERNAL doctrine) |
-| Discovery facts / steps lib | `src/lib/studio-conversation-discovery/*` | **REPAIR BEFORE ARCHIVE** (framework type coupling + tests) then candidate |
-| Migration ledger claim naming `DiscoveryTabletPanel` as tablet replacement | `studio-review-voice-tablet-migration-v1.ts` discovery row | **REPAIR BEFORE ARCHIVE** (ledger truth) |
+| Discovery facts / steps lib | `src/lib/studio-conversation-discovery/*` | **ARCHIVE CANDIDATE with discovery UI** — framework type coupling **repaired in CR-5B2** (Presentation payload type now owned by `studio-conversation-framework`). Lib remains for unwired UI + its tests only. |
+| Migration ledger claim naming `DiscoveryTabletPanel` as tablet replacement | `studio-review-voice-tablet-migration-v1.ts` discovery row | **REPAIRED in CR-5B2** — ledger states Guide is live; `DiscoveryTabletPanel` present but unwired / archive candidate |
 
 **Evidence:** Zero runtime importers from `ConversationRoomRuntime` / Guide. Live opening UI is `StudioGuideTabletView` + `StudioGuideCommPanel`. Barrel exports unused by the live page. Config `discovery-question-1-v1` still referenced by doctrine docs/AGENTS.
+
+**CR-5B2 repair (2026-07-26):** Framework `types.ts` / `presentation-manager.ts` no longer import `@/lib/studio-conversation-discovery`. Discovery UI files untouched. ARCHIVE-1 not started.
 
 ### Group 2 — `evaluateConversationPhaseGate`
 
@@ -257,10 +259,11 @@ Before any archive move:
 | Field | Value |
 |---|---|
 | Unwired discovery UI and chrome | **ARCHIVE CANDIDATE** (blocked until repairs) |
-| Coupled library + ledger claims | **REPAIR BEFORE ARCHIVE** |
+| Coupled library + ledger claims | **REPAIR BEFORE ARCHIVE** → **CR-5B2 completed** (framework decoupled; ledger corrected) |
 | First repairs | `studio-conversation-discovery` library coupling · inaccurate migration-ledger `DiscoveryTabletPanel` claim · any test/config dependency identified in this audit |
-| Sequence | 1) **CR-5B2 — Discovery dependency and ledger repair** · 2) **ARCHIVE-1 — Preserve and remove discovery UI from active product tree** · 3) deletion only after separate owner approval |
+| Sequence | 1) ~~**CR-5B2 — Discovery dependency and ledger repair**~~ · 2) **ARCHIVE-1 — Preserve and remove discovery UI from active product tree** · 3) deletion only after separate owner approval |
 | Customer-One | Archive can wait until after Customer-One unless repair exposes a customer-facing truth or stability problem |
+| Archive readiness after CR-5B2 | **READY FOR ARCHIVE-1 BOUNDARY REVIEW** — discovery UI remains unwired; no active Runtime/framework import of the discovery UI subsystem; remaining deps are discovery-internal + its own tests + phase-gate test usage of facts helpers |
 
 ### CR-5-D3 — Recommendation engine archive · **ANSWERED**
 
@@ -317,7 +320,11 @@ During CR-5 inspection and this audit checkpoint:
 
 **CR-5 — Obsolete-Path Dependency and Archive-Candidate Audit: COMPLETE.**
 
-Next genuine package: **CR-5B1 — Remove Host Intake CTA wording** (await Tagia authorization; do not begin in this checkpoint).
+Follow-on repairs:
+
+- ~~**CR-5B1 — Remove Host Intake CTA wording**~~ — protected
+- ~~**CR-5B2 — Discovery dependency and ledger repair**~~ — staged/protected when Tagia approves
+- Next after CR-5B2 protect: **ARCHIVE-1 boundary review** (do not begin until Tagia authorizes)
 
 ---
 

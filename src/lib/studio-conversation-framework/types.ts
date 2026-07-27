@@ -6,8 +6,27 @@ import type {
   PresentationSurfaceKind,
 } from "@/config/studio-conversation-framework-v1";
 import type { StudioCommunicationLightState } from "@/config/studio-conversation-room-v1";
-import type { DiscoveryPresentationPayload } from "@/lib/studio-conversation-discovery";
 import type { StudioPresenceSnapshot } from "@/lib/studio-conversation-framework/presence";
+
+/**
+ * Presentation Manager discovery payload shape (Package 3 contract).
+ * Owned here so the framework does not import the archive-candidate discovery
+ * presentation subsystem. Unwired discovery builders may still produce a
+ * structurally compatible object (compatibility re-export from that lib).
+ */
+export type DiscoveryPresentationPayload = {
+  stageLabel: string;
+  currentTitle: string;
+  currentQuestion: string;
+  currentSummary: string | null;
+  captured: ReadonlyArray<{
+    stepId: string;
+    title: string;
+    summary: string;
+  }>;
+  progressLabel: string;
+  discoveryComplete: boolean;
+};
 
 /** Temporary Review mode context — not a journey phase. */
 export type ConversationReviewState = {

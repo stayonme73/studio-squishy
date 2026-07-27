@@ -63,11 +63,11 @@ export const studioReviewVoiceTabletMigrationLedger: readonly StudioReviewMigrat
     ownerQaPresetId: null,
     sourceHref: "/business-discovery-studio",
     tabletReplacement:
-      "Voice tablet — Discovery rhythm stage (`DiscoveryTabletPanel` in Conversation Room Workspace)",
+      "Certified live Conversation Room Guide opening capture (`StudioGuideTabletView` + `StudioGuideCommPanel`) on stage `opening`. Unwired archive-candidate `DiscoveryTabletPanel` remains in the active tree but is not mounted by Runtime.",
     presentationView:
-      "Presentation Display — discovery surface (current question + captured summaries)",
+      "One-tablet Guide surface (certified). Dual-surface Presentation Display discovery view is unwired / archive candidate — not the live customer Presentation.",
     dataMapping:
-      "working_draft.slices.discoveryAnswers + deadlineInformation + materialsStatus (+ attribution); legacy business-discovery-answers bridged during migration",
+      "Guide capture → working draft (project need / deadline / materials as applicable). Legacy `discoveryAnswers` bridges and `studio-conversation-discovery` builders remain for unwired UI and tests; framework Presentation Manager no longer imports that subsystem (CR-5B2).",
     status: "in_progress",
     persistence: "pending",
     editing: "pending",
@@ -78,7 +78,7 @@ export const studioReviewVoiceTabletMigrationLedger: readonly StudioReviewMigrat
     ownerApproval: "pending",
     removal: "pending",
     notes:
-      "in_progress — Discovery conversation interface: Question → Answer → Got it → Next Question. Live Q1+Q2 on Presentation (Speak / Type only); tablet is Studio follow-only; no driver/mode chrome for the customer. Do not remove Studio Review / quarantined Discovery Room until entire Discovery migration is certified.",
+      "in_progress — Live authority is the Guide + stage machine (`opening → … → complete`), not `DiscoveryTabletPanel`. Parallel discovery UI under `components/studio-conversation-room/discovery/` is an ARCHIVE CANDIDATE (CR-5 / CR-5-D2): present, unwired, not archived. Do not remove Studio Review / quarantined Discovery Room until Tagia approves ARCHIVE-1 after CR-5B2.",
   },
   {
     id: "studio-lobby",
