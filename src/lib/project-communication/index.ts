@@ -1,4 +1,9 @@
 export {
+  canAccessStaffProjectCommunication,
+  canReplyStaffProjectCommunication,
+} from "./access";
+
+export {
   PROJECT_COMMUNICATION_BODY_MAX_LENGTH,
   PROJECT_COMMUNICATION_COPY,
   PROJECT_COMMUNICATION_ENVELOPE_VERSION,

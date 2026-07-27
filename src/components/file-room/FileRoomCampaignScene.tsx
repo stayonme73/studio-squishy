@@ -10,6 +10,7 @@ import FileRoomCustomerRequestsSection from "./FileRoomCustomerRequestsSection";
 import FileRoomExceptionsSection from "./FileRoomExceptionsSection";
 import FileRoomMaterialsSection from "./FileRoomMaterialsSection";
 import FileRoomProductionTasksSection from "./FileRoomProductionTasksSection";
+import FileRoomProjectCommunicationSection from "./FileRoomProjectCommunicationSection";
 import FileRoomSectionCard from "./FileRoomSectionCard";
 import FileRoomStatusRail from "./FileRoomStatusRail";
 import FileRoomSyncBadge from "./FileRoomSyncBadge";
@@ -142,6 +143,8 @@ export default function FileRoomCampaignScene({
             campaignId={campaignId}
             canReview={canReviewMaterials}
           />
+
+          <FileRoomProjectCommunicationSection campaignId={campaignId} />
 
           <FileRoomMaterialsSection
             campaignId={campaignId}
