@@ -5,6 +5,8 @@ import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared
 
 import {
   canAccessStaffProjectCommunication,
+  canCreateCustomerProjectCommunication,
+  canReadCustomerProjectCommunication,
   canReplyStaffProjectCommunication,
 } from "./access";
 
@@ -74,5 +76,37 @@ describe("project communication staff access", () => {
       false,
     );
     expect(canAccessStaffProjectCommunication(null, CAMPAIGN_ID, envelope, assigned)).toBe(false);
+  });
+});
+
+describe("project communication customer access", () => {
+  it("allows the owning client to read and create", () => {
+    expect(canReadCustomerProjectCommunication(client, CAMPAIGN_ID, envelope)).toBe(true);
+    expect(canCreateCustomerProjectCommunication(client, CAMPAIGN_ID, envelope)).toBe(true);
+  });
+
+  it("rejects other clients, staff, and null sessions", () => {
+    const other: StudioUser = {
+      id: "client-2",
+      email: "other@example.com",
+      displayName: "Other",
+      roles: ["client"],
+      currentCampaignId: "other-campaign",
+      clientCampaignIds: ["other-campaign"],
+    };
+    const dualRoleOwner: StudioUser = {
+      id: "owner-client",
+      email: "owner-client@studio.local",
+      displayName: "Owner Client",
+      roles: ["owner", "client"],
+    };
+    expect(canReadCustomerProjectCommunication(other, CAMPAIGN_ID, envelope)).toBe(false);
+    expect(canCreateCustomerProjectCommunication(other, CAMPAIGN_ID, envelope)).toBe(false);
+    expect(canReadCustomerProjectCommunication(owner, CAMPAIGN_ID, envelope)).toBe(false);
+    expect(canCreateCustomerProjectCommunication(staff, CAMPAIGN_ID, envelope)).toBe(false);
+    expect(canReadCustomerProjectCommunication(dualRoleOwner, CAMPAIGN_ID, envelope)).toBe(false);
+    expect(canCreateCustomerProjectCommunication(dualRoleOwner, CAMPAIGN_ID, envelope)).toBe(false);
+    expect(canReadCustomerProjectCommunication(null, CAMPAIGN_ID, envelope)).toBe(false);
+    expect(canCreateCustomerProjectCommunication(null, CAMPAIGN_ID, envelope)).toBe(false);
   });
 });

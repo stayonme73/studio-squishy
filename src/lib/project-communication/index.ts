@@ -1,5 +1,7 @@
 export {
   canAccessStaffProjectCommunication,
+  canCreateCustomerProjectCommunication,
+  canReadCustomerProjectCommunication,
   canReplyStaffProjectCommunication,
 } from "./access";
 

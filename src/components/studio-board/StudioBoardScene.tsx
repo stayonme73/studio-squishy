@@ -10,6 +10,7 @@ import CampaignProgressPanel from "@/components/studio-board/CampaignProgressPan
 import CampaignRecordDrawer from "@/components/studio-board/CampaignRecordDrawer";
 import RouteMapProductionBriefDrawer from "@/components/route-map/RouteMapProductionBriefDrawer";
 import StudioBoardMaterialsWorkflow from "@/components/studio-board/StudioBoardMaterialsWorkflow";
+import StudioBoardProjectCommunicationSection from "@/components/studio-board/StudioBoardProjectCommunicationSection";
 import ProjectSnapshotPanel from "@/components/studio-board/ProjectSnapshotPanel";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
 import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
@@ -587,6 +588,12 @@ export default function StudioBoardScene() {
             onMaterialsFactsChange={handleMaterialsFactsChange}
           />
         </div>
+
+        <StudioBoardProjectCommunicationSection
+          campaign={boardCampaign}
+          hasCampaign={Boolean(boardCampaign)}
+          campaignLookupPending={campaignLookupPending}
+        />
       </div>
 
       <CampaignRecordDrawer open={recordOpen} onClose={() => setRecordOpen(false)} />
