@@ -170,12 +170,16 @@ export function resolveDeliverablesRemainingSummary(
   campaign: CampaignRecord,
   maxItems = 3,
 ): string | null {
-  const items = resolveDeliverablesRemaining(campaign).filter((item) => item.remaining > 0);
-  if (items.length === 0) return "All deliverables complete";
+  const defined = resolveDeliverablesRemaining(campaign);
+  // Missing / empty definition is not completion.
+  if (defined.length === 0) return null;
 
-  const shown = items.slice(0, maxItems);
+  const remaining = defined.filter((item) => item.remaining > 0);
+  if (remaining.length === 0) return "All deliverables complete";
+
+  const shown = remaining.slice(0, maxItems);
   const summary = shown.map((item) => `${item.remaining} ${item.label}`).join(", ");
-  if (items.length > maxItems) return `${summary}, +${items.length - maxItems} more`;
+  if (remaining.length > maxItems) return `${summary}, +${remaining.length - maxItems} more`;
   return summary;
 }
 

@@ -6,12 +6,7 @@ import {
   resolveCampaignPlanLabel,
   resolveCampaignRevisionRounds,
 } from "@/lib/approved-plan-display";
-import {
-  SOCIAL_POSTS_LABEL,
-  SOCIAL_POSTS_TOTAL,
-  isSocialPostsCampaign,
-  resolveSocialPostsDeliveredCount,
-} from "@/lib/route-map-social-posts";
+import { resolveProjectSnapshotDeliverables } from "@/lib/studio-board-project-snapshot";
 import type { AccountPackageView, StudioBoardView } from "@/lib/studio-board-view";
 
 type Props = {
@@ -19,31 +14,6 @@ type Props = {
   view: StudioBoardView;
   account: AccountPackageView;
 };
-
-function resolveDeliverablesSnapshot(campaign: CampaignRecord, view: StudioBoardView) {
-  if (isSocialPostsCampaign(campaign)) {
-    return {
-      label: SOCIAL_POSTS_LABEL,
-      delivered: resolveSocialPostsDeliveredCount(campaign),
-      total: SOCIAL_POSTS_TOTAL,
-    };
-  }
-
-  const firstProgressItem = view.deliverablesProgress[0];
-  if (firstProgressItem) {
-    return {
-      label: firstProgressItem.label,
-      delivered: firstProgressItem.delivered,
-      total: firstProgressItem.total,
-    };
-  }
-
-  return {
-    label: SOCIAL_POSTS_LABEL,
-    delivered: 0,
-    total: SOCIAL_POSTS_TOTAL,
-  };
-}
 
 function resolvePlanSnapshot(campaign: CampaignRecord) {
   const revisions = resolveCampaignRevisionRounds(campaign);
@@ -109,13 +79,9 @@ export default function ProjectSnapshotPanel({ campaign, view, account }: Props)
     );
   }
 
-  const deliverables = resolveDeliverablesSnapshot(campaign!, view);
+  const deliverables = resolveProjectSnapshotDeliverables(campaign!, view.deliverablesProgress);
   const plan = resolvePlanSnapshot(campaign!);
   const accountSnapshot = resolveAccountSnapshot(account);
-  const progressPercent =
-    deliverables.total > 0
-      ? Math.round(Math.min(1, Math.max(0, deliverables.delivered / deliverables.total)) * 100)
-      : 0;
 
   return (
     <section className="sb-project-snapshot" aria-labelledby="sb-project-snapshot-title">
@@ -128,23 +94,38 @@ export default function ProjectSnapshotPanel({ campaign, view, account }: Props)
           <h2 id="sb-project-snapshot-deliverables" className="sb-project-snapshot__heading">
             Deliverables
           </h2>
-          <p className="sb-project-snapshot__primary">{deliverables.label}</p>
-          <p className="sb-project-snapshot__meta">
-            {deliverables.delivered} of {deliverables.total} complete
-          </p>
-          <div
-            className="sb-project-snapshot__progress"
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={deliverables.total}
-            aria-valuenow={deliverables.delivered}
-            aria-label={`${deliverables.label} progress`}
-          >
-            <div className="sb-project-snapshot__progress-fill" style={{ width: `${progressPercent}%` }} />
-          </div>
-          <Link href={routes.deliverables} className="sb-project-snapshot__link">
-            View deliverables →
-          </Link>
+          {deliverables.kind === "unavailable" ? (
+            <p className="sb-project-snapshot__empty">{deliverables.message}</p>
+          ) : (
+            <>
+              <p className="sb-project-snapshot__primary">{deliverables.label}</p>
+              <p className="sb-project-snapshot__meta">
+                {deliverables.delivered} of {deliverables.total} complete
+              </p>
+              <div
+                className="sb-project-snapshot__progress"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={deliverables.total}
+                aria-valuenow={deliverables.delivered}
+                aria-label={`${deliverables.label} progress`}
+              >
+                <div
+                  className="sb-project-snapshot__progress-fill"
+                  style={{
+                    width: `${Math.round(
+                      Math.min(1, Math.max(0, deliverables.delivered / deliverables.total)) * 100,
+                    )}%`,
+                  }}
+                />
+              </div>
+              {deliverables.showViewDeliverables ? (
+                <Link href={routes.deliverables} className="sb-project-snapshot__link">
+                  View deliverables →
+                </Link>
+              ) : null}
+            </>
+          )}
         </section>
 
         <section className="sb-project-snapshot__section" aria-labelledby="sb-project-snapshot-plan">
