@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { PROJECT_COMMUNICATION_CUSTOMER_V1 as copy } from "@/config/project-communication-customer-v1";
 import type { CampaignRecord } from "@/config/studio-board";
@@ -16,6 +16,14 @@ type CustomerMessageView = {
   studioHasReplied: boolean | null;
 };
 
+type NotificationState = {
+  hasNewStudioReply: boolean;
+  newestStudioReplyId: string | null;
+  newestStudioReplyCreatedAt: string | null;
+  lastAcknowledgedStudioReplyId: string | null;
+  lastAcknowledgedAt: string | null;
+};
+
 type ListResponse = {
   messages?: CustomerMessageView[];
   error?: string;
@@ -24,6 +32,11 @@ type ListResponse = {
 type SendResponse = {
   confirmation?: string;
   messages?: CustomerMessageView[];
+  error?: string;
+};
+
+type NotificationResponse = {
+  notification?: NotificationState;
   error?: string;
 };
 
@@ -51,6 +64,14 @@ function newIdempotencyKey(): string {
   return `customer-msg-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+const EMPTY_NOTIFICATION: NotificationState = {
+  hasNewStudioReply: false,
+  newestStudioReplyId: null,
+  newestStudioReplyCreatedAt: null,
+  lastAcknowledgedStudioReplyId: null,
+  lastAcknowledgedAt: null,
+};
+
 export default function StudioBoardProjectCommunicationSection({
   campaign,
   hasCampaign,
@@ -58,19 +79,49 @@ export default function StudioBoardProjectCommunicationSection({
 }: StudioBoardProjectCommunicationSectionProps) {
   const fieldId = useId();
   const statusId = useId();
+  const noticeId = useId();
+  const threadRef = useRef<HTMLDivElement | null>(null);
   const campaignId = campaign?.campaignId ?? null;
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [messages, setMessages] = useState<CustomerMessageView[]>([]);
+  const [notification, setNotification] = useState<NotificationState>(EMPTY_NOTIFICATION);
+  const [notificationLoadFailed, setNotificationLoadFailed] = useState(false);
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
+  const [ackBusy, setAckBusy] = useState(false);
+  const [ackError, setAckError] = useState<string | null>(null);
   const [idempotencyKey, setIdempotencyKey] = useState(newIdempotencyKey);
+
+  const loadNotification = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(
+        `/api/campaigns/${encodeURIComponent(id)}/project-communication/acknowledgment`,
+        {
+          method: "GET",
+          headers: { Accept: "application/json" },
+        },
+      );
+      const json = (await res.json()) as NotificationResponse;
+      if (!res.ok) {
+        setNotificationLoadFailed(true);
+        setNotification(EMPTY_NOTIFICATION);
+        return;
+      }
+      setNotificationLoadFailed(false);
+      setNotification(json.notification ?? EMPTY_NOTIFICATION);
+    } catch {
+      setNotificationLoadFailed(true);
+      setNotification(EMPTY_NOTIFICATION);
+    }
+  }, []);
 
   const load = useCallback(async () => {
     if (!campaignId) {
       setMessages([]);
+      setNotification(EMPTY_NOTIFICATION);
       setLoading(false);
       return;
     }
@@ -89,17 +140,19 @@ export default function StudioBoardProjectCommunicationSection({
         throw new Error(json.error ?? copy.loadFailedFallback);
       }
       setMessages(json.messages ?? []);
+      await loadNotification(campaignId);
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : copy.loadFailedFallback);
       setMessages([]);
     } finally {
       setLoading(false);
     }
-  }, [campaignId]);
+  }, [campaignId, loadNotification]);
 
   useEffect(() => {
     if (!hasCampaign || campaignLookupPending || !campaignId) {
       setMessages([]);
+      setNotification(EMPTY_NOTIFICATION);
       setLoading(false);
       return;
     }
@@ -140,10 +193,44 @@ export default function StudioBoardProjectCommunicationSection({
       setMessages(json.messages ?? []);
       setBody("");
       setIdempotencyKey(newIdempotencyKey());
+      await loadNotification(campaignId);
     } catch (sendError) {
       setError(sendError instanceof Error ? sendError.message : copy.sendFailedFallback);
     } finally {
       setBusy(false);
+    }
+  };
+
+  const viewProjectMessages = async () => {
+    if (!campaignId || !notification.newestStudioReplyId || ackBusy) return;
+    setAckBusy(true);
+    setAckError(null);
+    threadRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    try {
+      const res = await fetch(
+        `/api/campaigns/${encodeURIComponent(campaignId)}/project-communication/acknowledgment`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            action: "acknowledge_studio_reply",
+            studioReplyMessageId: notification.newestStudioReplyId,
+            channel: "customer_board_view_messages",
+          }),
+        },
+      );
+      const json = (await res.json()) as NotificationResponse & { confirmation?: string };
+      if (!res.ok) {
+        throw new Error(json.error ?? copy.acknowledgeFailedFallback);
+      }
+      setNotification(json.notification ?? EMPTY_NOTIFICATION);
+    } catch (ackErr) {
+      setAckError(ackErr instanceof Error ? ackErr.message : copy.acknowledgeFailedFallback);
+    } finally {
+      setAckBusy(false);
     }
   };
 
@@ -167,18 +254,39 @@ export default function StudioBoardProjectCommunicationSection({
     return null;
   }
 
+  const showNewReply =
+    !notificationLoadFailed && notification.hasNewStudioReply && Boolean(notification.newestStudioReplyId);
+
   return (
     <article
       className="sb-card sb-card--project-communication bf-material bf-material-paper"
       aria-labelledby="sb-project-communication-title"
     >
-      <p id="sb-project-communication-title" className="sb-card__tab">
-        {copy.sectionTitle}
-      </p>
+      <div className="sb-project-communication__header">
+        <p id="sb-project-communication-title" className="sb-card__tab">
+          {showNewReply ? copy.neutralMessagesLabel : copy.sectionTitle}
+        </p>
+        {showNewReply ? (
+          <div className="sb-project-communication__notice" id={noticeId}>
+            <p className="sb-project-communication__notice-text" role="status">
+              {copy.newReplyIndicator}
+            </p>
+            <button
+              type="button"
+              className="utility-btn utility-btn--secondary sb-project-communication__notice-action"
+              onClick={() => void viewProjectMessages()}
+              disabled={ackBusy}
+            >
+              {ackBusy ? "Opening…" : copy.viewMessagesAction}
+            </button>
+          </div>
+        ) : null}
+      </div>
       <p className="sb-project-communication__lead">{copy.sectionLead}</p>
 
       <div className="sb-project-communication__body">
         <div
+          ref={threadRef}
           className="sb-project-communication__thread"
           aria-live="polite"
           aria-busy={loading || undefined}
@@ -258,6 +366,11 @@ export default function StudioBoardProjectCommunicationSection({
         {error ? (
           <p className="sb-project-communication__error" role="alert">
             {error}
+          </p>
+        ) : null}
+        {ackError ? (
+          <p className="sb-project-communication__error" role="alert">
+            {ackError}
           </p>
         ) : null}
         {success ? (

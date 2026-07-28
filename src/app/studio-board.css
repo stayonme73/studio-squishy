@@ -7574,6 +7574,42 @@ body:has(.sb--v4) {
   color: var(--sb-text-muted);
 }
 
+.sb-project-communication__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 0.15rem;
+}
+
+.sb-project-communication__notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem 0.85rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--sb-denim) 28%, transparent);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--sb-denim) 8%, #fff 92%);
+}
+
+.sb-project-communication__notice-text {
+  margin: 0;
+  font-size: var(--sb-type-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--sb-text);
+}
+
+.sb-project-communication__notice-action {
+  flex: 0 0 auto;
+}
+
+.sb-project-communication__notice-action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .sb-project-communication__body {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);

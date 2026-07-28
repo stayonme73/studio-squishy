@@ -1,6 +1,7 @@
 /**
  * COMM-4 — Customer Studio Board project communication copy.
  * Truthful only — protected COMM-D4 strings.
+ * COMM-5 notification strings live in PROJECT_COMMUNICATION_ACK_COPY.
  */
 
 export const PROJECT_COMMUNICATION_CUSTOMER_V1 = {
@@ -20,4 +21,9 @@ export const PROJECT_COMMUNICATION_CUSTOMER_V1 = {
   loadFailedFallback: "Could not load project messages.",
   sendFailedFallback: "Could not send the message.",
   authRequiredLead: "Sign in to send and view project messages.",
+  /** COMM-5 — in-product notice only; not a read receipt. */
+  newReplyIndicator: "New reply from The Studio",
+  viewMessagesAction: "View project messages",
+  neutralMessagesLabel: "Project messages",
+  acknowledgeFailedFallback: "Could not update the reply notice.",
 } as const;
