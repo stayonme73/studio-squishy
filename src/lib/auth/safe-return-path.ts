@@ -7,6 +7,7 @@ export const SAFE_RETURN_PATHS = new Set([
   "/feedback-studio",
   "/review-room",
   "/deliverables",
+  "/campaign-details",
   "/help-center",
   "/verify-email/pending",
 ]);

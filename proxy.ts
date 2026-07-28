@@ -19,7 +19,8 @@ function isClientRoute(pathname: string): boolean {
     pathname.startsWith("/studio-board") ||
     pathname.startsWith("/feedback-studio") ||
     pathname.startsWith("/review-room") ||
-    pathname.startsWith("/deliverables")
+    pathname.startsWith("/deliverables") ||
+    pathname.startsWith("/campaign-details")
   );
 }
 
@@ -126,6 +127,7 @@ export const config = {
     "/feedback-studio",
     "/review-room",
     "/deliverables",
+    "/campaign-details",
     "/api/campaigns",
     "/api/campaigns/(.*)",
     "/api/decision-learner",

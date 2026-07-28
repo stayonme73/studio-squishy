@@ -13,6 +13,7 @@ import { RouteMapClientSummaryPanel } from "@/components/route-map/RouteMapIntak
 import InformationUpdateEntry from "@/components/campaign-details/InformationUpdateEntry";
 import ProjectRecordSquishy from "@/components/campaign-details/ProjectRecordSquishy";
 import ProjectActivityCard from "@/components/campaign-details/ProjectActivityCard";
+import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import HelpCenterLink from "@/components/shared/HelpCenterLink";
 import UtilityPageFrame from "@/components/shared/UtilityPageFrame";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
@@ -80,13 +81,16 @@ function StudioUpdatesSection({ updates }: { updates: readonly { date: string; m
 export default function CampaignDetailsScene() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { campaign, ready } = useCurrentCampaign();
+  const { campaign, ready, accessState, refresh } = useCurrentCampaign();
   const view = useMemo(() => resolveCampaignDetailsView(campaign), [campaign]);
   const showPaymentHelp =
     view.status === "DRAFT_RECEIVED" || view.status === "PAYMENT_RECEIVED";
   // No customer-safe status call before payment — there is nothing to fetch yet.
+  const authorizedCampaign = accessState === "ready" ? campaign : null;
   const { jobs: projectJobs, loading: projectJobsLoading, error: projectJobsError } =
-    useProjectJobStatus(campaign?.paymentReceivedAt ? campaign.campaignId : undefined);
+    useProjectJobStatus(
+      authorizedCampaign?.paymentReceivedAt ? authorizedCampaign.campaignId : undefined,
+    );
   const {
     events: activityEvents,
     pendingCount,
@@ -94,7 +98,10 @@ export default function CampaignDetailsScene() {
     loading: activityLoading,
     error: activityError,
     refresh: refreshActivity,
-  } = useProjectActivity(campaign?.campaignId, campaign?.paymentReceivedAt);
+  } = useProjectActivity(
+    authorizedCampaign?.campaignId,
+    authorizedCampaign?.paymentReceivedAt,
+  );
   const statusCopy = copy.projectStatusCopy;
   const projectStatusState = resolveProjectStatusPanelState({
     paymentReceivedAt: campaign?.paymentReceivedAt,
@@ -152,6 +159,17 @@ export default function CampaignDetailsScene() {
         <div className="utility-page" aria-busy="true">
           <div className="utility-shell utility-shell--loading" />
         </div>
+      </UtilityPageFrame>
+    );
+  }
+
+  if (accessState !== "ready") {
+    return (
+      <UtilityPageFrame navId="campaign-details">
+        <ClientAccessStatePanel
+          state={accessState}
+          onRetry={accessState === "error" ? () => void refresh() : undefined}
+        />
       </UtilityPageFrame>
     );
   }
