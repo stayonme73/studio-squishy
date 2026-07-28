@@ -16,16 +16,16 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | `257456c4f27cc4114a0f6156b786dd10d973fc19` — `docs(launch): certify full project communication loop` |
+| Protected tip | `48ae3f6ed157fedebca296d09aad0e3d833c9a46` — `fix(studio-board): stop inventing Project Snapshot deliverables` |
 | Branch | `fix/discovery-responsive-layout` |
-| Sync | **0 ahead / 0 behind** (verified at MLL-COMM-1 truth refresh) |
-| Current active item | **None** — COMM-CERT-1 protected; next Hierarchy C item not yet opened |
+| Sync | **0 ahead / 0 behind** (verified at MLL-BOARD-1 truth refresh) |
+| Current active item | **None** — BOARD-TRUTH-2 protected; next Hierarchy C item not yet opened |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
-| Most recently completed | COMM-CERT-1 full communication loop certification (`docs/launch/COMMUNICATION-FULL-LOOP-CERTIFICATION.md`) · tip `257456c` |
-| Next three priorities | 1) **Studio Board customer truth and completeness** — PARTIAL · 2) Purchased-room Auth (locked before Customer-One) · 3) Unified Review / Final / Delivery design approval (deferred until after Board + Auth prerequisites) |
+| Most recently completed | BOARD-TRUTH-2 Project Snapshot deliverables honesty (`docs/launch/BOARD-TRUTH-2-PROJECT-SNAPSHOT-DELIVERABLES-HONESTY.md`) · tip `48ae3f6` |
+| Next three priorities | 1) **Purchased-room Auth Route/Data Protection** — MISSING · **LOCKED before Customer-One** · 2) Unified Review / Final / Delivery design approval (deferred until after Auth prerequisites) · 3) Materials dual UX decision (waiting — Board limit, not next engineering package) |
 | Active blockers | Purchased-room Auth — locked **before Customer-One** |
-| Decisions waiting | **1** — Materials dual UX (Board package) |
-| Customer-One readiness | **4 of 23** readiness gates complete (#16, #18, #20, #22) · Gates **#7** and **#19** are **COMPLETE WITH LIMITS** (not counted in the complete total) |
+| Decisions waiting | **1** — Materials dual UX (Board limit; waiting Tagia decision) |
+| Customer-One readiness | **4 of 23** readiness gates complete (#16, #18, #20, #22) · Gates **#7** and **#19** are **COMPLETE WITH LIMITS**; Hierarchy C #5 Board truth is **COMPLETE WITH LIMITS** (not counted in the complete total) |
 | Last updated | 2026-07-28 |
 
 ---
@@ -115,6 +115,7 @@ Every completed item must show available evidence: commit hash · subject · tes
 - **2026-07-26 — ARCHIVE-1 BOUNDARY COMPLETE.** Boundary review protected — `eaf3c239` · `docs: define legacy discovery UI archive boundary` · record `docs/launch/ARCHIVE-1-LEGACY-DISCOVERY-UI-BOUNDARY.md`. Option A approved; future destination `src/archive/studio-conversation-discovery-ui/`; **actual archive move deferred until after Customer-One** (early-start only for build/security/truth/dependency obstruction). Directory not created.
 - **2026-07-26 — MLL truth refresh.** Daily Snapshot / Hierarchy B / Hierarchy C / Hierarchy H reconciled to tip `eaf3c239`. Next incomplete Hierarchy C item remains **Customer communication and follow-up access — MISSING** (not started).
 - **2026-07-28 — MLL-COMM-1 truth refresh.** Hierarchy C #4 and Gate #7 reconciled to tip `257456c` using `docs/launch/COMMUNICATION-FULL-LOOP-CERTIFICATION.md` (36/36 focused Vitest · 67/67 full-loop browser). Communication is **COMPLETE WITH LIMITS** (in-product Board + File Room only). Next incomplete Hierarchy C item = **Studio Board customer truth and completeness — PARTIAL**.
+- **2026-07-28 — MLL-BOARD-1 truth refresh.** Hierarchy C #5 reconciled to tip `48ae3f6` using BOARD-TRUTH-1 decision map + `docs/launch/BOARD-TRUTH-2-PROJECT-SNAPSHOT-DELIVERABLES-HONESTY.md` (**10/10** snapshot · **37/37** Board truth regression · desktop ~1440 / phone ~390). Board truth is **COMPLETE WITH LIMITS**. Next incomplete Hierarchy C item = **Purchased-room Auth Route/Data Protection — MISSING** (locked before Customer-One). Materials dual UX remains a waiting decision / Board limit — not the next engineering package.
 
 ### Decisions Needed
 
@@ -388,7 +389,7 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 
 **Reusable harnesses (committed; regenerate evidence locally):** `scripts/cert-conversation-room-journey.mjs` · `scripts/cert-cr4r-interaction-proof.mjs` · `scripts/cert-cr4r5-tablet-scrim.mjs`
 **Generated artifacts:** intentionally not committed.
-**Next launch-critical item (Hierarchy C #5 — PARTIAL):** Studio Board customer truth and completeness · carries Materials dual UX decision. Hierarchy C #4 communication is **COMPLETE WITH LIMITS** @ `257456c`.
+**Next launch-critical item (Hierarchy C #6 — MISSING):** Purchased-room Auth Route/Data Protection · **LOCKED before Customer-One**. Hierarchy C #5 Board truth is **COMPLETE WITH LIMITS** @ `48ae3f6`. Materials dual UX remains waiting (Board limit; not next engineering package).
 
 ### ✅ Previous active item — Studio Voice Definition and Customer-Presence Doctrine (complete)
 
@@ -407,7 +408,7 @@ Evidence: `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md
 2. [x] ~~**Studio Voice Definition and Customer-Presence Doctrine**~~ — subject `docs: lock Studio Voice doctrine` · V1/V2/V3 locked · full hash in return report
 3. [x] ~~**Conversation Room completion without recommendation engine**~~ — **CR-4 CERTIFIED** @ `02657aa` · 30/30 rows PASS · CR-5 `c69b669` · CR-5B1 `dd8f5a3` · CR-5B2 `cd1f631` · ARCHIVE-1 boundary `eaf3c239` (move deferred post–Customer-One) · non-blocking deferrals listed in Hierarchy B
 4. [x] ~~**Customer communication and follow-up access**~~ — **COMPLETE WITH LIMITS** — COMM-2…COMM-5 protected · COMM-CERT-1 `257456c` · `docs/launch/COMMUNICATION-FULL-LOOP-CERTIFICATION.md` · **36/36** focused Vitest · **67/67** full-loop browser · in-product Studio Board + File Room only · campaign-scoped · authenticated ownership · **no** email / SMS / push / browser notifications · **no** attachments · **no** read / delivered / seen receipts · **no** live chat or response-time promises
-5. [ ] **Studio Board customer truth and completeness** — PARTIAL · carries Materials dual UX decision
+5. [x] ~~**Studio Board customer truth and completeness**~~ — **COMPLETE WITH LIMITS** — BOARD-TRUTH-1 decision · BOARD-TRUTH-2 `48ae3f6` · `docs/launch/BOARD-TRUTH-2-PROJECT-SNAPSHOT-DELIVERABLES-HONESTY.md` · **10/10** snapshot · **37/37** Board truth regression · desktop ~1440 / phone ~390 · Project Snapshot no longer invents Social Posts / fake completion · Materials dual UX still **waiting** (Intake + Board) · purchased-room page Auth gate = Hierarchy C #6 · Review/Final Delivery nav not stage-gated (destinations carry preparing / unavailable / no-files) · Package 7A not wired to Board · COMM remains in-product only under certified limits
 6. [ ] **Purchased-room Auth Route/Data Protection** — MISSING · **LOCKED before Customer-One**
 7. [ ] **Unified Review / Final / Delivery design approval** — DEFERRED until after Voice, CR, comms, Board · Tagia approval required
 8. [ ] **Unified Review / Final / Delivery construction** — MISSING · after design approval
@@ -650,7 +651,7 @@ Complaint/refund/communication/update history: prefer panels inside Board/Review
 | Conversation Room commerce journey | COMPLETE WITH LIMITS | CR-4 certified Lobby→Board via CR (`79ed2ce`); Voice Host discontinued; no fake engine; ARCHIVE-1 move deferred; Auth / real payment remain launch limits |
 | Secure Checkout (CR stage) | PARTIAL | Local campaign bridge; not production processor cert |
 | Production Intake / Materials (CR) | PARTIAL | Dual location with Board |
-| Studio Board truth | PARTIAL | Auth missing; Materials dual UX waiting |
+| Studio Board truth | COMPLETE WITH LIMITS | BOARD-TRUTH-2 `48ae3f6` · Materials dual UX waiting · Auth = C #6 · 7A not on Board |
 | Project Record | PARTIAL | Stage truth not fully wired |
 | Review + Job Review | PARTIAL / COMPLETE WITH LIMITS | 7B1/7B2 strong; auth missing |
 | Final Delivery | PARTIAL / COMPLETE WITH LIMITS | HFF 67/67; auth missing |
@@ -696,7 +697,7 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 | 22 | Production build passes | **COMPLETE** (verified during Launch Tracker / recent packages; CR-4 production build PASS) |
 | 23 | Full E2E testing passes | **MISSING** — CR-4 closes Conversation Room E2E only, not full Customer-One E2E |
 
-**Customer-One readiness: 4 of 23 gates complete** (#16, #18, #20, #22). Gates **#7** and **#19** are COMPLETE WITH LIMITS and not counted in the complete total.
+**Customer-One readiness: 4 of 23 gates complete** (#16, #18, #20, #22). Gates **#7** and **#19** are COMPLETE WITH LIMITS and not counted in the complete total. Hierarchy C #5 Board truth is COMPLETE WITH LIMITS @ `48ae3f6` (not a numbered readiness-gate bump).
 
 ---
 
@@ -767,7 +768,7 @@ Tagia may add issues anytime. Each entry needs: surface · device · problem · 
 | Standalone Intake / draft-room / project-details | OBSOLETE REDIRECT | Same → CR `?stage=intake` |
 | Host Guide URLs | OBSOLETE REDIRECT | Same; Host direction discontinued |
 | Retired concept picker | OBSOLETE (customer-unreachable) | Components parked; delete only with Tagia approval |
-| Duplicate Materials locations | PARTIAL duplication | Decision waiting — Board package |
+| Duplicate Materials locations | PARTIAL duplication | Decision waiting — Board limit (not next engineering package) |
 | Dual CR phase/stage models | Consolidation debt | Address in CR completion |
 
 ---
@@ -829,11 +830,11 @@ Do **not** clean, restore, stage, commit, absorb, or rewrite without an approved
 | Voice definition | Inventory complete | — | CR completion | **COMPLETE** (doctrine protected; audible quality deferred) |
 | CR completion | Voice definition | — | Comms, Board truth inputs | **COMPLETE WITH LIMITS** through ARCHIVE-1 boundary @ `eaf3c239` |
 | Customer communication | Voice + CR complete | — | Customer-One gate #7 (**COMPLETE WITH LIMITS** @ `257456c`) | In-product Board + File Room · external channels deferred |
-| Board truth | CR + materials decision | Materials dual UX waiting | Auth package timing | Materials waiting |
-| Auth Route/Data Protection | Board truth (default) | — | Customer-One | Timing answered |
+| Board truth | CR + materials decision | — | Customer-One gate support · Auth timing | **COMPLETE WITH LIMITS** @ `48ae3f6` · Materials dual UX waiting (limit) |
+| Auth Route/Data Protection | Board truth (default) | — | Customer-One | Timing answered · **next Hierarchy C incomplete item** |
 | Unified room design | Voice, CR, comms, Board | Tagia approval | Construction | Kickoff answered |
 | ARCHIVE-1 execute | After Customer-One (default) | Early-start only if build/security/truth/dependency obstructs | Clean archive of discovery UI | Option A locked · move **not** started |
 
 ---
 
-**Document status:** MLL-COMM-1 truth refresh staged against tip `257456c` (2026-07-28) · documentation only · **no product code** · COMM-1…COMM-5 + COMM-CERT-1 protected · Hierarchy C #4 / Gate #7 = **COMPLETE WITH LIMITS** · next Hierarchy C incomplete item = **Studio Board customer truth and completeness — PARTIAL**.
+**Document status:** MLL-BOARD-1 truth refresh staged against tip `48ae3f6` (2026-07-28) · documentation only · **no product code** · BOARD-TRUTH-1/2 + COMM-CERT-1 protected · Hierarchy C #5 Board truth = **COMPLETE WITH LIMITS** · next Hierarchy C incomplete item = **Purchased-room Auth Route/Data Protection — MISSING** (locked before Customer-One) · Materials dual UX remains waiting (Board limit).
