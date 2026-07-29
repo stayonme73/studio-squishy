@@ -93,7 +93,11 @@ export default function FeedbackStudioScene() {
             lead={`${feedbackStudio.pageSubtitle} — ${review.serviceName}`}
           />
 
-          <JobReviewWorkspace review={review} onReviewUpdated={setReview} />
+          <JobReviewWorkspace
+            review={review}
+            campaign={campaign}
+            onReviewUpdated={setReview}
+          />
 
           <StudioBoardDevStatus placement="sidebar" />
         </div>

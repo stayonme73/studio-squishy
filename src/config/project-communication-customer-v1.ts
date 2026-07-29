@@ -8,6 +8,10 @@ export const PROJECT_COMMUNICATION_CUSTOMER_V1 = {
   sectionTitle: "Project communication",
   sectionLead:
     "Messages about this project stay on your Studio Board. Replies from The Studio appear here when they are saved.",
+  /** C8a — locked Review Room panel label (words first). */
+  reviewRoomSectionTitle: "PROJECT COMMUNICATION",
+  reviewRoomSectionLead:
+    "Messages about this project. Replies from The Studio appear here when they are saved.",
   emptyState: "No project messages yet.",
   youLabel: "You",
   studioLabel: "The Studio",

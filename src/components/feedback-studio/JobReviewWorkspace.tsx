@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import FeedbackStudioFeedbackPanel from "@/components/feedback-studio/FeedbackStudioFeedbackPanel";
+import FeedbackStudioHandoffStatus from "@/components/feedback-studio/FeedbackStudioHandoffStatus";
 import FeedbackStudioRevisionStatus from "@/components/feedback-studio/FeedbackStudioRevisionStatus";
 import JobReviewDeliverablePreview from "@/components/feedback-studio/JobReviewDeliverablePreview";
+import StudioBoardProjectCommunicationSection from "@/components/studio-board/StudioBoardProjectCommunicationSection";
 import type {
   FeedbackSectionId,
   FeedbackSession,
@@ -13,7 +15,8 @@ import type {
   StickyNoteColorId,
 } from "@/config/feedback-studio";
 import { feedbackStudio, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
-import { studioBoard } from "@/config/studio-board";
+import { PROJECT_COMMUNICATION_CUSTOMER_V1 } from "@/config/project-communication-customer-v1";
+import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import type { ClientReviewView } from "@/lib/job-control/review-room-view";
 import {
   deliverableKeyToSectionId,
@@ -24,11 +27,12 @@ import {
 
 type Props = {
   review: ClientReviewView;
+  campaign: CampaignRecord | null;
   onReviewUpdated: (review: ClientReviewView) => void;
 };
 
 /** Job-scoped Review Room workspace — real deliverables from Production Workspace. */
-export default function JobReviewWorkspace({ review, onReviewUpdated }: Props) {
+export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }: Props) {
   const sectionLabels = useMemo(() => {
     const labels: Record<string, string> = {};
     for (const deliverable of review.deliverables) {
@@ -330,7 +334,8 @@ export default function JobReviewWorkspace({ review, onReviewUpdated }: Props) {
           ) : null}
         </div>
 
-        <aside className="fs-review__rail" aria-label="Review status and feedback">
+        <aside className="fs-review__rail" aria-label="Review status, tools, and project communication">
+          <FeedbackStudioHandoffStatus review={review} />
           <FeedbackStudioRevisionStatus status={revisionStatus} />
 
           <FeedbackStudioFeedbackPanel
@@ -380,6 +385,19 @@ export default function JobReviewWorkspace({ review, onReviewUpdated }: Props) {
             onRevision={handleRevision}
             onSkip={handleSkip}
             onSubmit={() => undefined}
+          />
+
+          <StudioBoardProjectCommunicationSection
+            campaign={campaign}
+            hasCampaign={Boolean(campaign)}
+            campaignLookupPending={false}
+            presentation={{
+              sectionTitle: PROJECT_COMMUNICATION_CUSTOMER_V1.reviewRoomSectionTitle,
+              sectionLead: PROJECT_COMMUNICATION_CUSTOMER_V1.reviewRoomSectionLead,
+              titleId: "fs-project-communication-title",
+              rootClassName:
+                "fs-project-communication bf-material bf-material-paper",
+            }}
           />
         </aside>
       </div>

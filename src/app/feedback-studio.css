@@ -53,6 +53,52 @@
   color: var(--utility-primary);
 }
 
+.fs-status-card__meta {
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--utility-text-muted);
+}
+
+.fs-status-card--handoff .fs-status-card__value {
+  color: var(--utility-text);
+}
+
+/* C8a — in-room Project Communication (reuses Board COMM markup/classes). */
+.fs-project-communication {
+  width: 100%;
+  padding: 0.75rem 0.85rem 0.9rem;
+  border: 1px solid var(--utility-border);
+  border-radius: 10px;
+  background: var(--utility-card);
+  box-shadow: var(--utility-shadow);
+}
+
+.fs-project-communication .sb-card__tab {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--utility-text);
+}
+
+.fs-project-communication .sb-project-communication__lead {
+  margin: 0.45rem 0 0.65rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--utility-text-muted);
+}
+
+.fs-project-communication .sb-project-communication__thread {
+  max-height: 12rem;
+  overflow: auto;
+}
+
+.fs-project-communication .sb-project-communication__textarea {
+  min-height: 4.5rem;
+}
+
 /* —— Direction picker —— */
 
 .fs-picker {

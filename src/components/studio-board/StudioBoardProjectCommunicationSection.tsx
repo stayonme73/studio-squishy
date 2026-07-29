@@ -44,6 +44,13 @@ type StudioBoardProjectCommunicationSectionProps = {
   campaign: CampaignRecord | null;
   hasCampaign: boolean;
   campaignLookupPending: boolean;
+  /** C8a — Review Room chrome; defaults preserve Board copy and card layout. */
+  presentation?: {
+    sectionTitle: string;
+    sectionLead: string;
+    titleId?: string;
+    rootClassName?: string;
+  };
 };
 
 function formatWhen(iso: string): string {
@@ -76,10 +83,18 @@ export default function StudioBoardProjectCommunicationSection({
   campaign,
   hasCampaign,
   campaignLookupPending,
+  presentation,
 }: StudioBoardProjectCommunicationSectionProps) {
   const fieldId = useId();
   const statusId = useId();
   const noticeId = useId();
+  const generatedTitleId = useId();
+  const titleId = presentation?.titleId ?? generatedTitleId;
+  const sectionTitle = presentation?.sectionTitle ?? copy.sectionTitle;
+  const sectionLead = presentation?.sectionLead ?? copy.sectionLead;
+  const rootClassName =
+    presentation?.rootClassName ??
+    "sb-card sb-card--project-communication bf-material bf-material-paper";
   const threadRef = useRef<HTMLDivElement | null>(null);
   const campaignId = campaign?.campaignId ?? null;
 
@@ -236,12 +251,9 @@ export default function StudioBoardProjectCommunicationSection({
 
   if (campaignLookupPending) {
     return (
-      <article
-        className="sb-card sb-card--project-communication bf-material bf-material-paper"
-        aria-labelledby="sb-project-communication-title"
-      >
-        <p id="sb-project-communication-title" className="sb-card__tab">
-          {copy.sectionTitle}
+      <article className={rootClassName} aria-labelledby={titleId}>
+        <p id={titleId} className="sb-card__tab">
+          {sectionTitle}
         </p>
         <p className="sb-project-communication__meta" aria-busy="true">
           Loading project messages…
@@ -258,13 +270,10 @@ export default function StudioBoardProjectCommunicationSection({
     !notificationLoadFailed && notification.hasNewStudioReply && Boolean(notification.newestStudioReplyId);
 
   return (
-    <article
-      className="sb-card sb-card--project-communication bf-material bf-material-paper"
-      aria-labelledby="sb-project-communication-title"
-    >
+    <article className={rootClassName} aria-labelledby={titleId}>
       <div className="sb-project-communication__header">
-        <p id="sb-project-communication-title" className="sb-card__tab">
-          {showNewReply ? copy.neutralMessagesLabel : copy.sectionTitle}
+        <p id={titleId} className="sb-card__tab">
+          {showNewReply ? copy.neutralMessagesLabel : sectionTitle}
         </p>
         {showNewReply ? (
           <div className="sb-project-communication__notice" id={noticeId}>
@@ -282,7 +291,7 @@ export default function StudioBoardProjectCommunicationSection({
           </div>
         ) : null}
       </div>
-      <p className="sb-project-communication__lead">{copy.sectionLead}</p>
+      <p className="sb-project-communication__lead">{sectionLead}</p>
 
       <div className="sb-project-communication__body">
         <div

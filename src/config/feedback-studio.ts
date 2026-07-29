@@ -101,6 +101,11 @@ export const feedbackStudio = {
     roundOf: (current: number, total: number) => `Review ${current} of ${total}`,
   },
 
+  /** C8a — presentation handoff status (mapped from 7A; not a second stage system). */
+  handoffStatus: {
+    label: "Submission status",
+  },
+
   previewSections: {
     hero: "Hero",
     social: "Social post",
@@ -129,7 +134,8 @@ export const feedbackStudio = {
   },
 
   feedbackPanel: {
-    title: "Feedback Tools",
+    /** C8a — locked panel label (words first; icons support only). */
+    title: "REVIEW TOOLS",
     hint: "Select a section in the preview, then leave feedback using the tools below.",
     toolGroups: {
       annotate: "Annotate",
