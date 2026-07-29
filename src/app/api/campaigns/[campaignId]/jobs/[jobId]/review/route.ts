@@ -13,8 +13,11 @@ import {
   resolveCampaignCommunicationClientId,
   syncJobCommunicationRecords,
 } from "@/lib/job-control/communication";
-import { canClientAccessJobReview } from "@/lib/job-control/review-room-access";
-import { resolveClientReviewView } from "@/lib/job-control/review-room-view";
+import { canClientAccessJobReview, canClientViewJobReview } from "@/lib/job-control/review-room-access";
+import {
+  findJobReviewFeedback,
+  resolveClientReviewView,
+} from "@/lib/job-control/review-room-view";
 import { redactJobFileStorageForClient } from "@/lib/file-storage/redact";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 
@@ -74,10 +77,16 @@ export async function GET(request: Request, context: RouteContext) {
   }
 
   if (!canClientAccessJobReview(job)) {
-    return NextResponse.json(
-      { error: "This job is not ready for client review.", spineStatus: job.spineStatus },
-      { status: 403 },
+    const existingFeedback = findJobReviewFeedback(
+      envelopeWithCommunications,
+      job.jobId,
     );
+    if (!canClientViewJobReview(job, existingFeedback)) {
+      return NextResponse.json(
+        { error: "This job is not ready for client review.", spineStatus: job.spineStatus },
+        { status: 403 },
+      );
+    }
   }
 
   const view = resolveClientReviewView({

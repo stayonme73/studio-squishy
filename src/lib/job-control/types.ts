@@ -65,6 +65,7 @@ export type JobActivityEventKind =
   | "working_file_ref"
   | "deliverable_prepared"
   | "client_review_feedback"
+  | "client_review_received"
   | "client_revision_request"
   | "client_delivery_approval"
   | "owner_final_release"

@@ -16,6 +16,7 @@ import {
 } from "./review-feedback-types";
 import {
   canClientAccessJobReview,
+  canClientViewJobReview,
   filterClientVisibleActivity,
 } from "./review-room-access";
 import {
@@ -76,7 +77,9 @@ export function resolveClientReviewView(input: {
 }): ClientReviewView | null {
   const { campaign, job, envelope } = input;
 
-  if (!canClientAccessJobReview(job)) {
+  const existing = findJobReviewFeedback(envelope, job.jobId);
+
+  if (!canClientViewJobReview(job, existing)) {
     return null;
   }
 
@@ -115,7 +118,6 @@ export function resolveClientReviewView(input: {
     });
 
   const deliverableKeys = deliverables.map((entry) => entry.key);
-  const existing = findJobReviewFeedback(envelope, job.jobId);
   const feedback =
     existing ?? createEmptyJobReviewFeedback(campaign.campaignId, job.jobId, deliverableKeys);
 

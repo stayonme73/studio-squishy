@@ -10,10 +10,11 @@ import {
   clientRevisionRoundRequiresReserveHandling,
   clientRevisionRoundWouldExceed,
 } from "@/lib/job-control/review-room-gates";
-import { canClientAccessJobReview } from "@/lib/job-control/review-room-access";
+import { canClientAccessJobReview, canClientViewJobReview } from "@/lib/job-control/review-room-access";
 import { createEmptyJobReviewFeedback } from "@/lib/job-control/review-feedback-types";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
+import { releaseMessageRef } from "@/lib/job-control/review-handoff-receipts";
 
 function campaign(overrides: Partial<CampaignRecord> = {}): CampaignRecord {
   return {
@@ -114,6 +115,32 @@ const clientUser = {
   currentCampaignId: "review-v1",
 };
 
+const staffUser = {
+  id: "staff-1",
+  email: "staff@local.dev",
+  displayName: "Staff",
+  roles: ["staff"] as const,
+};
+
+function envelopeWithStudioRelease(jobRecord: PurchasedJobRecord): ServerTasksEnvelope {
+  const base = envelope(jobRecord);
+  return {
+    ...base,
+    jobActivityEvents: [
+      {
+        id: "status_change:release-1",
+        campaignId: jobRecord.campaignId,
+        jobId: jobRecord.jobId,
+        kind: "status_change",
+        occurredAt: "2026-07-03T11:00:00.000Z",
+        actor: { role: "staff", userId: "prod-1", displayName: "Production" },
+        spineStatus: "ready_for_review",
+        reason: "Production submitted client-ready work to Review Room",
+      },
+    ],
+  };
+}
+
 describe("review-room access", () => {
   it("allows only ready_for_review without owner gate pending", () => {
     expect(canClientAccessJobReview({ spineStatus: "ready_for_review" })).toBe(true);
@@ -124,6 +151,18 @@ describe("review-room access", () => {
       }),
     ).toBe(false);
     expect(canClientAccessJobReview({ spineStatus: "building_concepts" })).toBe(false);
+  });
+
+  it("allows read-only view of submitted packages after spine leaves ready_for_review", () => {
+    const submitted = createEmptyJobReviewFeedback("review-v1", "job-1", ["d0"]);
+    submitted.submittedAt = "2026-07-03T13:00:00.000Z";
+    submitted.submissionType = "revision_requested";
+    expect(
+      canClientViewJobReview({ spineStatus: "revision_requested" }, submitted),
+    ).toBe(true);
+    expect(canClientViewJobReview({ spineStatus: "revision_requested" }, null)).toBe(
+      false,
+    );
   });
 });
 
@@ -341,6 +380,103 @@ describe("review-room actions", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.updatedCampaign?.revisionRoundsUsed).toBe(2);
+    }
+  });
+
+  it("records authorized customer receipt once per Studio release", () => {
+    const jobRecord = job();
+    const first = applyReviewRoomPatch(
+      envelopeWithStudioRelease(jobRecord),
+      campaign(),
+      jobRecord,
+      { action: "acknowledge_review_received" },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+
+    const received = first.envelope.jobActivityEvents?.filter(
+      (event) => event.kind === "client_review_received",
+    );
+    expect(received).toHaveLength(1);
+    expect(received?.[0]?.messageRef).toBe(releaseMessageRef("status_change:release-1"));
+    expect(received?.[0]?.actor.userId).toBe(clientUser.id);
+
+    const second = applyReviewRoomPatch(
+      first.envelope,
+      campaign(),
+      jobRecord,
+      { action: "acknowledge_review_received" },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(second.ok).toBe(true);
+    if (!second.ok) return;
+    expect(
+      second.envelope.jobActivityEvents?.filter(
+        (event) => event.kind === "client_review_received",
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("rejects staff acknowledgment of customer receipt", () => {
+    const jobRecord = job();
+    const result = applyReviewRoomPatch(
+      envelopeWithStudioRelease(jobRecord),
+      campaign(),
+      jobRecord,
+      { action: "acknowledge_review_received" },
+      staffUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.status).toBe(403);
+    }
+  });
+
+  it("blocks a second formal submission after submittedAt is set", () => {
+    const jobRecord = job();
+    const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
+      "deliverable-0",
+      "deliverable-1",
+    ]);
+    feedback.sectionStatuses["deliverable-0"] = "approved";
+    feedback.sectionStatuses["deliverable-1"] = "approved";
+
+    const approved = applyReviewRoomPatch(
+      envelope(jobRecord),
+      campaign(),
+      jobRecord,
+      { action: "approve_for_delivery", feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(approved.ok).toBe(true);
+    if (!approved.ok) return;
+
+    const again = applyReviewRoomPatch(
+      approved.envelope,
+      campaign(),
+      approved.job,
+      { action: "approve_for_delivery", feedback: approved.feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(again.ok).toBe(false);
+
+    const saveBlocked = applyReviewRoomPatch(
+      approved.envelope,
+      campaign(),
+      job(),
+      { action: "save_feedback", feedback: approved.feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(saveBlocked.ok).toBe(false);
+    if (!saveBlocked.ok) {
+      expect(saveBlocked.error).toMatch(/already submitted/i);
     }
   });
 });

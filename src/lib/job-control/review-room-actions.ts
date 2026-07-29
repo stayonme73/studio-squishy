@@ -1,6 +1,7 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import { requiredDeliverablesForJob } from "@/lib/approved-plan-line";
 import { resolveCampaignRevisionRounds } from "@/lib/approved-plan-display";
+import { isClientOnly } from "@/lib/auth/roles";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
@@ -13,6 +14,12 @@ import {
   resolveRequiredDeliverableKeys,
 } from "./production-workspace-gates";
 import type { JobReviewFeedback } from "./review-feedback-types";
+import {
+  findClientReviewReceivedForRelease,
+  findLatestStudioReviewRelease,
+  releaseMessageRef,
+} from "./review-handoff-receipts";
+import { canClientAccessJobReview } from "./review-room-access";
 import {
   canApproveJobForDelivery,
   canRequestJobRevision,
@@ -34,6 +41,10 @@ export type ReviewRoomPatchBody =
   | {
       action: "approve_for_delivery";
       feedback: JobReviewFeedback;
+    }
+  | {
+      /** C8b — authorized customer open of an active review release. */
+      action: "acknowledge_review_received";
     };
 
 export type ReviewRoomActionResult =
@@ -111,6 +122,74 @@ export function applyReviewRoomPatch(
   const actor = clientActor(user);
   let events = [...(envelope.jobActivityEvents ?? [])];
   let currentJob = job;
+
+  if (body.action === "acknowledge_review_received") {
+    if (!isClientOnly(user)) {
+      return {
+        ok: false,
+        error: "Only the authorized customer can record review receipt.",
+        status: 403,
+      };
+    }
+    if (!canClientAccessJobReview(job)) {
+      return { ok: false, error: "Job is not open for review.", status: 422 };
+    }
+
+    const release = findLatestStudioReviewRelease(events, job.jobId);
+    if (!release) {
+      return {
+        ok: false,
+        error: "No Studio review release is available to acknowledge.",
+        status: 422,
+      };
+    }
+
+    const existingFeedback =
+      findJobReviewFeedback(envelope, job.jobId) ??
+      ({
+        jobId: job.jobId,
+        campaignId: job.campaignId,
+        sectionStatuses: {},
+        stickyNotes: [],
+        voiceNotes: [],
+        drawSections: [],
+        updatedAt: occurredAt,
+        submittedAt: null,
+        submissionType: null,
+      } satisfies JobReviewFeedback);
+
+    const existingReceipt = findClientReviewReceivedForRelease(
+      events,
+      job.jobId,
+      release.activityId,
+    );
+    if (existingReceipt) {
+      return {
+        ok: true,
+        envelope,
+        job: currentJob,
+        feedback: existingFeedback,
+      };
+    }
+
+    events = appendJobActivityEvent(events, {
+      campaignId: job.campaignId,
+      jobId: job.jobId,
+      kind: "client_review_received",
+      occurredAt,
+      actor,
+      reason: "Customer opened the released review",
+      messageRef: releaseMessageRef(release.activityId),
+      spineStatus: job.spineStatus,
+    });
+
+    return {
+      ok: true,
+      envelope: updateJobInEnvelope(envelope, currentJob, events),
+      job: currentJob,
+      feedback: existingFeedback,
+    };
+  }
 
   const scopeError = validateFeedbackJobScope(body.feedback, job.campaignId, job.jobId);
   if (scopeError) {

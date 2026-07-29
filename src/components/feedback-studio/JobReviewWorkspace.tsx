@@ -5,7 +5,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import FeedbackStudioFeedbackPanel from "@/components/feedback-studio/FeedbackStudioFeedbackPanel";
 import FeedbackStudioHandoffStatus from "@/components/feedback-studio/FeedbackStudioHandoffStatus";
+import FeedbackStudioLockedPackageReceipt from "@/components/feedback-studio/FeedbackStudioLockedPackageReceipt";
 import FeedbackStudioRevisionStatus from "@/components/feedback-studio/FeedbackStudioRevisionStatus";
+import FeedbackStudioSubmissionReceipt from "@/components/feedback-studio/FeedbackStudioSubmissionReceipt";
+import FeedbackStudioSubmitConfirm from "@/components/feedback-studio/FeedbackStudioSubmitConfirm";
 import JobReviewDeliverablePreview from "@/components/feedback-studio/JobReviewDeliverablePreview";
 import StudioBoardProjectCommunicationSection from "@/components/studio-board/StudioBoardProjectCommunicationSection";
 import type {
@@ -17,6 +20,11 @@ import type {
 import { feedbackStudio, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
 import { PROJECT_COMMUNICATION_CUSTOMER_V1 } from "@/config/project-communication-customer-v1";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
+import {
+  buildFeedbackPackageInventory,
+  buildLockedFeedbackPackageReceipt,
+  buildStudioSubmissionReceipt,
+} from "@/lib/job-control/review-handoff-receipts";
 import type { ClientReviewView } from "@/lib/job-control/review-room-view";
 import {
   deliverableKeyToSectionId,
@@ -62,12 +70,16 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmMode, setConfirmMode] = useState<"revision" | "approval" | null>(
+    null,
+  );
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const recordStartRef = useRef<number>(0);
   const recordTimerRef = useRef<number | null>(null);
   const noticeTimerRef = useRef<number | null>(null);
   const saveTimerRef = useRef<number | null>(null);
+  const receiveAckRef = useRef<string | null>(null);
 
   useEffect(() => {
     setSession(jobReviewFeedbackToFeedbackSession(review));
@@ -80,6 +92,34 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
       if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
     };
   }, []);
+
+  // C8b — record authorized customer open via authenticated POST (not GET/prefetch).
+  useEffect(() => {
+    if (receiveAckRef.current === review.jobId) return;
+    if (review.feedback.submittedAt) return;
+    if (review.spineStatus !== "ready_for_review") return;
+
+    receiveAckRef.current = review.jobId;
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const result = await patchJobReview(review.campaignId, review.jobId, {
+          action: "acknowledge_review_received",
+        });
+        if (!cancelled && result.review) {
+          onReviewUpdated(result.review);
+        }
+      } catch {
+        // Soft-fail: receipt stamp must never block review tools.
+        if (!cancelled) receiveAckRef.current = null;
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [review, onReviewUpdated]);
 
   const flashSaveNotice = useCallback((message: string) => {
     setSaveNotice(message);
@@ -251,7 +291,13 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
       if (result.review) {
         onReviewUpdated(result.review);
         setSession(jobReviewFeedbackToFeedbackSession(result.review));
+      } else {
+        setSession(jobReviewFeedbackToFeedbackSession({
+          ...review,
+          feedback: result.feedback,
+        }));
       }
+      setConfirmMode(null);
       flashSaveNotice(feedbackStudio.jobReview.submittedRevision);
     } catch (submitError) {
       const message =
@@ -278,7 +324,13 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
       if (result.review) {
         onReviewUpdated(result.review);
         setSession(jobReviewFeedbackToFeedbackSession(result.review));
+      } else {
+        setSession(jobReviewFeedbackToFeedbackSession({
+          ...review,
+          feedback: result.feedback,
+        }));
       }
+      setConfirmMode(null);
       flashSaveNotice(feedbackStudio.jobReview.submittedApproval);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Approval failed");
@@ -286,6 +338,41 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
       setBusy(false);
     }
   }
+
+  const submissionReceipt = useMemo(
+    () =>
+      buildStudioSubmissionReceipt({
+        deliverables: review.deliverables,
+        activity: review.activity,
+        jobId: review.jobId,
+      }),
+    [review],
+  );
+
+  const packageInventory = useMemo(
+    () =>
+      buildFeedbackPackageInventory(
+        feedbackSessionToJobReviewFeedback(session, review),
+        review.deliverables,
+      ),
+    [session, review],
+  );
+
+  const lockedPackageReceipt = useMemo(() => {
+    if (!review.feedback.submittedAt) return null;
+    const senderEvent = [...review.activity]
+      .reverse()
+      .find(
+        (event) =>
+          event.kind === "client_revision_request" ||
+          event.kind === "client_delivery_approval",
+      );
+    return buildLockedFeedbackPackageReceipt({
+      feedback: review.feedback,
+      deliverables: review.deliverables,
+      senderLabel: senderEvent?.actor.displayName?.trim() || "Customer",
+    });
+  }, [review]);
 
   return (
     <div className="fs-review fs-review--workspace">
@@ -310,7 +397,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
               type="button"
               className="utility-btn utility-btn--secondary"
               disabled={busy || submitted || !review.canRequestRevision}
-              onClick={() => void handleRequestRevision()}
+              onClick={() => setConfirmMode("revision")}
             >
               {feedbackStudio.feedbackPanel.requestRevisionJob}
             </button>
@@ -318,7 +405,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
               type="button"
               className="utility-btn utility-btn--primary"
               disabled={busy || submitted || !review.canApproveForDelivery}
-              onClick={() => void handleApproveForDelivery()}
+              onClick={() => setConfirmMode("approval")}
             >
               {feedbackStudio.feedbackPanel.approveForDelivery}
             </button>
@@ -332,10 +419,33 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
               {error}
             </p>
           ) : null}
+
+          {confirmMode ? (
+            <FeedbackStudioSubmitConfirm
+              mode={confirmMode}
+              inventory={packageInventory}
+              versionLabel={packageInventory.versionLabel}
+              busy={busy}
+              onCancel={() => setConfirmMode(null)}
+              onConfirm={() => {
+                if (confirmMode === "revision") {
+                  void handleRequestRevision();
+                } else {
+                  void handleApproveForDelivery();
+                }
+              }}
+            />
+          ) : null}
         </div>
 
         <aside className="fs-review__rail" aria-label="Review status, tools, and project communication">
           <FeedbackStudioHandoffStatus review={review} />
+          {submissionReceipt && !submitted ? (
+            <FeedbackStudioSubmissionReceipt receipt={submissionReceipt} />
+          ) : null}
+          {submitted && lockedPackageReceipt ? (
+            <FeedbackStudioLockedPackageReceipt receipt={lockedPackageReceipt} />
+          ) : null}
           <FeedbackStudioRevisionStatus status={revisionStatus} />
 
           <FeedbackStudioFeedbackPanel

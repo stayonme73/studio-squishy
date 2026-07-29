@@ -1,3 +1,4 @@
+import type { JobReviewFeedback } from "./review-feedback-types";
 import type { JobActivityEventKind } from "./types";
 
 /** Client may access Review Room only when job is ready for their review. */
@@ -7,6 +8,26 @@ export function canClientAccessJobReview(job: {
 }): boolean {
   if (job.ownerApprovalPending === "before_review") return false;
   return job.spineStatus === "ready_for_review";
+}
+
+/**
+ * C8b — read-only view of a locked submitted package after spine leaves ready_for_review.
+ * Mutations still require `canClientAccessJobReview`.
+ */
+export function canClientViewJobReview(
+  job: {
+    spineStatus: string;
+    ownerApprovalPending?: string | null;
+  },
+  feedback?: JobReviewFeedback | null,
+): boolean {
+  if (canClientAccessJobReview(job)) return true;
+  if (!feedback?.submittedAt) return false;
+  return (
+    job.spineStatus === "revision_requested" ||
+    job.spineStatus === "ready_for_queue" ||
+    job.spineStatus === "approved"
+  );
 }
 
 const CLIENT_HIDDEN_ACTIVITY_KINDS = new Set<JobActivityEventKind>([
