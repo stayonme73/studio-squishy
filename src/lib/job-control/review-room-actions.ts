@@ -1,6 +1,5 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import { requiredDeliverablesForJob } from "@/lib/approved-plan-line";
-import { resolveCampaignRevisionRounds } from "@/lib/approved-plan-display";
 import { isClientOnly } from "@/lib/auth/roles";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -10,10 +9,25 @@ import { applyJobSpineStatusChange } from "./actions";
 import { appendJobActivityEvent } from "./activity-log";
 import { enqueueJobCommunicationRecord } from "./communication";
 import {
+  appendCorrectionUseIdempotent,
+  buildCorrectionUseIdempotencyKey,
+  buildCorrectionUseRecord,
+  deriveCorrectionAccounting,
+  ensureWriteOnceRevisionAllowance,
+  findCorrectionUseByKey,
+  findCorrectionUseByPackageId,
+  mergeReconstructedCorrectionUses,
+  pickExtraGrantToConsume,
+  type CorrectionUseRecord,
+} from "./correction-round-ledger";
+import {
   allRequiredDeliverablesPrepared,
   resolveRequiredDeliverableKeys,
 } from "./production-workspace-gates";
-import type { JobReviewFeedback } from "./review-feedback-types";
+import {
+  ensureFeedbackPackageId,
+  type JobReviewFeedback,
+} from "./review-feedback-types";
 import {
   findClientReviewReceivedForRelease,
   findLatestStudioReviewRelease,
@@ -23,10 +37,13 @@ import { canClientAccessJobReview } from "./review-room-access";
 import {
   canApproveJobForDelivery,
   canRequestJobRevision,
-  clientRevisionRoundHardStops,
-  clientRevisionRoundRequiresReserveHandling,
 } from "./review-room-gates";
-import { findJobReviewFeedback, upsertJobReviewFeedback } from "./review-room-view";
+import {
+  findActiveJobReviewFeedback,
+  findJobReviewFeedback,
+  listLockedJobReviewFeedback,
+  upsertJobReviewFeedback,
+} from "./review-room-view";
 import type { JobActivityActor, JobActivityEvent, PurchasedJobRecord } from "./types";
 
 export type ReviewRoomPatchBody =
@@ -54,6 +71,8 @@ export type ReviewRoomActionResult =
       job: PurchasedJobRecord;
       feedback: JobReviewFeedback;
       updatedCampaign?: CampaignRecord;
+      correctionUse?: CorrectionUseRecord;
+      correctionUseCreated?: boolean;
     }
   | { ok: false; error: string; status: number; revisionLimitReached?: boolean };
 
@@ -109,19 +128,33 @@ function validateFeedbackJobScope(
   return null;
 }
 
+function resolveVersionLabel(job: PurchasedJobRecord): string | null {
+  const labels = (job.fileRegistry ?? [])
+    .map((ref) => ref.versionLabel?.trim())
+    .filter((label): label is string => Boolean(label));
+  return labels.at(-1) ?? null;
+}
+
 export function applyReviewRoomPatch(
   envelope: ServerTasksEnvelope,
-  campaign: CampaignRecord,
+  campaignInput: CampaignRecord,
   job: PurchasedJobRecord,
   body: ReviewRoomPatchBody,
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
-  clientId = `unclaimed-client:${campaign.campaignId}`,
+  clientId = `unclaimed-client:${campaignInput.campaignId}`,
 ): ReviewRoomActionResult {
   const occurredAt = new Date().toISOString();
   const actor = clientActor(user);
   let events = [...(envelope.jobActivityEvents ?? [])];
   let currentJob = job;
+
+  let workingEnvelope = mergeReconstructedCorrectionUses(
+    envelope,
+    campaignInput.campaignId,
+  );
+  const allowance = ensureWriteOnceRevisionAllowance(campaignInput, occurredAt);
+  let campaign = allowance.campaign;
 
   if (body.action === "acknowledge_review_received") {
     if (!isClientOnly(user)) {
@@ -145,8 +178,10 @@ export function applyReviewRoomPatch(
     }
 
     const existingFeedback =
-      findJobReviewFeedback(envelope, job.jobId) ??
+      findActiveJobReviewFeedback(workingEnvelope, job.jobId) ??
+      findJobReviewFeedback(workingEnvelope, job.jobId) ??
       ({
+        packageId: `pkg:${job.jobId}:draft:${release.activityId}`,
         jobId: job.jobId,
         campaignId: job.campaignId,
         sectionStatuses: {},
@@ -154,6 +189,7 @@ export function applyReviewRoomPatch(
         voiceNotes: [],
         drawSections: [],
         updatedAt: occurredAt,
+        releaseActivityId: release.activityId,
         submittedAt: null,
         submissionType: null,
       } satisfies JobReviewFeedback);
@@ -166,9 +202,10 @@ export function applyReviewRoomPatch(
     if (existingReceipt) {
       return {
         ok: true,
-        envelope,
+        envelope: workingEnvelope,
         job: currentJob,
         feedback: existingFeedback,
+        updatedCampaign: allowance.didSnapshot ? campaign : undefined,
       };
     }
 
@@ -185,9 +222,10 @@ export function applyReviewRoomPatch(
 
     return {
       ok: true,
-      envelope: updateJobInEnvelope(envelope, currentJob, events),
+      envelope: updateJobInEnvelope(workingEnvelope, currentJob, events),
       job: currentJob,
       feedback: existingFeedback,
+      updatedCampaign: allowance.didSnapshot ? campaign : undefined,
     };
   }
 
@@ -206,8 +244,10 @@ export function applyReviewRoomPatch(
     )
     .map((def) => def.key);
 
-  const revisionRoundsIncluded = resolveCampaignRevisionRounds(campaign);
-  const revisionRoundsUsed = campaign.revisionRoundsUsed ?? 0;
+  const accounting = deriveCorrectionAccounting({
+    campaign,
+    envelope: workingEnvelope,
+  });
 
   switch (body.action) {
     case "save_feedback": {
@@ -215,17 +255,33 @@ export function applyReviewRoomPatch(
         return { ok: false, error: "Job is not open for review.", status: 422 };
       }
 
-      const existing = findJobReviewFeedback(envelope, job.jobId);
-      if (existing?.submittedAt) {
+      const existingActive = findActiveJobReviewFeedback(workingEnvelope, job.jobId);
+      const locked = listLockedJobReviewFeedback(workingEnvelope, job.jobId);
+      if (!existingActive && locked.some((entry) => entry.packageId === body.feedback.packageId)) {
+        return { ok: false, error: "Locked feedback packages cannot be edited.", status: 422 };
+      }
+      if (existingActive?.submittedAt) {
         return { ok: false, error: "Review already submitted.", status: 422 };
       }
 
-      const feedback: JobReviewFeedback = {
+      const release = findLatestStudioReviewRelease(events, job.jobId);
+      const feedback = ensureFeedbackPackageId({
         ...body.feedback,
         jobId: job.jobId,
         campaignId: job.campaignId,
+        packageId:
+          body.feedback.packageId ||
+          existingActive?.packageId ||
+          `pkg:${job.jobId}:draft:${release?.activityId ?? "open"}`,
+        releaseActivityId:
+          body.feedback.releaseActivityId ??
+          existingActive?.releaseActivityId ??
+          release?.activityId ??
+          null,
         updatedAt: occurredAt,
-      };
+        submittedAt: null,
+        submissionType: null,
+      });
 
       events = appendJobActivityEvent(events, {
         campaignId: job.campaignId,
@@ -237,66 +293,123 @@ export function applyReviewRoomPatch(
       });
 
       const nextEnvelope = upsertJobReviewFeedback(
-        updateJobInEnvelope(envelope, currentJob, events),
+        updateJobInEnvelope(workingEnvelope, currentJob, events),
         feedback,
       );
 
-      return { ok: true, envelope: nextEnvelope, job: currentJob, feedback };
+      return {
+        ok: true,
+        envelope: nextEnvelope,
+        job: currentJob,
+        feedback,
+        updatedCampaign: allowance.didSnapshot ? campaign : undefined,
+      };
     }
 
     case "request_revision": {
-      if (clientRevisionRoundHardStops(revisionRoundsUsed)) {
-        events = appendJobActivityEvent(events, {
-          campaignId: job.campaignId,
-          jobId: job.jobId,
-          kind: "client_revision_request",
-          occurredAt,
-          actor,
-          reason: "Revision hard stop reached - Squishy will hold policy unless this becomes a boundary, scope, goodwill, or relationship decision.",
-        });
-
-        return {
-          ok: false,
-          error: "This job has reached the revision hard stop. Squishy will follow policy unless the request becomes a business judgment issue.",
-          status: 422,
-          revisionLimitReached: true,
-        };
-      }
-
       const gate = canRequestJobRevision({
         job,
         feedback: body.feedback,
-        revisionRoundsUsed,
-        revisionRoundsIncluded,
+        revisionRoundsRemaining: accounting.remaining,
         allDeliverablesPrepared: allPrepared,
       });
 
       if (!gate.allowed) {
-        return { ok: false, error: gate.reasons.join(" "), status: 422 };
+        const exhausted = accounting.remaining <= 0;
+        return {
+          ok: false,
+          error: gate.reasons.join(" "),
+          status: 422,
+          revisionLimitReached: exhausted,
+        };
       }
 
-      const feedback: JobReviewFeedback = {
+      const release = findLatestStudioReviewRelease(events, job.jobId);
+      const active = findActiveJobReviewFeedback(workingEnvelope, job.jobId);
+      const packageId =
+        body.feedback.packageId ||
+        active?.packageId ||
+        `pkg:${job.jobId}:draft:${release?.activityId ?? occurredAt}`;
+
+      const existingUse =
+        findCorrectionUseByPackageId(workingEnvelope, packageId) ??
+        findCorrectionUseByKey(
+          workingEnvelope,
+          buildCorrectionUseIdempotencyKey(job.jobId, body.feedback.submittedAt ?? ""),
+        );
+      if (existingUse) {
+        const existingFeedback =
+          listLockedJobReviewFeedback(workingEnvelope, job.jobId).find(
+            (entry) => entry.packageId === packageId,
+          ) ?? findJobReviewFeedback(workingEnvelope, job.jobId);
+        return {
+          ok: true,
+          envelope: workingEnvelope,
+          job: currentJob,
+          feedback: existingFeedback ?? ensureFeedbackPackageId(body.feedback),
+          updatedCampaign: campaign,
+          correctionUse: existingUse,
+          correctionUseCreated: false,
+        };
+      }
+
+      if (
+        listLockedJobReviewFeedback(workingEnvelope, job.jobId).some(
+          (entry) => entry.packageId === packageId,
+        )
+      ) {
+        return {
+          ok: false,
+          error: "This feedback package is already locked.",
+          status: 422,
+        };
+      }
+
+      const feedback = ensureFeedbackPackageId({
         ...body.feedback,
+        packageId,
         jobId: job.jobId,
         campaignId: job.campaignId,
+        releaseActivityId:
+          body.feedback.releaseActivityId ??
+          active?.releaseActivityId ??
+          release?.activityId ??
+          null,
         updatedAt: occurredAt,
         submittedAt: occurredAt,
         submissionType: "revision_requested",
-      };
-      const isReserveRevision = clientRevisionRoundRequiresReserveHandling(revisionRoundsUsed);
+      });
+
+      let consumptionKind: "included" | "owner_extra" = "included";
+      let extraGrantId: string | undefined;
+      if (accounting.remainingIncluded > 0) {
+        consumptionKind = "included";
+      } else {
+        const grant = pickExtraGrantToConsume(
+          accounting.grants,
+          accounting.history,
+          job.jobId,
+        );
+        if (!grant) {
+          return {
+            ok: false,
+            error: "All included correction rounds have been used.",
+            status: 422,
+            revisionLimitReached: true,
+          };
+        }
+        consumptionKind = "owner_extra";
+        extraGrantId = grant.id;
+      }
 
       const statusResult = applyJobSpineStatusChange(currentJob, events, {
         job: currentJob,
-        nextStatus: isReserveRevision ? "ready_for_queue" : "revision_requested",
+        nextStatus: "revision_requested",
         actor,
-        reason: isReserveRevision
-          ? "Reserve revision requested with feedback - returned to production queue"
-          : "Client requested revision with feedback",
+        reason: "Client requested revision with feedback",
         occurredAt,
       });
-      currentJob = isReserveRevision
-        ? { ...statusResult.job, laneQueuedAt: occurredAt }
-        : statusResult.job;
+      currentJob = statusResult.job;
       events = statusResult.events;
 
       events = appendJobActivityEvent(events, {
@@ -305,13 +418,13 @@ export function applyReviewRoomPatch(
         kind: "client_revision_request",
         occurredAt,
         actor,
-        reason: isReserveRevision
-          ? "Reserve revision round requested - required questions and delay acknowledgment handled by Squishy and Decision Core"
-          : "Client requested revision",
+        reason: "Client requested revision",
         spineStatus: currentJob.spineStatus,
+        messageRef: `correction:${packageId}:${occurredAt}`,
       });
+
       let nextEnvelope = enqueueJobCommunicationRecord(
-        { ...envelope, jobActivityEvents: events },
+        { ...workingEnvelope, jobActivityEvents: events },
         {
           campaign,
           clientId,
@@ -324,16 +437,54 @@ export function applyReviewRoomPatch(
       );
       events = nextEnvelope.jobActivityEvents ?? [];
 
+      const correctionUse = buildCorrectionUseRecord({
+        campaignId: job.campaignId,
+        jobId: job.jobId,
+        packageId,
+        submittedAt: occurredAt,
+        releaseActivityId: feedback.releaseActivityId ?? release?.activityId ?? null,
+        versionLabel: resolveVersionLabel(job),
+        actor,
+        occurredAt,
+        ordinal: accounting.history.length + 1,
+        consumptionKind,
+        extraGrantId,
+        feedback,
+      });
+
+      const appended = appendCorrectionUseIdempotent(nextEnvelope, correctionUse);
+      nextEnvelope = appended.envelope;
+
+      if (!appended.created) {
+        // Idempotent retry — return existing locked package / ledger row.
+        const existingFeedback =
+          listLockedJobReviewFeedback(nextEnvelope, job.jobId).find(
+            (entry) => entry.packageId === packageId,
+          ) ?? feedback;
+        return {
+          ok: true,
+          envelope: nextEnvelope,
+          job: currentJob,
+          feedback: existingFeedback,
+          updatedCampaign: campaign,
+          correctionUse: appended.record,
+          correctionUseCreated: false,
+        };
+      }
+
+      const ledgerUsed = (nextEnvelope.jobCorrectionUses ?? []).length;
       const updatedCampaign: CampaignRecord = {
         ...campaign,
-        revisionRoundsUsed: revisionRoundsUsed + 1,
+        revisionRoundsIncluded: campaign.revisionRoundsIncluded,
+        revisionRoundsIncludedSource: campaign.revisionRoundsIncludedSource,
+        revisionRoundsUsed: ledgerUsed,
         updatedAt: occurredAt,
       };
 
       nextEnvelope = upsertJobReviewFeedback(
         {
           ...nextEnvelope,
-          tasks: markTasksNeedsRevision(envelope.tasks ?? [], job.skuId),
+          tasks: markTasksNeedsRevision(workingEnvelope.tasks ?? [], job.skuId),
         },
         feedback,
       );
@@ -345,6 +496,8 @@ export function applyReviewRoomPatch(
         job: currentJob,
         feedback,
         updatedCampaign,
+        correctionUse: appended.record,
+        correctionUseCreated: true,
       };
     }
 
@@ -360,14 +513,25 @@ export function applyReviewRoomPatch(
         return { ok: false, error: gate.reasons.join(" "), status: 422 };
       }
 
-      const feedback: JobReviewFeedback = {
+      const release = findLatestStudioReviewRelease(events, job.jobId);
+      const active = findActiveJobReviewFeedback(workingEnvelope, job.jobId);
+      const feedback = ensureFeedbackPackageId({
         ...body.feedback,
+        packageId:
+          body.feedback.packageId ||
+          active?.packageId ||
+          `pkg:${job.jobId}:draft:${release?.activityId ?? occurredAt}`,
         jobId: job.jobId,
         campaignId: job.campaignId,
+        releaseActivityId:
+          body.feedback.releaseActivityId ??
+          active?.releaseActivityId ??
+          release?.activityId ??
+          null,
         updatedAt: occurredAt,
         submittedAt: occurredAt,
         submissionType: "approved_for_delivery",
-      };
+      });
 
       const statusResult = applyJobSpineStatusChange(currentJob, events, {
         job: currentJob,
@@ -392,7 +556,7 @@ export function applyReviewRoomPatch(
         spineStatus: "approved",
       });
 
-      let nextEnvelope = upsertJobReviewFeedback(envelope, feedback);
+      let nextEnvelope = upsertJobReviewFeedback(workingEnvelope, feedback);
       nextEnvelope = enqueueJobCommunicationRecord(
         { ...nextEnvelope, jobActivityEvents: events },
         {
@@ -408,7 +572,13 @@ export function applyReviewRoomPatch(
       events = nextEnvelope.jobActivityEvents ?? [];
       nextEnvelope = updateJobInEnvelope(nextEnvelope, currentJob, events);
 
-      return { ok: true, envelope: nextEnvelope, job: currentJob, feedback };
+      return {
+        ok: true,
+        envelope: nextEnvelope,
+        job: currentJob,
+        feedback,
+        updatedCampaign: allowance.didSnapshot ? campaign : undefined,
+      };
     }
 
     default:

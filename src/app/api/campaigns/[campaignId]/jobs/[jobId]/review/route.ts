@@ -2,13 +2,20 @@ import { NextResponse } from "next/server";
 
 import { upsertCampaignRecord } from "@/lib/campaign-store/store";
 import { requireReadableCampaign } from "@/lib/campaign-store/server-access";
-import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
+import {
+  getOrGenerateTasks,
+  readTasksEnvelope,
+  writeTasksEnvelope,
+} from "@/lib/campaign-tasks/store";
 import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import {
   applyReviewRoomPatch,
   type ReviewRoomPatchBody,
 } from "@/lib/job-control/review-room-actions";
+import {
+  findCorrectionUseByPackageId,
+} from "@/lib/job-control/correction-round-ledger";
 import {
   resolveCampaignCommunicationClientId,
   syncJobCommunicationRecords,
@@ -171,20 +178,47 @@ export async function PATCH(request: Request, context: RouteContext) {
     );
   }
 
-  if (result.updatedCampaign) {
-    await upsertCampaignRecord(result.updatedCampaign, user.id);
+  let envelopeToPersist = result.envelope;
+  let campaignToPersist = result.updatedCampaign;
+  let responseJob = result.job;
+  let skipWrite = false;
+
+  // C8c — re-read before write so a concurrent winner with the same package
+  // is not overwritten (file store is last-write-wins).
+  if (
+    body.action === "request_revision" &&
+    result.correctionUse &&
+    result.correctionUseCreated
+  ) {
+    const latest = await readTasksEnvelope(campaignId);
+    if (
+      latest &&
+      findCorrectionUseByPackageId(latest, result.correctionUse.packageId)
+    ) {
+      envelopeToPersist = latest;
+      campaignToPersist = undefined;
+      responseJob =
+        latest.jobRecords?.find((entry) => entry.jobId === jobId) ?? result.job;
+      skipWrite = true;
+    }
   }
 
-  const saved = await writeTasksEnvelope(result.envelope);
+  if (campaignToPersist) {
+    await upsertCampaignRecord(campaignToPersist, user.id);
+  }
+
+  const saved = skipWrite
+    ? envelopeToPersist
+    : await writeTasksEnvelope(envelopeToPersist);
 
   const view = resolveClientReviewView({
-    campaign: result.updatedCampaign ?? campaignEnvelope.record,
-    job: result.job,
+    campaign: campaignToPersist ?? campaignEnvelope.record,
+    job: responseJob,
     envelope: saved,
   });
 
   return NextResponse.json({
-    job: redactJobFileStorageForClient(result.job),
+    job: redactJobFileStorageForClient(responseJob),
     feedback: result.feedback,
     review: view,
     syncedAt: saved.syncedAt,

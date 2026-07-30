@@ -154,6 +154,15 @@ export type CampaignRecord = {
   paymentReceivedAt?: string | null;
   targetCompletionDate?: string | null;
   revisionRoundsIncluded?: number;
+  /**
+   * C8c — how write-once `revisionRoundsIncluded` was resolved.
+   * Never overwrite an existing included value from live package config.
+   */
+  revisionRoundsIncludedSource?:
+    | "campaign_field"
+    | "approved_plan"
+    | "package_snapshot"
+    | "legacy_package_config";
   revisionRoundsUsed?: number;
   deliverablesDelivered?: DeliverablesDelivered;
   /** Persisted notes; falls back to statusContent when absent */

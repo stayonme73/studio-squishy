@@ -101,6 +101,22 @@ export const feedbackStudio = {
     roundOf: (current: number, total: number) => `Review ${current} of ${total}`,
   },
 
+  /** C8c — finite correction-round accounting (ledger-derived). */
+  correctionAccounting: {
+    label: "Correction rounds",
+    included: "Included",
+    used: "Used",
+    remaining: "Remaining",
+    extraRemaining: "Extra owner-approved remaining",
+    includedUse: "Included correction",
+    ownerExtraUse: "Owner-authorized extra use",
+    versionFallback: "Version label not provided",
+    historyItem: (ordinal: number, included: number) =>
+      `Correction ${ordinal} of ${Math.max(included, ordinal)}`,
+    legacyNotice:
+      "Prior usage was recorded before package history was available. Remaining rounds are limited by that provisional count.",
+  },
+
   /** C8a — presentation handoff status (mapped from 7A; not a second stage system). */
   handoffStatus: {
     label: "Submission status",
@@ -152,7 +168,7 @@ export const feedbackStudio = {
     requestRevisionJob: "Request Revision",
     approveForDelivery: "Approve for Delivery",
     revisionLimitNotice:
-      "This request needs a business boundary review before Squishy can respond.",
+      "All included correction rounds have been used. You can still message the Studio about a problem or question. New creative changes may require additional scope.",
     submitted: "Feedback submitted — thank you.",
     stickyPlaceholder: "Write your note…",
     saveSticky: "Place note",

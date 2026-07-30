@@ -6,11 +6,20 @@ export type ReviewGateResult = {
   reasons: string[];
 };
 
-export type ClientRevisionPolicyStage = "included" | "reserve" | "hard_stop";
-
+/**
+ * @deprecated C8c — purchased allowance + owner grants are entitlement authority.
+ * Kept only for legacy test references; do not use for customer entitlement.
+ */
 export const INCLUDED_CLIENT_REVISION_ROUNDS = 3;
+/**
+ * @deprecated C8c — no silent reserve rounds beyond purchased allowance.
+ */
 export const RESERVE_CLIENT_REVISION_ROUNDS = 5;
 
+/** @deprecated C8c — use deriveCorrectionAccounting().remaining instead. */
+export type ClientRevisionPolicyStage = "included" | "reserve" | "hard_stop";
+
+/** @deprecated C8c — entitlement is ledger-derived remaining, not hardcoded stages. */
 export function resolveClientRevisionPolicyStage(
   revisionRoundsUsed: number,
 ): ClientRevisionPolicyStage {
@@ -20,12 +29,14 @@ export function resolveClientRevisionPolicyStage(
   return "hard_stop";
 }
 
+/** @deprecated C8c — reserve free rounds removed; owner extra grants only. */
 export function clientRevisionRoundRequiresReserveHandling(
-  revisionRoundsUsed: number,
+  _revisionRoundsUsed: number,
 ): boolean {
-  return resolveClientRevisionPolicyStage(revisionRoundsUsed) === "reserve";
+  return false;
 }
 
+/** @deprecated C8c — use remaining === 0 from correction accounting. */
 export function clientRevisionRoundHardStops(revisionRoundsUsed: number): boolean {
   return resolveClientRevisionPolicyStage(revisionRoundsUsed) === "hard_stop";
 }
@@ -60,8 +71,7 @@ export function resolveReviewBlockedReasons(input: {
 export function canRequestJobRevision(input: {
   job: PurchasedJobRecord;
   feedback: JobReviewFeedback;
-  revisionRoundsUsed: number;
-  revisionRoundsIncluded: number;
+  revisionRoundsRemaining: number;
   allDeliverablesPrepared: boolean;
 }): ReviewGateResult {
   const reasons: string[] = [];
@@ -78,8 +88,8 @@ export function canRequestJobRevision(input: {
     reasons.push("Required deliverables must be prepared before submitting.");
   }
 
-  if (clientRevisionRoundHardStops(input.revisionRoundsUsed)) {
-    reasons.push("Revision policy has reached the hard stop.");
+  if (input.revisionRoundsRemaining <= 0) {
+    reasons.push("All included correction rounds have been used.");
   }
 
   const hasRevisionSignal = hasClientRevisionIntent(input.feedback);

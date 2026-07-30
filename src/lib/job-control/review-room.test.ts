@@ -6,7 +6,6 @@ import { applyReviewRoomPatch } from "@/lib/job-control/review-room-actions";
 import {
   canApproveJobForDelivery,
   canRequestJobRevision,
-  clientRevisionRoundHardStops,
   clientRevisionRoundRequiresReserveHandling,
   clientRevisionRoundWouldExceed,
 } from "@/lib/job-control/review-room-gates";
@@ -181,11 +180,29 @@ describe("review-room gates", () => {
     expect(result.allowed).toBe(false);
   });
 
-  it("detects revision limit exhaustion", () => {
+  it("detects revision limit exhaustion helpers", () => {
     expect(clientRevisionRoundWouldExceed(1, 1)).toBe(true);
     expect(clientRevisionRoundWouldExceed(0, 1)).toBe(false);
-    expect(clientRevisionRoundRequiresReserveHandling(3)).toBe(true);
-    expect(clientRevisionRoundHardStops(5)).toBe(true);
+    // C8c — reserve free rounds removed; purchased allowance is authority.
+    expect(clientRevisionRoundRequiresReserveHandling(3)).toBe(false);
+  });
+
+  it("blocks request_revision when remaining is zero", () => {
+    const feedback = createEmptyJobReviewFeedback("review-v1", job().jobId, [
+      "deliverable-0",
+      "deliverable-1",
+    ]);
+    feedback.sectionStatuses["deliverable-0"] = "revision";
+    const result = canRequestJobRevision({
+      job: job(),
+      feedback,
+      revisionRoundsRemaining: 0,
+      allDeliverablesPrepared: true,
+    });
+    expect(result.allowed).toBe(false);
+    expect(result.reasons.some((reason) => /included correction/i.test(reason))).toBe(
+      true,
+    );
   });
 });
 
@@ -277,7 +294,7 @@ describe("review-room actions", () => {
     }
   });
 
-  it("handles reserve revision round without Owner Desk exception", () => {
+  it("creates one ledger use on formal revision and rejects when exhausted", () => {
     const jobRecord = job();
     const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
       "deliverable-0",
@@ -285,27 +302,130 @@ describe("review-room actions", () => {
     ]);
     feedback.sectionStatuses["deliverable-0"] = "revision";
 
-    const result = applyReviewRoomPatch(
+    const first = applyReviewRoomPatch(
       envelope(jobRecord),
-      campaign({ revisionRoundsIncluded: 3, revisionRoundsUsed: 3 }),
+      campaign({ revisionRoundsIncluded: 1, revisionRoundsUsed: 0 }),
       jobRecord,
       { action: "request_revision", feedback },
       clientUser,
       { staffByUserId: {}, staffCapabilities: {} },
     );
 
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.job.spineStatus).toBe("ready_for_queue");
-      expect(result.job.laneQueuedAt).toBe(result.job.updatedAt);
-      expect(result.envelope.exceptionRecords ?? []).toHaveLength(0);
-      expect(result.envelope.jobActivityEvents?.some((entry) =>
-        entry.reason?.includes("Reserve revision round requested"),
-      )).toBe(true);
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+    expect(first.correctionUseCreated).toBe(true);
+    expect(first.envelope.jobCorrectionUses).toHaveLength(1);
+    expect(first.updatedCampaign?.revisionRoundsUsed).toBe(1);
+
+    const secondFeedback = createEmptyJobReviewFeedback(
+      "review-v1",
+      jobRecord.jobId,
+      ["deliverable-0", "deliverable-1"],
+      { packageId: "pkg:second-cycle" },
+    );
+    secondFeedback.sectionStatuses["deliverable-0"] = "revision";
+
+    const second = applyReviewRoomPatch(
+      {
+        ...first.envelope,
+        jobRecords: [{ ...first.job, spineStatus: "ready_for_review" }],
+      },
+      first.updatedCampaign ?? campaign({ revisionRoundsIncluded: 1 }),
+      { ...first.job, spineStatus: "ready_for_review" },
+      { action: "request_revision", feedback: secondFeedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+
+    expect(second.ok).toBe(false);
+    if (!second.ok) {
+      expect(second.revisionLimitReached).toBe(true);
     }
   });
 
-  it("hard-stops revision after reserve rounds without Owner Desk exception", () => {
+  it("does not consume on draft save or approval", () => {
+    const jobRecord = job();
+    const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
+      "deliverable-0",
+      "deliverable-1",
+    ]);
+    feedback.sectionStatuses["deliverable-0"] = "approved";
+    feedback.sectionStatuses["deliverable-1"] = "skip";
+
+    const saved = applyReviewRoomPatch(
+      envelope(jobRecord),
+      campaign(),
+      jobRecord,
+      { action: "save_feedback", feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(saved.ok).toBe(true);
+    if (saved.ok) {
+      expect(saved.envelope.jobCorrectionUses ?? []).toHaveLength(0);
+    }
+
+    const approved = applyReviewRoomPatch(
+      envelope(jobRecord),
+      campaign(),
+      jobRecord,
+      { action: "approve_for_delivery", feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(approved.ok).toBe(true);
+    if (approved.ok) {
+      expect(approved.envelope.jobCorrectionUses ?? []).toHaveLength(0);
+    }
+  });
+
+  it("preserves prior locked package when a new draft cycle begins", () => {
+    const jobRecord = job();
+    const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
+      "deliverable-0",
+      "deliverable-1",
+    ]);
+    feedback.sectionStatuses["deliverable-0"] = "revision";
+
+    const first = applyReviewRoomPatch(
+      envelope(jobRecord),
+      campaign({ revisionRoundsIncluded: 2 }),
+      jobRecord,
+      { action: "request_revision", feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+
+    const secondDraft = createEmptyJobReviewFeedback(
+      "review-v1",
+      jobRecord.jobId,
+      ["deliverable-0", "deliverable-1"],
+      { packageId: "pkg:cycle-2" },
+    );
+    secondDraft.sectionStatuses["deliverable-0"] = "revision";
+
+    const saved = applyReviewRoomPatch(
+      {
+        ...first.envelope,
+        jobRecords: [{ ...jobRecord, spineStatus: "ready_for_review" }],
+      },
+      first.updatedCampaign ?? campaign({ revisionRoundsIncluded: 2 }),
+      { ...jobRecord, spineStatus: "ready_for_review" },
+      { action: "save_feedback", feedback: secondDraft },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(saved.ok).toBe(true);
+    if (!saved.ok) return;
+
+    const packages = saved.envelope.jobReviewFeedback ?? [];
+    expect(packages.filter((entry) => entry.submittedAt)).toHaveLength(1);
+    expect(packages.filter((entry) => !entry.submittedAt)).toHaveLength(1);
+  });
+
+  it("rejects exhausted included rounds without silent reserve", () => {
     const jobRecord = job();
     const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
       "deliverable-0",
@@ -315,7 +435,7 @@ describe("review-room actions", () => {
 
     const result = applyReviewRoomPatch(
       envelope(jobRecord),
-      campaign({ revisionRoundsIncluded: 3, revisionRoundsUsed: 5 }),
+      campaign({ revisionRoundsIncluded: 1, revisionRoundsUsed: 1 }),
       jobRecord,
       { action: "request_revision", feedback },
       clientUser,
@@ -325,11 +445,11 @@ describe("review-room actions", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.revisionLimitReached).toBe(true);
-      expect(result.error).not.toContain("Owner Desk");
+      expect(result.error).toMatch(/included correction/i);
     }
   });
 
-  it("uses revision rounds from frozen plan when campaign field is unset", () => {
+  it("snapshots write-once allowance from frozen plan when campaign field is unset", () => {
     const jobRecord = job();
     const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
       "deliverable-0",
@@ -339,7 +459,7 @@ describe("review-room actions", () => {
 
     const frozenPlanCampaign = campaign({
       revisionRoundsIncluded: undefined,
-      revisionRoundsUsed: 1,
+      revisionRoundsUsed: 0,
       approvedStudioPlan: {
         selectedServiceIds: ["sm-001"],
         includedServiceIds: ["sm-001"],
@@ -379,7 +499,45 @@ describe("review-room actions", () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.updatedCampaign?.revisionRoundsUsed).toBe(2);
+      expect(result.updatedCampaign?.revisionRoundsIncluded).toBe(2);
+      expect(result.updatedCampaign?.revisionRoundsIncludedSource).toBe(
+        "approved_plan",
+      );
+      expect(result.envelope.jobCorrectionUses).toHaveLength(1);
+    }
+  });
+
+  it("idempotent packageId does not create a second ledger row", () => {
+    const jobRecord = job();
+    const feedback = createEmptyJobReviewFeedback("review-v1", jobRecord.jobId, [
+      "deliverable-0",
+      "deliverable-1",
+    ]);
+    feedback.sectionStatuses["deliverable-0"] = "revision";
+
+    const first = applyReviewRoomPatch(
+      envelope(jobRecord),
+      campaign({ revisionRoundsIncluded: 2 }),
+      jobRecord,
+      { action: "request_revision", feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+
+    const retry = applyReviewRoomPatch(
+      first.envelope,
+      first.updatedCampaign ?? campaign({ revisionRoundsIncluded: 2 }),
+      { ...jobRecord, spineStatus: "ready_for_review" },
+      { action: "request_revision", feedback },
+      clientUser,
+      { staffByUserId: {}, staffCapabilities: {} },
+    );
+    expect(retry.ok).toBe(true);
+    if (retry.ok) {
+      expect(retry.correctionUseCreated).toBe(false);
+      expect(retry.envelope.jobCorrectionUses).toHaveLength(1);
     }
   });
 
@@ -476,7 +634,7 @@ describe("review-room actions", () => {
     );
     expect(saveBlocked.ok).toBe(false);
     if (!saveBlocked.ok) {
-      expect(saveBlocked.error).toMatch(/already submitted/i);
+      expect(saveBlocked.error).toMatch(/locked feedback|already submitted/i);
     }
   });
 });

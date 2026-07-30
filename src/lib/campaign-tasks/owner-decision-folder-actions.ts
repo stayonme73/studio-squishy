@@ -1,5 +1,6 @@
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
+import { appendCorrectionExtraGrant } from "@/lib/job-control/correction-round-ledger";
 
 import type { ExceptionActionResult } from "./exceptions-actions";
 import { findExceptionById } from "./exceptions";
@@ -145,7 +146,7 @@ export function applyOwnerAllowRevision(
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
 ): ExceptionActionResult {
-  return applyOwnerResolveExceptionDecision(
+  const resolved = applyOwnerResolveExceptionDecision(
     envelope,
     {
       exceptionId: payload.exceptionId,
@@ -155,6 +156,31 @@ export function applyOwnerAllowRevision(
     user,
     assignments,
   );
+  if (!resolved.ok) return resolved;
+
+  const existing = findExceptionById(envelope.exceptionRecords, payload.exceptionId);
+  const approvedAt = new Date().toISOString();
+  const grantId = `correction-extra:${payload.exceptionId}`;
+  const nextEnvelope = appendCorrectionExtraGrant(resolved.envelope, {
+    id: grantId,
+    campaignId: resolved.envelope.campaignId,
+    jobId: existing?.taskId,
+    quantity: 1,
+    approvedByUserId: user.id,
+    approvedByDisplayName: user.displayName ?? "Owner",
+    approvedAt,
+    reason:
+      payload.ownerNotes?.trim() ||
+      "Owner approved one additional correction use",
+    exceptionId: payload.exceptionId,
+  });
+
+  return {
+    ok: true,
+    envelope: nextEnvelope,
+    exception: resolved.exception,
+    materialsEnvelope: resolved.materialsEnvelope,
+  };
 }
 
 export function applyOwnerHoldFirmRevision(

@@ -124,6 +124,7 @@ export function feedbackSessionToJobReviewFeedback(
   }
 
   return {
+    packageId: review.feedback.packageId,
     jobId: review.jobId,
     campaignId: review.campaignId,
     sectionStatuses,
@@ -142,6 +143,7 @@ export function feedbackSessionToJobReviewFeedback(
     })),
     drawSections: session.drawSections.map(sectionIdToDeliverableKey),
     updatedAt: new Date().toISOString(),
+    releaseActivityId: review.feedback.releaseActivityId ?? null,
     submittedAt: session.submittedAt,
     submissionType: review.feedback.submissionType ?? null,
   };

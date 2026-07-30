@@ -1,9 +1,15 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import { findProductionPlanLineForJob } from "@/lib/approved-plan-line";
-import { resolveCampaignRevisionRounds } from "@/lib/approved-plan-display";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 
 import { mergeActivityEvents, deriveBaselineActivityEvents } from "./activity-log";
+import {
+  deriveCorrectionAccounting,
+  ensureWriteOnceRevisionAllowance,
+  mergeReconstructedCorrectionUses,
+  type CorrectionAccountingView,
+  type CorrectionUseRecord,
+} from "./correction-round-ledger";
 import {
   allRequiredDeliverablesPrepared,
   isDeliverablePrepared,
@@ -11,9 +17,13 @@ import {
 } from "./production-workspace-gates";
 import {
   createEmptyJobReviewFeedback,
+  ensureFeedbackPackageId,
   type ClientReviewDeliverable,
   type JobReviewFeedback,
 } from "./review-feedback-types";
+import {
+  findLatestStudioReviewRelease,
+} from "./review-handoff-receipts";
 import {
   canClientAccessJobReview,
   canClientViewJobReview,
@@ -37,35 +47,81 @@ export type ClientReviewView = {
   deliverables: ClientReviewDeliverable[];
   revisionRoundsIncluded: number;
   revisionRoundsUsed: number;
+  revisionRoundsRemaining: number;
+  extraCorrectionRemaining: number;
+  correctionAccounting: CorrectionAccountingView;
   feedback: JobReviewFeedback;
+  /** Prior locked packages for this job — immutable history. */
+  lockedFeedbackPackages: readonly JobReviewFeedback[];
   activity: readonly JobActivityEvent[];
   canRequestRevision: boolean;
   canApproveForDelivery: boolean;
   blockedReasons: readonly string[];
+  exhaustedWording: string | null;
 };
 
+export const CORRECTION_EXHAUSTED_WORDING =
+  "All included correction rounds have been used. You can still message the Studio about a problem or question. New creative changes may require additional scope.";
+
+/** Active editable draft for a job (no submittedAt). */
+export function findActiveJobReviewFeedback(
+  envelope: ServerTasksEnvelope,
+  jobId: string,
+): JobReviewFeedback | undefined {
+  const drafts = (envelope.jobReviewFeedback ?? [])
+    .filter((entry) => entry.jobId === jobId && !entry.submittedAt)
+    .map(ensureFeedbackPackageId);
+  return drafts.at(-1);
+}
+
+/** Locked submitted packages for a job — chronological. */
+export function listLockedJobReviewFeedback(
+  envelope: ServerTasksEnvelope,
+  jobId: string,
+): JobReviewFeedback[] {
+  return (envelope.jobReviewFeedback ?? [])
+    .filter((entry) => entry.jobId === jobId && Boolean(entry.submittedAt))
+    .map(ensureFeedbackPackageId)
+    .sort((a, b) => (a.submittedAt ?? "").localeCompare(b.submittedAt ?? ""));
+}
+
+/**
+ * Active draft when present; otherwise latest locked package (post-submit view).
+ * Prefer findActiveJobReviewFeedback / listLockedJobReviewFeedback for C8c cycles.
+ */
 export function findJobReviewFeedback(
   envelope: ServerTasksEnvelope,
   jobId: string,
 ): JobReviewFeedback | undefined {
-  return (envelope.jobReviewFeedback ?? []).find((entry) => entry.jobId === jobId);
+  const active = findActiveJobReviewFeedback(envelope, jobId);
+  if (active) return active;
+  const locked = listLockedJobReviewFeedback(envelope, jobId);
+  return locked.at(-1);
 }
 
 export function upsertJobReviewFeedback(
   envelope: ServerTasksEnvelope,
   feedback: JobReviewFeedback,
 ): ServerTasksEnvelope {
+  const normalized = ensureFeedbackPackageId(feedback);
   const existing = envelope.jobReviewFeedback ?? [];
-  const index = existing.findIndex((entry) => entry.jobId === feedback.jobId);
+  const index = existing.findIndex(
+    (entry) =>
+      entry.packageId === normalized.packageId ||
+      (!entry.packageId &&
+        entry.jobId === normalized.jobId &&
+        !entry.submittedAt &&
+        !normalized.submittedAt),
+  );
   const next =
     index >= 0
-      ? existing.map((entry, i) => (i === index ? feedback : entry))
-      : [...existing, feedback];
+      ? existing.map((entry, i) => (i === index ? normalized : entry))
+      : [...existing, normalized];
 
   return {
     ...envelope,
     jobReviewFeedback: next,
-    updatedAt: feedback.updatedAt,
+    updatedAt: normalized.updatedAt,
   };
 }
 
@@ -75,11 +131,19 @@ export function resolveClientReviewView(input: {
   envelope: ServerTasksEnvelope;
   materials?: readonly unknown[];
 }): ClientReviewView | null {
-  const { campaign, job, envelope } = input;
+  const { campaign: rawCampaign, job } = input;
+  let envelope = mergeReconstructedCorrectionUses(
+    input.envelope,
+    rawCampaign.campaignId,
+  );
+  const allowance = ensureWriteOnceRevisionAllowance(rawCampaign);
+  const campaign = allowance.campaign;
 
-  const existing = findJobReviewFeedback(envelope, job.jobId);
+  const existingActive = findActiveJobReviewFeedback(envelope, job.jobId);
+  const lockedPackages = listLockedJobReviewFeedback(envelope, job.jobId);
+  const existingForAccess = existingActive ?? lockedPackages.at(-1);
 
-  if (!canClientViewJobReview(job, existing)) {
+  if (!canClientViewJobReview(job, existingForAccess ?? null)) {
     return null;
   }
 
@@ -118,11 +182,36 @@ export function resolveClientReviewView(input: {
     });
 
   const deliverableKeys = deliverables.map((entry) => entry.key);
-  const feedback =
-    existing ?? createEmptyJobReviewFeedback(campaign.campaignId, job.jobId, deliverableKeys);
+  const release = findLatestStudioReviewRelease(
+    envelope.jobActivityEvents ?? [],
+    job.jobId,
+  );
 
-  const revisionRoundsIncluded = resolveCampaignRevisionRounds(campaign);
-  const revisionRoundsUsed = campaign.revisionRoundsUsed ?? 0;
+  let feedback: JobReviewFeedback;
+  if (existingActive) {
+    feedback = existingActive;
+  } else if (canClientAccessJobReview(job)) {
+    // New review release — present a stable draft identity; prior locked packages stay.
+    // Draft is persisted on first save_feedback / formal submit (not on GET).
+    feedback = createEmptyJobReviewFeedback(
+      campaign.campaignId,
+      job.jobId,
+      deliverableKeys,
+      {
+        packageId: `pkg:${job.jobId}:draft:${release?.activityId ?? "open"}`,
+        releaseActivityId: release?.activityId ?? null,
+      },
+    );
+  } else {
+    feedback =
+      lockedPackages.at(-1) ??
+      createEmptyJobReviewFeedback(campaign.campaignId, job.jobId, deliverableKeys);
+  }
+
+  const correctionAccounting = deriveCorrectionAccounting({
+    campaign,
+    envelope,
+  });
 
   const requiredDeliverableLabels = line?.deliverables ?? [];
   const allPrepared = allRequiredDeliverablesPrepared(job, requiredDeliverableLabels);
@@ -154,15 +243,18 @@ export function resolveClientReviewView(input: {
     campaignName: campaign.campaignName,
     spineStatus: job.spineStatus,
     deliverables,
-    revisionRoundsIncluded,
-    revisionRoundsUsed,
+    revisionRoundsIncluded: correctionAccounting.included,
+    revisionRoundsUsed: correctionAccounting.effectiveUsed,
+    revisionRoundsRemaining: correctionAccounting.remaining,
+    extraCorrectionRemaining: correctionAccounting.extraRemaining,
+    correctionAccounting,
     feedback,
+    lockedFeedbackPackages: lockedPackages,
     activity,
     canRequestRevision: canRequestJobRevision({
       job,
       feedback,
-      revisionRoundsUsed,
-      revisionRoundsIncluded,
+      revisionRoundsRemaining: correctionAccounting.remaining,
       allDeliverablesPrepared: allPrepared,
     }).allowed,
     canApproveForDelivery: canApproveJobForDelivery({
@@ -172,6 +264,9 @@ export function resolveClientReviewView(input: {
       deliverableCount: deliverables.length,
     }).allowed,
     blockedReasons,
+    exhaustedWording: correctionAccounting.exhausted
+      ? CORRECTION_EXHAUSTED_WORDING
+      : null,
   };
 }
 
@@ -181,3 +276,5 @@ export function findReviewReadyJobs(
 ): PurchasedJobRecord[] {
   return jobs.filter((job) => canClientAccessJobReview(job));
 }
+
+export type { CorrectionAccountingView, CorrectionUseRecord };

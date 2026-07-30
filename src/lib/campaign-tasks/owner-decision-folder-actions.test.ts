@@ -73,7 +73,7 @@ describe("owner-decision-folder-actions", () => {
     expect(result.exception.resolutionNotes).toContain("Committed Friday");
   });
 
-  it("owner_allow_revision resolves revision exception", () => {
+  it("owner_allow_revision resolves revision exception and grants one extra use", () => {
     const exc = exception("exc-revision", "revision_exhausted");
     const result = applyOwnerAllowRevision(
       envelope([exc]),
@@ -84,6 +84,11 @@ describe("owner-decision-folder-actions", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.exception.status).toBe("resolved");
+    expect(result.envelope.jobCorrectionExtraGrants).toHaveLength(1);
+    expect(result.envelope.jobCorrectionExtraGrants?.[0]?.quantity).toBe(1);
+    expect(result.envelope.jobCorrectionExtraGrants?.[0]?.reason).toContain(
+      "One more round",
+    );
   });
 
   it("owner_hold_firm_revision resolves with firm suffix", () => {

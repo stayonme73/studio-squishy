@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import FeedbackStudioCorrectionAccounting from "@/components/feedback-studio/FeedbackStudioCorrectionAccounting";
 import FeedbackStudioFeedbackPanel from "@/components/feedback-studio/FeedbackStudioFeedbackPanel";
 import FeedbackStudioHandoffStatus from "@/components/feedback-studio/FeedbackStudioHandoffStatus";
 import FeedbackStudioLockedPackageReceipt from "@/components/feedback-studio/FeedbackStudioLockedPackageReceipt";
@@ -159,12 +160,13 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
 
   const focusedSectionLabel = resolveFeedbackSectionLabel(focusedSection, sectionLabels);
   const submitted = Boolean(session.submittedAt);
+  const accounting = review.correctionAccounting;
   const revisionStatus =
-    review.revisionRoundsUsed >= review.revisionRoundsIncluded
+    accounting.remaining <= 0
       ? feedbackStudio.reviewStatus.finalRound
       : feedbackStudio.reviewStatus.roundOf(
-          review.revisionRoundsUsed + 1,
-          review.revisionRoundsIncluded,
+          Math.min(accounting.effectiveUsed + 1, accounting.included),
+          accounting.included,
         );
 
   function markDraw(sectionId: FeedbackSectionId) {
@@ -446,6 +448,10 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
           {submitted && lockedPackageReceipt ? (
             <FeedbackStudioLockedPackageReceipt receipt={lockedPackageReceipt} />
           ) : null}
+          <FeedbackStudioCorrectionAccounting
+            accounting={review.correctionAccounting}
+            exhaustedWording={review.exhaustedWording}
+          />
           <FeedbackStudioRevisionStatus status={revisionStatus} />
 
           <FeedbackStudioFeedbackPanel

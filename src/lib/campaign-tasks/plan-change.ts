@@ -13,7 +13,8 @@ import type {
   TaskWorkflowState,
 } from "./types";
 
-export const CAMPAIGN_TASKS_SCHEMA_VERSION = 11;
+/** Schema v12 — C8c correction-use ledger + owner extra-use grants. */
+export const CAMPAIGN_TASKS_SCHEMA_VERSION = 12;
 
 export type MergePlanChangeOptions = {
   ownerApproved?: boolean;
@@ -117,6 +118,8 @@ export function mergePlanChangeTasks(
     jobActivityEvents: existing.jobActivityEvents ?? [],
     jobReviewFeedback: existing.jobReviewFeedback ?? [],
     jobCommunicationRecords: existing.jobCommunicationRecords ?? [],
+    jobCorrectionUses: existing.jobCorrectionUses ?? [],
+    jobCorrectionExtraGrants: existing.jobCorrectionExtraGrants ?? [],
     planFingerprint: freshGenerated.planFingerprint,
     planVersion: previousVersion + 1,
     frozenPlanSnapshots: snapshots,
@@ -167,6 +170,8 @@ export function normalizeLegacyRecord(record: ServerTasksEnvelope): ServerTasksE
     jobActivityEvents: record.jobActivityEvents ?? [],
     jobReviewFeedback: record.jobReviewFeedback ?? [],
     jobCommunicationRecords: record.jobCommunicationRecords ?? [],
+    jobCorrectionUses: record.jobCorrectionUses ?? [],
+    jobCorrectionExtraGrants: record.jobCorrectionExtraGrants ?? [],
     tasks: record.tasks.map(normalizeLegacyTask),
   };
 }

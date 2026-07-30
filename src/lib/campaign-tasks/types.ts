@@ -188,15 +188,19 @@ export type CampaignTasksRecord = {
   jobRecords?: PurchasedJobRecord[];
   /** Append-only job activity timeline (schema v7). */
   jobActivityEvents?: JobActivityEvent[];
-  /** Job-scoped client review feedback sessions (schema v8). */
+  /** Job-scoped client review feedback sessions (schema v8). Multi-cycle packages retained (C8c). */
   jobReviewFeedback?: import("@/lib/job-control/review-feedback-types").JobReviewFeedback[];
   /** Durable client communication outbox / receipts (schema v9). */
   jobCommunicationRecords?: JobCommunicationRecord[];
   /** Owner decision desk — interaction-backed folders (schema v11). */
   ownerDecisionInteractions?: import("./owner-decision-interaction-types").OwnerDecisionInteractionRecord[];
-  /** Schema v10 adds internal job Work Packets on PurchasedJobRecord. Schema v11 adds ownerDecisionInteractions. */
+  /** C8c — append-only formal correction-use ledger (schema v12). */
+  jobCorrectionUses?: import("@/lib/job-control/correction-round-ledger").CorrectionUseRecord[];
+  /** C8c — owner/admin extra correction-use grants (schema v12). */
+  jobCorrectionExtraGrants?: import("@/lib/job-control/correction-round-ledger").CorrectionExtraGrantRecord[];
+  /** Schema v10 adds Work Packets. v11 ownerDecisionInteractions. v12 correction ledger. */
   updatedAt: string;
-  /** Envelope schema version — 11 adds owner decision interaction records. */
+  /** Envelope schema version — 12 adds correction-use ledger + extra grants. */
   version: number;
 };
 

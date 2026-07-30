@@ -60,6 +60,62 @@
   color: var(--utility-text-muted);
 }
 
+.fs-correction-accounting {
+  width: min(100%, 18rem);
+}
+
+.fs-correction-accounting__counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem 0.65rem;
+  margin: 0.35rem 0 0;
+}
+
+.fs-correction-accounting__counts dt {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--utility-text-muted);
+}
+
+.fs-correction-accounting__counts dd {
+  margin: 0.12rem 0 0;
+  font-size: 1rem;
+  font-weight: 650;
+  color: var(--utility-primary);
+}
+
+.fs-correction-accounting__exhausted {
+  margin: 0.55rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--utility-text);
+}
+
+.fs-correction-accounting__history {
+  margin: 0.55rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.fs-correction-accounting__history li {
+  display: grid;
+  gap: 0.08rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--utility-text);
+}
+
+.fs-correction-accounting__legacy {
+  margin: 0.5rem 0 0;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--utility-text-muted);
+}
+
 .fs-status-card--handoff .fs-status-card__value {
   color: var(--utility-text);
 }
