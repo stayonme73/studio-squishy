@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 
 import FinalDeliveryAtmosphere from "@/components/deliverables/FinalDeliveryAtmosphere";
@@ -364,8 +364,16 @@ function PreviewPackageGrid({ pkg }: { pkg: CampaignDeliverablesPackage }) {
   );
 }
 
+type DeliverablesSceneProps = {
+  /**
+   * C8d — host inside the unified Review Room Delivery state.
+   * Skips the standalone UtilityPageFrame + page header so the room shell owns chrome.
+   */
+  embedded?: boolean;
+};
+
 /** Final Delivery — honest released-files handoff. */
-export default function DeliverablesScene() {
+export default function DeliverablesScene({ embedded = false }: DeliverablesSceneProps) {
   const searchParams = useSearchParams();
   const previewQueryRequested =
     searchParams.get("preview") === "delivered" || searchParams.get("room") === "1";
@@ -395,71 +403,64 @@ export default function DeliverablesScene() {
       deliveryState.status === "idle" ||
       (deliveryState.status === "ready" && deliveryState.campaignId !== campaign?.campaignId));
 
+  const wrap = (node: ReactNode) =>
+    embedded ? (
+      <>{node}</>
+    ) : (
+      <UtilityPageFrame navId="deliverables">{node}</UtilityPageFrame>
+    );
+
   if (!ready || deliveryUnresolved) {
-    return (
-      <UtilityPageFrame navId="deliverables">
-        <div className="utility-page" aria-busy="true">
-          <div className="utility-shell utility-shell--loading" />
-        </div>
-      </UtilityPageFrame>
+    return wrap(
+      <div className="utility-page" aria-busy="true">
+        <div className="utility-shell utility-shell--loading" />
+      </div>,
     );
   }
 
   if (accessState !== "ready") {
-    return (
-      <UtilityPageFrame navId="deliverables">
-        {accessState === "no-active-project" ? (
-          <NoActiveProjectPanel copy={deliverables.clientAccess.noActiveProject} />
-        ) : (
-          <ClientAccessStatePanel
-            state={accessState}
-            onRetry={accessState === "error" ? () => void refresh() : undefined}
-          />
-        )}
-      </UtilityPageFrame>
+    return wrap(
+      accessState === "no-active-project" ? (
+        <NoActiveProjectPanel copy={deliverables.clientAccess.noActiveProject} />
+      ) : (
+        <ClientAccessStatePanel
+          state={accessState}
+          onRetry={accessState === "error" ? () => void refresh() : undefined}
+        />
+      ),
     );
   }
 
   if (deliveryState.status === "error" && !previewDevelopmentOnly) {
-    return (
-      <UtilityPageFrame navId="deliverables">
-        <ClientAccessStatePanel state="error" onRetry={() => refreshDelivery()} />
-      </UtilityPageFrame>
-    );
+    return wrap(<ClientAccessStatePanel state="error" onRetry={() => refreshDelivery()} />);
   }
 
   if (view.state === "no-campaign") {
-    return (
-      <UtilityPageFrame navId="deliverables">
-        <NoActiveProjectPanel
-          copy={deliverables.clientAccess.noActiveProject}
-          titleId="fd-access-title"
-        />
-      </UtilityPageFrame>
+    return wrap(
+      <NoActiveProjectPanel
+        copy={deliverables.clientAccess.noActiveProject}
+        titleId="fd-access-title"
+      />,
     );
   }
 
   if (view.state === "preparing") {
-    return (
-      <UtilityPageFrame navId="deliverables">
-        <NoActiveProjectPanel copy={deliverables.clientAccess.notReady} titleId="fd-access-title" />
-      </UtilityPageFrame>
+    return wrap(
+      <NoActiveProjectPanel copy={deliverables.clientAccess.notReady} titleId="fd-access-title" />,
     );
   }
 
   if (view.state === "delivered-no-files" && !view.useJobDelivery) {
-    return (
-      <UtilityPageFrame navId="deliverables">
-        <NoActiveProjectPanel
-          copy={{
-            ...deliverables.clientAccess.notReady,
-            title: HONEST_DELIVERY_COPY.deliveredNoFiles.title,
-            message: HONEST_DELIVERY_COPY.deliveredNoFiles.body,
-            messageSecondary: "",
-          }}
-          titleId="fd-delivered-no-files-title"
-        />
-      </UtilityPageFrame>
+    return wrap(
+      <NoActiveProjectPanel
+        copy={{
+          ...deliverables.clientAccess.notReady,
+          title: HONEST_DELIVERY_COPY.deliveredNoFiles.title,
+          message: HONEST_DELIVERY_COPY.deliveredNoFiles.body,
+          messageSecondary: "",
+        }}
+        titleId="fd-delivered-no-files-title"
+      />,
     );
   }
 
@@ -506,93 +507,98 @@ export default function DeliverablesScene() {
     (view.state === "delivered-no-files" && view.useJobDelivery) ||
     view.state === "preview-development-only";
 
-  return (
-    <UtilityPageFrame navId="deliverables">
-      <div
-        className="utility-page utility-page--delivery"
-        aria-label="Final Delivery"
-        data-delivery-state={view.state}
-      >
-        <FinalDeliveryAtmosphere />
+  return wrap(
+    <div
+      className={
+        embedded
+          ? "utility-page--delivery fd-embedded-delivery"
+          : "utility-page utility-page--delivery"
+      }
+      aria-label="Final Delivery"
+      data-delivery-state={view.state}
+      data-embedded={embedded ? "true" : undefined}
+    >
+      {embedded ? null : <FinalDeliveryAtmosphere />}
+      {embedded ? null : (
         <UtilityPageHeader
           backHref={routes.studioBoard}
           activeNav="deliverables"
           title={deliverables.pageTitle}
         />
-        <section
-          className="fd-hero fd-hero--compact"
-          aria-label={view.allowsFullCompletionLanguage ? "Campaign complete" : "Final Delivery status"}
-        >
-          <p className="fd-hero__badge">{heroBadge}</p>
-          <h2 className="fd-hero__title">{heroTitle}</h2>
-          <p className="fd-hero__lead">{heroLead}</p>
+      )}
+      <section
+        className="fd-hero fd-hero--compact"
+        aria-label={view.allowsFullCompletionLanguage ? "Campaign complete" : "Final Delivery status"}
+      >
+        <p className="fd-hero__badge">{heroBadge}</p>
+        <h2 className="fd-hero__title">{heroTitle}</h2>
+        <p className="fd-hero__lead">{heroLead}</p>
 
-          <div className="fd-campaign-strip">
-            <dl className="fd-campaign-strip__facts">
+        <div className="fd-campaign-strip">
+          <dl className="fd-campaign-strip__facts">
+            <div>
+              <dt>{summary.labels.campaignName}</dt>
+              <dd>{view.campaignName}</dd>
+            </div>
+            {view.selectedOption ? (
               <div>
-                <dt>{summary.labels.campaignName}</dt>
-                <dd>{view.campaignName}</dd>
+                <dt>{summary.labels.selectedOption}</dt>
+                <dd>{view.selectedOption}</dd>
               </div>
-              {view.selectedOption ? (
-                <div>
-                  <dt>{summary.labels.selectedOption}</dt>
-                  <dd>{view.selectedOption}</dd>
-                </div>
-              ) : null}
-              <div>
-                <dt>{summary.labels.completionDate}</dt>
-                <dd>{view.completionDate}</dd>
-              </div>
-              <div>
-                <dt>{summary.labels.status}</dt>
-                <dd>
-                  <span className="fd-summary__status">{view.statusLabel}</span>
-                </dd>
-              </div>
-            </dl>
-          </div>
-
-          {view.allowsFullCompletionLanguage ? (
-            <p className="fd-hero__footnote">{hero.footnote}</p>
-          ) : null}
-        </section>
-
-        {showDownloadSection ? (
-          <section className="fd-deliverables" aria-labelledby="fd-deliverables-title">
-            <h2 id="fd-deliverables-title" className="fd-deliverables__title">
-              {view.useJobDelivery || view.state !== "preview-development-only"
-                ? jobDelivery.sectionTitle
-                : sections.heading}
-            </h2>
-            <p className="fd-deliverables__subtitle">
-              {view.state === "preview-development-only"
-                ? "Preview content only."
-                : view.state === "delivered-no-files"
-                  ? HONEST_DELIVERY_COPY.deliveredNoFiles.perJob
-                  : view.useJobDelivery
-                    ? jobDelivery.sectionSubtitle
-                    : sections.subheading}
-            </p>
-
-            {view.useJobDelivery && view.finalDelivery ? (
-              <JobDeliveryGrid jobs={view.finalDelivery.jobs} emptyFilesCopy={emptyFilesCopy} />
-            ) : pkg ? (
-              <PreviewPackageGrid pkg={pkg} />
             ) : null}
-          </section>
-        ) : null}
-
-        <div className="fd-footer-actions">
-          <Link href={routes.draftRoom} className="fd-btn fd-btn--start">
-            {footer.startNewCampaign}
-          </Link>
-          <Link href={routes.studioBoard} className="fd-btn fd-btn--return">
-            {footer.returnToBoard} →
-          </Link>
+            <div>
+              <dt>{summary.labels.completionDate}</dt>
+              <dd>{view.completionDate}</dd>
+            </div>
+            <div>
+              <dt>{summary.labels.status}</dt>
+              <dd>
+                <span className="fd-summary__status">{view.statusLabel}</span>
+              </dd>
+            </div>
+          </dl>
         </div>
 
-        <StudioBoardDevStatus placement="sidebar" />
+        {view.allowsFullCompletionLanguage ? (
+          <p className="fd-hero__footnote">{hero.footnote}</p>
+        ) : null}
+      </section>
+
+      {showDownloadSection ? (
+        <section className="fd-deliverables" aria-labelledby="fd-deliverables-title">
+          <h2 id="fd-deliverables-title" className="fd-deliverables__title">
+            {view.useJobDelivery || view.state !== "preview-development-only"
+              ? jobDelivery.sectionTitle
+              : sections.heading}
+          </h2>
+          <p className="fd-deliverables__subtitle">
+            {view.state === "preview-development-only"
+              ? "Preview content only."
+              : view.state === "delivered-no-files"
+                ? HONEST_DELIVERY_COPY.deliveredNoFiles.perJob
+                : view.useJobDelivery
+                  ? jobDelivery.sectionSubtitle
+                  : sections.subheading}
+          </p>
+
+          {view.useJobDelivery && view.finalDelivery ? (
+            <JobDeliveryGrid jobs={view.finalDelivery.jobs} emptyFilesCopy={emptyFilesCopy} />
+          ) : pkg ? (
+            <PreviewPackageGrid pkg={pkg} />
+          ) : null}
+        </section>
+      ) : null}
+
+      <div className="fd-footer-actions">
+        <Link href={routes.draftRoom} className="fd-btn fd-btn--start">
+          {footer.startNewCampaign}
+        </Link>
+        <Link href={routes.studioBoard} className="fd-btn fd-btn--return">
+          {footer.returnToBoard} →
+        </Link>
       </div>
-    </UtilityPageFrame>
+
+      {embedded ? null : <StudioBoardDevStatus placement="sidebar" />}
+    </div>,
   );
 }

@@ -7,6 +7,7 @@ import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import type { CampaignRecord } from "@/config/studio-board";
 import { studioBoard } from "@/config/studio-board";
+import { buildUnifiedRoomHref } from "@/lib/c8d-unified-room-state";
 import { resolveFeedbackCampaignTitle } from "@/lib/feedback-studio-view";
 import type { ClientStagesJobItem } from "@/lib/review-delivery-stage/build-client-stages";
 import { useReviewDeliveryStages } from "@/lib/use-review-delivery-stages";
@@ -58,6 +59,12 @@ function StageCard({ job }: { job: ClientStagesJobItem }) {
     job.stageId === "work-ready-for-review" ||
     job.stageId === "customer-reviewing" ||
     job.stageId === "revised-work-ready";
+  /** Final = preparing (7A); Delivery = released files. Keep both distinct. */
+  const showFinalLink = job.stageId === "approved-for-final-delivery";
+  /**
+   * Keep href at /deliverables for Honest Final Files cert + Board bookmarks.
+   * That path redirects into the unified room Delivery state (C8d).
+   */
   const showDeliveryLink = job.stageId === "final-delivery";
 
   return (
@@ -74,6 +81,16 @@ function StageCard({ job }: { job: ClientStagesJobItem }) {
         <p className="rd-stage-card__actions">
           <Link className="utility-btn utility-btn--primary" href={reviewHref(job.jobId)}>
             Open Review
+          </Link>
+        </p>
+      ) : null}
+      {showFinalLink ? (
+        <p className="rd-stage-card__actions">
+          <Link
+            className="utility-btn utility-btn--primary"
+            href={buildUnifiedRoomHref({ roomState: "final", jobId: job.jobId })}
+          >
+            Open Final
           </Link>
         </p>
       ) : null}

@@ -1392,3 +1392,35 @@
     overflow-x: hidden;
   }
 }
+
+/* C8d — Final substance summary (compact facts inside unified room) */
+.c8d-final-summary__facts {
+  display: grid;
+  gap: 0.85rem;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.c8d-final-summary__facts > div {
+  min-width: 0;
+}
+
+.c8d-final-summary__facts dt {
+  margin: 0 0 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--utility-muted, #6b6560);
+}
+
+.c8d-final-summary__facts dd {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--utility-ink, #2a2622);
+}
+
+.c8d-final-summary__value--action {
+  font-weight: 600;
+}

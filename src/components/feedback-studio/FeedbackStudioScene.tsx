@@ -5,35 +5,53 @@ import { useMemo } from "react";
 
 import FeedbackStudioLayout from "@/components/feedback-studio/FeedbackStudioLayout";
 import JobReviewWorkspace from "@/components/feedback-studio/JobReviewWorkspace";
+import UnifiedRoomStateWorkspace from "@/components/feedback-studio/UnifiedRoomStateWorkspace";
 import ReviewDeliveryRoomShell from "@/components/review-delivery/ReviewDeliveryRoomShell";
 import ClientAccessStatePanel from "@/components/shared/ClientAccessStatePanel";
 import NoActiveProjectPanel from "@/components/shared/NoActiveProjectPanel";
 import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
+import { c8dUnifiedRoomStateV1 } from "@/config/c8d-unified-room-state-v1";
 import { feedbackStudio } from "@/config/feedback-studio";
 import { studioBoard } from "@/config/studio-board";
+import { parseUnifiedRoomStateParam } from "@/lib/c8d-unified-room-state";
 import { parseJobId } from "@/lib/job-control/lane-map";
 import { useDiscoverJobReview, useJobReview } from "@/lib/use-job-review";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 
-/** Feedback Studio — job-scoped Review Room shell + explicit job review. */
+/** Feedback Studio — job-scoped Review Room shell + Final / Delivery room states. */
 export default function FeedbackStudioScene() {
   const searchParams = useSearchParams();
   const { campaign, ready, accessState, refresh } = useCurrentCampaign();
 
   const jobIdParam = searchParams.get("jobId");
+  const roomStateParam = parseUnifiedRoomStateParam(
+    searchParams.get(c8dUnifiedRoomStateV1.queryKey),
+  );
+  /** Final / Delivery are explicit room states — do not let Job Review steal the URL. */
+  const prefersUnifiedRoomState =
+    roomStateParam === "final" || roomStateParam === "delivery";
   const parsedJob = jobIdParam ? parseJobId(jobIdParam) : null;
   const effectiveCampaignId = campaign?.campaignId ?? parsedJob?.campaignId;
 
-  const { primaryReview, loading: discoveringJobs } = useDiscoverJobReview(effectiveCampaignId);
-  const activeJobId = jobIdParam ?? primaryReview?.jobId ?? null;
+  const { primaryReview, loading: discoveringJobs } = useDiscoverJobReview(
+    prefersUnifiedRoomState ? undefined : effectiveCampaignId,
+  );
+  const activeJobId = prefersUnifiedRoomState
+    ? null
+    : (jobIdParam ?? primaryReview?.jobId ?? null);
   const { review, loading: loadingJobReview, setReview } = useJobReview(
-    effectiveCampaignId,
+    prefersUnifiedRoomState ? undefined : effectiveCampaignId,
     activeJobId,
   );
 
   const jobReviewActive = Boolean(review);
   const pageState = useMemo(() => {
+    if (prefersUnifiedRoomState) {
+      if (!campaign && !effectiveCampaignId) return "no-campaign" as const;
+      if (!campaign) return "no-campaign" as const;
+      return "unified-room" as const;
+    }
     if (jobReviewActive) return "job-review" as const;
     if (discoveringJobs || loadingJobReview) return "loading-review" as const;
     if (!campaign && !effectiveCampaignId) return "no-campaign" as const;
@@ -41,6 +59,7 @@ export default function FeedbackStudioScene() {
     if (!campaign) return "no-campaign" as const;
     return "not-ready" as const;
   }, [
+    prefersUnifiedRoomState,
     campaign,
     effectiveCampaignId,
     jobReviewActive,
@@ -77,6 +96,19 @@ export default function FeedbackStudioScene() {
     return (
       <FeedbackStudioLayout>
         <NoActiveProjectPanel copy={feedbackStudio.clientAccess.noActiveProject} titleId="fs-access-title" />
+      </FeedbackStudioLayout>
+    );
+  }
+
+  // C8d — Final / Delivery states of the same unified room (not a second product).
+  if (campaign && prefersUnifiedRoomState) {
+    return (
+      <FeedbackStudioLayout>
+        <UnifiedRoomStateWorkspace
+          roomState={roomStateParam}
+          campaign={campaign}
+          jobId={jobIdParam}
+        />
       </FeedbackStudioLayout>
     );
   }
