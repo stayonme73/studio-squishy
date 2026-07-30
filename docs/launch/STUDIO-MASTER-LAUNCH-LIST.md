@@ -16,17 +16,17 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | `235945a281e8260b3ee60ad66d84ceac9edd8ebb` — `docs(launch): mark purchased-room Auth complete with limits` |
+| Protected tip | `508bddf4fc4b6c6f4dfb015bd75fd12e2cfa9fbd` — `docs(launch): certify Review Room browser handoff with limits` |
 | Branch | `fix/discovery-responsive-layout` |
-| Sync | **0 ahead / 0 behind** at prior tip; this docs pass commits locally then awaits push approval |
-| Current active item | **None** — C #7 design approved; **C #8 UI construction NOT OPENED** |
+| Sync | **0 ahead / 0 behind** at tip `508bddf` before this docs pass; this refresh commits locally then awaits push |
+| Current active item | **None** — C8a/C8b browser-certified with limits; next narrow room slice not opened |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
-| Most recently completed | Hierarchy C #7 Unified Review / Final / Delivery **DESIGN APPROVED / COMPLETE WITH LIMITS** · `docs/launch/UNIFIED-REVIEW-FINAL-DELIVERY-ROOM-CONTRACT-V1-LOCKED.md` |
-| Next three priorities | 1) **Unified Review / Final / Delivery construction (C #8)** — **NOT OPENED** · waits Tagia engineering authorization · 2) Materials dual UX decision (waiting — Board limit) · 3) Project Claim / email hard-before-Board (separate Auth sequence — only when Tagia authorizes) |
-| Active blockers | C #8 blocked on Tagia construction authorization · Materials dual UX waiting |
+| Most recently completed | C8-CERT-1 Review Room browser certification **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** @ `508bddf` · construction C8a `04bd9ba` · C8b `77f6835` |
+| Next three priorities | 1) Remaining Unified Review / Final / Delivery construction slices (Delivery merge · correction accounting · highlighter/compare · Lobby continuity rebuild) — **not opened** · 2) Materials dual UX decision (waiting — Board limit) · 3) Project Claim / email hard-before-Board (separate Auth sequence — only when Tagia authorizes) |
+| Active blockers | Remaining C #8 slices wait Tagia package authorization · Materials dual UX waiting |
 | Decisions waiting | **1** — Materials dual UX (Board limit) |
-| Customer-One readiness | **4 of 23** readiness gates complete (#16, #18, #20, #22) · Gates **#4**, **#5**, **#7**, and **#19** are **COMPLETE WITH LIMITS** (not counted in the complete total) · Hierarchy C #5, #6, and #7 are **COMPLETE WITH LIMITS** (design for #7; not numbered readiness-gate bumps beyond existing gate statuses) |
-| Last updated | 2026-07-28 |
+| Customer-One readiness | **4 of 23** readiness gates complete (#16, #18, #20, #22) · Gates **#4**, **#5**, **#7**, **#9**, **#10**, **#11**, and **#19** are **COMPLETE WITH LIMITS** (not counted in the complete total) · Hierarchy C #5–#7 COMPLETE WITH LIMITS · C #8 **PARTIAL / COMPLETE WITH LIMITS** (C8a/C8b only; not a full unified-room close) |
+| Last updated | 2026-07-29 |
 
 ---
 
@@ -117,7 +117,8 @@ Every completed item must show available evidence: commit hash · subject · tes
 - **2026-07-28 — MLL-COMM-1 truth refresh.** Hierarchy C #4 and Gate #7 reconciled to tip `257456c` using `docs/launch/COMMUNICATION-FULL-LOOP-CERTIFICATION.md` (36/36 focused Vitest · 67/67 full-loop browser). Communication is **COMPLETE WITH LIMITS** (in-product Board + File Room only). Next incomplete Hierarchy C item = **Studio Board customer truth and completeness — PARTIAL**.
 - **2026-07-28 — MLL-BOARD-1 truth refresh.** Hierarchy C #5 reconciled to tip `48ae3f6` using BOARD-TRUTH-1 decision map + `docs/launch/BOARD-TRUTH-2-PROJECT-SNAPSHOT-DELIVERABLES-HONESTY.md` (**10/10** snapshot · **37/37** Board truth regression · desktop ~1440 / phone ~390). Board truth is **COMPLETE WITH LIMITS**. Next incomplete Hierarchy C item = **Purchased-room Auth Route/Data Protection — MISSING** (locked before Customer-One). Materials dual UX remains a waiting decision / Board limit — not the next engineering package.
 - **2026-07-28 — MLL-AUTH-1 truth refresh.** Hierarchy C #6 and readiness gates **#4** / **#5** reconciled to tip `e7688ef` using AUTH-TRUTH-1 + `docs/launch/AUTH-GATE-1-PROJECT-RECORD-PAGE-AUTHENTICATION.md` (**8/8** focused Auth Vitest · Board/Review/Delivery regression kept). Purchased-room Auth Route/Data Protection is **COMPLETE WITH LIMITS**. Stale “No server auth gate” language corrected for Board · Project Record · Review · Delivery. Next Hierarchy C item = **#7 Unified Review / Final / Delivery design approval** (waits on Tagia; not an engineering package). Project Claim, timeout WIP, Materials, and internal/dev routes remain outside this checkpoint.
-- **2026-07-28 — MLL-C7-1 truth refresh.** Hierarchy C #7 reconciled to **DESIGN APPROVED / COMPLETE WITH LIMITS** using `docs/launch/UNIFIED-REVIEW-FINAL-DELIVERY-ROOM-CONTRACT-V1-LOCKED.md`. Sealed: Lobby persistent environmental background; one room with Review/Final/Delivery states; labeled REVIEW TOOLS + PROJECT COMMUNICATION; version-linked finite corrections; visible Studio↔customer handoff; locked submitted feedback packages. **C #8 UI construction NOT OPENED.** Readiness math remains **4 of 23**. Materials dual UX still waiting. Project Claim / timeout / Auth reopen not absorbed.
+- **2026-07-28 — MLL-C7-1 truth refresh.** Hierarchy C #7 reconciled to **DESIGN APPROVED / COMPLETE WITH LIMITS** using `docs/launch/UNIFIED-REVIEW-FINAL-DELIVERY-ROOM-CONTRACT-V1-LOCKED.md`. Sealed: Lobby persistent environmental background; one room with Review/Final/Delivery states; labeled REVIEW TOOLS + PROJECT COMMUNICATION; version-linked finite corrections; visible Studio↔customer handoff; locked submitted feedback packages. **C #8 UI construction NOT OPENED** (at that checkpoint). Readiness math remains **4 of 23**. Materials dual UX still waiting. Project Claim / timeout / Auth reopen not absorbed.
+- **2026-07-29 — MLL-C8-CERT-1 truth refresh.** Hierarchy C #8 and Review Room gates reconciled to C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` (`docs/launch/C8A-REVIEW-ROOM-PANEL-CHROME.md` · `docs/launch/C8B-REVIEW-HANDOFF-RECEIPTS-LOCKED-SUBMISSIONS.md` · `docs/launch/C8-CERT-1-CUSTOMER-ONE-REVIEW-ROOM-BROWSER-CERTIFICATION.md`). C8a/C8b are **BROWSER-CERTIFIED WITH EXPLICIT LIMITS**. C #8 is **PARTIAL / COMPLETE WITH LIMITS** (panel chrome + handoff receipts only — not Delivery merge / correction accounting / highlighter/compare / Lobby rebuild). Gates **#9**, **#10**, **#11** → **COMPLETE WITH LIMITS**. Readiness math remains **4 of 23** complete. Artifacts and local cert data stay untracked. No new construction package opened.
 
 ### Decisions Needed
 
@@ -161,6 +162,7 @@ Every completed item must show available evidence: commit hash · subject · tes
 | 2026-07-26 | MLL truth refresh | Sync Daily Snapshot / Hierarchies B·C·H to tip `eaf3c239`; correct stale CR-5 / Voice / tip pins | `docs/launch/STUDIO-MASTER-LAUNCH-LIST.md` (this refresh) | Customer communication still MISSING · Auth before Customer-One | Tagia approves refresh commit; do not open Customer communication until authorized |
 | 2026-07-28 | MLL-AUTH-1 truth refresh | Hierarchy C #6 + gates #4/#5 → COMPLETE WITH LIMITS @ `e7688ef`; correct stale “No server auth gate” language; preserve Auth limits | `docs/launch/STUDIO-MASTER-LAUNCH-LIST.md` (docs only) | C #7 waits on Tagia · Materials dual UX waiting · Project Claim separate | Protect docs; do not open C #7 engineering |
 | 2026-07-28 | MLL-C7-1 design lock | C #7 DESIGN APPROVED / COMPLETE WITH LIMITS · Lobby-background + panels + corrections + handoff · C #8 not opened | `docs/launch/UNIFIED-REVIEW-FINAL-DELIVERY-ROOM-CONTRACT-V1-LOCKED.md` + MLL docs-only | C #8 waits Tagia · Materials waiting · readiness still 4/23 | Local commit → evidence → push approval |
+| 2026-07-29 | MLL-C8-CERT-1 truth refresh | C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` BROWSER-CERTIFIED WITH EXPLICIT LIMITS · gates #9/#10/#11 CWL · readiness still 4/23 | `docs/launch/STUDIO-MASTER-LAUNCH-LIST.md` (docs only) | Remaining C #8 slices not opened · Materials waiting · cert data cleanup pending | Protect docs; choose next narrow room slice separately |
 
 ---
 
@@ -280,8 +282,8 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 - [x] ~~**Package 7B1 — Review Room Stage Shell**~~ — **COMPLETE WITH LIMITS**
   - Commit: `13baf50a668f1db362ee5d723225b5f1fcc911ac` — `feat: add Review Room stage shell`
   - Certification: **44/44** (re-verified during 7B2)
-  - Limits: Session proxy gate present under Hierarchy C #6 @ `e7688ef`; unified room not built; Voice migration not started; Project Claim still separate
-  - Launch-ready: **shell yes**; **purchased-room session gate yes**
+  - Limits: Session proxy gate present under Hierarchy C #6 @ `e7688ef`; C8a/C8b handoff panel work browser-certified with limits @ `508bddf` (see Hierarchy C #8); Delivery merge / correction accounting / highlighter/compare still outside; Voice migration not started; Project Claim still separate
+  - Launch-ready: **shell yes**; **purchased-room session gate yes**; **C8a/C8b handoff with limits**
 
 - [x] ~~**Package 7B2 — Legacy Concept Review Customer-Path Retirement**~~ — **COMPLETE**
   - Commit: `5b95e1218d79325a3234c9f5daeb345a5933ad1e` — `fix: retire legacy concept review from customer path`
@@ -393,7 +395,7 @@ Keep crossed out. Evidence beneath each. Separate packages stay separate.
 
 **Reusable harnesses (committed; regenerate evidence locally):** `scripts/cert-conversation-room-journey.mjs` · `scripts/cert-cr4r-interaction-proof.mjs` · `scripts/cert-cr4r5-tablet-scrim.mjs`
 **Generated artifacts:** intentionally not committed.
-**Next launch-critical item (Hierarchy C #8 — NOT OPENED):** Unified Review / Final / Delivery **construction** — waits Tagia engineering authorization. Hierarchy C #7 is **DESIGN APPROVED / COMPLETE WITH LIMITS** (`docs/launch/UNIFIED-REVIEW-FINAL-DELIVERY-ROOM-CONTRACT-V1-LOCKED.md`). C #5 Board @ `48ae3f6` · C #6 Auth @ `e7688ef`. Materials dual UX remains waiting (Board limit).
+**Next launch-critical item:** Remaining Unified Review / Final / Delivery construction slices — **not opened**. Hierarchy C #7 remains **DESIGN APPROVED / COMPLETE WITH LIMITS**. Hierarchy C #8 is **PARTIAL / COMPLETE WITH LIMITS** for C8a `04bd9ba` + C8b `77f6835` + C8-CERT-1 `508bddf` only. C #5 Board @ `48ae3f6` · C #6 Auth @ `e7688ef`. Materials dual UX remains waiting (Board limit).
 
 ### ✅ Previous active item — Studio Voice Definition and Customer-Presence Doctrine (complete)
 
@@ -414,9 +416,9 @@ Evidence: `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md
 4. [x] ~~**Customer communication and follow-up access**~~ — **COMPLETE WITH LIMITS** — COMM-2…COMM-5 protected · COMM-CERT-1 `257456c` · `docs/launch/COMMUNICATION-FULL-LOOP-CERTIFICATION.md` · **36/36** focused Vitest · **67/67** full-loop browser · in-product Studio Board + File Room only · campaign-scoped · authenticated ownership · **no** email / SMS / push / browser notifications · **no** attachments · **no** read / delivered / seen receipts · **no** live chat or response-time promises
 5. [x] ~~**Studio Board customer truth and completeness**~~ — **COMPLETE WITH LIMITS** — BOARD-TRUTH-1 decision · BOARD-TRUTH-2 `48ae3f6` · `docs/launch/BOARD-TRUTH-2-PROJECT-SNAPSHOT-DELIVERABLES-HONESTY.md` · **10/10** snapshot · **37/37** Board truth regression · desktop ~1440 / phone ~390 · Project Snapshot no longer invents Social Posts / fake completion · Materials dual UX still **waiting** (Intake + Board) · purchased-room page Auth gate closed under Hierarchy C #6 @ `e7688ef` · Review/Final Delivery nav not stage-gated (destinations carry preparing / unavailable / no-files) · Package 7A not wired to Board · COMM remains in-product only under certified limits
 6. [x] ~~**Purchased-room Auth Route/Data Protection**~~ — **COMPLETE WITH LIMITS** — AUTH-TRUTH-1 · AUTH-GATE-1 `e7688ef` · `docs/launch/AUTH-GATE-1-PROJECT-RECORD-PAGE-AUTHENTICATION.md` · **8/8** focused Auth Vitest · Board · Project Record · Review · Delivery under purchased-room session proxy · `/campaign-details` safe return allowlisted · truthful Project Record access states · campaign APIs retain session + ownership (401/403) · **Limits:** Project Claim / email hard-before-Board still separate Auth sequence · inactivity timeout remains client-driven · ownership remains API-enforced by design · internal/dev tools (`/studio`, textures, decision-learner) remain outside Customer-One purchased-room spine · do not absorb timeout/sign-out WIP
-7. [x] ~~**Unified Review / Final / Delivery design approval**~~ — **DESIGN APPROVED / COMPLETE WITH LIMITS** — `docs/launch/UNIFIED-REVIEW-FINAL-DELIVERY-ROOM-CONTRACT-V1-LOCKED.md` · Lobby persistent environmental background across customer rooms · one room with Review / Final / Delivery as states · work visibly central · labeled **REVIEW TOOLS** + **PROJECT COMMUNICATION** · version-linked finite correction rounds (no silent reset) · clear Studio↔customer submit/receive/return · submitted feedback packages lock as permanent project records · **Limits:** contract approved / UI not constructed · responsive visual treatment belongs to implementation · file/version/annotation behavior must be proven in construction · correction entitlements need authoritative project data · no fake deliverables/submission/receipt/correction balance · Lobby continuity must not harm readability or mobile usability · **C #8 construction NOT OPENED**
-8. [ ] **Unified Review / Final / Delivery construction** — **NOT OPENED** · MISSING until Tagia authorizes engineering · after C #7 design approval
-9. [ ] **Revision, approval, final-file, and delivery integration** — PARTIAL across separate rooms
+7. [x] ~~**Unified Review / Final / Delivery design approval**~~ — **DESIGN APPROVED / COMPLETE WITH LIMITS** — `docs/launch/UNIFIED-REVIEW-FINAL-DELIVERY-ROOM-CONTRACT-V1-LOCKED.md` · Lobby persistent environmental background across customer rooms · one room with Review / Final / Delivery as states · work visibly central · labeled **REVIEW TOOLS** + **PROJECT COMMUNICATION** · version-linked finite correction rounds (no silent reset) · clear Studio↔customer submit/receive/return · submitted feedback packages lock as permanent project records · **Limits:** contract approved · responsive visual treatment and remaining construction slices still open · correction entitlements need authoritative project data · no fake deliverables/submission/receipt/correction balance · Lobby continuity must not harm readability or mobile usability · narrow C8a/C8b construction opened afterward (see #8)
+8. [x] ~~**Unified Review / Final / Delivery construction — C8a + C8b**~~ — **PARTIAL / COMPLETE WITH LIMITS** — C8a `04bd9ba` (`docs/launch/C8A-REVIEW-ROOM-PANEL-CHROME.md`) · C8b `77f6835` (`docs/launch/C8B-REVIEW-HANDOFF-RECEIPTS-LOCKED-SUBMISSIONS.md`) · C8-CERT-1 `508bddf` **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** (`docs/launch/C8-CERT-1-CUSTOMER-ONE-REVIEW-ROOM-BROWSER-CERTIFICATION.md`) · REVIEW TOOLS + PROJECT COMMUNICATION · Studio submission / authorized receipt / customer reviewing / feedback returned / locked package · 7A authority preserved · **Explicit cert limits:** voice-note flow not exercised · drawn-stroke inventory depth not certified · approval certified on a separate prepared job · **Still outside this slice:** Delivery route merge · correction-entitlement accounting · highlighter / version comparison · Lobby continuity rebuild · new COMM model · second stage system · Materials / Project Claim / timeout/Auth reopen · **no** Master Launch List update inside C8a/C8b product commits
+9. [ ] **Remaining Unified Review construction slices** — **NOT OPENED** · Delivery merge · correction accounting · highlighter/compare · Lobby continuity rebuild — choose separately after this truth refresh
 10. [ ] **Complaint and issue entry** — MISSING customer UI
 11. [ ] **Refund request entry** — MISSING customer UI (API/intake gate exists; Owner Desk internal)
 12. [ ] **Customer update history** — MISSING / Board notes partial
@@ -665,7 +667,7 @@ Complaint/refund/communication/update history: prefer panels inside Board/Review
 | Production Intake / Materials (CR) | PARTIAL | Dual location with Board |
 | Studio Board truth | COMPLETE WITH LIMITS | BOARD-TRUTH-2 `48ae3f6` · Materials dual UX waiting · purchased-room Auth = C #6 @ `e7688ef` · 7A not on Board |
 | Project Record | PARTIAL / COMPLETE WITH LIMITS | AUTH-GATE-1 session gate @ `e7688ef`; stage truth not fully wired |
-| Review + Job Review | PARTIAL / COMPLETE WITH LIMITS | 7B1/7B2 strong; session proxy gate @ `e7688ef`; unified room not built |
+| Review + Job Review | PARTIAL / COMPLETE WITH LIMITS | 7B1/7B2 · Auth @ `e7688ef` · C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` BROWSER-CERTIFIED WITH EXPLICIT LIMITS · Delivery merge / correction accounting still open |
 | Final Delivery | PARTIAL / COMPLETE WITH LIMITS | HFF 67/67; session proxy gate @ `e7688ef` |
 | Working draft cross-room proof | PARTIAL | Contract locked; Master List proof bar open |
 | CR Help overlay | SCAFFOLD | Links to Help Center |
@@ -674,7 +676,7 @@ Complaint/refund/communication/update history: prefer panels inside Board/Review
 | Complaint entry | MISSING | |
 | Refund entry UI | MISSING | Backend/Owner exist |
 | Update history | MISSING | |
-| Unified Review/Final/Delivery | DESIGN APPROVED / COMPLETE WITH LIMITS (C #7) · construction MISSING (C #8 not opened) | Contract `UNIFIED-REVIEW-FINAL-DELIVERY-ROOM-CONTRACT-V1-LOCKED.md` · Lobby-background workspace · UI not built |
+| Unified Review/Final/Delivery | DESIGN APPROVED (C #7) · construction **PARTIAL / COMPLETE WITH LIMITS** (C8a/C8b) | Contract locked · C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` · remaining slices not opened |
 | Auth Route/Data Protection (purchased rooms) | COMPLETE WITH LIMITS | AUTH-GATE-1 `e7688ef` · **8/8** · Board · Project Record · Review · Delivery |
 | Auth Project Claim | MISSING / not started | Separate Auth sequence · email hard-before-Board · do not absorb into C #6 |
 
@@ -694,9 +696,9 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 | 6 | Progress survives navigation and return | **PARTIAL** — CR-4 Lobby return + fresh-start PASS (`79ed2ce`); full cross-room proof bar still open |
 | 7 | Customer can communicate with The Studio | **COMPLETE WITH LIMITS** — COMM-CERT-1 `257456c` · `docs/launch/COMMUNICATION-FULL-LOOP-CERTIFICATION.md` · in-product Studio Board + File Room · campaign-scoped · authenticated ownership · **no** email / SMS / push / browser notifications · **no** attachments · **no** read / delivered / seen · **no** live chat or response-time promises |
 | 8 | Customer can see what is needed | PARTIAL |
-| 9 | Customer can review work | PARTIAL |
-| 10 | Customer can request revisions | PARTIAL |
-| 11 | Customer can approve | PARTIAL |
+| 9 | Customer can review work | **COMPLETE WITH LIMITS** — C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` · `docs/launch/C8-CERT-1-CUSTOMER-ONE-REVIEW-ROOM-BROWSER-CERTIFICATION.md` · authorized Job Review · Studio submission receipt · customer receipt · customer reviewing · desktop ~1440 / phone ~390 · **Limits:** voice-note flow not exercised · drawn-stroke inventory depth not certified · Delivery merge / correction accounting still open |
+| 10 | Customer can request revisions | **COMPLETE WITH LIMITS** — C8b + C8-CERT-1 Scenario D · pre-submit summary · `request_revision` · locked feedback package · double-submit blocked · PROJECT COMMUNICATION remains usable after lock · **Limits:** voice/draw depth as above · correction-entitlement accounting not opened |
+| 11 | Customer can approve | **COMPLETE WITH LIMITS** — C8b + C8-CERT-1 Scenario E · `approve_for_delivery` · locked approval receipt · repeat blocked · **Limit:** approval certified on a separate prepared job (Scenario D package not mutated) |
 | 12 | Customer can report an issue | **MISSING** |
 | 13 | Customer can request a refund | **MISSING** UI |
 | 14 | Deadlines and risks are visible | PARTIAL / Evidence not yet pinned |
@@ -710,7 +712,7 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 | 22 | Production build passes | **COMPLETE** (verified during Launch Tracker / recent packages; CR-4 production build PASS) |
 | 23 | Full E2E testing passes | **MISSING** — CR-4 closes Conversation Room E2E only, not full Customer-One E2E |
 
-**Customer-One readiness: 4 of 23 gates complete** (#16, #18, #20, #22). Gates **#4**, **#5**, **#7**, and **#19** are COMPLETE WITH LIMITS and not counted in the complete total. Hierarchy C #5 Board truth @ `48ae3f6`, C #6 purchased-room Auth @ `e7688ef`, and C #7 unified-room **design** (DESIGN APPROVED / COMPLETE WITH LIMITS) are COMPLETE WITH LIMITS — C #7 does not bump the numbered readiness-gate complete total; Review/Final/Delivery customer gates remain PARTIAL until C #8.
+**Customer-One readiness: 4 of 23 gates complete** (#16, #18, #20, #22). Gates **#4**, **#5**, **#7**, **#9**, **#10**, **#11**, and **#19** are COMPLETE WITH LIMITS and not counted in the complete total. Hierarchy C #5 Board @ `48ae3f6`, C #6 Auth @ `e7688ef`, C #7 unified-room **design**, and C #8 **C8a/C8b** slices (BROWSER-CERTIFIED WITH EXPLICIT LIMITS @ `508bddf`) are COMPLETE WITH LIMITS / PARTIAL WITH LIMITS — numbered readiness-gate complete total stays **4 of 23**; remaining C #8 slices (Delivery merge · correction accounting · highlighter/compare · Lobby rebuild) remain outside.
 
 ---
 
@@ -825,14 +827,14 @@ Deferred until customer rooms complete · Studio Voice defined · team/productio
 
 Do **not** clean, restore, stage, commit, absorb, or rewrite without an approved package boundary:
 
-- Conversation Room WIP  
-- Lobby WIP + untracked `MobileStudioEntry`  
-- Owner QA WIP  
-- Auth timeout WIP  
-- Migration ledger + Lobby `sourceHref` (`/studio-lobby?lobbyEntry=reset`)  
-- Package files  
-- Test artifacts  
-- All other pre-existing modifications  
+- Conversation Room WIP
+- Lobby WIP + untracked `MobileStudioEntry`
+- Owner QA WIP
+- Auth timeout WIP
+- Migration ledger + Lobby `sourceHref` (`/studio-lobby?lobbyEntry=reset`)
+- Package files
+- Test artifacts
+- All other pre-existing modifications
 
 ---
 
@@ -845,10 +847,10 @@ Do **not** clean, restore, stage, commit, absorb, or rewrite without an approved
 | Customer communication | Voice + CR complete | — | Customer-One gate #7 (**COMPLETE WITH LIMITS** @ `257456c`) | In-product Board + File Room · external channels deferred |
 | Board truth | CR + materials decision | — | Customer-One gate support · Auth timing | **COMPLETE WITH LIMITS** @ `48ae3f6` · Materials dual UX waiting (limit) |
 | Auth Route/Data Protection | Board truth (default) | — | Customer-One purchased-room gates | **COMPLETE WITH LIMITS** @ `e7688ef` · Project Claim separate |
-| Unified room design | Voice, CR, comms, Board, Auth C #6 | — | Construction (C #8) | **C #7 DESIGN APPROVED / COMPLETE WITH LIMITS** · contract locked · C #8 **NOT OPENED** |
-| Unified room construction (C #8) | C #7 design approval | Tagia engineering authorization | Customer Review/Final/Delivery in one Lobby-continuous room | **Not opened** |
+| Unified room design | Voice, CR, comms, Board, Auth C #6 | — | Construction (C #8) | **C #7 DESIGN APPROVED / COMPLETE WITH LIMITS** · contract locked |
+| Unified room construction (C #8) | C #7 design approval | Remaining slices wait Tagia package auth | Customer Review/Final/Delivery in one Lobby-continuous room | **PARTIAL / COMPLETE WITH LIMITS** — C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` · Delivery merge / correction accounting / highlighter/compare / Lobby rebuild **not opened** |
 | ARCHIVE-1 execute | After Customer-One (default) | Early-start only if build/security/truth/dependency obstructs | Clean archive of discovery UI | Option A locked · move **not** started |
 
 ---
 
-**Document status:** MLL-C7-1 truth refresh (2026-07-28) · documentation only · **no product code** · Hierarchy C #7 = **DESIGN APPROVED / COMPLETE WITH LIMITS** · contract `docs/launch/UNIFIED-REVIEW-FINAL-DELIVERY-ROOM-CONTRACT-V1-LOCKED.md` · Lobby persistent background sealed · **C #8 UI construction NOT OPENED** · readiness math remains **4 of 23** complete · Materials dual UX still waiting · Project Claim, timeout WIP, Auth reopen not absorbed.
+**Document status:** MLL-C8-CERT-1 truth refresh (2026-07-29) · documentation only · **no product code** · C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` = **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · Hierarchy C #8 = **PARTIAL / COMPLETE WITH LIMITS** (C8a/C8b only) · gates **#9/#10/#11** COMPLETE WITH LIMITS · readiness math remains **4 of 23** complete · explicit limits: voice-note flow not exercised · drawn-stroke inventory depth not certified · approval certified on a separate prepared job · artifacts and local certification data remain untracked · Materials dual UX still waiting · no new construction package opened.
