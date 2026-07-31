@@ -3,6 +3,40 @@
  * No page-edge decoration; sketch styling belongs in headers, dividers, and tools.
  */
 
+/**
+ * C8e — Lobby visual continuity (Review / Final / Delivery).
+ * Route-scoped via :has(.fs-room) — only the Feedback Studio room shell renders
+ * .fs-room, so this never affects Studio Board, Help Center, Campaign Details,
+ * or the standalone Deliverables page. Reuses the existing Lobby lounge plate +
+ * tokens already defined for `.studio-utility-scene--front-lobby` (unused
+ * elsewhere today) instead of the generic utility mural, with a lighter,
+ * rebalanced frost so the Lobby reads behind the workspace without competing
+ * with it. Purely additive — does not touch UtilityPageFrame.
+ */
+.studio-utility-scene:has(.fs-room) {
+  --studio-utility-backdrop-image: url("/welcome-hall/studio-lobby-lounge.png?v=1");
+  --studio-utility-backdrop-position: center center;
+  --studio-utility-backdrop-blur: blur(12px) brightness(0.84) saturate(0.95);
+  --studio-utility-backdrop-tint: color-mix(in srgb, #2e2d2b 17%, transparent);
+  --studio-utility-backdrop-fallback: #3a3937;
+}
+
+/* Naked (non-card) summary text sits directly on the Lobby backdrop — protect contrast. */
+.studio-utility-scene:has(.fs-room) .rd-shell__project,
+.studio-utility-scene:has(.fs-room) .rd-shell__summary-label,
+.studio-utility-scene:has(.fs-room) .rd-shell__summary-explanation {
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.72);
+}
+
+@media (max-width: 55.99rem) {
+  /* Tablet + mobile — less Lobby is visible around the narrower workspace;
+     rebalance toward readability rather than backdrop visibility. */
+  .studio-utility-scene:has(.fs-room) {
+    --studio-utility-backdrop-blur: blur(15px) brightness(0.8) saturate(0.92);
+    --studio-utility-backdrop-tint: color-mix(in srgb, #2e2d2b 23%, transparent);
+  }
+}
+
 .fs-room {
   flex: 1;
   min-height: 0;
