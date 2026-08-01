@@ -16,17 +16,17 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | `727c8311cf90184067d353fcd9f913bc48a597eb` — `feat: add customer problem reporting to project communication` |
+| Protected tip | `68dc50ad9ab1023adb81f28566391ae192f43d88` — `docs(launch): record customer issue entry truth` (product seal ISSUE-ENTRY-1 @ `727c831`) |
 | Branch | `fix/discovery-responsive-layout` |
-| Sync | **0 ahead / 0 behind** at tip `727c831` before this docs pass; working-tree docs refresh awaits Tagia review and commit approval |
-| Current active item | **None** — ISSUE-ENTRY-1 sealed with limits; next narrow room slice not opened |
+| Sync | **0 ahead / 0 behind** · staging empty · substantial unrelated dirty WIP present (leave untouched) |
+| Current active item | **None** — stand by; verify control point only · lean Scout handoff: `docs/launch/SCOUT-CONTROL-POINT-HANDOFF.md` |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
 | Most recently completed | ISSUE-ENTRY-1 Customer Problem Reporting @ `727c831` (`feat: add customer problem reporting to project communication`) · Focused Vitest **50/50 PASS** · browser certification **116/116 PASS** (`scripts/smoke-issue-entry-1.mjs`) · prior C8e Lobby Visual Continuity **BROWSER-CERTIFIED** @ `167979e` · C8d `956f4d8` · MLL-C8D-1 `0678111` · C8C-CERT-1 `ed5e1d0` · C8c `cebe713a` · C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` |
 | Next three priorities | 1) Remaining Unified Review construction slice (highlighter / version comparison, subject to launch-gate review) — **not opened** · 2) Materials dual UX decision (waiting — Board limit) · 3) Project Claim / email hard-before-Board (separate Auth sequence — only when Tagia authorizes) |
 | Active blockers | Remaining C #8 highlighter/compare slice waits Tagia package authorization · Materials dual UX waiting · Refund UI (Gate #13) and update history (Hierarchy C #12) remain unresolved |
 | Decisions waiting | **1** — Materials dual UX (Board limit) |
 | Customer-One readiness | **4 of 23** readiness gates complete (#16, #18, #20, #22) · Gates **#4**, **#5**, **#7**, **#9**, **#10**, **#11**, **#12**, and **#19** are **COMPLETE WITH LIMITS** (not counted in the complete total) · Hierarchy C #5–#7 COMPLETE WITH LIMITS · C #8 **PARTIAL / COMPLETE WITH LIMITS** (C8a/C8b/C8c/C8d/C8e; not a full unified-room close) · Hierarchy C #10 (Complaint and issue entry) **COMPLETE WITH LIMITS** @ `727c831` |
-| Last updated | 2026-07-31 |
+| Last updated | 2026-08-01 |
 
 ---
 
@@ -78,6 +78,7 @@ Every completed item must show available evidence: commit hash · subject · tes
 
 ### Tagia Notes
 
+- **2026-08-01 — Scout lean handoff (locked pattern):** Scout receives a separate control-point package, not the entire Flight Manual. Governing truth stays in Master List / Working Protocol / inventory; Scout’s immediate instructions stay narrow and action-ready. When no package is authorized: **Stand by. Verify the protected control point only. Do not begin a new package.** Template: `docs/launch/SCOUT-CONTROL-POINT-HANDOFF.md`. Protected tip for this resume: `68dc50ad9ab1023adb81f28566391ae192f43d88` · branch `fix/discovery-responsive-layout` · expected 0/0 · staging empty · open package **none**.
 - **2026-07-26 — Standing rule (locked):** Important Chat guidance must not live only in chat. Send it to Scout and record it here or in the relevant package document.
 - **2026-07-26 — Inventory accepted:** Classifications and completion order accepted. Inventory marked complete.
 - **2026-07-26 — LOCKED:** Purchased-room authentication and data protection must be completed and certified **before Tagia begins the Customer-One trial.** Not Parking Lot. Does not stop Studio Voice definition.

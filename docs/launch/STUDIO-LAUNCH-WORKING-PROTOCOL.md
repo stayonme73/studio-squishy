@@ -281,6 +281,34 @@ One finished room, then close the door.
 
 ## 11. Pack the Suitcase for Every New Thread
 
+### Lean Scout package vs governing truth
+
+The Flight Manual / Master Launch List / Working Protocol are **governing truth**. Scout’s immediate package must stay **narrow and action-ready**.
+
+Do **not** dump the full governing corpus into Scout’s lap as if it were construction authorization. Background context is not permission to build.
+
+Scout’s package must include, at minimum:
+
+- Protected tip · branch · expected sync (ahead/behind) · expected staging
+- Open package (or **none**)
+- Latest sealed work relevant to the resume
+- Gate / readiness status that affects the next decision
+- Known open customer-facing items (not a full inventory dump)
+- Explicit instruction: do **not** begin construction until one package is selected and authorized
+- Anti-loop authority to stop if requested work is already complete
+- Requirement to inspect the repo before proposing changes
+- Requirement to identify affected files, tests, certification path, and risks before editing
+- Rule against touching unrelated dirty work or cleanup outside the package
+- Rule that commit and push happen only after owner approval
+
+When no package is authorized, Scout’s truthful status is:
+
+> **Stand by. Verify the protected control point only. Do not begin a new package.**
+
+Canonical lean resume template: [`SCOUT-CONTROL-POINT-HANDOFF.md`](./SCOUT-CONTROL-POINT-HANDOFF.md).
+
+### Suitcase contents (governing references — consult, do not dump wholesale)
+
 The suitcase must contain:
 
 - **ANTI-LOOP RULE:** Before acting, verify whether the requested work is already completed, locked, tested, certified, or protected. If it is, red-flag the repetition, provide the existing evidence, and identify only the genuine remaining gap.
