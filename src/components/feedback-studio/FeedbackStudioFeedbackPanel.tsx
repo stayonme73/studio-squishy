@@ -36,6 +36,8 @@ type Props = {
   onDrawPencil: () => void;
   onDrawErase: () => void;
   onDrawDone: () => void;
+  onCompareToggle?: () => void;
+  onCompareDone?: () => void;
   onVoiceToggle: () => void;
   onApprove: () => void;
   onRevision: () => void;
@@ -67,6 +69,8 @@ export default function FeedbackStudioFeedbackPanel({
   onDrawPencil,
   onDrawErase,
   onDrawDone,
+  onCompareToggle,
+  onCompareDone,
   onVoiceToggle,
   onApprove,
   onRevision,
@@ -122,6 +126,16 @@ export default function FeedbackStudioFeedbackPanel({
           >
             <span aria-hidden>✏</span> {copy.drawAnnotation}
           </button>
+
+          {mode === "job" && onCompareToggle ? (
+            <button
+              type="button"
+              className={`fs-feedback-panel__btn${activeTool === "compare" ? " fs-feedback-panel__btn--active" : ""}`}
+              onClick={onCompareToggle}
+            >
+              <span aria-hidden>⧉</span> {copy.versionCompare}
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -198,6 +212,17 @@ export default function FeedbackStudioFeedbackPanel({
             </button>
             <button type="button" className="fs-feedback-panel__draw-btn" onClick={onDrawDone}>
               {copy.drawDone}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {mode === "job" && activeTool === "compare" && onCompareDone ? (
+        <div className="fs-feedback-panel__draw-tools">
+          <p className="fs-feedback-panel__draw-hint">{feedbackStudio.versionCompare.activeHint}</p>
+          <div className="fs-feedback-panel__draw-row">
+            <button type="button" className="fs-feedback-panel__draw-btn" onClick={onCompareDone}>
+              {feedbackStudio.versionCompare.closeCompare}
             </button>
           </div>
         </div>

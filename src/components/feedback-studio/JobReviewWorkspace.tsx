@@ -63,6 +63,8 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
     visibleSectionIds[0] ?? "fallback:deliverable-0",
   );
   const [activeTool, setActiveTool] = useState<FeedbackTool>("none");
+  const [compareCurrentId, setCompareCurrentId] = useState<string | null>(null);
+  const [comparePriorId, setComparePriorId] = useState<string | null>(null);
   const [stickyOpen, setStickyOpen] = useState(false);
   const [stickyColor, setStickyColor] = useState<StickyNoteColorId>("yellow");
   const [stickyDraft, setStickyDraft] = useState("");
@@ -391,8 +393,16 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             activeTool={activeTool}
             erasing={erasing}
             session={session}
-            onFocusSection={setFocusedSection}
+            compareCurrentId={compareCurrentId}
+            comparePriorId={comparePriorId}
+            onFocusSection={(sectionId) => {
+              setFocusedSection(sectionId);
+              setCompareCurrentId(null);
+              setComparePriorId(null);
+            }}
             onDrawStroke={() => markDraw(focusedSection)}
+            onCompareSelectCurrent={setCompareCurrentId}
+            onCompareSelectPrior={setComparePriorId}
           />
 
           <div className="fs-review__choose fs-review__choose--job">
@@ -498,6 +508,12 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
               setActiveTool("none");
               setErasing(false);
             }}
+            onCompareToggle={() => {
+              setActiveTool((tool) => (tool === "compare" ? "none" : "compare"));
+              setStickyOpen(false);
+              setErasing(false);
+            }}
+            onCompareDone={() => setActiveTool("none")}
             onVoiceToggle={() => void handleVoiceToggle()}
             onApprove={handleApprove}
             onRevision={handleRevision}

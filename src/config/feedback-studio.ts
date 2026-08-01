@@ -16,7 +16,7 @@ export type StickyNoteColorId = "yellow" | "blue" | "coral";
 
 export type SectionReviewStatus = "neutral" | "approved" | "revision" | "skip";
 
-export type FeedbackTool = "none" | "sticky" | "draw" | "voice";
+export type FeedbackTool = "none" | "sticky" | "draw" | "voice" | "compare";
 
 export type FeedbackConceptPreview = {
   id: FeedbackConceptId;
@@ -172,6 +172,7 @@ export const feedbackStudio = {
     addStickyNote: "Add Sticky Note",
     recordVoice: "Record Voice Feedback",
     drawAnnotation: "Draw Annotation",
+    versionCompare: "Version Compare",
     approveSection: "Approve Section",
     requestRevision: "Request Revision",
     skipSection: "Skip Section",
@@ -221,6 +222,22 @@ export const feedbackStudio = {
     deliverableReady: "Ready for review",
     submittedRevision: "Revision requested — returning to production.",
     submittedApproval: "Approved for delivery — awaiting Owner final approval.",
+  },
+
+  /** VERSION-COMPARE-1 — truthful presentation over recorded proofs only. */
+  versionCompare: {
+    title: "Version Compare",
+    lead: "Select two recorded proof versions for this deliverable. Labels and dates come from Studio records.",
+    currentLabel: "Current version",
+    priorLabel: "Prior version",
+    selectCurrent: "Choose current proof version",
+    selectPrior: "Choose prior proof version",
+    recordedLabel: "Recorded",
+    unavailable:
+      "Version comparison is not available for this deliverable yet. At least two recorded proof versions are required.",
+    noDiffNote: "This view shows the recorded versions side by side. It does not detect or highlight changes automatically.",
+    activeHint: "Comparing recorded proof versions for the focused deliverable.",
+    closeCompare: "Close version compare",
   },
 
   noCampaign: {

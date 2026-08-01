@@ -14,6 +14,7 @@ import type { ClientReviewDeliverable } from "@/lib/job-control/review-feedback-
 import { deliverableKeyToSectionId } from "@/lib/review-room-client";
 
 import FeedbackStudioDrawLayer from "./FeedbackStudioDrawLayer";
+import JobReviewVersionCompare from "./JobReviewVersionCompare";
 
 type Props = {
   reviewTitle: string;
@@ -25,8 +26,12 @@ type Props = {
   activeTool: FeedbackTool;
   erasing: boolean;
   session: FeedbackSession;
+  compareCurrentId: string | null;
+  comparePriorId: string | null;
   onFocusSection: (sectionId: FeedbackSectionId) => void;
   onDrawStroke: (sectionId: FeedbackSectionId) => void;
+  onCompareSelectCurrent: (id: string) => void;
+  onCompareSelectPrior: (id: string) => void;
 };
 
 export default function JobReviewDeliverablePreview({
@@ -39,8 +44,12 @@ export default function JobReviewDeliverablePreview({
   activeTool,
   erasing,
   session,
+  compareCurrentId,
+  comparePriorId,
   onFocusSection,
   onDrawStroke,
+  onCompareSelectCurrent,
+  onCompareSelectPrior,
 }: Props) {
   const deliverableByKey = new Map<string, ClientReviewDeliverable>(
     deliverables.map((entry) => [deliverableKeyToSectionId(entry.key), entry]),
@@ -87,6 +96,15 @@ export default function JobReviewDeliverablePreview({
                     day: "numeric",
                   })}
                 </p>
+              ) : null}
+              {activeTool === "compare" && focused ? (
+                <JobReviewVersionCompare
+                  proofFiles={deliverable.proofFiles}
+                  currentId={compareCurrentId}
+                  priorId={comparePriorId}
+                  onSelectCurrent={onCompareSelectCurrent}
+                  onSelectPrior={onCompareSelectPrior}
+                />
               ) : null}
               {deliverable.proofFiles.length > 0 ? (
                 <div className="fs-proof-refs" aria-label={`${deliverable.label} proof references`}>
