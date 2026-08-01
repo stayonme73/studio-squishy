@@ -2,7 +2,7 @@
 
 **Status:** STAND BY — verify protected control point only  
 **Authority:** Immediate Scout instructions for this resume. Narrow and action-ready.  
-**Not this document:** The Flight Manual / Master Launch List / Working Protocol are governing truth Scout may consult. They are **not** construction or inspection authorization. Do not treat background context as permission to build or inspect.
+**Not this document:** The Flight Manual / Master Launch List / Working Protocol are governing truth Scout may consult. They are **not** construction or certification authorization. Do not treat background context as permission to build or certify.
 
 ---
 
@@ -10,11 +10,12 @@
 
 **Stand by. Verify the protected control point only. Do not begin a new package.**
 
-**UR-PROOF-READINESS-INSPECT-1** is **defined** in governing docs. **Inspection is not authorized.**  
-**TEXT-COMMENT-1** is **SEALED · BROWSER-CERTIFIED WITH LIMITS**. Do not reopen without contradictory evidence.  
-**PAGE-TABS-1** is **deferred**. Do not fabricate Page Tabs.
+**UR-PROOF-READINESS-INSPECT-1** is **COMPLETE / CLOSED** — Choice **A** accepted (link-only proof viewing for Customer-One). Do not reopen without contradictory evidence.  
+**UR-ROOM-CERT-1** is **not defined** and **not authorized**.  
+**PAGE-TABS-1** is **deferred**. Do not fabricate Page Tabs.  
+No renderer construction. No Refund UI / Payment work.
 
-Do not begin product construction, run the inspection, modify product files, install renderer dependencies, or reopen sealed work.
+Do not begin product construction, room certification, modify product files, install renderer dependencies, or reopen sealed work.
 
 ---
 
@@ -24,18 +25,20 @@ Project Alpha is resuming from the following protected state:
 
 | Field | Value |
 |---|---|
-| Protected tip | `071c2b14c41ace29e3bc8ab2b58d80b73caf08a1` |
+| Protected tip | `b7fe061537a8713272e5258f9498fdd5fea37c7e` |
 | Branch | `fix/discovery-responsive-layout` |
 | Expected sync | **0 ahead / 0 behind** |
 | Expected staging | **empty** |
 | Open construction package | **none** |
 | Open inspection package | **none** |
-| Defined next package | **UR-PROOF-READINESS-INSPECT-1** — docs defined · inspection waits for separate authorization |
+| Defined next package | **UR-ROOM-CERT-1** — not yet defined · waits separate definition + seal + authorization |
 | Deferred | **PAGE-TABS-1** — pending truthful page/location identity |
 | Customer-One readiness | **4 of 23** |
+| Proof viewing (Customer-One) | Session-gated **link-only** — accepted certified limit (Choice A) |
 
 ### Recently sealed / closed
 
+- **UR-PROOF-READINESS-INSPECT-1** — COMPLETE / CLOSED · Choice **A** (link-only proofs; no renderer before room cert)
 - **TEXT-COMMENT-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `071c2b1…` (proof-version text; not in-proof location)
 - **REVIEW-TEXT-TOOLS-INSPECT-1** — COMPLETE / CLOSED
 - **HIGHLIGHTER-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `96b6a39…` (`proof_markup_board_v1`; not source-proof pixels)
@@ -52,10 +55,9 @@ Project Alpha is resuming from the following protected state:
 
 ### Known open customer-facing work (room sequence)
 
-1. UR-PROOF-READINESS-INSPECT-1 (defined; inspection not authorized) → then construction only from evidence
+1. UR-ROOM-CERT-1 (definition + seal + authorization still separate) — intended outcome **BROWSER-CERTIFIED WITH EXPLICIT LIMITS**
 2. PAGE-TABS-1 (deferred)
-3. UR-ROOM-CERT-1
-4. Only then Refund UI (Payment room)
+3. Only then Refund UI (Payment room)
 
 ---
 
@@ -65,7 +67,7 @@ Project Alpha is resuming from the following protected state:
 2. Local versus origin ahead/behind state
 3. Staging and working-tree state
 4. Whether any unrelated local work is present
-5. Whether the protected tip matches `071c2b14c41ace29e3bc8ab2b58d80b73caf08a1` (or the later tip after UR-PROOF-READINESS-INSPECT-1 definition seal)
+5. Whether the protected tip matches `b7fe061537a8713272e5258f9498fdd5fea37c7e` (or the later tip after UR-PROOF-READINESS-INSPECT-1 closure seal)
 
 **If the repository does not match the protected state, stop and report the discrepancy without altering anything.**
 
@@ -82,7 +84,6 @@ After verification, remain on standby for the next authorized package.
 - Preserve working behavior.
 - Do not reopen sealed work without evidence.
 - Raise an anti-loop warning if requested work appears already complete.
-- Combine work only when it shares the same business objective, architecture, affected files, and certification path — proof rendering and remaining room limits are inspected together; construction packages remain evidence-driven.
 - Leave unrelated dirty work untouched.
 - Do not commit or push without owner approval.
 
