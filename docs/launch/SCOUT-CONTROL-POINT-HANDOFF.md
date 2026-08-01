@@ -2,7 +2,7 @@
 
 **Status:** STAND BY — verify protected control point only  
 **Authority:** Immediate Scout instructions for this resume. Narrow and action-ready.  
-**Not this document:** The Flight Manual / Master Launch List / Working Protocol are governing truth Scout may consult. They are **not** construction or certification authorization. Do not treat background context as permission to build or certify.
+**Not this document:** The Flight Manual / Master Launch List / Working Protocol are governing truth Scout may consult. They are **not** certification authorization. Do not treat background context as permission to certify or build.
 
 ---
 
@@ -10,12 +10,12 @@
 
 **Stand by. Verify the protected control point only. Do not begin a new package.**
 
-**UR-PROOF-READINESS-INSPECT-1** is **COMPLETE / CLOSED** — Choice **A** accepted (link-only proof viewing for Customer-One). Do not reopen without contradictory evidence.  
-**UR-ROOM-CERT-1** is **not defined** and **not authorized**.  
+**UR-ROOM-CERT-1** is **defined** in governing docs. **Certification is not authorized.**  
+**UR-PROOF-READINESS-INSPECT-1** is **COMPLETE / CLOSED** — Choice **A** (link-only proofs). Do not reopen without contradictory evidence.  
 **PAGE-TABS-1** is **deferred**. Do not fabricate Page Tabs.  
-No renderer construction. No Refund UI / Payment work.
+No renderer construction. No Refund UI / Payment work. No product construction.
 
-Do not begin product construction, room certification, modify product files, install renderer dependencies, or reopen sealed work.
+Do not begin the certification run, modify product files, install dependencies, or reopen sealed work.
 
 ---
 
@@ -25,25 +25,27 @@ Project Alpha is resuming from the following protected state:
 
 | Field | Value |
 |---|---|
-| Protected tip | `b7fe061537a8713272e5258f9498fdd5fea37c7e` |
+| Protected tip | `4bb878c0ca1e5a6b88907bf36a1d7cc28e33ee54` |
 | Branch | `fix/discovery-responsive-layout` |
 | Expected sync | **0 ahead / 0 behind** |
 | Expected staging | **empty** |
 | Open construction package | **none** |
 | Open inspection package | **none** |
-| Defined next package | **UR-ROOM-CERT-1** — not yet defined · waits separate definition + seal + authorization |
+| Open certification package | **none** |
+| Defined next package | **UR-ROOM-CERT-1** — docs defined · certification waits for separate authorization |
 | Deferred | **PAGE-TABS-1** — pending truthful page/location identity |
 | Customer-One readiness | **4 of 23** |
 | Proof viewing (Customer-One) | Session-gated **link-only** — accepted certified limit (Choice A) |
+| Intended cert outcome | **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** |
 
 ### Recently sealed / closed
 
-- **UR-PROOF-READINESS-INSPECT-1** — COMPLETE / CLOSED · Choice **A** (link-only proofs; no renderer before room cert)
-- **TEXT-COMMENT-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `071c2b1…` (proof-version text; not in-proof location)
+- **UR-PROOF-READINESS-INSPECT-1** — COMPLETE / CLOSED · Choice **A** @ `4bb878c…` closure seal
+- **TEXT-COMMENT-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `071c2b1…`
 - **REVIEW-TEXT-TOOLS-INSPECT-1** — COMPLETE / CLOSED
-- **HIGHLIGHTER-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `96b6a39…` (`proof_markup_board_v1`; not source-proof pixels)
-- **VERSION-COMPARE-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `b0bd5e5…` (metadata compare only)
-- **UPDATE-HISTORY-1** Customer Update History @ `1e1308e…`
+- **HIGHLIGHTER-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `96b6a39…`
+- **VERSION-COMPARE-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `b0bd5e5…`
+- **UPDATE-HISTORY-1** @ `1e1308e…`
 - **HIGHLIGHTER-COMPARE-INSPECT-1** complete / closed
 - **C8e** Lobby continuity
 - **VQ-C8E-HEADER-1** closed as **NOT REPRODUCED — NO PRODUCT CHANGE JUSTIFIED**
@@ -55,7 +57,7 @@ Project Alpha is resuming from the following protected state:
 
 ### Known open customer-facing work (room sequence)
 
-1. UR-ROOM-CERT-1 (definition + seal + authorization still separate) — intended outcome **BROWSER-CERTIFIED WITH EXPLICIT LIMITS**
+1. UR-ROOM-CERT-1 (defined; certification not authorized)
 2. PAGE-TABS-1 (deferred)
 3. Only then Refund UI (Payment room)
 
@@ -67,7 +69,7 @@ Project Alpha is resuming from the following protected state:
 2. Local versus origin ahead/behind state
 3. Staging and working-tree state
 4. Whether any unrelated local work is present
-5. Whether the protected tip matches `b7fe061537a8713272e5258f9498fdd5fea37c7e` (or the later tip after UR-PROOF-READINESS-INSPECT-1 closure seal)
+5. Whether the protected tip matches `4bb878c0ca1e5a6b88907bf36a1d7cc28e33ee54` (or the later tip after UR-ROOM-CERT-1 definition seal)
 
 **If the repository does not match the protected state, stop and report the discrepancy without altering anything.**
 

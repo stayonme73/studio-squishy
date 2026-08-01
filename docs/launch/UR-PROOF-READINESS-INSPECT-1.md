@@ -56,7 +56,7 @@ Choice B would introduce large fresh machinery before a production MIME census e
 
 ### Next package
 
-**UR-ROOM-CERT-1** — definition / seal / authorization remain **separate**. PAGE-TABS-1 stays deferred. No renderer construction authorized by this closure.
+**UR-ROOM-CERT-1** — docs defined · certification waits for separate authorization (`docs/launch/UR-ROOM-CERT-1.md`). PAGE-TABS-1 stays deferred. No renderer construction authorized by this closure.
 
 Do **not** reopen this inspection without concrete contradictory evidence.
 
