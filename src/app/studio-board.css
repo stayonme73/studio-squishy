@@ -7698,6 +7698,75 @@ body:has(.sb--v4) {
   color: var(--sb-text);
 }
 
+/* ISSUE-ENTRY-1 — typed intent selector (Ask a question / Report a problem). */
+/* Fallback values keep this readable when reused outside the .sb board scope
+   (Review / Final / Delivery mount sb-project-communication__* classes without
+   the --sb-* custom-property scope — same pattern as the existing error/success rows). */
+.sb-project-communication__intent {
+  margin: 0 0 0.15rem;
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sb-project-communication__intent-legend {
+  padding: 0;
+  font-size: var(--sb-type-sm, 0.95rem);
+  font-weight: 600;
+  color: var(--sb-text, #2a2a2a);
+}
+
+.sb-project-communication__intent-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sb-project-communication__intent-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--sb-denim, #2c5f7c) 28%, transparent);
+  border-radius: 999px;
+  font-size: var(--sb-type-sm, 0.95rem);
+  color: var(--sb-text, #2a2a2a);
+  cursor: pointer;
+  background: color-mix(in srgb, #fff 70%, transparent);
+}
+
+.sb-project-communication__intent-option:has(input:focus-visible) {
+  outline: 2px solid color-mix(in srgb, var(--sb-denim, #2c5f7c) 70%, #000 30%);
+  outline-offset: 2px;
+}
+
+.sb-project-communication__intent-option[data-selected="true"] {
+  border-color: var(--sb-denim, #2c5f7c);
+  background: color-mix(in srgb, var(--sb-denim, #2c5f7c) 16%, #fff 84%);
+  font-weight: 700;
+}
+
+.sb-project-communication__intent-option input {
+  margin: 0;
+}
+
+.sb-project-communication__problem-status {
+  margin: 0 0 0.15rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--sb-denim, #2c5f7c) 28%, transparent);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--sb-denim, #2c5f7c) 8%, #fff 92%);
+  font-size: var(--sb-type-sm, 0.95rem);
+  line-height: 1.4;
+  color: var(--sb-text, #2a2a2a);
+}
+
+.sb-project-communication__problem-status-heading {
+  font-weight: 700;
+}
+
 .sb-project-communication__textarea {
   width: 100%;
   min-height: 5.5rem;

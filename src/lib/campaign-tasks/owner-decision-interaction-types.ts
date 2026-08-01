@@ -33,4 +33,11 @@ export type OwnerDecisionInteractionRecord = {
   updatedAt: string;
   resolutionNotes?: string;
   refundSnapshot?: RefundRequestSnapshot;
+  /**
+   * ISSUE-ENTRY-1 — client-supplied idempotency key for problem-report submission.
+   * Scoped per campaignId; lets a resubmit-with-same-key replay safely instead of
+   * creating a duplicate complaint record. Optional — refund_request and other
+   * interaction kinds do not set this.
+   */
+  submissionIdempotencyKey?: string;
 };

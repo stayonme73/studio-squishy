@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { PROJECT_COMMUNICATION_CUSTOMER_V1 as copy } from "@/config/project-communication-customer-v1";
+import { PROJECT_COMMUNICATION_PROBLEM_REPORT_V1 as problemCopy } from "@/config/project-communication-problem-report-v1";
 import type { CampaignRecord } from "@/config/studio-board";
 import { PROJECT_COMMUNICATION_BODY_MAX_LENGTH } from "@/lib/project-communication/types";
 import { customerCommunicationSenderLabel } from "@/lib/project-communication/customer-ui";
+import type { ProblemReportCustomerView } from "@/lib/campaign-tasks/problem-report-status-view";
 
 type CustomerMessageView = {
   id: string;
@@ -15,6 +17,9 @@ type CustomerMessageView = {
   replyToMessageId: string | null;
   studioHasReplied: boolean | null;
 };
+
+/** ISSUE-ENTRY-1 — typed customer intent. "question" keeps the ordinary message path. */
+type ComposerIntent = "question" | "problem";
 
 type NotificationState = {
   hasNewStudioReply: boolean;
@@ -40,10 +45,19 @@ type NotificationResponse = {
   error?: string;
 };
 
+type ProblemReportResponse = {
+  problemReport?: ProblemReportCustomerView | null;
+  confirmation?: string;
+  replayed?: boolean;
+  error?: string;
+};
+
 type StudioBoardProjectCommunicationSectionProps = {
   campaign: CampaignRecord | null;
   hasCampaign: boolean;
   campaignLookupPending: boolean;
+  /** ISSUE-ENTRY-1 — optional job association when the surrounding surface is job-scoped. */
+  jobId?: string | null;
   /** C8a — Review Room chrome; defaults preserve Board copy and card layout. */
   presentation?: {
     sectionTitle: string;
@@ -83,11 +97,14 @@ export default function StudioBoardProjectCommunicationSection({
   campaign,
   hasCampaign,
   campaignLookupPending,
+  jobId,
   presentation,
 }: StudioBoardProjectCommunicationSectionProps) {
   const fieldId = useId();
   const statusId = useId();
   const noticeId = useId();
+  const intentLegendId = useId();
+  const problemStatusId = useId();
   const generatedTitleId = useId();
   const titleId = presentation?.titleId ?? generatedTitleId;
   const sectionTitle = presentation?.sectionTitle ?? copy.sectionTitle;
@@ -109,6 +126,12 @@ export default function StudioBoardProjectCommunicationSection({
   const [ackBusy, setAckBusy] = useState(false);
   const [ackError, setAckError] = useState<string | null>(null);
   const [idempotencyKey, setIdempotencyKey] = useState(newIdempotencyKey);
+
+  // ISSUE-ENTRY-1 — typed intent selector. Defaults to "question" on every load and after
+  // a problem report is submitted, so this never becomes a permanent composer mode.
+  const [intent, setIntent] = useState<ComposerIntent>("question");
+  const [problemReport, setProblemReport] = useState<ProblemReportCustomerView | null>(null);
+  const [problemStatusLoadFailed, setProblemStatusLoadFailed] = useState(false);
 
   const loadNotification = useCallback(async (id: string) => {
     try {
@@ -133,10 +156,34 @@ export default function StudioBoardProjectCommunicationSection({
     }
   }, []);
 
+  const loadProblemReportStatus = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(
+        `/api/campaigns/${encodeURIComponent(id)}/project-communication/customer/problem-report`,
+        {
+          method: "GET",
+          headers: { Accept: "application/json" },
+        },
+      );
+      const json = (await res.json()) as ProblemReportResponse;
+      if (!res.ok) {
+        setProblemStatusLoadFailed(true);
+        setProblemReport(null);
+        return;
+      }
+      setProblemStatusLoadFailed(false);
+      setProblemReport(json.problemReport ?? null);
+    } catch {
+      setProblemStatusLoadFailed(true);
+      setProblemReport(null);
+    }
+  }, []);
+
   const load = useCallback(async () => {
     if (!campaignId) {
       setMessages([]);
       setNotification(EMPTY_NOTIFICATION);
+      setProblemReport(null);
       setLoading(false);
       return;
     }
@@ -156,18 +203,20 @@ export default function StudioBoardProjectCommunicationSection({
       }
       setMessages(json.messages ?? []);
       await loadNotification(campaignId);
+      await loadProblemReportStatus(campaignId);
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : copy.loadFailedFallback);
       setMessages([]);
     } finally {
       setLoading(false);
     }
-  }, [campaignId, loadNotification]);
+  }, [campaignId, loadNotification, loadProblemReportStatus]);
 
   useEffect(() => {
     if (!hasCampaign || campaignLookupPending || !campaignId) {
       setMessages([]);
       setNotification(EMPTY_NOTIFICATION);
+      setProblemReport(null);
       setLoading(false);
       return;
     }
@@ -179,38 +228,78 @@ export default function StudioBoardProjectCommunicationSection({
   const canSubmit =
     Boolean(campaignId) && !busy && trimmedLength > 0 && !overLimit && !campaignLookupPending;
 
+  const submitQuestion = async () => {
+    if (!campaignId) return;
+    const res = await fetch(
+      `/api/campaigns/${encodeURIComponent(campaignId)}/project-communication/customer`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "customer_message",
+          body,
+          idempotencyKey,
+        }),
+      },
+    );
+    const json = (await res.json()) as SendResponse;
+    if (!res.ok) {
+      throw new Error(json.error ?? copy.sendFailedFallback);
+    }
+    setSuccess(json.confirmation ?? copy.successCopy);
+    setMessages(json.messages ?? []);
+    await loadNotification(campaignId);
+  };
+
+  const submitProblem = async () => {
+    if (!campaignId) return;
+    const res = await fetch(
+      `/api/campaigns/${encodeURIComponent(campaignId)}/project-communication/customer/problem-report`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "customer_problem_report",
+          message: body,
+          idempotencyKey,
+          ...(jobId ? { jobId } : {}),
+        }),
+      },
+    );
+    const json = (await res.json()) as ProblemReportResponse;
+    if (!res.ok) {
+      throw new Error(json.error ?? problemCopy.problemSendFailedFallback);
+    }
+    setSuccess(json.confirmation ?? problemCopy.problemConfirmation);
+    setProblemReport(json.problemReport ?? null);
+    setProblemStatusLoadFailed(false);
+    // Never a permanent composer mode — hand the composer back to ordinary messages.
+    setIntent("question");
+  };
+
   const submit = async () => {
     if (!campaignId || !canSubmit) return;
     setBusy(true);
     setError(null);
     setSuccess(null);
     try {
-      const res = await fetch(
-        `/api/campaigns/${encodeURIComponent(campaignId)}/project-communication/customer`,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action: "customer_message",
-            body,
-            idempotencyKey,
-          }),
-        },
-      );
-      const json = (await res.json()) as SendResponse;
-      if (!res.ok) {
-        throw new Error(json.error ?? copy.sendFailedFallback);
+      if (intent === "problem") {
+        await submitProblem();
+      } else {
+        await submitQuestion();
       }
-      setSuccess(json.confirmation ?? copy.successCopy);
-      setMessages(json.messages ?? []);
       setBody("");
       setIdempotencyKey(newIdempotencyKey());
-      await loadNotification(campaignId);
     } catch (sendError) {
-      setError(sendError instanceof Error ? sendError.message : copy.sendFailedFallback);
+      const fallback =
+        intent === "problem" ? problemCopy.problemSendFailedFallback : copy.sendFailedFallback;
+      setError(sendError instanceof Error ? sendError.message : fallback);
     } finally {
       setBusy(false);
     }
@@ -339,8 +428,60 @@ export default function StudioBoardProjectCommunicationSection({
             void submit();
           }}
         >
+          <fieldset
+            className="sb-project-communication__intent"
+            aria-describedby={problemReport ? problemStatusId : undefined}
+          >
+            <legend id={intentLegendId} className="sb-project-communication__intent-legend">
+              {problemCopy.intentLegend}
+            </legend>
+            <div className="sb-project-communication__intent-options">
+              {(
+                [
+                  { value: "question" as const, label: problemCopy.intentQuestionLabel },
+                  { value: "problem" as const, label: problemCopy.intentProblemLabel },
+                ]
+              ).map((option) => (
+                <label
+                  key={option.value}
+                  className="sb-project-communication__intent-option"
+                  data-selected={intent === option.value ? "true" : undefined}
+                >
+                  <input
+                    type="radio"
+                    name={`${fieldId}-intent`}
+                    value={option.value}
+                    checked={intent === option.value}
+                    disabled={busy}
+                    onChange={() => {
+                      if (intent === option.value) return;
+                      setIntent(option.value);
+                      setBody("");
+                      setError(null);
+                      setSuccess(null);
+                    }}
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          {problemReport && !problemStatusLoadFailed ? (
+            <p
+              id={problemStatusId}
+              className="sb-project-communication__problem-status"
+              role="status"
+            >
+              <span className="sb-project-communication__problem-status-heading">
+                {problemCopy.problemStatusHeading}:
+              </span>{" "}
+              {problemReport.statusLabel}
+            </p>
+          ) : null}
+
           <label className="sb-project-communication__label" htmlFor={fieldId}>
-            {copy.composerLabel}
+            {intent === "problem" ? problemCopy.problemComposerLabel : copy.composerLabel}
           </label>
           <textarea
             id={fieldId}
@@ -352,7 +493,9 @@ export default function StudioBoardProjectCommunicationSection({
             }}
             maxLength={PROJECT_COMMUNICATION_BODY_MAX_LENGTH}
             rows={4}
-            placeholder={copy.composerPlaceholder}
+            placeholder={
+              intent === "problem" ? problemCopy.problemComposerPlaceholder : copy.composerPlaceholder
+            }
             disabled={busy}
             aria-describedby={statusId}
           />
@@ -365,7 +508,13 @@ export default function StudioBoardProjectCommunicationSection({
               className="utility-btn utility-btn--primary sb-project-communication__submit"
               disabled={!canSubmit}
             >
-              {busy ? copy.submitBusyLabel : copy.submitLabel}
+              {intent === "problem"
+                ? busy
+                  ? problemCopy.problemSubmitBusyLabel
+                  : problemCopy.problemSubmitLabel
+                : busy
+                  ? copy.submitBusyLabel
+                  : copy.submitLabel}
             </button>
           </div>
         </form>

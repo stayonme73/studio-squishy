@@ -507,6 +507,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             campaign={campaign}
             hasCampaign={Boolean(campaign)}
             campaignLookupPending={false}
+            jobId={review.jobId}
             presentation={{
               sectionTitle: PROJECT_COMMUNICATION_CUSTOMER_V1.reviewRoomSectionTitle,
               sectionLead: PROJECT_COMMUNICATION_CUSTOMER_V1.reviewRoomSectionLead,

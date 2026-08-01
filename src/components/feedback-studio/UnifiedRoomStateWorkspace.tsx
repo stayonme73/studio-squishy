@@ -57,6 +57,7 @@ export default function UnifiedRoomStateWorkspace({ roomState, campaign, jobId }
               campaign={campaign}
               hasCampaign
               campaignLookupPending={false}
+              jobId={jobId}
               presentation={{
                 sectionTitle: PROJECT_COMMUNICATION_CUSTOMER_V1.reviewRoomSectionTitle,
                 sectionLead: PROJECT_COMMUNICATION_CUSTOMER_V1.reviewRoomSectionLead,

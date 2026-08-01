@@ -191,7 +191,17 @@ export function regenerateIfPlanChanged(
   const plan = campaign.approvedStudioPlan;
   const fingerprint = plan ? computePlanFingerprint(plan) : "";
 
-  if (existing && existing.planFingerprint === fingerprint && existing.tasks.length > 0) {
+  // A campaign with no approved plan legitimately has an empty task list forever (fingerprint
+  // ""); that must still preserve the existing envelope's non-task fields (e.g. jobRecords,
+  // ownerDecisionInteractions) instead of falling through to a fresh, stripped regeneration
+  // below. Campaigns that DO have a plan but whose tasks were emptied by a prior bug/corruption
+  // still self-heal via the `existing.tasks.length > 0` fallback path further down.
+  const legitimatelyTaskless = !plan?.lineItems.length;
+  if (
+    existing &&
+    existing.planFingerprint === fingerprint &&
+    (existing.tasks.length > 0 || legitimatelyTaskless)
+  ) {
     const normalizedTasks = existing.tasks.map(normalizeLegacyTask);
     const refreshed = applyStatusesWithWorkflow(normalizedTasks, campaign, materials);
     return {
