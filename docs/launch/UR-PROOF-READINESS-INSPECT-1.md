@@ -56,7 +56,7 @@ Choice B would introduce large fresh machinery before a production MIME census e
 
 ### Next package
 
-**UR-ROOM-CERT-1** — **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** (`docs/launch/UR-ROOM-CERT-1.md`). PAGE-TABS-1 stays deferred. No renderer construction. Next room sequence: Payment / Refund UI.
+**UR-ROOM-CERT-1** — **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** (`docs/launch/UR-ROOM-CERT-1.md`). PAGE-TABS-1 stays deferred. No renderer construction. Next room sequence: Payment — **REFUND-UI-INSPECT-1 COMPLETE · CLOSED** · **REFUND-REQUEST-1** defined (construction not authorized).
 
 Do **not** reopen this inspection without concrete contradictory evidence.
 
@@ -83,8 +83,8 @@ Do **not** reopen this inspection without concrete contradictory evidence.
 5. TEXT-COMMENT-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `071c2b1…`
 6. PAGE-TABS-1 — **deferred**
 7. **UR-PROOF-READINESS-INSPECT-1** — **COMPLETE / CLOSED** · Choice **A** accepted
-8. **UR-ROOM-CERT-1** — certify the room with explicit limits (definition + auth still separate)
-9. Only then Payment room — **REFUND-UI-INSPECT-1** then evidence-driven Refund UI (separate authorizations)
+8. **UR-ROOM-CERT-1** — **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS**
+9. Payment room — **REFUND-UI-INSPECT-1 COMPLETE · CLOSED** · **REFUND-REQUEST-1** defined · construction waits
 
 ---
 
@@ -99,4 +99,4 @@ Do **not** reopen this inspection without concrete contradictory evidence.
 
 ---
 
-*End of UR-PROOF-READINESS-INSPECT-1. Closed with Choice A. Next: Payment room refund-authority inspection.*
+*End of UR-PROOF-READINESS-INSPECT-1. Closed with Choice A. Next Payment slice: REFUND-REQUEST-1 (defined; construction waits).*

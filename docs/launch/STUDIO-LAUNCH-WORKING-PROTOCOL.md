@@ -79,7 +79,7 @@ Sequencing is **room by room**, not feature by feature.
 
 > Once a customer-facing room becomes active, we complete and certify all known launch-critical work for that room before opening construction in another room. We do not leave known gaps behind merely because another feature appears easier or more urgent.
 
-**Active room now:** Payment room (refund authority / customer Refund UI path).
+**Active room now:** Payment room (customer Refund Request intake path).
 
 **Prior room (sealed):** Unified Review / Final / Delivery — **UR-ROOM-CERT-1 SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS**.
 
@@ -96,11 +96,12 @@ Sequencing is **room by room**, not feature by feature.
 
 **Payment room order (now active):**
 
-1. **REFUND-UI-INSPECT-1** — docs defined · inspection waits (`docs/launch/REFUND-UI-INSPECT-1.md`) — inspect refund authority **before** any Refund UI
-2. Refund UI construction — **only** after sealed inspection evidence + separate Tagia authorization
-3. Payment-room certification — as later authorized
+1. **REFUND-UI-INSPECT-1** — **COMPLETE · CLOSED** — record/adjudicate exists; provider money movement absent (`docs/launch/REFUND-UI-INSPECT-1.md`)
+2. **REFUND-REQUEST-1** — docs defined · construction waits (`docs/launch/REFUND-REQUEST-1.md`) — customer refund **intake only** via existing API · outside dirty checkout/payment files
+3. Optional later: customer status readout · refund history · provider program — each separate authorization
+4. Payment-room certification — as later authorized
 
-Do **not** invent eligibility, refund amounts, approvals, timelines, provider success, or completion claims. Do **not** call payment providers during inspection. Do **not** reopen the sealed Unified Room. Do **not** open Page Tabs, Board Materials, or project-wide Gate #17 under this package.
+Do **not** invent eligibility, refund amounts, approvals, timelines, provider success, money-returned, or completion claims. Do **not** call payment providers in REFUND-REQUEST-1. Do **not** reopen the sealed Unified Room. Do **not** open Page Tabs, Board Materials, or project-wide Gate #17 under this package. Do **not** build a persistent refund-status panel or second refund ledger in REFUND-REQUEST-1.
 
 ---
 
