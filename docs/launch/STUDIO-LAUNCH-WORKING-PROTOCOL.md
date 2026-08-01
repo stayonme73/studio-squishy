@@ -87,13 +87,13 @@ Sequencing is **room by room**, not feature by feature.
 2. VERSION-COMPARE-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `b0bd5e5…` (metadata compare only)
 3. HIGHLIGHTER-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `96b6a39…` (version-bound `proof_markup_board_v1`; not source-proof pixels)
 4. REVIEW-TEXT-TOOLS-INSPECT-1 — **COMPLETE / CLOSED** (inspect together · build separately)
-5. **TEXT-COMMENT-1** — proof-version-bound written comment · docs defined · construction waits (`docs/launch/TEXT-COMMENT-1.md`)
+5. TEXT-COMMENT-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `071c2b1…` (proof-version text; not in-proof location)
 6. **PAGE-TABS-1** — **deferred** pending truthful page/location identity (or explicit Tagia remap without inventing document pages)
-7. Remaining proof-rendering depth and prior certification limits
+7. **Proof-rendering + remaining certification limits** — **UR-PROOF-READINESS-INSPECT-1** defined · inspection waits (`docs/launch/UR-PROOF-READINESS-INSPECT-1.md`)
 8. **UR-ROOM-CERT-1** — certify the room as complete with explicit limits
 9. Only then move to the Payment room for Refund UI
 
-Version Compare, Highlighter, and Text Comment share this room sequence but **not** the same construction packages. Page Tabs remains deferred. Finishing Text Comment alone does **not** by itself close the room while items 6–8 remain open.
+Sealed Review tools share this room sequence but **not** the same construction packages. Page Tabs remains deferred. Do **not** open renderer construction until UR-PROOF-READINESS-INSPECT-1 is sealed and separately authorized. Finishing sealed tools alone does **not** close the room while items 6–8 remain open.
 
 Inspections for a missing capability inside an active room must inspect that capability **as part of finishing the room** — including dependencies on other unresolved launch-critical room behavior — not as an isolated feature. Do **not** inspect or build Refund UI while this room is active.
 

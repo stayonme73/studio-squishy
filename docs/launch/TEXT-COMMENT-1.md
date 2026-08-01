@@ -1,13 +1,15 @@
 # TEXT-COMMENT-1
 
-**Status:** DEFINED · **CONSTRUCTION NOT AUTHORIZED**  
-**Type:** Construction package definition (docs only until separately authorized)  
-**Definition base / protected product tip:** `36c3468873373ccffb87801edcd45f5ef6168888`  
+**Status:** SEALED · BROWSER-CERTIFIED WITH LIMITS  
+**Type:** Construction package (sealed)  
+**Sealed tip:** `071c2b14c41ace29e3bc8ab2b58d80b73caf08a1`  
 **Branch:** `fix/discovery-responsive-layout`  
 **Active room:** Unified Review / Final / Delivery Room  
 **Authority:** Working Protocol §1 room-completion rule (LOCKED 2026-08-01)  
 **Prior inspection:** REVIEW-TEXT-TOOLS-INSPECT-1 — **COMPLETE / CLOSED**  
 **Deferred sibling:** PAGE-TABS-1 — deferred pending truthful page/location identity (or explicit Tagia remap that does not invent document pages)
+
+**Carried truth lock:** Text Comment stores what the customer wrote about a specific recorded proof version. It does not claim a location inside the proof itself.
 
 ---
 
@@ -38,9 +40,9 @@ Owner decision after REVIEW-TEXT-TOOLS-INSPECT-1: **inspect together, build sepa
 2. VERSION-COMPARE-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `b0bd5e5…`
 3. HIGHLIGHTER-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `96b6a39…`
 4. REVIEW-TEXT-TOOLS-INSPECT-1 — **COMPLETE / CLOSED**
-5. **TEXT-COMMENT-1** ← this package (defined; construction waits)
+5. **TEXT-COMMENT-1** ← this package — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `071c2b1…`
 6. **PAGE-TABS-1** — deferred (not this package)
-7. Remaining proof-rendering depth and prior certification limits
+7. Proof-rendering + remaining certification limits — **UR-PROOF-READINESS-INSPECT-1**
 8. **UR-ROOM-CERT-1** — certify the room with explicit limits
 9. Only then Payment room / Refund UI
 
