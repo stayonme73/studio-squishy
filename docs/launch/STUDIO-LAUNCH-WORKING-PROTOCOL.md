@@ -89,13 +89,11 @@ Sequencing is **room by room**, not feature by feature.
 4. REVIEW-TEXT-TOOLS-INSPECT-1 — **COMPLETE / CLOSED** (inspect together · build separately)
 5. TEXT-COMMENT-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `071c2b1…` (proof-version text; not in-proof location)
 6. **PAGE-TABS-1** — **deferred** pending truthful page/location identity (or explicit Tagia remap without inventing document pages)
-7. **UR-PROOF-READINESS-INSPECT-1** — **COMPLETE / CLOSED** · Choice **A** accepted · session-gated **link-only** proof viewing for Customer-One · **no** renderer construction required before room cert (`docs/launch/UR-PROOF-READINESS-INSPECT-1.md`)
-8. **UR-ROOM-CERT-1** — docs defined · certification waits · intended class **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** (`docs/launch/UR-ROOM-CERT-1.md`)
-9. Only then move to the Payment room for Refund UI
+7. **UR-PROOF-READINESS-INSPECT-1** — **COMPLETE / CLOSED** · Choice **A** accepted · session-gated **link/list** proof viewing for Customer-One · **no** renderer required before room cert (`docs/launch/UR-PROOF-READINESS-INSPECT-1.md`)
+8. **UR-ROOM-CERT-1** — **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · browser **98/98** · focused unit **32/32** · desktop 1440 · phone 390 · **360 room requirement passed** · temp harness removed (`docs/launch/UR-ROOM-CERT-1.md`)
+9. **Payment room / Refund UI** — next active room sequence (separate definition + authorization)
 
-Sealed Review tools share this room sequence but **not** the same construction packages. Page Tabs remains deferred. Proof viewing for Customer-One is an accepted **link-only** certified limit — do **not** open renderer construction unless Tagia explicitly reopens Choice B. Do **not** run UR-ROOM-CERT-1 until Tagia separately authorizes certification after this definition is sealed. Finishing sealed tools alone does **not** close the room while items 6 and 8 remain open.
-
-Inspections for a missing capability inside an active room must inspect that capability **as part of finishing the room** — including dependencies on other unresolved launch-critical room behavior — not as an isolated feature. Do **not** inspect or build Refund UI while this room is active.
+Sealed Review tools and room cert share this sequence but **not** the same construction packages. Page Tabs remains deferred. Proof viewing for Customer-One is an accepted **link/list** certified limit — do **not** open renderer construction unless Tagia explicitly reopens Choice B. The Unified Review / Final / Delivery room is **certified for Customer-One with explicit limits**. Do **not** inspect or build Refund UI until Tagia opens the Payment room.
 
 ---
 
