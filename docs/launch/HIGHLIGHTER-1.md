@@ -1,13 +1,15 @@
 # HIGHLIGHTER-1
 
-**Status:** DEFINED · **CONSTRUCTION NOT AUTHORIZED**  
-**Type:** Construction package definition (docs only until separately authorized)  
-**Definition base / protected tip at draft:** `b0bd5e5f60eaf5342b45b3352d8903e237fec134`  
+**Status:** SEALED · BROWSER-CERTIFIED WITH LIMITS  
+**Type:** Construction package (sealed)  
+**Sealed tip:** `96b6a39606a7c9713327801f801d17b4c8c2068b`  
 **Branch:** `fix/discovery-responsive-layout`  
 **Active room:** Unified Review / Final / Delivery Room  
 **Authority:** Working Protocol §1 room-completion rule (LOCKED 2026-08-01)  
 **Prior inspection:** HIGHLIGHTER-COMPARE-INSPECT-1 — **COMPLETE / CLOSED**  
 **Prior sealed sibling:** VERSION-COMPARE-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `b0bd5e5…`
+
+**Carried truth lock:** Highlights live on version-bound `proof_markup_board_v1`, not on pixels inside the source proof.
 
 ---
 
@@ -35,8 +37,8 @@ They share the same **room-completion sequence**, not the same construction pack
 
 1. Customer Update History — **SEALED** · UPDATE-HISTORY-1 @ `1e1308e…`
 2. VERSION-COMPARE-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `b0bd5e5…`
-3. **HIGHLIGHTER-1** ← this package (defined; construction waits)
-4. Page Tabs and Text Comment — assessment / construction
+3. **HIGHLIGHTER-1** ← this package — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `96b6a39…`
+4. Page Tabs and Text Comment — **REVIEW-TEXT-TOOLS-INSPECT-1** defined · inspection waits
 5. Remaining proof-rendering depth and prior certification limits
 6. **UR-ROOM-CERT-1** — certify the room with explicit limits
 7. Only then Payment room / Refund UI
@@ -105,14 +107,8 @@ Exact harness paths are chosen during construction — not invented in this defi
 
 ## Authorization gates
 
-### Docs definition (this package document)
+### Sealed construction
 
-Authorized for documentation updates that define HIGHLIGHTER-1. After seal, construction remains blocked.
+HIGHLIGHTER-1 construction is **complete and sealed** at `96b6a39606a7c9713327801f801d17b4c8c2068b`. Do not reopen without contradictory evidence.
 
-### Construction
-
-Scout remains parked for product work until Tagia explicitly says:
-
-> **authorize HIGHLIGHTER-1 construction**
-
-Until then: definition may be sealed · open construction package **none** · product code stays at the protected tip.
+**Next room package:** [`REVIEW-TEXT-TOOLS-INSPECT-1.md`](./REVIEW-TEXT-TOOLS-INSPECT-1.md) (defined; inspection not authorized).
