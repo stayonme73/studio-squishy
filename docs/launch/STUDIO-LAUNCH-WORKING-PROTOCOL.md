@@ -79,21 +79,28 @@ Sequencing is **room by room**, not feature by feature.
 
 > Once a customer-facing room becomes active, we complete and certify all known launch-critical work for that room before opening construction in another room. We do not leave known gaps behind merely because another feature appears easier or more urgent.
 
-**Active room now:** Unified Review / Final / Delivery Room.
+**Active room now:** Payment room (refund authority / customer Refund UI path).
 
-**Room-completion order (this room):**
+**Prior room (sealed):** Unified Review / Final / Delivery — **UR-ROOM-CERT-1 SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS**.
+
+**Unified Review / Final / Delivery order (closed):**
 
 1. Customer Update History — **SEALED** · UPDATE-HISTORY-1
 2. VERSION-COMPARE-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `b0bd5e5…` (metadata compare only)
 3. HIGHLIGHTER-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `96b6a39…` (version-bound `proof_markup_board_v1`; not source-proof pixels)
 4. REVIEW-TEXT-TOOLS-INSPECT-1 — **COMPLETE / CLOSED** (inspect together · build separately)
 5. TEXT-COMMENT-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `071c2b1…` (proof-version text; not in-proof location)
-6. **PAGE-TABS-1** — **deferred** pending truthful page/location identity (or explicit Tagia remap without inventing document pages)
-7. **UR-PROOF-READINESS-INSPECT-1** — **COMPLETE / CLOSED** · Choice **A** accepted · session-gated **link/list** proof viewing for Customer-One · **no** renderer required before room cert (`docs/launch/UR-PROOF-READINESS-INSPECT-1.md`)
-8. **UR-ROOM-CERT-1** — **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · browser **98/98** · focused unit **32/32** · desktop 1440 · phone 390 · **360 room requirement passed** · temp harness removed (`docs/launch/UR-ROOM-CERT-1.md`)
-9. **Payment room / Refund UI** — next active room sequence (separate definition + authorization)
+6. **PAGE-TABS-1** — **deferred** pending truthful page/location identity (carried; not Payment work)
+7. **UR-PROOF-READINESS-INSPECT-1** — **COMPLETE / CLOSED** · Choice **A** · session-gated **link/list** proofs
+8. **UR-ROOM-CERT-1** — **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · browser **98/98** · unit **32/32** · 360 room requirement passed
 
-Sealed Review tools and room cert share this sequence but **not** the same construction packages. Page Tabs remains deferred. Proof viewing for Customer-One is an accepted **link/list** certified limit — do **not** open renderer construction unless Tagia explicitly reopens Choice B. The Unified Review / Final / Delivery room is **certified for Customer-One with explicit limits**. Do **not** inspect or build Refund UI until Tagia opens the Payment room.
+**Payment room order (now active):**
+
+1. **REFUND-UI-INSPECT-1** — docs defined · inspection waits (`docs/launch/REFUND-UI-INSPECT-1.md`) — inspect refund authority **before** any Refund UI
+2. Refund UI construction — **only** after sealed inspection evidence + separate Tagia authorization
+3. Payment-room certification — as later authorized
+
+Do **not** invent eligibility, refund amounts, approvals, timelines, provider success, or completion claims. Do **not** call payment providers during inspection. Do **not** reopen the sealed Unified Room. Do **not** open Page Tabs, Board Materials, or project-wide Gate #17 under this package.
 
 ---
 

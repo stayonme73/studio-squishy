@@ -84,7 +84,7 @@ Do **not** reopen this inspection without concrete contradictory evidence.
 6. PAGE-TABS-1 — **deferred**
 7. **UR-PROOF-READINESS-INSPECT-1** — **COMPLETE / CLOSED** · Choice **A** accepted
 8. **UR-ROOM-CERT-1** — certify the room with explicit limits (definition + auth still separate)
-9. Only then Payment room / Refund UI
+9. Only then Payment room — **REFUND-UI-INSPECT-1** then evidence-driven Refund UI (separate authorizations)
 
 ---
 
@@ -93,11 +93,10 @@ Do **not** reopen this inspection without concrete contradictory evidence.
 - No product construction from this package
 - No renderer installation or dependency changes
 - No Page Tabs construction
-- No Refund UI or Payment work
 - No inventing file contents, pages, previews, dimensions, or comparison results
 - Do not reopen sealed UPDATE-HISTORY-1, VERSION-COMPARE-1, HIGHLIGHTER-1, TEXT-COMMENT-1, C8a–C8e, correction accounting, handoff receipts, or ISSUE-ENTRY-1 without concrete contradictory evidence
 - Leave all **113** unrelated dirty WIP entries untouched
 
 ---
 
-*End of UR-PROOF-READINESS-INSPECT-1. Closed with Choice A.*
+*End of UR-PROOF-READINESS-INSPECT-1. Closed with Choice A. Next: Payment room refund-authority inspection.*

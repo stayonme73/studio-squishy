@@ -93,17 +93,17 @@ An older Next.js process exited when port 3000 was freed for a clean cert server
 6. PAGE-TABS-1 — **deferred**  
 7. UR-PROOF-READINESS-INSPECT-1 — **COMPLETE / CLOSED** · Choice **A**  
 8. **UR-ROOM-CERT-1** — **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** ← this package  
-9. **Payment room / Refund UI** — next room sequence (separate definition + authorization)  
+9. **Payment room** — **REFUND-UI-INSPECT-1** then evidence-driven Refund UI (separate authorizations)  
 
 ---
 
 ## Hard exclusions retained
 
 - No product construction from this seal  
-- No renderer · no Page Tabs · no Refund/Payment construction in this package  
+- No renderer · no Page Tabs · Refund/Payment construction only after REFUND-UI-INSPECT-1 + separate authorization  
 - Do not reopen sealed siblings without contradictory evidence  
 - Leave all **113** unrelated dirty WIP entries untouched  
 
 ---
 
-*End of UR-ROOM-CERT-1. Sealed with explicit limits — unfinished edges labeled, not wallpapered.*
+*End of UR-ROOM-CERT-1. Sealed with explicit limits — unfinished edges labeled, not wallpapered. Next: inspect Payment refund authority before any Refund UI.*
