@@ -65,6 +65,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
   const [activeTool, setActiveTool] = useState<FeedbackTool>("none");
   const [compareCurrentId, setCompareCurrentId] = useState<string | null>(null);
   const [comparePriorId, setComparePriorId] = useState<string | null>(null);
+  const [highlightProofId, setHighlightProofId] = useState<string | null>(null);
   const [stickyOpen, setStickyOpen] = useState(false);
   const [stickyColor, setStickyColor] = useState<StickyNoteColorId>("yellow");
   const [stickyDraft, setStickyDraft] = useState("");
@@ -87,7 +88,11 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
 
   useEffect(() => {
     setSession(jobReviewFeedbackToFeedbackSession(review));
-    setFocusedSection(visibleSectionIds[0] ?? "fallback:deliverable-0");
+    setFocusedSection((current) =>
+      visibleSectionIds.includes(current)
+        ? current
+        : (visibleSectionIds[0] ?? "fallback:deliverable-0"),
+    );
   }, [review, visibleSectionIds]);
 
   useEffect(() => {
@@ -386,6 +391,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
           <JobReviewDeliverablePreview
             reviewTitle={review.campaignName}
             serviceName={review.serviceName}
+            jobId={review.jobId}
             deliverables={review.deliverables}
             focusedSection={focusedSection}
             visibleSectionIds={visibleSectionIds}
@@ -395,14 +401,20 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             session={session}
             compareCurrentId={compareCurrentId}
             comparePriorId={comparePriorId}
+            highlightProofId={highlightProofId}
             onFocusSection={(sectionId) => {
               setFocusedSection(sectionId);
               setCompareCurrentId(null);
               setComparePriorId(null);
+              setHighlightProofId(null);
             }}
             onDrawStroke={() => markDraw(focusedSection)}
             onCompareSelectCurrent={setCompareCurrentId}
             onCompareSelectPrior={setComparePriorId}
+            onHighlightSelectProof={setHighlightProofId}
+            onHighlightsChange={(next) => {
+              debouncedPersist({ ...session, highlights: [...next] });
+            }}
           />
 
           <div className="fs-review__choose fs-review__choose--job">
@@ -514,6 +526,12 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
               setErasing(false);
             }}
             onCompareDone={() => setActiveTool("none")}
+            onHighlightToggle={() => {
+              setActiveTool((tool) => (tool === "highlight" ? "none" : "highlight"));
+              setStickyOpen(false);
+              setErasing(false);
+            }}
+            onHighlightDone={() => setActiveTool("none")}
             onVoiceToggle={() => void handleVoiceToggle()}
             onApprove={handleApprove}
             onRevision={handleRevision}

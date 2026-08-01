@@ -16,7 +16,7 @@ export type StickyNoteColorId = "yellow" | "blue" | "coral";
 
 export type SectionReviewStatus = "neutral" | "approved" | "revision" | "skip";
 
-export type FeedbackTool = "none" | "sticky" | "draw" | "voice" | "compare";
+export type FeedbackTool = "none" | "sticky" | "draw" | "voice" | "compare" | "highlight";
 
 export type FeedbackConceptPreview = {
   id: FeedbackConceptId;
@@ -59,6 +59,19 @@ export type FeedbackVoiceNote = {
   createdAt: string;
 };
 
+/** HIGHLIGHTER-1 session mirror of JobReviewHighlight (job Review only). */
+export type FeedbackHighlight = {
+  id: string;
+  jobId: string;
+  deliverableKey: string;
+  proofFileId: string;
+  versionLabel: string;
+  surface: "proof_markup_board_v1";
+  rects: readonly { x: number; y: number; w: number; h: number }[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type FeedbackSession = {
   conceptId: FeedbackConceptId;
   campaignId: string;
@@ -66,6 +79,8 @@ export type FeedbackSession = {
   stickyNotes: FeedbackStickyNote[];
   voiceNotes: FeedbackVoiceNote[];
   drawSections: FeedbackSectionId[];
+  /** HIGHLIGHTER-1 — empty for concept Review. */
+  highlights?: FeedbackHighlight[];
   submittedAt: string | null;
 };
 
@@ -173,6 +188,7 @@ export const feedbackStudio = {
     recordVoice: "Record Voice Feedback",
     drawAnnotation: "Draw Annotation",
     versionCompare: "Version Compare",
+    highlighter: "Highlighter",
     approveSection: "Approve Section",
     requestRevision: "Request Revision",
     skipSection: "Skip Section",
@@ -240,6 +256,21 @@ export const feedbackStudio = {
     closeCompare: "Close version compare",
   },
 
+  /** HIGHLIGHTER-1 — geometry on proof markup board, not Pencil and not auto-diff. */
+  highlighter: {
+    title: "Highlighter",
+    lead:
+      "Select a recorded proof version, then drag on the markup board to place transparent highlights. Highlights are saved for that deliverable and proof version only.",
+    boardNote:
+      "This markup board is bound to the selected proof version. It is not a pixel overlay on the file itself.",
+    selectProof: "Choose proof version to mark",
+    unavailable:
+      "Highlighter is not available for this deliverable yet. At least one recorded proof version is required.",
+    activeHint: "Highlighter is active for the focused deliverable and selected proof version.",
+    close: "Close highlighter",
+    clearBoard: "Clear highlights on this proof",
+  },
+
   noCampaign: {
     title: "No campaign yet",
     body: "Start a campaign in Project Discovery to review concepts here.",
@@ -303,6 +334,7 @@ export function createEmptyFeedbackSession(
     stickyNotes: [],
     voiceNotes: [],
     drawSections: [],
+    highlights: [],
     submittedAt: null,
   };
 }

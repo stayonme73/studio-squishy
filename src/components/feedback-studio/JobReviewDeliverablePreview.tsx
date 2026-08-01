@@ -15,10 +15,13 @@ import { deliverableKeyToSectionId } from "@/lib/review-room-client";
 
 import FeedbackStudioDrawLayer from "./FeedbackStudioDrawLayer";
 import JobReviewVersionCompare from "./JobReviewVersionCompare";
+import JobReviewHighlightBoard from "./JobReviewHighlightBoard";
+import type { JobReviewHighlight } from "@/lib/job-control/review-feedback-types";
 
 type Props = {
   reviewTitle: string;
   serviceName: string;
+  jobId: string;
   deliverables: readonly ClientReviewDeliverable[];
   focusedSection: FeedbackSectionId;
   visibleSectionIds: readonly FeedbackSectionId[];
@@ -28,15 +31,19 @@ type Props = {
   session: FeedbackSession;
   compareCurrentId: string | null;
   comparePriorId: string | null;
+  highlightProofId: string | null;
   onFocusSection: (sectionId: FeedbackSectionId) => void;
   onDrawStroke: (sectionId: FeedbackSectionId) => void;
   onCompareSelectCurrent: (id: string) => void;
   onCompareSelectPrior: (id: string) => void;
+  onHighlightSelectProof: (id: string) => void;
+  onHighlightsChange: (next: readonly JobReviewHighlight[]) => void;
 };
 
 export default function JobReviewDeliverablePreview({
   reviewTitle,
   serviceName,
+  jobId,
   deliverables,
   focusedSection,
   visibleSectionIds,
@@ -46,10 +53,13 @@ export default function JobReviewDeliverablePreview({
   session,
   compareCurrentId,
   comparePriorId,
+  highlightProofId,
   onFocusSection,
   onDrawStroke,
   onCompareSelectCurrent,
   onCompareSelectPrior,
+  onHighlightSelectProof,
+  onHighlightsChange,
 }: Props) {
   const deliverableByKey = new Map<string, ClientReviewDeliverable>(
     deliverables.map((entry) => [deliverableKeyToSectionId(entry.key), entry]),
@@ -104,6 +114,17 @@ export default function JobReviewDeliverablePreview({
                   priorId={comparePriorId}
                   onSelectCurrent={onCompareSelectCurrent}
                   onSelectPrior={onCompareSelectPrior}
+                />
+              ) : null}
+              {activeTool === "highlight" && focused ? (
+                <JobReviewHighlightBoard
+                  jobId={jobId}
+                  deliverableKey={deliverable.key}
+                  proofFiles={deliverable.proofFiles}
+                  selectedProofId={highlightProofId}
+                  highlights={(session.highlights ?? []) as JobReviewHighlight[]}
+                  onSelectProof={onHighlightSelectProof}
+                  onHighlightsChange={onHighlightsChange}
                 />
               ) : null}
               {deliverable.proofFiles.length > 0 ? (

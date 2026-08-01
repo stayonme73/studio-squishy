@@ -183,6 +183,7 @@ export function buildFeedbackPackageInventory(
     stickyNoteTexts.length === 0 &&
     feedback.voiceNotes.length === 0 &&
     feedback.drawSections.length === 0 &&
+    (feedback.highlights?.length ?? 0) === 0 &&
     sectionDecisions.length === 0;
 
   return {

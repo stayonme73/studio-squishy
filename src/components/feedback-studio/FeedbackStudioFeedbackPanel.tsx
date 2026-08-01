@@ -38,6 +38,8 @@ type Props = {
   onDrawDone: () => void;
   onCompareToggle?: () => void;
   onCompareDone?: () => void;
+  onHighlightToggle?: () => void;
+  onHighlightDone?: () => void;
   onVoiceToggle: () => void;
   onApprove: () => void;
   onRevision: () => void;
@@ -71,6 +73,8 @@ export default function FeedbackStudioFeedbackPanel({
   onDrawDone,
   onCompareToggle,
   onCompareDone,
+  onHighlightToggle,
+  onHighlightDone,
   onVoiceToggle,
   onApprove,
   onRevision,
@@ -134,6 +138,16 @@ export default function FeedbackStudioFeedbackPanel({
               onClick={onCompareToggle}
             >
               <span aria-hidden>⧉</span> {copy.versionCompare}
+            </button>
+          ) : null}
+
+          {mode === "job" && onHighlightToggle ? (
+            <button
+              type="button"
+              className={`fs-feedback-panel__btn${activeTool === "highlight" ? " fs-feedback-panel__btn--active" : ""}`}
+              onClick={onHighlightToggle}
+            >
+              <span aria-hidden>▮</span> {copy.highlighter}
             </button>
           ) : null}
         </div>
@@ -223,6 +237,17 @@ export default function FeedbackStudioFeedbackPanel({
           <div className="fs-feedback-panel__draw-row">
             <button type="button" className="fs-feedback-panel__draw-btn" onClick={onCompareDone}>
               {feedbackStudio.versionCompare.closeCompare}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {mode === "job" && activeTool === "highlight" && onHighlightDone ? (
+        <div className="fs-feedback-panel__draw-tools">
+          <p className="fs-feedback-panel__draw-hint">{feedbackStudio.highlighter.activeHint}</p>
+          <div className="fs-feedback-panel__draw-row">
+            <button type="button" className="fs-feedback-panel__draw-btn" onClick={onHighlightDone}>
+              {feedbackStudio.highlighter.close}
             </button>
           </div>
         </div>

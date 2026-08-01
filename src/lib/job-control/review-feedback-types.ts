@@ -18,6 +18,33 @@ export type JobReviewVoiceNote = {
   createdAt: string;
 };
 
+/**
+ * HIGHLIGHTER-1 — normalized rect on the proof markup board (0–1).
+ * Not a pixel overlay on unrendered file bytes.
+ */
+export type JobReviewHighlightRect = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
+
+/**
+ * HIGHLIGHTER-1 — geometry bound to a recorded proof version.
+ * `surface` documents the coordinate system; do not invent other surfaces.
+ */
+export type JobReviewHighlight = {
+  id: string;
+  jobId: string;
+  deliverableKey: string;
+  proofFileId: string;
+  versionLabel: string;
+  surface: "proof_markup_board_v1";
+  rects: readonly JobReviewHighlightRect[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 /** Persisted job-scoped client review feedback — tasks envelope (schema v8+). */
 export type JobReviewFeedback = {
   /** Stable package id — unique per draft/locked cycle; never reused after lock. */
@@ -28,6 +55,8 @@ export type JobReviewFeedback = {
   stickyNotes: JobReviewStickyNote[];
   voiceNotes: JobReviewVoiceNote[];
   drawSections: string[];
+  /** HIGHLIGHTER-1 — version-bound highlight geometry (optional on legacy packages). */
+  highlights?: readonly JobReviewHighlight[];
   updatedAt: string;
   /** Studio release activity id reviewed when this package was drafted/locked. */
   releaseActivityId?: string | null;
@@ -73,6 +102,7 @@ export function createEmptyJobReviewFeedback(
     stickyNotes: [],
     voiceNotes: [],
     drawSections: [],
+    highlights: [],
     updatedAt: now,
     releaseActivityId: options?.releaseActivityId ?? null,
     submittedAt: null,

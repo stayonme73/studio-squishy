@@ -351,6 +351,19 @@ describe("review-room actions", () => {
     ]);
     feedback.sectionStatuses["deliverable-0"] = "approved";
     feedback.sectionStatuses["deliverable-1"] = "skip";
+    feedback.highlights = [
+      {
+        id: "hl:test",
+        jobId: jobRecord.jobId,
+        deliverableKey: "deliverable-0",
+        proofFileId: "proof:1",
+        versionLabel: "v1",
+        surface: "proof_markup_board_v1",
+        rects: [{ x: 0.1, y: 0.1, w: 0.2, h: 0.2 }],
+        createdAt: "2026-08-01T12:00:00.000Z",
+        updatedAt: "2026-08-01T12:00:00.000Z",
+      },
+    ];
 
     const saved = applyReviewRoomPatch(
       envelope(jobRecord),
@@ -363,6 +376,10 @@ describe("review-room actions", () => {
     expect(saved.ok).toBe(true);
     if (saved.ok) {
       expect(saved.envelope.jobCorrectionUses ?? []).toHaveLength(0);
+      const stored = saved.envelope.jobReviewFeedback?.find(
+        (entry) => entry.jobId === jobRecord.jobId && !entry.submittedAt,
+      );
+      expect(stored?.highlights).toHaveLength(1);
     }
 
     const approved = applyReviewRoomPatch(
