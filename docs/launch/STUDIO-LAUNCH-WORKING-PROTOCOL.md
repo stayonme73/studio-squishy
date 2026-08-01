@@ -84,8 +84,8 @@ Sequencing is **room by room**, not feature by feature.
 **Room-completion order (this room):**
 
 1. Customer Update History — **SEALED** · UPDATE-HISTORY-1
-2. **VERSION-COMPARE-1** — truthful version navigation / side-by-side presentation (separate from Highlighter)
-3. **HIGHLIGHTER-1** — separate package; requires owner persistence decision before construction
+2. VERSION-COMPARE-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `b0bd5e5…` (metadata compare only)
+3. **HIGHLIGHTER-1** — distinct tool; geometry tied to selected proof version (docs defined; construction waits)
 4. Page Tabs and Text Comment — assessment / construction
 5. Remaining proof-rendering depth and prior certification limits
 6. **UR-ROOM-CERT-1** — certify the room as complete with explicit limits

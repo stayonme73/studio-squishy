@@ -10,7 +10,7 @@
 
 **Stand by. Verify the protected control point only. Do not begin a new package.**
 
-**VERSION-COMPARE-1** is **defined** in governing docs. **Construction is not authorized.**
+**HIGHLIGHTER-1** is **defined** in governing docs. **Construction is not authorized.**
 
 Do not begin product construction, modify product files, or reopen sealed work.
 
@@ -22,16 +22,17 @@ Project Alpha is resuming from the following protected state:
 
 | Field | Value |
 |---|---|
-| Protected tip | `29397b36141d92082f1a73d9cf8656111d3f827f` |
+| Protected tip | `b0bd5e5f60eaf5342b45b3352d8903e237fec134` |
 | Branch | `fix/discovery-responsive-layout` |
 | Expected sync | **0 ahead / 0 behind** |
 | Expected staging | **empty** |
 | Open construction package | **none** |
-| Defined next package | **VERSION-COMPARE-1** — docs defined · construction waits for separate authorization |
+| Defined next package | **HIGHLIGHTER-1** — docs defined · construction waits for separate authorization |
 | Customer-One readiness | **4 of 23** |
 
 ### Recently sealed / closed
 
+- **VERSION-COMPARE-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `b0bd5e5…` (metadata compare only)
 - **UPDATE-HISTORY-1** Customer Update History
 - **HIGHLIGHTER-COMPARE-INSPECT-1** complete / closed
 - **C8e** Lobby continuity
@@ -44,12 +45,11 @@ Project Alpha is resuming from the following protected state:
 
 ### Known open customer-facing work (room sequence)
 
-1. VERSION-COMPARE-1 (defined; construction not authorized)
-2. HIGHLIGHTER-1
-3. Page Tabs / Text Comment
-4. Proof-rendering + prior cert limits
-5. UR-ROOM-CERT-1
-6. Only then Refund UI (Payment room)
+1. HIGHLIGHTER-1 (defined; construction not authorized)
+2. Page Tabs / Text Comment
+3. Proof-rendering + prior cert limits
+4. UR-ROOM-CERT-1
+5. Only then Refund UI (Payment room)
 
 ---
 
@@ -59,7 +59,7 @@ Project Alpha is resuming from the following protected state:
 2. Local versus origin ahead/behind state
 3. Staging and working-tree state
 4. Whether any unrelated local work is present
-5. Whether the protected tip matches `29397b36141d92082f1a73d9cf8656111d3f827f` (or the later tip after VERSION-COMPARE-1 definition seal)
+5. Whether the protected tip matches `b0bd5e5f60eaf5342b45b3352d8903e237fec134` (or the later tip after HIGHLIGHTER-1 definition seal)
 
 **If the repository does not match the protected state, stop and report the discrepancy without altering anything.**
 

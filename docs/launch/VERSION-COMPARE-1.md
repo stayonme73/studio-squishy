@@ -1,16 +1,19 @@
 # VERSION-COMPARE-1
 
-**Status:** DEFINED · **CONSTRUCTION NOT AUTHORIZED**  
-**Type:** Construction package definition (docs only until separately authorized)  
-**Definition base / protected tip at draft:** `29397b36141d92082f1a73d9cf8656111d3f827f`  
+**Status:** SEALED · **BROWSER-CERTIFIED WITH LIMITS** @ `b0bd5e5f60eaf5342b45b3352d8903e237fec134`  
+**Type:** Construction package — sealed product tip above  
 **Branch:** `fix/discovery-responsive-layout`  
 **Active room:** Unified Review / Final / Delivery Room  
 **Authority:** Working Protocol §1 room-completion rule (LOCKED 2026-08-01)  
-**Prior inspection:** HIGHLIGHTER-COMPARE-INSPECT-1 — **COMPLETE / CLOSED** (inspection only; no product construction)
+**Prior inspection:** HIGHLIGHTER-COMPARE-INSPECT-1 — **COMPLETE / CLOSED**
+
+**Carried limit:** Recorded proof **metadata** comparison only. It is not rendered visual proof comparison and does not perform automated change detection.
+
+Do **not** reopen without concrete contradictory evidence. Next room slice: [`HIGHLIGHTER-1.md`](./HIGHLIGHTER-1.md).
 
 ---
 
-## Objective
+## Objective (historical)
 
 Deliver the smallest truthful **Version Compare** capability required to advance Unified Review / Final / Delivery room completion.
 
