@@ -1,28 +1,41 @@
 # REVIEW-TEXT-TOOLS-INSPECT-1
 
-**Status:** DEFINED · **INSPECTION NOT AUTHORIZED**  
-**Type:** Inspection package definition (docs only until separately authorized)  
-**Definition base / protected product tip:** `96b6a39606a7c9713327801f801d17b4c8c2068b`  
+**Status:** COMPLETE / CLOSED  
+**Type:** Inspection only — closed; construction combination decided  
+**Closed against tip:** `36c3468873373ccffb87801edcd45f5ef6168888` (definition seal) · inspection authorized, accepted, and closed 2026-08-01  
 **Branch:** `fix/discovery-responsive-layout`  
 **Active room:** Unified Review / Final / Delivery Room  
-**Authority:** Working Protocol §1 room-completion rule (LOCKED 2026-08-01)  
-**Prior sealed siblings:**  
-- HIGHLIGHTER-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `96b6a39…`  
-- VERSION-COMPARE-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `b0bd5e5…`  
-- UPDATE-HISTORY-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `1e1308e…`
+**Authority:** Working Protocol §1 room-completion rule (LOCKED 2026-08-01)
 
 ---
 
-## Objective
+## Outcome (accepted)
 
-Determine the **smallest truthful package or package sequence** needed to add:
+Inspection confirmed:
 
-1. **Page Tabs** — navigating or marking specific proof locations  
-2. **Text Comment** — a distinct customer feedback tool inside **REVIEW TOOLS**
+- Page Tabs and Text Comment are contract-listed and product-missing
+- Sticky Notes are **not** Text Comment (deliverable/section only; colored sticky UX)
+- No page/in-file location identity on registry or client proof DTO; no multipage proof render
+- `proof_markup_board_v1` is **not** a page-tab surface
+- Prefer `JobReviewFeedback` / `save_feedback` for persistence; drafting must not consume correction rounds
+- **Inspect together, build separately**
 
-This is a **combined inspection** because Page Tabs and Text Comment share the same room-completion objective, Review-tool architecture surface, likely persistence authority, affected Review workspace files, and certification path. Splitting the inspection would duplicate archaeology.
+**Owner decision:**
 
-**Construction combination remains undecided.** Combining construction is **not** assumed until inspection proves the boundaries truly match. If evidence shows separate packages are safer, report that honestly.
+| Package | Decision |
+|---|---|
+| **TEXT-COMMENT-1** | Next construction definition — proof-version-bound written comment; **no geometry** in first slice |
+| **PAGE-TABS-1** | **Deferred** until proof rendering exposes real page/location identities **or** Tagia explicitly remaps “Page Tabs” to a truthful existing unit without pretending proof files are document pages |
+
+**Next defined package:** [`TEXT-COMMENT-1.md`](./TEXT-COMMENT-1.md) (construction not yet authorized).
+
+Do **not** reopen this inspection without concrete contradictory evidence.
+
+---
+
+## Original objective (historical)
+
+Inspect Page Tabs and Text Comment together as the next unresolved capabilities required to complete the Unified Review / Final / Delivery Room. Combined inspection only — construction combination remained undecided until evidence.
 
 ---
 

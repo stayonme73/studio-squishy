@@ -38,10 +38,12 @@ They share the same **room-completion sequence**, not the same construction pack
 1. Customer Update History — **SEALED** · UPDATE-HISTORY-1 @ `1e1308e…`
 2. VERSION-COMPARE-1 — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `b0bd5e5…`
 3. **HIGHLIGHTER-1** ← this package — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `96b6a39…`
-4. Page Tabs and Text Comment — **REVIEW-TEXT-TOOLS-INSPECT-1** defined · inspection waits
-5. Remaining proof-rendering depth and prior certification limits
-6. **UR-ROOM-CERT-1** — certify the room with explicit limits
-7. Only then Payment room / Refund UI
+4. REVIEW-TEXT-TOOLS-INSPECT-1 — **COMPLETE / CLOSED**
+5. TEXT-COMMENT-1 — defined · construction waits
+6. PAGE-TABS-1 — deferred
+7. Remaining proof-rendering depth and prior certification limits
+8. **UR-ROOM-CERT-1** — certify the room with explicit limits
+9. Only then Payment room / Refund UI
 
 Finishing Highlighter alone does **not** finish the room.
 
@@ -111,4 +113,4 @@ Exact harness paths are chosen during construction — not invented in this defi
 
 HIGHLIGHTER-1 construction is **complete and sealed** at `96b6a39606a7c9713327801f801d17b4c8c2068b`. Do not reopen without contradictory evidence.
 
-**Next room package:** [`REVIEW-TEXT-TOOLS-INSPECT-1.md`](./REVIEW-TEXT-TOOLS-INSPECT-1.md) (defined; inspection not authorized).
+**Next room package:** [`TEXT-COMMENT-1.md`](./TEXT-COMMENT-1.md) (defined; construction not authorized). PAGE-TABS-1 deferred.

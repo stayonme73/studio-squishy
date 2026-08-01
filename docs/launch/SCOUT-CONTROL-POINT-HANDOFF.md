@@ -2,7 +2,7 @@
 
 **Status:** STAND BY — verify protected control point only  
 **Authority:** Immediate Scout instructions for this resume. Narrow and action-ready.  
-**Not this document:** The Flight Manual / Master Launch List / Working Protocol are governing truth Scout may consult. They are **not** construction or inspection authorization. Do not treat background context as permission to build or inspect.
+**Not this document:** The Flight Manual / Master Launch List / Working Protocol are governing truth Scout may consult. They are **not** construction authorization. Do not treat background context as permission to build.
 
 ---
 
@@ -10,10 +10,11 @@
 
 **Stand by. Verify the protected control point only. Do not begin a new package.**
 
-**REVIEW-TEXT-TOOLS-INSPECT-1** is **defined** in governing docs. **Inspection is not authorized.**  
-**HIGHLIGHTER-1** is **SEALED · BROWSER-CERTIFIED WITH LIMITS**. Do not reopen without contradictory evidence.
+**TEXT-COMMENT-1** is **defined** in governing docs. **Construction is not authorized.**  
+**REVIEW-TEXT-TOOLS-INSPECT-1** is **COMPLETE / CLOSED**. Do not reopen without contradictory evidence.  
+**PAGE-TABS-1** is **deferred**. Do not build Page Tabs under Text Comment.
 
-Do not begin product construction, run the inspection, modify product files, or reopen sealed work.
+Do not begin product construction, modify product files, or reopen sealed work.
 
 ---
 
@@ -23,17 +24,19 @@ Project Alpha is resuming from the following protected state:
 
 | Field | Value |
 |---|---|
-| Protected tip | `96b6a39606a7c9713327801f801d17b4c8c2068b` |
+| Protected tip | `36c3468873373ccffb87801edcd45f5ef6168888` |
 | Branch | `fix/discovery-responsive-layout` |
 | Expected sync | **0 ahead / 0 behind** |
 | Expected staging | **empty** |
 | Open construction package | **none** |
 | Open inspection package | **none** |
-| Defined next package | **REVIEW-TEXT-TOOLS-INSPECT-1** — docs defined · inspection waits for separate authorization |
+| Defined next package | **TEXT-COMMENT-1** — docs defined · construction waits for separate authorization |
+| Deferred | **PAGE-TABS-1** — pending truthful page/location identity |
 | Customer-One readiness | **4 of 23** |
 
 ### Recently sealed / closed
 
+- **REVIEW-TEXT-TOOLS-INSPECT-1** — COMPLETE / CLOSED (inspect together · build separately)
 - **HIGHLIGHTER-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `96b6a39…` (version-bound `proof_markup_board_v1`; not source-proof pixels)
 - **VERSION-COMPARE-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `b0bd5e5…` (metadata compare only)
 - **UPDATE-HISTORY-1** Customer Update History @ `1e1308e…`
@@ -48,10 +51,11 @@ Project Alpha is resuming from the following protected state:
 
 ### Known open customer-facing work (room sequence)
 
-1. REVIEW-TEXT-TOOLS-INSPECT-1 (defined; inspection not authorized) → Page Tabs / Text Comment construction only after inspection + separate authorization
-2. Proof-rendering + prior cert limits
-3. UR-ROOM-CERT-1
-4. Only then Refund UI (Payment room)
+1. TEXT-COMMENT-1 (defined; construction not authorized)
+2. PAGE-TABS-1 (deferred)
+3. Proof-rendering + prior cert limits
+4. UR-ROOM-CERT-1
+5. Only then Refund UI (Payment room)
 
 ---
 
@@ -61,7 +65,7 @@ Project Alpha is resuming from the following protected state:
 2. Local versus origin ahead/behind state
 3. Staging and working-tree state
 4. Whether any unrelated local work is present
-5. Whether the protected tip matches `96b6a39606a7c9713327801f801d17b4c8c2068b` (or the later tip after REVIEW-TEXT-TOOLS-INSPECT-1 definition seal)
+5. Whether the protected tip matches `36c3468873373ccffb87801edcd45f5ef6168888` (or the later tip after TEXT-COMMENT-1 definition seal)
 
 **If the repository does not match the protected state, stop and report the discrepancy without altering anything.**
 
@@ -78,7 +82,7 @@ After verification, remain on standby for the next authorized package.
 - Preserve working behavior.
 - Do not reopen sealed work without evidence.
 - Raise an anti-loop warning if requested work appears already complete.
-- Combine work only when it shares the same business objective, architecture, affected files, and certification path — construction combination for Page Tabs + Text Comment remains **undecided** until inspection evidence.
+- Combine work only when it shares the same business objective, architecture, affected files, and certification path — Page Tabs and Text Comment were inspected together and **must not** be forced into one construction package.
 - Leave unrelated dirty work untouched.
 - Do not commit or push without owner approval.
 
