@@ -73,6 +73,24 @@ We work in the approved order.
 
 If no, park it until after launch.
 
+### Room-completion rule (LOCKED · Tagia 2026-08-01)
+
+Sequencing is **room by room**, not feature by feature.
+
+> Once a customer-facing room becomes active, we complete and certify all known launch-critical work for that room before opening construction in another room. We do not leave known gaps behind merely because another feature appears easier or more urgent.
+
+**Active room now:** Unified Review / Final / Delivery Room.
+
+**Room-completion order (this room):**
+
+1. Customer Update History
+2. Highlighter / version comparison
+3. Any remaining launch-critical gaps discovered inside that same room
+4. Certify the room as complete with explicit limits
+5. Only then move to the Payment room for Refund UI
+
+Inspections for a missing capability inside an active room must inspect that capability **as part of finishing the room** — including dependencies on other unresolved launch-critical room behavior — not as an isolated feature. Do **not** inspect or build Refund UI while this room is active.
+
 ---
 
 ## 2. Master Launch List Follows Every Thread

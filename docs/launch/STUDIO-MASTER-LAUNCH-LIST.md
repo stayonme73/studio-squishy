@@ -7,6 +7,7 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 ### Permanent operating checklist
 
 - [x] **Do not repeat actions already completed.** Scout must red-flag repetitive instructions and return existing evidence instead of redoing the work. *(NON-NEGOTIABLE · Tagia 2026-07-26)*
+- [x] **Room-completion rule.** Once a customer-facing room is active, complete and certify all known launch-critical work for that room before opening construction in another room. *(LOCKED · Tagia 2026-08-01 · Working Protocol §1)*
 - [x] Important Chat guidance is recorded in this Communication Notebook or the relevant package document.
 - [x] Built ≠ tested ≠ certified ≠ protected ≠ launch-ready.
 
@@ -16,14 +17,14 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | `68dc50ad9ab1023adb81f28566391ae192f43d88` — `docs(launch): record customer issue entry truth` (product seal ISSUE-ENTRY-1 @ `727c831`) |
+| Protected tip | `286e6bff3b270b179c5f9ca8184d994ff8176e92` — `docs(launch): add lean Scout control-point handoff` (product seal ISSUE-ENTRY-1 @ `727c831`) |
 | Branch | `fix/discovery-responsive-layout` |
 | Sync | **0 ahead / 0 behind** · staging empty · substantial unrelated dirty WIP present (leave untouched) |
-| Current active item | **None** — stand by; verify control point only · lean Scout handoff: `docs/launch/SCOUT-CONTROL-POINT-HANDOFF.md` |
+| Current active item | **None** — Scout parked · room-completion rule locked · **UPDATE-HISTORY-INSPECT-1** defined but **not authorized** |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
-| Most recently completed | ISSUE-ENTRY-1 Customer Problem Reporting @ `727c831` (`feat: add customer problem reporting to project communication`) · Focused Vitest **50/50 PASS** · browser certification **116/116 PASS** (`scripts/smoke-issue-entry-1.mjs`) · prior C8e Lobby Visual Continuity **BROWSER-CERTIFIED** @ `167979e` · C8d `956f4d8` · MLL-C8D-1 `0678111` · C8C-CERT-1 `ed5e1d0` · C8c `cebe713a` · C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` |
-| Next three priorities | 1) Remaining Unified Review construction slice (highlighter / version comparison, subject to launch-gate review) — **not opened** · 2) Materials dual UX decision (waiting — Board limit) · 3) Project Claim / email hard-before-Board (separate Auth sequence — only when Tagia authorizes) |
-| Active blockers | Remaining C #8 highlighter/compare slice waits Tagia package authorization · Materials dual UX waiting · Refund UI (Gate #13) and update history (Hierarchy C #12) remain unresolved |
+| Most recently completed | Lean Scout control-point handoff @ `286e6bf` · ISSUE-ENTRY-1 Customer Problem Reporting @ `727c831` · C8e Lobby Visual Continuity **BROWSER-CERTIFIED** @ `167979e` · C8d `956f4d8` · C8C-CERT-1 `ed5e1d0` · C8c `cebe713a` · C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` |
+| Next three priorities | 1) Finish Unified Review / Final / Delivery Room — Update History → highlighter/compare → remaining room gaps → certify with limits · **UPDATE-HISTORY-INSPECT-1 not yet authorized** · 2) Materials dual UX decision (waiting — Board limit) · 3) Refund UI only after this room is certified (Payment room) |
+| Active blockers | Unified Review room not fully closed (update history · highlighter/compare · any remaining launch-critical room gaps) · Materials dual UX waiting · Refund UI waits room completion then Payment-room authorization |
 | Decisions waiting | **1** — Materials dual UX (Board limit) |
 | Customer-One readiness | **4 of 23** readiness gates complete (#16, #18, #20, #22) · Gates **#4**, **#5**, **#7**, **#9**, **#10**, **#11**, **#12**, and **#19** are **COMPLETE WITH LIMITS** (not counted in the complete total) · Hierarchy C #5–#7 COMPLETE WITH LIMITS · C #8 **PARTIAL / COMPLETE WITH LIMITS** (C8a/C8b/C8c/C8d/C8e; not a full unified-room close) · Hierarchy C #10 (Complaint and issue entry) **COMPLETE WITH LIMITS** @ `727c831` |
 | Last updated | 2026-08-01 |
@@ -78,7 +79,9 @@ Every completed item must show available evidence: commit hash · subject · tes
 
 ### Tagia Notes
 
-- **2026-08-01 — Scout lean handoff (locked pattern):** Scout receives a separate control-point package, not the entire Flight Manual. Governing truth stays in Master List / Working Protocol / inventory; Scout’s immediate instructions stay narrow and action-ready. When no package is authorized: **Stand by. Verify the protected control point only. Do not begin a new package.** Template: `docs/launch/SCOUT-CONTROL-POINT-HANDOFF.md`. Protected tip for this resume: `68dc50ad9ab1023adb81f28566391ae192f43d88` · branch `fix/discovery-responsive-layout` · expected 0/0 · staging empty · open package **none**.
+- **2026-08-01 — Room-completion rule (LOCKED):** Sequencing is **room by room**, not feature by feature. Once a customer-facing room is active, complete and certify all known launch-critical work for that room before opening construction in another room. **Active room:** Unified Review / Final / Delivery. **Order:** (1) Customer Update History (2) Highlighter/version comparison (3) remaining launch-critical gaps in that room (4) certify room with explicit limits (5) only then Payment room / Refund UI. Working Protocol §1.
+- **2026-08-01 — UPDATE-HISTORY-INSPECT-1 defined, not authorized:** Inspect Customer Update History as the next missing capability required to **finish the Unified Review / Final / Delivery Room**. Identify dependencies on version comparison and any other unresolved launch-critical room behavior. Do **not** inspect or build Refund UI. Inspection only when Tagia explicitly authorizes. Scout remains parked at `286e6bf…`.
+- **2026-08-01 — Scout lean handoff (locked pattern):** Scout receives a separate control-point package, not the entire Flight Manual. Governing truth stays in Master List / Working Protocol / inventory; Scout’s immediate instructions stay narrow and action-ready. When no package is authorized: **Stand by. Verify the protected control point only. Do not begin a new package.** Template: `docs/launch/SCOUT-CONTROL-POINT-HANDOFF.md`. Protected tip: `286e6bff3b270b179c5f9ca8184d994ff8176e92` · branch `fix/discovery-responsive-layout` · expected 0/0 · staging empty · open package **none**.
 - **2026-07-26 — Standing rule (locked):** Important Chat guidance must not live only in chat. Send it to Scout and record it here or in the relevant package document.
 - **2026-07-26 — Inventory accepted:** Classifications and completion order accepted. Inventory marked complete.
 - **2026-07-26 — LOCKED:** Purchased-room authentication and data protection must be completed and certified **before Tagia begins the Customer-One trial.** Not Parking Lot. Does not stop Studio Voice definition.
