@@ -33,8 +33,8 @@
 
 ### Honest construction sequence (accepted)
 
-1. **REFUND-REQUEST-1** — customer refund **intake only** (next package)  
-2. Inspect sealed intake → decide whether a separate customer status readout is still needed  
+1. **REFUND-REQUEST-1** — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `f60ee491…`  
+2. **REFUND-STATUS-INSPECT-1** — decide whether a separate customer status readout is still needed  
 3. Customer-safe refund history later  
 4. Provider execution · amounts · failures · partials only in a separate future payment-provider program  
 
@@ -44,9 +44,9 @@ Do **not** reopen this inspection without concrete contradictory evidence.
 
 ## Next package
 
-**REFUND-REQUEST-1** — **DEFINED · NOT AUTHORIZED FOR CONSTRUCTION** (`docs/launch/REFUND-REQUEST-1.md`).
+**REFUND-REQUEST-1** — **SEALED · BROWSER-CERTIFIED WITH LIMITS** (`docs/launch/REFUND-REQUEST-1.md`).
 
-Customer refund **intake only** · reuse existing refund-request API · post-payment surface **outside** dirty checkout/payment files · truthful unavailable / already submitted / pending / already decided / non-refundable handling · preserve Help Center “may be eligible” / “may be approved” · no provider · no amount · no money-returned claims · no persistent status panel · no refund history in that slice.
+Next recommended Payment step: **REFUND-STATUS-INSPECT-1** (not yet defined) — persistent customer status readout only if required and supportable; never invent money-returned claims.
 
 ---
 
@@ -73,4 +73,4 @@ Customer refund **intake only** · reuse existing refund-request API · post-pay
 
 ---
 
-*End of REFUND-UI-INSPECT-1. Closed. Next: REFUND-REQUEST-1 definition · construction waits separate authorization.*
+*End of REFUND-UI-INSPECT-1. Closed. REFUND-REQUEST-1 sealed. Next: REFUND-STATUS-INSPECT-1 (define separately).*

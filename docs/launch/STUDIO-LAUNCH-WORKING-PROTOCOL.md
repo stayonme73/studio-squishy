@@ -97,11 +97,12 @@ Sequencing is **room by room**, not feature by feature.
 **Payment room order (now active):**
 
 1. **REFUND-UI-INSPECT-1** — **COMPLETE · CLOSED** — record/adjudicate exists; provider money movement absent (`docs/launch/REFUND-UI-INSPECT-1.md`)
-2. **REFUND-REQUEST-1** — docs defined · construction waits (`docs/launch/REFUND-REQUEST-1.md`) — customer refund **intake only** via existing API · outside dirty checkout/payment files
-3. Optional later: customer status readout · refund history · provider program — each separate authorization
-4. Payment-room certification — as later authorized
+2. **REFUND-REQUEST-1** — **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `f60ee491…` — Studio Board intake · unit **18/18** · browser **10/10** · owner-review request only (`docs/launch/REFUND-REQUEST-1.md`)
+3. **REFUND-STATUS-INSPECT-1** — next (define + authorize separately) — whether Customer-One needs a persistent customer status readout
+4. Status readout construction — **only if** inspection proves required and supportable
+5. Payment/refund customer experience certification with explicit limits — then leave Payment room
 
-Do **not** invent eligibility, refund amounts, approvals, timelines, provider success, money-returned, or completion claims. Do **not** call payment providers in REFUND-REQUEST-1. Do **not** reopen the sealed Unified Room. Do **not** open Page Tabs, Board Materials, or project-wide Gate #17 under this package. Do **not** build a persistent refund-status panel or second refund ledger in REFUND-REQUEST-1.
+Do **not** invent eligibility, refund amounts, approvals, timelines, provider success, money-returned, or completion claims. Do **not** call payment providers. Do **not** reopen the sealed Unified Room. Do **not** open Page Tabs, Board Materials, or project-wide Gate #17 under Payment-room packages. Do **not** invent a persistent refund-status machine or second refund ledger without inspection evidence.
 
 ---
 
