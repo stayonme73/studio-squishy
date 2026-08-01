@@ -76,8 +76,8 @@
 
 1. **REFUND-UI-INSPECT-1** — **COMPLETE · CLOSED**  
 2. **REFUND-REQUEST-1** — **SEALED · BROWSER-CERTIFIED WITH LIMITS** ← this package  
-3. **REFUND-STATUS-INSPECT-1** — next (define + authorize separately) — whether Customer-One needs a persistent customer status readout  
-4. Status readout construction — **only if** inspection proves required and supportable  
+3. **REFUND-STATUS-INSPECT-1** — **DEFINED · NOT AUTHORIZED FOR INSPECTION** (`docs/launch/REFUND-STATUS-INSPECT-1.md`)  
+4. Status readout construction — **only if** sealed inspection proves required and supportable  
 5. Payment/refund customer experience certification with explicit limits  
 6. Then leave Payment room for the next room  
 
@@ -94,4 +94,4 @@ Do **not** invent “refund processed,” money returned, amounts, provider sett
 
 ---
 
-*End of REFUND-REQUEST-1. Sealed with limits — intake for owner review, not financial completion. Next: REFUND-STATUS-INSPECT-1 (not yet defined).*
+*End of REFUND-REQUEST-1. Sealed with limits — intake for owner review, not financial completion. Next: REFUND-STATUS-INSPECT-1 (defined; inspection waits).*

@@ -46,7 +46,7 @@ Do **not** reopen this inspection without concrete contradictory evidence.
 
 **REFUND-REQUEST-1** — **SEALED · BROWSER-CERTIFIED WITH LIMITS** (`docs/launch/REFUND-REQUEST-1.md`).
 
-Next recommended Payment step: **REFUND-STATUS-INSPECT-1** (not yet defined) — persistent customer status readout only if required and supportable; never invent money-returned claims.
+Next Payment step: **REFUND-STATUS-INSPECT-1** — **DEFINED · NOT AUTHORIZED FOR INSPECTION** (`docs/launch/REFUND-STATUS-INSPECT-1.md`) — persistent customer status readout only if required and supportable; never invent money-returned claims.
 
 ---
 
@@ -73,4 +73,4 @@ Next recommended Payment step: **REFUND-STATUS-INSPECT-1** (not yet defined) —
 
 ---
 
-*End of REFUND-UI-INSPECT-1. Closed. REFUND-REQUEST-1 sealed. Next: REFUND-STATUS-INSPECT-1 (define separately).*
+*End of REFUND-UI-INSPECT-1. Closed. REFUND-REQUEST-1 sealed. Next: REFUND-STATUS-INSPECT-1 (defined; inspection waits).*

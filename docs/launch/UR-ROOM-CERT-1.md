@@ -93,7 +93,7 @@ An older Next.js process exited when port 3000 was freed for a clean cert server
 6. PAGE-TABS-1 — **deferred**  
 7. UR-PROOF-READINESS-INSPECT-1 — **COMPLETE / CLOSED** · Choice **A**  
 8. **UR-ROOM-CERT-1** — **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** ← this package  
-9. **Payment room** — **REFUND-UI-INSPECT-1 COMPLETE · CLOSED** · **REFUND-REQUEST-1 SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `f60ee491…` · next **REFUND-STATUS-INSPECT-1**
+9. **Payment room** — **REFUND-REQUEST-1 SEALED** @ `f60ee491…` · **REFUND-STATUS-INSPECT-1** defined · inspection not authorized
 
 ---
 
@@ -106,4 +106,4 @@ An older Next.js process exited when port 3000 was freed for a clean cert server
 
 ---
 
-*End of UR-ROOM-CERT-1. Sealed with explicit limits — unfinished edges labeled, not wallpapered. Next Payment slice: REFUND-STATUS-INSPECT-1 (not yet defined).*
+*End of UR-ROOM-CERT-1. Sealed with explicit limits — unfinished edges labeled, not wallpapered. Next Payment slice: REFUND-STATUS-INSPECT-1 (defined; inspection waits).*

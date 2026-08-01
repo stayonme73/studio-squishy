@@ -10,14 +10,14 @@
 
 **Stand by. Verify the protected control point only. Do not begin a new package.**
 
+**REFUND-STATUS-INSPECT-1** is **defined** in governing docs. **Inspection is not authorized.**  
 **REFUND-REQUEST-1** is **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `f60ee491…`. Do not reopen without contradictory evidence.  
 **REFUND-UI-INSPECT-1** is **COMPLETE · CLOSED**.  
 **UR-ROOM-CERT-1** is **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS**. Do not reopen without contradictory evidence.  
 **PAGE-TABS-1** remains **deferred**.  
-**REFUND-STATUS-INSPECT-1** is the recommended next Payment-room package — **not defined · not authorized**.  
-No provider refund execution. No Board Materials. No project-wide Gate #17 claim.
+No status UI construction. No provider refund execution. No Board Materials. No project-wide Gate #17 claim.
 
-Do not begin inspection or construction, modify product files, call payment providers, or reopen sealed work.
+Do not begin the inspection, status UI construction, modify product files, call payment providers, or reopen sealed work.
 
 ---
 
@@ -27,19 +27,19 @@ Project Alpha is resuming from the following protected state:
 
 | Field | Value |
 |---|---|
-| Protected tip | `f60ee4911a2e6c076e8f00a632401257aee7be86` |
+| Protected tip | `b2941db1f1dbbe03580b3c6173aa2e79af0039fc` |
 | Branch | `fix/discovery-responsive-layout` |
 | Expected sync | **0 ahead / 0 behind** |
 | Expected staging | **empty** |
 | Open construction package | **none** |
 | Open inspection package | **none** |
 | Open certification package | **none** |
-| Defined next package | **none** — next recommended: **REFUND-STATUS-INSPECT-1** (docs definition waits) |
+| Defined next package | **REFUND-STATUS-INSPECT-1** — docs defined · inspection waits for separate authorization |
 | Deferred | **PAGE-TABS-1** — pending truthful page/location identity |
 | Customer-One readiness | **4 of 23** |
 | Unified room cert | **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · browser 98/98 · unit 32/32 |
 | Proof viewing (Customer-One) | Session-gated **link/list** — Choice A |
-| Active room sequence | **Payment room** — intake sealed; status-readout inspection next |
+| Active room sequence | **Payment room** — status-return-path inspection next |
 
 ### Recently sealed / closed
 
@@ -61,7 +61,7 @@ Project Alpha is resuming from the following protected state:
 
 ### Known open customer-facing work (sequence)
 
-1. REFUND-STATUS-INSPECT-1 (recommended; not defined) → status readout only if required and supportable  
+1. REFUND-STATUS-INSPECT-1 (defined; inspection not authorized) → status readout only if evidence requires and supports it  
 2. PAGE-TABS-1 (deferred)  
 3. Materials dual UX (Board — waiting)
 
@@ -73,7 +73,7 @@ Project Alpha is resuming from the following protected state:
 2. Local versus origin ahead/behind state  
 3. Staging and working-tree state  
 4. Whether any unrelated local work is present  
-5. Whether the protected tip matches `f60ee4911a2e6c076e8f00a632401257aee7be86` (or the later tip after REFUND-REQUEST-1 docs seal)
+5. Whether the protected tip matches `b2941db1f1dbbe03580b3c6173aa2e79af0039fc` (or the later tip after REFUND-STATUS-INSPECT-1 definition seal)
 
 **If the repository does not match the protected state, stop and report the discrepancy without altering anything.**
 
