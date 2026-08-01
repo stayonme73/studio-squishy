@@ -17,14 +17,14 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | `286e6bff3b270b179c5f9ca8184d994ff8176e92` — `docs(launch): add lean Scout control-point handoff` (product seal ISSUE-ENTRY-1 @ `727c831`) |
+| Protected tip | `1e1308e9f0e4c8b5728a605e4c930198fc2d17e6` — `feat: add customer update history to unified review room` |
 | Branch | `fix/discovery-responsive-layout` |
 | Sync | **0 ahead / 0 behind** · staging empty · substantial unrelated dirty WIP present (leave untouched) |
-| Current active item | **None** — Scout parked · room-completion rule locked · **UPDATE-HISTORY-INSPECT-1** defined but **not authorized** |
+| Current active item | **None** — Scout parked · **HIGHLIGHTER-COMPARE-INSPECT-1** defined but **not authorized** |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
-| Most recently completed | Lean Scout control-point handoff @ `286e6bf` · ISSUE-ENTRY-1 Customer Problem Reporting @ `727c831` · C8e Lobby Visual Continuity **BROWSER-CERTIFIED** @ `167979e` · C8d `956f4d8` · C8C-CERT-1 `ed5e1d0` · C8c `cebe713a` · C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` |
-| Next three priorities | 1) Finish Unified Review / Final / Delivery Room — Update History → highlighter/compare → remaining room gaps → certify with limits · **UPDATE-HISTORY-INSPECT-1 not yet authorized** · 2) Materials dual UX decision (waiting — Board limit) · 3) Refund UI only after this room is certified (Payment room) |
-| Active blockers | Unified Review room not fully closed (update history · highlighter/compare · any remaining launch-critical room gaps) · Materials dual UX waiting · Refund UI waits room completion then Payment-room authorization |
+| Most recently completed | UPDATE-HISTORY-1 Customer Update History **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `1e1308e` · ISSUE-ENTRY-1 @ `727c831` · C8e @ `167979e` · C8d `956f4d8` · C8C-CERT-1 `ed5e1d0` · C8c `cebe713a` · C8a `04bd9ba` · C8b `77f6835` · C8-CERT-1 `508bddf` |
+| Next three priorities | 1) Finish Unified Review / Final / Delivery Room — highlighter/compare inspect → construct → remaining room gaps → certify with limits · **HIGHLIGHTER-COMPARE-INSPECT-1 not yet authorized** · 2) Materials dual UX decision (waiting — Board limit) · 3) Refund UI only after this room is certified (Payment room) |
+| Active blockers | Unified Review room not fully closed (highlighter/compare · any remaining launch-critical room gaps) · Materials dual UX waiting · Refund UI waits room completion then Payment-room authorization |
 | Decisions waiting | **1** — Materials dual UX (Board limit) |
 | Customer-One readiness | **4 of 23** readiness gates complete (#16, #18, #20, #22) · Gates **#4**, **#5**, **#7**, **#9**, **#10**, **#11**, **#12**, and **#19** are **COMPLETE WITH LIMITS** (not counted in the complete total) · Hierarchy C #5–#7 COMPLETE WITH LIMITS · C #8 **PARTIAL / COMPLETE WITH LIMITS** (C8a/C8b/C8c/C8d/C8e; not a full unified-room close) · Hierarchy C #10 (Complaint and issue entry) **COMPLETE WITH LIMITS** @ `727c831` |
 | Last updated | 2026-08-01 |
@@ -79,8 +79,10 @@ Every completed item must show available evidence: commit hash · subject · tes
 
 ### Tagia Notes
 
+- **2026-08-01 — HIGHLIGHTER-COMPARE-INSPECT-1 defined, not authorized:** Inspect highlighter / version comparison as the next capability to finish Unified Review / Final / Delivery. Still contract-only — inspect recorded versions, file relationships, annotations, and what “highlighting” means before any UI. Do not invent comparison behavior or a second version system. Do not inspect Refund UI. Scout parked at `1e1308e…` until Tagia authorizes. Template: `docs/launch/HIGHLIGHTER-COMPARE-INSPECT-1.md`.
+- **2026-08-01 — UPDATE-HISTORY-1 sealed:** Customer Update History **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `1e1308e9f0e4c8b5728a605e4c930198fc2d17e6` — persisted `jobActivityEvents` projection only · Final/Delivery need `jobId` · COMM/project-activity not merged · browser 57/0 with temporary harness removed · Hierarchy C #12 advanced; Gate #12 remains issue reporting COMPLETE WITH LIMITS (do not conflate).
 - **2026-08-01 — Room-completion rule (LOCKED):** Sequencing is **room by room**, not feature by feature. Once a customer-facing room is active, complete and certify all known launch-critical work for that room before opening construction in another room. **Active room:** Unified Review / Final / Delivery. **Order:** (1) Customer Update History (2) Highlighter/version comparison (3) remaining launch-critical gaps in that room (4) certify room with explicit limits (5) only then Payment room / Refund UI. Working Protocol §1.
-- **2026-08-01 — UPDATE-HISTORY-INSPECT-1 defined, not authorized:** Inspect Customer Update History as the next missing capability required to **finish the Unified Review / Final / Delivery Room**. Identify dependencies on version comparison and any other unresolved launch-critical room behavior. Do **not** inspect or build Refund UI. Inspection only when Tagia explicitly authorizes. Scout remains parked at `286e6bf…`.
+- **2026-08-01 — UPDATE-HISTORY-INSPECT-1 closed:** Inspection completed; construction sealed as UPDATE-HISTORY-1 @ `1e1308e…`. Do not reopen as an open package.
 - **2026-08-01 — Scout lean handoff (locked pattern):** Scout receives a separate control-point package, not the entire Flight Manual. Governing truth stays in Master List / Working Protocol / inventory; Scout’s immediate instructions stay narrow and action-ready. When no package is authorized: **Stand by. Verify the protected control point only. Do not begin a new package.** Template: `docs/launch/SCOUT-CONTROL-POINT-HANDOFF.md`. Protected tip: `286e6bff3b270b179c5f9ca8184d994ff8176e92` · branch `fix/discovery-responsive-layout` · expected 0/0 · staging empty · open package **none**.
 - **2026-07-26 — Standing rule (locked):** Important Chat guidance must not live only in chat. Send it to Scout and record it here or in the relevant package document.
 - **2026-07-26 — Inventory accepted:** Classifications and completion order accepted. Inventory marked complete.
