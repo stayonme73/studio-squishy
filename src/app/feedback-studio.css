@@ -1120,6 +1120,103 @@
   cursor: pointer;
 }
 
+.fs-text-comment {
+  margin: 0.75rem 0 1rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--utility-primary) 18%, transparent);
+  background: color-mix(in srgb, #fff 92%, var(--utility-primary) 8%);
+}
+
+.fs-text-comment__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.fs-text-comment__lead,
+.fs-text-comment__unavailable,
+.fs-text-comment__note,
+.fs-text-comment__bound,
+.fs-text-comment__empty {
+  margin: 0 0 0.55rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--utility-text-muted);
+}
+
+.fs-text-comment__select {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.55rem;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--utility-primary) 28%, transparent);
+  background: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.fs-text-comment__list {
+  list-style: none;
+  margin: 0 0 0.65rem;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.fs-text-comment__item {
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--utility-primary) 16%, transparent);
+  background: #fff;
+}
+
+.fs-text-comment__item-text {
+  margin: 0 0 0.4rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.fs-text-comment__item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.fs-text-comment__item-actions button,
+.fs-text-comment__save {
+  display: inline-flex;
+  min-height: 2rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--utility-primary) 28%, transparent);
+  background: #fff;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.fs-text-comment__save:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.fs-text-comment__input {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.55rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--utility-primary) 28%, transparent);
+  background: #fff;
+  font: inherit;
+  font-size: 0.88rem;
+  resize: vertical;
+}
+
 .fs-mock__channel {
   margin: 0 0 0.35rem;
   font-size: 0.68rem;

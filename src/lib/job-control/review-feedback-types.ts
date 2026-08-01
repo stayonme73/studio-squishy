@@ -45,6 +45,21 @@ export type JobReviewHighlight = {
   updatedAt: string;
 };
 
+/**
+ * TEXT-COMMENT-1 — written comment bound to a recorded proof version.
+ * No page, region, or pixel geometry in this slice.
+ */
+export type JobReviewTextComment = {
+  id: string;
+  jobId: string;
+  deliverableKey: string;
+  proofFileId: string;
+  versionLabel: string;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 /** Persisted job-scoped client review feedback — tasks envelope (schema v8+). */
 export type JobReviewFeedback = {
   /** Stable package id — unique per draft/locked cycle; never reused after lock. */
@@ -57,6 +72,8 @@ export type JobReviewFeedback = {
   drawSections: string[];
   /** HIGHLIGHTER-1 — version-bound highlight geometry (optional on legacy packages). */
   highlights?: readonly JobReviewHighlight[];
+  /** TEXT-COMMENT-1 — proof-version-bound written comments (optional on legacy packages). */
+  textComments?: readonly JobReviewTextComment[];
   updatedAt: string;
   /** Studio release activity id reviewed when this package was drafted/locked. */
   releaseActivityId?: string | null;
@@ -103,6 +120,7 @@ export function createEmptyJobReviewFeedback(
     voiceNotes: [],
     drawSections: [],
     highlights: [],
+    textComments: [],
     updatedAt: now,
     releaseActivityId: options?.releaseActivityId ?? null,
     submittedAt: null,

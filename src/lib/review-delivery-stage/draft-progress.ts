@@ -20,5 +20,6 @@ export function hasUnsubmittedReviewDraft(
   if (feedback.stickyNotes.length > 0) return true;
   if (feedback.voiceNotes.length > 0) return true;
   if (feedback.drawSections.length > 0) return true;
+  if ((feedback.textComments?.length ?? 0) > 0) return true;
   return false;
 }

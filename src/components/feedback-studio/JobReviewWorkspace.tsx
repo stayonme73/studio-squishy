@@ -66,6 +66,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
   const [compareCurrentId, setCompareCurrentId] = useState<string | null>(null);
   const [comparePriorId, setComparePriorId] = useState<string | null>(null);
   const [highlightProofId, setHighlightProofId] = useState<string | null>(null);
+  const [textCommentProofId, setTextCommentProofId] = useState<string | null>(null);
   const [stickyOpen, setStickyOpen] = useState(false);
   const [stickyColor, setStickyColor] = useState<StickyNoteColorId>("yellow");
   const [stickyDraft, setStickyDraft] = useState("");
@@ -402,11 +403,13 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             compareCurrentId={compareCurrentId}
             comparePriorId={comparePriorId}
             highlightProofId={highlightProofId}
+            textCommentProofId={textCommentProofId}
             onFocusSection={(sectionId) => {
               setFocusedSection(sectionId);
               setCompareCurrentId(null);
               setComparePriorId(null);
               setHighlightProofId(null);
+              setTextCommentProofId(null);
             }}
             onDrawStroke={() => markDraw(focusedSection)}
             onCompareSelectCurrent={setCompareCurrentId}
@@ -414,6 +417,10 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             onHighlightSelectProof={setHighlightProofId}
             onHighlightsChange={(next) => {
               debouncedPersist({ ...session, highlights: [...next] });
+            }}
+            onTextCommentSelectProof={setTextCommentProofId}
+            onTextCommentsChange={(next) => {
+              debouncedPersist({ ...session, textComments: [...next] });
             }}
           />
 
@@ -532,6 +539,12 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
               setErasing(false);
             }}
             onHighlightDone={() => setActiveTool("none")}
+            onTextCommentToggle={() => {
+              setActiveTool((tool) => (tool === "textComment" ? "none" : "textComment"));
+              setStickyOpen(false);
+              setErasing(false);
+            }}
+            onTextCommentDone={() => setActiveTool("none")}
             onVoiceToggle={() => void handleVoiceToggle()}
             onApprove={handleApprove}
             onRevision={handleRevision}

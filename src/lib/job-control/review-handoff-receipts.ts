@@ -35,6 +35,8 @@ export type FeedbackPackageInventory = {
   stickyNoteTexts: readonly string[];
   drawingSectionCount: number;
   voiceNoteCount: number;
+  writtenCommentCount: number;
+  writtenCommentTexts: readonly string[];
   sectionDecisions: readonly { key: string; status: string }[];
   versionLabel: string;
   isEmpty: boolean;
@@ -175,6 +177,9 @@ export function buildFeedbackPackageInventory(
   const stickyNoteTexts = feedback.stickyNotes
     .map((note) => note.text.trim())
     .filter(Boolean);
+  const writtenCommentTexts = (feedback.textComments ?? [])
+    .map((entry) => entry.text.trim())
+    .filter(Boolean);
   const sectionDecisions = Object.entries(feedback.sectionStatuses)
     .filter(([, status]) => status !== "neutral")
     .map(([key, status]) => ({ key, status }));
@@ -184,6 +189,7 @@ export function buildFeedbackPackageInventory(
     feedback.voiceNotes.length === 0 &&
     feedback.drawSections.length === 0 &&
     (feedback.highlights?.length ?? 0) === 0 &&
+    writtenCommentTexts.length === 0 &&
     sectionDecisions.length === 0;
 
   return {
@@ -191,6 +197,8 @@ export function buildFeedbackPackageInventory(
     stickyNoteTexts,
     drawingSectionCount: feedback.drawSections.length,
     voiceNoteCount: feedback.voiceNotes.length,
+    writtenCommentCount: feedback.textComments?.length ?? 0,
+    writtenCommentTexts,
     sectionDecisions,
     versionLabel:
       resolveProofVersionLabel(deliverables) ?? "Version label not provided",

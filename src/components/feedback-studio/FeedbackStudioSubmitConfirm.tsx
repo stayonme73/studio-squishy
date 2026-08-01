@@ -57,6 +57,7 @@ export default function FeedbackStudioSubmitConfirm({
               <li>{inventoryCopy.stickyNotes(inventory.stickyNoteCount)}</li>
               <li>{inventoryCopy.drawings(inventory.drawingSectionCount)}</li>
               <li>{inventoryCopy.voiceNotes(inventory.voiceNoteCount)}</li>
+              <li>{inventoryCopy.writtenComments(inventory.writtenCommentCount)}</li>
               <li>
                 {inventoryCopy.sectionDecisions(inventory.sectionDecisions.length)}
               </li>
@@ -65,6 +66,13 @@ export default function FeedbackStudioSubmitConfirm({
               <ul className="fs-receipt__notes">
                 {inventory.stickyNoteTexts.map((text, index) => (
                   <li key={`${index}-${text.slice(0, 24)}`}>{text}</li>
+                ))}
+              </ul>
+            ) : null}
+            {inventory.writtenCommentTexts.length > 0 ? (
+              <ul className="fs-receipt__notes" aria-label="Written comments">
+                {inventory.writtenCommentTexts.map((text, index) => (
+                  <li key={`wc-${index}-${text.slice(0, 24)}`}>{text}</li>
                 ))}
               </ul>
             ) : null}

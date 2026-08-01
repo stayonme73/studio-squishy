@@ -364,6 +364,18 @@ describe("review-room actions", () => {
         updatedAt: "2026-08-01T12:00:00.000Z",
       },
     ];
+    feedback.textComments = [
+      {
+        id: "tc:test",
+        jobId: jobRecord.jobId,
+        deliverableKey: "deliverable-0",
+        proofFileId: "proof:1",
+        versionLabel: "v1",
+        text: "Tighten the headline on this proof version.",
+        createdAt: "2026-08-01T12:00:00.000Z",
+        updatedAt: "2026-08-01T12:00:00.000Z",
+      },
+    ];
 
     const saved = applyReviewRoomPatch(
       envelope(jobRecord),
@@ -380,6 +392,7 @@ describe("review-room actions", () => {
         (entry) => entry.jobId === jobRecord.jobId && !entry.submittedAt,
       );
       expect(stored?.highlights).toHaveLength(1);
+      expect(stored?.textComments).toHaveLength(1);
     }
 
     const approved = applyReviewRoomPatch(

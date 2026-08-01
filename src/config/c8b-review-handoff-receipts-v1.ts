@@ -40,6 +40,8 @@ export const c8bReviewHandoffReceiptsV1 = {
       count === 1 ? "1 marked section" : `${count} marked sections`,
     voiceNotes: (count: number) =>
       count === 1 ? "1 voice note" : `${count} voice notes`,
+    writtenComments: (count: number) =>
+      count === 1 ? "1 written comment" : `${count} written comments`,
     sectionDecisions: (count: number) =>
       count === 1 ? "1 section decision" : `${count} section decisions`,
   },

@@ -16,7 +16,11 @@ import { deliverableKeyToSectionId } from "@/lib/review-room-client";
 import FeedbackStudioDrawLayer from "./FeedbackStudioDrawLayer";
 import JobReviewVersionCompare from "./JobReviewVersionCompare";
 import JobReviewHighlightBoard from "./JobReviewHighlightBoard";
-import type { JobReviewHighlight } from "@/lib/job-control/review-feedback-types";
+import JobReviewTextCommentPanel from "./JobReviewTextCommentPanel";
+import type {
+  JobReviewHighlight,
+  JobReviewTextComment,
+} from "@/lib/job-control/review-feedback-types";
 
 type Props = {
   reviewTitle: string;
@@ -32,12 +36,15 @@ type Props = {
   compareCurrentId: string | null;
   comparePriorId: string | null;
   highlightProofId: string | null;
+  textCommentProofId: string | null;
   onFocusSection: (sectionId: FeedbackSectionId) => void;
   onDrawStroke: (sectionId: FeedbackSectionId) => void;
   onCompareSelectCurrent: (id: string) => void;
   onCompareSelectPrior: (id: string) => void;
   onHighlightSelectProof: (id: string) => void;
   onHighlightsChange: (next: readonly JobReviewHighlight[]) => void;
+  onTextCommentSelectProof: (id: string) => void;
+  onTextCommentsChange: (next: readonly JobReviewTextComment[]) => void;
 };
 
 export default function JobReviewDeliverablePreview({
@@ -54,12 +61,15 @@ export default function JobReviewDeliverablePreview({
   compareCurrentId,
   comparePriorId,
   highlightProofId,
+  textCommentProofId,
   onFocusSection,
   onDrawStroke,
   onCompareSelectCurrent,
   onCompareSelectPrior,
   onHighlightSelectProof,
   onHighlightsChange,
+  onTextCommentSelectProof,
+  onTextCommentsChange,
 }: Props) {
   const deliverableByKey = new Map<string, ClientReviewDeliverable>(
     deliverables.map((entry) => [deliverableKeyToSectionId(entry.key), entry]),
@@ -125,6 +135,17 @@ export default function JobReviewDeliverablePreview({
                   highlights={(session.highlights ?? []) as JobReviewHighlight[]}
                   onSelectProof={onHighlightSelectProof}
                   onHighlightsChange={onHighlightsChange}
+                />
+              ) : null}
+              {activeTool === "textComment" && focused ? (
+                <JobReviewTextCommentPanel
+                  jobId={jobId}
+                  deliverableKey={deliverable.key}
+                  proofFiles={deliverable.proofFiles}
+                  selectedProofId={textCommentProofId}
+                  comments={(session.textComments ?? []) as JobReviewTextComment[]}
+                  onSelectProof={onTextCommentSelectProof}
+                  onCommentsChange={onTextCommentsChange}
                 />
               ) : null}
               {deliverable.proofFiles.length > 0 ? (

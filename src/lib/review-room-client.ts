@@ -116,6 +116,16 @@ export function jobReviewFeedbackToFeedbackSession(
       createdAt: entry.createdAt,
       updatedAt: entry.updatedAt,
     })),
+    textComments: (review.feedback.textComments ?? []).map((entry) => ({
+      id: entry.id,
+      jobId: entry.jobId,
+      deliverableKey: entry.deliverableKey,
+      proofFileId: entry.proofFileId,
+      versionLabel: entry.versionLabel,
+      text: entry.text,
+      createdAt: entry.createdAt,
+      updatedAt: entry.updatedAt,
+    })),
     submittedAt: review.feedback.submittedAt ?? null,
   };
 }
@@ -161,6 +171,16 @@ export function feedbackSessionToJobReviewFeedback(
       versionLabel: entry.versionLabel,
       surface: entry.surface,
       rects: entry.rects.map((rect) => ({ ...rect })),
+      createdAt: entry.createdAt,
+      updatedAt: entry.updatedAt,
+    })),
+    textComments: (session.textComments ?? []).map((entry) => ({
+      id: entry.id,
+      jobId: entry.jobId || review.jobId,
+      deliverableKey: entry.deliverableKey,
+      proofFileId: entry.proofFileId,
+      versionLabel: entry.versionLabel,
+      text: entry.text,
       createdAt: entry.createdAt,
       updatedAt: entry.updatedAt,
     })),

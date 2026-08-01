@@ -45,6 +45,7 @@ export default function FeedbackStudioLockedPackageReceipt({ receipt }: Props) {
         <li>{copy.inventory.stickyNotes(inventory.stickyNoteCount)}</li>
         <li>{copy.inventory.drawings(inventory.drawingSectionCount)}</li>
         <li>{copy.inventory.voiceNotes(inventory.voiceNoteCount)}</li>
+        <li>{copy.inventory.writtenComments(inventory.writtenCommentCount)}</li>
         <li>
           {copy.inventory.sectionDecisions(inventory.sectionDecisions.length)}
         </li>
@@ -53,6 +54,13 @@ export default function FeedbackStudioLockedPackageReceipt({ receipt }: Props) {
         <ul className="fs-receipt__notes">
           {inventory.stickyNoteTexts.map((text, index) => (
             <li key={`${index}-${text.slice(0, 24)}`}>{text}</li>
+          ))}
+        </ul>
+      ) : null}
+      {inventory.writtenCommentTexts.length > 0 ? (
+        <ul className="fs-receipt__notes" aria-label="Written comments">
+          {inventory.writtenCommentTexts.map((text, index) => (
+            <li key={`wc-${index}-${text.slice(0, 24)}`}>{text}</li>
           ))}
         </ul>
       ) : null}

@@ -16,7 +16,14 @@ export type StickyNoteColorId = "yellow" | "blue" | "coral";
 
 export type SectionReviewStatus = "neutral" | "approved" | "revision" | "skip";
 
-export type FeedbackTool = "none" | "sticky" | "draw" | "voice" | "compare" | "highlight";
+export type FeedbackTool =
+  | "none"
+  | "sticky"
+  | "draw"
+  | "voice"
+  | "compare"
+  | "highlight"
+  | "textComment";
 
 export type FeedbackConceptPreview = {
   id: FeedbackConceptId;
@@ -72,6 +79,18 @@ export type FeedbackHighlight = {
   updatedAt: string;
 };
 
+/** TEXT-COMMENT-1 session mirror of JobReviewTextComment (job Review only). */
+export type FeedbackTextComment = {
+  id: string;
+  jobId: string;
+  deliverableKey: string;
+  proofFileId: string;
+  versionLabel: string;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type FeedbackSession = {
   conceptId: FeedbackConceptId;
   campaignId: string;
@@ -81,6 +100,8 @@ export type FeedbackSession = {
   drawSections: FeedbackSectionId[];
   /** HIGHLIGHTER-1 — empty for concept Review. */
   highlights?: FeedbackHighlight[];
+  /** TEXT-COMMENT-1 — empty for concept Review. */
+  textComments?: FeedbackTextComment[];
   submittedAt: string | null;
 };
 
@@ -189,6 +210,7 @@ export const feedbackStudio = {
     drawAnnotation: "Draw Annotation",
     versionCompare: "Version Compare",
     highlighter: "Highlighter",
+    textComment: "Text Comment",
     approveSection: "Approve Section",
     requestRevision: "Request Revision",
     skipSection: "Skip Section",
@@ -271,6 +293,24 @@ export const feedbackStudio = {
     clearBoard: "Clear highlights on this proof",
   },
 
+  /** TEXT-COMMENT-1 — written comments bound to proof version; not Sticky; no geometry. */
+  textComment: {
+    title: "Text Comment",
+    lead:
+      "Select a recorded proof version, then write a comment for that deliverable and version. Comments are not sticky notes and are not anchored to pages or pixels.",
+    selectProof: "Choose proof version for this comment",
+    unavailable:
+      "Text Comment is not available for this deliverable yet. At least one recorded proof version is required.",
+    activeHint: "Text Comment is active for the focused deliverable and selected proof version.",
+    close: "Close text comment",
+    placeholder: "Write your comment for this proof version…",
+    save: "Save comment",
+    update: "Update comment",
+    remove: "Remove",
+    emptyList: "No comments on this proof version yet.",
+    boundNote: "Bound to the selected proof version only — not a page or pixel location.",
+  },
+
   noCampaign: {
     title: "No campaign yet",
     body: "Start a campaign in Project Discovery to review concepts here.",
@@ -335,6 +375,7 @@ export function createEmptyFeedbackSession(
     voiceNotes: [],
     drawSections: [],
     highlights: [],
+    textComments: [],
     submittedAt: null,
   };
 }
