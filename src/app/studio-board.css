@@ -7839,3 +7839,109 @@ body:has(.sb--v4) {
     overflow: visible;
   }
 }
+
+/* REFUND-REQUEST-1 — customer refund intake (Studio Board; not checkout) */
+.sb-main > .sb-card--refund-request {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.sb-refund-request__lead,
+.sb-refund-request__policy,
+.sb-refund-request__help,
+.sb-refund-request__meta,
+.sb-refund-request__warning {
+  margin: 0.45rem 0 0;
+  font-size: var(--sb-type-sm);
+  line-height: 1.45;
+  color: var(--sb-ink, #2f3437);
+}
+
+.sb-refund-request__policy {
+  color: color-mix(in srgb, var(--sb-ink, #2f3437) 82%, transparent);
+}
+
+.sb-refund-request__help-link {
+  color: var(--sb-denim, #355c7d);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.sb-refund-request__warning {
+  padding: 0.55rem 0.65rem;
+  border-left: 3px solid var(--sb-coral, #d56b4d);
+  background: color-mix(in srgb, var(--sb-ivory, #f7f4ee) 88%, #fff 12%);
+}
+
+.sb-refund-request__form {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+}
+
+.sb-refund-request__label {
+  margin: 0.2rem 0 0;
+  font-size: var(--sb-type-sm);
+  font-weight: 600;
+  color: var(--sb-eucalyptus, #456b5a);
+}
+
+.sb-refund-request__select,
+.sb-refund-request__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--sb-denim, #355c7d) 28%, #ccc 72%);
+  border-radius: 0.35rem;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+  color: var(--sb-ink, #2f3437);
+  background: #fff;
+}
+
+.sb-refund-request__textarea:focus-visible,
+.sb-refund-request__select:focus-visible {
+  outline: 2px solid var(--sb-denim, #355c7d);
+  outline-offset: 2px;
+}
+
+.sb-refund-request__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.sb-refund-request__submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.sb-refund-request__status {
+  margin-top: 0.55rem;
+  min-height: 1.25rem;
+}
+
+.sb-refund-request__error {
+  margin: 0;
+  font-size: var(--sb-type-sm);
+  color: #8a1f1f;
+}
+
+.sb-refund-request__success {
+  margin: 0;
+  font-size: var(--sb-type-sm);
+  color: color-mix(in srgb, var(--sb-denim, #355c7d) 55%, #0a4 45%);
+}
+
+@media (max-width: 960px) {
+  .sb-main > .sb-card--refund-request {
+    margin-top: 0.85rem;
+  }
+
+  .sb-refund-request__footer {
+    justify-content: stretch;
+  }
+
+  .sb-refund-request__submit {
+    width: 100%;
+  }
+}
