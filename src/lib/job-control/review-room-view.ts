@@ -25,6 +25,10 @@ import {
   findLatestStudioReviewRelease,
 } from "./review-handoff-receipts";
 import {
+  projectCustomerUpdateHistory,
+  type CustomerUpdateHistoryItem,
+} from "./customer-update-history";
+import {
   canClientAccessJobReview,
   canClientViewJobReview,
   filterClientVisibleActivity,
@@ -54,6 +58,8 @@ export type ClientReviewView = {
   /** Prior locked packages for this job — immutable history. */
   lockedFeedbackPackages: readonly JobReviewFeedback[];
   activity: readonly JobActivityEvent[];
+  /** UPDATE-HISTORY-1 — customer-safe projection over authoritative job activity. */
+  updateHistory: readonly CustomerUpdateHistoryItem[];
   canRequestRevision: boolean;
   canApproveForDelivery: boolean;
   blockedReasons: readonly string[];
@@ -223,16 +229,19 @@ export function resolveClientReviewView(input: {
     deliverableCount: deliverables.length,
   });
 
-  const activity = filterClientVisibleActivity(
-    mergeActivityEvents(
-      envelope.jobActivityEvents,
-      deriveBaselineActivityEvents(
-        campaign,
-        [job],
-        [],
-        envelope.exceptionEvents,
-      ),
+  const mergedActivity = mergeActivityEvents(
+    envelope.jobActivityEvents,
+    deriveBaselineActivityEvents(
+      campaign,
+      [job],
+      [],
+      envelope.exceptionEvents,
     ),
+  );
+  const activity = filterClientVisibleActivity(mergedActivity, job.jobId);
+  /** UPDATE-HISTORY-1 — project from persisted job activity only (no synthetic baseline). */
+  const updateHistory = projectCustomerUpdateHistory(
+    envelope.jobActivityEvents ?? [],
     job.jobId,
   );
 
@@ -251,6 +260,7 @@ export function resolveClientReviewView(input: {
     feedback,
     lockedFeedbackPackages: lockedPackages,
     activity,
+    updateHistory,
     canRequestRevision: canRequestJobRevision({
       job,
       feedback,

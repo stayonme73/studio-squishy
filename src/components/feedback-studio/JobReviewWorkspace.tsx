@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import FeedbackStudioCorrectionAccounting from "@/components/feedback-studio/FeedbackStudioCorrectionAccounting";
 import FeedbackStudioFeedbackPanel from "@/components/feedback-studio/FeedbackStudioFeedbackPanel";
 import FeedbackStudioHandoffStatus from "@/components/feedback-studio/FeedbackStudioHandoffStatus";
+import FeedbackStudioUpdateHistory from "@/components/feedback-studio/FeedbackStudioUpdateHistory";
 import FeedbackStudioLockedPackageReceipt from "@/components/feedback-studio/FeedbackStudioLockedPackageReceipt";
 import FeedbackStudioRevisionStatus from "@/components/feedback-studio/FeedbackStudioRevisionStatus";
 import FeedbackStudioSubmissionReceipt from "@/components/feedback-studio/FeedbackStudioSubmissionReceipt";
@@ -442,6 +443,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
 
         <aside className="fs-review__rail" aria-label="Review status, tools, and project communication">
           <FeedbackStudioHandoffStatus review={review} />
+          <FeedbackStudioUpdateHistory items={review.updateHistory ?? []} />
           {submissionReceipt && !submitted ? (
             <FeedbackStudioSubmissionReceipt receipt={submissionReceipt} />
           ) : null}

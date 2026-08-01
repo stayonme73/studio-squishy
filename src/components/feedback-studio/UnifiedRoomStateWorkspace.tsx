@@ -1,6 +1,7 @@
 "use client";
 
 import DeliverablesScene from "@/components/deliverables/DeliverablesScene";
+import FeedbackStudioUpdateHistory from "@/components/feedback-studio/FeedbackStudioUpdateHistory";
 import UnifiedRoomFinalSummary from "@/components/feedback-studio/UnifiedRoomFinalSummary";
 import UnifiedRoomReviewToolsUnavailable from "@/components/feedback-studio/UnifiedRoomReviewToolsUnavailable";
 import StudioBoardProjectCommunicationSection from "@/components/studio-board/StudioBoardProjectCommunicationSection";
@@ -13,6 +14,7 @@ import {
 import { PROJECT_COMMUNICATION_CUSTOMER_V1 } from "@/config/project-communication-customer-v1";
 import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import { resolveFeedbackCampaignTitle } from "@/lib/feedback-studio-view";
+import { useJobReview } from "@/lib/use-job-review";
 
 type Props = {
   roomState: Extract<UnifiedRoomStateId, "final" | "delivery">;
@@ -24,6 +26,10 @@ type Props = {
 export default function UnifiedRoomStateWorkspace({ roomState, campaign, jobId }: Props) {
   const campaignTitle = resolveFeedbackCampaignTitle(campaign);
   const copy = roomState === "final" ? C8D_ROOM_STATE_COPY.final : C8D_ROOM_STATE_COPY.delivery;
+  const { review, loading: loadingHistory } = useJobReview(
+    campaign.campaignId,
+    jobId ?? null,
+  );
 
   return (
     <div
@@ -53,6 +59,14 @@ export default function UnifiedRoomStateWorkspace({ roomState, campaign, jobId }
             aria-label="Review tools and project communication"
           >
             <UnifiedRoomReviewToolsUnavailable roomState={roomState} />
+            {jobId ? (
+              <FeedbackStudioUpdateHistory
+                items={review?.updateHistory ?? []}
+                unavailable={!loadingHistory && !review}
+              />
+            ) : (
+              <FeedbackStudioUpdateHistory items={[]} />
+            )}
             <StudioBoardProjectCommunicationSection
               campaign={campaign}
               hasCampaign

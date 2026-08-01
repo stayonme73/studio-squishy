@@ -13,6 +13,8 @@ export function canClientAccessJobReview(job: {
 /**
  * C8b — read-only view of a locked submitted package after spine leaves ready_for_review.
  * Mutations still require `canClientAccessJobReview`.
+ * UPDATE-HISTORY-1 — also allows read-only view on delivery spines so Final / Delivery
+ * can show Update History without inventing a second access path.
  */
 export function canClientViewJobReview(
   job: {
@@ -22,10 +24,18 @@ export function canClientViewJobReview(
   feedback?: JobReviewFeedback | null,
 ): boolean {
   if (canClientAccessJobReview(job)) return true;
-  if (!feedback?.submittedAt) return false;
+  const readOnlySpines = new Set([
+    "revision_requested",
+    "ready_for_queue",
+    "approved",
+    "ready_for_delivery",
+    "delivered",
+  ]);
+  if (!readOnlySpines.has(job.spineStatus)) return false;
+  if (feedback?.submittedAt) return true;
   return (
-    job.spineStatus === "revision_requested" ||
-    job.spineStatus === "ready_for_queue" ||
+    job.spineStatus === "ready_for_delivery" ||
+    job.spineStatus === "delivered" ||
     job.spineStatus === "approved"
   );
 }

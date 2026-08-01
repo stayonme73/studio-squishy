@@ -122,6 +122,17 @@ export const feedbackStudio = {
     label: "Submission status",
   },
 
+  /** UPDATE-HISTORY-1 — customer-visible Update History (projection over job activity). */
+  updateHistory: {
+    label: "Update history",
+    empty:
+      "Updates appear here after The Studio records activity for this job.",
+    unavailable:
+      "Update history is not available for this job yet.",
+    actionRequiredLabel: "Action needed",
+    versionLabel: "Version",
+  },
+
   previewSections: {
     hero: "Hero",
     social: "Social post",
