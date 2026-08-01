@@ -10,9 +10,9 @@
 
 **Stand by. Verify the protected control point only. Do not begin a new package.**
 
-No new engineering package has been selected or authorized.
+**VERSION-COMPARE-1** is **defined** in governing docs. **Construction is not authorized.**
 
-Do not begin construction, modify files, or reopen sealed work.
+Do not begin product construction, modify product files, or reopen sealed work.
 
 ---
 
@@ -22,29 +22,34 @@ Project Alpha is resuming from the following protected state:
 
 | Field | Value |
 |---|---|
-| Protected tip | `68dc50ad9ab1023adb81f28566391ae192f43d88` |
+| Protected tip | `29397b36141d92082f1a73d9cf8656111d3f827f` |
 | Branch | `fix/discovery-responsive-layout` |
 | Expected sync | **0 ahead / 0 behind** |
 | Expected staging | **empty** |
 | Open construction package | **none** |
+| Defined next package | **VERSION-COMPARE-1** — docs defined · construction waits for separate authorization |
 | Customer-One readiness | **4 of 23** |
 
-### Recently sealed
+### Recently sealed / closed
 
+- **UPDATE-HISTORY-1** Customer Update History
+- **HIGHLIGHTER-COMPARE-INSPECT-1** complete / closed
 - **C8e** Lobby continuity
 - **VQ-C8E-HEADER-1** closed as **NOT REPRODUCED — NO PRODUCT CHANGE JUSTIFIED**
 - **ISSUE-ENTRY-1** customer problem reporting
-- **MLL-ISSUE-ENTRY-1** truth refresh
 
 ### Gate status
 
 **Gate #12** is **COMPLETE WITH LIMITS** and is **not** counted among the four fully complete gates.
 
-### Known open customer-facing work
+### Known open customer-facing work (room sequence)
 
-- Refund UI
-- Customer update history
-- Highlighter / version comparison
+1. VERSION-COMPARE-1 (defined; construction not authorized)
+2. HIGHLIGHTER-1
+3. Page Tabs / Text Comment
+4. Proof-rendering + prior cert limits
+5. UR-ROOM-CERT-1
+6. Only then Refund UI (Payment room)
 
 ---
 
@@ -54,7 +59,7 @@ Project Alpha is resuming from the following protected state:
 2. Local versus origin ahead/behind state
 3. Staging and working-tree state
 4. Whether any unrelated local work is present
-5. Whether the protected tip matches `68dc50ad9ab1023adb81f28566391ae192f43d88`
+5. Whether the protected tip matches `29397b36141d92082f1a73d9cf8656111d3f827f` (or the later tip after VERSION-COMPARE-1 definition seal)
 
 **If the repository does not match the protected state, stop and report the discrepancy without altering anything.**
 

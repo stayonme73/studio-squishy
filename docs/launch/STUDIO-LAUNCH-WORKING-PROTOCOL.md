@@ -83,11 +83,15 @@ Sequencing is **room by room**, not feature by feature.
 
 **Room-completion order (this room):**
 
-1. Customer Update History
-2. Highlighter / version comparison
-3. Any remaining launch-critical gaps discovered inside that same room
-4. Certify the room as complete with explicit limits
-5. Only then move to the Payment room for Refund UI
+1. Customer Update History — **SEALED** · UPDATE-HISTORY-1
+2. **VERSION-COMPARE-1** — truthful version navigation / side-by-side presentation (separate from Highlighter)
+3. **HIGHLIGHTER-1** — separate package; requires owner persistence decision before construction
+4. Page Tabs and Text Comment — assessment / construction
+5. Remaining proof-rendering depth and prior certification limits
+6. **UR-ROOM-CERT-1** — certify the room as complete with explicit limits
+7. Only then move to the Payment room for Refund UI
+
+Version Compare and Highlighter share this room sequence but **not** the same construction package. Finishing either (or both) does **not** by itself close the room while items 4–6 remain open.
 
 Inspections for a missing capability inside an active room must inspect that capability **as part of finishing the room** — including dependencies on other unresolved launch-critical room behavior — not as an isolated feature. Do **not** inspect or build Refund UI while this room is active.
 
