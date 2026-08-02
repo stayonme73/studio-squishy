@@ -17,16 +17,16 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | `c00f49964570cad2d8639e9c82a55aaa05d39909` — ROUTE-HYGIENE-1 sealed+pushed · **protected readiness still 4 / 12 / 16 of 23 until Gate #21 transfer+push** |
-| Branch | Integration `integrate/gate-21-route-honesty` · protected `fix/discovery-responsive-layout` |
-| Sync | Protected **0 ahead / 0 behind** @ `c00f499…` · staging empty · **107** porcelain WIP leave untouched · Gate #21 commits local on integration branch only |
-| Current active item | **None** — GATE-21 integration rebuild sealed on clean branch · await Tagia transfer/push |
+| Protected tip | `27b8b87b4e7018ce6f8eaa5b5820fcb44d4f25b2` — Gate #21 COMPLETE · readiness **5 / 12 / 17 of 23** |
+| Branch | Clean `cert/gate-2-service-promise-truth` · protected `fix/discovery-responsive-layout` |
+| Sync | Protected **0 ahead / 0 behind** @ `27b8b87…` · staging empty · **107** porcelain WIP leave untouched · Gate #2 work local on clean branch until commit/transfer |
+| Current active item | **None** — GATE-2-SERVICE-PROMISE-TRUTH-CERT-1 sealed on clean branch · await transfer/push |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
-| Most recently completed | GATE-21-ROUTE-HONESTY-CERT-1 integration rebuild — browser **43/0** · unit **15/15** · Gate **#21** → **COMPLETE** on integration branch · base `c00f499…` · prior ROUTE-HYGIENE-1 |
-| Next three priorities | 1) Transfer/push Gate #21 integration · 2) Materials dual UX (waiting) · 3) PAGE-TABS-1 deferred / remaining Hierarchy H partials |
-| Active blockers | Gate #21 sealed on integration branch but not yet on protected tip · full CR-5 route inventory hygiene still open · Materials dual UX waiting · PAGE-TABS-1 deferred · Project Claim not started |
+| Most recently completed | GATE-21-ROUTE-HONESTY-CERT-1 @ `27b8b87…` · Gate **#21 COMPLETE** |
+| Next three priorities | 1) Seal/push Gate #2 · 2) Materials dual UX (waiting) · 3) PAGE-TABS-1 deferred / remaining Hierarchy H partials |
+| Active blockers | Materials dual UX waiting · PAGE-TABS-1 deferred · Project Claim not started · full CR-5 route inventory hygiene open |
 | Decisions waiting | **1** — Materials dual UX (Board limit) |
-| Customer-One readiness | **Integration-branch after seal:** **5 fully complete** (#16, #18†, #20, #21, #22) · **12 complete with limits** · **17 of 23** · **5 partial** · **1 missing (#15)** · **Protected tip still displays 4 / 12 / 16 of 23 until transfer+push** · †#18 quirk retained |
+| Customer-One readiness | **Protected tip:** **5 fully complete** · **12 CWL** · **17 of 23** · **5 partial** · **1 missing (#15)** · **After Gate #2 transfer+push:** **6 / 12 / 18 of 23 · 4 partial** · †#18 quirk retained |
 | Last updated | 2026-08-02 |
 
 ---
@@ -79,6 +79,7 @@ Every completed item must show available evidence: commit hash · subject · tes
 
 ### Tagia Notes
 
+- **2026-08-02 — GATE-2-SERVICE-PROMISE-TRUTH-CERT-1 sealed on clean branch · BROWSER-CERTIFIED:** `cert/gate-2-service-promise-truth` · product `ddf77e8…` · browser **28 PASS / 0 FAIL** · focused unit **5/5** · related Board/Help/nav regressions green · desktop 1440 / phone 390 · production build not run (copy/config) · false ETA/production-state claims removed · fake recommendation + direct-annotate language corrected · absolute refund/fixed-delivery qualified · unsupported managed-execution promise removed · remaining disclosures are truthful limits · Gate **#2** → **COMPLETE** · proposed readiness **6 / 12 / 18 of 23** · protected tip stays `27b8b87…` / **5 / 12 / 17** until transfer+push · **107** WIP untouched. Evidence: `docs/launch/GATE-2-SERVICE-PROMISE-TRUTH-CERT-1.md`.
 - **2026-08-02 — GATE-21-ROUTE-HONESTY-CERT-1 integration rebuild sealed · BROWSER-CERTIFIED:** Clean worktree `integrate/gate-21-route-honesty` @ base `c00f499…` · reconciled with ROUTE-HYGIENE-1 (keep alt + Lobby wording + quarantine asserts; add Conversation Room eyebrow + scaffold non-advertise asserts) · browser **43 PASS / 0 FAIL** · unit **15/15** · Gate **#21** → **COMPLETE** on integration branch · readiness **5 / 12 / 17 of 23** after transfer+push · protected tip remains `c00f499…` / **4 / 12 / 16** until then · main **107** WIP untouched · no transfer/push yet. Evidence: `docs/launch/GATE-21-ROUTE-HONESTY-CERT-1.md`.
 - **2026-08-02 — ROUTE-HYGIENE-1 sealed and pushed:** Product `74a378e…` · docs `c00f499…` · narrow checkout quarantine + CR front door · Evidence: `docs/launch/ROUTE-HYGIENE-1.md`.
 - **2026-08-02 — ROUTE-HYGIENE-1 product committed (docs seal in progress):** Narrow checkout/quarantine shell only @ `74a378e7d632d78fae2c24278f6187803310a646` — `fix: align checkout quarantine and Conversation Room front door` · `/checkout` on quarantine list · checkout page → `activeCheckout` · payment shells aligned · Welcome Hall / Route Map recovery / route-chooser alt honesty · focused unit **6+8+9+4** · static smoke **21/21** · production build not run · full CR-5 route inventory hygiene **remains open** · Gate #21 still on clean `08f09f5` only · readiness stays **4 / 12 / 16 of 23** · **107** porcelain untouched · not pushed. Evidence: `docs/launch/ROUTE-HYGIENE-1.md`.
@@ -728,7 +729,7 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 | # | Gate | Status |
 |---|---|---|
 | 1 | Customer journey works from Lobby to final delivery | **COMPLETE WITH LIMITS** — CUSTOMER-ONE-E2E-CERT-1 · browser **53/0** · unit **40/40** · Lobby→CR→Payment→Intake→Account Handoff→Board→Review→Final→Delivery on desktop 1440 / phone 390 · product `d39165b…` · `docs/launch/CUSTOMER-ONE-E2E-CERT-1.md` · **Limits:** Project Claim not started · sandbox payment · post-Board honest production seed for Review/Final/Delivery · Discovery mid-spine seeded after Lobby+Voice · production build blocked by tip TS baseline · 360px outside package |
-| 2 | No false service promises | PARTIAL |
+| 2 | No false service promises | **COMPLETE** — GATE-2-SERVICE-PROMISE-TRUTH-CERT-1 · browser **28/0** · unit **5/5** · Board/Help/catalog/package promise corrections · `docs/launch/GATE-2-SERVICE-PROMISE-TRUTH-CERT-1.md` · **Protected tip bump awaits transfer+push** |
 | 3 | No recommendation engine pretending to be intelligent | **PARTIAL** — direction **DISCONTINUED** (Tagia 2026-07-26); CR-5 residual audit complete (`c69b669`); ARCHIVE-1 boundary parks discovery UI move until after Customer-One (`eaf3c239`); engine archive remains post–Customer-One |
 | 4 | Purchased routes are protected | **COMPLETE WITH LIMITS** — AUTH-GATE-1 `e7688ef` · `docs/launch/AUTH-GATE-1-PROJECT-RECORD-PAGE-AUTHENTICATION.md` · **8/8** focused Auth · Board · Project Record · Review · Delivery under session proxy · Project Claim / email hard-before-Board still separate · internal/dev tools outside spine |
 | 5 | Project data is protected | **COMPLETE WITH LIMITS** — campaign APIs session + ownership (401/403) · wrong-customer proof under AUTH-GATE-1 · ownership remains API-enforced by design · Project Claim still separate |
@@ -751,7 +752,7 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 | 22 | Production build passes | **COMPLETE** (verified during Launch Tracker / recent packages; CR-4 production build PASS) |
 | 23 | Full E2E testing passes | **COMPLETE WITH LIMITS** — CUSTOMER-ONE-E2E-CERT-1 · current CR-spine harness `scripts/cert-customer-one-e2e-1.mjs` · browser **53 PASS / 0 FAIL / 2 LIMIT** · focused unit **40/40** · **do not count** obsolete pre-CR Host / Route Map E2E scripts · **Limits:** same as Gate #1 (Project Claim · sandbox · production-seed · mid-spine seed · tip TS baseline / `next dev` cert · 360 outside) |
 
-**Customer-One readiness (dual headline):** **5 fully complete** (#16, #18†, #20, #21, #22) · **12 complete with limits** (#1, #4, #5, #7, #9, #10, #11, #12, #13, #17, #19, #23) · **17 of 23 materially delivered** · **5 partial** (#2, #3, #6, #8, #14) · **1 missing / not opened** (#15 deferred team phase). †Gate #18 remains counted among the five while labeled COMPLETE WITH LIMITS (retained quirk). Complete-with-limits means the customer-facing capability exists and has been tested with an explicitly documented bound — not unfinished vapor. Gate **#21** closed by GATE-21 integration rebuild (2026-08-02) on `integrate/gate-21-route-honesty`. **Protected tip `c00f499…` still reports 4 / 12 / 16 of 23 until transfer+push.** Do not treat “5 fully complete” alone as overall progress.
+**Customer-One readiness (dual headline):** **6 fully complete** (#2, #16, #18†, #20, #21, #22) · **12 complete with limits** (#1, #4, #5, #7, #9, #10, #11, #12, #13, #17, #19, #23) · **18 of 23 materially delivered** · **4 partial** (#3, #6, #8, #14) · **1 missing / not opened** (#15 deferred team phase). †Gate #18 remains counted among the six while labeled COMPLETE WITH LIMITS (retained quirk). Complete-with-limits means the customer-facing capability exists and has been tested with an explicitly documented bound — not unfinished vapor. Gate **#2** closed by GATE-2-SERVICE-PROMISE-TRUTH-CERT-1 (2026-08-02) on `cert/gate-2-service-promise-truth`. **Protected tip `27b8b87…` still reports 5 / 12 / 17 of 23 until Gate #2 transfer+push.** Do not treat “6 fully complete” alone as overall progress.
 
 ---
 
