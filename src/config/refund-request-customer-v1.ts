@@ -42,6 +42,10 @@ export const REFUND_REQUEST_CUSTOMER_V1 = {
   forbidden: "You do not have access to submit a refund request for this project.",
   jobNotFound: "That job could not be found for this project.",
 
+  statusLoading: "Loading refund request status…",
+  statusLoadFailed: "Could not load refund request status.",
+  statusHeading: "Current request status",
+
   helpCenterHint: "Read the Refund Policy in the Help Center for full eligibility details.",
   helpCenterHref: "/help-center",
 } as const;

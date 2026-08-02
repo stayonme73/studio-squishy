@@ -1,5 +1,8 @@
+import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
+import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
+import type { CampaignMaterialItem } from "@/lib/materials/types";
 
 import {
   buildRefundRequestSnapshot,
@@ -16,6 +19,28 @@ export type RefundRequestActionResult =
 
 function findJob(envelope: ServerTasksEnvelope, jobId: string): PurchasedJobRecord | undefined {
   return envelope.jobRecords?.find((entry) => entry.jobId === jobId);
+}
+
+/**
+ * Align refund-request job lookup with project-status / Board: jobs may be
+ * plan-synced even when not yet persisted on the tasks envelope.
+ */
+export function withSyncedJobRecordsForRefund(
+  envelope: ServerTasksEnvelope,
+  campaign: CampaignRecord,
+  materials: readonly CampaignMaterialItem[],
+): ServerTasksEnvelope {
+  const synced = syncJobRecordsFromCampaign(
+    campaign,
+    envelope.tasks ?? [],
+    materials,
+    envelope.exceptionRecords ?? [],
+    envelope.jobRecords,
+  );
+  return {
+    ...envelope,
+    jobRecords: synced,
+  };
 }
 
 function openRefundInteraction(
@@ -136,4 +161,18 @@ export function resolveRefundRequestInteractionOnOwnerDecision(
   resolutionNotes: string,
 ): ServerTasksEnvelope {
   return transitionRefundRequestInteraction(envelope, jobId, "resolved", resolutionNotes);
+}
+
+/** Latest refund_request interaction for a job — customer-safe status read. */
+export function findLatestRefundRequestForJob(
+  envelope: ServerTasksEnvelope | null,
+  jobId: string,
+): OwnerDecisionInteractionRecord | undefined {
+  const matches = (envelope?.ownerDecisionInteractions ?? []).filter(
+    (entry) => entry.interactionKind === "refund_request" && entry.jobId === jobId,
+  );
+  if (matches.length === 0) return undefined;
+  return matches.reduce((latest, entry) =>
+    entry.updatedAt.localeCompare(latest.updatedAt) >= 0 ? entry : latest,
+  );
 }

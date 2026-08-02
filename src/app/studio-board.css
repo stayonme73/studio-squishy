@@ -7920,6 +7920,30 @@ body:has(.sb--v4) {
   min-height: 1.25rem;
 }
 
+.sb-refund-request__persistent-status {
+  margin: 0.75rem 0 0.25rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--utility-ink, #1c1917) 14%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--utility-paper, #fff) 92%, #e8f0ec);
+}
+
+.sb-refund-request__status-heading {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--utility-ink, #1c1917) 72%, transparent);
+}
+
+.sb-refund-request__status-body {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--utility-ink, #1c1917);
+}
+
 .sb-refund-request__error {
   margin: 0;
   font-size: var(--sb-type-sm);

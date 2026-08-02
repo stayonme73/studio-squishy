@@ -12,6 +12,7 @@ import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 const requireSession = vi.fn();
 const readCampaignEnvelope = vi.fn();
 const getOrGenerateTasks = vi.fn();
+const getOrInitializeMaterials = vi.fn();
 const writeTasksEnvelope = vi.fn();
 
 vi.mock("@/lib/auth/require-session", () => ({
@@ -24,6 +25,9 @@ vi.mock("@/lib/campaign-store/store", () => ({
 vi.mock("@/lib/campaign-tasks/store", () => ({
   getOrGenerateTasks: (...args: unknown[]) => getOrGenerateTasks(...args),
   writeTasksEnvelope: (...args: unknown[]) => writeTasksEnvelope(...args),
+}));
+vi.mock("@/lib/materials/store", () => ({
+  getOrInitializeMaterials: (...args: unknown[]) => getOrInitializeMaterials(...args),
 }));
 
 async function importRoute() {
@@ -96,9 +100,108 @@ function postRequest(body: Record<string, unknown>) {
   );
 }
 
+function getRequest() {
+  return new Request(
+    `http://localhost/api/campaigns/${CAMPAIGN_ID}/jobs/${JOB_ID}/refund-request`,
+    {
+      method: "GET",
+      headers: { accept: "application/json" },
+    },
+  );
+}
+
+describe("GET /api/campaigns/[campaignId]/jobs/[jobId]/refund-request", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    getOrInitializeMaterials.mockResolvedValue({ items: [] });
+  });
+
+  it("rejects unauthorized clients without reading tasks", async () => {
+    requireSession.mockResolvedValue(client);
+    readCampaignEnvelope.mockResolvedValue({
+      ...campaignEnvelope,
+      campaignId: OTHER_CAMPAIGN_ID,
+      record: { ...campaignEnvelope.record, campaignId: OTHER_CAMPAIGN_ID },
+      clientUserId: "someone-else",
+    });
+
+    const { GET } = await importRoute();
+    const response = await GET(getRequest(), {
+      params: Promise.resolve({ campaignId: OTHER_CAMPAIGN_ID, jobId: JOB_ID }),
+    });
+
+    expect(response.status).toBe(403);
+    expect(getOrGenerateTasks).not.toHaveBeenCalled();
+    expect(writeTasksEnvelope).not.toHaveBeenCalled();
+  });
+
+  it("returns null refundRequest when none exists without writing via GET", async () => {
+    requireSession.mockResolvedValue(client);
+    readCampaignEnvelope.mockResolvedValue(campaignEnvelope);
+    getOrGenerateTasks.mockResolvedValue(tasksEnvelope(CAMPAIGN_ID));
+
+    const { GET } = await importRoute();
+    const response = await GET(getRequest(), {
+      params: Promise.resolve({ campaignId: CAMPAIGN_ID, jobId: JOB_ID }),
+    });
+    const body = (await response.json()) as {
+      ok: boolean;
+      refundRequest: null;
+    };
+
+    expect(response.status).toBe(200);
+    expect(body.ok).toBe(true);
+    expect(body.refundRequest).toBeNull();
+    expect(writeTasksEnvelope).not.toHaveBeenCalled();
+  });
+
+  it("returns customer-safe status without internal notes", async () => {
+    requireSession.mockResolvedValue(client);
+    readCampaignEnvelope.mockResolvedValue(campaignEnvelope);
+    getOrGenerateTasks.mockResolvedValue({
+      ...tasksEnvelope(CAMPAIGN_ID),
+      ownerDecisionInteractions: [
+        {
+          id: "interaction-refund-1",
+          campaignId: CAMPAIGN_ID,
+          jobId: JOB_ID,
+          interactionKind: "refund_request" as const,
+          status: "waiting_owner" as const,
+          clientMessage: "Need help",
+          createdAt: NOW,
+          updatedAt: NOW,
+          resolutionNotes: "Owner internal Stripe note",
+        },
+      ],
+    });
+
+    const { GET } = await importRoute();
+    const response = await GET(getRequest(), {
+      params: Promise.resolve({ campaignId: CAMPAIGN_ID, jobId: JOB_ID }),
+    });
+    const body = (await response.json()) as {
+      ok: boolean;
+      refundRequest: {
+        status: string;
+        statusLabel: string;
+        decisionOutcome: null;
+      };
+    };
+    const serialized = JSON.stringify(body);
+
+    expect(response.status).toBe(200);
+    expect(body.refundRequest.status).toBe("received");
+    expect(body.refundRequest.statusLabel).toMatch(/pending owner review/i);
+    expect(serialized).not.toContain("Stripe");
+    expect(serialized).not.toContain("Need help");
+    expect(writeTasksEnvelope).not.toHaveBeenCalled();
+  });
+});
+
 describe("POST /api/campaigns/[campaignId]/jobs/[jobId]/refund-request", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    getOrInitializeMaterials.mockResolvedValue({ items: [] });
     writeTasksEnvelope.mockImplementation(async (envelope: ServerTasksEnvelope) => envelope);
   });
 
