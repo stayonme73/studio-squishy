@@ -72,7 +72,10 @@ export const studioPolicies = {
           kind: "p",
           text: "We don't become your marketing department. We build the work you requested.",
         },
-        { kind: "p", text: "The Studio recommends individual services based on what you need." },
+        {
+          kind: "p",
+          text: "In the Conversation Room, The Studio suggests a starting route from what you shared. You choose the services to purchase.",
+        },
         { kind: "p", text: "You choose what to purchase, share Project Details, and review finished work in Review Room." },
         { kind: "p", text: "The Studio recommends." },
         { kind: "p", text: "You decide." },
@@ -258,7 +261,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "Use the Review Room to annotate, approve, or request revisions directly on your project.",
+            text: "Use the Review Room to open proofs via link, leave feedback, approve, or request revisions.",
           },
           {
             kind: "p",
@@ -545,7 +548,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "Use the Review Room to annotate, approve, or request revisions directly on your project.",
+            text: "Use the Review Room to open proofs via link, leave feedback, approve, or request revisions.",
           },
           {
             kind: "p",

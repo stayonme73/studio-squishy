@@ -166,8 +166,8 @@ function paymentDeliverableShortLabel(title: string): string {
 export function paymentTimelineLabel(packageId: StudioGuidePackageId): string {
   const pkg = getStudioGuideV1Package(packageId);
   if (!pkg) return "";
-  if (pkg.timeline.toLowerCase().includes("7 business days")) {
-    return "7 Business Days";
+  if (pkg.timeline.toLowerCase().includes("production starts")) {
+    return "After production starts";
   }
   return pkg.timeline;
 }

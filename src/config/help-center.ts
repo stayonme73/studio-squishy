@@ -94,7 +94,8 @@ export const helpCenter = {
       {
         id: "review-room",
         situation: "Review Room",
-        summary: "Annotate, approve, or request revisions directly on your project.",
+        summary:
+          "Open proofs via link, leave feedback, approve, or request revisions in the Review Room.",
         anchor: "policy-creative-room-policy",
         learnMoreLabel: "Review Room policy",
       },

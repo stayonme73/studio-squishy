@@ -848,7 +848,7 @@ const V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
     ],
     revisionRule: REVISION_MONTHLY,
     clientResponsibilities: [
-      "One connected client-owned social account for managed execution",
+      "Connected social-account access only if a publishing add-on is purchased",
       "Approved monthly offer/materials",
       "Timely approval",
     ],
