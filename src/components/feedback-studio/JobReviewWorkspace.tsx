@@ -90,7 +90,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
   useEffect(() => {
     setSession(jobReviewFeedbackToFeedbackSession(review));
     setFocusedSection((current) =>
-      visibleSectionIds.includes(current)
+      visibleSectionIds.some((id) => id === current)
         ? current
         : (visibleSectionIds[0] ?? "fallback:deliverable-0"),
     );
