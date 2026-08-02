@@ -10,14 +10,15 @@
 
 **Stand by. Verify the protected control point only. Do not begin a new package.**
 
-**REFUND-STATUS-INSPECT-1** is **defined** in governing docs. **Inspection is not authorized.**  
+**READINESS-RECONCILE-1** is **COMPLETE** (read-only). Scoreboard correction sealed in Master List + this handoff.  
+**REFUND-STATUS-INSPECT-1** is **defined** in governing docs. **Inspection is not authorized** until Tagia opens the Payment room bundle.  
 **REFUND-REQUEST-1** is **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `f60ee491…`. Do not reopen without contradictory evidence.  
 **REFUND-UI-INSPECT-1** is **COMPLETE · CLOSED**.  
 **UR-ROOM-CERT-1** is **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS**. Do not reopen without contradictory evidence.  
 **PAGE-TABS-1** remains **deferred**.  
 No status UI construction. No provider refund execution. No Board Materials. No project-wide Gate #17 claim.
 
-Do not begin the inspection, status UI construction, modify product files, call payment providers, or reopen sealed work.
+Do not begin Payment inspection/construction, modify product files, call payment providers, or reopen sealed work until authorized.
 
 ---
 
@@ -27,22 +28,24 @@ Project Alpha is resuming from the following protected state:
 
 | Field | Value |
 |---|---|
-| Protected tip | `b2941db1f1dbbe03580b3c6173aa2e79af0039fc` |
+| Protected tip | HEAD after scoreboard seal (verify git log -1 --oneline subject: correct Customer-One readiness scoreboard) · parent `b1f454da7d562b7b4ac11170718b0a4b972633a0` |
 | Branch | `fix/discovery-responsive-layout` |
 | Expected sync | **0 ahead / 0 behind** |
 | Expected staging | **empty** |
 | Open construction package | **none** |
 | Open inspection package | **none** |
 | Open certification package | **none** |
-| Defined next package | **REFUND-STATUS-INSPECT-1** — docs defined · inspection waits for separate authorization |
+| Defined next package | **Payment room bundle** (when authorized): refund-status inspection → build only if needed → Payment certification → **one** evidence-backed docs seal |
 | Deferred | **PAGE-TABS-1** — pending truthful page/location identity |
-| Customer-One readiness | **4 of 23** |
+| Customer-One readiness | **4 fully complete · 9 complete with limits · 13 of 23 materially delivered** · **8 partial · 2 missing / not opened** |
 | Unified room cert | **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · browser 98/98 · unit 32/32 |
 | Proof viewing (Customer-One) | Session-gated **link/list** — Choice A |
-| Active room sequence | **Payment room** — status-return-path inspection next |
+| Active room sequence | **Payment room** — waits room-bundle authorization |
 
 ### Recently sealed / closed
 
+- **READINESS-RECONCILE-1** — COMPLETE (read-only scoreboard reconcile)
+- **Scoreboard correction** — docs seal (Master List + this handoff only)
 - **REFUND-REQUEST-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `f60ee491…` (unit 18/18 · browser 10/10 · owner-review intake only)
 - **REFUND-UI-INSPECT-1** — COMPLETE · CLOSED (refund record/adjudicate exists; provider money movement absent)
 - **UR-ROOM-CERT-1** — SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS @ `e6be8bd…` seal docs
@@ -56,12 +59,16 @@ Project Alpha is resuming from the following protected state:
 
 ### Gate status
 
-**Gate #12** is **COMPLETE WITH LIMITS** and is **not** counted among the four fully complete gates.  
-**Gate #17** project-wide remains incomplete — Unified Room 360px requirement only was recorded as passed.
+**Fully complete (4):** #16, #18†, #20, #22.  
+**Complete with limits (9):** #4, #5, #7, #9, #10, #11, #12, **#13**, #19 — counted in **13 materially delivered**, not in the strict four.  
+**Gate #13** is **COMPLETE WITH LIMITS** (intake sealed; no money movement; status panel not inspected).  
+**Gate #9** tooling (Compare / Highlighter / Text Comment) is **sealed**; remaining review limits (Choice A, Pencil/Voice depth, PAGE-TABS-1 deferred) stay.  
+**Gate #17** project-wide remains incomplete — Unified Room 360px requirement only was recorded as passed.  
+†#18 counted among the four while labeled COMPLETE WITH LIMITS (retained quirk).
 
 ### Known open customer-facing work (sequence)
 
-1. REFUND-STATUS-INSPECT-1 (defined; inspection not authorized) → status readout only if evidence requires and supports it  
+1. Payment room bundle (when authorized) — no separate definition parade  
 2. PAGE-TABS-1 (deferred)  
 3. Materials dual UX (Board — waiting)
 
@@ -73,7 +80,7 @@ Project Alpha is resuming from the following protected state:
 2. Local versus origin ahead/behind state  
 3. Staging and working-tree state  
 4. Whether any unrelated local work is present  
-5. Whether the protected tip matches `b2941db1f1dbbe03580b3c6173aa2e79af0039fc` (or the later tip after REFUND-STATUS-INSPECT-1 definition seal)
+5. Whether HEAD matches `f34258214e437debeeaafcd91c4e35dbc5352604` (or later authorized tip)
 
 **If the repository does not match the protected state, stop and report the discrepancy without altering anything.**
 
@@ -86,6 +93,7 @@ After verification, remain on standby for the next authorized package.
 - Inspect before rewriting.  
 - Prefer small changes over large refactors.  
 - Make one functional package at a time.  
+- Prefer **room bundles** and **one evidence-backed docs seal** over seven-document micro-ceremonies.  
 - Do not perform unrelated cleanup.  
 - Preserve working behavior.  
 - Do not reopen sealed work without evidence.  
