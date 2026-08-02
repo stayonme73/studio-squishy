@@ -41,6 +41,7 @@ export const LEGACY_QUARANTINED_ROUTES = [
   "/project-summary",
   "/studio-plan-review",
   "/discovery-summary",
+  "/checkout",
   "/payment",
   "/project-details",
   "/studio-guide",

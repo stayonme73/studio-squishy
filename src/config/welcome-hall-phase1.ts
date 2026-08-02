@@ -1,7 +1,7 @@
 /**
  * Welcome Hall Phase 1 — Studio Lobby (Room 1).
  * 🔒 LOBBY LOCKED · CLOSED — Tagia 2026-07-17 · docs/studio-lobby-v1-locked.md
- * No redesign. Next: Route Map.
+ * No redesign. Next: Conversation Room.
  */
 
 import { helpCenterAnchor } from "@/config/help-center";
@@ -13,8 +13,8 @@ export const welcomeHallPhase1 = {
   journey: ["welcome-hall", "kiosk", "draft-room"] as const,
 
   cta: {
-  /** Primary — entire kiosk routes to Studio Route Map. */
-  kioskLabel: "Let's get started — choose your route on the Studio Route Map.",
+  /** Primary — entire kiosk routes to Studio Conversation Room. */
+  kioskLabel: "Let's get started — open the Studio Conversation Room.",
     kioskHeadline: "LET'S GET STARTED",
     kioskScreenLabel: "HOW CAN WE HELP?",
   },
@@ -56,7 +56,7 @@ export const welcomeHallPhase1 = {
     ],
   },
 
-  /** Welcome Hall kiosk → Studio Route Map V1 front door. */
+  /** Welcome Hall kiosk -> Studio Conversation Room front door. */
   routeToRouteMap: "/studio-conversation-room",
   /** @deprecated use routeToRouteMap — legacy discovery direct link preserved for deep links */
   routeToBusinessDiscoveryStudio: "/studio-conversation-room",

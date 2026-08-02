@@ -1,5 +1,5 @@
 /**
- * Secure Checkout — active `/payment` scene.
+ * Secure Checkout legacy export. Certified customer payment lives in Conversation Room.
  * @see src/components/payment/SecureCheckoutPageScene.tsx
  * @see src/archive/payment/CompleteYourOrderCheckoutScene.tsx
  * @see src/components/payment/SecureCheckoutGrid.tsx

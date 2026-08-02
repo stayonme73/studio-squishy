@@ -260,8 +260,8 @@ export default function RouteMapScene() {
         else {
           setIntakeGate({
             kind: "missing-plan",
-            recoveryHref: studioBoard.routes.newCampaign,
-            recoveryLabel: "Return to Route Map",
+            recoveryHref: customerJourneyStepRoute("studio-guide"),
+            recoveryLabel: "Return to Conversation Room",
           });
         }
         return false;

@@ -3,19 +3,38 @@ import { describe, expect, it } from "vitest";
 import { customerJourneyStepRoute } from "@/config/customer-journey-v1";
 import { campaignJourneyMap } from "@/config/campaign-journey-map";
 import { deliverables } from "@/config/deliverables";
+import {
+  LEGACY_QUARANTINED_ROUTES,
+  legacyRouteQuarantineV1,
+} from "@/config/legacy-route-quarantine-v1";
 import { studioBoard, studioBoardDraftRoomHref } from "@/config/studio-board";
 import { utilityShell } from "@/config/utility-shell";
 import { welcomeHallPhase1 } from "@/config/welcome-hall-phase1";
 
 describe("navigation cleanup v1", () => {
-  it("routes New Campaign directly to Route Map", () => {
-    expect(studioBoard.routes.newCampaign).toBe("/route-map");
-    expect(studioBoardDraftRoomHref()).toBe("/route-map");
+  it("routes New Campaign directly to the Conversation Room", () => {
+    expect(studioBoard.routes.newCampaign).toBe(legacyRouteQuarantineV1.activeFrontDoor);
+    expect(studioBoardDraftRoomHref()).toBe(legacyRouteQuarantineV1.activeFrontDoor);
   });
 
-  it("routes lobby kiosk to Route Map", () => {
-    expect(welcomeHallPhase1.routeToRouteMap).toBe("/route-map");
-    expect(welcomeHallPhase1.routeToBusinessDiscoveryStudio).toBe("/route-map");
+  it("routes lobby kiosk to the Conversation Room", () => {
+    expect(welcomeHallPhase1.routeToRouteMap).toBe(legacyRouteQuarantineV1.activeFrontDoor);
+    expect(welcomeHallPhase1.routeToBusinessDiscoveryStudio).toBe(
+      legacyRouteQuarantineV1.activeFrontDoor,
+    );
+  });
+
+  it("quarantines old payment and intake doors", () => {
+    expect(legacyRouteQuarantineV1.activeCheckout).toBe(
+      "/studio-conversation-room?stage=checkout",
+    );
+    expect(legacyRouteQuarantineV1.activeIntake).toBe(
+      "/studio-conversation-room?stage=intake",
+    );
+    expect(LEGACY_QUARANTINED_ROUTES).toContain("/checkout");
+    expect(LEGACY_QUARANTINED_ROUTES).toContain("/payment");
+    expect(LEGACY_QUARANTINED_ROUTES).toContain("/draft-room");
+    expect(LEGACY_QUARANTINED_ROUTES).toContain("/intake");
   });
 
   it("limits utility subnav to approved client items", () => {

@@ -136,7 +136,7 @@ export default function ConversationRouteChoose({
       <figure className={styles.mapFigure}>
         <img
           src="/route-map/studio-route-map-hero-v2.png"
-          alt="Studio Route Map showing a city skyline, highway interchange, and four Studio route options."
+          alt="Studio route chooser showing a city skyline, highway interchange, and four route options."
           className={styles.mapHeroImg}
         />
       </figure>
