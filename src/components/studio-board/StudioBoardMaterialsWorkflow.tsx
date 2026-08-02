@@ -383,6 +383,7 @@ function StudioBoardMaterialsWorkflowActive({
   onMaterialsFactsChange?: (facts: {
     blockingRequiredCount: number;
     stillNeededLabels: readonly string[];
+    receivedLabels: readonly string[];
   }) => void;
   movedToProduction?: boolean;
 }) {
@@ -544,12 +545,18 @@ function StudioBoardMaterialsWorkflowActive({
     ],
   );
 
+  const receivedLabels = useMemo(
+    () => receivedMaterials.map((item) => item.label),
+    [receivedMaterials],
+  );
+
   useEffect(() => {
     onMaterialsFactsChange?.({
       blockingRequiredCount,
       stillNeededLabels,
+      receivedLabels,
     });
-  }, [blockingRequiredCount, stillNeededLabels, onMaterialsFactsChange]);
+  }, [blockingRequiredCount, stillNeededLabels, receivedLabels, onMaterialsFactsChange]);
 
   const activeCard = actionCards.find(
     (card) => card.id === CAMPAIGN_MESSAGE_CARD_ID && card.id === activeCardId && card.request,
@@ -880,6 +887,7 @@ export default function StudioBoardMaterialsWorkflow({
   onMaterialsFactsChange?: (facts: {
     blockingRequiredCount: number;
     stillNeededLabels: readonly string[];
+    receivedLabels: readonly string[];
   }) => void;
   movedToProduction?: boolean;
 }) {

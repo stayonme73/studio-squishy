@@ -4928,6 +4928,63 @@ body:has(.sb--v4) {
   color: var(--sb-text-muted);
 }
 
+.sb-visibility-continuity {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0 0 0.85rem;
+  padding: 0.7rem 0.75rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--sb-walnut) 16%, transparent);
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, var(--sb-paper) 88%, var(--sb-walnut) 4%);
+}
+
+.sb-visibility-continuity__heading {
+  margin: 0;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sb-walnut);
+}
+
+.sb-visibility-continuity__list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.sb-visibility-continuity__row {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.sb-visibility-continuity__row dt {
+  margin: 0;
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sb-text-muted);
+}
+
+.sb-visibility-continuity__row dd {
+  margin: 0;
+  font-size: var(--sb-type-sm);
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--sb-text);
+  overflow-wrap: anywhere;
+}
+
+.sb-visibility-continuity__notes {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.sb-visibility-continuity__notes li {
+  margin: 0.15rem 0;
+}
+
 .sb-studio-note-panel {
   display: flex;
   flex: 1;

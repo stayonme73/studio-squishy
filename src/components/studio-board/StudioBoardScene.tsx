@@ -8,6 +8,7 @@ import CampaignBriefActions from "@/components/campaign-details/CampaignBriefAct
 import CampaignNextAction from "@/components/studio-board/CampaignNextAction";
 import CampaignProgressPanel from "@/components/studio-board/CampaignProgressPanel";
 import CampaignRecordDrawer from "@/components/studio-board/CampaignRecordDrawer";
+import CustomerVisibilityContinuityPanel from "@/components/studio-board/CustomerVisibilityContinuityPanel";
 import RouteMapProductionBriefDrawer from "@/components/route-map/RouteMapProductionBriefDrawer";
 import StudioBoardMaterialsWorkflow from "@/components/studio-board/StudioBoardMaterialsWorkflow";
 import StudioBoardProjectCommunicationSection from "@/components/studio-board/StudioBoardProjectCommunicationSection";
@@ -20,6 +21,8 @@ import CustomerSignOutButton from "@/components/auth/CustomerSignOutButton";
 import { helpCenter } from "@/config/help-center";
 import { studioBoard, studioBoardDraftRoomHref, studioBoardStudioGuideHref } from "@/config/studio-board";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import { resolveCustomerVisibilityContinuityView } from "@/lib/customer-visibility-continuity";
+import type { CustomerJobStatusSummary } from "@/lib/project-record-status";
 import {
   greetingPeriodFromDate,
   resolveAccountPackageView,
@@ -188,12 +191,14 @@ export default function StudioBoardScene() {
     ready && (accessState === "no-active-project" || !boardCampaign);
   const loadingCopy = emptyCopy.loading;
   const [movedToProduction, setMovedToProduction] = useState(false);
+  const [customerJobs, setCustomerJobs] = useState<readonly CustomerJobStatusSummary[]>([]);
   /** Session greeting — independent of campaign claim/load. */
   const [customerDisplayName, setCustomerDisplayName] = useState<string | null>(null);
   const [sessionGreetingResolved, setSessionGreetingResolved] = useState(false);
   const [materialsFacts, setMaterialsFacts] = useState<{
     blockingRequiredCount: number;
     stillNeededLabels: readonly string[];
+    receivedLabels: readonly string[];
   } | null>(null);
 
   useEffect(() => {
@@ -226,6 +231,7 @@ export default function StudioBoardScene() {
   useEffect(() => {
     if (!boardCampaign?.campaignId || !boardCampaign.paymentReceivedAt) {
       setMovedToProduction(false);
+      setCustomerJobs([]);
       return;
     }
 
@@ -234,13 +240,18 @@ export default function StudioBoardScene() {
       .then(async (response) => {
         if (!response.ok) return;
         const payload = (await response.json()) as {
-          jobs?: ReadonlyArray<{ hasProductionStarted?: boolean }>;
+          jobs?: ReadonlyArray<CustomerJobStatusSummary & { hasProductionStarted?: boolean }>;
         };
         if (cancelled) return;
-        setMovedToProduction(Boolean(payload.jobs?.some((job) => job.hasProductionStarted)));
+        const jobs = payload.jobs ?? [];
+        setCustomerJobs(jobs);
+        setMovedToProduction(Boolean(jobs.some((job) => job.hasProductionStarted)));
       })
       .catch(() => {
-        if (!cancelled) setMovedToProduction(false);
+        if (!cancelled) {
+          setMovedToProduction(false);
+          setCustomerJobs([]);
+        }
       });
 
     return () => {
@@ -267,19 +278,26 @@ export default function StudioBoardScene() {
   ]);
 
   const handleMaterialsFactsChange = useCallback(
-    (facts: { blockingRequiredCount: number; stillNeededLabels: readonly string[] }) => {
+    (facts: {
+      blockingRequiredCount: number;
+      stillNeededLabels: readonly string[];
+      receivedLabels?: readonly string[];
+    }) => {
       setMaterialsFacts((previous) => {
         const nextLabels = [...facts.stillNeededLabels];
+        const nextReceived = [...(facts.receivedLabels ?? [])];
         if (
           previous &&
           previous.blockingRequiredCount === facts.blockingRequiredCount &&
-          previous.stillNeededLabels.join("\0") === nextLabels.join("\0")
+          previous.stillNeededLabels.join("\0") === nextLabels.join("\0") &&
+          previous.receivedLabels.join("\0") === nextReceived.join("\0")
         ) {
           return previous;
         }
         return {
           blockingRequiredCount: facts.blockingRequiredCount,
           stillNeededLabels: nextLabels,
+          receivedLabels: nextReceived,
         };
       });
     },
@@ -289,6 +307,17 @@ export default function StudioBoardScene() {
   const view = useMemo(
     () => resolveStudioBoardView(boardCampaign, displayFacts),
     [boardCampaign, displayFacts],
+  );
+  const visibilityView = useMemo(
+    () =>
+      resolveCustomerVisibilityContinuityView({
+        campaign: boardCampaign,
+        displayFacts,
+        materialsFacts,
+        headerSnapshot: view.headerSnapshot,
+        jobs: customerJobs,
+      }),
+    [boardCampaign, customerJobs, displayFacts, materialsFacts, view.headerSnapshot],
   );
   const account = useMemo(() => resolveAccountPackageView(boardCampaign), [boardCampaign]);
 
@@ -454,6 +483,10 @@ export default function StudioBoardScene() {
                       ? view.campaignTitle
                       : emptyCopy.campaignNamePlaceholder}
                   </h2>
+
+                  {view.hasCampaign || showNoActiveProject ? (
+                    <CustomerVisibilityContinuityPanel view={visibilityView} />
+                  ) : null}
 
                   {view.hasCampaign ? (
                     <CampaignNextAction
