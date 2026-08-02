@@ -17,16 +17,16 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | Local cert tip (Gate #15 transferred) · origin still `f9c34cf…` until push |
+| Protected tip | `db5c731283fc55fb4b20c2d2cffdfb628853adad` — **Customer-One Launch Certification OFFICIALLY COMPLETE** |
 | Branch | `fix/discovery-responsive-layout` |
-| Sync | **ahead 2** / 0 behind · staging empty · main porcelain WIP leave untouched · **await push** |
-| Current active item | **None** — Gate #15 on protected branch · Customer-One Launch Certification complete locally · await push then Gold Master |
+| Sync | **0 ahead / 0 behind** · staging empty · porcelain WIP leave untouched |
+| Current active item | **None** — Gold Master snapshot authored locally · await docs commit/push · then park |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
-| Most recently completed | GATE-15-TEAM-OWNERSHIP-CERT-1 transferred · Gate **#15 COMPLETE WITH LIMITS** · product `f8f132c…` · cert tip on branch |
-| Next three priorities | 1) Push Gate #15 · 2) Launch Certification Snapshot (Gold Master) · 3) Park |
+| Most recently completed | Gate #15 pushed · **23 of 23** · Gold Master draft: `docs/launch/CUSTOMER-ONE-LAUNCH-CERTIFICATION-SNAPSHOT.md` |
+| Next three priorities | 1) Commit/push Gold Master · 2) Park · 3) Next chapter only by new authorization |
 | Active blockers | Materials dual UX waiting · PAGE-TABS-1 deferred · Project Claim not started · full CR-5 route inventory hygiene open |
 | Decisions waiting | **1** — Materials dual UX (Board limit) |
-| Customer-One readiness | **Local protected branch:** **10 / 13 / 23 of 23 · 0 partial · 0 missing** · **Official after push** · †#18 quirk retained |
+| Customer-One readiness | **10 / 13 / 23 of 23 · 0 partial · 0 missing** · **OFFICIALLY COMPLETE** · †#18 quirk retained |
 | Last updated | 2026-08-02 |
 
 ---
@@ -79,7 +79,8 @@ Every completed item must show available evidence: commit hash · subject · tes
 
 ### Tagia Notes
 
-- **2026-08-02 — GATE-15 transferred to protected branch · await push:** Product `f8f132c…` · cert tip on branch · Gate **#15 COMPLETE WITH LIMITS** · local readiness **10 / 13 / 23 of 23 · 0 missing** · Customer-One Launch Certification complete on branch · **not pushed** · Voice/main porcelain untouched. Evidence: `docs/launch/GATE-15-TEAM-OWNERSHIP-CERT-1.md`.
+- **2026-08-02 — Customer-One Launch Certification OFFICIALLY COMPLETE:** Protected tip `db5c731…` · **10 / 13 / 23 of 23 · 0 missing** · Gate #15 pushed · Gold Master snapshot authored (`docs/launch/CUSTOMER-ONE-LAUNCH-CERTIFICATION-SNAPSHOT.md` · `docs/launch/SCOUT-SUITCASE-CUSTOMER-ONE-GOLD-MASTER.md`) · await Gold Master docs commit/push · then park · no V1.1 / Customer Two / Taylor Brands until new chapter authorization.
+- **2026-08-02 — GATE-15 pushed:** Product `f8f132c…` · cert `db5c731…` · Gate **#15 COMPLETE WITH LIMITS**. Evidence: `docs/launch/GATE-15-TEAM-OWNERSHIP-CERT-1.md`.
 - **2026-08-02 — GATE-15-TEAM-OWNERSHIP-CERT-1 sealed on clean branch · BROWSER-CERTIFIED WITH LIMITS:** `cert/gate-15-team-ownership` @ base `f9c34cf…` · browser **24 PASS / 0 FAIL / 1 LIMIT** · unit **34/34** · Gate **#15** → **COMPLETE WITH LIMITS**. Evidence: `docs/launch/GATE-15-TEAM-OWNERSHIP-CERT-1.md`.
 - **2026-08-02 — GATE-2-SERVICE-PROMISE-TRUTH-CERT-1 sealed on clean branch · BROWSER-CERTIFIED:** `cert/gate-2-service-promise-truth` · product `ddf77e8…` · browser **28 PASS / 0 FAIL** · focused unit **5/5** · related Board/Help/nav regressions green · desktop 1440 / phone 390 · production build not run (copy/config) · false ETA/production-state claims removed · fake recommendation + direct-annotate language corrected · absolute refund/fixed-delivery qualified · unsupported managed-execution promise removed · remaining disclosures are truthful limits · Gate **#2** → **COMPLETE** · proposed readiness **6 / 12 / 18 of 23** · protected tip stays `27b8b87…` / **5 / 12 / 17** until transfer+push · **107** WIP untouched. Evidence: `docs/launch/GATE-2-SERVICE-PROMISE-TRUTH-CERT-1.md`.
 - **2026-08-02 — GATE-21-ROUTE-HONESTY-CERT-1 integration rebuild sealed · BROWSER-CERTIFIED:** Clean worktree `integrate/gate-21-route-honesty` @ base `c00f499…` · reconciled with ROUTE-HYGIENE-1 (keep alt + Lobby wording + quarantine asserts; add Conversation Room eyebrow + scaffold non-advertise asserts) · browser **43 PASS / 0 FAIL** · unit **15/15** · Gate **#21** → **COMPLETE** on integration branch · readiness **5 / 12 / 17 of 23** after transfer+push · protected tip remains `c00f499…` / **4 / 12 / 16** until then · main **107** WIP untouched · no transfer/push yet. Evidence: `docs/launch/GATE-21-ROUTE-HONESTY-CERT-1.md`.
@@ -744,7 +745,7 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 | 12 | Customer can report an issue | **COMPLETE WITH LIMITS** — ISSUE-ENTRY-1 `727c8311cf90184067d353fcd9f913bc48a597eb` — `feat: add customer problem reporting to project communication` · focused Vitest **50/50 PASS** · browser certification **116/116 PASS** (`scripts/smoke-issue-entry-1.mjs`) · Ask a question / Report a problem choice in the shared Project Communication composer across Board · Review · Final · Delivery · problem reports use existing complaint + `OwnerDecisionInteractionRecord` authority, tied to authorized customer and project/job context · **Limits:** system-receipt confirmation only — no human-review/assignment/escalation/investigation/response-deadline claim; customer-visible statuses limited to Received / Additional information requested / Closed; no ticketing platform, ticket numbers, departments, agents, priorities, or SLAs; not counted toward the numbered complete total (#9/#10/#11 pattern) |
 | 13 | Customer can request a refund | **COMPLETE WITH LIMITS** — intake REFUND-REQUEST-1 `f60ee491…` · status return path product `0555c580f7cfd6968c02313dd316f484e78750be` · REFUND-STATUS-INSPECT-1 **COMPLETE · CLOSED** · unit **25/25** · regression **11/11** · browser **14/14** (desktop + 390) · Studio Board **REFUND REQUEST** card with persistent customer-safe status · `GET/POST …/refund-request` · statuses: received/pending review · additional information requested · approved for job (no money-returned claim) · not approved · unavailable/blocked · REFUND-UI-INSPECT-1 **COMPLETE · CLOSED** · **Limits:** **no** provider execution · **no** money movement/money-returned confirmation · **no** amounts/partials · **no** settlement/bank timeline · **no** provider refs · **no** automatic approval · **no** refund history · not counted in fully-complete total |
 | 14 | Deadlines and risks are visible | **COMPLETE** — CUSTOMER-VISIBILITY-CONTINUITY-CERT-1 · authoritative `targetCompletionDate` or truthful not-set/checkpoint · real blockers or honest none-recorded · no invented ETA · browser **90/0** · predictive risk intelligence is beyond the published gate · awaits transfer+push |
-| 15 | Team ownership is visible internally | **COMPLETE WITH LIMITS** (on protected branch · await push) — product `f8f132c…` · cert tip · File Room Responsible role + Unclaimed/Claimed by · browser **24/0/1** · unit **34/34** · limits: trays · cross-campaign dashboards · SLA/tickets · second ledger · job-level named-owner · `docs/launch/GATE-15-TEAM-OWNERSHIP-CERT-1.md` |
+| 15 | Team ownership is visible internally | **COMPLETE WITH LIMITS** @ `db5c731…` — product `f8f132c…` · File Room Responsible role + Unclaimed/Claimed by · browser **24/0/1** · unit **34/34** · limits: trays · cross-campaign dashboards · SLA/tickets · second ledger · job-level named-owner · `docs/launch/GATE-15-TEAM-OWNERSHIP-CERT-1.md` |
 | 16 | Final files are truthful | **COMPLETE** (HFF 67/67) — purchased-room access gate closed under #4 @ `e7688ef` · C8d embeds Honest Final Files in the unified room @ `956f4d8` without changing HFF release-rule authority |
 | 17 | Mobile and desktop are certified | **COMPLETE WITH LIMITS** — CUSTOMER-ONE-E2E-CERT-1 journey certified desktop **1440** / phone **390** · `docs/launch/CUSTOMER-ONE-E2E-CERT-1.md` · **Limits:** 360px and broader all-surface certification remain outside this package · not every ancillary surface re-certified here |
 | 18 | Voice behavior is defined and implemented where required | **COMPLETE WITH LIMITS** — Voice = Studio Representative communication system; no Host; Lobby silent; CR asks preference before first speech; Voice On/Off certified in CR-4 (`79ed2ce`); doctrine protected (`docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md`); **audible Voice quality remains non-blocking deferred** (not certified) |
@@ -754,7 +755,7 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 | 22 | Production build passes | **COMPLETE** (verified during Launch Tracker / recent packages; CR-4 production build PASS) |
 | 23 | Full E2E testing passes | **COMPLETE WITH LIMITS** — CUSTOMER-ONE-E2E-CERT-1 · current CR-spine harness `scripts/cert-customer-one-e2e-1.mjs` · browser **53 PASS / 0 FAIL / 2 LIMIT** · focused unit **40/40** · **do not count** obsolete pre-CR Host / Route Map E2E scripts · **Limits:** same as Gate #1 (Project Claim · sandbox · production-seed · mid-spine seed · tip TS baseline / `next dev` cert · 360 outside) |
 
-**Customer-One readiness (dual headline):** **10 fully complete** (#2, #3, #6, #8, #14, #16, #18†, #20, #21, #22) · **13 complete with limits** (#1, #4, #5, #7, #9, #10, #11, #12, #13, **#15**, #17, #19, #23) · **23 of 23 materially delivered** · **0 partial** · **0 missing**. †Gate #18 remains counted among the fully-complete set while labeled COMPLETE WITH LIMITS (retained quirk). Gate **#15 COMPLETE WITH LIMITS** on protected branch (GATE-15-TEAM-OWNERSHIP-CERT-1) — product `f8f132c…` · cert tip. **Customer-One Launch Certification complete on the protected branch — official after push** (origin still `f9c34cf…` until then).
+**Customer-One readiness (dual headline):** **10 fully complete** (#2, #3, #6, #8, #14, #16, #18†, #20, #21, #22) · **13 complete with limits** (#1, #4, #5, #7, #9, #10, #11, #12, #13, **#15**, #17, #19, #23) · **23 of 23 materially delivered** · **0 partial** · **0 missing**. †Gate #18 remains counted among the fully-complete set while labeled COMPLETE WITH LIMITS (retained quirk). Gate **#15 COMPLETE WITH LIMITS** @ tip `db5c731…` (GATE-15-TEAM-OWNERSHIP-CERT-1). **Customer-One Launch Certification OFFICIALLY COMPLETE.** Gold Master: `docs/launch/CUSTOMER-ONE-LAUNCH-CERTIFICATION-SNAPSHOT.md`.
 
 ---
 
@@ -901,4 +902,4 @@ Do **not** clean, restore, stage, commit, absorb, or rewrite without an approved
 
 ---
 
-**Document status:** GATE-15 transferred (2026-08-02) · local cert tip · Gate **#15 COMPLETE WITH LIMITS** · **10 / 13 / 23 of 23** on protected branch · **await push** · Payment/refund remains sealed with limits.
+**Document status:** Customer-One Launch Certification OFFICIALLY COMPLETE (2026-08-02) @ `db5c731…` · **10 / 13 / 23 of 23** · Gold Master snapshot authored · await docs commit/push · then park.
