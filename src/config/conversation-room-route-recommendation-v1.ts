@@ -1,6 +1,7 @@
 /**
- * Conversation Room — project-need → route recommendation (Guidance Pass v1).
- * Voice recommends; the customer confirms. Never auto-commit a route.
+ * Conversation Room — project-need → suggested starting route (Guidance Pass v1).
+ * Keyword match only — not an intelligent recommendation engine.
+ * The customer confirms. Never auto-commit a route.
  *
  * @see docs/studio-voice-guidance-map-v1.md
  * @see src/config/conversation-room-guide-v1.ts
@@ -12,7 +13,7 @@ import type { RouteMapRoadId } from "@/config/route-map-v1";
 export type RecommendedRouteId = Exclude<RouteMapRoadId, "i285">;
 
 /**
- * Map opening “project need” bubbles (and close free-text) to a recommended road.
+ * Map opening “project need” bubbles (and close free-text) to a suggested starting road.
  * Empty / unknown → null (Voice asks the customer to choose without a highlight).
  */
 export function recommendRouteFromProjectNeed(

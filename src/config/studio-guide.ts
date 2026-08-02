@@ -14,7 +14,8 @@ export const studioGuide = {
 
   helpCard: {
     title: "NEED HELP CHOOSING?",
-    description: "Answer a few questions and we'll recommend the best path for your business.",
+    description:
+      "Answer a few questions and we'll suggest a starting package based on your answers. You can choose a different package anytime.",
     cta: "HELP ME CHOOSE",
   },
 
@@ -24,7 +25,7 @@ export const studioGuide = {
   },
 
   questionnaire: {
-    resultPrefix: "WE RECOMMEND:",
+    resultPrefix: "SUGGESTED STARTING POINT:",
     questions: [
       {
         id: "firstCampaign",

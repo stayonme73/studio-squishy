@@ -138,8 +138,8 @@ export default function DiscoveryPresentationView({
 
       {discovery.discoveryComplete ? (
         <p className={styles.complete}>
-          Discovery is complete. You can still correct any answer before we
-          recommend a route.
+          Discovery is complete. You can still correct any answer before you
+          choose a starting route.
         </p>
       ) : null}
     </section>

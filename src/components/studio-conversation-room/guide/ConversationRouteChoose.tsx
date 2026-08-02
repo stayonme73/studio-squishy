@@ -18,7 +18,7 @@ export type ConversationRouteChooseProps = {
   compact?: boolean;
   /** Pending / highlighted lane (customer has not confirmed yet). */
   previewRoadId?: RouteMapRoadId | null;
-  /** Voice recommendation from opening answers — visual mark only. */
+  /** Keyword-matched suggested starting road from opening answers — visual mark only. */
   recommendedRoadId?: RouteMapRoadId | null;
 };
 
@@ -31,8 +31,8 @@ function roadTagline(roadId: RouteMapRoadId, fallback: string): string {
 
 /**
  * Choose Your Route — map + lane cards on the tablet.
- * All four routes stay in one grid; Recommended is a badge on the card.
- * Voice may recommend; the customer confirms before the service chooser opens.
+ * All four routes stay in one grid; "Suggested starting point" is a badge on the card.
+ * Keyword routing may suggest a start; the customer confirms before the service chooser opens.
  */
 export default function ConversationRouteChoose({
   onPreviewRoad,

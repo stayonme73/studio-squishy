@@ -374,7 +374,7 @@ export const studioBoard = {
       studioUpdates: [{ date: "Today", message: "We received your discovery answers." }],
       whatHappensNextSteps: [
         "Review what we heard from your discovery answers.",
-        "Confirm your recommended services.",
+        "Confirm the services on your Studio Plan.",
         "Make changes if needed before production begins.",
         "The Studio begins your campaign.",
       ],
