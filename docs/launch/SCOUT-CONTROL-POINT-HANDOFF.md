@@ -1,6 +1,6 @@
 # SCOUT CONTROL-POINT HANDOFF
 
-**Status:** STAND BY — verify control point; clean-worktree commits await transfer  
+**Status:** STAND BY after ROUTE-HYGIENE-1 docs seal — await docs commit / product push / Gate #21 transfer auth  
 **Authority:** Immediate Scout instructions for this resume. Narrow and action-ready.  
 **Not this document:** The Flight Manual / Master Launch List / Working Protocol are governing truth Scout may consult. They are **not** inspection or construction authorization. Do not treat background context as permission to inspect or build.
 
@@ -8,14 +8,15 @@
 
 ## Current authorization
 
-**Stand by. Do not begin a new package. Do not merge, cherry-pick, or push without Tagia authorization.**
+**Stand by for the next explicit authorization.** Do not push, transfer Gate #21, or begin a new construction package without Tagia.
 
-**CUSTOMER-ONE-E2E-CERT-1** is **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** on clean worktree branch `cert/customer-one-e2e-1`.  
-Evidence: `docs/launch/CUSTOMER-ONE-E2E-CERT-1.md`.  
+**ROUTE-HYGIENE-1** product is committed locally @ `74a378e…`. Docs seal files are prepared; commit/push only when authorized.  
+Evidence: `docs/launch/ROUTE-HYGIENE-1.md`.  
+**GATE-21-ROUTE-HONESTY-CERT-1** remains **certified only** on clean branch `cert/gate-21-route-honesty` @ `08f09f5` — **not integrated**; transfer parked until after this docs seal and Tagia transfer auth.  
 **Payment/refund room** remains sealed — do not reopen without contradictory evidence.  
 **PAGE-TABS-1** remains **deferred**.  
 **Project Claim** remains **not started**.  
-No Board Materials. Do not absorb main-worktree WIP.
+Do not absorb the remaining **107** porcelain WIP entries.
 
 ---
 
@@ -23,30 +24,29 @@ No Board Materials. Do not absorb main-worktree WIP.
 
 | Field | Value |
 |---|---|
-| Main worktree tip | `0a8f84625d526d29109b5ded6ba11197ce0f1f95` — Payment room docs seal |
-| Clean worktree | `C:\Users\tagia\studio-squishy-customer-one-e2e-cert-1` · branch `cert/customer-one-e2e-1` |
-| Clean product tip | `d39165b0cfb277f29d1afa32b8cf8b3987ca9d08` — `fix: narrow JobReviewWorkspace focused-section type guard` |
-| Clean cert/docs tip | Advances on seal commit `test(cert): certify Customer-One Lobby-to-Delivery journey` |
+| Main worktree tip | `74a378e7d632d78fae2c24278f6187803310a646` — ROUTE-HYGIENE-1 product |
 | Main branch | `fix/discovery-responsive-layout` |
-| Main expected sync | **0 ahead / 0 behind** · staging **empty** · porcelain **115** (untouched) |
+| Main expected sync | **1 ahead / 0 behind** · staging **empty** after docs commit · porcelain **107** (untouched) |
+| Gate #21 clean worktree | `C:\Users\tagia\studio-squishy-gate-21-route-honesty` · `cert/gate-21-route-honesty` @ `08f09f5` |
 | Open construction package | **none** |
 | Open inspection package | **none** |
-| Open certification package | **none** — CUSTOMER-ONE-E2E-CERT-1 sealed locally on clean branch |
-| Defined next package | **none** — await Tagia for transfer into protected branch and next priority |
-| Deferred | **PAGE-TABS-1** · **#15** team-ownership phase |
-| Customer-One readiness | **4 fully complete · 12 complete with limits · 16 of 23 materially delivered** · **6 partial · 1 missing (#15)** |
+| Open documentation package | **ROUTE-HYGIENE-1 docs seal** (product already committed) |
+| Defined next package | Gate #21 transfer/reconcile after docs seal + push authorization |
+| Deferred | **PAGE-TABS-1** · **#15** team-ownership phase · full CR-5 route inventory hygiene |
+| Customer-One readiness | **4 fully complete · 12 complete with limits · 16 of 23 materially delivered** · **6 partial · 1 missing (#15)** — no bump until Gate #21 transfers and pushes |
 | Unified room cert | **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · browser 98/98 · unit 32/32 |
-| Payment/refund slice | **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** @ `0555c58…` / docs `0a8f846…` |
-| Customer-One E2E | **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · browser **53/0** · unit **40/40** · desktop 1440 / phone 390 |
+| Payment/refund slice | **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** @ `0555c58…` |
+| Customer-One E2E | **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** @ `ee1f48a…` · browser **53/0** · unit **40/40** |
+| ROUTE-HYGIENE-1 | Product **committed** @ `74a378e…` · narrow checkout shell only · full inventory hygiene open |
 | Proof viewing (Customer-One) | Session-gated **link/list** — Choice A |
 
 ### Recently sealed / closed
 
-- **CUSTOMER-ONE-E2E-CERT-1** — SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS · Gates **#1 · #17 · #23** → COMPLETE WITH LIMITS  
-- **Payment room bundle** — REFUND-STATUS-INSPECT-1 COMPLETE · status UI @ `0555c58…` · browser 14/14 · unit 25/25 · regression 11/11  
-- **READINESS-RECONCILE-1** — COMPLETE (read-only scoreboard reconcile)  
-- **UR-ROOM-CERT-1** — SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS @ `e6be8bd…`  
-- **REFUND-REQUEST-1** · **TEXT-COMMENT-1** · **HIGHLIGHTER-1** · **VERSION-COMPARE-1** · **UPDATE-HISTORY-1** · **ISSUE-ENTRY-1**
+- **ROUTE-HYGIENE-1** — product committed @ `74a378e…` · docs seal in progress · not pushed  
+- **CUSTOMER-ONE-E2E-CERT-1** — SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS · Gates **#1 · #17 · #23** → COMPLETE WITH LIMITS @ `ee1f48a…`  
+- **GATE-21-ROUTE-HONESTY-CERT-1** — certified on clean branch only @ `08f09f5` · transfer parked  
+- **Payment room bundle** — REFUND-STATUS-INSPECT-1 COMPLETE · status UI @ `0555c58…`  
+- **UR-ROOM-CERT-1** · **REFUND-REQUEST-1** · **TEXT-COMMENT-1** · **HIGHLIGHTER-1** · **VERSION-COMPARE-1** · **UPDATE-HISTORY-1** · **ISSUE-ENTRY-1**
 
 ### Gate status
 
@@ -58,24 +58,29 @@ No Board Materials. Do not absorb main-worktree WIP.
 
 ### Known open customer-facing work (sequence)
 
-1. PAGE-TABS-1 (deferred)  
-2. Materials dual UX (Board — waiting)  
-3. Project Claim (Auth Package 5 — not started)  
-4. Remaining Hierarchy H partial gates / tip TypeScript baseline / 360 all-surface as Tagia prioritizes  
+1. ROUTE-HYGIENE-1 docs commit → push product+docs → Gate #21 transfer/reconcile  
+2. PAGE-TABS-1 (deferred)  
+3. Materials dual UX (Board — waiting)  
+4. Project Claim (Auth Package 5 — not started)  
+5. Full CR-5 route inventory hygiene (separate from ROUTE-HYGIENE-1)
+
+### Gate #21 merge preserve list (when authorized)
+
+- Keep ROUTE-HYGIENE-1 RouteChoose **alt** + Welcome Hall **kioskLabel** + quarantine asserts  
+- Add Gate #21 Conversation Room **eyebrow** + scaffold non-advertise asserts (`/account` · `/past-campaigns` · `/creative-room`)  
 
 ---
 
 ## First action — verify and report only
 
-1. Main HEAD still `0a8f846…` until transfer  
-2. Clean branch commits present and not on protected branch yet  
-3. Staging empty on both trees after seal  
-4. Main porcelain ~115 untouched  
-5. No merge / cherry-pick / push without Tagia  
+1. Main HEAD includes `74a378e…` (ROUTE-HYGIENE-1 product)  
+2. Docs seal commit present when authorized; product still unpushed until Tagia says push  
+3. Staging empty after docs commit  
+4. Main porcelain ~107 untouched  
+5. Gate #21 still @ `08f09f5` until transfer auth  
+6. No Gate #21 cherry-pick / readiness bump without transfer + push  
 
 **If the repository does not match the expected state, stop and report the discrepancy without altering anything.**
-
-After verification, remain on standby for transfer authorization or the next authorized package.
 
 ---
 
@@ -90,7 +95,8 @@ After verification, remain on standby for transfer authorization or the next aut
 - Do not reopen sealed work without evidence.  
 - Raise an anti-loop warning if requested work appears already complete.  
 - Leave unrelated dirty work untouched.  
-- Do not commit or push without owner approval.
+- Do not commit or push without owner approval.  
+- Explicit-path staging only — no `git add .` / stash / reset / restore / clean against parking-lot WIP.
 
 ### Before any authorized package edit (when one is later selected)
 
@@ -107,4 +113,4 @@ If requested work is already complete, locked, tested, certified, or protected �
 
 ---
 
-*End of Scout control-point handoff. Wait for transfer authorization or the next authorized package.*
+*End of Scout control-point handoff. Wait for docs-commit / push / Gate #21 transfer authorization.*

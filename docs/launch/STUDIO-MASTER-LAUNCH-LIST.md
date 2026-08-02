@@ -17,16 +17,16 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | Clean-worktree `cert/customer-one-e2e-1` · product `d39165b0cfb277f29d1afa32b8cf8b3987ca9d08` · awaiting transfer to `fix/discovery-responsive-layout` (main tip still `0a8f846…` until merge) |
-| Branch | `cert/customer-one-e2e-1` (clean worktree) · protected branch remains `fix/discovery-responsive-layout` |
-| Sync | Clean branch local commits only · main worktree **0 ahead / 0 behind** @ `0a8f846…` · staging empty · **115** porcelain WIP leave untouched |
-| Current active item | **None** — CUSTOMER-ONE-E2E-CERT-1 **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · await Tagia transfer/push authorization |
+| Protected tip | Local `74a378e7d632d78fae2c24278f6187803310a646` — ROUTE-HYGIENE-1 product · parent `ee1f48a…` (CUSTOMER-ONE-E2E-CERT-1) · **not pushed** |
+| Branch | `fix/discovery-responsive-layout` |
+| Sync | **1 ahead / 0 behind** · staging empty · **107** unrelated porcelain WIP leave untouched |
+| Current active item | **ROUTE-HYGIENE-1 docs seal** (product committed) · next after docs: Gate #21 transfer from `cert/gate-21-route-honesty` @ `08f09f5` |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
-| Most recently completed | CUSTOMER-ONE-E2E-CERT-1 — browser **53/0** · focused unit **40/40** · desktop 1440 / phone 390 · Gates **#1 · #17 · #23** → COMPLETE WITH LIMITS · product `d39165b…` · prior Payment room @ `0555c58` / `0a8f846` |
-| Next three priorities | 1) Materials dual UX (waiting — Board limit) · 2) PAGE-TABS-1 deferred · 3) Remaining Hierarchy H partial gates / #15 deferred team phase per Tagia priority |
-| Active blockers | No provider money movement (acceptable certified limit) · Materials dual UX waiting · PAGE-TABS-1 deferred · tip TypeScript baseline blocks production build for this cert path · Project Claim not started |
+| Most recently completed | ROUTE-HYGIENE-1 product — narrow checkout quarantine + CR front-door shell @ `74a378e…` · prior CUSTOMER-ONE-E2E-CERT-1 @ `ee1f48a…` |
+| Next three priorities | 1) Finish ROUTE-HYGIENE-1 docs seal · push · Gate #21 transfer/reconcile · 2) Materials dual UX (waiting) · 3) PAGE-TABS-1 deferred / remaining Hierarchy H partials |
+| Active blockers | Gate #21 certified but not integrated (was blocked by this WIP; product now committed) · full CR-5 route inventory hygiene still open · Materials dual UX waiting · PAGE-TABS-1 deferred · Project Claim not started |
 | Decisions waiting | **1** — Materials dual UX (Board limit) |
-| Customer-One readiness | **4 fully complete** (#16, #18†, #20, #22) · **12 complete with limits** (#1, #4, #5, #7, #9, #10, #11, #12, #13, #17, #19, #23) · **16 of 23 materially delivered** · **6 partial** · **1 missing / not opened** (#15 deferred) · †#18 counted among the four while labeled COMPLETE WITH LIMITS (retained quirk) |
+| Customer-One readiness | **4 fully complete** (#16, #18†, #20, #22) · **12 complete with limits** (#1, #4, #5, #7, #9, #10, #11, #12, #13, #17, #19, #23) · **16 of 23 materially delivered** · **6 partial** (includes #21 until transfer+push) · **1 missing / not opened** (#15 deferred) · †#18 counted among the four while labeled COMPLETE WITH LIMITS (retained quirk) |
 | Last updated | 2026-08-02 |
 
 ---
@@ -79,6 +79,7 @@ Every completed item must show available evidence: commit hash · subject · tes
 
 ### Tagia Notes
 
+- **2026-08-02 — ROUTE-HYGIENE-1 product committed (docs seal in progress):** Narrow checkout/quarantine shell only @ `74a378e7d632d78fae2c24278f6187803310a646` — `fix: align checkout quarantine and Conversation Room front door` · `/checkout` on quarantine list · checkout page → `activeCheckout` · payment shells aligned · Welcome Hall / Route Map recovery / route-chooser alt honesty · focused unit **6+8+9+4** · static smoke **21/21** · production build not run · full CR-5 route inventory hygiene **remains open** · Gate #21 still on clean `08f09f5` only · readiness stays **4 / 12 / 16 of 23** · **107** porcelain untouched · not pushed. Evidence: `docs/launch/ROUTE-HYGIENE-1.md`.
 - **2026-08-02 — CUSTOMER-ONE-E2E-CERT-1 sealed · BROWSER-CERTIFIED WITH EXPLICIT LIMITS:** Clean worktree `cert/customer-one-e2e-1` · product `d39165b…` · harness `scripts/cert-customer-one-e2e-1.mjs` · browser **53 PASS / 0 FAIL / 2 LIMIT** · focused unit **40/40** · desktop **1440** + phone **390** Lobby→Conversation Room→Payment→Intake→Account Handoff→Board→Review→Final→Delivery · Lobby return / refresh / returning-customer / Sign In return · Project Claim **not started** · pre-CR Host/Route Map E2E scripts **do not count** · production build blocked by tip TypeScript baseline · 360px / all-surface outside package · Gates **#1 · #17 · #23** → **COMPLETE WITH LIMITS** · scoreboard **4 / 12 / 16 of 23 · 6 partial · 1 missing (#15)** · main WIP untouched · no merge/push yet. Evidence: `docs/launch/CUSTOMER-ONE-E2E-CERT-1.md`.
 - **2026-08-01 — Payment room bundle sealed (product @ `0555c58…`):** REFUND-STATUS-INSPECT-1 **COMPLETE · CLOSED**. Persistent return-path gap confirmed; construction required; customer-safe status on Studio Board Refund Request card + GET · no second ledger · internal notes hidden · history deferred. Validation: unit **25/25** · regression **11/11** · browser **14/14** (desktop + 390). Production build not run (narrow surface). Payment/refund slice **BROWSER-CERTIFIED WITH EXPLICIT LIMITS**. Gate #13 remains **COMPLETE WITH LIMITS** — persistent-status limit **closed**; money/provider/history limits remain. Cert evidence folded into `docs/launch/REFUND-STATUS-INSPECT-1.md` (no separate PAYMENT-ROOM-CERT-1). Fanout: that file · Master List · Scout handoff only.
 - **2026-08-01 — READINESS-RECONCILE-1 + scoreboard correction (LOCKED display):** Dual readiness headline required: **4 fully complete · 9 complete with limits · 13 of 23 materially delivered**. Strict “fully complete” must not erase certified CWL capabilities. Gate **#13** → COMPLETE WITH LIMITS (REFUND-REQUEST-1). Gate **#9** tooling limits corrected (Compare / Highlighter / Text Comment sealed). Protected tip = this scoreboard seal (parent was `b1f454da…`). Payment next as one room bundle — no seven-document echo chamber. Files: Master List Daily Snapshot + Hierarchy H · `SCOUT-CONTROL-POINT-HANDOFF.md` only.
@@ -790,6 +791,7 @@ May follow Customer One; must precede outside customers.
 | Conversation Room Package 3 visual | — | **Superseded for launch control** by CR-4 end-to-end cert (Package 3 visual cert was never a separate closed record) | — | — | Historical gap; do not reopen as CR rewrite |
 | Conversation Room CR-4 E2E | `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md` · three `scripts/cert-*.mjs` | **30/30 PASS** | 2026-07-26 | product `02657aa` · docs `79ed2ce` | Rerun if CR journey changes |
 | Full Customer-One E2E | `scripts/cert-customer-one-e2e-1.mjs` · `docs/launch/CUSTOMER-ONE-E2E-CERT-1.md` | **53 PASS / 0 FAIL / 2 LIMIT** · focused unit **40/40** · desktop 1440 / phone 390 | 2026-08-02 | product `d39165b…` (clean `cert/customer-one-e2e-1`) | Yes if journey / auth / Board / unified room contracts change · pre-CR Host/Route Map scripts do **not** count |
+| ROUTE-HYGIENE-1 narrow checkout shell | `docs/launch/ROUTE-HYGIENE-1.md` · focused Vitest navigation/handoff/redirect suites · static smoke | Unit **6+8+9+4** · static **21/21** · production build not run | 2026-08-02 | product `74a378e…` (local; push pending) | Yes if checkout quarantine / front-door redirects change · full inventory hygiene still open |
 | Purchased-room access control | — | **Not started** | — | — | Required before Customer-One |
 | ISSUE-ENTRY-1 customer problem reporting | `scripts/smoke-issue-entry-1.mjs` | Focused Vitest **50/50 PASS** · Browser certification **116/116 PASS** | 2026-07-31 | `727c831` | Yes if Project Communication composer changes |
 
