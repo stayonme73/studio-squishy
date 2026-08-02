@@ -29,7 +29,7 @@ export default function ConversationStudioPlanPanel({
     <div className={styles.sheet} data-panel="plan">
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Studio Guide</p>
+          <p className={styles.eyebrow}>Conversation Room</p>
           <h2 className={styles.title}>{v.studioPlanExtraDetailsTitle}</h2>
         </div>
         <button

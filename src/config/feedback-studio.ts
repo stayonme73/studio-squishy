@@ -313,7 +313,7 @@ export const feedbackStudio = {
 
   noCampaign: {
     title: "No campaign yet",
-    body: "Start a campaign in Project Discovery to review concepts here.",
+    body: "Start a project in the Conversation Room to review work here.",
     cta: "Go to Studio Board",
   },
 
@@ -323,9 +323,9 @@ export const feedbackStudio = {
       title: "No Active Project",
       message: "There isn't an active project ready for review.",
       messageSecondary:
-        "Start a new project from the Route Map, or return when your campaign reaches the Review stage.",
+        "Start a new project in the Conversation Room, or return when your campaign reaches the Review stage.",
       footnote: "Approved concepts will appear here when your project reaches the Review stage.",
-      primaryCta: "GO TO ROUTE MAP",
+      primaryCta: "GO TO CONVERSATION ROOM",
       secondaryCta: "Help Center",
       primaryHref: "/studio-conversation-room",
       secondaryHref: "/help-center",

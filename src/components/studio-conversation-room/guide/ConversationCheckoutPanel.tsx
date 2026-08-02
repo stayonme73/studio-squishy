@@ -61,7 +61,7 @@ export default function ConversationCheckoutPanel({
       <div className={styles.sheet} data-panel="checkout">
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Studio Guide</p>
+            <p className={styles.eyebrow}>Conversation Room</p>
             <h2 className={styles.title}>{v.checkoutTitle}</h2>
           </div>
           <button
@@ -91,7 +91,7 @@ export default function ConversationCheckoutPanel({
     <div className={styles.sheet} data-panel="checkout">
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Studio Guide</p>
+          <p className={styles.eyebrow}>Conversation Room</p>
           <h2 className={styles.title}>{v.checkoutTitle}</h2>
         </div>
         <button

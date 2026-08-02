@@ -27,11 +27,14 @@ describe("BH-HC-1 Help Center inbound vs outbound navigation contract", () => {
     expect(parseHelpCenterFromParam("unknown")).toBeNull();
   });
 
-  it("maps ?from=route-map to Route Map back navigation", () => {
+  it("maps ?from=route-map to the live Conversation Room front door", () => {
     expect(resolveHelpCenterBackHref("route-map")).toBe(
       legacyRouteQuarantineV1.activeFrontDoor,
     );
-    expect(resolveHelpCenterBackHref("route-map")).toBe("/route-map");
+    expect(resolveHelpCenterBackHref("route-map")).toBe(
+      "/studio-conversation-room",
+    );
+    expect(helpCenter.backLabels.routeMap).toBe("Back to Conversation Room");
   });
 
   it("maps ?from=studio-board to Studio Board back navigation", () => {

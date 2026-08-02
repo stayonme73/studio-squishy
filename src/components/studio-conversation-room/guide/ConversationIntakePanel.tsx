@@ -185,7 +185,7 @@ export default function ConversationIntakePanel({
       <div className={styles.sheet} data-panel="intake">
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Studio Guide</p>
+            <p className={styles.eyebrow}>Conversation Room</p>
             <h2 className={styles.title}>{v.intakeTitle}</h2>
           </div>
           <button
@@ -210,7 +210,7 @@ export default function ConversationIntakePanel({
       <div className={styles.sheet} data-panel="intake">
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Studio Guide</p>
+            <p className={styles.eyebrow}>Conversation Room</p>
             <h2 className={styles.title}>{v.intakeTitle}</h2>
           </div>
           <button
@@ -251,7 +251,7 @@ export default function ConversationIntakePanel({
     <div className={styles.sheet} data-panel="intake">
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Studio Guide</p>
+          <p className={styles.eyebrow}>Conversation Room</p>
           <h2 className={styles.title}>{v.intakeTitle}</h2>
         </div>
         <button

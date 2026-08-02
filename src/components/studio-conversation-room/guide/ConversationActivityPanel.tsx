@@ -474,7 +474,7 @@ export default function ConversationActivityPanel({
       <div className={styles.sheet} data-panel="builder">
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Studio Guide</p>
+            <p className={styles.eyebrow}>Conversation Room</p>
             <h2 className={styles.title}>
               {conversationRoomGuideV1.servicesPanelTitle}
             </h2>

@@ -26,7 +26,8 @@ export type ConversationRoomGuideQuestion = {
 export const STUDIO_GUIDE_TYPE_FIELD_ID = "studio-guide-type-field" as const;
 
 export const conversationRoomGuideV1 = {
-  eyebrow: studioGuideConversationV1.guideRoleLabel,
+  /** Room label — not a separate “Studio Guide” destination. */
+  eyebrow: "Conversation Room",
   continueLabel: studioGuideConversationV1.continueLabel,
   skipLabel: studioGuideConversationV1.skipLabel,
   correctLabel: studioGuideConversationV1.correctLabel,

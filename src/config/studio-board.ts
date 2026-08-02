@@ -389,7 +389,8 @@ export const studioBoard = {
       campaignDescription:
         "Vision Intake complete. The Studio will not begin creative work until your package is selected and payment is received.",
       estimatedCompletion: "Choose a package to begin",
-      studioNoteFollowUp: "Choose your package in the Studio Guide to continue.",
+      studioNoteFollowUp:
+        "Choose your services in the Conversation Room to continue.",
       studioNoteBoard: {
         letterLines: [
           "We received your Vision Intake — thank you.",
@@ -401,7 +402,7 @@ export const studioBoard = {
       },
       studioUpdates: [{ date: "Today", message: "Vision Intake received." }],
       whatHappensNextSteps: [
-        "Choose your package in the Studio Guide.",
+        "Choose your services in the Conversation Room.",
         "Complete payment.",
         "The Studio begins your campaign concepts.",
         "You review, approve, and receive your deliverables.",
@@ -539,7 +540,7 @@ export const studioBoard = {
   bottomBar: {
     headline: "Need something else marketed?",
     subline: "The Studio is here to help you grow.",
-    ariaLabel: "Start a new campaign in Project Discovery",
+    ariaLabel: "Start a new project in the Conversation Room",
   },
 
   /** Sidebar logo lockup — neutral Studio branding (no bundle tier names). */
@@ -834,7 +835,7 @@ export const studioBoard = {
     copyCampaignBriefSuccess: "Campaign Brief Copied",
     empty: {
       title: "No campaign yet",
-      body: "Start a campaign in Project Discovery to see your details here.",
+      body: "Start a project in the Conversation Room to see your details here.",
       cta: "Go to Studio Board",
     },
   },
@@ -862,15 +863,17 @@ export const studioBoard = {
   placeholders: {
     pastCampaigns: "Past Campaigns — coming soon.",
     account: "My Account — coming soon.",
-    helpCenter: "Help Center — coming soon.",
-    campaignDetails: "Campaign details — coming soon.",
+    /** Unused residue — Help Center is live; do not surface this string. */
+    helpCenter: "Help Center",
+    /** Unused residue — Project Record is live; do not surface this string. */
+    campaignDetails: "Project Record",
   },
 } as const;
 
 export type StudioBoardPrimaryRoute =
   (typeof studioBoard.statusContent)[CampaignStatus]["primaryRoute"];
 
-/** New Campaign — Route Map V2 is the sole live client entry. */
+/** New Campaign — Conversation Room is the sole live client entry. */
 export function studioBoardDraftRoomHref() {
   return studioBoard.routes.newCampaign;
 }

@@ -24,11 +24,11 @@ export const studioPolicies = {
     blocks: [
       {
         kind: "p",
-        text: "The Studio creates ready-to-use marketing materials for businesses, organizations, professionals, and entrepreneurs. Choose only the services you need, complete your Project Details, and we'll build the deliverables you selected.",
+        text: "The Studio creates ready-to-use marketing materials for businesses, organizations, professionals, and entrepreneurs. Choose only the services you need, complete Intake, and we'll build the deliverables you selected.",
       },
       {
         kind: "p",
-        text: "Your path through The Studio: Route Map → Secure Checkout → Project Details → Studio Board → Review Room → Final Delivery.",
+        text: "Your path through The Studio: Lobby → Conversation Room → Payment → Intake → Studio Board → Review Room → Final Delivery.",
       },
       {
         kind: "ul",
@@ -114,11 +114,11 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "After Secure Checkout, complete Project Details so The Studio knows what to create and which materials are required.",
+            text: "After payment in the Conversation Room, complete Intake so The Studio knows what to create and which materials are required.",
           },
           {
             kind: "p",
-            text: "Your path through The Studio: Route Map → Secure Checkout → Project Details → Studio Board → Review Room → Final Delivery.",
+            text: "Your path through The Studio: Lobby → Conversation Room → Payment → Intake → Studio Board → Review Room → Final Delivery.",
           },
           {
             kind: "p",

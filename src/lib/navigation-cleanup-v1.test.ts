@@ -37,6 +37,18 @@ describe("navigation cleanup v1", () => {
     expect(LEGACY_QUARANTINED_ROUTES).toContain("/intake");
   });
 
+  it("does not advertise Account, Past Campaigns, or Creative Room as ready", () => {
+    expect(studioBoard.routes.account).toBe("/account");
+    expect(studioBoard.routes.pastCampaigns).toBe("/past-campaigns");
+    expect(utilityShell.nav.map((item) => item.href)).not.toContain("/account");
+    expect(utilityShell.nav.map((item) => item.href)).not.toContain(
+      "/past-campaigns",
+    );
+    expect(utilityShell.nav.map((item) => item.href)).not.toContain(
+      "/creative-room",
+    );
+  });
+
   it("limits utility subnav to approved client items", () => {
     expect(utilityShell.nav.map((item) => item.id)).toEqual([
       "studio-board",

@@ -31,8 +31,8 @@ export const helpCenter = {
   backLabels: {
     studioBoard: "Back to Studio Board",
     campaignDetails: "Back to Project Record",
-    payment: "Back to Route Map",
-    routeMap: "Back to Route Map",
+    payment: "Back to Conversation Room",
+    routeMap: "Back to Conversation Room",
   },
   toc: {
     title: "On this page",
@@ -58,7 +58,8 @@ export const helpCenter = {
       {
         id: "starting-project",
         situation: "Starting a Project",
-        summary: "Choose services on the Route Map, pay through Secure Checkout, then complete Project Details.",
+        summary:
+          "Begin in the Conversation Room, complete payment, then finish Intake so The Studio can prepare your work.",
         anchor: "faq-after-payment",
         learnMoreLabel: "What happens after I pay?",
       },

@@ -403,7 +403,7 @@ export function resolveWhatHappensNextSentence(
   displayFacts?: StudioBoardDisplayFacts,
 ): string {
 
-  if (!campaign) return "Start a campaign in Project Discovery to begin.";
+  if (!campaign) return "Start a project in the Conversation Room to begin.";
 
   if (isPaidIncompleteIntake(campaign)) {
     return studioBoard.nextAction.completeProjectDetailsHint;
@@ -472,7 +472,7 @@ export function resolveStudioBoardView(
 
       whatHappensNextSteps: [
 
-        "Start a campaign in Project Discovery.",
+        "Start a project in the Conversation Room.",
 
         "We review your request.",
 

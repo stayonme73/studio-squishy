@@ -114,7 +114,7 @@ export default function ConversationRouteChoose({
     >
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Studio Guide</p>
+          <p className={styles.eyebrow}>Conversation Room</p>
           <h2 className={styles.title}>{v.routePanelTitle}</h2>
           <p className={styles.intro}>{v.routePanelLead}</p>
         </div>
