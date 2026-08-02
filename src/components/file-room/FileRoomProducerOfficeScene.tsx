@@ -11,6 +11,7 @@ import type {
   OfficeQueueTaskRow,
   ProducerDispatchView,
 } from "@/lib/campaign-tasks/office-view";
+import { resolveFileRoomTaskOwnershipPresentation } from "@/lib/campaign-tasks/task-ownership-presentation";
 import type { FileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
 import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -80,6 +81,10 @@ export default function FileRoomProducerOfficeScene({
                       {bucket.tasks.map((task) => {
                         const isSelected = task.id === selectedTask?.id;
                         const href = `/file-room/${campaignId}/office/producer_dispatcher?task=${encodeURIComponent(task.id)}`;
+                        const ownership = resolveFileRoomTaskOwnershipPresentation({
+                          responsibleRole: task.responsibleRole,
+                          claimedByDisplayName: task.claimedByDisplayName,
+                        });
                         return (
                           <li key={task.id}>
                             <Link
@@ -88,6 +93,16 @@ export default function FileRoomProducerOfficeScene({
                             >
                               <span className="fr-office-queue__title">{task.title}</span>
                               <span className="fr-office-queue__meta">{task.statusLabel}</span>
+                              <span
+                                className="fr-office-queue__meta fr-office-queue__ownership"
+                                data-fr-task-ownership={ownership.claimStatus}
+                              >
+                                <span data-fr-task-responsible-role>
+                                  {ownership.responsibleRoleLine}
+                                </span>
+                                {" · "}
+                                <span data-fr-task-claim-status>{ownership.claimLine}</span>
+                              </span>
                             </Link>
                           </li>
                         );

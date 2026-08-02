@@ -8,6 +8,7 @@ import {
   type TeamOfficeRoleSlug,
 } from "@/config/team-offices";
 import type { OfficeContextRailView, OfficeQueueTaskRow } from "@/lib/campaign-tasks/office-view";
+import { resolveFileRoomTaskOwnershipPresentation } from "@/lib/campaign-tasks/task-ownership-presentation";
 
 import FileRoomSectionCard from "@/components/file-room/FileRoomSectionCard";
 
@@ -50,6 +51,10 @@ export function OfficeQueuePanel({
       const isSelected = task.id === selectedTaskId;
       const href = `/file-room/${campaignId}/office/${officeSlug}?task=${encodeURIComponent(task.id)}`;
       const isSecondary = task.queueTier === "secondary";
+      const ownership = resolveFileRoomTaskOwnershipPresentation({
+        responsibleRole: task.responsibleRole,
+        claimedByDisplayName: task.claimedByDisplayName,
+      });
       return (
         <li key={task.id}>
           <Link
@@ -58,6 +63,14 @@ export function OfficeQueuePanel({
           >
             <span className="fr-office-queue__title">{task.title}</span>
             <span className="fr-office-queue__meta">{task.statusLabel}</span>
+            <span
+              className="fr-office-queue__meta fr-office-queue__ownership"
+              data-fr-task-ownership={ownership.claimStatus}
+            >
+              <span data-fr-task-responsible-role>{ownership.responsibleRoleLine}</span>
+              {" · "}
+              <span data-fr-task-claim-status>{ownership.claimLine}</span>
+            </span>
             {task.isWrongRole ? (
               <span className="fr-office-queue__badge">Other role</span>
             ) : null}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { campaignExceptionsConfig } from "@/config/campaign-exceptions";
+import { campaignTasksConfig } from "@/config/campaign-tasks";
 import { ownerConsole } from "@/config/owner-console";
 import type { FileRoomExceptionOperatorContext } from "@/lib/campaign-tasks/exceptions-view";
 import type {
@@ -12,6 +13,7 @@ import type {
   OwnerConsoleReassignContext,
 } from "@/lib/campaign-tasks/owner-console-campaign-view";
 import type { OwnerConsoleDecisionCard } from "@/lib/campaign-tasks/owner-console-view";
+import { resolveFileRoomTaskOwnershipPresentation } from "@/lib/campaign-tasks/task-ownership-presentation";
 import type { FileRoomTaskRow } from "@/lib/campaign-tasks/tasks-view";
 import type { TasksPatchBody } from "@/lib/campaign-tasks/actions";
 
@@ -68,12 +70,37 @@ export function FileRoomOwnerConsoleContextRail({
                 <span className="fr-kv-list__label">Status</span>
                 <p className="fr-kv-list__value">{linkedTask.statusLabel}</p>
               </li>
-              {linkedTask.claimedByDisplayName ? (
-                <li className="fr-kv-list__row">
-                  <span className="fr-kv-list__label">Claimed by</span>
-                  <p className="fr-kv-list__value">{linkedTask.claimedByDisplayName}</p>
-                </li>
-              ) : null}
+              {(() => {
+                const ownership = resolveFileRoomTaskOwnershipPresentation({
+                  responsibleRole: linkedTask.responsibleRole,
+                  claimedByDisplayName: linkedTask.claimedByDisplayName,
+                });
+                return (
+                  <>
+                    <li className="fr-kv-list__row">
+                      <span className="fr-kv-list__label">
+                        {campaignTasksConfig.responsibleRoleLabel}
+                      </span>
+                      <p
+                        className="fr-kv-list__value"
+                        data-fr-task-responsible-role={ownership.responsibleRoleLabel}
+                      >
+                        {ownership.responsibleRoleLabel}
+                      </p>
+                    </li>
+                    <li className="fr-kv-list__row">
+                      <span className="fr-kv-list__label">Claim</span>
+                      <p
+                        className="fr-kv-list__value"
+                        data-fr-task-ownership={ownership.claimStatus}
+                        data-fr-task-claim-status
+                      >
+                        {ownership.claimLine}
+                      </p>
+                    </li>
+                  </>
+                );
+              })()}
               {linkedTask.blockedReason ? (
                 <li className="fr-kv-list__row">
                   <span className="fr-kv-list__label">Blocker</span>

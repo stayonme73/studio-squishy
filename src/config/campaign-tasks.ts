@@ -25,6 +25,9 @@ export const campaignTasksConfig = {
   confirmReassignLabel: "Confirm reassign",
   cancelLabel: "Cancel",
   claimedByLabel: "Claimed by",
+  /** Gate #15 — always visible when no claimer (never leave ownership blank). */
+  unclaimedLabel: "Unclaimed",
+  responsibleRoleLabel: "Responsible role",
   handoffHistoryLabel: "Handoffs",
   conflictMessage: "This task was updated elsewhere. Refreshing to the latest state.",
   updateFailedMessage: "Update failed. Try again.",
@@ -185,6 +188,10 @@ export function taskStatusLabel(status: TaskDisplayStatus): string {
 
 export function taskPhaseLabel(phase: TaskPhase): string {
   return campaignTasksConfig.phaseLabels[phase];
+}
+
+export function productionRoleLabel(role: ProductionRole): string {
+  return campaignTasksConfig.productionRoleLabels[role];
 }
 
 const WORKFLOW_BLOCKED_TOKENS = Object.keys(

@@ -13,6 +13,7 @@ import type { FileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room
 import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
 import type { FileRoomQaHistoryEntry } from "@/lib/campaign-tasks/file-room-controls";
 import type { TasksPatchBody } from "@/lib/campaign-tasks/actions";
+import { resolveFileRoomTaskOwnershipPresentation } from "@/lib/campaign-tasks/task-ownership-presentation";
 import type { FileRoomProductionTasksView, FileRoomTaskRow } from "@/lib/campaign-tasks/tasks-view";
 import type { ProductionRole, QaRecord, TaskWorkflowState } from "@/lib/campaign-tasks/types";
 
@@ -466,6 +467,11 @@ function TaskRow({
     });
   };
 
+  const ownership = resolveFileRoomTaskOwnershipPresentation({
+    responsibleRole: task.responsibleRole,
+    claimedByDisplayName: localClaimedBy,
+  });
+
   return (
     <li className={`fr-tasks-row fr-tasks-row--${task.status}`}>
       <div className="fr-tasks-row__head">
@@ -481,11 +487,14 @@ function TaskRow({
         {task.cycleLabel ? ` · ${task.cycleLabel}` : ""}
         {task.dependsOnCount > 0 ? ` · ${task.dependsOnCount} dependency` : ""}
       </p>
-      {localClaimedBy ? (
-        <p className="fr-tasks-row__meta">
-          {campaignTasksConfig.claimedByLabel} {localClaimedBy}
-        </p>
-      ) : null}
+      <p
+        className="fr-tasks-row__meta fr-tasks-row__ownership"
+        data-fr-task-ownership={ownership.claimStatus}
+      >
+        <span data-fr-task-responsible-role>{ownership.responsibleRoleLine}</span>
+        {" · "}
+        <span data-fr-task-claim-status>{ownership.claimLine}</span>
+      </p>
       {localHandoffCount > 0 ? (
         <p className="fr-tasks-row__meta">
           {campaignTasksConfig.handoffHistoryLabel}: {localHandoffCount}
