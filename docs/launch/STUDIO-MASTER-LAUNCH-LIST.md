@@ -17,17 +17,17 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | `0555c580f7cfd6968c02313dd316f484e78750be` — `feat: add customer-safe refund request status on studio board` · Payment room docs seal pending |
-| Branch | `fix/discovery-responsive-layout` |
-| Sync | **1 ahead / 0 behind** until product push · staging empty · substantial unrelated dirty WIP present (leave untouched · expected **113**) |
-| Current active item | **None** — Scout parked · Payment room Customer-One refund intake + status return path **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** @ `0555c58…` · docs seal in progress |
+| Protected tip | Clean-worktree `cert/customer-one-e2e-1` · product `d39165b0cfb277f29d1afa32b8cf8b3987ca9d08` · awaiting transfer to `fix/discovery-responsive-layout` (main tip still `0a8f846…` until merge) |
+| Branch | `cert/customer-one-e2e-1` (clean worktree) · protected branch remains `fix/discovery-responsive-layout` |
+| Sync | Clean branch local commits only · main worktree **0 ahead / 0 behind** @ `0a8f846…` · staging empty · **115** porcelain WIP leave untouched |
+| Current active item | **None** — CUSTOMER-ONE-E2E-CERT-1 **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · await Tagia transfer/push authorization |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
-| Most recently completed | Payment room bundle — REFUND-STATUS-INSPECT-1 **COMPLETE · CLOSED** · status product @ `0555c58` (unit 25/25 · regression 11/11 · browser 14/14) · REFUND-REQUEST-1 @ `f60ee491` · READINESS-RECONCILE-1 · UR-ROOM-CERT-1 @ `e6be8bd` |
-| Next three priorities | 1) Materials dual UX (waiting — Board limit) · 2) PAGE-TABS-1 deferred · 3) Remaining Hierarchy H partial/missing gates per Tagia priority (not auto-opened) |
-| Active blockers | No provider money movement (acceptable certified limit) · Materials dual UX waiting · PAGE-TABS-1 deferred · Gate #17 project-wide scope not auto-closed by Unified Room / Payment seals |
+| Most recently completed | CUSTOMER-ONE-E2E-CERT-1 — browser **53/0** · focused unit **40/40** · desktop 1440 / phone 390 · Gates **#1 · #17 · #23** → COMPLETE WITH LIMITS · product `d39165b…` · prior Payment room @ `0555c58` / `0a8f846` |
+| Next three priorities | 1) Materials dual UX (waiting — Board limit) · 2) PAGE-TABS-1 deferred · 3) Remaining Hierarchy H partial gates / #15 deferred team phase per Tagia priority |
+| Active blockers | No provider money movement (acceptable certified limit) · Materials dual UX waiting · PAGE-TABS-1 deferred · tip TypeScript baseline blocks production build for this cert path · Project Claim not started |
 | Decisions waiting | **1** — Materials dual UX (Board limit) |
-| Customer-One readiness | **4 fully complete** (#16, #18†, #20, #22) · **9 complete with limits** (#4, #5, #7, #9, #10, #11, #12, #13, #19) · **13 of 23 materially delivered** · **8 partial** · **2 missing / not opened** (#15 deferred, #23) · †#18 counted among the four while labeled COMPLETE WITH LIMITS (retained quirk) · Hierarchy C #8 **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** via UR-ROOM-CERT-1 · Unified Room **360px room requirement passed** (does **not** alone close project-wide Gate #17) |
-| Last updated | 2026-08-01 |
+| Customer-One readiness | **4 fully complete** (#16, #18†, #20, #22) · **12 complete with limits** (#1, #4, #5, #7, #9, #10, #11, #12, #13, #17, #19, #23) · **16 of 23 materially delivered** · **6 partial** · **1 missing / not opened** (#15 deferred) · †#18 counted among the four while labeled COMPLETE WITH LIMITS (retained quirk) |
+| Last updated | 2026-08-02 |
 
 ---
 
@@ -79,6 +79,7 @@ Every completed item must show available evidence: commit hash · subject · tes
 
 ### Tagia Notes
 
+- **2026-08-02 — CUSTOMER-ONE-E2E-CERT-1 sealed · BROWSER-CERTIFIED WITH EXPLICIT LIMITS:** Clean worktree `cert/customer-one-e2e-1` · product `d39165b…` · harness `scripts/cert-customer-one-e2e-1.mjs` · browser **53 PASS / 0 FAIL / 2 LIMIT** · focused unit **40/40** · desktop **1440** + phone **390** Lobby→Conversation Room→Payment→Intake→Account Handoff→Board→Review→Final→Delivery · Lobby return / refresh / returning-customer / Sign In return · Project Claim **not started** · pre-CR Host/Route Map E2E scripts **do not count** · production build blocked by tip TypeScript baseline · 360px / all-surface outside package · Gates **#1 · #17 · #23** → **COMPLETE WITH LIMITS** · scoreboard **4 / 12 / 16 of 23 · 6 partial · 1 missing (#15)** · main WIP untouched · no merge/push yet. Evidence: `docs/launch/CUSTOMER-ONE-E2E-CERT-1.md`.
 - **2026-08-01 — Payment room bundle sealed (product @ `0555c58…`):** REFUND-STATUS-INSPECT-1 **COMPLETE · CLOSED**. Persistent return-path gap confirmed; construction required; customer-safe status on Studio Board Refund Request card + GET · no second ledger · internal notes hidden · history deferred. Validation: unit **25/25** · regression **11/11** · browser **14/14** (desktop + 390). Production build not run (narrow surface). Payment/refund slice **BROWSER-CERTIFIED WITH EXPLICIT LIMITS**. Gate #13 remains **COMPLETE WITH LIMITS** — persistent-status limit **closed**; money/provider/history limits remain. Cert evidence folded into `docs/launch/REFUND-STATUS-INSPECT-1.md` (no separate PAYMENT-ROOM-CERT-1). Fanout: that file · Master List · Scout handoff only.
 - **2026-08-01 — READINESS-RECONCILE-1 + scoreboard correction (LOCKED display):** Dual readiness headline required: **4 fully complete · 9 complete with limits · 13 of 23 materially delivered**. Strict “fully complete” must not erase certified CWL capabilities. Gate **#13** → COMPLETE WITH LIMITS (REFUND-REQUEST-1). Gate **#9** tooling limits corrected (Compare / Highlighter / Text Comment sealed). Protected tip = this scoreboard seal (parent was `b1f454da…`). Payment next as one room bundle — no seven-document echo chamber. Files: Master List Daily Snapshot + Hierarchy H · `SCOUT-CONTROL-POINT-HANDOFF.md` only.
 - **2026-08-01 — REFUND-STATUS-INSPECT-1 defined, inspection not authorized:** *(Superseded by Payment room bundle complete/closed note above.)*
@@ -459,7 +460,7 @@ Evidence: `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md
 11. [x] ~~**Refund request entry**~~ — **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS** — intake REFUND-REQUEST-1 `f60ee491…` · status return path `0555c580f7cfd6968c02313dd316f484e78750be` — `feat: add customer-safe refund request status on studio board` · unit **25/25** · regression **11/11** · browser **14/14** · Studio Board card + `GET/POST …/refund-request` · no second ledger · **Limits:** owner-review / owner-decision readout only · **no** financial execution/settlement/money-returned · **no** amount/partial/provider · **no** refund history · evidence `docs/launch/REFUND-STATUS-INSPECT-1.md`
 12. [x] ~~**Customer update history**~~ — **COMPLETE WITH LIMITS** — UPDATE-HISTORY-1 `1e1308e9f0e4c8b5728a605e4c930198fc2d17e6` — `feat: add customer update history to unified review room` · customer-safe projection over persisted `jobActivityEvents` only · Review / Final / Delivery rail · Final/Delivery need `jobId` · COMM / project-activity not merged · browser cert with temporary harness removed · **Limits:** job-scoped · no highlighter/compare · no Refund UI · do not conflate with Gate #12 (issue reporting)
 13. [ ] **Cross-room persistence and recovery proof** — PARTIAL (working-draft contract locked; proof bar open)
-14. [ ] **Desktop, phone, and 360px certification** — PARTIAL by package; full journey not closed
+14. [ ] **Desktop, phone, and 360px certification** — PARTIAL by package — Customer-One journey desktop 1440 / phone 390 sealed via CUSTOMER-ONE-E2E-CERT-1; **360px** and broader all-surface remain open
 15. [ ] **Team and production connection** — DEFERRED Early September
 16. [ ] **Repeated full-system testing** — DEFERRED Mid-to-Late September
 17. [ ] **Tagia Customer-One trial** — DEFERRED Late September / Early October
@@ -723,7 +724,7 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 
 | # | Gate | Status |
 |---|---|---|
-| 1 | Customer journey works from Lobby to final delivery | **PARTIAL** — CR-4 certifies Lobby → Conversation Room → Board handoff @ `02657aa` / `79ed2ce`; Review / Final Delivery / full purchased journey not closed by CR-4 |
+| 1 | Customer journey works from Lobby to final delivery | **COMPLETE WITH LIMITS** — CUSTOMER-ONE-E2E-CERT-1 · browser **53/0** · unit **40/40** · Lobby→CR→Payment→Intake→Account Handoff→Board→Review→Final→Delivery on desktop 1440 / phone 390 · product `d39165b…` · `docs/launch/CUSTOMER-ONE-E2E-CERT-1.md` · **Limits:** Project Claim not started · sandbox payment · post-Board honest production seed for Review/Final/Delivery · Discovery mid-spine seeded after Lobby+Voice · production build blocked by tip TS baseline · 360px outside package |
 | 2 | No false service promises | PARTIAL |
 | 3 | No recommendation engine pretending to be intelligent | **PARTIAL** — direction **DISCONTINUED** (Tagia 2026-07-26); CR-5 residual audit complete (`c69b669`); ARCHIVE-1 boundary parks discovery UI move until after Customer-One (`eaf3c239`); engine archive remains post–Customer-One |
 | 4 | Purchased routes are protected | **COMPLETE WITH LIMITS** — AUTH-GATE-1 `e7688ef` · `docs/launch/AUTH-GATE-1-PROJECT-RECORD-PAGE-AUTHENTICATION.md` · **8/8** focused Auth · Board · Project Record · Review · Delivery under session proxy · Project Claim / email hard-before-Board still separate · internal/dev tools outside spine |
@@ -739,15 +740,15 @@ Must be fully satisfied before Tagia begins the Customer-One trial.
 | 14 | Deadlines and risks are visible | PARTIAL / Evidence not yet pinned |
 | 15 | Team ownership is visible internally | DEFERRED (team phase) |
 | 16 | Final files are truthful | **COMPLETE** (HFF 67/67) — purchased-room access gate closed under #4 @ `e7688ef` · C8d embeds Honest Final Files in the unified room @ `956f4d8` without changing HFF release-rule authority |
-| 17 | Mobile and desktop are certified | **PARTIAL** — CR journey certified desktop 1440 / phone 390 / narrow 360 (`79ed2ce`); full-system mobile/desktop cert not closed |
+| 17 | Mobile and desktop are certified | **COMPLETE WITH LIMITS** — CUSTOMER-ONE-E2E-CERT-1 journey certified desktop **1440** / phone **390** · `docs/launch/CUSTOMER-ONE-E2E-CERT-1.md` · **Limits:** 360px and broader all-surface certification remain outside this package · not every ancillary surface re-certified here |
 | 18 | Voice behavior is defined and implemented where required | **COMPLETE WITH LIMITS** — Voice = Studio Representative communication system; no Host; Lobby silent; CR asks preference before first speech; Voice On/Off certified in CR-4 (`79ed2ce`); doctrine protected (`docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md`); **audible Voice quality remains non-blocking deferred** (not certified) |
 | 19 | Voice Off works without punishment or broken flow | **COMPLETE WITH LIMITS** — CR-4 Voice Off PASS (`79ed2ce`); account-level preference persistence still future construction (V1) |
 | 20 | Help remains available | **COMPLETE** |
 | 21 | No unfinished route is advertised as complete | PARTIAL (decision answered; audit remains) |
 | 22 | Production build passes | **COMPLETE** (verified during Launch Tracker / recent packages; CR-4 production build PASS) |
-| 23 | Full E2E testing passes | **MISSING** — CR-4 closes Conversation Room E2E only, not full Customer-One E2E |
+| 23 | Full E2E testing passes | **COMPLETE WITH LIMITS** — CUSTOMER-ONE-E2E-CERT-1 · current CR-spine harness `scripts/cert-customer-one-e2e-1.mjs` · browser **53 PASS / 0 FAIL / 2 LIMIT** · focused unit **40/40** · **do not count** obsolete pre-CR Host / Route Map E2E scripts · **Limits:** same as Gate #1 (Project Claim · sandbox · production-seed · mid-spine seed · tip TS baseline / `next dev` cert · 360 outside) |
 
-**Customer-One readiness (dual headline):** **4 fully complete** (#16, #18†, #20, #22) · **9 complete with limits** (#4, #5, #7, #9, #10, #11, #12, #13, #19) · **13 of 23 materially delivered** · **8 partial** (#1, #2, #3, #6, #8, #14, #17, #21) · **2 missing / not opened** (#15 deferred team phase, #23 full E2E). †Gate #18 remains counted among the four while labeled COMPLETE WITH LIMITS (retained quirk). Complete-with-limits means the customer-facing capability exists and has been tested with an explicitly documented bound — not unfinished vapor. Gate **#13** corrected from MISSING (REFUND-REQUEST-1). Gate **#9** tooling limits corrected (VERSION-COMPARE-1 · HIGHLIGHTER-1 · TEXT-COMMENT-1 · UR-ROOM-CERT-1 sealed). Do not treat “4 fully complete” alone as overall progress.
+**Customer-One readiness (dual headline):** **4 fully complete** (#16, #18†, #20, #22) · **12 complete with limits** (#1, #4, #5, #7, #9, #10, #11, #12, #13, #17, #19, #23) · **16 of 23 materially delivered** · **6 partial** (#2, #3, #6, #8, #14, #21) · **1 missing / not opened** (#15 deferred team phase). †Gate #18 remains counted among the four while labeled COMPLETE WITH LIMITS (retained quirk). Complete-with-limits means the customer-facing capability exists and has been tested with an explicitly documented bound — not unfinished vapor. Gates **#1 · #17 · #23** advanced by CUSTOMER-ONE-E2E-CERT-1 (2026-08-02). Do not treat “4 fully complete” alone as overall progress.
 
 ---
 
@@ -788,7 +789,7 @@ May follow Customer One; must precede outside customers.
 | Production build | `npm run build` | pass | Launch Tracker / inventory era | tip family | Always before protect of product packages |
 | Conversation Room Package 3 visual | — | **Superseded for launch control** by CR-4 end-to-end cert (Package 3 visual cert was never a separate closed record) | — | — | Historical gap; do not reopen as CR rewrite |
 | Conversation Room CR-4 E2E | `docs/launch/CR-4-CONVERSATION-ROOM-CERTIFICATION.md` · three `scripts/cert-*.mjs` | **30/30 PASS** | 2026-07-26 | product `02657aa` · docs `79ed2ce` | Rerun if CR journey changes |
-| Full Customer-One E2E | — | **Not started** | — | — | Required before trial |
+| Full Customer-One E2E | `scripts/cert-customer-one-e2e-1.mjs` · `docs/launch/CUSTOMER-ONE-E2E-CERT-1.md` | **53 PASS / 0 FAIL / 2 LIMIT** · focused unit **40/40** · desktop 1440 / phone 390 | 2026-08-02 | product `d39165b…` (clean `cert/customer-one-e2e-1`) | Yes if journey / auth / Board / unified room contracts change · pre-CR Host/Route Map scripts do **not** count |
 | Purchased-room access control | — | **Not started** | — | — | Required before Customer-One |
 | ISSUE-ENTRY-1 customer problem reporting | `scripts/smoke-issue-entry-1.mjs` | Focused Vitest **50/50 PASS** · Browser certification **116/116 PASS** | 2026-07-31 | `727c831` | Yes if Project Communication composer changes |
 
@@ -892,4 +893,4 @@ Do **not** clean, restore, stage, commit, absorb, or rewrite without an approved
 
 ---
 
-**Document status:** Payment room docs seal (2026-08-01) · documentation only on this commit · product tip `0555c580f7cfd6968c02313dd316f484e78750be` unchanged · Gate #13 **COMPLETE WITH LIMITS** (intake + persistent status; money/provider/history limits remain) · Payment/refund slice **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · cert folded into `REFUND-STATUS-INSPECT-1.md` · dual headline **4 / 9 / 13 of 23** retained · **113** WIP untouched · harness/artifacts unstaged.
+**Document status:** CUSTOMER-ONE-E2E-CERT-1 seal (2026-08-02) · product `d39165b…` · harness + docs on `cert/customer-one-e2e-1` · Gates **#1 · #17 · #23** **COMPLETE WITH LIMITS** · dual headline **4 / 12 / 16 of 23 · 6 partial · 1 missing (#15)** · Project Claim not started · main tip `0a8f846…` / WIP untouched until transfer · Payment/refund remains sealed with limits.
