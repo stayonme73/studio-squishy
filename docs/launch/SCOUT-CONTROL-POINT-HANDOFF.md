@@ -10,15 +10,13 @@
 
 **Stand by. Verify the protected control point only. Do not begin a new package.**
 
-**READINESS-RECONCILE-1** is **COMPLETE** (read-only). Scoreboard correction sealed in Master List + this handoff.  
-**REFUND-STATUS-INSPECT-1** is **defined** in governing docs. **Inspection is not authorized** until Tagia opens the Payment room bundle.  
-**REFUND-REQUEST-1** is **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `f60ee491…`. Do not reopen without contradictory evidence.  
+**Payment room bundle** product work is committed locally @ `0555c58…` and awaits this documentation seal (then push when authorized).  
+**REFUND-STATUS-INSPECT-1** is **COMPLETE · CLOSED** — persistent return-path gap confirmed; status construction sealed; Payment/refund slice **BROWSER-CERTIFIED WITH EXPLICIT LIMITS**. Evidence: `docs/launch/REFUND-STATUS-INSPECT-1.md`.  
+**REFUND-REQUEST-1** remains **SEALED · BROWSER-CERTIFIED WITH LIMITS** @ `f60ee491…`.  
 **REFUND-UI-INSPECT-1** is **COMPLETE · CLOSED**.  
-**UR-ROOM-CERT-1** is **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS**. Do not reopen without contradictory evidence.  
+**UR-ROOM-CERT-1** is **SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS**.  
 **PAGE-TABS-1** remains **deferred**.  
-No status UI construction. No provider refund execution. No Board Materials. No project-wide Gate #17 claim.
-
-Do not begin Payment inspection/construction, modify product files, call payment providers, or reopen sealed work until authorized.
+No provider refund execution. No Board Materials. No project-wide Gate #17 claim. Do not reopen sealed Payment work without contradictory evidence.
 
 ---
 
@@ -28,49 +26,44 @@ Project Alpha is resuming from the following protected state:
 
 | Field | Value |
 |---|---|
-| Protected tip | `c316568a2b07f1b6740b95e6c787482cf2ca427a` (scoreboard seal; tip-pin may sit one ahead) |
+| Protected tip | `0555c580f7cfd6968c02313dd316f484e78750be` (product) · docs seal advances HEAD when committed |
 | Branch | `fix/discovery-responsive-layout` |
-| Expected sync | **2 ahead / 0 behind** until push · then **0 / 0** |
-| Expected staging | **empty** |
+| Expected sync | **1 ahead / 0 behind** until product push; docs seal adds one more local commit when sealed |
+| Expected staging | **empty** after seal commit |
 | Open construction package | **none** |
 | Open inspection package | **none** |
 | Open certification package | **none** |
-| Defined next package | **Payment room bundle** (when authorized): refund-status inspection → build only if needed → Payment certification → **one** evidence-backed docs seal |
+| Defined next package | **none** — Payment room Customer-One slice sealed with limits; await Tagia for next room/bundle |
 | Deferred | **PAGE-TABS-1** — pending truthful page/location identity |
 | Customer-One readiness | **4 fully complete · 9 complete with limits · 13 of 23 materially delivered** · **8 partial · 2 missing / not opened** |
 | Unified room cert | **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** · browser 98/98 · unit 32/32 |
+| Payment/refund slice | **BROWSER-CERTIFIED WITH EXPLICIT LIMITS** @ `0555c58…` |
 | Proof viewing (Customer-One) | Session-gated **link/list** — Choice A |
-| Active room sequence | **Payment room** — waits room-bundle authorization |
+| Active room sequence | **Payment room** — Customer-One refund intake + status return path sealed with limits |
 
 ### Recently sealed / closed
 
-- **READINESS-RECONCILE-1** — COMPLETE (read-only scoreboard reconcile)
-- **Scoreboard correction** — docs seal (Master List + this handoff only)
-- **REFUND-REQUEST-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `f60ee491…` (unit 18/18 · browser 10/10 · owner-review intake only)
-- **REFUND-UI-INSPECT-1** — COMPLETE · CLOSED (refund record/adjudicate exists; provider money movement absent)
-- **UR-ROOM-CERT-1** — SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS @ `e6be8bd…` seal docs
-- **UR-PROOF-READINESS-INSPECT-1** — COMPLETE / CLOSED · Choice **A**
-- **TEXT-COMMENT-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `071c2b1…`
-- **REVIEW-TEXT-TOOLS-INSPECT-1** — COMPLETE / CLOSED
-- **HIGHLIGHTER-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `96b6a39…`
-- **VERSION-COMPARE-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `b0bd5e5…`
-- **UPDATE-HISTORY-1** @ `1e1308e…`
-- **ISSUE-ENTRY-1** customer problem reporting
+- **Payment room bundle** — REFUND-STATUS-INSPECT-1 COMPLETE · status UI @ `0555c58…` · browser 14/14 · unit 25/25 · regression 11/11  
+- **READINESS-RECONCILE-1** — COMPLETE (read-only scoreboard reconcile)  
+- **Scoreboard correction** — dual headline 4 / 9 / 13 of 23  
+- **REFUND-REQUEST-1** — SEALED · BROWSER-CERTIFIED WITH LIMITS @ `f60ee491…`  
+- **REFUND-UI-INSPECT-1** — COMPLETE · CLOSED  
+- **UR-ROOM-CERT-1** — SEALED · BROWSER-CERTIFIED WITH EXPLICIT LIMITS @ `e6be8bd…`  
+- **TEXT-COMMENT-1** · **HIGHLIGHTER-1** · **VERSION-COMPARE-1** · **UPDATE-HISTORY-1** · **ISSUE-ENTRY-1**
 
 ### Gate status
 
 **Fully complete (4):** #16, #18†, #20, #22.  
-**Complete with limits (9):** #4, #5, #7, #9, #10, #11, #12, **#13**, #19 — counted in **13 materially delivered**, not in the strict four.  
-**Gate #13** is **COMPLETE WITH LIMITS** (intake sealed; no money movement; status panel not inspected).  
-**Gate #9** tooling (Compare / Highlighter / Text Comment) is **sealed**; remaining review limits (Choice A, Pencil/Voice depth, PAGE-TABS-1 deferred) stay.  
-**Gate #17** project-wide remains incomplete — Unified Room 360px requirement only was recorded as passed.  
+**Complete with limits (9):** #4, #5, #7, #9, #10, #11, #12, **#13**, #19.  
+**Gate #13** remains **COMPLETE WITH LIMITS** — intake + persistent status sealed; **no** money movement / provider / history.  
+**Gate #17** project-wide remains incomplete.  
 †#18 counted among the four while labeled COMPLETE WITH LIMITS (retained quirk).
 
 ### Known open customer-facing work (sequence)
 
-1. Payment room bundle (when authorized) — no separate definition parade  
-2. PAGE-TABS-1 (deferred)  
-3. Materials dual UX (Board — waiting)
+1. PAGE-TABS-1 (deferred)  
+2. Materials dual UX (Board — waiting)  
+3. Remaining partial / missing Hierarchy H gates (journey E2E, Gate #17 project-wide, etc.) — await Tagia priority
 
 ---
 
@@ -80,7 +73,7 @@ Project Alpha is resuming from the following protected state:
 2. Local versus origin ahead/behind state  
 3. Staging and working-tree state  
 4. Whether any unrelated local work is present  
-5. Whether HEAD is at or after `c316568a2b07f1b6740b95e6c787482cf2ca427a` (scoreboard seal; tip-pin commit may sit one ahead)
+5. Whether HEAD is at or after product tip `0555c580f7cfd6968c02313dd316f484e78750be` (docs seal may sit one ahead)
 
 **If the repository does not match the protected state, stop and report the discrepancy without altering anything.**
 
