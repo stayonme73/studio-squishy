@@ -28,9 +28,9 @@ Project Alpha is resuming from the following protected state:
 
 | Field | Value |
 |---|---|
-| Protected tip | HEAD after scoreboard seal (verify git log -1 --oneline subject: correct Customer-One readiness scoreboard) · parent `b1f454da7d562b7b4ac11170718b0a4b972633a0` |
+| Protected tip | `c316568a2b07f1b6740b95e6c787482cf2ca427a` (scoreboard seal; tip-pin may sit one ahead) |
 | Branch | `fix/discovery-responsive-layout` |
-| Expected sync | **0 ahead / 0 behind** |
+| Expected sync | **2 ahead / 0 behind** until push · then **0 / 0** |
 | Expected staging | **empty** |
 | Open construction package | **none** |
 | Open inspection package | **none** |
@@ -80,7 +80,7 @@ Project Alpha is resuming from the following protected state:
 2. Local versus origin ahead/behind state  
 3. Staging and working-tree state  
 4. Whether any unrelated local work is present  
-5. Whether HEAD matches `f34258214e437debeeaafcd91c4e35dbc5352604` (or later authorized tip)
+5. Whether HEAD is at or after `c316568a2b07f1b6740b95e6c787482cf2ca427a` (scoreboard seal; tip-pin commit may sit one ahead)
 
 **If the repository does not match the protected state, stop and report the discrepancy without altering anything.**
 

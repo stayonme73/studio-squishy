@@ -17,9 +17,9 @@ Completed work stays visible and crossed out with evidence. Only one item is **C
 
 | Field | Value |
 |---|---|
-| Protected tip | `b1f454da7d562b7b4ac11170718b0a4b972633a0` — last remote tip before scoreboard seal · this seal advances HEAD · READINESS-RECONCILE-1 |
+| Protected tip | `c316568a2b07f1b6740b95e6c787482cf2ca427a` — `docs(launch): correct Customer-One readiness scoreboard` · tip pin HEAD · parent `b1f454da7d562b7b4ac11170718b0a4b972633a0` |
 | Branch | `fix/discovery-responsive-layout` |
-| Sync | **1 ahead / 0 behind** until push · staging empty · substantial unrelated dirty WIP present (leave untouched · expected **113**) |
+| Sync | **2 ahead / 0 behind** until push · staging empty · substantial unrelated dirty WIP present (leave untouched · expected **113**) |
 | Current active item | **None** — Scout parked · scoreboard reconciled · Payment room next as **one room bundle** when authorized (status inspect → build only if needed → Payment cert → one docs seal) |
 | Doctrine path | `docs/launch/STUDIO-VOICE-DEFINITION-AND-CUSTOMER-PRESENCE-DOCTRINE.md` (**PROTECTED**) |
 | Most recently completed | **READINESS-RECONCILE-1** (read-only) + this scoreboard correction · prior tip `b1f454da` (REFUND-STATUS-INSPECT-1 defined) · REFUND-REQUEST-1 **SEALED** @ `f60ee491` · UR-ROOM-CERT-1 @ `e6be8bd` · TEXT-COMMENT-1 · HIGHLIGHTER-1 · VERSION-COMPARE-1 · UPDATE-HISTORY-1 · ISSUE-ENTRY-1 · C8a–C8e |
