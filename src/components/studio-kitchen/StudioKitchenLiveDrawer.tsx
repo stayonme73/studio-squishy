@@ -98,6 +98,13 @@ export default function StudioKitchenLiveDrawer({ folder, onClose }: Props) {
               </dd>
             </div>
             <div>
+              <dt>Outbox records pending send</dt>
+              <dd>
+                {folder.pendingOutboxCount} — routine authorized notices await delivery
+                transport; this count is not an owner-decision queue
+              </dd>
+            </div>
+            <div>
               <dt>Due date</dt>
               <dd>{folder.dueLabel}</dd>
             </div>

@@ -93,6 +93,8 @@ Multiple layers may legitimately coexist. Do not force one oversimplified status
 - Supabase production system-of-record migration
 - Broad Squishy cleanup
 
+Internal operational communication over this foundation is introduced separately in **KITCHEN-COMMS-1** (`docs/studio-internal-communication-doctrine-v1-locked.md`) — projection only; not a second production truth.
+
 ---
 
 ## Related

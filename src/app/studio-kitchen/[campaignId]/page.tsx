@@ -8,6 +8,7 @@ import {
   isKitchenFixtureDemoRequested,
   loadKitchenProjectionDetail,
 } from "@/lib/studio-kitchen";
+import { loadKitchenCommsLedger } from "@/lib/studio-kitchen-comms";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 import "../../mobile-route-fixes.css";
@@ -40,11 +41,16 @@ export default async function StudioKitchenCampaignPage({ params, searchParams }
     fixtureDemoRequested: isKitchenFixtureDemoRequested(query),
   });
 
+  const ledger =
+    detail.kind === "ok" && detail.folder.source === "live_production"
+      ? await loadKitchenCommsLedger(campaignId)
+      : null;
+
   return (
     <main
       className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden bg-[var(--utility-paper-cream)]`}
     >
-      <StudioKitchenLiveDetailScene detail={detail} />
+      <StudioKitchenLiveDetailScene detail={detail} ledger={ledger} />
     </main>
   );
 }

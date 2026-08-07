@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import StudioKitchenCommsPanel from "@/components/studio-kitchen/StudioKitchenCommsPanel";
 import StudioKitchenHeader from "@/components/studio-kitchen/StudioKitchenHeader";
 import { studioKitchenFoundation } from "@/config/studio-kitchen-foundation-v1";
 import { studioKitchen } from "@/config/studio-kitchen";
@@ -8,12 +9,14 @@ import {
   kitchenDataSourceLabel,
   type KitchenProjectionDetail,
 } from "@/lib/studio-kitchen";
+import type { KitchenCommsLedger } from "@/lib/studio-kitchen-comms";
 
 type Props = {
   detail: KitchenProjectionDetail;
+  ledger: KitchenCommsLedger | null;
 };
 
-export default function StudioKitchenLiveDetailScene({ detail }: Props) {
+export default function StudioKitchenLiveDetailScene({ detail, ledger }: Props) {
   const copy = studioKitchenFoundation.page;
 
   if (detail.kind === "unavailable") {
@@ -154,6 +157,10 @@ export default function StudioKitchenLiveDetailScene({ detail }: Props) {
             </ul>
           )}
         </section>
+
+        {ledger && folder.source === "live_production" ? (
+          <StudioKitchenCommsPanel ledger={ledger} />
+        ) : null}
 
         <p>
           <Link href={folder.fileRoomHref} className="utility-btn utility-btn--primary">
