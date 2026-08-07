@@ -5,13 +5,13 @@ import {
   type KitchenBucketId,
 } from "@/config/studio-kitchen-buckets";
 import {
-  kitchenCampaigns,
   kitchenStageDefinitions,
   kitchenStageIndex,
   type KitchenAlert,
   type KitchenCampaign,
   type KitchenStageId,
 } from "@/config/studio-kitchen";
+import { kitchenFixtureCampaignSeed } from "@/lib/studio-kitchen/fixture-boundary";
 
 export type KitchenStageVisualState = "completed" | "current" | "pending";
 
@@ -62,8 +62,9 @@ export type KitchenDetailView = {
   stages: KitchenStageRow[];
 };
 
+/** Fixture lookup only — live Kitchen uses `@/lib/studio-kitchen` projection. */
 export function getKitchenCampaign(campaignId: string): KitchenCampaign | null {
-  return kitchenCampaigns.find((c) => c.id === campaignId) ?? null;
+  return kitchenFixtureCampaignSeed.find((c) => c.id === campaignId) ?? null;
 }
 
 export function withKitchenBucket(campaign: KitchenCampaign): KitchenCampaignWithBucket {
@@ -112,8 +113,12 @@ export function buildKitchenTableGroups(
   return groups;
 }
 
+/**
+ * Legacy dashboard builder. Defaults empty so fixtures cannot silently appear live.
+ * Pass `kitchenFixtureCampaignSeed` explicitly for labeled demo use only.
+ */
 export function buildKitchenDashboardView(
-  campaigns: KitchenCampaign[] = kitchenCampaigns,
+  campaigns: KitchenCampaign[] = [],
 ): KitchenDashboardView {
   const withBuckets = campaigns.map(withKitchenBucket);
 

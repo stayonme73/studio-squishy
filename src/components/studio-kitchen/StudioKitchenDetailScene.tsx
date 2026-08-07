@@ -18,7 +18,10 @@ type Props = {
   campaignId: string;
 };
 
-/** Studio Kitchen V3 — single campaign workflow detail. */
+/**
+ * Legacy seeded Kitchen detail — retained for reference only.
+ * Live route uses StudioKitchenLiveDetailScene + `@/lib/studio-kitchen` projection.
+ */
 export default function StudioKitchenDetailScene({ campaignId }: Props) {
   const folder = useMemo(() => getKitchenFolder(campaignId), [campaignId]);
   const view = useMemo(() => (folder ? buildKitchenDetailView(folder) : null), [folder]);

@@ -1,6 +1,10 @@
 /**
- * Studio Kitchen V2 — owner operations center (Phase 1).
- * Layout + workflow visualization only — no automation, email, or AI wiring.
+ * Studio Kitchen — legacy stage/bucket presentation config + fixture seed types.
+ *
+ * Live production authority is NOT here. Kitchen Foundation projects
+ * File Room / job-control / campaign-tasks truth via `@/lib/studio-kitchen`.
+ *
+ * @see docs/studio-kitchen-foundation-v1-locked.md
  */
 
 import { customerJourneyStepName } from "@/config/customer-journey-v1";
@@ -178,18 +182,22 @@ export const kitchenStageDefinitions: KitchenStageDefinition[] = [
   },
 ];
 
+/**
+ * @deprecated Fixture/demo seed only — never treat as live production truth.
+ * Use `kitchenFixtureCampaignSeed` from `@/lib/studio-kitchen` for explicit demo mode.
+ */
 export const kitchenCampaigns: KitchenCampaign[] = kitchenCampaignSeed;
 
 export const studioKitchen = {
   route: "/studio-kitchen",
 
   page: {
-    eyebrow: "Owner operations",
+    eyebrow: "Internal production",
     title: "Studio Kitchen",
     lead:
-      "Workflow control center — see every campaign, who owns the next step, and what needs attention.",
+      "Internal operating view of real Studio production state — Campaign Record, jobs, tasks, QA, blockers, and exceptions.",
     phaseNote:
-      "V5 — one folder, one bucket. Open folder → perform action → move folder. History holds completed stages.",
+      "Foundation — Kitchen projects existing File Room / job-control / campaign-tasks truth. It does not maintain a parallel production world.",
     backLabel: "← Studio Board",
     backHref: "/studio-board",
     dashboardBackLabel: "← All Campaigns",

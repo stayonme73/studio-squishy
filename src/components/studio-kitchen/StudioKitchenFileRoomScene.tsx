@@ -11,7 +11,10 @@ import { buildKitchenFileRoomView, getKitchenFolder } from "@/lib/studio-kitchen
 
 const { page, fileRoom } = studioKitchen;
 
-/** Studio Kitchen V5 — owner file room with stage-specific actions. */
+/**
+ * Legacy seeded Kitchen scene — retained for reference only.
+ * Live route uses StudioKitchenLiveFileRoomScene + `@/lib/studio-kitchen` projection.
+ */
 export default function StudioKitchenFileRoomScene() {
   const view = useMemo(() => buildKitchenFileRoomView(), []);
   const [drawerCampaignId, setDrawerCampaignId] = useState<string | null>(null);

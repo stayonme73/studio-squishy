@@ -15,7 +15,8 @@ import {
   type KitchenFolderSticker,
   type KitchenPriorityAlert,
 } from "@/config/studio-kitchen-file-room";
-import { kitchenCampaigns, type KitchenCampaign } from "@/config/studio-kitchen";
+import type { KitchenCampaign } from "@/config/studio-kitchen";
+import { kitchenFixtureCampaignSeed } from "@/lib/studio-kitchen/fixture-boundary";
 
 export type KitchenFolderView = KitchenCampaign & {
   placement: KitchenFolderPlacement;
@@ -58,8 +59,13 @@ export function withKitchenFolder(campaign: KitchenCampaign): KitchenFolderView 
   };
 }
 
+/**
+ * Legacy seeded file-room view builder.
+ * Defaults to an empty board so fixture seed cannot silently appear as live truth.
+ * Pass `kitchenFixtureCampaignSeed` explicitly for labeled demo use only.
+ */
 export function buildKitchenFileRoomView(
-  campaigns: KitchenCampaign[] = kitchenCampaigns,
+  campaigns: KitchenCampaign[] = [],
 ): KitchenFileRoomView {
   const folders = campaigns.map(withKitchenFolder);
 
@@ -219,7 +225,8 @@ export function buildKitchenPriorityAlerts(buckets: KitchenBucketSlotView[]): Ki
   return alerts;
 }
 
+/** Fixture lookup only — live Kitchen detail uses loadKitchenProjectionDetail. */
 export function getKitchenFolder(campaignId: string): KitchenFolderView | null {
-  const campaign = kitchenCampaigns.find((c) => c.id === campaignId);
+  const campaign = kitchenFixtureCampaignSeed.find((c) => c.id === campaignId);
   return campaign ? withKitchenFolder(campaign) : null;
 }
