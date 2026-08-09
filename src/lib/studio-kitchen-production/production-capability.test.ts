@@ -130,7 +130,10 @@ describe("KITCHEN-PRODUCTION-CAPABILITY-1", () => {
     expect(video.contract.readiness).toBe("contract_ready_integration_required");
     expect(profile.contract.readiness).toBe("partial");
     expect(page.contract.readiness).toBe("partial");
+    // CapCut Desktop exists but owner-independence FAIL — still integration_required / not customer-certified.
     expect(video.contract.primaryTool.integrationState).toBe("not_integrated");
+    expect(video.contract.primaryTool.toolReadiness).toBe("tool_integration_required");
+    expect(video.contract.primaryTool.note).toMatch(/OWNER-INDEPENDENCE FAIL/i);
     expect(voice.contract.primaryTool.integrationState).toBe("partial_adapter");
     expect(voice.contract.primaryTool.note).toMatch(/ElevenLabs/i);
     expect(rtuVoice.contract.primaryTool.integrationState).toBe("partial_adapter");

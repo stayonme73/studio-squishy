@@ -522,13 +522,14 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
     ],
     readiness: "contract_ready_integration_required",
     readinessNotes:
-      "KITCHEN-VIDEO-PRODUCTION-1: CapCut named, not integrated (INTEGRATION REQUIRED). No Studio MP4 render path. Manual CapCut packet not Kitchen-proven. Stock source + music rights UNRESOLVED. NOT CUSTOMER READY — do not certify in this package.",
+      "KITCHEN-VIDEO-OPERATIONAL-1: CAPCUT OWNER-INDEPENDENCE FAIL — no supported owner-free CapCut export. NOT CUSTOMER READY / NOT CERTIFIED. Work packet + bind gates retained for a future provider. Stock + music UNRESOLVED. Intake lead reconciled to 15–30s. Next: KITCHEN-VIDEO-PROVIDER-SELECTION-1.",
     specialNotes: [
       "Client posts/distributes the finished video.",
       "Customer must provide organized usable footage when using their own visuals.",
       "Optional certified voice MP3 may be referenced by hash; voice cert does not certify video.",
-      "Catalog/intake name Studio/stock/AI visuals, but no authorized source is established yet.",
-      "MUSIC CAPABILITY = UNRESOLVED — omit music until rights are certain.",
+      "Stock-media capability UNRESOLVED for jobs that need stock — unused in this package.",
+      "MUSIC CAPABILITY = UNRESOLVED — omit music until rights are certain (unused in this package).",
+      "Tagia/Owner CapCut click-export is NOT an acceptable production success path.",
     ],
   },
 };

@@ -683,7 +683,7 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
   "rtu-short-video": {
     type: "rtu-short-video",
     title: "Short Video Intake",
-    lead: "One short video up to 45 seconds — share purpose, format, and media references.",
+    lead: "One short video, 15–30 seconds — share purpose, format, and media references.",
     clientResponsibilityNote: RTU_SOCIAL_CLIENT_NOTE,
     fields: [
       {

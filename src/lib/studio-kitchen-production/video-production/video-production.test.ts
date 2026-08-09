@@ -132,32 +132,35 @@ describe("KITCHEN-VIDEO-PRODUCTION-1", () => {
       expect(resolved.contract.readiness).toBe("contract_ready_integration_required");
       expect(resolved.contract.primaryTool.toolId).toBe("capcut");
       expect(resolved.contract.primaryTool.integrationState).toBe("not_integrated");
-      expect(resolved.contract.readinessNotes).toMatch(/INTEGRATION REQUIRED/i);
-      expect(resolved.contract.readinessNotes).not.toMatch(/CUSTOMER READY(?! —)/i);
+      expect(resolved.contract.readinessNotes).toMatch(/OWNER-INDEPENDENCE FAIL/i);
       expect(resolved.contract.readinessNotes).toMatch(/NOT CUSTOMER READY/i);
+      expect(resolved.contract.readinessNotes).not.toMatch(/CUSTOMER READY WITH LIMITS — MP4/i);
       const truth = videoSkuContractTruth(sku);
-      expect(truth.readinessLabel).toMatch(/INTEGRATION REQUIRED/i);
       expect(truth.durationSecondsMin).toBe(VIDEO_DURATION_MIN_SECONDS);
       expect(truth.durationSecondsMax).toBe(VIDEO_DURATION_MAX_SECONDS);
       expect(truth.fileFormat).toBe("mp4");
       expect(truth.videoCount).toBe(1);
       expect(truth.publishingExcluded).toBe(true);
-      expect(truth.intakeLeadDurationDiscrepancy).toMatch(/45/);
+      expect(truth.intakeLeadDurationDiscrepancy).toMatch(/Reconciled|15–30/);
     }
   });
 
-  it("classifies CapCut as integration_required — not automated, not proven manual-operational", () => {
+  it("records CapCut owner-independence FAIL — no Tagia export success path", () => {
     const cap = classifyCapCutFinding();
     expect(cap.finding).toBe("integration_required");
+    expect(cap.ownerIndependence).toBe("fail");
     expect(cap.canCreateCustomerReadyMp4WithoutHumanCapCut).toBe(false);
+    expect(cap.canCreateCustomerReadyMp4WithoutTagia).toBe(false);
     const summary = summarizeVideoCapabilityInventory();
+    expect(summary.capCutOwnerIndependence).toBe("fail");
     expect(summary.canGenerateCustomerDeliverableMp4InStudio).toBe(false);
     expect(summary.customerReady).toBe(false);
     expect(summary.musicCapability).toBe("unresolved");
     expect(summary.stockMediaCapability).toBe("unresolved");
     expect(summary.studioVoiceUntouched).toBe(true);
-    expect(CAPCUT_MANUAL_OPERATIONAL_TARGET.status).toBe("not_kitchen_proven");
-    expect(CAPCUT_MANUAL_OPERATIONAL_TARGET.tagiaRoutineEditor).toBe(false);
+    expect(summary.recommendedNextPackage).toBe("KITCHEN-VIDEO-PROVIDER-SELECTION-1");
+    expect(CAPCUT_MANUAL_OPERATIONAL_TARGET.tagiaExportSuccessPath).toBe(false);
+    expect(CAPCUT_MANUAL_OPERATIONAL_TARGET.ownerIndependence).toBe("fail");
   });
 
   it("fails honestly when required assets are missing or stock is unapproved", () => {

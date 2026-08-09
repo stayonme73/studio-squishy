@@ -1,14 +1,14 @@
 /**
- * CapCut manual-operational boundary documentation.
- * Not proven as Kitchen-ready — records what would be required.
+ * CapCut path after owner-independence FAIL — retained for audit only.
  */
 
 export type CapCutManualOperationalPacket = {
-  status: "not_kitchen_proven";
+  status: "owner_independence_fail";
   finding: "integration_required";
-  ownerIndependence: "unproven";
-  whoOpensCapCut: "creative_production";
+  ownerIndependence: "fail";
+  whoOpensCapCut: "human_desktop_operator_required_unsupported_as_studio_path";
   tagiaRoutineEditor: false;
+  tagiaExportSuccessPath: false;
   requiredBeforeManualOperationalReady: readonly string[];
   inputsReceived: readonly string[];
   workPacketSteps: readonly string[];
@@ -16,53 +16,35 @@ export type CapCutManualOperationalPacket = {
   mp4ReturnPath: string;
   hashBinding: string;
   qaCorrectionTracking: string;
+  recommendedNextPackage: "KITCHEN-VIDEO-PROVIDER-SELECTION-1";
 };
 
-/**
- * Documented target for a future operational package.
- * This package does NOT authorize calling CapCut manual-operational.
- */
 export const CAPCUT_MANUAL_OPERATIONAL_TARGET: CapCutManualOperationalPacket = {
-  status: "not_kitchen_proven",
+  status: "owner_independence_fail",
   finding: "integration_required",
-  ownerIndependence: "unproven",
-  whoOpensCapCut: "creative_production",
+  ownerIndependence: "fail",
+  whoOpensCapCut: "human_desktop_operator_required_unsupported_as_studio_path",
   tagiaRoutineEditor: false,
+  tagiaExportSuccessPath: false,
   requiredBeforeManualOperationalReady: [
-    "Named Creative Production operator role (not Tagia) for CapCut assembly",
-    "Work packet with locked scriptVersionId, aspect ratio, asset refs, optional voice hash",
-    "Brand/template rules for RTU short video (captions + CTA)",
-    "Export checklist: MP4, duration 15–30s, one aspect, captions/CTA present",
-    "File Room / Kitchen return path for finished MP4",
-    "SHA-256 binding on returned bytes before QA READY",
-    "Authorized stock source if customer media absent",
-    "Music rights decision (omit until resolved)",
+    "Select a replacement provider with programmatic MP4 export (KITCHEN-VIDEO-PROVIDER-SELECTION-1)",
+    "Do not resume CapCut Owner/Tagia click-export as the Studio success path",
   ],
   inputsReceived: [
-    "Campaign Record + SKU v2-rtu-short-video",
-    "Locked on-screen text / CTA (scriptVersionId)",
-    "Storyboard / shot sequence",
-    "Customer footage/photos/logo refs OR authorized Studio visuals",
-    "Optional certified voice MP3 path + SHA-256",
-    "Must-not-show / disclaimer notes",
+    "Work packets wp-v1/wp-v2",
+    "Synthetic assets + sealed voice hash",
+    "CapCut Desktop install proven",
   ],
   workPacketSteps: [
-    "Open CapCut on operator workstation",
-    "Import approved assets + optional voice MP3",
-    "Assemble one 15–30s cut in chosen aspect",
-    "Add captions + CTA treatment",
-    "Omit music unless rights are resolved",
-    "Export MP4",
-    "Return MP4 to Studio File Room / Kitchen artifact path",
-    "Bind path + SHA-256 + metadata",
-    "Hand to QA",
+    "Work packet remains the decision encoding model",
+    "CapCut Desktop export is not Studio-automatable",
+    "Bind/QA READY gates await a programmatic exporter",
   ],
   templateBrandRules:
-    "Not yet Kitchen-packaged. Must not invent brand rules in this package.",
+    "docs/launch/kitchen-video-operational-1/work-packet/WORK-PACKET-v1.md",
   mp4ReturnPath:
-    "File Room final_delivery object path or Kitchen launch artifact root — exact operator SOP not yet sealed.",
-  hashBinding:
-    "registerBoundVideoArtifact + evaluateVideoArtifactBindings before QA READY.",
-  qaCorrectionTracking:
-    "Existing campaign-tasks QA fail/pass + Kitchen Comms — Creative Production → QA loop; owner_not_required for routine fixes.",
+    "Future provider export → docs/launch/.../artifacts with hash bind",
+  hashBinding: "bindCapCutExport renamed conceptually for future provider bind",
+  qaCorrectionTracking: "V1→V2 correction model retained; owner_not_required for routine fixes",
+  recommendedNextPackage: "KITCHEN-VIDEO-PROVIDER-SELECTION-1",
 };

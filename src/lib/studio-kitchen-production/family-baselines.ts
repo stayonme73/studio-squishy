@@ -92,7 +92,7 @@ const CAPCUT: ProductionToolRef = {
   integrationState: "not_integrated",
   toolReadiness: "tool_integration_required",
   note:
-    "Named video edit tool. No CapCut API in repo. Manual CapCut operational packet not Kitchen-proven (KITCHEN-VIDEO-PRODUCTION-1). Autonomous CapCut production is not claimed.",
+    "CapCut Desktop is installed but OWNER-INDEPENDENCE FAIL (KITCHEN-VIDEO-OPERATIONAL-1): no supported CLI/API/SDK/headless export. Human CapCut operation is not an acceptable Studio success path. Replacement selection required.",
 };
 
 const AI_VOICE: ProductionToolRef = {

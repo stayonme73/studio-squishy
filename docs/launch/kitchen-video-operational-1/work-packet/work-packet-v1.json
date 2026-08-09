@@ -1,0 +1,60 @@
+{
+  "workPacketId": "video-ops-1-cedar-lane",
+  "workPacketVersion": "wp-v1",
+  "storyboardVersion": "sb-v1",
+  "scriptVersionId": "script-v1",
+  "campaignId": "video-ops-1-cedar-lane",
+  "skuId": "v2-rtu-short-video",
+  "label": "INTERNAL VIDEO PRODUCTION TEST — NOT CUSTOMER DELIVERABLE",
+  "durationMinSeconds": 20,
+  "durationMaxSeconds": 25,
+  "durationTargetSeconds": 22.5,
+  "aspectRatio": "vertical",
+  "width": 1080,
+  "height": 1920,
+  "exportFormat": "mp4",
+  "musicAllowed": false,
+  "stockAllowed": false,
+  "productionMethod": "capcut",
+  "productionRoleOwner": "creative_production",
+  "temporaryPhysicalOperator": "tagia_one_time_desktop_gui",
+  "voiceArtifact": {
+    "relativePath": "docs/launch/kitchen-production-cert-voice-1/artifacts/cert-voice-1-cedar-lane/ap-001_cert-voice-script-v1_d283144563a6.mp3",
+    "contentSha256": "d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4"
+  },
+  "exportRelativePath": "docs/launch/kitchen-video-operational-1/artifacts/v1/v2-rtu-short-video_video-ops-1-cedar-lane_wp-v1_sb-v1.mp4",
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "assetId": "scene-01",
+      "relativePath": "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-01.png",
+      "startSeconds": 0,
+      "endSeconds": 5.5,
+      "caption": "Quiet craft. Clear message."
+    },
+    {
+      "sceneNumber": 2,
+      "assetId": "scene-02",
+      "relativePath": "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-02.png",
+      "startSeconds": 5.5,
+      "endSeconds": 11,
+      "caption": "Cedar Lane Studio"
+    },
+    {
+      "sceneNumber": 3,
+      "assetId": "scene-03",
+      "relativePath": "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-03.png",
+      "startSeconds": 11,
+      "endSeconds": 16.5,
+      "caption": "Brand stories, made calm."
+    },
+    {
+      "sceneNumber": 4,
+      "assetId": "scene-04",
+      "relativePath": "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-04-endcard.png",
+      "startSeconds": 16.5,
+      "endSeconds": 22.5,
+      "caption": "Book a visit"
+    }
+  ]
+}

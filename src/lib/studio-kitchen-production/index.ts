@@ -112,6 +112,19 @@ export {
   viewingNotesForHash,
 } from "./video-production";
 export {
+  CAPCUT_DESKTOP_SETUP,
+  VIDEO_OPS_PACKAGE_ROOT,
+  VIDEO_OPS_WORK_PACKET_V1_REL,
+  VIDEO_OPS_WORK_PACKET_V2_REL,
+  assertWorkPacketAssetsExist,
+  bindCapCutExport,
+  gateQaReadyFromBoundExport,
+  loadVideoWorkPacketV1,
+  loadVideoWorkPacketV2,
+  probeCapCutInstalled,
+  validateVideoWorkPacket,
+} from "./video-operational";
+export {
   CERT_VOICE_APPROVED_ARTIFACT,
   CERT_VOICE_APPROVED_SCRIPT,
   CERT_VOICE_ARTIFACT_ROOT,

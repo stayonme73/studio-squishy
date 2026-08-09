@@ -47,7 +47,7 @@ export type VideoSkuContractTruth = {
   primaryToolId: "capcut";
   primaryToolIntegrationState: string;
   primaryToolReadiness: string;
-  /** Intake lead still says "up to 45 seconds" — explicit discrepancy, not authority. */
+  /** Intake lead reconciled to 15–30s in KITCHEN-VIDEO-OPERATIONAL-1 (was 45s discrepancy). */
   intakeLeadDurationDiscrepancy: string;
 };
 
@@ -116,6 +116,6 @@ export function videoSkuContractTruth(skuId: VideoProductionSku): VideoSkuContra
     primaryToolIntegrationState: c.primaryTool.integrationState,
     primaryToolReadiness: c.primaryTool.toolReadiness,
     intakeLeadDurationDiscrepancy:
-      'Intake lead still says "up to 45 seconds"; catalog/contract authority is 15–30 seconds with exclusion longer than 30 seconds.',
+      "Reconciled in KITCHEN-VIDEO-OPERATIONAL-1: intake lead now matches catalog authority (15–30 seconds).",
   };
 }
