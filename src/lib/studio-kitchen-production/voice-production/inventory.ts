@@ -41,18 +41,19 @@ export const VOICE_AUDIO_CAPABILITY_INVENTORY: readonly AudioCapabilityFinding[]
       "src/lib/studio-kitchen-production/voice-production/generate.ts",
     ],
     notes:
-      "partial_adapter wired to ElevenLabs Text-to-Speech API. SKUs remain contract_ready_integration_required / NOT CUSTOMER READY until listening certification. Runtime requires ELEVENLABS_API_KEY.",
+      "partial_adapter wired to ElevenLabs Text-to-Speech API. MP3 path CUSTOMER READY WITH LIMITS after listening cert; WAV UNVERIFIED. Runtime requires ELEVENLABS_API_KEY.",
   },
   {
     id: "elevenlabs_tts_api",
     label: "ElevenLabs Text-to-Speech REST adapter",
-    classification: "integration_required",
+    classification: "present_and_usable",
     evidencePaths: [
       "src/lib/studio-kitchen-production/voice-production/elevenlabs/",
       "src/lib/studio-kitchen-production/voice-production/generate.ts",
+      "docs/launch/kitchen-production-cert-voice-1/",
     ],
     notes:
-      "Server-side fetch adapter present. Live usability depends on credentials + account capability discovery (MP3 vs WAV). Not ElevenLabs Studio product. Not beta services.",
+      "MP3 generation/export live-proven and listening-certified. WAV capability still unverified. Not ElevenLabs Studio product. Not beta services.",
   },
   {
     id: "materials_audio_upload_accept",
@@ -90,7 +91,7 @@ export function summarizeVoiceAudioInventory(): {
     studioVoiceUntouched: true,
     provider: "elevenlabs",
     blockingGap: keyPresent
-      ? "Credentials present — live capability discovery + listening certification still required before CUSTOMER READY."
+      ? "MP3 path certified with limits; WAV remains UNVERIFIED. Catalog MP3/WAV promise is an explicit follow-up discrepancy."
       : "ELEVENLABS_API_KEY absent. Adapter is built; live generation blocked until server-side key is configured (never paste into chat).",
     findings: VOICE_AUDIO_CAPABILITY_INVENTORY,
   };

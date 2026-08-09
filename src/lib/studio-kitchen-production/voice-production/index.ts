@@ -42,6 +42,11 @@ export {
   validateAudioQualityAttestations,
 } from "./evaluate";
 
+export {
+  fullListeningPassAttestations,
+  listeningNotesForHash,
+} from "./attestations";
+
 export type {
   AudioArtifactRef,
   AudioGenerationCapability,

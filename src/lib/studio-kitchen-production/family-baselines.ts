@@ -101,7 +101,7 @@ const AI_VOICE: ProductionToolRef = {
   integrationState: "partial_adapter",
   toolReadiness: "tool_integration_required",
   note:
-    "Kitchen adapter targets ElevenLabs TTS REST (not ElevenLabs Studio UI, not browser speechSynthesis). Requires server-side ELEVENLABS_API_KEY. NOT CUSTOMER READY until listening certification. Do not claim live generation without a bound audio artifact.",
+    "Kitchen adapter targets ElevenLabs TTS REST (not ElevenLabs Studio UI, not browser speechSynthesis). Requires server-side ELEVENLABS_API_KEY. MP3 path CUSTOMER READY WITH LIMITS after listening cert; WAV UNVERIFIED. Do not claim live generation without a bound audio artifact.",
 };
 
 const LANDING_STRUCTURE: ProductionToolRef = {

@@ -12,6 +12,11 @@ import type { VoiceProductionSku } from "./contracts";
 export const VOICE_INTEGRATION_ARTIFACT_ROOT =
   "docs/launch/kitchen-voice-integration-1/artifacts" as const;
 
+export type VoiceArtifactLabel =
+  | "INTERNAL PRODUCTION TEST — NOT CUSTOMER DELIVERABLE"
+  | "CERTIFICATION FIXTURE / INTERNAL TEST / NOT CUSTOMER DELIVERABLE"
+  | "PRODUCTION ARTIFACT — AWAITING QA";
+
 export type PersistedVoiceArtifact = {
   relativePath: string;
   absolutePath: string;
@@ -27,7 +32,7 @@ export type PersistedVoiceArtifact = {
   providerRequestId?: string;
   generatedAt: string;
   qaState: "qa_ready";
-  label: "INTERNAL PRODUCTION TEST — NOT CUSTOMER DELIVERABLE" | "PRODUCTION ARTIFACT — AWAITING QA";
+  label: VoiceArtifactLabel;
 };
 
 export function sha256Bytes(buf: Buffer): string {
@@ -47,6 +52,10 @@ export function persistVoiceArtifactBytes(input: {
   generatedAt?: string;
   /** Internal test generations must use the internal label. */
   internalTest: boolean;
+  /** Certification fixture label (takes precedence over internalTest). */
+  certificationFixture?: boolean;
+  /** Override default integration artifact root. */
+  artifactRoot?: string;
   fileStem?: string;
 }): PersistedVoiceArtifact | { error: string; code: "persistence_failure" | "empty_audio" } {
   if (!input.audioBytes.byteLength) {
@@ -58,8 +67,9 @@ export function persistVoiceArtifactBytes(input: {
   const stem =
     input.fileStem ??
     `${input.skuId}_${input.scriptVersionId}_${hash.slice(0, 12)}`;
+  const root = input.artifactRoot ?? VOICE_INTEGRATION_ARTIFACT_ROOT;
   const relativePath = path
-    .join(VOICE_INTEGRATION_ARTIFACT_ROOT, input.campaignId, `${stem}.${input.extension}`)
+    .join(root, input.campaignId, `${stem}.${input.extension}`)
     .replace(/\\/g, "/");
   const absolutePath = path.join(input.repoRoot, relativePath);
 
@@ -69,6 +79,12 @@ export function persistVoiceArtifactBytes(input: {
   } catch {
     return { error: `Failed to write audio artifact at ${relativePath}`, code: "persistence_failure" };
   }
+
+  const label: VoiceArtifactLabel = input.certificationFixture
+    ? "CERTIFICATION FIXTURE / INTERNAL TEST / NOT CUSTOMER DELIVERABLE"
+    : input.internalTest
+      ? "INTERNAL PRODUCTION TEST — NOT CUSTOMER DELIVERABLE"
+      : "PRODUCTION ARTIFACT — AWAITING QA";
 
   return {
     relativePath,
@@ -85,8 +101,6 @@ export function persistVoiceArtifactBytes(input: {
     providerRequestId: input.providerRequestId,
     generatedAt,
     qaState: "qa_ready",
-    label: input.internalTest
-      ? "INTERNAL PRODUCTION TEST — NOT CUSTOMER DELIVERABLE"
-      : "PRODUCTION ARTIFACT — AWAITING QA",
+    label,
   };
 }

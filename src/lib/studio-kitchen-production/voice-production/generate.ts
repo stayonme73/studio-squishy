@@ -39,6 +39,10 @@ export type GenerateVoiceArtifactInput = {
   outputFormat: "mp3" | "wav";
   /** Internal synthetic tests must set true. */
   internalTest?: boolean;
+  /** Certification fixture path/label (cert package). */
+  certificationFixture?: boolean;
+  /** Override artifact root (defaults to integration artifacts dir). */
+  artifactRoot?: string;
   repoRoot?: string;
   /** Test injection */
   fetchImpl?: ElevenLabsFetch;
@@ -220,6 +224,8 @@ export async function generateVoiceArtifact(
     providerModelId: voice.modelId,
     providerRequestId: tts.providerRequestId,
     internalTest: input.internalTest === true,
+    certificationFixture: input.certificationFixture === true,
+    artifactRoot: input.artifactRoot,
   });
 
   if ("error" in persisted) {

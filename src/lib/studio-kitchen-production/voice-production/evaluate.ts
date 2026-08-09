@@ -239,27 +239,41 @@ export function validateAudioQualityAttestations(
 
   const required: Array<[keyof AudioQualityJudgmentAttestations, string]> = [
     ["scriptFidelityReviewed", "Exact script fidelity must be reviewed by listening"],
-    ["pronunciationReviewed", "Pronunciation (names/brands/numbers) must be reviewed"],
-    ["pacingNaturalnessReviewed", "Pacing/naturalness must be reviewed"],
-    ["intelligibilityReviewed", "Intelligibility must be reviewed"],
-    ["artifactsClippingSilenceReviewed", "Artifacts/clipping/silence must be reviewed"],
+    ["pronunciationReviewed", "Pronunciation must be reviewed by listening"],
+    ["namesReviewed", "Business/person/service names must be reviewed by listening"],
+    ["numbersReviewed", "Numbers must be reviewed by listening"],
+    ["priceReviewed", "Spoken price must be reviewed by listening"],
+    ["dateReviewed", "Spoken date must be reviewed by listening"],
+    ["timeReviewed", "Spoken time must be reviewed by listening"],
+    ["phoneReviewed", "Spoken phone number must be reviewed by listening"],
+    ["urlReviewed", "Spoken URL must be reviewed by listening"],
+    ["acronymReviewed", "Acronym pronunciation must be reviewed by listening"],
+    ["pacingReviewed", "Pacing must be reviewed by listening"],
+    ["naturalnessReviewed", "Naturalness must be reviewed by listening"],
+    ["intelligibilityReviewed", "Intelligibility must be reviewed by listening"],
+    ["emphasisReviewed", "Emphasis must be reviewed by listening"],
+    ["unwantedArtifactsReviewed", "Unwanted audio artifacts must be reviewed by listening"],
+    ["excessiveSilenceReviewed", "Excessive silence must be reviewed by listening"],
+    ["clippingReviewed", "Clipping must be reviewed by listening"],
+    ["usableVolumeReviewed", "Usable volume must be reviewed by listening"],
+    ["beginningEndCompleteReviewed", "Beginning/end completeness must be reviewed by listening"],
+    ["commercialUsabilityReviewed", "Commercial usability must be reviewed by listening"],
     ["listeningMatchesBoundArtifact", "Listening judgment must be tied to the bound audio file"],
   ];
 
   for (const [key, message] of required) {
-    if (key === "notes") continue;
     if (attestations[key] !== true) {
       pushFail(findings, `attestation_${key}`, "judgment_attestation", message);
     }
   }
 
   const notes = attestations.notes.trim();
-  if (notes.length < 40) {
+  if (notes.length < 80) {
     pushFail(
       findings,
       "attestation_notes_thin",
       "judgment_attestation",
-      "Listening notes must explain audio judgment (min 40 characters) — looks_good=true is not sufficient",
+      "Listening notes must explain audio judgment (min 80 characters) — looks_good=true / metadata alone is not sufficient",
     );
   }
   if (
@@ -271,6 +285,14 @@ export function validateAudioQualityAttestations(
       "attestation_notes_unbound",
       "judgment_attestation",
       "Listening notes must reference the bound artifact hash/path",
+    );
+  }
+  if (!/commercial|usable|customer.?ready|deliverable/i.test(notes)) {
+    pushFail(
+      findings,
+      "attestation_notes_no_commercial",
+      "judgment_attestation",
+      "Listening notes must state commercial-usability judgment against the bound file",
     );
   }
 

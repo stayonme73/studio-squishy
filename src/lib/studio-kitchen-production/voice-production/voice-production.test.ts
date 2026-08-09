@@ -21,8 +21,10 @@ import {
   VOICE_SCRIPT_WORD_LIMIT,
   defaultVoiceAudioBrief,
   evaluateAudioQuality,
+  fullListeningPassAttestations,
   gateAudioQualityForQaPass,
   isVoiceProductionSku,
+  listeningNotesForHash,
   projectVoiceKitchenStates,
   registerBoundAudioArtifact,
   requiresAudioQualityGate,
@@ -121,7 +123,7 @@ function words(n: number): string {
 }
 
 const listeningNotesWithHash = (hash: string) =>
-  `Listened to bound file sha256=${hash}. Script fidelity, pronunciation, pacing, intelligibility, and clipping/silence reviewed against this exact artifact.`;
+  listeningNotesForHash(hash, "unit-test machinery only — not Owner listening approval");
 
 describe("KITCHEN-VOICE-PRODUCTION-1", () => {
   it("resolves active voice SKUs with contract_ready_integration_required", () => {
@@ -130,13 +132,14 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
       const resolved = resolveServiceProductionContract(sku);
       expect(resolved.status).toBe("resolved");
       if (resolved.status !== "resolved") return;
-      expect(resolved.contract.readiness).toBe("contract_ready_integration_required");
+      expect(resolved.contract.readiness).toBe("contract_ready");
       expect(resolved.contract.primaryTool.toolId).toBe("ai_voice_tool");
       expect(resolved.contract.primaryTool.integrationState).toBe("partial_adapter");
       const truth = voiceSkuContractTruth(sku);
       expect(truth.scriptWordLimit).toBe(VOICE_SCRIPT_WORD_LIMIT);
       expect(truth.promisedFormats).toEqual(["mp3", "wav"]);
       expect(truth.primaryToolIntegrationState).toBe("partial_adapter");
+      expect(resolved.contract.readinessNotes).toMatch(/CUSTOMER READY WITH LIMITS — MP3/i);
     }
   });
 
@@ -147,7 +150,7 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
     const browser = summary.findings.find((f) => f.id === "browser_speech_synthesis");
     expect(browser?.classification).toBe("present_but_not_exportable");
     const vendor = summary.findings.find((f) => f.id === "elevenlabs_tts_api");
-    expect(vendor?.classification).toBe("integration_required");
+    expect(vendor?.classification).toBe("present_and_usable");
     const contract = summary.findings.find((f) => f.id === "ai_voice_tool_contract");
     expect(contract?.classification).toBe("integration_required");
   });
@@ -241,15 +244,7 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
         claimsStudioGeneratedAudio: true,
         artifacts: [registered],
       },
-      attestations: {
-        scriptFidelityReviewed: true,
-        pronunciationReviewed: true,
-        pacingNaturalnessReviewed: true,
-        intelligibilityReviewed: true,
-        artifactsClippingSilenceReviewed: true,
-        listeningMatchesBoundArtifact: true,
-        notes: listeningNotesWithHash(hash),
-      },
+      attestations: fullListeningPassAttestations(listeningNotesWithHash(hash)),
     });
     expect(gated.ok).toBe(false);
     if (gated.ok) return;
@@ -302,15 +297,9 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
             claimsStudioGeneratedAudio: true,
             artifacts: [registered],
           },
-          attestations: {
-            scriptFidelityReviewed: true,
-            pronunciationReviewed: true,
-            pacingNaturalnessReviewed: true,
-            intelligibilityReviewed: true,
-            artifactsClippingSilenceReviewed: true,
-            listeningMatchesBoundArtifact: true,
-            notes: listeningNotesWithHash(registered.contentSha256!),
-          },
+          attestations: fullListeningPassAttestations(
+            listeningNotesWithHash(registered.contentSha256!),
+          ),
         },
       },
       qaStaff,
@@ -400,12 +389,11 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
   });
 
   it("does not certify untested services and leaves Studio Voice files present", () => {
-    // No CUSTOMER READY certification emitted by this package.
-    for (const sku of VOICE_PRODUCTION_SKUS) {
-      const resolved = resolveServiceProductionContract(sku);
-      expect(resolved.status).toBe("resolved");
-      if (resolved.status !== "resolved") return;
-      expect(resolved.contract.readiness).toBe("contract_ready_integration_required");
+    // Voice SKUs are MP3-limited customer-ready; unrelated SKUs are not auto-certified.
+    const flyer = resolveServiceProductionContract("v2-rtu-flyer");
+    expect(flyer.status).toBe("resolved");
+    if (flyer.status === "resolved") {
+      expect(flyer.contract.primaryTool.toolId).not.toBe("ai_voice_tool");
     }
 
     // Studio Voice browser path still exists and is classified separately.
@@ -440,15 +428,9 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
         claimsStudioGeneratedAudio: false,
         artifacts: [registered],
       },
-      attestations: {
-        scriptFidelityReviewed: true,
-        pronunciationReviewed: true,
-        pacingNaturalnessReviewed: true,
-        intelligibilityReviewed: true,
-        artifactsClippingSilenceReviewed: true,
-        listeningMatchesBoundArtifact: true,
-        notes: listeningNotesWithHash(registered.contentSha256!),
-      },
+      attestations: fullListeningPassAttestations(
+        listeningNotesWithHash(registered.contentSha256!),
+      ),
     });
     expect(gated.ok).toBe(true);
   });

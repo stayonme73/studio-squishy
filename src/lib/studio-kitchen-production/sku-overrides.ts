@@ -196,7 +196,8 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
     primaryTool: AI_VOICE_TOOL,
     optionalTools: [],
     formatExportRequirements: [
-      "Final MP3 or WAV",
+      "Final MP3 (CUSTOMER READY WITH LIMITS — MP3; ElevenLabs mp3_44100_128 certified)",
+      "WAV remains UNVERIFIED / NOT CERTIFIED — do not infer from MP3",
       "One AI voice style / one language",
       "Script ≤300 words",
     ],
@@ -215,14 +216,18 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
       },
       {
         id: "audio_format",
-        label: "Deliverable is MP3 or WAV",
-        reason: "Catalog deliverable format",
+        label: "Deliverable is MP3 (WAV unverified)",
+        reason: "Listening certification covers MP3 only",
         source: "deliverable_format",
       },
     ],
-    readiness: "contract_ready_integration_required",
+    extraLimitations: [
+      "CUSTOMER READY WITH LIMITS — MP3 only (KITCHEN-PRODUCTION-CERT-VOICE-1). WAV is UNVERIFIED.",
+      "Catalog still lists MP3 or WAV — WAV promise remains an explicit follow-up discrepancy until verified separately.",
+    ],
+    readiness: "contract_ready",
     readinessNotes:
-      "ElevenLabs TTS adapter exists (KITCHEN-VOICE-INTEGRATION-1). Remains CONTRACT READY — INTEGRATION REQUIRED / NOT CUSTOMER READY until live credentials + listening certification. Generation success ≠ QA pass ≠ customer ready.",
+      "CUSTOMER READY WITH LIMITS — MP3 after Owner listening approval of cert-voice artifact sha256 d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4. WAV UNVERIFIED. Catalog MP3/WAV promise not silently changed.",
     specialNotes: [
       "Scriptwriting is not included unless selected separately.",
       "Basic pacing/pronunciation review is required before QA pass.",
@@ -455,7 +460,8 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
     optionalTools: [TEXT_MODEL_TOOL],
     formatExportRequirements: [
       "Short announcement script when needed (≤300 words)",
-      "Final audio track for client distribution",
+      "Final MP3 audio track for client distribution (CUSTOMER READY WITH LIMITS — MP3)",
+      "WAV remains UNVERIFIED / NOT CERTIFIED — do not infer from MP3",
     ],
     extraQaItems: [
       {
@@ -471,9 +477,13 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         source: "service_contract",
       },
     ],
-    readiness: "contract_ready_integration_required",
+    extraLimitations: [
+      "CUSTOMER READY WITH LIMITS — MP3 only (KITCHEN-PRODUCTION-CERT-VOICE-1). WAV is UNVERIFIED.",
+      "Catalog still lists MP3 or WAV — WAV promise remains an explicit follow-up discrepancy until verified separately.",
+    ],
+    readiness: "contract_ready",
     readinessNotes:
-      "ElevenLabs TTS adapter exists (KITCHEN-VOICE-INTEGRATION-1). Remains NOT CUSTOMER READY until live credentials + listening certification. CapCut is not used for audio-only.",
+      "CUSTOMER READY WITH LIMITS — MP3 via shared ElevenLabs MP3 listening certification (cert-voice). WAV UNVERIFIED. CapCut is not used for audio-only.",
   },
   "v2-rtu-short-video": {
     producerRole: "creative_production",

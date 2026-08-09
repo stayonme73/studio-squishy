@@ -1,0 +1,21 @@
+{
+  "id": "cert-voice-v1",
+  "relativePath": "docs/launch/kitchen-production-cert-voice-1/artifacts/cert-voice-1-cedar-lane/ap-001_cert-voice-script-v1_d283144563a6.mp3",
+  "contentSha256": "d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4",
+  "byteLength": 631998,
+  "extension": "mp3",
+  "scriptVersionId": "cert-voice-script-v1",
+  "campaignId": "cert-voice-1-cedar-lane",
+  "skuId": "ap-001",
+  "provider": "elevenlabs",
+  "providerModelId": "eleven_multilingual_v2",
+  "providerVoiceId": "21m00Tcm4TlvDq8ikWAM",
+  "providerOutputFormat": "mp3_44100_128",
+  "generatedAt": "2026-08-09T14:21:42.892Z",
+  "label": "CERTIFICATION FIXTURE / INTERNAL TEST / NOT CUSTOMER DELIVERABLE",
+  "qaState": "qa_pass",
+  "ownerListeningApproval": "pass",
+  "ownerListeningApprovedAt": "2026-08-09T14:43:00.000Z",
+  "customerReadinessLabel": "CUSTOMER READY WITH LIMITS — MP3",
+  "wavCertified": false
+}

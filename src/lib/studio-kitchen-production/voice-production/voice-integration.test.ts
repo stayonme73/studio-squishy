@@ -91,10 +91,11 @@ describe("KITCHEN-VOICE-INTEGRATION-1", () => {
       const resolved = resolveServiceProductionContract(sku);
       expect(resolved.status).toBe("resolved");
       if (resolved.status !== "resolved") return;
-      expect(resolved.contract.readiness).toBe("contract_ready_integration_required");
+      expect(resolved.contract.readiness).toBe("contract_ready");
       expect(resolved.contract.primaryTool.integrationState).toBe("partial_adapter");
       expect(resolved.contract.primaryTool.note).toMatch(/ElevenLabs/i);
-      expect(resolved.contract.readinessNotes).toMatch(/NOT CUSTOMER READY/i);
+      expect(resolved.contract.readinessNotes).toMatch(/CUSTOMER READY WITH LIMITS — MP3/i);
+      expect(resolved.contract.readinessNotes).toMatch(/WAV UNVERIFIED/i);
     }
   });
 

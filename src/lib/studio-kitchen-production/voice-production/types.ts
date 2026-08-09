@@ -58,14 +58,39 @@ export type AudioQualitySubmission = {
   artifacts: readonly AudioArtifactRef[];
 };
 
+/**
+ * Listening judgment attestations — all required for voice qa_pass.
+ * Checklist/metadata alone cannot certify audio quality.
+ */
 export type AudioQualityJudgmentAttestations = {
   scriptFidelityReviewed: boolean;
   pronunciationReviewed: boolean;
-  pacingNaturalnessReviewed: boolean;
+  namesReviewed: boolean;
+  numbersReviewed: boolean;
+  priceReviewed: boolean;
+  dateReviewed: boolean;
+  timeReviewed: boolean;
+  phoneReviewed: boolean;
+  urlReviewed: boolean;
+  acronymReviewed: boolean;
+  pacingReviewed: boolean;
+  naturalnessReviewed: boolean;
   intelligibilityReviewed: boolean;
-  artifactsClippingSilenceReviewed: boolean;
+  emphasisReviewed: boolean;
+  unwantedArtifactsReviewed: boolean;
+  excessiveSilenceReviewed: boolean;
+  clippingReviewed: boolean;
+  usableVolumeReviewed: boolean;
+  beginningEndCompleteReviewed: boolean;
+  commercialUsabilityReviewed: boolean;
   /** Listening judgment tied to bound file hash/path. */
   listeningMatchesBoundArtifact: boolean;
+  /**
+   * Legacy aggregate fields — still accepted when true, but the granular
+   * fields above are authoritative for qa_pass.
+   */
+  pacingNaturalnessReviewed?: boolean;
+  artifactsClippingSilenceReviewed?: boolean;
   notes: string;
 };
 
