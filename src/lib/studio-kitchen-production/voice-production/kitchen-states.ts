@@ -11,29 +11,34 @@ import { summarizeVoiceAudioInventory } from "./inventory";
 export type VoiceKitchenStateSnapshot = {
   skuId: VoiceProductionSku;
   labels: readonly string[];
-  /** Steps that are operationally blocked until vendor/path exists. */
+  /** Steps blocked until credentials + successful generation produce a bound file. */
   blockedStepIds: readonly VoiceChainStepId[];
-  canRepresentAudioArtifactProduced: false;
-  generationIntegrated: false;
+  adapterWired: true;
+  credentialsPresent: boolean;
+  canRepresentAudioArtifactProduced: boolean;
+  generationIntegrated: true;
+  customerReady: false;
   notes: string;
 };
 
-/**
- * Kitchen can name the chain states; it cannot honestly mark
- * "audio artifact produced" from Studio generation today.
- */
 export function projectVoiceKitchenStates(skuId: VoiceProductionSku): VoiceKitchenStateSnapshot {
   const inventory = summarizeVoiceAudioInventory();
-  const blockedStepIds = VOICE_PRODUCTION_CHAIN.filter(
-    (s) => s.operationalStatus === "integration_required",
-  ).map((s) => s.id);
+  const credentialsPresent = inventory.canGenerateCustomerDeliverableAudio;
+  const blockedStepIds = credentialsPresent
+    ? ([] as VoiceChainStepId[])
+    : VOICE_PRODUCTION_CHAIN.filter(
+        (s) => s.operationalStatus === "adapter_wired_credentials_required",
+      ).map((s) => s.id);
 
   return {
     skuId,
     labels: VOICE_PRODUCTION_CHAIN.map((s) => s.kitchenStateLabel),
     blockedStepIds,
+    adapterWired: true,
+    credentialsPresent,
     canRepresentAudioArtifactProduced: false,
-    generationIntegrated: false,
+    generationIntegrated: true,
+    customerReady: false,
     notes: inventory.blockingGap,
   };
 }
@@ -47,44 +52,46 @@ export function resolveClaimableVoiceKitchenLabels(input: {
   hasApprovedScript: boolean;
   hasBoundAudioArtifact: boolean;
   audioQaPassed: boolean;
+  generationFailed?: boolean;
+  generationPending?: boolean;
 }): {
   claimable: readonly string[];
   blocked: readonly string[];
   inventedArtifact: false;
+  customerReady: false;
 } {
   const claimable: string[] = [];
   const blocked: string[] = [];
 
-  for (const step of VOICE_PRODUCTION_CHAIN) {
-    if (step.id === "script_ready" || step.id === "script_validation") {
-      if (input.hasApprovedScript) claimable.push(step.kitchenStateLabel);
-      else blocked.push(step.kitchenStateLabel);
-      continue;
-    }
-    if (step.id === "approved_final_script") {
-      if (input.hasApprovedScript) claimable.push(step.kitchenStateLabel);
-      else blocked.push(step.kitchenStateLabel);
-      continue;
-    }
-    if (step.operationalStatus === "integration_required") {
-      blocked.push(step.kitchenStateLabel);
-      continue;
-    }
-    if (step.id === "audio_qa" || step.id === "review_delivery") {
-      if (input.hasBoundAudioArtifact && input.audioQaPassed) {
-        claimable.push(step.kitchenStateLabel);
-      } else {
-        blocked.push(step.kitchenStateLabel);
-      }
-      continue;
-    }
-    if (step.id === "file_registration") {
-      if (input.hasBoundAudioArtifact) claimable.push(step.kitchenStateLabel);
-      else blocked.push(step.kitchenStateLabel);
-      continue;
-    }
-    blocked.push(step.kitchenStateLabel);
+  if (input.hasApprovedScript) {
+    claimable.push("script ready", "approved final script");
+  } else {
+    blocked.push("script ready", "approved final script");
   }
 
-  return { claimable, blocked, inventedArtifact: false };
+  if (input.generationPending) claimable.push("generation pending");
+  else blocked.push("generation pending");
+
+  if (input.generationFailed) claimable.push("generation failed");
+  else blocked.push("generation failed");
+
+  if (input.hasBoundAudioArtifact) {
+    claimable.push("audio generated", "QA ready", "file registered");
+  } else {
+    blocked.push("audio generated", "QA ready", "file registered");
+  }
+
+  if (input.hasBoundAudioArtifact && !input.audioQaPassed) {
+    claimable.push("QA correction required");
+  } else {
+    blocked.push("QA correction required");
+  }
+
+  if (input.audioQaPassed && input.hasBoundAudioArtifact) {
+    claimable.push("QA pass", "review ready");
+  } else {
+    blocked.push("QA pass", "review ready");
+  }
+
+  return { claimable, blocked, inventedArtifact: false, customerReady: false };
 }

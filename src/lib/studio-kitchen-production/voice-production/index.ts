@@ -53,3 +53,37 @@ export type {
   AudioQualityQaPayload,
   AudioQualitySubmission,
 } from "./types";
+
+export {
+  generateVoiceArtifact,
+  voiceSkuProductionProvider,
+} from "./generate";
+export type {
+  GenerateVoiceArtifactFailure,
+  GenerateVoiceArtifactInput,
+  GenerateVoiceArtifactResult,
+  GenerateVoiceArtifactSuccess,
+} from "./generate";
+
+export {
+  VOICE_INTEGRATION_ARTIFACT_ROOT,
+  persistVoiceArtifactBytes,
+  sha256Bytes,
+} from "./persist";
+export type { PersistedVoiceArtifact } from "./persist";
+
+export {
+  DEFAULT_ELEVENLABS_MODEL_ID,
+  DEFAULT_ELEVENLABS_VOICE_ID,
+  discoverElevenLabsAccountCapability,
+  elevenLabsCredentialPresence,
+  elevenLabsTextToSpeech,
+  readElevenLabsApiKey,
+  redactSecretsForEvidence,
+  resolveApprovedVoiceConfiguration,
+} from "./elevenlabs";
+export type {
+  ApprovedVoiceConfiguration,
+  ElevenLabsAccountCapability,
+  ElevenLabsCredentialPresence,
+} from "./elevenlabs";

@@ -128,7 +128,10 @@ describe("KITCHEN-PRODUCTION-CAPABILITY-1", () => {
     expect(profile.contract.readiness).toBe("partial");
     expect(page.contract.readiness).toBe("partial");
     expect(video.contract.primaryTool.integrationState).toBe("not_integrated");
-    expect(voice.contract.primaryTool.integrationState).toBe("not_integrated");
+    // ElevenLabs TTS adapter is partial_adapter — NOT CUSTOMER READY until listening cert.
+    expect(voice.contract.primaryTool.integrationState).toBe("partial_adapter");
+    expect(voice.contract.primaryTool.note).toMatch(/ElevenLabs/i);
+    expect(rtuVoice.contract.primaryTool.integrationState).toBe("partial_adapter");
   });
 
   it("creates no production records and no owner work on contract lookup", () => {

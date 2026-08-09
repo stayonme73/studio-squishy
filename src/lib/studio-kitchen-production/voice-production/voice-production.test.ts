@@ -132,23 +132,22 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
       if (resolved.status !== "resolved") return;
       expect(resolved.contract.readiness).toBe("contract_ready_integration_required");
       expect(resolved.contract.primaryTool.toolId).toBe("ai_voice_tool");
-      expect(resolved.contract.primaryTool.integrationState).toBe("not_integrated");
+      expect(resolved.contract.primaryTool.integrationState).toBe("partial_adapter");
       const truth = voiceSkuContractTruth(sku);
       expect(truth.scriptWordLimit).toBe(VOICE_SCRIPT_WORD_LIMIT);
       expect(truth.promisedFormats).toEqual(["mp3", "wav"]);
-      expect(truth.primaryToolIntegrationState).toBe("not_integrated");
+      expect(truth.primaryToolIntegrationState).toBe("partial_adapter");
     }
   });
 
-  it("inventories audio capability honestly — no deliverable generation/export", () => {
+  it("inventories audio capability honestly — adapter wired, live key may be absent", () => {
     const summary = summarizeVoiceAudioInventory();
-    expect(summary.canGenerateCustomerDeliverableAudio).toBe(false);
-    expect(summary.canExportMp3OrWavFromStudioStack).toBe(false);
     expect(summary.studioVoiceUntouched).toBe(true);
+    expect(summary.provider).toBe("elevenlabs");
     const browser = summary.findings.find((f) => f.id === "browser_speech_synthesis");
     expect(browser?.classification).toBe("present_but_not_exportable");
-    const vendor = summary.findings.find((f) => f.id === "elevenlabs_or_cloud_tts_sdk");
-    expect(vendor?.classification).toBe("unsupported");
+    const vendor = summary.findings.find((f) => f.id === "elevenlabs_tts_api");
+    expect(vendor?.classification).toBe("integration_required");
     const contract = summary.findings.find((f) => f.id === "ai_voice_tool_contract");
     expect(contract?.classification).toBe("integration_required");
   });
@@ -359,9 +358,13 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
   it("read-only kitchen projection invents no fake audio artifact", () => {
     const snap = projectVoiceKitchenStates("ap-001");
     expect(snap.canRepresentAudioArtifactProduced).toBe(false);
-    expect(snap.generationIntegrated).toBe(false);
-    expect(snap.blockedStepIds).toContain("voice_generation");
-    expect(snap.blockedStepIds).toContain("export");
+    expect(snap.generationIntegrated).toBe(true);
+    expect(snap.adapterWired).toBe(true);
+    expect(snap.customerReady).toBe(false);
+    if (!snap.credentialsPresent) {
+      expect(snap.blockedStepIds).toContain("voice_generation");
+      expect(snap.blockedStepIds).toContain("export");
+    }
 
     const claimable = resolveClaimableVoiceKitchenLabels({
       skuId: "ap-001",
@@ -370,9 +373,10 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
       audioQaPassed: false,
     });
     expect(claimable.inventedArtifact).toBe(false);
+    expect(claimable.customerReady).toBe(false);
     expect(claimable.claimable).toContain("script ready");
-    expect(claimable.blocked).toContain("audio artifact produced");
-    expect(claimable.blocked).toContain("audio production started");
+    expect(claimable.blocked).toContain("audio generated");
+    expect(claimable.blocked).toContain("generation pending");
 
     const ledger = projectKitchenCommsLedger({
       campaignId: campaign.campaignId,
@@ -397,8 +401,12 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
 
   it("does not certify untested services and leaves Studio Voice files present", () => {
     // No CUSTOMER READY certification emitted by this package.
-    const inventory = summarizeVoiceAudioInventory();
-    expect(inventory.canGenerateCustomerDeliverableAudio).toBe(false);
+    for (const sku of VOICE_PRODUCTION_SKUS) {
+      const resolved = resolveServiceProductionContract(sku);
+      expect(resolved.status).toBe("resolved");
+      if (resolved.status !== "resolved") return;
+      expect(resolved.contract.readiness).toBe("contract_ready_integration_required");
+    }
 
     // Studio Voice browser path still exists and is classified separately.
     for (const p of [

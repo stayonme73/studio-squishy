@@ -1,5 +1,5 @@
 /**
- * KITCHEN-VOICE-PRODUCTION-1 — honest inventory of audio generation/export capability.
+ * KITCHEN-VOICE-INTEGRATION-1 — audio capability inventory after ElevenLabs adapter.
  * Studio Voice browser TTS ≠ customer voice-over deliverable production.
  */
 
@@ -17,7 +17,7 @@ export type AudioCapabilityFinding = {
   notes: string;
 };
 
-/** Inventory at KITCHEN-VOICE-PRODUCTION-1 control tip (design seal 664af4c). */
+/** Inventory at KITCHEN-VOICE-INTEGRATION-1 (base seal voice-production 48d61c4). */
 export const VOICE_AUDIO_CAPABILITY_INVENTORY: readonly AudioCapabilityFinding[] = [
   {
     id: "browser_speech_synthesis",
@@ -29,26 +29,30 @@ export const VOICE_AUDIO_CAPABILITY_INVENTORY: readonly AudioCapabilityFinding[]
       "src/lib/studio-lobby-podium-guidance.ts",
     ],
     notes:
-      "Free browser TTS for customer-facing Studio presence playback. Does not export MP3/WAV deliverables. Tagia direction: stay on browser voices for launch Studio Voice — not a production vendor chain.",
+      "Free browser TTS for customer-facing Studio presence playback. Does not export MP3/WAV deliverables. Untouched by voice integration.",
   },
   {
     id: "ai_voice_tool_contract",
-    label: "Production contract primaryTool ai_voice_tool",
+    label: "Production contract primaryTool ai_voice_tool → ElevenLabs TTS",
     classification: "integration_required",
     evidencePaths: [
       "src/lib/studio-kitchen-production/family-baselines.ts",
       "src/lib/studio-kitchen-production/sku-overrides.ts",
+      "src/lib/studio-kitchen-production/voice-production/generate.ts",
     ],
     notes:
-      "Named as required for ap-001 / v2-rtu-voice. integrationState=not_integrated. No Kitchen vendor chain wired. Do not invent a vendor.",
+      "partial_adapter wired to ElevenLabs Text-to-Speech API. SKUs remain contract_ready_integration_required / NOT CUSTOMER READY until listening certification. Runtime requires ELEVENLABS_API_KEY.",
   },
   {
-    id: "elevenlabs_or_cloud_tts_sdk",
-    label: "Cloud TTS / ElevenLabs / OpenAI audio SDK in repo",
-    classification: "unsupported",
-    evidencePaths: [],
+    id: "elevenlabs_tts_api",
+    label: "ElevenLabs Text-to-Speech REST adapter",
+    classification: "integration_required",
+    evidencePaths: [
+      "src/lib/studio-kitchen-production/voice-production/elevenlabs/",
+      "src/lib/studio-kitchen-production/voice-production/generate.ts",
+    ],
     notes:
-      "No ElevenLabs, OpenAI /v1/audio, or equivalent production TTS SDK/credentials path found for customer deliverable export.",
+      "Server-side fetch adapter present. Live usability depends on credentials + account capability discovery (MP3 vs WAV). Not ElevenLabs Studio product. Not beta services.",
   },
   {
     id: "materials_audio_upload_accept",
@@ -67,23 +71,27 @@ export const VOICE_AUDIO_CAPABILITY_INVENTORY: readonly AudioCapabilityFinding[]
     classification: "integration_required",
     evidencePaths: ["src/lib/studio-kitchen-production/sku-overrides.ts"],
     notes:
-      "CapCut is the named short-video tool and is not integrated. Capability package forbids claiming CapCut for audio-only voice SKUs.",
+      "CapCut is the named short-video tool and is not used for audio-only voice SKUs.",
   },
 ] as const;
 
 export function summarizeVoiceAudioInventory(): {
-  canGenerateCustomerDeliverableAudio: false;
-  canExportMp3OrWavFromStudioStack: false;
+  canGenerateCustomerDeliverableAudio: boolean;
+  canExportMp3OrWavFromStudioStack: boolean;
   studioVoiceUntouched: true;
+  provider: "elevenlabs";
   blockingGap: string;
   findings: readonly AudioCapabilityFinding[];
 } {
+  const keyPresent = Boolean(process.env.ELEVENLABS_API_KEY?.trim());
   return {
-    canGenerateCustomerDeliverableAudio: false,
-    canExportMp3OrWavFromStudioStack: false,
+    canGenerateCustomerDeliverableAudio: keyPresent,
+    canExportMp3OrWavFromStudioStack: keyPresent,
     studioVoiceUntouched: true,
-    blockingGap:
-      "No approved, wired AI voice generation → MP3/WAV export chain exists in The Studio stack. Voice SKUs remain contract_ready_integration_required until a Tagia-approved vendor/path is integrated or an explicit manual-operational production SOP is authorized without inventing a vendor.",
+    provider: "elevenlabs",
+    blockingGap: keyPresent
+      ? "Credentials present — live capability discovery + listening certification still required before CUSTOMER READY."
+      : "ELEVENLABS_API_KEY absent. Adapter is built; live generation blocked until server-side key is configured (never paste into chat).",
     findings: VOICE_AUDIO_CAPABILITY_INVENTORY,
   };
 }

@@ -222,10 +222,11 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
     ],
     readiness: "contract_ready_integration_required",
     readinessNotes:
-      "Contract defines script → AI voice → QA → MP3/WAV. No approved Kitchen voice-vendor chain is wired yet. Do not invent a vendor.",
+      "ElevenLabs TTS adapter exists (KITCHEN-VOICE-INTEGRATION-1). Remains CONTRACT READY — INTEGRATION REQUIRED / NOT CUSTOMER READY until live credentials + listening certification. Generation success ≠ QA pass ≠ customer ready.",
     specialNotes: [
       "Scriptwriting is not included unless selected separately.",
       "Basic pacing/pronunciation review is required before QA pass.",
+      "Provider is ElevenLabs Text-to-Speech API only — not Studio Voice browser TTS.",
     ],
   },
   "rm-j002": {
@@ -472,7 +473,7 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
     ],
     readiness: "contract_ready_integration_required",
     readinessNotes:
-      "Voice RTU contract defined. Kitchen has no wired AI voice vendor chain. Do not invent a vendor or claim CapCut for audio-only.",
+      "ElevenLabs TTS adapter exists (KITCHEN-VOICE-INTEGRATION-1). Remains NOT CUSTOMER READY until live credentials + listening certification. CapCut is not used for audio-only.",
   },
   "v2-rtu-short-video": {
     producerRole: "creative_production",

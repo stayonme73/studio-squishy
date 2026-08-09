@@ -96,11 +96,12 @@ const CAPCUT: ProductionToolRef = {
 
 const AI_VOICE: ProductionToolRef = {
   toolId: "ai_voice_tool",
-  label: "Approved AI voice tool (operational)",
+  label: "ElevenLabs Text-to-Speech API (customer deliverable audio)",
   required: true,
-  integrationState: "not_integrated",
+  integrationState: "partial_adapter",
   toolReadiness: "tool_integration_required",
-  note: "Catalog promises AI voice output. No Kitchen voice-vendor chain is wired. Do not invent a vendor.",
+  note:
+    "Kitchen adapter targets ElevenLabs TTS REST (not ElevenLabs Studio UI, not browser speechSynthesis). Requires server-side ELEVENLABS_API_KEY. NOT CUSTOMER READY until listening certification. Do not claim live generation without a bound audio artifact.",
 };
 
 const LANDING_STRUCTURE: ProductionToolRef = {

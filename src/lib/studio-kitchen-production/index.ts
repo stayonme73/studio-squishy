@@ -65,12 +65,15 @@ export type {
 export {
   VOICE_AUDIO_CAPABILITY_INVENTORY,
   VOICE_ALLOWED_AUDIO_EXTENSIONS,
+  VOICE_INTEGRATION_ARTIFACT_ROOT,
   VOICE_PRODUCTION_CHAIN,
   VOICE_PRODUCTION_SKUS,
   VOICE_SCRIPT_WORD_LIMIT,
   defaultVoiceAudioBrief,
+  discoverElevenLabsAccountCapability,
   evaluateAudioQuality,
   gateAudioQualityForQaPass,
+  generateVoiceArtifact,
   isVoiceProductionSku,
   kitchenVoiceStatesForSku,
   projectVoiceKitchenStates,
@@ -79,6 +82,7 @@ export {
   resolveClaimableVoiceKitchenLabels,
   summarizeVoiceAudioInventory,
   voiceSkuContractTruth,
+  voiceSkuProductionProvider,
 } from "./voice-production";
 export type {
   AudioArtifactRef,
@@ -89,6 +93,9 @@ export type {
   AudioQualityJudgmentAttestations,
   AudioQualityQaPayload,
   AudioQualitySubmission,
+  ElevenLabsAccountCapability,
+  GenerateVoiceArtifactResult,
+  PersistedVoiceArtifact,
   VoiceProductionSku,
   VoiceSkuContractTruth,
 } from "./voice-production";
