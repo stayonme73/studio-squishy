@@ -44,7 +44,7 @@ export type VideoSkuContractTruth = {
   exclusionsSummary: readonly string[];
   clientInputs: readonly string[];
   qaRequirements: readonly string[];
-  primaryToolId: "capcut";
+  primaryToolId: "shotstack" | "capcut";
   primaryToolIntegrationState: string;
   primaryToolReadiness: string;
   /** Intake lead reconciled to 15–30s in KITCHEN-VIDEO-OPERATIONAL-1 (was 45s discrepancy). */
@@ -112,7 +112,7 @@ export function videoSkuContractTruth(skuId: VideoProductionSku): VideoSkuContra
       "Customer footage/assets usable or approved Studio assets used",
       "Studio QC review before delivery",
     ],
-    primaryToolId: "capcut",
+    primaryToolId: c.primaryTool.toolId === "shotstack" ? "shotstack" : "capcut",
     primaryToolIntegrationState: c.primaryTool.integrationState,
     primaryToolReadiness: c.primaryTool.toolReadiness,
     intakeLeadDurationDiscrepancy:

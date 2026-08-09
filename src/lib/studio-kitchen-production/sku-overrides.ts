@@ -8,6 +8,7 @@ import {
   CAPCUT_TOOL,
   LANDING_STRUCTURE_TOOL,
   PLATFORM_ADMIN_TOOL,
+  SHOTSTACK_TOOL,
   TEXT_MODEL_TOOL,
 } from "./family-baselines";
 import type {
@@ -487,8 +488,8 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "v2-rtu-short-video": {
     producerRole: "creative_production",
-    primaryTool: CAPCUT_TOOL,
-    optionalTools: [AI_VOICE_TOOL, CANVA_TOOL],
+    primaryTool: SHOTSTACK_TOOL,
+    optionalTools: [AI_VOICE_TOOL, CANVA_TOOL, CAPCUT_TOOL],
     formatExportRequirements: [
       "One basic short-form MP4, 15–30 seconds",
       "One aspect ratio only (vertical, square, or landscape)",
@@ -520,9 +521,9 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         source: "service_contract",
       },
     ],
-    readiness: "contract_ready_integration_required",
+    readiness: "contract_ready",
     readinessNotes:
-      "KITCHEN-VIDEO-OPERATIONAL-1: CAPCUT OWNER-INDEPENDENCE FAIL — no supported owner-free CapCut export. NOT CUSTOMER READY / NOT CERTIFIED. Work packet + bind gates retained for a future provider. Stock + music UNRESOLVED. Intake lead reconciled to 15–30s. Next: KITCHEN-VIDEO-PROVIDER-SELECTION-1.",
+      "KITCHEN-VIDEO-INTEGRATION-1: SHOTSTACK INTEGRATION PROVEN. INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED. CapCut CLOSED — OWNER-INDEPENDENCE FAIL. Stock + music UNRESOLVED. Next: KITCHEN-PRODUCTION-CERT-VIDEO-1.",
     specialNotes: [
       "Client posts/distributes the finished video.",
       "Customer must provide organized usable footage when using their own visuals.",
@@ -530,6 +531,7 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
       "Stock-media capability UNRESOLVED for jobs that need stock — unused in this package.",
       "MUSIC CAPABILITY = UNRESOLVED — omit music until rights are certain (unused in this package).",
       "Tagia/Owner CapCut click-export is NOT an acceptable production success path.",
+      "Primary producer: Shotstack Edit + Ingest API (stage proof bound under kitchen-video-integration-1 artifacts).",
     ],
   },
 };

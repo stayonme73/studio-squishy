@@ -54,7 +54,7 @@ export function defaultVideoQualityBrief(
     allowedExtensions: VIDEO_ALLOWED_EXTENSIONS,
     durationMinSeconds: VIDEO_DURATION_MIN_SECONDS,
     durationMaxSeconds: VIDEO_DURATION_MAX_SECONDS,
-    assemblyCapability: "integration_required",
+    assemblyCapability: "present_and_usable",
     requireArtifactBinding: true,
     musicUsed: false,
     musicRightsResolved: false,
@@ -104,7 +104,7 @@ export function evaluateVideoQuality(input: {
       findings,
       "assembly_not_integrated",
       "generation_capability",
-      "CapCut / Studio MP4 assembly is INTEGRATION REQUIRED — cannot claim Studio-generated customer video",
+      "Studio MP4 assembly is INTEGRATION REQUIRED — cannot claim Studio-generated customer video",
     );
   }
 
@@ -116,7 +116,7 @@ export function evaluateVideoQuality(input: {
       findings,
       "phantom_studio_assembly",
       "phantom_file",
-      "Cannot claim Studio-assembled MP4 while CapCut assembly remains integration_required",
+      "Cannot claim Studio-assembled MP4 while assembly remains integration_required",
     );
   }
 

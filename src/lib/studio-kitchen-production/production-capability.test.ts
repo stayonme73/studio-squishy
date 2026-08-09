@@ -127,13 +127,16 @@ describe("KITCHEN-PRODUCTION-CAPABILITY-1", () => {
     expect(rtuVoice.contract.readiness).toBe("contract_ready");
     expect(voice.contract.readinessNotes).toMatch(/CUSTOMER READY WITH LIMITS — MP3/i);
     expect(voice.contract.readinessNotes).toMatch(/WAV UNVERIFIED/i);
-    expect(video.contract.readiness).toBe("contract_ready_integration_required");
+    expect(video.contract.readiness).toBe("contract_ready");
     expect(profile.contract.readiness).toBe("partial");
     expect(page.contract.readiness).toBe("partial");
-    // CapCut Desktop exists but owner-independence FAIL — still integration_required / not customer-certified.
-    expect(video.contract.primaryTool.integrationState).toBe("not_integrated");
-    expect(video.contract.primaryTool.toolReadiness).toBe("tool_integration_required");
-    expect(video.contract.primaryTool.note).toMatch(/OWNER-INDEPENDENCE FAIL/i);
+    // Shotstack owner-independent MP4 path proven; CapCut remains closed FAIL; video not customer-certified.
+    expect(video.contract.primaryTool.toolId).toBe("shotstack");
+    expect(video.contract.primaryTool.integrationState).toBe("partial_adapter");
+    expect(video.contract.primaryTool.toolReadiness).toBe("contract_ready");
+    expect(video.contract.readinessNotes).toMatch(/NOT CUSTOMER READY/i);
+    expect(video.contract.readinessNotes).toMatch(/NOT CERTIFIED/i);
+    expect(video.contract.readinessNotes).toMatch(/SHOTSTACK INTEGRATION PROVEN/i);
     expect(voice.contract.primaryTool.integrationState).toBe("partial_adapter");
     expect(voice.contract.primaryTool.note).toMatch(/ElevenLabs/i);
     expect(rtuVoice.contract.primaryTool.integrationState).toBe("partial_adapter");

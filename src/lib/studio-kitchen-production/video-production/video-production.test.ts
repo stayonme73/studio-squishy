@@ -123,17 +123,18 @@ function envelope(tasks: CampaignTaskItem[]): ServerTasksEnvelope {
 }
 
 describe("KITCHEN-VIDEO-PRODUCTION-1", () => {
-  it("resolves v2-rtu-short-video to CapCut contract without customer-ready status", () => {
+  it("resolves v2-rtu-short-video to Shotstack-integrated contract without customer-ready status", () => {
     for (const sku of VIDEO_PRODUCTION_SKUS) {
       expect(isVideoProductionSku(sku)).toBe(true);
       const resolved = resolveServiceProductionContract(sku);
       expect(resolved.status).toBe("resolved");
       if (resolved.status !== "resolved") return;
-      expect(resolved.contract.readiness).toBe("contract_ready_integration_required");
-      expect(resolved.contract.primaryTool.toolId).toBe("capcut");
-      expect(resolved.contract.primaryTool.integrationState).toBe("not_integrated");
-      expect(resolved.contract.readinessNotes).toMatch(/OWNER-INDEPENDENCE FAIL/i);
+      expect(resolved.contract.readiness).toBe("contract_ready");
+      expect(resolved.contract.primaryTool.toolId).toBe("shotstack");
+      expect(resolved.contract.primaryTool.integrationState).toBe("partial_adapter");
+      expect(resolved.contract.readinessNotes).toMatch(/CapCut CLOSED|OWNER-INDEPENDENCE FAIL/i);
       expect(resolved.contract.readinessNotes).toMatch(/NOT CUSTOMER READY/i);
+      expect(resolved.contract.readinessNotes).toMatch(/NOT CERTIFIED/i);
       expect(resolved.contract.readinessNotes).not.toMatch(/CUSTOMER READY WITH LIMITS — MP4/i);
       const truth = videoSkuContractTruth(sku);
       expect(truth.durationSecondsMin).toBe(VIDEO_DURATION_MIN_SECONDS);
@@ -158,7 +159,8 @@ describe("KITCHEN-VIDEO-PRODUCTION-1", () => {
     expect(summary.musicCapability).toBe("unresolved");
     expect(summary.stockMediaCapability).toBe("unresolved");
     expect(summary.studioVoiceUntouched).toBe(true);
-    expect(summary.recommendedNextPackage).toBe("KITCHEN-VIDEO-PROVIDER-SELECTION-1");
+    expect(summary.shotstackIntegrationProven).toBe(true);
+    expect(summary.recommendedNextPackage).toBe("KITCHEN-PRODUCTION-CERT-VIDEO-1");
     expect(CAPCUT_MANUAL_OPERATIONAL_TARGET.tagiaExportSuccessPath).toBe(false);
     expect(CAPCUT_MANUAL_OPERATIONAL_TARGET.ownerIndependence).toBe("fail");
   });
@@ -320,9 +322,12 @@ describe("KITCHEN-VIDEO-PRODUCTION-1", () => {
     expect(metaOnly.customerReady).toBe(false);
   });
 
-  it("integration_required blocks Studio-assembled video claims", () => {
+  it("integration_required brief still blocks Studio-assembled video claims", () => {
     const evaln = evaluateVideoQuality({
-      brief: defaultVideoQualityBrief("v2-rtu-short-video", "video-prod-1", "script-v1"),
+      brief: {
+        ...defaultVideoQualityBrief("v2-rtu-short-video", "video-prod-1", "script-v1"),
+        assemblyCapability: "integration_required",
+      },
       submission: {
         scriptVersionId: "script-v1",
         campaignId: "video-prod-1",
@@ -416,8 +421,8 @@ describe("KITCHEN-VIDEO-PRODUCTION-1", () => {
   it("kitchen states never invent artifacts; chain covers required labels", () => {
     const snap = projectVideoKitchenStates("v2-rtu-short-video");
     expect(snap.customerReady).toBe(false);
-    expect(snap.assemblyIntegrated).toBe(false);
-    expect(snap.canRepresentVideoArtifactProduced).toBe(false);
+    expect(snap.assemblyIntegrated).toBe(true);
+    expect(snap.canRepresentVideoArtifactProduced).toBe(true);
     const labels = VIDEO_PRODUCTION_CHAIN.map((s) => s.kitchenStateLabel);
     expect(labels).toContain("render pending");
     expect(labels).toContain("video artifact produced");

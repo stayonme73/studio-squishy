@@ -88,11 +88,21 @@ const TEXT_MODEL: ProductionToolRef = {
 const CAPCUT: ProductionToolRef = {
   toolId: "capcut",
   label: "CapCut",
-  required: true,
+  required: false,
   integrationState: "not_integrated",
-  toolReadiness: "tool_integration_required",
+  toolReadiness: "unsupported",
   note:
-    "CapCut Desktop is installed but OWNER-INDEPENDENCE FAIL (KITCHEN-VIDEO-OPERATIONAL-1): no supported CLI/API/SDK/headless export. Human CapCut operation is not an acceptable Studio success path. Replacement selection required.",
+    "CLOSED — OWNER-INDEPENDENCE FAIL (KITCHEN-VIDEO-OPERATIONAL-1). Not an active production provider. Do not reopen for routine RTU short video.",
+};
+
+const SHOTSTACK: ProductionToolRef = {
+  toolId: "shotstack",
+  label: "Shotstack Edit + Ingest API",
+  required: true,
+  integrationState: "partial_adapter",
+  toolReadiness: "contract_ready",
+  note:
+    "KITCHEN-VIDEO-INTEGRATION-1: owner-independent Shotstack MP4 path proven (stage). INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED. Visual cert is a separate package.",
 };
 
 const AI_VOICE: ProductionToolRef = {
@@ -204,7 +214,7 @@ export const FAMILY_PRODUCTION_BASELINES: Record<
     productionFamilyId: "video_audio",
     defaultProducerRole: "creative_production",
     defaultSupportingRoles: ["qa", "producer_dispatcher", "copy"],
-    defaultPrimaryTool: CAPCUT,
+    defaultPrimaryTool: SHOTSTACK,
     defaultOptionalTools: [AI_VOICE],
     defaultStudioInputs: ["Approved script or footage requirements", "Plan limits"],
     defaultSteps: stepsFromPipeline("video_audio", phaseRole),
@@ -272,6 +282,7 @@ export const FAMILY_PRODUCTION_BASELINES: Record<
 export const PLATFORM_ADMIN_TOOL = PLATFORM_ADMIN;
 export const AI_VOICE_TOOL = AI_VOICE;
 export const CAPCUT_TOOL = CAPCUT;
+export const SHOTSTACK_TOOL = SHOTSTACK;
 export const CANVA_TOOL = CANVA_MANUAL;
 export const TEXT_MODEL_TOOL = TEXT_MODEL;
 export const LANDING_STRUCTURE_TOOL = LANDING_STRUCTURE;

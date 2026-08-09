@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "providerRenderId": "311fa267-f228-4b1f-bd71-fa4b5a1a78b4",
+  "sha256": "895c12c2d0adaad1d3a5c4fd2867f69a6e410a60faa4158bcaeb2d3238c633bf",
+  "byteLength": 7105903,
+  "durationSeconds": 22.48,
+  "path": "docs/launch/kitchen-video-integration-1/artifacts/v1/v2-rtu-short-video_video-int-1-cedar-lane_wp-v1_sb-v1.mp4",
+  "note": "V1 restored; hash may differ from first live render if Shotstack non-bit-identical"
+}

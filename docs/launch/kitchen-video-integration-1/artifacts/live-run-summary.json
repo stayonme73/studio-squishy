@@ -1,0 +1,50 @@
+{
+  "package": "KITCHEN-VIDEO-INTEGRATION-1",
+  "verdict": "SHOTSTACK INTEGRATION: PROVEN",
+  "readiness": "INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED",
+  "shotstackEnv": "stage",
+  "shotstackApiKeyPresent": true,
+  "v1": {
+    "ok": true,
+    "providerRenderId": "311fa267-f228-4b1f-bd71-fa4b5a1a78b4",
+    "status": "done",
+    "artifactPath": "docs/launch/kitchen-video-integration-1/artifacts/v1/v2-rtu-short-video_video-int-1-cedar-lane_wp-v1_sb-v1.mp4",
+    "sha256": "895c12c2d0adaad1d3a5c4fd2867f69a6e410a60faa4158bcaeb2d3238c633bf",
+    "byteLength": 7105903,
+    "width": 1080,
+    "height": 1920,
+    "durationSeconds": 22.48,
+    "frameRate": 25,
+    "codec": "h264",
+    "qaState": "qa_ready",
+    "customerReady": false,
+    "certified": false,
+    "note": "Restored live re-render after mock test path isolation; prior first-pass id 8bec1930 retained in job log"
+  },
+  "v2": {
+    "ok": true,
+    "providerRenderId": "4c5b5653-7fbe-46d1-9211-3c3b09baf6bf",
+    "status": "done",
+    "artifactPath": "docs/launch/kitchen-video-integration-1/artifacts/v2/v2-rtu-short-video_video-int-1-cedar-lane_wp-v2_sb-v2.mp4",
+    "sha256": "57817cdf40c34b472f77abcfcdbd301efb84d41a586804da0b02434c0fbb066d",
+    "byteLength": 7171724,
+    "width": 1080,
+    "height": 1920,
+    "durationSeconds": 23,
+    "frameRate": 25,
+    "codec": "h264",
+    "qaState": "qa_ready",
+    "customerReady": false,
+    "differentHashFromV1": true
+  },
+  "v1Preserved": true,
+  "v2Completed": true,
+  "capCutStatus": "CLOSED — OWNER-INDEPENDENCE FAIL",
+  "stock": "UNRESOLVED",
+  "music": "UNRESOLVED",
+  "nextPackage": "KITCHEN-PRODUCTION-CERT-VIDEO-1",
+  "git": {
+    "commit": false,
+    "push": false
+  }
+}

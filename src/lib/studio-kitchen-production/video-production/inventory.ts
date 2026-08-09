@@ -20,16 +20,28 @@ export type VideoCapabilityFinding = {
 
 export const VIDEO_CAPABILITY_INVENTORY: readonly VideoCapabilityFinding[] = [
   {
+    id: "shotstack_edit_ingest",
+    label: "Shotstack Edit + Ingest API (owner-independent MP4 proven)",
+    classification: "present_and_usable",
+    evidencePaths: [
+      "docs/launch/kitchen-video-integration-1/",
+      "src/lib/studio-kitchen-production/video-integration/",
+      "docs/launch/kitchen-video-provider-selection-1/KITCHEN-VIDEO-PROVIDER-SELECTION-1-REPORT.md",
+    ],
+    notes:
+      "KITCHEN-VIDEO-INTEGRATION-1: live stage renders V1+V2 bound with SHA-256. INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED.",
+  },
+  {
     id: "capcut_named_tool",
     label: "CapCut Desktop (installed; owner-independence FAIL)",
-    classification: "integration_required",
+    classification: "unsupported",
     evidencePaths: [
       "docs/launch/kitchen-video-operational-1/CAPCUT-OWNER-INDEPENDENCE.md",
       "docs/launch/kitchen-video-operational-1/CAPCUT-SETUP.md",
       "src/lib/studio-kitchen-production/family-baselines.ts",
     ],
     notes:
-      "CapCut 9.1.0.3879 is installed. No official CLI/API/SDK/headless export. Human desktop operation is not an acceptable Studio success path. CAPCUT OWNER-INDEPENDENCE: FAIL.",
+      "CLOSED — OWNER-INDEPENDENCE FAIL. Not an active production provider. Historical evaluation only.",
   },
   {
     id: "capcut_manual_operational_path",
@@ -137,6 +149,7 @@ export function classifyCapCutFinding(): {
 
 export function summarizeVideoCapabilityInventory(): {
   canGenerateCustomerDeliverableMp4InStudio: false;
+  shotstackIntegrationProven: true;
   capCutFinding: CapCutFindingClass;
   capCutOwnerIndependence: CapCutOwnerIndependence;
   musicCapability: "unresolved";
@@ -145,11 +158,13 @@ export function summarizeVideoCapabilityInventory(): {
   customerReady: false;
   blockingGaps: readonly string[];
   findings: readonly VideoCapabilityFinding[];
-  recommendedNextPackage: "KITCHEN-VIDEO-PROVIDER-SELECTION-1";
+  recommendedNextPackage: "KITCHEN-PRODUCTION-CERT-VIDEO-1";
 } {
   const capCut = classifyCapCutFinding();
   return {
+    // Integration proven ≠ customer deliverable certified.
     canGenerateCustomerDeliverableMp4InStudio: false,
+    shotstackIntegrationProven: true,
     capCutFinding: capCut.finding,
     capCutOwnerIndependence: "fail",
     musicCapability: "unresolved",
@@ -157,12 +172,12 @@ export function summarizeVideoCapabilityInventory(): {
     studioVoiceUntouched: true,
     customerReady: false,
     blockingGaps: [
-      "CAPCUT OWNER-INDEPENDENCE: FAIL — no supported owner-free CapCut MP4 export",
-      "Replacement provider selection required before video certification",
+      "Visual/content certification pending (KITCHEN-PRODUCTION-CERT-VIDEO-1)",
+      "NOT CUSTOMER READY / NOT CERTIFIED until cert package passes",
       "Stock source unresolved for jobs without customer media",
       "Music rights unresolved — omit music",
     ],
     findings: VIDEO_CAPABILITY_INVENTORY,
-    recommendedNextPackage: "KITCHEN-VIDEO-PROVIDER-SELECTION-1",
+    recommendedNextPackage: "KITCHEN-PRODUCTION-CERT-VIDEO-1",
   };
 }

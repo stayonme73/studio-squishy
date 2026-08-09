@@ -1,0 +1,38 @@
+{
+  "jobId": "0514b3f4-c9bd-45a9-9f4a-2db6bd99ebaf",
+  "provider": "shotstack",
+  "providerRenderId": "8bec1930-ef1f-4a07-9eff-9b2a5f987096",
+  "campaignId": "video-ops-1-cedar-lane",
+  "skuId": "v2-rtu-short-video",
+  "workPacketId": "video-ops-1-cedar-lane",
+  "workPacketVersion": "wp-v1",
+  "storyboardVersion": "sb-v1",
+  "scriptVersionId": "script-v1",
+  "status": "done",
+  "submittedAt": "2026-08-09T16:48:31.164Z",
+  "completedAt": "2026-08-09T16:48:55.170Z",
+  "requestHash": "3fff1c45c5db06af7a323799ad91c0c4bf04f74f0c296512654c78f8bfbde0bf",
+  "outputUrl": "https://shotstack-api-stage-output.s3-ap-southeast-2.amazonaws.com/jyp9zyib5p/8bec1930-ef1f-4a07-9eff-9b2a5f987096.mp4",
+  "retryCount": 0,
+  "requestedWidth": 1080,
+  "requestedHeight": 1920,
+  "requestedAspect": "9:16",
+  "requestedDurationTargetSeconds": 22.5,
+  "outputFormat": "mp4",
+  "sourceAssetPaths": [
+    "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-01.png",
+    "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-02.png",
+    "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-03.png",
+    "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-04-endcard.png",
+    "docs/launch/kitchen-production-cert-voice-1/artifacts/cert-voice-1-cedar-lane/ap-001_cert-voice-script-v1_d283144563a6.mp3"
+  ],
+  "sourceAssetHashes": {
+    "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-01.png": "27a13c142cad0bedbeebd8765e10360978a28ffbc6d34b4bbb2b69205f25dd95",
+    "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-02.png": "67e169d013d2c06ffda5625934ca673429a878128b042515c6da4912290f723b",
+    "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-03.png": "1c13638b82fdd92ce9d93c10370873143d8ddb71502a46ab6ca91ed1eb8a600c",
+    "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-04-endcard.png": "394cdbee4ee594486a07a2d536f5ed23b9e412550326fe3072d0abc67f7ded19",
+    "docs/launch/kitchen-production-cert-voice-1/artifacts/cert-voice-1-cedar-lane/ap-001_cert-voice-script-v1_d283144563a6.mp3": "d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4"
+  },
+  "voiceArtifactPath": "docs/launch/kitchen-production-cert-voice-1/artifacts/cert-voice-1-cedar-lane/ap-001_cert-voice-script-v1_d283144563a6.mp3",
+  "voiceArtifactSha256": "d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4"
+}

@@ -12,7 +12,7 @@ export type VideoKitchenStateSnapshot = {
   skuId: VideoProductionSku;
   labels: readonly string[];
   blockedStepIds: readonly VideoChainStepId[];
-  assemblyIntegrated: false;
+  assemblyIntegrated: boolean;
   canRepresentVideoArtifactProduced: boolean;
   customerReady: false;
   notes: string;
@@ -30,8 +30,8 @@ export function projectVideoKitchenStates(skuId: VideoProductionSku): VideoKitch
     skuId,
     labels: VIDEO_PRODUCTION_CHAIN.map((s) => s.kitchenStateLabel),
     blockedStepIds,
-    assemblyIntegrated: false,
-    canRepresentVideoArtifactProduced: false,
+    assemblyIntegrated: inventory.shotstackIntegrationProven,
+    canRepresentVideoArtifactProduced: inventory.shotstackIntegrationProven,
     customerReady: false,
     notes: inventory.blockingGaps.join(" · "),
   };

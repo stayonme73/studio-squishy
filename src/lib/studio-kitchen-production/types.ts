@@ -27,6 +27,7 @@ export type ProductionToolReadiness =
 export type ProductionToolId =
   | "canva"
   | "capcut"
+  | "shotstack"
   | "text_model"
   | "ai_voice_tool"
   | "studio_landing_page_structure"

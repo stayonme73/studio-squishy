@@ -1,0 +1,64 @@
+{
+  "workPacketId": "video-ops-1-cedar-lane",
+  "workPacketVersion": "wp-v2",
+  "storyboardVersion": "sb-v2",
+  "scriptVersionId": "script-v1",
+  "campaignId": "video-ops-1-cedar-lane",
+  "skuId": "v2-rtu-short-video",
+  "label": "INTERNAL SHOTSTACK INTEGRATION TEST — NOT CUSTOMER DELIVERABLE",
+  "supersedesWorkPacketVersion": "wp-v1",
+  "correctionReason": "End-card CTA held too briefly — extend scene 4 hold for legibility; CTA text clarified",
+  "ownerEscalation": "owner_not_required",
+  "durationMinSeconds": 20,
+  "durationMaxSeconds": 25,
+  "durationTargetSeconds": 23,
+  "aspectRatio": "vertical",
+  "width": 1080,
+  "height": 1920,
+  "exportFormat": "mp4",
+  "musicAllowed": false,
+  "stockAllowed": false,
+  "productionMethod": "shotstack",
+  "productionRoleOwner": "creative_production",
+  "ctaCaptionSceneNumber": 4,
+  "voiceArtifact": {
+    "relativePath": "docs/launch/kitchen-production-cert-voice-1/artifacts/cert-voice-1-cedar-lane/ap-001_cert-voice-script-v1_d283144563a6.mp3",
+    "contentSha256": "d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4"
+  },
+  "exportRelativePath": "docs/launch/kitchen-video-integration-1/artifacts/v2/v2-rtu-short-video_video-int-1-cedar-lane_wp-v2_sb-v2.mp4",
+  "preserveV1RelativePath": "docs/launch/kitchen-video-integration-1/artifacts/v1/v2-rtu-short-video_video-int-1-cedar-lane_wp-v1_sb-v1.mp4",
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "assetId": "scene-01",
+      "relativePath": "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-01.png",
+      "startSeconds": 0,
+      "endSeconds": 5,
+      "caption": "Quiet craft. Clear message."
+    },
+    {
+      "sceneNumber": 2,
+      "assetId": "scene-02",
+      "relativePath": "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-02.png",
+      "startSeconds": 5,
+      "endSeconds": 10,
+      "caption": "Cedar Lane Studio"
+    },
+    {
+      "sceneNumber": 3,
+      "assetId": "scene-03",
+      "relativePath": "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-03.png",
+      "startSeconds": 10,
+      "endSeconds": 15,
+      "caption": "Brand stories, made calm."
+    },
+    {
+      "sceneNumber": 4,
+      "assetId": "scene-04",
+      "relativePath": "docs/launch/kitchen-video-operational-1/source-assets/scenes/scene-04-endcard.png",
+      "startSeconds": 15,
+      "endSeconds": 23,
+      "caption": "Book your visit today"
+    }
+  ]
+}

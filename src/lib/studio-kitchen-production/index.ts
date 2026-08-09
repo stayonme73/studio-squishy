@@ -142,6 +142,21 @@ export {
   assertSelectionIntegrity,
 } from "./video-provider-selection";
 export {
+  CAPCUT_STATUS_CLOSED,
+  OWNER_SETUP_INSTRUCTIONS,
+  READINESS_BEFORE_LIVE_PROOF,
+  VIDEO_INTEGRATION_PACKAGE_ID,
+  VIDEO_INTEGRATION_SKU,
+  VIDEO_INTEGRATION_STARTING_CONTROL,
+  buildShotstackEditPayload,
+  integrationVerdictFromEvidence,
+  loadShotstackWorkPacketV1,
+  loadShotstackWorkPacketV2,
+  readinessForEvidence,
+  runShotstackWorkPacketPipeline,
+  shotstackCredentialPresence,
+} from "./video-integration";
+export {
   CERT_VOICE_APPROVED_ARTIFACT,
   CERT_VOICE_APPROVED_SCRIPT,
   CERT_VOICE_ARTIFACT_ROOT,
@@ -191,7 +206,10 @@ export {
   activeCustomerFacingSkuCount,
   isActiveCustomerFacingSku,
 } from "./active-set";
-export { FAMILY_PRODUCTION_BASELINES } from "./family-baselines";
+export {
+  FAMILY_PRODUCTION_BASELINES,
+  SHOTSTACK_TOOL,
+} from "./family-baselines";
 export { buildProductionCapabilityMatrix } from "./matrix";
 export {
   PRODUCTION_READINESS_LABELS,
