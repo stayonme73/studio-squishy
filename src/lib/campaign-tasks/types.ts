@@ -246,6 +246,11 @@ export type QaRecord = {
   missingFactReason?: string;
   /** Kitchen V1 — pins exact production version for QA (sm-001 production phases). */
   workVersionId?: string;
+  /**
+   * Copy-family (`copy_channels`) QA evidence — required for qa_pass on copy/qa phases.
+   * Checklist attestation alone is not sufficient for those tasks.
+   */
+  copyQualityEvidence?: import("@/lib/studio-kitchen-production/copy-quality").CopyQualityEvidence;
 };
 
 export type WorkflowTransitionRequest = {

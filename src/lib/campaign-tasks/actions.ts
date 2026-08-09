@@ -6,6 +6,11 @@ import type { CampaignRecord } from "@/config/studio-board";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import type { CampaignMaterialItem, MaterialCategory, MaterialContentKind, MaterialRequirementLevel, ServerMaterialsEnvelope } from "@/lib/materials/types";
+import {
+  gateCopyQualityForQaPass,
+  requiresCopyQualityGate,
+  type CopyQualityEvidence,
+} from "@/lib/studio-kitchen-production/copy-quality";
 
 import {
   canClaimTask,
@@ -148,6 +153,11 @@ export type TasksPatchBody =
       checks: string[];
       notes?: string;
       workVersionId?: string;
+      /**
+       * Required for copy_channels copy/qa phases.
+       * Server re-evaluates brief+submission; client cannot self-attest ok.
+       */
+      copyQuality?: import("@/lib/studio-kitchen-production/copy-quality").CopyQualityQaPayload;
     }
   | {
       action: "qa_fail";
@@ -872,6 +882,31 @@ export function applyQaPass(
     return { ok: false, error: kitchenQa.error, status: 400 };
   }
 
+  let copyQualityEvidence: CopyQualityEvidence | undefined;
+  if (requiresCopyQualityGate(task)) {
+    if (!body.copyQuality) {
+      return {
+        ok: false,
+        error:
+          "Copy-family QA pass requires copyQuality evaluation (brief + produced copy + judgment attestations). Checklist attestation alone is not sufficient.",
+        status: 400,
+      };
+    }
+    const gated = gateCopyQualityForQaPass({
+      brief: body.copyQuality.brief,
+      submission: body.copyQuality.submission,
+      attestations: body.copyQuality.attestations,
+    });
+    if (!gated.ok) {
+      return { ok: false, error: gated.error, status: 400 };
+    }
+    copyQualityEvidence = {
+      evaluation: gated.evaluation,
+      attestations: gated.attestations,
+      gatePassed: true,
+    };
+  }
+
   const actorRole = qaActorRole(user, context.assignments);
   const transitioned = transitionTask(
     envelope,
@@ -896,6 +931,7 @@ export function applyQaPass(
     checks: body.checks,
     notes: body.notes,
     workVersionId: body.workVersionId,
+    copyQualityEvidence,
   });
 
   const withRecord = appendEnvelopeQaRecord(transitioned.envelope, record);

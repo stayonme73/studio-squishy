@@ -1,4 +1,35 @@
 export {
+  CERT_COPY_CAMPAIGN_ID,
+  CERT_COPY_FIXTURE_LABEL,
+  CERT_COPY_PACKAGE_ID,
+  CERT_COPY_SKUS,
+  certCopyCustomerBrief,
+  certCopyQaSummary,
+  emailCampaignCorrectedDraft,
+  emailCampaignFirstDraft,
+  emailKitFinalDraft,
+  marketingCopyFinalDraft,
+  smsKitFinalDraft,
+} from "./cert-copy";
+export {
+  evaluateCopyQuality,
+  gateCopyQualityForQaPass,
+  harborOakCopyBrief,
+  requiresCopyQualityGate,
+  HARBOR_OAK_PASS_ATTESTATIONS,
+  submissionFromEmailCampaignDraft,
+  submissionFromEmailKitDraft,
+  submissionFromMarketingCopyDraft,
+  submissionFromSmsKitDraft,
+} from "./copy-quality";
+export type {
+  CopyQualityBrief,
+  CopyQualityEvaluation,
+  CopyQualityEvidence,
+  CopyQualityQaPayload,
+  CopyQualitySubmission,
+} from "./copy-quality";
+export {
   ACTIVE_CUSTOMER_FACING_SKUS,
   DISCOVERY_GREEN_SKUS,
   EXPLICITLY_EXCLUDED_FROM_CAPABILITY_SET,

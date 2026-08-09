@@ -125,6 +125,7 @@ export function buildQaRecord(input: {
   missingFactDescription?: string;
   missingFactReason?: string;
   workVersionId?: string;
+  copyQualityEvidence?: QaRecord["copyQualityEvidence"];
 }): QaRecord {
   return {
     id: randomUUID(),
@@ -142,6 +143,7 @@ export function buildQaRecord(input: {
     missingFactDescription: input.missingFactDescription,
     missingFactReason: input.missingFactReason,
     workVersionId: input.workVersionId?.trim() || undefined,
+    copyQualityEvidence: input.copyQualityEvidence,
   };
 }
 
