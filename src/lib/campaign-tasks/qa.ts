@@ -127,6 +127,7 @@ export function buildQaRecord(input: {
   workVersionId?: string;
   copyQualityEvidence?: QaRecord["copyQualityEvidence"];
   designQualityEvidence?: QaRecord["designQualityEvidence"];
+  audioQualityEvidence?: QaRecord["audioQualityEvidence"];
 }): QaRecord {
   return {
     id: randomUUID(),
@@ -146,6 +147,7 @@ export function buildQaRecord(input: {
     workVersionId: input.workVersionId?.trim() || undefined,
     copyQualityEvidence: input.copyQualityEvidence,
     designQualityEvidence: input.designQualityEvidence,
+    audioQualityEvidence: input.audioQualityEvidence,
   };
 }
 

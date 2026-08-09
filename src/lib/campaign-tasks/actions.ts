@@ -16,6 +16,11 @@ import {
   requiresDesignQualityGate,
   type DesignQualityEvidence,
 } from "@/lib/studio-kitchen-production/design-quality";
+import {
+  gateAudioQualityForQaPass,
+  requiresAudioQualityGate,
+  type AudioQualityEvidence,
+} from "@/lib/studio-kitchen-production/voice-production";
 
 import {
   canClaimTask,
@@ -168,6 +173,11 @@ export type TasksPatchBody =
        * Deterministic artifact checks + recorded visual judgment attestations.
        */
       designQuality?: import("@/lib/studio-kitchen-production/design-quality").DesignQualityQaPayload;
+      /**
+       * Required for voice SKUs (ap-001 / v2-rtu-voice) on video_audio creative|qa phases.
+       * Deterministic artifact/script checks + recorded listening judgment attestations.
+       */
+      audioQuality?: import("@/lib/studio-kitchen-production/voice-production").AudioQualityQaPayload;
     }
   | {
       action: "qa_fail";
@@ -942,6 +952,31 @@ export function applyQaPass(
     };
   }
 
+  let audioQualityEvidence: AudioQualityEvidence | undefined;
+  if (requiresAudioQualityGate(task)) {
+    if (!body.audioQuality) {
+      return {
+        ok: false,
+        error:
+          "Voice-family QA pass requires audioQuality evaluation (script + bound audio artifact + listening judgment attestations). Checklist attestation alone is not sufficient.",
+        status: 400,
+      };
+    }
+    const gated = gateAudioQualityForQaPass({
+      brief: body.audioQuality.brief,
+      submission: body.audioQuality.submission,
+      attestations: body.audioQuality.attestations,
+    });
+    if (!gated.ok) {
+      return { ok: false, error: gated.error, status: 400 };
+    }
+    audioQualityEvidence = {
+      evaluation: gated.evaluation,
+      attestations: gated.attestations,
+      gatePassed: true,
+    };
+  }
+
   const actorRole = qaActorRole(user, context.assignments);
   const transitioned = transitionTask(
     envelope,
@@ -968,6 +1003,7 @@ export function applyQaPass(
     workVersionId: body.workVersionId,
     copyQualityEvidence,
     designQualityEvidence,
+    audioQualityEvidence,
   });
 
   const withRecord = appendEnvelopeQaRecord(transitioned.envelope, record);

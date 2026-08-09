@@ -63,6 +63,36 @@ export type {
   DesignQualitySubmission,
 } from "./design-quality";
 export {
+  VOICE_AUDIO_CAPABILITY_INVENTORY,
+  VOICE_ALLOWED_AUDIO_EXTENSIONS,
+  VOICE_PRODUCTION_CHAIN,
+  VOICE_PRODUCTION_SKUS,
+  VOICE_SCRIPT_WORD_LIMIT,
+  defaultVoiceAudioBrief,
+  evaluateAudioQuality,
+  gateAudioQualityForQaPass,
+  isVoiceProductionSku,
+  kitchenVoiceStatesForSku,
+  projectVoiceKitchenStates,
+  registerBoundAudioArtifact,
+  requiresAudioQualityGate,
+  resolveClaimableVoiceKitchenLabels,
+  summarizeVoiceAudioInventory,
+  voiceSkuContractTruth,
+} from "./voice-production";
+export type {
+  AudioArtifactRef,
+  AudioCapabilityFinding,
+  AudioQualityBrief,
+  AudioQualityEvaluation,
+  AudioQualityEvidence,
+  AudioQualityJudgmentAttestations,
+  AudioQualityQaPayload,
+  AudioQualitySubmission,
+  VoiceProductionSku,
+  VoiceSkuContractTruth,
+} from "./voice-production";
+export {
   ACTIVE_CUSTOMER_FACING_SKUS,
   DISCOVERY_GREEN_SKUS,
   EXPLICITLY_EXCLUDED_FROM_CAPABILITY_SET,

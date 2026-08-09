@@ -44,6 +44,7 @@ export const PRODUCTION_READINESS_LABELS: Record<
 const DEFAULT_ESCALATION: EscalationContract = {
   producerHandles: [
     "Routine design or copy correction",
+    "Routine audio / pronunciation / pacing correction",
     "Ordinary revision within allowance",
     "Missing required input follow-up (request materials)",
     "Standard production redo after QA production_correction",
@@ -51,6 +52,7 @@ const DEFAULT_ESCALATION: EscalationContract = {
   qaHandles: [
     "QA failure for production quality / specs",
     "QA correction verification",
+    "Audio listening judgment re-check after regeneration",
     "Packaging / leak checks",
   ],
   managerOrSystemHandles: [

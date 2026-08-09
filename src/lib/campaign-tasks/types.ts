@@ -256,6 +256,11 @@ export type QaRecord = {
    * Checklist attestation alone is not sufficient for those tasks.
    */
   designQualityEvidence?: import("@/lib/studio-kitchen-production/design-quality").DesignQualityEvidence;
+  /**
+   * Voice-family (`video_audio` ap-001 / v2-rtu-voice) audio QA evidence.
+   * Checklist attestation alone is not sufficient for those tasks.
+   */
+  audioQualityEvidence?: import("@/lib/studio-kitchen-production/voice-production").AudioQualityEvidence;
 };
 
 export type WorkflowTransitionRequest = {
