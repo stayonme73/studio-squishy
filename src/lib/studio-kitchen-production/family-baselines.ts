@@ -91,7 +91,8 @@ const CAPCUT: ProductionToolRef = {
   required: true,
   integrationState: "not_integrated",
   toolReadiness: "tool_integration_required",
-  note: "Named video edit tool. No CapCut integration in repo. Autonomous CapCut production is not claimed.",
+  note:
+    "Named video edit tool. No CapCut API in repo. Manual CapCut operational packet not Kitchen-proven (KITCHEN-VIDEO-PRODUCTION-1). Autonomous CapCut production is not claimed.",
 };
 
 const AI_VOICE: ProductionToolRef = {

@@ -522,10 +522,13 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
     ],
     readiness: "contract_ready_integration_required",
     readinessNotes:
-      "CapCut is the named edit tool. No CapCut integration exists. Do not claim autonomous CapCut production. Manual CapCut operational path may exist outside the app but is not Kitchen-proven automation.",
+      "KITCHEN-VIDEO-PRODUCTION-1: CapCut named, not integrated (INTEGRATION REQUIRED). No Studio MP4 render path. Manual CapCut packet not Kitchen-proven. Stock source + music rights UNRESOLVED. NOT CUSTOMER READY — do not certify in this package.",
     specialNotes: [
       "Client posts/distributes the finished video.",
       "Customer must provide organized usable footage when using their own visuals.",
+      "Optional certified voice MP3 may be referenced by hash; voice cert does not certify video.",
+      "Catalog/intake name Studio/stock/AI visuals, but no authorized source is established yet.",
+      "MUSIC CAPABILITY = UNRESOLVED — omit music until rights are certain.",
     ],
   },
 };
