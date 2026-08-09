@@ -137,7 +137,7 @@ describe("KITCHEN-VOICE-PRODUCTION-1", () => {
       expect(resolved.contract.primaryTool.integrationState).toBe("partial_adapter");
       const truth = voiceSkuContractTruth(sku);
       expect(truth.scriptWordLimit).toBe(VOICE_SCRIPT_WORD_LIMIT);
-      expect(truth.promisedFormats).toEqual(["mp3", "wav"]);
+      expect(truth.promisedFormats).toEqual(["mp3"]);
       expect(truth.primaryToolIntegrationState).toBe("partial_adapter");
       expect(resolved.contract.readinessNotes).toMatch(/CUSTOMER READY WITH LIMITS — MP3/i);
     }

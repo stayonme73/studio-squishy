@@ -1,7 +1,7 @@
 # KITCHEN-PRODUCTION-CERT-DESIGN-1 — Consolidated Visual QA Correction
 
-**Status:** Pre-seal correction complete — awaiting owner/manager visual re-review  
-**Not sealed.**
+**Status:** Pre-seal correction completed and sealed with the design cert commit.  
+**Sealed:** `664af4c` — Customer Ready With Limits for tested design SKUs only (KITCHEN-PRODUCTION-CERT-DESIGN-1).
 
 ## Corrected PNG evidence (do not overwrite priors)
 

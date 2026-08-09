@@ -155,8 +155,9 @@ describe("KITCHEN-PRODUCTION-CERT-VOICE-1", () => {
     const ap = resolveServiceProductionContract("ap-001");
     expect(ap.status).toBe("resolved");
     if (ap.status !== "resolved") return;
-    // Catalog text still promises MP3 or WAV — discrepancy preserved, not silently edited.
-    expect(ap.contract.deliverables.some((d) => /MP3 or WAV/i.test(d))).toBe(true);
+    // Closeout honesty: catalog promises MP3 only; WAV remains unverified / not offered.
+    expect(ap.contract.deliverables.some((d) => /MP3 or WAV/i.test(d))).toBe(false);
+    expect(ap.contract.deliverables.some((d) => /final MP3/i.test(d))).toBe(true);
     expect(CERT_VOICE_CUSTOMER_READY_STATUS).toBe("CUSTOMER READY WITH LIMITS — MP3");
     expect(CERT_VOICE_OWNER_LISTENING_APPROVAL.wavCertified).toBe(false);
   });

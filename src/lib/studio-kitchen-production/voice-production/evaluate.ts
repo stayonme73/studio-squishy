@@ -25,7 +25,7 @@ export function isVoiceProductionSku(skuId: string): boolean {
 
 /**
  * Audio QA gate for voice SKUs on creative/qa phases.
- * Does not gate marketing_video / CapCut short-video paths.
+ * Does not gate marketing_video / Shotstack short-video paths.
  */
 export function requiresAudioQualityGate(task: CampaignTaskItem): boolean {
   const phaseOk =

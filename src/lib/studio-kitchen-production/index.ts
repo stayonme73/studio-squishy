@@ -283,6 +283,29 @@ export {
   summarizeProductionContractForSku,
 } from "./resolve-contract";
 export { getSkuOverride, SKU_PRODUCTION_OVERRIDES } from "./sku-overrides";
+export {
+  assertEveryActiveSkuHasDisposition,
+  buildFinalActiveSkuLedger,
+  closeoutControlPoint,
+  deriveCloseoutVerdict,
+  FINAL_PRODUCTION_TOOL_LEDGER,
+  FINAL_RED_FLAG_REGISTER,
+  launchBlockers,
+  weakestDisposition,
+  CLOSEOUT_PACKAGE_ID,
+  CLOSEOUT_STARTING_COMMIT,
+  CLOSEOUT_VERDICTS,
+  LAUNCH_DISPOSITIONS,
+  NORMALIZED_READINESS_STATUSES,
+} from "./closeout";
+export type {
+  CloseoutVerdict,
+  FinalActiveSkuLedgerRow,
+  LaunchDisposition,
+  NormalizedReadinessStatus,
+  ProductionToolLedgerRow,
+  RedFlag,
+} from "./closeout";
 export type {
   ContractLookupResult,
   EscalationContract,

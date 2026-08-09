@@ -5,9 +5,7 @@ import type { ACTIVE_CUSTOMER_FACING_SKUS } from "./active-set";
 import {
   AI_VOICE_TOOL,
   CANVA_TOOL,
-  CAPCUT_TOOL,
   LANDING_STRUCTURE_TOOL,
-  PLATFORM_ADMIN_TOOL,
   SHOTSTACK_TOOL,
   TEXT_MODEL_TOOL,
 } from "./family-baselines";
@@ -223,12 +221,11 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
       },
     ],
     extraLimitations: [
-      "CUSTOMER READY WITH LIMITS — MP3 only (KITCHEN-PRODUCTION-CERT-VOICE-1). WAV is UNVERIFIED.",
-      "Catalog still lists MP3 or WAV — WAV promise remains an explicit follow-up discrepancy until verified separately.",
+      "CUSTOMER READY WITH LIMITS — MP3 only (KITCHEN-PRODUCTION-CERT-VOICE-1). WAV is UNVERIFIED / NOT CERTIFIED — post-launch enhancement only.",
     ],
     readiness: "contract_ready",
     readinessNotes:
-      "CUSTOMER READY WITH LIMITS — MP3 after Owner listening approval of cert-voice artifact sha256 d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4. WAV UNVERIFIED. Catalog MP3/WAV promise not silently changed.",
+      "CUSTOMER READY WITH LIMITS — MP3 after Owner listening approval of cert-voice artifact sha256 d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4. WAV UNVERIFIED. Catalog honesty aligned to MP3-only in KITCHEN-PRODUCTION-READINESS-CLOSEOUT-1.",
     specialNotes: [
       "Scriptwriting is not included unless selected separately.",
       "Basic pacing/pronunciation review is required before QA pass.",
@@ -529,17 +526,16 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
       },
     ],
     extraLimitations: [
-      "CUSTOMER READY WITH LIMITS — MP3 only (KITCHEN-PRODUCTION-CERT-VOICE-1). WAV is UNVERIFIED.",
-      "Catalog still lists MP3 or WAV — WAV promise remains an explicit follow-up discrepancy until verified separately.",
+      "CUSTOMER READY WITH LIMITS — MP3 only (KITCHEN-PRODUCTION-CERT-VOICE-1). WAV is UNVERIFIED / NOT CERTIFIED — post-launch enhancement only.",
     ],
     readiness: "contract_ready",
     readinessNotes:
-      "CUSTOMER READY WITH LIMITS — MP3 via shared ElevenLabs MP3 listening certification (cert-voice). WAV UNVERIFIED. CapCut is not used for audio-only.",
+      "CUSTOMER READY WITH LIMITS — MP3 via shared ElevenLabs MP3 listening certification (cert-voice). WAV UNVERIFIED. Catalog honesty aligned to MP3-only in KITCHEN-PRODUCTION-READINESS-CLOSEOUT-1. CapCut is not used for audio-only.",
   },
   "v2-rtu-short-video": {
     producerRole: "creative_production",
     primaryTool: SHOTSTACK_TOOL,
-    optionalTools: [AI_VOICE_TOOL, CANVA_TOOL, CAPCUT_TOOL],
+    optionalTools: [AI_VOICE_TOOL, CANVA_TOOL],
     formatExportRequirements: [
       "One basic short-form MP4, 15–30 seconds (CUSTOMER READY WITH LIMITS — MP4)",
       "One aspect ratio only (vertical, square, or landscape)",

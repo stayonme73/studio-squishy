@@ -67,12 +67,12 @@ export const VOICE_AUDIO_CAPABILITY_INVENTORY: readonly AudioCapabilityFinding[]
       "UI can accept audio files as materials. That is storage/intake acceptance — not Studio generation or production export.",
   },
   {
-    id: "capcut_named_for_video",
-    label: "CapCut (named for short video, not audio-only)",
-    classification: "integration_required",
+    id: "shotstack_named_for_video",
+    label: "Shotstack (active short-video tool; CapCut CLOSED historical)",
+    classification: "present_but_not_exportable",
     evidencePaths: ["src/lib/studio-kitchen-production/sku-overrides.ts"],
     notes:
-      "CapCut is the named short-video tool and is not used for audio-only voice SKUs.",
+      "Shotstack is the active short-video producer. CapCut is CLOSED / historical only. Neither path is used for audio-only voice SKUs.",
   },
 ] as const;
 
@@ -91,7 +91,7 @@ export function summarizeVoiceAudioInventory(): {
     studioVoiceUntouched: true,
     provider: "elevenlabs",
     blockingGap: keyPresent
-      ? "MP3 path certified with limits; WAV remains UNVERIFIED. Catalog MP3/WAV promise is an explicit follow-up discrepancy."
+      ? "MP3 path certified with limits; WAV remains UNVERIFIED / not currently offered (post-launch enhancement)."
       : "ELEVENLABS_API_KEY absent. Adapter is built; live generation blocked until server-side key is configured (never paste into chat).",
     findings: VOICE_AUDIO_CAPABILITY_INVENTORY,
   };

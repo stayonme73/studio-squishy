@@ -39,7 +39,7 @@ export function voiceSkuContractTruth(skuId: VoiceProductionSku): VoiceSkuContra
       producerRole: c.producerRole,
       readiness: c.readiness,
       scriptWordLimit: VOICE_SCRIPT_WORD_LIMIT,
-      promisedFormats: ["mp3", "wav"],
+      promisedFormats: ["mp3"],
       promisedOutputs: "One AI voice-over track (one style, one language)",
       revisionRule: "One revision round (catalog one_time revision rule)",
       exclusionsSummary: [
@@ -49,6 +49,7 @@ export function voiceSkuContractTruth(skuId: VoiceProductionSku): VoiceSkuContra
         "Multiple speakers",
         "Translations",
         "Music / advanced mixing",
+        "WAV deliverable (unverified / not currently offered)",
         ">300 words",
       ],
       clientInputs: [
@@ -61,7 +62,7 @@ export function voiceSkuContractTruth(skuId: VoiceProductionSku): VoiceSkuContra
       qaRequirements: [
         "Script ≤300 words",
         "No voice cloning",
-        "MP3 or WAV deliverable",
+        "MP3 deliverable (WAV not currently offered)",
         "Basic pacing/pronunciation review",
       ],
       primaryToolIntegrationState: c.primaryTool.integrationState,
@@ -74,9 +75,9 @@ export function voiceSkuContractTruth(skuId: VoiceProductionSku): VoiceSkuContra
     producerRole: c.producerRole,
     readiness: c.readiness,
     scriptWordLimit: VOICE_SCRIPT_WORD_LIMIT,
-    promisedFormats: ["mp3", "wav"],
+    promisedFormats: ["mp3"],
     promisedOutputs:
-      "Short announcement script when needed (≤300 words) + one final audio track for client distribution",
+      "Short announcement script when needed (≤300 words) + one final MP3 audio track for client distribution",
     revisionRule: "One revision round",
     exclusionsSummary: [
       "Outside voice talent",
@@ -86,6 +87,7 @@ export function voiceSkuContractTruth(skuId: VoiceProductionSku): VoiceSkuContra
       "Music / advanced mixing",
       "Visual/social assembly",
       "Posting/publishing",
+      "WAV deliverable (unverified / not currently offered)",
       ">300 words",
     ],
     clientInputs: [

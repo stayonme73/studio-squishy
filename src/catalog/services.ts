@@ -1448,7 +1448,7 @@ const V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
       "Supports up to 300 script words",
       "Uses one approved voice style and one language",
       "Performs basic pacing/pronunciation review",
-      "Delivers final MP3 or WAV",
+      "Delivers final MP3 (WAV not currently offered)",
     ],
     exclusions: [
       "Scriptwriting unless selected separately",

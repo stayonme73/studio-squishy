@@ -333,7 +333,7 @@ export const CATALOG_V2_BATCH2_READY_TO_USE: readonly CatalogV2ServiceEntry[] = 
         key: "voice_audio_file",
         quantity: 1,
         unit: "file",
-        label: "Final MP3 or WAV audio file",
+        label: "Final MP3 audio file (WAV not currently offered)",
       },
       {
         key: "qc_review",

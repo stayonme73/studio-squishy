@@ -1,6 +1,7 @@
 /**
  * Truthful short-video production chain.
- * CapCut assembly/export is named but not Studio-integrated.
+ * Primary assembly/render: Shotstack (CUSTOMER READY WITH LIMITS — MP4).
+ * CapCut is CLOSED / historical only — OWNER-INDEPENDENCE FAIL.
  */
 
 import type { VideoProductionSku } from "./contracts";
@@ -82,16 +83,17 @@ export const VIDEO_PRODUCTION_CHAIN: readonly VideoChainStep[] = [
     id: "video_assembly",
     ownerRole: "creative_production",
     kitchenStateLabel: "production started",
-    operationalStatus: "integration_required",
+    operationalStatus: "reuse_certified_capability",
     notes:
-      "CapCut is the named assembly tool. Studio has no CapCut API. Human CapCut work is required until an approved integration/operational packet exists.",
+      "Shotstack Edit + Ingest API is the active assembly tool (KITCHEN-PRODUCTION-CERT-VIDEO-1). CapCut remains CLOSED — OWNER-INDEPENDENCE FAIL / historical only. Do not reopen CapCut for routine RTU short video.",
   },
   {
     id: "captions_text_timing",
     ownerRole: "creative_production",
     kitchenStateLabel: "production started",
-    operationalStatus: "integration_required",
-    notes: "On-screen captions + CTA treatment are contract-required. Timing is human CapCut work today.",
+    operationalStatus: "reuse_certified_capability",
+    notes:
+      "On-screen captions + CTA treatment are contract-required. Timing is authored in the Shotstack timeline / work packet — not CapCut.",
   },
   {
     id: "audio_music_handling",
@@ -105,9 +107,9 @@ export const VIDEO_PRODUCTION_CHAIN: readonly VideoChainStep[] = [
     id: "render_export",
     ownerRole: "creative_production",
     kitchenStateLabel: "render pending",
-    operationalStatus: "integration_required",
+    operationalStatus: "reuse_certified_capability",
     notes:
-      "MP4 export happens in CapCut (or future approved tool), not in Studio runtime. Render failed cannot become QA READY. States: render pending / render failed / video artifact produced.",
+      "MP4 render via Shotstack Production/v1 (customer delivers). Render failed cannot become QA READY. States: render pending / render failed / video artifact produced. CapCut export is not an acceptable success path.",
   },
   {
     id: "artifact_persistence",
@@ -129,9 +131,9 @@ export const VIDEO_PRODUCTION_CHAIN: readonly VideoChainStep[] = [
     id: "correction",
     ownerRole: "creative_production",
     kitchenStateLabel: "QA correction required",
-    operationalStatus: "integration_required",
+    operationalStatus: "defined",
     notes:
-      "Routine: Creative Production → QA → Creative Production → QA. Owner not required for ordinary timing/text/crop/caption/audio/render fixes.",
+      "Routine: Creative Production → QA → Creative Production → QA (including A/V beat sync regenerate). Owner not required for ordinary timing/text/crop/caption/audio/render fixes.",
   },
   {
     id: "review_delivery",
