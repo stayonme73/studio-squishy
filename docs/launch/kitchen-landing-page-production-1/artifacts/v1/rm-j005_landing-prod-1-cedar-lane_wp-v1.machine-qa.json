@@ -1,0 +1,118 @@
+{
+  "ok": true,
+  "qaPass": false,
+  "customerReady": false,
+  "certified": false,
+  "checks": [
+    {
+      "id": "packet_valid",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "id": "business_identity",
+      "ok": true,
+      "detail": "Cedar Lane Studio"
+    },
+    {
+      "id": "headline_bound",
+      "ok": true,
+      "detail": "Portrait Refresh — $99"
+    },
+    {
+      "id": "cta_text_exact",
+      "ok": true,
+      "detail": "Call to book"
+    },
+    {
+      "id": "cta_href_exact",
+      "ok": true,
+      "detail": "tel:+15550184421"
+    },
+    {
+      "id": "no_placeholder_href",
+      "ok": true,
+      "detail": "no # / about:blank / TODO href"
+    },
+    {
+      "id": "single_primary_cta_anchor",
+      "ok": true,
+      "detail": "one .cta anchor"
+    },
+    {
+      "id": "required_sections",
+      "ok": true,
+      "detail": "hero/offer/details/cta/footer"
+    },
+    {
+      "id": "no_unauthorized_nav",
+      "ok": true,
+      "detail": "no nav/blog/ecommerce/login in page markup"
+    },
+    {
+      "id": "no_dead_form",
+      "ok": true,
+      "detail": "no form (link CTA path)"
+    },
+    {
+      "id": "responsive_css_present",
+      "ok": true,
+      "detail": "tablet/mobile media + overflow guard"
+    },
+    {
+      "id": "viewport_meta",
+      "ok": true,
+      "detail": "viewport meta"
+    },
+    {
+      "id": "qr_present",
+      "ok": true,
+      "detail": "QR embedded"
+    },
+    {
+      "id": "qr_href_exact",
+      "ok": true,
+      "detail": "tel:+15550184421"
+    },
+    {
+      "id": "no_awkward_portrait_story",
+      "ok": true,
+      "detail": "no awkward portrait-story phrase"
+    },
+    {
+      "id": "no_redundant_deadline_banner",
+      "ok": true,
+      "detail": "deadline already in hero — banner omitted"
+    },
+    {
+      "id": "no_secret_leak_markers",
+      "ok": true,
+      "detail": "no provider secret markers"
+    },
+    {
+      "id": "artifact_qa_ready_only",
+      "ok": true,
+      "detail": "qa_ready / not customer ready / not certified"
+    },
+    {
+      "id": "definition_matches_packet",
+      "ok": true,
+      "detail": "definition mirrors packet"
+    },
+    {
+      "id": "asset_bound_logo",
+      "ok": true,
+      "detail": "docs/launch/kitchen-video-operational-1/source-assets/cedar-lane-logo.png"
+    },
+    {
+      "id": "asset_bound_hero",
+      "ok": true,
+      "detail": "docs/launch/kitchen-video-operational-1/source-assets/cedar-lane-still-01.png"
+    },
+    {
+      "id": "artifact_bytes_match",
+      "ok": true,
+      "detail": "3808661"
+    }
+  ]
+}

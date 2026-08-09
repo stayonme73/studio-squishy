@@ -1,0 +1,43 @@
+{
+  "package": "KITCHEN-LANDING-PAGE-PRODUCTION-1",
+  "packageStatus": "CLOSED",
+  "mode": "sealed",
+  "startingControlPoint": "dc82de7b9dc636ab593893327f511fe697aa829f",
+  "skuId": "rm-j005",
+  "contract": {
+    "serviceName": "Make Me a Page for My Sale, Event, Opening, Service, or Offer",
+    "readiness": "contract_ready",
+    "formPromised": false,
+    "customDomainPromised": false,
+    "discrepancies": [
+      "Catalog allows one approved basic contact form only if supported by existing Studio structure — structure previously absent; this package uses link-based CTA (tel/https) without inventing a form."
+    ]
+  },
+  "publishCredentialsConfigured": true,
+  "purchaseOccurred": false,
+  "tagiaEditing": false,
+  "perCustomerEngineeringRequired": false,
+  "customerReady": false,
+  "customerReadyWithLimits": true,
+  "customerReadyStatus": "CUSTOMER READY WITH LIMITS",
+  "certified": false,
+  "limits": [
+    "Customer-output mode must omit certification-fixture disclaimers (outputMode: \"customer\").",
+    "Per-artifact responsive QA remains required before delivery.",
+    "CTA / link / QR destination truth remains per-artifact QA.",
+    "Custom-domain handling is separate unless already promised by the contract."
+  ],
+  "desktopVisualQa": "PASS",
+  "tabletVisualQa": "PASS",
+  "mobileVisualQa": "PASS",
+  "liveVersion": "wp-v4",
+  "publicUrl": "https://studio-kitchen-landing-public-msmbepzz.netlify.app",
+  "deploymentId": "6a78f86fb464eb97ca5fd5fb",
+  "artifactRelativePath": "docs/launch/kitchen-landing-page-production-1/artifacts/v4/rm-j005_landing-prod-1-cedar-lane_wp-v4.html",
+  "artifactSha256": "6569c56c370ba19d4247bc237cef7fb986675ae968fe4adc07aa1f0da48c3a4e",
+  "preservedVersions": ["v1", "v2", "v3", "v4"],
+  "packageVerdict": "LANDING PAGE PRODUCTION: PROVEN — CLOSED",
+  "readiness": "CUSTOMER READY WITH LIMITS",
+  "nextFocus": "social-profile setup/update capabilities",
+  "sealedAt": "2026-08-09T22:02:00.000Z"
+}

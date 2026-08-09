@@ -1,0 +1,20 @@
+{
+  "definitionVersion": "def-wp-v4",
+  "structureId": "studio-campaign-page-v1",
+  "mechanismVersion": "landing-page-production-1.0.0",
+  "workPacketVersion": "wp-v4",
+  "campaignId": "landing-prod-1-cedar-lane",
+  "skuId": "rm-j005",
+  "sections": [
+    "hero",
+    "offer",
+    "details",
+    "cta",
+    "footer"
+  ],
+  "headline": "Portrait Refresh — $99",
+  "subheadline": "Book by May 3rd, 2026 · Sessions from 10:30 AM",
+  "ctaText": "Book your visit today",
+  "ctaHref": "tel:+15550184421",
+  "needsQr": true
+}

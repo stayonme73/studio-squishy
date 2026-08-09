@@ -117,11 +117,12 @@ const AI_VOICE: ProductionToolRef = {
 
 const LANDING_STRUCTURE: ProductionToolRef = {
   toolId: "studio_landing_page_structure",
-  label: "Approved Studio page structure",
+  label: "Approved Studio page structure (studio-campaign-page-v1)",
   required: true,
-  integrationState: "manual_operational",
-  toolReadiness: "tool_integration_required",
-  note: "Campaign page publication must use an approved Studio structure — not a full custom eng build per customer by default.",
+  integrationState: "partial_adapter",
+  toolReadiness: "contract_ready",
+  note:
+    "KITCHEN-LANDING-PAGE-PRODUCTION-1: CUSTOMER READY WITH LIMITS — work packet → studio-campaign-page-v1 HTML → Netlify Deploy API public publish proven. Limits: customer outputMode omits cert disclaimers; per-artifact responsive QA; CTA/link/QR destination truth per artifact; custom domain separate unless promised. Not a per-customer Studio eng build.",
 };
 
 const PLATFORM_ADMIN: ProductionToolRef = {

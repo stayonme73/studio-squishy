@@ -1,0 +1,23 @@
+{
+  "artifactId": "15fbc55c-df3a-4228-ae72-1d681e3f9b85",
+  "relativePath": "docs/launch/kitchen-landing-page-production-1/artifacts/v3/rm-j005_landing-prod-1-cedar-lane_wp-v3.html",
+  "contentSha256": "6569c56c370ba19d4247bc237cef7fb986675ae968fe4adc07aa1f0da48c3a4e",
+  "byteLength": 4008000,
+  "mimeType": "text/html",
+  "workPacketVersion": "wp-v3",
+  "definitionVersion": "def-wp-v3",
+  "structureId": "studio-campaign-page-v1",
+  "mechanismVersion": "landing-page-production-1.0.0",
+  "campaignId": "landing-prod-1-cedar-lane",
+  "skuId": "rm-j005",
+  "assetHashes": {
+    "docs/launch/kitchen-video-operational-1/source-assets/cedar-lane-logo.png": "285bdca23ba864d67a5ca72ba3178619dabb32a10d39f2c4a6e9bd3526f030b5",
+    "docs/launch/kitchen-landing-page-production-1/source-assets/cedar-lane-portrait-hero-v1.png": "6a892b752b2e6b9f6a49d89e857a43983e8b4284181eee8106cef8b24ef82f7a"
+  },
+  "boundAt": "2026-08-09T22:03:27.412Z",
+  "qaState": "qa_ready",
+  "customerReady": false,
+  "certified": false,
+  "qaPass": false,
+  "label": "CERTIFICATION FIXTURE / INTERNAL TEST / NOT CUSTOMER DELIVERABLE"
+}

@@ -1,0 +1,51 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "id": "responsive_desktop_no_overflow",
+      "ok": true,
+      "detail": "1280px scrollWidth=1280 clientWidth=1280"
+    },
+    {
+      "id": "responsive_desktop_cta_usable",
+      "ok": true,
+      "detail": "cta visible/tap-sized @ 1280px"
+    },
+    {
+      "id": "responsive_desktop_content_present",
+      "ok": true,
+      "detail": "textLen=551"
+    },
+    {
+      "id": "responsive_tablet_no_overflow",
+      "ok": true,
+      "detail": "768px scrollWidth=768 clientWidth=768"
+    },
+    {
+      "id": "responsive_tablet_cta_usable",
+      "ok": true,
+      "detail": "cta visible/tap-sized @ 768px"
+    },
+    {
+      "id": "responsive_tablet_content_present",
+      "ok": true,
+      "detail": "textLen=551"
+    },
+    {
+      "id": "responsive_mobile_no_overflow",
+      "ok": true,
+      "detail": "390px scrollWidth=390 clientWidth=390"
+    },
+    {
+      "id": "responsive_mobile_cta_usable",
+      "ok": true,
+      "detail": "cta visible/tap-sized @ 390px"
+    },
+    {
+      "id": "responsive_mobile_content_present",
+      "ok": true,
+      "detail": "textLen=549"
+    }
+  ],
+  "mode": "playwright"
+}

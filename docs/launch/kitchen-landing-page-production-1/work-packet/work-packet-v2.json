@@ -1,0 +1,62 @@
+{
+  "workPacketId": "landing-prod-1-cedar-lane",
+  "workPacketVersion": "wp-v2",
+  "campaignId": "landing-prod-1-cedar-lane",
+  "skuId": "rm-j005",
+  "label": "CERTIFICATION FIXTURE / INTERNAL TEST / NOT CUSTOMER DELIVERABLE",
+  "fixtureId": "landing-1-cedar-lane",
+  "businessName": "Cedar Lane Studio",
+  "personName": "Mira Chen",
+  "pagePurpose": "One campaign page for Portrait Refresh booking offer.",
+  "headline": "Portrait Refresh — $99",
+  "subheadline": "Book by May 3rd, 2026. Sessions from 10:30 AM.",
+  "offerSummary": "Refresh your portrait for $99 when you book by May 3rd, 2026.",
+  "detailBullets": [
+    "Sessions begin at 10:30 AM",
+    "Call (555) 018-4421",
+    "Visit cedar-lane-studio.example/book"
+  ],
+  "bodyCopy": "Cedar Lane Studio invites you to a Portrait Refresh for ninety-nine dollars. Bring your best self — we will handle the calm, clear portrait story.",
+  "limitedTime": true,
+  "deadlineText": "Before May 3rd, 2026",
+  "ctaKind": "call",
+  "ctaText": "Book your visit today",
+  "ctaHref": "tel:+15550184421",
+  "phoneDisplay": "(555) 018-4421",
+  "footerLegal": "Internal Studio certification fixture — not a customer deliverable. Offer facts are synthetic.",
+  "needsQr": true,
+  "brand": {
+    "primary": "#1F4A44",
+    "accent": "#8A6A4B",
+    "background": "#F7F1E8",
+    "text": "#1A1A1A",
+    "muted": "#5C6B66"
+  },
+  "assets": [
+    {
+      "assetId": "logo",
+      "role": "logo",
+      "relativePath": "docs/launch/kitchen-video-operational-1/source-assets/cedar-lane-logo.png",
+      "contentSha256": "285bdca23ba864d67a5ca72ba3178619dabb32a10d39f2c4a6e9bd3526f030b5"
+    },
+    {
+      "assetId": "hero",
+      "role": "hero",
+      "relativePath": "docs/launch/kitchen-video-operational-1/source-assets/cedar-lane-still-01.png",
+      "contentSha256": "b50d3fa08bd7260804e00fc72969aec68cfdebf3f4eadb45ebf2cf8e92c5289b"
+    }
+  ],
+  "sectionOrder": [
+    "hero",
+    "offer",
+    "details",
+    "cta",
+    "footer"
+  ],
+  "structureId": "studio-campaign-page-v1",
+  "publishTarget": "static_host_api",
+  "exportRelativePath": "docs/launch/kitchen-landing-page-production-1/artifacts/v2/rm-j005_landing-prod-1-cedar-lane_wp-v2.html",
+  "supersedesWorkPacketVersion": "wp-v1",
+  "correctionReason": "V1 CORRECTION: CTA text must match fixture booking language — Call to book → Book your visit today; keep tel: destination exact.",
+  "preserveV1RelativePath": "docs/launch/kitchen-landing-page-production-1/artifacts/v1/rm-j005_landing-prod-1-cedar-lane_wp-v1.html"
+}

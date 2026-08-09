@@ -25,7 +25,7 @@ export const studioKitchenProductionCapability = {
     "Studio Voice live production Q&A",
     "Owner Console redesign",
     "Supabase production SoR migration",
-    "Landing-page productized publication without per-customer engineering",
+    "Landing-page unlimited Customer Ready / CERTIFIED (KITCHEN-LANDING-PAGE-PRODUCTION-1 sealed CUSTOMER READY WITH LIMITS — per-artifact responsive + CTA/QR QA; custom domain separate)",
     "Real service production testing / certification runs",
     "Broad Squishy cleanup",
   ],

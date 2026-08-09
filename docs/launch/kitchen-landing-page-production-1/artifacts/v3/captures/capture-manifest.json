@@ -1,0 +1,53 @@
+{
+  "package": "KITCHEN-LANDING-PAGE-PRODUCTION-1",
+  "liveUrl": "https://studio-kitchen-landing-public-msmbepzz.netlify.app",
+  "workPacketVersion": "wp-v3",
+  "capturedAt": "2026-08-09T21:51:27.494Z",
+  "desktopVisualQa": "PASS",
+  "customerReady": false,
+  "captures": [
+    {
+      "viewport": "desktop",
+      "width": 1280,
+      "height": 800,
+      "http": 200,
+      "relativePath": "docs/launch/kitchen-landing-page-production-1/artifacts/v3/captures/rm-j005_landing-prod-1-cedar-lane_wp-v3_desktop.png",
+      "noOverflow": true,
+      "ctaUsable": true,
+      "ctaHeight": 48,
+      "hasPortraitAlt": true,
+      "hasBookingQr": true,
+      "title": "Cedar Lane Studio — Portrait Refresh — $99",
+      "ok": true
+    },
+    {
+      "viewport": "tablet",
+      "width": 768,
+      "height": 1024,
+      "http": 200,
+      "relativePath": "docs/launch/kitchen-landing-page-production-1/artifacts/v3/captures/rm-j005_landing-prod-1-cedar-lane_wp-v3_tablet.png",
+      "noOverflow": true,
+      "ctaUsable": true,
+      "ctaHeight": 48,
+      "hasPortraitAlt": true,
+      "hasBookingQr": true,
+      "title": "Cedar Lane Studio — Portrait Refresh — $99",
+      "ok": true
+    },
+    {
+      "viewport": "mobile",
+      "width": 390,
+      "height": 844,
+      "http": 200,
+      "relativePath": "docs/launch/kitchen-landing-page-production-1/artifacts/v3/captures/rm-j005_landing-prod-1-cedar-lane_wp-v3_mobile.png",
+      "noOverflow": true,
+      "ctaUsable": true,
+      "ctaHeight": 48,
+      "hasPortraitAlt": true,
+      "hasBookingQr": true,
+      "title": "Cedar Lane Studio — Portrait Refresh — $99",
+      "ok": true
+    }
+  ],
+  "allOk": true
+}
