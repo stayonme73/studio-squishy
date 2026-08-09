@@ -131,7 +131,8 @@ const PLATFORM_ADMIN: ProductionToolRef = {
   required: true,
   integrationState: "not_integrated",
   toolReadiness: "manual_operational_path_exists",
-  note: "Direct account modification requires customer-controlled secure access. No social OAuth/automation.",
+  note:
+    "KITCHEN-SOCIAL-PROFILE-PRODUCTION-1 A+C: rm-j002/rm-j008 sell PROFILE KITS (customer applies). Manual admin/login mutation is NOT the fulfillment path. Facebook Page API mutation preserved as future-only (INTEGRATION READY / ACCOUNT-AUTH BLOCKER) — Meta OAuth not started. Instagram + TikTok direct mutation UNSUPPORTED. No password vault / browser automation.",
 };
 
 export const FAMILY_PRODUCTION_BASELINES: Record<

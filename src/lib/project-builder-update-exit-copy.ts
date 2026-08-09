@@ -246,25 +246,29 @@ const UPDATE_EXIT_COPY: Record<UpdateExitPresentationServiceId, UpdateExitCopy> 
     ],
   },
   "rm-j008": {
-    name: "Update My Facebook, Instagram, or TikTok",
+    name: "Make Me a Social Profile Update Kit",
     cardPurpose:
-      "Refresh one existing social or business profile with current bio information, links, and customer-supplied brand visuals.",
+      "An update kit for one existing Facebook, Instagram, or TikTok profile — revised copy, updated imagery, before→after change sheet, and field-replacement instructions you apply.",
     tagline:
-      "Businesses with an existing Facebook, Instagram, or TikTok profile that needs current business information and supplied brand visuals refreshed.",
+      "Businesses with an existing Facebook, Instagram, or TikTok profile that need a clear update kit rather than ongoing profile management.",
     drawerPurpose:
-      "Refresh one existing social or business profile with current bio information, links, and customer-supplied brand visuals while preserving the existing profile structure.",
+      "Produce a Social Profile Update Kit for one existing platform profile: revised bio/about copy, updated profile and banner assets where applicable, URL/contact recommendations, a before→after change sheet, and exact field-replacement instructions the customer applies.",
     deliverables: [
-      "Update one existing profile on one platform",
-      "Refresh bio, business information, and profile links with customer-supplied details",
-      "Place, crop, or resize customer-supplied profile and banner images",
-      "Align the profile with the customer's current offer or branding",
+      "Reviewed current-profile inputs for one existing platform profile",
+      "Revised approved bio and about copy",
+      "Updated platform-ready profile image/avatar",
+      "Updated banner/cover asset where the chosen platform supports one",
+      "Approved URL and contact-field recommendations",
+      "Platform-specific before→after change sheet",
+      "Exact field-replacement instructions and implementation checklist",
       "Studio quality-control review before delivery",
     ],
     exclusions: [
+      "The Studio logging into your account or performing platform-side profile mutations",
       "New account setup",
       "Account recovery or login troubleshooting",
       "Original social media content creation",
-      "Custom logo, banner, or profile-image design",
+      "New logo creation from scratch",
       "Posting or scheduling content",
       "Ongoing profile or community management",
       "More than one platform",
@@ -272,9 +276,11 @@ const UPDATE_EXIT_COPY: Record<UpdateExitPresentationServiceId, UpdateExitCopy> 
       "More than one revision round",
     ],
     clientResponsibilities: [
-      "Platform login access for the existing profile you control",
-      "Updated business information and customer-supplied profile and banner images",
-      "Final approval before changes go live",
+      "Control of the existing profile on the chosen platform",
+      "Current profile details or screenshots for review",
+      "Updated business information and customer-supplied source images when available",
+      "Apply the delivered kit changes on the platform",
+      "Approval of the kit before you publish changes",
     ],
   },
 };

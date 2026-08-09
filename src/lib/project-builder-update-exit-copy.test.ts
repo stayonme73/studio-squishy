@@ -67,7 +67,7 @@ describe("project-builder update exit copy", () => {
       /existing promotional item/i,
     );
     expect(resolveProjectBuilderJobPresentation(profile, "update").drawerPurpose).toMatch(
-      /existing social or business profile/i,
+      /Social Profile Update Kit|existing platform profile/i,
     );
     expect(resolveProjectBuilderJobPresentation(promotion, "i20").purpose).toBe(promotion.purpose);
   });

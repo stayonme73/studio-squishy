@@ -148,7 +148,7 @@ async function captureDesktop(browser) {
 
   await gotoRouteMap(page);
   await selectRoadDesktop(page, "Get My Business Started");
-  await selectJobByName(page, "Set Up My Facebook");
+  await selectJobByName(page, "Make Me a Social Profile Setup Kit");
   await capture(page, "03-desktop-job-card-over-map.png");
 
   await context.close();
@@ -191,7 +191,7 @@ Desktop (1440×900)
 ------------------
 01  Full-screen map (no job pins):     ${BASE}/route-map
 02  Route panel slid up (I-75):        ${BASE}/route-map → Get My Business Started
-03  Job detail card over map:          ${BASE}/route-map → I-75 → Set Up My Facebook…
+03  Job detail card over map:          ${BASE}/route-map → I-75 → Make Me a Social Profile Setup Kit…
 
 Mobile (390×844)
 ----------------

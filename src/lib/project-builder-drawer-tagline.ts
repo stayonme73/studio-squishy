@@ -18,13 +18,13 @@ const DRAWER_PURPOSE_BY_JOB_ID: Partial<Record<string, string>> = {
   "v2-rtu-short-video":
     "One basic 15–30 second video for one campaign focus — built from your usable footage or approved Studio assets, with captions and a clear call to action.",
   "rm-j002":
-    "Basic setup for one Facebook, Instagram, or TikTok profile you already control — profile image, bio, links, and cover where applicable. No posting, content management, or ad management.",
+    "A complete setup kit for one Facebook, Instagram, or TikTok profile — bio/about copy, contact/URL field map, profile and cover assets where applicable, and exact setup instructions you apply. No posting, login-based mutation, or account management.",
   "rm-j005":
     "One functioning responsive page for one sale, event, opening, service, or offer, built with an approved Studio structure and one clear call to action. This is not a full website, online store, or custom application.",
   "rm-j007":
     "Limited update to one existing promotional item using customer-supplied replacement information or assets — not a redesign, new concept, or additional deliverable.",
   "rm-j008":
-    "Refresh one existing social or business profile with current bio information, links, and customer-supplied brand visuals.",
+    "An update kit for one existing Facebook, Instagram, or TikTok profile — revised copy, updated profile imagery, before→after change sheet, and field-replacement instructions you apply. Not done-for-you login-based profile management.",
 };
 
 /** Purpose copy for the Learn More drawer — may differ from the short card line. */
@@ -59,9 +59,9 @@ export function resolveProjectBuilderDrawerTagline(job: RouteMapJob): string {
       return "One focused responsive page with a single call to action.";
     case "social-setup":
       if (job.id === "rm-j008") {
-        return "One existing Facebook, Instagram, or TikTok profile that needs its basic business information and supplied brand visuals refreshed.";
+        return "One existing Facebook, Instagram, or TikTok profile that needs a clear update kit — revised words, imagery, and field-by-field instructions you apply.";
       }
-      return "One platform set up with profile details and brand visuals — no ongoing management.";
+      return "One platform that needs a complete profile setup kit — copy, assets, and instructions you apply yourself.";
     case "update":
       return "One existing promotional item that needs supplied details or one image refreshed.";
     default:

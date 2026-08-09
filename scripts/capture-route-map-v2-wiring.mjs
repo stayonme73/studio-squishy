@@ -77,7 +77,7 @@ async function captureLanePanels(browser) {
 
   await selectRoadDesktop(page, ROAD_LABELS.i75);
   await assertPanelContainsJob(page, "Make Me a Flyer");
-  await assertPanelContainsJob(page, "Set Up My Facebook");
+  await assertPanelContainsJob(page, "Make Me a Social Profile Setup Kit");
   await assertPanelExcludesJob(page, "Make and Post My Social Media Promotion");
   await assertPanelExcludesJob(page, "Make My Email Campaign Kit");
   await capture(page, "01-desktop-route-panel-i75.png");
@@ -91,7 +91,7 @@ async function captureLanePanels(browser) {
   await gotoRouteMap(page);
   await selectRoadDesktop(page, ROAD_LABELS.update);
   await assertPanelContainsJob(page, "Update My Existing Promotion");
-  await assertPanelContainsJob(page, "Update My Facebook");
+  await assertPanelContainsJob(page, "Make Me a Social Profile Update Kit");
   await assertPanelExcludesJob(page, "Make My Email Campaign Kit");
   await capture(page, "03-desktop-route-panel-update-exit.png");
 
@@ -156,7 +156,7 @@ async function captureV1RmJ002JobFlow(browser) {
   await clearCampaign(page);
   await gotoRouteMap(page);
   await selectRoadDesktop(page, ROAD_LABELS.i75);
-  await page.getByRole("button", { name: /Set Up My Facebook/i }).click();
+  await page.getByRole("button", { name: /Make Me a Social Profile Setup Kit/i }).click();
   await page.waitForSelector(".route-map-job-card", { timeout: 15000 });
   await page.waitForTimeout(350);
   await capture(page, "08-v1-rm-j002-job-flow.png", false);
@@ -248,12 +248,12 @@ async function runE2E(browser) {
   try {
     const v1Pass = await runCheckoutIntakeBoard(
       page,
-      "Set Up My Facebook",
+      "Make Me a Social Profile Setup Kit",
       ROAD_LABELS.i75,
     );
     results.push({
       path: "Continuing V1",
-      job: "rm-j002 / Set Up My Facebook…",
+      job: "rm-j002 / Make Me a Social Profile Setup Kit…",
       pass: v1Pass,
       notes: v1Pass
         ? "checkout → intake → Studio Board shows Building Concepts"
@@ -262,7 +262,7 @@ async function runE2E(browser) {
   } catch (error) {
     results.push({
       path: "Continuing V1",
-      job: "rm-j002 / Set Up My Facebook…",
+      job: "rm-j002 / Make Me a Social Profile Setup Kit…",
       pass: false,
       notes: error instanceof Error ? error.message : String(error),
     });

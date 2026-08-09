@@ -126,8 +126,8 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
   },
   "social-setup": {
     type: "social-setup",
-    title: "Social Profile Setup",
-    lead: "Tell us which platform and what we should set up or update.",
+    title: "Social Profile Kit Intake",
+    lead: "Tell us which platform and what the Studio should prepare in your setup or update kit. You will apply the finished kit on the platform.",
     fields: [
       {
         id: "platform",
@@ -149,11 +149,12 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
         required: true,
       },
       {
-        id: "accountAccess",
-        label: "How will you provide account access?",
-        type: "text",
+        id: "currentProfileNotes",
+        label: "Current profile details or what should change",
+        type: "textarea",
         required: true,
-        placeholder: "Admin invite email, login method, or notes",
+        placeholder:
+          "Example: current bio text, website link, or what feels outdated. For a new setup, describe what the profile should say.",
       },
       {
         id: "brandNotes",

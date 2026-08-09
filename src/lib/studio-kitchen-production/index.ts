@@ -186,6 +186,28 @@ export type {
   LandingPipelineResult,
 } from "./landing-page";
 export {
+  SOCIAL_PROFILE_PACKAGE_ID,
+  SOCIAL_PROFILE_MECHANISM_VERSION,
+  SOCIAL_PROFILE_SETUP_SKU,
+  SOCIAL_PROFILE_UPDATE_SKU,
+  SOCIAL_PROFILE_KIT_READINESS_STATUS,
+  loadAuthoritativeRmJ002Contract,
+  loadAuthoritativeRmJ008Contract,
+  getPlatformCapability,
+  platformHardGateMatrix,
+  deriveSkuReadinessFromPlatforms,
+  validateSocialProfileWorkPacket,
+  planPlatformAdapter,
+  sharedSpineSteps,
+  evaluateKitReadiness,
+  kitDeliverablesForMode,
+} from "./social-profile";
+export type {
+  SocialProfileWorkPacket,
+  PlatformCapabilityRecord,
+  PlatformProductionVerdict,
+} from "./social-profile";
+export {
   CERT_VIDEO_CERTIFIED_SKU,
   CERT_VIDEO_CUSTOMER_READY_STATUS,
   CERT_VIDEO_KNOWN_LIMITATION,

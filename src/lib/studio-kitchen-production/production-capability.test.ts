@@ -128,7 +128,10 @@ describe("KITCHEN-PRODUCTION-CAPABILITY-1", () => {
     expect(voice.contract.readinessNotes).toMatch(/CUSTOMER READY WITH LIMITS — MP3/i);
     expect(voice.contract.readinessNotes).toMatch(/WAV UNVERIFIED/i);
     expect(video.contract.readiness).toBe("contract_ready");
-    expect(profile.contract.readiness).toBe("partial");
+    expect(profile.contract.readiness).toBe("contract_ready");
+    expect(profile.contract.readinessNotes).toMatch(
+      /CUSTOMER READY WITH LIMITS — PROFILE KIT/i,
+    );
     expect(page.contract.readiness).toBe("contract_ready");
     expect(page.contract.readinessNotes).toMatch(/CUSTOMER READY WITH LIMITS/i);
     // Shotstack owner-independent MP4 path CUSTOMER READY WITH LIMITS — MP4; CapCut remains closed FAIL.

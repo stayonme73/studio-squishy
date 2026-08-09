@@ -23,10 +23,10 @@ const JOBS = [
   },
   {
     id: "rm-j002",
-    name: "Set Up My Facebook, Instagram, or TikTok",
-    price: "$400 / platform",
+    name: "Make Me a Social Profile Setup Kit",
+    price: "$99 / platform",
     road: "I Know What I Need",
-    intakeTitle: "Social Profile Setup",
+    intakeTitle: "Social Profile Kit Intake",
     forbiddenIntake: ["What is your primary business goal"],
   },
   {
@@ -66,10 +66,10 @@ const JOBS = [
   },
   {
     id: "rm-j008",
-    name: "Update My Facebook, Instagram, or TikTok",
-    price: "$400",
+    name: "Make Me a Social Profile Update Kit",
+    price: "$99 / platform",
     road: "Update What I Already Have",
-    intakeTitle: "Social Profile Setup",
+    intakeTitle: "Social Profile Kit Intake",
   },
 ];
 
@@ -285,7 +285,7 @@ async function testCardReadability(page) {
   await clearCampaign(page);
   await gotoRouteMap(page);
   await selectRoad(page, "Get My Business Started");
-  await selectJob(page, { name: "Set Up My Facebook, Instagram, or TikTok" });
+  await selectJob(page, { name: "Make Me a Social Profile Setup Kit" });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.screenshot({
     path: path.join(OUT_DIR, "06-desktop-social-setup-job-card.png"),
@@ -346,7 +346,7 @@ async function main() {
   await clearCampaign(mobilePage);
   await gotoRouteMap(mobilePage);
   await selectRoad(mobilePage, "Get My Business Started");
-  await selectJob(mobilePage, { name: "Set Up My Facebook, Instagram, or TikTok" });
+  await selectJob(mobilePage, { name: "Make Me a Social Profile Setup Kit" });
   await mobilePage.screenshot({
     path: path.join(OUT_DIR, "11-mobile-social-setup-job-card.png"),
     fullPage: false,

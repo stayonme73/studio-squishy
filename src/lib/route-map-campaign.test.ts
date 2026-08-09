@@ -171,7 +171,7 @@ describe("route-map catalog SKUs", () => {
 
   it("rm-j008 uses updated profile/platform name at $99 per platform on update + random-exit", () => {
     const job = getRouteMapJob("rm-j008");
-    expect(job?.name).toBe("Update My Facebook, Instagram, or TikTok");
+    expect(job?.name).toBe("Make Me a Social Profile Update Kit");
     expect(job?.priceCents).toBe(9900);
     expect(job?.priceDisplay).toBe("$99 / platform");
     expect(job?.roads).toEqual(["update", "random-exit"]);
@@ -673,7 +673,7 @@ describe("route-map campaign handoff", () => {
           platform: "Instagram",
           businessName: "Sunrise Bakery",
           profileGoal: "Show daily specials",
-          accountAccess: "Admin invite sent",
+          currentProfileNotes: "Current bio needs clearer offer wording",
           brandNotes: "Warm tones",
         },
         intakeAt,
@@ -1004,10 +1004,13 @@ describe("route-map intake E2E paths (programmatic)", () => {
         platform: "Facebook",
         businessName: "Acme",
         profileGoal: "Visibility",
-        accountAccess: "Admin invite",
+        currentProfileNotes: "New Page — need full setup kit",
       });
       expect(submitted?.campaignStatus).toBe("BUILDING_CONCEPTS");
-      expect(getRouteMapIntakeSchema("social-setup").title).toBe("Social Profile Setup");
+      expect(getRouteMapIntakeSchema("social-setup").title).toBe(
+        "Social Profile Kit Intake",
+      );
+      expect(job.name).toBe("Make Me a Social Profile Setup Kit");
     } finally {
       restore();
     }

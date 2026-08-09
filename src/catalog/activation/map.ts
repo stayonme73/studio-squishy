@@ -204,12 +204,12 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
   // --- Continuing V1 Route Map jobs (no V2 equivalent — keep until Batch 3) ---
   {
     routeMapSku: "rm-j002",
-    clientFacingName: "Set Up My Facebook, Instagram, or TikTok",
+    clientFacingName: "Make Me a Social Profile Setup Kit",
     status: "active_candidate",
     laneEligibility: ["i75", "random-exit"],
     directExitEligible: true,
     notes:
-      "Keep live rm-j002 on map — managed social profile setup with first post; no V2 RTU equivalent in Batch 1/2. Hold V2 replacement until Batch 3.",
+      "Keep live rm-j002 on map — Social Profile Setup Kit (customer applies; no login mutation). No V2 RTU equivalent in Batch 1/2. Hold V2 replacement until Batch 3.",
   },
   {
     routeMapSku: "rm-j005",
@@ -231,12 +231,12 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
   },
   {
     routeMapSku: "rm-j008",
-    clientFacingName: "Update My Facebook, Instagram, or TikTok",
+    clientFacingName: "Make Me a Social Profile Update Kit",
     status: "active_candidate",
     laneEligibility: ["update", "random-exit"],
     directExitEligible: true,
     notes:
-      "Keep live rm-j008 until Batch 3. Update Exit + Random Exit (Direct Exit eligible). Profile refresh; no V2 equivalent until Batch 3.",
+      "Keep live rm-j008 until Batch 3. Update Exit + Random Exit (Direct Exit eligible). Social Profile Update Kit (customer applies). No V2 equivalent until Batch 3.",
   },
 
   // --- Retired / redirect — bundled post/publish jobs replaced by V2 RTU + optional add-on ---
