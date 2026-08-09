@@ -251,6 +251,11 @@ export type QaRecord = {
    * Checklist attestation alone is not sufficient for those tasks.
    */
   copyQualityEvidence?: import("@/lib/studio-kitchen-production/copy-quality").CopyQualityEvidence;
+  /**
+   * Design-family (`marketing_assets` / `social` creative|qa) visual QA evidence.
+   * Checklist attestation alone is not sufficient for those tasks.
+   */
+  designQualityEvidence?: import("@/lib/studio-kitchen-production/design-quality").DesignQualityEvidence;
 };
 
 export type WorkflowTransitionRequest = {

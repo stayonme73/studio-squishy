@@ -11,6 +11,11 @@ import {
   requiresCopyQualityGate,
   type CopyQualityEvidence,
 } from "@/lib/studio-kitchen-production/copy-quality";
+import {
+  gateDesignQualityForQaPass,
+  requiresDesignQualityGate,
+  type DesignQualityEvidence,
+} from "@/lib/studio-kitchen-production/design-quality";
 
 import {
   canClaimTask,
@@ -158,6 +163,11 @@ export type TasksPatchBody =
        * Server re-evaluates brief+submission; client cannot self-attest ok.
        */
       copyQuality?: import("@/lib/studio-kitchen-production/copy-quality").CopyQualityQaPayload;
+      /**
+       * Required for marketing_assets/social creative|qa phases.
+       * Deterministic artifact checks + recorded visual judgment attestations.
+       */
+      designQuality?: import("@/lib/studio-kitchen-production/design-quality").DesignQualityQaPayload;
     }
   | {
       action: "qa_fail";
@@ -907,6 +917,31 @@ export function applyQaPass(
     };
   }
 
+  let designQualityEvidence: DesignQualityEvidence | undefined;
+  if (requiresDesignQualityGate(task)) {
+    if (!body.designQuality) {
+      return {
+        ok: false,
+        error:
+          "Design-family QA pass requires designQuality evaluation (artifact evidence + visual judgment attestations). Checklist attestation alone is not sufficient.",
+        status: 400,
+      };
+    }
+    const gated = gateDesignQualityForQaPass({
+      brief: body.designQuality.brief,
+      submission: body.designQuality.submission,
+      attestations: body.designQuality.attestations,
+    });
+    if (!gated.ok) {
+      return { ok: false, error: gated.error, status: 400 };
+    }
+    designQualityEvidence = {
+      evaluation: gated.evaluation,
+      attestations: gated.attestations,
+      gatePassed: true,
+    };
+  }
+
   const actorRole = qaActorRole(user, context.assignments);
   const transitioned = transitionTask(
     envelope,
@@ -932,6 +967,7 @@ export function applyQaPass(
     notes: body.notes,
     workVersionId: body.workVersionId,
     copyQualityEvidence,
+    designQualityEvidence,
   });
 
   const withRecord = appendEnvelopeQaRecord(transitioned.envelope, record);

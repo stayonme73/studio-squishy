@@ -30,6 +30,39 @@ export type {
   CopyQualitySubmission,
 } from "./copy-quality";
 export {
+  CERT_DESIGN_ARTIFACT_ROOT,
+  CERT_DESIGN_FIXTURE_LABEL,
+  CERT_DESIGN_PACKAGE_ID,
+  CERT_DESIGN_TESTED_SKUS,
+  designCertFixtures,
+  designFixtureA,
+  designFixtureB,
+  harborOakIdentityLock,
+  saltCedarIdentityLock,
+  briefForSku,
+  submissionForSku,
+  passAttestations,
+} from "./cert-design";
+export type { CertDesignTestedSku } from "./cert-design";
+export {
+  evaluateDesignQuality,
+  gateDesignQualityForQaPass,
+  requiresDesignQualityGate,
+  requiresMultiAssetConsistency,
+  requiresLogoVariant,
+} from "./design-quality";
+export type {
+  DesignArtifactRef,
+  DesignBrandIdentityLock,
+  DesignCampaignTruthLock,
+  DesignQualityBrief,
+  DesignQualityEvaluation,
+  DesignQualityEvidence,
+  DesignQualityJudgmentAttestations,
+  DesignQualityQaPayload,
+  DesignQualitySubmission,
+} from "./design-quality";
+export {
   ACTIVE_CUSTOMER_FACING_SKUS,
   DISCOVERY_GREEN_SKUS,
   EXPLICITLY_EXCLUDED_FROM_CAPABILITY_SET,
