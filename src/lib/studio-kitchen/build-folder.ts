@@ -22,6 +22,7 @@ import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
+import { summarizeProductionContractForSku } from "@/lib/studio-kitchen-production";
 
 import { jobSpineStatusLabel, projectKitchenBucketFromSpine } from "./status-projection";
 import type {
@@ -133,6 +134,7 @@ export function buildKitchenProductionFolderFromLive(input: {
     lane: job.productionLane ?? null,
     ownerApprovalPending: job.ownerApprovalPending ?? null,
     intakeComplete: job.intakeComplete,
+    productionContract: summarizeProductionContractForSku(job.skuId),
   }));
 
   const primaryJob = pickPrimaryJob(jobProjections);

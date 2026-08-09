@@ -154,6 +154,9 @@ describe("KITCHEN-FOUNDATION-1 projection", () => {
     expect(folder.source).toBe("live_production");
     expect(folder.campaignId).toBe("live-camp-1");
     expect(folder.primaryJob?.spineStatus).toBe("building_concepts");
+    expect(folder.primaryJob?.productionContract?.skuId).toBe("v2-rtu-flyer");
+    expect(folder.primaryJob?.productionContract?.producerRole).toBe("creative_production");
+    expect(folder.primaryJob?.productionContract?.readiness).toBe("contract_ready");
     expect(folder.tasks).toHaveLength(1);
     expect(folder.tasks[0]?.claimedByDisplayName).toBe("Producer Pat");
     expect(folder.tasks[0]?.qaState).toBe("not_started");

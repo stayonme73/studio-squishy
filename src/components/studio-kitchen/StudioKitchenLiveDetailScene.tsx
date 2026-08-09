@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import StudioKitchenCommsPanel from "@/components/studio-kitchen/StudioKitchenCommsPanel";
 import StudioKitchenHeader from "@/components/studio-kitchen/StudioKitchenHeader";
+import StudioKitchenProductionContractPanel from "@/components/studio-kitchen/StudioKitchenProductionContractPanel";
 import { studioKitchenFoundation } from "@/config/studio-kitchen-foundation-v1";
 import { studioKitchen } from "@/config/studio-kitchen";
 import { kitchenFileBucketLabel } from "@/config/studio-kitchen-file-room";
@@ -129,6 +130,10 @@ export default function StudioKitchenLiveDetailScene({ detail, ledger }: Props) 
             </ul>
           )}
         </section>
+
+        {folder.source === "live_production" ? (
+          <StudioKitchenProductionContractPanel jobs={folder.jobs} />
+        ) : null}
 
         <section className="utility-card" aria-labelledby="sk-live-tasks">
           <h2 id="sk-live-tasks">Tasks</h2>

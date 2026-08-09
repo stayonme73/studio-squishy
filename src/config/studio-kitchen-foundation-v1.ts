@@ -46,7 +46,7 @@ export const studioKitchenFoundation = {
     "Make integration",
     "Canva integration",
     "CapCut integration",
-    "Service-specific production certification",
+    "Service-specific production testing / certification (contracts defined in KITCHEN-PRODUCTION-CAPABILITY-1)",
     "Supabase production system-of-record migration",
     "Broad Squishy cleanup",
   ],

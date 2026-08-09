@@ -8,6 +8,7 @@ import type {
   TaskEffectiveStatus,
   TaskWorkflowState,
 } from "@/lib/campaign-tasks/types";
+import type { KitchenProductionContractSummary } from "@/lib/studio-kitchen-production";
 
 /** Where a Kitchen folder's data came from. Fixtures never masquerade as live. */
 export type KitchenDataSource = "live_production" | "fixture_demo";
@@ -36,6 +37,8 @@ export type KitchenJobProjection = {
   lane: ProductionControlLane | null;
   ownerApprovalPending: "before_review" | "before_delivery" | null;
   intakeComplete: boolean;
+  /** Read-only production contract summary — null when SKU has no active-set contract. */
+  productionContract: KitchenProductionContractSummary | null;
 };
 
 export type KitchenTaskProjection = {

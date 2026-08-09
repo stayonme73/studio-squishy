@@ -89,11 +89,13 @@ Multiple layers may legitimately coexist. Do not force one oversimplified status
 - Make integration
 - Canva integration
 - CapCut integration
-- Service-specific production certification
+- Service-specific production testing / certification (contracts defined in KITCHEN-PRODUCTION-CAPABILITY-1)
 - Supabase production system-of-record migration
 - Broad Squishy cleanup
 
 Internal operational communication over this foundation is introduced separately in **KITCHEN-COMMS-1** (`docs/studio-internal-communication-doctrine-v1-locked.md`) — projection only; not a second production truth.
+
+Service production contracts over this foundation are introduced in **KITCHEN-PRODUCTION-CAPABILITY-1** (`docs/studio-production-capability-doctrine-v1-locked.md`) — contracts and readiness honesty only; not live tool integration.
 
 ---
 
@@ -102,3 +104,4 @@ Internal operational communication over this foundation is introduced separately
 - Baseline inspection: `KITCHEN-BASELINE-INSPECT-1`
 - Decision Core: `docs/studio-decision-core-foundation-v1-locked.md`
 - Owner Console responsibility map: `docs/owner-console-responsibility-map-v1-planned.md`
+- Production capability: `docs/studio-production-capability-doctrine-v1-locked.md`

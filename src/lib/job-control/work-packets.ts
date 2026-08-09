@@ -6,6 +6,8 @@ import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
 import { redactWorkingFileRefForClient } from "@/lib/file-storage/redact";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 import type { RouteMapProductionBrief } from "@/lib/route-map-production-brief";
+import type { KitchenProductionContractSummary } from "@/lib/studio-kitchen-production";
+import { summarizeProductionContractForSku } from "@/lib/studio-kitchen-production";
 
 import { resolveRequiredDeliverableKeys } from "./production-workspace-gates";
 import type {
@@ -66,6 +68,8 @@ export type JobWorkPacketSummaryView = {
   ownerApprovalRequirement: string;
   returnLocationLabel: string;
   integrationStatusLabel: string;
+  /** Read-only SKU production contract — does not create tasks or tool connections. */
+  productionContract: KitchenProductionContractSummary | null;
 };
 
 export type TeamOfficeWorkPacketView = {
@@ -87,6 +91,7 @@ export type TeamOfficeWorkPacketView = {
   ownerApprovalRequirement: string;
   returnLocationLabel: string;
   integrationStatusLabel: string;
+  productionContract: KitchenProductionContractSummary | null;
 };
 
 export function isJobWorkPacketRole(role: string): role is JobWorkPacketRole {
@@ -215,6 +220,8 @@ export function resolveJobWorkPacketSummaryView(input: {
     };
   });
 
+  const productionContract = summarizeProductionContractForSku(job.skuId);
+
   return {
     jobId: job.jobId,
     campaignId: job.campaignId,
@@ -229,7 +236,10 @@ export function resolveJobWorkPacketSummaryView(input: {
     ownerApprovalRequirement:
       "Production is responsible for returning client-ready work; Owner support is only for escalations or business judgment.",
     returnLocationLabel: "Return draft/final file refs to Production Workspace.",
-    integrationStatusLabel: "Manual file links only — no external tool connection.",
+    integrationStatusLabel: productionContract
+      ? `${productionContract.primaryToolLabel} · ${productionContract.readinessLabel} · Manual file links only — no live Canva/CapCut/Make connection from this packet.`
+      : "Manual file links only — no external tool connection.",
+    productionContract,
   };
 }
 
@@ -278,5 +288,6 @@ export function resolveTeamOfficeWorkPacketView(input: {
     ownerApprovalRequirement: summary.ownerApprovalRequirement,
     returnLocationLabel: summary.returnLocationLabel,
     integrationStatusLabel: summary.integrationStatusLabel,
+    productionContract: summary.productionContract,
   };
 }
