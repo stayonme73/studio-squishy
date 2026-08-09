@@ -16,6 +16,14 @@ export type ShotstackRenderStatus =
   | "download_failed"
   | "unknown";
 
+/**
+ * How captions appear for a scene:
+ * - embedded_in_plate: caption already designed into the image; do NOT overlay same string
+ * - overlay: Shotstack text clip carries the caption/CTA
+ * Captions remain required for the SKU — collision is resolved by choosing one presentation.
+ */
+export type SceneCaptionPresentation = "embedded_in_plate" | "overlay";
+
 export type ShotstackWorkPacketScene = {
   sceneNumber: number;
   assetId: string;
@@ -23,6 +31,12 @@ export type ShotstackWorkPacketScene = {
   startSeconds: number;
   endSeconds: number;
   caption: string;
+  captionPresentation?: SceneCaptionPresentation;
+  /** Optional overlay style overrides (used for CTA contrast). */
+  overlayTextColor?: string;
+  overlayFontSize?: number;
+  overlayBackgroundColor?: string;
+  overlayOffsetY?: number;
 };
 
 /** Provider-independent packet shape bound for Shotstack production. */
@@ -53,11 +67,30 @@ export type ShotstackWorkPacket = {
   exportRelativePath: string;
   /** Last scene caption is the CTA for this fixture. */
   ctaCaptionSceneNumber: number;
+  /** Exact CTA string that must appear once (overlay). */
+  primaryCtaText?: string;
+  /** Shotstack environment required for this packet (v1 = no sandbox watermark). */
+  requiredShotstackEnv?: ShotstackEnvName;
   scenes: readonly ShotstackWorkPacketScene[];
   supersedesWorkPacketVersion?: string;
   correctionReason?: string;
   ownerEscalation?: "owner_not_required";
   preserveV1RelativePath?: string;
+  preserveV2RelativePath?: string;
+  preserveV3RelativePath?: string;
+  preserveV4RelativePath?: string;
+  /**
+   * Explicit narration→visual beat map (V4+). Times are scene start/end seconds
+   * aligned to the certified voice track (proportional estimate documented in packet).
+   */
+  sceneToScriptMap?: readonly {
+    sceneNumber: number;
+    timeRange: string;
+    narrationBeat: string;
+    visual: string;
+    designedText: string;
+    captionBehavior: string;
+  }[];
 };
 
 export type ShotstackEditPayload = {

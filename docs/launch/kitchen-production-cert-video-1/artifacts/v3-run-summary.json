@@ -1,0 +1,135 @@
+{
+  "package": "KITCHEN-PRODUCTION-CERT-VIDEO-1",
+  "candidate": "V3",
+  "requiredEnv": "v1",
+  "productionKeyPresent": true,
+  "stageKeyPresent": true,
+  "purchaseOccurred": false,
+  "tagiaEditing": false,
+  "startedAt": "2026-08-09T17:21:54.682Z",
+  "preserved": {
+    "v1": {
+      "ok": true,
+      "message": "v1_preserved"
+    },
+    "v2": {
+      "ok": true,
+      "path": "docs/launch/kitchen-video-integration-1/artifacts/v2/v2-rtu-short-video_video-int-1-cedar-lane_wp-v2_sb-v2.mp4"
+    }
+  },
+  "v3": {
+    "ok": true,
+    "providerRenderId": "1ef43f78-f5b9-4fe8-aebf-04392fb5b223",
+    "status": "done",
+    "path": "docs/launch/kitchen-production-cert-video-1/artifacts/v3/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v3_sb-v3.mp4",
+    "sha256": "15f2ffff4dcc2a44ac599c66b9234bc9b4625f8b22f34caedfee94d9bdfed154",
+    "byteLength": 6564096,
+    "width": 1080,
+    "height": 1920,
+    "durationSeconds": 21.48,
+    "frameRate": 25,
+    "codec": "h264",
+    "qaState": "qa_ready",
+    "customerReady": false,
+    "certified": false,
+    "qaPass": false,
+    "submittedAt": "2026-08-09T17:22:53.043Z",
+    "completedAt": "2026-08-09T17:23:11.720Z"
+  },
+  "machineQa": {
+    "ok": true,
+    "qaPass": false,
+    "customerReady": false,
+    "certified": false,
+    "checks": [
+      {
+        "id": "production_env",
+        "ok": true,
+        "detail": "renderEnvUsed=v1 (required v1 / Production — no sandbox watermark)"
+      },
+      {
+        "id": "packet_requires_v1",
+        "ok": true,
+        "detail": "packet.requiredShotstackEnv=v1"
+      },
+      {
+        "id": "payload_builds",
+        "ok": true,
+        "detail": "ok"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_1",
+        "ok": true,
+        "detail": "embedded only: Quiet craft. Clear message."
+      },
+      {
+        "id": "no_duplicate_overlay_scene_2",
+        "ok": true,
+        "detail": "embedded only: Cedar Lane Studio"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_3",
+        "ok": true,
+        "detail": "embedded only: Brand stories, made calm."
+      },
+      {
+        "id": "single_primary_cta_overlay",
+        "ok": true,
+        "detail": "primary CTA overlay count=1"
+      },
+      {
+        "id": "obsolete_cta_absent",
+        "ok": true,
+        "detail": "obsolete CTA absent from overlays"
+      },
+      {
+        "id": "cta_contrast_config",
+        "ok": true,
+        "detail": "overlayTextColor=#1F4A44 (must not be white on cream)"
+      },
+      {
+        "id": "v1_preserved",
+        "ok": true,
+        "detail": "docs/launch/kitchen-video-integration-1/artifacts/v1/v2-rtu-short-video_video-int-1-cedar-lane_wp-v1_sb-v1.mp4"
+      },
+      {
+        "id": "v2_preserved",
+        "ok": true,
+        "detail": "docs/launch/kitchen-video-integration-1/artifacts/v2/v2-rtu-short-video_video-int-1-cedar-lane_wp-v2_sb-v2.mp4"
+      },
+      {
+        "id": "artifact_downloaded",
+        "ok": true,
+        "detail": "docs/launch/kitchen-production-cert-video-1/artifacts/v3/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v3_sb-v3.mp4"
+      },
+      {
+        "id": "sha256_calculated",
+        "ok": true,
+        "detail": "15f2ffff4dcc2a44ac599c66b9234bc9b4625f8b22f34caedfee94d9bdfed154"
+      },
+      {
+        "id": "dimensions",
+        "ok": true,
+        "detail": "1080x1920"
+      },
+      {
+        "id": "duration_band",
+        "ok": true,
+        "detail": "21.48s"
+      },
+      {
+        "id": "codec_h264",
+        "ok": true,
+        "detail": "codec=h264"
+      },
+      {
+        "id": "audio_present",
+        "ok": true,
+        "detail": "hasAudio=true"
+      }
+    ]
+  },
+  "verdict": "V3 CANDIDATE READY FOR OWNER VISUAL REVIEW — NOT CERTIFIED",
+  "readiness": "INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED",
+  "finishedAt": "2026-08-09T17:23:11.920Z"
+}

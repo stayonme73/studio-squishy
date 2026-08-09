@@ -1,0 +1,42 @@
+{
+  "jobId": "7b705472-a666-4145-af72-966e6cce0b5f",
+  "provider": "shotstack",
+  "providerRenderId": "9d6ff47e-7b0b-4a7a-8c96-77788a6a21fa",
+  "campaignId": "video-ops-1-cedar-lane",
+  "skuId": "v2-rtu-short-video",
+  "workPacketId": "video-ops-1-cedar-lane",
+  "workPacketVersion": "wp-v5",
+  "storyboardVersion": "sb-v5",
+  "scriptVersionId": "cert-video-narration-v1",
+  "status": "done",
+  "submittedAt": "2026-08-09T18:00:19.949Z",
+  "completedAt": "2026-08-09T18:00:41.810Z",
+  "requestHash": "80c756b9e884606606755ad903bae58b4c9f1988d18e4a563d6cedba91563562",
+  "outputUrl": "https://shotstack-api-v1-output.s3-ap-southeast-2.amazonaws.com/9kngo12mih/9d6ff47e-7b0b-4a7a-8c96-77788a6a21fa.mp4",
+  "retryCount": 0,
+  "requestedWidth": 1080,
+  "requestedHeight": 1920,
+  "requestedAspect": "9:16",
+  "requestedDurationTargetSeconds": 23.23,
+  "outputFormat": "mp4",
+  "sourceAssetPaths": [
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-00-establish.png",
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-02-offer.png",
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-03-deadline.png",
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-04-sessions.png",
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-05-contact.png",
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-06-cta-base.png",
+    "docs/launch/kitchen-production-cert-video-1/artifacts/voice/cert-video-1-cedar-lane/ap-001_cert-video-narration-v1_f0d811bc5d10.mp3"
+  ],
+  "sourceAssetHashes": {
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-00-establish.png": "eb18c4bb32f6b3217581619e3e7343d2f20552cb67a66a700db106df9f977dc4",
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-02-offer.png": "c04847cb2499d0dfff3fa81f21814c9fa3fe10206926892b34edf83b2626fb38",
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-03-deadline.png": "6fdfb3c201fb782ed1fee290612a52166bda332d7739ec5914588f867ec3d376",
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-04-sessions.png": "2a9f865ed700b73f7924807f903434e4dd0ab0db8b1a1addd1da230361ec7a89",
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-05-contact.png": "e041758998df37c7fa7d4e59338694a742fb669c921f331cc36f3ed7a636a377",
+    "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-06-cta-base.png": "f250f6c3ad0b5ab7c8058141497605d785bc76206453877a326808798c874cd1",
+    "docs/launch/kitchen-production-cert-video-1/artifacts/voice/cert-video-1-cedar-lane/ap-001_cert-video-narration-v1_f0d811bc5d10.mp3": "f0d811bc5d10490b108fe58edad55d7d97001e799e34534c3e716186f4bf86c7"
+  },
+  "voiceArtifactPath": "docs/launch/kitchen-production-cert-video-1/artifacts/voice/cert-video-1-cedar-lane/ap-001_cert-video-narration-v1_f0d811bc5d10.mp3",
+  "voiceArtifactSha256": "f0d811bc5d10490b108fe58edad55d7d97001e799e34534c3e716186f4bf86c7"
+}

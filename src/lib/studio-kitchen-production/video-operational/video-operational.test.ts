@@ -172,16 +172,16 @@ describe("KITCHEN-VIDEO-OPERATIONAL-1", () => {
     expect(CAPCUT_DESKTOP_SETUP.musicUsed).toBe(false);
   });
 
-  it("routine correction remains owner_not_required; no customer-ready grant", () => {
+  it("routine correction remains owner_not_required; MP4 is CUSTOMER READY WITH LIMITS", () => {
     expect(ownerEscalationForRoutineOperationalEvent()).toBe("owner_not_required");
     for (const sku of VIDEO_PRODUCTION_SKUS) {
       const resolved = resolveServiceProductionContract(sku);
       expect(resolved.status).toBe("resolved");
       if (resolved.status !== "resolved") return;
-      expect(resolved.contract.readinessNotes).toMatch(/NOT CUSTOMER READY/i);
-      expect(resolved.contract.readinessNotes).not.toMatch(
+      expect(resolved.contract.readinessNotes).toMatch(
         /CUSTOMER READY WITH LIMITS — MP4/i,
       );
+      expect(resolved.contract.readinessNotes).not.toMatch(/NOT CUSTOMER READY/i);
     }
   });
 

@@ -1,0 +1,161 @@
+{
+  "workPacketId": "video-ops-1-cedar-lane",
+  "workPacketVersion": "wp-v4",
+  "storyboardVersion": "sb-v4",
+  "scriptVersionId": "cert-voice-script-v1",
+  "campaignId": "video-ops-1-cedar-lane",
+  "skuId": "v2-rtu-short-video",
+  "label": "INTERNAL SHOTSTACK CERT CANDIDATE V4 — MESSAGE-TO-VISUAL SYNC — NOT CUSTOMER DELIVERABLE UNTIL OWNER VISUAL PASS",
+  "supersedesWorkPacketVersion": "wp-v3",
+  "correctionReason": "V3 MESSAGE-TO-VISUAL SYNCHRONIZATION FAIL: rebuild timeline from certified narration beats (Mira Chen/Cedar Lane, Portrait Refresh $99, May 3rd 2026, 10:30 AM, contact, final CTA). Timing follows voice proportional map within 15–30s SKU band (voice artifact 39.43s — soundtrack fills to video length). Not a cosmetic-only revision.",
+  "ownerEscalation": "owner_not_required",
+  "durationMinSeconds": 28,
+  "durationMaxSeconds": 30,
+  "durationTargetSeconds": 29.75,
+  "aspectRatio": "vertical",
+  "width": 1080,
+  "height": 1920,
+  "exportFormat": "mp4",
+  "musicAllowed": false,
+  "stockAllowed": false,
+  "productionMethod": "shotstack",
+  "productionRoleOwner": "creative_production",
+  "requiredShotstackEnv": "v1",
+  "ctaCaptionSceneNumber": 7,
+  "primaryCtaText": "Book your visit today",
+  "voiceArtifact": {
+    "relativePath": "docs/launch/kitchen-production-cert-voice-1/artifacts/cert-voice-1-cedar-lane/ap-001_cert-voice-script-v1_d283144563a6.mp3",
+    "contentSha256": "d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4"
+  },
+  "exportRelativePath": "docs/launch/kitchen-production-cert-video-1/artifacts/v4/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v4_sb-v4.mp4",
+  "preserveV1RelativePath": "docs/launch/kitchen-video-integration-1/artifacts/v1/v2-rtu-short-video_video-int-1-cedar-lane_wp-v1_sb-v1.mp4",
+  "preserveV2RelativePath": "docs/launch/kitchen-video-integration-1/artifacts/v2/v2-rtu-short-video_video-int-1-cedar-lane_wp-v2_sb-v2.mp4",
+  "preserveV3RelativePath": "docs/launch/kitchen-production-cert-video-1/artifacts/v3/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v3_sb-v3.mp4",
+  "narrationTimingMethod": "character_proportional_estimate_against_voice_duration_39.427483s",
+  "sceneToScriptMap": [
+    {
+      "sceneNumber": 1,
+      "timeRange": "0.00–5.19s",
+      "narrationBeat": "Certification fixture disclaimer (pre-intro)",
+      "visual": "Studio still establishing Cedar Lane environment",
+      "designedText": "Cedar Lane Studio",
+      "captionBehavior": "embedded_in_plate support (historical V4 plate; superseded by V5 brand plate wording)"
+    },
+    {
+      "sceneNumber": 2,
+      "timeRange": "5.19–8.94s",
+      "narrationBeat": "Hello — this is Mira Chen at Cedar Lane Studio",
+      "visual": "Studio craft still + host/business identity card",
+      "designedText": "Mira Chen · Cedar Lane Studio",
+      "captionBehavior": "embedded_in_plate support: Hello — this is Mira Chen"
+    },
+    {
+      "sceneNumber": 3,
+      "timeRange": "8.94–12.93s",
+      "narrationBeat": "Book your Portrait Refresh for ninety-nine dollars",
+      "visual": "Studio workspace still + offer card",
+      "designedText": "Portrait Refresh · $99",
+      "captionBehavior": "embedded_in_plate support: for ninety-nine dollars (does not duplicate final CTA)"
+    },
+    {
+      "sceneNumber": 4,
+      "timeRange": "12.93–15.88s",
+      "narrationBeat": "before May third, twenty twenty-six",
+      "visual": "Branded still + deadline card",
+      "designedText": "Before May 3rd, 2026",
+      "captionBehavior": "embedded_in_plate support mirrors spoken date"
+    },
+    {
+      "sceneNumber": 5,
+      "timeRange": "15.88–19.39s",
+      "narrationBeat": "Sessions begin at ten thirty in the morning",
+      "visual": "Studio still + session timing card",
+      "designedText": "Sessions from 10:30 AM",
+      "captionBehavior": "embedded_in_plate support: Sessions begin at ten thirty"
+    },
+    {
+      "sceneNumber": 6,
+      "timeRange": "19.39–27.06s",
+      "narrationBeat": "Call 555-018-4421 or visit cedar-lane-studio.example/book",
+      "visual": "Endcard background + contact card",
+      "designedText": "(555) 018-4421 · cedar-lane-studio.example/book",
+      "captionBehavior": "embedded_in_plate support: Call or visit to book"
+    },
+    {
+      "sceneNumber": 7,
+      "timeRange": "27.06–29.75s",
+      "narrationBeat": "Final CTA visual (voice continues into pronunciation section; SKU caps at 30s)",
+      "visual": "Logo endcard with contact detail retained",
+      "designedText": "Book your visit today (Shotstack overlay, single CTA)",
+      "captionBehavior": "overlay only — primary CTA; no second competing CTA"
+    }
+  ],
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "assetId": "v4-beat-00-establish",
+      "relativePath": "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-00-establish.png",
+      "startSeconds": 0,
+      "endSeconds": 5.19,
+      "caption": "Cedar Lane Studio",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 2,
+      "assetId": "v4-beat-01-identity",
+      "relativePath": "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-01-identity.png",
+      "startSeconds": 5.19,
+      "endSeconds": 8.94,
+      "caption": "Mira Chen · Cedar Lane Studio",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 3,
+      "assetId": "v4-beat-02-offer",
+      "relativePath": "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-02-offer.png",
+      "startSeconds": 8.94,
+      "endSeconds": 12.93,
+      "caption": "Portrait Refresh $99",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 4,
+      "assetId": "v4-beat-03-deadline",
+      "relativePath": "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-03-deadline.png",
+      "startSeconds": 12.93,
+      "endSeconds": 15.88,
+      "caption": "Before May 3rd, 2026",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 5,
+      "assetId": "v4-beat-04-sessions",
+      "relativePath": "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-04-sessions.png",
+      "startSeconds": 15.88,
+      "endSeconds": 19.39,
+      "caption": "Sessions from 10:30 AM",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 6,
+      "assetId": "v4-beat-05-contact",
+      "relativePath": "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-05-contact.png",
+      "startSeconds": 19.39,
+      "endSeconds": 27.06,
+      "caption": "(555) 018-4421",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 7,
+      "assetId": "v4-beat-06-cta",
+      "relativePath": "docs/launch/kitchen-production-cert-video-1/source-assets/v4-beats/beat-06-cta-base.png",
+      "startSeconds": 27.06,
+      "endSeconds": 29.75,
+      "caption": "Book your visit today",
+      "captionPresentation": "overlay",
+      "overlayTextColor": "#1F4A44",
+      "overlayFontSize": 54,
+      "overlayOffsetY": 0.06
+    }
+  ]
+}

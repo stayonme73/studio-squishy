@@ -123,7 +123,7 @@ function envelope(tasks: CampaignTaskItem[]): ServerTasksEnvelope {
 }
 
 describe("KITCHEN-VIDEO-PRODUCTION-1", () => {
-  it("resolves v2-rtu-short-video to Shotstack-integrated contract without customer-ready status", () => {
+  it("resolves v2-rtu-short-video to Shotstack CUSTOMER READY WITH LIMITS — MP4", () => {
     for (const sku of VIDEO_PRODUCTION_SKUS) {
       expect(isVideoProductionSku(sku)).toBe(true);
       const resolved = resolveServiceProductionContract(sku);
@@ -133,9 +133,8 @@ describe("KITCHEN-VIDEO-PRODUCTION-1", () => {
       expect(resolved.contract.primaryTool.toolId).toBe("shotstack");
       expect(resolved.contract.primaryTool.integrationState).toBe("partial_adapter");
       expect(resolved.contract.readinessNotes).toMatch(/CapCut CLOSED|OWNER-INDEPENDENCE FAIL/i);
-      expect(resolved.contract.readinessNotes).toMatch(/NOT CUSTOMER READY/i);
-      expect(resolved.contract.readinessNotes).toMatch(/NOT CERTIFIED/i);
-      expect(resolved.contract.readinessNotes).not.toMatch(/CUSTOMER READY WITH LIMITS — MP4/i);
+      expect(resolved.contract.readinessNotes).toMatch(/CUSTOMER READY WITH LIMITS — MP4/i);
+      expect(resolved.contract.readinessNotes).toMatch(/A\/V beat sync|beat synchronization/i);
       const truth = videoSkuContractTruth(sku);
       expect(truth.durationSecondsMin).toBe(VIDEO_DURATION_MIN_SECONDS);
       expect(truth.durationSecondsMax).toBe(VIDEO_DURATION_MAX_SECONDS);
@@ -154,13 +153,15 @@ describe("KITCHEN-VIDEO-PRODUCTION-1", () => {
     expect(cap.canCreateCustomerReadyMp4WithoutTagia).toBe(false);
     const summary = summarizeVideoCapabilityInventory();
     expect(summary.capCutOwnerIndependence).toBe("fail");
-    expect(summary.canGenerateCustomerDeliverableMp4InStudio).toBe(false);
+    expect(summary.canGenerateCustomerDeliverableMp4InStudio).toBe(true);
     expect(summary.customerReady).toBe(false);
+    expect(summary.customerReadyWithLimits).toBe(true);
+    expect(summary.customerReadyStatus).toBe("CUSTOMER READY WITH LIMITS — MP4");
     expect(summary.musicCapability).toBe("unresolved");
     expect(summary.stockMediaCapability).toBe("unresolved");
     expect(summary.studioVoiceUntouched).toBe(true);
     expect(summary.shotstackIntegrationProven).toBe(true);
-    expect(summary.recommendedNextPackage).toBe("KITCHEN-PRODUCTION-CERT-VIDEO-1");
+    expect(summary.recommendedNextPackage).toBe("ROUTINE_PRODUCTION_AV_SYNC_QA");
     expect(CAPCUT_MANUAL_OPERATIONAL_TARGET.tagiaExportSuccessPath).toBe(false);
     expect(CAPCUT_MANUAL_OPERATIONAL_TARGET.ownerIndependence).toBe("fail");
   });

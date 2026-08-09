@@ -491,7 +491,7 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
     primaryTool: SHOTSTACK_TOOL,
     optionalTools: [AI_VOICE_TOOL, CANVA_TOOL, CAPCUT_TOOL],
     formatExportRequirements: [
-      "One basic short-form MP4, 15–30 seconds",
+      "One basic short-form MP4, 15–30 seconds (CUSTOMER READY WITH LIMITS — MP4)",
       "One aspect ratio only (vertical, square, or landscape)",
       "On-screen captions + CTA treatment",
     ],
@@ -520,18 +520,32 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         reason: "Client responsibilities / production quality",
         source: "service_contract",
       },
+      {
+        id: "av_beat_synchronization_per_artifact",
+        label: "Final A/V beat synchronization (per artifact)",
+        reason:
+          "KITCHEN-PRODUCTION-CERT-VIDEO-1 known limit — topic-card transitions can lag narration slightly; mandatory watch-with-sound QA before delivery; regenerate on fail; readiness does not inherit from prior video/hash",
+        source: "service_contract",
+      },
+    ],
+    extraLimitations: [
+      "CUSTOMER READY WITH LIMITS — MP4 (KITCHEN-PRODUCTION-CERT-VIDEO-1).",
+      "Final A/V beat synchronization remains a mandatory per-artifact QA check before customer delivery; if sync QA fails, regenerate before delivery.",
+      "No customer artifact may inherit readiness from a prior video/hash (per-artifact gate).",
+      "Stock-media capability UNRESOLVED for jobs that need stock.",
+      "MUSIC CAPABILITY = UNRESOLVED — omit music until rights are certain.",
     ],
     readiness: "contract_ready",
     readinessNotes:
-      "KITCHEN-VIDEO-INTEGRATION-1: SHOTSTACK INTEGRATION PROVEN. INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED. CapCut CLOSED — OWNER-INDEPENDENCE FAIL. Stock + music UNRESOLVED. Next: KITCHEN-PRODUCTION-CERT-VIDEO-1.",
+      "CUSTOMER READY WITH LIMITS — MP4 (KITCHEN-PRODUCTION-CERT-VIDEO-1). Owner-independent Shotstack Production proven. Known limit: topic-card transitions can lag narration slightly — final A/V beat sync is mandatory per-artifact QA before delivery. CapCut CLOSED — OWNER-INDEPENDENCE FAIL. Stock + music UNRESOLVED.",
     specialNotes: [
       "Client posts/distributes the finished video.",
       "Customer must provide organized usable footage when using their own visuals.",
-      "Optional certified voice MP3 may be referenced by hash; voice cert does not certify video.",
+      "Use SKU-appropriate narration (15–30s); do not force the 39s voice-cert fixture into short video.",
       "Stock-media capability UNRESOLVED for jobs that need stock — unused in this package.",
       "MUSIC CAPABILITY = UNRESOLVED — omit music until rights are certain (unused in this package).",
       "Tagia/Owner CapCut click-export is NOT an acceptable production success path.",
-      "Primary producer: Shotstack Edit + Ingest API (stage proof bound under kitchen-video-integration-1 artifacts).",
+      "Primary producer: Shotstack Edit + Ingest API (Production/v1 for customer delivers; stage proofs under kitchen-video-integration-1).",
     ],
   },
 };

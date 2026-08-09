@@ -155,11 +155,15 @@ export function writeArtifactBindingManifest(
 export function writeRenderJobManifest(
   repoRoot: string,
   job: ShotstackRenderJobRecord,
+  exportRelativePath?: string,
 ): string {
-  const folder =
-    job.workPacketVersion === "wp-v2"
-      ? "docs/launch/kitchen-video-integration-1/artifacts/v2"
-      : "docs/launch/kitchen-video-integration-1/artifacts/v1";
+  const folder = exportRelativePath
+    ? path.posix.dirname(exportRelativePath.replace(/\\/g, "/"))
+    : job.workPacketVersion === "wp-v3"
+      ? "docs/launch/kitchen-production-cert-video-1/artifacts/v3"
+      : job.workPacketVersion === "wp-v2"
+        ? "docs/launch/kitchen-video-integration-1/artifacts/v2"
+        : "docs/launch/kitchen-video-integration-1/artifacts/v1";
   const jobRel = `${folder}/render-job-${job.providerRenderId}.json`;
   const abs = path.join(repoRoot, jobRel);
   mkdirSync(path.dirname(abs), { recursive: true });

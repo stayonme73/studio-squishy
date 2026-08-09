@@ -1,0 +1,258 @@
+{
+  "package": "KITCHEN-PRODUCTION-CERT-VIDEO-1",
+  "candidate": "V4",
+  "requiredEnv": "v1",
+  "productionKeyPresent": true,
+  "stageKeyPresent": true,
+  "purchaseOccurred": false,
+  "tagiaEditing": false,
+  "correctionFocus": "message_to_visual_synchronization",
+  "startedAt": "2026-08-09T17:43:08.355Z",
+  "preserved": {
+    "v1": {
+      "ok": true,
+      "message": "v1_preserved"
+    },
+    "v2": {
+      "ok": true,
+      "path": "docs/launch/kitchen-video-integration-1/artifacts/v2/v2-rtu-short-video_video-int-1-cedar-lane_wp-v2_sb-v2.mp4"
+    },
+    "v3": {
+      "ok": true,
+      "path": "docs/launch/kitchen-production-cert-video-1/artifacts/v3/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v3_sb-v3.mp4"
+    }
+  },
+  "v4": {
+    "ok": true,
+    "providerRenderId": "f25cb1cd-e8f7-4585-93c1-1233f6ec4b86",
+    "status": "done",
+    "path": "docs/launch/kitchen-production-cert-video-1/artifacts/v4/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v4_sb-v4.mp4",
+    "sha256": "1c674130ba412751d5f5d0288426fac40e164925badec60519a6296437719fe8",
+    "byteLength": 9006057,
+    "width": 1080,
+    "height": 1920,
+    "durationSeconds": 29.72,
+    "frameRate": 25,
+    "codec": "h264",
+    "qaState": "qa_ready",
+    "customerReady": false,
+    "certified": false,
+    "qaPass": false,
+    "submittedAt": "2026-08-09T17:43:39.879Z",
+    "completedAt": "2026-08-09T17:44:10.501Z"
+  },
+  "sceneToScriptMap": [
+    {
+      "sceneNumber": 1,
+      "timeRange": "0.00–5.19s",
+      "narrationBeat": "Certification fixture disclaimer (pre-intro)",
+      "visual": "Studio still establishing Cedar Lane environment",
+      "designedText": "Cedar Lane Studio",
+      "captionBehavior": "embedded_in_plate support: Certification fixture — internal"
+    },
+    {
+      "sceneNumber": 2,
+      "timeRange": "5.19–8.94s",
+      "narrationBeat": "Hello — this is Mira Chen at Cedar Lane Studio",
+      "visual": "Studio craft still + host/business identity card",
+      "designedText": "Mira Chen · Cedar Lane Studio",
+      "captionBehavior": "embedded_in_plate support: Hello — this is Mira Chen"
+    },
+    {
+      "sceneNumber": 3,
+      "timeRange": "8.94–12.93s",
+      "narrationBeat": "Book your Portrait Refresh for ninety-nine dollars",
+      "visual": "Studio workspace still + offer card",
+      "designedText": "Portrait Refresh · $99",
+      "captionBehavior": "embedded_in_plate support: for ninety-nine dollars (does not duplicate final CTA)"
+    },
+    {
+      "sceneNumber": 4,
+      "timeRange": "12.93–15.88s",
+      "narrationBeat": "before May third, twenty twenty-six",
+      "visual": "Branded still + deadline card",
+      "designedText": "Before May 3rd, 2026",
+      "captionBehavior": "embedded_in_plate support mirrors spoken date"
+    },
+    {
+      "sceneNumber": 5,
+      "timeRange": "15.88–19.39s",
+      "narrationBeat": "Sessions begin at ten thirty in the morning",
+      "visual": "Studio still + session timing card",
+      "designedText": "Sessions from 10:30 AM",
+      "captionBehavior": "embedded_in_plate support: Sessions begin at ten thirty"
+    },
+    {
+      "sceneNumber": 6,
+      "timeRange": "19.39–27.06s",
+      "narrationBeat": "Call 555-018-4421 or visit cedar-lane-studio.example/book",
+      "visual": "Endcard background + contact card",
+      "designedText": "(555) 018-4421 · cedar-lane-studio.example/book",
+      "captionBehavior": "embedded_in_plate support: Call or visit to book"
+    },
+    {
+      "sceneNumber": 7,
+      "timeRange": "27.06–29.75s",
+      "narrationBeat": "Final CTA visual (voice continues into pronunciation section; SKU caps at 30s)",
+      "visual": "Logo endcard with contact detail retained",
+      "designedText": "Book your visit today (Shotstack overlay, single CTA)",
+      "captionBehavior": "overlay only — primary CTA; no second competing CTA"
+    }
+  ],
+  "machineQa": {
+    "ok": true,
+    "qaPass": false,
+    "customerReady": false,
+    "certified": false,
+    "checks": [
+      {
+        "id": "production_env",
+        "ok": true,
+        "detail": "renderEnvUsed=v1 (required v1 / Production — no sandbox watermark)"
+      },
+      {
+        "id": "packet_requires_v1",
+        "ok": true,
+        "detail": "packet.requiredShotstackEnv=v1"
+      },
+      {
+        "id": "payload_builds",
+        "ok": true,
+        "detail": "ok"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_1",
+        "ok": true,
+        "detail": "embedded only: Cedar Lane Studio"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_2",
+        "ok": true,
+        "detail": "embedded only: Mira Chen · Cedar Lane Studio"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_3",
+        "ok": true,
+        "detail": "embedded only: Portrait Refresh $99"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_4",
+        "ok": true,
+        "detail": "embedded only: Before May 3rd, 2026"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_5",
+        "ok": true,
+        "detail": "embedded only: Sessions from 10:30 AM"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_6",
+        "ok": true,
+        "detail": "embedded only: (555) 018-4421"
+      },
+      {
+        "id": "single_primary_cta_overlay",
+        "ok": true,
+        "detail": "primary CTA overlay count=1"
+      },
+      {
+        "id": "obsolete_cta_absent",
+        "ok": true,
+        "detail": "obsolete CTA absent from overlays"
+      },
+      {
+        "id": "cta_contrast_config",
+        "ok": true,
+        "detail": "overlayTextColor=#1F4A44 (must not be white on cream)"
+      },
+      {
+        "id": "v1_preserved",
+        "ok": true,
+        "detail": "docs/launch/kitchen-video-integration-1/artifacts/v1/v2-rtu-short-video_video-int-1-cedar-lane_wp-v1_sb-v1.mp4"
+      },
+      {
+        "id": "v2_preserved",
+        "ok": true,
+        "detail": "docs/launch/kitchen-video-integration-1/artifacts/v2/v2-rtu-short-video_video-int-1-cedar-lane_wp-v2_sb-v2.mp4"
+      },
+      {
+        "id": "v3_preserved",
+        "ok": true,
+        "detail": "docs/launch/kitchen-production-cert-video-1/artifacts/v3/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v3_sb-v3.mp4"
+      },
+      {
+        "id": "offer_beat_has_$99",
+        "ok": true,
+        "detail": "scene 3 contains $99 @ 8.94-12.93s"
+      },
+      {
+        "id": "deadline_beat_has_may_3_2026",
+        "ok": true,
+        "detail": "scene 4 contains May 3rd, 2026 @ 12.93-15.88s"
+      },
+      {
+        "id": "session_beat_has_1030",
+        "ok": true,
+        "detail": "scene 5 contains 10:30 @ 15.88-19.39s"
+      },
+      {
+        "id": "contact_beat_has_phone",
+        "ok": true,
+        "detail": "scene 6 contains 555 @ 19.39-27.06s"
+      },
+      {
+        "id": "cta_beat_primary",
+        "ok": true,
+        "detail": "scene 7 contains Book your visit today @ 27.06-29.75s"
+      },
+      {
+        "id": "identity_beat_mira_cedar",
+        "ok": true,
+        "detail": "scene 2 caption=Mira Chen · Cedar Lane Studio @ 5.19-8.94s"
+      },
+      {
+        "id": "scene_to_script_map_present",
+        "ok": true,
+        "detail": "map rows=7"
+      },
+      {
+        "id": "timing_not_equal_5s_slabs",
+        "ok": true,
+        "detail": "scene lengths=5.19,3.75,3.99,2.95,3.51,7.67,2.69"
+      },
+      {
+        "id": "artifact_downloaded",
+        "ok": true,
+        "detail": "docs/launch/kitchen-production-cert-video-1/artifacts/v4/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v4_sb-v4.mp4"
+      },
+      {
+        "id": "sha256_calculated",
+        "ok": true,
+        "detail": "1c674130ba412751d5f5d0288426fac40e164925badec60519a6296437719fe8"
+      },
+      {
+        "id": "dimensions",
+        "ok": true,
+        "detail": "1080x1920"
+      },
+      {
+        "id": "duration_band",
+        "ok": true,
+        "detail": "29.72s"
+      },
+      {
+        "id": "codec_h264",
+        "ok": true,
+        "detail": "codec=h264"
+      },
+      {
+        "id": "audio_present",
+        "ok": true,
+        "detail": "hasAudio=true"
+      }
+    ]
+  },
+  "verdict": "V4 CANDIDATE READY FOR OWNER VISUAL REVIEW — NOT CERTIFIED",
+  "readiness": "INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED",
+  "finishedAt": "2026-08-09T17:44:10.592Z"
+}

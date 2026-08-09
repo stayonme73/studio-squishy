@@ -88,7 +88,7 @@ describe("KITCHEN-VIDEO-INTEGRATION-1", () => {
     expect((imageTrack.clips[1] as { start: number }).start).toBe(5.5);
     const cta = textTrack.clips[3] as { asset: { text: string; font: { size: number } } };
     expect(cta.asset.text).toBe("Book a visit");
-    expect(cta.asset.font.size).toBe(48);
+    expect(cta.asset.font.size).toBe(52);
     expect(hashShotstackRequest(built.payload)).toHaveLength(64);
   });
 

@@ -19,6 +19,13 @@ export const READINESS_BEFORE_LIVE_PROOF =
 export const READINESS_AFTER_LIVE_PROOF =
   "INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED" as const;
 
+/**
+ * After KITCHEN-PRODUCTION-CERT-VIDEO-1 Owner close.
+ * Integration package language above remains historical for that package.
+ */
+export const READINESS_AFTER_VIDEO_CERT =
+  "CUSTOMER READY WITH LIMITS — MP4" as const;
+
 export const CAPCUT_STATUS_CLOSED =
   "CLOSED — OWNER-INDEPENDENCE FAIL" as const;
 

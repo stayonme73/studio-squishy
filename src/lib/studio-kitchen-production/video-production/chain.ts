@@ -139,7 +139,7 @@ export const VIDEO_PRODUCTION_CHAIN: readonly VideoChainStep[] = [
     kitchenStateLabel: "review ready",
     operationalStatus: "ready_when_file_exists",
     notes:
-      "After video QA PASS only. Client distributes. NOT CUSTOMER READY — this package does not certify.",
+      "After video QA PASS only (includes mandatory A/V beat sync watch). Client distributes. CUSTOMER READY WITH LIMITS — MP4 (KITCHEN-PRODUCTION-CERT-VIDEO-1).",
   },
 ] as const;
 

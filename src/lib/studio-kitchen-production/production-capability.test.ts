@@ -130,13 +130,13 @@ describe("KITCHEN-PRODUCTION-CAPABILITY-1", () => {
     expect(video.contract.readiness).toBe("contract_ready");
     expect(profile.contract.readiness).toBe("partial");
     expect(page.contract.readiness).toBe("partial");
-    // Shotstack owner-independent MP4 path proven; CapCut remains closed FAIL; video not customer-certified.
+    // Shotstack owner-independent MP4 path CUSTOMER READY WITH LIMITS — MP4; CapCut remains closed FAIL.
     expect(video.contract.primaryTool.toolId).toBe("shotstack");
     expect(video.contract.primaryTool.integrationState).toBe("partial_adapter");
     expect(video.contract.primaryTool.toolReadiness).toBe("contract_ready");
-    expect(video.contract.readinessNotes).toMatch(/NOT CUSTOMER READY/i);
-    expect(video.contract.readinessNotes).toMatch(/NOT CERTIFIED/i);
-    expect(video.contract.readinessNotes).toMatch(/SHOTSTACK INTEGRATION PROVEN/i);
+    expect(video.contract.readinessNotes).toMatch(/CUSTOMER READY WITH LIMITS — MP4/i);
+    expect(video.contract.readinessNotes).toMatch(/A\/V beat sync|beat synchronization/i);
+    expect(video.contract.readinessNotes).not.toMatch(/NOT CUSTOMER READY/i);
     expect(voice.contract.primaryTool.integrationState).toBe("partial_adapter");
     expect(voice.contract.primaryTool.note).toMatch(/ElevenLabs/i);
     expect(rtuVoice.contract.primaryTool.integrationState).toBe("partial_adapter");

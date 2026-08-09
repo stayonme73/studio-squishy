@@ -29,7 +29,7 @@ export const VIDEO_CAPABILITY_INVENTORY: readonly VideoCapabilityFinding[] = [
       "docs/launch/kitchen-video-provider-selection-1/KITCHEN-VIDEO-PROVIDER-SELECTION-1-REPORT.md",
     ],
     notes:
-      "KITCHEN-VIDEO-INTEGRATION-1: live stage renders V1+V2 bound with SHA-256. INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED.",
+      "KITCHEN-PRODUCTION-CERT-VIDEO-1: CUSTOMER READY WITH LIMITS — MP4. Owner-independent Shotstack Production proven (V5). Final A/V beat sync remains mandatory per-artifact QA.",
   },
   {
     id: "capcut_named_tool",
@@ -148,22 +148,24 @@ export function classifyCapCutFinding(): {
 }
 
 export function summarizeVideoCapabilityInventory(): {
-  canGenerateCustomerDeliverableMp4InStudio: false;
+  canGenerateCustomerDeliverableMp4InStudio: true;
   shotstackIntegrationProven: true;
   capCutFinding: CapCutFindingClass;
   capCutOwnerIndependence: CapCutOwnerIndependence;
   musicCapability: "unresolved";
   stockMediaCapability: "unresolved";
   studioVoiceUntouched: true;
+  /** Unlimited CUSTOMER READY is false — status is WITH LIMITS. */
   customerReady: false;
+  customerReadyWithLimits: true;
+  customerReadyStatus: "CUSTOMER READY WITH LIMITS — MP4";
   blockingGaps: readonly string[];
   findings: readonly VideoCapabilityFinding[];
-  recommendedNextPackage: "KITCHEN-PRODUCTION-CERT-VIDEO-1";
+  recommendedNextPackage: "ROUTINE_PRODUCTION_AV_SYNC_QA";
 } {
   const capCut = classifyCapCutFinding();
   return {
-    // Integration proven ≠ customer deliverable certified.
-    canGenerateCustomerDeliverableMp4InStudio: false,
+    canGenerateCustomerDeliverableMp4InStudio: true,
     shotstackIntegrationProven: true,
     capCutFinding: capCut.finding,
     capCutOwnerIndependence: "fail",
@@ -171,13 +173,14 @@ export function summarizeVideoCapabilityInventory(): {
     stockMediaCapability: "unresolved",
     studioVoiceUntouched: true,
     customerReady: false,
+    customerReadyWithLimits: true,
+    customerReadyStatus: "CUSTOMER READY WITH LIMITS — MP4",
     blockingGaps: [
-      "Visual/content certification pending (KITCHEN-PRODUCTION-CERT-VIDEO-1)",
-      "NOT CUSTOMER READY / NOT CERTIFIED until cert package passes",
+      "CUSTOMER READY WITH LIMITS — MP4: final A/V beat synchronization is mandatory per-artifact QA before delivery (topic cards may lag narration slightly)",
       "Stock source unresolved for jobs without customer media",
       "Music rights unresolved — omit music",
     ],
     findings: VIDEO_CAPABILITY_INVENTORY,
-    recommendedNextPackage: "KITCHEN-PRODUCTION-CERT-VIDEO-1",
+    recommendedNextPackage: "ROUTINE_PRODUCTION_AV_SYNC_QA",
   };
 }

@@ -93,6 +93,17 @@ export function buildShotstackEditPayload(
   }
   if (findings.length) return { ok: false, findings };
 
+  if (packet.primaryCtaText) {
+    const ctaScene = scenes.find(
+      (s) => s.sceneNumber === packet.ctaCaptionSceneNumber,
+    );
+    if (!ctaScene) findings.push("cta_scene_missing");
+    else if (ctaScene.caption !== packet.primaryCtaText) {
+      findings.push("cta_caption_mismatch_primaryCtaText");
+    }
+  }
+  if (findings.length) return { ok: false, findings };
+
   const imageClips = scenes.map((scene) => ({
     asset: {
       type: "image",
@@ -104,31 +115,71 @@ export function buildShotstackEditPayload(
     scale: 1,
   }));
 
-  const textClips = scenes.map((scene) => {
-    const isCta = scene.sceneNumber === packet.ctaCaptionSceneNumber;
-    return {
-      asset: {
-        type: "text",
-        text: scene.caption,
-        font: {
-          family: "Clear Sans",
-          color: "#ffffff",
-          size: isCta ? 48 : 42,
-          weight: 700,
+  /**
+   * Overlay only when captionPresentation is "overlay" (default for legacy packets).
+   * V3 plates embed scene captions; CTA uses overlay with high-contrast color.
+   */
+  const textClips = scenes
+    .filter((scene) => (scene.captionPresentation ?? "overlay") === "overlay")
+    .map((scene) => {
+      const isCta = scene.sceneNumber === packet.ctaCaptionSceneNumber;
+      const color = scene.overlayTextColor ?? (isCta ? "#1F4A44" : "#ffffff");
+      const size = scene.overlayFontSize ?? (isCta ? 52 : 42);
+      const bg = scene.overlayBackgroundColor;
+      const clip: Record<string, unknown> = {
+        asset: {
+          type: "text",
+          text: scene.caption,
+          font: {
+            family: isCta ? "Clear Sans" : "Clear Sans",
+            color,
+            size,
+            weight: 700,
+          },
+          alignment: {
+            horizontal: "center",
+            vertical: "center",
+          },
+          width: 960,
+          height: isCta ? 160 : 220,
+          ...(bg
+            ? {
+                background: {
+                  color: bg,
+                  opacity: 1,
+                },
+              }
+            : {}),
         },
-        alignment: {
-          horizontal: "center",
-          vertical: "bottom",
-        },
-        width: 900,
-        height: 220,
-      },
-      start: scene.startSeconds,
-      length: Number((scene.endSeconds - scene.startSeconds).toFixed(3)),
-      offset: { x: 0, y: -0.28 },
-      transition: { in: "fade", out: "fade" },
-    };
-  });
+        start: scene.startSeconds,
+        length: Number((scene.endSeconds - scene.startSeconds).toFixed(3)),
+        offset: { x: 0, y: scene.overlayOffsetY ?? (isCta ? 0.08 : -0.28) },
+        transition: { in: "fade", out: "fade" },
+      };
+      return clip;
+    });
+
+  // Reject accidental duplicate overlay of identical strings across clips
+  const overlayTexts = textClips.map(
+    (c) => (c.asset as { text?: string }).text ?? "",
+  );
+  if (packet.primaryCtaText) {
+    const ctaHits = overlayTexts.filter((t) => t === packet.primaryCtaText);
+    if (ctaHits.length !== 1) {
+      return {
+        ok: false,
+        findings: [`cta_overlay_count_${ctaHits.length}_expected_1`],
+      };
+    }
+    if (overlayTexts.some((t) => t === "Book a visit")) {
+      return { ok: false, findings: ["obsolete_cta_book_a_visit_still_overlaid"] };
+    }
+  }
+
+  const tracks =
+    textClips.length > 0
+      ? [{ clips: textClips }, { clips: imageClips }]
+      : [{ clips: imageClips }];
 
   const payload: ShotstackEditPayload = {
     timeline: {
@@ -137,7 +188,7 @@ export function buildShotstackEditPayload(
         volume: 1,
       },
       background: "#000000",
-      tracks: [{ clips: textClips }, { clips: imageClips }],
+      tracks,
     },
     output: {
       format: "mp4",

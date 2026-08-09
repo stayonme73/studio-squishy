@@ -102,7 +102,7 @@ const SHOTSTACK: ProductionToolRef = {
   integrationState: "partial_adapter",
   toolReadiness: "contract_ready",
   note:
-    "KITCHEN-VIDEO-INTEGRATION-1: owner-independent Shotstack MP4 path proven (stage). INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED. Visual cert is a separate package.",
+    "KITCHEN-PRODUCTION-CERT-VIDEO-1: owner-independent Shotstack MP4 path CUSTOMER READY WITH LIMITS — MP4. Final A/V beat synchronization is mandatory per-artifact QA before delivery. CapCut remains CLOSED — OWNER-INDEPENDENCE FAIL.",
 };
 
 const AI_VOICE: ProductionToolRef = {

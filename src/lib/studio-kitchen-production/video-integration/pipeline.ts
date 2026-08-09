@@ -65,13 +65,22 @@ export async function runShotstackWorkPacketPipeline(input: {
   pollDelayMs?: number;
   sleepFn?: (ms: number) => Promise<void>;
 }): Promise<ShotstackPipelineResult> {
-  const apiKey = input.apiKey ?? readShotstackApiKey();
+  const envName =
+    input.envName ?? input.packet.requiredShotstackEnv ?? undefined;
+  const apiKey =
+    input.apiKey ??
+    readShotstackApiKey(
+      process.env,
+      envName ?? undefined,
+    );
   if (!apiKey && !input.assetUrlsOverride) {
     return {
       ok: false,
       verdict: "CREDENTIALS_BLOCKED",
       message:
-        "SHOTSTACK_API_KEY missing. Owner must add stage key to .env.local — do not paste into chat.",
+        (envName ?? "stage") === "v1"
+          ? "SHOTSTACK_PRODUCTION_API_KEY missing for Production (v1). Owner must add Production key to .env.local — do not paste into chat. Do not purchase unless separately authorized."
+          : "SHOTSTACK_API_KEY missing. Owner must add stage key to .env.local — do not paste into chat.",
     };
   }
 
@@ -102,7 +111,7 @@ export async function runShotstackWorkPacketPipeline(input: {
       packet: input.packet,
       apiKey,
       fetchImpl: input.fetchImpl,
-      envName: input.envName,
+      envName,
     });
     if (!delivered.ok) {
       return {
@@ -134,7 +143,7 @@ export async function runShotstackWorkPacketPipeline(input: {
   const submit = await shotstackSubmitRender(built.payload, {
     apiKey,
     fetchImpl: input.fetchImpl,
-    envName: input.envName,
+    envName,
   });
 
   if (!submit.ok) {
@@ -160,7 +169,7 @@ export async function runShotstackWorkPacketPipeline(input: {
   const poll = await shotstackPollUntilDone(submit.providerRenderId, {
     apiKey,
     fetchImpl: input.fetchImpl,
-    envName: input.envName,
+    envName,
     maxAttempts: input.pollMaxAttempts,
     delayMs: input.pollDelayMs,
     sleepFn: input.sleepFn,
@@ -186,7 +195,7 @@ export async function runShotstackWorkPacketPipeline(input: {
       failureCode: "timed_out",
       failureMessage: poll.error,
     });
-    writeRenderJobManifest(input.repoRoot, job);
+    writeRenderJobManifest(input.repoRoot, job, input.packet.exportRelativePath);
     return { ok: false, verdict: "RENDER_FAILED", message: poll.error ?? "timed_out", job };
   }
 
@@ -204,7 +213,7 @@ export async function runShotstackWorkPacketPipeline(input: {
       credits: poll.credits,
       completedAt: poll.completedAt,
     });
-    writeRenderJobManifest(input.repoRoot, job);
+    writeRenderJobManifest(input.repoRoot, job, input.packet.exportRelativePath);
     return {
       ok: false,
       verdict: "RENDER_FAILED",
@@ -231,7 +240,7 @@ export async function runShotstackWorkPacketPipeline(input: {
       credits: poll.credits,
       completedAt: poll.completedAt,
     });
-    writeRenderJobManifest(input.repoRoot, job);
+    writeRenderJobManifest(input.repoRoot, job, input.packet.exportRelativePath);
     return {
       ok: false,
       verdict: "DOWNLOAD_FAILED",
@@ -260,7 +269,7 @@ export async function runShotstackWorkPacketPipeline(input: {
     bytes: download.bytes,
   });
   if (!bound.ok) {
-    writeRenderJobManifest(input.repoRoot, job);
+    writeRenderJobManifest(input.repoRoot, job, input.packet.exportRelativePath);
     return {
       ok: false,
       verdict: "BIND_FAILED",
@@ -269,7 +278,11 @@ export async function runShotstackWorkPacketPipeline(input: {
     };
   }
 
-  const jobManifestRel = writeRenderJobManifest(input.repoRoot, job);
+  const jobManifestRel = writeRenderJobManifest(
+    input.repoRoot,
+    job,
+    input.packet.exportRelativePath,
+  );
   const artifactManifestRel = writeArtifactBindingManifest(
     input.repoRoot,
     bound.artifact,

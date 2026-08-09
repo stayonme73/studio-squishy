@@ -49,7 +49,8 @@ export async function shotstackUploadLocalFile(input: {
   pollAttempts?: number;
   pollDelayMs?: number;
 }): Promise<ShotstackIngestUploadResult> {
-  const apiKey = input.apiKey ?? readShotstackApiKey();
+  const envName = input.envName ?? readShotstackEnv();
+  const apiKey = input.apiKey ?? readShotstackApiKey(process.env, envName);
   if (!apiKey) {
     return {
       ok: false,
@@ -65,7 +66,6 @@ export async function shotstackUploadLocalFile(input: {
     };
   }
 
-  const envName = input.envName ?? readShotstackEnv();
   const fetchImpl = input.fetchImpl ?? fetch;
   const ingestBase = shotstackIngestBaseUrl(envName);
   const bytes = readFileSync(input.absolutePath);

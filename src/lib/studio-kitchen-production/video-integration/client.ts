@@ -44,17 +44,19 @@ export async function shotstackSubmitRender(
     retry?: RetryPolicy;
   },
 ): Promise<ShotstackSubmitResult> {
-  const apiKey = options?.apiKey ?? readShotstackApiKey();
+  const envName = options?.envName ?? readShotstackEnv();
+  const apiKey = options?.apiKey ?? readShotstackApiKey(process.env, envName);
   if (!apiKey) {
     return {
       ok: false,
       code: "credentials_absent",
       message:
-        "SHOTSTACK_API_KEY absent — Owner must create stage key in .env.local (never paste into chat)",
+        envName === "v1"
+          ? "SHOTSTACK_PRODUCTION_API_KEY (or production SHOTSTACK_API_KEY) absent for v1 — Owner must add Production key to .env.local (never paste into chat)"
+          : "SHOTSTACK_API_KEY absent — Owner must create stage key in .env.local (never paste into chat)",
     };
   }
 
-  const envName = options?.envName ?? readShotstackEnv();
   const fetchImpl = options?.fetchImpl ?? fetch;
   const retry = options?.retry ?? DEFAULT_SUBMIT_RETRY;
   const url = `${shotstackEditBaseUrl(envName)}/render`;
@@ -136,7 +138,8 @@ export async function shotstackGetRender(
     envName?: "stage" | "v1";
   },
 ): Promise<ShotstackPollResult> {
-  const apiKey = options?.apiKey ?? readShotstackApiKey();
+  const envName = options?.envName ?? readShotstackEnv();
+  const apiKey = options?.apiKey ?? readShotstackApiKey(process.env, envName);
   if (!apiKey) {
     return {
       ok: false,
@@ -144,7 +147,6 @@ export async function shotstackGetRender(
       message: "SHOTSTACK_API_KEY absent",
     };
   }
-  const envName = options?.envName ?? readShotstackEnv();
   const fetchImpl = options?.fetchImpl ?? fetch;
   const url = `${shotstackEditBaseUrl(envName)}/render/${encodeURIComponent(providerRenderId)}`;
 

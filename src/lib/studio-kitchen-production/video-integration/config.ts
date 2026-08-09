@@ -6,16 +6,27 @@
 import type { ShotstackEnvName } from "./types";
 
 export const SHOTSTACK_API_KEY_ENV = "SHOTSTACK_API_KEY" as const;
+export const SHOTSTACK_PRODUCTION_API_KEY_ENV =
+  "SHOTSTACK_PRODUCTION_API_KEY" as const;
 export const SHOTSTACK_ENV_VAR = "SHOTSTACK_ENV" as const;
 
 /** Default to sandbox until Owner explicitly switches to production. */
 export const DEFAULT_SHOTSTACK_ENV: ShotstackEnvName = "stage";
 
+/**
+ * Read API key for the target environment.
+ * Production (v1) requires SHOTSTACK_PRODUCTION_API_KEY only —
+ * never fall back to the stage sandbox key (watermark / 403 risk).
+ */
 export function readShotstackApiKey(
   env: NodeJS.ProcessEnv = process.env,
+  envName?: ShotstackEnvName,
 ): string | undefined {
-  const key = env.SHOTSTACK_API_KEY?.trim();
-  return key || undefined;
+  const target = envName ?? readShotstackEnv(env);
+  if (target === "v1") {
+    return env.SHOTSTACK_PRODUCTION_API_KEY?.trim() || undefined;
+  }
+  return env.SHOTSTACK_API_KEY?.trim() || undefined;
 }
 
 export function readShotstackEnv(

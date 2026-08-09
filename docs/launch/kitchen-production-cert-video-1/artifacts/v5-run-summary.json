@@ -1,0 +1,284 @@
+{
+  "package": "KITCHEN-PRODUCTION-CERT-VIDEO-1",
+  "candidate": "V5",
+  "requiredEnv": "v1",
+  "productionKeyPresent": true,
+  "stageKeyPresent": true,
+  "purchaseOccurred": false,
+  "tagiaEditing": false,
+  "correctionFocus": "sku_appropriate_narration_then_av_sync",
+  "startedAt": "2026-08-09T17:59:51.840Z",
+  "preserved": {
+    "v1": {
+      "ok": true,
+      "message": "v1_preserved"
+    },
+    "v2": {
+      "ok": true,
+      "path": "docs/launch/kitchen-video-integration-1/artifacts/v2/v2-rtu-short-video_video-int-1-cedar-lane_wp-v2_sb-v2.mp4"
+    },
+    "v3": {
+      "ok": true,
+      "path": "docs/launch/kitchen-production-cert-video-1/artifacts/v3/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v3_sb-v3.mp4"
+    },
+    "v4": {
+      "ok": true,
+      "path": "docs/launch/kitchen-production-cert-video-1/artifacts/v4/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v4_sb-v4.mp4"
+    }
+  },
+  "v5": {
+    "ok": true,
+    "providerRenderId": "9d6ff47e-7b0b-4a7a-8c96-77788a6a21fa",
+    "status": "done",
+    "path": "docs/launch/kitchen-production-cert-video-1/artifacts/v5/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v5_sb-v5.mp4",
+    "sha256": "6223a8f016f53021172768d1a97b25376b9b18e2421d8bfef29647ecaf51f190",
+    "byteLength": 6659088,
+    "width": 1080,
+    "height": 1920,
+    "durationSeconds": 23.2,
+    "frameRate": 25,
+    "codec": "h264",
+    "qaState": "qa_ready",
+    "customerReady": false,
+    "certified": false,
+    "qaPass": false,
+    "submittedAt": "2026-08-09T18:00:19.949Z",
+    "completedAt": "2026-08-09T18:00:41.810Z",
+    "voiceArtifact": {
+      "relativePath": "docs/launch/kitchen-production-cert-video-1/artifacts/voice/cert-video-1-cedar-lane/ap-001_cert-video-narration-v1_f0d811bc5d10.mp3",
+      "contentSha256": "f0d811bc5d10490b108fe58edad55d7d97001e799e34534c3e716186f4bf86c7"
+    },
+    "scriptVersionId": "cert-video-narration-v1"
+  },
+  "sceneToScriptMap": [
+    {
+      "sceneNumber": 1,
+      "timeRange": "0.000–1.368s",
+      "narrationBeat": "Cedar Lane Studio.",
+      "visual": "V4 establish plate (brand)",
+      "designedText": "Cedar Lane Studio",
+      "captionBehavior": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 2,
+      "timeRange": "1.368–4.864s",
+      "narrationBeat": "Refresh your portrait for ninety-nine dollars",
+      "visual": "V4 offer plate",
+      "designedText": "Portrait Refresh · $99",
+      "captionBehavior": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 3,
+      "timeRange": "4.864–8.435s",
+      "narrationBeat": "when you book by May third, twenty twenty-six.",
+      "visual": "V4 deadline plate",
+      "designedText": "Before May 3rd, 2026",
+      "captionBehavior": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 4,
+      "timeRange": "8.435–11.855s",
+      "narrationBeat": "Sessions begin at ten thirty in the morning.",
+      "visual": "V4 sessions plate",
+      "designedText": "Sessions from 10:30 AM",
+      "captionBehavior": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 5,
+      "timeRange": "11.855–19.986s",
+      "narrationBeat": "Call … or visit cedar-lane-studio.example/book",
+      "visual": "V4 contact plate",
+      "designedText": "(555) 018-4421 · cedar-lane-studio.example/book",
+      "captionBehavior": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 6,
+      "timeRange": "19.986–23.234s",
+      "narrationBeat": "Book your visit today. (+1.5s endcard hold after VO for readability; no VO truncation)",
+      "visual": "V4 CTA endcard base + overlay",
+      "designedText": "Book your visit today",
+      "captionBehavior": "overlay only — single primary CTA"
+    }
+  ],
+  "machineQa": {
+    "ok": true,
+    "qaPass": false,
+    "customerReady": false,
+    "certified": false,
+    "checks": [
+      {
+        "id": "production_env",
+        "ok": true,
+        "detail": "renderEnvUsed=v1 (required v1 / Production — no sandbox watermark)"
+      },
+      {
+        "id": "packet_requires_v1",
+        "ok": true,
+        "detail": "packet.requiredShotstackEnv=v1"
+      },
+      {
+        "id": "payload_builds",
+        "ok": true,
+        "detail": "ok"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_1",
+        "ok": true,
+        "detail": "embedded only: Cedar Lane Studio"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_2",
+        "ok": true,
+        "detail": "embedded only: Portrait Refresh $99"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_3",
+        "ok": true,
+        "detail": "embedded only: Before May 3rd, 2026"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_4",
+        "ok": true,
+        "detail": "embedded only: Sessions from 10:30 AM"
+      },
+      {
+        "id": "no_duplicate_overlay_scene_5",
+        "ok": true,
+        "detail": "embedded only: (555) 018-4421"
+      },
+      {
+        "id": "single_primary_cta_overlay",
+        "ok": true,
+        "detail": "primary CTA overlay count=1"
+      },
+      {
+        "id": "obsolete_cta_absent",
+        "ok": true,
+        "detail": "obsolete CTA absent from overlays"
+      },
+      {
+        "id": "cta_contrast_config",
+        "ok": true,
+        "detail": "overlayTextColor=#1F4A44 (must not be white on cream)"
+      },
+      {
+        "id": "v1_preserved",
+        "ok": true,
+        "detail": "docs/launch/kitchen-video-integration-1/artifacts/v1/v2-rtu-short-video_video-int-1-cedar-lane_wp-v1_sb-v1.mp4"
+      },
+      {
+        "id": "v2_preserved",
+        "ok": true,
+        "detail": "docs/launch/kitchen-video-integration-1/artifacts/v2/v2-rtu-short-video_video-int-1-cedar-lane_wp-v2_sb-v2.mp4"
+      },
+      {
+        "id": "v3_preserved",
+        "ok": true,
+        "detail": "docs/launch/kitchen-production-cert-video-1/artifacts/v3/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v3_sb-v3.mp4"
+      },
+      {
+        "id": "v4_preserved",
+        "ok": true,
+        "detail": "docs/launch/kitchen-production-cert-video-1/artifacts/v4/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v4_sb-v4.mp4"
+      },
+      {
+        "id": "brand_beat_cedar_lane",
+        "ok": true,
+        "detail": "scene 1 contains /Cedar Lane Studio/i @ 0-1.368s"
+      },
+      {
+        "id": "offer_beat_has_$99",
+        "ok": true,
+        "detail": "scene 2 contains $99 @ 1.368-4.864s"
+      },
+      {
+        "id": "deadline_beat_has_may_3_2026",
+        "ok": true,
+        "detail": "scene 3 contains May 3rd, 2026 @ 4.864-8.435s"
+      },
+      {
+        "id": "session_beat_has_1030",
+        "ok": true,
+        "detail": "scene 4 contains 10:30 @ 8.435-11.855s"
+      },
+      {
+        "id": "contact_beat_has_phone",
+        "ok": true,
+        "detail": "scene 5 contains 555 @ 11.855-19.986s"
+      },
+      {
+        "id": "cta_beat_primary",
+        "ok": true,
+        "detail": "scene 6 contains Book your visit today @ 19.986-23.234s"
+      },
+      {
+        "id": "scene_to_script_map_present",
+        "ok": true,
+        "detail": "map rows=6"
+      },
+      {
+        "id": "timing_not_equal_5s_slabs",
+        "ok": true,
+        "detail": "scene lengths=1.37,3.50,3.57,3.42,8.13,3.25"
+      },
+      {
+        "id": "sku_narration_duration_band",
+        "ok": true,
+        "detail": "voice=21.734s"
+      },
+      {
+        "id": "no_certification_only_narration_beats",
+        "ok": true,
+        "detail": "sku narration beats clean"
+      },
+      {
+        "id": "not_bound_to_voice_cert_39s_fixture",
+        "ok": true,
+        "detail": "voiceSha=f0d811bc5d10…"
+      },
+      {
+        "id": "timeline_covers_full_narration",
+        "ok": true,
+        "detail": "timelineEnd=23.234s voice=21.734s"
+      },
+      {
+        "id": "artifact_downloaded",
+        "ok": true,
+        "detail": "docs/launch/kitchen-production-cert-video-1/artifacts/v5/v2-rtu-short-video_cert-video-1-cedar-lane_wp-v5_sb-v5.mp4"
+      },
+      {
+        "id": "sha256_calculated",
+        "ok": true,
+        "detail": "6223a8f016f53021172768d1a97b25376b9b18e2421d8bfef29647ecaf51f190"
+      },
+      {
+        "id": "dimensions",
+        "ok": true,
+        "detail": "1080x1920"
+      },
+      {
+        "id": "duration_band",
+        "ok": true,
+        "detail": "23.2s"
+      },
+      {
+        "id": "codec_h264",
+        "ok": true,
+        "detail": "codec=h264"
+      },
+      {
+        "id": "audio_present",
+        "ok": true,
+        "detail": "hasAudio=true"
+      },
+      {
+        "id": "no_voice_truncation",
+        "ok": true,
+        "detail": "mp4=23.200s voice=21.734s"
+      }
+    ]
+  },
+  "verdict": "V5 CANDIDATE READY FOR OWNER VISUAL REVIEW — NOT CERTIFIED",
+  "readiness": "INTEGRATED / QA READY / NOT CUSTOMER READY / NOT CERTIFIED",
+  "finishedAt": "2026-08-09T18:00:41.955Z"
+}
