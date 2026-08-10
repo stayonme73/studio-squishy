@@ -3,6 +3,7 @@
 **Package:** Materials must be cleared for use before production/release where required  
 **Branch:** `assurance/rights-approved-for-use-1`  
 **Starting tip:** `d4280c360417d8e01fa0088662fe0f18dda80c73`  
+**Package commit:** `a27336e6bc29783b45bebf0088c24e99c3d7cfd5`  
 **Final verdict:** RIGHTS / APPROVED-FOR-USE CONTROL IS COMPLETE FOR CURRENT ACTIVE MENU  
 **Status:** SEALED  
 **Scout:** PARKED  
@@ -59,25 +60,34 @@ Narrow only: known hard rights signal may prevent CLEAR; known material ambiguit
 
 Routine clear material: Owner action = **NONE**. Genuine gray area may route `OWNER_POLICY_REVIEW`. Ordinary missing authorization → clarification, not Tagia.
 
+### Downstream protection
+
+| Gate | Result |
+|------|--------|
+| QA-before-review | unchanged |
+| Approved-delivered binding | unchanged |
+| Review Room | unchanged |
+
 ---
 
 ## Git
 
 | Item | Value |
 |------|--------|
-| Commit | _(filled after package commit)_ |
-| Message | _(filled after package commit)_ |
+| Package commit | `a27336e6bc29783b45bebf0088c24e99c3d7cfd5` |
+| Message | `feat(assurance): require approved-for-use before material enters production` |
 | Branch | `assurance/rights-approved-for-use-1` |
-| Local HEAD | _(filled after push)_ |
-| Origin HEAD | _(filled after push)_ |
-| Ahead/behind | _(filled after push)_ |
 | Merge | none |
+
+Seal-record commit SHA filled after docs seal push.
 
 ---
 
 ## Final tests at seal
 
-_(filled after final run)_
+**123 PASS** / 8 files (22 material-use tests)
+
+Confirmed: submitted alone does not clear required material; routine authorized asset auto-clears; clarification / hard block / Owner gray-area paths; uncleared asset blocked from production; rights hold survives QA/customer approval; system Final Delivery blocks unresolved hold; pre-acceptance known rights signal prevents CLEAR where applicable; durable approval survives session loss; replacement invalidates prior decision; music/audio and font-file boundaries preserved; routine path requires no Tagia; QA-before-review / approved-delivered / Review Room suites green.
 
 ---
 
@@ -89,6 +99,6 @@ Deferred (not required for this P1 close): external plagiarism/trademark tools, 
 
 ---
 
-## READY / SEALED
+## SEALED
 
 Scout PARKED.
