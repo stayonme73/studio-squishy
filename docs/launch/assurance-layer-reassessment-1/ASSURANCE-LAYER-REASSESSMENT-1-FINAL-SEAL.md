@@ -3,6 +3,7 @@
 **Package:** End-to-end Production Assurance spine review — final chapter seal  
 **Branch:** `assurance/layer-reassessment-1-seal`  
 **Base sealed tip:** `565b2f1ea08c61d65f1ee22ff22a6b226207a66b`  
+**Seal commit:** `891c50661066deb2a38cd46f0a9735520d1e5ff6`  
 **Final verdict:** PRODUCTION ASSURANCE READY FOR CURRENT ACTIVE MENU  
 **Status:** SEALED  
 **Scout:** PARKED  
@@ -53,9 +54,12 @@ Current-menu boundary: this verdict does **not** automatically certify future se
 
 | Item | Value |
 |------|--------|
-| Commit | _(filled after commit)_ |
-| Message | _(filled after commit)_ |
+| Commit | `891c50661066deb2a38cd46f0a9735520d1e5ff6` |
+| Message | `docs(assurance): seal Production Assurance ready for current active menu` |
 | Branch | `assurance/layer-reassessment-1-seal` |
+| Local HEAD | _(filled after push)_ |
+| Origin HEAD | _(filled after push)_ |
+| Ahead/behind | _(filled after push)_ |
 | Merge | none |
 
 ---
