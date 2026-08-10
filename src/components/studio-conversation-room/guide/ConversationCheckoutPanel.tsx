@@ -27,6 +27,8 @@ export type ConversationCheckoutPanelProps = {
   onClose: () => void;
   onBackToStudioPlan: () => void;
   onPaymentComplete: () => void;
+  /** Pre-acceptance fail-closed gate (CLEAR_TO_ACCEPT required). */
+  onAuthorizePayment?: () => boolean;
 };
 
 /**
@@ -39,6 +41,7 @@ export default function ConversationCheckoutPanel({
   onClose,
   onBackToStudioPlan,
   onPaymentComplete,
+  onAuthorizePayment,
 }: ConversationCheckoutPanelProps) {
   const v = conversationRoomGuideV1;
   const serviceIds = useMemo(
@@ -138,6 +141,7 @@ export default function ConversationCheckoutPanel({
           submitLabel={v.checkoutCompleteCta}
           onBeforePayment={(acknowledgment) => {
             if (serviceIds.length === 0) return false;
+            if (onAuthorizePayment && !onAuthorizePayment()) return false;
             return Boolean(
               saveApprovedRouteMapPlan(serviceIds, acknowledgment),
             );

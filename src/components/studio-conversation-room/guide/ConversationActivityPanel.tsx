@@ -41,6 +41,8 @@ export type ConversationActivityPanelProps = {
   onReviewStudioPlan: () => void;
   onBackToStudioPlan: () => void;
   onCheckoutPaymentComplete: () => void;
+  /** Fail-closed pre-acceptance gate before Complete Checkout. */
+  onAuthorizeCheckoutPayment?: () => boolean;
   onIntakeSubmitSuccess: () => void | Promise<void>;
   onRecoverIntakePayment?: () => void;
   intakePrefillBusinessName?: string | null;
@@ -437,6 +439,7 @@ export default function ConversationActivityPanel({
   onReviewStudioPlan,
   onBackToStudioPlan,
   onCheckoutPaymentComplete,
+  onAuthorizeCheckoutPayment,
   onIntakeSubmitSuccess,
   onRecoverIntakePayment,
   intakePrefillBusinessName = null,
@@ -545,6 +548,7 @@ export default function ConversationActivityPanel({
         onClose={onClose}
         onBackToStudioPlan={onBackToStudioPlan}
         onPaymentComplete={onCheckoutPaymentComplete}
+        onAuthorizePayment={onAuthorizeCheckoutPayment}
       />
     );
   }

@@ -152,6 +152,22 @@ export type CampaignRecord = {
   concepts?: FeedbackConceptPreview[];
   conceptsGeneratedAt?: string | null;
   paymentReceivedAt?: string | null;
+  /**
+   * Write-once pre-acceptance payment authorization bound at successful payment.
+   * Session decision storage is live-only; this is the durable audit reference.
+   */
+  preAcceptancePaymentAuthorization?: {
+    decisionId: string;
+    outcome: "CLEAR_TO_ACCEPT";
+    paymentAuthorized: true;
+    evaluatedDraftRevision: number;
+    selectedServiceIds: readonly string[];
+    factFingerprint: string;
+    decisionSchemaVersion: number;
+    evaluatedAt: string;
+    authorizedAt: string;
+    packageId: string;
+  };
   targetCompletionDate?: string | null;
   revisionRoundsIncluded?: number;
   /**

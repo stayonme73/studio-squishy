@@ -71,6 +71,10 @@ export function mergeCustomerOwnedCampaignSync(
 
     if (incoming.approvedStudioPlan) bootstrapped.approvedStudioPlan = incoming.approvedStudioPlan;
     if (incoming.paymentReceivedAt) bootstrapped.paymentReceivedAt = incoming.paymentReceivedAt;
+    if (incoming.preAcceptancePaymentAuthorization) {
+      bootstrapped.preAcceptancePaymentAuthorization =
+        incoming.preAcceptancePaymentAuthorization;
+    }
     if (incoming.revisionRoundsIncluded != null) {
       bootstrapped.revisionRoundsIncluded = incoming.revisionRoundsIncluded;
     }
@@ -89,6 +93,13 @@ export function mergeCustomerOwnedCampaignSync(
   }
   if (!existing.paymentReceivedAt && incoming.paymentReceivedAt) {
     merged.paymentReceivedAt = incoming.paymentReceivedAt;
+  }
+  if (
+    !existing.preAcceptancePaymentAuthorization &&
+    incoming.preAcceptancePaymentAuthorization
+  ) {
+    merged.preAcceptancePaymentAuthorization =
+      incoming.preAcceptancePaymentAuthorization;
   }
   if (existing.revisionRoundsIncluded == null && incoming.revisionRoundsIncluded != null) {
     merged.revisionRoundsIncluded = incoming.revisionRoundsIncluded;

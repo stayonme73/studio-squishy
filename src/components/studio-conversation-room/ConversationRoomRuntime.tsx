@@ -78,6 +78,14 @@ import {
   readCurrentCampaignHydrated,
 } from "@/lib/studio-board-campaign";
 import {
+  assertPreAcceptanceAllowsPayment,
+  buildPreAcceptancePaymentAuthorization,
+  isClearToAccept,
+  projectFactsFromWorkingDraft,
+  runPreAcceptanceForCheckout,
+  studioPreAcceptanceV1,
+} from "@/lib/studio-pre-acceptance";
+import {
   bootConversationRoomState,
   createConversationRoomState,
   reduceConversationRoomState,
@@ -110,8 +118,7 @@ import {
   startConversationDictation,
   stopConversationDictation,
 } from "@/lib/studio-conversation-speech";
-import { clearWorkingDraft } from "@/lib/studio-working-draft";
-import type { WorkingDraftRecord } from "@/lib/studio-working-draft";
+import { clearWorkingDraft, type WorkingDraftRecord } from "@/lib/studio-working-draft";
 import {
   consumeStudioVoiceInvite,
   type StudioVoiceInviteReason,
@@ -180,7 +187,15 @@ function resolveBootStage(
   if (requestedStage === "checkout" || requestedStage === "intake") {
     const hasSelectedRoute = readSelectedRoute(project) !== null;
     const hasSelectedServices = readSelectedServices(project).length > 0;
-    return hasSelectedRoute && hasSelectedServices ? requestedStage : savedStage;
+    if (!hasSelectedRoute || !hasSelectedServices) return savedStage;
+    // Pre-acceptance gate: deep-link checkout requires CLEAR_TO_ACCEPT.
+    if (requestedStage === "checkout") {
+      const decision = runPreAcceptanceForCheckout(
+        projectFactsFromWorkingDraft(project),
+      );
+      if (!isClearToAccept(decision)) return savedStage;
+    }
+    return requestedStage;
   }
   return requestedStage;
 }
@@ -819,13 +834,29 @@ export default function ConversationRoomRuntime({
   }
 
   function handleLooksGoodPlan() {
-    const route = readSelectedRoute(
-      projectDraft ?? bootConversationProjectDraft(draft),
-    );
-    const services = readSelectedServices(
-      projectDraft ?? bootConversationProjectDraft(draft),
-    );
+    const project = projectDraft ?? bootConversationProjectDraft(draft);
+    const route = readSelectedRoute(project);
+    const services = readSelectedServices(project);
     if (!route || services.length === 0) return;
+
+    const decision = runPreAcceptanceForCheckout(
+      projectFactsFromWorkingDraft(project),
+    );
+    if (!isClearToAccept(decision)) {
+      setPlanBridgeError(
+        decision.customerMessage ??
+          conversationRoomGuideV1.studioPlanBridgeError,
+      );
+      const voice =
+        decision.voiceLine ??
+        (decision.outcome === "CLARIFICATION_REQUIRED"
+          ? conversationRoomGuideV1.preAcceptanceClarificationVoice
+          : decision.outcome === "OWNER_POLICY_REVIEW"
+            ? conversationRoomGuideV1.preAcceptanceOwnerPolicyVoice
+            : conversationRoomGuideV1.preAcceptanceDeclineVoice);
+      speakStudioLine(voice);
+      return;
+    }
 
     const serviceIds = services.map((s) => s.jobId as ServiceId);
     const ok = bridgeConversationPlanToCampaign(route.roadId, serviceIds);
@@ -842,6 +873,24 @@ export default function ConversationRoomRuntime({
     speakStudioLine(conversationRoomGuideV1.checkoutVoiceBridge);
   }
 
+  function authorizeCheckoutPayment(): boolean {
+    const project = projectDraft ?? bootConversationProjectDraft(draft);
+    const gate = assertPreAcceptanceAllowsPayment(
+      projectFactsFromWorkingDraft(project),
+    );
+    if (!gate.allowed) {
+      setPlanBridgeError(gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        gate.decision?.voiceLine ??
+          conversationRoomGuideV1.preAcceptanceClarificationVoice,
+      );
+      return false;
+    }
+    return true;
+  }
+
   function handleBackToStudioPlanFromCheckout() {
     setPlanBridgeError(null);
     setDetailJobId(null);
@@ -852,11 +901,33 @@ export default function ConversationRoomRuntime({
   /**
    * Payment success must be explicit (markPaymentReceived) before Intake.
    * Stay in the Conversation Room. Legacy intake URLs redirect back here.
+   * Re-asserts CLEAR and binds durable authorization evidence onto the Campaign Record.
    */
   function handleCheckoutPaymentComplete() {
     if (paymentCompleteGuardRef.current) return;
+    const project = projectDraft ?? bootConversationProjectDraft(draft);
+    const gate = assertPreAcceptanceAllowsPayment(
+      projectFactsFromWorkingDraft(project),
+    );
+    if (!gate.allowed) {
+      setPlanBridgeError(gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        gate.decision?.voiceLine ??
+          conversationRoomGuideV1.preAcceptanceClarificationVoice,
+      );
+      return;
+    }
+    const authorization = buildPreAcceptancePaymentAuthorization(gate.decision);
+    if (!authorization) {
+      setPlanBridgeError(studioPreAcceptanceV1.customerCopy.missingDecision);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      return;
+    }
     paymentCompleteGuardRef.current = true;
-    markPaymentReceived();
+    markPaymentReceived(undefined, authorization);
     saveRouteMapJourneyStep("intake");
     setDetailJobId(null);
     setIntakeLiveAnswers(null);
@@ -1223,6 +1294,7 @@ export default function ConversationRoomRuntime({
             onReviewStudioPlan={handleReviewStudioPlan}
             onBackToStudioPlan={handleBackToStudioPlanFromCheckout}
             onCheckoutPaymentComplete={handleCheckoutPaymentComplete}
+            onAuthorizeCheckoutPayment={authorizeCheckoutPayment}
             onIntakeSubmitSuccess={handleIntakeSubmitSuccess}
             onRecoverIntakePayment={() => {
               setDetailJobId(null);

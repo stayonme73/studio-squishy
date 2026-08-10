@@ -221,7 +221,10 @@ export function readCurrentCampaignHydrated(): CampaignRecord | null {
   return hydrateCampaignIntake() ?? readCurrentCampaign();
 }
 
-function createCampaignFromPayment(packageId: StudioGuidePackageId): CampaignRecord {
+function createCampaignFromPayment(
+  packageId: StudioGuidePackageId,
+  authorization?: CampaignRecord["preAcceptancePaymentAuthorization"] | null,
+): CampaignRecord {
   const pkg = getStudioGuidePackage(packageId);
   const content = statusContent.PAYMENT_RECEIVED;
   const now = new Date().toISOString();
@@ -235,6 +238,7 @@ function createCampaignFromPayment(packageId: StudioGuidePackageId): CampaignRec
     packageId,
     packageLabel: pkg?.label ?? packageId,
     paymentReceivedAt: now,
+    ...(authorization ? { preAcceptancePaymentAuthorization: authorization } : {}),
     targetCompletionDate: null,
     revisionRoundsIncluded: getPackageRevisionRounds(packageId),
     revisionRoundsUsed: 0,
@@ -391,11 +395,12 @@ function clearPrePaymentPlanDraft(campaign: CampaignRecord | null) {
 
 export function markPaymentReceived(
   packageId?: StudioGuidePackageId,
+  authorization?: CampaignRecord["preAcceptancePaymentAuthorization"] | null,
 ): CampaignRecord | null {
   let campaign = readCurrentCampaign();
   if (!campaign) {
     if (!packageId) return null;
-    const created = createCampaignFromPayment(packageId);
+    const created = createCampaignFromPayment(packageId, authorization);
     saveCurrentCampaign(created);
     dispatchCampaignUpdated();
     void syncCampaignToServer(created);
@@ -408,6 +413,10 @@ export function markPaymentReceived(
     ...campaign,
     paymentReceivedAt: now,
     updatedAt: now,
+    // Write-once: first successful payment binds the authorizing CLEAR decision.
+    ...(authorization && !campaign.preAcceptancePaymentAuthorization
+      ? { preAcceptancePaymentAuthorization: authorization }
+      : {}),
   };
 
   if (!campaign.approvedStudioPlan) {

@@ -150,6 +150,16 @@ export const conversationRoomGuideV1 = {
    */
   checkoutVoiceBridge:
     "Before you pay, confirm your services and total. This is your last chance to edit before the purchased scope is fixed.",
+  /**
+   * Pre-acceptance gate (PRODUCTION-ASSURANCE-PRE-ACCEPTANCE-GATE-1).
+   * Spoken only when payment is blocked for clarification / policy / decline.
+   */
+  preAcceptanceClarificationVoice:
+    "Before you pay, I need one quick clarification so we can take this on honestly.",
+  preAcceptanceOwnerPolicyVoice:
+    "This one needs a short Studio policy review before payment. Your plan is saved.",
+  preAcceptanceDeclineVoice:
+    "We can’t accept this project as selected right now. Your plan is saved — you can change services or timing and try again.",
   /** @deprecated Prefer checkoutVoiceBridge — kept for older narration callers. */
   studioPlanVoiceCheckout:
     studioPlanPreCheckoutFlexibilityV1.voiceCheckoutTransition,
