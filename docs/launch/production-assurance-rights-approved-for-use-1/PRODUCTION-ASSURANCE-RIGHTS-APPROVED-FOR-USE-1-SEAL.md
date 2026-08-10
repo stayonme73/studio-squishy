@@ -76,10 +76,12 @@ Routine clear material: Owner action = **NONE**. Genuine gray area may route `OW
 |------|--------|
 | Package commit | `a27336e6bc29783b45bebf0088c24e99c3d7cfd5` |
 | Message | `feat(assurance): require approved-for-use before material enters production` |
+| Seal-record commit | `6c1be6d26b5e68f5789e7250cbae8964bd61a61a` |
 | Branch | `assurance/rights-approved-for-use-1` |
+| Local HEAD | `6c1be6d26b5e68f5789e7250cbae8964bd61a61a` |
+| Origin HEAD | `6c1be6d26b5e68f5789e7250cbae8964bd61a61a` |
+| Ahead/behind | `0/0` |
 | Merge | none |
-
-Seal-record commit SHA filled after docs seal push.
 
 ---
 
