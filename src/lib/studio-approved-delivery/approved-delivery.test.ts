@@ -7,9 +7,12 @@ import {
   canMarkJobDelivered,
   canOwnerFinalRelease,
   canSystemAuthorizeFinalDelivery,
+  materialContextFromLedger,
 } from "@/lib/job-control/final-delivery-gates";
 import { applySystemFinalDeliveryAuthorization } from "@/lib/job-control/final-delivery-actions";
 import { canClientAccessJobDelivery } from "@/lib/job-control/final-delivery-access";
+
+const NO_MATERIAL_HOLDS = materialContextFromLedger([]);
 import { createEmptyJobReviewFeedback } from "@/lib/job-control/review-feedback-types";
 import { applyReviewRoomPatch } from "@/lib/job-control/review-room-actions";
 import { applyProductionWorkspacePatch } from "@/lib/job-control/production-workspace-actions";
@@ -353,7 +356,9 @@ describe("PRODUCTION-ASSURANCE-APPROVED-DELIVERED-BINDING-1", () => {
     });
     const decision = evaluateDeliveryEligibility({ job });
     expect(decision.outcome).toBe("BLOCKED_RELEASE_HOLD");
-    expect(canSystemAuthorizeFinalDelivery(job, ["Post concepts"]).allowed).toBe(false);
+    expect(canSystemAuthorizeFinalDelivery(job, ["Post concepts"], NO_MATERIAL_HOLDS).allowed).toBe(
+      false,
+    );
   });
 
   it("release hold remains independent of approval; Owner exception path available", () => {
@@ -367,10 +372,11 @@ describe("PRODUCTION-ASSURANCE-APPROVED-DELIVERED-BINDING-1", () => {
     const match = evaluateApprovalMatchForRelease({ job });
     expect(isEligibleForDelivery(match)).toBe(true);
     expect(canClientAccessJobDelivery(job)).toBe(false);
-    expect(canSystemAuthorizeFinalDelivery(job, ["Post concepts", "Caption copy"]).allowed).toBe(
-      false,
-    );
-    expect(canOwnerFinalRelease(job).allowed).toBe(true);
+    expect(
+      canSystemAuthorizeFinalDelivery(job, ["Post concepts", "Caption copy"], NO_MATERIAL_HOLDS)
+        .allowed,
+    ).toBe(false);
+    expect(canOwnerFinalRelease(job, NO_MATERIAL_HOLDS).allowed).toBe(true);
   });
 
   it("normal approved + matching + no hold → delivery without Tagia", () => {
@@ -385,20 +391,21 @@ describe("PRODUCTION-ASSURANCE-APPROVED-DELIVERED-BINDING-1", () => {
       }),
     );
 
-    expect(canSystemAuthorizeFinalDelivery(job, ["Post concepts", "Caption copy"]).allowed).toBe(
-      true,
-    );
+    expect(
+      canSystemAuthorizeFinalDelivery(job, ["Post concepts", "Caption copy"], NO_MATERIAL_HOLDS)
+        .allowed,
+    ).toBe(true);
 
     const released = applySystemFinalDeliveryAuthorization(
       job,
       [],
       ["Post concepts", "Caption copy"],
-      { occurredAt: NOW },
+      { occurredAt: NOW, materialUse: NO_MATERIAL_HOLDS },
     );
     expect(released.applied).toBe(true);
     expect(released.job.spineStatus).toBe("ready_for_delivery");
     expect(canClientAccessJobDelivery(released.job)).toBe(true);
-    expect(canOwnerFinalRelease(released.job).allowed).toBe(false);
+    expect(canOwnerFinalRelease(released.job, NO_MATERIAL_HOLDS).allowed).toBe(false);
 
     // Staff (not Tagia) may mark delivered after system release.
     const marked = applyProductionWorkspacePatch(
@@ -437,9 +444,13 @@ describe("PRODUCTION-ASSURANCE-APPROVED-DELIVERED-BINDING-1", () => {
     });
     const stamped = stampClientDeliveryFilesWithApproval(job);
     // Stamp may add decision/workVersion — still require hash when pin has hashes.
-    expect(canSystemAuthorizeFinalDelivery(stamped, ["Post concepts", "Caption copy"]).allowed).toBe(
-      false,
-    );
+    expect(
+      canSystemAuthorizeFinalDelivery(
+        stamped,
+        ["Post concepts", "Caption copy"],
+        NO_MATERIAL_HOLDS,
+      ).allowed,
+    ).toBe(false);
     const decision = evaluateApprovalMatchForRelease({ job: stamped });
     expect(
       decision.blockCodes.some(
@@ -594,10 +605,11 @@ describe("PRODUCTION-ASSURANCE-APPROVED-DELIVERED-BINDING-1", () => {
       ),
     );
     expect(held.ownerApprovalPending).toBe("before_delivery");
-    expect(canSystemAuthorizeFinalDelivery(held, ["Post concepts", "Caption copy"]).allowed).toBe(
-      false,
-    );
-    expect(canOwnerFinalRelease(held).allowed).toBe(true);
+    expect(
+      canSystemAuthorizeFinalDelivery(held, ["Post concepts", "Caption copy"], NO_MATERIAL_HOLDS)
+        .allowed,
+    ).toBe(false);
+    expect(canOwnerFinalRelease(held, NO_MATERIAL_HOLDS).allowed).toBe(true);
     const released = applyProductionWorkspacePatch(
       envelope(held),
       campaign(),

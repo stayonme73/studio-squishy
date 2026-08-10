@@ -166,6 +166,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     user,
     assignments,
     clientId,
+    materialsEnvelope.items,
+    true,
   );
 
   if (!result.ok) {

@@ -25,7 +25,12 @@ import {
   buildFinalDeliveryAuthorizationRecord,
   stampClientDeliveryFilesWithApproval,
 } from "@/lib/studio-approved-delivery";
-import { canMarkJobDelivered, canOwnerActOnReleaseGate, canOwnerFinalRelease } from "./final-delivery-gates";
+import {
+  canMarkJobDelivered,
+  canOwnerActOnReleaseGate,
+  canOwnerFinalRelease,
+  materialContextFromLedger,
+} from "./final-delivery-gates";
 import {
   buildInternalQaReviewAuthorization,
   evaluateReviewEligibility,
@@ -1016,12 +1021,16 @@ export function applyProductionWorkspacePatch(
       job = fileResult.job;
       events = fileResult.events;
 
-      // Routine: when assembled files match customer approval and no Owner hold, open Final Delivery.
+      // Routine: when assembled files match customer approval and no Owner/material hold, open Final Delivery.
       const systemRelease = applySystemFinalDeliveryAuthorization(
         job,
         events,
         requiredDeliverables,
-        { actor, occurredAt },
+        {
+          actor,
+          occurredAt,
+          materialUse: materialContextFromLedger(materials),
+        },
       );
       if (systemRelease.applied) {
         job = systemRelease.job;
@@ -1178,7 +1187,7 @@ export function applyProductionWorkspacePatch(
 
       job = stampClientDeliveryFilesWithApproval(job);
 
-      const releaseGate = canOwnerFinalRelease(job);
+      const releaseGate = canOwnerFinalRelease(job, materialContextFromLedger(materials));
       if (!releaseGate.allowed) {
         return {
           ok: false,

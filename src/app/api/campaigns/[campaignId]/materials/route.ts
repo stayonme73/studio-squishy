@@ -21,6 +21,7 @@ import {
   resolveCampaignCommunicationClientId,
   syncJobCommunicationRecords,
 } from "@/lib/job-control/communication";
+import { reevaluateSystemFinalDeliveryAfterMaterialChange } from "@/lib/job-control/final-delivery-actions";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
 import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
@@ -238,8 +239,13 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
   }
 
+  const clientId = resolveCampaignCommunicationClientId(
+    campaignEnvelope.clientUserId,
+    campaignEnvelope.campaignId,
+  );
+  let tasksEnvelope = await getOrGenerateTasks(campaignId, campaignEnvelope.record);
+
   if (submittedItemIds.length > 0) {
-    const tasksEnvelope = await getOrGenerateTasks(campaignId, campaignEnvelope.record);
     const updatedTasks = applyExceptionStatusOnClientMaterialSubmit(tasksEnvelope, submittedItemIds);
     const synced = syncJobRecordsFromCampaign(
       campaignEnvelope.record,
@@ -252,14 +258,22 @@ export async function PATCH(request: Request, context: RouteContext) {
     const communicationSync = syncJobCommunicationRecords({
       envelope: updatedTasks,
       campaign: campaignEnvelope.record,
-      clientId: resolveCampaignCommunicationClientId(
-        campaignEnvelope.clientUserId,
-        campaignEnvelope.campaignId,
-      ),
+      clientId,
       jobs,
       materials: saved.items,
     });
-    await writeTasksEnvelope(communicationSync.envelope);
+    tasksEnvelope = communicationSync.envelope;
+  }
+
+  // Rights hold cleared after customer approval → system may open Final Delivery (no re-approve).
+  const releaseRetry = reevaluateSystemFinalDeliveryAfterMaterialChange({
+    envelope: tasksEnvelope,
+    campaign: campaignEnvelope.record,
+    materials: saved.items,
+    clientId,
+  });
+  if (submittedItemIds.length > 0 || releaseRetry.releasedJobIds.length > 0) {
+    await writeTasksEnvelope(releaseRetry.envelope);
   }
 
   const audience = resolveMaterialsAudience(request, user, campaignId, campaignEnvelope, assignments);

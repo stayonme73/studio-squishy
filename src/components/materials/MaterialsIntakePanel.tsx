@@ -9,7 +9,8 @@ import type {
   ClientOptionalRequest,
 } from "@/lib/materials/client-requests";
 import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
-import type { MaterialContentKind } from "@/lib/materials/types";
+import type { MaterialCategory, MaterialContentKind } from "@/lib/materials/types";
+import { categoryRequiresUseClearance } from "@/lib/studio-material-use";
 
 type MaterialsClientResponse = {
   blockingRequiredCount: number;
@@ -87,6 +88,21 @@ function formatReceivedStatus(submittedAt: string | undefined): string {
     hour: "numeric",
     minute: "2-digit",
   }).format(parsed)}`;
+}
+
+function requiresUseAttestation(category: MaterialCategory): boolean {
+  return categoryRequiresUseClearance(category);
+}
+
+function buildSubmitPayload(
+  draft: ClientSubmitPayload | undefined,
+  category: MaterialCategory,
+): ClientSubmitPayload {
+  const payload: ClientSubmitPayload = { ...(draft ?? {}) };
+  if (requiresUseAttestation(category) && draft?.useAuthorizationBasis) {
+    payload.useAuthorizationBasis = draft.useAuthorizationBasis;
+  }
+  return payload;
 }
 
 function SubmitFields({
@@ -232,10 +248,13 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
   ]);
 
   const updateDraft = (id: string, field: keyof ClientSubmitPayload, value: string) => {
-    setDrafts((current) => ({
-      ...current,
-      [id]: { ...current[id], [field]: value },
-    }));
+    setDrafts((current) => {
+      const next: ClientSubmitPayload = { ...current[id], [field]: value };
+      if (field === "useAuthorizationBasis" && !value) {
+        delete next.useAuthorizationBasis;
+      }
+      return { ...current, [id]: next };
+    });
   };
 
   const selectFile = async (id: string, file: File | null) => {
@@ -300,13 +319,19 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     setError(null);
     setSuccessId(null);
     try {
+      if (
+        requiresUseAttestation(request.category) &&
+        !drafts[request.id]?.useAuthorizationBasis
+      ) {
+        throw new Error(materialsConfig.clientUseAuthorizationRequired);
+      }
       const res = await fetch(materialsEndpoint, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "client_submit_consolidated",
           consolidatedItemId: request.id,
-          payload: drafts[request.id] ?? {},
+          payload: buildSubmitPayload(drafts[request.id], request.category),
         }),
       });
       const json = (await res.json()) as MaterialsClientResponse;
@@ -327,13 +352,19 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     setError(null);
     setSuccessId(null);
     try {
+      if (
+        requiresUseAttestation(request.category) &&
+        !drafts[request.id]?.useAuthorizationBasis
+      ) {
+        throw new Error(materialsConfig.clientUseAuthorizationRequired);
+      }
       const res = await fetch(materialsEndpoint, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "client_submit",
           itemId: request.id,
-          payload: drafts[request.id] ?? {},
+          payload: buildSubmitPayload(drafts[request.id], request.category),
         }),
       });
       const json = (await res.json()) as MaterialsClientResponse;
@@ -436,6 +467,23 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           onFileSelect={(file) => void selectFile(request.id, file)}
                           disabled={submittingId === request.id}
                         />
+                        {requiresUseAttestation(request.category) ? (
+                          <label className="sb-materials-intake__attest">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(drafts[request.id]?.useAuthorizationBasis)}
+                              disabled={submittingId === request.id}
+                              onChange={(event) =>
+                                updateDraft(
+                                  request.id,
+                                  "useAuthorizationBasis",
+                                  event.target.checked ? "customer_has_permission" : "",
+                                )
+                              }
+                            />
+                            <span>{materialsConfig.clientUseAuthorizationLabel}</span>
+                          </label>
+                        ) : null}
                         <button
                           type="button"
                           className="utility-btn utility-btn--primary sb-materials-intake__submit"
@@ -513,6 +561,23 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           onFileSelect={(file) => void selectFile(request.id, file)}
                           disabled={submittingId === request.id}
                         />
+                        {requiresUseAttestation(request.category) ? (
+                          <label className="sb-materials-intake__attest">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(drafts[request.id]?.useAuthorizationBasis)}
+                              disabled={submittingId === request.id}
+                              onChange={(event) =>
+                                updateDraft(
+                                  request.id,
+                                  "useAuthorizationBasis",
+                                  event.target.checked ? "customer_has_permission" : "",
+                                )
+                              }
+                            />
+                            <span>{materialsConfig.clientUseAuthorizationLabel}</span>
+                          </label>
+                        ) : null}
                         <button
                           type="button"
                           className="utility-btn sb-materials-intake__submit"

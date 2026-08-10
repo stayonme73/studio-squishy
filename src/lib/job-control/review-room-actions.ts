@@ -35,7 +35,10 @@ import {
 } from "./review-handoff-receipts";
 import { buildCustomerApprovedArtifactAuthorization } from "@/lib/studio-approved-delivery";
 
+import type { CampaignMaterialItem } from "@/lib/materials/types";
+
 import { applySystemFinalDeliveryAuthorization } from "./final-delivery-actions";
+import { materialContextFromLedger } from "./final-delivery-gates";
 import { canClientAccessJobReview } from "./review-room-access";
 import {
   canApproveJobForDelivery,
@@ -146,6 +149,8 @@ export function applyReviewRoomPatch(
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
   clientId = `unclaimed-client:${campaignInput.campaignId}`,
+  materials: readonly CampaignMaterialItem[] = [],
+  materialLedgerLoaded = true,
 ): ReviewRoomActionResult {
   const occurredAt = new Date().toISOString();
   const actor = clientActor(user);
@@ -578,11 +583,17 @@ export function applyReviewRoomPatch(
       });
 
       // If final files are already assembled and match, system opens Final Delivery now.
+      // Material-use ledger is required — customer approval cannot waive rights holds.
       const systemRelease = applySystemFinalDeliveryAuthorization(
         currentJob,
         events,
         requiredDeliverablesForJob(campaign, currentJob),
-        { occurredAt },
+        {
+          occurredAt,
+          materialUse: materialLedgerLoaded
+            ? materialContextFromLedger(materials)
+            : { ledgerLoaded: false, items: [] },
+        },
       );
       currentJob = systemRelease.job;
       events = systemRelease.events;

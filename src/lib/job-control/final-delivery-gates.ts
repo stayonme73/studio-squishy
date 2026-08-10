@@ -46,13 +46,56 @@ export function allRequiredClientDeliveryFilesPresent(
 }
 
 /**
+ * Authoritative material-use input for system Final Delivery.
+ * `ledgerLoaded: false` must never be treated as “no holds.”
+ * `ledgerLoaded: true` + empty items = campaign has no material rows (no false block).
+ */
+export type SystemReleaseMaterialContext = {
+  ledgerLoaded: boolean;
+  items: readonly CampaignMaterialItem[];
+};
+
+export function materialContextFromLedger(
+  items: readonly CampaignMaterialItem[],
+): SystemReleaseMaterialContext {
+  return { ledgerLoaded: true, items };
+}
+
+export function materialContextUnavailable(): SystemReleaseMaterialContext {
+  return { ledgerLoaded: false, items: [] };
+}
+
+function materialUseReleaseBlock(
+  job: PurchasedJobRecord,
+  materialUse: SystemReleaseMaterialContext,
+): GateBlockReason | null {
+  if (!materialUse.ledgerLoaded) {
+    return {
+      code: "materials_ledger_unavailable",
+      message:
+        "Material-use ledger is unavailable — system Final Delivery cannot be authorized.",
+    };
+  }
+  // Reevaluates live (including contentFingerprint replacement) via materialBlocksProductionUse.
+  if (jobHasUnresolvedMaterialUseHold(materialUse.items, job.campaignId, job.skuId)) {
+    return {
+      code: "material_use_hold",
+      message:
+        "One or more required materials are not approved for Studio use — Final Delivery remains held.",
+    };
+  }
+  return null;
+}
+
+/**
  * Routine Final Delivery authorization — system path.
  * Owner must not click for ordinary matching, hold-free jobs.
+ * Customer creative approval cannot waive unresolved material-use holds.
  */
 export function canSystemAuthorizeFinalDelivery(
   job: PurchasedJobRecord,
   requiredDeliverables: readonly string[],
-  materials: readonly CampaignMaterialItem[] = [],
+  materialUse: SystemReleaseMaterialContext,
 ): { allowed: boolean; reasons: GateBlockReason[] } {
   const reasons: GateBlockReason[] = [];
 
@@ -85,17 +128,8 @@ export function canSystemAuthorizeFinalDelivery(
     });
   }
 
-  // Customer creative approval cannot waive unresolved material use-rights holds.
-  if (
-    materials.length > 0 &&
-    jobHasUnresolvedMaterialUseHold(materials, job.campaignId, job.skuId)
-  ) {
-    reasons.push({
-      code: "material_use_hold",
-      message:
-        "One or more required materials are not approved for Studio use — Final Delivery remains held.",
-    });
-  }
+  const materialBlock = materialUseReleaseBlock(job, materialUse);
+  if (materialBlock) reasons.push(materialBlock);
 
   if (reasons.length > 0) {
     return { allowed: false, reasons };
@@ -144,9 +178,16 @@ export function canOwnerActOnReleaseGate(
 
 export function canOwnerFinalRelease(
   job: PurchasedJobRecord,
+  materialUse: SystemReleaseMaterialContext,
 ): { allowed: boolean; reasons: GateBlockReason[] } {
   const gate = canOwnerActOnReleaseGate(job);
   if (!gate.allowed) return gate;
+
+  // Owner exception is not a rights waiver — resolve material-use first.
+  const materialBlock = materialUseReleaseBlock(job, materialUse);
+  if (materialBlock) {
+    return { allowed: false, reasons: [materialBlock] };
+  }
 
   const match = evaluateApprovalMatchForRelease({ job });
   if (!isEligibleForDelivery(match)) {

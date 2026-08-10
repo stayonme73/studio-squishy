@@ -122,11 +122,15 @@ export {
   canMarkJobDelivered,
   allRequiredClientDeliveryFilesPresent,
   allRequiredClientDeliveryFilesAssembled,
+  materialContextFromLedger,
+  materialContextUnavailable,
+  type SystemReleaseMaterialContext,
 } from "./final-delivery-gates";
 
 export {
   applyFinalDeliveryPatch,
   applySystemFinalDeliveryAuthorization,
+  reevaluateSystemFinalDeliveryAfterMaterialChange,
   addClientDeliveryFile,
   allJobsDelivered,
   syncCampaignStatusAfterDelivery,

@@ -63,6 +63,14 @@ export const materialsConfig = {
   addMoreLabel: "Add more (optional)",
   clientSubmitLabel: "Send to Studio",
   clientSubmitSuccess: "Submitted — our team will review shortly.",
+  /**
+   * Logo/photo use attestation — shown only for clearance-required file intake.
+   * Operational confirmation, not a legal guarantee.
+   */
+  clientUseAuthorizationLabel:
+    "I own this, or I have permission to use it for this project.",
+  clientUseAuthorizationRequired:
+    "Please confirm you own this file or have permission to use it before sending.",
   teamReviewApproveLabel: "Approve for use",
   teamReviewClarifyLabel: "Request clarification",
   teamReviewNotNeededLabel: "Not needed",

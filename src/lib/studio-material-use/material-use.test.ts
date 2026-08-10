@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { requestOwnerApprovalBeforeDelivery } from "@/lib/job-control/actions";
 import {
   canSystemAuthorizeFinalDelivery,
+  materialContextFromLedger,
 } from "@/lib/job-control/final-delivery-gates";
 import { applyTeamReview, applyClientSubmitConsolidated } from "@/lib/materials/actions";
 import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
@@ -340,7 +341,11 @@ describe("PRODUCTION-ASSURANCE-RIGHTS-APPROVED-FOR-USE-1", () => {
     });
     expect(jobHasUnresolvedMaterialUseHold([uncleared], CAMPAIGN, "bf-001")).toBe(true);
     expect(
-      canSystemAuthorizeFinalDelivery(job(), ["Brand kit"], [uncleared]).allowed,
+      canSystemAuthorizeFinalDelivery(
+        job(),
+        ["Brand kit"],
+        materialContextFromLedger([uncleared]),
+      ).allowed,
     ).toBe(false);
   });
 
@@ -350,9 +355,13 @@ describe("PRODUCTION-ASSURANCE-RIGHTS-APPROVED-FOR-USE-1", () => {
       relatedServiceIds: ["bf-001"],
     });
     const heldJob = requestOwnerApprovalBeforeDelivery(job());
-    expect(canSystemAuthorizeFinalDelivery(heldJob, ["Brand kit"], [blocked]).allowed).toBe(
-      false,
-    );
+    expect(
+      canSystemAuthorizeFinalDelivery(
+        heldJob,
+        ["Brand kit"],
+        materialContextFromLedger([blocked]),
+      ).allowed,
+    ).toBe(false);
     expect(heldJob.ownerApprovalPending).toBe("before_delivery");
   });
 

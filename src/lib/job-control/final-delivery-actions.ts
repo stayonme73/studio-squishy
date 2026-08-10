@@ -23,6 +23,9 @@ import {
   canMarkJobDelivered,
   canOwnerFinalRelease,
   canSystemAuthorizeFinalDelivery,
+  materialContextFromLedger,
+  materialContextUnavailable,
+  type SystemReleaseMaterialContext,
 } from "./final-delivery-gates";
 import type { JobActivityActor, JobActivityEvent, JobClientDeliveryFile, PurchasedJobRecord } from "./types";
 
@@ -31,28 +34,31 @@ const SYSTEM_RELEASE_ACTOR: JobActivityActor = {
   displayName: "Studio",
 };
 
+export type { SystemReleaseMaterialContext };
+
 /**
  * Routine Final Delivery open — exact approved identity match, no Owner hold.
  * Does not require Tagia. Owner `owner_final_release` remains exception-only.
+ * Requires authoritative material-use ledger context (never omit / never invent empty).
  */
 export function applySystemFinalDeliveryAuthorization(
   job: PurchasedJobRecord,
   events: readonly JobActivityEvent[],
   requiredDeliverables: readonly string[],
-  input?: {
+  input: {
     actor?: JobActivityActor;
     occurredAt?: string;
-    materials?: readonly CampaignMaterialItem[];
+    materialUse: SystemReleaseMaterialContext;
   },
 ): { applied: boolean; job: PurchasedJobRecord; events: JobActivityEvent[]; reason?: string } {
-  const occurredAt = input?.occurredAt ?? new Date().toISOString();
-  const actor = input?.actor ?? SYSTEM_RELEASE_ACTOR;
+  const occurredAt = input.occurredAt ?? new Date().toISOString();
+  const actor = input.actor ?? SYSTEM_RELEASE_ACTOR;
 
   let nextJob = stampClientDeliveryFilesWithApproval(job);
   const gate = canSystemAuthorizeFinalDelivery(
     nextJob,
     requiredDeliverables,
-    input?.materials ?? [],
+    input.materialUse,
   );
   if (!gate.allowed) {
     return {
@@ -93,6 +99,63 @@ export function applySystemFinalDeliveryAuthorization(
   });
 
   return { applied: true, job: nextJob, events: nextEvents };
+}
+
+/**
+ * After material-use holds clear, re-attempt system Final Delivery for jobs
+ * already customer-approved. Does not require re-approval unless artifacts change.
+ */
+export function reevaluateSystemFinalDeliveryAfterMaterialChange(input: {
+  envelope: ServerTasksEnvelope;
+  campaign: CampaignRecord;
+  materials: readonly CampaignMaterialItem[];
+  clientId?: string;
+  occurredAt?: string;
+}): { envelope: ServerTasksEnvelope; releasedJobIds: string[] } {
+  const occurredAt = input.occurredAt ?? new Date().toISOString();
+  const clientId =
+    input.clientId ?? `unclaimed-client:${input.campaign.campaignId}`;
+  const materialUse = materialContextFromLedger(input.materials);
+  let envelope = input.envelope;
+  let events = [...(envelope.jobActivityEvents ?? [])];
+  const releasedJobIds: string[] = [];
+
+  for (const job of envelope.jobRecords ?? []) {
+    if (job.spineStatus !== "approved") continue;
+    if (job.customerApprovedArtifactAuthorization?.status !== "CUSTOMER_APPROVED") {
+      continue;
+    }
+
+    const release = applySystemFinalDeliveryAuthorization(
+      job,
+      events,
+      requiredDeliverablesForJob(input.campaign, job),
+      { occurredAt, materialUse },
+    );
+    if (!release.applied) {
+      events = release.events;
+      continue;
+    }
+
+    releasedJobIds.push(job.jobId);
+    events = release.events;
+    envelope = updateJobInEnvelope(envelope, release.job, events);
+    envelope = enqueueJobCommunicationRecord(
+      { ...envelope, jobActivityEvents: events },
+      {
+        campaign: input.campaign,
+        clientId,
+        job: release.job,
+        eventType: "final_delivery_available",
+        sender: SYSTEM_RELEASE_ACTOR,
+        occurredAt,
+        idempotencyKey: `material-clear-release:${job.jobId}:${occurredAt}`,
+      },
+    );
+    events = envelope.jobActivityEvents ?? [];
+  }
+
+  return { envelope, releasedJobIds };
 }
 
 export type FinalDeliveryPatchAction = "owner_final_release" | "mark_delivered";
@@ -167,12 +230,17 @@ export function applyFinalDeliveryPatch(
   body: FinalDeliveryPatchBody,
   user: StudioUser,
   clientId = `unclaimed-client:${campaign.campaignId}`,
+  materials: readonly CampaignMaterialItem[] | null = null,
 ): FinalDeliveryPatchResult {
   const actor = actorFromUser(user);
   const occurredAt = new Date().toISOString();
   let events = [...(envelope.jobActivityEvents ?? [])];
   let currentJob = job;
   const requiredDeliverables = requiredDeliverablesForJob(campaign, job);
+  const materialUse =
+    materials == null
+      ? materialContextUnavailable()
+      : materialContextFromLedger(materials);
 
   switch (body.action) {
     case "owner_final_release": {
@@ -186,7 +254,7 @@ export function applyFinalDeliveryPatch(
 
       currentJob = stampClientDeliveryFilesWithApproval(currentJob);
 
-      const gate = canOwnerFinalRelease(currentJob);
+      const gate = canOwnerFinalRelease(currentJob, materialUse);
       if (!gate.allowed) {
         return {
           ok: false,

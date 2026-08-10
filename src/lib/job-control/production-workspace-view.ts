@@ -184,7 +184,10 @@ export function resolveProductionWorkspaceView(input: {
   const startGate = canTransitionToBuildingConcepts(job, materials, laneViews);
   const submitGate = canSubmitForOwnerApproval(job, line?.deliverables ?? []);
   const approveGate = canOwnerApproveForReview(job);
-  const finalReleaseGate = canOwnerFinalRelease(job);
+  const finalReleaseGate = canOwnerFinalRelease(job, {
+    ledgerLoaded: true,
+    items: materials,
+  });
   const deliverGate = canMarkJobDelivered(job, line?.deliverables ?? []);
   const allClientFiles = allRequiredClientDeliveryFilesPresent(job, line?.deliverables ?? []);
 

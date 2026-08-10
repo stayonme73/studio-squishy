@@ -234,7 +234,10 @@ describe("Final Delivery V1", () => {
       approvedJob,
       [],
       ["Post concepts", "Caption copy"],
-      { occurredAt: NOW },
+      {
+        occurredAt: NOW,
+        materialUse: { ledgerLoaded: true, items: [] },
+      },
     );
 
     expect(released.applied).toBe(true);
