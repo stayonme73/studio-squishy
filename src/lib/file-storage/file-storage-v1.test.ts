@@ -111,8 +111,46 @@ function campaign(): CampaignRecord {
   } as CampaignRecord;
 }
 
-function job(overrides: Partial<PurchasedJobRecord> = {}): PurchasedJobRecord {
+function deliveryPins() {
   return {
+    internalQaReviewAuthorization: {
+      status: "ELIGIBLE_FOR_REVIEW" as const,
+      decisionId: "re-private-storage",
+      packageId: "PRODUCTION-ASSURANCE-QA-BEFORE-REVIEW-1",
+      skuId: "sm-001",
+      qaRecordIds: ["qa-sm-001"],
+      workVersionId: "work:private-storage",
+      contentSha256s: ["sha256:private-storage"],
+      artifactIds: ["artifact:private-storage"],
+      authorizedAt: NOW,
+    },
+    customerApprovedArtifactAuthorization: {
+      status: "CUSTOMER_APPROVED" as const,
+      decisionId: "caa-private-storage",
+      schemaVersion: 1,
+      packageId: "PRODUCTION-ASSURANCE-APPROVED-DELIVERED-BINDING-1",
+      jobId: JOB_ID,
+      campaignId: CAMPAIGN_ID,
+      skuId: "sm-001",
+      workVersionId: "work:private-storage",
+      artifactIds: ["artifact:private-storage"],
+      contentSha256s: ["sha256:private-storage"],
+      qaRecordIds: ["qa-sm-001"],
+      reviewPackageId: "pkg:private-storage",
+      releaseActivityId: null,
+      approvedAt: NOW,
+      feedbackSubmissionType: "approved_for_delivery" as const,
+      sourceQaDecisionId: "re-private-storage",
+    },
+  };
+}
+
+function job(overrides: Partial<PurchasedJobRecord> = {}): PurchasedJobRecord {
+  const spine = overrides.spineStatus ?? "building_concepts";
+  const needsDeliveryPin = spine === "ready_for_delivery" || spine === "delivered";
+  const needsReviewPin = spine === "ready_for_review" || needsDeliveryPin;
+  const pins = deliveryPins();
+  const next: PurchasedJobRecord = {
     jobId: JOB_ID,
     campaignId: CAMPAIGN_ID,
     skuId: "sm-001",
@@ -122,8 +160,30 @@ function job(overrides: Partial<PurchasedJobRecord> = {}): PurchasedJobRecord {
     intakeComplete: true,
     deliverablePrep: [{ deliverableKey: "deliverable-0", label: "Post concepts", preparedAt: NOW }],
     updatedAt: NOW,
+    ...(needsReviewPin
+      ? {
+          internalQaReviewAuthorization: pins.internalQaReviewAuthorization,
+          ...(needsDeliveryPin
+            ? {
+                customerApprovedArtifactAuthorization:
+                  pins.customerApprovedArtifactAuthorization,
+              }
+            : {}),
+        }
+      : {}),
     ...overrides,
   };
+  if (needsDeliveryPin && next.clientDeliveryFiles) {
+    next.clientDeliveryFiles = next.clientDeliveryFiles.map((file) => ({
+      ...file,
+      contentSha256: file.contentSha256 ?? "sha256:private-storage",
+      artifactId: file.artifactId ?? "artifact:private-storage",
+      approvedWorkVersionId: file.approvedWorkVersionId ?? "work:private-storage",
+      approvedAuthorizationDecisionId:
+        file.approvedAuthorizationDecisionId ?? "caa-private-storage",
+    }));
+  }
+  return next;
 }
 
 function envelope(jobRecord: PurchasedJobRecord): ServerTasksEnvelope {

@@ -118,12 +118,15 @@ export {
 
 export {
   canOwnerFinalRelease,
+  canSystemAuthorizeFinalDelivery,
   canMarkJobDelivered,
   allRequiredClientDeliveryFilesPresent,
+  allRequiredClientDeliveryFilesAssembled,
 } from "./final-delivery-gates";
 
 export {
   applyFinalDeliveryPatch,
+  applySystemFinalDeliveryAuthorization,
   addClientDeliveryFile,
   allJobsDelivered,
   syncCampaignStatusAfterDelivery,

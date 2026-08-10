@@ -265,13 +265,27 @@ export function releaseFinalDeliveryFiles(
     return released;
   });
 
-  if (releasedIds.size === 0) return { job, events: nextEvents };
+  const clientDeliveryFiles = (job.clientDeliveryFiles ?? []).map((file) => {
+    const linkedRelease =
+      Boolean(file.registryFileId) && releasedIds.has(file.registryFileId!);
+    const pendingWithoutRegistry =
+      !file.registryFileId && file.releaseStatus !== "released" && Boolean(file.url?.trim());
+    if (!linkedRelease && !pendingWithoutRegistry) return file;
+    return {
+      ...file,
+      releaseStatus: "released" as const,
+      releasedAt: occurredAt,
+    };
+  });
 
-  const clientDeliveryFiles = (job.clientDeliveryFiles ?? []).map((file) =>
-    file.registryFileId && releasedIds.has(file.registryFileId)
-      ? { ...file, releaseStatus: "released" as const, releasedAt: occurredAt }
-      : file,
+  const cdfReleased = clientDeliveryFiles.some(
+    (file, index) => file.releaseStatus === "released" &&
+      (job.clientDeliveryFiles ?? [])[index]?.releaseStatus !== "released",
   );
+
+  if (releasedIds.size === 0 && !cdfReleased) {
+    return { job, events: nextEvents };
+  }
 
   return {
     job: {

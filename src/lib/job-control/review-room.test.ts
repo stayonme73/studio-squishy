@@ -308,7 +308,14 @@ describe("review-room actions", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.job.spineStatus).toBe("approved");
-      expect(result.job.ownerApprovalPending).toBe("before_delivery");
+      // Routine approve does not create an Owner release hold.
+      expect(result.job.ownerApprovalPending).toBeNull();
+      expect(result.job.customerApprovedArtifactAuthorization?.status).toBe(
+        "CUSTOMER_APPROVED",
+      );
+      expect(result.job.customerApprovedArtifactAuthorization?.sourceQaDecisionId).toBe(
+        "re-test",
+      );
     }
   });
 

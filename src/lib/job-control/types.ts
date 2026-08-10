@@ -68,6 +68,7 @@ export type JobActivityEventKind =
   | "client_review_received"
   | "client_revision_request"
   | "client_delivery_approval"
+  /** Legacy name — system actor = routine Final Delivery auth; owner actor = exception path. */
   | "owner_final_release"
   | "client_delivery_file_added"
   | "file_reference_added"
@@ -170,6 +171,13 @@ export type JobClientDeliveryFile = {
   useInstructions?: string;
   addedAt: string;
   addedBy: JobActivityActor;
+  /** Exact content identity when known — preferred over filename for delivery match. */
+  contentSha256?: string;
+  artifactId?: string;
+  /** Work version the file belongs to (must match customer approval pin when present). */
+  approvedWorkVersionId?: string;
+  /** CustomerApprovedArtifactAuthorization.decisionId this file is bound to. */
+  approvedAuthorizationDecisionId?: string;
 };
 
 export type JobActivityActor = {
@@ -249,6 +257,45 @@ export type PurchasedJobRecord = {
     contentSha256s: readonly string[];
     artifactIds: readonly string[];
     authorizedAt: string;
+  };
+  /**
+   * Customer creative approval pin — exact Review candidate approved for delivery.
+   * Does not authorize Studio release; Owner release gates remain separate.
+   */
+  customerApprovedArtifactAuthorization?: {
+    status: "CUSTOMER_APPROVED";
+    decisionId: string;
+    schemaVersion: number;
+    packageId: string;
+    jobId: string;
+    campaignId: string;
+    skuId: string;
+    workVersionId: string | null;
+    artifactIds: readonly string[];
+    contentSha256s: readonly string[];
+    qaRecordIds: readonly string[];
+    reviewPackageId: string;
+    releaseActivityId: string | null;
+    approvedAt: string;
+    feedbackSubmissionType: "approved_for_delivery";
+    sourceQaDecisionId: string;
+  };
+  /**
+   * Final delivery authorization — set at mark_delivered.
+   * Reconstructs customer approval → exact delivered artifact identity.
+   */
+  finalDeliveryAuthorization?: {
+    status: "DELIVERED";
+    deliveryId: string;
+    approvedAuthorizationDecisionId: string;
+    workVersionId: string | null;
+    contentSha256s: readonly string[];
+    artifactIds: readonly string[];
+    clientDeliveryFileIds: readonly string[];
+    reviewPackageId: string;
+    sourceQaDecisionId: string;
+    deliveredAt: string;
+    packageId: string;
   };
   /** Canonical File Room registry — metadata and storage refs only, never public provider links. */
   fileRegistry?: readonly StudioFileReference[];

@@ -8,6 +8,7 @@ import { canClientAccessJobReview } from "@/lib/job-control/review-room-access";
 import type { StudioFileReference } from "@/lib/file-registry/types";
 import { canClientAccessJobDelivery } from "@/lib/job-control/final-delivery-access";
 import type { JobClientDeliveryFile, PurchasedJobRecord } from "@/lib/job-control/types";
+import { evaluateDeliveryEligibility, isEligibleForDelivery } from "@/lib/studio-approved-delivery";
 
 export type FileRoomAccessDecision = {
   allowed: boolean;
@@ -49,6 +50,30 @@ export function canClientAccessFinalDeliveryFile(input: {
   if (isApprovedReviewProofReference(file)) return deny("Review proofs are not Final Delivery files.");
   if (clientDeliveryFile && !clientDeliveryFileIsReleased(job, clientDeliveryFile)) {
     return deny("Client delivery file has not been released.");
+  }
+
+  const eligibility = evaluateDeliveryEligibility({ job });
+  if (!isEligibleForDelivery(eligibility)) {
+    return deny("Final delivery candidate does not match the customer-approved identity.");
+  }
+
+  if (clientDeliveryFile) {
+    const approval = job.customerApprovedArtifactAuthorization;
+    if (
+      approval &&
+      clientDeliveryFile.approvedAuthorizationDecisionId &&
+      clientDeliveryFile.approvedAuthorizationDecisionId !== approval.decisionId
+    ) {
+      return deny("Final delivery file is not bound to the customer-approved identity.");
+    }
+    if (
+      approval &&
+      approval.contentSha256s.length > 0 &&
+      (!clientDeliveryFile.contentSha256 ||
+        !approval.contentSha256s.includes(clientDeliveryFile.contentSha256))
+    ) {
+      return deny("Final delivery file hash does not match the customer-approved identity.");
+    }
   }
 
   return allow("Released client-final file.");

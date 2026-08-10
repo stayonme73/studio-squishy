@@ -6,7 +6,10 @@ import { resolveOwnerDeskItems } from "@/lib/job-control/owner-desk";
 import { applyProductionWorkspacePatch } from "@/lib/job-control/production-workspace-actions";
 import { resolveProductionLaneViews } from "@/lib/job-control/capacity";
 import { resolveFinalDeliveryView } from "@/lib/job-control/final-delivery-view";
-import { syncCampaignStatusAfterDelivery } from "@/lib/job-control/final-delivery-actions";
+import {
+  applySystemFinalDeliveryAuthorization,
+  syncCampaignStatusAfterDelivery,
+} from "@/lib/job-control/final-delivery-actions";
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -70,25 +73,81 @@ function campaign(overrides: Partial<CampaignRecord> = {}): CampaignRecord {
   } as CampaignRecord;
 }
 
+function qaAuth(skuId: string) {
+  return {
+    status: "ELIGIBLE_FOR_REVIEW" as const,
+    decisionId: `re-fd-${skuId}`,
+    packageId: "PRODUCTION-ASSURANCE-QA-BEFORE-REVIEW-1",
+    skuId,
+    qaRecordIds: [`qa-${skuId}`],
+    workVersionId: "work:fd-v1",
+    contentSha256s: ["sha256:fd-v1"],
+    artifactIds: [`artifact:${skuId}`],
+    authorizedAt: NOW,
+  };
+}
+
+function approvalPin(jobId: string, campaignId: string, skuId: string) {
+  return {
+    status: "CUSTOMER_APPROVED" as const,
+    decisionId: `caa-fd-${skuId}`,
+    schemaVersion: 1,
+    packageId: "PRODUCTION-ASSURANCE-APPROVED-DELIVERED-BINDING-1",
+    jobId,
+    campaignId,
+    skuId,
+    workVersionId: "work:fd-v1",
+    artifactIds: [`artifact:${skuId}`],
+    contentSha256s: ["sha256:fd-v1"],
+    qaRecordIds: [`qa-${skuId}`],
+    reviewPackageId: `pkg:fd:${skuId}`,
+    releaseActivityId: null,
+    approvedAt: NOW,
+    feedbackSubmissionType: "approved_for_delivery" as const,
+    sourceQaDecisionId: `re-fd-${skuId}`,
+  };
+}
+
+function bindCdf(
+  file: NonNullable<PurchasedJobRecord["clientDeliveryFiles"]>[number],
+  skuId: string,
+) {
+  return {
+    ...file,
+    contentSha256: file.contentSha256 ?? "sha256:fd-v1",
+    artifactId: file.artifactId ?? `artifact:${skuId}`,
+    approvedWorkVersionId: file.approvedWorkVersionId ?? "work:fd-v1",
+    approvedAuthorizationDecisionId:
+      file.approvedAuthorizationDecisionId ?? `caa-fd-${skuId}`,
+  };
+}
+
 function job(
   skuId: "sm-001" | "ma-flyer-v2",
   overrides: Partial<PurchasedJobRecord> = {},
 ): PurchasedJobRecord {
-  return {
-    jobId: buildJobId("fd-v1", skuId),
+  const jobId = buildJobId("fd-v1", skuId);
+  const seed: PurchasedJobRecord = {
+    jobId,
     campaignId: "fd-v1",
     skuId,
     serviceName: skuId === "sm-001" ? "Social Launch" : "Flyer",
     spineStatus: "approved",
     productionLane: "quick",
     intakeComplete: true,
-    ownerApprovalPending: "before_delivery",
+    ownerApprovalPending: null,
     deliverablePrep: [
       { deliverableKey: "deliverable-0", label: "Item A", preparedAt: NOW },
     ],
+    internalQaReviewAuthorization: qaAuth(skuId),
+    customerApprovedArtifactAuthorization: approvalPin(jobId, "fd-v1", skuId),
     updatedAt: NOW,
-    ...overrides,
   };
+  const next = { ...seed, ...overrides };
+  if (next.clientDeliveryFiles) {
+    next.clientDeliveryFiles = next.clientDeliveryFiles.map((file) => bindCdf(file, skuId));
+  }
+  return next;
 }
 
 function envelope(...jobRecords: PurchasedJobRecord[]): ServerTasksEnvelope {
@@ -104,24 +163,87 @@ function envelope(...jobRecords: PurchasedJobRecord[]): ServerTasksEnvelope {
 }
 
 describe("Final Delivery V1", () => {
-  it("1. approved job appears on Owner Desk for final release", () => {
-    const approvedJob = job("sm-001");
-    const desk = resolveOwnerDeskItems([
+  it("1. routine approved job does not appear on Owner Desk; exception hold does", () => {
+    const routineApproved = job("sm-001", { ownerApprovalPending: null });
+    const exceptionHold = job("sm-001", { ownerApprovalPending: "before_delivery" });
+
+    const routineDesk = resolveOwnerDeskItems([
       {
         campaignId: "fd-v1",
         campaignName: "Final Delivery Demo",
-        jobs: [approvedJob],
+        jobs: [routineApproved],
         exceptions: [],
         laneViews: resolveProductionLaneViews([]),
       },
     ]);
+    expect(routineDesk.some((item) => item.reason === "approval_before_delivery")).toBe(
+      false,
+    );
 
-    expect(desk.some((item) => item.reason === "approval_before_delivery")).toBe(true);
-    expect(desk.some((item) => item.title.includes("Final Release Needed"))).toBe(true);
+    const exceptionDesk = resolveOwnerDeskItems([
+      {
+        campaignId: "fd-v1",
+        campaignName: "Final Delivery Demo",
+        jobs: [exceptionHold],
+        exceptions: [],
+        laneViews: resolveProductionLaneViews([]),
+      },
+    ]);
+    expect(exceptionDesk.some((item) => item.reason === "approval_before_delivery")).toBe(
+      true,
+    );
+    expect(exceptionDesk.some((item) => item.title.includes("Final Release Needed"))).toBe(
+      true,
+    );
   });
 
-  it("2. released job becomes ready_for_delivery", () => {
-    const approvedJob = job("sm-001");
+  it("2. system authorizes ready_for_delivery without Owner when files match", () => {
+    const approvedJob = job("sm-001", {
+      ownerApprovalPending: null,
+      clientDeliveryFiles: [
+        bindCdf(
+          {
+            id: "cdf-1",
+            deliverableKey: "deliverable-0",
+            deliverableLabel: "Post concepts",
+            fileName: "posts.zip",
+            fileType: "ZIP",
+            url: "https://files.example/posts.zip",
+            addedAt: NOW,
+            addedBy: { role: "staff", displayName: "Staff" },
+          },
+          "sm-001",
+        ),
+        bindCdf(
+          {
+            id: "cdf-2",
+            deliverableKey: "deliverable-1",
+            deliverableLabel: "Caption copy",
+            fileName: "captions.pdf",
+            fileType: "PDF",
+            url: "https://files.example/captions.pdf",
+            addedAt: NOW,
+            addedBy: { role: "staff", displayName: "Staff" },
+          },
+          "sm-001",
+        ),
+      ],
+    });
+
+    const released = applySystemFinalDeliveryAuthorization(
+      approvedJob,
+      [],
+      ["Post concepts", "Caption copy"],
+      { occurredAt: NOW },
+    );
+
+    expect(released.applied).toBe(true);
+    expect(released.job.spineStatus).toBe("ready_for_delivery");
+    expect(released.job.ownerApprovalPending).toBeNull();
+  });
+
+  it("2b. Owner final release remains for genuine before_delivery exception", () => {
+    const approvedJob = job("sm-001", { ownerApprovalPending: "before_delivery" });
     const result = applyProductionWorkspacePatch(
       envelope(approvedJob),
       campaign(),

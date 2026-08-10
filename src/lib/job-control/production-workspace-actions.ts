@@ -3,7 +3,7 @@ import { requiredDeliverablesForJob } from "@/lib/approved-plan-line";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
-import { isOwnerUser } from "@/lib/campaign-store/access";
+import { isOwnerUser, isStaffUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import {
   addJobFileReference,
@@ -16,7 +16,15 @@ import { applyJobSpineStatusChange } from "./actions";
 import { buildAcceptedAcceptanceReview } from "./acceptance-review";
 import { enqueueJobCommunicationRecord } from "./communication";
 import type { ProductionLaneView } from "./capacity";
-import { addClientDeliveryFile, syncCampaignStatusAfterDelivery } from "./final-delivery-actions";
+import {
+  addClientDeliveryFile,
+  applySystemFinalDeliveryAuthorization,
+  syncCampaignStatusAfterDelivery,
+} from "./final-delivery-actions";
+import {
+  buildFinalDeliveryAuthorizationRecord,
+  stampClientDeliveryFilesWithApproval,
+} from "@/lib/studio-approved-delivery";
 import { canMarkJobDelivered, canOwnerActOnReleaseGate, canOwnerFinalRelease } from "./final-delivery-gates";
 import {
   buildInternalQaReviewAuthorization,
@@ -165,8 +173,9 @@ function clearDeliverablePrepFlags(job: PurchasedJobRecord): PurchasedJobRecord 
       preparedAt: undefined,
       preparedBy: undefined,
     })),
-    // Prior QA authorization must not survive correction / send-back.
+    // Prior QA / customer-approval pins must not authorize a later version.
     internalQaReviewAuthorization: undefined,
+    customerApprovedArtifactAuthorization: undefined,
   };
 }
 
@@ -1006,6 +1015,34 @@ export function applyProductionWorkspacePatch(
       });
       job = fileResult.job;
       events = fileResult.events;
+
+      // Routine: when assembled files match customer approval and no Owner hold, open Final Delivery.
+      const systemRelease = applySystemFinalDeliveryAuthorization(
+        job,
+        events,
+        requiredDeliverables,
+        { actor, occurredAt },
+      );
+      if (systemRelease.applied) {
+        job = systemRelease.job;
+        events = systemRelease.events;
+        envelope = enqueueJobCommunicationRecord(
+          { ...envelope, jobActivityEvents: events },
+          {
+            campaign,
+            clientId,
+            job,
+            eventType: "final_delivery_available",
+            sender: actor,
+            occurredAt,
+            idempotencyKey: `system-release:${occurredAt}`,
+          },
+        );
+        events = envelope.jobActivityEvents ?? [];
+      } else {
+        job = systemRelease.job;
+        events = systemRelease.events;
+      }
       break;
     }
 
@@ -1020,7 +1057,12 @@ export function applyProductionWorkspacePatch(
         return { ok: false, error: "A note for production is required.", status: 400 };
       }
 
-      job = clearOwnerReviewGatePending(job, occurredAt);
+      job = {
+        ...clearOwnerReviewGatePending(job, occurredAt),
+        // Prior customer approval must not authorize the rebuilt package.
+        internalQaReviewAuthorization: undefined,
+        customerApprovedArtifactAuthorization: undefined,
+      };
 
       const spineResult = applyJobSpineStatusChange(job, events, {
         job,
@@ -1121,10 +1163,20 @@ export function applyProductionWorkspacePatch(
       break;
     }
 
+    /**
+     * Genuine Owner exception path only — requires ownerApprovalPending === "before_delivery".
+     * Routine matching jobs use applySystemFinalDeliveryAuthorization (no Tagia click).
+     */
     case "owner_final_release": {
       if (!isOwnerUser(user)) {
-        return { ok: false, error: "Owner approval requires owner role.", status: 403 };
+        return {
+          ok: false,
+          error: "Owner release exception requires owner role.",
+          status: 403,
+        };
       }
+
+      job = stampClientDeliveryFilesWithApproval(job);
 
       const releaseGate = canOwnerFinalRelease(job);
       if (!releaseGate.allowed) {
@@ -1181,15 +1233,29 @@ export function applyProductionWorkspacePatch(
     }
 
     case "mark_delivered": {
-      if (!isOwnerUser(user)) {
-        return { ok: false, error: "Owner approval requires owner role.", status: 403 };
+      if (!isOwnerUser(user) && !isStaffUser(user)) {
+        return { ok: false, error: "Staff or owner role required.", status: 403 };
       }
+
+      job = stampClientDeliveryFilesWithApproval(job);
 
       const deliverGate = canMarkJobDelivered(job, requiredDeliverables);
       if (!deliverGate.allowed) {
         return {
           ok: false,
           error: deliverGate.reasons.map((reason) => reason.message).join(" "),
+          status: 422,
+        };
+      }
+
+      const deliveryRecord = buildFinalDeliveryAuthorizationRecord({
+        job,
+        deliveredAt: occurredAt,
+      });
+      if (!deliveryRecord) {
+        return {
+          ok: false,
+          error: "Final delivery requires a durable customer-approved artifact authorization.",
           status: 422,
         };
       }
@@ -1204,6 +1270,7 @@ export function applyProductionWorkspacePatch(
       const deliveredJob: PurchasedJobRecord = {
         ...deliverResult.job,
         deliveredAt: occurredAt,
+        finalDeliveryAuthorization: deliveryRecord,
       };
       job = deliveredJob;
       events = deliverResult.events;

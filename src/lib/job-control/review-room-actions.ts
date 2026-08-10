@@ -33,6 +33,9 @@ import {
   findLatestStudioReviewRelease,
   releaseMessageRef,
 } from "./review-handoff-receipts";
+import { buildCustomerApprovedArtifactAuthorization } from "@/lib/studio-approved-delivery";
+
+import { applySystemFinalDeliveryAuthorization } from "./final-delivery-actions";
 import { canClientAccessJobReview } from "./review-room-access";
 import {
   canApproveJobForDelivery,
@@ -411,8 +414,9 @@ export function applyReviewRoomPatch(
       });
       currentJob = {
         ...statusResult.job,
-        // Prior review authorization must not authorize the next version.
+        // Prior review / delivery authorization must not authorize the next version.
         internalQaReviewAuthorization: undefined,
+        customerApprovedArtifactAuthorization: undefined,
       };
       events = statusResult.events;
 
@@ -537,16 +541,29 @@ export function applyReviewRoomPatch(
         submissionType: "approved_for_delivery",
       });
 
+      const approvalPin = buildCustomerApprovedArtifactAuthorization({
+        job: currentJob,
+        feedback,
+        approvedAt: occurredAt,
+      });
+      if (!approvalPin.ok) {
+        return { ok: false, error: approvalPin.error, status: 422 };
+      }
+
       const statusResult = applyJobSpineStatusChange(currentJob, events, {
         job: currentJob,
         nextStatus: "approved",
         actor,
-        reason: "Client approved for delivery — awaiting Owner final approval",
+        reason:
+          "Client approved for delivery — Studio release checks authorize Final Delivery when candidate matches",
         occurredAt,
       });
+      // Routine path: do NOT set ownerApprovalPending. Owner hold only via
+      // requestOwnerApprovalBeforeDelivery for genuine exceptions.
       currentJob = {
         ...statusResult.job,
-        ownerApprovalPending: "before_delivery",
+        ownerApprovalPending: null,
+        customerApprovedArtifactAuthorization: approvalPin.authorization,
       };
       events = statusResult.events;
 
@@ -560,6 +577,16 @@ export function applyReviewRoomPatch(
         spineStatus: "approved",
       });
 
+      // If final files are already assembled and match, system opens Final Delivery now.
+      const systemRelease = applySystemFinalDeliveryAuthorization(
+        currentJob,
+        events,
+        requiredDeliverablesForJob(campaign, currentJob),
+        { occurredAt },
+      );
+      currentJob = systemRelease.job;
+      events = systemRelease.events;
+
       let nextEnvelope = upsertJobReviewFeedback(workingEnvelope, feedback);
       nextEnvelope = enqueueJobCommunicationRecord(
         { ...nextEnvelope, jobActivityEvents: events },
@@ -567,7 +594,9 @@ export function applyReviewRoomPatch(
           campaign,
           clientId,
           job: currentJob,
-          eventType: "approved_for_delivery",
+          eventType: systemRelease.applied
+            ? "final_delivery_available"
+            : "approved_for_delivery",
           sender: actor,
           occurredAt,
           idempotencyKey: occurredAt,

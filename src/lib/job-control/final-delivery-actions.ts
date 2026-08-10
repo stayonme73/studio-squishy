@@ -1,7 +1,7 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import { requiredDeliverablesForJob } from "@/lib/approved-plan-line";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
-import { isOwnerUser } from "@/lib/campaign-store/access";
+import { isOwnerUser, isStaffUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import {
   addJobFileReference,
@@ -13,10 +13,80 @@ import { applyJobSpineStatusChange } from "./actions";
 import { appendJobActivityEvent } from "./activity-log";
 import { enqueueJobCommunicationRecord } from "./communication";
 import {
+  buildFinalDeliveryAuthorizationRecord,
+  stampClientDeliveryFilesWithApproval,
+} from "@/lib/studio-approved-delivery";
+
+import {
   canMarkJobDelivered,
   canOwnerFinalRelease,
+  canSystemAuthorizeFinalDelivery,
 } from "./final-delivery-gates";
 import type { JobActivityActor, JobActivityEvent, JobClientDeliveryFile, PurchasedJobRecord } from "./types";
+
+const SYSTEM_RELEASE_ACTOR: JobActivityActor = {
+  role: "system",
+  displayName: "Studio",
+};
+
+/**
+ * Routine Final Delivery open — exact approved identity match, no Owner hold.
+ * Does not require Tagia. Owner `owner_final_release` remains exception-only.
+ */
+export function applySystemFinalDeliveryAuthorization(
+  job: PurchasedJobRecord,
+  events: readonly JobActivityEvent[],
+  requiredDeliverables: readonly string[],
+  input?: {
+    actor?: JobActivityActor;
+    occurredAt?: string;
+  },
+): { applied: boolean; job: PurchasedJobRecord; events: JobActivityEvent[]; reason?: string } {
+  const occurredAt = input?.occurredAt ?? new Date().toISOString();
+  const actor = input?.actor ?? SYSTEM_RELEASE_ACTOR;
+
+  let nextJob = stampClientDeliveryFilesWithApproval(job);
+  const gate = canSystemAuthorizeFinalDelivery(nextJob, requiredDeliverables);
+  if (!gate.allowed) {
+    return {
+      applied: false,
+      job: nextJob,
+      events: [...events],
+      reason: gate.reasons.map((entry) => entry.message).join(" "),
+    };
+  }
+
+  const statusResult = applyJobSpineStatusChange(nextJob, events, {
+    job: nextJob,
+    nextStatus: "ready_for_delivery",
+    actor,
+    reason: "System authorized Final Delivery — approved identity matches delivery candidate",
+    occurredAt,
+  });
+  nextJob = statusResult.job;
+
+  const fileReleaseResult = releaseFinalDeliveryFiles(
+    nextJob,
+    statusResult.events,
+    actor,
+    occurredAt,
+  );
+  nextJob = fileReleaseResult.job;
+
+  // LEGACY kind name `owner_final_release` — when actor is system this is routine
+  // system authorization, not Owner participation (see studioApprovedDeliveryV1).
+  const nextEvents = appendJobActivityEvent(fileReleaseResult.events, {
+    campaignId: nextJob.campaignId,
+    jobId: nextJob.jobId,
+    kind: "owner_final_release",
+    occurredAt,
+    actor,
+    reason: "System authorized Final Delivery (routine — Owner action not required)",
+    spineStatus: "ready_for_delivery",
+  });
+
+  return { applied: true, job: nextJob, events: nextEvents };
+}
 
 export type FinalDeliveryPatchAction = "owner_final_release" | "mark_delivered";
 
@@ -91,10 +161,6 @@ export function applyFinalDeliveryPatch(
   user: StudioUser,
   clientId = `unclaimed-client:${campaign.campaignId}`,
 ): FinalDeliveryPatchResult {
-  if (!isOwnerUser(user)) {
-    return { ok: false, error: "Owner role required.", status: 403 };
-  }
-
   const actor = actorFromUser(user);
   const occurredAt = new Date().toISOString();
   let events = [...(envelope.jobActivityEvents ?? [])];
@@ -103,6 +169,16 @@ export function applyFinalDeliveryPatch(
 
   switch (body.action) {
     case "owner_final_release": {
+      if (!isOwnerUser(user)) {
+        return {
+          ok: false,
+          error: "Owner release exception requires owner role.",
+          status: 403,
+        };
+      }
+
+      currentJob = stampClientDeliveryFilesWithApproval(currentJob);
+
       const gate = canOwnerFinalRelease(currentJob);
       if (!gate.allowed) {
         return {
@@ -155,11 +231,30 @@ export function applyFinalDeliveryPatch(
     }
 
     case "mark_delivered": {
+      // Bookkeeping after Final Delivery is open — staff or Owner; not Tagia-only.
+      if (!isOwnerUser(user) && !isStaffUser(user)) {
+        return { ok: false, error: "Staff or owner role required.", status: 403 };
+      }
+
+      currentJob = stampClientDeliveryFilesWithApproval(currentJob);
+
       const gate = canMarkJobDelivered(currentJob, requiredDeliverables);
       if (!gate.allowed) {
         return {
           ok: false,
           error: gate.reasons.map((reason) => reason.message).join(" "),
+          status: 422,
+        };
+      }
+
+      const deliveryRecord = buildFinalDeliveryAuthorizationRecord({
+        job: currentJob,
+        deliveredAt: occurredAt,
+      });
+      if (!deliveryRecord) {
+        return {
+          ok: false,
+          error: "Final delivery requires a durable customer-approved artifact authorization.",
           status: 422,
         };
       }
@@ -174,6 +269,7 @@ export function applyFinalDeliveryPatch(
       currentJob = {
         ...statusResult.job,
         deliveredAt: occurredAt,
+        finalDeliveryAuthorization: deliveryRecord,
       };
       events = statusResult.events;
 
@@ -223,6 +319,10 @@ export function addClientDeliveryFile(
     fileType: string;
     url: string;
     useInstructions?: string;
+    contentSha256?: string;
+    artifactId?: string;
+    approvedWorkVersionId?: string;
+    approvedAuthorizationDecisionId?: string;
     actor: JobActivityActor;
     occurredAt?: string;
   },
@@ -246,6 +346,7 @@ export function addClientDeliveryFile(
     deliverableLabel: input.deliverableLabel,
     idPrefix: "final-file",
   });
+  const approval = job.customerApprovedArtifactAuthorization;
   const file: JobClientDeliveryFile = {
     id: `cdf:${job.jobId}:${input.deliverableKey}:${occurredAt}`,
     registryFileId: registryResult.file.id,
@@ -261,6 +362,16 @@ export function addClientDeliveryFile(
     useInstructions: input.useInstructions?.trim() || undefined,
     addedAt: occurredAt,
     addedBy: input.actor,
+    contentSha256: input.contentSha256?.trim() || undefined,
+    artifactId: input.artifactId?.trim() || undefined,
+    approvedWorkVersionId:
+      input.approvedWorkVersionId?.trim() ||
+      approval?.workVersionId ||
+      undefined,
+    approvedAuthorizationDecisionId:
+      input.approvedAuthorizationDecisionId?.trim() ||
+      approval?.decisionId ||
+      undefined,
   };
 
   const nextJob: PurchasedJobRecord = {
