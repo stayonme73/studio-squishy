@@ -29,6 +29,16 @@
 
 ---
 
-## Git (filled at seal)
+## Git
 
-See Scout seal response for commit SHA, push verification, ahead/behind, porcelain.
+| Item | Value |
+|------|--------|
+| Commit | `8fb7b8854e9778939281feae2acb455e0998e004` |
+| Message | `feat(assurance): bind exact customer-approved artifacts to final delivery` |
+| Branch | `assurance/approved-delivered-binding-1` |
+| Local HEAD | `8fb7b8854e9778939281feae2acb455e0998e004` |
+| Origin HEAD | `8fb7b8854e9778939281feae2acb455e0998e004` |
+| Ahead/behind | `0/0` |
+| Merge | none |
+
+Final tests at seal: **138 PASS** / 9 suites (23 approved-delivery).
