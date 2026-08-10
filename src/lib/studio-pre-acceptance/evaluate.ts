@@ -2,6 +2,7 @@ import { studioPreAcceptanceV1 } from "@/config/studio-pre-acceptance-v1";
 
 import { evaluateCapabilityForServices } from "./evaluate-capability";
 import { evaluateMaterialClarification } from "./evaluate-clarification";
+import { evaluateKnownMaterialRightsForAcceptance } from "./evaluate-material-use";
 import { evaluateMaterialRiskPolicy } from "./evaluate-risk";
 import { evaluateTimingTruth } from "./evaluate-timing";
 import { buildPreAcceptanceFactFingerprint } from "./fingerprint";
@@ -40,6 +41,9 @@ export function evaluatePreAcceptance(
   const riskPolicy = evaluateMaterialRiskPolicy(
     facts.riskScanText ?? facts.projectNeed,
   );
+  const materialRights = evaluateKnownMaterialRightsForAcceptance(
+    facts.materialRightsSignals ?? {},
+  );
 
   const blockingFacts: string[] = [];
   const nonBlockingFacts: string[] = [];
@@ -75,6 +79,13 @@ export function evaluatePreAcceptance(
     reasons.push(...riskPolicy.reasons);
   }
 
+  if (materialRights.verdict === "clear") {
+    nonBlockingFacts.push("No known material-rights acceptance blocker.");
+  } else {
+    blockingFacts.push(...materialRights.reasons);
+    reasons.push(...materialRights.reasons);
+  }
+
   let outcome: PreAcceptanceDecision["outcome"] =
     studioPreAcceptanceV1.outcomes.clearToAccept;
   let customerMessage: string | null = null;
@@ -82,21 +93,26 @@ export function evaluatePreAcceptance(
   let escalationTarget: PreAcceptanceDecision["escalationTarget"] = "none";
 
   // Priority: hard decline → owner policy → clarification → capability decline → clear
-  if (riskPolicy.verdict === "decline") {
+  if (riskPolicy.verdict === "decline" || materialRights.verdict === "decline") {
     outcome = studioPreAcceptanceV1.outcomes.decline;
     customerMessage = copy.declineLead;
     voiceLine = copy.declineVoice;
-  } else if (riskPolicy.verdict === "owner_policy_review") {
+  } else if (
+    riskPolicy.verdict === "owner_policy_review" ||
+    materialRights.verdict === "owner_policy_review"
+  ) {
     outcome = studioPreAcceptanceV1.outcomes.ownerPolicyReview;
     customerMessage = copy.ownerPolicyLead;
     voiceLine = copy.ownerPolicyVoice;
     escalationTarget = "owner_policy";
   } else if (
     clarification.verdict === "material_gap" ||
-    timing.verdict === "CLARIFICATION_NEEDED"
+    timing.verdict === "CLARIFICATION_NEEDED" ||
+    materialRights.verdict === "clarification_required"
   ) {
     outcome = studioPreAcceptanceV1.outcomes.clarificationRequired;
     const detail =
+      materialRights.customerPrompt ??
       clarification.customerPrompt ??
       (timing.verdict === "CLARIFICATION_NEEDED" ? timing.reason : copy.clarificationLead);
     customerMessage = `${copy.clarificationLead} ${detail}`;

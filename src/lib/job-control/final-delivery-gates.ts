@@ -4,6 +4,8 @@ import {
   isEligibleForDelivery,
 } from "@/lib/studio-approved-delivery";
 import { clientDeliveryFileIsReleased } from "@/lib/file-registry/job-files";
+import type { CampaignMaterialItem } from "@/lib/materials/types";
+import { jobHasUnresolvedMaterialUseHold } from "@/lib/studio-material-use";
 
 import type { PurchasedJobRecord } from "./types";
 import { resolveRequiredDeliverableKeys } from "./production-workspace-gates";
@@ -50,6 +52,7 @@ export function allRequiredClientDeliveryFilesPresent(
 export function canSystemAuthorizeFinalDelivery(
   job: PurchasedJobRecord,
   requiredDeliverables: readonly string[],
+  materials: readonly CampaignMaterialItem[] = [],
 ): { allowed: boolean; reasons: GateBlockReason[] } {
   const reasons: GateBlockReason[] = [];
 
@@ -79,6 +82,18 @@ export function canSystemAuthorizeFinalDelivery(
     reasons.push({
       code: "missing_client_files",
       message: "All required deliverables need a client delivery file before Final Delivery opens.",
+    });
+  }
+
+  // Customer creative approval cannot waive unresolved material use-rights holds.
+  if (
+    materials.length > 0 &&
+    jobHasUnresolvedMaterialUseHold(materials, job.campaignId, job.skuId)
+  ) {
+    reasons.push({
+      code: "material_use_hold",
+      message:
+        "One or more required materials are not approved for Studio use — Final Delivery remains held.",
     });
   }
 

@@ -17,6 +17,8 @@ import {
   stampClientDeliveryFilesWithApproval,
 } from "@/lib/studio-approved-delivery";
 
+import type { CampaignMaterialItem } from "@/lib/materials/types";
+
 import {
   canMarkJobDelivered,
   canOwnerFinalRelease,
@@ -40,13 +42,18 @@ export function applySystemFinalDeliveryAuthorization(
   input?: {
     actor?: JobActivityActor;
     occurredAt?: string;
+    materials?: readonly CampaignMaterialItem[];
   },
 ): { applied: boolean; job: PurchasedJobRecord; events: JobActivityEvent[]; reason?: string } {
   const occurredAt = input?.occurredAt ?? new Date().toISOString();
   const actor = input?.actor ?? SYSTEM_RELEASE_ACTOR;
 
   let nextJob = stampClientDeliveryFilesWithApproval(job);
-  const gate = canSystemAuthorizeFinalDelivery(nextJob, requiredDeliverables);
+  const gate = canSystemAuthorizeFinalDelivery(
+    nextJob,
+    requiredDeliverables,
+    input?.materials ?? [],
+  );
   if (!gate.allowed) {
     return {
       applied: false,

@@ -9,6 +9,7 @@ export type { PreAcceptancePaymentAuthorization } from "./authorization-binding"
 export { evaluatePreAcceptance } from "./evaluate";
 export { evaluateCapabilityForServices } from "./evaluate-capability";
 export { evaluateMaterialClarification } from "./evaluate-clarification";
+export { evaluateKnownMaterialRightsForAcceptance } from "./evaluate-material-use";
 export { evaluateMaterialRiskPolicy } from "./evaluate-risk";
 export {
   countBusinessDaysAfter,

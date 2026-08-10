@@ -86,4 +86,14 @@ export type PreAcceptanceProjectFacts = {
   existingMaterialsNote: string;
   /** Optional free-text that may carry risk signals (same as projectNeed typically). */
   riskScanText?: string;
+  /**
+   * Narrow known material-rights signals before payment.
+   * Distinct from post-payment per-material approved-for-use clearance.
+   */
+  materialRightsSignals?: {
+    hasHardRightsBlock?: boolean;
+    hasAcceptanceBlockingRightsAmbiguity?: boolean;
+    hasOwnerPolicyMaterialHold?: boolean;
+    clarificationPrompt?: string;
+  };
 };

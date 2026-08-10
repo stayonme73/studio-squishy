@@ -5,6 +5,12 @@ import {
   parseConsolidatedRequestId,
   resolveUnderlyingItemIdsForConsolidated,
 } from "./client-requests";
+import {
+  applyMaterialUseDecisionToItem,
+  buildUseAuthorization,
+  categoryRequiresUseClearance,
+} from "@/lib/studio-material-use";
+
 import { isBlockingMaterialItem } from "./materials-view";
 import {
   type ClientSubmitPayload,
@@ -23,6 +29,8 @@ const TEAM_REVIEW_STATUSES = new Set<MaterialReviewStatus>([
   "approved_for_use",
   "needs_clarification",
   "not_needed",
+  "owner_policy_review",
+  "blocked_from_use",
 ]);
 
 function submittedByFromUser(user: StudioUser): MaterialSubmittedBy {
@@ -42,14 +50,17 @@ function applyPayloadToItem(
   item: CampaignMaterialItem,
   payload: ClientSubmitPayload,
   user: StudioUser,
+  campaignId: string,
 ): CampaignMaterialItem {
   const now = new Date().toISOString();
+  const actor = submittedByFromUser(user);
   const patch: Partial<CampaignMaterialItem> = {
     reviewStatus: "submitted",
-    submittedBy: submittedByFromUser(user),
+    submittedBy: actor,
     submittedAt: now,
     uploadStatus: item.contentKind === "file-metadata" ? "metadata_only" : "none",
     teamNote: undefined,
+    useHold: null,
   };
 
   if (payload.text?.trim()) patch.text = payload.text.trim();
@@ -76,7 +87,34 @@ function applyPayloadToItem(
     patch.confirmedAt = now;
   }
 
-  return { ...item, ...patch };
+  if (payload.useAuthorizationBasis) {
+    patch.useAuthorization = buildUseAuthorization({
+      basis: payload.useAuthorizationBasis,
+      attestedAt: now,
+      attestedBy: actor,
+    });
+  } else if (!categoryRequiresUseClearance(item.category) && actor.role === "client") {
+    // Low-friction categories: customer submission is the operational use basis.
+    patch.useAuthorization = buildUseAuthorization({
+      basis: "customer_owns",
+      attestedAt: now,
+      attestedBy: actor,
+      statement: "Submitted customer material in a non-clearance category.",
+    });
+  } else if (actor.role === "staff" || actor.role === "owner") {
+    patch.useAuthorization = buildUseAuthorization({
+      basis: "studio_generated",
+      attestedAt: now,
+      attestedBy: actor,
+      statement: "Studio-sourced material.",
+    });
+  }
+
+  return applyMaterialUseDecisionToItem({
+    item: { ...item, ...patch },
+    campaignId,
+    evaluatedAt: now,
+  });
 }
 
 function updateItems(
@@ -120,7 +158,7 @@ export function applyClientSubmitConsolidated(
   }
 
   const updated = updateItems(envelope, underlyingIds, (item) =>
-    applyPayloadToItem(item, payload, user),
+    applyPayloadToItem(item, payload, user, envelope.campaignId),
   );
 
   return {
@@ -143,7 +181,7 @@ export function applyClientSubmitItem(
     return { ok: false, error: "Material item not found.", status: 404 };
   }
 
-  if (item.requirementLevel === "required" && isBlockingMaterialItem(item)) {
+  if (item.requirementLevel === "required" && isBlockingMaterialItem(item, envelope.campaignId)) {
     return {
       ok: false,
       error: "Use the consolidated request list for required blocking items.",
@@ -161,7 +199,7 @@ export function applyClientSubmitItem(
   }
 
   const updated = updateItems(envelope, [itemId], (entry) =>
-    applyPayloadToItem(entry, payload, user),
+    applyPayloadToItem(entry, payload, user, envelope.campaignId),
   );
 
   return {
@@ -198,13 +236,37 @@ export function applyTeamReview(
   }
 
   const now = new Date().toISOString();
-  const updated = updateItems(envelope, [itemId], (entry) => ({
-    ...entry,
-    reviewStatus,
-    reviewedBy: submittedByFromUser(user),
-    reviewedAt: now,
-    teamNote: teamNote?.trim() || undefined,
-  }));
+  const updated = updateItems(envelope, [itemId], (entry) => {
+    const next: CampaignMaterialItem = {
+      ...entry,
+      reviewStatus,
+      reviewedBy: submittedByFromUser(user),
+      reviewedAt: now,
+      teamNote: teamNote?.trim() || undefined,
+      useHold:
+        reviewStatus === "owner_policy_review" || reviewStatus === "blocked_from_use"
+          ? reviewStatus
+          : null,
+      useAuthorization:
+        reviewStatus === "approved_for_use"
+          ? entry.useAuthorization ??
+            buildUseAuthorization({
+              basis:
+                user.roles.includes("owner") || user.roles.includes("staff")
+                  ? "studio_controlled_licensed"
+                  : "customer_has_permission",
+              attestedAt: now,
+              attestedBy: submittedByFromUser(user),
+              statement: "Team approved material for Studio use.",
+            })
+          : entry.useAuthorization,
+    };
+    return applyMaterialUseDecisionToItem({
+      item: next,
+      campaignId: envelope.campaignId,
+      evaluatedAt: now,
+    });
+  });
 
   return {
     ok: true,

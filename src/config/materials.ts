@@ -30,6 +30,8 @@ export const materialsConfig = {
     needs_clarification: "Needs clarification",
     approved_for_use: "Approved for use",
     not_needed: "Not needed",
+    owner_policy_review: "Owner/policy review",
+    blocked_from_use: "Blocked from use",
   } satisfies Record<MaterialReviewStatus, string>,
   /** Client-facing status copy — no internal team notes or staff rationale. */
   clientStatusLabels: {
@@ -39,6 +41,8 @@ export const materialsConfig = {
     needs_clarification: "Needs your update",
     approved_for_use: "Approved",
     not_needed: "Not needed",
+    owner_policy_review: "Being reviewed by The Studio",
+    blocked_from_use: "Cannot be used as provided",
   } satisfies Record<MaterialReviewStatus, string>,
   clientNeedsClarificationBody:
     "Our team reviewed what you sent and needs an updated version. Please send revised details below.",

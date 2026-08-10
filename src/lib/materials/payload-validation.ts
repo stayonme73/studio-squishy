@@ -7,6 +7,13 @@ export type ClientSubmitPayload = {
   mimeType?: string;
   note?: string;
   availability?: "available" | "not_available_yet";
+  /** Operational use attestation — required for logo/photo clearance categories. */
+  useAuthorizationBasis?:
+    | "customer_owns"
+    | "customer_has_permission"
+    | "studio_generated"
+    | "studio_controlled_licensed"
+    | "provider_licensed";
 };
 
 const SECRET_PATTERNS: readonly RegExp[] = [

@@ -4,6 +4,7 @@ import type { PreAcceptanceProjectFacts } from "./types";
 export function buildPreAcceptanceFactFingerprint(
   facts: PreAcceptanceProjectFacts,
 ): string {
+  const rights = facts.materialRightsSignals;
   const payload = [
     facts.routeId ?? "",
     [...facts.selectedServiceIds].map(String).sort().join(","),
@@ -12,6 +13,9 @@ export function buildPreAcceptanceFactFingerprint(
     facts.deadlineStatus,
     facts.existingMaterialsNote.trim().toLowerCase(),
     (facts.riskScanText ?? facts.projectNeed).trim().toLowerCase(),
+    rights?.hasHardRightsBlock ? "hard" : "",
+    rights?.hasAcceptanceBlockingRightsAmbiguity ? "ambig" : "",
+    rights?.hasOwnerPolicyMaterialHold ? "owner" : "",
   ].join("|");
   return simpleHash(payload);
 }

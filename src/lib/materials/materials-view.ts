@@ -10,6 +10,8 @@ import {
   sanitizeClientConsolidatedRequests,
   sanitizeClientOptionalRequests,
 } from "./client-requests";
+import { materialBlocksProductionUse } from "@/lib/studio-material-use";
+
 import { filterClientVisibleItems } from "./promotion";
 import type {
   CampaignMaterialItem,
@@ -48,18 +50,22 @@ export type FileRoomMaterialsView = {
   isEmpty: boolean;
 };
 
-const BLOCKING_STATUSES = new Set<MaterialReviewStatus>([
-  "missing",
-  "requested",
-  "needs_clarification",
-]);
-
-export function isBlockingMaterialItem(item: CampaignMaterialItem): boolean {
-  return item.requirementLevel === "required" && BLOCKING_STATUSES.has(item.reviewStatus);
+/**
+ * Production blocker — required materials that are not APPROVED_FOR_USE.
+ * Submitted alone is insufficient for rights-sensitive categories.
+ */
+export function isBlockingMaterialItem(
+  item: CampaignMaterialItem,
+  campaignId = "unknown-campaign",
+): boolean {
+  return materialBlocksProductionUse(item, campaignId);
 }
 
-export function countBlockingRequiredMaterials(items: readonly CampaignMaterialItem[]): number {
-  return items.filter(isBlockingMaterialItem).length;
+export function countBlockingRequiredMaterials(
+  items: readonly CampaignMaterialItem[],
+  campaignId = "unknown-campaign",
+): number {
+  return items.filter((item) => isBlockingMaterialItem(item, campaignId)).length;
 }
 
 function resolveSubmittedByLabel(item: CampaignMaterialItem): string | null {
@@ -67,7 +73,7 @@ function resolveSubmittedByLabel(item: CampaignMaterialItem): string | null {
   return item.submittedBy.displayName ?? item.submittedBy.userId;
 }
 
-function toRow(item: CampaignMaterialItem): FileRoomMaterialRow {
+function toRow(item: CampaignMaterialItem, campaignId: string): FileRoomMaterialRow {
   return {
     id: item.id,
     category: item.category,
@@ -78,7 +84,7 @@ function toRow(item: CampaignMaterialItem): FileRoomMaterialRow {
     requirementLabel: materialsConfig.requirementLabels[item.requirementLevel],
     reviewStatus: item.reviewStatus,
     statusLabel: materialStatusLabel(item.reviewStatus),
-    isBlocking: isBlockingMaterialItem(item),
+    isBlocking: isBlockingMaterialItem(item, campaignId),
     submittedByLabel: resolveSubmittedByLabel(item),
     fileName: item.fileName ?? null,
     url: item.url ?? null,
@@ -94,7 +100,7 @@ export function resolveFileRoomMaterialsView(
 
   for (const item of record.items) {
     const rows = groupsMap.get(item.category) ?? [];
-    rows.push(toRow(item));
+    rows.push(toRow(item, record.campaignId));
     groupsMap.set(item.category, rows);
   }
 
@@ -107,7 +113,7 @@ export function resolveFileRoomMaterialsView(
     }));
 
   return {
-    blockingRequiredCount: countBlockingRequiredMaterials(record.items),
+    blockingRequiredCount: countBlockingRequiredMaterials(record.items, record.campaignId),
     groups,
     isEmpty: record.items.length === 0,
   };
@@ -124,7 +130,10 @@ export function resolveMaterialsApiPayload(
   consolidatedRequests?: ReturnType<typeof sanitizeClientConsolidatedRequests>;
   optionalRequests?: ReturnType<typeof sanitizeClientOptionalRequests>;
 } {
-  const blockingRequiredCount = countBlockingRequiredMaterials(record.items);
+  const blockingRequiredCount = countBlockingRequiredMaterials(
+    record.items,
+    record.campaignId,
+  );
   if (audience === "client") {
     const clientRecord = {
       ...record,
@@ -133,7 +142,10 @@ export function resolveMaterialsApiPayload(
     const serviceNameById = buildApprovedServiceNameLookup(campaign?.approvedStudioPlan?.lineItems);
     const consolidated = resolveConsolidatedClientRequests(clientRecord, serviceNameById);
     return {
-      blockingRequiredCount: countBlockingRequiredMaterials(clientRecord.items),
+      blockingRequiredCount: countBlockingRequiredMaterials(
+        clientRecord.items,
+        record.campaignId,
+      ),
       clientIntakeCount: countClientIntakeMaterials(clientRecord.items),
       consolidatedRequests: sanitizeClientConsolidatedRequests(consolidated),
       optionalRequests: sanitizeClientOptionalRequests(

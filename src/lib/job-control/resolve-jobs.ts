@@ -66,10 +66,12 @@ function isSkuBlocked(
 export function blockingMaterialsForSku(
   materials: readonly CampaignMaterialItem[],
   skuId: string,
+  campaignId = "unknown-campaign",
 ): CampaignMaterialItem[] {
   return materials.filter(
     (item) =>
-      isBlockingMaterialItem(item) && item.relatedServiceIds.includes(skuId as never),
+      isBlockingMaterialItem(item, campaignId) &&
+      item.relatedServiceIds.includes(skuId as never),
   );
 }
 

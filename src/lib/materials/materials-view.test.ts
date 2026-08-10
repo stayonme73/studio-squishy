@@ -40,16 +40,26 @@ describe("materials-view", () => {
     expect(view.isEmpty).toBe(false);
   });
 
-  it("counts only required missing/requested/needs_clarification as blocking", () => {
+  it("counts uncleared required materials as blocking (submitted alone is not enough for logos)", () => {
     expect(
-      countBlockingRequiredMaterials([
-        item({ reviewStatus: "missing" }),
-        item({ reviewStatus: "submitted" }),
-        item({ requirementLevel: "optional", reviewStatus: "missing" }),
-        item({ reviewStatus: "needs_clarification" }),
-      ]),
-    ).toBe(2);
-    expect(isBlockingMaterialItem(item({ reviewStatus: "not_needed" }))).toBe(false);
+      countBlockingRequiredMaterials(
+        [
+          item({ reviewStatus: "missing" }),
+          item({ reviewStatus: "submitted", submittedAt: "2026-01-02T00:00:00.000Z" }),
+          item({ requirementLevel: "optional", reviewStatus: "missing" }),
+          item({ reviewStatus: "needs_clarification" }),
+          item({
+            reviewStatus: "approved_for_use",
+            useAuthorization: {
+              basis: "customer_owns",
+              attestedAt: "2026-01-02T00:00:00.000Z",
+            },
+          }),
+        ],
+        "c-1",
+      ),
+    ).toBe(3);
+    expect(isBlockingMaterialItem(item({ reviewStatus: "not_needed" }), "c-1")).toBe(false);
   });
 
   it("client API payload omits internal ledger fields and team notes", () => {
@@ -94,7 +104,8 @@ describe("materials-view", () => {
     );
 
     expect(payload.clientIntakeCount).toBe(1);
-    expect(payload.blockingRequiredCount).toBe(0);
+    // Logo submitted without use authorization remains production-blocking.
+    expect(payload.blockingRequiredCount).toBe(1);
     expect(payload.consolidatedRequests).toHaveLength(1);
     expect(payload.consolidatedRequests?.[0]?.statusLabel).toBe("Received — under review");
     expect(payload.consolidatedRequests?.[0]?.submittedAt).toBe("2026-01-02T12:30:00.000Z");
