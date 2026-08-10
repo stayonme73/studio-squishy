@@ -19,6 +19,11 @@ import type { ProductionLaneView } from "./capacity";
 import { addClientDeliveryFile, syncCampaignStatusAfterDelivery } from "./final-delivery-actions";
 import { canMarkJobDelivered, canOwnerActOnReleaseGate, canOwnerFinalRelease } from "./final-delivery-gates";
 import {
+  buildInternalQaReviewAuthorization,
+  evaluateReviewEligibility,
+} from "@/lib/studio-review-eligibility";
+
+import {
   canOwnerActOnReviewGate,
   canOwnerApproveForReview,
   canSubmitForOwnerApproval,
@@ -160,6 +165,8 @@ function clearDeliverablePrepFlags(job: PurchasedJobRecord): PurchasedJobRecord 
       preparedAt: undefined,
       preparedBy: undefined,
     })),
+    // Prior QA authorization must not survive correction / send-back.
+    internalQaReviewAuthorization: undefined,
   };
 }
 
@@ -656,12 +663,39 @@ export function applyProductionWorkspacePatch(
       break;
     }
 
+    /**
+     * LEGACY ACTION NAME — not an Owner/Tagia approval step.
+     * Routine production staff submit QA-authorized work directly to customer Review.
+     * Customer-facing label: "Submit to Review Room". Owner is not required.
+     */
     case "submit_for_owner_approval": {
-      const gate = canSubmitForOwnerApproval(job, requiredDeliverables);
+      const qaContext = {
+        tasks: envelope.tasks,
+        qaRecords: envelope.qaRecords ?? [],
+      };
+      const gate = canSubmitForOwnerApproval(job, requiredDeliverables, qaContext);
       if (!gate.allowed) {
         return {
           ok: false,
           error: gate.reasons.map((reason) => reason.message).join(" "),
+          status: 422,
+        };
+      }
+
+      const eligibility = evaluateReviewEligibility({
+        jobId: job.jobId,
+        campaignId: job.campaignId,
+        skuId: job.skuId,
+        tasks: qaContext.tasks,
+        qaRecords: qaContext.qaRecords,
+      });
+      const authorization = buildInternalQaReviewAuthorization(eligibility, occurredAt);
+      if (!authorization) {
+        return {
+          ok: false,
+          error:
+            eligibility.reasons[0] ??
+            "Internal QA has not passed for this review candidate.",
           status: 422,
         };
       }
@@ -677,6 +711,7 @@ export function applyProductionWorkspacePatch(
       job = {
         ...result.job,
         ownerApprovalPending: null,
+        internalQaReviewAuthorization: authorization,
       };
       events = result.events;
       envelope = enqueueJobCommunicationRecord(
@@ -706,16 +741,43 @@ export function applyProductionWorkspacePatch(
       break;
     }
 
+    /**
+     * Genuine Owner exception path only — requires ownerApprovalPending === "before_review".
+     * Not on the routine QA→Review path. requestOwnerApprovalBeforeReview is not invoked
+     * by routine production; this action clears an Owner-support hold when one exists.
+     */
     case "owner_approve_for_review": {
       if (!isOwnerUser(user)) {
         return { ok: false, error: "Owner support review requires owner role.", status: 403 };
       }
 
-      const gate = canOwnerApproveForReview(job);
+      const qaContext = {
+        tasks: envelope.tasks,
+        qaRecords: envelope.qaRecords ?? [],
+      };
+      const gate = canOwnerApproveForReview(job, qaContext);
       if (!gate.allowed) {
         return {
           ok: false,
           error: gate.reasons.map((reason) => reason.message).join(" "),
+          status: 422,
+        };
+      }
+
+      const eligibility = evaluateReviewEligibility({
+        jobId: job.jobId,
+        campaignId: job.campaignId,
+        skuId: job.skuId,
+        tasks: qaContext.tasks,
+        qaRecords: qaContext.qaRecords,
+      });
+      const authorization = buildInternalQaReviewAuthorization(eligibility, occurredAt);
+      if (!authorization) {
+        return {
+          ok: false,
+          error:
+            eligibility.reasons[0] ??
+            "Internal QA has not passed for this review candidate.",
           status: 422,
         };
       }
@@ -725,6 +787,7 @@ export function applyProductionWorkspacePatch(
         ...job,
         ownerApprovalPending: null,
         updatedAt: occurredAt,
+        internalQaReviewAuthorization: authorization,
       };
 
       const result = applyJobSpineStatusChange(job, events, {
@@ -734,7 +797,10 @@ export function applyProductionWorkspacePatch(
         reason: "Owner support resolved — ready for client review",
         occurredAt,
       });
-      job = result.job;
+      job = {
+        ...result.job,
+        internalQaReviewAuthorization: authorization,
+      };
       events = result.events;
       envelope = enqueueJobCommunicationRecord(
         { ...envelope, jobActivityEvents: events },

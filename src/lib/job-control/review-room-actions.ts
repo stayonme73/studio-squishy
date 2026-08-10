@@ -409,7 +409,11 @@ export function applyReviewRoomPatch(
         reason: "Client requested revision with feedback",
         occurredAt,
       });
-      currentJob = statusResult.job;
+      currentJob = {
+        ...statusResult.job,
+        // Prior review authorization must not authorize the next version.
+        internalQaReviewAuthorization: undefined,
+      };
       events = statusResult.events;
 
       events = appendJobActivityEvent(events, {

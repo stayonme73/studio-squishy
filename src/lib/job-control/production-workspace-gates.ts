@@ -1,4 +1,10 @@
 import type { CampaignMaterialItem } from "@/lib/materials/types";
+import type { CampaignTaskItem, QaRecord } from "@/lib/campaign-tasks/types";
+import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
+import {
+  evaluateReviewEligibility,
+  isEligibleForReview,
+} from "@/lib/studio-review-eligibility";
 
 import { hasAcceptedAcceptanceReview } from "./acceptance-review";
 import type { ProductionLaneView } from "./capacity";
@@ -105,6 +111,11 @@ export function canTransitionToBuildingConcepts(
 export function canSubmitForOwnerApproval(
   job: PurchasedJobRecord,
   requiredDeliverables: readonly string[],
+  qaContext?: {
+    tasks: readonly CampaignTaskItem[];
+    qaRecords: readonly QaRecord[];
+    production?: ServerProductionEnvelope | null;
+  },
 ): { allowed: boolean; reasons: GateBlockReason[] } {
   const reasons: GateBlockReason[] = [];
 
@@ -129,13 +140,60 @@ export function canSubmitForOwnerApproval(
     });
   }
 
+  if (qaContext) {
+    const eligibility = evaluateReviewEligibility({
+      jobId: job.jobId,
+      campaignId: job.campaignId,
+      skuId: job.skuId,
+      tasks: qaContext.tasks,
+      qaRecords: qaContext.qaRecords,
+      production: qaContext.production,
+    });
+    if (!isEligibleForReview(eligibility)) {
+      reasons.push({
+        code: "internal_qa_blocked",
+        message: eligibility.reasons[0] ?? "Internal QA has not passed for this review candidate.",
+      });
+    }
+  }
+
   return { allowed: reasons.length === 0, reasons };
 }
 
 export function canOwnerApproveForReview(
   job: PurchasedJobRecord,
+  qaContext?: {
+    tasks: readonly CampaignTaskItem[];
+    qaRecords: readonly QaRecord[];
+    production?: ServerProductionEnvelope | null;
+  },
 ): { allowed: boolean; reasons: GateBlockReason[] } {
-  return canOwnerActOnReviewGate(job);
+  const base = canOwnerActOnReviewGate(job);
+  if (!base.allowed) return base;
+  if (!qaContext) return base;
+
+  const eligibility = evaluateReviewEligibility({
+    jobId: job.jobId,
+    campaignId: job.campaignId,
+    skuId: job.skuId,
+    tasks: qaContext.tasks,
+    qaRecords: qaContext.qaRecords,
+    production: qaContext.production,
+  });
+  if (!isEligibleForReview(eligibility)) {
+    return {
+      allowed: false,
+      reasons: [
+        {
+          code: "internal_qa_blocked",
+          message:
+            eligibility.reasons[0] ??
+            "Internal QA has not passed for this review candidate.",
+        },
+      ],
+    };
+  }
+  return base;
 }
 
 export function canOwnerActOnReviewGate(

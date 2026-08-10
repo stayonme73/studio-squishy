@@ -1,13 +1,16 @@
 import type { JobReviewFeedback } from "./review-feedback-types";
 import type { JobActivityEventKind } from "./types";
 
-/** Client may access Review Room only when job is ready for their review. */
+/** Client may access Review Room only when job is ready and internally QA-authorized. */
 export function canClientAccessJobReview(job: {
   spineStatus: string;
   ownerApprovalPending?: string | null;
+  internalQaReviewAuthorization?: { status?: string } | null;
 }): boolean {
   if (job.ownerApprovalPending === "before_review") return false;
-  return job.spineStatus === "ready_for_review";
+  if (job.spineStatus !== "ready_for_review") return false;
+  // Fail closed: spine alone is not enough after QA-BEFORE-REVIEW-1.
+  return job.internalQaReviewAuthorization?.status === "ELIGIBLE_FOR_REVIEW";
 }
 
 /**

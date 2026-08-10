@@ -235,6 +235,21 @@ export type PurchasedJobRecord = {
   workPackets?: readonly JobWorkPacket[];
   /** Pre-production mutual understanding gate before production starts. */
   acceptanceReview?: JobAcceptanceReview;
+  /**
+   * Internal QA authorization pin — set only when opening customer Review.
+   * Customer Review access requires this after PRODUCTION-ASSURANCE-QA-BEFORE-REVIEW-1.
+   */
+  internalQaReviewAuthorization?: {
+    status: "ELIGIBLE_FOR_REVIEW";
+    decisionId: string;
+    packageId: string;
+    skuId: string;
+    qaRecordIds: readonly string[];
+    workVersionId: string | null;
+    contentSha256s: readonly string[];
+    artifactIds: readonly string[];
+    authorizedAt: string;
+  };
   /** Canonical File Room registry — metadata and storage refs only, never public provider links. */
   fileRegistry?: readonly StudioFileReference[];
   /** Client-facing final delivery files — shown in Final Delivery only. */

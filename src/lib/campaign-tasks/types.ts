@@ -261,6 +261,32 @@ export type QaRecord = {
    * Checklist attestation alone is not sufficient for those tasks.
    */
   audioQualityEvidence?: import("@/lib/studio-kitchen-production/voice-production").AudioQualityEvidence;
+  /**
+   * Video-family (`video_audio` short-video) per-artifact A/V QA evidence.
+   * Render/assembly success alone is not sufficient.
+   */
+  videoQualityEvidence?: import("@/lib/studio-kitchen-production/video-production").VideoQualityEvidence;
+  /**
+   * Bound review-candidate identity captured at QA pass time.
+   * Used by review-eligibility to prevent V1 PASS authorizing V2.
+   */
+  artifactBinding?: {
+    workVersionId?: string;
+    artifactIds?: readonly string[];
+    contentSha256s?: readonly string[];
+    scriptVersionId?: string;
+  };
+  /**
+   * Landing-page machine QA evidence bound to the exact HTML artifact.
+   * Checklist attestation alone is not sufficient for rm-j005 Review.
+   */
+  landingPageQaEvidence?: {
+    artifactId: string;
+    contentSha256: string;
+    workPacketVersion: string;
+    machineChecksOk: true;
+    checkIds: readonly string[];
+  };
 };
 
 export type WorkflowTransitionRequest = {

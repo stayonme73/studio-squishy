@@ -24,7 +24,12 @@ export {
   buildLandingPageDefinition,
   renderLandingPageHtml,
 } from "./render";
-export { runLandingPageMachineQa } from "./qa";
+export {
+  gateLandingPageQaForQaPass,
+  requiresLandingPageQaGate,
+  runLandingPageMachineQa,
+} from "./qa";
+export type { LandingPageQaEvidence, LandingPageQaPayload } from "./qa";
 export { persistLandingPageArtifact, assertV1Preserved, sha256Text } from "./bind";
 export {
   netlifyCredentialPresence,

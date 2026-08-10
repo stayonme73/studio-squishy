@@ -74,6 +74,17 @@ function job(overrides: Partial<PurchasedJobRecord> = {}): PurchasedJobRecord {
       { deliverableKey: "deliverable-0", label: "Post concepts", preparedAt: now },
       { deliverableKey: "deliverable-1", label: "Caption copy", preparedAt: now },
     ],
+    internalQaReviewAuthorization: {
+      status: "ELIGIBLE_FOR_REVIEW",
+      decisionId: "re-test",
+      packageId: "PRODUCTION-ASSURANCE-QA-BEFORE-REVIEW-1",
+      skuId: "sm-001",
+      qaRecordIds: ["qa-sm-001"],
+      workVersionId: null,
+      contentSha256s: [],
+      artifactIds: [],
+      authorizedAt: now,
+    },
     laneQueuedAt: now,
     updatedAt: now,
     ...overrides,
@@ -141,12 +152,19 @@ function envelopeWithStudioRelease(jobRecord: PurchasedJobRecord): ServerTasksEn
 }
 
 describe("review-room access", () => {
-  it("allows only ready_for_review without owner gate pending", () => {
-    expect(canClientAccessJobReview({ spineStatus: "ready_for_review" })).toBe(true);
+  it("allows only ready_for_review with internal QA authorization and no owner gate pending", () => {
+    expect(canClientAccessJobReview({ spineStatus: "ready_for_review" })).toBe(false);
+    expect(
+      canClientAccessJobReview({
+        spineStatus: "ready_for_review",
+        internalQaReviewAuthorization: { status: "ELIGIBLE_FOR_REVIEW" },
+      }),
+    ).toBe(true);
     expect(
       canClientAccessJobReview({
         spineStatus: "ready_for_review",
         ownerApprovalPending: "before_review",
+        internalQaReviewAuthorization: { status: "ELIGIBLE_FOR_REVIEW" },
       }),
     ).toBe(false);
     expect(canClientAccessJobReview({ spineStatus: "building_concepts" })).toBe(false);

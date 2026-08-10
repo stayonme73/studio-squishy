@@ -128,6 +128,9 @@ export function buildQaRecord(input: {
   copyQualityEvidence?: QaRecord["copyQualityEvidence"];
   designQualityEvidence?: QaRecord["designQualityEvidence"];
   audioQualityEvidence?: QaRecord["audioQualityEvidence"];
+  videoQualityEvidence?: QaRecord["videoQualityEvidence"];
+  landingPageQaEvidence?: QaRecord["landingPageQaEvidence"];
+  artifactBinding?: QaRecord["artifactBinding"];
 }): QaRecord {
   return {
     id: randomUUID(),
@@ -148,6 +151,9 @@ export function buildQaRecord(input: {
     copyQualityEvidence: input.copyQualityEvidence,
     designQualityEvidence: input.designQualityEvidence,
     audioQualityEvidence: input.audioQualityEvidence,
+    videoQualityEvidence: input.videoQualityEvidence,
+    landingPageQaEvidence: input.landingPageQaEvidence,
+    artifactBinding: input.artifactBinding,
   };
 }
 

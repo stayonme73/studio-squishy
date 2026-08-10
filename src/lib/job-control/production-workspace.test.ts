@@ -119,6 +119,113 @@ function envelope(job: PurchasedJobRecord): ServerTasksEnvelope {
   };
 }
 
+/** Minimal internal QA pass so Review entry can open under QA-BEFORE-REVIEW-1. */
+function withInternalQaPass(
+  env: ServerTasksEnvelope,
+  skuId: string = "sm-001",
+  familyId: ProductionTaskFamilyId = "social",
+): ServerTasksEnvelope {
+  const taskId = `${skuId}:qa`;
+  const catalogFamilyId =
+    familyId === "video_audio"
+      ? ("marketing_video" as const)
+      : familyId === "marketing_assets"
+        ? ("marketing_assets" as const)
+        : ("social_media" as const);
+  const qaTask: CampaignTaskItem = {
+    id: taskId,
+    title: `${skuId} QA`,
+    phase: "qa",
+    status: "ready",
+    relatedServiceIds: [skuId as never],
+    familyId,
+    catalogFamilyId,
+    serviceName: skuId,
+    dependsOn: [],
+    workflowState: "complete",
+  };
+
+  const baseRecord = {
+    id: `qa-${skuId}`,
+    taskId,
+    campaignId: env.campaignId,
+    createdAt: "2026-07-03T13:00:00.000Z",
+    actorUserId: "qa-1",
+    actorDisplayName: "QA",
+    actorRole: "qa" as const,
+    action: "qa_pass" as const,
+    checks: ["quality"],
+  };
+
+  const designEvidence = {
+    designQualityEvidence: {
+      evaluation: {
+        skuId,
+        fixtureId: "fixture",
+        ok: true,
+        findings: [],
+        checkedAt: "2026-07-03T13:00:00.000Z",
+        deterministicFailCount: 0,
+        judgmentRequired: true as const,
+        summary: "ok",
+      },
+      attestations: {
+        hierarchyReviewed: true,
+        readabilityReviewed: true,
+        spacingCompositionReviewed: true,
+        brandFitReviewed: true,
+        genericnessRejected: true,
+        exportReadinessReviewed: true,
+        notes: "ok",
+      },
+      gatePassed: true,
+    },
+    artifactBinding: {
+      artifactIds: [`${skuId}-art`],
+      contentSha256s: [`${skuId}-hash`],
+    },
+  };
+
+  const record =
+    skuId === "v2-rtu-short-video"
+      ? {
+          ...baseRecord,
+          videoQualityEvidence: {
+            evaluation: {
+              skuId,
+              ok: true,
+              findings: [],
+              checkedAt: "2026-07-03T13:00:00.000Z",
+              deterministicFailCount: 0,
+              judgmentRequired: true as const,
+              assemblyCapability: "present_and_usable" as const,
+              summary: "ok",
+            },
+            attestations: { timingReviewed: true } as never,
+            gatePassed: true,
+          },
+          artifactBinding: {
+            artifactIds: [`${skuId}-art`],
+            contentSha256s: [`${skuId}-hash`],
+          },
+        }
+      : skuId.startsWith("v2-rtu-") ||
+          familyId === "marketing_assets" ||
+          skuId === "sm-001" ||
+          skuId === "sm-001-monthly" ||
+          skuId === "bf-001" ||
+          skuId === "rm-j007"
+        ? { ...baseRecord, ...designEvidence }
+        : baseRecord;
+
+  const withoutDup = env.tasks.filter((entry) => entry.id !== taskId);
+  return {
+    ...env,
+    tasks: [...withoutDup, qaTask],
+    qaRecords: [...(env.qaRecords ?? []).filter((r) => r.taskId !== taskId), record],
+  };
+}
+
 function taskForJob(input: {
   skuId: string;
   serviceName: string;
@@ -302,7 +409,7 @@ describe("production workspace handoff actions", () => {
     }
 
     const submitted = applyProductionWorkspacePatch(
-      currentEnv,
+      withInternalQaPass(currentEnv),
       campaign(),
       job.jobId,
       { action: "submit_for_owner_approval" },
@@ -314,6 +421,9 @@ describe("production workspace handoff actions", () => {
     if (!submitted.ok) return;
     expect(submitted.job.ownerApprovalPending).toBeNull();
     expect(submitted.job.spineStatus).toBe("ready_for_review");
+    expect(submitted.job.internalQaReviewAuthorization?.status).toBe(
+      "ELIGIBLE_FOR_REVIEW",
+    );
     expect(
       (submitted.envelope.jobActivityEvents ?? []).some((event) => event.kind === "status_change"),
     ).toBe(true);
@@ -634,7 +744,7 @@ describe("internal Work Packet handoff", () => {
       expect(returned.job.workingFileRefs?.[0]?.url).toContain(`/final`);
 
       const submitted = applyProductionWorkspacePatch(
-        returned.envelope,
+        withInternalQaPass(returned.envelope, skuId, familyId),
         campaignRecord,
         job.jobId,
         { action: "submit_for_owner_approval" },
@@ -648,6 +758,9 @@ describe("internal Work Packet handoff", () => {
       if (!submitted.ok) return;
       expect(submitted.job.ownerApprovalPending).toBeNull();
       expect(submitted.job.spineStatus).toBe("ready_for_review");
+      expect(submitted.job.internalQaReviewAuthorization?.status).toBe(
+        "ELIGIBLE_FOR_REVIEW",
+      );
 
       const events = submitted.envelope.jobActivityEvents ?? [];
       expect(events.some((event) => event.kind === "work_packet_assigned")).toBe(true);

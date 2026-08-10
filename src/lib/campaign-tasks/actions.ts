@@ -21,6 +21,16 @@ import {
   requiresAudioQualityGate,
   type AudioQualityEvidence,
 } from "@/lib/studio-kitchen-production/voice-production";
+import {
+  gateVideoQualityForQaPass,
+  requiresVideoQualityGate,
+  type VideoQualityEvidence,
+} from "@/lib/studio-kitchen-production/video-production";
+import {
+  gateLandingPageQaForQaPass,
+  requiresLandingPageQaGate,
+  type LandingPageQaEvidence,
+} from "@/lib/studio-kitchen-production/landing-page";
 
 import {
   canClaimTask,
@@ -178,6 +188,16 @@ export type TasksPatchBody =
        * Deterministic artifact/script checks + recorded listening judgment attestations.
        */
       audioQuality?: import("@/lib/studio-kitchen-production/voice-production").AudioQualityQaPayload;
+      /**
+       * Required for short-video SKUs on video_audio creative|qa phases.
+       * Per-artifact A/V QA — render/assembly success alone is not sufficient.
+       */
+      videoQuality?: import("@/lib/studio-kitchen-production/video-production").VideoQualityQaPayload;
+      /**
+       * Required for landing_page QA phase (rm-j005).
+       * Re-runs sealed machine QA against the bound HTML artifact.
+       */
+      landingPageQa?: import("@/lib/studio-kitchen-production/landing-page").LandingPageQaPayload;
     }
   | {
       action: "qa_fail";
@@ -872,6 +892,60 @@ function assertQaAuthorized(
   return null;
 }
 
+function buildQaArtifactBinding(input: {
+  workVersionId?: string;
+  designQuality?: Extract<TasksPatchBody, { action: "qa_pass" }>["designQuality"];
+  audioQuality?: Extract<TasksPatchBody, { action: "qa_pass" }>["audioQuality"];
+  videoQuality?: Extract<TasksPatchBody, { action: "qa_pass" }>["videoQuality"];
+  landingPageQa?: Extract<TasksPatchBody, { action: "qa_pass" }>["landingPageQa"];
+}): NonNullable<import("./types").QaRecord["artifactBinding"]> | undefined {
+  const artifactIds: string[] = [];
+  const contentSha256s: string[] = [];
+  let scriptVersionId: string | undefined;
+
+  for (const artifact of input.designQuality?.submission.artifacts ?? []) {
+    artifactIds.push(artifact.id);
+    if (artifact.contentSha256) contentSha256s.push(artifact.contentSha256);
+  }
+  for (const artifact of input.audioQuality?.submission.artifacts ?? []) {
+    artifactIds.push(artifact.id);
+    if (artifact.contentSha256) contentSha256s.push(artifact.contentSha256);
+  }
+  if (input.audioQuality?.submission.scriptVersionId) {
+    scriptVersionId = input.audioQuality.submission.scriptVersionId;
+  }
+  for (const artifact of input.videoQuality?.submission.artifacts ?? []) {
+    artifactIds.push(artifact.id);
+    if (artifact.contentSha256) contentSha256s.push(artifact.contentSha256);
+  }
+  if (input.videoQuality?.submission.scriptVersionId) {
+    scriptVersionId = input.videoQuality.submission.scriptVersionId;
+  }
+  if (input.landingPageQa?.artifact) {
+    artifactIds.push(input.landingPageQa.artifact.artifactId);
+    if (input.landingPageQa.artifact.contentSha256) {
+      contentSha256s.push(input.landingPageQa.artifact.contentSha256);
+    }
+  }
+
+  const workVersionId = input.workVersionId?.trim() || undefined;
+  if (
+    !workVersionId &&
+    artifactIds.length === 0 &&
+    contentSha256s.length === 0 &&
+    !scriptVersionId
+  ) {
+    return undefined;
+  }
+
+  return {
+    workVersionId,
+    artifactIds: artifactIds.length ? artifactIds : undefined,
+    contentSha256s: contentSha256s.length ? contentSha256s : undefined,
+    scriptVersionId,
+  };
+}
+
 export function applyQaPass(
   envelope: ServerTasksEnvelope,
   body: Extract<TasksPatchBody, { action: "qa_pass" }>,
@@ -977,6 +1051,62 @@ export function applyQaPass(
     };
   }
 
+  let videoQualityEvidence: VideoQualityEvidence | undefined;
+  if (requiresVideoQualityGate(task)) {
+    if (!body.videoQuality) {
+      return {
+        ok: false,
+        error:
+          "Video-family QA pass requires videoQuality evaluation (bound MP4 + script/voice binding + per-artifact visual/listening attestations including A/V beat sync). Render/assembly success alone is not sufficient.",
+        status: 400,
+      };
+    }
+    const gated = gateVideoQualityForQaPass({
+      brief: body.videoQuality.brief,
+      submission: body.videoQuality.submission,
+      attestations: body.videoQuality.attestations,
+    });
+    if (!gated.gatePassed) {
+      return {
+        ok: false,
+        error:
+          gated.evaluation.summary ||
+          "Video quality gate failed — per-artifact A/V QA must pass before Review.",
+        status: 400,
+      };
+    }
+    videoQualityEvidence = {
+      evaluation: gated.evaluation,
+      attestations: body.videoQuality.attestations,
+      gatePassed: true,
+    };
+  }
+
+  let landingPageQaEvidence: LandingPageQaEvidence | undefined;
+  if (requiresLandingPageQaGate(task)) {
+    if (!body.landingPageQa) {
+      return {
+        ok: false,
+        error:
+          "Landing-page QA pass requires landingPageQa (bound HTML artifact + work packet) so sealed machine QA can re-run. Checklist attestation alone is not sufficient.",
+        status: 400,
+      };
+    }
+    const gated = gateLandingPageQaForQaPass(body.landingPageQa);
+    if (!gated.ok) {
+      return { ok: false, error: gated.error, status: 400 };
+    }
+    landingPageQaEvidence = gated.evidence;
+  }
+
+  const artifactBinding = buildQaArtifactBinding({
+    workVersionId: body.workVersionId,
+    designQuality: body.designQuality,
+    audioQuality: body.audioQuality,
+    videoQuality: body.videoQuality,
+    landingPageQa: body.landingPageQa,
+  });
+
   const actorRole = qaActorRole(user, context.assignments);
   const transitioned = transitionTask(
     envelope,
@@ -1004,6 +1134,9 @@ export function applyQaPass(
     copyQualityEvidence,
     designQualityEvidence,
     audioQualityEvidence,
+    videoQualityEvidence,
+    landingPageQaEvidence,
+    artifactBinding,
   });
 
   const withRecord = appendEnvelopeQaRecord(transitioned.envelope, record);

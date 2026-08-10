@@ -1,13 +1,92 @@
 import { readFileSync } from "fs";
 import path from "path";
 
+import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
+
 import type {
   LandingPageArtifactRecord,
   LandingPageDefinition,
   LandingPageWorkPacket,
   LandingQaCheck,
 } from "./types";
+import { LANDING_PAGE_SKU } from "./types";
 import { validateLandingPageWorkPacket } from "./validate";
+
+/** Formal landing QA phase — machine checks bound to exact HTML artifact. */
+export function requiresLandingPageQaGate(task: CampaignTaskItem): boolean {
+  if (task.familyId !== "landing_page") return false;
+  if (task.phase !== "qa") return false;
+  return task.relatedServiceIds.some((id) => id === LANDING_PAGE_SKU);
+}
+
+export type LandingPageQaPayload = {
+  packet: LandingPageWorkPacket;
+  definition: LandingPageDefinition;
+  artifact: LandingPageArtifactRecord;
+  /** Optional HTML; when omitted, bytes are read from artifact.relativePath. */
+  html?: string;
+  repoRoot?: string;
+};
+
+export type LandingPageQaEvidence = {
+  artifactId: string;
+  contentSha256: string;
+  workPacketVersion: string;
+  machineChecksOk: true;
+  checkIds: readonly string[];
+};
+
+export function gateLandingPageQaForQaPass(input: LandingPageQaPayload):
+  | { ok: true; evidence: LandingPageQaEvidence }
+  | { ok: false; error: string } {
+  const repoRoot = input.repoRoot ?? process.cwd();
+  let html = input.html;
+  if (!html) {
+    try {
+      html = readFileSync(path.join(repoRoot, input.artifact.relativePath), "utf8");
+    } catch {
+      return {
+        ok: false,
+        error: "Landing Page QA requires readable bound HTML artifact bytes.",
+      };
+    }
+  }
+
+  if (input.artifact.skuId !== LANDING_PAGE_SKU) {
+    return { ok: false, error: "Landing Page QA artifact SKU must be rm-j005." };
+  }
+
+  const machine = runLandingPageMachineQa({
+    repoRoot,
+    packet: input.packet,
+    definition: input.definition,
+    artifact: input.artifact,
+    html,
+  });
+
+  if (!machine.ok) {
+    const failed = machine.checks.filter((check) => !check.ok).map((check) => check.id);
+    return {
+      ok: false,
+      error: `Landing Page machine QA failed: ${failed.join(", ") || "checks incomplete"}.`,
+    };
+  }
+
+  if (!input.artifact.contentSha256.trim()) {
+    return { ok: false, error: "Landing Page QA requires artifact contentSha256." };
+  }
+
+  return {
+    ok: true,
+    evidence: {
+      artifactId: input.artifact.artifactId,
+      contentSha256: input.artifact.contentSha256,
+      workPacketVersion: input.artifact.workPacketVersion,
+      machineChecksOk: true,
+      checkIds: machine.checks.map((check) => check.id),
+    },
+  };
+}
 
 export function runLandingPageMachineQa(input: {
   repoRoot: string;

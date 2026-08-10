@@ -11,8 +11,10 @@ import type {
 
 /**
  * Design-quality gate for static visual production.
- * Applies to marketing_assets creative/qa work, and to social visual RTU SKUs
- * (e.g. v2-rtu-social-posts). Does NOT gate legacy sm-001 Kitchen V1 creative path.
+ * Applies to marketing_assets creative/qa work, social visual RTU SKUs,
+ * and profile-kit SKUs (rm-j002 / rm-j008) that use the certified Canva design method.
+ * Does NOT gate legacy sm-001 Kitchen V1 creative path (method-covered via
+ * design evidence or Kitchen work-version pin at Review eligibility).
  */
 export function requiresDesignQualityGate(task: CampaignTaskItem): boolean {
   const phaseOk =
@@ -25,7 +27,11 @@ export function requiresDesignQualityGate(task: CampaignTaskItem): boolean {
 
   if (task.familyId === "social") {
     return task.relatedServiceIds.some(
-      (id) => id.startsWith("v2-rtu-") || id === "ma-001",
+      (id) =>
+        id.startsWith("v2-rtu-") ||
+        id === "ma-001" ||
+        id === "rm-j002" ||
+        id === "rm-j008",
     );
   }
 
