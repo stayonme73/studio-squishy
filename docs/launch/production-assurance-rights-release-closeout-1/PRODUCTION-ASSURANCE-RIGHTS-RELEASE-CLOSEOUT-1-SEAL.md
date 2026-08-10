@@ -3,6 +3,7 @@
 **Package:** Close the live material-hold → Final Delivery seam  
 **Branch:** `assurance/rights-release-closeout-1`  
 **Starting tip:** `a314e314fb84f9326acecf28b72772b5c6fdc9bd`  
+**Package commit:** `73c7e6b157e966b904b5f578b5aa95b0e379a623`  
 **Final verdict:** SCENARIO I CLOSED ON LIVE FINAL DELIVERY PATH  
 **Status:** SEALED  
 **Scout:** PARKED  
@@ -27,17 +28,33 @@
 
 ---
 
+## Live release callers (sealed)
+
+- `applyReviewRoomPatch` approve → system release (+ review API materials)
+- `add_client_delivery_file` → system release (+ workspace materials)
+- Owner `owner_final_release` → material-use evaluated
+- Materials clear → `reevaluateSystemFinalDeliveryAfterMaterialChange`
+
+**Materials-ledger source:** durable campaign materials ledger (`CampaignMaterialItem.useDecision` / `useAuthorization`).
+
+---
+
+## Scenario I
+
+**PASS** — approved creative + unresolved material-use hold → delivery blocked; hold resolved + unchanged artifact → system may release without Tagia / without re-approval.
+
+---
+
 ## Git
 
 | Item | Value |
 |------|--------|
-| Package commit | _(filled after commit)_ |
-| Message | _(filled after commit)_ |
+| Package commit | `73c7e6b157e966b904b5f578b5aa95b0e379a623` |
+| Message | `fix(assurance): block Final Delivery on live material-use holds` |
 | Branch | `assurance/rights-release-closeout-1` |
-| Local HEAD | _(filled after push)_ |
-| Origin HEAD | _(filled after push)_ |
-| Ahead/behind | _(filled after push)_ |
 | Merge | none |
+
+Seal-record / tip SHA completed after push verification.
 
 ---
 
