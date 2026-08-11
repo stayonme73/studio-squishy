@@ -18,9 +18,10 @@ Scope: **`v2-rtu-flyer` only** — remaining 12 design SKUs untouched.
 
 | Field | Value |
 |-------|--------|
-| Package commit SHA | *(filled after commit)* |
-| Seal tip | same as package commit (this report) |
-| Branch | `operating/design-renderer-proof-1` |
+| Package commit SHA | `d2a1703d620e84d0f54c4e67288b03c2e6be6b5f` |
+| Seal tip | *(this docs commit — filled after tip)* |
+| Commit message (package) | `feat(operating): seal v2-rtu-flyer owner-independent auto-production` |
+| Pushed branch | `operating/design-renderer-proof-1` |
 | Upstream base | `f9a19c530d5be5dd2f6dfc7cc30692f8557bbaf7` (Dispatch seal) |
 
 ## Accepted stack sealed
@@ -45,7 +46,7 @@ READY_FOR_DISPATCH
 → durable Machine/Campaign truth
 ```
 
-## Final tests (pre-commit)
+## Final tests / result
 
 ```
 design-renderer-proof.test.ts — 10 PASS
@@ -60,37 +61,48 @@ payment-truth.test.ts — 15 PASS
 
 **70/70 PASS**
 
-## Capability locks (preserved)
-
-| Lock | Status |
-|------|--------|
-| Flyer-only observer | READY |
-| Idempotency (`ALREADY_RENDERED`) | READY |
-| Concurrency (one success) | READY |
-| Versioning on truth change | READY |
-| Fail-closed | READY |
-| QA binding on artifact | READY |
-| Artifact identity/hash | READY |
-| Owner production | **NONE** |
-| Canva (this SKU) | **OFF spine** |
+| Check | Result |
+|-------|--------|
+| Flyer-only observer | READY — ready flyer auto-invokes; non-flyer never invokes; non-ready skips |
+| Idempotency | READY — repeat → `ALREADY_RENDERED`; no new vN; no PNG/PDF churn |
+| Concurrency | READY — exclusive lock + post-lock lookup → one successful identity |
+| Versioning | READY — content/material fingerprint change → immutable vN+1; prior receipts preserved |
+| Failure behavior | Fail-closed — never delivery-ready; recorded; not routine Owner work |
+| QA binding | QA failure blocks success; receipt not reusable PASS |
+| Artifact identity/hash | Per-version identity + content hashes; current pointer to successful render |
+| Owner-independence | Routine Owner production = **NONE** |
+| Canva | **OFF** fulfillment spine for `v2-rtu-flyer` |
 | Make | **NOT REQUIRED NOW** |
-| Other 12 SKUs | **untouched** |
-| Upstream Payment/Activation/Routing/Dispatch | **protected** |
+| Other-12-SKU protection | Untouched — no global mapping / no implied certification |
+| Upstream package protection | Dispatch / Routing / Activation / Payment Truth regressions green |
 
-## Staging policy
+## Files included (package commit)
 
-**Included:** renderer module, dispatch hook/idempotency/observer, flyer SKU tool override, governing docs/reports, Owner-accepted Harbor proof `renders/v5`, materials SVG, proof script.
+Renderer (`src/lib/studio-design-renderer/**`), dispatch hook / idempotency / observer / map-flyer-job-truth, `ensure.ts` observer wiring, flyer `primaryTool` → `studio_design_renderer`, proof script, governing reports, Owner-accepted Harbor `renders/v5` + materials + `current-identity.json` → v5, this seal report path.
 
-**Excluded:** `data/**` runtime artifacts · Canva/tool-coordination/executor inspection side-packages · secrets · unrelated worktree files · merge to main.
+**Not included:** `data/**` · secrets · Canva / tool-coordination / executor side-packages · local test render churn v1–v4, v6+.
+
+## Git verification
+
+| Check | Value |
+|-------|--------|
+| Local HEAD | *(filled after tip + push)* |
+| Origin HEAD | *(filled after tip + push)* |
+| Ahead/behind | *(filled after tip + push)* |
+| Staging | empty (seal tip) |
+| Worktree (seal scope) | clean tracked seal files |
+| No secrets staged | confirmed |
+| No `/data` staged | confirmed |
+| Merge | **NOT PERFORMED** |
 
 ## Remaining design gap
 
-Eleven other Canva-primary design SKUs (plus any non-Canva design-adjacent paths) are **not** certified by this seal. Next SKU must be chosen deliberately by new renderer capability required — not a bulk migration.
+Remaining design SKUs stay on existing paths (Canva-primary where previously mapped). This seal does **not** migrate them.
 
 ## Exactly one recommended next package
 
 **Owner/Manager select the next single design SKU for a renderer-capability delta inspection (not implementation), comparing required layout/export surface to `v2-rtu-flyer` before authorizing any second auto-production lane.**
 
----
+## Scout
 
-*Git SHAs and push verification filled in after commit/push.*
+**PARKED**
