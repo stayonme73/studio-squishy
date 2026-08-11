@@ -15,8 +15,9 @@
 | Branch | `operating/post-pay-activation-consumer-1` |
 | Base (Payment Truth seal tip) | `438f6e137e427113f461eda7ce0c1be1d8cb78ef` |
 | Package commit SHA | `c9498b3da759e5e964181a61643bae823f50b56d` |
-| Seal tip | *(recorded in follow-up docs commit after this seal document is committed)* |
+| Seal tip | `71dca9cb755255d9b1bdf755eedd2844022ee843` |
 | Package commit message | `feat(operating): seal post-pay activation after confirmed payment` |
+| Seal docs commit message | `docs(operating): record Post-Pay Activation Consumer seal` |
 
 ---
 
@@ -100,16 +101,16 @@ Scoped regression before commit:
 
 ---
 
-## Git verification (filled after push)
+## Git verification
 
 | Check | Value |
 |-------|-------|
 | Pushed branch | `operating/post-pay-activation-consumer-1` |
-| Local HEAD | `SEE_AFTER_PUSH` |
-| Origin HEAD | `SEE_AFTER_PUSH` |
-| Ahead/behind | `SEE_AFTER_PUSH` |
-| Staging | empty |
-| Worktree | clean |
+| Local HEAD | *(filled after tip-record commit + push)* |
+| Origin HEAD | *(filled after push)* |
+| Ahead/behind | *(filled after push)* |
+| Staging | empty after clean push |
+| Worktree | clean after clean push |
 | Merge | **NONE** |
 
 ---
