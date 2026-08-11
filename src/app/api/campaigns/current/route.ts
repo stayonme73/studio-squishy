@@ -22,6 +22,7 @@ import {
 import { linkClientCampaign, updateUserCurrentCampaign } from "@/lib/auth/users";
 import type { CampaignRecord } from "@/config/studio-board";
 import { logAccessEvent } from "@/lib/security/access-log";
+import { ensureRoutingHandoff } from "@/lib/studio-routing-handoff";
 
 export async function GET(request: Request) {
   const user = await requireSession(request);
@@ -83,6 +84,12 @@ export async function PATCH(request: Request) {
       recordToUpsert,
       user.roles.includes("client") ? user.id : undefined,
     );
+
+    // Server-driven routing wake when intake/materials facts arrive via sync.
+    if (envelope.record.paymentTruth?.status === "confirmed") {
+      await ensureRoutingHandoff(envelope.record);
+    }
+
     let updatedUser = user;
 
     if (user.currentCampaignId !== record.campaignId) {

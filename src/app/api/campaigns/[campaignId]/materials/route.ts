@@ -28,6 +28,7 @@ import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
 import { syncMaterialsSummaryOnCampaign } from "@/lib/materials/campaign-summary";
 import { resolveMaterialsApiPayload } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials, writeMaterialsEnvelope } from "@/lib/materials/store";
+import { ensureRoutingHandoff } from "@/lib/studio-routing-handoff";
 import type { MaterialReviewStatus } from "@/lib/materials/types";
 import { appendMaterialActivityEvent } from "@/lib/project-activity/actions";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
@@ -279,6 +280,14 @@ export async function PATCH(request: Request, context: RouteContext) {
   const audience = resolveMaterialsAudience(request, user, campaignId, campaignEnvelope, assignments);
   const payload = resolveMaterialsApiPayload(saved, audience, campaignEnvelope.record);
   await syncMaterialsSummaryOnCampaign(campaignId, payload.blockingRequiredCount);
+
+  // Server-driven routing wake — materials truth may unlock ready_for_routing.
+  if (campaignEnvelope.record.paymentTruth?.status === "confirmed") {
+    const latest = await readCampaignEnvelope(campaignId);
+    if (latest?.record) {
+      await ensureRoutingHandoff(latest.record);
+    }
+  }
 
   return NextResponse.json({
     ...payload,

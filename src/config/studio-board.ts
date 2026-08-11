@@ -183,6 +183,11 @@ export type CampaignRecord = {
    */
   postPayActivation?: import("@/lib/studio-post-pay-activation/types").PostPayActivationRecord;
   /**
+   * Server-owned routing handoff — durable per-job decisions after ready_for_routing.
+   * Capability-level only; does not select vendors or execute dispatch.
+   */
+  routingHandoff?: import("@/lib/studio-routing-handoff/types").RoutingHandoffRecord;
+  /**
    * Write-once pre-acceptance payment authorization bound at successful payment.
    * Session decision storage is live-only; this is the durable audit reference.
    */

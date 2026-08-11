@@ -5,6 +5,7 @@ import {
   upsertCampaignRecord,
 } from "@/lib/campaign-store/store";
 import { ensurePostPayActivation } from "@/lib/studio-post-pay-activation";
+import { ensureRoutingHandoff } from "@/lib/studio-routing-handoff";
 
 import { applyPaidTruthToCampaignRecord } from "./apply-paid-record";
 import {
@@ -19,14 +20,15 @@ import {
 import type { PaymentConfirmationInput, PaymentConfirmationResult } from "./types";
 
 /**
- * Payment stays authoritative even when activation fails — pending_retry is
- * detectable and retriable on the next confirm / reconcile observation.
+ * Payment stays authoritative even when activation/routing fails — pending_retry
+ * is detectable and retriable on the next confirm / reconcile observation.
  */
 async function activateAfterPayment(
   campaign: CampaignRecord,
 ): Promise<CampaignRecord> {
-  const result = await ensurePostPayActivation(campaign);
-  return result.campaign;
+  const activated = await ensurePostPayActivation(campaign);
+  const routed = await ensureRoutingHandoff(activated.campaign);
+  return routed.campaign;
 }
 
 function alreadyConfirmed(campaign: CampaignRecord): boolean {
