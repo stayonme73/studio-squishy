@@ -18,7 +18,7 @@ import {
 import { CAMPAIGN_SYNC_EVENT, type CampaignSyncStatus } from "@/lib/campaign-store/types";
 import { campaignSaveStatusLabel } from "@/lib/campaign-save-status-label";
 import { readCampaignSyncStatus } from "@/lib/campaign-store/sync-client";
-import { markPaymentReceived, readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
+import { readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 function routeMapSyncStatusLabel(status: CampaignSyncStatus | null): string {
@@ -75,9 +75,9 @@ export default function CheckoutScene() {
   const editProjectHref = roadId != null ? projectBuilderHref(roadId) : "/studio-conversation-room";
 
   const handlePaymentComplete = useCallback(() => {
-    markPaymentReceived();
-    saveRouteMapJourneyStep("intake");
-    router.push("/studio-conversation-room?stage=intake");
+    // Legacy standalone checkout cannot invent paid truth — route to Conversation Room.
+    saveRouteMapJourneyStep("checkout");
+    router.push("/studio-conversation-room?stage=checkout");
   }, [router]);
 
   if (selectedServiceIds.length === 0 || !planSummary) {

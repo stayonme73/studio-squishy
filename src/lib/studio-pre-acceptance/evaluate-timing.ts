@@ -1,7 +1,62 @@
 import { getServiceById } from "@/catalog";
+import { isGuideRelativeDeadlineChoice } from "@/config/conversation-room-guide-v1";
 import { studioPreAcceptanceV1 } from "@/config/studio-pre-acceptance-v1";
 
 import type { PreAcceptanceTimingVerdict } from "./types";
+
+/**
+ * Resolve Conversation Room relative deadline bubbles into a planning horizon.
+ * Relative wording stays customer-facing truth; this only derives a date ceiling
+ * for catalog turnaround checks — never invents a confirmed calendar commitment.
+ */
+export type RelativeDeadlineHorizon =
+  | { kind: "none" }
+  | { kind: "open_urgency" }
+  | { kind: "horizon"; date: Date; calendarDays: number }
+  | { kind: "not_relative" };
+
+export function resolveRelativeDeadlineHorizon(
+  raw: string,
+  today: Date = new Date(),
+): RelativeDeadlineHorizon {
+  const trimmed = raw.trim();
+  if (!trimmed) return { kind: "none" };
+  const lower = trimmed.toLowerCase();
+
+  if (
+    lower === "no deadline yet" ||
+    lower === "skip for now" ||
+    lower === "not requested"
+  ) {
+    return { kind: "none" };
+  }
+
+  if (lower === "as soon as possible") {
+    return { kind: "open_urgency" };
+  }
+
+  const calendarDaysByChoice: Record<string, number> = {
+    "within 1 week": 7,
+    "within 2 weeks": 14,
+    "within 1 month": 30,
+    "more than 1 month": 45,
+  };
+
+  const days = calendarDaysByChoice[lower];
+  if (days != null) {
+    const base = startOfLocalDay(today);
+    const date = new Date(base);
+    date.setDate(date.getDate() + days);
+    return { kind: "horizon", date, calendarDays: days };
+  }
+
+  if (isGuideRelativeDeadlineChoice(trimmed)) {
+    /* Defensive: known relative list member without a horizon map. */
+    return { kind: "open_urgency" };
+  }
+
+  return { kind: "not_relative" };
+}
 
 export type TimingEvaluationResult = {
   verdict: PreAcceptanceTimingVerdict;
@@ -47,7 +102,32 @@ export function evaluateTimingTruth(input: {
     };
   }
 
-  const parsed = parseCustomerDeadline(raw);
+  const relative = resolveRelativeDeadlineHorizon(raw);
+  if (relative.kind === "none") {
+    return {
+      verdict: "NO_KNOWN_TIMING_CONFLICT",
+      reason: "No fixed deadline requested.",
+      requiredMinBusinessDays: catalog.requiredMinBusinessDays,
+      availableBusinessDays: null,
+      evidenceSource: catalog.evidenceSource,
+    };
+  }
+  if (relative.kind === "open_urgency") {
+    /* ASAP — urgency noted, no fixed ceiling to violate. */
+    return {
+      verdict: "NO_KNOWN_TIMING_CONFLICT",
+      reason:
+        "Customer asked for the soonest workable timing without a fixed date. Catalog turnaround still applies when a date is set. This is not a capacity or on-time delivery guarantee.",
+      requiredMinBusinessDays: catalog.requiredMinBusinessDays,
+      availableBusinessDays: null,
+      evidenceSource: catalog.evidenceSource,
+    };
+  }
+
+  const parsed =
+    relative.kind === "horizon"
+      ? relative.date
+      : parseCustomerDeadline(raw);
   if (!parsed) {
     return {
       verdict: "CLARIFICATION_NEEDED",

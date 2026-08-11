@@ -1,5 +1,7 @@
-export { runCertVideoMachineQa } from "./machine-qa";
-export type { MachineQaCheck } from "./machine-qa";
+/**
+ * Browser-safe video cert constants.
+ * Node-only machine QA: import from `./machine-qa` (server/test only).
+ */
 export {
   CERT_VIDEO_CERTIFIED_SKU,
   CERT_VIDEO_CUSTOMER_READY_STATUS,

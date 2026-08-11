@@ -8,8 +8,8 @@ export const payment = {
   /** Customer-facing page title — honest for non-live card processing. */
   pageTitle: "Review and Confirm",
   pageLeadLines: [
-    "Review your Studio Plan, then confirm to continue.",
-    "This build records your plan locally so Project Intake can open next. Card payment processing is not connected yet.",
+    "Review your Studio Plan, then continue to secure checkout.",
+    "Payment is confirmed by Stripe. Returning to this page alone does not mark your project paid.",
   ] as const,
   backToStudioPlanLabel: "← Back to Studio Plan",
   editProjectLabel: "Edit Project",
@@ -18,11 +18,15 @@ export const payment = {
   sections: {
     summary: "Your Studio Plan",
     deliverables: "Selected services",
-    billing: "Contact Information",
-    payment: "Checkout details",
+    /** Hosted Stripe Checkout — confirm plan, then redirect (no local card form). */
+    confirm: "Confirm and continue",
     next: "What Happens Next",
-    /** @deprecated use billing + payment */
-    form: "Checkout",
+    /** @deprecated Hosted Checkout does not collect contact/card in The Studio. */
+    billing: "Contact Information",
+    /** @deprecated Card entry is Stripe-hosted only. */
+    payment: "Checkout details",
+    /** @deprecated use confirm */
+    form: "Confirm and continue",
   },
   summary: {
     recommendedServicesLabel: "Selected services",
@@ -30,7 +34,7 @@ export const payment = {
     monthlySubtotalLabel: "Monthly Subtotal",
     amountDueTodayLabel: "Estimated Investment",
     cardProcessingDisclosureNote:
-      "Estimated Investment reflects your selected services. Live card processing is not connected in this build.",
+      "Estimated Investment reflects your selected services. The amount charged is confirmed server-side with Stripe.",
     investmentLabel: "Estimated Investment",
     monthlyTotalLabel: "Monthly Total",
     includesLabel: "Includes:",
@@ -38,13 +42,21 @@ export const payment = {
     notesLabel: "Studio Notes",
   },
   form: {
+    /** @deprecated Not collected on hosted Checkout — Stripe collects payment details. */
     fullName: "Full Name",
+    /** @deprecated Not collected on hosted Checkout. */
     businessName: "Business Name",
+    /** @deprecated Not collected on hosted Checkout — optional on Stripe. */
     email: "Email",
+    /** @deprecated Not collected on hosted Checkout. */
     phone: "Phone",
+    /** @deprecated Forbidden on Studio hosted-checkout UI — Stripe only. */
     cardNumber: "Card Number",
+    /** @deprecated Forbidden on Studio hosted-checkout UI — Stripe only. */
     expDate: "Exp Date",
+    /** @deprecated Forbidden on Studio hosted-checkout UI — Stripe only. */
     cvv: "CVV",
+    /** @deprecated Forbidden on Studio hosted-checkout UI — Stripe only. */
     zipCode: "ZIP Code",
     acknowledgmentHeading: "Before you continue",
     acknowledgmentBody: [
@@ -54,18 +66,21 @@ export const payment = {
     termsLabel:
       "I reviewed my Studio Plan and understand that confirming checkout and completing Project Intake are required before work can move forward.",
     viewPlanDetailsLabel: "View your selected plan details above",
-    submitLabel: "Confirm and continue to Project Intake",
+    submitLabel: "Continue to secure checkout",
     paymentSecurityNote:
-      "This checkout step records your Studio Plan on this device so you can continue to Project Intake. Card payment processing is not connected in this build.",
+      "You will complete payment on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms the payment.",
     paymentReassurance:
-      "Card payment processing is not connected in this build. Confirming continues you to Project Intake.",
+      "Continue opens Stripe Checkout. Your project stays unpaid until Stripe confirms payment.",
   },
-  /** Local dev or NEXT_PUBLIC_PAYMENT_SANDBOX=1 (Vercel Preview only — not Production). */
+  /**
+   * Developer fixture only — hidden from normal customer checkout.
+   * Visible when NEXT_PUBLIC_DEV_TOOLS=1 or ?studioPaymentSandbox=1.
+   */
   sandbox: {
     label: "Developer Sandbox",
-    hint: "Simulates a successful checkout for journey testing. No card is charged.",
-    buttonLabel: "Test continue to Project Intake",
-    badge: "Test only",
+    hint: "Local fixture only. Does not open Stripe Checkout.",
+    buttonLabel: "Test pay with sandbox confirm",
+    badge: "Dev only",
   },
   whatsNext: {
     steps: [
@@ -80,9 +95,9 @@ export const payment = {
       "You can follow project status on your Studio Board after Project Intake. Automated stage emails are not sent in this build.",
   },
   secureNote:
-    "This checkout step records your Studio Plan locally so you can continue to Project Intake. Card payment processing is not connected in this build.",
+    "Payment truth comes from Stripe confirmation. The success return page is not fulfillment by itself.",
   intakeExplanation:
-    "After you confirm checkout, Project Intake opens so you can share the details and materials we need for your approved Studio Plan.",
+    "After Stripe confirms payment, Project Intake opens so you can share the details and materials we need for your approved Studio Plan.",
   routes: {
     studioBoard: "/studio-board",
     studioGuide: legacyRouteQuarantineV1.activeFrontDoor,

@@ -1,5 +1,3 @@
-import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
-
 import { evaluateVideoArtifactBindings } from "./artifact-binding";
 import { evaluateCustomerAssetTruth } from "./asset-truth";
 import {
@@ -22,16 +20,8 @@ export function isVideoProductionSku(skuId: string): boolean {
   return VIDEO_SKU_SET.has(skuId);
 }
 
-/** Video QA gate for marketing_video / short-video SKUs — not voice SKUs. */
-export function requiresVideoQualityGate(task: CampaignTaskItem): boolean {
-  const phaseOk =
-    task.phase === "creative" ||
-    task.phase === "creative_production" ||
-    task.phase === "qa";
-  if (!phaseOk) return false;
-  if (task.familyId !== "video_audio") return false;
-  return task.relatedServiceIds.some((id) => isVideoProductionSku(id));
-}
+/** Video QA gate for short-video SKUs — predicate lives in browser-safe quality-gates. */
+export { requiresVideoQualityGate } from "../quality-gates";
 
 function pushFail(
   findings: VideoQualityFinding[],

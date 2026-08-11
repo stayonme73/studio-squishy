@@ -8,7 +8,7 @@ import type {
   TaskEffectiveStatus,
   TaskWorkflowState,
 } from "@/lib/campaign-tasks/types";
-import type { KitchenProductionContractSummary } from "@/lib/studio-kitchen-production";
+import type { KitchenProductionContractSummary } from "@/lib/studio-kitchen-production/types";
 
 /** Where a Kitchen folder's data came from. Fixtures never masquerade as live. */
 export type KitchenDataSource = "live_production" | "fixture_demo";

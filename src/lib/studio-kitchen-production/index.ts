@@ -216,7 +216,6 @@ export {
   CERT_VIDEO_OWNER_VERDICT,
   CERT_VIDEO_PACKAGE_ID,
   CERT_VIDEO_V5_ARTIFACT,
-  runCertVideoMachineQa,
 } from "./video-cert";
 export {
   CERT_VOICE_APPROVED_ARTIFACT,
@@ -231,8 +230,12 @@ export {
   CERT_VOICE_TESTED_SKUS,
   gateCertVoiceListeningApproval,
   ownerListeningPassAttestationsForCertifiedArtifact,
-  readCertVoiceBindingManifest,
 } from "./cert-voice";
+/**
+ * Node-only machine QA / binding registry: import from
+ * `@/lib/studio-kitchen-production/server` (not this barrel).
+ * Quality-gate predicates: `./quality-gates` (also re-exported via evaluate barrels).
+ */
 export type {
   AudioArtifactRef,
   AudioCapabilityFinding,

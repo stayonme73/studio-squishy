@@ -70,11 +70,8 @@ export function mergeCustomerOwnedCampaignSync(
     );
 
     if (incoming.approvedStudioPlan) bootstrapped.approvedStudioPlan = incoming.approvedStudioPlan;
-    if (incoming.paymentReceivedAt) bootstrapped.paymentReceivedAt = incoming.paymentReceivedAt;
-    if (incoming.preAcceptancePaymentAuthorization) {
-      bootstrapped.preAcceptancePaymentAuthorization =
-        incoming.preAcceptancePaymentAuthorization;
-    }
+    // paymentReceivedAt / paymentTruth / preAcceptancePaymentAuthorization are
+    // server-owned — never bootstrap from untrusted client sync.
     if (incoming.revisionRoundsIncluded != null) {
       bootstrapped.revisionRoundsIncluded = incoming.revisionRoundsIncluded;
     }
@@ -91,15 +88,22 @@ export function mergeCustomerOwnedCampaignSync(
   if (!existing.approvedStudioPlan && incoming.approvedStudioPlan) {
     merged.approvedStudioPlan = incoming.approvedStudioPlan;
   }
-  if (!existing.paymentReceivedAt && incoming.paymentReceivedAt) {
-    merged.paymentReceivedAt = incoming.paymentReceivedAt;
+  // Reject client attempts to invent or upgrade payment truth.
+  if (existing.paymentReceivedAt) {
+    merged.paymentReceivedAt = existing.paymentReceivedAt;
+  } else {
+    delete merged.paymentReceivedAt;
   }
-  if (
-    !existing.preAcceptancePaymentAuthorization &&
-    incoming.preAcceptancePaymentAuthorization
-  ) {
+  if (existing.paymentTruth) {
+    merged.paymentTruth = existing.paymentTruth;
+  } else {
+    delete merged.paymentTruth;
+  }
+  if (existing.preAcceptancePaymentAuthorization) {
     merged.preAcceptancePaymentAuthorization =
-      incoming.preAcceptancePaymentAuthorization;
+      existing.preAcceptancePaymentAuthorization;
+  } else {
+    delete merged.preAcceptancePaymentAuthorization;
   }
   if (existing.revisionRoundsIncluded == null && incoming.revisionRoundsIncluded != null) {
     merged.revisionRoundsIncluded = incoming.revisionRoundsIncluded;

@@ -13,12 +13,10 @@ export {
   countScriptWords,
 } from "./fixtures";
 
-export {
-  CERT_VOICE_BINDING_MANIFEST_REL,
-  expectedCertVoiceDefaults,
-  readCertVoiceBindingManifest,
-} from "./artifact-registry";
-export type { CertVoiceBoundArtifact } from "./artifact-registry";
+/**
+ * Node-only binding registry: import from `./artifact-registry` (server/test only).
+ * Do not re-export here — keeps fixture/constants safe for closeout → pre-acceptance client graphs.
+ */
 
 export {
   CERT_VOICE_APPROVED_ARTIFACT,

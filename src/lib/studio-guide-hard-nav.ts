@@ -155,8 +155,17 @@ export function applyGuideAnswerToDraft(
   } else if (fromStep === "ask_business_name") {
     next.businessName = skipped ? "" : trimmed;
   } else if (fromStep === "ask_deadline") {
-    next.requestedDeadline = skipped ? "" : trimmed;
-    next.deadlineStatus = skipped || !trimmed ? "not_requested" : "unconfirmed";
+    const noDeadlinePhrase =
+      !trimmed ||
+      /^no deadline yet$/i.test(trimmed) ||
+      /^skip for now$/i.test(trimmed);
+    if (skipped || noDeadlinePhrase) {
+      next.requestedDeadline = "";
+      next.deadlineStatus = "not_requested";
+    } else {
+      next.requestedDeadline = trimmed;
+      next.deadlineStatus = "unconfirmed";
+    }
   } else if (fromStep === "ask_materials") {
     next.existingMaterialsNote = skipped ? "" : trimmed;
   }

@@ -9,7 +9,7 @@ import {
   requiresCopyQualityGate,
   requiresDesignQualityGate,
   requiresVideoQualityGate,
-} from "@/lib/studio-kitchen-production";
+} from "@/lib/studio-kitchen-production/quality-gates";
 
 import { evaluateCategoryEvidenceGaps } from "./sku-evidence";
 import type {

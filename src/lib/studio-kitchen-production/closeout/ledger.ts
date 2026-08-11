@@ -7,11 +7,12 @@ import { getServiceById } from "@/catalog/accessors";
 import { getRouteMapPriceDisplay } from "@/catalog/route-map-display";
 
 import { ACTIVE_CUSTOMER_FACING_SKUS } from "../active-set";
-import { CERT_COPY_SKUS } from "../cert-copy";
-import { CERT_DESIGN_TESTED_SKUS } from "../cert-design";
-import { CERT_VOICE_TESTED_SKUS } from "../cert-voice";
+/** Deep imports — avoid Kitchen cert barrels that pull Node-only QA/runtime into client graphs. */
+import { CERT_COPY_SKUS } from "../cert-copy/fixture";
+import { CERT_DESIGN_TESTED_SKUS } from "../cert-design/fixtures";
+import { CERT_VOICE_TESTED_SKUS } from "../cert-voice/fixtures";
 import { resolveServiceProductionContract } from "../resolve-contract";
-import { CERT_VIDEO_CERTIFIED_SKU } from "../video-cert";
+import { CERT_VIDEO_CERTIFIED_SKU } from "../video-cert/finalization";
 
 import type {
   CloseoutVerdict,

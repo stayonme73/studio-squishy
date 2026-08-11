@@ -175,6 +175,19 @@ describe("PRODUCTION-ASSURANCE-PRE-ACCEPTANCE-GATE-1", () => {
     expect(decision.paymentAllowed).toBe(false);
   });
 
+  it("treats guide relative deadline Within 2 weeks as readable planning horizon", () => {
+    const decision = evaluatePreAcceptance(
+      baseFacts({
+        requestedDeadline: "Within 2 weeks",
+        deadlineStatus: "unconfirmed",
+      }),
+    );
+    expect(decision.timing.reason).not.toBe(
+      studioPreAcceptanceV1.customerCopy.timingInvalid,
+    );
+    expect(decision.timing.verdict).not.toBe("CLARIFICATION_NEEDED");
+  });
+
   it("requires clarification for ambiguous timing", () => {
     const decision = evaluatePreAcceptance(
       baseFacts({
@@ -340,7 +353,9 @@ describe("PRODUCTION-ASSURANCE-PRE-ACCEPTANCE-GATE-1", () => {
       const authorization = buildPreAcceptancePaymentAuthorization(clear);
       expect(authorization?.decisionId).toBe(clear.decisionId);
 
-      const paid = markPaymentReceived(undefined, authorization);
+      const paid = markPaymentReceived(undefined, authorization, {
+        authority: "test_fixture",
+      });
       expect(paid?.paymentReceivedAt).toBeTruthy();
       expect(paid?.preAcceptancePaymentAuthorization?.decisionId).toBe(
         clear.decisionId,

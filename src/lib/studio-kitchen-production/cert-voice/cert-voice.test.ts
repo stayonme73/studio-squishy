@@ -26,10 +26,14 @@ import {
 } from "@/lib/studio-kitchen-production/voice-production";
 
 import {
+  CERT_VOICE_BINDING_MANIFEST_REL,
+  expectedCertVoiceDefaults,
+  readCertVoiceBindingManifest,
+} from "./artifact-registry";
+import {
   CERT_VOICE_APPROVED_ARTIFACT,
   CERT_VOICE_APPROVED_SCRIPT,
   CERT_VOICE_ARTIFACT_ROOT,
-  CERT_VOICE_BINDING_MANIFEST_REL,
   CERT_VOICE_CAMPAIGN_ID,
   CERT_VOICE_CUSTOMER_READY_STATUS,
   CERT_VOICE_FIXTURE_LABEL,
@@ -41,10 +45,8 @@ import {
   CERT_VOICE_TESTED_SKUS,
   certVoiceScriptDiffSummary,
   countScriptWords,
-  expectedCertVoiceDefaults,
   gateCertVoiceListeningApproval,
   ownerListeningPassAttestationsForCertifiedArtifact,
-  readCertVoiceBindingManifest,
 } from "./index";
 
 vi.mock("@/lib/draft-intake", () => ({

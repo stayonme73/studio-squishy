@@ -1,3 +1,7 @@
+/**
+ * Browser-safe Studio Kitchen projection helpers.
+ * Server loaders: import from `@/lib/studio-kitchen/load-projection`.
+ */
 export {
   buildKitchenProductionFolderFromFixture,
   buildKitchenProductionFolderFromLive,
@@ -17,10 +21,6 @@ export {
   kitchenFixtureCampaignIds,
   kitchenFixtureCampaignSeed,
 } from "./fixture-boundary";
-export {
-  loadKitchenProjectionBoard,
-  loadKitchenProjectionDetail,
-} from "./load-projection";
 export {
   jobSpineStatusLabel,
   projectKitchenBucketFromSpine,

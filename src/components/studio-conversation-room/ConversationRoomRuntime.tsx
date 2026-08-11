@@ -50,15 +50,16 @@ import {
   guideDraftFromOpening,
   isConversationJourneyComplete,
   openingFromGuideDraft,
+  clearRouteRecommendation,
   persistAddService,
   persistConversationStage,
   persistOpeningAnswers,
   persistRemoveService,
   persistRouteRecommendation,
   persistSelectedRoute,
+  readActiveRouteRecommendation,
   readConversationStage,
   readOpeningAnswers,
-  readRouteRecommendation,
   readSelectedRoute,
   readSelectedServices,
   recordIntakeSubmission,
@@ -74,16 +75,20 @@ import {
 import { saveRouteMapJourneyStep } from "@/lib/route-map-campaign";
 import { readUsableIntakeDraftAnswers } from "@/lib/route-map-intake-continuity";
 import {
-  markPaymentReceived,
+  applyServerPaymentTruthToLocalCampaign,
   readCurrentCampaignHydrated,
 } from "@/lib/studio-board-campaign";
 import {
+  confirmSandboxCheckoutClient,
+  reconcileCheckoutClient,
+  startHostedCheckout,
+} from "@/lib/studio-payment/client";
+import { studioPaymentV1 } from "@/config/studio-payment-v1";
+import {
   assertPreAcceptanceAllowsPayment,
-  buildPreAcceptancePaymentAuthorization,
   isClearToAccept,
   projectFactsFromWorkingDraft,
   runPreAcceptanceForCheckout,
-  studioPreAcceptanceV1,
 } from "@/lib/studio-pre-acceptance";
 import {
   bootConversationRoomState,
@@ -102,6 +107,7 @@ import {
   startNewGuideCaptureConversation,
   type GuideCaptureDraftV1,
 } from "@/lib/studio-guide-capture";
+import { resolveGuideAnswerFromUi } from "@/lib/studio-guide-answer-resolve";
 import {
   applyGuideAnswerToDraft,
   clearGuideUiStep,
@@ -422,7 +428,10 @@ export default function ConversationRoomRuntime({
       restoredStage === "opening" ? "none" : STAGE_DEFAULT_PANEL[restoredStage],
     );
     if (restoredStage === "route") {
-      const savedRec = readRouteRecommendation(project)?.roadId;
+      const savedRec = readActiveRouteRecommendation(
+        project,
+        hydratedGuide.projectNeed,
+      )?.roadId;
       const fromNeed = recommendRouteFromProjectNeed(
         hydratedGuide.projectNeed,
       );
@@ -538,10 +547,15 @@ export default function ConversationRoomRuntime({
     persistGuideDraft(nextDraft);
     setDraft(nextDraft);
     const base = projectDraft ?? bootConversationProjectDraft(nextDraft);
-    const nextProject = persistOpeningAnswers(
+    let nextProject = persistOpeningAnswers(
       base,
       openingFromGuideDraft(nextDraft),
     );
+    const priorNeed = readOpeningAnswers(base).projectNeed.trim().toLowerCase();
+    const nextNeed = nextDraft.projectNeed.trim().toLowerCase();
+    if (priorNeed && nextNeed && priorNeed !== nextNeed) {
+      nextProject = clearRouteRecommendation(nextProject);
+    }
     setProjectDraft(nextProject);
     pulseSaved();
   }
@@ -584,50 +598,15 @@ export default function ConversationRoomRuntime({
     handleSelectRoad(roadId);
   }
 
-  function resolveAnswerFromUi(questionStep: GuideConversationStep): {
-    answer: string;
-    skipped: boolean;
-  } {
-    const question = getConversationRoomGuideQuestion(questionStep);
-    const typed = textDraftRef.current.trim();
-    if (
-      question?.bubbleMode === "multi" &&
-      selectedBubbles.length > 0 &&
-      !selectedBubbles.includes("Skip for now")
-    ) {
-      const fromBubbles = selectedBubbles.join(", ");
-      const answer = typed
-        ? `${fromBubbles}${typed ? ` — ${typed}` : ""}`
-        : fromBubbles;
-      return { answer, skipped: false };
-    }
-    if (selectedBubbles.includes("Skip for now") && !typed) {
-      return { answer: "", skipped: true };
-    }
-    if (selectedBubbles.includes("No deadline yet") && !typed) {
-      return { answer: "", skipped: true };
-    }
-    if (
-      question?.opensDateFieldBubble &&
-      selectedBubbles.includes(question.opensDateFieldBubble) &&
-      !typed
-    ) {
-      return { answer: "", skipped: false };
-    }
-    if (typed) return { answer: typed, skipped: false };
-    if (selectedBubbles.length === 1) {
-      const bubble = selectedBubbles[0];
-      if (bubble === "Skip for now") return { answer: "", skipped: true };
-      return { answer: bubble, skipped: false };
-    }
-    return { answer: "", skipped: false };
-  }
-
   function handleContinue() {
     const question = getConversationRoomGuideQuestion(step);
     if (!question) return;
 
-    const { answer, skipped } = resolveAnswerFromUi(step);
+    const { answer, skipped } = resolveGuideAnswerFromUi({
+      step,
+      typed: textDraftRef.current,
+      selectedBubbles,
+    });
 
     if (step === "ask_preferred_name" && !answer.trim()) {
       setError("Please tell me what name you’d like me to use.");
@@ -826,7 +805,7 @@ export default function ConversationRoomRuntime({
     setDetailJobId(null);
     const base = projectDraft ?? bootConversationProjectDraft(draft);
     const recommended =
-      readRouteRecommendation(base)?.roadId ??
+      readActiveRouteRecommendation(base, draft.projectNeed)?.roadId ??
       recommendRouteFromProjectNeed(draft.projectNeed);
     setStageAndPersist("route");
     closeActivityPanel();
@@ -898,17 +877,27 @@ export default function ConversationRoomRuntime({
     closeActivityPanel();
   }
 
+  function advanceToIntakeAfterPaid() {
+    if (paymentCompleteGuardRef.current) return;
+    paymentCompleteGuardRef.current = true;
+    saveRouteMapJourneyStep("intake");
+    setDetailJobId(null);
+    setIntakeLiveAnswers(null);
+    setPlanBridgeError(null);
+    setStageAndPersist("intake");
+    openPanel("intake");
+    speakStudioLine(conversationRoomGuideV1.checkoutPaymentSuccessVoice);
+  }
+
   /**
-   * Payment success must be explicit (markPaymentReceived) before Intake.
-   * Stay in the Conversation Room. Legacy intake URLs redirect back here.
-   * Re-asserts CLEAR and binds durable authorization evidence onto the Campaign Record.
+   * Complete Checkout → Stripe-hosted Checkout only.
+   * Browser return alone never marks paid — webhook/reconcile does.
    */
-  function handleCheckoutPaymentComplete() {
+  async function handleCheckoutPaymentComplete() {
     if (paymentCompleteGuardRef.current) return;
     const project = projectDraft ?? bootConversationProjectDraft(draft);
-    const gate = assertPreAcceptanceAllowsPayment(
-      projectFactsFromWorkingDraft(project),
-    );
+    const facts = projectFactsFromWorkingDraft(project);
+    const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
       setStageAndPersist("plan");
@@ -917,24 +906,132 @@ export default function ConversationRoomRuntime({
         gate.decision?.voiceLine ??
           conversationRoomGuideV1.preAcceptanceClarificationVoice,
       );
-      return;
+      throw new Error(gate.message);
     }
-    const authorization = buildPreAcceptancePaymentAuthorization(gate.decision);
-    if (!authorization) {
-      setPlanBridgeError(studioPreAcceptanceV1.customerCopy.missingDecision);
-      setStageAndPersist("plan");
-      closeActivityPanel();
-      return;
+
+    const campaign = readCurrentCampaignHydrated();
+    if (!campaign?.campaignId) {
+      setPlanBridgeError(studioPaymentV1.customerCopy.amountInvalid);
+      throw new Error(studioPaymentV1.customerCopy.amountInvalid);
     }
-    paymentCompleteGuardRef.current = true;
-    markPaymentReceived(undefined, authorization);
-    saveRouteMapJourneyStep("intake");
-    setDetailJobId(null);
-    setIntakeLiveAnswers(null);
-    setStageAndPersist("intake");
-    openPanel("intake");
-    speakStudioLine(conversationRoomGuideV1.checkoutPaymentSuccessVoice);
+
+    setPlanBridgeError(null);
+    const started = await startHostedCheckout({
+      campaignId: campaign.campaignId,
+      facts,
+    });
+    if (!started.ok) {
+      setPlanBridgeError(started.message);
+      throw new Error(started.message);
+    }
+
+    if (started.mode !== "stripe" || !started.url) {
+      const message = studioPaymentV1.customerCopy.processorNotConfigured;
+      setPlanBridgeError(message);
+      throw new Error(message);
+    }
+
+    window.location.assign(started.url);
   }
+
+  /**
+   * Developer fixture only — synthetic session + sandbox-confirm.
+   * Never proof of Stripe hosted Checkout integration.
+   */
+  async function handleSandboxCheckoutConfirm() {
+    if (paymentCompleteGuardRef.current) return;
+    const project = projectDraft ?? bootConversationProjectDraft(draft);
+    const facts = projectFactsFromWorkingDraft(project);
+    const gate = assertPreAcceptanceAllowsPayment(facts);
+    if (!gate.allowed) {
+      setPlanBridgeError(gate.message);
+      throw new Error(gate.message);
+    }
+
+    const campaign = readCurrentCampaignHydrated();
+    if (!campaign?.campaignId) {
+      setPlanBridgeError(studioPaymentV1.customerCopy.amountInvalid);
+      throw new Error(studioPaymentV1.customerCopy.amountInvalid);
+    }
+
+    setPlanBridgeError(null);
+    const started = await startHostedCheckout({
+      campaignId: campaign.campaignId,
+      facts,
+      preferSandbox: true,
+    });
+    if (!started.ok) {
+      setPlanBridgeError(started.message);
+      throw new Error(started.message);
+    }
+    if (started.mode !== "sandbox") {
+      const message = studioPaymentV1.customerCopy.sandboxFixtureOnly;
+      setPlanBridgeError(message);
+      throw new Error(message);
+    }
+
+    const confirmed = await confirmSandboxCheckoutClient(
+      started.checkoutSessionId,
+    );
+    if (!confirmed.ok) {
+      setPlanBridgeError(confirmed.message);
+      throw new Error(confirmed.message);
+    }
+    const local = applyServerPaymentTruthToLocalCampaign(confirmed.campaign);
+    if (!local?.paymentReceivedAt) {
+      setPlanBridgeError(studioPaymentV1.customerCopy.paymentPending);
+      throw new Error(studioPaymentV1.customerCopy.paymentPending);
+    }
+    advanceToIntakeAfterPaid();
+  }
+
+  /** Return from Stripe Checkout — reconcile; do not treat URL as payment authority. */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const payment = params.get("payment");
+    const sessionId = params.get("session_id");
+    if (payment === "cancel") {
+      setPlanBridgeError(studioPaymentV1.customerCopy.paymentCancelled);
+      setStageAndPersist("checkout");
+      openPanel("checkout");
+      return;
+    }
+    if (payment !== "return" || !sessionId) return;
+    if (paymentCompleteGuardRef.current) return;
+
+    let cancelled = false;
+    void (async () => {
+      setPlanBridgeError(studioPaymentV1.customerCopy.paymentPending);
+      setStageAndPersist("checkout");
+      openPanel("checkout");
+      for (let attempt = 0; attempt < 8; attempt += 1) {
+        const result = await reconcileCheckoutClient(sessionId);
+        if (cancelled) return;
+        if (result.paid && result.campaign) {
+          const local = applyServerPaymentTruthToLocalCampaign(result.campaign);
+          if (local?.paymentReceivedAt) {
+            const url = new URL(window.location.href);
+            url.searchParams.delete("payment");
+            url.searchParams.delete("session_id");
+            window.history.replaceState({}, "", url.toString());
+            advanceToIntakeAfterPaid();
+            return;
+          }
+        }
+        await new Promise((r) => setTimeout(r, 750));
+      }
+      if (!cancelled) {
+        setPlanBridgeError(studioPaymentV1.customerCopy.paymentPending);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // Intentionally once on mount for return deep-link handling.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleIntakeSubmitSuccess() {
     setStageAndPersist("complete");
@@ -988,6 +1085,8 @@ export default function ConversationRoomRuntime({
         recommendedRoadId,
         confirmed.projectNeed,
       );
+    } else {
+      withRouteStage = clearRouteRecommendation(withRouteStage);
     }
     setProjectDraft(withRouteStage);
     setStage("route");
@@ -1294,6 +1393,7 @@ export default function ConversationRoomRuntime({
             onReviewStudioPlan={handleReviewStudioPlan}
             onBackToStudioPlan={handleBackToStudioPlanFromCheckout}
             onCheckoutPaymentComplete={handleCheckoutPaymentComplete}
+            onSandboxCheckoutConfirm={handleSandboxCheckoutConfirm}
             onAuthorizeCheckoutPayment={authorizeCheckoutPayment}
             onIntakeSubmitSuccess={handleIntakeSubmitSuccess}
             onRecoverIntakePayment={() => {
@@ -1382,8 +1482,10 @@ export default function ConversationRoomRuntime({
           onConfirmRoad={handleConfirmRoad}
           previewRoadId={previewRoadId}
           recommendedRoadId={
-            readRouteRecommendation(projectDraft)?.roadId ??
-            recommendRouteFromProjectNeed(draft.projectNeed)
+            (projectDraft
+              ? readActiveRouteRecommendation(projectDraft, draft.projectNeed)
+                  ?.roadId
+              : null) ?? recommendRouteFromProjectNeed(draft.projectNeed)
           }
           selectedServiceCount={selectedJobIds.size}
           selectedRouteLabel={
@@ -1429,7 +1531,7 @@ export default function ConversationRoomRuntime({
           onTextDraftFlush={handleTextDraftFlush}
           onStartListening={handleStartListening}
           onStopListening={handleStopListening}
-          onContinue={handleContinue}
+          onSubmitGuideAnswer={handleContinue}
           onSendMessage={handleSendMessage}
         />
         </>

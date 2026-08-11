@@ -14,9 +14,11 @@ export { evaluateMaterialRiskPolicy } from "./evaluate-risk";
 export {
   countBusinessDaysAfter,
   evaluateTimingTruth,
+  resolveRelativeDeadlineHorizon,
   parseCustomerDeadline,
   resolveRequiredMinBusinessDays,
 } from "./evaluate-timing";
+export type { RelativeDeadlineHorizon } from "./evaluate-timing";
 export { buildPreAcceptanceFactFingerprint } from "./fingerprint";
 export { projectFactsFromWorkingDraft } from "./facts-from-draft";
 export {

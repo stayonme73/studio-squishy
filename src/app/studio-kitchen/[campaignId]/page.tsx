@@ -4,10 +4,8 @@ import { notFound } from "next/navigation";
 import StudioKitchenLiveDetailScene from "@/components/studio-kitchen/StudioKitchenLiveDetailScene";
 import { isStaffOrOwner } from "@/lib/auth/roles";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
-import {
-  isKitchenFixtureDemoRequested,
-  loadKitchenProjectionDetail,
-} from "@/lib/studio-kitchen";
+import { isKitchenFixtureDemoRequested } from "@/lib/studio-kitchen";
+import { loadKitchenProjectionDetail } from "@/lib/studio-kitchen/load-projection";
 import { loadKitchenCommsLedger } from "@/lib/studio-kitchen-comms";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 

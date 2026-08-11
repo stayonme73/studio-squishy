@@ -122,6 +122,22 @@ export function readRouteRecommendation(
   };
 }
 
+/**
+ * Route suggestion is valid only while the underlying project-need text matches.
+ * Stale recommendations from a prior need must not highlight a route.
+ */
+export function readActiveRouteRecommendation(
+  draft: WorkingDraftRecord,
+  currentProjectNeed: string,
+): RouteRecommendationSlice | null {
+  const saved = readRouteRecommendation(draft);
+  if (!saved) return null;
+  const current = currentProjectNeed.trim().toLowerCase();
+  const bound = saved.projectNeed.trim().toLowerCase();
+  if (!current || !bound || current !== bound) return null;
+  return saved;
+}
+
 export function readSelectedServices(
   draft: WorkingDraftRecord,
 ): SelectedServiceSlice[] {

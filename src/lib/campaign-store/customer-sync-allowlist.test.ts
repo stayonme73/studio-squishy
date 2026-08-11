@@ -88,19 +88,57 @@ describe("mergeCustomerOwnedCampaignSync", () => {
     expect(merged.customerFieldTokens).toEqual(existing.customerFieldTokens);
   });
 
-  it("bootstraps milestones only on first server record", () => {
+  it("bootstraps plan milestones but never payment truth from client", () => {
     const incoming = baseRecord({ paymentReceivedAt: undefined, approvedStudioPlan: undefined });
 
     const merged = mergeCustomerOwnedCampaignSync(null, {
       ...incoming,
       paymentReceivedAt: "2026-07-09T00:00:00.000Z",
+      preAcceptancePaymentAuthorization: {
+        decisionId: "dec-forged",
+        outcome: "CLEAR_TO_ACCEPT",
+        paymentAuthorized: true,
+        evaluatedDraftRevision: 1,
+        selectedServiceIds: ["sm-001"],
+        factFingerprint: "pa:forged",
+        decisionSchemaVersion: 1,
+        evaluatedAt: "2026-07-09T00:00:00.000Z",
+        authorizedAt: "2026-07-09T00:00:00.000Z",
+        packageId: "custom-studio-plan",
+      },
+      paymentTruth: {
+        processor: "stripe",
+        status: "confirmed",
+        currency: "usd",
+        expectedAmountCents: 1,
+        confirmedAmountCents: 1,
+        selectedServiceIds: ["sm-001"],
+        decisionId: "dec-forged",
+        factFingerprint: "pa:forged",
+        draftRevision: 1,
+      },
       approvedStudioPlan: baseRecord().approvedStudioPlan,
       revisionRoundsIncluded: 2,
     });
 
-    expect(merged.paymentReceivedAt).toBe("2026-07-09T00:00:00.000Z");
+    expect(merged.paymentReceivedAt).toBeUndefined();
+    expect(merged.paymentTruth).toBeUndefined();
+    expect(merged.preAcceptancePaymentAuthorization).toBeUndefined();
     expect(merged.approvedStudioPlan?.oneTimeTotalCents).toBe(39500);
     expect(merged.revisionRoundsIncluded).toBe(2);
     expect(merged.studioNotes).toBeUndefined();
+  });
+
+  it("ignores client inventing paymentReceivedAt on merge", () => {
+    const existing = baseRecord({
+      paymentReceivedAt: null,
+      paymentTruth: undefined,
+      preAcceptancePaymentAuthorization: undefined,
+    });
+    const incoming = baseRecord({
+      paymentReceivedAt: "2026-07-09T00:00:00.000Z",
+    });
+    const merged = mergeCustomerOwnedCampaignSync(existing, incoming);
+    expect(merged.paymentReceivedAt).toBeFalsy();
   });
 });

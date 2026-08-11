@@ -1,5 +1,3 @@
-import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
-
 import { evaluateArtifactBindings } from "./artifact-binding";
 import type {
   DesignQualityBrief,
@@ -16,27 +14,7 @@ import type {
  * Does NOT gate legacy sm-001 Kitchen V1 creative path (method-covered via
  * design evidence or Kitchen work-version pin at Review eligibility).
  */
-export function requiresDesignQualityGate(task: CampaignTaskItem): boolean {
-  const phaseOk =
-    task.phase === "creative" ||
-    task.phase === "creative_production" ||
-    task.phase === "qa";
-  if (!phaseOk) return false;
-
-  if (task.familyId === "marketing_assets") return true;
-
-  if (task.familyId === "social") {
-    return task.relatedServiceIds.some(
-      (id) =>
-        id.startsWith("v2-rtu-") ||
-        id === "ma-001" ||
-        id === "rm-j002" ||
-        id === "rm-j008",
-    );
-  }
-
-  return false;
-}
+export { requiresDesignQualityGate } from "../quality-gates";
 
 /**
  * Prefer literal substring match so tokens like "(804) 555-0142" are not

@@ -2,8 +2,6 @@ import { createHash } from "crypto";
 import { existsSync, readFileSync, statSync } from "fs";
 import path from "path";
 
-import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
-
 import {
   VOICE_ALLOWED_AUDIO_EXTENSIONS,
   VOICE_PRODUCTION_SKUS,
@@ -23,20 +21,8 @@ export function isVoiceProductionSku(skuId: string): boolean {
   return VOICE_SKU_SET.has(skuId);
 }
 
-/**
- * Audio QA gate for voice SKUs on creative/qa phases.
- * Does not gate marketing_video / Shotstack short-video paths.
- */
-export function requiresAudioQualityGate(task: CampaignTaskItem): boolean {
-  const phaseOk =
-    task.phase === "creative" ||
-    task.phase === "creative_production" ||
-    task.phase === "qa" ||
-    task.phase === "copy";
-  if (!phaseOk) return false;
-  if (task.familyId !== "video_audio") return false;
-  return task.relatedServiceIds.some((id) => isVoiceProductionSku(id));
-}
+/** Audio QA gate for voice SKUs — predicate lives in browser-safe quality-gates. */
+export { requiresAudioQualityGate } from "../quality-gates";
 
 function countWords(text: string): number {
   return text

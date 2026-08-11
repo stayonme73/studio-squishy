@@ -393,10 +393,27 @@ function clearPrePaymentPlanDraft(campaign: CampaignRecord | null) {
   clearProjectSummaryPlanDraft(campaign?.campaignId);
 }
 
+export type MarkPaymentReceivedAuthority = "processor" | "test_fixture";
+
+/**
+ * Local paid mutation — gated.
+ * Customer UI must not call this. Authoritative paid truth comes from
+ * Stripe webhook/reconcile (applyServerPaymentTruthToLocalCampaign) or
+ * explicit test fixtures with authority: "test_fixture".
+ */
 export function markPaymentReceived(
   packageId?: StudioGuidePackageId,
   authorization?: CampaignRecord["preAcceptancePaymentAuthorization"] | null,
+  options?: { authority?: MarkPaymentReceivedAuthority },
 ): CampaignRecord | null {
+  const authority = options?.authority;
+  if (authority !== "processor" && authority !== "test_fixture") {
+    console.error(
+      "[payment-truth] markPaymentReceived blocked — requires processor or test_fixture authority",
+    );
+    return null;
+  }
+
   let campaign = readCurrentCampaign();
   if (!campaign) {
     if (!packageId) return null;
@@ -445,6 +462,40 @@ export function markPaymentReceived(
 
   clearPrePaymentPlanDraft(campaign);
   return persistCampaign(updated);
+}
+
+/**
+ * Apply server-confirmed payment truth onto the browser Campaign Record.
+ * Only call after webhook/reconcile/sandbox-confirm returns paid=true.
+ */
+export function applyServerPaymentTruthToLocalCampaign(
+  serverCampaign: CampaignRecord,
+): CampaignRecord | null {
+  if (!serverCampaign.paymentReceivedAt) return null;
+  if (serverCampaign.paymentTruth?.status !== "confirmed") return null;
+
+  const local = readCurrentCampaign();
+  if (local && local.campaignId !== serverCampaign.campaignId) {
+    console.error("[payment-truth] refused to apply paid truth for a different campaign");
+    return null;
+  }
+
+  const base = local ?? serverCampaign;
+  const merged: CampaignRecord = {
+    ...base,
+    ...serverCampaign,
+    // Preserve any newer local intake drafts the server does not yet have.
+    routeMapIntakeDraft: local?.routeMapIntakeDraft ?? serverCampaign.routeMapIntakeDraft,
+    paymentReceivedAt: serverCampaign.paymentReceivedAt,
+    paymentTruth: serverCampaign.paymentTruth,
+    preAcceptancePaymentAuthorization:
+      serverCampaign.preAcceptancePaymentAuthorization ??
+      local?.preAcceptancePaymentAuthorization,
+    campaignStatus: serverCampaign.campaignStatus,
+    updatedAt: serverCampaign.updatedAt,
+  };
+  clearPrePaymentPlanDraft(merged);
+  return persistCampaign(merged);
 }
 
 export function updateCampaignStatus(status: CampaignStatus): CampaignRecord | null {

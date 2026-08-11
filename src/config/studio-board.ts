@@ -9,6 +9,7 @@ import type { DiscoveryBriefAnswers } from "@/recommendation/types";
 import type { BillingType, ServiceFamilyId, ServiceId } from "@/catalog/types";
 import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
+import type { StudioPaymentStatus } from "@/config/studio-payment-v1";
 
 /** Immutable scope snapshot for one approved SKU — post-approval reads this, not live catalog. */
 export type ApprovedStudioPlanLineItem = {
@@ -152,6 +153,30 @@ export type CampaignRecord = {
   concepts?: FeedbackConceptPreview[];
   conceptsGeneratedAt?: string | null;
   paymentReceivedAt?: string | null;
+  /**
+   * Processor-authoritative payment truth (Stripe Checkout).
+   * Browser/client claims must not invent this; server webhook/reconcile writes it.
+   */
+  paymentTruth?: {
+    processor: "stripe";
+    status: StudioPaymentStatus;
+    currency: "usd";
+    expectedAmountCents: number;
+    confirmedAmountCents?: number;
+    checkoutSessionId?: string;
+    paymentIntentId?: string | null;
+    stripeEventId?: string | null;
+    selectedServiceIds: readonly string[];
+    decisionId: string;
+    factFingerprint: string;
+    draftRevision: number;
+    initiatedAt?: string;
+    confirmedAt?: string;
+    cancelledAt?: string;
+    failedAt?: string;
+    /** Sandbox confirmations are never live money. */
+    sandbox?: boolean;
+  };
   /**
    * Write-once pre-acceptance payment authorization bound at successful payment.
    * Session decision storage is live-only; this is the durable audit reference.

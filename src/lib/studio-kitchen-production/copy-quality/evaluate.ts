@@ -1,5 +1,3 @@
-import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
-
 import type {
   CopyQualityBrief,
   CopyQualityEvaluation,
@@ -29,24 +27,7 @@ const DEFAULT_CORPORATE_AI_TONE_PATTERNS: readonly string[] = [
   "proprietary comfort methodologies",
 ];
 
-export function requiresCopyQualityGate(task: CampaignTaskItem): boolean {
-  const phaseOk = task.phase === "copy" || task.phase === "qa";
-  if (!phaseOk) return false;
-
-  if (task.familyId === "copy_channels") return true;
-
-  // Profile kits — bio/about copy uses the certified copy method.
-  if (task.familyId === "social") {
-    return task.relatedServiceIds.some((id) => id === "rm-j002" || id === "rm-j008");
-  }
-
-  // Landing page copy phase uses the certified copy method before HTML QA.
-  if (task.familyId === "landing_page") {
-    return task.phase === "copy";
-  }
-
-  return false;
-}
+export { requiresCopyQualityGate } from "../quality-gates";
 
 function countWords(text: string): number {
   return text

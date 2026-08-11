@@ -56,7 +56,7 @@ describe("dual-write idempotency (server store)", () => {
     const afterPlan = JSON.parse(window.localStorage.getItem(CAMPAIGN_KEY)!) as CampaignRecord;
     await upsertCampaignRecord(afterPlan, "tagia");
 
-    markPaymentReceived();
+    markPaymentReceived(undefined, null, { authority: "test_fixture" });
     const afterPayment = JSON.parse(window.localStorage.getItem(CAMPAIGN_KEY)!) as CampaignRecord;
     await upsertCampaignRecord(afterPayment, "tagia");
 

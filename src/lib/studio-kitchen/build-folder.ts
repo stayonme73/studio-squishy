@@ -22,7 +22,7 @@ import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
-import { summarizeProductionContractForSku } from "@/lib/studio-kitchen-production";
+import { summarizeProductionContractForSku } from "@/lib/studio-kitchen-production/resolve-contract";
 
 import { jobSpineStatusLabel, projectKitchenBucketFromSpine } from "./status-projection";
 import type {

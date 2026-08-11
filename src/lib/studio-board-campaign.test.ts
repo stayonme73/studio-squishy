@@ -197,7 +197,9 @@ describe("submitProjectDetails", () => {
       }),
     );
 
-    const result = markPaymentReceived("momentum");
+    const result = markPaymentReceived("momentum", null, {
+      authority: "test_fixture",
+    });
     expect(result?.campaignStatus).toBe("PAYMENT_RECEIVED");
     expect(result?.projectDetailsSubmittedAt).toBeUndefined();
     expect(result?.packageId).toBe(CUSTOM_STUDIO_PLAN_PACKAGE_ID);
@@ -223,9 +225,20 @@ describe("submitProjectDetails", () => {
       }),
     );
 
-    const result = markPaymentReceived("momentum");
+    const result = markPaymentReceived("momentum", null, {
+      authority: "test_fixture",
+    });
     expect(result?.packageId).toBe(CUSTOM_STUDIO_PLAN_PACKAGE_ID);
     expect(result?.packageLabel).toBe(CUSTOM_STUDIO_PLAN_LABEL);
+  });
+
+  it("blocks markPaymentReceived without processor or test_fixture authority", () => {
+    window.localStorage.setItem(
+      "studio-squishy:current-campaign",
+      JSON.stringify(mockCampaign()),
+    );
+    const result = markPaymentReceived("momentum");
+    expect(result).toBeNull();
   });
 });
 

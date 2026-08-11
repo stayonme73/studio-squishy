@@ -40,7 +40,9 @@ export type ConversationActivityPanelProps = {
   onRemoveJob: (jobId: RouteMapJobId) => void;
   onReviewStudioPlan: () => void;
   onBackToStudioPlan: () => void;
-  onCheckoutPaymentComplete: () => void;
+  onCheckoutPaymentComplete: () => void | Promise<void>;
+  /** Local sandbox-confirm fixture — not Stripe hosted Checkout. */
+  onSandboxCheckoutConfirm?: () => void | Promise<void>;
   /** Fail-closed pre-acceptance gate before Complete Checkout. */
   onAuthorizeCheckoutPayment?: () => boolean;
   onIntakeSubmitSuccess: () => void | Promise<void>;
@@ -439,6 +441,7 @@ export default function ConversationActivityPanel({
   onReviewStudioPlan,
   onBackToStudioPlan,
   onCheckoutPaymentComplete,
+  onSandboxCheckoutConfirm,
   onAuthorizeCheckoutPayment,
   onIntakeSubmitSuccess,
   onRecoverIntakePayment,
@@ -548,6 +551,7 @@ export default function ConversationActivityPanel({
         onClose={onClose}
         onBackToStudioPlan={onBackToStudioPlan}
         onPaymentComplete={onCheckoutPaymentComplete}
+        onSandboxConfirm={onSandboxCheckoutConfirm}
         onAuthorizePayment={onAuthorizeCheckoutPayment}
       />
     );

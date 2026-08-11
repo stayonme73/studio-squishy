@@ -26,14 +26,16 @@ export type ConversationCheckoutPanelProps = {
   selectedJobIds: ReadonlySet<RouteMapJobId>;
   onClose: () => void;
   onBackToStudioPlan: () => void;
-  onPaymentComplete: () => void;
+  onPaymentComplete: () => void | Promise<void>;
+  /** Local sandbox-confirm fixture — not Stripe hosted Checkout. */
+  onSandboxConfirm?: () => void | Promise<void>;
   /** Pre-acceptance fail-closed gate (CLEAR_TO_ACCEPT required). */
   onAuthorizePayment?: () => boolean;
 };
 
 /**
  * Activity Panel Checkout — reuses SecureCheckoutGrid + campaign persistence.
- * Live card processing is not invented here; sandbox honesty copy stays intact.
+ * Paid truth is established by Stripe webhook/reconcile (or server sandbox-confirm).
  */
 export default function ConversationCheckoutPanel({
   roadId,
@@ -41,6 +43,7 @@ export default function ConversationCheckoutPanel({
   onClose,
   onBackToStudioPlan,
   onPaymentComplete,
+  onSandboxConfirm,
   onAuthorizePayment,
 }: ConversationCheckoutPanelProps) {
   const v = conversationRoomGuideV1;
@@ -147,6 +150,7 @@ export default function ConversationCheckoutPanel({
             );
           }}
           onPaymentComplete={onPaymentComplete}
+          onSandboxConfirm={onSandboxConfirm}
         />
         <p className={styles.checkoutHonestyNote}>
           {payment.form.paymentSecurityNote}

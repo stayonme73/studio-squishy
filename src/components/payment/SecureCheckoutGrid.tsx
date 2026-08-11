@@ -1,29 +1,35 @@
 "use client";
 
 import { type FormEvent, type ReactNode, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import type { ServiceId } from "@/catalog/types";
 import type { ApprovalAcknowledgment } from "@/config/studio-board";
 import { payment } from "@/config/payment";
-import { resolvePostPaymentIntakeHref } from "@/lib/intake-edit";
 import {
   ACKNOWLEDGMENT_VERSION,
   APPROVAL_ACKNOWLEDGMENT_TEXT,
 } from "@/config/service-guide";
 import type { StudioGuidePackageId } from "@/config/studio-guide";
+import { studioPaymentV1 } from "@/config/studio-payment-v1";
 import { resolveBundlePackageId } from "@/lib/approved-plan-display";
 import {
   buildPaymentPlanSummary,
   type PaymentPlanSummary,
 } from "@/lib/payment-plan-summary";
-import { isPaymentSandboxAvailable, simulateSandboxPayment } from "@/lib/payment-sandbox";
-import { readCurrentCampaignHydrated, markPaymentReceived } from "@/lib/studio-board-campaign";
+import { isDeveloperCheckoutSandboxVisible } from "@/lib/studio-payment/hosted-checkout-ui";
+import { readCurrentCampaignHydrated } from "@/lib/studio-board-campaign";
 
 type Props = {
   packageId?: StudioGuidePackageId;
-  /** When set, runs after payment instead of default Vision Intake navigation. */
-  onPaymentComplete?: (packageId: StudioGuidePackageId | undefined) => void;
+  /** Starts Stripe-hosted Checkout (redirect). Required for paid-truth Stripe smoke. */
+  onPaymentComplete?: (
+    packageId: StudioGuidePackageId | undefined,
+  ) => void | Promise<void>;
+  /**
+   * Local sandbox-confirm fixture only. Shown only with developer opt-in
+   * (`NEXT_PUBLIC_DEV_TOOLS=1` or `?studioPaymentSandbox=1`).
+   */
+  onSandboxConfirm?: () => void | Promise<void>;
   /** `embedded` — legacy two-column sheet. `full` — certified single-column checkout room. */
   layout?: "full" | "embedded";
   /** Live plan summary from customize column; overrides storage/mock summary when set. */
@@ -122,10 +128,14 @@ function resolveCheckoutPackageId(
   return resolveBundlePackageId(readCurrentCampaignHydrated()?.packageId);
 }
 
-/** Secure Checkout — presentation only; payment logic unchanged. */
+/**
+ * Hosted Stripe Checkout review surface.
+ * Plan + confirmation only — card entry happens solely on Stripe Checkout.
+ */
 export default function SecureCheckoutGrid({
   packageId: packageIdProp,
   onPaymentComplete,
+  onSandboxConfirm,
   layout = "full",
   planSummary: planSummaryProp,
   recommendationNotice,
@@ -135,15 +145,21 @@ export default function SecureCheckoutGrid({
   onViewPlanDetails,
   submitLabel,
 }: Props) {
-  const router = useRouter();
   const checkoutPackageId = resolveCheckoutPackageId(packageIdProp);
   const storedPlanSummary = useMemo(() => buildPaymentPlanSummary(), []);
   const planSummary = planSummaryProp ?? storedPlanSummary;
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [completing, setCompleting] = useState(false);
-  const showSandbox = isPaymentSandboxAvailable();
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const isEmbedded = layout === "embedded";
   const confirmLabel = submitLabel ?? payment.form.submitLabel;
+
+  const showSandboxFixture = useMemo(() => {
+    if (!onSandboxConfirm) return false;
+    const search =
+      typeof window !== "undefined" ? window.location.search : null;
+    return isDeveloperCheckoutSandboxVisible({ search });
+  }, [onSandboxConfirm]);
 
   function buildAcknowledgment(): ApprovalAcknowledgment {
     return {
@@ -153,36 +169,58 @@ export default function SecureCheckoutGrid({
     };
   }
 
-  function completeCheckout() {
+  async function completeCheckout() {
     if (completing) return;
     const acknowledgment = buildAcknowledgment();
     if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
+    setCheckoutError(null);
     setCompleting(true);
     if (onPaymentComplete) {
-      onPaymentComplete(checkoutPackageId);
+      try {
+        await onPaymentComplete(checkoutPackageId);
+        /* Redirect to Stripe leaves this page; if not, clear busy state. */
+        setCompleting(false);
+      } catch (error) {
+        const message =
+          error instanceof Error && error.message.trim()
+            ? error.message
+            : studioPaymentV1.customerCopy.paymentFailed;
+        setCheckoutError(message);
+        setCompleting(false);
+      }
       return;
     }
-    markPaymentReceived(checkoutPackageId);
-    router.push(resolvePostPaymentIntakeHref(readCurrentCampaignHydrated(), checkoutPackageId));
+    setCheckoutError(studioPaymentV1.customerCopy.legacyPaidBlocked);
+    setCompleting(false);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!termsAccepted || completing) return;
-    completeCheckout();
+    void completeCheckout();
   }
 
-  function handleSandboxPayment() {
-    if (completing) return;
-    const acknowledgment = buildAcknowledgment();
-    if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
-    setCompleting(true);
-    if (onPaymentComplete) {
-      onPaymentComplete(checkoutPackageId);
+  async function handleSandboxPayment() {
+    if (!onSandboxConfirm || completing) return;
+    if (!termsAccepted) {
+      setCheckoutError(payment.form.termsLabel);
       return;
     }
-    simulateSandboxPayment(checkoutPackageId);
-    router.push(resolvePostPaymentIntakeHref(readCurrentCampaignHydrated(), checkoutPackageId));
+    const acknowledgment = buildAcknowledgment();
+    if (onBeforePayment && !onBeforePayment(acknowledgment)) return;
+    setCheckoutError(null);
+    setCompleting(true);
+    try {
+      await onSandboxConfirm();
+      setCompleting(false);
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message.trim()
+          ? error.message
+          : studioPaymentV1.customerCopy.paymentFailed;
+      setCheckoutError(message);
+      setCompleting(false);
+    }
   }
 
   const showMonthlySubtotal = planSummary.monthlySubtotalCents > 0;
@@ -190,144 +228,121 @@ export default function SecureCheckoutGrid({
     planSummary.oneTimeSubtotalCents > 0 ||
     planSummary.lineItems.some((line) => line.billingType === "one_time");
 
-  const billingFields = (
-    <>
-      <label className="pay-field">
-        <span>{payment.form.fullName}</span>
-        <input type="text" name="fullName" autoComplete="name" required />
-      </label>
-      <label className="pay-field">
-        <span>{payment.form.businessName}</span>
-        <input type="text" name="businessName" autoComplete="organization" />
-      </label>
-      <label className="pay-field">
-        <span>{payment.form.email}</span>
-        <input type="email" name="email" autoComplete="email" required />
-      </label>
-      <label className="pay-field">
-        <span>{payment.form.phone}</span>
-        <input type="tel" name="phone" autoComplete="tel" />
-      </label>
-    </>
-  );
-
-  const paymentFields = (
-    <>
-      <label className="pay-field">
-        <span>{payment.form.cardNumber}</span>
+  const acknowledgmentBlock = (
+    <section className="pay-acknowledgment" aria-labelledby="pay-acknowledgment-heading">
+      {onViewPlanDetails ? (
+        <button type="button" className="pay-plan-details-link" onClick={onViewPlanDetails}>
+          {payment.form.viewPlanDetailsLabel}
+        </button>
+      ) : null}
+      <h3 id="pay-acknowledgment-heading" className="pay-acknowledgment__heading">
+        {payment.form.acknowledgmentHeading}
+      </h3>
+      {payment.form.acknowledgmentBody.map((paragraph) => (
+        <p key={paragraph} className="pay-acknowledgment__body">
+          {paragraph}
+        </p>
+      ))}
+      <label className="pay-acknowledgment__checkbox">
         <input
-          type="text"
-          name="cardNumber"
-          inputMode="numeric"
-          autoComplete="cc-number"
-          placeholder="0000 0000 0000 0000"
-          required
+          type="checkbox"
+          name="terms"
+          checked={termsAccepted}
+          onChange={(event) => setTermsAccepted(event.target.checked)}
         />
+        <span>{payment.form.termsLabel}</span>
       </label>
-      <div className="pay-form-row">
-        <label className="pay-field">
-          <span>{payment.form.expDate}</span>
-          <input
-            type="text"
-            name="expDate"
-            inputMode="numeric"
-            autoComplete="cc-exp"
-            placeholder="MM / YY"
-            required
-          />
-        </label>
-        <label className="pay-field">
-          <span>{payment.form.cvv}</span>
-          <input
-            type="text"
-            name="cvv"
-            inputMode="numeric"
-            autoComplete="cc-csc"
-            placeholder="CVV"
-            required
-          />
-        </label>
-      </div>
-      <label className="pay-field">
-        <span>{payment.form.zipCode}</span>
-        <input type="text" name="zipCode" inputMode="numeric" autoComplete="postal-code" required />
-      </label>
-    </>
+    </section>
   );
 
-  const sandboxPanel = showSandbox ? (
+  const sandboxPanel = showSandboxFixture ? (
     <div
       className={`pay-sandbox${isEmbedded ? "" : " pay-sandbox--stack"}`}
+      data-developer-fixture="sandbox-confirm"
       aria-label={payment.sandbox.label}
     >
       <div className="pay-sandbox__head">
         <p className="pay-sandbox__label">{payment.sandbox.label}</p>
         <span className="pay-sandbox__badge">{payment.sandbox.badge}</span>
       </div>
-      <p className="pay-sandbox__hint">{payment.sandbox.hint}</p>
+      <p className="pay-sandbox__hint">
+        {payment.sandbox.hint} {studioPaymentV1.customerCopy.sandboxFixtureOnly}
+      </p>
       <button
         type="button"
         className="pay-sandbox__btn"
-        onClick={handleSandboxPayment}
-        disabled={completing}
+        onClick={() => {
+          void handleSandboxPayment();
+        }}
+        disabled={completing || !termsAccepted}
       >
         {payment.sandbox.buttonLabel}
       </button>
     </div>
   ) : null;
 
+  const planSummaryBody = (
+    <>
+      <p className="pay-summary-includes-label">{payment.summary.recommendedServicesLabel}</p>
+      <ul className="pay-summary-includes-list">
+        {planSummary.lineItems.map((item) => (
+          <li key={item.serviceId}>
+            <SummaryCheckIcon />
+            <span>
+              {onOpenServiceGuide ? (
+                <button
+                  type="button"
+                  className="pay-summary-line-guide"
+                  onClick={() => onOpenServiceGuide(item.serviceId)}
+                >
+                  {item.name}
+                </button>
+              ) : (
+                item.name
+              )}
+              <span className="pay-summary-line-price"> — {item.priceDisplay}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <div className="pay-summary-investment">
+        {showOneTimeSubtotal ? (
+          <div className="pay-summary-total-row">
+            <p className="pay-summary-total-label">{payment.summary.oneTimeSubtotalLabel}</p>
+            <p className="pay-summary-price">{planSummary.oneTimeSubtotalDisplay}</p>
+          </div>
+        ) : null}
+        {showMonthlySubtotal ? (
+          <div className="pay-summary-total-row">
+            <p className="pay-summary-total-label">{payment.summary.monthlySubtotalLabel}</p>
+            <p className="pay-summary-price">{planSummary.monthlySubtotalDisplay}/month</p>
+          </div>
+        ) : null}
+        <div className="pay-summary-total-row pay-summary-total-row--due">
+          <p className="pay-summary-total-label">{payment.summary.amountDueTodayLabel}</p>
+          <p className="pay-summary-price">{planSummary.amountDueTodayDisplay}</p>
+        </div>
+        <p className="pay-summary-disclosure-note">
+          {payment.summary.cardProcessingDisclosureNote}
+        </p>
+      </div>
+    </>
+  );
+
   if (isEmbedded) {
     return (
-      <div className="pay-shell pay-shell--embedded">
+      <div
+        className="pay-shell pay-shell--embedded"
+        data-hosted-checkout="stripe"
+        data-collects-card="false"
+      >
         <div className="pay-checkout-grid pay-checkout-grid--embedded">
           <PaperCard title={payment.sections.summary} className="pay-paper-card--summary">
-            <p className="pay-summary-includes-label">{payment.summary.recommendedServicesLabel}</p>
-            <ul className="pay-summary-includes-list">
-              {planSummary.lineItems.map((item) => (
-                <li key={item.serviceId}>
-                  <SummaryCheckIcon />
-                  <span>
-                    {onOpenServiceGuide ? (
-                      <button
-                        type="button"
-                        className="pay-summary-line-guide"
-                        onClick={() => onOpenServiceGuide(item.serviceId)}
-                      >
-                        {item.name}
-                      </button>
-                    ) : (
-                      item.name
-                    )}
-                    <span className="pay-summary-line-price"> — {item.priceDisplay}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <div className="pay-summary-investment">
-              {showOneTimeSubtotal ? (
-                <div className="pay-summary-total-row">
-                  <p className="pay-summary-total-label">{payment.summary.oneTimeSubtotalLabel}</p>
-                  <p className="pay-summary-price">{planSummary.oneTimeSubtotalDisplay}</p>
-                </div>
-              ) : null}
-              {showMonthlySubtotal ? (
-                <div className="pay-summary-total-row">
-                  <p className="pay-summary-total-label">{payment.summary.monthlySubtotalLabel}</p>
-                  <p className="pay-summary-price">{planSummary.monthlySubtotalDisplay}/month</p>
-                </div>
-              ) : null}
-              <div className="pay-summary-total-row pay-summary-total-row--due">
-                <p className="pay-summary-total-label">{payment.summary.amountDueTodayLabel}</p>
-                <p className="pay-summary-price">{planSummary.amountDueTodayDisplay}</p>
-              </div>
-              <p className="pay-summary-disclosure-note">{payment.summary.cardProcessingDisclosureNote}</p>
-            </div>
+            {planSummaryBody}
           </PaperCard>
 
-          <PaperCard title={payment.sections.form} className="pay-paper-card--form">
+          <PaperCard title={payment.sections.confirm} className="pay-paper-card--form">
             <form className="pay-form" onSubmit={handleSubmit}>
-              {billingFields}
-              {paymentFields}
               {recommendationNotice ? (
                 <div className="pay-disclaimer" role="note">
                   <h3 className="pay-disclaimer__heading">{recommendationNotice.title}</h3>
@@ -341,30 +356,10 @@ export default function SecureCheckoutGrid({
               {paymentDecisionAddon ? (
                 <div className="pay-decision-addon">{paymentDecisionAddon}</div>
               ) : null}
-              <section className="pay-acknowledgment" aria-labelledby="pay-acknowledgment-heading">
-                {onViewPlanDetails ? (
-                  <button type="button" className="pay-plan-details-link" onClick={onViewPlanDetails}>
-                    {payment.form.viewPlanDetailsLabel}
-                  </button>
-                ) : null}
-                <h3 id="pay-acknowledgment-heading" className="pay-acknowledgment__heading">
-                  {payment.form.acknowledgmentHeading}
-                </h3>
-                {payment.form.acknowledgmentBody.map((paragraph) => (
-                  <p key={paragraph} className="pay-acknowledgment__body">
-                    {paragraph}
-                  </p>
-                ))}
-                <label className="pay-acknowledgment__checkbox">
-                  <input
-                    type="checkbox"
-                    name="terms"
-                    checked={termsAccepted}
-                    onChange={(event) => setTermsAccepted(event.target.checked)}
-                  />
-                  <span>{payment.form.termsLabel}</span>
-                </label>
-              </section>
+              {acknowledgmentBlock}
+              <p className="pay-summary-disclosure-note" role="note">
+                {payment.form.paymentSecurityNote}
+              </p>
               <button
                 type="submit"
                 className="pay-submit"
@@ -372,6 +367,15 @@ export default function SecureCheckoutGrid({
               >
                 {confirmLabel}
               </button>
+              {checkoutError ? (
+                <p className="pay-summary-disclosure-note" role="alert">
+                  {checkoutError}
+                </p>
+              ) : (
+                <p className="pay-summary-disclosure-note">
+                  {payment.form.paymentReassurance}
+                </p>
+              )}
               {sandboxPanel}
             </form>
           </PaperCard>
@@ -381,7 +385,11 @@ export default function SecureCheckoutGrid({
   }
 
   return (
-    <div className="pay-shell pay-shell--stack">
+    <div
+      className="pay-shell pay-shell--stack"
+      data-hosted-checkout="stripe"
+      data-collects-card="false"
+    >
       <div className="pay-checkout-stack">
         <CheckoutSection title={payment.sections.summary}>
           <h3 className="co-card__subheading">{payment.sections.deliverables}</h3>
@@ -428,13 +436,6 @@ export default function SecureCheckoutGrid({
         </CheckoutSection>
 
         <form className="pay-checkout-form" onSubmit={handleSubmit}>
-          <CheckoutSection title={payment.sections.billing}>{billingFields}</CheckoutSection>
-
-          <CheckoutSection title={payment.sections.payment}>
-            {paymentFields}
-            <p className="co-payment-security">{payment.form.paymentSecurityNote}</p>
-          </CheckoutSection>
-
           <CheckoutSection title={payment.sections.next}>
             <ol className="co-next-steps" aria-label={payment.sections.next}>
               {payment.whatsNext.steps.map((step, index) => (
@@ -449,7 +450,7 @@ export default function SecureCheckoutGrid({
             <p className="co-next-steps__reassurance">{payment.whatsNext.emailReassurance}</p>
           </CheckoutSection>
 
-          <CheckoutSection title="" className="co-card--confirm">
+          <CheckoutSection title={payment.sections.confirm} className="co-card--confirm">
             {recommendationNotice ? (
               <div className="pay-disclaimer" role="note">
                 <h3 className="pay-disclaimer__heading">{recommendationNotice.title}</h3>
@@ -472,6 +473,9 @@ export default function SecureCheckoutGrid({
               />
               <span>{payment.form.termsLabel}</span>
             </label>
+            <p className="co-payment-security" role="note">
+              {payment.form.paymentSecurityNote}
+            </p>
             <button
               type="submit"
               className="utility-btn utility-btn--primary co-submit"
@@ -479,7 +483,13 @@ export default function SecureCheckoutGrid({
             >
               {confirmLabel}
             </button>
-            <p className="co-payment-reassurance">{payment.form.paymentReassurance}</p>
+            {checkoutError ? (
+              <p className="co-payment-reassurance" role="alert">
+                {checkoutError}
+              </p>
+            ) : (
+              <p className="co-payment-reassurance">{payment.form.paymentReassurance}</p>
+            )}
             {sandboxPanel}
           </CheckoutSection>
         </form>

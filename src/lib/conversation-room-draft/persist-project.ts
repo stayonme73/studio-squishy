@@ -172,6 +172,23 @@ export function persistRouteRecommendation(
   );
 }
 
+/** Drop a route suggestion when project-need evidence changes or is insufficient. */
+export function clearRouteRecommendation(
+  draft: WorkingDraftRecord,
+): WorkingDraftRecord {
+  if (!draft.slices.routeRecommendation) return draft;
+  return okDraft(
+    patchWorkingDraftSlice(draft, "routeRecommendation", null, {
+      actor: "system",
+      initiatedBy: "system",
+      executedBy: "system",
+      summary: "Cleared stale route recommendation",
+      actionCode: "route-recommendation-cleared",
+    }),
+    draft,
+  );
+}
+
 export function persistAddService(
   draft: WorkingDraftRecord,
   jobId: RouteMapJobId,

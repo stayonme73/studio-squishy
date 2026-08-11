@@ -19,6 +19,7 @@ export {
   bootConversationProjectDraft,
   guideDraftFromOpening,
   openingFromGuideDraft,
+  clearRouteRecommendation,
   persistAddService,
   persistConversationStage,
   persistOpeningAnswers,
@@ -29,6 +30,7 @@ export {
 
 export {
   emptyOpeningAnswers,
+  readActiveRouteRecommendation,
   readConversationStage,
   readOpeningAnswers,
   readRouteRecommendation,

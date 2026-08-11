@@ -7,6 +7,7 @@ import {
   STUDIO_GUIDE_TYPE_FIELD_ID,
   conversationRoomGuideV1,
 } from "@/config/conversation-room-guide-v1";
+import { resolveComposerSendAction } from "@/lib/studio-guide-answer-resolve";
 
 export type StudioGuideCommPanelProps = {
   textDraft: string;
@@ -18,17 +19,22 @@ export type StudioGuideCommPanelProps = {
   speechSupported: boolean;
   interimTranscript: string;
   savedPulse: boolean;
-  /** When true, Enter / Send advances the guide question. */
+  /**
+   * When true, the customer is answering a guide question.
+   * Dock Send submits the same authoritative answer path as tablet Continue.
+   */
   isAnsweringQuestion: boolean;
   /** Preferred name / business name and other emphasized answers. */
   answerRequired?: boolean;
   /** Live typing — must only update a ref, never React state. */
   onTextDraftLive: (value: string) => void;
-  /** Commit before Continue / Send. */
+  /** Commit typed text before Send / Continue. */
   onTextDraftFlush: (value: string) => void;
   onStartListening: () => void;
   onStopListening: () => void;
-  onContinue: () => void;
+  /** Same submit path as tablet Continue (guide questions only). */
+  onSubmitGuideAnswer: () => void;
+  /** Free-ask note after guide questions. */
   onSendMessage: () => void;
 };
 
@@ -50,7 +56,7 @@ function StudioGuideCommPanel({
   onTextDraftFlush,
   onStartListening,
   onStopListening,
-  onContinue,
+  onSubmitGuideAnswer,
   onSendMessage,
 }: StudioGuideCommPanelProps) {
   const v = conversationRoomGuideV1;
@@ -65,6 +71,32 @@ function StudioGuideCommPanel({
     ? typePlaceholder
     : v.askAnythingPlaceholder;
 
+  function syncSendDisabled(typed: string) {
+    if (!sendRef.current) return;
+    const action = resolveComposerSendAction({
+      isAnsweringQuestion,
+      typedText: typed,
+    });
+    sendRef.current.disabled = action === "disabled";
+    sendRef.current.textContent = v.sendMessageLabel;
+    sendRef.current.dataset.sendAction = action;
+  }
+
+  function runSend() {
+    const next = textRef.current?.value ?? "";
+    onTextDraftFlush(next);
+    const action = resolveComposerSendAction({
+      isAnsweringQuestion,
+      typedText: next,
+    });
+    if (action === "disabled") return;
+    if (action === "submit_guide_answer") {
+      onSubmitGuideAnswer();
+      return;
+    }
+    onSendMessage();
+  }
+
   useEffect(() => {
     const node = textRef.current;
     if (!node) return;
@@ -73,12 +105,7 @@ function StudioGuideCommPanel({
       node.value = textDraft;
       emptyRef.current = !textDraft.trim();
     }
-    if (sendRef.current) {
-      sendRef.current.disabled = emptyRef.current;
-      sendRef.current.textContent = isAnsweringQuestion
-        ? v.continueLabel
-        : v.sendMessageLabel;
-    }
+    syncSendDisabled(node.value);
     if (wrapRef.current) {
       wrapRef.current.dataset.required =
         showRequired && emptyRef.current ? "true" : "false";
@@ -91,7 +118,6 @@ function StudioGuideCommPanel({
     textDraft,
     showRequired,
     isAnsweringQuestion,
-    v.continueLabel,
     v.sendMessageLabel,
   ]);
 
@@ -171,10 +197,12 @@ function StudioGuideCommPanel({
               /* Only touch siblings when emptiness flips — rewriting DOM every key stole focus. */
               if (empty !== emptyRef.current) {
                 emptyRef.current = empty;
-                if (sendRef.current) sendRef.current.disabled = empty;
+                syncSendDisabled(next);
                 if (wrapRef.current && showRequired) {
                   wrapRef.current.dataset.required = empty ? "true" : "false";
                 }
+              } else {
+                syncSendDisabled(next);
               }
               onTextDraftLive(next);
             }}
@@ -184,11 +212,13 @@ function StudioGuideCommPanel({
             onKeyDown={(event) => {
               if (event.key !== "Enter" || event.shiftKey) return;
               const next = textRef.current?.value ?? "";
-              if (!next.trim()) return;
+              const action = resolveComposerSendAction({
+                isAnsweringQuestion,
+                typedText: next,
+              });
+              if (action === "disabled") return;
               event.preventDefault();
-              onTextDraftFlush(next);
-              if (isAnsweringQuestion) onContinue();
-              else onSendMessage();
+              runSend();
             }}
             aria-required={showRequired ? true : undefined}
             aria-label={placeholder}
@@ -206,15 +236,13 @@ function StudioGuideCommPanel({
         ref={sendRef}
         type="button"
         className={styles.sendBtn}
-        onClick={() => {
-          const next = textRef.current?.value ?? "";
-          onTextDraftFlush(next);
-          if (!next.trim()) return;
-          if (isAnsweringQuestion) onContinue();
-          else onSendMessage();
-        }}
+        data-send-action={resolveComposerSendAction({
+          isAnsweringQuestion,
+          typedText: textDraft,
+        })}
+        onClick={runSend}
       >
-        {isAnsweringQuestion ? v.continueLabel : v.sendMessageLabel}
+        {v.sendMessageLabel}
       </button>
     </aside>
   );
