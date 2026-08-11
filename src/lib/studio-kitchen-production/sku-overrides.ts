@@ -430,9 +430,29 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "v2-rtu-flyer": {
     producerRole: "creative_production",
-    formatExportRequirements: canvaFormats("One flyer — PDF + digital"),
+    /**
+     * STUDIO-OPERATING-DESIGN-DISPATCH-HOOK-1 — Owner-sealed:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: design spec → HTML/CSS → Playwright PNG/PDF.
+     * Remaining design SKUs stay on Canva baseline until separately authorized.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for v2-rtu-flyer only (DESIGN-RENDERER-PROOF-1). Canva is not on the fulfillment spine for this SKU. Make not required.",
+    },
+    formatExportRequirements: [
+      "Final flattened digital export (PNG and/or PDF as appropriate)",
+      "Editable source files are not included unless separately authorized",
+      "One flyer — PDF + digital",
+    ],
     readiness: "contract_ready",
-    readinessNotes: "RTU flyer — creative_production + manual Canva; client distributes.",
+    readinessNotes:
+      "RTU flyer — creative_production + Studio Design Renderer (Owner-independent). Client distributes. Canva not required for this SKU.",
     extraQaItems: [
       {
         id: "flyer_contact_present",

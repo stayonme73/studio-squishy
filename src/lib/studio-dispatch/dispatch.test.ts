@@ -187,11 +187,17 @@ describe("STUDIO-OPERATING-DISPATCH-1", () => {
     const flyer = result.dispatch.records.find((r) => r.skuId === "v2-rtu-flyer")!;
     expect(flyer.dispatchId).toBe(`dd:${buildJobId(campaignId, "v2-rtu-flyer")}`);
     expect(flyer.routingDecisionId).toBe(`rd:${buildJobId(campaignId, "v2-rtu-flyer")}`);
-    expect(flyer.requirements?.primaryTool.toolId).toBeTruthy();
+    expect(flyer.requirements?.primaryTool.toolId).toBe("studio_design_renderer");
     expect(flyer.requirements?.productionSteps.length).toBeGreaterThan(0);
     expect(flyer.requirements?.deliverables.length).toBeGreaterThan(0);
-    // Tool refs are recorded — never invoked in this package.
+    // Identity still records tool refs; flyer observer may invoke after ensure (separate package).
     expect(flyer.requirements?.primaryTool.integrationState).toBeTruthy();
+    // Without Route Map flyer truth, observer invoke fails closed — identity remains ready.
+    const flyerObs = result.designRendererObserver?.results.find(
+      (r) => r.dispatchId === flyer.dispatchId,
+    );
+    expect(flyerObs?.action).toBe("invoked");
+    expect(flyerObs?.ok).toBe(false);
   });
 
   it("duplicate evaluation is idempotent", async () => {

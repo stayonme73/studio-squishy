@@ -82,6 +82,11 @@ export type DispatchExecutionRecord = {
   records: readonly JobDispatchRecord[];
   ownerActionRequired: false;
   lastError?: string | null;
+  /**
+   * STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1
+   * Flyer-only post-identity observe pass. Not part of identity equality.
+   */
+  designRendererObserver?: import("./design-renderer-observer").DesignRendererObserverPass;
 };
 
 export type DispatchExecutionResult =
@@ -90,6 +95,7 @@ export type DispatchExecutionResult =
       campaign: CampaignRecord;
       dispatch: DispatchExecutionRecord;
       alreadyEvaluated: boolean;
+      designRendererObserver?: import("./design-renderer-observer").DesignRendererObserverPass;
     }
   | {
       ok: false;

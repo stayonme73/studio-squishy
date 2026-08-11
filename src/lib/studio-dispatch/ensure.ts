@@ -3,6 +3,7 @@ import { studioDispatchV1 } from "@/config/studio-dispatch-v1";
 import { upsertCampaignRecord, readCampaignEnvelope } from "@/lib/campaign-store/store";
 import { ensureRoutingHandoff } from "@/lib/studio-routing-handoff";
 
+import { runDesignRendererDispatchObserver } from "./design-renderer-observer";
 import { evaluateJobDispatch } from "./evaluate";
 import type {
   DispatchExecutionRecord,
@@ -57,8 +58,48 @@ async function writePendingRetry(
 }
 
 /**
+ * After durable dispatch identity exists, observe flyer-ready records.
+ * Hook failures are recorded — they do not fail dispatch identity itself.
+ */
+async function attachDesignRendererObserver(input: {
+  campaign: CampaignRecord;
+  dispatch: DispatchExecutionRecord;
+  alreadyEvaluated: boolean;
+}): Promise<Extract<DispatchExecutionResult, { ok: true }>> {
+  const observer = await runDesignRendererDispatchObserver({
+    campaign: input.campaign,
+    dispatch: input.dispatch,
+  });
+
+  const dispatchWithObserver: DispatchExecutionRecord = {
+    ...input.dispatch,
+    designRendererObserver: observer,
+  };
+
+  const envelope = await readCampaignEnvelope(input.campaign.campaignId);
+  const saved = await upsertCampaignRecord(
+    {
+      ...input.campaign,
+      dispatchExecution: dispatchWithObserver,
+      updatedAt: new Date().toISOString(),
+    },
+    envelope?.clientUserId,
+  );
+
+  return {
+    ok: true,
+    campaign: saved.record,
+    dispatch: dispatchWithObserver,
+    alreadyEvaluated: input.alreadyEvaluated,
+    designRendererObserver: observer,
+  };
+}
+
+/**
  * Server-driven dispatch execution identity.
- * Refreshes routing first. Does not invoke producers or tools.
+ * Refreshes routing first. Identity evaluation does not invoke tools.
+ * After durable identity, STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1 may
+ * auto-invoke the flyer design renderer for v2-rtu-flyer only.
  */
 export async function ensureDispatchExecution(
   campaign: CampaignRecord,
@@ -130,12 +171,11 @@ export async function ensureDispatchExecution(
       prior.activationCheckoutSessionId === envelope.activationCheckoutSessionId &&
       recordsEqual(prior.records, envelope.records)
     ) {
-      return {
-        ok: true,
+      return attachDesignRendererObserver({
         campaign: working,
         dispatch: prior,
         alreadyEvaluated: true,
-      };
+      });
     }
 
     const campaignEnvelope = await readCampaignEnvelope(working.campaignId);
@@ -148,12 +188,11 @@ export async function ensureDispatchExecution(
       campaignEnvelope?.clientUserId,
     );
 
-    return {
-      ok: true,
+    return attachDesignRendererObserver({
       campaign: saved.record,
       dispatch: envelope,
       alreadyEvaluated: false,
-    };
+    });
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Dispatch execution failed.";

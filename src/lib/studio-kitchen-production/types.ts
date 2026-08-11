@@ -31,6 +31,8 @@ export type ProductionToolId =
   | "text_model"
   | "ai_voice_tool"
   | "studio_landing_page_structure"
+  /** Deterministic HTML/CSS + Playwright design renderer (v2-rtu-flyer proof path). */
+  | "studio_design_renderer"
   | "manual_platform_admin"
   | "none_specified";
 
