@@ -188,6 +188,11 @@ export type CampaignRecord = {
    */
   routingHandoff?: import("@/lib/studio-routing-handoff/types").RoutingHandoffRecord;
   /**
+   * Server-owned dispatch execution identity — durable after READY_FOR_DISPATCH.
+   * Exposes production requirements; does not invoke tools or start production.
+   */
+  dispatchExecution?: import("@/lib/studio-dispatch/types").DispatchExecutionRecord;
+  /**
    * Write-once pre-acceptance payment authorization bound at successful payment.
    * Session decision storage is live-only; this is the durable audit reference.
    */

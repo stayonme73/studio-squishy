@@ -22,7 +22,7 @@ import {
 import { linkClientCampaign, updateUserCurrentCampaign } from "@/lib/auth/users";
 import type { CampaignRecord } from "@/config/studio-board";
 import { logAccessEvent } from "@/lib/security/access-log";
-import { ensureRoutingHandoff } from "@/lib/studio-routing-handoff";
+import { ensureDispatchExecution } from "@/lib/studio-dispatch";
 
 export async function GET(request: Request) {
   const user = await requireSession(request);
@@ -85,9 +85,9 @@ export async function PATCH(request: Request) {
       user.roles.includes("client") ? user.id : undefined,
     );
 
-    // Server-driven routing wake when intake/materials facts arrive via sync.
+    // Server-driven dispatch wake (refreshes routing/activation) on paid sync.
     if (envelope.record.paymentTruth?.status === "confirmed") {
-      await ensureRoutingHandoff(envelope.record);
+      await ensureDispatchExecution(envelope.record);
     }
 
     let updatedUser = user;

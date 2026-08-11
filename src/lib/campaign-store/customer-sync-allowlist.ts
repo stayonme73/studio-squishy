@@ -71,8 +71,8 @@ export function mergeCustomerOwnedCampaignSync(
 
     if (incoming.approvedStudioPlan) bootstrapped.approvedStudioPlan = incoming.approvedStudioPlan;
     // paymentReceivedAt / paymentTruth / preAcceptancePaymentAuthorization /
-    // postPayActivation / routingHandoff are server-owned — never bootstrap
-    // from untrusted client sync.
+    // postPayActivation / routingHandoff / dispatchExecution are server-owned —
+    // never bootstrap from untrusted client sync.
     if (incoming.revisionRoundsIncluded != null) {
       bootstrapped.revisionRoundsIncluded = incoming.revisionRoundsIncluded;
     }
@@ -115,6 +115,11 @@ export function mergeCustomerOwnedCampaignSync(
     merged.routingHandoff = existing.routingHandoff;
   } else {
     delete merged.routingHandoff;
+  }
+  if (existing.dispatchExecution) {
+    merged.dispatchExecution = existing.dispatchExecution;
+  } else {
+    delete merged.dispatchExecution;
   }
   if (existing.revisionRoundsIncluded == null && incoming.revisionRoundsIncluded != null) {
     merged.revisionRoundsIncluded = incoming.revisionRoundsIncluded;
