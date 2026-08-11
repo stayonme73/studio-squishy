@@ -86,7 +86,7 @@ Renderer (`src/lib/studio-design-renderer/**`), dispatch hook / idempotency / ob
 
 | Check | Value |
 |-------|--------|
-| Local HEAD | *(filled after tip + push)* |
+| Local HEAD | `83a4282a462639e4793021b98caf84e32600b9e2` (pre-push) |
 | Origin HEAD | *(filled after tip + push)* |
 | Ahead/behind | *(filled after tip + push)* |
 | Staging | empty (seal tip) |
