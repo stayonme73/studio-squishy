@@ -19,8 +19,9 @@ Scope: **`v2-rtu-flyer` only** — remaining 12 design SKUs untouched.
 | Field | Value |
 |-------|--------|
 | Package commit SHA | `d2a1703d620e84d0f54c4e67288b03c2e6be6b5f` |
-| Seal tip | *(this docs commit — filled after tip)* |
+| Seal tip | `5dc0a72da4ab5fa7ce3ac28e3f73e6ac55eb10fa` |
 | Commit message (package) | `feat(operating): seal v2-rtu-flyer owner-independent auto-production` |
+| Commit message (seal tip) | `docs(operating): finalize flyer auto-production seal verification` |
 | Pushed branch | `operating/design-renderer-proof-1` |
 | Upstream base | `f9a19c530d5be5dd2f6dfc7cc30692f8557bbaf7` (Dispatch seal) |
 
@@ -86,11 +87,11 @@ Renderer (`src/lib/studio-design-renderer/**`), dispatch hook / idempotency / ob
 
 | Check | Value |
 |-------|--------|
-| Local HEAD | `83a4282a462639e4793021b98caf84e32600b9e2` (pre-push) |
-| Origin HEAD | *(filled after tip + push)* |
-| Ahead/behind | *(filled after tip + push)* |
-| Staging | empty (seal tip) |
-| Worktree (seal scope) | clean tracked seal files |
+| Local HEAD | `5dc0a72da4ab5fa7ce3ac28e3f73e6ac55eb10fa` |
+| Origin HEAD | `5dc0a72da4ab5fa7ce3ac28e3f73e6ac55eb10fa` |
+| Ahead/behind | `0/0` |
+| Staging | empty |
+| Worktree (seal scope) | tracked seal files clean; unrelated untracked side-packages / local render churn remain unstaged (not part of this seal) |
 | No secrets staged | confirmed |
 | No `/data` staged | confirmed |
 | Merge | **NOT PERFORMED** |
