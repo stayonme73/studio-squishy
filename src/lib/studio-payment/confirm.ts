@@ -4,6 +4,7 @@ import {
   readCampaignEnvelope,
   upsertCampaignRecord,
 } from "@/lib/campaign-store/store";
+import { ensurePostPayActivation } from "@/lib/studio-post-pay-activation";
 
 import { applyPaidTruthToCampaignRecord } from "./apply-paid-record";
 import {
@@ -16,6 +17,17 @@ import {
   writeProcessedPaymentEvent,
 } from "./events-store";
 import type { PaymentConfirmationInput, PaymentConfirmationResult } from "./types";
+
+/**
+ * Payment stays authoritative even when activation fails — pending_retry is
+ * detectable and retriable on the next confirm / reconcile observation.
+ */
+async function activateAfterPayment(
+  campaign: CampaignRecord,
+): Promise<CampaignRecord> {
+  const result = await ensurePostPayActivation(campaign);
+  return result.campaign;
+}
 
 function alreadyConfirmed(campaign: CampaignRecord): boolean {
   return Boolean(
@@ -143,7 +155,11 @@ export async function confirmPaymentFromProcessor(
       processedAt: new Date().toISOString(),
       kind: input.sandbox ? "sandbox" : input.stripeEventId ? "stripe_webhook" : "reconcile",
     });
-    return { ok: true, campaign, alreadyPaid: true };
+    // Recovery: paid but asleep / pending_retry wakes on duplicate observe.
+    const activated = alreadyConfirmed(campaign)
+      ? await activateAfterPayment(campaign)
+      : campaign;
+    return { ok: true, campaign: activated, alreadyPaid: true };
   }
 
   if (
@@ -167,5 +183,6 @@ export async function confirmPaymentFromProcessor(
     kind: input.sandbox ? "sandbox" : input.stripeEventId ? "stripe_webhook" : "reconcile",
   });
 
-  return { ok: true, campaign: saved.record, alreadyPaid: false };
+  const activated = await activateAfterPayment(saved.record);
+  return { ok: true, campaign: activated, alreadyPaid: false };
 }

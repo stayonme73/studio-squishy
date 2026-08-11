@@ -178,6 +178,11 @@ export type CampaignRecord = {
     sandbox?: boolean;
   };
   /**
+   * Server-owned post-pay activation — eager wake after paymentTruth confirmed.
+   * Browser return / File Room / Owner Console visits must not be required.
+   */
+  postPayActivation?: import("@/lib/studio-post-pay-activation/types").PostPayActivationRecord;
+  /**
    * Write-once pre-acceptance payment authorization bound at successful payment.
    * Session decision storage is live-only; this is the durable audit reference.
    */

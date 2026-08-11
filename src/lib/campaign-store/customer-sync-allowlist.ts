@@ -70,8 +70,8 @@ export function mergeCustomerOwnedCampaignSync(
     );
 
     if (incoming.approvedStudioPlan) bootstrapped.approvedStudioPlan = incoming.approvedStudioPlan;
-    // paymentReceivedAt / paymentTruth / preAcceptancePaymentAuthorization are
-    // server-owned — never bootstrap from untrusted client sync.
+    // paymentReceivedAt / paymentTruth / preAcceptancePaymentAuthorization /
+    // postPayActivation are server-owned — never bootstrap from untrusted client sync.
     if (incoming.revisionRoundsIncluded != null) {
       bootstrapped.revisionRoundsIncluded = incoming.revisionRoundsIncluded;
     }
@@ -104,6 +104,11 @@ export function mergeCustomerOwnedCampaignSync(
       existing.preAcceptancePaymentAuthorization;
   } else {
     delete merged.preAcceptancePaymentAuthorization;
+  }
+  if (existing.postPayActivation) {
+    merged.postPayActivation = existing.postPayActivation;
+  } else {
+    delete merged.postPayActivation;
   }
   if (existing.revisionRoundsIncluded == null && incoming.revisionRoundsIncluded != null) {
     merged.revisionRoundsIncluded = incoming.revisionRoundsIncluded;

@@ -181,6 +181,9 @@ describe("STUDIO-OPERATING-PAYMENT-TRUTH-1", () => {
     expect(confirmed.campaign.preAcceptancePaymentAuthorization?.outcome).toBe(
       "CLEAR_TO_ACCEPT",
     );
+    // Post-pay activation consumer — paid wakes without File Room visit.
+    expect(confirmed.campaign.postPayActivation?.status).toBe("activated");
+    expect(confirmed.campaign.postPayActivation?.ownerActionRequired).toBe(false);
 
     const again = await confirmSandboxCheckoutSession(started.checkoutSessionId);
     expect(again.ok).toBe(true);

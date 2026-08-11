@@ -12,11 +12,17 @@ export function buildReadinessContext(campaign: {
   approvedStudioPlan?: { lineItems: readonly unknown[] } | null;
   selectedCampaignOption?: string | null;
   projectDetailsSubmittedAt?: string | null;
+  routeMapIntakeSubmittedAt?: string | null;
+  visionSubmittedAt?: string | null;
 }): TaskReadinessContext {
   return {
     hasApprovedPlan: Boolean(campaign.approvedStudioPlan?.lineItems.length),
     directionApproved: Boolean(campaign.selectedCampaignOption?.trim()),
-    projectDetailsSubmitted: Boolean(campaign.projectDetailsSubmittedAt),
+    projectDetailsSubmitted: Boolean(
+      campaign.projectDetailsSubmittedAt ||
+        campaign.routeMapIntakeSubmittedAt ||
+        campaign.visionSubmittedAt,
+    ),
   };
 }
 
