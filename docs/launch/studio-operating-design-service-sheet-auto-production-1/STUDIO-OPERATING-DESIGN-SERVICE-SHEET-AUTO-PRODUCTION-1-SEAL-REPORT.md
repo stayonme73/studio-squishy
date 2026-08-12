@@ -18,8 +18,8 @@ Scope: **`v2-rtu-service-sheet` only** — remaining design SKUs untouched.
 
 | Field | Value |
 |-------|--------|
-| Package commit SHA | `PENDING_PACKAGE_SHA` |
-| Seal tip | `PENDING_SEAL_TIP` |
+| Package commit SHA | `5ac7cf2c874cc24f7240a1ad53ed1c539dbafa4a` |
+| Seal tip | `5ac7cf2c874cc24f7240a1ad53ed1c539dbafa4a` |
 | Commit message (package) | `feat(operating): seal v2-rtu-service-sheet owner-independent auto-production` |
 | Pushed branch | `operating/design-renderer-proof-1` |
 | Upstream base | `a92947a156fee54a25916da5803c9224ba1ed350` (Menu auto-production seal tip) |
@@ -120,8 +120,8 @@ Other design SKUs remain on existing paths. Sealed Machine design lanes are now 
 
 | Check | Value |
 |-------|--------|
-| Local HEAD | `PENDING_SEAL_TIP` |
-| Origin HEAD | `PENDING_SEAL_TIP` |
+| Local HEAD | `5ac7cf2c874cc24f7240a1ad53ed1c539dbafa4a` |
+| Origin HEAD | `PENDING_AFTER_PUSH` |
 | Ahead/behind | `0/0` |
 | Staging | empty |
 | Worktree (seal scope) | tracked seal files clean; unrelated untracked leftovers remain unstaged |
