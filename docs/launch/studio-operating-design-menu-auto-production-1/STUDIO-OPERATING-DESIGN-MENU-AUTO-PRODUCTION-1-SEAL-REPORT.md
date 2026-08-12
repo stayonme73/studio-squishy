@@ -18,7 +18,7 @@ Scope: **`v2-rtu-menu` only** — remaining design SKUs untouched.
 
 | Field | Value |
 |-------|--------|
-| Package commit SHA | *(filled after commit)* |
+| Package commit SHA | `5a07a2204dcabceefa20da7fa05827b66aee4be0` |
 | Seal tip | *(filled after tip)* |
 | Commit message (package) | `feat(operating): seal v2-rtu-menu owner-independent auto-production` |
 | Pushed branch | `operating/design-renderer-proof-1` |
