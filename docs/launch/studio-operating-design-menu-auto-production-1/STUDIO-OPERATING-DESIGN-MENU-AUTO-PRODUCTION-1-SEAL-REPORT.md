@@ -19,7 +19,7 @@ Scope: **`v2-rtu-menu` only** — remaining design SKUs untouched.
 | Field | Value |
 |-------|--------|
 | Package commit SHA | `5a07a2204dcabceefa20da7fa05827b66aee4be0` |
-| Seal tip | `f1a94f0b9a5d94adb489503415606bc7da23d6a0` |
+| Seal tip | `c6882e5a89bf2a2bd2ac054080570e128c5660dc` |
 | Commit message (package) | `feat(operating): seal v2-rtu-menu owner-independent auto-production` |
 | Pushed branch | `operating/design-renderer-proof-1` |
 | Upstream base | `a4a1a614dd0cf344f5230d49e50a75c229e24856` (Business-card auto-production seal tip) |
@@ -111,8 +111,8 @@ Other design SKUs remain on existing paths. Menu added structured repeated-conte
 
 | Check | Value |
 |-------|--------|
-| Local HEAD | `f1a94f0b9a5d94adb489503415606bc7da23d6a0` |
-| Origin HEAD | `f1a94f0b9a5d94adb489503415606bc7da23d6a0` |
+| Local HEAD | `c6882e5a89bf2a2bd2ac054080570e128c5660dc` |
+| Origin HEAD | `c6882e5a89bf2a2bd2ac054080570e128c5660dc` |
 | Ahead/behind | `0/0` |
 | Staging | empty |
 | Worktree (seal scope) | tracked seal files clean; unrelated untracked leftovers remain unstaged |
