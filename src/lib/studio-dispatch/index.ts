@@ -37,6 +37,18 @@ export {
 } from "./map-flyer-job-truth";
 export { mapBusinessCardProjectTruthFromJob } from "./map-business-card-job-truth";
 export {
+  mapMenuProjectTruthFromJob,
+  parseMenuSectionsFromAnswers,
+} from "./map-menu-job-truth";
+export {
+  invokeMenuDispatchHook,
+  MENU_DISPATCH_HOOK_PACKAGE_ID,
+} from "./menu-dispatch-hook";
+export type {
+  MenuDispatchHookResult,
+  MenuDispatchInvocationOutcome,
+} from "./menu-dispatch-hook";
+export {
   buildIdempotencyKey,
   buildIdempotencyTuple,
   findSuccessfulRenderForFingerprint,
@@ -46,6 +58,11 @@ export {
   buildCardIdempotencyTuple,
   findSuccessfulCardRenderForFingerprint,
 } from "./card-hook-idempotency";
+export {
+  buildMenuIdempotencyKey,
+  buildMenuIdempotencyTuple,
+  findSuccessfulMenuRenderForFingerprint,
+} from "./menu-hook-idempotency";
 export type {
   DispatchExecutionRecord,
   DispatchExecutionResult,

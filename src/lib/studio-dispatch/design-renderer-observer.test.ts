@@ -341,6 +341,160 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
   );
 
   it(
+    "menu uses studio_design_renderer and observer auto-invokes; repeat is ALREADY_RENDERED",
+    async () => {
+      const menuContract = resolveServiceProductionContract("v2-rtu-menu");
+      expect(menuContract.status).toBe("resolved");
+      if (menuContract.status === "resolved") {
+        expect(menuContract.contract.primaryTool.toolId).toBe(
+          "studio_design_renderer",
+        );
+      }
+
+      const campaignId = `obs-menu-${Date.now()}`;
+      ids.push(campaignId);
+      const now = new Date().toISOString();
+      const skus = ["v2-rtu-menu"] as const;
+      const totals = computePlanPricingTotals([...skus]);
+      const menuStructuredJson = JSON.stringify({
+        sections: [
+          {
+            title: "Pastries",
+            items: [
+              {
+                name: "Butter Croissant",
+                description: "Flaky laminated layers.",
+                priceDisplay: "$3.75",
+              },
+              {
+                name: "Cinnamon Roll",
+                description: "Soft swirl with glaze.",
+                priceDisplay: "$4.25",
+              },
+            ],
+          },
+          {
+            title: "Coffee",
+            items: [
+              {
+                name: "Drip Coffee",
+                description: "House blend.",
+                priceDisplay: "$2.75",
+              },
+              {
+                name: "Cafe Latte",
+                description: "Espresso with steamed milk.",
+                priceDisplay: "$4.50",
+              },
+            ],
+          },
+        ],
+      });
+      const campaign = paidFlyerCampaign(campaignId, {
+        campaignName: "Maple Street Bakery",
+        approvedStudioPlan: {
+          selectedServiceIds: [...skus],
+          includedServiceIds: [...skus],
+          additionalServiceIds: [],
+          additionalCostUsd: 0,
+          oneTimeTotalCents: totals.oneTimeSubtotalCents,
+          monthlyTotalCents: 0,
+          amountDueTodayCents: totals.amountDueTodayCents,
+          lineItems: buildServiceScopeSnapshot([...skus]),
+          approvedAt: now,
+        },
+        paymentTruth: {
+          processor: "stripe",
+          status: "confirmed",
+          currency: "usd",
+          expectedAmountCents: totals.amountDueTodayCents,
+          confirmedAmountCents: totals.amountDueTodayCents,
+          checkoutSessionId: `cs_menu_${campaignId}`,
+          paymentIntentId: `pi_menu_${campaignId}`,
+          stripeEventId: `evt_menu_${campaignId}`,
+          selectedServiceIds: [...skus],
+          decisionId: `dec_${campaignId}`,
+          factFingerprint: `fp_${campaignId}`,
+          draftRevision: 1,
+          confirmedAt: now,
+        },
+        routeMapIntake: {
+          submittedAt: now,
+          answers: {
+            businessName: "Maple Street Bakery",
+            businessType: "Bakery",
+            dietaryLabels:
+              "Contains wheat and dairy in various items. Customer-verified wording.",
+            disclaimers: "Prices subject to change.",
+            materials: "Logo staged for Machine production",
+            intendedUse: "Both print and digital",
+            menuStructuredJson,
+          },
+        },
+        routeMapIntakeSubmittedAt: now,
+      });
+      await upsertCampaignRecord(campaign);
+      const matNow = new Date().toISOString();
+      await writeMaterialsEnvelope({
+        campaignId,
+        items: [
+          {
+            id: `logo-${campaignId}`,
+            category: "logo-brand",
+            requirementLevel: "required",
+            reviewStatus: "approved_for_use",
+            contentKind: "file-metadata",
+            label: "Logo",
+            reason: "Brand mark",
+            relatedServiceIds: ["v2-rtu-menu"],
+            uploadStatus: "stored",
+            useAuthorization: { basis: "customer_owns", attestedAt: matNow },
+          },
+        ],
+        updatedAt: matNow,
+        syncedAt: matNow,
+        version: 1,
+      });
+      stageLogo(campaignId);
+
+      const first = await ensureDispatchExecution(campaign);
+      expect(first.ok).toBe(true);
+      if (!first.ok) return;
+      const menuRecord = first.dispatch.records.find(
+        (r) => r.skuId === "v2-rtu-menu",
+      );
+      expect(menuRecord?.requirements?.primaryTool.toolId).toBe(
+        "studio_design_renderer",
+      );
+      expect(menuRecord?.executionIdentityReady).toBe(true);
+      const obs1 = first.designRendererObserver?.results.find(
+        (r) => r.skuId === "v2-rtu-menu",
+      );
+      expect(obs1?.action).toBe("invoked");
+      expect(obs1?.ok).toBe(true);
+      expect(obs1?.invocationOutcome).toBe("RENDERED");
+      expect(obs1?.ownerRoutineProduction).toBe("NONE");
+      expect(obs1?.canvaRequired).toBe(false);
+      expect(obs1?.makeRequired).toBe(false);
+      expect(obs1?.pngContentSha256).toMatch(/^[a-f0-9]{64}$/);
+      const v1 = obs1?.renderVersion;
+      const hash1 = obs1?.pngContentSha256;
+
+      const second = await ensureDispatchExecution(first.campaign);
+      expect(second.ok).toBe(true);
+      if (!second.ok) return;
+      const obs2 = second.designRendererObserver?.results.find(
+        (r) => r.skuId === "v2-rtu-menu",
+      );
+      expect(obs2?.ok).toBe(true);
+      expect(obs2?.invocationOutcome).toBe("ALREADY_RENDERED");
+      expect(obs2?.renderVersion).toBe(v1);
+      expect(obs2?.pngContentSha256).toBe(hash1);
+    },
+    180_000,
+  );
+
+  it(
     "missing material / incomplete truth fails closed without completing render",
     async () => {
       const campaignId = `obs-miss-${Date.now()}`;

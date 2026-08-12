@@ -100,7 +100,8 @@ async function attachDesignRendererObserver(input: {
  * Server-driven dispatch execution identity.
  * Refreshes routing first. Identity evaluation does not invoke tools.
  * After durable identity, STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1 may
- * auto-invoke studio_design_renderer for v2-rtu-flyer and v2-rtu-business-card.
+ * auto-invoke studio_design_renderer for v2-rtu-flyer, v2-rtu-business-card,
+ * and v2-rtu-menu.
  */
 export async function ensureDispatchExecution(
   campaign: CampaignRecord,

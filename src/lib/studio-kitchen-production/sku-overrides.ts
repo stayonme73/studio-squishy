@@ -464,9 +464,30 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "v2-rtu-menu": {
     producerRole: "creative_production",
-    formatExportRequirements: canvaFormats("One menu design export"),
+    /**
+     * STUDIO-OPERATING-DESIGN-MENU-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: menu design spec → sectioned HTML/CSS → Playwright PNG/PDF.
+     * Visual Owner verdict: PASS WITH LIMITS (MENU-LAYOUT-1 max-load).
+     * Remaining design SKUs stay on Canva baseline until separately authorized.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for v2-rtu-menu only (MENU-PROOF-1 + MENU-LAYOUT-1 PASS WITH LIMITS). Canva is not on the fulfillment spine for this SKU. Make not required. Max 5 sections / 30 items TOTAL.",
+    },
+    formatExportRequirements: [
+      "Final flattened digital export (PNG and/or PDF as appropriate)",
+      "Editable source files are not included unless separately authorized",
+      "One single-page menu — PDF + digital",
+    ],
     readiness: "contract_ready",
-    readinessNotes: "RTU menu — manual Canva operational path.",
+    readinessNotes:
+      "RTU menu — creative_production + Studio Design Renderer (Owner-independent, two-column capable). Client prints/shares. Canva not required for this SKU. Visual PASS WITH LIMITS.",
   },
   "v2-rtu-service-sheet": {
     producerRole: "creative_production",

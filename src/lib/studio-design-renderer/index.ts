@@ -85,3 +85,56 @@ export {
   runBusinessCardProofPipeline,
   runBusinessCardJobPipeline,
 } from "./card-pipeline";
+
+/** Menu proof (additive — does not alter flyer/card lanes). */
+export {
+  DESIGN_RENDERER_MENU_SKU,
+  MENU_DESIGN_SPEC_VERSION,
+  MENU_RENDERER_VERSION,
+  MENU_CANVAS,
+  MENU_MAX_SECTIONS,
+  MENU_MAX_ITEMS_TOTAL,
+  MENU_MIN_FONT_PX,
+} from "./menu-types";
+export type {
+  MenuDesignSpec,
+  MenuProjectTruth,
+  MenuArtifactIdentity,
+  MenuRendererPipelineResult,
+} from "./menu-types";
+export {
+  MENU_PROOF_CONTRACT,
+  isDesignRendererMenuSku,
+  countMenuItems,
+} from "./menu-contracts";
+export {
+  MENU_PROOF_PACKAGE_ID,
+  MENU_PROOF_ARTIFACT_ROOT,
+  buildSaltCedarMenuProjectTruthMax,
+  buildSaltCedarMenuProjectTruthSmall,
+  buildSaltCedarMenuProjectTruthMedium,
+  ensureSaltCedarMenuLogoMaterial,
+  buildMaxLoadMenuSections,
+} from "./menu-fixtures";
+export { validateMenuDesignSpec } from "./menu-validate";
+export {
+  reasonMenuDesignSpecDeterministic,
+  assertMenuRequiredTruth,
+} from "./menu-reason";
+export {
+  renderMenuHtml,
+  declaredTextFromMenuSpec,
+} from "./menu-render-html";
+export { captureMenuExports } from "./menu-capture";
+export {
+  fingerprintMenuDesignSpec,
+  fingerprintMenuMaterials,
+  persistMenuArtifacts,
+  resolveMenuRenderPaths,
+} from "./menu-bind";
+export { verifyMenuItemCompletenessAndPrices } from "./menu-completeness";
+export {
+  runMenuRendererPipeline,
+  runMenuProofPipeline,
+  runMenuJobPipeline,
+} from "./menu-pipeline";

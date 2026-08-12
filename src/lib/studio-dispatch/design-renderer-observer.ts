@@ -1,10 +1,12 @@
 /**
  * STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1
  * (+ BUSINESS-CARD-DISPATCH-HOOK-1 card lane)
+ * (+ MENU-DISPATCH-HOOK-1 menu lane)
  *
  * Auto-invoke after durable ensureDispatchExecution for:
  *   - v2-rtu-flyer (sealed flyer hook)
  *   - v2-rtu-business-card (card hook — double-sided)
+ *   - v2-rtu-menu (menu hook — single-page sectioned list)
  * Relies on hook idempotency (ALREADY_RENDERED). Observer does not mint versions itself.
  */
 
@@ -14,12 +16,14 @@ import path from "path";
 import type { CampaignRecord } from "@/config/studio-board";
 import {
   DESIGN_RENDERER_BUSINESS_CARD_SKU,
+  DESIGN_RENDERER_MENU_SKU,
   DESIGN_RENDERER_PROOF_SKU,
 } from "@/lib/studio-design-renderer";
 import { readMaterialsEnvelope } from "@/lib/materials/store";
 
 import { invokeBusinessCardDispatchHook } from "./business-card-dispatch-hook";
 import { invokeDesignRendererDispatchHook } from "./design-renderer-hook";
+import { invokeMenuDispatchHook } from "./menu-dispatch-hook";
 import type { DispatchExecutionRecord, JobDispatchRecord } from "./types";
 
 export const DESIGN_DISPATCH_OBSERVER_PACKAGE_ID =
@@ -28,6 +32,7 @@ export const DESIGN_DISPATCH_OBSERVER_PACKAGE_ID =
 const OBSERVED_RENDERER_SKUS = new Set<string>([
   DESIGN_RENDERER_PROOF_SKU,
   DESIGN_RENDERER_BUSINESS_CARD_SKU,
+  DESIGN_RENDERER_MENU_SKU,
 ]);
 
 export type DesignRendererObserverResult = {
@@ -85,7 +90,7 @@ function resolveStagedLogoRelativePath(
 }
 
 /**
- * Hard gates for automatic design-renderer invoke (flyer or business card).
+ * Hard gates for automatic design-renderer invoke (flyer, business card, or menu).
  * Non-matches are silent skips (do nothing).
  */
 export function shouldObserveDesignRenderer(
@@ -196,6 +201,45 @@ export async function runDesignRendererDispatchObserver(input: {
           renderVersion: hooked.identity.renderVersion,
           pngContentSha256: front?.pngContentSha256,
           backPngContentSha256: back?.pngContentSha256,
+          receiptRelativePath: hooked.receiptRelativePath,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      } else {
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: false,
+          failureCode: hooked.failureCode,
+          message: hooked.message,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      }
+      continue;
+    }
+
+    if (record.skuId === DESIGN_RENDERER_MENU_SKU) {
+      const hooked = await invokeMenuDispatchHook({
+        repoRoot,
+        campaign: input.campaign,
+        dispatchRecord: record,
+        materials,
+        stagedLogoRelativePath,
+      });
+
+      if (hooked.ok) {
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: true,
+          invocationOutcome: hooked.invocationOutcome,
+          renderVersion: hooked.identity.renderVersion,
+          pngContentSha256: hooked.identity.pngContentSha256,
           receiptRelativePath: hooked.receiptRelativePath,
           ownerRoutineProduction: "NONE",
           canvaRequired: false,

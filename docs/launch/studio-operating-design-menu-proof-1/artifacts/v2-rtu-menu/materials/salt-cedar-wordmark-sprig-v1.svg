@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Salt and Cedar mark">
+  <rect width="256" height="256" fill="#F3E6D8"/>
+  <circle cx="128" cy="128" r="110" fill="#6B3E2E"/>
+  <path d="M128 48 C150 78 158 110 148 148 C140 174 128 196 128 196 C128 196 116 174 108 148 C98 110 106 78 128 48 Z" fill="#E8B86D"/>
+  <path d="M128 96 C140 112 144 132 138 152" fill="none" stroke="#F3E6D8" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="128" cy="88" r="8" fill="#F3E6D8"/>
+</svg>
