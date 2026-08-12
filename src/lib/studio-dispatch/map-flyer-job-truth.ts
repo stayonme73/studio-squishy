@@ -89,7 +89,7 @@ export function resolveApprovedLogoMaterial(input: {
     return {
       ok: false,
       code: "MISSING_REQUIRED_MATERIAL",
-      message: "No approved logo-brand material for v2-rtu-flyer",
+      message: `No approved logo-brand material for ${input.skuId}`,
     };
   }
 

@@ -139,7 +139,7 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
     await Promise.all(ids.splice(0).map((id) => cleanup(id)));
   });
 
-  it("gates refuse non-ready / wrong tool / non-flyer", () => {
+  it("gates refuse non-ready / wrong tool / non-lane SKUs", () => {
     const base = evaluateJobDispatch({
       campaignId: "gate",
       jobId: "gate::v2-rtu-flyer",
@@ -148,13 +148,23 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
     });
     expect(shouldObserveDesignRenderer(base).invoke).toBe(false);
 
-    const card = {
+    // Card without studio_design_renderer tool snapshot still skips.
+    const cardNoTool = {
       ...base,
       skuId: "v2-rtu-business-card" as const,
       executionIdentityReady: true,
       status: "EXECUTION_IDENTITY_READY" as const,
+      requirements: undefined,
     };
-    expect(shouldObserveDesignRenderer(card).invoke).toBe(false);
+    expect(shouldObserveDesignRenderer(cardNoTool).invoke).toBe(false);
+
+    const menu = {
+      ...base,
+      skuId: "v2-rtu-menu" as const,
+      executionIdentityReady: true,
+      status: "EXECUTION_IDENTITY_READY" as const,
+    };
+    expect(shouldObserveDesignRenderer(menu).invoke).toBe(false);
   });
 
   it(
@@ -228,65 +238,107 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
     expect(flyerSkip?.skipReason).toMatch(/not_execution_identity_ready|status_not_ready/);
   });
 
-  it("business-card remains Canva and never enters observer invoke", async () => {
-    const card = resolveServiceProductionContract("v2-rtu-business-card");
-    expect(card.status).toBe("resolved");
-    if (card.status === "resolved") {
-      expect(card.contract.primaryTool.toolId).toBe("canva");
-    }
+  it(
+    "business-card uses studio_design_renderer and observer auto-invokes double-sided",
+    async () => {
+      const card = resolveServiceProductionContract("v2-rtu-business-card");
+      expect(card.status).toBe("resolved");
+      if (card.status === "resolved") {
+        expect(card.contract.primaryTool.toolId).toBe("studio_design_renderer");
+      }
 
-    const campaignId = `obs-card-${Date.now()}`;
-    ids.push(campaignId);
-    const now = new Date().toISOString();
-    const skus = ["v2-rtu-business-card"] as const;
-    const totals = computePlanPricingTotals([...skus]);
-    const campaign = paidFlyerCampaign(campaignId, {
-      campaignName: "Card Only",
-      approvedStudioPlan: {
-        selectedServiceIds: [...skus],
-        includedServiceIds: [...skus],
-        additionalServiceIds: [],
-        additionalCostUsd: 0,
-        oneTimeTotalCents: totals.oneTimeSubtotalCents,
-        monthlyTotalCents: 0,
-        amountDueTodayCents: totals.amountDueTodayCents,
-        lineItems: buildServiceScopeSnapshot([...skus]),
-        approvedAt: now,
-      },
-      paymentTruth: {
-        processor: "stripe",
-        status: "confirmed",
-        currency: "usd",
-        expectedAmountCents: totals.amountDueTodayCents,
-        confirmedAmountCents: totals.amountDueTodayCents,
-        checkoutSessionId: `cs_card_${campaignId}`,
-        paymentIntentId: `pi_card_${campaignId}`,
-        stripeEventId: `evt_card_${campaignId}`,
-        selectedServiceIds: [...skus],
-        decisionId: `dec_${campaignId}`,
-        factFingerprint: `fp_${campaignId}`,
-        draftRevision: 1,
-        confirmedAt: now,
-      },
-      routeMapIntake: undefined,
-      routeMapIntakeSubmittedAt: undefined,
-    });
-    await upsertCampaignRecord(campaign);
-    await seedMaterials(campaignId);
+      const campaignId = `obs-card-${Date.now()}`;
+      ids.push(campaignId);
+      const now = new Date().toISOString();
+      const skus = ["v2-rtu-business-card"] as const;
+      const totals = computePlanPricingTotals([...skus]);
+      const campaign = paidFlyerCampaign(campaignId, {
+        campaignName: "Cedar Lane Studio",
+        approvedStudioPlan: {
+          selectedServiceIds: [...skus],
+          includedServiceIds: [...skus],
+          additionalServiceIds: [],
+          additionalCostUsd: 0,
+          oneTimeTotalCents: totals.oneTimeSubtotalCents,
+          monthlyTotalCents: 0,
+          amountDueTodayCents: totals.amountDueTodayCents,
+          lineItems: buildServiceScopeSnapshot([...skus]),
+          approvedAt: now,
+        },
+        paymentTruth: {
+          processor: "stripe",
+          status: "confirmed",
+          currency: "usd",
+          expectedAmountCents: totals.amountDueTodayCents,
+          confirmedAmountCents: totals.amountDueTodayCents,
+          checkoutSessionId: `cs_card_${campaignId}`,
+          paymentIntentId: `pi_card_${campaignId}`,
+          stripeEventId: `evt_card_${campaignId}`,
+          selectedServiceIds: [...skus],
+          decisionId: `dec_${campaignId}`,
+          factFingerprint: `fp_${campaignId}`,
+          draftRevision: 1,
+          confirmedAt: now,
+        },
+        routeMapIntake: {
+          submittedAt: now,
+          answers: {
+            businessName: "Cedar Lane Studio",
+            cardNameTitle: "Alex Rivera · Portrait Lead",
+            phone: "(804) 555-0199",
+            email: "alex@cedarlane.example",
+            webOrSocial: "cedarlane.example",
+            address: "Richmond, VA",
+            brandMaterials: "Logo staged for Machine production",
+          },
+        },
+        routeMapIntakeSubmittedAt: now,
+      });
+      await upsertCampaignRecord(campaign);
+      const matNow = new Date().toISOString();
+      await writeMaterialsEnvelope({
+        campaignId,
+        items: [
+          {
+            id: `logo-${campaignId}`,
+            category: "logo-brand",
+            requirementLevel: "required",
+            reviewStatus: "approved_for_use",
+            contentKind: "file-metadata",
+            label: "Logo",
+            reason: "Brand mark",
+            relatedServiceIds: ["v2-rtu-business-card"],
+            uploadStatus: "stored",
+            useAuthorization: { basis: "customer_owns", attestedAt: matNow },
+          },
+        ],
+        updatedAt: matNow,
+        syncedAt: matNow,
+        version: 1,
+      });
+      stageLogo(campaignId);
 
-    const result = await ensureDispatchExecution(campaign);
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    const cardRecord = result.dispatch.records.find(
-      (r) => r.skuId === "v2-rtu-business-card",
-    );
-    expect(cardRecord?.requirements?.primaryTool.toolId).toBe("canva");
-    expect(
-      result.designRendererObserver?.results.some(
+      const result = await ensureDispatchExecution(campaign);
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      const cardRecord = result.dispatch.records.find(
         (r) => r.skuId === "v2-rtu-business-card",
-      ),
-    ).toBe(false);
-  });
+      );
+      expect(cardRecord?.requirements?.primaryTool.toolId).toBe(
+        "studio_design_renderer",
+      );
+      expect(cardRecord?.executionIdentityReady).toBe(true);
+      const obs = result.designRendererObserver?.results.find(
+        (r) => r.skuId === "v2-rtu-business-card",
+      );
+      expect(obs?.action).toBe("invoked");
+      expect(obs?.ok).toBe(true);
+      expect(obs?.pngContentSha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(obs?.backPngContentSha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(obs?.pngContentSha256).not.toBe(obs?.backPngContentSha256);
+    },
+    180_000,
+  );
 
   it(
     "missing material / incomplete truth fails closed without completing render",

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Business card print v2-rtu-business-card</title>
+<style>
+  @page { size: 1536px 1024px; margin: 0; }
+  html, body { margin: 0; padding: 0; }
+  .page {
+    position: relative;
+    width: 1536px;
+    height: 1024px;
+    overflow: hidden;
+    page-break-after: always;
+    break-after: page;
+    font-family: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  }
+  .page.front { background: #F7F4EF; }
+  .page.back { background: #1F3A5F; page-break-after: auto; break-after: auto; }
+  .layer { position: absolute; box-sizing: border-box; }
+  .layer.text { white-space: pre-wrap; overflow: hidden; }
+  .layer.image img { display: block; }
+</style>
+</head>
+<body>
+<section class="page front canvas" data-side="front"><div class="layer shape" data-id="front-accent" data-role="accent_bar" style="left:0px;top:0px;width:28px;height:1024px;background:#1F3A5F;"></div>
+<div class="layer shape" data-id="front-logo-plate" data-role="logo_plate" style="left:72px;top:72px;width:160px;height:160px;background:#FFFFFF;border-radius:12px;"></div>
+<div class="layer image" data-id="front-logo" data-role="logo" style="left:88px;top:88px;width:128px;height:128px"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJIYXJib3IgYW5kIE9hayBtYXJrIj4KICA8cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0iI0Y3RjRFRiIvPgogIDxlbGxpcHNlIGN4PSIxMjgiIGN5PSIxMjgiIHJ4PSIxMDgiIHJ5PSIxMDgiIGZpbGw9IiMxRjNBNUYiLz4KICA8ZWxsaXBzZSBjeD0iMTI4IiBjeT0iMTI4IiByeD0iOTIiIHJ5PSI5MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzRBNTc0IiBzdHJva2Utd2lkdGg9IjgiLz4KICA8IS0tIFF1aWV0IG9hayBsZWFmIC0tPgogIDxwYXRoIGQ9Ik0xMjggNTYgQzE0OCA3OCAxNTYgMTA4IDE0OCAxMzggQzE0MCAxNjIgMTI4IDE3OCAxMjggMTc4IEMxMjggMTc4IDExNiAxNjIgMTA4IDEzOCBDMTAwIDEwOCAxMDggNzggMTI4IDU2IFoiIGZpbGw9IiNDNEE1NzQiLz4KICA8IS0tIEFuY2hvciBzdGVtIC0tPgogIDxyZWN0IHg9IjEyMCIgeT0iOTAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI4OCIgcng9IjQiIGZpbGw9IiNGN0Y0RUYiLz4KICA8Y2lyY2xlIGN4PSIxMjgiIGN5PSI4MiIgcj0iMTQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0Y3RjRFRiIgc3Ryb2tlLXdpZHRoPSIxMCIvPgogIDxwYXRoIGQ9Ik04OCAxNjggQzEwMCAxOTYgMTU2IDE5NiAxNjggMTY4IiBmaWxsPSJub25lIiBzdHJva2U9IiNGN0Y0RUYiIHN0cm9rZS13aWR0aD0iMTIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik05NiAxNTYgTDg4IDE3MiBNMTYwIDE1NiBMMTY4IDE3MiIgc3Ryb2tlPSIjRjdGNEVGIiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==" alt="" style="width:100%;height:100%;object-fit:contain" /></div>
+<div class="layer text" data-id="front-wordmark" data-role="wordmark" style="left:280px;top:96px;width:1160px;font-size:42px;font-weight:700;line-height:1.15;color:#1F3A5F;text-align:left;">Harbor &amp; Oak</div>
+<div class="layer text" data-id="front-person" data-role="person_name" style="left:280px;top:200px;width:1160px;font-size:36px;font-weight:600;line-height:1.2;color:#1A1A1A;text-align:left;">Jordan Hale</div>
+<div class="layer text" data-id="front-title" data-role="title" style="left:280px;top:260px;width:1160px;font-size:26px;font-weight:500;line-height:1.2;color:#5A6570;text-align:left;">Service Coordinator</div>
+<div class="layer shape" data-id="front-divider" data-role="divider" style="left:280px;top:340px;width:480px;height:3px;background:#C4A574;"></div>
+<div class="layer text" data-id="front-phone" data-role="phone" style="left:280px;top:400px;width:1160px;font-size:28px;font-weight:500;line-height:1.3;color:#1A1A1A;text-align:left;">(804) 555-0142</div>
+<div class="layer text" data-id="front-email" data-role="email" style="left:280px;top:460px;width:1160px;font-size:26px;font-weight:400;line-height:1.3;color:#1A1A1A;text-align:left;">jordan.hale@harborandoak.example</div>
+<div class="layer text" data-id="front-web" data-role="web" style="left:280px;top:520px;width:1160px;font-size:26px;font-weight:400;line-height:1.3;color:#1F3A5F;text-align:left;">harborandoak.example</div>
+<div class="layer text" data-id="front-address" data-role="address" style="left:280px;top:580px;width:1160px;font-size:24px;font-weight:400;line-height:1.3;color:#5A6570;text-align:left;">Richmond, VA metro</div></section>
+<section class="page back canvas" data-side="back"><div class="layer shape" data-id="back-plate" data-role="plate" style="left:0px;top:0px;width:1536px;height:1024px;background:#1F3A5F;"></div>
+<div class="layer shape" data-id="back-logo-plate" data-role="logo_plate" style="left:658px;top:220px;width:220px;height:220px;background:#FFFFFF;border-radius:16px;"></div>
+<div class="layer image" data-id="back-logo" data-role="logo" style="left:678px;top:240px;width:180px;height:180px"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJIYXJib3IgYW5kIE9hayBtYXJrIj4KICA8cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0iI0Y3RjRFRiIvPgogIDxlbGxpcHNlIGN4PSIxMjgiIGN5PSIxMjgiIHJ4PSIxMDgiIHJ5PSIxMDgiIGZpbGw9IiMxRjNBNUYiLz4KICA8ZWxsaXBzZSBjeD0iMTI4IiBjeT0iMTI4IiByeD0iOTIiIHJ5PSI5MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzRBNTc0IiBzdHJva2Utd2lkdGg9IjgiLz4KICA8IS0tIFF1aWV0IG9hayBsZWFmIC0tPgogIDxwYXRoIGQ9Ik0xMjggNTYgQzE0OCA3OCAxNTYgMTA4IDE0OCAxMzggQzE0MCAxNjIgMTI4IDE3OCAxMjggMTc4IEMxMjggMTc4IDExNiAxNjIgMTA4IDEzOCBDMTAwIDEwOCAxMDggNzggMTI4IDU2IFoiIGZpbGw9IiNDNEE1NzQiLz4KICA8IS0tIEFuY2hvciBzdGVtIC0tPgogIDxyZWN0IHg9IjEyMCIgeT0iOTAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI4OCIgcng9IjQiIGZpbGw9IiNGN0Y0RUYiLz4KICA8Y2lyY2xlIGN4PSIxMjgiIGN5PSI4MiIgcj0iMTQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0Y3RjRFRiIgc3Ryb2tlLXdpZHRoPSIxMCIvPgogIDxwYXRoIGQ9Ik04OCAxNjggQzEwMCAxOTYgMTU2IDE5NiAxNjggMTY4IiBmaWxsPSJub25lIiBzdHJva2U9IiNGN0Y0RUYiIHN0cm9rZS13aWR0aD0iMTIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik05NiAxNTYgTDg4IDE3MiBNMTYwIDE1NiBMMTY4IDE3MiIgc3Ryb2tlPSIjRjdGNEVGIiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==" alt="" style="width:100%;height:100%;object-fit:contain" /></div>
+<div class="layer text" data-id="back-wordmark" data-role="wordmark" style="left:80px;top:480px;width:1376px;font-size:40px;font-weight:700;line-height:1.15;color:#F7F4EF;text-align:center;">Harbor &amp; Oak</div>
+<div class="layer text" data-id="back-descriptor" data-role="descriptor" style="left:120px;top:620px;width:1296px;font-size:24px;font-weight:400;line-height:1.35;color:#C4A574;text-align:center;">Plainspoken home services — HVAC &amp; plumbing.</div>
+<div class="layer text" data-id="back-web" data-role="web" style="left:120px;top:700px;width:1296px;font-size:26px;font-weight:500;line-height:1.3;color:#F7F4EF;text-align:center;">harborandoak.example</div></section>
+</body>
+</html>

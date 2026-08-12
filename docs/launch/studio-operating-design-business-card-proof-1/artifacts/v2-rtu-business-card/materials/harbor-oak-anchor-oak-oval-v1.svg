@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Harbor and Oak mark">
+  <rect width="256" height="256" fill="#F7F4EF"/>
+  <ellipse cx="128" cy="128" rx="108" ry="108" fill="#1F3A5F"/>
+  <ellipse cx="128" cy="128" rx="92" ry="92" fill="none" stroke="#C4A574" stroke-width="8"/>
+  <!-- Quiet oak leaf -->
+  <path d="M128 56 C148 78 156 108 148 138 C140 162 128 178 128 178 C128 178 116 162 108 138 C100 108 108 78 128 56 Z" fill="#C4A574"/>
+  <!-- Anchor stem -->
+  <rect x="120" y="90" width="16" height="88" rx="4" fill="#F7F4EF"/>
+  <circle cx="128" cy="82" r="14" fill="none" stroke="#F7F4EF" stroke-width="10"/>
+  <path d="M88 168 C100 196 156 196 168 168" fill="none" stroke="#F7F4EF" stroke-width="12" stroke-linecap="round"/>
+  <path d="M96 156 L88 172 M160 156 L168 172" stroke="#F7F4EF" stroke-width="10" stroke-linecap="round"/>
+</svg>

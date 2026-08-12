@@ -1,7 +1,10 @@
 /**
  * STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1
+ * (+ BUSINESS-CARD-DISPATCH-HOOK-1 card lane)
  *
- * Flyer-only auto-invoke after durable ensureDispatchExecution.
+ * Auto-invoke after durable ensureDispatchExecution for:
+ *   - v2-rtu-flyer (sealed flyer hook)
+ *   - v2-rtu-business-card (card hook — double-sided)
  * Relies on hook idempotency (ALREADY_RENDERED). Observer does not mint versions itself.
  */
 
@@ -9,14 +12,23 @@ import { existsSync } from "fs";
 import path from "path";
 
 import type { CampaignRecord } from "@/config/studio-board";
-import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer";
+import {
+  DESIGN_RENDERER_BUSINESS_CARD_SKU,
+  DESIGN_RENDERER_PROOF_SKU,
+} from "@/lib/studio-design-renderer";
 import { readMaterialsEnvelope } from "@/lib/materials/store";
 
+import { invokeBusinessCardDispatchHook } from "./business-card-dispatch-hook";
 import { invokeDesignRendererDispatchHook } from "./design-renderer-hook";
 import type { DispatchExecutionRecord, JobDispatchRecord } from "./types";
 
 export const DESIGN_DISPATCH_OBSERVER_PACKAGE_ID =
   "STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1" as const;
+
+const OBSERVED_RENDERER_SKUS = new Set<string>([
+  DESIGN_RENDERER_PROOF_SKU,
+  DESIGN_RENDERER_BUSINESS_CARD_SKU,
+]);
 
 export type DesignRendererObserverResult = {
   dispatchId: string;
@@ -28,7 +40,9 @@ export type DesignRendererObserverResult = {
   failureCode?: string;
   message?: string;
   renderVersion?: number;
+  /** Flyer single PNG hash, or card front PNG hash. */
   pngContentSha256?: string;
+  backPngContentSha256?: string;
   receiptRelativePath?: string;
   ownerRoutineProduction: "NONE";
   canvaRequired: false;
@@ -71,13 +85,14 @@ function resolveStagedLogoRelativePath(
 }
 
 /**
- * Hard gates for automatic flyer invoke. Non-matches are silent skips (do nothing).
+ * Hard gates for automatic design-renderer invoke (flyer or business card).
+ * Non-matches are silent skips (do nothing).
  */
 export function shouldObserveDesignRenderer(
   record: JobDispatchRecord,
 ): { invoke: true } | { invoke: false; reason: string } {
-  if (record.skuId !== DESIGN_RENDERER_PROOF_SKU) {
-    return { invoke: false, reason: "sku_not_flyer" };
+  if (!OBSERVED_RENDERER_SKUS.has(record.skuId)) {
+    return { invoke: false, reason: "sku_not_design_renderer_lane" };
   }
   if (!record.executionIdentityReady) {
     return { invoke: false, reason: "not_execution_identity_ready" };
@@ -92,8 +107,8 @@ export function shouldObserveDesignRenderer(
 }
 
 /**
- * Observe durable dispatchExecution and invoke the flyer design hook when gated.
- * Safe under repeated ensureDispatchExecution (hook returns ALREADY_RENDERED).
+ * Observe durable dispatchExecution and invoke the matching design hook when gated.
+ * Safe under repeated ensureDispatchExecution (hooks return ALREADY_RENDERED).
  */
 export async function runDesignRendererDispatchObserver(input: {
   campaign: CampaignRecord;
@@ -114,49 +129,91 @@ export async function runDesignRendererDispatchObserver(input: {
   for (const record of input.dispatch.records) {
     const gate = shouldObserveDesignRenderer(record);
     if (!gate.invoke) {
-      // Only record skips for flyer-shaped attempts that failed a readiness gate;
-      // ignore other SKUs entirely (no noise / no cross-SKU side effects).
-      if (record.skuId === DESIGN_RENDERER_PROOF_SKU) {
+      if (OBSERVED_RENDERER_SKUS.has(record.skuId)) {
         results.push(skip(record, gate.reason));
       }
       continue;
     }
 
-    const hooked = await invokeDesignRendererDispatchHook({
-      repoRoot,
-      campaign: input.campaign,
-      dispatchRecord: record,
-      materials,
-      stagedLogoRelativePath,
-      preferAnthropic: false,
-    });
+    if (record.skuId === DESIGN_RENDERER_PROOF_SKU) {
+      const hooked = await invokeDesignRendererDispatchHook({
+        repoRoot,
+        campaign: input.campaign,
+        dispatchRecord: record,
+        materials,
+        stagedLogoRelativePath,
+        preferAnthropic: false,
+      });
 
-    if (hooked.ok) {
-      results.push({
-        dispatchId: record.dispatchId,
-        skuId: record.skuId,
-        action: "invoked",
-        ok: true,
-        invocationOutcome: hooked.invocationOutcome,
-        renderVersion: hooked.identity.renderVersion,
-        pngContentSha256: hooked.identity.pngContentSha256,
-        receiptRelativePath: hooked.receiptRelativePath,
-        ownerRoutineProduction: "NONE",
-        canvaRequired: false,
-        makeRequired: false,
+      if (hooked.ok) {
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: true,
+          invocationOutcome: hooked.invocationOutcome,
+          renderVersion: hooked.identity.renderVersion,
+          pngContentSha256: hooked.identity.pngContentSha256,
+          receiptRelativePath: hooked.receiptRelativePath,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      } else {
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: false,
+          failureCode: hooked.failureCode,
+          message: hooked.message,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      }
+      continue;
+    }
+
+    if (record.skuId === DESIGN_RENDERER_BUSINESS_CARD_SKU) {
+      const hooked = await invokeBusinessCardDispatchHook({
+        repoRoot,
+        campaign: input.campaign,
+        dispatchRecord: record,
+        materials,
+        stagedLogoRelativePath,
       });
-    } else {
-      results.push({
-        dispatchId: record.dispatchId,
-        skuId: record.skuId,
-        action: "invoked",
-        ok: false,
-        failureCode: hooked.failureCode,
-        message: hooked.message,
-        ownerRoutineProduction: "NONE",
-        canvaRequired: false,
-        makeRequired: false,
-      });
+
+      if (hooked.ok) {
+        const front = hooked.identity.sides.find((s) => s.side === "front");
+        const back = hooked.identity.sides.find((s) => s.side === "back");
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: true,
+          invocationOutcome: hooked.invocationOutcome,
+          renderVersion: hooked.identity.renderVersion,
+          pngContentSha256: front?.pngContentSha256,
+          backPngContentSha256: back?.pngContentSha256,
+          receiptRelativePath: hooked.receiptRelativePath,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      } else {
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: false,
+          failureCode: hooked.failureCode,
+          message: hooked.message,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      }
     }
   }
 

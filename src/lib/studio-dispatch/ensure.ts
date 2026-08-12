@@ -58,8 +58,9 @@ async function writePendingRetry(
 }
 
 /**
- * After durable dispatch identity exists, observe flyer-ready records.
- * Hook failures are recorded — they do not fail dispatch identity itself.
+ * After durable dispatch identity exists, observe design-renderer-ready records
+ * (v2-rtu-flyer and v2-rtu-business-card). Hook failures are recorded — they do
+ * not fail dispatch identity itself.
  */
 async function attachDesignRendererObserver(input: {
   campaign: CampaignRecord;
@@ -99,7 +100,7 @@ async function attachDesignRendererObserver(input: {
  * Server-driven dispatch execution identity.
  * Refreshes routing first. Identity evaluation does not invoke tools.
  * After durable identity, STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1 may
- * auto-invoke the flyer design renderer for v2-rtu-flyer only.
+ * auto-invoke studio_design_renderer for v2-rtu-flyer and v2-rtu-business-card.
  */
 export async function ensureDispatchExecution(
   campaign: CampaignRecord,

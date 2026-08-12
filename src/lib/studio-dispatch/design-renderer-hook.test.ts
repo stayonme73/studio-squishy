@@ -96,16 +96,11 @@ afterEach(async () => {
 });
 
 describe("STUDIO-OPERATING-DESIGN-DISPATCH-HOOK-1", () => {
-  it("points v2-rtu-flyer primaryTool at studio_design_renderer only", () => {
+  it("points v2-rtu-flyer primaryTool at studio_design_renderer", () => {
     const flyer = resolveServiceProductionContract("v2-rtu-flyer");
     expect(flyer.status).toBe("resolved");
     if (flyer.status !== "resolved") return;
     expect(flyer.contract.primaryTool.toolId).toBe("studio_design_renderer");
-
-    const card = resolveServiceProductionContract("v2-rtu-business-card");
-    expect(card.status).toBe("resolved");
-    if (card.status !== "resolved") return;
-    expect(card.contract.primaryTool.toolId).toBe("canva");
   });
 
   it("evaluateJobDispatch still does not invoke the renderer", () => {
@@ -135,7 +130,7 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-HOOK-1", () => {
     expect(mapped.ok).toBe(false);
   });
 
-  it("refuses non-flyer SKUs", async () => {
+  it("flyer hook refuses business-card SKU (card has its own hook)", async () => {
     const record = readyFlyerRecord("camp-hook-sku");
     const bad = {
       ...record,

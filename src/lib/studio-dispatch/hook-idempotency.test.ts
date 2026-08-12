@@ -390,11 +390,11 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-HOOK-IDEMPOTENCY-1", () => {
     180_000,
   );
 
-  it("still refuses non-flyer and keeps other SKUs on Canva", async () => {
-    const card = resolveServiceProductionContract("v2-rtu-business-card");
-    expect(card.status).toBe("resolved");
-    if (card.status === "resolved") {
-      expect(card.contract.primaryTool.toolId).toBe("canva");
+  it("still refuses non-flyer SKUs (menu stays off flyer hook)", async () => {
+    const menu = resolveServiceProductionContract("v2-rtu-menu");
+    expect(menu.status).toBe("resolved");
+    if (menu.status === "resolved") {
+      expect(menu.contract.primaryTool.toolId).toBe("canva");
     }
 
     const record = readyFlyerRecord("camp-hook-idem-sku");

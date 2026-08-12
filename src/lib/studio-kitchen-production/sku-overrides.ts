@@ -496,10 +496,32 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "v2-rtu-business-card": {
     producerRole: "creative_production",
-    formatExportRequirements: canvaFormats("Business card design only (print excluded)"),
+    /**
+     * STUDIO-OPERATING-DESIGN-BUSINESS-CARD-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: card design spec → front+back HTML/CSS → Playwright PNG/PDF.
+     * Remaining design SKUs stay on Canva baseline until separately authorized.
+     * Visual Owner verdict: PASS WITH LIMITS (BUSINESS-CARD-PROOF-1).
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for v2-rtu-business-card only (DESIGN-BUSINESS-CARD-PROOF-1). Canva is not on the fulfillment spine for this SKU. Make not required. Double-sided front+back required.",
+    },
+    formatExportRequirements: [
+      "Final flattened digital export (PNG and/or PDF as appropriate)",
+      "Editable source files are not included unless separately authorized",
+      "Business card design only (print excluded)",
+      "Double-sided design — front and back",
+    ],
     extraLimitations: ["Printing/shipping not included — design-only."],
     readiness: "contract_ready",
-    readinessNotes: "Design-only business card via manual Canva path.",
+    readinessNotes:
+      "RTU business card — creative_production + Studio Design Renderer (Owner-independent, double-sided). Client prints. Canva not required for this SKU. Visual PASS WITH LIMITS.",
   },
   "v2-rtu-email-kit": {
     producerRole: "copy",
