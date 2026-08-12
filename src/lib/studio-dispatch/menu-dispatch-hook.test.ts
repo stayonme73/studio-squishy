@@ -153,7 +153,7 @@ describe("STUDIO-OPERATING-DESIGN-MENU-DISPATCH-HOOK-1", () => {
     const sheet = resolveServiceProductionContract("v2-rtu-service-sheet");
     expect(sheet.status).toBe("resolved");
     if (sheet.status !== "resolved") return;
-    expect(sheet.contract.primaryTool.toolId).toBe("canva");
+    expect(sheet.contract.primaryTool.toolId).toBe("studio_design_renderer");
   });
 
   it("evaluateJobDispatch still does not invoke the renderer", () => {

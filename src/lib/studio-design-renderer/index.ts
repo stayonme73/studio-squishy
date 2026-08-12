@@ -138,3 +138,59 @@ export {
   runMenuProofPipeline,
   runMenuJobPipeline,
 } from "./menu-pipeline";
+
+/** Service-sheet proof (additive — does not alter flyer/card/menu; primaryTool stays Canva). */
+export {
+  DESIGN_RENDERER_SERVICE_SHEET_SKU,
+  SERVICE_SHEET_DESIGN_SPEC_VERSION,
+  SERVICE_SHEET_RENDERER_VERSION,
+  SERVICE_SHEET_CANVAS,
+  SERVICE_SHEET_MAX_SERVICES,
+  SERVICE_SHEET_MIN_FONT_PX,
+} from "./service-sheet-types";
+export type {
+  ServiceSheetDesignSpec,
+  ServiceSheetProjectTruth,
+  ServiceSheetArtifactIdentity,
+  ServiceSheetRendererPipelineResult,
+  ServicePriceDisplayMode,
+  ServiceRowTruth,
+} from "./service-sheet-types";
+export {
+  SERVICE_SHEET_PROOF_CONTRACT,
+  isDesignRendererServiceSheetSku,
+  countServiceSheetServices,
+} from "./service-sheet-contracts";
+export {
+  SERVICE_SHEET_PROOF_PACKAGE_ID,
+  SERVICE_SHEET_PROOF_ARTIFACT_ROOT,
+  FIXTURE_CONTACT_FOR_PRICING_LINE,
+  buildHarborOakServiceSheetProjectTruthMax,
+  buildMaxLoadServiceSheetRows,
+  ensureHarborOakServiceSheetLogoMaterial,
+} from "./service-sheet-fixtures";
+export {
+  mapServicePriceDisplayMode,
+  looksLikeInventedPricingFallback,
+} from "./service-sheet-map-price";
+export { validateServiceSheetDesignSpec } from "./service-sheet-validate";
+export {
+  reasonServiceSheetDesignSpecDeterministic,
+  assertServiceSheetRequiredTruth,
+} from "./service-sheet-reason";
+export {
+  renderServiceSheetHtml,
+  declaredTextFromServiceSheetSpec,
+} from "./service-sheet-render-html";
+export {
+  fingerprintServiceSheetDesignSpec,
+  fingerprintServiceSheetMaterials,
+  persistServiceSheetArtifacts,
+  resolveServiceSheetRenderPaths,
+} from "./service-sheet-bind";
+export { verifyServiceSheetCompletenessAndPrices } from "./service-sheet-completeness";
+export {
+  runServiceSheetRendererPipeline,
+  runServiceSheetProofPipeline,
+  runServiceSheetJobPipeline,
+} from "./service-sheet-pipeline";

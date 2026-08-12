@@ -491,9 +491,31 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "v2-rtu-service-sheet": {
     producerRole: "creative_production",
-    formatExportRequirements: canvaFormats("One service sheet export"),
+    /**
+     * STUDIO-OPERATING-DESIGN-SERVICE-SHEET-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: service-sheet design spec → list HTML/CSS → Playwright PNG/PDF.
+     * Pricing modes: listed | contact_for_pricing | omitted (no invented pricing).
+     * Visual Owner control: SERVICE-SHEET-PROOF-1 PASS.
+     * Remaining design SKUs stay on Canva baseline until separately authorized.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for v2-rtu-service-sheet only (SERVICE-SHEET-PROOF-1). Canva is not on the fulfillment spine for this SKU. Make not required. Max 10 services; optional pricing modes.",
+    },
+    formatExportRequirements: [
+      "Final flattened digital export (PNG and/or PDF as appropriate)",
+      "Editable source files are not included unless separately authorized",
+      "One single-page service sheet — PDF + digital",
+    ],
     readiness: "contract_ready",
-    readinessNotes: "RTU service sheet — manual Canva operational path.",
+    readinessNotes:
+      "RTU service sheet — creative_production + Studio Design Renderer (Owner-independent). Client prints/shares. Canva not required for this SKU.",
   },
   "v2-rtu-social-posts": {
     producerRole: "creative_production",

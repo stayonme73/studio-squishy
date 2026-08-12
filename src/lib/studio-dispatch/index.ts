@@ -63,6 +63,23 @@ export {
   buildMenuIdempotencyTuple,
   findSuccessfulMenuRenderForFingerprint,
 } from "./menu-hook-idempotency";
+export {
+  mapServiceSheetProjectTruthFromJob,
+  parseServiceSheetServicesFromAnswers,
+} from "./map-service-sheet-job-truth";
+export {
+  invokeServiceSheetDispatchHook,
+  SERVICE_SHEET_DISPATCH_HOOK_PACKAGE_ID,
+} from "./service-sheet-dispatch-hook";
+export type {
+  ServiceSheetDispatchHookResult,
+  ServiceSheetDispatchInvocationOutcome,
+} from "./service-sheet-dispatch-hook";
+export {
+  buildServiceSheetIdempotencyKey,
+  buildServiceSheetIdempotencyTuple,
+  findSuccessfulServiceSheetRenderForFingerprint,
+} from "./service-sheet-hook-idempotency";
 export type {
   DispatchExecutionRecord,
   DispatchExecutionResult,

@@ -341,6 +341,144 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
   );
 
   it(
+    "service-sheet uses studio_design_renderer and observer auto-invokes; repeat is ALREADY_RENDERED",
+    async () => {
+      const sheetContract = resolveServiceProductionContract(
+        "v2-rtu-service-sheet",
+      );
+      expect(sheetContract.status).toBe("resolved");
+      if (sheetContract.status === "resolved") {
+        expect(sheetContract.contract.primaryTool.toolId).toBe(
+          "studio_design_renderer",
+        );
+      }
+
+      const campaignId = `obs-sheet-${Date.now()}`;
+      ids.push(campaignId);
+      const now = new Date().toISOString();
+      const skus = ["v2-rtu-service-sheet"] as const;
+      const totals = computePlanPricingTotals([...skus]);
+      const serviceStructuredJson = JSON.stringify({
+        listHeading: "Our Services",
+        services: [
+          {
+            name: "Spring HVAC Tune-Up",
+            description: "Seasonal check.",
+            startingPriceText: "$189",
+          },
+          {
+            name: "Assessment",
+            description: "Walkthrough.",
+            contactForPricingText: "Contact for pricing",
+          },
+          {
+            name: "Custom Coordination",
+            description: "Scoped project help.",
+          },
+        ],
+      });
+      const campaign = paidFlyerCampaign(campaignId, {
+        campaignName: "Cedar Lane Home Care",
+        approvedStudioPlan: {
+          selectedServiceIds: [...skus],
+          includedServiceIds: [...skus],
+          additionalServiceIds: [],
+          additionalCostUsd: 0,
+          oneTimeTotalCents: totals.oneTimeSubtotalCents,
+          monthlyTotalCents: 0,
+          amountDueTodayCents: totals.amountDueTodayCents,
+          lineItems: buildServiceScopeSnapshot([...skus]),
+          approvedAt: now,
+        },
+        paymentTruth: {
+          processor: "stripe",
+          status: "confirmed",
+          currency: "usd",
+          expectedAmountCents: totals.amountDueTodayCents,
+          confirmedAmountCents: totals.amountDueTodayCents,
+          checkoutSessionId: `cs_sheet_${campaignId}`,
+          paymentIntentId: `pi_sheet_${campaignId}`,
+          stripeEventId: `evt_sheet_${campaignId}`,
+          selectedServiceIds: [...skus],
+          decisionId: `dec_${campaignId}`,
+          factFingerprint: `fp_${campaignId}`,
+          draftRevision: 1,
+          confirmedAt: now,
+        },
+        routeMapIntake: {
+          submittedAt: now,
+          answers: {
+            businessName: "Cedar Lane Home Care",
+            businessType: "Home services",
+            contactDetails: "Call (804) 555-0199 · cedarlane.example",
+            wording: "Starting prices shown where listed.",
+            materials: "Logo staged for Machine production",
+            intendedUse: "Both print and digital",
+            serviceStructuredJson,
+          },
+        },
+        routeMapIntakeSubmittedAt: now,
+      });
+      await upsertCampaignRecord(campaign);
+      const matNow = new Date().toISOString();
+      await writeMaterialsEnvelope({
+        campaignId,
+        items: [
+          {
+            id: `logo-${campaignId}`,
+            category: "logo-brand",
+            requirementLevel: "required",
+            reviewStatus: "approved_for_use",
+            contentKind: "file-metadata",
+            label: "Logo",
+            reason: "Brand mark",
+            relatedServiceIds: ["v2-rtu-service-sheet"],
+            uploadStatus: "stored",
+            useAuthorization: { basis: "customer_owns", attestedAt: matNow },
+          },
+        ],
+        updatedAt: matNow,
+        syncedAt: matNow,
+        version: 1,
+      });
+      stageLogo(campaignId);
+
+      const first = await ensureDispatchExecution(campaign);
+      expect(first.ok).toBe(true);
+      if (!first.ok) return;
+      const sheetRecord = first.dispatch.records.find(
+        (r) => r.skuId === "v2-rtu-service-sheet",
+      );
+      expect(sheetRecord?.requirements?.primaryTool.toolId).toBe(
+        "studio_design_renderer",
+      );
+      expect(sheetRecord?.executionIdentityReady).toBe(true);
+      const obs1 = first.designRendererObserver?.results.find(
+        (r) => r.skuId === "v2-rtu-service-sheet",
+      );
+      expect(obs1?.action).toBe("invoked");
+      expect(obs1?.ok).toBe(true);
+      expect(obs1?.invocationOutcome).toBe("RENDERED");
+      expect(obs1?.ownerRoutineProduction).toBe("NONE");
+      expect(obs1?.canvaRequired).toBe(false);
+      const v1 = obs1?.renderVersion;
+      const hash1 = obs1?.pngContentSha256;
+
+      const second = await ensureDispatchExecution(first.campaign);
+      expect(second.ok).toBe(true);
+      if (!second.ok) return;
+      const obs2 = second.designRendererObserver?.results.find(
+        (r) => r.skuId === "v2-rtu-service-sheet",
+      );
+      expect(obs2?.ok).toBe(true);
+      expect(obs2?.invocationOutcome).toBe("ALREADY_RENDERED");
+      expect(obs2?.renderVersion).toBe(v1);
+      expect(obs2?.pngContentSha256).toBe(hash1);
+    },
+    180_000,
+  );
+
+  it(
     "menu uses studio_design_renderer and observer auto-invokes; repeat is ALREADY_RENDERED",
     async () => {
       const menuContract = resolveServiceProductionContract("v2-rtu-menu");
