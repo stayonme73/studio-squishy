@@ -19,7 +19,7 @@ Scope: **`v2-rtu-business-card` only** — remaining design SKUs untouched.
 | Field | Value |
 |-------|--------|
 | Package commit SHA | `f4d4580ade8d5bc5fc0640c95799de818fc83ff9` |
-| Seal tip | `46bfbe0170389df5bdfd4884194813d5ecc75aa0` |
+| Seal tip | `c3f94dd4797058abbe304dac715bf682e7681628` |
 | Commit message (package) | `feat(operating): seal v2-rtu-business-card owner-independent auto-production` |
 | Pushed branch | `operating/design-renderer-proof-1` |
 | Upstream base | `4a48c9893174b05db65083ccad630852c2d0713f` (Flyer auto-production seal) |
@@ -110,9 +110,9 @@ Other design SKUs remain on existing paths. Next SKU must be chosen by renderer-
 
 | Check | Value |
 |-------|--------|
-| Local HEAD | `46bfbe0170389df5bdfd4884194813d5ecc75aa0` |
-| Origin HEAD | `46bfbe0170389df5bdfd4884194813d5ecc75aa0` (after push) |
-| Ahead/behind | `0/0` (after push) |
+| Local HEAD | `c3f94dd4797058abbe304dac715bf682e7681628` |
+| Origin HEAD | `c3f94dd4797058abbe304dac715bf682e7681628` |
+| Ahead/behind | `0/0` |
 | Staging | empty |
 | Worktree (seal scope) | tracked seal files clean; unrelated untracked leftovers remain unstaged |
 | No secrets staged | confirmed |
