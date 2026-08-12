@@ -19,7 +19,7 @@ Scope: **`v2-rtu-menu` only** — remaining design SKUs untouched.
 | Field | Value |
 |-------|--------|
 | Package commit SHA | `5a07a2204dcabceefa20da7fa05827b66aee4be0` |
-| Seal tip | *(filled after tip)* |
+| Seal tip | `8082a53e36c23e8f0e5cbe3f1a050f794c7c5b35` |
 | Commit message (package) | `feat(operating): seal v2-rtu-menu owner-independent auto-production` |
 | Pushed branch | `operating/design-renderer-proof-1` |
 | Upstream base | `a4a1a614dd0cf344f5230d49e50a75c229e24856` (Business-card auto-production seal tip) |
