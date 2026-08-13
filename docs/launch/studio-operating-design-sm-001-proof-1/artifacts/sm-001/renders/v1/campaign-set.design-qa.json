@@ -1,0 +1,408 @@
+{
+  "ok": true,
+  "individualQaOk": true,
+  "plannedPostCount": 6,
+  "plannedPostCountSelection": {
+    "plannedPostCount": 6,
+    "selectedBeforeExecution": true,
+    "rationale": "Full Launch Set: logo, offer facts, date window, extended copy, and secondary proof point support six coordinated posts without inventing content.",
+    "signals": {
+      "hasLogo": true,
+      "hasOfferFacts": true,
+      "hasDateWindow": true,
+      "hasExtendedCopy": true,
+      "hasSecondaryProofPoint": true
+    },
+    "selectionFingerprint": "36bb0a5afddcdabdf6d4aa3c8da015083938711e73336a372c9c82f44267f6da"
+  },
+  "setConsistency": {
+    "ok": true,
+    "summary": "Set consistency OK: 6/6 square posts on cert-square-1024 with distinct layout templates; 6 captions bound to posts; posting order 1:social-post-1 → 2:social-post-2 → 3:social-post-3 → 4:social-post-4 → 5:social-post-5 → 6:social-post-6; advisory schedule (constraint_window) 1:2026-03-10 → 2:2026-03-17 → 3:2026-03-24 → 4:2026-03-31 → 5:2026-04-07 → 6:2026-04-14."
+  },
+  "captionsBound": {
+    "ok": true
+  },
+  "calendar": {
+    "kind": "sm_001_schedule_manifest",
+    "plannedPostCount": 6,
+    "campaignSetRenderVersion": 1,
+    "advisory": true,
+    "publishingExcluded": true,
+    "postingTimesExcluded": true,
+    "dateGovernance": {
+      "respectedConstraints": {
+        "startDate": "2026-03-10",
+        "endDate": "2026-04-15"
+      },
+      "policy": "constraint_window",
+      "policyNote": "Suggested dates spaced inside authoritative campaign start/end window."
+    },
+    "entries": [
+      {
+        "setVersion": 1,
+        "orderIndex": 1,
+        "assetId": "social-post-1",
+        "captionId": "caption-1",
+        "suggestedDate": "2026-03-10",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-1.png"
+      },
+      {
+        "setVersion": 1,
+        "orderIndex": 2,
+        "assetId": "social-post-2",
+        "captionId": "caption-2",
+        "suggestedDate": "2026-03-17",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-2.png"
+      },
+      {
+        "setVersion": 1,
+        "orderIndex": 3,
+        "assetId": "social-post-3",
+        "captionId": "caption-3",
+        "suggestedDate": "2026-03-24",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-3.png"
+      },
+      {
+        "setVersion": 1,
+        "orderIndex": 4,
+        "assetId": "social-post-4",
+        "captionId": "caption-4",
+        "suggestedDate": "2026-03-31",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-4.png"
+      },
+      {
+        "setVersion": 1,
+        "orderIndex": 5,
+        "assetId": "social-post-5",
+        "captionId": "caption-5",
+        "suggestedDate": "2026-04-07",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-5.png"
+      },
+      {
+        "setVersion": 1,
+        "orderIndex": 6,
+        "assetId": "social-post-6",
+        "captionId": "caption-6",
+        "suggestedDate": "2026-04-14",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-6.png"
+      }
+    ]
+  },
+  "evaluation": {
+    "skuId": "sm-001",
+    "fixtureId": "cert-design-1-fixture-a-harbor-oak",
+    "ok": true,
+    "findings": [],
+    "checkedAt": "2026-08-13T22:02:23.008Z",
+    "deterministicFailCount": 0,
+    "judgmentRequired": true,
+    "multiAssetConsistencyChecked": true,
+    "summary": "Deterministic design + multi-asset brand/campaign checks passed. Visual judgment attestations still required."
+  },
+  "identity": {
+    "packageId": "STUDIO-OPERATING-DESIGN-SM-001-PROOF-1",
+    "campaignId": "camp-design-sm-001-proof-n6",
+    "jobId": "camp-design-sm-001-proof-n6::sm-001",
+    "dispatchId": "dd:camp-design-sm-001-proof-n6::sm-001",
+    "skuId": "sm-001",
+    "renderId": "ee3f1e87-eecc-469d-815e-ebc85cf3e511",
+    "plannedPostCount": 6,
+    "plannedPostCountSelection": {
+      "plannedPostCount": 6,
+      "selectedBeforeExecution": true,
+      "rationale": "Full Launch Set: logo, offer facts, date window, extended copy, and secondary proof point support six coordinated posts without inventing content.",
+      "signals": {
+        "hasLogo": true,
+        "hasOfferFacts": true,
+        "hasDateWindow": true,
+        "hasExtendedCopy": true,
+        "hasSecondaryProofPoint": true
+      },
+      "selectionFingerprint": "36bb0a5afddcdabdf6d4aa3c8da015083938711e73336a372c9c82f44267f6da"
+    },
+    "campaignSetRenderVersion": 1,
+    "designSpecVersion": "sm-001-design-spec-1.0.0",
+    "sharedSpecFingerprint": "b9a9d72080e6ebbcc4857cd9c78d82db1d080fee49870c47b1a5f79ce78d0d76",
+    "captionSetFingerprint": "72ebe2885e2c05dbfd00d67d3e87f71c68f159fe78ab9b1636f3fd4756eac31b",
+    "postingOrderFingerprint": "d63188e74afebe13df6ed2149fcfa3c0b03ad3778e01f18ac6c4ad8a8a0a586c",
+    "calendarFingerprint": "baa09db5576dd7076c7772dee303ae45ef98d03e63ed361cdb2c6f45a183e82b",
+    "materialFingerprint": "2a5490ae9ea5aa0336a33e4fbfacd8d905f1567bd226bd6755ae1d46bfb22b34",
+    "rendererVersion": "design-renderer-sm-001-1.0.0",
+    "platformLabel": "Instagram Post — square feed (CERT)",
+    "designSpecRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/campaign-set-design-spec.json",
+    "captionFileRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/captions.json",
+    "captionTextRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/captions.txt",
+    "postingOrderRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/posting-order.json",
+    "calendarRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/calendar-manifest.json",
+    "assets": [
+      {
+        "assetId": "social-post-1",
+        "orderIndex": 1,
+        "layoutTemplate": "offer_lead",
+        "authorizedPurpose": "Instagram Post — square feed (CERT) — Offer lead",
+        "captionId": "caption-1",
+        "plateId": "cert-square-1024",
+        "widthPx": 1024,
+        "heightPx": 1024,
+        "pngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-1.png",
+        "pdfRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-1.pdf",
+        "htmlRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-1.html",
+        "pngContentSha256": "aed49c82840f1334a3fa9883b2b1c7a46ebf313f4853a2b8ede7ebae0b6d192d",
+        "pdfContentSha256": "a4035ad9160062bc5a87a4b0d9b59888c1dabc127aa6b7c64f99d031d23048bc",
+        "assetSpecFingerprint": "6d0d1c3269f00a2fb4387c695f077f6a7b8b28d04d0317135be20c539130f68b",
+        "overflowOk": true,
+        "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+        "individualQaOk": true
+      },
+      {
+        "assetId": "social-post-2",
+        "orderIndex": 2,
+        "layoutTemplate": "cta_book",
+        "authorizedPurpose": "Instagram Post — square feed (CERT) — Booking call to action",
+        "captionId": "caption-2",
+        "plateId": "cert-square-1024",
+        "widthPx": 1024,
+        "heightPx": 1024,
+        "pngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-2.png",
+        "pdfRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-2.pdf",
+        "htmlRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-2.html",
+        "pngContentSha256": "c669344f5792ad1a2ef29d187622d4104a715d85ae42342aaa230cba8d45ac76",
+        "pdfContentSha256": "772d372abfb177291ba85a248ab38f43da6606015ba289455070183808febd43",
+        "assetSpecFingerprint": "8ac36e4b394f923fc70a5d3333a4984824159d82a1f1428473ae2f50ed7f86e2",
+        "overflowOk": true,
+        "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+        "individualQaOk": true
+      },
+      {
+        "assetId": "social-post-3",
+        "orderIndex": 3,
+        "layoutTemplate": "dates_window",
+        "authorizedPurpose": "Instagram Post — square feed (CERT) — Offer window reminder",
+        "captionId": "caption-3",
+        "plateId": "cert-square-1024",
+        "widthPx": 1024,
+        "heightPx": 1024,
+        "pngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-3.png",
+        "pdfRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-3.pdf",
+        "htmlRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-3.html",
+        "pngContentSha256": "1e0cc5abfaa74a11f72bfb67bba50af3552588be333f7cbc32faba27a1fa2222",
+        "pdfContentSha256": "278b80e128b997998033997b61ed74774c50214d4f76693d3168fc2b4e531157",
+        "assetSpecFingerprint": "fbf071b8521bbaa3fda8cf674fa164d6554b44e6ee86009020dbdd08f145366c",
+        "overflowOk": true,
+        "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+        "individualQaOk": true
+      },
+      {
+        "assetId": "social-post-4",
+        "orderIndex": 4,
+        "layoutTemplate": "trust_brand",
+        "authorizedPurpose": "Instagram Post — square feed (CERT) — Brand trust",
+        "captionId": "caption-4",
+        "plateId": "cert-square-1024",
+        "widthPx": 1024,
+        "heightPx": 1024,
+        "pngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-4.png",
+        "pdfRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-4.pdf",
+        "htmlRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-4.html",
+        "pngContentSha256": "2fb8e3970c3820a3bfb921e6d50b5f4c25d2d8fa3b51c04dd5e220fb9725d932",
+        "pdfContentSha256": "1890f4e25018eebde5880cffaba8979d38b469407c3ab7334a51aa69da6a06b3",
+        "assetSpecFingerprint": "d8706c74300002de9945b98cb25b9562e734e1f3bdab5f659ff79b34fa2ea7a7",
+        "overflowOk": true,
+        "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+        "individualQaOk": true
+      },
+      {
+        "assetId": "social-post-5",
+        "orderIndex": 5,
+        "layoutTemplate": "proof_point",
+        "authorizedPurpose": "Instagram Post — square feed (CERT) — Proof point",
+        "captionId": "caption-5",
+        "plateId": "cert-square-1024",
+        "widthPx": 1024,
+        "heightPx": 1024,
+        "pngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-5.png",
+        "pdfRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-5.pdf",
+        "htmlRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-5.html",
+        "pngContentSha256": "bafe5a049cb57e961b3ca5d5383a0c299f4002a607d83efff9709edd81fc314e",
+        "pdfContentSha256": "9129f67d554096a72041484003b3578ac1947be033af1c9b7113d2c18946883d",
+        "assetSpecFingerprint": "130bc98bff57020b9e590e5cda3f79b9d2c84dc5bc6dd9de4f5cc14ac4bfc243",
+        "overflowOk": true,
+        "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+        "individualQaOk": true
+      },
+      {
+        "assetId": "social-post-6",
+        "orderIndex": 6,
+        "layoutTemplate": "soft_close",
+        "authorizedPurpose": "Instagram Post — square feed (CERT) — Soft close reminder",
+        "captionId": "caption-6",
+        "plateId": "cert-square-1024",
+        "widthPx": 1024,
+        "heightPx": 1024,
+        "pngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-6.png",
+        "pdfRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-6.pdf",
+        "htmlRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-6.html",
+        "pngContentSha256": "5a51e46c67a1d5627138070b8b45ee93d14084f6f9b50d7a538e53df030742bf",
+        "pdfContentSha256": "1f080c62cfa79cd4d04cd0c45afb1574097684320b31c7fdea0ad9543b465ed6",
+        "assetSpecFingerprint": "5386d4c387dc6d0e50d4ba6027cb17044c81928fb5fea4a30be6a557a74f7dc0",
+        "overflowOk": true,
+        "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+        "individualQaOk": true
+      }
+    ],
+    "captions": [
+      {
+        "captionId": "caption-1",
+        "assetId": "social-post-1",
+        "orderIndex": 1,
+        "text": "Spring Tune-Up + Drain Clear is $189 at Harbor & Oak Home Services. The offer runs March 10 – April 15, 2026."
+      },
+      {
+        "captionId": "caption-2",
+        "assetId": "social-post-2",
+        "orderIndex": 2,
+        "text": "Book online or call: (804) 555-0142 or harborandoak.example/book-tuneup. Spring Tune-Up + Drain Clear is $189 at Harbor & Oak Home Services."
+      },
+      {
+        "captionId": "caption-3",
+        "assetId": "social-post-3",
+        "orderIndex": 3,
+        "text": "Harbor & Oak Home Services: Spring Tune-Up + Drain Clear runs March 10 – April 15, 2026 for $189. HVAC tune-up and drain clear for homeowners who want plain, steady service."
+      },
+      {
+        "captionId": "caption-4",
+        "assetId": "social-post-4",
+        "orderIndex": 4,
+        "text": "Harbor & Oak Home Services. Spring service you can trust. Book online or call: (804) 555-0142."
+      },
+      {
+        "captionId": "caption-5",
+        "assetId": "social-post-5",
+        "orderIndex": 5,
+        "text": "Spring Tune-Up + Drain Clear — $189 (was $249) at Harbor & Oak Home Services. Offer window March 10 – April 15, 2026."
+      },
+      {
+        "captionId": "caption-6",
+        "assetId": "social-post-6",
+        "orderIndex": 6,
+        "text": "Harbor & Oak Home Services: save your spot for Spring Tune-Up + Drain Clear. Book online or call (804) 555-0142. Runs March 10 – April 15, 2026."
+      }
+    ],
+    "postingOrder": [
+      {
+        "position": 1,
+        "assetId": "social-post-1",
+        "captionId": "caption-1"
+      },
+      {
+        "position": 2,
+        "assetId": "social-post-2",
+        "captionId": "caption-2"
+      },
+      {
+        "position": 3,
+        "assetId": "social-post-3",
+        "captionId": "caption-3"
+      },
+      {
+        "position": 4,
+        "assetId": "social-post-4",
+        "captionId": "caption-4"
+      },
+      {
+        "position": 5,
+        "assetId": "social-post-5",
+        "captionId": "caption-5"
+      },
+      {
+        "position": 6,
+        "assetId": "social-post-6",
+        "captionId": "caption-6"
+      }
+    ],
+    "calendar": {
+      "kind": "sm_001_schedule_manifest",
+      "plannedPostCount": 6,
+      "campaignSetRenderVersion": 1,
+      "advisory": true,
+      "publishingExcluded": true,
+      "postingTimesExcluded": true,
+      "dateGovernance": {
+        "respectedConstraints": {
+          "startDate": "2026-03-10",
+          "endDate": "2026-04-15"
+        },
+        "policy": "constraint_window",
+        "policyNote": "Suggested dates spaced inside authoritative campaign start/end window."
+      },
+      "entries": [
+        {
+          "setVersion": 1,
+          "orderIndex": 1,
+          "assetId": "social-post-1",
+          "captionId": "caption-1",
+          "suggestedDate": "2026-03-10",
+          "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-1.png"
+        },
+        {
+          "setVersion": 1,
+          "orderIndex": 2,
+          "assetId": "social-post-2",
+          "captionId": "caption-2",
+          "suggestedDate": "2026-03-17",
+          "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-2.png"
+        },
+        {
+          "setVersion": 1,
+          "orderIndex": 3,
+          "assetId": "social-post-3",
+          "captionId": "caption-3",
+          "suggestedDate": "2026-03-24",
+          "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-3.png"
+        },
+        {
+          "setVersion": 1,
+          "orderIndex": 4,
+          "assetId": "social-post-4",
+          "captionId": "caption-4",
+          "suggestedDate": "2026-03-31",
+          "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-4.png"
+        },
+        {
+          "setVersion": 1,
+          "orderIndex": 5,
+          "assetId": "social-post-5",
+          "captionId": "caption-5",
+          "suggestedDate": "2026-04-07",
+          "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-5.png"
+        },
+        {
+          "setVersion": 1,
+          "orderIndex": 6,
+          "assetId": "social-post-6",
+          "captionId": "caption-6",
+          "suggestedDate": "2026-04-14",
+          "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-6.png"
+        }
+      ]
+    },
+    "setQaOk": true,
+    "createdAt": "2026-08-13T22:02:23.004Z",
+    "lineageNote": "sm-001 Launch Set — one whole-set version binds all plannedPostCount posts, their captions, the posting order, and the advisory schedule manifest; prior vN retained. plannedPostCount was selected before execution and is never reduced to match what passed QA. Canva unchanged; Make unused; no dispatch remap in this proof.",
+    "proofScopeNote": "STUDIO-OPERATING-DESIGN-SM-001-PROOF-1 — proof only. primaryTool remains Canva. No dispatch. plannedPostCount ∈ {4,5,6} selected before execution. Square-only executable plate. Calendar schedule manifest with date governance. Sealed six lanes untouched. Make unused.",
+    "executablePlate": {
+      "plateId": "cert-square-1024",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "note": "Square-only executable plate for this proof. Portrait/TikTok variants are not authorized; the product contract plate remains deferred."
+    }
+  },
+  "outputMode": "certification_fixture",
+  "proofScopeNote": "STUDIO-OPERATING-DESIGN-SM-001-PROOF-1 — proof only. primaryTool remains Canva. No dispatch. plannedPostCount ∈ {4,5,6} selected before execution. Square-only executable plate. Calendar schedule manifest with date governance. Sealed six lanes untouched. Make unused.",
+  "executablePlate": {
+    "plateId": "cert-square-1024",
+    "widthPx": 1024,
+    "heightPx": 1024,
+    "note": "Square-only executable plate for this proof. Portrait/TikTok variants are not authorized; the product contract plate remains deferred."
+  }
+}

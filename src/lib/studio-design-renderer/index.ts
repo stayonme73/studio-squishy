@@ -354,3 +354,125 @@ export {
   runSocialPostsProofPipeline,
   runSocialPostsJobPipeline,
 } from "./social-posts-pipeline";
+
+/**
+ * sm-001 Launch Set (sealed social-posts lane untouched). SM-001-DISPATCH-HOOK-1
+ * remaps primaryTool and wires the dd:{jobId} hook for sm-001 only.
+ */
+export {
+  DESIGN_RENDERER_SM_001_SKU,
+  SM_001_DESIGN_SPEC_VERSION,
+  SM_001_RENDERER_VERSION,
+  SM_001_PLANNED_POST_COUNTS,
+  SM_001_SQUARE_PLATE,
+  SM_001_LAYOUT_TEMPLATES,
+} from "./sm-001-types";
+export type {
+  DesignRendererSm001Sku,
+  Sm001SetSpec,
+  Sm001ProjectTruth,
+  Sm001SetIdentity,
+  Sm001RendererPipelineResult,
+  Sm001RendererFailureCode,
+  Sm001MemberTruth,
+  Sm001AssetSpec,
+  Sm001AssetArtifact,
+  Sm001Caption,
+  Sm001PostingOrderEntry,
+  Sm001CalendarEntry,
+  Sm001CalendarManifest,
+  Sm001LayoutTemplate,
+  Sm001PlannedPostCount,
+  Sm001PlannedPostCountSelection,
+  Sm001PlateId,
+  Sm001TimingConstraints,
+  Sm001MaterialRef,
+  Sm001DesignLayer,
+  Sm001OutputMode,
+} from "./sm-001-types";
+export {
+  SM_001_PROOF_CONTRACT,
+  isDesignRendererSm001Sku,
+  isSm001PlannedPostCount,
+  resolveSm001ExecutablePlate,
+} from "./sm-001-contracts";
+export {
+  collectSm001NSelectSignals,
+  selectSm001PlannedPostCount,
+  assertPlannedPostCountLocked,
+} from "./sm-001-n-select";
+export type { Sm001NSelectInput } from "./sm-001-n-select";
+export {
+  SM_001_PROOF_PACKAGE_ID,
+  SM_001_PROOF_ARTIFACT_ROOT,
+  SM_001_PROOF_SCOPE_NOTE,
+  assignSm001MembersForCount,
+  buildHarborOakSm001ProjectTruth,
+  ensureHarborOakSm001LogoMaterial,
+} from "./sm-001-fixtures";
+export type { Sm001FixtureRichness } from "./sm-001-fixtures";
+export {
+  reasonSm001SetDeterministic,
+  assertSm001RequiredTruth,
+  sm001AuthorizedPurpose,
+  SM_001_SOCIAL_REUSED_TEMPLATES,
+  SM_001_EXTENSION_TEMPLATES,
+  SM_001_BRAND_ONLY_TEMPLATE,
+} from "./sm-001-reason";
+export {
+  reasonSm001CaptionsDeterministic,
+  assertSm001CaptionsBoundToPosts,
+  validateSm001CaptionFacts,
+} from "./sm-001-captions";
+export type { Sm001CaptionBindingResult } from "./sm-001-captions";
+export {
+  buildSm001CalendarManifest,
+  suggestSm001Dates,
+  assertSuggestedDatesObeyConstraints,
+  fingerprintSm001Calendar,
+} from "./sm-001-calendar";
+export type { Sm001CalendarBuildResult } from "./sm-001-calendar";
+export {
+  renderSm001AssetHtml,
+  declaredTextFromSm001Asset,
+} from "./sm-001-render-html";
+export { validateSm001SetSpec } from "./sm-001-validate";
+export type { Sm001ValidateResult } from "./sm-001-validate";
+export { evaluateSm001SetConsistency } from "./sm-001-set-qa";
+export type { Sm001SetQaResult } from "./sm-001-set-qa";
+export {
+  fingerprintSm001SharedSpec,
+  fingerprintSm001AssetSpec,
+  fingerprintSm001Materials,
+  fingerprintSm001Captions,
+  fingerprintSm001PostingOrder,
+  persistSm001SetArtifacts,
+  resolveSm001RenderPaths,
+} from "./sm-001-bind";
+export type { Sm001AssetRenderInput } from "./sm-001-bind";
+export {
+  runSm001RendererPipeline,
+  runSm001ProofPipeline,
+  runSm001JobPipeline,
+} from "./sm-001-pipeline";
+/** sm-001 INTAKE-TRUTH-1 — live set structure consumed by the sm-001 dispatch hook. */
+export {
+  SM_001_LAYOUT_TEMPLATE_CLASSIFICATION,
+  SM_001_AUTHORIZED_LIVE_TRUTH_KEYS,
+  SM_001_EXECUTABLE_PLATE_IDS,
+  mapSm001SetStructureFromLiveTruth,
+  hasSm001SetStructureLiveTruth,
+  assertSm001StructureExecutableForDispatch,
+  detectSm001UnauthorizedFields,
+  resolveSm001TimingConstraints,
+  isProvenSm001LayoutTemplate,
+} from "./sm-001-intake-truth";
+export type {
+  Sm001LiveTruthInput,
+  Sm001SetStructureTruth,
+  Sm001IntakeStructureResult,
+  Sm001IntakeStructureFailureCode,
+  Sm001DispatchReadinessResult,
+  Sm001LayoutTemplateAuthority,
+  Sm001TimingSource,
+} from "./sm-001-intake-truth";

@@ -108,6 +108,30 @@ export {
   buildSocialPostsIdempotencyTuple,
   findSuccessfulSocialPostsRenderForFingerprint,
 } from "./social-posts-hook-idempotency";
+export {
+  mapSm001ProjectTruthFromJob,
+  SM_001_DISPATCH_WIRING_SCOPE_NOTE,
+} from "./map-sm-001-job-truth";
+export type { Sm001TruthMapResult } from "./map-sm-001-job-truth";
+export {
+  invokeSm001DispatchHook,
+  SM_001_DISPATCH_HOOK_PACKAGE_ID,
+} from "./sm-001-dispatch-hook";
+export type {
+  Sm001DispatchHookResult,
+  Sm001DispatchInvocationOutcome,
+} from "./sm-001-dispatch-hook";
+export {
+  buildSm001IdempotencyKey,
+  buildSm001IdempotencyTuple,
+  fingerprintSm001CalendarInputs,
+  findSuccessfulSm001RenderForFingerprint,
+  findPartialSm001RenderState,
+} from "./sm-001-hook-idempotency";
+export type {
+  Sm001DispatchHookReceipt,
+  Sm001IdempotencyTuple,
+} from "./sm-001-hook-idempotency";
 export type {
   DispatchExecutionRecord,
   DispatchExecutionResult,

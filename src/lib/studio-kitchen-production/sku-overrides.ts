@@ -81,9 +81,33 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "sm-001": {
     producerRole: "creative_production",
-    formatExportRequirements: canvaFormats(
-      "Up to six static social posts + captions + simple calendar",
-    ),
+    /**
+     * STUDIO-OPERATING-DESIGN-SM-001-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: Launch Set design spec → HTML/CSS → Playwright PNG/PDF
+     * + Studio-written captions + posting order + advisory schedule manifest.
+     * plannedPostCount ∈ {4,5,6} is a Studio decision made before execution
+     * (SM-001-INTAKE-TRUTH-1) — never a customer field and never a QA outcome.
+     * Executable plate: Square cert-square-1024 only; portrait/TikTok fail closed.
+     * Visual: SM-001-PROOF-1 PASS WITH LIMITS.
+     * sm-001-monthly stays on the Canva baseline until separately authorized.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for sm-001 only (SM-001-PROOF-1 PASS WITH LIMITS + SM-001-INTAKE-TRUTH-1). Canva is not on the fulfillment spine for this SKU. Make not required. plannedPostCount 4-6 selected before execution; square-only; Studio captions + posting order + advisory calendar with date governance.",
+    },
+    formatExportRequirements: [
+      "Four to six coordinated static post graphics (PNG and/or PDF as appropriate) — plannedPostCount locked before execution",
+      "Caption document or plain-text caption file for every post in the set",
+      "Recommended posting order covering every post",
+      "Advisory posting calendar (schedule manifest) that respects campaign timing constraints — the Studio does not publish or schedule for you",
+      "Editable source files are not included unless separately authorized",
+    ],
     extraQaItems: [
       {
         id: "post_count_limit",
@@ -100,7 +124,7 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
     ],
     readiness: "contract_ready",
     readinessNotes:
-      "Social static content production method defined with manual Canva path. Posting/execution is out of base SKU.",
+      "Social Launch Set — creative_production + Studio Design Renderer (Owner-independent Machine path). Canva is not on the fulfillment spine for this SKU; Make not required. plannedPostCount 4-6 selected before execution from campaign truth and material availability; square-only executable plate; captions Studio-written; advisory posting calendar with date governance. Client posts and schedules. Visual PASS WITH LIMITS.",
   },
   "sm-001-monthly": {
     producerRole: "creative_production",

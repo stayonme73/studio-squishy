@@ -1,0 +1,74 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-SM-001-PROOF-1",
+  "skuId": "sm-001",
+  "campaignId": "camp-design-sm-001-proof-n6",
+  "plannedPostCount": 6,
+  "campaignSetRenderVersion": 1,
+  "scheduleSource": "studio_advisory_within_campaign_timing_constraints",
+  "manifest": {
+    "kind": "sm_001_schedule_manifest",
+    "plannedPostCount": 6,
+    "campaignSetRenderVersion": 1,
+    "advisory": true,
+    "publishingExcluded": true,
+    "postingTimesExcluded": true,
+    "dateGovernance": {
+      "respectedConstraints": {
+        "startDate": "2026-03-10",
+        "endDate": "2026-04-15"
+      },
+      "policy": "constraint_window",
+      "policyNote": "Suggested dates spaced inside authoritative campaign start/end window."
+    },
+    "entries": [
+      {
+        "setVersion": 1,
+        "orderIndex": 1,
+        "assetId": "social-post-1",
+        "captionId": "caption-1",
+        "suggestedDate": "2026-03-10",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-1.png"
+      },
+      {
+        "setVersion": 1,
+        "orderIndex": 2,
+        "assetId": "social-post-2",
+        "captionId": "caption-2",
+        "suggestedDate": "2026-03-17",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-2.png"
+      },
+      {
+        "setVersion": 1,
+        "orderIndex": 3,
+        "assetId": "social-post-3",
+        "captionId": "caption-3",
+        "suggestedDate": "2026-03-24",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-3.png"
+      },
+      {
+        "setVersion": 1,
+        "orderIndex": 4,
+        "assetId": "social-post-4",
+        "captionId": "caption-4",
+        "suggestedDate": "2026-03-31",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-4.png"
+      },
+      {
+        "setVersion": 1,
+        "orderIndex": 5,
+        "assetId": "social-post-5",
+        "captionId": "caption-5",
+        "suggestedDate": "2026-04-07",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-5.png"
+      },
+      {
+        "setVersion": 1,
+        "orderIndex": 6,
+        "assetId": "social-post-6",
+        "captionId": "caption-6",
+        "suggestedDate": "2026-04-14",
+        "artifactPngRelativePath": "docs/launch/studio-operating-design-sm-001-proof-1/artifacts/sm-001/renders/v1/social-post-6.png"
+      }
+    ]
+  }
+}
