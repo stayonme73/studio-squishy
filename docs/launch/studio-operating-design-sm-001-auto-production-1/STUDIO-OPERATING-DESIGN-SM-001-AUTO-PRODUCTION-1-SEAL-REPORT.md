@@ -26,8 +26,7 @@ Canva-replacement design migration progress after this seal: **7/13**.
 | Package commit message | `feat(design-renderer): wire sm-001 Launch Set dispatch hook` |
 | Seal commit message | `docs(operating): seal sm-001 owner-independent auto-production` |
 | Pushed branch | `operating/design-renderer-proof-1` |
-| Local HEAD | `1725ae5d1a13b2d46453ce858eb422bef7e0a86d` |
-| Origin HEAD | `1725ae5d1a13b2d46453ce858eb422bef7e0a86d` |
+| Branch tip (local = origin) | `9d987d78f4cfa213225564bbf5c032876ba71cf8` |
 | Ahead / behind | **0 / 0** (verified after push) |
 | Upstream prior tip | `fa3cddc3871ede9d75ad27b8e765edc565a10f7c` (Social-posts auto-production seal) |
 
