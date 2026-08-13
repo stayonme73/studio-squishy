@@ -135,6 +135,12 @@ describe("STUDIO-OPERATING-DESIGN-SERVICE-SHEET-DISPATCH-HOOK-1", () => {
     if (promo.status !== "resolved") return;
     // PROMOTION-GRAPHICS-DISPATCH-HOOK-1 — remapped; sealed sheet lane unchanged
     expect(promo.contract.primaryTool.toolId).toBe("studio_design_renderer");
+
+    const social = resolveServiceProductionContract("v2-rtu-social-posts");
+    expect(social.status).toBe("resolved");
+    if (social.status !== "resolved") return;
+    // SOCIAL-POSTS-DISPATCH-HOOK-1 — remapped; sealed sheet lane unchanged
+    expect(social.contract.primaryTool.toolId).toBe("studio_design_renderer");
   });
 
   it("evaluateJobDispatch still does not invoke the renderer", () => {

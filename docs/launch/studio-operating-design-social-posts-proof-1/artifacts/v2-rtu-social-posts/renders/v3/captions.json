@@ -1,0 +1,34 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-SOCIAL-POSTS-PROOF-1",
+  "skuId": "v2-rtu-social-posts",
+  "campaignId": "camp-design-social-posts-proof-harbor",
+  "campaignSetRenderVersion": 3,
+  "platformLabel": "Instagram Post — square feed (CERT)",
+  "captionSource": "studio_written_from_campaign_truth",
+  "captions": [
+    {
+      "captionId": "caption-1",
+      "assetId": "social-post-1",
+      "orderIndex": 1,
+      "text": "Spring Tune-Up + Drain Clear is $189 at Harbor & Oak Home Services. The offer runs March 10 – April 15, 2026."
+    },
+    {
+      "captionId": "caption-2",
+      "assetId": "social-post-2",
+      "orderIndex": 2,
+      "text": "Book online or call: (804) 555-0142 or harborandoak.example/book-tuneup. Spring Tune-Up + Drain Clear is $189 at Harbor & Oak Home Services."
+    },
+    {
+      "captionId": "caption-3",
+      "assetId": "social-post-3",
+      "orderIndex": 3,
+      "text": "Harbor & Oak Home Services: Spring Tune-Up + Drain Clear runs March 10 – April 15, 2026 for $189. HVAC tune-up and drain clear for homeowners who want plain, steady service."
+    },
+    {
+      "captionId": "caption-4",
+      "assetId": "social-post-4",
+      "orderIndex": 4,
+      "text": "Harbor & Oak Home Services. Spring service you can trust. Book online or call: (804) 555-0142."
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-SOCIAL-POSTS-PROOF-1",
+  "skuId": "v2-rtu-social-posts",
+  "campaignId": "camp-design-social-posts-proof-harbor",
+  "campaignSetRenderVersion": 3,
+  "platformLabel": "Instagram Post — square feed (CERT)",
+  "postingOrder": [
+    {
+      "position": 1,
+      "assetId": "social-post-1",
+      "captionId": "caption-1"
+    },
+    {
+      "position": 2,
+      "assetId": "social-post-2",
+      "captionId": "caption-2"
+    },
+    {
+      "position": 3,
+      "assetId": "social-post-3",
+      "captionId": "caption-3"
+    },
+    {
+      "position": 4,
+      "assetId": "social-post-4",
+      "captionId": "caption-4"
+    }
+  ]
+}

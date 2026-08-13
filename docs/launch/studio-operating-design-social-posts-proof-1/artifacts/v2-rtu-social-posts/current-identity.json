@@ -1,0 +1,150 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-SOCIAL-POSTS-PROOF-1",
+  "campaignId": "camp-design-social-posts-proof-harbor",
+  "jobId": "camp-design-social-posts-proof-harbor::v2-rtu-social-posts",
+  "dispatchId": "dd:camp-design-social-posts-proof-harbor::v2-rtu-social-posts",
+  "skuId": "v2-rtu-social-posts",
+  "renderId": "cad27806-f940-498a-ad80-aaa05fd189aa",
+  "campaignSetRenderVersion": 3,
+  "designSpecVersion": "social-posts-design-spec-1.0.0",
+  "sharedSpecFingerprint": "c2ac35ffa314ec7b298cd623dce9d3f6ca1bf1b4cfbc5d3d735b688a875e7f75",
+  "captionSetFingerprint": "b35d70a2023965a7afdb26182494337d68dbcd04bed74fd4a61ebc730765ccc6",
+  "postingOrderFingerprint": "66cbd417f04aa247091ecfd3ef81b2748aa713434f3ba6cf823bc3b68a3265a2",
+  "materialFingerprint": "2a5490ae9ea5aa0336a33e4fbfacd8d905f1567bd226bd6755ae1d46bfb22b34",
+  "rendererVersion": "design-renderer-social-posts-1.0.0",
+  "platformLabel": "Instagram Post — square feed (CERT)",
+  "designSpecRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/campaign-set-design-spec.json",
+  "captionFileRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/captions.json",
+  "captionTextRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/captions.txt",
+  "postingOrderRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/posting-order.json",
+  "assets": [
+    {
+      "assetId": "social-post-1",
+      "orderIndex": 1,
+      "roleAngle": "offer_lead",
+      "authorizedPurpose": "Instagram Post — square feed (CERT) — Offer lead",
+      "captionId": "caption-1",
+      "plateId": "cert-square-1024",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "pngRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-1.png",
+      "pdfRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-1.pdf",
+      "htmlRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-1.html",
+      "pngContentSha256": "c295cc80723d599ad96b10875bbc34c887fedf44263be330dba035e97eff2642",
+      "pdfContentSha256": "6013bfa37f3da8e41ccab73f451edaf413cec11ab81104d4901d435ce307b10d",
+      "assetSpecFingerprint": "7050141f0ee740e1bbefd6bbe8e23b6a03475b620505861e6d1b21816bada076",
+      "overflowOk": true,
+      "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+      "individualQaOk": true
+    },
+    {
+      "assetId": "social-post-2",
+      "orderIndex": 2,
+      "roleAngle": "cta_book",
+      "authorizedPurpose": "Instagram Post — square feed (CERT) — Booking call to action",
+      "captionId": "caption-2",
+      "plateId": "cert-square-1024",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "pngRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-2.png",
+      "pdfRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-2.pdf",
+      "htmlRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-2.html",
+      "pngContentSha256": "4f8f87db4f1f3a5bed518b30e9ec130d528c3961775efeb6a175e04b26181cf7",
+      "pdfContentSha256": "bac574ac5ae4d13bcb23e48995e1071d0a23fcfc6aa6a5f73e6b800e0add801e",
+      "assetSpecFingerprint": "a5a2316a8f586a6e3d7746f5c4ef8442df74da71c9c710e66e046f88cdd2d9c9",
+      "overflowOk": true,
+      "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+      "individualQaOk": true
+    },
+    {
+      "assetId": "social-post-3",
+      "orderIndex": 3,
+      "roleAngle": "dates_window",
+      "authorizedPurpose": "Instagram Post — square feed (CERT) — Offer window reminder",
+      "captionId": "caption-3",
+      "plateId": "cert-square-1024",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "pngRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-3.png",
+      "pdfRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-3.pdf",
+      "htmlRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-3.html",
+      "pngContentSha256": "6cb9aa9c2a5369e8d2e4c94560d5a41641280efdb826118e9a257d6d8d8d6843",
+      "pdfContentSha256": "c91720a9f9c0daa3580cca072a58866b1f0ee1000a04f3c545c98cdb06664367",
+      "assetSpecFingerprint": "4be2e186d4d10dabb086c6b987a03aafdcca92cc1802eb1d4d98894dcf6bdd7a",
+      "overflowOk": true,
+      "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+      "individualQaOk": true
+    },
+    {
+      "assetId": "social-post-4",
+      "orderIndex": 4,
+      "roleAngle": "trust_brand",
+      "authorizedPurpose": "Instagram Post — square feed (CERT) — Brand trust",
+      "captionId": "caption-4",
+      "plateId": "cert-square-1024",
+      "widthPx": 1024,
+      "heightPx": 1024,
+      "pngRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-4.png",
+      "pdfRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-4.pdf",
+      "htmlRelativePath": "docs/launch/studio-operating-design-social-posts-proof-1/artifacts/v2-rtu-social-posts/renders/v3/social-post-4.html",
+      "pngContentSha256": "ccff1cdb210d134e09de30e494c063b187f9d7bbaeda05d55fca01ddf93c5c08",
+      "pdfContentSha256": "e3368cb35077fe8435e801935dbeb969911f82d47bfd4f9c6dda3563bcc83dd9",
+      "assetSpecFingerprint": "025e13d4c64cd7736f39aa7eb833585477a45cf43a2ba16b7e384a9b301ea72b",
+      "overflowOk": true,
+      "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+      "individualQaOk": true
+    }
+  ],
+  "captions": [
+    {
+      "captionId": "caption-1",
+      "assetId": "social-post-1",
+      "orderIndex": 1,
+      "text": "Spring Tune-Up + Drain Clear is $189 at Harbor & Oak Home Services. The offer runs March 10 – April 15, 2026."
+    },
+    {
+      "captionId": "caption-2",
+      "assetId": "social-post-2",
+      "orderIndex": 2,
+      "text": "Book online or call: (804) 555-0142 or harborandoak.example/book-tuneup. Spring Tune-Up + Drain Clear is $189 at Harbor & Oak Home Services."
+    },
+    {
+      "captionId": "caption-3",
+      "assetId": "social-post-3",
+      "orderIndex": 3,
+      "text": "Harbor & Oak Home Services: Spring Tune-Up + Drain Clear runs March 10 – April 15, 2026 for $189. HVAC tune-up and drain clear for homeowners who want plain, steady service."
+    },
+    {
+      "captionId": "caption-4",
+      "assetId": "social-post-4",
+      "orderIndex": 4,
+      "text": "Harbor & Oak Home Services. Spring service you can trust. Book online or call: (804) 555-0142."
+    }
+  ],
+  "postingOrder": [
+    {
+      "position": 1,
+      "assetId": "social-post-1",
+      "captionId": "caption-1"
+    },
+    {
+      "position": 2,
+      "assetId": "social-post-2",
+      "captionId": "caption-2"
+    },
+    {
+      "position": 3,
+      "assetId": "social-post-3",
+      "captionId": "caption-3"
+    },
+    {
+      "position": 4,
+      "assetId": "social-post-4",
+      "captionId": "caption-4"
+    }
+  ],
+  "setQaOk": true,
+  "createdAt": "2026-08-13T20:36:45.161Z",
+  "lineageNote": "Social-posts campaign set — one whole-set version binds all four posts, their captions, and the posting order; prior vN retained. Canva unused; Make unused; primaryTool still Canva until a separately authorized dispatch package.",
+  "dispatchWiringScopeNote": "STUDIO-OPERATING-DESIGN-SOCIAL-POSTS-PROOF-1 is renderer proof only. primaryTool for v2-rtu-social-posts remains Canva; no dispatch hook, no observer wiring, no Make automation. Owner routine responsibility NONE. Executing this SKU through the Studio Design Renderer requires a separate Owner-authorized dispatch package."
+}

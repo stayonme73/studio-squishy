@@ -519,7 +519,31 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "v2-rtu-social-posts": {
     producerRole: "creative_production",
-    formatExportRequirements: canvaFormats("Four RTU social posts (client distributes)"),
+    /**
+     * STUDIO-OPERATING-DESIGN-SOCIAL-POSTS-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: four-post campaign set → HTML/CSS → Playwright PNG/PDF
+     * + Studio-written captions + posting order.
+     * Executable plate: Square cert-square-1024 only.
+     * Layout templates: Studio production assignment (INTAKE-TRUTH-1) — not
+     * customer role menus / not Harbor-as-contract.
+     * Portrait / TikTok: fail-closed. Visual: SOCIAL-POSTS-PROOF-1 PASS WITH LIMITS.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for v2-rtu-social-posts only (SOCIAL-POSTS-PROOF-1 PASS WITH LIMITS + INTAKE-TRUTH-1). Canva is not on the fulfillment spine for this SKU. Make not required. Exactly four posts; square-only; Studio captions + posting order; Studio layout templates.",
+    },
+    formatExportRequirements: [
+      "Four coordinated static post graphics (PNG and/or PDF as appropriate)",
+      "Caption document or plain-text caption file for all posts",
+      "Simple recommended posting order (not a full calendar)",
+      "Editable source files are not included unless separately authorized",
+    ],
     extraQaItems: [
       {
         id: "four_posts",
@@ -529,7 +553,8 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
       },
     ],
     readiness: "contract_ready",
-    readinessNotes: "RTU social posts — design/copy package; client posts.",
+    readinessNotes:
+      "RTU social posts — creative_production + Studio Design Renderer (Owner-independent set). Client posts. Canva not required for this SKU. Visual PASS WITH LIMITS.",
   },
   "v2-rtu-promotion-graphics": {
     producerRole: "creative_production",

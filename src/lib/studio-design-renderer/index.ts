@@ -255,3 +255,102 @@ export {
   hasPromoPerGraphicIntakeTruth,
   assertPromoAssetsExecutableForDispatch,
 } from "./promo-intake-truth";
+
+/**
+ * Social-posts proof (additive — primaryTool stays Canva; no dispatch/observer
+ * wiring; no sealed-lane edits).
+ */
+export {
+  DESIGN_RENDERER_SOCIAL_POSTS_SKU,
+  SOCIAL_POSTS_DESIGN_SPEC_VERSION,
+  SOCIAL_POSTS_RENDERER_VERSION,
+  SOCIAL_POSTS_EXACT_COUNT,
+  SOCIAL_POSTS_SQUARE_PLATE,
+  SOCIAL_POST_ROLE_ANGLES,
+  SOCIAL_POST_TRUST_ROLE_ANGLE,
+} from "./social-posts-types";
+export type {
+  DesignRendererSocialPostsSku,
+  SocialPostsSetSpec,
+  SocialPostsProjectTruth,
+  SocialPostsSetIdentity,
+  SocialPostsRendererPipelineResult,
+  SocialPostsRendererFailureCode,
+  SocialPostMemberTruth,
+  SocialPostAssetSpec,
+  SocialPostAssetArtifact,
+  SocialPostCaption,
+  SocialPostingOrderEntry,
+  SocialPostOrderIndex,
+  SocialPostRoleAngle,
+  SocialPostPlateId,
+  SocialPostsQuad,
+} from "./social-posts-types";
+export {
+  SOCIAL_POSTS_PROOF_CONTRACT,
+  isDesignRendererSocialPostsSku,
+  resolveSocialPostPlate,
+} from "./social-posts-contracts";
+export {
+  SOCIAL_POSTS_INTAKE_FIELD_IDS,
+  SOCIAL_POSTS_ROLE_ANGLE_CLASSIFICATION,
+  SOCIAL_POSTS_LIVE_PLATFORM_OPTIONS,
+  SOCIAL_POSTS_LIVE_PURPOSE_OPTIONS,
+  SOCIAL_POSTS_EXECUTABLE_PLATE_IDS,
+  mapSocialPostsSetStructureFromIntakeAnswers,
+  hasSocialPostsSetStructureIntakeTruth,
+  assertSocialPostsStructureExecutableForDispatch,
+  assignStudioProductionSocialPostMembers,
+  resolveSocialPostsPlatformPlacement,
+  isProvenSocialPostRoleAngle,
+} from "./social-posts-intake-truth";
+export type {
+  SocialPostsSetStructureTruth,
+  SocialPostsIntakeStructureResult,
+  SocialPostsRoleAngleAuthority,
+  SocialPostsLivePlatformOption,
+} from "./social-posts-intake-truth";
+
+export {
+  SOCIAL_POSTS_PROOF_PACKAGE_ID,
+  SOCIAL_POSTS_PROOF_ARTIFACT_ROOT,
+  SOCIAL_POSTS_DISPATCH_WIRING_SCOPE_NOTE,
+  SOCIAL_POSTS_FIXTURE_PLATFORM_LABEL,
+  buildHarborOakSocialPostsSetTruth,
+  ensureHarborOakSocialPostsLogoMaterial,
+} from "./social-posts-fixtures";
+export { validateSocialPostsSetSpec } from "./social-posts-validate";
+export {
+  reasonSocialPostsSetDeterministic,
+  assertSocialPostsRequiredTruth,
+  socialPostAuthorizedPurpose,
+} from "./social-posts-reason";
+export {
+  reasonSocialPostCaptionsDeterministic,
+  assertCaptionsBoundToPosts,
+  validateCaptionFacts,
+} from "./social-posts-captions";
+export type {
+  SocialPostCaptionValidation,
+  SocialPostCaptionBindingResult,
+} from "./social-posts-captions";
+export {
+  renderSocialPostAssetHtml,
+  declaredTextFromSocialPostAsset,
+} from "./social-posts-render-html";
+export {
+  fingerprintSocialPostsSharedSpec,
+  fingerprintSocialPostAssetSpec,
+  fingerprintSocialPostsMaterials,
+  fingerprintSocialPostCaptions,
+  fingerprintSocialPostingOrder,
+  persistSocialPostsSetArtifacts,
+  resolveSocialPostsRenderPaths,
+} from "./social-posts-bind";
+export { evaluateSocialPostsSetConsistency } from "./social-posts-set-qa";
+export type { SocialPostsSetQaResult } from "./social-posts-set-qa";
+export {
+  runSocialPostsRendererPipeline,
+  runSocialPostsProofPipeline,
+  runSocialPostsJobPipeline,
+} from "./social-posts-pipeline";

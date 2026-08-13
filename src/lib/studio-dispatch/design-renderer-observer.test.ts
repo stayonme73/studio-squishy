@@ -793,4 +793,131 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
     },
     240_000,
   );
+
+  it(
+    "social-posts uses studio_design_renderer and observer auto-invokes; repeat is ALREADY_RENDERED",
+    async () => {
+      const socialContract = resolveServiceProductionContract(
+        "v2-rtu-social-posts",
+      );
+      expect(socialContract.status).toBe("resolved");
+      if (socialContract.status === "resolved") {
+        expect(socialContract.contract.primaryTool.toolId).toBe(
+          "studio_design_renderer",
+        );
+      }
+
+      const campaignId = `obs-social-${Date.now()}`;
+      ids.push(campaignId);
+      const now = new Date().toISOString();
+      const skus = ["v2-rtu-social-posts"] as const;
+      const totals = computePlanPricingTotals([...skus]);
+      const campaign = paidFlyerCampaign(campaignId, {
+        campaignName: "Cedar Lane Home Care",
+        approvedStudioPlan: {
+          selectedServiceIds: [...skus],
+          includedServiceIds: [...skus],
+          additionalServiceIds: [],
+          additionalCostUsd: 0,
+          oneTimeTotalCents: totals.oneTimeSubtotalCents,
+          monthlyTotalCents: 0,
+          amountDueTodayCents: totals.amountDueTodayCents,
+          lineItems: buildServiceScopeSnapshot([...skus]),
+          approvedAt: now,
+        },
+        paymentTruth: {
+          processor: "stripe",
+          status: "confirmed",
+          currency: "usd",
+          expectedAmountCents: totals.amountDueTodayCents,
+          confirmedAmountCents: totals.amountDueTodayCents,
+          checkoutSessionId: `cs_social_${campaignId}`,
+          paymentIntentId: `pi_social_${campaignId}`,
+          stripeEventId: `evt_social_${campaignId}`,
+          selectedServiceIds: [...skus],
+          decisionId: `dec_${campaignId}`,
+          factFingerprint: `fp_${campaignId}`,
+          draftRevision: 1,
+          confirmedAt: now,
+        },
+        routeMapIntake: {
+          submittedAt: now,
+          answers: {
+            socialPostsPurposeChoice: "Promote an offer",
+            socialPostsActionChoice: "Book now",
+            socialPostsPlatformChoice: "Instagram Post",
+            socialPostsMaterialsChoices: "I can provide a logo",
+            postsAbout:
+              "Promote an offer — Spring Tune-Up + Drain Clear $189. March 10 – April 15, 2026.",
+            callToAction:
+              "Book now — Destination: (804) 555-0142 · cedarlane.example/book-tuneup",
+            platform: "Instagram Post — Square or portrait feed graphic",
+            materials: "Selected materials path: I can provide a logo",
+            wordingHashtags:
+              "No required wording, disclosures, or hashtags provided yet.",
+            mustNotSay: "",
+          },
+        },
+        routeMapIntakeSubmittedAt: now,
+      });
+      await upsertCampaignRecord(campaign);
+      const matNow = new Date().toISOString();
+      await writeMaterialsEnvelope({
+        campaignId,
+        items: [
+          {
+            id: `logo-${campaignId}`,
+            category: "logo-brand",
+            requirementLevel: "required",
+            reviewStatus: "approved_for_use",
+            contentKind: "file-metadata",
+            label: "Logo",
+            reason: "Brand mark",
+            relatedServiceIds: ["v2-rtu-social-posts"],
+            uploadStatus: "stored",
+            useAuthorization: { basis: "customer_owns", attestedAt: matNow },
+          },
+        ],
+        updatedAt: matNow,
+        syncedAt: matNow,
+        version: 1,
+      });
+      stageLogo(campaignId);
+
+      const first = await ensureDispatchExecution(campaign);
+      expect(first.ok).toBe(true);
+      if (!first.ok) return;
+      const socialRecord = first.dispatch.records.find(
+        (r) => r.skuId === "v2-rtu-social-posts",
+      );
+      expect(socialRecord?.requirements?.primaryTool.toolId).toBe(
+        "studio_design_renderer",
+      );
+      expect(socialRecord?.executionIdentityReady).toBe(true);
+      const obs1 = first.designRendererObserver?.results.find(
+        (r) => r.skuId === "v2-rtu-social-posts",
+      );
+      expect(obs1?.action).toBe("invoked");
+      expect(obs1?.ok).toBe(true);
+      expect(obs1?.invocationOutcome).toBe("RENDERED");
+      expect(obs1?.ownerRoutineProduction).toBe("NONE");
+      expect(obs1?.canvaRequired).toBe(false);
+      expect(obs1?.makeRequired).toBe(false);
+      expect(obs1?.pngContentSha256).toMatch(/^[a-f0-9]{64}$/);
+      const v1 = obs1?.renderVersion;
+      const hash1 = obs1?.pngContentSha256;
+
+      const second = await ensureDispatchExecution(first.campaign);
+      expect(second.ok).toBe(true);
+      if (!second.ok) return;
+      const obs2 = second.designRendererObserver?.results.find(
+        (r) => r.skuId === "v2-rtu-social-posts",
+      );
+      expect(obs2?.ok).toBe(true);
+      expect(obs2?.invocationOutcome).toBe("ALREADY_RENDERED");
+      expect(obs2?.renderVersion).toBe(v1);
+      expect(obs2?.pngContentSha256).toBe(hash1);
+    },
+    240_000,
+  );
 });

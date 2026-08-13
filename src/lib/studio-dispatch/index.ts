@@ -94,6 +94,20 @@ export {
   buildPromoIdempotencyTuple,
   findSuccessfulPromoRenderForFingerprint,
 } from "./promo-hook-idempotency";
+export { mapSocialPostsProjectTruthFromJob } from "./map-social-job-truth";
+export {
+  invokeSocialPostsDispatchHook,
+  SOCIAL_POSTS_DISPATCH_HOOK_PACKAGE_ID,
+} from "./social-posts-dispatch-hook";
+export type {
+  SocialPostsDispatchHookResult,
+  SocialPostsDispatchInvocationOutcome,
+} from "./social-posts-dispatch-hook";
+export {
+  buildSocialPostsIdempotencyKey,
+  buildSocialPostsIdempotencyTuple,
+  findSuccessfulSocialPostsRenderForFingerprint,
+} from "./social-posts-hook-idempotency";
 export type {
   DispatchExecutionRecord,
   DispatchExecutionResult,
