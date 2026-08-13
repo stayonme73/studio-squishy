@@ -133,8 +133,8 @@ describe("STUDIO-OPERATING-DESIGN-SERVICE-SHEET-DISPATCH-HOOK-1", () => {
     const promo = resolveServiceProductionContract("v2-rtu-promotion-graphics");
     expect(promo.status).toBe("resolved");
     if (promo.status !== "resolved") return;
-    // Family baseline Canva — no SKU override retarget
-    expect(promo.contract.primaryTool.toolId).toBe("canva");
+    // PROMOTION-GRAPHICS-DISPATCH-HOOK-1 — remapped; sealed sheet lane unchanged
+    expect(promo.contract.primaryTool.toolId).toBe("studio_design_renderer");
   });
 
   it("evaluateJobDispatch still does not invoke the renderer", () => {

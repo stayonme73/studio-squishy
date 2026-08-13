@@ -1,0 +1,456 @@
+{
+  "specVersion": "promotion-graphics-design-spec-1.0.0",
+  "skuId": "v2-rtu-promotion-graphics",
+  "colors": {
+    "primary": "#1F3A5F",
+    "secondary": "#C4A574",
+    "background": "#F7F4EF",
+    "text": "#1A1A1A",
+    "muted": "#5A6570"
+  },
+  "materials": [
+    {
+      "materialId": "mat-harbor-oak-logo-v1",
+      "role": "logo",
+      "relativePath": "docs/launch/studio-operating-design-promotion-graphics-proof-1/artifacts/v2-rtu-promotion-graphics/materials/harbor-oak-anchor-oak-oval-v1.svg",
+      "contentSha256": "e5a7876e20a7c79d7746975f3ad790cdd9c6b82bf9ac86c3897a7ad063e9b510",
+      "approvedIdentitySourceId": "harbor-oak-anchor-oak-oval-v1"
+    }
+  ],
+  "sharedCampaign": {
+    "businessName": "Harbor & Oak Home Services",
+    "wordmark": "Harbor & Oak",
+    "offerName": "Spring Tune-Up + Drain Clear",
+    "priceDisplay": "$189",
+    "dateWindow": "March 10 – April 15, 2026",
+    "phone": "(804) 555-0142",
+    "webDisplay": "harborandoak.example/book-tuneup",
+    "cta": "Book online or call"
+  },
+  "assets": [
+    {
+      "assetId": "spring-tuneup-social-square",
+      "authorizedPurpose": "Social feed placement (square)",
+      "plateId": "cert-square-1024",
+      "canvas": {
+        "widthPx": 1024,
+        "heightPx": 1024
+      },
+      "layoutVariant": "compact_square",
+      "background": {
+        "color": "#F7F4EF"
+      },
+      "layers": [
+        {
+          "type": "shape",
+          "id": "spring-tuneup-social-square-band",
+          "role": "offer_band",
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 120,
+          "fill": "#1F3A5F"
+        },
+        {
+          "type": "shape",
+          "id": "spring-tuneup-social-square-logo-plate",
+          "role": "logo_plate",
+          "x": 48,
+          "y": 148,
+          "width": 160,
+          "height": 160,
+          "fill": "#FFFFFF",
+          "borderRadiusPx": 24
+        },
+        {
+          "type": "image",
+          "id": "spring-tuneup-social-square-logo",
+          "role": "logo",
+          "materialId": "mat-harbor-oak-logo-v1",
+          "x": 64,
+          "y": 164,
+          "width": 128,
+          "height": 128,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-social-square-purpose",
+          "role": "purpose_label",
+          "content": "Social feed placement (square)",
+          "x": 48,
+          "y": 36,
+          "width": 928,
+          "fontSizePx": 18,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "letterSpacingPx": 1,
+          "color": "#F7F4EF",
+          "align": "left"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-social-square-wordmark",
+          "role": "wordmark",
+          "content": "Harbor & Oak",
+          "x": 232,
+          "y": 168,
+          "width": 744,
+          "fontSizePx": 34,
+          "fontWeight": 700,
+          "lineHeight": 1.15,
+          "color": "#1F3A5F",
+          "align": "left"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-social-square-descriptor",
+          "role": "descriptor",
+          "content": "Home Services",
+          "x": 232,
+          "y": 220,
+          "width": 744,
+          "fontSizePx": 18,
+          "fontWeight": 500,
+          "lineHeight": 1.25,
+          "color": "#C4A574",
+          "align": "left"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-social-square-offer",
+          "role": "offer",
+          "content": "Spring Tune-Up + Drain Clear",
+          "x": 48,
+          "y": 360,
+          "width": 928,
+          "fontSizePx": 36,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#1F3A5F",
+          "align": "left"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-social-square-price",
+          "role": "price",
+          "content": "$189 · was $249",
+          "x": 48,
+          "y": 460,
+          "width": 928,
+          "fontSizePx": 52,
+          "fontWeight": 700,
+          "lineHeight": 1.05,
+          "color": "#1A1A1A",
+          "align": "left"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-social-square-dates",
+          "role": "dates",
+          "content": "March 10 – April 15, 2026",
+          "x": 48,
+          "y": 540,
+          "width": 928,
+          "fontSizePx": 22,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#5A6570",
+          "align": "left"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-social-square-cta",
+          "role": "cta",
+          "content": "Book online or call",
+          "x": 48,
+          "y": 720,
+          "width": 928,
+          "fontSizePx": 26,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#1F3A5F",
+          "align": "left"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-social-square-phone",
+          "role": "contact_phone",
+          "content": "(804) 555-0142",
+          "x": 48,
+          "y": 780,
+          "width": 928,
+          "fontSizePx": 22,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#1A1A1A",
+          "align": "left"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-social-square-web",
+          "role": "contact_web",
+          "content": "harborandoak.example/book-tuneup",
+          "x": 48,
+          "y": 820,
+          "width": 928,
+          "fontSizePx": 20,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#C4A574",
+          "align": "left"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-social-square-disclaimer",
+          "role": "disclaimer",
+          "content": "CERTIFICATION FIXTURE / INTERNAL TEST — not a live customer. Two coordinated campaign graphics proof.",
+          "x": 48,
+          "y": 920,
+          "width": 928,
+          "fontSizePx": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.3,
+          "color": "#5A6570",
+          "align": "left"
+        }
+      ],
+      "outputFormats": [
+        "png",
+        "pdf"
+      ]
+    },
+    {
+      "assetId": "spring-tuneup-print-portrait",
+      "authorizedPurpose": "Print / in-store poster (portrait)",
+      "plateId": "cert-portrait-1024x1536",
+      "canvas": {
+        "widthPx": 1024,
+        "heightPx": 1536
+      },
+      "layoutVariant": "tall_portrait",
+      "background": {
+        "color": "#F7F4EF"
+      },
+      "layers": [
+        {
+          "type": "shape",
+          "id": "spring-tuneup-print-portrait-accent",
+          "role": "accent_bar",
+          "x": 0,
+          "y": 0,
+          "width": 28,
+          "height": 1536,
+          "fill": "#1F3A5F"
+        },
+        {
+          "type": "shape",
+          "id": "spring-tuneup-print-portrait-logo-plate",
+          "role": "logo_plate",
+          "x": 392,
+          "y": 64,
+          "width": 240,
+          "height": 240,
+          "fill": "#FFFFFF",
+          "borderRadiusPx": 120
+        },
+        {
+          "type": "image",
+          "id": "spring-tuneup-print-portrait-logo",
+          "role": "logo",
+          "materialId": "mat-harbor-oak-logo-v1",
+          "x": 416,
+          "y": 88,
+          "width": 192,
+          "height": 192,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-purpose",
+          "role": "purpose_label",
+          "content": "Print / in-store poster (portrait)",
+          "x": 72,
+          "y": 48,
+          "width": 300,
+          "fontSizePx": 16,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "letterSpacingPx": 1,
+          "color": "#C4A574",
+          "align": "left"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-wordmark",
+          "role": "wordmark",
+          "content": "Harbor & Oak",
+          "x": 72,
+          "y": 340,
+          "width": 880,
+          "fontSizePx": 48,
+          "fontWeight": 700,
+          "lineHeight": 1.15,
+          "color": "#1F3A5F",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-descriptor",
+          "role": "descriptor",
+          "content": "Home Services",
+          "x": 72,
+          "y": 408,
+          "width": 880,
+          "fontSizePx": 22,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "letterSpacingPx": 2,
+          "color": "#C4A574",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-headline",
+          "role": "headline",
+          "content": "Spring service you can trust",
+          "x": 88,
+          "y": 480,
+          "width": 848,
+          "fontSizePx": 38,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#1A1A1A",
+          "align": "center"
+        },
+        {
+          "type": "shape",
+          "id": "spring-tuneup-print-portrait-rule",
+          "role": "footer_rule",
+          "x": 360,
+          "y": 560,
+          "width": 304,
+          "height": 3,
+          "fill": "#C4A574"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-offer",
+          "role": "offer",
+          "content": "Spring Tune-Up + Drain Clear",
+          "x": 72,
+          "y": 596,
+          "width": 880,
+          "fontSizePx": 34,
+          "fontWeight": 700,
+          "lineHeight": 1.25,
+          "color": "#1F3A5F",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-price",
+          "role": "price",
+          "content": "$189 (was $249)",
+          "x": 72,
+          "y": 700,
+          "width": 880,
+          "fontSizePx": 56,
+          "fontWeight": 700,
+          "lineHeight": 1.1,
+          "color": "#1A1A1A",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-dates",
+          "role": "dates",
+          "content": "March 10 – April 15, 2026",
+          "x": 72,
+          "y": 790,
+          "width": 880,
+          "fontSizePx": 24,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#5A6570",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-body",
+          "role": "body",
+          "content": "HVAC tune-up and drain clear for homeowners who want plain, steady service.",
+          "x": 100,
+          "y": 880,
+          "width": 824,
+          "fontSizePx": 22,
+          "fontWeight": 400,
+          "lineHeight": 1.35,
+          "color": "#1A1A1A",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-cta",
+          "role": "cta",
+          "content": "Book online or call",
+          "x": 72,
+          "y": 1100,
+          "width": 880,
+          "fontSizePx": 28,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#1F3A5F",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-phone",
+          "role": "contact_phone",
+          "content": "(804) 555-0142",
+          "x": 72,
+          "y": 1180,
+          "width": 880,
+          "fontSizePx": 24,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#1A1A1A",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-web",
+          "role": "contact_web",
+          "content": "harborandoak.example/book-tuneup",
+          "x": 72,
+          "y": 1224,
+          "width": 880,
+          "fontSizePx": 22,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#C4A574",
+          "align": "center"
+        },
+        {
+          "type": "text",
+          "id": "spring-tuneup-print-portrait-disclaimer",
+          "role": "disclaimer",
+          "content": "CERTIFICATION FIXTURE / INTERNAL TEST — not a live customer. Two coordinated campaign graphics proof.",
+          "x": 72,
+          "y": 1400,
+          "width": 880,
+          "fontSizePx": 14,
+          "fontWeight": 400,
+          "lineHeight": 1.3,
+          "color": "#5A6570",
+          "align": "center"
+        }
+      ],
+      "outputFormats": [
+        "png",
+        "pdf"
+      ]
+    }
+  ],
+  "reasoningMode": "deterministic_constrained"
+}

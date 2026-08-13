@@ -533,9 +533,32 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "v2-rtu-promotion-graphics": {
     producerRole: "creative_production",
-    formatExportRequirements: canvaFormats("Two campaign graphics"),
+    /**
+     * STUDIO-OPERATING-DESIGN-PROMOTION-GRAPHICS-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: campaign-set design spec → dual HTML/CSS → Playwright PNG/PDF.
+     * Executable plates now: Square 1024×1024 + Portrait 1024×1536 only.
+     * Landscape may be recorded in intake but fails closed until promo landscape layout is proven.
+     * Visual Owner control: PROMOTION-GRAPHICS-PROOF-1 PASS WITH LIMITS.
+     * Remaining design SKUs stay on Canva baseline until separately authorized.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for v2-rtu-promotion-graphics only (PROMOTION-GRAPHICS-PROOF-1 PASS WITH LIMITS + INTAKE-TRUTH-1). Canva is not on the fulfillment spine for this SKU. Make not required. Exactly two assets; Square+Portrait executable; Landscape fail-closed.",
+    },
+    formatExportRequirements: [
+      "Final flattened digital export (PNG and/or PDF as appropriate)",
+      "Editable source files are not included unless separately authorized",
+      "Two coordinated campaign graphics — one agreed format/use per graphic",
+    ],
     readiness: "contract_ready",
-    readinessNotes: "RTU campaign graphics — distinct from published landing page (rm-j005).",
+    readinessNotes:
+      "RTU campaign graphics — creative_production + Studio Design Renderer (Owner-independent set). Distinct from published landing page (rm-j005). Canva not required for this SKU. Visual PASS WITH LIMITS.",
   },
   "v2-rtu-business-card": {
     producerRole: "creative_production",

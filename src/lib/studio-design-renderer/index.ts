@@ -194,3 +194,64 @@ export {
   runServiceSheetProofPipeline,
   runServiceSheetJobPipeline,
 } from "./service-sheet-pipeline";
+
+/** Promotion-graphics proof (additive — primaryTool stays Canva; no sealed-lane edits). */
+export {
+  DESIGN_RENDERER_PROMO_SKU,
+  PROMO_DESIGN_SPEC_VERSION,
+  PROMO_RENDERER_VERSION,
+  PROMO_SQUARE_PLATE,
+  PROMO_PORTRAIT_PLATE,
+  PROMO_LANDSCAPE_PLATE,
+} from "./promo-types";
+export type {
+  PromoCampaignSetSpec,
+  PromoProjectTruth,
+  PromoCampaignSetIdentity,
+  PromoRendererPipelineResult,
+  PromoAssetTruth,
+  PromoPlateId,
+} from "./promo-types";
+export {
+  PROMO_PROOF_CONTRACT,
+  isDesignRendererPromoSku,
+  resolvePromoPlate,
+} from "./promo-contracts";
+export {
+  PROMO_PROOF_PACKAGE_ID,
+  PROMO_PROOF_ARTIFACT_ROOT,
+  LIVE_INTAKE_PER_ASSET_PURPOSE_GAP,
+  buildHarborOakPromoCampaignSetTruth,
+  ensureHarborOakPromoLogoMaterial,
+} from "./promo-fixtures";
+export { validatePromoCampaignSetSpec } from "./promo-validate";
+export {
+  reasonPromoCampaignSetDeterministic,
+  assertPromoRequiredTruth,
+} from "./promo-reason";
+export {
+  renderPromoAssetHtml,
+  declaredTextFromPromoAsset,
+} from "./promo-render-html";
+export {
+  fingerprintPromoSharedSpec,
+  fingerprintPromoAssetSpec,
+  fingerprintPromoMaterials,
+  persistPromoCampaignSetArtifacts,
+  resolvePromoRenderPaths,
+} from "./promo-bind";
+export { evaluatePromoSetConsistency } from "./promo-set-qa";
+export {
+  runPromoRendererPipeline,
+  runPromoProofPipeline,
+  runPromoJobPipeline,
+} from "./promo-pipeline";
+export {
+  PROMO_INTAKE_PURPOSE_OPTIONS,
+  PROMO_INTAKE_PLATE_OPTIONS,
+  PROMO_INTAKE_FIELD_IDS,
+  PROMO_EXECUTABLE_PLATE_IDS,
+  mapPromoAssetsFromIntakeAnswers,
+  hasPromoPerGraphicIntakeTruth,
+  assertPromoAssetsExecutableForDispatch,
+} from "./promo-intake-truth";

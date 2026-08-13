@@ -1,0 +1,85 @@
+{
+  "ok": true,
+  "individualQaOk": true,
+  "setConsistency": {
+    "ok": true,
+    "summary": "Set consistency OK: spring-tuneup-social-square (cert-square-1024) + spring-tuneup-print-portrait (cert-portrait-1024x1536); related campaign truth; distinct layouts."
+  },
+  "evaluation": {
+    "skuId": "v2-rtu-promotion-graphics",
+    "fixtureId": "cert-design-1-fixture-a-harbor-oak",
+    "ok": true,
+    "findings": [],
+    "checkedAt": "2026-08-12T23:18:15.834Z",
+    "deterministicFailCount": 0,
+    "judgmentRequired": true,
+    "multiAssetConsistencyChecked": true,
+    "summary": "Deterministic design + multi-asset brand/campaign checks passed. Visual judgment attestations still required."
+  },
+  "identity": {
+    "packageId": "STUDIO-OPERATING-DESIGN-PROMOTION-GRAPHICS-PROOF-1",
+    "campaignId": "camp-design-promo-graphics-proof-harbor",
+    "jobId": "camp-design-promo-graphics-proof-harbor::v2-rtu-promotion-graphics",
+    "dispatchId": "dd:camp-design-promo-graphics-proof-harbor::v2-rtu-promotion-graphics",
+    "skuId": "v2-rtu-promotion-graphics",
+    "renderId": "f28cd129-8b21-4a42-81ac-fe401c951ca0",
+    "campaignSetRenderVersion": 3,
+    "designSpecVersion": "promotion-graphics-design-spec-1.0.0",
+    "sharedSpecFingerprint": "006d3e7f89b6cf628b7e8e767926335beeea106be6833e4d89548eaa4f57eeb3",
+    "materialFingerprint": "2a5490ae9ea5aa0336a33e4fbfacd8d905f1567bd226bd6755ae1d46bfb22b34",
+    "rendererVersion": "design-renderer-promotion-graphics-1.0.0",
+    "designSpecRelativePath": "docs/launch/studio-operating-design-promotion-graphics-proof-1/artifacts/v2-rtu-promotion-graphics/renders/v3/campaign-set-design-spec.json",
+    "assets": [
+      {
+        "assetId": "spring-tuneup-social-square",
+        "authorizedPurpose": "Social feed placement (square)",
+        "plateId": "cert-square-1024",
+        "widthPx": 1024,
+        "heightPx": 1024,
+        "layoutVariant": "compact_square",
+        "pngRelativePath": "docs/launch/studio-operating-design-promotion-graphics-proof-1/artifacts/v2-rtu-promotion-graphics/renders/v3/spring-tuneup-social-square.png",
+        "pdfRelativePath": "docs/launch/studio-operating-design-promotion-graphics-proof-1/artifacts/v2-rtu-promotion-graphics/renders/v3/spring-tuneup-social-square.pdf",
+        "htmlRelativePath": "docs/launch/studio-operating-design-promotion-graphics-proof-1/artifacts/v2-rtu-promotion-graphics/renders/v3/spring-tuneup-social-square.html",
+        "pngContentSha256": "4f63af83ece3f9470773be60afa1ee0e5bb64246ac9fc0b45c26e23a7f8d3bfc",
+        "pdfContentSha256": "be1948d99ce6105234395de336c3027aa41918d3cb52dedab203f98f4847f6d0",
+        "assetSpecFingerprint": "d120955d50189eb682165bfed7badf21dc74ebbde84e05875b2cf9b643cf9e91",
+        "overflowOk": true,
+        "overflowDetail": "scroll=1024x1024 canvas=1024x1024",
+        "individualQaOk": true
+      },
+      {
+        "assetId": "spring-tuneup-print-portrait",
+        "authorizedPurpose": "Print / in-store poster (portrait)",
+        "plateId": "cert-portrait-1024x1536",
+        "widthPx": 1024,
+        "heightPx": 1536,
+        "layoutVariant": "tall_portrait",
+        "pngRelativePath": "docs/launch/studio-operating-design-promotion-graphics-proof-1/artifacts/v2-rtu-promotion-graphics/renders/v3/spring-tuneup-print-portrait.png",
+        "pdfRelativePath": "docs/launch/studio-operating-design-promotion-graphics-proof-1/artifacts/v2-rtu-promotion-graphics/renders/v3/spring-tuneup-print-portrait.pdf",
+        "htmlRelativePath": "docs/launch/studio-operating-design-promotion-graphics-proof-1/artifacts/v2-rtu-promotion-graphics/renders/v3/spring-tuneup-print-portrait.html",
+        "pngContentSha256": "3c1b1d8b89a51668e9949a92d3b5631623e4e68997bb33ebed54421d6de51d65",
+        "pdfContentSha256": "89b73ceda0392c0a73a11757f35cebf2e732cca57cb7f605633fbd89a94e2003",
+        "assetSpecFingerprint": "ab08bfc746e273a7ab3ae61c04fb24b41df42d7d93232e24a5243e06c76efe35",
+        "overflowOk": true,
+        "overflowDetail": "scroll=1024x1536 canvas=1024x1536",
+        "individualQaOk": true
+      }
+    ],
+    "setQaOk": true,
+    "createdAt": "2026-08-12T23:18:15.831Z",
+    "lineageNote": "Promotion-graphics campaign set — whole-set version binds both assets; prior vN retained; Canva unused; primaryTool still Canva until authorized hook; live per-asset purpose intake gap documented.",
+    "liveIntakePerAssetPurposeGap": "Live rtu-promotion-graphics intake currently provides one job-level intendedUse (Print|Social|Email|In-store|Other) plus optional sizeNotes. It does not yet capture authoritative structured purpose/use and agreed plate for Asset A and Asset B separately. Operating dispatch remains blocked on that upstream truth gap even if this renderer proof PASSes. Exact future change: intake (or Campaign Record mapping) must record per-graphic authorizedPurpose + agreedPlate/size for each of the two required graphics before Owner-independent auto-production can be honest."
+  },
+  "outputMode": "certification_fixture",
+  "liveIntakePerAssetPurposeGap": "Live rtu-promotion-graphics intake currently provides one job-level intendedUse (Print|Social|Email|In-store|Other) plus optional sizeNotes. It does not yet capture authoritative structured purpose/use and agreed plate for Asset A and Asset B separately. Operating dispatch remains blocked on that upstream truth gap even if this renderer proof PASSes. Exact future change: intake (or Campaign Record mapping) must record per-graphic authorizedPurpose + agreedPlate/size for each of the two required graphics before Owner-independent auto-production can be honest.",
+  "squarePlateProven": {
+    "plateId": "cert-square-1024",
+    "widthPx": 1024,
+    "heightPx": 1024
+  },
+  "portraitPlateReused": {
+    "plateId": "cert-portrait-1024x1536",
+    "widthPx": 1024,
+    "heightPx": 1536
+  }
+}

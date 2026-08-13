@@ -80,6 +80,20 @@ export {
   buildServiceSheetIdempotencyTuple,
   findSuccessfulServiceSheetRenderForFingerprint,
 } from "./service-sheet-hook-idempotency";
+export { mapPromoProjectTruthFromJob } from "./map-promo-job-truth";
+export {
+  invokePromoDispatchHook,
+  PROMO_DISPATCH_HOOK_PACKAGE_ID,
+} from "./promo-dispatch-hook";
+export type {
+  PromoDispatchHookResult,
+  PromoDispatchInvocationOutcome,
+} from "./promo-dispatch-hook";
+export {
+  buildPromoIdempotencyKey,
+  buildPromoIdempotencyTuple,
+  findSuccessfulPromoRenderForFingerprint,
+} from "./promo-hook-idempotency";
 export type {
   DispatchExecutionRecord,
   DispatchExecutionResult,

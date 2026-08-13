@@ -3,12 +3,14 @@
  * (+ BUSINESS-CARD-DISPATCH-HOOK-1 card lane)
  * (+ MENU-DISPATCH-HOOK-1 menu lane)
  * (+ SERVICE-SHEET-DISPATCH-HOOK-1 service-sheet lane)
+ * (+ PROMOTION-GRAPHICS-DISPATCH-HOOK-1 promotion-graphics set lane)
  *
  * Auto-invoke after durable ensureDispatchExecution for:
  *   - v2-rtu-flyer (sealed flyer hook)
  *   - v2-rtu-business-card (card hook — double-sided)
  *   - v2-rtu-menu (menu hook — single-page sectioned list)
  *   - v2-rtu-service-sheet (service-sheet hook — optional pricing list)
+ *   - v2-rtu-promotion-graphics (promo campaign-set hook — Square+Portrait executable)
  * Relies on hook idempotency (ALREADY_RENDERED). Observer does not mint versions itself.
  */
 
@@ -20,6 +22,7 @@ import {
   DESIGN_RENDERER_BUSINESS_CARD_SKU,
   DESIGN_RENDERER_MENU_SKU,
   DESIGN_RENDERER_PROOF_SKU,
+  DESIGN_RENDERER_PROMO_SKU,
   DESIGN_RENDERER_SERVICE_SHEET_SKU,
 } from "@/lib/studio-design-renderer";
 import { readMaterialsEnvelope } from "@/lib/materials/store";
@@ -27,6 +30,7 @@ import { readMaterialsEnvelope } from "@/lib/materials/store";
 import { invokeBusinessCardDispatchHook } from "./business-card-dispatch-hook";
 import { invokeDesignRendererDispatchHook } from "./design-renderer-hook";
 import { invokeMenuDispatchHook } from "./menu-dispatch-hook";
+import { invokePromoDispatchHook } from "./promo-dispatch-hook";
 import { invokeServiceSheetDispatchHook } from "./service-sheet-dispatch-hook";
 import type { DispatchExecutionRecord, JobDispatchRecord } from "./types";
 
@@ -38,6 +42,7 @@ const OBSERVED_RENDERER_SKUS = new Set<string>([
   DESIGN_RENDERER_BUSINESS_CARD_SKU,
   DESIGN_RENDERER_MENU_SKU,
   DESIGN_RENDERER_SERVICE_SHEET_SKU,
+  DESIGN_RENDERER_PROMO_SKU,
 ]);
 
 export type DesignRendererObserverResult = {
@@ -95,7 +100,8 @@ function resolveStagedLogoRelativePath(
 }
 
 /**
- * Hard gates for automatic design-renderer invoke (flyer, business card, or menu).
+ * Hard gates for automatic design-renderer invoke
+ * (flyer, card, menu, service-sheet, promotion-graphics).
  * Non-matches are silent skips (do nothing).
  */
 export function shouldObserveDesignRenderer(
@@ -284,6 +290,47 @@ export async function runDesignRendererDispatchObserver(input: {
           invocationOutcome: hooked.invocationOutcome,
           renderVersion: hooked.identity.renderVersion,
           pngContentSha256: hooked.identity.pngContentSha256,
+          receiptRelativePath: hooked.receiptRelativePath,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      } else {
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: false,
+          failureCode: hooked.failureCode,
+          message: hooked.message,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      }
+      continue;
+    }
+
+    if (record.skuId === DESIGN_RENDERER_PROMO_SKU) {
+      const hooked = await invokePromoDispatchHook({
+        repoRoot,
+        campaign: input.campaign,
+        dispatchRecord: record,
+        materials,
+        stagedLogoRelativePath,
+      });
+
+      if (hooked.ok) {
+        const [assetA, assetB] = hooked.identity.assets;
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: true,
+          invocationOutcome: hooked.invocationOutcome,
+          renderVersion: hooked.identity.campaignSetRenderVersion,
+          pngContentSha256: assetA?.pngContentSha256,
+          backPngContentSha256: assetB?.pngContentSha256,
           receiptRelativePath: hooked.receiptRelativePath,
           ownerRoutineProduction: "NONE",
           canvaRequired: false,

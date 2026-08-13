@@ -662,4 +662,135 @@ describe("STUDIO-OPERATING-DESIGN-DISPATCH-OBSERVER-1", () => {
     },
     60_000,
   );
+
+  it(
+    "promotion-graphics uses studio_design_renderer and observer auto-invokes; repeat is ALREADY_RENDERED",
+    async () => {
+      const promoContract = resolveServiceProductionContract(
+        "v2-rtu-promotion-graphics",
+      );
+      expect(promoContract.status).toBe("resolved");
+      if (promoContract.status === "resolved") {
+        expect(promoContract.contract.primaryTool.toolId).toBe(
+          "studio_design_renderer",
+        );
+      }
+
+      const campaignId = `obs-promo-${Date.now()}`;
+      ids.push(campaignId);
+      const now = new Date().toISOString();
+      const skus = ["v2-rtu-promotion-graphics"] as const;
+      const totals = computePlanPricingTotals([...skus]);
+      const campaign = paidFlyerCampaign(campaignId, {
+        campaignName: "Cedar Lane Home Care",
+        approvedStudioPlan: {
+          selectedServiceIds: [...skus],
+          includedServiceIds: [...skus],
+          additionalServiceIds: [],
+          additionalCostUsd: 0,
+          oneTimeTotalCents: totals.oneTimeSubtotalCents,
+          monthlyTotalCents: 0,
+          amountDueTodayCents: totals.amountDueTodayCents,
+          lineItems: buildServiceScopeSnapshot([...skus]),
+          approvedAt: now,
+        },
+        paymentTruth: {
+          processor: "stripe",
+          status: "confirmed",
+          currency: "usd",
+          expectedAmountCents: totals.amountDueTodayCents,
+          confirmedAmountCents: totals.amountDueTodayCents,
+          checkoutSessionId: `cs_promo_${campaignId}`,
+          paymentIntentId: `pi_promo_${campaignId}`,
+          stripeEventId: `evt_promo_${campaignId}`,
+          selectedServiceIds: [...skus],
+          decisionId: `dec_${campaignId}`,
+          factFingerprint: `fp_${campaignId}`,
+          draftRevision: 1,
+          confirmedAt: now,
+        },
+        routeMapIntake: {
+          submittedAt: now,
+          answers: {
+            businessType: "Home services",
+            campaignFocus:
+              "Spring HVAC Tune-Up — neighborhood launch for March through April.",
+            mustInclude:
+              "Spring Tune-Up $189. March 10 – April 15, 2026. Call (804) 555-0142 · cedarlane.example/tuneup",
+            dates: "March 10 – April 15, 2026",
+            callToAction:
+              "Call (804) 555-0142 or visit cedarlane.example/tuneup",
+            materials: "Logo staged for Machine production.",
+            graphicA_authorizedPurpose: "Social",
+            graphicA_agreedPlate: "Square 1024×1024 (social / feed)",
+            graphicB_authorizedPurpose: "Print",
+            graphicB_agreedPlate: "Portrait 1024×1536 (print / tall)",
+            disclaimers: "While appointments remain.",
+          },
+        },
+        routeMapIntakeSubmittedAt: now,
+      });
+      await upsertCampaignRecord(campaign);
+      const matNow = new Date().toISOString();
+      await writeMaterialsEnvelope({
+        campaignId,
+        items: [
+          {
+            id: `logo-${campaignId}`,
+            category: "logo-brand",
+            requirementLevel: "required",
+            reviewStatus: "approved_for_use",
+            contentKind: "file-metadata",
+            label: "Logo",
+            reason: "Brand mark",
+            relatedServiceIds: ["v2-rtu-promotion-graphics"],
+            uploadStatus: "stored",
+            useAuthorization: { basis: "customer_owns", attestedAt: matNow },
+          },
+        ],
+        updatedAt: matNow,
+        syncedAt: matNow,
+        version: 1,
+      });
+      stageLogo(campaignId);
+
+      const first = await ensureDispatchExecution(campaign);
+      expect(first.ok).toBe(true);
+      if (!first.ok) return;
+      const promoRecord = first.dispatch.records.find(
+        (r) => r.skuId === "v2-rtu-promotion-graphics",
+      );
+      expect(promoRecord?.requirements?.primaryTool.toolId).toBe(
+        "studio_design_renderer",
+      );
+      expect(promoRecord?.executionIdentityReady).toBe(true);
+      const obs1 = first.designRendererObserver?.results.find(
+        (r) => r.skuId === "v2-rtu-promotion-graphics",
+      );
+      expect(obs1?.action).toBe("invoked");
+      expect(obs1?.ok).toBe(true);
+      expect(obs1?.invocationOutcome).toBe("RENDERED");
+      expect(obs1?.ownerRoutineProduction).toBe("NONE");
+      expect(obs1?.canvaRequired).toBe(false);
+      expect(obs1?.makeRequired).toBe(false);
+      expect(obs1?.pngContentSha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(obs1?.backPngContentSha256).toMatch(/^[a-f0-9]{64}$/);
+      const v1 = obs1?.renderVersion;
+      const hash1 = obs1?.pngContentSha256;
+      const hash2 = obs1?.backPngContentSha256;
+
+      const second = await ensureDispatchExecution(first.campaign);
+      expect(second.ok).toBe(true);
+      if (!second.ok) return;
+      const obs2 = second.designRendererObserver?.results.find(
+        (r) => r.skuId === "v2-rtu-promotion-graphics",
+      );
+      expect(obs2?.ok).toBe(true);
+      expect(obs2?.invocationOutcome).toBe("ALREADY_RENDERED");
+      expect(obs2?.renderVersion).toBe(v1);
+      expect(obs2?.pngContentSha256).toBe(hash1);
+      expect(obs2?.backPngContentSha256).toBe(hash2);
+    },
+    240_000,
+  );
 });

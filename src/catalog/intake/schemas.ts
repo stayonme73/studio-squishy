@@ -470,7 +470,7 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
   "rtu-promotion-graphics": {
     type: "rtu-promotion-graphics",
     title: "Campaign Graphics Intake",
-    lead: "Two branded graphics for one campaign — tell us the focus and exact copy.",
+    lead: "Two branded graphics for one campaign — tell us the focus, exact copy, and the use and format for each graphic.",
     clientResponsibilityNote: RTU_PRINT_CLIENT_NOTE,
     fields: [
       {
@@ -502,13 +502,45 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
         placeholder: "Example: event-hero.jpg, or logo from our Facebook page.",
       },
       {
-        id: "intendedUse",
-        label: "Intended use",
+        id: "graphicA_authorizedPurpose",
+        label: "Graphic 1 — intended use",
         type: "select",
         required: true,
         options: ["Print", "Social", "Email", "In-store", "Other"],
+        hint: "Choose how Graphic 1 will be used. The Studio will not invent a use for this graphic.",
       },
-      { id: "sizeNotes", label: "Required size or format, if known", type: "text" },
+      {
+        id: "graphicA_agreedPlate",
+        label: "Graphic 1 — agreed format",
+        type: "select",
+        required: true,
+        options: [
+          "Square 1024×1024 (social / feed)",
+          "Portrait 1024×1536 (print / tall)",
+          "Landscape 1536×1024 (wide)",
+        ],
+        hint: "Choose one agreed Studio format for Graphic 1. Only these formats are available for this service.",
+      },
+      {
+        id: "graphicB_authorizedPurpose",
+        label: "Graphic 2 — intended use",
+        type: "select",
+        required: true,
+        options: ["Print", "Social", "Email", "In-store", "Other"],
+        hint: "Choose how Graphic 2 will be used. The Studio will not invent a use for this graphic.",
+      },
+      {
+        id: "graphicB_agreedPlate",
+        label: "Graphic 2 — agreed format",
+        type: "select",
+        required: true,
+        options: [
+          "Square 1024×1024 (social / feed)",
+          "Portrait 1024×1536 (print / tall)",
+          "Landscape 1536×1024 (wide)",
+        ],
+        hint: "Choose one agreed Studio format for Graphic 2. Only these formats are available for this service.",
+      },
       {
         id: "disclaimers",
         label: "Any required wording or disclosures (you supply)",
