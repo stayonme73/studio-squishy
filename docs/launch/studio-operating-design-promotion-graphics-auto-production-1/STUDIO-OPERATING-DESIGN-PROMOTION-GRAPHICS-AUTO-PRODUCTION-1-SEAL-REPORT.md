@@ -19,7 +19,7 @@ Scope: **`v2-rtu-promotion-graphics` only** — remaining design SKUs untouched.
 | Field | Value |
 |-------|--------|
 | Package commit SHA | `62a88390c27afbb01e84f3ea8ee3f216cdc1fab0` |
-| Seal tip | `62a88390c27afbb01e84f3ea8ee3f216cdc1fab0` |
+| Seal tip | `86768edae20d71ea64727d0691a7cef2f56d7164` |
 | Commit message (package) | `feat(operating): seal v2-rtu-promotion-graphics owner-independent auto-production` |
 | Pushed branch | `operating/design-renderer-proof-1` |
 | Upstream base | `fce3c289dae50e5ff64ded8eb25a3cc4662c1961` (Service-sheet auto-production seal tip) |
@@ -132,8 +132,8 @@ Other design SKUs remain on existing Canva/manual paths. Sealed Machine design l
 
 | Check | Value |
 |-------|--------|
-| Local HEAD | `62a88390c27afbb01e84f3ea8ee3f216cdc1fab0` |
-| Origin HEAD | `62a88390c27afbb01e84f3ea8ee3f216cdc1fab0` |
+| Local HEAD | `86768edae20d71ea64727d0691a7cef2f56d7164` |
+| Origin HEAD | `86768edae20d71ea64727d0691a7cef2f56d7164` |
 | Ahead/behind | `0/0` |
 | Staging | empty |
 | Worktree (seal scope) | tracked seal files clean; unrelated untracked leftovers remain unstaged |
