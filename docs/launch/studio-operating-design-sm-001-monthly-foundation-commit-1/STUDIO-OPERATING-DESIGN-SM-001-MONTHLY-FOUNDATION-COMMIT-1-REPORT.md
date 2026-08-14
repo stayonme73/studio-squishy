@@ -20,7 +20,7 @@ Clean commit control point established for:
 
 | Field | Value |
 |-------|--------|
-| Commit SHA | `69d1579f4858024debbd7ef11a1fa0e5d9562f23` |
+| Commit SHA | `72f1127ee8b7d29529603090d871f9a5acd1e912` |
 | Branch | `operating/design-renderer-proof-1` |
 | Prior HEAD | `b974220a96a4f3f14fef00bb69e8980a61ee88b5` |
 | Push | **None** |
@@ -159,7 +159,7 @@ Checklist 1–14 from package auth: covered by the suites above.
 | State | Result |
 |-------|--------|
 | Staged | Empty |
-| Tracked foundation | On tip `69d1579f4858024debbd7ef11a1fa0e5d9562f23` (ahead 1 of origin) |
+| Tracked foundation | On tip `72f1127ee8b7d29529603090d871f9a5acd1e912` (ahead 1 of origin) |
 | Untracked/excluded | Renderer monthly proof sources, proof fixtures, sealed-lane identity churn, other packages remain out |
 
 ---
