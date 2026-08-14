@@ -24,7 +24,7 @@ Visual / customer limits inherit Owner-accepted **VISUAL/PRODUCT GATE: PASS WITH
 |-------|--------|
 | Lane feature commit SHA | `717aa1b6ec64135e33cd99ee975fa0cbd4a4b834` |
 | Seal-from (lane tip) | `717aa1b6ec64135e33cd99ee975fa0cbd4a4b834` |
-| Seal commit SHA | `SEAL_SHA_PENDING` |
+| Seal commit SHA | `0ab0b1b37064809092c7d737a026dbd230d86624` |
 | Seal commit message | `docs(operating): seal rm-j008 Social Profile Update Kit customer-ready-with-limits` |
 | Pushed branch | `operating/design-renderer-proof-1` |
 | Branch tip (local = origin) | `TIP_PENDING` |
