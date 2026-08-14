@@ -1,0 +1,41 @@
+{
+  "memberId": "field_map_checklist",
+  "kind": "field_map_package",
+  "platform": "instagram",
+  "durableMember": true,
+  "customerApplies": true,
+  "accountMutation": false,
+  "publishSaveIsCustomerAction": true,
+  "rows": [
+    {
+      "field": "Display name",
+      "action": "Enter approved display name",
+      "value": "Harbor & Oak Studio"
+    },
+    {
+      "field": "Bio",
+      "action": "Enter approved copy (do not truncate)",
+      "value": "Harbor & Oak Studio. Show a calm portrait photography studio that books discovery calls. https://harbor-and-oak.example"
+    },
+    {
+      "field": "Website / link",
+      "action": "Enter approved URL",
+      "value": "https://harbor-and-oak.example"
+    },
+    {
+      "field": "Phone / contact",
+      "action": "Enter approved contact",
+      "value": "(555) 014-2200"
+    },
+    {
+      "field": "Profile image",
+      "action": "Upload the Studio-delivered profile image asset",
+      "value": "[profile asset from kit]"
+    },
+    {
+      "field": "Publish / save",
+      "action": "Save changes on the platform after reviewing the kit",
+      "value": "Customer action"
+    }
+  ]
+}

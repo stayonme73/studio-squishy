@@ -1,0 +1,83 @@
+{
+  "skuId": "rm-j002",
+  "platform": "instagram",
+  "lockedKitMemberCount": 3,
+  "countUnit": "member_identities",
+  "kitRenderVersion": 17,
+  "kitFingerprint": "4a639b56a74222edcdc97bf2550eebc64a183608db6a21cbc362c144fbdf8750",
+  "kitQaOk": true,
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "accountMutation": false,
+  "fieldMapIsDurableMember": true,
+  "plateHonesty": "Studio render dimensions ≠ guaranteed visible pixels (circular crop / Page cover overlap).",
+  "members": [
+    {
+      "memberId": "bio_profile_copy",
+      "kind": "copy",
+      "order": 1,
+      "memberPurpose": "Studio-written scoped Instagram bio/profile copy",
+      "producerQaOk": true,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "copy_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v17/members/bio_profile_copy/copy.json",
+          "contentSha256": "e0fe695f237631bf620fba3b85a2cd32ba399cc31c51531b643d02885b3bc2e9"
+        },
+        {
+          "role": "copy_paste_ready",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v17/members/bio_profile_copy/copy-paste-ready.txt",
+          "contentSha256": "c1ae6b6ecc24c3099d55595fdeebced110bdfb5700cb1517b8ccf82dd66afdc2"
+        }
+      ]
+    },
+    {
+      "memberId": "field_map_checklist",
+      "kind": "field_map_package",
+      "order": 2,
+      "memberPurpose": "URL/contact/display-name recommendations + setup checklist",
+      "producerQaOk": true,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "field_map_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v17/members/field_map_checklist/field-map-checklist.json",
+          "contentSha256": "c10456713e51a457b5daccb5caacaa1978d55e4e177ebb283d5925dcfe4c4a03"
+        },
+        {
+          "role": "field_map_markdown",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v17/members/field_map_checklist/field-map-checklist.md",
+          "contentSha256": "01f8c37808cc238c554537949a4150aa12df507b3b23946f688cdf72c1bf0725"
+        }
+      ]
+    },
+    {
+      "memberId": "profile_image",
+      "kind": "design_avatar",
+      "order": 3,
+      "memberPurpose": "Instagram profile picture only — no profile cover",
+      "agreedPlateId": "profile-avatar-square",
+      "producerQaOk": true,
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "role": "avatar_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v17/members/profile_image/avatar.png",
+          "contentSha256": "8109095b132960242f23812d513a6d59835c2ad13155c01d99878cb4c32dd243"
+        },
+        {
+          "role": "avatar_html",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v17/members/profile_image/avatar.html",
+          "contentSha256": "71e57c47f5520f4df6e2d3ee2322a3954490af7af89178e22ec2e14c60a5488b"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v17/members/profile_image/plate-honesty.json",
+          "contentSha256": "42ffaa789553af76c768e4b0e0b77594d1b21f068ee84f43f3c44b5603709c0f"
+        }
+      ],
+      "plateHonestyNote": "Studio render canvas 1024×1024. Platforms crop to a circle — corner pixels are not guaranteed visible. Safe zone = centered content."
+    }
+  ]
+}

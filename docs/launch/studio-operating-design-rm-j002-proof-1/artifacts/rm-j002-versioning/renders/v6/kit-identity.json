@@ -1,0 +1,106 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-RM-J002-PROOF-1",
+  "campaignId": "camp-rmj002-versioning",
+  "jobId": "camp-rmj002-versioning::rm-j002",
+  "dispatchId": "dispatch-camp-rmj002-versioning",
+  "skuId": "rm-j002",
+  "platform": "instagram",
+  "kitRenderVersion": 6,
+  "lockedKitMemberCount": 3,
+  "plannedKitMembers": [
+    {
+      "memberId": "bio_profile_copy",
+      "kind": "copy",
+      "order": 1,
+      "memberPurpose": "Studio-written scoped Instagram bio/profile copy"
+    },
+    {
+      "memberId": "field_map_checklist",
+      "kind": "field_map_package",
+      "order": 2,
+      "memberPurpose": "URL/contact/display-name recommendations + setup checklist"
+    },
+    {
+      "memberId": "profile_image",
+      "kind": "design_avatar",
+      "order": 3,
+      "memberPurpose": "Instagram profile picture only — no profile cover",
+      "agreedPlateId": "profile-avatar-square"
+    }
+  ],
+  "members": [
+    {
+      "memberId": "bio_profile_copy",
+      "kind": "copy",
+      "order": 1,
+      "memberPurpose": "Studio-written scoped Instagram bio/profile copy",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "copy_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v6/members/bio_profile_copy/copy.json",
+          "contentSha256": "1405db7ede3bc17d270d028ac7c84b7865c7da856d0caa7fc42f57256fe66bab"
+        },
+        {
+          "role": "copy_paste_ready",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v6/members/bio_profile_copy/copy-paste-ready.txt",
+          "contentSha256": "026e333c4c5d6c8d4f6dd809f920a5ff1d6fd380d83438fb0d61a5bf667dc0bb"
+        }
+      ]
+    },
+    {
+      "memberId": "field_map_checklist",
+      "kind": "field_map_package",
+      "order": 2,
+      "memberPurpose": "URL/contact/display-name recommendations + setup checklist",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "field_map_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v6/members/field_map_checklist/field-map-checklist.json",
+          "contentSha256": "9899a06d23d9ffa14c4a52f8d67d3988cdf7d8915b9a380be30e5ec30ab7a500"
+        },
+        {
+          "role": "field_map_markdown",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v6/members/field_map_checklist/field-map-checklist.md",
+          "contentSha256": "e35c751027ab39718ffe1bd1d0a97d215b5598f831461ae947ce9cfbbf999101"
+        }
+      ]
+    },
+    {
+      "memberId": "profile_image",
+      "kind": "design_avatar",
+      "order": 3,
+      "memberPurpose": "Instagram profile picture only — no profile cover",
+      "agreedPlateId": "profile-avatar-square",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "avatar_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v6/members/profile_image/avatar.png",
+          "contentSha256": "8109095b132960242f23812d513a6d59835c2ad13155c01d99878cb4c32dd243"
+        },
+        {
+          "role": "avatar_html",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v6/members/profile_image/avatar.html",
+          "contentSha256": "71e57c47f5520f4df6e2d3ee2322a3954490af7af89178e22ec2e14c60a5488b"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v6/members/profile_image/plate-honesty.json",
+          "contentSha256": "173ca263ab201eb1dd8485b1cc7307059ebaa373aa224998d67e12831a2284c9"
+        }
+      ],
+      "plateHonestyNote": "Studio render canvas 1024×1024. Platforms crop to a circle — corner pixels are not guaranteed visible. Safe zone = centered content."
+    }
+  ],
+  "kitFingerprint": "ad3d8769f72dee3ac2c664f95163542f8f8eda5e1cdf1157003262dcf7a4bafc",
+  "kitQaOk": true,
+  "manifestRelativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v6/kit-manifest.json",
+  "identityRelativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-versioning/renders/v6/kit-identity.json",
+  "orchestratorVersion": "rm-j002-kit-orchestrator-1.0.0",
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "accountMutation": false,
+  "createdAt": "2026-08-14T21:31:24.434Z"
+}

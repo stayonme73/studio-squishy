@@ -1,0 +1,11 @@
+{
+  "plateId": "profile-avatar-square",
+  "studioRenderPx": {
+    "width": 1024,
+    "height": 1024
+  },
+  "platformCropBehavior": "circular",
+  "guaranteedVisible": "centered safe zone only — not every pixel",
+  "note": "Studio render canvas 1024×1024. Platforms crop to a circle — corner pixels are not guaranteed visible. Safe zone = centered content.",
+  "overflowOk": true
+}

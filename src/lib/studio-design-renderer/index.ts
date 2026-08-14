@@ -617,3 +617,95 @@ export type {
   Ma001PostPayStructureFailureCode,
   Ma001PostPayStructureBuildResult,
 } from "./ma-001-postpay-composition-dispatch-structure";
+
+/** rm-j002 Profile Setup Kit composer — PROOF-1 only (no remap / no Canva / no mutation). */
+export {
+  DESIGN_RENDERER_RM_J002_SKU,
+  RM_J002_KIT_SPEC_VERSION,
+  RM_J002_KIT_ORCHESTRATOR_VERSION,
+  RM_J002_AVATAR_VISUAL_VERSION,
+  RM_J002_COVER_VISUAL_VERSION,
+  RM_J002_COPY_CHECKLIST_PRESENTATION_VERSION,
+  RM_J002_AVATAR_PLATE,
+  RM_J002_FACEBOOK_COVER_PLATE,
+} from "./rm-j002-types";
+export { writeScopedProfileCopy } from "./rm-j002-members";
+export type {
+  RmJ002Platform,
+  RmJ002MemberKind,
+  RmJ002MemberId,
+  RmJ002PlannedKitMember,
+  RmJ002KitProjectTruth,
+  RmJ002KitIdentity,
+  RmJ002KitPipelineResult,
+  RmJ002MemberResult,
+} from "./rm-j002-types";
+export {
+  RM_J002_PROOF_CONTRACT,
+  recipeForPlatform,
+  isDesignRendererRmJ002Sku,
+  isRmJ002Platform,
+  validateRmJ002KitComposition,
+} from "./rm-j002-contracts";
+export {
+  RM_J002_PROOF_PACKAGE_ID,
+  RM_J002_PROOF_ARTIFACT_ROOT,
+  buildRmJ002KitTruth,
+  buildRmJ002UnsupportedInstagramCoverTruth,
+  ensureHarborOakRmJ002LogoMaterial,
+} from "./rm-j002-fixtures";
+export { fingerprintRmJ002Kit } from "./rm-j002-fingerprint";
+export { evaluateRmJ002KitQa } from "./rm-j002-kit-qa";
+export { persistRmJ002KitArtifacts } from "./rm-j002-bind";
+export {
+  runRmJ002KitComposerPipeline,
+  runRmJ002KitProofPipeline,
+} from "./rm-j002-pipeline";
+
+/** rm-j002 intake + payment lock — platform kit sealed before checkout (no remap). */
+export {
+  RM_J002_INTAKE_PAYMENT_LOCK_PACKAGE_ID,
+  RM_J002_CUSTOMER_PLATFORM_OPTIONS,
+  RM_J002_KIT_LOCK_FIELD_IDS,
+  RM_J002_FORBIDDEN_CREDENTIAL_INTAKE_FIELDS,
+  mapRmJ002KitLockFromLiveTruth,
+  rmJ002LiveKitLockFromFlatAnswers,
+  assertRmJ002KitReadyForPayment,
+  buildRmJ002KitManifestSeed,
+  customerFacingRmJ002KitLines,
+} from "./rm-j002-intake-truth";
+export type {
+  RmJ002LiveKitLockInput,
+  RmJ002KitLiveTruth,
+  RmJ002KitManifestSeed,
+  RmJ002CustomerPlatformOption,
+} from "./rm-j002-intake-truth";
+export {
+  RM_J002_KIT_PAYMENT_GATE_PACKAGE_ID,
+  fingerprintRmJ002KitLiveTruth,
+  normalizeRmJ002KitForPayment,
+  sealRmJ002KitForPayment,
+  evaluateRmJ002KitPaymentGate,
+  assertRmJ002KitUnchangedAfterCheckoutAuthority,
+  assertRmJ002PlanKitFresh,
+  rmJ002KitSealsMatch,
+} from "./rm-j002-kit-payment-gate";
+export type { RmJ002KitPaymentSeal } from "./rm-j002-kit-payment-gate";
+
+/** rm-j002 POSTPAY-KIT-DISPATCH-STRUCTURE-1 — paid seal → durable kit structure. */
+export {
+  RM_J002_POSTPAY_KIT_DISPATCH_STRUCTURE_PACKAGE_ID,
+  buildRmJ002PostPayDispatchStructureFromPaymentSeal,
+  buildRmJ002PostPayDispatchStructureFromCampaign,
+  assertRmJ002PostPayStructureMatchesPaymentSeal,
+  assertRmJ002PostPayStructureDispatchReady,
+  assertRmJ002PostPayStructureNoSilentKitMutation,
+  ensureRmJ002PostPayDispatchStructureOnCampaign,
+} from "./rm-j002-postpay-kit-dispatch-structure";
+export type {
+  RmJ002PostPayProductionRole,
+  RmJ002PostPayDispatchMember,
+  RmJ002PostPayDispatchStructure,
+  RmJ002PostPayStructureFailureCode,
+  RmJ002PostPayStructureBuildResult,
+} from "./rm-j002-postpay-kit-dispatch-structure";

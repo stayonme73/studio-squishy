@@ -49,3 +49,8 @@ export {
   writeMa001PackComposition,
   readMa001PaymentSealFromCampaign,
 } from "./ma-001-composition";
+export {
+  readRmJ002KitLock,
+  writeRmJ002KitLock,
+  readRmJ002PaymentSealFromCampaign,
+} from "./rm-j002-kit";

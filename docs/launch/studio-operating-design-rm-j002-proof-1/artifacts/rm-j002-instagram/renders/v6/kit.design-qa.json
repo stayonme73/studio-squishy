@@ -1,0 +1,26 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-RM-J002-PROOF-1",
+  "platform": "instagram",
+  "lockedKitMemberCount": 3,
+  "kitQaOk": true,
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "accountMutation": false,
+  "members": [
+    {
+      "memberId": "bio_profile_copy",
+      "producerQaOk": true,
+      "artifactCount": 2
+    },
+    {
+      "memberId": "field_map_checklist",
+      "producerQaOk": true,
+      "artifactCount": 2
+    },
+    {
+      "memberId": "profile_image",
+      "producerQaOk": true,
+      "artifactCount": 3
+    }
+  ]
+}

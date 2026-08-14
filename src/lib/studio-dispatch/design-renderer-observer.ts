@@ -8,6 +8,7 @@
  * (+ SM-001-DISPATCH-HOOK-1 Social Media Launch Set lane)
  * (+ SM-001-MONTHLY-DISPATCH-HOOK-1 pay-per-cycle monthly Launch Set lane)
  * (+ MA-001-DISPATCH-HOOK-1 Promotion Pack heterogeneous lane)
+ * (+ RM-J002-DISPATCH-HOOK-1 Social Profile Setup Kit lane)
  *
  * Auto-invoke after durable ensureDispatchExecution for:
  *   - v2-rtu-flyer (sealed flyer hook)
@@ -19,6 +20,7 @@
  *   - sm-001 (Launch Set — N∈{4,5,6} square posts + captions + order + calendar)
  *   - sm-001-monthly (cycle-keyed Launch Set — explicit productionCycleId + locked N)
  *   - ma-001 (Promotion Pack — paid composition structure → pack orchestrator)
+ *   - rm-j002 (Profile Setup Kit — paid kit structure → kit composer)
  * Relies on hook idempotency (ALREADY_RENDERED). Observer does not mint versions itself.
  */
 
@@ -32,6 +34,7 @@ import {
   DESIGN_RENDERER_MENU_SKU,
   DESIGN_RENDERER_PROOF_SKU,
   DESIGN_RENDERER_PROMO_SKU,
+  DESIGN_RENDERER_RM_J002_SKU,
   DESIGN_RENDERER_SERVICE_SHEET_SKU,
   DESIGN_RENDERER_SM_001_MONTHLY_SKU,
   DESIGN_RENDERER_SM_001_SKU,
@@ -44,6 +47,7 @@ import { invokeDesignRendererDispatchHook } from "./design-renderer-hook";
 import { invokeMa001DispatchHook } from "./ma-001-dispatch-hook";
 import { invokeMenuDispatchHook } from "./menu-dispatch-hook";
 import { invokePromoDispatchHook } from "./promo-dispatch-hook";
+import { invokeRmJ002DispatchHook } from "./rm-j002-dispatch-hook";
 import { invokeServiceSheetDispatchHook } from "./service-sheet-dispatch-hook";
 import { invokeSm001DispatchHook } from "./sm-001-dispatch-hook";
 import { invokeSm001MonthlyDispatchHook } from "./sm-001-monthly-dispatch-hook";
@@ -63,6 +67,7 @@ const OBSERVED_RENDERER_SKUS = new Set<string>([
   DESIGN_RENDERER_SM_001_SKU,
   DESIGN_RENDERER_SM_001_MONTHLY_SKU,
   DESIGN_RENDERER_MA_001_SKU,
+  DESIGN_RENDERER_RM_J002_SKU,
 ]);
 
 export type DesignRendererObserverResult = {
@@ -516,6 +521,49 @@ export async function runDesignRendererDispatchObserver(input: {
           invocationOutcome: hooked.invocationOutcome,
           renderVersion: hooked.identity.packRenderVersion,
           pngContentSha256: first?.contentSha256,
+          receiptRelativePath: hooked.receiptRelativePath,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      } else {
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: false,
+          failureCode: hooked.failureCode,
+          message: hooked.message,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      }
+      continue;
+    }
+
+    if (record.skuId === DESIGN_RENDERER_RM_J002_SKU) {
+      const hooked = await invokeRmJ002DispatchHook({
+        repoRoot,
+        campaign: input.campaign,
+        dispatchRecord: record,
+        materials,
+        stagedLogoRelativePath,
+      });
+
+      if (hooked.ok) {
+        const avatar = hooked.identity.members.find(
+          (m) => m.memberId === "profile_image",
+        );
+        const png = avatar?.artifacts.find((a) => a.role === "png");
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: true,
+          invocationOutcome: hooked.invocationOutcome,
+          renderVersion: hooked.identity.kitRenderVersion,
+          pngContentSha256: png?.contentSha256,
           receiptRelativePath: hooked.receiptRelativePath,
           ownerRoutineProduction: "NONE",
           canvaRequired: false,

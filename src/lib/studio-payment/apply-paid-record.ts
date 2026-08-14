@@ -5,6 +5,7 @@ import {
 } from "@/lib/approved-plan-display";
 import type { PreAcceptancePaymentAuthorization } from "@/lib/studio-pre-acceptance/authorization-binding";
 import { ensureMa001PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/ma-001-postpay-composition-dispatch-structure";
+import { ensureRmJ002PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/rm-j002-postpay-kit-dispatch-structure";
 
 import type { PaymentConfirmationInput } from "./types";
 
@@ -59,6 +60,7 @@ export function applyPaidTruthToCampaignRecord(
       ...(input.ma001CompositionSeal
         ? { ma001CompositionSeal: input.ma001CompositionSeal }
         : {}),
+      ...(input.rmj002KitSeal ? { rmj002KitSeal: input.rmj002KitSeal } : {}),
     },
   };
 
@@ -98,6 +100,14 @@ export function applyPaidTruthToCampaignRecord(
   // Durable ma-001 pack structure from sealed payment composition (no remap / no renderer).
   if (updated.paymentTruth?.ma001CompositionSeal) {
     const ensured = ensureMa001PostPayDispatchStructureOnCampaign(updated);
+    if (ensured.ok) {
+      updated = ensured.campaign;
+    }
+  }
+
+  // Durable rm-j002 kit structure from sealed payment kit (no remap / no composer).
+  if (updated.paymentTruth?.rmj002KitSeal) {
+    const ensured = ensureRmJ002PostPayDispatchStructureOnCampaign(updated);
     if (ensured.ok) {
       updated = ensured.campaign;
     }

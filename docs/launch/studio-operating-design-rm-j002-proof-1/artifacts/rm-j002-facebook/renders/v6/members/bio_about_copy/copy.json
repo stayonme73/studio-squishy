@@ -1,0 +1,11 @@
+{
+  "memberId": "bio_about_copy",
+  "kind": "copy",
+  "platform": "facebook",
+  "field": "about",
+  "studioWritten": true,
+  "text": "Harbor & Oak Studio — Calm, timeless portrait photography. Book a discovery call.",
+  "customerApplies": true,
+  "accountMutation": false,
+  "presentationVersion": "v2.1-customer-voice-platform-tailored"
+}

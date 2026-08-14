@@ -81,6 +81,7 @@ export async function confirmSandboxCheckoutSession(
     ...(binding.ma001CompositionSeal
       ? { ma001CompositionSeal: binding.ma001CompositionSeal }
       : {}),
+    ...(binding.rmj002KitSeal ? { rmj002KitSeal: binding.rmj002KitSeal } : {}),
   });
 }
 

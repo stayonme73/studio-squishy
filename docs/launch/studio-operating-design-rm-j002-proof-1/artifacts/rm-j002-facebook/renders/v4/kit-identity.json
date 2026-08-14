@@ -1,0 +1,139 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-RM-J002-PROOF-1",
+  "campaignId": "camp-rmj002-facebook",
+  "jobId": "camp-rmj002-facebook::rm-j002",
+  "dispatchId": "dispatch-camp-rmj002-facebook",
+  "skuId": "rm-j002",
+  "platform": "facebook",
+  "kitRenderVersion": 4,
+  "lockedKitMemberCount": 4,
+  "plannedKitMembers": [
+    {
+      "memberId": "bio_about_copy",
+      "kind": "copy",
+      "order": 1,
+      "memberPurpose": "Studio-written scoped Facebook Page about/description"
+    },
+    {
+      "memberId": "field_map_checklist",
+      "kind": "field_map_package",
+      "order": 2,
+      "memberPurpose": "URL/contact/display-name recommendations + setup checklist"
+    },
+    {
+      "memberId": "profile_image",
+      "kind": "design_avatar",
+      "order": 3,
+      "memberPurpose": "Facebook Page profile picture",
+      "agreedPlateId": "profile-avatar-square"
+    },
+    {
+      "memberId": "page_cover",
+      "kind": "design_page_cover",
+      "order": 4,
+      "memberPurpose": "Facebook Page cover photo",
+      "agreedPlateId": "facebook-page-cover-851x315"
+    }
+  ],
+  "members": [
+    {
+      "memberId": "bio_about_copy",
+      "kind": "copy",
+      "order": 1,
+      "memberPurpose": "Studio-written scoped Facebook Page about/description",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "copy_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/members/bio_about_copy/copy.json",
+          "contentSha256": "1a53f169ce609c718e7123110791b16ac3a62088318b5b8eb471ab9f4e4ee71f"
+        },
+        {
+          "role": "copy_paste_ready",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/members/bio_about_copy/copy-paste-ready.txt",
+          "contentSha256": "c1ae6b6ecc24c3099d55595fdeebced110bdfb5700cb1517b8ccf82dd66afdc2"
+        }
+      ]
+    },
+    {
+      "memberId": "field_map_checklist",
+      "kind": "field_map_package",
+      "order": 2,
+      "memberPurpose": "URL/contact/display-name recommendations + setup checklist",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "field_map_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/members/field_map_checklist/field-map-checklist.json",
+          "contentSha256": "df9260f20c0e70e172bd87a0782618503eae98000de51bbf456a64c82514b74f"
+        },
+        {
+          "role": "field_map_markdown",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/members/field_map_checklist/field-map-checklist.md",
+          "contentSha256": "741cbde674e8b9c85e8f4c9b212c71a1bda196a19d939b0e14b1618164614330"
+        }
+      ]
+    },
+    {
+      "memberId": "profile_image",
+      "kind": "design_avatar",
+      "order": 3,
+      "memberPurpose": "Facebook Page profile picture",
+      "agreedPlateId": "profile-avatar-square",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "avatar_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/members/profile_image/avatar.png",
+          "contentSha256": "8109095b132960242f23812d513a6d59835c2ad13155c01d99878cb4c32dd243"
+        },
+        {
+          "role": "avatar_html",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/members/profile_image/avatar.html",
+          "contentSha256": "71e57c47f5520f4df6e2d3ee2322a3954490af7af89178e22ec2e14c60a5488b"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/members/profile_image/plate-honesty.json",
+          "contentSha256": "173ca263ab201eb1dd8485b1cc7307059ebaa373aa224998d67e12831a2284c9"
+        }
+      ],
+      "plateHonestyNote": "Studio render canvas 1024×1024. Platforms crop to a circle — corner pixels are not guaranteed visible. Safe zone = centered content."
+    },
+    {
+      "memberId": "page_cover",
+      "kind": "design_page_cover",
+      "order": 4,
+      "memberPurpose": "Facebook Page cover photo",
+      "agreedPlateId": "facebook-page-cover-851x315",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "cover_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/members/page_cover/page-cover.png",
+          "contentSha256": "61a1acaa246b0c637433fc56a5378db82bc5bb738a5051b532904ced6670c1d5"
+        },
+        {
+          "role": "cover_html",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/members/page_cover/page-cover.html",
+          "contentSha256": "d6461c0ce311b9807287c3de79df2f8c70c0b53def04988229a0437a8dd58eab"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/members/page_cover/plate-honesty.json",
+          "contentSha256": "003b7985b6d4aee6e751c3e9b29364f0d6f215dfa0f08abf9ee0f17196d4354d"
+        }
+      ],
+      "plateHonestyNote": "Studio render canvas 851×315 (Meta fastest-load Page cover reference). Desktop/mobile crop differently; profile picture overlaps lower-left — not every pixel is guaranteed visible on every device."
+    }
+  ],
+  "kitFingerprint": "431bb2b481fa25d9f834bb0a41572b9335c91377d84509f804e03d95dbf5a64c",
+  "kitQaOk": true,
+  "manifestRelativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/kit-manifest.json",
+  "identityRelativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-facebook/renders/v4/kit-identity.json",
+  "orchestratorVersion": "rm-j002-kit-orchestrator-1.0.0",
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "accountMutation": false,
+  "createdAt": "2026-08-14T21:31:22.322Z"
+}

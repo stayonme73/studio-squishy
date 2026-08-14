@@ -68,6 +68,10 @@ export type CheckoutSessionBinding = {
    * Sealed ma-001 pack composition at checkout authority (when ma-001 selected).
    */
   ma001CompositionSeal?: import("@/lib/studio-design-renderer/ma-001-composition-payment-gate").Ma001CompositionPaymentSeal;
+  /**
+   * Sealed rm-j002 kit lock at checkout authority (when rm-j002 selected).
+   */
+  rmj002KitSeal?: import("@/lib/studio-design-renderer/rm-j002-kit-payment-gate").RmJ002KitPaymentSeal;
 };
 
 const SESSIONS_DIR = path.join(process.cwd(), "data", "payment-sessions");

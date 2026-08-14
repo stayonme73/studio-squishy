@@ -37,6 +37,13 @@ export type CheckoutSessionCreateRequest = {
   ma001PackComposition?: import("@/lib/studio-design-renderer/ma-001-intake-truth").Ma001LiveCompositionInput
     | import("@/lib/studio-design-renderer/ma-001-intake-truth").Ma001CompositionLiveTruth
     | null;
+  /**
+   * rm-j002 Social Profile Setup Kit — platform + facts lock required when selected.
+   * Server re-validates; client cannot invent a default platform kit.
+   */
+  rmj002KitLock?: import("@/lib/studio-design-renderer/rm-j002-intake-truth").RmJ002LiveKitLockInput
+    | import("@/lib/studio-design-renderer/rm-j002-intake-truth").RmJ002KitLiveTruth
+    | null;
 };
 
 export type CheckoutSessionCreateResult =
@@ -77,7 +84,8 @@ export type CheckoutSessionCreateResult =
         | "already_paid"
         | "invalid_request"
         | "paid_cycle_invalid"
-        | "ma001_composition_required";
+        | "ma001_composition_required"
+        | "rmj002_kit_lock_required";
       message: string;
     };
 
@@ -100,6 +108,11 @@ export type PaymentConfirmationInput = {
    * Must match checkout binding seal when ma-001 was purchased.
    */
   ma001CompositionSeal?: import("@/lib/studio-design-renderer/ma-001-composition-payment-gate").Ma001CompositionPaymentSeal
+    | null;
+  /**
+   * Must match checkout binding seal when rm-j002 was purchased.
+   */
+  rmj002KitSeal?: import("@/lib/studio-design-renderer/rm-j002-kit-payment-gate").RmJ002KitPaymentSeal
     | null;
 };
 

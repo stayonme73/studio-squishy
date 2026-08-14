@@ -31,6 +31,11 @@ export async function startHostedCheckout(args: {
    * Required when facts include ma-001; server re-validates and seals.
    */
   ma001PackComposition?: unknown;
+  /**
+   * rm-j002 Social Profile Setup Kit — locked platform kit from working draft.
+   * Required when facts include rm-j002; server re-validates and seals.
+   */
+  rmj002KitLock?: unknown;
 }): Promise<StartCheckoutClientResult> {
   const returnOrigin =
     typeof window !== "undefined" ? window.location.origin : "";
@@ -46,6 +51,9 @@ export async function startHostedCheckout(args: {
       preferSandbox: args.preferSandbox === true,
       ...(args.ma001PackComposition != null
         ? { ma001PackComposition: args.ma001PackComposition }
+        : {}),
+      ...(args.rmj002KitLock != null
+        ? { rmj002KitLock: args.rmj002KitLock }
         : {}),
     }),
   });

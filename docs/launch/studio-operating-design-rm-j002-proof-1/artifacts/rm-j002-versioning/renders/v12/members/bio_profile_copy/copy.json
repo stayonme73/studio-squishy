@@ -1,0 +1,11 @@
+{
+  "memberId": "bio_profile_copy",
+  "kind": "copy",
+  "platform": "instagram",
+  "field": "bio",
+  "studioWritten": true,
+  "text": "Material change — new booking CTA emphasis. Book a discovery call.",
+  "customerApplies": true,
+  "accountMutation": false,
+  "presentationVersion": "v2.1-customer-voice-platform-tailored"
+}

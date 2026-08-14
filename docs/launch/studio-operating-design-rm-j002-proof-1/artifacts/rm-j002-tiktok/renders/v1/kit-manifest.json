@@ -1,0 +1,83 @@
+{
+  "skuId": "rm-j002",
+  "platform": "tiktok",
+  "lockedKitMemberCount": 3,
+  "countUnit": "member_identities",
+  "kitRenderVersion": 1,
+  "kitFingerprint": "41cb4c592bd45c88300452666c699b52488caa291314eae3e292612ee4a66bbc",
+  "kitQaOk": true,
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "accountMutation": false,
+  "fieldMapIsDurableMember": true,
+  "plateHonesty": "Studio render dimensions ≠ guaranteed visible pixels (circular crop / Page cover overlap).",
+  "members": [
+    {
+      "memberId": "bio_profile_copy",
+      "kind": "copy",
+      "order": 1,
+      "memberPurpose": "Studio-written scoped TikTok bio/profile copy",
+      "producerQaOk": true,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "copy_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-tiktok/renders/v1/members/bio_profile_copy/copy.json",
+          "contentSha256": "8f359aec2989393c39bc1f5abd535c46665b0a1bf963e716878bab1f005c916d"
+        },
+        {
+          "role": "copy_paste_ready",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-tiktok/renders/v1/members/bio_profile_copy/copy-paste-ready.txt",
+          "contentSha256": "42e2706e3facbdf4803b54a1ac9be3a01d1a0a2a86c2d5d2e5ee354421a9c01f"
+        }
+      ]
+    },
+    {
+      "memberId": "field_map_checklist",
+      "kind": "field_map_package",
+      "order": 2,
+      "memberPurpose": "URL/contact/display-name recommendations + setup checklist",
+      "producerQaOk": true,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "field_map_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-tiktok/renders/v1/members/field_map_checklist/field-map-checklist.json",
+          "contentSha256": "2e993283440c2cec35e749dd89862711e38a8c3b9df854ed5fcaa305bdb46307"
+        },
+        {
+          "role": "field_map_markdown",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-tiktok/renders/v1/members/field_map_checklist/field-map-checklist.md",
+          "contentSha256": "446af5b7001902504bb4a2ac6e27806504fc51311daa7d4acc8a2e138a3f7df0"
+        }
+      ]
+    },
+    {
+      "memberId": "profile_image",
+      "kind": "design_avatar",
+      "order": 3,
+      "memberPurpose": "TikTok profile photo only — no cover",
+      "agreedPlateId": "profile-avatar-square",
+      "producerQaOk": true,
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "role": "avatar_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-tiktok/renders/v1/members/profile_image/avatar.png",
+          "contentSha256": "f08b550a9126419ff0c116d52bc51edc75c3cabf48a90ab9dcd017aa2e9bcc6d"
+        },
+        {
+          "role": "avatar_html",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-tiktok/renders/v1/members/profile_image/avatar.html",
+          "contentSha256": "703f3554348a5f6fd737ecd3e3444a737a0feab82c2c64bb64e7e47fe4221fce"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-rm-j002-proof-1/artifacts/rm-j002-tiktok/renders/v1/members/profile_image/plate-honesty.json",
+          "contentSha256": "05da5c3df2d6601a9f62b82f122c8504083112689d09e51e2fe02b31556c832a"
+        }
+      ],
+      "plateHonestyNote": "Studio render canvas 1024×1024. Platforms crop to a circle — corner pixels are not guaranteed visible. Safe zone = centered content."
+    }
+  ]
+}

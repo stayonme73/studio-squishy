@@ -203,9 +203,8 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
     revisionRule: ROUTE_MAP_REVISION_TEMPLATE,
     clientResponsibilities: [
       "Own or create the social account on the chosen platform",
-      "Complete any platform-required login or security verification",
-      "Apply the delivered kit fields and assets on the platform",
-      "Logo and brand assets",
+      "Apply the delivered kit fields and assets on the platform yourself",
+      "Logo and brand assets for the profile image",
       "Accurate business information, links, and hours",
     ],
     executionMode: "creation_delivery",

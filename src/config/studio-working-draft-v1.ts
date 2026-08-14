@@ -39,6 +39,12 @@ export const WORKING_DRAFT_PERSISTED_FIELDS = [
    * @see STUDIO-OPERATING-DESIGN-MA-001-INTAKE-TRUTH-1
    */
   "ma001PackComposition",
+  /**
+   * rm-j002 Social Profile Setup Kit — platform + facts locked before payment.
+   * skuId `rm-j002` alone is insufficient for checkout.
+   * @see STUDIO-OPERATING-DESIGN-RM-J002-INTAKE-PAYMENT-LOCK-1
+   */
+  "rmj002KitLock",
 ] as const;
 
 export type WorkingDraftPersistedField =

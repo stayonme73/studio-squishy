@@ -149,6 +149,19 @@ export type {
   Ma001DispatchInvocationOutcome,
 } from "./ma-001-dispatch-hook";
 export {
+  mapRmJ002KitProjectTruthFromJob,
+  RM_J002_DISPATCH_WIRING_SCOPE_NOTE,
+} from "./map-rm-j002-job-truth";
+export type { RmJ002TruthMapResult } from "./map-rm-j002-job-truth";
+export {
+  invokeRmJ002DispatchHook,
+  RM_J002_DISPATCH_HOOK_PACKAGE_ID,
+} from "./rm-j002-dispatch-hook";
+export type {
+  RmJ002DispatchHookResult,
+  RmJ002DispatchInvocationOutcome,
+} from "./rm-j002-dispatch-hook";
+export {
   buildSm001IdempotencyKey,
   buildSm001IdempotencyTuple,
   fingerprintSm001CalendarInputs,

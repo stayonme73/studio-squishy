@@ -60,6 +60,7 @@ import {
   readActiveRouteRecommendation,
   readConversationStage,
   readMa001PackComposition,
+  readRmJ002KitLock,
   readOpeningAnswers,
   readSelectedRoute,
   readSelectedServices,
@@ -67,6 +68,7 @@ import {
   selectedJobIdSet,
 } from "@/lib/conversation-room-draft";
 import { evaluateMa001CompositionPaymentGate } from "@/lib/studio-design-renderer/ma-001-composition-payment-gate";
+import { evaluateRmJ002KitPaymentGate } from "@/lib/studio-design-renderer/rm-j002-kit-payment-gate";
 import type { ServiceId } from "@/catalog/types";
 import type { RouteMapIntakeAnswers } from "@/catalog/intake";
 import { buildProjectBuilderStudioPlanSummary } from "@/lib/project-builder-studio-plan-summary";
@@ -832,6 +834,17 @@ export default function ConversationRoomRuntime({
       );
       return;
     }
+    const rmj002Gate = evaluateRmJ002KitPaymentGate({
+      selectedServiceIds: serviceIds.map(String),
+      kitLock: readRmJ002KitLock(project),
+    });
+    if (!rmj002Gate.ok) {
+      setPlanBridgeError(rmj002Gate.message);
+      speakStudioLine(
+        "Your Social Profile Setup Kit still needs one platform and the approved profile facts locked before checkout.",
+      );
+      return;
+    }
 
     const decision = runPreAcceptanceForCheckout(
       projectFactsFromWorkingDraft(project),
@@ -880,6 +893,21 @@ export default function ConversationRoomRuntime({
       closeActivityPanel();
       speakStudioLine(
         "Your Promotion Pack still needs its exact pieces locked before payment.",
+      );
+      return false;
+    }
+    const rmj002Gate = evaluateRmJ002KitPaymentGate({
+      selectedServiceIds: readSelectedServices(project).map((s) =>
+        String(s.jobId),
+      ),
+      kitLock: readRmJ002KitLock(project),
+    });
+    if (!rmj002Gate.ok) {
+      setPlanBridgeError(rmj002Gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        "Your Social Profile Setup Kit still needs one platform locked before payment.",
       );
       return false;
     }
@@ -940,6 +968,20 @@ export default function ConversationRoomRuntime({
       );
       throw new Error(ma001Gate.message);
     }
+    const rmj002KitLock = readRmJ002KitLock(project);
+    const rmj002Gate = evaluateRmJ002KitPaymentGate({
+      selectedServiceIds: facts.selectedServiceIds.map(String),
+      kitLock: rmj002KitLock,
+    });
+    if (!rmj002Gate.ok) {
+      setPlanBridgeError(rmj002Gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        "Your Social Profile Setup Kit still needs one platform locked before payment.",
+      );
+      throw new Error(rmj002Gate.message);
+    }
     const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
@@ -963,6 +1005,7 @@ export default function ConversationRoomRuntime({
       campaignId: campaign.campaignId,
       facts,
       ma001PackComposition: ma001Composition,
+      rmj002KitLock,
     });
     if (!started.ok) {
       setPlanBridgeError(started.message);
@@ -995,6 +1038,15 @@ export default function ConversationRoomRuntime({
       setPlanBridgeError(ma001Gate.message);
       throw new Error(ma001Gate.message);
     }
+    const rmj002KitLock = readRmJ002KitLock(project);
+    const rmj002Gate = evaluateRmJ002KitPaymentGate({
+      selectedServiceIds: facts.selectedServiceIds.map(String),
+      kitLock: rmj002KitLock,
+    });
+    if (!rmj002Gate.ok) {
+      setPlanBridgeError(rmj002Gate.message);
+      throw new Error(rmj002Gate.message);
+    }
     const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
@@ -1013,6 +1065,7 @@ export default function ConversationRoomRuntime({
       facts,
       preferSandbox: true,
       ma001PackComposition: ma001Composition,
+      rmj002KitLock,
     });
     if (!started.ok) {
       setPlanBridgeError(started.message);

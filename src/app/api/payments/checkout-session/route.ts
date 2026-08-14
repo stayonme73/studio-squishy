@@ -35,6 +35,7 @@ export async function POST(request: Request) {
       preferSandbox: body.preferSandbox === true,
       purchaseKind: body.purchaseKind,
       ma001PackComposition: body.ma001PackComposition ?? null,
+      rmj002KitLock: body.rmj002KitLock ?? null,
     });
 
     if (!result.ok) {
@@ -48,7 +49,8 @@ export async function POST(request: Request) {
               ? 502
               : result.error === "already_paid"
                 ? 409
-                : result.error === "ma001_composition_required"
+                : result.error === "ma001_composition_required" ||
+                    result.error === "rmj002_kit_lock_required"
                   ? 422
                   : 400;
       return NextResponse.json(result, { status });

@@ -1,0 +1,31 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-RM-J002-PROOF-1",
+  "platform": "facebook",
+  "lockedKitMemberCount": 4,
+  "kitQaOk": true,
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "accountMutation": false,
+  "members": [
+    {
+      "memberId": "bio_about_copy",
+      "producerQaOk": true,
+      "artifactCount": 2
+    },
+    {
+      "memberId": "field_map_checklist",
+      "producerQaOk": true,
+      "artifactCount": 2
+    },
+    {
+      "memberId": "profile_image",
+      "producerQaOk": true,
+      "artifactCount": 3
+    },
+    {
+      "memberId": "page_cover",
+      "producerQaOk": true,
+      "artifactCount": 3
+    }
+  ]
+}

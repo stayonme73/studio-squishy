@@ -1,0 +1,47 @@
+{
+  "memberId": "field_map_checklist",
+  "kind": "field_map_package",
+  "platform": "facebook",
+  "durableMember": true,
+  "customerApplies": true,
+  "accountMutation": false,
+  "publishSaveIsCustomerAction": true,
+  "presentationVersion": "v2-customer-voice-platform-tailored",
+  "rows": [
+    {
+      "field": "Display name",
+      "action": "Enter this display name",
+      "value": "Harbor & Oak Studio"
+    },
+    {
+      "field": "About",
+      "action": "Paste this About text (do not shorten it yourself)",
+      "value": "Calm, timeless portrait photography. Book a discovery call."
+    },
+    {
+      "field": "Website / link",
+      "action": "Enter this website link",
+      "value": "https://harbor-and-oak.example"
+    },
+    {
+      "field": "Phone / contact",
+      "action": "Enter this contact number",
+      "value": "(555) 014-2200"
+    },
+    {
+      "field": "Profile image",
+      "action": "Upload the profile image included with this kit",
+      "value": "profile_image (avatar.png)"
+    },
+    {
+      "field": "Cover / banner",
+      "action": "Upload the Facebook Page cover included with this kit",
+      "value": "page_cover (page-cover.png)"
+    },
+    {
+      "field": "Save changes",
+      "action": "Save your changes on the platform when you are ready",
+      "value": "You apply this step — The Studio does not log in or publish"
+    }
+  ]
+}

@@ -36,6 +36,8 @@ import type {
 } from "./types";
 import { evaluateMa001CompositionPaymentGate } from "@/lib/studio-design-renderer/ma-001-composition-payment-gate";
 import type { Ma001CompositionPaymentSeal } from "@/lib/studio-design-renderer/ma-001-composition-payment-gate";
+import { evaluateRmJ002KitPaymentGate } from "@/lib/studio-design-renderer/rm-j002-kit-payment-gate";
+import type { RmJ002KitPaymentSeal } from "@/lib/studio-design-renderer/rm-j002-kit-payment-gate";
 
 function ensureApprovedPlan(
   campaign: CampaignRecord,
@@ -281,6 +283,20 @@ export async function createCheckoutSession(
   const ma001CompositionSeal: Ma001CompositionPaymentSeal | undefined =
     ma001Gate.applicable ? ma001Gate.seal : undefined;
 
+  const rmj002Gate = evaluateRmJ002KitPaymentGate({
+    selectedServiceIds: facts.selectedServiceIds.map(String),
+    kitLock: request.rmj002KitLock ?? null,
+  });
+  if (!rmj002Gate.ok) {
+    return {
+      ok: false,
+      error: "rmj002_kit_lock_required",
+      message: rmj002Gate.message,
+    };
+  }
+  const rmj002KitSeal: RmJ002KitPaymentSeal | undefined =
+    rmj002Gate.applicable ? rmj002Gate.seal : undefined;
+
   const resolved = resolveCheckoutAmount(purchaseKind, facts.selectedServiceIds);
   if (!resolved.ok) {
     return {
@@ -372,6 +388,7 @@ export async function createCheckoutSession(
       ...(ma001CompositionSeal
         ? { ma001CompositionSeal }
         : {}),
+      ...(rmj002KitSeal ? { rmj002KitSeal } : {}),
       ...(purchaseKind === "paid_cycle"
         ? {
             purchaseKind: "paid_cycle" as const,

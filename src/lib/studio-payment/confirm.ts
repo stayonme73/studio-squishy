@@ -268,6 +268,31 @@ export async function confirmPaymentFromProcessor(
           "Confirmation includes a Promotion Pack composition that was not sealed at checkout.",
       };
     }
+    if (binding.rmj002KitSeal) {
+      if (
+        input.rmj002KitSeal &&
+        binding.rmj002KitSeal.kitFingerprint !==
+          input.rmj002KitSeal.kitFingerprint
+      ) {
+        return {
+          ok: false,
+          error: "sku_mismatch",
+          message:
+            "Social Profile Setup Kit lock does not match the kit sealed at checkout.",
+        };
+      }
+      input = {
+        ...input,
+        rmj002KitSeal: binding.rmj002KitSeal,
+      };
+    } else if (input.rmj002KitSeal) {
+      return {
+        ok: false,
+        error: "sku_mismatch",
+        message:
+          "Confirmation includes a Social Profile Setup Kit lock that was not sealed at checkout.",
+      };
+    }
   }
 
   const isPaidCycle = binding?.purchaseKind === "paid_cycle";

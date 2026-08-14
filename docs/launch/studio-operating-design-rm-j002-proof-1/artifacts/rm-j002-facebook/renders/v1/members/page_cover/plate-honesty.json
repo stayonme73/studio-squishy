@@ -1,0 +1,11 @@
+{
+  "plateId": "facebook-page-cover-851x315",
+  "studioRenderPx": {
+    "width": 851,
+    "height": 315
+  },
+  "platformCropBehavior": "Meta Page cover — desktop/mobile aspect differ; profile picture overlaps lower-left",
+  "guaranteedVisible": "centered safe content only — not every pixel",
+  "note": "Studio render canvas 851×315 (Meta fastest-load Page cover reference). Desktop/mobile crop differently; profile picture overlaps lower-left — not every pixel is guaranteed visible on every device.",
+  "overflowOk": true
+}

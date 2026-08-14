@@ -195,7 +195,7 @@ const STATIC_LEDGER: Record<
     exactDeliverable:
       "Social Profile Setup Kit for one platform (copy + assets + field-by-field setup sheet)",
     customerResponsibility:
-      "Own/create the account; complete platform login/security; apply kit fields and assets on-platform",
+      "Own/create the account; apply kit fields and assets on-platform yourself (Studio does not log in)",
     ownerRoutineResponsibility: "NONE",
     engineeringIndependence: "NONE",
     readinessStatus: "CUSTOMER READY WITH LIMITS — PROFILE KIT",

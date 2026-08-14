@@ -1,0 +1,10 @@
+{
+  "memberId": "bio_profile_copy",
+  "kind": "copy",
+  "platform": "instagram",
+  "field": "bio",
+  "studioWritten": true,
+  "text": "Harbor & Oak Studio. Show a calm portrait photography studio that books discovery calls. https://harbor-and-oak.example",
+  "customerApplies": true,
+  "accountMutation": false
+}

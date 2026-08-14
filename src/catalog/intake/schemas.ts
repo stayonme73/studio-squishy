@@ -127,7 +127,8 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
   "social-setup": {
     type: "social-setup",
     title: "Social Profile Kit Intake",
-    lead: "Tell us which platform and what the Studio should prepare in your setup or update kit. You will apply the finished kit on the platform.",
+    lead:
+      "Tell us which one platform and what the Studio should prepare in your setup kit. You will apply the finished kit on the platform yourself. The Studio never asks for your platform login, password, or admin invite.",
     fields: [
       {
         id: "platform",
@@ -141,6 +142,13 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
         label: "Business or profile name",
         type: "text",
         required: true,
+      },
+      {
+        id: "displayName",
+        label: "Display name to show on the profile",
+        type: "text",
+        required: true,
+        placeholder: "Example: Harbor & Oak Studio",
       },
       {
         id: "profileGoal",
@@ -157,12 +165,26 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
           "Example: current bio text, website link, or what feels outdated. For a new setup, describe what the profile should say.",
       },
       {
+        id: "website",
+        label: "Website or booking link (if you have one)",
+        type: "text",
+        required: false,
+        placeholder: "Example: https://your-site.example",
+      },
+      {
+        id: "phone",
+        label: "Phone or contact number (if it belongs on the profile)",
+        type: "text",
+        required: false,
+      },
+      {
         id: "brandNotes",
-        label: "Brand colors, fonts, or reference notes",
+        label: "Logo and brand notes for the profile image",
         type: "textarea",
+        required: true,
         role: "materials",
-        hint: "Describe filenames, links, or colors if you have them. You may also say you do not have this yet or will provide it later. Files are not uploaded on this form.",
-        placeholder: "Example: logo named bakery-mark.png, or colors from our website.",
+        hint: "Describe the logo filename, link, or colors the Studio should use for the avatar. You may also say you will provide the logo later. Files are not uploaded on this form. Do not send passwords or admin invites.",
+        placeholder: "Example: logo named harbor-oak-mark.svg, warm oak + soft harbor blue.",
       },
     ],
   },

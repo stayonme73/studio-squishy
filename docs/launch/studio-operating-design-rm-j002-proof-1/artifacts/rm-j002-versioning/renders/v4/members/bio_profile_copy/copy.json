@@ -1,0 +1,10 @@
+{
+  "memberId": "bio_profile_copy",
+  "kind": "copy",
+  "platform": "instagram",
+  "field": "bio",
+  "studioWritten": true,
+  "text": "Harbor & Oak Studio. Material change — new booking CTA emphasis. https://harbor-and-oak.example",
+  "customerApplies": true,
+  "accountMutation": false
+}

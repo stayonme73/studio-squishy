@@ -309,13 +309,27 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   "rm-j002": {
     producerRole: "creative_production",
     supportingRoles: ["copy", "qa", "producer_dispatcher"],
-    primaryTool: CANVA_TOOL,
+    /**
+     * STUDIO-OPERATING-DESIGN-RM-J002-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: paid rmJ002PostPayDispatchStructure → Profile Kit composer.
+     * Purchased platform kit is law — no membership invent / reorder / platform swap.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for rm-j002 only (RM-J002-PROOF-1 + INTAKE-PAYMENT-LOCK-1 + POSTPAY-KIT-DISPATCH-STRUCTURE-1 + DISPATCH-HOOK-1). Canva is not on the fulfillment spine for this SKU. Make not required. Exact platform + locked kit members N/N from paymentTruth seal. Customer applies the kit — Studio does not log in.",
+    },
     optionalTools: [TEXT_MODEL_TOOL],
     formatExportRequirements: [
-      "Social Profile Setup Kit (CUSTOMER READY WITH LIMITS — PROFILE KIT)",
-      "Platform-specific bio/about copy + URL/contact field map",
-      "Profile image/avatar + cover/banner where platform supports one",
-      "Platform-specific setup sheet with field-by-field checklist",
+      "One platform-locked Social Profile Setup Kit (Facebook 4 / Instagram 3 / TikTok 3 member identities)",
+      "Studio-written scoped bio/about copy + field-map checklist (customer applies)",
+      "Profile avatar on plate profile-avatar-square; Facebook page cover only when Facebook",
+      "Kit identity + kit manifest binding platform, member IDs, order, kinds, plates, artifacts, and QA",
     ],
     extraLimitations: [
       "CUSTOMER READY WITH LIMITS — PROFILE KIT (KITCHEN-SOCIAL-PROFILE-PRODUCTION-1 Owner decision A+C).",
@@ -325,6 +339,7 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
       "Instagram direct profile mutation: UNSUPPORTED.",
       "TikTok direct profile mutation: UNSUPPORTED.",
       "Per-artifact copy QA and design QA required before delivery.",
+      "Canva is not on the fulfillment spine for this SKU (Owner-authorized Machine remap).",
     ],
     extraQaItems: [
       {
@@ -345,10 +360,16 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         reason: "Security + contract honesty",
         source: "service_contract",
       },
+      {
+        id: "exact_platform_kit_nn",
+        label: "Exact locked platform kit N/N delivered",
+        reason: "Profile Setup Kit completeness = purchased platform membership",
+        source: "service_contract",
+      },
     ],
     readiness: "contract_ready",
     readinessNotes:
-      "CUSTOMER READY WITH LIMITS — PROFILE KIT (KITCHEN-SOCIAL-PROFILE-PRODUCTION-1 A+C). Owner-independent path: Copy + Design (manual Canva) + platform field-map package. Customer applies on platform. Facebook Page API mutation preserved as future-only (not wired). Instagram/TikTok mutation UNSUPPORTED. NOT unlimited Customer Ready / NOT CERTIFIED.",
+      "Social Profile Setup Kit — creative_production + Studio Design Renderer (Owner-independent Machine path). Canva is not on the fulfillment spine for this SKU; Make not required. Paid kit seal + post-pay structure required; exact platform + member N/N; customer applies on platform.",
     specialNotes: [
       "Do not reopen Meta OAuth unless product strategy or customer demand justifies App Review cost.",
       "Posting/scheduling/community management remain excluded.",
