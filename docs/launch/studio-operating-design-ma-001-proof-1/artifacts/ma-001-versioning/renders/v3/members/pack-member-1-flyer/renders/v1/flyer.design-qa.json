@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "evaluation": {
+    "skuId": "v2-rtu-flyer",
+    "fixtureId": "cert-design-1-fixture-a-harbor-oak",
+    "ok": true,
+    "findings": [],
+    "checkedAt": "2026-08-14T19:58:38.043Z",
+    "deterministicFailCount": 0,
+    "judgmentRequired": true,
+    "multiAssetConsistencyChecked": false,
+    "summary": "Deterministic design checks passed. Visual judgment attestations still required."
+  },
+  "overflowOk": true,
+  "overflowDetail": "scroll=1024x1536 canvas=1024x1536",
+  "identity": {
+    "packageId": "STUDIO-OPERATING-DESIGN-RENDERER-PROOF-1",
+    "campaignId": "camp-ma-001-versioning",
+    "jobId": "camp-ma-001-versioning::ma-001::member-flyer",
+    "dispatchId": "dd:camp-ma-001-versioning::ma-001::flyer",
+    "skuId": "v2-rtu-flyer",
+    "renderId": "6a9cbf0c-0520-4654-a9ec-960da802dd9e",
+    "renderVersion": 1,
+    "designSpecVersion": "flyer-design-spec-1.0.0",
+    "designSpecFingerprint": "3aea0f0f3c17541f97e4b785b9bbdd6dbbd0077ac3c7299dd909b00940a647e8",
+    "materialFingerprint": "2a5490ae9ea5aa0336a33e4fbfacd8d905f1567bd226bd6755ae1d46bfb22b34",
+    "rendererVersion": "design-renderer-proof-1.0.0",
+    "pngRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v3/members/pack-member-1-flyer/renders/v1/flyer.png",
+    "pdfRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v3/members/pack-member-1-flyer/renders/v1/flyer.pdf",
+    "htmlRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v3/members/pack-member-1-flyer/renders/v1/flyer.html",
+    "pngContentSha256": "ea0aa2714d4f90f0618974edc3cb6efed925e0a19ac60f15f36a93dd239060ce",
+    "pdfContentSha256": "6940c1a7e901323f53a11be894b04a18cbaef90007708c158df0e360a68ed482",
+    "widthPx": 1024,
+    "heightPx": 1536,
+    "createdAt": "2026-08-14T19:58:38.042Z",
+    "lineageNote": "Rerenders allocate a new vN directory; prior render folders are retained. Approved lineage is never silently overwritten."
+  },
+  "outputMode": "certification_fixture"
+}

@@ -184,6 +184,9 @@ export async function handleStripeWebhook(
     authorization,
     stripeEventId: event.id,
     sandbox: false,
+    ...(binding?.ma001CompositionSeal
+      ? { ma001CompositionSeal: binding.ma001CompositionSeal }
+      : {}),
   });
 
   if (!result.ok) {

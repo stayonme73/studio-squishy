@@ -517,3 +517,103 @@ export {
   runSm001MonthlyProofPipeline,
   resolveSm001MonthlyCycleArtifactRoot,
 } from "./sm-001-monthly-pipeline";
+
+/** ma-001 Promotion Pack orchestrator — PROOF-1 only (no remap / no dispatch). */
+export {
+  DESIGN_RENDERER_MA_001_SKU,
+  MA_001_PACK_SPEC_VERSION,
+  MA_001_PACK_ORCHESTRATOR_VERSION,
+  MA_001_SUPPORTED_KINDS,
+} from "./ma-001-types";
+export type {
+  Ma001SupportedKind,
+  Ma001LockedPackMemberCount,
+  Ma001PlannedPackMember,
+  Ma001PackProjectTruth,
+  Ma001PackIdentity,
+  Ma001PackPipelineResult,
+  Ma001MemberResult,
+  Ma001PromotionGraphicMemberTruth,
+} from "./ma-001-types";
+export {
+  MA_001_PROOF_CONTRACT,
+  isDesignRendererMa001Sku,
+  isMa001SupportedKind,
+  producerFamilyForKind,
+  validateMa001PackComposition,
+} from "./ma-001-contracts";
+export {
+  MA_001_PROOF_PACKAGE_ID,
+  MA_001_PROOF_ARTIFACT_ROOT,
+  buildHarborOakMa001MaxMixedPackTruth,
+  buildHarborOakMa001N1FlyerPackTruth,
+  buildMa001UnsupportedKindPackTruth,
+  ensureHarborOakMa001LogoMaterial,
+} from "./ma-001-fixtures";
+export { fingerprintMa001Pack } from "./ma-001-fingerprint";
+export { evaluateMa001PackQa } from "./ma-001-pack-qa";
+export { persistMa001PackArtifacts } from "./ma-001-bind";
+export { runMa001PromotionGraphicMemberAdapter } from "./ma-001-promo-member-adapter";
+export {
+  runMa001PackRendererPipeline,
+  runMa001PackProofPipeline,
+} from "./ma-001-pipeline";
+
+/** ma-001 INTAKE-TRUTH-1 — composition locked before payment (no remap / no dispatch). */
+export {
+  MA_001_INTAKE_TRUTH_PACKAGE_ID,
+  MA_001_CUSTOMER_KIND_OPTIONS,
+  MA_001_CUSTOMER_CAMPAIGN_GRAPHIC_FORMAT_OPTIONS,
+  MA_001_INHERITED_PLATE_BY_KIND,
+  MA_001_MEMBER_CONTENT_INHERITANCE,
+  MA_001_COMPOSITION_FIELD_IDS,
+  MA_001_FORBIDDEN_PACK_COPY_FIELDS,
+  MA_001_AMBIGUOUS_LEGACY_FIELDS,
+  MA_001_COMPOSITION_CUSTOMER_SCHEMA,
+  ma001MemberIdFor,
+  mapMa001CompositionFromLiveTruth,
+  buildMa001PackManifestSeed,
+  ma001LiveCompositionFromFlatAnswers,
+  assertMa001CompositionReadyForPayment,
+} from "./ma-001-intake-truth";
+export type {
+  Ma001CustomerKindOption,
+  Ma001CustomerCampaignGraphicFormatOption,
+  Ma001LiveMemberAnswer,
+  Ma001LiveCompositionInput,
+  Ma001CompositionLiveTruth,
+  Ma001PackManifestSeed,
+  Ma001CompositionMapResult,
+  Ma001PaymentReadinessResult,
+} from "./ma-001-intake-truth";
+
+/** ma-001 COMPOSITION-PAYMENT-GATE-1 — Plan/Checkout consume locked composition. */
+export {
+  MA_001_COMPOSITION_PAYMENT_GATE_PACKAGE_ID,
+  fingerprintMa001CompositionTruth,
+  normalizeMa001CompositionForPayment,
+  sealMa001CompositionForPayment,
+  ma001CompositionSealsMatch,
+  evaluateMa001CompositionPaymentGate,
+  customerFacingCompositionLines,
+  assertMa001CompositionUnchangedAfterCheckoutAuthority,
+  assertMa001PlanCompositionFresh,
+} from "./ma-001-composition-payment-gate";
+export type { Ma001CompositionPaymentSeal } from "./ma-001-composition-payment-gate";
+
+/** ma-001 POSTPAY-COMPOSITION-DISPATCH-STRUCTURE-1 — paid seal → durable pack structure. */
+export {
+  MA_001_POSTPAY_COMPOSITION_DISPATCH_STRUCTURE_PACKAGE_ID,
+  buildMa001PostPayDispatchStructureFromPaymentSeal,
+  buildMa001PostPayDispatchStructureFromCampaign,
+  assertMa001PostPayStructureMatchesPaymentSeal,
+  assertMa001PostPayStructureDispatchReady,
+  assertMa001PostPayStructureNoSilentMemberMutation,
+  ensureMa001PostPayDispatchStructureOnCampaign,
+} from "./ma-001-postpay-composition-dispatch-structure";
+export type {
+  Ma001PostPayDispatchMember,
+  Ma001PostPayDispatchStructure,
+  Ma001PostPayStructureFailureCode,
+  Ma001PostPayStructureBuildResult,
+} from "./ma-001-postpay-composition-dispatch-structure";

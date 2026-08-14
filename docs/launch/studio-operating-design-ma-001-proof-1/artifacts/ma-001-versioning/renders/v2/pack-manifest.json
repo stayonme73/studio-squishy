@@ -1,0 +1,43 @@
+{
+  "skuId": "ma-001",
+  "campaignFocus": "Spring Tune-Up + Drain Clear",
+  "lockedPackMemberCount": 1,
+  "countUnit": "member_identities",
+  "packRenderVersion": 2,
+  "packFingerprint": "0555ff41a6a5e3c030a10d7fa793ae0555e7ab60440377b496d032562c82406d",
+  "packQaOk": true,
+  "members": [
+    {
+      "memberId": "pack-member-1-flyer",
+      "kind": "flyer",
+      "order": 1,
+      "memberPurpose": "Launch flyer — Spring Tune-Up offer",
+      "producerFamily": "v2-rtu-flyer",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "producerQaOk": true,
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "role": "png",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v2/members/pack-member-1-flyer/renders/v1/flyer.png",
+          "contentSha256": "6b219b7c9f5fd7ceb39657cbc46ba167635dbc135372627a337d4a87701d9a47",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "pdf",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v2/members/pack-member-1-flyer/renders/v1/flyer.pdf",
+          "contentSha256": "4e0fb0bbcb5bb58ced60a956c22d20d24cdf09a58c4607fbe5b35dc17d2f2024",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "html",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v2/members/pack-member-1-flyer/renders/v1/flyer.html",
+          "contentSha256": "6b219b7c9f5fd7ceb39657cbc46ba167635dbc135372627a337d4a87701d9a47"
+        }
+      ]
+    }
+  ],
+  "note": "Pack completeness = member count, not artifact-file count."
+}

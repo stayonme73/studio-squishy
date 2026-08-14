@@ -1,0 +1,14 @@
+{
+  "adapter": "ma-001-promotion-graphic-single",
+  "memberId": "pack-member-4-promotion-graphic",
+  "assetId": "pack-spring-tuneup-social-square",
+  "plateId": "cert-square-1024",
+  "renderVersion": 1,
+  "pngRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v1/members/pack-member-4-promotion-graphic/renders/v1/pack-spring-tuneup-social-square.png",
+  "pdfRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v1/members/pack-member-4-promotion-graphic/renders/v1/pack-spring-tuneup-social-square.pdf",
+  "htmlRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v1/members/pack-member-4-promotion-graphic/renders/v1/pack-spring-tuneup-social-square.html",
+  "pngContentSha256": "d0a10f20505df7d688bfc0a9e73168c54c825be4fbb019ab3be760f9b859c7a6",
+  "pdfContentSha256": "4840e2a9559defa5a37bebca3722803334e4a2854caaaf4c6e7bc9913438ccbc",
+  "producerQaOk": false,
+  "note": "Single graphic only — placeholder host asset never rendered"
+}

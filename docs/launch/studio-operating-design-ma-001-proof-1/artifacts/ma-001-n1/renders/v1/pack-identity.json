@@ -1,0 +1,59 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-MA-001-PROOF-1",
+  "campaignId": "camp-ma-001-n1",
+  "jobId": "camp-ma-001-n1::ma-001",
+  "dispatchId": "dd:camp-ma-001-n1::ma-001",
+  "skuId": "ma-001",
+  "packRenderVersion": 1,
+  "lockedPackMemberCount": 1,
+  "plannedPackMembers": [
+    {
+      "memberId": "pack-member-1-flyer",
+      "kind": "flyer",
+      "order": 1,
+      "memberPurpose": "Launch flyer — Spring Tune-Up offer",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "producerFamily": "v2-rtu-flyer"
+    }
+  ],
+  "members": [
+    {
+      "memberId": "pack-member-1-flyer",
+      "kind": "flyer",
+      "order": 1,
+      "producerFamily": "v2-rtu-flyer",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "memberPurpose": "Launch flyer — Spring Tune-Up offer",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "png",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n1/renders/v1/members/pack-member-1-flyer/renders/v1/flyer.png",
+          "contentSha256": "ea0aa2714d4f90f0618974edc3cb6efed925e0a19ac60f15f36a93dd239060ce",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "pdf",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n1/renders/v1/members/pack-member-1-flyer/renders/v1/flyer.pdf",
+          "contentSha256": "7b07ce7ce94d8bf437844e1157a5429c8391fb94822bc3aed9ed90307b17bb2c",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "html",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n1/renders/v1/members/pack-member-1-flyer/renders/v1/flyer.html",
+          "contentSha256": "ea0aa2714d4f90f0618974edc3cb6efed925e0a19ac60f15f36a93dd239060ce"
+        }
+      ],
+      "producerIdentityRel": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n1/renders/v1/members/pack-member-1-flyer/renders/v1/artifact-identity.json",
+      "producerRenderVersion": 1
+    }
+  ],
+  "packFingerprint": "708c72bbf99397c2e819f5c131b84a32a503e26a06cf49c4356c4eb35410cd75",
+  "packQaOk": true,
+  "manifestRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n1/renders/v1/pack-manifest.json",
+  "identityRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n1/renders/v1/pack-identity.json",
+  "orchestratorVersion": "design-renderer-ma-001-pack-1.0.0",
+  "createdAt": "2026-08-14T19:57:50.573Z"
+}

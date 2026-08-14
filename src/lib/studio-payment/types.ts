@@ -30,6 +30,13 @@ export type CheckoutSessionCreateRequest = {
    * Default `studio_plan` preserves sealed Payment Truth checkout behavior.
    */
   purchaseKind?: CheckoutPurchaseKind;
+  /**
+   * ma-001 Promotion Pack — locked composition required when ma-001 is selected.
+   * Server re-validates; client cannot invent a default pack.
+   */
+  ma001PackComposition?: import("@/lib/studio-design-renderer/ma-001-intake-truth").Ma001LiveCompositionInput
+    | import("@/lib/studio-design-renderer/ma-001-intake-truth").Ma001CompositionLiveTruth
+    | null;
 };
 
 export type CheckoutSessionCreateResult =
@@ -69,7 +76,8 @@ export type CheckoutSessionCreateResult =
         | "campaign_mismatch"
         | "already_paid"
         | "invalid_request"
-        | "paid_cycle_invalid";
+        | "paid_cycle_invalid"
+        | "ma001_composition_required";
       message: string;
     };
 
@@ -88,6 +96,11 @@ export type PaymentConfirmationInput = {
   stripeEventId?: string | null;
   sandbox?: boolean;
   confirmedAt?: string;
+  /**
+   * Must match checkout binding seal when ma-001 was purchased.
+   */
+  ma001CompositionSeal?: import("@/lib/studio-design-renderer/ma-001-composition-payment-gate").Ma001CompositionPaymentSeal
+    | null;
 };
 
 export type PaymentConfirmationResult =

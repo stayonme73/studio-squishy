@@ -1,0 +1,43 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-BUSINESS-CARD-PROOF-1",
+  "campaignId": "camp-ma-001-partial-fail",
+  "jobId": "camp-ma-001-partial-fail::ma-001::member-card",
+  "dispatchId": "dd:camp-ma-001-partial-fail::ma-001::card",
+  "skuId": "v2-rtu-business-card",
+  "renderId": "51e36fcf-c5ff-4b5c-ab7e-782a0d8c02b7",
+  "renderVersion": 1,
+  "designSpecVersion": "business-card-design-spec-1.0.0",
+  "designSpecFingerprint": "04f2ef9ee15e57d9705c1bac77774304257c72b962655e0d79e2d9ab0e2fdd7f",
+  "materialFingerprint": "2a5490ae9ea5aa0336a33e4fbfacd8d905f1567bd226bd6755ae1d46bfb22b34",
+  "rendererVersion": "design-renderer-business-card-proof-1.0.0",
+  "sides": [
+    {
+      "side": "front",
+      "pngRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-partial-fail/renders/v2/members/pack-member-2-business-card/renders/v1/front.png",
+      "htmlRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-partial-fail/renders/v2/members/pack-member-2-business-card/renders/v1/front.html",
+      "pngContentSha256": "9994798e4994843bf4edfd6fa9e4313232cd979338d0980847333a0a3b9ff199",
+      "widthPx": 1536,
+      "heightPx": 1024,
+      "overflowOk": true,
+      "overflowDetail": "scroll=1536x1024 canvas=1536x1024"
+    },
+    {
+      "side": "back",
+      "pngRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-partial-fail/renders/v2/members/pack-member-2-business-card/renders/v1/back.png",
+      "htmlRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-partial-fail/renders/v2/members/pack-member-2-business-card/renders/v1/back.html",
+      "pngContentSha256": "263f487aba0ae14d48a141e0eb07d88a39467e8da6295b8ad61f2f2ad824c10c",
+      "widthPx": 1536,
+      "heightPx": 1024,
+      "overflowOk": true,
+      "overflowDetail": "scroll=1536x1024 canvas=1536x1024"
+    }
+  ],
+  "pdfRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-partial-fail/renders/v2/members/pack-member-2-business-card/renders/v1/business-card.pdf",
+  "pdfContentSha256": "8bd1402854f4ef0af3a69b99ef345961991eb568324d6a9e4a1548ec3a85356f",
+  "designSpecRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-partial-fail/renders/v2/members/pack-member-2-business-card/renders/v1/design-spec.json",
+  "widthPx": 1536,
+  "heightPx": 1024,
+  "createdAt": "2026-08-14T19:58:40.129Z",
+  "lineageNote": "Rerenders allocate a new vN directory; prior render folders are retained. Front and back are both bound per version.",
+  "printPromiseNote": "Flattened multi-page PDF (front then back) at the agreed CERT plate pixels, suitable for customer-managed print — not Studio print fulfillment and not prepress certification."
+}

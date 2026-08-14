@@ -34,6 +34,8 @@ import type {
   CheckoutSessionCreateRequest,
   CheckoutSessionCreateResult,
 } from "./types";
+import { evaluateMa001CompositionPaymentGate } from "@/lib/studio-design-renderer/ma-001-composition-payment-gate";
+import type { Ma001CompositionPaymentSeal } from "@/lib/studio-design-renderer/ma-001-composition-payment-gate";
 
 function ensureApprovedPlan(
   campaign: CampaignRecord,
@@ -265,6 +267,20 @@ export async function createCheckoutSession(
     };
   }
 
+  const ma001Gate = evaluateMa001CompositionPaymentGate({
+    selectedServiceIds: facts.selectedServiceIds.map(String),
+    composition: request.ma001PackComposition ?? null,
+  });
+  if (!ma001Gate.ok) {
+    return {
+      ok: false,
+      error: "ma001_composition_required",
+      message: ma001Gate.message,
+    };
+  }
+  const ma001CompositionSeal: Ma001CompositionPaymentSeal | undefined =
+    ma001Gate.applicable ? ma001Gate.seal : undefined;
+
   const resolved = resolveCheckoutAmount(purchaseKind, facts.selectedServiceIds);
   if (!resolved.ok) {
     return {
@@ -353,6 +369,9 @@ export async function createCheckoutSession(
       draftRevision: authorization.evaluatedDraftRevision,
       createdAt: new Date().toISOString(),
       sandbox,
+      ...(ma001CompositionSeal
+        ? { ma001CompositionSeal }
+        : {}),
       ...(purchaseKind === "paid_cycle"
         ? {
             purchaseKind: "paid_cycle" as const,

@@ -33,6 +33,8 @@ export async function POST(request: Request) {
       customerEmail: body.customerEmail,
       authorization: body.authorization,
       preferSandbox: body.preferSandbox === true,
+      purchaseKind: body.purchaseKind,
+      ma001PackComposition: body.ma001PackComposition ?? null,
     });
 
     if (!result.ok) {
@@ -46,7 +48,9 @@ export async function POST(request: Request) {
               ? 502
               : result.error === "already_paid"
                 ? 409
-                : 400;
+                : result.error === "ma001_composition_required"
+                  ? 422
+                  : 400;
       return NextResponse.json(result, { status });
     }
 

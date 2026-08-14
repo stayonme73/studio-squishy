@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "error": "Judgment notes must reference the bound artifact hash/path (sha256 / bound file) so QA is tied to the reviewed PNG",
+  "evaluation": {
+    "skuId": "ma-001",
+    "fixtureId": "ma-001-promo-member",
+    "ok": true,
+    "findings": [],
+    "checkedAt": "2026-08-14T19:58:22.886Z",
+    "deterministicFailCount": 0,
+    "judgmentRequired": true,
+    "multiAssetConsistencyChecked": false,
+    "summary": "Deterministic design checks passed. Visual judgment attestations still required."
+  }
+}

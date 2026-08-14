@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "evaluation": {
+    "skuId": "ma-001",
+    "fixtureId": "ma-001-promo-member",
+    "ok": true,
+    "findings": [],
+    "checkedAt": "2026-08-14T19:58:37.534Z",
+    "deterministicFailCount": 0,
+    "judgmentRequired": true,
+    "multiAssetConsistencyChecked": false,
+    "summary": "Deterministic design checks passed. Visual judgment attestations still required."
+  }
+}

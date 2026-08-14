@@ -78,6 +78,9 @@ export async function confirmSandboxCheckoutSession(
     authorization,
     stripeEventId: `evt_sandbox_${checkoutSessionId}`,
     sandbox: true,
+    ...(binding.ma001CompositionSeal
+      ? { ma001CompositionSeal: binding.ma001CompositionSeal }
+      : {}),
   });
 }
 

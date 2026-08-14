@@ -1,0 +1,259 @@
+{
+  "specVersion": "business-card-design-spec-1.0.0",
+  "skuId": "v2-rtu-business-card",
+  "canvas": {
+    "widthPx": 1536,
+    "heightPx": 1024
+  },
+  "colors": {
+    "primary": "#1F3A5F",
+    "secondary": "#C4A574",
+    "background": "#F7F4EF",
+    "text": "#1A1A1A",
+    "muted": "#5A6570"
+  },
+  "materials": [
+    {
+      "materialId": "mat-harbor-oak-logo-v1",
+      "role": "logo",
+      "relativePath": "docs/launch/studio-operating-design-business-card-proof-1/artifacts/v2-rtu-business-card/materials/harbor-oak-anchor-oak-oval-v1.svg",
+      "contentSha256": "e5a7876e20a7c79d7746975f3ad790cdd9c6b82bf9ac86c3897a7ad063e9b510",
+      "approvedIdentitySourceId": "harbor-oak-anchor-oak-oval-v1"
+    }
+  ],
+  "outputFormats": [
+    "png",
+    "pdf"
+  ],
+  "reasoningMode": "deterministic_constrained",
+  "front": {
+    "side": "front",
+    "background": {
+      "color": "#F7F4EF"
+    },
+    "layers": [
+      {
+        "type": "shape",
+        "id": "front-accent",
+        "role": "accent_bar",
+        "x": 0,
+        "y": 0,
+        "width": 28,
+        "height": 1024,
+        "fill": "#1F3A5F"
+      },
+      {
+        "type": "shape",
+        "id": "front-logo-plate",
+        "role": "logo_plate",
+        "x": 72,
+        "y": 72,
+        "width": 160,
+        "height": 160,
+        "fill": "#FFFFFF",
+        "borderRadiusPx": 12
+      },
+      {
+        "type": "image",
+        "id": "front-logo",
+        "role": "logo",
+        "materialId": "mat-harbor-oak-logo-v1",
+        "x": 88,
+        "y": 88,
+        "width": 128,
+        "height": 128,
+        "fit": "contain"
+      },
+      {
+        "type": "text",
+        "id": "front-wordmark",
+        "role": "wordmark",
+        "content": "Harbor & Oak",
+        "x": 280,
+        "y": 96,
+        "width": 1160,
+        "fontSizePx": 42,
+        "fontWeight": 700,
+        "lineHeight": 1.15,
+        "color": "#1F3A5F",
+        "align": "left"
+      },
+      {
+        "type": "text",
+        "id": "front-person",
+        "role": "person_name",
+        "content": "Jordan Hale",
+        "x": 280,
+        "y": 200,
+        "width": 1160,
+        "fontSizePx": 36,
+        "fontWeight": 600,
+        "lineHeight": 1.2,
+        "color": "#1A1A1A",
+        "align": "left"
+      },
+      {
+        "type": "text",
+        "id": "front-title",
+        "role": "title",
+        "content": "Service Coordinator",
+        "x": 280,
+        "y": 260,
+        "width": 1160,
+        "fontSizePx": 26,
+        "fontWeight": 500,
+        "lineHeight": 1.2,
+        "color": "#5A6570",
+        "align": "left"
+      },
+      {
+        "type": "shape",
+        "id": "front-divider",
+        "role": "divider",
+        "x": 280,
+        "y": 340,
+        "width": 480,
+        "height": 3,
+        "fill": "#C4A574"
+      },
+      {
+        "type": "text",
+        "id": "front-phone",
+        "role": "phone",
+        "content": "(804) 555-0142",
+        "x": 280,
+        "y": 400,
+        "width": 1160,
+        "fontSizePx": 28,
+        "fontWeight": 500,
+        "lineHeight": 1.3,
+        "color": "#1A1A1A",
+        "align": "left"
+      },
+      {
+        "type": "text",
+        "id": "front-email",
+        "role": "email",
+        "content": "jordan.hale@harborandoak.example",
+        "x": 280,
+        "y": 460,
+        "width": 1160,
+        "fontSizePx": 26,
+        "fontWeight": 400,
+        "lineHeight": 1.3,
+        "color": "#1A1A1A",
+        "align": "left"
+      },
+      {
+        "type": "text",
+        "id": "front-web",
+        "role": "web",
+        "content": "harborandoak.example",
+        "x": 280,
+        "y": 520,
+        "width": 1160,
+        "fontSizePx": 26,
+        "fontWeight": 400,
+        "lineHeight": 1.3,
+        "color": "#1F3A5F",
+        "align": "left"
+      },
+      {
+        "type": "text",
+        "id": "front-address",
+        "role": "address",
+        "content": "Richmond, VA metro",
+        "x": 280,
+        "y": 580,
+        "width": 1160,
+        "fontSizePx": 24,
+        "fontWeight": 400,
+        "lineHeight": 1.3,
+        "color": "#5A6570",
+        "align": "left"
+      }
+    ]
+  },
+  "back": {
+    "side": "back",
+    "background": {
+      "color": "#1F3A5F"
+    },
+    "layers": [
+      {
+        "type": "shape",
+        "id": "back-plate",
+        "role": "plate",
+        "x": 0,
+        "y": 0,
+        "width": 1536,
+        "height": 1024,
+        "fill": "#1F3A5F"
+      },
+      {
+        "type": "shape",
+        "id": "back-logo-plate",
+        "role": "logo_plate",
+        "x": 658,
+        "y": 220,
+        "width": 220,
+        "height": 220,
+        "fill": "#FFFFFF",
+        "borderRadiusPx": 16
+      },
+      {
+        "type": "image",
+        "id": "back-logo",
+        "role": "logo",
+        "materialId": "mat-harbor-oak-logo-v1",
+        "x": 678,
+        "y": 240,
+        "width": 180,
+        "height": 180,
+        "fit": "contain"
+      },
+      {
+        "type": "text",
+        "id": "back-wordmark",
+        "role": "wordmark",
+        "content": "Harbor & Oak",
+        "x": 80,
+        "y": 480,
+        "width": 1376,
+        "fontSizePx": 40,
+        "fontWeight": 700,
+        "lineHeight": 1.15,
+        "color": "#F7F4EF",
+        "align": "center"
+      },
+      {
+        "type": "text",
+        "id": "back-descriptor",
+        "role": "descriptor",
+        "content": "Plainspoken home services — HVAC & plumbing.",
+        "x": 120,
+        "y": 620,
+        "width": 1296,
+        "fontSizePx": 24,
+        "fontWeight": 400,
+        "lineHeight": 1.35,
+        "color": "#C4A574",
+        "align": "center"
+      },
+      {
+        "type": "text",
+        "id": "back-web",
+        "role": "web",
+        "content": "harborandoak.example",
+        "x": 120,
+        "y": 700,
+        "width": 1296,
+        "fontSizePx": 26,
+        "fontWeight": 500,
+        "lineHeight": 1.3,
+        "color": "#F7F4EF",
+        "align": "center"
+      }
+    ]
+  }
+}

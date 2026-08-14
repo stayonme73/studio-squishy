@@ -1,0 +1,22 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-RENDERER-PROOF-1",
+  "campaignId": "camp-ma-001-partial-fail",
+  "jobId": "camp-ma-001-partial-fail::ma-001::member-flyer",
+  "dispatchId": "dd:camp-ma-001-partial-fail::ma-001::flyer",
+  "skuId": "v2-rtu-flyer",
+  "renderId": "566eac4a-ebb2-48b1-8c24-10ade37d96ef",
+  "renderVersion": 1,
+  "designSpecVersion": "flyer-design-spec-1.0.0",
+  "designSpecFingerprint": "3aea0f0f3c17541f97e4b785b9bbdd6dbbd0077ac3c7299dd909b00940a647e8",
+  "materialFingerprint": "2a5490ae9ea5aa0336a33e4fbfacd8d905f1567bd226bd6755ae1d46bfb22b34",
+  "rendererVersion": "design-renderer-proof-1.0.0",
+  "pngRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-partial-fail/renders/v1/members/pack-member-1-flyer/renders/v1/flyer.png",
+  "pdfRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-partial-fail/renders/v1/members/pack-member-1-flyer/renders/v1/flyer.pdf",
+  "htmlRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-partial-fail/renders/v1/members/pack-member-1-flyer/renders/v1/flyer.html",
+  "pngContentSha256": "ea0aa2714d4f90f0618974edc3cb6efed925e0a19ac60f15f36a93dd239060ce",
+  "pdfContentSha256": "835d3551ad053260258170ede9b65b76eaca977b2f225eb4e57139cca6212d66",
+  "widthPx": 1024,
+  "heightPx": 1536,
+  "createdAt": "2026-08-14T19:57:54.233Z",
+  "lineageNote": "Rerenders allocate a new vN directory; prior render folders are retained. Approved lineage is never silently overwritten."
+}

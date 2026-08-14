@@ -4,6 +4,7 @@ import {
   CUSTOM_STUDIO_PLAN_PACKAGE_ID,
 } from "@/lib/approved-plan-display";
 import type { PreAcceptancePaymentAuthorization } from "@/lib/studio-pre-acceptance/authorization-binding";
+import { ensureMa001PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/ma-001-postpay-composition-dispatch-structure";
 
 import type { PaymentConfirmationInput } from "./types";
 
@@ -55,6 +56,9 @@ export function applyPaidTruthToCampaignRecord(
       initiatedAt: campaign.paymentTruth?.initiatedAt,
       confirmedAt: campaign.paymentTruth?.confirmedAt ?? now,
       sandbox: input.sandbox === true,
+      ...(input.ma001CompositionSeal
+        ? { ma001CompositionSeal: input.ma001CompositionSeal }
+        : {}),
     },
   };
 
@@ -89,6 +93,14 @@ export function applyPaidTruthToCampaignRecord(
         },
       ],
     };
+  }
+
+  // Durable ma-001 pack structure from sealed payment composition (no remap / no renderer).
+  if (updated.paymentTruth?.ma001CompositionSeal) {
+    const ensured = ensureMa001PostPayDispatchStructureOnCampaign(updated);
+    if (ensured.ok) {
+      updated = ensured.campaign;
+    }
   }
 
   return updated;

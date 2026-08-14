@@ -1,0 +1,76 @@
+{
+  "skuId": "ma-001",
+  "campaignFocus": "Spring Tune-Up + Drain Clear",
+  "lockedPackMemberCount": 2,
+  "countUnit": "member_identities",
+  "packRenderVersion": 1,
+  "packFingerprint": "35a4e52ec153c1e300b28e3d5f517693e93993533080d2ff150695ab3b27207d",
+  "packQaOk": true,
+  "members": [
+    {
+      "memberId": "pack-member-1-flyer",
+      "kind": "flyer",
+      "order": 1,
+      "memberPurpose": "Launch flyer — Spring Tune-Up offer",
+      "producerFamily": "v2-rtu-flyer",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "producerQaOk": true,
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "role": "png",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n2/renders/v1/members/pack-member-1-flyer/renders/v1/flyer.png",
+          "contentSha256": "ea0aa2714d4f90f0618974edc3cb6efed925e0a19ac60f15f36a93dd239060ce",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "pdf",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n2/renders/v1/members/pack-member-1-flyer/renders/v1/flyer.pdf",
+          "contentSha256": "909db1537fff9165741ab849e9eedce906db3fcff52d05755ed53dd76327ea88",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "html",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n2/renders/v1/members/pack-member-1-flyer/renders/v1/flyer.html",
+          "contentSha256": "ea0aa2714d4f90f0618974edc3cb6efed925e0a19ac60f15f36a93dd239060ce"
+        }
+      ]
+    },
+    {
+      "memberId": "pack-member-2-business-card",
+      "kind": "business_card",
+      "order": 2,
+      "memberPurpose": "Contact card — Jordan Hale",
+      "producerFamily": "v2-rtu-business-card",
+      "agreedPlateId": "cert-landscape-1536x1024",
+      "producerQaOk": true,
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "role": "side-front",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n2/renders/v1/members/pack-member-2-business-card/renders/v1/front.png",
+          "contentSha256": "9994798e4994843bf4edfd6fa9e4313232cd979338d0980847333a0a3b9ff199",
+          "widthPx": 1536,
+          "heightPx": 1024
+        },
+        {
+          "role": "side-back",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n2/renders/v1/members/pack-member-2-business-card/renders/v1/back.png",
+          "contentSha256": "263f487aba0ae14d48a141e0eb07d88a39467e8da6295b8ad61f2f2ad824c10c",
+          "widthPx": 1536,
+          "heightPx": 1024
+        },
+        {
+          "role": "pdf",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-n2/renders/v1/members/pack-member-2-business-card/renders/v1/business-card.pdf",
+          "contentSha256": "52a87b57d01acf4b28b937d4b5cda4aca68e3165ce00831a54d2fe35e67e2d3f",
+          "widthPx": 1536,
+          "heightPx": 1024
+        }
+      ]
+    }
+  ],
+  "note": "Pack completeness = member count, not artifact-file count."
+}

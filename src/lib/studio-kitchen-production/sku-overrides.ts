@@ -218,14 +218,33 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "ma-001": {
     producerRole: "creative_production",
-    formatExportRequirements: canvaFormats(
-      "Up to four branded standard-format digital assets",
-    ),
+    /**
+     * STUDIO-OPERATING-DESIGN-MA-001-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: paid ma001PostPayDispatchStructure → heterogeneous pack
+     * orchestrator (sealed flyer/card/service-sheet + single promo adapter).
+     * Purchased basket is law — no member invent / reorder / substitute.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for ma-001 only (MA-001-PROOF-1 + COMPOSITION-PAYMENT-GATE-1 + POSTPAY-COMPOSITION-DISPATCH-STRUCTURE-1). Canva is not on the fulfillment spine for this SKU. Make not required. Exact locked pack members N/N from paymentTruth seal.",
+    },
+    formatExportRequirements: [
+      "One to four branded pack members locked before payment (member identities — not artifact-file count)",
+      "Each member produced via its sealed producer family (flyer / menu / service sheet / business card / single promotion graphic)",
+      "Pack identity + pack manifest binding member IDs, order, kinds, plates, artifacts, and QA",
+      "Editable source files are not included unless separately authorized",
+    ],
     extraQaItems: [
       {
         id: "asset_count_four",
-        label: "No more than four assets",
-        reason: "Catalog deliverable limit",
+        label: "No more than four pack members",
+        reason: "Catalog deliverable limit (member identities)",
         source: "service_contract",
       },
       {
@@ -234,10 +253,16 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         reason: "Client responsibility + factual accuracy",
         source: "service_contract",
       },
+      {
+        id: "exact_member_nn",
+        label: "Exact locked member N/N delivered",
+        reason: "Promotion Pack completeness = purchased member identities",
+        source: "service_contract",
+      },
     ],
     readiness: "contract_ready",
     readinessNotes:
-      "Promotion Pack production method defined via creative_production + manual Canva. Source files not included by default.",
+      "Promotion Pack — creative_production + Studio Design Renderer (Owner-independent Machine path). Canva is not on the fulfillment spine for this SKU; Make not required. Paid composition seal + post-pay structure required; exact member N/N; sealed producer families reused.",
   },
   "ap-001": {
     producerRole: "creative_production",

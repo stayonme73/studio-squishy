@@ -1,0 +1,59 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-MA-001-PROOF-1",
+  "campaignId": "camp-ma-001-versioning",
+  "jobId": "camp-ma-001-versioning::ma-001",
+  "dispatchId": "dd:camp-ma-001-versioning::ma-001",
+  "skuId": "ma-001",
+  "packRenderVersion": 5,
+  "lockedPackMemberCount": 1,
+  "plannedPackMembers": [
+    {
+      "memberId": "pack-member-1-flyer",
+      "kind": "flyer",
+      "order": 1,
+      "memberPurpose": "Launch flyer — Spring Tune-Up offer",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "producerFamily": "v2-rtu-flyer"
+    }
+  ],
+  "members": [
+    {
+      "memberId": "pack-member-1-flyer",
+      "kind": "flyer",
+      "order": 1,
+      "producerFamily": "v2-rtu-flyer",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "memberPurpose": "Launch flyer — Spring Tune-Up offer",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "png",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v5/members/pack-member-1-flyer/renders/v1/flyer.png",
+          "contentSha256": "ea0aa2714d4f90f0618974edc3cb6efed925e0a19ac60f15f36a93dd239060ce",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "pdf",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v5/members/pack-member-1-flyer/renders/v1/flyer.pdf",
+          "contentSha256": "65e9b34a760ec5734a4285c98c8125ef42a8e9b6e83609416ca30cd7ef522599",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "html",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v5/members/pack-member-1-flyer/renders/v1/flyer.html",
+          "contentSha256": "ea0aa2714d4f90f0618974edc3cb6efed925e0a19ac60f15f36a93dd239060ce"
+        }
+      ],
+      "producerIdentityRel": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v5/members/pack-member-1-flyer/renders/v1/artifact-identity.json",
+      "producerRenderVersion": 1
+    }
+  ],
+  "packFingerprint": "fd4fc8ad503a40f0d3d204c2f2104a8fd68a27470cface6f4d08a7101f14955a",
+  "packQaOk": true,
+  "manifestRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v5/pack-manifest.json",
+  "identityRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001-versioning/renders/v5/pack-identity.json",
+  "orchestratorVersion": "design-renderer-ma-001-pack-1.0.0",
+  "createdAt": "2026-08-14T19:59:05.323Z"
+}

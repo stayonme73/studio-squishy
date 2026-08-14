@@ -7,6 +7,8 @@ import type { ProjectBuilderStudioPlanSummaryModel } from "@/lib/project-builder
 
 export type ConversationStudioPlanTabletProps = {
   model: ProjectBuilderStudioPlanSummaryModel;
+  /** Customer-facing ma-001 pack members (kinds only — no producer jargon). */
+  ma001CompositionMemberLabels?: readonly string[] | null;
   onEditPlan: () => void;
   onChangeRoute: () => void;
   onLooksGood: () => void;
@@ -25,6 +27,7 @@ function routeCustomerLabel(routeLabel: string): string {
  */
 export default function ConversationStudioPlanTablet({
   model,
+  ma001CompositionMemberLabels = null,
   onEditPlan,
   onChangeRoute,
   onLooksGood,
@@ -89,6 +92,23 @@ export default function ConversationStudioPlanTablet({
             ))}
           </ul>
         </section>
+
+        {ma001CompositionMemberLabels &&
+        ma001CompositionMemberLabels.length > 0 ? (
+          <section
+            className={styles.planFactCard}
+            aria-label="Promotion Pack contents"
+          >
+            <p className={styles.planFactLabel}>Promotion Pack includes</p>
+            <ul className={styles.planPackMemberList}>
+              {ma001CompositionMemberLabels.map((label, index) => (
+                <li key={`${label}-${index}`}>
+                  <span className={styles.planServiceName}>{label}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         <section className={styles.planFactCard}>
           <p className={styles.planFactLabel}>{PROJECT_BUILDER_V1.totalLabel}</p>

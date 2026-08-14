@@ -492,26 +492,34 @@ function reasonPortraitAsset(
   };
 }
 
+/**
+ * Reason one promo graphic layout from sealed square/portrait layout families.
+ * Used by the exact-two campaign set and by ma-001 single `promotion_graphic` member adapter.
+ * Does not change exact-two product law — dual set still requires two assets via assertPromoRequiredTruth.
+ */
+export function reasonPromoGraphicAsset(
+  truth: PromoProjectTruth,
+  asset: PromoAssetTruth,
+): PromoAssetSpec {
+  if (asset.layoutVariant === "compact_square") {
+    return reasonSquareAsset(truth, asset);
+  }
+  if (asset.layoutVariant === "tall_portrait") {
+    return reasonPortraitAsset(truth, asset);
+  }
+  if (asset.layoutVariant === "wide_landscape") {
+    throw new Error(
+      "MISSING_REQUIRED_TRUTH: landscape promo layout is intake-ready but not yet in the promotion-graphics renderer proof (square + portrait only). Do not invent a stretched portrait.",
+    );
+  }
+  throw new Error(`INVALID_DESIGN_SPEC: unknown layoutVariant`);
+}
+
 export function reasonPromoCampaignSetDeterministic(
   truth: PromoProjectTruth,
 ): PromoCampaignSetSpec {
   assertPromoRequiredTruth(truth);
   const [aTruth, bTruth] = truth.assets;
-
-  const reasonAsset = (asset: PromoAssetTruth): PromoAssetSpec => {
-    if (asset.layoutVariant === "compact_square") {
-      return reasonSquareAsset(truth, asset);
-    }
-    if (asset.layoutVariant === "tall_portrait") {
-      return reasonPortraitAsset(truth, asset);
-    }
-    if (asset.layoutVariant === "wide_landscape") {
-      throw new Error(
-        "MISSING_REQUIRED_TRUTH: landscape promo layout is intake-ready but not yet in the promotion-graphics renderer proof (square + portrait only). Do not invent a stretched portrait.",
-      );
-    }
-    throw new Error(`INVALID_DESIGN_SPEC: unknown layoutVariant`);
-  };
 
   return {
     specVersion: PROMO_DESIGN_SPEC_VERSION,
@@ -528,7 +536,10 @@ export function reasonPromoCampaignSetDeterministic(
       webDisplay: truth.webDisplay,
       cta: truth.cta,
     },
-    assets: [reasonAsset(aTruth), reasonAsset(bTruth)],
+    assets: [
+      reasonPromoGraphicAsset(truth, aTruth),
+      reasonPromoGraphicAsset(truth, bTruth),
+    ],
     reasoningMode: "deterministic_constrained",
   };
 }

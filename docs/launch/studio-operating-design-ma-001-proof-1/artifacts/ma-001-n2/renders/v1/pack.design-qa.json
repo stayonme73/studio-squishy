@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "summary": "Pack QA pass: 2 members, 6 artifacts (member≠file), campaign=\"Spring Tune-Up + Drain Clear\"",
+  "lockedPackMemberCount": 2,
+  "artifactFileCount": 6,
+  "flyerCanvas": {
+    "widthPx": 1024,
+    "heightPx": 1536
+  },
+  "serviceSheetCanvas": {
+    "widthPx": 1024,
+    "heightPx": 1536
+  },
+  "packageId": "STUDIO-OPERATING-DESIGN-MA-001-PROOF-1"
+}

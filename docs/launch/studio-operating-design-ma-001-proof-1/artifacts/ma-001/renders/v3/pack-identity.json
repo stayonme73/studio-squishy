@@ -1,0 +1,181 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-MA-001-PROOF-1",
+  "campaignId": "camp-design-ma-001-proof-harbor-mixed",
+  "jobId": "camp-design-ma-001-proof-harbor-mixed::ma-001",
+  "dispatchId": "dd:camp-design-ma-001-proof-harbor-mixed::ma-001",
+  "skuId": "ma-001",
+  "packRenderVersion": 3,
+  "lockedPackMemberCount": 4,
+  "plannedPackMembers": [
+    {
+      "memberId": "pack-member-1-flyer",
+      "kind": "flyer",
+      "order": 1,
+      "memberPurpose": "Launch flyer — Spring Tune-Up offer",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "producerFamily": "v2-rtu-flyer"
+    },
+    {
+      "memberId": "pack-member-2-business-card",
+      "kind": "business_card",
+      "order": 2,
+      "memberPurpose": "Contact card — Jordan Hale",
+      "agreedPlateId": "cert-landscape-1536x1024",
+      "producerFamily": "v2-rtu-business-card"
+    },
+    {
+      "memberId": "pack-member-3-service-sheet",
+      "kind": "service_sheet",
+      "order": 3,
+      "memberPurpose": "Service list handout",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "producerFamily": "v2-rtu-service-sheet"
+    },
+    {
+      "memberId": "pack-member-4-promotion-graphic",
+      "kind": "promotion_graphic",
+      "order": 4,
+      "memberPurpose": "Campaign social square graphic",
+      "agreedPlateId": "cert-square-1024",
+      "producerFamily": "v2-rtu-promotion-graphics-single-adapter"
+    }
+  ],
+  "members": [
+    {
+      "memberId": "pack-member-1-flyer",
+      "kind": "flyer",
+      "order": 1,
+      "producerFamily": "v2-rtu-flyer",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "memberPurpose": "Launch flyer — Spring Tune-Up offer",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "png",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-1-flyer/renders/v1/flyer.png",
+          "contentSha256": "ea0aa2714d4f90f0618974edc3cb6efed925e0a19ac60f15f36a93dd239060ce",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "pdf",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-1-flyer/renders/v1/flyer.pdf",
+          "contentSha256": "a7aba1369f83752bac5e739faaf64d45f324eacbe460d8e38e0098327a32ca86",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "html",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-1-flyer/renders/v1/flyer.html",
+          "contentSha256": "ea0aa2714d4f90f0618974edc3cb6efed925e0a19ac60f15f36a93dd239060ce"
+        }
+      ],
+      "producerIdentityRel": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-1-flyer/renders/v1/artifact-identity.json",
+      "producerRenderVersion": 1
+    },
+    {
+      "memberId": "pack-member-2-business-card",
+      "kind": "business_card",
+      "order": 2,
+      "producerFamily": "v2-rtu-business-card",
+      "agreedPlateId": "cert-landscape-1536x1024",
+      "memberPurpose": "Contact card — Jordan Hale",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "side-front",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-2-business-card/renders/v1/front.png",
+          "contentSha256": "9994798e4994843bf4edfd6fa9e4313232cd979338d0980847333a0a3b9ff199",
+          "widthPx": 1536,
+          "heightPx": 1024
+        },
+        {
+          "role": "side-back",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-2-business-card/renders/v1/back.png",
+          "contentSha256": "263f487aba0ae14d48a141e0eb07d88a39467e8da6295b8ad61f2f2ad824c10c",
+          "widthPx": 1536,
+          "heightPx": 1024
+        },
+        {
+          "role": "pdf",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-2-business-card/renders/v1/business-card.pdf",
+          "contentSha256": "af40939fc70b86ca939064f03552f86f2cc21430b146b622d202a26777bb8d02",
+          "widthPx": 1536,
+          "heightPx": 1024
+        }
+      ],
+      "producerIdentityRel": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-2-business-card/renders/v1/artifact-identity.json",
+      "producerRenderVersion": 1
+    },
+    {
+      "memberId": "pack-member-3-service-sheet",
+      "kind": "service_sheet",
+      "order": 3,
+      "producerFamily": "v2-rtu-service-sheet",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "memberPurpose": "Service list handout",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "png",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-3-service-sheet/renders/v1/service-sheet.png",
+          "contentSha256": "13849e85db7b79e3ae1f56fe6f4eec8fbb9be722dabfe11fea405062c5f6ff8d",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "pdf",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-3-service-sheet/renders/v1/service-sheet.pdf",
+          "contentSha256": "f31dc65bcabf4a99b250104b07b10138ac3914498633d96ca518f5344a6c172e",
+          "widthPx": 1024,
+          "heightPx": 1536
+        },
+        {
+          "role": "html",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-3-service-sheet/renders/v1/service-sheet.html",
+          "contentSha256": "13849e85db7b79e3ae1f56fe6f4eec8fbb9be722dabfe11fea405062c5f6ff8d"
+        }
+      ],
+      "producerIdentityRel": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-3-service-sheet/renders/v1/artifact-identity.json",
+      "producerRenderVersion": 1
+    },
+    {
+      "memberId": "pack-member-4-promotion-graphic",
+      "kind": "promotion_graphic",
+      "order": 4,
+      "producerFamily": "v2-rtu-promotion-graphics-single-adapter",
+      "agreedPlateId": "cert-square-1024",
+      "memberPurpose": "Campaign social square graphic",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "png",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-4-promotion-graphic/renders/v1/pack-spring-tuneup-social-square.png",
+          "contentSha256": "d0a10f20505df7d688bfc0a9e73168c54c825be4fbb019ab3be760f9b859c7a6",
+          "widthPx": 1024,
+          "heightPx": 1024
+        },
+        {
+          "role": "pdf",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-4-promotion-graphic/renders/v1/pack-spring-tuneup-social-square.pdf",
+          "contentSha256": "32947a6572b75ad22a20a19e5e2afc606a2a5fcf6e7c2934ebaab8ab1b0b00ce",
+          "widthPx": 1024,
+          "heightPx": 1024
+        },
+        {
+          "role": "html",
+          "relativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-4-promotion-graphic/renders/v1/pack-spring-tuneup-social-square.html",
+          "contentSha256": "ab0df6ecbdad2b8d09d4830a663aafd0e5d11c1e6f10968e51333b4ee8aed871"
+        }
+      ],
+      "producerIdentityRel": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/members/pack-member-4-promotion-graphic/renders/v1/member-identity.json",
+      "producerRenderVersion": 1
+    }
+  ],
+  "packFingerprint": "fb402f9790b33c2d5c200b6d90426ff5c8916b7f66a166a95b4f27f345be5f23",
+  "packQaOk": true,
+  "manifestRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/pack-manifest.json",
+  "identityRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v3/pack-identity.json",
+  "orchestratorVersion": "design-renderer-ma-001-pack-1.0.0",
+  "createdAt": "2026-08-14T19:58:37.536Z"
+}

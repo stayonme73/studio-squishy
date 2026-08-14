@@ -1,0 +1,254 @@
+{
+  "specVersion": "flyer-design-spec-1.0.0",
+  "skuId": "v2-rtu-flyer",
+  "canvas": {
+    "widthPx": 1024,
+    "heightPx": 1536
+  },
+  "background": {
+    "color": "#F7F4EF"
+  },
+  "colors": {
+    "primary": "#1F3A5F",
+    "secondary": "#C4A574",
+    "background": "#F7F4EF",
+    "text": "#1A1A1A",
+    "muted": "#5A6570"
+  },
+  "materials": [
+    {
+      "materialId": "mat-harbor-oak-logo-v1",
+      "role": "logo",
+      "relativePath": "docs/launch/studio-operating-design-renderer-proof-1/artifacts/v2-rtu-flyer/materials/harbor-oak-anchor-oak-oval-v1.svg",
+      "contentSha256": "e5a7876e20a7c79d7746975f3ad790cdd9c6b82bf9ac86c3897a7ad063e9b510",
+      "approvedIdentitySourceId": "harbor-oak-anchor-oak-oval-v1"
+    }
+  ],
+  "outputFormats": [
+    "png",
+    "pdf"
+  ],
+  "reasoningMode": "deterministic_constrained",
+  "layers": [
+    {
+      "type": "shape",
+      "id": "plate-top",
+      "role": "accent_bar",
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 28,
+      "fill": "#1F3A5F"
+    },
+    {
+      "type": "shape",
+      "id": "logo-plate",
+      "role": "logo_plate",
+      "x": 392,
+      "y": 72,
+      "width": 240,
+      "height": 240,
+      "fill": "#FFFFFF",
+      "borderRadiusPx": 120
+    },
+    {
+      "type": "image",
+      "id": "logo",
+      "role": "logo",
+      "materialId": "mat-harbor-oak-logo-v1",
+      "x": 416,
+      "y": 96,
+      "width": 192,
+      "height": 192,
+      "fit": "contain"
+    },
+    {
+      "type": "text",
+      "id": "wordmark",
+      "role": "wordmark",
+      "content": "Harbor & Oak",
+      "x": 72,
+      "y": 340,
+      "width": 880,
+      "fontSizePx": 52,
+      "fontWeight": 700,
+      "lineHeight": 1.15,
+      "color": "#1F3A5F",
+      "align": "center"
+    },
+    {
+      "type": "text",
+      "id": "descriptor",
+      "role": "descriptor",
+      "content": "Home Services",
+      "x": 72,
+      "y": 408,
+      "width": 880,
+      "fontSizePx": 22,
+      "fontWeight": 500,
+      "lineHeight": 1.2,
+      "letterSpacingPx": 2,
+      "color": "#C4A574",
+      "align": "center"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "role": "headline",
+      "content": "Spring service you can trust",
+      "x": 88,
+      "y": 480,
+      "width": 848,
+      "fontSizePx": 40,
+      "fontWeight": 600,
+      "lineHeight": 1.2,
+      "color": "#1A1A1A",
+      "align": "center"
+    },
+    {
+      "type": "shape",
+      "id": "offer-rule",
+      "role": "footer_rule",
+      "x": 360,
+      "y": 560,
+      "width": 304,
+      "height": 3,
+      "fill": "#C4A574"
+    },
+    {
+      "type": "text",
+      "id": "offer",
+      "role": "offer",
+      "content": "Spring Tune-Up + Drain Clear — revised",
+      "x": 72,
+      "y": 596,
+      "width": 880,
+      "fontSizePx": 34,
+      "fontWeight": 700,
+      "lineHeight": 1.25,
+      "color": "#1F3A5F",
+      "align": "center"
+    },
+    {
+      "type": "text",
+      "id": "price",
+      "role": "price",
+      "content": "$189 (was $249)",
+      "x": 72,
+      "y": 700,
+      "width": 880,
+      "fontSizePx": 56,
+      "fontWeight": 700,
+      "lineHeight": 1.1,
+      "color": "#1A1A1A",
+      "align": "center"
+    },
+    {
+      "type": "text",
+      "id": "dates",
+      "role": "dates",
+      "content": "March 10 – April 15, 2026",
+      "x": 72,
+      "y": 780,
+      "width": 880,
+      "fontSizePx": 26,
+      "fontWeight": 500,
+      "lineHeight": 1.2,
+      "color": "#5A6570",
+      "align": "center"
+    },
+    {
+      "type": "text",
+      "id": "body",
+      "role": "body",
+      "content": "HVAC tune-up and drain clear for homeowners who want plain, steady service — not hype.",
+      "x": 100,
+      "y": 860,
+      "width": 824,
+      "fontSizePx": 24,
+      "fontWeight": 400,
+      "lineHeight": 1.45,
+      "color": "#1A1A1A",
+      "align": "center",
+      "maxLines": 4
+    },
+    {
+      "type": "shape",
+      "id": "cta-plate",
+      "role": "plate",
+      "x": 212,
+      "y": 1040,
+      "width": 600,
+      "height": 88,
+      "fill": "#1F3A5F",
+      "borderRadiusPx": 12
+    },
+    {
+      "type": "text",
+      "id": "cta",
+      "role": "cta",
+      "content": "Book online or call",
+      "x": 212,
+      "y": 1064,
+      "width": 600,
+      "fontSizePx": 28,
+      "fontWeight": 600,
+      "lineHeight": 1.2,
+      "color": "#F7F4EF",
+      "align": "center"
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "role": "contact_phone",
+      "content": "phone (804) 555-0142",
+      "x": 72,
+      "y": 1180,
+      "width": 880,
+      "fontSizePx": 24,
+      "fontWeight": 500,
+      "lineHeight": 1.2,
+      "color": "#1A1A1A",
+      "align": "center"
+    },
+    {
+      "type": "text",
+      "id": "web",
+      "role": "contact_web",
+      "content": "web harborandoak.example/book-tuneup",
+      "x": 72,
+      "y": 1220,
+      "width": 880,
+      "fontSizePx": 22,
+      "fontWeight": 500,
+      "lineHeight": 1.2,
+      "color": "#1F3A5F",
+      "align": "center"
+    },
+    {
+      "type": "text",
+      "id": "disclaimer",
+      "role": "disclaimer",
+      "content": "CERTIFICATION FIXTURE / INTERNAL TEST — not a live customer. One single-sided flyer proof.",
+      "x": 72,
+      "y": 1420,
+      "width": 880,
+      "fontSizePx": 14,
+      "fontWeight": 400,
+      "lineHeight": 1.35,
+      "color": "#5A6570",
+      "align": "center",
+      "maxLines": 3
+    },
+    {
+      "type": "shape",
+      "id": "plate-bottom",
+      "role": "accent_bar",
+      "x": 0,
+      "y": 1508,
+      "width": 1024,
+      "height": 28,
+      "fill": "#1F3A5F"
+    }
+  ]
+}

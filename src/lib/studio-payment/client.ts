@@ -26,6 +26,11 @@ export async function startHostedCheckout(args: {
   customerEmail?: string;
   /** Local fixture only — never use for Stripe smoke proof. */
   preferSandbox?: boolean;
+  /**
+   * ma-001 Promotion Pack — locked composition from working draft.
+   * Required when facts include ma-001; server re-validates and seals.
+   */
+  ma001PackComposition?: unknown;
 }): Promise<StartCheckoutClientResult> {
   const returnOrigin =
     typeof window !== "undefined" ? window.location.origin : "";
@@ -39,6 +44,9 @@ export async function startHostedCheckout(args: {
       returnOrigin,
       customerEmail: args.customerEmail,
       preferSandbox: args.preferSandbox === true,
+      ...(args.ma001PackComposition != null
+        ? { ma001PackComposition: args.ma001PackComposition }
+        : {}),
     }),
   });
   const body = (await response.json().catch(() => ({}))) as Record<string, unknown>;

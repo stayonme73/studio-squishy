@@ -59,12 +59,14 @@ import {
   persistSelectedRoute,
   readActiveRouteRecommendation,
   readConversationStage,
+  readMa001PackComposition,
   readOpeningAnswers,
   readSelectedRoute,
   readSelectedServices,
   recordIntakeSubmission,
   selectedJobIdSet,
 } from "@/lib/conversation-room-draft";
+import { evaluateMa001CompositionPaymentGate } from "@/lib/studio-design-renderer/ma-001-composition-payment-gate";
 import type { ServiceId } from "@/catalog/types";
 import type { RouteMapIntakeAnswers } from "@/catalog/intake";
 import { buildProjectBuilderStudioPlanSummary } from "@/lib/project-builder-studio-plan-summary";
@@ -818,6 +820,19 @@ export default function ConversationRoomRuntime({
     const services = readSelectedServices(project);
     if (!route || services.length === 0) return;
 
+    const serviceIds = services.map((s) => s.jobId as ServiceId);
+    const ma001Gate = evaluateMa001CompositionPaymentGate({
+      selectedServiceIds: serviceIds.map(String),
+      composition: readMa001PackComposition(project),
+    });
+    if (!ma001Gate.ok) {
+      setPlanBridgeError(ma001Gate.message);
+      speakStudioLine(
+        "Your Promotion Pack still needs its exact pieces locked before checkout. Please finish choosing what is in the pack.",
+      );
+      return;
+    }
+
     const decision = runPreAcceptanceForCheckout(
       projectFactsFromWorkingDraft(project),
     );
@@ -837,7 +852,6 @@ export default function ConversationRoomRuntime({
       return;
     }
 
-    const serviceIds = services.map((s) => s.jobId as ServiceId);
     const ok = bridgeConversationPlanToCampaign(route.roadId, serviceIds);
     if (!ok) {
       setPlanBridgeError(conversationRoomGuideV1.studioPlanBridgeError);
@@ -854,6 +868,21 @@ export default function ConversationRoomRuntime({
 
   function authorizeCheckoutPayment(): boolean {
     const project = projectDraft ?? bootConversationProjectDraft(draft);
+    const ma001Gate = evaluateMa001CompositionPaymentGate({
+      selectedServiceIds: readSelectedServices(project).map((s) =>
+        String(s.jobId),
+      ),
+      composition: readMa001PackComposition(project),
+    });
+    if (!ma001Gate.ok) {
+      setPlanBridgeError(ma001Gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        "Your Promotion Pack still needs its exact pieces locked before payment.",
+      );
+      return false;
+    }
     const gate = assertPreAcceptanceAllowsPayment(
       projectFactsFromWorkingDraft(project),
     );
@@ -897,6 +926,20 @@ export default function ConversationRoomRuntime({
     if (paymentCompleteGuardRef.current) return;
     const project = projectDraft ?? bootConversationProjectDraft(draft);
     const facts = projectFactsFromWorkingDraft(project);
+    const ma001Composition = readMa001PackComposition(project);
+    const ma001Gate = evaluateMa001CompositionPaymentGate({
+      selectedServiceIds: facts.selectedServiceIds.map(String),
+      composition: ma001Composition,
+    });
+    if (!ma001Gate.ok) {
+      setPlanBridgeError(ma001Gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        "Your Promotion Pack still needs its exact pieces locked before payment.",
+      );
+      throw new Error(ma001Gate.message);
+    }
     const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
@@ -919,6 +962,7 @@ export default function ConversationRoomRuntime({
     const started = await startHostedCheckout({
       campaignId: campaign.campaignId,
       facts,
+      ma001PackComposition: ma001Composition,
     });
     if (!started.ok) {
       setPlanBridgeError(started.message);
@@ -942,6 +986,15 @@ export default function ConversationRoomRuntime({
     if (paymentCompleteGuardRef.current) return;
     const project = projectDraft ?? bootConversationProjectDraft(draft);
     const facts = projectFactsFromWorkingDraft(project);
+    const ma001Composition = readMa001PackComposition(project);
+    const ma001Gate = evaluateMa001CompositionPaymentGate({
+      selectedServiceIds: facts.selectedServiceIds.map(String),
+      composition: ma001Composition,
+    });
+    if (!ma001Gate.ok) {
+      setPlanBridgeError(ma001Gate.message);
+      throw new Error(ma001Gate.message);
+    }
     const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
@@ -959,6 +1012,7 @@ export default function ConversationRoomRuntime({
       campaignId: campaign.campaignId,
       facts,
       preferSandbox: true,
+      ma001PackComposition: ma001Composition,
     });
     if (!started.ok) {
       setPlanBridgeError(started.message);
@@ -1336,6 +1390,14 @@ export default function ConversationRoomRuntime({
           selectedRoute.roadId,
         )
       : null;
+  const ma001PlanComposition = evaluateMa001CompositionPaymentGate({
+    selectedServiceIds: Array.from(selectedJobIds).map(String),
+    composition: readMa001PackComposition(projectDraft),
+  });
+  const ma001CompositionMemberLabels =
+    ma001PlanComposition.ok && ma001PlanComposition.applicable
+      ? ma001PlanComposition.seal.customerKindLabels
+      : null;
   const slidePanel = isActivitySlidePanel(activePanel) ? activePanel : null;
 
   const question = getConversationRoomGuideQuestion(step);
@@ -1494,6 +1556,7 @@ export default function ConversationRoomRuntime({
               : null
           }
           planModel={planModel}
+          ma001CompositionMemberLabels={ma001CompositionMemberLabels}
           onEditPlan={handleEditPlan}
           onLooksGoodPlan={handleLooksGoodPlan}
           onOpenPlanExtraDetails={() => {

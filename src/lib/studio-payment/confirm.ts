@@ -242,6 +242,32 @@ export async function confirmPaymentFromProcessor(
         message: "Checkout session decision does not match confirmation.",
       };
     }
+    if (binding.ma001CompositionSeal) {
+      if (
+        input.ma001CompositionSeal &&
+        binding.ma001CompositionSeal.compositionFingerprint !==
+          input.ma001CompositionSeal.compositionFingerprint
+      ) {
+        return {
+          ok: false,
+          error: "sku_mismatch",
+          message:
+            "Promotion Pack composition does not match the composition sealed at checkout.",
+        };
+      }
+      // Binding seal is authoritative — processor/webhook may omit client seal.
+      input = {
+        ...input,
+        ma001CompositionSeal: binding.ma001CompositionSeal,
+      };
+    } else if (input.ma001CompositionSeal) {
+      return {
+        ok: false,
+        error: "sku_mismatch",
+        message:
+          "Confirmation includes a Promotion Pack composition that was not sealed at checkout.",
+      };
+    }
   }
 
   const isPaidCycle = binding?.purchaseKind === "paid_cycle";

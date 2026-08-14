@@ -64,6 +64,10 @@ export type CheckoutSessionBinding = {
   paidCyclePurchaseId?: string;
   cycleSkuId?: "sm-001-monthly";
   cyclePriceCents?: number;
+  /**
+   * Sealed ma-001 pack composition at checkout authority (when ma-001 selected).
+   */
+  ma001CompositionSeal?: import("@/lib/studio-design-renderer/ma-001-composition-payment-gate").Ma001CompositionPaymentSeal;
 };
 
 const SESSIONS_DIR = path.join(process.cwd(), "data", "payment-sessions");

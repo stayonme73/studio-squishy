@@ -176,7 +176,18 @@ export type CampaignRecord = {
     failedAt?: string;
     /** Sandbox confirmations are never live money. */
     sandbox?: boolean;
+    /**
+     * Sealed ma-001 Promotion Pack composition purchased with this payment.
+     * Absent when ma-001 was not in the cart.
+     */
+    ma001CompositionSeal?: import("@/lib/studio-design-renderer/ma-001-composition-payment-gate").Ma001CompositionPaymentSeal;
   };
+  /**
+   * Durable ma-001 post-pay pack structure derived from paymentTruth.ma001CompositionSeal.
+   * Authoritative member list for future dispatch — not a remap / not renderer invoke.
+   * @see STUDIO-OPERATING-DESIGN-MA-001-POSTPAY-COMPOSITION-DISPATCH-STRUCTURE-1
+   */
+  ma001PostPayDispatchStructure?: import("@/lib/studio-design-renderer/ma-001-postpay-composition-dispatch-structure").Ma001PostPayDispatchStructure;
   /**
    * Server-owned paid-cycle purchase ledger (sm-001-monthly pay-per-cycle).
    * Supplements paymentTruth — never means “all future cycles paid.”

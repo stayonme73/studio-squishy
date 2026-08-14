@@ -153,6 +153,9 @@ export async function reconcileCheckoutSession(
     authorization,
     stripeEventId: null,
     sandbox: false,
+    ...(binding.ma001CompositionSeal
+      ? { ma001CompositionSeal: binding.ma001CompositionSeal }
+      : {}),
   });
 
   if (!result.ok) {

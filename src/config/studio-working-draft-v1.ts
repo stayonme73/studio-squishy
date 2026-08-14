@@ -32,6 +32,13 @@ export const WORKING_DRAFT_PERSISTED_FIELDS = [
   "confirmationStatus",
   "actionAttributionHistory",
   "currentConversationLocation",
+  /**
+   * ma-001 Promotion Pack — customer-locked composition before payment
+   * (`Ma001CompositionLiveTruth` / live composition input).
+   * skuId `ma-001` alone is insufficient for checkout.
+   * @see STUDIO-OPERATING-DESIGN-MA-001-INTAKE-TRUTH-1
+   */
+  "ma001PackComposition",
 ] as const;
 
 export type WorkingDraftPersistedField =

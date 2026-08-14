@@ -45,6 +45,11 @@ export type StudioGuideTabletViewProps = {
   selectedRouteLabel?: string | null;
   /** Plan stage — Studio Plan summary on the tablet. */
   planModel?: ProjectBuilderStudioPlanSummaryModel | null;
+  /**
+   * ma-001 locked pack members in customer language (Flyer, Business card, …).
+   * No producer IDs or renderer terminology.
+   */
+  ma001CompositionMemberLabels?: readonly string[] | null;
   onEditPlan?: () => void;
   onLooksGoodPlan?: () => void;
   onOpenPlanExtraDetails?: () => void;
@@ -87,6 +92,7 @@ export default function StudioGuideTabletView({
   selectedServiceCount = 0,
   selectedRouteLabel = null,
   planModel = null,
+  ma001CompositionMemberLabels = null,
   onEditPlan,
   onLooksGoodPlan,
   onOpenPlanExtraDetails,
@@ -132,6 +138,7 @@ export default function StudioGuideTabletView({
         onOpenPlanExtraDetails ? (
           <ConversationStudioPlanTablet
             model={planModel}
+            ma001CompositionMemberLabels={ma001CompositionMemberLabels}
             onEditPlan={onEditPlan}
             onChangeRoute={onChangeRoute}
             onLooksGood={onLooksGoodPlan}

@@ -1,0 +1,66 @@
+{
+  "ok": true,
+  "evaluation": {
+    "skuId": "v2-rtu-business-card",
+    "fixtureId": "cert-design-1-fixture-a-harbor-oak",
+    "ok": true,
+    "findings": [],
+    "checkedAt": "2026-08-14T19:57:51.902Z",
+    "deterministicFailCount": 0,
+    "judgmentRequired": true,
+    "multiAssetConsistencyChecked": false,
+    "summary": "Deterministic design checks passed. Visual judgment attestations still required."
+  },
+  "frontOverflowOk": true,
+  "backOverflowOk": true,
+  "frontOverflowDetail": "scroll=1536x1024 canvas=1536x1024",
+  "backOverflowDetail": "scroll=1536x1024 canvas=1536x1024",
+  "identity": {
+    "packageId": "STUDIO-OPERATING-DESIGN-BUSINESS-CARD-PROOF-1",
+    "campaignId": "camp-design-ma-001-proof-harbor-mixed",
+    "jobId": "camp-design-ma-001-proof-harbor-mixed::ma-001::member-card",
+    "dispatchId": "dd:camp-design-ma-001-proof-harbor-mixed::ma-001::card",
+    "skuId": "v2-rtu-business-card",
+    "renderId": "ae7a2afb-1753-41a4-b869-649e7a51fc5a",
+    "renderVersion": 1,
+    "designSpecVersion": "business-card-design-spec-1.0.0",
+    "designSpecFingerprint": "04f2ef9ee15e57d9705c1bac77774304257c72b962655e0d79e2d9ab0e2fdd7f",
+    "materialFingerprint": "2a5490ae9ea5aa0336a33e4fbfacd8d905f1567bd226bd6755ae1d46bfb22b34",
+    "rendererVersion": "design-renderer-business-card-proof-1.0.0",
+    "sides": [
+      {
+        "side": "front",
+        "pngRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v1/members/pack-member-2-business-card/renders/v1/front.png",
+        "htmlRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v1/members/pack-member-2-business-card/renders/v1/front.html",
+        "pngContentSha256": "9994798e4994843bf4edfd6fa9e4313232cd979338d0980847333a0a3b9ff199",
+        "widthPx": 1536,
+        "heightPx": 1024,
+        "overflowOk": true,
+        "overflowDetail": "scroll=1536x1024 canvas=1536x1024"
+      },
+      {
+        "side": "back",
+        "pngRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v1/members/pack-member-2-business-card/renders/v1/back.png",
+        "htmlRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v1/members/pack-member-2-business-card/renders/v1/back.html",
+        "pngContentSha256": "263f487aba0ae14d48a141e0eb07d88a39467e8da6295b8ad61f2f2ad824c10c",
+        "widthPx": 1536,
+        "heightPx": 1024,
+        "overflowOk": true,
+        "overflowDetail": "scroll=1536x1024 canvas=1536x1024"
+      }
+    ],
+    "pdfRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v1/members/pack-member-2-business-card/renders/v1/business-card.pdf",
+    "pdfContentSha256": "42c41b8ad0b1d4f9afbbbed26c983d05acf585fe844c6e0e117045a3020a14b0",
+    "designSpecRelativePath": "docs/launch/studio-operating-design-ma-001-proof-1/artifacts/ma-001/renders/v1/members/pack-member-2-business-card/renders/v1/design-spec.json",
+    "widthPx": 1536,
+    "heightPx": 1024,
+    "createdAt": "2026-08-14T19:57:51.900Z",
+    "lineageNote": "Rerenders allocate a new vN directory; prior render folders are retained. Front and back are both bound per version.",
+    "printPromiseNote": "Flattened multi-page PDF (front then back) at the agreed CERT plate pixels, suitable for customer-managed print — not Studio print fulfillment and not prepress certification."
+  },
+  "outputMode": "certification_fixture",
+  "sidesBound": [
+    "front",
+    "back"
+  ]
+}
