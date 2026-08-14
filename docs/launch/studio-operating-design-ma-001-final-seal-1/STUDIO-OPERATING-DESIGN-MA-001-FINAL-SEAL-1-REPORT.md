@@ -27,8 +27,8 @@ Visual / customer limits inherit Owner-accepted PROOF-1 **PASS WITH LIMITS** (pa
 | Seal commit SHA | `9b26305ffd4158f3c3a3d5014f70c4ac2dd9a111` |
 | Seal commit message | `docs(operating): seal ma-001 Promotion Pack customer-ready-with-limits` |
 | Pushed branch | `operating/design-renderer-proof-1` |
-| Branch tip (local = origin) | *(filled after push tip-identity)* |
-| Ahead / behind | *(filled after push)* |
+| Branch tip (local = origin) | `5c5602f6c7cc24a4c7051714c2df63ba4f457457` |
+| Ahead / behind | **0 / 0** (verified after push) |
 
 ---
 
