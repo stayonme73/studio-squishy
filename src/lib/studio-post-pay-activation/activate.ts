@@ -10,6 +10,7 @@ import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 import { buildServiceScopeSnapshot } from "@/lib/plan-pricing";
 import type { ServiceId } from "@/catalog/types";
+import { ensureSm001MonthlyProductionCyclesFromPaidAuthority } from "@/lib/studio-monthly-production-cycle";
 
 import {
   isPaymentConfirmedForActivation,
@@ -119,7 +120,12 @@ export async function ensurePostPayActivation(
 
   const checkoutSessionId = campaign.paymentTruth!.checkoutSessionId!;
   const now = new Date().toISOString();
-  const working = ensureProductionLineItems(campaign);
+  let working = ensureProductionLineItems(campaign);
+
+  // Paid-cycle → production cycle create (idempotent). Skips purchases lacking
+  // explicit period truth. Does not invoke renderer / remap / dispatch.
+  const cycleEnsure = ensureSm001MonthlyProductionCyclesFromPaidAuthority(working);
+  working = cycleEnsure.campaign;
 
   try {
     const materialsEnvelope = await getOrInitializeMaterials(
@@ -174,15 +180,18 @@ export async function ensurePostPayActivation(
     };
 
     // Skip campaign rewrite when fully identical (idempotent hot path).
+    // Still persist when a new monthly production cycle was created (e.g. N+1).
     if (
       alreadyActivated &&
+      !cycleEnsure.changed &&
       prior &&
       prior.phase === activation.phase &&
       prior.blockingRequiredMaterialsCount ===
         activation.blockingRequiredMaterialsCount &&
       prior.intakeComplete === activation.intakeComplete &&
       prior.taskCount === activation.taskCount &&
-      working.approvedStudioPlan === campaign.approvedStudioPlan
+      working.approvedStudioPlan === campaign.approvedStudioPlan &&
+      working.sm001MonthlyProductionCycles === campaign.sm001MonthlyProductionCycles
     ) {
       return {
         ok: true,
@@ -206,7 +215,7 @@ export async function ensurePostPayActivation(
       ok: true,
       campaign: saved.record,
       activation,
-      alreadyActivated,
+      alreadyActivated: alreadyActivated && !cycleEnsure.changed,
     };
   } catch (error) {
     const message =

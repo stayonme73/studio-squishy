@@ -56,6 +56,14 @@ export type CheckoutSessionBinding = {
   draftRevision: number;
   createdAt: string;
   sandbox?: boolean;
+  /**
+   * Pay-per-cycle purchase (sm-001-monthly). Absent on sealed studio_plan checkouts.
+   * When set, amount must include cyclePriceCents and confirm writes ledger authority only for this id.
+   */
+  purchaseKind?: "studio_plan" | "paid_cycle";
+  paidCyclePurchaseId?: string;
+  cycleSkuId?: "sm-001-monthly";
+  cyclePriceCents?: number;
 };
 
 const SESSIONS_DIR = path.join(process.cwd(), "data", "payment-sessions");

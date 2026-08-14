@@ -71,8 +71,9 @@ export function mergeCustomerOwnedCampaignSync(
 
     if (incoming.approvedStudioPlan) bootstrapped.approvedStudioPlan = incoming.approvedStudioPlan;
     // paymentReceivedAt / paymentTruth / preAcceptancePaymentAuthorization /
-    // postPayActivation / routingHandoff / dispatchExecution are server-owned —
-    // never bootstrap from untrusted client sync.
+    // postPayActivation / routingHandoff / dispatchExecution / paidCyclePurchases /
+    // sm001MonthlyCyclePeriodTruths / sm001MonthlyProductionCycles
+    // are server-owned — never bootstrap from untrusted client sync.
     if (incoming.revisionRoundsIncluded != null) {
       bootstrapped.revisionRoundsIncluded = incoming.revisionRoundsIncluded;
     }
@@ -120,6 +121,21 @@ export function mergeCustomerOwnedCampaignSync(
     merged.dispatchExecution = existing.dispatchExecution;
   } else {
     delete merged.dispatchExecution;
+  }
+  if (existing.paidCyclePurchases) {
+    merged.paidCyclePurchases = existing.paidCyclePurchases;
+  } else {
+    delete merged.paidCyclePurchases;
+  }
+  if (existing.sm001MonthlyCyclePeriodTruths) {
+    merged.sm001MonthlyCyclePeriodTruths = existing.sm001MonthlyCyclePeriodTruths;
+  } else {
+    delete merged.sm001MonthlyCyclePeriodTruths;
+  }
+  if (existing.sm001MonthlyProductionCycles) {
+    merged.sm001MonthlyProductionCycles = existing.sm001MonthlyProductionCycles;
+  } else {
+    delete merged.sm001MonthlyProductionCycles;
   }
   if (existing.revisionRoundsIncluded == null && incoming.revisionRoundsIncluded != null) {
     merged.revisionRoundsIncluded = incoming.revisionRoundsIncluded;

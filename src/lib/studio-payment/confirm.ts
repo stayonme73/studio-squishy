@@ -1,4 +1,5 @@
 import type { CampaignRecord } from "@/config/studio-board";
+import { studioPaidCyclePaymentV1 } from "@/config/studio-paid-cycle-payment-v1";
 import { studioPaymentV1 } from "@/config/studio-payment-v1";
 import {
   readCampaignEnvelope,
@@ -16,6 +17,13 @@ import {
   readProcessedPaymentEvent,
   writeProcessedPaymentEvent,
 } from "./events-store";
+import { amountIncludesCyclePrice } from "./paid-cycle-amount";
+import {
+  findPaidCyclePurchase,
+  findPaidCyclePurchaseBySession,
+  upsertPaidCyclePurchase,
+} from "./paid-cycle-ledger";
+import type { PaidCyclePurchaseRecord } from "./paid-cycle-types";
 import type { PaymentConfirmationInput, PaymentConfirmationResult } from "./types";
 
 /**
@@ -36,6 +44,128 @@ function alreadyConfirmed(campaign: CampaignRecord): boolean {
     campaign.paymentReceivedAt &&
       campaign.paymentTruth?.status === "confirmed",
   );
+}
+
+function confirmPaidCycleLedger(
+  campaign: CampaignRecord,
+  input: PaymentConfirmationInput,
+  binding: NonNullable<Awaited<ReturnType<typeof readCheckoutSessionBinding>>>,
+):
+  | { ok: true; campaign: CampaignRecord; alreadyPaid: boolean }
+  | { ok: false; error: PaymentConfirmationResult extends { ok: false } ? PaymentConfirmationResult["error"] : never; message: string } {
+  const paidCyclePurchaseId = binding.paidCyclePurchaseId;
+  if (!paidCyclePurchaseId) {
+    return {
+      ok: false,
+      error: "paid_cycle_invalid",
+      message: "Paid-cycle confirmation requires paidCyclePurchaseId on the checkout binding.",
+    };
+  }
+
+  if (binding.purchaseKind !== "paid_cycle") {
+    return {
+      ok: false,
+      error: "paid_cycle_invalid",
+      message: "Checkout binding is not a paid-cycle purchase.",
+    };
+  }
+
+  if (
+    binding.cycleSkuId !== studioPaidCyclePaymentV1.skuId ||
+    !input.selectedServiceIds.map(String).includes(studioPaidCyclePaymentV1.skuId)
+  ) {
+    return {
+      ok: false,
+      error: "sku_mismatch",
+      message: "Paid-cycle confirmation requires sm-001-monthly.",
+    };
+  }
+
+  const cyclePriceCents = binding.cyclePriceCents ?? 0;
+  if (
+    !amountIncludesCyclePrice(input.expectedAmountCents, cyclePriceCents) ||
+    !amountIncludesCyclePrice(input.confirmedAmountCents, cyclePriceCents)
+  ) {
+    return {
+      ok: false,
+      error: "amount_mismatch",
+      message: "Confirmed amount does not include the monthly cycle price.",
+    };
+  }
+
+  const existing = findPaidCyclePurchase(campaign, paidCyclePurchaseId);
+  if (!existing) {
+    return {
+      ok: false,
+      error: "paid_cycle_invalid",
+      message: "No initiated paid-cycle purchase exists for this purchase id.",
+    };
+  }
+
+  if (existing.checkoutSessionId !== input.checkoutSessionId) {
+    return {
+      ok: false,
+      error: "purchase_mismatch",
+      message: "paidCyclePurchaseId is bound to a different checkout session.",
+    };
+  }
+
+  if (existing.campaignId !== input.campaignId) {
+    return {
+      ok: false,
+      error: "project_mismatch",
+      message: "Paid-cycle purchase campaign mismatch.",
+    };
+  }
+
+  if (existing.status === "confirmed") {
+    return { ok: true, campaign, alreadyPaid: true };
+  }
+
+  const bySession = findPaidCyclePurchaseBySession(campaign, input.checkoutSessionId);
+  if (
+    bySession &&
+    bySession.paidCyclePurchaseId !== paidCyclePurchaseId &&
+    bySession.status === "confirmed"
+  ) {
+    return {
+      ok: false,
+      error: "transaction_reuse",
+      message: "This checkout session already confirmed a different paid-cycle purchase.",
+    };
+  }
+
+  // Reuse of a prior confirmed purchase id as a “new” cycle buy — fail closed.
+  const duplicateConfirmedId = (campaign.paidCyclePurchases ?? []).some(
+    (row) =>
+      row.paidCyclePurchaseId === paidCyclePurchaseId &&
+      row.status === "confirmed" &&
+      row.checkoutSessionId !== input.checkoutSessionId,
+  );
+  if (duplicateConfirmedId) {
+    return {
+      ok: false,
+      error: "purchase_mismatch",
+      message: "This paidCyclePurchaseId was already confirmed for another session.",
+    };
+  }
+
+  const now = input.confirmedAt ?? new Date().toISOString();
+  const confirmed: PaidCyclePurchaseRecord = {
+    ...existing,
+    status: "confirmed",
+    expectedAmountCents: input.expectedAmountCents,
+    confirmedAt: now,
+    paymentIntentId: input.paymentIntentId ?? existing.paymentIntentId ?? null,
+    stripeEventId: input.stripeEventId ?? existing.stripeEventId ?? null,
+    sandbox: input.sandbox === true,
+  };
+
+  return {
+    ok: true,
+    campaign: upsertPaidCyclePurchase(campaign, confirmed),
+    alreadyPaid: false,
+  };
 }
 
 /**
@@ -114,6 +244,8 @@ export async function confirmPaymentFromProcessor(
     }
   }
 
+  const isPaidCycle = binding?.purchaseKind === "paid_cycle";
+
   const eventId =
     input.stripeEventId ??
     `session:${input.checkoutSessionId}:confirmed`;
@@ -137,7 +269,9 @@ export async function confirmPaymentFromProcessor(
     };
   }
 
+  // Studio-plan: one campaign paymentTruth session. Paid-cycle N+1 uses a new session.
   if (
+    !isPaidCycle &&
     campaign.paymentTruth?.checkoutSessionId &&
     campaign.paymentTruth.checkoutSessionId !== input.checkoutSessionId &&
     alreadyConfirmed(campaign)
@@ -146,6 +280,46 @@ export async function confirmPaymentFromProcessor(
       ok: false,
       error: "transaction_reuse",
       message: "Campaign is already paid under a different checkout session.",
+    };
+  }
+
+  if (isPaidCycle) {
+    if (!binding?.paidCyclePurchaseId) {
+      return {
+        ok: false,
+        error: "paid_cycle_invalid",
+        message: "Paid-cycle checkout binding is missing paidCyclePurchaseId.",
+      };
+    }
+
+    const ledger = confirmPaidCycleLedger(campaign, input, binding);
+    if (!ledger.ok) {
+      return ledger;
+    }
+
+    let working = ledger.campaign;
+    const cycleAlready = ledger.alreadyPaid;
+
+    // First-time campaign payment may still write sealed paymentTruth.
+    // N+1 must NOT overwrite campaign paymentTruth / invent lifetime monthly authority.
+    if (!alreadyConfirmed(working)) {
+      working = applyPaidTruthToCampaignRecord(working, input);
+    }
+
+    await writeProcessedPaymentEvent({
+      eventId,
+      campaignId: input.campaignId,
+      checkoutSessionId: input.checkoutSessionId,
+      processedAt: new Date().toISOString(),
+      kind: input.sandbox ? "sandbox" : input.stripeEventId ? "stripe_webhook" : "reconcile",
+    });
+
+    const saved = await upsertCampaignRecord(working, envelope.clientUserId);
+    const activated = await activateAfterPayment(saved.record);
+    return {
+      ok: true,
+      campaign: activated,
+      alreadyPaid: cycleAlready || Boolean(priorEvent && cycleAlready),
     };
   }
 

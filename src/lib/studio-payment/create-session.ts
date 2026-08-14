@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import type { ServiceId } from "@/catalog/types";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
+import { studioPaidCyclePaymentV1 } from "@/config/studio-paid-cycle-payment-v1";
 import { studioPaymentV1 } from "@/config/studio-payment-v1";
 import {
   readCampaignEnvelope,
@@ -22,7 +23,17 @@ import {
   inspectStripeSecretKey,
 } from "./env";
 import { writeCheckoutSessionBinding } from "./events-store";
-import type { CheckoutSessionCreateRequest, CheckoutSessionCreateResult } from "./types";
+import { derivePaidCycleCheckoutAmountCents } from "./paid-cycle-amount";
+import {
+  mintPaidCyclePurchaseId,
+  upsertPaidCyclePurchase,
+} from "./paid-cycle-ledger";
+import type { PaidCyclePurchaseRecord } from "./paid-cycle-types";
+import type {
+  CheckoutPurchaseKind,
+  CheckoutSessionCreateRequest,
+  CheckoutSessionCreateResult,
+} from "./types";
 
 function ensureApprovedPlan(
   campaign: CampaignRecord,
@@ -120,6 +131,100 @@ function assertServerClear(facts: PreAcceptanceProjectFacts) {
   return { allowed: true as const, decision };
 }
 
+type ResolvedCheckoutAmount = {
+  amountCents: number;
+  skuIds: ServiceId[];
+  purchaseKind: CheckoutPurchaseKind;
+  paidCyclePurchaseId?: string;
+  cyclePriceCents?: number;
+  cycleSkuId?: typeof studioPaidCyclePaymentV1.skuId;
+};
+
+function resolveCheckoutAmount(
+  purchaseKind: CheckoutPurchaseKind,
+  selectedServiceIds: readonly string[],
+):
+  | { ok: true; value: ResolvedCheckoutAmount }
+  | { ok: false; error: "amount_invalid" | "paid_cycle_invalid"; message: string } {
+  if (purchaseKind === "paid_cycle") {
+    const amount = derivePaidCycleCheckoutAmountCents(selectedServiceIds);
+    if (!amount.ok) {
+      return {
+        ok: false,
+        error: "paid_cycle_invalid",
+        message:
+          amount.reason === "missing_cycle_sku" || amount.reason === "wrong_cycle_sku"
+            ? "Paid-cycle checkout requires sm-001-monthly."
+            : studioPaymentV1.customerCopy.amountInvalid,
+      };
+    }
+    return {
+      ok: true,
+      value: {
+        amountCents: amount.amountCents,
+        skuIds: amount.skuIds,
+        purchaseKind: "paid_cycle",
+        paidCyclePurchaseId: mintPaidCyclePurchaseId(),
+        cyclePriceCents: amount.cyclePriceCents,
+        cycleSkuId: amount.cycleSkuId,
+      },
+    };
+  }
+
+  const amount = deriveCheckoutAmountCents(selectedServiceIds);
+  if (!amount.ok) {
+    return {
+      ok: false,
+      error: "amount_invalid",
+      message: studioPaymentV1.customerCopy.amountInvalid,
+    };
+  }
+  return {
+    ok: true,
+    value: {
+      amountCents: amount.amountCents,
+      skuIds: amount.skuIds,
+      purchaseKind: "studio_plan",
+    },
+  };
+}
+
+function withInitiatedPaidCycle(
+  campaign: CampaignRecord,
+  args: {
+    paidCyclePurchaseId: string;
+    checkoutSessionId: string;
+    expectedAmountCents: number;
+    cyclePriceCents: number;
+    selectedServiceIds: readonly ServiceId[];
+    decisionId: string;
+    factFingerprint: string;
+    draftRevision: number;
+    sandbox?: boolean;
+  },
+): CampaignRecord {
+  const now = new Date().toISOString();
+  const record: PaidCyclePurchaseRecord = {
+    schemaVersion: studioPaidCyclePaymentV1.schemaVersion,
+    paidCyclePurchaseId: args.paidCyclePurchaseId,
+    campaignId: campaign.campaignId,
+    skuId: studioPaidCyclePaymentV1.skuId,
+    purchaseKind: studioPaidCyclePaymentV1.purchaseKind,
+    status: "initiated",
+    expectedAmountCents: args.expectedAmountCents,
+    cyclePriceCents: args.cyclePriceCents,
+    currency: "usd",
+    checkoutSessionId: args.checkoutSessionId,
+    selectedServiceIds: [...args.selectedServiceIds],
+    decisionId: args.decisionId,
+    factFingerprint: args.factFingerprint,
+    draftRevision: args.draftRevision,
+    initiatedAt: now,
+    sandbox: args.sandbox === true,
+  };
+  return upsertPaidCyclePurchase(campaign, record);
+}
+
 export async function createCheckoutSession(
   request: CheckoutSessionCreateRequest,
   options?: {
@@ -139,6 +244,9 @@ export async function createCheckoutSession(
     };
   }
 
+  const purchaseKind: CheckoutPurchaseKind =
+    request.purchaseKind === "paid_cycle" ? "paid_cycle" : "studio_plan";
+
   const gate = assertServerClear(facts);
   if (!gate.allowed) {
     return {
@@ -157,17 +265,19 @@ export async function createCheckoutSession(
     };
   }
 
-  const amount = deriveCheckoutAmountCents(facts.selectedServiceIds);
-  if (!amount.ok) {
+  const resolved = resolveCheckoutAmount(purchaseKind, facts.selectedServiceIds);
+  if (!resolved.ok) {
     return {
       ok: false,
-      error: "amount_invalid",
-      message: studioPaymentV1.customerCopy.amountInvalid,
+      error: resolved.error,
+      message: resolved.message,
     };
   }
+  const amount = resolved.value;
 
   const existing = await readCampaignEnvelope(request.campaignId);
-  if (existing?.record.paymentReceivedAt) {
+  // Studio-plan checkout remains one-shot. Paid-cycle N+1 may open on an already plan-paid campaign.
+  if (existing?.record.paymentReceivedAt && purchaseKind !== "paid_cycle") {
     return {
       ok: false,
       error: "already_paid",
@@ -187,12 +297,72 @@ export async function createCheckoutSession(
     };
   }
 
-  campaign = ensureApprovedPlan(campaign, amount.skuIds, roadId);
+  // Do not rewrite an already-approved plan during N+1 cycle repurchase.
+  if (!(purchaseKind === "paid_cycle" && campaign.approvedStudioPlan)) {
+    campaign = ensureApprovedPlan(campaign, amount.skuIds, roadId);
+  }
 
   const meta = studioPaymentV1.metadataKeys;
   const origin = request.returnOrigin.replace(/\/$/, "");
   const successUrl = `${origin}/studio-conversation-room?stage=checkout&payment=return&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${origin}/studio-conversation-room?stage=checkout&payment=cancel`;
+
+  const paidCycleMeta =
+    purchaseKind === "paid_cycle" &&
+    amount.paidCyclePurchaseId &&
+    amount.cyclePriceCents != null &&
+    amount.cycleSkuId
+      ? {
+          [meta.purchaseKind]: studioPaidCyclePaymentV1.purchaseKind,
+          [meta.paidCyclePurchaseId]: amount.paidCyclePurchaseId,
+          [meta.cycleSkuId]: amount.cycleSkuId,
+          [meta.cyclePriceCents]: String(amount.cyclePriceCents),
+        }
+      : {};
+
+  const bindPaidCycle = (checkoutSessionId: string, sandbox: boolean) => {
+    if (
+      purchaseKind !== "paid_cycle" ||
+      !amount.paidCyclePurchaseId ||
+      amount.cyclePriceCents == null
+    ) {
+      return;
+    }
+    campaign = withInitiatedPaidCycle(campaign, {
+      paidCyclePurchaseId: amount.paidCyclePurchaseId,
+      checkoutSessionId,
+      expectedAmountCents: amount.amountCents,
+      cyclePriceCents: amount.cyclePriceCents,
+      selectedServiceIds: amount.skuIds,
+      decisionId: authorization.decisionId,
+      factFingerprint: authorization.factFingerprint,
+      draftRevision: authorization.evaluatedDraftRevision,
+      sandbox,
+    });
+  };
+
+  const writeBinding = async (checkoutSessionId: string, sandbox: boolean) => {
+    await writeCheckoutSessionBinding({
+      checkoutSessionId,
+      campaignId: request.campaignId,
+      expectedAmountCents: amount.amountCents,
+      currency: "usd",
+      selectedServiceIds: amount.skuIds,
+      decisionId: authorization.decisionId,
+      factFingerprint: authorization.factFingerprint,
+      draftRevision: authorization.evaluatedDraftRevision,
+      createdAt: new Date().toISOString(),
+      sandbox,
+      ...(purchaseKind === "paid_cycle"
+        ? {
+            purchaseKind: "paid_cycle" as const,
+            paidCyclePurchaseId: amount.paidCyclePurchaseId,
+            cycleSkuId: amount.cycleSkuId,
+            cyclePriceCents: amount.cyclePriceCents,
+          }
+        : { purchaseKind: "studio_plan" as const }),
+    });
+  };
 
   /* Explicit local fixture — never mistaken for Stripe hosted Checkout. */
   if (request.preferSandbox) {
@@ -205,28 +375,21 @@ export async function createCheckoutSession(
     }
 
     const checkoutSessionId = `cs_sandbox_${request.campaignId.slice(0, 8)}_${Date.now()}`;
-    campaign = applyCheckoutInitiatedToCampaignRecord(campaign, {
-      checkoutSessionId,
-      expectedAmountCents: amount.amountCents,
-      selectedServiceIds: amount.skuIds,
-      decisionId: authorization.decisionId,
-      factFingerprint: authorization.factFingerprint,
-      draftRevision: authorization.evaluatedDraftRevision,
-      sandbox: true,
-    });
+    // Mint purchase id + initiated ledger BEFORE confirming any payment.
+    bindPaidCycle(checkoutSessionId, true);
+    if (purchaseKind === "studio_plan" || !campaign.paymentReceivedAt) {
+      campaign = applyCheckoutInitiatedToCampaignRecord(campaign, {
+        checkoutSessionId,
+        expectedAmountCents: amount.amountCents,
+        selectedServiceIds: amount.skuIds,
+        decisionId: authorization.decisionId,
+        factFingerprint: authorization.factFingerprint,
+        draftRevision: authorization.evaluatedDraftRevision,
+        sandbox: true,
+      });
+    }
     await upsertCampaignRecord(campaign, existing?.clientUserId);
-    await writeCheckoutSessionBinding({
-      checkoutSessionId,
-      campaignId: request.campaignId,
-      expectedAmountCents: amount.amountCents,
-      currency: "usd",
-      selectedServiceIds: amount.skuIds,
-      decisionId: authorization.decisionId,
-      factFingerprint: authorization.factFingerprint,
-      draftRevision: authorization.evaluatedDraftRevision,
-      createdAt: new Date().toISOString(),
-      sandbox: true,
-    });
+    await writeBinding(checkoutSessionId, true);
 
     return {
       ok: true,
@@ -236,6 +399,9 @@ export async function createCheckoutSession(
       expectedAmountCents: amount.amountCents,
       currency: "usd",
       campaignId: request.campaignId,
+      purchaseKind,
+      paidCyclePurchaseId: amount.paidCyclePurchaseId,
+      cyclePriceCents: amount.cyclePriceCents,
     };
   }
 
@@ -258,14 +424,16 @@ export async function createCheckoutSession(
     };
   }
 
-  const stripe =
-    options?.stripe ??
-    new Stripe(keyStatus.secret);
+  const stripe = options?.stripe ?? new Stripe(keyStatus.secret);
 
   const lineName =
-    amount.skuIds.length === 1
-      ? `Studio Plan · ${amount.skuIds[0]}`
-      : `Studio Plan (${amount.skuIds.length} services)`;
+    purchaseKind === "paid_cycle"
+      ? amount.skuIds.length === 1
+        ? `Monthly cycle · ${amount.skuIds[0]}`
+        : `Monthly cycle + plan (${amount.skuIds.length} services)`
+      : amount.skuIds.length === 1
+        ? `Studio Plan · ${amount.skuIds[0]}`
+        : `Studio Plan (${amount.skuIds.length} services)`;
 
   let session: Stripe.Checkout.Session;
   try {
@@ -284,6 +452,7 @@ export async function createCheckoutSession(
               name: lineName,
               metadata: {
                 [meta.skuIds]: skuIdsKey(amount.skuIds).slice(0, 450),
+                ...paidCycleMeta,
               },
             },
           },
@@ -297,11 +466,15 @@ export async function createCheckoutSession(
         [meta.currency]: studioPaymentV1.currency,
         [meta.skuIds]: skuIdsKey(amount.skuIds).slice(0, 450),
         [meta.draftRevision]: String(authorization.evaluatedDraftRevision),
+        ...paidCycleMeta,
       },
       payment_intent_data: {
         metadata: {
           [meta.campaignId]: request.campaignId,
           [meta.decisionId]: authorization.decisionId,
+          ...(amount.paidCyclePurchaseId
+            ? { [meta.paidCyclePurchaseId]: amount.paidCyclePurchaseId }
+            : {}),
         },
       },
     });
@@ -331,28 +504,20 @@ export async function createCheckoutSession(
     };
   }
 
-  campaign = applyCheckoutInitiatedToCampaignRecord(campaign, {
-    checkoutSessionId: session.id,
-    expectedAmountCents: amount.amountCents,
-    selectedServiceIds: amount.skuIds,
-    decisionId: authorization.decisionId,
-    factFingerprint: authorization.factFingerprint,
-    draftRevision: authorization.evaluatedDraftRevision,
-    sandbox: false,
-  });
+  bindPaidCycle(session.id, false);
+  if (purchaseKind === "studio_plan" || !campaign.paymentReceivedAt) {
+    campaign = applyCheckoutInitiatedToCampaignRecord(campaign, {
+      checkoutSessionId: session.id,
+      expectedAmountCents: amount.amountCents,
+      selectedServiceIds: amount.skuIds,
+      decisionId: authorization.decisionId,
+      factFingerprint: authorization.factFingerprint,
+      draftRevision: authorization.evaluatedDraftRevision,
+      sandbox: false,
+    });
+  }
   await upsertCampaignRecord(campaign, existing?.clientUserId);
-  await writeCheckoutSessionBinding({
-    checkoutSessionId: session.id,
-    campaignId: request.campaignId,
-    expectedAmountCents: amount.amountCents,
-    currency: "usd",
-    selectedServiceIds: amount.skuIds,
-    decisionId: authorization.decisionId,
-    factFingerprint: authorization.factFingerprint,
-    draftRevision: authorization.evaluatedDraftRevision,
-    createdAt: new Date().toISOString(),
-    sandbox: false,
-  });
+  await writeBinding(session.id, false);
 
   return {
     ok: true,
@@ -362,5 +527,8 @@ export async function createCheckoutSession(
     expectedAmountCents: amount.amountCents,
     currency: "usd",
     campaignId: request.campaignId,
+    purchaseKind,
+    paidCyclePurchaseId: amount.paidCyclePurchaseId,
+    cyclePriceCents: amount.cyclePriceCents,
   };
 }

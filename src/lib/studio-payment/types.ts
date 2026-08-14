@@ -4,6 +4,8 @@ import type { StudioPaymentStatus } from "@/config/studio-payment-v1";
 import type { PreAcceptancePaymentAuthorization } from "@/lib/studio-pre-acceptance/authorization-binding";
 import type { PreAcceptanceProjectFacts } from "@/lib/studio-pre-acceptance/types";
 
+export type CheckoutPurchaseKind = "studio_plan" | "paid_cycle";
+
 export type CheckoutSessionCreateRequest = {
   campaignId: string;
   /** Material facts for server-side CLEAR re-evaluation. */
@@ -23,6 +25,11 @@ export type CheckoutSessionCreateRequest = {
    * Complete Checkout must omit this and require a real Stripe session URL.
    */
   preferSandbox?: boolean;
+  /**
+   * `paid_cycle` — explicit sm-001-monthly pay-per-cycle purchase (Cycle 1 or N+1).
+   * Default `studio_plan` preserves sealed Payment Truth checkout behavior.
+   */
+  purchaseKind?: CheckoutPurchaseKind;
 };
 
 export type CheckoutSessionCreateResult =
@@ -34,6 +41,9 @@ export type CheckoutSessionCreateResult =
       expectedAmountCents: number;
       currency: "usd";
       campaignId: string;
+      purchaseKind?: CheckoutPurchaseKind;
+      paidCyclePurchaseId?: string;
+      cyclePriceCents?: number;
     }
   | {
       ok: true;
@@ -44,6 +54,9 @@ export type CheckoutSessionCreateResult =
       expectedAmountCents: number;
       currency: "usd";
       campaignId: string;
+      purchaseKind?: CheckoutPurchaseKind;
+      paidCyclePurchaseId?: string;
+      cyclePriceCents?: number;
     }
   | {
       ok: false;
@@ -55,7 +68,8 @@ export type CheckoutSessionCreateResult =
         | "amount_invalid"
         | "campaign_mismatch"
         | "already_paid"
-        | "invalid_request";
+        | "invalid_request"
+        | "paid_cycle_invalid";
       message: string;
     };
 
@@ -93,7 +107,9 @@ export type PaymentConfirmationResult =
         | "decision_mismatch"
         | "transaction_reuse"
         | "not_clear_bound"
-        | "invalid_evidence";
+        | "invalid_evidence"
+        | "paid_cycle_invalid"
+        | "purchase_mismatch";
       message: string;
     };
 

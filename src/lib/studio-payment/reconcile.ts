@@ -44,7 +44,26 @@ export async function reconcileCheckoutSession(
   }
 
   const envelope = await readCampaignEnvelope(binding.campaignId);
-  if (envelope?.record.paymentReceivedAt) {
+
+  // Paid-cycle sessions: campaign-level paymentReceivedAt must NOT short-circuit.
+  // Only a confirmed ledger row for this session/purchase is authority.
+  if (binding.purchaseKind === "paid_cycle" && binding.paidCyclePurchaseId) {
+    const row = envelope?.record.paidCyclePurchases?.find(
+      (entry) =>
+        entry.paidCyclePurchaseId === binding.paidCyclePurchaseId &&
+        entry.checkoutSessionId === checkoutSessionId,
+    );
+    if (row?.status === "confirmed") {
+      return {
+        ok: true,
+        status: "confirmed",
+        paid: true,
+        campaign: envelope?.record ?? null,
+        checkoutSessionId,
+        message: studioPaymentV1.customerCopy.paymentConfirmed,
+      };
+    }
+  } else if (envelope?.record.paymentReceivedAt) {
     return {
       ok: true,
       status: "confirmed",

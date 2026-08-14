@@ -178,6 +178,22 @@ export type CampaignRecord = {
     sandbox?: boolean;
   };
   /**
+   * Server-owned paid-cycle purchase ledger (sm-001-monthly pay-per-cycle).
+   * Supplements paymentTruth — never means “all future cycles paid.”
+   * Does not mint productionCycleId.
+   */
+  paidCyclePurchases?: readonly import("@/lib/studio-payment/paid-cycle-types").PaidCyclePurchaseRecord[];
+  /**
+   * Explicit service-production-period truth per paidCyclePurchaseId.
+   * Required before production cycle mint — never wall-clock inferred.
+   */
+  sm001MonthlyCyclePeriodTruths?: readonly import("@/lib/studio-monthly-production-cycle/types").Sm001MonthlyCyclePeriodTruth[];
+  /**
+   * Authoritative sm-001-monthly production cycles (one per confirmed paid purchase).
+   * Created by activation seam; renderer consumes only.
+   */
+  sm001MonthlyProductionCycles?: readonly import("@/lib/studio-monthly-production-cycle/types").Sm001MonthlyProductionCycleRecord[];
+  /**
    * Server-owned post-pay activation — eager wake after paymentTruth confirmed.
    * Browser return / File Room / Owner Console visits must not be required.
    */

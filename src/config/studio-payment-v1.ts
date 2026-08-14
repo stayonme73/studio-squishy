@@ -17,6 +17,11 @@ export const studioPaymentV1 = {
     currency: "studio_currency",
     skuIds: "studio_sku_ids",
     draftRevision: "studio_draft_revision",
+    /** Additive paid-cycle keys — see studioPaidCyclePaymentV1.metadataKeys. */
+    purchaseKind: "studio_purchase_kind",
+    paidCyclePurchaseId: "studio_paid_cycle_purchase_id",
+    cycleSkuId: "studio_cycle_sku_id",
+    cyclePriceCents: "studio_cycle_price_cents",
   } as const,
   env: {
     secretKey: "STRIPE_SECRET_KEY",
