@@ -24,10 +24,10 @@ Visual / customer limits inherit Owner-accepted PROOF-1 **PASS WITH LIMITS** (pa
 |-------|--------|
 | Lane feature commit SHA | `a04e87c928f59e23d24f334c86a8ea6dae684c3d` |
 | Lane tip SHA (seal-from) | `efb04ccc8f27141a02e8b0168b2915e06d7235ca` |
-| Seal commit SHA | *(filled by tip-identity commit after seal)* |
+| Seal commit SHA | `9b26305ffd4158f3c3a3d5014f70c4ac2dd9a111` |
 | Seal commit message | `docs(operating): seal ma-001 Promotion Pack customer-ready-with-limits` |
 | Pushed branch | `operating/design-renderer-proof-1` |
-| Branch tip (local = origin) | *(filled after push)* |
+| Branch tip (local = origin) | *(filled after push tip-identity)* |
 | Ahead / behind | *(filled after push)* |
 
 ---
@@ -152,10 +152,10 @@ customer composition lock (ma001PackComposition)
 |-------|--------|
 | `ma-001-intake-truth` + `ma-001-composition-payment-gate` + `ma-001-postpay-composition-dispatch-structure` + `ma-001-dispatch-hook` + `payment-truth` | **63/63 pass** |
 | `ma-001-proof` | **6/6 pass** |
-| Eight-lane remap assertions (`ma-001` hook + payment-gate + postpay) | **3/3 pass** |
+| Eight-lane remap assertions (`ma-001` hook + payment-gate + postpay) | **3/3 pass** (subset of suites above) |
 | `sm-001-monthly` remaps-only filter | **1/1 pass** |
 
-**Combined seal regression:** **73 passed** (63 + 6 + 3 + 1; remap assertions overlap suites already counted in 63 — unique vitest cases exercised for seal gate: **69** across MA-001+Payment Truth+proof, plus explicit eight-lane / monthly remap spot checks above).
+**Combined unique seal regression:** **69/69 pass** (63 MA-001 lane + Payment Truth + 6 proof). Eight prior sealed lanes verified green via remap assertions; monthly remaps-only spot check green.
 
 ---
 
