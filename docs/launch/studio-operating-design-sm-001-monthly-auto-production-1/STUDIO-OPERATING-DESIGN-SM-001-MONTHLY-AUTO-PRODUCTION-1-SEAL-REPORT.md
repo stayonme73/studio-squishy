@@ -22,11 +22,11 @@ Canva-replacement design migration progress after this seal: **8/13**.
 | Field | Value |
 |-------|--------|
 | Dispatch commit SHA | `2d0ab8c9ab8dec2bea5f972124221c10e00d6898` |
-| Seal tip SHA | *(filled on seal tip commit)* |
+| Seal tip SHA | `48ae76b7088259ba066a7d07b8619c73b28cf239` |
 | Dispatch commit message | `feat(monthly): wire explicit cycle target and sm-001-monthly Machine dispatch` |
 | Seal commit message | `docs(operating): seal sm-001-monthly owner-independent auto-production` |
 | Pushed branch | `operating/design-renderer-proof-1` |
-| Local HEAD = origin HEAD | *(verified after push)* |
+| Branch tip (local = origin) | *(filled after tip-align + push)* |
 | Ahead / behind | *(verified after push — expect 0/0)* |
 
 ---
