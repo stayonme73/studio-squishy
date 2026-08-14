@@ -476,22 +476,39 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   "rm-j008": {
     producerRole: "creative_production",
     supportingRoles: ["copy", "qa", "producer_dispatcher"],
-    primaryTool: CANVA_TOOL,
+    /**
+     * STUDIO-OPERATING-DESIGN-RM-J008-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: paid rmJ008PostPayDispatchStructure → Update Kit composer.
+     * Purchased platform + before-state + full replacement membership are law.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for rm-j008 only (RM-J008-PROOF-1 + VISUAL/PRODUCT GATE + INTAKE-PAYMENT-LOCK-1 + POSTPAY-KIT-DISPATCH-STRUCTURE-1 + DISPATCH-HOOK-1). Canva is not on the fulfillment spine for this SKU. Make not required. Exact platform + customer-supplied before-state + full replacement members N/N from paymentTruth seal. Customer applies the kit — Studio does not log in.",
+    },
     optionalTools: [TEXT_MODEL_TOOL],
     formatExportRequirements: [
-      "Social Profile Update Kit (CUSTOMER READY WITH LIMITS — PROFILE KIT)",
-      "Revised bio/about copy + URL/contact recommendations",
-      "Updated profile/banner assets where applicable",
-      "Before→after change sheet + field-replacement checklist",
+      "One platform-locked Social Profile Update Kit (Facebook 5 / Instagram 4 / TikTok 4 member identities)",
+      "Customer-supplied before-state + revised bio/about copy + replacement checklist",
+      "Before→after change sheet always included; avatar always reissued",
+      "Profile avatar on plate profile-avatar-square; Facebook page cover only when Facebook",
+      "Kit identity + kit manifest binding platform, before-state, member IDs, order, kinds, plates, artifacts, and QA",
     ],
     extraLimitations: [
       "CUSTOMER READY WITH LIMITS — PROFILE KIT (KITCHEN-SOCIAL-PROFILE-PRODUCTION-1 Owner decision A+C).",
       "Kit delivery only — customer applies unsupported platform-side changes.",
       "Not done-for-you profile management / login-based mutation.",
+      "No Studio login, OAuth mutation, password vault, or browser automation in this SKU path.",
       "New logo creation from scratch excluded.",
       "Facebook Page mutation future-only (INTEGRATION READY / ACCOUNT-AUTH BLOCKER) — not wired.",
       "Instagram and TikTok direct profile mutation remain UNSUPPORTED.",
       "Per-artifact copy QA and design QA required before delivery.",
+      "Canva is not on the fulfillment spine for this SKU (Owner-authorized Machine remap).",
     ],
     extraQaItems: [
       {
@@ -513,6 +530,18 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         source: "deliverable_format",
       },
       {
+        id: "customer_supplied_before_state",
+        label: "Before-state is customer-supplied — no live profile inspect claimed",
+        reason: "Update kit honesty boundary",
+        source: "service_contract",
+      },
+      {
+        id: "exact_platform_kit_nn",
+        label: "Exact locked full-replacement Update Kit N/N delivered",
+        reason: "Update Kit completeness = purchased platform membership",
+        source: "service_contract",
+      },
+      {
         id: "no_new_content_creation",
         label: "No original social content creation claimed",
         reason: "Catalog exclusion",
@@ -521,7 +550,11 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
     ],
     readiness: "contract_ready",
     readinessNotes:
-      "CUSTOMER READY WITH LIMITS — PROFILE KIT (KITCHEN-SOCIAL-PROFILE-PRODUCTION-1 A+C). Owner-independent path: Copy + Design (manual Canva) + before→after field-map package. Customer applies on platform. Meta OAuth not started. Instagram/TikTok mutation UNSUPPORTED. NOT unlimited Customer Ready / NOT CERTIFIED.",
+      "Social Profile Update Kit — creative_production + Studio Design Renderer (Owner-independent Machine path). Canva is not on the fulfillment spine for this SKU; Make not required. Paid kit seal + post-pay structure required; exact platform + customer-supplied before-state + full replacement member N/N; customer applies on platform.",
+    specialNotes: [
+      "Do not reopen Meta OAuth unless product strategy or customer demand justifies App Review cost.",
+      "Posting/scheduling/community management remain excluded.",
+    ],
   },
   "v2-rtu-flyer": {
     producerRole: "creative_production",

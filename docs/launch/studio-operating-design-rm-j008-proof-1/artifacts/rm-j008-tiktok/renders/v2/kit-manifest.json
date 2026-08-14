@@ -1,0 +1,107 @@
+{
+  "skuId": "rm-j008",
+  "platform": "tiktok",
+  "lockedKitMemberCount": 4,
+  "countUnit": "member_identities",
+  "kitRenderVersion": 2,
+  "kitFingerprint": "68564f550a981c10643447a59e11917a08cb9cdce078b851709764807f2073fe",
+  "kitQaOk": true,
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "accountMutation": false,
+  "beforeStateSource": "customer_supplied",
+  "unchangedMembersPolicy": "reissue_always",
+  "changeSheetIsDurableMember": true,
+  "members": [
+    {
+      "memberId": "bio_profile_copy",
+      "kind": "copy",
+      "order": 1,
+      "memberPurpose": "Revised Studio scoped TikTok bio/profile copy",
+      "producerQaOk": true,
+      "changeStatus": "CHANGED",
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "copy_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-tiktok/renders/v2/members/bio_profile_copy/copy.json",
+          "contentSha256": "0578090afa32c1b194fe99b6c13ccf8d9fd26d9f9741eeceadf691de9bb621e6"
+        },
+        {
+          "role": "copy_paste_ready",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-tiktok/renders/v2/members/bio_profile_copy/copy-paste-ready.txt",
+          "contentSha256": "35ad17b0b99c2b30b9f84e287dd4c319cd2ed7d9e7d123f481ee474ca4a5b245"
+        }
+      ]
+    },
+    {
+      "memberId": "field_map_checklist",
+      "kind": "field_map_package",
+      "order": 2,
+      "memberPurpose": "URL/contact/display-name recommendations + setup checklist",
+      "producerQaOk": true,
+      "changeStatus": null,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "field_map_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-tiktok/renders/v2/members/field_map_checklist/field-map-checklist.json",
+          "contentSha256": "42ab48038f168f670b06cdd47f59cfc38b857a72afcfd859d01b90df4353808b"
+        },
+        {
+          "role": "field_map_markdown",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-tiktok/renders/v2/members/field_map_checklist/field-map-checklist.md",
+          "contentSha256": "71229a7486591f5830ec26368eaccc8967bc17d15a8a9c3dbd260fdbe4e97796"
+        }
+      ]
+    },
+    {
+      "memberId": "profile_image",
+      "kind": "design_avatar",
+      "order": 3,
+      "memberPurpose": "TikTok profile photo only — no cover",
+      "agreedPlateId": "profile-avatar-square",
+      "producerQaOk": true,
+      "changeStatus": "UNCHANGED",
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "role": "avatar_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-tiktok/renders/v2/members/profile_image/avatar.png",
+          "contentSha256": "8109095b132960242f23812d513a6d59835c2ad13155c01d99878cb4c32dd243"
+        },
+        {
+          "role": "avatar_html",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-tiktok/renders/v2/members/profile_image/avatar.html",
+          "contentSha256": "71e57c47f5520f4df6e2d3ee2322a3954490af7af89178e22ec2e14c60a5488b"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-tiktok/renders/v2/members/profile_image/plate-honesty.json",
+          "contentSha256": "42ffaa789553af76c768e4b0e0b77594d1b21f068ee84f43f3c44b5603709c0f"
+        }
+      ]
+    },
+    {
+      "memberId": "before_after_change_sheet",
+      "kind": "field_map_package",
+      "order": 4,
+      "memberPurpose": "Before→after change sheet from customer-supplied before vs approved after",
+      "producerQaOk": true,
+      "changeStatus": null,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "change_sheet_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-tiktok/renders/v2/members/before_after_change_sheet/before-after-change-sheet.json",
+          "contentSha256": "9341d20e3f1edd79f13f188c682a5d494cc13c9be67e6424dc817348b88a6d2a"
+        },
+        {
+          "role": "change_sheet_markdown",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-tiktok/renders/v2/members/before_after_change_sheet/before-after-change-sheet.md",
+          "contentSha256": "0fdddb58f06f0e30b598f35204f4c8006e192bc0067c164e882a09ee18fac0e8"
+        }
+      ]
+    }
+  ]
+}

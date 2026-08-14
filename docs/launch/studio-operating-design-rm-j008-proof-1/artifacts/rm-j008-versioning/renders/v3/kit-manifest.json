@@ -1,0 +1,107 @@
+{
+  "skuId": "rm-j008",
+  "platform": "instagram",
+  "lockedKitMemberCount": 4,
+  "countUnit": "member_identities",
+  "kitRenderVersion": 3,
+  "kitFingerprint": "8509765e2ea83d09a7b7a99b548c0501413403b888cd4ad50bf6964bc502a392",
+  "kitQaOk": true,
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "accountMutation": false,
+  "beforeStateSource": "customer_supplied",
+  "unchangedMembersPolicy": "reissue_always",
+  "changeSheetIsDurableMember": true,
+  "members": [
+    {
+      "memberId": "bio_profile_copy",
+      "kind": "copy",
+      "order": 1,
+      "memberPurpose": "Revised Studio scoped Instagram bio/profile copy",
+      "producerQaOk": true,
+      "changeStatus": "CHANGED",
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "copy_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-versioning/renders/v3/members/bio_profile_copy/copy.json",
+          "contentSha256": "e0fe695f237631bf620fba3b85a2cd32ba399cc31c51531b643d02885b3bc2e9"
+        },
+        {
+          "role": "copy_paste_ready",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-versioning/renders/v3/members/bio_profile_copy/copy-paste-ready.txt",
+          "contentSha256": "c1ae6b6ecc24c3099d55595fdeebced110bdfb5700cb1517b8ccf82dd66afdc2"
+        }
+      ]
+    },
+    {
+      "memberId": "field_map_checklist",
+      "kind": "field_map_package",
+      "order": 2,
+      "memberPurpose": "URL/contact/display-name recommendations + setup checklist",
+      "producerQaOk": true,
+      "changeStatus": null,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "field_map_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-versioning/renders/v3/members/field_map_checklist/field-map-checklist.json",
+          "contentSha256": "dc75309dfb2e2f88b666a91a977258d472e404321622468f63a5233693b90ce6"
+        },
+        {
+          "role": "field_map_markdown",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-versioning/renders/v3/members/field_map_checklist/field-map-checklist.md",
+          "contentSha256": "4ad9033a2f22c983899840a320bb6c0e4fea09c7232e762155c4c505d62794d1"
+        }
+      ]
+    },
+    {
+      "memberId": "profile_image",
+      "kind": "design_avatar",
+      "order": 3,
+      "memberPurpose": "Instagram profile picture only — no profile cover",
+      "agreedPlateId": "profile-avatar-square",
+      "producerQaOk": true,
+      "changeStatus": "UNCHANGED",
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "role": "avatar_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-versioning/renders/v3/members/profile_image/avatar.png",
+          "contentSha256": "8109095b132960242f23812d513a6d59835c2ad13155c01d99878cb4c32dd243"
+        },
+        {
+          "role": "avatar_html",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-versioning/renders/v3/members/profile_image/avatar.html",
+          "contentSha256": "71e57c47f5520f4df6e2d3ee2322a3954490af7af89178e22ec2e14c60a5488b"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-versioning/renders/v3/members/profile_image/plate-honesty.json",
+          "contentSha256": "42ffaa789553af76c768e4b0e0b77594d1b21f068ee84f43f3c44b5603709c0f"
+        }
+      ]
+    },
+    {
+      "memberId": "before_after_change_sheet",
+      "kind": "field_map_package",
+      "order": 4,
+      "memberPurpose": "Before→after change sheet from customer-supplied before vs approved after",
+      "producerQaOk": true,
+      "changeStatus": null,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "change_sheet_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-versioning/renders/v3/members/before_after_change_sheet/before-after-change-sheet.json",
+          "contentSha256": "77e347b0b6a4425e2d759227fc47833d804e855ef47dd00be0f574e3570ff9bf"
+        },
+        {
+          "role": "change_sheet_markdown",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-versioning/renders/v3/members/before_after_change_sheet/before-after-change-sheet.md",
+          "contentSha256": "885ae58e0839d5eb38fcc0f0ae5e0bb2cd24cef381c0b39b8be069b4d2517707"
+        }
+      ]
+    }
+  ]
+}

@@ -235,7 +235,7 @@ describe("route-map intake template routing", () => {
     expect(getRouteMapJob("rm-j002")?.intakeType).toBe("social-setup");
     expect(getRouteMapJob("rm-j005")?.intakeType).toBe("page");
     expect(getRouteMapJob("rm-j007")?.intakeType).toBe("update");
-    expect(getRouteMapJob("rm-j008")?.intakeType).toBe("social-setup");
+    expect(getRouteMapJob("rm-j008")?.intakeType).toBe("social-update");
   });
 
   it("redirects retired shelf IDs to V2 intake templates", () => {

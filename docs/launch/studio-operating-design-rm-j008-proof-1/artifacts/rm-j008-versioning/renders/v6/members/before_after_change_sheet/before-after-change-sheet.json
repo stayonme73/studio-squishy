@@ -1,0 +1,69 @@
+{
+  "memberId": "before_after_change_sheet",
+  "kind": "field_map_package",
+  "platform": "instagram",
+  "beforeStateSource": "customer_supplied",
+  "customerApplies": true,
+  "accountMutation": false,
+  "comparisonBasis": "authoritative_before_state_vs_approved_after_state_not_artifact_hashes",
+  "reviewedBeforeSummary": {
+    "displayName": "Harbor & Oak Studio",
+    "bioOrAbout": "Old bio: weekend snapshots and unclear booking link.",
+    "website": "https://old-harbor.example",
+    "phone": "(555) 000-0000",
+    "profileImageNote": "Current default platform avatar — low contrast",
+    "pageCoverNote": null
+  },
+  "rows": [
+    {
+      "fieldId": "displayName",
+      "fieldLabel": "Display name",
+      "beforeValue": "Harbor & Oak Studio",
+      "afterValue": "Harbor & Oak Studio",
+      "status": "UNCHANGED",
+      "note": "Compare customer-supplied before display name to approved after display name."
+    },
+    {
+      "fieldId": "bio",
+      "fieldLabel": "Bio",
+      "beforeValue": "Old bio: weekend snapshots and unclear booking link.",
+      "afterValue": "Calm, timeless portrait photography. Book a discovery call.",
+      "status": "CHANGED",
+      "memberId": "bio_profile_copy",
+      "note": "Compare customer-supplied before bio/about to Studio-written revised after copy (not artifact hashes)."
+    },
+    {
+      "fieldId": "website",
+      "fieldLabel": "Website / link",
+      "beforeValue": "https://old-harbor.example",
+      "afterValue": "https://harbor-and-oak.example",
+      "status": "CHANGED",
+      "note": "Compare customer-supplied before URL to approved after URL."
+    },
+    {
+      "fieldId": "phone",
+      "fieldLabel": "Phone / contact",
+      "beforeValue": "(555) 000-0000",
+      "afterValue": "(555) 014-2200",
+      "status": "CHANGED",
+      "note": "Compare customer-supplied before phone to approved after phone."
+    },
+    {
+      "fieldId": "profile_image",
+      "fieldLabel": "Profile image / avatar",
+      "beforeValue": "Current default platform avatar — low contrast",
+      "afterValue": "Keep your current look — this kit still includes a profile image file so the package is complete",
+      "status": "UNCHANGED",
+      "memberId": "profile_image",
+      "note": "Status follows the approved update decision. The profile image member is always included in the kit."
+    },
+    {
+      "fieldId": "page_cover",
+      "fieldLabel": "Cover / banner",
+      "beforeValue": "Not used on this platform",
+      "afterValue": "Not used on this platform",
+      "status": "NOT_APPLICABLE",
+      "note": "Instagram and TikTok kits do not include a profile cover."
+    }
+  ]
+}

@@ -44,6 +44,13 @@ export type CheckoutSessionCreateRequest = {
   rmj002KitLock?: import("@/lib/studio-design-renderer/rm-j002-intake-truth").RmJ002LiveKitLockInput
     | import("@/lib/studio-design-renderer/rm-j002-intake-truth").RmJ002KitLiveTruth
     | null;
+  /**
+   * rm-j008 Social Profile Update Kit — platform + customer-supplied before-state
+   * + full replacement membership lock required when selected.
+   */
+  rmj008KitLock?: import("@/lib/studio-design-renderer/rm-j008-intake-truth").RmJ008LiveKitLockInput
+    | import("@/lib/studio-design-renderer/rm-j008-intake-truth").RmJ008KitLiveTruth
+    | null;
 };
 
 export type CheckoutSessionCreateResult =
@@ -85,7 +92,8 @@ export type CheckoutSessionCreateResult =
         | "invalid_request"
         | "paid_cycle_invalid"
         | "ma001_composition_required"
-        | "rmj002_kit_lock_required";
+        | "rmj002_kit_lock_required"
+        | "rmj008_kit_lock_required";
       message: string;
     };
 
@@ -113,6 +121,11 @@ export type PaymentConfirmationInput = {
    * Must match checkout binding seal when rm-j002 was purchased.
    */
   rmj002KitSeal?: import("@/lib/studio-design-renderer/rm-j002-kit-payment-gate").RmJ002KitPaymentSeal
+    | null;
+  /**
+   * Must match checkout binding seal when rm-j008 was purchased.
+   */
+  rmj008KitSeal?: import("@/lib/studio-design-renderer/rm-j008-kit-payment-gate").RmJ008KitPaymentSeal
     | null;
 };
 

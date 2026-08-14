@@ -45,6 +45,13 @@ export const WORKING_DRAFT_PERSISTED_FIELDS = [
    * @see STUDIO-OPERATING-DESIGN-RM-J002-INTAKE-PAYMENT-LOCK-1
    */
   "rmj002KitLock",
+  /**
+   * rm-j008 Social Profile Update Kit — platform + customer-supplied before-state
+   * + full replacement membership locked before payment.
+   * skuId `rm-j008` alone is insufficient for checkout.
+   * @see STUDIO-OPERATING-DESIGN-RM-J008-INTAKE-PAYMENT-LOCK-1
+   */
+  "rmj008KitLock",
 ] as const;
 
 export type WorkingDraftPersistedField =

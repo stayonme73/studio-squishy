@@ -36,6 +36,11 @@ export async function startHostedCheckout(args: {
    * Required when facts include rm-j002; server re-validates and seals.
    */
   rmj002KitLock?: unknown;
+  /**
+   * rm-j008 Social Profile Update Kit — locked replacement kit from working draft.
+   * Required when facts include rm-j008; server re-validates and seals.
+   */
+  rmj008KitLock?: unknown;
 }): Promise<StartCheckoutClientResult> {
   const returnOrigin =
     typeof window !== "undefined" ? window.location.origin : "";
@@ -54,6 +59,9 @@ export async function startHostedCheckout(args: {
         : {}),
       ...(args.rmj002KitLock != null
         ? { rmj002KitLock: args.rmj002KitLock }
+        : {}),
+      ...(args.rmj008KitLock != null
+        ? { rmj008KitLock: args.rmj008KitLock }
         : {}),
     }),
   });

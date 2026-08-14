@@ -186,6 +186,12 @@ export type CampaignRecord = {
      * Absent when rm-j002 was not in the cart. Binds platform + exact membership.
      */
     rmj002KitSeal?: import("@/lib/studio-design-renderer/rm-j002-kit-payment-gate").RmJ002KitPaymentSeal;
+    /**
+     * Sealed rm-j008 Social Profile Update Kit purchased with this payment.
+     * Absent when rm-j008 was not in the cart. Binds platform + before-state +
+     * full replacement membership.
+     */
+    rmj008KitSeal?: import("@/lib/studio-design-renderer/rm-j008-kit-payment-gate").RmJ008KitPaymentSeal;
   };
   /**
    * Durable ma-001 post-pay pack structure derived from paymentTruth.ma001CompositionSeal.
@@ -199,6 +205,13 @@ export type CampaignRecord = {
    * @see STUDIO-OPERATING-DESIGN-RM-J002-POSTPAY-KIT-DISPATCH-STRUCTURE-1
    */
   rmJ002PostPayDispatchStructure?: import("@/lib/studio-design-renderer/rm-j002-postpay-kit-dispatch-structure").RmJ002PostPayDispatchStructure;
+  /**
+   * Durable rm-j008 post-pay Update Kit structure derived from paymentTruth.rmj008KitSeal.
+   * Authoritative platform + before-state + full replacement membership for future dispatch —
+   * not a remap / not composer invoke.
+   * @see STUDIO-OPERATING-DESIGN-RM-J008-POSTPAY-KIT-DISPATCH-STRUCTURE-1
+   */
+  rmJ008PostPayDispatchStructure?: import("@/lib/studio-design-renderer/rm-j008-postpay-kit-dispatch-structure").RmJ008PostPayDispatchStructure;
   /**
    * Server-owned paid-cycle purchase ledger (sm-001-monthly pay-per-cycle).
    * Supplements paymentTruth — never means “all future cycles paid.”

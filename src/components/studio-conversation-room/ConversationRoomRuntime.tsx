@@ -61,6 +61,7 @@ import {
   readConversationStage,
   readMa001PackComposition,
   readRmJ002KitLock,
+  readRmJ008KitLock,
   readOpeningAnswers,
   readSelectedRoute,
   readSelectedServices,
@@ -69,6 +70,7 @@ import {
 } from "@/lib/conversation-room-draft";
 import { evaluateMa001CompositionPaymentGate } from "@/lib/studio-design-renderer/ma-001-composition-payment-gate";
 import { evaluateRmJ002KitPaymentGate } from "@/lib/studio-design-renderer/rm-j002-kit-payment-gate";
+import { evaluateRmJ008KitPaymentGate } from "@/lib/studio-design-renderer/rm-j008-kit-payment-gate";
 import type { ServiceId } from "@/catalog/types";
 import type { RouteMapIntakeAnswers } from "@/catalog/intake";
 import { buildProjectBuilderStudioPlanSummary } from "@/lib/project-builder-studio-plan-summary";
@@ -845,6 +847,17 @@ export default function ConversationRoomRuntime({
       );
       return;
     }
+    const rmj008Gate = evaluateRmJ008KitPaymentGate({
+      selectedServiceIds: serviceIds.map(String),
+      kitLock: readRmJ008KitLock(project),
+    });
+    if (!rmj008Gate.ok) {
+      setPlanBridgeError(rmj008Gate.message);
+      speakStudioLine(
+        "Your Social Profile Update Kit still needs one platform, your current profile details, and the update plan locked before checkout.",
+      );
+      return;
+    }
 
     const decision = runPreAcceptanceForCheckout(
       projectFactsFromWorkingDraft(project),
@@ -908,6 +921,21 @@ export default function ConversationRoomRuntime({
       closeActivityPanel();
       speakStudioLine(
         "Your Social Profile Setup Kit still needs one platform locked before payment.",
+      );
+      return false;
+    }
+    const rmj008Gate = evaluateRmJ008KitPaymentGate({
+      selectedServiceIds: readSelectedServices(project).map((s) =>
+        String(s.jobId),
+      ),
+      kitLock: readRmJ008KitLock(project),
+    });
+    if (!rmj008Gate.ok) {
+      setPlanBridgeError(rmj008Gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        "Your Social Profile Update Kit still needs one platform and your current profile details locked before payment.",
       );
       return false;
     }
@@ -982,6 +1010,20 @@ export default function ConversationRoomRuntime({
       );
       throw new Error(rmj002Gate.message);
     }
+    const rmj008KitLock = readRmJ008KitLock(project);
+    const rmj008Gate = evaluateRmJ008KitPaymentGate({
+      selectedServiceIds: facts.selectedServiceIds.map(String),
+      kitLock: rmj008KitLock,
+    });
+    if (!rmj008Gate.ok) {
+      setPlanBridgeError(rmj008Gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        "Your Social Profile Update Kit still needs one platform and your current profile details locked before payment.",
+      );
+      throw new Error(rmj008Gate.message);
+    }
     const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
@@ -1006,6 +1048,7 @@ export default function ConversationRoomRuntime({
       facts,
       ma001PackComposition: ma001Composition,
       rmj002KitLock,
+      rmj008KitLock,
     });
     if (!started.ok) {
       setPlanBridgeError(started.message);
@@ -1047,6 +1090,15 @@ export default function ConversationRoomRuntime({
       setPlanBridgeError(rmj002Gate.message);
       throw new Error(rmj002Gate.message);
     }
+    const rmj008KitLock = readRmJ008KitLock(project);
+    const rmj008Gate = evaluateRmJ008KitPaymentGate({
+      selectedServiceIds: facts.selectedServiceIds.map(String),
+      kitLock: rmj008KitLock,
+    });
+    if (!rmj008Gate.ok) {
+      setPlanBridgeError(rmj008Gate.message);
+      throw new Error(rmj008Gate.message);
+    }
     const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
@@ -1066,6 +1118,7 @@ export default function ConversationRoomRuntime({
       preferSandbox: true,
       ma001PackComposition: ma001Composition,
       rmj002KitLock,
+      rmj008KitLock,
     });
     if (!started.ok) {
       setPlanBridgeError(started.message);

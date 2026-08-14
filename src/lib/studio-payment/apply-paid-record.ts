@@ -6,6 +6,7 @@ import {
 import type { PreAcceptancePaymentAuthorization } from "@/lib/studio-pre-acceptance/authorization-binding";
 import { ensureMa001PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/ma-001-postpay-composition-dispatch-structure";
 import { ensureRmJ002PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/rm-j002-postpay-kit-dispatch-structure";
+import { ensureRmJ008PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/rm-j008-postpay-kit-dispatch-structure";
 
 import type { PaymentConfirmationInput } from "./types";
 
@@ -61,6 +62,7 @@ export function applyPaidTruthToCampaignRecord(
         ? { ma001CompositionSeal: input.ma001CompositionSeal }
         : {}),
       ...(input.rmj002KitSeal ? { rmj002KitSeal: input.rmj002KitSeal } : {}),
+      ...(input.rmj008KitSeal ? { rmj008KitSeal: input.rmj008KitSeal } : {}),
     },
   };
 
@@ -108,6 +110,14 @@ export function applyPaidTruthToCampaignRecord(
   // Durable rm-j002 kit structure from sealed payment kit (no remap / no composer).
   if (updated.paymentTruth?.rmj002KitSeal) {
     const ensured = ensureRmJ002PostPayDispatchStructureOnCampaign(updated);
+    if (ensured.ok) {
+      updated = ensured.campaign;
+    }
+  }
+
+  // Durable rm-j008 Update Kit structure from sealed payment kit (no remap / no composer).
+  if (updated.paymentTruth?.rmj008KitSeal) {
+    const ensured = ensureRmJ008PostPayDispatchStructureOnCampaign(updated);
     if (ensured.ok) {
       updated = ensured.campaign;
     }

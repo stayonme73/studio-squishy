@@ -188,6 +188,7 @@ export async function handleStripeWebhook(
       ? { ma001CompositionSeal: binding.ma001CompositionSeal }
       : {}),
     ...(binding?.rmj002KitSeal ? { rmj002KitSeal: binding.rmj002KitSeal } : {}),
+    ...(binding?.rmj008KitSeal ? { rmj008KitSeal: binding.rmj008KitSeal } : {}),
   });
 
   if (!result.ok) {

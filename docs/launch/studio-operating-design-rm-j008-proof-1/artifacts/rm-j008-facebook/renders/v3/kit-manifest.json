@@ -1,0 +1,134 @@
+{
+  "skuId": "rm-j008",
+  "platform": "facebook",
+  "lockedKitMemberCount": 5,
+  "countUnit": "member_identities",
+  "kitRenderVersion": 3,
+  "kitFingerprint": "d3a61c10f5259154c2b34608695508598e9f39ce211b2a8df6750024db4460c4",
+  "kitQaOk": true,
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "accountMutation": false,
+  "beforeStateSource": "customer_supplied",
+  "unchangedMembersPolicy": "reissue_always",
+  "changeSheetIsDurableMember": true,
+  "members": [
+    {
+      "memberId": "bio_about_copy",
+      "kind": "copy",
+      "order": 1,
+      "memberPurpose": "Revised Studio scoped Facebook Page about/description",
+      "producerQaOk": true,
+      "changeStatus": "CHANGED",
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "copy_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/bio_about_copy/copy.json",
+          "contentSha256": "a15121b9332c545a61eb405e39f932c0ed8c4edd1dd1a33e4df40b489ce2aac7"
+        },
+        {
+          "role": "copy_paste_ready",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/bio_about_copy/copy-paste-ready.txt",
+          "contentSha256": "5cfa2cac51e4096d3a93a5f871e260560001debc5743b12e2167d52486d0cd29"
+        }
+      ]
+    },
+    {
+      "memberId": "field_map_checklist",
+      "kind": "field_map_package",
+      "order": 2,
+      "memberPurpose": "URL/contact/display-name recommendations + setup checklist",
+      "producerQaOk": true,
+      "changeStatus": null,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "field_map_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/field_map_checklist/field-map-checklist.json",
+          "contentSha256": "88dca76df2ab5769c5d11261de81a13b3387e1b957d9b230d3b88dc0585c7096"
+        },
+        {
+          "role": "field_map_markdown",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/field_map_checklist/field-map-checklist.md",
+          "contentSha256": "9117698923d08e360dcf69309e29b1be11287be576fb750254dcb0f84308a4e9"
+        }
+      ]
+    },
+    {
+      "memberId": "profile_image",
+      "kind": "design_avatar",
+      "order": 3,
+      "memberPurpose": "Facebook Page profile picture",
+      "agreedPlateId": "profile-avatar-square",
+      "producerQaOk": true,
+      "changeStatus": "UNCHANGED",
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "role": "avatar_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/profile_image/avatar.png",
+          "contentSha256": "8109095b132960242f23812d513a6d59835c2ad13155c01d99878cb4c32dd243"
+        },
+        {
+          "role": "avatar_html",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/profile_image/avatar.html",
+          "contentSha256": "71e57c47f5520f4df6e2d3ee2322a3954490af7af89178e22ec2e14c60a5488b"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/profile_image/plate-honesty.json",
+          "contentSha256": "42ffaa789553af76c768e4b0e0b77594d1b21f068ee84f43f3c44b5603709c0f"
+        }
+      ]
+    },
+    {
+      "memberId": "page_cover",
+      "kind": "design_page_cover",
+      "order": 4,
+      "memberPurpose": "Facebook Page cover photo",
+      "agreedPlateId": "facebook-page-cover-851x315",
+      "producerQaOk": true,
+      "changeStatus": "UNCHANGED",
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "role": "cover_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/page_cover/page-cover.png",
+          "contentSha256": "61a1acaa246b0c637433fc56a5378db82bc5bb738a5051b532904ced6670c1d5"
+        },
+        {
+          "role": "cover_html",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/page_cover/page-cover.html",
+          "contentSha256": "d6461c0ce311b9807287c3de79df2f8c70c0b53def04988229a0437a8dd58eab"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/page_cover/plate-honesty.json",
+          "contentSha256": "003b7985b6d4aee6e751c3e9b29364f0d6f215dfa0f08abf9ee0f17196d4354d"
+        }
+      ]
+    },
+    {
+      "memberId": "before_after_change_sheet",
+      "kind": "field_map_package",
+      "order": 5,
+      "memberPurpose": "Before→after change sheet from customer-supplied before vs approved after",
+      "producerQaOk": true,
+      "changeStatus": null,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "role": "change_sheet_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/before_after_change_sheet/before-after-change-sheet.json",
+          "contentSha256": "7c043092246f4d7758c3d74faf894843bcd30c69b3faea0b0fffe6b9910264c5"
+        },
+        {
+          "role": "change_sheet_markdown",
+          "relativePath": "docs/launch/studio-operating-design-rm-j008-proof-1/artifacts/rm-j008-facebook/renders/v3/members/before_after_change_sheet/before-after-change-sheet.md",
+          "contentSha256": "a5d6c951e969ffda16188e953f2dd8a38d48a05be9cb0e82377e6c1ab74b3563"
+        }
+      ]
+    }
+  ]
+}

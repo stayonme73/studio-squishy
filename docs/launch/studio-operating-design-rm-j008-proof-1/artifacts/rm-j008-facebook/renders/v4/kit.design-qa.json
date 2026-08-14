@@ -1,0 +1,43 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-RM-J008-PROOF-1",
+  "platform": "facebook",
+  "lockedKitMemberCount": 5,
+  "kitQaOk": true,
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "accountMutation": false,
+  "beforeStateSource": "customer_supplied",
+  "changeSheetComparison": "authoritative_before_vs_approved_after_not_hashes",
+  "members": [
+    {
+      "memberId": "bio_about_copy",
+      "producerQaOk": true,
+      "changeStatus": "CHANGED",
+      "artifactCount": 2
+    },
+    {
+      "memberId": "field_map_checklist",
+      "producerQaOk": true,
+      "changeStatus": null,
+      "artifactCount": 2
+    },
+    {
+      "memberId": "profile_image",
+      "producerQaOk": true,
+      "changeStatus": "UNCHANGED",
+      "artifactCount": 3
+    },
+    {
+      "memberId": "page_cover",
+      "producerQaOk": true,
+      "changeStatus": "UNCHANGED",
+      "artifactCount": 3
+    },
+    {
+      "memberId": "before_after_change_sheet",
+      "producerQaOk": true,
+      "changeStatus": null,
+      "artifactCount": 2
+    }
+  ]
+}

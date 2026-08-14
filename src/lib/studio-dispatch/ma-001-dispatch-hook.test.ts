@@ -193,7 +193,7 @@ describe("STUDIO-OPERATING-DESIGN-MA-001-DISPATCH-HOOK-1", () => {
     }
 
     // Remaining Canva-dependent SKUs stay Canva (sample)
-    for (const skuId of ["bf-001", "rm-j008"] as const) {
+    for (const skuId of ["bf-001", "rm-j007"] as const) {
       const resolved = resolveServiceProductionContract(skuId);
       if (resolved.status !== "resolved") continue;
       expect(resolved.contract.primaryTool.toolId).toBe("canva");

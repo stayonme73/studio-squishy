@@ -36,6 +36,7 @@ export async function POST(request: Request) {
       purchaseKind: body.purchaseKind,
       ma001PackComposition: body.ma001PackComposition ?? null,
       rmj002KitLock: body.rmj002KitLock ?? null,
+      rmj008KitLock: body.rmj008KitLock ?? null,
     });
 
     if (!result.ok) {

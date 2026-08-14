@@ -1,0 +1,19 @@
+{
+  "plateId": "facebook-page-cover-851x315",
+  "coverVisualVersion": "v2-customer-artwork-clean",
+  "studioRenderPx": {
+    "width": 851,
+    "height": 315
+  },
+  "platformCropBehavior": "Meta Page cover — desktop/mobile aspect differ; profile picture overlaps lower-left",
+  "guaranteedVisible": "centered safe content only — not every pixel",
+  "customerFacingLabelsInPng": false,
+  "productionAnnotationsRemoved": [
+    "Facebook Page cover · customer uploads",
+    "dashed profile-picture overlap cue",
+    "crop-honesty footer"
+  ],
+  "guidanceLocation": "field_map_checklist + plate-honesty.json",
+  "note": "Studio render canvas 851×315 (Meta fastest-load Page cover reference). Desktop/mobile crop differently; profile picture overlaps lower-left — not every pixel is guaranteed visible on every device.",
+  "overflowOk": true
+}
