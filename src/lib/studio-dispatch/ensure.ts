@@ -1,6 +1,7 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import { studioDispatchV1 } from "@/config/studio-dispatch-v1";
 import { upsertCampaignRecord, readCampaignEnvelope } from "@/lib/campaign-store/store";
+import { applySm001MonthlyDispatchTargetMirror } from "@/lib/studio-monthly-production-cycle";
 import { ensureRoutingHandoff } from "@/lib/studio-routing-handoff";
 
 import { runDesignRendererDispatchObserver } from "./design-renderer-observer";
@@ -25,6 +26,7 @@ function recordsEqual(
       other.routingFactFingerprint === record.routingFactFingerprint &&
       other.executionIdentityReady === record.executionIdentityReady &&
       other.blocker === record.blocker &&
+      other.productionCycleId === record.productionCycleId &&
       JSON.stringify(other.requirements) === JSON.stringify(record.requirements)
     );
   });
@@ -139,7 +141,7 @@ export async function ensureDispatchExecution(
     working.routingHandoff.activationCheckoutSessionId;
 
   try {
-    const records = working.routingHandoff.decisions.map((decision) =>
+    const evaluatedRecords = working.routingHandoff.decisions.map((decision) =>
       evaluateJobDispatch({
         campaignId: working.campaignId,
         routing: decision,
@@ -147,6 +149,11 @@ export async function ensureDispatchExecution(
         skuId: decision.skuId,
         evaluatedAt: now,
       }),
+    );
+    // Preserve explicit monthly cycle target mirror — never invent from newest/month.
+    const records = applySm001MonthlyDispatchTargetMirror(
+      working,
+      evaluatedRecords,
     );
 
     const anyReady = records.some((r) => r.executionIdentityReady);

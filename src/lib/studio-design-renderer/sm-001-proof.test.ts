@@ -412,7 +412,7 @@ describe("STUDIO-OPERATING-DESIGN-SM-001-PROOF-1", () => {
     expect(result.identity.calendar.entries).toHaveLength(5);
   }, 240_000);
 
-  it("sm-001 primaryTool is the Studio Design Renderer; sm-001-monthly stays Canva", () => {
+  it("sm-001 primaryTool is the Studio Design Renderer; sm-001-monthly remapped too", () => {
     const resolved = resolveServiceProductionContract("sm-001");
     expect(resolved.status).toBe("resolved");
     if (resolved.status !== "resolved") return;
@@ -421,7 +421,7 @@ describe("STUDIO-OPERATING-DESIGN-SM-001-PROOF-1", () => {
     const monthly = resolveServiceProductionContract("sm-001-monthly");
     expect(monthly.status).toBe("resolved");
     if (monthly.status !== "resolved") return;
-    expect(monthly.contract.primaryTool.toolId).toBe("canva");
+    expect(monthly.contract.primaryTool.toolId).toBe("studio_design_renderer");
   });
 
   it("six sealed lanes remain green (regression)", async () => {

@@ -90,7 +90,6 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
      * (SM-001-INTAKE-TRUTH-1) — never a customer field and never a QA outcome.
      * Executable plate: Square cert-square-1024 only; portrait/TikTok fail closed.
      * Visual: SM-001-PROOF-1 PASS WITH LIMITS.
-     * sm-001-monthly stays on the Canva baseline until separately authorized.
      */
     primaryTool: {
       toolId: "studio_design_renderer",
@@ -128,9 +127,28 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "sm-001-monthly": {
     producerRole: "creative_production",
-    formatExportRequirements: canvaFormats(
-      "Monthly batch up to six static posts + captions + calendar",
-    ),
+    /**
+     * STUDIO-OPERATING-DESIGN-SM-001-MONTHLY-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Cycle-keyed wrapper around sealed sm-001 — consumes explicit productionCycleId
+     * + locked per-cycle N; never mints cycles or selects N at render time.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for sm-001-monthly (pay-per-cycle). Explicit machineDispatchTarget + locked plannedPostCount required before invoke. Canva is not on the fulfillment spine. Make not required.",
+    },
+    formatExportRequirements: [
+      "Four to six coordinated static post graphics for the paid production cycle — plannedPostCount locked on that cycle before execution",
+      "Caption document or plain-text caption file for every post in the cycle set",
+      "Recommended posting order covering every post",
+      "Advisory posting calendar bounded to the explicit cycle period (and any narrower campaign timing) — the Studio does not publish or schedule for you",
+      "Editable source files are not included unless separately authorized",
+    ],
     extraQaItems: [
       {
         id: "monthly_batch_limit",
@@ -138,9 +156,16 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         reason: "Monthly SKU deliverable limit",
         source: "service_contract",
       },
+      {
+        id: "no_reels_claim",
+        label: "No reels/advanced motion claimed",
+        reason: "Catalog exclusion",
+        source: "catalog_exclusion",
+      },
     ],
     readiness: "contract_ready",
-    readinessNotes: "Same production method as sm-001 on a monthly cycle.",
+    readinessNotes:
+      "Monthly Social Launch Set — pay-per-cycle; Studio Design Renderer via cycle-keyed wrapper. Explicit productionCycleId target + locked N ∈ {4,5,6}. Canva not on fulfillment spine; Make not required. Client posts and schedules.",
   },
   "em-001": {
     producerRole: "copy",

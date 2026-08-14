@@ -97,9 +97,10 @@ export function campaignPaidAloneCreatesMonthlyCycle(): false {
   return false;
 }
 
-function upsertCycle(
+export function replaceSm001MonthlyProductionCycle(
   campaign: CampaignRecord,
   cycle: Sm001MonthlyProductionCycleRecord,
+  updatedAt?: string,
 ): CampaignRecord {
   const prior = listSm001MonthlyProductionCycles(campaign);
   const index = prior.findIndex(
@@ -112,8 +113,15 @@ function upsertCycle(
   return {
     ...campaign,
     sm001MonthlyProductionCycles: next,
-    updatedAt: cycle.createdAt,
+    updatedAt: updatedAt ?? cycle.createdAt,
   };
+}
+
+function upsertCycle(
+  campaign: CampaignRecord,
+  cycle: Sm001MonthlyProductionCycleRecord,
+): CampaignRecord {
+  return replaceSm001MonthlyProductionCycle(campaign, cycle);
 }
 
 function upsertPeriodTruth(

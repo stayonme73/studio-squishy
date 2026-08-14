@@ -1,5 +1,6 @@
 import type { Sm001MonthlyProductionCycleStatus } from "@/config/studio-sm-001-monthly-production-cycle-v1";
 import { studioSm001MonthlyProductionCycleV1 } from "@/config/studio-sm-001-monthly-production-cycle-v1";
+import type { Sm001PlannedPostCountSelection } from "@/lib/studio-design-renderer/sm-001-types";
 
 /**
  * Explicit service-production-period truth for one paid cycle purchase.
@@ -33,6 +34,18 @@ export type Sm001MonthlyProductionCycleRecord = {
   monthlyContentFocus: string;
   status: Sm001MonthlyProductionCycleStatus;
   createdAt: string;
-  /** Optional until pre-production Studio decision locks N ∈ {4,5,6}. */
+  /**
+   * Durable N lock ∈ {4,5,6}. Required before machineDispatchTarget.
+   * Optional only until Studio production locks N for this named cycle.
+   */
   plannedPostCount?: 4 | 5 | 6;
+  /** Auditable N selection — set with plannedPostCount; immutable after lock. */
+  plannedPostCountSelection?: Sm001PlannedPostCountSelection;
+  plannedPostCountLockedAt?: string;
+  /**
+   * Explicit Machine dispatch target for this named cycle.
+   * Never inferred from newest / last-paid / calendar / array order.
+   */
+  machineDispatchTarget?: boolean;
+  machineDispatchTargetSetAt?: string;
 };

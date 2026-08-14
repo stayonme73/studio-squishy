@@ -476,3 +476,44 @@ export type {
   Sm001LayoutTemplateAuthority,
   Sm001TimingSource,
 } from "./sm-001-intake-truth";
+
+/** sm-001-monthly — cycle-keyed wrapper + DISPATCH-HOOK-1 Machine path. */
+export {
+  DESIGN_RENDERER_SM_001_MONTHLY_SKU,
+  SM_001_MONTHLY_PROOF_PACKAGE_ID,
+  SM_001_MONTHLY_WRAPPER_VERSION,
+} from "./sm-001-monthly-types";
+export type {
+  Sm001MonthlyCycleIdentity,
+  Sm001MonthlyProjectTruth,
+  Sm001MonthlyCycleReceipt,
+  Sm001MonthlyPipelineResult,
+  Sm001MonthlyFailureCode,
+} from "./sm-001-monthly-types";
+export {
+  SM_001_MONTHLY_PROOF_CONTRACT,
+  isDesignRendererSm001MonthlySku,
+} from "./sm-001-monthly-contracts";
+export {
+  validateSm001MonthlyCycleIdentity,
+  validateSm001MonthlyPlannedPostCount,
+  intersectCycleWindowWithCampaignTiming,
+  assertNeverMintsCycleId,
+  sanitizeProductionCycleIdForPath,
+} from "./sm-001-monthly-cycle";
+export {
+  fingerprintSm001MonthlyProduction,
+  fingerprintSm001MonthlyFromTruth,
+} from "./sm-001-monthly-fingerprint";
+export {
+  SM_001_MONTHLY_PROOF_ARTIFACT_ROOT,
+  SM_001_MONTHLY_PROOF_SCOPE_NOTE,
+  SM_001_MONTHLY_PROOF_CYCLE_A,
+  SM_001_MONTHLY_PROOF_CYCLE_B,
+  buildHarborOakSm001MonthlyProjectTruth,
+} from "./sm-001-monthly-fixtures";
+export {
+  runSm001MonthlyRendererPipeline,
+  runSm001MonthlyProofPipeline,
+  resolveSm001MonthlyCycleArtifactRoot,
+} from "./sm-001-monthly-pipeline";

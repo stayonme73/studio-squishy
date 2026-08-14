@@ -1,6 +1,6 @@
 /**
  * STUDIO-OPERATING-DESIGN-SM-001-DISPATCH-HOOK-1 tests.
- * sm-001 only — sm-001-monthly stays on the Canva baseline.
+ * sm-001 Launch Set dispatch hook — sm-001-monthly remapped separately.
  */
 
 import { mkdirSync, writeFileSync } from "fs";
@@ -141,7 +141,7 @@ describe("STUDIO-OPERATING-DESIGN-SM-001-DISPATCH-HOOK-1", () => {
     );
   });
 
-  it("remaps sm-001 to the Studio Design Renderer and leaves sm-001-monthly on Canva", () => {
+  it("remaps sm-001 and sm-001-monthly to the Studio Design Renderer", () => {
     const sm001 = resolveServiceProductionContract("sm-001");
     expect(sm001.status).toBe("resolved");
     if (sm001.status !== "resolved") return;
@@ -161,7 +161,7 @@ describe("STUDIO-OPERATING-DESIGN-SM-001-DISPATCH-HOOK-1", () => {
     const monthly = resolveServiceProductionContract("sm-001-monthly");
     expect(monthly.status).toBe("resolved");
     if (monthly.status !== "resolved") return;
-    expect(monthly.contract.primaryTool.toolId).toBe("canva");
+    expect(monthly.contract.primaryTool.toolId).toBe("studio_design_renderer");
   });
 
   it("evaluateJobDispatch forms the sm-001 execution identity without invoking", () => {

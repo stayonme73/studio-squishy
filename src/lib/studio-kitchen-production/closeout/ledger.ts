@@ -90,13 +90,14 @@ const STATIC_LEDGER: Record<
     engineeringIndependence: "NONE",
     readinessStatus: "CUSTOMER READY WITH LIMITS — METHOD COVERED",
     readinessLimitations: [
-      "Same method as sm-001 on a monthly cycle",
-      "≤6 posts/month",
+      "Pay-per-cycle Machine path via Studio Design Renderer (cycle-keyed wrapper)",
+      "Explicit productionCycleId target + locked plannedPostCount ∈ {4,5,6}",
+      "≤6 posts/cycle",
       "No engagement / DMs / ads",
-      "Not separately cert-sealed — inherits static social Canva method",
+      "No automatic renewal / no Stripe subscription",
     ],
     certificationEvidencePackage:
-      "KITCHEN-PRODUCTION-CERT-DESIGN-1 (method) + sm-001 contract twin",
+      "KITCHEN-PRODUCTION-CERT-DESIGN-1 (method) + SM-001-MONTHLY-DISPATCH-HOOK-1",
     unresolvedDependency: null,
     launchDisposition: "SELL WITH LIMITS",
   },

@@ -44,7 +44,8 @@ export const SM_001_PROOF_CONTRACT = {
   /**
    * SM-001-DISPATCH-HOOK-1 (Owner-authorized): sm-001 `primaryTool` is remapped
    * to the Studio Design Renderer and the dd:{jobId} hook + observer lane are
-   * wired for sm-001 only. `sm-001-monthly` stays on the Canva baseline.
+   * wired for sm-001. SM-001-MONTHLY-DISPATCH-HOOK-1 remaps sm-001-monthly
+   * separately onto the same renderer via the cycle-keyed wrapper.
    */
   primaryToolRemapAuthorized: true,
   dispatchHookAuthorized: true,
@@ -53,7 +54,7 @@ export const SM_001_PROOF_CONTRACT = {
   ownerRoutineResponsibility: "NONE",
   dimensionTolerancePx: 40,
   note:
-    "sm-001: plannedPostCount ∈ {4,5,6} selected before execution; square-only executable plate; Studio captions; posting order; advisory schedule manifest with date governance; Canva not on the fulfillment spine for this SKU; Make unused; Owner routine NONE. INTAKE-TRUTH-1 resolves live set structure — layout templates, plate, and N stay Studio production decisions. DISPATCH-HOOK-1 wires the Owner-independent Machine path for sm-001 only; sm-001-monthly remains on Canva.",
+    "sm-001: plannedPostCount ∈ {4,5,6} selected before execution; square-only executable plate; Studio captions; posting order; advisory schedule manifest with date governance; Canva not on the fulfillment spine for this SKU; Make unused; Owner routine NONE. INTAKE-TRUTH-1 resolves live set structure — layout templates, plate, and N stay Studio production decisions. DISPATCH-HOOK-1 wires the Owner-independent Machine path for sm-001. sm-001-monthly is remapped separately by SM-001-MONTHLY-DISPATCH-HOOK-1 (explicit cycle target + locked N).",
 } as const;
 
 export function isDesignRendererSm001Sku(

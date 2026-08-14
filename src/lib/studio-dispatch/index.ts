@@ -122,6 +122,20 @@ export type {
   Sm001DispatchInvocationOutcome,
 } from "./sm-001-dispatch-hook";
 export {
+  mapSm001MonthlyProjectTruthFromJob,
+  customerMonthlyCycleArtifactRootRel,
+  SM_001_MONTHLY_DISPATCH_WIRING_SCOPE_NOTE,
+} from "./map-sm-001-monthly-job-truth";
+export type { Sm001MonthlyTruthMapResult } from "./map-sm-001-monthly-job-truth";
+export {
+  invokeSm001MonthlyDispatchHook,
+  SM_001_MONTHLY_DISPATCH_HOOK_PACKAGE_ID,
+} from "./sm-001-monthly-dispatch-hook";
+export type {
+  Sm001MonthlyDispatchHookResult,
+  Sm001MonthlyDispatchInvocationOutcome,
+} from "./sm-001-monthly-dispatch-hook";
+export {
   buildSm001IdempotencyKey,
   buildSm001IdempotencyTuple,
   fingerprintSm001CalendarInputs,

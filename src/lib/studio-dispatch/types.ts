@@ -71,6 +71,12 @@ export type JobDispatchRecord = {
   /** True only when status is EXECUTION_IDENTITY_READY. */
   executionIdentityReady: boolean;
   ownerActionRequired: false;
+  /**
+   * Explicit sm-001-monthly cycle bind — set only by named-cycle clearance.
+   * Never inferred from newest / last-paid / calendar / array order.
+   * Absent on non-monthly SKUs.
+   */
+  productionCycleId?: string;
 };
 
 export type DispatchExecutionRecord = {
