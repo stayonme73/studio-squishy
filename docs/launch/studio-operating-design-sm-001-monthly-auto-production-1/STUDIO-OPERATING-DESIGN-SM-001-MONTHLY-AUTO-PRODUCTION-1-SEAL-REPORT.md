@@ -26,8 +26,8 @@ Canva-replacement design migration progress after this seal: **8/13**.
 | Dispatch commit message | `feat(monthly): wire explicit cycle target and sm-001-monthly Machine dispatch` |
 | Seal commit message | `docs(operating): seal sm-001-monthly owner-independent auto-production` |
 | Pushed branch | `operating/design-renderer-proof-1` |
-| Branch tip (local = origin) | *(filled after tip-align + push)* |
-| Ahead / behind | *(verified after push — expect 0/0)* |
+| Branch tip (local = origin) | `29407d3ce284f180157becc7b8d41890774453a1` |
+| Ahead / behind | **0 / 0** (verified after push) |
 
 ---
 
