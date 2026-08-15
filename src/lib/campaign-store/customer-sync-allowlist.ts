@@ -72,7 +72,8 @@ export function mergeCustomerOwnedCampaignSync(
     if (incoming.approvedStudioPlan) bootstrapped.approvedStudioPlan = incoming.approvedStudioPlan;
     // paymentReceivedAt / paymentTruth / preAcceptancePaymentAuthorization /
     // postPayActivation / routingHandoff / dispatchExecution / paidCyclePurchases /
-    // sm001MonthlyCyclePeriodTruths / sm001MonthlyProductionCycles
+    // sm001MonthlyCyclePeriodTruths / sm001MonthlyProductionCycles /
+    // sealed post-pay kit structures
     // are server-owned — never bootstrap from untrusted client sync.
     if (incoming.revisionRoundsIncluded != null) {
       bootstrapped.revisionRoundsIncluded = incoming.revisionRoundsIncluded;

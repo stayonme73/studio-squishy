@@ -22,7 +22,10 @@ import {
 import { linkClientCampaign, updateUserCurrentCampaign } from "@/lib/auth/users";
 import type { CampaignRecord } from "@/config/studio-board";
 import { logAccessEvent } from "@/lib/security/access-log";
-import { ensureDispatchExecution } from "@/lib/studio-dispatch";
+import {
+  recoverPaidOperatingChain,
+  wakePaidCampaignEnvelope,
+} from "@/lib/studio-paid-activation-recovery";
 
 export async function GET(request: Request) {
   const user = await requireSession(request);
@@ -48,7 +51,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Access denied" }, { status: 403 });
   }
 
-  return NextResponse.json({ campaign: envelope });
+  const woken = await wakePaidCampaignEnvelope(envelope);
+  return NextResponse.json({ campaign: woken });
 }
 
 export async function PATCH(request: Request) {
@@ -115,9 +119,8 @@ export async function PATCH(request: Request) {
       user.roles.includes("client") ? user.id : undefined,
     );
 
-    // Server-driven dispatch wake (refreshes routing/activation) on paid sync.
     if (envelope.record.paymentTruth?.status === "confirmed") {
-      await ensureDispatchExecution(envelope.record);
+      await recoverPaidOperatingChain(envelope.record);
     }
 
     let updatedUser = user;

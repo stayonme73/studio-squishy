@@ -185,4 +185,49 @@ describe("resolveBoardNextActionPresentation", () => {
       href: studioBoard.routes.deliverables,
     });
   });
+
+  it("does not claim Building Concepts while post-pay activation is pending_retry", () => {
+    const campaign = baseCampaign("BUILDING_CONCEPTS", {
+      paymentReceivedAt: "2026-07-24T12:00:00.000Z",
+      projectDetailsSubmittedAt: "2026-07-24T13:00:00.000Z",
+      paymentTruth: {
+        processor: "stripe",
+        status: "confirmed",
+        currency: "usd",
+        expectedAmountCents: 6900,
+        confirmedAmountCents: 6900,
+        checkoutSessionId: "cs_pending",
+        selectedServiceIds: ["v2-rtu-flyer"],
+        decisionId: "dec_pending",
+        factFingerprint: "fp_pending",
+        draftRevision: 1,
+        confirmedAt: "2026-07-24T12:00:00.000Z",
+      },
+      postPayActivation: {
+        schemaVersion: 1,
+        status: "pending_retry",
+        phase: "awaiting_intake",
+        activatedAt: "2026-07-24T12:00:00.000Z",
+        lastAttemptAt: "2026-07-24T12:00:00.000Z",
+        checkoutSessionId: "cs_pending",
+        jobIds: [],
+        taskCount: 0,
+        intakeComplete: true,
+        blockingRequiredMaterialsCount: 0,
+        ownerActionRequired: false,
+        lastError: "activation failed",
+      },
+    });
+    const presentation = resolveBoardNextActionPresentation({
+      campaign,
+      displayFacts: {
+        blockingRequiredCount: 0,
+        movedToProduction: true,
+        productionGatePassed: true,
+      },
+    });
+    expect(presentation.statusLabel).toBe("Payment confirmed");
+    expect(presentation.lead).toMatch(/still getting your project ready/i);
+    expect(presentation.statusLabel).not.toBe(studioBoard.nextAction.buildingConceptsLabel);
+  });
 });

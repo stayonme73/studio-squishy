@@ -4,11 +4,7 @@ import {
   CUSTOM_STUDIO_PLAN_PACKAGE_ID,
 } from "@/lib/approved-plan-display";
 import type { PreAcceptancePaymentAuthorization } from "@/lib/studio-pre-acceptance/authorization-binding";
-import { ensureMa001PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/ma-001-postpay-composition-dispatch-structure";
-import { ensureRmJ002PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/rm-j002-postpay-kit-dispatch-structure";
-import { ensureRmJ008PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/rm-j008-postpay-kit-dispatch-structure";
-import { ensureBf001PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/bf-001-postpay-kit-dispatch-structure";
-import { ensureRmJ007PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/rm-j007-postpay-kit-dispatch-structure";
+import { applySealedPostPayStructures } from "@/lib/studio-paid-activation-recovery/apply-sealed-structures";
 
 import type { PaymentConfirmationInput } from "./types";
 
@@ -107,47 +103,10 @@ export function applyPaidTruthToCampaignRecord(
     };
   }
 
-  // Durable ma-001 pack structure from sealed payment composition (no remap / no renderer).
-  if (updated.paymentTruth?.ma001CompositionSeal) {
-    const ensured = ensureMa001PostPayDispatchStructureOnCampaign(updated);
-    if (ensured.ok) {
-      updated = ensured.campaign;
-    }
-  }
-
-  // Durable rm-j002 kit structure from sealed payment kit (no remap / no composer).
-  if (updated.paymentTruth?.rmj002KitSeal) {
-    const ensured = ensureRmJ002PostPayDispatchStructureOnCampaign(updated);
-    if (ensured.ok) {
-      updated = ensured.campaign;
-    }
-  }
-
-  // Durable rm-j008 Update Kit structure from sealed payment kit (no remap / no composer).
-  if (updated.paymentTruth?.rmj008KitSeal) {
-    const ensured = ensureRmJ008PostPayDispatchStructureOnCampaign(updated);
-    if (ensured.ok) {
-      updated = ensured.campaign;
-    }
-  }
-
-  // Durable bf-001 refresh package structure from sealed payment package (no remap / no composer).
-  if (updated.paymentTruth?.bf001PackageSeal) {
-    const ensured = ensureBf001PostPayDispatchStructureOnCampaign(updated);
-    if (ensured.ok) {
-      updated = ensured.campaign;
-    }
-  }
-
-  // Durable rm-j007 update structure from sealed payment update (no remap / no composer).
-  if (updated.paymentTruth?.rmj007UpdateSeal) {
-    const ensured = ensureRmJ007PostPayDispatchStructureOnCampaign(updated);
-    if (ensured.ok) {
-      updated = ensured.campaign;
-    }
-  }
-
-  return updated;
+  // Sealed Machine kit/pack structure from payment truth. Failures stay missing
+  // so recovery can retry — never silently treat a sealed purchase as structured.
+  const structured = applySealedPostPayStructures(updated);
+  return structured.campaign;
 }
 
 export function applyCheckoutInitiatedToCampaignRecord(

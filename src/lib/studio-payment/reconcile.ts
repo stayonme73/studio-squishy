@@ -2,6 +2,7 @@ import Stripe from "stripe";
 
 import { studioPaymentV1 } from "@/config/studio-payment-v1";
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
+import { recoverPaidOperatingChain } from "@/lib/studio-paid-activation-recovery";
 
 import { confirmPaymentFromProcessor } from "./confirm";
 import {
@@ -54,21 +55,25 @@ export async function reconcileCheckoutSession(
         entry.checkoutSessionId === checkoutSessionId,
     );
     if (row?.status === "confirmed") {
+      const woken = envelope?.record
+        ? await recoverPaidOperatingChain(envelope.record)
+        : null;
       return {
         ok: true,
         status: "confirmed",
         paid: true,
-        campaign: envelope?.record ?? null,
+        campaign: woken?.campaign ?? envelope?.record ?? null,
         checkoutSessionId,
         message: studioPaymentV1.customerCopy.paymentConfirmed,
       };
     }
   } else if (envelope?.record.paymentReceivedAt) {
+    const woken = await recoverPaidOperatingChain(envelope.record);
     return {
       ok: true,
       status: "confirmed",
       paid: true,
-      campaign: envelope.record,
+      campaign: woken.campaign,
       checkoutSessionId,
       message: studioPaymentV1.customerCopy.paymentConfirmed,
     };

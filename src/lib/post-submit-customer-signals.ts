@@ -8,6 +8,7 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import type { DecisionOutcome } from "@/decision-core/types";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
+import { needsPaidOperatingRecovery } from "@/lib/studio-paid-activation-recovery/needs-recovery";
 
 /** Locked customer primary status after Intake submit, before production gate. */
 export const PROJECT_INTAKE_RECEIVED_STATUS = "Project Intake Received";
@@ -163,6 +164,7 @@ export function mayShowBuildingConceptsCustomerCopy(
   campaign: CampaignRecord | null,
   facts: PostSubmitSignalFacts,
 ): boolean {
+  if (campaign && needsPaidOperatingRecovery(campaign)) return false;
   const mode = resolvePostSubmitCustomerMode(campaign, facts);
   return mode === "pass_through" || mode === "building_concepts_allowed";
 }

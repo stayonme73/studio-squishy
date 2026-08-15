@@ -221,7 +221,7 @@ export async function ensurePostPayActivation(
     const message =
       error instanceof Error ? error.message : "Post-pay activation failed.";
     try {
-      const failed = await writePendingRetry(campaign, message);
+      const failed = await writePendingRetry(working, message);
       return {
         ok: false,
         campaign: failed,

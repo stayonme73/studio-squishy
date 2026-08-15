@@ -1,0 +1,17 @@
+{
+  "package": "STUDIO-OPERATING-PAID-ACTIVATION-RECOVERY-1",
+  "startingControl": "792aa17",
+  "mayaPattern": {
+    "customer": "Maya Brooks",
+    "business": "Cedar & Bloom Home Organizing",
+    "sku": "v2-rtu-flyer",
+    "studioFeeCents": 6900,
+    "hostedStripeReopened": false
+  },
+  "ownerActionRequired": false,
+  "tests": {
+    "package": { "passed": 13, "failed": 0 },
+    "paidPathRelated": { "passed": 89, "failed": 0 },
+    "campaignTasksAndMaterialUse": { "passed": 349, "failed": 0 }
+  }
+}

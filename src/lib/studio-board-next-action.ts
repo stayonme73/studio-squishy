@@ -22,6 +22,7 @@ import {
   resolveWhatHappensNextSentence,
   type StudioBoardDisplayFacts,
 } from "@/lib/studio-board-view";
+import { resolvePaidOperatingRecoveryCustomerCopy } from "@/lib/studio-paid-activation-recovery/customer-copy";
 
 const { nextAction: nextCopy, campaignActions: actionCopy } = studioBoard;
 
@@ -212,6 +213,18 @@ export function resolveBoardNextActionPresentation(
       },
       tone: "default",
       materialsSupportLine: MATERIALS_SUPPORT_INCOMPLETE_INTAKE,
+    });
+  }
+
+  const recovering = resolvePaidOperatingRecoveryCustomerCopy(campaign);
+  if (recovering && (status === "PAYMENT_RECEIVED" || status === "BUILDING_CONCEPTS")) {
+    return presentation({
+      statusLabel: recovering.statusLabel,
+      lead: recovering.lead,
+      hint: recovering.hint,
+      action: null,
+      tone: "waiting",
+      materialsSupportLine: recovering.lead,
     });
   }
 

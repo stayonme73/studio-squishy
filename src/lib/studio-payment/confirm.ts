@@ -5,9 +5,12 @@ import {
   readCampaignEnvelope,
   upsertCampaignRecord,
 } from "@/lib/campaign-store/store";
-import { ensureDispatchExecution } from "@/lib/studio-dispatch";
 import { applyPostPaymentOwnership } from "@/lib/studio-project-claim/post-payment-ownership";
 import { sendProjectClaimRecoveryEmail } from "@/lib/studio-project-claim/send-claim-email";
+import {
+  recoverPaidOperatingChain,
+  sweepPaidActivationRecovery,
+} from "@/lib/studio-paid-activation-recovery";
 
 import { applyPaidTruthToCampaignRecord } from "./apply-paid-record";
 import {
@@ -29,16 +32,20 @@ import type { PaidCyclePurchaseRecord } from "./paid-cycle-types";
 import type { PaymentConfirmationInput, PaymentConfirmationResult } from "./types";
 
 /**
- * Payment stays authoritative even when activation/routing/dispatch fails —
- * pending_retry is detectable and retriable on the next observation.
- *
- * Chain: ensureDispatchExecution → ensureRoutingHandoff → ensurePostPayActivation.
+ * Payment stays authoritative even when activation/routing/dispatch fails.
+ * Immediate retries run here; durable pending_retry remains if still stuck.
+ * A best-effort sweep then wakes other already-paid stranded projects.
  */
 async function activateAfterPayment(
   campaign: CampaignRecord,
 ): Promise<CampaignRecord> {
-  const dispatched = await ensureDispatchExecution(campaign);
-  return dispatched.campaign;
+  const recovered = await recoverPaidOperatingChain(campaign);
+  if (process.env.NODE_ENV !== "test") {
+    void sweepPaidActivationRecovery({
+      excludeCampaignId: campaign.campaignId,
+    }).catch(() => undefined);
+  }
+  return recovered.campaign;
 }
 
 async function finalizeConfirmSuccess(input: {

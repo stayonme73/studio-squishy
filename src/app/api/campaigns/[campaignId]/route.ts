@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { requireReadableCampaign } from "@/lib/campaign-store/server-access";
+import { wakePaidCampaignEnvelope } from "@/lib/studio-paid-activation-recovery";
 
 type RouteContext = {
   params: Promise<{ campaignId: string }>;
@@ -15,5 +16,6 @@ export async function GET(request: Request, context: RouteContext) {
   );
   if (access instanceof NextResponse) return access;
 
-  return NextResponse.json({ campaign: access.campaignEnvelope });
+  const woken = await wakePaidCampaignEnvelope(access.campaignEnvelope);
+  return NextResponse.json({ campaign: woken });
 }
