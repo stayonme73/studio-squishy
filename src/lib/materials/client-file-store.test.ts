@@ -198,6 +198,29 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
     expect(truth.receivedMaterialCount).toBe(1);
   });
 
+  it("keeps an attested optional file stored and under review, not approved for use", async () => {
+    const adapter = createMockFileRoomStorageAdapter();
+    const stored = await storeAndAttachCustomerMaterialFile({
+      adapter,
+      campaign: campaign(),
+      campaignClientUserId: maya.id,
+      tasks: tasks(),
+      materials: materials([logoItem()]),
+      user: maya,
+      file: pngFile(),
+      itemId: logoItem().id,
+      useAuthorizationBasis: "customer_has_permission",
+    });
+
+    expect(stored.ok).toBe(true);
+    if (!stored.ok) return;
+    const item = stored.materials.items[0]!;
+    expect(item.uploadStatus).toBe("stored");
+    expect(item.reviewStatus).toBe("submitted");
+    expect(item.reviewStatus).not.toBe("approved_for_use");
+    expect(item.useAuthorization?.basis).toBe("customer_has_permission");
+  });
+
   it("keeps the first stored file on duplicate bytes and does not treat filename-only as received", async () => {
     const adapter = createMockFileRoomStorageAdapter();
     const file = pngFile();

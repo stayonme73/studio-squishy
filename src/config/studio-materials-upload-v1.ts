@@ -51,5 +51,8 @@ export const studioMaterialsUploadV1 = {
       "If you have a logo file, you may send it. A logo is not required for this flyer.",
     optionalPhotoPrompt:
       "If you have a photo, you may send it. Photos are not required for this flyer.",
+    storedFileStillAttached(fileName: string): string {
+      return `We have ${fileName} stored with this project.`;
+    },
   },
 } as const;

@@ -5,7 +5,7 @@ import { needsPaidOperatingRecovery } from "@/lib/studio-paid-activation-recover
 import { studioReviewEligibilityV1 } from "@/config/studio-review-eligibility-v1";
 import { evaluateReviewEligibility } from "@/lib/studio-review-eligibility";
 import { deriveCorrectionAccounting } from "@/lib/job-control/correction-round-ledger";
-import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer";
+import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer/types";
 
 import type {
   CustomerLifeInput,

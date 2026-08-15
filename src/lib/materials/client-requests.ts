@@ -63,6 +63,8 @@ export type ConsolidatedClientRequest = {
   canSubmit: boolean;
   submittedAt?: string;
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
+  /** Customer-facing stored filename only — never a checksum, path, or item id. */
+  fileName?: string;
 };
 
 /** Client API payload — no internal IDs or mapping fields (Slice 3d-c-c L4). */
@@ -79,6 +81,7 @@ export type ClientConsolidatedRequest = {
   isPendingReview: boolean;
   submittedAt?: string;
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
+  fileName?: string;
 };
 
 export type OptionalClientRequest = {
@@ -94,6 +97,7 @@ export type OptionalClientRequest = {
   isPendingReview: boolean;
   submittedAt?: string;
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
+  fileName?: string;
 };
 
 /** Client API payload for optional rows (Slice 3d-c-c L4). */
@@ -109,6 +113,7 @@ export type ClientOptionalRequest = {
   isPendingReview: boolean;
   submittedAt?: string;
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
+  fileName?: string;
 };
 
 export function isClientIntakeMaterialItem(item: CampaignMaterialItem): boolean {
@@ -116,12 +121,16 @@ export function isClientIntakeMaterialItem(item: CampaignMaterialItem): boolean 
 }
 
 export function canClientSubmitMaterialItem(item: CampaignMaterialItem): boolean {
+  if (
+    item.reviewStatus === "approved_for_use" ||
+    item.reviewStatus === "not_needed" ||
+    item.reviewStatus === "blocked_from_use" ||
+    item.reviewStatus === "owner_policy_review"
+  ) {
+    return false;
+  }
   if (CLIENT_SUBMIT_STATUSES.has(item.reviewStatus)) return true;
-  return (
-    item.contentKind === "file-metadata" &&
-    item.reviewStatus === "submitted" &&
-    item.uploadStatus !== "stored"
-  );
+  return item.contentKind === "file-metadata" && item.reviewStatus === "submitted";
 }
 
 export function consolidatedRequestId(
@@ -240,6 +249,15 @@ function latestSubmittedAt(items: readonly CampaignMaterialItem[]): string | und
     .at(-1);
 }
 
+function latestStoredCustomerFileName(
+  items: readonly CampaignMaterialItem[],
+): string | undefined {
+  const named = items
+    .filter((item) => item.uploadStatus === "stored" && Boolean(item.fileName?.trim()))
+    .sort((a, b) => (a.submittedAt ?? "").localeCompare(b.submittedAt ?? ""));
+  return named.at(-1)?.fileName?.trim();
+}
+
 function clientAvailabilityForItems(
   items: readonly CampaignMaterialItem[],
 ): CampaignMaterialItem["clientAvailability"] {
@@ -331,6 +349,7 @@ export function resolveConsolidatedClientRequests(
         canSubmit,
         submittedAt: latestSubmittedAt(visibleItems),
         clientAvailability: clientAvailabilityForItems(visibleItems),
+        fileName: latestStoredCustomerFileName(visibleItems),
       };
     });
 }
@@ -351,6 +370,7 @@ export function sanitizeClientConsolidatedRequests(
     isPendingReview: request.isPendingReview,
     submittedAt: request.submittedAt,
     clientAvailability: request.clientAvailability,
+    ...(request.fileName ? { fileName: request.fileName } : {}),
   }));
 }
 
@@ -385,6 +405,7 @@ export function resolveOptionalClientRequests(
         isPendingReview: item.reviewStatus === "submitted",
         submittedAt: item.submittedAt,
         clientAvailability: item.clientAvailability,
+        fileName: latestStoredCustomerFileName([item]),
       };
     });
 }
@@ -404,6 +425,7 @@ export function sanitizeClientOptionalRequests(
     isPendingReview: request.isPendingReview,
     submittedAt: request.submittedAt,
     clientAvailability: request.clientAvailability,
+    ...(request.fileName ? { fileName: request.fileName } : {}),
   }));
 }
 

@@ -4,6 +4,7 @@ import type { ApprovedStudioPlanLineItem, CampaignRecord } from "@/config/studio
 
 import {
   buildApprovedServiceNameLookup,
+  canClientSubmitMaterialItem,
   consolidatedRequestId,
   countClientIntakeMaterials,
   resolveConsolidatedClientRequests,
@@ -198,6 +199,35 @@ describe("resolveOptionalClientRequests", () => {
 
     expect(resolveOptionalClientRequests(record)).toHaveLength(1);
     expect(resolveOptionalClientRequests(record)[0]?.itemId).toBe("opt-1");
+  });
+
+  it("keeps a stored optional file sendable and names the stored file for the customer", () => {
+    const stored: CampaignMaterialItem = {
+      id: "logo-opt",
+      category: "logo-brand",
+      requirementLevel: "optional",
+      reviewStatus: "submitted",
+      contentKind: "file-metadata",
+      label: "Logo file",
+      reason: "Make Me a Flyer",
+      relatedServiceIds: ["v2-rtu-flyer"],
+      uploadStatus: "stored",
+      fileName: "maya-optional-mark.png",
+      submittedAt: now,
+    };
+    expect(canClientSubmitMaterialItem(stored)).toBe(true);
+    expect(
+      canClientSubmitMaterialItem({ ...stored, reviewStatus: "approved_for_use" }),
+    ).toBe(false);
+
+    const optional = resolveOptionalClientRequests({
+      campaignId: "c-stored-optional",
+      items: [stored],
+      updatedAt: now,
+      version: 1,
+    });
+    expect(optional[0]?.canSubmit).toBe(true);
+    expect(optional[0]?.fileName).toBe("maya-optional-mark.png");
   });
 });
 

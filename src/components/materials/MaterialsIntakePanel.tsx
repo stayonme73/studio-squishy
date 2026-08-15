@@ -529,6 +529,11 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           {materialsConfig.clientNeedsClarificationBody}
                         </p>
                       ) : null}
+                      {request.fileName ? (
+                        <p className="sb-materials-intake__stored-file" role="status">
+                          {studioMaterialsUploadV1.customerCopy.storedFileStillAttached(request.fileName)}
+                        </p>
+                      ) : null}
                     </div>
                     {request.canSubmit ? (
                       <>
@@ -621,6 +626,11 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                       {request.reviewStatus === "needs_clarification" ? (
                         <p className="sb-materials-intake__clarify" role="status">
                           {materialsConfig.clientNeedsClarificationBody}
+                        </p>
+                      ) : null}
+                      {request.fileName ? (
+                        <p className="sb-materials-intake__stored-file" role="status">
+                          {studioMaterialsUploadV1.customerCopy.storedFileStillAttached(request.fileName)}
                         </p>
                       ) : null}
                     </div>

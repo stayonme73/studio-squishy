@@ -1,0 +1,103 @@
+{
+  "packageId": "STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1",
+  "kind": "customer-board-walk",
+  "recordedAt": "2026-08-15T15:00:45.106Z",
+  "baseUrl": "http://127.0.0.1:3066",
+  "commitHint": "1debce469715f5ff9fbd0d98edb66cd609151b8f",
+  "runId": "8f772ca1-e79c-4a9d-a1a2-10424245054b",
+  "totals": {
+    "passed": 15,
+    "failed": 0,
+    "blocked": 0,
+    "total": 15
+  },
+  "verdict": "MATERIALS UPLOAD & RECEIPT READY FOR CLOSE",
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (external)"
+    },
+    {
+      "check": "maya_fixture",
+      "status": "PASS",
+      "detail": "Maya Brooks paid $69 flyer, intake complete, no invented business facts."
+    },
+    {
+      "check": "sign_in_opens_board",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066/studio-board",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-materials-upload-and-receipt-1\\customer-board-walk\\shots\\01-signed-in-board.png"
+    },
+    {
+      "check": "no_false_logo_required_blocker",
+      "status": "PASS",
+      "detail": "Optional logo/photo copy. Wordmark-only flyer not blocked.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-materials-upload-and-receipt-1\\customer-board-walk\\shots\\02-optional-materials-before-upload.png"
+    },
+    {
+      "check": "no_internal_id_required",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066/studio-board"
+    },
+    {
+      "check": "stored_file_acknowledgement",
+      "status": "PASS",
+      "detail": "Customer-safe stored receipt on Board after Send to Studio.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-materials-upload-and-receipt-1\\customer-board-walk\\shots\\03-stored-receipt.png"
+    },
+    {
+      "check": "uploaded_is_not_approved_for_use",
+      "status": "PASS",
+      "detail": "Allowed PNG stored as received / under review. Not auto-approved for use."
+    },
+    {
+      "check": "duplicate_upload_customer_safe",
+      "status": "PASS",
+      "detail": "Same file sent again. First copy kept.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-materials-upload-and-receipt-1\\customer-board-walk\\shots\\04-duplicate-kept.png"
+    },
+    {
+      "check": "ledger_has_stored_bytes",
+      "status": "PASS",
+      "detail": "maya-optional-mark.png checksum=c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77"
+    },
+    {
+      "check": "fresh_context_sign_in",
+      "status": "PASS",
+      "detail": "cookies=1 localCampaignAfterLoad=true"
+    },
+    {
+      "check": "fresh_context_file_still_attached",
+      "status": "PASS",
+      "detail": "Fresh context shows the same stored filename attached to the project.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-materials-upload-and-receipt-1\\customer-board-walk\\shots\\05-fresh-context-return.png"
+    },
+    {
+      "check": "fresh_context_still_not_approved_for_use",
+      "status": "PASS"
+    },
+    {
+      "check": "stored_file_persists_after_return",
+      "status": "PASS",
+      "detail": "same checksum c414cd0e204de974f73753c7e28d7638e7b3691bb8b1a2bab6b25bb7fed7ce77"
+    },
+    {
+      "check": "owner_intervention",
+      "status": "PASS",
+      "detail": "NONE. No Tagia download/re-upload. No Owner desk."
+    },
+    {
+      "check": "no_tagia_inbox_or_manual_bridge",
+      "status": "PASS",
+      "detail": "Account, payment fixture, and verification are scripted. Customer Board used for upload/return."
+    }
+  ],
+  "notes": [
+    "Walk used Studio Board materials UI (Choose file + Send to Studio). Not an API-only substitute.",
+    "Fresh Playwright context = new browser with empty cookies/localStorage.",
+    "Maya facts unchanged: Cedar & Bloom, Make Me a Flyer $69, wordmark-only allowed.",
+    "Email verification used markEmailVerified (no Tagia inbox).",
+    "Board opened at /studio-board with no campaignId in the URL."
+  ]
+}

@@ -315,6 +315,8 @@ export async function storeAndAttachCustomerMaterialFile(input: {
     ids.includes(item.id)
       ? {
           ...item,
+          // Stored is not approved for use. Team still reviews fitness.
+          reviewStatus: "submitted" as const,
           uploadStatus: "stored" as const,
           fileName: input.file.name,
           mimeType: metadata.contentType,

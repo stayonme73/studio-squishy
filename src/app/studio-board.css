@@ -19,6 +19,8 @@
 .studio-utility-scene--studio-board .sb-main,
 .studio-utility-scene--studio-board .sb--v4 .sb-main {
   background: transparent;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .studio-utility-scene--studio-board .sb-sidebar {

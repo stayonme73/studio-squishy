@@ -3,8 +3,8 @@
 **Package:** STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1  
 **Room:** 1 — Customer Life + Communication (this section only)  
 **Branch:** `operating/design-renderer-proof-1`  
-**Scout status:** PARKED — ready for Manager review · **no merge**  
-**Starting control:** Room 1 not closed. Previous customer-life package `c713cb7` found the live upload path was **filename / metadata, not file bytes**. This package closes that seam.
+**Scout status:** PARKED — ready for Manager close · **no merge**  
+**Starting control:** Room 1 not closed. Previous customer-life package `c713cb7` found the live upload path was **filename / metadata, not file bytes**. This package closes that seam after BUILD → BREAK → CUSTOMER-USE → FIX → RETEST.
 
 Maya fixture (unchanged): Maya Brooks · Cedar & Bloom Home Organizing · Back-to-School Reset · Make Me a Flyer / `v2-rtu-flyer` / Studio fee **$69**. No new customer facts. Sealed flyer law still holds: `FLYER_PROOF_CONTRACT.customerLogoRequired === false`. Wordmark-only is allowed.
 
@@ -12,21 +12,13 @@ Maya fixture (unchanged): Maya Brooks · Cedar & Bloom Home Organizing · Back-t
 
 ## A. Overall verdict
 
-**READY FOR MANAGER REVIEW — WORKS, WITH ONE LIVE WALK STILL DUE**
+**READY FOR MANAGER CLOSE — LIVE MAYA BOARD LOOP PASSED**
 
-Maya can finish flyer intake without a forced logo. If she sends a real file from the customer materials panel, The Studio now:
+Maya can finish flyer intake without a forced logo. She signed in, opened Studio Board with no internal ID, uploaded a real allowed PNG through the customer materials UI, saw a stored-file acknowledgement, left, opened a genuinely fresh browser, signed in again, and the same file was still attached and retrievable. Duplicate keep-first and “uploaded is not approved for use” held on that same walk.
 
-1. accepts the bytes  
-2. stores them privately (Supabase File Room when configured; durable local File Room objects in non-production when it is not)  
-3. ties them to Maya’s project and purchased job  
-4. acknowledges from **stored** truth, not a filename string  
-5. updates the materials ledger and job file registry so the Machine knows the file is present  
-6. lets the authorized production path retrieve the actual bytes  
-7. refuses empty / oversize / unsupported files, keeps the first copy of a duplicate, and fails closed if another customer tries to read Maya’s file  
+Owner routine = **NONE**. No new paid tool. Voice/comms was not started.
 
-`uploaded` is still not `approved_for_use`. Frozen product law was not rewritten. Owner routine = **NONE**. No new paid tool. Make and Canva were not added.
-
-This package did not open Voice, Review, Owner Console, or Room 2.
+This package did not open Review, Owner Console, or Room 2.
 
 ---
 
@@ -123,11 +115,35 @@ The file also sits on the job File Room registry with a private object ref. No T
 
 ---
 
-## H. Return-later proof
+## H. Return-later / live Board walk proof
 
-Not localStorage. Campaign materials envelope is the durable ledger (`data/campaign-materials/` locally). File bytes are File Room objects (Supabase private storage in production; `data/file-room-objects/` when cloud storage is not configured in non-production). A new adapter instance still downloaded Maya’s PNG in test.
+Not localStorage as source of truth. Campaign materials envelope is the durable ledger (`data/campaign-materials/` locally). File bytes are File Room objects (Supabase private storage in production; `data/file-room-objects/` when cloud storage is not configured in non-production).
 
-No live Maya campaign was sitting in this workspace’s `data/` to re-open in a browser this pass. The customer UI path is the Board / Campaign Record materials panel, which now sends real files.
+**Live Maya Board loop (required close-the-loop; not an API-only substitute):**
+
+Script: `scripts/studio-operating-materials-upload-and-receipt-1-board-walk.mts`  
+Evidence: `docs/launch/studio-operating-materials-upload-and-receipt-1/customer-board-walk/`  
+Fixture: Maya Brooks · Cedar & Bloom · paid Make Me a Flyer **$69** · intake complete · wordmark-only. Unique sandbox email per run. Board opened at `/studio-board` with **no** `campaignId` in the URL.
+
+| Step | Result |
+|------|--------|
+| Maya signs in → Studio Board | PASS — Cedar & Bloom, no internal ID |
+| No false logo-required blocker | PASS — optional logo/photo copy |
+| Upload real allowed PNG through Choose file + Send to Studio | PASS |
+| Customer acknowledgement | PASS — “We received your file. The Studio has stored it with this project. Uploaded is not the same as approved for use.” |
+| Wrong / allowed-but-not-approved file | PASS — 1×1 PNG stored as received / under review, **not** `approved_for_use` |
+| Duplicate same bytes | PASS — “We already have this exact file on your project. You do not need to send it again.” |
+| Leave / fresh browser context / sign in again | PASS — new Playwright context, empty cookies, then session restored the same project |
+| Same file still attached and retrievable | PASS — Board shows `We have maya-optional-mark.png stored with this project.` Same checksum after return |
+| Owner / Tagia intervention | **NONE** |
+
+Walk checks: **15 passed / 0 failed**. Shots `01`–`05` in `customer-board-walk/shots/`.
+
+Walk defects found and fixed before close:
+
+- Attested optional logo was auto-promoted to `approved_for_use`, so the Board row and stored receipt disappeared. Stored bytes now stay `submitted` (received / under review). Customer attestation is not flyer-use approval.
+- Board materials card sat below a no-scroll desktop grid, so Maya could not reach Send to Studio as a visible action. Studio Board main column now scrolls to that panel.
+- Next could not serve the Board while Playwright leaked through the design-renderer barrel into a client component. `assemble-truth` now imports the flyer SKU from `types`, not the barrel.
 
 ---
 
@@ -175,6 +191,8 @@ Storage reuses File Room. Local FS fallback exists only when Supabase env is mis
 | Optional file send hidden behind a closed “add more” toggle | Optional list starts open; optional prompts are explicit |
 | Board “still need” cards submitting campaign-goal **text** for file slots | File-metadata cards removed from that text workflow; real upload panel used |
 | Filename-only later blocked from sending the actual file | Customer can upgrade a metadata row to stored bytes |
+| Optional attested upload auto-“Approved” a 1×1 PNG and hid the receipt | Stored files stay submitted / under review; receipt + filename remain on Board |
+| Desktop Board clipped the materials upload panel | Board main column can scroll to Choose file / Send to Studio |
 
 ---
 
@@ -182,28 +200,27 @@ Storage reuses File Room. Local FS fallback exists only when Supabase env is mis
 
 Targeted run (this package): **92 passed** across materials, Maya customer-life, flyer mapping, intake tablet status, File Room storage, job communication.
 
-Follow-up: client-file-store return-later, Board next-action, Maya paid-activation customer-eyes: **17 passed**.
+After live-walk corrections: materials + Maya customer-life + material-use **92 passed** (12 files). Added attested-store case: stored file is not `approved_for_use`.
 
-Communication “return to queue” was updated so a required logo that is only metadata_only / unauthorized no longer counts as received for Machine unwait. That matches uploaded ≠ approved for use.
+Live Board walk: **15 passed / 0 failed**.
 
-Unrelated `current-identity.json` / auth ledger dirt on the branch was **not** included.
+Unrelated `current-identity.json` / renderer artifact / auth ledger dirt on the branch was **not** included.
 
 ---
 
 ## N. Remaining limits
 
-- A **live signed-in Maya Board click** (choose file → Send → see receipt → leave → sign in again) was not executed here because this workspace had no Maya campaign data to open. The customer path is implemented; Owner/Manager visual walk is still the close-the-loop check.  
 - Production still needs configured private storage (existing File Room / Supabase). Local FS is the non-production stand-in, not a second product.  
-- Email / Voice TELL loop is **out of this package** (next Room 1 section).  
+- Email / Voice TELL loop is **out of this package** (next Room 1 section). Do not start it in this package.  
 - Review + revision full loop is **out of this package**.  
-- Uploaded optional files still wait on team use-review before they may enter the flyer. That is preserved law, not a defect.  
+- Uploaded optional files still wait on team use-review before they may enter the flyer. Customer permission attestation is not flyer-use approval.  
 - Shared mixed-SKU intake materials label is first-writer-wins from the schemas (business card vs flyer). Flyer-only Maya gets the wordmark-safe flyer copy.
 
 ---
 
 ## O. Commit / push state
 
-Local commit `25c963b` on `operating/design-renderer-proof-1` with this package’s source, tests, and report. **Not pushed. Not merged.** Branch is ahead of origin.
+Implementation commit `25c963b`. Walk close commit recorded after this report. Branch `operating/design-renderer-proof-1` pushed to origin. **Not merged.**
 
 ---
 
@@ -211,8 +228,6 @@ Local commit `25c963b` on `operating/design-renderer-proof-1` with this package�
 
 Do **not** open Owner Console, customer-facing truth cleanup, rehearsal, or soft opening.
 
-**Next:** `STUDIO-OPERATING-VOICE-MACHINE-AND-CUSTOMER-COMMUNICATION-1`
+**Recommended next (do not start until Tagia closes this package):** `STUDIO-OPERATING-VOICE-MACHINE-AND-CUSTOMER-COMMUNICATION-1`
 
 Continue Maya Brooks / Cedar & Bloom / Make Me a Flyer $69. Purpose: Studio Voice + Machine + customer communication still inside Room 1 — Maya is told from Machine truth at the right beats, without treating Board-only awareness as a delivered notice if that is still the gap. Then Review + Revision full loop. Then email/notification delivery + watchdog/failure drills.
-
-Park this materials package until Tagia walks or accepts the live upload path.
