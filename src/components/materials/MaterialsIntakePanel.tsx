@@ -19,6 +19,7 @@ type MaterialsClientResponse = {
   optionalRequests?: ClientOptionalRequest[];
   syncedAt?: string;
   error?: string;
+  receiptMessage?: string;
 };
 
 type FileSelectionState = {
@@ -197,6 +198,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
   const [showOptional, setShowOptional] = useState(false);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
+  const [receiptMessage, setReceiptMessage] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, ClientSubmitPayload>>({});
   const [fileSelections, setFileSelections] = useState<Record<string, FileSelectionState>>({});
   const materialsEndpoint = `/api/campaigns/${encodeURIComponent(campaign.campaignId)}/materials?audience=client`;
@@ -318,6 +320,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     setSubmittingId(request.id);
     setError(null);
     setSuccessId(null);
+    setReceiptMessage(null);
     try {
       if (
         requiresUseAttestation(request.category) &&
@@ -338,6 +341,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
       if (!res.ok) throw new Error(json.error ?? `Submit failed (${res.status})`);
       setData(json);
       setSuccessId(request.id);
+      setReceiptMessage(json.receiptMessage ?? materialsConfig.clientSubmitSuccess);
       window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
       onSubmitted?.();
     } catch (submitError) {
@@ -351,6 +355,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     setSubmittingId(request.id);
     setError(null);
     setSuccessId(null);
+    setReceiptMessage(null);
     try {
       if (
         requiresUseAttestation(request.category) &&
@@ -371,6 +376,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
       if (!res.ok) throw new Error(json.error ?? `Submit failed (${res.status})`);
       setData(json);
       setSuccessId(request.id);
+      setReceiptMessage(json.receiptMessage ?? materialsConfig.clientSubmitSuccess);
       window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
       onSubmitted?.();
     } catch (submitError) {
@@ -494,7 +500,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                         </button>
                         {successId === request.id ? (
                           <p className="sb-materials-intake__success" role="status">
-                            {materialsConfig.clientSubmitSuccess}
+                            {receiptMessage ?? materialsConfig.clientSubmitSuccess}
                           </p>
                         ) : null}
                       </>
@@ -588,7 +594,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                         </button>
                         {successId === request.id ? (
                           <p className="sb-materials-intake__success" role="status">
-                            {materialsConfig.clientSubmitSuccess}
+                            {receiptMessage ?? materialsConfig.clientSubmitSuccess}
                           </p>
                         ) : null}
                       </>

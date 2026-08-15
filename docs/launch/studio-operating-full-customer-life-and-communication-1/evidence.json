@@ -1,0 +1,27 @@
+{
+  "package": "STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1",
+  "startingControl": "6e24e43",
+  "mayaPattern": {
+    "customer": "Maya Brooks",
+    "business": "Cedar & Bloom Home Organizing",
+    "offer": "Back-to-School Reset",
+    "sku": "v2-rtu-flyer",
+    "serviceName": "Make Me a Flyer",
+    "studioFeeCents": 6900,
+    "revisionRoundsIncluded": 1,
+    "newCustomerFactsInvented": false,
+    "hostedStripeReopened": false,
+    "makeAdded": false,
+    "canvaReintroduced": false,
+    "newPaidToolAdded": false
+  },
+  "ownerActionRequired": false,
+  "loop": "KNOW → ASSIGN → ACKNOWLEDGE → DO → CHECK → RECORD → TELL → RECOVER",
+  "tests": {
+    "customerLife": { "passed": 15, "failed": 0 },
+    "paidPathRelated": { "passed": 80, "failed": 0, "suites": "customer-life + dispatch + paid-activation-recovery + review-room + approved-delivery + guide-answer-resolve" },
+    "knownUnrelated": {
+      "jobCommunicationMaterialsReturnedToQueue": "pre-existing assertion uses sku ma-flyer-v2; not part of this package scope"
+    }
+  }
+}

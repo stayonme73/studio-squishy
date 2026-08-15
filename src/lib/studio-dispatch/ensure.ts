@@ -4,6 +4,7 @@ import { upsertCampaignRecord, readCampaignEnvelope } from "@/lib/campaign-store
 import { applySm001MonthlyDispatchTargetMirror } from "@/lib/studio-monthly-production-cycle";
 import { ensureRoutingHandoff } from "@/lib/studio-routing-handoff";
 
+import { ensureFlyerMachineReviewBind } from "@/lib/studio-customer-life/machine-review-bind";
 import { runDesignRendererDispatchObserver } from "./design-renderer-observer";
 import { evaluateJobDispatch } from "./evaluate";
 import type {
@@ -89,12 +90,16 @@ async function attachDesignRendererObserver(input: {
     envelope?.clientUserId,
   );
 
+  const boundCampaign = await ensureFlyerMachineReviewBind(saved.record);
+  const boundObserver =
+    boundCampaign.dispatchExecution?.designRendererObserver ?? observer;
+
   return {
     ok: true,
-    campaign: saved.record,
-    dispatch: dispatchWithObserver,
+    campaign: boundCampaign,
+    dispatch: boundCampaign.dispatchExecution ?? dispatchWithObserver,
     alreadyEvaluated: input.alreadyEvaluated,
-    designRendererObserver: observer,
+    designRendererObserver: boundObserver,
   };
 }
 

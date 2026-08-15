@@ -5,6 +5,7 @@ import {
   upsertCampaignRecord,
 } from "@/lib/campaign-store/store";
 import type { ServerCampaignEnvelope } from "@/lib/campaign-store/types";
+import { ensureFlyerMachineReviewBind } from "@/lib/studio-customer-life/machine-review-bind";
 import { ensureDispatchExecution } from "@/lib/studio-dispatch";
 
 import { applySealedPostPayStructures } from "./apply-sealed-structures";
@@ -62,13 +63,14 @@ export async function recoverPaidOperatingChain(
   }
 
   if (!needsPaidOperatingRecovery(campaign)) {
+    const bound = await ensureFlyerMachineReviewBind(campaign);
     return {
       ok: true,
       recovered: false,
       needsRecovery: false,
       alreadyClear: true,
       ownerActionRequired: false,
-      campaign,
+      campaign: bound,
       reason: "already_clear",
       attempts: 0,
     };
@@ -86,6 +88,7 @@ export async function recoverPaidOperatingChain(
     lastError = result.lastError;
 
     if (!needsPaidOperatingRecovery(working)) {
+      working = await ensureFlyerMachineReviewBind(working);
       return {
         ok: true,
         recovered: true,
@@ -117,7 +120,12 @@ export async function recoverPaidOperatingChain(
 export async function wakePaidCampaignEnvelope(
   envelope: ServerCampaignEnvelope,
 ): Promise<ServerCampaignEnvelope> {
-  if (!needsPaidOperatingRecovery(envelope.record)) return envelope;
+  if (!needsPaidOperatingRecovery(envelope.record)) {
+    const bound = await ensureFlyerMachineReviewBind(envelope.record);
+    if (bound === envelope.record) return envelope;
+    const latest = await readCampaignEnvelope(envelope.campaignId);
+    return latest ?? { ...envelope, record: bound };
+  }
   const recovered = await recoverPaidOperatingChain(envelope.record);
   const latest = await readCampaignEnvelope(envelope.campaignId);
   return latest ?? { ...envelope, record: recovered.campaign };

@@ -279,3 +279,24 @@
     box-shadow: 0 0 0 0 transparent;
   }
 }
+
+.voiceReply {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(40, 36, 24, 0.55);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: rgba(247, 244, 238, 0.96);
+}
+
+.voiceReplyLabel {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.95);
+}

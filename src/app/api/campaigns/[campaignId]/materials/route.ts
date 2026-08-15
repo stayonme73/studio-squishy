@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { studioCustomerLifeV1 } from "@/config/studio-customer-life-v1";
 
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
 import { isNextResponse, requireSession } from "@/lib/auth/require-session";
@@ -291,6 +291,10 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   return NextResponse.json({
     ...payload,
+    receiptMessage:
+      submittedItemIds.length > 0
+        ? studioCustomerLifeV1.customerCopy.materialReceivedAck
+        : undefined,
     syncedAt: saved.syncedAt,
   });
 }

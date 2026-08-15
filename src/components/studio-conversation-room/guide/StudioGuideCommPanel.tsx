@@ -36,6 +36,8 @@ export type StudioGuideCommPanelProps = {
   onSubmitGuideAnswer: () => void;
   /** Free-ask note after guide questions. */
   onSendMessage: () => void;
+  /** Latest truthful Voice reply from the Machine record. */
+  studioVoiceReply?: string | null;
 };
 
 /**
@@ -58,6 +60,7 @@ function StudioGuideCommPanel({
   onStopListening,
   onSubmitGuideAnswer,
   onSendMessage,
+  studioVoiceReply = null,
 }: StudioGuideCommPanelProps) {
   const v = conversationRoomGuideV1;
   const textRef = useRef<HTMLInputElement | null>(null);
@@ -232,6 +235,13 @@ function StudioGuideCommPanel({
         </p>
       ) : null}
 
+      {studioVoiceReply ? (
+        <p className={styles.voiceReply} aria-live="polite">
+          <span className={styles.voiceReplyLabel}>{v.studioVoiceSaysLabel}</span>
+          {studioVoiceReply}
+        </p>
+      ) : null}
+
       <button
         ref={sendRef}
         type="button"
@@ -257,6 +267,7 @@ export default memo(StudioGuideCommPanel, (prev, next) => {
     prev.interimTranscript === next.interimTranscript &&
     prev.savedPulse === next.savedPulse &&
     prev.isAnsweringQuestion === next.isAnsweringQuestion &&
-    prev.answerRequired === next.answerRequired
+    prev.answerRequired === next.answerRequired &&
+    prev.studioVoiceReply === next.studioVoiceReply
   );
 });

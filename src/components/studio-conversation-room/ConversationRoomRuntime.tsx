@@ -10,6 +10,7 @@ import StudioGuideTabletView, {
   STUDIO_GUIDE_MIC_PRIVACY_NOTE,
 } from "@/components/studio-conversation-room/guide/StudioGuideTabletView";
 import StudioConversationRoom from "@/components/studio-conversation-room/StudioConversationRoom";
+import { answerCustomerLifeQuestion } from "@/lib/studio-customer-life/answer-question";
 import {
   conversationRoomGuideV1,
   getConversationRoomGuideQuestion,
@@ -295,6 +296,7 @@ export default function ConversationRoomRuntime({
   );
   const [studioSpeaking, setStudioSpeaking] = useState(false);
   const [askMode, setAskMode] = useState(false);
+  const [studioVoiceReply, setStudioVoiceReply] = useState<string | null>(null);
   const [planBridgeError, setPlanBridgeError] = useState<string | null>(null);
   /** Live Intake answers for tablet status + post-refresh restore mirror. */
   const [intakeLiveAnswers, setIntakeLiveAnswers] =
@@ -1519,17 +1521,45 @@ export default function ConversationRoomRuntime({
     setListening(false);
   }
 
-  /** Free-form customer message — available on every screen, including after save. */
+  /** Free-form customer question — Voice answers from the Machine record. */
   function handleSendMessage() {
     const trimmed = textDraftRef.current.trim();
     if (!trimmed) return;
     setError(null);
     stopConversationDictation();
     setListening(false);
-    /* Typed note acknowledged — no conversational reply is generated. */
-    pulseSaved();
     writeTextDraft("");
     setInterimTranscript("");
+    const campaign = readCurrentCampaignHydrated();
+    const fallback = answerCustomerLifeQuestion(trimmed, {
+      campaign,
+      materials: [],
+      tasks: null,
+    });
+    void (async () => {
+      try {
+        const response = await fetch("/api/studio-customer-life/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            campaignId: campaign?.campaignId ?? null,
+            question: trimmed,
+          }),
+        });
+        if (!response.ok) {
+          setStudioVoiceReply(fallback.text);
+          speakStudioLine(fallback.text);
+          return;
+        }
+        const payload = (await response.json()) as { answer?: { text?: string } };
+        const text = payload.answer?.text?.trim() || fallback.text;
+        setStudioVoiceReply(text);
+        speakStudioLine(text);
+      } catch {
+        setStudioVoiceReply(fallback.text);
+        speakStudioLine(fallback.text);
+      }
+    })();
   }
 
   const serviceIdsForIntake = useMemo(() => {
@@ -1809,6 +1839,7 @@ export default function ConversationRoomRuntime({
           onStopListening={handleStopListening}
           onSubmitGuideAnswer={handleContinue}
           onSendMessage={handleSendMessage}
+          studioVoiceReply={studioVoiceReply}
         />
         </>
       }
