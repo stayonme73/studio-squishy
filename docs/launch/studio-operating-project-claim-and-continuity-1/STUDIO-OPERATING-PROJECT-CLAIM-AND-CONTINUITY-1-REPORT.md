@@ -115,7 +115,7 @@ Tagia should not need to manually match payments to customers for the happy path
 
 ## Commit state
 
-Scoped implementation present in worktree (claim lib, payment confirm/create wiring, claim API, claim page, Board resume, auth ledger). Unrelated design-renderer `current-identity` / render churn must stay out of this commit. **No merge.**
+Scoped implementation committed as `9ee8595` on `operating/design-renderer-proof-1` (claim lib, payment confirm/create wiring, claim API, claim page, Board resume, auth ledger). Unrelated design-renderer `current-identity` / render churn left unstaged. **No merge.**
 
 ## Recommended next broad package
 
