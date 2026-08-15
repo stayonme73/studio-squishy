@@ -168,6 +168,22 @@ describe("review-room access", () => {
       }),
     ).toBe(false);
     expect(canClientAccessJobReview({ spineStatus: "building_concepts" })).toBe(false);
+    expect(canClientViewJobReview({ spineStatus: "building_concepts" }, null)).toBe(false);
+  });
+
+  it("keeps Review Room closed to customer artifacts when only the sidebar can be seen", () => {
+    expect(
+      canClientAccessJobReview({
+        spineStatus: "building_concepts",
+        internalQaReviewAuthorization: null,
+      }),
+    ).toBe(false);
+    expect(
+      canClientViewJobReview(
+        { spineStatus: "building_concepts" },
+        null,
+      ),
+    ).toBe(false);
   });
 
   it("allows read-only view of submitted packages after spine leaves ready_for_review", () => {

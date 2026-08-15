@@ -130,6 +130,24 @@ function recordsForHash(
   );
 }
 
+function flyerQaRecords(envelope: ServerTasksEnvelope | null | undefined) {
+  return (envelope?.qaRecords ?? []).filter((record) =>
+    record.taskId.includes("v2-rtu-flyer"),
+  );
+}
+
+/** Latest flyer QA is an unresolved fail/block. Wake must not reopen Review. */
+export function latestFlyerQaIsUnresolvedFail(
+  envelope: ServerTasksEnvelope | null | undefined,
+): boolean {
+  const flyerQa = [...flyerQaRecords(envelope)].sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt),
+  );
+  if (flyerQa.length === 0) return false;
+  const last = flyerQa[flyerQa.length - 1]!;
+  return last.action === "qa_fail" || last.action === "qa_block";
+}
+
 /**
  * Connect sealed flyer renderer identity to Kitchen QA + Review eligibility.
  * Renderer success alone is not customer-ready: missing or failing design-qa
@@ -212,7 +230,34 @@ export function bindFlyerIdentityToQaRecords(input: {
   }
 
   if (!evidencePassed) {
-    return { envelope, bound: true, alreadyBound: false, qaAction };
+    let nextJob = {
+      ...job,
+      internalQaReviewAuthorization: undefined,
+    };
+    let events = envelope.jobActivityEvents ?? [];
+    if (job.spineStatus === "ready_for_review") {
+      const moved = applyJobSpineStatusChange(nextJob, events, {
+        job: nextJob,
+        nextStatus: "building_concepts",
+        actor: { role: "system", displayName: "Studio Machine" },
+        reason: "Internal quality evidence did not pass. Review is not open.",
+      });
+      nextJob = moved.job;
+      events = moved.events;
+    }
+    return {
+      envelope: {
+        ...envelope,
+        jobRecords: (envelope.jobRecords ?? []).map((entry) =>
+          entry.jobId === job.jobId ? nextJob : entry,
+        ),
+        jobActivityEvents: events,
+        updatedAt: new Date().toISOString(),
+      },
+      bound: true,
+      alreadyBound: false,
+      qaAction,
+    };
   }
 
   const decision = evaluateReviewEligibility({

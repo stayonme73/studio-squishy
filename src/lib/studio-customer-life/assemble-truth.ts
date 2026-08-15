@@ -61,25 +61,24 @@ function resolvePhase(input: {
   blockingMaterials: number;
   productionStarted: boolean;
   qaPassed: boolean;
+  qaFailedUnresolved: boolean;
   reviewEligible: boolean;
   spineStatus: string | null;
 }): CustomerLifePhase {
   if (!input.hasCampaign) return "no_project";
   if (!input.paymentConfirmed) return "unpaid";
-  if (input.recovering) return "recovering";
-  if (input.spineStatus === "delivered" || input.spineStatus === "ready_for_delivery") {
-    return input.spineStatus === "delivered" ? "delivered" : "approved";
+  if (input.spineStatus === "delivered") return "delivered";
+  if (input.spineStatus === "ready_for_delivery" || input.spineStatus === "approved") {
+    return "approved";
   }
-  if (input.spineStatus === "approved") return "approved";
   if (input.spineStatus === "revision_requested") return "revision";
-  if (input.reviewEligible || input.spineStatus === "ready_for_review") {
-    return "ready_for_review";
-  }
+  if (input.reviewEligible) return "ready_for_review";
   if (!input.intakeComplete) return "awaiting_intake";
   if (input.blockingMaterials > 0) return "awaiting_materials";
-  if (input.productionStarted && !input.qaPassed) return "producing";
+  if (input.qaFailedUnresolved) return "internal_qa";
   if (input.qaPassed && !input.reviewEligible) return "internal_qa";
   if (input.productionStarted) return "producing";
+  if (input.recovering) return "recovering";
   return "producing";
 }
 
@@ -107,6 +106,11 @@ export function assembleCustomerLifeTruth(
     (record) =>
       record.action === "qa_pass" && record.taskId.includes("v2-rtu-flyer"),
   );
+  const qaFailed = qaRecords.some(
+    (record) =>
+      record.taskId.includes("v2-rtu-flyer") &&
+      (record.action === "qa_fail" || record.action === "qa_block"),
+  );
   let reviewEligible = false;
   if (job && input.tasks) {
     const decision = evaluateReviewEligibility({
@@ -121,6 +125,9 @@ export function assembleCustomerLifeTruth(
   }
   if (job?.internalQaReviewAuthorization?.status === "ELIGIBLE_FOR_REVIEW") {
     reviewEligible = true;
+  }
+  if (qaFailed && !qaPassed) {
+    reviewEligible = false;
   }
 
   const included = campaign ? resolveCampaignRevisionRounds(campaign) : 0;
@@ -215,11 +222,6 @@ export function assembleCustomerLifeTruth(
       recoveryClass: "retryable",
     });
   }
-  const qaFailed = qaRecords.some(
-    (record) =>
-      record.taskId.includes("v2-rtu-flyer") &&
-      (record.action === "qa_fail" || record.action === "qa_block"),
-  );
   if (qaFailed && !qaPassed) {
     stalls.push({
       id: "qa_failed_unresolved",
@@ -233,7 +235,8 @@ export function assembleCustomerLifeTruth(
       (record.deliveryStatus === "pending_owner_send" ||
         record.deliveryStatus === "delivery_failed"),
   ).length;
-  if (queuedNotices > 0) {
+  const noticeTransportPending = queuedNotices > 0;
+  if (noticeTransportPending) {
     stalls.push({
       id: "notice_queued_email_not_confirmed",
       summary:
@@ -261,29 +264,8 @@ export function assembleCustomerLifeTruth(
     qaState = "failed";
   }
 
-  const customerWaiting =
-    stalls.some((stall) => stall.recoveryClass === "waiting_on_customer") ||
-    job?.spineStatus === "waiting_on_client";
-  let waitingOn: CustomerLifeWaitingOn = "none";
-  let waitingOnSummary: string | null = null;
-  if (customerWaiting) {
-    waitingOn = "customer";
-    waitingOnSummary =
-      stalls.find((stall) => stall.recoveryClass === "waiting_on_customer")?.summary ??
-      "The project is waiting on the customer.";
-  } else if (
-    stalls.some(
-      (stall) => stall.recoveryClass === "automatic" || stall.recoveryClass === "retryable",
-    )
-  ) {
-    waitingOn = "studio";
-    waitingOnSummary =
-      stalls.find(
-        (stall) => stall.recoveryClass === "automatic" || stall.recoveryClass === "retryable",
-      )?.summary ?? "The Studio is still working from the current record.";
-  }
-
   const spineStatus = job?.spineStatus ?? null;
+  const qaFailedUnresolved = qaFailed && !qaPassed;
   const phase = resolvePhase({
     hasCampaign: Boolean(campaign),
     paymentConfirmed,
@@ -292,9 +274,52 @@ export function assembleCustomerLifeTruth(
     blockingMaterials: blockingMaterialsCount,
     productionStarted,
     qaPassed,
+    qaFailedUnresolved,
     reviewEligible,
     spineStatus,
   });
+
+  const currentProjectStalls = stalls.filter((stall) => {
+    if (stall.id === "notice_queued_email_not_confirmed") return false;
+    if (
+      stall.id === "activation_pending_retry" &&
+      (reviewEligible ||
+        productionStarted ||
+        phase === "ready_for_review" ||
+        phase === "revision" ||
+        phase === "approved" ||
+        phase === "delivered")
+    ) {
+      return false;
+    }
+    if (stall.id === "production_without_qa" && (reviewEligible || qaPassed)) {
+      return false;
+    }
+    if (stall.id === "qa_without_review" && reviewEligible) return false;
+    return true;
+  });
+
+  const customerWaiting =
+    currentProjectStalls.some((stall) => stall.recoveryClass === "waiting_on_customer") ||
+    job?.spineStatus === "waiting_on_client";
+  let waitingOn: CustomerLifeWaitingOn = "none";
+  let waitingOnSummary: string | null = null;
+  if (customerWaiting) {
+    waitingOn = "customer";
+    waitingOnSummary =
+      currentProjectStalls.find((stall) => stall.recoveryClass === "waiting_on_customer")
+        ?.summary ?? "The project is waiting on the customer.";
+  } else if (
+    currentProjectStalls.some(
+      (stall) => stall.recoveryClass === "automatic" || stall.recoveryClass === "retryable",
+    )
+  ) {
+    waitingOn = "studio";
+    waitingOnSummary =
+      currentProjectStalls.find(
+        (stall) => stall.recoveryClass === "automatic" || stall.recoveryClass === "retryable",
+      )?.summary ?? "The Studio is still working from the current record.";
+  }
 
   const currentWorkVersionId =
     job?.internalQaReviewAuthorization?.workVersionId ??
@@ -346,6 +371,7 @@ export function assembleCustomerLifeTruth(
     spineStatus,
     serviceName: job?.serviceName ?? "Make Me a Flyer",
     stalls,
+    noticeTransportPending,
     ownerActionRequired: false,
   };
 }

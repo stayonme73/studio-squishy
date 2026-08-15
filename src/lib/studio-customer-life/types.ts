@@ -81,6 +81,8 @@ export type CustomerLifeTruth = {
   spineStatus: string | null;
   serviceName: string;
   stalls: readonly CustomerLifeStall[];
+  /** Queued or failed lifecycle notice. Never a current project blocker. */
+  noticeTransportPending: boolean;
   ownerActionRequired: false;
 };
 

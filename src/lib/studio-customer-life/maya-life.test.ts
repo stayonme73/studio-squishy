@@ -16,6 +16,7 @@ import {
   assembleCustomerLifeTruth,
   bindFlyerIdentityToQaRecords,
   classifyCustomerLifeQuestion,
+  latestFlyerQaIsUnresolvedFail,
   resolveFlyerObserverPngRelativePath,
 } from "@/lib/studio-customer-life";
 
@@ -240,9 +241,10 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
     });
     const truth = assembleCustomerLifeTruth({ campaign });
     const voice = answerCustomerLifeQuestion("What is happening with my flyer?", { campaign });
-    expect(truth.phase).toBe("recovering");
-    expect(voice.phase).toBe("recovering");
-    expect(voice.text).toMatch(/getting the project ready/i);
+    expect(truth.phase).toBe("awaiting_intake");
+    expect(voice.phase).toBe("awaiting_intake");
+    expect(voice.text).toBe(studioCustomerLifeV1.customerCopy.statusAwaitingIntake);
+    expect(voice.text).not.toMatch(/not been assigned/i);
     expect(truth.stalls.some((stall) => stall.recoveryClass === "automatic")).toBe(true);
     expect(truth.ownerActionRequired).toBe(false);
   });
@@ -313,6 +315,48 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
     });
     expect(passed.qaAction).toBe("qa_pass");
     expect(passed.envelope.jobRecords?.[0]?.spineStatus).toBe("ready_for_review");
+  });
+
+  it("closes Review when later quality evidence fails the same flyer identity", () => {
+    const campaign = mayaCampaign({
+      projectDetailsSubmittedAt: new Date().toISOString(),
+      campaignStatus: "READY_FOR_REVIEW",
+    });
+    const opened = bindFlyerIdentityToQaRecords({
+      campaign,
+      envelope: envelopeFor(campaign, "ready_for_review"),
+      pngContentSha256: "abc123",
+      renderVersion: 1,
+      artifactId: "flyer-v1",
+      designEvidence: designEvidence(),
+    });
+    expect(opened.envelope.jobRecords?.[0]?.spineStatus).toBe("ready_for_review");
+    const failed = bindFlyerIdentityToQaRecords({
+      campaign,
+      envelope: {
+        ...opened.envelope,
+        qaRecords: (opened.envelope.qaRecords ?? []).filter(
+          (record) => !record.taskId.includes("v2-rtu-flyer"),
+        ),
+        jobRecords: (opened.envelope.jobRecords ?? []).map((job) => ({
+          ...job,
+          internalQaReviewAuthorization: undefined,
+        })),
+      },
+      pngContentSha256: "abc123",
+      renderVersion: 1,
+      artifactId: "flyer-v1",
+      designEvidence: { gatePassed: false } as never,
+    });
+    expect(failed.qaAction).toBe("qa_fail");
+    expect(failed.envelope.jobRecords?.[0]?.spineStatus).toBe("building_concepts");
+    expect(failed.envelope.jobRecords?.[0]?.internalQaReviewAuthorization).toBeUndefined();
+    expect(latestFlyerQaIsUnresolvedFail(failed.envelope)).toBe(true);
+    const stillClosed = assembleCustomerLifeTruth({
+      campaign,
+      tasks: failed.envelope,
+    });
+    expect(stillClosed.reviewEligible).toBe(false);
   });
 
   it("resolves the sealed flyer PNG from artifact identity, not the receipt JSON sibling", () => {

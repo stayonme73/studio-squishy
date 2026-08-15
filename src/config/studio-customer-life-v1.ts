@@ -87,6 +87,25 @@ export const studioCustomerLifeV1 = {
     finalNotReady:
       "Final files are not released on the project record yet.",
     flyerStatusPrefix: "Here is what the Studio record shows for your flyer: ",
+    /**
+     * Coherent project-status answers. Voice names the current state first.
+     * Do not concatenate every Machine field.
+     */
+    statusAwaitingIntake:
+      "Payment is confirmed. Project Intake is still needed before we can produce your flyer.",
+    statusAwaitingMaterials:
+      "Payment is confirmed. The Studio still needs required materials from you before this job can move forward.",
+    statusProductionReady:
+      "Your project is set up. The Studio is preparing your flyer. It is not ready for Review yet.",
+    statusQaCorrection:
+      "The flyer is still in internal quality check. Review is not open yet.",
+    statusReviewReady:
+      "Your flyer is ready for Review. Open the Review Room from your Studio Board.",
+    statusEmailRetryingSecondary:
+      "An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth.",
+    statusApprovedPreparing:
+      "You approved the flyer. The Studio is preparing your final files from the exact version you approved.",
+
     materialReceivedAck:
       "We received what you sent. The Studio has recorded it. Uploaded is not the same as approved for use.",
     unusableMaterial:

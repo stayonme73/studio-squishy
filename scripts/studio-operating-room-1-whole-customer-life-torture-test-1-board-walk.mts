@@ -18,6 +18,7 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  unlinkSync,
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
@@ -52,6 +53,7 @@ import {
   bindFlyerIdentityToQaRecords,
   ensureFlyerMachineReviewBind,
   resolveFlyerObserverPngRelativePath,
+  statusSummaryHasObsoleteContradiction,
 } from "../src/lib/studio-customer-life";
 import { FLYER_INCLUDED_SLOT_TRUTH } from "../src/lib/studio-review-revision/flyer-purchase-delivery-truth";
 import { buildJobId } from "../src/lib/job-control/lane-map";
@@ -148,9 +150,30 @@ function crack(entry: Crack): void {
   console.log(`CRACK  ${entry.beat} — owner=${entry.ownerAction}`);
 }
 
+function voiceStatusLooksCoherent(text: string): boolean {
+  return (
+    !statusSummaryHasObsoleteContradiction(text) &&
+    !(
+      /ready for Review/i.test(text) &&
+      (/has not been assigned/i.test(text) ||
+        /no received upload/i.test(text) ||
+        /getting your project ready/i.test(text))
+    )
+  );
+}
+
 async function shot(page: Page, name: string): Promise<string> {
   const file = join(SHOTS, `${name}.png`);
-  await page.screenshot({ path: file, fullPage: true });
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      if (existsSync(file)) unlinkSync(file);
+      await page.screenshot({ path: file, fullPage: true });
+      return file;
+    } catch (error) {
+      if (attempt === 2) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 400));
+    }
+  }
   return file;
 }
 
@@ -636,7 +659,15 @@ async function main(): Promise<number> {
       campaignId,
       question: "What is holding my flyer?",
     });
+    const happeningPaid = await askCustomerLifeFromStore({
+      campaignId,
+      question: "What's happening with my flyer?",
+    });
     asked.push({ question: "What is holding my flyer?", answer: intakeVoice.answer.text });
+    asked.push({
+      question: "What's happening with my flyer? (paid / intake missing)",
+      answer: happeningPaid.answer.text,
+    });
     push(
       "voice_asks_for_intake_after_pay",
       /Project Intake/i.test(needAsk) || /Project Intake/i.test(intakeVoice.answer.text)
@@ -644,6 +675,15 @@ async function main(): Promise<number> {
         : "FAIL",
       needAsk.slice(0, 220),
       entryShot,
+    );
+    push(
+      "voice_status_paid_intake_missing",
+      happeningPaid.answer.phase === "awaiting_intake" &&
+        /Project Intake is still needed/i.test(happeningPaid.answer.text) &&
+        voiceStatusLooksCoherent(happeningPaid.answer.text)
+        ? "PASS"
+        : "FAIL",
+      happeningPaid.answer.text.slice(0, 280),
     );
     crack({
       beat: "entry_after_payment_before_intake",
@@ -667,10 +707,20 @@ async function main(): Promise<number> {
     await pageA.reload({ waitUntil: "domcontentloaded" });
     const afterIntakeAsk = await sendProjectMessage(pageA, "Do you need anything else from me?");
     const waitingAsk = await sendProjectMessage(pageA, "What's happening with my flyer?");
+    asked.push({ question: "What's happening with my flyer? (after intake)", answer: waitingAsk });
     push(
       "intake_submitted_same_campaign",
       Boolean(campaign.routeMapIntakeSubmittedAt) ? "PASS" : "FAIL",
       afterIntakeAsk.slice(0, 220),
+    );
+    push(
+      "voice_status_after_intake_coherent",
+      voiceStatusLooksCoherent(waitingAsk) &&
+        !/has not been assigned/i.test(waitingAsk) &&
+        !(/Review is open/i.test(waitingAsk) && /not assigned/i.test(waitingAsk))
+        ? "PASS"
+        : "FAIL",
+      waitingAsk.slice(0, 280),
     );
     crack({
       beat: "intake",
@@ -787,6 +837,13 @@ async function main(): Promise<number> {
       question: "What's happening with my flyer?",
     });
     asked.push({ question: "What's happening with my flyer? (injected stall)", answer: stallVoice.answer.text });
+    push(
+      "voice_status_stall_inject_coherent",
+      voiceStatusLooksCoherent(stallVoice.answer.text)
+        ? "PASS"
+        : "FAIL",
+      stallVoice.answer.text.slice(0, 280),
+    );
     const secondRecover = await recoverPaidOperatingChain(
       (await readCampaignEnvelope(campaignId))?.record ?? campaign,
     );
@@ -799,6 +856,25 @@ async function main(): Promise<number> {
       question: "Has work started on my flyer?",
     });
     asked.push({ question: "Has work started on my flyer?", answer: recoveredVoice.answer.text });
+    const happeningProducing = await askCustomerLifeFromStore({
+      campaignId,
+      question: "What's happening with my flyer?",
+    });
+    asked.push({
+      question: "What's happening with my flyer? (after stall recover)",
+      answer: happeningProducing.answer.text,
+    });
+    push(
+      "voice_status_production_underway_or_ready",
+      happeningProducing.truth.phase !== "awaiting_intake" &&
+        voiceStatusLooksCoherent(happeningProducing.answer.text) &&
+        (happeningProducing.truth.reviewEligible
+          ? /ready for Review/i.test(happeningProducing.answer.text)
+          : !/ready for Review/i.test(happeningProducing.answer.text))
+        ? "PASS"
+        : "FAIL",
+      `${happeningProducing.answer.phase}: ${happeningProducing.answer.text}`.slice(0, 280),
+    );
     push(
       "stall_recover_without_tagia",
       firstRecover.ownerActionRequired === false &&
@@ -849,6 +925,49 @@ async function main(): Promise<number> {
         question: studioReviewRevisionFullLoopV1.customerCopy.readyForReviewQuestion,
       });
       asked.push({ question: "Is my flyer ready for me to review? (qa_fail)", answer: qaFailVoice.answer.text });
+      const qaFailStatus = await askCustomerLifeFromStore({
+        campaignId,
+        question: "What's happening with my flyer?",
+      });
+      asked.push({
+        question: "What's happening with my flyer? (qa_fail)",
+        answer: qaFailStatus.answer.text,
+      });
+      await pageA.goto(`${BASE}/feedback-studio?jobId=${encodeURIComponent(jobId)}`, {
+        waitUntil: "domcontentloaded",
+        timeout: 90_000,
+      });
+      await pageA.waitForTimeout(1800);
+      const reviewBeforeReadyShot = await shot(pageA, "05b-review-nav-before-ready");
+      const reviewBeforeReadyText = await visibleText(pageA);
+      const prematureProof = await pageA.locator("img.fs-review-proof__image").count();
+      const claimsReviewReady =
+        /You are reviewing Version/i.test(reviewBeforeReadyText) ||
+        (await pageA.getByRole("button", { name: /Approve for Delivery/i }).count()) > 0;
+      const stillNotEligible = !(await askCustomerLifeFromStore({
+        campaignId,
+        question: "Is my flyer ready for me to review?",
+      })).truth.reviewEligible;
+      push(
+        "review_nav_before_ready_does_not_expose_artifact",
+        stillNotEligible &&
+          prematureProof === 0 &&
+          !claimsReviewReady &&
+          !qaFailVoice.truth.reviewEligible
+          ? "PASS"
+          : "FAIL",
+        `eligibleAfterLoad=${!stillNotEligible} proofImgs=${prematureProof} claimsReady=${claimsReviewReady} ${reviewBeforeReadyText.slice(0, 200)}`,
+        reviewBeforeReadyShot,
+      );
+      push(
+        "voice_status_qa_fail_coherent",
+        /internal quality check/i.test(qaFailStatus.answer.text) &&
+          !/ready for Review/i.test(qaFailStatus.answer.text) &&
+          voiceStatusLooksCoherent(qaFailStatus.answer.text)
+          ? "PASS"
+          : "FAIL",
+        qaFailStatus.answer.text.slice(0, 280),
+      );
       await pageA.goto(`${BASE}/studio-board`, { waitUntil: "domcontentloaded", timeout: 90_000 });
       await waitForMayaProject(pageA);
       const qaFailShot = await shot(pageA, "05-qa-fail-review-closed");
@@ -885,6 +1004,14 @@ async function main(): Promise<number> {
         question: studioReviewRevisionFullLoopV1.customerCopy.readyForReviewQuestion,
       });
       asked.push({ question: "Is my flyer ready for me to review? (after qa_pass)", answer: qaPassVoice.answer.text });
+      const happeningQaPass = await askCustomerLifeFromStore({
+        campaignId,
+        question: "What's happening with my flyer?",
+      });
+      asked.push({
+        question: "What's happening with my flyer? (after qa_pass)",
+        answer: happeningQaPass.answer.text,
+      });
       await pageA.reload({ waitUntil: "domcontentloaded" });
       await waitForMayaProject(pageA);
       const qaPassShot = await shot(pageA, "06-qa-pass-review-open");
@@ -897,6 +1024,16 @@ async function main(): Promise<number> {
           : "FAIL",
         qaPassVoice.answer.text.slice(0, 220),
         qaPassShot,
+      );
+      push(
+        "voice_status_review_ready",
+        happeningQaPass.answer.phase === "ready_for_review" &&
+          happeningQaPass.truth.reviewEligible &&
+          /ready for Review/i.test(happeningQaPass.answer.text) &&
+          voiceStatusLooksCoherent(happeningQaPass.answer.text)
+          ? "PASS"
+          : "FAIL",
+        happeningQaPass.answer.text.slice(0, 280),
       );
       crack({
         beat: "qa_pass_then_review",
@@ -969,6 +1106,81 @@ async function main(): Promise<number> {
         recovered: "Voice still sent Maya to Review from the Board. Email did not become the source of truth.",
         ownerAction: "NONE",
       });
+      const happeningReviewEmail = await askCustomerLifeFromStore({
+        campaignId,
+        question: "What's happening with my flyer?",
+      });
+      asked.push({
+        question: "What's happening with my flyer? (Review ready while email failed)",
+        answer: happeningReviewEmail.answer.text,
+      });
+      push(
+        "voice_status_review_email_secondary",
+        happeningReviewEmail.truth.reviewEligible &&
+          happeningReviewEmail.truth.noticeTransportPending &&
+          /ready for Review/i.test(happeningReviewEmail.answer.text) &&
+          /email notification is still retrying/i.test(happeningReviewEmail.answer.text) &&
+          !/has not been assigned/i.test(happeningReviewEmail.answer.text) &&
+          !/no received upload/i.test(happeningReviewEmail.answer.text) &&
+          !/getting your project ready/i.test(happeningReviewEmail.answer.text) &&
+          voiceStatusLooksCoherent(happeningReviewEmail.answer.text)
+          ? "PASS"
+          : "FAIL",
+        happeningReviewEmail.answer.text.slice(0, 280),
+      );
+      const mixedLive = (await readCampaignEnvelope(campaignId))?.record ?? campaign;
+      const priorDispatch = mixedLive.dispatchExecution;
+      if (priorDispatch) {
+        await upsertCampaignRecord(
+          {
+            ...mixedLive,
+            dispatchExecution: {
+              ...priorDispatch,
+              status: studioDispatchV1.envelopeStatuses.pendingRetry,
+            },
+          },
+          created.user.id,
+        );
+      }
+      const mixedVoice = await askCustomerLifeFromStore({
+        campaignId,
+        question: "What's happening with my flyer?",
+      });
+      asked.push({
+        question: "What's happening with my flyer? (mixed historical stall + Review)",
+        answer: mixedVoice.answer.text,
+      });
+      push(
+        "voice_status_mixed_historical_resolves_hierarchy",
+        mixedVoice.answer.phase === "ready_for_review" &&
+          mixedVoice.truth.activationPendingRetry === true &&
+          /ready for Review/i.test(mixedVoice.answer.text) &&
+          !/has not been assigned/i.test(mixedVoice.answer.text) &&
+          !/getting your project ready/i.test(mixedVoice.answer.text) &&
+          voiceStatusLooksCoherent(mixedVoice.answer.text)
+          ? "PASS"
+          : "FAIL",
+        `pendingRetry=${mixedVoice.truth.activationPendingRetry} assigned=${mixedVoice.truth.productionAssigned} ${mixedVoice.answer.text}`.slice(
+          0,
+          280,
+        ),
+      );
+      if (priorDispatch) {
+        const afterMixed = (await readCampaignEnvelope(campaignId))?.record ?? mixedLive;
+        if (afterMixed.dispatchExecution) {
+          const restored = await upsertCampaignRecord(
+            {
+              ...afterMixed,
+              dispatchExecution: {
+                ...afterMixed.dispatchExecution,
+                status: priorDispatch.status,
+              },
+            },
+            created.user.id,
+          );
+          campaign = restored.record;
+        }
+      }
     }
 
     contextB = await browser.newContext();
@@ -1121,6 +1333,27 @@ async function main(): Promise<number> {
       recovered: null,
       ownerAction: "NONE",
     });
+    const happeningRevision = await askCustomerLifeFromStore({
+      campaignId,
+      question: "What's happening with my flyer?",
+    });
+    asked.push({
+      question: "What's happening with my flyer? (revision underway)",
+      answer: happeningRevision.answer.text,
+    });
+    const revSpine =
+      afterRevTasks?.jobRecords?.find((entry) => entry.skuId === "v2-rtu-flyer")?.spineStatus;
+    push(
+      "voice_status_revision_underway",
+      voiceStatusLooksCoherent(happeningRevision.answer.text) &&
+        (revSpine === "revision_requested"
+          ? /revision is in progress/i.test(happeningRevision.answer.text) &&
+            !/ready for Review/i.test(happeningRevision.answer.text)
+          : /ready for Review|revision is in progress/i.test(happeningRevision.answer.text))
+        ? "PASS"
+        : "FAIL",
+      `spine=${revSpine} ${happeningRevision.answer.text}`.slice(0, 280),
+    );
 
     for (let i = 0; i < 24; i += 1) {
       const latest = await readTasksEnvelope(campaignId);
@@ -1175,6 +1408,17 @@ async function main(): Promise<number> {
       "voice_applied_change_from_record",
       /requested change was applied/i.test(made) ? "PASS" : "FAIL",
       made.slice(0, 220),
+    );
+    const happeningV2 = await sendProjectMessage(pageA, "What's happening with my flyer?");
+    asked.push({ question: "What's happening with my flyer? (Version 2 ready)", answer: happeningV2 });
+    push(
+      "voice_status_version_2_ready",
+      /ready for Review/i.test(happeningV2) &&
+        !/has not been assigned/i.test(happeningV2) &&
+        voiceStatusLooksCoherent(happeningV2)
+        ? "PASS"
+        : "FAIL",
+      happeningV2.slice(0, 280),
     );
 
     await forceClick(pageA.locator(".fs-feedback-panel__btn--approve"));
@@ -1339,6 +1583,25 @@ async function main(): Promise<number> {
       recovered: null,
       ownerAction: "NONE",
     });
+    const happeningFinal = await askCustomerLifeFromStore({
+      campaignId,
+      question: "What's happening with my flyer?",
+    });
+    asked.push({
+      question: "What's happening with my flyer? (approved / Final Delivery)",
+      answer: happeningFinal.answer.text,
+    });
+    push(
+      "voice_status_approved_final_ready",
+      happeningFinal.truth.finalDeliveryReady &&
+        /final files are ready/i.test(happeningFinal.answer.text) &&
+        !/has not been assigned/i.test(happeningFinal.answer.text) &&
+        !/retrying/i.test(happeningFinal.answer.text) &&
+        voiceStatusLooksCoherent(happeningFinal.answer.text)
+        ? "PASS"
+        : "FAIL",
+      happeningFinal.answer.text.slice(0, 280),
+    );
 
     await contextA.close();
     contextA = null;
@@ -1351,7 +1614,10 @@ async function main(): Promise<number> {
       waitUntil: "domcontentloaded",
       timeout: 90_000,
     });
-    await waitForMayaProject(pageC);
+    await pageC
+      .getByText(/Cedar & Bloom Home Organizing|Make Me a Flyer|Delivery in progress|final files/i)
+      .first()
+      .waitFor({ timeout: 45_000 });
     const returnShot = await shot(pageC, "15-fresh-context-return");
     const returnVoice = await sendProjectMessage(pageC, "Did you keep my approval?");
     await pageC.goto(`${BASE}/deliverables`, {
