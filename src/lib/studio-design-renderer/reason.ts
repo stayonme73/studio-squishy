@@ -28,6 +28,9 @@ export function reasonFlyerDesignSpecDeterministic(
   const c = truth.brandColors;
   const logo = truth.materials.find((m) => m.role === "logo");
   const yShift = logo ? 0 : -248;
+  const longBody = truth.body.trim().length > 160;
+  const bodyExtraY = longBody ? 120 : 0;
+
 
   const priceLine = truth.wasPriceDisplay
     ? `${truth.priceDisplay} (${truth.wasPriceDisplay})`
@@ -94,20 +97,24 @@ export function reasonFlyerDesignSpecDeterministic(
         color: c.primary,
         align: "center",
       }),
-      textLayer({
-        id: "descriptor",
-        role: "descriptor",
-        content: truth.descriptor,
-        x: 72,
-        y: 408 + yShift,
-        width: 880,
-        fontSizePx: 22,
-        fontWeight: 500,
-        lineHeight: 1.2,
-        letterSpacingPx: 2,
-        color: c.secondary,
-        align: "center",
-      }),
+      ...(truth.descriptor.trim()
+        ? [
+            textLayer({
+              id: "descriptor",
+              role: "descriptor",
+              content: truth.descriptor,
+              x: 72,
+              y: 408 + yShift,
+              width: 880,
+              fontSizePx: 22,
+              fontWeight: 500,
+              lineHeight: 1.2,
+              letterSpacingPx: 2,
+              color: c.secondary,
+              align: "center",
+            }),
+          ]
+        : []),
       textLayer({
         id: "headline",
         role: "headline",
@@ -177,19 +184,19 @@ export function reasonFlyerDesignSpecDeterministic(
         x: 100,
         y: 860 + yShift,
         width: 824,
-        fontSizePx: 24,
+        fontSizePx: longBody ? 20 : 24,
         fontWeight: 400,
         lineHeight: 1.45,
         color: c.text,
         align: "center",
-        maxLines: 4,
+        maxLines: longBody ? 7 : 4,
       }),
       {
         type: "shape",
         id: "cta-plate",
         role: "plate",
         x: 212,
-        y: 1040 + yShift,
+        y: 1040 + yShift + bodyExtraY,
         width: 600,
         height: 88,
         fill: c.primary,
@@ -200,7 +207,7 @@ export function reasonFlyerDesignSpecDeterministic(
         role: "cta",
         content: truth.cta,
         x: 212,
-        y: 1064 + yShift,
+        y: 1064 + yShift + bodyExtraY,
         width: 600,
         fontSizePx: 28,
         fontWeight: 600,
@@ -213,7 +220,7 @@ export function reasonFlyerDesignSpecDeterministic(
         role: "contact_phone",
         content: `phone ${truth.phone}`,
         x: 72,
-        y: 1180 + yShift,
+        y: 1180 + yShift + bodyExtraY,
         width: 880,
         fontSizePx: 24,
         fontWeight: 500,
@@ -226,7 +233,7 @@ export function reasonFlyerDesignSpecDeterministic(
         role: "contact_web",
         content: `web ${truth.webDisplay}`,
         x: 72,
-        y: 1220 + yShift,
+        y: 1220 + yShift + bodyExtraY,
         width: 880,
         fontSizePx: 22,
         fontWeight: 500,
@@ -239,7 +246,7 @@ export function reasonFlyerDesignSpecDeterministic(
         role: "disclaimer",
         content: truth.disclaimer,
         x: 72,
-        y: 1420 + yShift,
+        y: 1420 + yShift + bodyExtraY,
         width: 880,
         fontSizePx: 14,
         fontWeight: 400,

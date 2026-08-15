@@ -8,6 +8,7 @@ export {
   bindFlyerIdentityToQaRecords,
   ensureFlyerMachineReviewBind,
   resolveFlyerObserverPngRelativePath,
+  resolveFlyerObserverPdfRelativePath,
 } from "./machine-review-bind";
 export {
   askCustomerLifeFromStore,

@@ -24,7 +24,7 @@ import {
 } from "@/lib/studio-review-eligibility";
 
 import { presentFlyerReviewProof } from "@/lib/studio-review-revision/present-flyer-review";
-import { sameContentSha256 } from "@/lib/studio-review-revision/hash";
+import { normalizeContentSha256, sameContentSha256 } from "@/lib/studio-review-revision/hash";
 
 import { assembleCustomerLifeTruth } from "./assemble-truth";
 
@@ -68,6 +68,20 @@ export function resolveFlyerObserverPngRelativePath(flyer: {
     }
   }
   const sibling = receiptRel.replace(/\.json$/i, ".png");
+  return existsSync(path.join(process.cwd(), sibling)) ? sibling : undefined;
+}
+
+export function resolveFlyerObserverPdfRelativePath(flyer: {
+  pdfRelativePath?: string;
+  pngRelativePath?: string;
+  receiptRelativePath?: string;
+}): string | undefined {
+  if (flyer.pdfRelativePath?.trim()) {
+    return normalizeRel(flyer.pdfRelativePath);
+  }
+  const pngRel = resolveFlyerObserverPngRelativePath(flyer);
+  if (!pngRel) return undefined;
+  const sibling = pngRel.replace(/\.png$/i, ".pdf");
   return existsSync(path.join(process.cwd(), sibling)) ? sibling : undefined;
 }
 
@@ -124,6 +138,7 @@ export function bindFlyerIdentityToQaRecords(input: {
   campaign: CampaignRecord;
   envelope: ServerTasksEnvelope;
   pngContentSha256: string;
+  pdfContentSha256?: string;
   renderVersion: number;
   artifactId: string;
   workVersionId?: string;
@@ -136,9 +151,11 @@ export function bindFlyerIdentityToQaRecords(input: {
 } {
   const skuId = DESIGN_RENDERER_PROOF_SKU;
   const taskId = formalQaTaskIdForService(skuId);
-  const hash = input.pngContentSha256.startsWith("sha256:")
-    ? input.pngContentSha256
-    : `sha256:${input.pngContentSha256}`;
+  const hash = normalizeContentSha256(input.pngContentSha256);
+  const pdfHash = input.pdfContentSha256
+    ? normalizeContentSha256(input.pdfContentSha256)
+    : undefined;
+  const boundHashes = [hash, pdfHash].filter((value): value is string => Boolean(value));
   const matching = recordsForHash(input.envelope, hash, input.pngContentSha256);
   if (matching.some((record) => record.action === "qa_pass")) {
     return {
@@ -177,7 +194,7 @@ export function bindFlyerIdentityToQaRecords(input: {
     artifactBinding: {
       workVersionId,
       artifactIds: [input.artifactId],
-      contentSha256s: [hash],
+      contentSha256s: boundHashes,
     },
   });
 
@@ -287,10 +304,12 @@ export async function ensureFlyerMachineReviewBind(
   if (!envelope) return campaign;
 
   const pngRel = resolveFlyerObserverPngRelativePath(flyer);
+  const pdfRel = resolveFlyerObserverPdfRelativePath(flyer);
   const bound = bindFlyerIdentityToQaRecords({
     campaign,
     envelope,
     pngContentSha256: flyer.pngContentSha256,
+    pdfContentSha256: flyer.pdfContentSha256,
     renderVersion: flyer.renderVersion ?? 1,
     artifactId: `flyer-v${flyer.renderVersion ?? 1}`,
     designEvidence: readDesignQaEvidence(pngRel),
@@ -309,6 +328,8 @@ export async function ensureFlyerMachineReviewBind(
       envelope: nextEnvelope,
       pngRelativePath: pngRel,
       pngContentSha256: flyer.pngContentSha256,
+      pdfRelativePath: pdfRel,
+      pdfContentSha256: flyer.pdfContentSha256,
       renderVersion: flyer.renderVersion ?? 1,
       artifactId: `flyer-v${flyer.renderVersion ?? 1}`,
     });

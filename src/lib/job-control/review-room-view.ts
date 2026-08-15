@@ -162,7 +162,7 @@ export function resolveClientReviewView(input: {
         .filter(
           (ref) =>
             isApprovedReviewProofReference(ref) &&
-            (ref.deliverableKey === def.key || def.key === requiredDefs[0]?.key),
+            ref.deliverableKey === def.key,
         )
         .map((ref) => ({
           id: ref.id,

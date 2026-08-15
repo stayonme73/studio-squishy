@@ -16,6 +16,8 @@ export const studioReviewRevisionFullLoopV1 = {
   skuId: "v2-rtu-flyer",
   includedCorrectionRounds: 1,
   deliverableKey: "deliverable-0",
+  /** Frozen plan lists five slots; only PNG + PDF are customer files. See flyer-purchase-delivery-truth. */
+  customerPromisedFiles: ["print_ready_pdf", "digital_share_file"] as const,
 
   customerCopy: {
     currentVersionLead: (versionLabel: string) =>

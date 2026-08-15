@@ -3,6 +3,7 @@ import type {
   CampaignRecord,
 } from "@/config/studio-board";
 import { filterProductionPlanLineItems } from "@/lib/deliverable-scope";
+import { clientDeliveryFileLabelsForSku } from "@/lib/studio-review-revision/flyer-purchase-delivery-truth";
 
 import type { PurchasedJobRecord } from "@/lib/job-control/types";
 
@@ -30,4 +31,15 @@ export function requiredDeliverablesForJob(
 ): readonly string[] {
   const line = findProductionPlanLineForJob(campaign, job);
   return line?.deliverables ? [...line.deliverables] : [];
+}
+
+/** Required Final Delivery files — flyer promised files, not internal QA / supporting slots. */
+export function requiredClientDeliveryFileLabelsForJob(
+  campaign: CampaignRecord,
+  job: PurchasedJobRecord,
+): readonly string[] {
+  return clientDeliveryFileLabelsForSku(
+    job.skuId,
+    requiredDeliverablesForJob(campaign, job),
+  );
 }

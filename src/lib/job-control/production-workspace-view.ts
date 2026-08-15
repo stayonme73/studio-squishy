@@ -10,6 +10,7 @@ import {
 } from "@/lib/file-storage/redact";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
+import { clientDeliveryFileLabelsForSku } from "@/lib/studio-review-revision/flyer-purchase-delivery-truth";
 import type { RouteMapProductionBrief } from "@/lib/route-map-production-brief";
 import { resolveRouteMapProductionBrief } from "@/lib/route-map-production-brief";
 
@@ -188,8 +189,12 @@ export function resolveProductionWorkspaceView(input: {
     ledgerLoaded: true,
     items: materials,
   });
-  const deliverGate = canMarkJobDelivered(job, line?.deliverables ?? []);
-  const allClientFiles = allRequiredClientDeliveryFilesPresent(job, line?.deliverables ?? []);
+  const deliveryFileLabels = clientDeliveryFileLabelsForSku(
+    job.skuId,
+    line?.deliverables ?? [],
+  );
+  const deliverGate = canMarkJobDelivered(job, deliveryFileLabels);
+  const allClientFiles = allRequiredClientDeliveryFilesPresent(job, deliveryFileLabels);
 
   const lane = job.returnLane ?? job.productionLane;
 

@@ -1,5 +1,5 @@
 import type { CampaignRecord } from "@/config/studio-board";
-import { requiredDeliverablesForJob } from "@/lib/approved-plan-line";
+import { requiredClientDeliveryFileLabelsForJob, requiredDeliverablesForJob } from "@/lib/approved-plan-line";
 import { isClientOnly } from "@/lib/auth/roles";
 import type { CampaignTaskItem, ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -610,7 +610,7 @@ export function applyReviewRoomPatch(
       const systemRelease = applySystemFinalDeliveryAuthorization(
         currentJob,
         events,
-        requiredDeliverablesForJob(campaign, currentJob),
+        requiredClientDeliveryFileLabelsForJob(campaign, currentJob),
         {
           occurredAt,
           materialUse: materialLedgerLoaded

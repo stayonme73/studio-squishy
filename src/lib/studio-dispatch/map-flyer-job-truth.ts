@@ -40,6 +40,70 @@ function firstMatch(re: RegExp, text: string): string {
   return m?.[0]?.trim() ?? "";
 }
 
+const DEFAULT_FLYER_COLORS = {
+  primary: "#1F3A5F",
+  secondary: "#C4A574",
+  background: "#F7F4EF",
+  text: "#1A1A1A",
+  muted: "#5A6570",
+} as const;
+
+/** Soft-neutral botanical atmosphere from locked customer style notes — palette only, no invented illustration. */
+const SOFT_NEUTRAL_BOTANICAL_COLORS = {
+  primary: "#3F5A4A",
+  secondary: "#B89A6A",
+  background: "#F4F0E6",
+  text: "#2A2824",
+  muted: "#6A655C",
+} as const;
+
+function stripStyleDirection(text: string): string {
+  return text.replace(/\n*Style:\s*[\s\S]*$/i, "").trim();
+}
+
+function brandColorsFromDirection(text: string): typeof DEFAULT_FLYER_COLORS {
+  if (
+    /botanical|soft neutral|warm,\s*clean,\s*calm|uncluttered|no childish school/i.test(
+      text,
+    )
+  ) {
+    return SOFT_NEUTRAL_BOTANICAL_COLORS;
+  }
+  return DEFAULT_FLYER_COLORS;
+}
+
+function extractOfferName(
+  mustInclude: string,
+  flyerPurpose: string,
+  businessName: string,
+): string {
+  const lines = stripStyleDirection(mustInclude)
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const skip =
+    /includes:|customers may choose|^style:|call |visit |\(\d{3}\)|https?:|\$\d|book your reset/i;
+  const found = lines.find(
+    (line) => line !== businessName && !skip.test(line) && line.length < 80,
+  );
+  if (found) return found.slice(0, 80);
+  const purposeTail = flyerPurpose.replace(/^promotional flyer for\s+/i, "").trim();
+  return (purposeTail || flyerPurpose).slice(0, 80);
+}
+
+function customerFacingFlyerBody(mustInclude: string): string {
+  const facts = stripStyleDirection(mustInclude);
+  const lines = facts
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const includeLines = lines.filter((line) =>
+    /includes:|customers may choose|2-hour home organization session/i.test(line),
+  );
+  if (includeLines.length > 0) return includeLines.join(" ");
+  return facts;
+}
+
 function extractLines(mustInclude: string): {
   phone: string;
   webDisplay: string;
@@ -195,11 +259,16 @@ export function mapFlyerProjectTruthFromJob(input: {
 
   const businessName = input.campaign.campaignName.trim() || "Customer";
   const wordmark = businessName;
-  const descriptor = "Local business";
+  const descriptor = "";
   const customerDisclaimer = String(answers.disclaimers ?? "").trim();
   const disclaimer =
     customerDisclaimer ||
     "Finished single-sided flyer for your print or digital use. You distribute.";
+  const styleSource = [
+    mustInclude,
+    String(answers.materials ?? ""),
+    String(answers.styleNotes ?? ""),
+  ].join("\n");
 
   // Hard ban on leaking proof fixture language into customer jobs.
   if (/CERTIFICATION FIXTURE|INTERNAL TEST|harborandoak\.example/i.test(
@@ -212,8 +281,8 @@ export function mapFlyerProjectTruthFromJob(input: {
     };
   }
 
-  const offerName =
-    mustInclude.split(/[.\n]/)[0]?.trim().slice(0, 80) || flyerPurpose.slice(0, 80);
+  const offerName = extractOfferName(mustInclude, flyerPurpose, businessName);
+  const body = customerFacingFlyerBody(mustInclude);
   const cta =
     String(answers.callToAction ?? "").trim() ||
     "Book online or call";
@@ -229,6 +298,9 @@ export function mapFlyerProjectTruthFromJob(input: {
     ...(extracted.dateWindow
       ? extracted.dateWindow.split(/[–—,]/).map((s) => s.trim()).filter((s) => s.length > 2).slice(0, 3)
       : []),
+    ...( /2-hour/i.test(body) ? ["2-hour"] : []),
+    ...( /Includes:/i.test(body) ? ["Includes"] : []),
+    ...( /pantry/i.test(body) ? ["pantry"] : []),
   ];
 
   const truth: FlyerProjectTruth = {
@@ -246,19 +318,13 @@ export function mapFlyerProjectTruthFromJob(input: {
     offerName,
     priceDisplay: extracted.priceDisplay,
     dateWindow: extracted.dateWindow || "See offer details",
-    body: mustInclude.slice(0, 220),
+    body,
     cta,
     phone: extracted.phone,
     webDisplay: extracted.webDisplay,
     webUrl: extracted.webUrl,
     disclaimer,
-    brandColors: {
-      primary: "#1F3A5F",
-      secondary: "#C4A574",
-      background: "#F7F4EF",
-      text: "#1A1A1A",
-      muted: "#5A6570",
-    },
+    brandColors: brandColorsFromDirection(styleSource),
     approvedLogoVariantId: logo.material?.approvedIdentitySourceId ?? null,
     materials: logo.material ? [logo.material] : [],
     requiredTextTokens,
@@ -266,6 +332,10 @@ export function mapFlyerProjectTruthFromJob(input: {
       "Best in Richmond",
       "#1 rated",
       "CERTIFICATION FIXTURE",
+      "school bus",
+      "cartoon pencil",
+      "guarantee",
+      "% off",
     ],
   };
 

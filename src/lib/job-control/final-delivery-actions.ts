@@ -1,5 +1,5 @@
 import type { CampaignRecord } from "@/config/studio-board";
-import { requiredDeliverablesForJob } from "@/lib/approved-plan-line";
+import { requiredClientDeliveryFileLabelsForJob } from "@/lib/approved-plan-line";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { isOwnerUser, isStaffUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -129,7 +129,7 @@ export function reevaluateSystemFinalDeliveryAfterMaterialChange(input: {
     const release = applySystemFinalDeliveryAuthorization(
       job,
       events,
-      requiredDeliverablesForJob(input.campaign, job),
+      requiredClientDeliveryFileLabelsForJob(input.campaign, job),
       { occurredAt, materialUse },
     );
     if (!release.applied) {
@@ -236,7 +236,7 @@ export function applyFinalDeliveryPatch(
   const occurredAt = new Date().toISOString();
   let events = [...(envelope.jobActivityEvents ?? [])];
   let currentJob = job;
-  const requiredDeliverables = requiredDeliverablesForJob(campaign, job);
+  const requiredDeliverables = requiredClientDeliveryFileLabelsForJob(campaign, job);
   const materialUse =
     materials == null
       ? materialContextUnavailable()

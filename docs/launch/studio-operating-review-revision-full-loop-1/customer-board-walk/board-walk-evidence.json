@@ -1,15 +1,15 @@
 {
   "packageId": "STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1",
   "kind": "customer-review-walk",
-  "recordedAt": "2026-08-15T16:54:00.194Z",
+  "recordedAt": "2026-08-15T17:41:27.070Z",
   "baseUrl": "http://127.0.0.1:3066",
   "commitHint": "unknown",
-  "runId": "7c9db555-8069-445e-8244-1ea420caf8ef",
+  "runId": "0c64acf7-917f-4460-8c90-10cf8e700c6a",
   "totals": {
-    "passed": 24,
+    "passed": 29,
     "failed": 0,
     "blocked": 0,
-    "total": 24
+    "total": 29
   },
   "verdict": "REVIEW + REVISION FULL LOOP READY FOR CLOSE",
   "asked": [
@@ -82,6 +82,11 @@
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\customer-board-walk\\shots\\02-maya-reviews-real-flyer.png"
     },
     {
+      "check": "review_shows_flyer_design_not_qc_download",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nFeedback Studio — Make Me a Flyer\n\nSERVICE · MAKE ME A FLYER\n\nCedar & Bloom Home Organizing\n\nYour Studio team prepared "
+    },
+    {
       "check": "no_kitchen_jargon_in_review",
       "status": "PASS",
       "detail": "Customer Review copy checked for internal terminology."
@@ -105,7 +110,12 @@
     {
       "check": "revised_artifact_produced",
       "status": "PASS",
-      "detail": "v1=0dd0ead533ba v2=5429a61f9497"
+      "detail": "v1=6b30dae910d0 v2=9c5aef6d1766"
+    },
+    {
+      "check": "creative_brief_fidelity_v2",
+      "status": "PASS",
+      "detail": "Cedar & Bloom Home Organizing\nBook Your Reset\nBack-to-School Reset\n$149\nAugust 24 through September 14, 2026\n2-hour home organization session Includes: one 2-hour organizing session; organization of one selected household area; simple organization plan for maintaining the space. "
     },
     {
       "check": "rereview_shows_new_version",
@@ -136,18 +146,34 @@
     {
       "check": "exact_approval_binding",
       "status": "PASS",
-      "detail": "Pin flyer-v2 sha256:5429a61f9497981225629a631c85b09998eb28c2aeba4811c4a34db62c4a300e",
+      "detail": "Pin flyer-v2 sha256:9c5aef6d1766ad8741b43120e32456507ed20387bc44361acfda5945932f8bb0",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\customer-board-walk\\shots\\05-approved-exact-version.png"
     },
     {
       "check": "stale_version_cannot_win",
       "status": "PASS",
-      "detail": "v1=0dd0ead533ba v2=5429a61f9497 pin=5429a61f9497 files=5"
+      "detail": "v1=6b30dae910d0 v2=9c5aef6d1766 pin=9c5aef6d1766 files=2"
     },
     {
       "check": "exact_final_delivery",
       "status": "PASS",
-      "detail": "spine=ready_for_delivery files=5 pin=flyer-v2"
+      "detail": "spine=ready_for_delivery files=2 pin=flyer-v2"
+    },
+    {
+      "check": "five_slot_classification",
+      "status": "PASS",
+      "detail": "design_direction:supporting_studio_work, flyer_design:customer_promised_design, print_ready_pdf:customer_promised_file, digital_share_file:customer_promised_file, qc_review:internal_qa"
+    },
+    {
+      "check": "customer_received_promised_png_and_pdf",
+      "status": "PASS",
+      "detail": "files=2 png=9c5aef6d1766 pdf=abe5bb961acc v2pdf=abe5bb961acc pin=9c5aef6d+abe5bb96"
+    },
+    {
+      "check": "final_delivery_customer_truth",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nDelivery — truthful final files for this project. — Cedar & Bloom Home Organizing\n\nDELIVERY IN PROGRESS\n\nSome of your files are ready\n\nYou can download the released files below. O",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\customer-board-walk\\shots\\07-final-delivery-png-and-pdf.png"
     },
     {
       "check": "leave_return_preserves_approval_and_history",
@@ -168,10 +194,12 @@
   ],
   "artifacts": {
     "v1": "artifacts/maya-flyer-v1.png",
-    "v2": "artifacts/maya-flyer-v2.png"
+    "v2": "artifacts/maya-flyer-v2.png",
+    "v1Pdf": "artifacts/maya-flyer-v1.pdf",
+    "v2Pdf": "artifacts/maya-flyer-v2.pdf"
   },
   "notes": [
-    "Maya facts unchanged: Cedar & Bloom, Make Me a Flyer $69, wordmark-only, Book Your Reset CTA.",
+    "Maya facts restored from locked brief: included services, botanical/soft-neutral style, wordmark-only, Book Your Reset CTA.",
     "Lifecycle email was not built. Board / Review / Voice were the customer truth surfaces.",
     "Review has no revision-file attachment control. Reported as later enhancement, not invented.",
     "Fresh Playwright context = new browser with empty cookies/localStorage."

@@ -39,6 +39,7 @@ import { computePlanPricingTotals, buildServiceScopeSnapshot } from "../src/lib/
 import { recoverPaidOperatingChain } from "../src/lib/studio-paid-activation-recovery";
 import { ensureDispatchExecution } from "../src/lib/studio-dispatch";
 import { resolveFlyerObserverPngRelativePath } from "../src/lib/studio-customer-life";
+import { FLYER_INCLUDED_SLOT_TRUTH } from "../src/lib/studio-review-revision/flyer-purchase-delivery-truth";
 import { buildJobId } from "../src/lib/job-control/lane-map";
 import { DESIGN_RENDERER_PROOF_SKU } from "../src/lib/studio-design-renderer";
 
@@ -67,6 +68,23 @@ const SHOTS = join(OUT, "customer-board-walk", "shots");
 const ARTIFACTS = join(OUT, "artifacts");
 mkdirSync(SHOTS, { recursive: true });
 mkdirSync(ARTIFACTS, { recursive: true });
+
+const MAYA_MUST_INCLUDE = [
+  "Cedar & Bloom Home Organizing",
+  "Back-to-School Reset",
+  "2-hour home organization session",
+  "$149",
+  "August 24 through September 14, 2026",
+  "Includes: one 2-hour organizing session; organization of one selected household area; simple organization plan for maintaining the space.",
+  "Customers may choose: pantry, entryway, children's homework area, closet, or home office.",
+  "(804) 555-0186",
+  "cedarandbloom.example",
+  "Book Your Reset",
+].join("\n");
+
+const MAYA_STYLE_NOTE =
+  "Style: warm, clean, calm, uncluttered. Soft neutral atmosphere with subtle botanical influence. Do not use childish school graphics, cartoon pencils, school buses, loud primary colors, or cluttered layouts. No logo. No photos. No social handles. No testimonials. No discount. No guarantee. Do not state a service area.";
+
 
 type Check = {
   check: string;
@@ -167,8 +185,7 @@ function mayaPaidCampaign(campaignId: string): CampaignRecord {
       submittedAt: now,
       answers: {
         flyerPurpose: "Promotional flyer for Back-to-School Reset",
-        mustInclude:
-          "Back-to-School Reset — 2-hour session $149. August 24 – September 14, 2026. Call (804) 555-0186 or visit cedarandbloom.example. Book Your Reset.",
+        mustInclude: `${MAYA_MUST_INCLUDE}\n\n${MAYA_STYLE_NOTE}`,
         materials: "No logo. No photos. Please use the business name as a wordmark.",
         intendedUse: "Both print and digital",
         callToAction: "Book Your Reset",
@@ -208,11 +225,18 @@ function mayaPaidCampaign(campaignId: string): CampaignRecord {
   };
 }
 
-function latestRenderFlyerPng(campaignId: string): string | null {
+function latestRenderFlyerFile(
+  campaignId: string,
+  filename: "flyer.png" | "flyer.pdf",
+): string | null {
   const root = join(process.cwd(), "data", "campaign-design-artifacts", campaignId);
   if (!existsSync(root)) return null;
   let newest: { version: number; abs: string } | null = null;
   const stack = [root];
+  const needle = new RegExp(
+    `[/\\\\]renders[/\\\\]v(\\d+)[/\\\\]${filename.replace(".", "\\.")}$`,
+    "i",
+  );
   while (stack.length > 0) {
     const dir = stack.pop()!;
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -221,7 +245,7 @@ function latestRenderFlyerPng(campaignId: string): string | null {
         stack.push(abs);
         continue;
       }
-      const match = /[/\\]renders[/\\]v(\d+)[/\\]flyer\.png$/i.exec(abs.replace(/\\/g, "/"));
+      const match = needle.exec(abs.replace(/\\/g, "/"));
       if (!match) continue;
       const version = Number(match[1]);
       if (!newest || version >= newest.version) newest = { version, abs };
@@ -230,8 +254,28 @@ function latestRenderFlyerPng(campaignId: string): string | null {
   return newest?.abs ?? null;
 }
 
+function latestRenderFlyerPng(campaignId: string): string | null {
+  return latestRenderFlyerFile(campaignId, "flyer.png");
+}
+
 function fileSha256(abs: string): string {
   return createHash("sha256").update(readFileSync(abs)).digest("hex");
+}
+
+function declaredTextFromRenderPng(pngAbs: string): string {
+  const specAbs = pngAbs.replace(/flyer\.png$/i, "design-spec.json");
+  if (!existsSync(specAbs)) return "";
+  try {
+    const spec = JSON.parse(readFileSync(specAbs, "utf8")) as {
+      layers?: Array<{ type?: string; content?: string }>;
+    };
+    return (spec.layers ?? [])
+      .filter((layer) => layer.type === "text" && layer.content)
+      .map((layer) => layer.content)
+      .join("\n");
+  } catch {
+    return "";
+  }
 }
 
 async function copyFlyerPng(campaignId: string, versionName: string): Promise<string | null> {
@@ -251,6 +295,10 @@ async function copyFlyerPng(campaignId: string, versionName: string): Promise<st
   if (!abs) return null;
   const dest = join(ARTIFACTS, versionName);
   copyFileSync(abs, dest);
+  const pdfSrc = abs.replace(/\.png$/i, ".pdf");
+  if (existsSync(pdfSrc)) {
+    copyFileSync(pdfSrc, dest.replace(/\.png$/i, ".pdf"));
+  }
   return dest;
 }
 
@@ -350,9 +398,15 @@ function finish(code: number): number {
       v2: existsSync(join(ARTIFACTS, "maya-flyer-v2.png"))
         ? "artifacts/maya-flyer-v2.png"
         : null,
+      v1Pdf: existsSync(join(ARTIFACTS, "maya-flyer-v1.pdf"))
+        ? "artifacts/maya-flyer-v1.pdf"
+        : null,
+      v2Pdf: existsSync(join(ARTIFACTS, "maya-flyer-v2.pdf"))
+        ? "artifacts/maya-flyer-v2.pdf"
+        : null,
     },
     notes: [
-      "Maya facts unchanged: Cedar & Bloom, Make Me a Flyer $69, wordmark-only, Book Your Reset CTA.",
+      "Maya facts restored from locked brief: included services, botanical/soft-neutral style, wordmark-only, Book Your Reset CTA.",
       "Lifecycle email was not built. Board / Review / Voice were the customer truth surfaces.",
       "Review has no revision-file attachment control. Reported as later enhancement, not invented.",
       "Fresh Playwright context = new browser with empty cookies/localStorage.",
@@ -524,6 +578,14 @@ async function main(): Promise<number> {
       reviewShot,
     );
     push(
+      "review_shows_flyer_design_not_qc_download",
+      /finished single-sided flyer/i.test(reviewText) &&
+        !/Studio quality-control review before delivery/i.test(reviewText)
+        ? "PASS"
+        : "FAIL",
+      reviewText.slice(0, 220),
+    );
+    push(
       "no_kitchen_jargon_in_review",
       !/qa_pass|design-qa|Kitchen|Owner Console/i.test(reviewText) ? "PASS" : "FAIL",
       "Customer Review copy checked for internal terminology.",
@@ -612,12 +674,36 @@ async function main(): Promise<number> {
     const v2Path = await copyFlyerPng(campaignId, "maya-flyer-v2.png");
     const v1Hash = produced && existsSync(produced) ? fileSha256(produced) : null;
     const v2Hash = v2Path && existsSync(v2Path) ? fileSha256(v2Path) : null;
+    const v2PdfPath = v2Path ? v2Path.replace(/\.png$/i, ".pdf") : null;
+    const v2PdfHash =
+      v2PdfPath && existsSync(v2PdfPath) ? fileSha256(v2PdfPath) : null;
+    const v2SourcePng = latestRenderFlyerPng(campaignId);
+    const v2Declared = v2SourcePng ? declaredTextFromRenderPng(v2SourcePng) : "";
     push(
       "revised_artifact_produced",
       Boolean(v2Path && v1Hash && v2Hash && v1Hash !== v2Hash) ? "PASS" : "FAIL",
       v2Path
         ? `v1=${v1Hash?.slice(0, 12)} v2=${v2Hash?.slice(0, 12)}`
         : "No Version 2 PNG",
+    );
+    push(
+      "creative_brief_fidelity_v2",
+      /Cedar & Bloom/i.test(v2Declared) &&
+        /Back-to-School Reset/i.test(v2Declared) &&
+        /\$149/.test(v2Declared) &&
+        /2-hour/i.test(v2Declared) &&
+        /Includes/i.test(v2Declared) &&
+        /pantry/i.test(v2Declared) &&
+        /Book Your Reset/i.test(v2Declared) &&
+        /555-0186/.test(v2Declared) &&
+        /cedarandbloom\.example/i.test(v2Declared) &&
+        /2026/.test(v2Declared) &&
+        !/Local business/i.test(v2Declared) &&
+        !/school bus/i.test(v2Declared) &&
+        !/guarantee/i.test(v2Declared)
+        ? "PASS"
+        : "FAIL",
+      v2Declared.slice(0, 280),
     );
 
     await pageA.reload({ waitUntil: "domcontentloaded" });
@@ -716,7 +802,14 @@ async function main(): Promise<number> {
       approveShot,
     );
     const pinHash = pin?.contentSha256s?.[0] ?? "";
+    const pinHexes = (pin?.contentSha256s ?? []).map((hash) =>
+      hash.replace(/^sha256:/i, "").toLowerCase(),
+    );
     const pinHex = pinHash.replace(/^sha256:/i, "");
+    const pngFile = cdf.find((file) => /png|jpg/i.test(file.fileType));
+    const pdfFile = cdf.find((file) => /pdf/i.test(file.fileType));
+    const pngHex = (pngFile?.contentSha256 ?? "").replace(/^sha256:/i, "").toLowerCase();
+    const pdfHex = (pdfFile?.contentSha256 ?? "").replace(/^sha256:/i, "").toLowerCase();
     push(
       "stale_version_cannot_win",
       Boolean(v1Hash && v2Hash && pinHex === v2Hash && pinHex !== v1Hash) &&
@@ -735,6 +828,52 @@ async function main(): Promise<number> {
         : "FAIL",
       `spine=${approvedJob?.spineStatus} files=${cdf.length} pin=${pin?.workVersionId ?? "none"}`,
     );
+    push(
+      "five_slot_classification",
+      FLYER_INCLUDED_SLOT_TRUTH.filter((slot) => slot.class === "customer_promised_file").length === 2 &&
+        FLYER_INCLUDED_SLOT_TRUTH.some((slot) => slot.class === "internal_qa") &&
+        FLYER_INCLUDED_SLOT_TRUTH.some((slot) => slot.class === "supporting_studio_work")
+        ? "PASS"
+        : "FAIL",
+      FLYER_INCLUDED_SLOT_TRUTH.map((slot) => `${slot.key}:${slot.class}`).join(", "),
+    );
+    push(
+      "customer_received_promised_png_and_pdf",
+      Boolean(
+        pngFile &&
+          pdfFile &&
+          cdf.length === 2 &&
+          pngHex === (v2Hash ?? "") &&
+          pdfHex &&
+          pdfHex === (v2PdfHash ?? "") &&
+          pngHex !== pdfHex &&
+          pinHexes.includes(pngHex) &&
+          pinHexes.includes(pdfHex),
+      )
+        ? "PASS"
+        : "FAIL",
+      `files=${cdf.length} png=${pngHex.slice(0, 12)} pdf=${pdfHex.slice(0, 12)} v2pdf=${(v2PdfHash ?? "").slice(0, 12)} pin=${pinHexes.map((h) => h.slice(0, 8)).join("+")}`,
+    );
+
+    await pageA.goto(`${BASE}/deliverables`, {
+      waitUntil: "domcontentloaded",
+      timeout: 90_000,
+    });
+    await pageA.waitForTimeout(1200);
+    const deliveryShot = await shot(pageA, "07-final-delivery-png-and-pdf");
+    const deliveryText = await visibleText(pageA);
+    push(
+      "final_delivery_customer_truth",
+      /Print-ready PDF/i.test(deliveryText) &&
+        /Digital PNG or JPG/i.test(deliveryText) &&
+        /Version 2/i.test(deliveryText) &&
+        !/Studio quality-control review before delivery/i.test(deliveryText) &&
+        !/One defined design direction/i.test(deliveryText)
+        ? "PASS"
+        : "FAIL",
+      deliveryText.slice(0, 280),
+      deliveryShot,
+    );
 
     await contextA.close();
     contextA = null;
@@ -751,7 +890,9 @@ async function main(): Promise<number> {
     push(
       "leave_return_preserves_approval_and_history",
       returnJob?.customerApprovedArtifactAuthorization?.decisionId === pin?.decisionId &&
-        (returnTasks?.jobCorrectionUses ?? []).length === 1
+        (returnTasks?.jobCorrectionUses ?? []).length === 1 &&
+        (returnJob?.clientDeliveryFiles ?? []).some((file) => /pdf/i.test(file.fileType)) &&
+        (returnJob?.clientDeliveryFiles ?? []).some((file) => /png|jpg/i.test(file.fileType))
         ? "PASS"
         : "FAIL",
       `spine=${returnJob?.spineStatus}`,

@@ -24,7 +24,11 @@ export function allRequiredClientDeliveryFilesAssembled(
   const keys = resolveRequiredDeliverableKeys(requiredDeliverables);
   const files = job.clientDeliveryFiles ?? [];
   return keys.every((def) =>
-    files.some((file) => file.deliverableKey === def.key && Boolean(file.url.trim())),
+    files.some(
+      (file) =>
+        Boolean(file.url.trim()) &&
+        (file.deliverableKey === def.key || file.deliverableLabel === def.label),
+    ),
   );
 }
 
@@ -38,9 +42,9 @@ export function allRequiredClientDeliveryFilesPresent(
   return keys.every((def) =>
     files.some(
       (file) =>
-        file.deliverableKey === def.key &&
-        file.url.trim() &&
-        clientDeliveryFileIsReleased(job, file),
+        Boolean(file.url.trim()) &&
+        clientDeliveryFileIsReleased(job, file) &&
+        (file.deliverableKey === def.key || file.deliverableLabel === def.label),
     ),
   );
 }

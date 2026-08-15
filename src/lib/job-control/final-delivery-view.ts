@@ -1,5 +1,6 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import { findProductionPlanLineForJob } from "@/lib/approved-plan-line";
+import { customerVisiblePurchaseLabelsForSku } from "@/lib/studio-review-revision/flyer-purchase-delivery-truth";
 
 import { canClientAccessJobDelivery, isJobDeliveredToClient } from "./final-delivery-access";
 import type { JobClientDeliveryFile, PurchasedJobRecord } from "./types";
@@ -59,7 +60,8 @@ function completedDeliverablesForJob(
   job: PurchasedJobRecord,
 ): string[] {
   const line = findProductionPlanLineForJob(campaign, job);
-  return line?.deliverables ? [...line.deliverables] : [];
+  const labels = line?.deliverables ? [...line.deliverables] : [];
+  return [...customerVisiblePurchaseLabelsForSku(job.skuId, labels)];
 }
 
 function resolveJobDeliveryView(

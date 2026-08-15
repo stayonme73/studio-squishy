@@ -80,7 +80,7 @@ function buildJobDesignBrief(
     brandIdentity: {
       businessName: truth.businessName,
       requiredWordmark: truth.wordmark,
-      approvedDescriptors: [truth.descriptor],
+      approvedDescriptors: truth.descriptor.trim() ? [truth.descriptor] : [],
       prohibitedDescriptors: [],
       approvedLogoVariantIds: logoId ? [logoId] : [],
     },
