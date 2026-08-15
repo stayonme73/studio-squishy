@@ -347,6 +347,6 @@ Stay in Room 1. Do not start Owner Console, Room 2, or soft opening. Do not merg
 
 ## T. Git / park
 
-**Tip:** filled after commit  
+**Tip:** `5e40bf4`  
 Parked after commit + push of the Manager visual artifact correction. Remote/local match is confirmed in the chat after push. **No merge.**
 Email/Notifications not started.
