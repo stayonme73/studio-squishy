@@ -25,7 +25,7 @@ Visual / customer limits inherit Owner-accepted **VISUAL/PRODUCT GATE: PASS WITH
 | Lane feature commit SHA | `4c74839aee2af0dfcee03862ef17f8341b443808` |
 | Lane visual-fix commit SHA | `4462317980707f16d958fa97c3d5669990edcf69` |
 | Seal-from (lane tip) | `4462317980707f16d958fa97c3d5669990edcf69` |
-| Seal commit SHA | *(filled on seal commit)* |
+| Seal commit SHA | `f8447db8cc8613053aa4efaac2e54c873fbc78f0` |
 | Seal commit message | `docs(operating): seal rm-j007 Reference-Guided Promotion Update customer-ready-with-limits` |
 | Pushed branch | `operating/design-renderer-proof-1` |
 | Branch tip (local = origin) | *(filled after tip-identity + push)* |
