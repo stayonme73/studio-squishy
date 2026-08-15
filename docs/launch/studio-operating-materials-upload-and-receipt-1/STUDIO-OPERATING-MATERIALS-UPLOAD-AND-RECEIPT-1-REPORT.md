@@ -203,7 +203,7 @@ Unrelated `current-identity.json` / auth ledger dirt on the branch was **not** i
 
 ## O. Commit / push state
 
-Local commit on `operating/design-renderer-proof-1` with this package’s source, tests, and report. **Not pushed. Not merged.**
+Local commit `25c963b` on `operating/design-renderer-proof-1` with this package’s source, tests, and report. **Not pushed. Not merged.** Branch is ahead of origin.
 
 ---
 
