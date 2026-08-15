@@ -50,6 +50,7 @@ export const studioRoom1CustomerLifeCloseoutV1 = {
   /** Current non-domain-dependent Room 1 section. */
   activeSection: {
     id: "STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1",
-    status: "open" as const,
+    status: "parked_for_manager" as const,
+    roomClosed: false as const,
   },
 } as const;

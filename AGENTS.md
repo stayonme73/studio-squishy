@@ -71,7 +71,7 @@ Room 1 includes intake/materials, real upload storage/retrieval, Machine↔team 
 
 A section closes only after **BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST**. Never **BUILD → TESTS GREEN → NEXT**. Do not silently carry launch blockers into the next room.
 
-**Current board:** Room 1 is **not closed.** **COME BACK LATER:** live Resend / branded sender / inbox proof is PARKED WITH EXTERNAL PREREQUISITE at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`) — not closed, do not fake. Active section: `STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1`. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. Do not start rooms 2–5. No merge unless separately authorized.
+**Current board:** Room 1 is **not closed.** **COME BACK LATER:** live Resend / branded sender / inbox proof is PARKED WITH EXTERNAL PREREQUISITE at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`) — not closed, do not fake. Torture test `STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1` is **PARKED FOR MANAGER**, not a Room 1 close. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. Do not start rooms 2–5. No merge unless separately authorized.
 <!-- END:launch-readiness-execution-order -->
 
 <!-- BEGIN:conversation-room-machine-contract -->

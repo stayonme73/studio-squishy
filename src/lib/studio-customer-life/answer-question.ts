@@ -70,9 +70,9 @@ export function classifyCustomerLifeQuestion(question: string): CustomerLifeQues
   if (matches(text, ["new version ready", "revised", "updated version"])) {
     return "new_version_ready";
   }
-  if (matches(text, ["which version", "what version did i approve", "approved"])) {
-    return "which_version_approved";
-  }
+      if (text.includes("approval") || matches(text, ["which version", "what version did i approve", "approved"])) {
+        return "which_version_approved";
+      }
   if (matches(text, ["final file", "download", "finished file", "where are my"])) {
     return "final_files";
   }

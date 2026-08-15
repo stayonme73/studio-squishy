@@ -429,6 +429,7 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
       "Did you receive my revision?": "received_revision",
       "Is the new version ready?": "new_version_ready",
       "Which version did I approve?": "which_version_approved",
+      "Did you keep my approval?": "which_version_approved",
       "Where are my final files?": "final_files",
     };
     for (const [question, intent] of Object.entries(questions)) {

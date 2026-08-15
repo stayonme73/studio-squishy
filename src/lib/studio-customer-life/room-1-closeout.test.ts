@@ -22,5 +22,9 @@ describe("Room 1 closeout — come-back-later email flag", () => {
     expect(studioRoom1CustomerLifeCloseoutV1.activeSection.id).toBe(
       "STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1",
     );
+    expect(studioRoom1CustomerLifeCloseoutV1.activeSection.status).toBe(
+      "parked_for_manager",
+    );
+    expect(studioRoom1CustomerLifeCloseoutV1.activeSection.roomClosed).toBe(false);
   });
 });

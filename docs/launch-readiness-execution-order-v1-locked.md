@@ -107,7 +107,7 @@ Keep this sequence as the standing roadmap for all future launch work unless Tag
 
 | Room | Status |
 |------|--------|
-| 1. Customer Life + Communication | **ACTIVE — not closed.** Come-back-later: live Resend / branded sender / inbox proof is **PARKED WITH EXTERNAL PREREQUISITE** at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`). Not closed. Do not fake. Active section: whole-customer torture test. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. |
+| 1. Customer Life + Communication | **ACTIVE — not closed.** Come-back-later: live Resend / branded sender / inbox proof is **PARKED WITH EXTERNAL PREREQUISITE** at `d6974eb`. Not closed. Do not fake. Whole-customer torture test is **PARKED FOR MANAGER** (`STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1`) — not a Room 1 close. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. |
 | 2. Customer-facing truth + friction cleanup | Not started. Do not enter. |
 | 3. Owner Console | Not started. Do not enter. |
 | 4. Full business rehearsal | Not started. Do not enter. |
@@ -119,6 +119,6 @@ Launch blockers still inside Room 1 (not silently accepted as launch limits unle
 
 - **Live customer lifecycle email certification** — parked with external prerequisite above. Queued notices + Resend adapter remain wired; Board/Voice stay source of truth.
 - Seeded required logo/photo slots can mislead vs wordmark-only flyer SKU law.
-- Whole-customer torture test is the current non-domain-dependent section (wrong upload, duplicate, stall, QA fail, stale version, return-later, honest failed-notice).
+- Whole-customer torture test is **PARKED FOR MANAGER**, not a Room 1 close. Email still COME BACK LATER at `d6974eb`.
 
 Do not start Room 2–5 from this document.
