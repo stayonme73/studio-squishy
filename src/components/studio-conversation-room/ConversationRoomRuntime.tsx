@@ -10,7 +10,7 @@ import StudioGuideTabletView, {
   STUDIO_GUIDE_MIC_PRIVACY_NOTE,
 } from "@/components/studio-conversation-room/guide/StudioGuideTabletView";
 import StudioConversationRoom from "@/components/studio-conversation-room/StudioConversationRoom";
-import { answerCustomerLifeQuestion } from "@/lib/studio-customer-life/answer-question";
+import { studioVoiceMachineCustomerCommunicationV1 } from "@/config/studio-voice-machine-customer-communication-v1";
 import {
   conversationRoomGuideV1,
   getConversationRoomGuideQuestion,
@@ -1531,11 +1531,7 @@ export default function ConversationRoomRuntime({
     writeTextDraft("");
     setInterimTranscript("");
     const campaign = readCurrentCampaignHydrated();
-    const fallback = answerCustomerLifeQuestion(trimmed, {
-      campaign,
-      materials: [],
-      tasks: null,
-    });
+    const lookupFailed = studioVoiceMachineCustomerCommunicationV1.customerCopy.lookupFailed;
     void (async () => {
       try {
         const response = await fetch("/api/studio-customer-life/ask", {
@@ -1547,17 +1543,17 @@ export default function ConversationRoomRuntime({
           }),
         });
         if (!response.ok) {
-          setStudioVoiceReply(fallback.text);
-          speakStudioLine(fallback.text);
+          setStudioVoiceReply(lookupFailed);
+          speakStudioLine(lookupFailed);
           return;
         }
         const payload = (await response.json()) as { answer?: { text?: string } };
-        const text = payload.answer?.text?.trim() || fallback.text;
+        const text = payload.answer?.text?.trim() || lookupFailed;
         setStudioVoiceReply(text);
         speakStudioLine(text);
       } catch {
-        setStudioVoiceReply(fallback.text);
-        speakStudioLine(fallback.text);
+        setStudioVoiceReply(lookupFailed);
+        speakStudioLine(lookupFailed);
       }
     })();
   }

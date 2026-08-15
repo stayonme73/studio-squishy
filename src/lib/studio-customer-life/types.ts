@@ -16,6 +16,8 @@ export type CustomerLifeQuestionIntent =
   | "new_version_ready"
   | "which_version_approved"
   | "final_files"
+  | "production_assigned"
+  | "qa_status"
   | "unknown";
 
 export type CustomerLifePhase =
@@ -43,6 +45,10 @@ export type CustomerLifeStall = {
   recoveryClass: CustomerLifeRecoveryClass;
 };
 
+export type CustomerLifeWaitingOn = "customer" | "studio" | "none";
+
+export type CustomerLifeQaState = "not_recorded" | "passed" | "failed" | "blocked";
+
 export type CustomerLifeTruth = {
   campaignId: string | null;
   phase: CustomerLifePhase;
@@ -51,9 +57,16 @@ export type CustomerLifeTruth = {
   blockingMaterialsCount: number;
   receivedMaterialCount: number;
   unusableMaterialCount: number;
+  storedNotApprovedCount: number;
+  approvedForUseCount: number;
   activationPendingRetry: boolean;
   productionStarted: boolean;
+  productionAssigned: boolean;
+  waitingOn: CustomerLifeWaitingOn;
+  waitingOnSummary: string | null;
   qaPassed: boolean;
+  qaHappened: boolean;
+  qaState: CustomerLifeQaState;
   reviewEligible: boolean;
   revisionRequested: boolean;
   revisionAllowanceIncluded: number;

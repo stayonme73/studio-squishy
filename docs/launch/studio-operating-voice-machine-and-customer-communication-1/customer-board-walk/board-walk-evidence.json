@@ -1,0 +1,196 @@
+{
+  "packageId": "STUDIO-OPERATING-VOICE-MACHINE-AND-CUSTOMER-COMMUNICATION-1",
+  "kind": "customer-board-walk",
+  "recordedAt": "2026-08-15T15:27:34.592Z",
+  "baseUrl": "http://127.0.0.1:3066",
+  "commitHint": "1debce469715f5ff9fbd0d98edb66cd609151b8f",
+  "runId": "5522383f-623a-46d4-9738-86fa4016b255",
+  "totals": {
+    "passed": 22,
+    "failed": 0,
+    "blocked": 0,
+    "total": 22
+  },
+  "verdict": "VOICE + MACHINE + CUSTOMER COMMUNICATION READY FOR CLOSE",
+  "asked": [
+    {
+      "question": "Did my payment go through?",
+      "answer": "Yes. Payment is confirmed on the Studio record. You do not need to pay again."
+    },
+    {
+      "question": "Do you need anything else from me?",
+      "answer": "Yes. We still need your Project Intake before we can produce your flyer."
+    },
+    {
+      "question": "Did you receive my file?",
+      "answer": "The Studio record does not show a received upload yet. If you just sent a file, wait a moment and ask again."
+    },
+    {
+      "question": "Has work started yet?",
+      "answer": "Production has not started on the Studio record yet. Payment can be confirmed while we are still getting the project ready or waiting on intake."
+    },
+    {
+      "question": "What is happening with my flyer?",
+      "answer": "Here is what the Studio record shows for your flyer: Payment is confirmed. Project Intake is still needed. No received upload is on the record yet. Production has not been assigned yet. Work has not started. Internal quality check is not on the record yet. Waiting on you: Project Intake is still needed from the customer. Review is not open yet."
+    },
+    {
+      "question": "Is anything holding it up?",
+      "answer": "Project Intake is what is holding the next step."
+    },
+    {
+      "question": "When will I be able to review it?",
+      "answer": "Review is not open yet. The Studio is still preparing your flyer. I will not invent a date."
+    },
+    {
+      "question": "Can I make changes after I see it?",
+      "answer": "You can ask for changes once the flyer is in Review. It is not in Review yet."
+    },
+    {
+      "question": "What is Tagia's favorite color?",
+      "answer": "I do not have that on the project record yet, so I will not guess. Your Studio Board is the main place to see the current honest step."
+    },
+    {
+      "question": "Did my payment go through?",
+      "answer": "Yes. Payment is confirmed on the Studio record. You do not need to pay again."
+    },
+    {
+      "question": "I can finish Project Intake from here.",
+      "answer": "We received your reply and attached it to this project. The Studio still needs the missing step itself before that waiting state can clear. You do not need to repeat facts already on the record."
+    },
+    {
+      "question": "Do you need anything else from me?",
+      "answer": "The Studio record does not show anything waiting on you right now."
+    },
+    {
+      "question": "What is happening with my project?",
+      "answer": "Here is what the Studio record shows for your flyer: Payment is confirmed. Project Intake is on file. No received upload is on the record yet. Production has not been assigned yet. Work has not started. Internal quality check is not on the record yet. Waiting on The Studio: The production tool reported success but no flyer file identity is on the record. Review is not open yet."
+    },
+    {
+      "question": "Did you receive my file?",
+      "answer": "Yes. We received your file. It is still being checked for use. Received is not the same as approved for use."
+    }
+  ],
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (external)"
+    },
+    {
+      "check": "maya_fixture",
+      "status": "PASS",
+      "detail": "Maya Brooks paid $69 flyer, intake incomplete, existing Cedar & Bloom facts only."
+    },
+    {
+      "check": "sign_in_opens_board",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066/studio-board",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-voice-machine-and-customer-communication-1\\customer-board-walk\\shots\\01-board-studio-request.png"
+    },
+    {
+      "check": "studio_asks_maya_intake",
+      "status": "PASS",
+      "detail": "Machine waiting-on-customer request visible on Board.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-voice-machine-and-customer-communication-1\\customer-board-walk\\shots\\01-board-studio-request.png"
+    },
+    {
+      "check": "ask_Did_my_payment_go_through_",
+      "status": "PASS",
+      "detail": "Yes. Payment is confirmed on the Studio record. You do not need to pay again."
+    },
+    {
+      "check": "ask_Do_you_need_anything_else_fr",
+      "status": "PASS",
+      "detail": "Yes. We still need your Project Intake before we can produce your flyer."
+    },
+    {
+      "check": "ask_Did_you_receive_my_file_",
+      "status": "PASS",
+      "detail": "The Studio record does not show a received upload yet. If you just sent a file, wait a moment and ask again."
+    },
+    {
+      "check": "ask_Has_work_started_yet_",
+      "status": "PASS",
+      "detail": "Production has not started on the Studio record yet. Payment can be confirmed while we are still getting the project ready or waiting on intake."
+    },
+    {
+      "check": "ask_What_is_happening_with_my_fl",
+      "status": "PASS",
+      "detail": "Here is what the Studio record shows for your flyer: Payment is confirmed. Project Intake is still needed. No received upload is on the record yet. Production has not been assigned yet. Work has not started. Internal qua"
+    },
+    {
+      "check": "ask_Is_anything_holding_it_up_",
+      "status": "PASS",
+      "detail": "Project Intake is what is holding the next step."
+    },
+    {
+      "check": "ask_When_will_I_be_able_to_revie",
+      "status": "PASS",
+      "detail": "Review is not open yet. The Studio is still preparing your flyer. I will not invent a date."
+    },
+    {
+      "check": "ask_Can_I_make_changes_after_I_s",
+      "status": "PASS",
+      "detail": "You can ask for changes once the flyer is in Review. It is not in Review yet."
+    },
+    {
+      "check": "unknown_does_not_guess",
+      "status": "PASS",
+      "detail": "I do not have that on the project record yet, so I will not guess. Your Studio Board is the main place to see the current honest step."
+    },
+    {
+      "check": "duplicate_question_same_truth",
+      "status": "PASS",
+      "detail": "Same payment question asked twice. Same Machine answer."
+    },
+    {
+      "check": "maya_replies_to_studio_request",
+      "status": "PASS",
+      "detail": "We received your reply and attached it to this project. The Studio still needs the missing step itself before that waiting state can clear. You do not need to repeat facts already on the record."
+    },
+    {
+      "check": "waiting_still_open_until_intake_on_record",
+      "status": "PASS",
+      "detail": "Typed reply was recorded. Intake waiting did not silently clear."
+    },
+    {
+      "check": "asked_answered_screenshot",
+      "status": "PASS",
+      "detail": "Board shows Machine answers under Maya's questions.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-voice-machine-and-customer-communication-1\\customer-board-walk\\shots\\02-asked-and-answered.png"
+    },
+    {
+      "check": "fresh_context_waiting_cleared",
+      "status": "PASS",
+      "detail": "The Studio record does not show anything waiting on you right now.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-voice-machine-and-customer-communication-1\\customer-board-walk\\shots\\03-fresh-context-return.png"
+    },
+    {
+      "check": "fresh_context_same_project_truth",
+      "status": "PASS",
+      "detail": "Here is what the Studio record shows for your flyer: Payment is confirmed. Project Intake is on file. No received upload is on the record yet. Production has not been assigned yet. Work has not started. Internal quality check is not on the "
+    },
+    {
+      "check": "received_file_not_collapsed_into_approved",
+      "status": "PASS",
+      "detail": "Yes. We received your file. It is still being checked for use. Received is not the same as approved for use."
+    },
+    {
+      "check": "return_later_communication_persists",
+      "status": "PASS",
+      "detail": "Earlier questions remain on the same project ledger after a fresh browser.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-voice-machine-and-customer-communication-1\\customer-board-walk\\shots\\04-received-not-approved.png"
+    },
+    {
+      "check": "owner_intervention",
+      "status": "PASS",
+      "detail": "NONE. Routine questions did not require Tagia."
+    }
+  ],
+  "notes": [
+    "Walk used Studio Board project communication (not an API-only substitute).",
+    "Fresh Playwright context = new browser with empty cookies/localStorage.",
+    "Maya facts unchanged: Cedar & Bloom, Make Me a Flyer $69, wordmark-only allowed.",
+    "Intake completion after Maya's reply used existing Maya intake answers already on file for this flyer fixture."
+  ]
+}

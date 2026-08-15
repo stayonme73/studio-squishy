@@ -12,6 +12,13 @@ import {
   listProjectCommunicationForCustomer,
   type ProjectCommunicationMessage,
 } from "@/lib/project-communication";
+import {
+  handleCustomerBoardQuestion,
+  machineAnswerForMessage,
+  readCustomerLifeEnvelope,
+  readCustomerLifeStatus,
+} from "@/lib/studio-customer-life/communication-loop";
+import type { MachineAnswerView } from "@/lib/studio-customer-life/communication-loop";
 
 type RouteContext = {
   params: Promise<{ campaignId: string }>;
@@ -25,10 +32,12 @@ export type CustomerMessageView = {
   createdAt: string;
   replyToMessageId: string | null;
   studioHasReplied: boolean | null;
+  machineAnswer: MachineAnswerView | null;
 };
 
 function toCustomerMessageViews(
   messages: readonly ProjectCommunicationMessage[],
+  lifeAsks: Awaited<ReturnType<typeof readCustomerLifeEnvelope>> | null,
 ): CustomerMessageView[] {
   return messages.map((message) => ({
     id: message.id,
@@ -38,6 +47,7 @@ function toCustomerMessageViews(
     replyToMessageId: message.replyToMessageId,
     studioHasReplied:
       message.senderRole === "customer" ? hasStudioReply(messages, message.id) : null,
+    machineAnswer: lifeAsks ? machineAnswerForMessage(lifeAsks, message) : null,
   }));
 }
 
@@ -60,9 +70,14 @@ export async function GET(request: Request, context: RouteContext) {
     return NextResponse.json({ error: listed.error }, { status: listed.status });
   }
 
+  const life = await readCustomerLifeEnvelope(campaignId);
+  const status = await readCustomerLifeStatus(campaignId);
+
   return NextResponse.json({
     campaignId,
-    messages: toCustomerMessageViews(listed.messages),
+    messages: toCustomerMessageViews(listed.messages, life),
+    studioRequests: status.studioRequests,
+    communicationSummary: status.summary,
     syncedAt: listed.envelope.updatedAt,
   });
 }
@@ -121,10 +136,47 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }
 
+  let loop: Awaited<ReturnType<typeof handleCustomerBoardQuestion>> | null = null;
+  try {
+    loop = result.replayed
+      ? null
+      : await handleCustomerBoardQuestion({
+          campaignId,
+          question: result.message.body,
+          commMessageId: result.message.id,
+        });
+  } catch {
+    loop = {
+      answer: {
+        intent: "unknown",
+        text: "",
+        known: false,
+        phase: "no_project",
+        source: "none",
+      },
+      truth: (await readCustomerLifeStatus(campaignId)).truth,
+      confirmation:
+        "We received your message and attached it to this project. The Studio could not look up the live record just now, so it will not guess. Please ask again in a moment.",
+      machineAnswer: {
+        text: "I could not reach the live project record just now, so I will not guess. Please ask again in a moment, or check your Studio Board.",
+        known: false,
+        source: "none",
+        intent: "unknown",
+        askState: "waiting_for_studio",
+        lookupFailed: true,
+      },
+      studioRequests: [],
+    };
+  }
+
   const listed = await listProjectCommunicationForCustomer(campaignId);
+  const life = await readCustomerLifeEnvelope(campaignId);
   const messages = listed.ok
-    ? toCustomerMessageViews(listed.messages)
-    : toCustomerMessageViews(result.envelope.messages);
+    ? toCustomerMessageViews(listed.messages, life)
+    : toCustomerMessageViews(result.envelope.messages, life);
+  const machineAnswer =
+    loop?.machineAnswer ??
+    machineAnswerForMessage(life, result.message);
 
   return NextResponse.json({
     message: {
@@ -134,10 +186,16 @@ export async function POST(request: Request, context: RouteContext) {
       createdAt: result.message.createdAt,
       replyToMessageId: result.message.replyToMessageId,
       studioHasReplied: false,
+      machineAnswer,
     } satisfies CustomerMessageView,
     replayed: result.replayed,
     messages,
-    syncedAt: result.envelope.updatedAt,
+    studioRequests: loop?.studioRequests ?? (await readCustomerLifeStatus(campaignId)).studioRequests,
     confirmation: "Message sent to The Studio.",
+    machineConfirmation: loop?.confirmation ??
+      (machineAnswer?.known
+        ? "We received your question and answered it from the project record."
+        : undefined),
+    syncedAt: result.envelope.updatedAt,
   });
 }

@@ -5,12 +5,20 @@ export {
   classifyCustomerLifeQuestion,
 } from "./answer-question";
 export { bindFlyerIdentityToQaRecords, ensureFlyerMachineReviewBind } from "./machine-review-bind";
+export {
+  askCustomerLifeFromStore,
+  handleCustomerBoardQuestion,
+  readCustomerLifeStatus,
+} from "./ask";
+export { studioCustomerCommunicationEmailMapV1 } from "./email-capability-map";
 export type {
   CustomerLifeAnswer,
   CustomerLifeAskResult,
   CustomerLifePhase,
+  CustomerLifeQaState,
   CustomerLifeQuestionIntent,
   CustomerLifeRecoveryClass,
   CustomerLifeStall,
   CustomerLifeTruth,
+  CustomerLifeWaitingOn,
 } from "./types";

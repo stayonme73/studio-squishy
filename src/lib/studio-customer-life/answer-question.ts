@@ -34,6 +34,12 @@ export function classifyCustomerLifeQuestion(question: string): CustomerLifeQues
   if (matches(text, ["work started", "anyone started", "has work started", "started working"])) {
     return "work_started";
   }
+  if (matches(text, ["assigned", "who is working", "production team"])) {
+    return "production_assigned";
+  }
+  if (matches(text, ["qa happen", "has qa", "quality check", "internal quality"])) {
+    return "qa_status";
+  }
   if (matches(text, ["holding", "stuck", "delay", "waiting on"])) {
     return "holding_up";
   }
@@ -94,12 +100,19 @@ export function answerCustomerLifeQuestion(
       if (!truth.paymentConfirmed) return known(copy.paymentNotConfirmed);
       if (!truth.intakeComplete) return known(copy.intakeNeeded);
       if (truth.blockingMaterialsCount > 0) return known(copy.materialsNeeded);
+      if (truth.unusableMaterialCount > 0) return known(copy.unusableMaterial);
       return known(copy.nothingNeededNow);
     case "received_upload":
       if (truth.unusableMaterialCount > 0 && truth.receivedMaterialCount > 0) {
         return known(copy.unusableMaterial);
       }
-      return known(truth.receivedMaterialCount > 0 ? copy.uploadReceived : copy.uploadNotFound);
+      if (truth.storedNotApprovedCount > 0) {
+        return known(copy.uploadReceivedPendingUse);
+      }
+      if (truth.approvedForUseCount > 0) {
+        return known(copy.uploadApprovedForUse);
+      }
+      return known(copy.uploadNotFound);
     case "work_started":
       if (truth.activationPendingRetry) return known(copy.recovering);
       return known(truth.productionStarted ? copy.workStarted : copy.workNotStarted);
@@ -107,6 +120,7 @@ export function answerCustomerLifeQuestion(
       if (truth.activationPendingRetry) return known(copy.holdingRecovery);
       if (!truth.intakeComplete) return known(copy.holdingIntake);
       if (truth.blockingMaterialsCount > 0) return known(copy.holdingMaterials);
+      if (truth.unusableMaterialCount > 0) return known(copy.unusableMaterial);
       if (truth.revisionRequested) return known(copy.holdingRevision);
       if (truth.reviewEligible) return known(copy.holdingReview);
       if (truth.qaPassed && !truth.reviewEligible) return known(copy.holdingQa);
@@ -135,14 +149,44 @@ export function answerCustomerLifeQuestion(
       );
     case "final_files":
       return known(truth.finalDeliveryReady ? copy.finalReady : copy.finalNotReady);
+    case "production_assigned":
+      return known(truth.productionAssigned ? copy.productionAssigned : copy.productionNotAssigned);
+    case "qa_status":
+      if (truth.qaState === "passed") return known(copy.qaPassed);
+      if (truth.qaState === "failed" || truth.qaState === "blocked") return known(copy.qaFailed);
+      return known(copy.qaNotRecorded);
     case "flyer_status": {
+      const materialBit =
+        truth.approvedForUseCount > 0 && truth.storedNotApprovedCount === 0
+          ? "A file is received and approved for use."
+          : truth.unusableMaterialCount > 0
+            ? "A file was received and is still being checked for use."
+            : truth.receivedMaterialCount > 0
+              ? "A file is received and is still being checked for use."
+              : "No received upload is on the record yet.";
+      const waitingBit =
+        truth.waitingOn === "customer"
+          ? `Waiting on you${truth.waitingOnSummary ? `: ${truth.waitingOnSummary}` : "."}`
+          : truth.waitingOn === "studio"
+            ? `Waiting on The Studio${truth.waitingOnSummary ? `: ${truth.waitingOnSummary}` : "."}`
+            : "The record does not show a waiting state.";
       const bits = [
         truth.paymentConfirmed ? "Payment is confirmed." : "Payment is not confirmed.",
         truth.intakeComplete ? "Project Intake is on file." : "Project Intake is still needed.",
+        materialBit,
         truth.activationPendingRetry
           ? "The Studio is still getting the project ready after payment."
           : null,
+        truth.productionAssigned
+          ? "Production has been assigned."
+          : "Production has not been assigned yet.",
         truth.productionStarted ? "Work has started." : "Work has not started.",
+        truth.qaHappened
+          ? truth.qaState === "passed"
+            ? "Internal quality check has happened and passed."
+            : "Internal quality check has happened and has not passed yet."
+          : "Internal quality check is not on the record yet.",
+        waitingBit,
         truth.reviewEligible ? "Review is open." : "Review is not open yet.",
       ].filter(Boolean);
       return known(`${copy.flyerStatusPrefix}${bits.join(" ")}`);

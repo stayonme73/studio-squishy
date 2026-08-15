@@ -10,8 +10,10 @@ import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer/types";
 import type {
   CustomerLifeInput,
   CustomerLifePhase,
+  CustomerLifeQaState,
   CustomerLifeStall,
   CustomerLifeTruth,
+  CustomerLifeWaitingOn,
 } from "./types";
 
 function flyerJob(tasks: CustomerLifeInput["tasks"]) {
@@ -36,6 +38,18 @@ function countUnusable(materials: CustomerLifeInput["materials"]): number {
     (item) =>
       item.reviewStatus === "rejected" ||
       item.reviewStatus === "needs_clarification",
+  ).length;
+}
+
+function countApprovedForUse(materials: CustomerLifeInput["materials"]): number {
+  if (!materials) return 0;
+  return materials.filter((item) => item.reviewStatus === "approved_for_use").length;
+}
+
+function countStoredNotApproved(materials: CustomerLifeInput["materials"]): number {
+  if (!materials) return 0;
+  return materials.filter(
+    (item) => isReceivedMaterial(item) && item.reviewStatus !== "approved_for_use",
   ).length;
 }
 
@@ -179,6 +193,17 @@ export function assembleCustomerLifeTruth(
       recoveryClass: "retryable",
     });
   }
+  const unusableNeedsCustomer = (input.materials ?? []).filter(
+    (item) => item.reviewStatus === "needs_clarification",
+  ).length;
+  if (unusableNeedsCustomer > 0) {
+    stalls.push({
+      id: "upload_needs_usable_version",
+      summary:
+        "We received a file, and it is still being checked for use. A usable version is still needed.",
+      recoveryClass: "waiting_on_customer",
+    });
+  }
   const flyerObserver = campaign?.dispatchExecution?.designRendererObserver?.results.find(
     (result) => result.skuId === DESIGN_RENDERER_PROOF_SKU,
   );
@@ -216,6 +241,47 @@ export function assembleCustomerLifeTruth(
     });
   }
 
+  const productionAssigned = Boolean(
+    (job?.workPackets ?? []).some(
+      (packet) =>
+        packet.status === "assigned" || (packet.assignmentEvents?.length ?? 0) > 0,
+    ),
+  );
+  const flyerQa = qaRecords.filter((record) => record.taskId.includes("v2-rtu-flyer"));
+  const qaHappened = flyerQa.length > 0;
+  let qaState: CustomerLifeQaState = "not_recorded";
+  if (flyerQa.some((record) => record.action === "qa_block") && !qaPassed) {
+    qaState = "blocked";
+  } else if (flyerQa.some((record) => record.action === "qa_fail") && !qaPassed) {
+    qaState = "failed";
+  } else if (qaPassed) {
+    qaState = "passed";
+  } else if (qaHappened) {
+    qaState = "failed";
+  }
+
+  const customerWaiting =
+    stalls.some((stall) => stall.recoveryClass === "waiting_on_customer") ||
+    job?.spineStatus === "waiting_on_client";
+  let waitingOn: CustomerLifeWaitingOn = "none";
+  let waitingOnSummary: string | null = null;
+  if (customerWaiting) {
+    waitingOn = "customer";
+    waitingOnSummary =
+      stalls.find((stall) => stall.recoveryClass === "waiting_on_customer")?.summary ??
+      "The project is waiting on the customer.";
+  } else if (
+    stalls.some(
+      (stall) => stall.recoveryClass === "automatic" || stall.recoveryClass === "retryable",
+    )
+  ) {
+    waitingOn = "studio";
+    waitingOnSummary =
+      stalls.find(
+        (stall) => stall.recoveryClass === "automatic" || stall.recoveryClass === "retryable",
+      )?.summary ?? "The Studio is still working from the current record.";
+  }
+
   const spineStatus = job?.spineStatus ?? null;
   const phase = resolvePhase({
     hasCampaign: Boolean(campaign),
@@ -237,9 +303,16 @@ export function assembleCustomerLifeTruth(
     blockingMaterialsCount,
     receivedMaterialCount: countReceived(input.materials),
     unusableMaterialCount: countUnusable(input.materials),
+    storedNotApprovedCount: countStoredNotApproved(input.materials),
+    approvedForUseCount: countApprovedForUse(input.materials),
     activationPendingRetry: recovering,
     productionStarted,
+    productionAssigned,
+    waitingOn,
+    waitingOnSummary,
     qaPassed,
+    qaHappened,
+    qaState,
     reviewEligible,
     revisionRequested: spineStatus === "revision_requested",
     revisionAllowanceIncluded: included,

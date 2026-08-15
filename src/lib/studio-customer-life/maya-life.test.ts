@@ -200,8 +200,9 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
       campaign: mayaCampaign({ projectDetailsSubmittedAt: new Date().toISOString() }),
       materials,
     });
-    expect(received.text).toBe(studioCustomerLifeV1.customerCopy.uploadReceived);
-    expect(received.text.toLowerCase()).toMatch(/not automatically mean it is approved/);
+    expect(received.text).toBe(studioCustomerLifeV1.customerCopy.uploadReceivedPendingUse);
+    expect(received.text.toLowerCase()).toMatch(/still being checked for use/);
+    expect(received.text.toLowerCase()).toMatch(/not the same as approved/);
   });
 
   it("does not invent a review date and does not claim work started from payment alone", () => {
@@ -341,11 +342,18 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
       "Did my payment go through?": "payment",
       "Do you need anything else from me?": "need_anything",
       "Did you receive my upload?": "received_upload",
+      "Did you receive my file?": "received_upload",
       "Has work started?": "work_started",
+      "Has work started yet?": "work_started",
       "What is happening with my flyer?": "flyer_status",
+      "What is happening with my project?": "flyer_status",
       "Is anything holding it up?": "holding_up",
       "When can I review it?": "when_review",
+      "When will I be able to review it?": "when_review",
       "Can I ask for changes?": "can_changes",
+      "Can I make changes after I see it?": "can_changes",
+      "Has production been assigned?": "production_assigned",
+      "Has QA happened?": "qa_status",
       "How many changes do I have left?": "revisions_left",
       "Did you receive my revision?": "received_revision",
       "Is the new version ready?": "new_version_ready",

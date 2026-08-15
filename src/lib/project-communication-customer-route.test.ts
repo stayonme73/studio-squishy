@@ -111,6 +111,10 @@ describe("project-communication customer route", () => {
 
   afterEach(async () => {
     await fs.rm(path.join(COMM_DIR, `${CAMPAIGN_ID}.json`), { force: true });
+    await fs.rm(
+      path.join(process.cwd(), "data", "campaign-customer-life", `${CAMPAIGN_ID}.json`),
+      { force: true },
+    );
   });
 
   it("rejects unauthenticated access", async () => {

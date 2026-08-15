@@ -28,8 +28,22 @@ export const studioCustomerLifeV1 = {
       "The Studio record does not show anything waiting on you right now.",
     uploadReceived:
       "Yes. The Studio has the file or material you sent. That means we received it. It does not automatically mean it is approved for use.",
+    uploadReceivedPendingUse:
+      "Yes. We received your file. It is still being checked for use. Received is not the same as approved for use.",
+    uploadApprovedForUse:
+      "Yes. We received your file, and the project record shows it is approved for use.",
     uploadNotFound:
       "The Studio record does not show a received upload yet. If you just sent a file, wait a moment and ask again.",
+    productionAssigned:
+      "Yes. The project record shows production has been assigned.",
+    productionNotAssigned:
+      "The project record does not show a production assignment yet.",
+    qaPassed:
+      "Yes. Internal quality check is on the record as passed.",
+    qaFailed:
+      "Internal quality check is on the record, and it has not passed yet.",
+    qaNotRecorded:
+      "The project record does not show an internal quality check yet. I will not guess.",
     workNotStarted:
       "Production has not started on the Studio record yet. Payment can be confirmed while we are still getting the project ready or waiting on intake.",
     workStarted:
