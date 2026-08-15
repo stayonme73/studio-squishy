@@ -41,7 +41,7 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Studio Review → Voice Tablet Migration — see **Studio Review Migration** block below (`docs/studio-review-to-voice-tablet-migration-v1-locked.md`, `src/config/studio-review-voice-tablet-migration-v1.ts`). Studio Review stays as working reference; remove one page at a time only after full tablet integration + cert gates. Update the ledger on every Voice-tablet package. Do not modify without Tagia approval.
 - Build Your Project — pre-purchase workspace at `/project-builder` (`docs/project-builder-production-pattern-v1-locked.md`) — **locked 2026-07-11:** service card pattern, Learn More drawer sections, button behavior (Remove never primary), Project Summary placement, Best For header, Squishy message philosophy, one-screen workspace; reuse as template for remaining pre-purchase pages; do not modify without Tagia approval
 - Studio Plan Pre-Checkout Flexibility (`docs/studio-plan-pre-checkout-flexibility-v1-locked.md`, `src/config/studio-plan-pre-checkout-flexibility-v1.ts`) — **LOCKED:** free refine before checkout; checkout confirms scope; after checkout, additions/removals are Project Changes — not silent edits. Studio Voice explains freedom on Studio Plan and the purchased-scope boundary before payment. Do not modify without Tagia approval.
-- Launch readiness execution order (`docs/launch-readiness-execution-order-v1-locked.md`, `src/config/studio-launch-readiness-execution-order-v1.ts`) — **LOCKED 2026-08-15:** one active room at a time; do not skip ahead; technical PASS is not close. Current room is **1. Customer Life + Communication** until actually closed. Rooms 2–5 (friction cleanup, Owner Console, full rehearsal, soft opening) wait. Do not modify without Tagia approval.
+- Launch readiness execution order (`docs/launch-readiness-execution-order-v1-locked.md`, `src/config/studio-launch-readiness-execution-order-v1.ts`) — **LOCKED 2026-08-15:** one active room at a time; do not skip ahead; technical PASS is not close. Current room is **1. Customer Life + Communication** until actually closed. Live Resend / branded sender / inbox proof is **PARKED WITH EXTERNAL PREREQUISITE** (`d6974eb`) — not closed, do not fake. Rooms 2–5 wait. Do not modify the room order without Tagia approval.
 
 **Browser zoom standard:** If a customer has to change their browser zoom to use The Studio, it's a bug.
 
@@ -71,7 +71,7 @@ Room 1 includes intake/materials, real upload storage/retrieval, Machine↔team 
 
 A section closes only after **BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST**. Never **BUILD → TESTS GREEN → NEXT**. Do not silently carry launch blockers into the next room.
 
-**Current board:** Room 1 is **not closed**. Last package `STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1` (`c713cb7`) PARKED at **WORKS WITH LAUNCH BLOCKERS**. Do not start rooms 2–5. No merge unless separately authorized.
+**Current board:** Room 1 is **not closed.** **COME BACK LATER:** live Resend / branded sender / inbox proof is PARKED WITH EXTERNAL PREREQUISITE at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`) — not closed, do not fake. Active section: `STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1`. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. Do not start rooms 2–5. No merge unless separately authorized.
 <!-- END:launch-readiness-execution-order -->
 
 <!-- BEGIN:conversation-room-machine-contract -->

@@ -3,7 +3,8 @@
 **Package:** STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1  
 **Room:** 1 — Customer Life + Communication (this section only)  
 **Branch:** `operating/design-renderer-proof-1`  
-**Scout status:** PARKED for Manager review — **not closed**  
+**Scout status:** PARKED WITH EXTERNAL PREREQUISITE — **not closed**  
+**Protected checkpoint:** `d6974eb`  
 **Previous section:** STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1 = **CLOSED** (`07c1434`)  
 **Merge:** no merge
 
@@ -96,20 +97,13 @@ Live walk script: `scripts/studio-operating-resend-lifecycle-notifications-and-w
 
 ---
 
-## E. Owner setup (only remaining env action)
+## E. Owner setup (deferred — do not fake)
 
-Do **not** paste secret values into chat.
+Live inbox certification is **intentionally deferred** until The Studio has a purchased and verified business domain and business-email identity.
 
-In `.env.local` add, if missing:
+Do **not** keep pushing local `resend.dev` onboarding sender as branded Studio identity. Do not paste secrets into chat. Do not add another email provider.
 
-- `RESEND_API_KEY`
-- `TRANSACTIONAL_EMAIL_FROM`
-
-Use the already-authorized Resend sender for this local environment (historically the Studio onboarding sender on `resend.dev` — do not type the secret). Then **restart** the Next server on `127.0.0.1:3066`.
-
-Do not add another email provider.
-
-After that, Scout should re-run the existing Maya walk script on this same package. Do not open a new package.
+When that identity exists, return to **this same package** at checkpoint `d6974eb` and finish the deferred gates.
 
 ---
 
@@ -138,15 +132,19 @@ This package **does not close** on 51/51.
 
 Close only after: BUILD → BREAK → CUSTOMER-USE → FIX → RETEST → CLOSE, including one real lifecycle message in the safe test inbox.
 
-**Verdict: PARKED — WORKS WITH LAUNCH BLOCKER (Resend env + inbox walk).**
+**Verdict: PARKED WITH EXTERNAL PREREQUISITE. Not closed. Do not fake branded sender, inbox, or live reject/retry against a temporary sender. Return to this same package after Studio domain + business-email identity. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`.**
 
 ---
 
 ## I. Next Room-1 recommendation
 
-Do **not** start Owner Console, Room 2, or the final whole-customer torture test automatically.
+Live inbox certification is **intentionally deferred**. Do not keep pushing it.
 
-After this section actually closes (inbox + failure/retry live), the correct next Scout ask is the **final Room-1 whole-customer torture test** of Maya’s life under chaotic failures — only when Tagia authorizes it.
+The next non-domain-dependent Room 1 section is:
+
+`STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1`
+
+Do **not** start Owner Console or Room 2. Do not merge. Do not call this Resend package CLOSED.
 
 ---
 

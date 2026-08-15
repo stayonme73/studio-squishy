@@ -33,6 +33,24 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     roomClosed: false as const,
   },
 
+  /**
+   * Room 1 closeout ledger — not a green check.
+   * Live Resend inbox/sender cert is parked with an external prerequisite.
+   */
+  room1Closeout: {
+    ledger: "docs/launch/studio-operating-room-1-customer-life-closeout-v1.md",
+    roomClosed: false as const,
+    activeSection: "STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1",
+    comeBackLater: {
+      id: "studio-business-domain-and-email-identity",
+      parkedPackageId: "STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1",
+      protectedCheckpoint: "d6974eb",
+      verdict: "PARKED_WITH_EXTERNAL_PREREQUISITE" as const,
+      closed: false as const,
+      doNotFake: true as const,
+    },
+  },
+
   merge: "separately_authorized" as const,
   parallelPackages: false as const,
 } as const;

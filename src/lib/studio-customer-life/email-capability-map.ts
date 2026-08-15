@@ -46,7 +46,7 @@ export const studioCustomerCommunicationEmailMapV1 = {
   inAppOutboxChannel: "in_app_outbox" as const,
   routineProjectLifeEmail: "authorized_templates_via_resend" as const,
   missingWiringForLaterEmailSection: [
-    "Inbox placement and domain authentication are Owner environment setup, not an Owner send duty.",
+    "COME BACK LATER: branded sender, real inbox proof, and live provider reject/retry against the final Studio sender are parked until The Studio has a purchased and verified business domain and business-email identity. Do not fake. Do not call that package CLOSED. Protected checkpoint d6974eb.",
     "Studio Voice / Board Machine answers are not emailed as a chat transcript.",
     "pending_owner_send remains the storage fact for queued notices until transport succeeds.",
   ] as const,

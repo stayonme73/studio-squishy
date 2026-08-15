@@ -315,6 +315,6 @@ describe("STUDIO-OPERATING-VOICE-MACHINE-AND-CUSTOMER-COMMUNICATION-1", () => {
       "customer-lifecycle",
     ]);
     expect(map.durableInAppNotices).toContain("payment_received");
-    expect(map.missingWiringForLaterEmailSection.length).toBeGreaterThan(0);
+    expect(map.missingWiringForLaterEmailSection[0]).toMatch(/COME BACK LATER/);
   });
 });

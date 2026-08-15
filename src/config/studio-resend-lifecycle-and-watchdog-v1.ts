@@ -13,6 +13,10 @@ export const studioResendLifecycleAndWatchdogV1 = {
   room: 1 as const,
   ownerRoutine: "NONE" as const,
   merge: "separately_authorized" as const,
+  verdict: "PARKED_WITH_EXTERNAL_PREREQUISITE" as const,
+  closed: false as const,
+  protectedCheckpoint: "d6974eb" as const,
+  liveInboxCertification: "deferred_until_studio_domain_and_business_email" as const,
   previousClosedSection: {
     id: "STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1",
     tip: "07c1434",

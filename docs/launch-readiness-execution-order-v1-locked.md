@@ -107,17 +107,18 @@ Keep this sequence as the standing roadmap for all future launch work unless Tag
 
 | Room | Status |
 |------|--------|
-| 1. Customer Life + Communication | **ACTIVE — not closed.** Last package PARKED at `c713cb7` with verdict **WORKS WITH LAUNCH BLOCKERS**. Tests green is not close. Stay here. |
+| 1. Customer Life + Communication | **ACTIVE — not closed.** Come-back-later: live Resend / branded sender / inbox proof is **PARKED WITH EXTERNAL PREREQUISITE** at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`). Not closed. Do not fake. Active section: whole-customer torture test. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. |
 | 2. Customer-facing truth + friction cleanup | Not started. Do not enter. |
 | 3. Owner Console | Not started. Do not enter. |
 | 4. Full business rehearsal | Not started. Do not enter. |
 | 5. Soft-opening preparation | Not started. Do not enter. |
 
-Launch blockers still inside Room 1 (from that PARK, not silently accepted as launch limits unless Tagia says so):
+**COME BACK LATER (Room 1 — not a green check):** The Studio does not yet have a purchased and verified business domain or business email identity. Deferred until then: branded sender certification, real inbox delivery proof, live provider reject/retry against the final Studio sender. Return to the same Resend package when Owner establishes that identity.
 
-- Customer lifecycle email is queued, not delivered (`pending_owner_send` / no live Resend lifecycle).
-- Customer materials are metadata receipts, not stored-file retrieve.
+Launch blockers still inside Room 1 (not silently accepted as launch limits unless Tagia says so):
+
+- **Live customer lifecycle email certification** — parked with external prerequisite above. Queued notices + Resend adapter remain wired; Board/Voice stay source of truth.
 - Seeded required logo/photo slots can mislead vs wordmark-only flyer SKU law.
-- Live Maya USE-LIKE-A-CUSTOMER on the connected Voice/Review/revision path has not closed the room.
+- Whole-customer torture test is the current non-domain-dependent section (wrong upload, duplicate, stall, QA fail, stale version, return-later, honest failed-notice).
 
 Do not start Room 2–5 from this document.
