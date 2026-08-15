@@ -245,4 +245,5 @@ Stay in Room 1. Do not start Owner Console, Room 2, or soft opening. Do not merg
 
 ## T. Git / park
 
+**Tip:** `3c90dc0`  
 Parked after commit + push of this scoped package. Remote/local match is confirmed in the chat after push. **No merge.**
