@@ -152,4 +152,8 @@ After this section actually closes (inbox + failure/retry live), the correct nex
 
 ## J. Git
 
-See commit on `operating/design-renderer-proof-1`. No merge.
+**Commit:** `f437f98`  
+**Branch:** `operating/design-renderer-proof-1`  
+**Local / remote:** 0 / 0 (this tip)  
+**Push:** `07c1434..f437f98` to `origin/operating/design-renderer-proof-1`  
+**Merge:** none
