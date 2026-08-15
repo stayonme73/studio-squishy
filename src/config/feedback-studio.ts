@@ -259,7 +259,8 @@ export const feedbackStudio = {
     serviceLabel: "Service",
     deliverableReady: "Ready for review",
     submittedRevision: "Revision requested — returning to production.",
-    submittedApproval: "Approved for delivery — awaiting Owner final approval.",
+    submittedApproval:
+      "Approved. The Studio is preparing your final files from the exact version you approved.",
   },
 
   /** VERSION-COMPARE-1 — truthful presentation over recorded proofs only. */

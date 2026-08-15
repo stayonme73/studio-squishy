@@ -1,0 +1,179 @@
+{
+  "packageId": "STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1",
+  "kind": "customer-review-walk",
+  "recordedAt": "2026-08-15T16:54:00.194Z",
+  "baseUrl": "http://127.0.0.1:3066",
+  "commitHint": "unknown",
+  "runId": "7c9db555-8069-445e-8244-1ea420caf8ef",
+  "totals": {
+    "passed": 24,
+    "failed": 0,
+    "blocked": 0,
+    "total": 24
+  },
+  "verdict": "REVIEW + REVISION FULL LOOP READY FOR CLOSE",
+  "asked": [
+    {
+      "question": "Is my flyer ready for me to review?",
+      "answer": "You can review it now. Open the Review Room from your Studio Board."
+    },
+    {
+      "question": "Do you need anything else from me?",
+      "answer": "The Studio record does not show anything waiting on you right now."
+    },
+    {
+      "question": "Did you receive my revision?",
+      "answer": "Yes. The Studio received your revision request. It is on the project record."
+    },
+    {
+      "question": "Did you make my requested change?",
+      "answer": "Yes. The Studio record shows your requested change was applied in the current version."
+    },
+    {
+      "question": "Which version am I looking at?",
+      "answer": "You are looking at Version 2, the current version on the project record."
+    },
+    {
+      "question": "How many changes do I have left?",
+      "answer": "The project record shows no remaining revision rounds of the 1 included with this service."
+    }
+  ],
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (external)"
+    },
+    {
+      "check": "machine_produced_maya_flyer",
+      "status": "PASS",
+      "detail": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\artifacts\\maya-flyer-v1.png"
+    },
+    {
+      "check": "qa_pass_required_before_review",
+      "status": "PASS",
+      "detail": "Internal QA pass is on the record. Renderer success was not treated as customer-ready by itself."
+    },
+    {
+      "check": "review_proof_bytes_presented",
+      "status": "PASS",
+      "detail": "Review proofs: 1. Prepared: true"
+    },
+    {
+      "check": "review_qa_pin_survives_on_job",
+      "status": "PASS",
+      "detail": "pin flyer-v1"
+    },
+    {
+      "check": "board_tells_maya_review_is_ready",
+      "status": "PASS",
+      "detail": "the\n\nSTUDIO\n\nStudio Board\nReview Room\nFinal Delivery\nHelp Center\nNew Campaign\nSign out\nSTUDIO BOARD\n\nGood afternoon, Maya Brooks\n\nCURRENT CAMPAIGN\n\nCedar & Bloom Home Organizing\n\nPROJECT STATUS\n\nWHAT WE NEED FROM YOU\nNothing is required fro",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\customer-board-walk\\shots\\01-board-review-ready.png"
+    },
+    {
+      "check": "voice_review_ready_from_record",
+      "status": "PASS",
+      "detail": "You can review it now. Open the Review Room from your Studio Board."
+    },
+    {
+      "check": "maya_sees_real_flyer_version_and_actions",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nFeedback Studio — Make Me a Flyer\n\nSERVICE · MAKE ME A FLYER\n\nCedar & Bloom Home Organizing\n\nYour Studio team prepared deliverables for your review. Open the review workspace to l",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\customer-board-walk\\shots\\02-maya-reviews-real-flyer.png"
+    },
+    {
+      "check": "no_kitchen_jargon_in_review",
+      "status": "PASS",
+      "detail": "Customer Review copy checked for internal terminology."
+    },
+    {
+      "check": "question_does_not_create_revision",
+      "status": "PASS",
+      "detail": "The Studio record does not show anything waiting on you right now."
+    },
+    {
+      "check": "revision_received_and_durable",
+      "status": "PASS",
+      "detail": "Correction uses: 1",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\customer-board-walk\\shots\\03-revision-requested-ack.png"
+    },
+    {
+      "check": "voice_revision_received",
+      "status": "PASS",
+      "detail": "Yes. The Studio received your revision request. It is on the project record."
+    },
+    {
+      "check": "revised_artifact_produced",
+      "status": "PASS",
+      "detail": "v1=0dd0ead533ba v2=5429a61f9497"
+    },
+    {
+      "check": "rereview_shows_new_version",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nFeedback Studio — Make Me a Flyer\n\nSERVICE · MAKE ME A FLYER\n\nCedar & Bloom Home Organizing\n\nYour Studio team prepared deliverables for you",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\customer-board-walk\\shots\\04-rereview-version-2.png"
+    },
+    {
+      "check": "voice_applied_change_from_record",
+      "status": "PASS",
+      "detail": "Yes. The Studio record shows your requested change was applied in the current version."
+    },
+    {
+      "check": "voice_current_version",
+      "status": "PASS",
+      "detail": "You are looking at Version 2, the current version on the project record."
+    },
+    {
+      "check": "revision_allowance_exhausted",
+      "status": "PASS",
+      "detail": "The project record shows no remaining revision rounds of the 1 included with this service."
+    },
+    {
+      "check": "second_included_revision_blocked",
+      "status": "PASS",
+      "detail": "Job-level Request Revision is disabled after the included round."
+    },
+    {
+      "check": "exact_approval_binding",
+      "status": "PASS",
+      "detail": "Pin flyer-v2 sha256:5429a61f9497981225629a631c85b09998eb28c2aeba4811c4a34db62c4a300e",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\customer-board-walk\\shots\\05-approved-exact-version.png"
+    },
+    {
+      "check": "stale_version_cannot_win",
+      "status": "PASS",
+      "detail": "v1=0dd0ead533ba v2=5429a61f9497 pin=5429a61f9497 files=5"
+    },
+    {
+      "check": "exact_final_delivery",
+      "status": "PASS",
+      "detail": "spine=ready_for_delivery files=5 pin=flyer-v2"
+    },
+    {
+      "check": "leave_return_preserves_approval_and_history",
+      "status": "PASS",
+      "detail": "spine=ready_for_delivery",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\customer-board-walk\\shots\\06-fresh-context-return.png"
+    },
+    {
+      "check": "revision_attachment_not_invented",
+      "status": "PASS",
+      "detail": "Review has no file-attach control. Later enhancement."
+    },
+    {
+      "check": "owner_intervention",
+      "status": "PASS",
+      "detail": "NONE. Routine Review, revision, QA, and Final Delivery did not require Tagia."
+    }
+  ],
+  "artifacts": {
+    "v1": "artifacts/maya-flyer-v1.png",
+    "v2": "artifacts/maya-flyer-v2.png"
+  },
+  "notes": [
+    "Maya facts unchanged: Cedar & Bloom, Make Me a Flyer $69, wordmark-only, Book Your Reset CTA.",
+    "Lifecycle email was not built. Board / Review / Voice were the customer truth surfaces.",
+    "Review has no revision-file attachment control. Reported as later enhancement, not invented.",
+    "Fresh Playwright context = new browser with empty cookies/localStorage."
+  ]
+}

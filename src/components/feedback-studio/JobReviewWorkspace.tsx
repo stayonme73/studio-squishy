@@ -28,6 +28,7 @@ import {
   buildStudioSubmissionReceipt,
 } from "@/lib/job-control/review-handoff-receipts";
 import type { ClientReviewView } from "@/lib/job-control/review-room-view";
+import { hasClientRevisionIntent, canApproveJobForDelivery } from "@/lib/job-control/review-room-gates";
 import {
   deliverableKeyToSectionId,
   feedbackSessionToJobReviewFeedback,
@@ -86,15 +87,25 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
   const noticeTimerRef = useRef<number | null>(null);
   const saveTimerRef = useRef<number | null>(null);
   const receiveAckRef = useRef<string | null>(null);
+  const sessionRef = useRef(session);
+  sessionRef.current = session;
+  const draftKey = `${review.jobId}:${review.feedback.packageId ?? "open"}`;
+  const draftKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setSession(jobReviewFeedbackToFeedbackSession(review));
-    setFocusedSection((current) =>
-      visibleSectionIds.some((id) => id === current)
-        ? current
-        : (visibleSectionIds[0] ?? "fallback:deliverable-0"),
-    );
-  }, [review, visibleSectionIds]);
+    const incoming = jobReviewFeedbackToFeedbackSession(review);
+    const keyChanged = draftKeyRef.current !== draftKey;
+    const submitted = Boolean(review.feedback.submittedAt);
+    if (!draftKeyRef.current || keyChanged || submitted) {
+      draftKeyRef.current = draftKey;
+      setSession(incoming);
+      setFocusedSection((current) =>
+        visibleSectionIds.some((id) => id === current)
+          ? current
+          : (visibleSectionIds[0] ?? "fallback:deliverable-0"),
+      );
+    }
+  }, [draftKey, review, visibleSectionIds]);
 
   useEffect(() => {
     return () => {
@@ -169,6 +180,19 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
 
   const focusedSectionLabel = resolveFeedbackSectionLabel(focusedSection, sectionLabels);
   const submitted = Boolean(session.submittedAt);
+  const localFeedback = feedbackSessionToJobReviewFeedback(session, review);
+  const canRequestRevisionNow =
+    !submitted &&
+    (review.canRequestRevision || hasClientRevisionIntent(localFeedback));
+  const canApproveNow =
+    !submitted &&
+    (review.canApproveForDelivery ||
+      canApproveJobForDelivery({
+        job: { spineStatus: review.spineStatus } as never,
+        feedback: localFeedback,
+        allDeliverablesPrepared: true,
+        deliverableCount: review.deliverables.length,
+      }).allowed);
   const accounting = review.correctionAccounting;
   const revisionStatus =
     accounting.remaining <= 0
@@ -294,7 +318,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
     setBusy(true);
     setError(null);
     try {
-      const feedback = feedbackSessionToJobReviewFeedback(session, review);
+      const feedback = feedbackSessionToJobReviewFeedback(sessionRef.current, review);
       const result = await patchJobReview(review.campaignId, review.jobId, {
         action: "request_revision",
         feedback,
@@ -327,7 +351,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
     setBusy(true);
     setError(null);
     try {
-      const feedback = feedbackSessionToJobReviewFeedback(session, review);
+      const feedback = feedbackSessionToJobReviewFeedback(sessionRef.current, review);
       const result = await patchJobReview(review.campaignId, review.jobId, {
         action: "approve_for_delivery",
         feedback,
@@ -428,16 +452,30 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             <button
               type="button"
               className="utility-btn utility-btn--secondary"
-              disabled={busy || submitted || !review.canRequestRevision}
-              onClick={() => setConfirmMode("revision")}
+              disabled={busy || submitted || !canRequestRevisionNow}
+              onClick={() => {
+                if (saveTimerRef.current) {
+                  window.clearTimeout(saveTimerRef.current);
+                  saveTimerRef.current = null;
+                  void persistToServer(sessionRef.current);
+                }
+                setConfirmMode("revision");
+              }}
             >
               {feedbackStudio.feedbackPanel.requestRevisionJob}
             </button>
             <button
               type="button"
               className="utility-btn utility-btn--primary"
-              disabled={busy || submitted || !review.canApproveForDelivery}
-              onClick={() => setConfirmMode("approval")}
+              disabled={busy || submitted || !canApproveNow}
+              onClick={() => {
+                if (saveTimerRef.current) {
+                  window.clearTimeout(saveTimerRef.current);
+                  saveTimerRef.current = null;
+                  void persistToServer(sessionRef.current);
+                }
+                setConfirmMode("approval");
+              }}
             >
               {feedbackStudio.feedbackPanel.approveForDelivery}
             </button>

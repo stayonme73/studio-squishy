@@ -352,6 +352,7 @@ export function evaluateDesignQuality(input: {
       repoRoot: brief.artifactRepoRoot ?? process.cwd(),
       artifacts,
       requireBinding: true,
+      requireIdentitySource: requiresLogoVariant(brief),
     });
     findings.push(...bound.findings);
   }

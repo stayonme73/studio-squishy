@@ -152,6 +152,88 @@ describe("job-level tracking", () => {
     expect(flyer.spineStatus).toBe("delivered");
     expect(social.spineStatus).toBe("revision_requested");
   });
+
+  it("preserves QA Review and approval pins so Maya's Review Room stays open after Board sync", () => {
+    const record = campaign({ campaignStatus: "READY_FOR_REVIEW" });
+    const flyerJobId = "camp-multi:ma-flyer-v2";
+    const existing: PurchasedJobRecord = {
+      jobId: flyerJobId,
+      campaignId: record.campaignId,
+      skuId: "ma-flyer-v2" as never,
+      serviceName: "Flyer",
+      spineStatus: "ready_for_review",
+      productionLane: "quick",
+      intakeComplete: true,
+      productionStartedAt: "2026-07-03T12:00:00.000Z",
+      ownerApprovalPending: null,
+      updatedAt: "2026-07-03T12:00:00.000Z",
+      internalQaReviewAuthorization: {
+        status: "ELIGIBLE_FOR_REVIEW",
+        decisionId: "re-pin-1",
+        packageId: "PRODUCTION-ASSURANCE-QA-BEFORE-REVIEW-1",
+        skuId: "ma-flyer-v2",
+        qaRecordIds: ["qa-1"],
+        workVersionId: "flyer-v1",
+        contentSha256s: ["sha256:abc"],
+        artifactIds: ["flyer-v1"],
+        authorizedAt: "2026-07-03T12:00:00.000Z",
+      },
+      customerApprovedArtifactAuthorization: {
+        status: "CUSTOMER_APPROVED",
+        decisionId: "caa-1",
+        schemaVersion: 1,
+        packageId: "STUDIO-OPERATING-APPROVED-DELIVERY-1",
+        jobId: flyerJobId,
+        campaignId: record.campaignId,
+        skuId: "ma-flyer-v2",
+        workVersionId: "flyer-v1",
+        artifactIds: ["flyer-v1"],
+        contentSha256s: ["sha256:abc"],
+        qaRecordIds: ["qa-1"],
+        reviewPackageId: "pkg:1",
+        releaseActivityId: null,
+        approvedAt: "2026-07-03T13:00:00.000Z",
+        feedbackSubmissionType: "approved_for_delivery",
+        sourceQaDecisionId: "re-pin-1",
+      },
+    };
+    const jobs = syncJobRecordsFromCampaign(record, [], [], [], [existing]);
+    const flyer = jobs.find((job) => job.skuId === "ma-flyer-v2")!;
+    expect(flyer.internalQaReviewAuthorization?.decisionId).toBe("re-pin-1");
+    expect(flyer.customerApprovedArtifactAuthorization?.decisionId).toBe("caa-1");
+  });
+
+  it("does not yank a QA-passed Review job back to revision_requested from stale task flags", () => {
+    const record = campaign({ campaignStatus: "READY_FOR_REVIEW" });
+    const existing: PurchasedJobRecord = {
+      jobId: "camp-multi:ma-flyer-v2",
+      campaignId: record.campaignId,
+      skuId: "ma-flyer-v2" as never,
+      serviceName: "Flyer",
+      spineStatus: "ready_for_review",
+      productionLane: "quick",
+      intakeComplete: true,
+      productionStartedAt: "2026-07-03T12:00:00.000Z",
+      ownerApprovalPending: null,
+      updatedAt: "2026-07-03T12:00:00.000Z",
+      internalQaReviewAuthorization: {
+        status: "ELIGIBLE_FOR_REVIEW",
+        decisionId: "re-pin-2",
+        packageId: "PRODUCTION-ASSURANCE-QA-BEFORE-REVIEW-1",
+        skuId: "ma-flyer-v2",
+        qaRecordIds: ["qa-2"],
+        workVersionId: "flyer-v2",
+        contentSha256s: ["sha256:def"],
+        artifactIds: ["flyer-v2"],
+        authorizedAt: "2026-07-03T12:00:00.000Z",
+      },
+    };
+    const tasks = [task("ma-flyer-v2", "copy", "needs_revision")];
+    const flyer = syncJobRecordsFromCampaign(record, tasks, [], [], [existing]).find(
+      (job) => job.skuId === "ma-flyer-v2",
+    )!;
+    expect(flyer.spineStatus).toBe("ready_for_review");
+  });
 });
 
 describe("lane capacity", () => {

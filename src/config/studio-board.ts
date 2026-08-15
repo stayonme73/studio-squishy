@@ -271,6 +271,12 @@ export type CampaignRecord = {
    */
   dispatchExecution?: import("@/lib/studio-dispatch/types").DispatchExecutionRecord;
   /**
+   * Constrained Machine overlay for a customer revision of v2-rtu-flyer.
+   * May emphasize an existing intake token. Must not invent new business facts.
+   * @see STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1
+   */
+  machineFlyerRevisionEmphasis?: import("@/config/studio-review-revision-full-loop-v1").MachineFlyerRevisionEmphasis;
+  /**
    * Write-once pre-acceptance payment authorization bound at successful payment.
    * Session decision storage is live-only; this is the durable audit reference.
    */

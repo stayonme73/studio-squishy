@@ -88,6 +88,8 @@ describe("v2-rtu-flyer no-logo customer mapping", () => {
     expect(mapped.truth.materials).toEqual([]);
     expect(mapped.truth.businessName).toBe("Cedar & Bloom Home Organizing");
     expect(mapped.truth.outputMode).toBe("customer");
+    expect(mapped.truth.headline).toMatch(/Back-to-School Reset/);
+    expect(mapped.truth.cta).toBe("Book Your Reset");
 
     const spec = reasonFlyerDesignSpecDeterministic(mapped.truth);
     expect(spec.layers.some((l) => l.type === "image" && l.role === "logo")).toBe(
@@ -98,5 +100,31 @@ describe("v2-rtu-flyer no-logo customer mapping", () => {
     );
     const validated = validateFlyerDesignSpec(REPO, spec, mapped.truth);
     expect(validated).toEqual({ ok: true });
+  });
+
+  it("applies Maya's CTA-as-headline emphasis without inventing a new offer", () => {
+    const campaignId = "camp-maya-emphasis";
+    const campaign = mayaCampaign(campaignId);
+    campaign.machineFlyerRevisionEmphasis = {
+      packageId: "STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1",
+      instruction:
+        "Please make Book Your Reset more prominent as the headline.",
+      emphasizeExistingCtaAsHeadline: true,
+      sourceRevisionPackageId: "pkg:maya:rev-1",
+      priorWorkVersionId: "flyer-v1",
+      recordedAt: new Date().toISOString(),
+    };
+    const mapped = mapFlyerProjectTruthFromJob({
+      repoRoot: REPO,
+      campaign,
+      dispatchRecord: readyFlyerRecord(campaignId),
+      materials: [],
+    });
+    expect(mapped.ok).toBe(true);
+    if (!mapped.ok) return;
+    expect(mapped.truth.headline).toBe("Book Your Reset");
+    expect(mapped.truth.cta).toBe("Book Your Reset");
+    expect(mapped.truth.priceDisplay).toBe("$149");
+    expect(mapped.truth.body).toMatch(/2-hour session \$149/);
   });
 });

@@ -91,5 +91,15 @@ export const studioCustomerLifeV1 = {
       "We received what you sent. The Studio has recorded it. Uploaded is not the same as approved for use.",
     unusableMaterial:
       "We received the file, but it is not approved for use yet. The Studio still needs a usable version before that material can be used on your flyer.",
+    currentReviewVersion: (versionLabel: string) =>
+      `You are looking at ${versionLabel}, the current version on the project record.`,
+    currentReviewVersionUnknown:
+      "The project record does not yet show a current Review version, so I will not guess.",
+    revisionApplied:
+      "Yes. The Studio record shows your requested change was applied in the current version.",
+    revisionReceivedNotReady:
+      "Yes. The Studio received your revision request. A new version is not ready on the record yet.",
+    revisionChangeUnknown:
+      "The Studio record does not show a requested change applied yet, so I will not guess.",
   },
 } as const;

@@ -3,7 +3,7 @@ import path from "path";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import { isIntakeComplete } from "@/lib/studio-board-campaign";
-import { readCampaignEnvelope } from "@/lib/campaign-store/store";
+import { upsertCampaignRecord, readCampaignEnvelope } from "@/lib/campaign-store/store";
 import {
   appendQaRecord,
   buildQaRecord,
@@ -23,6 +23,9 @@ import {
   evaluateReviewEligibility,
 } from "@/lib/studio-review-eligibility";
 
+import { presentFlyerReviewProof } from "@/lib/studio-review-revision/present-flyer-review";
+import { sameContentSha256 } from "@/lib/studio-review-revision/hash";
+
 import { assembleCustomerLifeTruth } from "./assemble-truth";
 
 const MACHINE_ACTOR = {
@@ -31,6 +34,42 @@ const MACHINE_ACTOR = {
   displayName: "Studio Machine",
   roles: ["staff"] as const,
 };
+
+function normalizeRel(rel: string): string {
+  return rel.replace(/\\/g, "/").replace(/^\.?\//, "");
+}
+
+/**
+ * Resolve the sealed flyer PNG. Receipt JSON and flyer.png are siblings in name
+ * only by coincidence — identity.pngRelativePath is the file QA and Review must use.
+ */
+export function resolveFlyerObserverPngRelativePath(flyer: {
+  pngRelativePath?: string;
+  receiptRelativePath?: string;
+}): string | undefined {
+  if (flyer.pngRelativePath?.trim()) {
+    return normalizeRel(flyer.pngRelativePath);
+  }
+  const receiptRel = flyer.receiptRelativePath?.trim()
+    ? normalizeRel(flyer.receiptRelativePath)
+    : undefined;
+  if (!receiptRel) return undefined;
+  const receiptAbs = path.join(process.cwd(), receiptRel);
+  if (existsSync(receiptAbs)) {
+    try {
+      const parsed = JSON.parse(readFileSync(receiptAbs, "utf8")) as {
+        identity?: { pngRelativePath?: string };
+      };
+      if (parsed.identity?.pngRelativePath?.trim()) {
+        return normalizeRel(parsed.identity.pngRelativePath);
+      }
+    } catch {
+      /* fall through to sibling guess */
+    }
+  }
+  const sibling = receiptRel.replace(/\.json$/i, ".png");
+  return existsSync(path.join(process.cwd(), sibling)) ? sibling : undefined;
+}
 
 function readDesignQaEvidence(pngRelativePath: string | undefined): DesignQualityEvidence | null {
   if (!pngRelativePath) return null;
@@ -64,9 +103,22 @@ function readDesignQaEvidence(pngRelativePath: string | undefined): DesignQualit
   }
 }
 
+function recordsForHash(
+  envelope: ServerTasksEnvelope,
+  hash: string,
+  rawHash: string,
+) {
+  return (envelope.qaRecords ?? []).filter((record) =>
+    (record.artifactBinding?.contentSha256s ?? []).some(
+      (value) => sameContentSha256(value, hash) || value === rawHash,
+    ),
+  );
+}
+
 /**
  * Connect sealed flyer renderer identity to Kitchen QA + Review eligibility.
- * Does not invent visual judgment — uses the pipeline's fail-closed design-qa file when present.
+ * Renderer success alone is not customer-ready: missing or failing design-qa
+ * records qa_fail and keeps Review closed.
  */
 export function bindFlyerIdentityToQaRecords(input: {
   campaign: CampaignRecord;
@@ -76,29 +128,50 @@ export function bindFlyerIdentityToQaRecords(input: {
   artifactId: string;
   workVersionId?: string;
   designEvidence?: DesignQualityEvidence | null;
-}): { envelope: ServerTasksEnvelope; bound: boolean; alreadyBound: boolean } {
+}): {
+  envelope: ServerTasksEnvelope;
+  bound: boolean;
+  alreadyBound: boolean;
+  qaAction: "qa_pass" | "qa_fail" | "none";
+} {
   const skuId = DESIGN_RENDERER_PROOF_SKU;
   const taskId = formalQaTaskIdForService(skuId);
   const hash = input.pngContentSha256.startsWith("sha256:")
     ? input.pngContentSha256
     : `sha256:${input.pngContentSha256}`;
-  const existing = (input.envelope.qaRecords ?? []).some((record) =>
-    record.artifactBinding?.contentSha256s?.includes(hash) ||
-    record.artifactBinding?.contentSha256s?.includes(input.pngContentSha256),
-  );
-  if (existing) {
-    return { envelope: input.envelope, bound: false, alreadyBound: true };
+  const matching = recordsForHash(input.envelope, hash, input.pngContentSha256);
+  if (matching.some((record) => record.action === "qa_pass")) {
+    return {
+      envelope: input.envelope,
+      bound: false,
+      alreadyBound: true,
+      qaAction: "none",
+    };
+  }
+
+  const evidencePassed = input.designEvidence?.gatePassed === true;
+  if (!evidencePassed && matching.some((record) => record.action === "qa_fail")) {
+    return {
+      envelope: input.envelope,
+      bound: false,
+      alreadyBound: true,
+      qaAction: "none",
+    };
   }
 
   const workVersionId = input.workVersionId ?? `flyer-v${input.renderVersion}`;
+  const qaAction = evidencePassed ? "qa_pass" : "qa_fail";
   const record = buildQaRecord({
     campaignId: input.campaign.campaignId,
     taskId,
     user: MACHINE_ACTOR,
     actorRole: "qa",
-    action: "qa_pass",
+    action: qaAction,
+    category: evidencePassed ? undefined : "production_correction",
     checks: ["machine_renderer_identity"],
-    notes: "Sealed Machine flyer identity bound for Review eligibility.",
+    notes: evidencePassed
+      ? "Sealed Machine flyer identity bound for Review eligibility."
+      : "Renderer output is not customer-ready. Internal quality evidence did not pass.",
     workVersionId,
     designQualityEvidence: input.designEvidence ?? undefined,
     artifactBinding: {
@@ -116,7 +189,11 @@ export function bindFlyerIdentityToQaRecords(input: {
 
   const job = envelope.jobRecords?.find((entry) => entry.skuId === skuId);
   if (!job) {
-    return { envelope, bound: true, alreadyBound: false };
+    return { envelope, bound: true, alreadyBound: false, qaAction };
+  }
+
+  if (!evidencePassed) {
+    return { envelope, bound: true, alreadyBound: false, qaAction };
   }
 
   const decision = evaluateReviewEligibility({
@@ -133,7 +210,7 @@ export function bindFlyerIdentityToQaRecords(input: {
   });
   const authorization = buildInternalQaReviewAuthorization(decision);
   if (!authorization) {
-    return { envelope, bound: true, alreadyBound: false };
+    return { envelope, bound: true, alreadyBound: false, qaAction };
   }
 
   const truth = assembleCustomerLifeTruth({
@@ -172,6 +249,17 @@ export function bindFlyerIdentityToQaRecords(input: {
       row.jobId === nextJob.jobId ? nextJob : row,
     ),
     jobActivityEvents: events,
+    tasks: (envelope.tasks ?? []).map((task) => {
+      if (!task.relatedServiceIds.includes(skuId as never)) return task;
+      if (task.workflowState !== "needs_revision" && task.status !== "needs_revision") {
+        return task;
+      }
+      return {
+        ...task,
+        workflowState: "complete" as const,
+        status: "complete",
+      };
+    }),
   };
   if (nextJob.spineStatus === "ready_for_review") {
     envelope = enqueueJobCommunicationRecord(envelope, {
@@ -183,7 +271,7 @@ export function bindFlyerIdentityToQaRecords(input: {
     });
   }
 
-  return { envelope, bound: true, alreadyBound: false };
+  return { envelope, bound: true, alreadyBound: false, qaAction };
 }
 
 export async function ensureFlyerMachineReviewBind(
@@ -198,9 +286,7 @@ export async function ensureFlyerMachineReviewBind(
   const envelope = await readTasksEnvelope(campaign.campaignId);
   if (!envelope) return campaign;
 
-  const pngRel = flyer.receiptRelativePath
-    ? flyer.receiptRelativePath.replace(/\.json$/i, ".png")
-    : undefined;
+  const pngRel = resolveFlyerObserverPngRelativePath(flyer);
   const bound = bindFlyerIdentityToQaRecords({
     campaign,
     envelope,
@@ -209,8 +295,49 @@ export async function ensureFlyerMachineReviewBind(
     artifactId: `flyer-v${flyer.renderVersion ?? 1}`,
     designEvidence: readDesignQaEvidence(pngRel),
   });
-  if (!bound.bound && bound.alreadyBound) return campaign;
-  await writeTasksEnvelope(bound.envelope);
+
+  let nextEnvelope = bound.envelope;
+  let presented = false;
+  const hashHasQaPass = recordsForHash(
+    nextEnvelope,
+    flyer.pngContentSha256,
+    flyer.pngContentSha256,
+  ).some((record) => record.action === "qa_pass");
+  if (bound.qaAction === "qa_pass" || hashHasQaPass) {
+    const proof = await presentFlyerReviewProof({
+      campaign,
+      envelope: nextEnvelope,
+      pngRelativePath: pngRel,
+      pngContentSha256: flyer.pngContentSha256,
+      renderVersion: flyer.renderVersion ?? 1,
+      artifactId: `flyer-v${flyer.renderVersion ?? 1}`,
+    });
+    nextEnvelope = proof.envelope;
+    presented = proof.presented;
+  }
+
+  if (bound.bound || presented) {
+    await writeTasksEnvelope(nextEnvelope);
+  }
   const latest = await readCampaignEnvelope(campaign.campaignId);
-  return latest?.record ?? campaign;
+  let record = latest?.record ?? campaign;
+  const flyerJob = nextEnvelope.jobRecords?.find(
+    (entry) => entry.skuId === DESIGN_RENDERER_PROOF_SKU,
+  );
+  if (
+    flyerJob?.spineStatus === "ready_for_review" &&
+    record.campaignStatus !== "READY_FOR_REVIEW" &&
+    record.campaignStatus !== "DELIVERED"
+  ) {
+    const saved = await upsertCampaignRecord(
+      {
+        ...record,
+        campaignStatus: "READY_FOR_REVIEW",
+        updatedAt: new Date().toISOString(),
+      },
+      latest?.clientUserId,
+    );
+    record = saved.record;
+  }
+  return record;
 }

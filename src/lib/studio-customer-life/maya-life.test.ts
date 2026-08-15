@@ -1,3 +1,5 @@
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import type { CampaignRecord } from "@/config/studio-board";
@@ -14,6 +16,7 @@ import {
   assembleCustomerLifeTruth,
   bindFlyerIdentityToQaRecords,
   classifyCustomerLifeQuestion,
+  resolveFlyerObserverPngRelativePath,
 } from "@/lib/studio-customer-life";
 
 const FLYER = ["v2-rtu-flyer"] as const;
@@ -283,6 +286,71 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
     expect(first.envelope.jobRecords?.[0]?.spineStatus).toBe("ready_for_review");
   });
 
+  it("does not open Review when design quality evidence is missing", () => {
+    const campaign = mayaCampaign({
+      projectDetailsSubmittedAt: new Date().toISOString(),
+      campaignStatus: "BUILDING_CONCEPTS",
+    });
+    const failed = bindFlyerIdentityToQaRecords({
+      campaign,
+      envelope: envelopeFor(campaign, "building_concepts"),
+      pngContentSha256: "no-qa-yet",
+      renderVersion: 1,
+      artifactId: "flyer-v1",
+    });
+    expect(failed.qaAction).toBe("qa_fail");
+    expect(failed.envelope.qaRecords?.[0]?.action).toBe("qa_fail");
+    expect(failed.envelope.jobRecords?.[0]?.spineStatus).toBe("building_concepts");
+    expect(failed.envelope.jobRecords?.[0]?.internalQaReviewAuthorization).toBeUndefined();
+
+    const passed = bindFlyerIdentityToQaRecords({
+      campaign,
+      envelope: failed.envelope,
+      pngContentSha256: "no-qa-yet",
+      renderVersion: 1,
+      artifactId: "flyer-v1",
+      designEvidence: designEvidence(),
+    });
+    expect(passed.qaAction).toBe("qa_pass");
+    expect(passed.envelope.jobRecords?.[0]?.spineStatus).toBe("ready_for_review");
+  });
+
+  it("resolves the sealed flyer PNG from artifact identity, not the receipt JSON sibling", () => {
+    const dir = path.join(
+      process.cwd(),
+      "data",
+      "campaign-design-artifacts",
+      "maya-png-resolve-fixture",
+      "renders",
+      "v1",
+    );
+    mkdirSync(dir, { recursive: true });
+    const pngRel = "data/campaign-design-artifacts/maya-png-resolve-fixture/renders/v1/flyer.png";
+    const receiptRel =
+      "data/campaign-design-artifacts/maya-png-resolve-fixture/renders/v1/dispatch-hook-receipt.json";
+    writeFileSync(path.join(process.cwd(), pngRel), "png-bytes");
+    writeFileSync(
+      path.join(process.cwd(), receiptRel),
+      JSON.stringify({ identity: { pngRelativePath: pngRel } }),
+    );
+    try {
+      expect(resolveFlyerObserverPngRelativePath({ receiptRelativePath: receiptRel })).toBe(
+        pngRel,
+      );
+      expect(
+        resolveFlyerObserverPngRelativePath({
+          pngRelativePath: pngRel,
+          receiptRelativePath: receiptRel,
+        }),
+      ).toBe(pngRel);
+    } finally {
+      rmSync(path.join(process.cwd(), "data", "campaign-design-artifacts", "maya-png-resolve-fixture"), {
+        recursive: true,
+        force: true,
+      });
+    }
+  });
+
   it("does not guess when the Machine has no fact", () => {
     const answer = answerCustomerLifeQuestion("What is Tagia's favorite color?", {
       campaign: mayaCampaign(),
@@ -350,6 +418,9 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
       "Is anything holding it up?": "holding_up",
       "When can I review it?": "when_review",
       "When will I be able to review it?": "when_review",
+      "Is my flyer ready for me to review?": "when_review",
+      "Did you make my requested change?": "revision_applied",
+      "Which version am I looking at?": "current_review_version",
       "Can I ask for changes?": "can_changes",
       "Can I make changes after I see it?": "can_changes",
       "Has production been assigned?": "production_assigned",
@@ -552,6 +623,13 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
         tasks: second.envelope,
       }).text,
     ).toBe(studioCustomerLifeV1.customerCopy.newVersionReady);
+
+    expect(
+      answerCustomerLifeQuestion("Did you receive my revision?", {
+        campaign: { ...campaign, revisionRoundsUsed: 1, revisionRoundsIncluded: 1 },
+        tasks: second.envelope,
+      }).text,
+    ).toBe(studioCustomerLifeV1.customerCopy.revisionReceived);
   });
 
   it("blocks a second revision round for Maya's one-round flyer and reports zero remaining", () => {
@@ -579,6 +657,76 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
     });
     expect(blocked.allowed).toBe(false);
     expect(blocked.reasons.some((reason) => /included correction/i.test(reason))).toBe(true);
+  });
+
+  it("answers Review version and applied-change questions from the Machine record", () => {
+    const campaign = withActivation(
+      mayaCampaign({
+        projectDetailsSubmittedAt: new Date().toISOString(),
+        machineFlyerRevisionEmphasis: {
+          packageId: "STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1",
+          instruction: "Please make Book Your Reset more prominent as the headline.",
+          emphasizeExistingCtaAsHeadline: true,
+          sourceRevisionPackageId: "pkg:maya:rev",
+          priorWorkVersionId: "flyer-v1",
+          recordedAt: new Date().toISOString(),
+        },
+      }),
+    );
+    const first = bindFlyerIdentityToQaRecords({
+      campaign,
+      envelope: envelopeFor(campaign, "building_concepts"),
+      pngContentSha256: "abc123",
+      renderVersion: 1,
+      artifactId: "flyer-v1",
+      designEvidence: designEvidence(),
+    });
+    const waiting = answerCustomerLifeQuestion("Did you make my requested change?", {
+      campaign,
+      tasks: {
+        ...first.envelope,
+        jobRecords: (first.envelope.jobRecords ?? []).map((job) => ({
+          ...job,
+          spineStatus: "revision_requested" as const,
+        })),
+      },
+    });
+    expect(waiting.intent).toBe("revision_applied");
+    expect(waiting.text).toMatch(/received your revision request/i);
+
+    const second = bindFlyerIdentityToQaRecords({
+      campaign,
+      envelope: {
+        ...first.envelope,
+        jobRecords: (first.envelope.jobRecords ?? []).map((job) => ({
+          ...job,
+          spineStatus: "revision_requested" as const,
+          internalQaReviewAuthorization: undefined,
+        })),
+      },
+      pngContentSha256: "def456",
+      renderVersion: 2,
+      artifactId: "flyer-v2",
+      designEvidence: designEvidence(),
+    });
+    expect(
+      answerCustomerLifeQuestion("Did you make my requested change?", {
+        campaign,
+        tasks: second.envelope,
+      }).text,
+    ).toBe(studioCustomerLifeV1.customerCopy.revisionApplied);
+    expect(
+      answerCustomerLifeQuestion("Which version am I looking at?", {
+        campaign,
+        tasks: second.envelope,
+      }).text,
+    ).toMatch(/Version 2/);
+    expect(
+      answerCustomerLifeQuestion("Is my flyer ready for me to review?", {
+        campaign,
+        tasks: second.envelope,
+      }).text,
+    ).toBe(studioCustomerLifeV1.customerCopy.reviewReady);
   });
 
   it("classifies silent stalls without making Tagia the restart button", () => {

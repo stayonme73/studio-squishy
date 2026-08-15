@@ -20,6 +20,9 @@ export function classifyCustomerLifeQuestion(question: string): CustomerLifeQues
   if (matches(text, ["receive my revision", "got my revision", "receive my change"])) {
     return "received_revision";
   }
+  if (matches(text, ["did you make my", "made my change", "requested change", "make my requested"])) {
+    return "revision_applied";
+  }
   if (matches(text, ["need anything else", "need anything from me", "do you need"])) {
     return "need_anything";
   }
@@ -43,8 +46,20 @@ export function classifyCustomerLifeQuestion(question: string): CustomerLifeQues
   if (matches(text, ["holding", "stuck", "delay", "waiting on"])) {
     return "holding_up";
   }
-  if (matches(text, ["when can i review", "when will i", "review it"])) {
+  if (
+    matches(text, [
+      "when can i review",
+      "when will i",
+      "review it",
+      "ready for me to review",
+      "ready to review",
+      "ready for review",
+    ])
+  ) {
     return "when_review";
+  }
+  if (matches(text, ["which version am i looking", "what version am i looking", "which version is this", "what version is this"])) {
+    return "current_review_version";
   }
   if (matches(text, ["ask for change", "make change", "changes after", "revision round"])) {
     return "can_changes";
@@ -133,7 +148,13 @@ export function answerCustomerLifeQuestion(
     case "revisions_left":
       return known(copy.revisionsLeft(truth.revisionAllowanceRemaining, truth.revisionAllowanceIncluded));
     case "received_revision":
-      return known(truth.revisionRequested ? copy.revisionReceived : copy.revisionNotReceived);
+      return known(
+        truth.revisionRequested ||
+          truth.revisionChangeApplied === true ||
+          truth.revisionAllowanceRemaining < truth.revisionAllowanceIncluded
+          ? copy.revisionReceived
+          : copy.revisionNotReceived,
+      );
     case "new_version_ready":
       return known(
         truth.reviewEligible && truth.revisionAllowanceIncluded >= 0 && truth.spineStatus === "ready_for_review"
@@ -147,6 +168,19 @@ export function answerCustomerLifeQuestion(
       return known(
         `${copy.approvedVersion} Recorded identity: ${truth.approvedVersionLabel ?? "pinned file"} (${truth.approvedContentSha256 ?? "hash on file"}).`,
       );
+    case "current_review_version":
+      if (!truth.currentReviewVersionLabel) {
+        return known(copy.currentReviewVersionUnknown);
+      }
+      return known(copy.currentReviewVersion(truth.currentReviewVersionLabel));
+    case "revision_applied":
+      if (truth.revisionChangeApplied === true) {
+        return known(copy.revisionApplied);
+      }
+      if (truth.revisionRequested) {
+        return known(copy.revisionReceivedNotReady);
+      }
+      return known(copy.revisionChangeUnknown);
     case "final_files":
       return known(truth.finalDeliveryReady ? copy.finalReady : copy.finalNotReady);
     case "production_assigned":

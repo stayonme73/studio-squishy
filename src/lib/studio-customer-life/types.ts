@@ -18,6 +18,8 @@ export type CustomerLifeQuestionIntent =
   | "final_files"
   | "production_assigned"
   | "qa_status"
+  | "current_review_version"
+  | "revision_applied"
   | "unknown";
 
 export type CustomerLifePhase =
@@ -73,6 +75,8 @@ export type CustomerLifeTruth = {
   revisionAllowanceRemaining: number;
   approvedVersionLabel: string | null;
   approvedContentSha256: string | null;
+  currentReviewVersionLabel: string | null;
+  revisionChangeApplied: boolean | null;
   finalDeliveryReady: boolean;
   spineStatus: string | null;
   serviceName: string;

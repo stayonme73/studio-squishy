@@ -55,6 +55,8 @@ export function evaluateArtifactBindings(input: {
   repoRoot: string;
   artifacts: readonly DesignArtifactRef[];
   requireBinding: boolean;
+  /** When false, wordmark-only jobs may omit a logo identity source. Hash binding still required. */
+  requireIdentitySource?: boolean;
 }): { ok: boolean; findings: DesignQualityFinding[]; proofs: BoundArtifactProof[] } {
   const findings: DesignQualityFinding[] = [];
   const proofs: BoundArtifactProof[] = [];
@@ -91,7 +93,10 @@ export function evaluateArtifactBindings(input: {
         });
       }
 
-      if (!artifact.approvedIdentitySourceId?.trim()) {
+      if (
+        input.requireIdentitySource !== false &&
+        !artifact.approvedIdentitySourceId?.trim()
+      ) {
         findings.push({
           id: `bind_identity_source_${artifact.id}`,
           severity: "fail",

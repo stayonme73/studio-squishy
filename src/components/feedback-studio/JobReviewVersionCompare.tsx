@@ -57,7 +57,14 @@ function ProofPane({
         </label>
       </header>
       <div className="fs-version-compare__body">
-        <p className="fs-version-compare__filename">
+            {proof.accessHref ? (
+              <img
+                src={proof.accessHref}
+                alt={proof.versionLabel}
+                className="fs-review-proof__image"
+              />
+            ) : null}
+            <p className="fs-version-compare__filename">
           {proof.accessHref ? (
             <a href={proof.accessHref} target="_blank" rel="noreferrer">
               {proof.filename}

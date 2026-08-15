@@ -4,7 +4,11 @@ export {
   answerCustomerLifeQuestion,
   classifyCustomerLifeQuestion,
 } from "./answer-question";
-export { bindFlyerIdentityToQaRecords, ensureFlyerMachineReviewBind } from "./machine-review-bind";
+export {
+  bindFlyerIdentityToQaRecords,
+  ensureFlyerMachineReviewBind,
+  resolveFlyerObserverPngRelativePath,
+} from "./machine-review-bind";
 export {
   askCustomerLifeFromStore,
   handleCustomerBoardQuestion,

@@ -15,7 +15,7 @@ import type {
 } from "@/lib/studio-design-renderer/types";
 import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer/types";
 
-import type { JobDispatchRecord } from "./types";
+import { applyExistingCtaHeadlineEmphasis } from "@/lib/studio-review-revision/flyer-revision-emphasis";
 
 export type FlyerTruthMapResult =
   | { ok: true; truth: FlyerProjectTruth }
@@ -217,6 +217,11 @@ export function mapFlyerProjectTruthFromJob(input: {
   const cta =
     String(answers.callToAction ?? "").trim() ||
     "Book online or call";
+  const headline = applyExistingCtaHeadlineEmphasis({
+    headline: flyerPurpose.slice(0, 90),
+    callToAction: cta,
+    emphasis: input.campaign.machineFlyerRevisionEmphasis,
+  });
 
   const requiredTextTokens = [
     extracted.priceDisplay,
@@ -237,7 +242,7 @@ export function mapFlyerProjectTruthFromJob(input: {
     businessName,
     wordmark,
     descriptor,
-    headline: flyerPurpose.slice(0, 90),
+    headline,
     offerName,
     priceDisplay: extracted.priceDisplay,
     dateWindow: extracted.dateWindow || "See offer details",

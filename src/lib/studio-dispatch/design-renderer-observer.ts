@@ -97,6 +97,8 @@ export type DesignRendererObserverResult = {
   renderVersion?: number;
   /** Flyer single PNG hash, or card front PNG hash. */
   pngContentSha256?: string;
+  /** Authoritative flyer PNG path from artifact identity — not the receipt JSON sibling. */
+  pngRelativePath?: string;
   backPngContentSha256?: string;
   receiptRelativePath?: string;
   ownerRoutineProduction: "NONE";
@@ -210,6 +212,7 @@ export async function runDesignRendererDispatchObserver(input: {
           invocationOutcome: hooked.invocationOutcome,
           renderVersion: hooked.identity.renderVersion,
           pngContentSha256: hooked.identity.pngContentSha256,
+          pngRelativePath: hooked.identity.pngRelativePath,
           receiptRelativePath: hooked.receiptRelativePath,
           ownerRoutineProduction: "NONE",
           canvaRequired: false,

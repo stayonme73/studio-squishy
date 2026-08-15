@@ -914,6 +914,26 @@
   border: 1px solid color-mix(in srgb, var(--fs-accent, currentColor) 22%, transparent);
 }
 
+.fs-mock:has(.fs-review-proof) .fs-mock__hero-art {
+  display: none;
+}
+
+.fs-review-proof {
+  position: relative;
+  z-index: 1;
+  margin: 0.75rem 0 0;
+}
+
+.fs-review-proof__image {
+  display: block;
+  width: 100%;
+  max-width: 36rem;
+  height: auto;
+  border-radius: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--utility-primary) 22%, transparent);
+  background: #fff;
+}
+
 .fs-proof-refs {
   position: relative;
   z-index: 1;
@@ -1273,6 +1293,7 @@
 .fs-feedback-panel {
   position: sticky;
   top: 0.5rem;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;

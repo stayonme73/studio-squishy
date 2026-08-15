@@ -34,6 +34,11 @@ import {
   releaseMessageRef,
 } from "./review-handoff-receipts";
 import { buildCustomerApprovedArtifactAuthorization } from "@/lib/studio-approved-delivery";
+import { assembleApprovedFlyerClientDelivery } from "@/lib/studio-review-revision/assemble-approved-delivery";
+import {
+  buildMachineFlyerRevisionEmphasis,
+  currentFlyerWorkVersionId,
+} from "@/lib/studio-review-revision/flyer-revision-emphasis";
 
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 
@@ -486,11 +491,18 @@ export function applyReviewRoomPatch(
       }
 
       const ledgerUsed = (nextEnvelope.jobCorrectionUses ?? []).length;
+      const emphasis = buildMachineFlyerRevisionEmphasis({
+        feedback,
+        campaign,
+        priorWorkVersionId: currentFlyerWorkVersionId(job),
+        recordedAt: occurredAt,
+      });
       const updatedCampaign: CampaignRecord = {
         ...campaign,
         revisionRoundsIncluded: campaign.revisionRoundsIncluded,
         revisionRoundsIncludedSource: campaign.revisionRoundsIncludedSource,
         revisionRoundsUsed: ledgerUsed,
+        ...(emphasis ? { machineFlyerRevisionEmphasis: emphasis } : {}),
         updatedAt: occurredAt,
       };
 
@@ -571,6 +583,17 @@ export function applyReviewRoomPatch(
         customerApprovedArtifactAuthorization: approvalPin.authorization,
       };
       events = statusResult.events;
+
+      const assembled = assembleApprovedFlyerClientDelivery({
+        job: currentJob,
+        events,
+        actor,
+        occurredAt,
+        requiredDeliverableLabel: requiredDeliverables[0],
+        requiredDeliverables,
+      });
+      currentJob = assembled.job;
+      events = assembled.events;
 
       events = appendJobActivityEvent(events, {
         campaignId: job.campaignId,

@@ -12,7 +12,6 @@ import {
 } from "./correction-round-ledger";
 import {
   allRequiredDeliverablesPrepared,
-  isDeliverablePrepared,
   resolveRequiredDeliverableKeys,
 } from "./production-workspace-gates";
 import {
@@ -157,12 +156,13 @@ export function resolveClientReviewView(input: {
 
   const requiredDefs = resolveRequiredDeliverableKeys(line?.deliverables ?? []);
   const deliverables: ClientReviewDeliverable[] = requiredDefs
-    .filter((def) => isDeliverablePrepared(job, def.key))
     .map((def) => {
       const prep = (job.deliverablePrep ?? []).find((entry) => entry.deliverableKey === def.key);
       const proofFiles = (job.fileRegistry ?? [])
         .filter(
-          (ref) => ref.deliverableKey === def.key && isApprovedReviewProofReference(ref),
+          (ref) =>
+            isApprovedReviewProofReference(ref) &&
+            (ref.deliverableKey === def.key || def.key === requiredDefs[0]?.key),
         )
         .map((ref) => ({
           id: ref.id,
@@ -181,11 +181,12 @@ export function resolveClientReviewView(input: {
       return {
         key: def.key,
         label: def.label,
-        prepared: true,
+        prepared: Boolean(prep?.preparedAt),
         preparedAt: prep?.preparedAt,
         proofFiles,
       };
-    });
+    })
+    .filter((entry) => entry.prepared && entry.proofFiles.length > 0);
 
   const deliverableKeys = deliverables.map((entry) => entry.key);
   const release = findLatestStudioReviewRelease(

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { upsertCampaignRecord } from "@/lib/campaign-store/store";
+import { upsertCampaignRecord, readCampaignEnvelope } from "@/lib/campaign-store/store";
 import { requireReadableCampaign } from "@/lib/campaign-store/server-access";
 import {
   getOrGenerateTasks,
@@ -27,6 +27,7 @@ import {
 } from "@/lib/job-control/review-room-view";
 import { redactJobFileStorageForClient } from "@/lib/file-storage/redact";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
+import { ensureDispatchExecution } from "@/lib/studio-dispatch";
 
 type RouteContext = {
   params: Promise<{ campaignId: string; jobId: string }>;
@@ -213,16 +214,38 @@ export async function PATCH(request: Request, context: RouteContext) {
     ? envelopeToPersist
     : await writeTasksEnvelope(envelopeToPersist);
 
+  if (
+    body.action === "request_revision" &&
+    result.correctionUseCreated &&
+    !skipWrite
+  ) {
+    const latestCampaign =
+      campaignToPersist ??
+      (await readCampaignEnvelope(campaignId))?.record ??
+      campaignEnvelope.record;
+    await ensureDispatchExecution(latestCampaign);
+  }
+
+  const afterDispatch = await readTasksEnvelope(campaignId);
+  const envelopeForView = afterDispatch ?? saved;
+  const jobForView =
+    envelopeForView.jobRecords?.find((entry) => entry.jobId === jobId) ??
+    responseJob;
+  const campaignForView =
+    (await readCampaignEnvelope(campaignId))?.record ??
+    campaignToPersist ??
+    campaignEnvelope.record;
+
   const view = resolveClientReviewView({
-    campaign: campaignToPersist ?? campaignEnvelope.record,
-    job: responseJob,
-    envelope: saved,
+    campaign: campaignForView,
+    job: jobForView,
+    envelope: envelopeForView,
   });
 
   return NextResponse.json({
-    job: redactJobFileStorageForClient(responseJob),
+    job: redactJobFileStorageForClient(jobForView),
     feedback: result.feedback,
     review: view,
-    syncedAt: saved.syncedAt,
+    syncedAt: envelopeForView.syncedAt,
   });
 }

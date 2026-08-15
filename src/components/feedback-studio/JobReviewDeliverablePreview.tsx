@@ -10,8 +10,10 @@ import type {
   SectionReviewStatus,
 } from "@/config/feedback-studio";
 import { feedbackStudio, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
+import { studioReviewRevisionFullLoopV1 } from "@/config/studio-review-revision-full-loop-v1";
 import type { ClientReviewDeliverable } from "@/lib/job-control/review-feedback-types";
 import { deliverableKeyToSectionId } from "@/lib/review-room-client";
+import { sortProofsByAddedAtDesc } from "@/lib/job-control/version-compare";
 
 import FeedbackStudioDrawLayer from "./FeedbackStudioDrawLayer";
 import JobReviewVersionCompare from "./JobReviewVersionCompare";
@@ -92,6 +94,7 @@ export default function JobReviewDeliverablePreview({
         const label = resolveFeedbackSectionLabel(sectionId, sectionLabels);
         const status = session.sectionStatuses[sectionId] ?? "neutral";
         const focused = focusedSection === sectionId;
+        const currentProof = sortProofsByAddedAtDesc(deliverable.proofFiles)[0] ?? null;
 
         return (
           <PreviewSection
@@ -109,13 +112,31 @@ export default function JobReviewDeliverablePreview({
             <div className="fs-mock fs-mock--deliverable fs-mock--large">
               <p className="fs-mock__headline">{deliverable.label}</p>
               <p className="fs-mock__subhead">{feedbackStudio.jobReview.deliverableReady}</p>
-              {deliverable.preparedAt ? (
+              {currentProof ? (
+                <p className="fs-mock__meta">
+                  {studioReviewRevisionFullLoopV1.customerCopy.currentVersionLead(
+                    currentProof.versionLabel,
+                  )}
+                </p>
+              ) : deliverable.preparedAt ? (
                 <p className="fs-mock__meta">
                   Prepared {new Date(deliverable.preparedAt).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                   })}
                 </p>
+              ) : null}
+              {currentProof?.accessHref ? (
+                <figure className="fs-review-proof">
+                  <img
+                    src={currentProof.accessHref}
+                    alt={studioReviewRevisionFullLoopV1.customerCopy.reviewProofAlt(
+                      reviewTitle,
+                      currentProof.versionLabel,
+                    )}
+                    className="fs-review-proof__image"
+                  />
+                </figure>
               ) : null}
               {activeTool === "compare" && focused ? (
                 <JobReviewVersionCompare
@@ -149,8 +170,10 @@ export default function JobReviewDeliverablePreview({
                 />
               ) : null}
               {deliverable.proofFiles.length > 0 ? (
-                <div className="fs-proof-refs" aria-label={`${deliverable.label} proof references`}>
-                  <p className="fs-proof-refs__label">Approved proof references</p>
+                <div className="fs-proof-refs" aria-label={`${deliverable.label} recorded versions`}>
+                  <p className="fs-proof-refs__label">
+                    {studioReviewRevisionFullLoopV1.customerCopy.proofRefsLabel}
+                  </p>
                   <ul>
                     {deliverable.proofFiles.map((file) => (
                       <li key={file.id}>

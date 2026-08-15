@@ -295,6 +295,26 @@ export function assembleCustomerLifeTruth(
     spineStatus,
   });
 
+  const currentWorkVersionId =
+    job?.internalQaReviewAuthorization?.workVersionId ??
+    [...flyerQa].reverse().find((record) => record.action === "qa_pass")?.workVersionId ??
+    null;
+  const currentReviewVersionLabel = currentWorkVersionId
+    ? currentWorkVersionId.match(/v(?:ersion)?[\s-]*(\d+)/i)?.[1]
+      ? `Version ${currentWorkVersionId.match(/v(?:ersion)?[\s-]*(\d+)/i)![1]}`
+      : currentWorkVersionId
+    : null;
+  const emphasis = campaign?.machineFlyerRevisionEmphasis;
+  let revisionChangeApplied: boolean | null = null;
+  if (emphasis) {
+    revisionChangeApplied = Boolean(
+      currentWorkVersionId &&
+        emphasis.priorWorkVersionId &&
+        currentWorkVersionId !== emphasis.priorWorkVersionId &&
+        (reviewEligible || spineStatus === "approved" || spineStatus === "ready_for_delivery" || spineStatus === "delivered"),
+    );
+  }
+
   return {
     campaignId: campaign?.campaignId ?? null,
     phase,
@@ -319,6 +339,8 @@ export function assembleCustomerLifeTruth(
     revisionAllowanceRemaining: remaining >= 0 ? remaining : Math.max(0, included - used),
     approvedVersionLabel: approval?.workVersionId ?? approval?.artifactIds?.[0] ?? null,
     approvedContentSha256: approval?.contentSha256s?.[0] ?? null,
+    currentReviewVersionLabel,
+    revisionChangeApplied,
     finalDeliveryReady: spineStatus === "delivered" || spineStatus === "ready_for_delivery",
     spineStatus,
     serviceName: job?.serviceName ?? "Make Me a Flyer",

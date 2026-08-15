@@ -118,7 +118,12 @@ function deriveSpineStatus(
   }
 
   if (hasRevisionRequested(tasks, skuId)) {
-    return "revision_requested";
+    const qaReady =
+      persisted?.spineStatus === "ready_for_review" &&
+      persisted.internalQaReviewAuthorization?.status === "ELIGIBLE_FOR_REVIEW";
+    if (!qaReady) {
+      return "revision_requested";
+    }
   }
 
   if (persisted?.spineStatus === "ready_for_queue") {
@@ -204,12 +209,17 @@ export function buildPurchasedJobRecord(
       persisted?.nonRefundable ??
       Boolean(productionStarted || persisted?.productionStartedAt),
     refundEligibleAt: persisted?.refundEligibleAt ?? null,
+    refundOwnerDecisionAt: persisted?.refundOwnerDecisionAt ?? null,
+    heavyLaneOwnerDecision: persisted?.heavyLaneOwnerDecision ?? null,
     laneQueuedAt: leftWaitingTray ? now : persisted?.laneQueuedAt ?? now,
     deliverablePrep: persisted?.deliverablePrep,
     internalNotes: persisted?.internalNotes,
     workingFileRefs: persisted?.workingFileRefs,
     workPackets: persisted?.workPackets,
     acceptanceReview: persisted?.acceptanceReview,
+    internalQaReviewAuthorization: persisted?.internalQaReviewAuthorization,
+    customerApprovedArtifactAuthorization: persisted?.customerApprovedArtifactAuthorization,
+    finalDeliveryAuthorization: persisted?.finalDeliveryAuthorization,
     fileRegistry: persisted?.fileRegistry,
     clientDeliveryFiles: persisted?.clientDeliveryFiles,
     deliveredAt: persisted?.deliveredAt ?? null,

@@ -126,11 +126,14 @@ export function findClientReviewReceivedForRelease(
 export function resolveProofVersionLabel(
   deliverables: readonly ClientReviewDeliverable[],
 ): string | null {
-  const labels = deliverables
-    .flatMap((entry) => entry.proofFiles.map((file) => file.versionLabel.trim()))
-    .filter(Boolean);
-  if (labels.length === 0) return null;
-  return labels[labels.length - 1] ?? null;
+  const files = deliverables.flatMap((entry) => entry.proofFiles);
+  if (files.length === 0) return null;
+  const sorted = [...files].sort((a, b) => {
+    const byTime = b.addedAt.localeCompare(a.addedAt);
+    if (byTime !== 0) return byTime;
+    return a.id.localeCompare(b.id);
+  });
+  return sorted[0]?.versionLabel.trim() || null;
 }
 
 export function formatReceiptDateTime(iso: string | null | undefined): string | null {

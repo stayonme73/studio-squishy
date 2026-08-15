@@ -141,7 +141,7 @@ export function canApproveJobForDelivery(input: {
   return { allowed: reasons.length === 0, reasons };
 }
 
-function hasClientRevisionIntent(feedback: JobReviewFeedback): boolean {
+export function hasClientRevisionIntent(feedback: JobReviewFeedback): boolean {
   const sectionRevision = Object.values(feedback.sectionStatuses).some(
     (status) => status === "revision",
   );
