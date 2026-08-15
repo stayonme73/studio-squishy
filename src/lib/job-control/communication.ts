@@ -11,6 +11,7 @@ import type {
   JobCommunicationDeliveryStatus,
   JobCommunicationEventType,
   JobCommunicationRecord,
+  JobCommunicationTransportCode,
   PurchasedJobRecord,
 } from "./types";
 
@@ -33,7 +34,7 @@ export const JOB_COMMUNICATION_TEMPLATES = {
     id: "comm.materials_needed.v1",
     reason: "Intake or required materials needed",
     message: (job) =>
-      `We need a few required materials before ${job.serviceName} can move forward. Please open Project Details and send the requested items.`,
+      `We need a few required materials before ${job.serviceName} can move forward. Please open Project Intake and send the requested items.`,
   },
   reminder_48_hour: {
     id: "comm.reminder_48_hour.v1",
@@ -180,6 +181,10 @@ function deliveryStatusLabel(status: JobCommunicationDeliveryStatus): string {
   switch (status) {
     case "pending_owner_send":
       return "Pending owner send";
+    case "sent":
+      return "Sent";
+    case "delivery_failed":
+      return "Delivery failed";
     case "test_sent":
       return "Test sent";
     case "cancelled":
@@ -246,6 +251,43 @@ export function enqueueJobCommunicationRecord(
     ...envelope,
     jobCommunicationRecords: [...existing, record],
     jobActivityEvents: events,
+    updatedAt: occurredAt,
+    version: Math.max(envelope.version ?? 9, 9),
+  };
+}
+
+export function applyJobCommunicationTransportResult(
+  envelope: ServerTasksEnvelope,
+  communicationId: string,
+  result: {
+    ok: boolean;
+    code?: JobCommunicationTransportCode;
+    providerMessageId?: string;
+    occurredAt?: string;
+  },
+): ServerTasksEnvelope {
+  const records = envelope.jobCommunicationRecords ?? [];
+  const index = records.findIndex((record) => record.id === communicationId);
+  if (index === -1) return envelope;
+
+  const current = records[index];
+  const occurredAt = result.occurredAt ?? new Date().toISOString();
+  const record: JobCommunicationRecord = {
+    ...current,
+    deliveryStatus: result.ok ? "sent" : "delivery_failed",
+    transportAttempts: (current.transportAttempts ?? 0) + 1,
+    lastTransportAt: occurredAt,
+    lastTransportCode: result.ok ? "ok" : result.code ?? "delivery_failed",
+    transportProviderMessageId: result.ok
+      ? result.providerMessageId
+      : current.transportProviderMessageId,
+    updatedAt: occurredAt,
+  };
+  const nextRecords = [...records];
+  nextRecords[index] = record;
+  return {
+    ...envelope,
+    jobCommunicationRecords: nextRecords,
     updatedAt: occurredAt,
     version: Math.max(envelope.version ?? 9, 9),
   };

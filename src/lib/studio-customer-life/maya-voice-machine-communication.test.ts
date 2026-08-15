@@ -306,12 +306,13 @@ describe("STUDIO-OPERATING-VOICE-MACHINE-AND-CUSTOMER-COMMUNICATION-1", () => {
   it("maps current email capability without treating pending_owner_send as Tagia send duty", () => {
     const map = studioCustomerCommunicationEmailMapV1;
     expect(map.pendingOwnerSendIsOwnerRoutine).toBe(false);
-    expect(map.routineProjectLifeEmail).toBe("missing");
+    expect(map.routineProjectLifeEmail).toBe("authorized_templates_via_resend");
     expect(map.reachesResendToday.map((row) => row.kind)).toEqual([
       "email-verification",
       "email-verification-resend",
       "password-reset",
       "project-claim-recovery",
+      "customer-lifecycle",
     ]);
     expect(map.durableInAppNotices).toContain("payment_received");
     expect(map.missingWiringForLaterEmailSection.length).toBeGreaterThan(0);

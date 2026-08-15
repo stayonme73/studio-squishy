@@ -46,8 +46,17 @@ export type JobCommunicationChannel = "in_app_outbox" | "test_email";
 
 export type JobCommunicationDeliveryStatus =
   | "pending_owner_send"
+  | "sent"
+  | "delivery_failed"
   | "test_sent"
   | "cancelled";
+
+export type JobCommunicationTransportCode =
+  | "ok"
+  | "not_configured"
+  | "delivery_failed"
+  | "provider_error"
+  | "missing_recipient";
 
 export type JobActivityEventKind =
   | "payment"
@@ -326,6 +335,10 @@ export type JobCommunicationRecord = {
   testSentAt?: string;
   testSentBy?: JobActivityActor;
   testRecipient?: string;
+  transportAttempts?: number;
+  lastTransportAt?: string;
+  lastTransportCode?: JobCommunicationTransportCode;
+  transportProviderMessageId?: string;
 };
 
 export type JobActivityEvent = {

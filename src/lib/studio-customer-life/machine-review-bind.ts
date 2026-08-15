@@ -25,6 +25,7 @@ import {
 
 import { presentFlyerReviewProof } from "@/lib/studio-review-revision/present-flyer-review";
 import { normalizeContentSha256, sameContentSha256 } from "@/lib/studio-review-revision/hash";
+import { deliverLifecycleNoticesForCampaign } from "@/lib/studio-lifecycle-email/campaign";
 
 import { assembleCustomerLifeTruth } from "./assemble-truth";
 
@@ -143,6 +144,7 @@ export function bindFlyerIdentityToQaRecords(input: {
   artifactId: string;
   workVersionId?: string;
   designEvidence?: DesignQualityEvidence | null;
+  clientUserId?: string | null;
 }): {
   envelope: ServerTasksEnvelope;
   bound: boolean;
@@ -281,7 +283,10 @@ export function bindFlyerIdentityToQaRecords(input: {
   if (nextJob.spineStatus === "ready_for_review") {
     envelope = enqueueJobCommunicationRecord(envelope, {
       campaign: input.campaign,
-      clientId: resolveCampaignCommunicationClientId(undefined, input.campaign.campaignId),
+      clientId: resolveCampaignCommunicationClientId(
+        input.clientUserId,
+        input.campaign.campaignId,
+      ),
       job: nextJob,
       eventType: wasRevision ? "revision_ready_again" : "ready_for_review",
       idempotencyKey: authorization.decisionId,
@@ -302,6 +307,7 @@ export async function ensureFlyerMachineReviewBind(
 
   const envelope = await readTasksEnvelope(campaign.campaignId);
   if (!envelope) return campaign;
+  const campaignEnvelope = await readCampaignEnvelope(campaign.campaignId);
 
   const pngRel = resolveFlyerObserverPngRelativePath(flyer);
   const pdfRel = resolveFlyerObserverPdfRelativePath(flyer);
@@ -313,6 +319,7 @@ export async function ensureFlyerMachineReviewBind(
     renderVersion: flyer.renderVersion ?? 1,
     artifactId: `flyer-v${flyer.renderVersion ?? 1}`,
     designEvidence: readDesignQaEvidence(pngRel),
+    clientUserId: campaignEnvelope?.clientUserId,
   });
 
   let nextEnvelope = bound.envelope;
@@ -340,6 +347,7 @@ export async function ensureFlyerMachineReviewBind(
   if (bound.bound || presented) {
     await writeTasksEnvelope(nextEnvelope);
   }
+  await deliverLifecycleNoticesForCampaign(campaign.campaignId);
   const latest = await readCampaignEnvelope(campaign.campaignId);
   let record = latest?.record ?? campaign;
   const flyerJob = nextEnvelope.jobRecords?.find(

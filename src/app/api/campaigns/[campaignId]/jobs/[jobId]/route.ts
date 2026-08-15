@@ -17,6 +17,7 @@ import { resolveFileRoomListItemView } from "@/lib/file-room-view";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import { redactJobFileStorageForClient } from "@/lib/file-storage/redact";
+import { deliverLifecycleNoticesForCampaign } from "@/lib/studio-lifecycle-email/campaign";
 
 type RouteContext = {
   params: Promise<{ campaignId: string; jobId: string }>;
@@ -135,6 +136,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const saved = await writeTasksEnvelope(result.envelope);
+  await deliverLifecycleNoticesForCampaign(campaignId);
 
   if (result.updatedCampaign) {
     await upsertCampaignRecord(result.updatedCampaign);
@@ -201,6 +203,8 @@ export async function GET(request: Request, context: RouteContext) {
   ) {
     envelope = await writeTasksEnvelope(envelope);
   }
+
+  await deliverLifecycleNoticesForCampaign(campaignId);
 
   return NextResponse.json({
     jobRecords: communicationSync.jobs.map(redactJobFileStorageForClient),

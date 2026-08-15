@@ -39,6 +39,7 @@ import { resolveMaterialsApiPayload } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials, writeMaterialsEnvelope } from "@/lib/materials/store";
 import { recoverPaidOperatingChain } from "@/lib/studio-paid-activation-recovery";
 import { ensureDispatchExecution } from "@/lib/studio-dispatch";
+import { deliverLifecycleNoticesForCampaign } from "@/lib/studio-lifecycle-email/campaign";
 import type { MaterialReviewStatus, ServerMaterialsEnvelope } from "@/lib/materials/types";
 import { appendMaterialActivityEvent } from "@/lib/project-activity/actions";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
@@ -214,6 +215,7 @@ async function syncAfterClientSubmit(input: {
       }
     }
   }
+  await deliverLifecycleNoticesForCampaign(input.campaignId);
 
   return NextResponse.json({
     ...payload,

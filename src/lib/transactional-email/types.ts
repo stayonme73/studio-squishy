@@ -7,7 +7,8 @@ export type TransactionalEmailKind =
   | "email-verification"
   | "email-verification-resend"
   | "password-reset"
-  | "project-claim-recovery";
+  | "project-claim-recovery"
+  | "customer-lifecycle";
 
 export type SendTransactionalEmailInput = {
   kind: TransactionalEmailKind;

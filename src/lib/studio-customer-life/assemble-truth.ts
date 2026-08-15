@@ -229,14 +229,15 @@ export function assembleCustomerLifeTruth(
   }
   const queuedNotices = (input.tasks?.jobCommunicationRecords ?? []).filter(
     (record) =>
-      record.deliveryStatus === "pending_owner_send" &&
-      record.channel === "in_app_outbox",
+      record.channel === "in_app_outbox" &&
+      (record.deliveryStatus === "pending_owner_send" ||
+        record.deliveryStatus === "delivery_failed"),
   ).length;
   if (queuedNotices > 0) {
     stalls.push({
       id: "notice_queued_email_not_confirmed",
       summary:
-        "A customer notice is recorded on the project. Board is the source of truth. Email delivery is not confirmed.",
+        "A customer notice is on the project record. Studio Board is the source of truth. Email delivery is still being retried.",
       recoveryClass: "retryable",
     });
   }

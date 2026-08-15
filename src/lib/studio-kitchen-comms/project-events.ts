@@ -249,7 +249,9 @@ function fromOutbox(envelope: ServerTasksEnvelope): KitchenOperationalEvent[] {
       visibility: "customer_safe_candidate" as const,
       actionKind: "information_only" as const,
       lifecycle:
-        record.deliveryStatus === "test_sent" || record.deliveryStatus === "cancelled"
+        record.deliveryStatus === "test_sent" ||
+        record.deliveryStatus === "cancelled" ||
+        record.deliveryStatus === "sent"
           ? ("resolved" as const)
           : awaiting
             ? ("routed" as const)

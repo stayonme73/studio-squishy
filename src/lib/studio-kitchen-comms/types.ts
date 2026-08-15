@@ -48,6 +48,7 @@ export type KitchenOwnerEscalationVerdict =
 export type KitchenOutboxDisposition =
   | "awaiting_authorized_transport"
   | "owner_decision_required"
+  | "sent"
   | "test_sent"
   | "cancelled"
   | "unknown";

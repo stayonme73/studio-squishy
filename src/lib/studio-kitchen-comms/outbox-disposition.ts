@@ -37,8 +37,9 @@ export function classifyOutboxDisposition(
 
   if (status === "cancelled") return "cancelled";
   if (status === "test_sent") return "test_sent";
+  if (status === "sent") return "sent";
 
-  if (status === "pending_owner_send") {
+  if (status === "pending_owner_send" || status === "delivery_failed") {
     if (isJobControlTemplateCommunicationEventType(record.eventType)) {
       return "awaiting_authorized_transport";
     }
@@ -55,6 +56,8 @@ export function outboxDispositionLabel(disposition: KitchenOutboxDisposition): s
       return "Authorized communication awaiting delivery transport";
     case "owner_decision_required":
       return "Owner decision required before send";
+    case "sent":
+      return "Sent";
     case "test_sent":
       return "Test sent";
     case "cancelled":

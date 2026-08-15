@@ -1,13 +1,14 @@
 /**
  * Current customer-communication transport map.
- * Inspect-only for STUDIO-OPERATING-VOICE-MACHINE-AND-CUSTOMER-COMMUNICATION-1.
- * Does not add a new email provider or the full lifecycle email package.
+ * STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1
+ * Authorized job-control templates may use the existing Resend adapter.
+ * pending_owner_send is transport, not an Owner send duty.
  */
 
 import { JOB_COMMUNICATION_TEMPLATES } from "@/lib/job-control/communication";
 
 export const studioCustomerCommunicationEmailMapV1 = {
-  packageId: "STUDIO-OPERATING-VOICE-MACHINE-AND-CUSTOMER-COMMUNICATION-1",
+  packageId: "STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1",
   /**
    * pending_owner_send is a job-outbox transport fact.
    * It must not mean Tagia is responsible for sending routine notices by hand.
@@ -35,14 +36,18 @@ export const studioCustomerCommunicationEmailMapV1 = {
       source: "src/lib/studio-project-claim/send-claim-email.ts",
       customerLoop: false,
     },
+    {
+      kind: "customer-lifecycle",
+      source: "src/lib/studio-lifecycle-email/deliver.ts",
+      customerLoop: true,
+    },
   ] as const,
   durableInAppNotices: Object.keys(JOB_COMMUNICATION_TEMPLATES),
   inAppOutboxChannel: "in_app_outbox" as const,
-  routineProjectLifeEmail: "missing" as const,
+  routineProjectLifeEmail: "authorized_templates_via_resend" as const,
   missingWiringForLaterEmailSection: [
-    "Job-control notices enqueue to the in-app outbox as pending_owner_send; they do not call Resend.",
-    "Studio Voice / Board Machine answers are not emailed.",
-    "Customer Board messages are stored on the project communication ledger and are not emailed.",
-    "pending_owner_send is transport, not an Owner Desk send task.",
+    "Inbox placement and domain authentication are Owner environment setup, not an Owner send duty.",
+    "Studio Voice / Board Machine answers are not emailed as a chat transcript.",
+    "pending_owner_send remains the storage fact for queued notices until transport succeeds.",
   ] as const,
 } as const;

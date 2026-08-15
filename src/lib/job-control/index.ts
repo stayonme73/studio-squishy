@@ -5,6 +5,7 @@ export type {
   JobCommunicationEventType,
   JobCommunicationChannel,
   JobCommunicationDeliveryStatus,
+  JobCommunicationTransportCode,
   JobActivityEventKind,
   JobActivityActor,
   PurchasedJobRecord,
@@ -67,6 +68,7 @@ export {
 export {
   JOB_COMMUNICATION_TEMPLATES,
   enqueueJobCommunicationRecord,
+  applyJobCommunicationTransportResult,
   markJobCommunicationTestSent,
   resolveCampaignCommunicationClientId,
   resolveNeedsCommunicationQueue,
