@@ -29,27 +29,27 @@
         {
           "role": "update_html",
           "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-pass/renders/v1/members/updated_promotion/updated-promotion.html",
-          "contentSha256": "ccfac3a7d25635c74dbe6247272d593b2f926adde8e70c2cc739bd5e95306b51"
+          "contentSha256": "1a99f1b114c7da43888ca66463b510645376cd3bbff98c9d8334a2a2d0d29678"
         },
         {
           "role": "update_png",
           "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-pass/renders/v1/members/updated_promotion/updated-promotion.png",
-          "contentSha256": "3d6aa958899cce45410ab131ec0f83f325f6234bb38b5fd05f80c7f5898f4fdd"
+          "contentSha256": "b3ef74bcce90e6df7ba62bbe86c1edebbee3be0be72edb05f64a62272b56cc61"
         },
         {
           "role": "update_pdf",
           "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-pass/renders/v1/members/updated_promotion/updated-promotion.pdf",
-          "contentSha256": "a9344c3b48cbed0175fd883decd83e57717bede7ceb9f1c40019dc53992825b9"
+          "contentSha256": "00a2eb6b8e57642bfa2402894528a33c7073ea7857b989663fbbea7c4285bc24"
         },
         {
           "role": "after_png",
           "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-pass/renders/v1/after.png",
-          "contentSha256": "3d6aa958899cce45410ab131ec0f83f325f6234bb38b5fd05f80c7f5898f4fdd"
+          "contentSha256": "b3ef74bcce90e6df7ba62bbe86c1edebbee3be0be72edb05f64a62272b56cc61"
         },
         {
           "role": "after_pdf",
           "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-pass/renders/v1/after.pdf",
-          "contentSha256": "a9344c3b48cbed0175fd883decd83e57717bede7ceb9f1c40019dc53992825b9"
+          "contentSha256": "00a2eb6b8e57642bfa2402894528a33c7073ea7857b989663fbbea7c4285bc24"
         },
         {
           "role": "reference_before_png",
@@ -77,5 +77,5 @@
   "fulfillmentMode": "recreation",
   "acceptRecreationLimits": true,
   "redesignRequested": false,
-  "createdAt": "2026-08-15T00:57:47.315Z"
+  "createdAt": "2026-08-15T00:59:26.617Z"
 }

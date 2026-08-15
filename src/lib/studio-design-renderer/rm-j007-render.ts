@@ -86,13 +86,20 @@ export function buildRmJ007UpdateHtml(input: {
   .canvas {
     width: ${w}px; height: ${h}px;
     position: relative;
-    ${bg}
+    overflow: hidden;
     font-family: Georgia, "Times New Roman", serif;
     color: #F7F4EF;
+    background: #142033;
+  }
+  .ref {
+    position: absolute; inset: -24px;
+    ${bg}
+    filter: blur(18px) saturate(0.9) brightness(0.75);
+    transform: scale(1.06);
   }
   .veil {
     position: absolute; inset: 0;
-    background: linear-gradient(165deg, rgba(18,28,42,0.72) 0%, rgba(18,28,42,0.82) 55%, rgba(31,58,95,0.88) 100%);
+    background: linear-gradient(165deg, rgba(18,28,42,0.78) 0%, rgba(18,28,42,0.86) 50%, rgba(31,58,95,0.9) 100%);
   }
   .content {
     position: absolute; inset: 0;
@@ -149,6 +156,7 @@ export function buildRmJ007UpdateHtml(input: {
 </head>
 <body>
   <div class="canvas">
+    <div class="ref" aria-hidden="true"></div>
     <div class="veil" aria-hidden="true"></div>
     <div class="content">
       <div>
