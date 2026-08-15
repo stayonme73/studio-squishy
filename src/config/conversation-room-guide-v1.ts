@@ -169,14 +169,14 @@ export const conversationRoomGuideV1 = {
   checkoutScopeDisclosure:
     "Checkout confirms the selected project scope. After payment, the purchased scope is fixed. Later changes are handled through the Project Change process.",
   checkoutBackToPlanLabel: "Back to Studio Plan",
-  checkoutCompleteCta: "Complete Checkout",
+  checkoutCompleteCta: "Continue to secure checkout",
   /** Tablet status during checkout — guidance + facts, not a second pay button. */
   checkoutTabletTitle: "Checkout",
   checkoutTabletLead:
     "Before you pay, confirm your services and total. After payment, the purchased scope is fixed — later changes follow the Project Change process. Intake comes next after payment.",
-  checkoutOpenPanelCta: "Show payment form",
+  checkoutOpenPanelCta: "Continue to secure checkout",
   checkoutTaxesFeesNote:
-    "Estimated Investment reflects your selected services. Taxes and live card processing are not applied in this build.",
+    "You will complete payment on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms the payment.",
   /**
    * Spoken only after payment is confirmed (markPaymentReceived path).
    * Do not use for optimistic or pending payment states.
@@ -246,10 +246,13 @@ export const conversationRoomGuideV1 = {
     "Your project is set up. Here is what happens next. Create an account or sign in to open your Studio Board, track progress, and get help in the Help Center when you need it.",
   /** Account-choice utility after Intake (visual; speech already played). */
   boardHandoffAccountChoiceLead:
-    "Your project has been created. Create an account or sign in to open your Studio Board, track progress, and get help in the Help Center when you need it.",
-  /** Sign-in lead when arriving from account choice with Board return (visual). */
+    "Your paid project is saved. Create an account or sign in to open your Studio Board, track progress, and get help in the Help Center when you need it.",
+  /**
+   * Sign-in lead when arriving from Board. Never claims a project was created —
+   * sign-in does not know whether payment completed.
+   */
   boardHandoffSignInLead:
-    "Your project has been created. Sign in to open your Studio Board, track progress, and get help in the Help Center when you need it.",
+    "Sign in to open your Studio Board. If you have a purchased project, it will be here so you can track progress and get help in the Help Center when you need it.",
   /** Spoken once on first Board arrival after Voice handoff. */
   boardArrivalWelcomeVoice:
     "Your project is set up. Here is what happens next. From here you can follow progress, upload materials when the Studio asks, and get help in the Help Center.",

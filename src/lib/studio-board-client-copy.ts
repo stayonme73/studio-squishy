@@ -7,8 +7,8 @@ export function toClientFacingActivityMessage(message: string): string {
   if (!trimmed) return message;
 
   const replacements: Array<[pattern: RegExp, value: string]> = [
-    [/^Route Map job selected:\s*(.+)$/i, "Your project has been created: $1"],
-    [/^Route Map job selected$/i, "Your project has been created"],
+    [/^Route Map job selected:\s*(.+)$/i, "Added to your Studio Plan: $1"],
+    [/^Route Map job selected$/i, "Added to your Studio Plan"],
     [/^Payment received$/i, "We received your payment"],
     [/^Discovery received$/i, "We received your discovery answers"],
     [/^Discovery complete$/i, "Your Project Summary is ready"],

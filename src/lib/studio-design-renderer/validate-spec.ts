@@ -99,11 +99,12 @@ export function validateFlyerDesignSpec(
   }
 
   const materialById = new Map(spec.materials.map((m) => [m.materialId, m]));
-  if (spec.materials.length < 1) {
+  const imageLayers = spec.layers.filter((l) => l.type === "image");
+  if (imageLayers.length > 0 && spec.materials.length < 1) {
     return {
       ok: false,
       code: "MISSING_REQUIRED_MATERIAL",
-      message: "At least one logo material is required for v2-rtu-flyer identity lock",
+      message: "Image layers require bound materials on disk",
     };
   }
 

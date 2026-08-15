@@ -78,13 +78,16 @@ describe("Journey hydration — Board project paint", () => {
 });
 
 describe("Journey hydration — Sign In from prop", () => {
-  it("project-created lead only for explicit safe /studio-board", () => {
+  it("Board return uses Board sign-in lead without claiming an unpaid project exists", () => {
     expect(isExplicitStudioBoardFrom("/studio-board")).toBe(true);
     expect(isExplicitStudioBoardFrom("/studio-board?x=1")).toBe(true);
     expect(isExplicitStudioBoardFrom(null)).toBe(false);
     expect(isExplicitStudioBoardFrom("/studio-lobby")).toBe(false);
     expect(resolveSignInLead(isExplicitStudioBoardFrom("/studio-board"))).toBe(
       conversationRoomGuideV1.boardHandoffSignInLead,
+    );
+    expect(conversationRoomGuideV1.boardHandoffSignInLead).not.toMatch(
+      /project has been created/i,
     );
     expect(resolveSignInLead(isExplicitStudioBoardFrom(null))).toBe(GENERIC_SIGN_IN_LEAD);
   });

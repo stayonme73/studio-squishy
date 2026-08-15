@@ -140,7 +140,7 @@ export type FlyerProjectTruth = {
     text: string;
     muted: string;
   };
-  approvedLogoVariantId: string;
+  approvedLogoVariantId: string | null;
   materials: readonly DesignMaterialRef[];
   requiredTextTokens: readonly string[];
   prohibitedClaimPatterns: readonly string[];

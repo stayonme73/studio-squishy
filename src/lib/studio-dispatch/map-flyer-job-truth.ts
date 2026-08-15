@@ -68,7 +68,8 @@ function extractLines(mustInclude: string): {
 
 /**
  * Resolve an approved logo-brand material to a local repo-relative file.
- * Prefer explicit staged path (tests / production staging). Fail closed if missing.
+ * Prefer explicit staged path (tests / production staging).
+ * No approved logo → optional (wordmark-only). Broken approved path still fails closed.
  */
 export function resolveApprovedLogoMaterial(input: {
   repoRoot: string;
@@ -76,7 +77,7 @@ export function resolveApprovedLogoMaterial(input: {
   skuId: string;
   stagedLogoRelativePath?: string;
 }):
-  | { ok: true; material: DesignMaterialRef }
+  | { ok: true; material: DesignMaterialRef | null }
   | { ok: false; code: "MISSING_REQUIRED_MATERIAL" | "BROKEN_ASSET_REFERENCE"; message: string } {
   const approved = input.items.filter(
     (i) =>
@@ -86,11 +87,7 @@ export function resolveApprovedLogoMaterial(input: {
         i.relatedServiceIds.includes(input.skuId as never)),
   );
   if (approved.length === 0) {
-    return {
-      ok: false,
-      code: "MISSING_REQUIRED_MATERIAL",
-      message: `No approved logo-brand material for ${input.skuId}`,
-    };
+    return { ok: true, material: null };
   }
 
   let relativePath = input.stagedLogoRelativePath?.trim() ?? "";
@@ -257,8 +254,8 @@ export function mapFlyerProjectTruthFromJob(input: {
       text: "#1A1A1A",
       muted: "#5A6570",
     },
-    approvedLogoVariantId: logo.material.approvedIdentitySourceId!,
-    materials: [logo.material],
+    approvedLogoVariantId: logo.material?.approvedIdentitySourceId ?? null,
+    materials: logo.material ? [logo.material] : [],
     requiredTextTokens,
     prohibitedClaimPatterns: [
       "Best in Richmond",

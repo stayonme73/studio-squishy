@@ -9,7 +9,7 @@ import {
 describe("toClientFacingActivityMessage", () => {
   it("rewrites internal studio-note phrasing for clients", () => {
     expect(toClientFacingActivityMessage("Route Map job selected: Make My Social Media Posts.")).toBe(
-      "Your project has been created: Make My Social Media Posts",
+      "Added to your Studio Plan: Make My Social Media Posts",
     );
     expect(toClientFacingActivityMessage("Payment received.")).toBe("We received your payment");
     expect(toClientFacingActivityMessage("Discovery received.")).toBe(

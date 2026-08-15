@@ -31,6 +31,18 @@ describe("studio-design-renderer proof (v2-rtu-flyer)", () => {
     expect(spec.outputFormats).toEqual(["png", "pdf"]);
   });
 
+  it("wordmark-only truth reasons and validates without a logo material", () => {
+    const truth = buildHarborOakFlyerProjectTruth({ repoRoot: REPO_ROOT });
+    const noLogo = {
+      ...truth,
+      approvedLogoVariantId: null,
+      materials: [],
+    };
+    const spec = reasonFlyerDesignSpecDeterministic(noLogo);
+    expect(spec.layers.some((l) => l.type === "image")).toBe(false);
+    expect(validateFlyerDesignSpec(REPO_ROOT, spec, noLogo)).toEqual({ ok: true });
+  });
+
   it("invalid spec fails closed", () => {
     const truth = buildHarborOakFlyerProjectTruth({ repoRoot: REPO_ROOT });
     const spec = reasonFlyerDesignSpecDeterministic(truth);

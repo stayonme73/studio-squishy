@@ -306,7 +306,7 @@ export function createCampaignFromRouteMapJob(
     studioNotes: [
       {
         date: "Today",
-        message: `Your project has been created: ${resolveRouteMapServiceDisplayName(job.id as ServiceId, roadId)}.`,
+        message: `Added to your Studio Plan: ${resolveRouteMapServiceDisplayName(job.id as ServiceId, roadId)}.`,
       },
     ],
     createdAt: now,

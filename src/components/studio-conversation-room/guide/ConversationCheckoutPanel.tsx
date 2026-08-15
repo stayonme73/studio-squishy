@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import SecureCheckoutGrid from "@/components/payment/SecureCheckoutGrid";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
@@ -31,6 +31,8 @@ export type ConversationCheckoutPanelProps = {
   onSandboxConfirm?: () => void | Promise<void>;
   /** Pre-acceptance fail-closed gate (CLEAR_TO_ACCEPT required). */
   onAuthorizePayment?: () => boolean;
+  /** Cancelled / failed / pending payment copy from durable processor state. */
+  paymentHonestyMessage?: string | null;
 };
 
 /**
@@ -45,6 +47,7 @@ export default function ConversationCheckoutPanel({
   onPaymentComplete,
   onSandboxConfirm,
   onAuthorizePayment,
+  paymentHonestyMessage = null,
 }: ConversationCheckoutPanelProps) {
   const v = conversationRoomGuideV1;
   const serviceIds = useMemo(
@@ -61,6 +64,11 @@ export default function ConversationCheckoutPanel({
         : undefined,
     [serviceIds, roadId],
   );
+
+  useEffect(() => {
+    const confirm = document.getElementById("checkout-pay-continue");
+    confirm?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, []);
 
   if (serviceIds.length === 0 || !planSummary) {
     return (
@@ -123,9 +131,11 @@ export default function ConversationCheckoutPanel({
       <p className={styles.checkoutScopeDisclosure} role="note">
         {v.checkoutScopeDisclosure}
       </p>
-      <p className={styles.checkoutScopeDisclosure} role="note">
-        {v.checkoutTaxesFeesNote}
-      </p>
+      {paymentHonestyMessage ? (
+        <p className={styles.checkoutScopeDisclosure} role="alert">
+          {paymentHonestyMessage}
+        </p>
+      ) : null}
 
       <button
         type="button"
@@ -141,7 +151,7 @@ export default function ConversationCheckoutPanel({
         <SecureCheckoutGrid
           layout="full"
           planSummary={planSummary}
-          submitLabel={v.checkoutCompleteCta}
+          submitLabel={payment.form.submitLabel}
           onBeforePayment={(acknowledgment) => {
             if (serviceIds.length === 0) return false;
             if (onAuthorizePayment && !onAuthorizePayment()) return false;

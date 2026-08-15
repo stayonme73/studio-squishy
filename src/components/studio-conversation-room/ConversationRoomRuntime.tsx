@@ -1669,6 +1669,7 @@ export default function ConversationRoomRuntime({
             onCheckoutPaymentComplete={handleCheckoutPaymentComplete}
             onSandboxCheckoutConfirm={handleSandboxCheckoutConfirm}
             onAuthorizeCheckoutPayment={authorizeCheckoutPayment}
+            paymentHonestyMessage={planBridgeError}
             onIntakeSubmitSuccess={handleIntakeSubmitSuccess}
             onRecoverIntakePayment={() => {
               setDetailJobId(null);

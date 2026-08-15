@@ -63,6 +63,7 @@ function buildJobDesignBrief(
   repoRoot: string,
 ): DesignQualityBrief {
   const host = webHostToken(truth.webDisplay);
+  const logoId = truth.approvedLogoVariantId;
   return {
     skuId: truth.skuId,
     fixtureId: truth.fixtureId,
@@ -81,7 +82,7 @@ function buildJobDesignBrief(
       requiredWordmark: truth.wordmark,
       approvedDescriptors: [truth.descriptor],
       prohibitedDescriptors: [],
-      approvedLogoVariantIds: [truth.approvedLogoVariantId],
+      approvedLogoVariantIds: logoId ? [logoId] : [],
     },
     campaignTruth: {
       offerName: truth.offerName,
@@ -103,7 +104,7 @@ function buildJobDesignBrief(
         : []),
       ...(host ? [{ value: host, expectedKind: "web" as const }] : []),
     ],
-    requireLogoVariant: true,
+    requireLogoVariant: Boolean(logoId),
     requireMultiAssetConsistency: false,
     requireArtifactBinding: true,
     artifactRepoRoot: repoRoot,
@@ -127,7 +128,7 @@ function buildJobAttestations(
     imageryBusinessFitReviewed: true,
     renderedIdentityMatchesDeclaredSource: true,
     renderedContactSemanticsMatchDeclared: true,
-    notes: `Job flyer QA for ${truth.businessName}: hierarchy wordmark→offer→price→CTA→contact; bound file sha256 ${pngHash} at ${pngPath}; identity ${truth.approvedLogoVariantId}; overflow ${overflowDetail}.`,
+    notes: `Job flyer QA for ${truth.businessName}: hierarchy wordmark→offer→price→CTA→contact; bound file sha256 ${pngHash} at ${pngPath}; identity ${truth.approvedLogoVariantId ?? "wordmark-only"}; overflow ${overflowDetail}.`,
   };
 }
 
@@ -278,9 +279,11 @@ export async function runDesignRendererPipeline(input: {
           heightPx: identity.heightPx,
           extension: "png",
           contentSha256: pngHash,
-          approvedIdentitySourceId: input.truth.approvedLogoVariantId,
+          approvedIdentitySourceId:
+            input.truth.approvedLogoVariantId ?? undefined,
           declaredText,
-          declaredLogoVariantId: input.truth.approvedLogoVariantId,
+          declaredLogoVariantId:
+            input.truth.approvedLogoVariantId ?? undefined,
           declaredContactPresentations: [
             ...(input.truth.phone
               ? [

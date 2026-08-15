@@ -1,0 +1,257 @@
+{
+  "packageId": "STUDIO-COMPLETED-SYSTEM-DRY-RUN-1",
+  "recordedAt": "2026-08-15T11:43:10.918Z",
+  "runId": "6ed80937-dbe5-4f7a-a789-163b462f279d",
+  "customer": "Maya Brooks / Cedar & Bloom Home Organizing",
+  "sku": "v2-rtu-flyer",
+  "paymentPath": "failed",
+  "campaignId": "cedc317f-f5cd-4f3f-a665-89f262c13b35",
+  "campaignFile": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\data\\campaigns\\pcp-unpaid-1786758020349.json",
+  "flyerPng": null,
+  "dispatchNote": "No campaign-design-artifacts folder for Maya’s campaign. Machine likely did not render (logo required / QA bind unfinished).",
+  "journey": [
+    {
+      "step": "01-lobby",
+      "url": "http://127.0.0.1:3061/studio-lobby",
+      "stage": null,
+      "heading": "The Studio Lobby",
+      "notes": "First-time Maya arrives at Studio Lobby.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\01-lobby.png"
+    },
+    {
+      "step": "02-conversation-room",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "opening",
+      "heading": "Studio Conversation Room",
+      "notes": "Entered Conversation Room.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\02-conversation-entry.png"
+    },
+    {
+      "step": "03-name",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "opening",
+      "heading": "Studio Conversation Room",
+      "notes": "Told Studio to call her Maya.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\03-name.png"
+    },
+    {
+      "step": "04-need",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "opening",
+      "heading": "Studio Conversation Room",
+      "notes": "Gave exact flyer request.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\04-need.png"
+    },
+    {
+      "step": "05-business",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "opening",
+      "heading": "Studio Conversation Room",
+      "notes": "Gave business name.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\05-business.png"
+    },
+    {
+      "step": "06-deadline",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "opening",
+      "heading": "Studio Conversation Room",
+      "notes": "Requested flyer before the offer starts (August 23, 2026).",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\06-deadline.png"
+    },
+    {
+      "step": "07-materials",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "opening",
+      "heading": "Studio Conversation Room",
+      "notes": "Honest: no logo or photos.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\07-materials.png"
+    },
+    {
+      "step": "08-summary",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "route",
+      "heading": "Studio Conversation Room",
+      "notes": "Confirmed opening answers.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\08-summary.png"
+    },
+    {
+      "step": "09-route",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "services",
+      "heading": "Studio Conversation Room",
+      "notes": "Confirmed suggested route: Continue with Promote Something Now",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\09-route.png"
+    },
+    {
+      "step": "10-services",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "services",
+      "heading": "Studio Conversation Room",
+      "notes": "Attempted to add Make Me a Flyer only.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\10-services.png"
+    },
+    {
+      "step": "11-plan",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "plan",
+      "heading": "Studio Conversation Room",
+      "notes": "Studio Plan review.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\11-plan.png"
+    },
+    {
+      "step": "12-checkout",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "checkout",
+      "heading": "Studio Conversation Room",
+      "notes": "Checkout / Review and Confirm.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\12-checkout.png"
+    },
+    {
+      "step": "12b-payment-form",
+      "url": "http://127.0.0.1:3061/studio-conversation-room",
+      "stage": "checkout",
+      "heading": "Studio Conversation Room",
+      "notes": "Opened payment panel.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\12b-payment-form.png"
+    },
+    {
+      "step": "13-paid",
+      "url": "http://127.0.0.1:3061/studio-conversation-room?studioPaymentSandbox=1",
+      "stage": "checkout",
+      "heading": "Studio Conversation Room",
+      "notes": "Payment path=failed",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\13-paid.png"
+    },
+    {
+      "step": "14-intake-open",
+      "url": "http://127.0.0.1:3061/studio-conversation-room?studioPaymentSandbox=1",
+      "stage": "checkout",
+      "heading": "Studio Conversation Room",
+      "notes": "Project Intake opened.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\14-intake.png"
+    },
+    {
+      "step": "15-intake-filled",
+      "url": "http://127.0.0.1:3061/studio-conversation-room?studioPaymentSandbox=1",
+      "stage": "checkout",
+      "heading": "Studio Conversation Room",
+      "notes": "Maya filled flyer intake with supplied facts only.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\15-intake-filled.png"
+    },
+    {
+      "step": "16-after-intake",
+      "url": "http://127.0.0.1:3061/studio-conversation-room?studioPaymentSandbox=1",
+      "stage": "checkout",
+      "heading": "Studio Conversation Room",
+      "notes": "After intake submit.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\16-after-intake.png"
+    },
+    {
+      "step": "19-board",
+      "url": "http://127.0.0.1:3061/sign-in?from=%2Fstudio-board",
+      "stage": null,
+      "heading": "Sign in to The Studio",
+      "notes": "Studio Board.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\19-board.png"
+    },
+    {
+      "step": "20-voice",
+      "url": "http://127.0.0.1:3061/sign-in?from=%2Fstudio-board",
+      "stage": null,
+      "heading": "Sign in to The Studio",
+      "notes": "Asked seven customer status questions.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\20-voice.png"
+    },
+    {
+      "step": "21-feedback-studio",
+      "url": "http://127.0.0.1:3061/sign-in?from=%2Ffeedback-studio",
+      "stage": null,
+      "heading": "Sign in to The Studio",
+      "notes": "Visited /feedback-studio",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\21-feedback-studio.png"
+    },
+    {
+      "step": "21-deliverables",
+      "url": "http://127.0.0.1:3061/sign-in?from=%2Fdeliverables",
+      "stage": null,
+      "heading": "Sign in to The Studio",
+      "notes": "Visited /deliverables",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\21-deliverables.png"
+    },
+    {
+      "step": "22-new-device-board",
+      "url": "http://127.0.0.1:3061/sign-in?from=%2Fstudio-board",
+      "notes": "Fresh context Board. campaignId from device A=cedc317f-f5cd-4f3f-a665-89f262c13b35. Text=CLIENT ACCESS\n\nSIGN IN TO THE STUDIO\n\nYour project has been created. Sign in to open your Studio Board, track progress, and get help in the Help Center when you need it.\n\nEMAIL\nPASSWORD\n\nForgot password?\n\nSIGN IN\n\nNew here? Create an account.\n\nNeed help? Visit the Help Center.\n\nSTUDIO REVIEW",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-completed-system-dry-run-1\\customer-eyes\\22-return-new-context.png"
+    }
+  ],
+  "findings": [
+    {
+      "severity": "IMPORTANT FRICTION",
+      "step": "Route",
+      "whatMayaSaw": "Maya asked for a flyer; suggested route button was “Continue with Promote Something Now”."
+    },
+    {
+      "severity": "IMPORTANT FRICTION",
+      "step": "Payment",
+      "whatMayaSaw": "No Stripe completion and no customer sandbox CTA. Scout appended studioPaymentSandbox=1 (developer fixture) so the rest of the sealed spine can be observed."
+    },
+    {
+      "severity": "IMPORTANT FRICTION",
+      "step": "Intake",
+      "whatMayaSaw": "Could not find Save & Continue after filling intake."
+    },
+    {
+      "severity": "IMPORTANT FRICTION",
+      "step": "Board",
+      "whatMayaSaw": "Maya had to be taken to Studio Board; no obvious customer control."
+    },
+    {
+      "severity": "NOTE",
+      "step": "Continuity",
+      "whatMayaSaw": "New browser requires sign-in (expected). Claim path exists; verify email still needed for a brand-new account."
+    },
+    {
+      "severity": "BLOCKER",
+      "step": "Flyer production",
+      "whatMayaSaw": "Maya received no flyer file. Sealed Machine flyer path requires an approved logo material; Maya supplied none. Dispatch fail-closed is honest, but the customer still has no deliverable."
+    }
+  ],
+  "voiceAnswers": [
+    {
+      "question": "Did my payment go through?",
+      "studioResponse": "(no Ask field visible)",
+      "truthfulFromAuthoritativeState": "UNFINISHED"
+    },
+    {
+      "question": "Do you need anything else from me?",
+      "studioResponse": "(no Ask field visible)",
+      "truthfulFromAuthoritativeState": "UNFINISHED"
+    },
+    {
+      "question": "Has anyone started working on my project?",
+      "studioResponse": "(no Ask field visible)",
+      "truthfulFromAuthoritativeState": "UNFINISHED"
+    },
+    {
+      "question": "What is the status of my flyer?",
+      "studioResponse": "(no Ask field visible)",
+      "truthfulFromAuthoritativeState": "UNFINISHED"
+    },
+    {
+      "question": "When will I be able to review it?",
+      "studioResponse": "(no Ask field visible)",
+      "truthfulFromAuthoritativeState": "UNFINISHED"
+    },
+    {
+      "question": "Can I make changes after I see it?",
+      "studioResponse": "(no Ask field visible)",
+      "truthfulFromAuthoritativeState": "UNFINISHED"
+    },
+    {
+      "question": "Where do I go to see my finished file?",
+      "studioResponse": "(no Ask field visible)",
+      "truthfulFromAuthoritativeState": "UNFINISHED"
+    }
+  ]
+}

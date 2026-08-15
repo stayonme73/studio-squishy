@@ -45,6 +45,8 @@ export type ConversationActivityPanelProps = {
   onSandboxCheckoutConfirm?: () => void | Promise<void>;
   /** Fail-closed pre-acceptance gate before Complete Checkout. */
   onAuthorizeCheckoutPayment?: () => boolean;
+  /** Cancelled / failed / pending payment copy from durable processor state. */
+  paymentHonestyMessage?: string | null;
   onIntakeSubmitSuccess: () => void | Promise<void>;
   onRecoverIntakePayment?: () => void;
   intakePrefillBusinessName?: string | null;
@@ -443,6 +445,7 @@ export default function ConversationActivityPanel({
   onCheckoutPaymentComplete,
   onSandboxCheckoutConfirm,
   onAuthorizeCheckoutPayment,
+  paymentHonestyMessage = null,
   onIntakeSubmitSuccess,
   onRecoverIntakePayment,
   intakePrefillBusinessName = null,
@@ -553,6 +556,7 @@ export default function ConversationActivityPanel({
         onPaymentComplete={onCheckoutPaymentComplete}
         onSandboxConfirm={onSandboxCheckoutConfirm}
         onAuthorizePayment={onAuthorizeCheckoutPayment}
+        paymentHonestyMessage={paymentHonestyMessage}
       />
     );
   }

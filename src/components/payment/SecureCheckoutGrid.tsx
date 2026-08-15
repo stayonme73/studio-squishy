@@ -100,14 +100,17 @@ function CheckoutSection({
   title,
   children,
   className = "",
+  sectionId,
 }: {
   title: string;
   children: ReactNode;
   className?: string;
+  sectionId?: string;
 }) {
   const id = title ? `co-section-${title.replace(/\s+/g, "-").toLowerCase()}` : undefined;
   return (
     <section
+      id={sectionId}
       className={`co-card ${className}`.trim()}
       aria-labelledby={id}
     >
@@ -196,7 +199,11 @@ export default function SecureCheckoutGrid({
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!termsAccepted || completing) return;
+    if (completing) return;
+    if (!termsAccepted) {
+      setCheckoutError(payment.form.termsLabel);
+      return;
+    }
     void completeCheckout();
   }
 
@@ -247,6 +254,7 @@ export default function SecureCheckoutGrid({
         <input
           type="checkbox"
           name="terms"
+          data-checkout-terms="1"
           checked={termsAccepted}
           onChange={(event) => setTermsAccepted(event.target.checked)}
         />
@@ -363,7 +371,8 @@ export default function SecureCheckoutGrid({
               <button
                 type="submit"
                 className="pay-submit"
-                disabled={!termsAccepted || completing}
+                data-checkout-pay="continue"
+                disabled={completing}
               >
                 {confirmLabel}
               </button>
@@ -436,21 +445,11 @@ export default function SecureCheckoutGrid({
         </CheckoutSection>
 
         <form className="pay-checkout-form" onSubmit={handleSubmit}>
-          <CheckoutSection title={payment.sections.next}>
-            <ol className="co-next-steps" aria-label={payment.sections.next}>
-              {payment.whatsNext.steps.map((step, index) => (
-                <li key={step.label} className="co-next-steps__item">
-                  <span className="co-next-steps__num" aria-hidden="true">
-                    {index + 1}
-                  </span>
-                  <span className="co-next-steps__label">{step.label}</span>
-                </li>
-              ))}
-            </ol>
-            <p className="co-next-steps__reassurance">{payment.whatsNext.emailReassurance}</p>
-          </CheckoutSection>
-
-          <CheckoutSection title={payment.sections.confirm} className="co-card--confirm">
+          <CheckoutSection
+            title={payment.sections.confirm}
+            className="co-card--confirm"
+            sectionId="checkout-pay-continue"
+          >
             {recommendationNotice ? (
               <div className="pay-disclaimer" role="note">
                 <h3 className="pay-disclaimer__heading">{recommendationNotice.title}</h3>
@@ -468,6 +467,7 @@ export default function SecureCheckoutGrid({
               <input
                 type="checkbox"
                 name="terms"
+                data-checkout-terms="1"
                 checked={termsAccepted}
                 onChange={(event) => setTermsAccepted(event.target.checked)}
               />
@@ -479,7 +479,8 @@ export default function SecureCheckoutGrid({
             <button
               type="submit"
               className="utility-btn utility-btn--primary co-submit"
-              disabled={!termsAccepted || completing}
+              data-checkout-pay="continue"
+              disabled={completing}
             >
               {confirmLabel}
             </button>
@@ -491,6 +492,20 @@ export default function SecureCheckoutGrid({
               <p className="co-payment-reassurance">{payment.form.paymentReassurance}</p>
             )}
             {sandboxPanel}
+          </CheckoutSection>
+
+          <CheckoutSection title={payment.sections.next}>
+            <ol className="co-next-steps" aria-label={payment.sections.next}>
+              {payment.whatsNext.steps.map((step, index) => (
+                <li key={step.label} className="co-next-steps__item">
+                  <span className="co-next-steps__num" aria-hidden="true">
+                    {index + 1}
+                  </span>
+                  <span className="co-next-steps__label">{step.label}</span>
+                </li>
+              ))}
+            </ol>
+            <p className="co-next-steps__reassurance">{payment.whatsNext.emailReassurance}</p>
           </CheckoutSection>
         </form>
       </div>

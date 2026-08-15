@@ -166,14 +166,16 @@ describe("resolveMaterialsStillNeedEmptyState", () => {
 });
 
 describe("Sign In lead from safe from=", () => {
-  it("uses project-created lead for Board return path", () => {
+  it("uses Board sign-in lead without claiming the project was created", () => {
     expect(resolveSignInLeadFromFromParam("/studio-board")).toBe(
       conversationRoomGuideV1.boardHandoffSignInLead,
     );
     expect(resolveSignInLeadFromFromParam("/studio-board?x=1")).toBe(
       conversationRoomGuideV1.boardHandoffSignInLead,
     );
-    expect(conversationRoomGuideV1.boardHandoffSignInLead).toMatch(/project has been created/i);
+    expect(conversationRoomGuideV1.boardHandoffSignInLead).not.toMatch(
+      /project has been created/i,
+    );
     expect(conversationRoomGuideV1.boardHandoffSignInLead).toMatch(/Help Center/i);
   });
 
@@ -188,19 +190,23 @@ describe("Sign In lead from safe from=", () => {
 
 describe("first-minute Voice / handoff truth", () => {
   it("avoids all-set and messaging promises", () => {
-    const lines = [
+    const postPayLines = [
       conversationRoomGuideV1.intakeSubmitSuccessVoiceSignedOut,
       conversationRoomGuideV1.intakeSubmitSuccessVoiceSignedIn,
       conversationRoomGuideV1.boardHandoffAccountChoiceLead,
-      conversationRoomGuideV1.boardHandoffSignInLead,
       conversationRoomGuideV1.boardArrivalWelcomeVoice,
     ];
-    for (const line of lines) {
+    for (const line of postPayLines) {
       expect(line).not.toMatch(/you.?re all set/i);
       expect(line).not.toMatch(/everything required has been collected/i);
       expect(line).not.toMatch(/communicate with the Studio/i);
-      expect(line).toMatch(/set up|project has been created/i);
+      expect(line).toMatch(/set up|paid project is saved/i);
+      expect(line).not.toMatch(/project has been created/i);
     }
+    expect(conversationRoomGuideV1.boardHandoffSignInLead).not.toMatch(
+      /project has been created/i,
+    );
+    expect(conversationRoomGuideV1.boardHandoffSignInLead).not.toMatch(/you.?re all set/i);
   });
 });
 

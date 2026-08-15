@@ -1,0 +1,91 @@
+{
+  "base": "http://127.0.0.1:3061",
+  "passed": 14,
+  "failed": 0,
+  "proofs": [
+    {
+      "id": "unpaid-sign-in-honesty",
+      "ok": true,
+      "detail": "Unpaid Board sign-in does not say the project was created.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\sign-in-unpaid-honesty.png"
+    },
+    {
+      "id": "cancel-flyer-69",
+      "ok": true,
+      "detail": "Checkout shows Make Me a Flyer at $69.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\cancel-checkout.png"
+    },
+    {
+      "id": "cancel-no-live-processing-lie",
+      "ok": true,
+      "detail": "Checkout no longer says live card processing is missing from this build.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\cancel-checkout.png"
+    },
+    {
+      "id": "cancel-hosted-stripe-opened",
+      "ok": true,
+      "detail": "Cancel path opened hosted Checkout: https://checkout.stripe.com/c/pay/cs_test_a1Pihum6dBa6YygeYcAu4g9Jvgpa8DhPvWeS1kY9yJUG0aB7Ukn7FP7DLd#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRQNjdAMUFiNXw3dlJ8YHR9akRdTmp0TnJ0QUJOX39IdVZXZ1ZnN3xTbUZ8bzJCVkFUc1FWcUA8Q0g3czJPamc0U1w3NHUwU1VMNz02bENhQTRVdlNccmQ1NUpnPF1%2FdmBWJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\hosted-stripe-before-cancel.png"
+    },
+    {
+      "id": "cancelled-payment-honesty",
+      "ok": true,
+      "detail": "After cancel: stage=checkout unpaid; no created-project claim.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\cancelled-checkout-return.png"
+    },
+    {
+      "id": "cancelled-not-intake",
+      "ok": true,
+      "detail": "Cancelled checkout stayed on checkout (stage=checkout), not intake.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\cancelled-checkout-return.png"
+    },
+    {
+      "id": "pay-flyer-69",
+      "ok": true,
+      "detail": "Checkout shows Make Me a Flyer at $69.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\pay-checkout.png"
+    },
+    {
+      "id": "pay-no-live-processing-lie",
+      "ok": true,
+      "detail": "Checkout no longer says live card processing is missing from this build.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\pay-checkout.png"
+    },
+    {
+      "id": "hosted-stripe-opened",
+      "ok": true,
+      "detail": "Hosted Stripe Checkout opened: https://checkout.stripe.com/c/pay/cs_test_a1ZMCNP07loLCrSHZA8LgsvlAujivIdKZs3DdF6wMNS28yQwWpen2y5S4z#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRQNjdAMUFiNXw3dlJ8YHR9akRdTmp0TnJ0QUJOX39IdVZXZ1ZnN3xTbUZ8bzJCVkFUc1FWcUA8Q0g3czJPamc0U1w3NHUwU1VMNz02bENhQTRVdlNccmQ1NUpnPF1%2FdmBWJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\hosted-stripe-checkout.png"
+    },
+    {
+      "id": "stripe-test-card-filled",
+      "ok": true,
+      "detail": "Test card fields found.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\hosted-stripe-card-filled.png"
+    },
+    {
+      "id": "successful-studio-return",
+      "ok": true,
+      "detail": "Returned to Studio after Stripe. stage=intake url=http://127.0.0.1:3061/studio-conversation-room?stage=checkout",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\studio-return-after-pay.png"
+    },
+    {
+      "id": "intake-after-confirmed-pay",
+      "ok": true,
+      "detail": "Project Intake is the next customer step after confirmed payment.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\studio-return-after-pay.png"
+    },
+    {
+      "id": "no-false-created-after-pay-path",
+      "ok": true,
+      "detail": "Customer copy does not congratulate an unpaid created project.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\studio-return-after-pay.png"
+    },
+    {
+      "id": "no-logo-intake-truth",
+      "ok": true,
+      "detail": "Intake lets Maya say she does not have a logo. No test logo invented.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-customer-paid-entry-repair-1\\customer-eyes\\intake-no-logo.png"
+    }
+  ]
+}

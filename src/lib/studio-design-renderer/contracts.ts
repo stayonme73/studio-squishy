@@ -21,6 +21,12 @@ export const FLYER_PROOF_CONTRACT = {
   canvaRequired: false,
   makeRequired: false,
   ownerRoutineProduction: "NONE" as const,
+  /**
+   * Customer logo is not a frozen SKU product-law requirement.
+   * The renderer may produce a wordmark-only flyer when the customer supplied none.
+   * Do not invent or substitute a logo.
+   */
+  customerLogoRequired: false,
 } as const;
 
 export function isDesignRendererProofSku(skuId: string): boolean {
