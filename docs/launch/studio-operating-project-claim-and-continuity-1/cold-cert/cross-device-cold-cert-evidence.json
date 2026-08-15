@@ -1,0 +1,95 @@
+{
+  "packageId": "STUDIO-OPERATING-PROJECT-CLAIM-AND-CONTINUITY-1",
+  "kind": "cross-device-cold-cert",
+  "recordedAt": "2026-08-15T01:56:33.307Z",
+  "baseUrl": "http://127.0.0.1:3055",
+  "commitHint": "7dbbc00",
+  "runId": "511360d2-f076-4178-b5fa-cecdc1150fd1",
+  "totals": {
+    "passed": 15,
+    "failed": 0,
+    "blocked": 0,
+    "total": 15
+  },
+  "verdict": "PROJECT CLAIM & CROSS-DEVICE CONTINUITY READY",
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3055 (spawned)"
+    },
+    {
+      "check": "guest_sandbox_checkout",
+      "status": "PASS",
+      "detail": "cs_sandbox_claim-co_1786758978555"
+    },
+    {
+      "check": "guest_claim_receipt_minted",
+      "status": "PASS",
+      "detail": "raw token returned once"
+    },
+    {
+      "check": "guest_project_unowned_after_pay",
+      "status": "PASS"
+    },
+    {
+      "check": "payment_truth_confirmed",
+      "status": "PASS",
+      "detail": "6900¢"
+    },
+    {
+      "check": "device_a_unsigned_cannot_read_unowned_paid",
+      "status": "PASS",
+      "detail": "sessionUser=false status=401"
+    },
+    {
+      "check": "fresh_device_signup",
+      "status": "PASS",
+      "detail": "71eb81e2-8211-4d36-b899-8abab1b5c872"
+    },
+    {
+      "check": "fresh_device_email_verified",
+      "status": "PASS",
+      "detail": "2026-08-15T01:56:26.275Z"
+    },
+    {
+      "check": "fresh_device_claim_ui",
+      "status": "PASS",
+      "detail": "heading=Project claimed"
+    },
+    {
+      "check": "server_ownership_bound",
+      "status": "PASS",
+      "detail": "clientUserId=71eb81e2-8211-4d36-b899-8abab1b5c872"
+    },
+    {
+      "check": "payment_truth_unchanged_after_claim",
+      "status": "PASS"
+    },
+    {
+      "check": "studio_board_opens_same_project",
+      "status": "PASS",
+      "detail": "status=200 id=claim-cold-1786758974840"
+    },
+    {
+      "check": "claim_retry_idempotent",
+      "status": "PASS",
+      "detail": "alreadyOwned=true"
+    },
+    {
+      "check": "wrong_customer_cannot_claim",
+      "status": "PASS",
+      "detail": "status=403 error=wrong_owner"
+    },
+    {
+      "check": "no_duplicate_campaign_after_retries",
+      "status": "PASS"
+    }
+  ],
+  "notes": [
+    "Email verification used server-minted token (same pattern as email-verification-cold-cert.mts) — no Tagia inbox required.",
+    "Fresh Playwright browser contexts simulate separate devices (no shared cookies/storage).",
+    "Guest sandbox pay ran in-process with Stripe keys unset so sandbox confirm remains available.",
+    "Script started ephemeral next dev with cert SESSION_SECRET."
+  ]
+}

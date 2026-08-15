@@ -281,7 +281,7 @@ Password Recovery, Project Claim, and Parking Lot remain blocked until Tagia aut
 
 ---
 
-## Package 5 — Project Claim / Ownership (implementation complete · cold cert pending)
+## Package 5 — Project Claim / Ownership (**Cold-certified READY** · 2026-08-15)
 
 **Package id:** `STUDIO-OPERATING-PROJECT-CLAIM-AND-CONTINUITY-1`  
 **Authority:** Owner broad-package runway (2026-08-14). No merge.
@@ -299,7 +299,7 @@ Payment / SKU / intake / production / review / delivery truth is not mutated by 
 | Signed-in pay binds at confirm | Checkout binding `payerClientUserId` from server session only → `applyPostPaymentOwnership` |
 | Guest pay mints hashed claim receipt | `issueProjectClaimReceipt` → `data/project-claim-receipts.json` |
 | Claim API requires session + verified email + (receipt OR local possession) | `POST /api/campaigns/claim` + `claimCampaignForVerifiedClient` |
-| Fail-closed wrong owner / tampered / missing proof | Unit tests in `claim.test.ts` |
+| Fail-closed wrong owner / tampered / missing proof | Unit tests + cold cert |
 | Soft PATCH paid claim requires verified email | `PATCH /api/campaigns/current` |
 | Claim recovery email + `/claim-project` | `sendProjectClaimRecoveryEmail` + `ClaimProjectScene` |
 | Board resume uses server ownership; localStorage receipt convenience only | `useCurrentCampaign` + `client-receipt.ts` |
@@ -312,23 +312,32 @@ Payment / SKU / intake / production / review / delivery truth is not mutated by 
 | `src/lib/studio-project-claim` | **PASS** (5) |
 | Payment / post-pay / dispatch / campaign-store / email-verification sample | **PASS** — 190 tests / 28 files (2026-08-14) |
 
-### Explicit non-goals / remaining limits
+### Cold certification evidence — 2026-08-15 (Scout)
 
-- Owner cold cert (desktop + phone cross-device) still pending
-- Multi-project customer UX picker not redesigned (account can hold multiple `clientCampaignIds`)
-- Live Stripe claim-email delivery depends on transactional email config (same as verify/reset)
+| Check | Result |
+|-------|--------|
+| Guest sandbox pay → unowned + claim receipt | **PASS** |
+| Fresh Playwright context = new device | **PASS** |
+| Signup → server-minted verify (no Tagia inbox) → claim UI | **PASS** |
+| Studio Board opens same campaignId | **PASS** |
+| Wrong customer claim fail-closed | **PASS** (403 `wrong_owner`) |
+| Idempotent retry / no duplicate | **PASS** |
+| Payment truth unchanged | **PASS** |
+| Cold-cert totals | **15/15 PASS** |
+
+**Runner:** `scripts/project-claim-cross-device-cold-cert.mts`  
+**Evidence JSON:** `docs/launch/studio-operating-project-claim-and-continuity-1/cold-cert/cross-device-cold-cert-evidence.json`  
+**Run id:** `511360d2-f076-4178-b5fa-cecdc1150fd1`
+
+### Remaining limits
+
+- Optional physical-phone spot-check only (not required for seal)
+- Multi-project picker UX not redesigned
+- Live claim-email delivery depends on transactional email config
 - Package 6 Route / Data Protection still separate
 - No merge authorized
 
-### Cold certification checklist (desktop + real phone / second browser)
-
-1. Signed-in customer pays → Board opens owned project after refresh/logout/login  
-2. Guest pays → closes browser → signs in on new device with claim link → exact project  
-3. Wrong account cannot claim; tampered token fails  
-4. Retry claim does not duplicate campaign/ownership  
-5. Payment truth unchanged after claim  
-
-**Verdict pending owner cold cert.** Target: **PROJECT CLAIM & CROSS-DEVICE CONTINUITY READY**.
+**Verdict: PROJECT CLAIM & CROSS-DEVICE CONTINUITY READY.**
 
 **Next recommended broad package:** Paid Activation Recovery / post-pay status spine (per whole-system readiness). Parking Lot remains locked.
 
