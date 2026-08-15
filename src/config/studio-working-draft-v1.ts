@@ -52,6 +52,13 @@ export const WORKING_DRAFT_PERSISTED_FIELDS = [
    * @see STUDIO-OPERATING-DESIGN-RM-J008-INTAKE-PAYMENT-LOCK-1
    */
   "rmj008KitLock",
+  /**
+   * bf-001 Brand Identity Refresh — graphic kind (profile XOR cover), existing
+   * business name, and customer-supplied visual starting point locked before payment.
+   * skuId `bf-001` alone is insufficient for checkout.
+   * @see STUDIO-OPERATING-DESIGN-BF-001-INTAKE-PAYMENT-LOCK-1
+   */
+  "bf001PackageLock",
 ] as const;
 
 export type WorkingDraftPersistedField =

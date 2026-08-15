@@ -59,3 +59,8 @@ export {
   writeRmJ008KitLock,
   readRmJ008PaymentSealFromCampaign,
 } from "./rm-j008-kit";
+export {
+  readBf001PackageLock,
+  writeBf001PackageLock,
+  readBf001PackageSealFromCampaign,
+} from "./bf-001-package";

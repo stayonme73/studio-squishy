@@ -175,6 +175,23 @@ export type {
   RmJ008DispatchInvocationOutcome,
 } from "./rm-j008-dispatch-hook";
 export {
+  mapBf001RefreshProjectTruthFromJob,
+  BF_001_DISPATCH_WIRING_SCOPE_NOTE,
+  BF_001_STUDIO_BASELINE_PALETTE,
+  BF_001_STUDIO_BASELINE_FONT_RECOMMENDATIONS,
+  BF_001_STUDIO_BASELINE_LOGO_USAGE_RULES,
+  BF_001_GRAPHIC_RENDER_FONT_FAMILY,
+} from "./map-bf-001-job-truth";
+export type { Bf001TruthMapResult } from "./map-bf-001-job-truth";
+export {
+  invokeBf001DispatchHook,
+  BF_001_DISPATCH_HOOK_PACKAGE_ID,
+} from "./bf-001-dispatch-hook";
+export type {
+  Bf001DispatchHookResult,
+  Bf001DispatchInvocationOutcome,
+} from "./bf-001-dispatch-hook";
+export {
   buildSm001IdempotencyKey,
   buildSm001IdempotencyTuple,
   fingerprintSm001CalendarInputs,

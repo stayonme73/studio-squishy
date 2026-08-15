@@ -38,12 +38,6 @@ export type SkuProductionOverride = {
   finalDeliveryCriteria?: readonly string[];
 };
 
-const canvaFormats = (detail: string): readonly string[] => [
-  "Final flattened digital export (PNG and/or PDF as appropriate)",
-  "Editable Canva source files are not included unless separately authorized",
-  detail,
-];
-
 const copyFormats = (detail: string): readonly string[] => [
   "Client-readable copy document or structured paste-ready text",
   detail,
@@ -56,11 +50,40 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   "bf-001": {
     producerRole: "strategy",
     supportingRoles: ["creative_production", "copy", "qa", "producer_dispatcher"],
-    primaryTool: CANVA_TOOL,
+    /**
+     * STUDIO-OPERATING-DESIGN-BF-001-DISPATCH-HOOK-1 — Owner-authorized:
+     * Canva is not the operational executor for this SKU.
+     * Thin Machine path: paid bf001PostPayDispatchStructure → refresh package composer.
+     * Purchased graphic kind (profile XOR cover) + 2-member membership +
+     * customer-supplied visual starting point are law.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for bf-001 only (BF-001-PROOF-1 + INTAKE-PAYMENT-LOCK-1 + POSTPAY-PACKAGE-DISPATCH-STRUCTURE-1 + DISPATCH-HOOK-1). Canva is not on the fulfillment spine for this SKU. Make not required. Exact graphic kind (profile XOR cover) + 2/2 member identities + customer-supplied visual starting point from paymentTruth seal. Existing mark is placed, never redrawn; sheet fonts are recommendations only; the graphic renders Studio-safe faces.",
+    },
     optionalTools: [TEXT_MODEL_TOOL],
-    formatExportRequirements: canvaFormats(
-      "One-page Brand Direction Sheet + one branded profile or cover graphic",
-    ),
+    formatExportRequirements: [
+      "One-page Brand Direction Sheet on plate brand-direction-sheet-portrait-1024x1536",
+      "One branded graphic — profile plate or cover plate per the locked graphic kind",
+      "Palette with usable HEX codes plus font pairing recommendations for customer-owned materials",
+      "Logo usage guidance for the supplied mark — no new mark, no redraw",
+      "Package identity + manifest binding graphic kind, member IDs, order, kinds, plates, artifacts, and QA",
+      "Editable source files are not included unless separately authorized",
+    ],
+    extraLimitations: [
+      "Refresh only — bf-001 refines an existing presentation and never invents from nothing.",
+      "Naming / renaming, new logo creation from scratch, and brand messaging or taglines are excluded.",
+      "Requires an existing business name, a described visual starting point, and a supplied logo file.",
+      "Font pairings on the sheet are recommendations for customer-owned materials — not Studio render or license guarantees.",
+      "The delivered graphic renders Studio-safe fonts, which may differ from the recommended pairings.",
+      "Exactly one graphic per package — profile XOR cover, locked before payment.",
+      "Canva is not on the fulfillment spine for this SKU (Owner-authorized Machine remap).",
+    ],
     extraQaItems: [
       {
         id: "no_new_logo_claim",
@@ -74,10 +97,35 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
         reason: "Catalog deliverable requires HEX codes",
         source: "service_contract",
       },
+      {
+        id: "exact_two_member_package",
+        label: "Exact locked 2/2 refresh package delivered",
+        reason: "Package completeness = sheet + one purchased graphic",
+        source: "service_contract",
+      },
+      {
+        id: "one_graphic_only",
+        label: "Exactly one graphic — profile XOR cover",
+        reason: "Catalog exclusion: both profile and cover in one package",
+        source: "catalog_exclusion",
+      },
+      {
+        id: "customer_supplied_starting_point",
+        label:
+          "Starting point is customer-supplied — supplied mark placed, never redrawn",
+        reason: "Refresh honesty boundary",
+        source: "service_contract",
+      },
+      {
+        id: "font_recommendation_honesty",
+        label: "Sheet fonts labeled recommendations; graphic uses Studio-safe fonts",
+        reason: "No render or license guarantee on recommended families",
+        source: "deliverable_format",
+      },
     ],
     readiness: "contract_ready",
     readinessNotes:
-      "Strategy + creative path defined. Canva used operationally for profile/cover; no live Canva API required for first quality testing.",
+      "Brand Identity Refresh — strategy + Studio Design Renderer (Owner-independent Machine path). Canva is not on the fulfillment spine for this SKU; Make not required. Paid package seal + post-pay structure required; exact graphic kind (profile XOR cover) + 2/2 member identities + customer-supplied visual starting point; existing mark placed, never redrawn; sheet fonts are recommendations only.",
   },
   "sm-001": {
     producerRole: "creative_production",

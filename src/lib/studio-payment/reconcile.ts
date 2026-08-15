@@ -158,6 +158,9 @@ export async function reconcileCheckoutSession(
       : {}),
     ...(binding.rmj002KitSeal ? { rmj002KitSeal: binding.rmj002KitSeal } : {}),
     ...(binding.rmj008KitSeal ? { rmj008KitSeal: binding.rmj008KitSeal } : {}),
+    ...(binding.bf001PackageSeal
+      ? { bf001PackageSeal: binding.bf001PackageSeal }
+      : {}),
   });
 
   if (!result.ok) {

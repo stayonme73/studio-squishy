@@ -41,6 +41,11 @@ export async function startHostedCheckout(args: {
    * Required when facts include rm-j008; server re-validates and seals.
    */
   rmj008KitLock?: unknown;
+  /**
+   * bf-001 Brand Identity Refresh — locked 2-member refresh package from working draft.
+   * Required when facts include bf-001; server re-validates and seals.
+   */
+  bf001PackageLock?: unknown;
 }): Promise<StartCheckoutClientResult> {
   const returnOrigin =
     typeof window !== "undefined" ? window.location.origin : "";
@@ -62,6 +67,9 @@ export async function startHostedCheckout(args: {
         : {}),
       ...(args.rmj008KitLock != null
         ? { rmj008KitLock: args.rmj008KitLock }
+        : {}),
+      ...(args.bf001PackageLock != null
+        ? { bf001PackageLock: args.bf001PackageLock }
         : {}),
     }),
   });

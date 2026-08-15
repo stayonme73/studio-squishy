@@ -62,6 +62,7 @@ import {
   readMa001PackComposition,
   readRmJ002KitLock,
   readRmJ008KitLock,
+  readBf001PackageLock,
   readOpeningAnswers,
   readSelectedRoute,
   readSelectedServices,
@@ -71,6 +72,7 @@ import {
 import { evaluateMa001CompositionPaymentGate } from "@/lib/studio-design-renderer/ma-001-composition-payment-gate";
 import { evaluateRmJ002KitPaymentGate } from "@/lib/studio-design-renderer/rm-j002-kit-payment-gate";
 import { evaluateRmJ008KitPaymentGate } from "@/lib/studio-design-renderer/rm-j008-kit-payment-gate";
+import { evaluateBf001PackagePaymentGate } from "@/lib/studio-design-renderer/bf-001-kit-payment-gate";
 import type { ServiceId } from "@/catalog/types";
 import type { RouteMapIntakeAnswers } from "@/catalog/intake";
 import { buildProjectBuilderStudioPlanSummary } from "@/lib/project-builder-studio-plan-summary";
@@ -858,6 +860,17 @@ export default function ConversationRoomRuntime({
       );
       return;
     }
+    const bf001Gate = evaluateBf001PackagePaymentGate({
+      selectedServiceIds: serviceIds.map(String),
+      packageLock: readBf001PackageLock(project),
+    });
+    if (!bf001Gate.ok) {
+      setPlanBridgeError(bf001Gate.message);
+      speakStudioLine(
+        "Your Brand Identity Refresh still needs one graphic choice — profile image or cover graphic — plus your current logo and colors before checkout.",
+      );
+      return;
+    }
 
     const decision = runPreAcceptanceForCheckout(
       projectFactsFromWorkingDraft(project),
@@ -936,6 +949,21 @@ export default function ConversationRoomRuntime({
       closeActivityPanel();
       speakStudioLine(
         "Your Social Profile Update Kit still needs one platform and your current profile details locked before payment.",
+      );
+      return false;
+    }
+    const bf001Gate = evaluateBf001PackagePaymentGate({
+      selectedServiceIds: readSelectedServices(project).map((s) =>
+        String(s.jobId),
+      ),
+      packageLock: readBf001PackageLock(project),
+    });
+    if (!bf001Gate.ok) {
+      setPlanBridgeError(bf001Gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        "Your Brand Identity Refresh still needs one graphic choice and your current logo and colors locked before payment.",
       );
       return false;
     }
@@ -1024,6 +1052,20 @@ export default function ConversationRoomRuntime({
       );
       throw new Error(rmj008Gate.message);
     }
+    const bf001PackageLock = readBf001PackageLock(project);
+    const bf001Gate = evaluateBf001PackagePaymentGate({
+      selectedServiceIds: facts.selectedServiceIds.map(String),
+      packageLock: bf001PackageLock,
+    });
+    if (!bf001Gate.ok) {
+      setPlanBridgeError(bf001Gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        "Your Brand Identity Refresh still needs one graphic choice and your current logo and colors locked before payment.",
+      );
+      throw new Error(bf001Gate.message);
+    }
     const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
@@ -1049,6 +1091,7 @@ export default function ConversationRoomRuntime({
       ma001PackComposition: ma001Composition,
       rmj002KitLock,
       rmj008KitLock,
+      bf001PackageLock,
     });
     if (!started.ok) {
       setPlanBridgeError(started.message);
@@ -1099,6 +1142,15 @@ export default function ConversationRoomRuntime({
       setPlanBridgeError(rmj008Gate.message);
       throw new Error(rmj008Gate.message);
     }
+    const bf001PackageLock = readBf001PackageLock(project);
+    const bf001Gate = evaluateBf001PackagePaymentGate({
+      selectedServiceIds: facts.selectedServiceIds.map(String),
+      packageLock: bf001PackageLock,
+    });
+    if (!bf001Gate.ok) {
+      setPlanBridgeError(bf001Gate.message);
+      throw new Error(bf001Gate.message);
+    }
     const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
@@ -1119,6 +1171,7 @@ export default function ConversationRoomRuntime({
       ma001PackComposition: ma001Composition,
       rmj002KitLock,
       rmj008KitLock,
+      bf001PackageLock,
     });
     if (!started.ok) {
       setPlanBridgeError(started.message);

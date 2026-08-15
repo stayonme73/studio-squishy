@@ -1,0 +1,12 @@
+{
+  "plateId": "brand-direction-sheet-portrait-1024x1536",
+  "sheetVisualVersion": "v1.0-brand-direction-sheet-customer",
+  "sections": [
+    "hex_palette",
+    "font_recommendations",
+    "logo_usage_rules"
+  ],
+  "fontSectionMode": "recommendations_only",
+  "logoUsageMode": "usage_guidance_only",
+  "customerFacing": true
+}

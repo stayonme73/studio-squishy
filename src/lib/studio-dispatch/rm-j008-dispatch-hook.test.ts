@@ -177,7 +177,7 @@ describe("STUDIO-OPERATING-DESIGN-RM-J008-DISPATCH-HOOK-1", () => {
     delete process.env.STRIPE_SECRET_KEY;
   });
 
-  it("remaps only rm-j008 onto studio_design_renderer; bf-001 and rm-j007 stay Canva", () => {
+  it("remaps rm-j008 onto studio_design_renderer; rm-j007 stays Canva", () => {
     const kit = resolveServiceProductionContract(SKU);
     expect(kit.status).toBe("resolved");
     if (kit.status !== "resolved") return;
@@ -195,6 +195,7 @@ describe("STUDIO-OPERATING-DESIGN-RM-J008-DISPATCH-HOOK-1", () => {
       "sm-001-monthly",
       "ma-001",
       "rm-j002",
+      "bf-001",
     ] as const;
     for (const skuId of sealed) {
       const resolved = resolveServiceProductionContract(skuId);
@@ -203,7 +204,7 @@ describe("STUDIO-OPERATING-DESIGN-RM-J008-DISPATCH-HOOK-1", () => {
       expect(resolved.contract.primaryTool.toolId).toBe("studio_design_renderer");
     }
 
-    for (const skuId of ["bf-001", "rm-j007"] as const) {
+    for (const skuId of ["rm-j007"] as const) {
       const resolved = resolveServiceProductionContract(skuId);
       if (resolved.status !== "resolved") continue;
       expect(resolved.contract.primaryTool.toolId).toBe("canva");

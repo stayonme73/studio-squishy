@@ -802,3 +802,105 @@ export type {
   RmJ008PostPayStructureFailureCode,
   RmJ008PostPayStructureBuildResult,
 } from "./rm-j008-postpay-kit-dispatch-structure";
+
+/** bf-001 Brand Identity Refresh package composer — PROOF-1 only (no remap / Canva OFF). */
+export {
+  DESIGN_RENDERER_BF_001_SKU,
+  BF_001_PACKAGE_SPEC_VERSION,
+  BF_001_ORCHESTRATOR_VERSION,
+  BF_001_SHEET_VISUAL_VERSION,
+  BF_001_GRAPHIC_VISUAL_VERSION,
+  BF_001_SHEET_PLATE,
+  BF_001_PROFILE_PLATE,
+  BF_001_COVER_PLATE,
+  BF_001_STUDIO_SAFE_FONTS,
+} from "./bf-001-types";
+export type {
+  Bf001GraphicKind,
+  Bf001MemberId,
+  Bf001MemberKind,
+  Bf001PlannedMember,
+  Bf001LogoMaterial,
+  Bf001HexSwatch,
+  Bf001FontRecommendation,
+  Bf001LogoUsageRules,
+  Bf001RefreshProjectTruth,
+  Bf001PackageIdentity,
+  Bf001PackagePipelineResult,
+  Bf001MemberResult,
+} from "./bf-001-types";
+export {
+  BF_001_PROOF_CONTRACT,
+  isDesignRendererBf001Sku,
+  isBf001StudioSafeFont,
+  plateForGraphicKind,
+  recipeForGraphicKind,
+  validateBf001PackageComposition,
+} from "./bf-001-contracts";
+export {
+  BF_001_PROOF_PACKAGE_ID,
+  BF_001_PROOF_ARTIFACT_ROOT,
+  buildBf001RefreshTruth,
+  buildBf001ProfileAndCoverTruth,
+  ensureHarborOakBf001LogoMaterial,
+} from "./bf-001-fixtures";
+export { fingerprintBf001Package } from "./bf-001-fingerprint";
+export { evaluateBf001PackageQa } from "./bf-001-package-qa";
+export { persistBf001PackageArtifacts } from "./bf-001-bind";
+export {
+  runBf001PackageComposerPipeline,
+  runBf001PackageProofPipeline,
+} from "./bf-001-pipeline";
+
+/** bf-001 intake + payment lock — refresh package sealed before checkout (no remap). */
+export {
+  BF_001_INTAKE_PAYMENT_LOCK_PACKAGE_ID,
+  BF_001_CUSTOMER_GRAPHIC_KIND_OPTIONS,
+  BF_001_PACKAGE_LOCK_FIELD_IDS,
+  BF_001_FORBIDDEN_SCOPE_INTAKE_FIELDS,
+  BF_001_AMBIGUOUS_LEGACY_FIELDS,
+  mapBf001PackageLockFromLiveTruth,
+  bf001LivePackageLockFromFlatAnswers,
+  assertBf001PackageReadyForPayment,
+  buildBf001PackageManifestSeed,
+  customerFacingBf001PackageLines,
+} from "./bf-001-intake-truth";
+export type {
+  Bf001LivePackageLockInput,
+  Bf001PackageLiveTruth,
+  Bf001PackageManifestSeed,
+  Bf001PackageStartingPointIdentity,
+  Bf001PackageFailureCode,
+  Bf001PackageMapResult,
+  Bf001PaymentReadinessResult,
+  Bf001CustomerGraphicKindOption,
+} from "./bf-001-intake-truth";
+export {
+  BF_001_PACKAGE_PAYMENT_GATE_PACKAGE_ID,
+  fingerprintBf001PackageLiveTruth,
+  normalizeBf001PackageForPayment,
+  sealBf001PackageForPayment,
+  evaluateBf001PackagePaymentGate,
+  assertBf001PackageUnchangedAfterCheckoutAuthority,
+  assertBf001PlanPackageFresh,
+  bf001PackageSealsMatch,
+} from "./bf-001-kit-payment-gate";
+export type { Bf001PackagePaymentSeal } from "./bf-001-kit-payment-gate";
+
+/** bf-001 POSTPAY-PACKAGE-DISPATCH-STRUCTURE-1 — paid seal → durable refresh structure. */
+export {
+  BF_001_POSTPAY_PACKAGE_DISPATCH_STRUCTURE_PACKAGE_ID,
+  buildBf001PostPayDispatchStructureFromPaymentSeal,
+  buildBf001PostPayDispatchStructureFromCampaign,
+  assertBf001PostPayStructureMatchesPaymentSeal,
+  assertBf001PostPayStructureDispatchReady,
+  assertBf001PostPayStructureNoSilentPackageMutation,
+  ensureBf001PostPayDispatchStructureOnCampaign,
+} from "./bf-001-postpay-kit-dispatch-structure";
+export type {
+  Bf001PostPayProductionRole,
+  Bf001PostPayDispatchMember,
+  Bf001PostPayDispatchStructure,
+  Bf001PostPayStructureFailureCode,
+  Bf001PostPayStructureBuildResult,
+} from "./bf-001-postpay-kit-dispatch-structure";

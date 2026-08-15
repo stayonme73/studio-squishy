@@ -1,0 +1,100 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-BF-001-PROOF-1",
+  "campaignId": "camp-bf001-versioning",
+  "jobId": "camp-bf001-versioning::bf-001",
+  "dispatchId": "dispatch-camp-bf001-versioning",
+  "skuId": "bf-001",
+  "businessName": "Harbor & Oak Studio",
+  "graphicKind": "profile",
+  "packageRenderVersion": 5,
+  "lockedPackageMemberCount": 2,
+  "plannedMembers": [
+    {
+      "memberId": "brand_direction_sheet",
+      "kind": "strategy_document",
+      "order": 1,
+      "memberPurpose": "One-page Brand Direction Sheet",
+      "agreedPlateId": "brand-direction-sheet-portrait-1024x1536"
+    },
+    {
+      "memberId": "profile_or_cover_graphic",
+      "kind": "design_profile",
+      "order": 2,
+      "memberPurpose": "Branded profile graphic",
+      "agreedPlateId": "profile-avatar-square"
+    }
+  ],
+  "members": [
+    {
+      "memberId": "brand_direction_sheet",
+      "kind": "strategy_document",
+      "order": 1,
+      "memberPurpose": "One-page Brand Direction Sheet",
+      "agreedPlateId": "brand-direction-sheet-portrait-1024x1536",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "sheet_png",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-versioning/renders/v5/members/brand_direction_sheet/brand-direction-sheet.png",
+          "contentSha256": "01bb51b28b7a3fb78ce9634e6d0bb56ff0fd79bdaabba3186ad72d06a2af2ae8"
+        },
+        {
+          "role": "sheet_pdf",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-versioning/renders/v5/members/brand_direction_sheet/brand-direction-sheet.pdf",
+          "contentSha256": "8f8a0cb8840a2aa2f9554afa833f3c068d58ad6885e7cc38b0d36a75be67eea1"
+        },
+        {
+          "role": "sheet_html",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-versioning/renders/v5/members/brand_direction_sheet/brand-direction-sheet.html",
+          "contentSha256": "fb6d5d37de76e51ee56cb859eda42a04d8f30a4cea72d2d5c997fc9a568be5d9"
+        },
+        {
+          "role": "sheet_sections",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-versioning/renders/v5/members/brand_direction_sheet/sheet-sections.json",
+          "contentSha256": "ac21c0e843b7b235043a248dcc13b3825e2c27a75cdaf66bc7fe7caa2b18128c"
+        }
+      ],
+      "plateHonestyNote": "One-page Brand Direction Sheet — strategy document, not a campaign flyer."
+    },
+    {
+      "memberId": "profile_or_cover_graphic",
+      "kind": "design_profile",
+      "order": 2,
+      "memberPurpose": "Branded profile graphic",
+      "agreedPlateId": "profile-avatar-square",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "avatar_png",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-versioning/renders/v5/members/profile_or_cover_graphic/avatar.png",
+          "contentSha256": "8109095b132960242f23812d513a6d59835c2ad13155c01d99878cb4c32dd243"
+        },
+        {
+          "role": "avatar_pdf",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-versioning/renders/v5/members/profile_or_cover_graphic/avatar.pdf",
+          "contentSha256": "d24e77ff4765846e188a9a8285737815ee82e249f757b88bef37c7676b8332e6"
+        },
+        {
+          "role": "avatar_html",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-versioning/renders/v5/members/profile_or_cover_graphic/avatar.html",
+          "contentSha256": "3aa20678b016b86afc46d5d3228b4ee0b243f115e34688f677f5ce58f0805714"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-versioning/renders/v5/members/profile_or_cover_graphic/plate-honesty.json",
+          "contentSha256": "b7c7adb1e6a8eb66d8d30913bfd090ff84b00db4290ee0bdec97e28def3a46be"
+        }
+      ],
+      "plateHonestyNote": "Studio render canvas 1024×1024. Platforms crop to a circle — corner pixels are not guaranteed visible. Safe zone = centered content."
+    }
+  ],
+  "packageFingerprint": "3e833cfcdf7bcffd0915438d038ac0540fa8277822a7a5c2cb7675efba6b4f91",
+  "packageQaOk": true,
+  "manifestRelativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-versioning/renders/v5/package-manifest.json",
+  "identityRelativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-versioning/renders/v5/package-identity.json",
+  "orchestratorVersion": "bf-001-orchestrator-v1.0-proof",
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "remapAuthorized": false,
+  "createdAt": "2026-08-14T23:32:30.370Z"
+}

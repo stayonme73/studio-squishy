@@ -1,0 +1,23 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-BF-001-PROOF-1",
+  "graphicKind": "cover",
+  "lockedPackageMemberCount": 2,
+  "packageQaOk": true,
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "remapAuthorized": false,
+  "fontSectionMode": "recommendations_only",
+  "logoUsageMode": "usage_guidance_only",
+  "members": [
+    {
+      "memberId": "brand_direction_sheet",
+      "producerQaOk": true,
+      "artifactCount": 4
+    },
+    {
+      "memberId": "profile_or_cover_graphic",
+      "producerQaOk": true,
+      "artifactCount": 4
+    }
+  ]
+}

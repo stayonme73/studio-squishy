@@ -37,6 +37,7 @@ export async function POST(request: Request) {
       ma001PackComposition: body.ma001PackComposition ?? null,
       rmj002KitLock: body.rmj002KitLock ?? null,
       rmj008KitLock: body.rmj008KitLock ?? null,
+      bf001PackageLock: body.bf001PackageLock ?? null,
     });
 
     if (!result.ok) {
@@ -51,7 +52,9 @@ export async function POST(request: Request) {
               : result.error === "already_paid"
                 ? 409
                 : result.error === "ma001_composition_required" ||
-                    result.error === "rmj002_kit_lock_required"
+                    result.error === "rmj002_kit_lock_required" ||
+                    result.error === "rmj008_kit_lock_required" ||
+                    result.error === "bf001_package_lock_required"
                   ? 422
                   : 400;
       return NextResponse.json(result, { status });

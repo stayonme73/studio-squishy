@@ -1,0 +1,20 @@
+{
+  "plateId": "profile-avatar-square",
+  "graphicVisualVersion": "v1.1-profile-or-cover-logo-placed-clean",
+  "graphicKind": "profile",
+  "studioRenderPx": {
+    "width": 1024,
+    "height": 1024
+  },
+  "logoPlacement": "customer_supplied_image_placed_not_redrawn",
+  "logoMaterialId": "mat-harbor-oak-logo-v1",
+  "logoContentSha256": "e5a7876e20a7c79d7746975f3ad790cdd9c6b82bf9ac86c3897a7ad063e9b510",
+  "graphicRenderFontFamily": "Georgia, \"Times New Roman\", serif",
+  "recommendationFontsNotUsedOnGraphic": [
+    "Playfair Display",
+    "Source Sans 3"
+  ],
+  "customerFacingLabelsInPng": false,
+  "note": "Studio render canvas 1024×1024. Platforms crop to a circle — corner pixels are not guaranteed visible. Safe zone = centered content.",
+  "overflowOk": true
+}

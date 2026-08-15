@@ -183,7 +183,7 @@ describe("STUDIO-OPERATING-DESIGN-RM-J002-DISPATCH-HOOK-1", () => {
       expect(resolved.contract.primaryTool.toolId).toBe("studio_design_renderer");
     }
 
-    for (const skuId of ["bf-001", "rm-j007"] as const) {
+    for (const skuId of ["rm-j007"] as const) {
       const resolved = resolveServiceProductionContract(skuId);
       if (resolved.status !== "resolved") continue;
       expect(resolved.contract.primaryTool.toolId).toBe("canva");

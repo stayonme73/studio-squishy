@@ -31,6 +31,7 @@ import path from "path";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import {
+  DESIGN_RENDERER_BF_001_SKU,
   DESIGN_RENDERER_BUSINESS_CARD_SKU,
   DESIGN_RENDERER_MA_001_SKU,
   DESIGN_RENDERER_MENU_SKU,
@@ -45,6 +46,7 @@ import {
 } from "@/lib/studio-design-renderer";
 import { readMaterialsEnvelope } from "@/lib/materials/store";
 
+import { invokeBf001DispatchHook } from "./bf-001-dispatch-hook";
 import { invokeBusinessCardDispatchHook } from "./business-card-dispatch-hook";
 import { invokeDesignRendererDispatchHook } from "./design-renderer-hook";
 import { invokeMa001DispatchHook } from "./ma-001-dispatch-hook";
@@ -73,6 +75,7 @@ const OBSERVED_RENDERER_SKUS = new Set<string>([
   DESIGN_RENDERER_MA_001_SKU,
   DESIGN_RENDERER_RM_J002_SKU,
   DESIGN_RENDERER_RM_J008_SKU,
+  DESIGN_RENDERER_BF_001_SKU,
 ]);
 
 export type DesignRendererObserverResult = {
@@ -611,6 +614,51 @@ export async function runDesignRendererDispatchObserver(input: {
           ok: true,
           invocationOutcome: hooked.invocationOutcome,
           renderVersion: hooked.identity.kitRenderVersion,
+          pngContentSha256: png?.contentSha256,
+          receiptRelativePath: hooked.receiptRelativePath,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      } else {
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: false,
+          failureCode: hooked.failureCode,
+          message: hooked.message,
+          ownerRoutineProduction: "NONE",
+          canvaRequired: false,
+          makeRequired: false,
+        });
+      }
+      continue;
+    }
+
+    if (record.skuId === DESIGN_RENDERER_BF_001_SKU) {
+      const hooked = await invokeBf001DispatchHook({
+        repoRoot,
+        campaign: input.campaign,
+        dispatchRecord: record,
+        materials,
+        stagedLogoRelativePath,
+      });
+
+      if (hooked.ok) {
+        const graphic = hooked.identity.members.find(
+          (m) => m.memberId === "profile_or_cover_graphic",
+        );
+        const png = graphic?.artifacts.find(
+          (a) => a.role === "avatar_png" || a.role === "cover_png",
+        );
+        results.push({
+          dispatchId: record.dispatchId,
+          skuId: record.skuId,
+          action: "invoked",
+          ok: true,
+          invocationOutcome: hooked.invocationOutcome,
+          renderVersion: hooked.identity.packageRenderVersion,
           pngContentSha256: png?.contentSha256,
           receiptRelativePath: hooked.receiptRelativePath,
           ownerRoutineProduction: "NONE",

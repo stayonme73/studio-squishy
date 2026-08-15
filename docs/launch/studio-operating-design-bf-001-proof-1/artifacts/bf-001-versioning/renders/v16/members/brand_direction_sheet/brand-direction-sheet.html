@@ -1,0 +1,122 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"/><style>
+html,body{margin:0;padding:0;width:1024px;height:1536px;overflow:hidden;background:#F7F4EF;color:#2C3E50;
+  font-family:Georgia,"Times New Roman",serif}
+.canvas{width:1024px;height:1536px;box-sizing:border-box;padding:44px 52px 40px;display:grid;
+  grid-template-rows:auto 1fr auto;gap:0}
+.header{margin-bottom:22px}
+.eyebrow{font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:#5C7A8A;margin:0 0 12px}
+h1{font-size:44px;font-weight:500;margin:0 0 12px;line-height:1.12}
+.sub{font-size:19px;margin:0;color:#5C7A8A;line-height:1.5;max-width:96%}
+.grid{min-height:0;height:100%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr;gap:22px;align-items:stretch}
+.card{background:#fff;border:1px solid #E4DDD2;border-radius:12px;padding:26px 28px 24px;
+  display:flex;flex-direction:column;box-sizing:border-box;min-height:0;height:100%;overflow:hidden}
+.card h2{font-size:22px;margin:0 0 18px;font-weight:600;letter-spacing:.01em}
+.card h2.section-gap{margin-top:28px}
+.swatches{display:grid;grid-template-columns:1fr 1fr;gap:22px 18px;margin-bottom:4px}
+.swatch{display:flex;align-items:center;gap:14px}
+.chip{width:64px;height:64px;border-radius:12px;border:1px solid #d8d0c4;flex:0 0 auto;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.swatch-meta{min-width:0}
+.swatch-label{font-size:18px;font-weight:600;line-height:1.25}
+.swatch-hex{font-size:17px;font-family:Arial,Helvetica,sans-serif;letter-spacing:.03em;margin-top:4px;color:#2C3E50}
+.swatch-role{font-size:15px;color:#6b7280;text-transform:capitalize;margin-top:3px}
+.font-stack{display:flex;flex-direction:column;justify-content:space-evenly;flex:1 1 auto;gap:12px;min-height:0}
+.font-item{padding:8px 0}
+.font-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.font-role{font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:#5C7A8A;font-weight:600}
+.font-name{font-size:24px;font-weight:500;line-height:1.2;margin-bottom:8px}
+.rec-tag{display:inline-block;font-size:12px;letter-spacing:.05em;text-transform:uppercase;
+  color:#5C7A8A;border:1px solid #C4A574;border-radius:999px;padding:3px 10px;font-family:Arial,Helvetica,sans-serif}
+.muted{font-size:16px;color:#6b7280;line-height:1.5}
+.logo-row{display:flex;align-items:center;gap:18px;margin-bottom:10px;flex:0 0 auto}
+.logo-row img{width:96px;height:96px;object-fit:contain;flex:0 0 auto}
+.logo-title{font-size:19px;font-weight:600;margin-bottom:4px}
+.rules{margin:0;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:space-between}
+.rule{margin:0;padding:12px 0;border-bottom:1px solid #EFE8DE;flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
+.rule:last-of-type{border-bottom:0}
+.rule-label{font-size:17px;font-weight:600;margin:0 0 5px}
+.rule-body{margin:0;font-size:17px;line-height:1.45;color:#3a4553}
+.note{margin-top:auto;padding-top:16px;font-size:16px;color:#5C7A8A;line-height:1.5;flex:0 0 auto}
+.footer{margin-top:20px;font-size:14px;color:#8a8278;
+  display:flex;justify-content:space-between;gap:16px;border-top:1px solid #E4DDD2;padding-top:14px}
+</style></head><body><div class="canvas">
+<div class="header">
+<p class="eyebrow">Brand Identity Refresh</p>
+<h1>Brand Direction Sheet</h1>
+<p class="sub">A one-page refresh for <strong>Harbor &amp; Oak Studio</strong> — built from your existing name and visual starting point. This is not naming, not a new logo, and not messaging or tagline work.</p>
+</div>
+<div class="grid">
+  <div class="card">
+    <h2>Color palette (HEX)</h2>
+    <div class="swatches"><div class="swatch">
+  <div class="chip" style="background:#4A6B7A"></div>
+  <div class="swatch-meta">
+    <div class="swatch-label">Harbor blue refreshed</div>
+    <div class="swatch-hex">#4A6B7A</div>
+    <div class="swatch-role">primary</div>
+  </div>
+</div><div class="swatch">
+  <div class="chip" style="background:#B8955F"></div>
+  <div class="swatch-meta">
+    <div class="swatch-label">Warm oak refreshed</div>
+    <div class="swatch-hex">#B8955F</div>
+    <div class="swatch-role">secondary</div>
+  </div>
+</div><div class="swatch">
+  <div class="chip" style="background:#F7F4EF"></div>
+  <div class="swatch-meta">
+    <div class="swatch-label">Cream ground</div>
+    <div class="swatch-hex">#F7F4EF</div>
+    <div class="swatch-role">neutral</div>
+  </div>
+</div><div class="swatch">
+  <div class="chip" style="background:#2C3E50"></div>
+  <div class="swatch-meta">
+    <div class="swatch-label">Deep slate</div>
+    <div class="swatch-hex">#2C3E50</div>
+    <div class="swatch-role">ink</div>
+  </div>
+</div></div>
+    <h2 class="section-gap">Font recommendations</h2>
+    <div class="font-stack"><div class="font-item">
+  <div class="font-head">
+    <span class="font-role">primary</span>
+    <span class="rec-tag">Recommendation only</span>
+  </div>
+  <div class="font-name">Playfair Display</div>
+  <div class="muted">Recommendation for headlines on customer-owned materials — not a Studio render/license guarantee.</div>
+</div><div class="font-item">
+  <div class="font-head">
+    <span class="font-role">secondary</span>
+    <span class="rec-tag">Recommendation only</span>
+  </div>
+  <div class="font-name">Source Sans 3</div>
+  <div class="muted">Recommendation for body text on customer-owned materials — not a Studio render/license guarantee.</div>
+</div></div>
+    <p class="note">Recommended typefaces guide your future materials. They are <strong>not</strong> font licenses and are <strong>not</strong> guaranteed to be the faces rendered on the accompanying Studio graphic.</p>
+  </div>
+  <div class="card">
+    <h2>Existing-logo usage</h2>
+    <div class="logo-row">
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJIYXJib3IgYW5kIE9hayBtYXJrIj4KICA8cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0iI0Y3RjRFRiIvPgogIDxlbGxpcHNlIGN4PSIxMjgiIGN5PSIxMjgiIHJ4PSIxMDgiIHJ5PSIxMDgiIGZpbGw9IiMxRjNBNUYiLz4KICA8ZWxsaXBzZSBjeD0iMTI4IiBjeT0iMTI4IiByeD0iOTIiIHJ5PSI5MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQzRBNTc0IiBzdHJva2Utd2lkdGg9IjgiLz4KICA8IS0tIFF1aWV0IG9hayBsZWFmIC0tPgogIDxwYXRoIGQ9Ik0xMjggNTYgQzE0OCA3OCAxNTYgMTA4IDE0OCAxMzggQzE0MCAxNjIgMTI4IDE3OCAxMjggMTc4IEMxMjggMTc4IDExNiAxNjIgMTA4IDEzOCBDMTAwIDEwOCAxMDggNzggMTI4IDU2IFoiIGZpbGw9IiNDNEE1NzQiLz4KICA8IS0tIEFuY2hvciBzdGVtIC0tPgogIDxyZWN0IHg9IjEyMCIgeT0iOTAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI4OCIgcng9IjQiIGZpbGw9IiNGN0Y0RUYiLz4KICA8Y2lyY2xlIGN4PSIxMjgiIGN5PSI4MiIgcj0iMTQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0Y3RjRFRiIgc3Ryb2tlLXdpZHRoPSIxMCIvPgogIDxwYXRoIGQ9Ik04OCAxNjggQzEwMCAxOTYgMTU2IDE5NiAxNjggMTY4IiBmaWxsPSJub25lIiBzdHJva2U9IiNGN0Y0RUYiIHN0cm9rZS13aWR0aD0iMTIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik05NiAxNTYgTDg4IDE3MiBNMTYwIDE1NiBMMTY4IDE3MiIgc3Ryb2tlPSIjRjdGNEVGIiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==" alt="Harbor &amp; Oak Studio existing mark"/>
+      <div>
+        <div class="logo-title">Supplied mark</div>
+        <div class="muted">Placed as provided — not redrawn or redesigned.</div>
+      </div>
+    </div>
+    <div class="rules">
+      <div class="rule"><div class="rule-label">Clear space</div><div class="rule-body">Keep clear space around the mark equal to at least 1/8 of the mark height.</div></div>
+      <div class="rule"><div class="rule-label">Placement</div><div class="rule-body">Center the mark on profile graphics; keep the mark in the safe center band on cover graphics.</div></div>
+      <div class="rule"><div class="rule-label">Background contrast</div><div class="rule-body">Prefer cream or soft slate grounds; avoid low-contrast oak-on-oak.</div></div>
+      <div class="rule"><div class="rule-label">Preferred lockup</div><div class="rule-body">Prefer the existing oval lockup as supplied — do not invent a new lockup.</div></div>
+      <div class="rule"><div class="rule-label">Avoid distortion</div><div class="rule-body">Do not stretch, squash, skew, or recolor the mark outside the approved palette.</div></div>
+      <div class="rule"><div class="rule-label">Minimum size</div><div class="rule-body">Keep the mark large enough that the oak detail remains readable.</div></div>
+      <div class="rule"><div class="rule-label">Consistency</div><div class="rule-body">Use the same supplied mark and colorway across surfaces.</div></div>
+    </div>
+    <p class="note">Logo guidance is usage-only. The Studio will not create a new logo, modernize letterforms, or invent alternate marks in this package.</p>
+  </div>
+</div>
+<div class="footer">
+  <span>Harbor &amp; Oak Studio · refresh package</span>
+  <span>Accompanying graphic: profile · Studio-safe render fonts only</span>
+</div>
+</div></body></html>

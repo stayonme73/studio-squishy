@@ -1,0 +1,100 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-BF-001-PROOF-1",
+  "campaignId": "camp-bf001-cover",
+  "jobId": "camp-bf001-cover::bf-001",
+  "dispatchId": "dispatch-camp-bf001-cover",
+  "skuId": "bf-001",
+  "businessName": "Harbor & Oak Studio",
+  "graphicKind": "cover",
+  "packageRenderVersion": 4,
+  "lockedPackageMemberCount": 2,
+  "plannedMembers": [
+    {
+      "memberId": "brand_direction_sheet",
+      "kind": "strategy_document",
+      "order": 1,
+      "memberPurpose": "One-page Brand Direction Sheet",
+      "agreedPlateId": "brand-direction-sheet-portrait-1024x1536"
+    },
+    {
+      "memberId": "profile_or_cover_graphic",
+      "kind": "design_cover",
+      "order": 2,
+      "memberPurpose": "Branded cover graphic",
+      "agreedPlateId": "facebook-page-cover-851x315"
+    }
+  ],
+  "members": [
+    {
+      "memberId": "brand_direction_sheet",
+      "kind": "strategy_document",
+      "order": 1,
+      "memberPurpose": "One-page Brand Direction Sheet",
+      "agreedPlateId": "brand-direction-sheet-portrait-1024x1536",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "sheet_png",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-cover/renders/v4/members/brand_direction_sheet/brand-direction-sheet.png",
+          "contentSha256": "dc1abb024f2ac82e297dd345bc4ecfaaa35af09b1938d9ca0376e3853582fb99"
+        },
+        {
+          "role": "sheet_pdf",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-cover/renders/v4/members/brand_direction_sheet/brand-direction-sheet.pdf",
+          "contentSha256": "653cda73aef383dae01e1642576f7579cae25e00f8c9b795ff901c8aa4e44951"
+        },
+        {
+          "role": "sheet_html",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-cover/renders/v4/members/brand_direction_sheet/brand-direction-sheet.html",
+          "contentSha256": "6d4a895abb64b3654b3e9e9293516cb91a0e4bd82bb6b71717e559ad591a584b"
+        },
+        {
+          "role": "sheet_sections",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-cover/renders/v4/members/brand_direction_sheet/sheet-sections.json",
+          "contentSha256": "dc8e8696142a00c4f589d87e3e03637e52640be63aaf9fe4b2edc9763dd64a9a"
+        }
+      ],
+      "plateHonestyNote": "One-page Brand Direction Sheet — strategy document, not a campaign flyer."
+    },
+    {
+      "memberId": "profile_or_cover_graphic",
+      "kind": "design_cover",
+      "order": 2,
+      "memberPurpose": "Branded cover graphic",
+      "agreedPlateId": "facebook-page-cover-851x315",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "cover_png",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-cover/renders/v4/members/profile_or_cover_graphic/page-cover.png",
+          "contentSha256": "306cb24827e0b2a73a48b0928dfac6cf8a256853fc6b9b613f7bc2ae7543c211"
+        },
+        {
+          "role": "cover_pdf",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-cover/renders/v4/members/profile_or_cover_graphic/page-cover.pdf",
+          "contentSha256": "b0bb77f448b39272be19f51fd2c078d102a3851cbc740f30e56ee598069c3e79"
+        },
+        {
+          "role": "cover_html",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-cover/renders/v4/members/profile_or_cover_graphic/page-cover.html",
+          "contentSha256": "b41fee8067accc8f61e0fc1d354bd74aee6cd3aa835374f42e5cd93ae1aeb289"
+        },
+        {
+          "role": "plate_honesty",
+          "relativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-cover/renders/v4/members/profile_or_cover_graphic/plate-honesty.json",
+          "contentSha256": "1ce0f90c7b5f4d7fcfc6c9c330ab4569dfc5ac196dd5f60aae07ed7548af3bfb"
+        }
+      ],
+      "plateHonestyNote": "Studio render canvas 851×315 (Meta fastest-load Page cover reference). Desktop/mobile crop differently; profile picture overlaps lower-left — not every pixel is guaranteed visible on every device."
+    }
+  ],
+  "packageFingerprint": "6e0e59176d8139d7fd1e0dfb017e6949ef2229929a7bb6ed263ca3059a40a3e0",
+  "packageQaOk": true,
+  "manifestRelativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-cover/renders/v4/package-manifest.json",
+  "identityRelativePath": "docs/launch/studio-operating-design-bf-001-proof-1/artifacts/bf-001-cover/renders/v4/package-identity.json",
+  "orchestratorVersion": "bf-001-orchestrator-v1.0-proof",
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "remapAuthorized": false,
+  "createdAt": "2026-08-15T00:05:10.078Z"
+}

@@ -51,6 +51,13 @@ export type CheckoutSessionCreateRequest = {
   rmj008KitLock?: import("@/lib/studio-design-renderer/rm-j008-intake-truth").RmJ008LiveKitLockInput
     | import("@/lib/studio-design-renderer/rm-j008-intake-truth").RmJ008KitLiveTruth
     | null;
+  /**
+   * bf-001 Brand Identity Refresh — graphic kind (profile XOR cover), existing
+   * business name, and customer-supplied visual starting point lock required when selected.
+   */
+  bf001PackageLock?: import("@/lib/studio-design-renderer/bf-001-intake-truth").Bf001LivePackageLockInput
+    | import("@/lib/studio-design-renderer/bf-001-intake-truth").Bf001PackageLiveTruth
+    | null;
 };
 
 export type CheckoutSessionCreateResult =
@@ -93,7 +100,8 @@ export type CheckoutSessionCreateResult =
         | "paid_cycle_invalid"
         | "ma001_composition_required"
         | "rmj002_kit_lock_required"
-        | "rmj008_kit_lock_required";
+        | "rmj008_kit_lock_required"
+        | "bf001_package_lock_required";
       message: string;
     };
 
@@ -126,6 +134,11 @@ export type PaymentConfirmationInput = {
    * Must match checkout binding seal when rm-j008 was purchased.
    */
   rmj008KitSeal?: import("@/lib/studio-design-renderer/rm-j008-kit-payment-gate").RmJ008KitPaymentSeal
+    | null;
+  /**
+   * Must match checkout binding seal when bf-001 was purchased.
+   */
+  bf001PackageSeal?: import("@/lib/studio-design-renderer/bf-001-kit-payment-gate").Bf001PackagePaymentSeal
     | null;
 };
 

@@ -16,6 +16,7 @@ import type {
   LaunchStatus,
   MonthlyCycleWindow,
   ProductionLane,
+  RouteMapIntakeTemplateId,
   ServiceCategoryId,
   ServiceClass,
   ServiceFamilyId,
@@ -163,6 +164,8 @@ type V2ServiceSeed = {
   customerReceives?: string;
   internalProductionNotes?: string;
   includedRevisionRounds?: number;
+  /** Intake form template key — maps to @/catalog/intake schemas. */
+  intakeTemplate?: RouteMapIntakeTemplateId;
 };
 
 /** Shared discovery rules — v2 SKU mapping per approved billing rules (Slice 4). */
@@ -482,6 +485,7 @@ function v2Service(seed: V2ServiceSeed): StudioServiceEntry {
     launchStatus: resolveLaunchStatus(seed.id),
     serviceGuideFaq: [],
     deliveryMapping: seed.deliveryMapping,
+    ...(seed.intakeTemplate ? { intakeTemplate: seed.intakeTemplate } : {}),
     ...withDiscoverySync(seed.discoveryMapping ?? []),
   };
 }
@@ -534,6 +538,7 @@ const V2_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
     requiresClientMaterials: true,
     isRecommendable: true,
     isAddable: true,
+    intakeTemplate: "brand-refresh",
     deliveryMapping: {
       fulfillmentMode: "project",
       items: [

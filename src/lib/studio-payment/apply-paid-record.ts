@@ -7,6 +7,7 @@ import type { PreAcceptancePaymentAuthorization } from "@/lib/studio-pre-accepta
 import { ensureMa001PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/ma-001-postpay-composition-dispatch-structure";
 import { ensureRmJ002PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/rm-j002-postpay-kit-dispatch-structure";
 import { ensureRmJ008PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/rm-j008-postpay-kit-dispatch-structure";
+import { ensureBf001PostPayDispatchStructureOnCampaign } from "@/lib/studio-design-renderer/bf-001-postpay-kit-dispatch-structure";
 
 import type { PaymentConfirmationInput } from "./types";
 
@@ -63,6 +64,9 @@ export function applyPaidTruthToCampaignRecord(
         : {}),
       ...(input.rmj002KitSeal ? { rmj002KitSeal: input.rmj002KitSeal } : {}),
       ...(input.rmj008KitSeal ? { rmj008KitSeal: input.rmj008KitSeal } : {}),
+      ...(input.bf001PackageSeal
+        ? { bf001PackageSeal: input.bf001PackageSeal }
+        : {}),
     },
   };
 
@@ -118,6 +122,14 @@ export function applyPaidTruthToCampaignRecord(
   // Durable rm-j008 Update Kit structure from sealed payment kit (no remap / no composer).
   if (updated.paymentTruth?.rmj008KitSeal) {
     const ensured = ensureRmJ008PostPayDispatchStructureOnCampaign(updated);
+    if (ensured.ok) {
+      updated = ensured.campaign;
+    }
+  }
+
+  // Durable bf-001 refresh package structure from sealed payment package (no remap / no composer).
+  if (updated.paymentTruth?.bf001PackageSeal) {
+    const ensured = ensureBf001PostPayDispatchStructureOnCampaign(updated);
     if (ensured.ok) {
       updated = ensured.campaign;
     }

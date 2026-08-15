@@ -318,6 +318,31 @@ export async function confirmPaymentFromProcessor(
           "Confirmation includes a Social Profile Update Kit lock that was not sealed at checkout.",
       };
     }
+    if (binding.bf001PackageSeal) {
+      if (
+        input.bf001PackageSeal &&
+        binding.bf001PackageSeal.packageFingerprint !==
+          input.bf001PackageSeal.packageFingerprint
+      ) {
+        return {
+          ok: false,
+          error: "sku_mismatch",
+          message:
+            "Brand Identity Refresh package does not match the package sealed at checkout.",
+        };
+      }
+      input = {
+        ...input,
+        bf001PackageSeal: binding.bf001PackageSeal,
+      };
+    } else if (input.bf001PackageSeal) {
+      return {
+        ok: false,
+        error: "sku_mismatch",
+        message:
+          "Confirmation includes a Brand Identity Refresh package that was not sealed at checkout.",
+      };
+    }
   }
 
   const isPaidCycle = binding?.purchaseKind === "paid_cycle";

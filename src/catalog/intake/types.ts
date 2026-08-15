@@ -7,6 +7,7 @@ export type RouteMapIntakeTemplateId =
   | "discovery"
   | "social-setup"
   | "social-update"
+  | "brand-refresh"
   | "promotion"
   | "video"
   | "page"

@@ -4,6 +4,8 @@ import type { RouteMapIntakeType } from "@/config/route-map-v1";
 export const ROUTE_MAP_STOP_ICONS: Record<RouteMapIntakeType, string> = {
   discovery: "◎",
   "social-setup": "◉",
+  "social-update": "↺",
+  "brand-refresh": "❖",
   promotion: "▶",
   video: "▷",
   page: "▣",

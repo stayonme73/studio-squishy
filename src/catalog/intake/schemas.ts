@@ -262,6 +262,67 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
     ],
   },
+  "brand-refresh": {
+    type: "brand-refresh",
+    title: "Brand Identity Refresh Intake",
+    lead:
+      "This service refreshes the brand you already have. It does not invent a new one. Tell us your existing business name, what your brand looks like today, and which one graphic you want — a profile image or a cover graphic. The Studio does not name or rename your business, does not draw a new logo, and does not write brand messaging or taglines. Your existing logo is placed as supplied, never redrawn.",
+    fields: [
+      {
+        id: "businessName",
+        label: "Your existing business name",
+        type: "text",
+        required: true,
+        hint: "This service refreshes your current name. Naming and renaming are not included.",
+        placeholder: "Example: Harbor & Oak Studio",
+      },
+      {
+        id: "graphicKind",
+        label: "Which one graphic should the Studio deliver?",
+        type: "select",
+        required: true,
+        options: ["Profile image", "Cover graphic"],
+        hint: "Your refresh includes the Brand Direction Sheet plus exactly one graphic. Choose the one you need now.",
+      },
+      {
+        id: "visualStartingPointNotes",
+        label: "What does your brand look like today?",
+        type: "textarea",
+        required: true,
+        hint: "Describe the colors, fonts, and materials you already use. The Studio refines this starting point instead of starting over.",
+        placeholder:
+          "Example: oval oak-anchor mark on cream, warm oak and soft harbor blue on our business cards.",
+      },
+      {
+        id: "logoMaterialNote",
+        label: "Your existing logo file or link",
+        type: "textarea",
+        required: true,
+        role: "materials",
+        hint: "Describe the logo filename, link, or colors. Files are not uploaded on this form. A supplied logo is required because the Studio places your existing mark and does not draw a new one.",
+        placeholder:
+          "Example: logo named harbor-oak-mark.svg, warm oak on cream.",
+      },
+      {
+        id: "likesDislikes",
+        label: "Examples of what you like and dislike",
+        type: "textarea",
+        required: true,
+        hint: "These guide the palette and font pairing recommendations on your Brand Direction Sheet.",
+        placeholder:
+          "Example: like calm and timeless. Dislike neon accents and crowded layouts.",
+      },
+      {
+        id: "businessFacts",
+        label: "Accurate business information for the sheet",
+        type: "textarea",
+        required: true,
+        hint: "Only facts you can stand behind. The Studio does not write taglines, slogans, or positioning statements.",
+        placeholder:
+          "Example: downtown portrait sessions, discovery calls by appointment.",
+      },
+    ],
+  },
   "social-setup": {
     type: "social-setup",
     title: "Social Profile Kit Intake",
