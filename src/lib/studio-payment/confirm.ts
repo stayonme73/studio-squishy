@@ -6,6 +6,8 @@ import {
   upsertCampaignRecord,
 } from "@/lib/campaign-store/store";
 import { ensureDispatchExecution } from "@/lib/studio-dispatch";
+import { applyPostPaymentOwnership } from "@/lib/studio-project-claim/post-payment-ownership";
+import { sendProjectClaimRecoveryEmail } from "@/lib/studio-project-claim/send-claim-email";
 
 import { applyPaidTruthToCampaignRecord } from "./apply-paid-record";
 import {
@@ -37,6 +39,41 @@ async function activateAfterPayment(
 ): Promise<CampaignRecord> {
   const dispatched = await ensureDispatchExecution(campaign);
   return dispatched.campaign;
+}
+
+async function finalizeConfirmSuccess(input: {
+  campaign: CampaignRecord;
+  checkoutSessionId: string;
+  binding: Awaited<ReturnType<typeof readCheckoutSessionBinding>>;
+  priorClientUserId: string | null | undefined;
+  alreadyPaid: boolean;
+}): Promise<Extract<PaymentConfirmationResult, { ok: true }>> {
+  const ownership = await applyPostPaymentOwnership({
+    campaign: input.campaign,
+    checkoutSessionId: input.checkoutSessionId,
+    binding: input.binding,
+    priorClientUserId: input.priorClientUserId,
+  });
+
+  if (
+    ownership.claimRawToken &&
+    input.binding?.customerEmail?.trim()
+  ) {
+    // Best-effort recovery mail — payment truth already written.
+    void sendProjectClaimRecoveryEmail({
+      toEmail: input.binding.customerEmail.trim(),
+      campaignId: ownership.campaign.campaignId,
+      rawClaimToken: ownership.claimRawToken,
+    }).catch(() => undefined);
+  }
+
+  const activated = await activateAfterPayment(ownership.campaign);
+  return {
+    ok: true,
+    campaign: activated,
+    alreadyPaid: input.alreadyPaid,
+    claimRawToken: ownership.claimRawToken,
+  };
 }
 
 function alreadyConfirmed(campaign: CampaignRecord): boolean {
@@ -441,12 +478,13 @@ export async function confirmPaymentFromProcessor(
     });
 
     const saved = await upsertCampaignRecord(working, envelope.clientUserId);
-    const activated = await activateAfterPayment(saved.record);
-    return {
-      ok: true,
-      campaign: activated,
+    return finalizeConfirmSuccess({
+      campaign: saved.record,
+      checkoutSessionId: input.checkoutSessionId,
+      binding,
+      priorClientUserId: envelope.clientUserId,
       alreadyPaid: cycleAlready || Boolean(priorEvent && cycleAlready),
-    };
+    });
   }
 
   if (alreadyConfirmed(campaign) || priorEvent) {
@@ -458,10 +496,16 @@ export async function confirmPaymentFromProcessor(
       kind: input.sandbox ? "sandbox" : input.stripeEventId ? "stripe_webhook" : "reconcile",
     });
     // Recovery: paid but asleep / pending_retry wakes on duplicate observe.
+    // Already paid — do not re-mint claim receipts.
     const activated = alreadyConfirmed(campaign)
       ? await activateAfterPayment(campaign)
       : campaign;
-    return { ok: true, campaign: activated, alreadyPaid: true };
+    return {
+      ok: true,
+      campaign: activated,
+      alreadyPaid: true,
+      claimRawToken: null,
+    };
   }
 
   if (
@@ -485,6 +529,11 @@ export async function confirmPaymentFromProcessor(
     kind: input.sandbox ? "sandbox" : input.stripeEventId ? "stripe_webhook" : "reconcile",
   });
 
-  const activated = await activateAfterPayment(saved.record);
-  return { ok: true, campaign: activated, alreadyPaid: false };
+  return finalizeConfirmSuccess({
+    campaign: saved.record,
+    checkoutSessionId: input.checkoutSessionId,
+    binding,
+    priorClientUserId: envelope.clientUserId,
+    alreadyPaid: false,
+  });
 }

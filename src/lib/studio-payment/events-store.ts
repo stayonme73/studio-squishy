@@ -57,6 +57,14 @@ export type CheckoutSessionBinding = {
   createdAt: string;
   sandbox?: boolean;
   /**
+   * Signed-in customer at checkout create — used to bind ownership on confirm
+   * when the campaign is still unowned. Never trust client-supplied user ids
+   * outside the server session that wrote this binding.
+   */
+  payerClientUserId?: string;
+  /** Optional checkout email for claim-recovery mail (guest path). */
+  customerEmail?: string;
+  /**
    * Pay-per-cycle purchase (sm-001-monthly). Absent on sealed studio_plan checkouts.
    * When set, amount must include cyclePriceCents and confirm writes ledger authority only for this id.
    */

@@ -1,12 +1,13 @@
 /**
- * Transactional email adapter — verify + password-reset only.
+ * Transactional email adapter — verify, password-reset, project-claim recovery.
  * Auth packages must call this layer, never the Resend SDK directly.
  */
 
 export type TransactionalEmailKind =
   | "email-verification"
   | "email-verification-resend"
-  | "password-reset";
+  | "password-reset"
+  | "project-claim-recovery";
 
 export type SendTransactionalEmailInput = {
   kind: TransactionalEmailKind;

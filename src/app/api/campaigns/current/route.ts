@@ -73,6 +73,36 @@ export async function PATCH(request: Request) {
         "/api/campaigns/current",
       );
       if (claim instanceof NextResponse) return claim;
+
+      // Paid unowned projects require verified email (Project Claim gate).
+      const existingForPaidGate = await readCampaignEnvelope(record.campaignId);
+      const paid = Boolean(
+        existingForPaidGate?.record.paymentReceivedAt ||
+          existingForPaidGate?.record.paymentTruth?.status === "confirmed" ||
+          record.paymentReceivedAt ||
+          record.paymentTruth?.status === "confirmed",
+      );
+      if (
+        isClientUser(user) &&
+        paid &&
+        !existingForPaidGate?.clientUserId &&
+        !user.emailVerifiedAt
+      ) {
+        logAccessEvent({
+          kind: "campaign_claim_denied",
+          route: "/api/campaigns/current",
+          user,
+          campaignId: record.campaignId,
+          reason: "email_unverified",
+        });
+        return NextResponse.json(
+          {
+            error: "Verify your email before claiming a paid Studio project.",
+            code: "email_unverified",
+          },
+          { status: 403 },
+        );
+      }
     }
 
     const existingEnvelope = await readCampaignEnvelope(record.campaignId);

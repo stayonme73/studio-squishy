@@ -117,7 +117,10 @@ export async function startHostedCheckout(args: {
 
 export async function confirmSandboxCheckoutClient(
   checkoutSessionId: string,
-): Promise<{ ok: true; campaign: CampaignRecord } | { ok: false; message: string }> {
+): Promise<
+  | { ok: true; campaign: CampaignRecord; claimRawToken: string | null }
+  | { ok: false; message: string }
+> {
   const response = await fetch(studioPaymentV1.routes.sandboxConfirm, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -128,6 +131,7 @@ export async function confirmSandboxCheckoutClient(
     ok?: boolean;
     campaign?: CampaignRecord;
     message?: string;
+    claimRawToken?: string | null;
   };
   if (!response.ok || !body.ok || !body.campaign) {
     return {
@@ -135,7 +139,22 @@ export async function confirmSandboxCheckoutClient(
       message: body.message ?? studioPaymentV1.customerCopy.paymentFailed,
     };
   }
-  return { ok: true, campaign: body.campaign };
+  const claimRawToken =
+    typeof body.claimRawToken === "string" && body.claimRawToken
+      ? body.claimRawToken
+      : null;
+  if (claimRawToken && typeof window !== "undefined") {
+    const { writeStoredProjectClaimReceipt } = await import(
+      "@/lib/studio-project-claim/client-receipt"
+    );
+    writeStoredProjectClaimReceipt({
+      campaignId: body.campaign.campaignId,
+      claimToken: claimRawToken,
+      checkoutSessionId,
+      savedAt: new Date().toISOString(),
+    });
+  }
+  return { ok: true, campaign: body.campaign, claimRawToken };
 }
 
 export async function reconcileCheckoutClient(

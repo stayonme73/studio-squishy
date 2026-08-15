@@ -16,6 +16,10 @@ import {
   saveCurrentCampaign,
   updateCampaignStatus,
 } from "@/lib/studio-board-campaign";
+import {
+  clearStoredProjectClaimReceipt,
+  readStoredProjectClaimReceipt,
+} from "@/lib/studio-project-claim/client-receipt";
 
 export type CurrentCampaignAccessState =
   | "ready"
@@ -31,7 +35,9 @@ type CampaignEnvelopeResponse = {
   error?: string;
 };
 
-async function claimLocalCampaign(record: CampaignRecord): Promise<"claimed" | "denied" | "error"> {
+async function claimLocalCampaign(
+  record: CampaignRecord,
+): Promise<"claimed" | "denied" | "error"> {
   const response = await fetch("/api/campaigns/current", {
     method: "PATCH",
     credentials: "include",
@@ -43,12 +49,54 @@ async function claimLocalCampaign(record: CampaignRecord): Promise<"claimed" | "
   return "claimed";
 }
 
+async function claimWithStoredReceipt(): Promise<
+  "claimed" | "denied" | "none" | "error"
+> {
+  const stored = readStoredProjectClaimReceipt();
+  if (!stored) return "none";
+  const response = await fetch("/api/campaigns/claim", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      campaignId: stored.campaignId,
+      claimToken: stored.claimToken,
+    }),
+  });
+  if (response.status === 401 || response.status === 403) return "denied";
+  if (!response.ok) return "error";
+  clearStoredProjectClaimReceipt();
+  return "claimed";
+}
+
+async function loadCampaignById(
+  campaignId: string,
+): Promise<CampaignRecord | null> {
+  const response = await fetch(
+    `/api/campaigns/${encodeURIComponent(campaignId)}`,
+    { credentials: "include" },
+  );
+  if (!response.ok) return null;
+  const body = (await response.json()) as CampaignEnvelopeResponse;
+  return body.campaign?.record ?? null;
+}
+
+async function loadCurrentCampaignRecord(): Promise<CampaignRecord | null> {
+  const response = await fetch("/api/campaigns/current", {
+    credentials: "include",
+  });
+  if (!response.ok) return null;
+  const body = (await response.json()) as CampaignEnvelopeResponse;
+  return body.campaign?.record ?? null;
+}
+
 export function useCurrentCampaign() {
   const searchParams = useSearchParams();
   const searchKey = searchParams.toString();
   const [campaign, setCampaign] = useState<CampaignRecord | null>(null);
   const [ready, setReady] = useState(false);
-  const [accessState, setAccessState] = useState<CurrentCampaignAccessState>("ready");
+  const [accessState, setAccessState] =
+    useState<CurrentCampaignAccessState>("ready");
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
@@ -56,7 +104,9 @@ export function useCurrentCampaign() {
     const localCampaign = readCurrentCampaign();
     const params = new URLSearchParams(searchKey);
     const jobId = params.get("jobId");
-    const jobCampaignId = jobId?.includes(":") ? jobId.slice(0, jobId.indexOf(":")) : null;
+    const jobCampaignId = jobId?.includes(":")
+      ? jobId.slice(0, jobId.indexOf(":"))
+      : null;
     const requestedCampaignId = params.get("campaignId") ?? jobCampaignId;
     const endpoint = requestedCampaignId
       ? `/api/campaigns/${encodeURIComponent(requestedCampaignId)}`
@@ -99,13 +149,11 @@ export function useCurrentCampaign() {
       const body = (await response.json()) as CampaignEnvelopeResponse;
       const nextCampaign = body.campaign?.record ?? null;
       if (nextCampaign) {
-        // Package 2: do not discard an in-progress local Intake draft for a different server current.
         if (
           localCampaign &&
           localCampaign.campaignId !== nextCampaign.campaignId &&
           hasProtectedLocalIntakeDraft(localCampaign)
         ) {
-          // Surface the local draft immediately so Board is not blank while claim runs.
           saveCurrentCampaign(localCampaign);
           setCampaign(localCampaign);
           setAccessState("ready");
@@ -132,6 +180,21 @@ export function useCurrentCampaign() {
       }
 
       if (!requestedCampaignId && !localCampaign) {
+        const storedBefore = readStoredProjectClaimReceipt();
+        const receiptClaim = await claimWithStoredReceipt();
+        if (receiptClaim === "claimed") {
+          const recovered =
+            (storedBefore
+              ? await loadCampaignById(storedBefore.campaignId)
+              : null) ?? (await loadCurrentCampaignRecord());
+          if (recovered) {
+            saveCurrentCampaign(recovered);
+            setCampaign(recovered);
+            setAccessState("ready");
+            setError(null);
+            return;
+          }
+        }
         setCampaign(null);
         setAccessState("no-active-project");
         setError(null);
@@ -145,6 +208,17 @@ export function useCurrentCampaign() {
           setAccessState("ready");
           setError(null);
           return;
+        }
+        const receiptClaim = await claimWithStoredReceipt();
+        if (receiptClaim === "claimed") {
+          const recovered = await loadCampaignById(localCampaign.campaignId);
+          if (recovered) {
+            saveCurrentCampaign(recovered);
+            setCampaign(recovered);
+            setAccessState("ready");
+            setError(null);
+            return;
+          }
         }
         if (claimResult === "denied") {
           clearCampaignState();
@@ -164,7 +238,11 @@ export function useCurrentCampaign() {
     } catch (loadError) {
       setCampaign(requestedCampaignId ? null : localCampaign);
       setAccessState("error");
-      setError(loadError instanceof Error ? loadError.message : "Campaign could not be loaded.");
+      setError(
+        loadError instanceof Error
+          ? loadError.message
+          : "Campaign could not be loaded.",
+      );
     } finally {
       setReady(true);
     }
@@ -176,7 +254,10 @@ export function useCurrentCampaign() {
     window.addEventListener("studio-squishy:campaign-updated", handleRefresh);
     window.addEventListener("storage", handleRefresh);
     return () => {
-      window.removeEventListener("studio-squishy:campaign-updated", handleRefresh);
+      window.removeEventListener(
+        "studio-squishy:campaign-updated",
+        handleRefresh,
+      );
       window.removeEventListener("storage", handleRefresh);
     };
   }, [refresh]);

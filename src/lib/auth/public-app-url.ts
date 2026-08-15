@@ -67,3 +67,16 @@ export function buildPasswordResetUrl(rawToken: string): string | null {
   url.searchParams.set("token", rawToken);
   return url.toString();
 }
+
+/** Project Claim recovery — guest pay → later authenticated claim. */
+export function buildProjectClaimUrl(
+  rawToken: string,
+  campaignId: string,
+): string | null {
+  const origin = resolvePublicAppOrigin();
+  if (!origin) return null;
+  const url = new URL("/claim-project", `${origin}/`);
+  url.searchParams.set("token", rawToken);
+  url.searchParams.set("campaignId", campaignId);
+  return url.toString();
+}

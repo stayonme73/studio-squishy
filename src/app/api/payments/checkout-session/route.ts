@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { isClientUser } from "@/lib/campaign-store/access";
+import { readSessionFromRequest } from "@/lib/auth/session";
 import { createCheckoutSession } from "@/lib/studio-payment/create-session";
 import type { CheckoutSessionCreateRequest } from "@/lib/studio-payment/types";
 
@@ -25,21 +27,28 @@ export async function POST(request: Request) {
     );
   }
 
+  const sessionUser = await readSessionFromRequest(request);
+  const payerClientUserId =
+    sessionUser && isClientUser(sessionUser) ? sessionUser.id : undefined;
+
   try {
-    const result = await createCheckoutSession({
-      campaignId: body.campaignId,
-      facts: body.facts,
-      returnOrigin: body.returnOrigin,
-      customerEmail: body.customerEmail,
-      authorization: body.authorization,
-      preferSandbox: body.preferSandbox === true,
-      purchaseKind: body.purchaseKind,
-      ma001PackComposition: body.ma001PackComposition ?? null,
-      rmj002KitLock: body.rmj002KitLock ?? null,
-      rmj008KitLock: body.rmj008KitLock ?? null,
-      bf001PackageLock: body.bf001PackageLock ?? null,
-      rmj007UpdateLock: body.rmj007UpdateLock ?? null,
-    });
+    const result = await createCheckoutSession(
+      {
+        campaignId: body.campaignId,
+        facts: body.facts,
+        returnOrigin: body.returnOrigin,
+        customerEmail: body.customerEmail,
+        authorization: body.authorization,
+        preferSandbox: body.preferSandbox === true,
+        purchaseKind: body.purchaseKind,
+        ma001PackComposition: body.ma001PackComposition ?? null,
+        rmj002KitLock: body.rmj002KitLock ?? null,
+        rmj008KitLock: body.rmj008KitLock ?? null,
+        bf001PackageLock: body.bf001PackageLock ?? null,
+        rmj007UpdateLock: body.rmj007UpdateLock ?? null,
+      },
+      { payerClientUserId },
+    );
 
     if (!result.ok) {
       const status =

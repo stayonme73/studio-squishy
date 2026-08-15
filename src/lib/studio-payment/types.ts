@@ -160,6 +160,11 @@ export type PaymentConfirmationResult =
       ok: true;
       campaign: CampaignRecord;
       alreadyPaid: boolean;
+      /**
+       * One-time project claim raw token (guest / unowned pays only).
+       * Never log. Client may stash for convenience; server hash store is authority.
+       */
+      claimRawToken?: string | null;
     }
   | {
       ok: false;

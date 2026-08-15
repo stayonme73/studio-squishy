@@ -32,5 +32,6 @@ export async function POST(request: Request) {
     ok: true,
     alreadyPaid: result.alreadyPaid,
     campaign: result.campaign,
+    claimRawToken: result.claimRawToken ?? null,
   });
 }

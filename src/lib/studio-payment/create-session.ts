@@ -240,10 +240,16 @@ export async function createCheckoutSession(
   options?: {
     stripe?: Pick<Stripe, "checkout">;
     env?: NodeJS.ProcessEnv;
+    /**
+     * Server-session client user id only — never accept from request body.
+     * Binds ownership on payment confirm when the campaign is still unowned.
+     */
+    payerClientUserId?: string;
   },
 ): Promise<CheckoutSessionCreateResult> {
   const env = options?.env ?? process.env;
   assertStripeSafeForTests(env);
+  const payerClientUserId = options?.payerClientUserId?.trim() || undefined;
 
   const facts = request.facts;
   if (!request.campaignId || !facts?.selectedServiceIds?.length) {
@@ -433,6 +439,10 @@ export async function createCheckoutSession(
       draftRevision: authorization.evaluatedDraftRevision,
       createdAt: new Date().toISOString(),
       sandbox,
+      ...(payerClientUserId ? { payerClientUserId } : {}),
+      ...(request.customerEmail?.trim()
+        ? { customerEmail: request.customerEmail.trim() }
+        : {}),
       ...(ma001CompositionSeal
         ? { ma001CompositionSeal }
         : {}),

@@ -14,7 +14,7 @@
 | 2 | Email Verification | **Cold-certified PASS (live-delivery 2026-07-19)** | 2026-07-19 |
 | 3 | Sign-in / Session Hardening | **Cold-certified PASS** | 2026-07-19 |
 | 4 | Password Recovery | **Cold-certified PASS** | 2026-07-20 |
-| 5 | Project Claim / Ownership | Not started | — |
+| 5 | Project Claim / Ownership | **Implementation complete · cold cert pending** | 2026-08-14 |
 | 6 | Route / Data Protection | Not started | — |
 | 7 | Truthful Intake → Auth → Board Handoff | **Implementation complete · cold cert pending** | 2026-07-20 |
 | 8 | Production Auth Certification | Not started | — |
@@ -278,6 +278,59 @@ Password Recovery, Project Claim, and Parking Lot remain blocked until Tagia aut
 | Package 4 verdict | **PASS** |
 
 **Next when Tagia authorizes:** Project Claim. Parking Lot remains locked.
+
+---
+
+## Package 5 — Project Claim / Ownership (implementation complete · cold cert pending)
+
+**Package id:** `STUDIO-OPERATING-PROJECT-CLAIM-AND-CONTINUITY-1`  
+**Authority:** Owner broad-package runway (2026-08-14). No merge.
+
+### Authoritative ownership relationship
+
+`StudioUser.id` (verified client) ↔ `ServerCampaignEnvelope.clientUserId` + `clientCampaignIds[]`.
+
+Payment / SKU / intake / production / review / delivery truth is not mutated by claim.
+
+### Delivered
+
+| Behavior | Evidence |
+|----------|----------|
+| Signed-in pay binds at confirm | Checkout binding `payerClientUserId` from server session only → `applyPostPaymentOwnership` |
+| Guest pay mints hashed claim receipt | `issueProjectClaimReceipt` → `data/project-claim-receipts.json` |
+| Claim API requires session + verified email + (receipt OR local possession) | `POST /api/campaigns/claim` + `claimCampaignForVerifiedClient` |
+| Fail-closed wrong owner / tampered / missing proof | Unit tests in `claim.test.ts` |
+| Soft PATCH paid claim requires verified email | `PATCH /api/campaigns/current` |
+| Claim recovery email + `/claim-project` | `sendProjectClaimRecoveryEmail` + `ClaimProjectScene` |
+| Board resume uses server ownership; localStorage receipt convenience only | `useCurrentCampaign` + `client-receipt.ts` |
+| Idempotent re-claim | same-user alreadyOwned path |
+
+### Unit / neighboring regression
+
+| Suite | Result |
+|-------|--------|
+| `src/lib/studio-project-claim` | **PASS** (5) |
+| Payment / post-pay / dispatch / campaign-store / email-verification sample | **PASS** — 190 tests / 28 files (2026-08-14) |
+
+### Explicit non-goals / remaining limits
+
+- Owner cold cert (desktop + phone cross-device) still pending
+- Multi-project customer UX picker not redesigned (account can hold multiple `clientCampaignIds`)
+- Live Stripe claim-email delivery depends on transactional email config (same as verify/reset)
+- Package 6 Route / Data Protection still separate
+- No merge authorized
+
+### Cold certification checklist (desktop + real phone / second browser)
+
+1. Signed-in customer pays → Board opens owned project after refresh/logout/login  
+2. Guest pays → closes browser → signs in on new device with claim link → exact project  
+3. Wrong account cannot claim; tampered token fails  
+4. Retry claim does not duplicate campaign/ownership  
+5. Payment truth unchanged after claim  
+
+**Verdict pending owner cold cert.** Target: **PROJECT CLAIM & CROSS-DEVICE CONTINUITY READY**.
+
+**Next recommended broad package:** Paid Activation Recovery / post-pay status spine (per whole-system readiness). Parking Lot remains locked.
 
 ---
 
