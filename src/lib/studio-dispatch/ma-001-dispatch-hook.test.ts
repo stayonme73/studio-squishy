@@ -168,7 +168,7 @@ describe("STUDIO-OPERATING-DESIGN-MA-001-DISPATCH-HOOK-1", () => {
     delete process.env.STRIPE_SECRET_KEY;
   });
 
-  it("remaps only ma-001 onto studio_design_renderer; eight sealed lanes stay green", () => {
+  it("remaps ma-001 onto studio_design_renderer; sealed lanes stay green; rm-j007 remapped", () => {
     const pack = resolveServiceProductionContract(SKU);
     expect(pack.status).toBe("resolved");
     if (pack.status !== "resolved") return;
@@ -184,19 +184,13 @@ describe("STUDIO-OPERATING-DESIGN-MA-001-DISPATCH-HOOK-1", () => {
       "v2-rtu-social-posts",
       "sm-001",
       "sm-001-monthly",
+      "rm-j007",
     ] as const;
     for (const skuId of sealed) {
       const resolved = resolveServiceProductionContract(skuId);
       expect(resolved.status).toBe("resolved");
       if (resolved.status !== "resolved") continue;
       expect(resolved.contract.primaryTool.toolId).toBe("studio_design_renderer");
-    }
-
-    // Remaining Canva-dependent SKUs stay Canva (sample)
-    for (const skuId of ["rm-j007"] as const) {
-      const resolved = resolveServiceProductionContract(skuId);
-      if (resolved.status !== "resolved") continue;
-      expect(resolved.contract.primaryTool.toolId).toBe("canva");
     }
   });
 

@@ -42,6 +42,8 @@ import { evaluateRmJ008KitPaymentGate } from "@/lib/studio-design-renderer/rm-j0
 import type { RmJ008KitPaymentSeal } from "@/lib/studio-design-renderer/rm-j008-kit-payment-gate";
 import { evaluateBf001PackagePaymentGate } from "@/lib/studio-design-renderer/bf-001-kit-payment-gate";
 import type { Bf001PackagePaymentSeal } from "@/lib/studio-design-renderer/bf-001-kit-payment-gate";
+import { evaluateRmJ007UpdatePaymentGate } from "@/lib/studio-design-renderer/rm-j007-kit-payment-gate";
+import type { RmJ007UpdatePaymentSeal } from "@/lib/studio-design-renderer/rm-j007-kit-payment-gate";
 
 function ensureApprovedPlan(
   campaign: CampaignRecord,
@@ -329,6 +331,20 @@ export async function createCheckoutSession(
   const bf001PackageSeal: Bf001PackagePaymentSeal | undefined =
     bf001Gate.applicable ? bf001Gate.seal : undefined;
 
+  const rmj007Gate = evaluateRmJ007UpdatePaymentGate({
+    selectedServiceIds: facts.selectedServiceIds.map(String),
+    updateLock: request.rmj007UpdateLock ?? null,
+  });
+  if (!rmj007Gate.ok) {
+    return {
+      ok: false,
+      error: "rmj007_update_lock_required",
+      message: rmj007Gate.message,
+    };
+  }
+  const rmj007UpdateSeal: RmJ007UpdatePaymentSeal | undefined =
+    rmj007Gate.applicable ? rmj007Gate.seal : undefined;
+
   const resolved = resolveCheckoutAmount(purchaseKind, facts.selectedServiceIds);
   if (!resolved.ok) {
     return {
@@ -423,6 +439,7 @@ export async function createCheckoutSession(
       ...(rmj002KitSeal ? { rmj002KitSeal } : {}),
       ...(rmj008KitSeal ? { rmj008KitSeal } : {}),
       ...(bf001PackageSeal ? { bf001PackageSeal } : {}),
+      ...(rmj007UpdateSeal ? { rmj007UpdateSeal } : {}),
       ...(purchaseKind === "paid_cycle"
         ? {
             purchaseKind: "paid_cycle" as const,

@@ -86,6 +86,9 @@ export async function confirmSandboxCheckoutSession(
     ...(binding.bf001PackageSeal
       ? { bf001PackageSeal: binding.bf001PackageSeal }
       : {}),
+    ...(binding.rmj007UpdateSeal
+      ? { rmj007UpdateSeal: binding.rmj007UpdateSeal }
+      : {}),
   });
 }
 

@@ -59,6 +59,13 @@ export const WORKING_DRAFT_PERSISTED_FIELDS = [
    * @see STUDIO-OPERATING-DESIGN-BF-001-INTAKE-PAYMENT-LOCK-1
    */
   "bf001PackageLock",
+  /**
+   * rm-j007 Reference-Guided Promotion Update — named item + reference note +
+   * bounded changes + recreation-limits acceptance locked before payment.
+   * skuId `rm-j007` alone is insufficient for checkout.
+   * @see STUDIO-OPERATING-DESIGN-RM-J007-INTAKE-PAYMENT-LOCK-1
+   */
+  "rmj007UpdateLock",
 ] as const;
 
 export type WorkingDraftPersistedField =

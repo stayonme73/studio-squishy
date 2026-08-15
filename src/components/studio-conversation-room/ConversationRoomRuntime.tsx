@@ -63,6 +63,7 @@ import {
   readRmJ002KitLock,
   readRmJ008KitLock,
   readBf001PackageLock,
+  readRmJ007UpdateLock,
   readOpeningAnswers,
   readSelectedRoute,
   readSelectedServices,
@@ -73,6 +74,7 @@ import { evaluateMa001CompositionPaymentGate } from "@/lib/studio-design-rendere
 import { evaluateRmJ002KitPaymentGate } from "@/lib/studio-design-renderer/rm-j002-kit-payment-gate";
 import { evaluateRmJ008KitPaymentGate } from "@/lib/studio-design-renderer/rm-j008-kit-payment-gate";
 import { evaluateBf001PackagePaymentGate } from "@/lib/studio-design-renderer/bf-001-kit-payment-gate";
+import { evaluateRmJ007UpdatePaymentGate } from "@/lib/studio-design-renderer/rm-j007-kit-payment-gate";
 import type { ServiceId } from "@/catalog/types";
 import type { RouteMapIntakeAnswers } from "@/catalog/intake";
 import { buildProjectBuilderStudioPlanSummary } from "@/lib/project-builder-studio-plan-summary";
@@ -871,6 +873,17 @@ export default function ConversationRoomRuntime({
       );
       return;
     }
+    const rmj007Gate = evaluateRmJ007UpdatePaymentGate({
+      selectedServiceIds: serviceIds.map(String),
+      updateLock: readRmJ007UpdateLock(project),
+    });
+    if (!rmj007Gate.ok) {
+      setPlanBridgeError(rmj007Gate.message);
+      speakStudioLine(
+        "Your promotion update still needs the named existing item, a reference note, the exact changes, where it lives, and acceptance that Studio recreates an updated final.",
+      );
+      return;
+    }
 
     const decision = runPreAcceptanceForCheckout(
       projectFactsFromWorkingDraft(project),
@@ -964,6 +977,21 @@ export default function ConversationRoomRuntime({
       closeActivityPanel();
       speakStudioLine(
         "Your Brand Identity Refresh still needs one graphic choice and your current logo and colors locked before payment.",
+      );
+      return false;
+    }
+    const rmj007Gate = evaluateRmJ007UpdatePaymentGate({
+      selectedServiceIds: readSelectedServices(project).map((s) =>
+        String(s.jobId),
+      ),
+      updateLock: readRmJ007UpdateLock(project),
+    });
+    if (!rmj007Gate.ok) {
+      setPlanBridgeError(rmj007Gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        "Your promotion update still needs the named existing item, a reference note, the exact changes, where it lives, and acceptance that Studio recreates an updated final.",
       );
       return false;
     }
@@ -1066,6 +1094,20 @@ export default function ConversationRoomRuntime({
       );
       throw new Error(bf001Gate.message);
     }
+    const rmj007UpdateLock = readRmJ007UpdateLock(project);
+    const rmj007Gate = evaluateRmJ007UpdatePaymentGate({
+      selectedServiceIds: facts.selectedServiceIds.map(String),
+      updateLock: rmj007UpdateLock,
+    });
+    if (!rmj007Gate.ok) {
+      setPlanBridgeError(rmj007Gate.message);
+      setStageAndPersist("plan");
+      closeActivityPanel();
+      speakStudioLine(
+        "Your promotion update still needs the named existing item, a reference note, the exact changes, where it lives, and acceptance that Studio recreates an updated final.",
+      );
+      throw new Error(rmj007Gate.message);
+    }
     const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
@@ -1092,6 +1134,7 @@ export default function ConversationRoomRuntime({
       rmj002KitLock,
       rmj008KitLock,
       bf001PackageLock,
+      rmj007UpdateLock,
     });
     if (!started.ok) {
       setPlanBridgeError(started.message);
@@ -1151,6 +1194,15 @@ export default function ConversationRoomRuntime({
       setPlanBridgeError(bf001Gate.message);
       throw new Error(bf001Gate.message);
     }
+    const rmj007UpdateLock = readRmJ007UpdateLock(project);
+    const rmj007Gate = evaluateRmJ007UpdatePaymentGate({
+      selectedServiceIds: facts.selectedServiceIds.map(String),
+      updateLock: rmj007UpdateLock,
+    });
+    if (!rmj007Gate.ok) {
+      setPlanBridgeError(rmj007Gate.message);
+      throw new Error(rmj007Gate.message);
+    }
     const gate = assertPreAcceptanceAllowsPayment(facts);
     if (!gate.allowed) {
       setPlanBridgeError(gate.message);
@@ -1172,6 +1224,7 @@ export default function ConversationRoomRuntime({
       rmj002KitLock,
       rmj008KitLock,
       bf001PackageLock,
+      rmj007UpdateLock,
     });
     if (!started.ok) {
       setPlanBridgeError(started.message);

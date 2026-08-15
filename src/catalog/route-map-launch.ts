@@ -379,17 +379,23 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
     serviceClass: "core",
     priceCents: 6900,
     productionLane: "quick_turn",
+    /**
+     * Owner APPROVE B (2026-08-14) — Reference-Guided Promotion Update.
+     * Not literal in-place / source-file / Canva-file editing.
+     */
     purpose:
-      "Limited update to one existing promotional item using customer-supplied replacement information or assets — not a redesign or new deliverable.",
+      "Reference-guided update of one existing promotional item: you supply the existing promotion as visual/content reference plus exact changes; The Studio recreates one updated final promotional item with bounded edits only — not a redesign and not a pixel-perfect edit of your original file.",
     deliverables: [
-      "Update one named existing promotional item with supplied replacement details",
-      "Replace dates, prices, contact information, supplied wording, or one customer-supplied image",
-      "Export the corrected final file",
-      "Verify the updated item is current",
+      "One recreated updated promotional item guided by your supplied existing promotion reference",
+      "Bounded updates only: dates, prices, contact information, supplied wording, and optionally one customer-supplied image",
+      "Export of the updated final promotional file (PNG and/or PDF)",
+      "Clear change record of what was requested versus what was applied",
     ],
     exclusions: [
+      "Pixel-perfect or exact-layout matching of the original file",
+      "Source-file editing, Canva-file editing, or editable-layer restoration (PSD, AI, INDD, Canva project, and similar)",
       "New concept or campaign direction",
-      "Redesign or structural or layout reconstruction",
+      "Redesign or structural rebuild beyond what recreation requires to apply your bounded changes",
       "Additional deliverables or changing the type of promotional item",
       "Extensive copywriting or rebuilding a page or campaign",
       "Platform management, posting, or ongoing account work",
@@ -398,8 +404,9 @@ export const ROUTE_MAP_LAUNCH_SERVICES: readonly StudioServiceEntry[] = [
     ],
     revisionRule: ROUTE_MAP_REVISION_TEMPLATE,
     clientResponsibilities: [
-      "Link or file for the existing promotional item",
-      "Exact replacement dates, prices, contact information, wording, or one image you supply",
+      "A clear file or durable reference for the existing promotional item (PNG, JPG, or flattened PDF preferred)",
+      "Exact replacement dates, prices, contact information, wording, and optionally one image you supply",
+      "Acknowledgment that The Studio recreates an updated final — it does not edit your original source file in place",
       "Platform access only if republishing is required for the named item",
       "Approval before any republish",
     ],

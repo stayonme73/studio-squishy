@@ -161,6 +161,9 @@ export async function reconcileCheckoutSession(
     ...(binding.bf001PackageSeal
       ? { bf001PackageSeal: binding.bf001PackageSeal }
       : {}),
+    ...(binding.rmj007UpdateSeal
+      ? { rmj007UpdateSeal: binding.rmj007UpdateSeal }
+      : {}),
   });
 
   if (!result.ok) {

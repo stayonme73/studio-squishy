@@ -64,3 +64,8 @@ export {
   writeBf001PackageLock,
   readBf001PackageSealFromCampaign,
 } from "./bf-001-package";
+export {
+  readRmJ007UpdateLock,
+  writeRmJ007UpdateLock,
+  readRmJ007UpdateSealFromCampaign,
+} from "./rm-j007-package";

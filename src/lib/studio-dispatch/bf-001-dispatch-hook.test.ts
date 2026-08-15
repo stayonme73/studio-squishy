@@ -170,7 +170,7 @@ describe("STUDIO-OPERATING-DESIGN-BF-001-DISPATCH-HOOK-1", () => {
     delete process.env.STRIPE_SECRET_KEY;
   });
 
-  it("remaps bf-001 onto studio_design_renderer; rm-j007 stays Canva", () => {
+  it("remaps bf-001 onto studio_design_renderer; rm-j007 also remaps (APPROVE B)", () => {
     const refresh = resolveServiceProductionContract(SKU);
     expect(refresh.status).toBe("resolved");
     if (refresh.status !== "resolved") return;
@@ -179,11 +179,10 @@ describe("STUDIO-OPERATING-DESIGN-BF-001-DISPATCH-HOOK-1", () => {
       /Canva is not on the fulfillment spine/i,
     );
 
-    for (const skuId of ["rm-j007"] as const) {
-      const resolved = resolveServiceProductionContract(skuId);
-      if (resolved.status !== "resolved") continue;
-      expect(resolved.contract.primaryTool.toolId).toBe("canva");
-    }
+    const update = resolveServiceProductionContract("rm-j007");
+    expect(update.status).toBe("resolved");
+    if (update.status !== "resolved") return;
+    expect(update.contract.primaryTool.toolId).toBe("studio_design_renderer");
   });
 
   it("maps paid profile structure → exactly 2 members; cover uses the cover plate", () => {

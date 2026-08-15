@@ -81,6 +81,11 @@ export type CheckoutSessionBinding = {
    * (when bf-001 selected).
    */
   bf001PackageSeal?: import("@/lib/studio-design-renderer/bf-001-kit-payment-gate").Bf001PackagePaymentSeal;
+  /**
+   * Sealed rm-j007 Reference-Guided Promotion Update lock at checkout authority
+   * (when rm-j007 selected).
+   */
+  rmj007UpdateSeal?: import("@/lib/studio-design-renderer/rm-j007-kit-payment-gate").RmJ007UpdatePaymentSeal;
 };
 
 const SESSIONS_DIR = path.join(process.cwd(), "data", "payment-sessions");

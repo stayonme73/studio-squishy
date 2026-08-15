@@ -22,7 +22,7 @@ const DRAWER_PURPOSE_BY_JOB_ID: Partial<Record<string, string>> = {
   "rm-j005":
     "One functioning responsive page for one sale, event, opening, service, or offer, built with an approved Studio structure and one clear call to action. This is not a full website, online store, or custom application.",
   "rm-j007":
-    "Limited update to one existing promotional item using customer-supplied replacement information or assets — not a redesign, new concept, or additional deliverable.",
+    "Reference-guided update of one existing promotional item: supply the reference plus exact changes; The Studio recreates one updated final with bounded edits — not a redesign and not a pixel-perfect source-file edit.",
   "rm-j008":
     "An update kit for one existing Facebook, Instagram, or TikTok profile — revised copy, updated profile imagery, before→after change sheet, and field-replacement instructions you apply. Not done-for-you login-based profile management.",
 };
@@ -63,7 +63,7 @@ export function resolveProjectBuilderDrawerTagline(job: RouteMapJob): string {
       }
       return "One platform that needs a complete profile setup kit — copy, assets, and instructions you apply yourself.";
     case "update":
-      return "One existing promotional item that needs supplied details or one image refreshed.";
+      return "One existing promotional item that needs a reference-guided update — exact dates, prices, contact, wording, or one image refreshed.";
     default:
       return "When this service matches the goal you're trying to accomplish.";
   }

@@ -46,6 +46,11 @@ export async function startHostedCheckout(args: {
    * Required when facts include bf-001; server re-validates and seals.
    */
   bf001PackageLock?: unknown;
+  /**
+   * rm-j007 Reference-Guided Promotion Update — locked update from working draft.
+   * Required when facts include rm-j007; server re-validates and seals.
+   */
+  rmj007UpdateLock?: unknown;
 }): Promise<StartCheckoutClientResult> {
   const returnOrigin =
     typeof window !== "undefined" ? window.location.origin : "";
@@ -70,6 +75,9 @@ export async function startHostedCheckout(args: {
         : {}),
       ...(args.bf001PackageLock != null
         ? { bf001PackageLock: args.bf001PackageLock }
+        : {}),
+      ...(args.rmj007UpdateLock != null
+        ? { rmj007UpdateLock: args.rmj007UpdateLock }
         : {}),
     }),
   });

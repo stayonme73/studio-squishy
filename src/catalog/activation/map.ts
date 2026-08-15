@@ -227,7 +227,7 @@ export const CATALOG_V2_ACTIVATION_MAP_DRAFT: readonly CatalogV2ActivationMapEnt
     laneEligibility: ["i20", "update", "random-exit"],
     directExitEligible: true,
     notes:
-      "Keep live rm-j007 on map — update/republish of one existing live item; no V2 RTU equivalent. Hold V2 replacement until Batch 3.",
+      "Keep live rm-j007 on map — Reference-Guided Promotion Update (Owner APPROVE B): one existing reference → one recreated updated final; no V2 RTU equivalent.",
   },
   {
     routeMapSku: "rm-j008",

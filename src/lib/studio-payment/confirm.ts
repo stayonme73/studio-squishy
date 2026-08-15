@@ -343,6 +343,31 @@ export async function confirmPaymentFromProcessor(
           "Confirmation includes a Brand Identity Refresh package that was not sealed at checkout.",
       };
     }
+    if (binding.rmj007UpdateSeal) {
+      if (
+        input.rmj007UpdateSeal &&
+        binding.rmj007UpdateSeal.packageFingerprint !==
+          input.rmj007UpdateSeal.packageFingerprint
+      ) {
+        return {
+          ok: false,
+          error: "sku_mismatch",
+          message:
+            "Reference-Guided Promotion Update lock does not match the update sealed at checkout.",
+        };
+      }
+      input = {
+        ...input,
+        rmj007UpdateSeal: binding.rmj007UpdateSeal,
+      };
+    } else if (input.rmj007UpdateSeal) {
+      return {
+        ok: false,
+        error: "sku_mismatch",
+        message:
+          "Confirmation includes a Reference-Guided Promotion Update lock that was not sealed at checkout.",
+      };
+    }
   }
 
   const isPaidCycle = binding?.purchaseKind === "paid_cycle";

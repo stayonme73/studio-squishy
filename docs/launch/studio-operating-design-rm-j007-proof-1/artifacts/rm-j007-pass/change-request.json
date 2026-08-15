@@ -1,0 +1,25 @@
+{
+  "skuId": "rm-j007",
+  "businessName": "Harbor & Oak Studio",
+  "itemIdentity": "Spring Portrait Session flyer (existing)",
+  "whereLive": "Facebook event cover + lobby print stand",
+  "whatChange": "Update the session date from March to April, raise the price, and refresh the phone number.",
+  "newInfo": "New date: Saturday, April 12. New price: $59. Phone: (555) 010-2299.",
+  "boundedChanges": {
+    "dates": "April 12",
+    "prices": "$59",
+    "contact": "(555) 010-2299",
+    "wording": "Spring Portrait Session — courtyard seats limited"
+  },
+  "referenceMaterial": {
+    "materialId": "mat-harbor-oak-promo-reference-before-v1",
+    "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007/materials/reference-before.png",
+    "contentSha256": "19f77559f2069d854676c48c09f6b92bcfc2d8593fb50b0b052b0d20d2cafcd5",
+    "mime": "png"
+  },
+  "replacementImage": null,
+  "acceptRecreationLimits": true,
+  "redesignRequested": false,
+  "fulfillmentMode": "recreation",
+  "honesty": "Reference-guided recreation — not a pixel-perfect edit of your original file."
+}

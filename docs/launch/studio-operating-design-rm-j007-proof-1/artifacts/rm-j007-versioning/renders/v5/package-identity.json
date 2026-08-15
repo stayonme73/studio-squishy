@@ -1,0 +1,81 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-RM-J007-PROOF-1",
+  "campaignId": "camp-rmj007-version",
+  "jobId": "camp-rmj007-version::rm-j007",
+  "dispatchId": "dispatch-camp-rmj007-version",
+  "skuId": "rm-j007",
+  "businessName": "Harbor & Oak Studio",
+  "itemIdentity": "Spring Portrait Session flyer (existing)",
+  "packageRenderVersion": 5,
+  "lockedPackageMemberCount": 1,
+  "plannedMembers": [
+    {
+      "memberId": "updated_promotion",
+      "kind": "design_promotion_update",
+      "order": 1,
+      "memberPurpose": "Reference-guided recreated updated promotion",
+      "agreedPlateId": "cert-portrait-1024x1536"
+    }
+  ],
+  "members": [
+    {
+      "memberId": "updated_promotion",
+      "kind": "design_promotion_update",
+      "order": 1,
+      "memberPurpose": "Reference-guided recreated updated promotion",
+      "agreedPlateId": "cert-portrait-1024x1536",
+      "producerQaOk": true,
+      "artifacts": [
+        {
+          "role": "update_html",
+          "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/renders/v5/members/updated_promotion/updated-promotion.html",
+          "contentSha256": "bca1822602ad0b315c8ecadd18744a93f15ff08ff82f924289a1841f5f7eb6e2"
+        },
+        {
+          "role": "update_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/renders/v5/members/updated_promotion/updated-promotion.png",
+          "contentSha256": "fb93ae2ab8d69fed61ab7fd247ee3504de23e2062936c5ce545aee152694aa8e"
+        },
+        {
+          "role": "update_pdf",
+          "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/renders/v5/members/updated_promotion/updated-promotion.pdf",
+          "contentSha256": "78081e9dd335d7b75f65f872df78dcbaa3727c683cf44e7f3fe335424a83e283"
+        },
+        {
+          "role": "after_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/renders/v5/after.png",
+          "contentSha256": "fb93ae2ab8d69fed61ab7fd247ee3504de23e2062936c5ce545aee152694aa8e"
+        },
+        {
+          "role": "after_pdf",
+          "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/renders/v5/after.pdf",
+          "contentSha256": "78081e9dd335d7b75f65f872df78dcbaa3727c683cf44e7f3fe335424a83e283"
+        },
+        {
+          "role": "reference_before_png",
+          "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/renders/v5/reference-before.png",
+          "contentSha256": "b0bd2e1c2a6fb29c16a5447fbbb882a5a577e72b9fed559f3514062f95a4ac55"
+        },
+        {
+          "role": "change_request_json",
+          "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/renders/v5/change-request.json",
+          "contentSha256": "fb30914d9922d07015073dcf36a5e8abcab46bb242b08132e7a986726fd0e78a"
+        }
+      ],
+      "plateHonestyNote": "Reference-guided recreation — not a pixel-perfect edit of your original file."
+    }
+  ],
+  "packageFingerprint": "aacf49e9892d27b7d5a27798f4f110f4f2528537ac98f1163d4429dec19a3c75",
+  "packageQaOk": true,
+  "manifestRelativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/renders/v5/package-manifest.json",
+  "identityRelativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/renders/v5/package-identity.json",
+  "changeRequestRelativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/renders/v5/change-request.json",
+  "orchestratorVersion": "rm-j007-orchestrator-v1.0-proof",
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "remapAuthorized": true,
+  "fulfillmentMode": "recreation",
+  "acceptRecreationLimits": true,
+  "redesignRequested": false,
+  "createdAt": "2026-08-15T00:51:56.571Z"
+}

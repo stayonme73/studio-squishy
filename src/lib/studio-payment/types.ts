@@ -58,6 +58,13 @@ export type CheckoutSessionCreateRequest = {
   bf001PackageLock?: import("@/lib/studio-design-renderer/bf-001-intake-truth").Bf001LivePackageLockInput
     | import("@/lib/studio-design-renderer/bf-001-intake-truth").Bf001PackageLiveTruth
     | null;
+  /**
+   * rm-j007 Reference-Guided Promotion Update — named item + reference + bounded
+   * changes + recreation-limits acceptance lock required when selected.
+   */
+  rmj007UpdateLock?: import("@/lib/studio-design-renderer/rm-j007-intake-truth").RmJ007LiveUpdateLockInput
+    | import("@/lib/studio-design-renderer/rm-j007-intake-truth").RmJ007UpdateLiveTruth
+    | null;
 };
 
 export type CheckoutSessionCreateResult =
@@ -101,7 +108,8 @@ export type CheckoutSessionCreateResult =
         | "ma001_composition_required"
         | "rmj002_kit_lock_required"
         | "rmj008_kit_lock_required"
-        | "bf001_package_lock_required";
+        | "bf001_package_lock_required"
+        | "rmj007_update_lock_required";
       message: string;
     };
 
@@ -139,6 +147,11 @@ export type PaymentConfirmationInput = {
    * Must match checkout binding seal when bf-001 was purchased.
    */
   bf001PackageSeal?: import("@/lib/studio-design-renderer/bf-001-kit-payment-gate").Bf001PackagePaymentSeal
+    | null;
+  /**
+   * Must match checkout binding seal when rm-j007 was purchased.
+   */
+  rmj007UpdateSeal?: import("@/lib/studio-design-renderer/rm-j007-kit-payment-gate").RmJ007UpdatePaymentSeal
     | null;
 };
 

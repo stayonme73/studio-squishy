@@ -509,14 +509,65 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
   },
   update: {
     type: "update",
-    title: "Update Intake",
-    lead: "Identify the exact item to update.",
+    title: "Promotion Update Intake",
+    lead:
+      "Share your existing promotion as the reference, then the exact bounded changes. The Studio recreates one updated final — it does not edit your original source file in place.",
     fields: [
-      { id: "itemLink", label: "Paste a link or identify the exact item", type: "text", required: true },
-      { id: "whatChange", label: "What needs to change?", type: "textarea", required: true },
-      { id: "newInfo", label: "What is the correct new information?", type: "textarea", required: true },
-      { id: "remove", label: "What needs to be removed?", type: "textarea" },
-      { id: "whereLive", label: "Where is it currently live?", type: "text", required: true },
+      {
+        id: "businessName",
+        label: "Business name on the promotion",
+        type: "text",
+        required: true,
+      },
+      {
+        id: "itemLink",
+        label: "Link or clear identity for the existing promotional item",
+        type: "text",
+        required: true,
+      },
+      {
+        id: "referenceMaterialNote",
+        label:
+          "Describe the reference file you are supplying (PNG, JPG, or flattened PDF preferred)",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "whatChange",
+        label: "What needs to change? (dates, prices, contact, wording, and/or one image)",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "newInfo",
+        label: "What is the correct new information?",
+        type: "textarea",
+        required: true,
+      },
+      {
+        id: "remove",
+        label: "What needs to be removed?",
+        type: "textarea",
+      },
+      {
+        id: "replacementImageNote",
+        label: "If replacing one image, describe the replacement image you are supplying",
+        type: "textarea",
+      },
+      {
+        id: "whereLive",
+        label: "Where is it currently live?",
+        type: "text",
+        required: true,
+      },
+      {
+        id: "acceptRecreationLimits",
+        label:
+          "I understand this is a reference-guided recreation with bounded edits — not a pixel-perfect or source-file edit",
+        type: "select",
+        required: true,
+        options: ["Yes — I accept recreation with limits", "No"],
+      },
     ],
   },
   "rtu-flyer": {

@@ -1,0 +1,23 @@
+{
+  "skuId": "rm-j007",
+  "businessName": "Harbor & Oak Studio",
+  "itemIdentity": "Spring Portrait Session flyer (existing)",
+  "whereLive": "Facebook event cover + lobby print stand",
+  "whatChange": "Move to May and raise price again",
+  "newInfo": "May 3 · $69",
+  "boundedChanges": {
+    "dates": "May 3",
+    "prices": "$69"
+  },
+  "referenceMaterial": {
+    "materialId": "mat-changed",
+    "relativePath": "docs/launch/studio-operating-design-rm-j007-proof-1/artifacts/rm-j007-versioning/materials-alt/reference-changed.png",
+    "contentSha256": "b0bd2e1c2a6fb29c16a5447fbbb882a5a577e72b9fed559f3514062f95a4ac55",
+    "mime": "png"
+  },
+  "replacementImage": null,
+  "acceptRecreationLimits": true,
+  "redesignRequested": false,
+  "fulfillmentMode": "recreation",
+  "honesty": "Reference-guided recreation — not a pixel-perfect edit of your original file."
+}

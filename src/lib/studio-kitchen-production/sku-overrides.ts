@@ -499,27 +499,66 @@ export const SKU_PRODUCTION_OVERRIDES: Record<
   },
   "rm-j007": {
     producerRole: "creative_production",
+    supportingRoles: ["copy", "qa", "producer_dispatcher"],
+    /**
+     * STUDIO-OPERATING-DESIGN-RM-J007 — Owner APPROVE B (2026-08-14):
+     * Reference-Guided Promotion Update. Canva is not the operational executor.
+     * Thin Machine path: paid rmj007UpdateSeal → recreation composer.
+     * Customer reference + bounded change request are law.
+     */
+    primaryTool: {
+      toolId: "studio_design_renderer",
+      label: "Studio Design Renderer (HTML/CSS + Playwright)",
+      required: true,
+      integrationState: "integrated",
+      toolReadiness: "contract_ready",
+      note:
+        "Owner-approved Machine path for rm-j007 only (Reference-Guided Promotion Update). Canva is not on the fulfillment spine. Make not required. One existing promotional reference → one recreated updated final; bounded edits only (dates, prices, contact, wording, one image). No source-file editing, no Canva-file editing, no editable-layer restoration, no pixel-perfect/exact-layout guarantee. Redesign fails closed.",
+    },
+    optionalTools: [TEXT_MODEL_TOOL],
     formatExportRequirements: [
-      "Corrected final export of the named existing promotional item",
-      "No redesign / new concept",
+      "One recreated updated promotional export guided by the customer-supplied reference",
+      "Change record of requested vs applied bounded edits",
+      "No source-file / Canva-file / editable-layer edit claimed",
+    ],
+    extraLimitations: [
+      "CUSTOMER READY WITH LIMITS — Reference-Guided Promotion Update (Owner APPROVE B).",
+      "Not literal in-place editing of the customer's original file.",
+      "No pixel-perfect or exact-layout matching guarantee.",
+      "No source-file editing, Canva-file editing, or editable-layer restoration.",
+      "Bounded edits only: dates, prices, contact, wording, and one image.",
+      "Redesign / new concept / multi-item jobs fail closed.",
+      "Canva is not on the fulfillment spine for this SKU (Owner-authorized Machine remap).",
     ],
     extraQaItems: [
       {
         id: "named_item_only",
-        label: "Only the named existing item was updated",
-        reason: "Catalog scope: limited update, not redesign",
+        label: "Only one named existing promotional reference was used",
+        reason: "Catalog scope: one item, not multi-item",
         source: "service_contract",
       },
       {
         id: "replacement_facts_only",
-        label: "Only supplied replacement details applied",
+        label: "Only supplied bounded replacement details applied",
         reason: "Catalog purpose and client responsibilities",
+        source: "service_contract",
+      },
+      {
+        id: "recreation_honesty",
+        label: "Deliverable is reference-guided recreation — not source-file edit",
+        reason: "Owner APPROVE B product freeze",
+        source: "service_contract",
+      },
+      {
+        id: "no_pixel_perfect_claim",
+        label: "No pixel-perfect or exact-layout guarantee claimed",
+        reason: "Owner APPROVE B product freeze",
         source: "service_contract",
       },
     ],
     readiness: "contract_ready",
     readinessNotes:
-      "Limited update path is clear: apply customer-supplied replacements, export, QA. Manual Canva/file edit operational.",
+      "Reference-Guided Promotion Update — creative_production + Studio Design Renderer (Owner-independent Machine path). Canva is not on the fulfillment spine; Make not required. Paid update seal + post-pay structure required; customer reference + bounded change request; one recreated final; redesign fails closed.",
   },
   "rm-j008": {
     producerRole: "creative_production",

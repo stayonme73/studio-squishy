@@ -198,6 +198,12 @@ export type CampaignRecord = {
      * cover) + exact 2-member membership + customer-supplied starting point.
      */
     bf001PackageSeal?: import("@/lib/studio-design-renderer/bf-001-kit-payment-gate").Bf001PackagePaymentSeal;
+    /**
+     * Sealed rm-j007 Reference-Guided Promotion Update purchased with this payment.
+     * Absent when rm-j007 was not in the cart. Binds named item + reference note +
+     * bounded changes + recreation-limits acceptance.
+     */
+    rmj007UpdateSeal?: import("@/lib/studio-design-renderer/rm-j007-kit-payment-gate").RmJ007UpdatePaymentSeal;
   };
   /**
    * Durable ma-001 post-pay pack structure derived from paymentTruth.ma001CompositionSeal.
@@ -226,6 +232,13 @@ export type CampaignRecord = {
    * @see STUDIO-OPERATING-DESIGN-BF-001-POSTPAY-PACKAGE-DISPATCH-STRUCTURE-1
    */
   bf001PostPayDispatchStructure?: import("@/lib/studio-design-renderer/bf-001-postpay-kit-dispatch-structure").Bf001PostPayDispatchStructure;
+  /**
+   * Durable rm-j007 post-pay update structure derived from
+   * paymentTruth.rmj007UpdateSeal. Authoritative 1-member recreation membership
+   * + starting-point identity for future dispatch — not a remap / not composer invoke.
+   * @see STUDIO-OPERATING-DESIGN-RM-J007-POSTPAY-UPDATE-DISPATCH-STRUCTURE-1
+   */
+  rmj007PostPayDispatchStructure?: import("@/lib/studio-design-renderer/rm-j007-postpay-kit-dispatch-structure").RmJ007PostPayDispatchStructure;
   /**
    * Server-owned paid-cycle purchase ledger (sm-001-monthly pay-per-cycle).
    * Supplements paymentTruth — never means “all future cycles paid.”

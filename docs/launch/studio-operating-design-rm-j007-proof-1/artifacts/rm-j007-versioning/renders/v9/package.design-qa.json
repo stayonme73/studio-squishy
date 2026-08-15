@@ -1,0 +1,19 @@
+{
+  "packageId": "STUDIO-OPERATING-DESIGN-RM-J007-PROOF-1",
+  "lockedPackageMemberCount": 1,
+  "packageQaOk": true,
+  "ownerRoutine": "NONE",
+  "canvaUsed": false,
+  "remapAuthorized": true,
+  "fulfillmentMode": "recreation",
+  "acceptRecreationLimits": true,
+  "redesignRequested": false,
+  "honesty": "Reference-guided recreation — not a pixel-perfect edit of your original file.",
+  "members": [
+    {
+      "memberId": "updated_promotion",
+      "producerQaOk": true,
+      "artifactCount": 7
+    }
+  ]
+}

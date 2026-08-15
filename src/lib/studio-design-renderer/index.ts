@@ -904,3 +904,100 @@ export type {
   Bf001PostPayStructureFailureCode,
   Bf001PostPayStructureBuildResult,
 } from "./bf-001-postpay-kit-dispatch-structure";
+
+/** rm-j007 Reference-Guided Promotion Update — Owner APPROVE B (Canva OFF). */
+export {
+  DESIGN_RENDERER_RM_J007_SKU,
+  RM_J007_PACKAGE_SPEC_VERSION,
+  RM_J007_ORCHESTRATOR_VERSION,
+  RM_J007_VISUAL_VERSION,
+  RM_J007_UPDATE_PLATE,
+  RM_J007_HONESTY_LINE,
+} from "./rm-j007-types";
+export type {
+  RmJ007MemberId,
+  RmJ007MemberKind,
+  RmJ007ReferenceMime,
+  RmJ007ReferenceMaterial,
+  RmJ007ReplacementImageMaterial,
+  RmJ007BoundedChanges,
+  RmJ007PlannedMember,
+  RmJ007UpdateProjectTruth,
+  RmJ007PackageIdentity,
+  RmJ007PackagePipelineResult,
+  RmJ007MemberResult,
+} from "./rm-j007-types";
+export {
+  RM_J007_PROOF_CONTRACT,
+  RM_J007_SUPPORTED_REFERENCE_MIMES,
+  isDesignRendererRmJ007Sku,
+  recipeForRmJ007Update,
+  hasAtLeastOneBoundedChange,
+  validateRmJ007PackageComposition,
+} from "./rm-j007-contracts";
+export {
+  RM_J007_PROOF_PACKAGE_ID,
+  RM_J007_PROOF_ARTIFACT_ROOT,
+  RM_J007_MATERIALS_DIR_REL,
+  ensureRmJ007ReferenceFixture,
+  buildRmJ007UpdateTruth,
+} from "./rm-j007-fixtures";
+export { fingerprintRmJ007Package } from "./rm-j007-fingerprint";
+export { buildRmJ007UpdateHtml } from "./rm-j007-render";
+export { evaluateRmJ007PackageQa } from "./rm-j007-package-qa";
+export {
+  persistRmJ007PackageArtifacts,
+  buildRmJ007ChangeRequest,
+} from "./rm-j007-bind";
+export {
+  runRmJ007PackageComposerPipeline,
+  runRmJ007PackageProofPipeline,
+} from "./rm-j007-pipeline";
+
+/** rm-j007 intake + payment lock — update sealed before checkout. */
+export {
+  RM_J007_INTAKE_PAYMENT_LOCK_PACKAGE_ID,
+  RM_J007_ACCEPT_RECREATION_YES_VARIANTS,
+  RM_J007_UPDATE_LOCK_FIELD_IDS,
+  RM_J007_FORBIDDEN_REDESIGN_INTAKE_FIELDS,
+  mapRmJ007UpdateLockFromLiveTruth,
+  rmj007LiveUpdateLockFromFlatAnswers,
+  assertRmJ007UpdateReadyForPayment,
+  buildRmJ007UpdateManifestSeed,
+  customerFacingRmJ007UpdateLines,
+} from "./rm-j007-intake-truth";
+export type {
+  RmJ007LiveUpdateLockInput,
+  RmJ007UpdateLiveTruth,
+  RmJ007UpdateManifestSeed,
+  RmJ007UpdateStartingIdentity,
+  RmJ007UpdateFailureCode,
+  RmJ007UpdateMapResult,
+  RmJ007PaymentReadinessResult,
+} from "./rm-j007-intake-truth";
+export {
+  RM_J007_UPDATE_PAYMENT_GATE_PACKAGE_ID,
+  fingerprintRmJ007UpdateLiveTruth,
+  normalizeRmJ007UpdateForPayment,
+  sealRmJ007UpdateForPayment,
+  evaluateRmJ007UpdatePaymentGate,
+  assertRmJ007UpdateUnchangedAfterCheckoutAuthority,
+  rmj007UpdateSealsMatch,
+} from "./rm-j007-kit-payment-gate";
+export type { RmJ007UpdatePaymentSeal } from "./rm-j007-kit-payment-gate";
+
+/** rm-j007 POSTPAY-UPDATE-DISPATCH-STRUCTURE-1 — paid seal → durable structure. */
+export {
+  RM_J007_POSTPAY_UPDATE_DISPATCH_STRUCTURE_PACKAGE_ID,
+  buildRmJ007PostPayDispatchStructureFromPaymentSeal,
+  buildRmJ007PostPayDispatchStructureFromCampaign,
+  assertRmJ007PostPayStructureMatchesPaymentSeal,
+  assertRmJ007PostPayStructureDispatchReady,
+  ensureRmJ007PostPayDispatchStructureOnCampaign,
+} from "./rm-j007-postpay-kit-dispatch-structure";
+export type {
+  RmJ007PostPayDispatchMember,
+  RmJ007PostPayDispatchStructure,
+  RmJ007PostPayStructureFailureCode,
+  RmJ007PostPayStructureBuildResult,
+} from "./rm-j007-postpay-kit-dispatch-structure";
