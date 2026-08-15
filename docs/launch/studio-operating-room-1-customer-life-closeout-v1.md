@@ -44,7 +44,7 @@ Until then, Board + Voice remain the honest customer surfaces. Queued notices an
 | Studio Voice ↔ Machine ↔ customer | Sealed prior |
 | Review + revision + exact Final Delivery | **CLOSED** (`07c1434`) |
 | Resend / lifecycle email + watchdog live cert | **PARKED WITH EXTERNAL PREREQUISITE** (`d6974eb`) — see flag above |
-| Whole-customer torture test | **PARKED FOR MANAGER** — `STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1`. Architecture park `5407796`. Same-package Voice summary correction recorded in the torture-test report. Room 1 still **not closed**. |
+| Whole-customer torture test | **PARKED FOR MANAGER** — `STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1`. Architecture park `5407796`. Voice summary correction `9f58d41`. Room 1 still **not closed**. |
 
 Room 1 still requires the locked chaotic-failure pass (wrong upload, duplicate, stall/timeout recover, QA fail then pass, stale-version, return-later, failed notification with Board/Voice still honest). That pass **must not** require branded inbox certification.
 

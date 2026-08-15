@@ -8,7 +8,7 @@
 **Owner routine:** NONE  
 **Previous parked section:** Resend lifecycle + watchdog at `d6974eb` — **PARKED WITH EXTERNAL PREREQUISITE, not closed**  
 **First architecture park:** `5407796`  
-**This correction:** coherent Studio Voice project summary (same package, not a new package)
+**This correction commit:** `9f58d41`
 
 Maya fixture (unchanged): Maya Brooks · Cedar & Bloom Home Organizing · Back-to-School Reset · Make Me a Flyer / `v2-rtu-flyer` / Studio fee **$69**.
 
@@ -210,5 +210,7 @@ The previous stacking finding is **resolved**, not carried as an open defect.
 - `src/lib/studio-customer-life/coherent-status-summary.test.ts`
 - `scripts/studio-operating-room-1-whole-customer-life-torture-test-1-board-walk.mts`
 - Evidence + shots + flyer artifacts under this folder
+
+**Park commit:** `9f58d41` on `operating/design-renderer-proof-1`. Push sync recorded after this note.
 
 **Next:** Manager gate. Stay in Room 1. Do not open Owner Console or Room 2 unless Tagia closes this room after deciding what branded email remaining as the deferred prerequisite means for Room 1 closeout.
