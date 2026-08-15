@@ -245,7 +245,11 @@ Customer path: sign in → Board → ask → real Machine answers → answer a S
 
 ## Q. Final commit / sync
 
-Recorded after push. Merge: **NO**.
+**Commit:** `7731d40`  
+**Branch:** `operating/design-renderer-proof-1`  
+**Merge:** NO  
+
+Local/remote recorded after push.
 
 ---
 
