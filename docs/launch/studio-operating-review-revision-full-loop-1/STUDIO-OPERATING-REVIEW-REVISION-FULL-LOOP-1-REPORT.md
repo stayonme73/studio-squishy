@@ -330,5 +330,6 @@ Stay in Room 1. Do not start Owner Console, Room 2, or soft opening. Do not merg
 
 ## T. Git / park
 
-Continuation parked after commit + push of the two truth gates. Remote/local match is confirmed in the chat after push. **No merge.**
+**Tip:** `e8f185e`  
+Parked after commit + push of the two remaining truth gates. Remote/local match is confirmed in the chat after push. **No merge.**
 Email/Notifications not started.
