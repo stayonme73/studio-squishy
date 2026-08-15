@@ -3,7 +3,7 @@
 **Package:** STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1  
 **Room:** 1 — Customer Life + Communication (this section only)  
 **Branch:** `operating/design-renderer-proof-1`  
-**Scout status:** PARKED — ready for Manager visual review · **no merge**  
+**Scout status:** PARKED — ready for Manager CLOSE after visual artifact correction · **no merge**  
 **Close rule used:** BUILD → BREAK → CUSTOMER-USE → FIX → RETEST  
 **Previous section:** Studio Voice ↔ Machine ↔ Customer Communication = CLOSED (`4abc161`)
 
@@ -13,12 +13,13 @@ Maya fixture: Maya Brooks · Cedar & Bloom Home Organizing · Back-to-School Res
 
 ## A. Overall verdict
 
-**PARKED FOR MANAGER CLOSE — MECHANICS + TWO TRUTH GATES PASSED LIVE 29/0**
+**PARKED FOR MANAGER CLOSE — CREATIVE DIRECTION PASS + FOOTER/BODY CORRECTION PRODUCED THROUGH THE MACHINE · LIVE 29/0**
 
-Manager already accepted the Review → Revision → Re-review → Approval loop. This continuation did **not** start Email/Resend. It closed two remaining closets:
+Manager visually inspected Version 2 and passed creative-direction fidelity. She also found two customer-quality defects tests missed. This continuation did **not** start Email/Resend and did **not** redesign the flyer.
 
-1. **GATE 1 — Maya creative-direction fidelity.** Version 1 and Version 2 now execute the locked brief (facts + calm botanical atmosphere). Version 2 is the included revision (Book Your Reset as headline). Look at the PNGs — do not certify from hashes.
-2. **GATE 2 — $69 purchase → delivery truth.** Five frozen slots are **not** five customer files. Maya bought one flyer design as **print PDF + digital PNG** of the approved Version 2 identity. QC and “design direction” are studio work, not downloads.
+1. **GATE 1 — Maya creative-direction fidelity.** Manager PASS: cream/sage, clean vertical, wordmark-only, Book Your Reset, $149, dates, CTA, phone, website. No childish school graphics, no invented logo, no navy drift.
+2. **Visual artifact correction (this rerun).** Removed Studio/product-contract footer leak. Cleaned included-service body so it does not dump “2-hour… Includes: one 2-hour…”. Facts unchanged. PNG + print PDF from the same corrected Version 2 identity.
+3. **GATE 2 — $69 purchase → delivery truth.** Five frozen slots are **not** five customer files. Maya bought one flyer design as **print PDF + digital PNG** of the approved Version 2 identity.
 
 Maya can now answer, and the three answers agree:
 
@@ -32,20 +33,20 @@ Owner routine = **NONE**. Room 1 is **not** closed. Do not start Email until Tag
 
 ## B. Actual Maya flyer artifacts (look at the files)
 
-Do not certify from metadata alone. These are the PNGs from the passing continuation walk:
+Do not certify from metadata alone. These are the PNGs from the passing visual-correction walk:
 
 | Version | Launch copy (open this) | Hash (first 12) | What changed |
 |---|---|---|---|
-| 1 | `docs/launch/studio-operating-review-revision-full-loop-1/artifacts/maya-flyer-v1.png` | `6b30dae910d0` | Headline is “Promotional flyer for Back-to-School Reset.” Sage/cream wordmark layout. Included-service lines present. CTA button is Book Your Reset. |
-| 2 | `docs/launch/studio-operating-review-revision-full-loop-1/artifacts/maya-flyer-v2.png` | `9c5aef6d1766` | Headline is **Book Your Reset** (Maya’s included revision). Offer, price, dates, includes, phone, web, button unchanged. |
-| 1 PDF | `docs/launch/studio-operating-review-revision-full-loop-1/artifacts/maya-flyer-v1.pdf` | `4b8b9ee143f8` | Coordinated print export of Version 1. Not the approved identity. |
-| 2 PDF | `docs/launch/studio-operating-review-revision-full-loop-1/artifacts/maya-flyer-v2.pdf` | `abe5bb961acc` | Coordinated print export of Version 2. This is the delivered print file. |
+| 1 | `docs/launch/studio-operating-review-revision-full-loop-1/artifacts/maya-flyer-v1.png` | `1888fe1c1de0` | Headline is “Promotional flyer for Back-to-School Reset.” Sage/cream wordmark layout. Included-service facts without Studio footer. CTA button is Book Your Reset. |
+| 2 | `docs/launch/studio-operating-review-revision-full-loop-1/artifacts/maya-flyer-v2.png` | `7d59836ae084` | Headline is **Book Your Reset**. Studio footer removed. Included-service copy no longer repeats the 2-hour line. Offer, price, dates, phone, web, button unchanged. |
+| 1 PDF | `docs/launch/studio-operating-review-revision-full-loop-1/artifacts/maya-flyer-v1.pdf` | `efb33e47def4` | Coordinated print export of Version 1. Not the approved identity. |
+| 2 PDF | `docs/launch/studio-operating-review-revision-full-loop-1/artifacts/maya-flyer-v2.pdf` | `c2b097b0241c` | Coordinated print export of Version 2. This is the delivered print file. |
 
-Live campaign for the passing continuation: `maya-review-loop-1786815673678`  
+Live campaign for the passing visual-correction walk: `maya-review-loop-1786816932659`  
 Source Machine files (not committed; `data/` stays local):
 
-- `data/campaign-design-artifacts/maya-review-loop-1786815673678/.../renders/v1/flyer.png`
-- `data/campaign-design-artifacts/maya-review-loop-1786815673678/.../renders/v2/flyer.png`
+- `data/campaign-design-artifacts/maya-review-loop-1786816932659/.../renders/v1/flyer.png`
+- `data/campaign-design-artifacts/maya-review-loop-1786816932659/.../renders/v2/flyer.png`
 - sibling `flyer.pdf` in each render version
 
 Customer Review / Delivery screenshots:
@@ -68,7 +69,7 @@ The parked walk before this continuation used a truncated intake dump, Machine f
 
 Locked brief restored into the walk fixture. Mapper now:
 
-- puts included-service facts on the flyer (2-hour session, Includes…, pantry / entryway / homework area / closet / home office)
+- puts included-service facts on the flyer (one 2-hour home organization session, one selected household area, simple organization plan, pantry / entryway / homework area / closet / home office) without dumping “Includes: one 2-hour organizing session…”
 - skips invented descriptor copy
 - applies the locked soft-neutral botanical *palette* when style notes say so (sage/cream/warm gold) — no invented leaf clipart, because the SKU excludes custom illustration
 - keeps all established contact and offer facts
@@ -83,15 +84,29 @@ Checked on Version 2 declared text + visual plate:
 | Cedar & Bloom as wordmark, no invented logo | PASS |
 | Back-to-School Reset hierarchy | PASS |
 | $149 / 2-hour session | PASS |
-| Included-service information | PASS |
+| Included-service information | PASS — one session, one area, organization plan, listed household choices. No redundant Includes dump |
 | Aug. 24–Sept. 14, 2026 | PASS |
 | Book Your Reset prominent on Version 2 | PASS — headline + button |
 | Phone and website | PASS |
 | Soft neutral / subtle botanical | PASS — sage/cream atmosphere, no plants drawn |
 | No childish school imagery | PASS |
 | No invented business facts | PASS — no Local business, no guarantee, no service area |
+| No Studio/product-contract footer | PASS — “Finished single-sided flyer… You distribute.” is not on the plate |
 
-Scout does **not** stamp creative beauty. Manager compares the PNGs to the brief.
+Scout does **not** stamp CLOSE. Manager compares this Version 2 PNG to Maya’s advertisement.
+
+---
+
+## B4. Manager visual correction (this rerun)
+
+Manager PASS on creative direction. She then caught two defects 29/29 could not see:
+
+| Defect | Correction |
+|---|---|
+| Footer “Finished single-sided flyer for your print or digital use. You distribute.” | Customer jobs no longer inject a Studio SKU-contract disclaimer. Empty client disclaimer skips the disclaimer layer. That sentence is now prohibited on the flyer. |
+| Body “2-hour home organization session Includes: one 2-hour organizing session…” | Mapper composes the approved facts once: one 2-hour home organization session; one selected household area; simple organization plan; pantry / entryway / children’s homework area / closet / home office. No new claims. |
+
+Both customer files (PNG + print PDF) were remade by the Machine from that identity, then QA → Review → included revision (Book Your Reset headline) → Version 2 approval → Final Delivery. No hand-edit of the PNG/PDF.
 
 ---
 
@@ -109,7 +124,7 @@ Scout does **not** stamp creative beauty. Manager compares the PNGs to the brief
 
 **Purchased customer deliverables:** one finished flyer design, as print-ready PDF + digital PNG.
 
-**Delivered:** Version 2 PNG `9c5aef6d1766…` + Version 2 PDF `abe5bb961acc…`. Both hashes sit on the approval pin. QC and design-direction are not Final Delivery files.
+**Delivered:** Version 2 PNG `7d59836ae084…` + Version 2 PDF `c2b097b0241c…`. Both hashes sit on the approval pin. QC and design-direction are not Final Delivery files.
 
 **PNG/PDF approval-binding (existing product law, not a new rule):**
 
@@ -203,7 +218,7 @@ Those three states stay separate.
 ## I. Old-version trap
 
 - After Version 2 exists, the Review preview current file is Version 2 (newest proof). Maya cannot silently approve Version 1 as “current.”
-- Approval pin is `flyer-v2` / PNG `sha256:9c5aef6d1766…` + PDF `sha256:abe5bb961acc…` — Version 2 bytes, not Version 1 `6b30dae910d0`.
+- Approval pin is `flyer-v2` / PNG `sha256:7d59836ae084…` + PDF `sha256:c2b097b0241c…` — Version 2 bytes, not Version 1 `1888fe1c1de0`.
 - Final Delivery files are those two hashes. A Version 1 PNG or PDF is rejected (`stale_version_cannot_win` PASS; CDF count **2**, none are v1).
 - Assemble refuses Version 1 proofs when the pin is Version 2.
 - Assemble refuses a missing promised PDF, and refuses a PDF captured from a non-approved version.
@@ -215,7 +230,7 @@ Those three states stay separate.
 Live pin:
 
 - `workVersionId`: **flyer-v2**
-- `contentSha256s`: PNG `sha256:9c5aef6d1766ad8741b43120e32456507ed20387bc44361acfda5945932f8bb0` **and** PDF `sha256:abe5bb961acc…`
+- `contentSha256s`: PNG `sha256:7d59836ae084252acb01d79f4c7722dba2c9d6fddf58ea9649e97edca63aad17` **and** PDF `sha256:c2b097b0241ccddbbddc84bfb6b939e30e4f1eaa0c9528044c444dc739fc9035`
 - `status`: CUSTOMER_APPROVED
 
 Spine after approve: **`ready_for_delivery`**.  
@@ -268,8 +283,10 @@ Fresh Playwright context (empty cookies / localStorage): sign in → Review URL 
 | Walk fixture dropped locked included-service / style notes; Harbor navy leftover; “Local business” invented | Restore locked brief; botanical palette; skip invented descriptor |
 | Review attached the PNG to slot 0 (“One defined design direction”) | Proofs bind to the flyer-design slot only |
 | Observer recorded PNG only | Record PDF path + hash from the same render identity |
+| Studio SKU footer “Finished single-sided flyer… You distribute.” leaked onto Maya’s advertisement | Do not inject a default Studio disclaimer; skip empty disclaimer layer |
+| Body dumped “2-hour home organization session Includes: one 2-hour organizing session…” | Compose the approved facts once; do not invent new claims or a prettier redesign |
 
-Cosmetic redesign was not done. Version 2 exists because Maya asked for Book Your Reset as the headline, and because the dropped brief facts had to return to the plate.
+Cosmetic redesign was not done. Version 2 exists because Maya asked for Book Your Reset as the headline, and because the dropped brief facts had to return to the plate. The footer/body correction is a customer-quality truth fix on that same identity.
 
 ---
 
@@ -330,6 +347,6 @@ Stay in Room 1. Do not start Owner Console, Room 2, or soft opening. Do not merg
 
 ## T. Git / park
 
-**Tip:** `e8f185e`  
-Parked after commit + push of the two remaining truth gates. Remote/local match is confirmed in the chat after push. **No merge.**
+**Tip:** filled after commit  
+Parked after commit + push of the Manager visual artifact correction. Remote/local match is confirmed in the chat after push. **No merge.**
 Email/Notifications not started.

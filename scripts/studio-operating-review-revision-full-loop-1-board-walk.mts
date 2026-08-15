@@ -691,13 +691,22 @@ async function main(): Promise<number> {
       /Cedar & Bloom/i.test(v2Declared) &&
         /Back-to-School Reset/i.test(v2Declared) &&
         /\$149/.test(v2Declared) &&
-        /2-hour/i.test(v2Declared) &&
-        /Includes/i.test(v2Declared) &&
+        /2-hour home organization session/i.test(v2Declared) &&
+        /one selected household area/i.test(v2Declared) &&
+        /simple organization plan for maintaining the space/i.test(v2Declared) &&
         /pantry/i.test(v2Declared) &&
+        /entryway/i.test(v2Declared) &&
+        /homework area/i.test(v2Declared) &&
+        /closet/i.test(v2Declared) &&
+        /home office/i.test(v2Declared) &&
         /Book Your Reset/i.test(v2Declared) &&
         /555-0186/.test(v2Declared) &&
         /cedarandbloom\.example/i.test(v2Declared) &&
         /2026/.test(v2Declared) &&
+        !/Includes:/i.test(v2Declared) &&
+        !/Includes: one 2-hour organizing session/i.test(v2Declared) &&
+        !/Finished single-sided flyer/i.test(v2Declared) &&
+        !/You distribute/i.test(v2Declared) &&
         !/Local business/i.test(v2Declared) &&
         !/school bus/i.test(v2Declared) &&
         !/guarantee/i.test(v2Declared)

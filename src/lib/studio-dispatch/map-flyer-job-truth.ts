@@ -1,6 +1,7 @@
 /**
  * Map authoritative campaign/job truth → FlyerProjectTruth (customer mode).
- * Never injects Harbor CERT fixtures or certification disclaimers.
+ * Never injects Harbor CERT fixtures, certification disclaimers, or Studio
+ * SKU contract footer copy onto the customer-facing flyer.
  */
 
 import { createHash } from "crypto";
@@ -16,6 +17,7 @@ import type {
 import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer/types";
 
 import { applyExistingCtaHeadlineEmphasis } from "@/lib/studio-review-revision/flyer-revision-emphasis";
+import type { JobDispatchRecord } from "./types";
 
 export type FlyerTruthMapResult =
   | { ok: true; truth: FlyerProjectTruth }
@@ -93,14 +95,26 @@ function extractOfferName(
 
 function customerFacingFlyerBody(mustInclude: string): string {
   const facts = stripStyleDirection(mustInclude);
-  const lines = facts
+  const joined = facts.replace(/\s+/g, " ");
+  const hasSession = /2-hour home organization session/i.test(joined);
+  const hasArea = /one selected household area/i.test(joined);
+  const hasPlan = /simple organization plan for maintaining the space/i.test(joined);
+  const chooseLine = facts
     .split(/\n+/)
     .map((line) => line.trim())
-    .filter(Boolean);
-  const includeLines = lines.filter((line) =>
-    /includes:|customers may choose|2-hour home organization session/i.test(line),
-  );
-  if (includeLines.length > 0) return includeLines.join(" ");
+    .find((line) => /customers may choose:/i.test(line));
+  const chooseList = (chooseLine ?? "")
+    .replace(/customers may choose:\s*/i, "")
+    .replace(/\.$/, "")
+    .trim();
+  if (hasSession && hasArea && hasPlan) {
+    const sessionAreaPlan =
+      "One 2-hour home organization session. One selected household area. Simple organization plan for maintaining the space.";
+    if (chooseList) {
+      return `${sessionAreaPlan} ${chooseList.charAt(0).toUpperCase()}${chooseList.slice(1)}.`;
+    }
+    return sessionAreaPlan;
+  }
   return facts;
 }
 
@@ -260,10 +274,7 @@ export function mapFlyerProjectTruthFromJob(input: {
   const businessName = input.campaign.campaignName.trim() || "Customer";
   const wordmark = businessName;
   const descriptor = "";
-  const customerDisclaimer = String(answers.disclaimers ?? "").trim();
-  const disclaimer =
-    customerDisclaimer ||
-    "Finished single-sided flyer for your print or digital use. You distribute.";
+  const disclaimer = String(answers.disclaimers ?? "").trim();
   const styleSource = [
     mustInclude,
     String(answers.materials ?? ""),
@@ -299,8 +310,9 @@ export function mapFlyerProjectTruthFromJob(input: {
       ? extracted.dateWindow.split(/[–—,]/).map((s) => s.trim()).filter((s) => s.length > 2).slice(0, 3)
       : []),
     ...( /2-hour/i.test(body) ? ["2-hour"] : []),
-    ...( /Includes:/i.test(body) ? ["Includes"] : []),
-    ...( /pantry/i.test(body) ? ["pantry"] : []),
+    ...( /household area/i.test(body) ? ["household area"] : []),
+    ...( /organization plan/i.test(body) ? ["organization plan"] : []),
+    ...(body.match(/pantry/i)?.[0] ? [body.match(/pantry/i)![0]] : []),
   ];
 
   const truth: FlyerProjectTruth = {
@@ -336,6 +348,8 @@ export function mapFlyerProjectTruthFromJob(input: {
       "cartoon pencil",
       "guarantee",
       "% off",
+      "Finished single-sided flyer for your print or digital use",
+      "You distribute",
     ],
   };
 

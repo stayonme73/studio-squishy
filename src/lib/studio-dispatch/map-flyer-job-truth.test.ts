@@ -159,20 +159,47 @@ describe("v2-rtu-flyer no-logo customer mapping", () => {
     if (!mapped.ok) return;
     expect(mapped.truth.offerName).toBe("Back-to-School Reset");
     expect(mapped.truth.descriptor).toBe("");
-    expect(mapped.truth.body).toMatch(/Includes:/);
-    expect(mapped.truth.body).toMatch(/pantry/);
+    expect(mapped.truth.disclaimer).toBe("");
+    expect(mapped.truth.body).not.toMatch(/Includes:/);
+    expect(mapped.truth.body).not.toMatch(
+      /2-hour home organization session Includes: one 2-hour organizing session/i,
+    );
+    expect(mapped.truth.body).toMatch(/One 2-hour home organization session/i);
+    expect(mapped.truth.body).toMatch(/one selected household area/i);
+    expect(mapped.truth.body).toMatch(/simple organization plan for maintaining the space/i);
+    expect(mapped.truth.body).toMatch(/pantry/i);
+    expect(mapped.truth.body).toMatch(/entryway/i);
+    expect(mapped.truth.body).toMatch(/children's homework area/i);
+    expect(mapped.truth.body).toMatch(/closet/);
+    expect(mapped.truth.body).toMatch(/home office/);
     expect(mapped.truth.body).not.toMatch(/Style:/);
+    expect(mapped.truth.body).not.toMatch(/555-0186/);
+    expect(mapped.truth.body).not.toMatch(/cedarandbloom/);
+    expect(mapped.truth.body).not.toMatch(/You distribute/);
     expect(mapped.truth.brandColors.primary).toBe("#3F5A4A");
     expect(mapped.truth.requiredTextTokens).toEqual(
-      expect.arrayContaining(["$149", "2-hour", "Includes", "pantry"]),
+      expect.arrayContaining([
+        "$149",
+        "2-hour",
+        "household area",
+        "organization plan",
+        expect.stringMatching(/^pantry$/i),
+      ]),
     );
+    expect(mapped.truth.requiredTextTokens).not.toContain("Includes");
     const spec = reasonFlyerDesignSpecDeterministic(mapped.truth);
     const declared = spec.layers
       .filter((layer): layer is Extract<typeof layer, { type: "text" }> => layer.type === "text")
       .map((layer) => layer.content)
       .join("\n");
-    expect(declared).toMatch(/pantry/);
+    expect(declared).toMatch(/pantry/i);
     expect(declared).not.toMatch(/Local business/);
     expect(declared).not.toMatch(/school bus/i);
+    expect(declared).not.toMatch(/Finished single-sided flyer/i);
+    expect(declared).not.toMatch(/You distribute/i);
+    expect(declared).not.toMatch(/Includes:/);
+    expect(
+      spec.layers.some((layer) => layer.type === "text" && layer.role === "disclaimer"),
+    ).toBe(false);
   });
 });

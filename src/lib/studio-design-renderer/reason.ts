@@ -241,20 +241,24 @@ export function reasonFlyerDesignSpecDeterministic(
         color: c.primary,
         align: "center",
       }),
-      textLayer({
-        id: "disclaimer",
-        role: "disclaimer",
-        content: truth.disclaimer,
-        x: 72,
-        y: 1420 + yShift + bodyExtraY,
-        width: 880,
-        fontSizePx: 14,
-        fontWeight: 400,
-        lineHeight: 1.35,
-        color: c.muted,
-        align: "center",
-        maxLines: 3,
-      }),
+      ...(truth.disclaimer.trim()
+        ? [
+            textLayer({
+              id: "disclaimer",
+              role: "disclaimer",
+              content: truth.disclaimer,
+              x: 72,
+              y: 1420 + yShift + bodyExtraY,
+              width: 880,
+              fontSizePx: 14,
+              fontWeight: 400,
+              lineHeight: 1.35,
+              color: c.muted,
+              align: "center",
+              maxLines: 3,
+            }),
+          ]
+        : []),
       {
         type: "shape",
         id: "plate-bottom",

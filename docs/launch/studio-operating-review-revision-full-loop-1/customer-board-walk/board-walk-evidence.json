@@ -1,10 +1,10 @@
 {
   "packageId": "STUDIO-OPERATING-REVIEW-REVISION-FULL-LOOP-1",
   "kind": "customer-review-walk",
-  "recordedAt": "2026-08-15T17:41:27.070Z",
+  "recordedAt": "2026-08-15T18:02:28.361Z",
   "baseUrl": "http://127.0.0.1:3066",
-  "commitHint": "unknown",
-  "runId": "0c64acf7-917f-4460-8c90-10cf8e700c6a",
+  "commitHint": "67a8415",
+  "runId": "57491b33-fca2-41d5-a750-2c2c9848628f",
   "totals": {
     "passed": 29,
     "failed": 0,
@@ -110,12 +110,12 @@
     {
       "check": "revised_artifact_produced",
       "status": "PASS",
-      "detail": "v1=6b30dae910d0 v2=9c5aef6d1766"
+      "detail": "v1=1888fe1c1de0 v2=7d59836ae084"
     },
     {
       "check": "creative_brief_fidelity_v2",
       "status": "PASS",
-      "detail": "Cedar & Bloom Home Organizing\nBook Your Reset\nBack-to-School Reset\n$149\nAugust 24 through September 14, 2026\n2-hour home organization session Includes: one 2-hour organizing session; organization of one selected household area; simple organization plan for maintaining the space. "
+      "detail": "Cedar & Bloom Home Organizing\nBook Your Reset\nBack-to-School Reset\n$149\nAugust 24 through September 14, 2026\nOne 2-hour home organization session. One selected household area. Simple organization plan for maintaining the space. Pantry, entryway, children's homework area, closet, "
     },
     {
       "check": "rereview_shows_new_version",
@@ -146,13 +146,13 @@
     {
       "check": "exact_approval_binding",
       "status": "PASS",
-      "detail": "Pin flyer-v2 sha256:9c5aef6d1766ad8741b43120e32456507ed20387bc44361acfda5945932f8bb0",
+      "detail": "Pin flyer-v2 sha256:7d59836ae084252acb01d79f4c7722dba2c9d6fddf58ea9649e97edca63aad17",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-review-revision-full-loop-1\\customer-board-walk\\shots\\05-approved-exact-version.png"
     },
     {
       "check": "stale_version_cannot_win",
       "status": "PASS",
-      "detail": "v1=6b30dae910d0 v2=9c5aef6d1766 pin=9c5aef6d1766 files=2"
+      "detail": "v1=1888fe1c1de0 v2=7d59836ae084 pin=7d59836ae084 files=2"
     },
     {
       "check": "exact_final_delivery",
@@ -167,7 +167,7 @@
     {
       "check": "customer_received_promised_png_and_pdf",
       "status": "PASS",
-      "detail": "files=2 png=9c5aef6d1766 pdf=abe5bb961acc v2pdf=abe5bb961acc pin=9c5aef6d+abe5bb96"
+      "detail": "files=2 png=7d59836ae084 pdf=c2b097b0241c v2pdf=c2b097b0241c pin=7d59836a+c2b097b0"
     },
     {
       "check": "final_delivery_customer_truth",
