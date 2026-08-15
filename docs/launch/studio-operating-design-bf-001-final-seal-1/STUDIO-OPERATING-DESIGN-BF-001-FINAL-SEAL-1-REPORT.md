@@ -24,11 +24,11 @@ Visual / customer limits inherit Owner-accepted **VISUAL/PRODUCT GATE: PASS WITH
 |-------|--------|
 | Lane feature commit SHA | `2531e6ce05246a926657b1296021846ee3be6d26` |
 | Seal-from (lane tip) | `2531e6ce05246a926657b1296021846ee3be6d26` |
-| Seal commit SHA | *(filled on seal commit)* |
+| Seal commit SHA | `6a7d0ff99fd7c70d9c119aaa89d8929b2e7035d7` |
 | Seal commit message | `docs(operating): seal bf-001 Brand Identity Refresh customer-ready-with-limits` |
 | Pushed branch | `operating/design-renderer-proof-1` |
-| Branch tip (local = origin) | *(filled after push)* |
-| Ahead / behind | *(filled after push)* |
+| Branch tip (local = origin) | *(filled after tip-identity + push)* |
+| Ahead / behind | *(filled after tip-identity + push)* |
 
 ---
 
