@@ -1,0 +1,22 @@
+---
+description: Standing launch-readiness sequence. One active room at a time. Do not skip ahead.
+alwaysApply: true
+---
+
+# Launch readiness execution order (LOCKED)
+
+Authority: `docs/launch-readiness-execution-order-v1-locked.md` · `src/config/studio-launch-readiness-execution-order-v1.ts`
+
+This is sequence control, **not** permission to start multiple packages.
+
+**Active room is 1 — Customer Life + Communication.** It is **not closed.** Last customer-life package parked at `c713cb7` with **WORKS WITH LAUNCH BLOCKERS**. Tests green is not close. Stay in room 1.
+
+Do **not** start rooms 2–5 (friction cleanup, Owner Console, full rehearsal, soft opening) while room 1 has unresolved launch blockers or important customer-flow defects.
+
+Close a section only after: BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST.
+
+Do **not** use: BUILD → TESTS GREEN → NEXT.
+
+No parallel package jumping. No unrelated improvements. No merge unless separately authorized.
+
+If a new issue is found: current room → fix before leaving; sealed earlier room → report and repair narrowly; later room → record, do not jump ahead.

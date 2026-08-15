@@ -41,6 +41,7 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Studio Review → Voice Tablet Migration — see **Studio Review Migration** block below (`docs/studio-review-to-voice-tablet-migration-v1-locked.md`, `src/config/studio-review-voice-tablet-migration-v1.ts`). Studio Review stays as working reference; remove one page at a time only after full tablet integration + cert gates. Update the ledger on every Voice-tablet package. Do not modify without Tagia approval.
 - Build Your Project — pre-purchase workspace at `/project-builder` (`docs/project-builder-production-pattern-v1-locked.md`) — **locked 2026-07-11:** service card pattern, Learn More drawer sections, button behavior (Remove never primary), Project Summary placement, Best For header, Squishy message philosophy, one-screen workspace; reuse as template for remaining pre-purchase pages; do not modify without Tagia approval
 - Studio Plan Pre-Checkout Flexibility (`docs/studio-plan-pre-checkout-flexibility-v1-locked.md`, `src/config/studio-plan-pre-checkout-flexibility-v1.ts`) — **LOCKED:** free refine before checkout; checkout confirms scope; after checkout, additions/removals are Project Changes — not silent edits. Studio Voice explains freedom on Studio Plan and the purchased-scope boundary before payment. Do not modify without Tagia approval.
+- Launch readiness execution order (`docs/launch-readiness-execution-order-v1-locked.md`, `src/config/studio-launch-readiness-execution-order-v1.ts`) — **LOCKED 2026-08-15:** one active room at a time; do not skip ahead; technical PASS is not close. Current room is **1. Customer Life + Communication** until actually closed. Rooms 2–5 (friction cleanup, Owner Console, full rehearsal, soft opening) wait. Do not modify without Tagia approval.
 
 **Browser zoom standard:** If a customer has to change their browser zoom to use The Studio, it's a bug.
 
@@ -50,6 +51,28 @@ Do **freeze business rules** unless validated by real customer experience or an 
 
 **Build order (locked — work priority):** Finish the customer-facing journey before wiring Discovery Mapping or Recommendation Engine scoring. Philosophy docs are locked; UI with mock data is fine. Do **not** implement scoring, mapping, or engine wiring until end-to-end journey verification (Discovery → Project Summary → payment → Project Details → Studio Board) is complete. **Project Summary wide workspace Secure Checkout** is implemented (embedded `SecureCheckoutGrid` in row 2); Discovery split-panel slide-out remains planned. **Help Center V1 is locked** (`docs/help-center-v1-locked.md`) — do not continue Help Center polish; next focus: Service Catalog, Pricing Engine, Recommendation Engine, checkout wiring, Project Summary live totals, end-to-end purchase testing. See `docs/customer-journey-v1-locked.md` (Build order) · `docs/studio-plan-slide-out-checkout-v1-planned.md` · `docs/discovery-mapping-v1-planned.md` (PAUSED).
 <!-- END:studio-architecture-rules -->
+
+<!-- BEGIN:launch-readiness-execution-order -->
+# Launch readiness — standing execution order (LOCKED 2026-08-15)
+
+**Authority:** `docs/launch-readiness-execution-order-v1-locked.md` · `src/config/studio-launch-readiness-execution-order-v1.ts`
+
+Sequence control, **not** authorization to start multiple packages. One active room at a time. Do not skip ahead. Do not modify without Tagia approval.
+
+| # | Room | Enter when |
+|---|------|------------|
+| 1 | Customer Life + Communication | **Current. Stay until actually closed.** |
+| 2 | Customer-facing truth + friction cleanup | Only after #1 is closed |
+| 3 | Owner Console | Only after #2 is closed |
+| 4 | Full business rehearsal | Only after #3 is closed |
+| 5 | Soft-opening preparation | Only after #4 passes |
+
+Room 1 includes intake/materials, real upload storage/retrieval, Machine↔team handoff, Voice↔Machine↔customer communication, questions, Studio asks, acknowledgements, Resend/lifecycle email, Review/revision/re-review/approval/exact Final Delivery, return-later, watchdog, and chaotic failures.
+
+A section closes only after **BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST**. Never **BUILD → TESTS GREEN → NEXT**. Do not silently carry launch blockers into the next room.
+
+**Current board:** Room 1 is **not closed**. Last package `STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1` (`c713cb7`) PARKED at **WORKS WITH LAUNCH BLOCKERS**. Do not start rooms 2–5. No merge unless separately authorized.
+<!-- END:launch-readiness-execution-order -->
 
 <!-- BEGIN:conversation-room-machine-contract -->
 # Conversation Room — machine contract (Package 2 + 3)
