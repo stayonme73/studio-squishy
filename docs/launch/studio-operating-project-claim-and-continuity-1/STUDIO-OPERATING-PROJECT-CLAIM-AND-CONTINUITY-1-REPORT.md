@@ -134,7 +134,7 @@ Tagia does not need to manually match payments to customers for the proven happy
 ## Commit state
 
 Implementation: `9ee8595` (+ report note `7dbbc00`).  
-Cold-cert script + evidence + seal report update: this tip.  
+Cold-cert seal tip: `0cebc71` (script + evidence + ledger/report).  
 Unrelated design-renderer churn left unstaged. **No merge.**
 
 ## Recommended next broad package
