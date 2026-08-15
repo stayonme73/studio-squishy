@@ -27,8 +27,8 @@ Visual / customer limits inherit Owner-accepted **VISUAL/PRODUCT GATE: PASS WITH
 | Seal commit SHA | `6a7d0ff99fd7c70d9c119aaa89d8929b2e7035d7` |
 | Seal commit message | `docs(operating): seal bf-001 Brand Identity Refresh customer-ready-with-limits` |
 | Pushed branch | `operating/design-renderer-proof-1` |
-| Branch tip (local = origin) | *(filled after tip-identity + push)* |
-| Ahead / behind | *(filled after tip-identity + push)* |
+| Branch tip (local = origin) | `a3d0e4d73e3f7d44e749488c5f1e11bd0f42246e` |
+| Ahead / behind | **0 / 0** (verified after push) |
 
 ---
 
