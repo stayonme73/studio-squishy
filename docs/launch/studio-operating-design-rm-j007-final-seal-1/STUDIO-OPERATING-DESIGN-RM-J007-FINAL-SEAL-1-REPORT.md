@@ -28,8 +28,8 @@ Visual / customer limits inherit Owner-accepted **VISUAL/PRODUCT GATE: PASS WITH
 | Seal commit SHA | `f8447db8cc8613053aa4efaac2e54c873fbc78f0` |
 | Seal commit message | `docs(operating): seal rm-j007 Reference-Guided Promotion Update customer-ready-with-limits` |
 | Pushed branch | `operating/design-renderer-proof-1` |
-| Branch tip (local = origin) | *(filled after tip-identity + push)* |
-| Ahead / behind | *(filled after tip-identity + push)* |
+| Branch tip (local = origin) | `2801b6c63808cc417aab121013da192ae7d55acb` |
+| Ahead / behind | **0 / 0** (verified after push) |
 
 ---
 
