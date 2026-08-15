@@ -228,7 +228,7 @@ describe("client intake visibility (Slice 3d-c-c)", () => {
     expect(consolidated).toHaveLength(1);
     expect(consolidated[0]?.reviewStatus).toBe("submitted");
     expect(consolidated[0]?.statusLabel).toBe("Received — under review");
-    expect(consolidated[0]?.canSubmit).toBe(false);
+    expect(consolidated[0]?.canSubmit).toBe(true);
     expect(consolidated[0]?.isPendingReview).toBe(true);
     expect(countClientIntakeMaterials(record.items)).toBe(1);
   });

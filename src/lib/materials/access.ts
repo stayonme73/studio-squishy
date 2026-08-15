@@ -43,6 +43,16 @@ export function canReviewMaterials(
   return false;
 }
 
+/** Team production path may retrieve stored customer bytes. Clients cannot. */
+export function canDownloadStoredCustomerMaterial(
+  user: StudioUser | null,
+  campaignId: string,
+  envelope?: ServerCampaignEnvelope | null,
+  assignments?: CampaignAssignmentsFile | null,
+): boolean {
+  return canReviewMaterials(user, campaignId, envelope, assignments);
+}
+
 export function isMaterialsTeamAudience(
   user: StudioUser | null,
   campaignId: string,

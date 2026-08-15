@@ -1,8 +1,12 @@
+import { NextResponse } from "next/server";
+
 import { studioCustomerLifeV1 } from "@/config/studio-customer-life-v1";
+import { studioMaterialsUploadV1 } from "@/config/studio-materials-upload-v1";
 
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
 import { isNextResponse, requireSession } from "@/lib/auth/require-session";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
+import { createServerFileRoomStorageAdapter } from "@/lib/file-storage/server";
 import {
   canReadMaterials,
   canReviewMaterials,
@@ -13,7 +17,12 @@ import {
   applyClientSubmitConsolidated,
   applyClientSubmitItem,
   applyTeamReview,
+  isFilenameOnlyFileMetadataClaim,
 } from "@/lib/materials/actions";
+import {
+  customerStoredReceiptMessage,
+  storeAndAttachCustomerMaterialFile,
+} from "@/lib/materials/client-file-store";
 import { applyExceptionStatusOnClientMaterialSubmit } from "@/lib/materials/promotion";
 import { resolveUnderlyingItemIdsForConsolidated } from "@/lib/materials/client-requests";
 import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
@@ -29,10 +38,12 @@ import { syncMaterialsSummaryOnCampaign } from "@/lib/materials/campaign-summary
 import { resolveMaterialsApiPayload } from "@/lib/materials/materials-view";
 import { getOrInitializeMaterials, writeMaterialsEnvelope } from "@/lib/materials/store";
 import { recoverPaidOperatingChain } from "@/lib/studio-paid-activation-recovery";
-import type { MaterialReviewStatus } from "@/lib/materials/types";
+import { ensureDispatchExecution } from "@/lib/studio-dispatch";
+import type { MaterialReviewStatus, ServerMaterialsEnvelope } from "@/lib/materials/types";
 import { appendMaterialActivityEvent } from "@/lib/project-activity/actions";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
+import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 
 type RouteContext = {
   params: Promise<{ campaignId: string }>;
@@ -76,6 +87,12 @@ function disableClientSubmissions<T extends { canSubmit: boolean }>(
   return requests?.map((request) => ({ ...request, canSubmit: false }));
 }
 
+function asUploadedFile(value: FormDataEntryValue | null): File | null {
+  if (!value || typeof value === "string") return null;
+  if (typeof File !== "undefined" && value instanceof File) return value;
+  return null;
+}
+
 export async function GET(request: Request, context: RouteContext) {
   const user = await requireSession(request);
   if (isNextResponse(user)) return user;
@@ -113,6 +130,98 @@ export async function GET(request: Request, context: RouteContext) {
   });
 }
 
+async function syncAfterClientSubmit(input: {
+  campaignId: string;
+  campaignEnvelope: ServerCampaignEnvelope;
+  assignments: CampaignAssignmentsFile;
+  user: StudioUser;
+  request: Request;
+  saved: ServerMaterialsEnvelope;
+  tasksEnvelope: ServerTasksEnvelope;
+  submittedItemIds: string[];
+  receiptMessage?: string;
+  headline?: string;
+  detail?: string;
+}) {
+  if (input.submittedItemIds.length > 0) {
+    const sourceId = `${input.submittedItemIds.join(",")}:${input.saved.version}`;
+    await appendMaterialActivityEvent({
+      campaignId: input.campaignId,
+      kind: "material_submitted",
+      sourceId,
+      headline: input.headline ?? "File information sent",
+      detail: input.detail ?? "We received your material submission.",
+      actor: {
+        role: input.user.roles.includes("client") ? "customer" : "staff",
+        userId: input.user.id,
+        displayName: input.user.displayName,
+      },
+    });
+  }
+
+  const clientId = resolveCampaignCommunicationClientId(
+    input.campaignEnvelope.clientUserId,
+    input.campaignEnvelope.campaignId,
+  );
+  let tasksEnvelope = input.tasksEnvelope;
+
+  if (input.submittedItemIds.length > 0) {
+    const updatedTasks = applyExceptionStatusOnClientMaterialSubmit(tasksEnvelope, input.submittedItemIds);
+    const synced = syncJobRecordsFromCampaign(
+      input.campaignEnvelope.record,
+      updatedTasks.tasks ?? [],
+      input.saved.items,
+      updatedTasks.exceptionRecords ?? [],
+      updatedTasks.jobRecords,
+    );
+    const jobs = applyWaitingOnClientPolicies(synced, input.saved.items);
+    const communicationSync = syncJobCommunicationRecords({
+      envelope: updatedTasks,
+      campaign: input.campaignEnvelope.record,
+      clientId,
+      jobs,
+      materials: input.saved.items,
+    });
+    tasksEnvelope = communicationSync.envelope;
+  }
+
+  const releaseRetry = reevaluateSystemFinalDeliveryAfterMaterialChange({
+    envelope: tasksEnvelope,
+    campaign: input.campaignEnvelope.record,
+    materials: input.saved.items,
+    clientId,
+  });
+  if (input.submittedItemIds.length > 0 || releaseRetry.releasedJobIds.length > 0) {
+    await writeTasksEnvelope(releaseRetry.envelope);
+  }
+
+  const audience = resolveMaterialsAudience(
+    input.request,
+    input.user,
+    input.campaignId,
+    input.campaignEnvelope,
+    input.assignments,
+  );
+  const payload = resolveMaterialsApiPayload(input.saved, audience, input.campaignEnvelope.record);
+  await syncMaterialsSummaryOnCampaign(input.campaignId, payload.blockingRequiredCount);
+
+  if (input.campaignEnvelope.record.paymentTruth?.status === "confirmed") {
+    const latest = await readCampaignEnvelope(input.campaignId);
+    if (latest?.record) {
+      const recovered = await recoverPaidOperatingChain(latest.record);
+      if (recovered.alreadyClear && recovered.campaign) {
+        await ensureDispatchExecution(recovered.campaign);
+      }
+    }
+  }
+
+  return NextResponse.json({
+    ...payload,
+    receiptMessage: input.receiptMessage,
+    syncedAt: input.saved.syncedAt,
+  });
+}
+
 export async function PATCH(request: Request, context: RouteContext) {
   const user = await requireSession(request);
   if (isNextResponse(user)) return user;
@@ -129,6 +238,80 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   if (!canReadMaterials(user, campaignId, campaignEnvelope, assignments)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const contentType = request.headers.get("content-type") ?? "";
+  if (contentType.includes("multipart/form-data")) {
+    if (!canSubmitMaterials(user, campaignId, campaignEnvelope)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const form = await request.formData();
+    const action = String(form.get("action") ?? "");
+    const itemId = String(form.get("itemId") ?? "").trim() || undefined;
+    const consolidatedItemId = String(form.get("consolidatedItemId") ?? "").trim() || undefined;
+    const file = asUploadedFile(form.get("file"));
+    const basisRaw = String(form.get("useAuthorizationBasis") ?? "").trim();
+    const useAuthorizationBasis =
+      basisRaw === "customer_owns" ||
+      basisRaw === "customer_has_permission" ||
+      basisRaw === "studio_generated" ||
+      basisRaw === "studio_controlled_licensed" ||
+      basisRaw === "provider_licensed"
+        ? basisRaw
+        : undefined;
+
+    if (
+      (action !== "client_submit" && action !== "client_submit_consolidated") ||
+      (action === "client_submit" && !itemId) ||
+      (action === "client_submit_consolidated" && !consolidatedItemId)
+    ) {
+      return NextResponse.json({ error: "A matching material request is required." }, { status: 400 });
+    }
+    if (!file) {
+      return NextResponse.json(
+        { error: studioMaterialsUploadV1.customerCopy.missingFile },
+        { status: 400 },
+      );
+    }
+
+    const materialsEnvelope = await getOrInitializeMaterials(campaignId, campaignEnvelope.record);
+    const tasksEnvelope = await getOrGenerateTasks(campaignId, campaignEnvelope.record);
+    const stored = await storeAndAttachCustomerMaterialFile({
+      adapter: createServerFileRoomStorageAdapter(),
+      campaign: campaignEnvelope.record,
+      campaignClientUserId: campaignEnvelope.clientUserId,
+      tasks: tasksEnvelope,
+      materials: materialsEnvelope,
+      user,
+      file,
+      itemId,
+      consolidatedItemId,
+      useAuthorizationBasis,
+    });
+    if (!stored.ok) {
+      return NextResponse.json({ error: stored.error }, { status: stored.status });
+    }
+
+    const saved = await writeMaterialsEnvelope(stored.materials);
+    await writeTasksEnvelope(stored.tasks);
+    const submittedItemIds = saved.items
+      .filter((item) => item.uploadStatus === "stored" && item.storageRef?.checksumSha256 === stored.checksumSha256)
+      .map((item) => item.id);
+
+    return syncAfterClientSubmit({
+      campaignId,
+      campaignEnvelope,
+      assignments,
+      user,
+      request,
+      saved,
+      tasksEnvelope: stored.tasks,
+      submittedItemIds,
+      receiptMessage: customerStoredReceiptMessage(stored.duplicate),
+      headline: stored.duplicate ? "File already on this project" : "We received your file",
+      detail: customerStoredReceiptMessage(stored.duplicate),
+    });
   }
 
   let body: MaterialsPatchBody;
@@ -156,6 +339,12 @@ export async function PATCH(request: Request, context: RouteContext) {
       submittedItemIds = [
         ...resolveUnderlyingItemIdsForConsolidated(materialsEnvelope, body.consolidatedItemId),
       ];
+      if (isFilenameOnlyFileMetadataClaim(body.payload, materialsEnvelope.items.filter((item) => submittedItemIds.includes(item.id)))) {
+        return NextResponse.json(
+          { error: studioMaterialsUploadV1.customerCopy.filenameOnlyRejected },
+          { status: 400 },
+        );
+      }
       result = applyClientSubmitConsolidated(
         materialsEnvelope,
         body.consolidatedItemId,
@@ -170,6 +359,13 @@ export async function PATCH(request: Request, context: RouteContext) {
       }
       if (!body.itemId || !body.payload) {
         return NextResponse.json({ error: "itemId and payload are required" }, { status: 400 });
+      }
+      const item = materialsEnvelope.items.find((entry) => entry.id === body.itemId);
+      if (item && isFilenameOnlyFileMetadataClaim(body.payload, [item])) {
+        return NextResponse.json(
+          { error: studioMaterialsUploadV1.customerCopy.filenameOnlyRejected },
+          { status: 400 },
+        );
       }
       result = applyClientSubmitItem(materialsEnvelope, body.itemId, body.payload, user);
       if (result.ok) submittedItemIds = [body.itemId];
@@ -201,22 +397,6 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const saved = await writeMaterialsEnvelope(result.envelope);
 
-  if (body.action === "client_submit" || body.action === "client_submit_consolidated") {
-    const sourceId = `${submittedItemIds.join(",")}:${saved.version}`;
-    await appendMaterialActivityEvent({
-      campaignId,
-      kind: "material_submitted",
-      sourceId,
-      headline: "File information sent",
-      detail: "We received your material submission.",
-      actor: {
-        role: user.roles.includes("client") ? "customer" : "staff",
-        userId: user.id,
-        displayName: user.displayName,
-      },
-    });
-  }
-
   if (body.action === "team_review") {
     const kind =
       body.reviewStatus === "approved_for_use"
@@ -240,61 +420,19 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
   }
 
-  const clientId = resolveCampaignCommunicationClientId(
-    campaignEnvelope.clientUserId,
-    campaignEnvelope.campaignId,
-  );
-  let tasksEnvelope = await getOrGenerateTasks(campaignId, campaignEnvelope.record);
-
-  if (submittedItemIds.length > 0) {
-    const updatedTasks = applyExceptionStatusOnClientMaterialSubmit(tasksEnvelope, submittedItemIds);
-    const synced = syncJobRecordsFromCampaign(
-      campaignEnvelope.record,
-      updatedTasks.tasks ?? [],
-      saved.items,
-      updatedTasks.exceptionRecords ?? [],
-      updatedTasks.jobRecords,
-    );
-    const jobs = applyWaitingOnClientPolicies(synced, saved.items);
-    const communicationSync = syncJobCommunicationRecords({
-      envelope: updatedTasks,
-      campaign: campaignEnvelope.record,
-      clientId,
-      jobs,
-      materials: saved.items,
-    });
-    tasksEnvelope = communicationSync.envelope;
-  }
-
-  // Rights hold cleared after customer approval → system may open Final Delivery (no re-approve).
-  const releaseRetry = reevaluateSystemFinalDeliveryAfterMaterialChange({
-    envelope: tasksEnvelope,
-    campaign: campaignEnvelope.record,
-    materials: saved.items,
-    clientId,
-  });
-  if (submittedItemIds.length > 0 || releaseRetry.releasedJobIds.length > 0) {
-    await writeTasksEnvelope(releaseRetry.envelope);
-  }
-
-  const audience = resolveMaterialsAudience(request, user, campaignId, campaignEnvelope, assignments);
-  const payload = resolveMaterialsApiPayload(saved, audience, campaignEnvelope.record);
-  await syncMaterialsSummaryOnCampaign(campaignId, payload.blockingRequiredCount);
-
-  // Server-driven paid-chain recovery when materials change.
-  if (campaignEnvelope.record.paymentTruth?.status === "confirmed") {
-    const latest = await readCampaignEnvelope(campaignId);
-    if (latest?.record) {
-      await recoverPaidOperatingChain(latest.record);
-    }
-  }
-
-  return NextResponse.json({
-    ...payload,
+  const tasksEnvelope = await getOrGenerateTasks(campaignId, campaignEnvelope.record);
+  return syncAfterClientSubmit({
+    campaignId,
+    campaignEnvelope,
+    assignments,
+    user,
+    request,
+    saved,
+    tasksEnvelope,
+    submittedItemIds,
     receiptMessage:
-      submittedItemIds.length > 0
+      submittedItemIds.length > 0 && body.action !== "team_review"
         ? studioCustomerLifeV1.customerCopy.materialReceivedAck
         : undefined,
-    syncedAt: saved.syncedAt,
   });
 }

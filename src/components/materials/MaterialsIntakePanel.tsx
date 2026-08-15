@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { materialsConfig } from "@/config/materials";
+import { studioMaterialsUploadV1 } from "@/config/studio-materials-upload-v1";
 import type { CampaignRecord } from "@/config/studio-board";
 import type {
   ClientConsolidatedRequest,
@@ -54,7 +55,7 @@ function payloadFieldsForKind(contentKind: MaterialContentKind): Array<keyof Cli
     case "url":
       return ["url", "note"];
     case "file-metadata":
-      return ["fileName", "mimeType", "note"];
+      return ["note"];
     case "confirmation":
     case "text":
     default:
@@ -195,12 +196,13 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
   const [data, setData] = useState<MaterialsClientResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showOptional, setShowOptional] = useState(false);
+  const [showOptional, setShowOptional] = useState(true);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
   const [receiptMessage, setReceiptMessage] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, ClientSubmitPayload>>({});
   const [fileSelections, setFileSelections] = useState<Record<string, FileSelectionState>>({});
+  const [chosenFiles, setChosenFiles] = useState<Record<string, File>>({});
   const materialsEndpoint = `/api/campaigns/${encodeURIComponent(campaign.campaignId)}/materials?audience=client`;
 
   const refresh = useCallback(async () => {
@@ -261,20 +263,43 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
 
   const selectFile = async (id: string, file: File | null) => {
     if (!file) return;
-    if (file.size > MATERIALS_IMAGE_PREVIEW_MAX_BYTES) {
+    if (file.size <= 0) {
+      setChosenFiles((current) => {
+        const next = { ...current };
+        delete next[id];
+        return next;
+      });
       setFileSelections((current) => ({
         ...current,
         [id]: {
           kind: "error",
           fileName: file.name,
           mimeType: file.type || "application/octet-stream",
-          message: "This file is too large. Please choose a file under 5 MB.",
+          message: studioMaterialsUploadV1.customerCopy.emptyFile,
+        },
+      }));
+      return;
+    }
+    if (file.size > MATERIALS_IMAGE_PREVIEW_MAX_BYTES) {
+      setChosenFiles((current) => {
+        const next = { ...current };
+        delete next[id];
+        return next;
+      });
+      setFileSelections((current) => ({
+        ...current,
+        [id]: {
+          kind: "error",
+          fileName: file.name,
+          mimeType: file.type || "application/octet-stream",
+          message: studioMaterialsUploadV1.customerCopy.tooLarge,
         },
       }));
       return;
     }
 
     const mimeType = file.type || "application/octet-stream";
+    setChosenFiles((current) => ({ ...current, [id]: file }));
     updateDraft(id, "fileName", file.name);
     updateDraft(id, "mimeType", mimeType);
 
@@ -285,7 +310,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
           kind: "selected",
           fileName: file.name,
           mimeType,
-          message: "File selected locally. Preview is not available for this file type.",
+          message: "File selected. Send it so the Studio can store the actual file with this project.",
         },
       }));
       return;
@@ -300,7 +325,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
           fileName: file.name,
           mimeType,
           previewDataUrl,
-          message: "Image selected locally. Send to Studio when you are ready.",
+          message: "Image selected. Send it so the Studio can store the actual file with this project.",
         },
       }));
     } catch {
@@ -316,34 +341,85 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     }
   };
 
+  const postMaterialsSubmit = async (input: {
+    id: string;
+    action: "client_submit" | "client_submit_consolidated";
+    category: MaterialCategory;
+    contentKind: MaterialContentKind;
+  }) => {
+    if (requiresUseAttestation(input.category) && !drafts[input.id]?.useAuthorizationBasis) {
+      throw new Error(materialsConfig.clientUseAuthorizationRequired);
+    }
+
+    if (input.contentKind === "file-metadata") {
+      const file = chosenFiles[input.id];
+      if (!file) {
+        throw new Error(studioMaterialsUploadV1.customerCopy.missingFile);
+      }
+      const form = new FormData();
+      form.set("action", input.action);
+      if (input.action === "client_submit_consolidated") {
+        form.set("consolidatedItemId", input.id);
+      } else {
+        form.set("itemId", input.id);
+      }
+      form.set("file", file);
+      const basis = drafts[input.id]?.useAuthorizationBasis;
+      if (basis) form.set("useAuthorizationBasis", basis);
+      const note = drafts[input.id]?.note?.trim();
+      if (note) form.set("note", note);
+      const res = await fetch(materialsEndpoint, {
+        method: "PATCH",
+        body: form,
+      });
+      const json = (await res.json()) as MaterialsClientResponse;
+      if (!res.ok) throw new Error(json.error ?? `Submit failed (${res.status})`);
+      return json;
+    }
+
+    const res = await fetch(materialsEndpoint, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        input.action === "client_submit_consolidated"
+          ? {
+              action: input.action,
+              consolidatedItemId: input.id,
+              payload: buildSubmitPayload(drafts[input.id], input.category),
+            }
+          : {
+              action: input.action,
+              itemId: input.id,
+              payload: buildSubmitPayload(drafts[input.id], input.category),
+            },
+      ),
+    });
+    const json = (await res.json()) as MaterialsClientResponse;
+    if (!res.ok) throw new Error(json.error ?? `Submit failed (${res.status})`);
+    return json;
+  };
+
+  const finishSubmit = (id: string, json: MaterialsClientResponse) => {
+    setData(json);
+    setSuccessId(id);
+    setReceiptMessage(json.receiptMessage ?? materialsConfig.clientSubmitSuccess);
+    window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
+    onSubmitted?.();
+  };
+
   const submitConsolidated = async (request: ClientConsolidatedRequest) => {
     setSubmittingId(request.id);
     setError(null);
     setSuccessId(null);
     setReceiptMessage(null);
     try {
-      if (
-        requiresUseAttestation(request.category) &&
-        !drafts[request.id]?.useAuthorizationBasis
-      ) {
-        throw new Error(materialsConfig.clientUseAuthorizationRequired);
-      }
-      const res = await fetch(materialsEndpoint, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "client_submit_consolidated",
-          consolidatedItemId: request.id,
-          payload: buildSubmitPayload(drafts[request.id], request.category),
-        }),
+      const json = await postMaterialsSubmit({
+        id: request.id,
+        action: "client_submit_consolidated",
+        category: request.category,
+        contentKind: request.contentKind,
       });
-      const json = (await res.json()) as MaterialsClientResponse;
-      if (!res.ok) throw new Error(json.error ?? `Submit failed (${res.status})`);
-      setData(json);
-      setSuccessId(request.id);
-      setReceiptMessage(json.receiptMessage ?? materialsConfig.clientSubmitSuccess);
-      window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
-      onSubmitted?.();
+      finishSubmit(request.id, json);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Submit failed.");
     } finally {
@@ -357,33 +433,24 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     setSuccessId(null);
     setReceiptMessage(null);
     try {
-      if (
-        requiresUseAttestation(request.category) &&
-        !drafts[request.id]?.useAuthorizationBasis
-      ) {
-        throw new Error(materialsConfig.clientUseAuthorizationRequired);
-      }
-      const res = await fetch(materialsEndpoint, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "client_submit",
-          itemId: request.id,
-          payload: buildSubmitPayload(drafts[request.id], request.category),
-        }),
+      const json = await postMaterialsSubmit({
+        id: request.id,
+        action: "client_submit",
+        category: request.category,
+        contentKind: request.contentKind,
       });
-      const json = (await res.json()) as MaterialsClientResponse;
-      if (!res.ok) throw new Error(json.error ?? `Submit failed (${res.status})`);
-      setData(json);
-      setSuccessId(request.id);
-      setReceiptMessage(json.receiptMessage ?? materialsConfig.clientSubmitSuccess);
-      window.dispatchEvent(new Event("studio-squishy:campaign-updated"));
-      onSubmitted?.();
+      finishSubmit(request.id, json);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Submit failed.");
     } finally {
       setSubmittingId(null);
     }
+  };
+
+  const optionalPrompt = (request: ClientOptionalRequest): string => {
+    if (request.category === "logo-brand") return studioMaterialsUploadV1.customerCopy.optionalLogoPrompt;
+    if (request.category === "photo-video") return studioMaterialsUploadV1.customerCopy.optionalPhotoPrompt;
+    return request.label;
   };
 
   if (!showPanel) return null;
@@ -528,7 +595,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                   <li key={request.id} className="sb-materials-intake__item">
                     <div className="sb-materials-intake__item-head">
                       <div className="sb-materials-intake__item-title-row">
-                        <p className="sb-materials-intake__prompt">{request.label}</p>
+                        <p className="sb-materials-intake__prompt">{optionalPrompt(request)}</p>
                         {request.isPendingReview ? (
                           <div className="sb-materials-intake__status-stack">
                             <span className="sb-materials-intake__status sb-materials-intake__status--pending">

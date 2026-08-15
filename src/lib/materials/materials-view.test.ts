@@ -109,6 +109,6 @@ describe("materials-view", () => {
     expect(payload.consolidatedRequests).toHaveLength(1);
     expect(payload.consolidatedRequests?.[0]?.statusLabel).toBe("Received — under review");
     expect(payload.consolidatedRequests?.[0]?.submittedAt).toBe("2026-01-02T12:30:00.000Z");
-    expect(payload.consolidatedRequests?.[0]?.canSubmit).toBe(false);
+    expect(payload.consolidatedRequests?.[0]?.canSubmit).toBe(true);
   });
 });

@@ -10,6 +10,7 @@ import CampaignProgressPanel from "@/components/studio-board/CampaignProgressPan
 import CampaignRecordDrawer from "@/components/studio-board/CampaignRecordDrawer";
 import CustomerVisibilityContinuityPanel from "@/components/studio-board/CustomerVisibilityContinuityPanel";
 import RouteMapProductionBriefDrawer from "@/components/route-map/RouteMapProductionBriefDrawer";
+import MaterialsIntakePanel from "@/components/materials/MaterialsIntakePanel";
 import StudioBoardMaterialsWorkflow from "@/components/studio-board/StudioBoardMaterialsWorkflow";
 import StudioBoardProjectCommunicationSection from "@/components/studio-board/StudioBoardProjectCommunicationSection";
 import StudioBoardRefundRequestSection from "@/components/studio-board/StudioBoardRefundRequestSection";
@@ -621,6 +622,9 @@ export default function StudioBoardScene() {
             movedToProduction={movedToProduction}
             onMaterialsFactsChange={handleMaterialsFactsChange}
           />
+          {boardCampaign?.paymentReceivedAt ? (
+            <MaterialsIntakePanel campaign={boardCampaign} />
+          ) : null}
         </div>
 
         <StudioBoardProjectCommunicationSection

@@ -1,5 +1,6 @@
 import type { ApprovedStudioPlanLineItem } from "@/config/studio-board";
 import { clientMaterialStatusLabel, materialCategoryLabel, materialsConfig } from "@/config/materials";
+import { studioMaterialsUploadV1 } from "@/config/studio-materials-upload-v1";
 
 import {
   clientFacingPromotionKey,
@@ -115,7 +116,12 @@ export function isClientIntakeMaterialItem(item: CampaignMaterialItem): boolean 
 }
 
 export function canClientSubmitMaterialItem(item: CampaignMaterialItem): boolean {
-  return CLIENT_SUBMIT_STATUSES.has(item.reviewStatus);
+  if (CLIENT_SUBMIT_STATUSES.has(item.reviewStatus)) return true;
+  return (
+    item.contentKind === "file-metadata" &&
+    item.reviewStatus === "submitted" &&
+    item.uploadStatus !== "stored"
+  );
 }
 
 export function consolidatedRequestId(
@@ -152,6 +158,12 @@ function clientRequestPrompt(
   item?: CampaignMaterialItem,
 ): string {
   if (item?.clientFacingPrompt?.trim()) return item.clientFacingPrompt.trim();
+  if (item?.requirementLevel === "optional" && category === "logo-brand") {
+    return studioMaterialsUploadV1.customerCopy.optionalLogoPrompt;
+  }
+  if (item?.requirementLevel === "optional" && category === "photo-video") {
+    return studioMaterialsUploadV1.customerCopy.optionalPhotoPrompt;
+  }
   const key = `${category}:${contentKind}` as keyof typeof materialsConfig.clientRequestPrompts;
   return materialsConfig.clientRequestPrompts[key] ?? `Please send your ${clientRequestLabel(category, contentKind).toLowerCase()}`;
 }

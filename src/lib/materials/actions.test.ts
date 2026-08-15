@@ -6,6 +6,7 @@ import {
   applyClientSubmitConsolidated,
   applyClientSubmitItem,
   applyTeamReview,
+  isFilenameOnlyFileMetadataClaim,
 } from "./actions";
 import type { CampaignMaterialItem, ServerMaterialsEnvelope } from "./types";
 
@@ -145,5 +146,17 @@ describe("materials actions", () => {
     );
 
     expect(result.ok).toBe(false);
+  });
+
+  it("flags filename-only file claims unless the customer said they do not have the file yet", () => {
+    expect(
+      isFilenameOnlyFileMetadataClaim({ fileName: "logo.png" }, [sampleItem()]),
+    ).toBe(true);
+    expect(
+      isFilenameOnlyFileMetadataClaim(
+        { text: "No logo. Wordmark only.", availability: "not_available_yet" },
+        [sampleItem()],
+      ),
+    ).toBe(false);
   });
 });

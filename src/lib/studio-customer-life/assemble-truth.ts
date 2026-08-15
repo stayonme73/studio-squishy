@@ -18,14 +18,16 @@ function flyerJob(tasks: CustomerLifeInput["tasks"]) {
   return tasks?.jobRecords?.find((job) => job.skuId === "v2-rtu-flyer") ?? null;
 }
 
+function isReceivedMaterial(item: NonNullable<CustomerLifeInput["materials"]>[number]): boolean {
+  if (item.contentKind === "file-metadata") {
+    return item.uploadStatus === "stored" || item.reviewStatus === "approved_for_use";
+  }
+  return item.reviewStatus === "submitted" || item.reviewStatus === "approved_for_use";
+}
+
 function countReceived(materials: CustomerLifeInput["materials"]): number {
   if (!materials) return 0;
-  return materials.filter(
-    (item) =>
-      item.uploadStatus === "stored" ||
-      item.reviewStatus === "submitted" ||
-      item.reviewStatus === "approved_for_use",
-  ).length;
+  return materials.filter(isReceivedMaterial).length;
 }
 
 function countUnusable(materials: CustomerLifeInput["materials"]): number {

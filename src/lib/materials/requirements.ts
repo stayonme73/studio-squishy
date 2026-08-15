@@ -2,6 +2,10 @@ import { getServiceById } from "@/catalog/accessors";
 import type { ServiceId } from "@/catalog/types";
 import { materialCategoryLabel } from "@/config/materials";
 import type { ApprovedStudioPlanLineItem, CampaignRecord } from "@/config/studio-board";
+import {
+  FLYER_PROOF_CONTRACT,
+  isDesignRendererProofSku,
+} from "@/lib/studio-design-renderer";
 
 import type { MaterialCategory, MaterialRequirementLevel, MaterialSlotDefinition } from "./types";
 
@@ -81,23 +85,41 @@ function resolveCategoriesForLineItem(lineItem: ApprovedStudioPlanLineItem): Mat
     }
   }
 
-  return ALL_CATEGORIES.filter((category) => categories.has(category));
-}
+  /**
+   * Sealed flyer law: customer logo is not required; wordmark-only is allowed.
+   * Distribution copy about finished files is not an intake document request.
+   */
+  if (isDesignRendererProofSku(lineItem.skuId) && !FLYER_PROOF_CONTRACT.customerLogoRequired) {
+    categories.delete("document-reference");
+    categories.delete("access-instructions");
+    categories.delete("factual-confirmation");
+  }
 
-function slotLabel(category: MaterialCategory): string {
-  return materialCategoryLabel(category);
+  return ALL_CATEGORIES.filter((category) => categories.has(category));
 }
 
 function requirementLevelForCategory(
   category: MaterialCategory,
   requiresMaterials: boolean,
   requiresAccess: boolean,
+  skuId: ServiceId,
 ): MaterialRequirementLevel {
+  if (
+    isDesignRendererProofSku(skuId) &&
+    !FLYER_PROOF_CONTRACT.customerLogoRequired &&
+    (category === "logo-brand" || category === "photo-video")
+  ) {
+    return "optional";
+  }
   if (category === "access-instructions" && requiresAccess) return "required";
   if (category === "url-link" && requiresAccess && !requiresMaterials) return "required";
   if (requiresMaterials && category !== "other") return "required";
   if (requiresAccess && category === "url-link") return "required";
   return "optional";
+}
+
+function slotLabel(category: MaterialCategory): string {
+  return materialCategoryLabel(category);
 }
 
 function slotKey(category: MaterialCategory, serviceId: ServiceId): string {
@@ -133,6 +155,7 @@ export function resolveMaterialSlotsFromCampaign(
           category,
           catalog.requiresClientMaterials,
           catalog.requiresClientAccess,
+          lineItem.skuId,
         ),
         relatedServiceIds: [lineItem.skuId],
       });

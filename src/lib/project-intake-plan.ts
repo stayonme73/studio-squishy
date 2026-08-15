@@ -97,10 +97,10 @@ export function buildProjectIntakePlan(
             field: {
               ...field,
               id: "materials",
-              label: "Logo, photos, colors, or brand references",
+              label: field.label,
               hint:
                 field.hint ??
-                "Describe filenames, links, or brand notes you have. If you do not have materials yet, say so — do not invent files. Files are not uploaded on this form.",
+                "Describe filenames, links, or brand notes you have. If you do not have materials yet, say so — do not invent files. You can send an actual file from your Studio Board after this form.",
             },
           });
         } else {

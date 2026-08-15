@@ -439,7 +439,9 @@ function StudioBoardMaterialsWorkflowActive({
       request,
     }));
     const visible = [...consolidated, ...optional];
-    if (!socialPostsCampaign) return visible;
+    if (!socialPostsCampaign) {
+      return visible.filter(({ request }) => request.contentKind !== "file-metadata");
+    }
     return visible.filter(({ request }) => !shouldHideSocialPostsRequest(request));
   }, [data?.consolidatedRequests, data?.optionalRequests, socialPostsCampaign]);
 

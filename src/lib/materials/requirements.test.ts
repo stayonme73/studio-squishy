@@ -205,4 +205,55 @@ describe("resolveMaterialSlotsFromCampaign", () => {
     expect(slots.some((slot) => slot.category === "url-link")).toBe(true);
     expect(slots.every((slot) => slot.reason === "Copy Project")).toBe(true);
   });
+
+  it("does not require a customer logo or photos for the sealed wordmark-only flyer", () => {
+    const slots = resolveMaterialSlotsFromCampaign(
+      buildCampaign([
+        {
+          skuId: "v2-rtu-flyer",
+          serviceName: "Make Me a Flyer",
+          billingType: "one_time",
+          exactPriceCents: 6900,
+          priceDisplay: "$69",
+          deliverables: ["One flyer"],
+          exclusions: [],
+          timingWindowLabel: "3–5 days",
+          revisionRule: "1 round",
+          clientResponsibilities: [
+            "Final wording, prices, logo, images, and contact details you want on the flyer",
+            "Print, upload, post, email, or distribute the finished files yourself",
+          ],
+          executionResponsibility: "studio",
+        },
+      ]),
+    );
+
+    expect(slots.some((slot) => slot.category === "document-reference")).toBe(false);
+    expect(slots.some((slot) => slot.category === "access-instructions")).toBe(false);
+    expect(slots.find((slot) => slot.category === "logo-brand")?.requirementLevel).toBe("optional");
+    expect(slots.find((slot) => slot.category === "photo-video")?.requirementLevel).toBe("optional");
+    expect(slots.every((slot) => slot.requirementLevel !== "required")).toBe(true);
+  });
+
+  it("keeps Brand Foundation logo required", () => {
+    const slots = resolveMaterialSlotsFromCampaign(
+      buildCampaign([
+        {
+          skuId: "bf-001",
+          serviceName: "Brand Foundation",
+          billingType: "one_time",
+          exactPriceCents: 50000,
+          priceDisplay: "$500",
+          deliverables: ["Brand guide PDF"],
+          exclusions: [],
+          timingWindowLabel: "2 weeks",
+          revisionRule: "1 round",
+          clientResponsibilities: ["Existing logo files if available"],
+          executionResponsibility: "studio",
+        },
+      ]),
+    );
+
+    expect(slots.find((slot) => slot.category === "logo-brand")?.requirementLevel).toBe("required");
+  });
 });

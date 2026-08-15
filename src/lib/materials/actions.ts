@@ -67,7 +67,11 @@ function applyPayloadToItem(
   if (payload.url?.trim()) patch.url = payload.url.trim();
   if (payload.fileName?.trim()) patch.fileName = payload.fileName.trim();
   if (payload.mimeType?.trim()) patch.mimeType = payload.mimeType.trim();
-  if (item.contentKind === "file-metadata" && payload.fileName?.trim()) {
+  if (
+    item.contentKind === "file-metadata" &&
+    payload.fileName?.trim() &&
+    payload.availability !== "not_available_yet"
+  ) {
     patch.storageRef = createReferenceOnlyStorageRef({
       reference: payload.url?.trim() || payload.fileName.trim(),
       displayLabel: payload.fileName.trim(),
@@ -130,6 +134,15 @@ function updateItems(
     version: record.version + 1,
     items: record.items.map((item) => (idSet.has(item.id) ? updater(item) : item)),
   };
+}
+
+/** Filename + MIME is not receipt. Real bytes must be stored via multipart upload. */
+export function isFilenameOnlyFileMetadataClaim(
+  payload: ClientSubmitPayload,
+  items: readonly CampaignMaterialItem[],
+): boolean {
+  if (payload.availability === "not_available_yet") return false;
+  return items.some((item) => item.contentKind === "file-metadata");
 }
 
 export function applyClientSubmitConsolidated(

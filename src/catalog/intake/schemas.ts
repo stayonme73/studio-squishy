@@ -585,12 +585,12 @@ export const ROUTE_MAP_INTAKE_SCHEMAS: Record<RouteMapIntakeTemplateId, RouteMap
       },
       {
         id: "materials",
-        label: "Logo, photos, colors, or brand references",
+        label: "Brand references you already have — or say you are using wordmark only",
         type: "textarea",
         required: true,
         role: "materials",
-        hint: "Describe filenames, links, or brand notes you have. If you do not have materials yet, say so — do not invent files. Files are not uploaded on this form.",
-        placeholder: "Example: logo named store-mark.png, or brand colors from our site.",
+        hint: "A logo is not required for this flyer. If you have a logo or photo, name it here. If you do not, write that you want the business name set as a wordmark. You can send an actual file from your Studio Board after this form. Do not invent files.",
+        placeholder: "Example: no logo and no photos — please use Cedar & Bloom Home Organizing as a wordmark.",
       },
       {
         id: "intendedUse",

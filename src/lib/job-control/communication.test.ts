@@ -179,7 +179,17 @@ describe("job communication outbox", () => {
     const result = syncFor(
       record,
       envelope([waitingFlyer, reviewSocial]),
-      [material("ma-flyer-v2", "2026-06-30T12:00:00.000Z", "submitted")],
+      [
+        {
+          ...material("ma-flyer-v2", "2026-06-30T12:00:00.000Z", "submitted"),
+          uploadStatus: "stored",
+          useAuthorization: {
+            basis: "customer_has_permission",
+            attestedAt: NOW,
+            attestedBy: { role: "client", userId: CLIENT_ID, displayName: "Client" },
+          },
+        },
+      ],
     );
 
     expect(result.jobs.find((job) => job.skuId === "ma-flyer-v2")?.spineStatus).toBe("ready_for_queue");

@@ -71,9 +71,7 @@ describe("buildProjectIntakeTabletStatus", () => {
       copy,
     });
     expect(partial.completed).toContain("Business name");
-    expect(partial.completed).toContain(
-      "Logo, photos, colors, or brand references",
-    );
+    expect(partial.completed).toContain("Logo and brand color references");
     expect(partial.stillNeeded).not.toContain("Business name");
     expect(partial.stillNeeded).toContain("Phone number");
   });
@@ -133,9 +131,7 @@ describe("buildProjectIntakeTabletStatus", () => {
     expect(later.ready).toBe(true);
     expect(later.hasMaterialsDeferred).toBe(true);
     expect(later.nextLine).toBe(copy.nextReadyMaterialsLater);
-    expect(later.stillNeeded).not.toContain(
-      "Logo, photos, colors, or brand references",
-    );
+    expect(later.stillNeeded).not.toContain("Logo and brand color references");
   });
 
   it("uses ready Next line when all required are satisfied without deferred materials description", () => {

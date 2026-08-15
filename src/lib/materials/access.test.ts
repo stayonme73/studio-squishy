@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
 
-import { canReadMaterials, canReviewMaterials, canSubmitMaterials } from "./access";
+import {
+  canDownloadStoredCustomerMaterial,
+  canReadMaterials,
+  canReviewMaterials,
+  canSubmitMaterials,
+} from "./access";
 
 const owner: StudioUser = {
   id: "owner-1",
@@ -75,5 +80,19 @@ describe("materials access", () => {
     expect(canReviewMaterials(staff, "campaign-b", undefined, assignments)).toBe(true);
     expect(canReviewMaterials(staff, "campaign-a", envelope, assignments)).toBe(false);
     expect(canReviewMaterials(client, "campaign-a", envelope)).toBe(false);
+  });
+
+  it("lets only the production team retrieve stored customer bytes", () => {
+    expect(canDownloadStoredCustomerMaterial(owner, "campaign-a", envelope, assignments)).toBe(true);
+    expect(canDownloadStoredCustomerMaterial(staff, "campaign-a", envelope, assignments)).toBe(false);
+    expect(canDownloadStoredCustomerMaterial(client, "campaign-a", envelope)).toBe(false);
+    const otherClient: StudioUser = {
+      ...client,
+      id: "client-2",
+      email: "other@local.dev",
+      currentCampaignId: "campaign-b",
+    };
+    expect(canDownloadStoredCustomerMaterial(otherClient, "campaign-a", envelope)).toBe(false);
+    expect(canReadMaterials(otherClient, "campaign-a", envelope)).toBe(false);
   });
 });
