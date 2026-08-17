@@ -211,6 +211,12 @@ The previous stacking finding is **resolved**, not carried as an open defect.
 - `scripts/studio-operating-room-1-whole-customer-life-torture-test-1-board-walk.mts`
 - Evidence + shots + flyer artifacts under this folder
 
-**Park commit:** `9f58d41` on `operating/design-renderer-proof-1`. Push sync recorded after this note.
+**Park commit:** `9f58d41` on `operating/design-renderer-proof-1`. Push sync recorded after this note. Authoritative executable tip after Manager accepted the walk: **`a49efd7`**. Abandoned 3067 startup attempts do not count.
 
-**Next:** Manager gate. Stay in Room 1. Do not open Owner Console or Room 2 unless Tagia closes this room after deciding what branded email remaining as the deferred prerequisite means for Room 1 closeout.
+---
+
+## Addendum — Tagia Room 1 closeout call (2026-08-17)
+
+Room 1 is **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL**. No full CLOSED stamp. Executable/testable customer-life work stands at **`a49efd7`**. The yellow sticky remains `d6974eb` and **does not block Room 2**. Do not reopen this torture package unless new evidence proves an actual defect.
+
+Room 2 entry is recorded separately: `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1`.

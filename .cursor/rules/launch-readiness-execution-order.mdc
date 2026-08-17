@@ -9,18 +9,18 @@ Authority: `docs/launch-readiness-execution-order-v1-locked.md` · `src/config/s
 
 This is sequence control, **not** permission to start multiple packages.
 
-**Active room is 1 — Customer Life + Communication.** It is **not closed.**
+**Active room is 2 — Customer-facing truth + friction cleanup.** First section: `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1`. Park for Manager. Do not auto-advance.
 
-**COME BACK LATER:** live Resend / branded sender / inbox proof is **PARKED WITH EXTERNAL PREREQUISITE** (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1` @ `d6974eb`). Not closed. Do not fake. Resume that same package after Studio domain + business-email identity. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`.
+**Room 1 is COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL.** It is **not** a full CLOSED stamp. Authoritative executable tip: `a49efd7`. Abandoned 3067 attempts do not count.
 
-Current Room 1 section: whole-customer torture test is **PARKED FOR MANAGER**. Tests green is not close. Stay in room 1.
+**COME BACK LATER:** live Resend / branded sender / inbox proof is **PARKED WITH EXTERNAL PREREQUISITE** (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1` @ `d6974eb`). Not closed. Do not fake. This yellow sticky **does not block Room 2**. Do not reopen it from Room 2. Resume that same package after Studio domain + business-email identity. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`.
 
-Do **not** start rooms 2–5 (friction cleanup, Owner Console, full rehearsal, soft opening) while room 1 has unresolved launch blockers or important customer-flow defects.
+Do **not** start Owner Console or rooms 3–5. Do not reopen completed Room 1 capabilities unless new evidence proves an actual defect.
 
-Close a section only after: BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST.
+Close a section only after: BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST. Room 2 uses: CUSTOMER-USE → FIND FRICTION/TRUTH DEFECTS → FIX → BREAK → RETEST → CLOSE SECTION. Visual redesign spree is forbidden.
 
 Do **not** use: BUILD → TESTS GREEN → NEXT.
 
 No parallel package jumping. No unrelated improvements. No merge unless separately authorized.
 
-If a new issue is found: current room → fix before leaving; sealed earlier room → report and repair narrowly; later room → record, do not jump ahead.
+If a new issue is found: current room → fix before leaving; sealed earlier room → report and repair narrowly; later-room issue → record, do not jump ahead.

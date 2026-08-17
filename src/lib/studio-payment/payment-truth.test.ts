@@ -14,6 +14,7 @@ import { isDeveloperCheckoutSandboxVisible } from "./hosted-checkout-ui";
 import { writeCheckoutSessionBinding } from "./events-store";
 import { confirmSandboxCheckoutSession } from "./sandbox-confirm";
 import { handleStripeWebhook } from "./webhook";
+import { studioPaymentV1 } from "@/config/studio-payment-v1";
 import { mergeCustomerOwnedCampaignSync } from "@/lib/campaign-store/customer-sync-allowlist";
 import { upsertCampaignRecord, readCampaignEnvelope } from "@/lib/campaign-store/store";
 import { evaluatePreAcceptance } from "@/lib/studio-pre-acceptance/evaluate";
@@ -150,6 +151,8 @@ describe("STUDIO-OPERATING-PAYMENT-TRUTH-1", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).toBe("processor_credentials_invalid");
+    expect(result.message).toBe(studioPaymentV1.customerCopy.processorCredentialsInvalid);
+    expect(result.message).not.toMatch(/STRIPE_SECRET_KEY|sk_test_|sk_live_/);
   });
 
   it("creates sandbox session then confirms paid truth only when preferSandbox", async () => {
@@ -379,6 +382,8 @@ describe("STUDIO-OPERATING-PAYMENT-TRUTH-1", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error).toBe("processor_session_failed");
+    expect(result.message).toBe(studioPaymentV1.customerCopy.processorSessionFailed);
+    expect(result.message).not.toMatch(/Invalid API Key|credentials|STRIPE_/i);
     expect(create).toHaveBeenCalledOnce();
   });
 

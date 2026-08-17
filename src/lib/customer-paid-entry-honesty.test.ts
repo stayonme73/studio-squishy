@@ -13,15 +13,18 @@ describe("STUDIO-OPERATING-CUSTOMER-PAID-ENTRY-REPAIR-1 honesty", () => {
     );
     expect(conversationRoomGuideV1.checkoutTaxesFeesNote).toMatch(/Stripe/i);
     expect(payment.form.paymentSecurityNote).toMatch(/Stripe/i);
+    expect(payment.whatsNext.emailReassurance).not.toMatch(/this build/i);
+    expect(payment.whatsNext.emailReassurance).toMatch(/source of truth/i);
   });
 
-  it("uses Continue to secure checkout, not a fake in-Studio card form", () => {
-    expect(conversationRoomGuideV1.checkoutOpenPanelCta).toBe(
-      payment.form.submitLabel,
-    );
+  it("uses Continue to secure checkout for Stripe, not a fake in-Studio card form", () => {
     expect(conversationRoomGuideV1.checkoutCompleteCta).toBe(
       payment.form.submitLabel,
     );
+    expect(conversationRoomGuideV1.checkoutOpenPanelCta).not.toBe(
+      payment.form.submitLabel,
+    );
+    expect(conversationRoomGuideV1.checkoutOpenPanelCta).toMatch(/open checkout/i);
     expect(conversationRoomGuideV1.checkoutOpenPanelCta).not.toMatch(
       /show payment form/i,
     );

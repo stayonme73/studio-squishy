@@ -514,10 +514,7 @@ export async function createCheckoutSession(
     return {
       ok: false,
       error: "processor_credentials_invalid",
-      message:
-        process.env.NODE_ENV === "development"
-          ? `${studioPaymentV1.customerCopy.processorCredentialsInvalid} ${keyStatus.hint}`
-          : studioPaymentV1.customerCopy.processorCredentialsInvalid,
+      message: studioPaymentV1.customerCopy.processorCredentialsInvalid,
     };
   }
 
@@ -575,21 +572,11 @@ export async function createCheckoutSession(
         },
       },
     });
-  } catch (error) {
-    const stripeMessage =
-      error &&
-      typeof error === "object" &&
-      "message" in error &&
-      typeof (error as { message: unknown }).message === "string"
-        ? (error as { message: string }).message
-        : null;
+  } catch {
     return {
       ok: false,
       error: "processor_session_failed",
-      message:
-        process.env.NODE_ENV === "development" && stripeMessage
-          ? `${studioPaymentV1.customerCopy.processorSessionFailed} (${stripeMessage})`
-          : studioPaymentV1.customerCopy.processorSessionFailed,
+      message: studioPaymentV1.customerCopy.processorSessionFailed,
     };
   }
 
@@ -597,7 +584,7 @@ export async function createCheckoutSession(
     return {
       ok: false,
       error: "processor_session_failed",
-      message: "Stripe did not return a Checkout Session URL.",
+      message: studioPaymentV1.customerCopy.processorSessionFailed,
     };
   }
 

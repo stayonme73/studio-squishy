@@ -20,7 +20,7 @@ export const PROJECT_BUILDER_V1 = {
   backToRouteMapLabel: "Back to Route Map",
   routeContextEyebrow: "Your route",
   checkoutNotLiveNote:
-    "Checkout in this build records your Studio Plan locally and continues you to Project Intake. Card payment processing is not connected yet.",
+    "Continue to checkout to review your Studio Plan and pay on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms payment.",
   emptySelectionHint:
     "Select at least one service to review your Studio Plan. Timeline is reviewed before checkout.",
   reviewStudioPlanReadyHint:

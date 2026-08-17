@@ -5,7 +5,7 @@ import { getStudioGuideV1Package } from "@/config/studio-guide-v1-lock";
 
 export const payment = {
   brand: "THE STUDIO",
-  /** Customer-facing page title — honest for non-live card processing. */
+  /** Customer-facing page title — confirm the plan, then continue to Stripe. */
   pageTitle: "Review and Confirm",
   pageLeadLines: [
     "Review your Studio Plan, then continue to secure checkout.",
@@ -34,7 +34,7 @@ export const payment = {
     monthlySubtotalLabel: "Monthly Subtotal",
     amountDueTodayLabel: "Estimated Investment",
     cardProcessingDisclosureNote:
-      "Estimated Investment reflects your selected services. The amount charged is confirmed server-side with Stripe.",
+      "Estimated Investment reflects your selected services. The amount charged is confirmed with Stripe.",
     investmentLabel: "Estimated Investment",
     monthlyTotalLabel: "Monthly Total",
     includesLabel: "Includes:",
@@ -92,7 +92,7 @@ export const payment = {
       { label: "Final delivery", marker: "number" },
     ] as const,
     emailReassurance:
-      "You can follow project status on your Studio Board after Project Intake. Automated stage emails are not sent in this build.",
+      "You can follow project status on your Studio Board after Project Intake. Email notices are a courtesy. Your Studio Board is the source of truth.",
   },
   secureNote:
     "Payment truth comes from Stripe confirmation. The success return page is not fulfillment by itself.",

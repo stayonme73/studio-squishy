@@ -41,7 +41,7 @@ Do **freeze business rules** unless validated by real customer experience or an 
 - Studio Review → Voice Tablet Migration — see **Studio Review Migration** block below (`docs/studio-review-to-voice-tablet-migration-v1-locked.md`, `src/config/studio-review-voice-tablet-migration-v1.ts`). Studio Review stays as working reference; remove one page at a time only after full tablet integration + cert gates. Update the ledger on every Voice-tablet package. Do not modify without Tagia approval.
 - Build Your Project — pre-purchase workspace at `/project-builder` (`docs/project-builder-production-pattern-v1-locked.md`) — **locked 2026-07-11:** service card pattern, Learn More drawer sections, button behavior (Remove never primary), Project Summary placement, Best For header, Squishy message philosophy, one-screen workspace; reuse as template for remaining pre-purchase pages; do not modify without Tagia approval
 - Studio Plan Pre-Checkout Flexibility (`docs/studio-plan-pre-checkout-flexibility-v1-locked.md`, `src/config/studio-plan-pre-checkout-flexibility-v1.ts`) — **LOCKED:** free refine before checkout; checkout confirms scope; after checkout, additions/removals are Project Changes — not silent edits. Studio Voice explains freedom on Studio Plan and the purchased-scope boundary before payment. Do not modify without Tagia approval.
-- Launch readiness execution order (`docs/launch-readiness-execution-order-v1-locked.md`, `src/config/studio-launch-readiness-execution-order-v1.ts`) — **LOCKED 2026-08-15:** one active room at a time; do not skip ahead; technical PASS is not close. Current room is **1. Customer Life + Communication** until actually closed. Live Resend / branded sender / inbox proof is **PARKED WITH EXTERNAL PREREQUISITE** (`d6974eb`) — not closed, do not fake. Rooms 2–5 wait. Do not modify the room order without Tagia approval.
+- Launch readiness execution order (`docs/launch-readiness-execution-order-v1-locked.md`, `src/config/studio-launch-readiness-execution-order-v1.ts`) — **LOCKED 2026-08-15:** one active room at a time; do not skip ahead; technical PASS is not close. **Tagia closeout call 2026-08-17:** Room 1 is **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL** — not a full CLOSED stamp. Authoritative executable tip `a49efd7`. Live Resend / branded sender / inbox proof remains **PARKED WITH EXTERNAL PREREQUISITE** (`d6974eb`) — not closed, do not fake, **does not block Room 2**. Current execution room is **2. Customer-facing truth + friction cleanup**. Do not start Owner Console or rooms 3–5. Do not modify the room order without Tagia approval.
 
 **Browser zoom standard:** If a customer has to change their browser zoom to use The Studio, it's a bug.
 
@@ -61,8 +61,8 @@ Sequence control, **not** authorization to start multiple packages. One active r
 
 | # | Room | Enter when |
 |---|------|------------|
-| 1 | Customer Life + Communication | **Current. Stay until actually closed.** |
-| 2 | Customer-facing truth + friction cleanup | Only after #1 is closed |
+| 1 | Customer Life + Communication | **COMPLETE EXCEPT DEFERRED EMAIL.** Not a full CLOSED stamp. Yellow sticky at `d6974eb` does not block Room 2. |
+| 2 | Customer-facing truth + friction cleanup | **Current.** Tagia authorized 2026-08-17 despite Room 1 remaining open for email only. |
 | 3 | Owner Console | Only after #2 is closed |
 | 4 | Full business rehearsal | Only after #3 is closed |
 | 5 | Soft-opening preparation | Only after #4 passes |
@@ -71,7 +71,7 @@ Room 1 includes intake/materials, real upload storage/retrieval, Machine↔team 
 
 A section closes only after **BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST**. Never **BUILD → TESTS GREEN → NEXT**. Do not silently carry launch blockers into the next room.
 
-**Current board:** Room 1 is **not closed.** **COME BACK LATER:** live Resend / branded sender / inbox proof is PARKED WITH EXTERNAL PREREQUISITE at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`) — not closed, do not fake. Torture test `STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1` is **PARKED FOR MANAGER**, not a Room 1 close. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. Do not start rooms 2–5. No merge unless separately authorized.
+**Current board:** Room 1 is **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL** — not a full CLOSED stamp. Authoritative executable torture-test tip `a49efd7`. Abandoned 3067 attempts do not count. **COME BACK LATER:** live Resend / branded sender / inbox proof is PARKED WITH EXTERNAL PREREQUISITE at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`) — not closed, do not fake, **does not block Room 2**. Current execution: Room 2 entry `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1` — park for Manager; do not auto-advance. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. Do not start Owner Console or rooms 3–5. Do not reopen completed Room 1 capabilities unless new evidence. No merge unless separately authorized.
 <!-- END:launch-readiness-execution-order -->
 
 <!-- BEGIN:conversation-room-machine-contract -->

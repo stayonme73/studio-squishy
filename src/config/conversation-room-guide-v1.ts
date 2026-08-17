@@ -174,7 +174,7 @@ export const conversationRoomGuideV1 = {
   checkoutTabletTitle: "Checkout",
   checkoutTabletLead:
     "Before you pay, confirm your services and total. After payment, the purchased scope is fixed — later changes follow the Project Change process. Intake comes next after payment.",
-  checkoutOpenPanelCta: "Continue to secure checkout",
+  checkoutOpenPanelCta: "Open checkout",
   checkoutTaxesFeesNote:
     "You will complete payment on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms the payment.",
   /**

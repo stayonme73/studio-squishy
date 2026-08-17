@@ -116,7 +116,7 @@ describe("plan-pricing", () => {
 describe("card processing disclosure", () => {
   it("exposes the card processing disclosure note in payment config", () => {
     expect(payment.summary.cardProcessingDisclosureNote).toBe(
-      "Estimated Investment reflects your selected services. Live card processing is not connected in this build.",
+      "Estimated Investment reflects your selected services. The amount charged is confirmed with Stripe.",
     );
   });
 });

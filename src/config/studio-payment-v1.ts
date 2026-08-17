@@ -40,9 +40,9 @@ export const studioPaymentV1 = {
     processorNotConfigured:
       "Card payment is not ready yet. Please try again later or contact The Studio.",
     processorCredentialsInvalid:
-      "Stripe Checkout cannot open because the Studio’s Stripe secret key is missing or not a valid secret key (sk_test_… / sk_live_…). Update STRIPE_SECRET_KEY in the server environment, then restart the app.",
+      "Card payment could not open. Please try again later or contact The Studio.",
     processorSessionFailed:
-      "Stripe could not start Checkout. Your project is still saved — check Stripe credentials and try again.",
+      "Checkout could not start. Your project is still saved — try again later or contact The Studio.",
     clearRequired:
       "Your project needs a clear go-ahead before checkout can open. Return to Studio Plan to resolve what is still open.",
     amountInvalid:

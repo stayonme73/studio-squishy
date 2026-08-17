@@ -16,9 +16,17 @@ SCOUT — STANDING EXECUTION ORDER FOR LAUNCH READINESS
 This is a sequence-control instruction, not authorization to start multiple packages at once.
 From this point forward, The Studio follows this order and does not skip ahead.
 CURRENT ACTIVE ROOM
-1. CUSTOMER LIFE + COMMUNICATION
-Stay here until the full launch-scope customer journey is actually closed.
-Required areas inside this room:
+2. CUSTOMER-FACING TRUTH + FRICTION CLEANUP
+Tagia closeout call 2026-08-17: Room 1 stays technically OPEN solely for the deferred domain/email sticky (`d6974eb`). That prerequisite does **not** block Room 2. Room 1 does **not** receive a full CLOSED stamp.
+Executable Room 1 customer-life work stands at authoritative torture-test tip `a49efd7`. Abandoned 3067 attempts do not count.
+Do not leave this room because technical tests are green.
+A section closes only after:
+CUSTOMER-USE → FIND FRICTION/TRUTH DEFECTS → FIX → BREAK → RETEST
+Repeat until launch-scope blockers and important friction inside that section are resolved or explicitly accepted as a truthful launch limit.
+Do not silently carry launch blockers into the next room.
+Do not start Owner Console.
+ROOM 1 REMAINING (yellow sticky, not current execution)
+Customer-life work listed below is complete for launch-scope execution except branded domain/email identity. Do not reopen those capabilities unless new evidence proves a real defect.
 Intake + materials
 real upload/storage/retrieval behavior
 Machine ↔ team execution handoff
@@ -26,7 +34,7 @@ Studio Voice ↔ Machine ↔ customer communication
 customer questions during the project
 Studio asking customer for information
 acknowledgements
-Resend / customer lifecycle email
+Resend / customer lifecycle email — still parked at `d6974eb`
 Review
 revisions
 re-review
@@ -35,13 +43,9 @@ exact Final Delivery
 return-later continuity
 stalls / retries / watchdog behavior
 wrong uploads / duplicate uploads / failed notification / timeout / QA failure / stale-version attempts
-Do not leave this room because technical tests are green.
-A section closes only after:
-BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST
-Repeat until launch-scope blockers and important friction inside that section are resolved or explicitly accepted as a truthful launch limit.
-Do not silently carry launch blockers into the next room.
-NEXT ROOM, ONLY AFTER #1 IS CLOSED
-2. CUSTOMER-FACING TRUTH + FRICTION CLEANUP
+NEXT ROOM, ONLY AFTER #1 IS CLOSED — **exception authorized 2026-08-17**
+Room 1 is not fully closed. Tagia authorized Room 2 anyway because the only remaining Room 1 item is an external domain/email prerequisite, not a customer-life defect.
+2. CUSTOMER-FACING TRUTH + FRICTION CLEANUP — **CURRENT**
 Clean customer-visible residue found during the Maya runs:
 stale terminology
 contradictory wording/status
@@ -86,8 +90,9 @@ Do not use:
 BUILD → TESTS GREEN → NEXT
 Technical PASS alone is not enough.
 CURRENT PRIORITY RULE
-The active room is always the highest unfinished room above.
-Do not start work in a later room while the current room has an unresolved launch blocker or important customer-flow defect.
+The active execution room is always the highest unfinished room above, except the Tagia 2026-08-17 authorization: Room 1 remains open solely for deferred domain/email and that sticky must not block Room 2.
+Do not start Owner Console or rooms 3–5 while Room 2 is open.
+Do not start work in a later room while the current execution room has an unresolved launch blocker or important customer-flow defect.
 Do not reopen earlier sealed work unless new evidence proves a real defect.
 No parallel package jumping.
 No unrelated improvements.
@@ -107,18 +112,12 @@ Keep this sequence as the standing roadmap for all future launch work unless Tag
 
 | Room | Status |
 |------|--------|
-| 1. Customer Life + Communication | **ACTIVE — not closed.** Come-back-later: live Resend / branded sender / inbox proof is **PARKED WITH EXTERNAL PREREQUISITE** at `d6974eb`. Not closed. Do not fake. Whole-customer torture test is **PARKED FOR MANAGER** (`STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1`) — not a Room 1 close. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. |
-| 2. Customer-facing truth + friction cleanup | Not started. Do not enter. |
+| 1. Customer Life + Communication | **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL.** Not a full CLOSED stamp. Authoritative executable tip `a49efd7`. Yellow sticky: branded email/domain at `d6974eb`. Does **not** block Room 2. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. |
+| 2. Customer-facing truth + friction cleanup | **ACTIVE.** First section: `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1`. Park for Manager. Do not auto-advance. Do not start Owner Console. |
 | 3. Owner Console | Not started. Do not enter. |
 | 4. Full business rehearsal | Not started. Do not enter. |
 | 5. Soft-opening preparation | Not started. Do not enter. |
 
-**COME BACK LATER (Room 1 — not a green check):** The Studio does not yet have a purchased and verified business domain or business email identity. Deferred until then: branded sender certification, real inbox delivery proof, live provider reject/retry against the final Studio sender. Return to the same Resend package when Owner establishes that identity.
+**COME BACK LATER (Room 1 yellow sticky — does not block Room 2):** The Studio does not yet have a purchased and verified business domain or business email identity. Deferred until then: branded sender certification, real inbox delivery proof, live provider reject/retry against the final Studio sender. Return to the same Resend package when Owner establishes that identity. Do not fake. Do not reopen from Room 2.
 
-Launch blockers still inside Room 1 (not silently accepted as launch limits unless Tagia says so):
-
-- **Live customer lifecycle email certification** — parked with external prerequisite above. Queued notices + Resend adapter remain wired; Board/Voice stay source of truth.
-- Seeded required logo/photo slots can mislead vs wordmark-only flyer SKU law.
-- Whole-customer torture test is **PARKED FOR MANAGER**, not a Room 1 close. Email still COME BACK LATER at `d6974eb`.
-
-Do not start Room 2–5 from this document.
+Do **not** reopen completed Room 1 capabilities unless new evidence proves an actual defect. Do not start Owner Console or Rooms 3–5. No merge unless separately authorized.

@@ -1,17 +1,35 @@
 # Room 1 — Customer Life + Communication closeout
 
 **Room:** 1  
-**Room closed:** **NO**  
+**Room closed:** **NO** — no full CLOSED stamp  
+**Status:** **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL PREREQUISITE**  
+**Closeout call:** Tagia, 2026-08-17  
 **Merge:** no  
-**Do not start:** Owner Console · Rooms 2–5
+**Do not start:** Owner Console · Rooms 3–5  
+**Room 2:** **authorized.** The deferred email sticky does not block it.
 
-This is the Room 1 closeout ledger. It is **not** a green check. Technical tests passing do not close the room.
+This is the Room 1 closeout ledger. It is **not** a green check and **not** a full CLOSED stamp.
 
 ---
 
-## COME BACK LATER — live customer lifecycle email
+## Authoritative executable result
 
-> **FLAG: PARKED WITH EXTERNAL PREREQUISITE. NOT CLOSED. DO NOT FAKE.**
+All currently executable/testable customer-life work is complete through the Maya torture-test tip:
+
+**`a49efd7`**
+
+Voice summary correction (`9f58d41`) and the successful Maya walk stand.
+
+Abandoned **3067** startup attempts are **non-authoritative**. They do not count and do not reopen anything.
+
+Do **not** reopen payment, uploads, Voice, production, QA, Review, revision, delivery, or the torture test unless new evidence exposes a real defect.
+
+---
+
+## COME BACK LATER — live customer lifecycle email (the yellow sticky)
+
+> **FLAG: PARKED WITH EXTERNAL PREREQUISITE. NOT CLOSED. DO NOT FAKE.**  
+> **This deferred external prerequisite does not block entering Room 2.**
 
 **Package:** `STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`  
 **Protected checkpoint:** `d6974eb` — do not rewrite or claim this package CLOSED  
@@ -43,10 +61,16 @@ Until then, Board + Voice remain the honest customer surfaces. Queued notices an
 | Materials + real uploads | Sealed prior |
 | Studio Voice ↔ Machine ↔ customer | Sealed prior |
 | Review + revision + exact Final Delivery | **CLOSED** (`07c1434`) |
-| Resend / lifecycle email + watchdog live cert | **PARKED WITH EXTERNAL PREREQUISITE** (`d6974eb`) — see flag above |
-| Whole-customer torture test | **PARKED FOR MANAGER** — `STUDIO-OPERATING-ROOM-1-WHOLE-CUSTOMER-LIFE-TORTURE-TEST-1`. Architecture park `5407796`. Voice summary correction `9f58d41`. Room 1 still **not closed**. |
+| Resend / lifecycle email + watchdog live cert | **PARKED WITH EXTERNAL PREREQUISITE** (`d6974eb`) — yellow sticky; does **not** block Room 2 |
+| Whole-customer torture test | **COMPLETE (executable)** — authoritative tip `a49efd7`. Abandoned 3067 attempts do not count. Do not reopen unless new evidence. Room 1 still **not fully closed**. |
 
-Room 1 still requires the locked chaotic-failure pass (wrong upload, duplicate, stall/timeout recover, QA fail then pass, stale-version, return-later, failed notification with Board/Voice still honest). That pass **must not** require branded inbox certification.
+---
+
+## Tagia exception to “next room only after #1 is closed”
+
+Standing sequence still prefers one room at a time and still forbids skipping to Owner Console.
+
+On 2026-08-17 Tagia authorized entering Room 2 while Room 1 remains technically open **solely** for the deferred domain/email identity. Do not stand in the hallway staring at that sticky. Do not treat Room 1 as fully CLOSED.
 
 ---
 
