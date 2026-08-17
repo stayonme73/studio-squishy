@@ -83,6 +83,8 @@ Targeted vitest **48 / 48 PASS** on closeout, Room 2 entry, payment honesty, pla
 
 Green checks are **not** a Room 2 close.
 
+**Park commit:** `90dcc84` on `operating/design-renderer-proof-1`.
+
 ---
 
 ## What this package did **not** do
