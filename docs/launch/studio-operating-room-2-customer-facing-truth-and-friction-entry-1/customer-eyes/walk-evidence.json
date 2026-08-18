@@ -1,0 +1,267 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1",
+  "kind": "customer-eyes-front-door-walk",
+  "customer": {
+    "preferredName": "Jordan",
+    "businessName": "Hale Weekend Bakery",
+    "need": "I need a simple flyer for my Saturday farmers market stall so people know what I bake, where I'll be, and how to find me. I am not a designer."
+  },
+  "base": "http://127.0.0.1:3066",
+  "closed": false,
+  "parkCheckpoint": "90dcc84",
+  "ownerRoutine": "NONE",
+  "proofs": [
+    {
+      "id": "01-lobby-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/01-lobby.png"
+    },
+    {
+      "id": "lobby-first-time-knows-where-to-begin",
+      "ok": true,
+      "detail": "Lobby offers New to The Studio with Let’s Get Started.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/01-lobby.png"
+    },
+    {
+      "id": "lobby-returning-is-separate",
+      "ok": true,
+      "detail": "Returning Client is a Sign In path, not the first-time start.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/01-lobby.png"
+    },
+    {
+      "id": "02-conversation-open-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/02-conversation-open.png"
+    },
+    {
+      "id": "conversation-speak-and-type",
+      "ok": true,
+      "detail": "Customer can speak or type. Voice is not the only fill path.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/02-conversation-open.png"
+    },
+    {
+      "id": "03-route-recommendation-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/03-route-recommendation.png"
+    },
+    {
+      "id": "route-is-suggestion-not-command",
+      "ok": true,
+      "detail": "Route is framed as a suggested starting point the customer can change.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/03-route-recommendation.png"
+    },
+    {
+      "id": "04-service-selection-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/04-service-selection.png"
+    },
+    {
+      "id": "services-include-flyer",
+      "ok": true,
+      "detail": "Make Me a Flyer is on the currently presented service list.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/04-service-selection.png"
+    },
+    {
+      "id": "05-flyer-learn-more-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/05-flyer-learn-more.png"
+    },
+    {
+      "id": "flyer-has-inclusion-and-exclusion",
+      "ok": true,
+      "detail": "Flyer details show included work and what The Studio does not offer.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/05-flyer-learn-more.png"
+    },
+    {
+      "id": "flyer-shows-price",
+      "ok": true,
+      "detail": "Customer can see the $69 Studio fee before checkout.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/05-flyer-learn-more.png"
+    },
+    {
+      "id": "06-studio-plan-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/06-studio-plan.png"
+    },
+    {
+      "id": "plan-states-selected-service-and-price",
+      "ok": true,
+      "detail": "Studio Plan states Make Me a Flyer and $69.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/06-studio-plan.png"
+    },
+    {
+      "id": "07-studio-plan-details-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/07-studio-plan-details.png"
+    },
+    {
+      "id": "plan-shows-responsibility-or-revision",
+      "ok": true,
+      "detail": "Studio Plan or extras mention revisions or what the customer needs to provide.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/07-studio-plan-details.png"
+    },
+    {
+      "id": "08-payment-handoff-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/08-payment-handoff.png"
+    },
+    {
+      "id": "checkout-names-stripe-and-unpaid-until-confirmed",
+      "ok": true,
+      "detail": "Checkout names Stripe and says the project stays unpaid until Stripe confirms payment.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/08-payment-handoff.png"
+    },
+    {
+      "id": "checkout-board-is-source-of-truth",
+      "ok": true,
+      "detail": "What Happens Next still tells the customer the Studio Board is the source of truth.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/08-payment-handoff.png"
+    },
+    {
+      "id": "tablet-open-checkout-is-not-the-pay-cta",
+      "ok": true,
+      "detail": "Tablet uses Open checkout (visible=true, count=1). Stage=checkout.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/08-payment-handoff.png"
+    },
+    {
+      "id": "secure-checkout-cta-present",
+      "ok": true,
+      "detail": "Continue to secure checkout is the actual pay action (count=1).",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/08-payment-handoff.png"
+    },
+    {
+      "id": "checkout-controls-are-distinct",
+      "ok": true,
+      "detail": "Open checkout vs Continue to secure checkout stay distinct (“Open checkout” / “CONTINUE TO SECURE CHECKOUT”).",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/08-payment-handoff.png"
+    },
+    {
+      "id": "checkout-does-not-claim-paid-yet",
+      "ok": true,
+      "detail": "Checkout does not claim payment already occurred.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/08-payment-handoff.png"
+    },
+    {
+      "id": "09-checkout-panel-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/09-checkout-panel.png"
+    },
+    {
+      "id": "opening-panel-did-not-mark-paid",
+      "ok": true,
+      "detail": "Open checkout only reveals checkout details. Stripe hosted page has not opened yet.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/09-checkout-panel.png"
+    },
+    {
+      "id": "10-back-to-plan-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/10-back-to-plan.png"
+    },
+    {
+      "id": "back-from-checkout-stays-unpaid",
+      "ok": true,
+      "detail": "Back to Studio Plan does not invent a paid project or jump to intake.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/10-back-to-plan.png"
+    },
+    {
+      "id": "hosted-stripe-opened",
+      "ok": true,
+      "detail": "Continue to secure checkout opened hosted Stripe. before=http://127.0.0.1:3066/studio-conversation-room after=https://checkout.stripe.com/c/pay/cs_test_a1iDrk3VMZwKcAcqlpk10D2FdDXVLOu5WnRGJH0hX2VLgZVUxYRLxfDqdh#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRQNjdAMUFiNXw3dlJ8YHR9akRdTmp0TnJ0QUJOX39IdVZXZ1ZnN3xTbUZ8bzJCVkFUc1FWcUA8Q0g3czJPamc0U1w3NHUwU1VMNz02bENhQTRVdlNccmQ1NUpnPF1%2FdmBWJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/11-hosted-stripe-handoff.png"
+    },
+    {
+      "id": "12-cancel-or-back-from-stripe-no-forbidden-jargon",
+      "ok": true,
+      "detail": "No Squishy / this-build / Stripe-env / Canva jargon in visible copy.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/12-cancel-or-back-from-stripe.png"
+    },
+    {
+      "id": "cancel-back-stays-unpaid",
+      "ok": true,
+      "detail": "After cancel/back: stage=checkout still unpaid. No created-project claim.",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/12-cancel-or-back-from-stripe.png"
+    }
+  ],
+  "pauses": [
+    {
+      "where": "Payment handoff",
+      "kind": "what-next",
+      "note": "Tablet already says intake comes next. Board-is-source-of-truth copy lives in What Happens Next, below Continue to secure checkout, so a first-time customer can miss it unless they scroll.",
+      "blocking": false
+    }
+  ],
+  "stages": {
+    "01-lobby": {
+      "url": "http://127.0.0.1:3066/studio-lobby",
+      "excerpt": "The Studio Lobby × Welcome to THE STUDIO Choose where you’d like to begin. NEW TO THE STUDIO Begin with a guided conversation. LET’S GET STARTED → OR RETURNING CLIENT Sign in to access your Studio Board. SIGN IN → ?Need help deciding? Visit the Help Center for answers to common questions. OPEN HELP CENTER ↗ Your projects. Your information. We’re here when you’re ready. STUDIO REVIEW",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/01-lobby.png"
+    },
+    "02-conversation-open": {
+      "url": "http://127.0.0.1:3066/studio-conversation-room",
+      "excerpt": "Studio Conversation Room Voice: On Voice: Off Tap the mic to speak or start typing below OR REQUIRED This answer is required. Send STUDIO CONTROLS CONVERSATION 🎤 Speak ⌨️ Type ❓ Ask a question SESSION 💾 Save for now ✏️ Change an answer ➕ Start a new conversation 🚪 Close conversation 📋 Review Answers STUDIO 🏠 Return to Lobby 📚 Help Center Policies & FAQ SPEAK, TYPE, AND NAVIGATE CONVERSATION ROOM Before we begin, what name would you like me to call you? REQUIRED Continue STUDIO TABLET When you use the microphone, browser speech services may process your audio. The Studio does not upload or store your recording. STUDIO REVIEW",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/02-conversation-open.png"
+    },
+    "03-route-recommendation": {
+      "url": "http://127.0.0.1:3066/studio-conversation-room",
+      "excerpt": "Studio Conversation Room Voice: On Voice: Off Tap the mic to speak or start typing below OR Send STUDIO CONTROLS CONVERSATION 🎤 Speak ⌨️ Type ❓ Ask a question SESSION 💾 Save for now ✏️ Change an answer ➕ Start a new conversation 🚪 Close conversation 📋 Review Answers STUDIO 🏠 Return to Lobby 📚 Help Center Policies & FAQ SPEAK, TYPE, AND NAVIGATE CONVERSATION ROOM Choose Your Route Based on what you said you’re working on, this may be a good place to start. You can choose a different path. Continue with Promote Something Now Get My Business Started Forward route — sequential stops to build your foundation. → SUGGESTED STARTING POINT Promote Something Now Direct urgent route — get ready-to-use promotion assets quickly. → Update What I Already Have Refresh the marketing you already have without starting over. → I Know What I Need Opens the job shelf directly — ask if you are unsure. → STUDIO TABLET When you use the microphone, browser speech services may process your audio. The Studio does not upload or store your recording. STUDIO REVIEW",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/03-route-recommendation.png"
+    },
+    "04-service-selection": {
+      "url": "http://127.0.0.1:3066/studio-conversation-room",
+      "excerpt": "Studio Conversation Room Voice: On Voice: Off Tap the mic to speak or start typing below OR Send STUDIO CONTROLS CONVERSATION 🎤 Speak ⌨️ Type ❓ Ask a question SESSION 💾 Save for now ✏️ Change an answer ➕ Start a new conversation 🚪 Close conversation 📋 Review Answers STUDIO 🏠 Return to Lobby 📚 Help Center Policies & FAQ SPEAK, TYPE, AND NAVIGATE CONVERSATION ROOM Your project so far You do not need everything here. Many new businesses begin with business cards and one promotional piece. You can add or remove services before checkout. Route: Promote Something Now. Services selected: 0. Open service list Change route STUDIO TABLET When you use the microphone, browser speech services may process your audio. The Studio does not upload or store your recording. Choose your services I-20 — PROMOTE SOMETHING NOW Choose Your Services Close You do not need everything here. Many new businesses begin with business cards and one promotional piece. You can add or remove services before checkout. ← Back to routes Services: 0 Estimated Investment: $0 Make Me a Flyer $69 One single-sided flyer in one size — ready to print or share online. BEST FOR Businesses promoting one clear message, offer, or event. Show full details ▼ + Add to Project Make My Text Message Campaign Kit $69 Up to four text messages ready for you to send. BEST FOR Finished text messages ready for you to send. Show full details ▼ + Add to Project Update My Existing Promotion $69 Reference-guided update of one existing promotional item: you supply the existing promotion as visual/content reference plus exact changes; The Studio recreates one updated final promotional item with bounded edits only — not a redesign and not a pixel-perfect edit of your original file. BEST FOR One existing promotional item that needs a reference-guided update — exact dates, prices, contact, wording, or one image refreshed. Show full details ▼ + Add to Project Make Me a Service Sheet $79 One page with up to ten services and brief descriptions. BEST FOR Businesses that need customers to quickly understand everything they offer. Show full details ▼ + Add to Project Make My Campaign Graphics $79 Two coordinated static graphics for o",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/04-service-selection.png"
+    },
+    "05-flyer-learn-more": {
+      "url": "http://127.0.0.1:3066/studio-conversation-room",
+      "excerpt": "Studio Conversation Room Voice: On Voice: Off Tap the mic to speak or start typing below OR Send STUDIO CONTROLS CONVERSATION 🎤 Speak ⌨️ Type ❓ Ask a question SESSION 💾 Save for now ✏️ Change an answer ➕ Start a new conversation 🚪 Close conversation 📋 Review Answers STUDIO 🏠 Return to Lobby 📚 Help Center Policies & FAQ SPEAK, TYPE, AND NAVIGATE CONVERSATION ROOM Your project so far You do not need everything here. Many new businesses begin with business cards and one promotional piece. You can add or remove services before checkout. Route: Promote Something Now. Services selected: 0. Open service list Change route STUDIO TABLET When you use the microphone, browser speech services may process your audio. The Studio does not upload or store your recording. Choose your services I-20 — PROMOTE SOMETHING NOW Choose Your Services Close You do not need everything here. Many new businesses begin with business cards and one promotional piece. You can add or remove services before checkout. ← Back to routes Services: 0 Estimated Investment: $0 Make Me a Flyer $69 One single-sided flyer in one size — ready to print or share online. BEST FOR Businesses promoting one clear message, offer, or event. Hide details ▲ PURPOSE One single-sided flyer for one clear message, offer, or event — one agreed size, ready to print or share online. ✅ INCLUDED One defined design direction One finished single-sided flyer design one agreed size only Print-ready PDF Digital PNG or JPG version for sharing online (one agreed size) Studio quality-control review before delivery ❌ THE STUDIO DOES NOT OFFER Printing, shipping, or printer coordination Outside freelancers, voice actors, printers, or production vendors More than one flyer Double-sided flyer Multiple sizes or platform versions Editable source files Photography, custom illustration, packaging, signage, website work Posting, publishing, or scheduling 🔄 CHANGES TO YOUR PURCHASED DELIVERABLE More than one revision round 🔄 REVISIONS One revision round is included with this service. A revision is a customer-requested change to work that correctly followed the approved brief — for example, changing a color, replacing customer-supplied wo",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/05-flyer-learn-more.png"
+    },
+    "06-studio-plan": {
+      "url": "http://127.0.0.1:3066/studio-conversation-room",
+      "excerpt": "Studio Conversation Room Voice: On Voice: Off Tap the mic to speak or start typing below OR Send STUDIO CONTROLS CONVERSATION 🎤 Speak ⌨️ Type ❓ Ask a question SESSION 💾 Save for now ✏️ Change an answer ➕ Start a new conversation 🚪 Close conversation 📋 Review Answers STUDIO 🏠 Return to Lobby 📚 Help Center Policies & FAQ SPEAK, TYPE, AND NAVIGATE CONVERSATION ROOM Studio Plan Studio Voice says: Here's your Studio Plan. Review the services, price, and timeline. You can still make changes before checkout. BEFORE CHECKOUT ✓ Add services ✓ Remove services ✓ Change your route if needed ✓ Update your answers ✓ Review pricing anytime ROUTE Promote Something Now SERVICES Make Me a Flyer $69 ESTIMATED INVESTMENT $69 ESTIMATED TIMELINE 2–3 business days after all required materials are received. This timeline begins after we receive the required project materials. Revisions and materials details open beside you when you need them. Revisions, materials & scope → Change route Edit Plan Continue to Checkout STUDIO TABLET When you use the microphone, browser speech services may process your audio. The Studio does not upload or store your recording. STUDIO REVIEW",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/06-studio-plan.png"
+    },
+    "07-studio-plan-details": {
+      "url": "http://127.0.0.1:3066/studio-conversation-room",
+      "excerpt": "Studio Conversation Room Voice: On Voice: Off Tap the mic to speak or start typing below OR Send STUDIO CONTROLS CONVERSATION 🎤 Speak ⌨️ Type ❓ Ask a question SESSION 💾 Save for now ✏️ Change an answer ➕ Start a new conversation 🚪 Close conversation 📋 Review Answers STUDIO 🏠 Return to Lobby 📚 Help Center Policies & FAQ SPEAK, TYPE, AND NAVIGATE CONVERSATION ROOM Studio Plan Studio Voice says: Here's your Studio Plan. Review the services, price, and timeline. You can still make changes before checkout. BEFORE CHECKOUT ✓ Add services ✓ Remove services ✓ Change your route if needed ✓ Update your answers ✓ Review pricing anytime ROUTE Promote Something Now SERVICES Make Me a Flyer $69 ESTIMATED INVESTMENT $69 ESTIMATED TIMELINE 2–3 business days after all required materials are received. This timeline begins after we receive the required project materials. Revisions and materials details open beside you when you need them. Revisions, materials & scope → Change route Edit Plan Continue to Checkout STUDIO TABLET When you use the microphone, browser speech services may process your audio. The Studio does not upload or store your recording. Studio Plan CONVERSATION ROOM Plan details Close Revision policy, what you'll need after checkout, and View Scope for each service. Selected services Make Me a Flyer $69 One single-sided flyer in one size — ready to print or share online. View Scope Revision Policy One revision round is included for each service. Studio mistakes are corrected at no charge. Additional requested work follows the Project Change process. View complete revision policy We'll Need You'll provide these after Checkout during Project Intake. Final wording Logo Photos Pricing Contact information Platform or website links (if applicable) STUDIO REVIEW",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/07-studio-plan-details.png"
+    },
+    "08-payment-handoff": {
+      "url": "http://127.0.0.1:3066/studio-conversation-room",
+      "excerpt": "Studio Conversation Room Voice: On Voice: Off Tap the mic to speak or start typing below OR Send STUDIO CONTROLS CONVERSATION 🎤 Speak ⌨️ Type ❓ Ask a question SESSION 💾 Save for now ✏️ Change an answer ➕ Start a new conversation 🚪 Close conversation 📋 Review Answers STUDIO 🏠 Return to Lobby 📚 Help Center Policies & FAQ SPEAK, TYPE, AND NAVIGATE CONVERSATION ROOM Checkout Before you pay, confirm your services and total. After payment, the purchased scope is fixed — later changes follow the Project Change process. Intake comes next after payment. Route: Promote Something Now. Services: 1. Estimated Investment: $69. You will complete payment on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms the payment. Open checkout STUDIO TABLET When you use the microphone, browser speech services may process your audio. The Studio does not upload or store your recording. Activity panel CONVERSATION ROOM Ready to check out Close ROUTE Promote Something Now Confirm your services and total below. After payment, the purchased scope is fixed and later changes follow the Project Change process. Checkout confirms the selected project scope. After payment, the purchased scope is fixed. Later changes are handled through the Project Change process. ← Back to Studio Plan Your Studio Plan SELECTED SERVICES Make Me a Flyer $69 ESTIMATED INVESTMENT $69 Estimated Investment reflects your selected services. The amount charged is confirmed with Stripe. Confirm and continue I reviewed my Studio Plan and understand that confirming checkout and completing Project Intake are required before work can move forward. You will complete payment on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms the payment. CONTINUE TO SECURE CHECKOUT Continue opens Stripe Checkout. Your project stays unpaid until Stripe confirms payment. What Happens Next 1 Checkout confirmed 2 Project Intake opens 3 You provide your materials 4 Required information is reviewed 5 You'll review the work 6 Final delivery You can follow project status on your Studio Board after Project Intake. Email notices are a courtesy. Your Studio Board is t",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/08-payment-handoff.png"
+    },
+    "09-checkout-panel": {
+      "url": "http://127.0.0.1:3066/studio-conversation-room",
+      "excerpt": "Studio Conversation Room Voice: On Voice: Off Tap the mic to speak or start typing below OR Send STUDIO CONTROLS CONVERSATION 🎤 Speak ⌨️ Type ❓ Ask a question SESSION 💾 Save for now ✏️ Change an answer ➕ Start a new conversation 🚪 Close conversation 📋 Review Answers STUDIO 🏠 Return to Lobby 📚 Help Center Policies & FAQ SPEAK, TYPE, AND NAVIGATE CONVERSATION ROOM Checkout Before you pay, confirm your services and total. After payment, the purchased scope is fixed — later changes follow the Project Change process. Intake comes next after payment. Route: Promote Something Now. Services: 1. Estimated Investment: $69. You will complete payment on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms the payment. Open checkout STUDIO TABLET When you use the microphone, browser speech services may process your audio. The Studio does not upload or store your recording. Activity panel CONVERSATION ROOM Ready to check out Close ROUTE Promote Something Now Confirm your services and total below. After payment, the purchased scope is fixed and later changes follow the Project Change process. Checkout confirms the selected project scope. After payment, the purchased scope is fixed. Later changes are handled through the Project Change process. ← Back to Studio Plan Your Studio Plan SELECTED SERVICES Make Me a Flyer $69 ESTIMATED INVESTMENT $69 Estimated Investment reflects your selected services. The amount charged is confirmed with Stripe. Confirm and continue I reviewed my Studio Plan and understand that confirming checkout and completing Project Intake are required before work can move forward. You will complete payment on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms the payment. CONTINUE TO SECURE CHECKOUT Continue opens Stripe Checkout. Your project stays unpaid until Stripe confirms payment. What Happens Next 1 Checkout confirmed 2 Project Intake opens 3 You provide your materials 4 Required information is reviewed 5 You'll review the work 6 Final delivery You can follow project status on your Studio Board after Project Intake. Email notices are a courtesy. Your Studio Board is t",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/09-checkout-panel.png"
+    },
+    "10-back-to-plan": {
+      "url": "http://127.0.0.1:3066/studio-conversation-room",
+      "excerpt": "Studio Conversation Room Voice: On Voice: Off Tap the mic to speak or start typing below OR Send STUDIO CONTROLS CONVERSATION 🎤 Speak ⌨️ Type ❓ Ask a question SESSION 💾 Save for now ✏️ Change an answer ➕ Start a new conversation 🚪 Close conversation 📋 Review Answers STUDIO 🏠 Return to Lobby 📚 Help Center Policies & FAQ SPEAK, TYPE, AND NAVIGATE CONVERSATION ROOM Studio Plan Studio Voice says: Here's your Studio Plan. Review the services, price, and timeline. You can still make changes before checkout. BEFORE CHECKOUT ✓ Add services ✓ Remove services ✓ Change your route if needed ✓ Update your answers ✓ Review pricing anytime ROUTE Promote Something Now SERVICES Make Me a Flyer $69 ESTIMATED INVESTMENT $69 ESTIMATED TIMELINE 2–3 business days after all required materials are received. This timeline begins after we receive the required project materials. Revisions and materials details open beside you when you need them. Revisions, materials & scope → Change route Edit Plan Continue to Checkout STUDIO TABLET When you use the microphone, browser speech services may process your audio. The Studio does not upload or store your recording. STUDIO REVIEW",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/10-back-to-plan.png"
+    },
+    "12-cancel-or-back-from-stripe": {
+      "url": "http://127.0.0.1:3066/studio-conversation-room?stage=checkout&payment=cancel",
+      "excerpt": "Studio Conversation Room Voice: On Voice: Off Tap the mic to speak or start typing below OR Send STUDIO CONTROLS CONVERSATION 🎤 Speak ⌨️ Type ❓ Ask a question SESSION 💾 Save for now ✏️ Change an answer ➕ Start a new conversation 🚪 Close conversation 📋 Review Answers STUDIO 🏠 Return to Lobby 📚 Help Center Policies & FAQ SPEAK, TYPE, AND NAVIGATE CONVERSATION ROOM Checkout Before you pay, confirm your services and total. After payment, the purchased scope is fixed — later changes follow the Project Change process. Intake comes next after payment. Route: Promote Something Now. Services: 1. Estimated Investment: $69. You will complete payment on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms the payment. Open checkout STUDIO TABLET When you use the microphone, browser speech services may process your audio. The Studio does not upload or store your recording. Activity panel CONVERSATION ROOM Ready to check out Close ROUTE Promote Something Now Confirm your services and total below. After payment, the purchased scope is fixed and later changes follow the Project Change process. Checkout confirms the selected project scope. After payment, the purchased scope is fixed. Later changes are handled through the Project Change process. Checkout was cancelled. Your project is still saved — you can try payment again when ready. ← Back to Studio Plan Your Studio Plan SELECTED SERVICES Make Me a Flyer $69 ESTIMATED INVESTMENT $69 Estimated Investment reflects your selected services. The amount charged is confirmed with Stripe. Confirm and continue I reviewed my Studio Plan and understand that confirming checkout and completing Project Intake are required before work can move forward. You will complete payment on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms the payment. CONTINUE TO SECURE CHECKOUT Continue opens Stripe Checkout. Your project stays unpaid until Stripe confirms payment. What Happens Next 1 Checkout confirmed 2 Project Intake opens 3 You provide your materials 4 Required information is reviewed 5 You'll review the work 6 Final delivery You can follow project status on ",
+      "shot": "C:/Users/tagia/studio-squishy-kitchen-foundation-1/docs/launch/studio-operating-room-2-customer-facing-truth-and-friction-entry-1/customer-eyes/12-cancel-or-back-from-stripe.png"
+    }
+  },
+  "totals": {
+    "proofs": 30,
+    "passed": 30,
+    "failed": 0,
+    "pauses": 1,
+    "blockingPauses": 0
+  }
+}

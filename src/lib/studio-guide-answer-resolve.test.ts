@@ -68,6 +68,16 @@ describe("studio-guide-answer-resolve — Send / Continue parity", () => {
     expect(fromTyped).toEqual(fromBubble);
     expect(fromTypedAfterChip).toEqual(fromBubble);
 
+    const leftoverTypedAfterChip = resolveGuideAnswerFromUi({
+      step: "ask_deadline",
+      typed: "I do not have a logo or photos yet.",
+      selectedBubbles: ["Within 2 weeks"],
+    });
+    expect(leftoverTypedAfterChip).toEqual({
+      answer: "Within 2 weeks",
+      skipped: false,
+    });
+
     const draftBubble = applyGuideAnswerToDraft(
       createEmptyGuideCaptureDraft(),
       "ask_deadline",

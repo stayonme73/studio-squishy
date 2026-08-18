@@ -5,6 +5,7 @@ import { memo, useEffect, useRef } from "react";
 import styles from "@/components/studio-conversation-room/guide/studio-guide-comm.module.css";
 import {
   STUDIO_GUIDE_TYPE_FIELD_ID,
+  composerSubmitLabel,
   conversationRoomGuideV1,
 } from "@/config/conversation-room-guide-v1";
 import { resolveComposerSendAction } from "@/lib/studio-guide-answer-resolve";
@@ -63,7 +64,7 @@ function StudioGuideCommPanel({
   studioVoiceReply = null,
 }: StudioGuideCommPanelProps) {
   const v = conversationRoomGuideV1;
-  const textRef = useRef<HTMLInputElement | null>(null);
+  const textRef = useRef<HTMLTextAreaElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const sendRef = useRef<HTMLButtonElement | null>(null);
   const resetKeyRef = useRef(fieldResetKey);
@@ -182,11 +183,11 @@ function StudioGuideCommPanel({
           data-required={showRequired ? "true" : "false"}
           data-answering={isAnsweringQuestion ? "true" : "false"}
         >
-          <input
+          <textarea
             id={STUDIO_GUIDE_TYPE_FIELD_ID}
             ref={textRef}
             className={styles.typeLine}
-            type="text"
+            rows={2}
             defaultValue={textDraft}
             placeholder={placeholder}
             autoComplete="off"
@@ -225,7 +226,7 @@ function StudioGuideCommPanel({
             }}
             aria-required={showRequired ? true : undefined}
             aria-label={placeholder}
-          />
+          ></textarea>
         </div>
       </div>
 
@@ -252,7 +253,7 @@ function StudioGuideCommPanel({
         })}
         onClick={runSend}
       >
-        {v.sendMessageLabel}
+        {composerSubmitLabel(isAnsweringQuestion)}
       </button>
     </aside>
   );

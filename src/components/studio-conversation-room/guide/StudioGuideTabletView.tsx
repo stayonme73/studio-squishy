@@ -6,6 +6,7 @@ import styles from "@/components/studio-conversation-room/guide/studio-guide-tab
 import {
   conversationRoomGuideV1,
   getConversationRoomGuideQuestion,
+  shouldShowDeadlineFormatHint,
 } from "@/config/conversation-room-guide-v1";
 import type { ConversationRoomStage } from "@/config/conversation-room-stage-v1";
 import { PROJECT_BUILDER_V1 } from "@/config/project-builder-v1";
@@ -301,7 +302,7 @@ export default function StudioGuideTabletView({
               </div>
             ) : null}
 
-            {question.step === "ask_deadline" ? (
+            {shouldShowDeadlineFormatHint(selectedBubbles) ? (
               <p className={styles.hint}>{v.deadlineFormatHint}</p>
             ) : null}
 

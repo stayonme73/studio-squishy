@@ -443,6 +443,21 @@ export function getConversationRoomGuideQuestion(
   );
 }
 
+/** Date-format hint only when the customer actually chose a specific date. */
+export function shouldShowDeadlineFormatHint(
+  selectedBubbles: readonly string[],
+): boolean {
+  const dateBubble = getConversationRoomGuideQuestion("ask_deadline")?.opensDateFieldBubble;
+  return Boolean(dateBubble && selectedBubbles.includes(dateBubble));
+}
+
+/** Dock submit matches tablet Continue while a guide question is open. */
+export function composerSubmitLabel(isAnsweringQuestion: boolean): string {
+  return isAnsweringQuestion
+    ? conversationRoomGuideV1.continueLabel
+    : conversationRoomGuideV1.sendMessageLabel;
+}
+
 /** Relative deadline wording — stored honestly, never treated as a promised date. */
 export const GUIDE_RELATIVE_DEADLINE_CHOICES = [
   "As soon as possible",

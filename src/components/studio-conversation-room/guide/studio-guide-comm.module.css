@@ -211,12 +211,17 @@
   font-weight: 700;
   line-height: 1.45;
   text-align: left;
+  resize: none;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .typeLine::placeholder {
   color: rgba(247, 244, 238, 0.48);
   font-weight: 500;
   opacity: 1;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .typeLine:focus-visible {

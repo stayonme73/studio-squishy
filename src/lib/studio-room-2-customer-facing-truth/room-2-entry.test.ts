@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import {
+  composerSubmitLabel,
+  conversationRoomGuideV1,
+  shouldShowDeadlineFormatHint,
+} from "@/config/conversation-room-guide-v1";
 import { payment } from "@/config/payment";
 import { PROJECT_BUILDER_V1 } from "@/config/project-builder-v1";
 import { studioLaunchReadinessExecutionOrderV1 } from "@/config/studio-launch-readiness-execution-order-v1";
@@ -61,6 +65,14 @@ describe("STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1", (
     expect(conversationRoomGuideV1.checkoutCompleteCta).toBe(
       payment.form.submitLabel,
     );
+  });
+
+  it("shows the date-format hint only for a specific date, not duration chips", () => {
+    expect(shouldShowDeadlineFormatHint(["Within 2 weeks"])).toBe(false);
+    expect(shouldShowDeadlineFormatHint(["As soon as possible"])).toBe(false);
+    expect(shouldShowDeadlineFormatHint(["I have a specific date"])).toBe(true);
+    expect(composerSubmitLabel(true)).toBe(conversationRoomGuideV1.continueLabel);
+    expect(composerSubmitLabel(false)).toBe(conversationRoomGuideV1.sendMessageLabel);
   });
 
   it("does not tell customers checkout is unfinished, emails are off, or Stripe env secrets leaked", () => {

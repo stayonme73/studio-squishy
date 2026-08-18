@@ -5,6 +5,7 @@
  */
 
 import type { GuideConversationStep } from "@/config/studio-guide-conversation-v1";
+import { isGuideRelativeDeadlineChoice } from "@/config/conversation-room-guide-v1";
 import {
   confirmGuideCaptureDraft,
   createEmptyGuideCaptureDraft,
@@ -322,7 +323,10 @@ export function interpretGuideHardNav(
   }
 
   if (!skipped && fromRaw === "ask_deadline" && answer.trim()) {
-    if (!isAcceptableGuideDeadlineInput(answer)) {
+    if (
+      !isGuideRelativeDeadlineChoice(answer) &&
+      !isAcceptableGuideDeadlineInput(answer)
+    ) {
       return {
         kind: "error",
         message:

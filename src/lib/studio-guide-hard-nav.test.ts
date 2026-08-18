@@ -70,6 +70,20 @@ describe("studio-guide-hard-nav", () => {
     expect(result.kind).toBe("error");
   });
 
+  it("accepts a relative deadline choice without treating it as a calendar date", () => {
+    const params = new URLSearchParams({
+      guide: "1",
+      gact: "continue",
+      gfrom: "ask_deadline",
+      ganswer: "Within 2 weeks",
+    });
+    const result = processGuideHardNavSearchParams(params);
+    expect(result.kind).toBe("advanced");
+    if (result.kind !== "advanced") return;
+    expect(result.step).toBe("ask_materials");
+    expect(result.draft.requestedDeadline).toBe("Within 2 weeks");
+  });
+
   it("orders steps through the guided sequence", () => {
     expect(nextGuideStep("ask_preferred_name")).toBe("ask_project_need");
     expect(nextGuideStep("ask_project_need")).toBe("ask_business_name");

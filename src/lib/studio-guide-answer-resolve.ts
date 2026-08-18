@@ -5,8 +5,10 @@
 
 import {
   getConversationRoomGuideQuestion,
+  isGuideRelativeDeadlineChoice,
   type GuideConversationStep,
 } from "@/config/conversation-room-guide-v1";
+import { isAcceptableGuideDeadlineInput } from "@/lib/studio-guide-capture";
 
 export type GuideAnswerResolveInput = {
   step: GuideConversationStep;
@@ -51,6 +53,17 @@ export function resolveGuideAnswerFromUi(
     !typed
   ) {
     return { answer: "", skipped: false };
+  }
+  if (
+    question?.step === "ask_deadline" &&
+    selectedBubbles.length === 1 &&
+    isGuideRelativeDeadlineChoice(selectedBubbles[0])
+  ) {
+    const bubble = selectedBubbles[0];
+    if (!typed || typed === bubble || !isAcceptableGuideDeadlineInput(typed)) {
+      return { answer: bubble, skipped: false };
+    }
+    return { answer: typed, skipped: false };
   }
   if (typed) return { answer: typed, skipped: false };
   if (selectedBubbles.length === 1) {
