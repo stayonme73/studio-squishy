@@ -41,6 +41,8 @@ describe("STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1", (
     expect(studioLaunchReadinessExecutionOrderV1.room2Section2.packageId).toBe(
       "STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1",
     );
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section2.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section2.closeTip).toBe("e609203");
     expect(cfg.comeBackLaterEmail.protectedCheckpoint).toBe("d6974eb");
     expect(cfg.comeBackLaterEmail.doesNotBlockRoom2).toBe(true);
     expect(cfg.outOfScope).toEqual(

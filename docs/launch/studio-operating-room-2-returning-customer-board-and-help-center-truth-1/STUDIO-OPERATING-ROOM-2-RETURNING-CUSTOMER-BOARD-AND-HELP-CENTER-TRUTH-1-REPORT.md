@@ -2,14 +2,16 @@
 
 **Package:** STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1  
 **Room:** 2 — Customer-facing truth + friction cleanup  
-**Status:** PARKED FOR MANAGER — **not CLOSED**  
+**Status:** CLOSED  
 **Room 2 closed:** **NO**  
-**Section 2 closed:** **NO**  
+**Section 2 closed:** **YES**  
 **Do not auto-advance:** yes  
 **Merge:** no  
 **Owner routine:** NONE
 
-Section 1 `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1` is **CLOSED** at **`45b09b1`**. `90dcc84` remains an earlier PARK, not that close.
+Tagia closed this section 2026-08-17 on the signed-in Board evidence. Close tip **`e609203`**. Earlier PARK checkpoint **`e214b5f` is not the close**.
+
+Section 1 `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1` remains **CLOSED** at **`45b09b1`**. `90dcc84` remains an earlier PARK, not that close.
 
 Did **not** replay the first-time Lobby → checkout walk. Did **not** create a new paid order. Did **not** reopen Resend. Did **not** start the next Room 2 section.
 
@@ -102,7 +104,6 @@ Green checks are **not** a section close.
 
 ## What this package did **not** do
 
-- Close Room 2 Section 2
 - Reopen or restamp Section 1
 - Fully close Room 1
 - Close or rewrite `d6974eb`
@@ -117,4 +118,4 @@ Green checks are **not** a section close.
 
 ## Next
 
-Manager close review of this second Room 2 section. Do not auto-advance.
+**CLOSED.** Next Room 2 section waits for Tagia’s Scout package. Do not reopen this section unless new evidence. Do not auto-advance.

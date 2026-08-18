@@ -1,8 +1,8 @@
 /**
  * Room 2 Section 2 — returning customer, Board, Help Center truth.
- * Park for Manager. Do not auto-advance.
+ * CLOSED 2026-08-17 by Tagia on signed-in Board evidence.
  *
- * Authority: Tagia 2026-08-17 after closing Section 1 at 45b09b1.
+ * Close tip `e609203`. Earlier PARK checkpoint `e214b5f` is not the close.
  * Do not redo Section 1 Lobby → checkout. Do not start Owner Console.
  */
 
@@ -17,8 +17,9 @@ export const studioRoom2ReturningCustomerBoardAndHelpCenterTruthV1 = {
   roomId: "customer-facing-truth-and-friction-cleanup" as const,
   merge: "separately_authorized" as const,
   ownerRoutine: "NONE" as const,
-  parkForManager: true as const,
-  sectionClosed: false as const,
+  parkForManager: false as const,
+  sectionClosed: true as const,
+  closedAt: "2026-08-17" as const,
   doNotAutoAdvance: true as const,
   doNotStartOwnerConsole: true as const,
   doNotReopenResend: true as const,
@@ -26,6 +27,17 @@ export const studioRoom2ReturningCustomerBoardAndHelpCenterTruthV1 = {
   doNotReopenRoom1UnlessNewDefect: true as const,
   visualRedesign: false as const,
   closeRule: "CUSTOMER-USE → FIND FRICTION/TRUTH DEFECTS → FIX → BREAK → RETEST → CLOSE SECTION" as const,
+
+  closeEvidence: {
+    unsignedReturningCustomerWalk: "9/9" as const,
+    signedInBoardWalk: "17/17" as const,
+    targetedTests: "59/59" as const,
+    frictionFixedBeforeRerun: true as const,
+    ownerRoutine: "NONE" as const,
+    merge: false as const,
+    signedInBoardCloseTip: "e609203" as const,
+    parkCheckpointNotClose: "e214b5f" as const,
+  },
 
   priorSection: {
     packageId: studioRoom2CustomerFacingTruthAndFrictionEntryV1.packageId,

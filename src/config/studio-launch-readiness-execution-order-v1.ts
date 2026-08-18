@@ -72,9 +72,13 @@ export const studioLaunchReadinessExecutionOrderV1 = {
 
   room2Section2: {
     packageId: "STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1",
-    parkForManager: true as const,
+    sectionClosed: true as const,
+    parkForManager: false as const,
+    closeTip: "e609203" as const,
+    parkCheckpointNotClose: "e214b5f" as const,
     doNotAutoAdvance: true as const,
     doNotStartOwnerConsole: true as const,
+    nextSectionWaitsForScoutPackage: true as const,
   },
 
   merge: "separately_authorized" as const,

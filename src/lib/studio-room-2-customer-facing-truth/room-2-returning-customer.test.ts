@@ -21,21 +21,32 @@ const SQUISHY = /squishy/i;
 const THIS_VERSION = /this version|this build/i;
 
 describe("STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1", () => {
-  it("starts only after Section 1 is CLOSED and parks for Manager", () => {
+  it("is CLOSED on signed-in Board evidence and does not treat the earlier PARK as the close", () => {
     expect(cfg.packageId).toBe(
       "STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1",
     );
     expect(cfg.priorSection.sectionClosed).toBe(true);
     expect(cfg.priorSection.closeTip).toBe("45b09b1");
     expect(studioRoom2CustomerFacingTruthAndFrictionEntryV1.sectionClosed).toBe(true);
-    expect(cfg.sectionClosed).toBe(false);
-    expect(cfg.parkForManager).toBe(true);
+    expect(cfg.sectionClosed).toBe(true);
+    expect(cfg.parkForManager).toBe(false);
+    expect(cfg.closeEvidence.signedInBoardWalk).toBe("17/17");
+    expect(cfg.closeEvidence.targetedTests).toBe("59/59");
+    expect(cfg.closeEvidence.signedInBoardCloseTip).toBe("e609203");
+    expect(cfg.closeEvidence.parkCheckpointNotClose).toBe("e214b5f");
+    expect(cfg.closeEvidence.ownerRoutine).toBe("NONE");
+    expect(cfg.closeEvidence.merge).toBe(false);
     expect(cfg.doNotAutoAdvance).toBe(true);
     expect(cfg.doNotStartOwnerConsole).toBe(true);
     expect(cfg.doNotReopenResend).toBe(true);
     expect(cfg.doNotReopenSection1UnlessNewDefect).toBe(true);
     expect(cfg.visualRedesign).toBe(false);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section2.packageId).toBe(cfg.packageId);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section2.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section2.closeTip).toBe("e609203");
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section2.nextSectionWaitsForScoutPackage).toBe(
+      true,
+    );
     expect([...cfg.scopedSpine]).toEqual([
       "returning-client",
       "studio-board",
