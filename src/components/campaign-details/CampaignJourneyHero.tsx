@@ -11,7 +11,7 @@ export default function CampaignJourneyHero({ status }: { status: CampaignStatus
   const activeIndex = status ? campaignStatusIndex(status) : -1;
 
   return (
-    <ol className="cd-journey" aria-label="Campaign journey">
+    <ol className="cd-journey" aria-label="Project journey">
       {journeyStages.map((stage, index) => {
         const isComplete = activeIndex >= 0 && index < activeIndex;
         const isCurrent = activeIndex === index;
@@ -24,7 +24,9 @@ export default function CampaignJourneyHero({ status }: { status: CampaignStatus
             </span>
             <div className="cd-journey__copy">
               <span className="cd-journey__label">{stage.label}</span>
-              {"hint" in stage ? <span className="cd-journey__hint">{stage.hint}</span> : null}
+              {isCurrent && "hint" in stage ? (
+                <span className="cd-journey__hint">{stage.hint}</span>
+              ) : null}
             </div>
           </li>
         );

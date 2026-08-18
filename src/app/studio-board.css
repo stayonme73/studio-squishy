@@ -23,6 +23,10 @@
   overflow-y: auto;
 }
 
+.studio-utility-scene--studio-board .sb--v4 .sb-board-layout {
+  min-height: min(48vh, 26rem);
+}
+
 .studio-utility-scene--studio-board .sb-sidebar {
   background: linear-gradient(
     180deg,
@@ -7251,7 +7255,13 @@ body:has(.sb--v4) {
     overflow: hidden;
   }
 
-  .sb--v4 .sb-board-layout .sb-card--current .sb-current-campaign,
+  .sb--v4 .sb-board-layout .sb-card--current .sb-current-campaign {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
   .sb--v4 .sb-board-layout .sb-card--progress .sb-progress-panel,
   .sb--v4 .sb-board-layout .sb-card--project-snapshot .sb-project-snapshot {
     flex: 1 1 auto;

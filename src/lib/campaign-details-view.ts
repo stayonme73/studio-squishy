@@ -36,8 +36,9 @@ import {
 import {
   formatRecordFieldValue,
 } from "@/lib/project-record-client-copy";
+import { resolveStudioBoardView } from "@/lib/studio-board-view";
 
-const { campaignDetails: copy, statusContent } = studioBoard;
+const { campaignDetails: copy } = studioBoard;
 
 export type { ProjectDetailsSummarySection };
 
@@ -210,7 +211,6 @@ export function resolveCampaignDetailsView(
 ): CampaignDetailsView {
   if (!campaign) return emptyView;
 
-  const content = statusContent[campaign.campaignStatus];
   const visionData = resolveVisionData(campaign);
   const visionRaw = visionData ? draftRoomIntakeAnswerSummary(visionData) : [];
   const visionSummary = normalizeVisionSummaryForRecord(visionRaw);
@@ -224,10 +224,12 @@ export function resolveCampaignDetailsView(
   const routeMapRaw = resolveRouteMapClientSummary(campaign);
   const routeMapClientSummary = routeMapRaw ? normalizeRouteMapSummaryForRecord(routeMapRaw) : null;
 
+  const boardView = resolveStudioBoardView(campaign);
+
   return {
     hasCampaign: true,
     campaignName: resolveCampaignDisplayName(campaign),
-    statusLabel: content.statusLabel,
+    statusLabel: boardView.statusLabel,
     status: campaign.campaignStatus,
     estimatedCompletion: campaign.estimatedCompletion,
     createdDate: formatCreatedDate(campaign.createdAt),

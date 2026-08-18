@@ -5,13 +5,17 @@ import { helpCenter } from "@/config/help-center";
 import { studioPolicies } from "@/config/policies";
 import { PROJECT_BUILDER_V1 } from "@/config/project-builder-v1";
 import { REFUND_REQUEST_CHANNELS } from "@/config/refund-request-channels";
-import { studioBoard } from "@/config/studio-board";
+import { campaignJourneyMap } from "@/config/campaign-journey-map";
+import { studioBoard, type CampaignRecord } from "@/config/studio-board";
 import { studioLaunchReadinessExecutionOrderV1 } from "@/config/studio-launch-readiness-execution-order-v1";
 import { studioLobbyEntryV1 } from "@/config/studio-lobby-entry-v1";
 import { studioRoom2CustomerFacingTruthAndFrictionEntryV1 } from "@/config/studio-room-2-customer-facing-truth-and-friction-entry-v1";
 import { studioRoom2ReturningCustomerBoardAndHelpCenterTruthV1 as cfg } from "@/config/studio-room-2-returning-customer-board-and-help-center-truth-v1";
-import { campaignJourneyMap } from "@/config/campaign-journey-map";
 import { REFUND_INTAKE_CASUAL_PROMPT } from "@/lib/campaign-tasks/refund-request-intake";
+import { resolveBoardNextActionPresentation } from "@/lib/studio-board-next-action";
+import { resolveCampaignTimeline } from "@/lib/campaign-record";
+import { resolveCampaignDetailsView } from "@/lib/campaign-details-view";
+import { resolveWhatHappensNextSentence, resolveStudioBoardView } from "@/lib/studio-board-view";
 
 const SQUISHY = /squishy/i;
 const THIS_VERSION = /this version|this build/i;
@@ -68,6 +72,26 @@ describe("STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH
     expect(studioBoard.statusContent.PAYMENT_RECEIVED.primaryCta).toBe("OPEN PROJECT RECORD");
     expect(campaignJourneyMap.title).toBe("Your Project Journey");
     expect(studioBoard.campaignDetails.overviewLabels.name).toBe("Project Name");
+    expect(resolveCampaignTimeline({
+      campaignId: "room2-timeline",
+      campaignName: "Cedar & Bloom Home Organizing",
+      campaignStatus: "BUILDING_CONCEPTS",
+      campaignDescription: "Flyer",
+      estimatedCompletion: "Soon",
+      createdAt: "2026-08-17T18:00:00.000Z",
+      updatedAt: "2026-08-17T18:00:00.000Z",
+      deliverablesDelivered: {},
+    }).some((entry) => entry.label === "Project created")).toBe(true);
+    expect(resolveCampaignTimeline({
+      campaignId: "room2-timeline",
+      campaignName: "Cedar & Bloom Home Organizing",
+      campaignStatus: "BUILDING_CONCEPTS",
+      campaignDescription: "Flyer",
+      estimatedCompletion: "Soon",
+      createdAt: "2026-08-17T18:00:00.000Z",
+      updatedAt: "2026-08-17T18:00:00.000Z",
+      deliverablesDelivered: {},
+    }).some((entry) => /campaign created/i.test(entry.label))).toBe(false);
   });
 
   it("keeps Help Center email FAQ aligned with Board as source of truth", () => {
@@ -90,6 +114,49 @@ describe("STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH
     expect(REFUND_INTAKE_CASUAL_PROMPT).not.toMatch(/tagia/i);
     expect(PROJECT_BUILDER_V1.squishyLabel).toBe("Studio");
     expect(PROJECT_BUILDER_V1.squishyLabel).not.toMatch(SQUISHY);
+  });
+
+  it("does not tell a production project to open Review as if work is ready", () => {
+    const now = "2026-08-17T18:00:00.000Z";
+    const campaign: CampaignRecord = {
+      campaignId: "room2-building-board",
+      campaignName: "Cedar & Bloom Home Organizing",
+      campaignStatus: "BUILDING_CONCEPTS",
+      campaignDescription: "Back-to-School Reset flyer",
+      estimatedCompletion: "Soon",
+      packageId: "custom-studio-plan",
+      packageLabel: "Custom Studio Plan",
+      paymentReceivedAt: now,
+      projectDetailsSubmittedAt: now,
+      createdAt: now,
+      updatedAt: now,
+      deliverablesDelivered: {},
+    };
+    const presentation = resolveBoardNextActionPresentation({
+      campaign,
+      displayFacts: {
+        blockingRequiredCount: 0,
+        movedToProduction: true,
+        productionGatePassed: true,
+      },
+    });
+    expect(presentation.action).toBeNull();
+    expect(presentation.lead).not.toMatch(/open the review room/i);
+    expect(presentation.hint ?? "").not.toMatch(/open the review room/i);
+    expect(presentation.materialsSupportLine).not.toMatch(/open the review room/i);
+    expect(resolveWhatHappensNextSentence(campaign, {
+      blockingRequiredCount: 0,
+      movedToProduction: true,
+      productionGatePassed: true,
+    })).not.toMatch(/\bcampaign\b/i);
+    expect(resolveWhatHappensNextSentence(campaign, {
+      blockingRequiredCount: 0,
+      movedToProduction: true,
+      productionGatePassed: true,
+    })).not.toMatch(/open the review room/i);
+    expect(resolveCampaignDetailsView(campaign).statusLabel).toBe(
+      resolveStudioBoardView(campaign).statusLabel,
+    );
   });
 
   it("keeps Speak / Type on the permanent dock and quarantines the old Project Builder door", () => {

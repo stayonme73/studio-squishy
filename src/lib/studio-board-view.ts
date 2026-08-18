@@ -386,9 +386,9 @@ const whatHappensNextSentences: Record<CampaignStatus, string> = {
 
   DRAFT_RECEIVED: "Choose your package and complete payment to continue.",
 
-  PAYMENT_RECEIVED: "The Studio is preparing to begin your campaign.",
+  PAYMENT_RECEIVED: "The Studio is preparing to begin your project.",
 
-  BUILDING_CONCEPTS: "The Studio is building your campaign concepts. Check back here for your review invitation.",
+  BUILDING_CONCEPTS: "The Studio is building your concepts. Check back here for your review invitation.",
 
   READY_FOR_REVIEW: "Open the Review Room to see what is ready and what happens next.",
 
@@ -476,7 +476,7 @@ export function resolveStudioBoardView(
 
         "We review your request.",
 
-        "We build your campaign concepts.",
+        "We build your concepts.",
 
         "You choose your favorite.",
 
@@ -484,7 +484,7 @@ export function resolveStudioBoardView(
 
       stickySelection: null,
 
-      headerSubline: "Start a campaign to see your Studio journey unfold.",
+      headerSubline: "Start a project to see your Studio journey unfold.",
 
       primaryCta: empty.primaryCta,
 

@@ -205,6 +205,7 @@ function isBuildingConceptsActivityMessage(message: string): boolean {
     normalized === "we're building your concepts" ||
     normalized === "concept development started" ||
     normalized.includes("building your campaign concepts") ||
+    normalized.includes("building your concepts") ||
     normalized.includes("creative team is building") ||
     normalized.includes("creative team assigned") ||
     normalized.includes("campaign development has begun")
@@ -336,7 +337,7 @@ export function resolveCampaignTimeline(campaign: CampaignRecord): CampaignTimel
   const entries: CampaignTimelineEntry[] = [
     {
       date: formatTimelineDate(campaign.createdAt),
-      label: "Campaign created",
+      label: "Project created",
       sortKey: campaign.createdAt,
     },
   ];

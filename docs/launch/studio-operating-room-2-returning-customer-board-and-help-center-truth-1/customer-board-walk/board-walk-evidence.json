@@ -1,0 +1,121 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1",
+  "kind": "signed-in-board-walk",
+  "recordedAt": "2026-08-18T01:14:50.925Z",
+  "baseUrl": "http://127.0.0.1:3066",
+  "totals": {
+    "passed": 17,
+    "failed": 0,
+    "blocked": 0,
+    "total": 17
+  },
+  "verdict": "SIGNED-IN BOARD WALK READY FOR MANAGER CLOSE",
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (external)"
+    },
+    {
+      "check": "maya_fixture",
+      "status": "PASS",
+      "detail": "Maya Brooks · Cedar & Bloom · paid Make Me a Flyer $69. Unique sandbox email. No new Stripe checkout."
+    },
+    {
+      "check": "sign_in_opens_board",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066/studio-board",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\01-signed-in-board.png"
+    },
+    {
+      "check": "current_project_label",
+      "status": "PASS",
+      "detail": "Current Project heading is visible.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\01-signed-in-board.png"
+    },
+    {
+      "check": "new_project_nav",
+      "status": "PASS",
+      "detail": "Sidebar New Project is visible.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\01-signed-in-board.png"
+    },
+    {
+      "check": "open_project_record",
+      "status": "PASS",
+      "detail": "Customer path to Project Record is labeled without Campaign.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\01-signed-in-board.png"
+    },
+    {
+      "check": "no_stale_campaign_on_board",
+      "status": "PASS",
+      "detail": "No Ask Squishy / Current Campaign / New Campaign residue on Board.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\01-signed-in-board.png"
+    },
+    {
+      "check": "ask_surface_on_board",
+      "status": "PASS",
+      "detail": "Board Project communication is the place to ask a question.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\01-signed-in-board.png"
+    },
+    {
+      "check": "no_speak_type_on_board",
+      "status": "PASS",
+      "detail": "Speak / Type stay off the Board. They belong on the Conversation Room dock."
+    },
+    {
+      "check": "review_delivery_not_false_ready",
+      "status": "PASS",
+      "detail": "Sidebar Review Room / Final Delivery exist; next-step does not tell Maya to open Review as if work is ready. Status: Project Intake Received",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\01-signed-in-board.png"
+    },
+    {
+      "check": "no_duplicate_ask_squishy_on_board",
+      "status": "PASS",
+      "detail": "Ask Squishy is gone from the Board."
+    },
+    {
+      "check": "ask_the_studio_not_squishy",
+      "status": "PASS",
+      "detail": "Project Record shows Ask the Studio.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\02-project-record-ask-the-studio.png"
+    },
+    {
+      "check": "no_stale_campaign_on_project_record",
+      "status": "PASS",
+      "detail": "No Campaign jargon on Project Record customer copy.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\02-project-record-ask-the-studio.png"
+    },
+    {
+      "check": "project_record_review_not_false_ready",
+      "status": "PASS",
+      "detail": "Project Record does not tell Maya to open Review while concepts are still being built.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\02-project-record-ask-the-studio.png"
+    },
+    {
+      "check": "help_center_board_source_of_truth",
+      "status": "PASS",
+      "detail": "Help Center email FAQ still agrees with Board as source of truth.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\03-help-center-from-board-path.png"
+    },
+    {
+      "check": "fresh_return_to_board",
+      "status": "PASS",
+      "detail": "Same project is still on the Board after Help Center.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\04-fresh-return-to-board.png"
+    },
+    {
+      "check": "new_browser_same_board",
+      "status": "PASS",
+      "detail": "A fresh signed-in browser still opens the same Studio Board project.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-returning-customer-board-and-help-center-truth-1\\customer-board-walk\\shots\\05-new-browser-return.png"
+    }
+  ],
+  "notes": [
+    "Continuation of the same Section 2 package. Did not replay Lobby → checkout.",
+    "Did not reopen Resend. Did not start the next Room 2 section.",
+    "Maya fixture: Cedar & Bloom, Make Me a Flyer $69, unique sandbox email.",
+    "Email verification used markEmailVerified (no inbox).",
+    "Board opened at /studio-board with no campaignId in the URL.",
+    "Did not run paid-operating recovery / renderer bind. Fixture stays BUILDING_CONCEPTS."
+  ]
+}

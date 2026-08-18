@@ -23,7 +23,7 @@ export default function JourneyRail({
   return (
     <ol
       className={`sb-journey sb-journey--${layout}${variantClass}`}
-      aria-label="Campaign progress"
+      aria-label="Project progress"
     >
       {journeyStages.map((stage, index) => {
         const isComplete = activeIndex >= 0 && index < activeIndex;
@@ -37,7 +37,7 @@ export default function JourneyRail({
             </span>
             <div className="sb-journey__copy">
               <span className="sb-journey__label">{stage.label}</span>
-              {layout === "vertical" && showHints && "hint" in stage ? (
+              {layout === "vertical" && showHints && isCurrent && "hint" in stage ? (
                 <span className="sb-journey__hint">{stage.hint}</span>
               ) : null}
             </div>
