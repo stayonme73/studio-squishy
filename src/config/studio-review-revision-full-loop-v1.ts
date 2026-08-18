@@ -22,6 +22,8 @@ export const studioReviewRevisionFullLoopV1 = {
   customerCopy: {
     currentVersionLead: (versionLabel: string) =>
       `You are reviewing ${versionLabel}. This is the current version on the project record.`,
+    approvedVersionLead: (versionLabel: string) =>
+      `You approved ${versionLabel}. This is the version on the project record.`,
     currentReviewVersion: (versionLabel: string) =>
       `You are looking at ${versionLabel}, the current version on the project record.`,
     currentReviewVersionUnknown:

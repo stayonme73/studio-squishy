@@ -55,15 +55,16 @@ function jobSummary(
 }
 
 describe("STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1", () => {
-  it("is the current Room 2 section, parked for Manager, not closed", () => {
+  it("is CLOSED at 6cf9ca0 and is not the current Room 2 section", () => {
     expect(cfg.packageId).toBe(
       "STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1",
     );
     expect(cfg.room).toBe(2);
-    expect(cfg.sectionClosed).toBe(false);
-    expect(cfg.parkForManager).toBe(true);
-    expect(cfg.parkEvidence.liveCustomerWalk).toBe("17/17");
-    expect(cfg.parkEvidence.targetedTests).toBe("136/136");
+    expect(cfg.sectionClosed).toBe(true);
+    expect(cfg.parkForManager).toBe(false);
+    expect(cfg.closeEvidence.liveCustomerWalk).toBe("17/17");
+    expect(cfg.closeEvidence.targetedTests).toBe("136/136");
+    expect(cfg.closeTip).toBe("6cf9ca0");
     expect(cfg.doNotAutoAdvance).toBe(true);
     expect(cfg.doNotStartOwnerConsole).toBe(true);
     expect(cfg.doNotReopenResend).toBe(true);
@@ -76,10 +77,15 @@ describe("STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1", () => {
     expect(studioLaunchReadinessExecutionOrderV1.room2Section3.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section3.closeTip).toBe("3328807");
     expect(studioLaunchReadinessExecutionOrderV1.room2Section4.packageId).toBe(cfg.packageId);
-    expect(studioLaunchReadinessExecutionOrderV1.room2Section4.sectionClosed).toBe(false);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section4.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section4.closeTip).toBe("6cf9ca0");
     expect(studioLaunchReadinessExecutionOrderV1.room2Section4.nextSectionWaitsForScoutPackage).toBe(
-      true,
+      false,
     );
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section5.packageId).toBe(
+      "STUDIO-OPERATING-ROOM-2-WHOLE-CUSTOMER-TRUTH-AND-FRICTION-SWEEP-1",
+    );
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section5.sectionClosed).toBe(false);
     expect([...cfg.scopedSpine]).toEqual([
       "mixed-state-board",
       "status-hierarchy",
@@ -204,6 +210,8 @@ describe("STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1", () => {
     expect(helpText).not.toMatch(JOB_NOUN);
     expect(refundText).not.toMatch(/\bjobs?\b/i);
     expect(REFUND_REQUEST_CUSTOMER_V1.jobLabel).toBe("Which service is this request about?");
+    expect(REFUND_REQUEST_CUSTOMER_V1.jobSelectPlaceholder).toBe("Select a service");
+    expect(REFUND_REQUEST_CUSTOMER_V1.jobSelectPlaceholder).not.toMatch(JOB_NOUN);
     expect(studioPolicies.faq.items.find((item) => item.id === "revision-count")?.blocks).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

@@ -252,7 +252,7 @@ export default function StudioBoardRefundRequestSection({
                   setLockedAfterSubmit(false);
                 }}
               >
-                <option value="">Select a job</option>
+                <option value="">{copy.jobSelectPlaceholder}</option>
                 {selectableJobs.map((job) => (
                   <option key={job.jobId} value={job.jobId}>
                     {job.serviceName} — {job.statusLabel}
@@ -262,7 +262,7 @@ export default function StudioBoardRefundRequestSection({
             </>
           ) : (
             <p className="sb-refund-request__meta">
-              Job: {selectableJobs[0]!.serviceName} — {selectableJobs[0]!.statusLabel}
+              {selectableJobs[0]!.serviceName} — {selectableJobs[0]!.statusLabel}
             </p>
           )}
 

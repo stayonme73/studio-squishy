@@ -1,6 +1,9 @@
 import { createHash } from "crypto";
 
-import { studioMaterialsUploadV1 } from "@/config/studio-materials-upload-v1";
+import {
+  isAllowedCustomerMaterialFile,
+  studioMaterialsUploadV1,
+} from "@/config/studio-materials-upload-v1";
 import type { CampaignRecord } from "@/config/studio-board";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -15,11 +18,6 @@ import { parseConsolidatedRequestId } from "./client-requests";
 import { applyClientSubmitConsolidated, applyClientSubmitItem } from "./actions";
 import type { CampaignMaterialItem, ServerMaterialsEnvelope } from "./types";
 
-function extensionOf(fileName: string): string {
-  const match = fileName.trim().toLowerCase().match(/(\.[a-z0-9]+)$/);
-  return match?.[1] ?? "";
-}
-
 export function validateCustomerMaterialFile(file: File): { ok: true } | { ok: false; error: string } {
   const copy = studioMaterialsUploadV1.customerCopy;
   if (!file || !file.name.trim()) {
@@ -31,13 +29,7 @@ export function validateCustomerMaterialFile(file: File): { ok: true } | { ok: f
   if (file.size > studioMaterialsUploadV1.maxFileBytes) {
     return { ok: false, error: copy.tooLarge };
   }
-  const mime = file.type.trim().toLowerCase();
-  const ext = extensionOf(file.name);
-  const mimeOk =
-    mime.length > 0 &&
-    (studioMaterialsUploadV1.allowedMimeTypes as readonly string[]).includes(mime);
-  const extOk = (studioMaterialsUploadV1.allowedExtensions as readonly string[]).includes(ext);
-  if (!mimeOk && !extOk) {
+  if (!isAllowedCustomerMaterialFile(file.name, file.type)) {
     return { ok: false, error: copy.unsupportedType };
   }
   return { ok: true };

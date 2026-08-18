@@ -10,6 +10,7 @@ export const REFUND_REQUEST_CUSTOMER_V1 = {
     "You can request a refund review for a service on this project. Requests are reviewed by the owner. A refund may be eligible or may be approved only when policy conditions are met and production has not started on that service.",
 
   jobLabel: "Which service is this request about?",
+  jobSelectPlaceholder: "Select a service",
   jobLoading: "Loading your services…",
   jobLoadFailed: "Could not load services for this project.",
   jobEmpty: "No services are available for a refund request on this project.",

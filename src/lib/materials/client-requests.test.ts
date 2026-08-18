@@ -199,6 +199,7 @@ describe("resolveOptionalClientRequests", () => {
 
     expect(resolveOptionalClientRequests(record)).toHaveLength(1);
     expect(resolveOptionalClientRequests(record)[0]?.itemId).toBe("opt-1");
+    expect(resolveOptionalClientRequests(record)[0]?.statusLabel).toBe("Optional");
   });
 
   it("keeps a stored optional file sendable and names the stored file for the customer", () => {

@@ -1,41 +1,45 @@
 /**
- * Room 2 Section 4 — mixed-status and terminology truth.
- * CLOSED 2026-08-18 by Tagia on the Section 4 park tip.
+ * Room 2 Section 5 — whole-customer truth and friction sweep.
+ * PARK for Manager. Not closed. Do not auto-advance.
  *
- * Close tip `6cf9ca0`. Do not reopen unless new evidence proves a real defect.
- * Do not start Owner Console. Do not reopen Resend/domain.
+ * Prior closes: Section 1 `45b09b1` · Section 2 `e609203` · Section 3 `3328807` ·
+ * Section 4 `6cf9ca0`.
+ * Do not reopen those sections unless this sweep exposes a genuine defect.
+ * Do not start Owner Console. Do not reopen Resend/domain. Do not merge.
+ * Do not start Room 3 automatically.
  */
 
 import { studioLaunchReadinessExecutionOrderV1 } from "@/config/studio-launch-readiness-execution-order-v1";
 import { studioRoom1CustomerLifeCloseoutV1 } from "@/config/studio-room-1-customer-life-closeout-v1";
 import { studioRoom2CustomerFacingTruthAndFrictionEntryV1 } from "@/config/studio-room-2-customer-facing-truth-and-friction-entry-v1";
+import { studioRoom2MixedStatusAndTerminologyTruthV1 } from "@/config/studio-room-2-mixed-status-and-terminology-truth-v1";
 import { studioRoom2ReturningCustomerBoardAndHelpCenterTruthV1 } from "@/config/studio-room-2-returning-customer-board-and-help-center-truth-v1";
 import { studioRoom2ReviewFinalDeliveryTruthAndFrictionV1 } from "@/config/studio-room-2-review-final-delivery-truth-and-friction-v1";
 
-export const studioRoom2MixedStatusAndTerminologyTruthV1 = {
-  packageId: "STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1",
+export const studioRoom2WholeCustomerTruthAndFrictionSweepV1 = {
+  packageId: "STUDIO-OPERATING-ROOM-2-WHOLE-CUSTOMER-TRUTH-AND-FRICTION-SWEEP-1",
   schemaVersion: 1 as const,
   room: 2 as const,
   roomId: "customer-facing-truth-and-friction-cleanup" as const,
   merge: "separately_authorized" as const,
   ownerRoutine: "NONE" as const,
-  parkForManager: false as const,
-  sectionClosed: true as const,
-  closedAt: "2026-08-18" as const,
-  closeTip: "6cf9ca0" as const,
+  parkForManager: true as const,
+  sectionClosed: false as const,
   doNotAutoAdvance: true as const,
-  closeEvidence: {
-    liveCustomerWalk: "17/17" as const,
-    targetedTests: "136/136" as const,
+  parkEvidence: {
+    liveCustomerWalk: "46/46" as const,
+    targetedTests: "111/111" as const,
     ownerRoutine: "NONE" as const,
     merge: false as const,
-    closeTip: "6cf9ca0" as const,
+    room2Verdict: "READY_TO_CLOSE_WITH_EXPLICIT_NON_BLOCKING_LIMITS" as const,
   },
   doNotStartOwnerConsole: true as const,
+  doNotStartRoom3: true as const,
   doNotReopenResend: true as const,
   doNotReopenSection1UnlessNewDefect: true as const,
   doNotReopenSection2UnlessNewDefect: true as const,
   doNotReopenSection3UnlessNewDefect: true as const,
+  doNotReopenSection4UnlessNewDefect: true as const,
   doNotReopenRoom1UnlessNewDefect: true as const,
   visualRedesign: false as const,
   closeRule:
@@ -48,6 +52,8 @@ export const studioRoom2MixedStatusAndTerminologyTruthV1 = {
     section2CloseTip: "e609203" as const,
     section3PackageId: studioRoom2ReviewFinalDeliveryTruthAndFrictionV1.packageId,
     section3CloseTip: "3328807" as const,
+    section4PackageId: studioRoom2MixedStatusAndTerminologyTruthV1.packageId,
+    section4CloseTip: "6cf9ca0" as const,
   },
 
   room1Status: studioRoom1CustomerLifeCloseoutV1.status,
@@ -59,38 +65,46 @@ export const studioRoom2MixedStatusAndTerminologyTruthV1 = {
     protectedCheckpoint: studioRoom1CustomerLifeCloseoutV1.comeBackLater.protectedCheckpoint,
     verdict: studioRoom1CustomerLifeCloseoutV1.comeBackLater.verdict,
     doesNotBlockRoom2: studioRoom1CustomerLifeCloseoutV1.emailDoesNotBlockRoom2,
+    neitherPassNorFailForThisSweep: true as const,
   },
 
   scopedSpine: [
-    "mixed-state-board",
-    "status-hierarchy",
-    "customer-facing-terminology",
-    "help-center-residue",
-    "update-history",
-    "concept-strategy-labels",
-    "cross-surface-agreement",
+    "front-door",
+    "post-pay-intake",
+    "materials",
+    "board-and-project-record",
+    "voice-and-status",
+    "help-and-problem-reporting",
+    "review",
+    "revision-and-re-review",
+    "approval-and-final",
+    "delivery",
+    "return-later",
     "stale-tab-and-mixed-state",
-    "customer-eyes-walk",
+    "terminology-and-friction",
   ] as const,
 
   lookParticularlyFor: [
-    "Building Concepts vs Project Intake Received as competing current states",
-    "Ready for Review remaining current after revision or approval",
-    "Final Delivery ready while Review still looks unfinished",
-    "job / campaign / task / Kitchen / QA / hash residue on customer surfaces",
-    "Help Center each-job wording",
-    "Update History machine-log details",
-    "reachable Campaign Strategy labels vs dormant catalog residue",
+    "first-time vs Returning Client path collision",
+    "false payment confirmation",
+    "wordmark-only flyer demanding a logo",
+    "Board and Project Record disagreeing on current status",
+    "Voice dumping historical states into the current answer",
+    "Ask a question vs Report a problem collision",
+    "Review remaining unfinished after approval",
+    "wrong-version or incomplete delivery looking complete",
+    "stale tab remaining actionable after the project advances",
+    "reachable Campaign / job / Kitchen / QA / Squishy residue",
   ] as const,
 
   outOfScope: [
     "owner_console",
+    "room_3",
     "branded_sender_certification",
     "real_inbox_delivery_proof",
-    "room_1_production_rebuild",
+    "new_paid_order_to_repeat_stripe_cert",
     "review_delivery_machinery_rebuild",
     "visual_redesign_spree",
-    "help_center_full_rewrite",
     "merge",
   ] as const,
 } as const;

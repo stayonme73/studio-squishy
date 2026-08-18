@@ -400,7 +400,7 @@ export function resolveOptionalClientRequests(
         label: item.label,
         reason: formatServiceNameList(serviceNames),
         reviewStatus: item.reviewStatus,
-        statusLabel: clientMaterialStatusLabel(item.reviewStatus),
+        statusLabel: clientMaterialStatusLabel(item.reviewStatus, "optional"),
         canSubmit,
         isPendingReview: item.reviewStatus === "submitted",
         submittedAt: item.submittedAt,

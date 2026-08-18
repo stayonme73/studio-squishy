@@ -9,7 +9,7 @@ import type {
   FeedbackTool,
   SectionReviewStatus,
 } from "@/config/feedback-studio";
-import { feedbackStudio, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
+import { feedbackStudio, isJobReviewClosedSpine, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
 import { customerVisibleFileFormatLabel } from "@/config/deliverables";
 import { studioReviewRevisionFullLoopV1 } from "@/config/studio-review-revision-full-loop-v1";
 import type { ClientReviewDeliverable } from "@/lib/job-control/review-feedback-types";
@@ -29,6 +29,7 @@ type Props = {
   reviewTitle: string;
   serviceName: string;
   jobId: string;
+  spineStatus: string;
   deliverables: readonly ClientReviewDeliverable[];
   focusedSection: FeedbackSectionId;
   visibleSectionIds: readonly FeedbackSectionId[];
@@ -54,6 +55,7 @@ export default function JobReviewDeliverablePreview({
   reviewTitle,
   serviceName,
   jobId,
+  spineStatus,
   deliverables,
   focusedSection,
   visibleSectionIds,
@@ -78,6 +80,18 @@ export default function JobReviewDeliverablePreview({
     deliverables.map((entry) => [deliverableKeyToSectionId(entry.key), entry]),
   );
 
+  const reviewClosed = isJobReviewClosedSpine(spineStatus);
+  const summary = reviewClosed
+    ? feedbackStudio.jobReview.submittedApproval
+    : spineStatus === "revision_requested"
+      ? feedbackStudio.jobReview.submittedRevision
+      : feedbackStudio.jobReview.pickerLead;
+  const subhead = reviewClosed
+    ? feedbackStudio.jobReview.submittedApproval
+    : spineStatus === "revision_requested"
+      ? feedbackStudio.jobReview.submittedRevision
+      : feedbackStudio.jobReview.deliverableReady;
+
   return (
     <div className="fs-preview fs-preview--workspace">
       <header className="fs-preview__header">
@@ -85,7 +99,7 @@ export default function JobReviewDeliverablePreview({
           {feedbackStudio.jobReview.serviceLabel} · {serviceName}
         </p>
         <h2 className="fs-preview__title">{reviewTitle}</h2>
-        <p className="fs-preview__summary">{feedbackStudio.jobReview.pickerLead}</p>
+        <p className="fs-preview__summary">{summary}</p>
       </header>
 
       {visibleSectionIds.map((sectionId) => {
@@ -112,12 +126,16 @@ export default function JobReviewDeliverablePreview({
           >
             <div className="fs-mock fs-mock--deliverable fs-mock--large">
               <p className="fs-mock__headline">{deliverable.label}</p>
-              <p className="fs-mock__subhead">{feedbackStudio.jobReview.deliverableReady}</p>
+              <p className="fs-mock__subhead">{subhead}</p>
               {currentProof ? (
                 <p className="fs-mock__meta">
-                  {studioReviewRevisionFullLoopV1.customerCopy.currentVersionLead(
-                    currentProof.versionLabel,
-                  )}
+                  {reviewClosed
+                    ? studioReviewRevisionFullLoopV1.customerCopy.approvedVersionLead(
+                        currentProof.versionLabel,
+                      )
+                    : studioReviewRevisionFullLoopV1.customerCopy.currentVersionLead(
+                        currentProof.versionLabel,
+                      )}
                 </p>
               ) : deliverable.preparedAt ? (
                 <p className="fs-mock__meta">

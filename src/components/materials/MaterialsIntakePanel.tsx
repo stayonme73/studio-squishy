@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { materialsConfig } from "@/config/materials";
-import { studioMaterialsUploadV1 } from "@/config/studio-materials-upload-v1";
+import {
+  isAllowedCustomerMaterialFile,
+  studioMaterialsUploadV1,
+} from "@/config/studio-materials-upload-v1";
 import type { CampaignRecord } from "@/config/studio-board";
 import type {
   ClientConsolidatedRequest,
@@ -196,7 +199,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
   const [data, setData] = useState<MaterialsClientResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showOptional, setShowOptional] = useState(true);
+  const [showOptional, setShowOptional] = useState(false);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
   const [receiptMessage, setReceiptMessage] = useState<string | null>(null);
@@ -280,6 +283,24 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
       }));
       return;
     }
+    if (!isAllowedCustomerMaterialFile(file.name, file.type || "application/octet-stream")) {
+      setChosenFiles((current) => {
+        const next = { ...current };
+        delete next[id];
+        return next;
+      });
+      setFileSelections((current) => ({
+        ...current,
+        [id]: {
+          kind: "error",
+          fileName: file.name,
+          mimeType: file.type || "application/octet-stream",
+          message: studioMaterialsUploadV1.customerCopy.unsupportedType,
+        },
+      }));
+      return;
+    }
+
     if (file.size > MATERIALS_IMAGE_PREVIEW_MAX_BYTES) {
       setChosenFiles((current) => {
         const next = { ...current };
@@ -455,15 +476,18 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
 
   if (!showPanel) return null;
 
+  const panelTitle =
+    blockingCount > 0 ? materialsConfig.intakePanelTitle : materialsConfig.intakePanelCompleteTitle;
+
   return (
     <article
       className="sb-card sb-card--materials bf-material bf-material-paper"
       aria-labelledby="sb-materials-intake-title"
     >
-      <p className="sb-card__tab">{materialsConfig.intakePanelTitle}</p>
+      <p className="sb-card__tab">{panelTitle}</p>
       <div className="sb-materials-intake">
         <h2 id="sb-materials-intake-title" className="sr-only">
-          {materialsConfig.intakePanelTitle}
+          {panelTitle}
         </h2>
 
         {loading ? (
@@ -487,8 +511,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
 
         {!loading && consolidated.length === 0 && blockingCount > 0 ? (
           <p className="sb-materials-intake__meta" role="status">
-            We are syncing the required materials for this campaign. Refresh the Board in a moment
-            if the request list does not appear.
+            {materialsConfig.intakeSyncingBody}
           </p>
         ) : null}
 

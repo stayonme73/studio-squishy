@@ -60,6 +60,8 @@ export const materialsConfig = {
   intakePanelCompleteTitle: "Materials caught up",
   intakePanelCompleteBody:
     "Required materials are submitted or approved. Optional items stay available under Add more.",
+  intakeSyncingBody:
+    "We are syncing the required materials for this project. Refresh the Board in a moment if the request list does not appear.",
   addMoreLabel: "Add more (optional)",
   clientSubmitLabel: "Send to Studio",
   clientSubmitSuccess: "Submitted — our team will review shortly.",
@@ -117,6 +119,15 @@ export function materialStatusLabel(status: MaterialReviewStatus): string {
   return materialsConfig.statusLabels[status];
 }
 
-export function clientMaterialStatusLabel(status: MaterialReviewStatus): string {
+export function clientMaterialStatusLabel(
+  status: MaterialReviewStatus,
+  requirementLevel?: "required" | "optional",
+): string {
+  if (
+    requirementLevel === "optional" &&
+    (status === "missing" || status === "requested")
+  ) {
+    return materialsConfig.requirementLabels.optional;
+  }
   return materialsConfig.clientStatusLabels[status];
 }

@@ -1,0 +1,282 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-2-WHOLE-CUSTOMER-TRUTH-AND-FRICTION-SWEEP-1",
+  "kind": "whole-customer-truth-and-friction-sweep",
+  "recordedAt": "2026-08-18T19:42:11.109Z",
+  "baseUrl": "http://127.0.0.1:3066",
+  "totals": {
+    "passed": 46,
+    "failed": 0,
+    "blocked": 0,
+    "total": 46
+  },
+  "friction": [
+    {
+      "where": "Board current project (walk fixture)",
+      "classification": "acceptable",
+      "note": "This sweep used two Maya fixtures on one account so Review could bind without a new Stripe charge. The signed-in Board follows the session cookie until sign-in is refreshed. A single-project customer does not hit this. Mixed projects on one Board remain a later concern."
+    }
+  ],
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (existing)"
+    },
+    {
+      "check": "front_door_begin",
+      "status": "PASS",
+      "detail": "First-time customer can see Let’s Get Started.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\01-lobby.png"
+    },
+    {
+      "check": "front_door_returning_separate",
+      "status": "PASS",
+      "detail": "Returning Client is Sign In, not the first-time start.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\01-lobby.png"
+    },
+    {
+      "check": "front_door_no_forbidden",
+      "status": "PASS",
+      "detail": "Lobby has no forbidden residue.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\01-lobby.png"
+    },
+    {
+      "check": "conversation_speak_and_type",
+      "status": "PASS",
+      "detail": "Speak=true Type=true",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\02-conversation.png"
+    },
+    {
+      "check": "route_is_suggestion",
+      "status": "PASS",
+      "detail": "Route remains a suggestion, not a command.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\03-route.png"
+    },
+    {
+      "check": "flyer_price_and_scope",
+      "status": "PASS",
+      "detail": "Selected service and $69 are visible before checkout.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\04-flyer-details.png"
+    },
+    {
+      "check": "studio_plan_service_and_price",
+      "status": "PASS",
+      "detail": "Studio Plan states Make Me a Flyer and $69.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\05-studio-plan.png"
+    },
+    {
+      "check": "checkout_controls_distinct",
+      "status": "PASS",
+      "detail": "Open checkout=1 Continue to secure checkout=1",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\06-checkout-handoff.png"
+    },
+    {
+      "check": "checkout_not_paid_yet",
+      "status": "PASS",
+      "detail": "Checkout names Stripe and does not claim payment already happened.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\06-checkout-handoff.png"
+    },
+    {
+      "check": "maya_fixture",
+      "status": "PASS",
+      "detail": "Maya Brooks · Cedar & Bloom · paid Make Me a Flyer $69. No new Stripe order."
+    },
+    {
+      "check": "post_pay_intake_needed",
+      "status": "PASS",
+      "detail": "Paid truth is intake-needed. No fake production-started claim.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\07-intake-needed-board.png"
+    },
+    {
+      "check": "board_labels_current_project",
+      "status": "PASS",
+      "detail": "Current Project / New Project / Project Record language is present.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\07-intake-needed-board.png"
+    },
+    {
+      "check": "board_no_campaign_residue",
+      "status": "PASS",
+      "detail": "No Campaign / Squishy residue on signed-in Board.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\07-intake-needed-board.png"
+    },
+    {
+      "check": "ask_and_report_distinct",
+      "status": "PASS",
+      "detail": "Ask a question stays distinct from Report a problem.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\07-intake-needed-board.png"
+    },
+    {
+      "check": "voice_intake_needed",
+      "status": "PASS",
+      "detail": "Payment is confirmed. Project Intake is still needed before we can produce your flyer."
+    },
+    {
+      "check": "voice_needs_intake",
+      "status": "PASS",
+      "detail": "Yes. We still need your Project Intake before we can produce your flyer."
+    },
+    {
+      "check": "wordmark_does_not_demand_logo",
+      "status": "PASS",
+      "detail": "No required-logo demand on the wordmark-only flyer Board.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\08-materials.png"
+    },
+    {
+      "check": "materials_received_not_approved",
+      "status": "PASS",
+      "detail": "the STUDIO Studio Board Review Room Final Delivery Help Center New Project Sign out STUDIO BOARD Good afternoon, Maya Brooks CURRENT PROJECT Cedar & Bloom Home Organizing PROJECT STATUS WHAT WE NEED FROM YOU Finish Proje",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\08b-materials-upload.png"
+    },
+    {
+      "check": "materials_duplicate_copy",
+      "status": "PASS",
+      "detail": "Duplicate path did not surface extra jargon."
+    },
+    {
+      "check": "materials_unsupported_next_step",
+      "status": "PASS",
+      "detail": "Filenotes.exeThis file type is not supported. Please send a PNG, JPG, PDF, Word document, text file, MP3, WAV, or MP4.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\08c-unsupported-file.png"
+    },
+    {
+      "check": "help_center_no_job",
+      "status": "PASS",
+      "detail": "Help Center stays job-free.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\09-help-center.png"
+    },
+    {
+      "check": "production_underway_status",
+      "status": "PASS",
+      "detail": "Building Concepts In ProgressThe Studio is building your concepts. Check back here for your review invitation.The Studio team is creating your project directions. Your Studio Board will update when concepts are ready for review. Next update",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\10-producing.png"
+    },
+    {
+      "check": "stale_intake_tab_after_production",
+      "status": "PASS",
+      "detail": "Building Concepts In ProgressThe Studio is building your concepts. Check back here for your review invitation.The Studio team is creating your project directions. Your Studio Board will update when concepts are ready for review. Next update",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\10b-stale-intake-after-production.png"
+    },
+    {
+      "check": "voice_work_started",
+      "status": "PASS",
+      "detail": "Yes. The Studio record shows work has started on your flyer."
+    },
+    {
+      "check": "voice_got_file",
+      "status": "PASS",
+      "detail": "The Studio record does not show a received upload yet. If you just sent a file, wait a moment and ask again."
+    },
+    {
+      "check": "board_record_agree_producing",
+      "status": "PASS",
+      "detail": "Board=Building Concepts In ProgressThe Studio is building your concepts. Check back here for your review invitation.The Studio Record=Project NameCedar & Bloom Home Organizing\nCurrent StatusBuilding Concepts\nEstimated CompletionSoon\nCreated DateAugust 18, 2026\nProject TypeCustom Studio Plan\nMa",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\11-project-record.png"
+    },
+    {
+      "check": "revision_board_not_open_review",
+      "status": "PASS",
+      "detail": "Revision in progressThe Studio is updating your work from the revision you sent. Review will open again when the new version is ready.Nothing is required from you until the revised version is ready.Next update: When you review\nThe Studio is",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\15-revision-board.png"
+    },
+    {
+      "check": "voice_received_revision",
+      "status": "PASS",
+      "detail": "Yes. The Studio received your revision request. It is on the project record."
+    },
+    {
+      "check": "review_fixture_ready",
+      "status": "PASS",
+      "detail": "spine=ready_for_review qa=ELIGIBLE_FOR_REVIEW proofs=1 dispatchOk=true"
+    },
+    {
+      "check": "review_ready_from_board",
+      "status": "PASS",
+      "detail": "Ready for ReviewOpen the Review Room to see what is ready and what happens next.Open Review RoomOpen the Review Room to see what is ready and what happens next.\nReady for Review\nOpen the Review Room to see what is ready and what happens nex",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\12-review-ready-board.png"
+    },
+    {
+      "check": "voice_review_ready",
+      "status": "PASS",
+      "detail": "You can review it now. Open the Review Room from your Studio Board."
+    },
+    {
+      "check": "review_entry_clarity",
+      "status": "PASS",
+      "detail": "← BACK REVIEW ROOM Help Center → Studio Board Project Record Review Room Final Delivery Help Center Review your work — Make Me a Flyer SERVICE · MAKE ME A FLYER Cedar & Bloom Home Organizing Look at the current version. You can ask a question, request a revision, or approve this ",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\13-review.png"
+    },
+    {
+      "check": "review_no_hash_residue",
+      "status": "PASS",
+      "detail": "No hash/QA/Squishy residue on Review."
+    },
+    {
+      "check": "revision_confirm_clear",
+      "status": "PASS",
+      "detail": "← BACK REVIEW ROOM Help Center → Studio Board Project Record Review Room Final Delivery Help Center Review your work — Make Me a Flyer SERVICE · MAKE ME A FLYER Cedar & Bloom Home Organizing Look at the current version. You can ask a questi",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\14-revision-confirm.png"
+    },
+    {
+      "check": "approval_names_version",
+      "status": "PASS",
+      "detail": "← BACK REVIEW ROOM Help Center → Studio Board Project Record Review Room Final Delivery Help Center Review your work — Make Me a Flyer SERVICE · MAKE ME A FLYER Cedar & Bloom Home Organizing Look at the current version. You can ask a questi",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\16-approval-confirm.png"
+    },
+    {
+      "check": "after_approval_review_not_unfinished",
+      "status": "PASS",
+      "detail": "Final Delivery readyYour approved files are ready to download in Final Delivery.Open Final Delivery\nFinal Delivery ready\nYour approved files are ready to download in Final Delivery. (Open Final Delivery)\nNothing is required from you right n",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\17-approved-board.png"
+    },
+    {
+      "check": "final_preparing_not_delivered",
+      "status": "PASS",
+      "detail": "← BACK REVIEW ROOM Help Center → Studio Board Project Record Review Room Final Delivery Help Center Final — Review is complete. The Studio is preparing the files you will keep. — Cedar & Bloom Home Organizing Approved for Final Delivery Thi",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\18-final.png"
+    },
+    {
+      "check": "stale_review_tab_after_approval",
+      "status": "PASS",
+      "detail": "← BACK REVIEW ROOM Help Center → Studio Board Project Record Review Room Final Delivery Help Center Review your work — Make Me a Flyer SERVICE · MAKE ME A FLYER Cedar & Bloom Home Organizing Approved. The Studio is preparing your final file",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\19-stale-review-after-approval.png"
+    },
+    {
+      "check": "delivery_promised_files",
+      "status": "PASS",
+      "detail": "← BACK REVIEW ROOM Help Center → Studio Board Project Record Review Room Final Delivery Help Center Delivery — download the files from the version you approved. — Cedar & Bloom Home Organizing PROJECT COMPLETE Your files are ready. Download the files from the version you approved",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\20-delivery.png"
+    },
+    {
+      "check": "voice_final_files",
+      "status": "PASS",
+      "detail": "Your final files are ready in Final Delivery on your Studio Board."
+    },
+    {
+      "check": "return_later_same_project",
+      "status": "PASS",
+      "detail": "Final Delivery readyYour approved files are ready to download in Final Delivery.Open Final Delivery\nFinal Delivery ready\nYour approved files are ready to download in Final Delivery. (Open Final Delivery)\nNothing is required from you right n",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\21-return-later-board.png"
+    },
+    {
+      "check": "return_later_no_false_review",
+      "status": "PASS",
+      "detail": "Return later does not recreate an unfinished Review action."
+    },
+    {
+      "check": "return_later_files_remain",
+      "status": "PASS",
+      "detail": "← BACK REVIEW ROOM Help Center → Studio Board Project Record Review Room Final Delivery Help Center Delivery — download the files from the version you approved. — Cedar & Bloom Home Organizing PROJECT COMPLETE Your files are ready. Download",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-whole-customer-truth-and-friction-sweep-1\\customer-walk\\shots\\22-return-later-delivery.png"
+    },
+    {
+      "check": "resend_not_reopened",
+      "status": "PASS",
+      "detail": "Email remains parked at d6974eb. Neither PASS nor FAIL."
+    },
+    {
+      "check": "owner_routine",
+      "status": "PASS",
+      "detail": "NONE"
+    }
+  ]
+}

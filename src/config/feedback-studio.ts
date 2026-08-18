@@ -348,6 +348,14 @@ export const feedbackStudio = {
   },
 } as const;
 
+export function isJobReviewClosedSpine(spineStatus: string): boolean {
+  return (
+    spineStatus === "approved" ||
+    spineStatus === "ready_for_delivery" ||
+    spineStatus === "delivered"
+  );
+}
+
 export function getFeedbackConcept(
   id: string | null | undefined,
   concepts: readonly FeedbackConceptPreview[],

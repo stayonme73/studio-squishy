@@ -130,6 +130,9 @@ export function assembleCustomerLifeTruth(
     reviewEligible =
       decision.outcome === studioReviewEligibilityV1.outcomes.eligibleForReview;
   }
+  if (job?.spineStatus === "ready_for_review") {
+    reviewEligible = true;
+  }
   if (job?.internalQaReviewAuthorization?.status === "ELIGIBLE_FOR_REVIEW") {
     reviewEligible = true;
   }

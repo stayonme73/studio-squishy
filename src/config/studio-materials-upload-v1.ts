@@ -56,3 +56,13 @@ export const studioMaterialsUploadV1 = {
     },
   },
 } as const;
+
+export function isAllowedCustomerMaterialFile(fileName: string, mimeType: string): boolean {
+  const mime = mimeType.trim().toLowerCase();
+  const ext = fileName.trim().toLowerCase().match(/(\.[a-z0-9]+)$/)?.[1] ?? "";
+  const mimeOk =
+    mime.length > 0 &&
+    (studioMaterialsUploadV1.allowedMimeTypes as readonly string[]).includes(mime);
+  const extOk = (studioMaterialsUploadV1.allowedExtensions as readonly string[]).includes(ext);
+  return mimeOk || extOk;
+}

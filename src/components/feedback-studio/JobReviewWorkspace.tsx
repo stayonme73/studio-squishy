@@ -417,6 +417,7 @@ export default function JobReviewWorkspace({ review, campaign, onReviewUpdated }
             reviewTitle={review.campaignName}
             serviceName={review.serviceName}
             jobId={review.jobId}
+            spineStatus={review.spineStatus}
             deliverables={review.deliverables}
             focusedSection={focusedSection}
             visibleSectionIds={visibleSectionIds}

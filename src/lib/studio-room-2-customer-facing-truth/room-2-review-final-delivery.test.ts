@@ -51,7 +51,8 @@ describe("STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1", (
     expect(studioLaunchReadinessExecutionOrderV1.room2Section4.packageId).toBe(
       "STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1",
     );
-    expect(studioLaunchReadinessExecutionOrderV1.room2Section4.sectionClosed).toBe(false);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section4.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section4.closeTip).toBe("6cf9ca0");
     expect([...cfg.scopedSpine]).toEqual([
       "review-entry",
       "version-truth",
