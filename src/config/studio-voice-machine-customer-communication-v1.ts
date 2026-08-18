@@ -28,7 +28,7 @@ export const studioVoiceMachineCustomerCommunicationV1 = {
     intakeRequest:
       "We still need your Project Intake. Payment and your flyer project are already on the record. Please complete Project Intake so the next step can continue. You do not need to repeat facts the Studio already has.",
     materialsRequest:
-      "The Studio still needs a required material from you before this job can move forward.",
+      "The Studio still needs a required material from you before this service can move forward.",
     unusableFileRequest:
       "We received a file, and it is still being checked for use. Please send a usable version if the Studio asked for one. Received is not the same as approved for use.",
     responseAckRecorded:

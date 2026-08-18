@@ -41,6 +41,8 @@ import {
   resolveProductionGatePassedForCampaign,
   type PostSubmitSignalFacts,
 } from "@/lib/post-submit-customer-signals";
+import type { CustomerJobStatusSummary } from "@/lib/project-record-status";
+import { resolveCustomerCurrentStatusOverlay, type CustomerCurrentStatusOverlay } from "@/lib/studio-customer-current-status";
 
 const { empty, statusContent, routes, boardHeader } = studioBoard;
 
@@ -126,7 +128,7 @@ function campaignHeadline(name: string) {
     .replace(/\s+campaign$/i, "")
     .trim();
 
-  if (!base) return "Your Campaign";
+  if (!base) return "Your Project";
   if (base.includes(":")) return base;
 
   return base.replace(/\b\w+/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
@@ -138,11 +140,9 @@ export function formatCampaignTitle(name: string) {
 
   const trimmed = name.trim();
 
-  if (!trimmed) return "Your Campaign";
+  if (!trimmed) return "Your Project";
 
-  if (/campaign/i.test(trimmed)) return trimmed;
-
-  return `${trimmed} Campaign`;
+  return trimmed;
 
 }
 
@@ -255,6 +255,8 @@ export type StudioBoardDisplayFacts = {
   stillNeededLabel?: string | null;
   /** Authenticated customer display name — never config userName / Tagia. */
   customerDisplayName?: string | null;
+  /** Customer-safe purchased-service summaries from project-status. */
+  jobs?: readonly CustomerJobStatusSummary[];
 };
 
 function resolveProgressStepDetail(
@@ -262,10 +264,12 @@ function resolveProgressStepDetail(
   state: CampaignProgressStepState,
   campaign: CampaignRecord | null,
   facts?: PostSubmitSignalFacts,
+  overlayDetail?: string | null,
 ): string | null {
   if (state === "upcoming") return null;
 
   if (state === "current") {
+    if (overlayDetail) return overlayDetail;
     if (stageId === "BUILDING_CONCEPTS") {
       if (campaign && facts && !mayShowBuildingConceptsCustomerCopy(campaign, facts)) {
         return PROJECT_INTAKE_RECEIVED_STATUS;
@@ -317,8 +321,15 @@ export function resolveCampaignProgressSteps(
   campaign: CampaignRecord | null,
   displayFacts?: StudioBoardDisplayFacts,
 ): CampaignProgressStep[] {
-  const activeIndex = campaign ? campaignStatusIndex(campaign.campaignStatus) : -1;
   const facts = campaign ? resolveBoardDisplayFacts(campaign, displayFacts) : undefined;
+  const overlay = campaign
+    ? resolveCustomerCurrentStatusOverlay(campaign, facts ?? {
+        productionGatePassed: false,
+        blockingRequiredCount: 0,
+      }, displayFacts?.jobs)
+    : null;
+  const displayStatus = overlay?.journeyStatus ?? campaign?.campaignStatus;
+  const activeIndex = displayStatus ? campaignStatusIndex(displayStatus) : -1;
 
   return studioBoard.journeyStages.map((stage, index) => {
     let state: CampaignProgressStepState =
@@ -344,7 +355,13 @@ export function resolveCampaignProgressSteps(
       id: stage.id,
       label,
       state,
-      detail: resolveProgressStepDetail(stage.id, state, campaign, facts),
+      detail: resolveProgressStepDetail(
+        stage.id,
+        state,
+        campaign,
+        facts,
+        state === "current" ? overlay?.currentStepDetail ?? null : null,
+      ),
       href: resolveProgressStepHref(stage.id, state),
     };
   });
@@ -365,11 +382,13 @@ function resolveBoardHeaderSnapshot(
   const content = statusContent[campaign.campaignStatus];
   const targetDate = formatBoardDate(campaign.targetCompletionDate);
   const facts = resolveBoardDisplayFacts(campaign, displayFacts);
+  const overlay = resolveCustomerCurrentStatusOverlay(campaign, facts, displayFacts?.jobs);
   const mode = resolvePostSubmitCustomerMode(campaign, facts);
   const statusLabel =
-    mode === "intake_received" || mode === "materials_blocking"
+    overlay?.statusLabel ??
+    (mode === "intake_received" || mode === "materials_blocking"
       ? PROJECT_INTAKE_RECEIVED_STATUS
-      : content.statusLabel;
+      : content.statusLabel);
 
   return {
     statusDisplay: statusLabel.toUpperCase(),
@@ -410,6 +429,8 @@ export function resolveWhatHappensNextSentence(
   }
 
   const facts = resolveBoardDisplayFacts(campaign, displayFacts);
+  const overlay = resolveCustomerCurrentStatusOverlay(campaign, facts, displayFacts?.jobs);
+  if (overlay?.lead) return overlay.lead;
   const mode = resolvePostSubmitCustomerMode(campaign, facts);
   if (mode === "intake_received" || mode === "materials_blocking") {
     return PROJECT_INTAKE_RECEIVED_LEAD;
@@ -422,6 +443,27 @@ export function resolveWhatHappensNextSentence(
 
 
 /** Live board copy — always derived from current campaignStatus, never stale intake fields. */
+
+function applyOverlayActivity(
+  feed: ActivityFeedEntry[],
+  overlay: CustomerCurrentStatusOverlay | null,
+): ActivityFeedEntry[] {
+  if (!overlay?.activityCurrentMessage) return feed;
+  const withoutStaleReview = feed.filter(
+    (entry) => entry.message !== "Your concepts are ready for review",
+  );
+  if (withoutStaleReview.some((entry) => entry.message === overlay.activityCurrentMessage)) {
+    return withoutStaleReview;
+  }
+  return [
+    {
+      date: withoutStaleReview[0]?.date ?? "Today",
+      time: null,
+      message: overlay.activityCurrentMessage,
+    },
+    ...withoutStaleReview,
+  ];
+}
 
 export function resolveStudioBoardView(
   campaign: CampaignRecord | null,
@@ -507,9 +549,16 @@ export function resolveStudioBoardView(
   const deliverablesProgress = resolveDeliverablesRemaining(campaign);
 
   const facts = resolveBoardDisplayFacts(campaign, displayFacts);
+  const overlay = resolveCustomerCurrentStatusOverlay(campaign, facts, displayFacts?.jobs);
   const mode = resolvePostSubmitCustomerMode(campaign, facts);
   const suppressBuildingConcepts = mode === "intake_received" || mode === "materials_blocking";
   const paidIncompleteIntake = isPaidIncompleteIntake(campaign);
+  const activityFeed = applyOverlayActivity(
+    resolveActivityFeed(campaign, {
+      allowBuildingConceptsActivity: mayShowBuildingConceptsCustomerCopy(campaign, facts),
+    }),
+    overlay,
+  );
 
   return {
 
@@ -525,19 +574,22 @@ export function resolveStudioBoardView(
       ? resolveCampaignPlanLabel(campaign)
       : campaign.packageLabel,
 
-    campaignProgressLabel: suppressBuildingConcepts
-      ? PROJECT_INTAKE_RECEIVED_STAGE
-      : paidIncompleteIntake
-        ? studioBoard.nextAction.waitingOnProjectIntakeLabel
-        : content.campaignProgressLabel,
+    campaignProgressLabel: overlay?.progressLabel
+      ?? (suppressBuildingConcepts
+        ? PROJECT_INTAKE_RECEIVED_STAGE
+        : paidIncompleteIntake
+          ? studioBoard.nextAction.waitingOnProjectIntakeLabel
+          : content.campaignProgressLabel),
 
-    statusLabel: suppressBuildingConcepts ? PROJECT_INTAKE_RECEIVED_STATUS : content.statusLabel,
+    statusLabel: overlay?.statusLabel
+      ?? (suppressBuildingConcepts ? PROJECT_INTAKE_RECEIVED_STATUS : content.statusLabel),
 
-    campaignDescription: suppressBuildingConcepts
-      ? PROJECT_INTAKE_RECEIVED_LEAD
-      : paidIncompleteIntake
-        ? studioBoard.nextAction.completeProjectDetailsHint
-        : content.campaignDescription,
+    campaignDescription: overlay?.lead
+      ?? (suppressBuildingConcepts
+        ? PROJECT_INTAKE_RECEIVED_LEAD
+        : paidIncompleteIntake
+          ? studioBoard.nextAction.completeProjectDetailsHint
+          : content.campaignDescription),
 
     estimatedCompletion: content.estimatedCompletion,
 
@@ -549,9 +601,7 @@ export function resolveStudioBoardView(
 
     deliverablesProgress,
 
-    activityFeed: resolveActivityFeed(campaign, {
-      allowBuildingConceptsActivity: mayShowBuildingConceptsCustomerCopy(campaign, facts),
-    }),
+    activityFeed,
 
     lastStudioNote: resolveLastStudioNote(campaign),
 
@@ -563,15 +613,29 @@ export function resolveStudioBoardView(
 
     whatHappensNextSentence: resolveWhatHappensNextSentence(campaign, displayFacts),
 
-    whatHappensNextSteps: content.whatHappensNextSteps,
+    whatHappensNextSteps: overlay
+      ? overlay.preferDeliveryCta
+        ? statusContent.DELIVERED.whatHappensNextSteps
+        : overlay.suppressReviewCta
+          ? ([overlay.lead, overlay.hint].filter(Boolean) as string[])
+          : content.whatHappensNextSteps
+      : content.whatHappensNextSteps,
 
     stickySelection: campaign.selectedCampaignOption ?? null,
 
     headerSubline: defaultHeaderSubline,
 
-    primaryCta: content.primaryCta,
+    primaryCta: overlay?.preferDeliveryCta
+      ? statusContent.DELIVERED.primaryCta
+      : overlay?.suppressReviewCta
+        ? statusContent.BUILDING_CONCEPTS.primaryCta
+        : content.primaryCta,
 
-    primaryRoute: content.primaryRoute,
+    primaryRoute: overlay?.preferDeliveryCta
+      ? "deliverables"
+      : overlay?.suppressReviewCta
+        ? "campaignDetails"
+        : content.primaryRoute,
 
     emptyBoardSnapshot: null,
 

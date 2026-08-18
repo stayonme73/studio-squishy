@@ -138,6 +138,10 @@ function deriveSpineStatus(
     return "ready_for_review";
   }
 
+  if (persisted?.spineStatus === "revision_requested") {
+    return "revision_requested";
+  }
+
   if (persisted?.spineStatus === "approved") {
     return "approved";
   }

@@ -23,6 +23,7 @@ import {
   type StudioBoardDisplayFacts,
 } from "@/lib/studio-board-view";
 import { resolvePaidOperatingRecoveryCustomerCopy } from "@/lib/studio-paid-activation-recovery/customer-copy";
+import { resolveCustomerCurrentStatusOverlay } from "@/lib/studio-customer-current-status";
 
 const { nextAction: nextCopy, campaignActions: actionCopy } = studioBoard;
 
@@ -149,6 +150,44 @@ export function resolveBoardNextActionPresentation(
       action: null,
       tone: "waiting",
       materialsSupportLine: DISCOVERY_COMPLETE_HINT,
+    });
+  }
+
+  const overlay = resolveCustomerCurrentStatusOverlay(campaign, signalFacts, displayFacts?.jobs);
+  if (
+    overlay?.kind === "revision_underway" ||
+    overlay?.kind === "approved_preparing" ||
+    overlay?.kind === "delivery_ready" ||
+    overlay?.kind === "waiting_on_you"
+  ) {
+    return presentation({
+      statusLabel: overlay.statusLabel,
+      lead: overlay.lead,
+      hint: overlay.hint,
+      action: overlay.preferDeliveryCta
+        ? {
+            type: "navigate",
+            label: nextCopy.openFinalDelivery,
+            href: studioBoard.routes.deliverables,
+          }
+        : null,
+      tone: overlay.kind === "delivery_ready" ? "default" : "waiting",
+      materialsSupportLine: overlay.lead,
+    });
+  }
+
+  if (overlay?.kind === "review_ready") {
+    return presentation({
+      statusLabel: overlay.statusLabel,
+      lead: overlay.lead,
+      hint: nextCopy.reviewConceptsHint,
+      action: {
+        type: "navigate",
+        label: nextCopy.reviewMyConcepts,
+        href: studioBoard.routes.feedbackStudio,
+      },
+      tone: "review",
+      materialsSupportLine: overlay.lead,
     });
   }
 

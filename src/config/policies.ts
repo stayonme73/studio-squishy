@@ -143,7 +143,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "Timelines pause while a job is Waiting on Client for required information or materials.",
+            text: "Timelines pause while a service is Waiting on Client for required information or materials.",
           },
         ] as const,
       },
@@ -171,15 +171,15 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Payment is required before work can proceed, but paying alone does not start production on any job.",
+            text: "Payment is required before work can proceed, but paying alone does not start production on any service.",
           },
           {
             kind: "p",
-            text: "Refund eligibility is determined per job. If production has not started on that job and the requirements of the Refund Policy are met, a refund may be approved.",
+            text: "Refund eligibility is determined per service. If production has not started on that service and the requirements of the Refund Policy are met, a refund may be approved.",
           },
           {
             kind: "p",
-            text: "Once production has started on a job, payment for that job becomes non-refundable.",
+            text: "Once production has started on a service, payment for that service becomes non-refundable.",
           },
           {
             kind: "p",
@@ -247,7 +247,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "Your Project Record shows the revision policy details for each job, including revisions included, used, and remaining where applicable.",
+            text: "Your Project Record shows the revision policy details for each service, including revisions included, used, and remaining where applicable.",
           },
         ] as const,
       },
@@ -324,11 +324,11 @@ export const studioPolicies = {
           { kind: "p", text: "Payment is required before work can proceed." },
           {
             kind: "p",
-            text: "Production is tracked per job. Paying through Secure Checkout reserves your selected services but does not, by itself, start creative production on any job.",
+            text: "Production is tracked per service. Paying through Secure Checkout reserves your selected services but does not, by itself, start creative production on any service.",
           },
           {
             kind: "p",
-            text: "Submitting Project Details does not begin production on any job.",
+            text: "Submitting Project Details does not begin production on any service.",
           },
         ] as const,
       },
@@ -338,28 +338,28 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Production is tracked per job — not per customer account. Other jobs in your project can continue independently while one job is paused.",
+            text: "Production is tracked per service — not per customer account. Other services in your project can continue independently while one service is paused.",
           },
           {
             kind: "p",
-            text: "Production begins on a job only when all four conditions are true for that job:",
+            text: "Production begins on a service only when all four conditions are true for that service:",
           },
           {
             kind: "ul",
             items: [
               "Payment has been received.",
-              "Project Details for that job are complete.",
-              "Required materials for that job have been reviewed and accepted.",
-              "The job has been moved into production.",
+              "Project Details for that service are complete.",
+              "Required materials for that service have been reviewed and accepted.",
+              "The service has been moved into production.",
             ] as const,
           },
           {
             kind: "p",
-            text: "Only then does payment for that job become non-refundable.",
+            text: "Only then does payment for that service become non-refundable.",
           },
           {
             kind: "p",
-            text: "Missing required information or materials pauses production on that job only.",
+            text: "Missing required information or materials pauses production on that service only.",
           },
           {
             kind: "p",
@@ -381,11 +381,11 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "If required materials are still missing after 72 hours, the job moves to Waiting on Client. Only that job pauses — your other jobs can continue independently.",
+            text: "If required materials are still missing after 72 hours, the service moves to Waiting on Client. Only that service pauses — your other services can continue independently.",
           },
           {
             kind: "p",
-            text: "While a job is Waiting on Client, its timeline pauses until the required information or materials are received.",
+            text: "While a service is Waiting on Client, its timeline pauses until the required information or materials are received.",
           },
         ] as const,
       },
@@ -395,19 +395,19 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "The Studio cannot continue a job without the required information, materials, or approvals from you.",
+            text: "The Studio cannot continue a service without the required information, materials, or approvals from you.",
           },
           {
             kind: "p",
-            text: "When a job is Waiting on Client, production on that job pauses and its timeline pauses with it.",
+            text: "When a service is Waiting on Client, production on that service pauses and its timeline pauses with it.",
           },
           {
             kind: "p",
-            text: "Returning the required information or materials allows that job to re-enter the production queue.",
+            text: "Returning the required information or materials allows that service to re-enter the production queue.",
           },
           {
             kind: "p",
-            text: "If there is no client response for 14 calendar days while a job is Waiting on Client and production has not started on that job, a full refund may be eligible. See the Refund Policy.",
+            text: "If there is no client response for 14 calendar days while a service is Waiting on Client and production has not started on that service, a full refund may be eligible. See the Refund Policy.",
           },
         ] as const,
       },
@@ -429,7 +429,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "A job in Waiting on Client does not advance until the required response is received.",
+            text: "A service in Waiting on Client does not advance until the required response is received.",
           },
         ] as const,
       },
@@ -439,7 +439,7 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "Included revisions depend on the service you purchased. Your Project Record shows what is included for each job.",
+            text: "Included revisions depend on the service you purchased. Your Project Record shows what is included for each service.",
           },
           {
             kind: "p",
@@ -458,23 +458,23 @@ export const studioPolicies = {
           { kind: "p", text: "Payment is required before work can proceed." },
           {
             kind: "p",
-            text: "Refund eligibility is determined per job.",
+            text: "Refund eligibility is determined per service.",
           },
           {
             kind: "p",
-            text: "If production has not started on that job and the requirements of this policy are met, a refund may be approved.",
+            text: "If production has not started on that service and the requirements of this policy are met, a refund may be approved.",
           },
           {
             kind: "p",
-            text: "Once production has started on a job, payment for that job becomes non-refundable.",
+            text: "Once production has started on a service, payment for that service becomes non-refundable.",
           },
           {
             kind: "p",
-            text: "If you become unresponsive while required information or materials are missing, the job may move to Waiting on Client. After 14 calendar days without the required response, a full refund may be eligible if production has not started on that job.",
+            text: "If you become unresponsive while required information or materials are missing, the service may move to Waiting on Client. After 14 calendar days without the required response, a full refund may be eligible if production has not started on that service.",
           },
           {
             kind: "p",
-            text: "Paying or submitting Project Details alone does not start production on any job and does not remove refund eligibility by itself.",
+            text: "Paying or submitting Project Details alone does not start production on any service and does not remove refund eligibility by itself.",
           },
         ] as const,
       },
@@ -492,7 +492,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "You receive the approved client-facing deliverables for each completed job.",
+            text: "You receive the approved client-facing deliverables for each completed service.",
           },
         ] as const,
       },

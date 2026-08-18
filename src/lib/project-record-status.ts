@@ -6,6 +6,7 @@
  */
 
 import type { ServiceId } from "@/catalog/types";
+import { studioCustomerCurrentStatusV1 as currentStatus } from "@/config/studio-customer-current-status-v1";
 import type { JobSpineStatus, PurchasedJobRecord } from "@/lib/job-control/types";
 
 export type CustomerJobStatusSummary = {
@@ -22,14 +23,14 @@ export type CustomerJobStatusSummary = {
 };
 
 const SPINE_STATUS_CUSTOMER_LABEL: Record<JobSpineStatus, string> = {
-  ready_for_queue: "Preparing to start",
-  building_concepts: "In production",
-  ready_for_review: "Ready for your review",
-  revision_requested: "Working on your requested changes",
-  approved: "Approved — finishing up",
-  ready_for_delivery: "Getting ready to deliver",
-  delivered: "Delivered",
-  waiting_on_client: "Waiting on you",
+  ready_for_queue: currentStatus.labels.preparingToStart,
+  building_concepts: currentStatus.labels.producing,
+  ready_for_review: currentStatus.labels.reviewReady,
+  revision_requested: currentStatus.labels.revisionUnderway,
+  approved: currentStatus.labels.approvedPreparing,
+  ready_for_delivery: currentStatus.labels.deliveryReady,
+  delivered: currentStatus.labels.delivered,
+  waiting_on_client: currentStatus.labels.waitingOnYou,
   refunded_cancelled: "Cancelled",
 };
 

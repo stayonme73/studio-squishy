@@ -9,7 +9,7 @@ Authority: `docs/launch-readiness-execution-order-v1-locked.md` · `src/config/s
 
 This is sequence control, **not** permission to start multiple packages.
 
-**Active room is 2 — Customer-facing truth + friction cleanup.** Section 1 `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1` is **CLOSED** at `45b09b1`. Section 2 `STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1` is **CLOSED** at `e609203`. Current section: `STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1`. Park for Manager. Do not auto-advance.
+**Active room is 2 — Customer-facing truth + friction cleanup.** Section 1 `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1` is **CLOSED** at `45b09b1`. Section 2 `STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1` is **CLOSED** at `e609203`. Section 3 `STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1` is **CLOSED** at `3328807`. Current section: `STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1`. Park for Manager. Do not auto-advance.
 
 **Room 1 is COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL.** It is **not** a full CLOSED stamp. Authoritative executable tip: `a49efd7`. Abandoned 3067 attempts do not count.
 

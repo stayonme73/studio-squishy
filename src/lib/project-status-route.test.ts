@@ -115,7 +115,7 @@ describe("GET /api/campaigns/[campaignId]/project-status", () => {
         campaignId: "campaign-1",
         skuId: "v2-rtu-flyer",
         serviceName: "Make Me a Flyer",
-        statusLabel: "In production",
+        statusLabel: "Building Concepts",
         isWaitingOnClient: false,
         hasProductionStarted: false,
         deliveredAt: null,

@@ -20,16 +20,17 @@ const CORRECTION_ROUNDS = /correction rounds/i;
 const THIS_VERSION = /in this version|in this build/i;
 
 describe("STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1", () => {
-  it("is the current Room 2 section, parked for Manager, not closed", () => {
+  it("is CLOSED at 3328807 and is not the current Room 2 section", () => {
     expect(cfg.packageId).toBe(
       "STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1",
     );
     expect(cfg.room).toBe(2);
-    expect(cfg.sectionClosed).toBe(false);
-    expect(cfg.parkForManager).toBe(true);
-    expect(cfg.parkEvidence.liveCustomerWalk).toBe("23/23");
-    expect(cfg.parkEvidence.targetedTests).toBe("118/118");
-    expect(cfg.parkEvidence.ownerRoutine).toBe("NONE");
+    expect(cfg.sectionClosed).toBe(true);
+    expect(cfg.parkForManager).toBe(false);
+    expect(cfg.closeEvidence.liveCustomerWalk).toBe("23/23");
+    expect(cfg.closeEvidence.targetedTests).toBe("118/118");
+    expect(cfg.closeEvidence.ownerRoutine).toBe("NONE");
+    expect(cfg.closeTip).toBe("3328807");
     expect(cfg.doNotAutoAdvance).toBe(true);
     expect(cfg.doNotStartOwnerConsole).toBe(true);
     expect(cfg.doNotReopenResend).toBe(true);
@@ -41,15 +42,16 @@ describe("STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1", (
     expect(cfg.priorSections.section2LedgerStampNotClose).toBe("be8fd06");
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(2);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section2.sectionClosed).toBe(true);
-    expect(studioLaunchReadinessExecutionOrderV1.room2Section2.nextSectionWaitsForScoutPackage).toBe(
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section3.packageId).toBe(cfg.packageId);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section3.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section3.closeTip).toBe("3328807");
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section3.nextSectionWaitsForScoutPackage).toBe(
       false,
     );
-    expect(studioLaunchReadinessExecutionOrderV1.room2Section3.packageId).toBe(cfg.packageId);
-    expect(studioLaunchReadinessExecutionOrderV1.room2Section3.sectionClosed).toBe(false);
-    expect(studioLaunchReadinessExecutionOrderV1.room2Section3.parkForManager).toBe(true);
-    expect(studioLaunchReadinessExecutionOrderV1.room2Section3.nextSectionWaitsForScoutPackage).toBe(
-      true,
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section4.packageId).toBe(
+      "STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1",
     );
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section4.sectionClosed).toBe(false);
     expect([...cfg.scopedSpine]).toEqual([
       "review-entry",
       "version-truth",

@@ -245,6 +245,7 @@ export function resolveClientReviewView(input: {
   const updateHistory = projectCustomerUpdateHistory(
     envelope.jobActivityEvents ?? [],
     job.jobId,
+    { currentSpineStatus: job.spineStatus },
   );
 
   return {

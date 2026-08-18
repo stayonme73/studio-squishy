@@ -41,14 +41,14 @@ Use **Project Record** (not Campaign Page) in customer-facing copy.
 
 Production does **not** begin simply because materials were submitted or received.
 
-Production begins **per job** only when **all four conditions** are true for that job:
+Production begins **per service** only when **all four conditions** are true for that service:
 
 1. Payment has been received.
-2. Project Details for that job are complete.
-3. Required materials for that job have been reviewed and accepted.
-4. The job has been moved into production.
+2. Project Details for that service are complete.
+3. Required materials for that service have been reviewed and accepted.
+4. The service has been moved into production.
 
-**Only then** does payment for that job become non-refundable.
+**Only then** does payment for that service become non-refundable.
 
 Do not replace “reviewed and accepted” with “received” in production-trigger copy.
 
@@ -58,21 +58,23 @@ Keep operational flexibility — do **not** change “may be approved” or “m
 
 **Preferred wording (standard refund path):**
 
-> If production has not started on that job and the requirements of this policy are met, a refund may be approved.
+> If production has not started on that service and the requirements of this policy are met, a refund may be approved.
 
-**14-day Waiting on Client path:** a full refund **may be eligible** if production has not started on that job.
+**14-day Waiting on Client path:** a full refund **may be eligible** if production has not started on that service.
 
-### 3. Per-job terminology (LOCKED)
+### 3. Per-service terminology (LOCKED meaning · customer noun)
 
-Policies consistently reflect that production, refunds, and pauses are tracked **per job**, not per customer account.
+Policies consistently reflect that production, refunds, and pauses are tracked **per purchased service**, not per customer account.
 
-Examples locked in copy:
+Room 2 Section 4 (`STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1`, Tagia 2026-08-18) authorized the customer-facing noun **service** for this same per-item rule. Internal code may still say job.
 
-- Production is tracked per job.
-- Production begins per job when all four conditions are met.
-- Refund eligibility is determined per job.
-- Waiting on Client pauses only that job.
-- Other jobs continue independently.
+Examples locked in customer copy:
+
+- Production is tracked per service.
+- Production begins per service when all four conditions are met.
+- Refund eligibility is determined per service.
+- Waiting on Client pauses only that service.
+- Other services continue independently.
 
 This matches the Studio architecture and `src/config/job-control.ts` (`JOB_CONTROL_POLICY`: 48h reminder, 72h Waiting on Client, 14-day refund eligibility).
 

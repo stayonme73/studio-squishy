@@ -37,6 +37,8 @@ import {
   formatRecordFieldValue,
 } from "@/lib/project-record-client-copy";
 import { resolveStudioBoardView } from "@/lib/studio-board-view";
+import type { CustomerJobStatusSummary } from "@/lib/project-record-status";
+import { resolveCustomerCurrentStatusOverlay } from "@/lib/studio-customer-current-status";
 
 const { campaignDetails: copy } = studioBoard;
 
@@ -110,6 +112,7 @@ function resolveIntake(campaign: CampaignRecord): CampaignIntakeSnapshot | undef
 function resolveDeliverables(
   status: CampaignStatus,
   finalDelivery?: FinalDeliveryView | null,
+  overlay?: { suppressReviewCta: boolean; preferDeliveryCta: boolean } | null,
 ): DeliverablesPreview {
   const preparing = {
     ready: false as const,
@@ -131,14 +134,7 @@ function resolveDeliverables(
     };
   }
 
-  if (status === "READY_FOR_REVIEW") {
-    return {
-      ready: true,
-      links: [{ label: copy.deliverables.reviewConcepts, href: studioBoard.routes.feedbackStudio }],
-    };
-  }
-
-  if (status === "DELIVERED") {
+  if (overlay?.preferDeliveryCta || status === "DELIVERED") {
     return {
       ready: true,
       message: copy.deliverables.ready,
@@ -149,6 +145,17 @@ function resolveDeliverables(
           primary: true,
         },
       ],
+    };
+  }
+
+  if (overlay?.suppressReviewCta) {
+    return preparing;
+  }
+
+  if (status === "READY_FOR_REVIEW") {
+    return {
+      ready: true,
+      links: [{ label: copy.deliverables.reviewConcepts, href: studioBoard.routes.feedbackStudio }],
     };
   }
 
@@ -207,7 +214,10 @@ function normalizeRouteMapSummaryForRecord(
 
 export function resolveCampaignDetailsView(
   campaign: CampaignRecord | null,
-  options?: { finalDelivery?: FinalDeliveryView | null },
+  options?: {
+    finalDelivery?: FinalDeliveryView | null;
+    jobs?: readonly CustomerJobStatusSummary[];
+  },
 ): CampaignDetailsView {
   if (!campaign) return emptyView;
 
@@ -224,7 +234,20 @@ export function resolveCampaignDetailsView(
   const routeMapRaw = resolveRouteMapClientSummary(campaign);
   const routeMapClientSummary = routeMapRaw ? normalizeRouteMapSummaryForRecord(routeMapRaw) : null;
 
-  const boardView = resolveStudioBoardView(campaign);
+  const movedToProduction = Boolean(options?.jobs?.some((job) => job.hasProductionStarted));
+  const boardView = resolveStudioBoardView(campaign, {
+    jobs: options?.jobs,
+    movedToProduction,
+    blockingRequiredCount: campaign.materialsSummary?.blockingRequiredCount ?? 0,
+  });
+  const overlay = resolveCustomerCurrentStatusOverlay(
+    campaign,
+    {
+      productionGatePassed: movedToProduction,
+      blockingRequiredCount: campaign.materialsSummary?.blockingRequiredCount ?? 0,
+    },
+    options?.jobs,
+  );
 
   return {
     hasCampaign: true,
@@ -244,7 +267,7 @@ export function resolveCampaignDetailsView(
     deliverablesRemaining: resolveDeliverablesRemaining(campaign),
     packageIncludes: resolveCampaignPlanIncludes(campaign),
     studioUpdates: resolveCampaignStudioNotes(campaign),
-    deliverables: resolveDeliverables(campaign.campaignStatus, options?.finalDelivery),
+    deliverables: resolveDeliverables(campaign.campaignStatus, options?.finalDelivery, overlay),
     timeline: resolveCampaignTimeline(campaign),
   };
 }

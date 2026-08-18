@@ -1,0 +1,112 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1",
+  "kind": "mixed-status-customer-walk",
+  "recordedAt": "2026-08-18T18:33:12.279Z",
+  "baseUrl": "http://127.0.0.1:3066",
+  "totals": {
+    "passed": 17,
+    "failed": 0,
+    "blocked": 0,
+    "total": 17
+  },
+  "verdict": "PARK FOR MANAGER",
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (external)"
+    },
+    {
+      "check": "maya_fixture",
+      "status": "PASS",
+      "detail": "Maya Brooks · Cedar & Bloom · Make Me a Flyer $69"
+    },
+    {
+      "check": "state_01-intake-needed",
+      "status": "PASS",
+      "detail": "Board/Record current language matches 01-intake-needed.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\01-intake-needed-board.png"
+    },
+    {
+      "check": "state_02-intake-received",
+      "status": "PASS",
+      "detail": "Board/Record current language matches 02-intake-received.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\02-intake-received-board.png"
+    },
+    {
+      "check": "state_03-production-underway",
+      "status": "PASS",
+      "detail": "Board/Record current language matches 03-production-underway.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\03-production-underway-board.png"
+    },
+    {
+      "check": "state_04-review-not-ready",
+      "status": "PASS",
+      "detail": "Board/Record current language matches 04-review-not-ready.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\04-review-not-ready-board.png"
+    },
+    {
+      "check": "state_05-review-ready",
+      "status": "PASS",
+      "detail": "Board/Record current language matches 05-review-ready.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\05-review-ready-board.png"
+    },
+    {
+      "check": "state_06-revision-underway",
+      "status": "PASS",
+      "detail": "Board/Record current language matches 06-revision-underway.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\06-revision-underway-board.png"
+    },
+    {
+      "check": "state_07-revised-version-ready",
+      "status": "PASS",
+      "detail": "Board/Record current language matches 07-revised-version-ready.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\07-revised-version-ready-board.png"
+    },
+    {
+      "check": "state_08-approved",
+      "status": "PASS",
+      "detail": "Board/Record current language matches 08-approved.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\08-approved-board.png"
+    },
+    {
+      "check": "state_09-final-delivery-ready",
+      "status": "PASS",
+      "detail": "Board/Record current language matches 09-final-delivery-ready.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\09-final-delivery-ready-board.png"
+    },
+    {
+      "check": "help_center_no_job_noun",
+      "status": "PASS",
+      "detail": "Help Center customer copy uses service language, not job.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\10-help-center.png"
+    },
+    {
+      "check": "help_center_policy_meaning",
+      "status": "PASS",
+      "detail": "Refund/production policy meaning is preserved with service language.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\10-help-center.png"
+    },
+    {
+      "check": "stale_tab_before_advance",
+      "status": "PASS",
+      "detail": "Tab kept Review-ready copy before the state advanced."
+    },
+    {
+      "check": "fresh_tab_current_truth",
+      "status": "PASS",
+      "detail": "Fresh Board after revision shows Revision in progress, not Open Review Room.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-mixed-status-and-terminology-truth-1\\customer-walk\\shots\\11-fresh-after-revision.png"
+    },
+    {
+      "check": "stale_tab_reload_current_truth",
+      "status": "PASS",
+      "detail": "Reloaded earlier tab follows current revision state."
+    },
+    {
+      "check": "refund_section_service_language",
+      "status": "PASS",
+      "detail": "Refund customer copy does not ask which job."
+    }
+  ]
+}

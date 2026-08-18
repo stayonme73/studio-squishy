@@ -83,6 +83,16 @@ export const studioLaunchReadinessExecutionOrderV1 = {
 
   room2Section3: {
     packageId: "STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1",
+    sectionClosed: true as const,
+    parkForManager: false as const,
+    closeTip: "3328807" as const,
+    doNotAutoAdvance: true as const,
+    doNotStartOwnerConsole: true as const,
+    nextSectionWaitsForScoutPackage: false as const,
+  },
+
+  room2Section4: {
+    packageId: "STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1",
     sectionClosed: false as const,
     parkForManager: true as const,
     doNotAutoAdvance: true as const,

@@ -70,7 +70,7 @@ describe("projectCustomerUpdateHistory", () => {
     );
 
     expect(items.map((item) => item.headline)).toEqual([
-      "Studio updated a file version",
+      "The Studio updated your files",
       "Studio released files for you",
     ]);
     expect(items[0]?.versionLabel).toBe("Version 3");
@@ -154,5 +154,50 @@ describe("projectCustomerUpdateHistory", () => {
     );
 
     expect(items.map((item) => item.id)).toEqual(["newer", "older"]);
+  });
+
+  it("does not keep Review action-needed on historical events after approval", () => {
+    const items = projectCustomerUpdateHistory(
+      [
+        event({
+          id: "status_change:a",
+          kind: "status_change",
+          occurredAt: "2026-08-01T10:00:00.000Z",
+          spineStatus: "ready_for_review",
+          reason: "Released for Review Room",
+        }),
+        event({
+          id: "approval:a",
+          kind: "client_delivery_approval",
+          occurredAt: "2026-08-01T12:00:00.000Z",
+          actor: { role: "client" },
+        }),
+      ],
+      "job-1",
+      { currentSpineStatus: "approved" },
+    );
+
+    expect(items.find((item) => item.id === "status_change:a")?.actionRequired).toBeNull();
+    expect(items.find((item) => item.id === "status_change:a")?.detail).toBeNull();
+  });
+
+  it("strips internal QA / Machine detail from customer history", () => {
+    const items = projectCustomerUpdateHistory(
+      [
+        event({
+          id: "status_change:qa",
+          kind: "status_change",
+          occurredAt: "2026-08-01T10:00:00.000Z",
+          spineStatus: "ready_for_review",
+          reason: "Machine flyer identity passed internal QA.",
+        }),
+      ],
+      "job-1",
+      { currentSpineStatus: "ready_for_review" },
+    );
+
+    expect(items[0]?.headline).toBe("Studio submitted work for your review");
+    expect(items[0]?.detail).toBeNull();
+    expect(items[0]?.actionRequired).toContain("return feedback or approve");
   });
 });

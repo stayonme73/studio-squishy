@@ -4,7 +4,7 @@
  */
 
 import { formatReceiptDateTime } from "./review-handoff-receipts";
-import type { JobActivityActor, JobActivityEvent, JobActivityEventKind } from "./types";
+import type { JobActivityActor, JobActivityEvent, JobActivityEventKind, JobSpineStatus } from "./types";
 
 export type CustomerUpdateHistoryItem = {
   id: string;
@@ -104,7 +104,7 @@ function mapHeadline(event: JobActivityEvent): string | null {
         case "building_concepts":
           return "The Studio is building your concepts";
         case "ready_for_queue":
-          return "Your project returned to the Studio queue";
+          return "The Studio is preparing the next step";
         case "approved":
           return "Work approved for delivery";
         case "ready_for_delivery":
@@ -138,7 +138,7 @@ function mapHeadline(event: JobActivityEvent): string | null {
     case "owner_final_release":
       return "Studio released final files";
     case "file_version_updated":
-      return "Studio updated a file version";
+      return "The Studio updated your files";
     case "file_released":
       return "Studio released files for you";
     case "file_download_available":
@@ -148,21 +148,43 @@ function mapHeadline(event: JobActivityEvent): string | null {
   }
 }
 
-function mapActionRequired(event: JobActivityEvent): string | null {
+function mapActionRequired(
+  event: JobActivityEvent,
+  currentSpineStatus?: JobSpineStatus | null,
+): string | null {
   if (event.kind === "status_change" && event.spineStatus === "ready_for_review") {
+    if (currentSpineStatus && currentSpineStatus !== "ready_for_review") return null;
     return "Review this version and either return feedback or approve it";
   }
   if (event.kind === "file_released" || event.kind === "file_download_available") {
+    if (
+      currentSpineStatus &&
+      currentSpineStatus !== "ready_for_delivery" &&
+      currentSpineStatus !== "delivered"
+    ) {
+      return null;
+    }
     return "Open your files when you are ready";
   }
   if (event.kind === "missing_material_request") {
+    if (
+      currentSpineStatus &&
+      currentSpineStatus !== "waiting_on_client" &&
+      currentSpineStatus !== "ready_for_queue"
+    ) {
+      return null;
+    }
     return "Provide the requested materials";
   }
   if (event.kind === "status_change" && event.spineStatus === "waiting_on_client") {
+    if (currentSpineStatus && currentSpineStatus !== "waiting_on_client") return null;
     return "Respond so The Studio can continue";
   }
   return null;
 }
+
+const INTERNAL_DETAIL =
+  /release checks|candidate matches|sha256|owner console|kitchen|internal qa|machine flyer|artifact|pin\b|contentSha256|hash/i;
 
 function mapDetail(event: JobActivityEvent): string | null {
   const reason = event.reason?.trim();
@@ -171,9 +193,8 @@ function mapDetail(event: JobActivityEvent): string | null {
   if (event.kind === "status_change" && event.spineStatus === "ready_for_review") {
     if (/review room/i.test(reason)) return null;
   }
-  if (/release checks|candidate matches|sha256|owner console|kitchen/i.test(reason)) {
-    return null;
-  }
+  if (INTERNAL_DETAIL.test(reason)) return null;
+  if (/client requested revision/i.test(reason)) return null;
   return reason;
 }
 
@@ -184,6 +205,7 @@ function mapDetail(event: JobActivityEvent): string | null {
 export function projectCustomerUpdateHistory(
   events: readonly JobActivityEvent[],
   jobId: string,
+  options?: { currentSpineStatus?: JobSpineStatus | null },
 ): CustomerUpdateHistoryItem[] {
   const items: CustomerUpdateHistoryItem[] = [];
 
@@ -203,7 +225,7 @@ export function projectCustomerUpdateHistory(
       detail: mapDetail(event),
       actorLabel: actorLabel(event.actor),
       versionLabel: extractVersionLabel(event),
-      actionRequired: mapActionRequired(event),
+      actionRequired: mapActionRequired(event, options?.currentSpineStatus),
       sourceKind: event.kind,
     });
   }

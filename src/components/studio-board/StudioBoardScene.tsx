@@ -270,10 +270,12 @@ export default function StudioBoardScene() {
       movedToProduction,
       stillNeededLabel: materialsFacts?.stillNeededLabels[0] ?? null,
       customerDisplayName,
+      jobs: customerJobs,
     };
   }, [
     boardCampaign?.materialsSummary?.blockingRequiredCount,
     customerDisplayName,
+    customerJobs,
     materialsFacts,
     movedToProduction,
   ]);

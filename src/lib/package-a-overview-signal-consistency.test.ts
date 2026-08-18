@@ -76,7 +76,7 @@ describe("Package A — Overview Signal Consistency", () => {
     const campaign = paidIncompleteIntakeCampaign();
     const view = resolveStudioBoardView(campaign);
 
-    expect(view.statusLabel).toBe("Payment Received");
+    expect(view.statusLabel).toBe("Waiting on Project Intake");
     expect(view.campaignProgressLabel).toBe(studioBoard.nextAction.waitingOnProjectIntakeLabel);
     expect(view.campaignProgressLabel).not.toBe("Campaign Queued");
     expect(view.campaignDescription).toBe(studioBoard.nextAction.completeProjectDetailsHint);

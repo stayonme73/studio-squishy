@@ -82,15 +82,18 @@ export default function CampaignDetailsScene() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { campaign, ready, accessState, refresh } = useCurrentCampaign();
-  const view = useMemo(() => resolveCampaignDetailsView(campaign), [campaign]);
-  const showPaymentHelp =
-    view.status === "DRAFT_RECEIVED" || view.status === "PAYMENT_RECEIVED";
   // No customer-safe status call before payment — there is nothing to fetch yet.
   const authorizedCampaign = accessState === "ready" ? campaign : null;
   const { jobs: projectJobs, loading: projectJobsLoading, error: projectJobsError } =
     useProjectJobStatus(
       authorizedCampaign?.paymentReceivedAt ? authorizedCampaign.campaignId : undefined,
     );
+  const view = useMemo(
+    () => resolveCampaignDetailsView(campaign, { jobs: projectJobs }),
+    [campaign, projectJobs],
+  );
+  const showPaymentHelp =
+    view.status === "DRAFT_RECEIVED" || view.status === "PAYMENT_RECEIVED";
   const {
     events: activityEvents,
     pendingCount,

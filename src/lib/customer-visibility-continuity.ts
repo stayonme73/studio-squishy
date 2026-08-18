@@ -116,7 +116,7 @@ function resolveRiskOrBlocker(input: {
       : "Required materials are still needed before work can continue.";
   }
   if (input.waitingOnClient) {
-    return "At least one job is waiting on you.";
+    return "At least one service is waiting on you.";
   }
   if (input.neededItems.length > 0) {
     return `Customer action still needed: ${input.neededItems[0]}.`;

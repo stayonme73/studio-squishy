@@ -101,6 +101,6 @@ describe("Package 1b incomplete Project Intake Board cert", () => {
     const view = resolveStudioBoardView(campaign);
     expect(view.campaignProgressLabel).toBe(studioBoard.nextAction.waitingOnProjectIntakeLabel);
     expect(view.campaignProgressLabel).not.toBe("Campaign Queued");
-    expect(view.statusLabel).toBe("Payment Received");
+    expect(view.statusLabel).toBe("Waiting on Project Intake");
   });
 });

@@ -66,14 +66,14 @@ export const helpCenter = {
       {
         id: "payment",
         situation: "Payment",
-        summary: "Per job. Payment is required before work can proceed. Paying alone does not start production.",
+        summary: "Per service. Payment is required before work can proceed. Paying alone does not start production.",
         anchor: "policy-payment-policy",
         learnMoreLabel: "Payment policy",
       },
       {
         id: "production-begins",
         situation: "Production Begins",
-        summary: "Per job: payment received, Project Details complete, materials accepted, job moved into production. Then non-refundable.",
+        summary: "Per service: payment received, Project Details complete, materials accepted, service moved into production. Then non-refundable.",
         anchor: "policy-production-policy",
         learnMoreLabel: "Production policy",
       },
@@ -87,7 +87,7 @@ export const helpCenter = {
       {
         id: "waiting-on-client",
         situation: "Waiting on Client",
-        summary: "That job pauses until required information or materials are received. Timeline pauses with it.",
+        summary: "That service pauses until required information or materials are received. Timeline pauses with it.",
         anchor: "policy-waiting-on-client-policy",
         learnMoreLabel: "Waiting on Client policy",
       },
@@ -116,7 +116,7 @@ export const helpCenter = {
       {
         id: "refunds",
         situation: "Refunds",
-        summary: "Per job. Refund may be approved before production starts. Non-refundable after production starts on that job.",
+        summary: "Per service. Refund may be approved before production starts. Non-refundable after production starts on that service.",
         anchor: "policy-refund-policy",
         learnMoreLabel: "Refund policy",
       },

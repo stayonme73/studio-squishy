@@ -234,6 +234,26 @@ describe("job-level tracking", () => {
     )!;
     expect(flyer.spineStatus).toBe("ready_for_review");
   });
+
+  it("keeps revision_requested as current when the campaign is still READY_FOR_REVIEW", () => {
+    const record = campaign({ campaignStatus: "READY_FOR_REVIEW" });
+    const existing: PurchasedJobRecord = {
+      jobId: "camp-multi:ma-flyer-v2",
+      campaignId: record.campaignId,
+      skuId: "ma-flyer-v2" as never,
+      serviceName: "Flyer",
+      spineStatus: "revision_requested",
+      productionLane: "quick",
+      intakeComplete: true,
+      productionStartedAt: "2026-07-03T12:00:00.000Z",
+      ownerApprovalPending: null,
+      updatedAt: "2026-07-03T12:00:00.000Z",
+    };
+    const flyer = syncJobRecordsFromCampaign(record, [], [], [], [existing]).find(
+      (job) => job.skuId === "ma-flyer-v2",
+    )!;
+    expect(flyer.spineStatus).toBe("revision_requested");
+  });
 });
 
 describe("lane capacity", () => {
