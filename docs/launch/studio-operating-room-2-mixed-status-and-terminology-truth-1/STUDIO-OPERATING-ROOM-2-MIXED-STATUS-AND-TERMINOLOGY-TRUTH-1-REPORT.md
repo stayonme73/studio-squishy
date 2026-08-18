@@ -158,7 +158,7 @@ No remaining current-status contradiction on the scoped walk.
 
 ## Final commit / push / sync
 
-Park tip recorded after this report. Pushed to `operating/design-renderer-proof-1`. **No merge.**
+Park tip **`6cf9ca0`**. Pushed to `operating/design-renderer-proof-1`. **No merge.**
 
 ## Recommendation for the final Room 2 whole-customer sweep
 
