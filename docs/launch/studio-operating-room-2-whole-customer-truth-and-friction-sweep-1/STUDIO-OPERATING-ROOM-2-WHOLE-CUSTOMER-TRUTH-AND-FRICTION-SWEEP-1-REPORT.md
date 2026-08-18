@@ -244,4 +244,4 @@ Do **not** close Room 2 automatically because tests are green. This section is *
 
 ## Final commit / push / sync
 
-Park tip recorded after commit. Pushed to `operating/design-renderer-proof-1`. **No merge.**
+Park tip **`b3397a6`**. Pushed to `operating/design-renderer-proof-1`. **No merge.**
