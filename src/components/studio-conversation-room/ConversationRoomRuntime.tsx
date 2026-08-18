@@ -1722,15 +1722,6 @@ export default function ConversationRoomRuntime({
             (step === "summary" || step === "confirmed") &&
             !correcting
           }
-          listening={listening}
-          onSpeak={() => {
-            if (listening) handleStopListening();
-            else handleStartListening();
-          }}
-          onType={() => {
-            setAskMode(false);
-            stopStudioSpeech();
-          }}
           onAskQuestion={() => {
             setAskMode(true);
             stopStudioSpeech();

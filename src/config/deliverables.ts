@@ -39,12 +39,12 @@ export const deliverables = {
   },
 
   summary: {
-    badge: "Campaign Complete",
+    badge: "Project Complete",
     labels: {
-      campaignName: "Campaign Name",
+      campaignName: "Project Name",
       selectedOption: "Selected Option",
       completionDate: "Completion Date",
-      status: "Campaign Status",
+      status: "Project Status",
     },
     statusDelivered: "DELIVERED",
     thankYou:
@@ -52,10 +52,10 @@ export const deliverables = {
   },
 
   hero: {
-    badge: "Campaign Complete",
+    badge: "Project Complete",
     title: "Your marketing package is ready.",
     lead: "Everything has been prepared and organized for you.",
-    footnote: "The Studio is standing by when you're ready for your next campaign.",
+    footnote: "The Studio is standing by when you're ready for your next project.",
   },
 
   /** Margin walls — left writes downward; right is a static Studio letter. */

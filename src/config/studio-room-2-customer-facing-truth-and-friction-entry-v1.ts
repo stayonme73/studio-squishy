@@ -1,10 +1,9 @@
 /**
- * Room 2 entry — customer-facing truth + friction cleanup.
- * First section only. Park for Manager. Do not auto-advance.
+ * Room 2 Section 1 — customer-facing truth + friction entry.
+ * CLOSED 2026-08-17 by Tagia on customer-eyes evidence.
  *
- * Authority: Tagia Room 1 closeout call 2026-08-17.
- * Room 1 stays open solely for deferred domain/email at d6974eb.
- * That yellow sticky does not block Room 2.
+ * Close tip `45b09b1`. Earlier PARK checkpoint `90dcc84` is not the close.
+ * Board-as-source-of-truth below the pay button remains a non-blocking note.
  */
 
 import { studioLaunchReadinessExecutionOrderV1 } from "@/config/studio-launch-readiness-execution-order-v1";
@@ -12,18 +11,32 @@ import { studioRoom1CustomerLifeCloseoutV1 } from "@/config/studio-room-1-custom
 
 export const studioRoom2CustomerFacingTruthAndFrictionEntryV1 = {
   packageId: "STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1",
-  schemaVersion: 1 as const,
+  schemaVersion: 2 as const,
   room: 2 as const,
   roomId: "customer-facing-truth-and-friction-cleanup" as const,
   merge: "separately_authorized" as const,
   ownerRoutine: "NONE" as const,
-  parkForManager: true as const,
+  parkForManager: false as const,
+  sectionClosed: true as const,
+  closedAt: "2026-08-17" as const,
   doNotAutoAdvance: true as const,
   doNotStartOwnerConsole: true as const,
   doNotReopenResend: true as const,
   doNotReopenRoom1UnlessNewDefect: true as const,
   visualRedesign: false as const,
   closeRule: "CUSTOMER-USE → FIND FRICTION/TRUTH DEFECTS → FIX → BREAK → RETEST → CLOSE SECTION" as const,
+
+  closeEvidence: {
+    customerEyesWalk: "30/30" as const,
+    targetedTests: "54/54" as const,
+    frictionFixedBeforeRerun: true as const,
+    ownerRoutine: "NONE" as const,
+    merge: false as const,
+    customerEyesCloseTip: "45b09b1" as const,
+    parkCheckpointNotClose: "90dcc84" as const,
+    nonBlockingNote:
+      "Board-as-source-of-truth copy sits below the pay button — recorded, not a Section 1 blocker.",
+  },
 
   room1Status: studioRoom1CustomerLifeCloseoutV1.status,
   room1Closed: studioRoom1CustomerLifeCloseoutV1.roomClosed,

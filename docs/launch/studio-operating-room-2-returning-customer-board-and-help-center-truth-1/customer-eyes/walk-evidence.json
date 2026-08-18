@@ -1,0 +1,79 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1",
+  "walkedAt": "2026-08-17",
+  "customer": {
+    "kind": "returning-unsigned",
+    "note": "Did not replay Section 1 first-time checkout. Did not create a new account or paid order."
+  },
+  "beats": [
+    {
+      "id": 1,
+      "surface": "lobby-returning-client",
+      "url": "http://127.0.0.1:3066/studio-lobby",
+      "result": "PASS",
+      "detail": "RETURNING CLIENT is Sign In to access Studio Board. Separate from LET’S GET STARTED. No Squishy."
+    },
+    {
+      "id": 2,
+      "surface": "sign-in-from-board",
+      "url": "http://127.0.0.1:3066/sign-in?from=/studio-board",
+      "result": "PASS",
+      "detail": "Sign in to open your Studio Board. Mentions Help Center. No Squishy. No unfinished-build jargon."
+    },
+    {
+      "id": 3,
+      "surface": "help-center",
+      "url": "http://127.0.0.1:3066/help-center",
+      "result": "PASS",
+      "detail": "No Squishy. Email FAQ: Board is the source of truth; email is a courtesy. Refund language stays may-be-approved / per job."
+    },
+    {
+      "id": 4,
+      "surface": "help-center-email-faq-retest",
+      "url": "http://127.0.0.1:3066/help-center#faq-email-notifications",
+      "result": "PASS",
+      "detail": "Removed 'in this version' and 'test or external tool'. Live copy: If you received an email or a link, use it only as a reminder to sign in."
+    },
+    {
+      "id": 5,
+      "surface": "project-builder-redirect",
+      "url": "http://127.0.0.1:3066/project-builder",
+      "result": "PASS",
+      "detail": "Redirected to /studio-conversation-room. Companion is not a live customer surface."
+    },
+    {
+      "id": 6,
+      "surface": "route-map-redirect",
+      "url": "http://127.0.0.1:3066/route-map",
+      "result": "PASS",
+      "detail": "Redirected to /studio-conversation-room. Locked Route Map Squishy CTA is not customer-visible."
+    },
+    {
+      "id": 7,
+      "surface": "communication-control",
+      "url": "http://127.0.0.1:3066/studio-conversation-room",
+      "result": "PASS",
+      "detail": "Permanent dock is the only Speak/Type surface. Studio controls keep Ask a question with a hint to use the mic and type field above. After dock-label fix, Continue matches the tablet while answering."
+    },
+    {
+      "id": 8,
+      "surface": "studio-board-gate",
+      "url": "http://127.0.0.1:3066/studio-board",
+      "result": "PASS",
+      "detail": "Unsigned returning client is sent to /sign-in?from=/studio-board. Board is not a public surface."
+    },
+    {
+      "id": 9,
+      "surface": "project-record-gate",
+      "url": "http://127.0.0.1:3066/campaign-details",
+      "result": "PASS",
+      "detail": "Unsigned returning client is sent to /sign-in?from=/campaign-details."
+    }
+  ],
+  "blockingPauses": 0,
+  "nonBlockingNotes": [
+    "Signed-in Board / Project Record chrome was not live-walked. No existing session. Account creation was not used. Ask the Studio / Current Project / New Project are locked in config tests and replace the Maya-walk residue (Ask Squishy, CURRENT CAMPAIGN, New Campaign).",
+    "Quarantined /route-map source still names Squishy. Customer never sees it because the route redirects.",
+    "Kitchen / Owner Console Squishy language remains staff / later-room residue."
+  ]
+}

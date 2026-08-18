@@ -442,7 +442,7 @@ export default function ProjectRecordSquishy({
             >
               {line.speaker === "squishy" ? (
                 <>
-                  <span className="cd-squishy__speaker">Squishy</span> {line.text}
+                  <span className="cd-squishy__speaker">Studio</span> {line.text}
                 </>
               ) : (
                 line.text

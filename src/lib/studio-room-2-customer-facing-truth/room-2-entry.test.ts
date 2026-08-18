@@ -16,12 +16,19 @@ import { studioRoom2CustomerFacingTruthAndFrictionEntryV1 as cfg } from "@/confi
 const THIS_BUILD = /this build/i;
 
 describe("STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1", () => {
-  it("enters Room 2 without a full Room 1 CLOSED stamp and parks for Manager", () => {
+  it("is CLOSED on customer-eyes evidence and does not treat the earlier PARK as the close", () => {
     expect(cfg.packageId).toBe(
       "STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1",
     );
     expect(cfg.room).toBe(2);
-    expect(cfg.parkForManager).toBe(true);
+    expect(cfg.sectionClosed).toBe(true);
+    expect(cfg.parkForManager).toBe(false);
+    expect(cfg.closeEvidence.customerEyesWalk).toBe("30/30");
+    expect(cfg.closeEvidence.targetedTests).toBe("54/54");
+    expect(cfg.closeEvidence.customerEyesCloseTip).toBe("45b09b1");
+    expect(cfg.closeEvidence.parkCheckpointNotClose).toBe("90dcc84");
+    expect(cfg.closeEvidence.ownerRoutine).toBe("NONE");
+    expect(cfg.closeEvidence.merge).toBe(false);
     expect(cfg.doNotAutoAdvance).toBe(true);
     expect(cfg.doNotStartOwnerConsole).toBe(true);
     expect(cfg.doNotReopenResend).toBe(true);
@@ -30,6 +37,10 @@ describe("STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1", (
     expect(studioRoom1CustomerLifeCloseoutV1.roomClosed).toBe(false);
     expect(studioRoom1CustomerLifeCloseoutV1.room2Authorized).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(2);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Entry.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section2.packageId).toBe(
+      "STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1",
+    );
     expect(cfg.comeBackLaterEmail.protectedCheckpoint).toBe("d6974eb");
     expect(cfg.comeBackLaterEmail.doesNotBlockRoom2).toBe(true);
     expect(cfg.outOfScope).toEqual(

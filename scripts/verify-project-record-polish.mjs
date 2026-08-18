@@ -38,7 +38,7 @@ const STATE_CASES = [
         return { ok: false, detail: "Empty fixture should still show the approved Studio Plan" };
       }
       if (audit.locked) return { ok: false, detail: "Empty editable fixture should not show locked notice" };
-      const edit = audit.actions.find((a) => a.text.includes("Edit Campaign Brief"));
+      const edit = audit.actions.find((a) => a.text.includes("Edit project details"));
       const copy = audit.actions.find((a) => a.text.includes("Copy Campaign Brief"));
       if (!edit?.primary) return { ok: false, detail: "Edit should be primary when editable" };
       if (!copy?.secondary) return { ok: false, detail: "Copy should be secondary" };
@@ -60,7 +60,7 @@ const STATE_CASES = [
         return { ok: false, detail: "Partial fixture should not include complete-archive content" };
       }
       if (audit.locked) return { ok: false, detail: "Partial editable fixture should not show locked notice" };
-      const edit = audit.actions.find((a) => a.text.includes("Edit Campaign Brief"));
+      const edit = audit.actions.find((a) => a.text.includes("Edit project details"));
       const copy = audit.actions.find((a) => a.text.includes("Copy Campaign Brief"));
       if (!edit?.primary) return { ok: false, detail: "Edit should be primary" };
       if (!copy?.secondary) return { ok: false, detail: "Copy should be secondary" };
@@ -81,7 +81,7 @@ const STATE_CASES = [
         return { ok: false, detail: "Complete fixture should not include Not provided yet answers" };
       }
       if (audit.locked) return { ok: false, detail: "Complete editable fixture should not show locked notice" };
-      const edit = audit.actions.find((a) => a.text.includes("Edit Campaign Brief"));
+      const edit = audit.actions.find((a) => a.text.includes("Edit project details"));
       if (!edit?.primary) return { ok: false, detail: "Edit should remain primary while editable" };
       return { ok: true, detail: "Full submitted archive, no missing section, Edit primary" };
     },
@@ -94,7 +94,7 @@ const STATE_CASES = [
       if (audit.locked !== LOCKED_MSG) {
         return { ok: false, detail: `Locked notice mismatch: ${audit.locked ?? "missing"}` };
       }
-      if (audit.actions.some((a) => a.text.includes("Edit Campaign Brief"))) {
+      if (audit.actions.some((a) => a.text.includes("Edit project details"))) {
         return { ok: false, detail: "Edit should be hidden when locked" };
       }
       const copy = audit.actions.find((a) => a.text.includes("Copy Campaign Brief"));

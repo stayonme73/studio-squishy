@@ -6,10 +6,10 @@ import type { RefundRequestSourceChannel } from "@/config/refund-request-channel
 import type { RefundRequestSnapshot } from "./owner-decision-interaction-types";
 
 export const REFUND_INTAKE_CASUAL_PROMPT =
-  "I can help start a refund review. I need the reason for the request before I can place it on Tagia's desk.";
+  "I can help start a refund review. I need the reason for the request before it can go to owner review.";
 
 export const REFUND_INTAKE_MISSING_OUTCOME =
-  "I need to know what outcome you want from this refund review before I can place it on Tagia's desk.";
+  "I need to know what outcome you want from this refund review before it can go to owner review.";
 
 export type RefundIntakePayload = {
   reason?: string;

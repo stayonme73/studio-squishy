@@ -5,7 +5,7 @@ import { customerJourneyStepName } from "@/config/customer-journey-v1";
 export type CampaignJourneyStepId = "campaign-details" | "review-room" | "deliverables";
 
 export const campaignJourneyMap = {
-  title: "Your Campaign Journey",
+  title: "Your Project Journey",
   steps: [
     {
       id: "campaign-details" as const,

@@ -104,7 +104,7 @@ async function main() {
     await page.goto(`${BASE}/studio-board`);
     await page.waitForSelector(".campaign-brief-actions", { timeout: 15000 });
     const viewBtn = page.getByRole("button", { name: "View Campaign Brief" });
-    const editLink = page.getByRole("link", { name: "Edit Campaign Brief" });
+    const editLink = page.getByRole("link", { name: "Edit project details" });
     if ((await viewBtn.count()) && (await editLink.count())) {
       pass(6, "Studio Board shows View and Edit when intake is editable");
     } else {
@@ -114,7 +114,7 @@ async function main() {
     await viewBtn.click();
     await page.waitForSelector(".sb-record-drawer__panel", { timeout: 10000 });
     const drawerEdit = page.locator(".sb-record-drawer__panel").getByRole("link", {
-      name: "Edit Campaign Brief",
+      name: "Edit project details",
     });
     if (await drawerEdit.count()) {
       pass(6, "Campaign Record drawer shows Edit when editable");

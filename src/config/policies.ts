@@ -153,7 +153,7 @@ export const studioPolicies = {
         blocks: [
           {
             kind: "p",
-            text: "In this version of The Studio, project progress is shown inside your Studio Board — not through automated email notifications.",
+            text: "Project progress is shown on your Studio Board. Email notices are a courtesy when they are sent. Your Studio Board is the source of truth.",
           },
           {
             kind: "p",
@@ -161,7 +161,7 @@ export const studioPolicies = {
           },
           {
             kind: "p",
-            text: "If you received an email or link from a test or external tool, use it only as a reminder to sign in. Your official next step is always shown on the Studio Board.",
+            text: "If you received an email or a link, use it only as a reminder to sign in. Your official next step is always shown on the Studio Board.",
           },
         ] as const,
       },

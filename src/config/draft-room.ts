@@ -345,8 +345,8 @@ export const draftRoom = {
     studioGuide: `Continue to ${customerJourneyStepName("studio-guide")}`,
     studioBoard: "Continue to Studio Board",
     reviewAnswers: "Review your answers",
-    viewCampaignBrief: "View Campaign Brief",
-    editCampaignBrief: "Edit Campaign Brief",
+    viewCampaignBrief: "View project details",
+    editCampaignBrief: "Edit project details",
     acknowledgment:
       "I have reviewed my responses and understand campaign concepts will be based on the information I provided.",
     resubmitLabel: "Update & continue",

@@ -34,8 +34,8 @@ export const REFUND_REQUEST_CHANNELS: Record<
 > = {
   squishy_chat_post_payment: {
     id: "squishy_chat_post_payment",
-    label: "Squishy chat (post-payment)",
-    customerSurface: "Squishy chat after Secure Checkout",
+    label: "Studio conversation (post-payment)",
+    customerSurface: "Studio conversation after checkout",
     defaultEventType: "refund_request",
     clientInputMode: "text_only",
   },

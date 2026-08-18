@@ -126,7 +126,7 @@ function normalizeCampaignRecord(raw: CampaignRecord): CampaignRecord {
 
 function campaignNameFromProject(project: string) {
   const trimmed = project.trim();
-  if (!trimmed) return "New Campaign";
+  if (!trimmed) return "New Project";
   if (trimmed.length <= 64) return trimmed;
   return `${trimmed.slice(0, 61)}…`;
 }
@@ -231,7 +231,7 @@ function createCampaignFromPayment(
 
   return {
     campaignId: crypto.randomUUID(),
-    campaignName: pkg ? `${pkg.label} Campaign` : "New Campaign",
+    campaignName: pkg ? pkg.label : "New Project",
     campaignStatus: "PAYMENT_RECEIVED",
     campaignDescription: content.campaignDescription,
     estimatedCompletion: content.estimatedCompletion,
@@ -293,7 +293,7 @@ export function createCampaignFromDiscovery(answers: DiscoveryAnswers): Campaign
 
   return {
     campaignId: crypto.randomUUID(),
-    campaignName: campaignNameFromProject(businessName ?? "New Campaign"),
+    campaignName: campaignNameFromProject(businessName ?? "New Project"),
     campaignStatus: "DISCOVERY_COMPLETE",
     campaignDescription: content.campaignDescription,
     estimatedCompletion: content.estimatedCompletion,

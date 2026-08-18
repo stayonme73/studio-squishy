@@ -82,7 +82,7 @@ function StudioGuideCommPanel({
       typedText: typed,
     });
     sendRef.current.disabled = action === "disabled";
-    sendRef.current.textContent = v.sendMessageLabel;
+    sendRef.current.textContent = composerSubmitLabel(isAnsweringQuestion);
     sendRef.current.dataset.sendAction = action;
   }
 
@@ -123,6 +123,7 @@ function StudioGuideCommPanel({
     showRequired,
     isAnsweringQuestion,
     v.sendMessageLabel,
+    v.continueLabel,
   ]);
 
   return (

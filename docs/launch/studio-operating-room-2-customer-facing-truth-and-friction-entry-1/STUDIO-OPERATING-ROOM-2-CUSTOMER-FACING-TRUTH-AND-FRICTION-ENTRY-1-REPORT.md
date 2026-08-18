@@ -2,14 +2,16 @@
 
 **Package:** STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1  
 **Room:** 2 — Customer-facing truth + friction cleanup  
-**Status:** PARKED FOR MANAGER — **not CLOSED**  
+**Status:** CLOSED  
 **Room 2 closed:** **NO**  
-**Section 1 closed:** **NO**  
+**Section 1 closed:** **YES**  
 **Do not auto-advance:** yes  
 **Merge:** no  
 **Owner routine:** NONE
 
-First park checkpoint `90dcc84` remains a **PARK**, not a CLOSED stamp. This note continues the same package after the required customer-eyes walk.
+Tagia closed this section 2026-08-17 on the customer-eyes evidence. Close tip **`45b09b1`**. Earlier PARK checkpoint **`90dcc84` is not the close**.
+
+The Board-as-source-of-truth copy sitting below the pay button remains a **non-blocking friction note**, not a Section 1 blocker.
 
 Walk customer (first-time, nontechnical): Jordan · Hale Weekend Bakery · Saturday farmers-market flyer · Make Me a Flyer / `v2-rtu-flyer` / Studio fee **$69**. No new paid order. Stopped at hosted Stripe and cancelled back.
 
@@ -80,13 +82,15 @@ No in-scope blocking defect remained after the deadline / Continue / placeholder
 
 ---
 
-## Later Room 2 residue (still not this package)
+## Later Room 2 residue (handed to Section 2)
+
+Recorded here so Section 2 does not rediscover the same list. Section 2 is authorized to work these:
 
 - Studio Board **Ask Squishy**
-- Help Center legacy chat labels
+- Help Center legacy chat / “this version” email language
 - Redirected Project Builder companion
 - Quarantined `/route-map` Direct Route tagline still names Squishy in source
-- Kitchen / Owner Console Squishy language
+- Kitchen / Owner Console Squishy language (staff / later rooms — do not jump)
 
 The front-door walk did not encounter those surfaces.
 
@@ -98,20 +102,16 @@ Targeted vitest **54 / 54 PASS** (closeout, Room 2 entry, honesty, plan-summary,
 
 Live customer-eyes walk **30 / 30 PASS**.
 
-Green checks are **not** a section close. `90dcc84` is **not** a CLOSED checkpoint.
-
-**This walk park:** `45b09b1` on `operating/design-renderer-proof-1`.
+Green checks were **not** the close. Tagia closed on the customer-eyes evidence at **`45b09b1`**. `90dcc84` remains an earlier PARK checkpoint.
 
 ---
 
 ## What this package did **not** do
 
-- Close Room 2 Section 1
 - Fully close Room 1
 - Close or rewrite `d6974eb`
 - Complete a new paid order
 - Start Owner Console
-- Start later Room 2 sections
 - Visual redesign
 - Merge
 
@@ -119,4 +119,4 @@ Green checks are **not** a section close. `90dcc84` is **not** a CLOSED checkpoi
 
 ## Next
 
-Manager close review of this first Room 2 section. Do not auto-advance.
+**CLOSED.** Authorized next package: `STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1`. Do not reopen this section unless new evidence.

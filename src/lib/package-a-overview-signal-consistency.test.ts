@@ -155,7 +155,9 @@ describe("Package A — Overview Signal Consistency", () => {
     const view = resolveStudioBoardView(campaign, facts);
 
     expect(view.statusLabel).toBe("Building Concepts");
-    expect(view.campaignProgressLabel).toBe("Campaign in Progress");
+    expect(view.campaignProgressLabel).toBe(
+      studioBoard.statusContent.BUILDING_CONCEPTS.campaignProgressLabel,
+    );
 
     const progress = resolveCampaignProgressSteps(campaign, facts);
     const building = progress.find((step) => step.id === "BUILDING_CONCEPTS");

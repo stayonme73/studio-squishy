@@ -9,9 +9,6 @@ import {
 export type ConversationNavPanelProps = {
   canChangeAnswer: boolean;
   summaryOpen: boolean;
-  listening: boolean;
-  onSpeak: () => void;
-  onType: () => void;
   onAskQuestion: () => void;
   onReturnToLobby: () => void;
   onCloseConversation: () => void;
@@ -24,14 +21,11 @@ export type ConversationNavPanelProps = {
 
 /**
  * Studio control strip — Conversation · Session · Studio.
- * Customer-facing only (no internal Studio Review).
+ * Speak and type live only on the permanent communication dock above this strip.
  */
 export default function ConversationNavPanel({
   canChangeAnswer,
   summaryOpen,
-  listening,
-  onSpeak,
-  onType,
   onAskQuestion,
   onReturnToLobby,
   onCloseConversation,
@@ -42,13 +36,6 @@ export default function ConversationNavPanel({
   onToggleSummary,
 }: ConversationNavPanelProps) {
   const v = conversationRoomGuideV1;
-
-  function handleType() {
-    onType();
-    window.setTimeout(() => {
-      document.getElementById(STUDIO_GUIDE_TYPE_FIELD_ID)?.focus();
-    }, 0);
-  }
 
   function handleAsk() {
     onAskQuestion();
@@ -64,29 +51,14 @@ export default function ConversationNavPanel({
       <section className={styles.section} aria-label="Conversation">
         <p className={styles.sectionLabel}>Conversation</p>
         <div className={styles.group}>
-          <button
-            type="button"
-            className={styles.navBtn}
-            data-active={listening ? "true" : "false"}
-            aria-pressed={listening}
-            onClick={onSpeak}
-          >
-            <span className={styles.icon} aria-hidden="true">
-              🎤
-            </span>
-            Speak
-          </button>
-          <button type="button" className={styles.navBtn} onClick={handleType}>
-            <span className={styles.icon} aria-hidden="true">
-              ⌨️
-            </span>
-            Type
-          </button>
           <button type="button" className={styles.navBtn} onClick={handleAsk}>
             <span className={styles.icon} aria-hidden="true">
               ❓
             </span>
             Ask a question
+            <span className={styles.btnHint}>
+              Use the mic and type field above to speak or type.
+            </span>
           </button>
         </div>
       </section>

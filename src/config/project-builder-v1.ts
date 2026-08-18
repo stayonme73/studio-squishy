@@ -25,7 +25,7 @@ export const PROJECT_BUILDER_V1 = {
     "Select at least one service to review your Studio Plan. Timeline is reviewed before checkout.",
   reviewStudioPlanReadyHint:
     "Ready to continue? Review your selected services and project total.",
-  squishyLabel: "Squishy",
+  squishyLabel: "Studio",
   customerLabel: "Example customer",
   studioConversationLabel: "Example conversation",
   exampleConversationEyebrow: "Example only — not your conversation",

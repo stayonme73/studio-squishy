@@ -11,7 +11,7 @@ export default function SquishyStatusPanel({ message, classNamePrefix = "squishy
 
   return (
     <div className={classNamePrefix} role="status" aria-live="polite">
-      <span className={`${classNamePrefix}__label`}>Squishy</span>
+      <span className={`${classNamePrefix}__label`}>Studio</span>
       <span className={`${classNamePrefix}__text`}>{message.text}</span>
     </div>
   );

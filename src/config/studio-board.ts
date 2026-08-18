@@ -326,7 +326,7 @@ export type MembershipRecord = {
 export const studioBoard = {
   userName: "Tagia",
   pageTitle: "The Studio Board",
-  campaignNameLabel: "Campaign name",
+  campaignNameLabel: "Project name",
 
   assets: {
     /**
@@ -366,7 +366,7 @@ export const studioBoard = {
   },
 
   empty: {
-    campaignName: "No campaign started yet.",
+    campaignName: "No project started yet.",
     campaignNamePlaceholder: "No Active Project",
     campaignDescription:
       "You don't have an active project yet. Start a new project in the Conversation Room to begin working with The Studio.",
@@ -384,7 +384,7 @@ export const studioBoard = {
       snapshot: {
         deliverables: "Deliverables appear here once your project begins.",
         plan: "Plan details appear once you choose a Studio Plan.",
-        account: "Payment and account details appear once you start a campaign.",
+        account: "Payment and account details appear once you start a project.",
       },
       materials: {
         receivedLead: "What The Studio already has for this project.",
@@ -516,9 +516,9 @@ export const studioBoard = {
         "Review what we heard from your discovery answers.",
         "Confirm the services on your Studio Plan.",
         "Make changes if needed before production begins.",
-        "The Studio begins your campaign.",
+        "The Studio begins your project.",
       ],
-      primaryCta: "START A NEW CAMPAIGN",
+      primaryCta: "START A NEW PROJECT",
       primaryRoute: "newCampaign" as const,
     },
     DRAFT_RECEIVED: {
@@ -547,13 +547,13 @@ export const studioBoard = {
         "Finish intake and materials so production can begin.",
         "You review proofs and receive released deliverables.",
       ],
-      primaryCta: "OPEN CAMPAIGN",
+      primaryCta: "OPEN PROJECT RECORD",
       primaryRoute: "campaignDetails" as const,
     },
     PAYMENT_RECEIVED: {
       statusLabel: "Payment Received",
       nextUpdateLabel: "When the next project update is ready",
-      campaignProgressLabel: "Campaign Queued",
+      campaignProgressLabel: "Waiting to start",
       headerSubline:
         "We received your payment. Production begins after intake, materials, and the production gate are complete.",
       campaignDescription:
@@ -579,20 +579,20 @@ export const studioBoard = {
         "When the production gate opens, The Studio begins creative work.",
         "You review proofs and receive released deliverables.",
       ],
-      primaryCta: "OPEN CAMPAIGN",
+      primaryCta: "OPEN PROJECT RECORD",
       primaryRoute: "campaignDetails" as const,
     },
     BUILDING_CONCEPTS: {
       statusLabel: "Building Concepts",
       nextUpdateLabel: "When the next project update is ready",
-      campaignProgressLabel: "Campaign in Progress",
-      headerSubline: "Your creative team is at work on campaign options.",
-      campaignDescription: "The Studio is creating your campaign options with care and creativity.",
+      campaignProgressLabel: "In progress",
+      headerSubline: "Your creative team is at work on your project.",
+      campaignDescription: "The Studio is creating your options with care and creativity.",
       estimatedCompletion: "In progress",
-      studioNoteFollowUp: "Your creative team is building campaign concepts.",
+      studioNoteFollowUp: "Your creative team is building concepts.",
       studioNoteBoard: {
         letterLines: [
-          "Your creative team is building your campaign concepts.",
+          "Your creative team is building your concepts.",
           "We're putting care into every direction for you.",
           "Estimated first concepts will appear in your next project update when ready.",
           "Thank you for trusting The Studio.",
@@ -609,7 +609,7 @@ export const studioBoard = {
         "You choose your direction.",
         "Released deliverables appear when approved for delivery.",
       ],
-      primaryCta: "OPEN CAMPAIGN",
+      primaryCta: "OPEN PROJECT RECORD",
       primaryRoute: "campaignDetails" as const,
     },
     READY_FOR_REVIEW: {
@@ -642,15 +642,15 @@ export const studioBoard = {
         "The Studio continues production after your review.",
         "We deliver your final marketing package.",
       ],
-      primaryCta: "OPEN CAMPAIGN",
+      primaryCta: "OPEN PROJECT RECORD",
       primaryRoute: "feedbackStudio" as const,
     },
     DELIVERED: {
       statusLabel: "Delivered",
       nextUpdateLabel: "Complete",
-      campaignProgressLabel: "Campaign Complete",
-      headerSubline: "Your campaign package is complete and ready.",
-      campaignDescription: "Your campaign package is complete and ready for you.",
+      campaignProgressLabel: "Complete",
+      headerSubline: "Your project package is complete and ready.",
+      campaignDescription: "Your project package is complete and ready for you.",
       estimatedCompletion: "Complete",
       studioNoteFollowUp: "Your final package is ready to download.",
       studioNoteBoard: {
@@ -663,16 +663,16 @@ export const studioBoard = {
       },
       studioUpdates: [
         { date: "June 14", message: "Intake received." },
-        { date: "June 18", message: "Campaign direction selected." },
+        { date: "June 18", message: "Project direction selected." },
         { date: "June 22", message: "Final package delivered." },
       ],
       whatHappensNextSteps: [
         "Download your deliverables.",
-        "Launch your campaign.",
+        "Launch your project.",
         "Track results from your Studio Board.",
-        "Start your next campaign when you're ready.",
+        "Start your next project when you're ready.",
       ],
-      primaryCta: "OPEN CAMPAIGN",
+      primaryCta: "OPEN PROJECT RECORD",
       primaryRoute: "deliverables" as const,
     },
   },
@@ -692,7 +692,7 @@ export const studioBoard = {
   sidebar: {
     welcomeHall: customerJourneyStepName("studio-lobby"),
     studioBoard: customerJourneyStepName("studio-board"),
-    newCampaign: "New Campaign",
+    newCampaign: "New Project",
     campaignRecord: customerJourneyStepName("project-record"),
     reviewRoom: customerJourneyStepName("review-room"),
     finalDelivery: customerJourneyStepName("final-delivery"),
@@ -706,8 +706,8 @@ export const studioBoard = {
   notesCopy: {
     readOnlyHint: "Recent activity from the Studio.",
     heading: "Studio Notes",
-    emptyHint: "Updates will appear here as your campaign progresses.",
-    viewCampaignHistory: "View Campaign History",
+    emptyHint: "Updates will appear here as your project progresses.",
+    viewCampaignHistory: "View project history",
   },
 
   campaignSnapshot: {
@@ -716,13 +716,13 @@ export const studioBoard = {
   },
 
   campaignActions: {
-    heading: "Campaign Actions",
+    heading: "Project Actions",
     currentAction: "Current Action",
     assignedTo: "Assigned To",
     assignedTeam: "Studio Creative Team",
     lastUpdated: "Last Updated",
-    openCampaign: "Open Campaign",
-    openCampaignCta: "OPEN CAMPAIGN",
+    openCampaign: "Open Project Record",
+    openCampaignCta: "OPEN PROJECT RECORD",
     openCampaignRecord: `Open ${customerJourneyStepName("project-record")}`,
     reviewConcepts: "Open Review Room",
     chooseDirection: "Review Work",
@@ -733,7 +733,7 @@ export const studioBoard = {
     reviewCampaigns: "Review Campaigns",
     viewDeliverablesLegacy: "View Deliverables",
     viewDeliverablesCta: "VIEW DELIVERABLES",
-    unavailableHint: "Available when your campaign reaches this stage.",
+    unavailableHint: "Available when your project reaches this stage.",
     noActionsHint: "No actions available yet.",
   },
 
@@ -745,8 +745,8 @@ export const studioBoard = {
     choosePackage: "Choose Your Package",
     buildingConceptsLabel: "Building Concepts In Progress",
     buildingConceptsHint:
-      "The Studio team is creating your campaign directions. Your Studio Board will update when concepts are ready for review.",
-    paymentReceivedLabel: "Campaign Queued",
+      "The Studio team is creating your project directions. Your Studio Board will update when concepts are ready for review.",
+    paymentReceivedLabel: "Waiting to start",
     paymentReceivedHint:
       "We received your payment. Your Studio Board will update as your project progresses.",
     waitingOnProjectIntakeLabel: "Waiting on Project Intake",
@@ -759,13 +759,13 @@ export const studioBoard = {
 
   activityFeed: {
     heading: "Studio Timeline",
-    emptyHint: "Milestones appear here as your campaign moves forward.",
+    emptyHint: "Milestones appear here as your project moves forward.",
   },
 
   studioNote: {
     heading: "Studio Note",
     greetingPrefix: "Hi",
-    emptyHint: "A handwritten note from The Studio team will appear here as your campaign moves forward.",
+    emptyHint: "A handwritten note from The Studio team will appear here as your project moves forward.",
   },
 
   etaPanel: {
@@ -788,10 +788,10 @@ export const studioBoard = {
   },
 
   campaignBrief: {
-    viewLabel: "View Campaign Brief",
+    viewLabel: "View project details",
     openRecordLabel: "View submitted project details",
-    editLabel: "Edit Campaign Brief",
-    editableHint: "Review or update your answers before campaign development begins.",
+    editLabel: "Edit project details",
+    editableHint: "Review or update your answers before production begins.",
     lockedMessage:
       "Your Project Intake is submitted and locked for reference. Additional changes should go through Review Room or feedback to The Studio.",
     lockedTitle: "Intake locked",
@@ -804,8 +804,8 @@ export const studioBoard = {
   },
 
   progressCard: {
-    heading: "Campaign Progress",
-    journeyHeading: "Your Campaign Journey",
+    heading: "Project Progress",
+    journeyHeading: "Your Project Journey",
     timelineHeading: "Recent Updates",
   },
 
@@ -847,18 +847,18 @@ export const studioBoard = {
     packagePrice: "Package Price",
     paidInFull: "Paid in Full",
     paymentPending: "Payment Pending",
-    campaignsRemaining: "Campaigns Remaining",
+    campaignsRemaining: "Projects Remaining",
     emailsRemaining: "Emails Remaining",
     smsRemaining: "SMS Remaining",
     revisionsRemaining: "Revisions Remaining",
     renewalDate: "Renewal Date",
     usageHeading: "Usage",
     renewalHeading: "Renewal",
-    campaignLeft: "Campaign Left",
-    campaignsLeft: "Campaigns Left",
+    campaignLeft: "Project Left",
+    campaignsLeft: "Projects Left",
     emailsLeft: "Emails Left",
     smsLeft: "SMS Left",
-    emptyHint: "Payment and account details appear once you start a campaign.",
+    emptyHint: "Payment and account details appear once you start a project.",
     pendingValue: "—",
   },
 
@@ -880,11 +880,11 @@ export const studioBoard = {
   },
 
   currentCampaign: {
-    heading: "Current Campaign",
+    heading: "Current Project",
     package: "Package",
     status: "Current Status",
-    campaignStage: "Campaign Stage",
-    campaignsRemaining: "Campaigns Remaining",
+    campaignStage: "Project Stage",
+    campaignsRemaining: "Projects Remaining",
     emailsRemaining: "Emails Remaining",
     smsRemaining: "SMS Remaining",
     revisionsRemaining: "Revisions Remaining",
@@ -942,20 +942,20 @@ export const studioBoard = {
       activityEmpty: "Project activity will appear here as your project progresses.",
     },
     squishy: {
-      title: "Ask Squishy",
-      lead: "Squishy can explain your project status or guide a lightweight information update. Squishy does not apply changes directly.",
+      title: "Ask the Studio",
+      lead: "The Studio can explain your project status or guide a lightweight information update. Asking here does not apply changes directly.",
       prompt: "What would you like to know or update?",
       placeholder: "For example: What is my project status? Can I change my approver email?",
-      askLabel: "Ask Squishy",
+      askLabel: "Ask the Studio",
       continueLabel: "Continue",
       askAnotherLabel: "Ask another question",
     },
     overviewLabels: {
-      name: "Campaign Name",
+      name: "Project Name",
       status: "Current Status",
       estimatedCompletion: "Estimated Completion",
       createdDate: "Created Date",
-      campaignType: "Campaign Type",
+      campaignType: "Project Type",
     },
     intakeLabels: {
       goal: "Goal",
@@ -971,10 +971,10 @@ export const studioBoard = {
       viewFinalAssets: "VIEW DELIVERABLES",
     },
     notProvided: "Not provided yet",
-    copyCampaignBriefLabel: "Copy Campaign Brief",
-    copyCampaignBriefSuccess: "Campaign Brief Copied",
+    copyCampaignBriefLabel: "Copy project details",
+    copyCampaignBriefSuccess: "Project details copied",
     empty: {
-      title: "No campaign yet",
+      title: "No project yet",
       body: "Start a project in the Conversation Room to see your details here.",
       cta: "Go to Studio Board",
     },
