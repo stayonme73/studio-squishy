@@ -112,7 +112,7 @@ Help Center still says “each job” in locked policy copy. Left alone.
 
 ## Final commit / push / sync
 
-See git after this park. **No merge.**
+Park tip **`3328807`**. Pushed to `operating/design-renderer-proof-1`. **No merge.**
 
 ## Recommendation for the next Room 2 section
 
