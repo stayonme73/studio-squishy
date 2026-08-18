@@ -77,6 +77,7 @@ const ALL_RAISEABLE_KINDS: readonly CampaignExceptionKind[] = [
   "deadline_risk",
   "revision_exhausted",
   "client_request",
+  "pricing_exception",
 ] as const;
 
 const EMPTY_PROMOTION_PANEL: FileRoomExceptionPromotionPanel = {

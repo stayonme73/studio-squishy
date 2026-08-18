@@ -27,10 +27,12 @@ import {
   applyClientSubmitRefundRequest,
   withSyncedJobRecordsForRefund,
 } from "../src/lib/campaign-tasks/refund-request-actions";
+import { applyRaiseException } from "../src/lib/campaign-tasks/exceptions-actions";
 import { getOrGenerateTasks, writeTasksEnvelope } from "../src/lib/campaign-tasks/store";
-import { getOrInitializeMaterials } from "../src/lib/materials/store";
+import { getOrInitializeMaterials, writeMaterialsEnvelope } from "../src/lib/materials/store";
 import { computePlanPricingTotals, buildServiceScopeSnapshot } from "../src/lib/plan-pricing";
 import { buildJobId } from "../src/lib/job-control/lane-map";
+import { syncJobRecordsFromCampaign } from "../src/lib/job-control/resolve-jobs";
 import { enqueueJobCommunicationRecord } from "../src/lib/job-control/communication";
 import { OWNER_CONSOLE_ROUTE } from "../src/config/owner-console";
 
@@ -71,8 +73,36 @@ function push(check: string, status: Check["status"], detail?: string, shot?: st
 
 async function shot(page: Page, name: string): Promise<string> {
   const file = join(SHOTS, `${name}.png`);
-  await page.screenshot({ path: file, fullPage: true });
-  return file;
+  try {
+    await page.screenshot({ path: file, fullPage: true });
+    return file;
+  } catch {
+    const fallback = join(SHOTS, `${name}-${Date.now()}.png`);
+    await page.screenshot({ path: fallback, fullPage: true });
+    return fallback;
+  }
+}
+
+async function waitForCustomerJobLabel(
+  page: Page,
+  campaignId: string,
+  pattern: RegExp,
+): Promise<string> {
+  let labels = "";
+  for (let i = 0; i < 40; i += 1) {
+    const res = await page.request
+      .get(`${BASE}/api/campaigns/${encodeURIComponent(campaignId)}/project-status`)
+      .catch(() => null);
+    if (res?.ok()) {
+      const body = (await res.json()) as {
+        jobs?: ReadonlyArray<{ statusLabel?: string }>;
+      };
+      labels = (body.jobs ?? []).map((job) => job.statusLabel ?? "").join(" ");
+      if (pattern.test(labels)) return labels;
+    }
+    await page.waitForTimeout(500);
+  }
+  return labels;
 }
 
 async function visibleText(page: Page): Promise<string> {
@@ -199,6 +229,51 @@ async function seedRoutine(userId: string, campaignId: string, campaignName: str
   await writeTasksEnvelope(withNotice);
 }
 
+async function seedMissingFact(
+  userId: string,
+  campaignId: string,
+  campaignName: string,
+): Promise<void> {
+  const record = paidCampaign(campaignId, campaignName);
+  await upsertCampaignRecord(record, userId);
+  const materials = await getOrInitializeMaterials(campaignId, record);
+  const tasks = await getOrGenerateTasks(campaignId, record);
+  const task =
+    tasks.tasks.find(
+      (entry) =>
+        entry.relatedServiceIds.includes(SKU) && entry.id.includes(":creative"),
+    ) ??
+    tasks.tasks.find((entry) => entry.relatedServiceIds.includes(SKU)) ??
+    tasks.tasks[0];
+  const raised = applyRaiseException(
+    tasks,
+    {
+      kind: "missing_client_fact",
+      title: "Store hours for the flyer",
+      description: "Need the weekday store hours to finish the copy.",
+      taskId: task?.id,
+    },
+    {
+      id: "studio-machine-walk",
+      email: "studio-machine@studio.local",
+      displayName: "Studio",
+      roles: ["owner"],
+    },
+    { staffByUserId: {}, staffCapabilities: {} },
+    materials,
+  );
+  if (!raised.ok) throw new Error(raised.error);
+  const synced = syncJobRecordsFromCampaign(
+    record,
+    raised.envelope.tasks ?? [],
+    raised.materialsEnvelope?.items ?? materials.items,
+    raised.envelope.exceptionRecords ?? [],
+    raised.envelope.jobRecords,
+  );
+  await writeTasksEnvelope({ ...raised.envelope, jobRecords: synced });
+  if (raised.materialsEnvelope) await writeMaterialsEnvelope(raised.materialsEnvelope);
+}
+
 async function seedRefund(userId: string, campaignId: string, campaignName: string): Promise<string> {
   const record = paidCampaign(campaignId, campaignName);
   await upsertCampaignRecord(record, userId);
@@ -316,13 +391,17 @@ async function main(): Promise<number> {
   await markEmailVerified(created.user.id);
   const routineName = `Room 3 Routine ${stamp}`;
   const refundName = `Room 3 Refund ${stamp}`;
-  const routineId = `room3-s1-routine-${stamp}`;
-  const refundId = `room3-s1-refund-${stamp}`;
+  const missingFactName = `Room 3 Missing Fact ${stamp}`;
+  const routineId = `room3-live-routine-${stamp}`;
+  const refundId = `room3-live-refund-${stamp}`;
+  const missingFactId = `room3-live-fact-${stamp}`;
   await seedRoutine(created.user.id, routineId, routineName);
+  await seedMissingFact(created.user.id, missingFactId, missingFactName);
   await seedRefund(created.user.id, refundId, refundName);
   await linkClientCampaign(created.user.id, routineId);
+  await linkClientCampaign(created.user.id, missingFactId);
   await linkClientCampaign(created.user.id, refundId);
-  push("fixtures_seeded", "PASS", `${routineName} + ${refundName}`);
+  push("fixtures_seeded", "PASS", `${routineName} + ${missingFactName} + ${refundName}`);
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
@@ -343,6 +422,26 @@ async function main(): Promise<number> {
       /Owner Console|Today's Desk/i.test(text) ? "PASS" : "FAIL",
       text.slice(0, 180),
       openShot,
+    );
+    const folderMatch = text.match(/(\d+)\s+folders?/i);
+    const folderCount = folderMatch ? Number(folderMatch[1]) : NaN;
+    push(
+      "desk_noise_after_fixture_filter",
+      Number.isFinite(folderCount) && folderCount <= 3 && !/Package 3 Certification/i.test(text)
+        ? "PASS"
+        : "FAIL",
+      Number.isFinite(folderCount)
+        ? `${folderCount} folders on Today's Desk`
+        : "Could not read Today's Desk folder count",
+    );
+    push(
+      "missing_client_fact_off_owner_desk",
+      text.toLowerCase().includes(missingFactName.toLowerCase())
+        ? "FAIL"
+        : "PASS",
+      text.toLowerCase().includes(missingFactName.toLowerCase())
+        ? "Ordinary missing fact appeared as Owner work"
+        : "Ordinary missing fact stayed off the sequential desk",
     );
     push(
       "stale_squishy_language",
@@ -433,24 +532,121 @@ async function main(): Promise<number> {
 
     await page.request.post(`${BASE}/api/auth/logout`).catch(() => undefined);
     await signIn(page, clientEmail, "dev-only", /Cedar|Room 3|Studio Board/i);
+    const refundJobLabels = await waitForCustomerJobLabel(page, refundId, /Cancelled/i);
     await page.goto(`${BASE}/studio-board`, { waitUntil: "domcontentloaded", timeout: 90_000 });
     await page
-      .getByText(/Cancelled|An owner decision has been recorded|This work is closed after an Owner decision/i)
-      .first()
-      .waitFor({ timeout: 45_000 })
-      .catch(() => undefined);
+      .waitForFunction(
+        () => {
+          const studio = document.querySelector('[data-testid="cvc-studio"]')?.textContent ?? "";
+          const next = document.querySelector(".sb-next-action__lead")?.textContent ?? "";
+          return (
+            /closed after an Owner decision/i.test(studio) ||
+            /closed after an Owner decision/i.test(next) ||
+            /\bCancelled\b/i.test(document.body?.innerText || "")
+          );
+        },
+        undefined,
+        { timeout: 45_000 },
+      )
+      .catch(async () => {
+        await page.reload({ waitUntil: "domcontentloaded" });
+        await page
+          .locator('[data-testid="customer-visibility-continuity"]')
+          .waitFor({ timeout: 20_000 })
+          .catch(() => undefined);
+      });
     await page.getByText(/Refund Request/i).first().scrollIntoViewIfNeeded().catch(() => undefined);
+    const boardDebug = await page.evaluate(async () => {
+      const raw = window.localStorage.getItem("studio-squishy:current-campaign");
+      let local = null;
+      try {
+        local = raw ? JSON.parse(raw) : null;
+      } catch {
+        local = null;
+      }
+      const current = await fetch("/api/campaigns/current", { credentials: "include" })
+        .then((response) => response.json())
+        .catch(() => null);
+      const campaignId = current?.campaign?.record?.campaignId || local?.campaignId || "";
+      const jobs = campaignId
+        ? await fetch(`/api/campaigns/${encodeURIComponent(campaignId)}/project-status`, {
+            credentials: "include",
+          })
+            .then((response) => response.json())
+            .catch(() => null)
+        : null;
+      return {
+        localId: local?.campaignId ?? null,
+        localPay: Boolean(local?.paymentReceivedAt),
+        currentId: current?.campaign?.record?.campaignId ?? null,
+        currentPay: Boolean(current?.campaign?.record?.paymentReceivedAt),
+        pageJobs: (jobs?.jobs ?? []).map((job) => job.statusLabel ?? "").join(",") || "(none)",
+      };
+    });
     const boardText = await visibleText(page);
+    const continuityStudio =
+      (await page.locator('[data-testid="cvc-studio"]').textContent().catch(() => "")) ?? "";
+    const nextLead =
+      (await page.locator(".sb-next-action__lead").first().textContent().catch(() => "")) ?? "";
     const boardShot = await shot(page, "04-customer-after-owner-refund");
     const customerTruth =
-      /\bCancelled\b/i.test(boardText) ||
-      /An owner decision has been recorded/i.test(boardText) ||
-      /This work is closed after an Owner decision/i.test(boardText);
+      /closed after an Owner decision/i.test(continuityStudio) ||
+      /closed after an Owner decision/i.test(nextLead) ||
+      /\bCancelled\b/i.test(boardText);
+    const headlineLag =
+      /Waiting on Project Intake/i.test(`${continuityStudio} ${nextLead}`) ||
+      /We've received your Project Intake/i.test(`${continuityStudio} ${nextLead}`) ||
+      (/Building Concepts/i.test(`${continuityStudio} ${nextLead}`) &&
+        !/\bCancelled\b/i.test(`${continuityStudio} ${nextLead}`));
     push(
       "customer_project_updates_after_owner_decision",
-      customerTruth ? "PASS" : "FAIL",
-      boardText.slice(0, 400),
+      customerTruth && !headlineLag ? "PASS" : "FAIL",
+      `jobs=${refundJobLabels} page=${boardDebug.pageJobs} local=${boardDebug.localId}:${boardDebug.localPay} current=${boardDebug.currentId}:${boardDebug.currentPay} continuity=${continuityStudio.slice(0, 160)} next=${nextLead.slice(0, 160)}`,
       boardShot,
+    );
+
+    await linkClientCampaign(created.user.id, missingFactId);
+    await page.request.post(`${BASE}/api/auth/logout`).catch(() => undefined);
+    await signIn(page, clientEmail, "dev-only", /Cedar|Room 3|Studio Board/i);
+    await waitForCustomerJobLabel(page, missingFactId, /Waiting on you/i);
+    await page.goto(`${BASE}/studio-board`, { waitUntil: "domcontentloaded", timeout: 90_000 });
+    await page
+      .locator('[data-testid="customer-visibility-continuity"]')
+      .waitFor({ timeout: 45_000 })
+      .catch(() => undefined);
+    await page
+      .waitForFunction(
+        () => {
+          const needed = document.querySelector('[data-testid="cvc-needed"]')?.textContent ?? "";
+          const studio = document.querySelector('[data-testid="cvc-studio"]')?.textContent ?? "";
+          const body = document.body?.innerText || "";
+          return (
+            /Waiting on you/i.test(`${needed} ${studio}`) ||
+            /store hours/i.test(body) ||
+            /factual confirmation/i.test(body)
+          );
+        },
+        undefined,
+        { timeout: 45_000 },
+      )
+      .catch(() => undefined);
+    const factBoard = await visibleText(page);
+    const factNeeded =
+      (await page.locator('[data-testid="cvc-needed"]').textContent().catch(() => "")) ?? "";
+    const factStudio =
+      (await page.locator('[data-testid="cvc-studio"]').textContent().catch(() => "")) ?? "";
+    const factShot = await shot(page, "05-customer-missing-fact-wait");
+    push(
+      "missing_fact_waits_on_customer",
+      /Waiting on you/i.test(`${factNeeded} ${factStudio} ${factBoard}`) &&
+        !/Waiting — Owner/i.test(factBoard) &&
+        (/store hours/i.test(factBoard) ||
+          /factual confirmation/i.test(factBoard) ||
+          /waiting on you/i.test(`${factNeeded} ${factStudio}`))
+        ? "PASS"
+        : "FAIL",
+      `needed=${factNeeded.slice(0, 160)} studio=${factStudio.slice(0, 160)}`,
+      factShot,
     );
   } finally {
     await browser.close();

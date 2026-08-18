@@ -113,6 +113,15 @@ export type OwnerScopeDecisionAction =
   | "owner_ask_client_approval_scope_change"
   | "owner_assign_scope_change";
 
+export type OwnerPricingDecisionAction =
+  | "owner_approve_pricing_exception"
+  | "owner_decline_pricing_exception"
+  | "owner_hold_pricing_exception"
+  | "owner_ask_team_pricing_exception"
+  | "owner_ask_client_info_pricing_exception"
+  | "owner_ask_client_approval_pricing_exception"
+  | "owner_assign_pricing_exception";
+
 export type OwnerRefundDecisionAction =
   | "owner_approve_refund"
   | "owner_deny_refund"
@@ -247,6 +256,8 @@ function resolveSquishySaysForItem(item: OwnerConsoleSequentialItem): string {
       return "A legacy revision path now needs business judgment: boundary, scope, goodwill, or client relationship.";
     case "scope_change":
       return "A scope change needs your decision before production can continue.";
+    case "pricing_exception":
+      return "A pricing exception needs your judgment before quoted or purchased pricing can move.";
     case "client_request":
       return "A client-facing request needs your approval before anything goes to the client.";
     case "missing_client_fact":
@@ -636,6 +647,53 @@ export function resolveOwnerScopePostDecisionBriefing(
         message: `Routed to the client queue for scope confirmation. This folder left your desk — The Studio will track the response. ${ownerConfirmationSuffix()}`,
       };
     case "owner_assign_scope_change":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+      };
+    default:
+      return {
+        destination: "recently_handled",
+        message: `Folder archived. Your decision is recorded and this desk stays clear. ${ownerConfirmationSuffix()}`,
+      };
+  }
+}
+
+export function resolveOwnerPricingPostDecisionBriefing(
+  action: OwnerPricingDecisionAction,
+): OwnerPostDecisionBriefing {
+  switch (action) {
+    case "owner_approve_pricing_exception":
+      return {
+        destination: "production",
+        message: `Pricing exception approved. This folder left your desk — production continues from the recorded judgment. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_decline_pricing_exception":
+      return {
+        destination: "recently_handled",
+        message: `Pricing exception declined. This folder left your desk — quoted or purchased pricing stays as recorded. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_hold_pricing_exception":
+      return {
+        destination: "waiting_internal",
+        message: `Held for internal pricing review. This folder left your desk — the team will follow up internally. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_team_pricing_exception":
+      return {
+        destination: "waiting_internal",
+        message: `Routed to the team for pricing analysis. This folder left your desk. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_client_info_pricing_exception":
+      return {
+        destination: "waiting_on_client",
+        message: `Routed to the client queue for missing pricing facts. This folder left your desk — The Studio will track the response. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_ask_client_approval_pricing_exception":
+      return {
+        destination: "waiting_on_client",
+        message: `Routed to the client queue for pricing confirmation. This folder left your desk — The Studio will track the response. ${ownerConfirmationSuffix()}`,
+      };
+    case "owner_assign_pricing_exception":
       return {
         destination: "waiting_internal",
         message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,

@@ -346,6 +346,28 @@ describe("STUDIO-OPERATING-MATERIALS-UPLOAD-AND-RECEIPT-1", () => {
     ).toBe("required");
   });
 
+  it("does not demote an active flyer customer ask created from missing_client_fact", () => {
+    const seeded = materials([
+      {
+        id: "factual-confirmation-store-hours",
+        category: "factual-confirmation",
+        requirementLevel: "required",
+        reviewStatus: "requested",
+        contentKind: "confirmation",
+        label: "Store hours for the flyer",
+        reason: "Need weekday store hours",
+        relatedServiceIds: ["v2-rtu-flyer"],
+        uploadStatus: "none",
+        sourceExceptionId: "exc-missing-hours",
+        promotionApprovedAt: "2026-08-18T22:00:00.000Z",
+      },
+    ]);
+    const result = reconcileFlyerWordmarkMaterialTruth(seeded, campaign());
+    expect(result.changed).toBe(false);
+    expect(result.envelope.items[0]?.reviewStatus).toBe("requested");
+    expect(result.envelope.items[0]?.requirementLevel).toBe("required");
+  });
+
   it("keeps bytes after a fresh storage adapter — not localStorage-only", async () => {
     const adapter = createFsFileRoomStorageAdapter("studio-files-maya-return");
     const stored = await storeAndAttachCustomerMaterialFile({

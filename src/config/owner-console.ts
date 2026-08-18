@@ -449,6 +449,85 @@ export const ownerConsole = {
       },
     ],
   },
+  pricingDecision: {
+    decisionQuestion: "Should this pricing exception be approved, declined, or sent back for facts?",
+    whatTagiaReviews:
+      "This is not ordinary catalog display or checkout. Review the quoted amount, what was purchased, and why a pricing judgment is required before production continues.",
+    ownerNotesLabel: "Owner Notes",
+    ownerNotesPlaceholder:
+      "Your reasoning for this pricing decision — saved to the historical record.",
+    teamNoteLabel: "Note for Producer / planning",
+    teamNotePlaceholder: "What pricing facts or plan numbers need checking?",
+    clientMessageLabel: "Approved client-facing message",
+    clientMessagePlaceholder: "Write the exact wording the client should see.",
+    assignToLabel: "Assign to",
+    confirmApprove:
+      "Approve this pricing exception? Production will continue from the recorded judgment.",
+    confirmDecline:
+      "Decline this pricing exception? Quoted or purchased pricing stays as recorded.",
+    confirmHold:
+      "Hold this pricing review for internal follow-up? The folder will leave your desk.",
+    confirmAskTeam:
+      "Send this back to the team with your note? The folder will leave your desk.",
+    confirmAskClientInfo:
+      "Send this approved client message and pause for missing pricing facts? The folder will leave your desk.",
+    confirmAskClientApproval:
+      "Send this approved client message and pause for pricing confirmation? The folder will leave your desk.",
+    confirmAssign:
+      "Assign this pricing decision to the selected team member? The folder will leave your desk.",
+    approveLabel: "Approve pricing exception",
+    declineLabel: "Decline",
+    holdLabel: "Hold",
+    askTeamLabel: "Ask team",
+    askClientInfoLabel: "Ask client — need information",
+    askClientApprovalLabel: "Ask client — need approval",
+    assignLabel: "Assign",
+    openFileRoomLabel: "Open File Room",
+    availableActions: [
+      {
+        id: "approve",
+        label: "Approve pricing exception",
+        wired: true,
+        whereAfter: "Production — recorded judgment; folder leaves your desk immediately.",
+      },
+      {
+        id: "decline",
+        label: "Decline",
+        wired: true,
+        whereAfter: "Recently Handled — quoted or purchased pricing stays as recorded.",
+      },
+      {
+        id: "hold",
+        label: "Hold",
+        wired: true,
+        whereAfter: "Needs Clarification — internal pricing review.",
+      },
+      {
+        id: "ask_team",
+        label: "Ask team",
+        wired: true,
+        whereAfter: "Back to team — pricing analysis.",
+      },
+      {
+        id: "ask_client_info",
+        label: "Ask client — need information",
+        wired: true,
+        whereAfter: "Waiting on Client — awaiting a pricing fact.",
+      },
+      {
+        id: "ask_client_approval",
+        label: "Ask client — need approval",
+        wired: true,
+        whereAfter: "Waiting on Client — awaiting pricing confirmation.",
+      },
+      {
+        id: "assign",
+        label: "Assign",
+        wired: true,
+        whereAfter: "Back to assignee — folder leaves your desk.",
+      },
+    ],
+  },
   refundDecision: {
     decisionQuestion: "Should this work receive a refund, continue, or need more internal review?",
     whatTagiaReviews:
@@ -754,6 +833,8 @@ export const ownerConsoleImpactByKind: Record<CampaignExceptionKind, string> = {
     "Work on the linked task stays blocked until facts are resolved or promoted to the client.",
   scope_change:
     "Scope cannot change until Owner approves or declines the requested change.",
+  pricing_exception:
+    "Quoted or purchased pricing cannot move until Owner judges the exception.",
   deadline_commitment:
     "Deadline commitments cannot proceed without Owner sign-off.",
   deadline_risk:
@@ -773,6 +854,8 @@ export const ownerConsoleOutcomeByKind: Record<CampaignExceptionKind, string> = 
   missing_client_fact:
     "After approve → client materials queue; after hold/decline → internal team follows up.",
   scope_change: "After resolve → Producer adjusts plan or work resumes within approved scope.",
+  pricing_exception:
+    "After resolve → Machine continues from the recorded pricing judgment. Ordinary checkout is not Owner work.",
   deadline_commitment: "After resolve → Producer updates timeline and dispatch.",
   deadline_risk: "After resolve → team adjusts schedule or scope with Owner guidance.",
   revision_exhausted:

@@ -81,6 +81,10 @@ export function reconcileFlyerWordmarkMaterialTruth(
     const flyerRelated = item.relatedServiceIds.some((skuId) => flyerSkuIds.has(skuId));
     if (!flyerRelated) return item;
 
+    if (item.sourceExceptionId || item.promotionApprovedAt || item.reviewStatus === "requested") {
+      return item;
+    }
+
     if (
       (item.category === "document-reference" ||
         item.category === "access-instructions" ||

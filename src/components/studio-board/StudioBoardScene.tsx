@@ -23,7 +23,6 @@ import { helpCenter } from "@/config/help-center";
 import { studioBoard, studioBoardDraftRoomHref, studioBoardStudioGuideHref } from "@/config/studio-board";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import { resolveCustomerVisibilityContinuityView } from "@/lib/customer-visibility-continuity";
-import type { CustomerJobStatusSummary } from "@/lib/project-record-status";
 import {
   greetingPeriodFromDate,
   resolveAccountPackageView,
@@ -35,6 +34,7 @@ import { speakConversationLine } from "@/lib/studio-conversation-speech";
 import { consumeStudioVoiceBoardWelcome } from "@/lib/studio-voice-board-handoff";
 import { resolveBoardHeaderGreeting } from "@/lib/studio-board-customer-greeting";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
+import { useProjectJobStatus } from "@/lib/use-project-job-status";
 
 const {
   brand,
@@ -191,8 +191,10 @@ export default function StudioBoardScene() {
   const showNoActiveProject =
     ready && (accessState === "no-active-project" || !boardCampaign);
   const loadingCopy = emptyCopy.loading;
-  const [movedToProduction, setMovedToProduction] = useState(false);
-  const [customerJobs, setCustomerJobs] = useState<readonly CustomerJobStatusSummary[]>([]);
+  const { jobs: customerJobs } = useProjectJobStatus(
+    boardCampaign?.paymentReceivedAt ? boardCampaign.campaignId : undefined,
+  );
+  const movedToProduction = customerJobs.some((job) => job.hasProductionStarted);
   /** Session greeting — independent of campaign claim/load. */
   const [customerDisplayName, setCustomerDisplayName] = useState<string | null>(null);
   const [sessionGreetingResolved, setSessionGreetingResolved] = useState(false);
@@ -228,37 +230,6 @@ export default function StudioBoardScene() {
       cancelled = true;
     };
   }, []);
-
-  useEffect(() => {
-    if (!boardCampaign?.campaignId || !boardCampaign.paymentReceivedAt) {
-      setMovedToProduction(false);
-      setCustomerJobs([]);
-      return;
-    }
-
-    let cancelled = false;
-    void fetch(`/api/campaigns/${encodeURIComponent(boardCampaign.campaignId)}/project-status`)
-      .then(async (response) => {
-        if (!response.ok) return;
-        const payload = (await response.json()) as {
-          jobs?: ReadonlyArray<CustomerJobStatusSummary & { hasProductionStarted?: boolean }>;
-        };
-        if (cancelled) return;
-        const jobs = payload.jobs ?? [];
-        setCustomerJobs(jobs);
-        setMovedToProduction(Boolean(jobs.some((job) => job.hasProductionStarted)));
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setMovedToProduction(false);
-          setCustomerJobs([]);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [boardCampaign?.campaignId, boardCampaign?.paymentReceivedAt]);
 
   const displayFacts = useMemo<StudioBoardDisplayFacts>(() => {
     const blockingRequiredCount =

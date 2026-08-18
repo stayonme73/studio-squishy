@@ -192,9 +192,12 @@ export function resolveDefaultClientWording(
     ? relatedServiceIdsFromTask(record, tasks)
     : relatedServiceIdsFromMaterials(record, materials, tasks);
 
+  const factLabel =
+    record.kind === "missing_client_fact" ? record.title.trim() || null : null;
   if (draft) {
     const label =
       draft.exactClientOnlyItem?.trim() ||
+      factLabel ||
       configLabel(category, contentKind);
     const prompt = configPrompt(category, contentKind);
     const whyNeeded = formatWhyNeeded(record, tasks, materials);
@@ -212,7 +215,7 @@ export function resolveDefaultClientWording(
   return {
     category,
     contentKind,
-    clientFacingLabel: configLabel(category, contentKind),
+    clientFacingLabel: factLabel || configLabel(category, contentKind),
     clientFacingPrompt: configPrompt(category, contentKind),
     whyNeeded: formatWhyNeeded(record, tasks, materials),
     requirementLevel: "required",

@@ -27,6 +27,13 @@ import {
   applyOwnerAssignRevision,
   applyOwnerAssignScopeChange,
   applyOwnerApproveScopeChange,
+  applyOwnerApprovePricingException,
+  applyOwnerAskClientApprovalPricingException,
+  applyOwnerAskClientInfoPricingException,
+  applyOwnerAskTeamPricingException,
+  applyOwnerAssignPricingException,
+  applyOwnerDeclinePricingException,
+  applyOwnerHoldPricingException,
   applyOwnerCommitDeadline,
   applyOwnerDeclineScopeChange,
   applyOwnerHoldDeadline,
@@ -106,6 +113,35 @@ export type OwnerDecisionFolderPatchBody =
     }
   | {
       action: "owner_assign_scope_change";
+      exceptionId: string;
+      assignToUserId: string;
+      ownerNotes?: string;
+      note?: string;
+    }
+  | { action: "owner_approve_pricing_exception"; exceptionId: string; ownerNotes?: string }
+  | { action: "owner_decline_pricing_exception"; exceptionId: string; ownerNotes?: string }
+  | { action: "owner_hold_pricing_exception"; exceptionId: string; note: string; ownerNotes?: string }
+  | {
+      action: "owner_ask_team_pricing_exception";
+      exceptionId: string;
+      note: string;
+      ownerNotes?: string;
+      assignToUserId?: string;
+    }
+  | {
+      action: "owner_ask_client_info_pricing_exception";
+      exceptionId: string;
+      clientMessage: string;
+      ownerNotes?: string;
+    }
+  | {
+      action: "owner_ask_client_approval_pricing_exception";
+      exceptionId: string;
+      clientMessage: string;
+      ownerNotes?: string;
+    }
+  | {
+      action: "owner_assign_pricing_exception";
       exceptionId: string;
       assignToUserId: string;
       ownerNotes?: string;
@@ -207,6 +243,21 @@ export function dispatchOwnerDecisionFolderAction(
     case "owner_assign_scope_change":
       if (!targetUser) return { ok: false, error: "Assignee not found.", status: 404 };
       return applyOwnerAssignScopeChange(envelope, body, user, assignments, targetUser);
+    case "owner_approve_pricing_exception":
+      return applyOwnerApprovePricingException(envelope, body, user, assignments);
+    case "owner_decline_pricing_exception":
+      return applyOwnerDeclinePricingException(envelope, body, user, assignments);
+    case "owner_hold_pricing_exception":
+      return applyOwnerHoldPricingException(envelope, body, user, assignments);
+    case "owner_ask_team_pricing_exception":
+      return applyOwnerAskTeamPricingException(envelope, body, user, assignments, targetUser);
+    case "owner_ask_client_info_pricing_exception":
+      return applyOwnerAskClientInfoPricingException(envelope, body, user, assignments);
+    case "owner_ask_client_approval_pricing_exception":
+      return applyOwnerAskClientApprovalPricingException(envelope, body, user, assignments);
+    case "owner_assign_pricing_exception":
+      if (!targetUser) return { ok: false, error: "Assignee not found.", status: 404 };
+      return applyOwnerAssignPricingException(envelope, body, user, assignments, targetUser);
     case "owner_resolve_complaint":
       return applyOwnerResolveComplaint(envelope, body, user, assignments);
     case "owner_escalate_complaint_refund":

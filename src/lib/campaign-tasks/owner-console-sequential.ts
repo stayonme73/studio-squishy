@@ -87,6 +87,7 @@ const DECISION_EXCEPTION_KINDS = new Set<CampaignExceptionKind>([
   "compliance_hold",
   "direction_disagreement",
   "scope_change",
+  "pricing_exception",
   "deadline_commitment",
   "deadline_risk",
   "revision_exhausted",
@@ -107,6 +108,8 @@ export function resolveExceptionUrgencyRank(card: OwnerConsoleDecisionCard): num
 
   switch (kind) {
     case "scope_change":
+      return 5;
+    case "pricing_exception":
       return 5;
     case "revision_exhausted":
       return 6;

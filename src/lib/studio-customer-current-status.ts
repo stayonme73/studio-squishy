@@ -211,6 +211,15 @@ export function resolveCustomerCurrentStatusOverlay(
   jobs?: readonly CustomerJobStatusSummary[],
 ): CustomerCurrentStatusOverlay | null {
   if (!campaign) return null;
+
+  const cancelledJobs =
+    jobs?.filter((job) => spineKindFromLabel(job.statusLabel) === "refunded_cancelled") ?? [];
+  const liveJobs =
+    jobs?.filter((job) => spineKindFromLabel(job.statusLabel) !== "refunded_cancelled") ?? [];
+  if (jobs && jobs.length > 0 && liveJobs.length === 0 && cancelledJobs.length > 0) {
+    return overlayFromSpineLabel(copy.labels.cancelled, campaign, facts);
+  }
+
   if (isPaidIncompleteIntake(campaign)) {
     return {
       kind: "intake_needed",

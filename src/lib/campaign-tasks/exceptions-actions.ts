@@ -21,6 +21,8 @@ import {
   validateRaiseException,
   assignStatusForUser,
 } from "./exceptions";
+import { applyOrdinaryMissingClientFactAsk } from "./missing-client-fact-ask";
+import { CAMPAIGN_TASKS_SCHEMA_VERSION } from "./plan-change";
 import type {
   AssignExceptionPayload,
   ApproveClientRequestPayload,
@@ -29,7 +31,6 @@ import type {
   RaiseExceptionPayload,
   ResolveExceptionPayload,
 } from "./exceptions-types";
-import { CAMPAIGN_TASKS_SCHEMA_VERSION } from "./plan-change";
 import {
   applyPromotionToMaterials,
   contentKindForCategory,
@@ -116,6 +117,7 @@ export function applyRaiseException(
   payload: RaiseExceptionPayload,
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
+  materialsEnvelope?: ServerMaterialsEnvelope,
 ): ExceptionActionResult {
   if (!canRaiseException(user, assignments)) {
     return { ok: false, error: "Forbidden", status: 403 };
@@ -161,12 +163,32 @@ export function applyRaiseException(
 
   const records = upsertExceptionRecord(envelope.exceptionRecords, record);
   const events = appendExceptionEvent(envelope.exceptionEvents, event);
-
-  return {
+  const raised: ExceptionActionResult = {
     ok: true,
     envelope: withExceptionEnvelope(envelope, records, events),
     exception: record,
   };
+
+  if (record.kind !== "missing_client_fact") {
+    return raised;
+  }
+
+  const materials =
+    materialsEnvelope ?? {
+      campaignId: envelope.campaignId,
+      items: [],
+      updatedAt: record.createdAt,
+      version: 1,
+      syncedAt: record.createdAt,
+    };
+
+  return applyOrdinaryMissingClientFactAsk(
+    raised.envelope,
+    record.id,
+    user,
+    assignments,
+    materials,
+  );
 }
 
 export function applyAssignException(

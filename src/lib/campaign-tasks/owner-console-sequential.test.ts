@@ -203,6 +203,24 @@ describe("owner-console-sequential", () => {
     expect(desk.items[0]?.trayId).toBe("needs_my_approval");
   });
 
+  it("places pricing_exception on Needs My Decision", () => {
+    const view = {
+      waitingOnOwner: [
+        card({ id: "pricing", kind: "pricing_exception" }),
+        card({ id: "missing-fact", kind: "missing_client_fact" }),
+      ],
+      waitingCount: 2,
+      campaignCount: 1,
+      isEmpty: false,
+      campaigns: [],
+    };
+
+    const desk = resolveOwnerConsoleSequentialDesk(view, emptyControlRoom(), emptyScan());
+    expect(desk.todaysDecisionCount).toBe(1);
+    expect(desk.items[0]?.id).toBe("exception:pricing");
+    expect(desk.items[0]?.trayId).toBe("needs_my_decision");
+  });
+
   it("places compliance_hold in needs_my_decision tray", () => {
     const view = {
       waitingOnOwner: [

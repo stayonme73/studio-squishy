@@ -72,6 +72,7 @@ function isCampaignExceptionKind(value: string): value is CampaignExceptionKind 
     "direction_disagreement",
     "missing_client_fact",
     "scope_change",
+    "pricing_exception",
     "deadline_commitment",
     "deadline_risk",
     "revision_exhausted",
@@ -94,6 +95,7 @@ export const ELEVATED_TONE_INTERACTION_KINDS = new Set<CustomerInteractionKind>(
 /** Owner outcomes that may produce learning candidates — store only, never auto-apply. */
 export const NOTEWORTHY_OWNER_EXCEPTION_KINDS = new Set<CampaignExceptionKind>([
   "scope_change",
+  "pricing_exception",
   "client_request",
   "deadline_commitment",
   "deadline_risk",

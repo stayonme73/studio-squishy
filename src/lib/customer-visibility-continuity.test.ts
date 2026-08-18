@@ -150,6 +150,34 @@ describe("resolveCustomerVisibilityContinuityView", () => {
     expect(view.neededItems.some((item) => /Social Posts/i.test(item))).toBe(true);
     expect(view.whoActsNext).toBe("customer");
     expect(view.riskOrBlocker).toMatch(/waiting on you/i);
+    expect(view.whatStudioIsDoing).toMatch(/waiting on you/i);
+  });
+
+  it("lets an Owner refund overlay replace intake-style Board copy", () => {
+    const jobs: CustomerJobStatusSummary[] = [
+      {
+        jobId: "job-refund",
+        campaignId: "cvc",
+        skuId: "v2-rtu-flyer",
+        serviceName: "Make Me a Flyer",
+        statusLabel: "Cancelled",
+        isWaitingOnClient: false,
+        hasProductionStarted: false,
+        deliveredAt: null,
+        clientDeadline: null,
+      },
+    ];
+    const view = resolveCustomerVisibilityContinuityView({
+      campaign: baseCampaign("BUILDING_CONCEPTS", {
+        paymentReceivedAt: "2026-08-01T12:00:00.000Z",
+        projectDetailsSubmittedAt: "2026-08-01T13:00:00.000Z",
+      }),
+      displayFacts: { blockingRequiredCount: 0, jobs },
+      jobs,
+    });
+    expect(view.whatStudioIsDoing).toMatch(/Owner decision/i);
+    expect(view.whatStudioIsDoing).not.toMatch(/Project Intake/i);
+    expect(view.whoActsNext).toBe("none");
   });
 
   it("never invents guaranteed ETA language in the visibility story", () => {

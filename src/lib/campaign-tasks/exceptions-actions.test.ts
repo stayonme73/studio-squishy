@@ -336,16 +336,31 @@ describe("exceptions-actions", () => {
     expect(resolved.status).toBe(403);
   });
 
-  it("owner can decline missing_client_fact promotion", () => {
+  it("ordinary missing_client_fact auto-asks the customer instead of waiting on Owner", () => {
+    const raised = applyRaiseException(
+      envelope([blockedCopyTask()]),
+      { kind: "missing_client_fact", title: "Brand hex codes", taskId: "sm-001:copy" },
+      producer,
+      assignments,
+      materialsEnvelope(),
+    );
+    expect(raised.ok).toBe(true);
+    if (!raised.ok) return;
+    expect(raised.exception.status).toBe("waiting_client");
+    expect(raised.exception.promotion).toBeTruthy();
+    expect(raised.materialsEnvelope?.items.some((item) => item.sourceExceptionId === raised.exception.id)).toBe(
+      true,
+    );
+  });
+
+  it("owner can decline client_request promotion", () => {
     const raised = applyRaiseException(
       envelope(),
-      { kind: "missing_client_fact", title: "Brand hex codes" },
-      producer,
+      { kind: "client_request", title: "Need logo", clientRequestDraft: { exactClientOnlyItem: "Logo" } },
+      owner,
       assignments,
     );
     if (!raised.ok) throw new Error("raise failed");
-    expect(raised.exception.status).toBe("waiting_owner");
-
     const declined = applyDeclinePromotion(
       raised.envelope,
       { exceptionId: raised.exception.id, notes: "Team will source internally" },

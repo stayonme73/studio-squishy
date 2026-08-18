@@ -73,8 +73,8 @@ describe("exceptions validation and status", () => {
     expect(initialStatusForKind("compliance_hold")).toBe("waiting_internal");
   });
 
-  it("missing_client_fact starts waiting_owner", () => {
-    expect(initialStatusForKind("missing_client_fact")).toBe("waiting_owner");
+  it("missing_client_fact starts waiting_client", () => {
+    expect(initialStatusForKind("missing_client_fact")).toBe("waiting_client");
   });
 
   it("client_request starts waiting_owner", () => {

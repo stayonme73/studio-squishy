@@ -21,6 +21,7 @@ export type CampaignExceptionKind =
   | "direction_disagreement"
   | "missing_client_fact"
   | "scope_change"
+  | "pricing_exception"
   | "deadline_commitment"
   | "deadline_risk"
   | "revision_exhausted"

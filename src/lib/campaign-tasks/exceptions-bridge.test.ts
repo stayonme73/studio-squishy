@@ -154,6 +154,8 @@ describe("exceptions-bridge", () => {
     expect(result.envelope.exceptionRecords?.length).toBe(1);
     expect(result.envelope.exceptionRecords?.[0].kind).toBe("missing_client_fact");
     expect(result.envelope.exceptionRecords?.[0].taskId).toBe("sm-001:copy");
+    expect(result.envelope.exceptionRecords?.[0].status).toBe("waiting_client");
+    expect(result.envelope.exceptionRecords?.[0].promotion).toBeTruthy();
   });
 
   it("does not double-bridge the same qa record", () => {

@@ -83,6 +83,8 @@ import {
   applyOwnerConfirmDirectionDisagreement,
   applyOwnerHoldDirectionDisagreement,
 } from "./direction-disagreement-actions";
+import { applyOrdinaryMissingClientFactsInEnvelope } from "./missing-client-fact-ask";
+import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import {
   applyApproveClientRequest,
   applyAssignException,
@@ -332,6 +334,13 @@ const OWNER_DECISION_FOLDER_ACTIONS = new Set<string>([
   "owner_ask_client_info_scope_change",
   "owner_ask_client_approval_scope_change",
   "owner_assign_scope_change",
+  "owner_approve_pricing_exception",
+  "owner_decline_pricing_exception",
+  "owner_hold_pricing_exception",
+  "owner_ask_team_pricing_exception",
+  "owner_ask_client_info_pricing_exception",
+  "owner_ask_client_approval_pricing_exception",
+  "owner_assign_pricing_exception",
   "owner_resolve_complaint",
   "owner_escalate_complaint_refund",
   "owner_escalate_complaint_scope",
@@ -347,6 +356,45 @@ function isOwnerDecisionFolderPatch(
   body: TasksPatchBody,
 ): body is OwnerDecisionFolderPatchBody {
   return OWNER_DECISION_FOLDER_ACTIONS.has(body.action);
+}
+
+function syncJobsAfterMissingClientAsk(
+  envelope: ServerTasksEnvelope,
+  context: TaskActionContext,
+  materialsEnvelope?: ServerMaterialsEnvelope,
+): ServerTasksEnvelope {
+  const jobs = syncJobRecordsFromCampaign(
+    context.campaign,
+    envelope.tasks ?? [],
+    materialsEnvelope?.items ?? context.materials,
+    envelope.exceptionRecords ?? [],
+    envelope.jobRecords,
+  );
+  return { ...envelope, jobRecords: jobs };
+}
+
+function askOrdinaryMissingClientFacts(
+  envelope: ServerTasksEnvelope,
+  user: StudioUser,
+  context: TaskActionContext,
+): {
+  envelope: ServerTasksEnvelope;
+  materialsEnvelope?: ServerMaterialsEnvelope;
+} {
+  const asked = applyOrdinaryMissingClientFactsInEnvelope(
+    envelope,
+    user,
+    context.assignments,
+    context.materialsEnvelope,
+  );
+  return {
+    envelope: syncJobsAfterMissingClientAsk(
+      asked.envelope,
+      context,
+      asked.materialsEnvelope,
+    ),
+    materialsEnvelope: asked.materialsEnvelope,
+  };
 }
 
 export type TaskActionContext = {
@@ -1269,12 +1317,19 @@ export function applyQaFail(
     user,
     context.assignments,
   );
-  const updatedTask = bridged.tasks.find((entry) => entry.id === body.taskId);
+  const asked = askOrdinaryMissingClientFacts(bridged, user, context);
+  const updatedTask = asked.envelope.tasks.find((entry) => entry.id === body.taskId);
   if (!updatedTask) {
     return { ok: false, error: "Task not found after QA fail.", status: 500 };
   }
 
-  return { ok: true, envelope: bridged, task: updatedTask, productionEnvelope };
+  return {
+    ok: true,
+    envelope: asked.envelope,
+    task: updatedTask,
+    productionEnvelope,
+    materialsEnvelope: asked.materialsEnvelope,
+  };
 }
 
 export function applyQaBlock(
@@ -1388,9 +1443,21 @@ export function applyTaskPatch(
     case "qa_block":
       return applyQaBlock(envelope, body, user, context);
     case "raise_exception": {
-      const result = applyRaiseException(envelope, body, user, context.assignments);
+      const result = applyRaiseException(
+        envelope,
+        body,
+        user,
+        context.assignments,
+        context.materialsEnvelope,
+      );
       if (!result.ok) return result;
-      return { ok: true, envelope: result.envelope, exception: result.exception };
+      const asked = askOrdinaryMissingClientFacts(result.envelope, user, context);
+      return {
+        ok: true,
+        envelope: asked.envelope,
+        exception: asked.envelope.exceptionRecords?.find((entry) => entry.id === result.exception.id) ?? result.exception,
+        materialsEnvelope: asked.materialsEnvelope ?? result.materialsEnvelope,
+      };
     }
     case "assign_exception": {
       const result = applyAssignException(

@@ -400,3 +400,128 @@ export function applyOwnerAssignScopeChange(
     assignee,
   );
 }
+
+export function applyOwnerApprovePricingException(
+  envelope: Parameters<typeof applyOwnerResolveExceptionDecision>[0],
+  payload: { exceptionId: string; ownerNotes?: string },
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): ExceptionActionResult {
+  return applyOwnerResolveExceptionDecision(
+    envelope,
+    {
+      exceptionId: payload.exceptionId,
+      ownerNotes: payload.ownerNotes,
+      resolutionSuffix: "Owner approved pricing exception",
+    },
+    user,
+    assignments,
+  );
+}
+
+export function applyOwnerDeclinePricingException(
+  envelope: Parameters<typeof applyOwnerResolveExceptionDecision>[0],
+  payload: { exceptionId: string; ownerNotes?: string },
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): ExceptionActionResult {
+  return applyOwnerResolveExceptionDecision(
+    envelope,
+    {
+      exceptionId: payload.exceptionId,
+      ownerNotes: payload.ownerNotes,
+      resolutionSuffix: "Owner declined pricing exception",
+    },
+    user,
+    assignments,
+  );
+}
+
+export function applyOwnerHoldPricingException(
+  envelope: Parameters<typeof applyOwnerHoldExceptionDecision>[0],
+  payload: { exceptionId: string; note: string; ownerNotes?: string },
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): ExceptionActionResult {
+  return applyOwnerHoldExceptionDecision(
+    envelope,
+    { ...payload, eventPrefix: "Owner hold (pricing)" },
+    user,
+    assignments,
+    "pricing_exception",
+    "Pricing exception decision",
+  );
+}
+
+export function applyOwnerAskTeamPricingException(
+  envelope: Parameters<typeof applyOwnerAskTeamExceptionDecision>[0],
+  payload: { exceptionId: string; note: string; ownerNotes?: string },
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+  assignee?: StudioUser,
+): ExceptionActionResult {
+  return applyOwnerAskTeamExceptionDecision(
+    envelope,
+    { ...payload, eventPrefix: "Owner ask-team (pricing)" },
+    user,
+    assignments,
+    "pricing_exception",
+    "Pricing exception decision",
+    assignee,
+  );
+}
+
+export function applyOwnerAskClientInfoPricingException(
+  envelope: Parameters<typeof applyOwnerAskClientExceptionDecision>[0],
+  payload: { exceptionId: string; clientMessage: string; ownerNotes?: string },
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): ExceptionActionResult {
+  return applyOwnerAskClientExceptionDecision(
+    envelope,
+    { ...payload, eventPrefix: "Owner ask-client information (pricing)" },
+    user,
+    assignments,
+    "pricing_exception",
+    "Pricing exception decision",
+  );
+}
+
+export function applyOwnerAskClientApprovalPricingException(
+  envelope: Parameters<typeof applyOwnerAskClientExceptionDecision>[0],
+  payload: { exceptionId: string; clientMessage: string; ownerNotes?: string },
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+): ExceptionActionResult {
+  return applyOwnerAskClientExceptionDecision(
+    envelope,
+    { ...payload, eventPrefix: "Owner ask-client approval (pricing)" },
+    user,
+    assignments,
+    "pricing_exception",
+    "Pricing exception decision",
+  );
+}
+
+export function applyOwnerAssignPricingException(
+  envelope: Parameters<typeof applyOwnerAssignExceptionDecision>[0],
+  payload: {
+    exceptionId: string;
+    assignToUserId: string;
+    ownerNotes?: string;
+    note?: string;
+  },
+  user: StudioUser,
+  assignments: CampaignAssignmentsFile,
+  assignee: StudioUser,
+): ExceptionActionResult {
+  return applyOwnerAssignExceptionDecision(
+    envelope,
+    payload,
+    user,
+    assignments,
+    "pricing_exception",
+    "Pricing exception decision",
+    assignee,
+  );
+}

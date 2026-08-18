@@ -24,7 +24,10 @@ import {
 } from "@/lib/job-control/communication";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
-import { readMaterialsEnvelope } from "@/lib/materials/store";
+import { COORDINATOR_SYSTEM_USER } from "@/studio-coordinator/config";
+import { applyOrdinaryMissingClientFactsInEnvelope } from "@/lib/campaign-tasks/missing-client-fact-ask";
+import { shouldAppearOnLiveOwnerDesk } from "@/lib/file-room/owner-console-live-desk";
+import { getOrInitializeMaterials, readMaterialsEnvelope, writeMaterialsEnvelope } from "@/lib/materials/store";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
 import { loadFileRoomCampaignList } from "@/lib/file-room/load-campaign";
 
@@ -52,38 +55,68 @@ export async function loadOwnerConsoleAggregate(
     listStudioUsers(),
   ]);
 
+  const liveCampaigns = campaigns.filter((envelope) =>
+    shouldAppearOnLiveOwnerDesk(envelope.campaignId),
+  );
+
   const loadedBundles = await Promise.all(
-    campaigns.map(async (envelope): Promise<OwnerConsoleCampaignBundle> => {
-      // Tasks init already loads materials; avoid parallel summary sync on the same campaign file.
+    liveCampaigns.map(async (envelope) => {
       const tasksEnvelope = await getOrGenerateTasks(envelope.campaignId, envelope.record);
       const materialsEnvelope = await readMaterialsEnvelope(envelope.campaignId);
-      return {
-        envelope,
-        tasksEnvelope,
-        materials: materialsEnvelope?.items ?? [],
-      };
+      return { envelope, tasksEnvelope, materialsEnvelope };
     }),
   );
   const rawBundles = await Promise.all(
     loadedBundles.map(async (bundle): Promise<OwnerConsoleCampaignBundle> => {
+      let tasksEnvelope = bundle.tasksEnvelope;
+      let materials = bundle.materialsEnvelope?.items ?? [];
+      const openMissingFacts = (tasksEnvelope.exceptionRecords ?? []).some(
+        (record) =>
+          record.kind === "missing_client_fact" &&
+          record.status !== "resolved" &&
+          record.status !== "cancelled" &&
+          !(record.promotion && record.status === "waiting_client"),
+      );
+      if (shouldAppearOnLiveOwnerDesk(bundle.envelope.campaignId) && openMissingFacts) {
+        const workingMaterials =
+          bundle.materialsEnvelope ??
+          (await getOrInitializeMaterials(
+            bundle.envelope.campaignId,
+            bundle.envelope.record,
+          ));
+        const asked = applyOrdinaryMissingClientFactsInEnvelope(
+          tasksEnvelope,
+          COORDINATOR_SYSTEM_USER,
+          assignments,
+          workingMaterials,
+        );
+        if (asked.askedIds.length > 0) {
+          materials = asked.materialsEnvelope.items;
+          tasksEnvelope = asked.envelope;
+          await writeMaterialsEnvelope(asked.materialsEnvelope);
+        } else {
+          materials = workingMaterials.items;
+        }
+      }
+
       const synced = syncJobRecordsFromCampaign(
         bundle.envelope.record,
-        bundle.tasksEnvelope.tasks ?? [],
-        bundle.materials ?? [],
-        bundle.tasksEnvelope.exceptionRecords ?? [],
-        bundle.tasksEnvelope.jobRecords,
+        tasksEnvelope.tasks ?? [],
+        materials,
+        tasksEnvelope.exceptionRecords ?? [],
+        tasksEnvelope.jobRecords,
       );
-      const jobs = applyWaitingOnClientPolicies(synced, bundle.materials ?? []);
+      const jobs = applyWaitingOnClientPolicies(synced, materials);
       const clientId = resolveCampaignCommunicationClientId(
         bundle.envelope.clientUserId,
         bundle.envelope.campaignId,
       );
       const communicationSync = syncJobCommunicationRecords({
-        envelope: bundle.tasksEnvelope,
+        envelope: { ...tasksEnvelope, jobRecords: jobs },
         campaign: bundle.envelope.record,
         clientId,
         jobs,
-        materials: bundle.materials ?? [],
+        materials,
       });
       const nextEnvelope = communicationSync.envelope;
       const changed =
@@ -92,22 +125,31 @@ export async function loadOwnerConsoleAggregate(
         JSON.stringify(bundle.tasksEnvelope.jobCommunicationRecords ?? []) !==
           JSON.stringify(nextEnvelope.jobCommunicationRecords ?? []) ||
         JSON.stringify(bundle.tasksEnvelope.jobActivityEvents ?? []) !==
-          JSON.stringify(nextEnvelope.jobActivityEvents ?? []);
+          JSON.stringify(nextEnvelope.jobActivityEvents ?? []) ||
+        JSON.stringify(bundle.tasksEnvelope.exceptionRecords ?? []) !==
+          JSON.stringify(nextEnvelope.exceptionRecords ?? []);
 
-      if (!changed) return bundle;
-      const saved = await writeTasksEnvelope(nextEnvelope);
-      return { ...bundle, tasksEnvelope: saved };
+      const saved = changed ? await writeTasksEnvelope(nextEnvelope) : nextEnvelope;
+      return {
+        envelope: bundle.envelope,
+        tasksEnvelope: saved,
+        materials,
+      };
     }),
   );
 
+  const liveRawBundles = rawBundles.filter((bundle) =>
+    shouldAppearOnLiveOwnerDesk(bundle.envelope.campaignId),
+  );
+
   const assignCandidatesByCampaign = resolveAssignCandidatesByCampaign(
-    rawBundles,
+    liveRawBundles,
     assignments,
     studioUsers,
   );
 
   const provisionalView = resolveOwnerConsoleView(
-    rawBundles,
+    liveRawBundles,
     user,
     assignments,
     assignCandidatesByCampaign,
@@ -117,7 +159,7 @@ export async function loadOwnerConsoleAggregate(
     provisionalView.waitingOnOwner.map((card) => card.campaignId),
   );
 
-  const bundles = rawBundles.filter((bundle) =>
+  const bundles = liveRawBundles.filter((bundle) =>
     shouldIncludeCampaignInOwnerConsoleAggregate(
       bundle.envelope,
       waitingByCampaign.has(bundle.envelope.campaignId),
@@ -138,7 +180,7 @@ export async function loadOwnerConsoleAggregate(
     resolveWaitingOwnerExceptionIds(view.waitingOnOwner),
   );
 
-  const controlRoomBundles = filterBundlesForControlRoom(rawBundles);
+  const controlRoomBundles = filterBundlesForControlRoom(liveRawBundles);
   const controlRoom = resolveOwnerControlRoomView(controlRoomBundles);
 
   return {

@@ -226,6 +226,20 @@ describe("owner-console-view", () => {
     expect(shouldIncludeCampaignInOwnerConsoleAggregate(delivered, true)).toBe(true);
   });
 
+  it("shouldIncludeCampaignInOwnerConsoleAggregate hides stored certification residue", () => {
+    const cert = envelope("p3-cert-j1", "Package 3 Certification");
+    expect(shouldIncludeCampaignInOwnerConsoleAggregate(cert, true)).toBe(false);
+    expect(shouldIncludeCampaignInOwnerConsoleAggregate(envelope("room3-s1-refund-old", "Old walk"), true)).toBe(
+      false,
+    );
+    expect(shouldIncludeCampaignInOwnerConsoleAggregate(envelope("camp-consent-no-pending-1", "Consent fixture"), true)).toBe(
+      false,
+    );
+    expect(shouldIncludeCampaignInOwnerConsoleAggregate(envelope("room3-live-refund-now", "Live walk"), true)).toBe(
+      true,
+    );
+  });
+
   it("dedupes same campaign task and kind to one waiting card", () => {
     const bundles = [
       bundle("campaign-1", "Alpha Co", [

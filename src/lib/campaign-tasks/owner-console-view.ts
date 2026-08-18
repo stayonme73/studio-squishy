@@ -10,6 +10,7 @@ import {
 } from "@/config/owner-console";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
+import { shouldAppearOnLiveOwnerDesk } from "@/lib/file-room/owner-console-live-desk";
 import { resolveFileRoomListItemView } from "@/lib/file-room-view";
 
 import { isOpenExceptionStatus } from "./exceptions";
@@ -142,6 +143,7 @@ const OWNER_REASSIGN_BLOCKER_KINDS = new Set<CampaignExceptionKind>([
   "compliance_hold",
   "direction_disagreement",
   "scope_change",
+  "pricing_exception",
 ]);
 
 function isTaskBlockedByUnsolvableOwnerDecision(
@@ -458,6 +460,7 @@ export function shouldIncludeCampaignInOwnerConsoleAggregate(
   envelope: ServerCampaignEnvelope,
   hasWaitingOnOwner: boolean,
 ): boolean {
+  if (!shouldAppearOnLiveOwnerDesk(envelope.campaignId)) return false;
   if (hasWaitingOnOwner) return true;
   if (envelope.record.campaignStatus === "DELIVERED") return false;
   return false;

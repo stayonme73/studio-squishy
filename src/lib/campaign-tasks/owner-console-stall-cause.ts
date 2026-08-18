@@ -32,6 +32,10 @@ const EXCEPTION_STALL_CAUSE: Partial<Record<CampaignExceptionKind, OwnerStallCau
     category: "customer_requested_outside_scope",
     label: "Customer requested something outside the purchased scope.",
   },
+  pricing_exception: {
+    category: "policy_exception_requires_owner",
+    label: "Pricing exception — Owner must judge the quoted or purchased amount before work continues.",
+  },
   deadline_commitment: {
     category: "policy_exception_requires_owner",
     label: "Deadline commitment needs Owner judgment before the Studio promises a date.",

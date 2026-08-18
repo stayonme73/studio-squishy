@@ -1135,7 +1135,8 @@ export default function FileRoomOwnerConsoleSequentialDesk({
                   }
                   onSecondary={
                     selectedCard.row.kind === "revision_exhausted" ||
-                    selectedCard.row.kind === "scope_change"
+                    selectedCard.row.kind === "scope_change" ||
+                    selectedCard.row.kind === "pricing_exception"
                       ? (ownerNotes) =>
                           actions.confirmOwnerDecisionSecondary(selectedCard, ownerNotes)
                       : undefined
@@ -1163,7 +1164,8 @@ export default function FileRoomOwnerConsoleSequentialDesk({
                       : undefined
                   }
                   onAskClientInfo={
-                    selectedCard.row.kind === "scope_change"
+                    selectedCard.row.kind === "scope_change" ||
+                    selectedCard.row.kind === "pricing_exception"
                       ? (clientMessage, ownerNotes) =>
                           actions.confirmOwnerDecisionAskClientInfo(
                             selectedCard,
@@ -1174,7 +1176,8 @@ export default function FileRoomOwnerConsoleSequentialDesk({
                   }
                   onAskClientApproval={
                     selectedCard.row.kind === "revision_exhausted" ||
-                    selectedCard.row.kind === "scope_change"
+                    selectedCard.row.kind === "scope_change" ||
+                    selectedCard.row.kind === "pricing_exception"
                       ? (clientMessage, ownerNotes) =>
                           actions.confirmOwnerDecisionAskClientApproval(
                             selectedCard,

@@ -52,6 +52,7 @@ export {
   resolveOwnerRefundPostDecisionBriefing,
   resolveOwnerRevisionPostDecisionBriefing,
   resolveOwnerScopePostDecisionBriefing,
+  resolveOwnerPricingPostDecisionBriefing,
   resolveOwnerPostDecisionBriefing,
 } from "./briefings/owner-desk";
 export type {
@@ -63,6 +64,7 @@ export type {
   OwnerRefundDecisionAction,
   OwnerRevisionDecisionAction,
   OwnerScopeDecisionAction,
+  OwnerPricingDecisionAction,
   OwnerDeskBriefing,
   OwnerDeskBriefingFacts,
   OwnerDeskBreakdownLine,

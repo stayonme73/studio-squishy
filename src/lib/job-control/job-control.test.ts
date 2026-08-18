@@ -291,8 +291,8 @@ describe("waiting on client policies", () => {
     expect(resolveWaitingOnClientReminderStatus(since, null, now)).toBe("reminder_due");
   });
 
-  it("moves to waiting on client at 72h", () => {
-    const now = new Date("2026-07-04T12:00:00.000Z").getTime();
+  it("moves to waiting on client as soon as a blocking request exists", () => {
+    const now = new Date("2026-07-01T10:05:00.000Z").getTime();
     const job = syncJobRecordsFromCampaign(campaign(), [], [], [])[0];
     const materials: CampaignMaterialItem[] = [
       {

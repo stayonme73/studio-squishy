@@ -33,7 +33,7 @@ export function initialStatusForKind(kind: CampaignExceptionKind): CampaignExcep
   /** Routine compliance holds start with QA/Producer — Owner Desk only after explicit escalation. */
   if (kind === "compliance_hold") return "waiting_internal";
   if (exceptionKindRequiresOwner(kind)) return "waiting_owner";
-  if (kind === "missing_client_fact") return "waiting_owner";
+  if (kind === "missing_client_fact") return "waiting_client";
   if (kind === "client_request") return "waiting_owner";
   return "open";
 }

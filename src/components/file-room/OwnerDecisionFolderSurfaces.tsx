@@ -12,13 +12,14 @@ import type { CampaignExceptionKind } from "@/lib/campaign-tasks/exceptions-type
 import type { FileRoomExceptionOperatorContext } from "@/lib/campaign-tasks/exceptions-view";
 import { CoordinatorFolderBrief } from "./FileRoomOwnerConsoleSequentialDesk";
 
-type DecisionConfigKey = "deadlineDecision" | "revisionDecision" | "scopeDecision";
+type DecisionConfigKey = "deadlineDecision" | "revisionDecision" | "scopeDecision" | "pricingDecision";
 
 const EXCEPTION_CONFIG: Partial<Record<CampaignExceptionKind, DecisionConfigKey>> = {
   deadline_commitment: "deadlineDecision",
   deadline_risk: "deadlineDecision",
   revision_exhausted: "revisionDecision",
   scope_change: "scopeDecision",
+  pricing_exception: "pricingDecision",
 };
 
 export function resolveOwnerDecisionConfigKey(
@@ -89,13 +90,17 @@ export function OwnerDecisionFolderWorkingSurface({
       ? ownerConsole.deadlineDecision.commitLabel
       : configKey === "revisionDecision"
         ? ownerConsole.revisionDecision.allowLabel
-        : ownerConsole.scopeDecision.approveLabel;
+        : configKey === "pricingDecision"
+          ? ownerConsole.pricingDecision.approveLabel
+          : ownerConsole.scopeDecision.approveLabel;
   const secondaryLabel =
     configKey === "revisionDecision"
       ? ownerConsole.revisionDecision.holdFirmLabel
       : configKey === "scopeDecision"
         ? ownerConsole.scopeDecision.declineLabel
-        : undefined;
+        : configKey === "pricingDecision"
+          ? ownerConsole.pricingDecision.declineLabel
+          : undefined;
 
   return (
     <article className="fr-owner-sequential__working-surface">

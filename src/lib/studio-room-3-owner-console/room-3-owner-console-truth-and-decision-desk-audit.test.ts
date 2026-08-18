@@ -72,6 +72,7 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1"
     expect(shouldExceptionKindAppearOnSequentialDesk("client_request")).toBe(true);
     expect(shouldExceptionKindAppearOnSequentialDesk("revision_exhausted")).toBe(true);
     expect(shouldExceptionKindAppearOnSequentialDesk("missing_client_fact")).toBe(false);
+    expect(shouldExceptionKindAppearOnSequentialDesk("pricing_exception")).toBe(true);
     expect(shouldExceptionKindAppearOnSequentialDesk("routine_internal")).toBe(false);
     expect(classifyExceptionKindForOwnerDesk("missing_client_fact")).toBe("routine_off_desk");
     expect(classifyScanBucketForOwnerDesk("ready_to_move")).toBe("routine_off_desk");
@@ -351,6 +352,79 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1"
     expect(overlay?.statusLabel).toBe("Cancelled");
     expect(overlay?.lead).toMatch(/Owner decision/i);
     expect(overlay?.lead).toMatch(/does not confirm that money has been returned/i);
+  });
+
+  it("lets a cancelled Owner refund win over incomplete-intake Board copy", () => {
+    const overlay = resolveCustomerCurrentStatusOverlay(
+      {
+        campaignId: "room3-refund",
+        campaignName: "Room 3 Refund Exception",
+        campaignStatus: "PAYMENT_RECEIVED",
+        campaignDescription: "",
+        estimatedCompletion: "",
+        packageId: "custom-studio-plan",
+        packageLabel: "Custom Studio Plan",
+        paymentReceivedAt: "2026-08-18T20:00:00.000Z",
+        createdAt: "2026-08-18T20:00:00.000Z",
+        updatedAt: "2026-08-18T20:00:00.000Z",
+      } as CampaignRecord,
+      {
+        productionGatePassed: false,
+        blockingRequiredCount: 0,
+      },
+      [
+        {
+          jobId: "room3-refund:v2-rtu-flyer",
+          campaignId: "room3-refund",
+          skuId: "v2-rtu-flyer",
+          serviceName: "Make Me a Flyer",
+          statusLabel: "Cancelled",
+          isWaitingOnClient: false,
+          hasProductionStarted: false,
+          deliveredAt: null,
+          clientDeadline: null,
+        },
+      ],
+    );
+    expect(overlay?.kind).toBe("cancelled");
+    expect(overlay?.statusLabel).toBe("Cancelled");
+  });
+
+  it("maps a non-refund Owner review-gate result to Ready for Review", () => {
+    const overlay = resolveCustomerCurrentStatusOverlay(
+      {
+        campaignId: "room3-review-gate",
+        campaignName: "Room 3 Review Gate",
+        campaignStatus: "BUILDING_CONCEPTS",
+        campaignDescription: "",
+        estimatedCompletion: "",
+        packageId: "custom-studio-plan",
+        packageLabel: "Custom Studio Plan",
+        paymentReceivedAt: "2026-08-18T20:00:00.000Z",
+        projectDetailsSubmittedAt: "2026-08-18T20:00:00.000Z",
+        createdAt: "2026-08-18T20:00:00.000Z",
+        updatedAt: "2026-08-18T20:00:00.000Z",
+      } as CampaignRecord,
+      {
+        productionGatePassed: true,
+        blockingRequiredCount: 0,
+      },
+      [
+        {
+          jobId: "room3-review-gate:v2-rtu-flyer",
+          campaignId: "room3-review-gate",
+          skuId: "v2-rtu-flyer",
+          serviceName: "Make Me a Flyer",
+          statusLabel: "Ready for Review",
+          isWaitingOnClient: false,
+          hasProductionStarted: true,
+          deliveredAt: null,
+          clientDeadline: null,
+        },
+      ],
+    );
+    expect(overlay?.kind).toBe("review_ready");
+    expect(overlay?.statusLabel).toBe("Ready for Review");
   });
 
   it("keeps Scan noise buckets off the Owner awareness trays", () => {

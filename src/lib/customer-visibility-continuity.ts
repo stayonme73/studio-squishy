@@ -13,6 +13,7 @@ import {
   resolveBoardNextActionPresentation,
   type BoardNextActionPresentation,
 } from "@/lib/studio-board-next-action";
+import { resolveCustomerCurrentStatusOverlay } from "@/lib/studio-customer-current-status";
 import type { CustomerJobStatusSummary } from "@/lib/project-record-status";
 import type {
   BoardHeaderSnapshot,
@@ -158,7 +159,64 @@ export function resolveCustomerVisibilityContinuityView(
       input.displayFacts?.stillNeededLabel ??
       input.materialsFacts?.stillNeededLabels[0] ??
       null,
+    jobs: input.displayFacts?.jobs ?? input.jobs,
   };
+
+  const overlay = resolveCustomerCurrentStatusOverlay(
+    campaign,
+    {
+      productionGatePassed: displayFacts.productionGatePassed ?? false,
+      blockingRequiredCount: displayFacts.blockingRequiredCount ?? 0,
+    },
+    displayFacts.jobs,
+  );
+  if (overlay?.kind === "cancelled") {
+    return {
+      hasCampaign: true,
+      whatWeNeedFromYou: copy.empty.nothingNeeded,
+      whatStudioIsDoing: overlay.lead,
+      nextStep: overlay.lead,
+      whoActsNext: "none",
+      whoActsNextLabel: copy.actors.none,
+      targetOrCheckpoint: copy.empty.targetNotSet,
+      riskOrBlocker: overlay.hint ?? copy.empty.noRisk,
+      neededItems: [],
+      receivedOrCompleteNotes: [],
+      hasAuthoritativeTargetDate: Boolean(campaign.targetCompletionDate),
+    };
+  }
+
+  if (overlay?.kind === "waiting_on_you") {
+    const waitingLabels = (displayFacts.jobs ?? input.jobs ?? [])
+      .filter((job) => job.isWaitingOnClient)
+      .map((job) => `${job.serviceName} — waiting on you`);
+    const neededItems = resolveNeededItems({
+      campaign,
+      materialsFacts: input.materialsFacts,
+      displayFacts,
+      waitingJobLabels: waitingLabels,
+    });
+    return {
+      hasCampaign: true,
+      whatWeNeedFromYou:
+        neededItems.length > 0 ? neededItems.join("; ") : overlay.hint ?? overlay.lead,
+      whatStudioIsDoing: overlay.lead,
+      nextStep: overlay.hint ?? overlay.lead,
+      whoActsNext: "customer",
+      whoActsNextLabel: copy.actors.customer,
+      targetOrCheckpoint: copy.empty.targetNotSet,
+      riskOrBlocker: resolveRiskOrBlocker({
+        neededItems,
+        materialsBlocking: (displayFacts.blockingRequiredCount ?? 0) > 0,
+        waitingOnClient: true,
+        intakeIncomplete: false,
+        stillNeededLabel: displayFacts.stillNeededLabel ?? null,
+      }),
+      neededItems,
+      receivedOrCompleteNotes: [],
+      hasAuthoritativeTargetDate: Boolean(campaign.targetCompletionDate),
+    };
+  }
 
   const nextAction =
     input.nextAction ??

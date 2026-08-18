@@ -17,6 +17,7 @@ import {
   resolveOwnerRefundPostDecisionBriefing,
   resolveOwnerRevisionPostDecisionBriefing,
   resolveOwnerScopePostDecisionBriefing,
+  resolveOwnerPricingPostDecisionBriefing,
   resolveOwnerDeskJobPostDecisionBriefing,
   resolveOwnerPostDecisionBriefing,
   type OwnerComplaintDecisionAction,
@@ -764,6 +765,15 @@ export function useOwnerConsoleActions() {
         { action: "owner_approve_scope_change", exceptionId: card.id, ownerNotes },
         resolveOwnerScopePostDecisionBriefing,
       );
+      return;
+    }
+    if (kind === "pricing_exception") {
+      if (!confirmIrreversible(ownerConsole.pricingDecision.confirmApprove)) return;
+      void patchOwnerDecisionFolder(
+        card,
+        { action: "owner_approve_pricing_exception", exceptionId: card.id, ownerNotes },
+        resolveOwnerPricingPostDecisionBriefing,
+      );
     }
   };
 
@@ -836,6 +846,15 @@ export function useOwnerConsoleActions() {
         { action: "owner_decline_scope_change", exceptionId: card.id, ownerNotes },
         resolveOwnerScopePostDecisionBriefing,
       );
+      return;
+    }
+    if (kind === "pricing_exception") {
+      if (!confirmIrreversible(ownerConsole.pricingDecision.confirmDecline)) return;
+      void patchOwnerDecisionFolder(
+        card,
+        { action: "owner_decline_pricing_exception", exceptionId: card.id, ownerNotes },
+        resolveOwnerPricingPostDecisionBriefing,
+      );
     }
   };
 
@@ -869,6 +888,13 @@ export function useOwnerConsoleActions() {
         card,
         { action: "owner_hold_scope_change", exceptionId: card.id, note, ownerNotes },
         resolveOwnerScopePostDecisionBriefing,
+      );
+    } else if (kind === "pricing_exception") {
+      if (!confirmIrreversible(ownerConsole.pricingDecision.confirmHold)) return;
+      void patchOwnerDecisionFolder(
+        card,
+        { action: "owner_hold_pricing_exception", exceptionId: card.id, note, ownerNotes },
+        resolveOwnerPricingPostDecisionBriefing,
       );
     }
   };
@@ -923,6 +949,19 @@ export function useOwnerConsoleActions() {
         },
         resolveOwnerScopePostDecisionBriefing,
       );
+    } else if (kind === "pricing_exception") {
+      if (!confirmIrreversible(ownerConsole.pricingDecision.confirmAskTeam)) return;
+      void patchOwnerDecisionFolder(
+        card,
+        {
+          action: "owner_ask_team_pricing_exception",
+          exceptionId: card.id,
+          note,
+          ownerNotes,
+          assignToUserId,
+        },
+        resolveOwnerPricingPostDecisionBriefing,
+      );
     }
   };
 
@@ -955,6 +994,20 @@ export function useOwnerConsoleActions() {
   ) => {
     if (!clientMessage.trim()) {
       setError("Approved client-facing wording is required.");
+      return;
+    }
+    if (card.row.kind === "pricing_exception") {
+      if (!confirmIrreversible(ownerConsole.pricingDecision.confirmAskClientInfo)) return;
+      void patchOwnerDecisionFolder(
+        card,
+        {
+          action: "owner_ask_client_info_pricing_exception",
+          exceptionId: card.id,
+          clientMessage,
+          ownerNotes,
+        },
+        resolveOwnerPricingPostDecisionBriefing,
+      );
       return;
     }
     if (!confirmIrreversible(ownerConsole.scopeDecision.confirmAskClientInfo)) return;
@@ -1003,6 +1056,18 @@ export function useOwnerConsoleActions() {
           ownerNotes,
         },
         resolveOwnerScopePostDecisionBriefing,
+      );
+    } else if (kind === "pricing_exception") {
+      if (!confirmIrreversible(ownerConsole.pricingDecision.confirmAskClientApproval)) return;
+      void patchOwnerDecisionFolder(
+        card,
+        {
+          action: "owner_ask_client_approval_pricing_exception",
+          exceptionId: card.id,
+          clientMessage,
+          ownerNotes,
+        },
+        resolveOwnerPricingPostDecisionBriefing,
       );
     }
   };
@@ -1056,6 +1121,19 @@ export function useOwnerConsoleActions() {
           note,
         },
         resolveOwnerScopePostDecisionBriefing,
+      );
+    } else if (kind === "pricing_exception") {
+      if (!confirmIrreversible(ownerConsole.pricingDecision.confirmAssign)) return;
+      void patchOwnerDecisionFolder(
+        card,
+        {
+          action: "owner_assign_pricing_exception",
+          exceptionId: card.id,
+          assignToUserId,
+          ownerNotes,
+          note,
+        },
+        resolveOwnerPricingPostDecisionBriefing,
       );
     }
   };

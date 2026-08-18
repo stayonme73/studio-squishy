@@ -80,7 +80,7 @@ describe("exceptions-promotion-view", () => {
   it("defaults client wording from materials config for missing_client_fact", () => {
     const wording = resolveDefaultClientWording(exception(), tasks, materials);
     expect(wording.category).toBe("factual-confirmation");
-    expect(wording.clientFacingLabel).toBe("Factual confirmation");
+    expect(wording.clientFacingLabel).toBe("Brand hex codes");
     expect(wording.clientFacingPrompt).toContain("confirm");
     expect(wording.whyNeeded).toContain("color palette");
     expect(wording.whyNeeded.toLowerCase()).toContain("social");

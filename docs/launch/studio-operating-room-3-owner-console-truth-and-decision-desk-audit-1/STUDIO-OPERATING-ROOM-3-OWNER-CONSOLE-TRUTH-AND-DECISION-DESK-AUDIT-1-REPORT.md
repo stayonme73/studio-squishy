@@ -11,7 +11,9 @@
 **Merge:** no  
 **Owner routine:** NONE
 
-**Verdict:** **OWNER CONSOLE FOUNDATION READY WITH BLOCKERS**
+**Verdict:** **FOUNDATION BLOCKERS FIXED — PARK FOR MANAGER CLOSE**
+
+Section 1 is still **not CLOSED**. Manager already accepted the Console architecture and live refund walk. This continuation cleared the four foundation blockers in place. Do not start Section 2 from this package.
 
 Room 2 is CLOSED at `b3397a6` (hash note `c46e191` is not the close). Room 1 remains **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL** at `a49efd7`. Live Resend / branded sender / inbox proof stays **🟡 PARKED WITH EXTERNAL PREREQUISITE** at `d6974eb`. Neither PASS nor FAIL for this audit. Not reopened.
 
@@ -54,6 +56,7 @@ Exception kinds on the sequential desk:
 - `deadline_commitment` / `deadline_risk`
 - `revision_exhausted`
 - `client_request` (restored to Needs My Approval; was wrongly filtered with ordinary materials)
+- `pricing_exception` (narrow Owner-held kind; checkout/catalog display stay off the desk)
 
 Desk items:
 
@@ -85,16 +88,18 @@ Off the sequential desk by design:
 
 Live noise test: a paid “Room 3 Routine …” flyer with payment-received notice did **not** become an Owner folder.
 
-Live desk still showed **17 leftover Owner folders** from prior certification fixtures (older refunds, scope exceptions). That is historical Owner-held work, not the Machine dumping routine events. It makes the desk feel crowded until those leftovers are resolved. Recorded as remaining Room 3 work, not a reason to rebuild.
+Live desk after fixture filter: **2 folders** on Today's Desk during the Owner-eyes walk (the seeded refund plus one leftover live decision), down from **~17** stale certification/walk folders. Historical `p3-cert-*`, `room3-s1-*`, `camp-consent-*`, `camp-owner-*`, `camp-pc-*`, and related evidence files stay on disk. They no longer masquerade as current Owner work.
 
 ---
 
-## Missing Owner decision capabilities
+## Missing Owner decision capabilities — retest results
 
-- **No dedicated pricing-exception kind.** Scope change exists; a pure pricing exception has no first-class card.
-- **Final QA only where policy cannot resolve** is not a distinct desk kind. Review-gate exists when production asks for Owner support.
-- **`missing_client_fact` still starts `waiting_owner`** even though it is hidden from the sequential desk. Ordinary materials can stall without a Machine-sent templated ask. Owner-dependence defect for Section 2.
-- **Board headline after refund** can still read like intake/producing while Refund Request already shows Cancelled / owner-decision-recorded. Overlay mapping was added; headline lag remains.
+1. **`missing_client_fact`:** ordinary missing information now starts `waiting_client`, auto-asks the customer with a templated request, stays off the sequential desk, and keeps the job visible as waiting-on-customer. Owner Console only receives a missing-fact if a genuine judgment/exception is required. Flyer wordmark reconciliation no longer demotes an active customer ask.
+2. **Board after Owner decision:** Owner-approved refund sets spine `refunded_cancelled`; Board current status / next-action now read “This work is closed after an Owner decision,” not intake-received / building-concepts. Non-refund Owner review-gate overlay still maps to Ready for Review from the same spine overlay — no second status system.
+3. **`pricing_exception`:** added as a narrow Owner-held kind with durable approve/decline/hold/ask/assign actions. Ordinary pricing display and checkout are not Owner work.
+4. **Fixture clutter:** live-desk classifier hides stored certification/walk residue without deleting files. Owner Console aggregate now loads only live-desk campaigns.
+
+**Final QA only where policy cannot resolve** is still not a distinct desk kind. Review-gate remains the existing path. Not expanded here.
 
 ---
 
@@ -181,13 +186,14 @@ The Console does not duplicate those dashboards. Campaign drill-down still offer
 
 ## Noise-test result
 
-**PASS for routine events. WARN for leftover Owner fixtures.**
+**PASS for routine events. PASS for live-desk fixture filter.**
 
 - New paid routine project + payment notice → not a folder
+- Ordinary missing client fact → not a folder; customer Board waits on the customer
 - Genuine refund exception → folder
-- Live sequential desk still held ~17 prior Owner-held items and 12 Waiting on Client awareness rows
+- Live sequential desk held **2 folders** at walk open (seeded refund + one leftover live decision), down from **~17**
 
-The desk is selective about *new* Machine events. It is not yet a quiet desk because old Owner-held fixtures remain.
+The desk is selective about *new* Machine events. Historical certification records remain stored and are no longer current-looking Owner work.
 
 ---
 
@@ -202,28 +208,30 @@ Tagia-equivalent `tagia@local.dev` on `http://127.0.0.1:3066`.
 5. Approve refund
 6. Leave
 7. Return — that refund is gone
-8. Customer Board for that project shows refund-section owner-decision / Cancelled truth
+8. Customer Board current status follows the Owner refund (closed after an Owner decision)
+9. Ordinary missing fact waits on the customer, not Owner
 
 Walk evidence: `owner-walk/walk-evidence.json`  
 Shots: `owner-walk/shots/`
 
-**Live Owner-walk totals: 11/11 PASS · 0 FAIL · 0 BLOCKED**
+**Live Owner-walk totals: 14/14 PASS · 0 FAIL · 0 BLOCKED**
 
 ---
 
 ## Customer / project result after Owner decision
 
-**PASS with a remaining headline blocker.**
+**PASS.**
 
 Durable result:
 
 - job spine `refunded_cancelled`
 - Owner decision timestamp
 - interaction resolved
-- customer Refund Request can show Cancelled / “An owner decision has been recorded…”
+- Board continuity + next-action: “This work is closed after an Owner decision…”
 - copy does not claim money has been returned
+- Board no longer keeps saying intake received / building concepts / producing after that refund
 
-Remaining: Studio Board **headline** “What you should do next” can still read like Project Intake / preparing after that Owner refund, because the cancelled overlay is not always the headline yet. Refund Request is the truthful customer record today. Section 2 should make the Board headline follow the same spine.
+Non-refund Owner review-gate overlay (same spine overlay, not a second status system) maps to Ready for Review.
 
 ---
 
@@ -244,7 +252,7 @@ Still present / remaining:
 - Internal function names (`squishySays`, `resolveSquishySaysForItem`) — not customer-facing
 - Unused Control Room test-send
 - Campaign drill-down still a second layout
-- ~17 leftover Owner folders from earlier packages
+- One leftover live Owner folder besides the walk refund (not certification residue)
 
 ---
 
@@ -257,14 +265,19 @@ Still present / remaining:
 | Scan noise buckets on awareness trays | Server filters to waiting_client + recently_resolved |
 | Bare stall / Decision Core rule IDs on desk | Stall-cause labels from existing kinds |
 | Squishy / job / All campaigns language on desk | Operating language |
-| Cancelled spine had no customer overlay mapping | Added Cancelled overlay + next-action handling (headline lag remains) |
+| Cancelled spine had no customer overlay mapping | Cancelled overlay wins over intake/producing; Board next-action follows |
 | Review Folder walk never opened the working surface | Walk now waits for Close Folder / Approve refund |
+| Ordinary `missing_client_fact` started `waiting_owner` while hidden from the desk | Auto-ask customer; `waiting_client`; off sequential desk |
+| Flyer wordmark reconcile demoted active factual asks | Skip promoted / requested customer asks |
+| Board headline lagged after Owner refund | Same spine overlay + shared `useProjectJobStatus` on Board |
+| ~17 cert/walk fixtures looked like current Owner work | Live-desk filter; historical files kept |
+| No `pricing_exception` kind | Narrow Owner-held kind + durable folder actions |
 
 ---
 
 ## Automated totals
 
-Scoped vitest for this package + ledger guards: **95/95 PASS** across 11 files.
+Scoped vitest for this package + ledger guards: **117/117 PASS** across 12 files.
 
 Tests green do not close the section.
 
@@ -272,7 +285,7 @@ Tests green do not close the section.
 
 ## Live Owner-walk totals
 
-**11/11 PASS · 0 FAIL · 0 BLOCKED**
+**14/14 PASS · 0 FAIL · 0 BLOCKED**
 
 ---
 
@@ -285,24 +298,25 @@ The Console succeeds when Tagia is needed **less often**.
 | Payment, intake, upload, normal production, QA retry | Machine / production | Off desk |
 | Included revision | Machine | Off desk |
 | Refund / scope / compliance / direction / revision overage | Owner | On desk |
-| Ordinary missing materials | Machine templated ask | Still starts `waiting_owner`; hidden from sequential desk → can stall invisibly |
-| Leftover certification exceptions | Should have been resolved or aged off | Still sitting on Tagia’s desk (17 folders) |
+| Ordinary missing materials | Machine templated ask | Off desk; waits on customer |
+| Leftover certification exceptions | Stored evidence, not live desk | Hidden from sequential desk (~17 → 2 at walk open) |
 
-Routine Tagia-as-dispatcher is a defect. `missing_client_fact` Owner-gating is the clearest remaining routine dependency.
+Routine Tagia-as-dispatcher is still a defect if it returns. Ordinary missing-fact Owner-gating is fixed.
 
 ---
 
 ## Remaining Room 3 work
 
-Do **not** auto-start Section 2 from this package. Recommended Section 2 scope for Manager:
+Do **not** auto-start Section 2 from this package. **Park for Manager close.**
 
-1. Clear or age leftover Owner-held fixtures so the live desk is quiet
-2. Machine-owned ordinary materials asks — stop `missing_client_fact` Owner-gating
-3. Board headline follows cancelled/refunded spine (not only Refund Request)
-4. Decide whether campaign drill-down stays as a file cabinet or is trimmed
-5. Remove or quarantine Control Room test-send residue
-6. Pricing-exception card only if business actually needs it — do not invent
-7. Prove one more non-refund Owner decision (scope or revision overage) with the same open → decide → stuck → customer-truth loop
+If Manager closes Section 1, later Room 3 work can still include:
+
+1. Decide whether campaign drill-down stays as a file cabinet or is trimmed
+2. Remove or quarantine Control Room test-send residue
+3. Clear the one leftover live Owner folder if it is not real current work
+4. Prove one more live non-refund Owner decision (scope or revision overage) with the same open → decide → stuck → customer-truth loop
+
+Foundation blockers 1–4 from this continuation are fixed and retested.
 
 ---
 
@@ -316,6 +330,6 @@ Push scoped work when this commit lands. **No merge.**
 
 ## Recommendation for Room 3 Section 2
 
-**Park here.** Manager review first.
+**Park here.** Manager close only. Do not start Section 2.
 
-Section 2 should **trim leftover desk load and remaining Owner-dependence**, not redesign the Console. Keep sequential one-folder desk. Teach it to show Tagia even less, and make Board headline match the decision she already made.
+The desk is standing, the drawers work, and the jammed papers behind the cabinet are cleared. Manager stamps Section 1 CLOSED when ready.

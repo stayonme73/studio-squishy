@@ -57,7 +57,7 @@ export function resolveWaitingOnClientReminderStatus(
 export function shouldMoveJobToWaitingOnClient(
   job: PurchasedJobRecord,
   materials: readonly CampaignMaterialItem[],
-  nowMs = Date.now(),
+  _nowMs = Date.now(),
 ): boolean {
   if (job.spineStatus === "waiting_on_client") return false;
   const blocking = blockingMaterialsForSku(materials, job.skuId);
@@ -70,9 +70,7 @@ export function shouldMoveJobToWaitingOnClient(
 
   if (!requestedAt) return false;
 
-  return (
-    hoursSince(requestedAt, nowMs) >= JOB_CONTROL_POLICY.moveToWaitingOnClientHours
-  );
+  return true;
 }
 
 export function buildWaitingOnClientTrayItem(

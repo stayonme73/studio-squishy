@@ -23,6 +23,7 @@ export function classifyExceptionKindForOwnerDesk(
     case "compliance_hold":
     case "direction_disagreement":
     case "scope_change":
+    case "pricing_exception":
     case "deadline_commitment":
     case "deadline_risk":
     case "revision_exhausted":

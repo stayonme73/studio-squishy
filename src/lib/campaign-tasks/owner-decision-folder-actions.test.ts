@@ -5,6 +5,7 @@ import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared
 
 import {
   applyOwnerAllowRevision,
+  applyOwnerApprovePricingException,
   applyOwnerApproveScopeChange,
   applyOwnerCommitDeadline,
   applyOwnerDeclineScopeChange,
@@ -128,5 +129,19 @@ describe("owner-decision-folder-actions", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.exception.resolutionNotes).toContain("declined scope change");
+  });
+
+  it("owner_approve_pricing_exception records the decision and returns work to Machine", () => {
+    const exc = exception("exc-pricing", "pricing_exception");
+    const result = applyOwnerApprovePricingException(
+      envelope([exc]),
+      { exceptionId: exc.id, ownerNotes: "Honor the quoted $69 flyer." },
+      owner,
+      assignments,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.exception.status).toBe("resolved");
+    expect(result.exception.resolutionNotes).toContain("approved pricing exception");
   });
 });

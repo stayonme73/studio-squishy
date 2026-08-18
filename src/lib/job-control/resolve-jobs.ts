@@ -103,10 +103,11 @@ function deriveSpineStatus(
     return persisted.spineStatus;
   }
 
+  if (isWaitingOnClientForSku(exceptions, materials, skuId, tasks)) {
+    return "waiting_on_client";
+  }
+
   if (persisted?.spineStatus === "waiting_on_client") {
-    if (isWaitingOnClientForSku(exceptions, materials, skuId, tasks)) {
-      return "waiting_on_client";
-    }
     if (persisted.productionStartedAt || hasProductionStartedForSku(tasks, skuId)) {
       return "building_concepts";
     }
