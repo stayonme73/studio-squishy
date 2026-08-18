@@ -100,6 +100,8 @@ Live customer-eyes walk **30 / 30 PASS**.
 
 Green checks are **not** a section close. `90dcc84` is **not** a CLOSED checkpoint.
 
+**This walk park:** `45b09b1` on `operating/design-renderer-proof-1`.
+
 ---
 
 ## What this package did **not** do
