@@ -21,7 +21,8 @@ export type CustomerCurrentStatusKind =
   | "review_ready"
   | "revision_underway"
   | "approved_preparing"
-  | "delivery_ready";
+  | "delivery_ready"
+  | "cancelled";
 
 export type CustomerCurrentStatusOverlay = {
   kind: CustomerCurrentStatusKind;
@@ -58,6 +59,7 @@ function spineKindFromLabel(statusLabel: string): string | null {
   if (normalized === copy.labels.delivered.toLowerCase()) return "delivered";
   if (normalized === copy.labels.producing.toLowerCase()) return "building_concepts";
   if (normalized === copy.labels.preparingToStart.toLowerCase()) return "ready_for_queue";
+  if (normalized === copy.labels.cancelled.toLowerCase()) return "refunded_cancelled";
   return null;
 }
 
@@ -152,6 +154,21 @@ function overlayFromSpineLabel(
       journeyStatus: "DELIVERED",
       currentStepDetail: copy.progressDetails.deliveryReady,
       activityCurrentMessage: copy.activity.deliveryReady,
+    };
+  }
+
+  if (kind === "refunded_cancelled") {
+    return {
+      kind: "cancelled",
+      statusLabel: copy.labels.cancelled,
+      progressLabel: copy.labels.cancelled,
+      lead: copy.leads.cancelled,
+      hint: copy.hints.cancelled,
+      suppressReviewCta: true,
+      preferDeliveryCta: false,
+      journeyStatus: campaign.campaignStatus,
+      currentStepDetail: copy.labels.cancelled,
+      activityCurrentMessage: copy.activity.cancelled,
     };
   }
 

@@ -49,9 +49,10 @@ describe("Room 1 closeout — come-back-later email flag", () => {
     expect(studioRoom1CustomerLifeCloseoutV1.emailDoesNotBlockRoom2).toBe(true);
     expect(studioRoom1CustomerLifeCloseoutV1.doNotStartRoom2).toBe(false);
     expect(studioRoom1CustomerLifeCloseoutV1.doNotStartRooms2to5).toBe(false);
-    expect(studioRoom1CustomerLifeCloseoutV1.doNotStartOwnerConsole).toBe(true);
-    expect(studioRoom1CustomerLifeCloseoutV1.doNotStartRooms3to5).toBe(true);
-    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(2);
+    expect(studioRoom1CustomerLifeCloseoutV1.doNotStartOwnerConsole).toBe(false);
+    expect(studioRoom1CustomerLifeCloseoutV1.doNotStartRooms3to5).toBe(false);
+    expect(studioRoom1CustomerLifeCloseoutV1.room3Authorized).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(3);
     expect(studioLaunchReadinessExecutionOrderV1.room1Closeout.room2Authorized).toBe(
       true,
     );

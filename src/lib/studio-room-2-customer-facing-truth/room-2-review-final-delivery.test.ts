@@ -40,7 +40,7 @@ describe("STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1", (
     expect(cfg.priorSections.section1CloseTip).toBe("45b09b1");
     expect(cfg.priorSections.section2CloseTip).toBe("e609203");
     expect(cfg.priorSections.section2LedgerStampNotClose).toBe("be8fd06");
-    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(2);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(3);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section2.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section3.packageId).toBe(cfg.packageId);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section3.sectionClosed).toBe(true);

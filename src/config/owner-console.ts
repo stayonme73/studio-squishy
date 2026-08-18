@@ -13,8 +13,8 @@ export function ownerConsoleCampaignRoute(campaignId: string, itemId?: string): 
 export const ownerConsole = {
   pageTitle: "Owner Console",
   pageLead: "Your decision desk — one folder at a time.",
-  coordinatorName: "Squishy",
-  squishySaysLabel: "Squishy says:",
+  coordinatorName: "Studio",
+  squishySaysLabel: "Desk briefing:",
   todaysDeskLabel: "Today's Desk",
   foldersOnDeskLabel: (count: number) => (count === 1 ? "1 folder" : `${count} folders`),
   todaysDecisionsLabel: "Today's Decisions",
@@ -34,7 +34,7 @@ export const ownerConsole = {
     whatTagiaReviews:
       "Production owns client-ready creative. Review this only because the team requested support, the client escalated, revisions are failing, or the issue affects scope, money, policy, deadline, or relationship.",
     confirmApproveForReview:
-      "Resolve this support review and send the job to the client Review Room? The client will be notified that review is ready.",
+      "Resolve this support review and send this work to the client Review Room? The client will be notified that review is ready.",
     confirmSendBack:
       "Send this escalation back to production? The client will not see this version yet.",
     confirmHold:
@@ -237,7 +237,7 @@ export const ownerConsole = {
   deadlineDecision: {
     decisionQuestion: "What date or path should the team and client rely on?",
     whatTagiaReviews:
-      "Review lane capacity and job state before you commit a client-facing date. Internal-only updates do not need client notification.",
+      "Review lane capacity and production state before you commit a client-facing date. Internal-only updates do not need client notification.",
     ownerNotesLabel: "Owner Notes",
     ownerNotesPlaceholder:
       "Your reasoning for this decision — saved to the historical record.",
@@ -298,7 +298,7 @@ export const ownerConsole = {
   revisionDecision: {
     decisionQuestion: "What business boundary should the Studio hold for this client request?",
     whatTagiaReviews:
-      "Routine revision policy has already been handled by Squishy and Decision Core. Review only the business judgment issue: boundary, scope, goodwill, or client relationship.",
+      "Routine revision policy has already been handled. Review only the business judgment issue: boundary, scope, goodwill, or client relationship.",
     ownerNotesLabel: "Owner Notes",
     ownerNotesPlaceholder:
       "Your reasoning for this decision — saved to the historical record.",
@@ -308,7 +308,7 @@ export const ownerConsole = {
     clientMessagePlaceholder: "Write the exact wording for boundary, scope, or goodwill confirmation.",
     assignToLabel: "Assign to",
     confirmAllow:
-      "Approve this business exception and return work to production? Squishy will notify the client with your approved boundary.",
+      "Approve this business exception and return work to production? The Studio will notify the client with your approved boundary.",
     confirmHoldFirm:
       "Hold the Studio boundary and send the policy-bound message to the client?",
     confirmHold:
@@ -450,9 +450,9 @@ export const ownerConsole = {
     ],
   },
   refundDecision: {
-    decisionQuestion: "Should this job receive a refund, continue, or need more internal review?",
+    decisionQuestion: "Should this work receive a refund, continue, or need more internal review?",
     whatTagiaReviews:
-      "Review production status and waiting-on-client history before you approve or deny. Production-started jobs cannot be refunded through this desk.",
+      "Review production status and waiting-on-client history before you approve or deny. Work that has already started production cannot be refunded through this desk.",
     ownerNotesLabel: "Owner Notes",
     ownerNotesPlaceholder:
       "Your reasoning for this decision — saved to the historical record.",
@@ -479,9 +479,9 @@ export const ownerConsole = {
     conceptsReceivedYes: "Yes — client received concepts or files",
     conceptsReceivedNo: "No — no concepts or files delivered yet",
     confirmApprove:
-      "Approve this refund and close the job? The client will receive the approved template.",
+      "Approve this refund and close this work? The client will receive the approved template.",
     confirmDeny:
-      "Deny this refund? The job continues under policy and the client will be notified.",
+      "Deny this refund? The work continues under policy and the client will be notified.",
     confirmHold:
       "Hold this refund for internal review? The folder will leave your desk.",
     confirmAskTeam:
@@ -499,13 +499,13 @@ export const ownerConsole = {
         id: "approve",
         label: "Approve refund",
         wired: true,
-        whereAfter: "Job closed — refunded; folder leaves your desk immediately.",
+        whereAfter: "Work closed — refunded; folder leaves your desk immediately.",
       },
       {
         id: "deny",
         label: "Deny refund",
         wired: true,
-        whereAfter: "Production or Waiting on Client — job continues under policy.",
+        whereAfter: "Production or Waiting on Client — work continues under policy.",
       },
       {
         id: "hold",
@@ -622,20 +622,20 @@ export const ownerConsole = {
     ],
   },
   heavyLaneDecision: {
-    decisionQuestion: "Which job should run next in the heavy lane?",
+    decisionQuestion: "Which project should run next in the heavy lane?",
     whatTagiaReviews:
-      "Heavy lane is at capacity. Review queued job versus active job and client deadlines before you decide bump or wait.",
+      "Heavy lane is at capacity. Review queued work versus active work and client deadlines before you decide bump or wait.",
     ownerNotesLabel: "Owner Notes",
     ownerNotesPlaceholder:
       "Your reasoning for this decision — saved to the historical record.",
     teamNoteLabel: "Note for Producer",
     teamNotePlaceholder: "Queue reorder instructions for Producer.",
-    confirmResolveWait: "Wait — keep current active job in the heavy lane?",
-    confirmResolveBump: "Bump — prioritize the queued job in the heavy lane?",
+    confirmResolveWait: "Wait — keep current active work in the heavy lane?",
+    confirmResolveBump: "Bump — prioritize the queued work in the heavy lane?",
     confirmAssign:
       "Route queue reorder to Producer? The folder will leave your desk.",
     waitLabel: "Wait",
-    bumpLabel: "Bump queued job",
+    bumpLabel: "Bump queued work",
     assignLabel: "Assign to Producer",
     openFileRoomLabel: "Open File Room",
     availableActions: [
@@ -647,7 +647,7 @@ export const ownerConsole = {
       },
       {
         id: "bump",
-        label: "Bump queued job",
+        label: "Bump queued work",
         wired: true,
         whereAfter: "Production — lane assignment updated; folder leaves your desk.",
       },
@@ -662,10 +662,10 @@ export const ownerConsole = {
   waitingSectionTitle: "Waiting on you",
   waitingEmptyTitle: "Nothing waiting on you",
   waitingEmptyBody:
-    "Open exceptions that need Owner review will appear here across all campaigns.",
-  allCampaignsLink: "All campaigns",
+    "Open exceptions that need Owner review will appear here across all projects.",
+  allCampaignsLink: "File Room",
   refreshedLabel: "Refreshed",
-  campaignLabel: "Campaign",
+  campaignLabel: "Project",
   ageLabel: "Waiting since",
   selectedCardHint: "Select a decision to review context and act.",
   confirmApprove:
@@ -686,9 +686,9 @@ export const ownerConsole = {
     "Client material requires Owner approval before anything is sent to the client.",
   ownerHeldWhySuffix: "Owner review required before work continues.",
   campaignDrillDownLead:
-    "Full campaign context for the decision you selected. Act here or jump to File Room / Team Office.",
+    "Full project context for the decision you selected. Act here or jump to File Room / Team Office.",
   backToStudioQueue: "Owner Console",
-  openCampaignLabel: "Open campaign",
+  openCampaignLabel: "Open project",
   fullFileRoomLabel: "Full File Room",
   contextSectionTitle: "Linked context",
   linkedTaskTitle: "Linked task",
@@ -700,7 +700,7 @@ export const ownerConsole = {
   noLinkedTask: "No task linked to this exception.",
   noMaterials: "No linked materials for this exception.",
   noQaHistory: "No QA records for the linked task.",
-  noProduction: "No Kitchen V1 production work saved for this task yet.",
+  noProduction: "No production work saved for this task yet.",
   reassignSectionTitle: "Reassign task",
   reassignLead:
     "Send stuck work to the right AI role without opening multiple offices. Uses existing task reassign.",
@@ -712,6 +712,8 @@ export const ownerConsole = {
   reassignWhyLabel: "Why reassign",
   reassignTaskLabel: "Reassign linked task",
   reassignSuccessHint: "Task reassigned — assignee can continue in their Team Office.",
+  projectsCountLabel: (count: number) =>
+    count === 1 ? "1 project in File Room" : `${count} projects in File Room`,
   scanSectionTitle: "Scan",
   scanSectionLead: "Triage only — no duplicate team actions here. Open drill-down or File Room to act.",
   scanBuckets: {

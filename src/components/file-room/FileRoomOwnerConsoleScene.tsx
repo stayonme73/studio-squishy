@@ -66,7 +66,7 @@ export default function FileRoomOwnerConsoleScene({
           <Link href={FILE_ROOM_ROUTE}>← {ownerConsole.allCampaignsLink}</Link>
           <span className="fr-owner-console-footer__stats">
             {desk.todaysDecisionCount} {ownerConsole.todaysDecisionsLabel.toLowerCase()} ·{" "}
-            {view.campaignCount} campaign{view.campaignCount === 1 ? "" : "s"}
+            {ownerConsole.projectsCountLabel(view.campaignCount)}
           </span>
         </div>
       </footer>

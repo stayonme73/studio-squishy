@@ -5,6 +5,7 @@ import FileRoomOwnerConsoleScene from "@/components/file-room/FileRoomOwnerConso
 import { FileRoomForbiddenState } from "@/components/file-room/FileRoomStatePanels";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
 import { loadOwnerConsoleAggregate } from "@/lib/file-room/load-owner-console-aggregate";
+import { toOwnerDeskAwarenessScan } from "@/lib/campaign-tasks/owner-console-scan-view";
 
 export default async function OwnerConsolePage() {
   const cookieStore = await cookies();
@@ -27,7 +28,7 @@ export default async function OwnerConsolePage() {
       <FileRoomHeader user={user} showOwnerConsoleLink={false} ownerDeskMode />
       <FileRoomOwnerConsoleScene
         view={result.view}
-        scan={result.scan}
+        scan={toOwnerDeskAwarenessScan(result.scan)}
         controlRoom={result.controlRoom}
         refreshedAt={result.refreshedAt}
         ownerDisplayName={user.displayName}

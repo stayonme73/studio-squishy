@@ -8,6 +8,7 @@ import {
 } from "@/components/file-room/FileRoomStatePanels";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
 import { loadOwnerConsoleCampaign } from "@/lib/file-room/load-owner-console-campaign";
+import { toOwnerDeskAwarenessScan } from "@/lib/campaign-tasks/owner-console-scan-view";
 
 type OwnerConsoleCampaignPageProps = {
   params: Promise<{ campaignId: string }>;
@@ -52,7 +53,10 @@ export default async function OwnerConsoleCampaignPage({
         campaignId={campaignId}
         showOwnerConsoleLink={false}
       />
-      <FileRoomOwnerCampaignConsoleScene view={result.view} refreshedAt={result.refreshedAt} />
+      <FileRoomOwnerCampaignConsoleScene
+        view={{ ...result.view, scan: toOwnerDeskAwarenessScan(result.view.scan) }}
+        refreshedAt={result.refreshedAt}
+      />
     </>
   );
 }

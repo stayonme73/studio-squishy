@@ -54,7 +54,7 @@ function deskItemFromException(
     campaignId: record.campaignId,
     campaignName,
     jobId: job?.jobId ?? `${record.campaignId}:unknown`,
-    serviceName: job?.serviceName ?? "Campaign",
+    serviceName: job?.serviceName ?? "this project",
     title: record.kind === "revision_exhausted" ? "Client Boundary Review" : record.title,
     detail:
       record.kind === "revision_exhausted"
@@ -122,7 +122,7 @@ function deskItemFromRefundRequest(
   if (!isCompleteRefundSnapshot(interaction.refundSnapshot)) return null;
 
   const snapshot = interaction.refundSnapshot;
-  const serviceName = job?.serviceName ?? "Campaign";
+  const serviceName = job?.serviceName ?? "this project";
 
   return {
     id: `desk:refund:${interaction.jobId ?? interaction.id}`,
@@ -155,7 +155,7 @@ function deskItemFromComplaint(
     campaignId: interaction.campaignId,
     campaignName,
     jobId: job?.jobId ?? interaction.jobId ?? `${interaction.campaignId}:unknown`,
-    serviceName: job?.serviceName ?? "Campaign",
+    serviceName: job?.serviceName ?? "this project",
     title: "Client complaint — Owner response required",
     detail: interaction.clientMessage,
     drillDownHref: ownerConsoleCampaignRoute(interaction.campaignId),

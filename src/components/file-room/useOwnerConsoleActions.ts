@@ -29,7 +29,7 @@ import {
   type OwnerScopeDecisionAction,
   type OwnerDeskJobAction,
   type OwnerPostDecisionBriefing,
-} from "@/studio-coordinator";
+} from "@/studio-coordinator/briefings/owner-desk";
 import type { OwnerDecisionFolderPatchBody } from "@/lib/campaign-tasks/owner-decision-folder-dispatch";
 import { contentKindForCategory } from "@/lib/materials/promotion";
 

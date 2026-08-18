@@ -21,6 +21,7 @@ export const studioCustomerCurrentStatusV1 = {
     deliveryReady: "Final Delivery ready",
     delivered: "Delivered",
     preparingToStart: "Preparing to start",
+    cancelled: "Cancelled",
   },
 
   leads: {
@@ -31,12 +32,15 @@ export const studioCustomerCurrentStatusV1 = {
     deliveryReady: "Your approved files are ready to download in Final Delivery.",
     reviewReady: "Open the Review Room to see what is ready and what happens next.",
     waitingOnYou: "The Studio is waiting on you before this service can continue.",
+    cancelled:
+      "This work is closed after an Owner decision. This does not confirm that money has been returned.",
   },
 
   hints: {
     revisionUnderway: "Nothing is required from you until the revised version is ready.",
     approvedPreparing: "Downloads appear in Final Delivery when the files are ready.",
     waitingOnYou: "Complete the waiting step so The Studio can continue.",
+    cancelled: "Nothing is required from you on this service.",
   },
 
   progressDetails: {
@@ -50,6 +54,7 @@ export const studioCustomerCurrentStatusV1 = {
     approvedPreparing: "You approved this version — files are being prepared",
     deliveryReady: "Your deliverables are ready",
     reviewReady: "Your work is ready for review",
+    cancelled: "This work is closed",
   },
 
   cta: {

@@ -21,12 +21,16 @@ export const studioRoom1CustomerLifeCloseoutV1 = {
   closeoutCallAt: "2026-08-17" as const,
   merge: "separately_authorized" as const,
 
-  /** Tagia authorized exception: Room 1 stays open for email only; Room 2 may enter. */
+  /** Tagia authorized exception: Room 1 stays open for email only; Room 2 and Room 3 may enter. */
   room2Authorized: true as const,
   emailDoesNotBlockRoom2: true as const,
+  room3Authorized: true as const,
+  emailDoesNotBlockRoom3: true as const,
   doNotStartRoom2: false as const,
-  doNotStartOwnerConsole: true as const,
-  doNotStartRooms3to5: true as const,
+  doNotStartOwnerConsole: false as const,
+  doNotStartRooms3to5: false as const,
+  doNotStartRoom4: true as const,
+  doNotStartRoom5: true as const,
   /** @deprecated Prefer doNotStartRooms3to5 + room2Authorized. Kept false by closeout call. */
   doNotStartRooms2to5: false as const,
 
@@ -47,6 +51,7 @@ export const studioRoom1CustomerLifeCloseoutV1 = {
     doNotFake: true as const,
     doNotCallClosed: true as const,
     doesNotBlockRoom2: true as const,
+    doesNotBlockRoom3: true as const,
     reason:
       "The Studio does not yet have a purchased and verified business domain or business email identity.",
     deferredGates: [
@@ -89,7 +94,7 @@ export const studioRoom1CustomerLifeCloseoutV1 = {
 
   /**
    * Remaining Room 1 sticky — not the active execution room.
-   * Active launch room is Room 2 after the 2026-08-17 closeout call.
+   * Active launch room is Room 3 after the 2026-08-18 Room 2 close.
    */
   activeSection: {
     id: "STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1",

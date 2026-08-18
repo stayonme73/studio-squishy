@@ -44,7 +44,6 @@ export {
   landingPublishCredentialSnapshot,
 } from "./pipeline";
 export type { LandingPipelineResult } from "./pipeline";
-export { runResponsiveViewportChecks } from "./responsive";
 export {
   LANDING_FIXTURE_LABEL,
   LANDING_FIXTURE_ID,

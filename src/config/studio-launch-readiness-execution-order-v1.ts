@@ -4,7 +4,8 @@
  * Not permission to start later rooms. One active room at a time.
  *
  * Tagia 2026-08-17: Room 1 stays technically open solely for deferred
- * domain/email. That sticky does not block entering Room 2.
+ * domain/email. That sticky does not block entering Room 2 or Room 3.
+ * Tagia 2026-08-18: Room 2 CLOSED. Current execution is Room 3.
  */
 
 export const studioLaunchReadinessExecutionOrderV1 = {
@@ -24,9 +25,9 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     "soft-opening-preparation",
   ] as const,
 
-  /** Highest unfinished execution room. Room 1 remains open for email only. */
-  currentActiveRoom: 2 as const,
-  currentActiveRoomId: "customer-facing-truth-and-friction-cleanup" as const,
+  /** Highest unfinished execution room. Room 1 remains open for email only. Room 2 is CLOSED. */
+  currentActiveRoom: 3 as const,
+  currentActiveRoomId: "owner-console" as const,
   currentActiveRoomClosed: false as const,
 
   lastCustomerLifePackage: {
@@ -50,6 +51,8 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     authoritativeTortureTip: "a49efd7",
     room2Authorized: true as const,
     emailDoesNotBlockRoom2: true as const,
+    room3Authorized: true as const,
+    emailDoesNotBlockRoom3: true as const,
     comeBackLater: {
       id: "studio-business-domain-and-email-identity",
       parkedPackageId: "STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1",
@@ -103,10 +106,23 @@ export const studioLaunchReadinessExecutionOrderV1 = {
 
   room2Section5: {
     packageId: "STUDIO-OPERATING-ROOM-2-WHOLE-CUSTOMER-TRUTH-AND-FRICTION-SWEEP-1",
+    sectionClosed: true as const,
+    parkForManager: false as const,
+    closeTip: "b3397a6" as const,
+    hashNoteNotClose: "c46e191" as const,
+    doNotAutoAdvance: true as const,
+    doNotStartOwnerConsole: false as const,
+    nextSectionWaitsForScoutPackage: false as const,
+  },
+
+  room3Section1: {
+    packageId: "STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1",
     sectionClosed: false as const,
     parkForManager: true as const,
     doNotAutoAdvance: true as const,
-    doNotStartOwnerConsole: true as const,
+    doNotStartSection2: true as const,
+    doNotStartRoom4: true as const,
+    doNotRebuild: true as const,
     nextSectionWaitsForScoutPackage: true as const,
   },
 

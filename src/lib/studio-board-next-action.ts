@@ -158,7 +158,8 @@ export function resolveBoardNextActionPresentation(
     overlay?.kind === "revision_underway" ||
     overlay?.kind === "approved_preparing" ||
     overlay?.kind === "delivery_ready" ||
-    overlay?.kind === "waiting_on_you"
+    overlay?.kind === "waiting_on_you" ||
+    overlay?.kind === "cancelled"
   ) {
     return presentation({
       statusLabel: overlay.statusLabel,

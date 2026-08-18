@@ -1,0 +1,66 @@
+{
+  "passed": 11,
+  "failed": 0,
+  "blocked": 0,
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (existing)"
+    },
+    {
+      "check": "fixtures_seeded",
+      "status": "PASS",
+      "detail": "Room 3 Routine c2e6e920 + Room 3 Refund c2e6e920"
+    },
+    {
+      "check": "open_console",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good evening, Tagia. 17 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 17 folders 17 decisions Estimated rev",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-truth-and-decision-desk-audit-1\\owner-walk\\shots\\01-owner-console-open.png"
+    },
+    {
+      "check": "stale_squishy_language",
+      "status": "PASS",
+      "detail": "Desk briefing / Studio"
+    },
+    {
+      "check": "stale_all_campaigns",
+      "status": "PASS",
+      "detail": "File Room / projects"
+    },
+    {
+      "check": "genuine_refund_appears",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good evening, Tagia. 17 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 17 folders 17 decisions Estimated review time: about 51 minutes Refreshed Aug 18, 5:38 PM FILE CA",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-truth-and-decision-desk-audit-1\\owner-walk\\shots\\02-refund-folder.png"
+    },
+    {
+      "check": "noise_routine_payment_not_a_folder",
+      "status": "PASS",
+      "detail": "Routine payment / progress did not become the current Owner folder"
+    },
+    {
+      "check": "decision_card_context",
+      "status": "PASS",
+      "detail": "Refund card fields"
+    },
+    {
+      "check": "owner_approves_refund",
+      "status": "PASS",
+      "detail": "Refund decision recorded"
+    },
+    {
+      "check": "decision_stuck_after_return",
+      "status": "PASS",
+      "detail": "Room 3 Refund c2e6e920 left the desk",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-truth-and-decision-desk-audit-1\\owner-walk\\shots\\03-return-after-decision.png"
+    },
+    {
+      "check": "customer_project_updates_after_owner_decision",
+      "status": "PASS",
+      "detail": "the STUDIO Studio Board Review Room Final Delivery Help Center New Project Sign out STUDIO BOARD Good evening, Maya Brooks CURRENT PROJECT Room 3 Refund C2e6e920 PROJECT STATUS WHAT WE NEED FROM YOU Nothing is required from you right now. RECORDED OR COMPLETE Recorded: Project Intake submitted WHAT THE STUDIO IS WORKING ON We've received your Project Intake and are preparing your project for the n",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-truth-and-decision-desk-audit-1\\owner-walk\\shots\\04-customer-after-owner-refund.png"
+    }
+  ]
+}

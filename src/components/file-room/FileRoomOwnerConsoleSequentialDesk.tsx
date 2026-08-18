@@ -21,7 +21,7 @@ import {
   resolveOwnerDeskBriefing,
   resolveOwnerDeskGreetingParts,
   resolveOwnerDeskSummary,
-} from "@/studio-coordinator";
+} from "@/studio-coordinator/briefings/owner-desk";
 
 import {
   ComplaintDecisionWorkingSurface,

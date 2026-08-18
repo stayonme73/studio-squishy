@@ -1,6 +1,9 @@
-import { evaluateEscalation } from "@/decision-core";
 import { ownerConsole, ownerConsoleOutcomeByKind } from "@/config/owner-console";
 import type { CampaignExceptionKind } from "@/lib/campaign-tasks/exceptions-types";
+import {
+  resolveStallCauseForDeskReason,
+  resolveStallCauseForExceptionKind,
+} from "@/lib/campaign-tasks/owner-console-stall-cause";
 import type { OwnerConsoleDecisionCard } from "@/lib/campaign-tasks/owner-console-view";
 import type {
   OwnerConsoleSequentialDeskView,
@@ -13,7 +16,7 @@ import { greetingPeriodFromDate, type GreetingPeriod } from "@/lib/studio-board-
 export type OwnerDeskGreetingParts = {
   period: GreetingPeriod;
   ownerDisplayName: string;
-  /** Squishy briefing — useful desk context after the salutation. */
+  /** Desk briefing — useful desk context after the salutation. */
   briefing: string;
 };
 
@@ -221,18 +224,18 @@ function resolveSquishySaysForItem(item: OwnerConsoleSequentialItem): string {
       case "approval_before_delivery":
         return "The client approved this package. Your final release is required before they can receive it in Final Delivery.";
       case "revision_limit_reached":
-        return "A client boundary issue needs your business judgment before Squishy can respond.";
+        return "A client boundary issue needs your business judgment before The Studio can respond.";
       case "scope_issue":
         return "The team needs your scope decision before production can continue.";
       case "deadline_exception":
       case "at_risk_job":
         return "A deadline needs your judgment before the team commits further.";
       case "refund_eligible":
-        return "A refund decision needs you. Policy says this job may be eligible — approval is yours.";
+        return "A refund decision needs you. Policy says this work may be eligible — approval is yours.";
       case "client_complaint":
-        return "A client issue needs your judgment before Squishy can respond.";
+        return "A client issue needs your judgment before The Studio can respond.";
       case "heavy_lane_full":
-        return "The heavy lane is full. Your call sets which job runs next.";
+        return "The heavy lane is full. Your call sets which work runs next.";
       default:
         return `${item.deskItem.reasonLabel}. ${item.deskItem.detail}`;
     }
@@ -245,8 +248,9 @@ function resolveSquishySaysForItem(item: OwnerConsoleSequentialItem): string {
     case "scope_change":
       return "A scope change needs your decision before production can continue.";
     case "client_request":
+      return "A client-facing request needs your approval before anything goes to the client.";
     case "missing_client_fact":
-      return "A client materials request needs your approval before anything goes to the client.";
+      return "Work is waiting on customer information.";
     case "deadline_commitment":
     case "deadline_risk":
       return "A deadline commitment needs your sign-off before the team moves forward.";
@@ -319,49 +323,27 @@ function resolveDeskBriefing(input: {
   return `I organized today's ${total} folders by urgency. This one is first.`;
 }
 
-function exceptionRecordFromCard(card: OwnerConsoleDecisionCard) {
-  return {
-    id: card.id,
-    campaignId: card.campaignId,
-    kind: card.row.kind,
-    status: card.row.status,
-    title: card.row.title,
-    createdAt: card.updatedAt,
-    updatedAt: card.updatedAt,
-    raisedByUserId: "system",
-    raisedByDisplayName: card.row.raisedByDisplayName,
-    raisedByRole: "producer_dispatcher" as const,
-  };
-}
-
 export function resolveCoordinatorTraceForCard(card: OwnerConsoleDecisionCard): string {
-  const outcome = evaluateEscalation({
-    domain: "escalation",
-    campaignId: card.campaignId,
-    actor: "system",
-    trigger: { type: "exception_evaluated" },
-    occurredAt: card.updatedAt,
-    facts: { exception: exceptionRecordFromCard(card) },
-  });
-
-  if (!outcome.matchedRules.length) {
-    return "Studio policy requires Owner review before work continues.";
+  const cause = resolveStallCauseForExceptionKind(card.row.kind);
+  if (cause) {
+    return `Policy: ${cause.label}`;
   }
-
-  return outcome.matchedRules
-    .map((rule) =>
-      rule.ruleId
-        .replace(/^campaign-exceptions:kind:/, "Policy: ")
-        .replace(/^campaign-tasks\/exceptions-view:/, "Routing: "),
-    )
-    .join(" ");
+  return "Policy: Owner review is required before this work continues.";
 }
 
 function resolveWhyReachedForItem(item: OwnerConsoleSequentialItem): string {
   if (item.exceptionCard) {
+    const cause = resolveStallCauseForExceptionKind(item.exceptionCard.row.kind);
+    if (cause && !item.exceptionCard.whyOwner.includes(cause.label)) {
+      return `${cause.label} ${item.exceptionCard.whyOwner}`.trim();
+    }
     return item.exceptionCard.whyOwner;
   }
   if (item.deskItem) {
+    const cause = resolveStallCauseForDeskReason(item.deskItem.reason);
+    if (!item.deskItem.detail.includes(cause.label)) {
+      return `${cause.label} ${item.deskItem.reasonLabel}. ${item.deskItem.detail}`.trim();
+    }
     return `${item.deskItem.reasonLabel}. ${item.deskItem.detail}`;
   }
   return ownerConsole.selectedCardHint;
@@ -562,7 +544,7 @@ export function resolveOwnerDeadlinePostDecisionBriefing(
     case "owner_ask_client_deadline":
       return {
         destination: "waiting_on_client",
-        message: `Routed to the client queue for date confirmation. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the client queue for date confirmation. This folder left your desk — The Studio will track the response. ${ownerConfirmationSuffix()}`,
       };
     case "owner_assign_deadline":
       return {
@@ -584,12 +566,12 @@ export function resolveOwnerRevisionPostDecisionBriefing(
     case "owner_allow_revision":
       return {
         destination: "production",
-        message: `Business exception approved. This folder left your desk — production will continue under the approved boundary. Squishy will notify the client. ${ownerConfirmationSuffix()}`,
+        message: `Business exception approved. This folder left your desk — production will continue under the approved boundary. The Studio will notify the client. ${ownerConfirmationSuffix()}`,
       };
     case "owner_hold_firm_revision":
       return {
         destination: "waiting_on_client",
-        message: `Studio boundary held. This folder left your desk — Squishy will send the policy-bound message to the client. ${ownerConfirmationSuffix()}`,
+        message: `Studio boundary held. This folder left your desk — The Studio will send the policy-bound message to the client. ${ownerConfirmationSuffix()}`,
       };
     case "owner_hold_revision":
       return {
@@ -604,7 +586,7 @@ export function resolveOwnerRevisionPostDecisionBriefing(
     case "owner_ask_client_revision":
       return {
         destination: "waiting_on_client",
-        message: `Routed to the client queue for boundary confirmation. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the client queue for boundary confirmation. This folder left your desk — The Studio will track the response. ${ownerConfirmationSuffix()}`,
       };
     case "owner_assign_revision":
       return {
@@ -626,12 +608,12 @@ export function resolveOwnerScopePostDecisionBriefing(
     case "owner_approve_scope_change":
       return {
         destination: "production",
-        message: `Scope change approved. This folder left your desk — production will replan and continue. Squishy will notify the client if they requested this change. ${ownerConfirmationSuffix()}`,
+        message: `Scope change approved. This folder left your desk — production will replan and continue. The Studio will notify the client if they requested this change. ${ownerConfirmationSuffix()}`,
       };
     case "owner_decline_scope_change":
       return {
         destination: "recently_handled",
-        message: `Scope change declined. This folder left your desk — work stays within the approved plan. Squishy will send the policy-bound outcome if the client asked. ${ownerConfirmationSuffix()}`,
+        message: `Scope change declined. This folder left your desk — work stays within the approved plan. The Studio will send the policy-bound outcome if the client asked. ${ownerConfirmationSuffix()}`,
       };
     case "owner_hold_scope_change":
       return {
@@ -646,12 +628,12 @@ export function resolveOwnerScopePostDecisionBriefing(
     case "owner_ask_client_info_scope_change":
       return {
         destination: "waiting_on_client",
-        message: `Routed to the client queue for missing information. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the client queue for missing information. This folder left your desk — The Studio will track the response. ${ownerConfirmationSuffix()}`,
       };
     case "owner_ask_client_approval_scope_change":
       return {
         destination: "waiting_on_client",
-        message: `Routed to the client queue for scope confirmation. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the client queue for scope confirmation. This folder left your desk — The Studio will track the response. ${ownerConfirmationSuffix()}`,
       };
     case "owner_assign_scope_change":
       return {
@@ -673,12 +655,12 @@ export function resolveOwnerRefundPostDecisionBriefing(
     case "owner_approve_refund":
       return {
         destination: "closed",
-        message: `Refund approved. This folder left your desk — the job is closed and Squishy will notify the client with the approved template. ${ownerConfirmationSuffix()}`,
+        message: `Refund approved. This folder left your desk — the work is closed and The Studio will notify the client with the approved template. ${ownerConfirmationSuffix()}`,
       };
     case "owner_deny_refund":
       return {
         destination: "production",
-        message: `Refund denied. This folder left your desk — the job continues under policy and Squishy will notify the client. ${ownerConfirmationSuffix()}`,
+        message: `Refund denied. This folder left your desk — the work continues under policy and The Studio will notify the client. ${ownerConfirmationSuffix()}`,
       };
     case "owner_hold_refund":
       return {
@@ -693,7 +675,7 @@ export function resolveOwnerRefundPostDecisionBriefing(
     case "owner_ask_client_refund":
       return {
         destination: "waiting_on_client",
-        message: `Routed to the client queue for documentation. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the client queue for documentation. This folder left your desk — The Studio will track the response. ${ownerConfirmationSuffix()}`,
       };
     default:
       return {
@@ -710,7 +692,7 @@ export function resolveOwnerComplaintPostDecisionBriefing(
     case "owner_resolve_complaint":
       return {
         destination: "recently_handled",
-        message: `Response approved. This folder left your desk — Squishy will send your reply to the client. ${ownerConfirmationSuffix()}`,
+        message: `Response approved. This folder left your desk — The Studio will send your reply to the client. ${ownerConfirmationSuffix()}`,
       };
     case "owner_escalate_complaint_refund":
     case "owner_escalate_complaint_scope":
@@ -732,7 +714,7 @@ export function resolveOwnerComplaintPostDecisionBriefing(
     case "owner_ask_client_complaint":
       return {
         destination: "waiting_on_client",
-        message: `Routed to the client queue for more information. This folder left your desk — Squishy will track the response. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the client queue for more information. This folder left your desk — The Studio will track the response. ${ownerConfirmationSuffix()}`,
       };
     case "owner_assign_complaint":
       return {
@@ -742,7 +724,7 @@ export function resolveOwnerComplaintPostDecisionBriefing(
     case "owner_decline_complaint_escalation":
       return {
         destination: "recently_handled",
-        message: `Policy-bound response recorded. This folder left your desk — Squishy will notify the client. ${ownerConfirmationSuffix()}`,
+        message: `Policy-bound response recorded. This folder left your desk — The Studio will notify the client. ${ownerConfirmationSuffix()}`,
       };
     default:
       return {
@@ -783,7 +765,7 @@ export function resolveOwnerDeskJobPostDecisionBriefing(
       return {
         destination: "client",
         message:
-          "Routed to the client Review Room. This support review left your desk — Squishy will notify the client that review is ready.",
+          "Routed to the client Review Room. This support review left your desk — The Studio will notify the client that review is ready.",
       };
     case "owner_send_back_for_review":
       return {
@@ -807,13 +789,13 @@ export function resolveOwnerDeskJobPostDecisionBriefing(
       return {
         destination: "waiting_on_client",
         message:
-          "Routed to the client queue. This folder left your desk — Squishy will track the response.",
+          "Routed to the client queue. This folder left your desk — The Studio will track the response.",
       };
     case "owner_final_release":
       return {
         destination: "client",
         message:
-          "Routed to Final Delivery. This folder left your desk — Squishy will notify the client that delivery is ready.",
+          "Routed to Final Delivery. This folder left your desk — The Studio will notify the client that delivery is ready.",
       };
     case "owner_send_back_for_release":
       return {
@@ -852,7 +834,7 @@ export function resolveOwnerPostDecisionBriefing(
       return {
         destination: "waiting_on_client",
         message:
-          "Routed to the client queue. This folder left your desk — Squishy will track the response.",
+          "Routed to the client queue. This folder left your desk — The Studio will track the response.",
       };
     case "assign_exception":
       return {

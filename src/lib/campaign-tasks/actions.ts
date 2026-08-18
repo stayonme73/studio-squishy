@@ -30,7 +30,7 @@ import {
   gateLandingPageQaForQaPass,
   requiresLandingPageQaGate,
   type LandingPageQaEvidence,
-} from "@/lib/studio-kitchen-production/landing-page";
+} from "@/lib/studio-kitchen-production/landing-page/qa";
 
 import {
   canClaimTask,

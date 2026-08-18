@@ -49,6 +49,21 @@ export type OwnerConsoleScanView = {
   totalItems: number;
 };
 
+/** Awareness trays only — blocked / ready-to-move / internal stay off Tagia's desk. */
+export const OWNER_CONSOLE_AWARENESS_SCAN_BUCKET_IDS = [
+  "waiting_client",
+  "recently_resolved",
+] as const satisfies readonly OwnerConsoleScanBucketId[];
+
+export function toOwnerDeskAwarenessScan(scan: OwnerConsoleScanView): OwnerConsoleScanView {
+  const allowed = new Set<string>(OWNER_CONSOLE_AWARENESS_SCAN_BUCKET_IDS);
+  const buckets = scan.buckets.filter((bucket) => allowed.has(bucket.id));
+  return {
+    buckets,
+    totalItems: buckets.reduce((sum, bucket) => sum + bucket.items.length, 0),
+  };
+}
+
 const BUCKET_ORDER: readonly OwnerConsoleScanBucketId[] = [
   "blocked",
   "waiting_client",

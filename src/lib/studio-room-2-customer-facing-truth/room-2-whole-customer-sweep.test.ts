@@ -108,16 +108,17 @@ function tasksForSpine(spine: JobSpineStatus): ServerTasksEnvelope {
 }
 
 describe("STUDIO-OPERATING-ROOM-2-WHOLE-CUSTOMER-TRUTH-AND-FRICTION-SWEEP-1", () => {
-  it("is the current Room 2 section, parked for Manager, not closed", () => {
+  it("is CLOSED at b3397a6 and is not the current execution room", () => {
     expect(cfg.packageId).toBe(
       "STUDIO-OPERATING-ROOM-2-WHOLE-CUSTOMER-TRUTH-AND-FRICTION-SWEEP-1",
     );
     expect(cfg.room).toBe(2);
-    expect(cfg.sectionClosed).toBe(false);
-    expect(cfg.parkForManager).toBe(true);
+    expect(cfg.sectionClosed).toBe(true);
+    expect(cfg.parkForManager).toBe(false);
+    expect(cfg.closeTip).toBe("b3397a6");
     expect(cfg.doNotAutoAdvance).toBe(true);
-    expect(cfg.doNotStartOwnerConsole).toBe(true);
-    expect(cfg.doNotStartRoom3).toBe(true);
+    expect(cfg.doNotStartOwnerConsole).toBe(false);
+    expect(cfg.doNotStartRoom3).toBe(false);
     expect(cfg.doNotReopenResend).toBe(true);
     expect(cfg.doNotReopenSection4UnlessNewDefect).toBe(true);
     expect(cfg.visualRedesign).toBe(false);
@@ -127,20 +128,21 @@ describe("STUDIO-OPERATING-ROOM-2-WHOLE-CUSTOMER-TRUTH-AND-FRICTION-SWEEP-1", ()
     expect(cfg.priorSections.section4CloseTip).toBe("6cf9ca0");
     expect(cfg.comeBackLaterEmail.protectedCheckpoint).toBe("d6974eb");
     expect(cfg.comeBackLaterEmail.neitherPassNorFailForThisSweep).toBe(true);
-    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(2);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(3);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomClosed).toBe(false);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section4.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section4.closeTip).toBe("6cf9ca0");
     expect(studioLaunchReadinessExecutionOrderV1.room2Section5.packageId).toBe(cfg.packageId);
-    expect(studioLaunchReadinessExecutionOrderV1.room2Section5.sectionClosed).toBe(false);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section5.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room2Section5.closeTip).toBe("b3397a6");
     expect(studioLaunchReadinessExecutionOrderV1.room2Section5.nextSectionWaitsForScoutPackage).toBe(
-      true,
+      false,
     );
-    expect(cfg.parkEvidence.liveCustomerWalk).toBe("46/46");
-    expect(cfg.parkEvidence.targetedTests).toBe("111/111");
-    expect(cfg.parkEvidence.ownerRoutine).toBe("NONE");
-    expect(cfg.parkEvidence.merge).toBe(false);
-    expect(cfg.parkEvidence.room2Verdict).toBe(
+    expect(cfg.closeEvidence.liveCustomerWalk).toBe("46/46");
+    expect(cfg.closeEvidence.targetedTests).toBe("111/111");
+    expect(cfg.closeEvidence.ownerRoutine).toBe("NONE");
+    expect(cfg.closeEvidence.merge).toBe(false);
+    expect(cfg.closeEvidence.room2Verdict).toBe(
       "READY_TO_CLOSE_WITH_EXPLICIT_NON_BLOCKING_LIMITS",
     );
     expect([...cfg.scopedSpine]).toEqual([

@@ -11,7 +11,8 @@ function isPromotableExceptionKind(kind: CampaignExceptionKind): boolean {
 }
 
 function isOwnerDeskExceptionKind(kind: CampaignExceptionKind): boolean {
-  return !isPromotableExceptionKind(kind);
+  if (kind === "missing_client_fact" || kind === "routine_internal") return false;
+  return true;
 }
 
 /** Locked responsibility map — tray storage model. */
@@ -80,7 +81,6 @@ const TRAY_TAB_LABELS: Record<OwnerConsoleTrayId, string> = {
 
 const APPROVAL_EXCEPTION_KINDS = new Set<CampaignExceptionKind>([
   "client_request",
-  "missing_client_fact",
 ]);
 
 const DECISION_EXCEPTION_KINDS = new Set<CampaignExceptionKind>([
@@ -149,8 +149,11 @@ export function resolveDeskUrgencyRank(item: OwnerDeskItem): number {
 
 export function resolveTrayForException(card: OwnerConsoleDecisionCard): OwnerConsoleTrayId {
   const { kind } = card.row;
-  if (APPROVAL_EXCEPTION_KINDS.has(kind) || isPromotableExceptionKind(kind)) {
+  if (kind === "missing_client_fact") {
     return "needs_client";
+  }
+  if (kind === "client_request" || APPROVAL_EXCEPTION_KINDS.has(kind)) {
+    return "needs_my_approval";
   }
   if (DECISION_EXCEPTION_KINDS.has(kind)) {
     return "needs_my_decision";

@@ -1,12 +1,10 @@
 /**
  * Room 2 Section 5 — whole-customer truth and friction sweep.
- * PARK for Manager. Not closed. Do not auto-advance.
+ * CLOSED at `b3397a6`. Hash note `c46e191` is not the close tip.
  *
- * Prior closes: Section 1 `45b09b1` · Section 2 `e609203` · Section 3 `3328807` ·
- * Section 4 `6cf9ca0`.
- * Do not reopen those sections unless this sweep exposes a genuine defect.
- * Do not start Owner Console. Do not reopen Resend/domain. Do not merge.
- * Do not start Room 3 automatically.
+ * Tagia closeout call 2026-08-18: Room 2 is CLOSED.
+ * Do not reopen this section unless new evidence proves a genuine defect.
+ * Do not reopen Resend/domain. Do not merge.
  */
 
 import { studioLaunchReadinessExecutionOrderV1 } from "@/config/studio-launch-readiness-execution-order-v1";
@@ -23,18 +21,21 @@ export const studioRoom2WholeCustomerTruthAndFrictionSweepV1 = {
   roomId: "customer-facing-truth-and-friction-cleanup" as const,
   merge: "separately_authorized" as const,
   ownerRoutine: "NONE" as const,
-  parkForManager: true as const,
-  sectionClosed: false as const,
+  parkForManager: false as const,
+  sectionClosed: true as const,
+  closeTip: "b3397a6" as const,
+  hashNoteNotClose: "c46e191" as const,
   doNotAutoAdvance: true as const,
-  parkEvidence: {
+  closeEvidence: {
     liveCustomerWalk: "46/46" as const,
     targetedTests: "111/111" as const,
     ownerRoutine: "NONE" as const,
     merge: false as const,
     room2Verdict: "READY_TO_CLOSE_WITH_EXPLICIT_NON_BLOCKING_LIMITS" as const,
+    closeTip: "b3397a6" as const,
   },
-  doNotStartOwnerConsole: true as const,
-  doNotStartRoom3: true as const,
+  doNotStartOwnerConsole: false as const,
+  doNotStartRoom3: false as const,
   doNotReopenResend: true as const,
   doNotReopenSection1UnlessNewDefect: true as const,
   doNotReopenSection2UnlessNewDefect: true as const,

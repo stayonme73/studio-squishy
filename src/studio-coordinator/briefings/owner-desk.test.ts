@@ -221,6 +221,10 @@ describe("owner-desk briefings", () => {
     expect(briefing?.squishySays).toContain("business judgment");
     expect(briefing?.coordinatorTrace.length).toBeGreaterThan(0);
     expect(resolveCoordinatorTraceForCard(decisionCard())).toContain("Policy:");
+    expect(resolveCoordinatorTraceForCard(decisionCard())).toContain(
+      "Revision allowance is exhausted",
+    );
+    expect(resolveCoordinatorTraceForCard(decisionCard())).not.toMatch(/campaign-exceptions:kind:/);
   });
 
   it("maps resolve to production destination copy that clears the desk", () => {
