@@ -113,7 +113,7 @@ Keep this sequence as the standing roadmap for all future launch work unless Tag
 | Room | Status |
 |------|--------|
 | 1. Customer Life + Communication | **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL.** Not a full CLOSED stamp. Authoritative executable tip `a49efd7`. Yellow sticky: branded email/domain at `d6974eb`. Does **not** block Room 2. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. |
-| 2. Customer-facing truth + friction cleanup | **ACTIVE.** Section 1 `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1` is **CLOSED** at `45b09b1`. Section 2 `STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1` is **CLOSED** at `e609203`. Next Room 2 section waits for Tagia’s Scout package. Do not auto-advance. Do not start Owner Console. |
+| 2. Customer-facing truth + friction cleanup | **ACTIVE.** Section 1 `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1` is **CLOSED** at `45b09b1`. Section 2 `STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1` is **CLOSED** at `e609203`. Current section 3 `STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1` — park for Manager. Do not auto-advance. Do not start Owner Console. |
 | 3. Owner Console | Not started. Do not enter. |
 | 4. Full business rehearsal | Not started. Do not enter. |
 | 5. Soft-opening preparation | Not started. Do not enter. |

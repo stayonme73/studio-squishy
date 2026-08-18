@@ -943,7 +943,7 @@ async function main(): Promise<number> {
       const prematureProof = await pageA.locator("img.fs-review-proof__image").count();
       const claimsReviewReady =
         /You are reviewing Version/i.test(reviewBeforeReadyText) ||
-        (await pageA.getByRole("button", { name: /Approve for Delivery/i }).count()) > 0;
+        (await pageA.getByRole("button", { name: /Approve this version/i }).count()) > 0;
       const stillNotEligible = !(await askCustomerLifeFromStore({
         campaignId,
         question: "Is my flyer ready for me to review?",
@@ -1238,8 +1238,8 @@ async function main(): Promise<number> {
       "maya_sees_real_flyer_version_and_actions",
       (await proofImg.count()) > 0 &&
         /Version 1/i.test(reviewText) &&
-        /Request Revision/i.test(reviewText) &&
-        /Approve for Delivery/i.test(reviewText)
+        /Request a revision/i.test(reviewText) &&
+        /Approve this version/i.test(reviewText)
         ? "PASS"
         : "FAIL",
       reviewText.slice(0, 280),
@@ -1280,14 +1280,14 @@ async function main(): Promise<number> {
     await forceClick(pageA.locator(".fs-feedback-panel__btn--revision"));
     await pageA.waitForTimeout(800);
     const jobRevision = pageA.locator(".fs-review__choose").getByRole("button", {
-      name: /Request Revision/i,
+      name: /Request a revision/i,
     });
     for (let i = 0; i < 20; i += 1) {
       if (await jobRevision.isEnabled()) break;
       await pageA.waitForTimeout(250);
     }
     await forceClick(jobRevision);
-    await pageA.getByRole("button", { name: /Submit request changes/i }).waitFor({
+    await pageA.getByRole("button", { name: /Send revision request/i }).waitFor({
       timeout: 15_000,
     });
     const revisionPatch = pageA.waitForResponse(
@@ -1297,7 +1297,7 @@ async function main(): Promise<number> {
         (res.request().postData() ?? "").includes("request_revision"),
       { timeout: 120_000 },
     );
-    await forceClick(pageA.getByRole("button", { name: /Submit request changes/i }));
+    await forceClick(pageA.getByRole("button", { name: /Send revision request/i }));
     const revisionResponse = await revisionPatch;
     if (!revisionResponse.ok()) {
       const body = await revisionResponse.text();
@@ -1423,7 +1423,7 @@ async function main(): Promise<number> {
 
     await forceClick(pageA.locator(".fs-feedback-panel__btn--approve"));
     await pageA.waitForTimeout(800);
-    const jobApprove = pageA.getByRole("button", { name: /Approve for Delivery/i });
+    const jobApprove = pageA.getByRole("button", { name: /^Approve this version$/i });
     for (let i = 0; i < 24; i += 1) {
       if (await jobApprove.isEnabled()) break;
       await pageA.waitForTimeout(250);
@@ -1433,7 +1433,7 @@ async function main(): Promise<number> {
       throw new Error(`Approve stayed disabled. ${(await visibleText(pageA)).slice(0, 400)}`);
     }
     await forceClick(jobApprove);
-    await pageA.getByRole("button", { name: /Submit approval/i }).waitFor({ timeout: 15_000 });
+    await pageA.getByRole("button", { name: /Yes, approve this version/i }).waitFor({ timeout: 15_000 });
     const approvalPatch = pageA.waitForResponse(
       (res) =>
         res.url().includes("/review") &&
@@ -1441,7 +1441,7 @@ async function main(): Promise<number> {
         (res.request().postData() ?? "").includes("approve_for_delivery"),
       { timeout: 120_000 },
     );
-    await forceClick(pageA.getByRole("button", { name: /Submit approval/i }));
+    await forceClick(pageA.getByRole("button", { name: /Yes, approve this version/i }));
     const approvalResponse = await approvalPatch;
     if (!approvalResponse.ok()) {
       const body = await approvalResponse.text();
@@ -1476,10 +1476,10 @@ async function main(): Promise<number> {
         { timeout: 12_000 },
       );
       await forceClick(pageB.locator(".fs-feedback-panel__btn--approve")).catch(() => undefined);
-      const jobApproveB = pageB.getByRole("button", { name: /Approve for Delivery/i });
+      const jobApproveB = pageB.getByRole("button", { name: /^Approve this version$/i });
       if (await jobApproveB.isEnabled().catch(() => false)) {
         await forceClick(jobApproveB);
-        const submitB = pageB.getByRole("button", { name: /Submit approval/i });
+        const submitB = pageB.getByRole("button", { name: /Yes, approve this version/i });
         if (await submitB.count()) await forceClick(submitB);
       }
       const staleRes = await staleApprove;

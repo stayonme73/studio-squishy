@@ -234,7 +234,7 @@ describe("review-room gates", () => {
       allDeliverablesPrepared: true,
     });
     expect(result.allowed).toBe(false);
-    expect(result.reasons.some((reason) => /included correction/i.test(reason))).toBe(
+    expect(result.reasons.some((reason) => /included revision/i.test(reason))).toBe(
       true,
     );
   });
@@ -516,7 +516,7 @@ describe("review-room actions", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.revisionLimitReached).toBe(true);
-      expect(result.error).toMatch(/included correction/i);
+      expect(result.error).toMatch(/included revision/i);
     }
   });
 

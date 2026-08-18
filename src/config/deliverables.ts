@@ -7,8 +7,8 @@ import { scopeIncludesSection } from "@/lib/deliverable-scope";
 
 export const deliverables = {
   pageTitle: "Final Delivery",
-  eyebrow: "Your Campaign",
-  pageSubtitle: "Your marketing campaign is complete and ready for you to use.",
+  eyebrow: "Final Delivery",
+  pageSubtitle: "Your project is complete and the files you purchased are ready to use.",
   backLabel: "Back to Studio Board",
   userName: "Tagia",
 
@@ -30,8 +30,8 @@ export const deliverables = {
     brandBy: "BY SPARK",
     nav: {
       studioBoard: "Studio Board",
-      campaignDetails: "Campaign Details",
-      reviewCampaigns: "Review Campaigns",
+      campaignDetails: "Project Record",
+      reviewCampaigns: "Review Room",
       finalDelivery: "Final Delivery",
     },
     quote: "Good marketing isn't luck. It's strategy.",
@@ -53,8 +53,8 @@ export const deliverables = {
 
   hero: {
     badge: "Project Complete",
-    title: "Your marketing package is ready.",
-    lead: "Everything has been prepared and organized for you.",
+    title: "Your files are ready.",
+    lead: "Download the files from the version you approved.",
     footnote: "The Studio is standing by when you're ready for your next project.",
   },
 
@@ -67,7 +67,7 @@ export const deliverables = {
       { id: "enc-4", text: "Go tell your story.", doodle: "spark", inset: false },
       { id: "enc-5", text: "One post at a time.", doodle: "star", inset: true },
       { id: "enc-6", text: "Big ideas start small.", doodle: "trend", inset: false },
-      { id: "enc-7", text: "We believe in this campaign.", doodle: "bulb", inset: true },
+      { id: "enc-7", text: "We believe in this project.", doodle: "bulb", inset: true },
       { id: "enc-8", text: "The hard part is done.", doodle: "rocket", inset: false },
       { id: "enc-9", text: "Come back anytime.", doodle: "arrow", inset: true },
     ] as const,
@@ -94,7 +94,7 @@ export const deliverables = {
 
   sections: {
     heading: "Your Deliverables",
-    subheading: "Everything you need to market your campaign with confidence.",
+    subheading: "Download the files you purchased.",
     copyLabel: "Copy",
     copySuccess: "Copied!",
     downloadLabel: "Download .txt",
@@ -131,7 +131,7 @@ export const deliverables = {
 
   footer: {
     message: "You did the vision. We built the strategy. Now go make it happen.",
-    startNewCampaign: "START NEW CAMPAIGN",
+    startNewCampaign: "START NEW PROJECT",
     returnToBoard: "RETURN TO STUDIO BOARD",
   },
 
@@ -139,8 +139,8 @@ export const deliverables = {
     preparing: "The Studio team is preparing your final deliverables.",
     preparingHint: "Check back soon — you'll be notified when your package is ready.",
     noCampaignSubtitle:
-      "Your completed marketing files will appear here when a campaign is ready for delivery.",
-    noCampaign: "Start a campaign to receive deliverables from The Studio.",
+      "Your completed files will appear here when a project is ready for delivery.",
+    noCampaign: "Start a project to receive files from The Studio.",
     cta: "Go to Studio Board",
   },
 
@@ -161,7 +161,7 @@ export const deliverables = {
       title: "Not Ready for Delivery Yet",
       message: "The Studio team is preparing your final deliverables.",
       messageSecondary:
-        "Check back soon — your completed files will appear here once your campaign is approved and released.",
+        "Check back soon — your completed files will appear here once your project is approved and released.",
       primaryCta: "GO TO STUDIO BOARD",
       secondaryCta: "Help Center",
       primaryHref: "/studio-board",
@@ -176,12 +176,23 @@ export const deliverables = {
     deliverablesLabel: "Completed deliverables",
     filesLabel: "Files",
     downloadLabel: "Download",
+    downloadNamed: (formatLabel: string) => `Download ${formatLabel}`,
     deliveryDateLabel: "Delivered",
     fileTypeLabel: "Type",
     instructionsLabel: "How to use",
     noFiles: "Files are being prepared for this service.",
   },
 } as const;
+
+/** Customer-facing file format. Do not show raw MIME or storage-provider names. */
+export function customerVisibleFileFormatLabel(fileType: string, fileName = ""): string {
+  const haystack = `${fileType} ${fileName}`.toLowerCase();
+  if (haystack.includes("pdf")) return "Print-ready PDF";
+  if (haystack.includes("png")) return "Digital PNG";
+  if (haystack.includes("jpeg") || haystack.includes("jpg")) return "Digital JPG";
+  const stripped = fileType.replace(/^application\//i, "").replace(/^image\//i, "").trim();
+  return stripped ? stripped.toUpperCase() : "File";
+}
 
 export type DeliverableSocialPost = { id: string; label: string; caption: string };
 

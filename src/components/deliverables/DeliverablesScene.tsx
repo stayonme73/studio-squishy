@@ -12,6 +12,7 @@ import UtilityPageHeader from "@/components/shared/UtilityPageHeader";
 import StudioBoardDevStatus from "@/components/studio-board/StudioBoardDevStatus";
 import {
   deliverables,
+  customerVisibleFileFormatLabel,
   type CampaignDeliverablesPackage,
 } from "@/config/deliverables";
 import { copyTextToClipboard, downloadTextFile } from "@/lib/copy-download";
@@ -144,7 +145,8 @@ function JobDeliveryGrid({
                   <div key={file.id} className="fd-item">
                     <p className="fd-item__label">{file.deliverableLabel}</p>
                     <p className="fd-item__meta">
-                      {file.fileName} · {jobDelivery.fileTypeLabel}: {file.fileType}
+                      {file.fileName} · {jobDelivery.fileTypeLabel}:{" "}
+                      {customerVisibleFileFormatLabel(file.fileType, file.fileName)}
                       {file.versionLabel ? ` · ${file.versionLabel}` : ""}
                     </p>
                     {file.useInstructions ? (
@@ -153,7 +155,9 @@ function JobDeliveryGrid({
                       </p>
                     ) : null}
                     <a className="fd-block__download" href={file.url} download={file.fileName}>
-                      {jobDelivery.downloadLabel}
+                      {jobDelivery.downloadNamed(
+                        customerVisibleFileFormatLabel(file.fileType, file.fileName),
+                      )}
                     </a>
                   </div>
                 ))}
@@ -528,7 +532,7 @@ export default function DeliverablesScene({ embedded = false }: DeliverablesScen
       )}
       <section
         className="fd-hero fd-hero--compact"
-        aria-label={view.allowsFullCompletionLanguage ? "Campaign complete" : "Final Delivery status"}
+        aria-label={view.allowsFullCompletionLanguage ? "Project complete" : "Final Delivery status"}
       >
         <p className="fd-hero__badge">{heroBadge}</p>
         <h2 className="fd-hero__title">{heroTitle}</h2>

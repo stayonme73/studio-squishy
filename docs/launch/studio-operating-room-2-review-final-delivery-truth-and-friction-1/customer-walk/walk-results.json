@@ -1,0 +1,137 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1",
+  "totals": {
+    "pass": 23,
+    "fail": 0,
+    "blocked": 0,
+    "all": 23
+  },
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (external)"
+    },
+    {
+      "check": "maya_review_fixture_ready",
+      "status": "PASS",
+      "detail": "spine=ready_for_review qa=ELIGIBLE_FOR_REVIEW proofs=1"
+    },
+    {
+      "check": "review_entry_from_board",
+      "status": "PASS",
+      "detail": "the\n\nSTUDIO\n\nStudio Board\nReview Room\nFinal Delivery\nHelp Center\nNew Project\nSign out\nSTUDIO BOARD\n\nGood evening, Maya Brooks\n\nCURRENT PROJECT\n\nCedar & Bloom Home Organizing\n\nPROJECT STATUS\n\nWHAT WE NEED FROM YOU\nNothing is required from yo",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\01-board-review-ready.png"
+    },
+    {
+      "check": "review_entry_clarity",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nReview your work — Make Me a Flyer\n\nSERVICE · MAKE ME A FLYER\n\nCedar & Bloom Home Organizing\n\nLook at the current version. You can ask a question, request a revision, or approve t",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\02-review-entry.png"
+    },
+    {
+      "check": "question_revision_approval_distinct",
+      "status": "PASS",
+      "detail": "Ask / Request a revision / Approve this version / Mark section for changes"
+    },
+    {
+      "check": "revision_allowance_visible",
+      "status": "PASS",
+      "detail": "Allowance rail missing"
+    },
+    {
+      "check": "review_language_residue",
+      "status": "PASS",
+      "detail": "No Feedback Studio / correction / hash / MIME residue"
+    },
+    {
+      "check": "question_does_not_sound_or_act_like_revision",
+      "status": "PASS",
+      "detail": "You are looking at Version 1, the current version on the project record."
+    },
+    {
+      "check": "approval_names_current_version",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nReview your work — Make Me a Flyer\n\nSERVICE · MAKE ME A FLYER\n\nCedar & Bloom Home Organizing\n\nLook at the current version. You can ask a qu",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\04-approval-confirm.png"
+    },
+    {
+      "check": "revision_confirm_names_version_and_allowance",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nReview your work — Make Me a Flyer\n\nSERVICE · MAKE ME A FLYER\n\nCedar & Bloom Home Organizing\n\nLook at the current version. You can ask a qu",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\03-revision-confirm.png"
+    },
+    {
+      "check": "revision_allowance_exhausted_wording",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nReview your work — Make Me a Flyer\n\nSERVICE · MAKE ME A FLYER\n\nCedar & Bloom Home Organizing\n\nLook at the current version. You can ask a qu",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\05-revision-exhausted.png"
+    },
+    {
+      "check": "final_state_clarity",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nFinal — Review is complete. The Studio is preparing the files you will keep. — Cedar & Bloom Home Organizing\n\nApproved for Final Delivery\n\nThis work is approved and the Studio is ",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\06-final-state.png"
+    },
+    {
+      "check": "final_does_not_imply_delivery_files",
+      "status": "PASS",
+      "detail": "Final keeps downloads in Delivery"
+    },
+    {
+      "check": "final_language_residue",
+      "status": "PASS",
+      "detail": "No internal residue on Final"
+    },
+    {
+      "check": "stale_tab_cannot_approve_old_version",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nReview your work — Make Me a Flyer\n\nSERVICE · MAKE ME A FLYER\n\nCedar & Bloom Home Organizing\n\nLook at the current version. You can ask a qu",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\07-stale-tab-after-approval.png"
+    },
+    {
+      "check": "delivery_png_pdf_truth",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nDelivery — download the files from the version you approved. — Cedar & Bloom Home Organizing\n\nPROJECT COMPLETE\n\nYour files are ready.\n\nDownload the files from the version you appr",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\08-delivery-files.png"
+    },
+    {
+      "check": "delivery_language_residue",
+      "status": "PASS",
+      "detail": "No MIME / Campaign / hash residue"
+    },
+    {
+      "check": "download_controls_work",
+      "status": "PASS",
+      "detail": "pdf=true png=true"
+    },
+    {
+      "check": "missing_promised_file_is_honest",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nDelivery — download the files from the version you approved. — Cedar & Bloom Home Organizing\n\nDELIVERY IN PROGRESS\n\nSome of your files are ready\n\nYou can download the released fil",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\09-missing-pdf.png"
+    },
+    {
+      "check": "help_and_communication_in_review",
+      "status": "PASS",
+      "detail": "← BACK\nHELP CENTER\nStudio Board →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nStudio rules, policies, and answers — your reference desk for how The Studio works.\n\nON THIS PAGE\n",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\10-help-center.png"
+    },
+    {
+      "check": "return_later_complete_and_files_reachable",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nDelivery — download the files from the version you approved. — Cedar & Bloom Home Organizing\n\nPROJECT COMPLETE\n\nYour files are ready.\n\nDown",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-2-review-final-delivery-truth-and-friction-1\\customer-walk\\shots\\11-return-later.png"
+    },
+    {
+      "check": "return_later_does_not_demand_review_action",
+      "status": "PASS",
+      "detail": "Approved project does not still look like open Review"
+    },
+    {
+      "check": "owner_intervention",
+      "status": "PASS",
+      "detail": "NONE"
+    }
+  ]
+}

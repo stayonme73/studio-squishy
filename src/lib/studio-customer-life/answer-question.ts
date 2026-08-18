@@ -180,12 +180,13 @@ export function answerCustomerLifeQuestion(
           : copy.newVersionNotReady,
       );
     case "which_version_approved":
-      if (!truth.approvedContentSha256 && !truth.approvedVersionLabel) {
+      if (!truth.approvedVersionLabel && !truth.approvedContentSha256) {
         return known(copy.approvedVersionUnknown);
       }
-      return known(
-        `${copy.approvedVersion} Recorded identity: ${truth.approvedVersionLabel ?? "pinned file"} (${truth.approvedContentSha256 ?? "hash on file"}).`,
-      );
+      if (truth.approvedVersionLabel && /^Version\s+\d+$/i.test(truth.approvedVersionLabel)) {
+        return known(copy.approvedVersion(truth.approvedVersionLabel));
+      }
+      return known(copy.approvedVersionUnlabeled);
     case "current_review_version":
       if (!truth.currentReviewVersionLabel) {
         return known(copy.currentReviewVersionUnknown);

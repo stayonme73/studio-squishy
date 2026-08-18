@@ -16,6 +16,6 @@ export function resolveFeedbackRevisionStatus(campaign: CampaignRecord | null): 
 }
 
 export function resolveFeedbackCampaignTitle(campaign: CampaignRecord | null): string {
-  if (!campaign) return "Your Campaign";
+  if (!campaign) return "Your Project";
   return resolveCampaignDisplayName(campaign);
 }

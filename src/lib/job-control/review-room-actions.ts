@@ -1,3 +1,4 @@
+import { feedbackStudio } from "@/config/feedback-studio";
 import type { CampaignRecord } from "@/config/studio-board";
 import { requiredClientDeliveryFileLabelsForJob, requiredDeliverablesForJob } from "@/lib/approved-plan-line";
 import { isClientOnly } from "@/lib/auth/roles";
@@ -406,7 +407,7 @@ export function applyReviewRoomPatch(
         if (!grant) {
           return {
             ok: false,
-            error: "All included correction rounds have been used.",
+            error: feedbackStudio.feedbackPanel.revisionLimitShort,
             status: 422,
             revisionLimitReached: true,
           };
@@ -571,8 +572,7 @@ export function applyReviewRoomPatch(
         job: currentJob,
         nextStatus: "approved",
         actor,
-        reason:
-          "Client approved for delivery — Studio release checks authorize Final Delivery when candidate matches",
+        reason: "You approved this version. The Studio is preparing your files for download.",
         occurredAt,
       });
       // Routine path: do NOT set ownerApprovalPending. Owner hold only via

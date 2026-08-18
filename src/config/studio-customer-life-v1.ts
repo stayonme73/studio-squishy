@@ -23,7 +23,7 @@ export const studioCustomerLifeV1 = {
     intakeNeeded:
       "Yes. We still need your Project Intake before we can produce your flyer.",
     materialsNeeded:
-      "Yes. The Studio still needs materials from you before this job can move forward. Uploaded is not the same as approved for use.",
+      "Yes. The Studio still needs materials from you before this project can move forward. Uploaded is not the same as approved for use.",
     nothingNeededNow:
       "The Studio record does not show anything waiting on you right now.",
     uploadReceived:
@@ -39,11 +39,11 @@ export const studioCustomerLifeV1 = {
     productionNotAssigned:
       "The project record does not show a production assignment yet.",
     qaPassed:
-      "Yes. Internal quality check is on the record as passed.",
+      "Yes. The Studio finished checking the flyer before Review opened.",
     qaFailed:
-      "Internal quality check is on the record, and it has not passed yet.",
+      "The Studio is still finishing the flyer before Review can open.",
     qaNotRecorded:
-      "The project record does not show an internal quality check yet. I will not guess.",
+      "The project record does not show that the flyer is ready for Review yet. I will not guess.",
     workNotStarted:
       "Production has not started on the Studio record yet. Payment can be confirmed while we are still getting the project ready or waiting on intake.",
     workStarted:
@@ -53,7 +53,7 @@ export const studioCustomerLifeV1 = {
     holdingIntake: "Project Intake is what is holding the next step.",
     holdingMaterials: "Required materials are what is holding the next step.",
     holdingRecovery: "The Studio is still finishing setup after payment. That is holding the next internal step, not a new charge.",
-    holdingQa: "The flyer is still in internal quality check before Review can open.",
+    holdingQa: "The Studio is still finishing the flyer before Review can open.",
     holdingProduction:
       "Work is underway on your flyer. It is not ready for Review yet.",
     holdingReview: "Nothing on our side is holding it. It is ready for you to review.",
@@ -79,9 +79,11 @@ export const studioCustomerLifeV1 = {
     newVersionNotReady:
       "A new version is not marked ready on the project record yet.",
     approvedVersionUnknown:
-      "The Studio record does not yet show an approved version identity.",
-    approvedVersion:
-      "The approved version is the exact file identity stored on the project record. An older version cannot replace it.",
+      "The Studio record does not yet show which version you approved.",
+    approvedVersion: (versionLabel: string) =>
+      `You approved ${versionLabel}. That is the exact version The Studio will prepare for delivery. An older version cannot replace it.`,
+    approvedVersionUnlabeled:
+      "You approved the version shown in Review. That is the exact version The Studio will prepare for delivery. An older version cannot replace it.",
     finalReady:
       "Your final files are ready in Final Delivery on your Studio Board.",
     finalNotReady:
@@ -94,11 +96,11 @@ export const studioCustomerLifeV1 = {
     statusAwaitingIntake:
       "Payment is confirmed. Project Intake is still needed before we can produce your flyer.",
     statusAwaitingMaterials:
-      "Payment is confirmed. The Studio still needs required materials from you before this job can move forward.",
+      "Payment is confirmed. The Studio still needs required materials from you before this project can move forward.",
     statusProductionReady:
       "Your project is set up. The Studio is preparing your flyer. It is not ready for Review yet.",
     statusQaCorrection:
-      "The flyer is still in internal quality check. Review is not open yet.",
+      "The Studio is still finishing the flyer. Review is not open yet.",
     statusReviewReady:
       "Your flyer is ready for Review. Open the Review Room from your Studio Board.",
     statusEmailRetryingSecondary:

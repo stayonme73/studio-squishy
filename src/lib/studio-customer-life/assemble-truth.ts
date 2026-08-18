@@ -20,6 +20,13 @@ function flyerJob(tasks: CustomerLifeInput["tasks"]) {
   return tasks?.jobRecords?.find((job) => job.skuId === "v2-rtu-flyer") ?? null;
 }
 
+/** Customer-visible Version N. Does not expose hashes, pins, or artifact ids. */
+export function customerFacingVersionLabel(raw: string | null | undefined): string | null {
+  if (!raw?.trim()) return null;
+  const match = raw.match(/v(?:ersion)?[\s-]*(\d+)/i);
+  return match ? `Version ${match[1]}` : raw;
+}
+
 function isReceivedMaterial(item: NonNullable<CustomerLifeInput["materials"]>[number]): boolean {
   if (item.contentKind === "file-metadata") {
     return item.uploadStatus === "stored" || item.reviewStatus === "approved_for_use";
@@ -325,11 +332,7 @@ export function assembleCustomerLifeTruth(
     job?.internalQaReviewAuthorization?.workVersionId ??
     [...flyerQa].reverse().find((record) => record.action === "qa_pass")?.workVersionId ??
     null;
-  const currentReviewVersionLabel = currentWorkVersionId
-    ? currentWorkVersionId.match(/v(?:ersion)?[\s-]*(\d+)/i)?.[1]
-      ? `Version ${currentWorkVersionId.match(/v(?:ersion)?[\s-]*(\d+)/i)![1]}`
-      : currentWorkVersionId
-    : null;
+  const currentReviewVersionLabel = customerFacingVersionLabel(currentWorkVersionId);
   const emphasis = campaign?.machineFlyerRevisionEmphasis;
   let revisionChangeApplied: boolean | null = null;
   if (emphasis) {
@@ -363,7 +366,9 @@ export function assembleCustomerLifeTruth(
     revisionRequested: spineStatus === "revision_requested",
     revisionAllowanceIncluded: included,
     revisionAllowanceRemaining: remaining >= 0 ? remaining : Math.max(0, included - used),
-    approvedVersionLabel: approval?.workVersionId ?? approval?.artifactIds?.[0] ?? null,
+    approvedVersionLabel: customerFacingVersionLabel(
+      approval?.workVersionId ?? approval?.artifactIds?.[0] ?? null,
+    ),
     approvedContentSha256: approval?.contentSha256s?.[0] ?? null,
     currentReviewVersionLabel,
     revisionChangeApplied,

@@ -1,3 +1,4 @@
+import { feedbackStudio } from "@/config/feedback-studio";
 import type { CampaignRecord } from "@/config/studio-board";
 import { findProductionPlanLineForJob } from "@/lib/approved-plan-line";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
@@ -66,7 +67,7 @@ export type ClientReviewView = {
 };
 
 export const CORRECTION_EXHAUSTED_WORDING =
-  "All included correction rounds have been used. You can still message the Studio about a problem or question. New creative changes may require additional scope.";
+  feedbackStudio.feedbackPanel.revisionLimitNotice;
 
 /** Active editable draft for a job (no submittedAt). */
 export function findActiveJobReviewFeedback(

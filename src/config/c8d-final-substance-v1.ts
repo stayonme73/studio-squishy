@@ -17,10 +17,10 @@ export const c8dFinalSubstanceV1 = {
       "Approved work is with The Studio for final preparation. Released download files are not confirmed yet.",
   },
   workReference: {
-    label: "Work in Final",
-    none: "No specific work item is selected for Final right now.",
+    label: "Approved work",
+    none: "No specific service is selected for Final right now.",
     requestedUnavailable:
-      "The requested work item is not available for Final right now. Showing project-level Final status.",
+      "The requested service is not available for Final right now. Showing project-level Final status.",
     versionUnavailable: "No version label is available for this work.",
   },
   customerAction: {

@@ -1,19 +1,19 @@
 /** Review Room V1 — mock concept options for customer selection. */
 
 export const reviewRoom = {
-  pageTitle: "Review Campaigns",
+  pageTitle: "Review Room",
   eyebrow: "Review Room",
   backLabel: "Back to Studio Board",
   intro:
-    "Your Studio team prepared three campaign directions. Review each option and choose the one that fits best.",
+    "Your Studio team prepared three directions. Review each option and choose the one that fits best.",
   selectCta: "Choose this direction",
   selectedBadge: "Selected direction",
   notReady: {
     title: "Not ready for review yet",
-    body: "Your campaign concepts will appear here when the Studio finishes building them.",
+    body: "Your work will appear here when the Studio finishes preparing it.",
   },
   noCampaign: {
-    title: "No campaign yet",
+    title: "No project yet",
     body: "Start a project in the Conversation Room to review work here.",
     cta: "Go to Studio Board",
   },

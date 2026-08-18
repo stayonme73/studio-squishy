@@ -1,3 +1,5 @@
+import { feedbackStudio } from "@/config/feedback-studio";
+
 import type { JobReviewFeedback } from "./review-feedback-types";
 import type { PurchasedJobRecord } from "./types";
 
@@ -89,7 +91,7 @@ export function canRequestJobRevision(input: {
   }
 
   if (input.revisionRoundsRemaining <= 0) {
-    reasons.push("All included correction rounds have been used.");
+    reasons.push(feedbackStudio.feedbackPanel.revisionLimitShort);
   }
 
   const hasRevisionSignal = hasClientRevisionIntent(input.feedback);

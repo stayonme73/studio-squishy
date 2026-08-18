@@ -78,6 +78,15 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     parkCheckpointNotClose: "e214b5f" as const,
     doNotAutoAdvance: true as const,
     doNotStartOwnerConsole: true as const,
+    nextSectionWaitsForScoutPackage: false as const,
+  },
+
+  room2Section3: {
+    packageId: "STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1",
+    sectionClosed: false as const,
+    parkForManager: true as const,
+    doNotAutoAdvance: true as const,
+    doNotStartOwnerConsole: true as const,
     nextSectionWaitsForScoutPackage: true as const,
   },
 

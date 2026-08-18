@@ -36,7 +36,7 @@ export const studioReviewRevisionFullLoopV1 = {
       "Approved. The Studio is preparing your final files from the exact version you approved.",
     reviewProofAlt: (businessName: string, versionLabel: string) =>
       `${businessName} flyer, ${versionLabel}.`,
-    proofRefsLabel: "Recorded versions",
+    proofRefsLabel: "Versions of this work",
     readyForReviewQuestion: "Is my flyer ready for me to review?",
     didYouMakeMyChange: "Did you make my requested change?",
     whichVersionAmILookingAt: "Which version am I looking at?",

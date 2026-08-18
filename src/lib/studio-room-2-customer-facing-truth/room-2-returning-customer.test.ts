@@ -45,7 +45,7 @@ describe("STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH
     expect(studioLaunchReadinessExecutionOrderV1.room2Section2.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section2.closeTip).toBe("e609203");
     expect(studioLaunchReadinessExecutionOrderV1.room2Section2.nextSectionWaitsForScoutPackage).toBe(
-      true,
+      false,
     );
     expect([...cfg.scopedSpine]).toEqual([
       "returning-client",

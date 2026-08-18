@@ -88,9 +88,15 @@ export function allowsFullCompletionLanguage(delivery: FinalDeliveryView): boole
   if (delivery.state !== "ready") return false;
   if (delivery.jobs.length === 0) return false;
   if (!delivery.allJobsDelivered) return false;
-  return delivery.jobs.every(
-    (job) => job.spineStatus === "delivered" && job.files.length >= 1,
-  );
+  return delivery.jobs.every((job) => {
+    const promised = job.completedDeliverables.length;
+    const released = job.files.length;
+    const spineReady =
+      job.spineStatus === "delivered" || job.spineStatus === "ready_for_delivery";
+    if (!spineReady) return false;
+    if (promised > 0) return released >= promised;
+    return released >= 1;
+  });
 }
 
 function latestDeliveryDate(

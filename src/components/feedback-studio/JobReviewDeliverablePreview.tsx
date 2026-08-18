@@ -10,6 +10,7 @@ import type {
   SectionReviewStatus,
 } from "@/config/feedback-studio";
 import { feedbackStudio, resolveFeedbackSectionLabel } from "@/config/feedback-studio";
+import { customerVisibleFileFormatLabel } from "@/config/deliverables";
 import { studioReviewRevisionFullLoopV1 } from "@/config/studio-review-revision-full-loop-v1";
 import type { ClientReviewDeliverable } from "@/lib/job-control/review-feedback-types";
 import { deliverableKeyToSectionId } from "@/lib/review-room-client";
@@ -175,7 +176,16 @@ export default function JobReviewDeliverablePreview({
                     {studioReviewRevisionFullLoopV1.customerCopy.proofRefsLabel}
                   </p>
                   <ul>
-                    {deliverable.proofFiles.map((file) => (
+                    {deliverable.proofFiles.map((file) => {
+                      const isCurrent = currentProof?.id === file.id;
+                      const versionState = isCurrent
+                        ? feedbackStudio.versionCompare.currentLabel
+                        : feedbackStudio.versionCompare.priorLabel;
+                      const formatLabel = customerVisibleFileFormatLabel(
+                        file.fileType,
+                        file.filename,
+                      );
+                      return (
                       <li key={file.id}>
                         {file.accessHref ? (
                           <a href={file.accessHref} target="_blank" rel="noreferrer">
@@ -185,10 +195,11 @@ export default function JobReviewDeliverablePreview({
                           <span>{file.filename}</span>
                         )}
                         <span>
-                          {file.fileType} · {file.versionLabel}
+                          {versionState} · {file.versionLabel} · {formatLabel}
                         </span>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 </div>
               ) : null}

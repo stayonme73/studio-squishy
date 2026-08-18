@@ -117,12 +117,12 @@ export const FEEDBACK_REVIEW_ONLY_SECTION_IDS = ["hero", "rationale"] as const s
 
 export const feedbackStudio = {
   pageTitle: "Review Room",
-  pageSubtitle: "Feedback Studio",
+  pageSubtitle: "Review your work",
   eyebrow: "REVIEW ROOM",
   backLabel: "Back to Studio Board",
-  pickerTitle: "Choose a campaign direction",
+  pickerTitle: "Choose a direction",
   pickerLead:
-    "Your Studio team prepared three distinct directions. Open each concept, review the full campaign preview, and leave feedback before you choose.",
+    "Your Studio team prepared three distinct directions. Open each concept, review the full preview, and leave feedback before you choose.",
   openConceptCta: "Review this direction",
   compareHint: "Three directions · one campaign · your decision",
   reviewBackLabel: "All directions",
@@ -137,18 +137,18 @@ export const feedbackStudio = {
     roundOf: (current: number, total: number) => `Review ${current} of ${total}`,
   },
 
-  /** C8c — finite correction-round accounting (ledger-derived). */
+  /** C8c — finite revision-round accounting (ledger-derived). Internal field names stay. */
   correctionAccounting: {
-    label: "Correction rounds",
+    label: "Revision rounds",
     included: "Included",
     used: "Used",
     remaining: "Remaining",
-    extraRemaining: "Extra owner-approved remaining",
-    includedUse: "Included correction",
-    ownerExtraUse: "Owner-authorized extra use",
+    extraRemaining: "Additional rounds remaining",
+    includedUse: "Included revision round",
+    ownerExtraUse: "Additional authorized round",
     versionFallback: "Version label not provided",
     historyItem: (ordinal: number, included: number) =>
-      `Correction ${ordinal} of ${Math.max(included, ordinal)}`,
+      `Revision ${ordinal} of ${Math.max(included, ordinal)}`,
     legacyNotice:
       "Prior usage was recorded before package history was available. Remaining rounds are limited by that provisional count.",
   },
@@ -162,9 +162,9 @@ export const feedbackStudio = {
   updateHistory: {
     label: "Update history",
     empty:
-      "Updates appear here after The Studio records activity for this job.",
+      "Updates appear here after The Studio records activity for this project.",
     unavailable:
-      "Update history is not available for this job yet.",
+      "Update history is not available for this project yet.",
     actionRequiredLabel: "Action needed",
     versionLabel: "Version",
   },
@@ -211,14 +211,15 @@ export const feedbackStudio = {
     versionCompare: "Version Compare",
     highlighter: "Highlighter",
     textComment: "Text Comment",
-    approveSection: "Approve Section",
-    requestRevision: "Request Revision",
+    approveSection: "Mark section as approved",
+    requestRevision: "Mark section for changes",
     skipSection: "Skip Section",
     submitFeedback: "Submit Feedback",
-    requestRevisionJob: "Request Revision",
-    approveForDelivery: "Approve for Delivery",
+    requestRevisionJob: "Request a revision",
+    approveForDelivery: "Approve this version",
     revisionLimitNotice:
-      "All included correction rounds have been used. You can still message the Studio about a problem or question. New creative changes may require additional scope.",
+      "All included revision rounds have been used. You can still message the Studio about a problem or question. New creative changes may require additional scope.",
+    revisionLimitShort: "All included revision rounds have been used.",
     submitted: "Feedback submitted — thank you.",
     stickyPlaceholder: "Write your note…",
     saveSticky: "Place note",
@@ -248,13 +249,14 @@ export const feedbackStudio = {
   },
 
   notReady: {
-    title: "Not ready for feedback yet",
-    body: "Your deliverables will appear here when the Studio finishes preparing them for review.",
+    title: "Not ready for review yet",
+    body: "Your work will appear here when the Studio finishes preparing it for review.",
   },
 
   jobReview: {
     pickerTitle: "Review your deliverables",
-    pickerLead: "Your Studio team prepared deliverables for your review. Open the review workspace to leave feedback.",
+    pickerLead:
+      "Look at the current version. You can ask a question, request a revision, or approve this version.",
     openReviewCta: "Open review",
     serviceLabel: "Service",
     deliverableReady: "Ready for review",
@@ -313,7 +315,7 @@ export const feedbackStudio = {
   },
 
   noCampaign: {
-    title: "No campaign yet",
+    title: "No project yet",
     body: "Start a project in the Conversation Room to review work here.",
     cta: "Go to Studio Board",
   },
@@ -324,7 +326,7 @@ export const feedbackStudio = {
       title: "No Active Project",
       message: "There isn't an active project ready for review.",
       messageSecondary:
-        "Start a new project in the Conversation Room, or return when your campaign reaches the Review stage.",
+        "Start a new project in the Conversation Room, or return when your project reaches the Review stage.",
       footnote: "Approved concepts will appear here when your project reaches the Review stage.",
       primaryCta: "GO TO CONVERSATION ROOM",
       secondaryCta: "Help Center",
@@ -336,7 +338,7 @@ export const feedbackStudio = {
       title: "Not Ready for Review Yet",
       message: "Your concepts aren't ready for review yet.",
       messageSecondary:
-        "The Studio is still preparing your campaign. Check your Studio Board for status — Review Room opens when concepts are ready.",
+        "The Studio is still preparing your project. Check your Studio Board for status — Review Room opens when work is ready.",
       footnote: "Approved concepts will appear here when your project reaches the Review stage.",
       primaryCta: "GO TO STUDIO BOARD",
       secondaryCta: "Help Center",

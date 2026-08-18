@@ -22,17 +22,17 @@ export const UNIFIED_ROOM_STATE_IDS = ["review", "final", "delivery"] as const;
 
 export const C8D_ROOM_STATE_COPY = {
   final: {
-    pageLead: "Final — the Studio is preparing final delivery for this work.",
+    pageLead: "Final — Review is complete. The Studio is preparing the files you will keep.",
     toolsUnavailable:
-      "REVIEW TOOLS are not available while the Studio prepares final delivery. You can still message The Studio.",
+      "Review tools are not available while the Studio prepares your files. You can still message The Studio.",
     workTitle: "Final",
     workLead:
-      "This work is approved for final delivery. The Studio is preparing the files you will keep. File downloads appear in Delivery when they are released.",
+      "This work is approved. The Studio is preparing the files you will keep. Downloads appear in Delivery when they are released.",
   },
   delivery: {
-    pageLead: "Delivery — truthful final files for this project.",
+    pageLead: "Delivery — download the files from the version you approved.",
     toolsUnavailable:
-      "REVIEW TOOLS are not used during Delivery. You can download released final files and still message The Studio.",
+      "Review tools are not used during Delivery. You can download released files and still message The Studio.",
     workTitle: "Delivery",
   },
   reviewToolsTitle: "REVIEW TOOLS",

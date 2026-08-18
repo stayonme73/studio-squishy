@@ -616,8 +616,9 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
       campaign,
       tasks: approved,
     });
-    expect(which.text).toMatch(/flyer-v1/);
-    expect(which.text).toMatch(/sha256:maya-approved/);
+    expect(which.text).toMatch(/Version 1/);
+    expect(which.text).not.toMatch(/sha256/i);
+    expect(which.text).not.toMatch(/flyer-v1/);
     expect(
       answerCustomerLifeQuestion("Where are my final files?", {
         campaign,
@@ -701,7 +702,7 @@ describe("STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1", () => {
       allDeliverablesPrepared: true,
     });
     expect(blocked.allowed).toBe(false);
-    expect(blocked.reasons.some((reason) => /included correction/i.test(reason))).toBe(true);
+    expect(blocked.reasons.some((reason) => /included revision/i.test(reason))).toBe(true);
   });
 
   it("answers Review version and applied-change questions from the Machine record", () => {

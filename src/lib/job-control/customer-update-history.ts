@@ -171,6 +171,9 @@ function mapDetail(event: JobActivityEvent): string | null {
   if (event.kind === "status_change" && event.spineStatus === "ready_for_review") {
     if (/review room/i.test(reason)) return null;
   }
+  if (/release checks|candidate matches|sha256|owner console|kitchen/i.test(reason)) {
+    return null;
+  }
   return reason;
 }
 

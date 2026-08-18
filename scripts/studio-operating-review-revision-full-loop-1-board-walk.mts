@@ -570,8 +570,8 @@ async function main(): Promise<number> {
       "maya_sees_real_flyer_version_and_actions",
       (await proofImg.count()) > 0 &&
         /Version 1/i.test(reviewText) &&
-        /Request Revision/i.test(reviewText) &&
-        /Approve for Delivery/i.test(reviewText)
+        /Request a revision/i.test(reviewText) &&
+        /Approve this version/i.test(reviewText)
         ? "PASS"
         : "FAIL",
       reviewText.slice(0, 280),
@@ -618,14 +618,14 @@ async function main(): Promise<number> {
     await forceClick(pageA.locator(".fs-feedback-panel__btn--revision"));
     await pageA.waitForTimeout(800);
     const jobRevision = pageA.locator(".fs-review__choose").getByRole("button", {
-      name: /Request Revision/i,
+      name: /Request a revision/i,
     });
     for (let i = 0; i < 20; i += 1) {
       if (await jobRevision.isEnabled()) break;
       await pageA.waitForTimeout(250);
     }
     await forceClick(jobRevision);
-    await pageA.getByRole("button", { name: /Submit request changes/i }).waitFor({
+    await pageA.getByRole("button", { name: /Send revision request/i }).waitFor({
       timeout: 15_000,
     });
     const revisionPatch = pageA.waitForResponse(
@@ -635,7 +635,7 @@ async function main(): Promise<number> {
         (res.request().postData() ?? "").includes("request_revision"),
       { timeout: 120_000 },
     );
-    await forceClick(pageA.getByRole("button", { name: /Submit request changes/i }));
+    await forceClick(pageA.getByRole("button", { name: /Send revision request/i }));
     const revisionResponse = await revisionPatch;
     if (!revisionResponse.ok()) {
       const body = await revisionResponse.text();
@@ -754,17 +754,17 @@ async function main(): Promise<number> {
       left.slice(0, 220),
     );
     const revisionJobBtn = pageA.locator(".fs-review__choose").getByRole("button", {
-      name: /Request Revision/i,
+      name: /Request a revision/i,
     });
     push(
       "second_included_revision_blocked",
       (await revisionJobBtn.isDisabled()) ? "PASS" : "FAIL",
-      "Job-level Request Revision is disabled after the included round.",
+      "Job-level Request a revision is disabled after the included round.",
     );
 
     await forceClick(pageA.locator(".fs-feedback-panel__btn--approve"));
     await pageA.waitForTimeout(800);
-    const jobApprove = pageA.getByRole("button", { name: /Approve for Delivery/i });
+    const jobApprove = pageA.getByRole("button", { name: /^Approve this version$/i });
     for (let i = 0; i < 24; i += 1) {
       if (await jobApprove.isEnabled()) break;
       await pageA.waitForTimeout(250);
@@ -772,11 +772,11 @@ async function main(): Promise<number> {
     if (!(await jobApprove.isEnabled())) {
       await shot(pageA, "05-approve-still-disabled");
       throw new Error(
-        `Approve for Delivery stayed disabled. Body: ${(await visibleText(pageA)).slice(0, 500)}`,
+        `Approve this version stayed disabled. Body: ${(await visibleText(pageA)).slice(0, 500)}`,
       );
     }
     await forceClick(jobApprove);
-    await pageA.getByRole("button", { name: /Submit approval/i }).waitFor({
+    await pageA.getByRole("button", { name: /Yes, approve this version/i }).waitFor({
       timeout: 15_000,
     });
     const approvalPatch = pageA.waitForResponse(
@@ -786,7 +786,7 @@ async function main(): Promise<number> {
         (res.request().postData() ?? "").includes("approve_for_delivery"),
       { timeout: 120_000 },
     );
-    await forceClick(pageA.getByRole("button", { name: /Submit approval/i }));
+    await forceClick(pageA.getByRole("button", { name: /Yes, approve this version/i }));
     const approvalResponse = await approvalPatch;
     if (!approvalResponse.ok()) {
       const body = await approvalResponse.text();

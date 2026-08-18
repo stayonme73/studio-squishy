@@ -1,5 +1,6 @@
 "use client";
 
+import { customerVisibleFileFormatLabel } from "@/config/deliverables";
 import { feedbackStudio } from "@/config/feedback-studio";
 import type { VersionCompareProof } from "@/lib/job-control/version-compare";
 import { resolveVersionCompareSelection } from "@/lib/job-control/version-compare";
@@ -74,7 +75,7 @@ function ProofPane({
           )}
         </p>
         <p className="fs-version-compare__meta">
-          {proof.versionLabel} · {proof.fileType}
+          {proof.versionLabel} · {customerVisibleFileFormatLabel(proof.fileType, proof.filename)}
         </p>
         <p className="fs-version-compare__meta">
           {feedbackStudio.versionCompare.recordedLabel} {formatProofDate(proof.addedAt)}

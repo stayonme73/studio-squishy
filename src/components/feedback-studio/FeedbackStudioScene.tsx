@@ -117,7 +117,7 @@ export default function FeedbackStudioScene() {
   if (jobIdParam && pageState === "job-review" && review) {
     return (
       <FeedbackStudioLayout>
-        <div className="fs-page utility-page fs-page--review" aria-label="Job review workspace">
+          <div className="fs-page utility-page fs-page--review" aria-label="Review workspace">
           <UtilityPageHeader
             backHref={studioBoard.routes.studioBoard}
             activeNav="review-room"

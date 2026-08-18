@@ -372,5 +372,74 @@ describe("allowsFullCompletionLanguage", () => {
         }),
       ),
     ).toBe(true);
+
+    expect(
+      allowsFullCompletionLanguage(
+        delivery({
+          allJobsDelivered: true,
+          jobs: [
+            jobView({
+              jobId: "j1",
+              serviceName: "Flyer",
+              spineStatus: "ready_for_delivery",
+              completedDeliverables: ["Print-ready PDF", "Digital PNG"],
+              files: [
+                {
+                  id: "pdf",
+                  deliverableLabel: "Print-ready PDF",
+                  fileName: "flyer.pdf",
+                  fileType: "application/pdf",
+                  url: "/pdf",
+                  useInstructions: null,
+                  addedAt: "2026-06-28T12:00:00.000Z",
+                  versionLabel: "Version 1",
+                  releasedAt: "2026-06-28T12:00:00.000Z",
+                },
+                {
+                  id: "png",
+                  deliverableLabel: "Digital PNG",
+                  fileName: "flyer.png",
+                  fileType: "image/png",
+                  url: "/png",
+                  useInstructions: null,
+                  addedAt: "2026-06-28T12:00:00.000Z",
+                  versionLabel: "Version 1",
+                  releasedAt: "2026-06-28T12:00:00.000Z",
+                },
+              ],
+            }),
+          ],
+        }),
+      ),
+    ).toBe(true);
+
+    expect(
+      allowsFullCompletionLanguage(
+        delivery({
+          allJobsDelivered: true,
+          jobs: [
+            jobView({
+              jobId: "j1",
+              serviceName: "Flyer",
+              spineStatus: "ready_for_delivery",
+              completedDeliverables: ["Print-ready PDF", "Digital PNG"],
+              files: [
+                {
+                  id: "png",
+                  deliverableLabel: "Digital PNG",
+                  fileName: "flyer.png",
+                  fileType: "image/png",
+                  url: "/png",
+                  useInstructions: null,
+                  addedAt: "2026-06-28T12:00:00.000Z",
+                  versionLabel: "Version 1",
+                  releasedAt: "2026-06-28T12:00:00.000Z",
+                },
+              ],
+            }),
+          ],
+        }),
+      ),
+    ).toBe(false);
   });
 });

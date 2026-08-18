@@ -1,6 +1,6 @@
 import type { CampaignRecord } from "@/config/studio-board";
 import { findProductionPlanLineForJob } from "@/lib/approved-plan-line";
-import { customerVisiblePurchaseLabelsForSku } from "@/lib/studio-review-revision/flyer-purchase-delivery-truth";
+import { clientDeliveryFileLabelsForSku } from "@/lib/studio-review-revision/flyer-purchase-delivery-truth";
 
 import { canClientAccessJobDelivery, isJobDeliveredToClient } from "./final-delivery-access";
 import type { JobClientDeliveryFile, PurchasedJobRecord } from "./types";
@@ -61,7 +61,7 @@ function completedDeliverablesForJob(
 ): string[] {
   const line = findProductionPlanLineForJob(campaign, job);
   const labels = line?.deliverables ? [...line.deliverables] : [];
-  return [...customerVisiblePurchaseLabelsForSku(job.skuId, labels)];
+  return [...clientDeliveryFileLabelsForSku(job.skuId, labels)];
 }
 
 function resolveJobDeliveryView(
@@ -110,10 +110,19 @@ export function resolveFinalDeliveryView(
     return { ...base, state: "preparing", campaignName: campaign.campaignName };
   }
 
-  const hasDeliveredJobs = visibleJobs.some((job) => job.spineStatus === "delivered");
+  const hasDeliveredJobs = visibleJobs.some(
+    (job) => job.spineStatus === "delivered" || job.spineStatus === "ready_for_delivery",
+  );
   const campaignJobs = jobs.filter((job) => job.campaignId === campaign.campaignId);
   const allJobsDelivered =
-    campaignJobs.length > 0 && campaignJobs.every((job) => job.spineStatus === "delivered");
+    campaignJobs.length > 0 &&
+    campaignJobs.every((job) => {
+      if (job.spineStatus === "delivered") return true;
+      if (job.spineStatus !== "ready_for_delivery") return false;
+      return (job.clientDeliveryFiles ?? []).some((file) =>
+        clientDeliveryFileIsReleased(job, file),
+      );
+    });
 
   return {
     state: "ready",

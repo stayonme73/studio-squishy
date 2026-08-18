@@ -40,7 +40,7 @@ export default function FeedbackStudioSubmitConfirm({
         <h2 id="fs-submit-confirm-title" className="fs-submit-confirm__title">
           {copy.title}
         </h2>
-        <p className="fs-submit-confirm__lead">{copy.lead}</p>
+        <p className="fs-submit-confirm__lead">{copy.lead(versionLabel)}</p>
         <dl className="fs-receipt__list">
           <div className="fs-receipt__row">
             <dt>Version</dt>

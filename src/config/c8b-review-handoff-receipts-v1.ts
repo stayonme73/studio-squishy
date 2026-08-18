@@ -15,18 +15,20 @@ export const c8bReviewHandoffReceiptsV1 = {
     currentPrefix: "Current",
   },
   confirmRevision: {
-    title: "Confirm request changes",
-    lead: "Review what will be submitted with this request.",
-    actionLabel: "Request changes",
-    confirmCta: "Submit request changes",
-    cancelCta: "Keep editing",
-    emptyNotice: "No feedback notes or section decisions are included yet.",
+    title: "Confirm revision request",
+    lead: (versionLabel: string) =>
+      `You are requesting a revision of ${versionLabel}. This uses one included revision round.`,
+    actionLabel: "Request a revision",
+    confirmCta: "Send revision request",
+    cancelCta: "Keep reviewing",
+    emptyNotice: "No notes or section change marks are included yet.",
   },
   confirmApproval: {
     title: "Confirm approval",
-    lead: "You are approving the reviewed version for delivery.",
-    actionLabel: "Approve for delivery",
-    confirmCta: "Submit approval",
+    lead: (versionLabel: string) =>
+      `You are approving ${versionLabel}. This is the version The Studio will prepare for delivery.`,
+    actionLabel: "Approve this version",
+    confirmCta: "Yes, approve this version",
     cancelCta: "Keep reviewing",
   },
   lockedPackage: {
