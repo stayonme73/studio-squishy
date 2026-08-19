@@ -1,6 +1,6 @@
 /**
  * Room 4 — Full business rehearsal.
- * PARK for Manager. Do not auto-start Room 5.
+ * CLOSED at 9f9ac7c. Room 4 continues as 4B. Do not auto-start Room 5.
  *
  * Room 3 CLOSED at cd2a1e2. Room 2 CLOSED. Room 1 complete except deferred
  * domain/email at d6974eb. Do not reopen earlier rooms unless this rehearsal
@@ -19,7 +19,8 @@ export const studioRoom4FullBusinessRehearsalV1 = {
   merge: "separately_authorized" as const,
   ownerRoutine: "NONE" as const,
   parkForManager: true as const,
-  sectionClosed: false as const,
+  sectionClosed: true as const,
+  closeTip: "9f9ac7c" as const,
   roomClosed: false as const,
   doNotAutoAdvance: true as const,
   doNotStartRoom5: true as const,

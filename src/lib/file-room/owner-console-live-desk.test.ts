@@ -44,6 +44,12 @@ describe("owner-console-live-desk", () => {
     expect(classifyOwnerConsoleCampaignForLiveDesk("maya-r4-live-1787179086434")).toBe(
       "stored_historical_evidence",
     );
+    expect(classifyOwnerConsoleCampaignForLiveDesk("nia-r4b-live-1")).toBe(
+      "stored_historical_evidence",
+    );
+    expect(classifyOwnerConsoleCampaignForLiveDesk("nia-room4b-cert-old")).toBe(
+      "stored_historical_evidence",
+    );
     expect(shouldAppearOnLiveOwnerDesk("p3-cert-j12")).toBe(false);
   });
 

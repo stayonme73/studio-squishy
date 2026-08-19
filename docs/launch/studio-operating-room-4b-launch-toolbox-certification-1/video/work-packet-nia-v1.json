@@ -1,0 +1,75 @@
+{
+  "workPacketId": "nia-r4b-video-1787183222186",
+  "workPacketVersion": "wp-nia-v1",
+  "storyboardVersion": "sb-nia-v1",
+  "scriptVersionId": "nia-r4b-narration-1787183222186",
+  "campaignId": "nia-r4b-live-1787183222186",
+  "skuId": "v2-rtu-short-video",
+  "label": "Nia Fall Reset short-form candidate — NOT Board-certified until customer wire + Owner visual pass",
+  "durationMinSeconds": 22,
+  "durationMaxSeconds": 27,
+  "durationTargetSeconds": 24.61,
+  "aspectRatio": "vertical",
+  "width": 1080,
+  "height": 1920,
+  "exportFormat": "mp4",
+  "musicAllowed": false,
+  "stockAllowed": false,
+  "productionMethod": "shotstack",
+  "productionRoleOwner": "creative_production",
+  "voiceArtifact": {
+    "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/voice/nia-r4b-live-1787183222186/ap-001_nia-r4b-narration-1787183222186_0348497f413f.mp3",
+    "contentSha256": "0348497f413f31de5ec9d3566ba241c8825e8068cd0f88c535d8de80262263ec"
+  },
+  "exportRelativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/nia-fall-reset-1787183222186.mp4",
+  "ctaCaptionSceneNumber": 5,
+  "primaryCtaText": "Enroll in Fall Reset",
+  "requiredShotstackEnv": "v1",
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "assetId": "nia-beat-1",
+      "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-01-brand.png",
+      "startSeconds": 0,
+      "endSeconds": 2.954,
+      "caption": "Fall Reset",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 2,
+      "assetId": "nia-beat-2",
+      "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-02-offer.png",
+      "startSeconds": 2.954,
+      "endSeconds": 8.368,
+      "caption": "Fall Reset",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 3,
+      "assetId": "nia-beat-3",
+      "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-03-dates.png",
+      "startSeconds": 8.368,
+      "endSeconds": 13.291,
+      "caption": "September 9",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 4,
+      "assetId": "nia-beat-4",
+      "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-04-benefits.png",
+      "startSeconds": 13.291,
+      "endSeconds": 18.214,
+      "caption": "Weekly coaching",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 5,
+      "assetId": "nia-beat-5",
+      "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-05-cta.png",
+      "startSeconds": 18.214,
+      "endSeconds": 24.613,
+      "caption": "Enroll in Fall Reset",
+      "captionPresentation": "overlay"
+    }
+  ]
+}

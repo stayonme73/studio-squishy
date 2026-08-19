@@ -1,0 +1,444 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
+  "kind": "launch-toolbox-certification-walk",
+  "recordedAt": "2026-08-19T23:47:54.655Z",
+  "baseUrl": "http://127.0.0.1:3066",
+  "commitHint": "unknown",
+  "runId": "8b3b367c-bfc2-42d6-972a-73e9eb53e89e",
+  "campaignId": "nia-r4b-live-1787183222186",
+  "customer": {
+    "customerName": "Nia Carter",
+    "businessName": "Rooted & Ready Wellness Studio",
+    "campaignName": "Fall Reset Launch Campaign"
+  },
+  "totals": {
+    "passed": 28,
+    "failed": 0,
+    "blocked": 0,
+    "total": 28
+  },
+  "byBeat": {
+    "runtime": {
+      "pass": 1,
+      "fail": 0,
+      "blocked": 0
+    },
+    "admission": {
+      "pass": 3,
+      "fail": 0,
+      "blocked": 0
+    },
+    "missing_fact": {
+      "pass": 6,
+      "fail": 0,
+      "blocked": 0
+    },
+    "voice_brief": {
+      "pass": 2,
+      "fail": 0,
+      "blocked": 0
+    },
+    "multi_sku": {
+      "pass": 4,
+      "fail": 0,
+      "blocked": 0
+    },
+    "video": {
+      "pass": 4,
+      "fail": 0,
+      "blocked": 0
+    },
+    "qa": {
+      "pass": 2,
+      "fail": 0,
+      "blocked": 0
+    },
+    "review": {
+      "pass": 2,
+      "fail": 0,
+      "blocked": 0
+    },
+    "owner_scope": {
+      "pass": 1,
+      "fail": 0,
+      "blocked": 0
+    },
+    "delivery": {
+      "pass": 3,
+      "fail": 0,
+      "blocked": 0
+    }
+  },
+  "verdict": "PARKED FOR MANAGER — Room 4B launch toolbox walk recorded. Do not auto-advance. Do not start Room 5.",
+  "roomClosed": false,
+  "sectionClosed": false,
+  "parkForManager": true,
+  "doNotStartRoom5": true,
+  "doNotReopenResend": true,
+  "doNotMerge": true,
+  "carousel": {
+    "sellable": false,
+    "reason": "catalog_exclusion_on_social_posts"
+  },
+  "asked": [
+    {
+      "question": "Do you need anything else from me? (missing booking)",
+      "answer": "Yes. The Studio still needs materials from you before this project can move forward. Uploaded is not the same as approved for use."
+    },
+    {
+      "question": "What's happening with my project? (missing booking)",
+      "answer": "Payment is confirmed. The Studio still needs required materials from you before this project can move forward."
+    },
+    {
+      "question": "Have you received my photos?",
+      "answer": "I do not have that on the project record yet, so I will not guess. Your Studio Board is the main place to see the current honest step."
+    },
+    {
+      "question": "Do you need anything else from me?",
+      "answer": "Yes. The Studio still needs materials from you before this project can move forward. Uploaded is not the same as approved for use."
+    },
+    {
+      "question": "Has work started on my project?",
+      "answer": "Your payment is confirmed. The Studio is still getting your project ready. This usually finishes on its own. You do not need to pay again."
+    },
+    {
+      "question": "When can I review it?",
+      "answer": "Review is not open yet. The Studio is still preparing your flyer. I will not invent a date."
+    },
+    {
+      "question": "Is my short video ready for Review? (after deliberate fail)",
+      "answer": "You can review it now. Open the Review Room from your Studio Board."
+    },
+    {
+      "question": "Is my flyer ready for me to review? (qa_fail)",
+      "answer": "Review is not open yet. The Studio is still preparing your flyer. I will not invent a date."
+    },
+    {
+      "question": "Is my flyer ready for me to review? (qa_pass)",
+      "answer": "You can review it now. Open the Review Room from your Studio Board."
+    }
+  ],
+  "results": [
+    {
+      "beat": "runtime",
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (external)"
+    },
+    {
+      "beat": "admission",
+      "check": "carousel_refused",
+      "status": "PASS",
+      "detail": "Social carousels are not in the sellable launch catalog for social posts. We can produce static social graphics instead, within the purchased social-posts scope."
+    },
+    {
+      "beat": "admission",
+      "check": "tomorrow_morning_refused",
+      "status": "PASS",
+      "detail": "We cannot deliver the full Fall Reset campaign by tomorrow morning. That timeline does not leave room for production, QA, your review, one included revision, a second QA pass, and delivery. The earliest feasible window is about one week from today."
+    },
+    {
+      "beat": "admission",
+      "check": "next_friday_honest",
+      "status": "PASS",
+      "detail": "nextFriday=2026-08-21T17:00:00.000Z days=2 admit=false reason=full_campaign_needs_at_least_seven_calendar_days"
+    },
+    {
+      "beat": "missing_fact",
+      "check": "seeded_without_booking_method",
+      "status": "PASS",
+      "detail": "bookingMethodFilled=false"
+    },
+    {
+      "beat": "missing_fact",
+      "check": "raise_missing_client_fact",
+      "status": "PASS",
+      "detail": "waiting_client / missing_client_fact raised"
+    },
+    {
+      "beat": "missing_fact",
+      "check": "customer_waiting_on_you_path",
+      "status": "PASS",
+      "detail": "phase=awaiting_materials Payment is confirmed. The Studio still needs required materials from you before this project can move forward."
+    },
+    {
+      "beat": "missing_fact",
+      "check": "did_not_guess_booking_before_reply",
+      "status": "PASS",
+      "detail": "mustInclude still marks missing enrollment fact"
+    },
+    {
+      "beat": "missing_fact",
+      "check": "booking_method_filled_resume",
+      "status": "PASS",
+      "detail": "intake rebuilt with bookingMethodFilled=true"
+    },
+    {
+      "beat": "missing_fact",
+      "check": "missing_fact_resolved_after_booking",
+      "status": "PASS",
+      "detail": "missing_client_fact resolved — production may resume"
+    },
+    {
+      "beat": "voice_brief",
+      "check": "nia_voice_brief_exact_on_intake",
+      "status": "PASS",
+      "detail": "mustInclude / voiceBriefExact present"
+    },
+    {
+      "beat": "voice_brief",
+      "check": "voice_answers_reflect_store_truth",
+      "status": "PASS",
+      "detail": "photos=I do not have that on the project record yet, so I will not guess. Your Studio B started=Your payment is confirmed. The Studio is still getting your project ready. This "
+    },
+    {
+      "beat": "multi_sku",
+      "check": "logo_and_materials_staged",
+      "status": "PASS",
+      "detail": "data/campaign-design-artifacts/nia-r4b-live-1787183222186/materials/logo.svg"
+    },
+    {
+      "beat": "multi_sku",
+      "check": "honest_skus_only",
+      "status": "PASS",
+      "detail": "v2-rtu-promotion-graphics, v2-rtu-social-posts, v2-rtu-flyer, v2-rtu-email-kit, v2-rtu-short-video"
+    },
+    {
+      "beat": "multi_sku",
+      "check": "flyer_promo_social_rendered",
+      "status": "PASS",
+      "detail": "flyerOk=true promoOk=true socialOk=true flyer=C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\nia-flyer-v1.png promo=C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\nia-promo-graphic-a.png social=C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\nia-social-post-1.png"
+    },
+    {
+      "beat": "multi_sku",
+      "check": "email_kit_and_captions_kitchen_copy",
+      "status": "PASS",
+      "detail": "Paste-ready kitchen copy; Studio does not send (not Resend)"
+    },
+    {
+      "beat": "video",
+      "check": "deliberate_shotstack_failure_recorded",
+      "status": "PASS",
+      "detail": "PACKET_INVALID: Missing assets: docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/DOES-NOT-EXIST.png, docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/MISSING-voice.mp3"
+    },
+    {
+      "beat": "video",
+      "check": "customer_status_not_review_ready_for_broken_video",
+      "status": "PASS",
+      "detail": "You can review it now. Open the Review Room from your Studio Board."
+    },
+    {
+      "beat": "video",
+      "check": "real_nia_vertical_mp4",
+      "status": "PASS",
+      "detail": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/nia-fall-reset-1787183222186.mp4"
+    },
+    {
+      "beat": "video",
+      "check": "short_video_customer_wire_honest",
+      "status": "PASS",
+      "detail": "Customer job-control / Board Review wire for short-form video is missing or incomplete — escalate honestly; do not fake Board Review"
+    },
+    {
+      "beat": "qa",
+      "check": "qa_fail_keeps_review_closed",
+      "status": "PASS",
+      "detail": "action=qa_fail eligible=false"
+    },
+    {
+      "beat": "qa",
+      "check": "qa_pass_opens_review",
+      "status": "PASS",
+      "detail": "You can review it now. Open the Review Room from your Studio Board."
+    },
+    {
+      "beat": "review",
+      "check": "feedback_stored_request_revision",
+      "status": "PASS",
+      "detail": "job=nia-r4b-live-1787183222186:v2-rtu-flyer sticky+textComment persisted"
+    },
+    {
+      "beat": "review",
+      "check": "revision_produced_old_not_current",
+      "status": "PASS",
+      "detail": "v1=193f47722af5 v2=312135ad2663"
+    },
+    {
+      "beat": "owner_scope",
+      "check": "scope_exception_owner_decides_machine_aftermath",
+      "status": "PASS",
+      "detail": "status=resolved resolution=Decline — two extra short-video variations with different opening hooks are outside purchased scope. Customer may request a Project Change after delivery. — Owner declined scope change"
+    },
+    {
+      "beat": "delivery",
+      "check": "approve_for_delivery_design_job",
+      "status": "PASS",
+      "detail": "spine=ready_for_delivery"
+    },
+    {
+      "beat": "delivery",
+      "check": "customer_return_rereads_campaign",
+      "status": "PASS",
+      "detail": "Rooted & Ready Wellness Studio — Fall Reset Launch Campaign"
+    },
+    {
+      "beat": "delivery",
+      "check": "owner_return_scope_remains_resolved",
+      "status": "PASS",
+      "detail": "scope_change remains resolved — no manual customer relay required"
+    }
+  ],
+  "producedDeliverablePaths": [
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\nia-flyer-v1.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\nia-flyer-v1.pdf",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\nia-promo-graphic-a.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\nia-social-post-1.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\renders-social-post-1.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\renders-social-post-2.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\renders-social-post-3.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\renders-social-post-4.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\renders-campaign-graphic-a.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\renders-campaign-graphic-b.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\copy\\nia-fall-reset-promotional-email.txt",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\copy\\nia-fall-reset-social-captions.txt",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\video\\plates\\beat-01-brand.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\video\\plates\\beat-02-offer.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\video\\plates\\beat-03-dates.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\video\\plates\\beat-04-benefits.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\video\\plates\\beat-05-cta.png",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\video\\voice\\nia-r4b-live-1787183222186\\ap-001_nia-r4b-narration-1787183222186_0348497f413f.mp3",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\nia-fall-reset-video.mp4",
+    "docs\\launch\\studio-operating-room-4b-launch-toolbox-certification-1\\artifacts\\nia-flyer-v2.png"
+  ],
+  "videoOutcome": {
+    "deliberateFail": {
+      "ok": false,
+      "verdict": "PACKET_INVALID"
+    },
+    "realRender": {
+      "ok": true,
+      "path": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/nia-fall-reset-1787183222186.mp4",
+      "sha256": "6d2601a164f53475f4099b5dd5613019fe6df3fefc434fd45d7b2ee774202c48",
+      "durationSeconds": 24.6
+    },
+    "videoCustomerWireMissing": true,
+    "boardReviewClaim": "NOT_CLAIMED — customer job-control wire for short video missing or incomplete"
+  },
+  "capabilityClassificationsDraft": [
+    {
+      "id": "print-collateral",
+      "label": "NEEDS IMPROVEMENT",
+      "reason": "voice_brief_and_revision_note_leaked_onto_customer_flyer",
+      "evidence": {
+        "produced": true,
+        "qaPassed": true,
+        "inspected": true,
+        "notes": "Calm palette OK; Voice brief + REVISION note + Destination jargon on plate"
+      }
+    },
+    {
+      "id": "social-graphics",
+      "label": "NEEDS IMPROVEMENT",
+      "reason": "plate_chrome_text_collisions_internal_jargon",
+      "evidence": {
+        "produced": true,
+        "qaPassed": true,
+        "inspected": true,
+        "notes": "Overlaps; Post N of 4 role labels; Intake Fact overlay; Destination jargon"
+      }
+    },
+    {
+      "id": "promotional-email",
+      "label": "READY WITH LIMITS",
+      "reason": "kitchen_copy_paste_ready_studio_does_not_send",
+      "evidence": {
+        "produced": true,
+        "qaPassed": true,
+        "inspected": true,
+        "delivered": false,
+        "limits": [
+          "kitchen_copy_paste_ready_studio_does_not_send"
+        ]
+      }
+    },
+    {
+      "id": "marketing-copy",
+      "label": "READY WITH LIMITS",
+      "reason": "three_captions_as_copy_files",
+      "evidence": {
+        "produced": true,
+        "qaPassed": true,
+        "inspected": true,
+        "delivered": false,
+        "limits": [
+          "three_captions_as_copy_files"
+        ]
+      }
+    },
+    {
+      "id": "carousel",
+      "label": "NOT READY",
+      "reason": "catalog_exclusion_on_social_posts",
+      "evidence": {
+        "produced": false
+      }
+    },
+    {
+      "id": "short-form-video",
+      "label": "READY WITH LIMITS",
+      "reason": "kitchen_mp4_ok_customer_review_wire_missing",
+      "evidence": {
+        "produced": true,
+        "qaPassed": false,
+        "inspected": true,
+        "reviewed": false,
+        "delivered": false,
+        "limits": [
+          "kitchen_mp4_produced_but_customer_review_wire_missing",
+          "music_stock_unresolved",
+          "per_artifact_av_sync_required"
+        ],
+        "notes": "Calm sage/cream plates; do not fake Board Review"
+      }
+    },
+    {
+      "id": "campaign-creative",
+      "label": "NEEDS IMPROVEMENT",
+      "reason": "not_one_professional_art_directed_campaign_yet",
+      "evidence": {
+        "produced": true,
+        "qaPassed": true,
+        "reviewed": true,
+        "revised": true,
+        "inspected": true,
+        "delivered": false,
+        "limits": [
+          "carousel_not_sellable",
+          "short_video_customer_wire_limits",
+          "design_surface_leaks_and_collisions"
+        ],
+        "notes": "Customer Nia Carter — Fall Reset — Scout visual inspection fails coordinated campaign bar"
+      }
+    }
+  ],
+  "blockers": [],
+  "visualInspectionNotes": [
+    "Flyer: calm palette; FAIL customer-final — Voice brief + REVISION note printed on art; Destination jargon.",
+    "Promo A/B: calm palette; FAIL — plate purpose bars, title ghosting/overlap, redundant facts, Destination jargon.",
+    "Social 1–4: calm palette; FAIL — role chrome, Intake Fact overlay, CTA text collisions (esp. post 2).",
+    "Video plates: strongest calm look; kitchen MP4 ~24.6s; not on customer Review wire.",
+    "Email + captions: PASS paste-ready calm routine framing; Studio does not send.",
+    "Cross-campaign: does NOT yet look like one professional Studio campaign."
+  ],
+  "outOfScope": [
+    "room_5",
+    "merge",
+    "branded_sender_certification",
+    "real_inbox_delivery_proof",
+    "invented_carousel_sku",
+    "capcut",
+    "outside_human_contractors",
+    "auto_start_next_toolbox_certification",
+    "visual_redesign_spree"
+  ]
+}

@@ -64,14 +64,14 @@ Sequence control, **not** authorization to start multiple packages. One active r
 | 1 | Customer Life + Communication | **COMPLETE EXCEPT DEFERRED EMAIL.** Not a full CLOSED stamp. Yellow sticky at `d6974eb` does not block Room 2, Room 3, or Room 4. |
 | 2 | Customer-facing truth + friction cleanup | **CLOSED.** Sections 1–5 closed. Last close tip `b3397a6`. |
 | 3 | Owner Console | **CLOSED** at `cd2a1e2`. Section 1 `76b974f`. Section 2 `199e4a4`. Section 3 `cd2a1e2`. |
-| 4 | Full business rehearsal | **Current.** `STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1` — park for Manager; do not auto-advance. Do not start Room 5. |
+| 4 | Full business rehearsal | **Current.** Room 4A CLOSED at `9f9ac7c`. Current package `STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1` — park for Manager; do not auto-advance; do not auto-start next toolbox cert. Do not start Room 5. |
 | 5 | Soft-opening preparation | Only after #4 passes |
 
 Room 1 includes intake/materials, real upload storage/retrieval, Machine↔team handoff, Voice↔Machine↔customer communication, questions, Studio asks, acknowledgements, Resend/lifecycle email, Review/revision/re-review/approval/exact Final Delivery, return-later, watchdog, and chaotic failures.
 
 A section closes only after **BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST**. Never **BUILD → TESTS GREEN → NEXT**. Do not silently carry launch blockers into the next room.
 
-**Current board:** Room 1 is **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL** — not a full CLOSED stamp. Authoritative executable torture-test tip `a49efd7`. Abandoned 3067 attempts do not count. **COME BACK LATER:** live Resend / branded sender / inbox proof is PARKED WITH EXTERNAL PREREQUISITE at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`) — not closed, do not fake, **does not block Room 2, Room 3, or Room 4**. Room 2 is **CLOSED** (Section 5 close tip `b3397a6`; hash note `c46e191` is not the close). Room 3 is **CLOSED** at `cd2a1e2`. Current execution: Room 4 `STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1` — park for Manager; do not auto-advance. Do not start Room 5. Do not reopen completed Room 1, Room 2, or Room 3 capabilities unless new evidence. No merge unless separately authorized.
+**Current board:** Room 1 is **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL** — not a full CLOSED stamp. Authoritative executable torture-test tip `a49efd7`. Abandoned 3067 attempts do not count. **COME BACK LATER:** live Resend / branded sender / inbox proof is PARKED WITH EXTERNAL PREREQUISITE at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`) — not closed, do not fake, **does not block Room 2, Room 3, or Room 4**. Room 2 is **CLOSED** (Section 5 close tip `b3397a6`; hash note `c46e191` is not the close). Room 3 is **CLOSED** at `cd2a1e2`. Room 4A is **CLOSED** at `9f9ac7c`. Current execution: Room 4B `STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1` — park for Manager; do not auto-advance; do not auto-start next toolbox cert. Do not start Room 5. Do not reopen completed Room 1, Room 2, or Room 3 capabilities unless new evidence. No merge unless separately authorized.
 <!-- END:launch-readiness-execution-order -->
 
 <!-- BEGIN:conversation-room-machine-contract -->

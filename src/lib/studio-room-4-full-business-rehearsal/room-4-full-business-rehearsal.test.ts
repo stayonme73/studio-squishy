@@ -6,11 +6,11 @@ import { shouldExceptionKindAppearOnSequentialDesk } from "@/lib/campaign-tasks/
 import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer";
 
 describe("STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1", () => {
-  it("locks Room 4 as the current execution room and does not start Room 5", () => {
+  it("locks Room 4A closed and keeps Room 4 active without starting Room 5", () => {
     expect(cfg.packageId).toBe("STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1");
     expect(cfg.room).toBe(4);
-    expect(cfg.sectionClosed).toBe(false);
-    expect(cfg.parkForManager).toBe(true);
+    expect(cfg.sectionClosed).toBe(true);
+    expect(cfg.closeTip).toBe("9f9ac7c");
     expect(cfg.doNotStartRoom5).toBe(true);
     expect(cfg.doNotReopenResend).toBe(true);
     expect(cfg.priorRooms.room3CloseTip).toBe("cd2a1e2");
@@ -21,8 +21,17 @@ describe("STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1", () => {
     );
     expect(studioLaunchReadinessExecutionOrderV1.room3Section3.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room3Section3.closeTip).toBe("cd2a1e2");
-    expect(studioLaunchReadinessExecutionOrderV1.room4.packageId).toBe(cfg.packageId);
+    expect(studioLaunchReadinessExecutionOrderV1.room4A.packageId).toBe(cfg.packageId);
+    expect(studioLaunchReadinessExecutionOrderV1.room4A.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room4A.closeTip).toBe("9f9ac7c");
+    expect(studioLaunchReadinessExecutionOrderV1.room4.packageId).toBe(
+      "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
+    );
+    expect(studioLaunchReadinessExecutionOrderV1.room4B.packageId).toBe(
+      "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
+    );
     expect(studioLaunchReadinessExecutionOrderV1.room4.doNotStartRoom5).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room4.room4AClosedAt).toBe("9f9ac7c");
   });
 
   it("reuses Maya flyer on the certified renderer path and keeps Owner as judgment only", () => {

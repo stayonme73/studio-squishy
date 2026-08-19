@@ -6,7 +6,7 @@
  * Tagia 2026-08-17: Room 1 stays technically open solely for deferred
  * domain/email. That sticky does not block entering Room 2 or Room 3.
  * Tagia 2026-08-18: Room 2 CLOSED.
- * Tagia 2026-08-19: Room 3 CLOSED at cd2a1e2. Current execution is Room 4.
+ * Tagia 2026-08-19: Room 3 CLOSED at cd2a1e2. Room 4A CLOSED at 9f9ac7c. Current execution is Room 4B.
  */
 
 export const studioLaunchReadinessExecutionOrderV1 = {
@@ -153,12 +153,35 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     nextSectionWaitsForScoutPackage: false as const,
   },
 
+  /** Room 4A CLOSED at 9f9ac7c. Current Room 4 work is 4B. */
   room4: {
-    packageId: "STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1",
+    packageId: "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
     sectionClosed: false as const,
     parkForManager: true as const,
     doNotAutoAdvance: true as const,
     doNotStartRoom5: true as const,
+    doNotRebuild: true as const,
+    nextSectionWaitsForScoutPackage: true as const,
+    room4AClosedAt: "9f9ac7c" as const,
+  },
+
+  room4A: {
+    packageId: "STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1",
+    sectionClosed: true as const,
+    closeTip: "9f9ac7c" as const,
+    parkForManager: false as const,
+    doNotAutoAdvance: true as const,
+    doNotStartRoom5: true as const,
+    doNotRebuild: true as const,
+  },
+
+  room4B: {
+    packageId: "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
+    sectionClosed: false as const,
+    parkForManager: true as const,
+    doNotAutoAdvance: true as const,
+    doNotStartRoom5: true as const,
+    doNotAutoStartNextCertification: true as const,
     doNotRebuild: true as const,
     nextSectionWaitsForScoutPackage: true as const,
   },

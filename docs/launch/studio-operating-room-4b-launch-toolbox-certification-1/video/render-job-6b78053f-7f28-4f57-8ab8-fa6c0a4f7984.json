@@ -1,0 +1,40 @@
+{
+  "jobId": "9a1d883b-8a54-4a58-99dc-7d13f7dfdfa7",
+  "provider": "shotstack",
+  "providerRenderId": "6b78053f-7f28-4f57-8ab8-fa6c0a4f7984",
+  "campaignId": "nia-r4b-live-1787182985923",
+  "skuId": "v2-rtu-short-video",
+  "workPacketId": "nia-r4b-video-1787182985923",
+  "workPacketVersion": "wp-nia-v1",
+  "storyboardVersion": "sb-nia-v1",
+  "scriptVersionId": "nia-r4b-narration-1787182985923",
+  "status": "done",
+  "submittedAt": "2026-08-19T23:43:51.604Z",
+  "completedAt": "2026-08-19T23:44:09.811Z",
+  "requestHash": "54de1452a4951651e5d3bb86548d268fbb814c537f0460f1f6f71d278f6040e4",
+  "outputUrl": "https://shotstack-api-v1-output.s3-ap-southeast-2.amazonaws.com/9kngo12mih/6b78053f-7f28-4f57-8ab8-fa6c0a4f7984.mp4",
+  "retryCount": 0,
+  "requestedWidth": 1080,
+  "requestedHeight": 1920,
+  "requestedAspect": "9:16",
+  "requestedDurationTargetSeconds": 26.47,
+  "outputFormat": "mp4",
+  "sourceAssetPaths": [
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-01-brand.png",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-02-offer.png",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-03-dates.png",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-04-benefits.png",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-05-cta.png",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/voice/nia-r4b-live-1787182985923/ap-001_nia-r4b-narration-1787182985923_590813f0418f.mp3"
+  ],
+  "sourceAssetHashes": {
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-01-brand.png": "2a9ac1342138a1727d0074c0373feb79315a72246de1d7736ea2a9231d8ed90d",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-02-offer.png": "21212d6a7adee1e4af83f1122a6ff44b040c0d92b462328f235b986c569842af",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-03-dates.png": "25a82a36e7c040a45dff1cb0ba814d7fd829caf30c634884c25070d7caff99e7",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-04-benefits.png": "469826a3beece33c4af12440b5b0def8122013a48bc0fc50e3a59fc0a8afff43",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/beat-05-cta.png": "9f89da50750ad12374b277bec430b3a6a2d3f5bf60a50727f1adf35589f6b4a0",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/voice/nia-r4b-live-1787182985923/ap-001_nia-r4b-narration-1787182985923_590813f0418f.mp3": "590813f0418f5513ea4c6237b4afb05fec519f8161b19194b8bb07a3d3157b72"
+  },
+  "voiceArtifactPath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/voice/nia-r4b-live-1787182985923/ap-001_nia-r4b-narration-1787182985923_590813f0418f.mp3",
+  "voiceArtifactSha256": "590813f0418f5513ea4c6237b4afb05fec519f8161b19194b8bb07a3d3157b72"
+}
