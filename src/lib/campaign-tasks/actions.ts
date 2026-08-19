@@ -78,6 +78,10 @@ import {
   type OwnerDecisionFolderPatchBody,
 } from "./owner-decision-folder-dispatch";
 import {
+  applyCompleteInternalOwnerFollowUp,
+  type InternalOwnerFollowUpOutcome,
+} from "./owner-decision-internal-return";
+import {
   applyOwnerAskTeamDirectionDisagreement,
   applyOwnerAssignDirectionDisagreement,
   applyOwnerConfirmDirectionDisagreement,
@@ -306,6 +310,15 @@ export type TasksPatchBody =
       assignToUserId: string;
       ownerNotes?: string;
       note?: string;
+    }
+  | {
+      action: "complete_internal_owner_follow_up";
+      exceptionId?: string;
+      interactionId?: string;
+      jobId?: string;
+      note: string;
+      outcome: InternalOwnerFollowUpOutcome;
+      resolutionNotes?: string;
     }
   | {
       action: "owner_apply_project_change_scope";
@@ -1480,6 +1493,21 @@ export function applyTaskPatch(
       );
       if (!result.ok) return result;
       return { ok: true, envelope: result.envelope, exception: result.exception };
+    }
+    case "complete_internal_owner_follow_up": {
+      const result = applyCompleteInternalOwnerFollowUp(
+        envelope,
+        body,
+        user,
+        context.assignments,
+        context.materials,
+      );
+      if (!result.ok) return result;
+      return {
+        ok: true,
+        envelope: result.envelope,
+        exception: "exception" in result ? result.exception : undefined,
+      };
     }
     case "approve_client_request": {
       if (!context.materialsEnvelope) {

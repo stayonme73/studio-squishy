@@ -104,6 +104,13 @@ export default function FileRoomOwnerControlRoomPanels({ controlRoom }: Props) {
         <p className="fr-control-room__section-lead">
           {OWNER_CONTROL_ROOM_SECTION.needsCommunicationLead}
         </p>
+        {process.env.NODE_ENV !== "development" ? (
+          <p className="fr-tasks-empty__body">
+            Launch operations use Studio Board and the Owner Console decision desk. Branded email
+            transport remains deferred until domain certification resumes.
+          </p>
+        ) : (
+          <>
         {communicationError ? (
           <p className="fr-exceptions__error" role="alert">
             {communicationError}
@@ -147,6 +154,8 @@ export default function FileRoomOwnerControlRoomPanels({ controlRoom }: Props) {
               </li>
             ))}
           </ul>
+        )}
+          </>
         )}
       </FileRoomSectionCard>
 

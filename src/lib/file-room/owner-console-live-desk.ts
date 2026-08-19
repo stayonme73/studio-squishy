@@ -29,6 +29,7 @@ const STORED_EVIDENCE_ID_PREFIXES = [
   "room3-s1-",
   "room3-s2-",
   "room3-s2w-",
+  "room3-s2c-",
   "room3-live-price-",
   "room3-live-ask-",
   "room3-live-hold-",

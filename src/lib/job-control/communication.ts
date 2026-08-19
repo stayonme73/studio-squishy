@@ -133,6 +133,18 @@ export const AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES = [
   "refund_issued",
 ] as const satisfies readonly JobCommunicationEventType[];
 
+/** In-app Board notices — delivered immediately; not an Owner send chore. */
+const IN_APP_IMMEDIATE_EVENT_TYPES = new Set<JobCommunicationEventType>([
+  "owner_ask_client",
+  "owner_decision_recorded",
+]);
+
+function defaultDeliveryStatus(
+  eventType: JobCommunicationEventType,
+): JobCommunicationDeliveryStatus {
+  return IN_APP_IMMEDIATE_EVENT_TYPES.has(eventType) ? "sent" : "pending_owner_send";
+}
+
 export type EnqueueJobCommunicationInput = {
   campaign?: CampaignRecord;
   clientId: string;
@@ -209,7 +221,7 @@ function communicationLabel(eventType: JobCommunicationEventType): string {
 function deliveryStatusLabel(status: JobCommunicationDeliveryStatus): string {
   switch (status) {
     case "pending_owner_send":
-      return "Pending owner send";
+      return "Queued in Studio";
     case "sent":
       return "Sent";
     case "delivery_failed":
@@ -257,7 +269,7 @@ export function enqueueJobCommunicationRecord(
     sender,
     reason,
     messageContent,
-    deliveryStatus: input.deliveryStatus ?? "pending_owner_send",
+    deliveryStatus: input.deliveryStatus ?? defaultDeliveryStatus(input.eventType),
     createdAt: occurredAt,
     updatedAt: occurredAt,
     activityEventId: activityEventId(id),
@@ -378,8 +390,11 @@ export function markJobCommunicationTestSent(
 export function resolveNeedsCommunicationQueue(
   records: readonly JobCommunicationRecord[] | undefined,
 ): NeedsCommunicationQueueItem[] {
+  const lifecycleSet = new Set<string>(AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES);
   return (records ?? [])
     .filter((record) => record.deliveryStatus !== "cancelled")
+    .filter((record) => lifecycleSet.has(record.eventType))
+    .filter((record) => !IN_APP_IMMEDIATE_EVENT_TYPES.has(record.eventType))
     .map((record) => ({
       id: record.id,
       campaignId: record.campaignId,

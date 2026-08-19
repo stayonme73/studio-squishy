@@ -16,6 +16,12 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (!isOwnerUser(user)) {
     return NextResponse.json({ error: "Owner role required." }, { status: 403 });
   }
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { error: "Test-send is development certification residue only." },
+      { status: 404 },
+    );
+  }
 
   const { campaignId, communicationId } = await context.params;
   const campaignEnvelope = await readCampaignEnvelope(campaignId);

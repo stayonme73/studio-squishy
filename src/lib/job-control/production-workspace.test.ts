@@ -486,6 +486,7 @@ describe("production workspace handoff actions", () => {
     expect(held.ok).toBe(true);
     if (!held.ok) return;
     expect(held.job.ownerApprovalPending).toBeNull();
+    expect(held.job.ownerInternalResumeGate).toBe("before_review");
     expect(held.job.internalNotes?.some((note) => note.content.includes("Owner hold"))).toBe(true);
 
     const askTeam = applyProductionWorkspacePatch(
@@ -500,6 +501,7 @@ describe("production workspace handoff actions", () => {
     expect(askTeam.ok).toBe(true);
     if (!askTeam.ok) return;
     expect(askTeam.job.ownerApprovalPending).toBeNull();
+    expect(askTeam.job.ownerInternalResumeGate).toBe("before_review");
     expect(askTeam.job.internalNotes?.some((note) => note.content.includes("ask-team"))).toBe(
       true,
     );

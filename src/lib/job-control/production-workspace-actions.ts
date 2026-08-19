@@ -890,7 +890,10 @@ export function applyProductionWorkspacePatch(
         return { ok: false, error: "A hold note is required.", status: 400 };
       }
 
-      job = clearOwnerReviewGatePending(job, occurredAt);
+      job = {
+        ...clearOwnerReviewGatePending(job, occurredAt),
+        ownerInternalResumeGate: "before_review",
+      };
 
       const noted = appendOwnerInternalNote(
         job,
@@ -924,7 +927,10 @@ export function applyProductionWorkspacePatch(
         return { ok: false, error: "A note for the team is required.", status: 400 };
       }
 
-      job = clearOwnerReviewGatePending(job, occurredAt);
+      job = {
+        ...clearOwnerReviewGatePending(job, occurredAt),
+        ownerInternalResumeGate: "before_review",
+      };
 
       const noted = appendOwnerInternalNote(
         job,
@@ -1131,7 +1137,10 @@ export function applyProductionWorkspacePatch(
         return { ok: false, error: "A hold note is required.", status: 400 };
       }
 
-      job = clearOwnerReviewGatePending(job, occurredAt);
+      job = {
+        ...clearOwnerReviewGatePending(job, occurredAt),
+        ownerInternalResumeGate: "before_delivery",
+      };
 
       const noted = appendOwnerInternalNote(
         job,
@@ -1165,7 +1174,10 @@ export function applyProductionWorkspacePatch(
         return { ok: false, error: "A note for the team is required.", status: 400 };
       }
 
-      job = clearOwnerReviewGatePending(job, occurredAt);
+      job = {
+        ...clearOwnerReviewGatePending(job, occurredAt),
+        ownerInternalResumeGate: "before_delivery",
+      };
 
       const noted = appendOwnerInternalNote(
         job,

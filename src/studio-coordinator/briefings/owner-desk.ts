@@ -491,7 +491,7 @@ export function resolveOwnerComplianceHoldPostDecisionBriefing(
     case "owner_assign_compliance_hold":
       return {
         destination: "waiting_internal",
-        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the assignee. This folder left your desk — The Studio will return it when the team completes follow-up and your judgment is still required. ${ownerConfirmationSuffix()}`,
       };
     default:
       return {
@@ -523,7 +523,7 @@ export function resolveOwnerDirectionDisagreementPostDecisionBriefing(
     case "owner_assign_direction_disagreement":
       return {
         destination: "waiting_internal",
-        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the assignee. This folder left your desk — The Studio will return it when the team completes follow-up and your judgment is still required. ${ownerConfirmationSuffix()}`,
       };
     default:
       return {
@@ -560,7 +560,7 @@ export function resolveOwnerDeadlinePostDecisionBriefing(
     case "owner_assign_deadline":
       return {
         destination: "waiting_internal",
-        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the assignee. This folder left your desk — The Studio will return it when the team completes follow-up and your judgment is still required. ${ownerConfirmationSuffix()}`,
       };
     default:
       return {
@@ -602,7 +602,7 @@ export function resolveOwnerRevisionPostDecisionBriefing(
     case "owner_assign_revision":
       return {
         destination: "waiting_internal",
-        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the assignee. This folder left your desk — The Studio will return it when the team completes follow-up and your judgment is still required. ${ownerConfirmationSuffix()}`,
       };
     default:
       return {
@@ -649,7 +649,7 @@ export function resolveOwnerScopePostDecisionBriefing(
     case "owner_assign_scope_change":
       return {
         destination: "waiting_internal",
-        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the assignee. This folder left your desk — The Studio will return it when the team completes follow-up and your judgment is still required. ${ownerConfirmationSuffix()}`,
       };
     default:
       return {
@@ -696,7 +696,7 @@ export function resolveOwnerPricingPostDecisionBriefing(
     case "owner_assign_pricing_exception":
       return {
         destination: "waiting_internal",
-        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the assignee. This folder left your desk — The Studio will return it when the team completes follow-up and your judgment is still required. ${ownerConfirmationSuffix()}`,
       };
     default:
       return {
@@ -777,7 +777,7 @@ export function resolveOwnerComplaintPostDecisionBriefing(
     case "owner_assign_complaint":
       return {
         destination: "waiting_internal",
-        message: `Routed to the assignee. This folder left your desk — it will not return here unless re-raised. ${ownerConfirmationSuffix()}`,
+        message: `Routed to the assignee. This folder left your desk — The Studio will return it when the team completes follow-up and your judgment is still required. ${ownerConfirmationSuffix()}`,
       };
     case "owner_decline_complaint_escalation":
       return {
@@ -898,7 +898,7 @@ export function resolveOwnerPostDecisionBriefing(
       return {
         destination: "waiting_internal",
         message:
-          "Routed to the assignee's Team Office. This folder left your desk — it will not return here.",
+          "Routed to the assignee's Team Office. This folder left your desk — The Studio will return it when follow-up is complete and your judgment is still required.",
       };
     case "decline_promotion":
       return {

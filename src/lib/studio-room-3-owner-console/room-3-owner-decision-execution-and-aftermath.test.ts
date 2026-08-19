@@ -13,7 +13,9 @@ import {
   applyOwnerAllowRevision,
   applyOwnerDeclinePricingException,
   applyOwnerHoldPricingException,
+  applyOwnerAskTeamPricingException,
 } from "@/lib/campaign-tasks/owner-decision-folder-actions";
+import { applyCompleteInternalOwnerFollowUp } from "@/lib/campaign-tasks/owner-decision-internal-return";
 import {
   applyReturnOwnerAsksOnCustomerReply,
   ensureOwnerAskClientFollowUp,
@@ -354,7 +356,7 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1", () 
           sender: { role: "owner", userId: owner.id, displayName: "Tagia" },
           reason: "The Studio needs something from you",
           messageContent: "Please confirm the headline before review.",
-          deliveryStatus: "pending_owner_send",
+          deliveryStatus: "sent",
           createdAt: now,
           updatedAt: now,
           activityEventId: "act-1",
@@ -476,6 +478,113 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1", () 
         "Need the quote before I can decide. — Owner ask-client information (pricing): Please confirm the $69 flyer quote.",
       ),
     ).toBe("Please confirm the $69 flyer quote.");
+  });
+
+  it("returns an Owner-held folder to waiting_owner after internal follow-up", () => {
+    const held = applyOwnerHoldPricingException(
+      envelope([exception("pricing_exception")]),
+      { exceptionId: "exc-pricing_exception", note: "Need quote screenshot." },
+      owner,
+      assignments,
+    );
+    expect(held.ok).toBe(true);
+    if (!held.ok) return;
+
+    const returned = applyCompleteInternalOwnerFollowUp(
+      held.envelope,
+      {
+        exceptionId: "exc-pricing_exception",
+        note: "Found the quote screenshot in intake.",
+        outcome: "needs_owner_judgment",
+      },
+      owner,
+      assignments,
+    );
+    expect(returned.ok).toBe(true);
+    if (!returned.ok) return;
+    expect(returned.exception?.status).toBe("waiting_owner");
+    expect(
+      returned.envelope.exceptionEvents?.some((event) => event.action === "returned_to_owner"),
+    ).toBe(true);
+
+    const replay = applyCompleteInternalOwnerFollowUp(
+      returned.envelope,
+      {
+        exceptionId: "exc-pricing_exception",
+        note: "Duplicate update.",
+        outcome: "needs_owner_judgment",
+      },
+      owner,
+      assignments,
+    );
+    expect(replay.ok).toBe(true);
+  });
+
+  it("returns an Owner ask-team folder after internal follow-up", () => {
+    const asked = applyOwnerAskTeamPricingException(
+      envelope([exception("pricing_exception")]),
+      { exceptionId: "exc-pricing_exception", note: "Confirm margin with finance." },
+      owner,
+      assignments,
+    );
+    expect(asked.ok).toBe(true);
+    if (!asked.ok) return;
+    expect(asked.exception.status).toBe("waiting_internal");
+
+    const returned = applyCompleteInternalOwnerFollowUp(
+      asked.envelope,
+      {
+        exceptionId: "exc-pricing_exception",
+        note: "Finance confirmed the $69 quote is valid.",
+        outcome: "needs_owner_judgment",
+      },
+      owner,
+      assignments,
+    );
+    expect(returned.ok).toBe(true);
+    if (!returned.ok) return;
+    expect(returned.exception?.status).toBe("waiting_owner");
+  });
+
+  it("blocks deterministic resolve without Owner on owner-held pricing exceptions", () => {
+    const held = applyOwnerHoldPricingException(
+      envelope([exception("pricing_exception")]),
+      { exceptionId: "exc-pricing_exception", note: "Need quote screenshot." },
+      owner,
+      assignments,
+    );
+    expect(held.ok).toBe(true);
+    if (!held.ok) return;
+
+    const blocked = applyCompleteInternalOwnerFollowUp(
+      held.envelope,
+      {
+        exceptionId: "exc-pricing_exception",
+        note: "Team thinks this is fine now.",
+        outcome: "resolved_without_owner",
+      },
+      owner,
+      assignments,
+    );
+    expect(blocked.ok).toBe(false);
+    if (blocked.ok) return;
+    expect(blocked.status).toBe(422);
+  });
+
+  it("queues in-app Owner notices as sent transport, not pending_owner_send", () => {
+    const approved = applyOwnerApprovePricingException(
+      envelope([exception("pricing_exception")]),
+      { exceptionId: "exc-pricing_exception", ownerNotes: "Honor quote." },
+      owner,
+      assignments,
+    );
+    expect(approved.ok).toBe(true);
+    if (!approved.ok) return;
+    const record = approved.envelope.jobCommunicationRecords?.find(
+      (row) => row.eventType === "owner_decision_recorded",
+    );
+    expect(record?.deliveryStatus).toBe("sent");
+    expect(record?.channel).toBe("in_app_outbox");
   });
 });
 

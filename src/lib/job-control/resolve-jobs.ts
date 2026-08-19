@@ -211,6 +211,7 @@ export function buildPurchasedJobRecord(
     returnLane: leftWaitingTray ? undefined : persisted?.returnLane,
     ownerApprovalPending: persisted?.ownerApprovalPending ?? null,
     ownerAskResumeGate: persisted?.ownerAskResumeGate ?? null,
+    ownerInternalResumeGate: persisted?.ownerInternalResumeGate ?? null,
     nonRefundable:
       persisted?.nonRefundable ??
       Boolean(productionStarted || persisted?.productionStartedAt),

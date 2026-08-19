@@ -440,11 +440,11 @@ async function main(): Promise<number> {
   const askName = `Room 3 Ask ${stamp}`;
   const holdName = `Room 3 Hold ${stamp}`;
   const refundName = `Room 3 Refund ${stamp}`;
-  const priceId = `room3-s2w-price-${stamp}`;
-  const declineId = `room3-s2w-decline-${stamp}`;
-  const askId = `room3-s2w-ask-${stamp}`;
-  const holdId = `room3-s2w-hold-${stamp}`;
-  const refundId = `room3-s2w-refund-${stamp}`;
+  const priceId = `room3-s2c-price-${stamp}`;
+  const declineId = `room3-s2c-decline-${stamp}`;
+  const askId = `room3-s2c-ask-${stamp}`;
+  const holdId = `room3-s2c-hold-${stamp}`;
+  const refundId = `room3-s2c-refund-${stamp}`;
 
   await seedPricingException(created.user.id, priceId, priceName, "Quoted flyer price exception");
   await seedPricingException(created.user.id, declineId, declineName, "Quoted flyer price to decline");
@@ -642,6 +642,7 @@ async function main(): Promise<number> {
     lastDialog = "";
     if (openedHold && (await holdBtn.count()) > 0) {
       await holdBtn.click();
+      await waitForDecisionCarried(page);
       await page.waitForTimeout(800);
     }
     push(
@@ -651,6 +652,67 @@ async function main(): Promise<number> {
         : "FAIL",
       lastDialog.slice(0, 220) || "Hold confirm dialog was empty",
       await shot(page, "06-hold-folder"),
+    );
+
+    const holdTasks = (await (
+      await page.request.get(`${BASE}/api/campaigns/${encodeURIComponent(holdId)}/tasks`)
+    ).json()) as {
+      exceptionRecords?: Array<{ id: string; status: string; kind: string }>;
+    };
+    const holdException = holdTasks.exceptionRecords?.find(
+      (entry) => entry.kind === "pricing_exception" && entry.status === "waiting_internal",
+    );
+    const internalReturn = holdException
+      ? await page.request.patch(`${BASE}/api/campaigns/${encodeURIComponent(holdId)}/tasks`, {
+          data: {
+            action: "complete_internal_owner_follow_up",
+            exceptionId: holdException.id,
+            note: "Found the original $69 quote screenshot in intake files.",
+            outcome: "needs_owner_judgment",
+          },
+          headers: { "Content-Type": "application/json" },
+        })
+      : null;
+    push(
+      "hold_internal_follow_up_recorded",
+      internalReturn?.ok() ? "PASS" : "FAIL",
+      holdException
+        ? `complete_internal_owner_follow_up ${internalReturn?.status() ?? "missing"}`
+        : "No waiting_internal pricing exception after hold",
+    );
+
+    await openOwnerConsole(page);
+    const returnedHold = await openNamedFolder(page, holdName);
+    push(
+      "hold_returns_to_owner_after_internal_follow_up",
+      returnedHold ? "PASS" : "FAIL",
+      returnedHold ? `${holdName} ready for Owner again` : `${holdName} did not return`,
+      await shot(page, "06b-hold-returned"),
+    );
+
+    if (returnedHold) {
+      const approveHold = page.getByRole("button", { name: /Approve pricing exception/i }).first();
+      if ((await approveHold.count()) > 0) {
+        await approveHold.click();
+        await waitForDecisionCarried(page);
+      }
+    }
+
+    const internalReplay = holdException
+      ? await page.request.patch(`${BASE}/api/campaigns/${encodeURIComponent(holdId)}/tasks`, {
+          data: {
+            action: "complete_internal_owner_follow_up",
+            exceptionId: holdException.id,
+            note: "Duplicate stale-tab update.",
+            outcome: "needs_owner_judgment",
+          },
+          headers: { "Content-Type": "application/json" },
+        })
+      : null;
+    push(
+      "internal_return_replay_idempotent",
+      internalReplay?.ok() ? "PASS" : "FAIL",
+      `replay status ${internalReplay?.status() ?? "missing"}`,
     );
 
     const openedRefund = await openNamedFolder(page, refundName);

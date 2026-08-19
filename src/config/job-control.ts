@@ -10,7 +10,7 @@ export const OWNER_CONTROL_ROOM_SECTION = {
   ownerDeskEmpty: "No decisions waiting — production can proceed without Owner action.",
   needsCommunicationTitle: "Needs Communication",
   needsCommunicationLead:
-    "Internal outbox records for client notices. Test-send only — no live email automation.",
+    "Development-only lifecycle-email transport queue. Not part of launch Owner operations.",
   needsCommunicationEmpty: "No client communication waiting.",
   needsCommunicationTestSendLabel: "Mark test-sent",
   needsCommunicationTestSentLabel: "Test sent",

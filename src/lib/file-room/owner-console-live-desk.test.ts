@@ -35,6 +35,9 @@ describe("owner-console-live-desk", () => {
     expect(classifyOwnerConsoleCampaignForLiveDesk("room3-s2w-price-oldwalk")).toBe(
       "stored_historical_evidence",
     );
+    expect(classifyOwnerConsoleCampaignForLiveDesk("room3-s2c-hold-newwalk")).toBe(
+      "stored_historical_evidence",
+    );
     expect(shouldAppearOnLiveOwnerDesk("p3-cert-j12")).toBe(false);
   });
 
