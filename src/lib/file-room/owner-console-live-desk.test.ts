@@ -7,7 +7,7 @@ import {
 
 describe("owner-console-live-desk", () => {
   it("keeps current live work on the desk", () => {
-    expect(classifyOwnerConsoleCampaignForLiveDesk("room3-live-refund-abc")).toBe(
+    expect(classifyOwnerConsoleCampaignForLiveDesk("owner-live-desk-now")).toBe(
       "live_owner_work",
     );
     expect(shouldAppearOnLiveOwnerDesk("maya-brooks-cedar")).toBe(true);
@@ -30,6 +30,9 @@ describe("owner-console-live-desk", () => {
       "stored_historical_evidence",
     );
     expect(classifyOwnerConsoleCampaignForLiveDesk("room3-s1-refund-old")).toBe(
+      "stored_historical_evidence",
+    );
+    expect(classifyOwnerConsoleCampaignForLiveDesk("room3-s2w-price-oldwalk")).toBe(
       "stored_historical_evidence",
     );
     expect(shouldAppearOnLiveOwnerDesk("p3-cert-j12")).toBe(false);

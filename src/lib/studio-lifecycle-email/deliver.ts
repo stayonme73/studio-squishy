@@ -5,8 +5,10 @@
 
 import { studioResendLifecycleAndWatchdogV1 as cfg } from "@/config/studio-resend-lifecycle-and-watchdog-v1";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
-import { applyJobCommunicationTransportResult } from "@/lib/job-control/communication";
-import { isJobControlTemplateCommunicationEventType } from "@/lib/studio-kitchen-comms/outbox-disposition";
+import {
+  applyJobCommunicationTransportResult,
+  AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES,
+} from "@/lib/job-control/communication";
 import { sendTransactionalEmail } from "@/lib/transactional-email";
 import type {
   SendTransactionalEmailResult,
@@ -40,7 +42,9 @@ export function isAuthorizedLifecycleNotice(
   if (record.deliveryStatus === "cancelled" || record.deliveryStatus === "test_sent") {
     return false;
   }
-  return isJobControlTemplateCommunicationEventType(record.eventType);
+  return (AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES as readonly string[]).includes(
+    record.eventType,
+  );
 }
 
 export function isLifecycleTransportDue(

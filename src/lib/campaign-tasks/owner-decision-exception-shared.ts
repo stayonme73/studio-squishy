@@ -15,6 +15,11 @@ import {
 } from "./exceptions";
 import type { CampaignExceptionKind, CampaignExceptionRecord } from "./exceptions-types";
 import { CAMPAIGN_TASKS_SCHEMA_VERSION } from "./plan-change";
+import {
+  applyOwnerAskClientAftermath,
+  applyOwnerResolvedDecisionAftermath,
+  customerMessageForResolvedOwnerDecision,
+} from "./owner-decision-aftermath";
 import type { ServerTasksEnvelope } from "./types";
 
 export function mergeOwnerNotes(
@@ -56,6 +61,20 @@ export function requireOwnerExceptionGate(
   if (!isOpenExceptionStatus(record.status)) {
     return { ok: false, error: "Exception is not open.", status: 422 };
   }
+  if (record.status === "waiting_client") {
+    return {
+      ok: false,
+      error: "This folder is waiting on the client. It will return to your desk when they reply.",
+      status: 422,
+    };
+  }
+  if (record.status === "waiting_internal") {
+    return {
+      ok: false,
+      error: "This folder is on an internal hold or team follow-up. That is not an approve or decline.",
+      status: 422,
+    };
+  }
   if (record.status !== "waiting_owner" && record.status !== "open") {
     return { ok: false, error: `${waitingLabel} is not waiting on Owner.`, status: 422 };
   }
@@ -68,7 +87,7 @@ export function applyOwnerResolveExceptionDecision(
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
 ): ExceptionActionResult {
-  return applyResolveException(
+  const result = applyResolveException(
     envelope,
     {
       exceptionId: payload.exceptionId,
@@ -77,6 +96,17 @@ export function applyOwnerResolveExceptionDecision(
     user,
     assignments,
   );
+  if (!result.ok) return result;
+  return {
+    ok: true,
+    envelope: applyOwnerResolvedDecisionAftermath(
+      result.envelope,
+      result.exception,
+      user,
+      customerMessageForResolvedOwnerDecision(result.exception),
+    ),
+    exception: result.exception,
+  };
 }
 
 export function applyOwnerHoldExceptionDecision(
@@ -118,7 +148,7 @@ export function applyOwnerHoldExceptionDecision(
     campaignId: envelope.campaignId,
     user,
     actorRole,
-    action: "assigned",
+    action: "held",
     notes: combinedNotes,
     statusAfter: "waiting_internal",
   });
@@ -303,17 +333,19 @@ export function applyOwnerAskClientExceptionDecision(
     campaignId: envelope.campaignId,
     user,
     actorRole,
-    action: "assigned",
+    action: "asked_client",
     notes: combinedNotes,
+    resolutionNotes: clientMessage,
     statusAfter: "waiting_client",
   });
 
   const records = upsertExceptionRecord(envelope.exceptionRecords, updated);
   const events = appendExceptionEvent(envelope.exceptionEvents, event);
+  const withAsk = withOwnerDecisionEnvelope(envelope, records, events);
 
   return {
     ok: true,
-    envelope: withOwnerDecisionEnvelope(envelope, records, events),
+    envelope: applyOwnerAskClientAftermath(withAsk, updated, clientMessage, user),
     exception: updated,
   };
 }

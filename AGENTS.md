@@ -63,7 +63,7 @@ Sequence control, **not** authorization to start multiple packages. One active r
 |---|------|------------|
 | 1 | Customer Life + Communication | **COMPLETE EXCEPT DEFERRED EMAIL.** Not a full CLOSED stamp. Yellow sticky at `d6974eb` does not block Room 2 or Room 3. |
 | 2 | Customer-facing truth + friction cleanup | **CLOSED.** Sections 1–5 closed. Last close tip `b3397a6`. |
-| 3 | Owner Console | **Current.** Section 1 `STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1` — park for Manager; do not auto-advance. |
+| 3 | Owner Console | **Current.** Section 1 CLOSED at `76b974f`. Section 2 `STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1` — park for Manager; do not auto-advance. |
 | 4 | Full business rehearsal | Only after #3 is closed |
 | 5 | Soft-opening preparation | Only after #4 passes |
 
@@ -71,7 +71,7 @@ Room 1 includes intake/materials, real upload storage/retrieval, Machine↔team 
 
 A section closes only after **BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST**. Never **BUILD → TESTS GREEN → NEXT**. Do not silently carry launch blockers into the next room.
 
-**Current board:** Room 1 is **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL** — not a full CLOSED stamp. Authoritative executable torture-test tip `a49efd7`. Abandoned 3067 attempts do not count. **COME BACK LATER:** live Resend / branded sender / inbox proof is PARKED WITH EXTERNAL PREREQUISITE at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`) — not closed, do not fake, **does not block Room 2 or Room 3**. Room 2 is **CLOSED** (Section 5 close tip `b3397a6`; hash note `c46e191` is not the close). Current execution: Room 3 Section 1 `STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1` — park for Manager; do not auto-advance. Do not start Room 4 or Room 5. Do not reopen completed Room 1 or Room 2 capabilities unless new evidence. No merge unless separately authorized.
+**Current board:** Room 1 is **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL** — not a full CLOSED stamp. Authoritative executable torture-test tip `a49efd7`. Abandoned 3067 attempts do not count. **COME BACK LATER:** live Resend / branded sender / inbox proof is PARKED WITH EXTERNAL PREREQUISITE at `d6974eb` (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1`) — not closed, do not fake, **does not block Room 2 or Room 3**. Room 2 is **CLOSED** (Section 5 close tip `b3397a6`; hash note `c46e191` is not the close). Current execution: Room 3 Section 2 `STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1` — park for Manager; do not auto-advance. Section 1 CLOSED at `76b974f`. Do not start Room 4 or Room 5. Do not reopen completed Room 1 or Room 2 capabilities unless new evidence. No merge unless separately authorized.
 <!-- END:launch-readiness-execution-order -->
 
 <!-- BEGIN:conversation-room-machine-contract -->

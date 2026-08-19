@@ -115,7 +115,7 @@ Keep this sequence as the standing roadmap for all future launch work unless Tag
 |------|--------|
 | 1. Customer Life + Communication | **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL.** Not a full CLOSED stamp. Authoritative executable tip `a49efd7`. Yellow sticky: branded email/domain at `d6974eb`. Does **not** block Room 2 or Room 3. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. |
 | 2. Customer-facing truth + friction cleanup | **CLOSED.** Section 1 `45b09b1`. Section 2 `e609203`. Section 3 `3328807`. Section 4 `6cf9ca0`. Section 5 `b3397a6`. |
-| 3. Owner Console | **ACTIVE.** Section 1 `STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1` — park for Manager. Do not auto-advance. Do not rebuild. Do not start Room 4. |
+| 3. Owner Console | **ACTIVE.** Section 1 `STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1` CLOSED at `76b974f`. Section 2 `STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1` — park for Manager. Do not auto-advance. Do not rebuild. Do not start Room 4. |
 | 4. Full business rehearsal | Not started. Do not enter. |
 | 5. Soft-opening preparation | Not started. Do not enter. |
 

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { requireReadableCampaign } from "@/lib/campaign-store/server-access";
-import { getOrGenerateTasks } from "@/lib/campaign-tasks/store";
+import { getOrGenerateTasks, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
+import { recoverOwnerDecisionAftermath } from "@/lib/campaign-tasks/owner-decision-aftermath";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
@@ -43,6 +44,14 @@ export async function GET(request: Request, context: RouteContext) {
     tasksEnvelope.jobRecords,
   );
   const jobs = applyWaitingOnClientPolicies(synced, materialsEnvelope.items);
+  const recovered = recoverOwnerDecisionAftermath({
+    ...tasksEnvelope,
+    jobRecords: jobs,
+  });
+  if (recovered.recoveredIds.length > 0) {
+    await writeTasksEnvelope(recovered.envelope);
+  }
+  const visibleJobs = recovered.envelope.jobRecords ?? jobs;
 
-  return NextResponse.json({ jobs: buildCustomerJobStatusSummaries(jobs) });
+  return NextResponse.json({ jobs: buildCustomerJobStatusSummaries(visibleJobs) });
 }

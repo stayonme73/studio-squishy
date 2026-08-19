@@ -126,7 +126,7 @@ describe("direction disagreement owner actions", () => {
     if (!result.ok) return;
 
     expect(result.exception.status).toBe("waiting_internal");
-    expect(result.envelope.exceptionEvents?.some((entry) => entry.action === "assigned")).toBe(
+    expect(result.envelope.exceptionEvents?.some((entry) => entry.action === "held")).toBe(
       true,
     );
 

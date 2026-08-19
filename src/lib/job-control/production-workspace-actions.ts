@@ -958,7 +958,13 @@ export function applyProductionWorkspacePatch(
         return { ok: false, error: "Approved client-facing wording is required.", status: 400 };
       }
 
-      job = clearOwnerReviewGatePending(job, occurredAt);
+      if (job.ownerAskResumeGate) {
+        return {
+          ok: false,
+          error: "This folder is waiting on the client. It will return to your desk when they reply.",
+          status: 422,
+        };
+      }
 
       const spineResult = applyJobSpineStatusChange(job, events, {
         job,
@@ -967,7 +973,11 @@ export function applyProductionWorkspacePatch(
         reason: "Owner requested client input before review can continue",
         occurredAt,
       });
-      job = spineResult.job;
+      job = {
+        ...spineResult.job,
+        ownerApprovalPending: null,
+        ownerAskResumeGate: "before_review",
+      };
       events = spineResult.events;
 
       const noted = appendOwnerInternalNote(
@@ -980,15 +990,21 @@ export function applyProductionWorkspacePatch(
       job = noted.job;
       events = noted.events;
 
-      events = appendJobActivityEvent(events, {
-        campaignId: job.campaignId,
-        jobId: job.jobId,
-        kind: "client_communication",
-        occurredAt,
-        actor,
-        reason: "Owner requested client input before review",
-        messageContent: clientMessage,
-      });
+      envelope = enqueueJobCommunicationRecord(
+        { ...envelope, jobActivityEvents: events },
+        {
+          campaign,
+          clientId,
+          job,
+          eventType: "owner_ask_client",
+          sender: actor,
+          occurredAt,
+          idempotencyKey: `owner-ask-client:review-gate:${job.jobId}`,
+          reason: "The Studio needs something from you",
+          messageContent: clientMessage,
+        },
+      );
+      events = envelope.jobActivityEvents ?? [];
       break;
     }
 

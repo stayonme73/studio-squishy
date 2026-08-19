@@ -12,6 +12,10 @@ import {
 } from "./exceptions";
 import { CAMPAIGN_TASKS_SCHEMA_VERSION } from "./plan-change";
 import { mergeOwnerNotes } from "./owner-decision-exception-shared";
+import {
+  applyOwnerAskClientInteractionAftermath,
+  applyOwnerResolvedInteractionAftermath,
+} from "./owner-decision-aftermath";
 import type { OwnerDecisionInteractionRecord } from "./owner-decision-interaction-types";
 import type { ServerTasksEnvelope } from "./types";
 
@@ -171,6 +175,7 @@ function waitingInteraction(
   notes: string | undefined,
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
+  action: "held" | "asked_client" | "assigned" = "assigned",
 ): ComplaintActionResult {
   const gate = requireOwnerComplaintGate(user, interaction);
   if (!gate.ok) return gate;
@@ -189,7 +194,7 @@ function waitingInteraction(
     campaignId: envelope.campaignId,
     user,
     actorRole,
-    action: "assigned",
+    action,
     notes,
     statusAfter: status,
   });
@@ -220,7 +225,18 @@ export function applyOwnerResolveComplaint(
   }
 
   const notes = mergeOwnerNotes(payload.ownerNotes, `Owner resolve (complaint): ${clientReply}`);
-  return resolveComplaint(envelope, existing, notes, user, assignments);
+  const resolved = resolveComplaint(envelope, existing, notes, user, assignments);
+  if (!resolved.ok) return resolved;
+  return {
+    ok: true,
+    envelope: applyOwnerResolvedInteractionAftermath(
+      resolved.envelope,
+      resolved.interaction,
+      user,
+      clientReply,
+    ),
+    interaction: resolved.interaction,
+  };
 }
 
 export function applyOwnerEscalateComplaintRefund(
@@ -328,6 +344,7 @@ export function applyOwnerHoldComplaint(
     mergeOwnerNotes(payload.ownerNotes, `Owner hold (complaint): ${note}`),
     user,
     assignments,
+    "held",
   );
 }
 
@@ -367,14 +384,26 @@ export function applyOwnerAskClientComplaint(
     return { ok: false, error: "Approved client-facing wording is required.", status: 400 };
   }
 
-  return waitingInteraction(
+  const asked = waitingInteraction(
     envelope,
     existing,
     "waiting_client",
     mergeOwnerNotes(payload.ownerNotes, `Owner ask-client (complaint): ${clientMessage}`),
     user,
     assignments,
+    "asked_client",
   );
+  if (!asked.ok) return asked;
+  return {
+    ok: true,
+    envelope: applyOwnerAskClientInteractionAftermath(
+      asked.envelope,
+      asked.interaction,
+      clientMessage,
+      user,
+    ),
+    interaction: asked.interaction,
+  };
 }
 
 export function applyOwnerAssignComplaint(
@@ -417,5 +446,16 @@ export function applyOwnerDeclineComplaintEscalation(
     payload.ownerNotes,
     `Owner decline escalation (complaint): ${clientReply}`,
   );
-  return resolveComplaint(envelope, existing, notes, user, assignments);
+  const resolved = resolveComplaint(envelope, existing, notes, user, assignments);
+  if (!resolved.ok) return resolved;
+  return {
+    ok: true,
+    envelope: applyOwnerResolvedInteractionAftermath(
+      resolved.envelope,
+      resolved.interaction,
+      user,
+      clientReply,
+    ),
+    interaction: resolved.interaction,
+  };
 }

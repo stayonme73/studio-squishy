@@ -40,7 +40,9 @@ export type JobCommunicationEventType =
   | "approved_for_delivery"
   | "final_delivery_available"
   | "refund_eligibility_14_day"
-  | "refund_issued";
+  | "refund_issued"
+  | "owner_ask_client"
+  | "owner_decision_recorded";
 
 export type JobCommunicationChannel = "in_app_outbox" | "test_email";
 
@@ -235,6 +237,8 @@ export type PurchasedJobRecord = {
   lastReminderSentAt?: string | null;
   returnLane?: ProductionControlLane;
   ownerApprovalPending?: "before_review" | "before_delivery" | null;
+  /** Set while Owner asked the client from a review/delivery gate. Restored on reply. */
+  ownerAskResumeGate?: "before_review" | "before_delivery" | null;
   nonRefundable?: boolean;
   refundEligibleAt?: string | null;
   /** Set when Owner acts on refund-eligible desk folder — clears desk item. */

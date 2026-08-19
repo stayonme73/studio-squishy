@@ -117,10 +117,22 @@ export const studioLaunchReadinessExecutionOrderV1 = {
 
   room3Section1: {
     packageId: "STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1",
+    sectionClosed: true as const,
+    parkForManager: false as const,
+    closeTip: "76b974f" as const,
+    doNotAutoAdvance: true as const,
+    doNotStartSection2: false as const,
+    doNotStartRoom4: true as const,
+    doNotRebuild: true as const,
+    nextSectionWaitsForScoutPackage: false as const,
+  },
+
+  room3Section2: {
+    packageId: "STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1",
     sectionClosed: false as const,
     parkForManager: true as const,
     doNotAutoAdvance: true as const,
-    doNotStartSection2: true as const,
+    doNotStartSection3: true as const,
     doNotStartRoom4: true as const,
     doNotRebuild: true as const,
     nextSectionWaitsForScoutPackage: true as const,

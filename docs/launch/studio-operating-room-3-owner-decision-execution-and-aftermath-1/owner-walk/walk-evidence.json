@@ -1,0 +1,123 @@
+{
+  "passed": 21,
+  "failed": 0,
+  "blocked": 0,
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (existing)"
+    },
+    {
+      "check": "fixtures_seeded",
+      "status": "PASS",
+      "detail": "Room 3 Price 345d315f + Room 3 Decline 345d315f + Room 3 Ask 345d315f + Room 3 Hold 345d315f + Room 3 Refund 345d315f"
+    },
+    {
+      "check": "open_console",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good evening, Tagia. 8 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 8 folders 8 decisions Estimated review",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\01-owner-console-open.png"
+    },
+    {
+      "check": "non_refund_decision_on_desk",
+      "status": "PASS",
+      "detail": "Pricing exception folders visible in Decisions cabinet"
+    },
+    {
+      "check": "pricing_folder_context",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good evening, Tagia. 8 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 8 folders 8 decisions Estimated review time: about 24 minutes Refreshed Aug 18",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\02-pricing-folder.png"
+    },
+    {
+      "check": "pricing_approve_machine_acts",
+      "status": "PASS",
+      "detail": "Pricing approve confirmed by Machine briefing"
+    },
+    {
+      "check": "pricing_decline_recorded",
+      "status": "PASS",
+      "detail": "Decline this pricing exception? Quoted or purchased pricing stays as recorded.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\02b-pricing-decline.png"
+    },
+    {
+      "check": "ask_folder_not_closed",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good evening, Tagia. 8 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 8 folders 8 decisions Estimated review",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\03-ask-folder.png"
+    },
+    {
+      "check": "owner_ask_recorded",
+      "status": "PASS",
+      "detail": "Ask client confirmed by Machine briefing"
+    },
+    {
+      "check": "ask_left_active_tray",
+      "status": "PASS",
+      "detail": "Room 3 Ask 345d315f left the decision tray"
+    },
+    {
+      "check": "customer_sees_owner_ask",
+      "status": "PASS",
+      "detail": "ask jobs=Waiting on you",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\04-customer-after-ask.png"
+    },
+    {
+      "check": "customer_reply_recorded",
+      "status": "PASS",
+      "detail": "POST project-communication 200"
+    },
+    {
+      "check": "ask_loop_returns_to_desk",
+      "status": "PASS",
+      "detail": "Ask folder ready for Owner again",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\05-ask-returned.png"
+    },
+    {
+      "check": "hold_is_not_approve_or_decline",
+      "status": "PASS",
+      "detail": "Hold this pricing review for internal follow-up? This is a pause, not an approve or decline. The folder will leave your desk.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\06-hold-folder.png"
+    },
+    {
+      "check": "refund_folder_still_available",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good evening, Tagia. 6 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 6 folders 6 decisions Estimated review",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\07-refund-folder.png"
+    },
+    {
+      "check": "refund_approve_recorded",
+      "status": "PASS",
+      "detail": "Refund approve confirmed by Machine briefing"
+    },
+    {
+      "check": "refund_replay_blocked",
+      "status": "PASS",
+      "detail": "replay status 409"
+    },
+    {
+      "check": "handled_left_active_tray",
+      "status": "PASS",
+      "detail": "Approved and declined folders left Today's Desk",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\08-return-after-decisions.png"
+    },
+    {
+      "check": "recently_handled_shows_result",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good evening, Tagia. 2 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 2 folders 2 decisions Estimated review time: about 6 minutes Refreshed Aug 18,",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\08b-recently-handled.png"
+    },
+    {
+      "check": "customer_truth_after_refund",
+      "status": "PASS",
+      "detail": "jobs=Cancelled board=the STUDIO Studio Board Review Room Final Delivery Help Center New Project Sign out STUDIO BOARD Good evening, Maya Brooks CURRENT PROJECT Room 3 Refund 345d315f PROJECT STATUS WHA",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\09-customer-after-refund.png"
+    },
+    {
+      "check": "customer_truth_after_decline_not_cancelled",
+      "status": "PASS",
+      "detail": "decline jobs=Preparing to start"
+    }
+  ]
+}

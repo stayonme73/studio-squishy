@@ -89,12 +89,16 @@ function openExceptionsByTaskId(
   return map;
 }
 
-function isRecentlyResolved(record: CampaignExceptionRecord, nowMs: number): boolean {
-  if (!record.resolvedAt) return false;
-  const resolvedMs = new Date(record.resolvedAt).getTime();
+function isRecentlyResolvedAt(iso: string | undefined, nowMs: number): boolean {
+  if (!iso) return false;
+  const resolvedMs = new Date(iso).getTime();
   if (Number.isNaN(resolvedMs)) return false;
   const windowMs = OWNER_CONSOLE_RECENTLY_RESOLVED_DAYS * 24 * 60 * 60 * 1000;
   return nowMs - resolvedMs <= windowMs;
+}
+
+function isRecentlyResolved(record: CampaignExceptionRecord, nowMs: number): boolean {
+  return isRecentlyResolvedAt(record.resolvedAt, nowMs);
 }
 
 function sortScanItems(items: OwnerConsoleScanItem[]): OwnerConsoleScanItem[] {
@@ -183,6 +187,21 @@ export function resolveOwnerConsoleScanView(
       }
     }
 
+    for (const interaction of bundle.tasksEnvelope.ownerDecisionInteractions ?? []) {
+      if (interaction.status !== "waiting_client") continue;
+      bucketItems.waiting_client.push({
+        id: `client-interaction:${interaction.id}`,
+        campaignId: listItem.campaignId,
+        campaignName: listItem.campaignName,
+        title:
+          interaction.interactionKind === "refund_request"
+            ? "Refund request"
+            : "Client follow-up",
+        subtitle: "Waiting on client response — not closed",
+        drillDownHref: ownerConsoleCampaignRoute(listItem.campaignId),
+      });
+    }
+
     for (const item of bundle.materials ?? []) {
       if (!isBlockingMaterialItem(item)) continue;
       if (item.sourceExceptionId) {
@@ -224,11 +243,7 @@ export function resolveOwnerConsoleScanView(
 
     const resolvedRecent = records
       .filter((entry) => !isOpenExceptionStatus(entry.status) && isRecentlyResolved(entry, nowMs))
-      .sort((a, b) => (b.resolvedAt ?? "").localeCompare(a.resolvedAt ?? ""))
-      .slice(0, OWNER_CONSOLE_RECENTLY_RESOLVED_MAX);
-
-    for (const record of resolvedRecent) {
-      bucketItems.recently_resolved.push({
+      .map((record) => ({
         id: `resolved:${record.id}`,
         campaignId: listItem.campaignId,
         campaignName: listItem.campaignName,
@@ -240,6 +255,43 @@ export function resolveOwnerConsoleScanView(
             })}`
           : "Resolved",
         drillDownHref: ownerConsoleCampaignRoute(listItem.campaignId, record.id),
+        sortAt: record.resolvedAt ?? "",
+      }));
+
+    const resolvedInteractions = (bundle.tasksEnvelope.ownerDecisionInteractions ?? [])
+      .filter(
+        (interaction) =>
+          interaction.status === "resolved" &&
+          isRecentlyResolvedAt(interaction.updatedAt, nowMs),
+      )
+      .map((interaction) => ({
+        id: `resolved-interaction:${interaction.id}`,
+        campaignId: listItem.campaignId,
+        campaignName: listItem.campaignName,
+        title:
+          interaction.interactionKind === "refund_request"
+            ? "Refund request"
+            : "Owner decision",
+        subtitle: `Handled ${new Date(interaction.updatedAt).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        })}`,
+        drillDownHref: ownerConsoleCampaignRoute(listItem.campaignId),
+        sortAt: interaction.updatedAt,
+      }));
+
+    const handled = [...resolvedRecent, ...resolvedInteractions]
+      .sort((a, b) => b.sortAt.localeCompare(a.sortAt))
+      .slice(0, OWNER_CONSOLE_RECENTLY_RESOLVED_MAX);
+
+    for (const record of handled) {
+      bucketItems.recently_resolved.push({
+        id: record.id,
+        campaignId: record.campaignId,
+        campaignName: record.campaignName,
+        title: record.title,
+        subtitle: record.subtitle,
+        drillDownHref: record.drillDownHref,
       });
     }
   }

@@ -7,6 +7,7 @@ import {
   resolveRefundRequestInteractionOnOwnerDecision,
   transitionRefundRequestInteraction,
 } from "@/lib/campaign-tasks/refund-request-actions";
+import { isFinalRefundDecisionRecorded, clientIdForAftermath } from "@/lib/campaign-tasks/owner-decision-aftermath";
 import { appendJobActivityEvent } from "./activity-log";
 import { applyJobSpineStatusChange } from "./actions";
 import { enqueueJobCommunicationRecord } from "./communication";
@@ -89,6 +90,9 @@ export function applyOwnerApproveRefund(
   }
   const job = findJob(envelope, jobId);
   if (!job) return { ok: false, error: "Job not found.", status: 404 };
+  if (isFinalRefundDecisionRecorded(job)) {
+    return { ok: false, error: "Refund decision already recorded.", status: 409 };
+  }
   if (job.productionStartedAt || job.nonRefundable) {
     return {
       ok: false,
@@ -129,7 +133,7 @@ export function applyOwnerApproveRefund(
       eventType: "refund_issued",
       sender: actor,
       occurredAt,
-      idempotencyKey: occurredAt,
+      idempotencyKey: `owner-decision:refund-approve:${job.jobId}`,
       reason,
     },
   );
@@ -163,14 +167,30 @@ export function applyOwnerDenyRefund(
   }
   const job = findJob(envelope, jobId);
   if (!job) return { ok: false, error: "Job not found.", status: 404 };
+  if (isFinalRefundDecisionRecorded(job)) {
+    return { ok: false, error: "Refund decision already recorded.", status: 409 };
+  }
 
   const actor = actorFromUser(user);
   const occurredAt = new Date().toISOString();
   let events = [...(envelope.jobActivityEvents ?? [])];
   const reason = mergeNotes(payload.ownerNotes, payload.reason ?? "Owner denied refund");
 
+  let workingJob = job;
+  if (job.spineStatus === "waiting_on_client" && !job.productionStartedAt) {
+    const restored = applyJobSpineStatusChange(job, events, {
+      job,
+      nextStatus: "ready_for_queue",
+      actor,
+      reason: "Owner denied refund — work continues",
+      occurredAt,
+    });
+    workingJob = restored.job;
+    events = restored.events;
+  }
+
   let updatedJob: PurchasedJobRecord = {
-    ...job,
+    ...workingJob,
     refundEligibleAt: null,
     refundOwnerDecisionAt: occurredAt,
     updatedAt: occurredAt,
@@ -190,10 +210,26 @@ export function applyOwnerDenyRefund(
     messageContent: reason,
   });
 
+  let nextEnvelope = enqueueJobCommunicationRecord(
+    { ...envelope, jobActivityEvents: events },
+    {
+      clientId: clientIdForAftermath(envelope),
+      job: updatedJob,
+      eventType: "owner_decision_recorded",
+      sender: actor,
+      occurredAt,
+      idempotencyKey: `owner-decision:refund-deny:${job.jobId}`,
+      reason: "Owner decision recorded",
+      messageContent:
+        "An owner decision was recorded: a refund was not approved for this job. Studio Board shows the current status.",
+    },
+  );
+  events = nextEnvelope.jobActivityEvents ?? [];
+
   return {
     ok: true,
     envelope: resolveRefundRequestInteractionOnOwnerDecision(
-      updateJobInEnvelope(envelope, updatedJob, events),
+      updateJobInEnvelope(nextEnvelope, updatedJob, events),
       job.jobId,
       reason,
     ),
@@ -212,6 +248,9 @@ export function applyOwnerHoldRefund(
   }
   const job = findJob(envelope, jobId);
   if (!job) return { ok: false, error: "Job not found.", status: 404 };
+  if (isFinalRefundDecisionRecorded(job)) {
+    return { ok: false, error: "Refund decision already recorded.", status: 409 };
+  }
   const note = payload.note.trim();
   if (!note) return { ok: false, error: "A hold note is required.", status: 400 };
 
@@ -222,7 +261,6 @@ export function applyOwnerHoldRefund(
 
   let updatedJob: PurchasedJobRecord = {
     ...job,
-    refundOwnerDecisionAt: occurredAt,
     updatedAt: occurredAt,
   };
   const noted = appendOwnerNote(updatedJob, events, actor, occurredAt, combined);
@@ -263,6 +301,22 @@ export function applyOwnerAskClientRefund(
   }
   const job = findJob(envelope, jobId);
   if (!job) return { ok: false, error: "Job not found.", status: 404 };
+  if (isFinalRefundDecisionRecorded(job)) {
+    return { ok: false, error: "Refund decision already recorded.", status: 409 };
+  }
+  const pending = envelope.ownerDecisionInteractions?.find(
+    (entry) =>
+      entry.interactionKind === "refund_request" &&
+      entry.jobId === jobId &&
+      entry.status === "waiting_client",
+  );
+  if (pending) {
+    return {
+      ok: false,
+      error: "This folder is waiting on the client. It will return to your desk when they reply.",
+      status: 422,
+    };
+  }
   const clientMessage = payload.clientMessage.trim();
   if (!clientMessage) {
     return { ok: false, error: "Approved client-facing wording is required.", status: 400 };
@@ -281,7 +335,6 @@ export function applyOwnerAskClientRefund(
   });
   let updatedJob: PurchasedJobRecord = {
     ...spineResult.job,
-    refundOwnerDecisionAt: occurredAt,
   };
   events = spineResult.events;
 
@@ -301,11 +354,12 @@ export function applyOwnerAskClientRefund(
       campaign,
       clientId,
       job: updatedJob,
-      eventType: "reminder_48_hour",
+      eventType: "owner_ask_client",
       sender: actor,
       occurredAt,
-      idempotencyKey: occurredAt,
-      reason: clientMessage,
+      idempotencyKey: `owner-ask-client:refund:${job.jobId}:${occurredAt}`,
+      reason: "The Studio needs something from you",
+      messageContent: clientMessage,
     },
   );
   events = nextEnvelope.jobActivityEvents ?? [];

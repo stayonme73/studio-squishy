@@ -51,7 +51,7 @@ function openRefundInteraction(
     (entry) =>
       entry.interactionKind === "refund_request" &&
       entry.jobId === jobId &&
-      entry.status === "waiting_owner",
+      entry.status !== "resolved",
   );
 }
 
@@ -90,7 +90,14 @@ export function applyClientSubmitRefundRequest(
 
   const existing = openRefundInteraction(envelope, payload.jobId);
   if (existing) {
-    return { ok: false, error: "A refund request is already on Tagia's desk for this job.", status: 409 };
+    if (existing.status === "waiting_owner") {
+      return { ok: false, error: "A refund request is already on Tagia's desk for this job.", status: 409 };
+    }
+    return {
+      ok: false,
+      error: "A refund request for this job is already in progress.",
+      status: 409,
+    };
   }
 
   const snapshot = buildRefundRequestSnapshot(job, {
@@ -133,13 +140,20 @@ export function resolveRefundRequestInteractionForJob(
   );
 }
 
+export function pendingRefundRequestInteractionForJob(
+  envelope: ServerTasksEnvelope,
+  jobId: string,
+): OwnerDecisionInteractionRecord | undefined {
+  return openRefundInteraction(envelope, jobId);
+}
+
 export function transitionRefundRequestInteraction(
   envelope: ServerTasksEnvelope,
   jobId: string,
   status: OwnerDecisionInteractionRecord["status"],
   resolutionNotes: string,
 ): ServerTasksEnvelope {
-  const interaction = resolveRefundRequestInteractionForJob(envelope, jobId);
+  const interaction = pendingRefundRequestInteractionForJob(envelope, jobId);
   if (!interaction) return envelope;
 
   const now = new Date().toISOString();

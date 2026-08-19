@@ -210,6 +210,7 @@ export function buildPurchasedJobRecord(
     lastReminderSentAt: persisted?.lastReminderSentAt ?? null,
     returnLane: leftWaitingTray ? undefined : persisted?.returnLane,
     ownerApprovalPending: persisted?.ownerApprovalPending ?? null,
+    ownerAskResumeGate: persisted?.ownerAskResumeGate ?? null,
     nonRefundable:
       persisted?.nonRefundable ??
       Boolean(productionStarted || persisted?.productionStartedAt),

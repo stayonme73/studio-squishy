@@ -26,6 +26,7 @@ import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { applyWaitingOnClientPolicies } from "@/lib/job-control/waiting-on-client";
 import { COORDINATOR_SYSTEM_USER } from "@/studio-coordinator/config";
 import { applyOrdinaryMissingClientFactsInEnvelope } from "@/lib/campaign-tasks/missing-client-fact-ask";
+import { recoverOwnerDecisionAftermath } from "@/lib/campaign-tasks/owner-decision-aftermath";
 import { shouldAppearOnLiveOwnerDesk } from "@/lib/file-room/owner-console-live-desk";
 import { getOrInitializeMaterials, readMaterialsEnvelope, writeMaterialsEnvelope } from "@/lib/materials/store";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
@@ -107,15 +108,21 @@ export async function loadOwnerConsoleAggregate(
         tasksEnvelope.jobRecords,
       );
       const jobs = applyWaitingOnClientPolicies(synced, materials);
+      const recoveredAftermath = recoverOwnerDecisionAftermath({
+        ...tasksEnvelope,
+        jobRecords: jobs,
+      });
+      tasksEnvelope = recoveredAftermath.envelope;
+      const recoveredJobs = tasksEnvelope.jobRecords ?? jobs;
       const clientId = resolveCampaignCommunicationClientId(
         bundle.envelope.clientUserId,
         bundle.envelope.campaignId,
       );
       const communicationSync = syncJobCommunicationRecords({
-        envelope: { ...tasksEnvelope, jobRecords: jobs },
+        envelope: tasksEnvelope,
         campaign: bundle.envelope.record,
         clientId,
-        jobs,
+        jobs: recoveredJobs,
         materials,
       });
       const nextEnvelope = communicationSync.envelope;

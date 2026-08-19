@@ -12,6 +12,7 @@ import {
   listProjectCommunicationForCustomer,
   type ProjectCommunicationMessage,
 } from "@/lib/project-communication";
+import { resumeOwnerDecisionAsksAfterCustomerReply } from "@/lib/campaign-tasks/owner-decision-aftermath-resume";
 import {
   handleCustomerBoardQuestion,
   machineAnswerForMessage,
@@ -134,6 +135,14 @@ export async function POST(request: Request, context: RouteContext) {
 
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: result.status });
+  }
+
+  if (!result.replayed) {
+    try {
+      await resumeOwnerDecisionAsksAfterCustomerReply(campaignId);
+    } catch {
+      /* Decision stays durable. Machine retries on the next customer reply. */
+    }
   }
 
   let loop: Awaited<ReturnType<typeof handleCustomerBoardQuestion>> | null = null;

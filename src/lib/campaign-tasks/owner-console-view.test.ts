@@ -235,7 +235,7 @@ describe("owner-console-view", () => {
     expect(shouldIncludeCampaignInOwnerConsoleAggregate(envelope("camp-consent-no-pending-1", "Consent fixture"), true)).toBe(
       false,
     );
-    expect(shouldIncludeCampaignInOwnerConsoleAggregate(envelope("room3-live-refund-now", "Live walk"), true)).toBe(
+    expect(shouldIncludeCampaignInOwnerConsoleAggregate(envelope("owner-live-desk-now", "Live walk"), true)).toBe(
       true,
     );
   });

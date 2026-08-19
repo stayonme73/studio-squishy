@@ -92,6 +92,21 @@ describe("owner-decision-job-actions", () => {
     if (!result.ok) return;
     expect(result.job.spineStatus).toBe("refunded_cancelled");
     expect(result.job.refundOwnerDecisionAt).toBeTruthy();
+    const replay = applyOwnerApproveRefund(
+      result.envelope,
+      campaign,
+      "refund-folder-3:sm-001",
+      { reason: "Clicked again." },
+      owner,
+      "tagia",
+    );
+    expect(replay.ok).toBe(false);
+    if (!replay.ok) {
+      expect(replay.status).toBe(409);
+    }
+    expect(
+      (result.envelope.jobCommunicationRecords ?? []).filter((row) => row.eventType === "refund_issued"),
+    ).toHaveLength(1);
   });
 
   it("owner_deny_refund clears eligibility and records decision", () => {

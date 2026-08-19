@@ -5,6 +5,8 @@ import { needsPaidOperatingRecovery } from "@/lib/studio-paid-activation-recover
 import { studioReviewEligibilityV1 } from "@/config/studio-review-eligibility-v1";
 import { evaluateReviewEligibility } from "@/lib/studio-review-eligibility";
 import { deriveCorrectionAccounting } from "@/lib/job-control/correction-round-ledger";
+import { ownerAskCustomerStalls } from "@/lib/campaign-tasks/owner-decision-aftermath";
+import { AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES } from "@/lib/job-control/communication";
 import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer/types";
 
 import type {
@@ -221,6 +223,9 @@ export function assembleCustomerLifeTruth(
       recoveryClass: "waiting_on_customer",
     });
   }
+  for (const stall of ownerAskCustomerStalls(input.tasks)) {
+    stalls.push(stall);
+  }
   const flyerObserver = campaign?.dispatchExecution?.designRendererObserver?.results.find(
     (result) => result.skuId === DESIGN_RENDERER_PROOF_SKU,
   );
@@ -243,7 +248,10 @@ export function assembleCustomerLifeTruth(
     (record) =>
       record.channel === "in_app_outbox" &&
       (record.deliveryStatus === "pending_owner_send" ||
-        record.deliveryStatus === "delivery_failed"),
+        record.deliveryStatus === "delivery_failed") &&
+      AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES.includes(
+        record.eventType as (typeof AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES)[number],
+      ),
   ).length;
   const noticeTransportPending = queuedNotices > 0;
   if (noticeTransportPending) {

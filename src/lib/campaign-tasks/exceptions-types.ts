@@ -31,6 +31,9 @@ export type CampaignExceptionKind =
 export type CampaignExceptionEventAction =
   | "raised"
   | "assigned"
+  | "held"
+  | "asked_client"
+  | "returned_to_owner"
   | "resolved"
   | "cancelled"
   | "approved_client_request"

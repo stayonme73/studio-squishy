@@ -159,7 +159,7 @@ export function applyOwnerHoldComplianceHold(
     campaignId: envelope.campaignId,
     user,
     actorRole,
-    action: "assigned",
+    action: "held",
     notes: combinedNotes,
     statusAfter: "waiting_internal",
   });

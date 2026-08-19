@@ -37,15 +37,16 @@ const KITCHEN = /kitchen v1/i;
 const ALL_CAMPAIGNS = /all campaigns/i;
 
 describe("STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1", () => {
-  it("is the current Room 3 section, parked for Manager, not closed", () => {
+  it("is closed at 76b974f and does not reopen as the current Room 3 section", () => {
     expect(cfg.packageId).toBe(
       "STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1",
     );
     expect(cfg.room).toBe(3);
-    expect(cfg.sectionClosed).toBe(false);
-    expect(cfg.parkForManager).toBe(true);
+    expect(cfg.sectionClosed).toBe(true);
+    expect(cfg.closeTip).toBe("76b974f");
+    expect(cfg.parkForManager).toBe(false);
     expect(cfg.doNotAutoAdvance).toBe(true);
-    expect(cfg.doNotStartSection2).toBe(true);
+    expect(cfg.doNotStartSection2).toBe(false);
     expect(cfg.doNotStartRoom4).toBe(true);
     expect(cfg.doNotRebuildOwnerConsole).toBe(true);
     expect(cfg.doNotReopenResend).toBe(true);
@@ -57,8 +58,10 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1"
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomId).toBe("owner-console");
     expect(studioLaunchReadinessExecutionOrderV1.room2Section5.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room3Section1.packageId).toBe(cfg.packageId);
-    expect(studioLaunchReadinessExecutionOrderV1.room3Section1.parkForManager).toBe(true);
-    expect(studioLaunchReadinessExecutionOrderV1.room3Section1.doNotStartSection2).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room3Section1.parkForManager).toBe(false);
+    expect(studioLaunchReadinessExecutionOrderV1.room3Section1.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room3Section1.closeTip).toBe("76b974f");
+    expect(studioLaunchReadinessExecutionOrderV1.room3Section1.doNotStartSection2).toBe(false);
     expect(studioRoom1CustomerLifeCloseoutV1.roomClosed).toBe(false);
     expect(studioRoom1CustomerLifeCloseoutV1.room3Authorized).toBe(true);
     expect(cfg.comeBackLaterEmail.protectedCheckpoint).toBe("d6974eb");

@@ -1,46 +1,52 @@
 /**
- * Room 3 Section 1 — Owner Console truth and decision-desk audit.
- * CLOSED 2026-08-18 at 76b974f. Do not reopen unless new evidence.
+ * Room 3 Section 2 — Owner decision execution and aftermath.
+ * PARK for Manager. Do not auto-advance to Section 3.
  *
+ * Section 1 CLOSED at 76b974f. Do not reopen it unless new evidence.
  * Room 2 is CLOSED. Room 1 remains complete except deferred domain/email.
- * Do not reopen Room 1 or Room 2 unless new evidence proves a genuine defect.
  * Do not reopen Resend/domain. Do not start Room 4 or Room 5. Do not merge.
  * Do not rebuild the Owner Console.
  */
 
 import { studioLaunchReadinessExecutionOrderV1 } from "@/config/studio-launch-readiness-execution-order-v1";
 import { studioRoom1CustomerLifeCloseoutV1 } from "@/config/studio-room-1-customer-life-closeout-v1";
-import { studioRoom2WholeCustomerTruthAndFrictionSweepV1 } from "@/config/studio-room-2-whole-customer-truth-and-friction-sweep-v1";
+import { studioRoom3OwnerConsoleTruthAndDecisionDeskAuditV1 } from "@/config/studio-room-3-owner-console-truth-and-decision-desk-audit-v1";
 
-export const studioRoom3OwnerConsoleTruthAndDecisionDeskAuditV1 = {
-  packageId: "STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1",
+export const studioRoom3OwnerDecisionExecutionAndAftermathV1 = {
+  packageId: "STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1",
   schemaVersion: 1 as const,
   room: 3 as const,
   roomId: "owner-console" as const,
   merge: "separately_authorized" as const,
   ownerRoutine: "NONE" as const,
-  parkForManager: false as const,
-  sectionClosed: true as const,
-  closedAt: "2026-08-18" as const,
-  closeTip: "76b974f" as const,
+  parkForManager: true as const,
+  sectionClosed: false as const,
   doNotAutoAdvance: true as const,
-  doNotStartSection2: false as const,
+  doNotStartSection3: true as const,
   doNotStartRoom4: true as const,
   doNotStartRoom5: true as const,
   doNotRebuildOwnerConsole: true as const,
   doNotReopenResend: true as const,
   doNotReopenRoom1UnlessNewDefect: true as const,
   doNotReopenRoom2UnlessNewDefect: true as const,
+  doNotReopenSection1UnlessNewDefect: true as const,
   visualRedesign: false as const,
   closeRule:
-    "OWNER-USE → FIND → FIX → BREAK → RETEST → CLOSE SECTION" as const,
+    "OWNER-USE → DECIDE → SYSTEM-ACTS → BREAK → RECOVER → RETEST → CLOSE" as const,
+  northStar:
+    "OWNER DECIDES → MACHINE RECORDS → SYSTEM ACTS → CUSTOMER/PROJECT TRUTH UPDATES → FOLLOW-UP HAPPENS → NOTHING GETS STRANDED" as const,
+
+  priorSection: {
+    packageId: studioRoom3OwnerConsoleTruthAndDecisionDeskAuditV1.packageId,
+    sectionClosed: studioRoom3OwnerConsoleTruthAndDecisionDeskAuditV1.sectionClosed,
+    closeTip: "76b974f" as const,
+  },
 
   priorRooms: {
     room1Status: studioRoom1CustomerLifeCloseoutV1.status,
     room1Closed: studioRoom1CustomerLifeCloseoutV1.roomClosed,
     room1AuthoritativeTip: "a49efd7" as const,
     room2Closed: true as const,
-    room2Section5PackageId: studioRoom2WholeCustomerTruthAndFrictionSweepV1.packageId,
     room2Section5CloseTip: "b3397a6" as const,
   },
 
@@ -52,49 +58,38 @@ export const studioRoom3OwnerConsoleTruthAndDecisionDeskAuditV1 = {
     verdict: studioRoom1CustomerLifeCloseoutV1.comeBackLater.verdict,
     doesNotBlockRoom3: true as const,
     neitherPassNorFailForThisAudit: true as const,
+    deferredTransportNote:
+      "Outbound branded email remains parked at d6974eb. In-app Board / project record is the customer channel for this section." as const,
   },
 
-  northStar: [
-    "what_actually_needs_me",
-    "why_it_needs_me",
-    "what_happens_if_i_do_nothing",
-    "what_are_my_valid_choices",
-    "what_happened_after_i_chose",
-  ] as const,
-
-  ownerDecisionCategories: [
+  supportedDecisionClasses: [
     "refund",
-    "scope_change",
     "pricing_exception",
-    "revision_exception_overage",
-    "brand_direction_exception",
-    "customer_exception",
-    "final_qa_when_policy_cannot_resolve",
-    "non_deterministic_or_policy_breaking",
+    "scope_exception",
+    "revision_overage_exception",
+    "compliance_policy_hold",
+    "ask_customer_for_more_information",
+    "approve",
+    "decline",
+    "hold_pause",
   ] as const,
 
-  routineOffDesk: [
-    "payment_confirmed",
-    "intake_received",
-    "file_uploaded",
-    "normal_production_status",
-    "normal_qa_pass_fail_retry",
-    "included_revision_within_allowance",
-    "routine_customer_question",
-    "ordinary_missing_materials_request",
-    "email_retry",
-    "normal_delivery_preparation",
-    "deterministic_workflow_recovery",
+  customerChannelsInScope: [
+    "studio_board_status",
+    "studio_board_studio_request",
+    "project_communication_in_app",
+    "refund_request_status",
+    "job_in_app_outbox",
   ] as const,
 
   outOfScope: [
     "rebuild_owner_console",
-    "second_owner_console",
-    "move_studio_board_into_owner_console",
-    "expose_every_machine_event",
-    "make_tagia_the_dispatcher",
     "branded_sender_certification",
     "real_inbox_delivery_proof",
+    "invented_read_receipts",
+    "invented_decision_types",
+    "room_1_resend_reopen",
+    "room_2_reopen",
     "room_4",
     "room_5",
     "visual_redesign_spree",

@@ -151,7 +151,7 @@ export function applyOwnerAllowRevision(
     {
       exceptionId: payload.exceptionId,
       ownerNotes: payload.ownerNotes,
-      resolutionSuffix: "Owner approved business exception",
+      resolutionSuffix: "Owner granted one extra revision",
     },
     user,
     assignments,

@@ -42,7 +42,7 @@ export const ownerConsole = {
     confirmAskTeam:
       "Send this back to the team with your note? The folder will leave your desk.",
     confirmAskClient:
-      "Send this approved client message and pause for client response? The folder will leave your desk.",
+      "Send this approved client message and wait for a reply? This is not a closed decision — the folder returns to your desk when they reply.",
     approveForReviewLabel: "Send to Review Room",
     sendBackLabel: "Send back to production",
     holdLabel: "Hold",
@@ -82,7 +82,8 @@ export const ownerConsole = {
         id: "ask_client",
         label: "Ask client",
         wired: true,
-        whereAfter: "Waiting on Client — client input requested with your approved wording.",
+        whereAfter:
+          "Waiting on Client — not closed. The folder returns to your desk when they reply.",
       },
     ],
   },
@@ -249,11 +250,11 @@ export const ownerConsole = {
     confirmCommit:
       "Commit this timeline and return work to production? Dispatch will update accordingly.",
     confirmHold:
-      "Hold this deadline review for internal follow-up? The folder will leave your desk.",
+      "Hold this deadline review for internal follow-up? This is a pause, not an approve or decline. The folder will leave your desk.",
     confirmAskTeam:
       "Send this back to the team with your note? The folder will leave your desk.",
     confirmAskClient:
-      "Send this approved client message and pause for client confirmation? The folder will leave your desk.",
+      "Send this approved client message and wait for client confirmation? This is not a closed decision — the folder returns to your desk when they reply.",
     confirmAssign:
       "Assign this deadline decision to the selected team member? The folder will leave your desk.",
     commitLabel: "Commit timeline",
@@ -312,11 +313,11 @@ export const ownerConsole = {
     confirmHoldFirm:
       "Hold the Studio boundary and send the policy-bound message to the client?",
     confirmHold:
-      "Hold this boundary review for internal follow-up? The folder will leave your desk.",
+      "Hold this boundary review for internal follow-up? This is a pause, not an approve or decline. The folder will leave your desk.",
     confirmAskTeam:
       "Send this back to the team with your note? The folder will leave your desk.",
     confirmAskClient:
-      "Send this approved client message and pause for boundary confirmation? The folder will leave your desk.",
+      "Send this approved client message and wait for boundary confirmation? This is not a closed decision — the folder returns to your desk when they reply.",
     confirmAssign:
       "Assign this boundary decision to the selected team member? The folder will leave your desk.",
     allowLabel: "Approve exception",
@@ -382,13 +383,13 @@ export const ownerConsole = {
     confirmDecline:
       "Decline this scope change? Work stays within the approved plan.",
     confirmHold:
-      "Hold this scope review for internal follow-up? The folder will leave your desk.",
+      "Hold this scope review for internal follow-up? This is a pause, not an approve or decline. The folder will leave your desk.",
     confirmAskTeam:
       "Send this back to the team with your note? The folder will leave your desk.",
     confirmAskClientInfo:
-      "Send this approved client message and pause for missing information? The folder will leave your desk.",
+      "Send this approved client message and wait for missing information? This is not a closed decision — the folder returns to your desk when they reply.",
     confirmAskClientApproval:
-      "Send this approved client message and pause for scope confirmation? The folder will leave your desk.",
+      "Send this approved client message and wait for scope confirmation? This is not a closed decision — the folder returns to your desk when they reply.",
     confirmAssign:
       "Assign this scope decision to the selected team member? The folder will leave your desk.",
     confirmApplyProjectChange:
@@ -466,13 +467,13 @@ export const ownerConsole = {
     confirmDecline:
       "Decline this pricing exception? Quoted or purchased pricing stays as recorded.",
     confirmHold:
-      "Hold this pricing review for internal follow-up? The folder will leave your desk.",
+      "Hold this pricing review for internal follow-up? This is a pause, not an approve or decline. The folder will leave your desk.",
     confirmAskTeam:
       "Send this back to the team with your note? The folder will leave your desk.",
     confirmAskClientInfo:
-      "Send this approved client message and pause for missing pricing facts? The folder will leave your desk.",
+      "Send this approved client message and wait for missing pricing facts? This is not a closed decision — the folder returns to your desk when they reply.",
     confirmAskClientApproval:
-      "Send this approved client message and pause for pricing confirmation? The folder will leave your desk.",
+      "Send this approved client message and wait for pricing confirmation? This is not a closed decision — the folder returns to your desk when they reply.",
     confirmAssign:
       "Assign this pricing decision to the selected team member? The folder will leave your desk.",
     approveLabel: "Approve pricing exception",
@@ -562,11 +563,11 @@ export const ownerConsole = {
     confirmDeny:
       "Deny this refund? The work continues under policy and the client will be notified.",
     confirmHold:
-      "Hold this refund for internal review? The folder will leave your desk.",
+      "Hold this refund for internal review? This is a pause, not an approve or decline. The folder will leave your desk.",
     confirmAskTeam:
       "Send this back to the team with your note? The folder will leave your desk.",
     confirmAskClient:
-      "Send this approved client message and pause for documentation? The folder will leave your desk.",
+      "Send this approved client message and wait for their reply? This is not a closed decision — the folder returns to your desk when they respond.",
     approveLabel: "Approve refund",
     denyLabel: "Deny refund",
     holdLabel: "Hold",
@@ -630,7 +631,7 @@ export const ownerConsole = {
     confirmAskTeam:
       "Send this back to the team with your note? The folder will leave your desk.",
     confirmAskClient:
-      "Send this approved client message and pause for more information? The folder will leave your desk.",
+      "Send this approved client message and wait for more information? This is not a closed decision — the folder returns to your desk when they reply.",
     confirmAssign:
       "Assign this complaint to the selected team member? The folder will leave your desk.",
     resolveLabel: "Resolve with reply",

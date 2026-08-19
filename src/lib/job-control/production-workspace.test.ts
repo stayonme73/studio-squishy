@@ -528,7 +528,11 @@ describe("production workspace handoff actions", () => {
     expect(asked.ok).toBe(true);
     if (!asked.ok) return;
     expect(asked.job.ownerApprovalPending).toBeNull();
+    expect(asked.job.ownerAskResumeGate).toBe("before_review");
     expect(asked.job.spineStatus).toBe("waiting_on_client");
+    expect(
+      asked.envelope.jobCommunicationRecords?.some((row) => row.eventType === "owner_ask_client"),
+    ).toBe(true);
     expect(asked.job.internalNotes?.some((note) => note.content.includes("client ask"))).toBe(
       true,
     );

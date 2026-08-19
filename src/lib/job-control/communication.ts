@@ -102,10 +102,39 @@ export const JOB_COMMUNICATION_TEMPLATES = {
     message: (job) =>
       `A refund has been issued for ${job.serviceName}. This job has been closed.`,
   },
+  owner_ask_client: {
+    id: "comm.owner_ask_client.v1",
+    reason: "The Studio needs something from you",
+    message: (job) =>
+      `The Studio needs a reply from you before ${job.serviceName} can continue. Open Studio Board to read the request and respond.`,
+  },
+  owner_decision_recorded: {
+    id: "comm.owner_decision_recorded.v1",
+    reason: "Owner decision recorded",
+    message: (job) =>
+      `The Studio recorded an Owner decision for ${job.serviceName}. Studio Board shows the current status.`,
+  },
 } satisfies Record<JobCommunicationEventType, CommunicationTemplate>;
 
+/** Authorized Resend lifecycle kinds. Owner aftermath notices stay in-app until domain/email resumes. */
+export const AUTHORIZED_LIFECYCLE_EMAIL_EVENT_TYPES = [
+  "payment_received",
+  "intake_incomplete_materials_needed",
+  "reminder_48_hour",
+  "waiting_on_client_72_hour",
+  "materials_received_returned_to_queue",
+  "production_started",
+  "ready_for_review",
+  "revision_requested",
+  "revision_ready_again",
+  "approved_for_delivery",
+  "final_delivery_available",
+  "refund_eligibility_14_day",
+  "refund_issued",
+] as const satisfies readonly JobCommunicationEventType[];
+
 export type EnqueueJobCommunicationInput = {
-  campaign: CampaignRecord;
+  campaign?: CampaignRecord;
   clientId: string;
   job: PurchasedJobRecord;
   eventType: JobCommunicationEventType;
@@ -212,7 +241,9 @@ export function enqueueJobCommunicationRecord(
 
   const sender = input.sender ?? systemSender();
   const reason = input.reason ?? template.reason;
-  const messageContent = input.messageContent ?? template.message(input.job, input.campaign);
+  const messageContent =
+    input.messageContent ??
+    (input.campaign ? template.message(input.job, input.campaign) : template.reason);
   const record: JobCommunicationRecord = {
     id,
     campaignId: input.job.campaignId,

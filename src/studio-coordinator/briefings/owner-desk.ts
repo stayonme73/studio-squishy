@@ -466,7 +466,7 @@ function destinationForResolve(kind: CampaignExceptionKind): OwnerPostDecisionDe
 }
 
 function ownerConfirmationSuffix(): string {
-  return "Confirmed: destination assigned, notifications queued, record updated, desk clear.";
+  return "Confirmed: the decision is recorded, the folder left your desk, and The Studio will carry the next step.";
 }
 
 export function resolveOwnerComplianceHoldPostDecisionBriefing(
