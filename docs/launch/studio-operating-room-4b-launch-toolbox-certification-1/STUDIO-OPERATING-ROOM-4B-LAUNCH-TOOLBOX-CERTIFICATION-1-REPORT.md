@@ -258,7 +258,10 @@ Customer impact communicated via Machine status path (Project Change after deliv
 
 ## Final work commit / push-sync
 
-Recorded after this report lands (Scout commit + push on branch; **no merge**).
+- **Work tip:** `e87b193`
+- **Branch:** `operating/design-renderer-proof-1`
+- **Push/sync:** pushed; branch matches origin (`0	0` left-right)
+- **Merge:** No
 
 ---
 
