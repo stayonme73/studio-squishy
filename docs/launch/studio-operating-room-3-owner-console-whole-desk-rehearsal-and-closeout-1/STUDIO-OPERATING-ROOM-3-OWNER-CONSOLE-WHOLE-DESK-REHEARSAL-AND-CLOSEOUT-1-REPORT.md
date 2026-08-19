@@ -231,10 +231,11 @@ Manager may close Room 3 and authorize Room 4 entry separately. Do **not** auto-
 
 ## Final work commit
 
-*(filled after commit)*
+**`cd2a1e2`** — Close Room 3 Section 3 whole-desk rehearsal at 28/28 and park for Manager.  
+Prior Section 2 close: `199e4a4`. Section 1 close: `76b974f`.
 
 ---
 
 ## Push / sync state
 
-*(filled after push)*
+Pushed `ff6d3bc..cd2a1e2` on `origin/operating/design-renderer-proof-1`. **No merge.**
