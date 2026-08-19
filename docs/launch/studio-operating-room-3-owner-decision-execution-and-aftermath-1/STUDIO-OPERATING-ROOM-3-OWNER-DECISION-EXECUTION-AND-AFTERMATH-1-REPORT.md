@@ -213,13 +213,13 @@ Remaining routine-looking work (not hidden dispatcher steps for the walked types
 
 ## Final commit
 
-See git tip after push. Package id: `STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1`.
+Park tip: `4eed9c2`. Package id: `STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1`. This hash-note commit is not the park.
 
 ---
 
 ## Push / sync state
 
-Pushed to current branch only. **No merge.**
+Pushed to `origin/operating/design-renderer-proof-1` only. **No merge.**
 
 ---
 
