@@ -1,0 +1,162 @@
+{
+  "passed": 28,
+  "failed": 0,
+  "blocked": 0,
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (existing)"
+    },
+    {
+      "check": "fixtures_seeded",
+      "status": "PASS",
+      "detail": "Room 3 S3 Price 0c722a34 + Room 3 S3 Decline 0c722a34 + Room 3 S3 Ask 0c722a34 + Room 3 S3 Hold 0c722a34 + Room 3 S3 Scope 0c722a34 + Room 3 S3 Refund 0c722a34 + Room 3 S3 Recovery 0c722a34"
+    },
+    {
+      "check": "routine_noise_off_desk",
+      "status": "PASS",
+      "detail": "Routine payment_received stayed off the sequential desk",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\01-owner-console-open.png"
+    },
+    {
+      "check": "missing_fact_off_desk",
+      "status": "PASS",
+      "detail": "Ordinary missing fact stayed off the sequential desk"
+    },
+    {
+      "check": "certification_fixtures_hidden",
+      "status": "PASS",
+      "detail": "Historical certification folders filtered from live desk"
+    },
+    {
+      "check": "first_glance_understandable",
+      "status": "PASS",
+      "detail": "41 folders · urgency briefing present"
+    },
+    {
+      "check": "mixed_desk_decision_count",
+      "status": "PASS",
+      "detail": "9/9 seeded decisions for stamp 0c722a34 · desk total 41 folders"
+    },
+    {
+      "check": "one_stop_no_control_room",
+      "status": "PASS",
+      "detail": "Sequential landing only — no Control Room panels or test-send queue"
+    },
+    {
+      "check": "terminology_residue",
+      "status": "PASS",
+      "detail": "Desk briefing / File Room terminology clean"
+    },
+    {
+      "check": "genuine_scope_on_desk",
+      "status": "PASS",
+      "detail": "Room 3 S3 Scope 0c722a34 visible in Decisions cabinet"
+    },
+    {
+      "check": "session_approve_pricing",
+      "status": "PASS",
+      "detail": "Pricing approve confirmed by Machine briefing",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\02-pricing-approve.png"
+    },
+    {
+      "check": "leave_return_handled_stays",
+      "status": "PASS",
+      "detail": "Room 3 S3 Price 0c722a34 left the desk",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\03-leave-return-after-price.png"
+    },
+    {
+      "check": "session_decline_pricing",
+      "status": "PASS",
+      "detail": "Decline this pricing exception? Quoted or purchased pricing stays as recorded.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\04-pricing-decline.png"
+    },
+    {
+      "check": "session_ask_client",
+      "status": "PASS",
+      "detail": "Ask client confirmed by Machine briefing",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\05-ask-folder.png"
+    },
+    {
+      "check": "customer_reply_recorded",
+      "status": "PASS",
+      "detail": "POST project-communication 200"
+    },
+    {
+      "check": "ask_loop_returns",
+      "status": "PASS",
+      "detail": "Room 3 S3 Ask 0c722a34 returned to Owner desk after client reply",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\06-ask-returned.png"
+    },
+    {
+      "check": "session_hold_pause",
+      "status": "PASS",
+      "detail": "Hold this pricing review for internal follow-up? This is a pause, not an approve or decline. The folder will leave your desk.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\07-hold-pause.png"
+    },
+    {
+      "check": "hold_internal_return",
+      "status": "PASS",
+      "detail": "follow_up 200 · returned=true",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\08-hold-returned.png"
+    },
+    {
+      "check": "internal_replay_idempotent",
+      "status": "PASS",
+      "detail": "replay status 200"
+    },
+    {
+      "check": "hold_approve",
+      "status": "PASS",
+      "detail": "Room 3 S3 Hold 0c722a34 approved after internal return"
+    },
+    {
+      "check": "machine_recovery_no_owner_folder",
+      "status": "PASS",
+      "detail": "Room 3 S3 Recovery 0c722a34 resolved via API without Owner desk folder",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\09-machine-recovery.png"
+    },
+    {
+      "check": "stale_tab_scope_resolved_elsewhere",
+      "status": "PASS",
+      "detail": "tab1 retry status 200 · scope still open=false",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\10-stale-tab-scope.png"
+    },
+    {
+      "check": "decision_card_context_refund",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good evening, Tagia. 37 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 37 folders 37 decisions Estimated review time: about 111 minutes Refreshed Au",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\11-refund-folder.png"
+    },
+    {
+      "check": "stale_tab_refund_replay_blocked",
+      "status": "PASS",
+      "detail": "replay status 409"
+    },
+    {
+      "check": "fresh_session_return",
+      "status": "PASS",
+      "detail": "Fresh session desk accurate · 34 folders remain for open items",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\12-fresh-session.png"
+    },
+    {
+      "check": "customer_truth_after_refund",
+      "status": "PASS",
+      "detail": "jobs=Cancelled board=the STUDIO Studio Board Review Room Final Delivery Help Center New Project Sign out STUDIO BOARD Good evening, Maya Brooks CURRENT PROJECT Room 3 S3 Recovery 0c722a34 PROJECT STATU",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\13-customer-after-refund.png"
+    },
+    {
+      "check": "recently_handled_useful",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good evening, Tagia. 34 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 34 folders 34 decisions Estimated review time: about 102 minutes Refreshed Au",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\14-recently-handled.png"
+    },
+    {
+      "check": "handled_left_active_tray",
+      "status": "PASS",
+      "detail": "Handled folders left Today's Desk active tray",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-console-whole-desk-rehearsal-and-closeout-1\\owner-walk\\shots\\15-handled-left-tray.png"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 /**
  * Room 3 Section 2 — Owner decision execution and aftermath.
- * PARK for Manager. Do not auto-advance to Section 3.
+ * CLOSED at 199e4a4. Do not reopen unless new evidence.
  *
  * Section 1 CLOSED at 76b974f. Do not reopen it unless new evidence.
  * Room 2 is CLOSED. Room 1 remains complete except deferred domain/email.
@@ -19,10 +19,12 @@ export const studioRoom3OwnerDecisionExecutionAndAftermathV1 = {
   roomId: "owner-console" as const,
   merge: "separately_authorized" as const,
   ownerRoutine: "NONE" as const,
-  parkForManager: true as const,
-  sectionClosed: false as const,
+  parkForManager: false as const,
+  sectionClosed: true as const,
+  closedAt: "2026-08-19" as const,
+  closeTip: "199e4a4" as const,
   doNotAutoAdvance: true as const,
-  doNotStartSection3: true as const,
+  doNotStartSection3: false as const,
   doNotStartRoom4: true as const,
   doNotStartRoom5: true as const,
   doNotRebuildOwnerConsole: true as const,

@@ -118,21 +118,25 @@ function envelope(
 }
 
 describe("STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1", () => {
-  it("is the current Room 3 section, parked for Manager, not closed", () => {
+  it("is closed at 199e4a4 and no longer blocks Section 3", () => {
     expect(cfg.packageId).toBe(
       "STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1",
     );
     expect(cfg.room).toBe(3);
-    expect(cfg.sectionClosed).toBe(false);
-    expect(cfg.parkForManager).toBe(true);
-    expect(cfg.doNotStartSection3).toBe(true);
+    expect(cfg.sectionClosed).toBe(true);
+    expect(cfg.closeTip).toBe("199e4a4");
+    expect(cfg.parkForManager).toBe(false);
+    expect(cfg.doNotStartSection3).toBe(false);
     expect(cfg.doNotStartRoom4).toBe(true);
     expect(cfg.doNotRebuildOwnerConsole).toBe(true);
     expect(cfg.doNotReopenResend).toBe(true);
     expect(cfg.priorSection.closeTip).toBe("76b974f");
     expect(studioRoom3OwnerConsoleTruthAndDecisionDeskAuditV1.sectionClosed).toBe(true);
-    expect(studioLaunchReadinessExecutionOrderV1.room3Section2.packageId).toBe(cfg.packageId);
-    expect(studioLaunchReadinessExecutionOrderV1.room3Section2.doNotStartSection3).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room3Section2.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room3Section2.closeTip).toBe("199e4a4");
+    expect(studioLaunchReadinessExecutionOrderV1.room3Section3.packageId).toBe(
+      "STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-WHOLE-DESK-REHEARSAL-AND-CLOSEOUT-1",
+    );
     expect(cfg.supportedDecisionClasses).toEqual(
       expect.arrayContaining(["refund", "pricing_exception", "ask_customer_for_more_information"]),
     );
