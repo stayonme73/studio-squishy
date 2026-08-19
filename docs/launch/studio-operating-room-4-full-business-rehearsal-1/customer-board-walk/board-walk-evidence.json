@@ -1,0 +1,551 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1",
+  "kind": "full-business-rehearsal-walk",
+  "recordedAt": "2026-08-19T22:39:27.697Z",
+  "baseUrl": "http://127.0.0.1:3066",
+  "commitHint": "unknown",
+  "runId": "2c8aab8f-fb16-48da-a003-304da9ffcea2",
+  "totals": {
+    "passed": 49,
+    "failed": 0,
+    "blocked": 0,
+    "total": 49
+  },
+  "verdict": "PARKED FOR MANAGER — one Maya life rehearsed the Studio as a business. Room 4 is not closed. Branded email remains NOT YET CERTIFIED.",
+  "roomClosed": false,
+  "email": {
+    "status": "NOT_YET_CERTIFIED",
+    "verdict": "EXTERNAL_PREREQUISITE",
+    "countedAs": "neither_pass_nor_fail",
+    "protectedCheckpoint": "d6974eb",
+    "note": "Email is a nudge. Board and Voice remain the project truth even when branded transport is unavailable."
+  },
+  "paymentHonesty": "Front door walks Lobby → Conversation → Studio Plan → Stripe handoff. Live Stripe click-through is already certified and is not reopened. The paid operating chain uses the sealed processor-confirmed Maya $69 flyer fixture so one customer life can continue through production.",
+  "asked": [
+    {
+      "question": "Do you need anything else from me?",
+      "answer": "Yes. We still need your Project Intake before we can produce your flyer."
+    },
+    {
+      "question": "What is holding my flyer?",
+      "answer": "Project Intake is what is holding the next step."
+    },
+    {
+      "question": "What's happening with my flyer? (paid / intake missing)",
+      "answer": "Payment is confirmed. Project Intake is still needed before we can produce your flyer."
+    },
+    {
+      "question": "Do you need anything else from me?",
+      "answer": "The Studio record does not show anything waiting on you right now."
+    },
+    {
+      "question": "What's happening with my flyer?",
+      "answer": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "question": "What's happening with my flyer? (after intake)",
+      "answer": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "question": "What's happening with my flyer? (injected stall)",
+      "answer": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "question": "Has work started on my flyer?",
+      "answer": "Yes. The Studio record shows work has started on your flyer."
+    },
+    {
+      "question": "What's happening with my flyer? (after stall recover)",
+      "answer": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "question": "Is my flyer ready for me to review? (qa_fail)",
+      "answer": "Review is not open yet. The Studio is still preparing your flyer. I will not invent a date."
+    },
+    {
+      "question": "What's happening with my flyer? (qa_fail)",
+      "answer": "The Studio is still finishing the flyer. Review is not open yet."
+    },
+    {
+      "question": "Is my flyer ready for me to review? (after qa_pass)",
+      "answer": "You can review it now. Open the Review Room from your Studio Board."
+    },
+    {
+      "question": "What's happening with my flyer? (after qa_pass)",
+      "answer": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "question": "When can I review it? (failed notice)",
+      "answer": "You can review it now. Open the Review Room from your Studio Board."
+    },
+    {
+      "question": "What's happening with my flyer? (Review ready while email failed)",
+      "answer": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "question": "What's happening with my flyer? (mixed historical stall + Review)",
+      "answer": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "question": "Is my flyer ready for me to review?",
+      "answer": "You can review it now. Open the Review Room from your Studio Board."
+    },
+    {
+      "question": "Do you need anything else from me?",
+      "answer": "The Studio record does not show anything waiting on you right now."
+    },
+    {
+      "question": "Did you receive my revision?",
+      "answer": "Yes. The Studio received your revision request. It is on the project record."
+    },
+    {
+      "question": "What's happening with my flyer? (revision underway)",
+      "answer": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "question": "Did you make my requested change?",
+      "answer": "Yes. The Studio record shows your requested change was applied in the current version."
+    },
+    {
+      "question": "What's happening with my flyer?",
+      "answer": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "question": "What's happening with my flyer? (Version 2 ready)",
+      "answer": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "question": "What's happening with my flyer? (approved / Final Delivery)",
+      "answer": "Your final files are ready in Final Delivery on your Studio Board."
+    },
+    {
+      "question": "Did you keep my approval?",
+      "answer": "You approved Version 2. That is the exact version The Studio will prepare for delivery. An older version cannot replace it."
+    }
+  ],
+  "cracks": [
+    {
+      "beat": "entry_after_payment_before_intake",
+      "mayaSaw": "Board showed Cedar & Bloom Home Organizing after sign-in.",
+      "machineBelieved": "Payment confirmed. Project Intake not submitted.",
+      "teamDid": "No team action. Machine held the next step for intake.",
+      "voiceSaid": "Yes. We still need your Project Intake before we can produce your flyer.",
+      "failure": null,
+      "recovered": null,
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "wrong_upload",
+      "mayaSaw": "This file type is not supported. Please send a PNG, JPG, PDF, Word document, text file, MP3, WAV, or MP4.",
+      "machineBelieved": "The GIF was not stored. No fake receipt.",
+      "teamDid": "No Team clarification ticket. The type is simply not accepted.",
+      "voiceSaid": "(not asked — Board already showed the unsupported-type receipt)",
+      "failure": "Maya tried to send a GIF.",
+      "recovered": "Maya was told to send a supported type. Project record unchanged.",
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "duplicate_upload",
+      "mayaSaw": "We already have this exact file on your project. You do not need to send it again.",
+      "machineBelieved": "The exact PNG bytes were already stored. Duplicate did not replace the first.",
+      "teamDid": "No extra filing. First stored object kept.",
+      "voiceSaid": "(Board receipt was enough)",
+      "failure": "Maya sent the same optional PNG twice.",
+      "recovered": "First file stayed. Maya did not need Tagia.",
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "intake",
+      "mayaSaw": "Project Intake was accepted. Board still showed the same Cedar & Bloom project.",
+      "machineBelieved": "Intake complete. Locked Maya brief is on the campaign record.",
+      "teamDid": "No extra team form. Machine stored the submitted intake answers.",
+      "voiceSaid": "The Studio record does not show anything waiting on you right now.",
+      "failure": null,
+      "recovered": null,
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "waiting_after_intake",
+      "mayaSaw": "Board still showed the same Cedar & Bloom project. Review was not required yet.",
+      "machineBelieved": "Paid + intake on record. Optional materials not required. Production may still be recovering.",
+      "teamDid": "No person jumped in.",
+      "voiceSaid": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth.",
+      "failure": null,
+      "recovered": null,
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "timeout_or_stall_recover",
+      "mayaSaw": "Board did not ask Maya to pay again or contact Tagia.",
+      "machineBelieved": "Dispatch marked pending_retry, then recovered.",
+      "teamDid": "No team rescue. recoverPaidOperatingChain ran twice after the stall flag.",
+      "voiceSaid": "Yes. The Studio record shows work has started on your flyer.",
+      "failure": "A pending_retry stall was injected after first recovery.",
+      "recovered": "Second recovery cleared it. Owner NONE.",
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "qa_failure",
+      "mayaSaw": "Board still offered Review while QA had failed — leak.",
+      "machineBelieved": "qa_fail on the flyer identity. Review not eligible.",
+      "teamDid": "Internal quality check rejected the renderer output. No customer-facing Kitchen jargon.",
+      "voiceSaid": "Review is not open yet. The Studio is still preparing your flyer. I will not invent a date.",
+      "failure": "Internal design quality evidence did not pass.",
+      "recovered": null,
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "qa_pass_then_review",
+      "mayaSaw": "Board offered Review after QA passed.",
+      "machineBelieved": "Later qa_pass bound the same flyer identity. Review eligible.",
+      "teamDid": "Machine retried quality on the same campaign. No Tagia step.",
+      "voiceSaid": "You can review it now. Open the Review Room from your Studio Board.",
+      "failure": "Earlier qa_fail on the same campaign.",
+      "recovered": "Same project, later qa_pass, Review opened without Owner.",
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "failed_notification",
+      "mayaSaw": "Board still offered Review. Mail failure was not presented as project truth.",
+      "machineBelieved": "ready_for_review notice deliveryStatus=delivery_failed. Review eligible remains true.",
+      "teamDid": "No Owner send duty. Transport failed; Board stayed the record.",
+      "voiceSaid": "You can review it now. Open the Review Room from your Studio Board.",
+      "failure": "Lifecycle notice transport marked delivery_failed.",
+      "recovered": "Voice still sent Maya to Review from the Board. Email did not become the source of truth.",
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "two_browsers",
+      "mayaSaw": "A second signed-in browser showed the same Cedar & Bloom project and Review.",
+      "machineBelieved": "One campaign id. Two sessions. Same Machine record.",
+      "teamDid": "No duplicate job created.",
+      "voiceSaid": "You can review it now. Open the Review Room from your Studio Board.",
+      "failure": "Two live sessions at once.",
+      "recovered": "Both browsers told the same story.",
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "question_not_revision",
+      "mayaSaw": "Review stayed open. Asking a question did not spend the included round.",
+      "machineBelieved": "No correction-use row. Spine still ready_for_review.",
+      "teamDid": "No production restart.",
+      "voiceSaid": "The Studio record does not show anything waiting on you right now.",
+      "failure": null,
+      "recovered": null,
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "revision",
+      "mayaSaw": "Review acknowledged the revision and returned the job to production.",
+      "machineBelieved": "One correction-use row. Spine left ready_for_review.",
+      "teamDid": "Machine applied the included revision round. No extra Owner step.",
+      "voiceSaid": "Yes. The Studio received your revision request. It is on the project record.",
+      "failure": null,
+      "recovered": null,
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "stale_version_attempt",
+      "mayaSaw": "Current Review tab showed Version 2. The other tab still had Version 1.",
+      "machineBelieved": "Approval pin 9a92e2ceea69 matches Version 2, not Version 1.",
+      "teamDid": "Delivery assembled from the approved identity, not the stale tab.",
+      "failure": "Stale tab approval attempt: HTTP 422. {\"error\":\"Job must be ready for review.\",\"revisionLimitReached\":false}",
+      "recovered": "Version 1 did not become Final Delivery.",
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "final_delivery",
+      "mayaSaw": "Final Delivery showed Version 2 print PDF and digital PNG.",
+      "machineBelieved": "Customer promised files bound to the approved hashes.",
+      "teamDid": "No extra hand packaging. Exact approved identity released.",
+      "voiceSaid": "Your final files are ready in Final Delivery on your Studio Board.",
+      "failure": null,
+      "recovered": null,
+      "ownerAction": "NONE"
+    },
+    {
+      "beat": "return_later",
+      "mayaSaw": "A fresh browser still had the same Cedar & Bloom project, approval, and files.",
+      "machineBelieved": "Approval decision caa-c9f235b7-7aea-4eae-9516-4133f524726e and one revision history row survived.",
+      "teamDid": "No rebuild. Return used the stored campaign.",
+      "voiceSaid": "You approved Version 2. That is the exact version The Studio will prepare for delivery. An older version cannot replace it.",
+      "failure": "Maya left and came back in a new browser.",
+      "recovered": "Nothing was erased. No Tagia restore.",
+      "ownerAction": "NONE"
+    }
+  ],
+  "results": [
+    {
+      "check": "dev_server_available",
+      "status": "PASS",
+      "detail": "http://127.0.0.1:3066 (external)"
+    },
+    {
+      "check": "maya_paid_entry_seeded",
+      "status": "PASS",
+      "detail": "campaign=maya-r4-live-1787179086434 fee=$69 fixture, not a live Stripe click"
+    },
+    {
+      "check": "front_door_lobby",
+      "status": "PASS",
+      "detail": "The Studio Lobby\n×\n\nWelcome to\n\nTHE STUDIO\n\nChoose where you’d like to begin.\n\nNEW TO THE STUDIO\n\nBegin with a guided conversation.\n\nLET’S GET STARTED\n→\nOR\nRETURNING CLIENT\n\nSign i",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\00-lobby.png"
+    },
+    {
+      "check": "front_door_flyer_price",
+      "status": "PASS",
+      "detail": "Studio Conversation Room\nVoice: On\nVoice: Off\nTap the mic to speak\nor start typing below\nOR\nSend\n\nSTUDIO CONTROLS\n\nCONVERSATION\n\n❓\nAsk a question\nUse the mic and type field above to speak or type.\n\nSESSION\n\n💾\nSave for n",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\00b-flyer-details.png"
+    },
+    {
+      "check": "front_door_payment_handoff",
+      "status": "PASS",
+      "detail": "Studio Conversation Room\nVoice: On\nVoice: Off\nTap the mic to speak\nor start typing below\nOR\nSend\n\nSTUDIO CONTROLS\n\nCONVERSATION\n\n❓\nAsk a question\nUse the mic and type field above to speak or type.\n\nSESSION\n\n💾\nSave for now\n✏️\nChange an answ",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\00c-payment-handoff.png"
+    },
+    {
+      "check": "front_door_what_happens_next",
+      "status": "PASS",
+      "detail": "Checkout names next step / Board truth"
+    },
+    {
+      "check": "voice_asks_for_intake_after_pay",
+      "status": "PASS",
+      "detail": "Yes. We still need your Project Intake before we can produce your flyer.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\01-entry-paid-waiting-intake.png"
+    },
+    {
+      "check": "voice_status_paid_intake_missing",
+      "status": "PASS",
+      "detail": "Payment is confirmed. Project Intake is still needed before we can produce your flyer."
+    },
+    {
+      "check": "wrong_upload_rejected",
+      "status": "PASS",
+      "detail": "This file type is not supported. Please send a PNG, JPG, PDF, Word document, text file, MP3, WAV, or MP4.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\02-wrong-upload-rejected.png"
+    },
+    {
+      "check": "optional_png_stored",
+      "status": "PASS",
+      "detail": "maya-optional-mark.png:stored:c414cd0e204d",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\03-optional-png-stored.png"
+    },
+    {
+      "check": "duplicate_upload_kept_first",
+      "status": "PASS",
+      "detail": "We already have this exact file on your project. You do not need to send it again.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\04-duplicate-kept-first.png"
+    },
+    {
+      "check": "intake_submitted_same_campaign",
+      "status": "PASS",
+      "detail": "The Studio record does not show anything waiting on you right now."
+    },
+    {
+      "check": "voice_status_after_intake_coherent",
+      "status": "PASS",
+      "detail": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "check": "voice_status_stall_inject_coherent",
+      "status": "PASS",
+      "detail": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "check": "voice_status_production_underway_or_ready",
+      "status": "PASS",
+      "detail": "ready_for_review: Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "check": "stall_recover_without_tagia",
+      "status": "PASS",
+      "detail": "first=recovered second=recovered third=already_clear"
+    },
+    {
+      "check": "machine_produced_maya_flyer",
+      "status": "PASS",
+      "detail": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\artifacts\\maya-flyer-v1.png"
+    },
+    {
+      "check": "owner_decision_raised_once",
+      "status": "PASS",
+      "detail": "Exactly one pricing exception on this Maya life"
+    },
+    {
+      "check": "owner_desk_has_maya_judgment_not_routine",
+      "status": "PASS",
+      "detail": "Opened Maya pricing folder. File Room\n\nTagia\nowner, client\n\nSTUDIO\n\nGood evening, Tagia.\n\nOne decision needs you before production can continue.\n\nToday's Desk\n\n1 folder\n\n1 decision\n\nEstima",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\04b-owner-desk-maya.png"
+    },
+    {
+      "check": "owner_decides_once_machine_carries",
+      "status": "PASS",
+      "detail": "Pricing approve confirmed by Machine briefing",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\04c-owner-approved.png"
+    },
+    {
+      "check": "owner_return_later_handled_stays",
+      "status": "PASS",
+      "detail": "Handled Maya pricing folder stayed handled",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\04d-owner-return-later.png"
+    },
+    {
+      "check": "owner_decision_did_not_cancel_customer_life",
+      "status": "PASS",
+      "detail": "the\n\nSTUDIO\n\nStudio Board\nReview Room\nFinal Delivery\nHelp Center\nNew Project\nSign out\nSTUDIO BOARD\n\nGood evening, Maya Brooks\n\nCURRENT PROJECT\n\nCedar & Bloom R4 1787179086434\n\nPROJECT STATUS\n\nWHAT WE "
+    },
+    {
+      "check": "review_nav_before_ready_does_not_expose_artifact",
+      "status": "PASS",
+      "detail": "eligibleAfterLoad=false proofImgs=0 claimsReady=false ← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nCedar & Bloom R4 1787179086434\n\nCedar & Bloom R4 1787179086434\n\nStudio Working\n\nThe Studio owns the",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\05b-review-nav-before-ready.png"
+    },
+    {
+      "check": "voice_status_qa_fail_coherent",
+      "status": "PASS",
+      "detail": "The Studio is still finishing the flyer. Review is not open yet."
+    },
+    {
+      "check": "qa_fail_keeps_review_closed",
+      "status": "PASS",
+      "detail": "action=qa_fail eligible=false Review is not open yet. The Studio is still preparing your flyer. I will not invent a date.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\05-qa-fail-review-closed.png"
+    },
+    {
+      "check": "qa_pass_opens_review_same_project",
+      "status": "PASS",
+      "detail": "You can review it now. Open the Review Room from your Studio Board.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\06-qa-pass-review-open.png"
+    },
+    {
+      "check": "voice_status_review_ready",
+      "status": "PASS",
+      "detail": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "check": "failed_notification_board_and_voice_honest",
+      "status": "PASS",
+      "detail": "mail=delivery_failed eligible=true You can review it now. Open the Review Room from your Studio Board.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\07-failed-notice-board-still-honest.png"
+    },
+    {
+      "check": "voice_status_review_email_secondary",
+      "status": "PASS",
+      "detail": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "check": "voice_status_mixed_historical_resolves_hierarchy",
+      "status": "PASS",
+      "detail": "pendingRetry=true assigned=false Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "check": "two_browsers_same_maya_story",
+      "status": "PASS",
+      "detail": "You can review it now. Open the Review Room from your Studio Board.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\08-second-browser-same-project.png"
+    },
+    {
+      "check": "maya_sees_real_flyer_version_and_actions",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nReview your work — Make Me a Flyer\n\nSERVICE · MAKE ME A FLYER\n\nCedar & Bloom R4 1787179086434\n\nLook at the current version. You can ask a question, request a revision, or approve ",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\10-maya-reviews-real-flyer.png"
+    },
+    {
+      "check": "question_does_not_create_revision",
+      "status": "PASS",
+      "detail": "The Studio record does not show anything waiting on you right now."
+    },
+    {
+      "check": "revision_received_and_durable",
+      "status": "PASS",
+      "detail": "Correction uses: 1",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\11-revision-requested-ack.png"
+    },
+    {
+      "check": "voice_revision_received",
+      "status": "PASS",
+      "detail": "Yes. The Studio received your revision request. It is on the project record."
+    },
+    {
+      "check": "voice_status_revision_underway",
+      "status": "PASS",
+      "detail": "spine=ready_for_review Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "check": "revised_artifact_produced",
+      "status": "PASS",
+      "detail": "v1=4fed253980b2 v2=9a92e2ceea69"
+    },
+    {
+      "check": "creative_brief_fidelity_v2",
+      "status": "PASS",
+      "detail": "Cedar & Bloom R4 1787179086434\nBook Your Reset\nCedar & Bloom Home Organizing\n$149\nAugust 24 through September 14, 2026\nOne 2-hour home organization session. One selected household area. Simple organization plan for maintaining the space. Pantry, entryway, children's homework area"
+    },
+    {
+      "check": "rereview_shows_new_version",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nReview your work — Make Me a Flyer\n\nSERVICE · MAKE ME A FLYER\n\nCedar & Bloom R4 1787179086434\n\nLook at the current version. You can ask a q",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\12-rereview-version-2.png"
+    },
+    {
+      "check": "voice_applied_change_from_record",
+      "status": "PASS",
+      "detail": "Yes. The Studio record shows your requested change was applied in the current version."
+    },
+    {
+      "check": "voice_status_version_2_ready",
+      "status": "PASS",
+      "detail": "Your flyer is ready for Review. Open the Review Room from your Studio Board. An email notification is still retrying, but Review is available now on your Studio Board. The Board is the source of truth."
+    },
+    {
+      "check": "stale_version_cannot_win",
+      "status": "PASS",
+      "detail": "v1=4fed253980b2 v2=9a92e2ceea69 pin=9a92e2ceea69 stalePatch=422 {\"error\":\"Job must be ready for review.\",\"revisionLimitReached\":false}",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\13-approved-exact-version.png"
+    },
+    {
+      "check": "exact_final_delivery",
+      "status": "PASS",
+      "detail": "spine=ready_for_delivery files=2"
+    },
+    {
+      "check": "five_slot_classification",
+      "status": "PASS",
+      "detail": "design_direction:supporting_studio_work, flyer_design:customer_promised_design, print_ready_pdf:customer_promised_file, digital_share_file:customer_promised_file, qc_review:internal_qa"
+    },
+    {
+      "check": "customer_received_promised_png_and_pdf",
+      "status": "PASS",
+      "detail": "files=2 png=9a92e2ceea69 pdf=fd072d72861d"
+    },
+    {
+      "check": "final_delivery_customer_truth",
+      "status": "PASS",
+      "detail": "← BACK\nREVIEW ROOM\nHelp Center →\nStudio Board\nProject Record\nReview Room\nFinal Delivery\nHelp Center\n\nDelivery — download the files from the version you approved. — Cedar & Bloom R4 1787179086434\n\nPROJECT COMPLETE\n\nYour files are ready.\n\nDownload the files from the version you app",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\14-final-delivery-png-and-pdf.png"
+    },
+    {
+      "check": "voice_status_approved_final_ready",
+      "status": "PASS",
+      "detail": "Your final files are ready in Final Delivery on your Studio Board."
+    },
+    {
+      "check": "leave_return_preserves_approval_and_history",
+      "status": "PASS",
+      "detail": "spine=ready_for_delivery You approved Version 2. That is the exact version The Studio will prepare for delivery. An older version cannot replace it.",
+      "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-4-full-business-rehearsal-1\\customer-board-walk\\shots\\15-fresh-context-return.png"
+    },
+    {
+      "check": "owner_intervention",
+      "status": "PASS",
+      "detail": "Tagia decided the pricing exception once. Machine carried aftermath. Routine cracks stayed off the desk. Branded email remains NOT YET CERTIFIED."
+    }
+  ],
+  "artifacts": {
+    "v1": "artifacts/maya-flyer-v1.png",
+    "v2": "artifacts/maya-flyer-v2.png",
+    "v1Pdf": "artifacts/maya-flyer-v1.pdf",
+    "v2Pdf": "artifacts/maya-flyer-v2.pdf"
+  }
+}

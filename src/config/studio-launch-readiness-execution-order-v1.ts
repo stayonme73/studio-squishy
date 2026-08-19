@@ -5,7 +5,8 @@
  *
  * Tagia 2026-08-17: Room 1 stays technically open solely for deferred
  * domain/email. That sticky does not block entering Room 2 or Room 3.
- * Tagia 2026-08-18: Room 2 CLOSED. Current execution is Room 3.
+ * Tagia 2026-08-18: Room 2 CLOSED.
+ * Tagia 2026-08-19: Room 3 CLOSED at cd2a1e2. Current execution is Room 4.
  */
 
 export const studioLaunchReadinessExecutionOrderV1 = {
@@ -25,9 +26,9 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     "soft-opening-preparation",
   ] as const,
 
-  /** Highest unfinished execution room. Room 1 remains open for email only. Room 2 is CLOSED. */
-  currentActiveRoom: 3 as const,
-  currentActiveRoomId: "owner-console" as const,
+  /** Highest unfinished execution room. Room 1 remains open for email only. Rooms 2–3 CLOSED. */
+  currentActiveRoom: 4 as const,
+  currentActiveRoomId: "full-business-rehearsal" as const,
   currentActiveRoomClosed: false as const,
 
   lastCustomerLifePackage: {
@@ -53,6 +54,7 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     emailDoesNotBlockRoom2: true as const,
     room3Authorized: true as const,
     emailDoesNotBlockRoom3: true as const,
+    emailDoesNotBlockRoom4: true as const,
     comeBackLater: {
       id: "studio-business-domain-and-email-identity",
       parkedPackageId: "STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1",
@@ -142,10 +144,21 @@ export const studioLaunchReadinessExecutionOrderV1 = {
   room3Section3: {
     packageId:
       "STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-WHOLE-DESK-REHEARSAL-AND-CLOSEOUT-1",
+    sectionClosed: true as const,
+    parkForManager: false as const,
+    closeTip: "cd2a1e2" as const,
+    doNotAutoAdvance: true as const,
+    doNotStartRoom4: false as const,
+    doNotRebuild: true as const,
+    nextSectionWaitsForScoutPackage: false as const,
+  },
+
+  room4: {
+    packageId: "STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1",
     sectionClosed: false as const,
     parkForManager: true as const,
     doNotAutoAdvance: true as const,
-    doNotStartRoom4: true as const,
+    doNotStartRoom5: true as const,
     doNotRebuild: true as const,
     nextSectionWaitsForScoutPackage: true as const,
   },

@@ -42,7 +42,9 @@ describe("studio-room-3-whole-desk-rehearsal-and-closeout", () => {
     );
     expect(cfg.priorSections.section1.closeTip).toBe("76b974f");
     expect(cfg.priorSections.section2.closeTip).toBe("199e4a4");
-    expect(cfg.doNotStartRoom4).toBe(true);
+    expect(cfg.sectionClosed).toBe(true);
+    expect(cfg.closeTip).toBe("cd2a1e2");
+    expect(cfg.doNotStartRoom4).toBe(false);
     expect(cfg.doNotReopenResend).toBe(true);
   });
 

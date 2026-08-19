@@ -9,15 +9,15 @@ Authority: `docs/launch-readiness-execution-order-v1-locked.md` · `src/config/s
 
 This is sequence control, **not** permission to start multiple packages.
 
-**Active room is 3 — Owner Console.** Room 2 is **CLOSED**. Section 1 `STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1` is **CLOSED** at `45b09b1`. Section 2 `STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1` is **CLOSED** at `e609203`. Section 3 `STUDIO-OPERATING-ROOM-2-REVIEW-FINAL-DELIVERY-TRUTH-AND-FRICTION-1` is **CLOSED** at `3328807`. Section 4 `STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1` is **CLOSED** at `6cf9ca0`. Section 5 `STUDIO-OPERATING-ROOM-2-WHOLE-CUSTOMER-TRUTH-AND-FRICTION-SWEEP-1` is **CLOSED** at `b3397a6`. Room 3 Section 1 `STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1` is **CLOSED** at `76b974f`. Current section: `STUDIO-OPERATING-ROOM-3-OWNER-DECISION-EXECUTION-AND-AFTERMATH-1`. Park for Manager. Do not auto-advance.
+**Active room is 4 — Full business rehearsal.** Room 2 is **CLOSED**. Room 3 is **CLOSED** at `cd2a1e2`. Room 3 Section 1 CLOSED at `76b974f`. Section 2 CLOSED at `199e4a4`. Section 3 CLOSED at `cd2a1e2`. Current package: `STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1`. Park for Manager. Do not auto-advance. Do not start Room 5.
 
 **Room 1 is COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL.** It is **not** a full CLOSED stamp. Authoritative executable tip: `a49efd7`. Abandoned 3067 attempts do not count.
 
-**COME BACK LATER:** live Resend / branded sender / inbox proof is **PARKED WITH EXTERNAL PREREQUISITE** (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1` @ `d6974eb`). Not closed. Do not fake. This yellow sticky **does not block Room 2 or Room 3**. Do not reopen it from Room 3. Resume that same package after Studio domain + business-email identity. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`.
+**COME BACK LATER:** live Resend / branded sender / inbox proof is **PARKED WITH EXTERNAL PREREQUISITE** (`STUDIO-OPERATING-RESEND-LIFECYCLE-NOTIFICATIONS-AND-WATCHDOG-1` @ `d6974eb`). Not closed. Do not fake. This yellow sticky **does not block Room 2, Room 3, or Room 4**. Do not reopen it from Room 4. Resume that same package after Studio domain + business-email identity. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`.
 
-Do **not** start rooms 4–5. Do not reopen completed Room 1 or Room 2 capabilities unless new evidence proves an actual defect. Do not rebuild the Owner Console. Do not merge.
+Do **not** start Room 5. Do not reopen completed Room 1, Room 2, or Room 3 capabilities unless new evidence proves an actual defect. Do not rebuild the Owner Console. Do not merge.
 
-Close a section only after: BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST. Room 3 uses: OWNER-USE → FIND → FIX → BREAK → RETEST → CLOSE SECTION. Visual redesign spree is forbidden.
+Close a section only after: BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST. Room 4 uses: RUN BUSINESS → BREAK IT → RECOVER → RETEST → CLOSE. Visual redesign spree is forbidden.
 
 Do **not** use: BUILD → TESTS GREEN → NEXT.
 

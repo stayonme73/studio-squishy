@@ -1,0 +1,39 @@
+import { describe, expect, it } from "vitest";
+
+import { studioRoom4FullBusinessRehearsalV1 as cfg } from "@/config/studio-room-4-full-business-rehearsal-v1";
+import { studioLaunchReadinessExecutionOrderV1 } from "@/config/studio-launch-readiness-execution-order-v1";
+import { shouldExceptionKindAppearOnSequentialDesk } from "@/lib/campaign-tasks/owner-console-decision-boundary";
+import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer";
+
+describe("STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1", () => {
+  it("locks Room 4 as the current execution room and does not start Room 5", () => {
+    expect(cfg.packageId).toBe("STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1");
+    expect(cfg.room).toBe(4);
+    expect(cfg.sectionClosed).toBe(false);
+    expect(cfg.parkForManager).toBe(true);
+    expect(cfg.doNotStartRoom5).toBe(true);
+    expect(cfg.doNotReopenResend).toBe(true);
+    expect(cfg.priorRooms.room3CloseTip).toBe("cd2a1e2");
+    expect(cfg.priorRooms.room2Closed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(4);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomId).toBe(
+      "full-business-rehearsal",
+    );
+    expect(studioLaunchReadinessExecutionOrderV1.room3Section3.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room3Section3.closeTip).toBe("cd2a1e2");
+    expect(studioLaunchReadinessExecutionOrderV1.room4.packageId).toBe(cfg.packageId);
+    expect(studioLaunchReadinessExecutionOrderV1.room4.doNotStartRoom5).toBe(true);
+  });
+
+  it("reuses Maya flyer on the certified renderer path and keeps Owner as judgment only", () => {
+    expect(cfg.customerFixture.skuId).toBe(DESIGN_RENDERER_PROOF_SKU);
+    expect(cfg.customerFixture.productionPath).toBe("certified_design_renderer_v2_rtu_flyer");
+    expect(cfg.ownerRoutine).toBe("NONE");
+    expect(shouldExceptionKindAppearOnSequentialDesk("pricing_exception")).toBe(true);
+    expect(shouldExceptionKindAppearOnSequentialDesk("routine_internal")).toBe(false);
+    expect(cfg.comeBackLaterEmail.protectedCheckpoint).toBe("d6974eb");
+    expect(cfg.outOfScope).toEqual(
+      expect.arrayContaining(["room_5", "unapproved_production_tools", "branded_sender_certification"]),
+    );
+  });
+});

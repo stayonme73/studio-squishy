@@ -128,7 +128,7 @@ describe("STUDIO-OPERATING-ROOM-2-WHOLE-CUSTOMER-TRUTH-AND-FRICTION-SWEEP-1", ()
     expect(cfg.priorSections.section4CloseTip).toBe("6cf9ca0");
     expect(cfg.comeBackLaterEmail.protectedCheckpoint).toBe("d6974eb");
     expect(cfg.comeBackLaterEmail.neitherPassNorFailForThisSweep).toBe(true);
-    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(3);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(4);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomClosed).toBe(false);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section4.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section4.closeTip).toBe("6cf9ca0");

@@ -1,6 +1,6 @@
 /**
  * Room 3 Section 3 — whole-desk rehearsal and Room 3 closeout sweep.
- * PARK for Manager. Do not auto-start Room 4.
+ * CLOSED 2026-08-19 at cd2a1e2. Do not reopen unless new evidence.
  *
  * Section 1 CLOSED at 76b974f. Section 2 CLOSED at 199e4a4.
  * Do not reopen prior sections unless new evidence.
@@ -20,11 +20,13 @@ export const studioRoom3OwnerConsoleWholeDeskRehearsalAndCloseoutV1 = {
   roomId: "owner-console" as const,
   merge: "separately_authorized" as const,
   ownerRoutine: "NONE" as const,
-  parkForManager: true as const,
-  sectionClosed: false as const,
-  roomClosed: false as const,
+  parkForManager: false as const,
+  sectionClosed: true as const,
+  roomClosed: true as const,
+  closedAt: "2026-08-19" as const,
+  closeTip: "cd2a1e2" as const,
   doNotAutoAdvance: true as const,
-  doNotStartRoom4: true as const,
+  doNotStartRoom4: false as const,
   doNotStartRoom5: true as const,
   doNotRebuildOwnerConsole: true as const,
   doNotReopenResend: true as const,

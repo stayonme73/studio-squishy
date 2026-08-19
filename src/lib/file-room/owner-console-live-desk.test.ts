@@ -38,6 +38,12 @@ describe("owner-console-live-desk", () => {
     expect(classifyOwnerConsoleCampaignForLiveDesk("room3-s2c-hold-newwalk")).toBe(
       "stored_historical_evidence",
     );
+    expect(classifyOwnerConsoleCampaignForLiveDesk("maya-room4-rehearsal-old")).toBe(
+      "stored_historical_evidence",
+    );
+    expect(classifyOwnerConsoleCampaignForLiveDesk("maya-r4-live-1787179086434")).toBe(
+      "stored_historical_evidence",
+    );
     expect(shouldAppearOnLiveOwnerDesk("p3-cert-j12")).toBe(false);
   });
 

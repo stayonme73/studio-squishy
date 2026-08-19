@@ -40,6 +40,8 @@ const STORED_EVIDENCE_ID_PREFIXES = [
   "room3-live-routine-",
   "room3-live-fact-",
   "self-test-",
+  "maya-room4-rehearsal-",
+  "maya-r4-live-",
 ] as const;
 
 export function classifyOwnerConsoleCampaignForLiveDesk(

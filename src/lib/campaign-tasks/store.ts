@@ -2,6 +2,10 @@ import { promises as fs } from "fs";
 import path from "path";
 
 import type { CampaignRecord } from "@/config/studio-board";
+import {
+  atomicReplaceFile,
+  withCampaignWriteLock,
+} from "@/lib/campaign-store/file-io";
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
 import { getOrInitializeMaterials } from "@/lib/materials/store";
 
@@ -25,14 +29,25 @@ async function ensureTasksDir(): Promise<void> {
 export async function readTasksEnvelope(
   campaignId: string,
 ): Promise<ServerTasksEnvelope | null> {
-  try {
-    const raw = await fs.readFile(tasksPath(campaignId), "utf8");
-    const parsed = JSON.parse(raw) as ServerTasksEnvelope;
-    return normalizeLegacyRecord(parsed);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
-    throw error;
+  const file = tasksPath(campaignId);
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      const raw = await fs.readFile(file, "utf8");
+      if (!raw.trim()) {
+        await new Promise((resolve) => setTimeout(resolve, 20 * (attempt + 1)));
+        continue;
+      }
+      return normalizeLegacyRecord(JSON.parse(raw) as ServerTasksEnvelope);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+      if (error instanceof SyntaxError && attempt < 4) {
+        await new Promise((resolve) => setTimeout(resolve, 20 * (attempt + 1)));
+        continue;
+      }
+      throw error;
+    }
   }
+  throw new SyntaxError(`Tasks envelope for ${campaignId} was unreadable.`);
 }
 
 export async function listTasksEnvelopes(): Promise<ServerTasksEnvelope[]> {
@@ -58,9 +73,14 @@ export async function listTasksEnvelopes(): Promise<ServerTasksEnvelope[]> {
 export async function writeTasksEnvelope(
   envelope: ServerTasksEnvelope,
 ): Promise<ServerTasksEnvelope> {
-  await ensureTasksDir();
-  await fs.writeFile(tasksPath(envelope.campaignId), JSON.stringify(envelope, null, 2), "utf8");
-  return envelope;
+  return withCampaignWriteLock(envelope.campaignId, async () => {
+    await ensureTasksDir();
+    await atomicReplaceFile(
+      tasksPath(envelope.campaignId),
+      JSON.stringify(envelope, null, 2),
+    );
+    return envelope;
+  });
 }
 
 function toEnvelope(record: CampaignTasksRecord): ServerTasksEnvelope {

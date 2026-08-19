@@ -54,8 +54,8 @@ describe("STUDIO-OPERATING-ROOM-3-OWNER-CONSOLE-TRUTH-AND-DECISION-DESK-AUDIT-1"
     expect(cfg.priorRooms.room2Closed).toBe(true);
     expect(cfg.priorRooms.room2Section5CloseTip).toBe("b3397a6");
     expect(studioRoom2WholeCustomerTruthAndFrictionSweepV1.sectionClosed).toBe(true);
-    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(3);
-    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomId).toBe("owner-console");
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(4);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomId).toBe("full-business-rehearsal");
     expect(studioLaunchReadinessExecutionOrderV1.room2Section5.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room3Section1.packageId).toBe(cfg.packageId);
     expect(studioLaunchReadinessExecutionOrderV1.room3Section1.parkForManager).toBe(false);

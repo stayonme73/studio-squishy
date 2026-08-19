@@ -128,10 +128,22 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const [tasksEnvelope, materialsEnvelope] = await Promise.all([
-    getOrGenerateTasks(campaignId, campaignEnvelope.record),
-    getOrInitializeMaterials(campaignId, campaignEnvelope.record),
-  ]);
+  let tasksEnvelope;
+  let materialsEnvelope;
+  try {
+    [tasksEnvelope, materialsEnvelope] = await Promise.all([
+      getOrGenerateTasks(campaignId, campaignEnvelope.record),
+      getOrInitializeMaterials(campaignId, campaignEnvelope.record),
+    ]);
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: "The Studio is still recording that action. Please try again." },
+        { status: 503 },
+      );
+    }
+    throw error;
+  }
 
   const synced = syncJobRecordsFromCampaign(
     campaignEnvelope.record,

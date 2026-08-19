@@ -36,7 +36,7 @@ describe("STUDIO-OPERATING-ROOM-2-CUSTOMER-FACING-TRUTH-AND-FRICTION-ENTRY-1", (
     expect(cfg.merge).toBe("separately_authorized");
     expect(studioRoom1CustomerLifeCloseoutV1.roomClosed).toBe(false);
     expect(studioRoom1CustomerLifeCloseoutV1.room2Authorized).toBe(true);
-    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(3);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(4);
     expect(studioLaunchReadinessExecutionOrderV1.room2Entry.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section2.packageId).toBe(
       "STUDIO-OPERATING-ROOM-2-RETURNING-CUSTOMER-BOARD-AND-HELP-CENTER-TRUTH-1",

@@ -73,7 +73,7 @@ describe("STUDIO-OPERATING-ROOM-2-MIXED-STATUS-AND-TERMINOLOGY-TRUTH-1", () => {
     expect(cfg.priorSections.section1CloseTip).toBe("45b09b1");
     expect(cfg.priorSections.section2CloseTip).toBe("e609203");
     expect(cfg.priorSections.section3CloseTip).toBe("3328807");
-    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(3);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(4);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section3.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room2Section3.closeTip).toBe("3328807");
     expect(studioLaunchReadinessExecutionOrderV1.room2Section4.packageId).toBe(cfg.packageId);
