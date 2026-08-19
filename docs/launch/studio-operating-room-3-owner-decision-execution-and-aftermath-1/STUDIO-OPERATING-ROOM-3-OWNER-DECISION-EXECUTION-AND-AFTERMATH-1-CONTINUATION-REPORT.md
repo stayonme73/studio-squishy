@@ -120,13 +120,13 @@ Evidence shots: `docs/launch/studio-operating-room-3-owner-decision-execution-an
 
 ## Final work commit
 
-See git tip after push.
+Park tip: `0ed8c78`. Prior park: `4eed9c2`. Section 1 close: `76b974f`.
 
 ---
 
 ## Push / sync state
 
-Pushed to `origin/operating/design-renderer-proof-1` only. **No merge.**
+Pushed `a13e8d8..0ed8c78` on `origin/operating/design-renderer-proof-1`. **No merge.**
 
 ---
 
