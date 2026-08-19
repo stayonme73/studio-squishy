@@ -187,7 +187,10 @@ Routine cracks recovered by Machine. One genuine pricing judgment landed on the 
 
 ## Final work commit / push
 
-See git tip after this report lands. Branch: `operating/design-renderer-proof-1` (or current feature branch). Push when committed. **No merge.**
+- **Final work commit:** `9f9ac7c`
+- **Branch:** `operating/design-renderer-proof-1`
+- **Push/sync:** pushed to `origin/operating/design-renderer-proof-1` (`56f0349..9f9ac7c`)
+- **Merge:** not requested — park for Manager
 
 ---
 
