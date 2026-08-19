@@ -8,6 +8,7 @@ import {
   type OwnerConsoleCampaignBundle,
 } from "@/lib/campaign-tasks/owner-console-view";
 import {
+  bundleHasRecentlyResolvedForOwnerConsole,
   resolveOwnerConsoleScanView,
   resolveWaitingOwnerExceptionIds,
   type OwnerConsoleScanView,
@@ -166,10 +167,17 @@ export async function loadOwnerConsoleAggregate(
     provisionalView.waitingOnOwner.map((card) => card.campaignId),
   );
 
+  const recentlyResolvedByCampaign = new Set(
+    liveRawBundles
+      .filter((bundle) => bundleHasRecentlyResolvedForOwnerConsole(bundle))
+      .map((bundle) => bundle.envelope.campaignId),
+  );
+
   const bundles = liveRawBundles.filter((bundle) =>
     shouldIncludeCampaignInOwnerConsoleAggregate(
       bundle.envelope,
       waitingByCampaign.has(bundle.envelope.campaignId),
+      recentlyResolvedByCampaign.has(bundle.envelope.campaignId),
     ),
   );
 

@@ -219,6 +219,12 @@ describe("owner-console-view", () => {
     );
   });
 
+  it("shouldIncludeCampaignInOwnerConsoleAggregate keeps recently resolved campaigns", () => {
+    const active = envelope("owner-live-desk-now", "Live walk");
+    expect(shouldIncludeCampaignInOwnerConsoleAggregate(active, false, true)).toBe(true);
+    expect(shouldIncludeCampaignInOwnerConsoleAggregate(active, false, false)).toBe(false);
+  });
+
   it("shouldIncludeCampaignInOwnerConsoleAggregate skips delivered with no waiting", () => {
     const delivered = envelope("campaign-x", "Done Co");
     delivered.record.campaignStatus = "DELIVERED";

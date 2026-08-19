@@ -440,11 +440,11 @@ async function main(): Promise<number> {
   const askName = `Room 3 Ask ${stamp}`;
   const holdName = `Room 3 Hold ${stamp}`;
   const refundName = `Room 3 Refund ${stamp}`;
-  const priceId = `room3-s2c-price-${stamp}`;
-  const declineId = `room3-s2c-decline-${stamp}`;
-  const askId = `room3-s2c-ask-${stamp}`;
-  const holdId = `room3-s2c-hold-${stamp}`;
-  const refundId = `room3-s2c-refund-${stamp}`;
+  const priceId = `room3-s2d-price-${stamp}`;
+  const declineId = `room3-s2d-decline-${stamp}`;
+  const askId = `room3-s2d-ask-${stamp}`;
+  const holdId = `room3-s2d-hold-${stamp}`;
+  const refundId = `room3-s2d-refund-${stamp}`;
 
   await seedPricingException(created.user.id, priceId, priceName, "Quoted flyer price exception");
   await seedPricingException(created.user.id, declineId, declineName, "Quoted flyer price to decline");
@@ -690,14 +690,6 @@ async function main(): Promise<number> {
       await shot(page, "06b-hold-returned"),
     );
 
-    if (returnedHold) {
-      const approveHold = page.getByRole("button", { name: /Approve pricing exception/i }).first();
-      if ((await approveHold.count()) > 0) {
-        await approveHold.click();
-        await waitForDecisionCarried(page);
-      }
-    }
-
     const internalReplay = holdException
       ? await page.request.patch(`${BASE}/api/campaigns/${encodeURIComponent(holdId)}/tasks`, {
           data: {
@@ -714,6 +706,14 @@ async function main(): Promise<number> {
       internalReplay?.ok() ? "PASS" : "FAIL",
       `replay status ${internalReplay?.status() ?? "missing"}`,
     );
+
+    if (returnedHold) {
+      const approveHold = page.getByRole("button", { name: /Approve pricing exception/i }).first();
+      if ((await approveHold.count()) > 0) {
+        await approveHold.click();
+        await waitForDecisionCarried(page);
+      }
+    }
 
     const openedRefund = await openNamedFolder(page, refundName);
     text = await visibleText(page);
@@ -767,17 +767,32 @@ async function main(): Promise<number> {
       returnShot,
     );
 
+    await page
+      .waitForFunction(
+        () => {
+          const body = document.body?.innerText || "";
+          return /Your desk is clear/i.test(body) || /Completed Today/i.test(body);
+        },
+        undefined,
+        { timeout: 25_000 },
+      )
+      .catch(() => undefined);
+
     const completedTray = page.getByRole("button", { name: /Completed Today/i }).first();
     if ((await completedTray.count()) > 0) {
       await completedTray.click();
-      await page.waitForTimeout(600);
+      await page
+        .locator(".fr-owner-sequential__cabinet-item-title")
+        .first()
+        .waitFor({ state: "visible", timeout: 15_000 })
+        .catch(() => undefined);
     }
     text = await visibleText(page);
+    const recentlyHandledPattern =
+      /Quoted flyer price exception|Quoted flyer price to decline|Hold pricing internally|Refund request/i;
     push(
       "recently_handled_shows_result",
-      /Quoted flyer price exception|Quoted flyer price to decline|Refund/i.test(text)
-        ? "PASS"
-        : "FAIL",
+      recentlyHandledPattern.test(text) ? "PASS" : "FAIL",
       text.slice(0, 220),
       await shot(page, "08b-recently-handled"),
     );

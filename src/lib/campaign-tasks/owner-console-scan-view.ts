@@ -101,6 +101,27 @@ function isRecentlyResolved(record: CampaignExceptionRecord, nowMs: number): boo
   return isRecentlyResolvedAt(record.resolvedAt, nowMs);
 }
 
+/** Keep campaigns in Owner Console aggregate while Completed Today still has rows. */
+export function bundleHasRecentlyResolvedForOwnerConsole(
+  bundle: OwnerConsoleCampaignBundle,
+  nowMs: number = Date.now(),
+): boolean {
+  for (const record of bundle.tasksEnvelope.exceptionRecords ?? []) {
+    if (!isOpenExceptionStatus(record.status) && isRecentlyResolved(record, nowMs)) {
+      return true;
+    }
+  }
+  for (const interaction of bundle.tasksEnvelope.ownerDecisionInteractions ?? []) {
+    if (
+      interaction.status === "resolved" &&
+      isRecentlyResolvedAt(interaction.updatedAt, nowMs)
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function sortScanItems(items: OwnerConsoleScanItem[]): OwnerConsoleScanItem[] {
   return items.sort((a, b) => {
     const campaign = a.campaignName.localeCompare(b.campaignName);

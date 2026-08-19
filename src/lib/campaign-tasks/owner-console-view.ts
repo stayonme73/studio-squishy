@@ -459,9 +459,11 @@ export function resolveAssignCandidatesByCampaign(
 export function shouldIncludeCampaignInOwnerConsoleAggregate(
   envelope: ServerCampaignEnvelope,
   hasWaitingOnOwner: boolean,
+  hasRecentlyResolved = false,
 ): boolean {
   if (!shouldAppearOnLiveOwnerDesk(envelope.campaignId)) return false;
   if (hasWaitingOnOwner) return true;
+  if (hasRecentlyResolved) return true;
   if (envelope.record.campaignStatus === "DELIVERED") return false;
   return false;
 }

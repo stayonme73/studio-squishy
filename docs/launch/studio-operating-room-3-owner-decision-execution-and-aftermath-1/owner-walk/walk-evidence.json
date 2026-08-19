@@ -1,6 +1,6 @@
 {
-  "passed": 8,
-  "failed": 16,
+  "passed": 24,
+  "failed": 0,
   "blocked": 0,
   "results": [
     {
@@ -11,56 +11,56 @@
     {
       "check": "fixtures_seeded",
       "status": "PASS",
-      "detail": "Room 3 Price 50f77c00 + Room 3 Decline 50f77c00 + Room 3 Ask 50f77c00 + Room 3 Hold 50f77c00 + Room 3 Refund 50f77c00"
+      "detail": "Room 3 Price d6c35794 + Room 3 Decline d6c35794 + Room 3 Ask d6c35794 + Room 3 Hold d6c35794 + Room 3 Refund d6c35794"
     },
     {
       "check": "open_console",
       "status": "PASS",
-      "detail": "File Room Tagia owner, client STUDIO Good afternoon, Tagia. Everything is running smoothly. Your desk is clear. Today's Desk 0 folders Refreshed Aug 19, 4:02 PM FILE CABINET 🟠 Dec",
+      "detail": "File Room Tagia owner, client STUDIO Good afternoon, Tagia. 6 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 6 folders 6 decisions Estimated revi",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\01-owner-console-open.png"
     },
     {
       "check": "non_refund_decision_on_desk",
-      "status": "FAIL",
+      "status": "PASS",
       "detail": "Pricing exception folders visible in Decisions cabinet"
     },
     {
       "check": "pricing_folder_context",
-      "status": "FAIL",
-      "detail": "File Room Tagia owner, client STUDIO Good afternoon, Tagia. Everything is running smoothly. Your desk is clear. Today's Desk 0 folders Refreshed Aug 19, 4:02 PM FILE CABINET 🟠 Decisions 0 🔵 Approvals 0 🟢 Ready to Rele",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good afternoon, Tagia. 6 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 6 folders 6 decisions Estimated review time: about 18 minutes Refreshed Aug ",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\02-pricing-folder.png"
     },
     {
       "check": "pricing_approve_machine_acts",
-      "status": "FAIL",
-      "detail": "Approve pricing exception missing"
+      "status": "PASS",
+      "detail": "Pricing approve confirmed by Machine briefing"
     },
     {
       "check": "pricing_decline_recorded",
-      "status": "FAIL",
-      "detail": "Decline folder missing",
+      "status": "PASS",
+      "detail": "Decline this pricing exception? Quoted or purchased pricing stays as recorded.",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\02b-pricing-decline.png"
     },
     {
       "check": "ask_folder_not_closed",
-      "status": "FAIL",
-      "detail": "File Room Tagia owner, client STUDIO Good afternoon, Tagia. Everything is running smoothly. Your desk is clear. Today's Desk 0 folders Refreshed Aug 19, 4:02 PM FILE CABINET 🟠 Dec",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good afternoon, Tagia. 6 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 6 folders 6 decisions Estimated revi",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\03-ask-folder.png"
     },
     {
       "check": "owner_ask_recorded",
-      "status": "FAIL",
-      "detail": "Ask client button missing"
+      "status": "PASS",
+      "detail": "Ask client confirmed by Machine briefing"
     },
     {
       "check": "ask_left_active_tray",
       "status": "PASS",
-      "detail": "Room 3 Ask 50f77c00 left the decision tray"
+      "detail": "Room 3 Ask d6c35794 left the decision tray"
     },
     {
       "check": "customer_sees_owner_ask",
-      "status": "FAIL",
-      "detail": "ask jobs=Preparing to start",
+      "status": "PASS",
+      "detail": "ask jobs=Waiting on you",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\04-customer-after-ask.png"
     },
     {
@@ -70,47 +70,47 @@
     },
     {
       "check": "ask_loop_returns_to_desk",
-      "status": "FAIL",
-      "detail": "Room 3 Ask 50f77c00 did not return",
+      "status": "PASS",
+      "detail": "Ask folder ready for Owner again",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\05-ask-returned.png"
     },
     {
       "check": "hold_is_not_approve_or_decline",
-      "status": "FAIL",
-      "detail": "Hold confirm dialog was empty",
+      "status": "PASS",
+      "detail": "Hold this pricing review for internal follow-up? This is a pause, not an approve or decline. The folder will leave your desk.",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\06-hold-folder.png"
     },
     {
       "check": "hold_internal_follow_up_recorded",
-      "status": "FAIL",
-      "detail": "No waiting_internal pricing exception after hold"
+      "status": "PASS",
+      "detail": "complete_internal_owner_follow_up 200"
     },
     {
       "check": "hold_returns_to_owner_after_internal_follow_up",
-      "status": "FAIL",
-      "detail": "Room 3 Hold 50f77c00 did not return",
+      "status": "PASS",
+      "detail": "Room 3 Hold d6c35794 ready for Owner again",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\06b-hold-returned.png"
     },
     {
       "check": "internal_return_replay_idempotent",
-      "status": "FAIL",
-      "detail": "replay status missing"
+      "status": "PASS",
+      "detail": "replay status 200"
     },
     {
       "check": "refund_folder_still_available",
-      "status": "FAIL",
-      "detail": "File Room Tagia owner, client STUDIO Good afternoon, Tagia. One decision needs you before production can continue. Today's Desk 1 folder 1 decision Estimated review time: about 3 m",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good afternoon, Tagia. 3 decisions need you. I sorted them by urgency — this folder is first. Today's Desk 3 folders 3 decisions Estimated revi",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\07-refund-folder.png"
     },
     {
       "check": "refund_approve_recorded",
-      "status": "FAIL",
-      "detail": "Approve refund missing"
+      "status": "PASS",
+      "detail": "Refund approve confirmed by Machine briefing"
     },
     {
       "check": "refund_replay_blocked",
-      "status": "FAIL",
-      "detail": "replay status 200"
+      "status": "PASS",
+      "detail": "replay status 409"
     },
     {
       "check": "handled_left_active_tray",
@@ -120,14 +120,14 @@
     },
     {
       "check": "recently_handled_shows_result",
-      "status": "FAIL",
-      "detail": "File Room Tagia owner, client STUDIO Good afternoon, Tagia. One decision needs you before production can continue. Today's Desk 1 folder 1 decision Estimated review time: about 3 minutes Refreshed Aug 19, 4:11 PM FILE CA",
+      "status": "PASS",
+      "detail": "File Room Tagia owner, client STUDIO Good afternoon, Tagia. Everything is running smoothly. Your desk is clear. Today's Desk 0 folders Refreshed Aug 19, 4:59 PM FILE CABINET 🟠 Decisions 0 🔵 Approvals 0 🟢 Ready to Rele",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\08b-recently-handled.png"
     },
     {
       "check": "customer_truth_after_refund",
       "status": "PASS",
-      "detail": "jobs=Cancelled board=the STUDIO Studio Board Review Room Final Delivery Help Center New Project Sign out STUDIO BOARD Good afternoon, Maya Brooks CURRENT PROJECT Room 3 Refund 50f77c00 PROJECT STATUS W",
+      "detail": "jobs=Cancelled board=the STUDIO Studio Board Review Room Final Delivery Help Center New Project Sign out STUDIO BOARD Good afternoon, Maya Brooks CURRENT PROJECT Room 3 Refund D6c35794 PROJECT STATUS W",
       "shot": "C:\\Users\\tagia\\studio-squishy-kitchen-foundation-1\\docs\\launch\\studio-operating-room-3-owner-decision-execution-and-aftermath-1\\owner-walk\\shots\\09-customer-after-refund.png"
     },
     {
