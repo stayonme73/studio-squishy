@@ -3,7 +3,7 @@
 **Package:** `STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-BUILD-1`  
 **Manager decision:** **A. BUILD MACHINE-NATIVE — ACCEPTED**  
 **Prior design tip:** `c4deabb` · note `020dbe9`  
-**This tip:** recorded at commit below  
+**This tip:** `791e302` (pushed; synced with `origin/operating/design-renderer-proof-1`)  
 **4B:** REMAINS OPEN  
 **Stop state:** **READY FOR NIA PHOTO LIVE CERTIFICATION**  
 **Owner input:** **NIA PHOTO PACK** (required before live visual cert)  
