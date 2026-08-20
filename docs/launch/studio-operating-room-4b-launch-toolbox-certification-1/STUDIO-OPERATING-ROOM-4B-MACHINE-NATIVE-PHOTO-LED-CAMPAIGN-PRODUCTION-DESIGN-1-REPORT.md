@@ -3,7 +3,8 @@
 **Package:** `STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1`  
 **Parent:** `STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1` (remains OPEN)  
 **Prior park tip:** `47ba8c0`  
-**This tip:** recorded at commit (below) · contracts: `src/lib/studio-campaign-creative/contracts.ts`  
+**This tip:** `c4deabb` (pushed; synced with `origin/operating/design-renderer-proof-1`)  
+**Contracts:** `src/lib/studio-campaign-creative/contracts.ts`  
 **Mode:** Design + decomposition + repo feasibility — **no purchase · no vendor trial · no giant rewrite**  
 **Room 5:** NOT STARTED · **No merge** · **No next Toolbox service**
 
