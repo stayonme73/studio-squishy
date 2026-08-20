@@ -21,6 +21,10 @@ import {
 } from "../types";
 import { assertNoInternalLeakInCampaignText } from "../customer-safe";
 
+function bookingContactHasPhone(contact: string): boolean {
+  return /\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/.test(contact);
+}
+
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
   const h = hex.replace("#", "").trim();
   if (h.length !== 6) return { r: 31, g: 58, b: 77 };
@@ -286,7 +290,9 @@ export function emitAssetLayers(input: {
         const contactSize = isUsLetter
           ? ctaSize
           : Math.max(Math.round(ctaSize * 0.78), 16);
-        const contactGap = isUsLetter ? Math.round(ctaSize * 1.55) : 34;
+        const contactGap = isUsLetter
+          ? Math.round(ctaSize * 1.55)
+          : Math.round(ctaSize * 1.45);
         layers.push(
           textFromSlot(
             `${recipe.recipeId}-cta`,
@@ -356,6 +362,27 @@ export function emitAssetLayers(input: {
             1,
           ),
         );
+        const webContact = brief.facts.bookingContact.trim();
+        if (webContact && !bookingContactHasPhone(webContact)) {
+          layers.push(
+            textFromSlot(
+              `${recipe.recipeId}-contact`,
+              "contact",
+              webContact,
+              {
+                x: b.x,
+                y: b.y + Math.max(b.height, 40) + 6,
+                width: Math.min(b.width, 520),
+                height: 22,
+              },
+              isFullBleed ? bleedText : system.palette.text,
+              16,
+              500,
+              "left",
+              1,
+            ),
+          );
+        }
       }
       continue;
     }

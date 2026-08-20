@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { readFileSync } from "fs";
 import path from "path";
 import { describe, expect, it } from "vitest";
@@ -8,6 +9,7 @@ import {
 } from "@/config/studio-room-4c-scenario-2-harbor-roast-v1";
 import { studioRoom4cMultiServiceClientGauntletV1 } from "@/config/studio-room-4c-multi-service-client-gauntlet-v1";
 import { evaluateCopyQuality } from "@/lib/studio-kitchen-production/copy-quality/evaluate";
+import { evaluateProductionRoutingEligibility } from "@/lib/studio-customer-facts";
 import {
   emitAssetLayers,
   getLayoutRecipe,
@@ -35,6 +37,7 @@ import {
   hashScenario2Brief,
   routeScenario2Services,
   scenario2CopyQualityBrief,
+  scenario2EmailCopyQualityBrief,
   scenario2VideoCtaPlateCopy,
   SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD,
   SCENARIO_2_STALE_BOOKING_URL,
@@ -57,7 +60,10 @@ describe("Room 4C Scenario 2 — machine-readable brief", () => {
     expect(creative.facts.datesDisplay).toBe(brief.facts.datesDisplay);
     expect(creative.facts.priceDisplay).toBe("$48");
     expect(creative.facts.cta).toBe("Limited autumn box");
-    expect(creative.facts.bookingContact).toBe("");
+    expect(creative.facts.bookingContact).toBe("harborroast.example/autumn-box");
+    expect(creative.facts.supportingCopy).toBe(
+      "three 8-ounce bags of whole-bean single-origin coffee",
+    );
     expect(creative.targetFormats).toEqual([
       "social_square",
       "social_vertical",
@@ -70,12 +76,17 @@ describe("Room 4C Scenario 2 — machine-readable brief", () => {
     expect(creative.constraints.noNeon).toBe(true);
   });
 
-  it("does not invent URL, email, phone, or carousel", () => {
-    expect(brief.facts.bookingContact).toBe("");
+  it("locks authorized URL, email, and contents without inventing a phone", () => {
+    expect(brief.facts.bookingContact).toBe("harborroast.example/autumn-box");
+    expect(brief.cta.bookingUrl).toBe("harborroast.example/autumn-box");
+    expect(brief.cta.supportEmail).toBe("hello@harborroast.example");
+    expect(brief.offer.contentsDisplay).toBe(
+      "three 8-ounce bags of whole-bean single-origin coffee",
+    );
+    expect(brief.offer.contentsDisplay).not.toBe(brief.offer.name);
     expect(brief.refusedIfAsked).toContain("carousel");
-    expect(JSON.stringify(brief)).not.toContain("harborroast.example");
-    expect(JSON.stringify(brief)).not.toContain("@");
     expect(JSON.stringify(brief)).not.toContain("(804)");
+    expect(JSON.stringify(brief)).not.toContain("harborroast.example/book");
     expect(
       studioRoom4cMultiServiceClientGauntletV1.frozenLaunchNowServices.carousel,
     ).toBe("NOT ON LAUNCH MENU");
@@ -102,9 +113,14 @@ describe("Room 4C Scenario 2 — acceptance and routing", () => {
     expect(result.menuOk).toBe(true);
     expect(result.carousel.admit).toBe(false);
     expect(result.unsupportedRefused).toContain("carousel");
-    expect(result.disclosedLimits.some((l) => l.includes("No shop URL"))).toBe(
+    expect(result.disclosedLimits.some((l) => l.includes("No phone"))).toBe(
       true,
     );
+    expect(
+      result.disclosedLimits.some((l) =>
+        l.includes("harborroast.example/autumn-box"),
+      ),
+    ).toBe(true);
   });
 
   it("routes every deliverable from the shared brief after the fact gate", () => {
@@ -137,13 +153,22 @@ describe("Room 4C Scenario 2 — copy quality", () => {
       submission: { kind: "plain_text", plainText: caption },
     });
     expect(captionPass.ok).toBe(true);
+    const emailCopyBrief = scenario2EmailCopyQualityBrief();
     const emailPass = evaluateCopyQuality({
-      brief: { ...copyBrief, maxEmails: 1 },
+      brief: { ...emailCopyBrief, maxEmails: 1 },
       submission: { kind: "email_set", emails: [email] },
     });
     expect(emailPass.ok).toBe(true);
     expect(formatScenario2EmailPasteReady()).toContain("$48");
-    expect(formatScenario2EmailPasteReady()).not.toContain("harborroast.example");
+    expect(formatScenario2EmailPasteReady()).toContain(
+      "harborroast.example/autumn-box",
+    );
+    expect(formatScenario2EmailPasteReady()).toContain(
+      "hello@harborroast.example",
+    );
+    expect(formatScenario2EmailPasteReady()).not.toContain(
+      "harborroast.example/book",
+    );
 
     const fail = evaluateCopyQuality({
       brief: copyBrief,
@@ -158,7 +183,7 @@ describe("Room 4C Scenario 2 — copy quality", () => {
   it("uses the continuous narration and does not speak contact", () => {
     const script = buildScenario2NarrationScript();
     expect(script).toBe(
-      "Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This limited launch is forty-eight dollars, available October first through October thirty-first, twenty twenty-six. A seasonal coffee box for fall. Get the limited box while it lasts.",
+      "Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This limited launch is forty-eight dollars and includes three 8-ounce bags of whole-bean single-origin coffee, available October first through October thirty-first, twenty twenty-six. Get the limited autumn box.",
     );
     expect(script).toContain(brief.customer.businessName);
     expect(script).toContain(brief.offer.name);
@@ -172,7 +197,11 @@ describe("Room 4C Scenario 2 — copy quality", () => {
     const direction = buildScenario2CampaignDirection();
     expect(direction).toContain("$48");
     expect(direction).toContain("October 1 – October 31, 2026");
-    expect(direction).not.toContain("harborroast.example");
+    expect(direction).toContain("harborroast.example/autumn-box");
+    expect(direction).toContain("hello@harborroast.example");
+    expect(direction).toContain(
+      "three 8-ounce bags of whole-bean single-origin coffee",
+    );
   });
 });
 
@@ -184,9 +213,12 @@ describe("Room 4C Scenario 2 — exact canonical facts in render sources", () =>
     expect(SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.values.priceDisplay).toBe(
       "$48",
     );
-    expect(
-      SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.values.bookingUrl,
-    ).toBeUndefined();
+    expect(SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.values.bookingUrl).toBe(
+      "harborroast.example/autumn-box",
+    );
+    expect(SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.values.emailDisplay).toBe(
+      "hello@harborroast.example",
+    );
     expect(() => routeScenario2Services()).not.toThrow();
 
     const result = evaluateScenario2CustomerFactSourceGate();
@@ -233,7 +265,17 @@ describe("Room 4C Scenario 2 — exact canonical facts in render sources", () =>
     const contact = printLayers.find(
       (l) => l.type === "text" && l.role === "contact",
     );
-    expect(contact).toBeUndefined();
+    expect(contact?.type).toBe("text");
+    if (contact?.type === "text") {
+      expect(contact.content).toBe("harborroast.example/autumn-box");
+    }
+    const body = printLayers.find((l) => l.type === "text" && l.role === "body");
+    expect(body?.type).toBe("text");
+    if (body?.type === "text") {
+      expect(body.content).toBe(
+        "three 8-ounce bags of whole-bean single-origin coffee",
+      );
+    }
 
     const squareLayers = emitAssetLayers({
       recipe: getLayoutRecipe("full_bleed_hero", "social_square"),
@@ -248,24 +290,27 @@ describe("Room 4C Scenario 2 — exact canonical facts in render sources", () =>
       .join("\n");
     expect(squareText).toContain("$48");
     expect(squareText).toContain("Limited autumn box");
+    expect(squareText).toContain("harborroast.example/autumn-box");
+    expect(squareText).toContain(
+      "three 8-ounce bags of whole-bean single-origin coffee",
+    );
     expect(staleScenario2FactHits(squareText)).toEqual([]);
 
     const ctaPlate = scenario2VideoCtaPlateCopy();
     expect(ctaPlate.line1).toBe("Limited autumn box");
-    expect(ctaPlate.line2).toContain("$48");
+    expect(ctaPlate.line2).toBe("harborroast.example/autumn-box");
+    expect(ctaPlate.line3).toBe("$48");
   });
 
   it("does not treat generic-gate test doubles as valid production facts", () => {
     expect(SCENARIO_2_STALE_PHONE).toBe("(804) 555-0100");
     expect(SCENARIO_2_STALE_BOOKING_URL).toBe("harborroast.example/book");
-    expect(SCENARIO_2_STALE_EMAIL).toBe("hello@harborroast.example");
+    expect(SCENARIO_2_STALE_EMAIL).toBe("info@harborroast.example");
     expect(
       staleScenario2FactHits(
         "Order at harborroast.example/book or (804) 555-0100",
       ),
-    ).toEqual(
-      expect.arrayContaining(["stale-phone-0100", "stale-url-book", "invented-example-host"]),
-    );
+    ).toEqual(expect.arrayContaining(["stale-phone-0100", "stale-url-book"]));
   });
 
   it("passes the generic customer-fact source gate for social, email, print, video, and narration", () => {
@@ -279,13 +324,19 @@ describe("Room 4C Scenario 2 — exact canonical facts in render sources", () =>
       ]),
     );
     expect(byId.email?.requireExact).toEqual(
-      expect.arrayContaining(["priceDisplay", "datesDisplay", "contentsDisplay"]),
+      expect.arrayContaining([
+        "priceDisplay",
+        "datesDisplay",
+        "contentsDisplay",
+        "bookingUrl",
+        "emailDisplay",
+      ]),
     );
-    expect(byId["social-square-layers"]?.text).not.toContain(
-      "harborroast.example",
+    expect(byId["social-square-layers"]?.text).toContain(
+      "harborroast.example/autumn-box",
     );
-    expect(byId.narration?.forbidSubstrings).toEqual(
-      expect.arrayContaining(["harborroast.example", "@"]),
+    expect(byId.narration?.forbidExact).toEqual(
+      expect.arrayContaining(["bookingUrl", "emailDisplay"]),
     );
   });
 });
@@ -378,3 +429,163 @@ describe("Room 4C Scenario 2 — provenance, delivery, and 5x7 print", () => {
     expect(isFiveBySevenMediaBox({ width: 612, height: 792 })).toBe(false);
   });
 });
+
+describe("Room 4C Scenario 2 — authorized-fact omission correction proofs", () => {
+  const contents = "three 8-ounce bags of whole-bean single-origin coffee";
+  const productUrl = "harborroast.example/autumn-box";
+  const supportEmail = "hello@harborroast.example";
+
+  it("1. product name cannot substitute for contents", () => {
+    expect(brief.offer.contentsDisplay).toBe(contents);
+    expect(brief.offer.contentsDisplay).not.toBe(brief.offer.name);
+    expect(
+      SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.values.contentsDisplay,
+    ).not.toBe(SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.values.offerName);
+  });
+
+  it("2. exact contents reach every applicable render and copy source", () => {
+    const byId = Object.fromEntries(
+      collectScenario2CustomerFactSources().map((source) => [
+        source.sourceId,
+        source,
+      ]),
+    );
+    for (const id of [
+      "social-square-layers",
+      "social-vertical-layers",
+      "caption",
+      "email",
+      "print-counter-card-layers",
+      "video-offer-plate",
+      "narration",
+    ]) {
+      expect(byId[id]?.text).toContain(contents);
+    }
+  });
+
+  it("3. exact URL reaches email, caption, counter card, video CTA, and social", () => {
+    const byId = Object.fromEntries(
+      collectScenario2CustomerFactSources().map((source) => [
+        source.sourceId,
+        source,
+      ]),
+    );
+    for (const id of [
+      "email",
+      "caption",
+      "print-counter-card-layers",
+      "video-cta-plate",
+      "social-square-layers",
+      "social-vertical-layers",
+    ]) {
+      expect(byId[id]?.text).toContain(productUrl);
+    }
+  });
+
+  it("4. exact support email reaches the email package", () => {
+    const email = formatScenario2EmailPasteReady();
+    expect(email).toContain(supportEmail);
+    expect(email).toMatch(/^Subject:/m);
+    expect(email).toMatch(/^Preheader:/m);
+    expect(email).toContain("$48");
+    expect(email).toContain(contents);
+    expect(email).toContain("October 1 – October 31, 2026");
+    expect(email).toContain("Limited autumn box");
+    expect(email).toContain(productUrl);
+  });
+
+  it("5. missing URL blocks routing", () => {
+    const routing = evaluateProductionRoutingEligibility({
+      approvedRecord: {
+        ...SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD,
+        values: {
+          ...SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.values,
+          bookingUrl: "",
+        },
+      },
+    });
+    expect(routing.routingAllowed).toBe(false);
+    expect(
+      routing.findings.some(
+        (f) => f.code === "required_fact_missing" && f.factId === "bookingUrl",
+      ),
+    ).toBe(true);
+  });
+
+  it("6. missing support email blocks routing", () => {
+    const routing = evaluateProductionRoutingEligibility({
+      approvedRecord: {
+        ...SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD,
+        values: {
+          ...SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.values,
+          emailDisplay: "",
+        },
+      },
+    });
+    expect(routing.routingAllowed).toBe(false);
+    expect(
+      routing.findings.some(
+        (f) => f.code === "required_fact_missing" && f.factId === "emailDisplay",
+      ),
+    ).toBe(true);
+  });
+
+  it("7. no phone is required or invented", () => {
+    expect(SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.requiredFactIds).not.toContain(
+      "phoneDisplay",
+    );
+    expect(() => routeScenario2Services()).not.toThrow();
+    const joined = collectScenario2CustomerFactSources()
+      .map((source) => source.text)
+      .join("\n");
+    expect(joined).not.toContain("(804)");
+    expect(staleScenario2FactHits(joined)).toEqual([]);
+  });
+
+  it("8. the 5x7 PNG contract remains valid", () => {
+    const recipe = getLayoutRecipe("full_bleed_hero", "print_counter_card");
+    expect(recipe.canvas).toEqual({ widthPx: 1500, heightPx: 2100 });
+    expect(CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.pdfPage).toEqual({
+      width: "5in",
+      height: "7in",
+      widthPt: 360,
+      heightPt: 504,
+    });
+  });
+
+  it("9. video duration contract remains 20–30 seconds", () => {
+    const src = readFileSync(
+      path.join(__dirname, "../../../scripts/execute-room-4c-scenario-2.mts"),
+      "utf8",
+    );
+    expect(src).toContain("durationMinSeconds: 20");
+    expect(src).toContain("durationMaxSeconds: 30");
+    expect(src).toContain("videoDuration >= 20 && videoDuration <= 30");
+  });
+
+  it("10. Scenario 1 approved deliverable hashes remain unchanged", () => {
+    const expected: Record<string, string> = {
+      "social-square.png":
+        "a565cd5f1fd2cb3d174daa0eb87029a819c322f6b7be88af9258bc9982cd7c6e",
+      "video.mp4":
+        "cdca7998bb6fded01b42248dca0c22e029d9e350e248801511aab8a45d0a5ff9",
+      "caption.txt":
+        "2220894a986ecbe144b50a62f85244ee36d8a04b40c32e5a33313f9acb8ad1b5",
+      "handout.png":
+        "f4ff91ba99c536fd0b1c5efdb5f60a9ed1791253fc91e4b79da722ef4d17debf",
+      "handout.pdf":
+        "ff931b9249f95d5ba96f732412b57171878fcf63c07e151fc859c6c9180131a0",
+    };
+    const root = path.join(
+      __dirname,
+      "../../../docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables",
+    );
+    for (const [file, hash] of Object.entries(expected)) {
+      const actual = createHash("sha256")
+        .update(readFileSync(path.join(root, file)))
+        .digest("hex");
+      expect(actual).toBe(hash);
+    }
+  });
+});
+

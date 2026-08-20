@@ -17,6 +17,8 @@ import path from "path";
 
 import {
   HARBOR_ROAST_ASSET_IDS,
+  HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
+  HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL,
   ROOM_4C_SCENARIO_2_PACKAGE_ID,
   studioRoom4cScenario2HarborRoastV1 as brief,
 } from "../src/config/studio-room-4c-scenario-2-harbor-roast-v1.ts";
@@ -47,6 +49,7 @@ import {
   hashScenario2Brief,
   routeScenario2Services,
   scenario2CopyQualityBrief,
+  scenario2EmailCopyQualityBrief,
   scenario2VideoPlateCopy,
   staleScenario2FactHits,
 } from "../src/lib/studio-room-4c-scenario-2/index.ts";
@@ -212,7 +215,7 @@ async function writeVideoPlate(input: {
   <text x="90" y="1380" font-family="Georgia, serif" font-size="54" font-weight="700" fill="#F4EDE3">${esc(input.line1)}</text>
   ${
     input.line2
-      ? `<text x="90" y="1470" font-family="Georgia, serif" font-size="34" fill="#F4EDE3">${esc(input.line2)}</text>`
+      ? `<text x="90" y="1470" font-family="Georgia, serif" font-size="${input.line2.length > 40 ? 24 : 34}" fill="#F4EDE3">${esc(input.line2)}</text>`
       : ""
   }
   ${
@@ -304,13 +307,97 @@ function pdfLooksValid(abs: string): boolean {
   return readFileSync(abs, "utf8").startsWith("%PDF");
 }
 
+const SCENARIO_1_DELIVERABLE_HASHES: Record<string, string> = {
+  "social-square.png":
+    "a565cd5f1fd2cb3d174daa0eb87029a819c322f6b7be88af9258bc9982cd7c6e",
+  "video.mp4":
+    "cdca7998bb6fded01b42248dca0c22e029d9e350e248801511aab8a45d0a5ff9",
+  "caption.txt":
+    "2220894a986ecbe144b50a62f85244ee36d8a04b40c32e5a33313f9acb8ad1b5",
+  "handout.png":
+    "f4ff91ba99c536fd0b1c5efdb5f60a9ed1791253fc91e4b79da722ef4d17debf",
+  "handout.pdf":
+    "ff931b9249f95d5ba96f732412b57171878fcf63c07e151fc859c6c9180131a0",
+};
+
+function assertScenario1HashesUnchanged() {
+  const root = path.join(
+    repoRoot,
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables",
+  );
+  for (const [file, expected] of Object.entries(SCENARIO_1_DELIVERABLE_HASHES)) {
+    const actual = sha256File(path.join(root, file));
+    if (actual !== expected) {
+      throw new Error(`SCENARIO_1_HASH_CHANGED:${file}`);
+    }
+  }
+}
+
 function assertNoInventedContact(label: string, text: string) {
   const stale = staleScenario2FactHits(text);
   if (stale.length > 0) {
     throw new Error(`STALE_FACTS:${label}:${stale.join(",")}`);
   }
-  if (/harborroast\.example/i.test(text) || /\(\d{3}\)/.test(text)) {
-    throw new Error(`INVENTED_CONTACT:${label}`);
+  if (/\(\d{3}\)/.test(text)) {
+    throw new Error(`INVENTED_PHONE:${label}`);
+  }
+  const urls = text.match(/\b[a-z0-9][a-z0-9.-]*\.[a-z]{2,}\/[^\s]*/gi) ?? [];
+  for (const url of urls) {
+    if (url.toLowerCase() !== HARBOR_ROAST_AUTHORIZED_PRODUCT_URL) {
+      throw new Error(`INVENTED_URL:${label}:${url}`);
+    }
+  }
+  const emails = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) ?? [];
+  for (const email of emails) {
+    if (email.toLowerCase() !== HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL) {
+      throw new Error(`INVENTED_EMAIL:${label}:${email}`);
+    }
+  }
+}
+
+function markFirstPassSuperseded() {
+  const supersededRel = `${EVIDENCE_REL}/superseded-first-pass`;
+  const note = `# SUPERSEDED — first-pass Harbor Roast outputs
+
+Tagia classified the first Scenario 2 execution as **FIX REQUIRED**.
+
+Scout treated owner-authorized facts as unauthorized because they were missing from Scout’s own record, then fed an incomplete record to the generic fact gate. That first pass replaced box contents with the product name and omitted the product URL and support email.
+
+Do **not** use the following as the current owner-review set:
+
+- \`campaign-artifacts/renders/v1/\`
+- \`campaign-artifacts/renders/v2/\`
+- First-pass files copied under \`${supersededRel}/\`
+
+Current owner-review index: \`${REVIEW_REL}/OWNER-REVIEW.md\`
+`;
+  write(`${supersededRel}/SUPERSEDED.md`, note);
+  write(
+    `${ARTIFACT_REL}/renders/v1/SUPERSEDED.md`,
+    "# SUPERSEDED\n\nFirst incomplete Harbor Roast render. Not in the current owner-review index.\n",
+  );
+  write(
+    `${ARTIFACT_REL}/renders/v2/SUPERSEDED.md`,
+    "# SUPERSEDED\n\nFirst complete Harbor Roast render with omitted authorized product facts. Not in the current owner-review index.\n",
+  );
+  write(
+    `${ARTIFACT_REL}/renders/v3/SUPERSEDED.md`,
+    "# SUPERSEDED\n\nIntermediate Harbor Roast render from the authorized-fact correction attempt. Not in the current owner-review index. Current campaign render is v4.\n",
+  );
+  const archiveRoot = path.join(repoRoot, supersededRel, "owner-review");
+  if (!existsSync(path.join(archiveRoot, "OWNER-REVIEW.md"))) {
+    const priorReview = [
+      "OWNER-REVIEW.md",
+      "VIDEO-REVIEW.md",
+      "contact-sheet.png",
+      "counter-card-price-crop.png",
+    ];
+    for (const file of priorReview) {
+      const src = path.join(repoRoot, REVIEW_REL, file);
+      if (existsSync(src)) {
+        copyOver(src, path.join(archiveRoot, file));
+      }
+    }
   }
 }
 
@@ -335,6 +422,9 @@ async function main() {
   ensureDir(path.join(repoRoot, DELIVERABLES_REL));
   ensureDir(path.join(repoRoot, `${VIDEO_REL}/plates`));
   ensureDir(path.join(repoRoot, REVIEW_REL));
+
+  assertScenario1HashesUnchanged();
+  markFirstPassSuperseded();
 
   const briefJson = canonicalScenario2BriefJson();
   const briefSha256 = hashScenario2Brief(briefJson);
@@ -415,7 +505,13 @@ async function main() {
   const printContact = printAsset.layers.find(
     (l) => l.type === "text" && l.role === "contact",
   );
-  if (printContact) throw new Error("PRINT_MUST_NOT_INVENT_CONTACT");
+  if (
+    !printContact ||
+    printContact.type !== "text" ||
+    printContact.content !== HARBOR_ROAST_AUTHORIZED_PRODUCT_URL
+  ) {
+    throw new Error("PRINT_PRODUCT_URL_MISSING");
+  }
   for (const asset of campaign.setSpec.assets) {
     for (const layer of asset.layers) {
       if (layer.type === "text") {
@@ -444,7 +540,16 @@ async function main() {
   const direction = buildScenario2CampaignDirection();
   const directionRel = `${DELIVERABLES_REL}/campaign-direction.md`;
   write(directionRel, `${direction}\n`);
-  assertExactCanonicalLaunchFacts("campaign-direction", direction);
+  assertExactCanonicalLaunchFacts("campaign-direction", direction, [
+    "offerName",
+    "datesDisplay",
+    "priceDisplay",
+    "contentsDisplay",
+    "cta",
+    "businessName",
+    "bookingUrl",
+    "emailDisplay",
+  ]);
 
   const caption = buildScenario2Caption();
   const captionRel = `${DELIVERABLES_REL}/caption.txt`;
@@ -453,12 +558,13 @@ async function main() {
   const emailRel = `${DELIVERABLES_REL}/email.txt`;
   write(emailRel, `${emailText}\n`);
   const copyBrief = scenario2CopyQualityBrief();
+  const emailCopyBrief = scenario2EmailCopyQualityBrief();
   const captionEval = evaluateCopyQuality({
     brief: copyBrief,
     submission: { kind: "plain_text", plainText: caption },
   });
   const emailEval = evaluateCopyQuality({
-    brief: copyBrief,
+    brief: emailCopyBrief,
     submission: {
       kind: "email_set",
       emails: [
@@ -484,11 +590,39 @@ async function main() {
       `COPY_QA_FAIL_EMAIL:${emailEval.findings.map((f) => f.id).join(",")}`,
     );
   }
-  assertExactCanonicalLaunchFacts("caption", caption);
-  assertExactCanonicalLaunchFacts("email", emailText);
+  assertExactCanonicalLaunchFacts("caption", caption, [
+    "offerName",
+    "datesDisplay",
+    "priceDisplay",
+    "contentsDisplay",
+    "cta",
+    "businessName",
+    "bookingUrl",
+  ]);
+  assertExactCanonicalLaunchFacts("email", emailText, [
+    "offerName",
+    "datesDisplay",
+    "priceDisplay",
+    "contentsDisplay",
+    "cta",
+    "businessName",
+    "bookingUrl",
+    "emailDisplay",
+  ]);
 
   const narrationPreview = buildScenario2NarrationScript();
-  assertNoInventedContact("narration", narrationPreview);
+  assertExactCanonicalLaunchFacts("narration", narrationPreview, [
+    "businessName",
+    "offerName",
+    "contentsDisplay",
+  ]);
+  if (
+    narrationPreview.includes("harborroast.example") ||
+    narrationPreview.includes("@") ||
+    /\(\d{3}\)/.test(narrationPreview)
+  ) {
+    throw new Error("NARRATION_MUST_NOT_SPEAK_CONTACT");
+  }
 
   const heroAbs = path.join(repoRoot, MATERIALS_REL, "harbor-roast-hero-box.png");
   const plates = scenario2VideoPlateCopy();
@@ -926,7 +1060,7 @@ async function main() {
     customerFactSourceGate: true,
     narrationIsApprovedContinuous: narration === narrationPreview,
     videoDurationInBand:
-      videoDuration != null && videoDuration >= 15 && videoDuration <= 32,
+      videoDuration != null && videoDuration >= 20 && videoDuration <= 30,
     filesOpen: true,
     runId: randomUUID(),
   };
@@ -986,7 +1120,11 @@ async function main() {
 
   write(
     `${REVIEW_REL}/OWNER-REVIEW.md`,
-    `# Owner-review index — Scenario 2 Harbor Roast
+    `# Owner-review index — Scenario 2 Harbor Roast (authorized-fact correction)
+
+This is the **current** review set. First-pass outputs are superseded and are **not** listed here.
+
+See \`${EVIDENCE_REL}/superseded-first-pass/SUPERSEDED.md\`.
 
 Review evidence only. Classification remains **OWNER DECISION PENDING**.
 
@@ -1032,7 +1170,7 @@ ${narration}
 
 ## Narration vs on-screen facts
 
-All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, price **$48**, dates **October 1 – October 31, 2026**, CTA **Limited autumn box**. No shop URL, email, or phone is spoken or shown.
+All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, contents **three 8-ounce bags of whole-bean single-origin coffee**, price **$48**, dates **October 1 – October 31, 2026**, CTA **Limited autumn box**, product URL **harborroast.example/autumn-box** on the CTA plate, caption, email, social, and counter card. Narration does **not** speak the URL, support email, or a phone. Support email **hello@harborroast.example** is in the email package only.
 
 ## Known pacing concern
 

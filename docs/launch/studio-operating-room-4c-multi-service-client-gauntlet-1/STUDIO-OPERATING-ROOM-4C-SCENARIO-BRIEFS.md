@@ -37,6 +37,10 @@ Fictional customers only. Preserve approved substance.
 **Offer:** Limited “Autumn Single-Origin Box” launch  
 **Sale window:** October 1 – October 31, 2026  
 **Price:** $48  
+**Contents:** three 8-ounce bags of whole-bean single-origin coffee  
+**Product URL:** harborroast.example/autumn-box  
+**Support email:** hello@harborroast.example  
+**Phone:** not authorized — do not invent  
 
 **Requested (all Launch Now):**
 - Campaign concept and message direction  
@@ -45,11 +49,11 @@ Fictional customers only. Preserve approved substance.
 - Marketing copy / email (+ captions as appropriate)  
 - Print collateral where appropriate (shelf / counter card)  
 
-**Limits disclosed:** no ads operations; no carousel; Level 1 ad creative only if creatively requested and already sellable as creative production — never targeting/budgets/ops.
+**Limits disclosed:** no ads operations; no carousel; Level 1 ad creative only if creatively requested and already sellable as creative production — never targeting/budgets/ops. Product name does not substitute for contents.
 
 **Scenario status at package open:** NOT_STARTED  
-**Scenario status now:** EXECUTED · OWNER DECISION PENDING  
-**Fact status:** OWNER_APPROVED_FOR_CERTIFICATION (locked package-brief facts only; no shop URL, contact email, or phone was authorized)
+**Scenario status now:** EXECUTED · OWNER DECISION PENDING (first pass FIX REQUIRED; authorized-fact correction complete; Tagia still reviews)  
+**Fact status:** OWNER_APPROVED_FOR_CERTIFICATION (locked package-brief facts include contents, product URL, and support email; no phone was authorized)
 
 ---
 

@@ -13,5 +13,12 @@ Refused before production:
 - Carousel — not on Launch Now menu
 - Ad account management / targeting / budgets / ops
 - Unsupported sizes outside Studio contracts
-- Invented shop URL, contact email, or phone (none was owner-authorized)
-- Invented origin, weight, or flavor claims (none was supplied)
+- Invented phone (none was owner-authorized)
+- Invented origin, tasting notes, discount, shipping claim, reviews, extra quantities, or certifications
+
+Owner-authorized production facts that must appear:
+
+- Contents: three 8-ounce bags of whole-bean single-origin coffee
+- Product URL: harborroast.example/autumn-box
+- Support email: hello@harborroast.example (email package)
+- Exact price $48 and October 1 – October 31, 2026 window

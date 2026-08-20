@@ -1,13 +1,17 @@
 /**
  * Scenario 2 fact integrity.
  *
- * Harbor Roast production facts come from the locked package brief and this
- * approved record. Do not invent a shop URL, contact email, phone, origin,
- * weight, or tasting notes. Generic-gate Harbor Roast test fixtures are not
- * production facts.
+ * Harbor Roast production facts come from the owner-authorized record.
+ * Product name must not substitute for contents. Phone is not authorized.
+ * Generic-gate /book test double is not the product URL.
  */
 
-import { studioRoom4cScenario2HarborRoastV1 as brief } from "@/config/studio-room-4c-scenario-2-harbor-roast-v1";
+import {
+  HARBOR_ROAST_AUTHORIZED_CONTENTS,
+  HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
+  HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL,
+  studioRoom4cScenario2HarborRoastV1 as brief,
+} from "@/config/studio-room-4c-scenario-2-harbor-roast-v1";
 import {
   assertCustomerFactSourceGate,
   assertProductionRoutingAllowed,
@@ -15,10 +19,10 @@ import {
   type CanonicalCustomerFacts,
 } from "@/lib/studio-customer-facts";
 
-/** Generic-gate test doubles — must never appear in Scenario 2 production. */
+/** Wrong-path test double — not the authorized autumn-box URL. */
 export const SCENARIO_2_STALE_PHONE = "(804) 555-0100";
 export const SCENARIO_2_STALE_BOOKING_URL = "harborroast.example/book";
-export const SCENARIO_2_STALE_EMAIL = "hello@harborroast.example";
+export const SCENARIO_2_STALE_EMAIL = "info@harborroast.example";
 
 export const SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD: ApprovedCustomerFactRecord =
   {
@@ -27,9 +31,12 @@ export const SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD: ApprovedCustomerFactRecor
       offerName: "Autumn Single-Origin Box",
       datesDisplay: "October 1 – October 31, 2026",
       priceDisplay: "$48",
-      contentsDisplay: "Autumn Single-Origin Box",
+      contentsDisplay: HARBOR_ROAST_AUTHORIZED_CONTENTS,
       cta: "Limited autumn box",
       businessName: "Harbor Roast Coffee Co.",
+      bookingUrl: HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
+      bookingContact: HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
+      emailDisplay: HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL,
     },
     requiredFactIds: [
       "offerName",
@@ -38,6 +45,8 @@ export const SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD: ApprovedCustomerFactRecor
       "contentsDisplay",
       "cta",
       "businessName",
+      "bookingUrl",
+      "emailDisplay",
     ],
     forbiddenExact: [
       SCENARIO_2_STALE_PHONE,
@@ -50,6 +59,8 @@ export const SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD: ApprovedCustomerFactRecor
       "ethiopian",
       "colombian",
       "tasting notes",
+      "free shipping",
+      "50% off",
     ],
   };
 
@@ -63,9 +74,9 @@ export function scenario2CanonicalCustomerFacts(): CanonicalCustomerFacts {
       cta: brief.cta.label,
       businessName: brief.customer.businessName,
       bookingContact: brief.facts.bookingContact,
-      bookingUrl: "",
+      bookingUrl: brief.cta.bookingUrl,
       phoneDisplay: "",
-      emailDisplay: "",
+      emailDisplay: brief.cta.supportEmail,
     },
     forbiddenExact: SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.forbiddenExact,
   };
@@ -80,7 +91,6 @@ export function staleScenario2FactHits(text: string): string[] {
   if (text.toLowerCase().includes(SCENARIO_2_STALE_EMAIL)) {
     hits.push("stale-email");
   }
-  if (/harborroast\.example/i.test(text)) hits.push("invented-example-host");
   return hits;
 }
 
@@ -98,6 +108,16 @@ export function assertScenario2ProductionRoutingAllowed(): void {
 export function assertExactCanonicalLaunchFacts(
   label: string,
   text: string,
+  requireExact: readonly (
+    | "offerName"
+    | "datesDisplay"
+    | "priceDisplay"
+    | "contentsDisplay"
+    | "cta"
+    | "businessName"
+    | "bookingUrl"
+    | "emailDisplay"
+  )[],
 ): void {
   assertCustomerFactSourceGate({
     approvedRecord: SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD,
@@ -106,14 +126,7 @@ export function assertExactCanonicalLaunchFacts(
       {
         sourceId: label,
         text,
-        requireExact: [
-          "offerName",
-          "datesDisplay",
-          "priceDisplay",
-          "contentsDisplay",
-          "cta",
-          "businessName",
-        ],
+        requireExact,
       },
     ],
   });

@@ -292,68 +292,128 @@ describe("generic customer-fact source gate", () => {
     );
   });
 
-  it("allows a priced product launch with no URL, phone, or email", () => {
+  it("fails when required contents are replaced by the product name", () => {
+    const routing = evaluateProductionRoutingEligibility({
+      approvedRecord: {
+        approvalStatus: "OWNER_APPROVED_FOR_CERTIFICATION",
+        values: {
+          offerName: "Autumn Single-Origin Box",
+          contentsDisplay: "Autumn Single-Origin Box",
+          bookingUrl: "harborroast.example/autumn-box",
+          emailDisplay: "hello@harborroast.example",
+        },
+        requiredFactIds: ["contentsDisplay", "bookingUrl", "emailDisplay"],
+        forbiddenExact: [],
+      },
+    });
+    expect(routing.routingAllowed).toBe(false);
+    expect(routing.findings.map((f) => f.code)).toContain(
+      "contents_substituted_with_offer_name",
+    );
+  });
+
+  it("blocks routing when a required product URL is missing", () => {
+    const routing = evaluateProductionRoutingEligibility({
+      approvedRecord: {
+        approvalStatus: "OWNER_APPROVED_FOR_CERTIFICATION",
+        values: {
+          offerName: "Autumn Single-Origin Box",
+          contentsDisplay:
+            "three 8-ounce bags of whole-bean single-origin coffee",
+          bookingUrl: "",
+          emailDisplay: "hello@harborroast.example",
+        },
+        requiredFactIds: ["contentsDisplay", "bookingUrl", "emailDisplay"],
+        forbiddenExact: [],
+      },
+    });
+    expect(routing.routingAllowed).toBe(false);
+    expect(
+      routing.findings.some(
+        (f) => f.code === "required_fact_missing" && f.factId === "bookingUrl",
+      ),
+    ).toBe(true);
+  });
+
+  it("blocks routing when a required support email is missing", () => {
+    const routing = evaluateProductionRoutingEligibility({
+      approvedRecord: {
+        approvalStatus: "OWNER_APPROVED_FOR_CERTIFICATION",
+        values: {
+          offerName: "Autumn Single-Origin Box",
+          contentsDisplay:
+            "three 8-ounce bags of whole-bean single-origin coffee",
+          bookingUrl: "harborroast.example/autumn-box",
+          emailDisplay: "",
+        },
+        requiredFactIds: ["contentsDisplay", "bookingUrl", "emailDisplay"],
+        forbiddenExact: [],
+      },
+    });
+    expect(routing.routingAllowed).toBe(false);
+    expect(
+      routing.findings.some(
+        (f) => f.code === "required_fact_missing" && f.factId === "emailDisplay",
+      ),
+    ).toBe(true);
+  });
+
+  it("accepts an approved product URL when it appears with sentence punctuation", () => {
+    const approved: ApprovedCustomerFactRecord = {
+      approvalStatus: "OWNER_APPROVED_FOR_CERTIFICATION",
+      values: {
+        contentsDisplay:
+          "three 8-ounce bags of whole-bean single-origin coffee",
+        bookingUrl: "harborroast.example/autumn-box",
+        emailDisplay: "hello@harborroast.example",
+      },
+      requiredFactIds: ["contentsDisplay", "bookingUrl", "emailDisplay"],
+      forbiddenExact: [],
+    };
+    const result = evaluateCustomerFactSourceGate({
+      approvedRecord: approved,
+      sources: [
+        {
+          sourceId: "campaign-direction",
+          text: "Purchase: harborroast.example/autumn-box. Support: hello@harborroast.example.",
+          requireExact: ["bookingUrl", "emailDisplay"],
+        },
+      ],
+    });
+    expect(result).toEqual({ ok: true, findings: [] });
+  });
+
+  it("does not require a phone when phone is not on the approved record", () => {
     const approved: ApprovedCustomerFactRecord = {
       approvalStatus: "OWNER_APPROVED_FOR_CERTIFICATION",
       values: {
         offerName: "Autumn Single-Origin Box",
-        datesDisplay: "October 1 – October 31, 2026",
-        priceDisplay: "$48",
-        contentsDisplay: "Autumn Single-Origin Box",
-        cta: "Limited autumn box",
-        businessName: "Harbor Roast Coffee Co.",
+        contentsDisplay:
+          "three 8-ounce bags of whole-bean single-origin coffee",
+        bookingUrl: "harborroast.example/autumn-box",
+        emailDisplay: "hello@harborroast.example",
       },
-      requiredFactIds: [
-        "offerName",
-        "datesDisplay",
-        "priceDisplay",
-        "contentsDisplay",
-        "cta",
-        "businessName",
-      ],
-      forbiddenExact: ["harborroast.example/book", "(804) 555-0100"],
+      requiredFactIds: ["contentsDisplay", "bookingUrl", "emailDisplay"],
+      forbiddenExact: ["(804) 555-0100"],
     };
-    const candidate = { ...approved.values };
-    const routing = evaluateProductionRoutingEligibility({
-      approvedRecord: approved,
-      candidateValues: candidate,
-    });
-    expect(routing.routingAllowed).toBe(true);
+    expect(
+      evaluateProductionRoutingEligibility({ approvedRecord: approved })
+        .routingAllowed,
+    ).toBe(true);
 
-    const pass = evaluateCustomerFactSourceGate({
+    const withInventedPhone = evaluateCustomerFactSourceGate({
       approvedRecord: approved,
-      candidateValues: candidate,
       sources: [
         {
-          sourceId: "email",
-          text: "Harbor Roast Coffee Co. Autumn Single-Origin Box is $48, October 1 – October 31, 2026. Limited autumn box.",
-          requireExact: [
-            "offerName",
-            "datesDisplay",
-            "priceDisplay",
-            "contentsDisplay",
-            "cta",
-            "businessName",
-          ],
+          sourceId: "caption",
+          text: "Autumn Single-Origin Box three 8-ounce bags of whole-bean single-origin coffee harborroast.example/autumn-box hello@harborroast.example Call (804) 555-0100",
+          requireExact: ["contentsDisplay", "bookingUrl", "emailDisplay"],
         },
       ],
     });
-    expect(pass).toEqual({ ok: true, findings: [] });
-
-    const inferredUrl = evaluateCustomerFactSourceGate({
-      approvedRecord: approved,
-      candidateValues: candidate,
-      sources: [
-        {
-          sourceId: "email",
-          text: "Buy at harborroast.example/shop",
-          requireExact: ["offerName"],
-        },
-      ],
-    });
-    expect(inferredUrl.ok).toBe(false);
-    expect(inferredUrl.findings.map((f) => f.code)).toContain(
-      "machine_inferred_contact",
+    expect(withInventedPhone.ok).toBe(false);
+    expect(withInventedPhone.findings.map((f) => f.code)).toEqual(
+      expect.arrayContaining(["machine_inferred_contact", "stale_or_invented_fact"]),
     );
   });
 });

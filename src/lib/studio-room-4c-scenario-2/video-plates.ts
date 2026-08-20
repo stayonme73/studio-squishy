@@ -36,7 +36,8 @@ export function scenario2VideoPlateCopy(): readonly Scenario2VideoPlateCopy[] {
       file: "beat-04-cta.png",
       eyebrow: "SEASONAL LAUNCH",
       line1: brief.cta.label,
-      line2: `${brief.offer.priceDisplay} · October 1–31`,
+      line2: brief.cta.bookingUrl,
+      line3: brief.offer.priceDisplay,
     },
   ];
 }

@@ -15,7 +15,7 @@ What can currently be proven from existing protected evidence (phone 390), not f
 
 Scenario 2 deliverable-level phone notes:
 
-- Square social graphic is 1080×1080. Preview: `deliverables/social-square-phone-390.png` is a **full-image resize to 390×390**, not a crop. Headline, dates, price, and CTA remain on the complete square and stay readable.
+- Square social graphic is 1080×1080. Preview: `deliverables/social-square-phone-390.png` is a **full-image resize to 390×390**, not a crop. Headline, dates, price, CTA, contents, and product URL remain on the complete square and stay readable.
 - Vertical social graphic is 1080×1920. Preview: `deliverables/social-vertical-phone-390.png` is a complete 390×693 resize.
 - Vertical video is 1080×1920 (phone-native), 20.00s.
 - Caption and email are plain text (readable on phone).

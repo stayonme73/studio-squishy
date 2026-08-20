@@ -57,7 +57,7 @@ export function routeScenario2Services(): readonly Scenario2Route[] {
       productionPath: "studio_campaign_creative_pipeline",
       toolId: "studio_campaign_creative",
       skuId: "v2-rtu-flyer",
-      note: "5×7 counter card PNG + PDF. Print CTA is the authorized label; no invented URL.",
+      note: "5×7 counter card PNG + PDF. Print CTA and authorized product URL.",
     },
     {
       deliverableId: "promo-caption",
@@ -73,7 +73,7 @@ export function routeScenario2Services(): readonly Scenario2Route[] {
       productionPath: "scenario_2_copy_from_brief",
       toolId: "studio_copy_quality_gate",
       skuId: "marketing-copy",
-      note: "Paste-ready promotional email. No shop URL or contact email was authorized.",
+      note: "Paste-ready promotional email with authorized product URL and support email.",
     },
     {
       deliverableId: "short-vertical-video",

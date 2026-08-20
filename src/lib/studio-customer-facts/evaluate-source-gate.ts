@@ -74,7 +74,11 @@ function phoneDigits(value: string): string {
 }
 
 function normalizeUrl(value: string): string {
-  return value.trim().toLowerCase().replace(/\/+$/, "");
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[.,;:!?)]+$/g, "")
+    .replace(/\/+$/, "");
 }
 
 function approvedPhoneDigits(record: ApprovedCustomerFactRecord): Set<string> {
@@ -139,6 +143,21 @@ export function evaluateApprovedCustomerFactRecord(
         sourceId: "approved-record",
         factId,
         detail: `Required ${factId} is not present on the approved fact record.`,
+      });
+    }
+  }
+
+  if (approvedRecord.requiredFactIds.includes("contentsDisplay")) {
+    const contents = valueOf(approvedRecord.values, "contentsDisplay");
+    const offer = valueOf(approvedRecord.values, "offerName");
+    if (contents && offer && contents === offer) {
+      push(findings, {
+        code: "contents_substituted_with_offer_name",
+        sourceId: "approved-record",
+        factId: "contentsDisplay",
+        expected: contents,
+        detail:
+          "Required contentsDisplay must not be replaced by the product name.",
       });
     }
   }

@@ -1,0 +1,22 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1",
+  "campaignId": "room-4c-s2-harbor-roast-coffee",
+  "systemId": "harbor-roast-coffee-v1",
+  "familyId": "full_bleed_hero",
+  "renderVersion": 4,
+  "heroMaterialId": "harbor-roast-hero-box",
+  "materialFingerprint": "edfd641e76c5cbfb997b5d642210d4cc0e3197e68c48a3386ec08949597c8233",
+  "setFingerprint": "4b7804bd40ca8ced54480b8350dc28c01fe7e6c86696e02a05fb20ed4a76b86b",
+  "assetFingerprints": {
+    "social_square__full_bleed_hero": "efbfeb733884f0dd29b2ae2fb58e500f8c6a3fc5ad02fa1303dbb26f4396d4bf",
+    "social_vertical__full_bleed_hero": "b199b4b5d9e0d0b74a050ed696a06e22f9d2d5e36bcaa14de746fe4deb7123f2",
+    "print_counter_card__full_bleed_hero": "3ba08ee801af6a60e19a1e5a31abb361dfd6c65d91accdcdf4bcbc322a23727c"
+  },
+  "pngShas": {
+    "social_square__full_bleed_hero": "393ddcd855de954fa1ee351410157a050a9e9f551dd389dc3a8ae398f45785b6",
+    "social_vertical__full_bleed_hero": "043bf9a66b500a8b3d57fbe6dc02d6bdf0c2a463db830c242de42e9ccc83cce2",
+    "print_counter_card__full_bleed_hero": "3e22fe863dbe19a885b463c6d2942754a761008f99941b96cb2f74952b0ef9d0"
+  },
+  "createdAt": "2026-08-20T22:56:54.911Z",
+  "rendererVersion": "studio-campaign-creative-1.0.0"
+}

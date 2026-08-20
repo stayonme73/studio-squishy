@@ -1,0 +1,38 @@
+{
+  "jobId": "372f2029-9791-48e8-9f7c-7544fd369b0b",
+  "provider": "shotstack",
+  "providerRenderId": "d370e277-dc02-4789-bfbc-068e77d54a85",
+  "campaignId": "room-4c-s2-harbor-roast-coffee",
+  "skuId": "v2-rtu-short-video",
+  "workPacketId": "room-4c-s2-1787266615556",
+  "workPacketVersion": "wp-s2-v1",
+  "storyboardVersion": "sb-s2-v1",
+  "scriptVersionId": "harbor-roast-s2-narration-1787266615556",
+  "status": "done",
+  "submittedAt": "2026-08-20T22:57:42.564Z",
+  "completedAt": "2026-08-20T22:58:06.655Z",
+  "requestHash": "86c9495c64f74a67c835af97110de936e4220dd4fe38ee9bf7c79456b532c6e4",
+  "outputUrl": "https://shotstack-api-v1-output.s3-ap-southeast-2.amazonaws.com/9kngo12mih/d370e277-dc02-4789-bfbc-068e77d54a85.mp4",
+  "retryCount": 0,
+  "requestedWidth": 1080,
+  "requestedHeight": 1920,
+  "requestedAspect": "9:16",
+  "requestedDurationTargetSeconds": 20,
+  "outputFormat": "mp4",
+  "sourceAssetPaths": [
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-01-brand.png",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-02-offer.png",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-03-price.png",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-04-cta.png",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787266615556_53b8b9e2ffed.mp3"
+  ],
+  "sourceAssetHashes": {
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-01-brand.png": "4edef9cbed8bc07b15f4d60fe6e2a65498efd29f565caf1dbcf62edc28ac7ab9",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-02-offer.png": "8eeae1eb23f2df8ef4fcfeaa8a1c7d6c341490f37c3930933b5afe73211f9894",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-03-price.png": "b8f8622eada86bdcd1b02e0fdb7a8c10acea1fa980874637c69039732418ccce",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-04-cta.png": "b5f238d7ee8cf441411907b88c1ea63cd88b0e3eb51de3fa33e912f5b9077cfe",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787266615556_53b8b9e2ffed.mp3": "53b8b9e2ffed362eebc31df3b3e3deeca6ee0c2842020e6004b3f2bec54de4b4"
+  },
+  "voiceArtifactPath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787266615556_53b8b9e2ffed.mp3",
+  "voiceArtifactSha256": "53b8b9e2ffed362eebc31df3b3e3deeca6ee0c2842020e6004b3f2bec54de4b4"
+}

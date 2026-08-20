@@ -2,7 +2,6 @@
  * Scenario 2 collectors for the generic customer-fact source gate.
  */
 
-import { studioRoom4cScenario2HarborRoastV1 as brief } from "@/config/studio-room-4c-scenario-2-harbor-roast-v1";
 import {
   emitAssetLayers,
   getLayoutRecipe,
@@ -25,6 +24,8 @@ import {
 import {
   scenario2CanonicalCustomerFacts,
   SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD,
+  SCENARIO_2_STALE_BOOKING_URL,
+  SCENARIO_2_STALE_PHONE,
 } from "./fact-integrity";
 import { scenario2VideoCtaPlateCopy, scenario2VideoPlateCopy } from "./video-plates";
 
@@ -62,16 +63,25 @@ export function collectScenario2CustomerFactSources(): CustomerFactSource[] {
   if (!offerPlate) throw new Error("SCENARIO_2_OFFER_PLATE_MISSING");
   if (!pricePlate) throw new Error("SCENARIO_2_PRICE_PLATE_MISSING");
 
+  const socialRequired = [
+    "offerName",
+    "datesDisplay",
+    "priceDisplay",
+    "contentsDisplay",
+    "cta",
+    "bookingUrl",
+  ] as const;
+
   return [
     {
       sourceId: "social-square-layers",
       text: joinTextLayers(squareLayers),
-      requireExact: ["offerName", "datesDisplay", "priceDisplay", "cta"],
+      requireExact: socialRequired,
     },
     {
       sourceId: "social-vertical-layers",
       text: joinTextLayers(verticalLayers),
-      requireExact: ["offerName", "datesDisplay", "priceDisplay", "cta"],
+      requireExact: socialRequired,
     },
     {
       sourceId: "caption",
@@ -83,6 +93,7 @@ export function collectScenario2CustomerFactSources(): CustomerFactSource[] {
         "contentsDisplay",
         "cta",
         "businessName",
+        "bookingUrl",
       ],
     },
     {
@@ -95,26 +106,35 @@ export function collectScenario2CustomerFactSources(): CustomerFactSource[] {
         "contentsDisplay",
         "cta",
         "businessName",
+        "bookingUrl",
+        "emailDisplay",
       ],
     },
     {
       sourceId: "print-counter-card-layers",
       text: joinTextLayers(printLayers),
-      requireExact: ["offerName", "datesDisplay", "priceDisplay", "cta"],
+      requireExact: [
+        "offerName",
+        "datesDisplay",
+        "priceDisplay",
+        "contentsDisplay",
+        "cta",
+        "bookingUrl",
+      ],
     },
     {
       sourceId: "video-cta-plate",
       text: [ctaPlate.line1, ctaPlate.line2, ctaPlate.line3]
         .filter(Boolean)
         .join("\n"),
-      requireExact: ["priceDisplay", "cta"],
+      requireExact: ["priceDisplay", "cta", "bookingUrl"],
     },
     {
       sourceId: "video-offer-plate",
       text: [offerPlate.eyebrow, offerPlate.line1, offerPlate.line2, offerPlate.line3]
         .filter(Boolean)
         .join("\n"),
-      requireExact: ["offerName"],
+      requireExact: ["offerName", "contentsDisplay"],
     },
     {
       sourceId: "video-price-plate",
@@ -126,12 +146,9 @@ export function collectScenario2CustomerFactSources(): CustomerFactSource[] {
     {
       sourceId: "narration",
       text: buildScenario2NarrationScript(),
-      requireExact: ["businessName", "offerName"],
-      forbidSubstrings: [
-        brief.facts.bookingContact,
-        "harborroast.example",
-        "@",
-      ],
+      requireExact: ["businessName", "offerName", "contentsDisplay"],
+      forbidExact: ["bookingUrl", "emailDisplay"],
+      forbidSubstrings: [SCENARIO_2_STALE_PHONE, SCENARIO_2_STALE_BOOKING_URL],
     },
   ];
 }

@@ -1,7 +1,6 @@
 /**
  * Room 4C Scenario 2 — Harbor Roast Coffee Co.
- * Authoritative campaign facts. Only owner-authorized package-brief facts.
- * No shop URL or contact email was supplied — do not invent one.
+ * Authoritative campaign facts. Owner-authorized before production.
  */
 
 export const ROOM_4C_SCENARIO_2_PACKAGE_ID =
@@ -17,6 +16,15 @@ export const HARBOR_ROAST_ASSET_IDS = {
   logo: "harbor-roast-logo",
   heroBox: "harbor-roast-hero-box",
 } as const;
+
+export const HARBOR_ROAST_AUTHORIZED_CONTENTS =
+  "three 8-ounce bags of whole-bean single-origin coffee" as const;
+
+export const HARBOR_ROAST_AUTHORIZED_PRODUCT_URL =
+  "harborroast.example/autumn-box" as const;
+
+export const HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL =
+  "hello@harborroast.example" as const;
 
 export const studioRoom4cScenario2HarborRoastV1 = {
   schemaVersion: 1 as const,
@@ -35,7 +43,7 @@ export const studioRoom4cScenario2HarborRoastV1 = {
     windowStartIso: "2026-10-01",
     windowEndIso: "2026-10-31",
     priceDisplay: "$48",
-    contentsDisplay: "Autumn Single-Origin Box",
+    contentsDisplay: HARBOR_ROAST_AUTHORIZED_CONTENTS,
   },
   tone: {
     voice: "Warm, grounded, no neon",
@@ -45,6 +53,8 @@ export const studioRoom4cScenario2HarborRoastV1 = {
   },
   cta: {
     label: "Limited autumn box",
+    bookingUrl: HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
+    supportEmail: HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL,
   },
   requestedDeliverables: [
     {
@@ -86,13 +96,13 @@ export const studioRoom4cScenario2HarborRoastV1 = {
   visualSystemId: "harbor-roast-coffee-v1" as const,
   facts: {
     headline: "Autumn Single-Origin Box",
-    supportingCopy:
-      "A limited autumn coffee box.",
+    supportingCopy: HARBOR_ROAST_AUTHORIZED_CONTENTS,
     datesDisplay: "October 1 – October 31, 2026",
     priceDisplay: "$48",
     cta: "Limited autumn box",
-    bookingContact: "",
-    contentsDisplay: "Autumn Single-Origin Box",
+    bookingContact: HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
+    contentsDisplay: HARBOR_ROAST_AUTHORIZED_CONTENTS,
+    emailDisplay: HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL,
   },
   printCounterCardContractId: "campaign-print-counter-card-v1-5x7" as const,
 } as const;

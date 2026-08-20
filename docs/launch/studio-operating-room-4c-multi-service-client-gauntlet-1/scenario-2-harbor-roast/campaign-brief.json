@@ -14,7 +14,7 @@
     "windowStartIso": "2026-10-01",
     "windowEndIso": "2026-10-31",
     "priceDisplay": "$48",
-    "contentsDisplay": "Autumn Single-Origin Box"
+    "contentsDisplay": "three 8-ounce bags of whole-bean single-origin coffee"
   },
   "tone": {
     "voice": "Warm, grounded, no neon",
@@ -23,7 +23,9 @@
     "calmWellness": false
   },
   "cta": {
-    "label": "Limited autumn box"
+    "label": "Limited autumn box",
+    "bookingUrl": "harborroast.example/autumn-box",
+    "supportEmail": "hello@harborroast.example"
   },
   "requestedDeliverables": [
     {
@@ -65,12 +67,13 @@
   "visualSystemId": "harbor-roast-coffee-v1",
   "facts": {
     "headline": "Autumn Single-Origin Box",
-    "supportingCopy": "A limited autumn coffee box.",
+    "supportingCopy": "three 8-ounce bags of whole-bean single-origin coffee",
     "datesDisplay": "October 1 – October 31, 2026",
     "priceDisplay": "$48",
     "cta": "Limited autumn box",
-    "bookingContact": "",
-    "contentsDisplay": "Autumn Single-Origin Box"
+    "bookingContact": "harborroast.example/autumn-box",
+    "contentsDisplay": "three 8-ounce bags of whole-bean single-origin coffee",
+    "emailDisplay": "hello@harborroast.example"
   },
   "printCounterCardContractId": "campaign-print-counter-card-v1-5x7"
 }

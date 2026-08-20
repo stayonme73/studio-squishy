@@ -17,6 +17,7 @@ export {
   formatScenario2EmailPasteReady,
   SCENARIO_2_APPROVED_NARRATION,
   scenario2CopyQualityBrief,
+  scenario2EmailCopyQualityBrief,
 } from "./copy";
 export {
   assertExactCanonicalLaunchFacts,

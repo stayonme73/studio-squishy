@@ -166,13 +166,29 @@ export function validateCampaignCreativeSetSpec(
         const hasPrice = asset.layers.some(
           (l) =>
             l.type === "text" &&
-            (l.role === "price" || l.content.includes(setSpec.brief.facts.priceDisplay)),
+            (l.role === "price" ||
+              l.content.includes(setSpec.brief.facts.priceDisplay)),
         );
         if (!hasPrice) {
           findings.push({
             id: `print_price_missing_${asset.assetId}`,
             severity: "fail",
             message: `Counter card needs the authorized price on ${asset.assetId}`,
+          });
+        }
+      }
+      if (setSpec.brief.facts.bookingContact.trim()) {
+        const hasContact = asset.layers.some(
+          (l) =>
+            l.type === "text" &&
+            (l.role === "contact" ||
+              l.content.includes(setSpec.brief.facts.bookingContact)),
+        );
+        if (!hasContact) {
+          findings.push({
+            id: `print_cta_contact_${asset.assetId}`,
+            severity: "fail",
+            message: `Counter card needs the authorized product URL on ${asset.assetId}`,
           });
         }
       }

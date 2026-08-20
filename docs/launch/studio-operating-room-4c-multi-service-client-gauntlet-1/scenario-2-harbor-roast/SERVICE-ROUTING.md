@@ -11,4 +11,4 @@
 | Promo email | Marketing copy / email | Copy assembled from canonical brief + copy-quality gate | studio_copy_quality_gate |
 | Vertical video | Short-form video | Shotstack work packet + ElevenLabs supporting narration | shotstack |
 
-Shared campaign facts are not retyped into conflicting copies. Visual system: `harbor-roast-coffee-v1`. Production routing calls the generic customer-fact source gate and cannot begin until required launch facts are `OWNER_APPROVED_FOR_CERTIFICATION`. Shop URL, email, and phone are absent from the approved record, so any inferred contact fails the gate.
+Shared campaign facts are not retyped into conflicting copies. Visual system: `harbor-roast-coffee-v1`. Production routing calls the generic customer-fact source gate and cannot begin until required launch facts are `OWNER_APPROVED_FOR_CERTIFICATION`. Required facts include contents, product URL, and support email. Phone is not required and is not invented. Product name cannot substitute for contents.

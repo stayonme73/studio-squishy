@@ -1,30 +1,36 @@
 # Defects and explicit limits — Scenario 2
 
-## Fact-authorization (the Cedar Lane lesson applied)
+## First-pass defect (corrected)
 
-Every production fact was owner-authorized before the first Harbor Roast asset was created. The locked package brief supplies business name, offer, October window, and $48. It does **not** supply a shop URL, contact email, phone, origin, weight, or flavor notes. Those values were left empty. The generic customer-fact source gate ran before routing. Generic-gate test doubles `harborroast.example/book` and `(804) 555-0100` were not used as production facts.
+Scout omitted owner-authorized contents, product URL, and support email. Scout treated “not present in Scout’s own record” as “not authorized,” then fed an incomplete record to the generic fact gate. Tagia classified that run **FIX REQUIRED**. An email advertising a $48 product with no place to buy it is not commercially deliverable.
+
+That first pass is superseded. See `superseded-first-pass/SUPERSEDED.md`.
+
+## Fact-authorization after correction
+
+The locked package brief now carries the owner-authorized facts that were required before production: business name, offer, October window, $48, three 8-ounce bags of whole-bean single-origin coffee, `harborroast.example/autumn-box`, and `hello@harborroast.example`. Phone remains unauthorized and is not invented. Product name cannot substitute for contents. Generic-gate test doubles `harborroast.example/book` and `(804) 555-0100` are not production facts.
 
 ## Refusals (correct)
 
 - Carousel refused (not on Launch Now menu).
 - Ad ops refused.
-- No invented URL, email, or phone.
-- No invented origin, weight, or flavor claims.
+- No invented phone.
+- No invented origin, tasting notes, discount, shipping, reviews, extra quantities, or certifications.
 
 ## Explicit limits (do not hide)
 
 - Frozen Launch Now services remain READY WITH EXPLICIT LIMITS. Classifications were not changed.
-- Promotional email has no click-through destination because none was authorized. That is a commercial limit of this brief, not a reason to invent a shop URL.
 - Voice TTS still enters through the `ap-001` adapter while routing is supporting narration for `v2-rtu-short-video`. Disclosed; not sold as a voice announcement.
 - Photography is Studio-generated for this fictional launch, not a customer photo pack (that is Scenario 3).
 - Mobile notes are responsive coverage, not Room 4 mobile certification.
 - Short video is polished template-led production using one primary photograph, not cinematic production.
 - Video beat 1 is 2.8s. Whether that feels rushed is an owner listening call.
 
-## Not defects
+## Not defects after correction
 
-- Coordinated campaign identity: same box photograph, same roast-brown/cream system, same offer/price/dates/CTA across square, vertical, counter card, caption, email, and video plates.
+- Coordinated campaign identity: same box photograph, same roast-brown/cream system, same offer/price/dates/contents/CTA/URL across square, vertical, counter card, caption, email, and video plates.
 - Phone preview is a complete 390×390 resize of the square, not a crop.
 - Counter card is genuinely 5×7 (1500×2100 px; PDF 360×504 pt). Historical handout v1 and Cedar Lane Letter v2 were not rewritten.
 - No unsupported claims in caption, email, or on-art copy.
 - No owner production labor.
+- Scenario 1 approved deliverable hashes remain unchanged.

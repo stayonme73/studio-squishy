@@ -72,7 +72,8 @@ export type CustomerFactSourceGateFindingCode =
   | "facts_not_approved"
   | "machine_inferred_contact"
   | "placeholder_contact"
-  | "unapproved_claim";
+  | "unapproved_claim"
+  | "contents_substituted_with_offer_name";
 
 export type CustomerFactSourceGateFinding = {
   code: CustomerFactSourceGateFindingCode;

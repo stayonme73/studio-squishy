@@ -1,4 +1,8 @@
-# Owner-review index — Scenario 2 Harbor Roast
+# Owner-review index — Scenario 2 Harbor Roast (authorized-fact correction)
+
+This is the **current** review set. First-pass outputs are superseded and are **not** listed here.
+
+See `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-first-pass/SUPERSEDED.md`.
 
 Review evidence only. Classification remains **OWNER DECISION PENDING**.
 

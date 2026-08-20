@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-20T22:29:06.619Z",
-  "briefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721",
+  "generatedAt": "2026-08-20T22:56:50.999Z",
+  "briefSha256": "955bbebd70470521680250f47e6f7ce536a1b74cc87f2137a769b6bce28ce4db",
   "acceptance": {
     "admit": true,
     "menuOk": true,
@@ -17,10 +17,10 @@
       "Campaign creative: READY WITH EXPLICIT LIMITS",
       "Carousel: NOT ON LAUNCH MENU",
       "No owner production labor. Owner creative review is approval, not production.",
-      "No shop URL was owner-authorized; none is shown.",
-      "No contact email was owner-authorized; none is shown.",
       "No phone was owner-authorized; none is shown.",
-      "Box contents are the authorized product name only. Origin, weight, and tasting notes were not supplied and are not invented.",
+      "Product URL: harborroast.example/autumn-box.",
+      "Support email: hello@harborroast.example.",
+      "Box contents: three 8-ounce bags of whole-bean single-origin coffee. Product name does not substitute for contents.",
       "Fictional customer. Production facts are OWNER_APPROVED_FOR_CERTIFICATION from the locked package brief.",
       "Studio-produced campaign photography — not customer-supplied photos.",
       "Video narration uses ElevenLabs as a production tool for the short-video SKU; a standalone voice SKU was not sold.",
@@ -73,7 +73,7 @@
       "productionPath": "studio_campaign_creative_pipeline",
       "toolId": "studio_campaign_creative",
       "skuId": "v2-rtu-flyer",
-      "note": "5×7 counter card PNG + PDF. Print CTA is the authorized label; no invented URL."
+      "note": "5×7 counter card PNG + PDF. Print CTA and authorized product URL."
     },
     {
       "deliverableId": "promo-caption",
@@ -89,7 +89,7 @@
       "productionPath": "scenario_2_copy_from_brief",
       "toolId": "studio_copy_quality_gate",
       "skuId": "marketing-copy",
-      "note": "Paste-ready promotional email. No shop URL or contact email was authorized."
+      "note": "Paste-ready promotional email with authorized product URL and support email."
     },
     {
       "deliverableId": "short-vertical-video",
@@ -101,27 +101,27 @@
     }
   ],
   "campaign": {
-    "renderVersion": 2,
+    "renderVersion": 4,
     "systemId": "harbor-roast-coffee-v1",
     "familyId": "full_bleed_hero",
-    "setFingerprint": "85e6e565751213e32f588a8e168b774a85c933cec72490ce6f6b546c1573a147",
+    "setFingerprint": "4b7804bd40ca8ced54480b8350dc28c01fe7e6c86696e02a05fb20ed4a76b86b",
     "pngShas": {
-      "social_square__full_bleed_hero": "5bd3368ce9905bece27844c612f5dd4570cd1e709fbae72349f0ed72f07478c6",
-      "social_vertical__full_bleed_hero": "6c29eae42facd8ed9434df74894912bb04005850d8918a931b684e1cb190af88",
-      "print_counter_card__full_bleed_hero": "474b33c43772f1ee608b9b69ecabc6ec02c5518bde8bbf1c385b2d291b6935ff"
+      "social_square__full_bleed_hero": "393ddcd855de954fa1ee351410157a050a9e9f551dd389dc3a8ae398f45785b6",
+      "social_vertical__full_bleed_hero": "043bf9a66b500a8b3d57fbe6dc02d6bdf0c2a463db830c242de42e9ccc83cce2",
+      "print_counter_card__full_bleed_hero": "3e22fe863dbe19a885b463c6d2942754a761008f99941b96cb2f74952b0ef9d0"
     }
   },
   "voice": {
-    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787264951170_538314367190.mp3",
-    "contentSha256": "538314367190fad5d3c804833479d70b70f2c1942cbf0abc93f6dd254648a6ab",
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787266615556_53b8b9e2ffed.mp3",
+    "contentSha256": "53b8b9e2ffed362eebc31df3b3e3deeca6ee0c2842020e6004b3f2bec54de4b4",
     "skuUsedForTtsAdapter": "ap-001",
     "soldAs": "supporting narration for v2-rtu-short-video"
   },
   "video": {
-    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/work-packet-s2-1787264951170.json",
-    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787264951170.mp4",
+    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/work-packet-s2-1787266615556.json",
+    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787266615556.mp4",
     "durationSeconds": 20,
-    "providerRenderId": "516b35a0-fe66-4001-b509-8751d606ab6e"
+    "providerRenderId": "d370e277-dc02-4789-bfbc-068e77d54a85"
   },
   "print": {
     "pngPx": {
@@ -173,6 +173,6 @@
     "narrationIsApprovedContinuous": true,
     "videoDurationInBand": true,
     "filesOpen": true,
-    "runId": "ebcaf3ef-6607-4280-9d19-96a7876790bf"
+    "runId": "8cbf85ed-163e-4138-909a-17e781122f93"
   }
 }

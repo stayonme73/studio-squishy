@@ -9,15 +9,18 @@ function literalToken(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+const STALE_BOOKING_URL = "harborroast.example/book";
+
 export function buildScenario2Caption(): string {
   return [
     `${brief.offer.name} is ${brief.offer.priceDisplay}, ${brief.offer.windowDisplay}.`,
     "",
     brief.customer.businessName,
     "",
-    brief.offer.description,
+    brief.offer.contentsDisplay,
     "",
     brief.cta.label,
+    brief.cta.bookingUrl,
   ].join("\n");
 }
 
@@ -28,21 +31,19 @@ export function buildScenario2Email(): {
   cta: string;
 } {
   return {
-    subjectOptions: [
-      `${brief.offer.name} — ${brief.offer.priceDisplay}`,
-      `Limited ${brief.offer.name} from ${brief.customer.businessName}`,
-    ],
+    subjectOptions: [`${brief.offer.name} — ${brief.offer.priceDisplay}`],
     previewText: `${brief.offer.priceDisplay} · ${brief.offer.windowDisplay}`,
     body: [
-      `${brief.customer.businessName} is launching a limited ${brief.offer.name}.`,
+      `${brief.customer.businessName} is launching the ${brief.offer.name}.`,
       "",
-      `The box is ${brief.offer.priceDisplay}, available ${brief.offer.windowDisplay}.`,
+      `The box is ${brief.offer.priceDisplay} and includes ${brief.offer.contentsDisplay}.`,
+      `Available ${brief.offer.windowDisplay}.`,
       "",
-      brief.offer.description,
+      `${brief.cta.label}: ${brief.cta.bookingUrl}`,
       "",
-      "This limited autumn box is available for the October window only.",
+      `Support: ${brief.cta.supportEmail}`,
     ].join("\n"),
-    cta: brief.cta.label,
+    cta: `${brief.cta.label}: ${brief.cta.bookingUrl}`,
   };
 }
 
@@ -50,21 +51,18 @@ export function formatScenario2EmailPasteReady(): string {
   const email = buildScenario2Email();
   return [
     `Subject: ${email.subjectOptions[0]}`,
-    `Alt subject: ${email.subjectOptions[1]}`,
-    `Preview: ${email.previewText}`,
+    `Preheader: ${email.previewText}`,
     "",
     email.body,
-    "",
-    email.cta,
   ].join("\n");
 }
 
 /**
  * Owner-facing Scenario 2 narration. One continuous passage.
- * Speak the authorized price and dates. Do not speak a URL, email, or phone.
+ * Speak the authorized price, dates, and contents. Do not speak URL, email, or phone.
  */
 export const SCENARIO_2_APPROVED_NARRATION =
-  "Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This limited launch is forty-eight dollars, available October first through October thirty-first, twenty twenty-six. A seasonal coffee box for fall. Get the limited box while it lasts.";
+  "Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This limited launch is forty-eight dollars and includes three 8-ounce bags of whole-bean single-origin coffee, available October first through October thirty-first, twenty twenty-six. Get the limited autumn box.";
 
 export function buildScenario2NarrationScript(): string {
   return SCENARIO_2_APPROVED_NARRATION;
@@ -74,13 +72,15 @@ export function buildScenario2CampaignDirection(): string {
   return [
     "Campaign direction — Harbor Roast Coffee Co.",
     "",
-    "One product launch. One box. One price. One window.",
+    "One product launch. One box. One price. One window. One purchase URL.",
     "",
     `${brief.customer.businessName} launches the ${brief.offer.name} at ${brief.offer.priceDisplay}, ${brief.offer.windowDisplay}.`,
-    "Tone is warm and grounded. No neon. Origin, weight, and flavor claims were not supplied and are not invented.",
+    `Contents: ${brief.offer.contentsDisplay}.`,
+    `Purchase: ${brief.cta.bookingUrl}.`,
+    `Support: ${brief.cta.supportEmail}.`,
+    "Tone is warm and grounded. No neon. No invented origin, shipping, discount, reviews, or phone.",
     `Call to action: ${brief.cta.label}.`,
     "Social square, social vertical, short vertical video, promotional email, caption, and 5×7 counter card share the same photograph, logo, and facts.",
-    "Shop URL, contact email, and phone were not owner-authorized, so they do not appear.",
   ].join("\n");
 }
 
@@ -94,6 +94,8 @@ export function scenario2CopyQualityBrief(): CopyQualityBrief {
       "October 31, 2026",
       brief.customer.businessName,
       brief.cta.label,
+      literalToken(brief.offer.contentsDisplay),
+      literalToken(brief.cta.bookingUrl),
     ],
     prohibitedClaimPatterns: [
       "guaranteed",
@@ -105,15 +107,30 @@ export function scenario2CopyQualityBrief(): CopyQualityBrief {
       "colombian",
       "tasting notes",
       "50% off",
+      "free shipping",
       "we will post for you",
       "ad account",
-      "harborroast\\.example",
+      literalToken(STALE_BOOKING_URL),
     ],
-    ctaTokens: [brief.cta.label, literalToken(brief.offer.priceDisplay)],
+    ctaTokens: [
+      brief.cta.label,
+      literalToken(brief.offer.priceDisplay),
+      literalToken(brief.cta.bookingUrl),
+    ],
     requireCta: true,
     maxEmails: 1,
     maxAssets: 1,
     maxTotalWords: 220,
     forbiddenTonePatterns: ["neon", "synergy", "revolutionize", "next-level"],
+  };
+}
+
+export function scenario2EmailCopyQualityBrief(): CopyQualityBrief {
+  return {
+    ...scenario2CopyQualityBrief(),
+    requiredFactTokens: [
+      ...scenario2CopyQualityBrief().requiredFactTokens,
+      literalToken(brief.cta.supportEmail),
+    ],
   };
 }
