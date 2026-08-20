@@ -55,16 +55,21 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
   /**
    * Campaign creative is NOT abandoned.
    * Text-led CERT plates remain accepted with limits.
-   * Photo-led campaign art direction is OPEN pending CapCut-style engine cert.
+   * Photo-led art direction stays OPEN.
+   * CapCut lesson: own the capability; vendors are optional sockets.
+   * Next: Machine-native production design — not another vendor trial.
    * Carousel stays off the Launch Now menu (Manager accepted).
    */
   campaignCreativeStatus: {
     abandoned: false as const,
     launchReady: false as const,
-    posture: "OPEN_PENDING_PHOTO_LED_ENGINE_CERT" as const,
+    posture: "OPEN_PENDING_MACHINE_NATIVE_PHOTO_LED_DESIGN" as const,
     textLedRenderer: "READY_WITH_EXPLICIT_LIMITS" as const,
     nextGate:
-      "Owner access decision + Nia photo pack, then resume CapCut-style live API cert" as const,
+      "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1" as const,
+    nextGateKind: "capability_decomposition_not_vendor_trial" as const,
+    doNotOpenPlacidTrialYet: true as const,
+    doNotBuyCanvaOrAdobeYet: true as const,
   },
 
   carouselDecision: {
@@ -117,6 +122,44 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
     twoStageMeansTwoSubscriptions: false as const,
     purchase: false as const,
     integrate: false as const,
+    parkForManager: true as const,
+    supersededAsImmediateNextStep: true as const,
+    supersessionNote:
+      "Manager 2026-08-19: do not open Placid trial next; run Machine-native capability decomposition first." as const,
+  },
+
+  /**
+   * Next authorized package name (awaiting Manager Scout block).
+   * CapCut parallel: own short-video capability via Shotstack — not automate CapCut.
+   * Same here: own photo-led campaign production; Canva/Adobe/Placid only if a primitive cannot be owned.
+   */
+  machineNativePhotoLedDesign: {
+    packageId:
+      "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1" as const,
+    status: "AWAITING_MANAGER_SCOUT_BLOCK" as const,
+    question:
+      "Can we build a Machine-operated photo-led campaign workstation, with vendors only as replaceable engines where truly necessary?" as const,
+    customerFacingNames: [
+      "Social Graphic",
+      "Campaign Creative",
+      "Short Promotional Video",
+    ] as const,
+    neverCustomerFacingProviderNames: [
+      "Canva Graphic",
+      "Adobe Firefly Creative",
+      "Shotstack Video",
+    ] as const,
+    preferredArchitecture: [
+      "Machine chooses creative recipe",
+      "Studio Visual Prep",
+      "Studio Campaign Renderer",
+      "Studio QA",
+      "Review / revision",
+      "Delivery",
+    ] as const,
+    doNotRebuildCanvaOrPhotoshop: true as const,
+    purchase: false as const,
+    doNotOpenPlacidTrial: true as const,
     parkForManager: true as const,
   },
 

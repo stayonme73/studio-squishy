@@ -187,6 +187,10 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     photoLedLiveCertRecommendation:
       "OWNER_PURCHASE_DECISION_REQUIRED" as const,
     twoStageMeansTwoSubscriptions: false as const,
+    nextPackageId:
+      "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1" as const,
+    nextPackageStatus: "AWAITING_MANAGER_SCOUT_BLOCK" as const,
+    doNotOpenPlacidTrialYet: true as const,
   },
 
   merge: "separately_authorized" as const,
