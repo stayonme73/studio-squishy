@@ -1,14 +1,14 @@
 {
-  "workPacketId": "room-4c-s1-1787254779414",
+  "workPacketId": "room-4c-s1-1787257432291",
   "workPacketVersion": "wp-s1-v1",
   "storyboardVersion": "sb-s1-v1",
-  "scriptVersionId": "cedar-lane-s1-narration-1787254779414",
+  "scriptVersionId": "cedar-lane-s1-narration-1787257432291",
   "campaignId": "room-4c-s1-cedar-lane-home-organizing",
   "skuId": "v2-rtu-short-video",
   "label": "Room 4C Scenario 1 Cedar Lane Home Organizing — coordinated short-form video",
-  "durationMinSeconds": 24,
-  "durationMaxSeconds": 29,
-  "durationTargetSeconds": 26.42,
+  "durationMinSeconds": 21,
+  "durationMaxSeconds": 26,
+  "durationTargetSeconds": 23.68,
   "aspectRatio": "vertical",
   "width": 1080,
   "height": 1920,
@@ -18,8 +18,8 @@
   "productionMethod": "shotstack",
   "productionRoleOwner": "creative_production",
   "voiceArtifact": {
-    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-1787254779414_2fbb8cf88a9d.mp3",
-    "contentSha256": "2fbb8cf88a9de5b215871ce065eddc7e23a278cc79e7089d526ca719dc4ba2f2"
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-1787257432291_0a98262e97b3.mp3",
+    "contentSha256": "0a98262e97b3ce2518f7614225f0f46b6fb44979f5f4f336461b3fcf3a1bfb24"
   },
   "exportRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/cedar-lane-fall-closet-reset.mp4",
   "ctaCaptionSceneNumber": 4,
@@ -31,7 +31,7 @@
       "assetId": "cedar-lane-beat-1",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-01-brand.png",
       "startSeconds": 0,
-      "endSeconds": 4.756,
+      "endSeconds": 4.263,
       "caption": "Richmond, VA",
       "captionPresentation": "embedded_in_plate"
     },
@@ -39,8 +39,8 @@
       "sceneNumber": 2,
       "assetId": "cedar-lane-beat-2",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-02-offer.png",
-      "startSeconds": 4.756,
-      "endSeconds": 12.155,
+      "startSeconds": 4.263,
+      "endSeconds": 10.895,
       "caption": "Fall Closet Reset",
       "captionPresentation": "embedded_in_plate"
     },
@@ -48,8 +48,8 @@
       "sceneNumber": 3,
       "assetId": "cedar-lane-beat-3",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-03-dates.png",
-      "startSeconds": 12.155,
-      "endSeconds": 18.497,
+      "startSeconds": 10.895,
+      "endSeconds": 16.579,
       "caption": "September 15",
       "captionPresentation": "embedded_in_plate"
     },
@@ -57,8 +57,8 @@
       "sceneNumber": 4,
       "assetId": "cedar-lane-beat-4",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-04-cta.png",
-      "startSeconds": 18.497,
-      "endSeconds": 26.424,
+      "startSeconds": 16.579,
+      "endSeconds": 23.684,
       "caption": "Book a consult",
       "captionPresentation": "overlay"
     }

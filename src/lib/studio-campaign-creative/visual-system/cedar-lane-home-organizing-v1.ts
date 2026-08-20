@@ -32,7 +32,7 @@ export const CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1: CampaignVisualSystem =
     imageTreatmentRules: {
       preferredFit: "cover",
       allowFullBleed: true,
-      overlayMaxOpacity: 0.58,
+      overlayMaxOpacity: 0.74,
     },
     spacingScalePx: [16, 24, 32, 48, 64, 80],
     ctaStyle: {
@@ -43,4 +43,5 @@ export const CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1: CampaignVisualSystem =
     },
     hierarchy: ["photo", "logo", "headline", "body", "dates", "cta"],
     approvedLayoutFamilyIds: ["full_bleed_hero", "split_hero", "image_panel"],
+    fullBleedDateColor: "#F6F1E8",
   };

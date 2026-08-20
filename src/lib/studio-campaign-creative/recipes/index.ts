@@ -4,24 +4,51 @@
  */
 
 import type { CampaignFormatId, LayoutRecipe } from "../contracts";
-import { CAMPAIGN_FORMAT_CANVASES } from "../formats";
+import {
+  CAMPAIGN_FORMAT_CANVASES,
+  CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER,
+  resolvePrintHandoutContract,
+  type CampaignPrintHandoutContract,
+  type CampaignPrintHandoutContractId,
+} from "../formats";
 import type { CampaignLayoutFamilyId } from "../types";
 
-function canvasOf(formatId: CampaignFormatId) {
+function canvasOf(
+  formatId: CampaignFormatId,
+  printContract: CampaignPrintHandoutContract,
+) {
+  if (formatId === "print_handout") {
+    return { widthPx: printContract.widthPx, heightPx: printContract.heightPx };
+  }
   return CAMPAIGN_FORMAT_CANVASES[formatId];
 }
 
-function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
-  const { widthPx: W, heightPx: H } = canvasOf(formatId);
+function isUsLetterPrint(
+  formatId: CampaignFormatId,
+  printContract: CampaignPrintHandoutContract,
+): boolean {
+  return (
+    formatId === "print_handout" &&
+    printContract.contractId ===
+      CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER.contractId
+  );
+}
+
+function fullBleed(
+  formatId: CampaignFormatId,
+  printContract: CampaignPrintHandoutContract,
+): LayoutRecipe {
+  const { widthPx: W, heightPx: H } = canvasOf(formatId, printContract);
   const isPrint = formatId === "print_handout";
+  const isLetter = isUsLetterPrint(formatId, printContract);
   const isSquare = formatId === "social_square";
 
-  if (isPrint) {
-    // US Letter 2550×3300 @ 300 DPI — reflowed, not a stretched 2:3 stack.
-    const margin = 180;
-    const stackH = 1180;
+  if (isLetter) {
+    // US Letter 2550×3300 @ 300 DPI — contract v2, not a stretched v1 canvas.
+    const margin = 200;
+    const stackH = 1380;
     const contentTop = H - stackH;
-    const overlayTop = contentTop - 420;
+    const overlayTop = contentTop - 720;
     const contentWidth = W - margin * 2;
     return {
       recipeId: `full_bleed_hero__${formatId}`,
@@ -63,7 +90,7 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
           id: "headline",
           kind: "text",
           role: "headline",
-          box: { x: margin, y: contentTop + 56, width: contentWidth, height: 200 },
+          box: { x: margin, y: contentTop + 40, width: contentWidth, height: 200 },
           maxLines: 1,
           minFontPx: 168,
         },
@@ -73,12 +100,12 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
           role: "body",
           box: {
             x: margin,
-            y: contentTop + 280,
+            y: contentTop + 250,
             width: contentWidth,
-            height: 220,
+            height: 320,
           },
           maxLines: 3,
-          minFontPx: 56,
+          minFontPx: 82,
         },
         {
           id: "dates",
@@ -86,12 +113,12 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
           role: "dates",
           box: {
             x: margin,
-            y: contentTop + 540,
+            y: contentTop + 590,
             width: contentWidth,
-            height: 88,
+            height: 96,
           },
           maxLines: 1,
-          minFontPx: 68,
+          minFontPx: 72,
         },
         {
           id: "price",
@@ -99,7 +126,7 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
           role: "price",
           box: {
             x: margin,
-            y: contentTop + 648,
+            y: contentTop + 700,
             width: contentWidth,
             height: 96,
           },
@@ -112,12 +139,118 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
           role: "cta",
           box: {
             x: margin,
-            y: contentTop + 780,
+            y: H - 640,
             width: contentWidth,
-            height: 280,
+            height: 340,
           },
           maxLines: 2,
-          minFontPx: 64,
+          minFontPx: 76,
+        },
+      ],
+    };
+  }
+
+  if (isPrint) {
+    // Historical v1 1024×1536 — Room 4B sealed replay.
+    const stackH = 340;
+    const contentTop = H - stackH;
+    const overlayTop = Math.max(0, contentTop - 96);
+    const contentWidth = W - 120;
+    return {
+      recipeId: `full_bleed_hero__${formatId}`,
+      familyId: "full_bleed_hero",
+      formatId,
+      canvas: { widthPx: W, heightPx: H },
+      slots: [
+        {
+          id: "hero",
+          kind: "image",
+          role: "hero",
+          box: { x: 0, y: 0, width: W, height: H },
+          fit: "cover",
+        },
+        {
+          id: "overlay",
+          kind: "shape",
+          role: "overlay",
+          box: {
+            x: 0,
+            y: overlayTop,
+            width: W,
+            height: H - overlayTop,
+          },
+        },
+        {
+          id: "logo",
+          kind: "logo",
+          role: "logo",
+          box: {
+            x: 36,
+            y: 28,
+            width: Math.floor(W * 0.3),
+            height: Math.floor(W * 0.09),
+          },
+          fit: "contain",
+        },
+        {
+          id: "headline",
+          kind: "text",
+          role: "headline",
+          box: { x: 48, y: contentTop + 4, width: contentWidth, height: 52 },
+          maxLines: 1,
+          minFontPx: 44,
+        },
+        {
+          id: "body",
+          kind: "text",
+          role: "body",
+          box: {
+            x: 48,
+            y: contentTop + 58,
+            width: contentWidth,
+            height: 64,
+          },
+          maxLines: 3,
+          minFontPx: 18,
+        },
+        {
+          id: "dates",
+          kind: "text",
+          role: "dates",
+          box: {
+            x: 48,
+            y: contentTop + 130,
+            width: contentWidth,
+            height: 28,
+          },
+          maxLines: 1,
+          minFontPx: 18,
+        },
+        {
+          id: "price",
+          kind: "text",
+          role: "price",
+          box: {
+            x: 48,
+            y: contentTop + 164,
+            width: contentWidth,
+            height: 36,
+          },
+          maxLines: 1,
+          minFontPx: 26,
+        },
+        {
+          id: "cta",
+          kind: "cta",
+          role: "cta",
+          box: {
+            x: 48,
+            y: contentTop + 214,
+            width: contentWidth,
+            height: 64,
+          },
+          maxLines: 2,
+          minFontPx: 17,
         },
       ],
     };
@@ -228,8 +361,11 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
   };
 }
 
-function splitHero(formatId: CampaignFormatId): LayoutRecipe {
-  const { widthPx: W, heightPx: H } = canvasOf(formatId);
+function splitHero(
+  formatId: CampaignFormatId,
+  printContract: CampaignPrintHandoutContract,
+): LayoutRecipe {
+  const { widthPx: W, heightPx: H } = canvasOf(formatId, printContract);
   const isPrint = formatId === "print_handout";
   const photoH = isPrint
     ? Math.floor(H * 0.5)
@@ -338,8 +474,11 @@ function splitHero(formatId: CampaignFormatId): LayoutRecipe {
   };
 }
 
-function imagePanel(formatId: CampaignFormatId): LayoutRecipe {
-  const { widthPx: W, heightPx: H } = canvasOf(formatId);
+function imagePanel(
+  formatId: CampaignFormatId,
+  printContract: CampaignPrintHandoutContract,
+): LayoutRecipe {
+  const { widthPx: W, heightPx: H } = canvasOf(formatId, printContract);
   const isPrint = formatId === "print_handout";
   const gutter = isPrint ? 80 : 40;
   const photoW = Math.floor(W * (isPrint ? 0.55 : 0.58));
@@ -441,7 +580,10 @@ function imagePanel(formatId: CampaignFormatId): LayoutRecipe {
 
 const BUILDERS: Record<
   CampaignLayoutFamilyId,
-  (formatId: CampaignFormatId) => LayoutRecipe
+  (
+    formatId: CampaignFormatId,
+    printContract: CampaignPrintHandoutContract,
+  ) => LayoutRecipe
 > = {
   full_bleed_hero: fullBleed,
   split_hero: splitHero,
@@ -451,8 +593,10 @@ const BUILDERS: Record<
 export function getLayoutRecipe(
   familyId: CampaignLayoutFamilyId,
   formatId: CampaignFormatId,
+  printHandoutContractId?: CampaignPrintHandoutContractId,
 ): LayoutRecipe {
-  return BUILDERS[familyId](formatId);
+  const printContract = resolvePrintHandoutContract(printHandoutContractId);
+  return BUILDERS[familyId](formatId, printContract);
 }
 
 export const ALL_LAYOUT_FAMILY_IDS: readonly CampaignLayoutFamilyId[] = [

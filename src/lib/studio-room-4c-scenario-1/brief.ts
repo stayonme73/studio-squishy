@@ -39,5 +39,6 @@ export function buildCedarLaneCreativeBrief(): CreativeBrief {
       supportPhotoIds: [CEDAR_LANE_ASSET_IDS.supportEntry],
     },
     targetFormats: [...CAMPAIGN_FORMAT_ORDER],
+    printHandoutContractId: brief.printHandoutContractId,
   };
 }

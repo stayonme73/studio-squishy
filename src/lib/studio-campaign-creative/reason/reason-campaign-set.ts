@@ -3,7 +3,10 @@
  */
 
 import type { AssetAssessment, CampaignVisualSystem, CreativeBrief } from "../contracts";
-import { CAMPAIGN_FORMAT_ORDER } from "../formats";
+import {
+  CAMPAIGN_FORMAT_ORDER,
+  CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER,
+} from "../formats";
 import { getLayoutRecipe } from "../recipes";
 import type {
   CampaignAssetSpec,
@@ -120,7 +123,13 @@ export function emitAssetLayers(input: {
   const bleedText = system.palette.background;
   const isFullBleed = recipe.familyId === "full_bleed_hero";
   const isPrint = recipe.formatId === "print_handout";
-  const dateColor = isFullBleed ? bleedText : system.palette.text;
+  const isUsLetter =
+    isPrint &&
+    recipe.canvas.widthPx ===
+      CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER.widthPx;
+  const dateColor = isFullBleed
+    ? (system.fullBleedDateColor ?? system.palette.muted)
+    : system.palette.text;
   const dateWeight = 600 as const;
 
   for (const slot of recipe.slots) {
@@ -246,7 +255,7 @@ export function emitAssetLayers(input: {
           brief.facts.datesDisplay,
           b,
           dateColor,
-          Math.max(slot.minFontPx ?? 20, isPrint ? 48 : 18),
+          Math.max(slot.minFontPx ?? 20, 18),
           dateWeight,
           "left",
           slot.maxLines,
@@ -274,8 +283,10 @@ export function emitAssetLayers(input: {
     if (slot.role === "cta") {
       if (isPrint) {
         const ctaSize = Math.max(slot.minFontPx ?? 20, 18);
-        const contactSize = Math.max(Math.round(ctaSize * 0.78), isPrint ? 44 : 16);
-        const contactGap = isPrint ? Math.round(ctaSize * 1.35) : 34;
+        const contactSize = isUsLetter
+          ? ctaSize
+          : Math.max(Math.round(ctaSize * 0.78), 16);
+        const contactGap = isUsLetter ? Math.round(ctaSize * 1.55) : 34;
         layers.push(
           textFromSlot(
             `${recipe.recipeId}-cta`,
@@ -393,7 +404,11 @@ export function reasonCampaignCreativeSetDeterministic(input: {
   const assets: CampaignAssetSpec[] = [];
   for (const formatId of CAMPAIGN_FORMAT_ORDER) {
     if (!input.brief.targetFormats.includes(formatId)) continue;
-    const recipe = getLayoutRecipe(familyId, formatId);
+    const recipe = getLayoutRecipe(
+      familyId,
+      formatId,
+      input.brief.printHandoutContractId,
+    );
     const prepared = input.preparedHeroByFormat[formatId];
     if (!prepared) throw new Error(`MISSING_PREPARED_HERO:${formatId}`);
     const layers = emitAssetLayers({

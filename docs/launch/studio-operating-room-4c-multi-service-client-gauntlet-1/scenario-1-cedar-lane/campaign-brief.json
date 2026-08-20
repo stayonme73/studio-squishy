@@ -24,10 +24,10 @@
   },
   "cta": {
     "label": "Book a consult",
-    "phoneDisplay": "(804) 555-0172",
-    "phoneSpoken": "eight zero four, five five five, zero one seven two",
-    "bookingUrl": "cedarlaneorganizing.example/fall-reset",
-    "bookingUrlSpoken": "cedar lane organizing dot example slash fall reset"
+    "phoneDisplay": "(804) 555-0147",
+    "phoneSpoken": "eight zero four, five five five, zero one four seven",
+    "bookingUrl": "cedarlaneorganizing.example/book",
+    "bookingUrlSpoken": "cedar lane organizing dot example slash book"
   },
   "requestedDeliverables": [
     {
@@ -63,6 +63,7 @@
     "datesDisplay": "September 15 – October 15, 2026",
     "priceDisplay": "",
     "cta": "Book a consult",
-    "bookingContact": "(804) 555-0172 · cedarlaneorganizing.example/fall-reset"
-  }
+    "bookingContact": "(804) 555-0147 · cedarlaneorganizing.example/book"
+  },
+  "printHandoutContractId": "campaign-print-handout-v2-us-letter"
 }

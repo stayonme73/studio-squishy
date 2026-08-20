@@ -19,4 +19,4 @@ Additional Scenario 1 limits:
 - Owner creative review is approval, not production labor.
 - Mobile notes in this package are responsive coverage, not Room 4 mobile certification.
 
-Print output is US Letter (8.5×11 in, 2550×3300 px at 300 DPI, PDF 612×792 pt). That is the accepted specification, not a remaining size limit.
+Print output is US Letter via explicit contract `campaign-print-handout-v2-us-letter` (8.5×11 in, 2550×3300 px at 300 DPI, PDF 612×792 pt). Room 4B historical replay remains `campaign-print-handout-v1`. That is the accepted specification, not a remaining size limit.

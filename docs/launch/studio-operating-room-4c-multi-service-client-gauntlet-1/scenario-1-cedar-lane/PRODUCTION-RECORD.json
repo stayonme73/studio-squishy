@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-20T19:55:24.505Z",
-  "briefSha256": "a1a9cdf9709379a5d4e4cac9eae5fbad31392bdbc75fdc4661453bf6c1fffde5",
+  "generatedAt": "2026-08-20T20:30:14.793Z",
+  "briefSha256": "348542fdccde1e289a824f7d3260ca6f00d6173e9eb416bb446520f86d109706",
   "acceptance": {
     "admit": true,
     "menuOk": true,
@@ -73,27 +73,27 @@
     }
   ],
   "campaign": {
-    "renderVersion": 2,
+    "renderVersion": 6,
     "systemId": "cedar-lane-home-organizing-v1",
     "familyId": "full_bleed_hero",
-    "setFingerprint": "b295c588244b83d712050088507377b194e17c89b4d8c7f877329fd1f95ffaa9",
+    "setFingerprint": "14de2ba3d08a9b5d3da6b6a572836219ccd1b1c8df0a834188ca615e1a8dbc3a",
     "pngShas": {
-      "social_square__full_bleed_hero": "a753f7da569ba512fd0714c2e5f8cc7a9ca12f78a0f55b5c927b2e46469dd798",
-      "social_vertical__full_bleed_hero": "30ebe5a2232a391e9316c3c27e3ad7291c79b06d3f87c776e1fe9149f365789c",
-      "print_handout__full_bleed_hero": "c8e6aeb3da706fb5c98377d70a1d24b3a5fa39dde8c5ce4c159a2738efc1fc13"
+      "social_square__full_bleed_hero": "a565cd5f1fd2cb3d174daa0eb87029a819c322f6b7be88af9258bc9982cd7c6e",
+      "social_vertical__full_bleed_hero": "1d163970e97edf5a104df24a20cfc6a38edc19c1c6a22e1954be536bee87629e",
+      "print_handout__full_bleed_hero": "f4ff91ba99c536fd0b1c5efdb5f60a9ed1791253fc91e4b79da722ef4d17debf"
     }
   },
   "voice": {
-    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-1787254779414_2fbb8cf88a9d.mp3",
-    "contentSha256": "2fbb8cf88a9de5b215871ce065eddc7e23a278cc79e7089d526ca719dc4ba2f2",
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-1787257821973_65664176de30.mp3",
+    "contentSha256": "65664176de308f3765970ae202e757d8b0ca9e1fb0a8b56c436cc668a1fbeaaa",
     "skuUsedForTtsAdapter": "ap-001",
     "soldAs": "supporting narration for v2-rtu-short-video"
   },
   "video": {
-    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/work-packet-s1-v1.json",
-    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/cedar-lane-fall-closet-reset.mp4",
-    "durationSeconds": 26.4,
-    "providerRenderId": "33c47a07-3778-4300-b094-c9754f5aa094"
+    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/work-packet-s1-1787257821973.json",
+    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/cedar-lane-fall-closet-reset-1787257821973.mp4",
+    "durationSeconds": 23.68,
+    "providerRenderId": "358740bf-1a30-40a3-8dea-59f16abc4278"
   },
   "print": {
     "pngPx": {
@@ -106,12 +106,7 @@
       "width": 612,
       "height": 792
     },
-    "pageInches": {
-      "widthIn": 8.5,
-      "heightIn": 11,
-      "widthPt": 612,
-      "heightPt": 792
-    }
+    "contractId": "campaign-print-handout-v2-us-letter"
   },
   "tools": [
     "studio_campaign_creative",
@@ -120,7 +115,7 @@
     "studio_copy_quality_gate"
   ],
   "ownerLabor": [
-    "None. Scout corrected the Machine print-handout path and regenerated campaign outputs. Tagia did not design, edit, format, or repair deliverables."
+    "None. Scout corrected canonical contact facts, versioned the Letter print contract, regenerated Machine deliverables, and prepared owner-review crops. Tagia did not design, edit, format, or repair deliverables."
   ],
   "qa": {
     "copyOk": true,
@@ -136,14 +131,19 @@
       "width": 612,
       "height": 792
     },
+    "printHandoutContractId": "campaign-print-handout-v2-us-letter",
     "printPngOk": true,
     "printPdfOk": true,
     "socialPngOk": true,
-    "dateContrastNotMuted": true,
-    "captionHasFacts": true,
+    "exactPhone": "(804) 555-0147",
+    "exactBookingUrl": "cedarlaneorganizing.example/book",
+    "captionHasExactFacts": true,
+    "printContactHasExactFacts": true,
+    "videoPlateHasExactFacts": true,
+    "narrationHasExactSpokenFacts": true,
     "videoDurationInBand": true,
     "filesOpen": true,
-    "runId": "db2c44d3-120b-492f-a12c-482d0785f7b7",
-    "correction": "us-letter-print-and-phone-390"
+    "runId": "5d70fd84-5238-4e2c-a982-c56bbc2eafeb",
+    "correction": "canonical-facts-and-letter-v2-contract"
   }
 }

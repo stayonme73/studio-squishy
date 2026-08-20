@@ -3,15 +3,15 @@
   "packageId": "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1",
   "scenarioId": "scenario-1-local-business-promotion",
   "campaignId": "room-4c-s1-cedar-lane-home-organizing",
-  "briefSha256": "a1a9cdf9709379a5d4e4cac9eae5fbad31392bdbc75fdc4661453bf6c1fffde5",
-  "generatedAt": "2026-08-20T19:55:24.505Z",
+  "briefSha256": "348542fdccde1e289a824f7d3260ca6f00d6173e9eb416bb446520f86d109706",
+  "generatedAt": "2026-08-20T20:30:14.793Z",
   "files": [
     {
       "id": "social-square",
       "previewRole": "social-graphic",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables/social-square.png",
-      "contentSha256": "a753f7da569ba512fd0714c2e5f8cc7a9ca12f78a0f55b5c927b2e46469dd798",
-      "byteLength": 1293668,
+      "contentSha256": "a565cd5f1fd2cb3d174daa0eb87029a819c322f6b7be88af9258bc9982cd7c6e",
+      "byteLength": 1267394,
       "widthPx": 1080,
       "heightPx": 1080,
       "mimeType": "image/png"
@@ -20,27 +20,27 @@
       "id": "video",
       "previewRole": "video",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables/video.mp4",
-      "contentSha256": "65640eb32a50cb3c23d507df4de1ad2c54e1cb426a06f29429165ef2c88e3274",
-      "byteLength": 12761919,
+      "contentSha256": "7ca4070ceff50eb28b0b09b8ec9d66b29356322ffd284377dbc94d1881ff5025",
+      "byteLength": 11452893,
       "widthPx": 1080,
       "heightPx": 1920,
-      "durationSeconds": 26.4,
+      "durationSeconds": 23.68,
       "mimeType": "video/mp4"
     },
     {
       "id": "caption",
       "previewRole": "caption",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables/caption.txt",
-      "contentSha256": "ed34fc1666ed8d80e4283fdb7df76a86e308ebf172012fe66b0a0a013cd0a587",
-      "byteLength": 266,
+      "contentSha256": "2220894a986ecbe144b50a62f85244ee36d8a04b40c32e5a33313f9acb8ad1b5",
+      "byteLength": 260,
       "mimeType": "text/plain"
     },
     {
       "id": "handout-png",
       "previewRole": "handout-png",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables/handout.png",
-      "contentSha256": "c8e6aeb3da706fb5c98377d70a1d24b3a5fa39dde8c5ce4c159a2738efc1fc13",
-      "byteLength": 7141914,
+      "contentSha256": "f4ff91ba99c536fd0b1c5efdb5f60a9ed1791253fc91e4b79da722ef4d17debf",
+      "byteLength": 7183596,
       "widthPx": 2550,
       "heightPx": 3300,
       "mimeType": "image/png"
@@ -49,8 +49,8 @@
       "id": "handout-pdf",
       "previewRole": "handout-pdf",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables/handout.pdf",
-      "contentSha256": "7afe4cd8a7ce552b739c6057835740488805082d6a64b2778c0cc809f6eea16b",
-      "byteLength": 12516186,
+      "contentSha256": "ff931b9249f95d5ba96f732412b57171878fcf63c07e151fc859c6c9180131a0",
+      "byteLength": 12129901,
       "mimeType": "application/pdf"
     }
   ]

@@ -121,13 +121,15 @@ export async function prepareVisualAsset(input: {
   formatId: CampaignFormatId;
   outAbsolutePath: string;
   contrastBoost?: number;
+  targetCanvas?: { widthPx: number; heightPx: number };
 }): Promise<PreparedVisualAsset> {
   if (!input.assessment.technical.usable) {
     throw new Error(
       `UNUSABLE_ASSET:${input.assessment.assetId}:${input.assessment.technical.failReasons.join(",")}`,
     );
   }
-  const canvas = CAMPAIGN_FORMAT_CANVASES[input.formatId];
+  const canvas =
+    input.targetCanvas ?? CAMPAIGN_FORMAT_CANVASES[input.formatId];
   const crop = computeCoverCrop({
     sourceW: input.assessment.widthPx,
     sourceH: input.assessment.heightPx,

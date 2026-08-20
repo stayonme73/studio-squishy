@@ -13,7 +13,7 @@ import {
   sha256File,
 } from "./bind";
 import type { CreativeBrief } from "./contracts";
-import { CAMPAIGN_FORMAT_ORDER, US_LETTER_PAGE } from "./formats";
+import { CAMPAIGN_FORMAT_ORDER, resolvePrintHandoutContract } from "./formats";
 import {
   reasonCampaignCreativeSetDeterministic,
 } from "./reason/reason-campaign-set";
@@ -77,6 +77,10 @@ export async function runCampaignCreativePipeline(input: {
   const preparedDirRel = `${input.artifactRootRel}/prepared/v${renderVersion}`;
   mkdirSync(path.join(input.repoRoot, preparedDirRel), { recursive: true });
 
+  const printContract = resolvePrintHandoutContract(
+    input.brief.printHandoutContractId,
+  );
+
   const preparedHeroByFormat: Record<string, CampaignMaterialRef> = {};
   for (const formatId of CAMPAIGN_FORMAT_ORDER) {
     if (!input.brief.targetFormats.includes(formatId)) continue;
@@ -87,6 +91,10 @@ export async function runCampaignCreativePipeline(input: {
       formatId,
       outAbsolutePath: path.join(input.repoRoot, outRel),
       contrastBoost: 1.05,
+      targetCanvas:
+        formatId === "print_handout"
+          ? { widthPx: printContract.widthPx, heightPx: printContract.heightPx }
+          : undefined,
     });
     preparedHeroByFormat[formatId] = {
       materialId: prepared.preparedId,
@@ -145,10 +153,10 @@ export async function runCampaignCreativePipeline(input: {
       widthPx: asset.canvas.widthPx,
       heightPx: asset.canvas.heightPx,
       pdfPage:
-        asset.formatId === "print_handout"
+        asset.formatId === "print_handout" && "pdfPage" in printContract
           ? {
-              width: `${US_LETTER_PAGE.widthIn}in`,
-              height: `${US_LETTER_PAGE.heightIn}in`,
+              width: printContract.pdfPage.width,
+              height: printContract.pdfPage.height,
             }
           : undefined,
     });

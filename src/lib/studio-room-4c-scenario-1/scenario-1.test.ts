@@ -6,8 +6,19 @@ import {
 } from "@/config/studio-room-4c-scenario-1-cedar-lane-v1";
 import { studioRoom4cMultiServiceClientGauntletV1 } from "@/config/studio-room-4c-multi-service-client-gauntlet-v1";
 import { evaluateCopyQuality } from "@/lib/studio-kitchen-production/copy-quality/evaluate";
-import { CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1, emitAssetLayers, getLayoutRecipe } from "@/lib/studio-campaign-creative";
-import { CAMPAIGN_FORMAT_CANVASES } from "@/lib/studio-campaign-creative/formats";
+import {
+  buildNiaFallResetCreativeBrief,
+  CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1,
+  emitAssetLayers,
+  getLayoutRecipe,
+  ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1,
+} from "@/lib/studio-campaign-creative";
+import {
+  CAMPAIGN_FORMAT_CANVASES,
+  CAMPAIGN_PRINT_HANDOUT_CONTRACT_V1,
+  CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER,
+  resolvePrintHandoutContract,
+} from "@/lib/studio-campaign-creative/formats";
 import {
   buildCedarLaneCreativeBrief,
   buildScenario1Caption,
@@ -19,7 +30,14 @@ import {
   hashScenario1Brief,
   isUsLetterMediaBox,
   routeScenario1Services,
+  scenario1CanonicalBookingContact,
+  scenario1CanonicalBookingUrl,
+  scenario1CanonicalPhone,
   scenario1CopyQualityBrief,
+  scenario1VideoCtaPlateCopy,
+  SCENARIO_1_STALE_BOOKING_URL,
+  SCENARIO_1_STALE_PHONE,
+  staleScenario1FactHits,
 } from "@/lib/studio-room-4c-scenario-1";
 
 describe("Room 4C Scenario 1 — machine-readable brief", () => {
@@ -110,6 +128,100 @@ describe("Room 4C Scenario 1 — copy quality", () => {
   });
 });
 
+describe("Room 4C Scenario 1 — exact canonical facts in render sources", () => {
+  it("locks Tagia's canonical phone and booking URL on the brief", () => {
+    expect(scenario1CanonicalPhone()).toBe("(804) 555-0147");
+    expect(scenario1CanonicalBookingUrl()).toBe(
+      "cedarlaneorganizing.example/book",
+    );
+    expect(scenario1CanonicalBookingContact()).toBe(
+      "(804) 555-0147 · cedarlaneorganizing.example/book",
+    );
+    expect(brief.cta.phoneDisplay).toBe("(804) 555-0147");
+    expect(brief.cta.bookingUrl).toBe("cedarlaneorganizing.example/book");
+    expect(brief.facts.bookingContact).toBe(
+      "(804) 555-0147 · cedarlaneorganizing.example/book",
+    );
+  });
+
+  it("puts the exact phone and URL on caption, narration, print contact, and video CTA plate", () => {
+    const caption = buildScenario1Caption();
+    expect(caption).toContain("(804) 555-0147");
+    expect(caption).toContain("cedarlaneorganizing.example/book");
+    expect(staleScenario1FactHits(caption)).toEqual([]);
+
+    const narration = buildScenario1NarrationScript();
+    expect(narration).toContain(brief.cta.phoneSpoken);
+    expect(narration).toContain(brief.cta.bookingUrlSpoken);
+    expect(narration).toContain("zero one four seven");
+    expect(narration).toContain("slash book");
+    expect(staleScenario1FactHits(narration)).toEqual([]);
+
+    const creative = buildCedarLaneCreativeBrief();
+    expect(creative.facts.bookingContact).toBe(
+      "(804) 555-0147 · cedarlaneorganizing.example/book",
+    );
+
+    const printRecipe = getLayoutRecipe(
+      "full_bleed_hero",
+      "print_handout",
+      creative.printHandoutContractId,
+    );
+    const printLayers = emitAssetLayers({
+      recipe: printRecipe,
+      brief: creative,
+      system: CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1,
+      heroPreparedMaterialId: "hero",
+      logoMaterialId: "logo",
+    });
+    const contact = printLayers.find(
+      (l) => l.type === "text" && l.role === "contact",
+    );
+    expect(contact?.type).toBe("text");
+    if (contact?.type === "text") {
+      expect(contact.content).toBe(
+        "(804) 555-0147 · cedarlaneorganizing.example/book",
+      );
+      expect(contact.content).toContain("(804) 555-0147");
+      expect(contact.content).toContain("cedarlaneorganizing.example/book");
+      expect(staleScenario1FactHits(contact.content)).toEqual([]);
+    }
+
+    const squareRecipe = getLayoutRecipe("full_bleed_hero", "social_square");
+    const squareLayers = emitAssetLayers({
+      recipe: squareRecipe,
+      brief: creative,
+      system: CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1,
+      heroPreparedMaterialId: "hero",
+      logoMaterialId: "logo",
+    });
+    for (const layer of squareLayers) {
+      if (layer.type === "text") {
+        expect(staleScenario1FactHits(layer.content)).toEqual([]);
+      }
+    }
+
+    const ctaPlate = scenario1VideoCtaPlateCopy();
+    expect(ctaPlate.line1).toBe("(804) 555-0147");
+    expect(ctaPlate.line2).toBe("cedarlaneorganizing.example/book");
+    expect(
+      staleScenario1FactHits(`${ctaPlate.line1}\n${ctaPlate.line2}`),
+    ).toEqual([]);
+  });
+
+  it("does not treat leftover invented facts as valid", () => {
+    expect(SCENARIO_1_STALE_PHONE).toBe("(804) 555-0172");
+    expect(SCENARIO_1_STALE_BOOKING_URL).toBe(
+      "cedarlaneorganizing.example/fall-reset",
+    );
+    expect(
+      staleScenario1FactHits(
+        "Book a consult: (804) 555-0172\ncedarlaneorganizing.example/fall-reset",
+      ),
+    ).toEqual(["stale-phone-0172", "stale-url-fall-reset"]);
+  });
+});
+
 describe("Room 4C Scenario 1 — provenance and delivery manifest", () => {
   it("rejects assets not bound to the brief hash", () => {
     const briefSha256 = hashScenario1Brief();
@@ -139,7 +251,12 @@ describe("Room 4C Scenario 1 — provenance and delivery manifest", () => {
     const briefSha256 = hashScenario1Brief();
     const file = (
       id: string,
-      previewRole: "social-graphic" | "video" | "caption" | "handout-png" | "handout-pdf",
+      previewRole:
+        | "social-graphic"
+        | "video"
+        | "caption"
+        | "handout-png"
+        | "handout-pdf",
       mimeType: string,
     ) => ({
       id,
@@ -177,17 +294,63 @@ describe("Room 4C Scenario 1 — provenance and delivery manifest", () => {
   });
 });
 
-describe("Room 4C Scenario 1 — US Letter print geometry", () => {
-  it("uses 2550×3300 print canvas, not 2:3 1024×1536", () => {
+describe("Room 4C Scenario 1 — versioned print format", () => {
+  it("keeps the unnamed default and Room 4B Nia brief on historical v1", () => {
     expect(CAMPAIGN_FORMAT_CANVASES.print_handout).toEqual({
-      widthPx: 2550,
-      heightPx: 3300,
+      widthPx: 1024,
+      heightPx: 1536,
     });
-    const recipe = getLayoutRecipe("full_bleed_hero", "print_handout");
-    expect(recipe.canvas).toEqual({ widthPx: 2550, heightPx: 3300 });
-    expect(brief.requestedDeliverables.find((d) => d.id === "print-handout")?.output).toContain(
-      "2550x3300",
+    expect(resolvePrintHandoutContract()).toEqual(
+      CAMPAIGN_PRINT_HANDOUT_CONTRACT_V1,
     );
+    expect(resolvePrintHandoutContract("campaign-print-handout-v1")).toEqual(
+      CAMPAIGN_PRINT_HANDOUT_CONTRACT_V1,
+    );
+    const historical = getLayoutRecipe("full_bleed_hero", "print_handout");
+    expect(historical.canvas).toEqual({ widthPx: 1024, heightPx: 1536 });
+
+    const nia = buildNiaFallResetCreativeBrief();
+    expect(nia.printHandoutContractId).toBe("campaign-print-handout-v1");
+    const niaPrint = getLayoutRecipe(
+      "full_bleed_hero",
+      "print_handout",
+      nia.printHandoutContractId,
+    );
+    expect(niaPrint.canvas).toEqual({ widthPx: 1024, heightPx: 1536 });
+  });
+
+  it("resolves Cedar Lane to US Letter without redefining v1", () => {
+    expect(brief.printHandoutContractId).toBe(
+      "campaign-print-handout-v2-us-letter",
+    );
+    const cedar = buildCedarLaneCreativeBrief();
+    expect(cedar.printHandoutContractId).toBe(
+      "campaign-print-handout-v2-us-letter",
+    );
+    const letter = resolvePrintHandoutContract(cedar.printHandoutContractId);
+    expect(letter).toEqual(CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER);
+    expect(letter.widthPx).toBe(2550);
+    expect(letter.heightPx).toBe(3300);
+    if ("pdfPage" in letter) {
+      expect(letter.pdfPage.widthPt).toBe(612);
+      expect(letter.pdfPage.heightPt).toBe(792);
+    } else {
+      throw new Error("v2 contract missing pdfPage");
+    }
+    const recipe = getLayoutRecipe(
+      "full_bleed_hero",
+      "print_handout",
+      cedar.printHandoutContractId,
+    );
+    expect(recipe.canvas).toEqual({ widthPx: 2550, heightPx: 3300 });
+    expect(CAMPAIGN_PRINT_HANDOUT_CONTRACT_V1).toEqual({
+      contractId: "campaign-print-handout-v1",
+      widthPx: 1024,
+      heightPx: 1536,
+    });
+    expect(
+      brief.requestedDeliverables.find((d) => d.id === "print-handout")?.output,
+    ).toContain("2550x3300");
   });
 
   it("treats 612×792 points as US Letter", () => {
@@ -195,24 +358,42 @@ describe("Room 4C Scenario 1 — US Letter print geometry", () => {
     expect(isUsLetterMediaBox({ width: 1024, height: 1536 })).toBe(false);
   });
 
-  it("paints dates in cream, not muted gray, on full-bleed recipes", () => {
-    const recipe = getLayoutRecipe("full_bleed_hero", "social_square");
-    const layers = emitAssetLayers({
-      recipe,
+  it("scopes cream date color to Cedar Lane, not Room 4B replay", () => {
+    const cedarRecipe = getLayoutRecipe("full_bleed_hero", "social_square");
+    const cedarDates = emitAssetLayers({
+      recipe: cedarRecipe,
       brief: buildCedarLaneCreativeBrief(),
       system: CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1,
       heroPreparedMaterialId: "hero",
       logoMaterialId: "logo",
-    });
-    const dates = layers.find((l) => l.type === "text" && l.role === "dates");
-    expect(dates?.type).toBe("text");
-    if (dates?.type === "text") {
-      expect(dates.color.toLowerCase()).toBe(
+    }).find((l) => l.type === "text" && l.role === "dates");
+    expect(cedarDates?.type).toBe("text");
+    if (cedarDates?.type === "text") {
+      expect(cedarDates.color.toLowerCase()).toBe(
         CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1.palette.background.toLowerCase(),
       );
-      expect(dates.color.toLowerCase()).not.toBe(
-        CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1.palette.muted.toLowerCase(),
+    }
+
+    const niaRecipe = getLayoutRecipe(
+      "full_bleed_hero",
+      "print_handout",
+      "campaign-print-handout-v1",
+    );
+    const niaDates = emitAssetLayers({
+      recipe: niaRecipe,
+      brief: buildNiaFallResetCreativeBrief(),
+      system: ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1,
+      heroPreparedMaterialId: "hero",
+      logoMaterialId: "logo",
+    }).find((l) => l.type === "text" && l.role === "dates");
+    expect(niaDates?.type).toBe("text");
+    if (niaDates?.type === "text") {
+      expect(niaDates.color.toLowerCase()).toBe(
+        ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1.palette.muted.toLowerCase(),
       );
+      expect(
+        ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1.fullBleedDateColor,
+      ).toBeUndefined();
     }
   });
 });

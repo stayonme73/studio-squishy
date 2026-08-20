@@ -53,6 +53,14 @@ export type CreativeBrief = {
     supportPhotoIds: string[];
   };
   targetFormats: CampaignFormatId[];
+  /**
+   * Explicit print-handout contract. Omit or `campaign-print-handout-v1`
+   * for Room 4B historical 1024×1536. `campaign-print-handout-v2-us-letter`
+   * for US Letter 2550×3300 / 612×792 pt.
+   */
+  printHandoutContractId?:
+    | "campaign-print-handout-v1"
+    | "campaign-print-handout-v2-us-letter";
 };
 
 export type CampaignVisualSystem = {
@@ -88,6 +96,11 @@ export type CampaignVisualSystem = {
   };
   hierarchy: ("logo" | "headline" | "photo" | "body" | "price" | "dates" | "cta")[];
   approvedLayoutFamilyIds: string[];
+  /**
+   * Full-bleed date color. Omit to keep historical muted dates (Room 4B).
+   * Cedar Lane sets cream for commercial contrast.
+   */
+  fullBleedDateColor?: string;
 };
 
 export type AssetAssessment = {

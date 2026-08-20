@@ -60,8 +60,8 @@ describe("recipes", () => {
         const recipe = getLayoutRecipe(family, format);
         expect(recipe.canvas.widthPx).toBeGreaterThan(0);
         if (format === "print_handout") {
-          expect(recipe.canvas.widthPx).toBe(2550);
-          expect(recipe.canvas.heightPx).toBe(3300);
+          expect(recipe.canvas.widthPx).toBe(1024);
+          expect(recipe.canvas.heightPx).toBe(1536);
         }
         const hero = recipe.slots.find((s) => s.role === "hero");
         expect(hero).toBeTruthy();
@@ -77,6 +77,23 @@ describe("recipes", () => {
         }
       }
     }
+  });
+
+  it("keeps historical print_handout v1 and adds Letter as a separate contract", () => {
+    const v1 = getLayoutRecipe("full_bleed_hero", "print_handout");
+    const v1Explicit = getLayoutRecipe(
+      "full_bleed_hero",
+      "print_handout",
+      "campaign-print-handout-v1",
+    );
+    const v2 = getLayoutRecipe(
+      "full_bleed_hero",
+      "print_handout",
+      "campaign-print-handout-v2-us-letter",
+    );
+    expect(v1.canvas).toEqual({ widthPx: 1024, heightPx: 1536 });
+    expect(v1Explicit.canvas).toEqual({ widthPx: 1024, heightPx: 1536 });
+    expect(v2.canvas).toEqual({ widthPx: 2550, heightPx: 3300 });
   });
 });
 
@@ -253,6 +270,20 @@ describe("pipeline + revision (synthetic proof assets)", () => {
       expect(v2.identity.materialFingerprint).not.toBe(
         v1.identity.materialFingerprint,
       );
+
+      const printAsset = v1.setSpec.assets.find(
+        (a) => a.formatId === "print_handout",
+      );
+      expect(printAsset?.canvas).toEqual({ widthPx: 1024, heightPx: 1536 });
+      const dates = printAsset?.layers.find(
+        (l) => l.type === "text" && l.role === "dates",
+      );
+      expect(dates?.type).toBe("text");
+      if (dates?.type === "text") {
+        expect(dates.color.toLowerCase()).toBe(
+          ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1.palette.muted.toLowerCase(),
+        );
+      }
     },
     180_000,
   );

@@ -75,8 +75,17 @@ export function renderCampaignAssetHtml(
       layer.letterSpacingPx != null
         ? `letter-spacing:${layer.letterSpacingPx}px;`
         : "";
+    const printReadable =
+      asset.formatId === "print_handout" &&
+      asset.canvas.widthPx >= 2000 &&
+      (layer.role === "body" ||
+        layer.role === "contact" ||
+        layer.role === "dates" ||
+        layer.role === "cta")
+        ? "text-shadow:0 2px 12px rgba(0,0,0,0.55);"
+        : "";
     parts.push(
-      `<div class="layer text" data-id="${esc(layer.id)}" data-role="${esc(layer.role)}" style="left:${layer.x}px;top:${layer.y}px;width:${layer.width}px;font-size:${layer.fontSizePx}px;font-weight:${layer.fontWeight};line-height:${layer.lineHeight};color:${esc(layer.color)};text-align:${layer.align};${tracking}">${esc(layer.content)}</div>`,
+      `<div class="layer text" data-id="${esc(layer.id)}" data-role="${esc(layer.role)}" style="left:${layer.x}px;top:${layer.y}px;width:${layer.width}px;font-size:${layer.fontSizePx}px;font-weight:${layer.fontWeight};line-height:${layer.lineHeight};color:${esc(layer.color)};text-align:${layer.align};${tracking}${printReadable}">${esc(layer.content)}</div>`,
     );
   }
 

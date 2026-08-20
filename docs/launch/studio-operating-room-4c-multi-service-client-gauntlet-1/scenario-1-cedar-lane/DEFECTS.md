@@ -1,10 +1,26 @@
 # Defects and explicit limits — Scenario 1
 
-## Correction completed (was a requirement, not a disclosed limit)
+## Blocking defect found and corrected (fact integrity)
 
-The first print delivery was 1024×1536 (2:3). That did **not** meet the accepted US Letter specification. Print is now reflowed to 2550×3300 PNG at 300 DPI and PDF page 8.5×11 in (MediaBox 612×792 pt). The 2:3 artwork was not stretched.
+The first customer-facing artwork used invented contact facts:
 
-Date-line contrast was strengthened to cream on the overlay (commercially readable on social, phone 390, and Letter handout).
+- Phone shown: `(804) 555-0172`
+- URL shown: `cedarlaneorganizing.example/fall-reset`
+
+Canonical facts (Tagia):
+
+- Phone: `(804) 555-0147`
+- Booking URL: `cedarlaneorganizing.example/book`
+
+Automated copy/campaign checks passed because they compared outputs to Scout’s invented brief, not to Tagia’s facts. That closed loop is the Room 4C failure mode. Current deliverables and render sources bind to the canonical pair. Tests now assert the exact phone and URL on caption, narration, print contact layer, and video CTA plate copy — not merely that “a phone” exists.
+
+## Print format versioning (not a silent Room 4B rewrite)
+
+US Letter is contract `campaign-print-handout-v2-us-letter` (2550×3300 PNG, PDF 612×792 pt). Historical Room 4B replay stays on `campaign-print-handout-v1` (1024×1536). The unnamed default canvas map was restored to v1. Cream full-bleed date color is scoped to the Cedar Lane visual system; Rooted & Ready replay stays muted.
+
+## Visual print notes (corrected, not redesigned)
+
+Supporting copy is larger over a darker overlay. Contact matches CTA size with extra bottom safe margin. Photograph, palette, and headline hierarchy were kept.
 
 ## Refusals (correct)
 
@@ -19,7 +35,7 @@ Date-line contrast was strengthened to cream on the overlay (commercially readab
 - Photography is Studio-generated for this fictional promo, not a customer photo pack (that is Scenario 3).
 - Square social CTA is the label “Book a consult”; phone and URL live on caption + handout + video end plate.
 - Mobile notes are responsive coverage, not Room 4 mobile certification.
-- Video pacing/text timing still needs Tagia watching the MP4. Machine duration 26.4s does not replace that review.
+- Video pacing/text timing still needs Tagia watching the MP4. Machine duration 23.68s does not replace that review.
 
 ## Not defects
 

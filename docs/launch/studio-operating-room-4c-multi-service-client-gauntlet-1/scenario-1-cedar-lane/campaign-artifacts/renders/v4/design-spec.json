@@ -1,0 +1,469 @@
+{
+  "specVersion": "campaign-creative-design-spec-1.0.0",
+  "systemId": "cedar-lane-home-organizing-v1",
+  "familyId": "full_bleed_hero",
+  "colors": {
+    "primary": "#3D5A4C",
+    "secondary": "#8B7355",
+    "background": "#F6F1E8",
+    "text": "#2C2A26",
+    "muted": "#6B6560",
+    "accent": "#C4A574"
+  },
+  "materials": [
+    {
+      "materialId": "cedar-lane-logo",
+      "role": "logo",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/materials/cedar-lane-logo.svg",
+      "contentSha256": "ba1cd030305c0bebffa0c6bc27963e01a2d2d9d71a2abb0ab51b5fd820b1bdf9"
+    },
+    {
+      "materialId": "cedar-lane-hero-closet__social_square__78d59496c456",
+      "role": "hero",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/campaign-artifacts/prepared/v4/hero-social_square.jpg",
+      "contentSha256": "78d59496c45619766be7cca1a5b129480b3a9cad29eb6a6b4e9e2b1e220da47e"
+    },
+    {
+      "materialId": "cedar-lane-hero-closet__social_vertical__1ee66214eaac",
+      "role": "hero",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/campaign-artifacts/prepared/v4/hero-social_vertical.jpg",
+      "contentSha256": "1ee66214eaac3f69d7646afd05e7566e8a55acf7db80d170d35e1f8908aca1d8"
+    },
+    {
+      "materialId": "cedar-lane-hero-closet__print_handout__0a458ae5c909",
+      "role": "hero",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/campaign-artifacts/prepared/v4/hero-print_handout.jpg",
+      "contentSha256": "0a458ae5c9099f6b2f557a689300561745ab39c8399e118d11f54ba0323d28d1"
+    }
+  ],
+  "brief": {
+    "campaignId": "room-4c-s1-cedar-lane-home-organizing",
+    "businessName": "Cedar Lane Home Organizing",
+    "facts": {
+      "headline": "Fall Closet Reset",
+      "supportingCopy": "A calm, practical closet reset for Richmond homes. Keep what you use. Let the rest go.",
+      "datesDisplay": "September 15 – October 15, 2026",
+      "priceDisplay": "",
+      "cta": "Book a consult",
+      "bookingContact": "(804) 555-0147 · cedarlaneorganizing.example/book"
+    },
+    "constraints": {
+      "noNeon": true,
+      "noBeforeAfterBody": true,
+      "calmWellness": false
+    },
+    "voiceDirection": "Calm, practical, no neon"
+  },
+  "assets": [
+    {
+      "assetId": "social_square__full_bleed_hero",
+      "formatId": "social_square",
+      "recipeId": "full_bleed_hero__social_square",
+      "familyId": "full_bleed_hero",
+      "canvas": {
+        "widthPx": 1080,
+        "heightPx": 1080
+      },
+      "background": {
+        "color": "#F6F1E8"
+      },
+      "layers": [
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_square-hero",
+          "role": "hero",
+          "materialId": "cedar-lane-hero-closet__social_square__78d59496c456",
+          "x": 0,
+          "y": 0,
+          "width": 1080,
+          "height": 1080,
+          "fit": "cover"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_square-overlay",
+          "role": "overlay",
+          "x": 0,
+          "y": 674,
+          "width": 1080,
+          "height": 406,
+          "fill": "linear-gradient(to bottom, rgba(61,90,76,0) 0%, rgba(61,90,76,0.333) 42%, rgba(61,90,76,0.740) 100%)"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_square-logo-plate",
+          "role": "logo_plate",
+          "x": 34,
+          "y": 26,
+          "width": 328,
+          "height": 101,
+          "fill": "rgba(61, 90, 76, 0.2)",
+          "borderRadiusPx": 6
+        },
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_square-logo",
+          "role": "logo",
+          "materialId": "cedar-lane-logo",
+          "x": 36,
+          "y": 28,
+          "width": 324,
+          "height": 97,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-headline",
+          "role": "headline",
+          "content": "Fall Closet Reset",
+          "x": 48,
+          "y": 774,
+          "width": 842,
+          "fontSizePx": 40,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-body",
+          "role": "body",
+          "content": "A calm, practical closet reset for Richmond homes. Keep what you use. Let the rest go.",
+          "x": 48,
+          "y": 828,
+          "width": 842,
+          "fontSizePx": 18,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 2
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-dates",
+          "role": "dates",
+          "content": "September 15 – October 15, 2026",
+          "x": 48,
+          "y": 884,
+          "width": 842,
+          "fontSizePx": 20,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_square-cta-btn",
+          "role": "cta_button",
+          "x": 48,
+          "y": 968,
+          "width": 320,
+          "height": 44,
+          "fill": "rgba(246, 241, 232, 0.16)",
+          "borderRadiusPx": 4
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-cta",
+          "role": "cta",
+          "content": "Book a consult",
+          "x": 62,
+          "y": 978,
+          "width": 292,
+          "fontSizePx": 18,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 1
+        }
+      ],
+      "outputFormats": [
+        "png"
+      ]
+    },
+    {
+      "assetId": "social_vertical__full_bleed_hero",
+      "formatId": "social_vertical",
+      "recipeId": "full_bleed_hero__social_vertical",
+      "familyId": "full_bleed_hero",
+      "canvas": {
+        "widthPx": 1080,
+        "heightPx": 1920
+      },
+      "background": {
+        "color": "#F6F1E8"
+      },
+      "layers": [
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_vertical-hero",
+          "role": "hero",
+          "materialId": "cedar-lane-hero-closet__social_vertical__1ee66214eaac",
+          "x": 0,
+          "y": 0,
+          "width": 1080,
+          "height": 1920,
+          "fit": "cover"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_vertical-overlay",
+          "role": "overlay",
+          "x": 0,
+          "y": 1504,
+          "width": 1080,
+          "height": 416,
+          "fill": "linear-gradient(to bottom, rgba(61,90,76,0) 0%, rgba(61,90,76,0.333) 42%, rgba(61,90,76,0.740) 100%)"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_vertical-logo-plate",
+          "role": "logo_plate",
+          "x": 34,
+          "y": 26,
+          "width": 328,
+          "height": 101,
+          "fill": "rgba(61, 90, 76, 0.2)",
+          "borderRadiusPx": 6
+        },
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_vertical-logo",
+          "role": "logo",
+          "materialId": "cedar-lane-logo",
+          "x": 36,
+          "y": 28,
+          "width": 324,
+          "height": 97,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-headline",
+          "role": "headline",
+          "content": "Fall Closet Reset",
+          "x": 48,
+          "y": 1604,
+          "width": 842,
+          "fontSizePx": 44,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-body",
+          "role": "body",
+          "content": "A calm, practical closet reset for Richmond homes. Keep what you use. Let the rest go.",
+          "x": 48,
+          "y": 1658,
+          "width": 842,
+          "fontSizePx": 18,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 2
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-dates",
+          "role": "dates",
+          "content": "September 15 – October 15, 2026",
+          "x": 48,
+          "y": 1714,
+          "width": 842,
+          "fontSizePx": 20,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_vertical-cta-btn",
+          "role": "cta_button",
+          "x": 48,
+          "y": 1798,
+          "width": 320,
+          "height": 44,
+          "fill": "rgba(246, 241, 232, 0.16)",
+          "borderRadiusPx": 4
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-cta",
+          "role": "cta",
+          "content": "Book a consult",
+          "x": 62,
+          "y": 1808,
+          "width": 292,
+          "fontSizePx": 18,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 1
+        }
+      ],
+      "outputFormats": [
+        "png"
+      ]
+    },
+    {
+      "assetId": "print_handout__full_bleed_hero",
+      "formatId": "print_handout",
+      "recipeId": "full_bleed_hero__print_handout",
+      "familyId": "full_bleed_hero",
+      "canvas": {
+        "widthPx": 2550,
+        "heightPx": 3300
+      },
+      "background": {
+        "color": "#F6F1E8"
+      },
+      "layers": [
+        {
+          "type": "image",
+          "id": "full_bleed_hero__print_handout-hero",
+          "role": "hero",
+          "materialId": "cedar-lane-hero-closet__print_handout__0a458ae5c909",
+          "x": 0,
+          "y": 0,
+          "width": 2550,
+          "height": 3300,
+          "fit": "cover"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__print_handout-overlay",
+          "role": "overlay",
+          "x": 0,
+          "y": 1200,
+          "width": 2550,
+          "height": 2100,
+          "fill": "linear-gradient(to bottom, rgba(61,90,76,0) 0%, rgba(61,90,76,0.333) 42%, rgba(61,90,76,0.740) 100%)"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__print_handout-logo-plate",
+          "role": "logo_plate",
+          "x": 188,
+          "y": 148,
+          "width": 804,
+          "height": 244,
+          "fill": "rgba(61, 90, 76, 0.2)",
+          "borderRadiusPx": 12
+        },
+        {
+          "type": "image",
+          "id": "full_bleed_hero__print_handout-logo",
+          "role": "logo",
+          "materialId": "cedar-lane-logo",
+          "x": 200,
+          "y": 160,
+          "width": 780,
+          "height": 220,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_handout-headline",
+          "role": "headline",
+          "content": "Fall Closet Reset",
+          "x": 200,
+          "y": 1960,
+          "width": 2150,
+          "fontSizePx": 168,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_handout-body",
+          "role": "body",
+          "content": "A calm, practical closet reset for Richmond homes. Keep what you use. Let the rest go.",
+          "x": 200,
+          "y": 2170,
+          "width": 2150,
+          "fontSizePx": 82,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 3
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_handout-dates",
+          "role": "dates",
+          "content": "September 15 – October 15, 2026",
+          "x": 200,
+          "y": 2510,
+          "width": 2150,
+          "fontSizePx": 72,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_handout-cta",
+          "role": "cta",
+          "content": "Book a consult",
+          "x": 200,
+          "y": 2660,
+          "width": 2150,
+          "fontSizePx": 76,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_handout-contact",
+          "role": "contact",
+          "content": "(804) 555-0147 · cedarlaneorganizing.example/book",
+          "x": 200,
+          "y": 2778,
+          "width": 2150,
+          "fontSizePx": 76,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F6F1E8",
+          "align": "left",
+          "maxLines": 1
+        }
+      ],
+      "outputFormats": [
+        "png",
+        "pdf"
+      ]
+    }
+  ],
+  "reasoningMode": "deterministic_constrained",
+  "reasoning": {
+    "familyId": "full_bleed_hero",
+    "heroMaterialId": "cedar-lane-hero-closet",
+    "rationaleCodes": [
+      "bounded_grammar_only",
+      "portrait_prefers_full_bleed"
+    ]
+  }
+}

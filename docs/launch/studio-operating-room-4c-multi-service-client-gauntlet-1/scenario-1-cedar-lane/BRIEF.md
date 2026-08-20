@@ -6,7 +6,7 @@
 **Dates:** September 15 – October 15, 2026  
 **Tone:** Calm, practical, no neon  
 **CTA:** Book a consult  
-**Contact:** (804) 555-0172 · cedarlaneorganizing.example/fall-reset  
+**Contact:** (804) 555-0147 · cedarlaneorganizing.example/book  
 **Price:** Not supplied. None invented.
 
 **Authoritative machine-readable brief:** `campaign-brief.json`  

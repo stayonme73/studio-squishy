@@ -4,7 +4,7 @@
 
 **Authority:** OWNER DECISION PENDING
 
-The Letter print specification is now met. Remaining limits are frozen Launch Now service limits, Studio-generated photography, social CTA label-only (contact on caption/handout/video), and video watching/listening that Tagia must still do.
+Canonical contact facts now match Tagia’s brief, and Letter print is a versioned contract rather than a silent overwrite of Room 4B. Remaining limits are frozen Launch Now service limits, Studio-generated photography, social CTA label-only (contact on caption/handout/video), and video watching/listening that Tagia must still do.
 
 Tagia must review the visual, video, copy, print output, and evidence before this becomes an owner classification.
 

@@ -1,0 +1,38 @@
+{
+  "jobId": "bf244e98-965d-44ca-afba-56a6f876d497",
+  "provider": "shotstack",
+  "providerRenderId": "358740bf-1a30-40a3-8dea-59f16abc4278",
+  "campaignId": "room-4c-s1-cedar-lane-home-organizing",
+  "skuId": "v2-rtu-short-video",
+  "workPacketId": "room-4c-s1-1787257821973",
+  "workPacketVersion": "wp-s1-v1",
+  "storyboardVersion": "sb-s1-v1",
+  "scriptVersionId": "cedar-lane-s1-narration-1787257821973",
+  "status": "done",
+  "submittedAt": "2026-08-20T20:31:02.255Z",
+  "completedAt": "2026-08-20T20:31:33.474Z",
+  "requestHash": "07281d3ceda06762a8127c4c1398f00c76c58e811340c4d448e0456ebbe215af",
+  "outputUrl": "https://shotstack-api-v1-output.s3-ap-southeast-2.amazonaws.com/9kngo12mih/358740bf-1a30-40a3-8dea-59f16abc4278.mp4",
+  "retryCount": 0,
+  "requestedWidth": 1080,
+  "requestedHeight": 1920,
+  "requestedAspect": "9:16",
+  "requestedDurationTargetSeconds": 23.68,
+  "outputFormat": "mp4",
+  "sourceAssetPaths": [
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-01-brand.png",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-02-offer.png",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-03-dates.png",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-04-cta.png",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-1787257821973_65664176de30.mp3"
+  ],
+  "sourceAssetHashes": {
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-01-brand.png": "34001593e54bfa74eadfdfbb14a5427baeec0332023012ae988f6616d09efecc",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-02-offer.png": "123c9150aa792ae82d321e7672e1630639a4b0264e1dd5eaf7ba4dddfc770658",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-03-dates.png": "19d5654d82cabed6a316f67cc0ef096082ecdf99a4dc6f6c8ee0a6b37beec3a6",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/plates/beat-04-cta.png": "c2fdae588e257364aabd2e1cde4037f9cb0b78c47d69dddbe06d57d72db6ff27",
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-1787257821973_65664176de30.mp3": "65664176de308f3765970ae202e757d8b0ca9e1fb0a8b56c436cc668a1fbeaaa"
+  },
+  "voiceArtifactPath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-1787257821973_65664176de30.mp3",
+  "voiceArtifactSha256": "65664176de308f3765970ae202e757d8b0ca9e1fb0a8b56c436cc668a1fbeaaa"
+}

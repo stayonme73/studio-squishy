@@ -65,6 +65,7 @@ export function buildNiaFallResetCreativeBrief(input?: {
       ],
     },
     targetFormats: [...CAMPAIGN_FORMAT_ORDER],
+    printHandoutContractId: "campaign-print-handout-v1",
   };
 }
 

@@ -46,11 +46,11 @@ export const studioRoom4cScenario1CedarLaneV1 = {
   },
   cta: {
     label: "Book a consult",
-    phoneDisplay: "(804) 555-0172",
+    phoneDisplay: "(804) 555-0147",
     phoneSpoken:
-      "eight zero four, five five five, zero one seven two",
-    bookingUrl: "cedarlaneorganizing.example/fall-reset",
-    bookingUrlSpoken: "cedar lane organizing dot example slash fall reset",
+      "eight zero four, five five five, zero one four seven",
+    bookingUrl: "cedarlaneorganizing.example/book",
+    bookingUrlSpoken: "cedar lane organizing dot example slash book",
   },
   requestedDeliverables: [
     {
@@ -88,8 +88,9 @@ export const studioRoom4cScenario1CedarLaneV1 = {
     priceDisplay: "",
     cta: "Book a consult",
     bookingContact:
-      "(804) 555-0172 · cedarlaneorganizing.example/fall-reset",
+      "(804) 555-0147 · cedarlaneorganizing.example/book",
   },
+  printHandoutContractId: "campaign-print-handout-v2-us-letter" as const,
 } as const;
 
 export type StudioRoom4cScenario1CedarLaneBrief =
