@@ -1,0 +1,120 @@
+{
+  "generatedAt": "2026-08-20T19:39:36.436Z",
+  "briefSha256": "55a6a85e0431c2df8eb695c7da285943e73bf23640a2efc125a34f6b79fae0de",
+  "acceptance": {
+    "admit": true,
+    "menuOk": true,
+    "unsupportedRefused": [
+      "carousel",
+      "ad_account_ops",
+      "unsupported_sizes_outside_studio_contracts"
+    ],
+    "disclosedLimits": [
+      "Short-form video: READY WITH EXPLICIT LIMITS",
+      "Social graphics: READY WITH EXPLICIT LIMITS",
+      "Print collateral: READY WITH EXPLICIT LIMITS",
+      "Marketing copy / email: READY WITH EXPLICIT LIMITS",
+      "Campaign creative: READY WITH EXPLICIT LIMITS",
+      "Carousel: NOT ON LAUNCH MENU",
+      "No owner production labor. Owner creative review is approval, not production.",
+      "No price was supplied; none is shown.",
+      "Fictional customer; example phone and booking URL only.",
+      "Studio-produced campaign photography — not customer-supplied photos.",
+      "Video narration uses ElevenLabs as a production tool for the short-video SKU; a standalone voice SKU was not sold.",
+      "Customer prints and posts; Studio does not run ads, targeting, or social accounts."
+    ],
+    "carousel": {
+      "admit": false,
+      "reason": "catalog_exclusion_on_social_posts",
+      "customerFacingMessage": "Social carousels are not on The Studio Launch Now menu. We can produce coordinated static social graphics instead, within the purchased social-posts scope."
+    },
+    "findings": []
+  },
+  "routing": [
+    {
+      "deliverableId": "campaign-set",
+      "launchNowService": "campaign-creative",
+      "productionPath": "studio_campaign_creative_pipeline",
+      "toolId": "studio_campaign_creative",
+      "skuId": "campaign-creative",
+      "note": "Coordinator. One CreativeBrief drives square social, vertical static, and print handout."
+    },
+    {
+      "deliverableId": "social-square",
+      "launchNowService": "social-graphics",
+      "productionPath": "studio_campaign_creative_pipeline",
+      "toolId": "studio_campaign_creative",
+      "skuId": "v2-rtu-social-posts",
+      "note": "Square PNG from the shared campaign set (social_square)."
+    },
+    {
+      "deliverableId": "print-handout",
+      "launchNowService": "print-collateral",
+      "productionPath": "studio_campaign_creative_pipeline",
+      "toolId": "studio_campaign_creative",
+      "skuId": "v2-rtu-flyer",
+      "note": "One-page PNG + PDF from the shared campaign set (print_handout). Print CTA is contact/URL, not a web button."
+    },
+    {
+      "deliverableId": "promo-caption",
+      "launchNowService": "marketing-copy-email",
+      "productionPath": "scenario_1_copy_from_brief",
+      "toolId": "studio_copy_quality_gate",
+      "skuId": "marketing-copy",
+      "note": "Paste-ready caption assembled from the same campaign facts. Not a full email kit."
+    },
+    {
+      "deliverableId": "short-vertical-video",
+      "launchNowService": "short-form-video",
+      "productionPath": "shotstack_work_packet",
+      "toolId": "shotstack",
+      "skuId": "v2-rtu-short-video",
+      "note": "Vertical MP4 from the same facts and visual system. ElevenLabs TTS is supporting narration, not a sold voice SKU."
+    }
+  ],
+  "campaign": {
+    "renderVersion": 1,
+    "systemId": "cedar-lane-home-organizing-v1",
+    "familyId": "full_bleed_hero",
+    "setFingerprint": "78e8bca5c36937f92be8d8c6b444b7605d59abfa7418c3f00267c8118ebe9110",
+    "pngShas": {
+      "social_square__full_bleed_hero": "4fad2bac0cf469a61c807db86c4fa63b47b12327200cca9a806f9dd991b85015",
+      "social_vertical__full_bleed_hero": "76820f878672bab60ffdaa95cab32cba4ac95dc9164937f7e3e374f7579d5dfa",
+      "print_handout__full_bleed_hero": "53101ea9c2633d0075f20d505179ca2f150e591fea978f5995ca41fd3c02ec29"
+    }
+  },
+  "voice": {
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-1787254779414_2fbb8cf88a9d.mp3",
+    "contentSha256": "2fbb8cf88a9de5b215871ce065eddc7e23a278cc79e7089d526ca719dc4ba2f2",
+    "skuUsedForTtsAdapter": "ap-001",
+    "soldAs": "supporting narration for v2-rtu-short-video"
+  },
+  "video": {
+    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/work-packet-s1-v1.json",
+    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/cedar-lane-fall-closet-reset.mp4",
+    "durationSeconds": 26.4,
+    "providerRenderId": "33c47a07-3778-4300-b094-c9754f5aa094"
+  },
+  "tools": [
+    "studio_campaign_creative",
+    "elevenlabs_tts_adapter",
+    "shotstack",
+    "studio_copy_quality_gate"
+  ],
+  "ownerLabor": [
+    "None. Scout generated photography via Studio image tool, assembled logo SVG, and ran existing Machine pipelines. Tagia did not design, edit, format, or repair deliverables."
+  ],
+  "qa": {
+    "copyOk": true,
+    "campaignQaPass": true,
+    "overflowOk": true,
+    "socialDims": true,
+    "printPngOk": true,
+    "printPdfOk": true,
+    "socialPngOk": true,
+    "captionHasFacts": true,
+    "videoDurationInBand": true,
+    "filesOpen": true,
+    "runId": "33ffa4b6-d3eb-47b5-9649-dfa1a13d51ed"
+  }
+}

@@ -1,7 +1,7 @@
 /**
  * Room 4C — Multi-Service Client Gauntlet.
  * OPEN at baseCommit 8c919e0. Room 4B remains CLOSED. Room 5 NOT STARTED.
- * Do not merge. Do not expand Launch Now menu. Scenario 1 not started in opening package.
+ * Do not merge. Do not expand Launch Now menu. Scenario 1 executed; owner decision pending.
  */
 
 export const studioRoom4cMultiServiceClientGauntletV1 = {
@@ -52,7 +52,7 @@ export const studioRoom4cMultiServiceClientGauntletV1 = {
     {
       id: "scenario-1-local-business-promotion" as const,
       customer: "Cedar Lane Home Organizing" as const,
-      status: "NOT_STARTED" as const,
+      status: "EXECUTED_OWNER_DECISION_PENDING" as const,
     },
     {
       id: "scenario-2-product-or-offer-launch" as const,

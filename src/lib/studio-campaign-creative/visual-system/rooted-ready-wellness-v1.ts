@@ -3,6 +3,7 @@
  * One-time Owner creative approval happens after seeing live art — not abstract CSS.
  */
 
+import { CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1 } from "./cedar-lane-home-organizing-v1";
 import type { CampaignVisualSystem } from "../contracts";
 
 export const ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1: CampaignVisualSystem = {
@@ -51,6 +52,9 @@ export const ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1: CampaignVisualSystem = {
 export function loadCampaignVisualSystem(systemId: string): CampaignVisualSystem {
   if (systemId === ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1.systemId) {
     return ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1;
+  }
+  if (systemId === CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1.systemId) {
+    return CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1;
   }
   throw new Error(`UNKNOWN_CAMPAIGN_VISUAL_SYSTEM:${systemId}`);
 }

@@ -18,6 +18,16 @@ import {
 } from "../types";
 import { assertNoInternalLeakInCampaignText } from "../customer-safe";
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const h = hex.replace("#", "").trim();
+  if (h.length !== 6) return { r: 31, g: 58, b: 77 };
+  return {
+    r: Number.parseInt(h.slice(0, 2), 16),
+    g: Number.parseInt(h.slice(2, 4), 16),
+    b: Number.parseInt(h.slice(4, 6), 16),
+  };
+}
+
 export function resolveHeroMaterialId(
   brief: CreativeBrief,
   assessments: readonly AssetAssessment[],
@@ -105,7 +115,10 @@ export function emitAssetLayers(input: {
 }): CampaignDesignLayer[] {
   const { recipe, brief, system } = input;
   const layers: CampaignDesignLayer[] = [];
-  const overlayFill = `rgba(31, 58, 77, ${system.imageTreatmentRules.overlayMaxOpacity})`;
+  const overlayRgb = hexToRgb(system.palette.primary);
+  const overlayFill = `rgba(${overlayRgb.r}, ${overlayRgb.g}, ${overlayRgb.b}, ${system.imageTreatmentRules.overlayMaxOpacity})`;
+  const bleedText = system.palette.background;
+  const bleedMuted = system.palette.muted;
   const isFullBleed = recipe.familyId === "full_bleed_hero";
   const isPrint = recipe.formatId === "print_handout";
 
@@ -135,7 +148,7 @@ export function emitAssetLayers(input: {
         y: b.y - 2,
         width: b.width + 4,
         height: b.height + 4,
-        fill: "rgba(31, 58, 77, 0.2)",
+        fill: `rgba(${overlayRgb.r}, ${overlayRgb.g}, ${overlayRgb.b}, 0.2)`,
         borderRadiusPx: 6,
       });
       layers.push({
@@ -163,7 +176,7 @@ export function emitAssetLayers(input: {
           y: b.y,
           width: b.width,
           height: b.height,
-          fill: `linear-gradient(to bottom, rgba(31,58,77,0) 0%, rgba(31,58,77,${(peak * 0.45).toFixed(3)}) 42%, rgba(31,58,77,${peak.toFixed(3)}) 100%)`,
+          fill: `linear-gradient(to bottom, rgba(${overlayRgb.r},${overlayRgb.g},${overlayRgb.b},0) 0%, rgba(${overlayRgb.r},${overlayRgb.g},${overlayRgb.b},${(peak * 0.45).toFixed(3)}) 42%, rgba(${overlayRgb.r},${overlayRgb.g},${overlayRgb.b},${peak.toFixed(3)}) 100%)`,
         });
       } else {
         layers.push({
@@ -199,7 +212,7 @@ export function emitAssetLayers(input: {
           "headline",
           brief.facts.headline,
           b,
-          isFullBleed ? "#F7F3EC" : system.palette.primary,
+          isFullBleed ? bleedText : system.palette.primary,
           Math.max(slot.minFontPx ?? 32, 32),
           700,
           "left",
@@ -215,7 +228,7 @@ export function emitAssetLayers(input: {
           "body",
           brief.facts.supportingCopy,
           b,
-          isFullBleed ? "#F2EBE2" : system.palette.text,
+          isFullBleed ? bleedText : system.palette.text,
           Math.max(slot.minFontPx ?? 20, 18),
           isFullBleed ? 500 : 400,
           "left",
@@ -231,7 +244,7 @@ export function emitAssetLayers(input: {
           "dates",
           brief.facts.datesDisplay,
           b,
-          isFullBleed ? "#EDE4D8" : system.palette.muted,
+          isFullBleed ? bleedMuted : system.palette.muted,
           Math.max(slot.minFontPx ?? 20, 18),
           500,
           "left",
@@ -241,13 +254,14 @@ export function emitAssetLayers(input: {
       continue;
     }
     if (slot.role === "price") {
+      if (!brief.facts.priceDisplay.trim()) continue;
       layers.push(
         textFromSlot(
           `${recipe.recipeId}-price`,
           "price",
           brief.facts.priceDisplay,
           b,
-          isFullBleed ? "#F7F3EC" : system.palette.text,
+          isFullBleed ? bleedText : system.palette.text,
           Math.max(slot.minFontPx ?? 28, 26),
           600,
           "left",
@@ -270,7 +284,7 @@ export function emitAssetLayers(input: {
               width: b.width,
               height: 28,
             },
-            isFullBleed ? "#F7F3EC" : system.palette.primary,
+            isFullBleed ? bleedText : system.palette.primary,
             Math.max(slot.minFontPx ?? 20, 18),
             600,
             "left",
@@ -288,7 +302,7 @@ export function emitAssetLayers(input: {
               width: b.width,
               height: 28,
             },
-            isFullBleed ? "#E2C9A8" : system.palette.muted,
+            isFullBleed ? system.palette.accent : system.palette.muted,
             16,
             500,
             "left",
@@ -305,8 +319,8 @@ export function emitAssetLayers(input: {
           y: b.y,
           width: Math.min(b.width, 320),
           height: Math.max(b.height, 40),
-          fill: "rgba(247, 243, 236, 0.14)",
-          borderRadiusPx: 4,
+          fill: system.ctaStyle.background,
+          borderRadiusPx: system.ctaStyle.borderRadiusPx,
         });
         layers.push(
           textFromSlot(
@@ -319,7 +333,7 @@ export function emitAssetLayers(input: {
               width: Math.min(b.width, 320) - 28,
               height: b.height - 16,
             },
-            "#F7F3EC",
+            system.ctaStyle.textColor,
             Math.max(slot.minFontPx ?? 18, 17),
             600,
             "left",

@@ -25,7 +25,8 @@ Fictional customers only. Preserve approved substance.
 
 **Must refuse if asked:** carousel, ad account ops, unsupported sizes invented outside Studio contracts.
 
-**Scenario status at package open:** NOT_STARTED
+**Scenario status at package open:** NOT_STARTED  
+**Scenario status now:** EXECUTED — OWNER DECISION PENDING
 
 ---
 

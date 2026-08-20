@@ -74,6 +74,7 @@ export function persistCampaignCreativeSetArtifacts(input: {
   renderVersion: number;
   pngAbsoluteByAssetId: Record<string, string>;
   pdfAbsoluteByAssetId?: Record<string, string>;
+  packageId?: string;
 }): CampaignCreativeSetIdentity {
   const dirRel = `${input.artifactRootRel}/renders/v${input.renderVersion}`;
   const dirAbs = path.join(input.repoRoot, dirRel);
@@ -94,7 +95,9 @@ export function persistCampaignCreativeSetArtifacts(input: {
   }
 
   const identity: CampaignCreativeSetIdentity = {
-    packageId: "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-BUILD-1",
+    packageId:
+      input.packageId ??
+      "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-BUILD-1",
     campaignId: input.setSpec.brief.campaignId,
     systemId: input.setSpec.systemId,
     familyId: input.setSpec.familyId,

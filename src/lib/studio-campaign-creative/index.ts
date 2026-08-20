@@ -20,4 +20,5 @@ export {
   ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1,
   loadCampaignVisualSystem,
 } from "./visual-system/rooted-ready-wellness-v1";
+export { CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1 } from "./visual-system/cedar-lane-home-organizing-v1";
 export { writeSyntheticProofAssets } from "./fixtures/synthetic-proof-assets";

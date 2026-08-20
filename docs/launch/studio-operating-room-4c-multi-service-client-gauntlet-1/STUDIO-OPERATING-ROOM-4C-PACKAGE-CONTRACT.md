@@ -7,7 +7,7 @@
 **Room 4B:** CLOSED (frozen)  
 **Room 5:** NOT STARTED  
 **Merge:** No  
-**Scenario 1:** NOT STARTED in this opening package  
+**Scenario 1:** EXECUTED — OWNER DECISION PENDING. Scenarios 2–3 not started.  
 
 Config: `src/config/studio-room-4c-multi-service-client-gauntlet-v1.ts`
 

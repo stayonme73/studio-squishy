@@ -49,6 +49,7 @@ export async function runCampaignCreativePipeline(input: {
   systemId: string;
   materials: readonly CampaignPipelineMaterialInput[];
   artifactRootRel: string;
+  packageId?: string;
 }): Promise<CampaignPipelineResult> {
   const system = loadCampaignVisualSystem(input.systemId);
   const logo = input.materials.find((m) => m.role === "logo");
@@ -161,6 +162,7 @@ export async function runCampaignCreativePipeline(input: {
     renderVersion,
     pngAbsoluteByAssetId,
     pdfAbsoluteByAssetId,
+    packageId: input.packageId,
   });
 
   return {

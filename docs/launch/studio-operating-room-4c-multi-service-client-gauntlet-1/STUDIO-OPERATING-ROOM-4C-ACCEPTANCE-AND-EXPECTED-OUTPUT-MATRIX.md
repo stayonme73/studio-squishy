@@ -70,6 +70,7 @@ When a scenario runs, Scout must create at least:
 ```
 scenario-N-<slug>/
   BRIEF.md
+  campaign-brief.json          # authoritative machine-readable brief (hashed)
   ACCEPTED-SCOPE.md
   DISCLOSED-LIMITS.md
   SERVICE-ROUTING.md
@@ -79,8 +80,12 @@ scenario-N-<slug>/
   MOBILE-RESPONSIVE-OBSERVATIONS.md
   DEFECTS.md
   CLASSIFICATION.md
-  deliverables/   # generated artifacts
+  ASSET-PROVENANCE.json        # every asset bound to the brief hash
+  DELIVERY-MANIFEST.json       # customer outputs with SHA-256
+  deliverables/                # generated artifacts
 ```
+
+The machine-readable brief, provenance record, and hashed delivery manifest are essential. Files without those records cannot prove that the same facts and approved assets produced every deliverable.
 
 Plus package-level:
 
