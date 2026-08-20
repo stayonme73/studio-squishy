@@ -4,7 +4,7 @@
 **Mode:** CapCut-style live operational certification — audition before hire  
 **4B status:** **REMAINS OPEN**  
 **Prior tips:** evaluation `cdf39bf` · note `a492b77` · Nia work `f21c65e`  
-**This live-cert tip:** recorded at commit below  
+**This live-cert tip:** `57632ca` (pushed; synced with `origin/operating/design-renderer-proof-1`)  
 **Room 5:** NOT STARTED · **No merge** · **No next Toolbox project** · **No purchase**
 
 ---
