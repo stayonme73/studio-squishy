@@ -8,4 +8,4 @@
 | Caption | Marketing copy / email | Copy assembled from canonical brief + copy-quality gate | studio_copy_quality_gate |
 | Vertical video | Short-form video | Shotstack work packet + ElevenLabs supporting narration | shotstack |
 
-Shared campaign facts are not retyped into conflicting copies. Visual system: `cedar-lane-home-organizing-v1`.
+Shared campaign facts are not retyped into conflicting copies. Visual system: `cedar-lane-home-organizing-v1`. Production routing calls the generic customer-fact source gate and cannot begin until required certification facts are `OWNER_APPROVED_FOR_CERTIFICATION`.

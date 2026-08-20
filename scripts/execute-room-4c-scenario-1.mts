@@ -32,6 +32,8 @@ import { evaluateCopyQuality } from "../src/lib/studio-kitchen-production/copy-q
 import { CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER } from "../src/lib/studio-campaign-creative/formats.ts";
 import {
   assertExactCanonicalContactFacts,
+  assertScenario1CustomerFactSourceGate,
+  assertScenario1ProductionRoutingAllowed,
   buildCedarLaneCreativeBrief,
   buildScenario1Caption,
   buildScenario1DeliveryManifest,
@@ -321,6 +323,8 @@ async function main() {
   if (!acceptance.admit) {
     throw new Error(`ACCEPTANCE_BLOCKED:${acceptance.findings.join(",")}`);
   }
+  assertScenario1ProductionRoutingAllowed();
+  assertScenario1CustomerFactSourceGate();
 
   copyGeneratedPhoto(
     "cedar-lane-hero-closet.png",
@@ -832,6 +836,7 @@ async function main() {
     videoPlateHasExactFacts:
       ctaPlate.line1 === "(804) 555-0147" &&
       ctaPlate.line2 === "cedarlaneorganizing.example/book",
+    customerFactSourceGate: true,
     narrationIsApprovedContinuous:
       narration ===
         "Ready for a calmer, more usable closet? Cedar Lane Home Organizing's Fall Closet Reset is available September fifteenth through October fifteenth for Richmond-area homes. Keep what you use, let the rest go, and book your free twenty-minute consultation today." &&

@@ -1,8 +1,11 @@
 /**
  * Room 4C Scenario 1 — production routing from one brief.
+ * Routing cannot begin until required certification facts are approved.
  */
 
 import { studioRoom4cScenario1CedarLaneV1 as brief } from "@/config/studio-room-4c-scenario-1-cedar-lane-v1";
+
+import { assertScenario1ProductionRoutingAllowed } from "./fact-integrity";
 
 export type Scenario1Route = {
   deliverableId: string;
@@ -14,6 +17,7 @@ export type Scenario1Route = {
 };
 
 export function routeScenario1Services(): readonly Scenario1Route[] {
+  assertScenario1ProductionRoutingAllowed();
   return [
     {
       deliverableId: "campaign-set",

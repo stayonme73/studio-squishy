@@ -27,6 +27,8 @@ import {
 import { probeMp4WithFfprobe } from "../src/lib/studio-kitchen-production/video-operational/bind-export.ts";
 import {
   assertExactCanonicalContactFacts,
+  assertScenario1CustomerFactSourceGate,
+  assertScenario1ProductionRoutingAllowed,
   buildScenario1Caption,
   buildScenario1DeliveryManifest,
   buildScenario1NarrationScript,
@@ -146,6 +148,8 @@ async function main() {
     "None. Scout regenerated one continuous narration track and one revised MP4. Tagia did not design, edit, format, or repair deliverables. Approved stills were reused.",
   ];
 
+  assertScenario1ProductionRoutingAllowed();
+  assertScenario1CustomerFactSourceGate();
   const caption = buildScenario1Caption();
   assertExactCanonicalContactFacts("caption", caption);
   const narration = buildScenario1NarrationScript();

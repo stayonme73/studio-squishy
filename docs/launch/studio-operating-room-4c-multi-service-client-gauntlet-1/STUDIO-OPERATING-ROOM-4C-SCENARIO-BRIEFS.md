@@ -26,7 +26,8 @@ Fictional customers only. Preserve approved substance.
 **Must refuse if asked:** carousel, ad account ops, unsupported sizes invented outside Studio contracts.
 
 **Scenario status at package open:** NOT_STARTED  
-**Scenario status now:** EXECUTED — OWNER DECISION PENDING
+**Scenario status now:** PASS WITH EXPLICIT LIMITS  
+**Contact fact status:** OWNER_APPROVED_FOR_CERTIFICATION (fictional certification phone/URL; not customer-provided real-world facts)
 
 ---
 

@@ -1,7 +1,8 @@
 /**
  * Room 4C — Multi-Service Client Gauntlet.
  * OPEN at baseCommit 8c919e0. Room 4B remains CLOSED. Room 5 NOT STARTED.
- * Do not merge. Do not expand Launch Now menu. Scenario 1 executed; owner decision pending.
+ * Do not merge. Do not expand Launch Now menu. Scenario 1 PASS WITH EXPLICIT LIMITS.
+ * Scenarios 2–3 not started. Room 4C remains OPEN.
  */
 
 export const studioRoom4cMultiServiceClientGauntletV1 = {
@@ -52,7 +53,16 @@ export const studioRoom4cMultiServiceClientGauntletV1 = {
     {
       id: "scenario-1-local-business-promotion" as const,
       customer: "Cedar Lane Home Organizing" as const,
-      status: "EXECUTED_OWNER_DECISION_PENDING" as const,
+      status: "PASS WITH EXPLICIT LIMITS" as const,
+      classification: "PASS WITH EXPLICIT LIMITS" as const,
+      contactFactApprovalStatus: "OWNER_APPROVED_FOR_CERTIFICATION" as const,
+      explicitLimits: [
+        "Studio-generated photography rather than customer-supplied photography.",
+        "Social graphic relies on its accompanying caption for phone and booking URL.",
+        "Short video is polished template-led production using one primary photograph, not cinematic production.",
+        "Mobile findings are responsive coverage only, not final Room 4 mobile certification.",
+        "Frozen Launch Now service classifications remain READY WITH EXPLICIT LIMITS.",
+      ] as const,
     },
     {
       id: "scenario-2-product-or-offer-launch" as const,

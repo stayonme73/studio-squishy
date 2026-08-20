@@ -78,7 +78,7 @@ export function evaluateScenario1Acceptance(input?: {
     `Carousel: ${FROZEN.carousel}`,
     "No owner production labor. Owner creative review is approval, not production.",
     "No price was supplied; none is shown.",
-    "Fictional customer; example phone and booking URL only.",
+    "Fictional customer; certification phone and booking URL (OWNER_APPROVED_FOR_CERTIFICATION). Not customer-provided real-world facts.",
     "Studio-produced campaign photography — not customer-supplied photos.",
     "Video narration uses ElevenLabs as a production tool for the short-video SKU; a standalone voice SKU was not sold.",
     "Customer prints and posts; Studio does not run ads, targeting, or social accounts.",

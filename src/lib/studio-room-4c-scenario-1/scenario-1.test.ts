@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+import path from "path";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -26,7 +28,9 @@ import {
   buildScenario1NarrationScript,
   buildScenario1Provenance,
   canonicalScenario1BriefJson,
+  collectScenario1CustomerFactSources,
   evaluateScenario1Acceptance,
+  evaluateScenario1CustomerFactSourceGate,
   hashScenario1Brief,
   isUsLetterMediaBox,
   routeScenario1Services,
@@ -35,6 +39,8 @@ import {
   scenario1CanonicalPhone,
   scenario1CopyQualityBrief,
   scenario1VideoCtaPlateCopy,
+  SCENARIO_1_APPROVED_CUSTOMER_FACT_RECORD,
+  SCENARIO_1_OWNER_LOCKED_FACTS,
   SCENARIO_1_STALE_BOOKING_URL,
   SCENARIO_1_STALE_PHONE,
   staleScenario1FactHits,
@@ -65,6 +71,28 @@ describe("Room 4C Scenario 1 — machine-readable brief", () => {
     expect(
       studioRoom4cMultiServiceClientGauntletV1.frozenLaunchNowServices.carousel,
     ).toBe("NOT ON LAUNCH MENU");
+  });
+
+  it("classifies Scenario 1 PASS WITH EXPLICIT LIMITS while later scenarios stay unstarted", () => {
+    const scenario1 = studioRoom4cMultiServiceClientGauntletV1.scenarios[0];
+    expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe("OPEN");
+    expect(scenario1?.status).toBe("PASS WITH EXPLICIT LIMITS");
+    expect(scenario1?.contactFactApprovalStatus).toBe(
+      "OWNER_APPROVED_FOR_CERTIFICATION",
+    );
+    expect(scenario1?.explicitLimits).toEqual([
+      "Studio-generated photography rather than customer-supplied photography.",
+      "Social graphic relies on its accompanying caption for phone and booking URL.",
+      "Short video is polished template-led production using one primary photograph, not cinematic production.",
+      "Mobile findings are responsive coverage only, not final Room 4 mobile certification.",
+      "Frozen Launch Now service classifications remain READY WITH EXPLICIT LIMITS.",
+    ]);
+    expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[1]?.status).toBe(
+      "NOT_STARTED",
+    );
+    expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.status).toBe(
+      "NOT_STARTED",
+    );
   });
 });
 
@@ -152,7 +180,37 @@ describe("Room 4C Scenario 1 — exact canonical facts in render sources", () =>
     );
   });
 
-  it("puts the exact phone and URL on caption, print contact, and video CTA plate", () => {
+  it("8. uses the generic fact gate without scenario-specific bypass logic", () => {
+    expect(
+      SCENARIO_1_APPROVED_CUSTOMER_FACT_RECORD.approvalStatus,
+    ).toBe("OWNER_APPROVED_FOR_CERTIFICATION");
+    expect(SCENARIO_1_APPROVED_CUSTOMER_FACT_RECORD.values.phoneDisplay).toBe(
+      "(804) 555-0147",
+    );
+    expect(SCENARIO_1_APPROVED_CUSTOMER_FACT_RECORD.values.bookingUrl).toBe(
+      "cedarlaneorganizing.example/book",
+    );
+    expect(() => routeScenario1Services()).not.toThrow();
+
+    const result = evaluateScenario1CustomerFactSourceGate();
+    expect(result.ok).toBe(true);
+    expect(result.findings).toEqual([]);
+
+    const routingSrc = readFileSync(
+      path.join(__dirname, "routing.ts"),
+      "utf8",
+    );
+    const collectorSrc = readFileSync(
+      path.join(__dirname, "customer-fact-sources.ts"),
+      "utf8",
+    );
+    expect(routingSrc).toContain("assertScenario1ProductionRoutingAllowed");
+    expect(collectorSrc).toContain("evaluateCustomerFactSourceGate");
+    expect(collectorSrc).toContain("SCENARIO_1_APPROVED_CUSTOMER_FACT_RECORD");
+    expect(collectorSrc).not.toMatch(/if\s*\(.*cedar/i);
+  });
+
+  it("9. puts exact approved facts on caption, print contact, video CTA plate, and other applicable outputs", () => {
     const caption = buildScenario1Caption();
     expect(caption).toContain("(804) 555-0147");
     expect(caption).toContain("cedarlaneorganizing.example/book");
@@ -225,6 +283,51 @@ describe("Room 4C Scenario 1 — exact canonical facts in render sources", () =>
         "Book a consult: (804) 555-0172\ncedarlaneorganizing.example/fall-reset",
       ),
     ).toEqual(["stale-phone-0172", "stale-url-fall-reset"]);
+  });
+
+  it("records Cedar Lane contact as fictional certification facts, not customer-provided real-world facts", () => {
+    expect(SCENARIO_1_APPROVED_CUSTOMER_FACT_RECORD.approvalStatus).toBe(
+      "OWNER_APPROVED_FOR_CERTIFICATION",
+    );
+    expect(SCENARIO_1_OWNER_LOCKED_FACTS.phoneDisplay).toBe("(804) 555-0147");
+    expect(SCENARIO_1_OWNER_LOCKED_FACTS.bookingUrl).toBe(
+      "cedarlaneorganizing.example/book",
+    );
+    expect(SCENARIO_1_OWNER_LOCKED_FACTS.phoneDisplay).not.toBe(
+      SCENARIO_1_STALE_PHONE,
+    );
+    expect(SCENARIO_1_OWNER_LOCKED_FACTS.bookingUrl).not.toBe(
+      SCENARIO_1_STALE_BOOKING_URL,
+    );
+  });
+
+  it("passes the generic customer-fact source gate for social, caption, print, video, and narration", () => {
+    const result = evaluateScenario1CustomerFactSourceGate();
+    expect(result.ok).toBe(true);
+    expect(result.findings).toEqual([]);
+
+    const byId = Object.fromEntries(
+      collectScenario1CustomerFactSources().map((source) => [
+        source.sourceId,
+        source,
+      ]),
+    );
+    expect(byId.caption?.requireExact).toEqual(
+      expect.arrayContaining(["phoneDisplay", "bookingUrl"]),
+    );
+    expect(byId["social-square-layers"]?.requireExact).toEqual([
+      "offerName",
+      "datesDisplay",
+      "cta",
+    ]);
+    expect(byId["social-square-layers"]?.text).not.toContain(
+      "(804) 555-0147",
+    );
+    expect(byId["social-square-layers"]?.text).toContain("Book a consult");
+    expect(byId.narration?.forbidExact).toEqual([
+      "phoneDisplay",
+      "bookingUrl",
+    ]);
   });
 });
 

@@ -11,5 +11,7 @@ Machine-readable companion: `PRODUCTION-RECORD.json`
 | Shotstack render | `3a3b1fff-b44f-406e-b5e1-84a15386291c` |
 | Stills | unchanged (social, handout, caption, plates) |
 | Owner labor | None |
+| Classification | PASS WITH EXPLICIT LIMITS |
+| Contact facts | OWNER_APPROVED_FOR_CERTIFICATION |
 
-Execution script: `scripts/revise-room-4c-scenario-1-narration.mts`
+Approved deliverable hashes were not changed by the fact-gate closeout. Execution script for the last media revision: `scripts/revise-room-4c-scenario-1-narration.mts`

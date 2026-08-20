@@ -12,7 +12,7 @@ Frozen Launch Now classifications are unchanged:
 Additional Scenario 1 limits:
 
 - No price shown (not supplied).
-- Fictional customer; example phone and booking URL.
+- Fictional customer; certification phone `(804) 555-0147` and booking URL `cedarlaneorganizing.example/book` are `OWNER_APPROVED_FOR_CERTIFICATION`. They are not customer-provided real-world facts.
 - Studio-produced campaign photography — not customer-supplied photos (that is Scenario 3).
 - Video narration uses ElevenLabs as a production tool for the short-video SKU. A standalone voice SKU was not sold.
 - Customer prints and posts. Studio does not run ads or social accounts.

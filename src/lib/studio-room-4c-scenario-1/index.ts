@@ -16,13 +16,23 @@ export {
 } from "./copy";
 export {
   assertExactCanonicalContactFacts,
+  assertScenario1ProductionRoutingAllowed,
   scenario1CanonicalBookingContact,
   scenario1CanonicalBookingUrl,
+  scenario1CanonicalCustomerFacts,
   scenario1CanonicalPhone,
+  scenario1ProductionRoutingInput,
+  SCENARIO_1_APPROVED_CUSTOMER_FACT_RECORD,
+  SCENARIO_1_OWNER_LOCKED_FACTS,
   SCENARIO_1_STALE_BOOKING_URL,
   SCENARIO_1_STALE_PHONE,
   staleScenario1FactHits,
 } from "./fact-integrity";
+export {
+  assertScenario1CustomerFactSourceGate,
+  collectScenario1CustomerFactSources,
+  evaluateScenario1CustomerFactSourceGate,
+} from "./customer-fact-sources";
 export {
   scenario1VideoCtaPlateCopy,
   scenario1VideoPlateCopy,

@@ -1,6 +1,8 @@
 # Video review support — Scenario 1 (narration revision)
 
-Machine duration: **20.00s**. This does **not** replace Tagia watching and listening.
+Owner review: **video visuals approved with explicit limits; narration approved.**
+
+Machine duration: **20.00s**.
 
 ## Text-card transitions
 

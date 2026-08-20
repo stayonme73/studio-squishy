@@ -7,6 +7,7 @@
 **Tone:** Calm, practical, no neon  
 **CTA:** Book a consult  
 **Contact:** (804) 555-0147 · cedarlaneorganizing.example/book  
+**Contact fact status:** OWNER_APPROVED_FOR_CERTIFICATION (fictional certification facts; not customer-provided real-world facts)  
 **Price:** Not supplied. None invented.
 
 **Authoritative machine-readable brief:** `campaign-brief.json`  

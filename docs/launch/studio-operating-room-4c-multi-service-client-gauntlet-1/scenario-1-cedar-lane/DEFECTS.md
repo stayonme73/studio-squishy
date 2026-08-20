@@ -12,7 +12,9 @@ Canonical facts (Tagia):
 - Phone: `(804) 555-0147`
 - Booking URL: `cedarlaneorganizing.example/book`
 
-Automated copy/campaign checks passed because they compared outputs to Scout’s invented brief, not to Tagia’s facts. That closed loop is the Room 4C failure mode. Current deliverables and render sources bind to the canonical pair. Tests now assert the exact phone and URL on caption, narration, print contact layer, and video CTA plate copy — not merely that “a phone” exists.
+Automated copy/campaign checks passed because they compared outputs to Scout’s invented brief, not to Tagia’s facts. That closed loop is the Room 4C failure mode. Current deliverables and render sources bind to the canonical pair.
+
+A generic customer-fact source gate lives in `src/lib/studio-customer-facts`. Cedar Lane supplies an `OWNER_APPROVED_FOR_CERTIFICATION` fact record and named sources to that reusable evaluator — there is no scenario-specific bypass. Production routing cannot begin until required facts are approved. Social still does not require on-art contact; that remains an explicit limit.
 
 ## Print format versioning (not a silent Room 4B rewrite)
 
@@ -35,7 +37,7 @@ Supporting copy is larger over a darker overlay. Contact matches CTA size with e
 - Photography is Studio-generated for this fictional promo, not a customer photo pack (that is Scenario 3).
 - Square social CTA is the label “Book a consult”; phone and URL live on caption + handout + video end plate.
 - Mobile notes are responsive coverage, not Room 4 mobile certification.
-- Video pacing/text timing still needs Tagia watching and listening to the revised MP4. Machine duration 20.0s does not replace that review.
+- Short video is polished template-led production using one primary photograph, not cinematic production.
 
 ## Not defects
 
