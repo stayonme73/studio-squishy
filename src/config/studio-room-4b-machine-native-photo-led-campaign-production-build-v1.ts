@@ -33,4 +33,8 @@ export const studioRoom4bMachineNativePhotoLedCampaignProductionBuildV1 = {
     "nia-photo-mediocre-1",
     "nia-photo-mediocre-2",
   ] as const,
+  niaPhotoPackRequirementsDoc:
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-NIA-PHOTO-PACK-REQUIREMENTS.md" as const,
+  niaPhotoPackDirectory:
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-pack" as const,
 } as const;

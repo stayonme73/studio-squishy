@@ -1,18 +1,9 @@
-# Room 4B — next gate after BUILD-1
+# Room 4B — next gate
 
-**Stop:** READY FOR NIA PHOTO LIVE CERTIFICATION  
-**Owner input:** NIA PHOTO PACK  
+**Waiting:** Nia photo pack (7 files)  
+**Spec:** `STUDIO-OPERATING-ROOM-4B-NIA-PHOTO-PACK-REQUIREMENTS.md`  
+**Drop folder:** `docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-pack/`
 
-Required asset IDs:
+Then authorize live cert → real square / vertical / print art for creative-director yay/nay.
 
-- nia-logo  
-- nia-photo-good-1 (window)  
-- nia-photo-good-2 (standing)  
-- nia-photo-good-3 (activity)  
-- nia-photo-good-4 (environment)  
-- nia-photo-mediocre-1  
-- nia-photo-mediocre-2  
-
-Controlled fictional pack OK. Then live visual: would we charge Nia?
-
-No vendor trial. No purchase. No merge. No Room 5.
+No more build coding until pack lands.
