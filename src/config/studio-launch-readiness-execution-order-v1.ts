@@ -189,7 +189,8 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     twoStageMeansTwoSubscriptions: false as const,
     nextPackageId:
       "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1" as const,
-    nextPackageStatus: "AWAITING_MANAGER_SCOUT_BLOCK" as const,
+    nextPackageStatus: "PARKED_FOR_MANAGER" as const,
+    machineNativeRecommendation: "A_BUILD_MACHINE_NATIVE" as const,
     doNotOpenPlacidTrialYet: true as const,
   },
 

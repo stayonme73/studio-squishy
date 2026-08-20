@@ -63,11 +63,11 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
   campaignCreativeStatus: {
     abandoned: false as const,
     launchReady: false as const,
-    posture: "OPEN_PENDING_MACHINE_NATIVE_PHOTO_LED_DESIGN" as const,
+    posture: "OPEN_PENDING_MACHINE_NATIVE_BUILD_ACCEPTANCE" as const,
     textLedRenderer: "READY_WITH_EXPLICIT_LIMITS" as const,
     nextGate:
-      "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1" as const,
-    nextGateKind: "capability_decomposition_not_vendor_trial" as const,
+      "Manager accept A_BUILD_MACHINE_NATIVE then authorize next coherent build package" as const,
+    nextGateKind: "build_acceptance_not_vendor_trial" as const,
     doNotOpenPlacidTrialYet: true as const,
     doNotBuyCanvaOrAdobeYet: true as const,
   },
@@ -129,16 +129,22 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
   },
 
   /**
-   * Next authorized package name (awaiting Manager Scout block).
-   * CapCut parallel: own short-video capability via Shotstack — not automate CapCut.
-   * Same here: own photo-led campaign production; Canva/Adobe/Placid only if a primitive cannot be owned.
+   * Machine-native photo-led design package — parked with recommendation A.
+   * CapCut parallel: own the capability; vendors optional sockets only.
    */
   machineNativePhotoLedDesign: {
     packageId:
       "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1" as const,
-    status: "AWAITING_MANAGER_SCOUT_BLOCK" as const,
+    status: "PARKED_FOR_MANAGER" as const,
+    recommendation: "A_BUILD_MACHINE_NATIVE" as const,
+    smallestExternalDependencySet: [] as const,
+    reportDoc:
+      "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1-REPORT.md" as const,
+    contractsModule: "src/lib/studio-campaign-creative/contracts.ts" as const,
     question:
       "Can we build a Machine-operated photo-led campaign workstation, with vendors only as replaceable engines where truly necessary?" as const,
+    answer:
+      "Yes — own Visual Prep + Campaign Renderer + QA; zero vendors required for Launch Now; sockets reserved for advanced ops." as const,
     customerFacingNames: [
       "Social Graphic",
       "Campaign Creative",
