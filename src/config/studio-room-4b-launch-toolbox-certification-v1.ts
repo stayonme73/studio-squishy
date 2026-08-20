@@ -58,6 +58,21 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
    * Catalog already excludes carousels on v2-rtu-social-posts.
    * Decision B: do not advertise as Launch Now capability.
    */
+  /**
+   * Campaign creative is NOT abandoned.
+   * Text-led CERT plates remain accepted with limits.
+   * Photo-led campaign art direction is OPEN pending CapCut-style engine cert.
+   * Carousel stays off the Launch Now menu.
+   */
+  campaignCreativeStatus: {
+    abandoned: false as const,
+    launchReady: false as const,
+    posture: "OPEN_PENDING_PHOTO_LED_ENGINE_CERT" as const,
+    textLedRenderer: "READY_WITH_EXPLICIT_LIMITS" as const,
+    nextGate:
+      "CapCut-style owner-independence cert for Adobe / Canva / two-stage vs Nia" as const,
+  },
+
   carouselDecision: {
     choice: "B_REMOVE_FROM_LAUNCH_NOW_MENU" as const,
     classification: "NOT ON LAUNCH MENU" as const,
@@ -71,6 +86,21 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
     ] as const,
     doNotInventSku: true as const,
     catalogAlreadyExcludes: true as const,
+    managerAcceptedOffMenu: true as const,
+  },
+
+  photoLedToolEvaluation: {
+    packageDoc:
+      "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-PHOTO-LED-CAMPAIGN-PRODUCTION-TOOL-EVALUATION.md" as const,
+    recommendation: "USE_TWO_STAGE_STACK" as const,
+    purchase: false as const,
+    integrate: false as const,
+    candidates: [
+      "adobe_firefly_photoshop_api",
+      "canva_connect_autofill",
+      "placid",
+      "bannerbear",
+    ] as const,
   },
 
 

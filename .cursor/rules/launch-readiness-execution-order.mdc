@@ -9,7 +9,7 @@ Authority: `docs/launch-readiness-execution-order-v1-locked.md` · `src/config/s
 
 This is sequence control, **not** permission to start multiple packages.
 
-**Active room is 4 — Full business rehearsal.** Room 2 is **CLOSED**. Room 3 is **CLOSED** at `cd2a1e2`. Room 3 Section 1 CLOSED at `76b974f`. Section 2 CLOSED at `199e4a4`. Section 3 CLOSED at `cd2a1e2`. Room 4A is **CLOSED** at `9f9ac7c`. Current package: `STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1` — **OPEN / PARKED WITH PRODUCT BLOCKERS** (work tip `e87b193`; finish Nia — do not start next toolbox service). Do not auto-advance. Do not start Room 5.
+**Active room is 4 — Full business rehearsal.** Room 2 is **CLOSED**. Room 3 is **CLOSED** at `cd2a1e2`. Room 3 Section 1 CLOSED at `76b974f`. Section 2 CLOSED at `199e4a4`. Section 3 CLOSED at `cd2a1e2`. Room 4A is **CLOSED** at `9f9ac7c`. Current package: `STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1` — **OPEN**. Text-led renderer accepted with limits. Photo-led campaign creative engine selection in progress (no purchase). Carousel off Launch Now menu. Do not auto-advance. Do not start Room 5.
 
 **Room 1 is COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL.** It is **not** a full CLOSED stamp. Authoritative executable tip: `a49efd7`. Abandoned 3067 attempts do not count.
 
