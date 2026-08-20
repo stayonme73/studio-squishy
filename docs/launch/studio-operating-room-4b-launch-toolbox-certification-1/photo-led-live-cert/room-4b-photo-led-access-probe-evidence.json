@@ -1,0 +1,66 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
+  "kind": "photo-led-campaign-live-certification-access-probe",
+  "recordedAt": "2026-08-20T00:55:17.145Z",
+  "recommendation": "OWNER_PURCHASE_DECISION_REQUIRED",
+  "twoStageMeansLogicalCapabilitiesNotTwoSubscriptions": true,
+  "niaPhotoBinariesPresent": false,
+  "niaMaterialsNote": "src/lib/studio-room-4b-launch-toolbox/nia-fixture.ts NIA_MATERIALS are descriptive placeholders — not image files.",
+  "textLedBaselinePaths": [
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation-v2/artifacts/nia-social-post-1.png",
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation-v2/artifacts/nia-flyer-v1.png"
+  ],
+  "accessMatrix": [
+    {
+      "id": "adobe",
+      "envKeysChecked": [
+        "ADOBE_CLIENT_ID",
+        "ADOBE_CLIENT_SECRET",
+        "ADOBE_FIREFLY_CLIENT_ID",
+        "ADOBE_FIREFLY_CLIENT_SECRET",
+        "FIREFLY_CLIENT_ID",
+        "FIREFLY_CLIENT_SECRET"
+      ],
+      "credentialPresent": false,
+      "liveApiCallableWithoutPurchase": false,
+      "status": "ACCESS_GATE_OWNER_DECISION",
+      "notes": "Firefly Services / Photoshop API require org provisioning (ETLA). Creative Cloud individual ≠ API."
+    },
+    {
+      "id": "canva",
+      "envKeysChecked": [
+        "CANVA_CLIENT_ID",
+        "CANVA_CLIENT_SECRET",
+        "CANVA_ACCESS_TOKEN",
+        "CANVA_REFRESH_TOKEN"
+      ],
+      "credentialPresent": false,
+      "liveApiCallableWithoutPurchase": false,
+      "status": "ACCESS_GATE_OWNER_DECISION",
+      "notes": "Brand Template + Autofill require Canva Enterprise (or Owner-approved developer exception)."
+    },
+    {
+      "id": "placid",
+      "envKeysChecked": [
+        "PLACID_API_TOKEN",
+        "PLACID_API_KEY"
+      ],
+      "credentialPresent": false,
+      "liveApiCallableWithoutPurchase": false,
+      "status": "ACCESS_GATE_OWNER_DECISION",
+      "notes": "Free trial exists officially (no card; watermarked previews). Not started without Manager-scoped authorization."
+    }
+  ],
+  "adobeRateLimitsOfficialDefault": {
+    "rpm": 4,
+    "rpd": 9000,
+    "source": "https://developer.adobe.com/firefly-services/docs/firefly-api/guides/concepts/rate-limits/"
+  },
+  "parkForManager": true,
+  "doNotPurchase": true,
+  "doNotMerge": true,
+  "doNotStartRoom5": true,
+  "visualBaselineInspected": true,
+  "candidatePhotoLedOutputProduced": false,
+  "reportDoc": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-PHOTO-LED-CAMPAIGN-LIVE-CERTIFICATION-1-REPORT.md"
+}

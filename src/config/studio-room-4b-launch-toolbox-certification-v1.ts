@@ -64,7 +64,7 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
     posture: "OPEN_PENDING_PHOTO_LED_ENGINE_CERT" as const,
     textLedRenderer: "READY_WITH_EXPLICIT_LIMITS" as const,
     nextGate:
-      "CapCut-style owner-independence cert for Adobe / Canva / two-stage vs Nia" as const,
+      "Owner access decision + Nia photo pack, then resume CapCut-style live API cert" as const,
   },
 
   carouselDecision: {
@@ -95,6 +95,29 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
       "placid",
       "bannerbear",
     ] as const,
+  },
+
+  /**
+   * CapCut-style live cert — access-first audition.
+   * Two-stage = logical capabilities, not automatic dual subscriptions.
+   */
+  photoLedLiveCertification: {
+    packageDoc:
+      "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-PHOTO-LED-CAMPAIGN-LIVE-CERTIFICATION-1-REPORT.md" as const,
+    accessProbeScript:
+      "scripts/studio-operating-room-4b-photo-led-access-probe.mts" as const,
+    recommendation: "OWNER_PURCHASE_DECISION_REQUIRED" as const,
+    adobe: "ACCESS_GATE_OWNER_DECISION" as const,
+    canva: "ACCESS_GATE_OWNER_DECISION" as const,
+    placid: "ACCESS_GATE_OWNER_DECISION" as const,
+    twoStageProof: "NOT_RUN" as const,
+    revisionProof: "NOT_RUN" as const,
+    failureRecoveryProof: "NOT_RUN" as const,
+    niaPhotoBinaries: "MISSING_PLACEHOLDERS_ONLY" as const,
+    twoStageMeansTwoSubscriptions: false as const,
+    purchase: false as const,
+    integrate: false as const,
+    parkForManager: true as const,
   },
 
 

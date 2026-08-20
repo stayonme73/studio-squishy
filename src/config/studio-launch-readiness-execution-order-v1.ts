@@ -184,6 +184,9 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     doNotAutoStartNextCertification: true as const,
     doNotRebuild: true as const,
     nextSectionWaitsForScoutPackage: true as const,
+    photoLedLiveCertRecommendation:
+      "OWNER_PURCHASE_DECISION_REQUIRED" as const,
+    twoStageMeansTwoSubscriptions: false as const,
   },
 
   merge: "separately_authorized" as const,
