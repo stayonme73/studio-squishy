@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20T20:30:14.793Z",
+  "generatedAt": "2026-08-20T21:12:45.447Z",
   "briefSha256": "348542fdccde1e289a824f7d3260ca6f00d6173e9eb416bb446520f86d109706",
   "acceptance": {
     "admit": true,
@@ -84,16 +84,19 @@
     }
   },
   "voice": {
-    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-1787257821973_65664176de30.mp3",
-    "contentSha256": "65664176de308f3765970ae202e757d8b0ca9e1fb0a8b56c436cc668a1fbeaaa",
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-continuous-1787260365461_ca9fa307cc5b.mp3",
+    "contentSha256": "ca9fa307cc5ba84dc88a2708038629f64915cd1f4529b9415bc244f3b42e48f4",
     "skuUsedForTtsAdapter": "ap-001",
-    "soldAs": "supporting narration for v2-rtu-short-video"
+    "soldAs": "supporting narration for v2-rtu-short-video",
+    "generation": "one_continuous_elevenlabs_tts_request",
+    "script": "Ready for a calmer, more usable closet? Cedar Lane Home Organizing's Fall Closet Reset is available September fifteenth through October fifteenth for Richmond-area homes. Keep what you use, let the rest go, and book your free twenty-minute consultation today."
   },
   "video": {
-    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/work-packet-s1-1787257821973.json",
-    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/cedar-lane-fall-closet-reset-1787257821973.mp4",
-    "durationSeconds": 23.68,
-    "providerRenderId": "358740bf-1a30-40a3-8dea-59f16abc4278"
+    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/work-packet-s1-narration-1787260365461.json",
+    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/cedar-lane-fall-closet-reset-1787260365461.mp4",
+    "durationSeconds": 20,
+    "providerRenderId": "3a3b1fff-b44f-406e-b5e1-84a15386291c",
+    "revision": "continuous-narration-quality-1"
   },
   "print": {
     "pngPx": {
@@ -115,7 +118,7 @@
     "studio_copy_quality_gate"
   ],
   "ownerLabor": [
-    "None. Scout corrected canonical contact facts, versioned the Letter print contract, regenerated Machine deliverables, and prepared owner-review crops. Tagia did not design, edit, format, or repair deliverables."
+    "None. Scout regenerated one continuous narration track and one revised MP4. Tagia did not design, edit, format, or repair deliverables. Approved stills were reused."
   ],
   "qa": {
     "copyOk": true,
@@ -143,7 +146,15 @@
     "narrationHasExactSpokenFacts": true,
     "videoDurationInBand": true,
     "filesOpen": true,
-    "runId": "5d70fd84-5238-4e2c-a982-c56bbc2eafeb",
-    "correction": "canonical-facts-and-letter-v2-contract"
+    "runId": "718481b1-8576-474e-9ca2-93d32056fb56",
+    "correction": "continuous-narration-quality-1",
+    "videoHasAudio": true,
+    "audioPeakDb": -9.3,
+    "audioMeanDb": -30,
+    "audioClipped": false,
+    "sourceAudioPeakDb": -6.1,
+    "sourceAudioClipped": false,
+    "narrationIsApprovedContinuous": true,
+    "stillsUnchanged": true
   }
 }

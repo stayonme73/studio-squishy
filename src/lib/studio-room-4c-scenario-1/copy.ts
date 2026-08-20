@@ -23,13 +23,15 @@ export function buildScenario1Caption(): string {
   ].join("\n");
 }
 
+/**
+ * Owner-approved Scenario 1 narration. One continuous passage.
+ * Do not speak the phone or URL — those stay on the CTA plate.
+ */
+export const SCENARIO_1_APPROVED_NARRATION =
+  "Ready for a calmer, more usable closet? Cedar Lane Home Organizing's Fall Closet Reset is available September fifteenth through October fifteenth for Richmond-area homes. Keep what you use, let the rest go, and book your free twenty-minute consultation today.";
+
 export function buildScenario1NarrationScript(): string {
-  return [
-    `${brief.customer.businessName}.`,
-    `${brief.offer.name} — ${brief.offer.description}`,
-    `${brief.offer.windowDisplay}.`,
-    `${brief.cta.label} at ${brief.cta.bookingUrlSpoken}, or call ${brief.cta.phoneSpoken}.`,
-  ].join(" ");
+  return SCENARIO_1_APPROVED_NARRATION;
 }
 
 export function scenario1CopyQualityBrief(): CopyQualityBrief {

@@ -4,7 +4,7 @@
   "scenarioId": "scenario-1-local-business-promotion",
   "campaignId": "room-4c-s1-cedar-lane-home-organizing",
   "briefSha256": "348542fdccde1e289a824f7d3260ca6f00d6173e9eb416bb446520f86d109706",
-  "generatedAt": "2026-08-20T20:30:14.793Z",
+  "generatedAt": "2026-08-20T21:12:45.447Z",
   "files": [
     {
       "id": "social-square",
@@ -20,11 +20,11 @@
       "id": "video",
       "previewRole": "video",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables/video.mp4",
-      "contentSha256": "7ca4070ceff50eb28b0b09b8ec9d66b29356322ffd284377dbc94d1881ff5025",
-      "byteLength": 11452893,
+      "contentSha256": "cdca7998bb6fded01b42248dca0c22e029d9e350e248801511aab8a45d0a5ff9",
+      "byteLength": 9634991,
       "widthPx": 1080,
       "heightPx": 1920,
-      "durationSeconds": 23.68,
+      "durationSeconds": 20,
       "mimeType": "video/mp4"
     },
     {

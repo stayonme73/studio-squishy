@@ -5,7 +5,7 @@
   "campaignId": "room-4c-s1-cedar-lane-home-organizing",
   "briefSha256": "348542fdccde1e289a824f7d3260ca6f00d6173e9eb416bb446520f86d109706",
   "visualSystemId": "cedar-lane-home-organizing-v1",
-  "generatedAt": "2026-08-20T20:30:14.793Z",
+  "generatedAt": "2026-08-20T21:12:45.447Z",
   "assets": [
     {
       "id": "campaign-brief",
@@ -66,8 +66,8 @@
     {
       "id": "voice",
       "role": "voice_mp3",
-      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-1787257821973_65664176de30.mp3",
-      "contentSha256": "65664176de308f3765970ae202e757d8b0ca9e1fb0a8b56c436cc668a1fbeaaa",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/video/voice/room-4c-s1-cedar-lane-home-organizing/ap-001_cedar-lane-s1-narration-continuous-1787260365461_ca9fa307cc5b.mp3",
+      "contentSha256": "ca9fa307cc5ba84dc88a2708038629f64915cd1f4529b9415bc244f3b42e48f4",
       "source": "derived_from_brief",
       "derivedFromBriefSha256": "348542fdccde1e289a824f7d3260ca6f00d6173e9eb416bb446520f86d109706"
     },
@@ -75,7 +75,7 @@
       "id": "video",
       "role": "video_mp4",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables/video.mp4",
-      "contentSha256": "7ca4070ceff50eb28b0b09b8ec9d66b29356322ffd284377dbc94d1881ff5025",
+      "contentSha256": "cdca7998bb6fded01b42248dca0c22e029d9e350e248801511aab8a45d0a5ff9",
       "source": "derived_from_brief",
       "derivedFromBriefSha256": "348542fdccde1e289a824f7d3260ca6f00d6173e9eb416bb446520f86d109706"
     }

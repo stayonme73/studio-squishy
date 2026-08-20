@@ -35,7 +35,7 @@ Supporting copy is larger over a darker overlay. Contact matches CTA size with e
 - Photography is Studio-generated for this fictional promo, not a customer photo pack (that is Scenario 3).
 - Square social CTA is the label “Book a consult”; phone and URL live on caption + handout + video end plate.
 - Mobile notes are responsive coverage, not Room 4 mobile certification.
-- Video pacing/text timing still needs Tagia watching the MP4. Machine duration 23.68s does not replace that review.
+- Video pacing/text timing still needs Tagia watching and listening to the revised MP4. Machine duration 20.0s does not replace that review.
 
 ## Not defects
 

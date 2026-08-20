@@ -430,10 +430,12 @@ async function main() {
     );
   }
   if (
-    !narrationPreview.includes(brief.cta.phoneSpoken) ||
-    !narrationPreview.includes(brief.cta.bookingUrlSpoken)
+    narrationPreview.includes(brief.cta.phoneSpoken) ||
+    narrationPreview.includes(brief.cta.bookingUrlSpoken) ||
+    narrationPreview.includes(brief.cta.phoneDisplay) ||
+    narrationPreview.includes(brief.cta.bookingUrl)
   ) {
-    throw new Error("NARRATION_MISSING_CANONICAL_SPOKEN_FACTS");
+    throw new Error("NARRATION_MUST_NOT_SPEAK_CONTACT");
   }
 
   const heroAbs = path.join(
@@ -502,12 +504,23 @@ async function main() {
 
   const duration =
     probeDurationSeconds(voiceResult.artifact.absolutePath) ?? 22;
-  const beatLens = [0.18, 0.28, 0.24, 0.3];
+  const timeline = Number(
+    Math.min(30, Math.max(20, duration + 0.45)).toFixed(3),
+  );
+  const ctaHold = Math.min(
+    Math.max(6.8, timeline * 0.36),
+    timeline - 12,
+  );
+  const preCta = timeline - ctaHold;
+  const beatLens = [0.22, 0.42, 0.36];
   let t = 0;
   const scenes = plates.map((plate, idx) => {
     const start = Number(t.toFixed(3));
-    t += duration * beatLens[idx]!;
-    const end = Number(Math.min(Math.max(duration, 15), t).toFixed(3));
+    t =
+      idx < 3
+        ? t + preCta * beatLens[idx]!
+        : timeline;
+    const end = Number(Math.min(timeline, t).toFixed(3));
     return {
       sceneNumber: idx + 1,
       assetId: `cedar-lane-beat-${idx + 1}`,
@@ -521,11 +534,7 @@ async function main() {
           : ("embedded_in_plate" as const),
     };
   });
-  scenes[scenes.length - 1]!.endSeconds = Number(
-    Math.min(30, Math.max(duration, scenes[scenes.length - 1]!.endSeconds)).toFixed(
-      3,
-    ),
-  );
+  scenes[scenes.length - 1]!.endSeconds = timeline;
 
   const packet: ShotstackWorkPacket = {
     workPacketId: `room-4c-s1-${stamp}`,
@@ -536,9 +545,9 @@ async function main() {
     skuId: "v2-rtu-short-video",
     label:
       "Room 4C Scenario 1 Cedar Lane Home Organizing — coordinated short-form video",
-    durationMinSeconds: Math.max(15, Math.floor(duration - 2)),
-    durationMaxSeconds: Math.min(30, Math.ceil(duration + 2)),
-    durationTargetSeconds: Number(Math.min(30, Math.max(15, duration)).toFixed(2)),
+    durationMinSeconds: 20,
+    durationMaxSeconds: 30,
+    durationTargetSeconds: Number(timeline.toFixed(2)),
     aspectRatio: "vertical",
     width: 1080,
     height: 1920,
@@ -823,10 +832,11 @@ async function main() {
     videoPlateHasExactFacts:
       ctaPlate.line1 === "(804) 555-0147" &&
       ctaPlate.line2 === "cedarlaneorganizing.example/book",
-    narrationHasExactSpokenFacts:
-      narration.includes(brief.cta.phoneSpoken) &&
-      narration.includes(brief.cta.bookingUrlSpoken) &&
-      staleScenario1FactHits(narration).length === 0,
+    narrationIsApprovedContinuous:
+      narration ===
+        "Ready for a calmer, more usable closet? Cedar Lane Home Organizing's Fall Closet Reset is available September fifteenth through October fifteenth for Richmond-area homes. Keep what you use, let the rest go, and book your free twenty-minute consultation today." &&
+      staleScenario1FactHits(narration).length === 0 &&
+      !narration.includes(brief.cta.phoneSpoken),
     videoDurationInBand:
       videoDuration != null && videoDuration >= 15 && videoDuration <= 32,
     filesOpen: true,

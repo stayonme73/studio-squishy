@@ -120,11 +120,19 @@ describe("Room 4C Scenario 1 — copy quality", () => {
     expect(fail.ok).toBe(false);
   });
 
-  it("keeps narration on the same facts", () => {
+  it("uses the owner-approved continuous narration and does not speak contact", () => {
     const script = buildScenario1NarrationScript();
+    expect(script).toBe(
+      "Ready for a calmer, more usable closet? Cedar Lane Home Organizing's Fall Closet Reset is available September fifteenth through October fifteenth for Richmond-area homes. Keep what you use, let the rest go, and book your free twenty-minute consultation today.",
+    );
     expect(script).toContain(brief.customer.businessName);
     expect(script).toContain(brief.offer.name);
-    expect(script).toContain(brief.cta.bookingUrlSpoken);
+    expect(script).not.toContain(brief.cta.phoneSpoken);
+    expect(script).not.toContain(brief.cta.bookingUrlSpoken);
+    expect(script).not.toContain("(804)");
+    expect(script).not.toContain("cedarlaneorganizing.example");
+    expect(script.split("?").length).toBe(2);
+    expect(staleScenario1FactHits(script)).toEqual([]);
   });
 });
 
@@ -144,17 +152,15 @@ describe("Room 4C Scenario 1 — exact canonical facts in render sources", () =>
     );
   });
 
-  it("puts the exact phone and URL on caption, narration, print contact, and video CTA plate", () => {
+  it("puts the exact phone and URL on caption, print contact, and video CTA plate", () => {
     const caption = buildScenario1Caption();
     expect(caption).toContain("(804) 555-0147");
     expect(caption).toContain("cedarlaneorganizing.example/book");
     expect(staleScenario1FactHits(caption)).toEqual([]);
 
     const narration = buildScenario1NarrationScript();
-    expect(narration).toContain(brief.cta.phoneSpoken);
-    expect(narration).toContain(brief.cta.bookingUrlSpoken);
-    expect(narration).toContain("zero one four seven");
-    expect(narration).toContain("slash book");
+    expect(narration).not.toContain(brief.cta.phoneSpoken);
+    expect(narration).not.toContain(brief.cta.bookingUrlSpoken);
     expect(staleScenario1FactHits(narration)).toEqual([]);
 
     const creative = buildCedarLaneCreativeBrief();

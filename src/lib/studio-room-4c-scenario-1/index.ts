@@ -11,6 +11,7 @@ export { routeScenario1Services } from "./routing";
 export {
   buildScenario1Caption,
   buildScenario1NarrationScript,
+  SCENARIO_1_APPROVED_NARRATION,
   scenario1CopyQualityBrief,
 } from "./copy";
 export {
