@@ -3,20 +3,20 @@
   "campaignId": "nia-r4b-photo-led-live-cert",
   "systemId": "rooted-ready-wellness-v1",
   "familyId": "full_bleed_hero",
-  "renderVersion": 1,
+  "renderVersion": 11,
   "heroMaterialId": "nia-photo-good-2",
-  "materialFingerprint": "8dc136d1e533654ae018b6000d3a91e849baf403fcd639cafc10dddffa30a2e0",
-  "setFingerprint": "707b5b2c6f599725495fd934c7ee5f905f52a945299610ab0532312aa08c2934",
+  "materialFingerprint": "f8c4e849d3b4298c76864ee148750d5670070a029caf985b1f409b7ef8e91578",
+  "setFingerprint": "70f097340a51d1ee4c84283dd64b58669f3fc61c17ec5aec6190232a45e5596a",
   "assetFingerprints": {
-    "social_square__full_bleed_hero": "a9c18250af2e5114aa7a87b0fe8e5864e9bb495ce23962158590e85e89820b1b",
-    "social_vertical__full_bleed_hero": "47263a80318758f407a87fbcbadbae0f89b7d45f44a19933699b22d6caad1290",
-    "print_handout__full_bleed_hero": "2e2c9851d560495434ec842eae87c48e9113093c6c810e4c28e7bf4d2816acbe"
+    "social_square__full_bleed_hero": "78390654fe0186bd7425fc1065f769a215b794e4df9f50b06f7c17d65032e150",
+    "social_vertical__full_bleed_hero": "081e0fe161e903e59509464eabda5932300a900213b14c76ae83c2000e25fdc0",
+    "print_handout__full_bleed_hero": "323dc2d9952eb5745fcd58ad3f91b0bb980bef9c4f58e70775ba47adf6cbef8a"
   },
   "pngShas": {
-    "social_square__full_bleed_hero": "943931c52e4f5990b203ddbc9946b8b5867237500fc9b32840478aa913d05269",
-    "social_vertical__full_bleed_hero": "972ac498fad58be0a9859ac0b7bbd3069a9e04df43cfe403b9a5b132ac97ccf2",
-    "print_handout__full_bleed_hero": "728d49f42657fa23e95a5d59ecaf176cccb25310445a3be2d30a73c80f0378d1"
+    "social_square__full_bleed_hero": "10861ee3e7047425d7710279b2023dad4644d5624f51edbf67f7700a48ce8c1d",
+    "social_vertical__full_bleed_hero": "9e5557396e06a46e9852a8065901fce1d0c17ac1a83c7ee55d4de788abbec06f",
+    "print_handout__full_bleed_hero": "d49376e1aff8a895e7dab8efe3e6709776e037f66fe67b6c948798039e59f67e"
   },
-  "createdAt": "2026-08-20T02:09:50.570Z",
+  "createdAt": "2026-08-20T02:49:48.031Z",
   "rendererVersion": "studio-campaign-creative-1.0.0"
 }

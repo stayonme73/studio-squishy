@@ -1,7 +1,7 @@
 /**
  * Room 4B — Launch toolbox certification.
- * PARK for Manager. Do not auto-start the next toolbox certification.
- * Do not start Room 5. Do not reopen Resend/domain. Do not merge.
+ * CLOSED 2026-08-19 (Manager choice A) with frozen Launch Now classifications.
+ * Do not start Room 4C tonight. Do not start Room 5. Do not merge.
  *
  * Room 4A CLOSED at 9f9ac7c. Resend parked at d6974eb.
  */
@@ -19,18 +19,24 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
   merge: "separately_authorized" as const,
   doNotMerge: true as const,
   ownerRoutine: "NONE" as const,
-  parkForManager: true as const,
-  parkForManagerReview: true as const,
-  sectionClosed: false as const,
-  roomClosed: false as const,
+  parkForManager: false as const,
+  parkForManagerReview: false as const,
+  sectionClosed: true as const,
+  roomClosed: true as const,
+  closedAt: "2026-08-19" as const,
+  closeChoice: "A_CLOSE_WITH_CLASSIFICATIONS_FROZEN" as const,
+  closeoutDoc:
+    "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-CLOSEOUT.md" as const,
   doNotAutoAdvance: true as const,
   doNotAutoStartNextCertification: true as const,
+  doNotStartRoom4CTonight: true as const,
   doNotStartRoom5: true as const,
   doNotReopenResend: true as const,
   doNotReopenRoom1UnlessNewDefect: true as const,
   doNotReopenRoom2UnlessNewDefect: true as const,
   doNotReopenRoom3UnlessNewDefect: true as const,
   doNotReopenRoom4AUnlessNewDefect: true as const,
+  doNotReopenRoom4BUnlessNewDefect: true as const,
   visualRedesign: false as const,
 
   room4AClosedAt: "9f9ac7c" as const,
@@ -47,26 +53,44 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
     "NOT ON LAUNCH MENU",
   ] as const,
 
-  /** Manager-facing package state until continuation closes. */
-  managerVerdict: "OPEN / PARKED WITH PRODUCT BLOCKERS" as const,
+  managerVerdict: "ROOM_4B_CLOSED" as const,
   authoritativeWorkTip: "e87b193" as const,
   hashNote: "7fdcefe" as const,
 
   /**
-   * Campaign creative is NOT abandoned.
-   * Text-led CERT plates remain accepted with limits.
-   * Photo-led art direction stays OPEN.
+   * Frozen Launch Now classifications — Manager 2026-08-19.
+   * Campaign Creative is back on Launch Now within Machine-native limits.
+   * Carousel stays off menu.
+   */
+  frozenLaunchCapabilityClassifications: {
+    shortFormVideo: "READY WITH EXPLICIT LIMITS" as const,
+    socialGraphics: "READY WITH EXPLICIT LIMITS" as const,
+    printCollateral: "READY WITH EXPLICIT LIMITS" as const,
+    marketingCopyEmail: "READY WITH EXPLICIT LIMITS" as const,
+    campaignCreative: "READY WITH EXPLICIT LIMITS" as const,
+    carousel: "NOT ON LAUNCH MENU" as const,
+    frozenAt: "2026-08-19" as const,
+    doNotReopenWithoutNewEvidenceOrManagerDecision: true as const,
+  },
+
+  /**
+   * Campaign creative — on Launch Now with Machine-native explicit limits.
    * CapCut lesson: own the capability; vendors are optional sockets.
-   * Next: Machine-native production design — not another vendor trial.
-   * Carousel stays off the Launch Now menu (Manager accepted).
    */
   campaignCreativeStatus: {
     abandoned: false as const,
+    onLaunchNowMenu: true as const,
     launchReady: false as const,
-    posture: "OPEN_READY_FOR_NIA_PHOTO_LIVE_CERTIFICATION" as const,
-    textLedRenderer: "READY_WITH_EXPLICIT_LIMITS" as const,
-    nextGate: "OWNER_INPUT_REQUIRED_NIA_PHOTO_PACK" as const,
-    nextGateKind: "live_visual_cert_after_photo_pack" as const,
+    posture: "CERTIFIED_MACHINE_NATIVE_READY_WITH_EXPLICIT_LIMITS" as const,
+    classification: "READY WITH EXPLICIT LIMITS" as const,
+    textLedRenderer: "READY WITH EXPLICIT LIMITS" as const,
+    photoLedMachineNative: "READY WITH EXPLICIT LIMITS" as const,
+    niaPhotoLedLiveCertPackageId:
+      "STUDIO-OPERATING-ROOM-4B-NIA-PHOTO-LED-LIVE-CERTIFICATION-1" as const,
+    niaPhotoLedLiveCertReport:
+      "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-NIA-PHOTO-LED-LIVE-CERTIFICATION-1-REPORT.md" as const,
+    nextGate: "ROOM_4C_MULTI_SERVICE_CLIENT_GAUNTLET_ON_RESUME" as const,
+    nextGateKind: "named_next_not_started" as const,
     doNotOpenPlacidTrialYet: true as const,
     doNotBuyCanvaOrAdobeYet: true as const,
   },
@@ -99,56 +123,48 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
       "placid",
       "bannerbear",
     ] as const,
+    supersededByMachineNative: true as const,
   },
 
-  /**
-   * CapCut-style live cert — access-first audition.
-   * Two-stage = logical capabilities, not automatic dual subscriptions.
-   */
   photoLedLiveCertification: {
     packageDoc:
       "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-PHOTO-LED-CAMPAIGN-LIVE-CERTIFICATION-1-REPORT.md" as const,
     accessProbeScript:
       "scripts/studio-operating-room-4b-photo-led-access-probe.mts" as const,
-    recommendation: "OWNER_PURCHASE_DECISION_REQUIRED" as const,
-    adobe: "ACCESS_GATE_OWNER_DECISION" as const,
-    canva: "ACCESS_GATE_OWNER_DECISION" as const,
-    placid: "ACCESS_GATE_OWNER_DECISION" as const,
-    twoStageProof: "NOT_RUN" as const,
-    revisionProof: "NOT_RUN" as const,
-    failureRecoveryProof: "NOT_RUN" as const,
-    niaPhotoBinaries: "MISSING_PLACEHOLDERS_ONLY" as const,
+    recommendation: "SUPERSEDED_BY_MACHINE_NATIVE_NIA_CERT" as const,
+    adobe: "NOT_REQUIRED_FOR_LAUNCH_NOW" as const,
+    canva: "NOT_REQUIRED_FOR_LAUNCH_NOW" as const,
+    placid: "NOT_REQUIRED_FOR_LAUNCH_NOW" as const,
     twoStageMeansTwoSubscriptions: false as const,
     purchase: false as const,
     integrate: false as const,
-    parkForManager: true as const,
+    parkForManager: false as const,
     supersededAsImmediateNextStep: true as const,
     supersessionNote:
-      "Manager 2026-08-19: do not open Placid trial next; run Machine-native capability decomposition first." as const,
+      "Manager 2026-08-19: Machine-native Nia photo-led cert closed the creative bar; no vendor purchase." as const,
   },
 
-  /**
-   * Machine-native photo-led design package — parked with recommendation A.
-   * CapCut parallel: own the capability; vendors optional sockets only.
-   */
   machineNativePhotoLedDesign: {
     packageId:
       "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1" as const,
-    status: "PARKED_FOR_MANAGER" as const,
+    status: "CLOSED_WITH_PARENT_4B" as const,
     recommendation: "A_BUILD_MACHINE_NATIVE" as const,
     recommendationAccepted: true as const,
     buildPackageId:
       "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-BUILD-1" as const,
-    buildStopState: "READY_FOR_NIA_PHOTO_LIVE_CERTIFICATION" as const,
-    ownerInputRequired: "NIA_PHOTO_PACK" as const,
+    buildStopState: "CLOSED_WITH_PARENT_4B" as const,
+    ownerInputRequired: "NONE" as const,
+    niaPhotoLedLiveCertStatus: "CLOSED_PASS" as const,
     smallestExternalDependencySet: [] as const,
     reportDoc:
       "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1-REPORT.md" as const,
+    liveCertReportDoc:
+      "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-NIA-PHOTO-LED-LIVE-CERTIFICATION-1-REPORT.md" as const,
     contractsModule: "src/lib/studio-campaign-creative/contracts.ts" as const,
     question:
       "Can we build a Machine-operated photo-led campaign workstation, with vendors only as replaceable engines where truly necessary?" as const,
     answer:
-      "Yes — own Visual Prep + Campaign Renderer + QA; zero vendors required for Launch Now; sockets reserved for advanced ops." as const,
+      "Yes — proven on Nia Fall Reset; zero vendors required for Launch Now; sockets reserved for advanced ops." as const,
     customerFacingNames: [
       "Social Graphic",
       "Campaign Creative",
@@ -170,9 +186,19 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
     doNotRebuildCanvaOrPhotoshop: true as const,
     purchase: false as const,
     doNotOpenPlacidTrial: true as const,
-    parkForManager: true as const,
+    parkForManager: false as const,
   },
 
+  /** Named next — do not start tonight. */
+  nextOnResume: {
+    packageId:
+      "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1" as const,
+    title: "Multi-Service Client Gauntlet" as const,
+    status: "NAMED_NOT_STARTED" as const,
+    doNotStartTonight: true as const,
+    purpose:
+      "Test another realistic business with a different service mix; prove Nia was not a one-hit wonder." as const,
+  },
 
   customer: {
     customerName: "Nia Carter",
@@ -192,7 +218,6 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
     "one included revision round within the defined scope",
   ] as const,
 
-  /** Launch menu candidates under certification — carousel/Stories/Reels not advertised. */
   launchToolboxCandidates: [
     "Short-form promotional video",
     "Campaign creative / coordinated multi-format campaign",
@@ -266,6 +291,7 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
     "capcut",
     "outside_human_contractors",
     "auto_start_next_toolbox_certification",
+    "auto_start_room_4c_tonight",
     "visual_redesign_spree",
   ] as const,
 } as const;

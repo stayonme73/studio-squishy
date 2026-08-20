@@ -80,6 +80,65 @@ export function validateCampaignCreativeSetSpec(
       });
     }
 
+    const declared = declaredTextFromCampaignAsset(asset);
+    const declaredLower = declared.toLowerCase();
+    if (
+      declaredLower.includes("nia rooted wellness") ||
+      declaredLower.includes("nia rooted")
+    ) {
+      findings.push({
+        id: `brand_mismatch_${asset.assetId}`,
+        severity: "fail",
+        message: `Forbidden brand string in artwork text on ${asset.assetId}`,
+      });
+    }
+    if (
+      !declared.includes(setSpec.brief.businessName) &&
+      !asset.layers.some((l) => l.type === "image" && l.role === "logo")
+    ) {
+      findings.push({
+        id: `brand_missing_${asset.assetId}`,
+        severity: "fail",
+        message: `Business identity missing on ${asset.assetId}`,
+      });
+    }
+
+    const hasBody = asset.layers.some(
+      (l) => l.type === "text" && l.role === "body" && l.content.trim().length >= 24,
+    );
+    if (asset.familyId === "full_bleed_hero" && !hasBody) {
+      findings.push({
+        id: `sell_copy_missing_${asset.assetId}`,
+        severity: "fail",
+        message: `Full-bleed asset ${asset.assetId} needs supporting proposition copy`,
+      });
+    }
+
+    if (asset.formatId === "print_handout") {
+      const hasWebButton = asset.layers.some(
+        (l) => l.type === "shape" && l.role === "cta_button",
+      );
+      if (hasWebButton) {
+        findings.push({
+          id: `print_cta_web_button_${asset.assetId}`,
+          severity: "fail",
+          message: `Print handout must not use a web-style CTA button on ${asset.assetId}`,
+        });
+      }
+      const hasContact = asset.layers.some(
+        (l) =>
+          l.type === "text" &&
+          (l.role === "contact" || l.content === setSpec.brief.facts.bookingContact),
+      );
+      if (!hasContact || !setSpec.brief.facts.bookingContact.trim()) {
+        findings.push({
+          id: `print_cta_contact_${asset.assetId}`,
+          severity: "fail",
+          message: `Print handout needs contact/URL with CTA on ${asset.assetId}`,
+        });
+      }
+    }
+
     const textInputs: TextLayerCollisionInput[] = asset.layers
       .filter((l): l is Extract<typeof l, { type: "text" }> => l.type === "text")
       .map((l) => ({

@@ -22,7 +22,7 @@ const materials = [
   {
     materialId: NIA_PHOTO_ASSET_IDS.logo,
     role: "logo" as const,
-    relativePath: `${packRel}/nia-logo.png`,
+    relativePath: `${packRel}/nia-logo.svg`,
   },
   {
     materialId: NIA_PHOTO_ASSET_IDS.windowPortrait,

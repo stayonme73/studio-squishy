@@ -6,7 +6,8 @@
  * Tagia 2026-08-17: Room 1 stays technically open solely for deferred
  * domain/email. That sticky does not block entering Room 2 or Room 3.
  * Tagia 2026-08-18: Room 2 CLOSED.
- * Tagia 2026-08-19: Room 3 CLOSED at cd2a1e2. Room 4A CLOSED at 9f9ac7c. Current execution is Room 4B.
+ * Tagia 2026-08-19: Room 3 CLOSED at cd2a1e2. Room 4A CLOSED at 9f9ac7c.
+ * Tagia 2026-08-19 (later): Room 4B CLOSED. Next named: Room 4C (not started).
  */
 
 export const studioLaunchReadinessExecutionOrderV1 = {
@@ -26,10 +27,12 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     "soft-opening-preparation",
   ] as const,
 
-  /** Highest unfinished execution room. Room 1 remains open for email only. Rooms 2–3 CLOSED. */
+  /** Highest unfinished execution room. Rooms 2–3 CLOSED. Room 4A+4B CLOSED. 4C named not started. */
   currentActiveRoom: 4 as const,
   currentActiveRoomId: "full-business-rehearsal" as const,
   currentActiveRoomClosed: false as const,
+  currentActiveSectionId: "4c-multi-service-client-gauntlet" as const,
+  currentActiveSectionStatus: "NAMED_NOT_STARTED" as const,
 
   lastCustomerLifePackage: {
     id: "STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1",
@@ -153,16 +156,19 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     nextSectionWaitsForScoutPackage: false as const,
   },
 
-  /** Room 4A CLOSED at 9f9ac7c. Current Room 4 work is 4B. */
+  /** Room 4A CLOSED. Room 4B CLOSED 2026-08-19. Next: 4C named, not started. */
   room4: {
     packageId: "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
-    sectionClosed: false as const,
-    parkForManager: true as const,
+    sectionClosed: true as const,
+    parkForManager: false as const,
     doNotAutoAdvance: true as const,
     doNotStartRoom5: true as const,
     doNotRebuild: true as const,
     nextSectionWaitsForScoutPackage: true as const,
     room4AClosedAt: "9f9ac7c" as const,
+    room4BClosedAt: "2026-08-19" as const,
+    nextSectionId: "4c-multi-service-client-gauntlet" as const,
+    nextSectionStatus: "NAMED_NOT_STARTED" as const,
   },
 
   room4A: {
@@ -177,23 +183,43 @@ export const studioLaunchReadinessExecutionOrderV1 = {
 
   room4B: {
     packageId: "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
-    sectionClosed: false as const,
-    parkForManager: true as const,
+    sectionClosed: true as const,
+    roomClosed: true as const,
+    closedAt: "2026-08-19" as const,
+    closeChoice: "A_CLOSE_WITH_CLASSIFICATIONS_FROZEN" as const,
+    closeoutDoc:
+      "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-CLOSEOUT.md" as const,
+    parkForManager: false as const,
     doNotAutoAdvance: true as const,
     doNotStartRoom5: true as const,
     doNotAutoStartNextCertification: true as const,
+    doNotStartRoom4CTonight: true as const,
     doNotRebuild: true as const,
     nextSectionWaitsForScoutPackage: true as const,
     photoLedLiveCertRecommendation:
-      "OWNER_PURCHASE_DECISION_REQUIRED" as const,
+      "MACHINE_NATIVE_NIA_CERT_CLOSED_NO_VENDOR_PURCHASE" as const,
     twoStageMeansTwoSubscriptions: false as const,
-    nextPackageId:
-      "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-BUILD-1" as const,
-    nextPackageStatus: "READY_FOR_NIA_PHOTO_LIVE_CERTIFICATION" as const,
+    niaPhotoLedLiveCertStatus: "CLOSED_PASS" as const,
     machineNativeRecommendation: "A_BUILD_MACHINE_NATIVE" as const,
     machineNativeRecommendationAccepted: true as const,
-    ownerInputRequired: "NIA_PHOTO_PACK" as const,
+    ownerInputRequired: "NONE" as const,
     doNotOpenPlacidTrialYet: true as const,
+    campaignCreativeOnLaunchNow: true as const,
+    frozenClassifications: true as const,
+  },
+
+  room4C: {
+    packageId:
+      "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1" as const,
+    title: "Multi-Service Client Gauntlet" as const,
+    sectionClosed: false as const,
+    status: "NAMED_NOT_STARTED" as const,
+    doNotStartTonight: true as const,
+    doNotAutoStart: true as const,
+    doNotStartRoom5: true as const,
+    doNotMerge: true as const,
+    configModule:
+      "src/config/studio-room-4c-multi-service-client-gauntlet-v1.ts" as const,
   },
 
   merge: "separately_authorized" as const,

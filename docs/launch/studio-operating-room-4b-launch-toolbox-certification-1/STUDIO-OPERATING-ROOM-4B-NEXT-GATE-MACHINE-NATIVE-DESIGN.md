@@ -1,9 +1,9 @@
-# Room 4B — next gate
+# Room 4 — board after 4B close
 
-**Waiting:** Nia photo pack (7 files)  
-**Spec:** `STUDIO-OPERATING-ROOM-4B-NIA-PHOTO-PACK-REQUIREMENTS.md`  
-**Drop folder:** `docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-pack/`
+**Room 4B:** **CLOSED** 2026-08-19  
+**Closeout:** `STUDIO-OPERATING-ROOM-4B-CLOSEOUT.md`
 
-Then authorize live cert → real square / vertical / print art for creative-director yay/nay.
+**Next (resume later):** Room 4C — Multi-Service Client Gauntlet  
+`STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1` — **NAMED NOT STARTED**
 
-No more build coding until pack lands.
+Do not start 4C tonight. Do not start Room 5. Do not merge.

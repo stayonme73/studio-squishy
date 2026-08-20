@@ -117,9 +117,9 @@ Keep this sequence as the standing roadmap for all future launch work unless Tag
 | 1. Customer Life + Communication | **COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL.** Not a full CLOSED stamp. Authoritative executable tip `a49efd7`. Yellow sticky: branded email/domain at `d6974eb`. Does **not** block Room 2 or Room 3. Ledger: `docs/launch/studio-operating-room-1-customer-life-closeout-v1.md`. |
 | 2. Customer-facing truth + friction cleanup | **CLOSED.** Section 1 `45b09b1`. Section 2 `e609203`. Section 3 `3328807`. Section 4 `6cf9ca0`. Section 5 `b3397a6`. |
 | 3. Owner Console | **CLOSED** at `cd2a1e2`. Section 1 `76b974f`. Section 2 `199e4a4`. Section 3 `cd2a1e2`. Do not reopen unless new evidence. |
-| 4. Full business rehearsal | **ACTIVE.** Room 4A CLOSED at `9f9ac7c`. Current package `STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1` — park for Manager. Do not auto-advance. Do not auto-start next toolbox cert. Do not start Room 5. |
+| 4. Full business rehearsal | **ACTIVE.** Room 4A CLOSED at `9f9ac7c`. Room 4B **CLOSED** 2026-08-19 — closeout `docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-CLOSEOUT.md`. Classifications frozen (Campaign Creative on Launch Now with limits; carousel off menu). Next: Room 4C Multi-Service Client Gauntlet — **NAMED NOT STARTED**. Do not start tonight. Do not start Room 5. |
 | 5. Soft-opening preparation | Not started. Do not enter. |
 
 **COME BACK LATER (Room 1 yellow sticky — does not block Room 2, Room 3, or Room 4):** The Studio does not yet have a purchased and verified business domain or business email identity. Deferred until then: branded sender certification, real inbox delivery proof, live provider reject/retry against the final Studio sender. Return to the same Resend package when Owner establishes that identity. Do not fake. Do not reopen from Room 4.
 
-Do **not** reopen completed Room 1, Room 2, or Room 3 capabilities unless new evidence proves an actual defect. Do not start Room 5. No merge unless separately authorized.
+Do **not** reopen completed Room 1, Room 2, Room 3, or Room 4B capabilities unless new evidence proves an actual defect. Do not start Room 5. Do not auto-start Room 4C. No merge unless separately authorized.

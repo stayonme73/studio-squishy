@@ -106,6 +106,8 @@ export function emitAssetLayers(input: {
   const { recipe, brief, system } = input;
   const layers: CampaignDesignLayer[] = [];
   const overlayFill = `rgba(31, 58, 77, ${system.imageTreatmentRules.overlayMaxOpacity})`;
+  const isFullBleed = recipe.familyId === "full_bleed_hero";
+  const isPrint = recipe.formatId === "print_handout";
 
   for (const slot of recipe.slots) {
     const b = slot.box;
@@ -124,16 +126,17 @@ export function emitAssetLayers(input: {
       continue;
     }
     if (slot.role === "logo") {
+      // Light whisper plate — brand reads without a chunky badge
       layers.push({
         type: "shape",
         id: `${recipe.recipeId}-logo-plate`,
         role: "logo_plate",
-        x: b.x - 8,
-        y: b.y - 8,
-        width: b.width + 16,
-        height: b.height + 16,
-        fill: "#FFFFFF",
-        borderRadiusPx: 16,
+        x: b.x - 2,
+        y: b.y - 2,
+        width: b.width + 4,
+        height: b.height + 4,
+        fill: "rgba(31, 58, 77, 0.2)",
+        borderRadiusPx: 6,
       });
       layers.push({
         type: "image",
@@ -149,16 +152,31 @@ export function emitAssetLayers(input: {
       continue;
     }
     if (slot.role === "overlay") {
-      layers.push({
-        type: "shape",
-        id: `${recipe.recipeId}-overlay`,
-        role: "overlay",
-        x: b.x,
-        y: b.y,
-        width: b.width,
-        height: b.height,
-        fill: overlayFill,
-      });
+      if (isFullBleed) {
+        // Seamless fade — no stacked bands (those read as UI divider lines)
+        const peak = system.imageTreatmentRules.overlayMaxOpacity;
+        layers.push({
+          type: "shape",
+          id: `${recipe.recipeId}-overlay`,
+          role: "overlay",
+          x: b.x,
+          y: b.y,
+          width: b.width,
+          height: b.height,
+          fill: `linear-gradient(to bottom, rgba(31,58,77,0) 0%, rgba(31,58,77,${(peak * 0.45).toFixed(3)}) 42%, rgba(31,58,77,${peak.toFixed(3)}) 100%)`,
+        });
+      } else {
+        layers.push({
+          type: "shape",
+          id: `${recipe.recipeId}-overlay`,
+          role: "overlay",
+          x: b.x,
+          y: b.y,
+          width: b.width,
+          height: b.height,
+          fill: overlayFill,
+        });
+      }
       continue;
     }
     if (slot.role === "content_panel") {
@@ -181,9 +199,7 @@ export function emitAssetLayers(input: {
           "headline",
           brief.facts.headline,
           b,
-          recipe.familyId === "full_bleed_hero"
-            ? "#F7F3EC"
-            : system.palette.primary,
+          isFullBleed ? "#F7F3EC" : system.palette.primary,
           Math.max(slot.minFontPx ?? 32, 32),
           700,
           "left",
@@ -199,9 +215,9 @@ export function emitAssetLayers(input: {
           "body",
           brief.facts.supportingCopy,
           b,
-          system.palette.text,
+          isFullBleed ? "#F2EBE2" : system.palette.text,
           Math.max(slot.minFontPx ?? 20, 18),
-          400,
+          isFullBleed ? 500 : 400,
           "left",
           slot.maxLines,
         ),
@@ -215,9 +231,7 @@ export function emitAssetLayers(input: {
           "dates",
           brief.facts.datesDisplay,
           b,
-          recipe.familyId === "full_bleed_hero"
-            ? "#E8E0D5"
-            : system.palette.muted,
+          isFullBleed ? "#EDE4D8" : system.palette.muted,
           Math.max(slot.minFontPx ?? 20, 18),
           500,
           "left",
@@ -233,11 +247,9 @@ export function emitAssetLayers(input: {
           "price",
           brief.facts.priceDisplay,
           b,
-          recipe.familyId === "full_bleed_hero"
-            ? "#FFFFFF"
-            : system.palette.text,
-          Math.max(slot.minFontPx ?? 36, 28),
-          700,
+          isFullBleed ? "#F7F3EC" : system.palette.text,
+          Math.max(slot.minFontPx ?? 28, 26),
+          600,
           "left",
           slot.maxLines,
         ),
@@ -245,35 +257,76 @@ export function emitAssetLayers(input: {
       continue;
     }
     if (slot.role === "cta") {
-      layers.push({
-        type: "shape",
-        id: `${recipe.recipeId}-cta-btn`,
-        role: "cta_button",
-        x: b.x,
-        y: b.y,
-        width: b.width,
-        height: Math.max(b.height, system.ctaStyle.minHeightPx),
-        fill: system.ctaStyle.background,
-        borderRadiusPx: system.ctaStyle.borderRadiusPx,
-      });
-      layers.push(
-        textFromSlot(
-          `${recipe.recipeId}-cta`,
-          "cta",
-          brief.facts.cta,
-          {
-            x: b.x + 16,
-            y: b.y + 16,
-            width: b.width - 32,
-            height: b.height - 24,
-          },
-          system.ctaStyle.textColor,
-          Math.max(slot.minFontPx ?? 20, 18),
-          600,
-          "center",
-          1,
-        ),
-      );
+      if (isPrint) {
+        // Print handout: enrollment line + contact/URL — not a fake web button
+        layers.push(
+          textFromSlot(
+            `${recipe.recipeId}-cta`,
+            "cta",
+            brief.facts.cta,
+            {
+              x: b.x,
+              y: b.y,
+              width: b.width,
+              height: 28,
+            },
+            isFullBleed ? "#F7F3EC" : system.palette.primary,
+            Math.max(slot.minFontPx ?? 20, 18),
+            600,
+            "left",
+            1,
+          ),
+        );
+        layers.push(
+          textFromSlot(
+            `${recipe.recipeId}-contact`,
+            "contact",
+            brief.facts.bookingContact,
+            {
+              x: b.x,
+              y: b.y + 34,
+              width: b.width,
+              height: 28,
+            },
+            isFullBleed ? "#E2C9A8" : system.palette.muted,
+            16,
+            500,
+            "left",
+            1,
+          ),
+        );
+      } else {
+        // Soft campaign CTA — translucent plate + type, not a solid web button
+        layers.push({
+          type: "shape",
+          id: `${recipe.recipeId}-cta-btn`,
+          role: "cta_button",
+          x: b.x,
+          y: b.y,
+          width: Math.min(b.width, 320),
+          height: Math.max(b.height, 40),
+          fill: "rgba(247, 243, 236, 0.14)",
+          borderRadiusPx: 4,
+        });
+        layers.push(
+          textFromSlot(
+            `${recipe.recipeId}-cta`,
+            "cta",
+            brief.facts.cta,
+            {
+              x: b.x + 14,
+              y: b.y + 10,
+              width: Math.min(b.width, 320) - 28,
+              height: b.height - 16,
+            },
+            "#F7F3EC",
+            Math.max(slot.minFontPx ?? 18, 17),
+            600,
+            "left",
+            1,
+          ),
+        );
+      }
       continue;
     }
   }

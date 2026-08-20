@@ -86,7 +86,7 @@ export type CampaignVisualSystem = {
     borderRadiusPx: number;
     minHeightPx: number;
   };
-  hierarchy: ("logo" | "headline" | "photo" | "price" | "dates" | "cta")[];
+  hierarchy: ("logo" | "headline" | "photo" | "body" | "price" | "dates" | "cta")[];
   approvedLayoutFamilyIds: string[];
 };
 

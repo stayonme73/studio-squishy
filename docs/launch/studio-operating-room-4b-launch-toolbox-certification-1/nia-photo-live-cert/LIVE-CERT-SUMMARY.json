@@ -1,22 +1,43 @@
 {
   "packageId": "STUDIO-OPERATING-ROOM-4B-NIA-PHOTO-LED-LIVE-CERTIFICATION-1",
   "kind": "controlled_fictional_nia_photo_pack_live_cert",
+  "status": "CLOSED",
+  "creativeQualityBar": "MET",
+  "managerSellability": "YES",
+  "capabilityClassification": "READY_WITH_EXPLICIT_LIMITS",
+  "parentPackageId": "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
+  "parentRoom4bStatus": "CLOSED_2026-08-19",
+  "room4cStatus": "NAMED_NOT_STARTED",
+  "doNotStartRoom4CTonight": true,
+  "doNotStartRoom5": true,
+  "doNotMerge": true,
+  "doNotBuyCanvaAdobePlacid": true,
   "packRel": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-pack",
   "outRel": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-live-cert",
+  "certifiedSetDir": "v2-revision-window-good-1",
+  "certifiedArtifacts": [
+    "social_square__full_bleed_hero.png",
+    "social_vertical__full_bleed_hero.png",
+    "print_handout__full_bleed_hero.png"
+  ],
   "v1": {
     "hero": "nia-photo-good-2",
     "familyId": "full_bleed_hero",
-    "renderVersion": 1,
+    "renderVersion": 11,
     "dir": "v1-hero-good-2-standing",
     "qaPass": true
   },
   "v2": {
     "hero": "nia-photo-good-1",
     "familyId": "full_bleed_hero",
-    "renderVersion": 2,
+    "renderVersion": 12,
     "dir": "v2-revision-window-good-1",
     "qaPass": true,
     "systemPreserved": true
   },
-  "creativeDirectorQuestion": "Would The Studio confidently charge Nia for this exact campaign?"
+  "creativeDirectorQuestion": "Would The Studio confidently charge Nia for this exact campaign?",
+  "creativeDirectorAnswer": "YES",
+  "reportDoc": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-NIA-PHOTO-LED-LIVE-CERTIFICATION-1-REPORT.md",
+  "managerForkResolved": "A_CLOSE_ROOM_4B_WITH_CLASSIFICATIONS_FROZEN",
+  "closeoutDoc": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-CLOSEOUT.md"
 }

@@ -48,7 +48,7 @@ export function buildNiaFallResetCreativeBrief(input?: {
     facts: {
       headline: NIA_PROGRAM_TITLE,
       supportingCopy:
-        "Six-week wellness program for busy women. Calm, grown-up, motivating.",
+        "A six-week guided reset for busy women — live coaching, simple daily practices, and a calm plan you can keep.",
       datesDisplay: NIA_PROGRAM_DATES_DISPLAY,
       priceDisplay: NIA_PRICE_DISPLAY,
       cta: "Enroll in Fall Reset",

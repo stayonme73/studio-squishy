@@ -13,8 +13,13 @@ function canvasOf(formatId: CampaignFormatId) {
 
 function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
   const { widthPx: W, heightPx: H } = canvasOf(formatId);
+  const isPrint = formatId === "print_handout";
   const isSquare = formatId === "social_square";
-  const contentTop = isSquare ? Math.floor(H * 0.55) : Math.floor(H * 0.58);
+  // Compact bottom stack — portrait owns most of the frame (especially vertical)
+  const stackH = isPrint ? 340 : isSquare ? 310 : 320;
+  const contentTop = H - stackH;
+  const overlayTop = Math.max(0, contentTop - 96);
+  const contentWidth = Math.min(W - 96, isPrint ? W - 120 : Math.floor(W * 0.78));
   return {
     recipeId: `full_bleed_hero__${formatId}`,
     familyId: "full_bleed_hero",
@@ -32,38 +37,71 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
         id: "overlay",
         kind: "shape",
         role: "overlay",
-        box: { x: 0, y: contentTop - 40, width: W, height: H - contentTop + 40 },
+        box: {
+          x: 0,
+          y: overlayTop,
+          width: W,
+          height: H - overlayTop,
+        },
       },
       {
         id: "logo",
         kind: "logo",
         role: "logo",
-        box: { x: 48, y: 48, width: Math.floor(W * 0.18), height: Math.floor(W * 0.18) },
+        box: {
+          x: 36,
+          y: 28,
+          width: Math.floor(W * 0.3),
+          height: Math.floor(W * 0.09),
+        },
         fit: "contain",
       },
       {
         id: "headline",
         kind: "text",
         role: "headline",
-        box: { x: 48, y: contentTop, width: W - 96, height: 80 },
-        maxLines: 2,
-        minFontPx: 36,
+        box: { x: 48, y: contentTop + 4, width: contentWidth, height: 52 },
+        maxLines: 1,
+        minFontPx: isSquare ? 40 : 44,
+      },
+      {
+        id: "body",
+        kind: "text",
+        role: "body",
+        box: {
+          x: 48,
+          y: contentTop + 58,
+          width: contentWidth,
+          height: isPrint ? 64 : 48,
+        },
+        maxLines: isPrint ? 3 : 2,
+        minFontPx: isPrint ? 18 : 17,
       },
       {
         id: "dates",
         kind: "text",
         role: "dates",
-        box: { x: 48, y: contentTop + 88, width: W - 96, height: 40 },
+        box: {
+          x: 48,
+          y: contentTop + (isPrint ? 130 : 114),
+          width: contentWidth,
+          height: 28,
+        },
         maxLines: 1,
-        minFontPx: 22,
+        minFontPx: 18,
       },
       {
         id: "price",
         kind: "text",
         role: "price",
-        box: { x: 48, y: contentTop + 136, width: W - 96, height: 56 },
+        box: {
+          x: 48,
+          y: contentTop + (isPrint ? 164 : 148),
+          width: contentWidth,
+          height: 36,
+        },
         maxLines: 1,
-        minFontPx: 40,
+        minFontPx: 26,
       },
       {
         id: "cta",
@@ -71,12 +109,12 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
         role: "cta",
         box: {
           x: 48,
-          y: Math.min(H - 120, contentTop + 220),
-          width: Math.min(420, W - 96),
-          height: 64,
+          y: contentTop + (isPrint ? 214 : 198),
+          width: Math.min(isPrint ? contentWidth : 360, contentWidth),
+          height: isPrint ? 64 : 44,
         },
-        maxLines: 1,
-        minFontPx: 22,
+        maxLines: isPrint ? 2 : 1,
+        minFontPx: isPrint ? 17 : 18,
       },
     ],
   };

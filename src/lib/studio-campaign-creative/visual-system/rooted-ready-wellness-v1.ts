@@ -31,16 +31,16 @@ export const ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1: CampaignVisualSystem = {
   imageTreatmentRules: {
     preferredFit: "cover",
     allowFullBleed: true,
-    overlayMaxOpacity: 0.45,
+    overlayMaxOpacity: 0.62,
   },
   spacingScalePx: [16, 24, 32, 48, 64, 80],
   ctaStyle: {
-    background: "#1F3A4D",
+    background: "rgba(247, 243, 236, 0.14)",
     textColor: "#F7F3EC",
-    borderRadiusPx: 12,
-    minHeightPx: 56,
+    borderRadiusPx: 4,
+    minHeightPx: 40,
   },
-  hierarchy: ["photo", "logo", "headline", "dates", "price", "cta"],
+  hierarchy: ["photo", "logo", "headline", "body", "dates", "price", "cta"],
   approvedLayoutFamilyIds: [
     "full_bleed_hero",
     "split_hero",
