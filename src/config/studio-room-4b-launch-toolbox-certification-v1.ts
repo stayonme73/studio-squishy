@@ -63,11 +63,10 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
   campaignCreativeStatus: {
     abandoned: false as const,
     launchReady: false as const,
-    posture: "OPEN_PENDING_MACHINE_NATIVE_BUILD_ACCEPTANCE" as const,
+    posture: "OPEN_READY_FOR_NIA_PHOTO_LIVE_CERTIFICATION" as const,
     textLedRenderer: "READY_WITH_EXPLICIT_LIMITS" as const,
-    nextGate:
-      "Manager accept A_BUILD_MACHINE_NATIVE then authorize next coherent build package" as const,
-    nextGateKind: "build_acceptance_not_vendor_trial" as const,
+    nextGate: "OWNER_INPUT_REQUIRED_NIA_PHOTO_PACK" as const,
+    nextGateKind: "live_visual_cert_after_photo_pack" as const,
     doNotOpenPlacidTrialYet: true as const,
     doNotBuyCanvaOrAdobeYet: true as const,
   },
@@ -137,6 +136,11 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
       "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1" as const,
     status: "PARKED_FOR_MANAGER" as const,
     recommendation: "A_BUILD_MACHINE_NATIVE" as const,
+    recommendationAccepted: true as const,
+    buildPackageId:
+      "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-BUILD-1" as const,
+    buildStopState: "READY_FOR_NIA_PHOTO_LIVE_CERTIFICATION" as const,
+    ownerInputRequired: "NIA_PHOTO_PACK" as const,
     smallestExternalDependencySet: [] as const,
     reportDoc:
       "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1-REPORT.md" as const,

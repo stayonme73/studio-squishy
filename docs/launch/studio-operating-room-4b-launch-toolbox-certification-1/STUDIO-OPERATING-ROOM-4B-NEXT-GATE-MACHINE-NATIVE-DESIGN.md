@@ -1,19 +1,18 @@
-# Room 4B — next gate (after Machine-native design)
+# Room 4B — next gate after BUILD-1
 
-**Design package:** `STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1`  
-**Recommendation:** **A. BUILD MACHINE-NATIVE**  
-**Report:** `STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1-REPORT.md`
+**Stop:** READY FOR NIA PHOTO LIVE CERTIFICATION  
+**Owner input:** NIA PHOTO PACK  
 
-## Locked
+Required asset IDs:
 
-- Zero vendors required for Launch Now photo-led campaign capability
-- Canva / Adobe / Placid = optional sockets only
-- No Placid trial · no purchase · no merge · no Room 5
+- nia-logo  
+- nia-photo-good-1 (window)  
+- nia-photo-good-2 (standing)  
+- nia-photo-good-3 (activity)  
+- nia-photo-good-4 (environment)  
+- nia-photo-mediocre-1  
+- nia-photo-mediocre-2  
 
-## Await Manager
+Controlled fictional pack OK. Then live visual: would we charge Nia?
 
-1. Accept **A** (or override)
-2. Authorize next coherent **build** package (not another vendor audition)
-3. Nia photo pack before live visual cert
-
-Parent 4B remains OPEN.
+No vendor trial. No purchase. No merge. No Room 5.

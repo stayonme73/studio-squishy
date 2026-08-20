@@ -188,9 +188,11 @@ export const studioLaunchReadinessExecutionOrderV1 = {
       "OWNER_PURCHASE_DECISION_REQUIRED" as const,
     twoStageMeansTwoSubscriptions: false as const,
     nextPackageId:
-      "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-DESIGN-1" as const,
-    nextPackageStatus: "PARKED_FOR_MANAGER" as const,
+      "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-BUILD-1" as const,
+    nextPackageStatus: "READY_FOR_NIA_PHOTO_LIVE_CERTIFICATION" as const,
     machineNativeRecommendation: "A_BUILD_MACHINE_NATIVE" as const,
+    machineNativeRecommendationAccepted: true as const,
+    ownerInputRequired: "NIA_PHOTO_PACK" as const,
     doNotOpenPlacidTrialYet: true as const,
   },
 
