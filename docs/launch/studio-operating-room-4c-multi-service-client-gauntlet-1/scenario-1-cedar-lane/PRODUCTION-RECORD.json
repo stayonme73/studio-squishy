@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-20T19:39:36.436Z",
-  "briefSha256": "55a6a85e0431c2df8eb695c7da285943e73bf23640a2efc125a34f6b79fae0de",
+  "generatedAt": "2026-08-20T19:55:24.505Z",
+  "briefSha256": "a1a9cdf9709379a5d4e4cac9eae5fbad31392bdbc75fdc4661453bf6c1fffde5",
   "acceptance": {
     "admit": true,
     "menuOk": true,
@@ -73,14 +73,14 @@
     }
   ],
   "campaign": {
-    "renderVersion": 1,
+    "renderVersion": 2,
     "systemId": "cedar-lane-home-organizing-v1",
     "familyId": "full_bleed_hero",
-    "setFingerprint": "78e8bca5c36937f92be8d8c6b444b7605d59abfa7418c3f00267c8118ebe9110",
+    "setFingerprint": "b295c588244b83d712050088507377b194e17c89b4d8c7f877329fd1f95ffaa9",
     "pngShas": {
-      "social_square__full_bleed_hero": "4fad2bac0cf469a61c807db86c4fa63b47b12327200cca9a806f9dd991b85015",
-      "social_vertical__full_bleed_hero": "76820f878672bab60ffdaa95cab32cba4ac95dc9164937f7e3e374f7579d5dfa",
-      "print_handout__full_bleed_hero": "53101ea9c2633d0075f20d505179ca2f150e591fea978f5995ca41fd3c02ec29"
+      "social_square__full_bleed_hero": "a753f7da569ba512fd0714c2e5f8cc7a9ca12f78a0f55b5c927b2e46469dd798",
+      "social_vertical__full_bleed_hero": "30ebe5a2232a391e9316c3c27e3ad7291c79b06d3f87c776e1fe9149f365789c",
+      "print_handout__full_bleed_hero": "c8e6aeb3da706fb5c98377d70a1d24b3a5fa39dde8c5ce4c159a2738efc1fc13"
     }
   },
   "voice": {
@@ -95,6 +95,24 @@
     "durationSeconds": 26.4,
     "providerRenderId": "33c47a07-3778-4300-b094-c9754f5aa094"
   },
+  "print": {
+    "pngPx": {
+      "width": 2550,
+      "height": 3300
+    },
+    "pdfMediaBoxPt": {
+      "x": 0,
+      "y": 0,
+      "width": 612,
+      "height": 792
+    },
+    "pageInches": {
+      "widthIn": 8.5,
+      "heightIn": 11,
+      "widthPt": 612,
+      "heightPt": 792
+    }
+  },
   "tools": [
     "studio_campaign_creative",
     "elevenlabs_tts_adapter",
@@ -102,19 +120,30 @@
     "studio_copy_quality_gate"
   ],
   "ownerLabor": [
-    "None. Scout generated photography via Studio image tool, assembled logo SVG, and ran existing Machine pipelines. Tagia did not design, edit, format, or repair deliverables."
+    "None. Scout corrected the Machine print-handout path and regenerated campaign outputs. Tagia did not design, edit, format, or repair deliverables."
   ],
   "qa": {
     "copyOk": true,
     "campaignQaPass": true,
     "overflowOk": true,
     "socialDims": true,
+    "phonePreview390x390": true,
+    "printPngLetter": true,
+    "printPdfUsLetter": true,
+    "printPdfMediaBox": {
+      "x": 0,
+      "y": 0,
+      "width": 612,
+      "height": 792
+    },
     "printPngOk": true,
     "printPdfOk": true,
     "socialPngOk": true,
+    "dateContrastNotMuted": true,
     "captionHasFacts": true,
     "videoDurationInBand": true,
     "filesOpen": true,
-    "runId": "33ffa4b6-d3eb-47b5-9649-dfa1a13d51ed"
+    "runId": "db2c44d3-120b-492f-a12c-482d0785f7b7",
+    "correction": "us-letter-print-and-phone-390"
   }
 }

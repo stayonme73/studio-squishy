@@ -26,7 +26,7 @@
 | Social promo graphic | Social graphics / Campaign creative (static) | Square PNG (e.g. 1080×1080) with brand, offer, dates, CTA |
 | Short vertical video | Short-form video | Vertical MP4 ~20–30s; calm tone; offer + CTA on-message |
 | Promo copy / caption | Marketing copy / email | Paste-ready caption(s) matching brief facts |
-| Printable piece | Print collateral | One-page PNG/PDF handout; print CTA/contact (not fake web-only button) |
+| Printable piece | Print collateral | US Letter 8.5×11 in; PNG 2550×3300 at 300 DPI; PDF page 612×792 pt; print CTA/contact (not fake web-only button) |
 
 **Evidence folder (when executed):**  
 `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/`

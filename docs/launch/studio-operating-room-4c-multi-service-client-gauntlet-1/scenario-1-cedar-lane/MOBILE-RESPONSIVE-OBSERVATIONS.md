@@ -13,11 +13,11 @@ What can currently be proven from existing protected evidence (phone 390), not f
 | Approve | Review / Final / Delivery states exist on phone 390 | Owner final-release gate remains internal |
 | Receive delivery | Delivery state of Unified Review reachable on phone 390 | Not a new Scenario 1 live delivery walk |
 
-Scenario 1 deliverable-level phone note (after production):
+Scenario 1 deliverable-level phone note (after Letter correction):
 
-- Square social graphic is 1080×1080. Preview: `deliverables/social-square-phone-390.png`. Headline, subhead, and CTA remain readable at 390px. The date line is the weakest element at that size.
+- Square social graphic is 1080×1080. Preview: `deliverables/social-square-phone-390.png` is a **full-image resize to 390×390**, not a crop. Headline, subhead, dates, and CTA remain on the complete square.
 - Vertical video is 1080×1920 (phone-native), 26.4s.
 - Caption is plain text (readable on phone).
-- Handout is print-first; phone viewing is secondary.
+- Handout is print-first US Letter; phone viewing is secondary.
 
 Do not treat this table as final Room 4 mobile certification.

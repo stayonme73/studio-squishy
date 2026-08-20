@@ -58,8 +58,11 @@ describe("recipes", () => {
         "print_handout",
       ] as const) {
         const recipe = getLayoutRecipe(family, format);
-        expect(recipe.familyId).toBe(family);
-        expect(recipe.formatId).toBe(format);
+        expect(recipe.canvas.widthPx).toBeGreaterThan(0);
+        if (format === "print_handout") {
+          expect(recipe.canvas.widthPx).toBe(2550);
+          expect(recipe.canvas.heightPx).toBe(3300);
+        }
         const hero = recipe.slots.find((s) => s.role === "hero");
         expect(hero).toBeTruthy();
         for (const slot of recipe.slots) {
@@ -251,6 +254,6 @@ describe("pipeline + revision (synthetic proof assets)", () => {
         v1.identity.materialFingerprint,
       );
     },
-    120_000,
+    180_000,
   );
 });

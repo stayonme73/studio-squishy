@@ -1,0 +1,22 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1",
+  "campaignId": "room-4c-s1-cedar-lane-home-organizing",
+  "systemId": "cedar-lane-home-organizing-v1",
+  "familyId": "full_bleed_hero",
+  "renderVersion": 2,
+  "heroMaterialId": "cedar-lane-hero-closet",
+  "materialFingerprint": "8734b70abd4196f146db1acb6018a291cee43b4fe98d06acf7c7c9e08d391c3e",
+  "setFingerprint": "b295c588244b83d712050088507377b194e17c89b4d8c7f877329fd1f95ffaa9",
+  "assetFingerprints": {
+    "social_square__full_bleed_hero": "f60c3150aa27f8cda22511437403147a25ee9c6e28abe94b35757268e57b19b6",
+    "social_vertical__full_bleed_hero": "e8dad9f4ddbe9aef4e4c93650e461c648c3f61397f59fd5a8668a0cce463fdee",
+    "print_handout__full_bleed_hero": "c2d727e10fdcf559297c66eaba3afe091e469fe23d1399592cf3b94d4a6b08d9"
+  },
+  "pngShas": {
+    "social_square__full_bleed_hero": "a753f7da569ba512fd0714c2e5f8cc7a9ca12f78a0f55b5c927b2e46469dd798",
+    "social_vertical__full_bleed_hero": "30ebe5a2232a391e9316c3c27e3ad7291c79b06d3f87c776e1fe9149f365789c",
+    "print_handout__full_bleed_hero": "c8e6aeb3da706fb5c98377d70a1d24b3a5fa39dde8c5ce4c159a2738efc1fc13"
+  },
+  "createdAt": "2026-08-20T19:55:29.389Z",
+  "rendererVersion": "studio-campaign-creative-1.0.0"
+}

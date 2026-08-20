@@ -118,9 +118,10 @@ export function emitAssetLayers(input: {
   const overlayRgb = hexToRgb(system.palette.primary);
   const overlayFill = `rgba(${overlayRgb.r}, ${overlayRgb.g}, ${overlayRgb.b}, ${system.imageTreatmentRules.overlayMaxOpacity})`;
   const bleedText = system.palette.background;
-  const bleedMuted = system.palette.muted;
   const isFullBleed = recipe.familyId === "full_bleed_hero";
   const isPrint = recipe.formatId === "print_handout";
+  const dateColor = isFullBleed ? bleedText : system.palette.text;
+  const dateWeight = 600 as const;
 
   for (const slot of recipe.slots) {
     const b = slot.box;
@@ -139,17 +140,17 @@ export function emitAssetLayers(input: {
       continue;
     }
     if (slot.role === "logo") {
-      // Light whisper plate — brand reads without a chunky badge
+      const platePad = isPrint ? 12 : 2;
       layers.push({
         type: "shape",
         id: `${recipe.recipeId}-logo-plate`,
         role: "logo_plate",
-        x: b.x - 2,
-        y: b.y - 2,
-        width: b.width + 4,
-        height: b.height + 4,
+        x: b.x - platePad,
+        y: b.y - platePad,
+        width: b.width + platePad * 2,
+        height: b.height + platePad * 2,
         fill: `rgba(${overlayRgb.r}, ${overlayRgb.g}, ${overlayRgb.b}, 0.2)`,
-        borderRadiusPx: 6,
+        borderRadiusPx: isPrint ? 12 : 6,
       });
       layers.push({
         type: "image",
@@ -244,9 +245,9 @@ export function emitAssetLayers(input: {
           "dates",
           brief.facts.datesDisplay,
           b,
-          isFullBleed ? bleedMuted : system.palette.muted,
-          Math.max(slot.minFontPx ?? 20, 18),
-          500,
+          dateColor,
+          Math.max(slot.minFontPx ?? 20, isPrint ? 48 : 18),
+          dateWeight,
           "left",
           slot.maxLines,
         ),
@@ -272,7 +273,9 @@ export function emitAssetLayers(input: {
     }
     if (slot.role === "cta") {
       if (isPrint) {
-        // Print handout: enrollment line + contact/URL — not a fake web button
+        const ctaSize = Math.max(slot.minFontPx ?? 20, 18);
+        const contactSize = Math.max(Math.round(ctaSize * 0.78), isPrint ? 44 : 16);
+        const contactGap = isPrint ? Math.round(ctaSize * 1.35) : 34;
         layers.push(
           textFromSlot(
             `${recipe.recipeId}-cta`,
@@ -282,10 +285,10 @@ export function emitAssetLayers(input: {
               x: b.x,
               y: b.y,
               width: b.width,
-              height: 28,
+              height: Math.round(ctaSize * 1.3),
             },
             isFullBleed ? bleedText : system.palette.primary,
-            Math.max(slot.minFontPx ?? 20, 18),
+            ctaSize,
             600,
             "left",
             1,
@@ -298,13 +301,13 @@ export function emitAssetLayers(input: {
             brief.facts.bookingContact,
             {
               x: b.x,
-              y: b.y + 34,
+              y: b.y + contactGap,
               width: b.width,
-              height: 28,
+              height: Math.round(contactSize * 1.4),
             },
-            isFullBleed ? system.palette.accent : system.palette.muted,
-            16,
-            500,
+            isFullBleed ? bleedText : system.palette.text,
+            contactSize,
+            600,
             "left",
             1,
           ),
@@ -346,7 +349,7 @@ export function emitAssetLayers(input: {
   }
 
   // Wordmark for identity on content-heavy recipes
-  if (recipe.familyId !== "full_bleed_hero") {
+  if (recipe.familyId !== "full_bleed_hero" && !isPrint) {
     layers.push(
       textFromSlot(
         `${recipe.recipeId}-wordmark`,

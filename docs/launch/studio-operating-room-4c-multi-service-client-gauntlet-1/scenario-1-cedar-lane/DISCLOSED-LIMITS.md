@@ -18,3 +18,5 @@ Additional Scenario 1 limits:
 - Customer prints and posts. Studio does not run ads or social accounts.
 - Owner creative review is approval, not production labor.
 - Mobile notes in this package are responsive coverage, not Room 4 mobile certification.
+
+Print output is US Letter (8.5×11 in, 2550×3300 px at 300 DPI, PDF 612×792 pt). That is the accepted specification, not a remaining size limit.

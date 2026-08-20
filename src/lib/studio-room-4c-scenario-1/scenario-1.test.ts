@@ -6,7 +6,8 @@ import {
 } from "@/config/studio-room-4c-scenario-1-cedar-lane-v1";
 import { studioRoom4cMultiServiceClientGauntletV1 } from "@/config/studio-room-4c-multi-service-client-gauntlet-v1";
 import { evaluateCopyQuality } from "@/lib/studio-kitchen-production/copy-quality/evaluate";
-import { CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1 } from "@/lib/studio-campaign-creative";
+import { CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1, emitAssetLayers, getLayoutRecipe } from "@/lib/studio-campaign-creative";
+import { CAMPAIGN_FORMAT_CANVASES } from "@/lib/studio-campaign-creative/formats";
 import {
   buildCedarLaneCreativeBrief,
   buildScenario1Caption,
@@ -16,6 +17,7 @@ import {
   canonicalScenario1BriefJson,
   evaluateScenario1Acceptance,
   hashScenario1Brief,
+  isUsLetterMediaBox,
   routeScenario1Services,
   scenario1CopyQualityBrief,
 } from "@/lib/studio-room-4c-scenario-1";
@@ -172,5 +174,45 @@ describe("Room 4C Scenario 1 — provenance and delivery manifest", () => {
         files: [file("social-square.png", "social-graphic", "image/png")],
       }),
     ).toThrow(/DELIVERY_MANIFEST_MISSING/);
+  });
+});
+
+describe("Room 4C Scenario 1 — US Letter print geometry", () => {
+  it("uses 2550×3300 print canvas, not 2:3 1024×1536", () => {
+    expect(CAMPAIGN_FORMAT_CANVASES.print_handout).toEqual({
+      widthPx: 2550,
+      heightPx: 3300,
+    });
+    const recipe = getLayoutRecipe("full_bleed_hero", "print_handout");
+    expect(recipe.canvas).toEqual({ widthPx: 2550, heightPx: 3300 });
+    expect(brief.requestedDeliverables.find((d) => d.id === "print-handout")?.output).toContain(
+      "2550x3300",
+    );
+  });
+
+  it("treats 612×792 points as US Letter", () => {
+    expect(isUsLetterMediaBox({ width: 612, height: 792 })).toBe(true);
+    expect(isUsLetterMediaBox({ width: 1024, height: 1536 })).toBe(false);
+  });
+
+  it("paints dates in cream, not muted gray, on full-bleed recipes", () => {
+    const recipe = getLayoutRecipe("full_bleed_hero", "social_square");
+    const layers = emitAssetLayers({
+      recipe,
+      brief: buildCedarLaneCreativeBrief(),
+      system: CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1,
+      heroPreparedMaterialId: "hero",
+      logoMaterialId: "logo",
+    });
+    const dates = layers.find((l) => l.type === "text" && l.role === "dates");
+    expect(dates?.type).toBe("text");
+    if (dates?.type === "text") {
+      expect(dates.color.toLowerCase()).toBe(
+        CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1.palette.background.toLowerCase(),
+      );
+      expect(dates.color.toLowerCase()).not.toBe(
+        CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1.palette.muted.toLowerCase(),
+      );
+    }
   });
 });

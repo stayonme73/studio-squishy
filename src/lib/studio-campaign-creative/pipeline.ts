@@ -13,7 +13,7 @@ import {
   sha256File,
 } from "./bind";
 import type { CreativeBrief } from "./contracts";
-import { CAMPAIGN_FORMAT_ORDER } from "./formats";
+import { CAMPAIGN_FORMAT_ORDER, US_LETTER_PAGE } from "./formats";
 import {
   reasonCampaignCreativeSetDeterministic,
 } from "./reason/reason-campaign-set";
@@ -144,6 +144,13 @@ export async function runCampaignCreativePipeline(input: {
       pdfAbsolutePath: pdfAbs,
       widthPx: asset.canvas.widthPx,
       heightPx: asset.canvas.heightPx,
+      pdfPage:
+        asset.formatId === "print_handout"
+          ? {
+              width: `${US_LETTER_PAGE.widthIn}in`,
+              height: `${US_LETTER_PAGE.heightIn}in`,
+            }
+          : undefined,
     });
     if (!capture.overflowOk) {
       throw new Error(

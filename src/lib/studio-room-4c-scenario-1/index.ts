@@ -15,3 +15,4 @@ export {
 } from "./copy";
 export { buildScenario1Provenance } from "./provenance";
 export { buildScenario1DeliveryManifest } from "./delivery-manifest";
+export { readPdfMediaBoxPoints, isUsLetterMediaBox } from "./pdf-page";

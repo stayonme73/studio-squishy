@@ -38,6 +38,8 @@ import {
   canonicalScenario1BriefJson,
   evaluateScenario1Acceptance,
   hashScenario1Brief,
+  isUsLetterMediaBox,
+  readPdfMediaBoxPoints,
   routeScenario1Services,
   scenario1CopyQualityBrief,
 } from "../src/lib/studio-room-4c-scenario-1/index.ts";
@@ -470,7 +472,7 @@ async function main() {
     DELIVERABLES_REL,
     "social-square-phone-390.png",
   );
-  await sharp(socialDest).resize({ width: 390 }).png().toFile(phonePreviewAbs);
+  await sharp(socialDest).resize(390, 390, { fit: "fill" }).png().toFile(phonePreviewAbs);
 
   const videoDuration = probeDurationSeconds(videoDest);
 
@@ -626,12 +628,27 @@ async function main() {
     `${JSON.stringify(manifest, null, 2)}\n`,
   );
 
+  const mediaBox = readPdfMediaBoxPoints(handoutPdfDest);
+  if (
+    handoutMeta.width !== 2550 ||
+    handoutMeta.height !== 3300 ||
+    !mediaBox ||
+    !isUsLetterMediaBox(mediaBox)
+  ) {
+    throw new Error(
+      `PRINT_NOT_US_LETTER:png=${handoutMeta.width}x${handoutMeta.height} pdf=${JSON.stringify(mediaBox)}`,
+    );
+  }
+
   const qa = {
     copyOk: copyEval.ok,
     campaignQaPass: campaign.qa.pass,
     overflowOk: Object.values(campaign.overflowByAssetId).every(Boolean),
     socialDims:
       socialMeta.width === 1080 && socialMeta.height === 1080,
+    printPngLetter: true,
+    printPdfUsLetter: true,
+    printPdfMediaBox: mediaBox,
     printPngOk: pngLooksValid(handoutPngDest),
     printPdfOk: pdfLooksValid(handoutPdfDest),
     socialPngOk: pngLooksValid(socialDest),

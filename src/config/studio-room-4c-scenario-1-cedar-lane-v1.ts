@@ -71,7 +71,7 @@ export const studioRoom4cScenario1CedarLaneV1 = {
     {
       id: "print-handout",
       launchNowService: "print-collateral",
-      output: "one-page PNG and PDF",
+      output: "US Letter 8.5x11 in; PNG 2550x3300 at 300 DPI; PDF 612x792 pt",
     },
   ],
   refusedIfAsked: [

@@ -6,7 +6,7 @@ Accepted Launch Now services only:
 - Social graphics (square PNG)
 - Short-form video (vertical MP4)
 - Marketing copy / email (paste-ready caption)
-- Print collateral (one-page PNG + PDF)
+- Print collateral (US Letter 8.5×11 in; PNG 2550×3300 at 300 DPI; PDF 612×792 pt)
 
 Refused before production:
 

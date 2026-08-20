@@ -15,11 +15,119 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
   const { widthPx: W, heightPx: H } = canvasOf(formatId);
   const isPrint = formatId === "print_handout";
   const isSquare = formatId === "social_square";
+
+  if (isPrint) {
+    // US Letter 2550×3300 @ 300 DPI — reflowed, not a stretched 2:3 stack.
+    const margin = 180;
+    const stackH = 1180;
+    const contentTop = H - stackH;
+    const overlayTop = contentTop - 420;
+    const contentWidth = W - margin * 2;
+    return {
+      recipeId: `full_bleed_hero__${formatId}`,
+      familyId: "full_bleed_hero",
+      formatId,
+      canvas: { widthPx: W, heightPx: H },
+      slots: [
+        {
+          id: "hero",
+          kind: "image",
+          role: "hero",
+          box: { x: 0, y: 0, width: W, height: H },
+          fit: "cover",
+        },
+        {
+          id: "overlay",
+          kind: "shape",
+          role: "overlay",
+          box: {
+            x: 0,
+            y: overlayTop,
+            width: W,
+            height: H - overlayTop,
+          },
+        },
+        {
+          id: "logo",
+          kind: "logo",
+          role: "logo",
+          box: {
+            x: margin,
+            y: 160,
+            width: 780,
+            height: 220,
+          },
+          fit: "contain",
+        },
+        {
+          id: "headline",
+          kind: "text",
+          role: "headline",
+          box: { x: margin, y: contentTop + 56, width: contentWidth, height: 200 },
+          maxLines: 1,
+          minFontPx: 168,
+        },
+        {
+          id: "body",
+          kind: "text",
+          role: "body",
+          box: {
+            x: margin,
+            y: contentTop + 280,
+            width: contentWidth,
+            height: 220,
+          },
+          maxLines: 3,
+          minFontPx: 56,
+        },
+        {
+          id: "dates",
+          kind: "text",
+          role: "dates",
+          box: {
+            x: margin,
+            y: contentTop + 540,
+            width: contentWidth,
+            height: 88,
+          },
+          maxLines: 1,
+          minFontPx: 68,
+        },
+        {
+          id: "price",
+          kind: "text",
+          role: "price",
+          box: {
+            x: margin,
+            y: contentTop + 648,
+            width: contentWidth,
+            height: 96,
+          },
+          maxLines: 1,
+          minFontPx: 80,
+        },
+        {
+          id: "cta",
+          kind: "cta",
+          role: "cta",
+          box: {
+            x: margin,
+            y: contentTop + 780,
+            width: contentWidth,
+            height: 280,
+          },
+          maxLines: 2,
+          minFontPx: 64,
+        },
+      ],
+    };
+  }
+
   // Compact bottom stack — portrait owns most of the frame (especially vertical)
-  const stackH = isPrint ? 340 : isSquare ? 310 : 320;
+  const stackH = isSquare ? 310 : 320;
   const contentTop = H - stackH;
   const overlayTop = Math.max(0, contentTop - 96);
-  const contentWidth = Math.min(W - 96, isPrint ? W - 120 : Math.floor(W * 0.78));
+  const contentWidth = Math.min(W - 96, Math.floor(W * 0.78));
   return {
     recipeId: `full_bleed_hero__${formatId}`,
     familyId: "full_bleed_hero",
@@ -72,10 +180,10 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
           x: 48,
           y: contentTop + 58,
           width: contentWidth,
-          height: isPrint ? 64 : 48,
+          height: 48,
         },
-        maxLines: isPrint ? 3 : 2,
-        minFontPx: isPrint ? 18 : 17,
+        maxLines: 2,
+        minFontPx: 17,
       },
       {
         id: "dates",
@@ -83,12 +191,12 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
         role: "dates",
         box: {
           x: 48,
-          y: contentTop + (isPrint ? 130 : 114),
+          y: contentTop + 114,
           width: contentWidth,
           height: 28,
         },
         maxLines: 1,
-        minFontPx: 18,
+        minFontPx: 20,
       },
       {
         id: "price",
@@ -96,7 +204,7 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
         role: "price",
         box: {
           x: 48,
-          y: contentTop + (isPrint ? 164 : 148),
+          y: contentTop + 148,
           width: contentWidth,
           height: 36,
         },
@@ -109,12 +217,12 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
         role: "cta",
         box: {
           x: 48,
-          y: contentTop + (isPrint ? 214 : 198),
-          width: Math.min(isPrint ? contentWidth : 360, contentWidth),
-          height: isPrint ? 64 : 44,
+          y: contentTop + 198,
+          width: Math.min(360, contentWidth),
+          height: 44,
         },
-        maxLines: isPrint ? 2 : 1,
-        minFontPx: isPrint ? 17 : 18,
+        maxLines: 1,
+        minFontPx: 18,
       },
     ],
   };
@@ -122,8 +230,14 @@ function fullBleed(formatId: CampaignFormatId): LayoutRecipe {
 
 function splitHero(formatId: CampaignFormatId): LayoutRecipe {
   const { widthPx: W, heightPx: H } = canvasOf(formatId);
-  const photoH = formatId === "social_square" ? Math.floor(H * 0.52) : Math.floor(H * 0.48);
+  const isPrint = formatId === "print_handout";
+  const photoH = isPrint
+    ? Math.floor(H * 0.5)
+    : formatId === "social_square"
+      ? Math.floor(H * 0.52)
+      : Math.floor(H * 0.48);
   const panelY = photoH;
+  const gutter = isPrint ? 180 : 48;
   return {
     recipeId: `split_hero__${formatId}`,
     familyId: "split_hero",
@@ -147,53 +261,78 @@ function splitHero(formatId: CampaignFormatId): LayoutRecipe {
         id: "logo",
         kind: "logo",
         role: "logo",
-        box: { x: 48, y: panelY + 32, width: 96, height: 96 },
+        box: {
+          x: gutter,
+          y: panelY + (isPrint ? 80 : 32),
+          width: isPrint ? 220 : 96,
+          height: isPrint ? 220 : 96,
+        },
         fit: "contain",
       },
       {
         id: "headline",
         kind: "text",
         role: "headline",
-        box: { x: 168, y: panelY + 40, width: W - 216, height: 72 },
+        box: {
+          x: gutter + (isPrint ? 260 : 120),
+          y: panelY + (isPrint ? 100 : 40),
+          width: W - gutter * 2 - (isPrint ? 260 : 120),
+          height: isPrint ? 180 : 72,
+        },
         maxLines: 2,
-        minFontPx: 32,
+        minFontPx: isPrint ? 96 : 32,
       },
       {
         id: "body",
         kind: "text",
         role: "body",
-        box: { x: 48, y: panelY + 140, width: W - 96, height: 72 },
+        box: {
+          x: gutter,
+          y: panelY + (isPrint ? 340 : 140),
+          width: W - gutter * 2,
+          height: isPrint ? 180 : 72,
+        },
         maxLines: 2,
-        minFontPx: 20,
+        minFontPx: isPrint ? 48 : 20,
       },
       {
         id: "dates",
         kind: "text",
         role: "dates",
-        box: { x: 48, y: panelY + 220, width: W - 96, height: 36 },
+        box: {
+          x: gutter,
+          y: panelY + (isPrint ? 560 : 220),
+          width: W - gutter * 2,
+          height: isPrint ? 80 : 36,
+        },
         maxLines: 1,
-        minFontPx: 20,
+        minFontPx: isPrint ? 56 : 20,
       },
       {
         id: "price",
         kind: "text",
         role: "price",
-        box: { x: 48, y: panelY + 268, width: W - 96, height: 48 },
+        box: {
+          x: gutter,
+          y: panelY + (isPrint ? 660 : 268),
+          width: W - gutter * 2,
+          height: isPrint ? 100 : 48,
+        },
         maxLines: 1,
-        minFontPx: 36,
+        minFontPx: isPrint ? 72 : 36,
       },
       {
         id: "cta",
         kind: "cta",
         role: "cta",
         box: {
-          x: 48,
-          y: Math.min(H - 100, panelY + 340),
-          width: Math.min(400, W - 96),
-          height: 60,
+          x: gutter,
+          y: isPrint ? H - 360 : Math.min(H - 100, panelY + 340),
+          width: Math.min(isPrint ? W - gutter * 2 : 400, W - gutter * 2),
+          height: isPrint ? 220 : 60,
         },
-        maxLines: 1,
-        minFontPx: 20,
+        maxLines: isPrint ? 2 : 1,
+        minFontPx: isPrint ? 48 : 20,
       },
     ],
   };
@@ -201,8 +340,13 @@ function splitHero(formatId: CampaignFormatId): LayoutRecipe {
 
 function imagePanel(formatId: CampaignFormatId): LayoutRecipe {
   const { widthPx: W, heightPx: H } = canvasOf(formatId);
-  const gutter = 40;
-  const photoW = Math.floor(W * 0.58);
+  const isPrint = formatId === "print_handout";
+  const gutter = isPrint ? 80 : 40;
+  const photoW = Math.floor(W * (isPrint ? 0.55 : 0.58));
+  const panelX = photoW;
+  const panelW = W - photoW;
+  const typeX = panelX + (isPrint ? 80 : 32);
+  const typeW = panelW - (isPrint ? 160 : 64);
   return {
     recipeId: `image_panel__${formatId}`,
     familyId: "image_panel",
@@ -231,45 +375,65 @@ function imagePanel(formatId: CampaignFormatId): LayoutRecipe {
         id: "logo",
         kind: "logo",
         role: "logo",
-        box: { x: photoW + 32, y: 48, width: 88, height: 88 },
+        box: {
+          x: typeX,
+          y: isPrint ? 120 : 48,
+          width: isPrint ? 200 : 88,
+          height: isPrint ? 200 : 88,
+        },
         fit: "contain",
       },
       {
         id: "headline",
         kind: "text",
         role: "headline",
-        box: { x: photoW + 32, y: 160, width: W - photoW - 64, height: 100 },
+        box: {
+          x: typeX,
+          y: isPrint ? 360 : 160,
+          width: typeW,
+          height: isPrint ? 280 : 100,
+        },
         maxLines: 3,
-        minFontPx: 28,
+        minFontPx: isPrint ? 72 : 28,
       },
       {
         id: "dates",
         kind: "text",
         role: "dates",
-        box: { x: photoW + 32, y: 280, width: W - photoW - 64, height: 48 },
+        box: {
+          x: typeX,
+          y: isPrint ? 680 : 280,
+          width: typeW,
+          height: isPrint ? 120 : 48,
+        },
         maxLines: 2,
-        minFontPx: 18,
+        minFontPx: isPrint ? 48 : 18,
       },
       {
         id: "price",
         kind: "text",
         role: "price",
-        box: { x: photoW + 32, y: 340, width: W - photoW - 64, height: 56 },
+        box: {
+          x: typeX,
+          y: isPrint ? 840 : 340,
+          width: typeW,
+          height: isPrint ? 120 : 56,
+        },
         maxLines: 1,
-        minFontPx: 32,
+        minFontPx: isPrint ? 72 : 32,
       },
       {
         id: "cta",
         kind: "cta",
         role: "cta",
         box: {
-          x: photoW + 32,
-          y: H - 140,
-          width: W - photoW - 64,
-          height: 60,
+          x: typeX,
+          y: isPrint ? H - 420 : H - 140,
+          width: typeW,
+          height: isPrint ? 260 : 60,
         },
-        maxLines: 1,
-        minFontPx: 18,
+        maxLines: isPrint ? 2 : 1,
+        minFontPx: isPrint ? 44 : 18,
       },
     ],
   };
