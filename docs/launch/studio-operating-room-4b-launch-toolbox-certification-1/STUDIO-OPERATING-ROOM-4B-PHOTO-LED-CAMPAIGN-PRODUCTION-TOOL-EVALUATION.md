@@ -2,8 +2,8 @@
 
 **Package:** `STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1` (continuation)  
 **Manager verdict:** 4B REMAINS OPEN  
+**This evaluation tip:** `cdf39bf`  
 **Prior work tip:** `f21c65e` · hash note `de0ad14`  
-**This evaluation tip:** recorded at commit (below)  
 **Mode:** Selection / CapCut-style operating gates — **no purchase · no subscription · no integration**  
 **Room 5:** NOT STARTED · **No merge** · **No next Toolbox certification**  
 **Carousel:** stays **NOT ON LAUNCH MENU** (accepted)

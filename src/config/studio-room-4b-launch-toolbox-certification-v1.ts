@@ -53,16 +53,10 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
   hashNote: "7fdcefe" as const,
 
   /**
-   * Carousel decision (Blocker 7) — evidence-based, not wishful.
-   * Missing: multi-slide contract, sizing set, export, Review/Delivery, QA.
-   * Catalog already excludes carousels on v2-rtu-social-posts.
-   * Decision B: do not advertise as Launch Now capability.
-   */
-  /**
    * Campaign creative is NOT abandoned.
    * Text-led CERT plates remain accepted with limits.
    * Photo-led campaign art direction is OPEN pending CapCut-style engine cert.
-   * Carousel stays off the Launch Now menu.
+   * Carousel stays off the Launch Now menu (Manager accepted).
    */
   campaignCreativeStatus: {
     abandoned: false as const,
