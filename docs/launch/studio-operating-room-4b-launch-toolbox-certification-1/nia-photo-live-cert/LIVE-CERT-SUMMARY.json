@@ -1,0 +1,22 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-4B-NIA-PHOTO-LED-LIVE-CERTIFICATION-1",
+  "kind": "controlled_fictional_nia_photo_pack_live_cert",
+  "packRel": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-pack",
+  "outRel": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-live-cert",
+  "v1": {
+    "hero": "nia-photo-good-2",
+    "familyId": "full_bleed_hero",
+    "renderVersion": 1,
+    "dir": "v1-hero-good-2-standing",
+    "qaPass": true
+  },
+  "v2": {
+    "hero": "nia-photo-good-1",
+    "familyId": "full_bleed_hero",
+    "renderVersion": 2,
+    "dir": "v2-revision-window-good-1",
+    "qaPass": true,
+    "systemPreserved": true
+  },
+  "creativeDirectorQuestion": "Would The Studio confidently charge Nia for this exact campaign?"
+}

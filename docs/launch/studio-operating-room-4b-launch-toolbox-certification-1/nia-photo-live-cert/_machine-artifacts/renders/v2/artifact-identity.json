@@ -1,0 +1,22 @@
+{
+  "packageId": "STUDIO-OPERATING-ROOM-4B-MACHINE-NATIVE-PHOTO-LED-CAMPAIGN-PRODUCTION-BUILD-1",
+  "campaignId": "nia-r4b-photo-led-live-cert",
+  "systemId": "rooted-ready-wellness-v1",
+  "familyId": "full_bleed_hero",
+  "renderVersion": 2,
+  "heroMaterialId": "nia-photo-good-1",
+  "materialFingerprint": "66a888db0a7ecfb32e3b65fd2119aa29577c0172d1bf9319b69e75db2f4f431a",
+  "setFingerprint": "21caf56d395ceaa39958ac54a440738671fe2bf62b18930b83f4f75b13e86233",
+  "assetFingerprints": {
+    "social_square__full_bleed_hero": "e83be4fc21f26b12466842cb8bca04146d95a65f2618719a9697c50ed4bd688f",
+    "social_vertical__full_bleed_hero": "e8b34f48fecc60310e26d8c26ff853c8f74ed891d988e3a0effdc4cafc3c407b",
+    "print_handout__full_bleed_hero": "84a53c17243bf70dabe5322ad3d59b64d25e78b3317ef1fbea06065d0028c368"
+  },
+  "pngShas": {
+    "social_square__full_bleed_hero": "086b31fbded548dd90b2d54754f6f54cf3e3bfb5da52e33d6e6561192f9e962d",
+    "social_vertical__full_bleed_hero": "80ac344ba6642c48e8cacef93fc2518699c3df0abf67730b970f1a4629af61c6",
+    "print_handout__full_bleed_hero": "0ba1ff07064e677f462aadb260c9be7845dbed67f333c32fd425f2567c187c61"
+  },
+  "createdAt": "2026-08-20T02:09:52.918Z",
+  "rendererVersion": "studio-campaign-creative-1.0.0"
+}

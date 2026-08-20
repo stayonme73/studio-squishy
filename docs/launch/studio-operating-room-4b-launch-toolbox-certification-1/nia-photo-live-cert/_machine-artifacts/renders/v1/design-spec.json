@@ -1,0 +1,465 @@
+{
+  "specVersion": "campaign-creative-design-spec-1.0.0",
+  "systemId": "rooted-ready-wellness-v1",
+  "familyId": "full_bleed_hero",
+  "colors": {
+    "primary": "#1F3A4D",
+    "secondary": "#8B7355",
+    "background": "#F7F3EC",
+    "text": "#1A1A1A",
+    "muted": "#6B6560",
+    "accent": "#C4A484"
+  },
+  "materials": [
+    {
+      "materialId": "nia-logo",
+      "role": "logo",
+      "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-pack/nia-logo.png",
+      "contentSha256": "66615b77f4bc3ddf3f38270b6699f3aa9dbb867593fe5e79065708922dea2bb0"
+    },
+    {
+      "materialId": "nia-photo-good-2__social_square__50be50139ccf",
+      "role": "hero",
+      "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-live-cert/_machine-artifacts/prepared/v1/hero-social_square.jpg",
+      "contentSha256": "50be50139ccffe6ac93a925a83a4b5319fe792606627959fc9e0832293e238a4"
+    },
+    {
+      "materialId": "nia-photo-good-2__social_vertical__74a8974543f5",
+      "role": "hero",
+      "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-live-cert/_machine-artifacts/prepared/v1/hero-social_vertical.jpg",
+      "contentSha256": "74a8974543f5cd8beb97e2e425b3235eb015d359894677c698db99cb37b55151"
+    },
+    {
+      "materialId": "nia-photo-good-2__print_handout__10c4edb573ae",
+      "role": "hero",
+      "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/nia-photo-live-cert/_machine-artifacts/prepared/v1/hero-print_handout.jpg",
+      "contentSha256": "10c4edb573ae97ceb99ac88bc29a64e5b3942f4d746007e5cc7f480a2b237e84"
+    }
+  ],
+  "brief": {
+    "campaignId": "nia-r4b-photo-led-live-cert",
+    "businessName": "Rooted & Ready Wellness Studio",
+    "facts": {
+      "headline": "Fall Reset",
+      "supportingCopy": "Six-week wellness program for busy women. Calm, grown-up, motivating.",
+      "datesDisplay": "September 9 – October 20, 2026",
+      "priceDisplay": "$297",
+      "cta": "Enroll in Fall Reset",
+      "bookingContact": "(804) 555-0194 · rootedandready.example/fall-reset"
+    },
+    "constraints": {
+      "noNeon": true,
+      "noBeforeAfterBody": true,
+      "calmWellness": true
+    },
+    "voiceDirection": "I really don't want this to look like one of those loud fitness challenges. My customers are mostly women in their thirties through fifties. I want it to feel calm but motivating. No neon colors and no before-and-after body pictures."
+  },
+  "assets": [
+    {
+      "assetId": "social_square__full_bleed_hero",
+      "formatId": "social_square",
+      "recipeId": "full_bleed_hero__social_square",
+      "familyId": "full_bleed_hero",
+      "canvas": {
+        "widthPx": 1080,
+        "heightPx": 1080
+      },
+      "background": {
+        "color": "#F7F3EC"
+      },
+      "layers": [
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_square-hero",
+          "role": "hero",
+          "materialId": "nia-photo-good-2__social_square__50be50139ccf",
+          "x": 0,
+          "y": 0,
+          "width": 1080,
+          "height": 1080,
+          "fit": "cover"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_square-overlay",
+          "role": "overlay",
+          "x": 0,
+          "y": 554,
+          "width": 1080,
+          "height": 526,
+          "fill": "rgba(31, 58, 77, 0.45)"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_square-logo-plate",
+          "role": "logo_plate",
+          "x": 40,
+          "y": 40,
+          "width": 210,
+          "height": 210,
+          "fill": "#FFFFFF",
+          "borderRadiusPx": 16
+        },
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_square-logo",
+          "role": "logo",
+          "materialId": "nia-logo",
+          "x": 48,
+          "y": 48,
+          "width": 194,
+          "height": 194,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-headline",
+          "role": "headline",
+          "content": "Fall Reset",
+          "x": 48,
+          "y": 594,
+          "width": 984,
+          "fontSizePx": 36,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#F7F3EC",
+          "align": "left",
+          "maxLines": 2
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-dates",
+          "role": "dates",
+          "content": "September 9 – October 20, 2026",
+          "x": 48,
+          "y": 682,
+          "width": 984,
+          "fontSizePx": 22,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#E8E0D5",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-price",
+          "role": "price",
+          "content": "$297",
+          "x": 48,
+          "y": 730,
+          "width": 984,
+          "fontSizePx": 40,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#FFFFFF",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_square-cta-btn",
+          "role": "cta_button",
+          "x": 48,
+          "y": 814,
+          "width": 420,
+          "height": 64,
+          "fill": "#1F3A4D",
+          "borderRadiusPx": 12
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-cta",
+          "role": "cta",
+          "content": "Enroll in Fall Reset",
+          "x": 64,
+          "y": 830,
+          "width": 388,
+          "fontSizePx": 22,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F7F3EC",
+          "align": "center",
+          "maxLines": 1
+        }
+      ],
+      "outputFormats": [
+        "png"
+      ]
+    },
+    {
+      "assetId": "social_vertical__full_bleed_hero",
+      "formatId": "social_vertical",
+      "recipeId": "full_bleed_hero__social_vertical",
+      "familyId": "full_bleed_hero",
+      "canvas": {
+        "widthPx": 1080,
+        "heightPx": 1920
+      },
+      "background": {
+        "color": "#F7F3EC"
+      },
+      "layers": [
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_vertical-hero",
+          "role": "hero",
+          "materialId": "nia-photo-good-2__social_vertical__74a8974543f5",
+          "x": 0,
+          "y": 0,
+          "width": 1080,
+          "height": 1920,
+          "fit": "cover"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_vertical-overlay",
+          "role": "overlay",
+          "x": 0,
+          "y": 1073,
+          "width": 1080,
+          "height": 847,
+          "fill": "rgba(31, 58, 77, 0.45)"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_vertical-logo-plate",
+          "role": "logo_plate",
+          "x": 40,
+          "y": 40,
+          "width": 210,
+          "height": 210,
+          "fill": "#FFFFFF",
+          "borderRadiusPx": 16
+        },
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_vertical-logo",
+          "role": "logo",
+          "materialId": "nia-logo",
+          "x": 48,
+          "y": 48,
+          "width": 194,
+          "height": 194,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-headline",
+          "role": "headline",
+          "content": "Fall Reset",
+          "x": 48,
+          "y": 1113,
+          "width": 984,
+          "fontSizePx": 36,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#F7F3EC",
+          "align": "left",
+          "maxLines": 2
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-dates",
+          "role": "dates",
+          "content": "September 9 – October 20, 2026",
+          "x": 48,
+          "y": 1201,
+          "width": 984,
+          "fontSizePx": 22,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#E8E0D5",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-price",
+          "role": "price",
+          "content": "$297",
+          "x": 48,
+          "y": 1249,
+          "width": 984,
+          "fontSizePx": 40,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#FFFFFF",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_vertical-cta-btn",
+          "role": "cta_button",
+          "x": 48,
+          "y": 1333,
+          "width": 420,
+          "height": 64,
+          "fill": "#1F3A4D",
+          "borderRadiusPx": 12
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-cta",
+          "role": "cta",
+          "content": "Enroll in Fall Reset",
+          "x": 64,
+          "y": 1349,
+          "width": 388,
+          "fontSizePx": 22,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F7F3EC",
+          "align": "center",
+          "maxLines": 1
+        }
+      ],
+      "outputFormats": [
+        "png"
+      ]
+    },
+    {
+      "assetId": "print_handout__full_bleed_hero",
+      "formatId": "print_handout",
+      "recipeId": "full_bleed_hero__print_handout",
+      "familyId": "full_bleed_hero",
+      "canvas": {
+        "widthPx": 1024,
+        "heightPx": 1536
+      },
+      "background": {
+        "color": "#F7F3EC"
+      },
+      "layers": [
+        {
+          "type": "image",
+          "id": "full_bleed_hero__print_handout-hero",
+          "role": "hero",
+          "materialId": "nia-photo-good-2__print_handout__10c4edb573ae",
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 1536,
+          "fit": "cover"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__print_handout-overlay",
+          "role": "overlay",
+          "x": 0,
+          "y": 850,
+          "width": 1024,
+          "height": 686,
+          "fill": "rgba(31, 58, 77, 0.45)"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__print_handout-logo-plate",
+          "role": "logo_plate",
+          "x": 40,
+          "y": 40,
+          "width": 200,
+          "height": 200,
+          "fill": "#FFFFFF",
+          "borderRadiusPx": 16
+        },
+        {
+          "type": "image",
+          "id": "full_bleed_hero__print_handout-logo",
+          "role": "logo",
+          "materialId": "nia-logo",
+          "x": 48,
+          "y": 48,
+          "width": 184,
+          "height": 184,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_handout-headline",
+          "role": "headline",
+          "content": "Fall Reset",
+          "x": 48,
+          "y": 890,
+          "width": 928,
+          "fontSizePx": 36,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#F7F3EC",
+          "align": "left",
+          "maxLines": 2
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_handout-dates",
+          "role": "dates",
+          "content": "September 9 – October 20, 2026",
+          "x": 48,
+          "y": 978,
+          "width": 928,
+          "fontSizePx": 22,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#E8E0D5",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_handout-price",
+          "role": "price",
+          "content": "$297",
+          "x": 48,
+          "y": 1026,
+          "width": 928,
+          "fontSizePx": 40,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#FFFFFF",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__print_handout-cta-btn",
+          "role": "cta_button",
+          "x": 48,
+          "y": 1110,
+          "width": 420,
+          "height": 64,
+          "fill": "#1F3A4D",
+          "borderRadiusPx": 12
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_handout-cta",
+          "role": "cta",
+          "content": "Enroll in Fall Reset",
+          "x": 64,
+          "y": 1126,
+          "width": 388,
+          "fontSizePx": 22,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F7F3EC",
+          "align": "center",
+          "maxLines": 1
+        }
+      ],
+      "outputFormats": [
+        "png",
+        "pdf"
+      ]
+    }
+  ],
+  "reasoningMode": "deterministic_constrained",
+  "reasoning": {
+    "familyId": "full_bleed_hero",
+    "heroMaterialId": "nia-photo-good-2",
+    "rationaleCodes": [
+      "bounded_grammar_only",
+      "portrait_prefers_full_bleed"
+    ]
+  }
+}
