@@ -24,6 +24,19 @@ export const CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER = {
   },
 } as const;
 
+/** 5×7 in counter/shelf card at 300 DPI. Not a handout rewrite. */
+export const CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7 = {
+  contractId: "campaign-print-counter-card-v1-5x7" as const,
+  widthPx: 1500,
+  heightPx: 2100,
+  pdfPage: {
+    width: "5in" as const,
+    height: "7in" as const,
+    widthPt: 360,
+    heightPt: 504,
+  },
+} as const;
+
 export type CampaignPrintHandoutContractId =
   | typeof CAMPAIGN_PRINT_HANDOUT_CONTRACT_V1.contractId
   | typeof CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER.contractId;
@@ -66,16 +79,25 @@ export const CAMPAIGN_FORMAT_CANVASES = {
     widthPx: CAMPAIGN_PRINT_HANDOUT_CONTRACT_V1.widthPx,
     heightPx: CAMPAIGN_PRINT_HANDOUT_CONTRACT_V1.heightPx,
   },
+  print_counter_card: {
+    widthPx: CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.widthPx,
+    heightPx: CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.heightPx,
+  },
 } as const satisfies Record<
   CampaignFormatId,
   { widthPx: number; heightPx: number }
 >;
 
+/** Historical three-format campaign set. Counter card is opt-in via targetFormats. */
 export const CAMPAIGN_FORMAT_ORDER: readonly CampaignFormatId[] = [
   "social_square",
   "social_vertical",
   "print_handout",
 ] as const;
+
+export function isCampaignPrintFormat(formatId: CampaignFormatId): boolean {
+  return formatId === "print_handout" || formatId === "print_counter_card";
+}
 
 /** @deprecated Use CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER */
 export const US_LETTER_300DPI = {

@@ -47,7 +47,9 @@ Fictional customers only. Preserve approved substance.
 
 **Limits disclosed:** no ads operations; no carousel; Level 1 ad creative only if creatively requested and already sellable as creative production — never targeting/budgets/ops.
 
-**Scenario status at package open:** NOT_STARTED
+**Scenario status at package open:** NOT_STARTED  
+**Scenario status now:** EXECUTED · OWNER DECISION PENDING  
+**Fact status:** OWNER_APPROVED_FOR_CERTIFICATION (locked package-brief facts only; no shop URL, contact email, or phone was authorized)
 
 ---
 

@@ -4,6 +4,7 @@
  */
 
 import { CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1 } from "./cedar-lane-home-organizing-v1";
+import { HARBOR_ROAST_COFFEE_VISUAL_SYSTEM_V1 } from "./harbor-roast-coffee-v1";
 import type { CampaignVisualSystem } from "../contracts";
 
 export const ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1: CampaignVisualSystem = {
@@ -55,6 +56,9 @@ export function loadCampaignVisualSystem(systemId: string): CampaignVisualSystem
   }
   if (systemId === CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1.systemId) {
     return CEDAR_LANE_HOME_ORGANIZING_VISUAL_SYSTEM_V1;
+  }
+  if (systemId === HARBOR_ROAST_COFFEE_VISUAL_SYSTEM_V1.systemId) {
+    return HARBOR_ROAST_COFFEE_VISUAL_SYSTEM_V1;
   }
   throw new Error(`UNKNOWN_CAMPAIGN_VISUAL_SYSTEM:${systemId}`);
 }

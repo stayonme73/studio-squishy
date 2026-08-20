@@ -1,0 +1,66 @@
+{
+  "workPacketId": "room-4c-s2-1787264951170",
+  "workPacketVersion": "wp-s2-v1",
+  "storyboardVersion": "sb-s2-v1",
+  "scriptVersionId": "harbor-roast-s2-narration-1787264951170",
+  "campaignId": "room-4c-s2-harbor-roast-coffee",
+  "skuId": "v2-rtu-short-video",
+  "label": "Room 4C Scenario 2 Harbor Roast Coffee Co. — coordinated short-form video",
+  "durationMinSeconds": 20,
+  "durationMaxSeconds": 30,
+  "durationTargetSeconds": 20,
+  "aspectRatio": "vertical",
+  "width": 1080,
+  "height": 1920,
+  "exportFormat": "mp4",
+  "musicAllowed": false,
+  "stockAllowed": false,
+  "productionMethod": "shotstack",
+  "productionRoleOwner": "creative_production",
+  "voiceArtifact": {
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787264951170_538314367190.mp3",
+    "contentSha256": "538314367190fad5d3c804833479d70b70f2c1942cbf0abc93f6dd254648a6ab"
+  },
+  "exportRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787264951170.mp4",
+  "ctaCaptionSceneNumber": 4,
+  "primaryCtaText": "Limited autumn box",
+  "requiredShotstackEnv": "v1",
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "assetId": "harbor-roast-beat-1",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-01-brand.png",
+      "startSeconds": 0,
+      "endSeconds": 2.816,
+      "caption": "Autumn launch",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 2,
+      "assetId": "harbor-roast-beat-2",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-02-offer.png",
+      "startSeconds": 2.816,
+      "endSeconds": 8.192,
+      "caption": "Autumn Single-Origin Box",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 3,
+      "assetId": "harbor-roast-beat-3",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-03-price.png",
+      "startSeconds": 8.192,
+      "endSeconds": 12.8,
+      "caption": "$48",
+      "captionPresentation": "embedded_in_plate"
+    },
+    {
+      "sceneNumber": 4,
+      "assetId": "harbor-roast-beat-4",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/beat-04-cta.png",
+      "startSeconds": 12.8,
+      "endSeconds": 20,
+      "caption": "Limited autumn box",
+      "captionPresentation": "overlay"
+    }
+  ]
+}

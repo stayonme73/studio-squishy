@@ -12,6 +12,7 @@ import { PRODUCTION_ALLOWED_FACT_STATUSES } from "./types";
 
 const PHONE_RE = /\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
 const URL_RE = /\b[a-z0-9][a-z0-9.-]*\.[a-z]{2,}\/[^\s]*/gi;
+const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
 
 const PLACEHOLDER_PATTERNS: readonly RegExp[] = [
   /\(555\)\s*555-5555/,
@@ -96,6 +97,17 @@ function approvedUrls(record: ApprovedCustomerFactRecord): Set<string> {
     }
   }
   return urls;
+}
+
+function approvedEmails(record: ApprovedCustomerFactRecord): Set<string> {
+  const emails = new Set<string>();
+  for (const value of Object.values(record.values)) {
+    if (!value) continue;
+    for (const match of value.matchAll(new RegExp(EMAIL_RE.source, "gi"))) {
+      emails.add(match[0].toLowerCase());
+    }
+  }
+  return emails;
 }
 
 export function evaluateApprovedCustomerFactRecord(
@@ -235,6 +247,19 @@ function evaluateSource(
         sourceId: source.sourceId,
         expected: match[0],
         detail: `${source.sourceId} contains a booking URL that is not on the approved fact record.`,
+      });
+    }
+  }
+
+  const emails = approvedEmails(record);
+  for (const match of source.text.matchAll(new RegExp(EMAIL_RE.source, "gi"))) {
+    const normalized = match[0].toLowerCase();
+    if (normalized && !emails.has(normalized)) {
+      push(findings, {
+        code: "machine_inferred_contact",
+        sourceId: source.sourceId,
+        expected: match[0],
+        detail: `${source.sourceId} contains an email that is not on the approved fact record.`,
       });
     }
   }

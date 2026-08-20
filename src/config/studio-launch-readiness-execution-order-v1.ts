@@ -222,6 +222,8 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     doNotMerge: true as const,
     doNotExpandLaunchMenu: true as const,
     scenario1Status: "PASS WITH EXPLICIT LIMITS" as const,
+    scenario2Status: "EXECUTED_OWNER_DECISION_PENDING" as const,
+    scenario3Status: "NOT_STARTED" as const,
     configModule:
       "src/config/studio-room-4c-multi-service-client-gauntlet-v1.ts" as const,
   },

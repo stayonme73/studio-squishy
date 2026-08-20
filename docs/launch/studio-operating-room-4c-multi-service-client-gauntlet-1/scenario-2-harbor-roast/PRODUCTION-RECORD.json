@@ -1,0 +1,178 @@
+{
+  "generatedAt": "2026-08-20T22:29:06.619Z",
+  "briefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721",
+  "acceptance": {
+    "admit": true,
+    "menuOk": true,
+    "unsupportedRefused": [
+      "carousel",
+      "ad_account_ops",
+      "unsupported_sizes_outside_studio_contracts"
+    ],
+    "disclosedLimits": [
+      "Short-form video: READY WITH EXPLICIT LIMITS",
+      "Social graphics: READY WITH EXPLICIT LIMITS",
+      "Print collateral: READY WITH EXPLICIT LIMITS",
+      "Marketing copy / email: READY WITH EXPLICIT LIMITS",
+      "Campaign creative: READY WITH EXPLICIT LIMITS",
+      "Carousel: NOT ON LAUNCH MENU",
+      "No owner production labor. Owner creative review is approval, not production.",
+      "No shop URL was owner-authorized; none is shown.",
+      "No contact email was owner-authorized; none is shown.",
+      "No phone was owner-authorized; none is shown.",
+      "Box contents are the authorized product name only. Origin, weight, and tasting notes were not supplied and are not invented.",
+      "Fictional customer. Production facts are OWNER_APPROVED_FOR_CERTIFICATION from the locked package brief.",
+      "Studio-produced campaign photography — not customer-supplied photos.",
+      "Video narration uses ElevenLabs as a production tool for the short-video SKU; a standalone voice SKU was not sold.",
+      "Customer prints and posts; Studio does not run ads, targeting, or social accounts.",
+      "Counter card is 5×7 in (1500×2100 px at 300 DPI; PDF 360×504 pt). Not a US Letter rewrite."
+    ],
+    "carousel": {
+      "admit": false,
+      "reason": "catalog_exclusion_on_social_posts",
+      "customerFacingMessage": "Social carousels are not on The Studio Launch Now menu. We can produce coordinated static social graphics instead, within the purchased social-posts scope."
+    },
+    "findings": []
+  },
+  "routing": [
+    {
+      "deliverableId": "campaign-direction",
+      "launchNowService": "campaign-creative",
+      "productionPath": "scenario_2_direction_from_brief",
+      "toolId": "studio_campaign_creative",
+      "skuId": "campaign-creative",
+      "note": "Written campaign direction bound to the hashed Harbor Roast brief."
+    },
+    {
+      "deliverableId": "campaign-set",
+      "launchNowService": "campaign-creative",
+      "productionPath": "studio_campaign_creative_pipeline",
+      "toolId": "studio_campaign_creative",
+      "skuId": "campaign-creative",
+      "note": "Coordinator. One CreativeBrief drives square social, vertical social, and 5×7 counter card."
+    },
+    {
+      "deliverableId": "social-square",
+      "launchNowService": "social-graphics",
+      "productionPath": "studio_campaign_creative_pipeline",
+      "toolId": "studio_campaign_creative",
+      "skuId": "v2-rtu-social-posts",
+      "note": "Square PNG from the shared campaign set (social_square)."
+    },
+    {
+      "deliverableId": "social-vertical",
+      "launchNowService": "social-graphics",
+      "productionPath": "studio_campaign_creative_pipeline",
+      "toolId": "studio_campaign_creative",
+      "skuId": "v2-rtu-social-posts",
+      "note": "Vertical PNG from the shared campaign set (social_vertical)."
+    },
+    {
+      "deliverableId": "print-counter-card",
+      "launchNowService": "print-collateral",
+      "productionPath": "studio_campaign_creative_pipeline",
+      "toolId": "studio_campaign_creative",
+      "skuId": "v2-rtu-flyer",
+      "note": "5×7 counter card PNG + PDF. Print CTA is the authorized label; no invented URL."
+    },
+    {
+      "deliverableId": "promo-caption",
+      "launchNowService": "marketing-copy-email",
+      "productionPath": "scenario_2_copy_from_brief",
+      "toolId": "studio_copy_quality_gate",
+      "skuId": "marketing-copy",
+      "note": "Paste-ready caption assembled from the same campaign facts."
+    },
+    {
+      "deliverableId": "promo-email",
+      "launchNowService": "marketing-copy-email",
+      "productionPath": "scenario_2_copy_from_brief",
+      "toolId": "studio_copy_quality_gate",
+      "skuId": "marketing-copy",
+      "note": "Paste-ready promotional email. No shop URL or contact email was authorized."
+    },
+    {
+      "deliverableId": "short-vertical-video",
+      "launchNowService": "short-form-video",
+      "productionPath": "shotstack_work_packet",
+      "toolId": "shotstack",
+      "skuId": "v2-rtu-short-video",
+      "note": "Vertical MP4 from the same facts and visual system. ElevenLabs TTS is supporting narration, not a sold voice SKU."
+    }
+  ],
+  "campaign": {
+    "renderVersion": 2,
+    "systemId": "harbor-roast-coffee-v1",
+    "familyId": "full_bleed_hero",
+    "setFingerprint": "85e6e565751213e32f588a8e168b774a85c933cec72490ce6f6b546c1573a147",
+    "pngShas": {
+      "social_square__full_bleed_hero": "5bd3368ce9905bece27844c612f5dd4570cd1e709fbae72349f0ed72f07478c6",
+      "social_vertical__full_bleed_hero": "6c29eae42facd8ed9434df74894912bb04005850d8918a931b684e1cb190af88",
+      "print_counter_card__full_bleed_hero": "474b33c43772f1ee608b9b69ecabc6ec02c5518bde8bbf1c385b2d291b6935ff"
+    }
+  },
+  "voice": {
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787264951170_538314367190.mp3",
+    "contentSha256": "538314367190fad5d3c804833479d70b70f2c1942cbf0abc93f6dd254648a6ab",
+    "skuUsedForTtsAdapter": "ap-001",
+    "soldAs": "supporting narration for v2-rtu-short-video"
+  },
+  "video": {
+    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/work-packet-s2-1787264951170.json",
+    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787264951170.mp4",
+    "durationSeconds": 20,
+    "providerRenderId": "516b35a0-fe66-4001-b509-8751d606ab6e"
+  },
+  "print": {
+    "pngPx": {
+      "width": 1500,
+      "height": 2100
+    },
+    "pdfMediaBoxPt": {
+      "x": 0,
+      "y": 0,
+      "width": 360,
+      "height": 504
+    },
+    "contractId": "campaign-print-counter-card-v1-5x7"
+  },
+  "tools": [
+    "studio_campaign_creative",
+    "elevenlabs_tts_adapter",
+    "shotstack",
+    "studio_copy_quality_gate"
+  ],
+  "ownerLabor": [
+    "None. Scout generated campaign photography via the Studio image tool, wrote a deterministic SVG logo, and ran existing Machine pipelines. Tagia did not design, edit, format, or repair deliverables."
+  ],
+  "qa": {
+    "copyOk": true,
+    "campaignQaPass": true,
+    "overflowOk": true,
+    "socialDims": true,
+    "verticalDims": true,
+    "phonePreview390x390": true,
+    "printPngFiveBySeven": true,
+    "printPdfFiveBySeven": true,
+    "printPdfMediaBox": {
+      "x": 0,
+      "y": 0,
+      "width": 360,
+      "height": 504
+    },
+    "printCounterCardContractId": "campaign-print-counter-card-v1-5x7",
+    "printPngOk": true,
+    "printPdfOk": true,
+    "socialPngOk": true,
+    "verticalPngOk": true,
+    "exactPrice": "$48",
+    "exactDates": "October 1 – October 31, 2026",
+    "noInventedUrl": true,
+    "noInventedEmail": true,
+    "customerFactSourceGate": true,
+    "narrationIsApprovedContinuous": true,
+    "videoDurationInBand": true,
+    "filesOpen": true,
+    "runId": "ebcaf3ef-6607-4280-9d19-96a7876790bf"
+  }
+}

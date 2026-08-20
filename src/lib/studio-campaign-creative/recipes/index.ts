@@ -6,7 +6,9 @@
 import type { CampaignFormatId, LayoutRecipe } from "../contracts";
 import {
   CAMPAIGN_FORMAT_CANVASES,
+  CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7,
   CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER,
+  isCampaignPrintFormat,
   resolvePrintHandoutContract,
   type CampaignPrintHandoutContract,
   type CampaignPrintHandoutContractId,
@@ -19,6 +21,12 @@ function canvasOf(
 ) {
   if (formatId === "print_handout") {
     return { widthPx: printContract.widthPx, heightPx: printContract.heightPx };
+  }
+  if (formatId === "print_counter_card") {
+    return {
+      widthPx: CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.widthPx,
+      heightPx: CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.heightPx,
+    };
   }
   return CAMPAIGN_FORMAT_CANVASES[formatId];
 }
@@ -39,8 +47,9 @@ function fullBleed(
   printContract: CampaignPrintHandoutContract,
 ): LayoutRecipe {
   const { widthPx: W, heightPx: H } = canvasOf(formatId, printContract);
-  const isPrint = formatId === "print_handout";
+  const isPrint = isCampaignPrintFormat(formatId);
   const isLetter = isUsLetterPrint(formatId, printContract);
+  const isCounterCard = formatId === "print_counter_card";
   const isSquare = formatId === "social_square";
 
   if (isLetter) {
@@ -145,6 +154,112 @@ function fullBleed(
           },
           maxLines: 2,
           minFontPx: 76,
+        },
+      ],
+    };
+  }
+
+  if (isCounterCard) {
+    const margin = 120;
+    const stackH = 920;
+    const contentTop = H - stackH;
+    const overlayTop = contentTop - 420;
+    const contentWidth = W - margin * 2;
+    return {
+      recipeId: `full_bleed_hero__${formatId}`,
+      familyId: "full_bleed_hero",
+      formatId,
+      canvas: { widthPx: W, heightPx: H },
+      slots: [
+        {
+          id: "hero",
+          kind: "image",
+          role: "hero",
+          box: { x: 0, y: 0, width: W, height: H },
+          fit: "cover",
+        },
+        {
+          id: "overlay",
+          kind: "shape",
+          role: "overlay",
+          box: {
+            x: 0,
+            y: overlayTop,
+            width: W,
+            height: H - overlayTop,
+          },
+        },
+        {
+          id: "logo",
+          kind: "logo",
+          role: "logo",
+          box: {
+            x: margin,
+            y: 100,
+            width: 520,
+            height: 150,
+          },
+          fit: "contain",
+        },
+        {
+          id: "headline",
+          kind: "text",
+          role: "headline",
+          box: { x: margin, y: contentTop + 24, width: contentWidth, height: 140 },
+          maxLines: 2,
+          minFontPx: 72,
+        },
+        {
+          id: "body",
+          kind: "text",
+          role: "body",
+          box: {
+            x: margin,
+            y: contentTop + 180,
+            width: contentWidth,
+            height: 180,
+          },
+          maxLines: 3,
+          minFontPx: 36,
+        },
+        {
+          id: "dates",
+          kind: "text",
+          role: "dates",
+          box: {
+            x: margin,
+            y: contentTop + 380,
+            width: contentWidth,
+            height: 56,
+          },
+          maxLines: 1,
+          minFontPx: 34,
+        },
+        {
+          id: "price",
+          kind: "text",
+          role: "price",
+          box: {
+            x: margin,
+            y: contentTop + 450,
+            width: contentWidth,
+            height: 72,
+          },
+          maxLines: 1,
+          minFontPx: 56,
+        },
+        {
+          id: "cta",
+          kind: "cta",
+          role: "cta",
+          box: {
+            x: margin,
+            y: H - 280,
+            width: contentWidth,
+            height: 160,
+          },
+          maxLines: 2,
+          minFontPx: 36,
         },
       ],
     };
@@ -366,7 +481,7 @@ function splitHero(
   printContract: CampaignPrintHandoutContract,
 ): LayoutRecipe {
   const { widthPx: W, heightPx: H } = canvasOf(formatId, printContract);
-  const isPrint = formatId === "print_handout";
+  const isPrint = isCampaignPrintFormat(formatId);
   const photoH = isPrint
     ? Math.floor(H * 0.5)
     : formatId === "social_square"
@@ -479,7 +594,7 @@ function imagePanel(
   printContract: CampaignPrintHandoutContract,
 ): LayoutRecipe {
   const { widthPx: W, heightPx: H } = canvasOf(formatId, printContract);
-  const isPrint = formatId === "print_handout";
+  const isPrint = isCampaignPrintFormat(formatId);
   const gutter = isPrint ? 80 : 40;
   const photoW = Math.floor(W * (isPrint ? 0.55 : 0.58));
   const panelX = photoW;

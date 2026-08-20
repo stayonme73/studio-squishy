@@ -47,6 +47,13 @@ describe("campaign visual system", () => {
       ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1.palette.primary,
     );
   });
+
+  it("loads Harbor Roast coffee system as a distinct campaign identity", () => {
+    const system = loadCampaignVisualSystem("harbor-roast-coffee-v1");
+    expect(system.systemId).toBe("harbor-roast-coffee-v1");
+    expect(system.palette.primary).toBe("#4A2C2A");
+    expect(system.hierarchy).toContain("price");
+  });
 });
 
 describe("recipes", () => {
@@ -94,6 +101,13 @@ describe("recipes", () => {
     expect(v1.canvas).toEqual({ widthPx: 1024, heightPx: 1536 });
     expect(v1Explicit.canvas).toEqual({ widthPx: 1024, heightPx: 1536 });
     expect(v2.canvas).toEqual({ widthPx: 2550, heightPx: 3300 });
+  });
+
+  it("adds 5x7 counter card as a separate print format", () => {
+    const card = getLayoutRecipe("full_bleed_hero", "print_counter_card");
+    expect(card.canvas).toEqual({ widthPx: 1500, heightPx: 2100 });
+    const handout = getLayoutRecipe("full_bleed_hero", "print_handout");
+    expect(handout.canvas).toEqual({ widthPx: 1024, heightPx: 1536 });
   });
 });
 

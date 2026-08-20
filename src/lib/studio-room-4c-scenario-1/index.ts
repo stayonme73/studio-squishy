@@ -39,4 +39,4 @@ export {
 } from "./video-plates";
 export { buildScenario1Provenance } from "./provenance";
 export { buildScenario1DeliveryManifest } from "./delivery-manifest";
-export { readPdfMediaBoxPoints, isUsLetterMediaBox } from "./pdf-page";
+export { readPdfMediaBoxPoints, isUsLetterMediaBox, isFiveBySevenMediaBox } from "./pdf-page";

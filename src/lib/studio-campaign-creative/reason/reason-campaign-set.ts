@@ -4,8 +4,8 @@
 
 import type { AssetAssessment, CampaignVisualSystem, CreativeBrief } from "../contracts";
 import {
-  CAMPAIGN_FORMAT_ORDER,
   CAMPAIGN_PRINT_HANDOUT_CONTRACT_V2_US_LETTER,
+  isCampaignPrintFormat,
 } from "../formats";
 import { getLayoutRecipe } from "../recipes";
 import type {
@@ -122,7 +122,7 @@ export function emitAssetLayers(input: {
   const overlayFill = `rgba(${overlayRgb.r}, ${overlayRgb.g}, ${overlayRgb.b}, ${system.imageTreatmentRules.overlayMaxOpacity})`;
   const bleedText = system.palette.background;
   const isFullBleed = recipe.familyId === "full_bleed_hero";
-  const isPrint = recipe.formatId === "print_handout";
+  const isPrint = isCampaignPrintFormat(recipe.formatId);
   const isUsLetter =
     isPrint &&
     recipe.canvas.widthPx ===
@@ -305,24 +305,26 @@ export function emitAssetLayers(input: {
             1,
           ),
         );
-        layers.push(
-          textFromSlot(
-            `${recipe.recipeId}-contact`,
-            "contact",
-            brief.facts.bookingContact,
-            {
-              x: b.x,
-              y: b.y + contactGap,
-              width: b.width,
-              height: Math.round(contactSize * 1.4),
-            },
-            isFullBleed ? bleedText : system.palette.text,
-            contactSize,
-            600,
-            "left",
-            1,
-          ),
-        );
+        if (brief.facts.bookingContact.trim()) {
+          layers.push(
+            textFromSlot(
+              `${recipe.recipeId}-contact`,
+              "contact",
+              brief.facts.bookingContact,
+              {
+                x: b.x,
+                y: b.y + contactGap,
+                width: b.width,
+                height: Math.round(contactSize * 1.4),
+              },
+              isFullBleed ? bleedText : system.palette.text,
+              contactSize,
+              600,
+              "left",
+              1,
+            ),
+          );
+        }
       } else {
         // Soft campaign CTA — translucent plate + type, not a solid web button
         layers.push({
@@ -402,8 +404,7 @@ export function reasonCampaignCreativeSetDeterministic(input: {
   if (!logo) throw new Error("MISSING_LOGO_MATERIAL");
 
   const assets: CampaignAssetSpec[] = [];
-  for (const formatId of CAMPAIGN_FORMAT_ORDER) {
-    if (!input.brief.targetFormats.includes(formatId)) continue;
+  for (const formatId of input.brief.targetFormats) {
     const recipe = getLayoutRecipe(
       familyId,
       formatId,
@@ -426,13 +427,14 @@ export function reasonCampaignCreativeSetDeterministic(input: {
       canvas: recipe.canvas,
       background: { color: input.system.palette.background },
       layers,
-      outputFormats:
-        formatId === "print_handout" ? ["png", "pdf"] : ["png"],
+      outputFormats: isCampaignPrintFormat(formatId) ? ["png", "pdf"] : ["png"],
     });
   }
 
-  if (assets.length !== 3) {
-    throw new Error(`EXPECTED_THREE_FORMATS:got_${assets.length}`);
+  if (assets.length !== input.brief.targetFormats.length) {
+    throw new Error(
+      `EXPECTED_FORMAT_COUNT:${input.brief.targetFormats.length}:got_${assets.length}`,
+    );
   }
 
   return {

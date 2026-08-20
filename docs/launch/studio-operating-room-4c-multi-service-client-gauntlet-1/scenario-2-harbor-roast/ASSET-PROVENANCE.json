@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "packageId": "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1",
+  "scenarioId": "scenario-2-product-or-offer-launch",
+  "campaignId": "room-4c-s2-harbor-roast-coffee",
+  "briefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721",
+  "visualSystemId": "harbor-roast-coffee-v1",
+  "generatedAt": "2026-08-20T22:29:06.619Z",
+  "assets": [
+    {
+      "id": "campaign-brief",
+      "role": "brief",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/campaign-brief.json",
+      "contentSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721",
+      "source": "authoritative_brief",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "logo",
+      "role": "logo",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/materials/harbor-roast-logo.svg",
+      "contentSha256": "0664d112453c8c9cd3616f3821eacc95a646866d5c937f6a385122bdbe2cc864",
+      "source": "studio_generated",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "hero",
+      "role": "hero_photo",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/materials/harbor-roast-hero-box.png",
+      "contentSha256": "dcce1315e74d8682d1203f84e8093d0b1c86064962f2ce957964f12914bd7694",
+      "source": "studio_generated",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "campaign-direction",
+      "role": "campaign_direction",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/campaign-direction.md",
+      "contentSha256": "429debbd17a45809eea72ec255250d694637be5b05a2f0948649e5a763e41189",
+      "source": "derived_from_brief",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "social-square",
+      "role": "social_square",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/social-square.png",
+      "contentSha256": "5bd3368ce9905bece27844c612f5dd4570cd1e709fbae72349f0ed72f07478c6",
+      "source": "derived_from_brief",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "social-vertical",
+      "role": "social_vertical",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/social-vertical.png",
+      "contentSha256": "6c29eae42facd8ed9434df74894912bb04005850d8918a931b684e1cb190af88",
+      "source": "derived_from_brief",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "counter-card-png",
+      "role": "print_counter_card_png",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/counter-card.png",
+      "contentSha256": "474b33c43772f1ee608b9b69ecabc6ec02c5518bde8bbf1c385b2d291b6935ff",
+      "source": "derived_from_brief",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "counter-card-pdf",
+      "role": "print_counter_card_pdf",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/counter-card.pdf",
+      "contentSha256": "44faa4139d14659f82992cdeaac422964e638727bf080cbb6077f296a8c34da9",
+      "source": "derived_from_brief",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "caption",
+      "role": "caption",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/caption.txt",
+      "contentSha256": "e4139ff1eea59f47618287ddf4f942a664f5e4df1a84ce1482ad1073b93193b6",
+      "source": "derived_from_brief",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "email",
+      "role": "email",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/email.txt",
+      "contentSha256": "c32c6d41fe34ba3ae4ac3ab4facc3f40eda41efae34fc559016a6a9973b24e4d",
+      "source": "derived_from_brief",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "voice",
+      "role": "voice_mp3",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787264951170_538314367190.mp3",
+      "contentSha256": "538314367190fad5d3c804833479d70b70f2c1942cbf0abc93f6dd254648a6ab",
+      "source": "derived_from_brief",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    },
+    {
+      "id": "video",
+      "role": "video_mp4",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/video.mp4",
+      "contentSha256": "a2ef8d752d1af1d0c2cd5d4aa4d8ffb8abcb3bd09d0c86954e626b3c4f8479ed",
+      "source": "derived_from_brief",
+      "derivedFromBriefSha256": "ed3210a62ba506114c95cb8d50a98ac66557f10fc70acadd42d8772d14bf9721"
+    }
+  ]
+}

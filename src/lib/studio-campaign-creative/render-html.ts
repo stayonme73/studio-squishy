@@ -76,11 +76,13 @@ export function renderCampaignAssetHtml(
         ? `letter-spacing:${layer.letterSpacingPx}px;`
         : "";
     const printReadable =
-      asset.formatId === "print_handout" &&
-      asset.canvas.widthPx >= 2000 &&
+      (asset.formatId === "print_handout" ||
+        asset.formatId === "print_counter_card") &&
+      asset.canvas.widthPx >= 1400 &&
       (layer.role === "body" ||
         layer.role === "contact" ||
         layer.role === "dates" ||
+        layer.role === "price" ||
         layer.role === "cta")
         ? "text-shadow:0 2px 12px rgba(0,0,0,0.55);"
         : "";

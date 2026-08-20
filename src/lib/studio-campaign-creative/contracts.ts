@@ -19,7 +19,8 @@ export const STUDIO_CAMPAIGN_CREATIVE_CUSTOMER_NAMES = [
 export type CampaignFormatId =
   | "social_square"
   | "social_vertical"
-  | "print_handout";
+  | "print_handout"
+  | "print_counter_card";
 
 export type RectPx = {
   x: number;
@@ -61,6 +62,11 @@ export type CreativeBrief = {
   printHandoutContractId?:
     | "campaign-print-handout-v1"
     | "campaign-print-handout-v2-us-letter";
+  /**
+   * Explicit 5×7 counter-card contract. Omit unless the job is a
+   * counter/shelf card. Does not replace print_handout.
+   */
+  printCounterCardContractId?: "campaign-print-counter-card-v1-5x7";
 };
 
 export type CampaignVisualSystem = {

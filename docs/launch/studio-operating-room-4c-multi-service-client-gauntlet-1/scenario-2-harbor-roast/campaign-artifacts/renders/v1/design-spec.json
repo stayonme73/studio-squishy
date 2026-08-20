@@ -1,0 +1,499 @@
+{
+  "specVersion": "campaign-creative-design-spec-1.0.0",
+  "systemId": "harbor-roast-coffee-v1",
+  "familyId": "full_bleed_hero",
+  "colors": {
+    "primary": "#4A2C2A",
+    "secondary": "#8C5A3C",
+    "background": "#F4EDE3",
+    "text": "#241714",
+    "muted": "#6E5348",
+    "accent": "#C4844A"
+  },
+  "materials": [
+    {
+      "materialId": "harbor-roast-logo",
+      "role": "logo",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/materials/harbor-roast-logo.svg",
+      "contentSha256": "0664d112453c8c9cd3616f3821eacc95a646866d5c937f6a385122bdbe2cc864"
+    },
+    {
+      "materialId": "harbor-roast-hero-box__social_square__a39d8fc4498b",
+      "role": "hero",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/campaign-artifacts/prepared/v1/hero-social_square.jpg",
+      "contentSha256": "a39d8fc4498b2b998d571cbf1032a4ef0867b91aabf533a422e4fd88ccdf11fc"
+    },
+    {
+      "materialId": "harbor-roast-hero-box__social_vertical__e62a0e14d4fa",
+      "role": "hero",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/campaign-artifacts/prepared/v1/hero-social_vertical.jpg",
+      "contentSha256": "e62a0e14d4fa2a4b671c1b1fccc70e2450e2b4be9fd6201a79937eafcd7db1c6"
+    },
+    {
+      "materialId": "harbor-roast-hero-box__print_counter_card__9c3a128b573e",
+      "role": "hero",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/campaign-artifacts/prepared/v1/hero-print_counter_card.jpg",
+      "contentSha256": "9c3a128b573ec691d20f03c5971b48d5758f8174e50e003f9697bd2f3c93543b"
+    }
+  ],
+  "brief": {
+    "campaignId": "room-4c-s2-harbor-roast-coffee",
+    "businessName": "Harbor Roast Coffee Co.",
+    "facts": {
+      "headline": "Autumn Single-Origin Box",
+      "supportingCopy": "A limited autumn coffee box.",
+      "datesDisplay": "October 1 – October 31, 2026",
+      "priceDisplay": "$48",
+      "cta": "Limited autumn box",
+      "bookingContact": ""
+    },
+    "constraints": {
+      "noNeon": true,
+      "noBeforeAfterBody": true,
+      "calmWellness": false
+    },
+    "voiceDirection": "Warm, grounded, no neon"
+  },
+  "assets": [
+    {
+      "assetId": "social_square__full_bleed_hero",
+      "formatId": "social_square",
+      "recipeId": "full_bleed_hero__social_square",
+      "familyId": "full_bleed_hero",
+      "canvas": {
+        "widthPx": 1080,
+        "heightPx": 1080
+      },
+      "background": {
+        "color": "#F4EDE3"
+      },
+      "layers": [
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_square-hero",
+          "role": "hero",
+          "materialId": "harbor-roast-hero-box__social_square__a39d8fc4498b",
+          "x": 0,
+          "y": 0,
+          "width": 1080,
+          "height": 1080,
+          "fit": "cover"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_square-overlay",
+          "role": "overlay",
+          "x": 0,
+          "y": 674,
+          "width": 1080,
+          "height": 406,
+          "fill": "linear-gradient(to bottom, rgba(74,44,42,0) 0%, rgba(74,44,42,0.324) 42%, rgba(74,44,42,0.720) 100%)"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_square-logo-plate",
+          "role": "logo_plate",
+          "x": 34,
+          "y": 26,
+          "width": 328,
+          "height": 101,
+          "fill": "rgba(74, 44, 42, 0.2)",
+          "borderRadiusPx": 6
+        },
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_square-logo",
+          "role": "logo",
+          "materialId": "harbor-roast-logo",
+          "x": 36,
+          "y": 28,
+          "width": 324,
+          "height": 97,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-headline",
+          "role": "headline",
+          "content": "Autumn Single-Origin Box",
+          "x": 48,
+          "y": 774,
+          "width": 842,
+          "fontSizePx": 40,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-body",
+          "role": "body",
+          "content": "A limited autumn coffee box.",
+          "x": 48,
+          "y": 828,
+          "width": 842,
+          "fontSizePx": 18,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 2
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-dates",
+          "role": "dates",
+          "content": "October 1 – October 31, 2026",
+          "x": 48,
+          "y": 884,
+          "width": 842,
+          "fontSizePx": 20,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-price",
+          "role": "price",
+          "content": "$48",
+          "x": 48,
+          "y": 918,
+          "width": 842,
+          "fontSizePx": 26,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_square-cta-btn",
+          "role": "cta_button",
+          "x": 48,
+          "y": 968,
+          "width": 320,
+          "height": 44,
+          "fill": "rgba(244, 237, 227, 0.16)",
+          "borderRadiusPx": 4
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_square-cta",
+          "role": "cta",
+          "content": "Limited autumn box",
+          "x": 62,
+          "y": 978,
+          "width": 292,
+          "fontSizePx": 18,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        }
+      ],
+      "outputFormats": [
+        "png"
+      ]
+    },
+    {
+      "assetId": "social_vertical__full_bleed_hero",
+      "formatId": "social_vertical",
+      "recipeId": "full_bleed_hero__social_vertical",
+      "familyId": "full_bleed_hero",
+      "canvas": {
+        "widthPx": 1080,
+        "heightPx": 1920
+      },
+      "background": {
+        "color": "#F4EDE3"
+      },
+      "layers": [
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_vertical-hero",
+          "role": "hero",
+          "materialId": "harbor-roast-hero-box__social_vertical__e62a0e14d4fa",
+          "x": 0,
+          "y": 0,
+          "width": 1080,
+          "height": 1920,
+          "fit": "cover"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_vertical-overlay",
+          "role": "overlay",
+          "x": 0,
+          "y": 1504,
+          "width": 1080,
+          "height": 416,
+          "fill": "linear-gradient(to bottom, rgba(74,44,42,0) 0%, rgba(74,44,42,0.324) 42%, rgba(74,44,42,0.720) 100%)"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_vertical-logo-plate",
+          "role": "logo_plate",
+          "x": 34,
+          "y": 26,
+          "width": 328,
+          "height": 101,
+          "fill": "rgba(74, 44, 42, 0.2)",
+          "borderRadiusPx": 6
+        },
+        {
+          "type": "image",
+          "id": "full_bleed_hero__social_vertical-logo",
+          "role": "logo",
+          "materialId": "harbor-roast-logo",
+          "x": 36,
+          "y": 28,
+          "width": 324,
+          "height": 97,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-headline",
+          "role": "headline",
+          "content": "Autumn Single-Origin Box",
+          "x": 48,
+          "y": 1604,
+          "width": 842,
+          "fontSizePx": 44,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-body",
+          "role": "body",
+          "content": "A limited autumn coffee box.",
+          "x": 48,
+          "y": 1658,
+          "width": 842,
+          "fontSizePx": 18,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 2
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-dates",
+          "role": "dates",
+          "content": "October 1 – October 31, 2026",
+          "x": 48,
+          "y": 1714,
+          "width": 842,
+          "fontSizePx": 20,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-price",
+          "role": "price",
+          "content": "$48",
+          "x": 48,
+          "y": 1748,
+          "width": 842,
+          "fontSizePx": 26,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__social_vertical-cta-btn",
+          "role": "cta_button",
+          "x": 48,
+          "y": 1798,
+          "width": 320,
+          "height": 44,
+          "fill": "rgba(244, 237, 227, 0.16)",
+          "borderRadiusPx": 4
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__social_vertical-cta",
+          "role": "cta",
+          "content": "Limited autumn box",
+          "x": 62,
+          "y": 1808,
+          "width": 292,
+          "fontSizePx": 18,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        }
+      ],
+      "outputFormats": [
+        "png"
+      ]
+    },
+    {
+      "assetId": "print_counter_card__full_bleed_hero",
+      "formatId": "print_counter_card",
+      "recipeId": "full_bleed_hero__print_counter_card",
+      "familyId": "full_bleed_hero",
+      "canvas": {
+        "widthPx": 1500,
+        "heightPx": 2100
+      },
+      "background": {
+        "color": "#F4EDE3"
+      },
+      "layers": [
+        {
+          "type": "image",
+          "id": "full_bleed_hero__print_counter_card-hero",
+          "role": "hero",
+          "materialId": "harbor-roast-hero-box__print_counter_card__9c3a128b573e",
+          "x": 0,
+          "y": 0,
+          "width": 1500,
+          "height": 2100,
+          "fit": "cover"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__print_counter_card-overlay",
+          "role": "overlay",
+          "x": 0,
+          "y": 760,
+          "width": 1500,
+          "height": 1340,
+          "fill": "linear-gradient(to bottom, rgba(74,44,42,0) 0%, rgba(74,44,42,0.324) 42%, rgba(74,44,42,0.720) 100%)"
+        },
+        {
+          "type": "shape",
+          "id": "full_bleed_hero__print_counter_card-logo-plate",
+          "role": "logo_plate",
+          "x": 108,
+          "y": 88,
+          "width": 544,
+          "height": 174,
+          "fill": "rgba(74, 44, 42, 0.2)",
+          "borderRadiusPx": 12
+        },
+        {
+          "type": "image",
+          "id": "full_bleed_hero__print_counter_card-logo",
+          "role": "logo",
+          "materialId": "harbor-roast-logo",
+          "x": 120,
+          "y": 100,
+          "width": 520,
+          "height": 150,
+          "fit": "contain"
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_counter_card-headline",
+          "role": "headline",
+          "content": "Autumn Single-Origin Box",
+          "x": 120,
+          "y": 1204,
+          "width": 1260,
+          "fontSizePx": 72,
+          "fontWeight": 700,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 2
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_counter_card-body",
+          "role": "body",
+          "content": "A limited autumn coffee box.",
+          "x": 120,
+          "y": 1360,
+          "width": 1260,
+          "fontSizePx": 36,
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 3
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_counter_card-dates",
+          "role": "dates",
+          "content": "October 1 – October 31, 2026",
+          "x": 120,
+          "y": 1560,
+          "width": 1260,
+          "fontSizePx": 34,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_counter_card-price",
+          "role": "price",
+          "content": "$48",
+          "x": 120,
+          "y": 1630,
+          "width": 1260,
+          "fontSizePx": 56,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        },
+        {
+          "type": "text",
+          "id": "full_bleed_hero__print_counter_card-cta",
+          "role": "cta",
+          "content": "Limited autumn box",
+          "x": 120,
+          "y": 1820,
+          "width": 1260,
+          "fontSizePx": 36,
+          "fontWeight": 600,
+          "lineHeight": 1.2,
+          "color": "#F4EDE3",
+          "align": "left",
+          "maxLines": 1
+        }
+      ],
+      "outputFormats": [
+        "png",
+        "pdf"
+      ]
+    }
+  ],
+  "reasoningMode": "deterministic_constrained",
+  "reasoning": {
+    "familyId": "full_bleed_hero",
+    "heroMaterialId": "harbor-roast-hero-box",
+    "rationaleCodes": [
+      "bounded_grammar_only",
+      "portrait_prefers_full_bleed"
+    ]
+  }
+}

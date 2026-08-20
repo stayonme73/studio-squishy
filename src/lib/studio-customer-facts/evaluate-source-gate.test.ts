@@ -278,4 +278,82 @@ describe("generic customer-fact source gate", () => {
       }),
     ).toThrow(/CUSTOMER_FACT_SOURCE_GATE:missing_exact_fact:caption:/);
   });
+
+  it("fails an unapproved email when no email is on the approved record", () => {
+    const result = evaluateHarbor(
+      harborSources({
+        caption:
+          "Fall Drip Club is open September 15 – October 15, 2026.\nHarbor Roast\nBook a tasting: (804) 555-0100\nharborroast.example/book\nhello@harborroast.example",
+      }),
+    );
+    expect(result.ok).toBe(false);
+    expect(result.findings.map((f) => f.code)).toContain(
+      "machine_inferred_contact",
+    );
+  });
+
+  it("allows a priced product launch with no URL, phone, or email", () => {
+    const approved: ApprovedCustomerFactRecord = {
+      approvalStatus: "OWNER_APPROVED_FOR_CERTIFICATION",
+      values: {
+        offerName: "Autumn Single-Origin Box",
+        datesDisplay: "October 1 – October 31, 2026",
+        priceDisplay: "$48",
+        contentsDisplay: "Autumn Single-Origin Box",
+        cta: "Limited autumn box",
+        businessName: "Harbor Roast Coffee Co.",
+      },
+      requiredFactIds: [
+        "offerName",
+        "datesDisplay",
+        "priceDisplay",
+        "contentsDisplay",
+        "cta",
+        "businessName",
+      ],
+      forbiddenExact: ["harborroast.example/book", "(804) 555-0100"],
+    };
+    const candidate = { ...approved.values };
+    const routing = evaluateProductionRoutingEligibility({
+      approvedRecord: approved,
+      candidateValues: candidate,
+    });
+    expect(routing.routingAllowed).toBe(true);
+
+    const pass = evaluateCustomerFactSourceGate({
+      approvedRecord: approved,
+      candidateValues: candidate,
+      sources: [
+        {
+          sourceId: "email",
+          text: "Harbor Roast Coffee Co. Autumn Single-Origin Box is $48, October 1 – October 31, 2026. Limited autumn box.",
+          requireExact: [
+            "offerName",
+            "datesDisplay",
+            "priceDisplay",
+            "contentsDisplay",
+            "cta",
+            "businessName",
+          ],
+        },
+      ],
+    });
+    expect(pass).toEqual({ ok: true, findings: [] });
+
+    const inferredUrl = evaluateCustomerFactSourceGate({
+      approvedRecord: approved,
+      candidateValues: candidate,
+      sources: [
+        {
+          sourceId: "email",
+          text: "Buy at harborroast.example/shop",
+          requireExact: ["offerName"],
+        },
+      ],
+    });
+    expect(inferredUrl.ok).toBe(false);
+    expect(inferredUrl.findings.map((f) => f.code)).toContain(
+      "machine_inferred_contact",
+    );
+  });
 });

@@ -32,3 +32,13 @@ export function isUsLetterMediaBox(
     Math.abs(box.height - 792) <= tolerancePt
   );
 }
+
+export function isFiveBySevenMediaBox(
+  box: { width: number; height: number },
+  tolerancePt = 0.75,
+): boolean {
+  return (
+    Math.abs(box.width - 360) <= tolerancePt &&
+    Math.abs(box.height - 504) <= tolerancePt
+  );
+}

@@ -2,7 +2,7 @@
  * Room 4C — Multi-Service Client Gauntlet.
  * OPEN at baseCommit 8c919e0. Room 4B remains CLOSED. Room 5 NOT STARTED.
  * Do not merge. Do not expand Launch Now menu. Scenario 1 PASS WITH EXPLICIT LIMITS.
- * Scenarios 2–3 not started. Room 4C remains OPEN.
+ * Scenario 2 EXECUTED_OWNER_DECISION_PENDING. Scenario 3 not started. Room 4C remains OPEN.
  */
 
 export const studioRoom4cMultiServiceClientGauntletV1 = {
@@ -67,7 +67,18 @@ export const studioRoom4cMultiServiceClientGauntletV1 = {
     {
       id: "scenario-2-product-or-offer-launch" as const,
       customer: "Harbor Roast Coffee Co." as const,
-      status: "NOT_STARTED" as const,
+      status: "EXECUTED_OWNER_DECISION_PENDING" as const,
+      classification: "OWNER DECISION PENDING" as const,
+      recommendedClassification: "PASS WITH EXPLICIT LIMITS" as const,
+      factApprovalStatus: "OWNER_APPROVED_FOR_CERTIFICATION" as const,
+      explicitLimits: [
+        "No shop URL, contact email, or phone was owner-authorized; none appear.",
+        "Box contents are the authorized product name only. Origin, weight, and tasting notes were not supplied.",
+        "Studio-generated photography rather than customer-supplied photography.",
+        "Short video is polished template-led production using one primary photograph, not cinematic production.",
+        "Mobile findings are responsive coverage only, not final Room 4 mobile certification.",
+        "Frozen Launch Now service classifications remain READY WITH EXPLICIT LIMITS.",
+      ] as const,
     },
     {
       id: "scenario-3-photo-led-campaign" as const,

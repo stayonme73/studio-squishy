@@ -22,14 +22,26 @@ export function validateCampaignCreativeSetSpec(
   }
 
   const formatIds = new Set(setSpec.assets.map((a) => a.formatId));
-  for (const f of ["social_square", "social_vertical", "print_handout"] as const) {
-    if (!formatIds.has(f)) {
-      findings.push({
-        id: `missing_format_${f}`,
-        severity: "fail",
-        message: `Missing format ${f}`,
-      });
-    }
+  if (!formatIds.has("social_square")) {
+    findings.push({
+      id: "missing_format_social_square",
+      severity: "fail",
+      message: "Missing format social_square",
+    });
+  }
+  if (!formatIds.has("social_vertical")) {
+    findings.push({
+      id: "missing_format_social_vertical",
+      severity: "fail",
+      message: "Missing format social_vertical",
+    });
+  }
+  if (!formatIds.has("print_handout") && !formatIds.has("print_counter_card")) {
+    findings.push({
+      id: "missing_print_format",
+      severity: "fail",
+      message: "Missing print_handout or print_counter_card",
+    });
   }
 
   for (const asset of setSpec.assets) {
@@ -136,6 +148,33 @@ export function validateCampaignCreativeSetSpec(
           severity: "fail",
           message: `Print handout needs contact/URL with CTA on ${asset.assetId}`,
         });
+      }
+    }
+
+    if (asset.formatId === "print_counter_card") {
+      const hasWebButton = asset.layers.some(
+        (l) => l.type === "shape" && l.role === "cta_button",
+      );
+      if (hasWebButton) {
+        findings.push({
+          id: `print_cta_web_button_${asset.assetId}`,
+          severity: "fail",
+          message: `Counter card must not use a web-style CTA button on ${asset.assetId}`,
+        });
+      }
+      if (setSpec.brief.facts.priceDisplay.trim()) {
+        const hasPrice = asset.layers.some(
+          (l) =>
+            l.type === "text" &&
+            (l.role === "price" || l.content.includes(setSpec.brief.facts.priceDisplay)),
+        );
+        if (!hasPrice) {
+          findings.push({
+            id: `print_price_missing_${asset.assetId}`,
+            severity: "fail",
+            message: `Counter card needs the authorized price on ${asset.assetId}`,
+          });
+        }
       }
     }
 

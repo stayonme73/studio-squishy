@@ -7,7 +7,7 @@
 **Room 4B:** CLOSED (frozen)  
 **Room 5:** NOT STARTED  
 **Merge:** No  
-**Scenario 1:** PASS WITH EXPLICIT LIMITS. Scenarios 2–3 not started.  
+**Scenario 1:** PASS WITH EXPLICIT LIMITS. Scenario 2 EXECUTED · OWNER DECISION PENDING. Scenario 3 not started.  
 
 Config: `src/config/studio-room-4c-multi-service-client-gauntlet-v1.ts`
 

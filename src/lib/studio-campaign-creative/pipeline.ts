@@ -13,7 +13,11 @@ import {
   sha256File,
 } from "./bind";
 import type { CreativeBrief } from "./contracts";
-import { CAMPAIGN_FORMAT_ORDER, resolvePrintHandoutContract } from "./formats";
+import {
+  CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7,
+  isCampaignPrintFormat,
+  resolvePrintHandoutContract,
+} from "./formats";
 import {
   reasonCampaignCreativeSetDeterministic,
 } from "./reason/reason-campaign-set";
@@ -82,8 +86,7 @@ export async function runCampaignCreativePipeline(input: {
   );
 
   const preparedHeroByFormat: Record<string, CampaignMaterialRef> = {};
-  for (const formatId of CAMPAIGN_FORMAT_ORDER) {
-    if (!input.brief.targetFormats.includes(formatId)) continue;
+  for (const formatId of input.brief.targetFormats) {
     const outRel = `${preparedDirRel}/hero-${formatId}.jpg`;
     const prepared = await prepareVisualAsset({
       sourceAbsolutePath: heroAbs,
@@ -94,7 +97,12 @@ export async function runCampaignCreativePipeline(input: {
       targetCanvas:
         formatId === "print_handout"
           ? { widthPx: printContract.widthPx, heightPx: printContract.heightPx }
-          : undefined,
+          : formatId === "print_counter_card"
+            ? {
+                widthPx: CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.widthPx,
+                heightPx: CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.heightPx,
+              }
+            : undefined,
     });
     preparedHeroByFormat[formatId] = {
       materialId: prepared.preparedId,
@@ -158,7 +166,12 @@ export async function runCampaignCreativePipeline(input: {
               width: printContract.pdfPage.width,
               height: printContract.pdfPage.height,
             }
-          : undefined,
+          : asset.formatId === "print_counter_card"
+            ? {
+                width: CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.pdfPage.width,
+                height: CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.pdfPage.height,
+              }
+            : undefined,
     });
     if (!capture.overflowOk) {
       throw new Error(
