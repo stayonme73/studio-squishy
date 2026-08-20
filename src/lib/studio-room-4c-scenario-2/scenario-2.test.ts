@@ -41,6 +41,7 @@ import {
   scenario2VideoCtaPlateCopy,
   SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD,
   SCENARIO_2_STALE_BOOKING_URL,
+  SCENARIO_2_STALE_CTA,
   SCENARIO_2_STALE_EMAIL,
   SCENARIO_2_STALE_PHONE,
   staleScenario2FactHits,
@@ -59,7 +60,7 @@ describe("Room 4C Scenario 2 — machine-readable brief", () => {
     expect(creative.facts.headline).toBe(brief.facts.headline);
     expect(creative.facts.datesDisplay).toBe(brief.facts.datesDisplay);
     expect(creative.facts.priceDisplay).toBe("$48");
-    expect(creative.facts.cta).toBe("Limited autumn box");
+    expect(creative.facts.cta).toBe("Shop the autumn box");
     expect(creative.facts.bookingContact).toBe("harborroast.example/autumn-box");
     expect(creative.facts.supportingCopy).toBe(
       "three 8-ounce bags of whole-bean single-origin coffee",
@@ -183,7 +184,7 @@ describe("Room 4C Scenario 2 — copy quality", () => {
   it("uses the continuous narration and does not speak contact", () => {
     const script = buildScenario2NarrationScript();
     expect(script).toBe(
-      "Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This limited launch is forty-eight dollars and includes three 8-ounce bags of whole-bean single-origin coffee, available October first through October thirty-first, twenty twenty-six. Get the limited autumn box.",
+      "Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This autumn launch is forty-eight dollars and includes three 8-ounce bags of whole-bean single-origin coffee, available October first through October thirty-first, twenty twenty-six. Shop the autumn box this October.",
     );
     expect(script).toContain(brief.customer.businessName);
     expect(script).toContain(brief.offer.name);
@@ -289,7 +290,7 @@ describe("Room 4C Scenario 2 — exact canonical facts in render sources", () =>
       .map((l) => (l.type === "text" ? l.content : ""))
       .join("\n");
     expect(squareText).toContain("$48");
-    expect(squareText).toContain("Limited autumn box");
+    expect(squareText).toContain("Shop the autumn box");
     expect(squareText).toContain("harborroast.example/autumn-box");
     expect(squareText).toContain(
       "three 8-ounce bags of whole-bean single-origin coffee",
@@ -297,7 +298,7 @@ describe("Room 4C Scenario 2 — exact canonical facts in render sources", () =>
     expect(staleScenario2FactHits(squareText)).toEqual([]);
 
     const ctaPlate = scenario2VideoCtaPlateCopy();
-    expect(ctaPlate.line1).toBe("Limited autumn box");
+    expect(ctaPlate.line1).toBe("Shop the autumn box");
     expect(ctaPlate.line2).toBe("harborroast.example/autumn-box");
     expect(ctaPlate.line3).toBe("$48");
   });
@@ -306,11 +307,15 @@ describe("Room 4C Scenario 2 — exact canonical facts in render sources", () =>
     expect(SCENARIO_2_STALE_PHONE).toBe("(804) 555-0100");
     expect(SCENARIO_2_STALE_BOOKING_URL).toBe("harborroast.example/book");
     expect(SCENARIO_2_STALE_EMAIL).toBe("info@harborroast.example");
+    expect(SCENARIO_2_STALE_CTA).toBe("Limited autumn box");
     expect(
       staleScenario2FactHits(
         "Order at harborroast.example/book or (804) 555-0100",
       ),
     ).toEqual(expect.arrayContaining(["stale-phone-0100", "stale-url-book"]));
+    expect(staleScenario2FactHits("Limited autumn box")).toEqual([
+      "stale-cta-limited",
+    ]);
   });
 
   it("passes the generic customer-fact source gate for social, email, print, video, and narration", () => {
@@ -490,7 +495,7 @@ describe("Room 4C Scenario 2 — authorized-fact omission correction proofs", ()
     expect(email).toContain("$48");
     expect(email).toContain(contents);
     expect(email).toContain("October 1 – October 31, 2026");
-    expect(email).toContain("Limited autumn box");
+    expect(email).toContain("Shop the autumn box");
     expect(email).toContain(productUrl);
   });
 
@@ -564,6 +569,120 @@ describe("Room 4C Scenario 2 — authorized-fact omission correction proofs", ()
   });
 
   it("10. Scenario 1 approved deliverable hashes remain unchanged", () => {
+    const expected: Record<string, string> = {
+      "social-square.png":
+        "a565cd5f1fd2cb3d174daa0eb87029a819c322f6b7be88af9258bc9982cd7c6e",
+      "video.mp4":
+        "cdca7998bb6fded01b42248dca0c22e029d9e350e248801511aab8a45d0a5ff9",
+      "caption.txt":
+        "2220894a986ecbe144b50a62f85244ee36d8a04b40c32e5a33313f9acb8ad1b5",
+      "handout.png":
+        "f4ff91ba99c536fd0b1c5efdb5f60a9ed1791253fc91e4b79da722ef4d17debf",
+      "handout.pdf":
+        "ff931b9249f95d5ba96f732412b57171878fcf63c07e151fc859c6c9180131a0",
+    };
+    const root = path.join(
+      __dirname,
+      "../../../docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables",
+    );
+    for (const [file, hash] of Object.entries(expected)) {
+      const actual = createHash("sha256")
+        .update(readFileSync(path.join(root, file)))
+        .digest("hex");
+      expect(actual).toBe(hash);
+    }
+  });
+});
+
+describe("Room 4C Scenario 2 — CTA authority correction proofs", () => {
+  const approvedCta = "Shop the autumn box";
+  const contents = "three 8-ounce bags of whole-bean single-origin coffee";
+  const productUrl = "harborroast.example/autumn-box";
+  const supportEmail = "hello@harborroast.example";
+  const dates = "October 1 – October 31, 2026";
+
+  it("1. a CTA different from the approved CTA fails", () => {
+    expect(evaluateScenario2CustomerFactSourceGate().ok).toBe(true);
+    const swapped = evaluateProductionRoutingEligibility({
+      approvedRecord: {
+        ...SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD,
+        values: {
+          ...SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.values,
+          cta: "Reserve yours",
+        },
+      },
+      candidateValues: {
+        ...SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD.values,
+        cta: "Shop the autumn box",
+      },
+    });
+    expect(swapped.routingAllowed).toBe(false);
+    expect(swapped.findings.map((f) => f.code)).toContain("owner_lock_mismatch");
+  });
+
+  it("2. a non-action label cannot substitute for the approved CTA", () => {
+    expect(brief.cta.label).toBe(approvedCta);
+    expect(brief.cta.label).not.toBe("Limited autumn box");
+    expect(staleScenario2FactHits("Limited autumn box")).toContain(
+      "stale-cta-limited",
+    );
+    const joined = collectScenario2CustomerFactSources()
+      .map((source) => source.text)
+      .join("\n");
+    expect(joined).not.toMatch(/\blimited\b/i);
+  });
+
+  it("3. unauthorized scarcity language fails", () => {
+    const fail = evaluateCopyQuality({
+      brief: scenario2CopyQualityBrief(),
+      submission: {
+        kind: "plain_text",
+        plainText: `${buildScenario2Caption()}\nWhile supplies last.`,
+      },
+    });
+    expect(fail.ok).toBe(false);
+  });
+
+  it("4. exact approved CTA reaches all applicable render and copy sources", () => {
+    const byId = Object.fromEntries(
+      collectScenario2CustomerFactSources().map((source) => [
+        source.sourceId,
+        source,
+      ]),
+    );
+    for (const id of [
+      "social-square-layers",
+      "social-vertical-layers",
+      "caption",
+      "email",
+      "print-counter-card-layers",
+      "video-cta-plate",
+      "narration",
+    ]) {
+      expect(byId[id]?.text).toContain(approvedCta);
+    }
+    expect(buildScenario2CampaignDirection()).toContain(approvedCta);
+  });
+
+  it("5. authorized availability dates remain intact", () => {
+    expect(brief.offer.windowDisplay).toBe(dates);
+    expect(buildScenario2Caption()).toContain(dates);
+    expect(formatScenario2EmailPasteReady()).toContain(dates);
+  });
+
+  it("6. contents, price, URL, and support email remain correct", () => {
+    expect(brief.offer.contentsDisplay).toBe(contents);
+    expect(brief.offer.priceDisplay).toBe("$48");
+    expect(brief.cta.bookingUrl).toBe(productUrl);
+    expect(brief.cta.supportEmail).toBe(supportEmail);
+    const email = formatScenario2EmailPasteReady();
+    expect(email).toContain(contents);
+    expect(email).toContain("$48");
+    expect(email).toContain(productUrl);
+    expect(email).toContain(supportEmail);
+  });
+
+  it("7. Scenario 1 approved deliverable hashes remain unchanged", () => {
     const expected: Record<string, string> = {
       "social-square.png":
         "a565cd5f1fd2cb3d174daa0eb87029a819c322f6b7be88af9258bc9982cd7c6e",

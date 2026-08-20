@@ -6,16 +6,20 @@ Scout omitted owner-authorized contents, product URL, and support email. Scout t
 
 That first pass is superseded. See `superseded-first-pass/SUPERSEDED.md`.
 
+## CTA authority defect (corrected)
+
+Scout substituted **Limited autumn box** for the authorized CTA **Shop the autumn box**. That is not an action, and “limited” is prohibited scarcity language. Dates October 1–31, 2026 do not authorize a shortage claim. Those outputs are superseded. See `superseded-limited-cta/SUPERSEDED.md`.
+
 ## Fact-authorization after correction
 
-The locked package brief now carries the owner-authorized facts that were required before production: business name, offer, October window, $48, three 8-ounce bags of whole-bean single-origin coffee, `harborroast.example/autumn-box`, and `hello@harborroast.example`. Phone remains unauthorized and is not invented. Product name cannot substitute for contents. Generic-gate test doubles `harborroast.example/book` and `(804) 555-0100` are not production facts.
+The locked package brief now carries the owner-authorized facts that were required before production: business name, offer, October window, $48, three 8-ounce bags of whole-bean single-origin coffee, `harborroast.example/autumn-box`, `hello@harborroast.example`, and CTA **Shop the autumn box**. Phone remains unauthorized and is not invented. Product name cannot substitute for contents. A non-action label cannot substitute for the approved CTA. Generic-gate test doubles `harborroast.example/book` and `(804) 555-0100` are not production facts.
 
 ## Refusals (correct)
 
 - Carousel refused (not on Launch Now menu).
 - Ad ops refused.
 - No invented phone.
-- No invented origin, tasting notes, discount, shipping, reviews, extra quantities, or certifications.
+- No invented origin, tasting notes, discount, shipping, reviews, extra quantities, certifications, or scarcity claims.
 
 ## Explicit limits (do not hide)
 

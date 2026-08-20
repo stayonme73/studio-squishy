@@ -26,6 +26,8 @@ export const HARBOR_ROAST_AUTHORIZED_PRODUCT_URL =
 export const HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL =
   "hello@harborroast.example" as const;
 
+export const HARBOR_ROAST_AUTHORIZED_CTA = "Shop the autumn box" as const;
+
 export const studioRoom4cScenario2HarborRoastV1 = {
   schemaVersion: 1 as const,
   packageId: ROOM_4C_SCENARIO_2_PACKAGE_ID,
@@ -38,7 +40,7 @@ export const studioRoom4cScenario2HarborRoastV1 = {
   offer: {
     name: "Autumn Single-Origin Box",
     description:
-      "A limited autumn coffee box from Harbor Roast Coffee Co.",
+      "The Autumn Single-Origin Box from Harbor Roast Coffee Co.",
     windowDisplay: "October 1 – October 31, 2026",
     windowStartIso: "2026-10-01",
     windowEndIso: "2026-10-31",
@@ -52,7 +54,7 @@ export const studioRoom4cScenario2HarborRoastV1 = {
     calmWellness: false,
   },
   cta: {
-    label: "Limited autumn box",
+    label: HARBOR_ROAST_AUTHORIZED_CTA,
     bookingUrl: HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
     supportEmail: HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL,
   },
@@ -99,7 +101,7 @@ export const studioRoom4cScenario2HarborRoastV1 = {
     supportingCopy: HARBOR_ROAST_AUTHORIZED_CONTENTS,
     datesDisplay: "October 1 – October 31, 2026",
     priceDisplay: "$48",
-    cta: "Limited autumn box",
+    cta: HARBOR_ROAST_AUTHORIZED_CTA,
     bookingContact: HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
     contentsDisplay: HARBOR_ROAST_AUTHORIZED_CONTENTS,
     emailDisplay: HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL,

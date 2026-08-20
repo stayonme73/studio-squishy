@@ -416,4 +416,77 @@ describe("generic customer-fact source gate", () => {
       expect.arrayContaining(["machine_inferred_contact", "stale_or_invented_fact"]),
     );
   });
+
+  it("fails when a CTA differs from the approved CTA", () => {
+    const approved: ApprovedCustomerFactRecord = {
+      approvalStatus: "OWNER_APPROVED_FOR_CERTIFICATION",
+      values: { cta: "Shop the autumn box" },
+      requiredFactIds: ["cta"],
+      forbiddenExact: [],
+    };
+    const result = evaluateCustomerFactSourceGate({
+      approvedRecord: approved,
+      sources: [
+        {
+          sourceId: "caption",
+          text: "Reserve yours today",
+          requireExact: ["cta"],
+        },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    expect(
+      result.findings.some(
+        (f) => f.code === "missing_exact_fact" && f.factId === "cta",
+      ),
+    ).toBe(true);
+  });
+
+  it("fails when a non-action label substitutes for the approved CTA", () => {
+    const approved: ApprovedCustomerFactRecord = {
+      approvalStatus: "OWNER_APPROVED_FOR_CERTIFICATION",
+      values: { cta: "Shop the autumn box" },
+      requiredFactIds: ["cta"],
+      forbiddenExact: [],
+    };
+    const result = evaluateCustomerFactSourceGate({
+      approvedRecord: approved,
+      sources: [
+        {
+          sourceId: "social-square-layers",
+          text: "Limited autumn box",
+          requireExact: ["cta"],
+        },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    expect(result.findings.map((f) => f.code)).toEqual(
+      expect.arrayContaining([
+        "missing_exact_fact",
+        "cta_substituted_with_non_action_label",
+        "unapproved_claim",
+      ]),
+    );
+  });
+
+  it("fails unauthorized scarcity language even when the approved CTA is present", () => {
+    const approved: ApprovedCustomerFactRecord = {
+      approvalStatus: "OWNER_APPROVED_FOR_CERTIFICATION",
+      values: { cta: "Shop the autumn box" },
+      requiredFactIds: ["cta"],
+      forbiddenExact: [],
+    };
+    const result = evaluateCustomerFactSourceGate({
+      approvedRecord: approved,
+      sources: [
+        {
+          sourceId: "email",
+          text: "Shop the autumn box while supplies last",
+          requireExact: ["cta"],
+        },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    expect(result.findings.map((f) => f.code)).toContain("unapproved_claim");
+  });
 });

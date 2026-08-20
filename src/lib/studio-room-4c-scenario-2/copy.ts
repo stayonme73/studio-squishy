@@ -62,7 +62,7 @@ export function formatScenario2EmailPasteReady(): string {
  * Speak the authorized price, dates, and contents. Do not speak URL, email, or phone.
  */
 export const SCENARIO_2_APPROVED_NARRATION =
-  "Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This limited launch is forty-eight dollars and includes three 8-ounce bags of whole-bean single-origin coffee, available October first through October thirty-first, twenty twenty-six. Get the limited autumn box.";
+  "Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This autumn launch is forty-eight dollars and includes three 8-ounce bags of whole-bean single-origin coffee, available October first through October thirty-first, twenty twenty-six. Shop the autumn box this October.";
 
 export function buildScenario2NarrationScript(): string {
   return SCENARIO_2_APPROVED_NARRATION;
@@ -78,7 +78,8 @@ export function buildScenario2CampaignDirection(): string {
     `Contents: ${brief.offer.contentsDisplay}.`,
     `Purchase: ${brief.cta.bookingUrl}.`,
     `Support: ${brief.cta.supportEmail}.`,
-    "Tone is warm and grounded. No neon. No invented origin, shipping, discount, reviews, or phone.",
+    "Tone is warm and grounded. No neon. No invented origin, shipping, discount, reviews, phone, or scarcity.",
+    "Availability dates are the window only. They do not authorize a shortage claim.",
     `Call to action: ${brief.cta.label}.`,
     "Social square, social vertical, short vertical video, promotional email, caption, and 5×7 counter card share the same photograph, logo, and facts.",
   ].join("\n");
@@ -111,6 +112,12 @@ export function scenario2CopyQualityBrief(): CopyQualityBrief {
       "we will post for you",
       "ad account",
       literalToken(STALE_BOOKING_URL),
+      String.raw`\blimited\b`,
+      "limited-time",
+      "while supplies last",
+      "selling fast",
+      "only a few left",
+      "exclusive availability",
     ],
     ctaTokens: [
       brief.cta.label,

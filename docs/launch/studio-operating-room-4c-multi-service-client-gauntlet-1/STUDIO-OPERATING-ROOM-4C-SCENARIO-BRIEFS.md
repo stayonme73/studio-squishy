@@ -34,9 +34,10 @@ Fictional customers only. Preserve approved substance.
 ## Scenario 2 — Product or Offer Launch
 
 **Customer:** Harbor Roast Coffee Co.  
-**Offer:** Limited “Autumn Single-Origin Box” launch  
+**Offer:** “Autumn Single-Origin Box” launch  
 **Sale window:** October 1 – October 31, 2026  
 **Price:** $48  
+**CTA:** Shop the autumn box  
 **Contents:** three 8-ounce bags of whole-bean single-origin coffee  
 **Product URL:** harborroast.example/autumn-box  
 **Support email:** hello@harborroast.example  
@@ -49,11 +50,11 @@ Fictional customers only. Preserve approved substance.
 - Marketing copy / email (+ captions as appropriate)  
 - Print collateral where appropriate (shelf / counter card)  
 
-**Limits disclosed:** no ads operations; no carousel; Level 1 ad creative only if creatively requested and already sellable as creative production — never targeting/budgets/ops. Product name does not substitute for contents.
+**Limits disclosed:** no ads operations; no carousel; Level 1 ad creative only if creatively requested and already sellable as creative production — never targeting/budgets/ops. Product name does not substitute for contents. CTA must be the authorized action. Dates do not authorize scarcity claims.
 
 **Scenario status at package open:** NOT_STARTED  
-**Scenario status now:** EXECUTED · OWNER DECISION PENDING (first pass FIX REQUIRED; authorized-fact correction complete; Tagia still reviews)  
-**Fact status:** OWNER_APPROVED_FOR_CERTIFICATION (locked package-brief facts include contents, product URL, and support email; no phone was authorized)
+**Scenario status now:** EXECUTED · OWNER DECISION PENDING (CTA authority correction complete; Tagia still reviews)  
+**Fact status:** OWNER_APPROVED_FOR_CERTIFICATION (contents, product URL, support email, CTA **Shop the autumn box**; no phone; no scarcity claims)
 
 ---
 

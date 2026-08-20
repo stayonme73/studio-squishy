@@ -22,7 +22,7 @@ export function scenario2VideoPlateCopy(): readonly Scenario2VideoPlateCopy[] {
     },
     {
       file: "beat-02-offer.png",
-      eyebrow: "LIMITED BOX",
+      eyebrow: "AUTUMN BOX",
       line1: brief.offer.name,
       line2: brief.offer.contentsDisplay,
     },

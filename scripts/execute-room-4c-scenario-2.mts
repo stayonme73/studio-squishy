@@ -341,6 +341,14 @@ function assertNoInventedContact(label: string, text: string) {
   if (/\(\d{3}\)/.test(text)) {
     throw new Error(`INVENTED_PHONE:${label}`);
   }
+  if (
+    /\blimited\b/i.test(text) ||
+    /while supplies last/i.test(text) ||
+    /selling fast/i.test(text) ||
+    /only a few left/i.test(text)
+  ) {
+    throw new Error(`SCARCITY_CLAIM:${label}`);
+  }
   const urls = text.match(/\b[a-z0-9][a-z0-9.-]*\.[a-z]{2,}\/[^\s]*/gi) ?? [];
   for (const url of urls) {
     if (url.toLowerCase() !== HARBOR_ROAST_AUTHORIZED_PRODUCT_URL) {
@@ -382,7 +390,28 @@ Current owner-review index: \`${REVIEW_REL}/OWNER-REVIEW.md\`
   );
   write(
     `${ARTIFACT_REL}/renders/v3/SUPERSEDED.md`,
-    "# SUPERSEDED\n\nIntermediate Harbor Roast render from the authorized-fact correction attempt. Not in the current owner-review index. Current campaign render is v4.\n",
+    "# SUPERSEDED\n\nIntermediate Harbor Roast render from the authorized-fact correction attempt. Not in the current owner-review index.\n",
+  );
+}
+
+function markLimitedCtaSuperseded() {
+  const supersededRel = `${EVIDENCE_REL}/superseded-limited-cta`;
+  write(
+    `${supersededRel}/SUPERSEDED.md`,
+    `# SUPERSEDED — Limited autumn box CTA
+
+Tagia rejected the authorized-fact correction because the CTA was **Limited autumn box**.
+
+The owner-authorized CTA is **Shop the autumn box**. “Limited” is prohibited scarcity language. Dates October 1–31, 2026 remain authorized and do not authorize a shortage claim.
+
+Do **not** use \`campaign-artifacts/renders/v4/\` or files under \`${supersededRel}/\` as the current owner-review set.
+
+Current owner-review index: \`${REVIEW_REL}/OWNER-REVIEW.md\`
+`,
+  );
+  write(
+    `${ARTIFACT_REL}/renders/v4/SUPERSEDED.md`,
+    "# SUPERSEDED\n\nHarbor Roast render using the unauthorized CTA “Limited autumn box”. Not in the current owner-review index.\n",
   );
   const archiveRoot = path.join(repoRoot, supersededRel, "owner-review");
   if (!existsSync(path.join(archiveRoot, "OWNER-REVIEW.md"))) {
@@ -425,6 +454,7 @@ async function main() {
 
   assertScenario1HashesUnchanged();
   markFirstPassSuperseded();
+  markLimitedCtaSuperseded();
 
   const briefJson = canonicalScenario2BriefJson();
   const briefSha256 = hashScenario2Brief(briefJson);
@@ -571,7 +601,6 @@ async function main() {
         {
           subjectOptions: [
             `${brief.offer.name} — ${brief.offer.priceDisplay}`,
-            `Limited ${brief.offer.name} from ${brief.customer.businessName}`,
           ],
           previewText: `${brief.offer.priceDisplay} · ${brief.offer.windowDisplay}`,
           body: emailText,
@@ -615,6 +644,7 @@ async function main() {
     "businessName",
     "offerName",
     "contentsDisplay",
+    "cta",
   ]);
   if (
     narrationPreview.includes("harborroast.example") ||
@@ -1120,11 +1150,12 @@ async function main() {
 
   write(
     `${REVIEW_REL}/OWNER-REVIEW.md`,
-    `# Owner-review index — Scenario 2 Harbor Roast (authorized-fact correction)
+    `# Owner-review index — Scenario 2 Harbor Roast (CTA authority correction)
 
-This is the **current** review set. First-pass outputs are superseded and are **not** listed here.
+This is the **current** review set. Earlier outputs are superseded and are **not** listed here.
 
-See \`${EVIDENCE_REL}/superseded-first-pass/SUPERSEDED.md\`.
+- First-pass omitted facts: \`${EVIDENCE_REL}/superseded-first-pass/SUPERSEDED.md\`
+- Unauthorized CTA “Limited autumn box”: \`${EVIDENCE_REL}/superseded-limited-cta/SUPERSEDED.md\`
 
 Review evidence only. Classification remains **OWNER DECISION PENDING**.
 
@@ -1170,7 +1201,7 @@ ${narration}
 
 ## Narration vs on-screen facts
 
-All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, contents **three 8-ounce bags of whole-bean single-origin coffee**, price **$48**, dates **October 1 – October 31, 2026**, CTA **Limited autumn box**, product URL **harborroast.example/autumn-box** on the CTA plate, caption, email, social, and counter card. Narration does **not** speak the URL, support email, or a phone. Support email **hello@harborroast.example** is in the email package only.
+All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, contents **three 8-ounce bags of whole-bean single-origin coffee**, price **$48**, dates **October 1 – October 31, 2026**, CTA **${brief.cta.label}**, product URL **harborroast.example/autumn-box** on the CTA plate, caption, email, social, and counter card. Narration does **not** speak the URL, support email, or a phone. Support email **hello@harborroast.example** is in the email package only. Dates are the availability window, not a scarcity claim.
 
 ## Known pacing concern
 

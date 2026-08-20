@@ -8,6 +8,7 @@
 
 import {
   HARBOR_ROAST_AUTHORIZED_CONTENTS,
+  HARBOR_ROAST_AUTHORIZED_CTA,
   HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
   HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL,
   studioRoom4cScenario2HarborRoastV1 as brief,
@@ -23,6 +24,7 @@ import {
 export const SCENARIO_2_STALE_PHONE = "(804) 555-0100";
 export const SCENARIO_2_STALE_BOOKING_URL = "harborroast.example/book";
 export const SCENARIO_2_STALE_EMAIL = "info@harborroast.example";
+export const SCENARIO_2_STALE_CTA = "Limited autumn box";
 
 export const SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD: ApprovedCustomerFactRecord =
   {
@@ -32,7 +34,7 @@ export const SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD: ApprovedCustomerFactRecor
       datesDisplay: "October 1 – October 31, 2026",
       priceDisplay: "$48",
       contentsDisplay: HARBOR_ROAST_AUTHORIZED_CONTENTS,
-      cta: "Limited autumn box",
+      cta: HARBOR_ROAST_AUTHORIZED_CTA,
       businessName: "Harbor Roast Coffee Co.",
       bookingUrl: HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
       bookingContact: HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
@@ -52,6 +54,7 @@ export const SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD: ApprovedCustomerFactRecor
       SCENARIO_2_STALE_PHONE,
       SCENARIO_2_STALE_BOOKING_URL,
       SCENARIO_2_STALE_EMAIL,
+      SCENARIO_2_STALE_CTA,
     ],
     unapprovedClaimPatterns: [
       "best coffee",
@@ -61,6 +64,12 @@ export const SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD: ApprovedCustomerFactRecor
       "tasting notes",
       "free shipping",
       "50% off",
+      String.raw`\blimited\b`,
+      "limited-time",
+      "while supplies last",
+      "selling fast",
+      "only a few left",
+      "exclusive availability",
     ],
   };
 
@@ -91,6 +100,7 @@ export function staleScenario2FactHits(text: string): string[] {
   if (text.toLowerCase().includes(SCENARIO_2_STALE_EMAIL)) {
     hits.push("stale-email");
   }
+  if (text.includes(SCENARIO_2_STALE_CTA)) hits.push("stale-cta-limited");
   return hits;
 }
 

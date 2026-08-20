@@ -73,7 +73,8 @@ export type CustomerFactSourceGateFindingCode =
   | "machine_inferred_contact"
   | "placeholder_contact"
   | "unapproved_claim"
-  | "contents_substituted_with_offer_name";
+  | "contents_substituted_with_offer_name"
+  | "cta_substituted_with_non_action_label";
 
 export type CustomerFactSourceGateFinding = {
   code: CustomerFactSourceGateFindingCode;

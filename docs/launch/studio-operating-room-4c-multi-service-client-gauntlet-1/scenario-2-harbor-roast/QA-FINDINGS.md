@@ -8,7 +8,8 @@ First-pass QA that treated missing URL/email/contents as an explicit limit is **
 |-------|--------|
 | Coordinated product-launch package | PASS (same photo, logo, offer, price, dates, CTA, contents, URL) |
 | Same product appearance across formats | PASS |
-| Exact price / dates / contents / CTA | PASS (`$48`, October 1 – October 31, 2026, three 8-ounce bags of whole-bean single-origin coffee, Limited autumn box) |
+| Exact price / dates / contents / CTA | PASS (`$48`, October 1 – October 31, 2026, three 8-ounce bags of whole-bean single-origin coffee, Shop the autumn box) |
+| Approved CTA is an action; no scarcity language | PASS |
 | Product name cannot substitute for contents | PASS |
 | Exact product URL on email, caption, counter card, video CTA, and social | PASS (`harborroast.example/autumn-box`) |
 | Exact support email on the email package | PASS (`hello@harborroast.example`) |

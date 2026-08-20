@@ -25,6 +25,7 @@ import {
   scenario2CanonicalCustomerFacts,
   SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD,
   SCENARIO_2_STALE_BOOKING_URL,
+  SCENARIO_2_STALE_CTA,
   SCENARIO_2_STALE_PHONE,
 } from "./fact-integrity";
 import { scenario2VideoCtaPlateCopy, scenario2VideoPlateCopy } from "./video-plates";
@@ -146,9 +147,13 @@ export function collectScenario2CustomerFactSources(): CustomerFactSource[] {
     {
       sourceId: "narration",
       text: buildScenario2NarrationScript(),
-      requireExact: ["businessName", "offerName", "contentsDisplay"],
+      requireExact: ["businessName", "offerName", "contentsDisplay", "cta"],
       forbidExact: ["bookingUrl", "emailDisplay"],
-      forbidSubstrings: [SCENARIO_2_STALE_PHONE, SCENARIO_2_STALE_BOOKING_URL],
+      forbidSubstrings: [
+        SCENARIO_2_STALE_PHONE,
+        SCENARIO_2_STALE_BOOKING_URL,
+        SCENARIO_2_STALE_CTA,
+      ],
     },
   ];
 }

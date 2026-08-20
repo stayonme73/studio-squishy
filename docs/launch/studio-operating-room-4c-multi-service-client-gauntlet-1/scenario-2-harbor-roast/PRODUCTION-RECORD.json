@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-20T22:56:50.999Z",
-  "briefSha256": "955bbebd70470521680250f47e6f7ce536a1b74cc87f2137a769b6bce28ce4db",
+  "generatedAt": "2026-08-20T23:24:19.237Z",
+  "briefSha256": "f64a550f96b3859cf952eeab611461b38df288d005f3adda6ea22f25f542e36d",
   "acceptance": {
     "admit": true,
     "menuOk": true,
@@ -101,27 +101,27 @@
     }
   ],
   "campaign": {
-    "renderVersion": 4,
+    "renderVersion": 6,
     "systemId": "harbor-roast-coffee-v1",
     "familyId": "full_bleed_hero",
-    "setFingerprint": "4b7804bd40ca8ced54480b8350dc28c01fe7e6c86696e02a05fb20ed4a76b86b",
+    "setFingerprint": "ce3304770dceb554de5e547a274d15bbab66d33be711eef835ec8d2288ae7588",
     "pngShas": {
-      "social_square__full_bleed_hero": "393ddcd855de954fa1ee351410157a050a9e9f551dd389dc3a8ae398f45785b6",
-      "social_vertical__full_bleed_hero": "043bf9a66b500a8b3d57fbe6dc02d6bdf0c2a463db830c242de42e9ccc83cce2",
-      "print_counter_card__full_bleed_hero": "3e22fe863dbe19a885b463c6d2942754a761008f99941b96cb2f74952b0ef9d0"
+      "social_square__full_bleed_hero": "059733f9ccb32c56a44351de49416a2a4a89fdefbd5f3cdca6777cf081cb8ae5",
+      "social_vertical__full_bleed_hero": "b519eb38762860a8fd832340c531fa8b72071e1d8495113f9f033442e5043b36",
+      "print_counter_card__full_bleed_hero": "5b5d398bad4b8e755c5af59dd3a29b46ca7d9f1f84fee7969c334042a73b40a9"
     }
   },
   "voice": {
-    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787266615556_53b8b9e2ffed.mp3",
-    "contentSha256": "53b8b9e2ffed362eebc31df3b3e3deeca6ee0c2842020e6004b3f2bec54de4b4",
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787268263863_ed60557813d4.mp3",
+    "contentSha256": "ed60557813d4255d5ce873ffa2967475c2e35c7f38ff191a73e184fab555dced",
     "skuUsedForTtsAdapter": "ap-001",
     "soldAs": "supporting narration for v2-rtu-short-video"
   },
   "video": {
-    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/work-packet-s2-1787266615556.json",
-    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787266615556.mp4",
+    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/work-packet-s2-1787268263863.json",
+    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787268263863.mp4",
     "durationSeconds": 20,
-    "providerRenderId": "d370e277-dc02-4789-bfbc-068e77d54a85"
+    "providerRenderId": "894220f4-ac92-4d91-bec0-a95dcef2c56a"
   },
   "print": {
     "pngPx": {
@@ -173,6 +173,6 @@
     "narrationIsApprovedContinuous": true,
     "videoDurationInBand": true,
     "filesOpen": true,
-    "runId": "8cbf85ed-163e-4138-909a-17e781122f93"
+    "runId": "9cdc5b1d-309a-4876-8f26-6b01d72f54ba"
   }
 }

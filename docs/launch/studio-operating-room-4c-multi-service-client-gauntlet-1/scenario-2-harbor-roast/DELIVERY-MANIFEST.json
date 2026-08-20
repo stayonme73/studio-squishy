@@ -3,23 +3,23 @@
   "packageId": "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1",
   "scenarioId": "scenario-2-product-or-offer-launch",
   "campaignId": "room-4c-s2-harbor-roast-coffee",
-  "briefSha256": "955bbebd70470521680250f47e6f7ce536a1b74cc87f2137a769b6bce28ce4db",
-  "generatedAt": "2026-08-20T22:56:50.999Z",
+  "briefSha256": "f64a550f96b3859cf952eeab611461b38df288d005f3adda6ea22f25f542e36d",
+  "generatedAt": "2026-08-20T23:24:19.237Z",
   "files": [
     {
       "id": "campaign-direction",
       "previewRole": "campaign-direction",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/campaign-direction.md",
-      "contentSha256": "05a7219431343eec8a24dcb3b1cf6c33c41f616fe93a70a5ecad8e03482fbe02",
-      "byteLength": 643,
+      "contentSha256": "0370d0f63004f41b264da6b26e76efb758515b01815a8b811f9430a544f6c876",
+      "byteLength": 734,
       "mimeType": "text/markdown"
     },
     {
       "id": "social-square",
       "previewRole": "social-square",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/social-square.png",
-      "contentSha256": "393ddcd855de954fa1ee351410157a050a9e9f551dd389dc3a8ae398f45785b6",
-      "byteLength": 1073518,
+      "contentSha256": "059733f9ccb32c56a44351de49416a2a4a89fdefbd5f3cdca6777cf081cb8ae5",
+      "byteLength": 1073697,
       "widthPx": 1080,
       "heightPx": 1080,
       "mimeType": "image/png"
@@ -28,8 +28,8 @@
       "id": "social-vertical",
       "previewRole": "social-vertical",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/social-vertical.png",
-      "contentSha256": "043bf9a66b500a8b3d57fbe6dc02d6bdf0c2a463db830c242de42e9ccc83cce2",
-      "byteLength": 1780749,
+      "contentSha256": "b519eb38762860a8fd832340c531fa8b72071e1d8495113f9f033442e5043b36",
+      "byteLength": 1781181,
       "widthPx": 1080,
       "heightPx": 1920,
       "mimeType": "image/png"
@@ -38,8 +38,8 @@
       "id": "video",
       "previewRole": "video",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/video.mp4",
-      "contentSha256": "da3806ecfae43d809739e05caa7dc1a674efe393ba7b27d45774bc570110f9f4",
-      "byteLength": 7525112,
+      "contentSha256": "d5a58bdcc6426e198d91f120ee826793de93d577893cd0f09a18fb3b91a5bd03",
+      "byteLength": 7553142,
       "widthPx": 1080,
       "heightPx": 1920,
       "durationSeconds": 20,
@@ -49,24 +49,24 @@
       "id": "caption",
       "previewRole": "caption",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/caption.txt",
-      "contentSha256": "56f7574ba5dbe310c279feab9c687f6c349de02e3171de7c0dec9357fee720e9",
-      "byteLength": 196,
+      "contentSha256": "8210e3b4bd40309a8e9dc4da67f01d30074ea9a851bad48e4f21e1f265a18af3",
+      "byteLength": 197,
       "mimeType": "text/plain"
     },
     {
       "id": "email",
       "previewRole": "email",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/email.txt",
-      "contentSha256": "7b58b9b79b5b2d8e7893359054fb638595bfa6fb7281f333c5c0ced3dd9b4cc2",
-      "byteLength": 373,
+      "contentSha256": "34eb2a5e39706a5ce1e8538098d497d716bfec94016edb5ffc5640a5984c4af8",
+      "byteLength": 374,
       "mimeType": "text/plain"
     },
     {
       "id": "counter-card-png",
       "previewRole": "counter-card-png",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/counter-card.png",
-      "contentSha256": "3e22fe863dbe19a885b463c6d2942754a761008f99941b96cb2f74952b0ef9d0",
-      "byteLength": 2630171,
+      "contentSha256": "5b5d398bad4b8e755c5af59dd3a29b46ca7d9f1f84fee7969c334042a73b40a9",
+      "byteLength": 2630432,
       "widthPx": 1500,
       "heightPx": 2100,
       "mimeType": "image/png"
@@ -75,8 +75,8 @@
       "id": "counter-card-pdf",
       "previewRole": "counter-card-pdf",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/counter-card.pdf",
-      "contentSha256": "28ec32da5c7eef5f45ecef4e6b22d22258ef4a538c7c581c6a41e3e126088865",
-      "byteLength": 3862019,
+      "contentSha256": "eecaa18345e05fa3beb88c1c7414d871303fd00e14e69ad7adbd92da3931da8b",
+      "byteLength": 3861815,
       "mimeType": "application/pdf"
     }
   ]

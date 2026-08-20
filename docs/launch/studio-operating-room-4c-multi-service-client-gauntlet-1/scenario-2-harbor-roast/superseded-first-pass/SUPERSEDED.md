@@ -8,9 +8,6 @@ Do **not** use the following as the current owner-review set:
 
 - `campaign-artifacts/renders/v1/`
 - `campaign-artifacts/renders/v2/`
-- `campaign-artifacts/renders/v3/` (intermediate correction attempt)
 - First-pass files copied under `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-first-pass/`
-
-Current campaign render is **v4**.
 
 Current owner-review index: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/OWNER-REVIEW.md`

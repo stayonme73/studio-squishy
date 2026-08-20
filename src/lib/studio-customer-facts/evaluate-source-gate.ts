@@ -30,6 +30,9 @@ const PLACEHOLDER_PATTERNS: readonly RegExp[] = [
   /xxx-xxx-xxxx/i,
 ];
 
+const ACTION_CTA_RE =
+  /^(shop|book|buy|order|get|call|visit|join|start|try|see|learn|schedule|reserve)\b/i;
+
 const UNAPPROVED_CLAIM_PATTERNS: readonly RegExp[] = [
   /guaranteed/i,
   /best in /i,
@@ -38,6 +41,12 @@ const UNAPPROVED_CLAIM_PATTERNS: readonly RegExp[] = [
   /50%\s*off/i,
   /we will post for you/i,
   /ad account/i,
+  /\blimited(?:-time)?\b/i,
+  /while supplies last/i,
+  /selling fast/i,
+  /only a few left/i,
+  /exclusive availability/i,
+  /running out/i,
 ];
 
 function push(
@@ -206,6 +215,20 @@ function evaluateSource(
         expected,
         detail: `${source.sourceId} is missing exact ${factId}.`,
       });
+      if (
+        factId === "cta" &&
+        ACTION_CTA_RE.test(expected.trim()) &&
+        !ACTION_CTA_RE.test(source.text.trim())
+      ) {
+        push(findings, {
+          code: "cta_substituted_with_non_action_label",
+          sourceId: source.sourceId,
+          factId: "cta",
+          expected,
+          detail:
+            "A non-action label cannot substitute for the approved CTA.",
+        });
+      }
     }
   }
 
