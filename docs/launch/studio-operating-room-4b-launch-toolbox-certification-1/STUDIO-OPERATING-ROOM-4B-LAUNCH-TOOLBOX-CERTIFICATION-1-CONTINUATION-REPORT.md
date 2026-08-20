@@ -201,7 +201,10 @@ Live creative inspection: **overrides** “green walk = sellable campaign.”
 
 ## Final work commit / push-sync
 
-Recorded after this report lands (Scout commit + push). **No merge.**
+- **Continuation work tip:** `f21c65e`
+- Prior park tip: `e87b193` · hash note `7fdcefe`
+- **Branch:** `operating/design-renderer-proof-1` (synced with origin)
+- **Merge:** No
 
 ---
 
