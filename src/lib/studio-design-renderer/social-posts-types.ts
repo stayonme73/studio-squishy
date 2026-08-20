@@ -293,7 +293,9 @@ export type SocialPostsRendererFailureCode =
   | "QA_FAILURE"
   | "SET_CONSISTENCY_FAILURE"
   | "PARTIAL_SET_FAILURE"
-  | "FIXTURE_LEAKAGE";
+  | "FIXTURE_LEAKAGE"
+  | "COLLISION"
+  | "OVERLAP";
 
 export type SocialPostsRendererPipelineResult =
   | {

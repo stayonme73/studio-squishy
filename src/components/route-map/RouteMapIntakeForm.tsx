@@ -161,7 +161,7 @@ function buildSocialPostsAnswers(state: SocialPostsIntakeState): RouteMapIntakeA
     postsAbout: [state.purpose, state.purposeDetail.trim()].filter(Boolean).join(" — "),
     callToAction: [
       state.action,
-      state.actionDestination.trim() ? `Destination: ${state.actionDestination.trim()}` : "",
+      state.actionDestination.trim(),
     ]
       .filter(Boolean)
       .join(" — "),

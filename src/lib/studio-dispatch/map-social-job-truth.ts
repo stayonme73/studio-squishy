@@ -12,6 +12,13 @@ import {
   mapSocialPostsSetStructureFromIntakeAnswers,
 } from "@/lib/studio-design-renderer";
 import type { SocialPostsProjectTruth } from "@/lib/studio-design-renderer";
+import {
+  isInternalProductionChromeText,
+  resolveCustomerBusinessName,
+  resolveCustomerOfferHeadline,
+  shortenCustomerFacingCta,
+  stripCustomerFacingCta,
+} from "@/lib/studio-design-renderer/customer-facing-creative-copy";
 
 import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
 import type { JobDispatchRecord } from "./types";
@@ -212,30 +219,61 @@ export function mapSocialPostsProjectTruthFromJob(input: {
     return { ok: false, code: logo.code, message: logo.message };
   }
 
-  const businessName = input.campaign.campaignName.trim() || "Customer";
+  const businessName = resolveCustomerBusinessName({
+    campaignName: input.campaign.campaignName,
+    mustInclude: String(answers.mustInclude ?? postsAbout),
+    businessNameAnswer: String(answers.businessName ?? "").trim() || undefined,
+  });
   const wordmark = businessName;
   const purposeChoice = String(
     answers.socialPostsPurposeChoice ?? "",
   ).trim();
-  const descriptor =
-    purposeChoice ||
-    String(answers.businessType ?? "").trim() ||
-    "Local business";
-  const actionChoice = String(answers.socialPostsActionChoice ?? "").trim();
+  const offerNameRaw = resolveCustomerOfferHeadline({
+    postsAbout,
+    mustInclude: String(answers.mustInclude ?? ""),
+    fallback:
+      postsAbout
+        .replace(
+          /^(Promote an offer|Share an update|Build awareness|Something else)\s*[—–-]\s*/i,
+          "",
+        )
+        .split(/[.\n—–-]/)[0]
+        ?.trim()
+        .slice(0, 80) || postsAbout.slice(0, 80),
+  });
+  // Offer name/headline must not embed price — trust_brand paints headline and
+  // set QA forbids campaign price on the brand-only post.
   const offerName =
-    postsAbout.split(/[.\n—–-]/)[0]?.trim().slice(0, 80) ||
-    postsAbout.slice(0, 80);
-  const cta =
-    actionChoice && !callToAction.toLowerCase().includes(actionChoice.toLowerCase())
-      ? `${actionChoice} — ${callToAction}`.slice(0, 120)
-      : callToAction.slice(0, 120);
-  const disclaimer =
-    mustNotSay ||
-    "Finished social posts and captions for your upload. You post and schedule.";
+    brandSafeBody(offerNameRaw)
+      .replace(/\s*[—–.]\s*$/g, "")
+      .trim()
+      .slice(0, 80) || "Your offer";
+  // Prefer offer language — never paint bare intake chips alone.
+  const descriptor =
+    (purposeChoice && !isInternalProductionChromeText(purposeChoice)
+      ? ""
+      : "") ||
+    String(answers.businessType ?? "").trim() ||
+    "Wellness studio";
+  const strippedCta = shortenCustomerFacingCta(
+    stripCustomerFacingCta(callToAction),
+  );
+  const cta = strippedCta.slice(0, 48);
+  // Customer art: mustNotSay constraints stay out of PNG; no distribution footnotes.
+  const disclaimer = "";
+  const bodyRaw = brandSafeBody(postsAbout)
+    .replace(
+      /^(Promote an offer|Share an update|Build awareness|Something else)\s*[—–-]\s*/i,
+      "",
+    )
+    .replace(/\s*[—–-]\s*/g, " — ")
+    .replace(/\.{2,}/g, ".")
+    .replace(/\s+/g, " ")
+    .trim();
 
   const requiredTextTokens = [
     extracted.priceDisplay,
-    businessName.split(/\s+/)[0]!,
+    wordmark.split(/\s+/)[0]!,
     ...extracted.dateWindow
       .split(/[–—,]/)
       .map((s) => s.trim())
@@ -254,11 +292,11 @@ export function mapSocialPostsProjectTruthFromJob(input: {
     businessName,
     wordmark,
     descriptor,
-    headline: "Service you can trust",
+    headline: offerName.slice(0, 90) || "Service you can trust",
     offerName,
     priceDisplay: extracted.priceDisplay,
     dateWindow: extracted.dateWindow.slice(0, 120),
-    body: brandSafeBody(postsAbout),
+    body: bodyRaw.slice(0, 160),
     cta,
     phone: extracted.phone,
     webDisplay: extracted.webDisplay,
@@ -287,6 +325,12 @@ export function mapSocialPostsProjectTruthFromJob(input: {
       "CERTIFICATION FIXTURE",
       "Best in Richmond",
       "#1 rated",
+      "Destination:",
+      "Voice brief",
+      "MISSING FACT",
+      "You post and schedule",
+      "offer_lead",
+      "Post 1 of 4",
       ...(mustNotSay ? [mustNotSay.slice(0, 80)] : []),
     ],
     assets: structureMapped.structure.assets,

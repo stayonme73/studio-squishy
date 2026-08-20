@@ -73,7 +73,10 @@ export function socialPostsStateFromAnswers(
 
   const callToAction = String(answers.callToAction ?? "");
   const destinationMatch = callToAction.match(/Destination:\s*(.+)$/i);
-  const actionDestination = destinationMatch?.[1]?.trim() ?? "";
+  let actionDestination = destinationMatch?.[1]?.trim() ?? "";
+  if (!actionDestination && action && callToAction.startsWith(`${action} — `)) {
+    actionDestination = callToAction.slice(action.length + 3).trim();
+  }
 
   const materials = String(answers.materials ?? "");
   const fileName = firstLineAfterPrefix(materials, /Selected file:\s*(.+)/i);

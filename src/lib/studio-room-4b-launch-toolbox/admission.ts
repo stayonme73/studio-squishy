@@ -156,19 +156,19 @@ export function evaluateCampaignDeadlineAdmission(
   };
 }
 
-/** Carousel is a catalog exclusion on social posts — not sellable at launch. */
+/** Carousel is a catalog exclusion — not on the Launch Now menu. */
 export function evaluateCarouselAdmission(): CarouselAdmissionResult {
   return {
     admit: false,
     reason: "catalog_exclusion_on_social_posts",
     customerFacingMessage:
-      "Social carousels are not in the sellable launch catalog for social posts. We can produce static social graphics instead, within the purchased social-posts scope.",
+      "Social carousels are not on The Studio Launch Now menu. We can produce coordinated static social graphics instead, within the purchased social-posts scope.",
   };
 }
 
 /**
  * Classify one toolbox component from evidence.
- * Pure helper — does not invent production capability.
+ * Close taxonomy only: READY FOR LAUNCH | READY WITH EXPLICIT LIMITS | NOT ON LAUNCH MENU.
  */
 export function classifyToolboxComponent(
   id: ToolboxComponentId,
@@ -177,8 +177,8 @@ export function classifyToolboxComponent(
   if (id === "carousel") {
     return {
       id,
-      label: "NOT READY",
-      reason: "catalog_exclusion_on_social_posts",
+      label: "NOT ON LAUNCH MENU",
+      reason: "catalog_exclusion_decision_B_remove_from_launch_now",
       evidence,
     };
   }
@@ -186,7 +186,7 @@ export function classifyToolboxComponent(
   if (evidence.blockers && evidence.blockers.length > 0) {
     return {
       id,
-      label: "NOT READY",
+      label: "NOT ON LAUNCH MENU",
       reason: evidence.blockers.join("; "),
       evidence,
     };
@@ -195,7 +195,7 @@ export function classifyToolboxComponent(
   if (!evidence.produced) {
     return {
       id,
-      label: "NOT READY",
+      label: "NOT ON LAUNCH MENU",
       reason: "not_produced_in_this_certification",
       evidence,
     };
@@ -204,8 +204,8 @@ export function classifyToolboxComponent(
   if (evidence.produced && (!evidence.qaPassed || !evidence.inspected)) {
     return {
       id,
-      label: "NEEDS IMPROVEMENT",
-      reason: "produced_but_qa_or_inspection_incomplete",
+      label: "NOT ON LAUNCH MENU",
+      reason: "produced_but_not_professional_or_inspected",
       evidence,
     };
   }
@@ -213,7 +213,7 @@ export function classifyToolboxComponent(
   if (evidence.limits && evidence.limits.length > 0) {
     return {
       id,
-      label: "READY WITH LIMITS",
+      label: "READY WITH EXPLICIT LIMITS",
       reason: evidence.limits.join("; "),
       evidence,
     };
@@ -236,7 +236,7 @@ export function classifyToolboxComponent(
 
   return {
     id,
-    label: "READY WITH LIMITS",
+    label: "READY WITH EXPLICIT LIMITS",
     reason: evidence.notes ?? "partial_certification_path",
     evidence,
   };

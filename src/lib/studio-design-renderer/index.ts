@@ -241,6 +241,28 @@ export {
   resolvePromoRenderPaths,
 } from "./promo-bind";
 export { evaluatePromoSetConsistency } from "./promo-set-qa";
+export type { PromoSetQaResult } from "./promo-set-qa";
+export {
+  INTERNAL_FIELD_LEAK_PATTERNS,
+  FORBIDDEN_CUSTOMER_ART_FRAGMENTS,
+  assertNoInternalLeakInCustomerText,
+  stripCustomerFacingCta,
+  stripProductionMetadataFromMustInclude,
+  isInternalProductionChromeText,
+  curatedCustomerBodyFromMustInclude,
+  customerArtContainsForbiddenFragment,
+} from "./customer-facing-creative-copy";
+export {
+  evaluateTextLayerCollisions,
+  assertNoTextLayerCollisions,
+  estimateTextLayerAabb,
+  textLayersForCollisionCheck,
+} from "./text-layer-collision";
+export type {
+  TextLayerCollisionInput,
+  TextLayerCollisionResult,
+  TextLayerCollision,
+} from "./text-layer-collision";
 export {
   runPromoRendererPipeline,
   runPromoProofPipeline,

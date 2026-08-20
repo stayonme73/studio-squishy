@@ -3,11 +3,27 @@
  * Complements per-asset design-quality gating.
  */
 
+import {
+  customerArtContainsForbiddenFragment,
+  isInternalProductionChromeText,
+} from "./customer-facing-creative-copy";
+import {
+  evaluateTextLayerCollisions,
+  textLayersForCollisionCheck,
+} from "./text-layer-collision";
 import type { PromoAssetSpec, PromoCampaignSetSpec, PromoProjectTruth } from "./promo-types";
 
 export type PromoSetQaResult =
   | { ok: true; summary: string }
-  | { ok: false; code: "SET_CONSISTENCY_FAILURE" | "FIXTURE_LEAKAGE"; message: string };
+  | {
+      ok: false;
+      code:
+        | "SET_CONSISTENCY_FAILURE"
+        | "FIXTURE_LEAKAGE"
+        | "COLLISION"
+        | "OVERLAP";
+      message: string;
+    };
 
 function layoutFingerprint(asset: PromoAssetSpec): string {
   return asset.layers
@@ -25,6 +41,7 @@ export function evaluatePromoSetConsistency(input: {
   declaredTextByAsset: Record<string, string>;
 }): PromoSetQaResult {
   const { truth, spec, declaredTextByAsset } = input;
+  const customerMode = truth.outputMode === "customer";
 
   if (spec.assets.length !== 2) {
     return {
@@ -57,7 +74,60 @@ export function evaluatePromoSetConsistency(input: {
         message: `Asset ${asset.assetId} missing shared price truth`,
       };
     }
-    if (!text.includes(asset.authorizedPurpose)) {
+
+    if (customerMode) {
+      // Customer mode: purpose chrome on PNG is a FAIL (identity JSON may still carry it).
+      if (
+        asset.authorizedPurpose.trim() &&
+        text.includes(asset.authorizedPurpose)
+      ) {
+        return {
+          ok: false,
+          code: "FIXTURE_LEAKAGE",
+          message: `Customer asset ${asset.assetId} paints authorizedPurpose chrome onto PNG`,
+        };
+      }
+      if (
+        asset.layers.some(
+          (l) => l.type === "text" && l.role === "purpose_label",
+        )
+      ) {
+        return {
+          ok: false,
+          code: "FIXTURE_LEAKAGE",
+          message: `Customer asset ${asset.assetId} still declares a purpose_label layer`,
+        };
+      }
+      const leak = customerArtContainsForbiddenFragment(text);
+      if (leak) {
+        return {
+          ok: false,
+          code: "FIXTURE_LEAKAGE",
+          message: `Customer asset ${asset.assetId} contains internal fragment "${leak}"`,
+        };
+      }
+      for (const layer of asset.layers) {
+        if (layer.type !== "text") continue;
+        if (isInternalProductionChromeText(layer.content)) {
+          return {
+            ok: false,
+            code: "FIXTURE_LEAKAGE",
+            message: `Customer asset ${asset.assetId} layer ${layer.id} is production chrome`,
+          };
+        }
+      }
+      const collision = evaluateTextLayerCollisions(
+        textLayersForCollisionCheck(asset.layers),
+      );
+      if (!collision.ok) {
+        return {
+          ok: false,
+          code: collision.code,
+          message: `Asset ${asset.assetId}: ${collision.message}`,
+        };
+      }
+    } else if (!text.includes(asset.authorizedPurpose)) {
+      // Certification / production: purpose must remain visible on the plate.
       return {
         ok: false,
         code: "SET_CONSISTENCY_FAILURE",
@@ -97,7 +167,7 @@ export function evaluatePromoSetConsistency(input: {
   }
 
   // Customer mode must not leak fixture wording into deliverables.
-  if (truth.outputMode === "customer") {
+  if (customerMode) {
     for (const asset of spec.assets) {
       const text = declaredTextByAsset[asset.assetId] ?? "";
       if (/CERTIFICATION FIXTURE|INTERNAL TEST/i.test(text)) {

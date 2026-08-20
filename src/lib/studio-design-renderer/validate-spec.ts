@@ -6,6 +6,13 @@ import { existsSync } from "fs";
 import path from "path";
 
 import { FLYER_PROOF_CONTRACT } from "./contracts";
+import {
+  customerArtContainsForbiddenFragment,
+} from "./customer-facing-creative-copy";
+import {
+  evaluateTextLayerCollisions,
+  textLayersForCollisionCheck,
+} from "./text-layer-collision";
 import type { FlyerDesignSpec, FlyerProjectTruth } from "./types";
 import {
   DESIGN_RENDERER_PROOF_SKU,
@@ -15,7 +22,16 @@ import {
 
 export type SpecValidationResult =
   | { ok: true }
-  | { ok: false; code: "INVALID_DESIGN_SPEC" | "MISSING_REQUIRED_MATERIAL" | "BROKEN_ASSET_REFERENCE"; message: string };
+  | {
+      ok: false;
+      code:
+        | "INVALID_DESIGN_SPEC"
+        | "MISSING_REQUIRED_MATERIAL"
+        | "BROKEN_ASSET_REFERENCE"
+        | "COLLISION"
+        | "OVERLAP";
+      message: string;
+    };
 
 function isHexColor(v: string): boolean {
   return /^#[0-9A-Fa-f]{6}$/.test(v);
@@ -199,6 +215,24 @@ export function validateFlyerDesignSpec(
           code: "INVALID_DESIGN_SPEC",
           message:
             "Customer-mode flyer must not leak certification fixture labeling or Harbor demo destinations",
+        };
+      }
+      const fragment = customerArtContainsForbiddenFragment(joined);
+      if (fragment) {
+        return {
+          ok: false,
+          code: "INVALID_DESIGN_SPEC",
+          message: `Customer-mode flyer contains internal fragment "${fragment}"`,
+        };
+      }
+      const collision = evaluateTextLayerCollisions(
+        textLayersForCollisionCheck(spec.layers),
+      );
+      if (!collision.ok) {
+        return {
+          ok: false,
+          code: collision.code,
+          message: collision.message,
         };
       }
     }

@@ -16,6 +16,14 @@ import type {
 } from "@/lib/studio-design-renderer/types";
 import { DESIGN_RENDERER_PROOF_SKU } from "@/lib/studio-design-renderer/types";
 
+import {
+  curatedCustomerBodyFromMustInclude,
+  resolveCustomerBusinessName,
+  resolveCustomerOfferHeadline,
+  shortenCustomerFacingCta,
+  stripCustomerFacingCta,
+  stripProductionMetadataFromMustInclude,
+} from "@/lib/studio-design-renderer/customer-facing-creative-copy";
 import { applyExistingCtaHeadlineEmphasis } from "@/lib/studio-review-revision/flyer-revision-emphasis";
 import type { JobDispatchRecord } from "./types";
 
@@ -59,10 +67,6 @@ const SOFT_NEUTRAL_BOTANICAL_COLORS = {
   muted: "#6A655C",
 } as const;
 
-function stripStyleDirection(text: string): string {
-  return text.replace(/\n*Style:\s*[\s\S]*$/i, "").trim();
-}
-
 function brandColorsFromDirection(text: string): typeof DEFAULT_FLYER_COLORS {
   if (
     /botanical|soft neutral|warm,\s*clean,\s*calm|uncluttered|no childish school/i.test(
@@ -79,12 +83,12 @@ function extractOfferName(
   flyerPurpose: string,
   businessName: string,
 ): string {
-  const lines = stripStyleDirection(mustInclude)
+  const lines = stripProductionMetadataFromMustInclude(mustInclude)
     .split(/\n+/)
     .map((line) => line.trim())
     .filter(Boolean);
   const skip =
-    /includes:|customers may choose|^style:|call |visit |\(\d{3}\)|https?:|\$\d|book your reset/i;
+    /includes:|customers may choose|^style:|call |visit |\(\d{3}\)|https?:|\$\d|book your reset|voice brief|missing fact/i;
   const found = lines.find(
     (line) => line !== businessName && !skip.test(line) && line.length < 80,
   );
@@ -93,8 +97,13 @@ function extractOfferName(
   return (purposeTail || flyerPurpose).slice(0, 80);
 }
 
-function customerFacingFlyerBody(mustInclude: string): string {
-  const facts = stripStyleDirection(mustInclude);
+function customerFacingFlyerBody(
+  mustInclude: string,
+  voiceBriefExact?: string,
+): string {
+  const facts = stripProductionMetadataFromMustInclude(mustInclude, {
+    voiceBriefExact,
+  });
   const joined = facts.replace(/\s+/g, " ");
   const hasSession = /2-hour home organization session/i.test(joined);
   const hasArea = /one selected household area/i.test(joined);
@@ -115,7 +124,12 @@ function customerFacingFlyerBody(mustInclude: string): string {
     }
     return sessionAreaPlan;
   }
-  return facts;
+  return (
+    curatedCustomerBodyFromMustInclude(mustInclude, {
+      voiceBriefExact,
+      maxLen: 480,
+    }) || facts
+  );
 }
 
 function extractLines(mustInclude: string): {
@@ -271,7 +285,10 @@ export function mapFlyerProjectTruthFromJob(input: {
     };
   }
 
-  const businessName = input.campaign.campaignName.trim() || "Customer";
+  const businessName = resolveCustomerBusinessName({
+    campaignName: input.campaign.campaignName,
+    mustInclude,
+  });
   const wordmark = businessName;
   const descriptor = "";
   const disclaimer = String(answers.disclaimers ?? "").trim();
@@ -292,13 +309,22 @@ export function mapFlyerProjectTruthFromJob(input: {
     };
   }
 
-  const offerName = extractOfferName(mustInclude, flyerPurpose, businessName);
-  const body = customerFacingFlyerBody(mustInclude);
-  const cta =
-    String(answers.callToAction ?? "").trim() ||
-    "Book online or call";
+  const offerName = resolveCustomerOfferHeadline({
+    flyerPurpose,
+    mustInclude,
+    fallback: extractOfferName(mustInclude, flyerPurpose, businessName),
+  });
+  const voiceBriefExact = String(
+    answers.voiceBriefExact ?? answers.studioVoiceBrief ?? "",
+  ).trim();
+  const body = customerFacingFlyerBody(mustInclude, voiceBriefExact || undefined);
+  const cta = shortenCustomerFacingCta(
+    stripCustomerFacingCta(
+      String(answers.callToAction ?? "").trim() || "Book online or call",
+    ),
+  );
   const headline = applyExistingCtaHeadlineEmphasis({
-    headline: flyerPurpose.slice(0, 90),
+    headline: offerName.slice(0, 90),
     callToAction: cta,
     emphasis: input.campaign.machineFlyerRevisionEmphasis,
   });

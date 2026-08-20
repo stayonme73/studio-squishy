@@ -119,9 +119,10 @@ function niaMustInclude(bookingMethodFilled: boolean): string {
     `Price: ${NIA_PRICE_DISPLAY}.`,
     `Benefits: ${NIA_BENEFITS.join("; ")}.`,
     `Contact: ${NIA_CONTACT.phone} · ${NIA_CONTACT.email} · ${NIA_CONTACT.studioCity}.`,
-    `Style / Voice brief (authoritative): ${NIA_VOICE_BRIEF_EXACT}`,
-    NIA_STYLE_DIRECTION,
+    // Style direction stays for palette detection; mappers strip Style: trails from body.
+    `Style: ${NIA_STYLE_DIRECTION}`,
   ];
+  // Voice brief lives only on dedicated answer keys — never concatenated into mustInclude body.
   if (bookingMethodFilled) {
     facts.push(
       `Enrollment: book at rootedandready.example/fall-reset or call ${NIA_CONTACT.phone}.`,
@@ -160,7 +161,7 @@ function buildIntakeAnswers(opts: {
     businessType: "Wellness studio",
     campaignFocus: `${NIA_PROGRAM_TITLE} launch — six-week program starting ${NIA_PROGRAM_START_ISO}.`,
     dates: NIA_PROGRAM_DATES_DISPLAY,
-    disclaimers: "Spots limited. Finished creatives — customer distributes.",
+    disclaimers: "Spots limited.",
     graphicA_authorizedPurpose: "Social",
     graphicA_agreedPlate: SQUARE_PLATE,
     graphicB_authorizedPurpose: "Social",
@@ -171,7 +172,7 @@ function buildIntakeAnswers(opts: {
     socialPostsActionChoice: opts.bookingMethodFilled ? "Book now" : "Learn more",
     socialPostsPlatformChoice: "Instagram Post",
     socialPostsMaterialsChoices: "I can provide a logo",
-    postsAbout: `Promote an offer — ${NIA_PROGRAM_TITLE} ${NIA_PRICE_DISPLAY}. ${NIA_PROGRAM_DATES_DISPLAY}.`,
+    postsAbout: `${NIA_PROGRAM_TITLE} — six-week calm wellness reset. ${NIA_PRICE_DISPLAY}. ${NIA_PROGRAM_DATES_DISPLAY}.`,
     platform: "Instagram Post — Square or portrait feed graphic",
     wordingHashtags: "No required hashtags. Avoid loud fitness-challenge language.",
     // Keep empty — design QA treats mustNotSay text as declared creative copy;
@@ -182,7 +183,8 @@ function buildIntakeAnswers(opts: {
   };
 
   if (opts.bookingMethodFilled) {
-    answers.callToAction = `${ctaLabel} — Destination: ${ctaDestination}`;
+    // Plain CTA + destination — never prefix Destination: (mapper strip is safety net).
+    answers.callToAction = `${ctaLabel} — ${ctaDestination}`;
   } else {
     // Missing fact: do not put booking CTA destination in answers.
     answers.callToAction = ctaLabel;

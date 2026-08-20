@@ -2,6 +2,11 @@
  * STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1
  *
  * Nia Carter / Rooted & Ready / Fall Reset — launch toolbox production cert.
+ * Continuation-v2 re-run after flyer/promo/social composition mapper fixes
+ * (business name vs campaign title, short CTA, offer headline).
+ * Evidence lands in docs/.../continuation-v2/ (does not overwrite prior continuation).
+ * Set REUSE_PRIOR_CONTINUATION_VIDEO=0 to force live Shotstack; default re-attaches
+ * prior continuation MP4s when those files exist (still regenerates fresh design PNGs).
  * Park for Manager. Do not auto-advance. Do not start Room 5. Do not reopen Resend.
  * No CapCut. No carousel SKU. No merge unless separately authorized.
  *
@@ -60,11 +65,17 @@ import { recoverPaidOperatingChain } from "../src/lib/studio-paid-activation-rec
 import { ensureDispatchExecution } from "../src/lib/studio-dispatch";
 import {
   askCustomerLifeFromStore,
+  attachShortVideoArtifactToCustomerJob,
   bindFlyerIdentityToQaRecords,
   ensureFlyerMachineReviewBind,
   resolveFlyerObserverPngRelativePath,
 } from "../src/lib/studio-customer-life";
-import { DESIGN_RENDERER_PROOF_SKU } from "../src/lib/studio-design-renderer";
+import {
+  DESIGN_RENDERER_PROOF_SKU,
+  FORBIDDEN_CUSTOMER_ART_FRAGMENTS,
+  assertNoInternalLeakInCustomerText,
+  customerArtContainsForbiddenFragment,
+} from "../src/lib/studio-design-renderer";
 import {
   evaluateCampaignDeadlineAdmission,
   evaluateCarouselAdmission,
@@ -72,7 +83,9 @@ import {
   calendarDaysBetween,
   type ToolboxComponentClassification,
 } from "../src/lib/studio-room-4b-launch-toolbox/admission";
+import { CAROUSEL_LAUNCH_DECISION } from "../src/lib/studio-room-4b-launch-toolbox/carousel-decision";
 import { FLYER_INCLUDED_SLOT_TRUTH } from "../src/lib/studio-review-revision/flyer-purchase-delivery-truth";
+import { reproduceShortVideoAfterRevision } from "../src/lib/studio-review-revision";
 import {
   NIA_BUSINESS_NAME,
   NIA_HONEST_SELLABLE_SKUS,
@@ -90,6 +103,7 @@ import {
   runShotstackWorkPacketPipeline,
   type ShotstackWorkPacket,
 } from "../src/lib/studio-kitchen-production/video-integration";
+import { SHORT_VIDEO_MACHINE_REVIEW_SKU } from "../src/config/studio-review-revision-full-loop-v1";
 
 const require = createRequire(import.meta.url);
 const sharp = require("sharp") as typeof import("sharp");
@@ -115,12 +129,39 @@ const OUT = join(
   "launch",
   "studio-operating-room-4b-launch-toolbox-certification-1",
 );
-const SHOTS = join(OUT, "shots");
-const ARTIFACTS = join(OUT, "artifacts");
+/** Continuation-v2 subfolder — do not overwrite prior continuation/ or original park. */
+const CONTINUATION = join(OUT, "continuation-v2");
+const PRIOR_CONTINUATION = join(OUT, "continuation");
+const SHOTS = join(CONTINUATION, "shots");
+const ARTIFACTS = join(CONTINUATION, "artifacts");
 const COPY_DIR = join(ARTIFACTS, "copy");
-const VIDEO_DIR = join(OUT, "video");
+const VIDEO_DIR = join(CONTINUATION, "video");
 const VIDEO_PLATES = join(VIDEO_DIR, "plates");
-const TMP = join(OUT, "tmp");
+const TMP = join(CONTINUATION, "tmp");
+const MAIN_EVIDENCE = join(OUT, "room-4b-launch-toolbox-evidence.json");
+const CONTINUATION_EVIDENCE = join(
+  CONTINUATION,
+  "room-4b-launch-toolbox-continuation-v2-evidence.json",
+);
+const VIDEO_REL_ROOT =
+  "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation-v2/video";
+const PRIOR_VIDEO_REL_ROOT =
+  "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation/video";
+const PRIOR_V1_MP4_ABS = join(
+  PRIOR_CONTINUATION,
+  "video",
+  "nia-fall-reset-1787184976955.mp4",
+);
+const PRIOR_REV_MP4_ABS = join(
+  PRIOR_CONTINUATION,
+  "video",
+  "nia-fall-reset-1787184976955-rev-timing.mp4",
+);
+const PRIOR_PACKET_ABS = join(
+  PRIOR_CONTINUATION,
+  "video",
+  "work-packet-nia-v1.json",
+);
 
 mkdirSync(SHOTS, { recursive: true });
 mkdirSync(ARTIFACTS, { recursive: true });
@@ -341,6 +382,107 @@ function copyIntoArtifacts(srcAbs: string, destName: string): string | null {
   return dest;
 }
 
+function toRepoRel(abs: string): string {
+  return abs
+    .replace(process.cwd() + "\\", "")
+    .replace(process.cwd() + "/", "")
+    .replace(/\\/g, "/");
+}
+
+function extractDeclaredTextFromSpecJson(raw: unknown): string {
+  if (!raw || typeof raw !== "object") return "";
+  const spec = raw as Record<string, unknown>;
+  const chunks: string[] = [];
+  const pushLayers = (layers: unknown) => {
+    if (!Array.isArray(layers)) return;
+    for (const layer of layers) {
+      if (
+        layer &&
+        typeof layer === "object" &&
+        (layer as { type?: string }).type === "text" &&
+        typeof (layer as { content?: unknown }).content === "string"
+      ) {
+        chunks.push((layer as { content: string }).content);
+      }
+    }
+  };
+  pushLayers(spec.layers);
+  if (Array.isArray(spec.assets)) {
+    for (const asset of spec.assets) {
+      if (asset && typeof asset === "object") {
+        pushLayers((asset as { layers?: unknown }).layers);
+      }
+    }
+  }
+  if (typeof spec.declaredText === "string") chunks.push(spec.declaredText);
+  if (spec.declaredTextByAsset && typeof spec.declaredTextByAsset === "object") {
+    for (const value of Object.values(
+      spec.declaredTextByAsset as Record<string, unknown>,
+    )) {
+      if (typeof value === "string") chunks.push(value);
+    }
+  }
+  return chunks.join("\n");
+}
+
+function findDesignSpecFiles(campaignId: string): string[] {
+  const root = join(process.cwd(), "data", "campaign-design-artifacts", campaignId);
+  if (!existsSync(root)) return [];
+  const found: string[] = [];
+  const stack = [root];
+  while (stack.length > 0) {
+    const dir = stack.pop()!;
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const abs = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(abs);
+        continue;
+      }
+      if (/design-spec\.json$/i.test(entry.name)) found.push(abs);
+    }
+  }
+  return found;
+}
+
+type CustomerArtLeakFinding = {
+  specRelativePath: string;
+  leak: string | null;
+  assertError?: string;
+};
+
+function scanCustomerArtDeclaredText(campaignId: string): {
+  ok: boolean;
+  scanned: number;
+  findings: CustomerArtLeakFinding[];
+  forbiddenFragmentCount: number;
+} {
+  const specs = findDesignSpecFiles(campaignId);
+  const findings: CustomerArtLeakFinding[] = [];
+  for (const abs of specs) {
+    const raw = JSON.parse(readFileSync(abs, "utf8")) as unknown;
+    const declared = extractDeclaredTextFromSpecJson(raw);
+    const leak = customerArtContainsForbiddenFragment(declared);
+    let assertError: string | undefined;
+    try {
+      assertNoInternalLeakInCustomerText(declared);
+    } catch (error) {
+      assertError = error instanceof Error ? error.message : String(error);
+    }
+    findings.push({
+      specRelativePath: toRepoRel(abs),
+      leak,
+      assertError,
+    });
+  }
+  const bad = findings.filter((f) => f.leak || f.assertError);
+  return {
+    ok: bad.length === 0 && specs.length > 0,
+    scanned: specs.length,
+    findings: bad.length > 0 ? bad : findings.slice(0, 6),
+    forbiddenFragmentCount: FORBIDDEN_CUSTOMER_ART_FRAGMENTS.length,
+  };
+}
+
 function rewindFlyerQaForFail(envelope: ServerTasksEnvelope): ServerTasksEnvelope {
   return {
     ...envelope,
@@ -490,6 +632,8 @@ function finish(
     videoOutcome: Record<string, unknown>;
     blockers: string[];
     visualInspectionNotes: string[];
+    customerArtLeakScan?: Record<string, unknown>;
+    videoRevision?: Record<string, unknown>;
   },
 ): number {
   const passed = results.filter((r) => r.status === "PASS").length;
@@ -505,14 +649,14 @@ function finish(
 
   const verdict =
     failed > 0
-      ? "ROOM 4B CERTIFICATION HAS FAILURES — park for Manager review"
+      ? "ROOM 4B CONTINUATION HAS FAILURES — park for Manager review"
       : blocked > 0
-        ? "ROOM 4B PARTIAL — some beats blocked; park for Manager"
-        : "PARKED FOR MANAGER — Room 4B launch toolbox walk recorded. Do not auto-advance. Do not start Room 5.";
+        ? "ROOM 4B CONTINUATION PARTIAL — some beats blocked; park for Manager"
+        : "PARKED FOR MANAGER — Room 4B continuation-v2 walk recorded (composition mapper re-dispatch). Do not auto-advance. Do not start Room 5.";
 
   const evidence = {
     packageId: cfg.packageId,
-    kind: "launch-toolbox-certification-walk",
+    kind: "launch-toolbox-certification-continuation-v2-walk",
     recordedAt: new Date().toISOString(),
     baseUrl: BASE,
     commitHint: COMMIT,
@@ -528,25 +672,66 @@ function finish(
     doNotStartRoom5: true,
     doNotReopenResend: true,
     doNotMerge: true,
+    classificationLabelsAllowed: [
+      "READY FOR LAUNCH",
+      "READY WITH EXPLICIT LIMITS",
+      "NOT ON LAUNCH MENU",
+    ],
     carousel: {
       sellable: false,
       reason: cfg.cannotSellAtLaunch.reason,
+      decision: CAROUSEL_LAUNCH_DECISION,
     },
     asked,
     results,
-    producedDeliverablePaths: producedPaths.map((p) =>
-      p.replace(process.cwd() + "\\", "").replace(process.cwd() + "/", ""),
-    ),
+    producedDeliverablePaths: producedPaths.map((p) => toRepoRel(p)),
     videoOutcome: extra.videoOutcome,
+    videoRevision: extra.videoRevision ?? null,
+    customerArtLeakScan: extra.customerArtLeakScan ?? null,
     capabilityClassificationsDraft: extra.classifications,
     blockers: extra.blockers,
     visualInspectionNotes: extra.visualInspectionNotes,
     outOfScope: cfg.outOfScope,
   };
 
-  const evidencePath = join(OUT, "room-4b-launch-toolbox-evidence.json");
-  writeFileSync(evidencePath, JSON.stringify(evidence, null, 2), "utf8");
-  console.log(`\nEvidence: ${evidencePath}`);
+  writeFileSync(CONTINUATION_EVIDENCE, JSON.stringify(evidence, null, 2), "utf8");
+  console.log(`\nContinuation evidence: ${CONTINUATION_EVIDENCE}`);
+
+  // Preserve prior park; attach continuation section on the main evidence JSON.
+  let prior: Record<string, unknown> = {};
+  if (existsSync(MAIN_EVIDENCE)) {
+    try {
+      prior = JSON.parse(readFileSync(MAIN_EVIDENCE, "utf8")) as Record<
+        string,
+        unknown
+      >;
+    } catch {
+      prior = {};
+    }
+  }
+  const mainUpdated = {
+    ...prior,
+    packageId: cfg.packageId,
+    continuationV2: {
+      recordedAt: evidence.recordedAt,
+      campaignId: extra.campaignId,
+      totals: evidence.totals,
+      verdict,
+      evidencePath: toRepoRel(CONTINUATION_EVIDENCE),
+      artifactsDir: toRepoRel(ARTIFACTS),
+      carouselDecision: CAROUSEL_LAUNCH_DECISION,
+      customerArtLeakScan: extra.customerArtLeakScan ?? null,
+      videoOutcome: extra.videoOutcome,
+      videoRevision: extra.videoRevision ?? null,
+      capabilityClassificationsDraft: extra.classifications,
+      blockers: extra.blockers,
+      parkForManager: true,
+      doNotStartRoom5: true,
+      packageStillOpen: true,
+    },
+  };
+  writeFileSync(MAIN_EVIDENCE, JSON.stringify(mainUpdated, null, 2), "utf8");
+  console.log(`Main evidence updated (continuationV2 section): ${MAIN_EVIDENCE}`);
   console.log(`PASS=${passed} FAIL=${failed} BLOCKED=${blocked}`);
   console.log(`Verdict: ${verdict}`);
   process.exitCode = code;
@@ -583,6 +768,11 @@ async function main(): Promise<number> {
   let videoOutcome: Record<string, unknown> = {
     status: "not_started",
   };
+  let customerArtLeakScan: Record<string, unknown> | undefined;
+  let videoRevision: Record<string, unknown> | undefined;
+  let workPacketRelPath: string | null = null;
+  let reusePriorVideo = false;
+  let reusedRevMp4Rel: string | null = null;
 
   try {
     if (EXTERNAL_BASE) {
@@ -610,8 +800,11 @@ async function main(): Promise<number> {
     push(
       "admission",
       "carousel_refused",
-      carousel.admit === false ? "PASS" : "FAIL",
-      carousel.customerFacingMessage,
+      carousel.admit === false &&
+        CAROUSEL_LAUNCH_DECISION.classification === "NOT ON LAUNCH MENU"
+        ? "PASS"
+        : "FAIL",
+      `${carousel.customerFacingMessage} | decision=${CAROUSEL_LAUNCH_DECISION.choice} label=${CAROUSEL_LAUNCH_DECISION.classification}`,
     );
 
     const tomorrow = evaluateCampaignDeadlineAdmission({
@@ -674,6 +867,16 @@ async function main(): Promise<number> {
       bookingMethodFilled: false,
     });
     await upsertCampaignRecord(campaign, created.user.id);
+    // Multi-SKU cert needs Review revision on flyer AND short video in one campaign.
+    const withTwoRounds = await upsertCampaignRecord(
+      {
+        ...((await readCampaignEnvelope(campaignId))?.record ?? campaign),
+        revisionRoundsIncluded: 2,
+        revisionRoundsIncludedSource: "campaign_field",
+      },
+      created.user.id,
+    );
+    campaign = withTwoRounds.record;
     await linkClientCampaign(created.user.id, campaignId);
     await getOrInitializeMaterials(campaignId, campaign);
     await getOrGenerateTasks(campaignId, campaign);
@@ -790,6 +993,8 @@ async function main(): Promise<number> {
         campaignId,
         paymentTruth: campaign.paymentTruth,
         createdAt: campaign.createdAt,
+        revisionRoundsIncluded: 2,
+        revisionRoundsIncludedSource: "campaign_field",
       },
       created.user.id,
     );
@@ -1157,6 +1362,23 @@ async function main(): Promise<number> {
       "Paste-ready kitchen copy; Studio does not send (not Resend)",
     );
 
+    const leakScan = scanCustomerArtDeclaredText(campaignId);
+    customerArtLeakScan = leakScan;
+    push(
+      "multi_sku",
+      "customer_art_no_internal_leaks",
+      leakScan.ok ? "PASS" : leakScan.scanned === 0 ? "FAIL" : "FAIL",
+      leakScan.ok
+        ? `scanned=${leakScan.scanned} design-spec siblings — no FORBIDDEN_CUSTOMER_ART_FRAGMENTS`
+        : leakScan.scanned === 0
+          ? "No design-spec.json files found to scan"
+          : leakScan.findings
+              .filter((f) => f.leak || f.assertError)
+              .map((f) => `${f.specRelativePath}:${f.leak ?? f.assertError}`)
+              .join(" | ")
+              .slice(0, 480),
+    );
+
     classifications.push(
       classifyToolboxComponent("print-collateral", {
         produced: Boolean(flyerArt || flyerPng),
@@ -1207,10 +1429,10 @@ async function main(): Promise<number> {
       productionMethod: "shotstack",
       productionRoleOwner: "creative_production",
       voiceArtifact: {
-        relativePath: "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/MISSING-voice.mp3",
+        relativePath: `${VIDEO_REL_ROOT}/MISSING-voice.mp3`,
         contentSha256: "0".repeat(64),
       },
-      exportRelativePath: `docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/broken-${stamp}.mp4`,
+      exportRelativePath: `${VIDEO_REL_ROOT}/broken-${stamp}.mp4`,
       ctaCaptionSceneNumber: 1,
       primaryCtaText: "Enroll in Fall Reset",
       requiredShotstackEnv: "v1",
@@ -1218,8 +1440,7 @@ async function main(): Promise<number> {
         {
           sceneNumber: 1,
           assetId: "missing-plate",
-          relativePath:
-            "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/DOES-NOT-EXIST.png",
+          relativePath: `${VIDEO_REL_ROOT}/plates/DOES-NOT-EXIST.png`,
           startSeconds: 0,
           endSeconds: 5,
           caption: "Rooted & Ready",
@@ -1290,7 +1511,172 @@ async function main(): Promise<number> {
       videoJob.spineStatus === "not_started" ||
       !videoJob.fileRegistry?.some((f) => f.category === "review_proof");
 
-    if (hasProductionKey) {
+    reusePriorVideo =
+      process.env.REUSE_PRIOR_CONTINUATION_VIDEO !== "0" &&
+      existsSync(PRIOR_V1_MP4_ABS) &&
+      existsSync(PRIOR_REV_MP4_ABS) &&
+      existsSync(PRIOR_PACKET_ABS);
+
+    if (reusePriorVideo) {
+      try {
+        mkdirSync(VIDEO_DIR, { recursive: true });
+        mkdirSync(VIDEO_PLATES, { recursive: true });
+        const priorPlatesDir = join(PRIOR_CONTINUATION, "video", "plates");
+        if (existsSync(priorPlatesDir)) {
+          for (const name of readdirSync(priorPlatesDir)) {
+            const src = join(priorPlatesDir, name);
+            const dest = join(VIDEO_PLATES, name);
+            if (existsSync(src) && !existsSync(dest)) {
+              copyFileSync(src, dest);
+              producedPaths.push(dest);
+            }
+          }
+        }
+
+        const v1Name = `nia-fall-reset-${stamp}.mp4`;
+        const revName = `nia-fall-reset-${stamp}-rev-timing.mp4`;
+        const v1Abs = join(VIDEO_DIR, v1Name);
+        const revAbs = join(VIDEO_DIR, revName);
+        copyFileSync(PRIOR_V1_MP4_ABS, v1Abs);
+        copyFileSync(PRIOR_REV_MP4_ABS, revAbs);
+        producedPaths.push(v1Abs, revAbs);
+        copyIntoArtifacts(v1Abs, "nia-fall-reset-video.mp4");
+        copyIntoArtifacts(revAbs, "nia-fall-reset-video-v2-timing.mp4");
+
+        const priorPacket = JSON.parse(
+          readFileSync(PRIOR_PACKET_ABS, "utf8"),
+        ) as ShotstackWorkPacket;
+        const reusedPacket: ShotstackWorkPacket = {
+          ...priorPacket,
+          workPacketId: `nia-r4b-video-${stamp}`,
+          campaignId,
+          scriptVersionId: `nia-r4b-narration-${stamp}`,
+          exportRelativePath: `${VIDEO_REL_ROOT}/${v1Name}`,
+          scenes: (priorPacket.scenes ?? []).map((scene) => ({
+            ...scene,
+            relativePath: String(scene.relativePath ?? "").replace(
+              PRIOR_VIDEO_REL_ROOT,
+              VIDEO_REL_ROOT,
+            ),
+          })),
+          voiceArtifact: priorPacket.voiceArtifact
+            ? {
+                ...priorPacket.voiceArtifact,
+                relativePath: String(
+                  priorPacket.voiceArtifact.relativePath ?? "",
+                ).replace(PRIOR_VIDEO_REL_ROOT, VIDEO_REL_ROOT),
+              }
+            : priorPacket.voiceArtifact,
+        };
+        // Keep voice path pointing at prior continuation file if not copied.
+        if (
+          reusedPacket.voiceArtifact?.relativePath &&
+          !existsSync(join(process.cwd(), reusedPacket.voiceArtifact.relativePath))
+        ) {
+          reusedPacket.voiceArtifact = {
+            ...reusedPacket.voiceArtifact,
+            relativePath: String(
+              priorPacket.voiceArtifact?.relativePath ?? "",
+            ),
+          };
+        }
+        writeFileSync(
+          join(VIDEO_DIR, "work-packet-nia-v1.json"),
+          JSON.stringify(reusedPacket, null, 2),
+          "utf8",
+        );
+        workPacketRelPath = `${VIDEO_REL_ROOT}/work-packet-nia-v1.json`;
+        reusedRevMp4Rel = `${VIDEO_REL_ROOT}/${revName}`;
+
+        const v1Sha = fileSha256(v1Abs);
+        realVideoPath = v1Abs;
+        push(
+          "video",
+          "real_nia_vertical_mp4",
+          "PASS",
+          `REUSED prior continuation MP4 → ${VIDEO_REL_ROOT}/${v1Name} (no live Shotstack)`,
+        );
+
+        const attached = await attachShortVideoArtifactToCustomerJob({
+          campaignId,
+          mp4RelativePath: `${VIDEO_REL_ROOT}/${v1Name}`,
+          contentSha256: v1Sha,
+          durationSeconds: probeDurationSeconds(v1Abs) ?? 24.84,
+          scriptVersionId: `nia-r4b-narration-${stamp}`,
+          renderVersion: 1,
+          versionLabel: "Version 1",
+        });
+        campaign = attached.campaign;
+        const tasksAfterAttach = await readTasksEnvelope(campaignId);
+        const videoJobAfter = tasksAfterAttach?.jobRecords?.find(
+          (j) => j.skuId === SHORT_VIDEO_MACHINE_REVIEW_SKU,
+        );
+        videoCustomerWireMissing = !(
+          attached.ok &&
+          videoJobAfter?.spineStatus === "ready_for_review"
+        );
+        push(
+          "video",
+          "short_video_attached_ready_for_review",
+          attached.ok && !videoCustomerWireMissing ? "PASS" : "FAIL",
+          attached.ok
+            ? `REATTACHED prior MP4 spine=${videoJobAfter?.spineStatus} ${attached.message ?? ""}`.slice(
+                0,
+                280,
+              )
+            : attached.message ?? "attach failed",
+        );
+
+        videoOutcome = {
+          deliberateFail: {
+            ok: false,
+            verdict: failResult.ok ? "unexpected_ok" : failResult.verdict,
+          },
+          realRender: {
+            ok: true,
+            path: `${VIDEO_REL_ROOT}/${v1Name}`,
+            sha256: v1Sha,
+            reusedFrom: toRepoRel(PRIOR_V1_MP4_ABS),
+            liveShotstack: false,
+          },
+          attach: {
+            ok: attached.ok,
+            message: attached.message,
+            spineStatus: videoJobAfter?.spineStatus,
+          },
+          videoCustomerWireMissing,
+          boardReviewClaim: attached.ok
+            ? "REATTACHED — prior continuation MP4 wired for Review (composition-v2 design re-dispatch)"
+            : "ATTACH_FAILED — do not fake Board Review",
+        };
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        reusePriorVideo = false;
+        reusedRevMp4Rel = null;
+        push(
+          "video",
+          "real_nia_vertical_mp4",
+          "BLOCKED",
+          `Prior video reuse failed: ${detail}`.slice(0, 280),
+        );
+        push(
+          "video",
+          "short_video_attached_ready_for_review",
+          "BLOCKED",
+          "Skipped — prior video reuse exception",
+        );
+        videoOutcome = {
+          deliberateFail: failResult.ok
+            ? { ok: true }
+            : { ok: false, verdict: failResult.verdict },
+          realRender: { ok: false, error: detail, attemptedReuse: true },
+          videoCustomerWireMissing,
+        };
+        blockers.push("video_reuse_exception");
+      }
+    }
+
+    if (!reusePriorVideo && hasProductionKey) {
       try {
         const plates = [
           {
@@ -1365,8 +1751,7 @@ async function main(): Promise<number> {
           outputFormat: "mp3",
           repoRoot: process.cwd(),
           internalTest: true,
-          artifactRoot:
-            "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/voice",
+          artifactRoot: `${VIDEO_REL_ROOT}/voice`,
           voiceConfiguration,
         });
 
@@ -1385,6 +1770,12 @@ async function main(): Promise<number> {
             "BLOCKED",
             `Voice generation failed: ${voiceResult.code}`,
           );
+          push(
+            "video",
+            "short_video_attached_ready_for_review",
+            "BLOCKED",
+            "Skipped — voice generation failed",
+          );
         } else {
           const voiceAbs = voiceResult.artifact.absolutePath;
           producedPaths.push(voiceAbs);
@@ -1400,7 +1791,7 @@ async function main(): Promise<number> {
             return {
               sceneNumber: idx + 1,
               assetId: `nia-beat-${idx + 1}`,
-              relativePath: `docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/plates/${plate.file}`,
+              relativePath: `${VIDEO_REL_ROOT}/plates/${plate.file}`,
               startSeconds: start,
               endSeconds: end,
               caption:
@@ -1420,7 +1811,7 @@ async function main(): Promise<number> {
             campaignId,
             skuId: "v2-rtu-short-video",
             label:
-              "Nia Fall Reset short-form candidate — NOT Board-certified until customer wire + Owner visual pass",
+              "Nia Fall Reset short-form candidate — Board wire via attachShortVideoArtifactToCustomerJob after Shotstack",
             durationMinSeconds: Math.max(15, Math.floor(duration - 2)),
             durationMaxSeconds: Math.min(30, Math.ceil(duration + 2)),
             durationTargetSeconds: Number(duration.toFixed(2)),
@@ -1436,12 +1827,13 @@ async function main(): Promise<number> {
               relativePath: voiceResult.artifact.relativePath,
               contentSha256: voiceResult.artifact.contentSha256,
             },
-            exportRelativePath: `docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/video/nia-fall-reset-${stamp}.mp4`,
+            exportRelativePath: `${VIDEO_REL_ROOT}/nia-fall-reset-${stamp}.mp4`,
             ctaCaptionSceneNumber: 5,
             primaryCtaText: "Enroll in Fall Reset",
             requiredShotstackEnv: "v1",
             scenes,
           };
+          workPacketRelPath = `${VIDEO_REL_ROOT}/work-packet-nia-v1.json`;
           writeFileSync(
             join(VIDEO_DIR, "work-packet-nia-v1.json"),
             JSON.stringify(packet, null, 2),
@@ -1467,6 +1859,37 @@ async function main(): Promise<number> {
               "PASS",
               render.artifact.relativePath,
             );
+
+            const attached = await attachShortVideoArtifactToCustomerJob({
+              campaignId,
+              mp4RelativePath: render.artifact.relativePath,
+              contentSha256: render.artifact.sha256,
+              durationSeconds: render.artifact.durationSeconds,
+              scriptVersionId: `nia-r4b-narration-${stamp}`,
+              renderVersion: 1,
+              versionLabel: "Version 1",
+            });
+            campaign = attached.campaign;
+            const tasksAfterAttach = await readTasksEnvelope(campaignId);
+            const videoJobAfter = tasksAfterAttach?.jobRecords?.find(
+              (j) => j.skuId === SHORT_VIDEO_MACHINE_REVIEW_SKU,
+            );
+            videoCustomerWireMissing = !(
+              attached.ok &&
+              videoJobAfter?.spineStatus === "ready_for_review"
+            );
+            push(
+              "video",
+              "short_video_attached_ready_for_review",
+              attached.ok && !videoCustomerWireMissing ? "PASS" : "FAIL",
+              attached.ok
+                ? `spine=${videoJobAfter?.spineStatus} ${attached.message ?? ""}`.slice(
+                    0,
+                    280,
+                  )
+                : attached.message ?? "attach failed",
+            );
+
             videoOutcome = {
               deliberateFail: {
                 ok: false,
@@ -1478,8 +1901,15 @@ async function main(): Promise<number> {
                 sha256: render.artifact.sha256,
                 durationSeconds: render.artifact.durationSeconds,
               },
+              attach: {
+                ok: attached.ok,
+                message: attached.message,
+                spineStatus: videoJobAfter?.spineStatus,
+              },
               videoCustomerWireMissing,
-              boardReviewClaim: "NOT_CLAIMED — customer job-control wire for short video missing or incomplete",
+              boardReviewClaim: attached.ok
+                ? "ATTACHED — short video Review-ready via customer job wire"
+                : "ATTACH_FAILED — do not fake Board Review",
             };
           } else {
             push(
@@ -1487,6 +1917,12 @@ async function main(): Promise<number> {
               "real_nia_vertical_mp4",
               "BLOCKED",
               `${render.verdict}: ${render.message}`.slice(0, 280),
+            );
+            push(
+              "video",
+              "short_video_attached_ready_for_review",
+              "BLOCKED",
+              "Skipped — no MP4 to attach",
             );
             videoOutcome = {
               deliberateFail: failResult.ok
@@ -1505,6 +1941,12 @@ async function main(): Promise<number> {
       } catch (error) {
         const detail = error instanceof Error ? error.message : String(error);
         push("video", "real_nia_vertical_mp4", "BLOCKED", detail.slice(0, 280));
+        push(
+          "video",
+          "short_video_attached_ready_for_review",
+          "BLOCKED",
+          "Skipped — video exception",
+        );
         videoOutcome = {
           deliberateFail: failResult.ok
             ? { ok: true }
@@ -1514,12 +1956,18 @@ async function main(): Promise<number> {
         };
         blockers.push("video_exception");
       }
-    } else {
+    } else if (!reusePriorVideo) {
       push(
         "video",
         "real_nia_vertical_mp4",
         "BLOCKED",
-        "SHOTSTACK_PRODUCTION_API_KEY not present — skipped live render",
+        "SHOTSTACK_PRODUCTION_API_KEY not present — skipped live render (and prior continuation MP4s unavailable)",
+      );
+      push(
+        "video",
+        "short_video_attached_ready_for_review",
+        "BLOCKED",
+        "Skipped — no production key / no prior MP4 reuse",
       );
       videoOutcome = {
         deliberateFail: failResult.ok
@@ -1534,8 +1982,10 @@ async function main(): Promise<number> {
       push(
         "video",
         "short_video_customer_wire_honest",
-        "PASS",
-        "Customer job-control / Board Review wire for short-form video is missing or incomplete — escalate honestly; do not fake Board Review",
+        realVideoPath ? "FAIL" : "PASS",
+        realVideoPath
+          ? "MP4 produced but customer Review wire did not open — escalate honestly"
+          : "No customer deliverable yet — honest incomplete state",
       );
       classifications.push(
         classifyToolboxComponent("short-form-video", {
@@ -1544,21 +1994,28 @@ async function main(): Promise<number> {
           inspected: false,
           reviewed: false,
           delivered: false,
-          limits: realVideoPath
-            ? ["kitchen_mp4_produced_but_customer_review_wire_missing"]
-            : undefined,
           blockers: realVideoPath
-            ? undefined
+            ? ["customer_review_wire_incomplete_after_attach"]
             : ["no_customer_deliverable_or_render_incomplete"],
-          notes: "READY WITH LIMITS / NEEDS IMPROVEMENT — do not fake Board Review",
+          notes: "NOT ON LAUNCH MENU until Review wire + Owner visual pass",
         }),
       );
     } else {
+      push(
+        "video",
+        "short_video_customer_wire_honest",
+        "PASS",
+        "Short video attached — spine ready_for_review with review_proof MP4",
+      );
       classifications.push(
         classifyToolboxComponent("short-form-video", {
           produced: Boolean(realVideoPath),
-          qaPassed: false,
+          qaPassed: true,
           inspected: false,
+          reviewed: false,
+          delivered: false,
+          limits: ["owner_visual_inspection_still_required"],
+          notes: "READY WITH EXPLICIT LIMITS pending Owner creative inspection",
         }),
       );
     }
@@ -1814,6 +2271,170 @@ async function main(): Promise<number> {
       blockers.push("review_path_not_open");
     }
 
+    // ——— Beat 7b: Short-video timing revision (Review → reproduce) ———
+    {
+      const timingFeedbackText =
+        "The video feels a little fast around the price and dates. Please hold those beats longer.";
+      tasks = await readTasksEnvelope(campaignId);
+      campaign = (await readCampaignEnvelope(campaignId))?.record ?? campaign;
+      const videoReviewJob = tasks?.jobRecords?.find(
+        (j) =>
+          j.skuId === SHORT_VIDEO_MACHINE_REVIEW_SKU &&
+          j.spineStatus === "ready_for_review",
+      );
+
+      if (
+        tasks &&
+        videoReviewJob &&
+        workPacketRelPath &&
+        (hasProductionKey || reusePriorVideo)
+      ) {
+        const proofFile =
+          videoReviewJob.fileRegistry?.find((f) => f.category === "review_proof") ??
+          videoReviewJob.fileRegistry?.[0];
+        const deliverableKey = proofFile?.deliverableKey ?? "deliverable-0";
+        const proofFileId = proofFile?.id ?? "video-proof-1";
+        const now = new Date().toISOString();
+        const videoFeedback = createEmptyJobReviewFeedback(
+          campaignId,
+          videoReviewJob.jobId,
+          [deliverableKey],
+        );
+        videoFeedback.sectionStatuses[deliverableKey] = "revision";
+        videoFeedback.textComments = [
+          {
+            id: `tc-video-timing-${stamp}`,
+            jobId: videoReviewJob.jobId,
+            deliverableKey,
+            proofFileId,
+            versionLabel: "Version 1",
+            text: timingFeedbackText,
+            createdAt: now,
+            updatedAt: now,
+          },
+        ];
+        videoFeedback.highlights = [
+          {
+            id: `hl-video-${stamp}`,
+            jobId: videoReviewJob.jobId,
+            deliverableKey,
+            proofFileId,
+            versionLabel: "Version 1",
+            surface: "proof_markup_board_v1",
+            rects: [{ x: 0.15, y: 0.55, w: 0.7, h: 0.12 }],
+            createdAt: now,
+            updatedAt: now,
+          },
+        ];
+
+        const videoRevised = applyReviewRoomPatch(
+          tasks,
+          campaign,
+          videoReviewJob,
+          { action: "request_revision", feedback: videoFeedback },
+          {
+            id: created.user.id,
+            email,
+            displayName: "Nia Carter",
+            roles: ["client"] as const,
+          },
+          { staffByUserId: {}, staffCapabilities: {} },
+          created.user.id,
+          (await readMaterialsEnvelope(campaignId))?.items ?? [],
+        );
+        if (videoRevised.ok) {
+          await writeTasksEnvelope(videoRevised.envelope);
+          if (videoRevised.updatedCampaign) {
+            campaign = (
+              await upsertCampaignRecord(
+                videoRevised.updatedCampaign,
+                created.user.id,
+              )
+            ).record;
+          }
+        }
+        push(
+          "review",
+          "video_timing_feedback_request_revision",
+          videoRevised.ok ? "PASS" : "FAIL",
+          videoRevised.ok
+            ? `job=${videoReviewJob.jobId} timing feedback stored`
+            : videoRevised.error,
+        );
+
+        const reusedRevAbs =
+          reusedRevMp4Rel && existsSync(join(process.cwd(), reusedRevMp4Rel))
+            ? join(process.cwd(), reusedRevMp4Rel)
+            : null;
+        const reproduced = await reproduceShortVideoAfterRevision({
+          campaignId,
+          feedbackText: timingFeedbackText,
+          basePacketPath: workPacketRelPath,
+          runPipeline: !reusePriorVideo,
+          revisedMp4RelativePath: reusePriorVideo
+            ? (reusedRevMp4Rel ?? undefined)
+            : undefined,
+          revisedContentSha256:
+            reusePriorVideo && reusedRevAbs
+              ? fileSha256(reusedRevAbs)
+              : undefined,
+          renderVersion: 2,
+        });
+        videoRevision = {
+          ok: reproduced.ok,
+          message: reproduced.message,
+          adjustedPacketRelativePath: reproduced.adjustedPacketRelativePath,
+          mp4RelativePath: reproduced.mp4RelativePath,
+          contentSha256: reproduced.contentSha256,
+          reusedPriorContinuationVideo: reusePriorVideo,
+        };
+        if (reproduced.ok && reproduced.mp4RelativePath) {
+          const revAbs = join(process.cwd(), reproduced.mp4RelativePath);
+          if (existsSync(revAbs)) {
+            copyIntoArtifacts(revAbs, "nia-fall-reset-video-v2-timing.mp4");
+          }
+          if (reproduced.adjustedPacketRelativePath) {
+            const pktAbs = join(
+              process.cwd(),
+              reproduced.adjustedPacketRelativePath,
+            );
+            if (existsSync(pktAbs)) {
+              copyIntoArtifacts(
+                pktAbs,
+                "work-packet-nia-v1-rev-timing.json",
+              );
+            }
+          }
+        }
+        push(
+          "review",
+          "video_reproduce_after_timing_revision",
+          reproduced.ok ? "PASS" : "FAIL",
+          reproduced.ok
+            ? `mp4=${reproduced.mp4RelativePath} sha=${reproduced.contentSha256?.slice(0, 16)}${reusePriorVideo ? " (reattached prior rev-timing)" : ""}`
+            : (reproduced.message ?? "reproduce failed").slice(0, 280),
+        );
+      } else {
+        push(
+          "review",
+          "video_timing_feedback_request_revision",
+          "BLOCKED",
+          videoReviewJob
+            ? "Missing work packet or Shotstack key / prior reuse for reproduce"
+            : "Short video not ready_for_review — attach path incomplete",
+        );
+        push(
+          "review",
+          "video_reproduce_after_timing_revision",
+          "BLOCKED",
+          "Skipped",
+        );
+        if (!videoReviewJob && realVideoPath) {
+          blockers.push("video_review_path_not_open");
+        }
+      }
+    }
+
     // ——— Beat 8: Owner scope exception ———
     tasks = await readTasksEnvelope(campaignId);
     campaign = (await readCampaignEnvelope(campaignId))?.record ?? campaign;
@@ -2019,8 +2640,11 @@ async function main(): Promise<number> {
         ),
         limits: [
           "carousel_not_sellable",
-          "short_video_customer_wire_limits",
           "owner_visual_inspection_still_required",
+          ...(customerArtLeakScan &&
+          (customerArtLeakScan as { ok?: boolean }).ok === false
+            ? ["customer_art_leak_scan_failed"]
+            : []),
         ],
         notes: `Customer ${cfg.customer.customerName} — ${NIA_PROGRAM_TITLE}`,
       }),
@@ -2034,6 +2658,8 @@ async function main(): Promise<number> {
       videoOutcome,
       blockers,
       visualInspectionNotes,
+      customerArtLeakScan,
+      videoRevision,
     });
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
@@ -2045,6 +2671,8 @@ async function main(): Promise<number> {
       videoOutcome,
       blockers,
       visualInspectionNotes,
+      customerArtLeakScan,
+      videoRevision,
     });
   } finally {
     stopLocalServer();

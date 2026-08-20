@@ -53,3 +53,17 @@ export type MachineFlyerRevisionEmphasis = {
   priorWorkVersionId: string | null;
   recordedAt: string;
 };
+
+/** Constrained short-video timing revision — lengthen existing price/date holds only. */
+export type MachineShortVideoRevisionEmphasis = {
+  packageId: typeof studioReviewRevisionFullLoopV1.packageId;
+  instruction: string;
+  lengthenPriceDateSceneHolds: boolean;
+  holdExtensionSeconds: number;
+  sourceRevisionPackageId: string;
+  priorWorkVersionId: string | null;
+  recordedAt: string;
+};
+
+export const SHORT_VIDEO_MACHINE_REVIEW_SKU = "v2-rtu-short-video" as const;
+export const SHORT_VIDEO_TIMING_HOLD_EXTENSION_SECONDS = 1.5 as const;

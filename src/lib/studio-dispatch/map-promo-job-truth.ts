@@ -11,6 +11,13 @@ import {
   mapPromoAssetsFromIntakeAnswers,
 } from "@/lib/studio-design-renderer";
 import type { PromoProjectTruth } from "@/lib/studio-design-renderer";
+import {
+  curatedCustomerBodyFromMustInclude,
+  resolveCustomerBusinessName,
+  resolveCustomerOfferHeadline,
+  shortenCustomerFacingCta,
+  stripCustomerFacingCta,
+} from "@/lib/studio-design-renderer/customer-facing-creative-copy";
 
 import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
 import type { JobDispatchRecord } from "./types";
@@ -173,16 +180,31 @@ export function mapPromoProjectTruthFromJob(input: {
     return { ok: false, code: logo.code, message: logo.message };
   }
 
-  const businessName = input.campaign.campaignName.trim() || "Customer";
+  const businessName = resolveCustomerBusinessName({
+    campaignName: input.campaign.campaignName,
+    mustInclude,
+    businessNameAnswer: String(answers.businessName ?? "").trim() || undefined,
+  });
   const wordmark = businessName;
   const descriptor = String(answers.businessType ?? "").trim() || "Local business";
-  const offerName =
-    campaignFocus.split(/[.\n]/)[0]?.trim().slice(0, 80) ||
-    mustInclude.split(/[.\n]/)[0]?.trim().slice(0, 80) ||
-    campaignFocus.slice(0, 80);
-  const disclaimer =
-    disclaimers ||
-    "Finished campaign graphics for your print or digital use. You distribute.";
+  const offerName = resolveCustomerOfferHeadline({
+    campaignFocus,
+    mustInclude,
+    fallback:
+      campaignFocus.split(/[.\n]/)[0]?.trim().slice(0, 80) ||
+      mustInclude.split(/[.\n]/)[0]?.trim().slice(0, 80) ||
+      campaignFocus.slice(0, 80),
+  });
+  // Customer art: intake disclaimer only — never invent distribution footnotes.
+  const disclaimer = disclaimers;
+  const voiceBriefExact = String(
+    answers.voiceBriefExact ?? answers.studioVoiceBrief ?? "",
+  ).trim();
+  const body = curatedCustomerBodyFromMustInclude(mustInclude, {
+    voiceBriefExact: voiceBriefExact || undefined,
+    maxLen: 220,
+  });
+  const cta = shortenCustomerFacingCta(stripCustomerFacingCta(callToAction));
 
   const requiredTextTokens = [
     extracted.priceDisplay,
@@ -205,12 +227,12 @@ export function mapPromoProjectTruthFromJob(input: {
     businessName,
     wordmark,
     descriptor,
-    headline: campaignFocus.slice(0, 90),
+    headline: offerName.slice(0, 90),
     offerName,
     priceDisplay: extracted.priceDisplay,
     dateWindow: dates.slice(0, 120),
-    body: mustInclude.slice(0, 220),
-    cta: callToAction,
+    body,
+    cta,
     phone: extracted.phone,
     webDisplay: extracted.webDisplay,
     webUrl: extracted.webUrl,
@@ -237,6 +259,10 @@ export function mapPromoProjectTruthFromJob(input: {
       "CERTIFICATION FIXTURE",
       "Best in Richmond",
       "#1 rated",
+      "You distribute",
+      "Destination:",
+      "Voice brief",
+      "MISSING FACT",
     ],
     assets: assetMapped.assets,
     liveIntakePerAssetPurposeGap:

@@ -1,0 +1,11 @@
+{
+  "kind": "kitchen_copy_produced",
+  "notResend": true,
+  "studioDoesNotSend": true,
+  "email": "nia-fall-reset-promotional-email.txt",
+  "captions": "nia-fall-reset-social-captions.txt",
+  "skus": [
+    "v2-rtu-email-kit",
+    "marketing_copy_support"
+  ]
+}

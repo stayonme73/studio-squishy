@@ -51,8 +51,10 @@ describe("Room 4B Nia fixture", () => {
     const answers = missing.routeMapIntake?.answers ?? {};
     expect(answers.voiceBriefExact).toBe(NIA_VOICE_BRIEF_EXACT);
     expect(answers.studioVoiceBrief).toBe(NIA_VOICE_BRIEF_EXACT);
-    expect(answers.mustInclude).toContain(NIA_VOICE_BRIEF_EXACT);
+    // Dual-channel: brief stays on dedicated keys — never dumped into mustInclude body.
+    expect(answers.mustInclude).not.toContain(NIA_VOICE_BRIEF_EXACT);
     expect(answers.mustInclude).toMatch(/MISSING FACT/i);
+    expect(answers.mustInclude).toMatch(/^Style:/m);
     expect(answers.mustInclude).not.toMatch(/rootedandready\.example\/fall-reset/i);
     expect(answers.callToAction).not.toMatch(/Destination:/i);
 
@@ -64,7 +66,9 @@ describe("Room 4B Nia fixture", () => {
     const filledAnswers = filled.routeMapIntake?.answers ?? {};
     expect(filledAnswers.mustInclude).toMatch(/rootedandready\.example\/fall-reset/i);
     expect(filledAnswers.mustInclude).not.toMatch(/MISSING FACT/i);
+    expect(filledAnswers.mustInclude).not.toContain(NIA_VOICE_BRIEF_EXACT);
     expect(filledAnswers.callToAction).toMatch(/Enroll in Fall Reset/i);
+    expect(filledAnswers.callToAction).not.toMatch(/Destination:/i);
   });
 
   it("uses only the honest sellable SKUs from Room 4B config", () => {

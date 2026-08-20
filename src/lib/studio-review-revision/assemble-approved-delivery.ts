@@ -1,10 +1,14 @@
 /**
  * Bind the exact approved Review identity into customer Final Delivery files.
- * Flyer: PNG + PDF of Version N. Approval of the creative authorizes coordinated
- * exports from that render identity. Wrong-version or missing promised files fail closed.
+ * Flyer: PNG + PDF of Version N. Short video: MP4 of Version N.
+ * Approval of the creative authorizes coordinated exports from that render identity.
+ * Wrong-version or missing promised files fail closed.
  */
 
-import { studioReviewRevisionFullLoopV1 } from "@/config/studio-review-revision-full-loop-v1";
+import {
+  SHORT_VIDEO_MACHINE_REVIEW_SKU,
+  studioReviewRevisionFullLoopV1,
+} from "@/config/studio-review-revision-full-loop-v1";
 import {
   addJobFileReference,
   isApprovedReviewProofReference,
@@ -89,6 +93,130 @@ function appendCdf(
       approvedAuthorizationDecisionId: input.approval.decisionId,
     },
   ];
+}
+
+function isVideoMp4Proof(ref: StudioFileReference): boolean {
+  return (
+    /video\/mp4/i.test(ref.fileType) ||
+    /\.mp4$/i.test(ref.filename) ||
+    (ref.storageRef.provider === "supabase_storage" &&
+      /video\/mp4/i.test(ref.storageRef.contentType ?? ""))
+  );
+}
+
+/**
+ * Pin the approved Review MP4 as the client Final Delivery file for short video.
+ */
+export function assembleApprovedShortVideoClientDelivery(input: {
+  job: PurchasedJobRecord;
+  events: readonly JobActivityEvent[];
+  actor: JobActivityActor;
+  occurredAt?: string;
+  requiredDeliverableLabel?: string;
+  requiredDeliverables?: readonly string[];
+}): { job: PurchasedJobRecord; events: JobActivityEvent[]; assembled: boolean } {
+  const occurredAt = input.occurredAt ?? new Date().toISOString();
+  const approval = input.job.customerApprovedArtifactAuthorization;
+  if (!approval || approval.status !== "CUSTOMER_APPROVED") {
+    return { job: input.job, events: [...input.events], assembled: false };
+  }
+
+  const pinHashes = approval.contentSha256s.map(normalizeContentSha256);
+  const proofs = (input.job.fileRegistry ?? []).filter(isApprovedReviewProofReference);
+  const mp4Source = proofs.find(
+    (ref) => isVideoMp4Proof(ref) && Boolean(pinHashMatching(pinHashes, proofChecksum(ref))),
+  );
+  const mp4PinHash = mp4Source
+    ? pinHashMatching(pinHashes, proofChecksum(mp4Source))
+    : undefined;
+  if (!mp4Source || !mp4PinHash) {
+    return { job: input.job, events: [...input.events], assembled: false };
+  }
+
+  const allDefs = resolveRequiredDeliverableKeys(input.requiredDeliverables ?? []);
+  const fallbackKey =
+    mp4Source.deliverableKey ?? studioReviewRevisionFullLoopV1.deliverableKey;
+  const fallbackLabel =
+    mp4Source.deliverableLabel ??
+    input.requiredDeliverableLabel ??
+    "Final MP4 with basic edit, on-screen captions, and CTA treatment";
+  const defs =
+    allDefs.length > 0 ? allDefs : [{ key: fallbackKey, label: fallbackLabel }];
+  const existing = input.job.clientDeliveryFiles ?? [];
+  const missing = defs.filter(
+    (def) =>
+      !existing.some(
+        (file) =>
+          file.deliverableKey === def.key &&
+          sameContentSha256(file.contentSha256, mp4PinHash),
+      ),
+  );
+  if (missing.length === 0) {
+    return { job: input.job, events: [...input.events], assembled: false };
+  }
+
+  let job = input.job;
+  let events = [...input.events];
+  let nextFiles = [...existing];
+
+  for (const def of missing) {
+    const registry = addJobFileReference(job, events, {
+      clientId: mp4Source.clientId,
+      category: "final_delivery",
+      filename: mp4Source.filename,
+      fileType: mp4Source.fileType,
+      storageRef:
+        mp4Source.storageRef.provider === "supabase_storage"
+          ? { ...mp4Source.storageRef, visibilityState: "client-final" }
+          : mp4Source.storageRef,
+      visibility: "client_visible",
+      status: "approved_for_release",
+      versionLabel: mp4Source.versionLabel,
+      actor: input.actor,
+      occurredAt,
+      deliverableKey: def.key,
+      deliverableLabel: def.label,
+      idPrefix: "final-file",
+    });
+    job = registry.job;
+    events = registry.events;
+    nextFiles = appendCdf(nextFiles, {
+      job,
+      def,
+      source: mp4Source,
+      pinHash: mp4PinHash,
+      occurredAt,
+      actor: input.actor,
+      approval,
+      registryFileId: registry.file.id,
+      storageRef: registry.file.storageRef,
+    });
+  }
+
+  return {
+    assembled: true,
+    events,
+    job: {
+      ...job,
+      clientDeliveryFiles: nextFiles,
+      updatedAt: occurredAt,
+    },
+  };
+}
+
+/** Route flyer vs short-video Final Delivery assembly on the shared job-control spine. */
+export function assembleApprovedClientDelivery(input: {
+  job: PurchasedJobRecord;
+  events: readonly JobActivityEvent[];
+  actor: JobActivityActor;
+  occurredAt?: string;
+  requiredDeliverableLabel?: string;
+  requiredDeliverables?: readonly string[];
+}): { job: PurchasedJobRecord; events: JobActivityEvent[]; assembled: boolean } {
+  if (input.job.skuId === SHORT_VIDEO_MACHINE_REVIEW_SKU) {
+    return assembleApprovedShortVideoClientDelivery(input);
+  }
+  return assembleApprovedFlyerClientDelivery(input);
 }
 
 export function assembleApprovedFlyerClientDelivery(input: {

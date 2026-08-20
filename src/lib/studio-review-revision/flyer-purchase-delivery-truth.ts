@@ -113,9 +113,17 @@ export function clientDeliveryFileLabelsForSku(
   skuId: string,
   labels: readonly string[],
 ): readonly string[] {
-  if (skuId !== FLYER_SKU_ID) return [...labels];
-  const files = customerPromisedFileLabels(labels);
-  return files.length > 0 ? files : [...labels];
+  if (skuId === FLYER_SKU_ID) {
+    const files = customerPromisedFileLabels(labels);
+    return files.length > 0 ? files : [...labels];
+  }
+  if (skuId === "v2-rtu-short-video") {
+    const mp4 = labels.filter(
+      (label) => /mp4/i.test(label) || /final\s+mp4/i.test(label),
+    );
+    return mp4.length > 0 ? mp4 : [...labels];
+  }
+  return [...labels];
 }
 
 export function customerVisiblePurchaseLabelsForSku(

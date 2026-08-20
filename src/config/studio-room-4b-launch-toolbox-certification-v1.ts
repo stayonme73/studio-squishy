@@ -40,12 +40,39 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
   closeRule:
     "CUSTOMER USE → PRODUCE → BREAK → RECOVER → QA → REVIEW → REVISE → INSPECT → DELIVER → RETURN" as const,
 
+  /** Close taxonomy — no vague NEEDS IMPROVEMENT when package closes. */
   classificationLabels: [
     "READY FOR LAUNCH",
-    "READY WITH LIMITS",
-    "NEEDS IMPROVEMENT",
-    "NOT READY",
+    "READY WITH EXPLICIT LIMITS",
+    "NOT ON LAUNCH MENU",
   ] as const,
+
+  /** Manager-facing package state until continuation closes. */
+  managerVerdict: "OPEN / PARKED WITH PRODUCT BLOCKERS" as const,
+  authoritativeWorkTip: "e87b193" as const,
+  hashNote: "7fdcefe" as const,
+
+  /**
+   * Carousel decision (Blocker 7) — evidence-based, not wishful.
+   * Missing: multi-slide contract, sizing set, export, Review/Delivery, QA.
+   * Catalog already excludes carousels on v2-rtu-social-posts.
+   * Decision B: do not advertise as Launch Now capability.
+   */
+  carouselDecision: {
+    choice: "B_REMOVE_FROM_LAUNCH_NOW_MENU" as const,
+    classification: "NOT ON LAUNCH MENU" as const,
+    missing: [
+      "renderer_multi_slide_capability",
+      "multi_slide_service_contract",
+      "carousel_sizing_export",
+      "review_handling_per_slide",
+      "delivery_handling",
+      "qa_set_consistency",
+    ] as const,
+    doNotInventSku: true as const,
+    catalogAlreadyExcludes: true as const,
+  },
+
 
   customer: {
     customerName: "Nia Carter",
@@ -65,11 +92,12 @@ export const studioRoom4bLaunchToolboxCertificationV1 = {
     "one included revision round within the defined scope",
   ] as const,
 
+  /** Launch menu candidates under certification — carousel/Stories/Reels not advertised. */
   launchToolboxCandidates: [
     "Short-form promotional video",
     "Campaign creative / coordinated multi-format campaign",
     "Content repurposing / clipping",
-    "Social graphics / carousels / Stories",
+    "Social graphics (static posts) — carousels, Stories, and Reels not offered at launch",
     "Level 1 ad creative",
     "Motion creative",
     "Marketing copy / email / SMS content",

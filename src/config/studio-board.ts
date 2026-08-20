@@ -277,6 +277,12 @@ export type CampaignRecord = {
    */
   machineFlyerRevisionEmphasis?: import("@/config/studio-review-revision-full-loop-v1").MachineFlyerRevisionEmphasis;
   /**
+   * Constrained Machine overlay for a customer revision of v2-rtu-short-video.
+   * May lengthen existing price/date scene holds. Must not invent new business facts.
+   * @see STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1 Blockers 5+6
+   */
+  machineShortVideoRevisionEmphasis?: import("@/config/studio-review-revision-full-loop-v1").MachineShortVideoRevisionEmphasis;
+  /**
    * Write-once pre-acceptance payment authorization bound at successful payment.
    * Session decision storage is live-only; this is the durable audit reference.
    */

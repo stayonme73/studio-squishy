@@ -17,6 +17,13 @@ export {
   resolveFlyerObserverPdfRelativePath,
 } from "./machine-review-bind";
 export {
+  attachShortVideoArtifactToCustomerJob,
+  bindShortVideoIdentityToQaRecords,
+  ensureShortVideoMachineReviewBind,
+  latestShortVideoQaIsUnresolvedFail,
+  resolveShortVideoMp4AbsolutePath,
+} from "./machine-short-video-review-bind";
+export {
   askCustomerLifeFromStore,
   handleCustomerBoardQuestion,
   readCustomerLifeStatus,

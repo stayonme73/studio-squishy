@@ -22,6 +22,13 @@ function textLayer(partial: Omit<SocialPostTextLayer, "type">): SocialPostTextLa
   return { type: "text", ...partial };
 }
 
+/** Purpose / role chrome stays on identity JSON; never paint on customer art. */
+function shouldPaintPurposeLabel(
+  truth: Pick<SocialPostsProjectTruth, "outputMode">,
+): boolean {
+  return truth.outputMode !== "customer";
+}
+
 const ROLE_ANGLE_TITLES: Record<string, string> = {
   offer_lead: "Offer lead",
   cta_book: "Booking call to action",
@@ -939,6 +946,19 @@ function reasonSocialPostAsset(
     );
   }
 
+  const layers = layout({
+    truth,
+    member,
+    logoMaterialId: logo.materialId,
+    width: plate.widthPx,
+    height: plate.heightPx,
+  });
+  const painted = shouldPaintPurposeLabel(truth)
+    ? layers
+    : layers.filter(
+        (l) => !(l.type === "text" && l.role === "purpose_label"),
+      );
+
   return {
     assetId: member.assetId,
     orderIndex: member.orderIndex,
@@ -947,13 +967,7 @@ function reasonSocialPostAsset(
     plateId: plate.plateId,
     canvas: { widthPx: plate.widthPx, heightPx: plate.heightPx },
     background: { color: truth.brandColors.background },
-    layers: layout({
-      truth,
-      member,
-      logoMaterialId: logo.materialId,
-      width: plate.widthPx,
-      height: plate.heightPx,
-    }),
+    layers: painted,
     outputFormats: ["png", "pdf"],
   };
 }

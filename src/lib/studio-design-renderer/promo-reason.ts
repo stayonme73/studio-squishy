@@ -19,6 +19,13 @@ function textLayer(
   return { type: "text", ...partial };
 }
 
+/** Purpose bars stay on identity JSON for production; never paint on customer art. */
+function shouldPaintPurposeLabel(
+  truth: Pick<PromoProjectTruth, "outputMode">,
+): boolean {
+  return truth.outputMode !== "customer";
+}
+
 export function assertPromoRequiredTruth(truth: PromoProjectTruth): void {
   if (truth.skuId !== "v2-rtu-promotion-graphics") {
     throw new Error("MISSING_REQUIRED_TRUTH: skuId must be v2-rtu-promotion-graphics");
@@ -121,20 +128,24 @@ function reasonSquareAsset(
       height: 128,
       fit: "contain",
     },
-    textLayer({
-      id: `${asset.assetId}-purpose`,
-      role: "purpose_label",
-      content: asset.authorizedPurpose,
-      x: 48,
-      y: 36,
-      width: W - 96,
-      fontSizePx: 18,
-      fontWeight: 600,
-      lineHeight: 1.2,
-      letterSpacingPx: 1,
-      color: "#F7F4EF",
-      align: "left",
-    }),
+    ...(shouldPaintPurposeLabel(truth)
+      ? [
+          textLayer({
+            id: `${asset.assetId}-purpose`,
+            role: "purpose_label",
+            content: asset.authorizedPurpose,
+            x: 48,
+            y: 36,
+            width: W - 96,
+            fontSizePx: 18,
+            fontWeight: 600,
+            lineHeight: 1.2,
+            letterSpacingPx: 1,
+            color: "#F7F4EF",
+            align: "left",
+          }),
+        ]
+      : []),
     textLayer({
       id: `${asset.assetId}-wordmark`,
       role: "wordmark",
@@ -310,20 +321,24 @@ function reasonPortraitAsset(
       height: 192,
       fit: "contain",
     },
-    textLayer({
-      id: `${asset.assetId}-purpose`,
-      role: "purpose_label",
-      content: asset.authorizedPurpose,
-      x: 72,
-      y: 48,
-      width: 300,
-      fontSizePx: 16,
-      fontWeight: 600,
-      lineHeight: 1.2,
-      letterSpacingPx: 1,
-      color: c.secondary,
-      align: "left",
-    }),
+    ...(shouldPaintPurposeLabel(truth)
+      ? [
+          textLayer({
+            id: `${asset.assetId}-purpose`,
+            role: "purpose_label",
+            content: asset.authorizedPurpose,
+            x: 72,
+            y: 48,
+            width: 300,
+            fontSizePx: 16,
+            fontWeight: 600,
+            lineHeight: 1.2,
+            letterSpacingPx: 1,
+            color: c.secondary,
+            align: "left",
+          }),
+        ]
+      : []),
     textLayer({
       id: `${asset.assetId}-wordmark`,
       role: "wordmark",

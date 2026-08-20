@@ -177,7 +177,9 @@ export type DesignRendererFailureCode =
   | "RENDER_FAILURE"
   | "EXPORT_FAILURE"
   | "QA_FAILURE"
-  | "SKU_NOT_SUPPORTED";
+  | "SKU_NOT_SUPPORTED"
+  | "COLLISION"
+  | "OVERLAP";
 
 export type DesignRendererPipelineResult =
   | {

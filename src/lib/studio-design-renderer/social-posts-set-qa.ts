@@ -5,6 +5,14 @@
  */
 
 import {
+  customerArtContainsForbiddenFragment,
+  isInternalProductionChromeText,
+} from "./customer-facing-creative-copy";
+import {
+  evaluateTextLayerCollisions,
+  textLayersForCollisionCheck,
+} from "./text-layer-collision";
+import {
   SOCIAL_POSTS_EXACT_COUNT,
   SOCIAL_POST_TRUST_ROLE_ANGLE,
   type SocialPostAssetSpec,
@@ -23,7 +31,9 @@ export type SocialPostsSetQaResult =
         | "CAPTION_FAILURE"
         | "ORDER_FAILURE"
         | "BINDING_FAILURE"
-        | "FIXTURE_LEAKAGE";
+        | "FIXTURE_LEAKAGE"
+        | "COLLISION"
+        | "OVERLAP";
       message: string;
     };
 
@@ -45,6 +55,7 @@ export function evaluateSocialPostsSetConsistency(input: {
   postingOrder: readonly SocialPostingOrderEntry[];
 }): SocialPostsSetQaResult {
   const { truth, spec, declaredTextByAsset, captions, postingOrder } = input;
+  const customerMode = truth.outputMode === "customer";
 
   if (spec.assets.length !== SOCIAL_POSTS_EXACT_COUNT) {
     return {
@@ -116,20 +127,78 @@ export function evaluateSocialPostsSetConsistency(input: {
         message: `Missing purpose for ${asset.assetId}`,
       };
     }
-    if (!text.includes(asset.authorizedPurpose)) {
-      return {
-        ok: false,
-        code: "SET_CONSISTENCY_FAILURE",
-        message: `Post ${asset.assetId} does not surface its authorized purpose`,
-      };
+
+    if (customerMode) {
+      if (text.includes(asset.authorizedPurpose)) {
+        return {
+          ok: false,
+          code: "FIXTURE_LEAKAGE",
+          message: `Customer post ${asset.assetId} paints authorizedPurpose chrome onto PNG`,
+        };
+      }
+      if (text.includes(asset.roleAngle)) {
+        return {
+          ok: false,
+          code: "FIXTURE_LEAKAGE",
+          message: `Customer post ${asset.assetId} paints roleAngle chrome onto PNG`,
+        };
+      }
+      if (
+        asset.layers.some(
+          (l) => l.type === "text" && l.role === "purpose_label",
+        )
+      ) {
+        return {
+          ok: false,
+          code: "FIXTURE_LEAKAGE",
+          message: `Customer post ${asset.assetId} still declares a purpose_label layer`,
+        };
+      }
+      const leak = customerArtContainsForbiddenFragment(text);
+      if (leak) {
+        return {
+          ok: false,
+          code: "FIXTURE_LEAKAGE",
+          message: `Customer post ${asset.assetId} contains internal fragment "${leak}"`,
+        };
+      }
+      for (const layer of asset.layers) {
+        if (layer.type !== "text") continue;
+        if (isInternalProductionChromeText(layer.content)) {
+          return {
+            ok: false,
+            code: "FIXTURE_LEAKAGE",
+            message: `Customer post ${asset.assetId} layer ${layer.id} is production chrome`,
+          };
+        }
+      }
+      const collision = evaluateTextLayerCollisions(
+        textLayersForCollisionCheck(asset.layers),
+      );
+      if (!collision.ok) {
+        return {
+          ok: false,
+          code: collision.code,
+          message: `Post ${asset.assetId}: ${collision.message}`,
+        };
+      }
+    } else {
+      if (!text.includes(asset.authorizedPurpose)) {
+        return {
+          ok: false,
+          code: "SET_CONSISTENCY_FAILURE",
+          message: `Post ${asset.assetId} does not surface its authorized purpose`,
+        };
+      }
+      if (!text.includes(asset.roleAngle)) {
+        return {
+          ok: false,
+          code: "SET_CONSISTENCY_FAILURE",
+          message: `Post ${asset.assetId} does not surface its role angle (set variety must be visible)`,
+        };
+      }
     }
-    if (!text.includes(asset.roleAngle)) {
-      return {
-        ok: false,
-        code: "SET_CONSISTENCY_FAILURE",
-        message: `Post ${asset.assetId} does not surface its role angle (set variety must be visible)`,
-      };
-    }
+
     if (!text.includes(truth.wordmark)) {
       return {
         ok: false,
@@ -207,6 +276,16 @@ export function evaluateSocialPostsSetConsistency(input: {
         code: "CAPTION_FAILURE",
         message: `Caption ${caption.captionId} does not name the business`,
       };
+    }
+    if (customerMode) {
+      const captionLeak = customerArtContainsForbiddenFragment(caption.text);
+      if (captionLeak) {
+        return {
+          ok: false,
+          code: "FIXTURE_LEAKAGE",
+          message: `Caption ${caption.captionId} contains internal fragment "${captionLeak}"`,
+        };
+      }
     }
     if (asset.roleAngle !== SOCIAL_POST_TRUST_ROLE_ANGLE) {
       if (!caption.text.includes(truth.priceDisplay)) {
@@ -295,7 +374,7 @@ export function evaluateSocialPostsSetConsistency(input: {
     };
   }
 
-  if (truth.outputMode === "customer") {
+  if (customerMode) {
     const leak = /CERTIFICATION FIXTURE|INTERNAL TEST|\(CERT\)/i;
     for (const asset of spec.assets) {
       const text = declaredTextByAsset[asset.assetId] ?? "";

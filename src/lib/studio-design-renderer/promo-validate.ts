@@ -6,6 +6,10 @@ import { existsSync } from "fs";
 import path from "path";
 
 import { resolvePromoPlate } from "./promo-contracts";
+import {
+  evaluateTextLayerCollisions,
+  textLayersForCollisionCheck,
+} from "./text-layer-collision";
 import type {
   PromoCampaignSetSpec,
   PromoProjectTruth,
@@ -14,7 +18,16 @@ import { PROMO_DESIGN_SPEC_VERSION } from "./promo-types";
 
 export type PromoValidateResult =
   | { ok: true }
-  | { ok: false; code: "INVALID_DESIGN_SPEC" | "INVALID_PLATE" | "BROKEN_ASSET_REFERENCE"; message: string };
+  | {
+      ok: false;
+      code:
+        | "INVALID_DESIGN_SPEC"
+        | "INVALID_PLATE"
+        | "BROKEN_ASSET_REFERENCE"
+        | "COLLISION"
+        | "OVERLAP";
+      message: string;
+    };
 
 export function validatePromoCampaignSetSpec(
   repoRoot: string,
@@ -85,6 +98,29 @@ export function validatePromoCampaignSetSpec(
         code: "INVALID_DESIGN_SPEC",
         message: `Asset ${asset.assetId} missing logo layer`,
       };
+    }
+    const customerMode = truth.outputMode === "customer";
+    const hasPurposeLabel = asset.layers.some(
+      (l) => l.type === "text" && l.role === "purpose_label",
+    );
+    if (customerMode && hasPurposeLabel) {
+      return {
+        ok: false,
+        code: "INVALID_DESIGN_SPEC",
+        message: `Customer asset ${asset.assetId} must not paint purpose_label chrome`,
+      };
+    }
+    if (customerMode) {
+      const collision = evaluateTextLayerCollisions(
+        textLayersForCollisionCheck(asset.layers),
+      );
+      if (!collision.ok) {
+        return {
+          ok: false,
+          code: collision.code,
+          message: `Asset ${asset.assetId}: ${collision.message}`,
+        };
+      }
     }
     for (const layer of asset.layers) {
       if (layer.type !== "image") continue;

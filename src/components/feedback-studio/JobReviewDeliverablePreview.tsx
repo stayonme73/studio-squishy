@@ -147,14 +147,32 @@ export default function JobReviewDeliverablePreview({
               ) : null}
               {currentProof?.accessHref ? (
                 <figure className="fs-review-proof">
-                  <img
-                    src={currentProof.accessHref}
-                    alt={studioReviewRevisionFullLoopV1.customerCopy.reviewProofAlt(
-                      reviewTitle,
-                      currentProof.versionLabel,
-                    )}
-                    className="fs-review-proof__image"
-                  />
+                  {currentProof.fileType === "video/mp4" ||
+                  currentProof.fileType.startsWith("video/") ||
+                  /\.mp4$/i.test(currentProof.filename) ? (
+                    <video
+                      controls
+                      playsInline
+                      preload="metadata"
+                      src={currentProof.accessHref}
+                      className="fs-review-proof__video"
+                      aria-label={studioReviewRevisionFullLoopV1.customerCopy.reviewProofAlt(
+                        reviewTitle,
+                        currentProof.versionLabel,
+                      )}
+                    >
+                      Your browser cannot play this video. Use the download link under Versions of this work.
+                    </video>
+                  ) : (
+                    <img
+                      src={currentProof.accessHref}
+                      alt={studioReviewRevisionFullLoopV1.customerCopy.reviewProofAlt(
+                        reviewTitle,
+                        currentProof.versionLabel,
+                      )}
+                      className="fs-review-proof__image"
+                    />
+                  )}
                 </figure>
               ) : null}
               {activeTool === "compare" && focused ? (

@@ -440,5 +440,347 @@
     "outside_human_contractors",
     "auto_start_next_toolbox_certification",
     "visual_redesign_spree"
-  ]
+  ],
+  "continuation": {
+    "recordedAt": "2026-08-20T00:17:52.072Z",
+    "campaignId": "nia-r4b-live-1787184976955",
+    "totals": {
+      "passed": 32,
+      "failed": 0,
+      "blocked": 0,
+      "total": 32
+    },
+    "verdict": "PARKED FOR MANAGER — Room 4B continuation walk recorded. Do not auto-advance. Do not start Room 5.",
+    "evidencePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation/room-4b-launch-toolbox-continuation-evidence.json",
+    "artifactsDir": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation/artifacts",
+    "carouselDecision": {
+      "choice": "B_REMOVE_FROM_LAUNCH_NOW_MENU",
+      "classification": "NOT ON LAUNCH MENU",
+      "packageId": "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
+      "catalogAuthority": "src/catalog/v2/batch1-ready-to-use.ts exclusions on v2-rtu-social-posts",
+      "whyNotA": [
+        "No multi-slide renderer contract for customer carousel sets",
+        "Social RTU is square four-post static only — carousels explicitly excluded",
+        "No Review Room multi-slide feedback/version spine for carousel",
+        "No Delivery packaging for carousel slide sets",
+        "No QA set consistency for ordered multi-slide creative",
+        "Building a certifiable carousel path now would invent a new SKU mid-certification"
+      ],
+      "customerFacingHonesty": "Social carousels are not on The Studio Launch Now menu. We produce coordinated static social graphics (four square posts) within the social-posts service — not carousels, Stories, or Reels.",
+      "launchMenuWording": "Social graphics (static posts) — carousels, Stories, and Reels are not offered at launch"
+    },
+    "customerArtLeakScan": {
+      "ok": true,
+      "scanned": 3,
+      "findings": [
+        {
+          "specRelativePath": "data/campaign-design-artifacts/nia-r4b-live-1787184976955/dd_nia-r4b-live-1787184976955_v2-rtu-social-posts/renders/v1/campaign-set-design-spec.json",
+          "leak": null
+        },
+        {
+          "specRelativePath": "data/campaign-design-artifacts/nia-r4b-live-1787184976955/dd_nia-r4b-live-1787184976955_v2-rtu-promotion-graphics/renders/v1/campaign-set-design-spec.json",
+          "leak": null
+        },
+        {
+          "specRelativePath": "data/campaign-design-artifacts/nia-r4b-live-1787184976955/dd_nia-r4b-live-1787184976955_v2-rtu-flyer/renders/v1/design-spec.json",
+          "leak": null
+        }
+      ],
+      "forbiddenFragmentCount": 22
+    },
+    "videoOutcome": {
+      "deliberateFail": {
+        "ok": false,
+        "verdict": "PACKET_INVALID"
+      },
+      "realRender": {
+        "ok": true,
+        "path": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation/video/nia-fall-reset-1787184976955.mp4",
+        "sha256": "5465975d82d3c13278d617f14b9c8247fd2a2f46ed02d25e548efd2e07c38621",
+        "durationSeconds": 24.84
+      },
+      "attach": {
+        "ok": true,
+        "message": "Short video bound and Review-ready with playable MP4 proof.",
+        "spineStatus": "ready_for_review"
+      },
+      "videoCustomerWireMissing": false,
+      "boardReviewClaim": "ATTACHED — short video Review-ready via customer job wire"
+    },
+    "videoRevision": {
+      "ok": true,
+      "adjustedPacketRelativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation/video/work-packet-nia-v1-rev-timing.json",
+      "mp4RelativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation/video/nia-fall-reset-1787184976955-rev-timing.mp4",
+      "contentSha256": "ceb65a0c9a0248c7365b36da130af8b9e9b165f00deb63884615ca1587294d29"
+    },
+    "capabilityClassificationsDraft": [
+      {
+        "id": "print-collateral",
+        "label": "NOT ON LAUNCH MENU",
+        "reason": "produced_but_not_professional_or_inspected",
+        "evidence": {
+          "produced": true,
+          "qaPassed": false,
+          "inspected": false,
+          "notes": "Flyer path — QA/review later in walk"
+        }
+      },
+      {
+        "id": "social-graphics",
+        "label": "NOT ON LAUNCH MENU",
+        "reason": "produced_but_not_professional_or_inspected",
+        "evidence": {
+          "produced": true,
+          "qaPassed": false,
+          "inspected": false
+        }
+      },
+      {
+        "id": "promotional-email",
+        "label": "READY WITH EXPLICIT LIMITS",
+        "reason": "kitchen_copy_paste_ready_studio_does_not_send",
+        "evidence": {
+          "produced": true,
+          "qaPassed": true,
+          "inspected": true,
+          "delivered": false,
+          "limits": [
+            "kitchen_copy_paste_ready_studio_does_not_send"
+          ]
+        }
+      },
+      {
+        "id": "marketing-copy",
+        "label": "READY WITH EXPLICIT LIMITS",
+        "reason": "three_captions_as_copy_files",
+        "evidence": {
+          "produced": true,
+          "qaPassed": true,
+          "inspected": true,
+          "delivered": false,
+          "limits": [
+            "three_captions_as_copy_files"
+          ]
+        }
+      },
+      {
+        "id": "carousel",
+        "label": "NOT ON LAUNCH MENU",
+        "reason": "catalog_exclusion_decision_B_remove_from_launch_now",
+        "evidence": {
+          "produced": false
+        }
+      },
+      {
+        "id": "short-form-video",
+        "label": "NOT ON LAUNCH MENU",
+        "reason": "produced_but_not_professional_or_inspected",
+        "evidence": {
+          "produced": true,
+          "qaPassed": true,
+          "inspected": false,
+          "reviewed": false,
+          "delivered": false,
+          "limits": [
+            "owner_visual_inspection_still_required"
+          ],
+          "notes": "READY WITH EXPLICIT LIMITS pending Owner creative inspection"
+        }
+      },
+      {
+        "id": "campaign-creative",
+        "label": "NOT ON LAUNCH MENU",
+        "reason": "produced_but_not_professional_or_inspected",
+        "evidence": {
+          "produced": true,
+          "qaPassed": true,
+          "reviewed": true,
+          "revised": true,
+          "inspected": false,
+          "delivered": true,
+          "limits": [
+            "carousel_not_sellable",
+            "owner_visual_inspection_still_required"
+          ],
+          "notes": "Customer Nia Carter — Fall Reset"
+        }
+      }
+    ],
+    "blockers": [],
+    "parkForManager": true,
+    "doNotStartRoom5": true,
+    "packageStillOpen": true
+  },
+  "continuationV2": {
+    "recordedAt": "2026-08-20T00:25:04.981Z",
+    "campaignId": "nia-r4b-live-1787185497469",
+    "totals": {
+      "passed": 32,
+      "failed": 0,
+      "blocked": 0,
+      "total": 32
+    },
+    "verdict": "PARKED FOR MANAGER — Room 4B continuation-v2 walk recorded (composition mapper re-dispatch). Do not auto-advance. Do not start Room 5.",
+    "evidencePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation-v2/room-4b-launch-toolbox-continuation-v2-evidence.json",
+    "artifactsDir": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation-v2/artifacts",
+    "carouselDecision": {
+      "choice": "B_REMOVE_FROM_LAUNCH_NOW_MENU",
+      "classification": "NOT ON LAUNCH MENU",
+      "packageId": "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
+      "catalogAuthority": "src/catalog/v2/batch1-ready-to-use.ts exclusions on v2-rtu-social-posts",
+      "whyNotA": [
+        "No multi-slide renderer contract for customer carousel sets",
+        "Social RTU is square four-post static only — carousels explicitly excluded",
+        "No Review Room multi-slide feedback/version spine for carousel",
+        "No Delivery packaging for carousel slide sets",
+        "No QA set consistency for ordered multi-slide creative",
+        "Building a certifiable carousel path now would invent a new SKU mid-certification"
+      ],
+      "customerFacingHonesty": "Social carousels are not on The Studio Launch Now menu. We produce coordinated static social graphics (four square posts) within the social-posts service — not carousels, Stories, or Reels.",
+      "launchMenuWording": "Social graphics (static posts) — carousels, Stories, and Reels are not offered at launch"
+    },
+    "customerArtLeakScan": {
+      "ok": true,
+      "scanned": 3,
+      "findings": [
+        {
+          "specRelativePath": "data/campaign-design-artifacts/nia-r4b-live-1787185497469/dd_nia-r4b-live-1787185497469_v2-rtu-social-posts/renders/v1/campaign-set-design-spec.json",
+          "leak": null
+        },
+        {
+          "specRelativePath": "data/campaign-design-artifacts/nia-r4b-live-1787185497469/dd_nia-r4b-live-1787185497469_v2-rtu-promotion-graphics/renders/v1/campaign-set-design-spec.json",
+          "leak": null
+        },
+        {
+          "specRelativePath": "data/campaign-design-artifacts/nia-r4b-live-1787185497469/dd_nia-r4b-live-1787185497469_v2-rtu-flyer/renders/v1/design-spec.json",
+          "leak": null
+        }
+      ],
+      "forbiddenFragmentCount": 22
+    },
+    "videoOutcome": {
+      "deliberateFail": {
+        "ok": false,
+        "verdict": "PACKET_INVALID"
+      },
+      "realRender": {
+        "ok": true,
+        "path": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation-v2/video/nia-fall-reset-1787185497469.mp4",
+        "sha256": "5465975d82d3c13278d617f14b9c8247fd2a2f46ed02d25e548efd2e07c38621",
+        "reusedFrom": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation/video/nia-fall-reset-1787184976955.mp4",
+        "liveShotstack": false
+      },
+      "attach": {
+        "ok": true,
+        "message": "Short video bound and Review-ready with playable MP4 proof.",
+        "spineStatus": "ready_for_review"
+      },
+      "videoCustomerWireMissing": false,
+      "boardReviewClaim": "REATTACHED — prior continuation MP4 wired for Review (composition-v2 design re-dispatch)"
+    },
+    "videoRevision": {
+      "ok": true,
+      "adjustedPacketRelativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation-v2/video/work-packet-nia-v1-rev-timing.json",
+      "mp4RelativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation-v2/video/nia-fall-reset-1787185497469-rev-timing.mp4",
+      "contentSha256": "ceb65a0c9a0248c7365b36da130af8b9e9b165f00deb63884615ca1587294d29",
+      "reusedPriorContinuationVideo": true
+    },
+    "capabilityClassificationsDraft": [
+      {
+        "id": "print-collateral",
+        "label": "NOT ON LAUNCH MENU",
+        "reason": "produced_but_not_professional_or_inspected",
+        "evidence": {
+          "produced": true,
+          "qaPassed": false,
+          "inspected": false,
+          "notes": "Flyer path — QA/review later in walk"
+        }
+      },
+      {
+        "id": "social-graphics",
+        "label": "NOT ON LAUNCH MENU",
+        "reason": "produced_but_not_professional_or_inspected",
+        "evidence": {
+          "produced": true,
+          "qaPassed": false,
+          "inspected": false
+        }
+      },
+      {
+        "id": "promotional-email",
+        "label": "READY WITH EXPLICIT LIMITS",
+        "reason": "kitchen_copy_paste_ready_studio_does_not_send",
+        "evidence": {
+          "produced": true,
+          "qaPassed": true,
+          "inspected": true,
+          "delivered": false,
+          "limits": [
+            "kitchen_copy_paste_ready_studio_does_not_send"
+          ]
+        }
+      },
+      {
+        "id": "marketing-copy",
+        "label": "READY WITH EXPLICIT LIMITS",
+        "reason": "three_captions_as_copy_files",
+        "evidence": {
+          "produced": true,
+          "qaPassed": true,
+          "inspected": true,
+          "delivered": false,
+          "limits": [
+            "three_captions_as_copy_files"
+          ]
+        }
+      },
+      {
+        "id": "carousel",
+        "label": "NOT ON LAUNCH MENU",
+        "reason": "catalog_exclusion_decision_B_remove_from_launch_now",
+        "evidence": {
+          "produced": false
+        }
+      },
+      {
+        "id": "short-form-video",
+        "label": "NOT ON LAUNCH MENU",
+        "reason": "produced_but_not_professional_or_inspected",
+        "evidence": {
+          "produced": true,
+          "qaPassed": true,
+          "inspected": false,
+          "reviewed": false,
+          "delivered": false,
+          "limits": [
+            "owner_visual_inspection_still_required"
+          ],
+          "notes": "READY WITH EXPLICIT LIMITS pending Owner creative inspection"
+        }
+      },
+      {
+        "id": "campaign-creative",
+        "label": "NOT ON LAUNCH MENU",
+        "reason": "produced_but_not_professional_or_inspected",
+        "evidence": {
+          "produced": true,
+          "qaPassed": true,
+          "reviewed": true,
+          "revised": true,
+          "inspected": false,
+          "delivered": true,
+          "limits": [
+            "carousel_not_sellable",
+            "owner_visual_inspection_still_required"
+          ],
+          "notes": "Customer Nia Carter — Fall Reset"
+        }
+      }
+    ],
+    "blockers": [],
+    "parkForManager": true,
+    "doNotStartRoom5": true,
+    "packageStillOpen": true
+  }
 }

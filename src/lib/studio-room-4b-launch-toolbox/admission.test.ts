@@ -77,7 +77,7 @@ describe("Room 4B launch toolbox admission", () => {
     expect(result.reason).toBe("catalog_exclusion_on_social_posts");
     expect(result.customerFacingMessage).toMatch(/carousel/i);
     expect(classifyToolboxComponent("carousel", { produced: false }).label).toBe(
-      "NOT READY",
+      "NOT ON LAUNCH MENU",
     );
   });
 });

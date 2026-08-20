@@ -1,0 +1,39 @@
+{
+  "workPacketId": "nia-r4b-broken-1787184976955",
+  "workPacketVersion": "wp-broken",
+  "storyboardVersion": "sb-broken",
+  "scriptVersionId": "nia-broken-script",
+  "campaignId": "nia-r4b-live-1787184976955",
+  "skuId": "v2-rtu-short-video",
+  "label": "DELIBERATE FAILURE — missing asset",
+  "durationMinSeconds": 15,
+  "durationMaxSeconds": 30,
+  "durationTargetSeconds": 22,
+  "aspectRatio": "vertical",
+  "width": 1080,
+  "height": 1920,
+  "exportFormat": "mp4",
+  "musicAllowed": false,
+  "stockAllowed": false,
+  "productionMethod": "shotstack",
+  "productionRoleOwner": "creative_production",
+  "voiceArtifact": {
+    "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation/video/MISSING-voice.mp3",
+    "contentSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "exportRelativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation/video/broken-1787184976955.mp4",
+  "ctaCaptionSceneNumber": 1,
+  "primaryCtaText": "Enroll in Fall Reset",
+  "requiredShotstackEnv": "v1",
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "assetId": "missing-plate",
+      "relativePath": "docs/launch/studio-operating-room-4b-launch-toolbox-certification-1/continuation/video/plates/DOES-NOT-EXIST.png",
+      "startSeconds": 0,
+      "endSeconds": 5,
+      "caption": "Rooted & Ready",
+      "captionPresentation": "embedded_in_plate"
+    }
+  ]
+}
