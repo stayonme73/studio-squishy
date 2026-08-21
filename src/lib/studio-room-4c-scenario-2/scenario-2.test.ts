@@ -102,7 +102,7 @@ describe("Room 4C Scenario 2 — machine-readable brief", () => {
     ).toBe("NOT ON LAUNCH MENU");
   });
 
-  it("keeps Scenario 1 and Scenario 2 classified, Scenario 3 unstarted", () => {
+  it("keeps Scenario 1–3 classified PASS WITH EXPLICIT LIMITS while Room 4C stays OPEN", () => {
     expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe("OPEN");
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[0]?.status).toBe(
       "PASS WITH EXPLICIT LIMITS",
@@ -117,7 +117,7 @@ describe("Room 4C Scenario 2 — machine-readable brief", () => {
       studioRoom4cMultiServiceClientGauntletV1.mediaNaturalnessCarryForwardStatus,
     ).toBe("REQUIRED_NOT_CERTIFIED");
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.status).toBe(
-      "IN_PRODUCTION",
+      "PASS WITH EXPLICIT LIMITS",
     );
   });
 });

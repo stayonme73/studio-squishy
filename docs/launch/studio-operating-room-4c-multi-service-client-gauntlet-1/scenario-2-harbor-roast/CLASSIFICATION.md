@@ -29,4 +29,4 @@ Creative package owner review:
 
 Carry-forward: `ROOM-4-MEDIA-NATURALNESS-INDEPENDENT-QA` remains REQUIRED · NOT CERTIFIED. Do not mark it complete.
 
-Room 4C stays OPEN. Scenario 1 remains PASS WITH EXPLICIT LIMITS. Scenario 3 remains NOT_STARTED. Room 5 remains NOT_STARTED. Carousel remains NOT ON LAUNCH MENU.
+Room 4C stays OPEN. Scenario 1 remains PASS WITH EXPLICIT LIMITS. Scenario 3 remains PASS WITH EXPLICIT LIMITS. Room 5 remains NOT_STARTED. Carousel remains NOT ON LAUNCH MENU.

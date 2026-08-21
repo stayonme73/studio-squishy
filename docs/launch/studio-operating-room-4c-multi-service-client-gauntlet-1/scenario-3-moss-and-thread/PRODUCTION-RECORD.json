@@ -59,7 +59,13 @@
   "scenario2HashesUnchanged": true,
   "motionSafetyOk": true,
   "classificationRecommended": "PASS WITH EXPLICIT LIMITS",
-  "ownerDecision": "OWNER DECISION PENDING",
+  "ownerDecision": "PASS WITH EXPLICIT LIMITS",
+  "ownerApprovedForDelivery": true,
+  "ownerDeliveryApprovedAt": "2026-08-21",
+  "approvedVideoSha256": "638c00f4103d49c5cbcb4516cb0e4a91a79bb78742a3134099e0abbb3f99e376",
+  "room4cStatus": "OPEN",
+  "room5Status": "NOT_STARTED",
+  "carousel": "NOT ON LAUNCH MENU",
   "routing": [
     {
       "deliverableId": "campaign-direction",

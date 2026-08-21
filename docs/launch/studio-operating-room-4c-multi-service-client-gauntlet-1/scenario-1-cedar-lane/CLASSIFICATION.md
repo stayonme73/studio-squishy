@@ -21,4 +21,4 @@ Creative package owner review:
 - Mobile findings are responsive coverage only, not final Room 4 mobile certification.
 - Frozen Launch Now service classifications remain READY WITH EXPLICIT LIMITS.
 
-Room 4C stays OPEN. Scenario 2 remains NOT_STARTED. Scenario 3 remains NOT_STARTED. Room 5 remains NOT_STARTED. Carousel remains NOT ON LAUNCH MENU.
+Room 4C stays OPEN. Scenario 2 remains PASS WITH EXPLICIT LIMITS. Scenario 3 remains PASS WITH EXPLICIT LIMITS. Room 5 remains NOT_STARTED. Carousel remains NOT ON LAUNCH MENU.

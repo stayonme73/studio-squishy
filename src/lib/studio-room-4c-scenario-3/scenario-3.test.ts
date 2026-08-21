@@ -31,21 +31,38 @@ import {
   scenario3ProductionAuthorizedByOwner,
 } from "./production-authorization";
 import {
+  SCENARIO_3_OWNER_DELIVERY_APPROVAL,
+  scenario3OwnerDeliveryApproved,
+} from "./owner-delivery-approval";
+import {
   assertScenario3FactsStamped,
   assertScenario3ProductionAuthorized,
   scenario3ProductionMayStart,
 } from "./production-gate";
 
 describe("Room 4C Scenario 3 — stamped brief + production authorized", () => {
-  it("keeps the frozen brief hash and releases production after owner authorization", () => {
+  it("keeps the frozen brief hash and records owner delivery approval after production", () => {
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.status).toBe(
-      "IN_PRODUCTION",
+      "PASS WITH EXPLICIT LIMITS",
     );
     expect(
+      studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.classification,
+    ).toBe("PASS WITH EXPLICIT LIMITS");
+    expect(
       studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.productionHold,
-    ).toBe("PRODUCTION_AUTHORIZED");
+    ).toBe("PRODUCTION_COMPLETE");
+    expect(
+      studioRoom4cMultiServiceClientGauntletV1.scenarios[2]
+        ?.ownerApprovedForDelivery,
+    ).toBe(true);
+    expect(
+      studioRoom4cMultiServiceClientGauntletV1.scenarios[2]
+        ?.ownerVerificationPending,
+    ).toBe(false);
     expect(brief.productionStatus).toBe("NOT_STARTED");
     expect(brief.factApprovalStatus).toBe("OWNER_APPROVED_FOR_CERTIFICATION");
+    // Frozen brief hash still carries the historical pending flag; delivery
+    // approval is stamped separately without mutating the brief.
     expect(brief.ownerVerificationPending).toBe(true);
     expect(brief.customer.locationDisplay).toBe(MOSS_THREAD_AUTHORIZED_LOCATION);
     expect(brief.offer.visitorClaim).toBe(MOSS_THREAD_AUTHORIZED_CLAIM);
@@ -56,8 +73,23 @@ describe("Room 4C Scenario 3 — stamped brief + production authorized", () => {
     expect(SCENARIO_3_PRODUCTION_AUTHORIZATION.requiredBriefSha256).toBe(
       SCENARIO_3_BRIEF_SHA256,
     );
+    expect(SCENARIO_3_PRODUCTION_AUTHORIZATION.postDeliveryOwnerReviewStillRequired).toBe(
+      false,
+    );
+    expect(scenario3OwnerDeliveryApproved()).toBe(true);
+    expect(SCENARIO_3_OWNER_DELIVERY_APPROVAL.classification).toBe(
+      "PASS WITH EXPLICIT LIMITS",
+    );
+    expect(SCENARIO_3_OWNER_DELIVERY_APPROVAL.approvedVideoSha256).toBe(
+      "638c00f4103d49c5cbcb4516cb0e4a91a79bb78742a3134099e0abbb3f99e376",
+    );
     expect(scenario3ProductionMayStart()).toBe(true);
     expect(() => assertScenario3ProductionAuthorized()).not.toThrow();
+    expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe("OPEN");
+    expect(studioRoom4cMultiServiceClientGauntletV1.doNotStartRoom5).toBe(true);
+    expect(
+      studioRoom4cMultiServiceClientGauntletV1.frozenLaunchNowServices.carousel,
+    ).toBe("NOT ON LAUNCH MENU");
   });
 
   it("preserves package-locked substance and the fictional certification stamp", () => {

@@ -2,7 +2,8 @@
  * Room 4C — Multi-Service Client Gauntlet.
  * OPEN at baseCommit 8c919e0. Room 4B remains CLOSED. Room 5 NOT STARTED.
  * Do not merge. Do not expand Launch Now menu. Scenario 1 PASS WITH EXPLICIT LIMITS.
- * Scenario 2 PASS WITH EXPLICIT LIMITS. Scenario 3 not started. Room 4C remains OPEN.
+ * Scenario 2 PASS WITH EXPLICIT LIMITS. Scenario 3 PASS WITH EXPLICIT LIMITS.
+ * Room 4C remains OPEN pending closeout recommendation.
  */
 
 export const studioRoom4cMultiServiceClientGauntletV1 = {
@@ -84,12 +85,27 @@ export const studioRoom4cMultiServiceClientGauntletV1 = {
     {
       id: "scenario-3-photo-led-campaign" as const,
       customer: "Moss & Thread Studio" as const,
-      status: "IN_PRODUCTION" as const,
+      status: "PASS WITH EXPLICIT LIMITS" as const,
+      classification: "PASS WITH EXPLICIT LIMITS" as const,
       factApprovalStatus: "OWNER_APPROVED_FOR_CERTIFICATION" as const,
-      productionHold: "PRODUCTION_AUTHORIZED" as const,
+      productionHold: "PRODUCTION_COMPLETE" as const,
       productionBlockedUntilPhotoRightsClear: false as const,
-      ownerVerificationPending: true as const,
+      ownerVerificationPending: false as const,
+      ownerApprovedForDelivery: true as const,
       productionAuthorizedAt: "2026-08-21" as const,
+      ownerDeliveryApprovedAt: "2026-08-21" as const,
+      approvedVideoSha256:
+        "638c00f4103d49c5cbcb4516cb0e4a91a79bb78742a3134099e0abbb3f99e376" as const,
+      explicitLimits: [
+        "Scenario 3 uses Studio-generated certification-fixture photographs, not a real external customer photo pack.",
+        "The external customer-photo submission and rights-verification path remains NOT PROVEN.",
+        "Eleven Music Starter is Individual Use Only under the owner-confirmed account.",
+        "Music may be delivered only embedded in the finished promotional MP4.",
+        "No standalone music redistribution or streaming.",
+        "No music-library or reseller use.",
+        "No film, television, radio, or Studio Games use.",
+        "Mobile findings remain responsive coverage, not final Room 4 mobile certification.",
+      ] as const,
     },
   ],
 

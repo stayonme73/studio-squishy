@@ -13,11 +13,11 @@ export const SCENARIO_3_PRODUCTION_AUTHORIZATION = {
   requiredBriefSha256:
     "feceace09e382de7a5c59a79884727e86c6d613dbd8c324b8594c16a67e49904" as const,
   /**
-   * Brief still carries ownerVerificationPending for post-delivery listening /
-   * deliverable review (OWNER DECISION PENDING). That flag no longer blocks
-   * production once this authorization is stamped.
+   * Brief still carries ownerVerificationPending (frozen hash). Post-delivery
+   * listening/approval is recorded in SCENARIO_3_OWNER_DELIVERY_APPROVAL —
+   * owner delivery review is complete as of 2026-08-21.
    */
-  postDeliveryOwnerReviewStillRequired: true as const,
+  postDeliveryOwnerReviewStillRequired: false as const,
 } as const;
 
 export function scenario3ProductionAuthorizedByOwner(): boolean {

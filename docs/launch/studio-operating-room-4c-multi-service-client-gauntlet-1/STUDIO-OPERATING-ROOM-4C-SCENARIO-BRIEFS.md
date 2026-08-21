@@ -75,8 +75,9 @@ Fictional customers only. Preserve approved substance.
 **Distinct from Nia / wellness.** No carousel. Uses Machine-native photo-led path within Room 4B certified limits.
 
 **Scenario status at package open:** NOT_STARTED  
-**Scenario status now:** NOT_STARTED (production blocked)  
+**Scenario status now:** PASS WITH EXPLICIT LIMITS  
 **Fact status:** OWNER_APPROVED_FOR_CERTIFICATION (fictional certification facts; not real-world customer facts)
+**Owner delivery:** APPROVED 2026-08-21 (music-led package; explicit photo and music limits disclosed)
 
 Owner-approved event facts:
 

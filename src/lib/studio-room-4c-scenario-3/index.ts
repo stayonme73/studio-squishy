@@ -43,6 +43,10 @@ export {
   scenario3ProductionAuthorizedByOwner,
 } from "./production-authorization";
 export {
+  SCENARIO_3_OWNER_DELIVERY_APPROVAL,
+  scenario3OwnerDeliveryApproved,
+} from "./owner-delivery-approval";
+export {
   buildScenario3Caption,
   buildScenario3CampaignDirection,
   buildScenario3Email,

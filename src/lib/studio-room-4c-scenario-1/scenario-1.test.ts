@@ -73,7 +73,7 @@ describe("Room 4C Scenario 1 — machine-readable brief", () => {
     ).toBe("NOT ON LAUNCH MENU");
   });
 
-  it("classifies Scenario 1 PASS WITH EXPLICIT LIMITS while Scenario 3 stays unstarted", () => {
+  it("classifies Scenario 1 PASS WITH EXPLICIT LIMITS while Scenario 3 is stamped PASS WITH EXPLICIT LIMITS", () => {
     const scenario1 = studioRoom4cMultiServiceClientGauntletV1.scenarios[0];
     expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe("OPEN");
     expect(scenario1?.status).toBe("PASS WITH EXPLICIT LIMITS");
@@ -91,7 +91,7 @@ describe("Room 4C Scenario 1 — machine-readable brief", () => {
       "PASS WITH EXPLICIT LIMITS",
     );
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.status).toBe(
-      "IN_PRODUCTION",
+      "PASS WITH EXPLICIT LIMITS",
     );
   });
 });

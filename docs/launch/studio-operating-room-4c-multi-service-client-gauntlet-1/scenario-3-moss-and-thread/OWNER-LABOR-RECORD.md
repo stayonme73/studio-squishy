@@ -1,5 +1,9 @@
 # Owner labor record — Scenario 3
 
-No owner production labor. Owner creative review (listen / approve) remains required and is not production.
+No owner production labor.
 
-Authorization stamped 2026-08-21. Post-delivery decision: OWNER DECISION PENDING.
+Tagia and Shelly performed customer-style review only (watch / listen / approve).
+Neither performed production, editing, formatting, repair, or assembly.
+
+Authorization stamped 2026-08-21.  
+Owner delivery decision stamped 2026-08-21: **PASS WITH EXPLICIT LIMITS**.
