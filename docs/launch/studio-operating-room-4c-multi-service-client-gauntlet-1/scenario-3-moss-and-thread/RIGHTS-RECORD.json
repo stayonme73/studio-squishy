@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "campaignId": "room-4c-s3-moss-and-thread-studio",
+  "recordType": "photo-pack-rights-bound-to-file-hash",
+  "source": "STUDIO_GENERATED_CERTIFICATION_FIXTURE",
+  "customerOwned": false,
+  "customerProvided": false,
+  "ownerApprovedForCertification": true,
+  "campaignUsePermitted": true,
+  "cropAndAdaptPermitted": true,
+  "externalCustomerPhotoPathProven": false,
+  "realExternalCustomerPhotoRightsCertified": false,
+  "doNotLabel": ["CUSTOMER_PROVIDED", "CUSTOMER_OWNS"],
+  "eventBriefSha256": "feceace09e382de7a5c59a79884727e86c6d613dbd8c324b8594c16a67e49904",
+  "files": [
+    {
+      "sha256": "6047959b737c49e01c158bd8e5c61a7e29e5a437617189a01e347112f6dcd4a3",
+      "filename": "moss-thread-product-textile-1.png",
+      "category": "product",
+      "intendedUse": "product-led social, video, and print"
+    },
+    {
+      "sha256": "a745d1054eb0f8e6885a08acc080d20fc619a84400ec34ae185a760047f38503",
+      "filename": "moss-thread-product-textile-2.png",
+      "category": "product",
+      "intendedUse": "secondary product scene for social, video, and print"
+    },
+    {
+      "sha256": "349cc3898fc862752d1642597875d33dd75e1a8526eb2c586b305498b70f9daf",
+      "filename": "moss-thread-maker-at-work.png",
+      "category": "maker",
+      "intendedUse": "maker/story scene for campaign and video",
+      "likenessType": "SYNTHETIC_FICTIONAL_PERSON_NO_REAL_LIKENESS",
+      "realPersonConsentRequired": false,
+      "publicFigure": false
+    },
+    {
+      "sha256": "9009ab60f0850404861e085dd307533e32435bfcf8f9553284e29a5fd88b1945",
+      "filename": "moss-thread-studio-interior.png",
+      "category": "studio",
+      "intendedUse": "location/open-studio scene for campaign, video, and print"
+    }
+  ]
+}

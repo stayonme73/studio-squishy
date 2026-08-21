@@ -74,4 +74,24 @@ Fictional customers only. Preserve approved substance.
 
 **Distinct from Nia / wellness.** No carousel. Uses Machine-native photo-led path within Room 4B certified limits.
 
-**Scenario status at package open:** NOT_STARTED
+**Scenario status at package open:** NOT_STARTED  
+**Scenario status now:** NOT_STARTED (production blocked)  
+**Fact status:** OWNER_APPROVED_FOR_CERTIFICATION (fictional certification facts; not real-world customer facts)
+
+Owner-approved event facts:
+
+- Location: 214 Loom Street, Richmond, Virginia (fictional certification address)  
+- Hours: Saturday 10:00 AM–5:00 PM; Sunday 11:00 AM–4:00 PM  
+- CTA: Visit the open studio  
+- URL: mossthread.example/open-weekend  
+- Support email: hello@mossthread.example  
+- Phone: not required — do not invent  
+- Admission: Free to visit  
+- Approved claim: visitors may view the studio, meet the maker, and shop available textile pieces in person  
+- Photo rights: STUDIO_GENERATED_CERTIFICATION_FIXTURE; customerOwned false; not CUSTOMER_PROVIDED or CUSTOMER_OWNS; external customer-photo path not proven  
+- Print: US Letter invitation/handout, 8.5×11 inches, print-ready PDF and 2550×3300 PNG  
+
+Do not invent product prices, discounts, demonstrations, workshops, refreshments, giveaways, limited quantities, custom-order availability, accessibility claims, parking, shipping, a phone number, or additional event activities.
+
+Authorization card: `scenario-3-moss-and-thread/OWNER-AUTHORIZATION.md`  
+Machine-readable brief: `src/config/studio-room-4c-scenario-3-moss-and-thread-v1.ts`

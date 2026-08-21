@@ -85,6 +85,10 @@ export const studioRoom4cMultiServiceClientGauntletV1 = {
       id: "scenario-3-photo-led-campaign" as const,
       customer: "Moss & Thread Studio" as const,
       status: "NOT_STARTED" as const,
+      factApprovalStatus: "OWNER_APPROVED_FOR_CERTIFICATION" as const,
+      productionHold: "PRE_PRODUCTION_BLOCKED" as const,
+      productionBlockedUntilPhotoRightsClear: true as const,
+      ownerVerificationPending: true as const,
     },
   ],
 

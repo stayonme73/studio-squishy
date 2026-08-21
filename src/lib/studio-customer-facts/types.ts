@@ -15,6 +15,8 @@ export const CUSTOMER_FACT_IDS = [
   "priceDisplay",
   "contentsDisplay",
   "emailDisplay",
+  "locationDisplay",
+  "hoursDisplay",
 ] as const;
 
 export type CustomerFactId = (typeof CUSTOMER_FACT_IDS)[number];

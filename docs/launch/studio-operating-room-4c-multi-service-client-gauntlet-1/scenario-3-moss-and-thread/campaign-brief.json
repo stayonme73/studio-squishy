@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "packageId": "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1",
+  "scenarioId": "scenario-3-photo-led-campaign",
+  "campaignId": "room-4c-s3-moss-and-thread-studio",
+  "fictional": true,
+  "certificationStatus": "All business, event, address, contact, and offer facts are fictional and owner-approved solely for Studio certification.",
+  "productionStatus": "NOT_STARTED",
+  "factApprovalStatus": "OWNER_APPROVED_FOR_CERTIFICATION",
+  "ownerVerificationPending": true,
+  "customer": {
+    "businessName": "Moss & Thread Studio",
+    "craftCategory": "textile / soft-goods maker",
+    "locationDisplay": "214 Loom Street, Richmond, Virginia"
+  },
+  "offer": {
+    "name": "Studio Open Weekend",
+    "windowDisplay": "November 7–8, 2026",
+    "windowStartIso": "2026-11-07",
+    "windowEndIso": "2026-11-08",
+    "hoursSaturdayDisplay": "10:00 AM–5:00 PM",
+    "hoursSundayDisplay": "11:00 AM–4:00 PM",
+    "hoursDisplay": "Saturday 10:00 AM–5:00 PM; Sunday 11:00 AM–4:00 PM",
+    "admissionDisplay": "Free to visit",
+    "visitorClaim": "visitors may view the studio, meet the maker, and shop available textile pieces in person"
+  },
+  "tone": {
+    "voice": "Warm, handmade, grounded. Textile studio, not wellness.",
+    "noNeon": true,
+    "noBeforeAfterBody": true,
+    "calmWellness": false,
+    "distinctFromNia": true
+  },
+  "cta": {
+    "label": "Visit the open studio",
+    "eventUrl": "mossthread.example/open-weekend",
+    "supportEmail": "hello@mossthread.example",
+    "phoneAuthorized": false
+  },
+  "photoRights": {
+    "source": "STUDIO_GENERATED_CERTIFICATION_FIXTURE",
+    "customerOwned": false,
+    "customerProvided": false,
+    "ownerApprovedForCertification": true,
+    "campaignUsePermitted": true,
+    "cropAndAdaptPermitted": true,
+    "externalCustomerPhotoPathProven": false,
+    "realExternalCustomerPhotoRightsCertified": false,
+    "makerImage": {
+      "assetId": "moss-thread-maker-at-work",
+      "likenessType": "SYNTHETIC_FICTIONAL_PERSON_NO_REAL_LIKENESS",
+      "realPersonConsentRequired": false,
+      "publicFigure": false
+    },
+    "boundFiles": [
+      {
+        "assetId": "moss-thread-product-textile-1",
+        "filename": "moss-thread-product-textile-1.png",
+        "sha256": "6047959b737c49e01c158bd8e5c61a7e29e5a437617189a01e347112f6dcd4a3",
+        "category": "product"
+      },
+      {
+        "assetId": "moss-thread-product-textile-2",
+        "filename": "moss-thread-product-textile-2.png",
+        "sha256": "a745d1054eb0f8e6885a08acc080d20fc619a84400ec34ae185a760047f38503",
+        "category": "product"
+      },
+      {
+        "assetId": "moss-thread-maker-at-work",
+        "filename": "moss-thread-maker-at-work.png",
+        "sha256": "349cc3898fc862752d1642597875d33dd75e1a8526eb2c586b305498b70f9daf",
+        "category": "maker"
+      },
+      {
+        "assetId": "moss-thread-studio-interior",
+        "filename": "moss-thread-studio-interior.png",
+        "sha256": "9009ab60f0850404861e085dd307533e32435bfcf8f9553284e29a5fd88b1945",
+        "category": "studio"
+      }
+    ],
+    "productTruth": "Use the bound certification-fixture product and maker photographs as the product. Do not restyle, relabel, or replace them with generated goods that change what a visitor would see.",
+    "requiredRoles": [
+      {
+        "assetId": "moss-thread-product-textile-1",
+        "role": "product",
+        "label": "Certification fixture product photograph 1"
+      },
+      {
+        "assetId": "moss-thread-product-textile-2",
+        "role": "product",
+        "label": "Certification fixture product photograph 2"
+      },
+      {
+        "assetId": "moss-thread-maker-at-work",
+        "role": "maker",
+        "label": "Certification fixture maker photograph"
+      },
+      {
+        "assetId": "moss-thread-studio-interior",
+        "role": "studio",
+        "label": "Certification fixture studio photograph"
+      }
+    ]
+  },
+  "approvedClaims": [
+    "visitors may view the studio, meet the maker, and shop available textile pieces in person"
+  ],
+  "forbiddenInventions": [
+    "product prices",
+    "discounts",
+    "demonstrations",
+    "workshops",
+    "refreshments",
+    "giveaways",
+    "limited quantities",
+    "custom-order availability",
+    "accessibility claims",
+    "parking information",
+    "shipping",
+    "phone number",
+    "additional event activities"
+  ],
+  "requestedDeliverables": [
+    {
+      "id": "campaign-direction",
+      "launchNowService": "campaign-creative",
+      "output": "written direction bound to one brief and customer photos"
+    },
+    {
+      "id": "social-square",
+      "launchNowService": "campaign-creative",
+      "output": "photo-led square PNG 1080x1080"
+    },
+    {
+      "id": "social-vertical",
+      "launchNowService": "campaign-creative",
+      "output": "photo-led vertical PNG 1080x1920"
+    },
+    {
+      "id": "short-vertical-video",
+      "launchNowService": "short-form-video",
+      "output": "vertical MP4 ~20-30s; motion-safe; synchronized narration"
+    },
+    {
+      "id": "promo-copy",
+      "launchNowService": "marketing-copy-email",
+      "output": "paste-ready promotional copy / caption"
+    },
+    {
+      "id": "print-invite",
+      "launchNowService": "print-collateral",
+      "output": "US Letter invitation/handout, 8.5×11 inches, print-ready PDF and 2550×3300 PNG"
+    }
+  ],
+  "refusedIfAsked": [
+    "carousel",
+    "ad_account_ops",
+    "unsupported_sizes_outside_studio_contracts",
+    "nia_wellness_language",
+    "studio_generated_product_photo_as_customer_photo",
+    "invented_phone",
+    "invented_product_price",
+    "invented_event_activity"
+  ],
+  "visualSystemId": "moss-and-thread-studio-v1",
+  "printHandoutContractId": "campaign-print-handout-v2-us-letter",
+  "facts": {
+    "headline": "Studio Open Weekend",
+    "supportingCopy": "visitors may view the studio, meet the maker, and shop available textile pieces in person",
+    "datesDisplay": "November 7–8, 2026",
+    "hoursDisplay": "Saturday 10:00 AM–5:00 PM; Sunday 11:00 AM–4:00 PM",
+    "locationDisplay": "214 Loom Street, Richmond, Virginia",
+    "priceDisplay": "Free to visit",
+    "cta": "Visit the open studio",
+    "bookingContact": "mossthread.example/open-weekend",
+    "emailDisplay": "hello@mossthread.example"
+  }
+}
