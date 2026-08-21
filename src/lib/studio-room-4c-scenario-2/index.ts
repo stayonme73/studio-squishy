@@ -37,6 +37,17 @@ export {
   evaluateScenario2CustomerFactSourceGate,
 } from "./customer-fact-sources";
 export {
+  assertScenario2ProductRepresentation,
+  evaluateScenario2ProductRepresentation,
+  scenario2ProductRepresentationInput,
+  SCENARIO_2_APPROVED_PRODUCT_REPRESENTATION,
+  SCENARIO_2_AUTHORIZED_UNIT_COUNT,
+  SCENARIO_2_AUTHORIZED_UNIT_TYPE,
+  SCENARIO_2_HERO_GENERATION_PROMPT,
+  SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC,
+  SCENARIO_2_VISUAL_UNIT_TYPE,
+} from "./product-representation";
+export {
   scenario2VideoCtaPlateCopy,
   scenario2VideoPlateCopy,
 } from "./video-plates";

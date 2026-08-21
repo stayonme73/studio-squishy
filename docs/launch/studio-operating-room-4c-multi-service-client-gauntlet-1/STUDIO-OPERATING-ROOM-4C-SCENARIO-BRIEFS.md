@@ -50,11 +50,11 @@ Fictional customers only. Preserve approved substance.
 - Marketing copy / email (+ captions as appropriate)  
 - Print collateral where appropriate (shelf / counter card)  
 
-**Limits disclosed:** no ads operations; no carousel; Level 1 ad creative only if creatively requested and already sellable as creative production — never targeting/budgets/ops. Product name does not substitute for contents. CTA must be the authorized action. Dates do not authorize scarcity claims.
+**Limits disclosed:** no ads operations; no carousel; Level 1 ad creative only if creatively requested and already sellable as creative production — never targeting/budgets/ops. Product name does not substitute for contents. CTA must be the authorized action. Dates do not authorize scarcity claims. Visual unit count and package type must match authorized product facts.
 
 **Scenario status at package open:** NOT_STARTED  
-**Scenario status now:** EXECUTED · OWNER DECISION PENDING (CTA authority correction complete; Tagia still reviews)  
-**Fact status:** OWNER_APPROVED_FOR_CERTIFICATION (contents, product URL, support email, CTA **Shop the autumn box**; no phone; no scarcity claims)
+**Scenario status now:** EXECUTED · OWNER DECISION PENDING (product-representation correction complete; Tagia still reviews)  
+**Fact status:** OWNER_APPROVED_FOR_CERTIFICATION (contents, product URL, support email, CTA **Shop the autumn box**, three packaged bags in the hero photograph; no phone; no scarcity claims)
 
 ---
 

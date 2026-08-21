@@ -10,9 +10,13 @@ That first pass is superseded. See `superseded-first-pass/SUPERSEDED.md`.
 
 Scout substituted **Limited autumn box** for the authorized CTA **Shop the autumn box**. That is not an action, and “limited” is prohibited scarcity language. Dates October 1–31, 2026 do not authorize a shortage claim. Those outputs are superseded. See `superseded-limited-cta/SUPERSEDED.md`.
 
+## Product-representation defect (corrected)
+
+Copy promised three 8-ounce bags. The photograph showed one open bag of loose coffee. That misrepresents the product a paying customer would receive. Those one-bag outputs are superseded. See `superseded-one-bag/SUPERSEDED.md`. The visual production specification now binds authorized unit count 3 and sealed 8-ounce bags to three packaged bags before render. Post-render alt text is not a substitute.
+
 ## Fact-authorization after correction
 
-The locked package brief now carries the owner-authorized facts that were required before production: business name, offer, October window, $48, three 8-ounce bags of whole-bean single-origin coffee, `harborroast.example/autumn-box`, `hello@harborroast.example`, and CTA **Shop the autumn box**. Phone remains unauthorized and is not invented. Product name cannot substitute for contents. A non-action label cannot substitute for the approved CTA. Generic-gate test doubles `harborroast.example/book` and `(804) 555-0100` are not production facts.
+The locked package brief now carries the owner-authorized facts that were required before production: business name, offer, October window, $48, three 8-ounce bags of whole-bean single-origin coffee, `harborroast.example/autumn-box`, `hello@harborroast.example`, and CTA **Shop the autumn box**. Phone remains unauthorized and is not invented. Product name cannot substitute for contents. A non-action label cannot substitute for the approved CTA. One depicted bag cannot substitute for three packaged bags. Generic-gate test doubles `harborroast.example/book` and `(804) 555-0100` are not production facts.
 
 ## Refusals (correct)
 
@@ -32,7 +36,7 @@ The locked package brief now carries the owner-authorized facts that were requir
 
 ## Not defects after correction
 
-- Coordinated campaign identity: same box photograph, same roast-brown/cream system, same offer/price/dates/contents/CTA/URL across square, vertical, counter card, caption, email, and video plates.
+- Coordinated campaign identity: same three-bag photograph, same roast-brown/cream system, same offer/price/dates/contents/CTA/URL across square, vertical, counter card, caption, email, and video plates.
 - Phone preview is a complete 390×390 resize of the square, not a crop.
 - Counter card is genuinely 5×7 (1500×2100 px; PDF 360×504 pt). Historical handout v1 and Cedar Lane Letter v2 were not rewritten.
 - No unsupported claims in caption, email, or on-art copy.

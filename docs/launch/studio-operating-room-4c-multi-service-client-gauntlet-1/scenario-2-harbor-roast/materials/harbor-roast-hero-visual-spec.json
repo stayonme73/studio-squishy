@@ -1,0 +1,17 @@
+{
+  "specId": "harbor-roast-hero-three-packaged-bags-v1",
+  "visualUnitCount": 3,
+  "visualUnitType": "packaged coffee bags",
+  "packageType": "packaged_bags",
+  "productDescription": "three 8-ounce bags of whole-bean single-origin coffee",
+  "generationPrompt": "Warm seasonal commercial product photograph of Autumn Single-Origin Box. The product in the photograph is exactly three sealed 8-ounce coffee bags, shown as packaged coffee bags. All three packaged bags stand clearly visible so a customer can count three separate bags. Do not show a single open sack of loose beans as the product. Do not substitute loose bulk coffee for packaged bags. A few decorative beans and autumn leaves on a dark wood table are acceptable only as styling around the three sealed bags. Window light, roast-brown and cream palette, linen cloth, photorealistic food and product photography, no text, no logos, no neon, no watermark.",
+  "boundFormatIds": [
+    "social_square",
+    "social_vertical",
+    "print_counter_card",
+    "short_vertical_video"
+  ],
+  "forbiddenDepictions": [
+    "single open sack of loose beans"
+  ]
+}

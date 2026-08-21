@@ -1,9 +1,10 @@
-# Owner-review index — Scenario 2 Harbor Roast (CTA authority correction)
+# Owner-review index — Scenario 2 Harbor Roast (product-representation correction)
 
 This is the **current** review set. Earlier outputs are superseded and are **not** listed here.
 
 - First-pass omitted facts: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-first-pass/SUPERSEDED.md`
 - Unauthorized CTA “Limited autumn box”: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-limited-cta/SUPERSEDED.md`
+- One-bag product photograph: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-one-bag/SUPERSEDED.md`
 
 Review evidence only. Classification remains **OWNER DECISION PENDING**.
 

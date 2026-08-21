@@ -19,6 +19,7 @@ export type Scenario2ProvenanceAsset = {
     | "brief"
     | "logo"
     | "hero_photo"
+    | "visual_production_spec"
     | "campaign_direction"
     | "social_square"
     | "social_vertical"

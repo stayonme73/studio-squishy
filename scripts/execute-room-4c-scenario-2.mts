@@ -36,6 +36,7 @@ import { isFiveBySevenMediaBox, readPdfMediaBoxPoints } from "../src/lib/studio-
 import {
   assertExactCanonicalLaunchFacts,
   assertScenario2CustomerFactSourceGate,
+  assertScenario2ProductRepresentation,
   assertScenario2ProductionRoutingAllowed,
   buildHarborRoastCreativeBrief,
   buildScenario2CampaignDirection,
@@ -51,6 +52,7 @@ import {
   scenario2CopyQualityBrief,
   scenario2EmailCopyQualityBrief,
   scenario2VideoPlateCopy,
+  SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC,
   staleScenario2FactHits,
 } from "../src/lib/studio-room-4c-scenario-2/index.ts";
 
@@ -430,6 +432,54 @@ Current owner-review index: \`${REVIEW_REL}/OWNER-REVIEW.md\`
   }
 }
 
+function markOneBagProductSuperseded() {
+  const supersededRel = `${EVIDENCE_REL}/superseded-one-bag`;
+  write(
+    `${supersededRel}/SUPERSEDED.md`,
+    `# SUPERSEDED — one-bag product photograph
+
+Tagia rejected the CTA-corrected Harbor Roast package because the photograph showed one open bag of loose coffee. The authorized product is **three sealed 8-ounce bags**. Copy promised three bags; the picture sold one.
+
+Do **not** use \`campaign-artifacts/renders/v5/\`, \`campaign-artifacts/renders/v6/\`, or files under \`${supersededRel}/\` as the current owner-review set.
+
+Current owner-review index: \`${REVIEW_REL}/OWNER-REVIEW.md\`
+`,
+  );
+  write(
+    `${ARTIFACT_REL}/renders/v5/SUPERSEDED.md`,
+    "# SUPERSEDED\n\nHarbor Roast render with the one-bag product photograph. Not in the current owner-review index.\n",
+  );
+  write(
+    `${ARTIFACT_REL}/renders/v6/SUPERSEDED.md`,
+    "# SUPERSEDED\n\nHarbor Roast render with the one-bag product photograph. Not in the current owner-review index.\n",
+  );
+  const archiveRoot = path.join(repoRoot, supersededRel, "owner-review");
+  if (!existsSync(path.join(archiveRoot, "OWNER-REVIEW.md"))) {
+    const priorReview = [
+      "OWNER-REVIEW.md",
+      "VIDEO-REVIEW.md",
+      "contact-sheet.png",
+      "counter-card-price-crop.png",
+    ];
+    for (const file of priorReview) {
+      const src = path.join(repoRoot, REVIEW_REL, file);
+      if (existsSync(src)) {
+        copyOver(src, path.join(archiveRoot, file));
+      }
+    }
+  }
+  const priorHero = path.join(repoRoot, MATERIALS_REL, "harbor-roast-hero-box.png");
+  const archivedHero = path.join(
+    repoRoot,
+    supersededRel,
+    "materials",
+    "harbor-roast-hero-box.png",
+  );
+  if (existsSync(priorHero) && !existsSync(archivedHero)) {
+    copyOver(priorHero, archivedHero);
+  }
+}
+
 loadEnvLocal();
 if (!process.env.PLAYWRIGHT_BROWSERS_PATH) {
   process.env.PLAYWRIGHT_BROWSERS_PATH = path.join(
@@ -443,7 +493,7 @@ if (!process.env.PLAYWRIGHT_BROWSERS_PATH) {
 async function main() {
   const generatedAt = new Date().toISOString();
   const ownerLabor: string[] = [
-    "None. Scout generated campaign photography via the Studio image tool, wrote a deterministic SVG logo, and ran existing Machine pipelines. Tagia did not design, edit, format, or repair deliverables.",
+    "None. Scout generated campaign photography via the Studio image tool from the bound three-bag visual production specification, wrote a deterministic SVG logo, and ran existing Machine pipelines. Tagia did not design, edit, format, or repair deliverables.",
   ];
 
   ensureDir(EVIDENCE);
@@ -455,6 +505,7 @@ async function main() {
   assertScenario1HashesUnchanged();
   markFirstPassSuperseded();
   markLimitedCtaSuperseded();
+  markOneBagProductSuperseded();
 
   const briefJson = canonicalScenario2BriefJson();
   const briefSha256 = hashScenario2Brief(briefJson);
@@ -470,10 +521,22 @@ async function main() {
   }
   assertScenario2ProductionRoutingAllowed();
   assertScenario2CustomerFactSourceGate();
+  assertScenario2ProductRepresentation();
+  if (
+    !SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC.boundFormatIds.includes(
+      "short_vertical_video",
+    )
+  ) {
+    throw new Error("PRODUCT_IDENTITY_MISSING_VIDEO_FORMAT");
+  }
+  write(
+    `${MATERIALS_REL}/harbor-roast-hero-visual-spec.json`,
+    `${JSON.stringify(SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC, null, 2)}\n`,
+  );
 
   writeHarborLogo(path.join(repoRoot, MATERIALS_REL, "harbor-roast-logo.svg"));
   copyGeneratedPhoto(
-    "harbor-roast-hero-box.png",
+    "harbor-roast-hero-three-bags.png",
     `${MATERIALS_REL}/harbor-roast-hero-box.png`,
   );
 
@@ -874,6 +937,16 @@ async function main() {
       derivedFromBriefSha256: briefSha256,
     },
     {
+      id: "hero-visual-spec",
+      role: "visual_production_spec" as const,
+      relativePath: `${MATERIALS_REL}/harbor-roast-hero-visual-spec.json`,
+      contentSha256: sha256File(
+        path.join(repoRoot, MATERIALS_REL, "harbor-roast-hero-visual-spec.json"),
+      ),
+      source: "authoritative_brief" as const,
+      derivedFromBriefSha256: briefSha256,
+    },
+    {
       id: "hero",
       role: "hero_photo" as const,
       relativePath: `${MATERIALS_REL}/harbor-roast-hero-box.png`,
@@ -1088,6 +1161,9 @@ async function main() {
     noInventedUrl: true,
     noInventedEmail: true,
     customerFactSourceGate: true,
+    productRepresentationOk: true,
+    visualUnitCount: 3,
+    visualUnitType: "packaged coffee bags",
     narrationIsApprovedContinuous: narration === narrationPreview,
     videoDurationInBand:
       videoDuration != null && videoDuration >= 20 && videoDuration <= 30,
@@ -1132,7 +1208,15 @@ async function main() {
           "elevenlabs_tts_adapter",
           "shotstack",
           "studio_copy_quality_gate",
+          "studio_product_representation",
         ],
+        productRepresentation: {
+          unitCount: 3,
+          unitType: "sealed 8-ounce coffee bags",
+          visualUnitCount: SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC.visualUnitCount,
+          visualUnitType: SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC.visualUnitType,
+          specId: SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC.specId,
+        },
         ownerLabor,
         qa,
       },
@@ -1150,12 +1234,13 @@ async function main() {
 
   write(
     `${REVIEW_REL}/OWNER-REVIEW.md`,
-    `# Owner-review index — Scenario 2 Harbor Roast (CTA authority correction)
+    `# Owner-review index — Scenario 2 Harbor Roast (product-representation correction)
 
 This is the **current** review set. Earlier outputs are superseded and are **not** listed here.
 
 - First-pass omitted facts: \`${EVIDENCE_REL}/superseded-first-pass/SUPERSEDED.md\`
 - Unauthorized CTA “Limited autumn box”: \`${EVIDENCE_REL}/superseded-limited-cta/SUPERSEDED.md\`
+- One-bag product photograph: \`${EVIDENCE_REL}/superseded-one-bag/SUPERSEDED.md\`
 
 Review evidence only. Classification remains **OWNER DECISION PENDING**.
 
@@ -1201,7 +1286,7 @@ ${narration}
 
 ## Narration vs on-screen facts
 
-All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, contents **three 8-ounce bags of whole-bean single-origin coffee**, price **$48**, dates **October 1 – October 31, 2026**, CTA **${brief.cta.label}**, product URL **harborroast.example/autumn-box** on the CTA plate, caption, email, social, and counter card. Narration does **not** speak the URL, support email, or a phone. Support email **hello@harborroast.example** is in the email package only. Dates are the availability window, not a scarcity claim.
+All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, contents **three 8-ounce bags of whole-bean single-origin coffee**, price **$48**, dates **October 1 – October 31, 2026**, CTA **${brief.cta.label}**, product URL **harborroast.example/autumn-box** on the CTA plate, caption, email, social, and counter card. The hero photograph is bound to three packaged coffee bags. Narration does **not** speak the URL, support email, or a phone. Support email **hello@harborroast.example** is in the email package only. Dates are the availability window, not a scarcity claim.
 
 ## Known pacing concern
 

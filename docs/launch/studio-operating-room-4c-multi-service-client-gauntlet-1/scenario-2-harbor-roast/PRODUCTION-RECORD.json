@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20T23:24:19.237Z",
+  "generatedAt": "2026-08-21T00:09:48.058Z",
   "briefSha256": "f64a550f96b3859cf952eeab611461b38df288d005f3adda6ea22f25f542e36d",
   "acceptance": {
     "admit": true,
@@ -101,27 +101,27 @@
     }
   ],
   "campaign": {
-    "renderVersion": 6,
+    "renderVersion": 7,
     "systemId": "harbor-roast-coffee-v1",
     "familyId": "full_bleed_hero",
-    "setFingerprint": "ce3304770dceb554de5e547a274d15bbab66d33be711eef835ec8d2288ae7588",
+    "setFingerprint": "ffd03470ad0ef93ba7ff32a71ae48e24cb46afe78edc527e6a83fc4385d61c3e",
     "pngShas": {
-      "social_square__full_bleed_hero": "059733f9ccb32c56a44351de49416a2a4a89fdefbd5f3cdca6777cf081cb8ae5",
-      "social_vertical__full_bleed_hero": "b519eb38762860a8fd832340c531fa8b72071e1d8495113f9f033442e5043b36",
-      "print_counter_card__full_bleed_hero": "5b5d398bad4b8e755c5af59dd3a29b46ca7d9f1f84fee7969c334042a73b40a9"
+      "social_square__full_bleed_hero": "72b12a28f4d0ae1af6fb42a9ed73532610e048e36411c4df028f663cdadf2109",
+      "social_vertical__full_bleed_hero": "1320c885cf91a0a97f69598ec9cb89b27ef9c91d724d909902e14741177eac20",
+      "print_counter_card__full_bleed_hero": "023f91a952e9acfcd572b8434647c063fa8ff92653f879bfeb84d42602cb0380"
     }
   },
   "voice": {
-    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787268263863_ed60557813d4.mp3",
-    "contentSha256": "ed60557813d4255d5ce873ffa2967475c2e35c7f38ff191a73e184fab555dced",
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787270993932_357e22d5fbe2.mp3",
+    "contentSha256": "357e22d5fbe29febe8541a354d2551d396efe3f5a86089d01670025e701e0ad2",
     "skuUsedForTtsAdapter": "ap-001",
     "soldAs": "supporting narration for v2-rtu-short-video"
   },
   "video": {
-    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/work-packet-s2-1787268263863.json",
-    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787268263863.mp4",
+    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/work-packet-s2-1787270993932.json",
+    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787270993932.mp4",
     "durationSeconds": 20,
-    "providerRenderId": "894220f4-ac92-4d91-bec0-a95dcef2c56a"
+    "providerRenderId": "f295d470-5ac6-4654-a89e-d5a220de40e3"
   },
   "print": {
     "pngPx": {
@@ -140,10 +140,18 @@
     "studio_campaign_creative",
     "elevenlabs_tts_adapter",
     "shotstack",
-    "studio_copy_quality_gate"
+    "studio_copy_quality_gate",
+    "studio_product_representation"
   ],
+  "productRepresentation": {
+    "unitCount": 3,
+    "unitType": "sealed 8-ounce coffee bags",
+    "visualUnitCount": 3,
+    "visualUnitType": "packaged coffee bags",
+    "specId": "harbor-roast-hero-three-packaged-bags-v1"
+  },
   "ownerLabor": [
-    "None. Scout generated campaign photography via the Studio image tool, wrote a deterministic SVG logo, and ran existing Machine pipelines. Tagia did not design, edit, format, or repair deliverables."
+    "None. Scout generated campaign photography via the Studio image tool from the bound three-bag visual production specification, wrote a deterministic SVG logo, and ran existing Machine pipelines. Tagia did not design, edit, format, or repair deliverables."
   ],
   "qa": {
     "copyOk": true,
@@ -170,9 +178,12 @@
     "noInventedUrl": true,
     "noInventedEmail": true,
     "customerFactSourceGate": true,
+    "productRepresentationOk": true,
+    "visualUnitCount": 3,
+    "visualUnitType": "packaged coffee bags",
     "narrationIsApprovedContinuous": true,
     "videoDurationInBand": true,
     "filesOpen": true,
-    "runId": "9cdc5b1d-309a-4876-8f26-6b01d72f54ba"
+    "runId": "c4fcf61e-8ba8-475b-b956-c98eb4fa0aea"
   }
 }

@@ -7,6 +7,7 @@ First-pass QA that treated missing URL/email/contents as an explicit limit is **
 | Check | Result |
 |-------|--------|
 | Coordinated product-launch package | PASS (same photo, logo, offer, price, dates, CTA, contents, URL) |
+| Product representation | PASS (authorized unit count 3; visual unit count 3; sealed 8-ounce bags bound to packaged coffee bags before render) |
 | Same product appearance across formats | PASS |
 | Exact price / dates / contents / CTA | PASS (`$48`, October 1 – October 31, 2026, three 8-ounce bags of whole-bean single-origin coffee, Shop the autumn box) |
 | Approved CTA is an action; no scarcity language | PASS |
@@ -23,6 +24,7 @@ First-pass QA that treated missing URL/email/contents as an explicit limit is **
 | Files open correctly | PASS |
 | Owner production labor | None |
 | Generic customer-fact source gate | PASS |
+| Product-representation gate | PASS |
 | Scenario 1 approved hashes | UNCHANGED |
 
 Generic-gate Harbor Roast test fixtures (`harborroast.example/book`, `(804) 555-0100`) were not used as production facts.

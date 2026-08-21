@@ -21,6 +21,7 @@ import {
   CAMPAIGN_PRINT_HANDOUT_CONTRACT_V1,
 } from "@/lib/studio-campaign-creative/formats";
 import { isFiveBySevenMediaBox } from "@/lib/studio-room-4c-scenario-1";
+import { evaluateProductRepresentation } from "@/lib/studio-product-representation";
 import {
   buildHarborRoastCreativeBrief,
   buildScenario2Caption,
@@ -33,6 +34,7 @@ import {
   collectScenario2CustomerFactSources,
   evaluateScenario2Acceptance,
   evaluateScenario2CustomerFactSourceGate,
+  evaluateScenario2ProductRepresentation,
   formatScenario2EmailPasteReady,
   hashScenario2Brief,
   routeScenario2Services,
@@ -40,10 +42,16 @@ import {
   scenario2EmailCopyQualityBrief,
   scenario2VideoCtaPlateCopy,
   SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD,
+  SCENARIO_2_APPROVED_PRODUCT_REPRESENTATION,
+  SCENARIO_2_AUTHORIZED_UNIT_COUNT,
+  SCENARIO_2_AUTHORIZED_UNIT_TYPE,
+  SCENARIO_2_HERO_GENERATION_PROMPT,
+  SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC,
   SCENARIO_2_STALE_BOOKING_URL,
   SCENARIO_2_STALE_CTA,
   SCENARIO_2_STALE_EMAIL,
   SCENARIO_2_STALE_PHONE,
+  SCENARIO_2_VISUAL_UNIT_TYPE,
   staleScenario2FactHits,
 } from "@/lib/studio-room-4c-scenario-2";
 
@@ -678,6 +686,139 @@ describe("Room 4C Scenario 2 — CTA authority correction proofs", () => {
     const email = formatScenario2EmailPasteReady();
     expect(email).toContain(contents);
     expect(email).toContain("$48");
+    expect(email).toContain(productUrl);
+    expect(email).toContain(supportEmail);
+  });
+
+  it("7. Scenario 1 approved deliverable hashes remain unchanged", () => {
+    const expected: Record<string, string> = {
+      "social-square.png":
+        "a565cd5f1fd2cb3d174daa0eb87029a819c322f6b7be88af9258bc9982cd7c6e",
+      "video.mp4":
+        "cdca7998bb6fded01b42248dca0c22e029d9e350e248801511aab8a45d0a5ff9",
+      "caption.txt":
+        "2220894a986ecbe144b50a62f85244ee36d8a04b40c32e5a33313f9acb8ad1b5",
+      "handout.png":
+        "f4ff91ba99c536fd0b1c5efdb5f60a9ed1791253fc91e4b79da722ef4d17debf",
+      "handout.pdf":
+        "ff931b9249f95d5ba96f732412b57171878fcf63c07e151fc859c6c9180131a0",
+    };
+    const root = path.join(
+      __dirname,
+      "../../../docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables",
+    );
+    for (const [file, hash] of Object.entries(expected)) {
+      const actual = createHash("sha256")
+        .update(readFileSync(path.join(root, file)))
+        .digest("hex");
+      expect(actual).toBe(hash);
+    }
+  });
+});
+
+describe("Room 4C Scenario 2 — product-representation correction proofs", () => {
+  const contents = "three 8-ounce bags of whole-bean single-origin coffee";
+  const productUrl = "harborroast.example/autumn-box";
+  const supportEmail = "hello@harborroast.example";
+  const dates = "October 1 – October 31, 2026";
+
+  it("1. one depicted bag fails against an authorized count of three", () => {
+    const result = evaluateProductRepresentation({
+      authorized: SCENARIO_2_APPROVED_PRODUCT_REPRESENTATION,
+      visualSpec: {
+        ...SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC,
+        visualUnitCount: 1,
+        generationPrompt:
+          "Warm product photo of one sealed 8-ounce coffee bag in an open gift box.",
+      },
+      postRenderAltText: contents,
+    });
+    expect(result.ok).toBe(false);
+    expect(result.findings.map((f) => f.code)).toContain("unit_count_mismatch");
+    expect(result.findings.map((f) => f.code)).toContain(
+      "post_render_alt_text_cannot_substitute",
+    );
+  });
+
+  it("2. loose bulk coffee cannot substitute for three packaged bags", () => {
+    const result = evaluateProductRepresentation({
+      authorized: SCENARIO_2_APPROVED_PRODUCT_REPRESENTATION,
+      visualSpec: {
+        ...SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC,
+        visualUnitCount: 3,
+        visualUnitType: "loose bulk coffee",
+        packageType: "loose_bulk",
+        generationPrompt:
+          "Photograph of three scoops of loose bulk coffee poured into a box.",
+      },
+    });
+    expect(result.ok).toBe(false);
+    expect(result.findings.map((f) => f.code)).toContain(
+      "loose_bulk_substituted_for_packaged_bags",
+    );
+  });
+
+  it("3. three packaged bags pass", () => {
+    expect(SCENARIO_2_APPROVED_PRODUCT_REPRESENTATION.unitCount).toBe(
+      SCENARIO_2_AUTHORIZED_UNIT_COUNT,
+    );
+    expect(SCENARIO_2_APPROVED_PRODUCT_REPRESENTATION.unitType).toBe(
+      SCENARIO_2_AUTHORIZED_UNIT_TYPE,
+    );
+    expect(SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC.visualUnitCount).toBe(3);
+    expect(SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC.visualUnitType).toBe(
+      SCENARIO_2_VISUAL_UNIT_TYPE,
+    );
+    expect(evaluateScenario2ProductRepresentation().ok).toBe(true);
+    expect(SCENARIO_2_HERO_GENERATION_PROMPT).toContain("three");
+    expect(SCENARIO_2_HERO_GENERATION_PROMPT).toMatch(/\b(sealed|packaged)\b/i);
+  });
+
+  it("4. no unauthorized product claims enter labels or copy", () => {
+    const joined = collectScenario2CustomerFactSources()
+      .map((source) => source.text)
+      .join("\n");
+    expect(joined.toLowerCase()).not.toMatch(/award-winning|ethiopian|tasting notes|free shipping/);
+    expect(evaluateScenario2ProductRepresentation().findings.map((f) => f.code)).not.toContain(
+      "unauthorized_product_claim",
+    );
+  });
+
+  it("5. corrected product identity reaches every visual format", () => {
+    expect(SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC.boundFormatIds).toEqual([
+      "social_square",
+      "social_vertical",
+      "print_counter_card",
+      "short_vertical_video",
+    ]);
+    const creative = buildHarborRoastCreativeBrief();
+    expect(creative.selectedAssetIds.primaryPhotoId).toBe("harbor-roast-hero-box");
+    expect(creative.targetFormats).toEqual([
+      "social_square",
+      "social_vertical",
+      "print_counter_card",
+    ]);
+    const src = readFileSync(
+      path.join(__dirname, "../../../scripts/execute-room-4c-scenario-2.mts"),
+      "utf8",
+    );
+    expect(src).toContain("assertScenario2ProductRepresentation");
+    expect(src).toContain("harbor-roast-hero-box.png");
+    expect(src).toContain("short_vertical_video");
+  });
+
+  it("6. price, dates, CTA, contents, URL, and email remain correct", () => {
+    expect(brief.offer.priceDisplay).toBe("$48");
+    expect(brief.offer.windowDisplay).toBe(dates);
+    expect(brief.cta.label).toBe("Shop the autumn box");
+    expect(brief.offer.contentsDisplay).toBe(contents);
+    expect(brief.cta.bookingUrl).toBe(productUrl);
+    expect(brief.cta.supportEmail).toBe(supportEmail);
+    const email = formatScenario2EmailPasteReady();
+    expect(email).toContain("$48");
+    expect(email).toContain(dates);
+    expect(email).toContain("Shop the autumn box");
+    expect(email).toContain(contents);
     expect(email).toContain(productUrl);
     expect(email).toContain(supportEmail);
   });

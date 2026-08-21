@@ -10,7 +10,7 @@
 **Product URL:** harborroast.example/autumn-box  
 **Support email:** hello@harborroast.example  
 **Phone:** Not owner-authorized. None shown.  
-**Fact status:** OWNER_APPROVED_FOR_CERTIFICATION from the locked package brief. Product name does not substitute for contents. CTA is an action. Dates are the window, not a scarcity claim.
+**Fact status:** OWNER_APPROVED_FOR_CERTIFICATION from the locked package brief. Product name does not substitute for contents. CTA is an action. Dates are the window, not a scarcity claim. The hero photograph must depict three packaged bags; alt text after render is not a substitute.
 
 **Authoritative machine-readable brief:** `campaign-brief.json`  
 SHA-256: `f64a550f96b3859cf952eeab611461b38df288d005f3adda6ea22f25f542e36d`  

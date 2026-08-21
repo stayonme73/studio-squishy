@@ -17,7 +17,7 @@ Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This autumn launc
 
 ## Narration vs on-screen facts
 
-All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, contents **three 8-ounce bags of whole-bean single-origin coffee**, price **$48**, dates **October 1 – October 31, 2026**, CTA **Shop the autumn box**, product URL **harborroast.example/autumn-box** on the CTA plate, caption, email, social, and counter card. Narration does **not** speak the URL, support email, or a phone. Support email **hello@harborroast.example** is in the email package only. Dates are the availability window, not a scarcity claim.
+All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, contents **three 8-ounce bags of whole-bean single-origin coffee**, price **$48**, dates **October 1 – October 31, 2026**, CTA **Shop the autumn box**, product URL **harborroast.example/autumn-box** on the CTA plate, caption, email, social, and counter card. The hero photograph is bound to three packaged coffee bags. Narration does **not** speak the URL, support email, or a phone. Support email **hello@harborroast.example** is in the email package only. Dates are the availability window, not a scarcity claim.
 
 ## Known pacing concern
 
