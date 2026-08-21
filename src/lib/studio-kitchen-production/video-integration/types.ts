@@ -37,6 +37,8 @@ export type ShotstackWorkPacketScene = {
   overlayFontSize?: number;
   overlayBackgroundColor?: string;
   overlayOffsetY?: number;
+  /** Restrained still-image motion. Omit for static clips. */
+  motionEffect?: "zoomIn" | "zoomOut" | "slideLeft" | "slideRight";
 };
 
 /** Provider-independent packet shape bound for Shotstack production. */

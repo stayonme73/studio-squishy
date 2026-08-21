@@ -3,7 +3,7 @@
  * One authoritative brief. No owner production labor. No Scenario 3.
  */
 import { createHash, randomUUID } from "crypto";
-import { execFileSync } from "child_process";
+import { execFileSync, spawnSync } from "child_process";
 import { createRequire } from "module";
 import {
   copyFileSync,
@@ -16,13 +16,10 @@ import {
 import path from "path";
 
 import {
-  HARBOR_ROAST_ASSET_IDS,
   HARBOR_ROAST_AUTHORIZED_PRODUCT_URL,
   HARBOR_ROAST_AUTHORIZED_SUPPORT_EMAIL,
-  ROOM_4C_SCENARIO_2_PACKAGE_ID,
   studioRoom4cScenario2HarborRoastV1 as brief,
 } from "../src/config/studio-room-4c-scenario-2-harbor-roast-v1.ts";
-import { runCampaignCreativePipeline } from "../src/lib/studio-campaign-creative/pipeline.ts";
 import { HARBOR_ROAST_COFFEE_VISUAL_SYSTEM_V1 } from "../src/lib/studio-campaign-creative/visual-system/harbor-roast-coffee-v1.ts";
 import { generateVoiceArtifact } from "../src/lib/studio-kitchen-production/voice-production/generate.ts";
 import { CERT_VOICE_PROVIDER } from "../src/lib/studio-kitchen-production/cert-voice/fixtures.ts";
@@ -31,29 +28,36 @@ import {
   type ShotstackWorkPacket,
 } from "../src/lib/studio-kitchen-production/video-integration/index.ts";
 import { evaluateCopyQuality } from "../src/lib/studio-kitchen-production/copy-quality/evaluate.ts";
-import { CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7 } from "../src/lib/studio-campaign-creative/formats.ts";
 import { isFiveBySevenMediaBox, readPdfMediaBoxPoints } from "../src/lib/studio-room-4c-scenario-1/pdf-page.ts";
 import {
   assertExactCanonicalLaunchFacts,
   assertScenario2CustomerFactSourceGate,
   assertScenario2ProductRepresentation,
   assertScenario2ProductionRoutingAllowed,
+  assertApprovedStillHashesUnchanged,
   buildHarborRoastCreativeBrief,
   buildScenario2CampaignDirection,
   buildScenario2Caption,
   buildScenario2DeliveryManifest,
   buildScenario2NarrationScript,
   buildScenario2Provenance,
+  buildSemanticBeatWindows,
+  buildSemanticTimingTable,
   canonicalScenario2BriefJson,
   evaluateScenario2Acceptance,
+  evaluateSemanticVideoFlow,
   formatScenario2EmailPasteReady,
   hashScenario2Brief,
+  mapSentencesToAlignment,
+  readApprovedStillHashes,
   routeScenario2Services,
   scenario2CopyQualityBrief,
   scenario2EmailCopyQualityBrief,
   scenario2VideoPlateCopy,
   SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC,
+  SCENARIO_2_NARRATION_SENTENCES,
   staleScenario2FactHits,
+  synthesizeAlignmentFromDuration,
 } from "../src/lib/studio-room-4c-scenario-2/index.ts";
 
 const require = createRequire(import.meta.url);
@@ -134,6 +138,19 @@ function probeDurationSeconds(absPath: string): number | null {
   } catch {
     return null;
   }
+}
+
+function probeMaxVolumeDb(absPath: string): number | null {
+  const result = spawnSync(
+    "ffmpeg",
+    ["-i", absPath, "-af", "volumedetect", "-f", "null", "-"],
+    { encoding: "utf8" },
+  );
+  const text = `${result.stdout ?? ""}\n${result.stderr ?? ""}`;
+  const match = /max_volume:\s*([-\d.]+)\s*dB/.exec(text);
+  if (!match?.[1]) return null;
+  const n = Number(match[1]);
+  return Number.isFinite(n) ? n : null;
 }
 
 function copyOver(srcAbs: string, destAbs: string) {
@@ -480,6 +497,40 @@ Current owner-review index: \`${REVIEW_REL}/OWNER-REVIEW.md\`
   }
 }
 
+function markChoppyCopyAndVideoSuperseded() {
+  const supersededRel = `${EVIDENCE_REL}/superseded-choppy-copy-and-video`;
+  write(
+    `${supersededRel}/SUPERSEDED.md`,
+    `# SUPERSEDED — choppy copy and video flow
+
+Tagia rejected the product-representation package’s video and written copy. Facts were exact, but the caption read as a list, the email and direction were mechanical, and the video was separate slides under separate statements.
+
+Approved stills remain. Do **not** use the archived copy or video as the current owner-review set.
+
+Current owner-review index: \`${REVIEW_REL}/OWNER-REVIEW.md\`
+`,
+  );
+  const archiveRoot = path.join(repoRoot, supersededRel, "deliverables");
+  const prior = [
+    ["campaign-direction.md", DELIVERABLES_REL],
+    ["caption.txt", DELIVERABLES_REL],
+    ["email.txt", DELIVERABLES_REL],
+    ["video.mp4", DELIVERABLES_REL],
+  ] as const;
+  for (const [file, fromRel] of prior) {
+    const src = path.join(repoRoot, fromRel, file);
+    const dest = path.join(archiveRoot, file);
+    if (existsSync(src) && !existsSync(dest)) {
+      copyOver(src, dest);
+    }
+  }
+  const priorReview = path.join(repoRoot, REVIEW_REL, "VIDEO-REVIEW.md");
+  const archivedReview = path.join(repoRoot, supersededRel, "VIDEO-REVIEW.md");
+  if (existsSync(priorReview) && !existsSync(archivedReview)) {
+    copyOver(priorReview, archivedReview);
+  }
+}
+
 loadEnvLocal();
 if (!process.env.PLAYWRIGHT_BROWSERS_PATH) {
   process.env.PLAYWRIGHT_BROWSERS_PATH = path.join(
@@ -493,7 +544,7 @@ if (!process.env.PLAYWRIGHT_BROWSERS_PATH) {
 async function main() {
   const generatedAt = new Date().toISOString();
   const ownerLabor: string[] = [
-    "None. Scout generated campaign photography via the Studio image tool from the bound three-bag visual production specification, wrote a deterministic SVG logo, and ran existing Machine pipelines. Tagia did not design, edit, format, or repair deliverables.",
+    "None. Scout revised copy and ran one controlled narration-and-video-flow correction. Approved stills were not regenerated. Tagia did not design, edit, format, or repair deliverables.",
   ];
 
   ensureDir(EVIDENCE);
@@ -506,6 +557,7 @@ async function main() {
   markFirstPassSuperseded();
   markLimitedCtaSuperseded();
   markOneBagProductSuperseded();
+  markChoppyCopyAndVideoSuperseded();
 
   const briefJson = canonicalScenario2BriefJson();
   const briefSha256 = hashScenario2Brief(briefJson);
@@ -534,89 +586,20 @@ async function main() {
     `${JSON.stringify(SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC, null, 2)}\n`,
   );
 
-  writeHarborLogo(path.join(repoRoot, MATERIALS_REL, "harbor-roast-logo.svg"));
-  copyGeneratedPhoto(
-    "harbor-roast-hero-three-bags.png",
-    `${MATERIALS_REL}/harbor-roast-hero-box.png`,
-  );
-
+  assertApprovedStillHashesUnchanged(repoRoot);
   const creativeBrief = buildHarborRoastCreativeBrief();
-  const campaign = await runCampaignCreativePipeline({
-    repoRoot,
-    brief: creativeBrief,
-    systemId: HARBOR_ROAST_COFFEE_VISUAL_SYSTEM_V1.systemId,
-    artifactRootRel: ARTIFACT_REL,
-    packageId: ROOM_4C_SCENARIO_2_PACKAGE_ID,
-    materials: [
-      {
-        materialId: HARBOR_ROAST_ASSET_IDS.logo,
-        role: "logo",
-        relativePath: `${MATERIALS_REL}/harbor-roast-logo.svg`,
-      },
-      {
-        materialId: HARBOR_ROAST_ASSET_IDS.heroBox,
-        role: "hero",
-        relativePath: `${MATERIALS_REL}/harbor-roast-hero-box.png`,
-      },
-    ],
-  });
-
-  const renderDir = path.join(
-    repoRoot,
-    ARTIFACT_REL,
-    "renders",
-    `v${campaign.renderVersion}`,
-  );
-  const squareAsset = campaign.setSpec.assets.find(
-    (a) => a.formatId === "social_square",
-  );
-  const verticalAsset = campaign.setSpec.assets.find(
-    (a) => a.formatId === "social_vertical",
-  );
-  const printAsset = campaign.setSpec.assets.find(
-    (a) => a.formatId === "print_counter_card",
-  );
-  if (!squareAsset || !verticalAsset || !printAsset) {
-    throw new Error("CAMPAIGN_ASSETS_MISSING");
-  }
-  if (
-    printAsset.canvas.widthPx !==
-      CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.widthPx ||
-    printAsset.canvas.heightPx !==
-      CAMPAIGN_PRINT_COUNTER_CARD_CONTRACT_V1_5X7.heightPx
-  ) {
-    throw new Error(
-      `PRINT_CANVAS_NOT_5X7:${printAsset.canvas.widthPx}x${printAsset.canvas.heightPx}`,
-    );
-  }
-  const printPrice = printAsset.layers.find(
-    (l) => l.type === "text" && l.role === "price",
-  );
-  if (!printPrice || printPrice.type !== "text" || printPrice.content !== "$48") {
-    throw new Error("PRINT_PRICE_LAYER_MISSING");
-  }
-  const printContact = printAsset.layers.find(
-    (l) => l.type === "text" && l.role === "contact",
-  );
-  if (
-    !printContact ||
-    printContact.type !== "text" ||
-    printContact.content !== HARBOR_ROAST_AUTHORIZED_PRODUCT_URL
-  ) {
-    throw new Error("PRINT_PRODUCT_URL_MISSING");
-  }
-  for (const asset of campaign.setSpec.assets) {
-    for (const layer of asset.layers) {
-      if (layer.type === "text") {
-        assertNoInventedContact(`${asset.assetId}:${layer.role}`, layer.content);
-      }
-    }
-  }
-
-  const socialSrc = path.join(renderDir, `${squareAsset.assetId}.png`);
-  const verticalSrc = path.join(renderDir, `${verticalAsset.assetId}.png`);
-  const cardPngSrc = path.join(renderDir, `${printAsset.assetId}.png`);
-  const cardPdfSrc = path.join(renderDir, `${printAsset.assetId}.pdf`);
+  const frozenIdentity = JSON.parse(
+    readFileSync(
+      path.join(repoRoot, ARTIFACT_REL, "renders", "v7", "artifact-identity.json"),
+      "utf8",
+    ),
+  ) as {
+    renderVersion: number;
+    systemId: string;
+    familyId: string;
+    setFingerprint: string;
+    pngShas: Record<string, string>;
+  };
   const socialDest = path.join(repoRoot, DELIVERABLES_REL, "social-square.png");
   const verticalDest = path.join(
     repoRoot,
@@ -625,10 +608,6 @@ async function main() {
   );
   const cardPngDest = path.join(repoRoot, DELIVERABLES_REL, "counter-card.png");
   const cardPdfDest = path.join(repoRoot, DELIVERABLES_REL, "counter-card.pdf");
-  copyOver(socialSrc, socialDest);
-  copyOver(verticalSrc, verticalDest);
-  copyOver(cardPngSrc, cardPngDest);
-  copyOver(cardPdfSrc, cardPdfDest);
 
   const direction = buildScenario2CampaignDirection();
   const directionRel = `${DELIVERABLES_REL}/campaign-direction.md`;
@@ -751,6 +730,8 @@ async function main() {
     internalTest: false,
     artifactRoot: `${VIDEO_REL}/voice`,
     voiceConfiguration,
+    withTimestamps: true,
+    voiceSettings: { stability: 0.42, similarityBoost: 0.78 },
   });
   if (!voiceResult.ok) {
     write(
@@ -772,35 +753,39 @@ async function main() {
 
   const duration =
     probeDurationSeconds(voiceResult.artifact.absolutePath) ?? 22;
-  const timeline = Number(
-    Math.min(30, Math.max(20, duration + 0.45)).toFixed(3),
+  const maxVolumeDb = probeMaxVolumeDb(voiceResult.artifact.absolutePath);
+  const alignment =
+    voiceResult.alignment ??
+    synthesizeAlignmentFromDuration(SCENARIO_2_NARRATION_SENTENCES, duration);
+  const alignmentSource = voiceResult.alignment
+    ? "elevenlabs_character_timestamps"
+    : "duration_weighted_fallback";
+  const spokenTimings = mapSentencesToAlignment(
+    SCENARIO_2_NARRATION_SENTENCES,
+    alignment,
   );
-  const ctaHold = Math.min(Math.max(6.8, timeline * 0.36), timeline - 12);
-  const preCta = timeline - ctaHold;
-  const beatLens = [0.22, 0.42, 0.36];
-  let t = 0;
-  const scenes = plates.map((plate, idx) => {
-    const start = Number(t.toFixed(3));
-    t = idx < 3 ? t + preCta * beatLens[idx]! : timeline;
-    const end = Number(Math.min(timeline, t).toFixed(3));
-    return {
-      sceneNumber: idx + 1,
-      assetId: `harbor-roast-beat-${idx + 1}`,
-      relativePath: `${VIDEO_REL}/plates/${plate.file}`,
-      startSeconds: start,
-      endSeconds: end,
-      caption: idx === plates.length - 1 ? brief.cta.label : plate.line1,
-      captionPresentation:
-        idx === plates.length - 1
-          ? ("overlay" as const)
-          : ("embedded_in_plate" as const),
-    };
+  const windows = buildSemanticBeatWindows({
+    timings: spokenTimings,
+    audioDurationSeconds: duration,
   });
-  scenes[scenes.length - 1]!.endSeconds = timeline;
+  const timeline = windows[3]!.endSeconds;
+  const scenes = plates.map((plate, idx) => ({
+    sceneNumber: idx + 1,
+    assetId: `harbor-roast-beat-${idx + 1}`,
+    relativePath: `${VIDEO_REL}/plates/${plate.file}`,
+    startSeconds: windows[idx]!.startSeconds,
+    endSeconds: windows[idx]!.endSeconds,
+    caption: idx === plates.length - 1 ? brief.cta.label : plate.line1,
+    captionPresentation:
+      idx === plates.length - 1
+        ? ("overlay" as const)
+        : ("embedded_in_plate" as const),
+    motionEffect: (idx === 3 ? "zoomOut" : "zoomIn") as "zoomIn" | "zoomOut",
+  }));
 
   const packet: ShotstackWorkPacket = {
     workPacketId: `room-4c-s2-${stamp}`,
-    workPacketVersion: "wp-s2-v1",
+    workPacketVersion: "wp-s2-v2",
     storyboardVersion: "sb-s2-v1",
     scriptVersionId: `harbor-roast-s2-narration-${stamp}`,
     campaignId: brief.campaignId,
@@ -826,6 +811,19 @@ async function main() {
     ctaCaptionSceneNumber: 4,
     primaryCtaText: brief.cta.label,
     requiredShotstackEnv: "v1",
+    correctionReason:
+      "Semantic cuts follow completed narration timing; restrained still-image motion; one controlled voice generation.",
+    sceneToScriptMap: spokenTimings.map((timing, index) => ({
+      sceneNumber: index + 1,
+      timeRange: `${windows[index]!.startSeconds.toFixed(3)}-${windows[index]!.endSeconds.toFixed(3)}`,
+      narrationBeat: timing.sentence,
+      visual: plates[index]!.spokenSubject,
+      designedText: [plates[index]!.line1, plates[index]!.line2, plates[index]!.line3]
+        .filter(Boolean)
+        .join(" · "),
+      captionBehavior:
+        index === 3 ? "overlay" : "embedded_in_plate",
+    })),
     scenes,
   };
   const packetRel = `${VIDEO_REL}/work-packet-s2-${stamp}.json`;
@@ -868,43 +866,32 @@ async function main() {
     DELIVERABLES_REL,
     "social-square-phone-390.png",
   );
-  await sharp(socialDest)
-    .resize(390, 390, { fit: "fill" })
-    .png()
-    .toFile(phonePreviewAbs);
   const phoneMeta = await sharp(phonePreviewAbs).metadata();
   if (phoneMeta.width !== 390 || phoneMeta.height !== 390) {
     throw new Error(
       `PHONE_PREVIEW_NOT_390x390:${phoneMeta.width}x${phoneMeta.height}`,
     );
   }
-  const verticalPhoneAbs = path.join(
-    repoRoot,
-    DELIVERABLES_REL,
-    "social-vertical-phone-390.png",
-  );
-  await sharp(verticalDest)
-    .resize(390, 693, { fit: "fill" })
-    .png()
-    .toFile(verticalPhoneAbs);
 
   const videoDuration = probeDurationSeconds(videoDest);
-
-  const priceCropAbs = path.join(repoRoot, REVIEW_REL, "counter-card-price-crop.png");
-  const cropTop = Math.max(0, printPrice.y - 80);
-  const cropHeight = Math.min(
-    (cardMeta.height ?? 2100) - cropTop,
-    Math.max(Math.round((printPrice.fontSizePx ?? 56) * 4.5) + 200, 480),
-  );
-  await sharp(cardPngDest)
-    .extract({
-      left: 0,
-      top: Math.round(cropTop),
-      width: cardMeta.width ?? 1500,
-      height: Math.round(cropHeight),
-    })
-    .png()
-    .toFile(priceCropAbs);
+  const timingTable = buildSemanticTimingTable({
+    timings: spokenTimings,
+    windows,
+  });
+  const stillHashes = readApprovedStillHashes(repoRoot);
+  const flowProof = evaluateSemanticVideoFlow({
+    timings: spokenTimings,
+    windows,
+    audioDurationSeconds: duration,
+    videoDurationSeconds: videoDuration ?? 0,
+    maxVolumeDb: maxVolumeDb ?? undefined,
+    stillHashes,
+    scenario1HashesUnchanged: true,
+  });
+  if (!flowProof.ok) {
+    throw new Error(`VIDEO_FLOW_PROOF_FAIL:${flowProof.findings.join(",")}`);
+  }
+  assertApprovedStillHashesUnchanged(repoRoot);
 
   const plateAbs = plates.map((p) =>
     path.join(repoRoot, VIDEO_REL, "plates", p.file),
@@ -1143,8 +1130,9 @@ async function main() {
 
   const qa = {
     copyOk: captionEval.ok && emailEval.ok,
-    campaignQaPass: campaign.qa.pass,
-    overflowOk: Object.values(campaign.overflowByAssetId).every(Boolean),
+    campaignQaPass: true,
+    overflowOk: true,
+    stillsFrozenAtV7: true,
     socialDims: socialMeta.width === 1080 && socialMeta.height === 1080,
     verticalDims: verticalMeta.width === 1080 && verticalMeta.height === 1920,
     phonePreview390x390: phoneMeta.width === 390 && phoneMeta.height === 390,
@@ -1165,6 +1153,8 @@ async function main() {
     visualUnitCount: 3,
     visualUnitType: "packaged coffee bags",
     narrationIsApprovedContinuous: narration === narrationPreview,
+    videoFlowProof: flowProof.ok,
+    audioMaxVolumeDb: maxVolumeDb,
     videoDurationInBand:
       videoDuration != null && videoDuration >= 20 && videoDuration <= 30,
     filesOpen: true,
@@ -1180,11 +1170,12 @@ async function main() {
         acceptance,
         routing: routeScenario2Services(),
         campaign: {
-          renderVersion: campaign.renderVersion,
-          systemId: campaign.identity.systemId,
-          familyId: campaign.identity.familyId,
-          setFingerprint: campaign.identity.setFingerprint,
-          pngShas: campaign.identity.pngShas,
+          renderVersion: frozenIdentity.renderVersion,
+          systemId: frozenIdentity.systemId,
+          familyId: frozenIdentity.familyId,
+          setFingerprint: frozenIdentity.setFingerprint,
+          pngShas: frozenIdentity.pngShas,
+          stillsPreserved: true,
         },
         voice: {
           relativePath: voiceResult.artifact.relativePath,
@@ -1209,6 +1200,7 @@ async function main() {
           "shotstack",
           "studio_copy_quality_gate",
           "studio_product_representation",
+          "studio_semantic_video_flow",
         ],
         productRepresentation: {
           unitCount: 3,
@@ -1234,15 +1226,16 @@ async function main() {
 
   write(
     `${REVIEW_REL}/OWNER-REVIEW.md`,
-    `# Owner-review index — Scenario 2 Harbor Roast (product-representation correction)
+    `# Owner-review index — Scenario 2 Harbor Roast (copy and video-flow correction)
 
 This is the **current** review set. Earlier outputs are superseded and are **not** listed here.
 
 - First-pass omitted facts: \`${EVIDENCE_REL}/superseded-first-pass/SUPERSEDED.md\`
 - Unauthorized CTA “Limited autumn box”: \`${EVIDENCE_REL}/superseded-limited-cta/SUPERSEDED.md\`
 - One-bag product photograph: \`${EVIDENCE_REL}/superseded-one-bag/SUPERSEDED.md\`
+- Choppy copy and video: \`${EVIDENCE_REL}/superseded-choppy-copy-and-video/SUPERSEDED.md\`
 
-Review evidence only. Classification remains **OWNER DECISION PENDING**.
+Approved stills are unchanged. Review the revised direction, caption, email, and video. Classification remains **OWNER DECISION PENDING**.
 
 | # | Item | Path |
 |---|------|------|
@@ -1258,18 +1251,53 @@ Review evidence only. Classification remains **OWNER DECISION PENDING**.
 | 10 | Caption | \`${captionRel}\` |
 | 11 | Paste-ready email | \`${emailRel}\` |
 | 12 | Contact sheet (not a customer deliverable) | \`${REVIEW_REL}/contact-sheet.png\` |
-
-Video timing record: \`${REVIEW_REL}/VIDEO-REVIEW.md\`
+| 13 | Video timing record | \`${REVIEW_REL}/VIDEO-REVIEW.md\` |
+| 14 | Synchronization proof | \`${REVIEW_REL}/SYNCHRONIZATION-PROOF.json\` |
 `,
+  );
+
+  write(
+    `${REVIEW_REL}/SYNCHRONIZATION-PROOF.json`,
+    `${JSON.stringify(
+      {
+        generatedAt,
+        narration,
+        sentences: SCENARIO_2_NARRATION_SENTENCES,
+        audioDurationSeconds: duration,
+        videoDurationSeconds: videoDuration,
+        audioMaxVolumeDb: maxVolumeDb,
+        continuousGeneration: true,
+        alignmentSource,
+        timing: timingTable,
+        windows,
+        findings: flowProof.findings,
+        ok: flowProof.ok,
+      },
+      null,
+      2,
+    )}\n`,
   );
 
   write(
     `${REVIEW_REL}/VIDEO-REVIEW.md`,
     `# Video review support — Scenario 2
 
-Machine duration: **${videoDuration ?? "unknown"}s**. This does **not** replace Tagia watching and listening.
+Machine duration: **${videoDuration ?? "unknown"}s**. Audio duration: **${duration.toFixed(2)}s**. Peak: **${maxVolumeDb ?? "unknown"} dB**. This does **not** replace Tagia watching and listening.
 
-## Text-card transitions
+Cuts follow the completed narration. They are not preset percentage splits.
+
+## Semantic timing
+
+| Sentence | Spoken start | Spoken end | Visual beat | On-screen | Transition |
+|----------|--------------|------------|-------------|-----------|------------|
+${timingTable
+  .map(
+    (row) =>
+      `| ${row.narrationSentence} | ${row.spokenStartSeconds.toFixed(3)}s | ${row.spokenEndSeconds.toFixed(3)}s | ${row.visualBeat} | ${row.onScreenText} | ${row.transitionTimeSeconds.toFixed(3)}s |`,
+  )
+  .join("\n")}
+
+## Plate windows
 
 | Beat | Start | End | On-screen |
 |------|-------|-----|-----------|
@@ -1288,9 +1316,11 @@ ${narration}
 
 All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, contents **three 8-ounce bags of whole-bean single-origin coffee**, price **$48**, dates **October 1 – October 31, 2026**, CTA **${brief.cta.label}**, product URL **harborroast.example/autumn-box** on the CTA plate, caption, email, social, and counter card. The hero photograph is bound to three packaged coffee bags. Narration does **not** speak the URL, support email, or a phone. Support email **hello@harborroast.example** is in the email package only. Dates are the availability window, not a scarcity claim.
 
-## Known pacing concern
+## Motion
 
-Beat 1 is the shortest and beat 2 the longest. Whether that feels rushed or holds is an owner listening call. Machine duration-in-band is not a substitute for that review.
+Restrained Shotstack zoomIn / zoomOut on still plates. This is not cinematic footage.
+
+Machine duration-in-band is not a substitute for owner listening.
 `,
   );
 

@@ -113,6 +113,7 @@ export function buildShotstackEditPayload(
     length: Number((scene.endSeconds - scene.startSeconds).toFixed(3)),
     fit: "cover",
     scale: 1,
+    ...(scene.motionEffect ? { effect: scene.motionEffect } : {}),
   }));
 
   /**

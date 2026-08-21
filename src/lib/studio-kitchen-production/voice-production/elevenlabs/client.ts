@@ -85,7 +85,21 @@ export async function elevenLabsTextToSpeech(
 
   const fetchImpl = options?.fetchImpl ?? fetch;
   const base = options?.baseUrl ?? ELEVENLABS_API_BASE;
-  const url = `${base}/v1/text-to-speech/${encodeURIComponent(request.voiceId)}?output_format=${encodeURIComponent(request.outputFormat)}`;
+  const path = request.withTimestamps
+    ? `/v1/text-to-speech/${encodeURIComponent(request.voiceId)}/with-timestamps`
+    : `/v1/text-to-speech/${encodeURIComponent(request.voiceId)}`;
+  const url = `${base}${path}?output_format=${encodeURIComponent(request.outputFormat)}`;
+
+  const body: Record<string, unknown> = {
+    text: request.text,
+    model_id: request.modelId,
+  };
+  if (request.voiceSettings) {
+    body.voice_settings = {
+      stability: request.voiceSettings.stability,
+      similarity_boost: request.voiceSettings.similarityBoost,
+    };
+  }
 
   let response: Response;
   try {
@@ -94,12 +108,11 @@ export async function elevenLabsTextToSpeech(
       headers: {
         "xi-api-key": apiKey,
         "Content-Type": "application/json",
-        Accept: "audio/mpeg, audio/wav, application/octet-stream",
+        Accept: request.withTimestamps
+          ? "application/json"
+          : "audio/mpeg, audio/wav, application/octet-stream",
       },
-      body: JSON.stringify({
-        text: request.text,
-        model_id: request.modelId,
-      }),
+      body: JSON.stringify(body),
     });
   } catch {
     return {
@@ -115,6 +128,66 @@ export async function elevenLabsTextToSpeech(
     return { ok: false, ...classified, httpStatus: response.status };
   }
 
+  const requestId =
+    response.headers.get("request-id") ??
+    response.headers.get("x-request-id") ??
+    undefined;
+
+  if (request.withTimestamps) {
+    let parsed: {
+      audio_base64?: string;
+      alignment?: {
+        characters?: string[];
+        character_start_times_seconds?: number[];
+        character_end_times_seconds?: number[];
+      };
+    };
+    try {
+      parsed = (await response.json()) as typeof parsed;
+    } catch {
+      return {
+        ok: false,
+        code: "empty_audio",
+        message: "ElevenLabs timestamps response was not JSON",
+      };
+    }
+    const audioB64 = parsed.audio_base64 ?? "";
+    const audioBytes = Buffer.from(audioB64, "base64");
+    if (audioBytes.byteLength <= 0) {
+      return {
+        ok: false,
+        code: "empty_audio",
+        message: "ElevenLabs returned empty timestamped audio body",
+      };
+    }
+    const alignment = parsed.alignment;
+    if (
+      !alignment?.characters?.length ||
+      alignment.characters.length !==
+        alignment.character_start_times_seconds?.length ||
+      alignment.characters.length !==
+        alignment.character_end_times_seconds?.length
+    ) {
+      return {
+        ok: false,
+        code: "invalid_request",
+        message: "ElevenLabs timestamps response missing character alignment",
+      };
+    }
+    return {
+      ok: true,
+      audioBytes,
+      contentType: "audio/mpeg",
+      providerRequestId: requestId ?? undefined,
+      byteLength: audioBytes.byteLength,
+      alignment: {
+        characters: alignment.characters,
+        character_start_times_seconds: alignment.character_start_times_seconds,
+        character_end_times_seconds: alignment.character_end_times_seconds,
+      },
+    };
+  }
+
   const ab = await response.arrayBuffer();
   const audioBytes = Buffer.from(ab);
   if (audioBytes.byteLength <= 0) {
@@ -124,11 +197,6 @@ export async function elevenLabsTextToSpeech(
       message: "ElevenLabs returned empty audio body",
     };
   }
-
-  const requestId =
-    response.headers.get("request-id") ??
-    response.headers.get("x-request-id") ??
-    undefined;
 
   return {
     ok: true,

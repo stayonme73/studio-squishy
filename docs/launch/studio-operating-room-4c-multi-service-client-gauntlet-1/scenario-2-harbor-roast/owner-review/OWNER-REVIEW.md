@@ -1,12 +1,13 @@
-# Owner-review index — Scenario 2 Harbor Roast (product-representation correction)
+# Owner-review index — Scenario 2 Harbor Roast (copy and video-flow correction)
 
 This is the **current** review set. Earlier outputs are superseded and are **not** listed here.
 
 - First-pass omitted facts: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-first-pass/SUPERSEDED.md`
 - Unauthorized CTA “Limited autumn box”: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-limited-cta/SUPERSEDED.md`
 - One-bag product photograph: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-one-bag/SUPERSEDED.md`
+- Choppy copy and video: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-choppy-copy-and-video/SUPERSEDED.md`
 
-Review evidence only. Classification remains **OWNER DECISION PENDING**.
+Approved stills are unchanged. Review the revised direction, caption, email, and video. Classification remains **OWNER DECISION PENDING**.
 
 | # | Item | Path |
 |---|------|------|
@@ -22,5 +23,5 @@ Review evidence only. Classification remains **OWNER DECISION PENDING**.
 | 10 | Caption | `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/caption.txt` |
 | 11 | Paste-ready email | `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/email.txt` |
 | 12 | Contact sheet (not a customer deliverable) | `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/contact-sheet.png` |
-
-Video timing record: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/VIDEO-REVIEW.md`
+| 13 | Video timing record | `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/VIDEO-REVIEW.md` |
+| 14 | Synchronization proof | `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/SYNCHRONIZATION-PROOF.json` |

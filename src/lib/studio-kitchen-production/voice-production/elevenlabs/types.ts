@@ -16,6 +16,17 @@ export type ElevenLabsTtsRequest = {
   modelId: string;
   text: string;
   outputFormat: string;
+  voiceSettings?: {
+    stability?: number;
+    similarityBoost?: number;
+  };
+  withTimestamps?: boolean;
+};
+
+export type ElevenLabsCharacterAlignment = {
+  characters: string[];
+  character_start_times_seconds: number[];
+  character_end_times_seconds: number[];
 };
 
 export type ElevenLabsTtsSuccess = {
@@ -25,6 +36,7 @@ export type ElevenLabsTtsSuccess = {
   /** Provider request id when exposed safely (header). Never an API key. */
   providerRequestId?: string;
   byteLength: number;
+  alignment?: ElevenLabsCharacterAlignment;
 };
 
 export type ElevenLabsTtsFailure = {

@@ -1,5 +1,6 @@
 /**
- * Room 4C Scenario 2 — paste-ready caption and email from the authoritative brief.
+ * Room 4C Scenario 2 — paste-ready caption, email, direction, and narration.
+ * Customer-facing copy must read as communication, not a fact list.
  */
 
 import type { CopyQualityBrief } from "@/lib/studio-kitchen-production/copy-quality/types";
@@ -11,16 +12,27 @@ function literalToken(value: string): string {
 
 const STALE_BOOKING_URL = "harborroast.example/book";
 
+/**
+ * Four spoken beats for one continuous commercial. Joined as a single
+ * generation. Visual cuts must follow these sentences after the audio exists.
+ */
+export const SCENARIO_2_NARRATION_SENTENCES = [
+  "Harbor Roast Coffee Co. is launching the Autumn Single-Origin Box.",
+  "Inside are three 8-ounce bags of whole-bean single-origin coffee.",
+  "The box is forty-eight dollars, available October first through October thirty-first, twenty twenty-six.",
+  "Shop the autumn box this October.",
+] as const;
+
+export const SCENARIO_2_APPROVED_NARRATION =
+  SCENARIO_2_NARRATION_SENTENCES.join(" ");
+
 export function buildScenario2Caption(): string {
   return [
-    `${brief.offer.name} is ${brief.offer.priceDisplay}, ${brief.offer.windowDisplay}.`,
+    `${brief.customer.businessName} is launching the ${brief.offer.name} this October.`,
     "",
-    brief.customer.businessName,
+    `The box is ${brief.offer.priceDisplay} and includes ${brief.offer.contentsDisplay}, available ${brief.offer.windowDisplay}.`,
     "",
-    brief.offer.contentsDisplay,
-    "",
-    brief.cta.label,
-    brief.cta.bookingUrl,
+    `${brief.cta.label}: ${brief.cta.bookingUrl}`,
   ].join("\n");
 }
 
@@ -32,12 +44,11 @@ export function buildScenario2Email(): {
 } {
   return {
     subjectOptions: [`${brief.offer.name} — ${brief.offer.priceDisplay}`],
-    previewText: `${brief.offer.priceDisplay} · ${brief.offer.windowDisplay}`,
+    previewText: `The ${brief.offer.name} is ${brief.offer.priceDisplay} this October.`,
     body: [
       `${brief.customer.businessName} is launching the ${brief.offer.name}.`,
       "",
-      `The box is ${brief.offer.priceDisplay} and includes ${brief.offer.contentsDisplay}.`,
-      `Available ${brief.offer.windowDisplay}.`,
+      `This October the box is ${brief.offer.priceDisplay} and includes ${brief.offer.contentsDisplay}. Available ${brief.offer.windowDisplay}.`,
       "",
       `${brief.cta.label}: ${brief.cta.bookingUrl}`,
       "",
@@ -57,31 +68,31 @@ export function formatScenario2EmailPasteReady(): string {
   ].join("\n");
 }
 
-/**
- * Owner-facing Scenario 2 narration. One continuous passage.
- * Speak the authorized price, dates, and contents. Do not speak URL, email, or phone.
- */
-export const SCENARIO_2_APPROVED_NARRATION =
-  "Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This autumn launch is forty-eight dollars and includes three 8-ounce bags of whole-bean single-origin coffee, available October first through October thirty-first, twenty twenty-six. Shop the autumn box this October.";
-
 export function buildScenario2NarrationScript(): string {
   return SCENARIO_2_APPROVED_NARRATION;
 }
 
 export function buildScenario2CampaignDirection(): string {
   return [
-    "Campaign direction — Harbor Roast Coffee Co.",
+    `${brief.customer.businessName} — ${brief.offer.name}`,
     "",
-    "One product launch. One box. One price. One window. One purchase URL.",
+    "Campaign direction",
     "",
-    `${brief.customer.businessName} launches the ${brief.offer.name} at ${brief.offer.priceDisplay}, ${brief.offer.windowDisplay}.`,
+    "This launch should feel like a warm counter conversation, not a spec sheet. One photograph of three sealed bags carries the square, the vertical, the short video, and the 5×7 counter card. The customer should see the product they will receive and know exactly how to buy it.",
+    "",
+    "The idea",
+    `${brief.customer.businessName} is opening the ${brief.offer.name} this October. Keep the tone warm and grounded. Speak in complete sentences. Do not stack facts as a list, and do not start a sentence with a lowercase product count.`,
+    "",
+    "Locked campaign facts",
+    `Offer: ${brief.offer.name} at ${brief.offer.priceDisplay}, ${brief.offer.windowDisplay}.`,
     `Contents: ${brief.offer.contentsDisplay}.`,
+    `Call to action: ${brief.cta.label}.`,
     `Purchase: ${brief.cta.bookingUrl}.`,
     `Support: ${brief.cta.supportEmail}.`,
-    "Tone is warm and grounded. No neon. No invented origin, shipping, discount, reviews, phone, or scarcity.",
-    "Availability dates are the window only. They do not authorize a shortage claim.",
-    `Call to action: ${brief.cta.label}.`,
-    "Social square, social vertical, short vertical video, promotional email, caption, and 5×7 counter card share the same photograph, logo, and facts.",
+    "Availability dates are the window only. They do not authorize a shortage claim. No neon, no invented origin, shipping, discount, reviews, phone, or scarcity.",
+    "",
+    "How the pieces work together",
+    "Social square, social vertical, short vertical video, promotional email, caption, and 5×7 counter card share the same photograph, logo, and facts. Video beats follow the spoken subject. The purchase plate holds on Shop the autumn box and the product URL long enough to read.",
   ].join("\n");
 }
 

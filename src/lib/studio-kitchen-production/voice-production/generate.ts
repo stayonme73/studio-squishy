@@ -50,6 +50,12 @@ export type GenerateVoiceArtifactInput = {
   capability?: ElevenLabsAccountCapability;
   /** Optional override of voice config — must still be approved provider IDs, not clones. */
   voiceConfiguration?: ReturnType<typeof resolveApprovedVoiceConfiguration>;
+  /** One-shot character alignment for semantic video cuts. Not a second generation. */
+  withTimestamps?: boolean;
+  voiceSettings?: {
+    stability?: number;
+    similarityBoost?: number;
+  };
 };
 
 export type GenerateVoiceArtifactSuccess = {
@@ -60,6 +66,7 @@ export type GenerateVoiceArtifactSuccess = {
   qaPassed: false;
   customerReady: false;
   artifact: PersistedVoiceArtifact;
+  alignment?: import("./elevenlabs/types").ElevenLabsCharacterAlignment;
   evidence: {
     provider: "elevenlabs";
     providerVoiceId: string;
@@ -202,6 +209,8 @@ export async function generateVoiceArtifact(
       modelId: voice.modelId,
       text: script,
       outputFormat: providerOutputFormat,
+      withTimestamps: input.withTimestamps === true,
+      voiceSettings: input.voiceSettings,
     },
     {
       apiKey: env.ELEVENLABS_API_KEY?.trim(),
@@ -239,6 +248,7 @@ export async function generateVoiceArtifact(
     qaPassed: false,
     customerReady: false,
     artifact: persisted,
+    alignment: tts.alignment,
     evidence: {
       provider: "elevenlabs",
       providerVoiceId: voice.voiceId,

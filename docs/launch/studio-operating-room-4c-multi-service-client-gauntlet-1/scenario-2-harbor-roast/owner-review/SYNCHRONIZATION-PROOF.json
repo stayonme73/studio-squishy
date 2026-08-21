@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-08-21T00:38:01.572Z",
+  "narration": "Harbor Roast Coffee Co. is launching the Autumn Single-Origin Box. Inside are three 8-ounce bags of whole-bean single-origin coffee. The box is forty-eight dollars, available October first through October thirty-first, twenty twenty-six. Shop the autumn box this October.",
+  "sentences": [
+    "Harbor Roast Coffee Co. is launching the Autumn Single-Origin Box.",
+    "Inside are three 8-ounce bags of whole-bean single-origin coffee.",
+    "The box is forty-eight dollars, available October first through October thirty-first, twenty twenty-six.",
+    "Shop the autumn box this October."
+  ],
+  "audioDurationSeconds": 19.272562,
+  "videoDurationSeconds": 20.52,
+  "audioMaxVolumeDb": -6.5,
+  "continuousGeneration": true,
+  "alignmentSource": "elevenlabs_character_timestamps",
+  "timing": [
+    {
+      "narrationSentence": "Harbor Roast Coffee Co. is launching the Autumn Single-Origin Box.",
+      "spokenStartSeconds": 0,
+      "spokenEndSeconds": 4.203,
+      "visualBeat": 1,
+      "onScreenText": "Autumn Single-Origin Box · This October",
+      "transitionTimeSeconds": 0
+    },
+    {
+      "narrationSentence": "Inside are three 8-ounce bags of whole-bean single-origin coffee.",
+      "spokenStartSeconds": 4.644,
+      "spokenEndSeconds": 9.207,
+      "visualBeat": 2,
+      "onScreenText": "Autumn Single-Origin Box · three 8-ounce bags of whole-bean single-origin coffee",
+      "transitionTimeSeconds": 4.644
+    },
+    {
+      "narrationSentence": "The box is forty-eight dollars, available October first through October thirty-first, twenty twenty-six.",
+      "spokenStartSeconds": 9.59,
+      "spokenEndSeconds": 15.952,
+      "visualBeat": 3,
+      "onScreenText": "$48 · October 1 – October 31, 2026",
+      "transitionTimeSeconds": 9.59
+    },
+    {
+      "narrationSentence": "Shop the autumn box this October.",
+      "spokenStartSeconds": 16.556,
+      "spokenEndSeconds": 19.273,
+      "visualBeat": 4,
+      "onScreenText": "Shop the autumn box · harborroast.example/autumn-box · $48",
+      "transitionTimeSeconds": 16.556
+    }
+  ],
+  "windows": [
+    {
+      "startSeconds": 0,
+      "endSeconds": 4.644
+    },
+    {
+      "startSeconds": 4.644,
+      "endSeconds": 9.59
+    },
+    {
+      "startSeconds": 9.59,
+      "endSeconds": 16.556
+    },
+    {
+      "startSeconds": 16.556,
+      "endSeconds": 20.556
+    }
+  ],
+  "findings": [],
+  "ok": true
+}

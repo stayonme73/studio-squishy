@@ -192,7 +192,7 @@ describe("Room 4C Scenario 2 — copy quality", () => {
   it("uses the continuous narration and does not speak contact", () => {
     const script = buildScenario2NarrationScript();
     expect(script).toBe(
-      "Harbor Roast Coffee Co. presents the Autumn Single-Origin Box. This autumn launch is forty-eight dollars and includes three 8-ounce bags of whole-bean single-origin coffee, available October first through October thirty-first, twenty twenty-six. Shop the autumn box this October.",
+      "Harbor Roast Coffee Co. is launching the Autumn Single-Origin Box. Inside are three 8-ounce bags of whole-bean single-origin coffee. The box is forty-eight dollars, available October first through October thirty-first, twenty twenty-six. Shop the autumn box this October.",
     );
     expect(script).toContain(brief.customer.businessName);
     expect(script).toContain(brief.offer.name);
@@ -211,6 +211,17 @@ describe("Room 4C Scenario 2 — copy quality", () => {
     expect(direction).toContain(
       "three 8-ounce bags of whole-bean single-origin coffee",
     );
+    expect(direction).toContain("warm counter conversation");
+  });
+
+  it("writes caption and email as complete promotional sentences", () => {
+    const caption = buildScenario2Caption();
+    expect(caption.startsWith("Harbor Roast Coffee Co.")).toBe(true);
+    expect(caption).not.toMatch(/(^|\n)three /);
+    expect(caption).toContain("Shop the autumn box: harborroast.example/autumn-box");
+    const email = formatScenario2EmailPasteReady();
+    expect(email).toContain("This October the box is $48");
+    expect(email).toContain("hello@harborroast.example");
   });
 });
 
@@ -574,6 +585,8 @@ describe("Room 4C Scenario 2 — authorized-fact omission correction proofs", ()
     expect(src).toContain("durationMinSeconds: 20");
     expect(src).toContain("durationMaxSeconds: 30");
     expect(src).toContain("videoDuration >= 20 && videoDuration <= 30");
+    expect(src).toContain("buildSemanticBeatWindows");
+    expect(src).not.toContain("beatLens");
   });
 
   it("10. Scenario 1 approved deliverable hashes remain unchanged", () => {

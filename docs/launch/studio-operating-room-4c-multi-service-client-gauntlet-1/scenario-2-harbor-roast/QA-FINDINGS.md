@@ -2,7 +2,7 @@
 
 Owner creative review is **not** complete. Classification remains **OWNER DECISION PENDING** until Tagia reviews the stills and listens to the video.
 
-First-pass QA that treated missing URL/email/contents as an explicit limit is **superseded**. Tagia classified that run **FIX REQUIRED**.
+First-pass QA that treated missing URL/email/contents as an explicit limit is **superseded**. Tagia classified that run **FIX REQUIRED**. The choppy percentage-split video and list-like copy are **superseded**.
 
 | Check | Result |
 |-------|--------|
@@ -17,9 +17,12 @@ First-pass QA that treated missing URL/email/contents as an explicit limit is **
 | No invented phone | PASS |
 | Unsupported product claims | PASS (none invented) |
 | Phone-size text (390×390 complete resize) | PASS as responsive observation; headline, dates, price, CTA, contents, and URL remain readable |
-| Video duration in band | PASS (20.00s; contract 20–30s) |
-| Video pacing / narration commercially usable | OWNER LISTENING PENDING (beat 1 is 2.8s; machine duration is not a substitute) |
+| Approved still hashes frozen | PASS (square / vertical / counter-card PNG+PDF unchanged) |
+| Video duration in band | PASS (20.52s; contract 20–30s) |
+| Semantic video flow | PASS (cuts follow spoken sentence starts; CTA hold 4.00s; one continuous generation; peak −6.5 dB) |
+| Video pacing / narration commercially usable | OWNER LISTENING PENDING (machine timing is not a substitute) |
 | Email commercially deliverable | PASS on facts (subject, preheader, body, $48, contents, dates, CTA, purchase URL, support email). Owner still reviews. |
+| Caption is a complete promotional sentence | PASS (does not begin a sentence with lowercase “three”) |
 | Counter card printable 5×7 | PASS (1500×2100 PNG; PDF 360×504 pt; files open) |
 | Files open correctly | PASS |
 | Owner production labor | None |

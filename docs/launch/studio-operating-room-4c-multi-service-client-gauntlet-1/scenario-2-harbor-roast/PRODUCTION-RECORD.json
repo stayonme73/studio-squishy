@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-21T00:09:48.058Z",
+  "generatedAt": "2026-08-21T00:38:01.572Z",
   "briefSha256": "f64a550f96b3859cf952eeab611461b38df288d005f3adda6ea22f25f542e36d",
   "acceptance": {
     "admit": true,
@@ -109,19 +109,20 @@
       "social_square__full_bleed_hero": "72b12a28f4d0ae1af6fb42a9ed73532610e048e36411c4df028f663cdadf2109",
       "social_vertical__full_bleed_hero": "1320c885cf91a0a97f69598ec9cb89b27ef9c91d724d909902e14741177eac20",
       "print_counter_card__full_bleed_hero": "023f91a952e9acfcd572b8434647c063fa8ff92653f879bfeb84d42602cb0380"
-    }
+    },
+    "stillsPreserved": true
   },
   "voice": {
-    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787270993932_357e22d5fbe2.mp3",
-    "contentSha256": "357e22d5fbe29febe8541a354d2551d396efe3f5a86089d01670025e701e0ad2",
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787272682283_00f4ec01aada.mp3",
+    "contentSha256": "00f4ec01aada1d36d44d98655c3a079149eb0df51ef16a194f3f0fe2c5411e44",
     "skuUsedForTtsAdapter": "ap-001",
     "soldAs": "supporting narration for v2-rtu-short-video"
   },
   "video": {
-    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/work-packet-s2-1787270993932.json",
-    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787270993932.mp4",
-    "durationSeconds": 20,
-    "providerRenderId": "f295d470-5ac6-4654-a89e-d5a220de40e3"
+    "packet": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/work-packet-s2-1787272682283.json",
+    "artifact": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787272682283.mp4",
+    "durationSeconds": 20.52,
+    "providerRenderId": "f1d8b9a4-bf20-40a5-80a0-db8fe05ff0fb"
   },
   "print": {
     "pngPx": {
@@ -141,7 +142,8 @@
     "elevenlabs_tts_adapter",
     "shotstack",
     "studio_copy_quality_gate",
-    "studio_product_representation"
+    "studio_product_representation",
+    "studio_semantic_video_flow"
   ],
   "productRepresentation": {
     "unitCount": 3,
@@ -151,12 +153,13 @@
     "specId": "harbor-roast-hero-three-packaged-bags-v1"
   },
   "ownerLabor": [
-    "None. Scout generated campaign photography via the Studio image tool from the bound three-bag visual production specification, wrote a deterministic SVG logo, and ran existing Machine pipelines. Tagia did not design, edit, format, or repair deliverables."
+    "None. Scout revised copy and ran one controlled narration-and-video-flow correction. Approved stills were not regenerated. Tagia did not design, edit, format, or repair deliverables."
   ],
   "qa": {
     "copyOk": true,
     "campaignQaPass": true,
     "overflowOk": true,
+    "stillsFrozenAtV7": true,
     "socialDims": true,
     "verticalDims": true,
     "phonePreview390x390": true,
@@ -182,8 +185,10 @@
     "visualUnitCount": 3,
     "visualUnitType": "packaged coffee bags",
     "narrationIsApprovedContinuous": true,
+    "videoFlowProof": true,
+    "audioMaxVolumeDb": -6.5,
     "videoDurationInBand": true,
     "filesOpen": true,
-    "runId": "c4fcf61e-8ba8-475b-b956-c98eb4fa0aea"
+    "runId": "36ff756a-00cb-4f58-ace6-2b98f2a8ae3a"
   }
 }

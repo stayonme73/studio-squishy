@@ -16,6 +16,7 @@ export {
   buildScenario2NarrationScript,
   formatScenario2EmailPasteReady,
   SCENARIO_2_APPROVED_NARRATION,
+  SCENARIO_2_NARRATION_SENTENCES,
   scenario2CopyQualityBrief,
   scenario2EmailCopyQualityBrief,
 } from "./copy";
@@ -51,5 +52,15 @@ export {
   scenario2VideoCtaPlateCopy,
   scenario2VideoPlateCopy,
 } from "./video-plates";
+export {
+  SCENARIO_2_APPROVED_STILL_HASHES,
+  assertApprovedStillHashesUnchanged,
+  buildSemanticBeatWindows,
+  buildSemanticTimingTable,
+  evaluateSemanticVideoFlow,
+  mapSentencesToAlignment,
+  readApprovedStillHashes,
+  synthesizeAlignmentFromDuration,
+} from "./video-flow";
 export { buildScenario2Provenance } from "./provenance";
 export { buildScenario2DeliveryManifest } from "./delivery-manifest";
