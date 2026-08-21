@@ -336,7 +336,11 @@ function baseJob(input: {
     requestedDurationTargetSeconds: input.packet.durationTargetSeconds,
     outputFormat: "mp4",
     sourceAssetPaths: [
-      ...input.packet.scenes.map((s) => s.relativePath),
+      ...input.packet.scenes.flatMap((s) =>
+        s.overlayRelativePath
+          ? [s.relativePath, s.overlayRelativePath]
+          : [s.relativePath],
+      ),
       input.packet.voiceArtifact.relativePath,
     ],
     sourceAssetHashes: input.sourceAssetHashes,

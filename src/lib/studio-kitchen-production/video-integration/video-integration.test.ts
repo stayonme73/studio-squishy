@@ -281,4 +281,43 @@ describe("KITCHEN-VIDEO-INTEGRATION-1", () => {
     }
     expect(phase).toBe("download");
   });
+
+  it("applies motion to the background photograph only", () => {
+    const packet = loadShotstackWorkPacketV1(repoRoot);
+    const overlayPacket = {
+      ...packet,
+      primaryCtaText: undefined,
+      scenes: packet.scenes.map((scene, idx) => ({
+        ...scene,
+        captionPresentation: "embedded_in_plate" as const,
+        overlayRelativePath: `overlay-${idx + 1}.png`,
+        motionEffect: "zoomIn" as const,
+        backgroundScale: 1.12,
+      })),
+    };
+    const urls = new Map<string, string>();
+    for (const scene of overlayPacket.scenes) {
+      urls.set(scene.relativePath, `https://example.test/${scene.assetId}.png`);
+      urls.set(
+        scene.overlayRelativePath!,
+        `https://example.test/overlay-${scene.assetId}.png`,
+      );
+    }
+    urls.set(packet.voiceArtifact.relativePath, "https://example.test/voice.mp3");
+    const built = buildShotstackEditPayload(overlayPacket, urls);
+    expect(built.ok).toBe(true);
+    if (!built.ok) return;
+    const overlayTrack = built.payload.timeline.tracks[0]!;
+    const photoTrack = built.payload.timeline.tracks.at(-1)!;
+    expect(overlayTrack.clips).toHaveLength(4);
+    expect(photoTrack.clips).toHaveLength(4);
+    for (const clip of overlayTrack.clips) {
+      expect(clip).not.toHaveProperty("effect");
+      expect(clip.scale).toBe(1);
+    }
+    for (const clip of photoTrack.clips) {
+      expect(clip.effect).toBe("zoomIn");
+      expect(clip.scale).toBe(1.12);
+    }
+  });
 });

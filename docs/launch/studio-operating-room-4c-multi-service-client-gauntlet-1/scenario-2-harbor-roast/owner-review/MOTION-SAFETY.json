@@ -1,0 +1,357 @@
+{
+  "ok": true,
+  "findings": [
+    {
+      "id": "overlay_inside_safe_area_beat_1",
+      "ok": true,
+      "detail": "box={\"left\":98,\"top\":1269,\"right\":806,\"bottom\":1472}"
+    },
+    {
+      "id": "text_stationary_beat_1_quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=4.36 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_1_midpoint",
+      "ok": true,
+      "detail": "meanAbsDiff=4.79 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_1_three-quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=5.10 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_1_beat-end",
+      "ok": true,
+      "detail": "meanAbsDiff=5.40 (max 22)"
+    },
+    {
+      "id": "no_blank_edges_beat_1_start",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.002"
+    },
+    {
+      "id": "no_blank_edges_beat_1_end",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.000"
+    },
+    {
+      "id": "product_visible_beat_1",
+      "ok": true,
+      "detail": "upperVariance=4279.2"
+    },
+    {
+      "id": "overlay_inside_safe_area_beat_2",
+      "ok": true,
+      "detail": "box={\"left\":98,\"top\":1269,\"right\":806,\"bottom\":1477}"
+    },
+    {
+      "id": "text_stationary_beat_2_quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=3.87 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_2_midpoint",
+      "ok": true,
+      "detail": "meanAbsDiff=4.35 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_2_three-quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=4.90 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_2_beat-end",
+      "ok": true,
+      "detail": "meanAbsDiff=5.47 (max 22)"
+    },
+    {
+      "id": "no_blank_edges_beat_2_start",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.007"
+    },
+    {
+      "id": "no_blank_edges_beat_2_end",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.063"
+    },
+    {
+      "id": "product_visible_beat_2",
+      "ok": true,
+      "detail": "upperVariance=5418.8"
+    },
+    {
+      "id": "overlay_inside_safe_area_beat_3",
+      "ok": true,
+      "detail": "box={\"left\":100,\"top\":1269,\"right\":537,\"bottom\":1477}"
+    },
+    {
+      "id": "text_stationary_beat_3_quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=5.28 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_3_midpoint",
+      "ok": true,
+      "detail": "meanAbsDiff=6.08 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_3_three-quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=6.63 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_3_beat-end",
+      "ok": true,
+      "detail": "meanAbsDiff=7.12 (max 22)"
+    },
+    {
+      "id": "no_blank_edges_beat_3_start",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.011"
+    },
+    {
+      "id": "no_blank_edges_beat_3_end",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.002"
+    },
+    {
+      "id": "product_visible_beat_3",
+      "ok": true,
+      "detail": "upperVariance=3669.6"
+    },
+    {
+      "id": "overlay_inside_safe_area_beat_4",
+      "ok": true,
+      "detail": "box={\"left\":100,\"top\":1269,\"right\":669,\"bottom\":1553}"
+    },
+    {
+      "id": "text_stationary_beat_4_quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=4.56 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_4_midpoint",
+      "ok": true,
+      "detail": "meanAbsDiff=4.90 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_4_three-quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=5.40 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_4_beat-end",
+      "ok": true,
+      "detail": "meanAbsDiff=6.66 (max 22)"
+    },
+    {
+      "id": "no_blank_edges_beat_4_start",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.014"
+    },
+    {
+      "id": "no_blank_edges_beat_4_end",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.047"
+    },
+    {
+      "id": "product_visible_beat_4",
+      "ok": true,
+      "detail": "upperVariance=4221.6"
+    },
+    {
+      "id": "cta_text_visible_cta-mid",
+      "ok": true,
+      "detail": "meanAbsDiff=4.90"
+    },
+    {
+      "id": "cta_text_visible_final-frame",
+      "ok": true,
+      "detail": "meanAbsDiff=6.65"
+    },
+    {
+      "id": "max_pan_point",
+      "ok": true,
+      "detail": "no pan used; zoomIn only on oversized backgrounds so edges stay covered"
+    }
+  ],
+  "frames": [
+    {
+      "id": "beat-1-beat-start",
+      "seconds": 0.04,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-1-beat-start.jpg",
+      "role": "beat-start",
+      "beat": 1
+    },
+    {
+      "id": "beat-1-quarter",
+      "seconds": 1.161,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-1-quarter.jpg",
+      "role": "quarter",
+      "beat": 1
+    },
+    {
+      "id": "beat-1-midpoint",
+      "seconds": 2.322,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-1-midpoint.jpg",
+      "role": "midpoint",
+      "beat": 1
+    },
+    {
+      "id": "beat-1-three-quarter",
+      "seconds": 3.483,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-1-three-quarter.jpg",
+      "role": "three-quarter",
+      "beat": 1
+    },
+    {
+      "id": "beat-1-beat-end",
+      "seconds": 4.564,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-1-beat-end.jpg",
+      "role": "beat-end",
+      "beat": 1
+    },
+    {
+      "id": "beat-2-beat-start",
+      "seconds": 4.684,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-2-beat-start.jpg",
+      "role": "beat-start",
+      "beat": 2
+    },
+    {
+      "id": "beat-2-quarter",
+      "seconds": 5.88,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-2-quarter.jpg",
+      "role": "quarter",
+      "beat": 2
+    },
+    {
+      "id": "beat-2-midpoint",
+      "seconds": 7.117,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-2-midpoint.jpg",
+      "role": "midpoint",
+      "beat": 2
+    },
+    {
+      "id": "beat-2-three-quarter",
+      "seconds": 8.354,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-2-three-quarter.jpg",
+      "role": "three-quarter",
+      "beat": 2
+    },
+    {
+      "id": "beat-2-beat-end",
+      "seconds": 9.51,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-2-beat-end.jpg",
+      "role": "beat-end",
+      "beat": 2
+    },
+    {
+      "id": "beat-3-beat-start",
+      "seconds": 9.63,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-3-beat-start.jpg",
+      "role": "beat-start",
+      "beat": 3
+    },
+    {
+      "id": "beat-3-quarter",
+      "seconds": 11.332,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-3-quarter.jpg",
+      "role": "quarter",
+      "beat": 3
+    },
+    {
+      "id": "beat-3-midpoint",
+      "seconds": 13.073,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-3-midpoint.jpg",
+      "role": "midpoint",
+      "beat": 3
+    },
+    {
+      "id": "beat-3-three-quarter",
+      "seconds": 14.815,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-3-three-quarter.jpg",
+      "role": "three-quarter",
+      "beat": 3
+    },
+    {
+      "id": "beat-3-beat-end",
+      "seconds": 16.476,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-3-beat-end.jpg",
+      "role": "beat-end",
+      "beat": 3
+    },
+    {
+      "id": "beat-4-beat-start",
+      "seconds": 16.596,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-4-beat-start.jpg",
+      "role": "beat-start",
+      "beat": 4
+    },
+    {
+      "id": "beat-4-quarter",
+      "seconds": 17.556,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-4-quarter.jpg",
+      "role": "quarter",
+      "beat": 4
+    },
+    {
+      "id": "beat-4-midpoint",
+      "seconds": 18.556,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-4-midpoint.jpg",
+      "role": "midpoint",
+      "beat": 4
+    },
+    {
+      "id": "beat-4-three-quarter",
+      "seconds": 19.556,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-4-three-quarter.jpg",
+      "role": "three-quarter",
+      "beat": 4
+    },
+    {
+      "id": "beat-4-beat-end",
+      "seconds": 20.476,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/beat-4-beat-end.jpg",
+      "role": "beat-end",
+      "beat": 4
+    },
+    {
+      "id": "cta-start",
+      "seconds": 16.636,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/cta-start.jpg",
+      "role": "cta-start",
+      "beat": 4
+    },
+    {
+      "id": "cta-mid",
+      "seconds": 18.556,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/cta-mid.jpg",
+      "role": "cta-mid",
+      "beat": 4
+    },
+    {
+      "id": "final-frame",
+      "seconds": 20.44,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/final-frame.jpg",
+      "role": "final-frame",
+      "beat": 4
+    },
+    {
+      "id": "max-zoom-point",
+      "seconds": 4.564,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/max-zoom-point.jpg",
+      "role": "max-zoom-point",
+      "beat": 1
+    },
+    {
+      "id": "max-pan-point",
+      "seconds": 4.564,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-2-harbor-roast\\owner-review\\motion-safety-frames/max-pan-point.jpg",
+      "role": "max-pan-point",
+      "beat": 1
+    }
+  ]
+}

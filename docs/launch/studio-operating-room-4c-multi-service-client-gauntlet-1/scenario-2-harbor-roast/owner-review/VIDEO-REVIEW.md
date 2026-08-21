@@ -32,6 +32,10 @@ All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, 
 
 ## Motion
 
-Restrained Shotstack zoomIn / zoomOut on still plates. This is not cinematic footage.
+Background photographs move with restrained zoomIn. Type lives on a separate stationary overlay. Words are checked from extracted MP4 frames, not from timeline JSON.
+
+Motion-safety report: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/MOTION-SAFETY.json`
+Rendered-frame sheet: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/motion-safety-contact-sheet.png`
+Result: **PASS**
 
 Machine duration-in-band is not a substitute for owner listening.

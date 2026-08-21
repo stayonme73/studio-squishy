@@ -9,6 +9,7 @@ import {
   copyFileSync,
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   statSync,
   writeFileSync,
@@ -21,12 +22,11 @@ import {
   studioRoom4cScenario2HarborRoastV1 as brief,
 } from "../src/config/studio-room-4c-scenario-2-harbor-roast-v1.ts";
 import { HARBOR_ROAST_COFFEE_VISUAL_SYSTEM_V1 } from "../src/lib/studio-campaign-creative/visual-system/harbor-roast-coffee-v1.ts";
-import { generateVoiceArtifact } from "../src/lib/studio-kitchen-production/voice-production/generate.ts";
-import { CERT_VOICE_PROVIDER } from "../src/lib/studio-kitchen-production/cert-voice/fixtures.ts";
 import {
   runShotstackWorkPacketPipeline,
   type ShotstackWorkPacket,
 } from "../src/lib/studio-kitchen-production/video-integration/index.ts";
+import { evaluateRenderedMotionSafety } from "../src/lib/studio-kitchen-production/video-motion-safety/index.ts";
 import { evaluateCopyQuality } from "../src/lib/studio-kitchen-production/copy-quality/evaluate.ts";
 import { isFiveBySevenMediaBox, readPdfMediaBoxPoints } from "../src/lib/studio-room-4c-scenario-1/pdf-page.ts";
 import {
@@ -48,7 +48,6 @@ import {
   evaluateSemanticVideoFlow,
   formatScenario2EmailPasteReady,
   hashScenario2Brief,
-  mapSentencesToAlignment,
   readApprovedStillHashes,
   routeScenario2Services,
   scenario2CopyQualityBrief,
@@ -57,7 +56,6 @@ import {
   SCENARIO_2_HERO_VISUAL_PRODUCTION_SPEC,
   SCENARIO_2_NARRATION_SENTENCES,
   staleScenario2FactHits,
-  synthesizeAlignmentFromDuration,
 } from "../src/lib/studio-room-4c-scenario-2/index.ts";
 
 const require = createRequire(import.meta.url);
@@ -210,9 +208,18 @@ function writeHarborLogo(destAbs: string) {
   );
 }
 
-async function writeVideoPlate(input: {
+async function writeVideoBackground(input: {
   destAbs: string;
-  heroAbs: string;
+  photoAbs: string;
+}) {
+  await sharp(input.photoAbs)
+    .resize(1215, 2160, { fit: "cover", position: "centre" })
+    .png()
+    .toFile(input.destAbs);
+}
+
+async function writeVideoTextOverlay(input: {
+  destAbs: string;
   eyebrow: string;
   line1: string;
   line2?: string;
@@ -224,30 +231,26 @@ async function writeVideoPlate(input: {
 <svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#4A2C2A" stop-opacity="0.08"/>
-      <stop offset="45%" stop-color="#4A2C2A" stop-opacity="0.32"/>
-      <stop offset="100%" stop-color="#4A2C2A" stop-opacity="0.82"/>
+      <stop offset="0%" stop-color="#4A2C2A" stop-opacity="0"/>
+      <stop offset="48%" stop-color="#4A2C2A" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#4A2C2A" stop-opacity="0.88"/>
     </linearGradient>
   </defs>
   <rect width="${W}" height="${H}" fill="url(#g)"/>
-  <text x="90" y="1280" font-family="Georgia, serif" font-size="26" letter-spacing="4" fill="#F4EDE3">${esc(input.eyebrow)}</text>
-  <text x="90" y="1380" font-family="Georgia, serif" font-size="54" font-weight="700" fill="#F4EDE3">${esc(input.line1)}</text>
+  <text x="100" y="1288" font-family="Georgia, serif" font-size="26" letter-spacing="4" fill="#F4EDE3">${esc(input.eyebrow)}</text>
+  <text x="100" y="1384" font-family="Georgia, serif" font-size="52" font-weight="700" fill="#F4EDE3">${esc(input.line1)}</text>
   ${
     input.line2
-      ? `<text x="90" y="1470" font-family="Georgia, serif" font-size="${input.line2.length > 40 ? 24 : 34}" fill="#F4EDE3">${esc(input.line2)}</text>`
+      ? `<text x="100" y="1472" font-family="Georgia, serif" font-size="${input.line2.length > 40 ? 24 : 34}" fill="#F4EDE3">${esc(input.line2)}</text>`
       : ""
   }
   ${
     input.line3
-      ? `<text x="90" y="1548" font-family="Georgia, serif" font-size="30" fill="#C4844A">${esc(input.line3)}</text>`
+      ? `<text x="100" y="1548" font-family="Georgia, serif" font-size="30" fill="#C4844A">${esc(input.line3)}</text>`
       : ""
   }
 </svg>`);
-  await sharp(input.heroAbs)
-    .resize(W, H, { fit: "cover", position: "centre" })
-    .composite([{ input: overlay, top: 0, left: 0 }])
-    .png()
-    .toFile(input.destAbs);
+  await sharp(overlay).png().toFile(input.destAbs);
 }
 
 async function writeContactSheet(input: {
@@ -313,6 +316,68 @@ async function writeContactSheet(input: {
     },
   })
     .composite([{ input: svg, top: 0, left: 0 }, ...composites])
+    .png()
+    .toFile(input.destAbs);
+}
+
+async function writeFrameContactSheet(input: {
+  destAbs: string;
+  frames: readonly {
+    id: string;
+    seconds: number;
+    absolutePath: string;
+    role: string;
+    beat: number;
+  }[];
+}) {
+  const thumbW = 216;
+  const thumbH = 384;
+  const pad = 36;
+  const cols = 6;
+  const rows = Math.max(1, Math.ceil(input.frames.length / cols));
+  const W = pad * 2 + cols * thumbW + (cols - 1) * 16;
+  const H = 80 + rows * (thumbH + 48) + pad;
+  const thumbs = await Promise.all(
+    input.frames.map((frame) =>
+      sharp(frame.absolutePath)
+        .resize(thumbW, thumbH, { fit: "cover" })
+        .png()
+        .toBuffer(),
+    ),
+  );
+  const labels = Buffer.from(
+    `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+  <rect width="${W}" height="${H}" fill="#F4EDE3"/>
+  <text x="${pad}" y="44" font-family="Georgia, serif" font-size="22" fill="#4A2C2A">Harbor Roast — rendered-frame motion-safety sheet (not a customer deliverable)</text>
+  ${input.frames
+    .map((frame, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = pad + col * (thumbW + 16);
+      const y = 64 + row * (thumbH + 48) + thumbH + 22;
+      return `<text x="${x}" y="${y}" font-family="Georgia, serif" font-size="14" fill="#4A2C2A">${esc(frame.id)} @ ${frame.seconds.toFixed(2)}s</text>`;
+    })
+    .join("")}
+</svg>`,
+  );
+  const composites = thumbs.map((thumb, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    return {
+      input: thumb,
+      top: 64 + row * (thumbH + 48),
+      left: pad + col * (thumbW + 16),
+    };
+  });
+  await sharp({
+    create: {
+      width: W,
+      height: H,
+      channels: 3,
+      background: { r: 244, g: 237, b: 227 },
+    },
+  })
+    .composite([{ input: labels, top: 0, left: 0 }, ...composites])
     .png()
     .toFile(input.destAbs);
 }
@@ -497,6 +562,29 @@ Current owner-review index: \`${REVIEW_REL}/OWNER-REVIEW.md\`
   }
 }
 
+function markMovingTextVideoSuperseded() {
+  const supersededRel = `${EVIDENCE_REL}/superseded-moving-text-video`;
+  write(
+    `${supersededRel}/SUPERSEDED.md`,
+    `# SUPERSEDED — moving-text / single-image video
+
+Tagia rejected the copy/video-flow package’s motion. Shotstack zoomed the finished plate, so the words moved with the photograph and left the phone-safe area.
+
+The approved campaign-direction audience fix is kept. This archive is the rejected video only.
+
+Current owner-review index: \`${REVIEW_REL}/OWNER-REVIEW.md\`
+`,
+  );
+  const src = path.join(repoRoot, DELIVERABLES_REL, "video.mp4");
+  const dest = path.join(repoRoot, supersededRel, "deliverables", "video.mp4");
+  if (existsSync(src) && !existsSync(dest)) copyOver(src, dest);
+  const priorReview = path.join(repoRoot, REVIEW_REL, "VIDEO-REVIEW.md");
+  const archivedReview = path.join(repoRoot, supersededRel, "VIDEO-REVIEW.md");
+  if (existsSync(priorReview) && !existsSync(archivedReview)) {
+    copyOver(priorReview, archivedReview);
+  }
+}
+
 function markChoppyCopyAndVideoSuperseded() {
   const supersededRel = `${EVIDENCE_REL}/superseded-choppy-copy-and-video`;
   write(
@@ -544,7 +632,7 @@ if (!process.env.PLAYWRIGHT_BROWSERS_PATH) {
 async function main() {
   const generatedAt = new Date().toISOString();
   const ownerLabor: string[] = [
-    "None. Scout revised copy and ran one controlled narration-and-video-flow correction. Approved stills were not regenerated. Tagia did not design, edit, format, or repair deliverables.",
+    "None. Scout corrected motion-safe layered video and included the approved campaign-direction audience fix. Approved stills were not regenerated. The certified narration MP3 was reused. Tagia did not design, edit, format, or repair deliverables.",
   ];
 
   ensureDir(EVIDENCE);
@@ -558,6 +646,7 @@ async function main() {
   markLimitedCtaSuperseded();
   markOneBagProductSuperseded();
   markChoppyCopyAndVideoSuperseded();
+  markMovingTextVideoSuperseded();
 
   const briefJson = canonicalScenario2BriefJson();
   const briefSha256 = hashScenario2Brief(briefJson);
@@ -697,73 +786,92 @@ async function main() {
   }
 
   const heroAbs = path.join(repoRoot, MATERIALS_REL, "harbor-roast-hero-box.png");
+  copyGeneratedPhoto(
+    "harbor-roast-video-beat-02-closer.png",
+    `${MATERIALS_REL}/harbor-roast-video-beat-02-closer.png`,
+  );
+  copyGeneratedPhoto(
+    "harbor-roast-video-beat-03-angle.png",
+    `${MATERIALS_REL}/harbor-roast-video-beat-03-angle.png`,
+  );
+  copyGeneratedPhoto(
+    "harbor-roast-video-beat-04-table.png",
+    `${MATERIALS_REL}/harbor-roast-video-beat-04-table.png`,
+  );
+  const scenePhotos = [
+    heroAbs,
+    path.join(repoRoot, MATERIALS_REL, "harbor-roast-video-beat-02-closer.png"),
+    path.join(repoRoot, MATERIALS_REL, "harbor-roast-video-beat-03-angle.png"),
+    path.join(repoRoot, MATERIALS_REL, "harbor-roast-video-beat-04-table.png"),
+  ];
   const plates = scenario2VideoPlateCopy();
-  for (const plate of plates) {
-    await writeVideoPlate({
-      destAbs: path.join(repoRoot, VIDEO_REL, "plates", plate.file),
-      heroAbs,
+  const overlayAbsPaths: string[] = [];
+  for (const [idx, plate] of plates.entries()) {
+    const bgRel = `${VIDEO_REL}/plates/bg-${plate.file}`;
+    const overlayRel = `${VIDEO_REL}/plates/type-${plate.file}`;
+    await writeVideoBackground({
+      destAbs: path.join(repoRoot, bgRel),
+      photoAbs: scenePhotos[idx]!,
+    });
+    await writeVideoTextOverlay({
+      destAbs: path.join(repoRoot, overlayRel),
       eyebrow: plate.eyebrow,
       line1: plate.line1,
       line2: "line2" in plate ? plate.line2 : undefined,
       line3: "line3" in plate ? plate.line3 : undefined,
     });
+    overlayAbsPaths.push(path.join(repoRoot, overlayRel));
   }
 
   const stamp = Date.now();
   const narration = buildScenario2NarrationScript();
-  const voiceConfiguration = {
-    provider: "elevenlabs" as const,
-    voiceId: process.env.ELEVENLABS_VOICE_ID?.trim() || CERT_VOICE_PROVIDER.voiceId,
-    modelId: process.env.ELEVENLABS_MODEL_ID?.trim() || CERT_VOICE_PROVIDER.modelId,
-    source: process.env.ELEVENLABS_VOICE_ID?.trim()
-      ? ("env" as const)
-      : ("default_candidate" as const),
-  };
-
-  const voiceResult = await generateVoiceArtifact({
-    campaignId: brief.campaignId,
-    skuId: "ap-001",
-    approvedScript: narration,
-    scriptVersionId: `harbor-roast-s2-narration-${stamp}`,
-    outputFormat: "mp3",
-    repoRoot,
-    internalTest: false,
-    artifactRoot: `${VIDEO_REL}/voice`,
-    voiceConfiguration,
-    withTimestamps: true,
-    voiceSettings: { stability: 0.42, similarityBoost: 0.78 },
-  });
-  if (!voiceResult.ok) {
-    write(
-      `${EVIDENCE_REL}/PRODUCTION-BLOCK.json`,
-      `${JSON.stringify(
-        {
-          blocked: true,
-          stage: "voice",
-          code: voiceResult.code,
-          message: voiceResult.message,
-          note: "Keys not printed.",
-        },
-        null,
-        2,
-      )}\n`,
-    );
-    throw new Error(`VOICE_BLOCKED:${voiceResult.code}`);
+  const preservedVoiceRel =
+    `${VIDEO_REL}/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787272682283_00f4ec01aada.mp3`;
+  const preservedVoiceSha =
+    "00f4ec01aada1d36d44d98655c3a079149eb0df51ef16a194f3f0fe2c5411e44";
+  const preservedVoiceAbs = path.join(repoRoot, preservedVoiceRel);
+  if (!existsSync(preservedVoiceAbs)) {
+    throw new Error("PRESERVED_VOICE_MISSING");
   }
-
-  const duration =
-    probeDurationSeconds(voiceResult.artifact.absolutePath) ?? 22;
-  const maxVolumeDb = probeMaxVolumeDb(voiceResult.artifact.absolutePath);
-  const alignment =
-    voiceResult.alignment ??
-    synthesizeAlignmentFromDuration(SCENARIO_2_NARRATION_SENTENCES, duration);
-  const alignmentSource = voiceResult.alignment
-    ? "elevenlabs_character_timestamps"
-    : "duration_weighted_fallback";
-  const spokenTimings = mapSentencesToAlignment(
-    SCENARIO_2_NARRATION_SENTENCES,
-    alignment,
-  );
+  if (sha256File(preservedVoiceAbs) !== preservedVoiceSha) {
+    throw new Error("PRESERVED_VOICE_HASH_CHANGED");
+  }
+  const voiceResult = {
+    artifact: {
+      relativePath: preservedVoiceRel,
+      contentSha256: preservedVoiceSha,
+      absolutePath: preservedVoiceAbs,
+    },
+  };
+  const duration = probeDurationSeconds(preservedVoiceAbs) ?? 19.273;
+  const maxVolumeDb = probeMaxVolumeDb(preservedVoiceAbs);
+  const alignmentSource = "preserved_elevenlabs_character_timestamps";
+  const spokenTimings = [
+    {
+      sentence: SCENARIO_2_NARRATION_SENTENCES[0]!,
+      startSeconds: 0,
+      endSeconds: 4.203,
+      visualBeat: 1,
+    },
+    {
+      sentence: SCENARIO_2_NARRATION_SENTENCES[1]!,
+      startSeconds: 4.644,
+      endSeconds: 9.207,
+      visualBeat: 2,
+    },
+    {
+      sentence: SCENARIO_2_NARRATION_SENTENCES[2]!,
+      startSeconds: 9.59,
+      endSeconds: 15.952,
+      visualBeat: 3,
+    },
+    {
+      sentence: SCENARIO_2_NARRATION_SENTENCES[3]!,
+      startSeconds: 16.556,
+      endSeconds: 19.273,
+      visualBeat: 4,
+    },
+  ];
   const windows = buildSemanticBeatWindows({
     timings: spokenTimings,
     audioDurationSeconds: duration,
@@ -772,22 +880,21 @@ async function main() {
   const scenes = plates.map((plate, idx) => ({
     sceneNumber: idx + 1,
     assetId: `harbor-roast-beat-${idx + 1}`,
-    relativePath: `${VIDEO_REL}/plates/${plate.file}`,
+    relativePath: `${VIDEO_REL}/plates/bg-${plate.file}`,
+    overlayRelativePath: `${VIDEO_REL}/plates/type-${plate.file}`,
     startSeconds: windows[idx]!.startSeconds,
     endSeconds: windows[idx]!.endSeconds,
     caption: idx === plates.length - 1 ? brief.cta.label : plate.line1,
-    captionPresentation:
-      idx === plates.length - 1
-        ? ("overlay" as const)
-        : ("embedded_in_plate" as const),
-    motionEffect: (idx === 3 ? "zoomOut" : "zoomIn") as "zoomIn" | "zoomOut",
+    captionPresentation: "embedded_in_plate" as const,
+    motionEffect: "zoomIn" as const,
+    backgroundScale: 1.12,
   }));
 
   const packet: ShotstackWorkPacket = {
     workPacketId: `room-4c-s2-${stamp}`,
-    workPacketVersion: "wp-s2-v2",
-    storyboardVersion: "sb-s2-v1",
-    scriptVersionId: `harbor-roast-s2-narration-${stamp}`,
+    workPacketVersion: "wp-s2-v3",
+    storyboardVersion: "sb-s2-v2",
+    scriptVersionId: "harbor-roast-s2-narration-1787272682283",
     campaignId: brief.campaignId,
     skuId: "v2-rtu-short-video",
     label:
@@ -812,7 +919,7 @@ async function main() {
     primaryCtaText: brief.cta.label,
     requiredShotstackEnv: "v1",
     correctionReason:
-      "Semantic cuts follow completed narration timing; restrained still-image motion; one controlled voice generation.",
+      "Background photograph moves; type stays stationary inside the 9:16 safe area. Coordinated three-bag scenes. Preserved narration.",
     sceneToScriptMap: spokenTimings.map((timing, index) => ({
       sceneNumber: index + 1,
       timeRange: `${windows[index]!.startSeconds.toFixed(3)}-${windows[index]!.endSeconds.toFixed(3)}`,
@@ -821,37 +928,61 @@ async function main() {
       designedText: [plates[index]!.line1, plates[index]!.line2, plates[index]!.line3]
         .filter(Boolean)
         .join(" · "),
-      captionBehavior:
-        index === 3 ? "overlay" : "embedded_in_plate",
+      captionBehavior: "stationary_type_overlay",
     })),
     scenes,
   };
   const packetRel = `${VIDEO_REL}/work-packet-s2-${stamp}.json`;
   write(packetRel, `${JSON.stringify(packet, null, 2)}\n`);
 
-  const render = await runShotstackWorkPacketPipeline({
-    repoRoot,
-    packet,
-    envName: "v1",
-    pollMaxAttempts: 90,
-    pollDelayMs: 3000,
-  });
-  if (!render.ok) {
-    write(
-      `${EVIDENCE_REL}/PRODUCTION-BLOCK.json`,
-      `${JSON.stringify(
-        {
-          blocked: true,
-          stage: "shotstack",
-          verdict: render.verdict,
-          message: render.message,
-          note: "Keys not printed.",
-        },
-        null,
-        2,
-      )}\n`,
-    );
-    throw new Error(`VIDEO_BLOCKED:${render.verdict}`);
+  let render: {
+    ok: true;
+    artifact: { relativePath: string };
+    job: { providerRenderId: string };
+  };
+  if (process.env.ROOM_4C_S2_REUSE_VIDEO === "1") {
+    const latest = readdirSync(path.join(repoRoot, VIDEO_REL))
+      .filter(
+        (name) =>
+          name.startsWith("harbor-roast-autumn-box-") && name.endsWith(".binding.json"),
+      )
+      .sort()
+      .at(-1);
+    if (!latest) throw new Error("REUSE_VIDEO_MISSING_BINDING");
+    const binding = JSON.parse(
+      readFileSync(path.join(repoRoot, VIDEO_REL, latest), "utf8"),
+    ) as { relativePath: string; providerRenderId: string };
+    render = {
+      ok: true,
+      artifact: { relativePath: binding.relativePath },
+      job: { providerRenderId: binding.providerRenderId },
+    };
+  } else {
+    const submitted = await runShotstackWorkPacketPipeline({
+      repoRoot,
+      packet,
+      envName: "v1",
+      pollMaxAttempts: 90,
+      pollDelayMs: 3000,
+    });
+    if (!submitted.ok) {
+      write(
+        `${EVIDENCE_REL}/PRODUCTION-BLOCK.json`,
+        `${JSON.stringify(
+          {
+            blocked: true,
+            stage: "shotstack",
+            verdict: submitted.verdict,
+            message: submitted.message,
+            note: "Keys not printed.",
+          },
+          null,
+          2,
+        )}\n`,
+      );
+      throw new Error(`VIDEO_BLOCKED:${submitted.verdict}`);
+    }
+    render = submitted;
   }
 
   const videoSrc = path.join(repoRoot, render.artifact.relativePath);
@@ -893,8 +1024,41 @@ async function main() {
   }
   assertApprovedStillHashesUnchanged(repoRoot);
 
+  const framesDirAbs = path.join(repoRoot, REVIEW_REL, "motion-safety-frames");
+  const motionSafety = await evaluateRenderedMotionSafety({
+    videoAbs: videoDest,
+    framesDirAbs,
+    durationSeconds: videoDuration ?? timeline,
+    beats: plates.map((plate, idx) => ({
+      beat: idx + 1,
+      startSeconds: windows[idx]!.startSeconds,
+      endSeconds: windows[idx]!.endSeconds,
+      overlayAbs: overlayAbsPaths[idx]!,
+      expectedText: [plate.line1, plate.line2, plate.line3].filter(
+        (line): line is string => Boolean(line),
+      ),
+      isCta: idx === 3,
+    })),
+  });
+  write(
+    `${REVIEW_REL}/MOTION-SAFETY.json`,
+    `${JSON.stringify(motionSafety, null, 2)}\n`,
+  );
+  if (!motionSafety.ok) {
+    throw new Error(
+      `MOTION_SAFETY_FAIL:${motionSafety.findings
+        .filter((f) => !f.ok)
+        .map((f) => f.id)
+        .join(",")}`,
+    );
+  }
+  await writeFrameContactSheet({
+    destAbs: path.join(repoRoot, REVIEW_REL, "motion-safety-contact-sheet.png"),
+    frames: motionSafety.frames,
+  });
+
   const plateAbs = plates.map((p) =>
-    path.join(repoRoot, VIDEO_REL, "plates", p.file),
+    path.join(repoRoot, VIDEO_REL, "plates", `bg-${p.file}`),
   );
   await writeContactSheet({
     destAbs: path.join(repoRoot, REVIEW_REL, "contact-sheet.png"),
@@ -1154,6 +1318,7 @@ async function main() {
     visualUnitType: "packaged coffee bags",
     narrationIsApprovedContinuous: narration === narrationPreview,
     videoFlowProof: flowProof.ok,
+    motionSafetyOk: motionSafety.ok,
     audioMaxVolumeDb: maxVolumeDb,
     videoDurationInBand:
       videoDuration != null && videoDuration >= 20 && videoDuration <= 30,
@@ -1188,6 +1353,9 @@ async function main() {
           artifact: render.artifact.relativePath,
           durationSeconds: videoDuration,
           providerRenderId: render.job.providerRenderId,
+          motionSafetyOk: motionSafety.ok,
+          voicePreserved: true,
+          voiceSha256: preservedVoiceSha,
         },
         print: {
           pngPx: { width: cardMeta.width, height: cardMeta.height },
@@ -1201,6 +1369,7 @@ async function main() {
           "studio_copy_quality_gate",
           "studio_product_representation",
           "studio_semantic_video_flow",
+          "studio_rendered_frame_motion_safety",
         ],
         productRepresentation: {
           unitCount: 3,
@@ -1226,7 +1395,7 @@ async function main() {
 
   write(
     `${REVIEW_REL}/OWNER-REVIEW.md`,
-    `# Owner-review index — Scenario 2 Harbor Roast (copy and video-flow correction)
+    `# Owner-review index — Scenario 2 Harbor Roast (motion-safety and multi-scene correction)
 
 This is the **current** review set. Earlier outputs are superseded and are **not** listed here.
 
@@ -1234,8 +1403,9 @@ This is the **current** review set. Earlier outputs are superseded and are **not
 - Unauthorized CTA “Limited autumn box”: \`${EVIDENCE_REL}/superseded-limited-cta/SUPERSEDED.md\`
 - One-bag product photograph: \`${EVIDENCE_REL}/superseded-one-bag/SUPERSEDED.md\`
 - Choppy copy and video: \`${EVIDENCE_REL}/superseded-choppy-copy-and-video/SUPERSEDED.md\`
+- Moving-text / single-image video: \`${EVIDENCE_REL}/superseded-moving-text-video/SUPERSEDED.md\`
 
-Approved stills are unchanged. Review the revised direction, caption, email, and video. Classification remains **OWNER DECISION PENDING**.
+Approved stills are unchanged. Narration MP3 is preserved. Review the layered video, motion-safety frames, and campaign direction. Classification remains **OWNER DECISION PENDING**.
 
 | # | Item | Path |
 |---|------|------|
@@ -1253,6 +1423,8 @@ Approved stills are unchanged. Review the revised direction, caption, email, and
 | 12 | Contact sheet (not a customer deliverable) | \`${REVIEW_REL}/contact-sheet.png\` |
 | 13 | Video timing record | \`${REVIEW_REL}/VIDEO-REVIEW.md\` |
 | 14 | Synchronization proof | \`${REVIEW_REL}/SYNCHRONIZATION-PROOF.json\` |
+| 15 | Motion-safety report | \`${REVIEW_REL}/MOTION-SAFETY.json\` |
+| 16 | Rendered-frame contact sheet | \`${REVIEW_REL}/motion-safety-contact-sheet.png\` |
 `,
   );
 
@@ -1268,6 +1440,8 @@ Approved stills are unchanged. Review the revised direction, caption, email, and
         audioMaxVolumeDb: maxVolumeDb,
         continuousGeneration: true,
         alignmentSource,
+        voicePreserved: true,
+        voiceSha256: preservedVoiceSha,
         timing: timingTable,
         windows,
         findings: flowProof.findings,
@@ -1318,7 +1492,11 @@ All beats bind to the same canonical brief: offer **Autumn Single-Origin Box**, 
 
 ## Motion
 
-Restrained Shotstack zoomIn / zoomOut on still plates. This is not cinematic footage.
+Background photographs move with restrained zoomIn. Type lives on a separate stationary overlay. Words are checked from extracted MP4 frames, not from timeline JSON.
+
+Motion-safety report: \`${REVIEW_REL}/MOTION-SAFETY.json\`
+Rendered-frame sheet: \`${REVIEW_REL}/motion-safety-contact-sheet.png\`
+Result: **${motionSafety.ok ? "PASS" : "FAIL"}**
 
 Machine duration-in-band is not a substitute for owner listening.
 `,

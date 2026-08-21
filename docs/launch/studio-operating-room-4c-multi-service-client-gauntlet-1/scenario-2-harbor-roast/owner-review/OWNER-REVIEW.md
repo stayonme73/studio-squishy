@@ -1,4 +1,4 @@
-# Owner-review index — Scenario 2 Harbor Roast (copy and video-flow correction)
+# Owner-review index — Scenario 2 Harbor Roast (motion-safety and multi-scene correction)
 
 This is the **current** review set. Earlier outputs are superseded and are **not** listed here.
 
@@ -6,8 +6,9 @@ This is the **current** review set. Earlier outputs are superseded and are **not
 - Unauthorized CTA “Limited autumn box”: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-limited-cta/SUPERSEDED.md`
 - One-bag product photograph: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-one-bag/SUPERSEDED.md`
 - Choppy copy and video: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-choppy-copy-and-video/SUPERSEDED.md`
+- Moving-text / single-image video: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-moving-text-video/SUPERSEDED.md`
 
-Approved stills are unchanged. Review the revised direction, caption, email, and video. Classification remains **OWNER DECISION PENDING**.
+Approved stills are unchanged. Narration MP3 is preserved. Review the layered video, motion-safety frames, and campaign direction. Classification remains **OWNER DECISION PENDING**.
 
 | # | Item | Path |
 |---|------|------|
@@ -25,3 +26,5 @@ Approved stills are unchanged. Review the revised direction, caption, email, and
 | 12 | Contact sheet (not a customer deliverable) | `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/contact-sheet.png` |
 | 13 | Video timing record | `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/VIDEO-REVIEW.md` |
 | 14 | Synchronization proof | `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/SYNCHRONIZATION-PROOF.json` |
+| 15 | Motion-safety report | `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/MOTION-SAFETY.json` |
+| 16 | Rendered-frame contact sheet | `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/motion-safety-contact-sheet.png` |

@@ -178,7 +178,11 @@ export async function deliverPacketAssets(input: {
   const sourceIds: Record<string, string> = {};
 
   const paths = [
-    ...input.packet.scenes.map((s) => s.relativePath),
+    ...input.packet.scenes.flatMap((s) =>
+      s.overlayRelativePath
+        ? [s.relativePath, s.overlayRelativePath]
+        : [s.relativePath],
+    ),
     input.packet.voiceArtifact.relativePath,
   ];
 

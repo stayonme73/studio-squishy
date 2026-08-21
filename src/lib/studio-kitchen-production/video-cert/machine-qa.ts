@@ -87,6 +87,12 @@ export function runCertVideoMachineQa(input: {
   const dummyUrls = new Map<string, string>();
   for (const scene of input.packet.scenes) {
     dummyUrls.set(scene.relativePath, `https://example.test/${scene.assetId}`);
+    if (scene.overlayRelativePath) {
+      dummyUrls.set(
+        scene.overlayRelativePath,
+        `https://example.test/overlay-${scene.assetId}`,
+      );
+    }
   }
   dummyUrls.set(
     input.packet.voiceArtifact.relativePath,

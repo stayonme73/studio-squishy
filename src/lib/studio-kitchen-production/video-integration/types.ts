@@ -37,8 +37,15 @@ export type ShotstackWorkPacketScene = {
   overlayFontSize?: number;
   overlayBackgroundColor?: string;
   overlayOffsetY?: number;
-  /** Restrained still-image motion. Omit for static clips. */
+  /** Restrained still-image motion. Applied only to the background photograph. */
   motionEffect?: "zoomIn" | "zoomOut" | "slideLeft" | "slideRight";
+  /**
+   * Stationary full-frame overlay (typically transparent PNG with type).
+   * Never receives motionEffect. Required for motion-safe text.
+   */
+  overlayRelativePath?: string;
+  /** Background scale > 1 so zoom/pan cannot reveal empty frame edges. */
+  backgroundScale?: number;
 };
 
 /** Provider-independent packet shape bound for Shotstack production. */

@@ -4,14 +4,14 @@
   "scenarioId": "scenario-2-product-or-offer-launch",
   "campaignId": "room-4c-s2-harbor-roast-coffee",
   "briefSha256": "f64a550f96b3859cf952eeab611461b38df288d005f3adda6ea22f25f542e36d",
-  "generatedAt": "2026-08-21T00:38:01.572Z",
+  "generatedAt": "2026-08-21T01:11:16.194Z",
   "files": [
     {
       "id": "campaign-direction",
       "previewRole": "campaign-direction",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/campaign-direction.md",
-      "contentSha256": "48f9a67b648c06392ff26476ad967316f4ff7fb9c1a182beb4c8be8e38660d61",
-      "byteLength": 1329,
+      "contentSha256": "c833aec03cee8192a7e4089f86f34a8e85537cdd0b3cf84bb0fe8dc4a347002d",
+      "byteLength": 1913,
       "mimeType": "text/markdown"
     },
     {
@@ -38,8 +38,8 @@
       "id": "video",
       "previewRole": "video",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables/video.mp4",
-      "contentSha256": "ab1b69b05cc03de06257256c5e29f30bc3148ae29ef12d4aceef6580a7c9b46d",
-      "byteLength": 8617153,
+      "contentSha256": "58e7e2f967ee0714e5c1874deb02f5f02a93b67de1ca868b16f97fcde7621070",
+      "byteLength": 8909593,
       "widthPx": 1080,
       "heightPx": 1920,
       "durationSeconds": 20.52,

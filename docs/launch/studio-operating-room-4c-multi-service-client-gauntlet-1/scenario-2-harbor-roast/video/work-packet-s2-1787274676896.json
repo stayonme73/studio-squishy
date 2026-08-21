@@ -1,0 +1,113 @@
+{
+  "workPacketId": "room-4c-s2-1787274676896",
+  "workPacketVersion": "wp-s2-v3",
+  "storyboardVersion": "sb-s2-v2",
+  "scriptVersionId": "harbor-roast-s2-narration-1787272682283",
+  "campaignId": "room-4c-s2-harbor-roast-coffee",
+  "skuId": "v2-rtu-short-video",
+  "label": "Room 4C Scenario 2 Harbor Roast Coffee Co. — coordinated short-form video",
+  "durationMinSeconds": 20,
+  "durationMaxSeconds": 30,
+  "durationTargetSeconds": 20.56,
+  "aspectRatio": "vertical",
+  "width": 1080,
+  "height": 1920,
+  "exportFormat": "mp4",
+  "musicAllowed": false,
+  "stockAllowed": false,
+  "productionMethod": "shotstack",
+  "productionRoleOwner": "creative_production",
+  "voiceArtifact": {
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/voice/room-4c-s2-harbor-roast-coffee/ap-001_harbor-roast-s2-narration-1787272682283_00f4ec01aada.mp3",
+    "contentSha256": "00f4ec01aada1d36d44d98655c3a079149eb0df51ef16a194f3f0fe2c5411e44"
+  },
+  "exportRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/harbor-roast-autumn-box-1787274676896.mp4",
+  "ctaCaptionSceneNumber": 4,
+  "primaryCtaText": "Shop the autumn box",
+  "requiredShotstackEnv": "v1",
+  "correctionReason": "Background photograph moves; type stays stationary inside the 9:16 safe area. Coordinated three-bag scenes. Preserved narration.",
+  "sceneToScriptMap": [
+    {
+      "sceneNumber": 1,
+      "timeRange": "0.000-4.644",
+      "narrationBeat": "Harbor Roast Coffee Co. is launching the Autumn Single-Origin Box.",
+      "visual": "brand-and-offer",
+      "designedText": "Autumn Single-Origin Box · This October",
+      "captionBehavior": "stationary_type_overlay"
+    },
+    {
+      "sceneNumber": 2,
+      "timeRange": "4.644-9.590",
+      "narrationBeat": "Inside are three 8-ounce bags of whole-bean single-origin coffee.",
+      "visual": "contents",
+      "designedText": "Autumn Single-Origin Box · three 8-ounce bags of whole-bean single-origin coffee",
+      "captionBehavior": "stationary_type_overlay"
+    },
+    {
+      "sceneNumber": 3,
+      "timeRange": "9.590-16.556",
+      "narrationBeat": "The box is forty-eight dollars, available October first through October thirty-first, twenty twenty-six.",
+      "visual": "price-and-dates",
+      "designedText": "$48 · October 1 – October 31, 2026",
+      "captionBehavior": "stationary_type_overlay"
+    },
+    {
+      "sceneNumber": 4,
+      "timeRange": "16.556-20.556",
+      "narrationBeat": "Shop the autumn box this October.",
+      "visual": "purchase-action",
+      "designedText": "Shop the autumn box · harborroast.example/autumn-box · $48",
+      "captionBehavior": "stationary_type_overlay"
+    }
+  ],
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "assetId": "harbor-roast-beat-1",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/bg-beat-01-brand.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/type-beat-01-brand.png",
+      "startSeconds": 0,
+      "endSeconds": 4.644,
+      "caption": "Autumn Single-Origin Box",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    },
+    {
+      "sceneNumber": 2,
+      "assetId": "harbor-roast-beat-2",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/bg-beat-02-offer.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/type-beat-02-offer.png",
+      "startSeconds": 4.644,
+      "endSeconds": 9.59,
+      "caption": "Autumn Single-Origin Box",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    },
+    {
+      "sceneNumber": 3,
+      "assetId": "harbor-roast-beat-3",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/bg-beat-03-price.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/type-beat-03-price.png",
+      "startSeconds": 9.59,
+      "endSeconds": 16.556,
+      "caption": "$48",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    },
+    {
+      "sceneNumber": 4,
+      "assetId": "harbor-roast-beat-4",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/bg-beat-04-cta.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/video/plates/type-beat-04-cta.png",
+      "startSeconds": 16.556,
+      "endSeconds": 20.556,
+      "caption": "Shop the autumn box",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    }
+  ]
+}

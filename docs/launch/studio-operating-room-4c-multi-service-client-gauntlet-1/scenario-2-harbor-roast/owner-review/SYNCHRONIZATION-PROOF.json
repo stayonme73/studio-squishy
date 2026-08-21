@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-21T00:38:01.572Z",
+  "generatedAt": "2026-08-21T01:11:16.194Z",
   "narration": "Harbor Roast Coffee Co. is launching the Autumn Single-Origin Box. Inside are three 8-ounce bags of whole-bean single-origin coffee. The box is forty-eight dollars, available October first through October thirty-first, twenty twenty-six. Shop the autumn box this October.",
   "sentences": [
     "Harbor Roast Coffee Co. is launching the Autumn Single-Origin Box.",
@@ -11,7 +11,9 @@
   "videoDurationSeconds": 20.52,
   "audioMaxVolumeDb": -6.5,
   "continuousGeneration": true,
-  "alignmentSource": "elevenlabs_character_timestamps",
+  "alignmentSource": "preserved_elevenlabs_character_timestamps",
+  "voicePreserved": true,
+  "voiceSha256": "00f4ec01aada1d36d44d98655c3a079149eb0df51ef16a194f3f0fe2c5411e44",
   "timing": [
     {
       "narrationSentence": "Harbor Roast Coffee Co. is launching the Autumn Single-Origin Box.",

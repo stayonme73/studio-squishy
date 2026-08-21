@@ -90,6 +90,9 @@ export function buildShotstackEditPayload(
     if (!assetUrls.get(scene.relativePath)) {
       findings.push(`missing_asset_url_${scene.assetId}`);
     }
+    if (scene.overlayRelativePath && !assetUrls.get(scene.overlayRelativePath)) {
+      findings.push(`missing_overlay_url_${scene.assetId}`);
+    }
   }
   if (findings.length) return { ok: false, findings };
 
@@ -111,10 +114,24 @@ export function buildShotstackEditPayload(
     },
     start: scene.startSeconds,
     length: Number((scene.endSeconds - scene.startSeconds).toFixed(3)),
-    fit: "cover",
-    scale: 1,
+    fit: "cover" as const,
+    scale: scene.backgroundScale ?? 1,
     ...(scene.motionEffect ? { effect: scene.motionEffect } : {}),
   }));
+
+  const overlayImageClips = scenes
+    .filter((scene) => scene.overlayRelativePath)
+    .map((scene) => ({
+      asset: {
+        type: "image",
+        src: assetUrls.get(scene.overlayRelativePath!)!,
+      },
+      start: scene.startSeconds,
+      length: Number((scene.endSeconds - scene.startSeconds).toFixed(3)),
+      fit: "none" as const,
+      scale: 1,
+      position: "center",
+    }));
 
   /**
    * Overlay only when captionPresentation is "overlay" (default for legacy packets).
@@ -166,7 +183,20 @@ export function buildShotstackEditPayload(
   );
   if (packet.primaryCtaText) {
     const ctaHits = overlayTexts.filter((t) => t === packet.primaryCtaText);
-    if (ctaHits.length !== 1) {
+    const ctaScene = scenes.find(
+      (s) => s.sceneNumber === packet.ctaCaptionSceneNumber,
+    );
+    const ctaEmbedded =
+      ctaScene?.captionPresentation === "embedded_in_plate" ||
+      Boolean(ctaScene?.overlayRelativePath);
+    if (ctaEmbedded) {
+      if (ctaHits.length !== 0) {
+        return {
+          ok: false,
+          findings: [`cta_overlay_count_${ctaHits.length}_expected_0_embedded`],
+        };
+      }
+    } else if (ctaHits.length !== 1) {
       return {
         ok: false,
         findings: [`cta_overlay_count_${ctaHits.length}_expected_1`],
@@ -177,10 +207,11 @@ export function buildShotstackEditPayload(
     }
   }
 
-  const tracks =
-    textClips.length > 0
-      ? [{ clips: textClips }, { clips: imageClips }]
-      : [{ clips: imageClips }];
+  const tracks = [
+    ...(overlayImageClips.length ? [{ clips: overlayImageClips }] : []),
+    ...(textClips.length > 0 ? [{ clips: textClips }] : []),
+    { clips: imageClips },
+  ];
 
   const payload: ShotstackEditPayload = {
     timeline: {

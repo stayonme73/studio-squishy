@@ -212,6 +212,9 @@ describe("Room 4C Scenario 2 — copy quality", () => {
       "three 8-ounce bags of whole-bean single-origin coffee",
     );
     expect(direction).toContain("warm counter conversation");
+    expect(direction).toMatch(/^Audience$/m);
+    expect(direction).toContain("people shopping a seasonal whole-bean coffee box");
+    expect(direction.toLowerCase()).not.toContain("lowercase product count");
   });
 
   it("writes caption and email as complete promotional sentences", () => {
@@ -586,7 +589,10 @@ describe("Room 4C Scenario 2 — authorized-fact omission correction proofs", ()
     expect(src).toContain("durationMaxSeconds: 30");
     expect(src).toContain("videoDuration >= 20 && videoDuration <= 30");
     expect(src).toContain("buildSemanticBeatWindows");
+    expect(src).toContain("overlayRelativePath");
+    expect(src).toContain("evaluateRenderedMotionSafety");
     expect(src).not.toContain("beatLens");
+    expect(src).not.toContain("writeVideoPlate");
   });
 
   it("10. Scenario 1 approved deliverable hashes remain unchanged", () => {

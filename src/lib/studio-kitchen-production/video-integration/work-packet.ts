@@ -41,6 +41,12 @@ export function assertShotstackPacketAssetsExist(
     if (!existsSync(path.join(repoRoot, scene.relativePath))) {
       missing.push(scene.relativePath);
     }
+    if (
+      scene.overlayRelativePath &&
+      !existsSync(path.join(repoRoot, scene.overlayRelativePath))
+    ) {
+      missing.push(scene.overlayRelativePath);
+    }
   }
   if (!existsSync(path.join(repoRoot, packet.voiceArtifact.relativePath))) {
     missing.push(packet.voiceArtifact.relativePath);
