@@ -1,0 +1,357 @@
+{
+  "ok": true,
+  "findings": [
+    {
+      "id": "overlay_inside_safe_area_beat_1",
+      "ok": true,
+      "detail": "box={\"left\":96,\"top\":1263,\"right\":576,\"bottom\":1444}"
+    },
+    {
+      "id": "text_stationary_beat_1_quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=5.05 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_1_midpoint",
+      "ok": true,
+      "detail": "meanAbsDiff=5.50 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_1_three-quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=5.56 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_1_beat-end",
+      "ok": true,
+      "detail": "meanAbsDiff=5.95 (max 22)"
+    },
+    {
+      "id": "no_blank_edges_beat_1_start",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.002"
+    },
+    {
+      "id": "no_blank_edges_beat_1_end",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.000"
+    },
+    {
+      "id": "product_visible_beat_1",
+      "ok": true,
+      "detail": "upperVariance=1591.3"
+    },
+    {
+      "id": "overlay_inside_safe_area_beat_2",
+      "ok": true,
+      "detail": "box={\"left\":95,\"top\":1263,\"right\":700,\"bottom\":1445}"
+    },
+    {
+      "id": "text_stationary_beat_2_quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=5.04 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_2_midpoint",
+      "ok": true,
+      "detail": "meanAbsDiff=6.07 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_2_three-quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=6.61 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_2_beat-end",
+      "ok": true,
+      "detail": "meanAbsDiff=7.70 (max 22)"
+    },
+    {
+      "id": "no_blank_edges_beat_2_start",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.000"
+    },
+    {
+      "id": "no_blank_edges_beat_2_end",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.000"
+    },
+    {
+      "id": "product_visible_beat_2",
+      "ok": true,
+      "detail": "upperVariance=1281.5"
+    },
+    {
+      "id": "overlay_inside_safe_area_beat_3",
+      "ok": true,
+      "detail": "box={\"left\":95,\"top\":1263,\"right\":434,\"bottom\":1440}"
+    },
+    {
+      "id": "text_stationary_beat_3_quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=4.61 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_3_midpoint",
+      "ok": true,
+      "detail": "meanAbsDiff=5.10 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_3_three-quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=5.45 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_3_beat-end",
+      "ok": true,
+      "detail": "meanAbsDiff=5.74 (max 22)"
+    },
+    {
+      "id": "no_blank_edges_beat_3_start",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.008"
+    },
+    {
+      "id": "no_blank_edges_beat_3_end",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.008"
+    },
+    {
+      "id": "product_visible_beat_3",
+      "ok": true,
+      "detail": "upperVariance=1839.7"
+    },
+    {
+      "id": "overlay_inside_safe_area_beat_4",
+      "ok": true,
+      "detail": "box={\"left\":95,\"top\":1263,\"right\":595,\"bottom\":1575}"
+    },
+    {
+      "id": "text_stationary_beat_4_quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=4.32 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_4_midpoint",
+      "ok": true,
+      "detail": "meanAbsDiff=4.82 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_4_three-quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=5.12 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_4_beat-end",
+      "ok": true,
+      "detail": "meanAbsDiff=5.75 (max 22)"
+    },
+    {
+      "id": "no_blank_edges_beat_4_start",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.003"
+    },
+    {
+      "id": "no_blank_edges_beat_4_end",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.000"
+    },
+    {
+      "id": "product_visible_beat_4",
+      "ok": true,
+      "detail": "upperVariance=1590.7"
+    },
+    {
+      "id": "cta_text_visible_cta-mid",
+      "ok": true,
+      "detail": "meanAbsDiff=4.85"
+    },
+    {
+      "id": "cta_text_visible_final-frame",
+      "ok": true,
+      "detail": "meanAbsDiff=5.70"
+    },
+    {
+      "id": "max_pan_point",
+      "ok": true,
+      "detail": "no pan used; zoomIn only on oversized backgrounds so edges stay covered"
+    }
+  ],
+  "frames": [
+    {
+      "id": "beat-1-beat-start",
+      "seconds": 0.04,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-1-beat-start.jpg",
+      "role": "beat-start",
+      "beat": 1
+    },
+    {
+      "id": "beat-1-quarter",
+      "seconds": 1.271,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-1-quarter.jpg",
+      "role": "quarter",
+      "beat": 1
+    },
+    {
+      "id": "beat-1-midpoint",
+      "seconds": 2.542,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-1-midpoint.jpg",
+      "role": "midpoint",
+      "beat": 1
+    },
+    {
+      "id": "beat-1-three-quarter",
+      "seconds": 3.814,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-1-three-quarter.jpg",
+      "role": "three-quarter",
+      "beat": 1
+    },
+    {
+      "id": "beat-1-beat-end",
+      "seconds": 5.005,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-1-beat-end.jpg",
+      "role": "beat-end",
+      "beat": 1
+    },
+    {
+      "id": "beat-2-beat-start",
+      "seconds": 5.125,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-2-beat-start.jpg",
+      "role": "beat-start",
+      "beat": 2
+    },
+    {
+      "id": "beat-2-quarter",
+      "seconds": 6.588,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-2-quarter.jpg",
+      "role": "quarter",
+      "beat": 2
+    },
+    {
+      "id": "beat-2-midpoint",
+      "seconds": 8.092,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-2-midpoint.jpg",
+      "role": "midpoint",
+      "beat": 2
+    },
+    {
+      "id": "beat-2-three-quarter",
+      "seconds": 9.596,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-2-three-quarter.jpg",
+      "role": "three-quarter",
+      "beat": 2
+    },
+    {
+      "id": "beat-2-beat-end",
+      "seconds": 11.019,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-2-beat-end.jpg",
+      "role": "beat-end",
+      "beat": 2
+    },
+    {
+      "id": "beat-3-beat-start",
+      "seconds": 11.139,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-3-beat-start.jpg",
+      "role": "beat-start",
+      "beat": 3
+    },
+    {
+      "id": "beat-3-quarter",
+      "seconds": 12.475,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-3-quarter.jpg",
+      "role": "quarter",
+      "beat": 3
+    },
+    {
+      "id": "beat-3-midpoint",
+      "seconds": 13.851,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-3-midpoint.jpg",
+      "role": "midpoint",
+      "beat": 3
+    },
+    {
+      "id": "beat-3-three-quarter",
+      "seconds": 15.226,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-3-three-quarter.jpg",
+      "role": "three-quarter",
+      "beat": 3
+    },
+    {
+      "id": "beat-3-beat-end",
+      "seconds": 16.522,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-3-beat-end.jpg",
+      "role": "beat-end",
+      "beat": 3
+    },
+    {
+      "id": "beat-4-beat-start",
+      "seconds": 16.642,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-4-beat-start.jpg",
+      "role": "beat-start",
+      "beat": 4
+    },
+    {
+      "id": "beat-4-quarter",
+      "seconds": 17.892,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-4-quarter.jpg",
+      "role": "quarter",
+      "beat": 4
+    },
+    {
+      "id": "beat-4-midpoint",
+      "seconds": 19.182,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-4-midpoint.jpg",
+      "role": "midpoint",
+      "beat": 4
+    },
+    {
+      "id": "beat-4-three-quarter",
+      "seconds": 20.472,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-4-three-quarter.jpg",
+      "role": "three-quarter",
+      "beat": 4
+    },
+    {
+      "id": "beat-4-beat-end",
+      "seconds": 21.682,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-4-beat-end.jpg",
+      "role": "beat-end",
+      "beat": 4
+    },
+    {
+      "id": "cta-start",
+      "seconds": 16.682,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/cta-start.jpg",
+      "role": "cta-start",
+      "beat": 4
+    },
+    {
+      "id": "cta-mid",
+      "seconds": 19.182000000000002,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/cta-mid.jpg",
+      "role": "cta-mid",
+      "beat": 4
+    },
+    {
+      "id": "final-frame",
+      "seconds": 21.680000000000003,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/final-frame.jpg",
+      "role": "final-frame",
+      "beat": 4
+    },
+    {
+      "id": "max-zoom-point",
+      "seconds": 5.005,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/max-zoom-point.jpg",
+      "role": "max-zoom-point",
+      "beat": 1
+    },
+    {
+      "id": "max-pan-point",
+      "seconds": 5.005,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/max-pan-point.jpg",
+      "role": "max-pan-point",
+      "beat": 1
+    }
+  ]
+}

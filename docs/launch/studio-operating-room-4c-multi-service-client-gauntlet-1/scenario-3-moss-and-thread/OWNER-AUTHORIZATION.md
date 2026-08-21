@@ -2,8 +2,8 @@
 
 **Stamp:** OWNER_APPROVED_FOR_CERTIFICATION  
 **Photo pack:** APPROVED as STUDIO_GENERATED_CERTIFICATION_FIXTURE  
-**Production:** PRE_PRODUCTION_BLOCKED
+**Production:** PRODUCTION_AUTHORIZED (2026-08-21)
 
-Event facts remain as stamped. Photo-source authority is recorded on the authoritative brief, the photo manifest, and the rights record. These images are not customer-owned and are not proof of a real external-customer photo path.
+Event facts remain as stamped on brief SHA-256 `feceace09e382de7a5c59a79884727e86c6d613dbd8c324b8594c16a67e49904`. Photo-source authority remains STUDIO_GENERATED_CERTIFICATION_FIXTURE. These images are not customer-owned and are not proof of a real external-customer photo path.
 
-Campaign production has not been authorized.
+Tagia authorized Scenario 3 campaign production. Post-delivery owner review (listen to video; approve current deliverables) remains **OWNER DECISION PENDING**.

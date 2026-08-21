@@ -10,6 +10,7 @@ import { evaluateProductionRoutingEligibility } from "@/lib/studio-customer-fact
 import { evaluateScenario3CustomerFactSourceGate } from "./customer-fact-sources";
 import { scenario3ProductionRoutingInput } from "./fact-integrity";
 import { evaluateScenario3PhotoPackIngest } from "./photo-pack-ingest";
+import { scenario3ProductionAuthorizedByOwner } from "./production-authorization";
 
 export const SCENARIO_3_LAUNCH_NOW_SERVICES = [
   "campaign-creative",
@@ -27,6 +28,7 @@ export type Scenario3AcceptanceResult = {
   productionRoutingAllowed: boolean;
   photoRightsOk: boolean;
   ownerVerificationPending: boolean;
+  productionAuthorized: boolean;
   unsupportedRefused: readonly string[];
   disclosedLimits: readonly string[];
   carousel: ReturnType<typeof evaluateCarouselAdmission>;
@@ -75,7 +77,17 @@ export function evaluateScenario3Acceptance(): Scenario3AcceptanceResult {
   const photoPack = evaluateScenario3PhotoPackIngest();
   if (!photoPack.ok) findings.push("photo_pack_ingest_failed");
 
-  if (brief.ownerVerificationPending) {
+  const productionAuthorized = scenario3ProductionAuthorizedByOwner();
+  if (!productionAuthorized) {
+    findings.push("owner_production_authorization_missing");
+  }
+
+  /**
+   * ownerVerificationPending on the frozen brief means post-delivery owner
+   * review (listen / approve deliverables). It does not block production once
+   * Tagia stamps production authorization.
+   */
+  if (brief.ownerVerificationPending && !productionAuthorized) {
     findings.push("owner_verification_pending");
   }
 
@@ -102,7 +114,7 @@ export function evaluateScenario3Acceptance(): Scenario3AcceptanceResult {
   const productionMayStart =
     admit &&
     photoPack.ok &&
-    !brief.ownerVerificationPending &&
+    productionAuthorized &&
     findings.length === 0;
 
   return {
@@ -114,6 +126,7 @@ export function evaluateScenario3Acceptance(): Scenario3AcceptanceResult {
     productionRoutingAllowed: routing.routingAllowed,
     photoRightsOk: photoPack.ok,
     ownerVerificationPending: brief.ownerVerificationPending,
+    productionAuthorized,
     unsupportedRefused: [
       "carousel",
       "ad_account_ops",

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "scenario-3-photo-led-campaign",
+  "campaignId": "room-4c-s3-moss-and-thread-studio",
+  "briefSha256": "feceace09e382de7a5c59a79884727e86c6d613dbd8c324b8594c16a67e49904",
+  "generatedAt": "2026-08-21T19:04:06.666Z",
+  "photoRightsBasis": "STUDIO_GENERATED_CERTIFICATION_FIXTURE",
+  "externalCustomerPhotoPathProven": false,
+  "photos": [
+    {
+      "assetId": "moss-thread-product-textile-1",
+      "filename": "moss-thread-product-textile-1.png",
+      "sha256": "6047959b737c49e01c158bd8e5c61a7e29e5a437617189a01e347112f6dcd4a3",
+      "rightsBasis": "STUDIO_GENERATED_CERTIFICATION_FIXTURE"
+    },
+    {
+      "assetId": "moss-thread-product-textile-2",
+      "filename": "moss-thread-product-textile-2.png",
+      "sha256": "a745d1054eb0f8e6885a08acc080d20fc619a84400ec34ae185a760047f38503",
+      "rightsBasis": "STUDIO_GENERATED_CERTIFICATION_FIXTURE"
+    },
+    {
+      "assetId": "moss-thread-maker-at-work",
+      "filename": "moss-thread-maker-at-work.png",
+      "sha256": "349cc3898fc862752d1642597875d33dd75e1a8526eb2c586b305498b70f9daf",
+      "rightsBasis": "STUDIO_GENERATED_CERTIFICATION_FIXTURE"
+    },
+    {
+      "assetId": "moss-thread-studio-interior",
+      "filename": "moss-thread-studio-interior.png",
+      "sha256": "9009ab60f0850404861e085dd307533e32435bfcf8f9553284e29a5fd88b1945",
+      "rightsBasis": "STUDIO_GENERATED_CERTIFICATION_FIXTURE"
+    }
+  ],
+  "tools": [
+    "studio_campaign_creative",
+    "studio_copy_quality_gate",
+    "elevenlabs_tts_adapter",
+    "shotstack",
+    "studio_rendered_frame_motion_safety"
+  ]
+}

@@ -91,7 +91,7 @@ describe("Room 4C Scenario 1 — machine-readable brief", () => {
       "PASS WITH EXPLICIT LIMITS",
     );
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.status).toBe(
-      "NOT_STARTED",
+      "IN_PRODUCTION",
     );
   });
 });

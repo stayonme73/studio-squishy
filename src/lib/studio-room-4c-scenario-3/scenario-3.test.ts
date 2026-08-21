@@ -27,19 +27,23 @@ import {
   photoAuthorityContradictsFixturePack,
 } from "./photo-authority-agreement";
 import {
+  SCENARIO_3_PRODUCTION_AUTHORIZATION,
+  scenario3ProductionAuthorizedByOwner,
+} from "./production-authorization";
+import {
   assertScenario3FactsStamped,
-  assertScenario3ProductionBlockedUntilAuthorized,
+  assertScenario3ProductionAuthorized,
   scenario3ProductionMayStart,
 } from "./production-gate";
 
-describe("Room 4C Scenario 3 — stamped brief, production still blocked", () => {
-  it("keeps production blocked after photo-pack ingest", () => {
+describe("Room 4C Scenario 3 — stamped brief + production authorized", () => {
+  it("keeps the frozen brief hash and releases production after owner authorization", () => {
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.status).toBe(
-      "NOT_STARTED",
+      "IN_PRODUCTION",
     );
     expect(
       studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.productionHold,
-    ).toBe("PRE_PRODUCTION_BLOCKED");
+    ).toBe("PRODUCTION_AUTHORIZED");
     expect(brief.productionStatus).toBe("NOT_STARTED");
     expect(brief.factApprovalStatus).toBe("OWNER_APPROVED_FOR_CERTIFICATION");
     expect(brief.ownerVerificationPending).toBe(true);
@@ -48,10 +52,12 @@ describe("Room 4C Scenario 3 — stamped brief, production still blocked", () =>
     expect(JSON.stringify(brief)).not.toContain(SCENARIO_3_STALE_LOCATION);
     expect(brief.cta.phoneAuthorized).toBe(false);
     assertScenario3FactsStamped();
-    expect(scenario3ProductionMayStart()).toBe(false);
-    expect(() => assertScenario3ProductionBlockedUntilAuthorized()).toThrow(
-      /SCENARIO_3_PRODUCTION_BLOCKED/,
+    expect(scenario3ProductionAuthorizedByOwner()).toBe(true);
+    expect(SCENARIO_3_PRODUCTION_AUTHORIZATION.requiredBriefSha256).toBe(
+      SCENARIO_3_BRIEF_SHA256,
     );
+    expect(scenario3ProductionMayStart()).toBe(true);
+    expect(() => assertScenario3ProductionAuthorized()).not.toThrow();
   });
 
   it("preserves package-locked substance and the fictional certification stamp", () => {
@@ -88,7 +94,7 @@ describe("Room 4C Scenario 3 — stamped brief, production still blocked", () =>
     }
   });
 
-  it("admits the Launch Now request but does not release production", () => {
+  it("admits the Launch Now request and releases production under owner authorization", () => {
     const acceptance = evaluateScenario3Acceptance();
     expect(acceptance.menuOk).toBe(true);
     expect(acceptance.factsApproved).toBe(true);
@@ -96,9 +102,10 @@ describe("Room 4C Scenario 3 — stamped brief, production still blocked", () =>
     expect(acceptance.productionRoutingAllowed).toBe(true);
     expect(acceptance.photoRightsOk).toBe(true);
     expect(acceptance.ownerVerificationPending).toBe(true);
+    expect(acceptance.productionAuthorized).toBe(true);
     expect(acceptance.admit).toBe(true);
-    expect(acceptance.productionMayStart).toBe(false);
-    expect(acceptance.findings).toEqual(["owner_verification_pending"]);
+    expect(acceptance.productionMayStart).toBe(true);
+    expect(acceptance.findings).toEqual([]);
   });
 
   it("rejects a customer-ownership claim on a Studio certification fixture pack", () => {

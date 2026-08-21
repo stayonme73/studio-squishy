@@ -1,0 +1,113 @@
+{
+  "workPacketId": "room-4c-s3-1787338841975",
+  "workPacketVersion": "wp-s3-v1",
+  "storyboardVersion": "sb-s3-v1",
+  "scriptVersionId": "moss-thread-s3-narration-1787338841975",
+  "campaignId": "room-4c-s3-moss-and-thread-studio",
+  "skuId": "v2-rtu-short-video",
+  "label": "Room 4C Scenario 3 Moss & Thread Studio — coordinated short-form video",
+  "durationMinSeconds": 20,
+  "durationMaxSeconds": 30,
+  "durationTargetSeconds": 20.37,
+  "aspectRatio": "vertical",
+  "width": 1080,
+  "height": 1920,
+  "exportFormat": "mp4",
+  "musicAllowed": false,
+  "stockAllowed": false,
+  "productionMethod": "shotstack",
+  "productionRoleOwner": "creative_production",
+  "voiceArtifact": {
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/voice/room-4c-s3-moss-and-thread-studio/ap-001_moss-thread-s3-narration-1787338841975_41db5264f2d9.mp3",
+    "contentSha256": "41db5264f2d9dcfd7eb9a60f262ec1c56966045967a4d13546c18accb1cf3981"
+  },
+  "exportRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/moss-thread-open-weekend-1787338841975.mp4",
+  "ctaCaptionSceneNumber": 4,
+  "primaryCtaText": "Visit the open studio",
+  "requiredShotstackEnv": "v1",
+  "correctionReason": "Background photographs move; type stays stationary inside the 9:16 safe area. Four coordinated certification-fixture scenes.",
+  "sceneToScriptMap": [
+    {
+      "sceneNumber": 1,
+      "timeRange": "0.000-4.888",
+      "narrationBeat": "Moss & Thread Studio is opening its doors November seventh and eighth.",
+      "visual": "studio-opening",
+      "designedText": "Studio Open Weekend · November 7–8, 2026",
+      "captionBehavior": "stationary_type_overlay"
+    },
+    {
+      "sceneNumber": 2,
+      "timeRange": "4.888-10.553",
+      "narrationBeat": "Visit the studio, meet the maker, and shop available textile pieces in person.",
+      "visual": "product-story",
+      "designedText": "Shop available textile pieces · Visit in person",
+      "captionBehavior": "stationary_type_overlay"
+    },
+    {
+      "sceneNumber": 3,
+      "timeRange": "10.553-15.708",
+      "narrationBeat": "Saturday hours are ten to five, and Sunday hours are eleven to four.",
+      "visual": "meet-maker",
+      "designedText": "Meet the maker · View the studio",
+      "captionBehavior": "stationary_type_overlay"
+    },
+    {
+      "sceneNumber": 4,
+      "timeRange": "15.708-20.369",
+      "narrationBeat": "Admission is free.",
+      "visual": "visit-details",
+      "designedText": "Saturday 10:00 AM–5:00 PM; Sunday 11:00 AM–4:00 PM · 214 Loom Street, Richmond, Virginia · Free to visit · Visit the open studio · mossthread.example/open-weekend",
+      "captionBehavior": "stationary_type_overlay"
+    }
+  ],
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "assetId": "moss-thread-beat-1",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/bg-beat-01-intro.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/type-beat-01-intro.png",
+      "startSeconds": 0,
+      "endSeconds": 4.888,
+      "caption": "Studio Open Weekend",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    },
+    {
+      "sceneNumber": 2,
+      "assetId": "moss-thread-beat-2",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/bg-beat-02-product.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/type-beat-02-product.png",
+      "startSeconds": 4.888,
+      "endSeconds": 10.553,
+      "caption": "Shop available textile pieces",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    },
+    {
+      "sceneNumber": 3,
+      "assetId": "moss-thread-beat-3",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/bg-beat-03-maker.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/type-beat-03-maker.png",
+      "startSeconds": 10.553,
+      "endSeconds": 15.708,
+      "caption": "Meet the maker",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    },
+    {
+      "sceneNumber": 4,
+      "assetId": "moss-thread-beat-4",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/bg-beat-04-visit.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/type-beat-04-visit.png",
+      "startSeconds": 15.708,
+      "endSeconds": 20.369,
+      "caption": "Visit the open studio",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    }
+  ]
+}

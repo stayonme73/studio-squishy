@@ -1,0 +1,40 @@
+{
+  "admit": true,
+  "productionMayStart": true,
+  "menuOk": true,
+  "factsApproved": true,
+  "factSourceGateOk": true,
+  "productionRoutingAllowed": true,
+  "photoRightsOk": true,
+  "ownerVerificationPending": true,
+  "productionAuthorized": true,
+  "unsupportedRefused": [
+    "carousel",
+    "ad_account_ops",
+    "unsupported_sizes_outside_studio_contracts"
+  ],
+  "disclosedLimits": [
+    "Short-form video: READY WITH EXPLICIT LIMITS",
+    "Social graphics: READY WITH EXPLICIT LIMITS",
+    "Print collateral: READY WITH EXPLICIT LIMITS",
+    "Marketing copy / email: READY WITH EXPLICIT LIMITS",
+    "Campaign creative: READY WITH EXPLICIT LIMITS",
+    "Carousel: NOT ON LAUNCH MENU",
+    "No owner production labor. Owner creative review is approval, not production.",
+    "No phone was owner-authorized; none is shown.",
+    "Event URL: mossthread.example/open-weekend.",
+    "Support email: hello@mossthread.example.",
+    "All business, event, address, contact, and offer facts are fictional and owner-approved solely for Studio certification.",
+    "This certification photo pack is STUDIO_GENERATED_CERTIFICATION_FIXTURE. Do not label it CUSTOMER_PROVIDED or CUSTOMER_OWNS. External customer-photo path is not proven.",
+    "Studio-generated certification fixtures must not be presented as a real customer's photographs.",
+    "Do not invent product prices, discounts, demonstrations, workshops, refreshments, giveaways, limited quantities, custom-order availability, accessibility claims, parking, shipping, a phone number, or additional event activities.",
+    "Print invitation/handout is US Letter 8.5×11 in (2550×3300 px at 300 DPI; PDF 612×792 pt).",
+    "Independent AI voice-naturalness judgment is not yet certified. Customer listening approval remains required."
+  ],
+  "carousel": {
+    "admit": false,
+    "reason": "catalog_exclusion_on_social_posts",
+    "customerFacingMessage": "Social carousels are not on The Studio Launch Now menu. We can produce coordinated static social graphics instead, within the purchased social-posts scope."
+  },
+  "findings": []
+}

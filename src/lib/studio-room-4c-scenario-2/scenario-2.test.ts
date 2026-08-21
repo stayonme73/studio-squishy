@@ -117,7 +117,7 @@ describe("Room 4C Scenario 2 — machine-readable brief", () => {
       studioRoom4cMultiServiceClientGauntletV1.mediaNaturalnessCarryForwardStatus,
     ).toBe("REQUIRED_NOT_CERTIFIED");
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.status).toBe(
-      "NOT_STARTED",
+      "IN_PRODUCTION",
     );
   });
 });

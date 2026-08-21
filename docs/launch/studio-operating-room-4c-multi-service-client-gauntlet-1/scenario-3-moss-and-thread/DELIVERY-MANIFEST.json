@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "packageId": "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1",
+  "scenarioId": "scenario-3-photo-led-campaign",
+  "campaignId": "room-4c-s3-moss-and-thread-studio",
+  "briefSha256": "feceace09e382de7a5c59a79884727e86c6d613dbd8c324b8594c16a67e49904",
+  "generatedAt": "2026-08-21T19:04:06.666Z",
+  "files": [
+    {
+      "id": "campaign-direction",
+      "previewRole": "campaign-direction",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/campaign-direction.md",
+      "contentSha256": "9a2f48e849e935b2998fe008003a1b04821331dee7cbfb70cb4a8d54a3b0eafd",
+      "byteLength": 2114,
+      "mimeType": "text/markdown"
+    },
+    {
+      "id": "social-square",
+      "previewRole": "social-square",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/social-square.png",
+      "contentSha256": "dd6d875c6fc1c8a705db54f0582cc6f483525b8ed4204e6ef0d00eeeb3d684b0",
+      "byteLength": 2246845,
+      "widthPx": 1080,
+      "heightPx": 1080,
+      "mimeType": "image/png"
+    },
+    {
+      "id": "social-vertical",
+      "previewRole": "social-vertical",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/social-vertical.png",
+      "contentSha256": "2306403c97b099fe4cf81d2bc0bd9a7eac8ffd2ca0b728462b40b6281f67b8ef",
+      "byteLength": 4380768,
+      "widthPx": 1080,
+      "heightPx": 1920,
+      "mimeType": "image/png"
+    },
+    {
+      "id": "video",
+      "previewRole": "video",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/video.mp4",
+      "contentSha256": "5767ed5322f57f1c856906ef583f14eba72d8fb010e828aa177c1029de8a91b0",
+      "byteLength": 10738867,
+      "durationSeconds": 21.76,
+      "mimeType": "video/mp4"
+    },
+    {
+      "id": "caption",
+      "previewRole": "caption",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/caption.txt",
+      "contentSha256": "03a4d1eda3f5615752e4a4b41954d1e26db3466ec804866dbaad046b959a55c6",
+      "byteLength": 326,
+      "mimeType": "text/plain"
+    },
+    {
+      "id": "email",
+      "previewRole": "email",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/email.txt",
+      "contentSha256": "6bf9960fded5172216d7be0bb270b5b46bc614e1a4f2a2f9c6beb172b340d352",
+      "byteLength": 488,
+      "mimeType": "text/plain"
+    },
+    {
+      "id": "invitation-handout-png",
+      "previewRole": "invitation-handout-png",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/invitation-handout.png",
+      "contentSha256": "0c89f0c0666162025ae6c40e906997f06b271a8519ad45bd4b1749314b85258c",
+      "byteLength": 13237416,
+      "widthPx": 2550,
+      "heightPx": 3300,
+      "mimeType": "image/png"
+    },
+    {
+      "id": "invitation-handout-pdf",
+      "previewRole": "invitation-handout-pdf",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/invitation-handout.pdf",
+      "contentSha256": "9d94a7cac94a30a716063542a3dd5075d2c992f5d405c68624c7e4a6bafb5d1e",
+      "byteLength": 12612524,
+      "mimeType": "application/pdf"
+    }
+  ]
+}
