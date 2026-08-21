@@ -32,7 +32,10 @@ describe("STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1", () => {
     );
     expect(studioLaunchReadinessExecutionOrderV1.room4.doNotStartRoom5).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room4.room4AClosedAt).toBe("9f9ac7c");
-    expect(studioLaunchReadinessExecutionOrderV1.room4C.status).toBe("OPEN");
+    expect(studioLaunchReadinessExecutionOrderV1.room4C.status).toBe(
+      "CLOSED WITH EXPLICIT LIMITS",
+    );
+    expect(studioLaunchReadinessExecutionOrderV1.room4C.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room4C.scenario1Status).toBe(
       "PASS WITH EXPLICIT LIMITS",
     );
@@ -40,7 +43,7 @@ describe("STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1", () => {
       "PASS WITH EXPLICIT LIMITS",
     );
     expect(studioLaunchReadinessExecutionOrderV1.room4C.scenario3Status).toBe(
-      "NOT_STARTED",
+      "PASS WITH EXPLICIT LIMITS",
     );
     expect(
       studioLaunchReadinessExecutionOrderV1.room4C.mediaNaturalnessCarryForwardStatus,

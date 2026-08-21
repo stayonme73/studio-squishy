@@ -1,9 +1,8 @@
 /**
  * Room 4C — Multi-Service Client Gauntlet.
- * OPEN at baseCommit 8c919e0. Room 4B remains CLOSED. Room 5 NOT STARTED.
- * Do not merge. Do not expand Launch Now menu. Scenario 1 PASS WITH EXPLICIT LIMITS.
- * Scenario 2 PASS WITH EXPLICIT LIMITS. Scenario 3 PASS WITH EXPLICIT LIMITS.
- * Room 4C remains OPEN pending closeout recommendation.
+ * CLOSED WITH EXPLICIT LIMITS 2026-08-21. Room 4B remains CLOSED. Room 5 NOT STARTED.
+ * Room 4 (full business rehearsal) remains open for later packages. Do not merge.
+ * Do not expand Launch Now menu. Scenarios 1–3 PASS WITH EXPLICIT LIMITS.
  */
 
 export const studioRoom4cMultiServiceClientGauntletV1 = {
@@ -14,14 +13,19 @@ export const studioRoom4cMultiServiceClientGauntletV1 = {
   roomId: "full-business-rehearsal" as const,
   sectionId: "4c-multi-service-client-gauntlet" as const,
   title: "Multi-Service Client Gauntlet" as const,
-  status: "OPEN" as const,
-  sectionClosed: false as const,
+  status: "CLOSED WITH EXPLICIT LIMITS" as const,
+  sectionClosed: true as const,
+  packageRecommendation: "CLOSE WITH EXPLICIT LIMITS" as const,
   baseCommit: "8c919e0d8af0c6f996c4a53792b74aef7b69c279" as const,
   openedAt: "2026-08-20" as const,
+  closedAt: "2026-08-21" as const,
+  closeoutDoc:
+    "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/STUDIO-OPERATING-ROOM-4C-CLOSEOUT.md" as const,
   doNotMerge: true as const,
   doNotStartRoom5: true as const,
   doNotExpandLaunchMenu: true as const,
   doNotExecuteScenario1InOpeningPackage: true as const,
+  room4RemainsOpen: true as const,
   priorSection: "4b-launch-toolbox-certification" as const,
   priorSectionClosed: true as const,
   room4bRemainsClosed: true as const,
@@ -146,6 +150,7 @@ export const studioRoom4cMultiServiceClientGauntletV1 = {
     "tagia_reviews_close_recommendation",
   ] as const,
 
+  closeGateSatisfied: true as const,
   finalReviewAuthority: "Tagia" as const,
 } as const;
 

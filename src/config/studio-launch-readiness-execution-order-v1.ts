@@ -157,7 +157,7 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     nextSectionWaitsForScoutPackage: false as const,
   },
 
-  /** Room 4A CLOSED. Room 4B CLOSED 2026-08-19. Room 4C OPEN 2026-08-20. */
+  /** Room 4A CLOSED. Room 4B CLOSED 2026-08-19. Room 4C CLOSED WITH EXPLICIT LIMITS 2026-08-21. Room 4 remains open. */
   room4: {
     packageId: "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1",
     sectionClosed: false as const,
@@ -165,12 +165,13 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     doNotAutoAdvance: true as const,
     doNotStartRoom5: true as const,
     doNotRebuild: true as const,
-    nextSectionWaitsForScoutPackage: false as const,
+    nextSectionWaitsForScoutPackage: true as const,
     room4AClosedAt: "9f9ac7c" as const,
     room4BClosedAt: "2026-08-19" as const,
     room4BSealCommit: "8c919e0" as const,
+    room4CClosedAt: "2026-08-21" as const,
     currentSectionId: "4c-multi-service-client-gauntlet" as const,
-    currentSectionStatus: "OPEN" as const,
+    currentSectionStatus: "CLOSED WITH EXPLICIT LIMITS" as const,
   },
 
   room4A: {
@@ -213,22 +214,27 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     packageId:
       "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1" as const,
     title: "Multi-Service Client Gauntlet" as const,
-    sectionClosed: false as const,
-    status: "OPEN" as const,
+    sectionClosed: true as const,
+    status: "CLOSED WITH EXPLICIT LIMITS" as const,
+    packageRecommendation: "CLOSE WITH EXPLICIT LIMITS" as const,
     baseCommit: "8c919e0d8af0c6f996c4a53792b74aef7b69c279" as const,
     openedAt: "2026-08-20" as const,
+    closedAt: "2026-08-21" as const,
     doNotAutoStart: false as const,
     doNotStartRoom5: true as const,
     doNotMerge: true as const,
     doNotExpandLaunchMenu: true as const,
+    room4RemainsOpen: true as const,
     mediaNaturalnessCarryForward:
       "ROOM-4-MEDIA-NATURALNESS-INDEPENDENT-QA" as const,
     mediaNaturalnessCarryForwardStatus: "REQUIRED_NOT_CERTIFIED" as const,
     scenario1Status: "PASS WITH EXPLICIT LIMITS" as const,
     scenario2Status: "PASS WITH EXPLICIT LIMITS" as const,
-    scenario3Status: "NOT_STARTED" as const,
+    scenario3Status: "PASS WITH EXPLICIT LIMITS" as const,
     configModule:
       "src/config/studio-room-4c-multi-service-client-gauntlet-v1.ts" as const,
+    closeoutDoc:
+      "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/STUDIO-OPERATING-ROOM-4C-CLOSEOUT.md" as const,
   },
 
   merge: "separately_authorized" as const,

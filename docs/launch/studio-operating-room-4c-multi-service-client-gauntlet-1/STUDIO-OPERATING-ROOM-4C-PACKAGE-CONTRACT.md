@@ -1,15 +1,18 @@
 # STUDIO-OPERATING-ROOM-4C — PACKAGE CONTRACT
 
 **Package:** `STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1`  
-**Status:** **OPEN**  
+**Status:** **CLOSED WITH EXPLICIT LIMITS**  
 **Base commit:** `8c919e0d8af0c6f996c4a53792b74aef7b69c279`  
 **Opened:** 2026-08-20  
+**Closed:** 2026-08-21  
 **Room 4B:** CLOSED (frozen)  
+**Room 4:** remains OPEN for later packages  
 **Room 5:** NOT STARTED  
 **Merge:** No  
 **Scenario 1:** PASS WITH EXPLICIT LIMITS. Scenario 2 PASS WITH EXPLICIT LIMITS. Scenario 3 PASS WITH EXPLICIT LIMITS.  
-**Room 4C:** OPEN (awaiting closeout recommendation). Room 5 NOT STARTED. No merge. Carousel NOT ON LAUNCH MENU. 
+**Room 4C:** CLOSED WITH EXPLICIT LIMITS. Carousel NOT ON LAUNCH MENU.  
 
+Closeout: `STUDIO-OPERATING-ROOM-4C-CLOSEOUT.md`  
 Config: `src/config/studio-room-4c-multi-service-client-gauntlet-v1.ts`
 
 ---

@@ -30,12 +30,13 @@ Creative package owner review:
 - No film, television, radio, or Studio Games use.
 - Mobile findings remain responsive coverage, not final Room 4 mobile certification.
 
-## Package status (unchanged by this stamp)
+## Package status
 
 - Scenario 1: PASS WITH EXPLICIT LIMITS
 - Scenario 2: PASS WITH EXPLICIT LIMITS
 - Scenario 3: PASS WITH EXPLICIT LIMITS
-- Room 4C: OPEN (closeout recommendation still required)
+- Room 4C: CLOSED WITH EXPLICIT LIMITS
+- Room 4: OPEN
 - Room 5: NOT_STARTED
 - Carousel: NOT ON LAUNCH MENU
 - Merge: no

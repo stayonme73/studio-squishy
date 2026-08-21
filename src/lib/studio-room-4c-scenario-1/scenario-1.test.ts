@@ -75,7 +75,11 @@ describe("Room 4C Scenario 1 — machine-readable brief", () => {
 
   it("classifies Scenario 1 PASS WITH EXPLICIT LIMITS while Scenario 3 is stamped PASS WITH EXPLICIT LIMITS", () => {
     const scenario1 = studioRoom4cMultiServiceClientGauntletV1.scenarios[0];
-    expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe("OPEN");
+    expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe(
+      "CLOSED WITH EXPLICIT LIMITS",
+    );
+    expect(studioRoom4cMultiServiceClientGauntletV1.sectionClosed).toBe(true);
+    expect(studioRoom4cMultiServiceClientGauntletV1.room4RemainsOpen).toBe(true);
     expect(scenario1?.status).toBe("PASS WITH EXPLICIT LIMITS");
     expect(scenario1?.contactFactApprovalStatus).toBe(
       "OWNER_APPROVED_FOR_CERTIFICATION",

@@ -85,7 +85,11 @@ describe("Room 4C Scenario 3 — stamped brief + production authorized", () => {
     );
     expect(scenario3ProductionMayStart()).toBe(true);
     expect(() => assertScenario3ProductionAuthorized()).not.toThrow();
-    expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe("OPEN");
+    expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe(
+      "CLOSED WITH EXPLICIT LIMITS",
+    );
+    expect(studioRoom4cMultiServiceClientGauntletV1.sectionClosed).toBe(true);
+    expect(studioRoom4cMultiServiceClientGauntletV1.room4RemainsOpen).toBe(true);
     expect(studioRoom4cMultiServiceClientGauntletV1.doNotStartRoom5).toBe(true);
     expect(
       studioRoom4cMultiServiceClientGauntletV1.frozenLaunchNowServices.carousel,

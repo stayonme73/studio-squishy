@@ -102,8 +102,12 @@ describe("Room 4C Scenario 2 — machine-readable brief", () => {
     ).toBe("NOT ON LAUNCH MENU");
   });
 
-  it("keeps Scenario 1–3 classified PASS WITH EXPLICIT LIMITS while Room 4C stays OPEN", () => {
-    expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe("OPEN");
+  it("keeps Scenario 1–3 classified PASS WITH EXPLICIT LIMITS while Room 4C is closed with limits", () => {
+    expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe(
+      "CLOSED WITH EXPLICIT LIMITS",
+    );
+    expect(studioRoom4cMultiServiceClientGauntletV1.sectionClosed).toBe(true);
+    expect(studioRoom4cMultiServiceClientGauntletV1.room4RemainsOpen).toBe(true);
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[0]?.status).toBe(
       "PASS WITH EXPLICIT LIMITS",
     );
