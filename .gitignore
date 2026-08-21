@@ -56,6 +56,3 @@ src/app/_test-*.css
 next-env.d.ts
 
 .vercel
-
-# Kitchen Shotstack unit-test side-effect fixtures (recreated by vitest; not deliverables)
-docs/launch/kitchen-video-integration-1/artifacts/test-fixtures/

@@ -1,4 +1,6 @@
 import { createHash } from "crypto";
+import { existsSync, mkdtempSync, readdirSync, rmSync } from "fs";
+import os from "os";
 import path from "path";
 import { describe, expect, it } from "vitest";
 
@@ -27,11 +29,25 @@ import {
 } from "./index";
 
 const repoRoot = path.resolve(__dirname, "../../../..");
+const DURABLE_INTEGRATION_ARTIFACTS =
+  "docs/launch/kitchen-video-integration-1/artifacts";
+const DURABLE_TEST_FIXTURES = path.join(
+  repoRoot,
+  DURABLE_INTEGRATION_ARTIFACTS,
+  "test-fixtures",
+);
 
 function fakeMp4Bytes(size = 4096): Buffer {
   const buf = Buffer.alloc(size, 0);
   buf.write("xxxxftypisom", 0, "ascii");
   return buf;
+}
+
+function listDurableMockLeakPaths(): string[] {
+  if (!existsSync(DURABLE_TEST_FIXTURES)) return [];
+  return readdirSync(DURABLE_TEST_FIXTURES).map((name) =>
+    path.join(DURABLE_TEST_FIXTURES, name),
+  );
 }
 
 describe("KITCHEN-VIDEO-INTEGRATION-1", () => {
@@ -202,11 +218,17 @@ describe("KITCHEN-VIDEO-INTEGRATION-1", () => {
 
   it("runs mocked pipeline end-to-end without escalating customer ready", async () => {
     const base = loadShotstackWorkPacketV1(repoRoot);
-    // Never write mock bytes over live integration artifacts.
+    // Isolate mock writes outside durable Kitchen evidence trees.
+    const tmpDir = mkdtempSync(path.join(os.tmpdir(), "kitchen-video-int-mock-"));
+    const exportAbs = path.join(tmpDir, "mock-pipeline-not-a-deliverable.mp4");
+    const exportRelativePath = path
+      .relative(repoRoot, exportAbs)
+      .split(path.sep)
+      .join("/");
+    const expectedJobAbs = path.join(tmpDir, "render-job-mock-rend.json");
     const packet = {
       ...base,
-      exportRelativePath:
-        "docs/launch/kitchen-video-integration-1/artifacts/test-fixtures/mock-pipeline-not-a-deliverable.mp4",
+      exportRelativePath,
       workPacketVersion: "wp-mock-test",
     };
     const urls = new Map<string, string>();
@@ -255,31 +277,48 @@ describe("KITCHEN-VIDEO-INTEGRATION-1", () => {
       return new Response("no", { status: 404 });
     };
 
-    const result = await runShotstackWorkPacketPipeline({
-      repoRoot,
-      packet,
-      apiKey: "test-key",
-      fetchImpl,
-      assetUrlsOverride: urls,
-      sourceHashesOverride: hashes,
-      pollMaxAttempts: 2,
-      pollDelayMs: 1,
-      sleepFn: async () => undefined,
-    });
+    try {
+      const result = await runShotstackWorkPacketPipeline({
+        repoRoot,
+        packet,
+        apiKey: "test-key",
+        fetchImpl,
+        assetUrlsOverride: urls,
+        sourceHashesOverride: hashes,
+        pollMaxAttempts: 2,
+        pollDelayMs: 1,
+        sleepFn: async () => undefined,
+      });
 
-    // Fake MP4 will not pass ffprobe — BIND_FAILED is acceptable for mocked bytes.
-    expect(["SHOTSTACK_INTEGRATION_STEP_OK", "BIND_FAILED"]).toContain(
-      result.ok ? result.verdict : result.verdict,
-    );
-    if (!result.ok) {
-      expect(result.verdict).toBe("BIND_FAILED");
-    } else {
-      expect(result.artifact.customerReady).toBe(false);
-      expect(result.artifact.certified).toBe(false);
-      expect(result.artifact.qaPass).toBe(false);
-      expect(result.artifact.qaState).toBe("qa_ready");
+      // Fake MP4 will not pass ffprobe — BIND_FAILED is acceptable for mocked bytes.
+      // Path also contains not-a-deliverable, which refuses persist before probe.
+      expect(["SHOTSTACK_INTEGRATION_STEP_OK", "BIND_FAILED"]).toContain(
+        result.ok ? result.verdict : result.verdict,
+      );
+      if (!result.ok) {
+        expect(result.verdict).toBe("BIND_FAILED");
+      } else {
+        expect(result.artifact.customerReady).toBe(false);
+        expect(result.artifact.certified).toBe(false);
+        expect(result.artifact.qaPass).toBe(false);
+        expect(result.artifact.qaState).toBe("qa_ready");
+      }
+      expect(phase).toBe("download");
+      // Mock render record must exist while the pipeline still needs it for evidence.
+      expect(existsSync(expectedJobAbs)).toBe(true);
+      expect(listDurableMockLeakPaths()).toEqual([]);
+    } finally {
+      rmSync(tmpDir, { recursive: true, force: true });
     }
-    expect(phase).toBe("download");
+
+    expect(existsSync(expectedJobAbs)).toBe(false);
+    expect(existsSync(DURABLE_TEST_FIXTURES)).toBe(false);
+    expect(listDurableMockLeakPaths()).toEqual([]);
+  });
+
+  it("leaves no durable Kitchen mock fixtures after the mocked pipeline", () => {
+    expect(existsSync(DURABLE_TEST_FIXTURES)).toBe(false);
+    expect(listDurableMockLeakPaths()).toEqual([]);
   });
 
   it("applies motion to the background photograph only", () => {

@@ -2,34 +2,65 @@
 
 **Package:** `STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1`  
 **Owner close:** 2026-08-21 — Tagia  
-**Status:** **ROOM 4C — CLOSED WITH EXPLICIT LIMITS**  
-**Package recommendation applied:** CLOSE WITH EXPLICIT LIMITS  
+**Status:** **CLOSED**  
+**Classification:** **CLOSE WITH EXPLICIT LIMITS**  
+**sectionClosed:** true  
+**Tagia final review authority:** exercised  
+**Owner production labor:** none  
 **Room 4B:** CLOSED (frozen)  
 **Room 4 (full business rehearsal):** remains **OPEN** for later packages  
-**Room 5:** NOT STARTED  
+**Room 5:** NOT_STARTED  
 **Carousel:** NOT ON LAUNCH MENU  
-**Merge:** No  
+**Merge:** none  
 
+Close tip (initial stamp): `969b68d`  
 Config: `src/config/studio-room-4c-multi-service-client-gauntlet-v1.ts`  
 Board: `ROOM-4C-STATUS-BOARD.md`
 
 ---
 
-## Why 4C closes
+## Close stamp
 
-The package promise is proven:
+| Field | Value |
+|-------|-------|
+| Room 4C — Multi-Service Client Gauntlet | CLOSED |
+| Classification | CLOSE WITH EXPLICIT LIMITS |
+| sectionClosed | true |
+| Tagia final review authority | exercised |
+| Owner production labor | none |
+| Room 4B | CLOSED |
+| Room 5 | NOT_STARTED |
+| Carousel | NOT ON LAUNCH MENU |
+| Merge | none |
 
-> Can The Studio truthfully accept and fulfill realistic multi-service Launch Now requests without contradicting the brief, losing continuity, promising unsupported work, or depending on owner production labor?
+---
 
-**Yes — with explicit limits.**
+## Scenario results
 
-| Scenario | Classification |
-|----------|----------------|
-| 1 Cedar Lane Home Organizing | PASS WITH EXPLICIT LIMITS |
-| 2 Harbor Roast Coffee Co. | PASS WITH EXPLICIT LIMITS |
-| 3 Moss & Thread Studio | PASS WITH EXPLICIT LIMITS |
+| Scenario | Customer | Classification |
+|----------|----------|----------------|
+| 1 | Cedar Lane Home Organizing | PASS WITH EXPLICIT LIMITS |
+| 2 | Harbor Roast Coffee Co. | PASS WITH EXPLICIT LIMITS |
+| 3 | Moss & Thread Studio | PASS WITH EXPLICIT LIMITS |
 
-Owner production labor across all three scenarios: **none**. Tagia (and Shelly on Scenario 3) performed review/approval only.
+Owner production labor across all three scenarios: **none**. Tagia (and Shelly on Scenario 3) performed review/approval only. Customer review and approval do not count as owner production labor.
+
+---
+
+## What Room 4C proved
+
+Three realistic multi-service requests proved:
+
+- one authoritative brief can route multiple frozen Launch Now services;
+- supported scope can be enforced before production;
+- customer facts can remain consistent across coordinated deliverables;
+- Machine routing can coordinate social, video, copy/email, campaign direction, and print production;
+- owner-independent production is achievable;
+- coordinated campaign quality requires substantive QA and owner review, not merely file existence;
+- format, dimension, print, motion-safety, rights, and factual gates can block or correct defective work;
+- Studio defects are corrected without being misclassified as customer revisions;
+- no silent contractor or outside human production labor was used;
+- carousel remained excluded.
 
 ---
 
@@ -46,18 +77,20 @@ Owner production labor across all three scenarios: **none**. Tagia (and Shelly o
 
 ---
 
-## Carry-forward limits (must appear on any later Room 4 close)
+## Mandatory explicit limits (carry forward)
 
 1. Frozen Launch Now services remain READY WITH EXPLICIT LIMITS.
 2. Carousel remains NOT ON LAUNCH MENU.
-3. Mobile observations from this gauntlet are responsive coverage only — not final Room 4 mobile certification.
-4. Dedicated mobile customer-journey certification remains required before Room 4 closes.
-5. External real-customer photo submission and rights verification remain NOT PROVEN.
-6. Scenario 3 Studio certification-fixture photographs must not be represented as customer photographs.
-7. Eleven Music Starter remains Individual Use Only under the owner-confirmed account; music may be delivered only embedded in a finished promotional MP4; no standalone redistribution or streaming; no music-library or reseller use; no film, television, radio, or Studio Games use.
-8. Independent AI voice-naturalness QA remains REQUIRED · NOT CERTIFIED (`ROOM-4-MEDIA-NATURALNESS-INDEPENDENT-QA`).
-9. Unresolved synthetic narration must not be silently delivered.
-10. Customer listening remains required where synthetic narration is used.
+3. Scenario mobile observations are responsive coverage only. Dedicated mobile customer-journey certification remains required before Room 4 can close.
+4. The real external-customer photograph submission, per-file rights, likeness/privacy, third-party-IP inspection, and crop/adaptation authorization path remains NOT PROVEN.
+5. Scenario 3 used Studio-generated certification fixtures and must never be represented as proving receipt or rights verification of genuine customer photographs.
+6. Eleven Music Starter is Individual Use Only under Tagia’s confirmed account and may be used only within its recorded commercial-media boundaries.
+7. Scenario 3 music is delivered embedded in the finished MP4 only: no standalone redistribution, streaming, reseller use, music library/repository use, film, television, radio, or Studio Games.
+8. Independent AI voice-naturalness QA remains REQUIRED_NOT_CERTIFIED (`ROOM-4-MEDIA-NATURALNESS-INDEPENDENT-QA`).
+9. Synthetic narration that is choppy, robotic, stiff, or improperly synchronized is a Studio defect and must not be silently delivered.
+10. Customer listening approval remains required whenever synthetic narration is used until independent voice-naturalness QA is certified.
+11. Template-led short-form video is not represented as cinematic production.
+12. Customer review and approval do not count as owner production labor.
 
 ---
 
@@ -71,7 +104,7 @@ Owner production labor across all three scenarios: **none**. Tagia (and Shelly o
 | owner_production_labor_recorded_honestly | satisfied |
 | mobile_observations_recorded | satisfied |
 | final_classifications_supported | satisfied |
-| tagia_reviews_close_recommendation | satisfied (owner authorized closeout commit) |
+| tagia_reviews_close_recommendation | satisfied (owner authorized closeout) |
 
 ---
 
@@ -81,3 +114,4 @@ Owner production labor across all three scenarios: **none**. Tagia (and Shelly o
 - Do not start Room 5.
 - Do not expand the Launch Now menu from this closeout.
 - Do not reopen Scenario 1–3 classifications without new evidence or intentional Manager decision.
+- Room 4 remains open for later packages; Room 4C itself stays closed.
