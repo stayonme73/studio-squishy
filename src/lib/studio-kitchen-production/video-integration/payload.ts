@@ -32,8 +32,31 @@ export function validateShotstackWorkPacket(packet: ShotstackWorkPacket): {
   ) {
     findings.push("must_be_vertical_1080x1920");
   }
-  if (packet.musicAllowed !== false) findings.push("music_not_allowed");
   if (packet.stockAllowed !== false) findings.push("stock_not_allowed");
+  if (packet.musicAllowed === true) {
+    if (packet.audioMode !== "music_led") {
+      findings.push("music_led_requires_audio_mode_music_led");
+    }
+    if (
+      !packet.musicArtifact?.relativePath ||
+      !packet.musicArtifact.contentSha256 ||
+      !packet.musicArtifact.rightsRecordRelativePath
+    ) {
+      findings.push("music_artifact_and_rights_required");
+    }
+    if (packet.voiceArtifact?.relativePath) {
+      findings.push("music_led_must_not_include_voice_artifact");
+    }
+  } else if (packet.musicAllowed === false) {
+    if (
+      !packet.voiceArtifact?.relativePath ||
+      !packet.voiceArtifact.contentSha256
+    ) {
+      findings.push("certified_voice_required_for_fixture");
+    }
+  } else {
+    findings.push("music_allowed_must_be_boolean");
+  }
   if (
     packet.durationMinSeconds < 15 ||
     packet.durationMaxSeconds > 30 ||
@@ -43,9 +66,6 @@ export function validateShotstackWorkPacket(packet: ShotstackWorkPacket): {
     findings.push("duration_band_invalid");
   }
   if (!packet.scenes?.length) findings.push("scenes_required");
-  if (!packet.voiceArtifact?.relativePath || !packet.voiceArtifact.contentSha256) {
-    findings.push("certified_voice_required_for_fixture");
-  }
   let prevEnd = -1;
   for (const scene of packet.scenes ?? []) {
     if (scene.endSeconds <= scene.startSeconds) {
@@ -82,8 +102,12 @@ export function buildShotstackEditPayload(
   }
 
   const findings: string[] = [];
-  const voiceUrl = assetUrls.get(packet.voiceArtifact.relativePath);
-  if (!voiceUrl) findings.push("missing_voice_url");
+  const soundtrackRel =
+    packet.musicAllowed === true
+      ? packet.musicArtifact!.relativePath
+      : packet.voiceArtifact!.relativePath;
+  const soundtrackUrl = assetUrls.get(soundtrackRel);
+  if (!soundtrackUrl) findings.push("missing_soundtrack_url");
 
   const scenes = [...packet.scenes].sort((a, b) => a.startSeconds - b.startSeconds);
   for (const scene of scenes) {
@@ -216,8 +240,8 @@ export function buildShotstackEditPayload(
   const payload: ShotstackEditPayload = {
     timeline: {
       soundtrack: {
-        src: voiceUrl!,
-        volume: 1,
+        src: soundtrackUrl!,
+        volume: packet.musicAllowed === true ? 0.85 : 1,
       },
       background: "#000000",
       tracks,

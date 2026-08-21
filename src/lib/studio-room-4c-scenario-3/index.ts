@@ -52,8 +52,13 @@ export {
   SCENARIO_3_NARRATION_SENTENCES,
   scenario3CopyQualityBrief,
   scenario3EmailCopyQualityBrief,
+  scenario3VisitorClaimSentence,
 } from "./copy";
-export { scenario3VideoPlateCopy, scenario3VideoCtaPlateCopy } from "./video-plates";
+export {
+  scenario3VideoPlateCopy,
+  scenario3VideoCtaPlateCopy,
+  SCENARIO_3_MUSIC_LED_WINDOWS,
+} from "./video-plates";
 export type { Scenario3VideoPlateCopy } from "./video-plates";
 export {
   SCENARIO_3_MIN_CTA_HOLD_SECONDS,

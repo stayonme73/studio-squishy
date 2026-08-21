@@ -130,7 +130,7 @@ export function bindShotstackArtifact(input: {
     workPacketVersion: input.packet.workPacketVersion,
     storyboardVersion: input.packet.storyboardVersion,
     scriptVersionId: input.packet.scriptVersionId,
-    voiceArtifactSha256: input.packet.voiceArtifact.contentSha256,
+    voiceArtifactSha256: input.packet.voiceArtifact?.contentSha256,
     qaState: "qa_ready",
     label: input.packet.label,
     customerReady: false,

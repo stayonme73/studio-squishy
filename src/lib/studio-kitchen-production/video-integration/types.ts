@@ -64,14 +64,26 @@ export type ShotstackWorkPacket = {
   width: 1080;
   height: 1920;
   exportFormat: "mp4";
-  musicAllowed: false;
+  /**
+   * false = voice-led (default certification path).
+   * true = rights-cleared music bed only (no narration); requires musicArtifact.
+   */
+  musicAllowed: boolean;
   stockAllowed: false;
   productionMethod: "shotstack";
   productionRoleOwner: "creative_production";
-  voiceArtifact: {
+  /** Voice narration artifact. Required when musicAllowed is false. */
+  voiceArtifact?: {
     relativePath: string;
     contentSha256: string;
   };
+  /** Rights-cleared instrumental bed. Required when musicAllowed is true. */
+  musicArtifact?: {
+    relativePath: string;
+    contentSha256: string;
+    rightsRecordRelativePath: string;
+  };
+  audioMode?: "voice_narration" | "music_led";
   /** Studio-persisted MP4 relative path (not CapCut). */
   exportRelativePath: string;
   /** Last scene caption is the CTA for this fixture. */

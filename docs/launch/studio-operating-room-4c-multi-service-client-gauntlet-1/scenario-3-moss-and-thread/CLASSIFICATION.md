@@ -3,4 +3,4 @@
 **Scout recommendation:** PASS WITH EXPLICIT LIMITS  
 **Owner decision:** OWNER DECISION PENDING
 
-Retain: external real-customer photo path is NOT PROVEN.
+Explicit limits: external real-customer photo path NOT PROVEN (Studio certification fixtures). Music: Starter Individual Use Only; no standalone music redistribution; no film/TV/radio/Studio Games.

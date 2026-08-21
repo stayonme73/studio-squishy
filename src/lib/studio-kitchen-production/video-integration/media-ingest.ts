@@ -183,7 +183,12 @@ export async function deliverPacketAssets(input: {
         ? [s.relativePath, s.overlayRelativePath]
         : [s.relativePath],
     ),
-    input.packet.voiceArtifact.relativePath,
+    ...(input.packet.voiceArtifact?.relativePath
+      ? [input.packet.voiceArtifact.relativePath]
+      : []),
+    ...(input.packet.musicArtifact?.relativePath
+      ? [input.packet.musicArtifact.relativePath]
+      : []),
   ];
 
   for (const rel of paths) {
@@ -194,12 +199,27 @@ export async function deliverPacketAssets(input: {
     const hash = sha256FileAbs(abs);
     hashes[rel] = hash;
 
-    if (rel === input.packet.voiceArtifact.relativePath) {
+    if (
+      input.packet.voiceArtifact &&
+      rel === input.packet.voiceArtifact.relativePath
+    ) {
       if (hash !== input.packet.voiceArtifact.contentSha256) {
         return {
           ok: false,
           code: "voice_hash_mismatch",
           message: `Voice SHA mismatch for ${rel}`,
+        };
+      }
+    }
+    if (
+      input.packet.musicArtifact &&
+      rel === input.packet.musicArtifact.relativePath
+    ) {
+      if (hash !== input.packet.musicArtifact.contentSha256) {
+        return {
+          ok: false,
+          code: "music_hash_mismatch",
+          message: `Music SHA mismatch for ${rel}`,
         };
       }
     }

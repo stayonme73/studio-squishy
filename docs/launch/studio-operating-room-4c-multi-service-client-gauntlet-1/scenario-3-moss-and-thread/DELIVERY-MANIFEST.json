@@ -4,14 +4,14 @@
   "scenarioId": "scenario-3-photo-led-campaign",
   "campaignId": "room-4c-s3-moss-and-thread-studio",
   "briefSha256": "feceace09e382de7a5c59a79884727e86c6d613dbd8c324b8594c16a67e49904",
-  "generatedAt": "2026-08-21T19:04:06.666Z",
+  "generatedAt": "2026-08-21T20:19:57.605Z",
   "files": [
     {
       "id": "campaign-direction",
       "previewRole": "campaign-direction",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/campaign-direction.md",
-      "contentSha256": "9a2f48e849e935b2998fe008003a1b04821331dee7cbfb70cb4a8d54a3b0eafd",
-      "byteLength": 2114,
+      "contentSha256": "78f5e0a808bd86e6ebb62db7adb76f86319ad71ace2ca62f577d534f0b4bf01b",
+      "byteLength": 1730,
       "mimeType": "text/markdown"
     },
     {
@@ -38,25 +38,25 @@
       "id": "video",
       "previewRole": "video",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/video.mp4",
-      "contentSha256": "5767ed5322f57f1c856906ef583f14eba72d8fb010e828aa177c1029de8a91b0",
-      "byteLength": 10738867,
-      "durationSeconds": 21.76,
+      "contentSha256": "638c00f4103d49c5cbcb4516cb0e4a91a79bb78742a3134099e0abbb3f99e376",
+      "byteLength": 11649131,
+      "durationSeconds": 23.04,
       "mimeType": "video/mp4"
     },
     {
       "id": "caption",
       "previewRole": "caption",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/caption.txt",
-      "contentSha256": "03a4d1eda3f5615752e4a4b41954d1e26db3466ec804866dbaad046b959a55c6",
-      "byteLength": 326,
+      "contentSha256": "ad26448703b71158e5a2980ef235c12bd9d16e89f5f11aae7ddc5d7f7e59bb2c",
+      "byteLength": 334,
       "mimeType": "text/plain"
     },
     {
       "id": "email",
       "previewRole": "email",
       "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/email.txt",
-      "contentSha256": "6bf9960fded5172216d7be0bb270b5b46bc614e1a4f2a2f9c6beb172b340d352",
-      "byteLength": 488,
+      "contentSha256": "a3bdd8966002a51be6b66af695bdfbe6fd7c4e441bacc37f60a7ae645262340e",
+      "byteLength": 503,
       "mimeType": "text/plain"
     },
     {

@@ -2,26 +2,33 @@ Moss & Thread Studio — Studio Open Weekend
 
 Campaign direction
 
-This open-weekend launch should feel like warm handmade textile work — moss greens, natural linen, terracotta accents — not spa neon. The four certification-fixture photographs (studio interior, two product textiles, maker at work) carry the square, the vertical, the invitation handout, and the short video. Do not present these images as a real customer’s photographs. External customer-photo path is not proven.
+1. Campaign goal
+Invite people to Studio Open Weekend on November 7–8, 2026. Make the weekend feel welcoming, handmade, and easy to understand: when to come, what to expect, and how to learn more.
 
-Campaign goal
-Invite visitors to Studio Open Weekend on November 7–8, 2026. One studio, one weekend, free admission, one place to learn more.
+2. Audience
+Neighbors, textile shoppers, and anyone curious about handmade soft goods who may visit a working studio in Richmond for an open weekend.
 
-Audience
-People who want to visit a textile studio in person: meet the maker, see the work, and shop available pieces. Write for a weekend open-studio visitor, not a class enrollee and not a calm-spa client.
+3. Campaign idea
+Moss & Thread Studio is opening its doors for Studio Open Weekend. The message is simple and warm: come see the studio, meet the maker, and shop available textile pieces in person.
 
-The idea
-Moss & Thread Studio is opening its doors for Studio Open Weekend. Keep the tone warm and grounded. Speak in complete sentences. visitors may view the studio, meet the maker, and shop available textile pieces in person.
+4. Tone
+Warm, handmade, grounded. Textile studio, not wellness.
 
-Offer
-Studio Open Weekend — November 7–8, 2026.
-Saturday 10:00 AM–5:00 PM; Sunday 11:00 AM–4:00 PM.
-Free to visit.
-Location: 214 Loom Street, Richmond, Virginia.
-Call to action: Visit the open studio.
-Event URL: mossthread.example/open-weekend.
-Support: hello@mossthread.example.
-Do not invent product prices, promotional markdowns, classes, hospitality extras, prizes, scarcity language, made-to-order promises, access statements, vehicle-storage notes, fulfillment offers, a phone number, or extra event activities. Maker photographs must not imply a staged in-person show.
+5. Visual direction
+Lead with moss greens, natural linen, and terracotta accents. Use the studio interior for place and arrival. Use product textiles for the work on offer. Use the maker photograph as brand-story imagery — not as a promise that a staged in-person show will occur.
 
-How the pieces work together
-Social square (product-led), social vertical, promotional email, caption, and US Letter invitation handout share the same photos and facts. The short video uses moving photo backgrounds with stationary text overlays in the phone-safe area. Video beats follow the spoken subject. The visit-details plate holds hours, address, free admission, CTA, and URL long enough to read. Narration may omit the full address, URL, and email.
+6. Messaging hierarchy
+1. Studio Open Weekend
+2. November 7–8, 2026
+3. 214 Loom Street, Richmond, Virginia
+4. Saturday and Sunday hours
+5. Free to visit
+6. Visit the open studio → mossthread.example/open-weekend
+
+7. How each deliverable is used
+- Square social graphic: product-led invitation for feeds.
+- Vertical social graphic: taller story/reel frame with dates and call to action.
+- Short-form video: music-led multi-photo sequence that opens with the studio, shows textiles and the maker, and closes on visit details, CTA, and URL.
+- Promotional caption: paste-ready post copy with the full visit facts.
+- Event email: subject, preheader, and body for a warm invitation.
+- US Letter invitation/handout: print-ready guest piece for the counter or mailing.

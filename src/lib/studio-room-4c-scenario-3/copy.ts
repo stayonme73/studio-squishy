@@ -1,6 +1,6 @@
 /**
- * Room 4C Scenario 3 — paste-ready caption, email, direction, and narration.
- * Warm handmade textile voice. No wellness neon. No prohibited inventions.
+ * Room 4C Scenario 3 — customer-facing caption, email, direction.
+ * Warm handmade textile voice. Facts only from the authoritative brief.
  */
 
 import type { CopyQualityBrief } from "@/lib/studio-kitchen-production/copy-quality/types";
@@ -10,10 +10,15 @@ function literalToken(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/** Capitalize the approved visitor claim for customer-facing sentences. */
+export function scenario3VisitorClaimSentence(): string {
+  const claim = brief.offer.visitorClaim;
+  return claim.charAt(0).toUpperCase() + claim.slice(1);
+}
+
 /**
- * Five spoken sentences for one continuous commercial. Joined as a single
- * generation. Visual beats (4) follow these sentences after the audio exists;
- * sentences 4–5 share the visit-details plate.
+ * Retained for regression against the rejected narrated package.
+ * Music-led delivery does not speak these lines.
  */
 export const SCENARIO_3_NARRATION_SENTENCES = [
   "Moss & Thread Studio is opening its doors November seventh and eighth.",
@@ -28,14 +33,18 @@ export const SCENARIO_3_APPROVED_NARRATION =
 
 export function buildScenario3Caption(): string {
   return [
-    `${brief.customer.businessName} — ${brief.offer.name}`,
+    `Step inside ${brief.customer.businessName} for ${brief.offer.name}, ${brief.offer.windowDisplay}.`,
     "",
-    `${brief.offer.windowDisplay} at ${brief.customer.locationDisplay}.`,
-    `${brief.offer.visitorClaim}.`,
+    scenario3VisitorClaimSentence() + ".",
     "",
-    `${brief.offer.hoursDisplay}. ${brief.offer.admissionDisplay}.`,
+    `Saturday ${brief.offer.hoursSaturdayDisplay}`,
+    `Sunday ${brief.offer.hoursSundayDisplay}`,
+    brief.offer.admissionDisplay,
     "",
-    `${brief.cta.label}: ${brief.cta.eventUrl}`,
+    brief.customer.locationDisplay,
+    "",
+    `${brief.cta.label}:`,
+    brief.cta.eventUrl,
   ].join("\n");
 }
 
@@ -47,22 +56,23 @@ export function buildScenario3Email(): {
 } {
   return {
     subjectOptions: [
-      `${brief.offer.name} — ${brief.offer.windowDisplay}`,
+      `${brief.offer.name} at ${brief.customer.businessName}`,
     ],
-    previewText: `${brief.offer.admissionDisplay} · ${brief.customer.locationDisplay}`,
+    previewText: `${brief.offer.windowDisplay} · ${brief.offer.admissionDisplay}`,
     body: [
-      `${brief.customer.businessName} is hosting ${brief.offer.name} on ${brief.offer.windowDisplay}.`,
+      `You are invited to ${brief.offer.name} at ${brief.customer.businessName}.`,
       "",
-      `${brief.offer.visitorClaim}.`,
+      `Join us ${brief.offer.windowDisplay}. ${scenario3VisitorClaimSentence()}.`,
       "",
-      `${brief.offer.hoursDisplay}.`,
-      `${brief.offer.admissionDisplay}.`,
+      `Saturday ${brief.offer.hoursSaturdayDisplay}`,
+      `Sunday ${brief.offer.hoursSundayDisplay}`,
+      brief.offer.admissionDisplay,
       "",
-      `${brief.customer.locationDisplay}`,
+      brief.customer.locationDisplay,
       "",
       `${brief.cta.label}: ${brief.cta.eventUrl}`,
       "",
-      `Support: ${brief.cta.supportEmail}`,
+      `Questions are welcome at ${brief.cta.supportEmail}.`,
     ].join("\n"),
     cta: `${brief.cta.label}: ${brief.cta.eventUrl}`,
   };
@@ -88,29 +98,36 @@ export function buildScenario3CampaignDirection(): string {
     "",
     "Campaign direction",
     "",
-    "This open-weekend launch should feel like warm handmade textile work — moss greens, natural linen, terracotta accents — not spa neon. The four certification-fixture photographs (studio interior, two product textiles, maker at work) carry the square, the vertical, the invitation handout, and the short video. Do not present these images as a real customer’s photographs. External customer-photo path is not proven.",
+    "1. Campaign goal",
+    `Invite people to ${brief.offer.name} on ${brief.offer.windowDisplay}. Make the weekend feel welcoming, handmade, and easy to understand: when to come, what to expect, and how to learn more.`,
     "",
-    "Campaign goal",
-    `Invite visitors to ${brief.offer.name} on ${brief.offer.windowDisplay}. One studio, one weekend, free admission, one place to learn more.`,
+    "2. Audience",
+    "Neighbors, textile shoppers, and anyone curious about handmade soft goods who may visit a working studio in Richmond for an open weekend.",
     "",
-    "Audience",
-    "People who want to visit a textile studio in person: meet the maker, see the work, and shop available pieces. Write for a weekend open-studio visitor, not a class enrollee and not a calm-spa client.",
+    "3. Campaign idea",
+    `${brief.customer.businessName} is opening its doors for ${brief.offer.name}. The message is simple and warm: come see the studio, meet the maker, and shop available textile pieces in person.`,
     "",
-    "The idea",
-    `${brief.customer.businessName} is opening its doors for ${brief.offer.name}. Keep the tone warm and grounded. Speak in complete sentences. ${brief.offer.visitorClaim}.`,
+    "4. Tone",
+    brief.tone.voice,
     "",
-    "Offer",
-    `${brief.offer.name} — ${brief.offer.windowDisplay}.`,
-    `${brief.offer.hoursDisplay}.`,
-    `${brief.offer.admissionDisplay}.`,
-    `Location: ${brief.customer.locationDisplay}.`,
-    `Call to action: ${brief.cta.label}.`,
-    `Event URL: ${brief.cta.eventUrl}.`,
-    `Support: ${brief.cta.supportEmail}.`,
-    "Do not invent product prices, promotional markdowns, classes, hospitality extras, prizes, scarcity language, made-to-order promises, access statements, vehicle-storage notes, fulfillment offers, a phone number, or extra event activities. Maker photographs must not imply a staged in-person show.",
+    "5. Visual direction",
+    "Lead with moss greens, natural linen, and terracotta accents. Use the studio interior for place and arrival. Use product textiles for the work on offer. Use the maker photograph as brand-story imagery — not as a promise that a staged in-person show will occur.",
     "",
-    "How the pieces work together",
-    "Social square (product-led), social vertical, promotional email, caption, and US Letter invitation handout share the same photos and facts. The short video uses moving photo backgrounds with stationary text overlays in the phone-safe area. Video beats follow the spoken subject. The visit-details plate holds hours, address, free admission, CTA, and URL long enough to read. Narration may omit the full address, URL, and email.",
+    "6. Messaging hierarchy",
+    `1. ${brief.offer.name}`,
+    `2. ${brief.offer.windowDisplay}`,
+    `3. ${brief.customer.locationDisplay}`,
+    `4. Saturday and Sunday hours`,
+    `5. ${brief.offer.admissionDisplay}`,
+    `6. ${brief.cta.label} → ${brief.cta.eventUrl}`,
+    "",
+    "7. How each deliverable is used",
+    "- Square social graphic: product-led invitation for feeds.",
+    "- Vertical social graphic: taller story/reel frame with dates and call to action.",
+    "- Short-form video: music-led multi-photo sequence that opens with the studio, shows textiles and the maker, and closes on visit details, CTA, and URL.",
+    "- Promotional caption: paste-ready post copy with the full visit facts.",
+    "- Event email: subject, preheader, and body for a warm invitation.",
+    "- US Letter invitation/handout: print-ready guest piece for the counter or mailing.",
   ].join("\n");
 }
 
@@ -131,10 +148,10 @@ export function scenario3CopyQualityBrief(): CopyQualityBrief {
       "percent off",
       "workshop",
       "demonstration",
-      "demo",
+      "live weaving",
       "refreshment",
       "giveaway",
-      String.raw`\blimited\b`,
+      String.raw`\blimited quantities\b`,
       "custom.?order",
       "wheelchair",
       "accessible entrance",
@@ -142,10 +159,11 @@ export function scenario3CopyQualityBrief(): CopyQualityBrief {
       "shipping",
       String.raw`\bnia\b`,
       String.raw`\byoga\b`,
-      "wellness",
-      "neon",
+      "certification-fixture",
+      "external-photo-path",
+      "motion-safe",
+      "copy-QA",
       String.raw`\(804\)`,
-      "555-0188",
       "Clay Street",
       "mossthread.example/visit",
     ],
@@ -154,7 +172,7 @@ export function scenario3CopyQualityBrief(): CopyQualityBrief {
     maxEmails: 1,
     maxAssets: 1,
     maxTotalWords: 260,
-    forbiddenTonePatterns: ["neon", "synergy", "revolutionize", "next-level", "wellness"],
+    forbiddenTonePatterns: ["synergy", "revolutionize", "next-level"],
   };
 }
 

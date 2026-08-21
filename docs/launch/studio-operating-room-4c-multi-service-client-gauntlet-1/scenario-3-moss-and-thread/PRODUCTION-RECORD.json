@@ -1,50 +1,65 @@
 {
   "schemaVersion": 1,
-  "scenarioId": "scenario-3-photo-led-campaign",
-  "campaignId": "room-4c-s3-moss-and-thread-studio",
+  "revision": "music-led-controlled-1",
+  "generatedAt": "2026-08-21T20:19:57.605Z",
+  "runId": "7fdf8938-f468-42f2-a414-fa80d94a4e36",
   "briefSha256": "feceace09e382de7a5c59a79884727e86c6d613dbd8c324b8594c16a67e49904",
-  "generatedAt": "2026-08-21T19:04:06.666Z",
-  "runId": "d7352c7e-2e79-49b3-b58e-b144a9893abf",
-  "acceptance": {
-    "admit": true,
-    "productionMayStart": true,
-    "menuOk": true,
-    "factsApproved": true,
-    "factSourceGateOk": true,
-    "productionRoutingAllowed": true,
-    "photoRightsOk": true,
-    "ownerVerificationPending": true,
-    "productionAuthorized": true,
-    "unsupportedRefused": [
-      "carousel",
-      "ad_account_ops",
-      "unsupported_sizes_outside_studio_contracts"
+  "audioMode": "music_led",
+  "music": {
+    "schemaVersion": 1,
+    "provider": "elevenlabs",
+    "product": "eleven_music",
+    "modelId": "music_v2",
+    "generationId": "6U8zONTwKZ5b0bISyGVQ",
+    "generationDate": "2026-08-21T20:19:57.733Z",
+    "accountTier": "starter",
+    "accountEligibilityNote": "Owner-confirmed Starter plan, Individual Use Only — Tagia as individual Studio owner. Music Commercial Rights table: online and offline commercial media except film, television, radio, and Studio Games. No attribution required.",
+    "sourceAudioRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/music/moss-thread-s3-instrumental-1787343597605.mp3",
+    "sourceAudioSha256": "0e3ebd0319b84f5ace89c673c69fefa9650d733b1014006c2595217875f293d1",
+    "durationMs": 23000,
+    "prompt": "Warm inviting instrumental for a handmade textile studio open weekend. Soft acoustic guitar and gentle organic textures, light hand percussion pulse, friendly and welcoming. Noticeable but soft opening entrance, then spacious mid section with room for on-screen event text, clean natural ending suitable for a short fade. No vocals, no choir, no lyrics, no singing. No trailer risers, no epic cinematic drums, no EDM drop. Not aggressive. Original instrumental only; do not reference any artist, song title, album, or copyrighted melody.",
+    "forceInstrumental": true,
+    "commercialUseAuthority": "Starter Music Commercial Rights — commercial online/offline media use permitted excluding film, television, radio, and Studio Games (Music Model-Specific Terms / Commercial Rights table, owner-confirmed 2026-08-21).",
+    "clientCampaignUseAuthority": "Owner-confirmed: delivering one finished promotional MP4 with embedded music to a client is permitted under Starter commercial media use; not a music-library or model-resale use.",
+    "attributionRequired": false,
+    "editingTrimmingPermission": "Trim, fade, volume adjust, and embed under video permitted for campaign production under paid Music commercial rights.",
+    "platformRestrictions": [
+      "No film, television, radio, or Studio Games under Starter",
+      "No standalone distribution to music streaming platforms (Spotify, Apple Music, etc.)",
+      "No resale, redistribution, or sublicensing of the music as a standalone asset",
+      "No music library/repository of Outputs for licensing to third parties",
+      "Starter designated Individual Use Only — account must remain individual owner subscription"
     ],
-    "disclosedLimits": [
-      "Short-form video: READY WITH EXPLICIT LIMITS",
-      "Social graphics: READY WITH EXPLICIT LIMITS",
-      "Print collateral: READY WITH EXPLICIT LIMITS",
-      "Marketing copy / email: READY WITH EXPLICIT LIMITS",
-      "Campaign creative: READY WITH EXPLICIT LIMITS",
-      "Carousel: NOT ON LAUNCH MENU",
-      "No owner production labor. Owner creative review is approval, not production.",
-      "No phone was owner-authorized; none is shown.",
-      "Event URL: mossthread.example/open-weekend.",
-      "Support email: hello@mossthread.example.",
-      "All business, event, address, contact, and offer facts are fictional and owner-approved solely for Studio certification.",
-      "This certification photo pack is STUDIO_GENERATED_CERTIFICATION_FIXTURE. Do not label it CUSTOMER_PROVIDED or CUSTOMER_OWNS. External customer-photo path is not proven.",
-      "Studio-generated certification fixtures must not be presented as a real customer's photographs.",
-      "Do not invent product prices, discounts, demonstrations, workshops, refreshments, giveaways, limited quantities, custom-order availability, accessibility claims, parking, shipping, a phone number, or additional event activities.",
-      "Print invitation/handout is US Letter 8.5×11 in (2550×3300 px at 300 DPI; PDF 612×792 pt).",
-      "Independent AI voice-naturalness judgment is not yet certified. Customer listening approval remains required."
+    "standaloneRedistributionProhibited": true,
+    "musicLibraryResaleProhibited": true,
+    "termsUrls": [
+      {
+        "label": "Music Terms",
+        "url": "https://elevenlabs.io/music-terms",
+        "notedEffectiveDate": "2026-05-26"
+      },
+      {
+        "label": "Eleven Music Model-Specific Terms",
+        "url": "https://elevenlabs.io/eleven-music-model-specific-terms",
+        "notedEffectiveDate": "2026-05-26"
+      },
+      {
+        "label": "Publish / commercial-use help",
+        "url": "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+        "notedEffectiveDate": "retrieved-2026-08-21"
+      }
     ],
-    "carousel": {
-      "admit": false,
-      "reason": "catalog_exclusion_on_social_posts",
-      "customerFacingMessage": "Social carousels are not on The Studio Launch Now menu. We can produce coordinated static social graphics instead, within the purchased social-posts scope."
-    },
-    "findings": []
+    "creditsEstimateNote": "Public pricing ~900 credits/minute; 22–24s ≈ 330–360 credits per generation."
   },
+  "fadedMusicSha256": "fb552df42d73091954d98d4d353149e40000d80056a9275aea3d3a40839b562d",
+  "videoSha256": "638c00f4103d49c5cbcb4516cb0e4a91a79bb78742a3134099e0abbb3f99e376",
+  "videoDurationSeconds": 23.04,
+  "staticHashesUnchanged": true,
+  "scenario1HashesUnchanged": true,
+  "scenario2HashesUnchanged": true,
+  "motionSafetyOk": true,
+  "classificationRecommended": "PASS WITH EXPLICIT LIMITS",
+  "ownerDecision": "OWNER DECISION PENDING",
   "routing": [
     {
       "deliverableId": "campaign-direction",
@@ -102,35 +117,5 @@
       "skuId": "v2-rtu-short-video",
       "note": "Vertical MP4; ElevenLabs TTS supporting narration; multi-photo motion-safe plates."
     }
-  ],
-  "voice": {
-    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/voice/room-4c-s3-moss-and-thread-studio/ap-001_moss-thread-s3-narration-1787339046666_629874b21e77.mp3",
-    "contentSha256": "629874b21e77fc3260c2cea7069bd207864bdb3ec97ca30f09e5bdf851450abb",
-    "durationSeconds": 21.362358,
-    "maxVolumeDb": -7.2,
-    "withTimestamps": true
-  },
-  "video": {
-    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/deliverables/video.mp4",
-    "contentSha256": "5767ed5322f57f1c856906ef583f14eba72d8fb010e828aa177c1029de8a91b0",
-    "durationSeconds": 21.76,
-    "workPacket": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/work-packet-s3-1787339046666.json",
-    "providerRenderId": "050e1bfb-caa9-4cf7-b3ad-a14271260b90"
-  },
-  "print": {
-    "png": {
-      "width": 2550,
-      "height": 3300
-    },
-    "pdfMediaBoxPt": {
-      "x": 0,
-      "y": 0,
-      "width": 612,
-      "height": 792
-    }
-  },
-  "scenario1HashesUnchanged": true,
-  "scenario2HashesUnchanged": true,
-  "classificationRecommended": "PASS WITH EXPLICIT LIMITS",
-  "ownerDecision": "OWNER DECISION PENDING"
+  ]
 }

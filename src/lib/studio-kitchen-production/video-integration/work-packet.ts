@@ -48,8 +48,21 @@ export function assertShotstackPacketAssetsExist(
       missing.push(scene.overlayRelativePath);
     }
   }
-  if (!existsSync(path.join(repoRoot, packet.voiceArtifact.relativePath))) {
-    missing.push(packet.voiceArtifact.relativePath);
+  if (packet.voiceArtifact?.relativePath) {
+    if (!existsSync(path.join(repoRoot, packet.voiceArtifact.relativePath))) {
+      missing.push(packet.voiceArtifact.relativePath);
+    }
+  }
+  if (packet.musicArtifact?.relativePath) {
+    if (!existsSync(path.join(repoRoot, packet.musicArtifact.relativePath))) {
+      missing.push(packet.musicArtifact.relativePath);
+    }
+    if (
+      packet.musicArtifact.rightsRecordRelativePath &&
+      !existsSync(path.join(repoRoot, packet.musicArtifact.rightsRecordRelativePath))
+    ) {
+      missing.push(packet.musicArtifact.rightsRecordRelativePath);
+    }
   }
   return { ok: missing.length === 0, missing };
 }

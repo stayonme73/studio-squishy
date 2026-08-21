@@ -1,9 +1,9 @@
 # Defects and limitations — Scenario 3
 
-## Required explicit limit
-The external real-customer photo-supply and rights-verification path is not proven. Scenario 3 uses Studio-generated certification fixtures (`STUDIO_GENERATED_CERTIFICATION_FIXTURE`).
+## Corrected
+- Rejected choppy narration (Studio defect). Replaced with music-led video.
+- Customer-facing copy capitalization and natural rewrite.
 
-## Other limits
-- Independent AI voice-naturalness judgment remains NOT CERTIFIED.
-- No carousel, ad operations, email sending, or event management.
-- Maker-at-work photograph is brand-story imagery; it does not authorize a live demonstration claim.
+## Retained limits
+- External real-customer photo path NOT PROVEN.
+- Eleven Music Starter: Individual Use Only; no standalone music redistribution; no film/TV/radio/Studio Games.

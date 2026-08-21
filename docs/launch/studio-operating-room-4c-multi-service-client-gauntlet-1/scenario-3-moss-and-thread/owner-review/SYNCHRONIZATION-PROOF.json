@@ -1,78 +1,46 @@
 {
-  "generatedAt": "2026-08-21T19:04:06.666Z",
-  "narration": "Moss & Thread Studio is opening its doors November seventh and eighth. Visit the studio, meet the maker, and shop available textile pieces in person. Saturday hours are ten to five, and Sunday hours are eleven to four. Admission is free. Visit the open studio this November.",
-  "sentences": [
-    "Moss & Thread Studio is opening its doors November seventh and eighth.",
-    "Visit the studio, meet the maker, and shop available textile pieces in person.",
-    "Saturday hours are ten to five, and Sunday hours are eleven to four.",
-    "Admission is free.",
-    "Visit the open studio this November."
-  ],
-  "audioDurationSeconds": 21.362358,
-  "videoDurationSeconds": 21.76,
-  "audioMaxVolumeDb": -7.2,
-  "continuousGeneration": true,
-  "alignmentSource": "elevenlabs_character_timestamps",
-  "timing": [
-    {
-      "narrationSentence": "Moss & Thread Studio is opening its doors November seventh and eighth.",
-      "spokenStartSeconds": 0,
-      "spokenEndSeconds": 4.644,
-      "visualBeat": 1,
-      "onScreenText": "Studio Open Weekend · November 7–8, 2026",
-      "transitionTimeSeconds": 0
-    },
-    {
-      "narrationSentence": "Visit the studio, meet the maker, and shop available textile pieces in person.",
-      "spokenStartSeconds": 5.085,
-      "spokenEndSeconds": 10.495,
-      "visualBeat": 2,
-      "onScreenText": "Shop available textile pieces · Visit in person",
-      "transitionTimeSeconds": 5.085
-    },
-    {
-      "narrationSentence": "Saturday hours are ten to five, and Sunday hours are eleven to four.",
-      "spokenStartSeconds": 11.099,
-      "spokenEndSeconds": 15.999,
-      "visualBeat": 3,
-      "onScreenText": "Meet the maker · View the studio",
-      "transitionTimeSeconds": 11.099
-    },
-    {
-      "narrationSentence": "Admission is free.",
-      "spokenStartSeconds": 16.602,
-      "spokenEndSeconds": 17.763,
-      "visualBeat": 4,
-      "onScreenText": "Sat 10:00 AM–5:00 PM · Sun 11:00 AM–4:00 PM · Richmond, VA · Visit the open studio",
-      "transitionTimeSeconds": 16.602
-    },
-    {
-      "narrationSentence": "Visit the open studio this November.",
-      "spokenStartSeconds": 18.274,
-      "spokenEndSeconds": 21.362,
-      "visualBeat": 4,
-      "onScreenText": "Sat 10:00 AM–5:00 PM · Sun 11:00 AM–4:00 PM · Richmond, VA · Visit the open studio",
-      "transitionTimeSeconds": 16.602
-    }
-  ],
+  "generatedAt": "2026-08-21T20:19:57.605Z",
+  "audioMode": "music_led",
+  "narrationPresent": false,
+  "music": {
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/music/moss-thread-s3-instrumental-faded-1787343597605.mp3",
+    "sourceSha256": "0e3ebd0319b84f5ace89c673c69fefa9650d733b1014006c2595217875f293d1",
+    "fadedSha256": "fb552df42d73091954d98d4d353149e40000d80056a9275aea3d3a40839b562d",
+    "generationId": "6U8zONTwKZ5b0bISyGVQ",
+    "modelId": "music_v2",
+    "durationSeconds": 23.04,
+    "maxVolumeDb": -1.7
+  },
+  "videoDurationSeconds": 23.04,
+  "videoMaxVolumeDb": -3.4,
   "windows": [
     {
       "startSeconds": 0,
-      "endSeconds": 5.085
+      "endSeconds": 4.8
     },
     {
-      "startSeconds": 5.085,
-      "endSeconds": 11.099
+      "startSeconds": 4.8,
+      "endSeconds": 8.8
     },
     {
-      "startSeconds": 11.099,
-      "endSeconds": 16.602
+      "startSeconds": 8.8,
+      "endSeconds": 12.6
     },
     {
-      "startSeconds": 16.602,
-      "endSeconds": 21.762
+      "startSeconds": 12.6,
+      "endSeconds": 16.4
+    },
+    {
+      "startSeconds": 16.4,
+      "endSeconds": 23.04
     }
   ],
-  "findings": [],
+  "plates": [
+    "studio-opening",
+    "product-story-a",
+    "product-story-b",
+    "meet-maker",
+    "visit-details"
+  ],
   "ok": true
 }

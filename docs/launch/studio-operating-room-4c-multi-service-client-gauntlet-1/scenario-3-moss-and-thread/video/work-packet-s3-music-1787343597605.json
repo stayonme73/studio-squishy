@@ -1,0 +1,135 @@
+{
+  "workPacketId": "room-4c-s3-music-1787343597605",
+  "workPacketVersion": "wp-s3-music-v1",
+  "storyboardVersion": "sb-s3-music-v1",
+  "scriptVersionId": "moss-thread-s3-music-led-1787343597605",
+  "campaignId": "room-4c-s3-moss-and-thread-studio",
+  "skuId": "v2-rtu-short-video",
+  "label": "Room 4C Scenario 3 Moss & Thread — music-led short-form video",
+  "durationMinSeconds": 20,
+  "durationMaxSeconds": 30,
+  "durationTargetSeconds": 23.04,
+  "aspectRatio": "vertical",
+  "width": 1080,
+  "height": 1920,
+  "exportFormat": "mp4",
+  "musicAllowed": true,
+  "stockAllowed": false,
+  "audioMode": "music_led",
+  "productionMethod": "shotstack",
+  "productionRoleOwner": "creative_production",
+  "musicArtifact": {
+    "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/music/moss-thread-s3-instrumental-faded-1787343597605.mp3",
+    "contentSha256": "fb552df42d73091954d98d4d353149e40000d80056a9275aea3d3a40839b562d",
+    "rightsRecordRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/MUSIC-RIGHTS-RECORD.json"
+  },
+  "exportRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/moss-thread-open-weekend-music-1787343597605.mp4",
+  "ctaCaptionSceneNumber": 5,
+  "primaryCtaText": "Visit the open studio",
+  "requiredShotstackEnv": "v1",
+  "correctionReason": "Music-led revision: remove failed narration; rights-cleared Eleven Music instrumental; stationary overlays; phrase-timed cuts.",
+  "sceneToScriptMap": [
+    {
+      "sceneNumber": 1,
+      "timeRange": "0.000-4.800",
+      "narrationBeat": "(music-led — no narration)",
+      "visual": "studio-opening",
+      "designedText": "Studio Open Weekend · November 7–8, 2026",
+      "captionBehavior": "stationary_type_overlay"
+    },
+    {
+      "sceneNumber": 2,
+      "timeRange": "4.800-8.800",
+      "narrationBeat": "(music-led — no narration)",
+      "visual": "product-story-a",
+      "designedText": "View the studio · Shop available textile pieces",
+      "captionBehavior": "stationary_type_overlay"
+    },
+    {
+      "sceneNumber": 3,
+      "timeRange": "8.800-12.600",
+      "narrationBeat": "(music-led — no narration)",
+      "visual": "product-story-b",
+      "designedText": "Shop available pieces · Visit in person",
+      "captionBehavior": "stationary_type_overlay"
+    },
+    {
+      "sceneNumber": 4,
+      "timeRange": "12.600-16.400",
+      "narrationBeat": "(music-led — no narration)",
+      "visual": "meet-maker",
+      "designedText": "Meet the maker · Handmade textile work",
+      "captionBehavior": "stationary_type_overlay"
+    },
+    {
+      "sceneNumber": 5,
+      "timeRange": "16.400-23.040",
+      "narrationBeat": "(music-led — no narration)",
+      "visual": "visit-details",
+      "designedText": "Sat 10:00 AM–5:00 PM · Sun 11:00 AM–4:00 PM · Visit the open studio",
+      "captionBehavior": "stationary_type_overlay"
+    }
+  ],
+  "scenes": [
+    {
+      "sceneNumber": 1,
+      "assetId": "moss-thread-music-beat-1",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/bg-beat-01-intro.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/type-beat-01-intro.png",
+      "startSeconds": 0,
+      "endSeconds": 4.8,
+      "caption": "Studio Open Weekend",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    },
+    {
+      "sceneNumber": 2,
+      "assetId": "moss-thread-music-beat-2",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/bg-beat-02-product-a.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/type-beat-02-product-a.png",
+      "startSeconds": 4.8,
+      "endSeconds": 8.8,
+      "caption": "View the studio",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    },
+    {
+      "sceneNumber": 3,
+      "assetId": "moss-thread-music-beat-3",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/bg-beat-02-product-b.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/type-beat-02-product-b.png",
+      "startSeconds": 8.8,
+      "endSeconds": 12.6,
+      "caption": "Shop available pieces",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    },
+    {
+      "sceneNumber": 4,
+      "assetId": "moss-thread-music-beat-4",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/bg-beat-03-maker.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/type-beat-03-maker.png",
+      "startSeconds": 12.6,
+      "endSeconds": 16.4,
+      "caption": "Meet the maker",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    },
+    {
+      "sceneNumber": 5,
+      "assetId": "moss-thread-music-beat-5",
+      "relativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/bg-beat-04-visit.png",
+      "overlayRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/plates/type-beat-04-visit.png",
+      "startSeconds": 16.4,
+      "endSeconds": 23.04,
+      "caption": "Visit the open studio",
+      "captionPresentation": "embedded_in_plate",
+      "motionEffect": "zoomIn",
+      "backgroundScale": 1.12
+    }
+  ]
+}

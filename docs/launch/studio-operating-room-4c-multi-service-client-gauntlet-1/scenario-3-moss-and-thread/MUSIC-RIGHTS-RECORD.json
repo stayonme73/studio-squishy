@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "provider": "elevenlabs",
+  "product": "eleven_music",
+  "modelId": "music_v2",
+  "generationId": "6U8zONTwKZ5b0bISyGVQ",
+  "generationDate": "2026-08-21T20:19:57.733Z",
+  "accountTier": "starter",
+  "accountEligibilityNote": "Owner-confirmed Starter plan, Individual Use Only — Tagia as individual Studio owner. Music Commercial Rights table: online and offline commercial media except film, television, radio, and Studio Games. No attribution required.",
+  "sourceAudioRelativePath": "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-3-moss-and-thread/video/music/moss-thread-s3-instrumental-1787343597605.mp3",
+  "sourceAudioSha256": "0e3ebd0319b84f5ace89c673c69fefa9650d733b1014006c2595217875f293d1",
+  "durationMs": 23000,
+  "prompt": "Warm inviting instrumental for a handmade textile studio open weekend. Soft acoustic guitar and gentle organic textures, light hand percussion pulse, friendly and welcoming. Noticeable but soft opening entrance, then spacious mid section with room for on-screen event text, clean natural ending suitable for a short fade. No vocals, no choir, no lyrics, no singing. No trailer risers, no epic cinematic drums, no EDM drop. Not aggressive. Original instrumental only; do not reference any artist, song title, album, or copyrighted melody.",
+  "forceInstrumental": true,
+  "commercialUseAuthority": "Starter Music Commercial Rights — commercial online/offline media use permitted excluding film, television, radio, and Studio Games (Music Model-Specific Terms / Commercial Rights table, owner-confirmed 2026-08-21).",
+  "clientCampaignUseAuthority": "Owner-confirmed: delivering one finished promotional MP4 with embedded music to a client is permitted under Starter commercial media use; not a music-library or model-resale use.",
+  "attributionRequired": false,
+  "editingTrimmingPermission": "Trim, fade, volume adjust, and embed under video permitted for campaign production under paid Music commercial rights.",
+  "platformRestrictions": [
+    "No film, television, radio, or Studio Games under Starter",
+    "No standalone distribution to music streaming platforms (Spotify, Apple Music, etc.)",
+    "No resale, redistribution, or sublicensing of the music as a standalone asset",
+    "No music library/repository of Outputs for licensing to third parties",
+    "Starter designated Individual Use Only — account must remain individual owner subscription"
+  ],
+  "standaloneRedistributionProhibited": true,
+  "musicLibraryResaleProhibited": true,
+  "termsUrls": [
+    {
+      "label": "Music Terms",
+      "url": "https://elevenlabs.io/music-terms",
+      "notedEffectiveDate": "2026-05-26"
+    },
+    {
+      "label": "Eleven Music Model-Specific Terms",
+      "url": "https://elevenlabs.io/eleven-music-model-specific-terms",
+      "notedEffectiveDate": "2026-05-26"
+    },
+    {
+      "label": "Publish / commercial-use help",
+      "url": "https://help.elevenlabs.io/hc/en-us/articles/13313564601361-Can-I-publish-the-content-I-generate-on-the-platform",
+      "notedEffectiveDate": "retrieved-2026-08-21"
+    }
+  ],
+  "creditsEstimateNote": "Public pricing ~900 credits/minute; 22–24s ≈ 330–360 credits per generation."
+}

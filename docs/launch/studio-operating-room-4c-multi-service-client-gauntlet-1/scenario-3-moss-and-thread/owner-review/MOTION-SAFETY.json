@@ -9,22 +9,22 @@
     {
       "id": "text_stationary_beat_1_quarter",
       "ok": true,
-      "detail": "meanAbsDiff=5.05 (max 22)"
+      "detail": "meanAbsDiff=5.02 (max 22)"
     },
     {
       "id": "text_stationary_beat_1_midpoint",
       "ok": true,
-      "detail": "meanAbsDiff=5.50 (max 22)"
+      "detail": "meanAbsDiff=5.42 (max 22)"
     },
     {
       "id": "text_stationary_beat_1_three-quarter",
       "ok": true,
-      "detail": "meanAbsDiff=5.56 (max 22)"
+      "detail": "meanAbsDiff=5.69 (max 22)"
     },
     {
       "id": "text_stationary_beat_1_beat-end",
       "ok": true,
-      "detail": "meanAbsDiff=5.95 (max 22)"
+      "detail": "meanAbsDiff=6.10 (max 22)"
     },
     {
       "id": "no_blank_edges_beat_1_start",
@@ -39,32 +39,32 @@
     {
       "id": "product_visible_beat_1",
       "ok": true,
-      "detail": "upperVariance=1591.3"
+      "detail": "upperVariance=1597.4"
     },
     {
       "id": "overlay_inside_safe_area_beat_2",
       "ok": true,
-      "detail": "box={\"left\":95,\"top\":1263,\"right\":700,\"bottom\":1445}"
+      "detail": "box={\"left\":94,\"top\":1263,\"right\":428,\"bottom\":1445}"
     },
     {
       "id": "text_stationary_beat_2_quarter",
       "ok": true,
-      "detail": "meanAbsDiff=5.04 (max 22)"
+      "detail": "meanAbsDiff=5.91 (max 22)"
     },
     {
       "id": "text_stationary_beat_2_midpoint",
       "ok": true,
-      "detail": "meanAbsDiff=6.07 (max 22)"
+      "detail": "meanAbsDiff=6.45 (max 22)"
     },
     {
       "id": "text_stationary_beat_2_three-quarter",
       "ok": true,
-      "detail": "meanAbsDiff=6.61 (max 22)"
+      "detail": "meanAbsDiff=6.96 (max 22)"
     },
     {
       "id": "text_stationary_beat_2_beat-end",
       "ok": true,
-      "detail": "meanAbsDiff=7.70 (max 22)"
+      "detail": "meanAbsDiff=7.86 (max 22)"
     },
     {
       "id": "no_blank_edges_beat_2_start",
@@ -79,97 +79,137 @@
     {
       "id": "product_visible_beat_2",
       "ok": true,
-      "detail": "upperVariance=1281.5"
+      "detail": "upperVariance=1282.2"
     },
     {
       "id": "overlay_inside_safe_area_beat_3",
       "ok": true,
-      "detail": "box={\"left\":95,\"top\":1263,\"right\":434,\"bottom\":1440}"
+      "detail": "box={\"left\":95,\"top\":1263,\"right\":554,\"bottom\":1445}"
     },
     {
       "id": "text_stationary_beat_3_quarter",
       "ok": true,
-      "detail": "meanAbsDiff=4.61 (max 22)"
+      "detail": "meanAbsDiff=4.70 (max 22)"
     },
     {
       "id": "text_stationary_beat_3_midpoint",
       "ok": true,
-      "detail": "meanAbsDiff=5.10 (max 22)"
+      "detail": "meanAbsDiff=4.72 (max 22)"
     },
     {
       "id": "text_stationary_beat_3_three-quarter",
       "ok": true,
-      "detail": "meanAbsDiff=5.45 (max 22)"
+      "detail": "meanAbsDiff=4.86 (max 22)"
     },
     {
       "id": "text_stationary_beat_3_beat-end",
       "ok": true,
-      "detail": "meanAbsDiff=5.74 (max 22)"
+      "detail": "meanAbsDiff=5.06 (max 22)"
     },
     {
       "id": "no_blank_edges_beat_3_start",
       "ok": true,
-      "detail": "emptyEdgeRatio=0.008"
+      "detail": "emptyEdgeRatio=0.001"
     },
     {
       "id": "no_blank_edges_beat_3_end",
       "ok": true,
-      "detail": "emptyEdgeRatio=0.008"
+      "detail": "emptyEdgeRatio=0.000"
     },
     {
       "id": "product_visible_beat_3",
       "ok": true,
-      "detail": "upperVariance=1839.7"
+      "detail": "upperVariance=1516.4"
     },
     {
       "id": "overlay_inside_safe_area_beat_4",
       "ok": true,
-      "detail": "box={\"left\":95,\"top\":1263,\"right\":595,\"bottom\":1575}"
+      "detail": "box={\"left\":96,\"top\":1263,\"right\":434,\"bottom\":1440}"
     },
     {
       "id": "text_stationary_beat_4_quarter",
       "ok": true,
-      "detail": "meanAbsDiff=4.32 (max 22)"
+      "detail": "meanAbsDiff=4.61 (max 22)"
     },
     {
       "id": "text_stationary_beat_4_midpoint",
       "ok": true,
-      "detail": "meanAbsDiff=4.82 (max 22)"
+      "detail": "meanAbsDiff=5.07 (max 22)"
     },
     {
       "id": "text_stationary_beat_4_three-quarter",
       "ok": true,
-      "detail": "meanAbsDiff=5.12 (max 22)"
+      "detail": "meanAbsDiff=5.41 (max 22)"
     },
     {
       "id": "text_stationary_beat_4_beat-end",
       "ok": true,
-      "detail": "meanAbsDiff=5.75 (max 22)"
+      "detail": "meanAbsDiff=5.85 (max 22)"
     },
     {
       "id": "no_blank_edges_beat_4_start",
       "ok": true,
-      "detail": "emptyEdgeRatio=0.003"
+      "detail": "emptyEdgeRatio=0.008"
     },
     {
       "id": "no_blank_edges_beat_4_end",
       "ok": true,
-      "detail": "emptyEdgeRatio=0.000"
+      "detail": "emptyEdgeRatio=0.008"
     },
     {
       "id": "product_visible_beat_4",
       "ok": true,
-      "detail": "upperVariance=1590.7"
+      "detail": "upperVariance=1843.9"
+    },
+    {
+      "id": "overlay_inside_safe_area_beat_5",
+      "ok": true,
+      "detail": "box={\"left\":95,\"top\":1263,\"right\":595,\"bottom\":1575}"
+    },
+    {
+      "id": "text_stationary_beat_5_quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=4.28 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_5_midpoint",
+      "ok": true,
+      "detail": "meanAbsDiff=4.93 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_5_three-quarter",
+      "ok": true,
+      "detail": "meanAbsDiff=4.95 (max 22)"
+    },
+    {
+      "id": "text_stationary_beat_5_beat-end",
+      "ok": true,
+      "detail": "meanAbsDiff=5.36 (max 22)"
+    },
+    {
+      "id": "no_blank_edges_beat_5_start",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.003"
+    },
+    {
+      "id": "no_blank_edges_beat_5_end",
+      "ok": true,
+      "detail": "emptyEdgeRatio=0.000"
+    },
+    {
+      "id": "product_visible_beat_5",
+      "ok": true,
+      "detail": "upperVariance=1596.4"
     },
     {
       "id": "cta_text_visible_cta-mid",
       "ok": true,
-      "detail": "meanAbsDiff=4.85"
+      "detail": "meanAbsDiff=4.93"
     },
     {
       "id": "cta_text_visible_final-frame",
       "ok": true,
-      "detail": "meanAbsDiff=5.70"
+      "detail": "meanAbsDiff=5.36"
     },
     {
       "id": "max_pan_point",
@@ -187,168 +227,203 @@
     },
     {
       "id": "beat-1-quarter",
-      "seconds": 1.271,
+      "seconds": 1.2,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-1-quarter.jpg",
       "role": "quarter",
       "beat": 1
     },
     {
       "id": "beat-1-midpoint",
-      "seconds": 2.542,
+      "seconds": 2.4,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-1-midpoint.jpg",
       "role": "midpoint",
       "beat": 1
     },
     {
       "id": "beat-1-three-quarter",
-      "seconds": 3.814,
+      "seconds": 3.6,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-1-three-quarter.jpg",
       "role": "three-quarter",
       "beat": 1
     },
     {
       "id": "beat-1-beat-end",
-      "seconds": 5.005,
+      "seconds": 4.72,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-1-beat-end.jpg",
       "role": "beat-end",
       "beat": 1
     },
     {
       "id": "beat-2-beat-start",
-      "seconds": 5.125,
+      "seconds": 4.84,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-2-beat-start.jpg",
       "role": "beat-start",
       "beat": 2
     },
     {
       "id": "beat-2-quarter",
-      "seconds": 6.588,
+      "seconds": 5.8,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-2-quarter.jpg",
       "role": "quarter",
       "beat": 2
     },
     {
       "id": "beat-2-midpoint",
-      "seconds": 8.092,
+      "seconds": 6.8,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-2-midpoint.jpg",
       "role": "midpoint",
       "beat": 2
     },
     {
       "id": "beat-2-three-quarter",
-      "seconds": 9.596,
+      "seconds": 7.8,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-2-three-quarter.jpg",
       "role": "three-quarter",
       "beat": 2
     },
     {
       "id": "beat-2-beat-end",
-      "seconds": 11.019,
+      "seconds": 8.72,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-2-beat-end.jpg",
       "role": "beat-end",
       "beat": 2
     },
     {
       "id": "beat-3-beat-start",
-      "seconds": 11.139,
+      "seconds": 8.84,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-3-beat-start.jpg",
       "role": "beat-start",
       "beat": 3
     },
     {
       "id": "beat-3-quarter",
-      "seconds": 12.475,
+      "seconds": 9.75,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-3-quarter.jpg",
       "role": "quarter",
       "beat": 3
     },
     {
       "id": "beat-3-midpoint",
-      "seconds": 13.851,
+      "seconds": 10.7,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-3-midpoint.jpg",
       "role": "midpoint",
       "beat": 3
     },
     {
       "id": "beat-3-three-quarter",
-      "seconds": 15.226,
+      "seconds": 11.65,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-3-three-quarter.jpg",
       "role": "three-quarter",
       "beat": 3
     },
     {
       "id": "beat-3-beat-end",
-      "seconds": 16.522,
+      "seconds": 12.52,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-3-beat-end.jpg",
       "role": "beat-end",
       "beat": 3
     },
     {
       "id": "beat-4-beat-start",
-      "seconds": 16.642,
+      "seconds": 12.64,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-4-beat-start.jpg",
       "role": "beat-start",
       "beat": 4
     },
     {
       "id": "beat-4-quarter",
-      "seconds": 17.892,
+      "seconds": 13.55,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-4-quarter.jpg",
       "role": "quarter",
       "beat": 4
     },
     {
       "id": "beat-4-midpoint",
-      "seconds": 19.182,
+      "seconds": 14.5,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-4-midpoint.jpg",
       "role": "midpoint",
       "beat": 4
     },
     {
       "id": "beat-4-three-quarter",
-      "seconds": 20.472,
+      "seconds": 15.45,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-4-three-quarter.jpg",
       "role": "three-quarter",
       "beat": 4
     },
     {
       "id": "beat-4-beat-end",
-      "seconds": 21.682,
+      "seconds": 16.32,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-4-beat-end.jpg",
       "role": "beat-end",
       "beat": 4
     },
     {
+      "id": "beat-5-beat-start",
+      "seconds": 16.44,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-5-beat-start.jpg",
+      "role": "beat-start",
+      "beat": 5
+    },
+    {
+      "id": "beat-5-quarter",
+      "seconds": 18.06,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-5-quarter.jpg",
+      "role": "quarter",
+      "beat": 5
+    },
+    {
+      "id": "beat-5-midpoint",
+      "seconds": 19.72,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-5-midpoint.jpg",
+      "role": "midpoint",
+      "beat": 5
+    },
+    {
+      "id": "beat-5-three-quarter",
+      "seconds": 21.38,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-5-three-quarter.jpg",
+      "role": "three-quarter",
+      "beat": 5
+    },
+    {
+      "id": "beat-5-beat-end",
+      "seconds": 22.96,
+      "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/beat-5-beat-end.jpg",
+      "role": "beat-end",
+      "beat": 5
+    },
+    {
       "id": "cta-start",
-      "seconds": 16.682,
+      "seconds": 16.479999999999997,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/cta-start.jpg",
       "role": "cta-start",
-      "beat": 4
+      "beat": 5
     },
     {
       "id": "cta-mid",
-      "seconds": 19.182000000000002,
+      "seconds": 19.72,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/cta-mid.jpg",
       "role": "cta-mid",
-      "beat": 4
+      "beat": 5
     },
     {
       "id": "final-frame",
-      "seconds": 21.680000000000003,
+      "seconds": 22.96,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/final-frame.jpg",
       "role": "final-frame",
-      "beat": 4
+      "beat": 5
     },
     {
       "id": "max-zoom-point",
-      "seconds": 5.005,
+      "seconds": 4.72,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/max-zoom-point.jpg",
       "role": "max-zoom-point",
       "beat": 1
     },
     {
       "id": "max-pan-point",
-      "seconds": 5.005,
+      "seconds": 4.72,
       "absolutePath": "C:\\Users\\tagia\\studio-squishy-room-4c\\docs\\launch\\studio-operating-room-4c-multi-service-client-gauntlet-1\\scenario-3-moss-and-thread\\owner-review\\motion-safety-frames/max-pan-point.jpg",
       "role": "max-pan-point",
       "beat": 1

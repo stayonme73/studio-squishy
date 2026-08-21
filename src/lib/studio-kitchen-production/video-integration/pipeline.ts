@@ -341,11 +341,16 @@ function baseJob(input: {
           ? [s.relativePath, s.overlayRelativePath]
           : [s.relativePath],
       ),
-      input.packet.voiceArtifact.relativePath,
+      ...(input.packet.voiceArtifact?.relativePath
+        ? [input.packet.voiceArtifact.relativePath]
+        : []),
+      ...(input.packet.musicArtifact?.relativePath
+        ? [input.packet.musicArtifact.relativePath]
+        : []),
     ],
     sourceAssetHashes: input.sourceAssetHashes,
-    voiceArtifactPath: input.packet.voiceArtifact.relativePath,
-    voiceArtifactSha256: input.packet.voiceArtifact.contentSha256,
+    voiceArtifactPath: input.packet.voiceArtifact?.relativePath,
+    voiceArtifactSha256: input.packet.voiceArtifact?.contentSha256,
     credits: input.credits,
   };
 }
