@@ -8,7 +8,7 @@ This is the **current** review set. Earlier outputs are superseded and are **not
 - Choppy copy and video: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-choppy-copy-and-video/SUPERSEDED.md`
 - Moving-text / single-image video: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/superseded-moving-text-video/SUPERSEDED.md`
 
-Approved stills are unchanged. Narration MP3 is preserved. Review the layered video, motion-safety frames, and campaign direction. Classification remains **OWNER DECISION PENDING**.
+Approved stills are unchanged. Narration MP3 is preserved. Owner review is complete. Classification: **PASS WITH EXPLICIT LIMITS**.
 
 | # | Item | Path |
 |---|------|------|

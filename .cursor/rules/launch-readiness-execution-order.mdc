@@ -9,7 +9,7 @@ Authority: `docs/launch-readiness-execution-order-v1-locked.md` · `src/config/s
 
 This is sequence control, **not** permission to start multiple packages.
 
-**Active room is 4 — Full business rehearsal.** Room 2 is **CLOSED**. Room 3 is **CLOSED** at `cd2a1e2`. Room 4A is **CLOSED** at `9f9ac7c`. Room 4B is **CLOSED** at `8c919e0` (classifications frozen). Room 4C `STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1` is **OPEN**. Do **not** start Room 5. Do not merge. Do not expand Launch Now menu. Carousel **NOT ON LAUNCH MENU**. Campaign Creative **READY WITH EXPLICIT LIMITS**. Scenario 1 not started at open.
+**Active room is 4 — Full business rehearsal.** Room 2 is **CLOSED**. Room 3 is **CLOSED** at `cd2a1e2`. Room 4A is **CLOSED** at `9f9ac7c`. Room 4B is **CLOSED** at `8c919e0` (classifications frozen). Room 4C `STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1` is **OPEN**. Scenario 1 PASS WITH EXPLICIT LIMITS. Scenario 2 PASS WITH EXPLICIT LIMITS. Scenario 3 not started. `ROOM-4-MEDIA-NATURALNESS-INDEPENDENT-QA` remains REQUIRED · NOT CERTIFIED. Do **not** start Room 5. Do not merge. Do not expand Launch Now menu. Carousel **NOT ON LAUNCH MENU**. Campaign Creative **READY WITH EXPLICIT LIMITS**.
 
 **Room 1 is COMPLETE EXCEPT DEFERRED EXTERNAL DOMAIN/EMAIL.** It is **not** a full CLOSED stamp. Authoritative executable tip: `a49efd7`. Abandoned 3067 attempts do not count.
 

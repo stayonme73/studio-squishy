@@ -53,6 +53,7 @@ export {
   scenario2VideoPlateCopy,
 } from "./video-plates";
 export {
+  SCENARIO_2_APPROVED_PACKAGE_HASHES,
   SCENARIO_2_APPROVED_STILL_HASHES,
   assertApprovedStillHashesUnchanged,
   buildSemanticBeatWindows,

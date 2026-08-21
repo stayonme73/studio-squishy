@@ -13,7 +13,7 @@ export const ROUTE_MAP_REVISION_DRAWER_ITEMS: readonly string[] = [
   "One revision round is included with this service.",
   "A revision is a customer-requested change to work that correctly followed the approved brief — for example, changing a color, replacing customer-supplied wording, moving or resizing content, requesting a different image, or changing the approved design direction.",
   "One included revision round may contain a reasonable grouped list of changes submitted together. Individual comments within the same round are not separate paid revisions.",
-  "The Studio corrects its own mistakes at no charge. Spelling or typing errors, incorrect placement of your supplied information, missing content you provided on time, wrong file dimensions, broken exports, failure to follow the approved brief, layout mistakes, and internal handoff errors do not count against your revision allowance.",
+  "The Studio corrects its own mistakes at no charge. Spelling or typing errors, incorrect placement of your supplied information, missing content you provided on time, wrong file dimensions, broken exports, failure to follow the approved brief, layout mistakes, internal handoff errors, and choppy or robotic Studio narration do not count against your revision allowance.",
   "Work beyond the purchased scope — such as an additional page, size, or version; more posts or graphics; substantial new wording after approval; or a new design direction — follows the existing Project Change process.",
 ];
 

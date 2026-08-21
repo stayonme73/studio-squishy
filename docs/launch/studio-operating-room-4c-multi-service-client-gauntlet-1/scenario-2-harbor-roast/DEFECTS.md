@@ -33,10 +33,11 @@ The locked package brief now carries the owner-authorized facts that were requir
 
 - Frozen Launch Now services remain READY WITH EXPLICIT LIMITS. Classifications were not changed.
 - Voice TTS still enters through the `ap-001` adapter while routing is supporting narration for `v2-rtu-short-video`. Disclosed; not sold as a voice announcement.
-- Photography is Studio-generated for this fictional launch, not a customer photo pack (that is Scenario 3).
+- Photography is Studio-generated fictional product photography, not a customer photo pack (that is Scenario 3). Generic fictional bag packaging means campaign text carries much of the product identity.
 - Mobile notes are responsive coverage, not Room 4 mobile certification.
 - Short video is polished template-led production with coordinated Studio photographs, not cinematic production.
 - Motion safety is proven from extracted MP4 frames. Timeline JSON alone is not enough.
+- Independent AI voice-naturalness judgment is not yet certified (`ROOM-4-MEDIA-NATURALNESS-INDEPENDENT-QA`). Customer listening approval remains required. Choppy or robotic Studio narration is a no-charge Studio defect and does not consume revision allowance.
 
 ## Not defects after correction
 

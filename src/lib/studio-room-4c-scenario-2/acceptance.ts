@@ -79,6 +79,8 @@ export function evaluateScenario2Acceptance(input?: {
     "Video narration uses ElevenLabs as a production tool for the short-video SKU; a standalone voice SKU was not sold.",
     "Customer prints and posts; Studio does not run ads, targeting, or social accounts.",
     "Counter card is 5×7 in (1500×2100 px at 300 DPI; PDF 360×504 pt). Not a US Letter rewrite.",
+    "Independent AI voice-naturalness judgment is not yet certified. Customer listening approval remains required.",
+    "Choppy or robotic Studio narration is a Studio defect. It is corrected at no charge and does not consume revision allowance.",
   ];
 
   return {

@@ -42,6 +42,7 @@ import {
   scenario2EmailCopyQualityBrief,
   scenario2VideoCtaPlateCopy,
   SCENARIO_2_APPROVED_CUSTOMER_FACT_RECORD,
+  SCENARIO_2_APPROVED_PACKAGE_HASHES,
   SCENARIO_2_APPROVED_PRODUCT_REPRESENTATION,
   SCENARIO_2_AUTHORIZED_UNIT_COUNT,
   SCENARIO_2_AUTHORIZED_UNIT_TYPE,
@@ -101,14 +102,20 @@ describe("Room 4C Scenario 2 — machine-readable brief", () => {
     ).toBe("NOT ON LAUNCH MENU");
   });
 
-  it("keeps Scenario 1 closed, Scenario 2 pending owner decision, Scenario 3 unstarted", () => {
+  it("keeps Scenario 1 and Scenario 2 classified, Scenario 3 unstarted", () => {
     expect(studioRoom4cMultiServiceClientGauntletV1.status).toBe("OPEN");
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[0]?.status).toBe(
       "PASS WITH EXPLICIT LIMITS",
     );
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[1]?.status).toBe(
-      "EXECUTED_OWNER_DECISION_PENDING",
+      "PASS WITH EXPLICIT LIMITS",
     );
+    expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[1]?.classification).toBe(
+      "PASS WITH EXPLICIT LIMITS",
+    );
+    expect(
+      studioRoom4cMultiServiceClientGauntletV1.mediaNaturalnessCarryForwardStatus,
+    ).toBe("REQUIRED_NOT_CERTIFIED");
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.status).toBe(
       "NOT_STARTED",
     );
@@ -613,6 +620,19 @@ describe("Room 4C Scenario 2 — authorized-fact omission correction proofs", ()
       "../../../docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-1-cedar-lane/deliverables",
     );
     for (const [file, hash] of Object.entries(expected)) {
+      const actual = createHash("sha256")
+        .update(readFileSync(path.join(root, file)))
+        .digest("hex");
+      expect(actual).toBe(hash);
+    }
+  });
+
+  it("11. Scenario 2 approved package hashes remain unchanged", () => {
+    const root = path.join(
+      __dirname,
+      "../../../docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/deliverables",
+    );
+    for (const [file, hash] of Object.entries(SCENARIO_2_APPROVED_PACKAGE_HASHES)) {
       const actual = createHash("sha256")
         .update(readFileSync(path.join(root, file)))
         .digest("hex");

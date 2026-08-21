@@ -2,6 +2,8 @@
 
 **Owner production labor:** none recorded.
 
-Scout corrected motion-safe layered video, added coordinated three-bag scenes, and included the approved campaign-direction audience fix. Approved stills were not regenerated. The certified narration MP3 was reused. Tagia did not design, edit, format, or repair deliverables.
+Tagia reviewed and classified the Harbor Roast package. Owner creative approval is not production labor.
 
-Owner creative approval is not production labor. Scenario 2 classification remains **OWNER DECISION PENDING**. Moving-text video, choppy copy/video, one-bag, limited-CTA, and omitted-fact outputs are superseded.
+Scenario 2 classification: **PASS WITH EXPLICIT LIMITS**. Owner approved for delivery.
+
+Moving-text video, choppy copy/video, one-bag, limited-CTA, and omitted-fact outputs remain superseded.

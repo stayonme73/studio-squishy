@@ -88,7 +88,7 @@ describe("Room 4C Scenario 1 — machine-readable brief", () => {
       "Frozen Launch Now service classifications remain READY WITH EXPLICIT LIMITS.",
     ]);
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[1]?.status).toBe(
-      "EXECUTED_OWNER_DECISION_PENDING",
+      "PASS WITH EXPLICIT LIMITS",
     );
     expect(studioRoom4cMultiServiceClientGauntletV1.scenarios[2]?.status).toBe(
       "NOT_STARTED",

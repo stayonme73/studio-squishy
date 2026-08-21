@@ -21,6 +21,18 @@ export const SCENARIO_2_APPROVED_STILL_HASHES = {
     "ef3a94f41cb1e91900a4ab81eb5747a8ee6b642d9dd49a3049d44caf38d495b0",
 } as const;
 
+export const SCENARIO_2_APPROVED_PACKAGE_HASHES = {
+  ...SCENARIO_2_APPROVED_STILL_HASHES,
+  "video.mp4":
+    "58e7e2f967ee0714e5c1874deb02f5f02a93b67de1ca868b16f97fcde7621070",
+  "caption.txt":
+    "c5dadfa8eeba231b3ab5fb2006f89b16079b3c74d659c858238bdb75d08c2deb",
+  "email.txt":
+    "89ab0448520f72720850caa1c4a16b4d979217378fadca8eb76046473890bdef",
+  "campaign-direction.md":
+    "c833aec03cee8192a7e4089f86f34a8e85537cdd0b3cf84bb0fe8dc4a347002d",
+} as const;
+
 export const SCENARIO_2_MIN_CTA_HOLD_SECONDS = 4;
 export const SCENARIO_2_VIDEO_MIN_SECONDS = 20;
 export const SCENARIO_2_VIDEO_MAX_SECONDS = 30;

@@ -38,4 +38,4 @@ Motion-safety report: `docs/launch/studio-operating-room-4c-multi-service-client
 Rendered-frame sheet: `docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/scenario-2-harbor-roast/owner-review/motion-safety-contact-sheet.png`
 Result: **PASS**
 
-Machine duration-in-band is not a substitute for owner listening.
+Machine duration-in-band is not a substitute for listening approval. Independent AI voice-naturalness judgment is not yet certified (`ROOM-4-MEDIA-NATURALNESS-INDEPENDENT-QA`). Customer listening approval remains required.

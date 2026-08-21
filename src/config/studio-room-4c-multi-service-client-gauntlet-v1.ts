@@ -2,7 +2,7 @@
  * Room 4C — Multi-Service Client Gauntlet.
  * OPEN at baseCommit 8c919e0. Room 4B remains CLOSED. Room 5 NOT STARTED.
  * Do not merge. Do not expand Launch Now menu. Scenario 1 PASS WITH EXPLICIT LIMITS.
- * Scenario 2 EXECUTED_OWNER_DECISION_PENDING. Scenario 3 not started. Room 4C remains OPEN.
+ * Scenario 2 PASS WITH EXPLICIT LIMITS. Scenario 3 not started. Room 4C remains OPEN.
  */
 
 export const studioRoom4cMultiServiceClientGauntletV1 = {
@@ -67,18 +67,18 @@ export const studioRoom4cMultiServiceClientGauntletV1 = {
     {
       id: "scenario-2-product-or-offer-launch" as const,
       customer: "Harbor Roast Coffee Co." as const,
-      status: "EXECUTED_OWNER_DECISION_PENDING" as const,
-      classification: "OWNER DECISION PENDING" as const,
-      recommendedClassification: "OWNER DECISION PENDING" as const,
+      status: "PASS WITH EXPLICIT LIMITS" as const,
+      classification: "PASS WITH EXPLICIT LIMITS" as const,
       factApprovalStatus: "OWNER_APPROVED_FOR_CERTIFICATION" as const,
+      ownerApprovedForDelivery: true as const,
       explicitLimits: [
-        "No phone was owner-authorized; none appears.",
-        "Product URL harborroast.example/autumn-box and support email hello@harborroast.example are owner-authorized production facts.",
-        "Box contents are three 8-ounce bags of whole-bean single-origin coffee. Product name does not substitute for contents. Origin, tasting notes, and certifications were not supplied.",
-        "Studio-generated photography rather than customer-supplied photography.",
-        "Short video is polished template-led production using one primary photograph, not cinematic production.",
-        "Mobile findings are responsive coverage only, not final Room 4 mobile certification.",
-        "Frozen Launch Now service classifications remain READY WITH EXPLICIT LIMITS.",
+        "Studio-generated fictional product photography.",
+        "Generic fictional bag packaging; campaign text carries much of the product identity.",
+        "Template-led short-form video rather than cinematic production.",
+        "Independent AI voice-naturalness judgment is not yet certified.",
+        "Customer listening approval remains required.",
+        "Mobile observations are responsive coverage, not final Room 4 mobile certification.",
+        "Frozen Launch Now services remain READY WITH EXPLICIT LIMITS.",
       ] as const,
     },
     {
@@ -90,6 +90,9 @@ export const studioRoom4cMultiServiceClientGauntletV1 = {
 
   evidenceRoot:
     "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1" as const,
+  mediaNaturalnessCarryForward:
+    "ROOM-4-MEDIA-NATURALNESS-INDEPENDENT-QA" as const,
+  mediaNaturalnessCarryForwardStatus: "REQUIRED_NOT_CERTIFIED" as const,
   packageContractDoc:
     "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/STUDIO-OPERATING-ROOM-4C-PACKAGE-CONTRACT.md" as const,
   scenarioBriefsDoc:

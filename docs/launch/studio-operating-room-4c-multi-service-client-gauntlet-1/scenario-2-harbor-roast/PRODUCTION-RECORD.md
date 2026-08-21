@@ -2,7 +2,7 @@
 
 Machine-readable companion: `PRODUCTION-RECORD.json`
 
-This record is the **motion-safety and multi-scene video correction**. Approved stills remain v7. The moving-text / single-image video is superseded. Earlier choppy, one-bag, limited-CTA, and omitted-fact outputs remain superseded.
+This record is the **motion-safety and multi-scene video correction**, now classified **PASS WITH EXPLICIT LIMITS**. Approved stills remain v7. The moving-text / single-image video is superseded. Earlier choppy, one-bag, limited-CTA, and omitted-fact outputs remain superseded.
 
 | Field | Value |
 |-------|--------|
@@ -21,7 +21,7 @@ This record is the **motion-safety and multi-scene video correction**. Approved 
 | Motion safety | PASS from extracted MP4 frames |
 | Print | 5×7 PNG 1500×2100; PDF MediaBox 360×504 pt |
 | Owner labor | None |
-| Classification | OWNER DECISION PENDING |
+| Classification | PASS WITH EXPLICIT LIMITS |
 | Fact approval | OWNER_APPROVED_FOR_CERTIFICATION |
 | Authorized CTA | Shop the autumn box |
 | Product representation | unit count 3; sealed 8-ounce bags; visual packaged coffee bags |

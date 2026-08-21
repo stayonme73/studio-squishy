@@ -221,8 +221,11 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     doNotStartRoom5: true as const,
     doNotMerge: true as const,
     doNotExpandLaunchMenu: true as const,
+    mediaNaturalnessCarryForward:
+      "ROOM-4-MEDIA-NATURALNESS-INDEPENDENT-QA" as const,
+    mediaNaturalnessCarryForwardStatus: "REQUIRED_NOT_CERTIFIED" as const,
     scenario1Status: "PASS WITH EXPLICIT LIMITS" as const,
-    scenario2Status: "EXECUTED_OWNER_DECISION_PENDING" as const,
+    scenario2Status: "PASS WITH EXPLICIT LIMITS" as const,
     scenario3Status: "NOT_STARTED" as const,
     configModule:
       "src/config/studio-room-4c-multi-service-client-gauntlet-v1.ts" as const,

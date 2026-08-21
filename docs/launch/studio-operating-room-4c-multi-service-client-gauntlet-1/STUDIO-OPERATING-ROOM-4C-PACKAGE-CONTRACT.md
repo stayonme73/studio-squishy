@@ -7,7 +7,7 @@
 **Room 4B:** CLOSED (frozen)  
 **Room 5:** NOT STARTED  
 **Merge:** No  
-**Scenario 1:** PASS WITH EXPLICIT LIMITS. Scenario 2 EXECUTED · OWNER DECISION PENDING. Scenario 3 not started.  
+**Scenario 1:** PASS WITH EXPLICIT LIMITS. Scenario 2 PASS WITH EXPLICIT LIMITS. Scenario 3 not started.  
 
 Config: `src/config/studio-room-4c-multi-service-client-gauntlet-v1.ts`
 
@@ -120,6 +120,8 @@ Evidence root: `docs/launch/studio-operating-room-4c-multi-service-client-gauntl
 ## Defect and limitation ledger
 
 Maintain a running ledger of defects, explicit limits hit, refusals, and owner interventions. Do not hide limits to manufacture a PASS.
+
+Carry-forward: `ROOM-4-MEDIA-NATURALNESS-INDEPENDENT-QA` is REQUIRED · NOT CERTIFIED. Do not mark it complete. Required before external launch or before removing the listening-approval limit.
 
 ---
 

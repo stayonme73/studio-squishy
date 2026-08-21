@@ -25,13 +25,26 @@ describe("STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1", () => {
     expect(studioLaunchReadinessExecutionOrderV1.room4A.sectionClosed).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room4A.closeTip).toBe("9f9ac7c");
     expect(studioLaunchReadinessExecutionOrderV1.room4.packageId).toBe(
-      "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
+      "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1",
     );
     expect(studioLaunchReadinessExecutionOrderV1.room4B.packageId).toBe(
       "STUDIO-OPERATING-ROOM-4B-LAUNCH-TOOLBOX-CERTIFICATION-1",
     );
     expect(studioLaunchReadinessExecutionOrderV1.room4.doNotStartRoom5).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room4.room4AClosedAt).toBe("9f9ac7c");
+    expect(studioLaunchReadinessExecutionOrderV1.room4C.status).toBe("OPEN");
+    expect(studioLaunchReadinessExecutionOrderV1.room4C.scenario1Status).toBe(
+      "PASS WITH EXPLICIT LIMITS",
+    );
+    expect(studioLaunchReadinessExecutionOrderV1.room4C.scenario2Status).toBe(
+      "PASS WITH EXPLICIT LIMITS",
+    );
+    expect(studioLaunchReadinessExecutionOrderV1.room4C.scenario3Status).toBe(
+      "NOT_STARTED",
+    );
+    expect(
+      studioLaunchReadinessExecutionOrderV1.room4C.mediaNaturalnessCarryForwardStatus,
+    ).toBe("REQUIRED_NOT_CERTIFIED");
   });
 
   it("reuses Maya flyer on the certified renderer path and keeps Owner as judgment only", () => {
