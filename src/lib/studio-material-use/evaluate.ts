@@ -4,6 +4,10 @@ import {
   type StudioMaterialUseOutcome,
 } from "@/config/studio-material-use-v1";
 import type { CampaignMaterialItem, MaterialCategory } from "@/lib/materials/types";
+import {
+  isCustomerContentClearedForProduction,
+  requiresContentCertificationGate,
+} from "@/lib/studio-customer-content-intake";
 
 import type {
   MaterialUseAuthorization,
@@ -242,6 +246,9 @@ export function isApprovedForUse(decision: MaterialUseDecision): boolean {
 export function materialBlocksProductionUse(item: CampaignMaterialItem, campaignId: string): boolean {
   if (item.requirementLevel !== "required") return false;
   if (item.reviewStatus === "not_needed") return false;
+  if (requiresContentCertificationGate(item) && !isCustomerContentClearedForProduction(item)) {
+    return true;
+  }
   return !isApprovedForUse(evaluateMaterialUseDecision({ item, campaignId }));
 }
 

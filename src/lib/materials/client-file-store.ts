@@ -13,6 +13,10 @@ import { buildJobId } from "@/lib/job-control/lane-map";
 import { resolveCampaignCommunicationClientId } from "@/lib/job-control/communication";
 import { appendJobActivityEvent } from "@/lib/job-control/activity-log";
 import type { JobActivityActor, PurchasedJobRecord } from "@/lib/job-control/types";
+import {
+  certifyCustomerMaterialUpload,
+  type CustomerContentRightsInput,
+} from "@/lib/studio-customer-content-intake";
 
 import { parseConsolidatedRequestId } from "./client-requests";
 import { applyClientSubmitConsolidated, applyClientSubmitItem } from "./actions";
@@ -143,6 +147,7 @@ export async function storeAndAttachCustomerMaterialFile(input: {
     | "studio_generated"
     | "studio_controlled_licensed"
     | "provider_licensed";
+  rightsInput?: CustomerContentRightsInput;
 }): Promise<
   | {
       ok: true;
@@ -167,6 +172,7 @@ export async function storeAndAttachCustomerMaterialFile(input: {
 
   const bytes = Buffer.from(await input.file.arrayBuffer());
   const checksum = sha256Hex(bytes);
+
   const already = targets.find(
     (item) => isPrivateStoredMaterial(item) && item.storageRef?.checksumSha256 === checksum,
   );
@@ -195,6 +201,31 @@ export async function storeAndAttachCustomerMaterialFile(input: {
 
   const ids = attachable.map((item) => item.id);
   const firstItem = attachable[0]!;
+
+  const certificationResult = certifyCustomerMaterialUpload({
+    category: firstItem.category,
+    bytes,
+    fileName: input.file.name,
+    mimeType: input.file.type || "application/octet-stream",
+    checksumSha256: checksum,
+    rightsInput: {
+      useAuthorizationBasis: input.useAuthorizationBasis ?? input.rightsInput?.useAuthorizationBasis,
+      cropAdaptPermitted: input.rightsInput?.cropAdaptPermitted,
+      commercialUsePermitted: input.rightsInput?.commercialUsePermitted,
+      attributionRequired: input.rightsInput?.attributionRequired,
+    },
+    evaluatedAt: new Date().toISOString(),
+    priorCertification: firstItem.contentCertification ?? null,
+  });
+  if (!certificationResult.ok) {
+    return {
+      ok: false,
+      error: certificationResult.error,
+      status: certificationResult.status,
+    };
+  }
+  const contentCertification = certificationResult.certification;
+
   const payload = {
     fileName: input.file.name,
     mimeType: input.file.type || "application/octet-stream",
@@ -315,6 +346,7 @@ export async function storeAndAttachCustomerMaterialFile(input: {
           sizeBytes: retrieved,
           storageRef: boundRef,
           fileRegistryRefs: [registry.file],
+          contentCertification,
         }
       : item,
   );

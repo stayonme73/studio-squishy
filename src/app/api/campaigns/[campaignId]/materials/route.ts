@@ -262,6 +262,13 @@ export async function PATCH(request: Request, context: RouteContext) {
       basisRaw === "provider_licensed"
         ? basisRaw
         : undefined;
+    const parseBool = (key: string): boolean | undefined => {
+      const raw = String(form.get(key) ?? "").trim().toLowerCase();
+      if (!raw) return undefined;
+      if (raw === "true" || raw === "1" || raw === "yes" || raw === "on") return true;
+      if (raw === "false" || raw === "0" || raw === "no" || raw === "off") return false;
+      return undefined;
+    };
 
     if (
       (action !== "client_submit" && action !== "client_submit_consolidated") ||
@@ -290,6 +297,12 @@ export async function PATCH(request: Request, context: RouteContext) {
       itemId,
       consolidatedItemId,
       useAuthorizationBasis,
+      rightsInput: {
+        useAuthorizationBasis,
+        cropAdaptPermitted: parseBool("cropAdaptPermitted"),
+        commercialUsePermitted: parseBool("commercialUsePermitted"),
+        attributionRequired: parseBool("attributionRequired"),
+      },
     });
     if (!stored.ok) {
       return NextResponse.json({ error: stored.error }, { status: stored.status });

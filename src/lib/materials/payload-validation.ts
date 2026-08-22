@@ -14,6 +14,11 @@ export type ClientSubmitPayload = {
     | "studio_generated"
     | "studio_controlled_licensed"
     | "provider_licensed";
+  /** Gate X — explicit crop/adapt permission for this file. */
+  cropAdaptPermitted?: boolean;
+  /** Gate X — explicit commercial/campaign use permission for this file. */
+  commercialUsePermitted?: boolean;
+  attributionRequired?: boolean;
 };
 
 const SECRET_PATTERNS: readonly RegExp[] = [

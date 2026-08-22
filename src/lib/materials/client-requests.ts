@@ -1,6 +1,8 @@
 import type { ApprovedStudioPlanLineItem } from "@/config/studio-board";
 import { clientMaterialStatusLabel, materialCategoryLabel, materialsConfig } from "@/config/materials";
 import { studioMaterialsUploadV1 } from "@/config/studio-materials-upload-v1";
+import { contentRoutingLabel } from "@/lib/studio-customer-content-intake";
+import type { ContentRoutingState } from "@/lib/studio-customer-content-intake";
 
 import {
   clientFacingPromotionKey,
@@ -65,6 +67,8 @@ export type ConsolidatedClientRequest = {
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
   /** Customer-facing stored filename only — never a checksum, path, or item id. */
   fileName?: string;
+  contentRoutingState?: ContentRoutingState;
+  contentRoutingLabel?: string;
 };
 
 /** Client API payload — no internal IDs or mapping fields (Slice 3d-c-c L4). */
@@ -82,6 +86,8 @@ export type ClientConsolidatedRequest = {
   submittedAt?: string;
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
   fileName?: string;
+  contentRoutingState?: ContentRoutingState;
+  contentRoutingLabel?: string;
 };
 
 export type OptionalClientRequest = {
@@ -114,6 +120,8 @@ export type ClientOptionalRequest = {
   submittedAt?: string;
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
   fileName?: string;
+  contentRoutingState?: ContentRoutingState;
+  contentRoutingLabel?: string;
 };
 
 export function isClientIntakeMaterialItem(item: CampaignMaterialItem): boolean {
@@ -258,6 +266,20 @@ function latestStoredCustomerFileName(
   return named.at(-1)?.fileName?.trim();
 }
 
+function latestContentRoutingFromItems(
+  items: readonly CampaignMaterialItem[],
+): { state: ContentRoutingState; label: string } | undefined {
+  const stored = items
+    .filter((item) => item.uploadStatus === "stored" && item.contentCertification)
+    .sort((a, b) => (a.submittedAt ?? "").localeCompare(b.submittedAt ?? ""));
+  const cert = stored.at(-1)?.contentCertification;
+  if (!cert) return undefined;
+  return {
+    state: cert.routingState,
+    label: contentRoutingLabel(cert.routingState),
+  };
+}
+
 function clientAvailabilityForItems(
   items: readonly CampaignMaterialItem[],
 ): CampaignMaterialItem["clientAvailability"] {
@@ -332,6 +354,7 @@ export function resolveConsolidatedClientRequests(
 
       const reviewStatus = consolidatedReviewStatus(visibleItems.map((item) => item.reviewStatus));
       const canSubmit = visibleItems.some(canClientSubmitMaterialItem);
+      const routing = latestContentRoutingFromItems(visibleItems);
 
       return {
         id,
@@ -350,6 +373,12 @@ export function resolveConsolidatedClientRequests(
         submittedAt: latestSubmittedAt(visibleItems),
         clientAvailability: clientAvailabilityForItems(visibleItems),
         fileName: latestStoredCustomerFileName(visibleItems),
+        ...(routing
+          ? {
+              contentRoutingState: routing.state,
+              contentRoutingLabel: routing.label,
+            }
+          : {}),
       };
     });
 }
@@ -371,6 +400,12 @@ export function sanitizeClientConsolidatedRequests(
     submittedAt: request.submittedAt,
     clientAvailability: request.clientAvailability,
     ...(request.fileName ? { fileName: request.fileName } : {}),
+    ...(request.contentRoutingState
+      ? {
+          contentRoutingState: request.contentRoutingState,
+          contentRoutingLabel: request.contentRoutingLabel,
+        }
+      : {}),
   }));
 }
 
@@ -392,6 +427,7 @@ export function resolveOptionalClientRequests(
         serviceNameById,
         [item],
       );
+      const routing = latestContentRoutingFromItems([item]);
       return {
         id: item.id,
         itemId: item.id,
@@ -406,6 +442,12 @@ export function resolveOptionalClientRequests(
         submittedAt: item.submittedAt,
         clientAvailability: item.clientAvailability,
         fileName: latestStoredCustomerFileName([item]),
+        ...(routing
+          ? {
+              contentRoutingState: routing.state,
+              contentRoutingLabel: routing.label,
+            }
+          : {}),
       };
     });
 }
@@ -426,6 +468,12 @@ export function sanitizeClientOptionalRequests(
     submittedAt: request.submittedAt,
     clientAvailability: request.clientAvailability,
     ...(request.fileName ? { fileName: request.fileName } : {}),
+    ...(request.contentRoutingState
+      ? {
+          contentRoutingState: request.contentRoutingState,
+          contentRoutingLabel: request.contentRoutingLabel,
+        }
+      : {}),
   }));
 }
 

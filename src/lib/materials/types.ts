@@ -1,6 +1,8 @@
 import type { ServiceId } from "@/catalog/types";
 import type { StudioFileReference, StudioFileStorageReference } from "@/lib/file-registry/types";
 
+import type { CustomerContentCertification } from "@/lib/studio-customer-content-intake/types";
+
 export type MaterialCategory =
   | "logo-brand"
   | "photo-video"
@@ -106,6 +108,8 @@ export type CampaignMaterialItem = {
     escalationTarget: "none" | "owner_policy";
     reasons: readonly string[];
   };
+  /** Gate X per-file intake, rights, technical inspection, and routing record. */
+  contentCertification?: CustomerContentCertification;
 };
 
 export type CampaignMaterialsRecord = {

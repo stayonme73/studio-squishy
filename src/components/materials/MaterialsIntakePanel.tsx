@@ -254,9 +254,13 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     paidCampaign,
   ]);
 
-  const updateDraft = (id: string, field: keyof ClientSubmitPayload, value: string) => {
+  const updateDraft = (
+    id: string,
+    field: keyof ClientSubmitPayload,
+    value: string | boolean,
+  ) => {
     setDrafts((current) => {
-      const next: ClientSubmitPayload = { ...current[id], [field]: value };
+      const next: ClientSubmitPayload = { ...current[id], [field]: value as never };
       if (field === "useAuthorizationBasis" && !value) {
         delete next.useAuthorizationBasis;
       }
@@ -387,6 +391,14 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
       form.set("file", file);
       const basis = drafts[input.id]?.useAuthorizationBasis;
       if (basis) form.set("useAuthorizationBasis", basis);
+      if (drafts[input.id]?.cropAdaptPermitted === true) {
+        form.set("cropAdaptPermitted", "true");
+      } else if (drafts[input.id]?.cropAdaptPermitted === false) {
+        form.set("cropAdaptPermitted", "false");
+      }
+      if (drafts[input.id]?.commercialUsePermitted === true) {
+        form.set("commercialUsePermitted", "true");
+      }
       const note = drafts[input.id]?.note?.trim();
       if (note) form.set("note", note);
       const res = await fetch(materialsEndpoint, {
@@ -557,6 +569,11 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           {studioMaterialsUploadV1.customerCopy.storedFileStillAttached(request.fileName)}
                         </p>
                       ) : null}
+                      {request.contentRoutingLabel ? (
+                        <p className="sb-materials-intake__routing-state" role="status">
+                          {request.contentRoutingLabel}
+                        </p>
+                      ) : null}
                     </div>
                     {request.canSubmit ? (
                       <>
@@ -569,21 +586,40 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           disabled={submittingId === request.id}
                         />
                         {requiresUseAttestation(request.category) ? (
-                          <label className="sb-materials-intake__attest">
-                            <input
-                              type="checkbox"
-                              checked={Boolean(drafts[request.id]?.useAuthorizationBasis)}
-                              disabled={submittingId === request.id}
-                              onChange={(event) =>
-                                updateDraft(
-                                  request.id,
-                                  "useAuthorizationBasis",
-                                  event.target.checked ? "customer_has_permission" : "",
-                                )
-                              }
-                            />
-                            <span>{materialsConfig.clientUseAuthorizationLabel}</span>
-                          </label>
+                          <>
+                            <label className="sb-materials-intake__attest">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(drafts[request.id]?.useAuthorizationBasis)}
+                                disabled={submittingId === request.id}
+                                onChange={(event) =>
+                                  updateDraft(
+                                    request.id,
+                                    "useAuthorizationBasis",
+                                    event.target.checked ? "customer_has_permission" : "",
+                                  )
+                                }
+                              />
+                              <span>{materialsConfig.clientUseAuthorizationLabel}</span>
+                            </label>
+                            <label className="sb-materials-intake__attest">
+                              <input
+                                type="checkbox"
+                                checked={drafts[request.id]?.cropAdaptPermitted === true}
+                                disabled={submittingId === request.id}
+                                onChange={(event) =>
+                                  updateDraft(
+                                    request.id,
+                                    "cropAdaptPermitted",
+                                    event.target.checked,
+                                  )
+                                }
+                              />
+                              <span>
+                                The Studio may crop, resize, or adapt this file for the project.
+                              </span>
+                            </label>
+                          </>
                         ) : null}
                         <button
                           type="button"
@@ -656,6 +692,11 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           {studioMaterialsUploadV1.customerCopy.storedFileStillAttached(request.fileName)}
                         </p>
                       ) : null}
+                      {request.contentRoutingLabel ? (
+                        <p className="sb-materials-intake__routing-state" role="status">
+                          {request.contentRoutingLabel}
+                        </p>
+                      ) : null}
                     </div>
                     {request.canSubmit ? (
                       <>
@@ -668,21 +709,40 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           disabled={submittingId === request.id}
                         />
                         {requiresUseAttestation(request.category) ? (
-                          <label className="sb-materials-intake__attest">
-                            <input
-                              type="checkbox"
-                              checked={Boolean(drafts[request.id]?.useAuthorizationBasis)}
-                              disabled={submittingId === request.id}
-                              onChange={(event) =>
-                                updateDraft(
-                                  request.id,
-                                  "useAuthorizationBasis",
-                                  event.target.checked ? "customer_has_permission" : "",
-                                )
-                              }
-                            />
-                            <span>{materialsConfig.clientUseAuthorizationLabel}</span>
-                          </label>
+                          <>
+                            <label className="sb-materials-intake__attest">
+                              <input
+                                type="checkbox"
+                                checked={Boolean(drafts[request.id]?.useAuthorizationBasis)}
+                                disabled={submittingId === request.id}
+                                onChange={(event) =>
+                                  updateDraft(
+                                    request.id,
+                                    "useAuthorizationBasis",
+                                    event.target.checked ? "customer_has_permission" : "",
+                                  )
+                                }
+                              />
+                              <span>{materialsConfig.clientUseAuthorizationLabel}</span>
+                            </label>
+                            <label className="sb-materials-intake__attest">
+                              <input
+                                type="checkbox"
+                                checked={drafts[request.id]?.cropAdaptPermitted === true}
+                                disabled={submittingId === request.id}
+                                onChange={(event) =>
+                                  updateDraft(
+                                    request.id,
+                                    "cropAdaptPermitted",
+                                    event.target.checked,
+                                  )
+                                }
+                              />
+                              <span>
+                                The Studio may crop, resize, or adapt this file for the project.
+                              </span>
+                            </label>
+                          </>
                         ) : null}
                         <button
                           type="button"
