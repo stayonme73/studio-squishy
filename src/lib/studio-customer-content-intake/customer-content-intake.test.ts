@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createHash } from "crypto";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import { studioExternalCustomerContentIntakeAndRightsCertificationV1 } from "@/config/studio-external-customer-content-intake-and-rights-certification-v1";
@@ -12,18 +14,22 @@ import { materialBlocksProductionUse } from "@/lib/studio-material-use";
 import { getServiceById } from "@/catalog/accessors";
 import {
   applyCustomerWithdrawFile,
+  assertCustomerFileMayBeCroppedOrAdapted,
   buildGateXCertificationRunManifest,
   certifyCustomerMaterialUpload,
   contentRoutingExplanation,
   inspectCustomerFileBytes,
   isCustomerContentClearedForProduction,
   jobHasUnclearedCustomerContent,
+  materialPermitsCropOrAdapt,
+  NO_CROP_ADAPT_LIMIT,
   resolveContentRoutingState,
   syntheticCorruptPngFile,
   syntheticFakePngFile,
   syntheticPngFile,
   syntheticReplacementPngFile,
   SYNTHETIC_PNG_1X1_BYTES,
+  teamClearsContentCertification,
   teamResolvesTechnicalContentReview,
 } from "@/lib/studio-customer-content-intake";
 import { fileRightsDraftToInput, validateFileRightsDraft } from "@/lib/materials/materials-intake-rights-form";
@@ -74,6 +80,21 @@ function photoItem(overrides: Partial<CampaignMaterialItem> = {}): CampaignMater
     reviewStatus: "missing",
     contentKind: "file-metadata",
     label: "Photos",
+    reason: "Campaign",
+    relatedServiceIds: ["v2-rtu-flyer"],
+    uploadStatus: "none",
+    ...overrides,
+  };
+}
+
+function documentItem(overrides: Partial<CampaignMaterialItem> = {}): CampaignMaterialItem {
+  return {
+    id: "document-reference-slot",
+    category: "document-reference",
+    requirementLevel: "required",
+    reviewStatus: "missing",
+    contentKind: "file-metadata",
+    label: "Documents",
     reason: "Campaign",
     relatedServiceIds: ["v2-rtu-flyer"],
     uploadStatus: "none",
@@ -274,6 +295,49 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
     expect(resolved.routingState).toBe("CLEARED_WITH_LIMITS");
     expect(resolved.limits).toContain("no_crop_adapt");
     expect(resolved.productionCleared).toBe(true);
+  });
+
+  it("Case 2: document-reference crop/adapt denial stores CLEARED_WITH_LIMITS and blocks crop", async () => {
+    const adapter = createMockFileRoomStorageAdapter();
+    const stored = await storeAndAttachCustomerMaterialFile({
+      adapter,
+      campaign: campaign(),
+      campaignClientUserId: client.id,
+      tasks: tasks(),
+      materials: materials([documentItem()]),
+      user: client,
+      file: syntheticPngFile("northwind-menu-scan-no-adapt.png"),
+      consolidatedItemId: "document-reference:file-metadata",
+      useAuthorizationBasis: "customer_owns",
+      rightsInput: fullClearanceRightsInput({ cropAdaptPermitted: false }),
+    });
+    expect(stored.ok).toBe(true);
+    if (!stored.ok) return;
+
+    const item = stored.materials.items[0]!;
+    const cert = item.contentCertification;
+    expect(cert?.routingState).toBe("CLEARED_WITH_LIMITS");
+    expect(cert?.limits).toEqual([NO_CROP_ADAPT_LIMIT]);
+    expect(cert?.rights.cropAdaptPermitted).toBe(false);
+    expect(cert?.productionCleared).toBe(true);
+    expect(isCustomerContentClearedForProduction(item)).toBe(true);
+    expect(materialPermitsCropOrAdapt(item)).toBe(false);
+    expect(() => assertCustomerFileMayBeCroppedOrAdapted(item)).toThrow(/NO_CROP_ADAPT/);
+  });
+
+  it("does not unrestricted-clear a document-reference file that omitted crop/adapt answers", () => {
+    const checksum = createHash("sha256").update(SYNTHETIC_PNG_1X1_BYTES).digest("hex");
+    const result = certifyCustomerMaterialUpload({
+      category: "document-reference",
+      bytes: SYNTHETIC_PNG_1X1_BYTES,
+      fileName: "northwind-menu-scan-no-adapt.png",
+      mimeType: "image/png",
+      checksumSha256: checksum,
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.certification.routingState).not.toBe("CLEARED_FOR_PRODUCTION");
+    expect(result.certification.productionCleared).toBe(false);
   });
 
   it("quarantines when recognizable people are present without likeness consent", () => {
@@ -499,6 +563,143 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
     );
     expect(resolved.routingState).toBe("CLEARED_FOR_PRODUCTION");
     expect(resolved.teamTechnicalReview?.clearedBy).toBe("team");
+  });
+
+  it("Case 4: PNG bytes declared as JPEG still quarantine unresolved third-party rights", () => {
+    const checksum = createHash("sha256").update(SYNTHETIC_PNG_1X1_BYTES).digest("hex");
+    const result = certifyCustomerMaterialUpload({
+      category: "document-reference",
+      bytes: SYNTHETIC_PNG_1X1_BYTES,
+      fileName: "northwind-shelf-with-fictional-labels.jpg",
+      mimeType: "image/jpeg",
+      checksumSha256: checksum,
+      rightsInput: fullClearanceRightsInput({
+        thirdPartyMaterialPresent: true,
+        thirdPartyRightsConfirmed: false,
+      }),
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.certification.routingState).toBe("QUARANTINED");
+    expect(result.certification.routingState).not.toBe("TECHNICAL_REVIEW_REQUIRED");
+    expect(result.certification.productionCleared).toBe(false);
+    expect(result.certification.technical.issues.length).toBeGreaterThan(0);
+    expect(result.certification.technical.signatureMatch).toBe(false);
+    expect(result.certification.rights.thirdPartyMaterialPresent).toBe(true);
+    expect(result.certification.rights.thirdPartyRightsConfirmed).toBe(false);
+
+    const resolved = teamResolvesTechnicalContentReview(
+      result.certification,
+      "document-reference",
+      now,
+    );
+    expect(resolved.routingState).toBe("QUARANTINED");
+    expect(resolved.productionCleared).toBe(false);
+
+    const fabricated = teamClearsContentCertification(
+      result.certification,
+      "document-reference",
+      now,
+    );
+    expect(fabricated.routingState).toBe("QUARANTINED");
+    expect(fabricated.productionCleared).toBe(false);
+
+    const envelope = materials([
+      documentItem({
+        reviewStatus: "submitted",
+        uploadStatus: "stored",
+        contentCertification: result.certification,
+        storageRef: {
+          provider: "supabase_storage",
+          connectionStatus: "private_object",
+          objectPath: "mock/path",
+          checksumSha256: checksum,
+        },
+      }),
+    ]);
+    const reviewed = applyTeamReview(
+      envelope,
+      "document-reference-slot",
+      "approved_for_use",
+      undefined,
+      staff,
+    );
+    expect(reviewed.ok).toBe(true);
+    if (!reviewed.ok) return;
+    expect(reviewed.envelope.items[0]?.contentCertification?.routingState).toBe("QUARANTINED");
+    expect(reviewed.envelope.items[0]?.contentCertification?.productionCleared).toBe(false);
+    expect(isCustomerContentClearedForProduction(reviewed.envelope.items[0]!)).toBe(false);
+  });
+
+  it("Case 4 Scout JPEG fixture is technically valid and still quarantines unresolved third-party rights", () => {
+    const fixturePath = join(
+      process.cwd(),
+      "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/controlled-test-pack/04-third-party-fictional/northwind-shelf-with-fictional-labels.jpg",
+    );
+    const bytes = readFileSync(fixturePath);
+    expect(bytes[0]).toBe(0xff);
+    expect(bytes[1]).toBe(0xd8);
+    expect(bytes[2]).toBe(0xff);
+
+    const checksum = createHash("sha256").update(bytes).digest("hex");
+    const inspection = inspectCustomerFileBytes({
+      bytes,
+      fileName: "northwind-shelf-with-fictional-labels.jpg",
+      mimeType: "image/jpeg",
+      checksumSha256: checksum,
+    });
+    expect(inspection.verifiedMimeType).toBe("image/jpeg");
+    expect(inspection.signatureMatch).toBe(true);
+    expect(inspection.corrupt).toBe(false);
+    expect(inspection.supported).toBe(true);
+    expect(inspection.issues).toEqual([]);
+
+    const result = certifyCustomerMaterialUpload({
+      category: "document-reference",
+      bytes,
+      fileName: "northwind-shelf-with-fictional-labels.jpg",
+      mimeType: "image/jpeg",
+      checksumSha256: checksum,
+      rightsInput: fullClearanceRightsInput({
+        thirdPartyMaterialPresent: true,
+        thirdPartyRightsConfirmed: false,
+      }),
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.certification.routingState).toBe("QUARANTINED");
+    expect(result.certification.routingState).not.toBe("TECHNICAL_REVIEW_REQUIRED");
+    expect(result.certification.productionCleared).toBe(false);
+    expect(result.certification.technical.issues).toEqual([]);
+  });
+
+  it("team technical approval cannot clear unresolved third-party rights even on a technical-review record", () => {
+    const checksum = createHash("sha256").update(SYNTHETIC_PNG_1X1_BYTES).digest("hex");
+    const result = certifyCustomerMaterialUpload({
+      category: "photo-video",
+      bytes: SYNTHETIC_PNG_1X1_BYTES,
+      fileName: "northwind-shelf-with-fictional-labels.jpg",
+      mimeType: "image/jpeg",
+      checksumSha256: checksum,
+      rightsInput: fullClearanceRightsInput({
+        thirdPartyMaterialPresent: true,
+      }),
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    const forcedTechnical: typeof result.certification = {
+      ...result.certification,
+      routingState: "TECHNICAL_REVIEW_REQUIRED",
+    };
+    const resolved = teamResolvesTechnicalContentReview(
+      forcedTechnical,
+      "photo-video",
+      now,
+    );
+    expect(resolved.routingState).toBe("QUARANTINED");
+    expect(resolved.productionCleared).toBe(false);
+    expect(resolved.technical.issues.length).toBeGreaterThan(0);
   });
 
   it("likeness consent from customer clears quarantine when other rights are complete", () => {

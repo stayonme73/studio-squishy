@@ -40,7 +40,7 @@ function readJpegDimensions(bytes: Buffer): { width: number; height: number } | 
       continue;
     }
     const marker = bytes[offset + 1];
-    if (marker === 0xc0 || marker === 0xc2) {
+    if (marker === 0xc0 || marker === 0xc1 || marker === 0xc2 || marker === 0xc3) {
       const height = bytes.readUInt16BE(offset + 5);
       const width = bytes.readUInt16BE(offset + 7);
       if (width && height) return { width, height };

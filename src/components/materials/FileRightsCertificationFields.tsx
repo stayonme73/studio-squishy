@@ -5,23 +5,27 @@ import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
 
 type FileRightsCertificationFieldsProps = {
   values: ClientSubmitPayload;
+  namePrefix: string;
   disabled?: boolean;
   onChange: (field: keyof ClientSubmitPayload, value: string | boolean) => void;
 };
 
 function YesNoField({
   name,
+  namePrefix,
   label,
   value,
   disabled,
   onChange,
 }: {
   name: keyof ClientSubmitPayload;
+  namePrefix: string;
   label: string;
   value: boolean | undefined;
   disabled?: boolean;
   onChange: (field: keyof ClientSubmitPayload, value: boolean) => void;
 }) {
+  const radioName = `${namePrefix}-${name}`;
   return (
     <fieldset className="sb-materials-intake__rights-group">
       <legend className="sb-materials-intake__rights-legend">{label}</legend>
@@ -29,7 +33,7 @@ function YesNoField({
         <label className="sb-materials-intake__rights-option">
           <input
             type="radio"
-            name={name}
+            name={radioName}
             checked={value === true}
             disabled={disabled}
             onChange={() => onChange(name, true)}
@@ -39,7 +43,7 @@ function YesNoField({
         <label className="sb-materials-intake__rights-option">
           <input
             type="radio"
-            name={name}
+            name={radioName}
             checked={value === false}
             disabled={disabled}
             onChange={() => onChange(name, false)}
@@ -53,6 +57,7 @@ function YesNoField({
 
 export default function FileRightsCertificationFields({
   values,
+  namePrefix,
   disabled,
   onChange,
 }: FileRightsCertificationFieldsProps) {
@@ -79,6 +84,7 @@ export default function FileRightsCertificationFields({
 
       <YesNoField
         name="commercialUsePermitted"
+        namePrefix={namePrefix}
         label={copy.commercialUse}
         value={values.commercialUsePermitted}
         disabled={disabled}
@@ -87,6 +93,7 @@ export default function FileRightsCertificationFields({
 
       <YesNoField
         name="cropAdaptPermitted"
+        namePrefix={namePrefix}
         label={copy.cropAdapt}
         value={values.cropAdaptPermitted}
         disabled={disabled}
@@ -95,6 +102,7 @@ export default function FileRightsCertificationFields({
 
       <YesNoField
         name="recognizablePeoplePresent"
+        namePrefix={namePrefix}
         label={copy.recognizablePeopleQuestion}
         value={values.recognizablePeoplePresent}
         disabled={disabled}
@@ -125,6 +133,7 @@ export default function FileRightsCertificationFields({
 
       <YesNoField
         name="thirdPartyMaterialPresent"
+        namePrefix={namePrefix}
         label={copy.thirdPartyMaterialQuestion}
         value={values.thirdPartyMaterialPresent}
         disabled={disabled}

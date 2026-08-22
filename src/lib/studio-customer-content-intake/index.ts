@@ -8,17 +8,24 @@ export {
 } from "./certification-run-capture";
 export type { GateXCertificationRunManifest, GateXCertificationRunManifestEntry } from "./certification-run-capture";
 export {
+  assertCustomerFileMayBeCroppedOrAdapted,
+  certificationPermitsCropOrAdapt,
   customerContentProductionBlockReason,
+  customerFileCropAdaptBlockReason,
   isCustomerContentClearedForProduction,
   jobHasUnclearedCustomerContent,
   listUnclearedCustomerContentForSku,
+  materialPermitsCropOrAdapt,
+  NO_CROP_ADAPT_LIMIT,
   requiresContentCertificationGate,
 } from "./production-gate";
 export {
   buildCustomerContentRightsRecord,
+  customerFileRequiresRightsCertification,
   detectRightsFilenameContradiction,
   filenameLikenessHint,
   filenameThirdPartyHint,
+  hasUnresolvedCustomerRightsHold,
   rightsMissingCropAdaptPermission,
   rightsNeedFollowUp,
   technicalNeedsReview,

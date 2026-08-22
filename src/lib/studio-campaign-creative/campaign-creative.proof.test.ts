@@ -14,6 +14,7 @@ import {
   NIA_DEFAULT_VISUAL_SYSTEM_ID,
   NIA_PHOTO_ASSET_IDS,
   pickRecipeFamily,
+  prepareVisualAsset,
   reasonCampaignCreativeSetDeterministic,
   resolveHeroMaterialId,
   ROOTED_READY_WELLNESS_VISUAL_SYSTEM_V1,
@@ -131,6 +132,26 @@ describe("visual prep", () => {
     });
     expect(crop.width).toBeGreaterThan(0);
     expect(crop.height).toBeGreaterThan(0);
+  });
+
+  it("refuses cover-crop when customer crop/adapt permission is denied", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "cc-prep-nocrop-"));
+    temps.push(dir);
+    await writeSyntheticProofAssets(dir);
+    const sourceAbsolutePath = path.join(dir, "proof-hero-portrait.jpg");
+    const assessment = await assessImageAsset({
+      assetId: "proof-hero",
+      absolutePath: sourceAbsolutePath,
+    });
+    await expect(
+      prepareVisualAsset({
+        sourceAbsolutePath,
+        assessment,
+        formatId: "social_square",
+        outAbsolutePath: path.join(dir, "out.jpg"),
+        cropAdaptPermitted: false,
+      }),
+    ).rejects.toThrow(/NO_CROP_ADAPT/);
   });
 });
 

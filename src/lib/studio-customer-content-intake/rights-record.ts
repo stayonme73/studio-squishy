@@ -12,6 +12,11 @@ import type {
 
 const PACKAGE_ID = studioExternalCustomerContentIntakeAndRightsCertificationV1.packageId;
 
+/** Per-file Gate X rights apply to clearance categories and document files. */
+export function customerFileRequiresRightsCertification(category: MaterialCategory): boolean {
+  return categoryRequiresUseClearance(category) || category === "document-reference";
+}
+
 export const LIKENESS_HINT_PATTERNS: readonly RegExp[] = [
   /\bportrait\b/i,
   /\bheadshot\b/i,
@@ -62,21 +67,21 @@ export function buildCustomerContentRightsRecord(input: {
   const recordedAt = input.recordedAt ?? new Date().toISOString();
   const basis =
     input.rightsInput?.useAuthorizationBasis ?? input.useAuthorizationBasis ?? null;
-  const clearanceRequired = categoryRequiresUseClearance(input.category);
+  const rightsRequired = customerFileRequiresRightsCertification(input.category);
   const fileName = input.fileName.trim();
 
   const likenessFilenameHint = filenameLikenessHint(fileName);
   const thirdPartyFilenameHint = filenameThirdPartyHint(fileName);
-  const recognizablePeoplePresent = clearanceRequired
+  const recognizablePeoplePresent = rightsRequired
     ? (input.rightsInput?.recognizablePeoplePresent ?? null)
     : false;
-  const thirdPartyMaterialPresent = clearanceRequired
+  const thirdPartyMaterialPresent = rightsRequired
     ? (input.rightsInput?.thirdPartyMaterialPresent ?? null)
     : false;
-  const commercialUsePermitted = clearanceRequired
+  const commercialUsePermitted = rightsRequired
     ? (input.rightsInput?.commercialUsePermitted ?? null)
     : true;
-  const cropAdaptPermitted = clearanceRequired
+  const cropAdaptPermitted = rightsRequired
     ? (input.rightsInput?.cropAdaptPermitted ?? null)
     : true;
   const likenessConsentConfirmed = input.rightsInput?.likenessConsentConfirmed === true;
@@ -87,7 +92,7 @@ export function buildCustomerContentRightsRecord(input: {
     thirdPartyMaterialPresent,
   });
 
-  const statementComplete = clearanceRequired
+  const statementComplete = rightsRequired
     ? Boolean(basis) &&
       commercialUsePermitted === true &&
       cropAdaptPermitted !== null &&
@@ -127,11 +132,18 @@ export function rightsMissingCropAdaptPermission(rights: CustomerContentRightsRe
   return rights.cropAdaptPermitted === false;
 }
 
+export function hasUnresolvedCustomerRightsHold(rights: CustomerContentRightsRecord): boolean {
+  if (rights.rightsAnswersContradictFilenameHints) return true;
+  if (rights.recognizablePeoplePresent === true && !rights.likenessConsentConfirmed) return true;
+  if (rights.thirdPartyMaterialPresent === true && !rights.thirdPartyRightsConfirmed) return true;
+  return false;
+}
+
 export function rightsNeedFollowUp(
   rights: CustomerContentRightsRecord,
   category: MaterialCategory,
 ): boolean {
-  if (!categoryRequiresUseClearance(category)) return false;
+  if (!customerFileRequiresRightsCertification(category)) return false;
   if (!rights.ownershipBasis) return true;
   if (!rights.statementComplete) return true;
   if (rights.commercialUsePermitted !== true) return true;

@@ -25,6 +25,12 @@ Depicted product names are invented for this test only:
 
 These names are not claimed as real brands. They exist so the file can show **fictional** third-party-looking labels without using anyone’s actual mark.
 
+## Container correction (2026-08-22)
+
+The original generated still was PNG bytes saved with a `.jpg` filename. That mismatch made Case 4 divert to `TECHNICAL_REVIEW_REQUIRED` in sealed run `gate-x-run-2026-08-22T230059190Z` (see `DEFECT-LEDGER.md` GX-D4).
+
+The same illustrated still was re-encoded as a real JPEG (`FF D8 FF…`) under the **same filename** so the rights-quarantine path can be proven without an accidental technical-review diversion. This is a Scout fixture correction, not an owner file.
+
 ## Internal certification / test-use permission
 
 Scout created this JPEG solely as a Gate X certification fixture for The Studio.

@@ -386,7 +386,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     category: MaterialCategory;
     contentKind: MaterialContentKind;
   }) => {
-    if (requiresUseAttestation(input.category)) {
+    if (fileUploadRequiresRightsCertification(input.category)) {
       const rightsCheck = validateFileRightsDraft(drafts[input.id], input.category);
       if (!rightsCheck.ok) {
         throw new Error(rightsCheck.error);
@@ -642,6 +642,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                         {request.contentKind === "file-metadata" &&
                         fileUploadRequiresRightsCertification(request.category) ? (
                           <FileRightsCertificationFields
+                            namePrefix={request.id}
                             values={drafts[request.id] ?? {}}
                             disabled={submittingId === request.id}
                             onChange={(field, value) => updateDraft(request.id, field, value)}
@@ -752,6 +753,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                         {request.contentKind === "file-metadata" &&
                         fileUploadRequiresRightsCertification(request.category) ? (
                           <FileRightsCertificationFields
+                            namePrefix={request.id}
                             values={drafts[request.id] ?? {}}
                             disabled={submittingId === request.id}
                             onChange={(field, value) => updateDraft(request.id, field, value)}

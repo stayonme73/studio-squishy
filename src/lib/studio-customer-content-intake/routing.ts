@@ -4,6 +4,7 @@ import type { MaterialCategory } from "@/lib/materials/types";
 
 import { newContentCertificationId } from "./certification-id";
 import {
+  hasUnresolvedCustomerRightsHold,
   rightsMissingCropAdaptPermission,
   rightsNeedFollowUp,
   technicalNeedsReview,
@@ -17,6 +18,8 @@ import type {
 } from "./types";
 
 const PACKAGE_ID = studioExternalCustomerContentIntakeAndRightsCertificationV1.packageId;
+
+export const NO_CROP_ADAPT_LIMIT = "no_crop_adapt";
 
 export const CONTENT_ROUTING_LABELS: Record<ContentRoutingState, string> = {
   RECEIVED: "Received — review pending",
@@ -63,38 +66,6 @@ export function resolveContentRoutingState(input: {
     };
   }
 
-  if (!technical.supported) {
-    return {
-      routingState: "QUARANTINED",
-      productionCleared: false,
-      productionBlockReason:
-        technical.issues[0] ?? "File is quarantined until technical review completes.",
-      limits: [],
-      reason: "Unsupported or unverified file type.",
-    };
-  }
-
-  if (technicalNeedsReview(technical)) {
-    return {
-      routingState: "TECHNICAL_REVIEW_REQUIRED",
-      productionCleared: false,
-      productionBlockReason:
-        technical.issues[0] ?? "File needs technical review before production use.",
-      limits: [],
-      reason: "Technical review required.",
-    };
-  }
-
-  if (rightsNeedFollowUp(rights, category)) {
-    return {
-      routingState: "RIGHTS_INFORMATION_REQUIRED",
-      productionCleared: false,
-      productionBlockReason: "The Studio needs file-specific rights information before production use.",
-      limits: [],
-      reason: "Rights information incomplete.",
-    };
-  }
-
   if (rights.rightsAnswersContradictFilenameHints) {
     return {
       routingState: "QUARANTINED",
@@ -128,12 +99,44 @@ export function resolveContentRoutingState(input: {
     };
   }
 
+  if (!technical.supported) {
+    return {
+      routingState: "QUARANTINED",
+      productionCleared: false,
+      productionBlockReason:
+        technical.issues[0] ?? "File is quarantined until technical review completes.",
+      limits: [],
+      reason: "Unsupported or unverified file type.",
+    };
+  }
+
+  if (technicalNeedsReview(technical)) {
+    return {
+      routingState: "TECHNICAL_REVIEW_REQUIRED",
+      productionCleared: false,
+      productionBlockReason:
+        technical.issues[0] ?? "File needs technical review before production use.",
+      limits: [],
+      reason: "Technical review required.",
+    };
+  }
+
+  if (rightsNeedFollowUp(rights, category)) {
+    return {
+      routingState: "RIGHTS_INFORMATION_REQUIRED",
+      productionCleared: false,
+      productionBlockReason: "The Studio needs file-specific rights information before production use.",
+      limits: [],
+      reason: "Rights information incomplete.",
+    };
+  }
+
   if (rightsMissingCropAdaptPermission(rights)) {
     return {
       routingState: "CLEARED_WITH_LIMITS",
       productionCleared: true,
       productionBlockReason: null,
-      limits: ["no_crop_adapt"],
+      limits: [NO_CROP_ADAPT_LIMIT],
       reason: "Cleared with no crop/adapt permission.",
     };
   }
@@ -259,6 +262,16 @@ export function teamResolvesTechnicalContentReview(
   if (certification.routingState !== "TECHNICAL_REVIEW_REQUIRED") {
     return certification;
   }
+  if (hasUnresolvedCustomerRightsHold(certification.rights)) {
+    return buildCustomerContentCertification({
+      category,
+      technical: certification.technical,
+      rights: certification.rights,
+      evaluatedAt: at,
+      prior: certification,
+      certificationId: certification.certificationId,
+    });
+  }
 
   const technical: CustomerContentTechnicalInspection = {
     ...certification.technical,
@@ -289,26 +302,17 @@ export function teamResolvesTechnicalContentReview(
 /** @deprecated Team approval cannot fabricate customer rights — use teamResolvesTechnicalContentReview. */
 export function teamClearsContentCertification(
   certification: CustomerContentCertification,
+  category: MaterialCategory,
   evaluatedAt?: string,
 ): CustomerContentCertification {
-  const at = evaluatedAt ?? new Date().toISOString();
-  if (certification.routingState === "REJECTED" || certification.routingState === "WITHDRAWN_BY_CUSTOMER") {
+  if (
+    certification.routingState === "REJECTED" ||
+    certification.routingState === "WITHDRAWN_BY_CUSTOMER"
+  ) {
     return certification;
   }
-  return {
-    ...certification,
-    routingState: certification.limits.length > 0 ? "CLEARED_WITH_LIMITS" : "CLEARED_FOR_PRODUCTION",
-    routingStateAt: at,
-    productionCleared: true,
-    productionBlockReason: null,
-    history: [
-      ...certification.history,
-      historyEntry(
-        certification.routingState,
-        certification.limits.length > 0 ? "CLEARED_WITH_LIMITS" : "CLEARED_FOR_PRODUCTION",
-        "Team cleared file for production.",
-        at,
-      ),
-    ],
-  };
+  if (hasUnresolvedCustomerRightsHold(certification.rights)) {
+    return certification;
+  }
+  return teamResolvesTechnicalContentReview(certification, category, evaluatedAt);
 }

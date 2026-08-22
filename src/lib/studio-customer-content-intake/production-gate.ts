@@ -1,7 +1,10 @@
 import { categoryRequiresUseClearance } from "@/lib/studio-material-use";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 
-import type { ContentRoutingState } from "./types";
+import { NO_CROP_ADAPT_LIMIT } from "./routing";
+import type { ContentRoutingState, CustomerContentCertification } from "./types";
+
+export { NO_CROP_ADAPT_LIMIT };
 
 const PRODUCTION_CLEARED_STATES = new Set<ContentRoutingState>([
   "CLEARED_FOR_PRODUCTION",
@@ -57,4 +60,29 @@ export function listUnclearedCustomerContentForSku(
       requiresContentCertificationGate(item) &&
       !isCustomerContentClearedForProduction(item),
   );
+}
+
+export function certificationPermitsCropOrAdapt(
+  certification: CustomerContentCertification | null | undefined,
+): boolean {
+  if (!certification) return true;
+  if (certification.rights.cropAdaptPermitted === false) return false;
+  if (certification.limits.includes(NO_CROP_ADAPT_LIMIT)) return false;
+  return true;
+}
+
+export function materialPermitsCropOrAdapt(item: CampaignMaterialItem): boolean {
+  return certificationPermitsCropOrAdapt(item.contentCertification);
+}
+
+export function customerFileCropAdaptBlockReason(item: CampaignMaterialItem): string | null {
+  if (materialPermitsCropOrAdapt(item)) return null;
+  return "This file may be used as submitted. The Studio may not crop or adapt it.";
+}
+
+export function assertCustomerFileMayBeCroppedOrAdapted(item: CampaignMaterialItem): void {
+  const reason = customerFileCropAdaptBlockReason(item);
+  if (reason) {
+    throw new Error(`NO_CROP_ADAPT: ${reason}`);
+  }
 }

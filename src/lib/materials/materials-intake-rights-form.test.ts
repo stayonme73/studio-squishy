@@ -9,6 +9,7 @@ import {
   createEmptyFileRightsDraft,
   FILE_RIGHTS_FORM_FIELDS,
   fileRightsDraftToInput,
+  fileUploadRequiresRightsCertification,
   rightsDraftHasNoPrecheckedDefaults,
   validateFileRightsDraft,
 } from "@/lib/materials/materials-intake-rights-form";
@@ -57,6 +58,9 @@ describe("materials-intake-rights-form", () => {
 
   it("blocks submit when authority or commercial-use certification is missing", () => {
     expect(validateFileRightsDraft(createEmptyFileRightsDraft(), "photo-video").ok).toBe(false);
+    expect(validateFileRightsDraft(createEmptyFileRightsDraft(), "document-reference").ok).toBe(
+      false,
+    );
     expect(
       validateFileRightsDraft(
         completeRightsDraft({ useAuthorizationBasis: undefined, commercialUsePermitted: undefined }),
@@ -85,6 +89,18 @@ describe("materials-intake-rights-form", () => {
     const result = validateFileRightsDraft(case4Draft, "photo-video");
     expect(result.ok).toBe(true);
     expect(case4Draft.thirdPartyRightsConfirmed).not.toBe(true);
+  });
+
+  it("requires Gate X rights on document-reference file uploads", () => {
+    expect(fileUploadRequiresRightsCertification("document-reference")).toBe(true);
+    expect(validateFileRightsDraft(completeRightsDraft({ cropAdaptPermitted: false }), "document-reference").ok).toBe(
+      true,
+    );
+    const case4OnDocument = completeRightsDraft({
+      thirdPartyMaterialPresent: true,
+    });
+    expect(validateFileRightsDraft(case4OnDocument, "document-reference").ok).toBe(true);
+    expect(case4OnDocument.thirdPartyRightsConfirmed).not.toBe(true);
   });
 
   it("still blocks submit when commercial use is denied", () => {

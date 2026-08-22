@@ -122,11 +122,16 @@ export async function prepareVisualAsset(input: {
   outAbsolutePath: string;
   contrastBoost?: number;
   targetCanvas?: { widthPx: number; heightPx: number };
+  /** Gate X: customer crop/adapt denial must hard-stop this pipeline. */
+  cropAdaptPermitted?: boolean;
 }): Promise<PreparedVisualAsset> {
   if (!input.assessment.technical.usable) {
     throw new Error(
       `UNUSABLE_ASSET:${input.assessment.assetId}:${input.assessment.technical.failReasons.join(",")}`,
     );
+  }
+  if (input.cropAdaptPermitted === false) {
+    throw new Error("NO_CROP_ADAPT: this customer file may not be cropped or adapted.");
   }
   const canvas =
     input.targetCanvas ?? CAMPAIGN_FORMAT_CANVASES[input.formatId];

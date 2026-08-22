@@ -1,6 +1,6 @@
 import { studioCustomerContentRightsAttestationV1 } from "@/config/studio-customer-content-rights-attestation-v1";
 import type { MaterialCategory } from "@/lib/materials/types";
-import { categoryRequiresUseClearance } from "@/lib/studio-material-use";
+import { customerFileRequiresRightsCertification } from "@/lib/studio-customer-content-intake/rights-record";
 import type { CustomerContentRightsInput } from "@/lib/studio-customer-content-intake/types";
 
 import type { ClientSubmitPayload } from "./payload-validation";
@@ -19,7 +19,7 @@ export const FILE_RIGHTS_FORM_FIELDS = [
 export type FileRightsFormField = (typeof FILE_RIGHTS_FORM_FIELDS)[number];
 
 export function fileUploadRequiresRightsCertification(category: MaterialCategory): boolean {
-  return categoryRequiresUseClearance(category);
+  return customerFileRequiresRightsCertification(category);
 }
 
 export function createEmptyFileRightsDraft(): ClientSubmitPayload {

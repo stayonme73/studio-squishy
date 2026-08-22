@@ -23,11 +23,16 @@ certification-runs/
 
 ## Status
 
-**Structure and capture procedure are ready.**
+Original sealed run (immutable):
 
-No controlled-test manifest has been recorded yet.
+- `gate-x-run-2026-08-22T230059190Z`
+- Manifest SHA-256: `04c34166c92efe0b6f241033bff7f391e5ee98e2b12782d812def7b61412a14c`
+
+Do **not** overwrite, rename, or reinterpret that run. Supplemental runs are additive directories only.
 
 Owner raw photographs never enter this Git-tracked folder. After an authorized run, this folder may hold manifests, hashes, routing records, and redacted screenshots only.
+
+Defects from the sealed run are recorded in [DEFECT-LEDGER.md](../DEFECT-LEDGER.md).
 
 ## Procedure
 

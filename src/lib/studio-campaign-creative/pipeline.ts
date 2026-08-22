@@ -36,6 +36,8 @@ export type CampaignPipelineMaterialInput = {
   role: "logo" | "hero" | "support";
   /** Repo-relative path to source binary. */
   relativePath: string;
+  /** Gate X: false forbids cover-crop / adapt of this customer file. */
+  cropAdaptPermitted?: boolean;
 };
 
 export type CampaignPipelineResult = {
@@ -94,6 +96,7 @@ export async function runCampaignCreativePipeline(input: {
       formatId,
       outAbsolutePath: path.join(input.repoRoot, outRel),
       contrastBoost: 1.05,
+      cropAdaptPermitted: heroSource.cropAdaptPermitted,
       targetCanvas:
         formatId === "print_handout"
           ? { widthPx: printContract.widthPx, heightPx: printContract.heightPx }
