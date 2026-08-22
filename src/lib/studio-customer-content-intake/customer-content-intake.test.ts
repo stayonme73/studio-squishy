@@ -27,6 +27,7 @@ import { buildCustomerContentRightsRecord } from "@/lib/studio-customer-content-
 import { applyTeamReview } from "@/lib/materials/actions";
 import { storeAndAttachCustomerMaterialFile } from "@/lib/materials/client-file-store";
 import type { CampaignMaterialItem, ServerMaterialsEnvelope } from "@/lib/materials/types";
+import type { CustomerContentRightsInput } from "@/lib/studio-customer-content-intake/types";
 
 const now = "2026-08-22T12:00:00.000Z";
 const CAMPAIGN_ID = "gate-x-cert-campaign";
@@ -47,6 +48,19 @@ const staff: StudioUser = {
   roles: ["staff"],
   currentCampaignId: CAMPAIGN_ID,
 };
+
+function fullClearanceRightsInput(
+  overrides: Partial<CustomerContentRightsInput> = {},
+): CustomerContentRightsInput {
+  return {
+    useAuthorizationBasis: "customer_owns",
+    commercialUsePermitted: true,
+    cropAdaptPermitted: true,
+    recognizablePeoplePresent: false,
+    thirdPartyMaterialPresent: false,
+    ...overrides,
+  };
+}
 
 function photoItem(overrides: Partial<CampaignMaterialItem> = {}): CampaignMaterialItem {
   return {
@@ -226,11 +240,7 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       fileName: "northwind-own-photo.jpg",
       mimeType: "image/png",
       checksumSha256: checksum,
-      rightsInput: {
-        useAuthorizationBasis: "customer_owns",
-        cropAdaptPermitted: true,
-        commercialUsePermitted: true,
-      },
+      rightsInput: fullClearanceRightsInput(),
     });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -250,11 +260,7 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
     const rights = buildCustomerContentRightsRecord({
       category: "photo-video",
       fileName: "northwind-menu-scan-no-adapt.pdf",
-      rightsInput: {
-        useAuthorizationBasis: "customer_owns",
-        cropAdaptPermitted: false,
-        commercialUsePermitted: true,
-      },
+      rightsInput: fullClearanceRightsInput({ cropAdaptPermitted: false }),
     });
     const resolved = resolveContentRoutingState({
       category: "photo-video",
@@ -266,19 +272,15 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
     expect(resolved.productionCleared).toBe(true);
   });
 
-  it("quarantines identifiable-person filename hints until customer likeness consent", () => {
+  it("quarantines when recognizable people are present without likeness consent", () => {
     const checksum = createHash("sha256").update(SYNTHETIC_PNG_1X1_BYTES).digest("hex");
     const result = certifyCustomerMaterialUpload({
       category: "photo-video",
       bytes: SYNTHETIC_PNG_1X1_BYTES,
-      fileName: "team-member-portrait.png",
+      fileName: "northwind-team-photo.png",
       mimeType: "image/png",
       checksumSha256: checksum,
-      rightsInput: {
-        useAuthorizationBasis: "customer_owns",
-        cropAdaptPermitted: true,
-        commercialUsePermitted: true,
-      },
+      rightsInput: fullClearanceRightsInput({ recognizablePeoplePresent: true }),
     });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -344,11 +346,7 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       file: syntheticPngFile(),
       consolidatedItemId: "photo-video:file-metadata",
       useAuthorizationBasis: "customer_owns",
-      rightsInput: {
-        useAuthorizationBasis: "customer_owns",
-        cropAdaptPermitted: true,
-        commercialUsePermitted: true,
-      },
+      rightsInput: fullClearanceRightsInput(),
     });
   }
 
@@ -391,11 +389,7 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       file: syntheticReplacementPngFile(),
       consolidatedItemId: "photo-video:file-metadata",
       useAuthorizationBasis: "customer_owns",
-      rightsInput: {
-        useAuthorizationBasis: "customer_owns",
-        cropAdaptPermitted: true,
-        commercialUsePermitted: true,
-      },
+      rightsInput: fullClearanceRightsInput(),
     });
     expect(second.ok).toBe(true);
     if (!second.ok) return;
@@ -445,14 +439,11 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       fileName: "team-member-portrait.png",
       mimeType: "image/png",
       checksumSha256: checksum,
-      rightsInput: {
-        useAuthorizationBasis: "customer_owns",
-        cropAdaptPermitted: true,
-        commercialUsePermitted: true,
-      },
+      rightsInput: fullClearanceRightsInput({ recognizablePeoplePresent: true }),
     });
     expect(likeness.ok).toBe(true);
     if (!likeness.ok) return;
+    expect(likeness.certification.routingState).toBe("QUARANTINED");
 
     const envelope = materials([
       photoItem({
@@ -491,11 +482,7 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       fileName: "northwind-photo.jpg",
       mimeType: "image/jpeg",
       checksumSha256: checksum,
-      rightsInput: {
-        useAuthorizationBasis: "customer_owns",
-        cropAdaptPermitted: true,
-        commercialUsePermitted: true,
-      },
+      rightsInput: fullClearanceRightsInput(),
     });
     expect(technicalMismatch.ok).toBe(true);
     if (!technicalMismatch.ok) return;
@@ -518,12 +505,10 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       fileName: "team-member-portrait.png",
       mimeType: "image/png",
       checksumSha256: checksum,
-      rightsInput: {
-        useAuthorizationBasis: "customer_owns",
-        cropAdaptPermitted: true,
-        commercialUsePermitted: true,
+      rightsInput: fullClearanceRightsInput({
+        recognizablePeoplePresent: true,
         likenessConsentConfirmed: true,
-      },
+      }),
     });
     expect(cleared.ok).toBe(true);
     if (!cleared.ok) return;
@@ -538,11 +523,7 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
       fileName: "manifest-proof.png",
       mimeType: "image/png",
       checksumSha256: checksum,
-      rightsInput: {
-        useAuthorizationBasis: "customer_owns",
-        cropAdaptPermitted: true,
-        commercialUsePermitted: true,
-      },
+      rightsInput: fullClearanceRightsInput(),
     });
     expect(cert.ok).toBe(true);
     if (!cert.ok) return;

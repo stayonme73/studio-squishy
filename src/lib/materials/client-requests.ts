@@ -2,6 +2,7 @@ import type { ApprovedStudioPlanLineItem } from "@/config/studio-board";
 import { clientMaterialStatusLabel, materialCategoryLabel, materialsConfig } from "@/config/materials";
 import { studioMaterialsUploadV1 } from "@/config/studio-materials-upload-v1";
 import { contentRoutingLabel, canCustomerWithdrawStoredFile } from "@/lib/studio-customer-content-intake";
+import { contentRoutingExplanation } from "@/lib/studio-customer-content-intake/content-routing-explanation";
 import type { ContentRoutingState } from "@/lib/studio-customer-content-intake";
 
 import {
@@ -69,6 +70,7 @@ export type ConsolidatedClientRequest = {
   fileName?: string;
   contentRoutingState?: ContentRoutingState;
   contentRoutingLabel?: string;
+  contentRoutingExplanation?: string;
   canWithdrawFile?: boolean;
 };
 
@@ -89,6 +91,7 @@ export type ClientConsolidatedRequest = {
   fileName?: string;
   contentRoutingState?: ContentRoutingState;
   contentRoutingLabel?: string;
+  contentRoutingExplanation?: string;
   canWithdrawFile?: boolean;
 };
 
@@ -124,6 +127,7 @@ export type ClientOptionalRequest = {
   fileName?: string;
   contentRoutingState?: ContentRoutingState;
   contentRoutingLabel?: string;
+  contentRoutingExplanation?: string;
   canWithdrawFile?: boolean;
 };
 
@@ -280,7 +284,7 @@ function latestWithdrawableItem(
 
 function latestContentRoutingFromItems(
   items: readonly CampaignMaterialItem[],
-): { state: ContentRoutingState; label: string } | undefined {
+): { state: ContentRoutingState; label: string; explanation: string } | undefined {
   const stored = items
     .filter((item) => item.uploadStatus === "stored" && item.contentCertification)
     .sort((a, b) => (a.submittedAt ?? "").localeCompare(b.submittedAt ?? ""));
@@ -289,6 +293,11 @@ function latestContentRoutingFromItems(
   return {
     state: cert.routingState,
     label: contentRoutingLabel(cert.routingState),
+    explanation: contentRoutingExplanation({
+      routingState: cert.routingState,
+      productionBlockReason: cert.productionBlockReason,
+      rights: cert.rights,
+    }),
   };
 }
 
@@ -390,6 +399,7 @@ export function resolveConsolidatedClientRequests(
           ? {
               contentRoutingState: routing.state,
               contentRoutingLabel: routing.label,
+              contentRoutingExplanation: routing.explanation,
             }
           : {}),
         ...(withdrawable ? { canWithdrawFile: true } : {}),
@@ -418,6 +428,7 @@ export function sanitizeClientConsolidatedRequests(
       ? {
           contentRoutingState: request.contentRoutingState,
           contentRoutingLabel: request.contentRoutingLabel,
+          contentRoutingExplanation: request.contentRoutingExplanation,
         }
       : {}),
     ...(request.canWithdrawFile ? { canWithdrawFile: true } : {}),
@@ -461,6 +472,7 @@ export function resolveOptionalClientRequests(
           ? {
               contentRoutingState: routing.state,
               contentRoutingLabel: routing.label,
+              contentRoutingExplanation: routing.explanation,
             }
           : {}),
         ...(canCustomerWithdrawStoredFile(item) ? { canWithdrawFile: true } : {}),
@@ -488,6 +500,7 @@ export function sanitizeClientOptionalRequests(
       ? {
           contentRoutingState: request.contentRoutingState,
           contentRoutingLabel: request.contentRoutingLabel,
+          contentRoutingExplanation: request.contentRoutingExplanation,
         }
       : {}),
     ...(request.canWithdrawFile ? { canWithdrawFile: true } : {}),

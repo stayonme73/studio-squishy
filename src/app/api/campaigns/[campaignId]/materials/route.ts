@@ -311,8 +311,12 @@ export async function PATCH(request: Request, context: RouteContext) {
         cropAdaptPermitted: parseBool("cropAdaptPermitted"),
         commercialUsePermitted: parseBool("commercialUsePermitted"),
         attributionRequired: parseBool("attributionRequired"),
+        recognizablePeoplePresent: parseBool("recognizablePeoplePresent"),
         likenessConsentConfirmed: parseBool("likenessConsentConfirmed"),
+        thirdPartyMaterialPresent: parseBool("thirdPartyMaterialPresent"),
         thirdPartyRightsConfirmed: parseBool("thirdPartyRightsConfirmed"),
+        attestationTextVersion:
+          String(form.get("attestationTextVersion") ?? "").trim() || undefined,
       },
     });
     if (!stored.ok) {

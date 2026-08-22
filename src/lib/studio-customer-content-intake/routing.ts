@@ -95,7 +95,18 @@ export function resolveContentRoutingState(input: {
     };
   }
 
-  if (rights.likenessReviewRequired && !rights.likenessConsentConfirmed) {
+  if (rights.rightsAnswersContradictFilenameHints) {
+    return {
+      routingState: "QUARANTINED",
+      productionCleared: false,
+      productionBlockReason:
+        "Your answers do not match signals in this file name. The Studio will review this file before production use.",
+      limits: [],
+      reason: "Customer rights answers contradict filename hints.",
+    };
+  }
+
+  if (rights.recognizablePeoplePresent === true && !rights.likenessConsentConfirmed) {
     return {
       routingState: "QUARANTINED",
       productionCleared: false,
@@ -106,7 +117,7 @@ export function resolveContentRoutingState(input: {
     };
   }
 
-  if (rights.thirdPartyMaterialReviewRequired && !rights.thirdPartyRightsConfirmed) {
+  if (rights.thirdPartyMaterialPresent === true && !rights.thirdPartyRightsConfirmed) {
     return {
       routingState: "QUARANTINED",
       productionCleared: false,

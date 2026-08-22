@@ -19,8 +19,11 @@ export type ClientSubmitPayload = {
   /** Gate X — explicit commercial/campaign use permission for this file. */
   commercialUsePermitted?: boolean;
   attributionRequired?: boolean;
+  recognizablePeoplePresent?: boolean;
   likenessConsentConfirmed?: boolean;
+  thirdPartyMaterialPresent?: boolean;
   thirdPartyRightsConfirmed?: boolean;
+  attestationTextVersion?: string;
 };
 
 const SECRET_PATTERNS: readonly RegExp[] = [

@@ -1,3 +1,4 @@
+export { contentRoutingExplanation } from "./content-routing-explanation";
 export { certifyCustomerMaterialUpload } from "./certify-upload";
 export { newContentCertificationId } from "./certification-id";
 export {
@@ -15,6 +16,9 @@ export {
 } from "./production-gate";
 export {
   buildCustomerContentRightsRecord,
+  detectRightsFilenameContradiction,
+  filenameLikenessHint,
+  filenameThirdPartyHint,
   rightsMissingCropAdaptPermission,
   rightsNeedFollowUp,
   technicalNeedsReview,

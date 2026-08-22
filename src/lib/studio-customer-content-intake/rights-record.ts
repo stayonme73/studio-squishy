@@ -1,3 +1,4 @@
+import { studioCustomerContentRightsAttestationV1 } from "@/config/studio-customer-content-rights-attestation-v1";
 import { studioExternalCustomerContentIntakeAndRightsCertificationV1 } from "@/config/studio-external-customer-content-intake-and-rights-certification-v1";
 import type { MaterialUseAuthorizationBasis } from "@/config/studio-material-use-v1";
 import { categoryRequiresUseClearance } from "@/lib/studio-material-use";
@@ -11,7 +12,7 @@ import type {
 
 const PACKAGE_ID = studioExternalCustomerContentIntakeAndRightsCertificationV1.packageId;
 
-const LIKENESS_HINT_PATTERNS: readonly RegExp[] = [
+export const LIKENESS_HINT_PATTERNS: readonly RegExp[] = [
   /\bportrait\b/i,
   /\bheadshot\b/i,
   /\bteam[\s_-]?member\b/i,
@@ -20,7 +21,7 @@ const LIKENESS_HINT_PATTERNS: readonly RegExp[] = [
   /\blikeness\b/i,
 ];
 
-const THIRD_PARTY_HINT_PATTERNS: readonly RegExp[] = [
+export const THIRD_PARTY_HINT_PATTERNS: readonly RegExp[] = [
   /\blogo\b/i,
   /\btrademark\b/i,
   /\bbrand[\s_-]?label\b/i,
@@ -29,6 +30,27 @@ const THIRD_PARTY_HINT_PATTERNS: readonly RegExp[] = [
   /\bsignage\b/i,
   /\bscreenshot\b/i,
 ];
+
+export function filenameLikenessHint(fileName: string): boolean {
+  return LIKENESS_HINT_PATTERNS.some((pattern) => pattern.test(fileName.trim()));
+}
+
+export function filenameThirdPartyHint(fileName: string): boolean {
+  return THIRD_PARTY_HINT_PATTERNS.some((pattern) => pattern.test(fileName.trim()));
+}
+
+export function detectRightsFilenameContradiction(input: {
+  fileName: string;
+  recognizablePeoplePresent: boolean | null;
+  thirdPartyMaterialPresent: boolean | null;
+}): boolean {
+  const likenessHint = filenameLikenessHint(input.fileName);
+  const thirdPartyHint = filenameThirdPartyHint(input.fileName);
+  return (
+    (likenessHint && input.recognizablePeoplePresent === false) ||
+    (thirdPartyHint && input.thirdPartyMaterialPresent === false)
+  );
+}
 
 export function buildCustomerContentRightsRecord(input: {
   category: MaterialCategory;
@@ -43,24 +65,34 @@ export function buildCustomerContentRightsRecord(input: {
   const clearanceRequired = categoryRequiresUseClearance(input.category);
   const fileName = input.fileName.trim();
 
-  const likenessReviewRequired = LIKENESS_HINT_PATTERNS.some((pattern) => pattern.test(fileName));
-  const thirdPartyMaterialReviewRequired = THIRD_PARTY_HINT_PATTERNS.some((pattern) =>
-    pattern.test(fileName),
-  );
-
-  const campaignUsePermitted =
-    input.rightsInput?.commercialUsePermitted ??
-    (basis ? true : clearanceRequired ? null : true);
-  const cropAdaptPermitted =
-    input.rightsInput?.cropAdaptPermitted ?? (clearanceRequired ? null : true);
-  const commercialUsePermitted =
-    input.rightsInput?.commercialUsePermitted ?? (basis ? true : clearanceRequired ? null : true);
+  const likenessFilenameHint = filenameLikenessHint(fileName);
+  const thirdPartyFilenameHint = filenameThirdPartyHint(fileName);
+  const recognizablePeoplePresent = clearanceRequired
+    ? (input.rightsInput?.recognizablePeoplePresent ?? null)
+    : false;
+  const thirdPartyMaterialPresent = clearanceRequired
+    ? (input.rightsInput?.thirdPartyMaterialPresent ?? null)
+    : false;
+  const commercialUsePermitted = clearanceRequired
+    ? (input.rightsInput?.commercialUsePermitted ?? null)
+    : true;
+  const cropAdaptPermitted = clearanceRequired
+    ? (input.rightsInput?.cropAdaptPermitted ?? null)
+    : true;
+  const likenessConsentConfirmed = input.rightsInput?.likenessConsentConfirmed === true;
+  const thirdPartyRightsConfirmed = input.rightsInput?.thirdPartyRightsConfirmed === true;
+  const rightsAnswersContradictFilenameHints = detectRightsFilenameContradiction({
+    fileName,
+    recognizablePeoplePresent,
+    thirdPartyMaterialPresent,
+  });
 
   const statementComplete = clearanceRequired
     ? Boolean(basis) &&
-      campaignUsePermitted !== null &&
+      commercialUsePermitted === true &&
       cropAdaptPermitted !== null &&
-      commercialUsePermitted !== null
+      recognizablePeoplePresent !== null &&
+      thirdPartyMaterialPresent !== null
     : true;
 
   return {
@@ -68,15 +100,26 @@ export function buildCustomerContentRightsRecord(input: {
     packageId: PACKAGE_ID,
     customerProvided: true,
     ownershipBasis: basis,
-    campaignUsePermitted,
+    campaignUsePermitted: commercialUsePermitted,
     cropAdaptPermitted,
     commercialUsePermitted,
     attributionRequired: input.rightsInput?.attributionRequired ?? null,
     statementComplete,
-    likenessReviewRequired,
-    thirdPartyMaterialReviewRequired,
-    likenessConsentConfirmed: input.rightsInput?.likenessConsentConfirmed === true,
-    thirdPartyRightsConfirmed: input.rightsInput?.thirdPartyRightsConfirmed === true,
+    likenessReviewRequired:
+      recognizablePeoplePresent === true ||
+      (recognizablePeoplePresent === null && likenessFilenameHint),
+    thirdPartyMaterialReviewRequired:
+      thirdPartyMaterialPresent === true ||
+      (thirdPartyMaterialPresent === null && thirdPartyFilenameHint),
+    likenessConsentConfirmed,
+    thirdPartyRightsConfirmed,
+    recognizablePeoplePresent,
+    thirdPartyMaterialPresent,
+    likenessFilenameHint,
+    thirdPartyFilenameHint,
+    rightsAnswersContradictFilenameHints,
+    attestationTextVersion:
+      input.rightsInput?.attestationTextVersion ?? studioCustomerContentRightsAttestationV1.version,
   };
 }
 
@@ -91,6 +134,10 @@ export function rightsNeedFollowUp(
   if (!categoryRequiresUseClearance(category)) return false;
   if (!rights.ownershipBasis) return true;
   if (!rights.statementComplete) return true;
+  if (rights.commercialUsePermitted !== true) return true;
+  if (rights.cropAdaptPermitted === null) return true;
+  if (rights.recognizablePeoplePresent === null) return true;
+  if (rights.thirdPartyMaterialPresent === null) return true;
   return false;
 }
 

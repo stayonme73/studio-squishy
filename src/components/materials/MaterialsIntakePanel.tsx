@@ -13,8 +13,15 @@ import type {
   ClientOptionalRequest,
 } from "@/lib/materials/client-requests";
 import type { ClientSubmitPayload } from "@/lib/materials/payload-validation";
+import {
+  appendFileRightsToFormData,
+  fileUploadRequiresRightsCertification,
+  validateFileRightsDraft,
+} from "@/lib/materials/materials-intake-rights-form";
 import type { MaterialCategory, MaterialContentKind } from "@/lib/materials/types";
 import { categoryRequiresUseClearance } from "@/lib/studio-material-use";
+
+import FileRightsCertificationFields from "./FileRightsCertificationFields";
 
 type MaterialsClientResponse = {
   blockingRequiredCount: number;
@@ -24,6 +31,7 @@ type MaterialsClientResponse = {
   syncedAt?: string;
   error?: string;
   receiptMessage?: string;
+  contentRoutingExplanation?: string;
 };
 
 type FileSelectionState = {
@@ -264,6 +272,12 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
       if (field === "useAuthorizationBasis" && !value) {
         delete next.useAuthorizationBasis;
       }
+      if (field === "likenessConsentConfirmed" && value !== true) {
+        delete next.likenessConsentConfirmed;
+      }
+      if (field === "thirdPartyRightsConfirmed" && value !== true) {
+        delete next.thirdPartyRightsConfirmed;
+      }
       return { ...current, [id]: next };
     });
   };
@@ -372,8 +386,11 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     category: MaterialCategory;
     contentKind: MaterialContentKind;
   }) => {
-    if (requiresUseAttestation(input.category) && !drafts[input.id]?.useAuthorizationBasis) {
-      throw new Error(materialsConfig.clientUseAuthorizationRequired);
+    if (requiresUseAttestation(input.category)) {
+      const rightsCheck = validateFileRightsDraft(drafts[input.id], input.category);
+      if (!rightsCheck.ok) {
+        throw new Error(rightsCheck.error);
+      }
     }
 
     if (input.contentKind === "file-metadata") {
@@ -389,15 +406,11 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
         form.set("itemId", input.id);
       }
       form.set("file", file);
-      const basis = drafts[input.id]?.useAuthorizationBasis;
-      if (basis) form.set("useAuthorizationBasis", basis);
-      if (drafts[input.id]?.cropAdaptPermitted === true) {
-        form.set("cropAdaptPermitted", "true");
-      } else if (drafts[input.id]?.cropAdaptPermitted === false) {
-        form.set("cropAdaptPermitted", "false");
-      }
-      if (drafts[input.id]?.commercialUsePermitted === true) {
-        form.set("commercialUsePermitted", "true");
+      if (fileUploadRequiresRightsCertification(input.category)) {
+        appendFileRightsToFormData(form, drafts[input.id]);
+      } else {
+        const basis = drafts[input.id]?.useAuthorizationBasis;
+        if (basis) form.set("useAuthorizationBasis", basis);
       }
       const note = drafts[input.id]?.note?.trim();
       if (note) form.set("note", note);
@@ -600,6 +613,11 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           {request.contentRoutingLabel}
                         </p>
                       ) : null}
+                      {request.contentRoutingExplanation ? (
+                        <p className="sb-materials-intake__routing-explanation" role="status">
+                          {request.contentRoutingExplanation}
+                        </p>
+                      ) : null}
                       {request.canWithdrawFile ? (
                         <button
                           type="button"
@@ -621,41 +639,13 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           onFileSelect={(file) => void selectFile(request.id, file)}
                           disabled={submittingId === request.id}
                         />
-                        {requiresUseAttestation(request.category) ? (
-                          <>
-                            <label className="sb-materials-intake__attest">
-                              <input
-                                type="checkbox"
-                                checked={Boolean(drafts[request.id]?.useAuthorizationBasis)}
-                                disabled={submittingId === request.id}
-                                onChange={(event) =>
-                                  updateDraft(
-                                    request.id,
-                                    "useAuthorizationBasis",
-                                    event.target.checked ? "customer_has_permission" : "",
-                                  )
-                                }
-                              />
-                              <span>{materialsConfig.clientUseAuthorizationLabel}</span>
-                            </label>
-                            <label className="sb-materials-intake__attest">
-                              <input
-                                type="checkbox"
-                                checked={drafts[request.id]?.cropAdaptPermitted === true}
-                                disabled={submittingId === request.id}
-                                onChange={(event) =>
-                                  updateDraft(
-                                    request.id,
-                                    "cropAdaptPermitted",
-                                    event.target.checked,
-                                  )
-                                }
-                              />
-                              <span>
-                                The Studio may crop, resize, or adapt this file for the project.
-                              </span>
-                            </label>
-                          </>
+                        {request.contentKind === "file-metadata" &&
+                        fileUploadRequiresRightsCertification(request.category) ? (
+                          <FileRightsCertificationFields
+                            values={drafts[request.id] ?? {}}
+                            disabled={submittingId === request.id}
+                            onChange={(field, value) => updateDraft(request.id, field, value)}
+                          />
                         ) : null}
                         <button
                           type="button"
@@ -733,6 +723,11 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           {request.contentRoutingLabel}
                         </p>
                       ) : null}
+                      {request.contentRoutingExplanation ? (
+                        <p className="sb-materials-intake__routing-explanation" role="status">
+                          {request.contentRoutingExplanation}
+                        </p>
+                      ) : null}
                       {request.canWithdrawFile ? (
                         <button
                           type="button"
@@ -754,41 +749,13 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           onFileSelect={(file) => void selectFile(request.id, file)}
                           disabled={submittingId === request.id}
                         />
-                        {requiresUseAttestation(request.category) ? (
-                          <>
-                            <label className="sb-materials-intake__attest">
-                              <input
-                                type="checkbox"
-                                checked={Boolean(drafts[request.id]?.useAuthorizationBasis)}
-                                disabled={submittingId === request.id}
-                                onChange={(event) =>
-                                  updateDraft(
-                                    request.id,
-                                    "useAuthorizationBasis",
-                                    event.target.checked ? "customer_has_permission" : "",
-                                  )
-                                }
-                              />
-                              <span>{materialsConfig.clientUseAuthorizationLabel}</span>
-                            </label>
-                            <label className="sb-materials-intake__attest">
-                              <input
-                                type="checkbox"
-                                checked={drafts[request.id]?.cropAdaptPermitted === true}
-                                disabled={submittingId === request.id}
-                                onChange={(event) =>
-                                  updateDraft(
-                                    request.id,
-                                    "cropAdaptPermitted",
-                                    event.target.checked,
-                                  )
-                                }
-                              />
-                              <span>
-                                The Studio may crop, resize, or adapt this file for the project.
-                              </span>
-                            </label>
-                          </>
+                        {request.contentKind === "file-metadata" &&
+                        fileUploadRequiresRightsCertification(request.category) ? (
+                          <FileRightsCertificationFields
+                            values={drafts[request.id] ?? {}}
+                            disabled={submittingId === request.id}
+                            onChange={(field, value) => updateDraft(request.id, field, value)}
+                          />
                         ) : null}
                         <button
                           type="button"

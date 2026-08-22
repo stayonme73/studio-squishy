@@ -46,6 +46,18 @@ export type CustomerContentRightsRecord = {
   likenessConsentConfirmed: boolean;
   /** Customer-only attestation — team approval cannot substitute. */
   thirdPartyRightsConfirmed: boolean;
+  /** Customer answer — whether recognizable people appear in this file. */
+  recognizablePeoplePresent: boolean | null;
+  /** Customer answer — whether third-party protected material appears. */
+  thirdPartyMaterialPresent: boolean | null;
+  /** Filename pattern suggested recognizable people. */
+  likenessFilenameHint: boolean;
+  /** Filename pattern suggested third-party protected material. */
+  thirdPartyFilenameHint: boolean;
+  /** Customer answers conflict with filename or technical hints. */
+  rightsAnswersContradictFilenameHints: boolean;
+  /** Version of customer attestation copy captured at certification time. */
+  attestationTextVersion: string;
 };
 
 export type CustomerContentTeamTechnicalReview = {
@@ -85,8 +97,11 @@ export type CustomerContentRightsInput = {
   cropAdaptPermitted?: boolean;
   commercialUsePermitted?: boolean;
   attributionRequired?: boolean;
+  recognizablePeoplePresent?: boolean;
   likenessConsentConfirmed?: boolean;
+  thirdPartyMaterialPresent?: boolean;
   thirdPartyRightsConfirmed?: boolean;
+  attestationTextVersion?: string;
 };
 
 export type CertifyCustomerMaterialUploadInput = {
