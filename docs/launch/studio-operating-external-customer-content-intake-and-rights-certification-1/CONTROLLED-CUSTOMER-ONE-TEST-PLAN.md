@@ -1,10 +1,16 @@
 # CONTROLLED CUSTOMER-ONE TEST PLAN
 
-**Package:** `STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1`  
-**Status:** PROPOSAL ONLY — do not execute in opening package  
+**Package:** `STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1`
+
+**Status:** PREPARATION — Owner File Collection Checklist correction. Do not execute.
+
 **Date:** 2026-08-22
 
 This plan designs a later controlled test using the **actual customer route** (`MaterialsIntakePanel` → multipart PATCH `/api/campaigns/{campaignId}/materials`). Studio-generated Room 4C fixtures and developer shortcuts are forbidden.
+
+Canonical owner raw-file staging (Git-ignored, one path only): `tmp/gate-x-controlled-test-owner-staging/`
+
+Procedure: `OWNER-FILE-STAGING-PROCEDURE.md`
 
 ---
 
@@ -16,9 +22,16 @@ Use a dedicated certification campaign (not Moss & Thread, Cedar Lane, or Harbor
 |-------|-------|
 | Customer name | Gate X Certification Customer (fictional) |
 | Business | Northwind Pantry Co-op (fictional) |
-| Service | Social graphics or campaign creative (Launch Now with limits) |
+| Launch Now capability ID | `campaign-creative` |
+| Customer-facing shelf / checkout SKU | `v2-rtu-promotion-graphics` (“Make My Campaign Graphics”) |
+| Case 9 production-gate identifier | purchased `job.skuId` = `v2-rtu-promotion-graphics` |
+| Frozen classification | READY WITH EXPLICIT LIMITS |
 | Route | Hire → pay → Studio Board materials upload |
 | Owner labor | NONE during test execution |
+
+Do **not** send `campaign-creative` into catalog checkout, `getServiceById()`, `relatedServiceIds`, or `canTransitionToBuildingConcepts(job.skuId)`. That id is the Launch Now capability / Room 4C routing SKU only.
+
+Sources: capability `campaign-creative` in `src/lib/studio-room-4c-scenario-1/routing.ts` (and scenarios 2–3) plus `src/lib/studio-room-4b-launch-toolbox/admission.ts`. Shelf SKU `v2-rtu-promotion-graphics` in `src/catalog/v2/batch1-ready-to-use.ts` and `src/catalog/types.ts` (`RouteMapV2ShelfServiceId`). Job-level gate uses `job.skuId` from the purchased plan (`src/lib/job-control/resolve-jobs.ts`, `src/lib/job-control/production-workspace-gates.ts`) matched to `relatedServiceIds` from `src/lib/materials/requirements.ts`. Config: `launchNowCampaignCreativeSku` and `customerFacingCampaignGraphicsShelfSku`.
 
 Tagia approves the fixture before execution. Do not substitute real customer data without explicit authorization.
 
@@ -30,12 +43,12 @@ Tagia approves the fixture before execution. Do not substitute real customer dat
 
 | Field | Proposed file |
 |-------|---------------|
-| Filename | `northwind-storefront-own-photo.jpg` |
-| Description | Simple storefront photo Tagia owns or created; no identifiable strangers, no third-party marks |
+| Filename | `gate-x-owner-neutral-scene.jpg` |
+| Description | Neutral scene JPEG Tagia owns; no recognizable people; no visible brands |
 | Expected | RECEIVED → CLEARED_FOR_PRODUCTION |
-| Rights statement | Customer confirms own photo, campaign use permitted, crop/adapt permitted |
+| Rights statement | Customer owns file, campaign use permitted, crop/adapt permitted, no recognizable people, no third-party material |
 
-**Tagia supply:** Provide a JPEG you own (phone photo of a neutral scene or Studio-owned test image). Place in `controlled-test-pack/01-own-photo/` before execution. Record SHA-256 in the run manifest.
+**Tagia supply:** One owned JPEG. Exact name `gate-x-owner-neutral-scene.jpg`. Place only in `tmp/gate-x-controlled-test-owner-staging/`.
 
 ---
 
@@ -43,11 +56,11 @@ Tagia approves the fixture before execution. Do not substitute real customer dat
 
 | Field | Proposed file |
 |-------|---------------|
-| Filename | `northwind-menu-scan-no-adapt.pdf` |
-| Description | Customer-owned scan but customer denies cropping/resizing/editing |
-| Expected | RIGHTS_INFORMATION_REQUIRED or CLEARED_WITH_LIMITS that blocks adaptation; production gate blocks if adaptation required |
+| Filename | `gate-x-owner-document-no-adapt.pdf` |
+| Description | Customer-owned PDF; customer denies cropping/resizing/editing |
+| Expected | CLEARED_WITH_LIMITS with `no_crop_adapt`; production gate blocks adaptation |
 
-**Tagia supply:** Any PDF you own. During upload, answer rights questions to deny crop/adapt permission.
+**Tagia supply:** One owned PDF. Exact name `gate-x-owner-document-no-adapt.pdf`. Place only in `tmp/gate-x-controlled-test-owner-staging/`. During upload, answer crop/adapt = **No**.
 
 ---
 
@@ -55,23 +68,42 @@ Tagia approves the fixture before execution. Do not substitute real customer dat
 
 | Field | Proposed file |
 |-------|---------------|
-| Filename | `northwind-team-member-portrait.jpg` |
-| Description | Photo with one clearly identifiable adult (Tagia or consenting volunteer) |
-| Expected | RIGHTS_INFORMATION_REQUIRED → likeness follow-up → cleared only with explicit consent |
+| Filename | `gate-x-owner-self-portrait.jpg` |
+| Description | Tagia self-portrait JPEG; one clearly identifiable adult |
+| Expected | QUARANTINED until likeness consent is confirmed; cleared only with explicit consent |
 
-**Tagia supply:** Portrait where the subject is Tagia or a consenting adult who approves Studio test use. Document consent in run notes (not in customer-facing copy).
+**Tagia supply:** One self-portrait JPEG. Exact name `gate-x-owner-self-portrait.jpg`. Place only in `tmp/gate-x-controlled-test-owner-staging/`. Filename contains `portrait` (intended likeness hint).
 
 ---
 
-### Case 4 — Third-party material requiring inspection
+### Case 4 — Third-party material requiring inspection (Scout-supplied)
 
 | Field | Proposed file |
 |-------|---------------|
-| Filename | `northwind-shelf-with-brand-labels.jpg` |
-| Description | Photo containing visible third-party logos, packaging, or signage |
-| Expected | TECHNICAL_REVIEW_REQUIRED or QUARANTINED until third-party material decision; may become CLEARED_WITH_LIMITS (blur/crop) or REJECTED |
+| Filename | `northwind-shelf-with-fictional-labels.jpg` |
+| Description | Scout-created illustrated shelf with **entirely fictional** product names — no real companies, no real trademarks, no copied commercial packaging, no Tagia photography |
+| Expected | `QUARANTINED` |
+| Variant | **Rights-missing** |
 
-**Tagia supply:** Shelf/product photo with obvious brand labels (grocery items, book spines, etc.). No need for real trademark conflict — test is inspection routing, not legal opinion.
+**Tagia supply:** None. Do not use Tagia photography.
+
+**Scout supply:** Fixture lives in `controlled-test-pack/04-third-party-fictional/`. Source and test-use permission: `controlled-test-pack/04-third-party-fictional/FIXTURE-SOURCE-AND-TEST-USE-PERMISSION.md`. Filename contains `shelf` (intended third-party hint).
+
+**Certification answers (exact):**
+
+| Field | Answer |
+|-------|--------|
+| Upload authority | Yes — `customer_has_permission` |
+| Commercial use permitted | Yes |
+| Crop/adapt permitted | Yes |
+| Recognizable people present | No |
+| Likeness consent | Not shown / not confirmed |
+| Third-party material present | **Yes** |
+| Third-party commercial-use authority | **Not confirmed** (leave `thirdPartyRightsConfirmed` unchecked / false) |
+
+**Expected routing:** `QUARANTINED` because `thirdPartyMaterialPresent === true` and `thirdPartyRightsConfirmed` is not true (`src/lib/studio-customer-content-intake/routing.ts`). Production not cleared. Customer-visible explanation: third-party protected material appears, but commercial-use authority is not confirmed.
+
+Live form: `validateFileRightsDraft()` must allow this honest state. Unconfirmed third-party authority is not a submit blocker; the Machine quarantines after submit and production stays blocked.
 
 ---
 
@@ -80,10 +112,10 @@ Tagia approves the fixture before execution. Do not substitute real customer dat
 | Field | Proposed file |
 |-------|---------------|
 | Filename | `northwind-corrupt.png` |
-| Description | PNG extension with invalid/corrupt bytes, or disallowed type |
+| Description | PNG extension with invalid/corrupt bytes |
 | Expected | REJECTED with clear customer message |
 
-**Tagia supply:** Scout generates a zero-byte or truncated PNG in `controlled-test-pack/05-corrupt/` during execution package (synthetic corrupt file — not a real customer asset).
+**Tagia supply:** None. Scout generates a truncated PNG in `controlled-test-pack/05-corrupt/` during the later execution package (synthetic bytes — not a customer asset).
 
 ---
 
@@ -91,11 +123,11 @@ Tagia approves the fixture before execution. Do not substitute real customer dat
 
 | Field | Proposed files |
 |-------|----------------|
-| First | `northwind-logo-v1.png` |
-| Second | `northwind-logo-v2.png` (different bytes, same slot) |
+| First | `gate-x-owner-mark-v1.png` |
+| Second | `gate-x-owner-mark-v2.png` (different bytes, same slot) |
 | Expected | First → SUPERSEDED; second → active; only v2 eligible for production |
 
-**Tagia supply:** Two distinct PNGs you own (any simple shapes/colors).
+**Tagia supply:** Two different simple owned PNG marks. Exact names `gate-x-owner-mark-v1.png` and `gate-x-owner-mark-v2.png`. Place only in `tmp/gate-x-controlled-test-owner-staging/`. Do not use the word `logo` in the filename (that token is a third-party filename hint).
 
 ---
 
@@ -103,10 +135,10 @@ Tagia approves the fixture before execution. Do not substitute real customer dat
 
 | Field | Proposed file |
 |-------|---------------|
-| Filename | Re-upload exact bytes from Case 1 |
+| Filename | Re-upload exact bytes of `gate-x-owner-neutral-scene.jpg` |
 | Expected | Duplicate detected; `duplicateKept` or equivalent; no duplicate ledger pollution |
 
-**Tagia supply:** Re-use Case 1 file bytes.
+**Tagia supply:** None. Scout re-uses Case 1 bytes already staged. No additional owner file.
 
 ---
 
@@ -114,10 +146,10 @@ Tagia approves the fixture before execution. Do not substitute real customer dat
 
 | Field | Proposed file |
 |-------|---------------|
-| Filename | Any uploaded file from earlier case |
+| Filename | An already-uploaded file from an earlier case |
 | Expected | WITHDRAWN_BY_CUSTOMER; removed from production eligibility |
 
-**Tagia supply:** Perform withdrawal action through customer UI once built; no new file needed.
+**Tagia supply:** None. Scout performs the withdrawal action through the customer UI. No additional owner file.
 
 ---
 
@@ -126,9 +158,25 @@ Tagia approves the fixture before execution. Do not substitute real customer dat
 | Field | Proposed action |
 |-------|-----------------|
 | Setup | Cases 1–8 complete; only cleared files remain eligible |
-| Expected | Simulated production-routing gate receives only CLEARED_FOR_PRODUCTION / CLEARED_WITH_LIMITS files; all others blocked with auditable reason |
+| Per-file gate | `isCustomerContentClearedForProduction` / `materialBlocksProductionUse` — SKU-agnostic; only `CLEARED_FOR_PRODUCTION` or `CLEARED_WITH_LIMITS` may pass |
+| Job-level gate | `canTransitionToBuildingConcepts` → `blockingMaterialsForSku(materials, job.skuId)` where `job.skuId` is the purchased shelf SKU `v2-rtu-promotion-graphics` |
+| Expected | Production start remains blocked while any related file is uncleared; capability id `campaign-creative` is not used as `job.skuId` |
 
-**Tagia supply:** None — verification step only.
+**Tagia supply:** None. Scout verification step only. No additional owner file.
+
+---
+
+## Owner files required (exactly five)
+
+| # | Exact filename | Case |
+|---|----------------|------|
+| 1 | `gate-x-owner-neutral-scene.jpg` | 1 (and reused by 7) |
+| 2 | `gate-x-owner-document-no-adapt.pdf` | 2 |
+| 3 | `gate-x-owner-self-portrait.jpg` | 3 |
+| 4 | `gate-x-owner-mark-v1.png` | 6 first |
+| 5 | `gate-x-owner-mark-v2.png` | 6 second |
+
+Place all five in `tmp/gate-x-controlled-test-owner-staging/` only. Do not collect them until owner review of this correction.
 
 ---
 
@@ -137,26 +185,26 @@ Tagia approves the fixture before execution. Do not substitute real customer dat
 | # | Action | Owner |
 |---|--------|-------|
 | 1 | Approve fictional test customer fixture | Tagia |
-| 2 | Supply Cases 1–4 and 6 image/PDF files to `controlled-test-pack/` | Tagia |
-| 3 | Approve likeness subject for Case 3 | Tagia (or consenting volunteer) |
-| 4 | Authorize corrupt file generation for Case 5 | Tagia (synthetic only) |
-| 5 | Confirm test campaign service SKU on Launch Now | Tagia |
-| 6 | Do not use real outside-customer files without separate authorization | Tagia |
+| 2 | After review, place the five named files in `tmp/gate-x-controlled-test-owner-staging/` | Tagia |
+| 3 | Authorize Scout to generate the Case 5 synthetic corrupt PNG | Tagia |
+| 4 | Do not use real outside-customer files without separate authorization | Tagia |
+
+Identifiers already resolved from the repository: Launch Now capability `campaign-creative`; live hire/pay shelf SKU `v2-rtu-promotion-graphics`. Case 9 uses the shelf SKU as `job.skuId`.
 
 ---
 
 ## Safe file handling rules
 
-1. Store test pack only in `controlled-test-pack/` inside the package evidence tree.  
-2. Record SHA-256 of every file in the run manifest before upload.  
-3. Do not commit real customer PII or unpaid third-party commercial assets.  
-4. Use fictional business name throughout.  
-5. Delete local copies from personal devices after SHA-256 is recorded if desired.  
-6. Do not upload until execution package is explicitly authorized.
+1. Store Scout fixtures only in `controlled-test-pack/` inside the package evidence tree. Store owner raw files only in `tmp/gate-x-controlled-test-owner-staging/` (Git-ignored by existing `tmp/`).
+2. Record SHA-256 of every file in the run manifest before upload.
+3. Git may retain only approved filenames, SHA-256 hashes, routing/certification results, manifest records, redacted screenshots, and non-personal synthetic/fictional fixtures.
+4. Never commit Tagia’s selfie, other personal photographs, original owner JPEG/PDF/PNG bytes, private EXIF/GPS, or unredacted raw uploads.
+5. Use the fictional business name throughout.
+6. Do not upload until execution is explicitly authorized.
 
 ---
 
-## Execution sequence (future — not opening)
+## Execution sequence (future — not this turn)
 
 1. Create certification campaign through live hire/pay path.  
 2. Upload Case 1; verify identity fields and CLEARED state.  

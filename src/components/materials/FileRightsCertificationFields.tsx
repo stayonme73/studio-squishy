@@ -105,15 +105,22 @@ export default function FileRightsCertificationFields({
       />
 
       {values.recognizablePeoplePresent === true ? (
-        <label className="sb-materials-intake__attest">
-          <input
-            type="checkbox"
-            checked={values.likenessConsentConfirmed === true}
-            disabled={disabled}
-            onChange={(event) => onChange("likenessConsentConfirmed", event.target.checked)}
-          />
-          <span>{copy.likenessConsent}</span>
-        </label>
+        <>
+          <label className="sb-materials-intake__attest">
+            <input
+              type="checkbox"
+              checked={values.likenessConsentConfirmed === true}
+              disabled={disabled}
+              onChange={(event) => onChange("likenessConsentConfirmed", event.target.checked)}
+            />
+            <span>{copy.likenessConsent}</span>
+          </label>
+          {values.likenessConsentConfirmed !== true ? (
+            <p className="sb-materials-intake__rights-disclaimer" role="note">
+              {copy.likenessConsentUnresolvedHold}
+            </p>
+          ) : null}
+        </>
       ) : null}
 
       <YesNoField
@@ -128,15 +135,22 @@ export default function FileRightsCertificationFields({
       />
 
       {values.thirdPartyMaterialPresent === true ? (
-        <label className="sb-materials-intake__attest">
-          <input
-            type="checkbox"
-            checked={values.thirdPartyRightsConfirmed === true}
-            disabled={disabled}
-            onChange={(event) => onChange("thirdPartyRightsConfirmed", event.target.checked)}
-          />
-          <span>{copy.thirdPartyRights}</span>
-        </label>
+        <>
+          <label className="sb-materials-intake__attest">
+            <input
+              type="checkbox"
+              checked={values.thirdPartyRightsConfirmed === true}
+              disabled={disabled}
+              onChange={(event) => onChange("thirdPartyRightsConfirmed", event.target.checked)}
+            />
+            <span>{copy.thirdPartyRights}</span>
+          </label>
+          {values.thirdPartyRightsConfirmed !== true ? (
+            <p className="sb-materials-intake__rights-disclaimer" role="note">
+              {copy.thirdPartyRightsUnresolvedHold}
+            </p>
+          ) : null}
+        </>
       ) : null}
     </div>
   );

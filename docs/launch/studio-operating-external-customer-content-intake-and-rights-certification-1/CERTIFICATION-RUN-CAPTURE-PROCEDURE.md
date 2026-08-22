@@ -8,7 +8,7 @@ Only after:
 
 1. Gate X completion pass is accepted
 2. Controlled Customer-One test is explicitly authorized
-3. Test file pack is collected per `CONTROLLED-CUSTOMER-ONE-TEST-PLAN.md`
+3. Owner files are in ignored staging `tmp/gate-x-controlled-test-owner-staging/` per `OWNER-FILE-STAGING-PROCEDURE.md`; Scout fixtures are in `controlled-test-pack/`
 
 Do **not** record a certification run during implementation-only proof tests.
 

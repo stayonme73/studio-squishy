@@ -9,12 +9,15 @@ import { createMockFileRoomStorageAdapter } from "@/lib/file-storage/mock";
 import { buildJobId } from "@/lib/job-control/lane-map";
 import { canTransitionToBuildingConcepts } from "@/lib/job-control/production-workspace-gates";
 import { materialBlocksProductionUse } from "@/lib/studio-material-use";
+import { getServiceById } from "@/catalog/accessors";
 import {
   applyCustomerWithdrawFile,
   buildGateXCertificationRunManifest,
   certifyCustomerMaterialUpload,
+  contentRoutingExplanation,
   inspectCustomerFileBytes,
   isCustomerContentClearedForProduction,
+  jobHasUnclearedCustomerContent,
   resolveContentRoutingState,
   syntheticCorruptPngFile,
   syntheticFakePngFile,
@@ -23,6 +26,7 @@ import {
   SYNTHETIC_PNG_1X1_BYTES,
   teamResolvesTechnicalContentReview,
 } from "@/lib/studio-customer-content-intake";
+import { fileRightsDraftToInput, validateFileRightsDraft } from "@/lib/materials/materials-intake-rights-form";
 import { buildCustomerContentRightsRecord } from "@/lib/studio-customer-content-intake/rights-record";
 import { applyTeamReview } from "@/lib/materials/actions";
 import { storeAndAttachCustomerMaterialFile } from "@/lib/materials/client-file-store";
@@ -544,5 +548,68 @@ describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICA
     expect(manifest.entries).toHaveLength(1);
     expect(manifest.entries[0]?.certificationId).toBe(cert.certification.certificationId);
     expect(manifest.manifestSha256).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  it("Case 4: honest unresolved third-party rights can be submitted, quarantined, and blocked from production", async () => {
+    const shelfSku =
+      studioExternalCustomerContentIntakeAndRightsCertificationV1.customerFacingCampaignGraphicsShelfSku;
+    const capabilityId =
+      studioExternalCustomerContentIntakeAndRightsCertificationV1.launchNowCampaignCreativeSku;
+    const case4Draft = {
+      useAuthorizationBasis: "customer_has_permission" as const,
+      commercialUsePermitted: true,
+      cropAdaptPermitted: true,
+      recognizablePeoplePresent: false,
+      thirdPartyMaterialPresent: true,
+    };
+
+    expect(validateFileRightsDraft(case4Draft, "photo-video").ok).toBe(true);
+    expect(getServiceById(shelfSku)?.id).toBe(shelfSku);
+    expect(getServiceById(capabilityId)).toBeUndefined();
+
+    const adapter = createMockFileRoomStorageAdapter();
+    const stored = await storeAndAttachCustomerMaterialFile({
+      adapter,
+      campaign: campaign(),
+      campaignClientUserId: client.id,
+      tasks: tasks(),
+      materials: materials([photoItem()]),
+      user: client,
+      file: syntheticPngFile("northwind-shelf-with-fictional-labels.png"),
+      consolidatedItemId: "photo-video:file-metadata",
+      useAuthorizationBasis: "customer_has_permission",
+      rightsInput: fileRightsDraftToInput(case4Draft),
+    });
+    expect(stored.ok).toBe(true);
+    if (!stored.ok) return;
+
+    const item = stored.materials.items[0]!;
+    const cert = item.contentCertification;
+    expect(cert?.routingState).toBe("QUARANTINED");
+    expect(cert?.productionCleared).toBe(false);
+    expect(cert?.rights.thirdPartyMaterialPresent).toBe(true);
+    expect(cert?.rights.thirdPartyRightsConfirmed).toBe(false);
+    expect(isCustomerContentClearedForProduction(item)).toBe(false);
+    expect(materialBlocksProductionUse(item, CAMPAIGN_ID)).toBe(true);
+
+    const explanation = contentRoutingExplanation({
+      routingState: cert!.routingState,
+      productionBlockReason: cert!.productionBlockReason,
+      rights: cert!.rights,
+    });
+    expect(explanation).toContain("Third-party protected material");
+    expect(explanation).toContain("commercial-use authority is not confirmed");
+
+    const gate = canTransitionToBuildingConcepts(
+      tasks().jobRecords![0]!,
+      stored.materials.items,
+      [{ lane: "quick", availableSlots: 2, activeJobs: [] }],
+    );
+    expect(gate.allowed).toBe(false);
+    expect(gate.reasons.some((reason) => reason.code === "materials_incomplete")).toBe(true);
+
+    const shelfBoundItem = { ...item, relatedServiceIds: [shelfSku] as const };
+    expect(jobHasUnclearedCustomerContent([shelfBoundItem], shelfSku)).toBe(true);
+    expect(jobHasUnclearedCustomerContent([shelfBoundItem], capabilityId)).toBe(false);
   });
 });

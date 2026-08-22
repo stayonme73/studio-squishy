@@ -4,7 +4,7 @@
  */
 
 export const studioCustomerContentRightsAttestationV1 = {
-  version: "gate-x-rights-attestation-v1-2026-08-22" as const,
+  version: "gate-x-rights-attestation-v1-2026-08-22-honest-hold" as const,
   disclaimer:
     "These confirmations record your representations for this file. They do not guarantee legal ownership. The Studio uses them to control production use for your project." as const,
   uploadAuthority:
@@ -16,10 +16,14 @@ export const studioCustomerContentRightsAttestationV1 = {
   recognizablePeopleQuestion: "Does this file show recognizable people?" as const,
   likenessConsent:
     "Everyone shown has given appropriate consent for commercial use in this project." as const,
+  likenessConsentUnresolvedHold:
+    "If you cannot confirm this, you may still send the file. The Studio will hold it out of production until likeness consent is confirmed." as const,
   thirdPartyMaterialQuestion:
     "Does this file include third-party logos, artwork, trademarks, photography, or other protected material?" as const,
   thirdPartyRights:
     "I have authority for commercial use of that third-party material in this project." as const,
+  thirdPartyRightsUnresolvedHold:
+    "If you cannot confirm this, you may still send the file. The Studio will hold it out of production until authority is confirmed." as const,
   validation: {
     uploadAuthorityRequired:
       "Please confirm you own this file or have permission to provide it before sending." as const,

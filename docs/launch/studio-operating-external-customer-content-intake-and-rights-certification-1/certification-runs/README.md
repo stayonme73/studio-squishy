@@ -23,10 +23,11 @@ certification-runs/
 
 ## Status
 
-**Structure and capture procedure are ready.**  
-No controlled-test manifest has been recorded yet.  
-Do not place Tagia's photographs here until the completion pass is accepted and  
-the controlled Customer-One test is authorized.
+**Structure and capture procedure are ready.**
+
+No controlled-test manifest has been recorded yet.
+
+Owner raw photographs never enter this Git-tracked folder. After an authorized run, this folder may hold manifests, hashes, routing records, and redacted screenshots only.
 
 ## Procedure
 

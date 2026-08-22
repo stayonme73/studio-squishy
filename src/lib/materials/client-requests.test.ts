@@ -230,6 +230,84 @@ describe("resolveOptionalClientRequests", () => {
     expect(optional[0]?.canSubmit).toBe(true);
     expect(optional[0]?.fileName).toBe("maya-optional-mark.png");
   });
+
+  it("surfaces Case 4 quarantine explanation on the customer request payload", () => {
+    const stored: CampaignMaterialItem = {
+      id: "photo-case-4",
+      category: "photo-video",
+      requirementLevel: "required",
+      reviewStatus: "submitted",
+      contentKind: "file-metadata",
+      label: "Photos",
+      reason: "Make My Campaign Graphics",
+      relatedServiceIds: ["v2-rtu-promotion-graphics"],
+      uploadStatus: "stored",
+      fileName: "northwind-shelf-with-fictional-labels.jpg",
+      submittedAt: now,
+      contentCertification: {
+        schemaVersion: 1,
+        packageId: "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1",
+        certificationId: "ccert-case-4",
+        routingState: "QUARANTINED",
+        routingStateAt: now,
+        technical: {
+          inspectedAt: now,
+          packageId: "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1",
+          originalFileName: "northwind-shelf-with-fictional-labels.jpg",
+          declaredMimeType: "image/jpeg",
+          verifiedMimeType: "image/jpeg",
+          signatureMatch: true,
+          byteSize: 12,
+          sha256: "abc",
+          imageWidth: 1,
+          imageHeight: 1,
+          corrupt: false,
+          supported: true,
+          passwordProtected: false,
+          duplicateOfSha256: null,
+          issues: [],
+        },
+        rights: {
+          recordedAt: now,
+          packageId: "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1",
+          customerProvided: true,
+          ownershipBasis: "customer_has_permission",
+          campaignUsePermitted: true,
+          cropAdaptPermitted: true,
+          commercialUsePermitted: true,
+          attributionRequired: null,
+          statementComplete: true,
+          likenessReviewRequired: false,
+          thirdPartyMaterialReviewRequired: true,
+          likenessConsentConfirmed: false,
+          thirdPartyRightsConfirmed: false,
+          recognizablePeoplePresent: false,
+          thirdPartyMaterialPresent: true,
+          likenessFilenameHint: false,
+          thirdPartyFilenameHint: true,
+          rightsAnswersContradictFilenameHints: false,
+          attestationTextVersion: "gate-x-rights-attestation-v1-2026-08-22-honest-hold",
+        },
+        productionCleared: false,
+        productionBlockReason:
+          "This file needs customer third-party rights confirmation before production use.",
+        limits: [],
+        history: [],
+      },
+    };
+
+    const consolidated = resolveConsolidatedClientRequests({
+      campaignId: "c-case-4",
+      items: [stored],
+      updatedAt: now,
+      version: 1,
+    });
+    const sanitized = sanitizeClientConsolidatedRequests(consolidated);
+    expect(sanitized[0]?.contentRoutingState).toBe("QUARANTINED");
+    expect(sanitized[0]?.contentRoutingExplanation).toContain(
+      "commercial-use authority is not confirmed",
+    );
+  });
 });
 
 describe("client intake visibility (Slice 3d-c-c)", () => {

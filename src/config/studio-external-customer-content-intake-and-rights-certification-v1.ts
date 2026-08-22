@@ -102,6 +102,14 @@ export const studioExternalCustomerContentIntakeAndRightsCertificationV1 = {
       "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/certification-runs" as const,
   },
 
+  /** Canonical owner raw-file staging. Covered by existing `tmp/` gitignore. Never commit contents. */
+  ownerRawFileStagingDir: "tmp/gate-x-controlled-test-owner-staging" as const,
+
+  /** Launch Now capability / Room 4C routing id — not a catalog checkout ServiceId. */
+  launchNowCampaignCreativeSku: "campaign-creative" as const,
+  /** Live Route Map V2 shelf SKU for campaign graphics hire/pay. Case 9 job.skuId. */
+  customerFacingCampaignGraphicsShelfSku: "v2-rtu-promotion-graphics" as const,
+
   openingArtifactsOnly: true as const,
   recommendedFirstExecutionStep:
     "Implement per-file routing states and durable rights records on the live MaterialsIntakePanel → /api/campaigns/{id}/materials path; then run the controlled Customer-One test pack." as const,

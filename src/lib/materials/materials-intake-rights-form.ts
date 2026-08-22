@@ -63,15 +63,11 @@ export function validateFileRightsDraft(
   if (draft.recognizablePeoplePresent === undefined) {
     return { ok: false, error: copy.recognizablePeopleRequired };
   }
-  if (draft.recognizablePeoplePresent === true && draft.likenessConsentConfirmed !== true) {
-    return { ok: false, error: copy.likenessConsentRequired };
-  }
   if (draft.thirdPartyMaterialPresent === undefined) {
     return { ok: false, error: copy.thirdPartyMaterialRequired };
   }
-  if (draft.thirdPartyMaterialPresent === true && draft.thirdPartyRightsConfirmed !== true) {
-    return { ok: false, error: copy.thirdPartyRightsRequired };
-  }
+  // Presence must be answered. Unconfirmed likeness / third-party authority is an
+  // honest submit: routing quarantines and production stays blocked.
 
   return { ok: true };
 }

@@ -69,24 +69,32 @@ describe("materials-intake-rights-form", () => {
     ).toBe(false);
   });
 
-  it("blocks submit when likeness is present without consent confirmation", () => {
+  it("allows honest submit when likeness is present without consent confirmation", () => {
     const result = validateFileRightsDraft(
       completeRightsDraft({ recognizablePeoplePresent: true }),
       "photo-video",
     );
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.error).toContain("likeness");
+    expect(result.ok).toBe(true);
   });
 
-  it("blocks submit when third-party material is present without rights confirmation", () => {
+  it("allows honest submit when third-party material is present without rights confirmation", () => {
+    const case4Draft = completeRightsDraft({
+      useAuthorizationBasis: "customer_has_permission",
+      thirdPartyMaterialPresent: true,
+    });
+    const result = validateFileRightsDraft(case4Draft, "photo-video");
+    expect(result.ok).toBe(true);
+    expect(case4Draft.thirdPartyRightsConfirmed).not.toBe(true);
+  });
+
+  it("still blocks submit when commercial use is denied", () => {
     const result = validateFileRightsDraft(
-      completeRightsDraft({ thirdPartyMaterialPresent: true }),
+      completeRightsDraft({ commercialUsePermitted: false }),
       "photo-video",
     );
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.error).toContain("third-party");
+    expect(result.error).toBe(studioCustomerContentRightsAttestationV1.validation.commercialUseDenied);
   });
 
   it("maps a complete draft into certification input with attestation version", () => {

@@ -129,5 +129,7 @@ Do not close on tests green alone. Requires BUILD → BREAK → USE LIKE A CUSTO
 | `EXISTING-CUSTOMER-UPLOAD-AND-ROUTING-MAP.md` | Honest route map from discovery |
 | `ACCEPTANCE-AND-CERTIFICATION-MATRIX.md` | Requirement → evidence mapping |
 | `CONTROLLED-CUSTOMER-ONE-TEST-PLAN.md` | Later controlled test design |
-| `controlled-test-pack/` | Owner-supplied test files (not created in opening) |
+| `OWNER-FILE-STAGING-PROCEDURE.md` | Canonical ignored staging path and Tagia transfer names |
+| `controlled-test-pack/` | Scout-supplied fictional/synthetic fixtures only — never owner raw files |
+| `tmp/gate-x-controlled-test-owner-staging/` | Canonical Git-ignored owner raw-file staging (not created in Git) |
 | `certification-runs/` | Sealed run evidence (future) |
