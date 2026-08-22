@@ -47,6 +47,18 @@ Root cause:
 
 Required correction: a valid technical fixture must not accidentally divert this rights test; unresolved third-party rights must route to `QUARANTINED` even if concurrent technical findings are recorded; team technical approval must never clear unresolved third-party rights.
 
+## Supplemental retest
+
+Directory: `certification-runs/gate-x-run-2026-08-22T232853529Z/`  
+Manifest SHA-256: `77f1dbf62b634bc5d695476f855d2dccf8e4bcd273260078bcf39b4f4d1073ab`  
+Campaign: `2d6ea4d7-230d-42b4-94a1-6b0fa8f1f46a`
+
+Actual supplemental outcomes:
+
+- Case 2: `CLEARED_WITH_LIMITS` with `cropAdaptPermitted=false` and `limits=["no_crop_adapt"]`
+- Case 4: `QUARANTINED` with `thirdPartyMaterialPresent=true`, authority unconfirmed, and no technical-review diversion
+- Case 9 recheck: `canTransitionToBuildingConcepts.allowed=false` (`materials_incomplete`); uncleared certified file is the Case 4 logo-brand slot
+
 ## Package recommendation
 
 Gate X remains **OPEN**. No close. No merge. Room 5 remains `NOT_STARTED`. Register tip `5c22de9` remains untouched.

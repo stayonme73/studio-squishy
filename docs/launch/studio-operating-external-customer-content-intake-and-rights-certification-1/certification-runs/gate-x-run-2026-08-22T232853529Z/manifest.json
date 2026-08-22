@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "packageId": "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1",
+  "runId": "gate-x-run-2026-08-22T232853529Z",
+  "capturedAt": "2026-08-22T23:28:53.529Z",
+  "campaignId": "2d6ea4d7-230d-42b4-94a1-6b0fa8f1f46a",
+  "procedure": "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/CERTIFICATION-RUN-CAPTURE-PROCEDURE.md",
+  "entries": [
+    {
+      "materialItemId": "document-reference-v2-rtu-promotion-graphics-slot",
+      "certificationId": "ccert-2026-08-22T232822330Z-d03a6831-a006-45e2-b977-3e407df5c14a",
+      "routingState": "CLEARED_WITH_LIMITS",
+      "sha256": "ca95f5d76a62f741254e0962e8b0d14b9d9191ccf983c4dbc8688d05448bc1f6",
+      "originalFileName": "gate-x-owner-document-no-adapt.pdf",
+      "archiveCount": 0,
+      "productionCleared": true
+    },
+    {
+      "materialItemId": "logo-brand-v2-rtu-promotion-graphics-slot",
+      "certificationId": "ccert-2026-08-22T232825102Z-a5e64029-e8d6-4ea3-b880-8bd04d6147ea",
+      "routingState": "QUARANTINED",
+      "sha256": "6f7e9f3549ac975c3f522bcb60ca23d779816db7e613920937b459a1c999305a",
+      "originalFileName": "northwind-shelf-with-fictional-labels.jpg",
+      "archiveCount": 0,
+      "productionCleared": false
+    }
+  ],
+  "manifestSha256": "77f1dbf62b634bc5d695476f855d2dccf8e4bcd273260078bcf39b4f4d1073ab"
+}
