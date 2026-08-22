@@ -22,6 +22,8 @@ export function certifyCustomerMaterialUpload(input: {
   evaluatedAt?: string;
   priorCertification?: CustomerContentCertification | null;
   duplicateOfSha256?: string | null;
+  certificationId?: string;
+  replacesCertificationId?: string;
 }):
   | { ok: true; certification: CustomerContentCertification }
   | { ok: false; error: string; status: number; certification?: CustomerContentCertification } {
@@ -49,6 +51,8 @@ export function certifyCustomerMaterialUpload(input: {
       rights,
       evaluatedAt,
       prior: input.priorCertification,
+      certificationId: input.certificationId,
+      replacesCertificationId: input.replacesCertificationId,
     });
     return { ok: false, error: reject.reason, status: 400, certification };
   }
@@ -67,6 +71,8 @@ export function certifyCustomerMaterialUpload(input: {
     rights,
     evaluatedAt,
     prior: input.priorCertification,
+    certificationId: input.certificationId,
+    replacesCertificationId: input.replacesCertificationId,
   });
 
   return { ok: true, certification };

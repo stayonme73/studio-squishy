@@ -15,8 +15,13 @@ import { appendJobActivityEvent } from "@/lib/job-control/activity-log";
 import type { JobActivityActor, PurchasedJobRecord } from "@/lib/job-control/types";
 import {
   certifyCustomerMaterialUpload,
+  newContentCertificationId,
   type CustomerContentRightsInput,
 } from "@/lib/studio-customer-content-intake";
+import {
+  canReplaceStoredCustomerFile,
+  prepareSupersessionArchive,
+} from "@/lib/studio-customer-content-intake/supersession";
 
 import { parseConsolidatedRequestId } from "./client-requests";
 import { applyClientSubmitConsolidated, applyClientSubmitItem } from "./actions";
@@ -188,7 +193,9 @@ export async function storeAndAttachCustomerMaterialFile(input: {
   }
 
   const attachable = targets.filter(canAttachStoredFile);
-  if (attachable.length === 0) {
+  const replaceable = targets.filter(canReplaceStoredCustomerFile);
+  const openTargets = attachable.length > 0 ? attachable : replaceable;
+  if (openTargets.length === 0) {
     if (targets.some(isPrivateStoredMaterial)) {
       return {
         ok: false,
@@ -199,8 +206,23 @@ export async function storeAndAttachCustomerMaterialFile(input: {
     return { ok: false, error: "This item is not open for client submission.", status: 400 };
   }
 
-  const ids = attachable.map((item) => item.id);
-  const firstItem = attachable[0]!;
+  const ids = openTargets.map((item) => item.id);
+  const firstItem = openTargets[0]!;
+  const isReplacement = attachable.length === 0 && replaceable.length > 0;
+  const occurredAt = new Date().toISOString();
+  const newCertificationId = newContentCertificationId(occurredAt);
+
+  let contentCertificationArchive = firstItem.contentCertificationArchive ?? [];
+  let replacesCertificationId: string | undefined;
+  if (isReplacement && firstItem.contentCertification) {
+    const supersession = prepareSupersessionArchive({
+      item: firstItem,
+      supersededByCertificationId: newCertificationId,
+      evaluatedAt: occurredAt,
+    });
+    contentCertificationArchive = supersession.contentCertificationArchive;
+    replacesCertificationId = firstItem.contentCertification.certificationId;
+  }
 
   const certificationResult = certifyCustomerMaterialUpload({
     category: firstItem.category,
@@ -213,9 +235,13 @@ export async function storeAndAttachCustomerMaterialFile(input: {
       cropAdaptPermitted: input.rightsInput?.cropAdaptPermitted,
       commercialUsePermitted: input.rightsInput?.commercialUsePermitted,
       attributionRequired: input.rightsInput?.attributionRequired,
+      likenessConsentConfirmed: input.rightsInput?.likenessConsentConfirmed,
+      thirdPartyRightsConfirmed: input.rightsInput?.thirdPartyRightsConfirmed,
     },
-    evaluatedAt: new Date().toISOString(),
-    priorCertification: firstItem.contentCertification ?? null,
+    evaluatedAt: occurredAt,
+    priorCertification: isReplacement ? null : (firstItem.contentCertification ?? null),
+    certificationId: newCertificationId,
+    replacesCertificationId,
   });
   if (!certificationResult.ok) {
     return {
@@ -234,7 +260,7 @@ export async function storeAndAttachCustomerMaterialFile(input: {
   };
 
   let workingMaterials = input.materials;
-  const openForSubmit = attachable.filter(needsLedgerSubmit);
+  const openForSubmit = openTargets.filter(needsLedgerSubmit);
   if (openForSubmit.length > 0) {
     const submitted =
       input.consolidatedItemId && parseConsolidatedRequestId(input.consolidatedItemId)
@@ -260,7 +286,6 @@ export async function storeAndAttachCustomerMaterialFile(input: {
     input.campaignClientUserId ?? undefined,
     input.campaign.campaignId,
   );
-  const occurredAt = new Date().toISOString();
   const scope = {
     clientId,
     campaignId: input.campaign.campaignId,
@@ -347,6 +372,7 @@ export async function storeAndAttachCustomerMaterialFile(input: {
           storageRef: boundRef,
           fileRegistryRefs: [registry.file],
           contentCertification,
+          contentCertificationArchive,
         }
       : item,
   );

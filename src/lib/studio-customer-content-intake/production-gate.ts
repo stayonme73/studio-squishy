@@ -19,6 +19,9 @@ export function isCustomerContentClearedForProduction(item: CampaignMaterialItem
   const cert = item.contentCertification;
   if (!cert) return false;
   if (cert.withdrawnAt) return false;
+  if (cert.routingState === "WITHDRAWN_BY_CUSTOMER" || cert.routingState === "SUPERSEDED") {
+    return false;
+  }
   if (!cert.productionCleared) return false;
   return PRODUCTION_CLEARED_STATES.has(cert.routingState);
 }

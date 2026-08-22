@@ -40,6 +40,10 @@ import { getOrInitializeMaterials, writeMaterialsEnvelope } from "@/lib/material
 import { recoverPaidOperatingChain } from "@/lib/studio-paid-activation-recovery";
 import { ensureDispatchExecution } from "@/lib/studio-dispatch";
 import { deliverLifecycleNoticesForCampaign } from "@/lib/studio-lifecycle-email/campaign";
+import {
+  applyCustomerWithdrawFile,
+  resolveWithdrawTargetItemId,
+} from "@/lib/studio-customer-content-intake";
 import type { MaterialReviewStatus, ServerMaterialsEnvelope } from "@/lib/materials/types";
 import { appendMaterialActivityEvent } from "@/lib/project-activity/actions";
 import type { ServerCampaignEnvelope, StudioUser } from "@/lib/campaign-store/types";
@@ -66,6 +70,11 @@ type MaterialsPatchBody =
       itemId: string;
       reviewStatus: MaterialReviewStatus;
       teamNote?: string;
+    }
+  | {
+      action: "customer_withdraw_file";
+      itemId?: string;
+      consolidatedItemId?: string;
     };
 
 function resolveMaterialsAudience(
@@ -302,6 +311,8 @@ export async function PATCH(request: Request, context: RouteContext) {
         cropAdaptPermitted: parseBool("cropAdaptPermitted"),
         commercialUsePermitted: parseBool("commercialUsePermitted"),
         attributionRequired: parseBool("attributionRequired"),
+        likenessConsentConfirmed: parseBool("likenessConsentConfirmed"),
+        thirdPartyRightsConfirmed: parseBool("thirdPartyRightsConfirmed"),
       },
     });
     if (!stored.ok) {
@@ -340,7 +351,8 @@ export async function PATCH(request: Request, context: RouteContext) {
   let result:
     | ReturnType<typeof applyClientSubmitConsolidated>
     | ReturnType<typeof applyClientSubmitItem>
-    | ReturnType<typeof applyTeamReview>;
+    | ReturnType<typeof applyTeamReview>
+    | ReturnType<typeof applyCustomerWithdrawFile>;
   let submittedItemIds: string[] = [];
 
   switch (body.action) {
@@ -400,6 +412,23 @@ export async function PATCH(request: Request, context: RouteContext) {
         body.teamNote,
         user,
       );
+      break;
+    }
+    case "customer_withdraw_file": {
+      if (!canSubmitMaterials(user, campaignId, campaignEnvelope)) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      const withdrawItemId = resolveWithdrawTargetItemId(materialsEnvelope, {
+        itemId: body.itemId,
+        consolidatedItemId: body.consolidatedItemId,
+      });
+      if (!withdrawItemId) {
+        return NextResponse.json(
+          { error: "No stored file is available to withdraw on this request." },
+          { status: 400 },
+        );
+      }
+      result = applyCustomerWithdrawFile(materialsEnvelope, withdrawItemId);
       break;
     }
     default:

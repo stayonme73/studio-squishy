@@ -2,6 +2,7 @@ import { studioExternalCustomerContentIntakeAndRightsCertificationV1 } from "@/c
 import { categoryRequiresUseClearance } from "@/lib/studio-material-use";
 import type { MaterialCategory } from "@/lib/materials/types";
 
+import { newContentCertificationId } from "./certification-id";
 import {
   rightsMissingCropAdaptPermission,
   rightsNeedFollowUp,
@@ -94,14 +95,25 @@ export function resolveContentRoutingState(input: {
     };
   }
 
-  if (rights.likenessReviewRequired || rights.thirdPartyMaterialReviewRequired) {
+  if (rights.likenessReviewRequired && !rights.likenessConsentConfirmed) {
     return {
       routingState: "QUARANTINED",
       productionCleared: false,
       productionBlockReason:
-        "This file needs Studio review for likeness or third-party material before production use.",
+        "This file needs customer likeness consent before production use.",
       limits: [],
-      reason: "Likeness or third-party material review required.",
+      reason: "Likeness consent not confirmed by customer.",
+    };
+  }
+
+  if (rights.thirdPartyMaterialReviewRequired && !rights.thirdPartyRightsConfirmed) {
+    return {
+      routingState: "QUARANTINED",
+      productionCleared: false,
+      productionBlockReason:
+        "This file needs customer third-party rights confirmation before production use.",
+      limits: [],
+      reason: "Third-party rights not confirmed by customer.",
     };
   }
 
@@ -150,6 +162,8 @@ export function buildCustomerContentCertification(input: {
   rights: CustomerContentRightsRecord;
   evaluatedAt?: string;
   prior?: CustomerContentCertification | null;
+  certificationId?: string;
+  replacesCertificationId?: string;
 }): CustomerContentCertification {
   const evaluatedAt = input.evaluatedAt ?? new Date().toISOString();
   const resolved = resolveContentRoutingState({
@@ -159,10 +173,13 @@ export function buildCustomerContentCertification(input: {
     evaluatedAt,
   });
   const priorState = input.prior?.routingState ?? null;
+  const certificationId =
+    input.certificationId ?? input.prior?.certificationId ?? newContentCertificationId(evaluatedAt);
 
   return {
     schemaVersion: 1,
     packageId: PACKAGE_ID,
+    certificationId,
     routingState: resolved.routingState,
     routingStateAt: evaluatedAt,
     technical: input.technical,
@@ -170,6 +187,8 @@ export function buildCustomerContentCertification(input: {
     productionCleared: resolved.productionCleared,
     productionBlockReason: resolved.productionBlockReason,
     limits: [...resolved.limits],
+    replacesCertificationId: input.replacesCertificationId ?? input.prior?.replacesCertificationId,
+    teamTechnicalReview: input.prior?.teamTechnicalReview,
     history: [
       ...(input.prior?.history ?? []),
       historyEntry(priorState, resolved.routingState, resolved.reason, evaluatedAt),
@@ -220,6 +239,43 @@ export function markContentCertificationSuperseded(
   };
 }
 
+export function teamResolvesTechnicalContentReview(
+  certification: CustomerContentCertification,
+  category: MaterialCategory,
+  evaluatedAt?: string,
+): CustomerContentCertification {
+  const at = evaluatedAt ?? new Date().toISOString();
+  if (certification.routingState !== "TECHNICAL_REVIEW_REQUIRED") {
+    return certification;
+  }
+
+  const technical: CustomerContentTechnicalInspection = {
+    ...certification.technical,
+    signatureMatch: true,
+    supported: true,
+    corrupt: false,
+    passwordProtected: false,
+    issues: [],
+  };
+
+  return buildCustomerContentCertification({
+    category,
+    technical,
+    rights: certification.rights,
+    evaluatedAt: at,
+    prior: {
+      ...certification,
+      teamTechnicalReview: {
+        clearedAt: at,
+        clearedBy: "team",
+        note: "Team resolved authorized technical-review condition.",
+      },
+    },
+    certificationId: certification.certificationId,
+  });
+}
+
+/** @deprecated Team approval cannot fabricate customer rights — use teamResolvesTechnicalContentReview. */
 export function teamClearsContentCertification(
   certification: CustomerContentCertification,
   evaluatedAt?: string,

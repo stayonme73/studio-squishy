@@ -480,6 +480,32 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
     }
   };
 
+  const withdrawStoredFile = async (input: { id: string; kind: "consolidated" | "optional" }) => {
+    setSubmittingId(input.id);
+    setError(null);
+    setSuccessId(null);
+    setReceiptMessage(null);
+    try {
+      const res = await fetch(materialsEndpoint, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          input.kind === "consolidated"
+            ? { action: "customer_withdraw_file", consolidatedItemId: input.id }
+            : { action: "customer_withdraw_file", itemId: input.id },
+        ),
+      });
+      const json = (await res.json()) as MaterialsClientResponse;
+      if (!res.ok) throw new Error(json.error ?? `Withdraw failed (${res.status})`);
+      finishSubmit(input.id, json);
+      setReceiptMessage("We withdrew this file. It is no longer cleared for production use.");
+    } catch (withdrawError) {
+      setError(withdrawError instanceof Error ? withdrawError.message : "Withdraw failed.");
+    } finally {
+      setSubmittingId(null);
+    }
+  };
+
   const optionalPrompt = (request: ClientOptionalRequest): string => {
     if (request.category === "logo-brand") return studioMaterialsUploadV1.customerCopy.optionalLogoPrompt;
     if (request.category === "photo-video") return studioMaterialsUploadV1.customerCopy.optionalPhotoPrompt;
@@ -573,6 +599,16 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                         <p className="sb-materials-intake__routing-state" role="status">
                           {request.contentRoutingLabel}
                         </p>
+                      ) : null}
+                      {request.canWithdrawFile ? (
+                        <button
+                          type="button"
+                          className="utility-btn sb-materials-intake__withdraw"
+                          disabled={submittingId === request.id}
+                          onClick={() => void withdrawStoredFile({ id: request.id, kind: "consolidated" })}
+                        >
+                          Withdraw this file
+                        </button>
                       ) : null}
                     </div>
                     {request.canSubmit ? (
@@ -696,6 +732,16 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                         <p className="sb-materials-intake__routing-state" role="status">
                           {request.contentRoutingLabel}
                         </p>
+                      ) : null}
+                      {request.canWithdrawFile ? (
+                        <button
+                          type="button"
+                          className="utility-btn sb-materials-intake__withdraw"
+                          disabled={submittingId === request.id}
+                          onClick={() => void withdrawStoredFile({ id: request.id, kind: "optional" })}
+                        >
+                          Withdraw this file
+                        </button>
                       ) : null}
                     </div>
                     {request.canSubmit ? (

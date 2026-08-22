@@ -75,6 +75,8 @@ export function buildCustomerContentRightsRecord(input: {
     statementComplete,
     likenessReviewRequired,
     thirdPartyMaterialReviewRequired,
+    likenessConsentConfirmed: input.rightsInput?.likenessConsentConfirmed === true,
+    thirdPartyRightsConfirmed: input.rightsInput?.thirdPartyRightsConfirmed === true,
   };
 }
 
@@ -89,7 +91,6 @@ export function rightsNeedFollowUp(
   if (!categoryRequiresUseClearance(category)) return false;
   if (!rights.ownershipBasis) return true;
   if (!rights.statementComplete) return true;
-  if (rights.likenessReviewRequired && !rights.ownershipBasis) return true;
   return false;
 }
 

@@ -42,6 +42,16 @@ export type CustomerContentRightsRecord = {
   statementComplete: boolean;
   likenessReviewRequired: boolean;
   thirdPartyMaterialReviewRequired: boolean;
+  /** Customer-only attestation — team approval cannot substitute. */
+  likenessConsentConfirmed: boolean;
+  /** Customer-only attestation — team approval cannot substitute. */
+  thirdPartyRightsConfirmed: boolean;
+};
+
+export type CustomerContentTeamTechnicalReview = {
+  clearedAt: string;
+  clearedBy: "team";
+  note?: string;
 };
 
 export type CustomerContentRoutingHistoryEntry = {
@@ -54,6 +64,7 @@ export type CustomerContentRoutingHistoryEntry = {
 export type CustomerContentCertification = {
   schemaVersion: 1;
   packageId: string;
+  certificationId: string;
   routingState: ContentRoutingState;
   routingStateAt: string;
   technical: CustomerContentTechnicalInspection;
@@ -62,8 +73,11 @@ export type CustomerContentCertification = {
   productionBlockReason: string | null;
   limits: readonly string[];
   history: readonly CustomerContentRoutingHistoryEntry[];
+  replacesCertificationId?: string;
+  supersededByCertificationId?: string;
   supersededByMaterialId?: string;
   withdrawnAt?: string;
+  teamTechnicalReview?: CustomerContentTeamTechnicalReview;
 };
 
 export type CustomerContentRightsInput = {
@@ -71,6 +85,8 @@ export type CustomerContentRightsInput = {
   cropAdaptPermitted?: boolean;
   commercialUsePermitted?: boolean;
   attributionRequired?: boolean;
+  likenessConsentConfirmed?: boolean;
+  thirdPartyRightsConfirmed?: boolean;
 };
 
 export type CertifyCustomerMaterialUploadInput = {

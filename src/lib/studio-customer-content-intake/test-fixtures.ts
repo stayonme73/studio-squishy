@@ -30,3 +30,14 @@ export function syntheticFakePngFile(name = "gate-x-fake.png"): File {
 export function syntheticCorruptPngFile(name = "gate-x-corrupt.png"): File {
   return new File([SYNTHETIC_CORRUPT_PNG_BYTES], name, { type: "image/png" });
 }
+
+/** Valid PNG variant with different SHA-256 for replacement/supersession proof tests. */
+export const SYNTHETIC_PNG_REPLACEMENT_BYTES = (() => {
+  const bytes = Buffer.from(SYNTHETIC_PNG_1X1_BYTES);
+  bytes[40] = bytes[40]! ^ 0x01;
+  return bytes;
+})();
+
+export function syntheticReplacementPngFile(name = "gate-x-replacement.png"): File {
+  return new File([SYNTHETIC_PNG_REPLACEMENT_BYTES], name, { type: "image/png" });
+}

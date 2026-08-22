@@ -10,7 +10,7 @@ import {
   buildUseAuthorization,
   categoryRequiresUseClearance,
 } from "@/lib/studio-material-use";
-import { teamClearsContentCertification, contentRoutingLabel } from "@/lib/studio-customer-content-intake";
+import { teamResolvesTechnicalContentReview } from "@/lib/studio-customer-content-intake";
 
 import { isBlockingMaterialItem } from "./materials-view";
 import {
@@ -276,7 +276,7 @@ export function applyTeamReview(
           : entry.useAuthorization,
       contentCertification:
         reviewStatus === "approved_for_use" && entry.contentCertification
-          ? teamClearsContentCertification(entry.contentCertification, now)
+          ? teamResolvesTechnicalContentReview(entry.contentCertification, entry.category, now)
           : entry.contentCertification,
     };
     return applyMaterialUseDecisionToItem({

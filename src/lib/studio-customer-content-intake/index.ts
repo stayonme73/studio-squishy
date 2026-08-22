@@ -1,4 +1,11 @@
 export { certifyCustomerMaterialUpload } from "./certify-upload";
+export { newContentCertificationId } from "./certification-id";
+export {
+  buildGateXCertificationRunManifest,
+  GATE_X_CERTIFICATION_RUNS_DIR,
+  listArchivedCertifications,
+} from "./certification-run-capture";
+export type { GateXCertificationRunManifest, GateXCertificationRunManifestEntry } from "./certification-run-capture";
 export {
   customerContentProductionBlockReason,
   isCustomerContentClearedForProduction,
@@ -20,11 +27,23 @@ export {
   markContentCertificationWithdrawn,
   resolveContentRoutingState,
   teamClearsContentCertification,
+  teamResolvesTechnicalContentReview,
 } from "./routing";
+export {
+  canReplaceStoredCustomerFile,
+  isActiveStoredCustomerFile,
+  prepareSupersessionArchive,
+} from "./supersession";
 export {
   inspectCustomerFileBytes,
   technicalInspectionRejectsUpload,
 } from "./technical-inspection";
+export {
+  applyCustomerWithdrawFile,
+  canCustomerWithdrawStoredFile,
+  resolveWithdrawTargetItemId,
+  withdrawCustomerContentCertification,
+} from "./withdrawal";
 export {
   SYNTHETIC_CORRUPT_PNG_BYTES,
   SYNTHETIC_FAKE_PNG_BYTES,
@@ -32,6 +51,7 @@ export {
   syntheticCorruptPngFile,
   syntheticFakePngFile,
   syntheticPngFile,
+  syntheticReplacementPngFile,
 } from "./test-fixtures";
 export type {
   CertifyCustomerMaterialUploadInput,
@@ -40,5 +60,6 @@ export type {
   CustomerContentRightsInput,
   CustomerContentRightsRecord,
   CustomerContentRoutingHistoryEntry,
+  CustomerContentTeamTechnicalReview,
   CustomerContentTechnicalInspection,
 } from "./types";

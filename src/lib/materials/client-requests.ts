@@ -1,7 +1,7 @@
 import type { ApprovedStudioPlanLineItem } from "@/config/studio-board";
 import { clientMaterialStatusLabel, materialCategoryLabel, materialsConfig } from "@/config/materials";
 import { studioMaterialsUploadV1 } from "@/config/studio-materials-upload-v1";
-import { contentRoutingLabel } from "@/lib/studio-customer-content-intake";
+import { contentRoutingLabel, canCustomerWithdrawStoredFile } from "@/lib/studio-customer-content-intake";
 import type { ContentRoutingState } from "@/lib/studio-customer-content-intake";
 
 import {
@@ -69,6 +69,7 @@ export type ConsolidatedClientRequest = {
   fileName?: string;
   contentRoutingState?: ContentRoutingState;
   contentRoutingLabel?: string;
+  canWithdrawFile?: boolean;
 };
 
 /** Client API payload — no internal IDs or mapping fields (Slice 3d-c-c L4). */
@@ -88,6 +89,7 @@ export type ClientConsolidatedRequest = {
   fileName?: string;
   contentRoutingState?: ContentRoutingState;
   contentRoutingLabel?: string;
+  canWithdrawFile?: boolean;
 };
 
 export type OptionalClientRequest = {
@@ -122,6 +124,7 @@ export type ClientOptionalRequest = {
   fileName?: string;
   contentRoutingState?: ContentRoutingState;
   contentRoutingLabel?: string;
+  canWithdrawFile?: boolean;
 };
 
 export function isClientIntakeMaterialItem(item: CampaignMaterialItem): boolean {
@@ -266,6 +269,15 @@ function latestStoredCustomerFileName(
   return named.at(-1)?.fileName?.trim();
 }
 
+function latestWithdrawableItem(
+  items: readonly CampaignMaterialItem[],
+): CampaignMaterialItem | undefined {
+  return items
+    .filter((item) => canCustomerWithdrawStoredFile(item))
+    .sort((a, b) => (a.submittedAt ?? "").localeCompare(b.submittedAt ?? ""))
+    .at(-1);
+}
+
 function latestContentRoutingFromItems(
   items: readonly CampaignMaterialItem[],
 ): { state: ContentRoutingState; label: string } | undefined {
@@ -355,6 +367,7 @@ export function resolveConsolidatedClientRequests(
       const reviewStatus = consolidatedReviewStatus(visibleItems.map((item) => item.reviewStatus));
       const canSubmit = visibleItems.some(canClientSubmitMaterialItem);
       const routing = latestContentRoutingFromItems(visibleItems);
+      const withdrawable = latestWithdrawableItem(visibleItems);
 
       return {
         id,
@@ -379,6 +392,7 @@ export function resolveConsolidatedClientRequests(
               contentRoutingLabel: routing.label,
             }
           : {}),
+        ...(withdrawable ? { canWithdrawFile: true } : {}),
       };
     });
 }
@@ -406,6 +420,7 @@ export function sanitizeClientConsolidatedRequests(
           contentRoutingLabel: request.contentRoutingLabel,
         }
       : {}),
+    ...(request.canWithdrawFile ? { canWithdrawFile: true } : {}),
   }));
 }
 
@@ -448,6 +463,7 @@ export function resolveOptionalClientRequests(
               contentRoutingLabel: routing.label,
             }
           : {}),
+        ...(canCustomerWithdrawStoredFile(item) ? { canWithdrawFile: true } : {}),
       };
     });
 }
@@ -474,6 +490,7 @@ export function sanitizeClientOptionalRequests(
           contentRoutingLabel: request.contentRoutingLabel,
         }
       : {}),
+    ...(request.canWithdrawFile ? { canWithdrawFile: true } : {}),
   }));
 }
 

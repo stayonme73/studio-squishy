@@ -110,6 +110,8 @@ export type CampaignMaterialItem = {
   };
   /** Gate X per-file intake, rights, technical inspection, and routing record. */
   contentCertification?: CustomerContentCertification;
+  /** Prior per-file certification records preserved on supersession or withdrawal. */
+  contentCertificationArchive?: readonly CustomerContentCertification[];
 };
 
 export type CampaignMaterialsRecord = {
