@@ -8,7 +8,9 @@
  * Tagia 2026-08-18: Room 2 CLOSED.
  * Tagia 2026-08-19: Room 3 CLOSED at cd2a1e2. Room 4A CLOSED at 9f9ac7c.
  * Tagia 2026-08-19 (later): Room 4B CLOSED.
- * Tagia 2026-08-20: Room 4C OPEN (multi-service client gauntlet).
+ * Tagia 2026-08-20: Room 4C opened (multi-service client gauntlet).
+ * Tagia 2026-08-21: Room 4C CLOSED WITH EXPLICIT LIMITS at 92f47e2.
+ * Tagia 2026-08-21 (later): Pre-Launch Master Closeout Register ACTIVE (not execution).
  */
 
 export const studioLaunchReadinessExecutionOrderV1 = {
@@ -28,12 +30,12 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     "soft-opening-preparation",
   ] as const,
 
-  /** Highest unfinished execution room. Rooms 2–3 CLOSED. Room 4A+4B CLOSED. Room 4C OPEN. */
+  /** Highest unfinished execution room. Rooms 2–3 CLOSED. Room 4A+4B+4C closed sections. Room 4 remains open. */
   currentActiveRoom: 4 as const,
   currentActiveRoomId: "full-business-rehearsal" as const,
   currentActiveRoomClosed: false as const,
-  currentActiveSectionId: "4c-multi-service-client-gauntlet" as const,
-  currentActiveSectionStatus: "OPEN" as const,
+  currentActiveSectionId: "pre-launch-master-closeout-register" as const,
+  currentActiveSectionStatus: "ACTIVE_REGISTER" as const,
 
   lastCustomerLifePackage: {
     id: "STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1",
@@ -157,7 +159,7 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     nextSectionWaitsForScoutPackage: false as const,
   },
 
-  /** Room 4A CLOSED. Room 4B CLOSED 2026-08-19. Room 4C CLOSED WITH EXPLICIT LIMITS 2026-08-21. Room 4 remains open. */
+  /** Room 4A CLOSED. Room 4B CLOSED 2026-08-19. Room 4C CLOSED WITH EXPLICIT LIMITS at 92f47e2. Register ACTIVE. Room 4 remains open. */
   room4: {
     packageId: "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1",
     sectionClosed: false as const,
@@ -170,8 +172,11 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     room4BClosedAt: "2026-08-19" as const,
     room4BSealCommit: "8c919e0" as const,
     room4CClosedAt: "2026-08-21" as const,
-    currentSectionId: "4c-multi-service-client-gauntlet" as const,
-    currentSectionStatus: "CLOSED WITH EXPLICIT LIMITS" as const,
+    room4CCloseTip: "92f47e200ab59979a2c8b16e813abfef9e067765" as const,
+    currentSectionId: "pre-launch-master-closeout-register" as const,
+    currentSectionStatus: "ACTIVE_REGISTER" as const,
+    activeRegisterPackageId:
+      "STUDIO-PRE-LAUNCH-MASTER-CLOSEOUT-REGISTER-1" as const,
   },
 
   room4A: {
@@ -235,6 +240,24 @@ export const studioLaunchReadinessExecutionOrderV1 = {
       "src/config/studio-room-4c-multi-service-client-gauntlet-v1.ts" as const,
     closeoutDoc:
       "docs/launch/studio-operating-room-4c-multi-service-client-gauntlet-1/STUDIO-OPERATING-ROOM-4C-CLOSEOUT.md" as const,
+    closeTip: "92f47e200ab59979a2c8b16e813abfef9e067765" as const,
+  },
+
+  preLaunchMasterCloseoutRegister: {
+    packageId: "STUDIO-PRE-LAUNCH-MASTER-CLOSEOUT-REGISTER-1" as const,
+    status: "ACTIVE_REGISTER" as const,
+    notAnExecutionPackage: true as const,
+    baseTip: "92f47e200ab59979a2c8b16e813abfef9e067765" as const,
+    doNotStartRoom5: true as const,
+    doNotMerge: true as const,
+    doNotExecuteRoadmapFromRegister: true as const,
+    registerDoc:
+      "docs/launch/studio-pre-launch-master-closeout-register-1/STUDIO-PRE-LAUNCH-MASTER-CLOSEOUT-REGISTER-1.md" as const,
+    configModule:
+      "src/config/studio-pre-launch-master-closeout-register-v1.ts" as const,
+    recommendedNextPackageId:
+      "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1" as const,
+    doNotStartRecommendedNextInThisPackage: true as const,
   },
 
   merge: "separately_authorized" as const,
