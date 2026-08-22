@@ -1,0 +1,5 @@
+# Launch evidence under docs/launch/ is SHA-256-bound.
+# Force LF so working-tree bytes stay stable across Windows and non-Windows worktrees.
+docs/launch/**/*.md text eol=lf
+docs/launch/**/*.json text eol=lf
+docs/launch/**/*.txt text eol=lf
