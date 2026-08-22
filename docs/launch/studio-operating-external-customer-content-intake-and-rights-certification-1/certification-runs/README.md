@@ -28,7 +28,12 @@ Original sealed run (immutable):
 - `gate-x-run-2026-08-22T230059190Z`
 - Manifest SHA-256: `04c34166c92efe0b6f241033bff7f391e5ee98e2b12782d812def7b61412a14c`
 
-Do **not** overwrite, rename, or reinterpret that run. Supplemental runs are additive directories only.
+Supplemental two-defect retest:
+
+- `gate-x-run-2026-08-22T232853529Z`
+- Manifest SHA-256: `77f1dbf62b634bc5d695476f855d2dccf8e4bcd273260078bcf39b4f4d1073ab`
+
+Do **not** overwrite, rename, or reinterpret the original sealed run. Supplemental runs are additive directories only.
 
 Owner raw photographs never enter this Git-tracked folder. After an authorized run, this folder may hold manifests, hashes, routing records, and redacted screenshots only.
 
