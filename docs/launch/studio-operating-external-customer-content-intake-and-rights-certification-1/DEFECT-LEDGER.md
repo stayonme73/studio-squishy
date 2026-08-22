@@ -59,6 +59,20 @@ Actual supplemental outcomes:
 - Case 4: `QUARANTINED` with `thirdPartyMaterialPresent=true`, authority unconfirmed, and no technical-review diversion
 - Case 9 recheck: `canTransitionToBuildingConcepts.allowed=false` (`materials_incomplete`); uncleared certified file is the Case 4 logo-brand slot
 
+## Case 3 likeness-hold live proof
+
+Directory: `certification-runs/gate-x-run-2026-08-22T235349346Z/`  
+Manifest SHA-256: `ebd769003e7527fd906b627390f6804d71fe6b50fef68ae36bbdbc2be433f1d2`  
+Campaign: `cd09adb6-18a8-4015-884d-2b42eaefb8dd`
+
+Actual:
+
+- `recognizablePeoplePresent=true`
+- `likenessConsentConfirmed=false`
+- `rightsAnswersContradictFilenameHints=false`
+- Routing: `QUARANTINED`
+- Customer-visible explanation: Recognizable people appear in this file, but likeness consent is not confirmed yet.
+
 ## Package recommendation
 
 Gate X remains **OPEN**. No close. No merge. Room 5 remains `NOT_STARTED`. Register tip `5c22de9` remains untouched.

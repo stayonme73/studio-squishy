@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "packageId": "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1",
+  "runId": "gate-x-run-2026-08-22T235349346Z",
+  "capturedAt": "2026-08-22T23:53:49.346Z",
+  "campaignId": "cd09adb6-18a8-4015-884d-2b42eaefb8dd",
+  "procedure": "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/CERTIFICATION-RUN-CAPTURE-PROCEDURE.md",
+  "entries": [
+    {
+      "materialItemId": "document-reference-v2-rtu-promotion-graphics-slot",
+      "certificationId": "ccert-2026-08-22T235332260Z-9ffa5cab-d792-465d-85dd-03a08990c7fa",
+      "routingState": "QUARANTINED",
+      "sha256": "0ce54a2168128ba35537ad33f3adccbc324579ca193db00553f8f69494733e8b",
+      "originalFileName": "gate-x-owner-self-portrait.jpg",
+      "archiveCount": 0,
+      "productionCleared": false
+    }
+  ],
+  "manifestSha256": "ebd769003e7527fd906b627390f6804d71fe6b50fef68ae36bbdbc2be433f1d2"
+}

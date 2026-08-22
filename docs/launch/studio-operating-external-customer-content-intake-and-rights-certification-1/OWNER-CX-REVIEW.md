@@ -94,7 +94,7 @@ Read original + supplemental together. Original actuals are not rewritten.
 | 1. Rights form, no preselects | Empty Yes/No and authority checkbox | Automated (`materials-intake-rights-form.test.ts`) |
 | 2. Case 1 — cleared | Label **Cleared for production** + cleared explanation | **Original** live GET |
 | 3. Case 2 — cleared with limits | Label **Cleared with limits** + no-crop/adapt explanation; stored `no_crop_adapt` | **Supplemental** live GET (original live was unrestricted clearance — GX-D2) |
-| 4. Case 3 — likeness quarantine | Live original quarantined, but the explanation was filename mismatch, not the likeness-hold sentence | **Original** live GET for quarantine; likeness-hold sentence proven by **automated** routing copy |
+| 4. Case 3 — likeness quarantine | Label **Quarantined — Studio review required**. Explanation: Recognizable people appear in this file, but likeness consent is not confirmed yet. | **Case 3 supplemental** live GET. Original live quarantined on filename mismatch and is not rewritten. |
 | 5. Case 4 — third-party quarantine | Label **Quarantined — Studio review required** + third-party authority sentence | **Supplemental** live GET (original live was technical review — GX-D4) |
 | 6. Case 5 — corrupt rejection | HTTP 400; prior file unchanged. Panel alert uses the could-not-read sentence | **Original** live 400 + slot unchanged; sentence from live API copy / automated reject |
 | 7. Case 6 — replacement | Active v2 **Cleared for production**; v1 archived SUPERSEDED internally | **Original** live GET (active filename v2) + original notes (archive) |
@@ -126,7 +126,7 @@ That 132 is the post-correction Gate X + Room 4 bar. It is not a full-repo total
 ## Remaining honest limits
 
 - Original Case 2 and Case 4 failed; those records stay failed in the original sealed run.
-- Original Case 3 quarantined, but the client explanation was filename mismatch (`Your answers do not match signals in this file name…`), because the live form did not store people = Yes. The likeness-hold sentence is implemented and unit-tested; it was not the sentence on that live GET.
+- Original Case 3 quarantined on filename mismatch in the first sealed run. That record stays unchanged. A later Case 3 supplemental live run proved the intended likeness-hold explanation.
 - Original Case 5 proved reject + unchanged slot. The exact alert sentence was not stored in `outcomes.json`.
 - Case 6 customer view is the new file, not a superseded banner on the old file.
 - Case 9 customer view is outstanding materials / uncleared routing, not the internal `canTransitionToBuildingConcepts` object.
