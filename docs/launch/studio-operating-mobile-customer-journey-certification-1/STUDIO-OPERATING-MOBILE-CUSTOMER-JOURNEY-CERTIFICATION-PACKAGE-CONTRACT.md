@@ -1,7 +1,7 @@
 # STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION — PACKAGE CONTRACT
 
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`  
-**Status:** **OPEN** — readiness pass prepared; real-phone certification **not** stamped  
+**Status:** **PARKED — BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION** (not closed; real-phone certification **not** stamped)  
 **Base commit:** `15ee699c7d16331b3f410871f02555841fddd4d6` (Gate X close)  
 **Base branch:** `operating/external-customer-content-intake-and-rights-certification-1`  
 **Opened:** 2026-08-22  
@@ -112,6 +112,9 @@ Authorized after opening. Prepares the live journey so Tagia can test on her act
 | Artifact | Path |
 |----------|------|
 | Owner guide | `OWNER-PHONE-RUN-GUIDE.md` |
+| Park and resume | `PARK-AND-RESUME.md` |
+| Supervision audit | `SUPERVISION-DEPENDENCY-AUDIT.md` |
+| Temporary HTTPS stop | `TEMPORARY-HTTPS-STOP-RECORD.md` |
 | Phone access | `PHONE-ACCESS-METHOD.md` |
 | Route / control map | `JOURNEY-ROUTE-AND-CONTROL-MAP.md` |
 | Defect ledger | `DEFECT-LEDGER.md` |

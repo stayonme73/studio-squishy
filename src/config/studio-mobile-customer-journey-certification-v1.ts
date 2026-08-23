@@ -1,7 +1,9 @@
 /**
  * Mobile Customer Journey Certification.
- * OPEN 2026-08-22. Base 15ee699c (Gate X close). Register area 2 execution package.
- * Room 4 only. Do not assign Room 4D / 4E. Do not merge. Do not start Room 5.
+ * PARKED 2026-08-23 — blocked by missing independent supervision and incident
+ * escalation. Not closed. Real-phone certification NOT STARTED.
+ * Readiness tip b35c8aa2. Room 4 only. Do not assign Room 4D / 4E.
+ * Do not merge. Do not start Room 5.
  */
 
 export const studioMobileCustomerJourneyCertificationV1 = {
@@ -12,8 +14,15 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   roomId: "full-business-rehearsal" as const,
   sectionId: "mobile-customer-journey-certification" as const,
   title: "Mobile Customer Journey Certification" as const,
-  status: "OPEN" as const,
+  status: "PARKED" as const,
+  parkClassification:
+    "BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION" as const,
   sectionClosed: false as const,
+  parkedAt: "2026-08-23" as const,
+  livePhoneCertification: "NOT_STARTED" as const,
+  readinessTip: "b35c8aa2c2fdc7b1f1f5161d38479fdded0e5361" as const,
+  resumeAfterPackageId:
+    "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
   baseCommit: "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
   baseBranch:
     "operating/external-customer-content-intake-and-rights-certification-1" as const,
@@ -114,7 +123,11 @@ export const studioMobileCustomerJourneyCertificationV1 = {
 
   openingArtifactsOnly: false as const,
   readinessPassComplete: true as const,
-  readinessStatus: "READY_FOR_OWNER_PHONE_RUN_AFTER_SCOUT_STARTS_HTTPS" as const,
+  readinessStatus: "PARKED_BEFORE_OWNER_PHONE_RUN" as const,
+  parkAndResumeDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/PARK-AND-RESUME.md" as const,
+  supervisionDependencyAuditDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/SUPERVISION-DEPENDENCY-AUDIT.md" as const,
   ownerPhoneRunGuideDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/OWNER-PHONE-RUN-GUIDE.md" as const,
   phoneAccessMethod: "local_https_lan" as const,
@@ -123,5 +136,5 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   journeyRouteMapDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/JOURNEY-ROUTE-AND-CONTROL-MAP.md" as const,
   recommendedFirstExecutionStep:
-    "Tagia reviews Scout readiness, then walks OWNER-PHONE-RUN-GUIDE.md on her real phone. Do not stamp certification from preflight tests, Room 4C notes, or desktop emulation." as const,
+    "Do not begin the real-phone walk. Resume this package from readiness tip b35c8aa2 only after STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1 closes." as const,
 } as const;

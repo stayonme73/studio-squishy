@@ -402,9 +402,9 @@ Exactly one per area:
 
 **`STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`**
 
-Status: **OPEN** (readiness pass prepared; real-phone certification not stamped). Base: Gate X close `15ee699c`. Owner guide: `docs/launch/studio-operating-mobile-customer-journey-certification-1/OWNER-PHONE-RUN-GUIDE.md`. Closeout of prior package: `docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md`.
+Status: **PARKED — BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION** (not closed; real-phone certification not stamped). Readiness tip `b35c8aa2`. Resume after `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1` closes. Owner guide: `docs/launch/studio-operating-mobile-customer-journey-certification-1/OWNER-PHONE-RUN-GUIDE.md`. Park record: `docs/launch/studio-operating-mobile-customer-journey-certification-1/PARK-AND-RESUME.md`.
 
-Live real-phone certification is **not** stamped in this pass. Do **not** assign Room 4D/4E. Room 4 remains OPEN. Room 5 remains NOT_STARTED. No merge.
+Live real-phone certification is **not** stamped. Do **not** assign Room 4D/4E. Room 4 remains OPEN. Room 5 remains NOT_STARTED. No merge.
 
 ---
 

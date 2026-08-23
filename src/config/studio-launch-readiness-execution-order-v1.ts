@@ -14,6 +14,8 @@
  * Tagia 2026-08-22: External Customer Content Intake and Rights Certification
  * CLOSED WITH EXPLICIT LIMITS at 15ee699c.
  * Tagia 2026-08-22 (later): Mobile Customer Journey Certification OPEN.
+ * Tagia 2026-08-23: Mobile Customer Journey Certification PARKED — blocked by
+ * missing independent supervision and incident escalation. Not closed.
  * Room 4 remains OPEN. Do not start Room 5. Do not assign Room 4D / 4E.
  */
 
@@ -40,7 +42,7 @@ export const studioLaunchReadinessExecutionOrderV1 = {
   currentActiveRoomClosed: false as const,
   currentActiveSectionId:
     "mobile-customer-journey-certification" as const,
-  currentActiveSectionStatus: "OPEN" as const,
+  currentActiveSectionStatus: "PARKED" as const,
 
   lastCustomerLifePackage: {
     id: "STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1",
@@ -309,10 +311,17 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     packageId:
       "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
     title: "Mobile Customer Journey Certification" as const,
-    status: "OPEN" as const,
+    status: "PARKED" as const,
+    parkClassification:
+      "BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION" as const,
     sectionClosed: false as const,
     baseCommit: "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
     openedAt: "2026-08-22" as const,
+    parkedAt: "2026-08-23" as const,
+    readinessTip: "b35c8aa2c2fdc7b1f1f5161d38479fdded0e5361" as const,
+    livePhoneCertification: "NOT_STARTED" as const,
+    resumeAfterPackageId:
+      "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
     registerRequirement: "FULL_MOBILE_CUSTOMER_JOURNEY_CERTIFICATION" as const,
     doNotAssignRoom4dOr4eLabel: true as const,
     doNotStartRoom5: true as const,
@@ -326,6 +335,8 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     readinessPassComplete: true as const,
     ownerPhoneRunGuideDoc:
       "docs/launch/studio-operating-mobile-customer-journey-certification-1/OWNER-PHONE-RUN-GUIDE.md" as const,
+    parkAndResumeDoc:
+      "docs/launch/studio-operating-mobile-customer-journey-certification-1/PARK-AND-RESUME.md" as const,
     room4RemainsOpen: true as const,
     gateXRemainsClosed: true as const,
     gateXCloseTip: "15ee699c7d16331b3f410871f02555841fddd4d6" as const,

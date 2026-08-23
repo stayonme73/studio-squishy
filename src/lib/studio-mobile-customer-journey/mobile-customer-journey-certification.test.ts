@@ -9,8 +9,18 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
       "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1",
     );
     expect(cfg.room).toBe(4);
-    expect(cfg.status).toBe("OPEN");
+    expect(cfg.status).toBe("PARKED");
     expect(cfg.sectionClosed).toBe(false);
+    expect(cfg.parkClassification).toBe(
+      "BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION",
+    );
+    expect(cfg.livePhoneCertification).toBe("NOT_STARTED");
+    expect(cfg.readinessTip).toBe(
+      "b35c8aa2c2fdc7b1f1f5161d38479fdded0e5361",
+    );
+    expect(cfg.resumeAfterPackageId).toBe(
+      "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1",
+    );
     expect(cfg.baseCommit).toBe("15ee699c7d16331b3f410871f02555841fddd4d6");
     expect(cfg.doNotAssignRoom4dOr4eLabel).toBe(true);
     expect(cfg.doNotStartRoom5).toBe(true);
@@ -39,10 +49,10 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveSectionId).toBe(
       "mobile-customer-journey-certification",
     );
-    expect(studioLaunchReadinessExecutionOrderV1.currentActiveSectionStatus).toBe("OPEN");
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveSectionStatus).toBe("PARKED");
     expect(
       studioLaunchReadinessExecutionOrderV1.mobileCustomerJourneyCertification.status,
-    ).toBe("OPEN");
+    ).toBe("PARKED");
     expect(
       studioLaunchReadinessExecutionOrderV1.externalCustomerContentIntakeAndRightsCertification
         .status,
