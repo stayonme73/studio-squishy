@@ -1,7 +1,7 @@
 # STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION — PACKAGE CONTRACT
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 accepted at `0dc76903`. Runtime Pass 2 in progress (Machine leases, authenticated heartbeat ingest, independent sweep). **Not** certified. **Not** closed.  
+**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 accepted at `0dc76903`. Runtime Pass 2 accepted at `1f8e2600` as a controlled foundation. Durable Pass 3 in progress (provider-independent `studio-data-json` persistence and restart recovery). **Not** certified. **Not** closed.  
 **Opened:** 2026-08-23  
 **Base:** mobile park tip `bc458931c46ed845b982f62a4c70f8a312c169c8`  
 **Branch:** `operating/work-supervision-and-incident-escalation-1`  
@@ -31,6 +31,10 @@ Provider-independent Machine incident core, heartbeat/lease health, severity/esc
 ## What Runtime Pass 2 authorizes
 
 Machine-owned work leases, authenticated provider-independent heartbeat ingest, an independent Machine sweep, contract-authorized routine recovery, and a registration/heartbeat contract that future workers can use. Live controlled proof uses fictional work only. This pass does **not** connect Claude, Build-A-Bot, Make, or Resend.
+
+## What Durable Pass 3 authorizes
+
+Provider-independent durable persistence for leases, heartbeats, idempotency keys, incidents, append-only events, recovery attempts, coverage, next-check schedules, and escalation state, plus restart recovery. Incident Command reads fixtures and persisted live records in separate sets. This pass does **not** connect Build-A-Bot, Claude, Make, or Resend. An external scheduler is not authorized until this durable restart proof is accepted.
 
 ## What this package still does **not** authorize
 

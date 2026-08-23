@@ -1,8 +1,8 @@
 /**
  * Work Supervision and Incident Escalation.
  * OPEN 2026-08-23. Foundation Pass 1 accepted at 0dc76903.
- * Runtime Pass 2 in progress. Not certified. Not closed.
- * Do not connect Claude, Build-A-Bot, Make, or Resend.
+ * Runtime Pass 2 accepted at 1f8e2600. Durable Pass 3 in progress.
+ * Not certified. Not closed. Do not connect Claude, Build-A-Bot, Make, or Resend.
  * Base: mobile park tip bc458931. Room 4 only. Do not assign Room 4D / 4E.
  * Do not merge. Do not start Room 5. Do not unpark mobile until this package closes.
  */
@@ -23,7 +23,12 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
   foundationPass: 1 as const,
   foundationPassAccepted: true as const,
   foundationPassAcceptedAt: "0dc769038518a31db91346a6164c58a27a3f2239" as const,
-  runtimePass: 2 as const,
+  runtimePass: 3 as const,
+  runtimePass2Accepted: true as const,
+  runtimePass2AcceptedAt: "1f8e2600f0daab4e60a25725fcb0aab291440613" as const,
+  durablePass: 3 as const,
+  persistenceProvider: "studio-data-json" as const,
+  supabaseRecordStore: "not configured — Supabase in this repo is private file storage only" as const,
   packageClosed: false as const,
   baseCommit: "bc458931c46ed845b982f62a4c70f8a312c169c8" as const,
   baseBranch:
@@ -49,6 +54,8 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
   supervisionRegisterPath: "/api/operating/supervision/register" as const,
   supervisionHeartbeatPath: "/api/operating/supervision/heartbeat" as const,
   supervisionSweepPath: "/api/operating/supervision/sweep" as const,
+  supervisionReloadPath: "/api/operating/supervision/reload" as const,
+  supervisionSnapshotPath: "/api/operating/supervision/snapshot" as const,
   doNotClaimClaudeConnected: true as const,
   doNotClaimBuildABotConnected: true as const,
   doNotClaimResendLive: true as const,
@@ -69,6 +76,8 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
     "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/CURRENT-TRUTH-CONNECTION-MATRIX.md" as const,
   incidentSchemaDoc:
     "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/MACHINE-INCIDENT-SCHEMA.md" as const,
+  durableStoreSchemaDoc:
+    "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/SUPERVISION-DURABLE-STORE-SCHEMA.md" as const,
   severityMatrixDoc:
     "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/SEVERITY-AND-ESCALATION-MATRIX.md" as const,
   heartbeatContractDoc:

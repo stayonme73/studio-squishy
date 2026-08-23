@@ -1,15 +1,15 @@
 # Defect and limit ledger
 
-Opening snapshot 2026-08-23. Runtime Pass 2 updates L4/L6/L7 only. Do not treat this as package close.
+Opening snapshot 2026-08-23. Durable Pass 3 updates L4/L6 only. Do not treat this as package close.
 
 | Id | Limit | Status |
 |----|-------|--------|
 | L1 | Claude not connected | Open |
 | L2 | Build-A-Bot not in repo | Open |
 | L3 | Resend parked; cannot be the out-of-band proof | Open |
-| L4 | Machine incident record | **In progress** — in-process append-only incident and lease store. Authenticated ingest exists. Not persisted. Not certified. |
-| L5 | Owner Console is a decision desk, not incident command | **In progress** — additive `/file-room/incident-command` board exists. Decision desk unchanged. Not certified. |
-| L6 | No scheduled heartbeat | **In progress** — Machine sweep runs in-process while Node is awake and can be woken by `POST /api/operating/supervision/sweep`. No external scheduler is connected. If Node dies, the in-process sweep dies. |
+| L4 | Machine incident record | **In progress** — durable `studio-data-json` store under `data/supervision/` (or `STUDIO_SUPERVISION_DATA_DIR`). Append-only events. Restart recovery implemented. Not certified. |
+| L5 | Owner Console is a decision desk, not incident command | **In progress** — additive `/file-room/incident-command` board exists. Decision desk unchanged. Fixture and live records are separate. Not certified. |
+| L6 | No scheduled heartbeat | **In progress** — Machine sweep runs in-process while Node is awake and can be woken by `POST /api/operating/supervision/sweep`. State survives an intentional Node stop/start. No external scheduler is connected. |
 | L7 | Agents/tools/security not in current exception model | **In progress** — provider-independent registration/heartbeat contract exists; Claude/Build-A-Bot/Make/Resend remain NOT CONNECTED |
 | L8 | No proven out-of-band Owner alert | Open |
 | L9 | Mobile phone cert parked; not a substitute for this package | Recorded |

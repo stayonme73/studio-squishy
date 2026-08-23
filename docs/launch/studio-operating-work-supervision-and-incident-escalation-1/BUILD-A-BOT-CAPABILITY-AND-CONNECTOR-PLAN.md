@@ -1,6 +1,8 @@
 # Build-A-Bot capability and connector plan (opening)
 
-**Status:** Not in this repository. Not connected. Not proven.
+**Status:** Not in this repository. Not connected. Not proven. Durable Pass 3 does **not** connect Build-A-Bot.
+
+An external scheduler cannot repair missing leases or incidents. Persistence and restart recovery come first. After Durable Pass 3 restart proof is accepted, Build-A-Bot may be evaluated as the independent scheduler against `PROVIDER-INDEPENDENT-AUTOMATION-CONTRACT.md`. Do not connect it before that evaluation.
 
 ## Work to do later (not this commit)
 

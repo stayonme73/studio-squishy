@@ -1,6 +1,6 @@
 # Machine incident schema (opening)
 
-The Machine is the system of record. This schema is the contract. It is **not** implemented in this opening.
+The Machine is the system of record. This schema is the contract. Durable Pass 3 persists the derived incident and append-only event history in `data/supervision/` (`studio-data-json`). It does not change the field contract.
 
 Every incident must include:
 

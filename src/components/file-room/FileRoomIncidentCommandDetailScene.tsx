@@ -36,6 +36,7 @@ export default function FileRoomIncidentCommandDetailScene({ detail }: Props) {
       <h2 className="fr-header__title">
         {incident.customerLabel} · {incident.incidentId}
       </h2>
+      <p className="fr-incident-command__fixture-note">{detail.sourceLabel}</p>
       <p className="fr-lead">
         Project {incident.projectId}. Campaign {incident.campaignId}.
       </p>

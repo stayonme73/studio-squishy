@@ -25,6 +25,7 @@ export async function POST(request: Request) {
     sweep,
     incidents: snapshot.incidents.map((incident) => ({
       incidentId: incident.incidentId,
+      leaseId: incident.leaseId,
       customerId: incident.customerId,
       customerLabel: incident.customerLabel,
       projectId: incident.projectId,

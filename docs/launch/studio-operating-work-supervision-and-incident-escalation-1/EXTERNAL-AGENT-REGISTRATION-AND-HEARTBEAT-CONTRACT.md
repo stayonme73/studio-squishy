@@ -1,7 +1,7 @@
 # External agent registration and heartbeat contract
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Pass:** Runtime Pass 2  
+**Pass:** Durable Pass 3  
 **Status:** Contract implemented. Providers below are **not** connected because this contract exists.
 
 The Machine owns registration, heartbeat truth, and health. Scout, Claude, Cody, Build-A-Bot, and production workers may use this contract later. Registration is not a connection claim.
@@ -24,6 +24,8 @@ This follows the existing operating sweep header used by lifecycle watchdog and 
 | `POST` | `/api/operating/supervision/register` | Machine creates a finite-work or long-running-service lease |
 | `POST` | `/api/operating/supervision/heartbeat` | Worker reports evidence. Machine computes health |
 | `POST` | `/api/operating/supervision/sweep` | Machine evaluates leases, recovery, and overdue checks |
+| `POST` | `/api/operating/supervision/reload` | Drop the in-process Machine and restore from the durable store |
+| `GET` | `/api/operating/supervision/snapshot` | Service-auth Incident Command view: fixture set and live set, never mixed |
 
 Idempotency: `Idempotency-Key` header or `idempotencyKey` in the heartbeat body.
 

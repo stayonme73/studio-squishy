@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { isNextResponse, requireOwner } from "@/lib/auth/require-session";
 import { applyRuntimeOwnerAction } from "@/lib/studio-work-supervision/runtime";
+import { getLiveSupervisionMachine } from "@/lib/studio-work-supervision/live-runtime";
 import { OWNER_ACTIONS, type OwnerActionId } from "@/lib/studio-work-supervision/types";
 
 type RouteContext = {
@@ -34,11 +35,16 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   try {
-    const incident = applyRuntimeOwnerAction(incidentId, body.action, note);
-    return NextResponse.json({ incident });
+    const fixture = applyRuntimeOwnerAction(incidentId, body.action, note);
+    return NextResponse.json({ incident: fixture });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Owner action failed.";
-    const status = /unknown incident/i.test(message) ? 404 : 400;
-    return NextResponse.json({ error: message }, { status });
+    try {
+      const live = getLiveSupervisionMachine().applyOwnerAction(incidentId, body.action, note);
+      return NextResponse.json({ incident: live });
+    } catch {
+      const message = error instanceof Error ? error.message : "Owner action failed.";
+      const status = /unknown incident/i.test(message) ? 404 : 400;
+      return NextResponse.json({ error: message }, { status });
+    }
   }
 }

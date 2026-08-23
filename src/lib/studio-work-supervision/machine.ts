@@ -1,6 +1,9 @@
 import { studioWorkSupervisionAndIncidentEscalationV1 as cfg } from "@/config/studio-work-supervision-and-incident-escalation-v1";
 
 import { cloneJson, createSequenceIdFactory, createSystemClock, isoNow } from "./clock";
+import { createMemorySupervisionRepository } from "./memory-repository";
+import type { SupervisionRepository } from "./repository";
+import { assertDurableRepository } from "./repository";
 import {
   AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
   DEFAULT_GRACE_MS,
@@ -74,15 +77,18 @@ function pushHistory(
   actor: IncidentEvent["actor"],
   summary: string,
   payload: IncidentEvent["payload"] = {},
+  repository?: SupervisionRepository,
 ): void {
-  incident.history.push({
+  const event = {
     eventId: ids("evt"),
     at: isoNow(clock),
     type,
     actor,
     summary,
     payload,
-  });
+  };
+  incident.history.push(event);
+  repository?.appendIncidentEvent(incident.incidentId, event);
 }
 
 function computeState(incident: MachineIncident): IncidentState {
@@ -152,6 +158,7 @@ function computeHealth(lease: WorkLease, now: Date): HealthStatus {
     Date.parse(lease.lastHeartbeatAt) + lease.heartbeatIntervalMs + lease.graceMs;
   const stale = now.getTime() > staleAfter;
   if (lease.kind === "LONG_RUNNING_SERVICE") {
+    if (lease.serviceNeedsHealthCheck) return "STALLED";
     return stale ? "STALLED" : "SERVICE_AWAKE";
   }
   if (lease.blocker) return stale ? "STALLED" : "BLOCKED";
@@ -289,12 +296,62 @@ function ownerHistoryType(action: OwnerActionId): string {
 export function createSupervisionMachine(options?: {
   clock?: Clock;
   ids?: IdFactory;
+  repository?: SupervisionRepository;
+  recordSource?: "fixture" | "live";
+  holderId?: string;
+  requireDurable?: boolean;
 }): SupervisionMachine {
   const clock = options?.clock ?? createSystemClock();
   const ids = options?.ids ?? createSequenceIdFactory();
+  const repository = options?.repository ?? createMemorySupervisionRepository();
+  const recordSource = options?.recordSource ?? (repository.kind === "durable-file" ? "live" : "fixture");
+  const holderId = options?.holderId ?? ids("holder");
+  if (options?.requireDurable) {
+    assertDurableRepository(repository, { ...process.env, STUDIO_SUPERVISION_REQUIRE_DURABLE: "1" });
+  }
+  if (process.env.NODE_ENV === "production") {
+    assertDurableRepository(repository);
+  }
+  repository.load();
   const leases = new Map<string, WorkLease>();
   const incidents = new Map<string, MachineIncident>();
-  const seenHeartbeatKeys = new Set<string>();
+  for (const lease of repository.listLeases()) leases.set(lease.leaseId, lease);
+  for (const incident of repository.listIncidents()) incidents.set(incident.incidentId, incident);
+
+  function persistLease(lease: WorkLease): void {
+    repository.saveLease(lease);
+  }
+
+  function persistIncident(incident: MachineIncident): void {
+    repository.saveIncident(incident);
+  }
+
+  function applyRestartRecovery(): void {
+    if (repository.kind !== "durable-file" || leases.size === 0) return;
+    repository.markRestored(isoNow(clock));
+    for (const lease of leases.values()) {
+      if (lease.kind === "LONG_RUNNING_SERVICE" && !lease.completedAt) {
+        lease.serviceNeedsHealthCheck = true;
+      }
+      lease.health = computeHealth(lease, clock.now());
+      persistLease(lease);
+    }
+  }
+
+  applyRestartRecovery();
+
+  function track(
+    incident: MachineIncident,
+    _ids: IdFactory,
+    _clock: Clock,
+    type: string,
+    actor: IncidentEvent["actor"],
+    summary: string,
+    payload: IncidentEvent["payload"] = {},
+  ): void {
+    pushHistory(incident, ids, clock, type, actor, summary, payload, repository);
+    persistIncident(incident);
+  }
 
   function requireLease(leaseId: string): WorkLease {
     const lease = leases.get(leaseId);
@@ -381,8 +438,10 @@ export function createSupervisionMachine(options?: {
             : "ACTIVE"
           : "COVERAGE_NOT_CONNECTED",
         openIncidentId: null,
+        serviceNeedsHealthCheck: false,
       };
       leases.set(lease.leaseId, lease);
+      persistLease(lease);
       return snapshotLease(lease);
     },
 
@@ -391,7 +450,6 @@ export function createSupervisionMachine(options?: {
     },
 
     recordHeartbeat(input) {
-      const key = `${input.leaseId}:${input.idempotencyKey}`;
       const lease = requireLease(input.leaseId);
       if (input.customerId && input.customerId !== lease.customerId) {
         throw new SupervisionIsolationError(
@@ -403,12 +461,12 @@ export function createSupervisionMachine(options?: {
           "Heartbeat project does not match the lease.",
         );
       }
-      if (seenHeartbeatKeys.has(key)) {
+      if (!repository.rememberIdempotency(input.leaseId, input.idempotencyKey)) {
         return { lease: snapshotLease(lease), ignored: true };
       }
-      seenHeartbeatKeys.add(key);
       const at = input.at ?? isoNow(clock);
       lease.lastHeartbeatAt = at;
+      lease.serviceNeedsHealthCheck = false;
       lease.expectedUpdateAt = new Date(
         Date.parse(at) + lease.heartbeatIntervalMs,
       ).toISOString();
@@ -447,6 +505,15 @@ export function createSupervisionMachine(options?: {
       }
 
       applyComputedHealth(lease, at);
+      repository.appendHeartbeat({
+        leaseId: lease.leaseId,
+        idempotencyKey: input.idempotencyKey,
+        at,
+        reportedStatus: input.reportedStatus ?? null,
+        customerId: lease.customerId,
+        projectId: lease.projectId,
+      });
+      persistLease(lease);
 
       if (lease.openIncidentId) {
         const incident = incidents.get(lease.openIncidentId);
@@ -461,7 +528,7 @@ export function createSupervisionMachine(options?: {
               recordedAt: at,
             });
           }
-          pushHistory(
+          track(
             incident,
             ids,
             clock,
@@ -486,6 +553,7 @@ export function createSupervisionMachine(options?: {
       lease.blocker = null;
       lease.reportedStatus = "waiting_for_owner";
       lease.health = computeHealth(lease, clock.now());
+      persistLease(lease);
       return snapshotLease(lease);
     },
 
@@ -495,6 +563,7 @@ export function createSupervisionMachine(options?: {
       lease.waitingReason = null;
       lease.reportedStatus = "blocked";
       lease.health = computeHealth(lease, clock.now());
+      persistLease(lease);
       return snapshotLease(lease);
     },
 
@@ -514,7 +583,7 @@ export function createSupervisionMachine(options?: {
       if (lease.openIncidentId) {
         const incident = incidents.get(lease.openIncidentId);
         if (incident && incident.severity === "ROUTINE" && incident.state !== "RESOLVED") {
-          pushHistory(
+          track(
             incident,
             ids,
             clock,
@@ -529,6 +598,7 @@ export function createSupervisionMachine(options?: {
           lease.openIncidentId = null;
         }
       }
+      persistLease(lease);
       return snapshotLease(lease);
     },
 
@@ -550,6 +620,7 @@ export function createSupervisionMachine(options?: {
             ? "Confirm the worker is on the assigned branch and commit, or reassign the lease."
             : undefined,
         });
+        persistLease(lease);
       }
       return [...leases.values()].map(snapshotLease);
     },
@@ -557,6 +628,27 @@ export function createSupervisionMachine(options?: {
     sweep() {
       const now = clock.now();
       const evaluatedAt = now.toISOString();
+      const claimId = ids("sweep");
+      const claim = repository.tryClaimSweep({
+        claimId,
+        holder: holderId,
+        at: evaluatedAt,
+        ttlMs: 10_000,
+      });
+      if (!claim.claimed) {
+        return {
+          evaluatedAt,
+          claimed: false,
+          claimId: claim.claim?.claimId ?? null,
+          skippedBecauseClaimHeld: true,
+          leaseHealth: {},
+          incidentsOpenedOrUpdated: [],
+          recoveries: [],
+          overdueNextChecks: [],
+          mismatches: [],
+          sweepEvaluations: [],
+        };
+      }
       const incidentsOpenedOrUpdated = new Set<string>();
       const recoveries: SweepResult["recoveries"] = [];
       const overdueNextChecks: string[] = [];
@@ -573,7 +665,7 @@ export function createSupervisionMachine(options?: {
         if (incident.state === "RESOLVED") continue;
         if (Date.parse(incident.nextCheckAt) < now.getTime()) {
           overdueNextChecks.push(incident.incidentId);
-          pushHistory(
+          track(
             incident,
             ids,
             clock,
@@ -653,17 +745,37 @@ export function createSupervisionMachine(options?: {
       }
 
       const leaseHealth: SweepResult["leaseHealth"] = {};
+      const sweepEvaluations: SweepResult["sweepEvaluations"] = [];
       for (const lease of leases.values()) {
         leaseHealth[lease.leaseId] = lease.health;
+        const evaluation = {
+          evaluationId: ids("eval"),
+          claimId,
+          at: evaluatedAt,
+          leaseId: lease.leaseId,
+          incidentId: lease.openIncidentId,
+          health: lease.health,
+        };
+        repository.recordSweepEvaluation(evaluation);
+        sweepEvaluations.push({
+          leaseId: lease.leaseId,
+          incidentId: lease.openIncidentId,
+          health: lease.health,
+        });
+        persistLease(lease);
       }
 
       return {
         evaluatedAt,
+        claimed: true,
+        claimId,
+        skippedBecauseClaimHeld: false,
         leaseHealth,
         incidentsOpenedOrUpdated: [...incidentsOpenedOrUpdated],
         recoveries,
         overdueNextChecks,
         mismatches,
+        sweepEvaluations,
       };
     },
 
@@ -675,7 +787,7 @@ export function createSupervisionMachine(options?: {
           row.state !== "RESOLVED",
       );
       if (existing) {
-        pushHistory(
+        track(
           existing,
           ids,
           clock,
@@ -739,12 +851,12 @@ export function createSupervisionMachine(options?: {
         state: "OPEN",
         ownerEscalated: escalateNow,
       };
-      pushHistory(incident, ids, clock, "incident_opened", "machine", "Incident opened by the Machine.", {
+      track(incident, ids, clock, "incident_opened", "machine", "Incident opened by the Machine.", {
         severity,
         dedupeKey: input.dedupeKey,
       });
       if (escalateNow) {
-        pushHistory(
+        track(
           incident,
           ids,
           clock,
@@ -756,6 +868,7 @@ export function createSupervisionMachine(options?: {
       }
       refreshIncident(incident, clock);
       incidents.set(incident.incidentId, incident);
+      persistIncident(incident);
       return snapshotIncident(incident);
     },
 
@@ -772,7 +885,7 @@ export function createSupervisionMachine(options?: {
         detail,
       };
       incident.recoveryAttempts.push(attempt);
-      pushHistory(
+      track(
         incident,
         ids,
         clock,
@@ -785,6 +898,7 @@ export function createSupervisionMachine(options?: {
         incident.nextAutomaticAction =
           "Wait for a fresh worker heartbeat inside the authorized recovery window. Owner is not interrupted.";
         refreshIncident(incident, clock);
+        persistIncident(incident);
         return snapshotIncident(incident);
       }
       const escalate = ownerMustBeInterrupted({
@@ -793,7 +907,7 @@ export function createSupervisionMachine(options?: {
         ownerJudgmentRequired: incident.ownerDecisionRequired !== "none",
       });
       if (result === "success" && incident.severity === "ROUTINE" && !escalate) {
-        pushHistory(
+        track(
           incident,
           ids,
           clock,
@@ -808,7 +922,10 @@ export function createSupervisionMachine(options?: {
         incident.nextAutomaticAction = "None. Incident is resolved. History is preserved.";
         if (incident.leaseId) {
           const lease = leases.get(incident.leaseId);
-          if (lease) lease.openIncidentId = null;
+          if (lease) {
+            lease.openIncidentId = null;
+            persistLease(lease);
+          }
         }
       } else if (result === "failure") {
         incident.ownerEscalated = true;
@@ -817,7 +934,7 @@ export function createSupervisionMachine(options?: {
         incident.whoMustBeContacted = contactFor(incident.severity, true);
         incident.nextAutomaticAction =
           "Wait for Owner action. Recheck on schedule if Tagia does nothing.";
-        pushHistory(
+        track(
           incident,
           ids,
           clock,
@@ -828,6 +945,7 @@ export function createSupervisionMachine(options?: {
         );
       }
       refreshIncident(incident, clock);
+      persistIncident(incident);
       return snapshotIncident(incident);
     },
 
@@ -836,7 +954,7 @@ export function createSupervisionMachine(options?: {
       if (!incident.ownerEscalated && incident.severity === "ROUTINE") {
         throw new Error("Owner controls are not authorized on unescalated routine incidents.");
       }
-      pushHistory(incident, ids, clock, ownerHistoryType(action), "owner", note, { action });
+      track(incident, ids, clock, ownerHistoryType(action), "owner", note, { action });
       if (action === "resolve") {
         incident.currentResponsibleParty = "Owner";
         incident.nextAutomaticAction = "None. Owner resolved. History is preserved.";
@@ -855,6 +973,7 @@ export function createSupervisionMachine(options?: {
           "Collect the requested information and return to the Owner desk.";
       }
       refreshIncident(incident, clock);
+      persistIncident(incident);
       return snapshotIncident(incident);
     },
 
@@ -878,7 +997,8 @@ export function createSupervisionMachine(options?: {
       return {
         leases: [...leases.values()].map(snapshotLease),
         incidents: [...incidents.values()].map(snapshotIncident),
-        providers: cloneJson([...UNCONNECTED_PROVIDER_PORTS]),
+        providers: cloneJson(repository.getCoverage()),
+        recordSource,
       };
     },
   };

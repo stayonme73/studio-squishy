@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "provider": "studio-data-json",
+  "mechanism": "Studio data/ JSON store with atomic replace and append-only jsonl",
+  "supabaseRecordStore": "not used — Supabase in this repo is private file storage only and is not configured for records"
+}

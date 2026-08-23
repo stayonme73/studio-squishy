@@ -1,0 +1,54 @@
+{
+  "ok": true,
+  "persistenceProvider": "studio-data-json",
+  "supabaseRecordStore": "not used",
+  "configuration": {
+    "studioDataJson": true,
+    "supabaseUrlConfigured": false,
+    "supabaseServiceRoleConfigured": false,
+    "databaseUrlConfigured": false
+  },
+  "twoProcessRestart": {
+    "processA": "process-a-exit-intentional",
+    "processB": "process-b-restored-after-intentional-exit",
+    "note": "Process A exited intentionally (exit 0). Process B started after A terminated. This was not an accidental stall."
+  },
+  "scenarios": {
+    "authDeniedWithoutSecret": true,
+    "routineIncident": true,
+    "escalatedIncident": true,
+    "recordsSurvivedReload": true,
+    "waitingForOwnerNotRelabeledWorking": true,
+    "serviceAwakeOnlyAfterHealthCheck": true,
+    "downtimeMissedHeartbeatDetected": true,
+    "noDuplicateIncidents": true,
+    "secondSweepDoesNotDuplicate": true,
+    "crossCustomerBlocked": true,
+    "fixtureLiveSeparated": true,
+    "buildABotStillNotConnected": true
+  },
+  "limits": [
+    "Claude NOT CONNECTED",
+    "Build-A-Bot NOT CONNECTED",
+    "Make NOT ACTIVE",
+    "Resend PARKED",
+    "No external scheduler. Durable state now survives an intentional Node stop/start.",
+    "No proven out-of-band alert"
+  ],
+  "nodeStops": [
+    {
+      "at": "2026-08-23T15:47:19.572Z",
+      "kind": "intentional_next_stop_to_disable_live_sweep",
+      "pid": 22896,
+      "note": "The worktree Next process was stopped on purpose so Pass 3 could restart it with the in-process live sweep disabled. This was not an accidental stall."
+    },
+    {
+      "at": "2026-08-23T15:47:54.638Z",
+      "kind": "intentional_next_stop",
+      "pid": 8016,
+      "note": "The worktree Next process was stopped on purpose so durable files could be proven after restart. This was not an accidental stall."
+    }
+  ],
+  "elapsedMs": 39275,
+  "dataDir": "C:\\Users\\tagia\\studio-squishy-external-content-rights-1\\data\\supervision"
+}

@@ -19,6 +19,8 @@ export type IncidentCommandCard = {
 
 export type IncidentCommandDetail = {
   incident: MachineIncident;
+  recordSource: "fixture" | "live";
+  sourceLabel: string;
   showSquishy: boolean;
   presentation: "routine" | "serious" | "critical";
   whatHappened: string;
@@ -30,6 +32,8 @@ export type IncidentCommandDetail = {
 export type IncidentCommandView = {
   title: string;
   lead: string;
+  recordSource: "fixture" | "live";
+  sourceLabel: string;
   watchkeeper: {
     showSquishy: boolean;
     assetSrc: string;
@@ -66,6 +70,11 @@ export function toIncidentCommandView(snapshot: SupervisionSnapshot): IncidentCo
   return {
     title: "Incident Command",
     lead: "Machine-owned supervision. The decision desk is unchanged. This board is the incident command view.",
+    recordSource: snapshot.recordSource,
+    sourceLabel:
+      snapshot.recordSource === "live"
+        ? "Persisted live supervision records. Fictional proof customers only. Not mixed with Studio Review fixtures."
+        : "Fictional Maple & Pine Books and Harbor Lantern Co. fixtures. These are not durable operational records.",
     watchkeeper: {
       showSquishy: !securityOpen,
       assetSrc: SQUISHY_WATCHKEEPER_PUBLIC_PATH,
@@ -98,10 +107,18 @@ export function toIncidentCommandView(snapshot: SupervisionSnapshot): IncidentCo
   };
 }
 
-export function toIncidentCommandDetail(incident: MachineIncident): IncidentCommandDetail {
+export function toIncidentCommandDetail(
+  incident: MachineIncident,
+  recordSource: "fixture" | "live" = "fixture",
+): IncidentCommandDetail {
   const security = isSecuritySeverity(incident.severity);
   return {
     incident,
+    recordSource,
+    sourceLabel:
+      recordSource === "live"
+        ? "Persisted live supervision record. Fictional proof customer. Not a Studio Review fixture."
+        : "Fictional fixture record. Not a persisted live operational record.",
     showSquishy: mayShowSquishy(incident.severity),
     presentation: security ? "critical" : incident.ownerEscalated ? "serious" : "routine",
     whatHappened: incident.customerImpact,

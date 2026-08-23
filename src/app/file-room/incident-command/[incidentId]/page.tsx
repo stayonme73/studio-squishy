@@ -8,6 +8,7 @@ import {
 } from "@/components/file-room/FileRoomStatePanels";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
+import { getLiveSupervisionMachine } from "@/lib/studio-work-supervision/live-runtime";
 import { getRuntimeSupervisionMachine } from "@/lib/studio-work-supervision/runtime";
 import { toIncidentCommandDetail } from "@/lib/studio-work-supervision/view-model";
 
@@ -37,7 +38,12 @@ export default async function IncidentCommandDetailPage({ params }: PageProps) {
     );
   }
 
-  const incident = getRuntimeSupervisionMachine().getIncident(incidentId);
+  const fixtureIncident = getRuntimeSupervisionMachine().getIncident(incidentId);
+  const liveIncident = fixtureIncident
+    ? undefined
+    : getLiveSupervisionMachine().getIncident(incidentId);
+  const incident = fixtureIncident ?? liveIncident;
+  const recordSource = fixtureIncident ? "fixture" : "live";
   if (!incident) {
     return (
       <>
@@ -50,7 +56,9 @@ export default async function IncidentCommandDetailPage({ params }: PageProps) {
   return (
     <>
       <FileRoomHeader user={user} showIncidentCommandLink={false} />
-      <FileRoomIncidentCommandDetailScene detail={toIncidentCommandDetail(incident)} />
+      <FileRoomIncidentCommandDetailScene
+        detail={toIncidentCommandDetail(incident, recordSource)}
+      />
     </>
   );
 }

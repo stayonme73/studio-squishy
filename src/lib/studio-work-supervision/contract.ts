@@ -9,6 +9,10 @@ export const SUPERVISION_HEARTBEAT_PATH =
   "/api/operating/supervision/heartbeat" as const;
 export const SUPERVISION_SWEEP_PATH =
   "/api/operating/supervision/sweep" as const;
+export const SUPERVISION_RELOAD_PATH =
+  "/api/operating/supervision/reload" as const;
+export const SUPERVISION_SNAPSHOT_PATH =
+  "/api/operating/supervision/snapshot" as const;
 export const SUPERVISION_AUTH_HEADER = "x-studio-operating-secret" as const;
 export const SUPERVISION_IDEMPOTENCY_HEADER = "idempotency-key" as const;
 

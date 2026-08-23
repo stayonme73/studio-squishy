@@ -180,6 +180,7 @@ export type WorkLease = {
   evidence: EvidenceRef[];
   health: HealthStatus;
   openIncidentId: string | null;
+  serviceNeedsHealthCheck: boolean;
 };
 
 export type MachineIncident = {
@@ -259,6 +260,9 @@ export type HeartbeatInput = {
 
 export type SweepResult = {
   evaluatedAt: string;
+  claimed: boolean;
+  claimId: string | null;
+  skippedBecauseClaimHeld: boolean;
   leaseHealth: Record<string, HealthStatus>;
   incidentsOpenedOrUpdated: string[];
   recoveries: Array<{
@@ -268,6 +272,11 @@ export type SweepResult = {
   }>;
   overdueNextChecks: string[];
   mismatches: string[];
+  sweepEvaluations: Array<{
+    leaseId: string;
+    incidentId: string | null;
+    health: HealthStatus;
+  }>;
 };
 
 export type OpenIncidentInput = {
@@ -306,6 +315,7 @@ export type SupervisionSnapshot = {
   leases: WorkLease[];
   incidents: MachineIncident[];
   providers: ProviderPortStatus[];
+  recordSource: "fixture" | "live";
 };
 
 export class SupervisionIsolationError extends Error {
