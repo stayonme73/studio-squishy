@@ -19,6 +19,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
     "BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION" as const,
   sectionClosed: false as const,
   parkedAt: "2026-08-23" as const,
+  parkTip: "bc458931c46ed845b982f62a4c70f8a312c169c8" as const,
   livePhoneCertification: "NOT_STARTED" as const,
   readinessTip: "b35c8aa2c2fdc7b1f1f5161d38479fdded0e5361" as const,
   resumeAfterPackageId:

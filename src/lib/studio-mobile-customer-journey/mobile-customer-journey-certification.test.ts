@@ -47,9 +47,9 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(4);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomClosed).toBe(false);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveSectionId).toBe(
-      "mobile-customer-journey-certification",
+      "work-supervision-and-incident-escalation",
     );
-    expect(studioLaunchReadinessExecutionOrderV1.currentActiveSectionStatus).toBe("PARKED");
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveSectionStatus).toBe("OPEN");
     expect(
       studioLaunchReadinessExecutionOrderV1.mobileCustomerJourneyCertification.status,
     ).toBe("PARKED");

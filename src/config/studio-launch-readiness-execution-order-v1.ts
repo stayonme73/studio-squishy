@@ -14,8 +14,8 @@
  * Tagia 2026-08-22: External Customer Content Intake and Rights Certification
  * CLOSED WITH EXPLICIT LIMITS at 15ee699c.
  * Tagia 2026-08-22 (later): Mobile Customer Journey Certification OPEN.
- * Tagia 2026-08-23: Mobile Customer Journey Certification PARKED — blocked by
- * missing independent supervision and incident escalation. Not closed.
+ * Tagia 2026-08-23: Mobile Customer Journey Certification PARKED. Work
+ * Supervision and Incident Escalation OPEN (opening artifacts only).
  * Room 4 remains OPEN. Do not start Room 5. Do not assign Room 4D / 4E.
  */
 
@@ -41,8 +41,8 @@ export const studioLaunchReadinessExecutionOrderV1 = {
   currentActiveRoomId: "full-business-rehearsal" as const,
   currentActiveRoomClosed: false as const,
   currentActiveSectionId:
-    "mobile-customer-journey-certification" as const,
-  currentActiveSectionStatus: "PARKED" as const,
+    "work-supervision-and-incident-escalation" as const,
+  currentActiveSectionStatus: "OPEN" as const,
 
   lastCustomerLifePackage: {
     id: "STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1",
@@ -181,7 +181,7 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     room4CClosedAt: "2026-08-21" as const,
     room4CCloseTip: "92f47e200ab59979a2c8b16e813abfef9e067765" as const,
     currentSectionId:
-      "mobile-customer-journey-certification" as const,
+      "work-supervision-and-incident-escalation" as const,
     currentSectionStatus: "OPEN" as const,
     activeRegisterPackageId:
       "STUDIO-PRE-LAUNCH-MASTER-CLOSEOUT-REGISTER-1" as const,
@@ -190,7 +190,7 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     lastClosedExecutionPackageTip:
       "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
     activeExecutionPackageId:
-      "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
+      "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
     doNotOpenNextPackage: true as const,
   },
 
@@ -318,6 +318,7 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     baseCommit: "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
     openedAt: "2026-08-22" as const,
     parkedAt: "2026-08-23" as const,
+    parkTip: "bc458931c46ed845b982f62a4c70f8a312c169c8" as const,
     readinessTip: "b35c8aa2c2fdc7b1f1f5161d38479fdded0e5361" as const,
     livePhoneCertification: "NOT_STARTED" as const,
     resumeAfterPackageId:
@@ -348,6 +349,31 @@ export const studioLaunchReadinessExecutionOrderV1 = {
       "docs/launch/studio-operating-mobile-customer-journey-certification-1/STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-PACKAGE-CONTRACT.md" as const,
   },
 
+  workSupervisionAndIncidentEscalation: {
+    packageId:
+      "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
+    title: "Work Supervision and Incident Escalation" as const,
+    status: "OPEN" as const,
+    progress: "IN_PROGRESS" as const,
+    sectionClosed: false as const,
+    openingArtifactsOnly: true as const,
+    implementationAuthorized: false as const,
+    baseCommit: "bc458931c46ed845b982f62a4c70f8a312c169c8" as const,
+    openedAt: "2026-08-23" as const,
+    doNotAssignRoom4dOr4eLabel: true as const,
+    doNotStartRoom5: true as const,
+    doNotMerge: true as const,
+    doNotClaimClaudeConnected: true as const,
+    doNotClaimBuildABotConnected: true as const,
+    doNotClaimResendLive: true as const,
+    room4RemainsOpen: true as const,
+    configModule:
+      "src/config/studio-work-supervision-and-incident-escalation-v1.ts" as const,
+    packageContractDoc:
+      "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-PACKAGE-CONTRACT.md" as const,
+  },
+
   merge: "separately_authorized" as const,
   parallelPackages: false as const,
+  room5RemainsNotStarted: true as const,
 } as const;

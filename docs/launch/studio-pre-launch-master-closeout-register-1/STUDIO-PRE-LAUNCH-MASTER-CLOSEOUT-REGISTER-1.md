@@ -107,9 +107,9 @@ Exactly one per area:
 
 | Field | Value |
 |-------|-------|
-| Classification | REQUIRED_NOT_STARTED (live cert not stamped) |
-| Current truth | Execution package **OPEN** 2026-08-22 from Gate X close `15ee699c`. Opening artifacts only. Room 4C mobile notes remain responsive coverage only. |
-| Evidence | Package contract `docs/launch/studio-operating-mobile-customer-journey-certification-1/STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-PACKAGE-CONTRACT.md`; S1–S3 `MOBILE-RESPONSIVE-OBSERVATIONS.md` are **not** this cert |
+| Classification | PARKED — BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION |
+| Current truth | Parked 2026-08-23 (not closed). Readiness tip `b35c8aa2`. Park tip `bc458931`. Real-phone certification NOT STARTED. Resume after `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1` closes. |
+| Evidence | Park record `docs/launch/studio-operating-mobile-customer-journey-certification-1/PARK-AND-RESUME.md`; readiness at `b35c8aa2`; S1–S3 `MOBILE-RESPONSIVE-OBSERVATIONS.md` are **not** this cert |
 | Remaining gap | Real-phone hire, pay, intake, upload, rights, communicate, track, review, feedback, approval, delivery, and error recovery |
 | Dependencies | Gate X is COMPLETE_WITH_EXPLICIT_LIMITS and remains closed |
 | Sequence | **A — before Room 4 closes** (after X) |
@@ -400,11 +400,13 @@ Exactly one per area:
 
 ## Active execution package
 
-**`STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`**
+**`STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`**
 
-Status: **PARKED — BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION** (not closed; real-phone certification not stamped). Readiness tip `b35c8aa2`. Resume after `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1` closes. Owner guide: `docs/launch/studio-operating-mobile-customer-journey-certification-1/OWNER-PHONE-RUN-GUIDE.md`. Park record: `docs/launch/studio-operating-mobile-customer-journey-certification-1/PARK-AND-RESUME.md`.
+Status: **OPEN / IN PROGRESS** (opening artifacts only; not implemented; not certified). Base: mobile park tip `bc458931`. Contract: `docs/launch/studio-operating-work-supervision-and-incident-escalation-1/STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-PACKAGE-CONTRACT.md`.
 
-Live real-phone certification is **not** stamped. Do **not** assign Room 4D/4E. Room 4 remains OPEN. Room 5 remains NOT_STARTED. No merge.
+**`STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`** is **PARKED** (not closed). Readiness tip `b35c8aa2`. Park tip `bc458931`. Resume after supervision closes. Do **not** start the real-phone walk.
+
+Do **not** assign Room 4D/4E. Room 4 remains OPEN. Room 5 remains NOT_STARTED. No merge.
 
 ---
 

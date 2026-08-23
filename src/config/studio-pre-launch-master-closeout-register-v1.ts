@@ -69,8 +69,13 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
     },
     fullMobileCustomerJourneyCertification: {
       id: 2 as const,
-      classification: "REQUIRED_NOT_STARTED" as const,
-      executionPackageStatus: "OPEN" as const,
+      classification: "PARKED_BY_SEQUENCE" as const,
+      executionPackageStatus: "PARKED" as const,
+      parkedAt: "2026-08-23" as const,
+      parkedBecause:
+        "BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION" as const,
+      resumeAfterPackageId:
+        "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
       openedAt: "2026-08-22" as const,
       doNotStartWithoutOwnerAuthorization: true as const,
       dependsOnExternalContentRights: true as const,
@@ -227,12 +232,13 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
 
   recommendedNextSinglePackage: {
     packageId:
-      "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
+      "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
     status: "OPEN" as const,
+    openingArtifactsOnly: true as const,
     doNotStartInThisPackage: false as const,
     doNotOpenNextPackage: true as const,
     reason:
-      "Register area 2. Required before Room 4 closes. Owner authorized opening from Gate X close tip 15ee699c. Live phone certification is not stamped in opening. Do not assign Room 4D/4E. Do not start Room 5." as const,
+      "Owner authorized parking mobile certification and opening one Room 4 supervision package. Opening artifacts only. Do not implement in this pass. Do not assign Room 4D/4E. Do not start Room 5. Mobile resumes after this package closes." as const,
   },
 
   sequenceGates: {
