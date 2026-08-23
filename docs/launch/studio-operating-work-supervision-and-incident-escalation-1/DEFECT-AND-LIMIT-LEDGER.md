@@ -9,11 +9,11 @@ Opening snapshot 2026-08-23. Pass 3B records the launch-runtime durability defec
 | L3 | Resend parked; cannot be the out-of-band proof | Open |
 | L4 | Machine incident record | **In progress** — local `studio-data-json` store under `data/supervision/` is accepted for local development and controlled restart proof only (Pass 3 at `05509c9b`). Launch production requires shared Supabase Postgres. Not launch-certified. |
 | L5 | Owner Console is a decision desk, not incident command | **In progress** — additive `/file-room/incident-command` board exists. Decision desk unchanged. Fixture and live records are separate. Not certified. |
-| L6 | No scheduled heartbeat | **In progress** — Machine sweep runs in-process while Node is awake and can be woken by `POST /api/operating/supervision/sweep`. Local JSON state survives an intentional Node stop/start. No external scheduler. Scheduler is not authorized until **live** production durability is proven. |
+| L6 | No scheduled heartbeat | **In progress** — Machine sweep runs in-process while Node is awake. Live two-process Supabase proof passed. No external scheduler. Do not connect a scheduler until Tagia separately authorizes it. |
 | L7 | Agents/tools/security not in current exception model | **In progress** — provider-independent registration/heartbeat contract exists; Claude/Build-A-Bot/Make/Resend remain NOT CONNECTED |
 | L8 | No proven out-of-band Owner alert | Open |
 | L9 | Mobile phone cert parked; not a substitute for this package | Recorded |
-| L10 | JSON file store is not a launch-production incident store | **Pass 3B accepted** as the production guardrail. **Pass 3C** wired the live REST/RPC connector. Live Supabase remains **not certified**. Do not connect Build-A-Bot until live two-process proof is accepted. |
+| L10 | JSON file store is not a launch-production incident store | **Pass 3B accepted.** **Pass 3C** wired the live REST/RPC connector. **Live two-process proof passed** with fictional Maple/Harbor records. JSON remains local-only. Package remains OPEN. Do not connect Build-A-Bot until Tagia authorizes it. |
 | L11 | Live connector sent Secret Keys as Authorization Bearer | **Corrected.** Current `sb_secret_` keys use `apikey` only. Legacy JWT `service_role` remains a compatibility fallback. Do not paste secrets into chat. |
 
 ## Observed incidents (historical)

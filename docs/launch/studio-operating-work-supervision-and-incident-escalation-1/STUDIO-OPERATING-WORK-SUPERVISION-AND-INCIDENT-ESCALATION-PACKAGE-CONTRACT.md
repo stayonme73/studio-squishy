@@ -44,7 +44,7 @@ Classify providers (memory = tests, JSON = local/controlled, Postgres = launch p
 
 ## What Pass 3C authorizes
 
-A real server-side Supabase Postgres connector on `SupervisionRepository`: schema verification, hydrate, transactional RPCs, and fail-closed launch selection. Current Secret Keys (`sb_secret_`) are sent only as `apikey`. The JWT `service_role` key is a documented compatibility fallback. Deterministic PostgREST proof only. Do **not** claim live Supabase certification. Do **not** connect Build-A-Bot. An external scheduler is not authorized until a live two-process proof against the real database is accepted.
+A real server-side Supabase Postgres connector on `SupervisionRepository`: schema verification, hydrate, transactional RPCs, and fail-closed launch selection. Current Secret Keys (`sb_secret_`) are sent only as `apikey`. The JWT `service_role` key is a documented compatibility fallback. A live two-process proof against the real database has passed with fictional Maple/Harbor records. This does **not** close the package. Do **not** connect Build-A-Bot. An external scheduler is still not authorized until Tagia separately authorizes it.
 
 ## What this package still does **not** authorize
 

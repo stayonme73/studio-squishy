@@ -4,7 +4,8 @@
  * Runtime Pass 2 accepted at 1f8e2600. Durable Pass 3 accepted locally at 05509c9b.
  * Pass 3B accepted at 7d0d4323. Pass 3C live REST/RPC connector ready.
  * Secret Key uses apikey only; legacy JWT service_role is a compatibility fallback.
- * Live Supabase is not certified. Not closed. Do not connect Claude, Build-A-Bot, Make, or Resend.
+ * Live two-process proof passed. Full launch stamp is not closed. Package remains OPEN.
+ * Do not connect Claude, Build-A-Bot, Make, or Resend.
  * Base: mobile park tip bc458931. Room 4 only. Do not assign Room 4D / 4E.
  * Do not merge. Do not start Room 5. Do not unpark mobile until this package closes.
  */
@@ -33,6 +34,7 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
   pass3bAccepted: true as const,
   pass3bAcceptedAt: "7d0d43234bbe9805da39c6d1cc59f0b258d478a4" as const,
   liveConnectorReady: true as const,
+  liveTwoProcessProofPassed: true as const,
   launchProductionCertified: false as const,
   pass3LocalAccepted: true as const,
   pass3LocalAcceptedAt: "05509c9bc7d87d388002e11048ba416b80e80199" as const,
@@ -40,7 +42,7 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
   localPersistenceProvider: "studio-data-json" as const,
   productionPersistenceProvider: "supabase-postgres" as const,
   supabaseRecordStore:
-    "live REST/RPC connector ready; live project not certified" as const,
+    "live two-process proof passed; package not closed" as const,
   ownerSetupPostgresDoc:
     "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/OWNER-SETUP-SUPERVISION-POSTGRES.md" as const,
   retentionPolicyDoc:

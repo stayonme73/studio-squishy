@@ -1,0 +1,83 @@
+{
+  "ok": true,
+  "classification": "live-two-process-supabase-proof",
+  "liveProductionCertified": false,
+  "liveTwoProcessProofPassed": true,
+  "packageStatus": "OPEN",
+  "room4": "OPEN",
+  "room5": "NOT_STARTED",
+  "mobile": "PARKED",
+  "buildABot": "NOT CONNECTED",
+  "claude": "NOT CONNECTED",
+  "scheduler": "not authorized",
+  "resend": "PARKED / not claimed",
+  "configurationPresent": {
+    "STUDIO_SUPERVISION_SUPABASE_URL": true,
+    "STUDIO_SUPERVISION_SUPABASE_SECRET_KEY": true,
+    "STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY": false,
+    "SUPABASE_SERVICE_ROLE_KEY": false,
+    "NEXT_PUBLIC_SUPABASE_URL": false,
+    "STUDIO_SUPERVISION_ALLOW_INPROCESS_POSTGRES": false
+  },
+  "secretKeyHasSbSecretPrefix": true,
+  "secretKeyNameUsed": "STUDIO_SUPERVISION_SUPABASE_SECRET_KEY",
+  "selectedProvider": "supabase-postgres",
+  "jsonFallbackUsed": false,
+  "memoryFallbackUsed": false,
+  "schema": {
+    "ok": true,
+    "schemaVersion": 2,
+    "provider": "supabase-postgres",
+    "healthOk": true
+  },
+  "headers": {
+    "hasApikey": true,
+    "hasAuthorization": false,
+    "keyKind": "sb_secret"
+  },
+  "competingSweep": {
+    "processAClaimed": true,
+    "processBClaimed": false,
+    "winnerCount": 1,
+    "bothWon": false
+  },
+  "writer": {
+    "role": "writer",
+    "ok": true,
+    "leaseId": "lease_maple_livep3c_1787511670976",
+    "incidentId": "inc_maple_livep3c_1787511670976",
+    "firstHeartbeatAccepted": true,
+    "duplicateHeartbeatIgnored": true,
+    "writerHydrateFoundLease": true,
+    "writerHydrateFoundIncident": true,
+    "headers": {
+      "hasApikey": true,
+      "hasAuthorization": false,
+      "keyKind": "sb_secret"
+    }
+  },
+  "reader": {
+    "processAStopped": true,
+    "processBReadSameRecords": true,
+    "processBContinued": true,
+    "tenantIsolationHeld": true,
+    "appendOnly": true,
+    "historyCount": 2,
+    "recoveryCount": 1,
+    "missedHeartbeatDetected": true,
+    "noDuplicateIncident": true,
+    "duplicateHeartbeatIgnored": true
+  },
+  "restartHydrate": {
+    "foundLease": true,
+    "foundIncident": true
+  },
+  "fixtureNamespace": {
+    "customerId": "cust_maple_live_cert",
+    "projectId": "proj_maple_live_cert",
+    "runId": "livep3c_1787511670976",
+    "disposition": "Fictional Maple/Harbor live-cert records remain in the shared database under this namespace. They are not customer data. Append-only events were not deleted."
+  },
+  "realCustomerData": false,
+  "migrationsAltered": false
+}

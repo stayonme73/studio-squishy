@@ -22,6 +22,7 @@ describe("STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1", () => {
     expect(cfg.launchRuntimePass).toBe("3C");
     expect(cfg.pass3bAccepted).toBe(true);
     expect(cfg.liveConnectorReady).toBe(true);
+    expect(cfg.liveTwoProcessProofPassed).toBe(true);
     expect(cfg.launchProductionCertified).toBe(false);
     expect(cfg.pass3LocalAccepted).toBe(true);
     expect(cfg.persistenceProvider).toBe("studio-data-json");
