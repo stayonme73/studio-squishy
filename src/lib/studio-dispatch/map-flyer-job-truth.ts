@@ -50,24 +50,32 @@ function firstMatch(re: RegExp, text: string): string {
   return m?.[0]?.trim() ?? "";
 }
 
-const DEFAULT_FLYER_COLORS = {
+type FlyerBrandColors = {
+  primary: string;
+  secondary: string;
+  background: string;
+  text: string;
+  muted: string;
+};
+
+const DEFAULT_FLYER_COLORS: FlyerBrandColors = {
   primary: "#1F3A5F",
   secondary: "#C4A574",
   background: "#F7F4EF",
   text: "#1A1A1A",
   muted: "#5A6570",
-} as const;
+};
 
 /** Soft-neutral botanical atmosphere from locked customer style notes — palette only, no invented illustration. */
-const SOFT_NEUTRAL_BOTANICAL_COLORS = {
+const SOFT_NEUTRAL_BOTANICAL_COLORS: FlyerBrandColors = {
   primary: "#3F5A4A",
   secondary: "#B89A6A",
   background: "#F4F0E6",
   text: "#2A2824",
   muted: "#6A655C",
-} as const;
+};
 
-function brandColorsFromDirection(text: string): typeof DEFAULT_FLYER_COLORS {
+function brandColorsFromDirection(text: string): FlyerBrandColors {
   if (
     /botanical|soft neutral|warm,\s*clean,\s*calm|uncluttered|no childish school/i.test(
       text,
@@ -229,6 +237,26 @@ export function resolveApprovedLogoMaterial(input: {
       approvedIdentitySourceId: logoId,
     },
   };
+}
+
+export function requireApprovedLogoFile(
+  logo: ReturnType<typeof resolveApprovedLogoMaterial>,
+):
+  | { ok: true; material: DesignMaterialRef }
+  | {
+      ok: false;
+      code: "MISSING_REQUIRED_MATERIAL" | "BROKEN_ASSET_REFERENCE";
+      message: string;
+    } {
+  if (!logo.ok) return logo;
+  if (!logo.material) {
+    return {
+      ok: false,
+      code: "MISSING_REQUIRED_MATERIAL",
+      message: "MISSING_REQUIRED_MATERIAL: approved logo file is required",
+    };
+  }
+  return { ok: true, material: logo.material };
 }
 
 export function mapFlyerProjectTruthFromJob(input: {

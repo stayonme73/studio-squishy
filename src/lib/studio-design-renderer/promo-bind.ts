@@ -109,7 +109,7 @@ export function persistPromoCampaignSetArtifacts(input: {
     "utf8",
   );
 
-  const assets = input.assetRenders.map((r) => {
+  const mappedAssets = input.assetRenders.map((r) => {
     const paths = resolvePromoRenderPaths({
       artifactRootRel: input.artifactRootRel,
       renderVersion,
@@ -136,7 +136,13 @@ export function persistPromoCampaignSetArtifacts(input: {
       individualQaOk: r.individualQaOk,
     };
     return artifact;
-  }) as [PromoAssetArtifact, PromoAssetArtifact];
+  });
+  const first = mappedAssets[0];
+  const second = mappedAssets[1];
+  if (!first || !second) {
+    throw new Error("PARTIAL_SET_FAILURE: persist requires exactly two asset renders");
+  }
+  const assets: [PromoAssetArtifact, PromoAssetArtifact] = [first, second];
 
   const identity: PromoCampaignSetIdentity = {
     packageId: PROMO_PROOF_PACKAGE_ID,

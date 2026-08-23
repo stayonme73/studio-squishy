@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { createFrozenClock } from "./clock";
 import { buildFoundationFixturePack } from "./fixtures";
-import { createSupervisionMachine } from "./machine";
+import { createTestSupervisionMachine } from "./machine";
 import {
   DEFAULT_GRACE_MS,
   DEFAULT_HEARTBEAT_INTERVAL_MS,
@@ -35,7 +35,7 @@ function copyAgent() {
 
 describe("work supervision foundation pass 1", () => {
   it("keeps healthy finite work ACTIVE without an incident", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const lease = machine.issueLease({
       kind: "FINITE_WORK",
       ...maple,
@@ -51,7 +51,7 @@ describe("work supervision foundation pass 1", () => {
   });
 
   it("keeps a healthy long-running service SERVICE_AWAKE, distinct from finite work", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const lease = machine.issueLease({
       kind: "LONG_RUNNING_SERVICE",
       ...maple,
@@ -66,7 +66,7 @@ describe("work supervision foundation pass 1", () => {
 
   it("opens a deterministic stale-heartbeat incident for finite work", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     const lease = machine.issueLease({
       kind: "FINITE_WORK",
       heartbeatIntervalMs: 30_000,
@@ -88,7 +88,7 @@ describe("work supervision foundation pass 1", () => {
 
   it("detects a dead long-running service separately from quiet finite work", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     machine.issueLease({
       kind: "FINITE_WORK",
       ...maple,
@@ -114,7 +114,7 @@ describe("work supervision foundation pass 1", () => {
   });
 
   it("records blocked work with the exact blocker and does not call it a dead service", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const lease = machine.issueLease({
       kind: "FINITE_WORK",
       ...harbor,
@@ -137,7 +137,7 @@ describe("work supervision foundation pass 1", () => {
   });
 
   it("ignores duplicate heartbeats with the same idempotency key", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const lease = machine.issueLease({
       kind: "FINITE_WORK",
       ...maple,
@@ -159,7 +159,7 @@ describe("work supervision foundation pass 1", () => {
 
   it("resolves routine recovery without escalating to the Owner", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     const lease = machine.issueLease({
       kind: "FINITE_WORK",
       heartbeatIntervalMs: 30_000,
@@ -184,7 +184,7 @@ describe("work supervision foundation pass 1", () => {
 
   it("escalates a complete Owner incident when routine recovery fails", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     const lease = machine.issueLease({
       kind: "FINITE_WORK",
       heartbeatIntervalMs: 30_000,
@@ -212,7 +212,7 @@ describe("work supervision foundation pass 1", () => {
   });
 
   it("opens deadline, financial, rights, and suspected-security incidents with the required escalation", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const deadline = machine.openIncident({
       ...harbor,
       dedupeKey: "harbor:deadline",
@@ -291,7 +291,7 @@ describe("work supervision foundation pass 1", () => {
   });
 
   it("never displays an unconnected provider as healthy", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const lease = machine.issueLease({
       kind: "LONG_RUNNING_SERVICE",
       coverageConnected: false,
@@ -314,7 +314,7 @@ describe("work supervision foundation pass 1", () => {
 
   it("preserves append-only history and does not overwrite earlier events", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     const lease = machine.issueLease({
       kind: "FINITE_WORK",
       heartbeatIntervalMs: 30_000,
@@ -339,7 +339,7 @@ describe("work supervision foundation pass 1", () => {
   });
 
   it("isolates incidents by customer/project", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     machine.openIncident({
       ...maple,
       dedupeKey: "maple:only",
@@ -383,7 +383,7 @@ describe("work supervision foundation pass 1", () => {
     expect(nextCheckAt(now, "SECURITY_SUSPECTED")).toBe(
       new Date(now.getTime() + NEXT_CHECK_INTERVAL_MS.SECURITY_SUSPECTED).toISOString(),
     );
-    const machine = createSupervisionMachine({
+    const machine = createTestSupervisionMachine({
       clock: createFrozenClock("2026-08-23T12:00:00.000Z"),
     });
     const incident = machine.openIncident({
@@ -409,7 +409,7 @@ describe("work supervision foundation pass 1", () => {
   });
 
   it("does not create a second open incident for a duplicate signal", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const first = machine.openIncident({
       ...maple,
       dedupeKey: "maple:dup",

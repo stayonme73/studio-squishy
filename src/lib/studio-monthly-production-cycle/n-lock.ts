@@ -96,7 +96,8 @@ function validateCycleAuthority(
 ):
   | { ok: true; cycle: Sm001MonthlyProductionCycleRecord }
   | { ok: false; error: Sm001MonthlyNLockError; message: string } {
-  if (!productionCycleId?.trim()) {
+  const cycleId = productionCycleId?.trim();
+  if (!cycleId) {
     return {
       ok: false,
       error: "missing_cycle_id",
@@ -104,7 +105,7 @@ function validateCycleAuthority(
     };
   }
 
-  const cycle = findProductionCycleById(campaign, productionCycleId);
+  const cycle = findProductionCycleById(campaign, cycleId);
   if (!cycle) {
     return {
       ok: false,

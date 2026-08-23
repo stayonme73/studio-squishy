@@ -18,6 +18,7 @@ export {
   isDeadlineAnswerComplete,
   isDiscoveryFormTileId,
   isDiscoveryTabletComplete,
+  isDiscoveryTabletStepId,
   isDiscoveryTabletStepComplete,
   resolveDiscoveryResumeStepIndex,
   type DiscoveryDeadlineOption,

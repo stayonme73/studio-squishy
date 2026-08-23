@@ -37,6 +37,15 @@ export type InternalOwnerFollowUpOutcome =
   | "needs_owner_judgment"
   | "resolved_without_owner";
 
+export type InternalOwnerFollowUpResult =
+  | (ExceptionActionResult & { job?: PurchasedJobRecord })
+  | {
+      ok: true;
+      envelope: ServerTasksEnvelope;
+      exception?: undefined;
+      job?: PurchasedJobRecord;
+    };
+
 export type CompleteInternalOwnerFollowUpPayload = {
   exceptionId?: string;
   interactionId?: string;
@@ -251,7 +260,7 @@ export function applyCompleteInternalOwnerFollowUp(
   user: StudioUser,
   assignments: CampaignAssignmentsFile,
   materials: readonly CampaignMaterialItem[] = [],
-): ExceptionActionResult & { job?: PurchasedJobRecord } {
+): InternalOwnerFollowUpResult {
   const actorGate = requireStaffFollowUpActor(user, assignments);
   if (!actorGate.ok) return actorGate;
 

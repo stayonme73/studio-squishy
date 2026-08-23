@@ -49,7 +49,7 @@ export async function GET(request: Request, context: RouteContext) {
   }
 
   const filename = (item.fileName ?? "material").replace(/[\r\n"\\]/g, "_");
-  return new Response(downloaded.body, {
+  return new Response(Buffer.from(downloaded.body), {
     status: 200,
     headers: {
       "cache-control": "private, no-store",

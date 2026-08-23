@@ -17,7 +17,10 @@ import type {
 } from "@/lib/studio-design-renderer/menu-types";
 import { countMenuItems } from "@/lib/studio-design-renderer/menu-contracts";
 
-import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import {
+  requireApprovedLogoFile,
+  resolveApprovedLogoMaterial,
+} from "./map-flyer-job-truth";
 import type { JobDispatchRecord } from "./types";
 
 export type MenuTruthMapResult =
@@ -243,12 +246,14 @@ export function mapMenuProjectTruthFromJob(input: {
     return { ok: false, code: "MISSING_REQUIRED_TRUTH", message: parsed.message };
   }
 
-  const logo = resolveApprovedLogoMaterial({
+  const logo = requireApprovedLogoFile(
+    resolveApprovedLogoMaterial({
     repoRoot: input.repoRoot,
     items: input.materials,
     skuId: DESIGN_RENDERER_MENU_SKU,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
-  });
+  }),
+  );
   if (!logo.ok) {
     return { ok: false, code: logo.code, message: logo.message };
   }

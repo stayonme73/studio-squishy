@@ -2,7 +2,7 @@
  * Authoritative item set vs rendered item set — exact completeness + price truth.
  */
 
-import type { MenuDesignSpec, MenuProjectTruth } from "./menu-types";
+import type { MenuDesignSpec, MenuProjectTruth, MenuTextLayer } from "./menu-types";
 
 export type MenuCompletenessResult =
   | { ok: true; itemCount: number }
@@ -106,7 +106,7 @@ export function verifyMenuItemCompletenessAndPrices(
 
   for (const sec of truth.sections) {
     const titleLayer = spec.layers.find(
-      (l) =>
+      (l): l is MenuTextLayer =>
         l.type === "text" &&
         l.role === "section_title" &&
         l.sectionId === sec.sectionId,

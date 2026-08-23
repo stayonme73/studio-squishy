@@ -147,9 +147,9 @@ export function buildKitchenProductionFolderFromLive(input: {
         return {
           id: task.id,
           title: task.title,
-          effectiveStatus: task.effectiveStatus ?? null,
-          effectiveStatusLabel: task.effectiveStatus
-            ? effectiveStatusLabel(task.effectiveStatus)
+          effectiveStatus: task.status ?? null,
+          effectiveStatusLabel: task.status
+            ? effectiveStatusLabel(task.status)
             : unavailable,
           workflowState: task.workflowState ?? null,
           responsibleRole: role,
@@ -167,7 +167,9 @@ export function buildKitchenProductionFolderFromLive(input: {
   const openExceptionCount = exceptions.filter((record) =>
     isOpenExceptionStatus(record.status),
   ).length;
-  const blockingMaterialCount = input.materials.filter(isBlockingMaterialItem).length;
+  const blockingMaterialCount = input.materials.filter((item) =>
+    isBlockingMaterialItem(item, campaign.campaignId),
+  ).length;
   const pendingOutboxCount = communications.filter(
     (record) => record.deliveryStatus === "pending_owner_send",
   ).length;

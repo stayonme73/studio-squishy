@@ -65,7 +65,7 @@ export type RmJ008PostPayDispatchStructure = {
   /** Fingerprint of the paid seal — links structure to purchased kit. */
   kitFingerprint: string;
   platform: RmJ008Platform;
-  lockedKitMemberCount: 4 | 5;
+  lockedKitMemberCount: 2 | 4 | 5;
   replacementKitScope: "full_platform_replacement_kit";
   beforeStateSource: "customer_supplied";
   beforeStateIdentity: {

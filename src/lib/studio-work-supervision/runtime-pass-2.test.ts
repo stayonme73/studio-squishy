@@ -9,7 +9,7 @@ import {
 import { POST as postHeartbeat } from "@/app/api/operating/supervision/heartbeat/route";
 import { POST as postRegister } from "@/app/api/operating/supervision/register/route";
 import { POST as postSweep } from "@/app/api/operating/supervision/sweep/route";
-import { createSupervisionMachine } from "./machine";
+import { createTestSupervisionMachine } from "./machine";
 import { ROUTINE_RECOVERY_WINDOW_MS, UNCONNECTED_PROVIDER_PORTS } from "./policy";
 import { resetLiveSupervisionMachineForTests } from "./live-runtime";
 import { toIncidentCommandView } from "./view-model";
@@ -46,7 +46,7 @@ describe("work supervision runtime pass 2", () => {
   });
 
   it("records assigned worker, package, branch, commit, and expected update on a Machine-owned lease", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const lease = machine.registerWorker({
       kind: "FINITE_WORK",
       ...maple,
@@ -74,7 +74,7 @@ describe("work supervision runtime pass 2", () => {
   });
 
   it("keeps healthy finite work ACTIVE and a healthy service SERVICE_AWAKE", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const finite = machine.registerWorker({
       kind: "FINITE_WORK",
       ...maple,
@@ -113,7 +113,7 @@ describe("work supervision runtime pass 2", () => {
 
   it("marks a stopped finite heartbeat STALLED after the contract threshold", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     const lease = machine.registerWorker({
       kind: "FINITE_WORK",
       heartbeatIntervalMs: 1_000,
@@ -135,7 +135,7 @@ describe("work supervision runtime pass 2", () => {
 
   it("opens a dead-service incident without calling quiet finite work a dead service", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     const service = machine.registerWorker({
       kind: "LONG_RUNNING_SERVICE",
       heartbeatIntervalMs: 1_000,
@@ -152,7 +152,7 @@ describe("work supervision runtime pass 2", () => {
   });
 
   it("detects branch/commit mismatch from worker evidence, not worker health claims", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const lease = machine.registerWorker({
       kind: "FINITE_WORK",
       ...maple,
@@ -180,7 +180,7 @@ describe("work supervision runtime pass 2", () => {
 
   it("resolves authorized routine recovery without Owner escalation after a fresh heartbeat", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     const lease = machine.registerWorker({
       kind: "FINITE_WORK",
       heartbeatIntervalMs: 1_000,
@@ -210,7 +210,7 @@ describe("work supervision runtime pass 2", () => {
 
   it("creates a complete Owner incident when authorized recovery fails", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     const lease = machine.registerWorker({
       kind: "FINITE_WORK",
       heartbeatIntervalMs: 1_000,
@@ -238,7 +238,7 @@ describe("work supervision runtime pass 2", () => {
   });
 
   it("does not mislabel WAITING_FOR_OWNER as WORKING or ACTIVE", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const lease = machine.registerWorker({
       kind: "FINITE_WORK",
       ...maple,
@@ -266,7 +266,7 @@ describe("work supervision runtime pass 2", () => {
   });
 
   it("keeps unconnected providers COVERAGE_NOT_CONNECTED even if they register", () => {
-    const machine = createSupervisionMachine();
+    const machine = createTestSupervisionMachine();
     const lease = machine.registerWorker({
       kind: "LONG_RUNNING_SERVICE",
       coverageConnected: true,
@@ -293,7 +293,7 @@ describe("work supervision runtime pass 2", () => {
 
   it("does not duplicate incidents for duplicate heartbeats or duplicate sweeps", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     const lease = machine.registerWorker({
       kind: "FINITE_WORK",
       heartbeatIntervalMs: 1_000,
@@ -324,7 +324,7 @@ describe("work supervision runtime pass 2", () => {
 
   it("records overdue next checks without replacing history", () => {
     const clock = createFrozenClock("2026-08-23T12:00:00.000Z");
-    const machine = createSupervisionMachine({ clock });
+    const machine = createTestSupervisionMachine({ clock });
     const lease = machine.registerWorker({
       kind: "FINITE_WORK",
       heartbeatIntervalMs: 1_000,

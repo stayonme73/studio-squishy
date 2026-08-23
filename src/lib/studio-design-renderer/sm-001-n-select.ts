@@ -21,17 +21,19 @@ export type Sm001NSelectInput = {
 };
 
 export function collectSm001NSelectSignals(
-  truth: Pick<
-    Sm001ProjectTruth,
-    | "materials"
-    | "offerName"
-    | "priceDisplay"
-    | "cta"
-    | "dateWindow"
-    | "body"
-    | "headline"
-    | "wasPriceDisplay"
-  >,
+  truth: Pick<Sm001ProjectTruth, "materials"> &
+    Partial<
+      Pick<
+        Sm001ProjectTruth,
+        | "offerName"
+        | "priceDisplay"
+        | "cta"
+        | "dateWindow"
+        | "body"
+        | "headline"
+        | "wasPriceDisplay"
+      >
+    >,
 ): Sm001NSelectInput {
   const hasLogo = truth.materials.some((m) => m.role === "logo");
   const hasOfferFacts = Boolean(

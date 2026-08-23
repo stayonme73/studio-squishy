@@ -38,7 +38,32 @@ import type {
 } from "./types";
 import { SupervisionIsolationError, UnknownLeaseError } from "./types";
 
+export type MaybePromise<T> = T | Promise<T>;
+
 export type SupervisionMachine = {
+  issueLease: (input: IssueLeaseInput) => MaybePromise<WorkLease>;
+  registerWorker: (input: IssueLeaseInput) => MaybePromise<WorkLease>;
+  recordHeartbeat: (input: HeartbeatInput) => MaybePromise<{ lease: WorkLease; ignored: boolean }>;
+  markWaiting: (leaseId: string, reason: string) => MaybePromise<WorkLease>;
+  markBlocked: (leaseId: string, code: string, detail: string) => MaybePromise<WorkLease>;
+  completeFiniteWork: (leaseId: string) => MaybePromise<WorkLease>;
+  evaluateLeases: () => MaybePromise<WorkLease[]>;
+  sweep: () => MaybePromise<SweepResult>;
+  openIncident: (input: OpenIncidentInput) => MaybePromise<MachineIncident>;
+  attemptRecovery: (
+    incidentId: string,
+    result: "pending" | "success" | "failure",
+    strategy: string,
+    detail: string,
+  ) => MaybePromise<MachineIncident>;
+  applyOwnerAction: (incidentId: string, action: OwnerActionId, note: string) => MaybePromise<MachineIncident>;
+  getLease: (leaseId: string) => WorkLease | undefined;
+  getIncident: (incidentId: string) => MachineIncident | undefined;
+  listIncidentsForCustomer: (customerId: string) => MachineIncident[];
+  snapshot: () => SupervisionSnapshot;
+};
+
+export type SyncSupervisionMachine = {
   issueLease: (input: IssueLeaseInput) => WorkLease;
   registerWorker: (input: IssueLeaseInput) => WorkLease;
   recordHeartbeat: (input: HeartbeatInput) => { lease: WorkLease; ignored: boolean };
@@ -60,6 +85,51 @@ export type SupervisionMachine = {
   listIncidentsForCustomer: (customerId: string) => MachineIncident[];
   snapshot: () => SupervisionSnapshot;
 };
+
+function isThenableValue<T>(value: MaybePromise<T>): value is Promise<T> {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "then" in value &&
+    typeof (value as Promise<T>).then === "function"
+  );
+}
+
+export function unwrapSyncSupervision<T>(value: MaybePromise<T>): T {
+  if (isThenableValue(value)) {
+    throw new Error("Expected synchronous supervision result");
+  }
+  return value;
+}
+
+export function asSyncSupervisionMachine(machine: SupervisionMachine): SyncSupervisionMachine {
+  return {
+    issueLease: (input) => unwrapSyncSupervision(machine.issueLease(input)),
+    registerWorker: (input) => unwrapSyncSupervision(machine.registerWorker(input)),
+    recordHeartbeat: (input) => unwrapSyncSupervision(machine.recordHeartbeat(input)),
+    markWaiting: (leaseId, reason) => unwrapSyncSupervision(machine.markWaiting(leaseId, reason)),
+    markBlocked: (leaseId, code, detail) =>
+      unwrapSyncSupervision(machine.markBlocked(leaseId, code, detail)),
+    completeFiniteWork: (leaseId) => unwrapSyncSupervision(machine.completeFiniteWork(leaseId)),
+    evaluateLeases: () => unwrapSyncSupervision(machine.evaluateLeases()),
+    sweep: () => unwrapSyncSupervision(machine.sweep()),
+    openIncident: (input) => unwrapSyncSupervision(machine.openIncident(input)),
+    attemptRecovery: (incidentId, result, strategy, detail) =>
+      unwrapSyncSupervision(machine.attemptRecovery(incidentId, result, strategy, detail)),
+    applyOwnerAction: (incidentId, action, note) =>
+      unwrapSyncSupervision(machine.applyOwnerAction(incidentId, action, note)),
+    getLease: (leaseId) => machine.getLease(leaseId),
+    getIncident: (incidentId) => machine.getIncident(incidentId),
+    listIncidentsForCustomer: (customerId) => machine.listIncidentsForCustomer(customerId),
+    snapshot: () => machine.snapshot(),
+  };
+}
+
+export function createTestSupervisionMachine(
+  ...args: Parameters<typeof createSupervisionMachine>
+): SyncSupervisionMachine {
+  return asSyncSupervisionMachine(createSupervisionMachine(...args));
+}
 
 function snapshotLease(lease: WorkLease): WorkLease {
   return cloneJson(lease);
@@ -322,6 +392,13 @@ export function createSupervisionMachine(options?: {
 
   function isThenable<T>(value: T | Promise<T>): value is Promise<T> {
     return Boolean(value) && typeof (value as Promise<T>).then === "function";
+  }
+
+  function nestedSync<T>(value: T | Promise<T>): T {
+    if (isThenable(value)) {
+      throw new Error("Nested supervision write must remain synchronous");
+    }
+    return value;
   }
 
   function afterWrite<T>(value: T): T | Promise<T> {
@@ -727,13 +804,15 @@ export function createSupervisionMachine(options?: {
             lease.health === "COMPLETE";
           const lastRecovery = incident.recoveryAttempts.at(-1);
 
-          if (healthyNow && incident.state !== "RESOLVED") {
-            const recovered = machine.attemptRecovery(
+          if (healthyNow) {
+            const recovered = nestedSync(
+              machine.attemptRecovery(
               incident.incidentId,
               "success",
               AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
               "Fresh heartbeat returned inside the authorized recovery window.",
-            ) as MachineIncident;
+              ),
+            );
             recoveries.push({
               incidentId: recovered.incidentId,
               result: "success",
@@ -744,12 +823,14 @@ export function createSupervisionMachine(options?: {
           }
 
           if (!healthyNow && lease.health === "STALLED" && !lastRecovery) {
-            const pending = machine.attemptRecovery(
+            const pending = nestedSync(
+              machine.attemptRecovery(
               incident.incidentId,
               "pending",
               AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
               "Machine requested a fresh heartbeat. Owner is not interrupted yet.",
-            ) as MachineIncident;
+              ),
+            );
             recoveries.push({
               incidentId: pending.incidentId,
               result: "pending",
@@ -765,12 +846,14 @@ export function createSupervisionMachine(options?: {
             lastRecovery?.result === "pending" &&
             now.getTime() - Date.parse(lastRecovery.at) >= ROUTINE_RECOVERY_WINDOW_MS
           ) {
-            const failed = machine.attemptRecovery(
+            const failed = nestedSync(
+              machine.attemptRecovery(
               incident.incidentId,
               "failure",
               AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
               "Authorized routine recovery did not restore a heartbeat in time.",
-            ) as MachineIncident;
+              ),
+            );
             recoveries.push({
               incidentId: failed.incidentId,
               result: "failure",

@@ -105,6 +105,12 @@ export function discoveryTabletCoversAllFormTiles(): boolean {
   );
 }
 
+export function isDiscoveryTabletStepId(
+  stepId: string,
+): stepId is DiscoveryTabletStepId {
+  return (DISCOVERY_TABLET_STEP_ORDER as readonly string[]).includes(stepId);
+}
+
 export function isDiscoveryFormTileId(
   stepId: DiscoveryTabletStepId,
 ): stepId is DiscoveryFormTileId {

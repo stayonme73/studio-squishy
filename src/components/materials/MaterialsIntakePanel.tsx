@@ -184,7 +184,7 @@ function SubmitFields({
             <textarea
               className="sb-materials-intake__input"
               rows={field === "text" ? 3 : 2}
-              value={values[field] ?? ""}
+              value={typeof values[field] === "string" ? values[field] : ""}
               disabled={disabled}
               onChange={(event) => onChange(field, event.target.value)}
             />
@@ -192,7 +192,7 @@ function SubmitFields({
             <input
               className="sb-materials-intake__input"
               type={field === "url" ? "url" : "text"}
-              value={values[field] ?? ""}
+              value={typeof values[field] === "string" ? values[field] : ""}
               disabled={disabled}
               onChange={(event) => onChange(field, event.target.value)}
             />

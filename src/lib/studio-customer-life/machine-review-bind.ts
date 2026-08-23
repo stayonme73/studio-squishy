@@ -12,6 +12,7 @@ import {
 import { readTasksEnvelope, writeTasksEnvelope } from "@/lib/campaign-tasks/store";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { applyJobSpineStatusChange } from "@/lib/job-control/actions";
+import type { PurchasedJobRecord } from "@/lib/job-control/types";
 import {
   enqueueJobCommunicationRecord,
   resolveCampaignCommunicationClientId,
@@ -230,10 +231,8 @@ export function bindFlyerIdentityToQaRecords(input: {
   }
 
   if (!evidencePassed) {
-    let nextJob = {
-      ...job,
-      internalQaReviewAuthorization: undefined,
-    };
+    const { internalQaReviewAuthorization: _cleared, ...rest } = job;
+    let nextJob: PurchasedJobRecord = rest;
     let events = envelope.jobActivityEvents ?? [];
     if (job.spineStatus === "ready_for_review") {
       const moved = applyJobSpineStatusChange(nextJob, events, {
@@ -283,7 +282,7 @@ export function bindFlyerIdentityToQaRecords(input: {
   });
   const now = new Date().toISOString();
   const wasRevision = job.spineStatus === "revision_requested";
-  let nextJob = {
+  let nextJob: PurchasedJobRecord = {
     ...job,
     internalQaReviewAuthorization: authorization,
     productionStartedAt: job.productionStartedAt ?? now,

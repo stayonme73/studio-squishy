@@ -43,11 +43,10 @@ function countReceived(materials: CustomerLifeInput["materials"]): number {
 
 function countUnusable(materials: CustomerLifeInput["materials"]): number {
   if (!materials) return 0;
-  return materials.filter(
-    (item) =>
-      item.reviewStatus === "rejected" ||
-      item.reviewStatus === "needs_clarification",
-  ).length;
+  return materials.filter((item) => {
+    const status: string = item.reviewStatus;
+    return status === "rejected" || item.reviewStatus === "needs_clarification";
+  }).length;
 }
 
 function countApprovedForUse(materials: CustomerLifeInput["materials"]): number {

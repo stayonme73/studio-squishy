@@ -73,7 +73,7 @@ export type PromoIntakeAssetTruthResult =
 function parsePurpose(
   raw: string | undefined,
   which: "Graphic 1" | "Graphic 2",
-): PromoIntakePurposeOption | PromoIntakeAssetTruthResult {
+): PromoIntakePurposeOption | Extract<PromoIntakeAssetTruthResult, { ok: false }> {
   const value = raw?.trim() ?? "";
   if (!value) {
     return {
@@ -97,7 +97,9 @@ function parsePurpose(
 function parsePlate(
   raw: string | undefined,
   which: "Graphic 1" | "Graphic 2",
-): { plateId: PromoPlateId; canvas: { widthPx: number; heightPx: number } } | PromoIntakeAssetTruthResult {
+):
+  | { plateId: PromoPlateId; canvas: { widthPx: number; heightPx: number } }
+  | Extract<PromoIntakeAssetTruthResult, { ok: false }> {
   const value = raw?.trim() ?? "";
   if (!value) {
     return {

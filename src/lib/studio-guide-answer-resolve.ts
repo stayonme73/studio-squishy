@@ -6,8 +6,8 @@
 import {
   getConversationRoomGuideQuestion,
   isGuideRelativeDeadlineChoice,
-  type GuideConversationStep,
 } from "@/config/conversation-room-guide-v1";
+import type { GuideConversationStep } from "@/config/studio-guide-conversation-v1";
 import { isAcceptableGuideDeadlineInput } from "@/lib/studio-guide-capture";
 
 export type GuideAnswerResolveInput = {

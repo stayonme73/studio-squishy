@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { createFrozenClock } from "./clock";
 import { createFileSupervisionRepository } from "./file-repository";
-import { createSupervisionMachine } from "./machine";
+import { createTestSupervisionMachine } from "./machine";
 import { createMemorySupervisionRepository } from "./memory-repository";
 import {
   AppendOnlyViolationError,
@@ -58,7 +58,7 @@ describe("work supervision pass 3 durable persistence", () => {
   it("persists leases, incidents, recovery history, and next checks across restart", () => {
     const dir = tempDir();
     const clock = createFrozenClock("2026-08-23T15:00:00.000Z");
-    const first = createSupervisionMachine({
+    const first = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       clock,
       recordSource: "live",
@@ -109,7 +109,7 @@ describe("work supervision pass 3 durable persistence", () => {
     const before = first.getIncident(stalledId)!;
     const lastHealthy = first.getLease(finite.leaseId)!.lastHealthyAt;
 
-    const restored = createSupervisionMachine({
+    const restored = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       clock,
       recordSource: "live",
@@ -130,7 +130,7 @@ describe("work supervision pass 3 durable persistence", () => {
   it("detects downtime-missed heartbeats after restart without duplicating incidents", () => {
     const dir = tempDir();
     const clock = createFrozenClock("2026-08-23T15:00:00.000Z");
-    const first = createSupervisionMachine({
+    const first = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       clock,
       recordSource: "live",
@@ -149,7 +149,7 @@ describe("work supervision pass 3 durable persistence", () => {
     expect(first.listIncidentsForCustomer(maple.customerId)).toHaveLength(1);
 
     clock.advanceMs(60_000);
-    const restored = createSupervisionMachine({
+    const restored = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       clock,
       recordSource: "live",
@@ -165,7 +165,7 @@ describe("work supervision pass 3 durable persistence", () => {
 
   it("reconstructs derived incident state from append-only history", () => {
     const dir = tempDir();
-    const machine = createSupervisionMachine({
+    const machine = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       recordSource: "live",
     });
@@ -188,7 +188,7 @@ describe("work supervision pass 3 durable persistence", () => {
     );
     const events = repo.listIncidentEvents(opened.incidentId);
     expect(events[0]?.type).toBe("incident_opened");
-    const restored = createSupervisionMachine({
+    const restored = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       recordSource: "live",
     });
@@ -201,7 +201,7 @@ describe("work supervision pass 3 durable persistence", () => {
 
   it("enforces tenant isolation after restore", () => {
     const dir = tempDir();
-    const first = createSupervisionMachine({
+    const first = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       recordSource: "live",
     });
@@ -217,7 +217,7 @@ describe("work supervision pass 3 durable persistence", () => {
       subject: copyAgent(),
       step: "harbor_only",
     });
-    const restored = createSupervisionMachine({
+    const restored = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       recordSource: "live",
     });
@@ -235,7 +235,7 @@ describe("work supervision pass 3 durable persistence", () => {
 
   it("keeps idempotency across restart", () => {
     const dir = tempDir();
-    const first = createSupervisionMachine({
+    const first = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       recordSource: "live",
     });
@@ -250,7 +250,7 @@ describe("work supervision pass 3 durable persistence", () => {
       idempotencyKey: "same",
       reportedStatus: "working",
     });
-    const restored = createSupervisionMachine({
+    const restored = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       recordSource: "live",
     });
@@ -266,7 +266,7 @@ describe("work supervision pass 3 durable persistence", () => {
   it("prevents a concurrent sweep holder from duplicating recoveries", () => {
     const dir = tempDir();
     const clock = createFrozenClock("2026-08-23T15:00:00.000Z");
-    const a = createSupervisionMachine({
+    const a = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       clock,
       recordSource: "live",
@@ -283,7 +283,7 @@ describe("work supervision pass 3 durable persistence", () => {
     clock.advanceMs(1_300);
     const firstSweep = a.sweep();
     expect(firstSweep.claimed).toBe(true);
-    const b = createSupervisionMachine({
+    const b = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       clock,
       recordSource: "live",
@@ -297,7 +297,7 @@ describe("work supervision pass 3 durable persistence", () => {
 
   it("restores SERVICE_AWAKE only after a post-restart health check", () => {
     const dir = tempDir();
-    const first = createSupervisionMachine({
+    const first = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       recordSource: "live",
     });
@@ -313,7 +313,7 @@ describe("work supervision pass 3 durable persistence", () => {
       reportedStatus: "service_awake",
     });
     expect(first.getLease(service.leaseId)!.health).toBe("SERVICE_AWAKE");
-    const restored = createSupervisionMachine({
+    const restored = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       recordSource: "live",
     });
@@ -327,8 +327,8 @@ describe("work supervision pass 3 durable persistence", () => {
   });
 
   it("keeps fixture and live snapshots separate", () => {
-    const fixture = createSupervisionMachine({ recordSource: "fixture" });
-    const live = createSupervisionMachine({
+    const fixture = createTestSupervisionMachine({ recordSource: "fixture" });
+    const live = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(tempDir()),
       recordSource: "live",
     });
@@ -380,7 +380,7 @@ describe("work supervision pass 3 durable persistence", () => {
       }),
     ).toThrow(/Launch runtime cannot use memory or JSON-file/);
     expect(() =>
-      createSupervisionMachine({
+      createTestSupervisionMachine({
         repository: createMemorySupervisionRepository(),
         requireDurable: true,
       }),
@@ -389,7 +389,7 @@ describe("work supervision pass 3 durable persistence", () => {
 
   it("proves an intentional second Node process can still read the durable files", () => {
     const dir = tempDir();
-    const machine = createSupervisionMachine({
+    const machine = createTestSupervisionMachine({
       repository: createFileSupervisionRepository(dir),
       recordSource: "live",
     });

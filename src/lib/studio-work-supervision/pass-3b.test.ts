@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { createFrozenClock } from "./clock";
 import { createFileSupervisionRepository } from "./file-repository";
 import { createLiveSupervisionRepository } from "./live-runtime";
-import { createSupervisionMachine } from "./machine";
+import { createTestSupervisionMachine } from "./machine";
 import { createMemorySupervisionRepository } from "./memory-repository";
 import { createPostgresSupervisionRepository, sharedPostgresPair } from "./postgres-adapter";
 import { createSupervisionPostgresEngine } from "./postgres-engine";
@@ -99,7 +99,7 @@ describe("work supervision pass 3B launch-runtime durability", () => {
 
   it("persists through the Postgres adapter and restores derived state", () => {
     const engine = createSupervisionPostgresEngine();
-    const first = createSupervisionMachine({
+    const first = createTestSupervisionMachine({
       repository: createPostgresSupervisionRepository(engine),
       recordSource: "live",
     });
@@ -130,7 +130,7 @@ describe("work supervision pass 3B launch-runtime durability", () => {
       rightsOrComplianceImpact: "none proven",
       securityOrBreachImpact: "none proven",
     });
-    const restored = createSupervisionMachine({
+    const restored = createTestSupervisionMachine({
       repository: createPostgresSupervisionRepository(engine),
       recordSource: "live",
     });
@@ -144,7 +144,7 @@ describe("work supervision pass 3B launch-runtime durability", () => {
 
   it("enforces append-only incident events on the Postgres adapter", () => {
     const repo = createPostgresSupervisionRepository();
-    const machine = createSupervisionMachine({ repository: repo, recordSource: "live" });
+    const machine = createTestSupervisionMachine({ repository: repo, recordSource: "live" });
     const opened = machine.openIncident({
       ...harbor,
       dedupeKey: "harbor:append",
@@ -166,7 +166,7 @@ describe("work supervision pass 3B launch-runtime durability", () => {
   it("prevents two competing sweep holders from both winning", () => {
     const clock = createFrozenClock("2026-08-23T16:00:00.000Z");
     const { processA, processB } = sharedPostgresPair();
-    const a = createSupervisionMachine({
+    const a = createTestSupervisionMachine({
       repository: processA,
       clock,
       recordSource: "live",
@@ -182,7 +182,7 @@ describe("work supervision pass 3B launch-runtime durability", () => {
     });
     clock.advanceMs(1_300);
     const first = a.sweep();
-    const b = createSupervisionMachine({
+    const b = createTestSupervisionMachine({
       repository: processB,
       clock,
       recordSource: "live",
@@ -198,7 +198,7 @@ describe("work supervision pass 3B launch-runtime durability", () => {
   it("lets process B continue after process A stops, without duplicating work", () => {
     const clock = createFrozenClock("2026-08-23T16:00:00.000Z");
     const { processA, processB } = sharedPostgresPair();
-    const a = createSupervisionMachine({
+    const a = createTestSupervisionMachine({
       repository: processA,
       clock,
       recordSource: "live",
@@ -218,7 +218,7 @@ describe("work supervision pass 3B launch-runtime durability", () => {
       reportedStatus: "working",
     });
     clock.advanceMs(60_000);
-    const b = createSupervisionMachine({
+    const b = createTestSupervisionMachine({
       repository: processB,
       clock,
       recordSource: "live",
@@ -235,7 +235,7 @@ describe("work supervision pass 3B launch-runtime durability", () => {
 
   it("keeps idempotency and tenant isolation across two repository handles", () => {
     const { processA, processB } = sharedPostgresPair();
-    const a = createSupervisionMachine({
+    const a = createTestSupervisionMachine({
       repository: processA,
       recordSource: "live",
     });
@@ -250,7 +250,7 @@ describe("work supervision pass 3B launch-runtime durability", () => {
       idempotencyKey: "same",
       reportedStatus: "working",
     });
-    const b = createSupervisionMachine({
+    const b = createTestSupervisionMachine({
       repository: processB,
       recordSource: "live",
     });
@@ -272,8 +272,8 @@ describe("work supervision pass 3B launch-runtime durability", () => {
   });
 
   it("keeps Owner Console fixture and live Postgres snapshots separate", () => {
-    const fixture = createSupervisionMachine({ recordSource: "fixture" });
-    const live = createSupervisionMachine({
+    const fixture = createTestSupervisionMachine({ recordSource: "fixture" });
+    const live = createTestSupervisionMachine({
       repository: createPostgresSupervisionRepository(),
       recordSource: "live",
     });

@@ -6,6 +6,7 @@ import { studioMaterialsUploadV1 } from "@/config/studio-materials-upload-v1";
 import { readCampaignEnvelope } from "@/lib/campaign-store/store";
 import { isNextResponse, requireSession } from "@/lib/auth/require-session";
 import { readCampaignAssignments } from "@/lib/file-room/assignments";
+import { storageChecksumSha256 } from "@/lib/file-registry/types";
 import { createServerFileRoomStorageAdapter } from "@/lib/file-storage/server";
 import {
   canReadMaterials,
@@ -326,7 +327,11 @@ export async function PATCH(request: Request, context: RouteContext) {
     const saved = await writeMaterialsEnvelope(stored.materials);
     await writeTasksEnvelope(stored.tasks);
     const submittedItemIds = saved.items
-      .filter((item) => item.uploadStatus === "stored" && item.storageRef?.checksumSha256 === stored.checksumSha256)
+      .filter(
+        (item) =>
+          item.uploadStatus === "stored" &&
+          storageChecksumSha256(item.storageRef) === stored.checksumSha256,
+      )
       .map((item) => item.id);
 
     return syncAfterClientSubmit({

@@ -211,10 +211,8 @@ export function bindShortVideoIdentityToQaRecords(input: {
   }
 
   if (!evidencePassed) {
-    let nextJob: PurchasedJobRecord = {
-      ...job,
-      internalQaReviewAuthorization: undefined,
-    };
+    const { internalQaReviewAuthorization: _cleared, ...rest } = job;
+    let nextJob: PurchasedJobRecord = rest;
     let events = envelope.jobActivityEvents ?? [];
     if (job.spineStatus === "ready_for_review") {
       const moved = applyJobSpineStatusChange(nextJob, events, {

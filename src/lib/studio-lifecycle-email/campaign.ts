@@ -22,8 +22,9 @@ export async function resolveLifecycleRecipientEmail(input: {
     return { email: null };
   }
   const user = await findUserById(clientUserId);
-  const email = user?.email?.trim() ?? "";
-  if (!email || !isPlausibleEmail(email)) return { email: null, userId: user?.id };
+  if (!user) return { email: null };
+  const email = user.email?.trim() ?? "";
+  if (!email || !isPlausibleEmail(email)) return { email: null, userId: user.id };
   return { email, userId: user.id };
 }
 

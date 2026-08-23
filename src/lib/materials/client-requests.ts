@@ -109,6 +109,10 @@ export type OptionalClientRequest = {
   submittedAt?: string;
   clientAvailability?: CampaignMaterialItem["clientAvailability"];
   fileName?: string;
+  contentRoutingState?: ContentRoutingState;
+  contentRoutingLabel?: string;
+  contentRoutingExplanation?: string;
+  canWithdrawFile?: boolean;
 };
 
 /** Client API payload for optional rows (Slice 3d-c-c L4). */

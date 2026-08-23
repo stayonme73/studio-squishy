@@ -40,7 +40,7 @@ function afterStateMembers(
 }
 
 export function recipeForUpdatePlatform(platform: RmJ008Platform): {
-  lockedKitMemberCount: 4 | 5;
+  lockedKitMemberCount: 2 | 4 | 5;
   plannedKitMembers: readonly RmJ008PlannedKitMember[];
 } {
   const after = afterStateMembers(platform);

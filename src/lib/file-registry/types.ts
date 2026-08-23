@@ -54,6 +54,18 @@ export type StudioFileStorageReference =
   | StudioFileReferenceOnlyStorageReference
   | StudioFileSupabaseStorageReference;
 
+export function isSupabasePrivateStorageRef(
+  ref: StudioFileStorageReference | null | undefined,
+): ref is StudioFileSupabaseStorageReference {
+  return ref?.provider === "supabase_storage" && ref.connectionStatus === "private_object";
+}
+
+export function storageChecksumSha256(
+  ref: StudioFileStorageReference | null | undefined,
+): string | undefined {
+  return isSupabasePrivateStorageRef(ref) ? ref.checksumSha256 : undefined;
+}
+
 export type StudioFileReference = {
   id: string;
   clientId: string;

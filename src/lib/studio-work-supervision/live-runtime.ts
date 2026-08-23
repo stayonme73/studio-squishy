@@ -36,11 +36,11 @@ type LiveSupervisionSlot = {
 const SLOT_KEY = "__studioLiveSupervisionRuntime" as const;
 
 function slot(): LiveSupervisionSlot | undefined {
-  return (globalThis as Record<string, LiveSupervisionSlot | undefined>)[SLOT_KEY];
+  return (globalThis as unknown as Record<string, LiveSupervisionSlot | undefined>)[SLOT_KEY];
 }
 
 function setSlot(value: LiveSupervisionSlot | undefined): void {
-  (globalThis as Record<string, LiveSupervisionSlot | undefined>)[SLOT_KEY] = value;
+  (globalThis as unknown as Record<string, LiveSupervisionSlot | undefined>)[SLOT_KEY] = value;
 }
 
 const MACHINE_CUSTOMER = {
@@ -113,7 +113,7 @@ export async function createLiveSupervisionRepositoryAsync(
   return createLiveSupervisionRepository(env);
 }
 
-function ensureMachineSweepLease(state: LiveSupervisionSlot): string | Promise<string> {
+async function ensureMachineSweepLease(state: LiveSupervisionSlot): Promise<string> {
   if (state.sweepLeaseId && state.machine.getLease(state.sweepLeaseId)) {
     return state.sweepLeaseId;
   }
@@ -124,55 +124,55 @@ function ensureMachineSweepLease(state: LiveSupervisionSlot): string | Promise<s
     state.sweepLeaseId = existing.leaseId;
     return existing.leaseId;
   }
-  const issued = state.machine.issueLease({
-    leaseId: "lease_machine_sweep",
-    kind: "LONG_RUNNING_SERVICE",
-    ...MACHINE_CUSTOMER,
-    subject: {
-      kind: "service",
-      id: "machine_supervision_sweep",
-      label: "Machine supervision sweep",
-    },
-    assignedWorker: {
-      providerId: "machine",
-      workerId: "machine_sweep",
-      label: "Machine sweep",
-    },
-    packageId: cfg.packageId,
-    branch: cfg.branch,
-    commit: null,
-    step: "evaluate_leases_on_schedule",
-    heartbeatIntervalMs: LIVE_SWEEP_INTERVAL_MS,
-    graceMs: LIVE_SWEEP_INTERVAL_MS,
-  });
-  const assign = (lease: { leaseId: string }) => {
-    state.sweepLeaseId = lease.leaseId;
-    return lease.leaseId;
-  };
-  if (issued && typeof (issued as Promise<{ leaseId: string }>).then === "function") {
-    return (issued as Promise<{ leaseId: string }>).then(assign);
-  }
-  return assign(issued as { leaseId: string });
+  const issued = await Promise.resolve(
+    state.machine.issueLease({
+      leaseId: "lease_machine_sweep",
+      kind: "LONG_RUNNING_SERVICE",
+      ...MACHINE_CUSTOMER,
+      subject: {
+        kind: "service",
+        id: "machine_supervision_sweep",
+        label: "Machine supervision sweep",
+      },
+      assignedWorker: {
+        providerId: "machine",
+        workerId: "machine_sweep",
+        label: "Machine sweep",
+      },
+      packageId: cfg.packageId,
+      branch: cfg.branch,
+      commit: null,
+      step: "evaluate_leases_on_schedule",
+      heartbeatIntervalMs: LIVE_SWEEP_INTERVAL_MS,
+      graceMs: LIVE_SWEEP_INTERVAL_MS,
+    }),
+  );
+  state.sweepLeaseId = issued.leaseId;
+  return issued.leaseId;
 }
 
-function startLiveSweepScheduler(state: LiveSupervisionSlot): void {
+async function startLiveSweepScheduler(state: LiveSupervisionSlot): Promise<void> {
   if (liveSweepDisabled() || state.sweepTimer) return;
-  const leaseId = ensureMachineSweepLease(state);
-  state.machine.recordHeartbeat({
-    leaseId,
-    idempotencyKey: `machine-sweep-boot-${Date.now()}`,
-    reportedStatus: "service_awake",
-    evidenceSummary: "Post-restart service health check.",
-  });
+  const leaseId = await ensureMachineSweepLease(state);
+  void Promise.resolve(
+    state.machine.recordHeartbeat({
+      leaseId,
+      idempotencyKey: `machine-sweep-boot-${Date.now()}`,
+      reportedStatus: "service_awake",
+      evidenceSummary: "Post-restart service health check.",
+    }),
+  );
   state.sweepTimer = setInterval(() => {
     try {
-      state.machine.recordHeartbeat({
-        leaseId,
-        idempotencyKey: `machine-sweep-${Date.now()}`,
-        reportedStatus: "service_awake",
-        evidenceSummary: "Detached Machine sweep tick.",
-      });
-      state.machine.sweep();
+      void Promise.resolve(
+        state.machine.recordHeartbeat({
+          leaseId,
+          idempotencyKey: `machine-sweep-${Date.now()}`,
+          reportedStatus: "service_awake",
+          evidenceSummary: "Detached Machine sweep tick.",
+        }),
+      );
+      void Promise.resolve(state.machine.sweep());
     } catch {
       // Fail closed on a tick.
     }
@@ -198,9 +198,9 @@ export async function getLiveSupervisionMachine(): Promise<SupervisionMachine> {
       sweepLeaseId: null,
       dataDir,
     };
-    await Promise.resolve(ensureMachineSweepLease(state));
+    await ensureMachineSweepLease(state);
     await Promise.resolve(repository.flush?.());
-    startLiveSweepScheduler(state);
+    await startLiveSweepScheduler(state);
     setSlot(state);
   }
   return state.machine;

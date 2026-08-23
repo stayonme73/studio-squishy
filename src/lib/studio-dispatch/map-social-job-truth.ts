@@ -13,14 +13,16 @@ import {
 } from "@/lib/studio-design-renderer";
 import type { SocialPostsProjectTruth } from "@/lib/studio-design-renderer";
 import {
-  isInternalProductionChromeText,
   resolveCustomerBusinessName,
   resolveCustomerOfferHeadline,
   shortenCustomerFacingCta,
   stripCustomerFacingCta,
 } from "@/lib/studio-design-renderer/customer-facing-creative-copy";
 
-import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import {
+  requireApprovedLogoFile,
+  resolveApprovedLogoMaterial,
+} from "./map-flyer-job-truth";
 import type { JobDispatchRecord } from "./types";
 
 export type SocialPostsTruthMapResult =
@@ -209,12 +211,14 @@ export function mapSocialPostsProjectTruthFromJob(input: {
     };
   }
 
-  const logo = resolveApprovedLogoMaterial({
+  const logo = requireApprovedLogoFile(
+    resolveApprovedLogoMaterial({
     repoRoot: input.repoRoot,
     items: input.materials,
     skuId: DESIGN_RENDERER_SOCIAL_POSTS_SKU,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
-  });
+  }),
+  );
   if (!logo.ok) {
     return { ok: false, code: logo.code, message: logo.message };
   }
@@ -225,9 +229,6 @@ export function mapSocialPostsProjectTruthFromJob(input: {
     businessNameAnswer: String(answers.businessName ?? "").trim() || undefined,
   });
   const wordmark = businessName;
-  const purposeChoice = String(
-    answers.socialPostsPurposeChoice ?? "",
-  ).trim();
   const offerNameRaw = resolveCustomerOfferHeadline({
     postsAbout,
     mustInclude: String(answers.mustInclude ?? ""),
@@ -250,11 +251,7 @@ export function mapSocialPostsProjectTruthFromJob(input: {
       .slice(0, 80) || "Your offer";
   // Prefer offer language — never paint bare intake chips alone.
   const descriptor =
-    (purposeChoice && !isInternalProductionChromeText(purposeChoice)
-      ? ""
-      : "") ||
-    String(answers.businessType ?? "").trim() ||
-    "Wellness studio";
+    String(answers.businessType ?? "").trim() || "Wellness studio";
   const strippedCta = shortenCustomerFacingCta(
     stripCustomerFacingCta(callToAction),
   );

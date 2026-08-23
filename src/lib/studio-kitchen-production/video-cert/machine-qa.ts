@@ -71,6 +71,11 @@ export function runCertVideoMachineQa(input: {
     checks.push({ id, ok, detail });
   };
 
+  const voiceArtifact = input.packet.voiceArtifact;
+  if (!voiceArtifact) {
+    throw new Error("voice artifact is required for machine QA");
+  }
+
   push(
     "production_env",
     input.renderEnvUsed === "v1",
@@ -95,7 +100,7 @@ export function runCertVideoMachineQa(input: {
     }
   }
   dummyUrls.set(
-    input.packet.voiceArtifact.relativePath,
+    voiceArtifact.relativePath,
     "https://example.test/voice.mp3",
   );
   const built = buildShotstackEditPayload(input.packet, dummyUrls);
@@ -251,7 +256,7 @@ export function runCertVideoMachineQa(input: {
   if (input.packet.workPacketVersion === "wp-v5") {
     const voiceAbs = path.join(
       input.repoRoot,
-      input.packet.voiceArtifact.relativePath,
+      voiceArtifact.relativePath,
     );
     const voiceDur = existsSync(voiceAbs)
       ? probeMediaDurationSeconds(voiceAbs)
@@ -281,9 +286,9 @@ export function runCertVideoMachineQa(input: {
     // Source voice SHA must be the new short-video narration, not the 39s voice-cert fixture
     push(
       "not_bound_to_voice_cert_39s_fixture",
-      input.packet.voiceArtifact.contentSha256 !==
+      voiceArtifact.contentSha256 !==
         "d283144563a6fe2075be956fd144fe1c0bb4de29ec55ca308c5b8060c94647e4",
-      `voiceSha=${input.packet.voiceArtifact.contentSha256.slice(0, 12)}…`,
+      `voiceSha=${voiceArtifact.contentSha256.slice(0, 12)}…`,
     );
 
     if (voiceDur != null) {
@@ -328,7 +333,7 @@ export function runCertVideoMachineQa(input: {
       if (input.packet.workPacketVersion === "wp-v5") {
         const voiceAbs = path.join(
           input.repoRoot,
-          input.packet.voiceArtifact.relativePath,
+          voiceArtifact.relativePath,
         );
         const voiceDur = existsSync(voiceAbs)
           ? probeMediaDurationSeconds(voiceAbs)

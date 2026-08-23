@@ -3,8 +3,8 @@
  * Do not certify from timeline JSON alone.
  */
 
-import { createRequire } from "module";
 import { existsSync } from "fs";
+import sharp from "sharp";
 
 import {
   VIDEO_SAFE_AREA_9X16,
@@ -13,9 +13,6 @@ import {
   type PixelBox,
 } from "./safe-area";
 import { extractVideoFrame } from "./extract";
-
-const require = createRequire(import.meta.url);
-const sharp = require("sharp") as typeof import("sharp");
 
 export type MotionSafetyBeatSpec = {
   beat: number;

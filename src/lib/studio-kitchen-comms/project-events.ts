@@ -385,7 +385,7 @@ function fromMaterials(
   materials: readonly CampaignMaterialItem[],
   syncedAt: string,
 ): KitchenOperationalEvent[] {
-  return materials.filter(isBlockingMaterialItem).map((item) => ({
+  return materials.filter((item) => isBlockingMaterialItem(item, campaignId)).map((item) => ({
     eventId: `material-block:${item.id}`,
     occurredAt: item.reviewedAt ?? item.submittedAt ?? syncedAt,
     campaignId,

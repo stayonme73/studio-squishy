@@ -1,5 +1,5 @@
 import { createFrozenClock } from "./clock";
-import { createSupervisionMachine, type SupervisionMachine } from "./machine";
+import { createTestSupervisionMachine, type SyncSupervisionMachine } from "./machine";
 import { UNCONNECTED_PROVIDER_PORTS } from "./policy";
 import type { MachineIncident, SupervisionSnapshot, WorkLease } from "./types";
 
@@ -25,7 +25,7 @@ function agent(id: string, label: string) {
 
 export type FoundationFixturePack = {
   clock: ReturnType<typeof createFrozenClock>;
-  machine: SupervisionMachine;
+  machine: SyncSupervisionMachine;
   snapshot: SupervisionSnapshot;
   healthyFinite: WorkLease;
   healthyService: WorkLease;
@@ -43,7 +43,7 @@ export type FoundationFixturePack = {
 
 export function buildFoundationFixturePack(): FoundationFixturePack {
   const clock = createFrozenClock(FIXTURE_NOW);
-  const machine = createSupervisionMachine({ clock });
+  const machine = createTestSupervisionMachine({ clock });
 
   const healthyFinite = machine.issueLease({
     leaseId: "lease_fixture_finite_healthy",

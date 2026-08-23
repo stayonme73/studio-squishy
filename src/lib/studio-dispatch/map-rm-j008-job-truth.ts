@@ -22,7 +22,10 @@ import {
   type RmJ008KitPaymentSeal,
 } from "@/lib/studio-design-renderer";
 
-import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import {
+  requireApprovedLogoFile,
+  resolveApprovedLogoMaterial,
+} from "./map-flyer-job-truth";
 import type { JobDispatchRecord } from "./types";
 
 export const RM_J008_DISPATCH_WIRING_SCOPE_NOTE =
@@ -318,12 +321,14 @@ export function mapRmJ008KitProjectTruthFromJob(input: {
     };
   }
 
-  const logo = resolveApprovedLogoMaterial({
+  const logo = requireApprovedLogoFile(
+    resolveApprovedLogoMaterial({
     repoRoot: input.repoRoot,
     items: input.materials,
     skuId: DESIGN_RENDERER_RM_J008_SKU,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
-  });
+  }),
+  );
   if (!logo.ok) {
     return { ok: false, code: logo.code, message: logo.message };
   }

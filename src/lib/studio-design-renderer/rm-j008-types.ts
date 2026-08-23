@@ -84,7 +84,7 @@ export type RmJ008UpdateKitProjectTruth = {
   jobId: string;
   dispatchId: string;
   platform: RmJ008Platform;
-  lockedKitMemberCount: 4 | 5;
+  lockedKitMemberCount: 2 | 4 | 5;
   plannedKitMembers: readonly RmJ008PlannedKitMember[];
   before: RmJ008BeforeState;
   after: RmJ008AfterState;
@@ -139,7 +139,7 @@ export type RmJ008KitIdentity = {
   skuId: typeof DESIGN_RENDERER_RM_J008_SKU;
   platform: RmJ008Platform;
   kitRenderVersion: number;
-  lockedKitMemberCount: 4 | 5;
+  lockedKitMemberCount: 2 | 4 | 5;
   plannedKitMembers: readonly RmJ008PlannedKitMember[];
   members: readonly RmJ008MemberResult[];
   kitFingerprint: string;

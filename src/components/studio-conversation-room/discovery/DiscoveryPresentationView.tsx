@@ -8,10 +8,11 @@ import type { ConversationDriver } from "@/config/studio-conversation-driver-v1"
 import type { VoiceModeAssistControl } from "@/config/studio-conversation-driver-v1";
 import { isPresentationInteractive } from "@/config/studio-conversation-driver-v1";
 import type { DiscoveryAnswers } from "@/lib/business-discovery-session";
-import type {
-  DiscoveryDeadlineInformation,
-  DiscoveryPresentationPayload,
-  DiscoveryTabletStepId,
+import {
+  isDiscoveryTabletStepId,
+  type DiscoveryDeadlineInformation,
+  type DiscoveryPresentationPayload,
+  type DiscoveryTabletStepId,
 } from "@/lib/studio-conversation-discovery";
 
 export type DiscoveryPresentationViewProps = {
@@ -122,7 +123,11 @@ export default function DiscoveryPresentationView({
                   <button
                     type="button"
                     className={styles.itemTitleButton}
-                    onClick={() => onSelectCaptured(item.stepId)}
+                    onClick={() => {
+                      if (isDiscoveryTabletStepId(item.stepId)) {
+                        onSelectCaptured(item.stepId);
+                      }
+                    }}
                   >
                     {item.title}
                   </button>

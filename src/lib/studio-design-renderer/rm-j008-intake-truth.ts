@@ -110,7 +110,7 @@ export type RmJ008LiveKitLockInput = {
   platform: string;
   businessName: string;
   /** Must affirm existing profile control — not new setup. */
-  customerControlsExistingProfile: boolean | "Yes" | "true" | true;
+  customerControlsExistingProfile: boolean | string;
   beforeDisplayName: string;
   beforeBioOrAbout: string;
   beforeWebsite: string;
@@ -139,7 +139,7 @@ export type RmJ008LiveKitLockInput = {
 export type RmJ008KitLiveTruth = {
   skuId: typeof DESIGN_RENDERER_RM_J008_SKU;
   platform: RmJ008Platform;
-  lockedKitMemberCount: 4 | 5;
+  lockedKitMemberCount: 2 | 4 | 5;
   plannedKitMembers: readonly RmJ008PlannedKitMember[];
   replacementKitScope: "full_platform_replacement_kit";
   beforeStateSource: "customer_supplied";
@@ -179,7 +179,7 @@ export type RmJ008KitManifestSeed = {
   status: "kit_locked_pre_payment";
   skuId: typeof DESIGN_RENDERER_RM_J008_SKU;
   platform: RmJ008Platform;
-  lockedKitMemberCount: 4 | 5;
+  lockedKitMemberCount: 2 | 4 | 5;
   replacementKitScope: "full_platform_replacement_kit";
   beforeStateSource: "customer_supplied";
   countUnit: "kit_member_identities";

@@ -29,7 +29,10 @@ import {
   type Bf001RefreshProjectTruth,
 } from "@/lib/studio-design-renderer";
 
-import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import {
+  requireApprovedLogoFile,
+  resolveApprovedLogoMaterial,
+} from "./map-flyer-job-truth";
 import type { JobDispatchRecord } from "./types";
 
 export const BF_001_DISPATCH_WIRING_SCOPE_NOTE =
@@ -373,12 +376,14 @@ export function mapBf001RefreshProjectTruthFromJob(input: {
     };
   }
 
-  const logo = resolveApprovedLogoMaterial({
+  const logo = requireApprovedLogoFile(
+    resolveApprovedLogoMaterial({
     repoRoot: input.repoRoot,
     items: input.materials,
     skuId: DESIGN_RENDERER_BF_001_SKU,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
-  });
+  }),
+  );
   if (!logo.ok) {
     return { ok: false, code: logo.code, message: logo.message };
   }

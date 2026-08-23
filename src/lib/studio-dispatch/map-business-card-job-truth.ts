@@ -8,7 +8,10 @@ import type { CampaignMaterialItem } from "@/lib/materials/types";
 import type { BusinessCardProjectTruth } from "@/lib/studio-design-renderer/card-types";
 import { DESIGN_RENDERER_BUSINESS_CARD_SKU } from "@/lib/studio-design-renderer/card-types";
 
-import { resolveApprovedLogoMaterial } from "./map-flyer-job-truth";
+import {
+  requireApprovedLogoFile,
+  resolveApprovedLogoMaterial,
+} from "./map-flyer-job-truth";
 import type { JobDispatchRecord } from "./types";
 
 export type BusinessCardTruthMapResult =
@@ -86,12 +89,14 @@ export function mapBusinessCardProjectTruthFromJob(input: {
     };
   }
 
-  const logo = resolveApprovedLogoMaterial({
+  const logo = requireApprovedLogoFile(
+    resolveApprovedLogoMaterial({
     repoRoot: input.repoRoot,
     items: input.materials,
     skuId: DESIGN_RENDERER_BUSINESS_CARD_SKU,
     stagedLogoRelativePath: input.stagedLogoRelativePath,
-  });
+  }),
+  );
   if (!logo.ok) {
     return { ok: false, code: logo.code, message: logo.message };
   }

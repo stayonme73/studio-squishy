@@ -1,3 +1,4 @@
+import { isSupabasePrivateStorageRef } from "@/lib/file-registry/types";
 import type { CampaignMaterialItem, ServerMaterialsEnvelope } from "@/lib/materials/types";
 import { parseConsolidatedRequestId } from "@/lib/materials/client-requests";
 
@@ -5,12 +6,12 @@ import { markContentCertificationWithdrawn } from "./routing";
 import type { CustomerContentCertification } from "./types";
 
 function isPrivateStoredMaterial(item: CampaignMaterialItem): boolean {
+  const ref = item.storageRef;
   return (
     item.uploadStatus === "stored" &&
-    item.storageRef?.provider === "supabase_storage" &&
-    item.storageRef.connectionStatus === "private_object" &&
-    Boolean(item.storageRef.objectPath) &&
-    Boolean(item.storageRef.checksumSha256)
+    isSupabasePrivateStorageRef(ref) &&
+    Boolean(ref.objectPath) &&
+    Boolean(ref.checksumSha256)
   );
 }
 

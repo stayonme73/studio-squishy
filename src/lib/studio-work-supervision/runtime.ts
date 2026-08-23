@@ -1,10 +1,10 @@
 import { buildFoundationFixturePack } from "./fixtures";
-import type { SupervisionMachine } from "./machine";
+import type { SyncSupervisionMachine } from "./machine";
 import type { OwnerActionId } from "./types";
 
-let runtime: SupervisionMachine | null = null;
+let runtime: SyncSupervisionMachine | null = null;
 
-export function getRuntimeSupervisionMachine(): SupervisionMachine {
+export function getRuntimeSupervisionMachine(): SyncSupervisionMachine {
   if (!runtime) {
     runtime = buildFoundationFixturePack().machine;
   }

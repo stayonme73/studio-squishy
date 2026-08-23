@@ -393,7 +393,7 @@ export async function createCheckoutSession(
   const successUrl = `${origin}/studio-conversation-room?stage=checkout&payment=return&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${origin}/studio-conversation-room?stage=checkout&payment=cancel`;
 
-  const paidCycleMeta =
+  const paidCycleMeta: Record<string, string> =
     purchaseKind === "paid_cycle" &&
     amount.paidCyclePurchaseId &&
     amount.cyclePriceCents != null &&
@@ -531,7 +531,7 @@ export async function createCheckoutSession(
 
   let session: Stripe.Checkout.Session;
   try {
-    session = await stripe.checkout.sessions.create({
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
       customer_email: request.customerEmail || undefined,
       success_url: successUrl,
@@ -571,7 +571,8 @@ export async function createCheckoutSession(
             : {}),
         },
       },
-    });
+    };
+    session = await stripe.checkout.sessions.create(sessionParams);
   } catch {
     return {
       ok: false,

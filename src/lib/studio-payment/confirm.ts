@@ -96,7 +96,7 @@ function confirmPaidCycleLedger(
   binding: NonNullable<Awaited<ReturnType<typeof readCheckoutSessionBinding>>>,
 ):
   | { ok: true; campaign: CampaignRecord; alreadyPaid: boolean }
-  | { ok: false; error: PaymentConfirmationResult extends { ok: false } ? PaymentConfirmationResult["error"] : never; message: string } {
+  | { ok: false; error: Extract<PaymentConfirmationResult, { ok: false }>["error"]; message: string } {
   const paidCyclePurchaseId = binding.paidCyclePurchaseId;
   if (!paidCyclePurchaseId) {
     return {

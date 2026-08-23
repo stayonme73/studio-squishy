@@ -5,6 +5,10 @@
  * Do not expand Launch Now menu. Scenarios 1–3 PASS WITH EXPLICIT LIMITS.
  */
 
+export type FrozenLaunchNowClassification =
+  | "READY WITH EXPLICIT LIMITS"
+  | "NOT ON LAUNCH MENU";
+
 export const studioRoom4cMultiServiceClientGauntletV1 = {
   packageId:
     "STUDIO-OPERATING-ROOM-4C-MULTI-SERVICE-CLIENT-GAUNTLET-1" as const,
@@ -35,12 +39,12 @@ export const studioRoom4cMultiServiceClientGauntletV1 = {
     "Prove The Studio can truthfully accept and fulfill realistic multi-service Launch Now requests without contradicting the brief, losing continuity, promising unsupported work, or depending on owner production labor." as const,
 
   frozenLaunchNowServices: {
-    shortFormVideo: "READY WITH EXPLICIT LIMITS" as const,
-    socialGraphics: "READY WITH EXPLICIT LIMITS" as const,
-    printCollateral: "READY WITH EXPLICIT LIMITS" as const,
-    marketingCopyEmail: "READY WITH EXPLICIT LIMITS" as const,
-    campaignCreative: "READY WITH EXPLICIT LIMITS" as const,
-    carousel: "NOT ON LAUNCH MENU" as const,
+    shortFormVideo: "READY WITH EXPLICIT LIMITS" as FrozenLaunchNowClassification,
+    socialGraphics: "READY WITH EXPLICIT LIMITS" as FrozenLaunchNowClassification,
+    printCollateral: "READY WITH EXPLICIT LIMITS" as FrozenLaunchNowClassification,
+    marketingCopyEmail: "READY WITH EXPLICIT LIMITS" as FrozenLaunchNowClassification,
+    campaignCreative: "READY WITH EXPLICIT LIMITS" as FrozenLaunchNowClassification,
+    carousel: "NOT ON LAUNCH MENU" as FrozenLaunchNowClassification,
   },
 
   excluded: [

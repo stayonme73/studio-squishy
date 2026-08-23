@@ -81,7 +81,8 @@ export function reconcileFlyerWordmarkMaterialTruth(
     const flyerRelated = item.relatedServiceIds.some((skuId) => flyerSkuIds.has(skuId));
     if (!flyerRelated) return item;
 
-    if (item.sourceExceptionId || item.promotionApprovedAt || item.reviewStatus === "requested") {
+    const reviewStatus = item.reviewStatus;
+    if (item.sourceExceptionId || item.promotionApprovedAt || reviewStatus === "requested") {
       return item;
     }
 
@@ -90,17 +91,20 @@ export function reconcileFlyerWordmarkMaterialTruth(
         item.category === "access-instructions" ||
         item.category === "factual-confirmation") &&
       item.uploadStatus !== "stored" &&
-      item.reviewStatus !== "submitted" &&
-      item.reviewStatus !== "approved_for_use"
+      reviewStatus !== "submitted" &&
+      reviewStatus !== "approved_for_use"
     ) {
       changed = true;
       return {
         ...item,
         requirementLevel: "optional" as const,
         reviewStatus:
-          item.reviewStatus === "missing" || item.reviewStatus === "requested"
-            ? ("not_needed" as const)
-            : item.reviewStatus,
+          (() => {
+            const statusName: string = reviewStatus;
+            return statusName === "missing" || statusName === "requested"
+              ? ("not_needed" as const)
+              : reviewStatus;
+          })(),
       };
     }
 

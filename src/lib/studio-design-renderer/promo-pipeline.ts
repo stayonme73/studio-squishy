@@ -389,13 +389,19 @@ export async function runPromoRendererPipeline(input: {
   const setQaOk = gated.ok && setEval.ok;
 
   // Rewrite identity with final QA flags (same version directory).
+  const nextAssets = identityDraft.assets.map((a) => ({
+      ...a,
+      individualQaOk: bothIndividualOk,
+  }));
+  const firstAsset = nextAssets[0];
+  const secondAsset = nextAssets[1];
+  if (!firstAsset || !secondAsset || nextAssets.length !== 2) {
+    throw new Error("PARTIAL_SET_FAILURE: identity rewrite requires exactly two assets");
+  }
   const identity = {
     ...identityDraft,
     setQaOk,
-    assets: identityDraft.assets.map((a) => ({
-      ...a,
-      individualQaOk: bothIndividualOk,
-    })) as typeof identityDraft.assets,
+    assets: [firstAsset, secondAsset] as const,
   };
   writeFileSync(
     path.join(

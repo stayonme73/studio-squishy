@@ -1282,10 +1282,13 @@ export function applyTaskPatch(
       );
       if (!result.ok) return result;
       const asked = askOrdinaryMissingClientFacts(result.envelope, user, context);
+      const raised = result.exception;
       return {
         ok: true,
         envelope: asked.envelope,
-        exception: asked.envelope.exceptionRecords?.find((entry) => entry.id === result.exception.id) ?? result.exception,
+        exception: raised
+          ? asked.envelope.exceptionRecords?.find((entry) => entry.id === raised.id) ?? raised
+          : undefined,
         materialsEnvelope: asked.materialsEnvelope ?? result.materialsEnvelope,
       };
     }

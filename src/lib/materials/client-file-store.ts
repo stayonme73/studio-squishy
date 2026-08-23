@@ -8,7 +8,11 @@ import type { CampaignRecord } from "@/config/studio-board";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import { addJobFileReference } from "@/lib/file-registry/job-files";
-import type { FileRoomStorageAdapter } from "@/lib/file-storage/types";
+import {
+  isSupabasePrivateStorageRef,
+  type StudioFileSupabaseStorageReference,
+} from "@/lib/file-registry/types";
+import type { FileRoomStorageAdapter, FileRoomStorageDownloadResult } from "@/lib/file-storage/types";
 import { buildJobId } from "@/lib/job-control/lane-map";
 import { resolveCampaignCommunicationClientId } from "@/lib/job-control/communication";
 import { appendJobActivityEvent } from "@/lib/job-control/activity-log";
@@ -44,13 +48,15 @@ export function validateCustomerMaterialFile(file: File): { ok: true } | { ok: f
   return { ok: true };
 }
 
-export function isPrivateStoredMaterial(item: CampaignMaterialItem): boolean {
+export function isPrivateStoredMaterial(
+  item: CampaignMaterialItem,
+): item is CampaignMaterialItem & { storageRef: StudioFileSupabaseStorageReference } {
+  const ref = item.storageRef;
   return (
     item.uploadStatus === "stored" &&
-    item.storageRef?.provider === "supabase_storage" &&
-    item.storageRef.connectionStatus === "private_object" &&
-    Boolean(item.storageRef.objectPath) &&
-    Boolean(item.storageRef.checksumSha256)
+    isSupabasePrivateStorageRef(ref) &&
+    Boolean(ref.objectPath) &&
+    Boolean(ref.checksumSha256)
   );
 }
 
@@ -77,6 +83,31 @@ function retrievedByteLength(body: unknown, fallback: number): number {
   if (Buffer.isBuffer(body)) return body.byteLength;
   if (body instanceof ArrayBuffer) return body.byteLength;
   return fallback;
+}
+
+async function downloadBodyToBuffer(
+  body: FileRoomStorageDownloadResult["body"],
+): Promise<Buffer> {
+  if (Buffer.isBuffer(body)) return body;
+  if (body instanceof Uint8Array) return Buffer.from(body);
+  if (body instanceof ArrayBuffer) return Buffer.from(body);
+  if (typeof Blob !== "undefined" && body instanceof Blob) {
+    return Buffer.from(await body.arrayBuffer());
+  }
+  if (typeof ReadableStream !== "undefined" && body instanceof ReadableStream) {
+    return Buffer.from(await new Response(body).arrayBuffer());
+  }
+  const chunks: Buffer[] = [];
+  for await (const chunk of body as NodeJS.ReadableStream) {
+    chunks.push(nodeStreamChunkToBuffer(chunk));
+  }
+  return Buffer.concat(chunks);
+}
+
+function nodeStreamChunkToBuffer(chunk: unknown): Buffer {
+  if (typeof chunk === "string") return Buffer.from(chunk);
+  if (chunk instanceof Uint8Array) return Buffer.from(chunk);
+  throw new Error("Unsupported download stream chunk");
 }
 
 function bucketItems(
@@ -179,7 +210,7 @@ export async function storeAndAttachCustomerMaterialFile(input: {
   const checksum = sha256Hex(bytes);
 
   const already = targets.find(
-    (item) => isPrivateStoredMaterial(item) && item.storageRef?.checksumSha256 === checksum,
+    (item) => isPrivateStoredMaterial(item) && item.storageRef.checksumSha256 === checksum,
   );
   if (already) {
     return {
@@ -413,23 +444,19 @@ export async function downloadStoredCustomerMaterialBytes(input: {
   }
   try {
     const download = await input.adapter.downloadObject({ storageRef: input.item.storageRef });
-    const bytes = Buffer.from(
-      download.body instanceof ArrayBuffer
-        ? download.body
-        : download.body instanceof Uint8Array
-          ? download.body
-          : Buffer.isBuffer(download.body)
-            ? download.body
-            : await new Response(download.body as BodyInit).arrayBuffer(),
-    );
+    const bytes = await downloadBodyToBuffer(download.body);
     if (bytes.byteLength <= 0) {
+      return { ok: false, error: "Stored file is not available.", status: 404 };
+    }
+    const checksumSha256 = input.item.storageRef.checksumSha256;
+    if (!checksumSha256) {
       return { ok: false, error: "Stored file is not available.", status: 404 };
     }
     return {
       ok: true,
       body: bytes,
       contentType: download.contentType ?? input.item.mimeType ?? "application/octet-stream",
-      checksumSha256: input.item.storageRef.checksumSha256!,
+      checksumSha256,
     };
   } catch {
     return { ok: false, error: "Stored file is not available.", status: 502 };
