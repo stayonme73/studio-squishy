@@ -1,0 +1,114 @@
+{
+  "ok": true,
+  "scenarios": {
+    "authDeniedWithoutSecret": true,
+    "healthyFiniteWork": true,
+    "healthyLongRunningService": true,
+    "waitingForOwnerNotWorking": true,
+    "unconnectedProviderCoverageNotConnected": true,
+    "stoppedHeartbeatStalled": true,
+    "deadServiceIncident": true,
+    "branchCommitMismatch": true,
+    "routineRecoveryWithoutOwner": true,
+    "duplicateHeartbeatsDoNotDuplicateIncidents": true,
+    "recoveryFailureCreatesOwnerIncident": true,
+    "machineComputesHealth": true
+  },
+  "limits": [
+    "Claude NOT CONNECTED",
+    "Build-A-Bot NOT CONNECTED",
+    "Make NOT ACTIVE",
+    "Resend PARKED",
+    "No external scheduler. In-process sweep dies with the Node process.",
+    "No proven out-of-band alert"
+  ],
+  "elapsedMs": 31592,
+  "failedIncident": {
+    "incidentId": "sup_inc_15",
+    "customerId": "cust_proof_harbor",
+    "customerLabel": "Harbor Lantern Co. (fixture)",
+    "projectId": "proj_proof_harbor",
+    "campaignId": "camp_proof_harbor",
+    "severity": "ROUTINE",
+    "category": "agent",
+    "state": "ESCALATED",
+    "ownerEscalated": true,
+    "failedOrStalledStep": "upload_final_files",
+    "customerImpact": "Finite work missed its heartbeat while it was expected to be active.",
+    "deadlineImpact": "Delay possible if the stall continues.",
+    "financialImpact": "none proven",
+    "rightsOrComplianceImpact": "none proven",
+    "securityOrBreachImpact": "none proven",
+    "containmentPerformed": "Machine isolated the lease; worker cannot self-certify health.",
+    "currentResponsibleParty": "Owner",
+    "whoMustBeContacted": "Owner. Authorized routine recovery failed.",
+    "lastHealthyAt": "2026-08-23T14:51:36.068Z",
+    "lastHeartbeatAt": "2026-08-23T14:51:36.068Z",
+    "recoveryAttempts": [
+      {
+        "attemptId": "sup_rec_25",
+        "at": "2026-08-23T14:51:36.481Z",
+        "strategy": "request_fresh_heartbeat",
+        "result": "pending",
+        "detail": "Machine requested a fresh heartbeat. Owner is not interrupted yet."
+      },
+      {
+        "attemptId": "sup_rec_53",
+        "at": "2026-08-23T14:52:07.535Z",
+        "strategy": "request_fresh_heartbeat",
+        "result": "failure",
+        "detail": "Authorized routine recovery did not restore a heartbeat in time."
+      }
+    ],
+    "ownerDecisionRequired": "Review the failed recovery and decide whether to retry, reassign, or stop this work.",
+    "nextAutomaticAction": "Wait for Owner action. Recheck on schedule if Tagia does nothing.",
+    "ifOwnerDoesNothing": "The Machine keeps the incident on the Owner desk and rechecks at 2026-08-23T14:57:07.535Z. Customer impact does not clear by silence.",
+    "nextCheckAt": "2026-08-23T14:57:07.535Z",
+    "evidence": [],
+    "history": [
+      {
+        "eventId": "sup_evt_16",
+        "at": "2026-08-23T14:51:36.480Z",
+        "type": "incident_opened",
+        "actor": "machine",
+        "summary": "Incident opened by the Machine.",
+        "payload": {
+          "severity": "ROUTINE",
+          "dedupeKey": "lease_proof_fail_1787496695944:stale_heartbeat"
+        }
+      },
+      {
+        "eventId": "sup_evt_26",
+        "at": "2026-08-23T14:51:36.481Z",
+        "type": "recovery_attempted",
+        "actor": "machine",
+        "summary": "Recovery pending: request_fresh_heartbeat",
+        "payload": {
+          "result": "pending",
+          "strategy": "request_fresh_heartbeat"
+        }
+      },
+      {
+        "eventId": "sup_evt_54",
+        "at": "2026-08-23T14:52:07.535Z",
+        "type": "recovery_attempted",
+        "actor": "machine",
+        "summary": "Recovery failure: request_fresh_heartbeat",
+        "payload": {
+          "result": "failure",
+          "strategy": "request_fresh_heartbeat"
+        }
+      },
+      {
+        "eventId": "sup_evt_55",
+        "at": "2026-08-23T14:52:07.535Z",
+        "type": "owner_escalated",
+        "actor": "machine",
+        "summary": "Recovery failed. Complete Owner incident is on the desk.",
+        "payload": {
+          "strategy": "request_fresh_heartbeat"
+        }
+      }
+    ]
+  }
+}

@@ -1,8 +1,8 @@
 /**
  * Work Supervision and Incident Escalation.
- * OPEN 2026-08-23. Foundation Pass 1 in progress. Not certified. Not closed.
- * Opening artifacts exist. Machine incident core + Owner incident command view
- * authorized. Do not connect Claude, Build-A-Bot, Make, or Resend.
+ * OPEN 2026-08-23. Foundation Pass 1 accepted at 0dc76903.
+ * Runtime Pass 2 in progress. Not certified. Not closed.
+ * Do not connect Claude, Build-A-Bot, Make, or Resend.
  * Base: mobile park tip bc458931. Room 4 only. Do not assign Room 4D / 4E.
  * Do not merge. Do not start Room 5. Do not unpark mobile until this package closes.
  */
@@ -21,6 +21,9 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
   openingArtifactsOnly: false as const,
   implementationAuthorized: true as const,
   foundationPass: 1 as const,
+  foundationPassAccepted: true as const,
+  foundationPassAcceptedAt: "0dc769038518a31db91346a6164c58a27a3f2239" as const,
+  runtimePass: 2 as const,
   packageClosed: false as const,
   baseCommit: "bc458931c46ed845b982f62a4c70f8a312c169c8" as const,
   baseBranch:
@@ -43,6 +46,9 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
   doNotReopenGateXWithoutDefect: true as const,
   doNotUnparkMobileInOpening: true as const,
   incidentCommandRoute: "/file-room/incident-command" as const,
+  supervisionRegisterPath: "/api/operating/supervision/register" as const,
+  supervisionHeartbeatPath: "/api/operating/supervision/heartbeat" as const,
+  supervisionSweepPath: "/api/operating/supervision/sweep" as const,
   doNotClaimClaudeConnected: true as const,
   doNotClaimBuildABotConnected: true as const,
   doNotClaimResendLive: true as const,
@@ -85,4 +91,6 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
     "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/DEFECT-AND-LIMIT-LEDGER.md" as const,
   packageAgentsDoc:
     "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/AGENTS.md" as const,
+  externalAgentContractDoc:
+    "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/EXTERNAL-AGENT-REGISTRATION-AND-HEARTBEAT-CONTRACT.md" as const,
 } as const;

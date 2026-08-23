@@ -81,6 +81,32 @@ export const UNCONNECTED_PROVIDERS = [
 ] as const;
 export type UnconnectedProviderId = (typeof UNCONNECTED_PROVIDERS)[number];
 
+export const WORKER_REPORTED_STATUSES = [
+  "working",
+  "service_awake",
+  "waiting_for_owner",
+  "blocked",
+  "complete",
+] as const;
+export type WorkerReportedStatus = (typeof WORKER_REPORTED_STATUSES)[number];
+
+export const WORKER_PROVIDER_IDS = [
+  "machine",
+  "scout",
+  "claude",
+  "cody",
+  "build_a_bot",
+  "production_worker",
+  "fixture",
+] as const;
+export type WorkerProviderId = (typeof WORKER_PROVIDER_IDS)[number];
+
+export type AssignedWorker = {
+  providerId: WorkerProviderId | string;
+  workerId: string;
+  label: string;
+};
+
 export type ResponsibleComponent = {
   kind: ComponentKind;
   id: string;
@@ -98,7 +124,16 @@ export type RecoveryAttempt = {
   attemptId: string;
   at: string;
   strategy: string;
-  result: "success" | "failure";
+  result: "pending" | "success" | "failure";
+  detail: string;
+};
+
+export type LeaseMismatch = {
+  code: "branch_commit_mismatch";
+  expectedBranch: string | null;
+  expectedCommit: string | null;
+  reportedBranch: string | null;
+  reportedCommit: string | null;
   detail: string;
 };
 
@@ -121,6 +156,10 @@ export type WorkLease = {
   kind: LeaseKind;
   coverageConnected: boolean;
   subject: ResponsibleComponent;
+  assignedWorker: AssignedWorker;
+  packageId: string;
+  branch: string | null;
+  commit: string | null;
   customerId: string;
   customerLabel: string;
   projectId: string;
@@ -132,9 +171,13 @@ export type WorkLease = {
   lastHeartbeatAt: string;
   lastHealthyAt: string | null;
   expectedCompletionAt: string | null;
+  expectedUpdateAt: string | null;
   completedAt: string | null;
   blocker: ExactBlocker | null;
   waitingReason: string | null;
+  reportedStatus: WorkerReportedStatus | null;
+  mismatch: LeaseMismatch | null;
+  evidence: EvidenceRef[];
   health: HealthStatus;
   openIncidentId: string | null;
 };
@@ -185,6 +228,10 @@ export type IssueLeaseInput = {
   kind: LeaseKind;
   coverageConnected?: boolean;
   subject: ResponsibleComponent;
+  assignedWorker?: AssignedWorker;
+  packageId?: string;
+  branch?: string | null;
+  commit?: string | null;
   customerId: string;
   customerLabel: string;
   projectId: string;
@@ -193,12 +240,34 @@ export type IssueLeaseInput = {
   heartbeatIntervalMs?: number;
   graceMs?: number;
   expectedCompletionAt?: string | null;
+  expectedUpdateAt?: string | null;
 };
 
 export type HeartbeatInput = {
   leaseId: string;
   idempotencyKey: string;
   at?: string;
+  reportedStatus?: WorkerReportedStatus;
+  evidenceSummary?: string;
+  branch?: string | null;
+  commit?: string | null;
+  customerId?: string;
+  projectId?: string;
+  blocker?: ExactBlocker;
+  waitingReason?: string;
+};
+
+export type SweepResult = {
+  evaluatedAt: string;
+  leaseHealth: Record<string, HealthStatus>;
+  incidentsOpenedOrUpdated: string[];
+  recoveries: Array<{
+    incidentId: string;
+    result: RecoveryAttempt["result"];
+    strategy: string;
+  }>;
+  overdueNextChecks: string[];
+  mismatches: string[];
 };
 
 export type OpenIncidentInput = {
@@ -238,3 +307,19 @@ export type SupervisionSnapshot = {
   incidents: MachineIncident[];
   providers: ProviderPortStatus[];
 };
+
+export class SupervisionIsolationError extends Error {
+  readonly code = "CUSTOMER_PROJECT_ISOLATION" as const;
+  constructor(message = "Heartbeat customer or project does not match the lease.") {
+    super(message);
+    this.name = "SupervisionIsolationError";
+  }
+}
+
+export class UnknownLeaseError extends Error {
+  readonly code = "UNKNOWN_LEASE" as const;
+  constructor(leaseId: string) {
+    super(`Unknown lease ${leaseId}`);
+    this.name = "UnknownLeaseError";
+  }
+}

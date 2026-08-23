@@ -5,7 +5,7 @@ import { studioMobileCustomerJourneyCertificationV1 as mobile } from "@/config/s
 import { studioWorkSupervisionAndIncidentEscalationV1 as cfg } from "@/config/studio-work-supervision-and-incident-escalation-v1";
 
 describe("STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1", () => {
-  it("stays OPEN in Room 4 for foundation pass 1 without closing or starting Room 5", () => {
+  it("stays OPEN in Room 4 for runtime pass 2 without closing or starting Room 5", () => {
     expect(cfg.packageId).toBe(
       "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1",
     );
@@ -15,6 +15,8 @@ describe("STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1", () => {
     expect(cfg.openingArtifactsOnly).toBe(false);
     expect(cfg.implementationAuthorized).toBe(true);
     expect(cfg.foundationPass).toBe(1);
+    expect(cfg.foundationPassAccepted).toBe(true);
+    expect(cfg.runtimePass).toBe(2);
     expect(cfg.packageClosed).toBe(false);
     expect(cfg.baseCommit).toBe(
       "bc458931c46ed845b982f62a4c70f8a312c169c8",

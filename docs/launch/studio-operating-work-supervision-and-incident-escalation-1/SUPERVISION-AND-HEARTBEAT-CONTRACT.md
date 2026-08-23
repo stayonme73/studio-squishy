@@ -28,4 +28,4 @@ The **Machine** owns heartbeat and status truth. Scout does not. Claude does not
 - Routine: Machine recovers; Tagia is not interrupted.  
 - Escalate only after recovery fails or Owner judgment is required.
 
-This contract is not implemented in the opening commit.
+This contract is implemented for Machine leases, authenticated ingest, and an in-process sweep. Claude, Build-A-Bot, Make, and Resend remain not connected. An external scheduler is not connected; if the Node process dies, the in-process sweep dies with it.

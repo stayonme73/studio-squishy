@@ -1,7 +1,7 @@
 # STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION — PACKAGE CONTRACT
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 in progress (Machine incident core + additive Incident Command). **Not** certified. **Not** closed.  
+**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 accepted at `0dc76903`. Runtime Pass 2 in progress (Machine leases, authenticated heartbeat ingest, independent sweep). **Not** certified. **Not** closed.  
 **Opened:** 2026-08-23  
 **Base:** mobile park tip `bc458931c46ed845b982f62a4c70f8a312c169c8`  
 **Branch:** `operating/work-supervision-and-incident-escalation-1`  
@@ -27,6 +27,10 @@ Opening documents, schema, contracts, scenario list, defect ledger, board pointe
 ## What Foundation Pass 1 authorizes
 
 Provider-independent Machine incident core, heartbeat/lease health, severity/escalation rules, additive Owner Incident Command, Squishy Watchkeeper on routine internal states only, and proof tests with fictional fixtures.
+
+## What Runtime Pass 2 authorizes
+
+Machine-owned work leases, authenticated provider-independent heartbeat ingest, an independent Machine sweep, contract-authorized routine recovery, and a registration/heartbeat contract that future workers can use. Live controlled proof uses fictional work only. This pass does **not** connect Claude, Build-A-Bot, Make, or Resend.
 
 ## What this package still does **not** authorize
 

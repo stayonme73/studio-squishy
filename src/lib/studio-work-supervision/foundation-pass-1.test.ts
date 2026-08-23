@@ -204,7 +204,8 @@ describe("work supervision foundation pass 1", () => {
     expect(incident.ownerEscalated).toBe(true);
     expect(incident.state).toBe("ESCALATED");
     expect(incident.ownerDecisionRequired).not.toBe("none");
-    expect(incident.whoMustBeContacted.length).toBeGreaterThan(0);
+    expect(incident.whoMustBeContacted).toContain("Owner");
+    expect(incident.ifOwnerDoesNothing).toContain("Owner desk");
     expect(incident.ifOwnerDoesNothing).toContain(incident.nextCheckAt);
     expect(incident.recoveryAttempts).toHaveLength(1);
     expect(incident.recoveryAttempts[0]?.result).toBe("failure");

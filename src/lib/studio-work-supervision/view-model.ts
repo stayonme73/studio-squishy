@@ -77,9 +77,10 @@ export function toIncidentCommandView(snapshot: SupervisionSnapshot): IncidentCo
     providers: snapshot.providers,
     healthyLeases: snapshot.leases.filter(
       (lease) =>
-        lease.health === "ACTIVE" ||
-        lease.health === "SERVICE_AWAKE" ||
-        lease.health === "COMPLETE",
+        !lease.mismatch &&
+        (lease.health === "ACTIVE" ||
+          lease.health === "SERVICE_AWAKE" ||
+          lease.health === "COMPLETE"),
     ),
     incidentCards: snapshot.incidents.map((incident) => ({
       incidentId: incident.incidentId,

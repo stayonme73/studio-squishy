@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Owner Incident Command evidence · failed routine recovery</title>
+  <style>
+    body { font-family: Georgia, serif; background: #111; color: #f4f1ea; padding: 24px; }
+    h1 { font-size: 22px; }
+    dt { font-weight: 700; margin-top: 12px; }
+    dd { margin-left: 0; }
+  </style>
+</head>
+<body>
+  <p>Incident Command evidence · fictional fixture · Runtime Pass 2</p>
+  <h1>Harbor Lantern Co. (fixture) · sup_inc_15</h1>
+  <dl>
+    <dt>Severity / state</dt><dd>ROUTINE · ESCALATED · ownerEscalated=true</dd>
+    <dt>Customer and project</dt><dd>Harbor Lantern Co. (fixture) (cust_proof_harbor). Project proj_proof_harbor. Campaign camp_proof_harbor.</dd>
+    <dt>Failed or stalled step</dt><dd>upload_final_files</dd>
+    <dt>Last healthy / last heartbeat</dt><dd>2026-08-23T14:51:36.068Z / 2026-08-23T14:51:36.068Z</dd>
+    <dt>Owner decision</dt><dd>Review the failed recovery and decide whether to retry, reassign, or stop this work.</dd>
+    <dt>If Owner does nothing</dt><dd>The Machine keeps the incident on the Owner desk and rechecks at 2026-08-23T14:57:07.535Z. Customer impact does not clear by silence.</dd>
+    <dt>Next check</dt><dd>2026-08-23T14:57:07.535Z</dd>
+    <dt>Recovery attempts</dt><dd><ul><li>2026-08-23T14:51:36.481Z · request_fresh_heartbeat · pending · Machine requested a fresh heartbeat. Owner is not interrupted yet.</li><li>2026-08-23T14:52:07.535Z · request_fresh_heartbeat · failure · Authorized routine recovery did not restore a heartbeat in time.</li></ul></dd>
+    <dt>History</dt><dd><ol><li>2026-08-23T14:51:36.480Z · machine · incident_opened · Incident opened by the Machine.</li><li>2026-08-23T14:51:36.481Z · machine · recovery_attempted · Recovery pending: request_fresh_heartbeat</li><li>2026-08-23T14:52:07.535Z · machine · recovery_attempted · Recovery failure: request_fresh_heartbeat</li><li>2026-08-23T14:52:07.535Z · machine · owner_escalated · Recovery failed. Complete Owner incident is on the desk.</li></ol></dd>
+  </dl>
+</body>
+</html>

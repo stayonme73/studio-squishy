@@ -2,6 +2,9 @@ import type { IncidentSeverity, ProviderPortStatus } from "./types";
 
 export const DEFAULT_HEARTBEAT_INTERVAL_MS = 30_000;
 export const DEFAULT_GRACE_MS = 5_000;
+export const ROUTINE_RECOVERY_WINDOW_MS = 30_000;
+export const LIVE_SWEEP_INTERVAL_MS = 30_000;
+export const AUTHORIZED_ROUTINE_RECOVERY_STRATEGY = "request_fresh_heartbeat" as const;
 
 /** Next-check cadence after evaluation or escalation. */
 export const NEXT_CHECK_INTERVAL_MS: Record<IncidentSeverity, number> = {
@@ -62,11 +65,12 @@ export function mayShowSquishy(severity: IncidentSeverity): boolean {
 export function ifOwnerDoesNothingCopy(
   severity: IncidentSeverity,
   nextAt: string,
+  ownerEscalated = false,
 ): string {
   if (isSecuritySeverity(severity)) {
     return `Containment stays in place. The Machine rechecks at ${nextAt}. This stays on the Owner desk until Tagia acts or confirms resolution.`;
   }
-  if (severity === "ROUTINE") {
+  if (severity === "ROUTINE" && !ownerEscalated) {
     return `The Machine retries recovery at ${nextAt}. Tagia is not paged for routine recovery.`;
   }
   return `The Machine keeps the incident on the Owner desk and rechecks at ${nextAt}. Customer impact does not clear by silence.`;
@@ -89,4 +93,20 @@ export function ownerMustBeInterrupted(input: {
   }
   if (severity === "ROUTINE" && recoveryFailed) return true;
   return false;
+}
+
+export function isUnconnectedProviderId(id: string | null | undefined): boolean {
+  return id === "claude" || id === "build_a_bot" || id === "make" || id === "resend";
+}
+
+export function routineRecoveryAuthorized(input: {
+  severity: IncidentSeverity;
+  category: string;
+}): boolean {
+  if (isSecuritySeverity(input.severity)) return false;
+  if (input.severity === "FINANCIAL_RISK") return false;
+  if (input.severity === "DEADLINE_CRITICAL") return false;
+  if (input.severity === "RIGHTS_OR_COMPLIANCE_RISK") return false;
+  if (input.category === "provider") return false;
+  return input.severity === "ROUTINE";
 }
