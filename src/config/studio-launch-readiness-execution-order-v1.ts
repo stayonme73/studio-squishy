@@ -12,7 +12,9 @@
  * Tagia 2026-08-21: Room 4C CLOSED WITH EXPLICIT LIMITS at 92f47e2.
  * Tagia 2026-08-21 (later): Pre-Launch Master Closeout Register ACTIVE (not execution).
  * Tagia 2026-08-22: External Customer Content Intake and Rights Certification
- * CLOSED WITH EXPLICIT LIMITS. Do not open the next package. Room 4 remains OPEN.
+ * CLOSED WITH EXPLICIT LIMITS at 15ee699c.
+ * Tagia 2026-08-22 (later): Mobile Customer Journey Certification OPEN.
+ * Room 4 remains OPEN. Do not start Room 5. Do not assign Room 4D / 4E.
  */
 
 export const studioLaunchReadinessExecutionOrderV1 = {
@@ -37,8 +39,8 @@ export const studioLaunchReadinessExecutionOrderV1 = {
   currentActiveRoomId: "full-business-rehearsal" as const,
   currentActiveRoomClosed: false as const,
   currentActiveSectionId:
-    "external-customer-content-intake-and-rights-certification" as const,
-  currentActiveSectionStatus: "CLOSED WITH EXPLICIT LIMITS" as const,
+    "mobile-customer-journey-certification" as const,
+  currentActiveSectionStatus: "OPEN" as const,
 
   lastCustomerLifePackage: {
     id: "STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1",
@@ -177,12 +179,16 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     room4CClosedAt: "2026-08-21" as const,
     room4CCloseTip: "92f47e200ab59979a2c8b16e813abfef9e067765" as const,
     currentSectionId:
-      "external-customer-content-intake-and-rights-certification" as const,
-    currentSectionStatus: "CLOSED WITH EXPLICIT LIMITS" as const,
+      "mobile-customer-journey-certification" as const,
+    currentSectionStatus: "OPEN" as const,
     activeRegisterPackageId:
       "STUDIO-PRE-LAUNCH-MASTER-CLOSEOUT-REGISTER-1" as const,
     lastClosedExecutionPackageId:
       "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1" as const,
+    lastClosedExecutionPackageTip:
+      "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
+    activeExecutionPackageId:
+      "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
     doNotOpenNextPackage: true as const,
   },
 
@@ -263,9 +269,9 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     configModule:
       "src/config/studio-pre-launch-master-closeout-register-v1.ts" as const,
     recommendedNextPackageId:
-      "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1" as const,
-    recommendedNextPackageStatus: "CLOSED WITH EXPLICIT LIMITS" as const,
-    doNotStartRecommendedNextInThisPackage: true as const,
+      "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
+    recommendedNextPackageStatus: "OPEN" as const,
+    doNotStartRecommendedNextInThisPackage: false as const,
     doNotOpenNextPackage: true as const,
   },
 
@@ -296,6 +302,35 @@ export const studioLaunchReadinessExecutionOrderV1 = {
       "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-PACKAGE-CONTRACT.md" as const,
     closeoutDoc:
       "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md" as const,
+    closeTip: "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
+  },
+
+  mobileCustomerJourneyCertification: {
+    packageId:
+      "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
+    title: "Mobile Customer Journey Certification" as const,
+    status: "OPEN" as const,
+    sectionClosed: false as const,
+    baseCommit: "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
+    openedAt: "2026-08-22" as const,
+    registerRequirement: "FULL_MOBILE_CUSTOMER_JOURNEY_CERTIFICATION" as const,
+    doNotAssignRoom4dOr4eLabel: true as const,
+    doNotStartRoom5: true as const,
+    doNotMerge: true as const,
+    doNotChangeLaunchNowMenu: true as const,
+    doNotReopenRoom4bWithoutDefect: true as const,
+    doNotReopenRoom4cWithoutDefect: true as const,
+    doNotReopenGateXWithoutDefect: true as const,
+    doNotExecuteLivePhoneJourneyInOpening: true as const,
+    room4RemainsOpen: true as const,
+    gateXRemainsClosed: true as const,
+    gateXCloseTip: "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
+    room4cRemainsClosed: true as const,
+    room4cCloseTip: "92f47e200ab59979a2c8b16e813abfef9e067765" as const,
+    configModule:
+      "src/config/studio-mobile-customer-journey-certification-v1.ts" as const,
+    packageContractDoc:
+      "docs/launch/studio-operating-mobile-customer-journey-certification-1/STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-PACKAGE-CONTRACT.md" as const,
   },
 
   merge: "separately_authorized" as const,

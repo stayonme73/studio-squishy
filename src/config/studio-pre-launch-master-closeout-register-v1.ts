@@ -70,6 +70,8 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
     fullMobileCustomerJourneyCertification: {
       id: 2 as const,
       classification: "REQUIRED_NOT_STARTED" as const,
+      executionPackageStatus: "OPEN" as const,
+      openedAt: "2026-08-22" as const,
       doNotStartWithoutOwnerAuthorization: true as const,
       dependsOnExternalContentRights: true as const,
       requiredBeforeRoom4Close: true as const,
@@ -225,12 +227,12 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
 
   recommendedNextSinglePackage: {
     packageId:
-      "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1" as const,
-    status: "CLOSED WITH EXPLICIT LIMITS" as const,
-    doNotStartInThisPackage: true as const,
+      "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
+    status: "OPEN" as const,
+    doNotStartInThisPackage: false as const,
     doNotOpenNextPackage: true as const,
     reason:
-      "Gate X closed with explicit limits. Do not open the next register package from this closeout. Mobile certification remains REQUIRED_NOT_STARTED and unauthorized." as const,
+      "Register area 2. Required before Room 4 closes. Owner authorized opening from Gate X close tip 15ee699c. Live phone certification is not stamped in opening. Do not assign Room 4D/4E. Do not start Room 5." as const,
   },
 
   sequenceGates: {

@@ -107,15 +107,15 @@ Exactly one per area:
 
 | Field | Value |
 |-------|-------|
-| Classification | REQUIRED_NOT_STARTED |
-| Current truth | Room 4C mobile notes are responsive coverage only. |
-| Evidence | S1–S3 `MOBILE-RESPONSIVE-OBSERVATIONS.md` |
-| Remaining gap | Phone cert for hire, communication, uploads, feedback, approval, delivery |
-| Dependencies | Gate X is COMPLETE_WITH_EXPLICIT_LIMITS. Mobile cert still requires that cleared path and is **not started**. |
+| Classification | REQUIRED_NOT_STARTED (live cert not stamped) |
+| Current truth | Execution package **OPEN** 2026-08-22 from Gate X close `15ee699c`. Opening artifacts only. Room 4C mobile notes remain responsive coverage only. |
+| Evidence | Package contract `docs/launch/studio-operating-mobile-customer-journey-certification-1/STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-PACKAGE-CONTRACT.md`; S1–S3 `MOBILE-RESPONSIVE-OBSERVATIONS.md` are **not** this cert |
+| Remaining gap | Real-phone hire, pay, intake, upload, rights, communicate, track, review, feedback, approval, delivery, and error recovery |
+| Dependencies | Gate X is COMPLETE_WITH_EXPLICIT_LIMITS and remains closed |
 | Sequence | **A — before Room 4 closes** (after X) |
 | Proposed package | `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1` |
-| Collision check | No existing `room-4d` / `mobile-customer-journey` package branch; do **not** auto-assign Room 4D/4E labels |
-| doNotStartWithoutOwnerAuthorization | true |
+| Collision check | No Room 4D / 4E label. Descriptive package ID only. |
+| doNotStartWithoutOwnerAuthorization | true (opening authorized 2026-08-22; live run not authorized in opening) |
 | Soft-open | Required before Room 4 close |
 
 ### 3a. Studio name and core identity
@@ -343,7 +343,7 @@ Exactly one per area:
 
 1. This register (ACTIVE — not execution)
 2. External Customer Content Intake and Rights Certification — COMPLETE_WITH_EXPLICIT_LIMITS
-3. Full mobile customer-journey certification (using cleared upload/rights path)
+3. Full mobile customer-journey certification — OPEN (opening only; live phone cert not stamped)
 
 ### B — Required before Owner-as-Customer Real Studio Campaign
 
@@ -398,13 +398,13 @@ Exactly one per area:
 
 ---
 
-## Last closed execution package (do not open the next)
+## Active execution package
 
-**`STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1`**
+**`STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`**
 
-Status: **CLOSED WITH EXPLICIT LIMITS** (owner ACCEPTED 2026-08-22). Closeout: `docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md`.
+Status: **OPEN** (opening only). Base: Gate X close `15ee699c`. Closeout of prior package: `docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md`.
 
-Do **not** open the next register package from this close. Dedicated mobile customer-journey certification remains REQUIRED_NOT_STARTED and unauthorized. No Room 4D/4E label assigned. Room 4 remains OPEN. Room 5 remains NOT_STARTED. No merge.
+Live real-phone certification is **not** stamped in opening. Do **not** assign Room 4D/4E. Room 4 remains OPEN. Room 5 remains NOT_STARTED. No merge.
 
 ---
 

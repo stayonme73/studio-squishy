@@ -57,6 +57,10 @@ describe("STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1", () => {
         .sectionClosed,
     ).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomClosed).toBe(false);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveSectionStatus).toBe("OPEN");
+    expect(
+      studioLaunchReadinessExecutionOrderV1.mobileCustomerJourneyCertification.packageId,
+    ).toBe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1");
     expect(studioLaunchReadinessExecutionOrderV1.room4.doNotStartRoom5).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room4.doNotOpenNextPackage).toBe(true);
     expect(studioLaunchReadinessExecutionOrderV1.room4C.sectionClosed).toBe(true);
