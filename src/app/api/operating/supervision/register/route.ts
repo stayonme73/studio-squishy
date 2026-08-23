@@ -27,7 +27,9 @@ export async function POST(request: Request) {
 
   try {
     const input = parseRegisterBody(body);
-    const lease = getLiveSupervisionMachine().registerWorker(input);
+    const lease = await getLiveSupervisionMachine().then((machine) =>
+      Promise.resolve(machine.registerWorker(input)),
+    );
     return NextResponse.json({
       ok: true,
       path: SUPERVISION_REGISTER_PATH,

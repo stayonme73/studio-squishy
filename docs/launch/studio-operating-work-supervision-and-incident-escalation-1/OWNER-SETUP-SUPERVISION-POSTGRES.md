@@ -1,48 +1,44 @@
 # Owner setup — supervision Postgres (names only)
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Pass:** 3B  
-**Live production certified:** no
+**Pass:** 3C  
+**Live production certified:** no  
+**Live REST/RPC connector:** ready in code
 
-Do not paste secret values into chat, commits, or evidence files. This page lists names and server-side steps only.
+Do not paste secret values into chat, commits, Scout, or screenshots. This page lists names and server-side steps only.
 
-Pass 3B ships the adapter, SQL migration, and deterministic tests. It does **not** claim a live Supabase project is configured.
+After Pass 3C, Tagia only needs to configure the project and authorize the real two-process proof. There is no remaining connector coding gap.
 
 ## What production requires
 
-Launch runtime (`NODE_ENV=production`, `NETLIFY=true`, or `STUDIO_SUPERVISION_RUNTIME=launch`) refuses memory and `studio-data-json`. It requires a shared Supabase **Postgres** record store. Supabase object/file storage is not the incident database.
+Launch runtime (`NODE_ENV=production`, `NETLIFY=true`, or `STUDIO_SUPERVISION_RUNTIME=launch`) refuses memory and `studio-data-json`. It initializes the live Supabase Postgres connector, verifies schema version 2, and hydrates records. It never silently falls back to JSON or memory.
+
+Supabase object/file storage is not the incident database.
 
 ## Environment-variable names
 
-Set these on the **server** (Netlify site env / Owner secrets store). Never `NEXT_PUBLIC_` for the service-role key. Never send the service-role key to the browser.
+Set these on the **server** through an approved local or Netlify secret-setting path. Never `NEXT_PUBLIC_` for the service-role key. Never send the service-role key to the browser.
 
 | Name | Role |
 |------|------|
-| `STUDIO_SUPERVISION_SUPABASE_URL` | Preferred project URL for the supervision adapter |
+| `STUDIO_SUPERVISION_SUPABASE_URL` | Preferred project URL |
 | `STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY` | Preferred service-role key (server only) |
 | `NEXT_PUBLIC_SUPABASE_URL` | Allowed fallback for the URL only |
 | `SUPABASE_SERVICE_ROLE_KEY` | Allowed fallback for the service-role key |
-| `STUDIO_SUPERVISION_RUNTIME=launch` | Optional explicit launch classification |
-| `STUDIO_SUPERVISION_PROVIDER=supabase-postgres` | Optional explicit provider request |
 
-Do **not** set `STUDIO_SUPERVISION_ALLOW_INPROCESS_POSTGRES` in production. That flag is a deterministic in-process stand-in and is not live certification.
+JSON-file local variables remain valid for local development only (`STUDIO_SUPERVISION_DATA_DIR`, `STUDIO_SUPERVISION_REQUIRE_DURABLE`, `STUDIO_SUPERVISION_DISABLE_LIVE_SWEEP`).
 
-JSON-file local variables remain valid for development only:
+Do **not** set `STUDIO_SUPERVISION_ALLOW_INPROCESS_POSTGRES` in production.
 
-| Name | Role |
-|------|------|
-| `STUDIO_SUPERVISION_DATA_DIR` | Local `studio-data-json` directory |
-| `STUDIO_SUPERVISION_REQUIRE_DURABLE=1` | Forbids memory in local controlled proofs |
-| `STUDIO_SUPERVISION_DISABLE_LIVE_SWEEP=1` | Disables in-process sweep ticks |
+## Owner steps remaining
 
-## Owner steps (server-side)
+1. Select or create a Supabase project that will hold supervision **records**, not just file storage.  
+2. Apply both migrations, in order:  
+   - `supabase/migrations/20260823_supervision_launch_runtime.sql`  
+   - `supabase/migrations/20260824_supervision_live_connector.sql`  
+3. Place the two server-only environment variables through the approved secret-setting path.  
+4. Authorize the real two-process live proof (separate processes against the real database). Do not treat Netlify as durable until that proof is accepted.
 
-1. Create or select a Supabase project that will hold supervision **records**, not just file storage.  
-2. Apply `supabase/migrations/20260823_supervision_launch_runtime.sql` in the Supabase SQL editor or CLI.  
-3. Confirm the service-role key is stored only in server environment variables.  
-4. Confirm the anon/authenticated browser key cannot read supervision tables (the migration revokes those grants).  
-5. Do not mark production certified until a later authorized live proof: two separate processes against the real database, competing sweep claims, missed-heartbeat continuation, tenant isolation, and fail-closed launch start.
+## What the connector already does
 
-## After credentials exist
-
-Pass 3B still will not claim live production. The live REST hydrate/flush path is not wired. Authorize a later live proof pass before treating Netlify as durable.
+When those variables are present, the Machine selects `supabase-postgres`, verifies schema, hydrates, and writes through transactional RPCs (`supervision_accept_heartbeat`, `supervision_upsert_incident_with_events`, `supervision_try_claim_sweep`, `supervision_apply_ops`, and related functions). Pass 3C proved those requests against a deterministic PostgREST stub. That is not live Supabase certification.

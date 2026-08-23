@@ -12,6 +12,8 @@ export const SUPERVISION_PROVIDER_CLASS = {
 export const SUPERVISION_JSON_PROVIDER = "studio-data-json" as const;
 export const SUPERVISION_POSTGRES_PROVIDER = "supabase-postgres" as const;
 
+export const SUPERVISION_POSTGRES_SCHEMA_VERSION = 2 as const;
+
 export const SUPERVISION_LAUNCH_ENV_KEYS = {
   url: "STUDIO_SUPERVISION_SUPABASE_URL",
   urlFallback: "NEXT_PUBLIC_SUPABASE_URL",

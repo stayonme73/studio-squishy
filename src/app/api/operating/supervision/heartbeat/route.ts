@@ -28,7 +28,9 @@ export async function POST(request: Request) {
       body,
       request.headers.get(SUPERVISION_IDEMPOTENCY_HEADER),
     );
-    const result = getLiveSupervisionMachine().recordHeartbeat(input);
+    const result = await getLiveSupervisionMachine().then((machine) =>
+      Promise.resolve(machine.recordHeartbeat(input)),
+    );
     return NextResponse.json({
       ok: true,
       path: SUPERVISION_HEARTBEAT_PATH,

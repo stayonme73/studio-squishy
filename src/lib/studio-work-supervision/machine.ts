@@ -320,6 +320,26 @@ export function createSupervisionMachine(options?: {
   for (const lease of repository.listLeases()) leases.set(lease.leaseId, lease);
   for (const incident of repository.listIncidents()) incidents.set(incident.incidentId, incident);
 
+  function isThenable<T>(value: T | Promise<T>): value is Promise<T> {
+    return Boolean(value) && typeof (value as Promise<T>).then === "function";
+  }
+
+  function afterWrite<T>(value: T): T | Promise<T> {
+    depth -= 1;
+    if (depth > 0) return value;
+    const flushed = repository.flush?.();
+    if (flushed && typeof (flushed as Promise<void>).then === "function") {
+      return (flushed as Promise<void>).then(() => value);
+    }
+    return value;
+  }
+
+  function beginWrite(): void {
+    depth += 1;
+  }
+
+  let depth = 0;
+
   function persistLease(lease: WorkLease): void {
     repository.saveLease(lease);
   }
@@ -367,9 +387,9 @@ export function createSupervisionMachine(options?: {
     return incident;
   }
 
-  function openLeaseIncident(lease: WorkLease, extra?: Partial<OpenIncidentInput>): MachineIncident {
+  function openLeaseIncident(lease: WorkLease, extra?: Partial<OpenIncidentInput>) {
     const defaults = defaultsForLease(lease);
-    const incident = machine.openIncident({
+    const opened = machine.openIncident({
       ...defaults,
       ...extra,
       leaseId: lease.leaseId,
@@ -386,8 +406,12 @@ export function createSupervisionMachine(options?: {
           ? "Unconnected provider hidden from healthy display."
           : "Machine isolated the lease; worker cannot self-certify health."),
     });
-    lease.openIncidentId = incident.incidentId;
-    return incident;
+    const assign = (incident: MachineIncident) => {
+      lease.openIncidentId = incident.incidentId;
+      return incident;
+    };
+    if (isThenable(opened)) return opened.then(assign);
+    return assign(opened);
   }
 
   function applyComputedHealth(lease: WorkLease, at: string): void {
@@ -399,6 +423,7 @@ export function createSupervisionMachine(options?: {
 
   const machine: SupervisionMachine = {
     issueLease(input) {
+      beginWrite();
       const now = isoNow(clock);
       const worker = assignedWorkerFrom(input);
       const coverageConnected = coverageFor(input, worker);
@@ -444,7 +469,7 @@ export function createSupervisionMachine(options?: {
       };
       leases.set(lease.leaseId, lease);
       persistLease(lease);
-      return snapshotLease(lease);
+      return afterWrite(snapshotLease(lease));
     },
 
     registerWorker(input) {
@@ -452,19 +477,22 @@ export function createSupervisionMachine(options?: {
     },
 
     recordHeartbeat(input) {
+      beginWrite();
       const lease = requireLease(input.leaseId);
       if (input.customerId && input.customerId !== lease.customerId) {
+        depth -= 1;
         throw new SupervisionIsolationError(
           "Heartbeat customer does not match the lease.",
         );
       }
       if (input.projectId && input.projectId !== lease.projectId) {
+        depth -= 1;
         throw new SupervisionIsolationError(
           "Heartbeat project does not match the lease.",
         );
       }
       if (!repository.rememberIdempotency(input.leaseId, input.idempotencyKey)) {
-        return { lease: snapshotLease(lease), ignored: true };
+        return afterWrite({ lease: snapshotLease(lease), ignored: true });
       }
       const at = input.at ?? isoNow(clock);
       lease.lastHeartbeatAt = at;
@@ -546,30 +574,33 @@ export function createSupervisionMachine(options?: {
           );
         }
       }
-      return { lease: snapshotLease(lease), ignored: false };
+      return afterWrite({ lease: snapshotLease(lease), ignored: false });
     },
 
     markWaiting(leaseId, reason) {
+      beginWrite();
       const lease = requireLease(leaseId);
       lease.waitingReason = reason;
       lease.blocker = null;
       lease.reportedStatus = "waiting_for_owner";
       lease.health = computeHealth(lease, clock.now());
       persistLease(lease);
-      return snapshotLease(lease);
+      return afterWrite(snapshotLease(lease));
     },
 
     markBlocked(leaseId, code, detail) {
+      beginWrite();
       const lease = requireLease(leaseId);
       lease.blocker = { code, detail };
       lease.waitingReason = null;
       lease.reportedStatus = "blocked";
       lease.health = computeHealth(lease, clock.now());
       persistLease(lease);
-      return snapshotLease(lease);
+      return afterWrite(snapshotLease(lease));
     },
 
     completeFiniteWork(leaseId) {
+      beginWrite();
       const lease = requireLease(leaseId);
       if (lease.kind !== "FINITE_WORK") {
         throw new Error("Only finite work can complete.");
@@ -601,10 +632,11 @@ export function createSupervisionMachine(options?: {
         }
       }
       persistLease(lease);
-      return snapshotLease(lease);
+      return afterWrite(snapshotLease(lease));
     },
 
     evaluateLeases() {
+      beginWrite();
       const now = clock.now();
       for (const lease of leases.values()) {
         lease.health = computeHealth(lease, now);
@@ -624,164 +656,172 @@ export function createSupervisionMachine(options?: {
         });
         persistLease(lease);
       }
-      return [...leases.values()].map(snapshotLease);
+      return afterWrite([...leases.values()].map(snapshotLease));
     },
 
     sweep() {
       const now = clock.now();
       const evaluatedAt = now.toISOString();
       const claimId = ids("sweep");
-      const claim = repository.tryClaimSweep({
+      const input = {
         claimId,
         holder: holderId,
         at: evaluatedAt,
         ttlMs: 10_000,
-      });
-      if (!claim.claimed) {
-        return {
-          evaluatedAt,
-          claimed: false,
-          claimId: claim.claim?.claimId ?? null,
-          skippedBecauseClaimHeld: true,
-          leaseHealth: {},
-          incidentsOpenedOrUpdated: [],
-          recoveries: [],
-          overdueNextChecks: [],
-          mismatches: [],
-          sweepEvaluations: [],
-        };
-      }
-      const incidentsOpenedOrUpdated = new Set<string>();
-      const recoveries: SweepResult["recoveries"] = [];
-      const overdueNextChecks: string[] = [];
-      const mismatches: string[] = [];
-
-      machine.evaluateLeases();
-
-      for (const lease of leases.values()) {
-        if (lease.mismatch) mismatches.push(lease.leaseId);
-        if (lease.openIncidentId) incidentsOpenedOrUpdated.add(lease.openIncidentId);
-      }
-
-      for (const incident of incidents.values()) {
-        if (incident.state === "RESOLVED") continue;
-        if (Date.parse(incident.nextCheckAt) < now.getTime()) {
-          overdueNextChecks.push(incident.incidentId);
-          track(
-            incident,
-            ids,
-            clock,
-            "overdue_next_check",
-            "machine",
-            "Next check was overdue. Machine evaluated the lease again.",
-            { nextCheckAt: incident.nextCheckAt },
-          );
-          refreshIncident(incident, clock);
-          incidentsOpenedOrUpdated.add(incident.incidentId);
-        }
-
-        const lease = incident.leaseId ? leases.get(incident.leaseId) : undefined;
-        if (!lease) continue;
-        if (!routineRecoveryAuthorized({ severity: incident.severity, category: incident.category })) {
-          continue;
-        }
-        if (lease.mismatch) continue;
-
-        const healthyNow =
-          lease.health === "ACTIVE" ||
-          lease.health === "SERVICE_AWAKE" ||
-          lease.health === "COMPLETE";
-        const lastRecovery = incident.recoveryAttempts.at(-1);
-
-        if (healthyNow && incident.state !== "RESOLVED") {
-          const recovered = machine.attemptRecovery(
-            incident.incidentId,
-            "success",
-            AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
-            "Fresh heartbeat returned inside the authorized recovery window.",
-          );
-          recoveries.push({
-            incidentId: recovered.incidentId,
-            result: "success",
-            strategy: AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
-          });
-          incidentsOpenedOrUpdated.add(recovered.incidentId);
-          continue;
-        }
-
-        if (!healthyNow && lease.health === "STALLED" && !lastRecovery) {
-          const pending = machine.attemptRecovery(
-            incident.incidentId,
-            "pending",
-            AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
-            "Machine requested a fresh heartbeat. Owner is not interrupted yet.",
-          );
-          recoveries.push({
-            incidentId: pending.incidentId,
-            result: "pending",
-            strategy: AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
-          });
-          incidentsOpenedOrUpdated.add(pending.incidentId);
-          continue;
-        }
-
-        if (
-          !healthyNow &&
-          lease.health === "STALLED" &&
-          lastRecovery?.result === "pending" &&
-          now.getTime() - Date.parse(lastRecovery.at) >= ROUTINE_RECOVERY_WINDOW_MS
-        ) {
-          const failed = machine.attemptRecovery(
-            incident.incidentId,
-            "failure",
-            AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
-            "Authorized routine recovery did not restore a heartbeat in time.",
-          );
-          recoveries.push({
-            incidentId: failed.incidentId,
-            result: "failure",
-            strategy: AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
-          });
-          incidentsOpenedOrUpdated.add(failed.incidentId);
-        }
-      }
-
-      const leaseHealth: SweepResult["leaseHealth"] = {};
-      const sweepEvaluations: SweepResult["sweepEvaluations"] = [];
-      for (const lease of leases.values()) {
-        leaseHealth[lease.leaseId] = lease.health;
-        const evaluation = {
-          evaluationId: ids("eval"),
-          claimId,
-          at: evaluatedAt,
-          leaseId: lease.leaseId,
-          incidentId: lease.openIncidentId,
-          health: lease.health,
-        };
-        repository.recordSweepEvaluation(evaluation);
-        sweepEvaluations.push({
-          leaseId: lease.leaseId,
-          incidentId: lease.openIncidentId,
-          health: lease.health,
-        });
-        persistLease(lease);
-      }
-
-      return {
-        evaluatedAt,
-        claimed: true,
-        claimId,
-        skippedBecauseClaimHeld: false,
-        leaseHealth,
-        incidentsOpenedOrUpdated: [...incidentsOpenedOrUpdated],
-        recoveries,
-        overdueNextChecks,
-        mismatches,
-        sweepEvaluations,
       };
+      const run = (claim: { claimed: boolean; claim: { claimId: string } | null }) => {
+        beginWrite();
+        if (!claim.claimed) {
+          return afterWrite({
+            evaluatedAt,
+            claimed: false,
+            claimId: claim.claim?.claimId ?? null,
+            skippedBecauseClaimHeld: true,
+            leaseHealth: {},
+            incidentsOpenedOrUpdated: [],
+            recoveries: [],
+            overdueNextChecks: [],
+            mismatches: [],
+            sweepEvaluations: [],
+          });
+        }
+        const incidentsOpenedOrUpdated = new Set<string>();
+        const recoveries: SweepResult["recoveries"] = [];
+        const overdueNextChecks: string[] = [];
+        const mismatches: string[] = [];
+
+        machine.evaluateLeases();
+
+        for (const lease of leases.values()) {
+          if (lease.mismatch) mismatches.push(lease.leaseId);
+          if (lease.openIncidentId) incidentsOpenedOrUpdated.add(lease.openIncidentId);
+        }
+
+        for (const incident of incidents.values()) {
+          if (incident.state === "RESOLVED") continue;
+          if (Date.parse(incident.nextCheckAt) < now.getTime()) {
+            overdueNextChecks.push(incident.incidentId);
+            track(
+              incident,
+              ids,
+              clock,
+              "overdue_next_check",
+              "machine",
+              "Next check was overdue. Machine evaluated the lease again.",
+              { nextCheckAt: incident.nextCheckAt },
+            );
+            refreshIncident(incident, clock);
+            incidentsOpenedOrUpdated.add(incident.incidentId);
+          }
+
+          const lease = incident.leaseId ? leases.get(incident.leaseId) : undefined;
+          if (!lease) continue;
+          if (!routineRecoveryAuthorized({ severity: incident.severity, category: incident.category })) {
+            continue;
+          }
+          if (lease.mismatch) continue;
+
+          const healthyNow =
+            lease.health === "ACTIVE" ||
+            lease.health === "SERVICE_AWAKE" ||
+            lease.health === "COMPLETE";
+          const lastRecovery = incident.recoveryAttempts.at(-1);
+
+          if (healthyNow && incident.state !== "RESOLVED") {
+            const recovered = machine.attemptRecovery(
+              incident.incidentId,
+              "success",
+              AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
+              "Fresh heartbeat returned inside the authorized recovery window.",
+            ) as MachineIncident;
+            recoveries.push({
+              incidentId: recovered.incidentId,
+              result: "success",
+              strategy: AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
+            });
+            incidentsOpenedOrUpdated.add(recovered.incidentId);
+            continue;
+          }
+
+          if (!healthyNow && lease.health === "STALLED" && !lastRecovery) {
+            const pending = machine.attemptRecovery(
+              incident.incidentId,
+              "pending",
+              AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
+              "Machine requested a fresh heartbeat. Owner is not interrupted yet.",
+            ) as MachineIncident;
+            recoveries.push({
+              incidentId: pending.incidentId,
+              result: "pending",
+              strategy: AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
+            });
+            incidentsOpenedOrUpdated.add(pending.incidentId);
+            continue;
+          }
+
+          if (
+            !healthyNow &&
+            lease.health === "STALLED" &&
+            lastRecovery?.result === "pending" &&
+            now.getTime() - Date.parse(lastRecovery.at) >= ROUTINE_RECOVERY_WINDOW_MS
+          ) {
+            const failed = machine.attemptRecovery(
+              incident.incidentId,
+              "failure",
+              AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
+              "Authorized routine recovery did not restore a heartbeat in time.",
+            ) as MachineIncident;
+            recoveries.push({
+              incidentId: failed.incidentId,
+              result: "failure",
+              strategy: AUTHORIZED_ROUTINE_RECOVERY_STRATEGY,
+            });
+            incidentsOpenedOrUpdated.add(failed.incidentId);
+          }
+        }
+
+        const leaseHealth: SweepResult["leaseHealth"] = {};
+        const sweepEvaluations: SweepResult["sweepEvaluations"] = [];
+        for (const lease of leases.values()) {
+          leaseHealth[lease.leaseId] = lease.health;
+          const evaluation = {
+            evaluationId: ids("eval"),
+            claimId,
+            at: evaluatedAt,
+            leaseId: lease.leaseId,
+            incidentId: lease.openIncidentId,
+            health: lease.health,
+          };
+          repository.recordSweepEvaluation(evaluation);
+          sweepEvaluations.push({
+            leaseId: lease.leaseId,
+            incidentId: lease.openIncidentId,
+            health: lease.health,
+          });
+          persistLease(lease);
+        }
+
+        return afterWrite({
+          evaluatedAt,
+          claimed: true,
+          claimId,
+          skippedBecauseClaimHeld: false,
+          leaseHealth,
+          incidentsOpenedOrUpdated: [...incidentsOpenedOrUpdated],
+          recoveries,
+          overdueNextChecks,
+          mismatches,
+          sweepEvaluations,
+        });
+      };
+      if (repository.tryClaimSweepAsync) {
+        return repository.tryClaimSweepAsync(input).then(run);
+      }
+      return run(repository.tryClaimSweep(input));
     },
 
     openIncident(input) {
+      beginWrite();
       const existing = [...incidents.values()].find(
         (row) =>
           row.dedupeKey === input.dedupeKey &&
@@ -798,7 +838,7 @@ export function createSupervisionMachine(options?: {
           "Duplicate incident signal ignored; existing record kept.",
           { dedupeKey: input.dedupeKey },
         );
-        return snapshotIncident(existing);
+        return afterWrite(snapshotIncident(existing));
       }
 
       const now = isoNow(clock);
@@ -871,10 +911,11 @@ export function createSupervisionMachine(options?: {
       refreshIncident(incident, clock);
       incidents.set(incident.incidentId, incident);
       persistIncident(incident);
-      return snapshotIncident(incident);
+      return afterWrite(snapshotIncident(incident));
     },
 
     attemptRecovery(incidentId, result, strategy, detail) {
+      beginWrite();
       const incident = requireIncident(incidentId);
       if (incident.state === "RESOLVED") {
         throw new Error("Cannot recover a resolved incident.");
@@ -901,7 +942,7 @@ export function createSupervisionMachine(options?: {
           "Wait for a fresh worker heartbeat inside the authorized recovery window. Owner is not interrupted.";
         refreshIncident(incident, clock);
         persistIncident(incident);
-        return snapshotIncident(incident);
+        return afterWrite(snapshotIncident(incident));
       }
       const escalate = ownerMustBeInterrupted({
         severity: incident.severity,
@@ -948,10 +989,11 @@ export function createSupervisionMachine(options?: {
       }
       refreshIncident(incident, clock);
       persistIncident(incident);
-      return snapshotIncident(incident);
+      return afterWrite(snapshotIncident(incident));
     },
 
     applyOwnerAction(incidentId, action, note) {
+      beginWrite();
       const incident = requireIncident(incidentId);
       if (!incident.ownerEscalated && incident.severity === "ROUTINE") {
         throw new Error("Owner controls are not authorized on unescalated routine incidents.");
@@ -976,7 +1018,7 @@ export function createSupervisionMachine(options?: {
       }
       refreshIncident(incident, clock);
       persistIncident(incident);
-      return snapshotIncident(incident);
+      return afterWrite(snapshotIncident(incident));
     },
 
     getLease(leaseId) {

@@ -199,6 +199,98 @@ export class SupervisionPostgresEngine {
     this.validateTimestamp(at, "restoredAt");
     this.meta.restoredAt = at;
   }
+
+  dueNextChecks(at: string): { leaseIds: string[]; incidentIds: string[] } {
+    this.validateTimestamp(at, "due.at");
+    const now = Date.parse(at);
+    const leaseIds = [...this.leases.values()]
+      .filter((row) => row.payload.expectedUpdateAt && Date.parse(row.payload.expectedUpdateAt) <= now)
+      .map((row) => row.leaseId);
+    const incidentIds = [...this.incidents.values()]
+      .filter((row) => row.state !== "RESOLVED" && Date.parse(row.nextCheckAt) <= now)
+      .map((row) => row.incidentId);
+    return { leaseIds, incidentIds };
+  }
+
+  acceptHeartbeat(
+    lease: WorkLease,
+    heartbeat: HeartbeatRecord,
+  ): { accepted: boolean } {
+    const existing = this.getLease(heartbeat.leaseId);
+    if (existing) {
+      if (heartbeat.customerId && heartbeat.customerId !== existing.customerId) {
+        throw new Error("TENANT_ISOLATION");
+      }
+      if (heartbeat.projectId && heartbeat.projectId !== existing.projectId) {
+        throw new Error("TENANT_ISOLATION");
+      }
+    }
+    if (!this.rememberIdempotency(heartbeat.leaseId, heartbeat.idempotencyKey)) {
+      return { accepted: false };
+    }
+    this.appendHeartbeat(heartbeat);
+    this.saveLease(lease);
+    return { accepted: true };
+  }
+
+  upsertIncidentWithEvents(incident: MachineIncident, events: IncidentEvent[]): void {
+    this.saveIncident(incident);
+    for (const event of events) {
+      const already = (this.events.get(incident.incidentId) ?? []).some(
+        (row) => row.eventId === event.eventId,
+      );
+      if (!already) this.appendIncidentEvent(incident.incidentId, event);
+    }
+    this.recovery.set(incident.incidentId, cloneJson(incident.recoveryAttempts));
+  }
+
+  toSnapshot(): Record<string, unknown> {
+    return {
+      schemaVersion: this.meta.schemaVersion,
+      provider: this.meta.provider,
+      leases: this.listLeases(),
+      incidents: this.listIncidents(),
+      idempotency: [...this.idempotency],
+      heartbeats: cloneJson(this.heartbeats),
+      coverage: cloneJson(this.coverage),
+      evaluations: cloneJson(this.evaluations),
+      sweepClaim: cloneJson(this.sweepClaim),
+      meta: cloneJson(this.meta),
+    };
+  }
+
+  loadSnapshot(snapshot: {
+    schemaVersion?: number;
+    leases?: WorkLease[];
+    incidents?: MachineIncident[];
+    idempotency?: string[];
+    heartbeats?: HeartbeatRecord[];
+    coverage?: ProviderPortStatus[];
+    evaluations?: SweepEvaluationRecord[];
+    sweepClaim?: SweepClaim | null;
+    meta?: SupervisionStoreMeta;
+  }): void {
+    this.leases.clear();
+    this.incidents.clear();
+    this.events.clear();
+    this.recovery.clear();
+    this.idempotency.clear();
+    this.heartbeats.splice(0, this.heartbeats.length);
+    this.evaluations.splice(0, this.evaluations.length);
+    for (const lease of snapshot.leases ?? []) this.saveLease(lease);
+    for (const incident of snapshot.incidents ?? []) {
+      this.saveIncident(incident);
+      this.events.set(incident.incidentId, cloneJson(incident.history));
+      this.recovery.set(incident.incidentId, cloneJson(incident.recoveryAttempts));
+    }
+    for (const key of snapshot.idempotency ?? []) this.idempotency.add(key);
+    this.heartbeats.push(...cloneJson(snapshot.heartbeats ?? []));
+    if (snapshot.coverage) this.coverage = cloneJson(snapshot.coverage);
+    this.evaluations.push(...cloneJson(snapshot.evaluations ?? []));
+    this.sweepClaim = snapshot.sweepClaim ? cloneJson(snapshot.sweepClaim) : null;
+    if (snapshot.meta) this.meta = cloneJson(snapshot.meta);
+    if (snapshot.schemaVersion) this.meta.schemaVersion = snapshot.schemaVersion;
+  }
 }
 
 export function createSupervisionPostgresEngine(): SupervisionPostgresEngine {

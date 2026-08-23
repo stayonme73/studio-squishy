@@ -10,6 +10,8 @@ import {
   createFileSupervisionRepository,
 } from "./file-repository";
 import { createSupervisionMachine, type SupervisionMachine } from "./machine";
+import { createLivePostgresSupervisionRepository } from "./postgres-live-repository";
+import { createSupervisionLiveClient } from "./postgres-live-client";
 import { createPostgresSupervisionRepository } from "./postgres-adapter";
 import { createSupervisionPostgresEngine } from "./postgres-engine";
 import { LIVE_SWEEP_INTERVAL_MS } from "./policy";
@@ -77,7 +79,7 @@ export function createLiveSupervisionRepository(
       return createPostgresSupervisionRepository(createSupervisionPostgresEngine());
     }
     throw new DurablePersistenceUnavailableError(
-      "Supabase Postgres credentials are present, but live production certification is not claimed in Pass 3B. Apply supabase/migrations/20260823_supervision_launch_runtime.sql, then authorize a live production proof. Deterministic adapter proof is not live certification.",
+      "Use createLiveSupervisionRepositoryAsync when Supabase credentials are present.",
     );
   }
   if (requested === "memory") {
@@ -88,7 +90,30 @@ export function createLiveSupervisionRepository(
   return createFileSupervisionRepository(resolveSupervisionDataDir(env));
 }
 
-function ensureMachineSweepLease(state: LiveSupervisionSlot): string {
+export async function createLiveSupervisionRepositoryAsync(
+  env: NodeJS.ProcessEnv = process.env,
+): Promise<SupervisionRepository> {
+  const requested = requestedSupervisionProvider(env);
+  if (isLaunchRuntime(env) || requested === "supabase-postgres") {
+    const resolved = resolveSupervisionPostgresConfig(env);
+    if (!resolved.ok) {
+      throw new DurablePersistenceUnavailableError(
+        `Launch supervision requires Supabase Postgres. Missing ${resolved.missing.join(", ")}. studio-data-json is local-only and is not a launch production store.`,
+      );
+    }
+    if (env.STUDIO_SUPERVISION_ALLOW_INPROCESS_POSTGRES === "1") {
+      return createPostgresSupervisionRepository(createSupervisionPostgresEngine());
+    }
+    const client = createSupervisionLiveClient(resolved.config);
+    await client.initialize();
+    const repository = createLivePostgresSupervisionRepository(client);
+    await repository.load();
+    return repository;
+  }
+  return createLiveSupervisionRepository(env);
+}
+
+function ensureMachineSweepLease(state: LiveSupervisionSlot): string | Promise<string> {
   if (state.sweepLeaseId && state.machine.getLease(state.sweepLeaseId)) {
     return state.sweepLeaseId;
   }
@@ -99,7 +124,7 @@ function ensureMachineSweepLease(state: LiveSupervisionSlot): string {
     state.sweepLeaseId = existing.leaseId;
     return existing.leaseId;
   }
-  const lease = state.machine.issueLease({
+  const issued = state.machine.issueLease({
     leaseId: "lease_machine_sweep",
     kind: "LONG_RUNNING_SERVICE",
     ...MACHINE_CUSTOMER,
@@ -120,8 +145,14 @@ function ensureMachineSweepLease(state: LiveSupervisionSlot): string {
     heartbeatIntervalMs: LIVE_SWEEP_INTERVAL_MS,
     graceMs: LIVE_SWEEP_INTERVAL_MS,
   });
-  state.sweepLeaseId = lease.leaseId;
-  return lease.leaseId;
+  const assign = (lease: { leaseId: string }) => {
+    state.sweepLeaseId = lease.leaseId;
+    return lease.leaseId;
+  };
+  if (issued && typeof (issued as Promise<{ leaseId: string }>).then === "function") {
+    return (issued as Promise<{ leaseId: string }>).then(assign);
+  }
+  return assign(issued as { leaseId: string });
 }
 
 function startLiveSweepScheduler(state: LiveSupervisionSlot): void {
@@ -148,11 +179,11 @@ function startLiveSweepScheduler(state: LiveSupervisionSlot): void {
   }, LIVE_SWEEP_INTERVAL_MS);
 }
 
-export function getLiveSupervisionMachine(): SupervisionMachine {
+export async function getLiveSupervisionMachine(): Promise<SupervisionMachine> {
   let state = slot();
   if (!state) {
     const dataDir = resolveSupervisionDataDir();
-    const repository = createLiveSupervisionRepository();
+    const repository = await createLiveSupervisionRepositoryAsync();
     assertDurableRepository(repository, {
       ...process.env,
       STUDIO_SUPERVISION_REQUIRE_DURABLE: process.env.VITEST ? "0" : "1",
@@ -167,14 +198,15 @@ export function getLiveSupervisionMachine(): SupervisionMachine {
       sweepLeaseId: null,
       dataDir,
     };
-    ensureMachineSweepLease(state);
+    await Promise.resolve(ensureMachineSweepLease(state));
+    await Promise.resolve(repository.flush?.());
     startLiveSweepScheduler(state);
     setSlot(state);
   }
   return state.machine;
 }
 
-export function reloadLiveSupervisionMachineFromDisk(): SupervisionMachine {
+export async function reloadLiveSupervisionMachineFromDisk(): Promise<SupervisionMachine> {
   const state = slot();
   if (state?.sweepTimer) clearInterval(state.sweepTimer);
   setSlot(undefined);

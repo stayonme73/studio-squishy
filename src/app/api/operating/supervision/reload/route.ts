@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
-  const machine = reloadLiveSupervisionMachineFromDisk();
+  const machine = await reloadLiveSupervisionMachineFromDisk();
   const snapshot = machine.snapshot();
   return NextResponse.json({
     ok: true,

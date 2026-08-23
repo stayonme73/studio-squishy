@@ -31,7 +31,7 @@ export default async function IncidentCommandPage() {
   }
 
   const fixture = toIncidentCommandView(getRuntimeSupervisionMachine().snapshot());
-  const live = toIncidentCommandView(getLiveSupervisionMachine().snapshot());
+  const live = toIncidentCommandView((await getLiveSupervisionMachine()).snapshot());
 
   return (
     <>

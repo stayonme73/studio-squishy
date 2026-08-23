@@ -5,7 +5,7 @@ import { studioMobileCustomerJourneyCertificationV1 as mobile } from "@/config/s
 import { studioWorkSupervisionAndIncidentEscalationV1 as cfg } from "@/config/studio-work-supervision-and-incident-escalation-v1";
 
 describe("STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1", () => {
-  it("stays OPEN in Room 4 for pass 3B without closing or starting Room 5", () => {
+  it("stays OPEN in Room 4 for pass 3C without closing or starting Room 5", () => {
     expect(cfg.packageId).toBe(
       "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1",
     );
@@ -19,9 +19,11 @@ describe("STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1", () => {
     expect(cfg.runtimePass).toBe(3);
     expect(cfg.runtimePass2Accepted).toBe(true);
     expect(cfg.durablePass).toBe(3);
-    expect(cfg.launchRuntimePass).toBe("3B");
-    expect(cfg.pass3LocalAccepted).toBe(true);
+    expect(cfg.launchRuntimePass).toBe("3C");
+    expect(cfg.pass3bAccepted).toBe(true);
+    expect(cfg.liveConnectorReady).toBe(true);
     expect(cfg.launchProductionCertified).toBe(false);
+    expect(cfg.pass3LocalAccepted).toBe(true);
     expect(cfg.persistenceProvider).toBe("studio-data-json");
     expect(cfg.localPersistenceProvider).toBe("studio-data-json");
     expect(cfg.productionPersistenceProvider).toBe("supabase-postgres");

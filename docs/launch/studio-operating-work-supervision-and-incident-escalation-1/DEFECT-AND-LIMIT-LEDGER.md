@@ -13,7 +13,7 @@ Opening snapshot 2026-08-23. Pass 3B records the launch-runtime durability defec
 | L7 | Agents/tools/security not in current exception model | **In progress** — provider-independent registration/heartbeat contract exists; Claude/Build-A-Bot/Make/Resend remain NOT CONNECTED |
 | L8 | No proven out-of-band Owner alert | Open |
 | L9 | Mobile phone cert parked; not a substitute for this package | Recorded |
-| L10 | JSON file store is not a launch-production incident store | **Open / Pass 3B** — Netlify runs Next.js route handlers as serverless functions. Runtime filesystem storage is ephemeral and not a shared transactional record. `studio-data-json` can lose incidents or diverge across instances after deploy. Memory = unit tests only. JSON = local/controlled cert only. Production = Supabase Postgres. Production fails closed if only memory or JSON is available. Adapter + migration + deterministic tests exist. Live Supabase project is **not** certified. Do not connect Build-A-Bot until launch-runtime durability is proven. |
+| L10 | JSON file store is not a launch-production incident store | **Pass 3B accepted** as the production guardrail. **Pass 3C** wired the live REST/RPC connector. Live Supabase remains **not certified**. Do not connect Build-A-Bot until live two-process proof is accepted. |
 
 ## Observed incidents (historical)
 

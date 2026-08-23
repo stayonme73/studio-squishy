@@ -1,7 +1,7 @@
 # STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION — PACKAGE CONTRACT
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 accepted at `0dc76903`. Runtime Pass 2 accepted at `1f8e2600` as a controlled foundation. Durable Pass 3 accepted at `05509c9b` for **local development and controlled restart proof only**. Pass 3B is the launch-runtime durability correction (Supabase Postgres adapter). **Not** launch-certified. **Not** closed.  
+**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 accepted at `0dc76903`. Runtime Pass 2 accepted at `1f8e2600`. Durable Pass 3 accepted at `05509c9b` for local/controlled proof only. Pass 3B accepted at `7d0d4323` as the production guardrail. Pass 3C completes the live Supabase REST/RPC connector. **Not** live-certified. **Not** closed.  
 **Opened:** 2026-08-23  
 **Base:** mobile park tip `bc458931c46ed845b982f62a4c70f8a312c169c8`  
 **Branch:** `operating/work-supervision-and-incident-escalation-1`  
@@ -41,6 +41,10 @@ Pass 3 is accepted for **local development and controlled Node restart proof onl
 ## What Pass 3B authorizes
 
 Classify providers (memory = tests, JSON = local/controlled, Postgres = launch production). Fail closed in launch runtime if only memory or JSON is available. Implement a Supabase Postgres adapter on the existing `SupervisionRepository` contract, with SQL migration and deterministic multi-process tests. Do **not** claim live production certification without a live shared database proof. Do **not** connect Build-A-Bot. An external scheduler is not authorized until **live** production durability is proven.
+
+## What Pass 3C authorizes
+
+A real server-side Supabase Postgres connector on `SupervisionRepository`: schema verification, hydrate, transactional RPCs, and fail-closed launch selection. Deterministic PostgREST proof only. Do **not** claim live Supabase certification. Do **not** connect Build-A-Bot. An external scheduler is not authorized until a live two-process proof against the real database is accepted.
 
 ## What this package still does **not** authorize
 

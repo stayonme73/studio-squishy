@@ -41,7 +41,7 @@ export default async function IncidentCommandDetailPage({ params }: PageProps) {
   const fixtureIncident = getRuntimeSupervisionMachine().getIncident(incidentId);
   const liveIncident = fixtureIncident
     ? undefined
-    : getLiveSupervisionMachine().getIncident(incidentId);
+    : (await getLiveSupervisionMachine()).getIncident(incidentId);
   const incident = fixtureIncident ?? liveIncident;
   const recordSource = fixtureIncident ? "fixture" : "live";
   if (!incident) {

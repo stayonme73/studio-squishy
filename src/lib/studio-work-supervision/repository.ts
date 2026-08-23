@@ -32,7 +32,7 @@ export type SweepEvaluationRecord = {
 };
 
 export type SupervisionStoreMeta = {
-  schemaVersion: typeof SUPERVISION_STORE_SCHEMA_VERSION;
+  schemaVersion: number;
   provider: typeof SUPERVISION_JSON_PROVIDER | typeof SUPERVISION_POSTGRES_PROVIDER;
   restoredAt: string | null;
   lastSweepClaim: SweepClaim | null;
@@ -49,7 +49,7 @@ export type HeartbeatRecord = {
 
 export type SupervisionRepository = {
   kind: SupervisionRepositoryKind;
-  load(): void;
+  load(): void | Promise<void>;
   saveLease(lease: WorkLease): void;
   getLease(leaseId: string): WorkLease | undefined;
   listLeases(): WorkLease[];
@@ -71,10 +71,18 @@ export type SupervisionRepository = {
     at: string;
     ttlMs: number;
   }): { claimed: boolean; claim: SweepClaim | null };
+  tryClaimSweepAsync?: (input: {
+    claimId: string;
+    holder: string;
+    at: string;
+    ttlMs: number;
+  }) => Promise<{ claimed: boolean; claim: SweepClaim | null }>;
   recordSweepEvaluation(record: SweepEvaluationRecord): void;
   listSweepEvaluations(): SweepEvaluationRecord[];
   getMeta(): SupervisionStoreMeta;
   markRestored(at: string): void;
+  flush?: () => void | Promise<void>;
+  dueNextChecks?: (at: string) => { leaseIds: string[]; incidentIds: string[] };
 };
 
 export class AppendOnlyViolationError extends Error {
@@ -100,6 +108,24 @@ export class VolatileMemoryForbiddenError extends Error {
   ) {
     super(message);
     this.name = "VolatileMemoryForbiddenError";
+  }
+}
+
+export class SchemaMismatchError extends Error {
+  readonly code = "SCHEMA_MISMATCH" as const;
+  constructor(
+    message = "Supervision Postgres schema is missing or incompatible.",
+  ) {
+    super(message);
+    this.name = "SchemaMismatchError";
+  }
+}
+
+export class LiveStoreUnhealthyError extends Error {
+  readonly code = "LIVE_STORE_UNHEALTHY" as const;
+  constructor(message = "Supervision Postgres is unavailable.") {
+    super(message);
+    this.name = "LiveStoreUnhealthyError";
   }
 }
 

@@ -10,8 +10,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
-  const machine = getLiveSupervisionMachine();
-  const sweep = machine.sweep();
+  const machine = await getLiveSupervisionMachine();
+  const sweep = await Promise.resolve(machine.sweep());
   const snapshot = machine.snapshot();
   return NextResponse.json({
     ok: true,

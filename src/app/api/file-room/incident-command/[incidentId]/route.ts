@@ -39,7 +39,9 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ incident: fixture });
   } catch (error) {
     try {
-      const live = getLiveSupervisionMachine().applyOwnerAction(incidentId, body.action, note);
+      const live = await Promise.resolve(
+        (await getLiveSupervisionMachine()).applyOwnerAction(incidentId, body.action, note),
+      );
       return NextResponse.json({ incident: live });
     } catch {
       const message = error instanceof Error ? error.message : "Owner action failed.";

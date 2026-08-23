@@ -1,7 +1,7 @@
 # Supervision durable store schema
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Pass:** 3B (launch-runtime durability correction)
+**Pass:** 3C (live REST/RPC connector)
 
 This document classifies providers. It does **not** rewrite or replace Pass 3 local evidence.
 
@@ -17,7 +17,7 @@ Launch runtime (`NODE_ENV=production`, `NETLIFY=true`, or `STUDIO_SUPERVISION_RU
 
 Supabase **object/file storage is not the incident database**.
 
-Live production is **not certified** in Pass 3B. The Postgres adapter, SQL migration, and deterministic tests exist. A live project/credentials/REST hydrate path is a later Owner proof.
+Live production is **not certified** in Pass 3C. The live REST/RPC connector is wired. Owner still must apply migrations, set server-only env names, and authorize a real two-process proof.
 
 ## Local JSON layout (Pass 3, accepted for local/controlled proof only)
 
@@ -56,6 +56,28 @@ Migration: `supabase/migrations/20260823_supervision_launch_runtime.sql`
 | `supervision_meta` | Schema/provider stamp and last claim |
 
 Adapter: `src/lib/studio-work-supervision/postgres-adapter.ts` over `postgres-engine.ts` (deterministic) using the existing `SupervisionRepository` contract. Object storage is unused.
+
+## Live connector RPCs (Pass 3C)
+
+Migration: `supabase/migrations/20260824_supervision_live_connector.sql` (schema version 2)
+
+| Function | Atomic group |
+|----------|----------------|
+| `supervision_verify_schema` | Initialization / compatibility |
+| `supervision_hydrate` | Active-record restore after restart/deploy |
+| `supervision_due_next_checks` | Due-check query |
+| `supervision_upsert_lease` | Lease registration/update |
+| `supervision_accept_heartbeat` | Idempotency + heartbeat + lease |
+| `supervision_upsert_incident_with_events` | Incident derived state + append-only events + recovery rows |
+| `supervision_record_recovery` | Recovery + incident-state transition |
+| `supervision_try_claim_sweep` | Atomic sweep claim |
+| `supervision_record_sweep_evaluation` | Sweep evaluation + lease next-check |
+| `supervision_save_coverage` | Provider coverage |
+| `supervision_mark_restored` | Restart stamp |
+| `supervision_apply_ops` | One Postgres transaction wrapping the coalesced ops from a Machine write |
+
+Live client: `src/lib/studio-work-supervision/postgres-live-client.ts`  
+Live repository: `src/lib/studio-work-supervision/postgres-live-repository.ts`
 
 Least privilege: `anon` / `authenticated` revoked. `service_role` only. Service-role key must not reach the browser.
 

@@ -1,8 +1,8 @@
 # Build-A-Bot capability and connector plan (opening)
 
-**Status:** Not in this repository. Not connected. Not proven. Pass 3B does **not** connect Build-A-Bot.
+**Status:** Not in this repository. Not connected. Not proven. Pass 3C does **not** connect Build-A-Bot.
 
-An external scheduler cannot repair a store that forgets incidents after deploy. Local JSON restart proof is not launch-runtime durability. After **live** production durability is proven against shared Supabase Postgres, Build-A-Bot may be evaluated as the independent scheduler against `PROVIDER-INDEPENDENT-AUTOMATION-CONTRACT.md`. Do not connect it before that evaluation.
+An external scheduler cannot repair a store that forgets incidents after deploy. Local JSON restart proof is not launch-runtime durability. The live REST/RPC connector is ready in code, but live Supabase is **not certified**. After **live** production durability is proven against shared Supabase Postgres, Build-A-Bot may be evaluated as the independent scheduler against `PROVIDER-INDEPENDENT-AUTOMATION-CONTRACT.md`. Do not connect it before that evaluation.
 
 ## Work to do later (not this commit)
 
