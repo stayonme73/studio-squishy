@@ -9,6 +9,11 @@ export function isStaffOrOwner(user: StudioUser | null | undefined): boolean {
   return hasRole(user, "owner") || hasRole(user, "staff");
 }
 
+export function isOwner(user: StudioUser | null | undefined): boolean {
+  if (!user) return false;
+  return hasRole(user, "owner");
+}
+
 export function isClientOnly(user: StudioUser | null | undefined): boolean {
   if (!user) return false;
   return hasRole(user, "client") && !isStaffOrOwner(user);

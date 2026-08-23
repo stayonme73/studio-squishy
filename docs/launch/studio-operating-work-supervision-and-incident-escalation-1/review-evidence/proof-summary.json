@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "identity": "tagia@local.dev",
+  "listPath": "/file-room/incident-command",
+  "routinePath": "/file-room/incident-command/sup_inc_1",
+  "securityPath": "/file-room/incident-command/inc_fixture_security",
+  "authPath": "POST /api/auth/login from local seed fixture",
+  "screenshots": [
+    "incident-command-list.png",
+    "incident-command-routine.png",
+    "incident-command-security.png"
+  ],
+  "notes": [
+    "List hides Watchkeeper because a security incident is open.",
+    "Routine detail shows canonical Squishy Watchkeeper.",
+    "Security detail is critical and does not show Squishy."
+  ]
+}

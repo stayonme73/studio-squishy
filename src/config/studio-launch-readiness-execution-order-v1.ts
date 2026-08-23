@@ -15,7 +15,7 @@
  * CLOSED WITH EXPLICIT LIMITS at 15ee699c.
  * Tagia 2026-08-22 (later): Mobile Customer Journey Certification OPEN.
  * Tagia 2026-08-23: Mobile Customer Journey Certification PARKED. Work
- * Supervision and Incident Escalation OPEN (opening artifacts only).
+ * Supervision and Incident Escalation OPEN (Foundation Pass 1 in progress).
  * Room 4 remains OPEN. Do not start Room 5. Do not assign Room 4D / 4E.
  */
 
@@ -356,8 +356,9 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     status: "OPEN" as const,
     progress: "IN_PROGRESS" as const,
     sectionClosed: false as const,
-    openingArtifactsOnly: true as const,
-    implementationAuthorized: false as const,
+    openingArtifactsOnly: false as const,
+    implementationAuthorized: true as const,
+    foundationPass: 1 as const,
     baseCommit: "bc458931c46ed845b982f62a4c70f8a312c169c8" as const,
     openedAt: "2026-08-23" as const,
     doNotAssignRoom4dOr4eLabel: true as const,

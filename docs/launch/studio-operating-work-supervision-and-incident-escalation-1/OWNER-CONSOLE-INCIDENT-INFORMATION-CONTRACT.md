@@ -17,6 +17,6 @@ For every escalated incident Tagia must see, in plain language:
 11. When the Machine checks again  
 12. Evidence and full history  
 
-Today’s Owner Console is a **decision desk** for production exceptions. It does not yet meet this contract. Implementation is not in this opening.
+The Owner Console decision desk is unchanged. Foundation Pass 1 adds an **additive** incident command board at `/file-room/incident-command`. That board is fixture-seeded, Owner-only, and not certified. Do not treat the decision desk as closed or reopened.
 
 Security suspected/confirmed: serious layout, no Squishy.

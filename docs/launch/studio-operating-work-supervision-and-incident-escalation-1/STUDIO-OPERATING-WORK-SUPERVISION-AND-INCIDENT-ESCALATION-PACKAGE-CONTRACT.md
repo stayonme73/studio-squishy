@@ -1,7 +1,7 @@
 # STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION — PACKAGE CONTRACT
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Status:** **OPEN / IN PROGRESS** — opening artifacts only; **not** implemented; **not** certified  
+**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 in progress (Machine incident core + additive Incident Command). **Not** certified. **Not** closed.  
 **Opened:** 2026-08-23  
 **Base:** mobile park tip `bc458931c46ed845b982f62a4c70f8a312c169c8`  
 **Branch:** `operating/work-supervision-and-incident-escalation-1`  
@@ -20,14 +20,18 @@ Scout may build. Claude may later **verify** incidents. Build-A-Bot may later **
 
 ---
 
-## What opening authorizes
+## What opening authorized
 
 Opening documents, schema, contracts, scenario list, defect ledger, board pointers, and one opening commit.
 
-## What opening does **not** authorize
+## What Foundation Pass 1 authorizes
 
-- Implementing detection, heartbeats, Console UI, alerts, Claude wiring, or Build-A-Bot  
-- Claiming Claude, Build-A-Bot, Resend, or any alert channel is live  
+Provider-independent Machine incident core, heartbeat/lease health, severity/escalation rules, additive Owner Incident Command, Squishy Watchkeeper on routine internal states only, and proof tests with fictional fixtures.
+
+## What this package still does **not** authorize
+
+- Claiming Claude, Build-A-Bot, Make, Resend, or any alert channel is live  
+- Fake success connectors  
 - Using real customer data  
 - Security theater  
 - Merging  

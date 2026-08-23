@@ -1,6 +1,8 @@
 /**
  * Work Supervision and Incident Escalation.
- * OPEN 2026-08-23. Opening artifacts only. Not implemented. Not certified.
+ * OPEN 2026-08-23. Foundation Pass 1 in progress. Not certified. Not closed.
+ * Opening artifacts exist. Machine incident core + Owner incident command view
+ * authorized. Do not connect Claude, Build-A-Bot, Make, or Resend.
  * Base: mobile park tip bc458931. Room 4 only. Do not assign Room 4D / 4E.
  * Do not merge. Do not start Room 5. Do not unpark mobile until this package closes.
  */
@@ -16,8 +18,10 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
   status: "OPEN" as const,
   progress: "IN_PROGRESS" as const,
   sectionClosed: false as const,
-  openingArtifactsOnly: true as const,
-  implementationAuthorized: false as const,
+  openingArtifactsOnly: false as const,
+  implementationAuthorized: true as const,
+  foundationPass: 1 as const,
+  packageClosed: false as const,
   baseCommit: "bc458931c46ed845b982f62a4c70f8a312c169c8" as const,
   baseBranch:
     "operating/mobile-customer-journey-certification-1" as const,
@@ -38,6 +42,7 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
   doNotReopenRoom4cWithoutDefect: true as const,
   doNotReopenGateXWithoutDefect: true as const,
   doNotUnparkMobileInOpening: true as const,
+  incidentCommandRoute: "/file-room/incident-command" as const,
   doNotClaimClaudeConnected: true as const,
   doNotClaimBuildABotConnected: true as const,
   doNotClaimResendLive: true as const,

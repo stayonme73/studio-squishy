@@ -4,6 +4,7 @@ import type { StudioUser } from "@/lib/campaign-store/types";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import { fileRoom } from "@/config/file-room";
 import { OWNER_CONSOLE_ROUTE } from "@/config/owner-console";
+import { INCIDENT_COMMAND_ROUTE } from "@/lib/studio-work-supervision/view-model";
 import { canEnterTeamOffice } from "@/lib/campaign-tasks/office-access";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 import {
@@ -21,6 +22,8 @@ type FileRoomHeaderProps = {
   assignments?: CampaignAssignmentsFile;
   /** Hide Owner Console link when already on Owner Console. */
   showOwnerConsoleLink?: boolean;
+  /** Hide Incident Command link when already on that board. */
+  showIncidentCommandLink?: boolean;
   /** Owner Console landing — larger type, gold name, hide list lead. */
   ownerDeskMode?: boolean;
 };
@@ -45,11 +48,14 @@ export default function FileRoomHeader({
   campaignId,
   assignments,
   showOwnerConsoleLink = true,
+  showIncidentCommandLink = true,
   ownerDeskMode = false,
 }: FileRoomHeaderProps) {
   const officeLinks =
     campaignId && assignments ? resolveOfficeLinks(user, campaignId, assignments) : [];
   const ownerConsoleLinkVisible = showOwnerConsoleLink && isOwnerUser(user);
+  const incidentCommandLinkVisible = showIncidentCommandLink && isOwnerUser(user);
+  const utilityLinksVisible = ownerConsoleLinkVisible || incidentCommandLinkVisible;
 
   return (
     <header className={`fr-header${ownerDeskMode ? " fr-header--owner-desk" : ""}`}>
@@ -58,10 +64,14 @@ export default function FileRoomHeader({
         {ownerDeskMode ? null : (
           <p className="fr-header__meta">{campaignName ?? fileRoom.listLead}</p>
         )}
-        {ownerConsoleLinkVisible ? (
+        {utilityLinksVisible ? (
           <p className="fr-header__meta">
-            <Link href={OWNER_CONSOLE_ROUTE}>Owner Console</Link>
-            {" · "}
+            {ownerConsoleLinkVisible ? <Link href={OWNER_CONSOLE_ROUTE}>Owner Console</Link> : null}
+            {ownerConsoleLinkVisible && incidentCommandLinkVisible ? " · " : null}
+            {incidentCommandLinkVisible ? (
+              <Link href={INCIDENT_COMMAND_ROUTE}>Incident Command</Link>
+            ) : null}
+            {incidentCommandLinkVisible || ownerConsoleLinkVisible ? " · " : null}
             <Link href="/file-room/launch-tracker">Launch Tracker</Link>
             {" · "}
             <Link href="/file-room/studio-self-test">Studio Self-Test</Link>
