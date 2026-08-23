@@ -304,12 +304,14 @@ export function createSupervisionMachine(options?: {
   const clock = options?.clock ?? createSystemClock();
   const ids = options?.ids ?? createSequenceIdFactory();
   const repository = options?.repository ?? createMemorySupervisionRepository();
-  const recordSource = options?.recordSource ?? (repository.kind === "durable-file" ? "live" : "fixture");
+  const recordSource =
+    options?.recordSource ??
+    (repository.kind === "memory" ? "fixture" : "live");
   const holderId = options?.holderId ?? ids("holder");
   if (options?.requireDurable) {
     assertDurableRepository(repository, { ...process.env, STUDIO_SUPERVISION_REQUIRE_DURABLE: "1" });
   }
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" || process.env.STUDIO_SUPERVISION_RUNTIME === "launch") {
     assertDurableRepository(repository);
   }
   repository.load();
@@ -327,7 +329,7 @@ export function createSupervisionMachine(options?: {
   }
 
   function applyRestartRecovery(): void {
-    if (repository.kind !== "durable-file" || leases.size === 0) return;
+    if (repository.kind === "memory" || leases.size === 0) return;
     repository.markRestored(isoNow(clock));
     for (const lease of leases.values()) {
       if (lease.kind === "LONG_RUNNING_SERVICE" && !lease.completedAt) {

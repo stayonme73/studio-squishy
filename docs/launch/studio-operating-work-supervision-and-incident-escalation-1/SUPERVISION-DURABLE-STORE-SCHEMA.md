@@ -1,14 +1,25 @@
 # Supervision durable store schema
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Pass:** Durable Pass 3  
-**Provider:** `studio-data-json`  
-**Schema version:** `1`  
-**Mechanism:** Studio `data/` JSON store (same family as `src/lib/campaign-store/`) with atomic replace and append-only jsonl.
+**Pass:** 3B (launch-runtime durability correction)
 
-This is **not** a new database. Supabase in this repository is private **file storage** only and is **not configured** as a record store. There is no SQL migration folder and no `DATABASE_URL` record database. If those credentials or a Postgres schema appear later, this file must be updated honestly before any claim that Supabase holds supervision records.
+This document classifies providers. It does **not** rewrite or replace Pass 3 local evidence.
 
-## Layout
+## Provider classification
+
+| Kind | Provider stamp | Allowed use |
+|------|----------------|-------------|
+| `memory` | in-process maps | Unit tests only |
+| `durable-file` | `studio-data-json` | Local development and controlled certification only |
+| `supabase-postgres` | `supabase-postgres` | Required launch-production shared store |
+
+Launch runtime (`NODE_ENV=production`, `NETLIFY=true`, or `STUDIO_SUPERVISION_RUNTIME=launch`) **fails closed** if only memory or JSON-file persistence is available.
+
+Supabase **object/file storage is not the incident database**.
+
+Live production is **not certified** in Pass 3B. The Postgres adapter, SQL migration, and deterministic tests exist. A live project/credentials/REST hydrate path is a later Owner proof.
+
+## Local JSON layout (Pass 3, accepted for local/controlled proof only)
 
 Root: `data/supervision/` or `STUDIO_SUPERVISION_DATA_DIR`.
 
@@ -25,15 +36,37 @@ Root: `data/supervision/` or `STUDIO_SUPERVISION_DATA_DIR`.
 | `sweep-evaluations.jsonl` | Which Machine sweep claimed and evaluated each due item |
 | `sweep-claim.json` | Current sweep holder / TTL |
 
+Pass 3 proof files remain under `review-evidence/pass-3-*.json` and `owner-evidence-pass-3-*.html`. Do not delete them.
+
+## Production Postgres (Pass 3B adapter)
+
+Migration: `supabase/migrations/20260823_supervision_launch_runtime.sql`
+
+| Table / object | Role |
+|----------------|------|
+| `supervision_leases` | Current derived leases; tenant and heartbeat indexes |
+| `supervision_incidents` | Current derived incidents; due-check and open-dedupe indexes |
+| `supervision_incident_events` | Append-only incident events (trigger forbids UPDATE/DELETE) |
+| `supervision_recovery_attempts` | Recovery attempts |
+| `supervision_idempotency` | Unique `(lease_id, idempotency_key)` |
+| `supervision_heartbeats` | Append-only heartbeat log |
+| `supervision_coverage` | Provider coverage |
+| `supervision_sweep_claims` | Single-row sweep holder; claimed through `supervision_try_claim_sweep` |
+| `supervision_sweep_evaluations` | Append-only sweep evaluation log |
+| `supervision_meta` | Schema/provider stamp and last claim |
+
+Adapter: `src/lib/studio-work-supervision/postgres-adapter.ts` over `postgres-engine.ts` (deterministic) using the existing `SupervisionRepository` contract. Object storage is unused.
+
+Least privilege: `anon` / `authenticated` revoked. `service_role` only. Service-role key must not reach the browser.
+
+Retention and deletion are documented separately in `SUPERVISION-RECORD-RETENTION-AND-DELETION.md`.
+
 ## Rules
 
 - Incident events cannot be overwritten or deleted through normal operations. `replaceIncidentEvents` throws `AppendOnlyViolationError`.
-- Derived incident state is reconstructed from immutable jsonl history.
-- Concurrent sweeps: a live claim from another holder is refused. Same holder may continue.
+- Derived incident state is reconstructed from immutable history.
+- Concurrent sweeps: a live claim from another holder is refused. Same holder may continue. `supervision_try_claim_sweep` uses row lock (`FOR UPDATE`) in SQL.
 - Tenant isolation remains `customerId` / `projectId` on the lease and incident. Cross-customer writes stay `403`.
-- Production and `STUDIO_SUPERVISION_REQUIRE_DURABLE=1` forbid the in-memory repository. There is no fallback from durable persistence to volatile memory.
+- Production/launch forbids memory and JSON-file repositories.
 - The in-memory repository remains for deterministic unit tests only.
-
-## Restart
-
-After Node starts, the Machine loads leases, incidents, recovery attempts, next-check times, coverage, heartbeats, and idempotency keys from this directory. Long-running services are not `SERVICE_AWAKE` until a new health check passes. `WAITING_FOR_OWNER` is not relabeled `WORKING` or `ACTIVE`.
+- `studio-data-json` remains for local development and the accepted Pass 3 restart proof only.

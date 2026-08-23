@@ -10,8 +10,19 @@ import {
   createFileSupervisionRepository,
 } from "./file-repository";
 import { createSupervisionMachine, type SupervisionMachine } from "./machine";
+import { createPostgresSupervisionRepository } from "./postgres-adapter";
+import { createSupervisionPostgresEngine } from "./postgres-engine";
 import { LIVE_SWEEP_INTERVAL_MS } from "./policy";
-import { assertDurableRepository } from "./repository";
+import {
+  isLaunchRuntime,
+  requestedSupervisionProvider,
+  resolveSupervisionPostgresConfig,
+} from "./provider-class";
+import {
+  DurablePersistenceUnavailableError,
+  assertDurableRepository,
+  type SupervisionRepository,
+} from "./repository";
 
 type LiveSupervisionSlot = {
   machine: SupervisionMachine;
@@ -49,6 +60,32 @@ export function resolveSupervisionDataDir(
     return path.join(os.tmpdir(), "studio-supervision-vitest", String(process.pid));
   }
   return DEFAULT_SUPERVISION_DATA_DIR;
+}
+
+export function createLiveSupervisionRepository(
+  env: NodeJS.ProcessEnv = process.env,
+): SupervisionRepository {
+  const requested = requestedSupervisionProvider(env);
+  if (isLaunchRuntime(env) || requested === "supabase-postgres") {
+    const resolved = resolveSupervisionPostgresConfig(env);
+    if (!resolved.ok) {
+      throw new DurablePersistenceUnavailableError(
+        `Launch supervision requires Supabase Postgres. Missing ${resolved.missing.join(", ")}. studio-data-json is local-only and is not a launch production store.`,
+      );
+    }
+    if (env.STUDIO_SUPERVISION_ALLOW_INPROCESS_POSTGRES === "1") {
+      return createPostgresSupervisionRepository(createSupervisionPostgresEngine());
+    }
+    throw new DurablePersistenceUnavailableError(
+      "Supabase Postgres credentials are present, but live production certification is not claimed in Pass 3B. Apply supabase/migrations/20260823_supervision_launch_runtime.sql, then authorize a live production proof. Deterministic adapter proof is not live certification.",
+    );
+  }
+  if (requested === "memory") {
+    throw new DurablePersistenceUnavailableError(
+      "The memory repository is unit tests only.",
+    );
+  }
+  return createFileSupervisionRepository(resolveSupervisionDataDir(env));
 }
 
 function ensureMachineSweepLease(state: LiveSupervisionSlot): string {
@@ -115,7 +152,7 @@ export function getLiveSupervisionMachine(): SupervisionMachine {
   let state = slot();
   if (!state) {
     const dataDir = resolveSupervisionDataDir();
-    const repository = createFileSupervisionRepository(dataDir);
+    const repository = createLiveSupervisionRepository();
     assertDurableRepository(repository, {
       ...process.env,
       STUDIO_SUPERVISION_REQUIRE_DURABLE: process.env.VITEST ? "0" : "1",

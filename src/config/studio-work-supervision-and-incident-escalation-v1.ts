@@ -1,7 +1,8 @@
 /**
  * Work Supervision and Incident Escalation.
  * OPEN 2026-08-23. Foundation Pass 1 accepted at 0dc76903.
- * Runtime Pass 2 accepted at 1f8e2600. Durable Pass 3 in progress.
+ * Runtime Pass 2 accepted at 1f8e2600. Durable Pass 3 accepted locally at 05509c9b.
+ * Pass 3B launch-runtime durability correction in progress.
  * Not certified. Not closed. Do not connect Claude, Build-A-Bot, Make, or Resend.
  * Base: mobile park tip bc458931. Room 4 only. Do not assign Room 4D / 4E.
  * Do not merge. Do not start Room 5. Do not unpark mobile until this package closes.
@@ -27,8 +28,19 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
   runtimePass2Accepted: true as const,
   runtimePass2AcceptedAt: "1f8e2600f0daab4e60a25725fcb0aab291440613" as const,
   durablePass: 3 as const,
+  launchRuntimePass: "3B" as const,
+  pass3LocalAccepted: true as const,
+  pass3LocalAcceptedAt: "05509c9bc7d87d388002e11048ba416b80e80199" as const,
+  launchProductionCertified: false as const,
   persistenceProvider: "studio-data-json" as const,
-  supabaseRecordStore: "not configured — Supabase in this repo is private file storage only" as const,
+  localPersistenceProvider: "studio-data-json" as const,
+  productionPersistenceProvider: "supabase-postgres" as const,
+  supabaseRecordStore:
+    "adapter and migration present; live project not certified" as const,
+  ownerSetupPostgresDoc:
+    "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/OWNER-SETUP-SUPERVISION-POSTGRES.md" as const,
+  retentionPolicyDoc:
+    "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/SUPERVISION-RECORD-RETENTION-AND-DELETION.md" as const,
   packageClosed: false as const,
   baseCommit: "bc458931c46ed845b982f62a4c70f8a312c169c8" as const,
   baseBranch:

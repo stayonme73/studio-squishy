@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "classification": "deterministic-adapter-proof-not-live-production",
+  "liveProductionCertified": false,
+  "pass3LocalEvidencePreserved": true,
+  "pass3ProofPath": "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/review-evidence/pass-3-proof.json",
+  "persistence": {
+    "memory": "unit-tests-only",
+    "studio-data-json": "local-development-and-controlled-certification-only",
+    "supabase-postgres": "launch-production-shared-durable-store-required"
+  },
+  "supabaseObjectStorage": "not the incident database",
+  "configurationPresent": {
+    "STUDIO_SUPERVISION_SUPABASE_URL": false,
+    "NEXT_PUBLIC_SUPABASE_URL": false,
+    "STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY": false,
+    "SUPABASE_SERVICE_ROLE_KEY": false,
+    "DATABASE_URL": false
+  },
+  "liveCredentialsPresent": false,
+  "livePingPerformed": false,
+  "livePingResult": "not attempted — live REST repository is not wired in Pass 3B",
+  "twoOsProcessSweepClaim": {
+    "processAClaimed": true,
+    "processBClaimed": false,
+    "bothWon": false,
+    "classification": "deterministic-adapter-proof-not-live-production"
+  },
+  "testTotals": {
+    "passed": 52,
+    "skipped": 0,
+    "failed": 0,
+    "total": 52,
+    "summary": "Tests  52 passed (52)"
+  },
+  "buildABot": "NOT CONNECTED",
+  "claude": "NOT CONNECTED",
+  "make": "NOT ACTIVE",
+  "resend": "PARKED / not claimed",
+  "scheduler": "not authorized until live production durability is proven",
+  "packageStatus": "OPEN",
+  "room4": "OPEN",
+  "room5": "NOT_STARTED",
+  "mobile": "PARKED"
+}

@@ -1,7 +1,7 @@
 # External agent registration and heartbeat contract
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Pass:** Durable Pass 3  
+**Pass:** Durable Pass 3 (local JSON) / Pass 3B (Postgres adapter; live store not certified)  
 **Status:** Contract implemented. Providers below are **not** connected because this contract exists.
 
 The Machine owns registration, heartbeat truth, and health. Scout, Claude, Cody, Build-A-Bot, and production workers may use this contract later. Registration is not a connection claim.

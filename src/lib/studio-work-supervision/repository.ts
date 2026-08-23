@@ -4,11 +4,16 @@ import type {
   ProviderPortStatus,
   WorkLease,
 } from "./types";
+import {
+  isLaunchRuntime,
+  SUPERVISION_JSON_PROVIDER,
+  SUPERVISION_POSTGRES_PROVIDER,
+  type SupervisionRepositoryKind,
+} from "./provider-class";
 
 export const SUPERVISION_STORE_SCHEMA_VERSION = 1 as const;
-export const SUPERVISION_STORE_PROVIDER = "studio-data-json" as const;
-
-export type SupervisionRepositoryKind = "memory" | "durable-file";
+export const SUPERVISION_STORE_PROVIDER = SUPERVISION_JSON_PROVIDER;
+export type { SupervisionRepositoryKind };
 
 export type SweepClaim = {
   claimId: string;
@@ -28,7 +33,7 @@ export type SweepEvaluationRecord = {
 
 export type SupervisionStoreMeta = {
   schemaVersion: typeof SUPERVISION_STORE_SCHEMA_VERSION;
-  provider: typeof SUPERVISION_STORE_PROVIDER;
+  provider: typeof SUPERVISION_JSON_PROVIDER | typeof SUPERVISION_POSTGRES_PROVIDER;
   restoredAt: string | null;
   lastSweepClaim: SweepClaim | null;
 };
@@ -98,13 +103,31 @@ export class VolatileMemoryForbiddenError extends Error {
   }
 }
 
+export class LaunchPersistenceForbiddenError extends Error {
+  readonly code = "LAUNCH_PERSISTENCE_FORBIDDEN" as const;
+  constructor(
+    message = "Launch runtime cannot use memory or JSON-file supervision storage.",
+  ) {
+    super(message);
+    this.name = "LaunchPersistenceForbiddenError";
+  }
+}
+
 export function assertDurableRepository(
   repository: SupervisionRepository,
   env: NodeJS.ProcessEnv = process.env,
 ): void {
-  const production = env.NODE_ENV === "production";
-  const requireDurable = env.STUDIO_SUPERVISION_REQUIRE_DURABLE === "1" || production;
-  if (requireDurable && repository.kind !== "durable-file") {
+  if (isLaunchRuntime(env)) {
+    if (repository.kind !== "supabase-postgres") {
+      throw new LaunchPersistenceForbiddenError();
+    }
+    return;
+  }
+  const requireDurable = env.STUDIO_SUPERVISION_REQUIRE_DURABLE === "1";
+  if (requireDurable && repository.kind === "memory") {
+    throw new VolatileMemoryForbiddenError();
+  }
+  if (env.NODE_ENV === "production" && repository.kind === "memory") {
     throw new VolatileMemoryForbiddenError();
   }
 }

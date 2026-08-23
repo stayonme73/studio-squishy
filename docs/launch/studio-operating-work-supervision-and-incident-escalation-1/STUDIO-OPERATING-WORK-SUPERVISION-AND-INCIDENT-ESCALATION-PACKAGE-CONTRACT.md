@@ -1,7 +1,7 @@
 # STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION — PACKAGE CONTRACT
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 accepted at `0dc76903`. Runtime Pass 2 accepted at `1f8e2600` as a controlled foundation. Durable Pass 3 in progress (provider-independent `studio-data-json` persistence and restart recovery). **Not** certified. **Not** closed.  
+**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 accepted at `0dc76903`. Runtime Pass 2 accepted at `1f8e2600` as a controlled foundation. Durable Pass 3 accepted at `05509c9b` for **local development and controlled restart proof only**. Pass 3B is the launch-runtime durability correction (Supabase Postgres adapter). **Not** launch-certified. **Not** closed.  
 **Opened:** 2026-08-23  
 **Base:** mobile park tip `bc458931c46ed845b982f62a4c70f8a312c169c8`  
 **Branch:** `operating/work-supervision-and-incident-escalation-1`  
@@ -34,7 +34,13 @@ Machine-owned work leases, authenticated provider-independent heartbeat ingest, 
 
 ## What Durable Pass 3 authorizes
 
-Provider-independent durable persistence for leases, heartbeats, idempotency keys, incidents, append-only events, recovery attempts, coverage, next-check schedules, and escalation state, plus restart recovery. Incident Command reads fixtures and persisted live records in separate sets. This pass does **not** connect Build-A-Bot, Claude, Make, or Resend. An external scheduler is not authorized until this durable restart proof is accepted.
+Provider-independent durable persistence for leases, heartbeats, idempotency keys, incidents, append-only events, recovery attempts, coverage, next-check schedules, and escalation state, plus restart recovery. Incident Command reads fixtures and persisted live records in separate sets. This pass does **not** connect Build-A-Bot, Claude, Make, or Resend.
+
+Pass 3 is accepted for **local development and controlled Node restart proof only**. `studio-data-json` is not a certified launch-production store.
+
+## What Pass 3B authorizes
+
+Classify providers (memory = tests, JSON = local/controlled, Postgres = launch production). Fail closed in launch runtime if only memory or JSON is available. Implement a Supabase Postgres adapter on the existing `SupervisionRepository` contract, with SQL migration and deterministic multi-process tests. Do **not** claim live production certification without a live shared database proof. Do **not** connect Build-A-Bot. An external scheduler is not authorized until **live** production durability is proven.
 
 ## What this package still does **not** authorize
 

@@ -1,6 +1,6 @@
 # Machine incident schema (opening)
 
-The Machine is the system of record. This schema is the contract. Durable Pass 3 persists the derived incident and append-only event history in `data/supervision/` (`studio-data-json`). It does not change the field contract.
+The Machine is the system of record. This schema is the contract. Durable Pass 3 persists the derived incident and append-only event history in `data/supervision/` (`studio-data-json`) for local development and controlled proof. Pass 3B adds a Supabase Postgres adapter for launch production; it does not change the field contract. Live Postgres is not certified in Pass 3B.
 
 Every incident must include:
 

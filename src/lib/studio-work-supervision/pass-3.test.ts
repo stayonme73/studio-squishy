@@ -378,7 +378,7 @@ describe("work supervision pass 3 durable persistence", () => {
       assertDurableRepository(createMemorySupervisionRepository(), {
         NODE_ENV: "production",
       }),
-    ).toThrow(VolatileMemoryForbiddenError);
+    ).toThrow(/Launch runtime cannot use memory or JSON-file/);
     expect(() =>
       createSupervisionMachine({
         repository: createMemorySupervisionRepository(),

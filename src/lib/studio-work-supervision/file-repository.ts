@@ -73,7 +73,8 @@ export function createFileSupervisionRepository(
           schemaVersion: SUPERVISION_STORE_SCHEMA_VERSION,
           provider: SUPERVISION_STORE_PROVIDER,
           mechanism: "Studio data/ JSON store with atomic replace and append-only jsonl",
-          supabaseRecordStore: "not used — Supabase in this repo is private file storage only and is not configured for records",
+          supabaseRecordStore:
+            "not used by studio-data-json — launch production requires supabase-postgres; object storage is not the incident database",
         },
         null,
         2,
