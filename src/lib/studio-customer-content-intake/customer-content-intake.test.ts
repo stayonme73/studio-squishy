@@ -179,7 +179,41 @@ function tasks(jobOverrides: Partial<NonNullable<ServerTasksEnvelope["jobRecords
 
 describe("STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1", () => {
   it("locks package routing states from config", () => {
-    expect(studioExternalCustomerContentIntakeAndRightsCertificationV1.status).toBe("OPEN");
+    expect(studioExternalCustomerContentIntakeAndRightsCertificationV1.status).toBe(
+      "CLOSED WITH EXPLICIT LIMITS",
+    );
+    expect(studioExternalCustomerContentIntakeAndRightsCertificationV1.sectionClosed).toBe(
+      true,
+    );
+    expect(studioExternalCustomerContentIntakeAndRightsCertificationV1.ownerDecision).toBe(
+      "ACCEPTED",
+    );
+    expect(
+      studioExternalCustomerContentIntakeAndRightsCertificationV1.packageRecommendation,
+    ).toBe("CLOSE WITH EXPLICIT LIMITS");
+    expect(
+      studioExternalCustomerContentIntakeAndRightsCertificationV1.doNotOpenNextPackage,
+    ).toBe(true);
+    expect(
+      studioExternalCustomerContentIntakeAndRightsCertificationV1.doNotStartRoom5,
+    ).toBe(true);
+    expect(
+      studioExternalCustomerContentIntakeAndRightsCertificationV1.frozenLaunchNowServices
+        .carousel,
+    ).toBe("NOT ON LAUNCH MENU");
+    expect(
+      studioExternalCustomerContentIntakeAndRightsCertificationV1.sealedEvidenceRuns,
+    ).toHaveLength(3);
+    expect(
+      studioExternalCustomerContentIntakeAndRightsCertificationV1.defectDisposition["GX-D2"],
+    ).toBe("CORRECTED_AND_CERTIFIED");
+    expect(
+      studioExternalCustomerContentIntakeAndRightsCertificationV1.defectDisposition["GX-D4"],
+    ).toBe("CORRECTED_AND_CERTIFIED");
+    expect(
+      studioExternalCustomerContentIntakeAndRightsCertificationV1.defectDisposition
+        .originalFailuresPreserved,
+    ).toBe(true);
     expect(studioExternalCustomerContentIntakeAndRightsCertificationV1.routingStates).toEqual(
       expect.arrayContaining([
         "RECEIVED",

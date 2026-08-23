@@ -1,8 +1,8 @@
 /**
  * External Customer Content Intake and Rights Certification.
- * OPEN 2026-08-22. Base 5c22de9. Register Gate X execution package.
- * Closes Room 4C Scenario 3 limitation: studio fixtures did not prove the real customer route.
- * Do not merge. Do not start Room 5. Do not start mobile certification in opening.
+ * CLOSED WITH EXPLICIT LIMITS 2026-08-22. Owner decision ACCEPTED.
+ * Base 5c22de9 remains an untouched ancestor. Register Gate X execution package.
+ * Do not merge. Do not start Room 5. Do not start mobile certification. Do not open the next package.
  */
 
 export const studioExternalCustomerContentIntakeAndRightsCertificationV1 = {
@@ -13,11 +13,14 @@ export const studioExternalCustomerContentIntakeAndRightsCertificationV1 = {
   roomId: "full-business-rehearsal" as const,
   sectionId: "external-customer-content-intake-and-rights-certification" as const,
   title: "External Customer Content Intake and Rights Certification" as const,
-  status: "OPEN" as const,
-  sectionClosed: false as const,
+  status: "CLOSED WITH EXPLICIT LIMITS" as const,
+  sectionClosed: true as const,
+  ownerDecision: "ACCEPTED" as const,
+  packageRecommendation: "CLOSE WITH EXPLICIT LIMITS" as const,
   baseCommit: "5c22de9ed82c4b3009ef5d0bbe8b623f4a90ef88" as const,
   baseBranch: "operating/pre-launch-master-closeout-register-1" as const,
   openedAt: "2026-08-22" as const,
+  closedAt: "2026-08-22" as const,
   registerRequirement: "EXTERNAL_CUSTOMER_CONTENT_INTAKE_AND_RIGHTS" as const,
   registerPackageId: "STUDIO-PRE-LAUNCH-MASTER-CLOSEOUT-REGISTER-1" as const,
   registerTip: "5c22de9ed82c4b3009ef5d0bbe8b623f4a90ef88" as const,
@@ -25,6 +28,8 @@ export const studioExternalCustomerContentIntakeAndRightsCertificationV1 = {
     "operating/external-customer-content-intake-and-rights-certification-1" as const,
   packageContractDoc:
     "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-PACKAGE-CONTRACT.md" as const,
+  closeoutDoc:
+    "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md" as const,
   routeMapDoc:
     "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/EXISTING-CUSTOMER-UPLOAD-AND-ROUTING-MAP.md" as const,
   certificationMatrixDoc:
@@ -35,6 +40,7 @@ export const studioExternalCustomerContentIntakeAndRightsCertificationV1 = {
   doNotMerge: true as const,
   doNotStartRoom5: true as const,
   doNotStartMobileCertification: true as const,
+  doNotOpenNextPackage: true as const,
   doNotChangeLaunchNowMenu: true as const,
   doNotReopenRoom4cWithoutDefect: true as const,
   doNotUploadControlledTestFilesInOpening: true as const,
@@ -102,6 +108,41 @@ export const studioExternalCustomerContentIntakeAndRightsCertificationV1 = {
       "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/certification-runs" as const,
   },
 
+  sealedEvidenceRuns: [
+    {
+      id: "gate-x-run-2026-08-22T230059190Z" as const,
+      role: "original" as const,
+      manifestSha256:
+        "04c34166c92efe0b6f241033bff7f391e5ee98e2b12782d812def7b61412a14c" as const,
+    },
+    {
+      id: "gate-x-run-2026-08-22T232853529Z" as const,
+      role: "cases-2-and-4-supplemental" as const,
+      manifestSha256:
+        "77f1dbf62b634bc5d695476f855d2dccf8e4bcd273260078bcf39b4f4d1073ab" as const,
+    },
+    {
+      id: "gate-x-run-2026-08-22T235349346Z" as const,
+      role: "case-3-likeness-supplemental" as const,
+      manifestSha256:
+        "ebd769003e7527fd906b627390f6804d71fe6b50fef68ae36bbdbc2be433f1d2" as const,
+    },
+  ] as const,
+
+  defectDisposition: {
+    "GX-D2": "CORRECTED_AND_CERTIFIED" as const,
+    "GX-D4": "CORRECTED_AND_CERTIFIED" as const,
+    originalFailuresPreserved: true as const,
+  },
+
+  explicitLimits: [
+    "Likeness and third-party detection uses customer declarations and filename hints; it does not perform image-content recognition.",
+    "Rights certification records customer representations and Studio controls; it is not an independent legal ownership determination.",
+    "Malware scanning is not included or claimed.",
+    "A superseded prior file is preserved internally but is not displayed to the customer with a separate “Superseded” banner.",
+    "The customer sees outstanding-material status rather than the internal `materials_incomplete` production-gate code.",
+  ] as const,
+
   /** Canonical owner raw-file staging. Covered by existing `tmp/` gitignore. Never commit contents. */
   ownerRawFileStagingDir: "tmp/gate-x-controlled-test-owner-staging" as const,
 
@@ -110,7 +151,7 @@ export const studioExternalCustomerContentIntakeAndRightsCertificationV1 = {
   /** Live Route Map V2 shelf SKU for campaign graphics hire/pay. Case 9 job.skuId. */
   customerFacingCampaignGraphicsShelfSku: "v2-rtu-promotion-graphics" as const,
 
-  openingArtifactsOnly: true as const,
+  openingArtifactsOnly: false as const,
   recommendedFirstExecutionStep:
-    "Implement per-file routing states and durable rights records on the live MaterialsIntakePanel → /api/campaigns/{id}/materials path; then run the controlled Customer-One test pack." as const,
+    "Package closed. Do not open the next package from this closeout." as const,
 } as const;

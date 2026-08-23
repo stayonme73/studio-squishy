@@ -11,7 +11,8 @@
  * Tagia 2026-08-20: Room 4C opened (multi-service client gauntlet).
  * Tagia 2026-08-21: Room 4C CLOSED WITH EXPLICIT LIMITS at 92f47e2.
  * Tagia 2026-08-21 (later): Pre-Launch Master Closeout Register ACTIVE (not execution).
- * Tagia 2026-08-22: External Customer Content Intake and Rights Certification OPEN.
+ * Tagia 2026-08-22: External Customer Content Intake and Rights Certification
+ * CLOSED WITH EXPLICIT LIMITS. Do not open the next package. Room 4 remains OPEN.
  */
 
 export const studioLaunchReadinessExecutionOrderV1 = {
@@ -37,7 +38,7 @@ export const studioLaunchReadinessExecutionOrderV1 = {
   currentActiveRoomClosed: false as const,
   currentActiveSectionId:
     "external-customer-content-intake-and-rights-certification" as const,
-  currentActiveSectionStatus: "OPEN" as const,
+  currentActiveSectionStatus: "CLOSED WITH EXPLICIT LIMITS" as const,
 
   lastCustomerLifePackage: {
     id: "STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1",
@@ -177,11 +178,12 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     room4CCloseTip: "92f47e200ab59979a2c8b16e813abfef9e067765" as const,
     currentSectionId:
       "external-customer-content-intake-and-rights-certification" as const,
-    currentSectionStatus: "OPEN" as const,
+    currentSectionStatus: "CLOSED WITH EXPLICIT LIMITS" as const,
     activeRegisterPackageId:
       "STUDIO-PRE-LAUNCH-MASTER-CLOSEOUT-REGISTER-1" as const,
-    activeExecutionPackageId:
+    lastClosedExecutionPackageId:
       "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1" as const,
+    doNotOpenNextPackage: true as const,
   },
 
   room4A: {
@@ -262,24 +264,29 @@ export const studioLaunchReadinessExecutionOrderV1 = {
       "src/config/studio-pre-launch-master-closeout-register-v1.ts" as const,
     recommendedNextPackageId:
       "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1" as const,
-    recommendedNextPackageStatus: "OPEN" as const,
-    doNotStartRecommendedNextInThisPackage: false as const,
+    recommendedNextPackageStatus: "CLOSED WITH EXPLICIT LIMITS" as const,
+    doNotStartRecommendedNextInThisPackage: true as const,
+    doNotOpenNextPackage: true as const,
   },
 
   externalCustomerContentIntakeAndRightsCertification: {
     packageId:
       "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1" as const,
     title: "External Customer Content Intake and Rights Certification" as const,
-    status: "OPEN" as const,
-    sectionClosed: false as const,
+    status: "CLOSED WITH EXPLICIT LIMITS" as const,
+    sectionClosed: true as const,
+    ownerDecision: "ACCEPTED" as const,
+    packageRecommendation: "CLOSE WITH EXPLICIT LIMITS" as const,
     baseCommit: "5c22de9ed82c4b3009ef5d0bbe8b623f4a90ef88" as const,
     openedAt: "2026-08-22" as const,
+    closedAt: "2026-08-22" as const,
     registerRequirement: "EXTERNAL_CUSTOMER_CONTENT_INTAKE_AND_RIGHTS" as const,
     doNotStartMobileCertification: true as const,
     doNotStartRoom5: true as const,
     doNotMerge: true as const,
     doNotChangeLaunchNowMenu: true as const,
     doNotReopenRoom4cWithoutDefect: true as const,
+    doNotOpenNextPackage: true as const,
     room4RemainsOpen: true as const,
     room4cRemainsClosed: true as const,
     room4cCloseTip: "92f47e200ab59979a2c8b16e813abfef9e067765" as const,
@@ -287,6 +294,8 @@ export const studioLaunchReadinessExecutionOrderV1 = {
       "src/config/studio-external-customer-content-intake-and-rights-certification-v1.ts" as const,
     packageContractDoc:
       "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-PACKAGE-CONTRACT.md" as const,
+    closeoutDoc:
+      "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md" as const,
   },
 
   merge: "separately_authorized" as const,

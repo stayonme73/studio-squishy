@@ -23,6 +23,10 @@ certification-runs/
 
 ## Status
 
+Package classification: **CLOSED WITH EXPLICIT LIMITS** (owner decision ACCEPTED, 2026-08-22).
+
+Final certification evidence — three sealed runs. Read together. Do **not** overwrite, rename, or reinterpret any of them.
+
 Original sealed run (immutable):
 
 - `gate-x-run-2026-08-22T230059190Z`
@@ -38,7 +42,7 @@ Case 3 likeness-hold live proof:
 - `gate-x-run-2026-08-22T235349346Z`
 - Manifest SHA-256: `ebd769003e7527fd906b627390f6804d71fe6b50fef68ae36bbdbc2be433f1d2`
 
-Do **not** overwrite, rename, or reinterpret the original sealed run. Supplemental runs are additive directories only.
+Supplemental runs are additive directories only. Closeout: [STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md](../STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md).
 
 Owner raw photographs never enter this Git-tracked folder. After an authorized run, this folder may hold manifests, hashes, routing records, and redacted screenshots only.
 

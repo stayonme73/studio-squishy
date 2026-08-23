@@ -47,13 +47,17 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
   externalCustomerContentIntakeAndRights: {
     id: "external-customer-content-intake-and-rights" as const,
     title: "External Customer Content Intake and Rights Certification" as const,
-    classification: "REQUIRED_NOT_STARTED" as const,
+    classification: "COMPLETE_WITH_EXPLICIT_LIMITS" as const,
+    ownerDecision: "ACCEPTED" as const,
+    closedAt: "2026-08-22" as const,
     doNotStartWithoutOwnerAuthorization: true as const,
     requiredBeforeRoom4CloseIfPhotoLedAccepted: true as const,
     requiredBeforeMobileUploadCertification: true as const,
     studioFixturesDoNotProvePath: true as const,
     proposedPackageId:
       "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1" as const,
+    closeoutDoc:
+      "docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md" as const,
   },
 
   areas: {
@@ -222,9 +226,11 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
   recommendedNextSinglePackage: {
     packageId:
       "STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1" as const,
+    status: "CLOSED WITH EXPLICIT LIMITS" as const,
     doNotStartInThisPackage: true as const,
+    doNotOpenNextPackage: true as const,
     reason:
-      "Required before Room 4 closes while photo-led Launch Now remains accepted; mobile upload certification depends on this cleared path." as const,
+      "Gate X closed with explicit limits. Do not open the next register package from this closeout. Mobile certification remains REQUIRED_NOT_STARTED and unauthorized." as const,
   },
 
   sequenceGates: {

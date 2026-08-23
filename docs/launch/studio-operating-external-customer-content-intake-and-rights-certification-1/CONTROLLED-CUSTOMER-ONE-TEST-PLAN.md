@@ -2,9 +2,17 @@
 
 **Package:** `STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1`
 
-**Status:** PREPARATION — Owner File Collection Checklist correction. Do not execute.
+**Status:** EXECUTED AND CERTIFIED — CLOSED WITH EXPLICIT LIMITS (owner decision ACCEPTED 2026-08-22).
 
 **Date:** 2026-08-22
+
+Live proof is sealed. Do not re-execute this pack unless new evidence proves a defect. Closeout: `STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md`.
+
+| Run | Manifest SHA-256 |
+|-----|------------------|
+| `gate-x-run-2026-08-22T230059190Z` | `04c34166c92efe0b6f241033bff7f391e5ee98e2b12782d812def7b61412a14c` |
+| `gate-x-run-2026-08-22T232853529Z` | `77f1dbf62b634bc5d695476f855d2dccf8e4bcd273260078bcf39b4f4d1073ab` |
+| `gate-x-run-2026-08-22T235349346Z` | `ebd769003e7527fd906b627390f6804d71fe6b50fef68ae36bbdbc2be433f1d2` |
 
 This plan designs a later controlled test using the **actual customer route** (`MaterialsIntakePanel` → multipart PATCH `/api/campaigns/{campaignId}/materials`). Studio-generated Room 4C fixtures and developer shortcuts are forbidden.
 
@@ -204,21 +212,22 @@ Identifiers already resolved from the repository: Launch Now capability `campaig
 
 ---
 
-## Execution sequence (future — not this turn)
+## Execution sequence (completed)
 
 1. Create certification campaign through live hire/pay path.  
 2. Upload Case 1; verify identity fields and CLEARED state.  
 3. Proceed Cases 2–8 in order; record state transitions.  
-4. Run Case 9 production-routing simulation.  
-5. Seal evidence in `certification-runs/{date}-gate-x/`.  
-6. Tagia review before close stamp.
+4. Run Case 9 production-routing verification.  
+5. Seal evidence in `certification-runs/`. Original failures GX-D2 and GX-D4 were corrected and supplementally certified without rewriting the original run.  
+6. Tagia review accepted CLOSE WITH EXPLICIT LIMITS.
 
 ---
 
 ## Pass criteria
 
-- All 9 cases behave as specified on the **live customer route**.  
+- All 9 cases behave as specified on the **live customer route** when original + supplemental runs are read together.  
 - No uncleared file reaches production routing.  
 - Durable per-file rights records exist for every uploaded file.  
 - Customer sees honest status for every file.  
-- Evidence manifest matches on-disk SHA-256 values.
+- Evidence manifest matches on-disk SHA-256 values.  
+- GX-D2 and GX-D4 original failures remain preserved and are not treated as current failures.

@@ -37,7 +37,7 @@ Room 4C closeout: `docs/launch/studio-operating-room-4c-multi-service-client-gau
 2. Carousel remains NOT ON LAUNCH MENU.
 3. Room 4C is complete and must not be reopened casually.
 4. Dedicated mobile certification remains required before Room 4 closes.
-5. External real-customer photo submission and rights verification remain unproven.
+5. External real-customer content intake and per-file rights certification is COMPLETE_WITH_EXPLICIT_LIMITS (Gate X closeout 2026-08-22). Studio-generated Room 4C fixtures still do not count as that proof.
 6. Independent AI voice-naturalness QA remains not certified.
 7. Synthetic narration requires customer listening until that QA exists.
 8. Music licensing remains constrained by recorded Eleven Music Starter boundaries.
@@ -73,19 +73,19 @@ Exactly one per area:
 
 | Field | Value |
 |-------|-------|
-| Classification | REQUIRED_NOT_STARTED |
-| Current truth | Studio-generated certification fixtures (Room 4B/4C) do **not** prove the external customer upload/rights path. |
-| Evidence | Room 4C closeout limits 4–5; production-assurance rights packages (internal/kitchen — not customer-route proof) |
-| Do not reopen | Room 4C Scenario 3 as substitute proof |
-| Remaining gap | Full customer-route upload → identity/SHA → ownership → campaign/crop permissions → likeness/privacy → third-party IP → accept/reject/quarantine → cleared-to-production / uncleared-blocked → durable rights records |
-| Risk if omitted | Photo-led Launch Now work can accept customer photos without a truthful cleared path; mobile upload cert would be false |
-| Dependencies | None for starting design; must complete **before** mobile journey certification can truthfully certify uploads |
-| Sequence | **A — before Room 4 closes** (required while photo-led work remains on Launch Now) |
+| Classification | COMPLETE_WITH_EXPLICIT_LIMITS |
+| Current truth | Closed 2026-08-22. Owner decision ACCEPTED. Live per-file rights certification proven on the actual customer route with explicit limits. |
+| Evidence | `STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md`; sealed runs `gate-x-run-2026-08-22T230059190Z`, `gate-x-run-2026-08-22T232853529Z`, `gate-x-run-2026-08-22T235349346Z` |
+| Do not reopen | Yes — unless genuine defect |
+| Remaining gap | Explicit limits only (no image-content recognition; not a legal ownership determination; no malware scanning; no customer “Superseded” banner; customer sees outstanding-material status rather than `materials_incomplete`) |
+| Risk if omitted | n/a — package closed |
+| Dependencies | None remaining for this gate; mobile journey certification still requires this completed path and is **not started** |
+| Sequence | Complete with explicit limits |
 | Proposed package | `STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1` |
-| Owner decision | Confirm Launch Now continues to accept customer-photo-led work (default: yes → this gate required) |
-| doNotStartWithoutOwnerAuthorization | true |
-| Close condition | All listed rights/intake proofs pass on the actual customer route |
-| Soft-open | Required before Room 4 close if customer-photo-led remains accepted |
+| Owner decision | ACCEPTED — CLOSE WITH EXPLICIT LIMITS |
+| doNotStartWithoutOwnerAuthorization | true (reopen only) |
+| Close condition | Satisfied |
+| Soft-open | Preserve; required before Room 4 close if customer-photo-led remains accepted |
 
 ---
 
@@ -111,7 +111,7 @@ Exactly one per area:
 | Current truth | Room 4C mobile notes are responsive coverage only. |
 | Evidence | S1–S3 `MOBILE-RESPONSIVE-OBSERVATIONS.md` |
 | Remaining gap | Phone cert for hire, communication, uploads, feedback, approval, delivery |
-| Dependencies | **Requires gate X first** (external content intake/rights) so upload certification is truthful |
+| Dependencies | Gate X is COMPLETE_WITH_EXPLICIT_LIMITS. Mobile cert still requires that cleared path and is **not started**. |
 | Sequence | **A — before Room 4 closes** (after X) |
 | Proposed package | `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1` |
 | Collision check | No existing `room-4d` / `mobile-customer-journey` package branch; do **not** auto-assign Room 4D/4E labels |
@@ -342,7 +342,7 @@ Exactly one per area:
 ### A — Required before Room 4 can close
 
 1. This register (ACTIVE — not execution)
-2. External Customer Content Intake and Rights Certification
+2. External Customer Content Intake and Rights Certification — COMPLETE_WITH_EXPLICIT_LIMITS
 3. Full mobile customer-journey certification (using cleared upload/rights path)
 
 ### B — Required before Owner-as-Customer Real Studio Campaign
@@ -398,13 +398,13 @@ Exactly one per area:
 
 ---
 
-## Proposed next single package (not started)
+## Last closed execution package (do not open the next)
 
 **`STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1`**
 
-Rationale: Required before Room 4 closes while photo-led Launch Now remains accepted; mobile upload certification cannot truthfully pass without it. No Room 4D/4E label assigned (collision check: none found; prefer descriptive package IDs).
+Status: **CLOSED WITH EXPLICIT LIMITS** (owner ACCEPTED 2026-08-22). Closeout: `docs/launch/studio-operating-external-customer-content-intake-and-rights-certification-1/STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md`.
 
-Opening scope (when separately authorized — **not this commit**): package contract + customer-route intake/rights design + acceptance matrix; no production of customer deliverables; no Room 5; no merge.
+Do **not** open the next register package from this close. Dedicated mobile customer-journey certification remains REQUIRED_NOT_STARTED and unauthorized. No Room 4D/4E label assigned. Room 4 remains OPEN. Room 5 remains NOT_STARTED. No merge.
 
 ---
 

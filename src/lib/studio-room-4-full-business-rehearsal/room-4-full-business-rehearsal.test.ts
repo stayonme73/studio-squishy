@@ -48,6 +48,19 @@ describe("STUDIO-OPERATING-ROOM-4-FULL-BUSINESS-REHEARSAL-1", () => {
     expect(
       studioLaunchReadinessExecutionOrderV1.room4C.mediaNaturalnessCarryForwardStatus,
     ).toBe("REQUIRED_NOT_CERTIFIED");
+    expect(
+      studioLaunchReadinessExecutionOrderV1.externalCustomerContentIntakeAndRightsCertification
+        .status,
+    ).toBe("CLOSED WITH EXPLICIT LIMITS");
+    expect(
+      studioLaunchReadinessExecutionOrderV1.externalCustomerContentIntakeAndRightsCertification
+        .sectionClosed,
+    ).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomClosed).toBe(false);
+    expect(studioLaunchReadinessExecutionOrderV1.room4.doNotStartRoom5).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room4.doNotOpenNextPackage).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room4C.sectionClosed).toBe(true);
+    expect(studioLaunchReadinessExecutionOrderV1.room4B.sectionClosed).toBe(true);
   });
 
   it("reuses Maya flyer on the certified renderer path and keeps Owner as judgment only", () => {

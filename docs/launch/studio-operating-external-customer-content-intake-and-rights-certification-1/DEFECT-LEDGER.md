@@ -1,14 +1,16 @@
 # Gate X defect ledger
 
 Package: `STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CERTIFICATION-1`  
-Status: **OPEN** — corrections recorded; package is not closed.
+Status: **CLOSED WITH EXPLICIT LIMITS** — GX-D2 and GX-D4 are corrected and certified. Original sealed failures remain preserved.
+
+Owner decision: **ACCEPTED** (2026-08-22). Classification: **CLOSE WITH EXPLICIT LIMITS**.
 
 Original sealed run (immutable; do not overwrite, rename, or reinterpret):
 
 - Directory: `certification-runs/gate-x-run-2026-08-22T230059190Z/`
 - Manifest SHA-256: `04c34166c92efe0b6f241033bff7f391e5ee98e2b12782d812def7b61412a14c`
 
-Owner decision on that sealed run: Cases 1, 3, 5, 6, 7, 8, and 9 matched. Cases 2 and 4 did not. Gate X remains OPEN.
+Owner decision on that sealed run: Cases 1, 3, 5, 6, 7, 8, and 9 matched. Cases 2 and 4 did not. Those original failed outcomes remain valuable evidence. They are **not** current failures.
 
 ## GX-D2 — Case 2 crop/adapt denial cleared without limits
 
@@ -19,6 +21,7 @@ Owner decision on that sealed run: Cases 1, 3, 5, 6, 7, 8, and 9 matched. Cases 
 | Actual (sealed) | `CLEARED_FOR_PRODUCTION` on the PDF |
 | Stored rights (sealed) | `cropAdaptPermitted=true` on the superseded PDF record |
 | Classification | Genuine control defect |
+| Disposition | **CORRECTED AND CERTIFIED** |
 
 Root cause:
 
@@ -29,6 +32,8 @@ Root cause:
 
 Required correction: honor crop/adapt denial on document-reference file uploads; route to `CLEARED_WITH_LIMITS`; store `no_crop_adapt`; keep as-is production clearance; forbid downstream crop/adapt.
 
+Supplemental proof: `gate-x-run-2026-08-22T232853529Z` Case 2 = `CLEARED_WITH_LIMITS` with `cropAdaptPermitted=false` and `limits=["no_crop_adapt"]`.
+
 ## GX-D4 — Case 4 diverted to technical review instead of rights quarantine
 
 | Field | Record |
@@ -38,6 +43,7 @@ Required correction: honor crop/adapt denial on document-reference file uploads;
 | Actual (sealed) | `TECHNICAL_REVIEW_REQUIRED` |
 | Stored rights (sealed) | `thirdPartyMaterialPresent=false` on the shelf file |
 | Classification | Control + fixture defect; production stayed blocked |
+| Disposition | **CORRECTED AND CERTIFIED** |
 
 Root cause:
 
@@ -46,6 +52,8 @@ Root cause:
 3. Document-reference forced `thirdPartyMaterialPresent: false`, so the live Case 4 never stored the intended third-party-yes / authority-unchecked answers.
 
 Required correction: a valid technical fixture must not accidentally divert this rights test; unresolved third-party rights must route to `QUARANTINED` even if concurrent technical findings are recorded; team technical approval must never clear unresolved third-party rights.
+
+Supplemental proof: `gate-x-run-2026-08-22T232853529Z` Case 4 = `QUARANTINED` with `thirdPartyMaterialPresent=true`, authority unconfirmed, and no technical-review diversion.
 
 ## Supplemental retest
 
@@ -73,6 +81,8 @@ Actual:
 - Routing: `QUARANTINED`
 - Customer-visible explanation: Recognizable people appear in this file, but likeness consent is not confirmed yet.
 
-## Package recommendation
+## Package close
 
-Gate X remains **OPEN**. No close. No merge. Room 5 remains `NOT_STARTED`. Register tip `5c22de9` remains untouched.
+Gate X is **CLOSED WITH EXPLICIT LIMITS**. No merge. Room 5 remains `NOT_STARTED`. Register tip `5c22de9` remains an untouched ancestor. The next package is not opened.
+
+Closeout: `STUDIO-OPERATING-EXTERNAL-CUSTOMER-CONTENT-INTAKE-AND-RIGHTS-CLOSEOUT.md`
