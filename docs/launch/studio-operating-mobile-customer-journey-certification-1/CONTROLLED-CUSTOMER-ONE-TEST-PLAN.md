@@ -2,11 +2,15 @@
 
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`
 
-**Status:** PREPARATION — opening only. Do not execute.
+**Status:** READINESS PREPARED — real-phone walk not started
 
 **Date:** 2026-08-22
 
-This plan designs a later controlled test on a **real phone** along the locked customer spine. Desktop-width emulation and Room 4C responsive notes are forbidden as the sole proof.
+Owner script: `OWNER-PHONE-RUN-GUIDE.md`.  
+Access: `PHONE-ACCESS-METHOD.md`.  
+Empty evidence: `certification-runs/_template/`.
+
+Desktop-width emulation and Room 4C responsive notes remain forbidden as the sole proof.
 
 Canonical customer names and routes: `docs/customer-journey-v1-locked.md`.
 
@@ -14,18 +18,21 @@ Canonical customer names and routes: `docs/customer-journey-v1-locked.md`.
 
 ## Test customer fixture
 
-Use a dedicated certification campaign (not Moss & Thread, Cedar Lane, Harbor Roast, or Gate X live campaigns). Suggested identity is recorded at execution, not in opening.
-
 | Field | Value |
 |-------|-------|
-| Device | Real phone (not desktop-only) |
-| Hire path | Live customer spine |
-| Payment | Sandbox |
+| Fictional customer | Mira Chen |
+| Business | Pine & Petal Market |
+| Account | pinepetal.cert@local.dev / studio-cert-phone (create on the phone) |
+| Device | Tagia’s real phone, portrait |
+| Hire path | Lobby → Conversation Room |
+| Service | Make My Campaign Graphics (`v2-rtu-promotion-graphics`) if recommended |
+| Payment | Sandbox confirm only — no real charge |
 | Rights path | Live Gate X per-file certification on the phone |
-| Owner labor | NONE during test execution |
+| Materials | Synthetic / Studio-owned fixtures in `/mobile-customer-journey-cert-1/` |
+| Owner labor during Tagia’s walk | NONE except Scout HTTPS start and the documented review-state seed after Board |
 | Carousel | Not on Launch Now menu; do not sell |
 
-Do not send `campaign-creative` as a catalog checkout `ServiceId`. Use the live shelf SKU actually hired, as Gate X did for campaign graphics (`v2-rtu-promotion-graphics`) if that is the hired service.
+Do not send `campaign-creative` as a catalog checkout `ServiceId`.
 
 ---
 
@@ -46,28 +53,31 @@ Device bar: readable text, usable forms, clear status, no desktop-only dependenc
 
 ---
 
-## Owner actions required before execution
+## Owner actions
 
 | # | Action | Owner |
 |---|--------|-------|
-| 1 | Authorize the live real-phone run after opening review | Tagia |
-| 2 | Confirm the phone used is a real device, not desktop-only proof | Tagia |
-| 3 | Do not use real outside-customer files without separate authorization | Tagia |
+| 1 | Review Scout readiness return | Tagia |
+| 2 | Wait until Scout says the Studio is awake | Tagia |
+| 3 | Walk `OWNER-PHONE-RUN-GUIDE.md` on the real phone | Tagia |
+| 4 | Stop after Board communication for the honest review seed | Tagia + Scout |
+| 5 | Do not use real outside-customer files | Tagia |
 
 ---
 
-## Execution sequence (future — not this turn)
+## Execution sequence (tomorrow — not claimed done)
 
-1. Create the certification campaign through the live hire/pay path on the phone.  
-2. Complete intake, upload, and rights certification on the phone.  
-3. Communicate, track, review, feedback, approve, and download delivery on the phone.  
-4. Force at least one blocked or failed action and record the recovery path.  
-5. Seal evidence in `certification-runs/`.  
-6. Tagia review before close stamp.
+1. Tagia creates the certification campaign through the live hire/pay path on the phone.  
+2. Tagia completes intake, upload, rights, and one Board message.  
+3. Scout seeds honest production review state.  
+4. Tagia reviews, leaves feedback, approves, and downloads delivery.  
+5. Error cases in the owner guide are part of the same walk.  
+6. Seal evidence from `_template/` into a timestamped run.  
+7. Tagia review before any close stamp.
 
 ---
 
-## Pass criteria
+## Pass criteria (future close)
 
 - All 8 proofs pass on a real phone.  
 - Device bar holds at every step.  

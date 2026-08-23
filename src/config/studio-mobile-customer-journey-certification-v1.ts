@@ -44,6 +44,8 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   doNotReopenGateXWithoutDefect: true as const,
   doNotExecuteLivePhoneJourneyInOpening: true as const,
   doNotStampCertificationResultInOpening: true as const,
+  doNotExecuteLivePhoneJourneyUntilOwnerAuthorization: true as const,
+  doNotStampCertificationResult: true as const,
   responsiveCoverageDoesNotProvePath: true as const,
   room4RemainsOpen: true as const,
   room4cRemainsClosed: true as const,
@@ -110,7 +112,16 @@ export const studioMobileCustomerJourneyCertificationV1 = {
       "docs/launch/studio-operating-mobile-customer-journey-certification-1/certification-runs" as const,
   },
 
-  openingArtifactsOnly: true as const,
+  openingArtifactsOnly: false as const,
+  readinessPassComplete: true as const,
+  readinessStatus: "READY_FOR_OWNER_PHONE_RUN_AFTER_SCOUT_STARTS_HTTPS" as const,
+  ownerPhoneRunGuideDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/OWNER-PHONE-RUN-GUIDE.md" as const,
+  phoneAccessMethod: "local_https_lan" as const,
+  phoneAccessDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/PHONE-ACCESS-METHOD.md" as const,
+  journeyRouteMapDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/JOURNEY-ROUTE-AND-CONTROL-MAP.md" as const,
   recommendedFirstExecutionStep:
-    "After opening, design the live real-phone Customer-One journey against the eight required proofs; do not stamp certification from Room 4C responsive notes or desktop-only runs." as const,
+    "Tagia reviews Scout readiness, then walks OWNER-PHONE-RUN-GUIDE.md on her real phone. Do not stamp certification from preflight tests, Room 4C notes, or desktop emulation." as const,
 } as const;

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { LOBBY_ENTRY_CHOICE_COOKIE } from "@/config/studio-lobby-entry-v1";
 import { browserSafeRedirectUrl } from "@/lib/browser-safe-redirect-url";
+import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
 
 /**
  * Progressive-enhancement entry for "New to the Studio".
@@ -10,7 +11,12 @@ import { browserSafeRedirectUrl } from "@/lib/browser-safe-redirect-url";
  * `lobbyEntry=new` is required so a stale cookie alone cannot unlock.
  */
 export async function GET(request: Request) {
-  const destination = browserSafeRedirectUrl(request, "/studio-conversation-room");
+  const incoming = new URL(request.url);
+  const conversationPath = withStudioPaymentSandboxQuery(
+    "/studio-conversation-room",
+    incoming.search,
+  );
+  const destination = browserSafeRedirectUrl(request, conversationPath);
   const response = NextResponse.redirect(destination);
   response.cookies.set(LOBBY_ENTRY_CHOICE_COOKIE, "new-to-studio", {
     path: "/",

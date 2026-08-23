@@ -1,12 +1,12 @@
 # ACCEPTANCE AND CERTIFICATION MATRIX
 
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`  
-**Status:** OPEN — matrix only; no results stamped  
+**Status:** OPEN — readiness prepared; **no real-phone results stamped**  
 **Date:** 2026-08-22
 
 Legend: ✅ proven · ⚠️ partial · ❌ missing · 🚫 not in scope
 
-Opening does not stamp certification. Prior phone-390 / responsive notes are ⚠️ at most.
+Readiness and preflight tests do not stamp certification. Prior phone-390 / responsive notes remain ⚠️ at most.
 
 ---
 

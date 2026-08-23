@@ -1,7 +1,7 @@
 # STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION — PACKAGE CONTRACT
 
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`  
-**Status:** **OPEN** (opening commit only — no certification result stamped)  
+**Status:** **OPEN** — readiness pass prepared; real-phone certification **not** stamped  
 **Base commit:** `15ee699c7d16331b3f410871f02555841fddd4d6` (Gate X close)  
 **Base branch:** `operating/external-customer-content-intake-and-rights-certification-1`  
 **Opened:** 2026-08-22  
@@ -105,11 +105,27 @@ Do not close on tests green alone. Requires BUILD → BREAK → USE LIKE A CUSTO
 
 ---
 
+## Readiness pass (2026-08-22)
+
+Authorized after opening. Prepares the live journey so Tagia can test on her actual phone without touching code.
+
+| Artifact | Path |
+|----------|------|
+| Owner guide | `OWNER-PHONE-RUN-GUIDE.md` |
+| Phone access | `PHONE-ACCESS-METHOD.md` |
+| Route / control map | `JOURNEY-ROUTE-AND-CONTROL-MAP.md` |
+| Defect ledger | `DEFECT-LEDGER.md` |
+| Empty run template | `certification-runs/_template/` |
+
+Real-phone certification still requires Tagia’s walk tomorrow. Preflight tests are not that walk.
+
 ## Evidence structure
 
 | Path | Purpose |
 |------|---------|
 | `EXISTING-MOBILE-COVERAGE-MAP.md` | Honest map of prior phone/responsive coverage and why it is not this cert |
 | `ACCEPTANCE-AND-CERTIFICATION-MATRIX.md` | Requirement → evidence mapping |
-| `CONTROLLED-CUSTOMER-ONE-TEST-PLAN.md` | Later real-phone test design |
-| `certification-runs/` | Sealed run evidence (future) |
+| `CONTROLLED-CUSTOMER-ONE-TEST-PLAN.md` | Real-phone test design + owner guide pointer |
+| `OWNER-PHONE-RUN-GUIDE.md` | One link, one action at a time |
+| `certification-runs/_template/` | Empty timestamp-ready run |
+| `certification-runs/` | Sealed run evidence (future, after the phone walk) |

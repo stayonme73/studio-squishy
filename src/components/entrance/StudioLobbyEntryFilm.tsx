@@ -13,6 +13,8 @@ type Props = {
   onClose: () => void;
   /** Instant unlock when JS attaches — storage + cookie still written for reload. */
   onBeginNew?: () => void;
+  /** No-JS fallback; may carry `?studioPaymentSandbox=1` for local cert. */
+  beginNewHref?: string;
 };
 
 /**
@@ -27,6 +29,7 @@ export default function StudioLobbyEntryFilm({
   sessionState,
   onClose,
   onBeginNew,
+  beginNewHref,
 }: Props) {
   const { copy, routes } = studioLobbyEntryV1;
   const returning =
@@ -63,7 +66,7 @@ export default function StudioLobbyEntryFilm({
             <h3 className="lobby-entry-film__choice-title">{copy.newToStudio.title}</h3>
             <p className="lobby-entry-film__choice-desc">{copy.newToStudio.description}</p>
             <a
-              href={routes.beginNew}
+              href={beginNewHref ?? routes.beginNew}
               className="lobby-entry-film__cta"
               onClick={(event) => {
                 writeLobbyEntryChoice("new-to-studio");

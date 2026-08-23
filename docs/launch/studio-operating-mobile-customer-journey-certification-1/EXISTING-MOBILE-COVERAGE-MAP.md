@@ -1,7 +1,7 @@
 # Existing mobile coverage map
 
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`  
-**Status:** OPEN — discovery only; no new live phone run in opening  
+**Status:** OPEN — readiness prepared; no real-phone certification stamped  
 **Date:** 2026-08-22
 
 This map records what already exists so this package does **not** treat it as dedicated Room 4 mobile journey certification.

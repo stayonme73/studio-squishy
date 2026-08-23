@@ -28,6 +28,7 @@ import {
 } from "@/config/welcome-hall-scene";
 import { cancelLobbyPodiumGuidanceSpeech } from "@/lib/studio-lobby-podium-guidance";
 import { loadGuideDraft } from "@/lib/studio-guide-hard-nav";
+import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
 import { setStudioVoiceInvite } from "@/lib/studio-voice-invite";
 
 const DESKTOP_KIOSK_MIN_WIDTH = 1025;
@@ -65,9 +66,12 @@ async function probeLobbySession(
  */
 export default function WelcomeHallWelcomeScene({
   initialChoseNew = false,
+  paymentSandbox = false,
 }: {
   /** From visit cookie — unlocks Lobby in HTML when phone JS never attaches. */
   initialChoseNew?: boolean;
+  /** Local/cert opt-in only — keep `?studioPaymentSandbox=1` through Let’s Get Started. */
+  paymentSandbox?: boolean;
 }) {
   const plateRef = useRef<HTMLDivElement>(null);
   const mobileCropRef = useRef<HTMLDivElement>(null);
@@ -208,8 +212,13 @@ export default function WelcomeHallWelcomeScene({
     const hasProgress = Boolean(draft?.projectNeed?.trim() || draft?.confirmedAt);
     setStudioVoiceInvite(hasProgress ? "resume" : "start");
     setTransitioning(true);
-    window.location.assign("/studio-conversation-room");
-  }, []);
+    const sourceSearch = paymentSandbox
+      ? window.location.search || "?studioPaymentSandbox=1"
+      : window.location.search;
+    window.location.assign(
+      withStudioPaymentSandboxQuery("/studio-conversation-room", sourceSearch),
+    );
+  }, [paymentSandbox]);
 
   const handleReopenFilm = useCallback(() => {
     writeLobbyEntryFilmDismissed(false);
@@ -274,6 +283,10 @@ export default function WelcomeHallWelcomeScene({
             sessionState={sessionState}
             onClose={handleCloseFilm}
             onBeginNew={handleBeginNew}
+            beginNewHref={withStudioPaymentSandboxQuery(
+              studioLobbyEntryV1.routes.beginNew,
+              paymentSandbox ? "?studioPaymentSandbox=1" : "",
+            )}
           />
         ) : null}
         {showReopenFilm ? (

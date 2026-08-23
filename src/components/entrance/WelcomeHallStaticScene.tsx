@@ -10,12 +10,18 @@ import WelcomeHallWelcomeScene from "@/components/entrance/WelcomeHallWelcomeSce
  */
 export default function WelcomeHallStaticScene({
   initialChoseNew = false,
+  paymentSandbox = false,
 }: {
   initialChoseNew?: boolean;
+  /** Local/cert opt-in only — keep `?studioPaymentSandbox=1` through Let’s Get Started. */
+  paymentSandbox?: boolean;
 }) {
   return (
     <Suspense fallback={null}>
-      <WelcomeHallWelcomeScene initialChoseNew={initialChoseNew} />
+      <WelcomeHallWelcomeScene
+        initialChoseNew={initialChoseNew}
+        paymentSandbox={paymentSandbox}
+      />
     </Suspense>
   );
 }

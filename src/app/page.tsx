@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import WelcomeHallStaticScene from "@/components/entrance/WelcomeHallStaticScene";
 import { isStudioGuideConversationEnabled } from "@/config/studio-guide-conversation-v1";
 import { buildLobbyGuideBoot } from "@/lib/studio-guide-lobby-boot";
+import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
 
 import "./mobile-route-fixes.css";
 
@@ -25,9 +26,13 @@ export default async function StudioLobbyRootPage({
 }: StudioLobbyRootPageProps) {
   const params = await searchParams;
   const boot = buildLobbyGuideBoot(params, isStudioGuideConversationEnabled());
+  const paymentSandbox = firstParam(params.studioPaymentSandbox) === "1";
+  const sandboxSearch = paymentSandbox ? "?studioPaymentSandbox=1" : "";
 
   if (boot.guideOpen) {
-    redirect("/studio-conversation-room");
+    redirect(
+      withStudioPaymentSandboxQuery("/studio-conversation-room", sandboxSearch),
+    );
   }
 
   /** Only explicit begin-new handoff unlocks in HTML — never a stale cookie alone. */
@@ -35,7 +40,10 @@ export default async function StudioLobbyRootPage({
 
   return (
     <main className="flex min-h-0 flex-1 flex-col">
-      <WelcomeHallStaticScene initialChoseNew={initialChoseNew} />
+      <WelcomeHallStaticScene
+        initialChoseNew={initialChoseNew}
+        paymentSandbox={paymentSandbox}
+      />
     </main>
   );
 }

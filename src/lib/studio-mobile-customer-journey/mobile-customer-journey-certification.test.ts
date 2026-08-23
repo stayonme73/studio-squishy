@@ -17,6 +17,19 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.doNotMerge).toBe(true);
     expect(cfg.doNotExecuteLivePhoneJourneyInOpening).toBe(true);
     expect(cfg.doNotStampCertificationResultInOpening).toBe(true);
+    expect(cfg.doNotExecuteLivePhoneJourneyUntilOwnerAuthorization).toBe(true);
+    expect(cfg.doNotStampCertificationResult).toBe(true);
+    expect(cfg.openingArtifactsOnly).toBe(false);
+    expect(cfg.readinessPassComplete).toBe(true);
+    expect(cfg.phoneAccessMethod).toBe("local_https_lan");
+    expect(
+      studioLaunchReadinessExecutionOrderV1.mobileCustomerJourneyCertification
+        .readinessPassComplete,
+    ).toBe(true);
+    expect(
+      studioLaunchReadinessExecutionOrderV1.mobileCustomerJourneyCertification
+        .doNotStampCertificationResult,
+    ).toBe(true);
     expect(cfg.gateXRemainsClosed).toBe(true);
     expect(cfg.gateXCloseTip).toBe("15ee699c7d16331b3f410871f02555841fddd4d6");
     expect(cfg.frozenLaunchNowServices.carousel).toBe("NOT ON LAUNCH MENU");

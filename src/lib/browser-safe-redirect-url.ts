@@ -47,7 +47,7 @@ export function browserSafeRedirectUrl(
       : incoming.protocol;
 
   const url = new URL(pathname, `${protocol}//${safeHost}`);
-  url.search = "";
+  /* Keep query the caller put on `pathname`. Do not copy the incoming request search. */
   url.hash = "";
   if (UNSAFE_BROWSER_HOSTS.has(url.hostname)) {
     url.hostname = "localhost";

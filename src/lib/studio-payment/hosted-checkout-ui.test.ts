@@ -24,6 +24,11 @@ describe("hosted Checkout single-entry UI contract", () => {
     expect(source).not.toContain('autoComplete="cc-csc"');
     expect(source).toContain('data-collects-card="false"');
     expect(source).toContain('data-hosted-checkout="stripe"');
+    expect(source).toContain("useEffect");
+    expect(source).toContain("setShowSandboxFixture");
+    expect(source).not.toContain(
+      'typeof window !== "undefined" ? window.location.search',
+    );
   });
 
   it("hides sandbox fixture from normal customer checkout", () => {

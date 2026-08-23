@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, type ReactNode, useMemo, useState } from "react";
+import { type FormEvent, type ReactNode, useEffect, useMemo, useState } from "react";
 
 import type { ServiceId } from "@/catalog/types";
 import type { ApprovalAcknowledgment } from "@/config/studio-board";
@@ -154,14 +154,20 @@ export default function SecureCheckoutGrid({
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [completing, setCompleting] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [showSandboxFixture, setShowSandboxFixture] = useState(false);
   const isEmbedded = layout === "embedded";
   const confirmLabel = submitLabel ?? payment.form.submitLabel;
 
-  const showSandboxFixture = useMemo(() => {
-    if (!onSandboxConfirm) return false;
-    const search =
-      typeof window !== "undefined" ? window.location.search : null;
-    return isDeveloperCheckoutSandboxVisible({ search });
+  /* Query flag is only knowable after mount. SSR `window` is undefined, so a
+     useMemo on first paint hid the fixture even with ?studioPaymentSandbox=1. */
+  useEffect(() => {
+    if (!onSandboxConfirm) {
+      setShowSandboxFixture(false);
+      return;
+    }
+    setShowSandboxFixture(
+      isDeveloperCheckoutSandboxVisible({ search: window.location.search }),
+    );
   }, [onSandboxConfirm]);
 
   function buildAcknowledgment(): ApprovalAcknowledgment {

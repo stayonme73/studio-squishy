@@ -322,6 +322,10 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     doNotReopenRoom4cWithoutDefect: true as const,
     doNotReopenGateXWithoutDefect: true as const,
     doNotExecuteLivePhoneJourneyInOpening: true as const,
+    doNotStampCertificationResult: true as const,
+    readinessPassComplete: true as const,
+    ownerPhoneRunGuideDoc:
+      "docs/launch/studio-operating-mobile-customer-journey-certification-1/OWNER-PHONE-RUN-GUIDE.md" as const,
     room4RemainsOpen: true as const,
     gateXRemainsClosed: true as const,
     gateXCloseTip: "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
