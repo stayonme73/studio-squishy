@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 import type { CampaignRecord } from "@/config/studio-board";
 import { isOwnerUser } from "@/lib/campaign-store/access";
@@ -6,6 +6,7 @@ import type { StudioUser } from "@/lib/campaign-store/types";
 import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared";
 
 import { userCanPerformRole } from "./capabilities";
+import { isQaBlockedReason } from "./qa-blocked";
 import { indexTasksById } from "./dependencies";
 import { validateChecklistForPhase } from "./qa-checklists";
 import { buildReadinessContext } from "./readiness";
@@ -43,10 +44,7 @@ export function qaActorRole(
   return isOwnerUser(user) ? "owner" : "qa";
 }
 
-export function isQaBlockedReason(task: CampaignTaskItem): boolean {
-  const reason = task.workflowBlockedReason ?? "";
-  return reason.includes("compliance_hold") || reason.includes("owner_escalation");
-}
+export { isQaBlockedReason };
 
 export function deliveryPrepTaskIdForService(serviceId: string): string {
   return `${serviceId}:delivery_prep`;
@@ -315,14 +313,7 @@ export function resolveQaSummary(qaRecords: readonly QaRecord[] | undefined) {
   };
 }
 
-export function qaRecordsForTask(
-  qaRecords: readonly QaRecord[] | undefined,
-  taskId: string,
-): readonly QaRecord[] {
-  return (qaRecords ?? []).filter(
-    (record) => record.taskId === taskId || record.routedTaskId === taskId,
-  );
-}
+export { qaRecordsForTask } from "./qa-records";
 
 export function stripInternalQaFields(
   envelope: ServerTasksEnvelope,

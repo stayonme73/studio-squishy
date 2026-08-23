@@ -5,7 +5,7 @@ import type { CampaignAssignmentsFile } from "@/lib/file-room/assignments-shared
 import { isStaffAssignedToCampaign } from "@/lib/file-room/assignments-shared";
 
 import { canOperateProductionTasks } from "./access";
-import { resolveOperatorPayload } from "./actions";
+import { resolveOperatorPayload } from "./operator-payload";
 import {
   canClaimTask,
   canPerformQa,
@@ -23,7 +23,8 @@ import {
   isUserCapableForTaskFamily,
   userProductionRoles,
 } from "./capabilities";
-import { isQaBlockedReason, qaRecordsForTask } from "./qa";
+import { qaRecordsForTask } from "./qa-records";
+import { isQaBlockedReason } from "./qa-blocked";
 import { campaignTasksConfig } from "@/config/campaign-tasks";
 
 import type {
@@ -37,12 +38,14 @@ import type {
 } from "./types";
 
 import type {
+  FileRoomQaHistoryEntry,
   FileRoomTaskOperator,
   FileRoomTaskOperatorContext,
   FileRoomTaskPermissions,
   ReassignCandidate,
 } from "./file-room-controls-types";
 export type {
+  FileRoomQaHistoryEntry,
   FileRoomTaskOperator,
   FileRoomTaskOperatorContext,
   FileRoomTaskPermissions,
@@ -238,23 +241,6 @@ export function resolveLatestHandoffForTask(
   };
 }
 
-export type FileRoomQaHistoryEntry = {
-  id: string;
-  action: QaRecord["action"];
-  actionLabel: string;
-  categoryLabel: string | null;
-  actorDisplayName: string;
-  createdAt: string;
-  notesPreview: string | null;
-};
-
-export type FileRoomTaskQaSummary = {
-  total: number;
-  passes: number;
-  fails: number;
-  blocks: number;
-};
-
 function qaCategoryLabel(record: QaRecord): string | null {
   if (!record.category) return null;
   if (record.category === "scope_change") return null;
@@ -297,18 +283,8 @@ export function resolveLatestQaHistoryForTask(
   return history.length > 0 ? history[history.length - 1] : null;
 }
 
-export function resolveQaSummaryForTask(
-  qaRecords: readonly QaRecord[] | undefined,
-  taskId: string,
-): FileRoomTaskQaSummary {
-  const records = qaRecordsForTask(qaRecords, taskId);
-  return {
-    total: records.length,
-    passes: records.filter((entry) => entry.action === "qa_pass").length,
-    fails: records.filter((entry) => entry.action === "qa_fail").length,
-    blocks: records.filter((entry) => entry.action === "qa_block").length,
-  };
-}
+export { resolveQaSummaryForTask } from "./qa-records";
+export type { FileRoomTaskQaSummary } from "./file-room-controls-types";
 
 export function resolveFileRoomTaskOperatorContext(
   user: StudioUser,

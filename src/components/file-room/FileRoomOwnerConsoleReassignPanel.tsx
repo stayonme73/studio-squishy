@@ -5,7 +5,7 @@ import { useState } from "react";
 import { campaignTasksConfig } from "@/config/campaign-tasks";
 import { ownerConsole } from "@/config/owner-console";
 import type { OwnerConsoleReassignContext } from "@/lib/campaign-tasks/owner-console-campaign-view";
-import type { TasksPatchBody } from "@/lib/campaign-tasks/actions";
+import type { TasksPatchBody } from "@/lib/campaign-tasks/patch-types";
 
 import { emptyHandoffForm, type HandoffFormState } from "./FileRoomTaskHandoffPanel";
 

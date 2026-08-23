@@ -15,7 +15,7 @@ import { resolveFileRoomTaskOwnershipPresentation } from "@/lib/campaign-tasks/t
 import type { FileRoomProductionTasksView } from "@/lib/campaign-tasks/tasks-view";
 import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
-import type { TeamOfficeWorkPacketView } from "@/lib/job-control/work-packets";
+import type { TeamOfficeWorkPacketView } from "@/lib/job-control/work-packet-types";
 
 import FileRoomWorkPacketPanel from "./FileRoomWorkPacketPanel";
 

@@ -1,12 +1,10 @@
 /**
  * Browser-safe Studio Kitchen projection helpers.
- * Server loaders: import from `@/lib/studio-kitchen/load-projection`.
+ * Server loaders and folder builders: import from
+ * `@/lib/studio-kitchen/load-projection` and `./build-folder`.
+ * Do not re-export Node folder builders here — Client Components import this barrel.
  */
-export {
-  buildKitchenProductionFolderFromFixture,
-  buildKitchenProductionFolderFromLive,
-  kitchenDataSourceLabel,
-} from "./build-folder";
+export { kitchenDataSourceLabel } from "./data-source-label";
 export {
   buildKitchenLiveFileRoomView,
   type KitchenLiveBucketSlotView,

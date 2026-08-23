@@ -1,40 +1,21 @@
-import { readFileSync } from "fs";
-import path from "path";
-
-import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 
 import type {
   LandingPageArtifactRecord,
   LandingPageDefinition,
+  LandingPageQaEvidence,
+  LandingPageQaPayload,
   LandingPageWorkPacket,
   LandingQaCheck,
 } from "./types";
 import { LANDING_PAGE_SKU } from "./types";
 import { validateLandingPageWorkPacket } from "./validate";
 
+export type { LandingPageQaEvidence, LandingPageQaPayload } from "./types";
+
 /** Formal landing QA phase — machine checks bound to exact HTML artifact. */
-export function requiresLandingPageQaGate(task: CampaignTaskItem): boolean {
-  if (task.familyId !== "landing_page") return false;
-  if (task.phase !== "qa") return false;
-  return task.relatedServiceIds.some((id) => id === LANDING_PAGE_SKU);
-}
-
-export type LandingPageQaPayload = {
-  packet: LandingPageWorkPacket;
-  definition: LandingPageDefinition;
-  artifact: LandingPageArtifactRecord;
-  /** Optional HTML; when omitted, bytes are read from artifact.relativePath. */
-  html?: string;
-  repoRoot?: string;
-};
-
-export type LandingPageQaEvidence = {
-  artifactId: string;
-  contentSha256: string;
-  workPacketVersion: string;
-  machineChecksOk: true;
-  checkIds: readonly string[];
-};
+export { requiresLandingPageQaGate } from "../quality-gates";
 
 export function gateLandingPageQaForQaPass(input: LandingPageQaPayload):
   | { ok: true; evidence: LandingPageQaEvidence }

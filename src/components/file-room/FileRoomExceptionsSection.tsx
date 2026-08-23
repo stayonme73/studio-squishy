@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { campaignExceptionsConfig } from "@/config/campaign-exceptions";
 import { contentKindForCategory } from "@/lib/materials/promotion";
-import type { TasksPatchBody } from "@/lib/campaign-tasks/actions";
+import type { TasksPatchBody } from "@/lib/campaign-tasks/patch-types";
 import type { CampaignExceptionStatus } from "@/lib/campaign-tasks/exceptions-types";
 import type {
   ExceptionFilter,

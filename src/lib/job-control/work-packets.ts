@@ -6,10 +6,11 @@ import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
 import { redactWorkingFileRefForClient } from "@/lib/file-storage/redact";
 import type { CampaignMaterialItem } from "@/lib/materials/types";
 import type { RouteMapProductionBrief } from "@/lib/route-map-production-brief";
-import type { KitchenProductionContractSummary } from "@/lib/studio-kitchen-production";
-import { summarizeProductionContractForSku } from "@/lib/studio-kitchen-production";
+import { summarizeProductionContractForSku } from "@/lib/studio-kitchen-production/resolve-contract";
+import type { KitchenProductionContractSummary } from "@/lib/studio-kitchen-production/types";
 
 import { resolveRequiredDeliverableKeys } from "./production-workspace-gates";
+import type { TeamOfficeWorkPacketView, WorkPacketReturnFileRow } from "./work-packet-types";
 import type {
   JobInternalNote,
   JobWorkPacket,
@@ -43,16 +44,7 @@ export type WorkPacketRoleRow = {
   canAssign: boolean;
 };
 
-export type WorkPacketReturnFileRow = {
-  id: string;
-  kind: "draft" | "final";
-  label: string;
-  url: string;
-  returnedAt: string;
-  returnedByLabel: string;
-  deliverableLabel: string | null;
-  note: string | null;
-};
+export type { TeamOfficeWorkPacketView, WorkPacketReturnFileRow } from "./work-packet-types";
 
 export type JobWorkPacketSummaryView = {
   jobId: string;
@@ -69,28 +61,6 @@ export type JobWorkPacketSummaryView = {
   returnLocationLabel: string;
   integrationStatusLabel: string;
   /** Read-only SKU production contract — does not create tasks or tool connections. */
-  productionContract: KitchenProductionContractSummary | null;
-};
-
-export type TeamOfficeWorkPacketView = {
-  packetId: string;
-  jobId: string;
-  campaignId: string;
-  serviceName: string;
-  role: JobWorkPacketRole;
-  roleLabel: string;
-  taskTitle: string;
-  statusLabel: string;
-  productionBriefAvailable: boolean;
-  productionBrief: RouteMapProductionBrief | null;
-  requiredDeliverables: readonly { key: string; label: string; prepared: boolean }[];
-  materials: readonly { id: string; label: string; status: string }[];
-  internalNotes: readonly JobInternalNote[];
-  workingFileRefs: readonly JobWorkingFileRef[];
-  returnedFiles: readonly WorkPacketReturnFileRow[];
-  ownerApprovalRequirement: string;
-  returnLocationLabel: string;
-  integrationStatusLabel: string;
   productionContract: KitchenProductionContractSummary | null;
 };
 

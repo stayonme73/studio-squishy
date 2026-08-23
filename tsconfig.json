@@ -34,7 +34,8 @@
     "node_modules",
     "tmp",
     "tmp-*",
-    "tmp-tile-crops"
+    "tmp-tile-crops",
+    "scripts"
   ]
 }
 

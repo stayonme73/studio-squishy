@@ -1,4 +1,4 @@
-import type { ProductionRole } from "./types";
+import type { ProductionRole, QaAction } from "./types";
 
 export type FileRoomTaskPermissions = {
   canClaim: boolean;
@@ -26,4 +26,21 @@ export type FileRoomTaskOperatorContext = {
   canOperate: boolean;
   operator: FileRoomTaskOperator;
   reassignCandidates: readonly ReassignCandidate[];
+};
+
+export type FileRoomTaskQaSummary = {
+  total: number;
+  passes: number;
+  fails: number;
+  blocks: number;
+};
+
+export type FileRoomQaHistoryEntry = {
+  id: string;
+  action: QaAction;
+  actionLabel: string;
+  categoryLabel: string | null;
+  actorDisplayName: string;
+  createdAt: string;
+  notesPreview: string | null;
 };

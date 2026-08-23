@@ -11,8 +11,8 @@ import { resolveBlockedTaskGuidance, isTaskWorkflowBlocked, shouldOfferReassignC
 import type { ServerProductionEnvelope } from "@/lib/campaign-production/types";
 import type { FileRoomTaskOperatorContext } from "@/lib/campaign-tasks/file-room-controls-types";
 import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
-import type { FileRoomQaHistoryEntry } from "@/lib/campaign-tasks/file-room-controls";
-import type { TasksPatchBody } from "@/lib/campaign-tasks/actions";
+import type { FileRoomQaHistoryEntry } from "@/lib/campaign-tasks/file-room-controls-types";
+import type { TasksPatchBody } from "@/lib/campaign-tasks/patch-types";
 import { resolveFileRoomTaskOwnershipPresentation } from "@/lib/campaign-tasks/task-ownership-presentation";
 import type { FileRoomProductionTasksView, FileRoomTaskRow } from "@/lib/campaign-tasks/tasks-view";
 import type { ProductionRole, QaRecord, TaskWorkflowState } from "@/lib/campaign-tasks/types";

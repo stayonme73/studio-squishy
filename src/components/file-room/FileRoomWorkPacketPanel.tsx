@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import type { TeamOfficeWorkPacketView } from "@/lib/job-control/work-packets";
+import type { TeamOfficeWorkPacketView } from "@/lib/job-control/work-packet-types";
 
 import FileRoomSectionCard from "./FileRoomSectionCard";
 

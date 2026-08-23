@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import type { StudioUser } from "@/lib/campaign-store/types";
@@ -19,15 +19,12 @@ import type {
   RaiseExceptionPayload,
 } from "./exceptions-types";
 import type { ProductionRole } from "./types";
+import {
+  TERMINAL_EXCEPTION_STATUSES,
+  isOpenExceptionStatus,
+} from "./exceptions-status";
 
-export const TERMINAL_EXCEPTION_STATUSES: readonly CampaignExceptionStatus[] = [
-  "resolved",
-  "cancelled",
-] as const;
-
-export function isOpenExceptionStatus(status: CampaignExceptionStatus): boolean {
-  return !TERMINAL_EXCEPTION_STATUSES.includes(status);
-}
+export { TERMINAL_EXCEPTION_STATUSES, isOpenExceptionStatus };
 
 export function initialStatusForKind(kind: CampaignExceptionKind): CampaignExceptionStatus {
   /** Routine compliance holds start with QA/Producer — Owner Desk only after explicit escalation. */

@@ -15,7 +15,7 @@ import type {
 import type { OwnerConsoleDecisionCard } from "@/lib/campaign-tasks/owner-console-view";
 import { resolveFileRoomTaskOwnershipPresentation } from "@/lib/campaign-tasks/task-ownership-presentation";
 import type { FileRoomTaskRow } from "@/lib/campaign-tasks/tasks-view";
-import type { TasksPatchBody } from "@/lib/campaign-tasks/actions";
+import type { TasksPatchBody } from "@/lib/campaign-tasks/patch-types";
 
 import FileRoomExceptionAssignPanel, {
   type AssignExceptionFormState,

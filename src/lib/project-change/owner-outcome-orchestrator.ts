@@ -1,4 +1,5 @@
-import { applyTaskPatch, type TaskActionContext, type TaskActionResult, type TaskConflictSnapshot, type TasksPatchBody } from "@/lib/campaign-tasks/actions";
+import { applyTaskPatch, type TaskActionContext, type TaskActionResult, type TaskConflictSnapshot } from "@/lib/campaign-tasks/actions";
+import type { TasksPatchBody } from "@/lib/campaign-tasks/patch-types";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import type { StudioUser } from "@/lib/campaign-store/types";
 import { getOrInitializeProjectActivity, writeProjectActivityEnvelope } from "@/lib/project-activity/store";

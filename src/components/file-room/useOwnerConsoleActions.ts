@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { campaignExceptionsConfig } from "@/config/campaign-exceptions";
 import { ownerConsole } from "@/config/owner-console";
-import type { TasksPatchBody } from "@/lib/campaign-tasks/actions";
+import type { TasksPatchBody } from "@/lib/campaign-tasks/patch-types";
 import type { OwnerConsoleDecisionCard } from "@/lib/campaign-tasks/owner-console-view";
 import type { OwnerConsoleSequentialItem } from "@/lib/campaign-tasks/owner-console-sequential";
 import {
@@ -28,10 +28,11 @@ import {
   type OwnerRefundDecisionAction,
   type OwnerRevisionDecisionAction,
   type OwnerScopeDecisionAction,
+  type OwnerPricingDecisionAction,
   type OwnerDeskJobAction,
   type OwnerPostDecisionBriefing,
 } from "@/studio-coordinator/briefings/owner-desk";
-import type { OwnerDecisionFolderPatchBody } from "@/lib/campaign-tasks/owner-decision-folder-dispatch";
+import type { OwnerDecisionFolderPatchBody } from "@/lib/campaign-tasks/owner-decision-folder-patch-types";
 import { contentKindForCategory } from "@/lib/materials/promotion";
 
 import {
@@ -51,7 +52,8 @@ import {
 type OwnerFolderBriefingAction =
   | OwnerDeadlineDecisionAction
   | OwnerRevisionDecisionAction
-  | OwnerScopeDecisionAction;
+  | OwnerScopeDecisionAction
+  | OwnerPricingDecisionAction;
 
 type OwnerFolderBriefingBody = Extract<
   OwnerDecisionFolderPatchBody,

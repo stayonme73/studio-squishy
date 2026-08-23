@@ -7,6 +7,7 @@ import type { CampaignTaskItem } from "@/lib/campaign-tasks/types";
 
 import { VOICE_PRODUCTION_SKUS } from "./voice-production/contracts";
 import { VIDEO_PRODUCTION_SKUS } from "./video-production/contracts";
+import { LANDING_PAGE_SKU } from "./landing-page/types";
 
 const VOICE_SKU_SET = new Set<string>(VOICE_PRODUCTION_SKUS);
 const VIDEO_SKU_SET = new Set<string>(VIDEO_PRODUCTION_SKUS);
@@ -69,4 +70,10 @@ export function requiresVideoQualityGate(task: CampaignTaskItem): boolean {
   if (!phaseOk) return false;
   if (task.familyId !== "video_audio") return false;
   return task.relatedServiceIds.some((id) => VIDEO_SKU_SET.has(id));
+}
+
+export function requiresLandingPageQaGate(task: CampaignTaskItem): boolean {
+  if (task.familyId !== "landing_page") return false;
+  if (task.phase !== "qa") return false;
+  return task.relatedServiceIds.some((id) => id === LANDING_PAGE_SKU);
 }

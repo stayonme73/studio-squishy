@@ -150,3 +150,20 @@ export type LandingQaCheck = {
   ok: boolean;
   detail: string;
 };
+
+export type LandingPageQaPayload = {
+  packet: LandingPageWorkPacket;
+  definition: LandingPageDefinition;
+  artifact: LandingPageArtifactRecord;
+  /** Optional HTML; when omitted, bytes are read from artifact.relativePath. */
+  html?: string;
+  repoRoot?: string;
+};
+
+export type LandingPageQaEvidence = {
+  artifactId: string;
+  contentSha256: string;
+  workPacketVersion: string;
+  machineChecksOk: true;
+  checkIds: readonly string[];
+};

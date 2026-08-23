@@ -13,11 +13,9 @@ import {
 } from "@/lib/campaign-record";
 import { resolveCampaignCustomerName } from "@/lib/campaign-vision";
 import type { ServerCampaignEnvelope } from "@/lib/campaign-store/types";
-import { isOpenExceptionStatus } from "@/lib/campaign-tasks/exceptions";
-import {
-  resolveLatestHandoffForTask,
-  resolveQaSummaryForTask,
-} from "@/lib/campaign-tasks/file-room-controls";
+import { isOpenExceptionStatus } from "@/lib/campaign-tasks/exceptions-status";
+import { resolveLatestHandoffForTask } from "@/lib/campaign-tasks/file-room-controls";
+import { resolveQaSummaryForTask } from "@/lib/campaign-tasks/qa-records";
 import type { ServerTasksEnvelope } from "@/lib/campaign-tasks/types";
 import { syncJobRecordsFromCampaign } from "@/lib/job-control/resolve-jobs";
 import { isBlockingMaterialItem } from "@/lib/materials/materials-view";
@@ -277,10 +275,4 @@ export function buildKitchenProductionFolderFromFixture(
     },
     updatedAt: null,
   };
-}
-
-export function kitchenDataSourceLabel(source: KitchenDataSource): string {
-  return source === "live_production"
-    ? studioKitchenFoundation.page.liveBadge
-    : studioKitchenFoundation.page.fixtureBadge;
 }
