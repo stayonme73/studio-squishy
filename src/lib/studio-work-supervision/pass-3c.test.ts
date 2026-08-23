@@ -8,7 +8,12 @@ import { createSupervisionMachine } from "./machine";
 import { createSupervisionLiveClient } from "./postgres-live-client";
 import { createLivePostgresSupervisionRepository } from "./postgres-live-repository";
 import { createLiveSupervisionRepositoryAsync } from "./live-runtime";
-import { SUPERVISION_POSTGRES_SCHEMA_VERSION } from "./provider-class";
+import {
+  SUPERVISION_POSTGRES_SCHEMA_VERSION,
+  classifySupervisionSecretKey,
+  resolveSupervisionPostgresConfig,
+  supervisionRestHeaders,
+} from "./provider-class";
 import { startSupervisionPostgrestStub } from "./postgres-rest";
 import {
   AppendOnlyViolationError,
@@ -35,13 +40,24 @@ function copyAgent() {
   return { kind: "agent" as const, id: "agent_p3c", label: "Copy agent (fixture)" };
 }
 
-function configFor(stub: { url: string; key: string }) {
+const SB_SECRET_FIXTURE = "sb_secret_supervision_test_fixture";
+const LEGACY_SERVICE_ROLE_FIXTURE = "supervision-test-service-role";
+
+function configFor(stub: { url: string; key: string }, keyName = "STUDIO_SUPERVISION_SUPABASE_SECRET_KEY") {
   return {
     url: stub.url,
     serviceRoleKey: stub.key,
     urlKeyUsed: "STUDIO_SUPERVISION_SUPABASE_URL",
-    serviceRoleKeyName: "STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY",
+    serviceRoleKeyName: keyName,
+    keyKind: classifySupervisionSecretKey(stub.key),
   };
+}
+
+function startSecretStub(options?: { schemaVersion?: number }) {
+  return startSupervisionPostgrestStub({
+    serviceRoleKey: SB_SECRET_FIXTURE,
+    schemaVersion: options?.schemaVersion,
+  });
 }
 
 describe("work supervision pass 3C live connector", () => {
@@ -77,9 +93,15 @@ describe("work supervision pass 3C live connector", () => {
   });
 
   it("initializes, hydrates, and records work through live RPCs", async () => {
-    const stub = await startSupervisionPostgrestStub();
+    const stub = await startSecretStub();
     servers.push(stub.server);
-    const log: { method: string; path: string; rpc: string | null }[] = [];
+    const log: {
+      method: string;
+      path: string;
+      rpc: string | null;
+      hasApikey: boolean;
+      hasAuthorization: boolean;
+    }[] = [];
     const client = createSupervisionLiveClient(configFor(stub), { requestLog: log });
     await client.initialize();
     const repo = createLivePostgresSupervisionRepository(client);
@@ -121,6 +143,8 @@ describe("work supervision pass 3C live connector", () => {
     expect(log.some((row) => row.rpc === "supervision_hydrate")).toBe(true);
     expect(log.some((row) => row.path.includes("supervision_meta"))).toBe(true);
     expect(log.some((row) => row.rpc === "supervision_apply_ops")).toBe(true);
+    expect(log.every((row) => row.hasApikey)).toBe(true);
+    expect(log.every((row) => row.hasAuthorization === false)).toBe(true);
     const restored = createLivePostgresSupervisionRepository(client);
     await restored.load();
     expect(restored.getLease(lease.leaseId)?.step).toBe("draft");
@@ -130,8 +154,78 @@ describe("work supervision pass 3C live connector", () => {
     expect(JSON.stringify(log)).not.toContain(stub.key);
   });
 
+  it("sends sb_secret_ only as apikey and never as Authorization Bearer", async () => {
+    const headers = supervisionRestHeaders(SB_SECRET_FIXTURE);
+    expect(headers.apikey).toBe(SB_SECRET_FIXTURE);
+    expect(headers.Authorization).toBeUndefined();
+    const stub = await startSecretStub();
+    servers.push(stub.server);
+    const log: {
+      method: string;
+      path: string;
+      rpc: string | null;
+      hasApikey: boolean;
+      hasAuthorization: boolean;
+    }[] = [];
+    const client = createSupervisionLiveClient(configFor(stub), { requestLog: log });
+    await client.initialize();
+    expect(log.length).toBeGreaterThan(0);
+    expect(log.every((row) => row.hasApikey && row.hasAuthorization === false)).toBe(true);
+    const bearerRejected = await fetch(`${stub.url}/rest/v1/rpc/supervision_verify_schema`, {
+      method: "POST",
+      headers: {
+        apikey: SB_SECRET_FIXTURE,
+        Authorization: `Bearer ${SB_SECRET_FIXTURE}`,
+        "content-type": "application/json",
+      },
+      body: "{}",
+    });
+    expect(bearerRejected.status).toBe(401);
+    expect(await bearerRejected.text()).toContain("Invalid JWT");
+    expect(JSON.stringify(log)).not.toContain(SB_SECRET_FIXTURE);
+  });
+
+  it("retains legacy JWT service_role headers only as a compatibility fallback", async () => {
+    const stub = await startSupervisionPostgrestStub({
+      serviceRoleKey: LEGACY_SERVICE_ROLE_FIXTURE,
+    });
+    servers.push(stub.server);
+    const log: {
+      method: string;
+      path: string;
+      rpc: string | null;
+      hasApikey: boolean;
+      hasAuthorization: boolean;
+    }[] = [];
+    const resolved = resolveSupervisionPostgresConfig({
+      STUDIO_SUPERVISION_SUPABASE_URL: stub.url,
+      STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY: LEGACY_SERVICE_ROLE_FIXTURE,
+    });
+    expect(resolved.ok).toBe(true);
+    if (!resolved.ok) throw new Error("expected legacy config");
+    expect(resolved.config.serviceRoleKeyName).toBe("STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY");
+    expect(resolved.config.keyKind).toBe("legacy_jwt_service_role");
+    const client = createSupervisionLiveClient(resolved.config, { requestLog: log });
+    await client.initialize();
+    expect(log.every((row) => row.hasApikey && row.hasAuthorization)).toBe(true);
+    expect(JSON.stringify(log)).not.toContain(LEGACY_SERVICE_ROLE_FIXTURE);
+  });
+
+  it("prefers STUDIO_SUPERVISION_SUPABASE_SECRET_KEY over the legacy service_role names", () => {
+    const resolved = resolveSupervisionPostgresConfig({
+      STUDIO_SUPERVISION_SUPABASE_URL: "https://example.supabase.co",
+      STUDIO_SUPERVISION_SUPABASE_SECRET_KEY: SB_SECRET_FIXTURE,
+      STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY: LEGACY_SERVICE_ROLE_FIXTURE,
+    });
+    expect(resolved.ok).toBe(true);
+    if (!resolved.ok) throw new Error("expected secret config");
+    expect(resolved.config.serviceRoleKeyName).toBe("STUDIO_SUPERVISION_SUPABASE_SECRET_KEY");
+    expect(resolved.config.keyKind).toBe("sb_secret");
+    expect(resolved.config.serviceRoleKey).toBe(SB_SECRET_FIXTURE);
+  });
+
   it("rejects browser-style keys and does not leak the service-role secret", async () => {
-    const stub = await startSupervisionPostgrestStub();
+    const stub = await startSecretStub();
     servers.push(stub.server);
     const client = createSupervisionLiveClient({
       ...configFor(stub),
@@ -152,22 +246,23 @@ describe("work supervision pass 3C live connector", () => {
   it("fails closed when the database is unavailable", async () => {
     const client = createSupervisionLiveClient({
       url: "http://127.0.0.1:9",
-      serviceRoleKey: "supervision-test-service-role",
+      serviceRoleKey: SB_SECRET_FIXTURE,
       urlKeyUsed: "STUDIO_SUPERVISION_SUPABASE_URL",
-      serviceRoleKeyName: "STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY",
+      serviceRoleKeyName: "STUDIO_SUPERVISION_SUPABASE_SECRET_KEY",
+      keyKind: "sb_secret",
     });
     await expect(client.initialize()).rejects.toThrow(LiveStoreUnhealthyError);
   });
 
   it("fails closed on schema mismatch", async () => {
-    const stub = await startSupervisionPostgrestStub({ schemaVersion: 1 });
+    const stub = await startSecretStub({ schemaVersion: 1 });
     servers.push(stub.server);
     const client = createSupervisionLiveClient(configFor(stub));
     await expect(client.initialize()).rejects.toThrow(SchemaMismatchError);
   });
 
   it("does not apply a partial write when apply_ops fails", async () => {
-    const stub = await startSupervisionPostgrestStub();
+    const stub = await startSecretStub();
     servers.push(stub.server);
     const client = createSupervisionLiveClient(configFor(stub));
     await client.initialize();
@@ -191,7 +286,7 @@ describe("work supervision pass 3C live connector", () => {
   });
 
   it("fails closed when a transactional RPC fails", async () => {
-    const stub = await startSupervisionPostgrestStub();
+    const stub = await startSecretStub();
     servers.push(stub.server);
     const client = createSupervisionLiveClient(configFor(stub));
     await client.initialize();
@@ -200,7 +295,7 @@ describe("work supervision pass 3C live connector", () => {
   });
 
   it("persists recovery attempts atomically through hydrate", async () => {
-    const stub = await startSupervisionPostgrestStub();
+    const stub = await startSecretStub();
     servers.push(stub.server);
     const client = createSupervisionLiveClient(configFor(stub));
     await client.initialize();
@@ -246,7 +341,7 @@ describe("work supervision pass 3C live connector", () => {
   });
 
   it("ignores duplicate idempotency keys across hydrate", async () => {
-    const stub = await startSupervisionPostgrestStub();
+    const stub = await startSecretStub();
     servers.push(stub.server);
     const client = createSupervisionLiveClient(configFor(stub));
     await client.initialize();
@@ -281,7 +376,7 @@ describe("work supervision pass 3C live connector", () => {
   });
 
   it("prevents competing live sweep claims and enforces tenant isolation", async () => {
-    const stub = await startSupervisionPostgrestStub();
+    const stub = await startSecretStub();
     servers.push(stub.server);
     const client = createSupervisionLiveClient(configFor(stub));
     await client.initialize();
@@ -343,7 +438,7 @@ describe("work supervision pass 3C live connector", () => {
   });
 
   it("enforces append-only through the live repository", async () => {
-    const stub = await startSupervisionPostgrestStub();
+    const stub = await startSecretStub();
     servers.push(stub.server);
     const client = createSupervisionLiveClient(configFor(stub));
     await client.initialize();
@@ -353,19 +448,19 @@ describe("work supervision pass 3C live connector", () => {
   });
 
   it("selects the live connector when launch credentials are present and never falls back to JSON", async () => {
-    const stub = await startSupervisionPostgrestStub();
+    const stub = await startSecretStub();
     servers.push(stub.server);
     const repo = await createLiveSupervisionRepositoryAsync({
       NODE_ENV: "production",
       STUDIO_SUPERVISION_SUPABASE_URL: stub.url,
-      STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY: stub.key,
+      STUDIO_SUPERVISION_SUPABASE_SECRET_KEY: stub.key,
     });
     expect(repo.kind).toBe("supabase-postgres");
     expect(repo.flush).toBeTypeOf("function");
   });
 
   it("queries due next checks after hydration", async () => {
-    const stub = await startSupervisionPostgrestStub();
+    const stub = await startSecretStub();
     servers.push(stub.server);
     const client = createSupervisionLiveClient(configFor(stub));
     await client.initialize();

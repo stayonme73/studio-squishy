@@ -79,7 +79,7 @@ Migration: `supabase/migrations/20260824_supervision_live_connector.sql` (schema
 Live client: `src/lib/studio-work-supervision/postgres-live-client.ts`  
 Live repository: `src/lib/studio-work-supervision/postgres-live-repository.ts`
 
-Least privilege: `anon` / `authenticated` revoked. `service_role` only. Service-role key must not reach the browser.
+Least privilege: `anon` / `authenticated` revoked. Postgres `GRANT EXECUTE` remains `service_role`. Current Secret Keys (`sb_secret_`) authenticate through the `apikey` header only. Do not send them as `Authorization: Bearer`. Legacy JWT `service_role` is a compatibility fallback. Secret keys must not reach the browser.
 
 Retention and deletion are documented separately in `SUPERVISION-RECORD-RETENTION-AND-DELETION.md`.
 

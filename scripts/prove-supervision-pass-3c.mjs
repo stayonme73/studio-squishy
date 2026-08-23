@@ -45,6 +45,7 @@ const proof = {
   classification: "deterministic-live-connector-proof-not-live-supabase-certification",
   liveProductionCertified: false,
   liveConnectorReady: true,
+  ownerShouldUseCurrentSecretKey: true,
   liveRestHydrateFlushWired: true,
   pass3LocalEvidencePreserved: true,
   pass3bAcceptedAt: "7d0d43234bbe9805da39c6d1cc59f0b258d478a4",
@@ -70,6 +71,7 @@ const proof = {
   configurationPresent: {
     STUDIO_SUPERVISION_SUPABASE_URL: false,
     NEXT_PUBLIC_SUPABASE_URL: false,
+    STUDIO_SUPERVISION_SUPABASE_SECRET_KEY: false,
     STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY: false,
     SUPABASE_SERVICE_ROLE_KEY: false,
     DATABASE_URL: false,
@@ -81,6 +83,9 @@ const proof = {
   pass3cTests: [
     "validates the live connector SQL migration",
     "initializes, hydrates, and records work through live RPCs",
+    "sends sb_secret_ only as apikey and never as Authorization Bearer",
+    "retains legacy JWT service_role headers only as a compatibility fallback",
+    "prefers STUDIO_SUPERVISION_SUPABASE_SECRET_KEY over the legacy service_role names",
     "rejects browser-style keys and does not leak the service-role secret",
     "fails closed when the database is unavailable",
     "fails closed on schema mismatch",
@@ -105,11 +110,11 @@ const proof = {
   remainingOwnerSteps: [
     "Select or create the Supabase project for supervision records",
     "Apply both migrations in order",
-    "Place STUDIO_SUPERVISION_SUPABASE_URL and STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY through an approved secret-setting path",
+    "Place STUDIO_SUPERVISION_SUPABASE_URL and STUDIO_SUPERVISION_SUPABASE_SECRET_KEY through an approved secret-setting path",
     "Authorize the real two-process live proof",
   ],
   recommendedNext:
-    "Owner applies both migrations, sets the two server-only env names through an approved secret path, then authorizes a live two-process proof. Do not paste secrets into chat.",
+    "Owner applies both migrations, sets STUDIO_SUPERVISION_SUPABASE_SECRET_KEY through an approved secret path, then authorizes a live two-process proof. Do not paste secrets into chat.",
 };
 
 if (proof.liveProductionCertified) throw new Error("Pass 3C must not claim live certification.");

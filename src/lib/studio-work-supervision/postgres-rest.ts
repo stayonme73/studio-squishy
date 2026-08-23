@@ -1,10 +1,14 @@
 import type { IncomingMessage, ServerResponse } from "http";
 import { createServer, type Server } from "http";
 
-import { SUPERVISION_POSTGRES_SCHEMA_VERSION } from "./provider-class";
+import {
+  SUPERVISION_POSTGRES_SCHEMA_VERSION,
+  classifySupervisionSecretKey,
+  supervisionRestHeaders,
+  type SupervisionPostgresConfig,
+} from "./provider-class";
 import { createSupervisionPostgresEngine, type SupervisionPostgresEngine } from "./postgres-engine";
 import { applySupervisionRpc } from "./postgres-rpc";
-import type { SupervisionPostgresConfig } from "./provider-class";
 import type { SweepClaim } from "./repository";
 
 export type SupervisionStubRequest = {
@@ -32,7 +36,12 @@ function hasServiceRole(req: IncomingMessage, expected: string): boolean {
   const auth = req.headers.authorization ?? "";
   const apiKey = String(req.headers.apikey ?? "");
   const token = auth.toLowerCase().startsWith("bearer ") ? auth.slice(7).trim() : "";
-  return Boolean(expected) && token === expected && apiKey === expected;
+  if (!expected) return false;
+  if (classifySupervisionSecretKey(expected) === "sb_secret") {
+    if (token === expected) return false;
+    return apiKey === expected;
+  }
+  return token === expected && apiKey === expected;
 }
 
 function rpcName(pathname: string): string | null {
@@ -64,7 +73,16 @@ export function handleSupervisionPostgrest(
       authorized,
     });
     if (!authorized) {
-      send(res, 401, { error: "Service role required. Browser keys are not accepted." });
+      const token = (req.headers.authorization ?? "").toLowerCase().startsWith("bearer ")
+        ? (req.headers.authorization ?? "").slice(7).trim()
+        : "";
+      const invalidJwt =
+        classifySupervisionSecretKey(serviceRoleKey) === "sb_secret" && token === serviceRoleKey;
+      send(res, 401, {
+        error: invalidJwt
+          ? "Invalid JWT"
+          : "Service role required. Browser keys are not accepted.",
+      });
       return;
     }
     const name = rpcName(pathname);
@@ -166,11 +184,7 @@ export async function pingSupervisionPostgres(
   config: SupervisionPostgresConfig,
 ): Promise<{ ok: boolean; status: number }> {
   const res = await fetch(`${config.url}/rest/v1/supervision_meta?select=id`, {
-    headers: {
-      apikey: config.serviceRoleKey,
-      Authorization: `Bearer ${config.serviceRoleKey}`,
-      Accept: "application/json",
-    },
+    headers: supervisionRestHeaders(config.serviceRoleKey, config.keyKind),
   });
   return { ok: res.ok, status: res.status };
 }
@@ -181,11 +195,7 @@ export async function restTryClaimSweep(
 ): Promise<{ claimed: boolean; claim: SweepClaim | null }> {
   const res = await fetch(`${config.url}/rest/v1/rpc/supervision_try_claim_sweep`, {
     method: "POST",
-    headers: {
-      apikey: config.serviceRoleKey,
-      Authorization: `Bearer ${config.serviceRoleKey}`,
-      "content-type": "application/json",
-    },
+    headers: supervisionRestHeaders(config.serviceRoleKey, config.keyKind),
     body: JSON.stringify({
       p_claim_id: input.claimId,
       p_holder: input.holder,

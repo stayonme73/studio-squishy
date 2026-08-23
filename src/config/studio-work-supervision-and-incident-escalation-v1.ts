@@ -3,6 +3,7 @@
  * OPEN 2026-08-23. Foundation Pass 1 accepted at 0dc76903.
  * Runtime Pass 2 accepted at 1f8e2600. Durable Pass 3 accepted locally at 05509c9b.
  * Pass 3B accepted at 7d0d4323. Pass 3C live REST/RPC connector ready.
+ * Secret Key uses apikey only; legacy JWT service_role is a compatibility fallback.
  * Live Supabase is not certified. Not closed. Do not connect Claude, Build-A-Bot, Make, or Resend.
  * Base: mobile park tip bc458931. Room 4 only. Do not assign Room 4D / 4E.
  * Do not merge. Do not start Room 5. Do not unpark mobile until this package closes.

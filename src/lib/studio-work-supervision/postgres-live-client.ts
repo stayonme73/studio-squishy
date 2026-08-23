@@ -1,6 +1,8 @@
 import {
   SUPERVISION_POSTGRES_PROVIDER,
   SUPERVISION_POSTGRES_SCHEMA_VERSION,
+  classifySupervisionSecretKey,
+  supervisionRestHeaders,
   type SupervisionPostgresConfig,
 } from "./provider-class";
 import type { SupervisionQueuedOp } from "./postgres-rpc";
@@ -17,15 +19,15 @@ export type SupervisionLiveRequestLog = {
   method: string;
   path: string;
   rpc: string | null;
+  hasApikey: boolean;
+  hasAuthorization: boolean;
 };
 
-function restHeaders(serviceRoleKey: string): HeadersInit {
-  return {
-    apikey: serviceRoleKey,
-    Authorization: `Bearer ${serviceRoleKey}`,
-    "content-type": "application/json",
-    Accept: "application/json",
-  };
+function restHeaders(config: SupervisionPostgresConfig): Record<string, string> {
+  return supervisionRestHeaders(
+    config.serviceRoleKey,
+    config.keyKind ?? classifySupervisionSecretKey(config.serviceRoleKey),
+  );
 }
 
 function safeStoreError(status: number, path: string, code: string): never {
@@ -53,12 +55,19 @@ export function createSupervisionLiveClient(
     body?: unknown,
   ): Promise<{ status: number; json: unknown }> {
     const rpc = path.includes("/rpc/") ? path.slice(path.lastIndexOf("/") + 1) : null;
-    log?.push({ method, path, rpc });
+    const headers = restHeaders(config);
+    log?.push({
+      method,
+      path,
+      rpc,
+      hasApikey: Object.prototype.hasOwnProperty.call(headers, "apikey"),
+      hasAuthorization: Object.prototype.hasOwnProperty.call(headers, "Authorization"),
+    });
     let res: Response;
     try {
       res = await fetchFn(`${config.url}${path}`, {
         method,
-        headers: restHeaders(config.serviceRoleKey),
+        headers,
         body: body === undefined ? undefined : JSON.stringify(body),
       });
     } catch {

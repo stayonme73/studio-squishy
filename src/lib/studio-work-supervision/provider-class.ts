@@ -14,14 +14,40 @@ export const SUPERVISION_POSTGRES_PROVIDER = "supabase-postgres" as const;
 
 export const SUPERVISION_POSTGRES_SCHEMA_VERSION = 2 as const;
 
+export const SUPERVISION_SB_SECRET_PREFIX = "sb_secret_" as const;
+
+export type SupervisionSecretKeyKind = "sb_secret" | "legacy_jwt_service_role";
+
 export const SUPERVISION_LAUNCH_ENV_KEYS = {
   url: "STUDIO_SUPERVISION_SUPABASE_URL",
   urlFallback: "NEXT_PUBLIC_SUPABASE_URL",
+  secret: "STUDIO_SUPERVISION_SUPABASE_SECRET_KEY",
   serviceRole: "STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY",
   serviceRoleFallback: "SUPABASE_SERVICE_ROLE_KEY",
   runtime: "STUDIO_SUPERVISION_RUNTIME",
   provider: "STUDIO_SUPERVISION_PROVIDER",
 } as const;
+
+export function classifySupervisionSecretKey(value: string): SupervisionSecretKeyKind {
+  return value.startsWith(SUPERVISION_SB_SECRET_PREFIX)
+    ? "sb_secret"
+    : "legacy_jwt_service_role";
+}
+
+export function supervisionRestHeaders(
+  key: string,
+  kind: SupervisionSecretKeyKind = classifySupervisionSecretKey(key),
+): Record<string, string> {
+  const headers: Record<string, string> = {
+    apikey: key,
+    "content-type": "application/json",
+    Accept: "application/json",
+  };
+  if (kind === "legacy_jwt_service_role") {
+    headers.Authorization = `Bearer ${key}`;
+  }
+  return headers;
+}
 
 export function isLaunchRuntime(env: NodeJS.ProcessEnv = process.env): boolean {
   if (env.STUDIO_SUPERVISION_RUNTIME === "launch") return true;
@@ -47,6 +73,7 @@ export type SupervisionPostgresConfig = {
   serviceRoleKey: string;
   urlKeyUsed: string;
   serviceRoleKeyName: string;
+  keyKind?: SupervisionSecretKeyKind;
 };
 
 export function resolveSupervisionPostgresConfig(
@@ -56,6 +83,7 @@ export function resolveSupervisionPostgresConfig(
     envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.url) ??
     envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.urlFallback);
   const serviceRoleKey =
+    envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.secret) ??
     envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.serviceRole) ??
     envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.serviceRoleFallback);
   const missing: string[] = [];
@@ -66,10 +94,15 @@ export function resolveSupervisionPostgresConfig(
   }
   if (!serviceRoleKey) {
     missing.push(
-      `${SUPERVISION_LAUNCH_ENV_KEYS.serviceRole} (or ${SUPERVISION_LAUNCH_ENV_KEYS.serviceRoleFallback})`,
+      `${SUPERVISION_LAUNCH_ENV_KEYS.secret} (or ${SUPERVISION_LAUNCH_ENV_KEYS.serviceRole} / ${SUPERVISION_LAUNCH_ENV_KEYS.serviceRoleFallback})`,
     );
   }
   if (!url || !serviceRoleKey) return { ok: false, missing };
+  const serviceRoleKeyName = envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.secret)
+    ? SUPERVISION_LAUNCH_ENV_KEYS.secret
+    : envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.serviceRole)
+      ? SUPERVISION_LAUNCH_ENV_KEYS.serviceRole
+      : SUPERVISION_LAUNCH_ENV_KEYS.serviceRoleFallback;
   return {
     ok: true,
     config: {
@@ -78,9 +111,8 @@ export function resolveSupervisionPostgresConfig(
       urlKeyUsed: envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.url)
         ? SUPERVISION_LAUNCH_ENV_KEYS.url
         : SUPERVISION_LAUNCH_ENV_KEYS.urlFallback,
-      serviceRoleKeyName: envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.serviceRole)
-        ? SUPERVISION_LAUNCH_ENV_KEYS.serviceRole
-        : SUPERVISION_LAUNCH_ENV_KEYS.serviceRoleFallback,
+      serviceRoleKeyName,
+      keyKind: classifySupervisionSecretKey(serviceRoleKey),
     },
   };
 }

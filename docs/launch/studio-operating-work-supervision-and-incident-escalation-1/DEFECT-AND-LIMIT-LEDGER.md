@@ -14,6 +14,7 @@ Opening snapshot 2026-08-23. Pass 3B records the launch-runtime durability defec
 | L8 | No proven out-of-band Owner alert | Open |
 | L9 | Mobile phone cert parked; not a substitute for this package | Recorded |
 | L10 | JSON file store is not a launch-production incident store | **Pass 3B accepted** as the production guardrail. **Pass 3C** wired the live REST/RPC connector. Live Supabase remains **not certified**. Do not connect Build-A-Bot until live two-process proof is accepted. |
+| L11 | Live connector sent Secret Keys as Authorization Bearer | **Corrected.** Current `sb_secret_` keys use `apikey` only. Legacy JWT `service_role` remains a compatibility fallback. Do not paste secrets into chat. |
 
 ## Observed incidents (historical)
 

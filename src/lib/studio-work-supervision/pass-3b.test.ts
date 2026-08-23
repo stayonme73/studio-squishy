@@ -338,7 +338,7 @@ describe("work supervision pass 3B launch-runtime durability", () => {
     expect(resolved.ok).toBe(false);
     if (resolved.ok) throw new Error("expected missing config");
     expect(resolved.missing.join(" ")).toContain("STUDIO_SUPERVISION_SUPABASE_URL");
-    expect(resolved.missing.join(" ")).toContain("STUDIO_SUPERVISION_SUPABASE_SERVICE_ROLE_KEY");
+    expect(resolved.missing.join(" ")).toContain("STUDIO_SUPERVISION_SUPABASE_SECRET_KEY");
   });
 
   it("proves two OS processes cannot both win the same sweep claim", async () => {
