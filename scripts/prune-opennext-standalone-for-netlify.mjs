@@ -98,6 +98,7 @@ function take(label, path) {
   notes.push(`${label}: ${(n / 1048576).toFixed(2)} MB`);
 }
 
+take(".git (not runtime; Linux packfile filled the handler zip)", join(standalone, ".git"));
 take(
   "data/file-room-objects (gitignored binaries)",
   join(standalone, "data", "file-room-objects"),
@@ -111,6 +112,10 @@ take(".netlify (prior Netlify cache/plugins traced into standalone)", join(stand
 walkDirs(standalone, (path) => {
   const rel = relative(standalone, path).replace(/\\/g, "/");
   const base = rel.split("/").pop() ?? "";
+  if (base === ".git") {
+    take(rel, path);
+    return;
+  }
   if (
     base === "playwright" ||
     base === "playwright-core" ||
@@ -133,6 +138,45 @@ const keepList = join(standalone, KEEP_LAUNCH_LIST);
 if (!existsSync(keepList) || !statSync(keepList).isFile()) {
   console.error(
     `prune-opennext-standalone: missing required ${KEEP_LAUNCH_LIST}`,
+  );
+  process.exit(1);
+}
+
+function gitRelPaths(dir) {
+  const hits = [];
+  const stack = [dir];
+  while (stack.length) {
+    const cur = stack.pop();
+    let entries;
+    try {
+      entries = readdirSync(cur);
+    } catch {
+      continue;
+    }
+    for (const name of entries) {
+      const p = join(cur, name);
+      const rel = relative(standalone, p).replace(/\\/g, "/");
+      if (name === ".git" || rel === ".git" || rel.startsWith(".git/")) {
+        hits.push(rel);
+        continue;
+      }
+      let st;
+      try {
+        st = lstatSync(p);
+      } catch {
+        continue;
+      }
+      if (st.isDirectory()) stack.push(p);
+    }
+  }
+  return hits;
+}
+
+const leftoverGit = gitRelPaths(standalone);
+if (leftoverGit.length > 0) {
+  console.error(
+    "prune-opennext-standalone: .git still present in standalone (not runtime):",
+    leftoverGit.slice(0, 20).join(", "),
   );
   process.exit(1);
 }

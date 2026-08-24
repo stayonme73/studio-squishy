@@ -28,7 +28,25 @@ test("readZipEntries reports uncompressed totals from a real zip", () => {
   const report = reportZip(zipPath, dir);
   assert.equal(report.entry_count, 1);
   assert.equal(report.present.docs.present, true);
+  assert.equal(report.present[".git"].present, false);
   assert.equal(report.present.playwright.present, false);
   assert.equal(report.exceeds_45mb, report.zip_bytes > LIMIT_BYTES);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("reportZip flags .git packfiles as present", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "handler-diag-git-"));
+  const payload = path.join(dir, "pack");
+  const zipPath = path.join(dir, "___netlify-server-handler.zip");
+  fs.writeFileSync(payload, "not-a-real-pack");
+  const py = process.platform === "win32" ? "py" : "python3";
+  execFileSync(py, [
+    "-c",
+    "import zipfile, sys; zipfile.ZipFile(sys.argv[1],'w').write(sys.argv[2],'.git/objects/pack/pack')",
+    zipPath,
+    payload,
+  ]);
+  const report = reportZip(zipPath, dir);
+  assert.equal(report.present[".git"].present, true);
   fs.rmSync(dir, { recursive: true, force: true });
 });

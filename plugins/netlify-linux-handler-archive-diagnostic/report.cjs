@@ -34,6 +34,11 @@ function isDirPath(posixName, dir) {
   return n === dir || n.startsWith(`${dir}/`) || n.includes(`/${dir}/`);
 }
 
+function isGitPath(posixName) {
+  const n = posixName.replace(/\\/g, "/");
+  return n === ".git" || n.startsWith(".git/") || n.includes("/.git/");
+}
+
 function isSrcTree(posixName) {
   const n = posixName.replace(/\\/g, "/");
   return n === "src" || n.startsWith("src/") || n.includes("/src/");
@@ -117,6 +122,7 @@ function reportZip(zipPath, cwd) {
     entry_count: entries.length,
     exceeds_45mb: zipBytes > LIMIT_BYTES,
     present: {
+      ".git": bucket(entries, isGitPath),
       ".netlify": bucket(entries, (n) => isDirPath(n, ".netlify")),
       playwright: bucket(entries, (n) => /playwright/i.test(n)),
       "native_sharp_or_libvips": bucket(entries, isNativeSharp),
@@ -176,6 +182,14 @@ async function reportHandlerArchive({ constants = {}, fail }) {
   if (handlerZips.length === 0) {
     fail(
       "Handler archive diagnostic: ___netlify-server-handler.zip was not found after Functions bundling. Refusing to upload.",
+    );
+    return payload;
+  }
+
+  const gitHits = payload.archives.filter((archive) => archive.present[".git"]?.present);
+  if (gitHits.length > 0) {
+    fail(
+      "Handler archive diagnostic: .git is present in ___netlify-server-handler.zip. Git history is not runtime. Refusing to upload.",
     );
     return payload;
   }

@@ -11,7 +11,9 @@ const nextConfig: NextConfig = {
    * Netlify ___netlify-server-handler size. OpenNext copies
    * `.next/standalone` into the function archive (not the NFT file list).
    * Turbopack traces path.join(process.cwd(), dynamicRel) as the repo,
-   * which pulled launch media, source, and `.netlify` cache into standalone.
+   * which pulled launch media, source, `.netlify` cache, and `.git` history
+   * into standalone. Linux evidence: one `.git/objects/pack` file was
+   * 924 MB of the 895 MB handler zip. Git history is not runtime.
    * These globs prune the server-function file trace only.
    * Public browser assets still publish as static site files.
    * Keep docs/launch/*.md (Launch Tracker reads STUDIO-MASTER-LAUNCH-LIST.md;
@@ -43,6 +45,7 @@ const nextConfig: NextConfig = {
       "./tmp-tile-crops/**",
       "./test-artifacts/**",
       "./public/**",
+      "./.git/**",
       "./.netlify/**",
       "./node_modules/playwright/**",
       "./node_modules/playwright-core/**",
