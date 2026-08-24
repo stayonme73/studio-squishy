@@ -1,10 +1,13 @@
 import Link from "next/link";
 
+import type { LiveReadResult } from "@/lib/studio-work-supervision/live-read";
+import { sanitizedLiveStatusPane } from "@/lib/studio-work-supervision/live-read";
 import type { IncidentCommandView } from "@/lib/studio-work-supervision/view-model";
 
 type Props = {
   fixture: IncidentCommandView;
-  live: IncidentCommandView;
+  live: IncidentCommandView | null;
+  liveRead: LiveReadResult;
 };
 
 function RecordSection({ view }: { view: IncidentCommandView }) {
@@ -72,12 +75,40 @@ function RecordSection({ view }: { view: IncidentCommandView }) {
   );
 }
 
-export default function FileRoomIncidentCommandScene({ fixture, live }: Props) {
+export function FileRoomIncidentCommandLiveStatus({
+  liveRead,
+  variant = "page",
+}: {
+  liveRead: LiveReadResult;
+  variant?: "page" | "detail";
+}) {
+  const pane = sanitizedLiveStatusPane(liveRead, variant);
+  const closed = !liveRead.ok;
+  return (
+    <section
+      className={`fr-incident-command__live-status utility-card${
+        closed ? " fr-incident-command__live-status--closed" : ""
+      }`}
+      data-live-init-stage={pane.stage}
+      data-live-error-class={pane.errorClass ?? "none"}
+      data-live-schema-version={pane.schemaVersion ?? "withheld"}
+    >
+      <h3 className="fr-section-title">{pane.title}</h3>
+      <p className={closed ? "fr-incident-command__error" : "fr-incident-command__fixture-note"}>
+        {pane.body}
+      </p>
+    </section>
+  );
+}
+
+export default function FileRoomIncidentCommandScene({ fixture, live, liveRead }: Props) {
   const securityBoard =
-    fixture.watchkeeper.ring === "hidden" || live.watchkeeper.ring === "hidden";
-  const watchkeeper = securityBoard ? fixture.watchkeeper : live.watchkeeper.ring === "green"
+    fixture.watchkeeper.ring === "hidden" || live?.watchkeeper.ring === "hidden";
+  const watchkeeper = securityBoard
     ? fixture.watchkeeper
-    : live.watchkeeper;
+    : !live || live.watchkeeper.ring === "green"
+      ? fixture.watchkeeper
+      : live.watchkeeper;
 
   return (
     <div
@@ -89,6 +120,8 @@ export default function FileRoomIncidentCommandScene({ fixture, live }: Props) {
         Fixture records and persisted live records are shown in separate sets. They are never mixed.
         No real customer data is on this board.
       </p>
+
+      <FileRoomIncidentCommandLiveStatus liveRead={liveRead} />
 
       <section className="fr-incident-command__watchkeeper utility-card">
         {securityBoard ? (
@@ -131,7 +164,7 @@ export default function FileRoomIncidentCommandScene({ fixture, live }: Props) {
       </section>
 
       <RecordSection view={fixture} />
-      <RecordSection view={live} />
+      {live ? <RecordSection view={live} /> : null}
     </div>
   );
 }

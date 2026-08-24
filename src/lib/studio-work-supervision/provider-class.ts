@@ -49,11 +49,33 @@ export function supervisionRestHeaders(
   return headers;
 }
 
-export function isLaunchRuntime(env: NodeJS.ProcessEnv = process.env): boolean {
+export type LaunchRuntimeHints = {
+  globalRef?: typeof globalThis;
+  cwd?: string;
+};
+
+export function isLaunchRuntime(
+  env: NodeJS.ProcessEnv = process.env,
+  hints?: LaunchRuntimeHints,
+): boolean {
   if (env.STUDIO_SUPERVISION_RUNTIME === "launch") return true;
-  if (env.NETLIFY === "true") return true;
-  if (env.NETLIFY === "1") return true;
-  return env.NODE_ENV === "production";
+  if (env.NETLIFY === "true" || env.NETLIFY === "1") return true;
+  if (env.NEXT_RUNTIME === "edge") return true;
+  if (env.NODE_ENV === "production") return true;
+
+  const globalRef = hints?.globalRef ?? globalThis;
+  const deno = (globalRef as { Deno?: unknown }).Deno;
+  const edgeRuntime = (globalRef as { EdgeRuntime?: unknown }).EdgeRuntime;
+  if (typeof deno !== "undefined") return true;
+  if (typeof edgeRuntime === "string" || typeof edgeRuntime === "boolean") {
+    return true;
+  }
+
+  const cwd =
+    hints?.cwd ?? (typeof process.cwd === "function" ? process.cwd() : "");
+  if (cwd === "/platform" || cwd.startsWith("/platform/")) return true;
+
+  return false;
 }
 
 export function envValue(env: NodeJS.ProcessEnv, key: string): string | undefined {

@@ -179,6 +179,10 @@ async function startLiveSweepScheduler(state: LiveSupervisionSlot): Promise<void
   }, LIVE_SWEEP_INTERVAL_MS);
 }
 
+export function peekLiveSupervisionMachine(): SupervisionMachine | null {
+  return slot()?.machine ?? null;
+}
+
 export async function getLiveSupervisionMachine(): Promise<SupervisionMachine> {
   let state = slot();
   if (!state) {

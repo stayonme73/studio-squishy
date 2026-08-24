@@ -2,13 +2,14 @@ import { cookies } from "next/headers";
 
 import FileRoomHeader from "@/components/file-room/FileRoomHeader";
 import FileRoomIncidentCommandDetailScene from "@/components/file-room/FileRoomIncidentCommandDetailScene";
+import { FileRoomIncidentCommandLiveStatus } from "@/components/file-room/FileRoomIncidentCommandScene";
 import {
   FileRoomForbiddenState,
   FileRoomNotFoundState,
 } from "@/components/file-room/FileRoomStatePanels";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
-import { getLiveSupervisionMachine } from "@/lib/studio-work-supervision/live-runtime";
+import { readLiveSupervisionForIncidentCommand } from "@/lib/studio-work-supervision/live-read";
 import { getRuntimeSupervisionMachine } from "@/lib/studio-work-supervision/runtime";
 import { toIncidentCommandDetail } from "@/lib/studio-work-supervision/view-model";
 
@@ -39,12 +40,33 @@ export default async function IncidentCommandDetailPage({ params }: PageProps) {
   }
 
   const fixtureIncident = getRuntimeSupervisionMachine().getIncident(incidentId);
-  const liveIncident = fixtureIncident
-    ? undefined
-    : (await getLiveSupervisionMachine()).getIncident(incidentId);
-  const incident = fixtureIncident ?? liveIncident;
-  const recordSource = fixtureIncident ? "fixture" : "live";
-  if (!incident) {
+  if (fixtureIncident) {
+    return (
+      <>
+        <FileRoomHeader user={user} showIncidentCommandLink={false} />
+        <FileRoomIncidentCommandDetailScene
+          detail={toIncidentCommandDetail(fixtureIncident, "fixture")}
+        />
+      </>
+    );
+  }
+
+  const liveRead = await readLiveSupervisionForIncidentCommand();
+  if (!liveRead.ok) {
+    return (
+      <>
+        <FileRoomHeader user={user} showIncidentCommandLink={false} />
+        <div className="fr-incident-command">
+          <FileRoomIncidentCommandLiveStatus liveRead={liveRead} variant="detail" />
+        </div>
+      </>
+    );
+  }
+
+  const liveIncident = liveRead.snapshot.incidents.find(
+    (incident) => incident.incidentId === incidentId,
+  );
+  if (!liveIncident) {
     return (
       <>
         <FileRoomHeader user={user} showIncidentCommandLink={false} />
@@ -57,7 +79,7 @@ export default async function IncidentCommandDetailPage({ params }: PageProps) {
     <>
       <FileRoomHeader user={user} showIncidentCommandLink={false} />
       <FileRoomIncidentCommandDetailScene
-        detail={toIncidentCommandDetail(incident, recordSource)}
+        detail={toIncidentCommandDetail(liveIncident, "live")}
       />
     </>
   );

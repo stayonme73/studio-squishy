@@ -119,28 +119,55 @@ export function createSupervisionLiveClient(
     return json as T;
   }
 
+  async function verifySchema(): Promise<{
+    ok: true;
+    schemaVersion: number;
+    provider: string;
+  }> {
+    const verified = await rpc<{
+      ok: boolean;
+      schemaVersion: number;
+      provider: string;
+      expected: number;
+    }>("supervision_verify_schema");
+    if (
+      !verified?.ok ||
+      verified.schemaVersion !== SUPERVISION_POSTGRES_SCHEMA_VERSION ||
+      verified.provider !== SUPERVISION_POSTGRES_PROVIDER
+    ) {
+      throw new SchemaMismatchError();
+    }
+    return {
+      ok: true,
+      schemaVersion: verified.schemaVersion,
+      provider: verified.provider,
+    };
+  }
+
+  async function pingHealth(): Promise<void> {
+    const health = await pingMeta();
+    if (health.status < 200 || health.status >= 300) {
+      throw new LiveStoreUnhealthyError("Supervision Postgres health check failed.");
+    }
+  }
+
+  async function pingMeta(): Promise<{ status: number }> {
+    const { status } = await request(
+      "GET",
+      "/rest/v1/supervision_meta?select=schema_version,provider",
+    );
+    return { status };
+  }
+
   return {
     provider: SUPERVISION_POSTGRES_PROVIDER,
     urlKeyUsed: config.urlKeyUsed,
     serviceRoleKeyName: config.serviceRoleKeyName,
+    verifySchema,
+    pingHealth,
     async initialize(): Promise<void> {
-      const verified = await rpc<{
-        ok: boolean;
-        schemaVersion: number;
-        provider: string;
-        expected: number;
-      }>("supervision_verify_schema");
-      if (
-        !verified?.ok ||
-        verified.schemaVersion !== SUPERVISION_POSTGRES_SCHEMA_VERSION ||
-        verified.provider !== SUPERVISION_POSTGRES_PROVIDER
-      ) {
-        throw new SchemaMismatchError();
-      }
-      const health = await this.pingMeta();
-      if (health.status < 200 || health.status >= 300) {
-        throw new LiveStoreUnhealthyError("Supervision Postgres health check failed.");
-      }
+      await verifySchema();
+      await pingHealth();
     },
     async hydrate() {
       return rpc<Record<string, unknown>>("supervision_hydrate");
@@ -196,10 +223,7 @@ export function createSupervisionLiveClient(
     async applyOps(ops: SupervisionQueuedOp[]) {
       return rpc<{ ok: boolean; results: unknown[] }>("supervision_apply_ops", { p_ops: ops });
     },
-    async pingMeta(): Promise<{ status: number }> {
-      const { status } = await request("GET", "/rest/v1/supervision_meta?select=schema_version,provider");
-      return { status };
-    },
+    pingMeta,
   };
 }
 

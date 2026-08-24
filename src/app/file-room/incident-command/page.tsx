@@ -5,7 +5,7 @@ import FileRoomIncidentCommandScene from "@/components/file-room/FileRoomInciden
 import { FileRoomForbiddenState } from "@/components/file-room/FileRoomStatePanels";
 import { isOwnerUser } from "@/lib/campaign-store/access";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
-import { getLiveSupervisionMachine } from "@/lib/studio-work-supervision/live-runtime";
+import { readLiveSupervisionForIncidentCommand } from "@/lib/studio-work-supervision/live-read";
 import { getRuntimeSupervisionMachine } from "@/lib/studio-work-supervision/runtime";
 import { toIncidentCommandView } from "@/lib/studio-work-supervision/view-model";
 
@@ -31,12 +31,13 @@ export default async function IncidentCommandPage() {
   }
 
   const fixture = toIncidentCommandView(getRuntimeSupervisionMachine().snapshot());
-  const live = toIncidentCommandView((await getLiveSupervisionMachine()).snapshot());
+  const liveRead = await readLiveSupervisionForIncidentCommand();
+  const live = liveRead.ok ? toIncidentCommandView(liveRead.snapshot) : null;
 
   return (
     <>
       <FileRoomHeader user={user} showIncidentCommandLink={false} />
-      <FileRoomIncidentCommandScene fixture={fixture} live={live} />
+      <FileRoomIncidentCommandScene fixture={fixture} live={live} liveRead={liveRead} />
     </>
   );
 }

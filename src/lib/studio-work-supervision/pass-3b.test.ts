@@ -315,6 +315,31 @@ describe("work supervision pass 3B launch-runtime durability", () => {
 
   it("fails closed in launch runtime if only memory or JSON is available", () => {
     expect(isLaunchRuntime({ NODE_ENV: "production" })).toBe(true);
+    expect(isLaunchRuntime({ NETLIFY: "true" })).toBe(true);
+    expect(
+      isLaunchRuntime(
+        {},
+        { globalRef: { Deno: {} } as unknown as typeof globalThis, cwd: "C:\\local" },
+      ),
+    ).toBe(true);
+    expect(
+      isLaunchRuntime(
+        { NEXT_RUNTIME: "edge" },
+        { globalRef: {} as unknown as typeof globalThis, cwd: "C:\\local" },
+      ),
+    ).toBe(true);
+    expect(
+      isLaunchRuntime(
+        {},
+        { globalRef: {} as unknown as typeof globalThis, cwd: "/platform" },
+      ),
+    ).toBe(true);
+    expect(
+      isLaunchRuntime(
+        { NODE_ENV: "development" },
+        { globalRef: {} as unknown as typeof globalThis, cwd: "C:\\local" },
+      ),
+    ).toBe(false);
     expect(() =>
       assertDurableRepository(createMemorySupervisionRepository(), { NODE_ENV: "production" }),
     ).toThrow(LaunchPersistenceForbiddenError);
