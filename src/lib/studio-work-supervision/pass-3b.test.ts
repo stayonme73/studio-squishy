@@ -340,6 +340,26 @@ describe("work supervision pass 3B launch-runtime durability", () => {
         { globalRef: {} as unknown as typeof globalThis, cwd: "C:\\local" },
       ),
     ).toBe(false);
+    expect(
+      resolveSupervisionPostgresConfig(
+        {},
+        {
+          globalRef: {
+            Deno: {
+              env: {
+                get(key: string) {
+                  if (key === "STUDIO_SUPERVISION_SUPABASE_URL") return "http://127.0.0.1:9";
+                  if (key === "STUDIO_SUPERVISION_SUPABASE_SECRET_KEY") {
+                    return "sb_secret_fixture";
+                  }
+                  return undefined;
+                },
+              },
+            },
+          } as unknown as typeof globalThis,
+        },
+      ).ok,
+    ).toBe(true);
     expect(() =>
       assertDurableRepository(createMemorySupervisionRepository(), { NODE_ENV: "production" }),
     ).toThrow(LaunchPersistenceForbiddenError);
