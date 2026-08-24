@@ -15,7 +15,8 @@ Opening snapshot 2026-08-23. Pass 3B records the launch-runtime durability defec
 | L9 | Mobile phone cert parked; not a substitute for this package | Recorded |
 | L10 | JSON file store is not a launch-production incident store | **Pass 3B accepted.** **Pass 3C** wired the live REST/RPC connector. **Live two-process proof passed** with fictional Maple/Harbor records. JSON remains local-only. Package remains OPEN. Do not connect Build-A-Bot until Tagia authorizes it. |
 | L11 | Live connector sent Secret Keys as Authorization Bearer | **Corrected.** Current `sb_secret_` keys use `apikey` only. Legacy JWT `service_role` remains a compatibility fallback. Do not paste secrets into chat. |
-| L12 | Durable customer identity | **Outside this Owner-auth repair.** Production staff lookup is the immutable bundled seed in memory. Production customer signup and mutable `data/studio-users.json` stay fail-closed. This cert-only staff path does not solve durable customer authentication. |
+| L12 | Durable customer identity | **Outside this Owner-auth repair.** Production staff lookup is the immutable bundled seed in memory. Production customer signup and mutable `data/studio-users.json` stay fail-closed. The Edge/Deno proxy gate fail-closes unknown and customer cookies until a durable customer identity repository exists. This cert-only staff path does not solve durable customer authentication. |
+| L13 | Durable Studio Board campaign/job repository | **Separate production gap. Not this Edge session repair.** Studio Board campaign, job, task, materials, communication, and related records still use local JSON under `data/`. Netlify cannot provide a durable filesystem. Do not substitute volatile memory, `/tmp`, or bundled JSON. Incident Command live supervision already uses Supabase; Board records need their own production repository in a later scoped package. |
 
 ## Observed incidents (historical)
 

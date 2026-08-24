@@ -158,7 +158,7 @@ describe("syncCampaignToServer auth guard", () => {
 
     const response = await handleProtectedRoutes(makeNextRequest("/file-room", clientCookie));
     expect(response?.status).toBe(307);
-    expect(response?.headers.get("location")).toContain("/access-denied");
+    expect(response?.headers.get("location")).toContain("/sign-in");
   });
 
   it("allows staff accounts into File Room", async () => {
@@ -195,6 +195,6 @@ describe("syncCampaignToServer auth guard", () => {
     const response = await handleProtectedRoutes(
       makeNextRequest("/api/decision-learner/stats", clientCookie),
     );
-    expect(response?.status).toBe(403);
+    expect(response?.status).toBe(401);
   });
 });

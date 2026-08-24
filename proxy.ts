@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { isStaffOrOwner } from "@/lib/auth/roles";
-import { readSessionFromCookieHeader } from "@/lib/auth/session";
+import { readEdgeSafeSessionFromCookieHeader } from "@/lib/auth/edge-staff-session";
 import { resolveAccessDeniedRoomFromPath } from "@/config/access-control";
 import { logAccessEvent } from "@/lib/security/access-log";
+
+/**
+ * Session lookup for this gate is Edge-safe bundled staff only.
+ * Do not import `@/lib/auth/session` or `@/lib/auth/users` — those pull the
+ * JSON user file and Node `fs`, which Deno/Netlify cannot write.
+ */
 
 function isInternalRoute(pathname: string): boolean {
   return (
@@ -43,7 +49,7 @@ export async function handleProtectedRoutes(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (isInternalRoute(pathname)) {
-    const user = await readSessionFromCookieHeader(request.headers.get("cookie"));
+    const user = await readEdgeSafeSessionFromCookieHeader(request.headers.get("cookie"));
     if (!user || !isStaffOrOwner(user)) {
       logAccessEvent({
         kind: user ? "staff_route_denied" : "auth_required",
@@ -58,7 +64,7 @@ export async function handleProtectedRoutes(request: NextRequest) {
   }
 
   if (isClientRoute(pathname)) {
-    const user = await readSessionFromCookieHeader(request.headers.get("cookie"));
+    const user = await readEdgeSafeSessionFromCookieHeader(request.headers.get("cookie"));
     if (!user) {
       logAccessEvent({ kind: "auth_required", route: pathname });
       return signInRedirect(request);
@@ -67,7 +73,7 @@ export async function handleProtectedRoutes(request: NextRequest) {
   }
 
   if (pathname === "/api/campaigns") {
-    const user = await readSessionFromCookieHeader(request.headers.get("cookie"));
+    const user = await readEdgeSafeSessionFromCookieHeader(request.headers.get("cookie"));
     if (!user || !isStaffOrOwner(user)) {
       logAccessEvent({
         kind: user ? "staff_route_denied" : "auth_required",
@@ -84,7 +90,7 @@ export async function handleProtectedRoutes(request: NextRequest) {
   }
 
   if (pathname.startsWith("/api/decision-learner")) {
-    const user = await readSessionFromCookieHeader(request.headers.get("cookie"));
+    const user = await readEdgeSafeSessionFromCookieHeader(request.headers.get("cookie"));
     if (!user || !isStaffOrOwner(user)) {
       logAccessEvent({
         kind: user ? "staff_route_denied" : "auth_required",
@@ -101,7 +107,7 @@ export async function handleProtectedRoutes(request: NextRequest) {
   }
 
   if (pathname.startsWith("/api/campaigns/") && !pathname.startsWith("/api/campaigns/current")) {
-    const user = await readSessionFromCookieHeader(request.headers.get("cookie"));
+    const user = await readEdgeSafeSessionFromCookieHeader(request.headers.get("cookie"));
     if (!user) {
       logAccessEvent({ kind: "auth_required", route: pathname });
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });

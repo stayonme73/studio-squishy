@@ -15,4 +15,6 @@
 - Mobile certification is PARKED; do not start the phone walk.  
 - Squishy Watchkeeper: `public/squishy/squishy-studio-guide-v1.png` only; CSS rings only; never on security incidents.  
 - Additive command route: `/file-room/incident-command`. Do not reopen the Owner Console decision desk.  
+- Edge/Deno proxy session gate is bundled staff only — never `data/studio-users.json` or Node `fs`. Unknown/customer identities fail closed (ledger L12).  
+- Studio Board campaign/job JSON under `data/` is a separate missing production repository (ledger L13). Do not disguise it with memory or bundled JSON.  
 - No merge.
