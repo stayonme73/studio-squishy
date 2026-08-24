@@ -73,6 +73,14 @@ function isLiveInitErrorClass(value: string): value is LiveInitErrorClass {
   return (LIVE_INIT_ERROR_CLASSES as readonly string[]).includes(value);
 }
 
+function sanitizedFailure(stage: LiveInitStage, errorClass: LiveInitErrorClass): LiveReadFailure {
+  return {
+    ok: false,
+    stage: isLiveInitStage(stage) ? stage : "configuration",
+    errorClass: isLiveInitErrorClass(errorClass) ? errorClass : "configuration",
+  };
+}
+
 export function classifyLiveInitError(
   error: unknown,
   stage: LiveInitStage,
@@ -190,11 +198,17 @@ export function sanitizedLiveStatusPane(
 }
 
 export async function readLiveSupervisionForIncidentCommand(
-  env: NodeJS.ProcessEnv = process.env,
+  env?: NodeJS.ProcessEnv,
+  hints?: { globalRef?: typeof globalThis },
 ): Promise<LiveReadResult> {
   let stage: LiveInitStage = "configuration";
   try {
-    const resolved = resolveSupervisionPostgresConfig(env);
+    const runtimeEnv: NodeJS.ProcessEnv =
+      env ??
+      (typeof process !== "undefined" && process.env
+        ? process.env
+        : ({} as NodeJS.ProcessEnv));
+    const resolved = resolveSupervisionPostgresConfig(runtimeEnv, hints);
     if (!resolved.ok) {
       return { ok: false, stage: "configuration", errorClass: "configuration" };
     }
@@ -211,7 +225,7 @@ export async function readLiveSupervisionForIncidentCommand(
     const repository = createLivePostgresSupervisionRepository(client);
     await repository.load();
     assertDurableRepository(repository, {
-      ...env,
+      ...runtimeEnv,
       STUDIO_SUPERVISION_REQUIRE_DURABLE: "1",
     });
 
@@ -229,6 +243,6 @@ export async function readLiveSupervisionForIncidentCommand(
   } catch (error) {
     const mapped = classifyLiveInitError(error, stage);
     if (mapped) return mapped;
-    throw error;
+    return sanitizedFailure(stage, stage);
   }
 }

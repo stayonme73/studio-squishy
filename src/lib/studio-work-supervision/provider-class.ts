@@ -54,6 +54,46 @@ export type LaunchRuntimeHints = {
   cwd?: string;
 };
 
+type DenoEnvReader = {
+  env?: { get?: (key: string) => string | undefined };
+};
+
+const LAUNCH_ENV_KEY_CANDIDATES = [
+  SUPERVISION_LAUNCH_ENV_KEYS.url,
+  SUPERVISION_LAUNCH_ENV_KEYS.urlFallback,
+  SUPERVISION_LAUNCH_ENV_KEYS.secret,
+  SUPERVISION_LAUNCH_ENV_KEYS.serviceRole,
+  SUPERVISION_LAUNCH_ENV_KEYS.serviceRoleFallback,
+  SUPERVISION_LAUNCH_ENV_KEYS.runtime,
+  SUPERVISION_LAUNCH_ENV_KEYS.provider,
+  "NETLIFY",
+  "NODE_ENV",
+  "NEXT_RUNTIME",
+] as const;
+
+function processEnvOrEmpty(env?: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  if (env) return env;
+  if (typeof process !== "undefined" && process.env) return process.env;
+  return {} as NodeJS.ProcessEnv;
+}
+
+/** Fill only missing known launch keys from Deno.env. Never log values. */
+export function mergeLaunchRuntimeEnv(
+  env: NodeJS.ProcessEnv = processEnvOrEmpty(),
+  hints?: LaunchRuntimeHints,
+): NodeJS.ProcessEnv {
+  const merged: Record<string, string | undefined> = { ...env };
+  const globalRef = hints?.globalRef ?? globalThis;
+  const get = (globalRef as { Deno?: DenoEnvReader }).Deno?.env?.get;
+  if (typeof get !== "function") return merged as NodeJS.ProcessEnv;
+  for (const key of LAUNCH_ENV_KEY_CANDIDATES) {
+    if (envValue(merged as NodeJS.ProcessEnv, key)) continue;
+    const fromDeno = get(key);
+    if (fromDeno && fromDeno.trim()) merged[key] = fromDeno;
+  }
+  return merged as NodeJS.ProcessEnv;
+}
+
 export function isLaunchRuntime(
   env: NodeJS.ProcessEnv = process.env,
   hints?: LaunchRuntimeHints,
@@ -99,15 +139,17 @@ export type SupervisionPostgresConfig = {
 };
 
 export function resolveSupervisionPostgresConfig(
-  env: NodeJS.ProcessEnv = process.env,
+  env: NodeJS.ProcessEnv = processEnvOrEmpty(),
+  hints?: LaunchRuntimeHints,
 ): { ok: true; config: SupervisionPostgresConfig } | { ok: false; missing: string[] } {
+  const resolvedEnv = mergeLaunchRuntimeEnv(env, hints);
   const url =
-    envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.url) ??
-    envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.urlFallback);
+    envValue(resolvedEnv, SUPERVISION_LAUNCH_ENV_KEYS.url) ??
+    envValue(resolvedEnv, SUPERVISION_LAUNCH_ENV_KEYS.urlFallback);
   const serviceRoleKey =
-    envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.secret) ??
-    envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.serviceRole) ??
-    envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.serviceRoleFallback);
+    envValue(resolvedEnv, SUPERVISION_LAUNCH_ENV_KEYS.secret) ??
+    envValue(resolvedEnv, SUPERVISION_LAUNCH_ENV_KEYS.serviceRole) ??
+    envValue(resolvedEnv, SUPERVISION_LAUNCH_ENV_KEYS.serviceRoleFallback);
   const missing: string[] = [];
   if (!url) {
     missing.push(
@@ -120,9 +162,9 @@ export function resolveSupervisionPostgresConfig(
     );
   }
   if (!url || !serviceRoleKey) return { ok: false, missing };
-  const serviceRoleKeyName = envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.secret)
+  const serviceRoleKeyName = envValue(resolvedEnv, SUPERVISION_LAUNCH_ENV_KEYS.secret)
     ? SUPERVISION_LAUNCH_ENV_KEYS.secret
-    : envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.serviceRole)
+    : envValue(resolvedEnv, SUPERVISION_LAUNCH_ENV_KEYS.serviceRole)
       ? SUPERVISION_LAUNCH_ENV_KEYS.serviceRole
       : SUPERVISION_LAUNCH_ENV_KEYS.serviceRoleFallback;
   return {
@@ -130,7 +172,7 @@ export function resolveSupervisionPostgresConfig(
     config: {
       url: url.replace(/\/$/, ""),
       serviceRoleKey,
-      urlKeyUsed: envValue(env, SUPERVISION_LAUNCH_ENV_KEYS.url)
+      urlKeyUsed: envValue(resolvedEnv, SUPERVISION_LAUNCH_ENV_KEYS.url)
         ? SUPERVISION_LAUNCH_ENV_KEYS.url
         : SUPERVISION_LAUNCH_ENV_KEYS.urlFallback,
       serviceRoleKeyName,

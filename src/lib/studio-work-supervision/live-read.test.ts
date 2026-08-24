@@ -161,6 +161,32 @@ describe("incident command read-only live hydration", () => {
     expect(pane.body).not.toContain("Schema version 2");
   });
 
+  it("maps a health-check authentication failure after schema verification", async () => {
+    const stub = await startScriptedServer((req, res) => {
+      const url = new URL(req.url ?? "/", "http://studio.local");
+      if (url.pathname.endsWith("/supervision_verify_schema")) {
+        send(res, 200, {
+          ok: true,
+          schemaVersion: SUPERVISION_POSTGRES_SCHEMA_VERSION,
+          provider: "supabase-postgres",
+        });
+        return;
+      }
+      if (url.pathname.includes("supervision_meta")) {
+        send(res, 401, { error: "AUTH_FAILED" });
+        return;
+      }
+      send(res, 500, { error: "unexpected" });
+    });
+    servers.push(stub.server);
+    const result = await readLiveSupervisionForIncidentCommand(postgresEnv(stub.url));
+    expect(result).toEqual({ ok: false, stage: "health", errorClass: "authentication" });
+    const pane = sanitizedLiveStatusPane(result);
+    expect(pane.body).toContain("Error class: authentication");
+    expect(pane.body).not.toContain(stub.url);
+    expect(pane.body).not.toContain("sb_secret");
+  });
+
   it("maps a health failure after schema verification", async () => {
     const stub = await startScriptedServer((req, res) => {
       const url = new URL(req.url ?? "/", "http://studio.local");
@@ -250,6 +276,65 @@ describe("incident command read-only live hydration", () => {
         (rpc) => rpc === "supervision_upsert_lease" || rpc === "supervision_apply_ops",
       ),
     ).toBe(true);
+  });
+
+  it("maps unexpected hydration payloads to hydration without leaking the body", async () => {
+    const stub = await startScriptedServer((req, res) => {
+      const url = new URL(req.url ?? "/", "http://studio.local");
+      if (url.pathname.endsWith("/supervision_verify_schema")) {
+        send(res, 200, {
+          ok: true,
+          schemaVersion: SUPERVISION_POSTGRES_SCHEMA_VERSION,
+          provider: "supabase-postgres",
+        });
+        return;
+      }
+      if (url.pathname.includes("supervision_meta")) {
+        send(res, 200, [{ schema_version: 2, provider: "supabase-postgres" }]);
+        return;
+      }
+      if (url.pathname.endsWith("/supervision_hydrate")) {
+        send(res, 200, {
+          leases: 123,
+          secret: "sb_secret_should_not_leak",
+          href: "https://leak.example",
+        });
+        return;
+      }
+      send(res, 500, { error: "unexpected" });
+    });
+    servers.push(stub.server);
+    const result = await readLiveSupervisionForIncidentCommand(postgresEnv(stub.url));
+    expect(result).toEqual({ ok: false, stage: "hydration", errorClass: "hydration" });
+    const pane = sanitizedLiveStatusPane(result);
+    expect(pane.body).toContain("Error class: hydration");
+    expect(pane.body).not.toContain("sb_secret");
+    expect(pane.body).not.toMatch(/https?:\/\//i);
+    expect(pane.body).not.toContain("leak.example");
+  });
+
+  it("uses Deno.env launch keys when process env is empty", async () => {
+    const stub = await startSupervisionPostgrestStub({ serviceRoleKey: SB_SECRET_FIXTURE });
+    servers.push(stub.server);
+    const deno = {
+      env: {
+        get(key: string) {
+          if (key === "STUDIO_SUPERVISION_SUPABASE_URL") return stub.url;
+          if (key === "STUDIO_SUPERVISION_SUPABASE_SECRET_KEY") return SB_SECRET_FIXTURE;
+          return undefined;
+        },
+      },
+    };
+    const result = await readLiveSupervisionForIncidentCommand(
+      {},
+      { globalRef: { Deno: deno } as unknown as typeof globalThis },
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error("expected Deno.env live read success");
+    expect(result.snapshot.recordSource).toBe("live");
+    expect(result.snapshot.leases.some((lease) => lease.leaseId === "lease_machine_sweep")).toBe(
+      false,
+    );
   });
 
   it("does not import the worker boot from the Incident Command page", () => {

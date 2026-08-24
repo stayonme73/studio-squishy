@@ -146,6 +146,11 @@ export function createSupervisionLiveClient(
 
   async function pingHealth(): Promise<void> {
     const health = await pingMeta();
+    if (health.status === 401 || health.status === 403) {
+      throw new DurablePersistenceUnavailableError(
+        `Supervision store AUTH_FAILED (HTTP ${health.status}) at /rest/v1/supervision_meta`,
+      );
+    }
     if (health.status < 200 || health.status >= 300) {
       throw new LiveStoreUnhealthyError("Supervision Postgres health check failed.");
     }
