@@ -8,12 +8,17 @@ const nextConfig: NextConfig = {
     authInterrupts: true,
   },
   /**
-   * Netlify ___netlify-server-handler size. Turbopack traces
-   * path.join(process.cwd(), dynamicRel) as the whole repo, which pulled
-   * ~1.4 GB of launch media into the serverless function (250 MB unzipped
-   * limit). These globs only prune the server-function file trace.
+   * Netlify ___netlify-server-handler size. OpenNext copies
+   * `.next/standalone` into the function archive (not the NFT file list).
+   * Turbopack traces path.join(process.cwd(), dynamicRel) as the repo,
+   * which pulled launch media, source, and `.netlify` cache into standalone.
+   * These globs prune the server-function file trace only.
    * Public browser assets still publish as static site files.
-   * Keep docs/launch/*.md (Launch Tracker reads STUDIO-MASTER-LAUNCH-LIST.md).
+   * Keep docs/launch/*.md (Launch Tracker reads STUDIO-MASTER-LAUNCH-LIST.md;
+   * Kitchen / Room 4C still read launch package files).
+   * Native sharp/libvips stay out; wasm32 remains for next/image.
+   * `.netlify` must stay out of standalone — a prior packaging run left
+   * 251 MB of plugins/zips that OpenNext would zip into the handler.
    * Use anchored ./dir/** patterns — bare "docs" can match unrelated paths.
    */
   outputFileTracingExcludes: {
@@ -32,14 +37,23 @@ const nextConfig: NextConfig = {
       "./docs/launch/**/*.svg",
       "./docs/illustration/**",
       "./docs/review-captures/**",
-      "./src/archive/**",
+      "./src/**",
       "./scripts/**",
       "./tmp/**",
       "./tmp-tile-crops/**",
       "./test-artifacts/**",
       "./public/**",
+      "./.netlify/**",
       "./node_modules/playwright/**",
       "./node_modules/playwright-core/**",
+      "./node_modules/@img/sharp-libvips-*/**",
+      "./node_modules/@img/sharp-linux*/**",
+      "./node_modules/@img/sharp-win32*/**",
+      "./node_modules/@img/sharp-darwin*/**",
+      "./node_modules/next/node_modules/@img/sharp-libvips-*/**",
+      "./node_modules/next/node_modules/@img/sharp-linux*/**",
+      "./node_modules/next/node_modules/@img/sharp-win32*/**",
+      "./node_modules/next/node_modules/@img/sharp-darwin*/**",
       "./.env.local",
       "./tsconfig.tsbuildinfo",
     ],
