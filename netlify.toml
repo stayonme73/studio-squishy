@@ -1,0 +1,5 @@
+# Diagnostic-only. Does not change Studio customer or production behavior.
+# Prints the real ___netlify-server-handler zip after OpenNext + Functions
+# bundling, then fails the build before upload if that zip exceeds 45 MB.
+[[plugins]]
+  package = "./plugins/netlify-linux-handler-archive-diagnostic"
