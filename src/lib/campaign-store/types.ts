@@ -35,8 +35,9 @@ export type StudioUserRecord = StudioUser & {
    */
   passwordHash?: string;
   /**
-   * Legacy plaintext — development seed migration only.
-   * Never accept for authentication in production.
+   * Legacy plaintext — local development file only.
+   * Committed seeds must not include this field. Never accept the
+   * publicly known Git-history seed password.
    */
   password?: string;
   /**

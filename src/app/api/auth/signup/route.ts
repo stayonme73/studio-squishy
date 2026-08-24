@@ -36,11 +36,13 @@ export async function POST(request: Request) {
       const status =
         result.code === "email_taken"
           ? 409
-          : result.code === "invalid_email" ||
-              result.code === "invalid_password" ||
-              result.code === "invalid_display_name"
-            ? 400
-            : 400;
+          : result.code === "durable_identity_unavailable"
+            ? 503
+            : result.code === "invalid_email" ||
+                result.code === "invalid_password" ||
+                result.code === "invalid_display_name"
+              ? 400
+              : 400;
       return NextResponse.json(
         { error: result.message, code: result.code },
         { status },

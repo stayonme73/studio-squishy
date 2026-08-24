@@ -2,34 +2,40 @@
   {
     "id": "tagia",
     "email": "tagia@local.dev",
-    "password": "dev-only",
+    "passwordHash": "scrypt$16384$8$1$ZwryakzrmPP4sIYA_BwVeg$DgRi_QEmL_xHHFpyxIWsXebHsFJ6D9wFW_zBtcqbyR6jwMJrPPg6zQWa7mbbxQQTAgfkzyAwY8Hi9nvujx9pkg",
     "displayName": "Tagia",
-    "roles": ["owner", "client"],
+    "roles": [
+      "owner",
+      "client"
+    ],
     "accountClass": "staff"
   },
   {
     "id": "staff-dev",
     "email": "staff@local.dev",
-    "password": "dev-only",
     "displayName": "Staff Dev",
-    "roles": ["staff"],
+    "roles": [
+      "staff"
+    ],
     "accountClass": "staff"
   },
   {
     "id": "client-a",
     "email": "client-a@local.dev",
-    "password": "dev-only",
     "displayName": "Client A",
-    "roles": ["client"],
+    "roles": [
+      "client"
+    ],
     "accountClass": "test",
     "clientCampaignIds": []
   },
   {
     "id": "client-b",
     "email": "client-b@local.dev",
-    "password": "dev-only",
     "displayName": "Client B",
-    "roles": ["client"],
+    "roles": [
+      "client"
+    ],
     "accountClass": "test",
     "clientCampaignIds": []
   }

@@ -98,7 +98,11 @@ describe("createClientAccount", () => {
     const clients = users.filter(
       (user) =>
         user.accountClass === "test" ||
-        user.email.endsWith("@local.dev") && user.roles.includes("client"),
+        user.accountClass === "customer" ||
+        (user.email.endsWith("@local.dev") &&
+          user.roles.includes("client") &&
+          !user.roles.includes("owner") &&
+          !user.roles.includes("staff")),
     );
     // In development, test seeds may exist — ensure they are not labeled staff.
     for (const user of clients) {

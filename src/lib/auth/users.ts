@@ -14,18 +14,35 @@ import {
   validateNewPassword,
   verifyPassword,
 } from "@/lib/auth/password-hash";
+import {
+  PRODUCTION_CUSTOMER_IDENTITY_LIMIT,
+  bundledStaffRecords,
+  findBundledStaffByEmail,
+  findBundledStaffById,
+  isKnownPublicSeedPassword,
+  isProductionRuntime,
+} from "@/lib/auth/production-staff-identity";
 
 import seedUsers from "./studio-users.seed.json";
 
 const USERS_PATH = path.join(process.cwd(), "data", "studio-users.json");
 
+let productionUserFileIo = 0;
+
+function rejectProductionUserFileIo(): void {
+  if (!isProductionRuntime()) return;
+  productionUserFileIo += 1;
+  throw new Error(PRODUCTION_CUSTOMER_IDENTITY_LIMIT);
+}
+
+/** Test-facing: production staff lookup must never touch the JSON user file. */
+export function productionUserFileIoCount(): number {
+  return productionUserFileIo;
+}
+
 type SeedUserJson = StudioUserRecord & {
   accountClass?: StudioUserAccountClass;
 };
-
-function isProductionRuntime(): boolean {
-  return process.env.NODE_ENV === "production";
-}
 
 function seedAccountClass(user: SeedUserJson): StudioUserAccountClass {
   if (user.accountClass) return user.accountClass;
@@ -35,15 +52,15 @@ function seedAccountClass(user: SeedUserJson): StudioUserAccountClass {
   return "test";
 }
 
-/** Seeds allowed to merge into the runtime user file. */
+/** Seeds allowed to merge into the local development user file. Never used in production. */
 function allowedSeedUsers(): SeedUserJson[] {
   const all = seedUsers as SeedUserJson[];
-  if (!isProductionRuntime()) return all;
-  // Production: staff only — never customer/test seeds from the repository.
-  return all.filter((user) => seedAccountClass(user) === "staff");
+  if (isProductionRuntime()) return [];
+  return all;
 }
 
 async function ensureUsersFile(): Promise<void> {
+  rejectProductionUserFileIo();
   await fs.mkdir(path.dirname(USERS_PATH), { recursive: true });
   const seeds = allowedSeedUsers();
   try {
@@ -53,8 +70,9 @@ async function ensureUsersFile(): Promise<void> {
     let changed = false;
     for (const seedUser of seeds) {
       if (usersById.has(seedUser.id)) continue;
+      const { password: _removed, ...rest } = seedUser;
       existing.push({
-        ...seedUser,
+        ...rest,
         accountClass: seedAccountClass(seedUser),
       });
       changed = true;
@@ -66,10 +84,13 @@ async function ensureUsersFile(): Promise<void> {
     await fs.writeFile(
       USERS_PATH,
       JSON.stringify(
-        seeds.map((user) => ({
-          ...user,
-          accountClass: seedAccountClass(user),
-        })),
+        seeds.map((user) => {
+          const { password: _removed, ...rest } = user;
+          return {
+            ...rest,
+            accountClass: seedAccountClass(user),
+          };
+        }),
         null,
         2,
       ),
@@ -79,12 +100,16 @@ async function ensureUsersFile(): Promise<void> {
 }
 
 export async function listStudioUsers(): Promise<StudioUserRecord[]> {
+  if (isProductionRuntime()) {
+    return bundledStaffRecords();
+  }
   await ensureUsersFile();
   const raw = await fs.readFile(USERS_PATH, "utf8");
   return JSON.parse(raw) as StudioUserRecord[];
 }
 
 async function writeStudioUsers(users: StudioUserRecord[]): Promise<void> {
+  rejectProductionUserFileIo();
   await fs.mkdir(path.dirname(USERS_PATH), { recursive: true });
   await fs.writeFile(USERS_PATH, JSON.stringify(users, null, 2), "utf8");
 }
@@ -92,6 +117,9 @@ async function writeStudioUsers(users: StudioUserRecord[]): Promise<void> {
 export async function findUserByEmail(
   email: string,
 ): Promise<StudioUserRecord | null> {
+  if (isProductionRuntime()) {
+    return findBundledStaffByEmail(email);
+  }
   const normalized = normalizeEmail(email);
   const users = await listStudioUsers();
   return (
@@ -100,6 +128,9 @@ export async function findUserByEmail(
 }
 
 export async function findUserById(id: string): Promise<StudioUserRecord | null> {
+  if (isProductionRuntime()) {
+    return findBundledStaffById(id);
+  }
   const users = await listStudioUsers();
   return users.find((user) => user.id === id) ?? null;
 }
@@ -117,12 +148,16 @@ async function passwordMatches(
   record: StudioUserRecord,
   password: string,
 ): Promise<"hash" | "legacy" | null> {
+  if (isKnownPublicSeedPassword(password)) {
+    return null;
+  }
   if (record.passwordHash && isPasswordHash(record.passwordHash)) {
     return (await verifyPassword(password, record.passwordHash))
       ? "hash"
       : null;
   }
-  // Legacy plaintext seeds — development / test only.
+  // Legacy plaintext on the local development file only — never production,
+  // and never the publicly known Git-history seed password.
   if (
     !isProductionRuntime() &&
     typeof record.password === "string" &&
@@ -138,6 +173,7 @@ async function upgradeLegacyPassword(
   userId: string,
   password: string,
 ): Promise<void> {
+  if (isProductionRuntime()) return;
   const users = await listStudioUsers();
   const index = users.findIndex((user) => user.id === userId);
   if (index === -1) return;
@@ -154,6 +190,9 @@ export async function verifyLogin(
   email: string,
   password: string,
 ): Promise<StudioUser | null> {
+  if (isKnownPublicSeedPassword(password)) {
+    return null;
+  }
   const user = await findUserByEmail(email);
   if (!user) return null;
   const match = await passwordMatches(user, password);
@@ -179,17 +218,26 @@ export type CreateClientAccountResult =
         | "invalid_email"
         | "invalid_password"
         | "invalid_display_name"
-        | "email_taken";
+        | "email_taken"
+        | "durable_identity_unavailable";
       message: string;
     };
 
 /**
  * Public customer account creation — hashed password, normalized email.
- * Does not send verification email (Email Verification package).
+ * Production is fail-closed: durable customer identity is not this JSON file.
  */
 export async function createClientAccount(
   input: CreateClientAccountInput,
 ): Promise<CreateClientAccountResult> {
+  if (isProductionRuntime()) {
+    return {
+      ok: false,
+      code: "durable_identity_unavailable",
+      message: PRODUCTION_CUSTOMER_IDENTITY_LIMIT,
+    };
+  }
+
   const email = normalizeEmail(input.email);
   const displayName = input.displayName.trim();
   const password = input.password;
@@ -249,6 +297,9 @@ export async function markEmailVerified(
   userId: string,
   verifiedAt: string = new Date().toISOString(),
 ): Promise<StudioUser | null> {
+  if (isProductionRuntime()) {
+    return null;
+  }
   const users = await listStudioUsers();
   const index = users.findIndex((user) => user.id === userId);
   if (index === -1) return null;
@@ -270,18 +321,29 @@ export type UpdatePasswordAfterResetResult =
   | { ok: true; user: StudioUser; passwordChangedAtMs: number }
   | {
       ok: false;
-      code: "invalid_password" | "unknown_user";
+      code:
+        | "invalid_password"
+        | "unknown_user"
+        | "durable_identity_unavailable";
       message: string;
     };
 
 /**
  * Password Recovery — replace hash and stamp passwordChangedAtMs so every
- * older session (issuedAt <= stamp) is rejected on the next read.
+ * older session (issued at <= stamp) is rejected on the next read.
  */
 export async function updatePasswordAfterReset(
   userId: string,
   newPassword: string,
 ): Promise<UpdatePasswordAfterResetResult> {
+  if (isProductionRuntime()) {
+    return {
+      ok: false,
+      code: "durable_identity_unavailable",
+      message: PRODUCTION_CUSTOMER_IDENTITY_LIMIT,
+    };
+  }
+
   const passwordError = validateNewPassword(newPassword);
   if (passwordError) {
     return {
@@ -321,6 +383,9 @@ export async function updateUserCurrentCampaign(
   userId: string,
   campaignId: string | undefined,
 ): Promise<StudioUser | null> {
+  if (isProductionRuntime()) {
+    return null;
+  }
   const users = await listStudioUsers();
   const index = users.findIndex((user) => user.id === userId);
   if (index === -1) return null;
@@ -338,6 +403,9 @@ export async function linkClientCampaign(
   userId: string,
   campaignId: string,
 ): Promise<StudioUser | null> {
+  if (isProductionRuntime()) {
+    return null;
+  }
   const users = await listStudioUsers();
   const index = users.findIndex((user) => user.id === userId);
   if (index === -1) return null;
