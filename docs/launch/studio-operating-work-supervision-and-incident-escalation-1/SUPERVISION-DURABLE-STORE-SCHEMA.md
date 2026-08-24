@@ -83,6 +83,20 @@ Least privilege: `anon` / `authenticated` revoked. Postgres `GRANT EXECUTE` rema
 
 Retention and deletion are documented separately in `SUPERVISION-RECORD-RETENTION-AND-DELETION.md`.
 
+## Planned additive wake-runtime objects (not migrated)
+
+**Not applied. Do not treat as shipped.** Required in the **same** Supabase project before a wake runtime can certify 24-hour HTTP idempotency. This is not a second database.
+
+Existing `supervision_idempotency` + `supervision_accept_heartbeat` remains **heartbeat-only**. It must not be reused for wake HTTP replay.
+
+| Object | Role |
+|--------|------|
+| Table `supervision_wake_idempotency` | Durable 24-hour wake keys, stored sanitized response, `first_completed_at` for the 18/hour unique-success cap |
+| RPC `supervision_claim_wake_idempotency` | Atomic insert-or-replay (`FOR UPDATE` / conflict). Replays do not consume unique-hour capacity. |
+| RPC `supervision_complete_wake_idempotency` | Marks first successful completion and stores the sanitized Machine JSON |
+
+If these objects are missing, the wake site fail-closes. Process memory is not an allowed fallback. Spec: `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md`.
+
 ## Rules
 
 - Incident events cannot be overwritten or deleted through normal operations. `replaceIncidentEvents` throws `AppendOnlyViolationError`.

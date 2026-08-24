@@ -8,6 +8,8 @@
  * Do not connect Claude, Build-A-Bot, Make, or Resend.
  * Base: mobile park tip bc458931. Room 4 only. Do not assign Room 4D / 4E.
  * Do not merge. Do not start Room 5. Do not unpark mobile until this package closes.
+ * Wake runtime: planning only. Do not build until Tagia authorizes that pass.
+ * L15: never-ran-on-hydrate is EVENTUAL; independent scheduler-death detection is unproven.
  */
 
 export const studioWorkSupervisionAndIncidentEscalationV1 = {
@@ -122,4 +124,6 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
     "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/EXTERNAL-AGENT-REGISTRATION-AND-HEARTBEAT-CONTRACT.md" as const,
   machineOnlyWakeIngressDecisionDoc:
     "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md" as const,
+  machineOnlyWakeRuntimeImplementationContractDoc:
+    "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md" as const,
 } as const;

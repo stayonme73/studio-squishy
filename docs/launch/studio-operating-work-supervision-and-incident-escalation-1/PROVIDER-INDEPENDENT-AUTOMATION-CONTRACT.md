@@ -20,14 +20,24 @@ The private certification host requires human Netlify Team Login. An external wa
 
 Recorded 2026-08-24: `POST /api/operating/supervision/sweep` with `x-studio-operating-secret` and no query string received **401 HTML**. The Studio returned no Machine JSON. Studio service authentication never ran. This is **not** a mismatched sweep secret.
 
-Until a separate machine-only wake ingress exists (see `MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md`):
+Until a separate machine-only wake **runtime** exists (see `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md`):
 
 - Keep the certification site private.
 - Stop sweep tests against that host.
 - Do not rotate `STUDIO_OPERATING_SWEEP_SECRET` again for this failure.
+- Do not proxy to the private host from a second URL.
 - Do not use a Netlify management API token as visitor authentication.
 - Do not claim the authenticated sweep passed or failed at the Studio layer.
 - Do not connect a scheduler.
+- Do not implement the wake runtime until Tagia authorizes the build pass.
+
+Wake-runtime contract corrections (planning only; not built):
+
+- Provider request cap **before** handler authentication. Wrong-secret traffic is bounded with no Supabase write. Application still returns 401 JSON and writes nothing when the Studio secret is wrong.
+- Authenticated store-backed cap: **18 unique successful wakes per rolling hour**. Repeated idempotency keys do not consume additional capacity.
+- Durable 24-hour wake idempotency: table `supervision_wake_idempotency`, RPCs `supervision_claim_wake_idempotency` and `supervision_complete_wake_idempotency`. No process memory. Existing `supervision_idempotency` stays heartbeat-only.
+- Never-ran-on-hydrate is **EVENTUAL** detection (L15). Independent scheduler-death detection remains unproven until a separate heartbeat observer is certified. Capability 7 (“a dead scheduler must itself become an incident”) is not closed by hydrate-only detection.
+- If Supabase is down after authentication: sanitized 503, no claimed durable failed-to-run write, caller retains the attempt result, stale-last-success creates the incident after recovery.
 
 ## Build-A-Bot
 

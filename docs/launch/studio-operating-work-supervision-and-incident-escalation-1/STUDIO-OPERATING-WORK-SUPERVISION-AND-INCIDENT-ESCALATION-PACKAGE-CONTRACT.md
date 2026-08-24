@@ -44,7 +44,7 @@ Classify providers (memory = tests, JSON = local/controlled, Postgres = launch p
 
 ## What Pass 3C authorizes
 
-A real server-side Supabase Postgres connector on `SupervisionRepository`: schema verification, hydrate, transactional RPCs, and fail-closed launch selection. Current Secret Keys (`sb_secret_`) are sent only as `apikey`. The JWT `service_role` key is a documented compatibility fallback. A live two-process proof against the real database has passed with fictional Maple/Harbor records. This does **not** close the package. Do **not** connect Build-A-Bot. An external scheduler is still not authorized. **L14:** the private certification host’s Netlify Team Login blocked a noninteractive sweep POST (401 HTML) before Studio authentication. Keep the site private. Stop sweep tests on that host. See `MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md`.
+A real server-side Supabase Postgres connector on `SupervisionRepository`: schema verification, hydrate, transactional RPCs, and fail-closed launch selection. Current Secret Keys (`sb_secret_`) are sent only as `apikey`. The JWT `service_role` key is a documented compatibility fallback. A live two-process proof against the real database has passed with fictional Maple/Harbor records. This does **not** close the package. Do **not** connect Build-A-Bot. An external scheduler is still not authorized. **L14:** the private certification host’s Netlify Team Login blocked a noninteractive sweep POST (401 HTML) before Studio authentication. Keep the site private. Stop sweep tests on that host. Architecture for a non-proxy machine-only wake runtime is **conditionally approved**; do not build it until Tagia authorizes the implementation pass. Provider cap before handler auth; authenticated cap 18 unique successful wakes per rolling hour; durable table `supervision_wake_idempotency` plus claim/complete RPCs (no process memory). Store-down after auth: sanitized 503, no claimed durable failed-to-run write. See `MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md` and `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md`. **L15:** never-ran-on-hydrate is EVENTUAL detection; independent scheduler-death detection is unproven.
 
 ## What this package still does **not** authorize
 
@@ -56,8 +56,10 @@ A real server-side Supabase Postgres connector on `SupervisionRepository`: schem
 - Rotating `STUDIO_OPERATING_SWEEP_SECRET` again because of L14  
 - Using a Netlify management API token as visitor authentication  
 - Claiming the authenticated sweep passed or failed at the Studio layer  
-- Connecting an external scheduler before a machine-only wake ingress exists  
-- Implementing a connector or gateway in this recording  
+- Connecting an external scheduler before a machine-only wake runtime exists and is certified  
+- Proxying a second URL to the private Studio host  
+- Implementing the wake runtime before Tagia authorizes the build pass  
+- Claiming never-ran-on-hydrate as independent real-time scheduler-death detection (L15)  
 - L13 / Board persistence work  
 - Merging  
 - Starting Room 5  
