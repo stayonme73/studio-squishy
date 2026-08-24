@@ -44,7 +44,7 @@ Classify providers (memory = tests, JSON = local/controlled, Postgres = launch p
 
 ## What Pass 3C authorizes
 
-A real server-side Supabase Postgres connector on `SupervisionRepository`: schema verification, hydrate, transactional RPCs, and fail-closed launch selection. Current Secret Keys (`sb_secret_`) are sent only as `apikey`. The JWT `service_role` key is a documented compatibility fallback. A live two-process proof against the real database has passed with fictional Maple/Harbor records. This does **not** close the package. Do **not** connect Build-A-Bot. An external scheduler is still not authorized until Tagia separately authorizes it.
+A real server-side Supabase Postgres connector on `SupervisionRepository`: schema verification, hydrate, transactional RPCs, and fail-closed launch selection. Current Secret Keys (`sb_secret_`) are sent only as `apikey`. The JWT `service_role` key is a documented compatibility fallback. A live two-process proof against the real database has passed with fictional Maple/Harbor records. This does **not** close the package. Do **not** connect Build-A-Bot. An external scheduler is still not authorized. **L14:** the private certification host’s Netlify Team Login blocked a noninteractive sweep POST (401 HTML) before Studio authentication. Keep the site private. Stop sweep tests on that host. See `MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md`.
 
 ## What this package still does **not** authorize
 
@@ -52,6 +52,13 @@ A real server-side Supabase Postgres connector on `SupervisionRepository`: schem
 - Fake success connectors  
 - Using real customer data  
 - Security theater  
+- Making the private certification site public  
+- Rotating `STUDIO_OPERATING_SWEEP_SECRET` again because of L14  
+- Using a Netlify management API token as visitor authentication  
+- Claiming the authenticated sweep passed or failed at the Studio layer  
+- Connecting an external scheduler before a machine-only wake ingress exists  
+- Implementing a connector or gateway in this recording  
+- L13 / Board persistence work  
 - Merging  
 - Starting Room 5  
 - Unparking or running the mobile phone walk  

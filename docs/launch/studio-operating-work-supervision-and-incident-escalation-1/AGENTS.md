@@ -11,7 +11,8 @@
 - Do not delete Pass 3 local evidence. Do not claim the JSON file store is launch-certified.  
 - Current Secret Keys (`sb_secret_`) go only in the `apikey` header. Do not send them as `Authorization: Bearer`. Do not expose secret keys to the browser. Object/file storage is not the incident database.  
 - Do not connect or claim Claude, Build-A-Bot, Make, or Resend.  
-- Do not add a scheduler connector until Tagia separately authorizes it. Live two-process durability is proven; scheduler is still not connected.  
+- Do not add a scheduler connector until Tagia separately authorizes it **and** L14 is solved by a machine-only wake ingress. Live two-process durability is proven; the private certification host currently blocks noninteractive sweep POST with Netlify Team Login (401 HTML). That is not a Studio-layer sweep result. Keep the site private. Stop sweep tests on that host. Decision note: `MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md`.  
+- Do not start L13 / Board persistence from this recording.  
 - Mobile certification is PARKED; do not start the phone walk.  
 - Squishy Watchkeeper: `public/squishy/squishy-studio-guide-v1.png` only; CSS rings only; never on security incidents.  
 - Additive command route: `/file-room/incident-command`. Do not reopen the Owner Console decision desk.  

@@ -120,4 +120,6 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
     "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/AGENTS.md" as const,
   externalAgentContractDoc:
     "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/EXTERNAL-AGENT-REGISTRATION-AND-HEARTBEAT-CONTRACT.md" as const,
+  machineOnlyWakeIngressDecisionDoc:
+    "docs/launch/studio-operating-work-supervision-and-incident-escalation-1/MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md" as const,
 } as const;

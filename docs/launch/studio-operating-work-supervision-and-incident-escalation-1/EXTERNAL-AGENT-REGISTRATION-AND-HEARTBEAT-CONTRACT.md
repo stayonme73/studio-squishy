@@ -17,6 +17,8 @@ The Machine owns registration, heartbeat truth, and health. Scout, Claude, Cody,
 
 This follows the existing operating sweep header used by lifecycle watchdog and paid-activation recovery.
 
+Host-level human login (including Netlify Team Login on the private certification site) is **not** this contract. A 401 HTML login wall means the request never reached Studio service authentication (ledger L14). Keep that site private. Do not rotate the sweep secret for that failure. See `MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md`.
+
 ## Endpoints
 
 | Method | Path | Purpose |
