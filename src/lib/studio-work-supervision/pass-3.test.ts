@@ -6,11 +6,13 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { createFrozenClock } from "./clock";
 import { createFileSupervisionRepository } from "./file-repository";
+import { buildFoundationFixturePack } from "./fixtures";
 import { createTestSupervisionMachine } from "./machine";
 import { createMemorySupervisionRepository } from "./memory-repository";
 import {
   AppendOnlyViolationError,
   DurablePersistenceUnavailableError,
+  LaunchPersistenceForbiddenError,
   VolatileMemoryForbiddenError,
   assertDurableRepository,
 } from "./repository";
@@ -385,6 +387,25 @@ describe("work supervision pass 3 durable persistence", () => {
         requireDurable: true,
       }),
     ).toThrow(VolatileMemoryForbiddenError);
+  });
+
+  it("boots fictional fixtures in launch runtime without treating them as live production data", () => {
+    const previous = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+    try {
+      const pack = buildFoundationFixturePack();
+      expect(pack.snapshot.recordSource).toBe("fixture");
+      expect(pack.snapshot.incidents.length).toBeGreaterThan(0);
+      expect(() =>
+        createTestSupervisionMachine({
+          repository: createMemorySupervisionRepository(),
+          recordSource: "live",
+        }),
+      ).toThrow(LaunchPersistenceForbiddenError);
+    } finally {
+      if (previous === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = previous;
+    }
   });
 
   it("proves an intentional second Node process can still read the durable files", () => {

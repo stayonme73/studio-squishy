@@ -2,6 +2,7 @@ import { studioWorkSupervisionAndIncidentEscalationV1 as cfg } from "@/config/st
 
 import { cloneJson, createSequenceIdFactory, createSystemClock, isoNow } from "./clock";
 import { createMemorySupervisionRepository } from "./memory-repository";
+import { isLaunchRuntime } from "./provider-class";
 import type { SupervisionRepository } from "./repository";
 import { assertDurableRepository } from "./repository";
 import {
@@ -381,7 +382,7 @@ export function createSupervisionMachine(options?: {
   if (options?.requireDurable) {
     assertDurableRepository(repository, { ...process.env, STUDIO_SUPERVISION_REQUIRE_DURABLE: "1" });
   }
-  if (process.env.NODE_ENV === "production" || process.env.STUDIO_SUPERVISION_RUNTIME === "launch") {
+  if (recordSource !== "fixture" && isLaunchRuntime()) {
     assertDurableRepository(repository);
   }
   repository.load();

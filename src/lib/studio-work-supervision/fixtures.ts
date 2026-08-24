@@ -43,7 +43,7 @@ export type FoundationFixturePack = {
 
 export function buildFoundationFixturePack(): FoundationFixturePack {
   const clock = createFrozenClock(FIXTURE_NOW);
-  const machine = createTestSupervisionMachine({ clock });
+  const machine = createTestSupervisionMachine({ clock, recordSource: "fixture" });
 
   const healthyFinite = machine.issueLease({
     leaseId: "lease_fixture_finite_healthy",
