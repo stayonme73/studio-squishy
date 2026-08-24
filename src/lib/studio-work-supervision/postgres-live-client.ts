@@ -13,6 +13,11 @@ import {
   type HeartbeatRecord,
   type SweepClaim,
 } from "./repository";
+import {
+  SUPERVISION_CLAIM_WAKE_IDEMPOTENCY_RPC,
+  SUPERVISION_COMPLETE_WAKE_IDEMPOTENCY_RPC,
+  type WakeIdempotencyClaim,
+} from "./wake-idempotency";
 import type { IncidentEvent, MachineIncident, ProviderPortStatus, WorkLease } from "./types";
 
 export type SupervisionLiveRequestLog = {
@@ -227,6 +232,25 @@ export function createSupervisionLiveClient(
     },
     async applyOps(ops: SupervisionQueuedOp[]) {
       return rpc<{ ok: boolean; results: unknown[] }>("supervision_apply_ops", { p_ops: ops });
+    },
+    async claimWakeIdempotency(key: string, nowIso: string): Promise<WakeIdempotencyClaim> {
+      return rpc<WakeIdempotencyClaim>(SUPERVISION_CLAIM_WAKE_IDEMPOTENCY_RPC, {
+        p_key: key,
+        p_now: nowIso,
+      });
+    },
+    async completeWakeIdempotency(
+      key: string,
+      status: number,
+      body: unknown,
+      nowIso: string,
+    ): Promise<{ ok: true }> {
+      return rpc<{ ok: true }>(SUPERVISION_COMPLETE_WAKE_IDEMPOTENCY_RPC, {
+        p_key: key,
+        p_status: status,
+        p_body: body,
+        p_now: nowIso,
+      });
     },
     pingMeta,
   };

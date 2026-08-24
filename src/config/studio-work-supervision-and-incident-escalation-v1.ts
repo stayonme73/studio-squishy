@@ -8,7 +8,7 @@
  * Do not connect Claude, Build-A-Bot, Make, or Resend.
  * Base: mobile park tip bc458931. Room 4 only. Do not assign Room 4D / 4E.
  * Do not merge. Do not start Room 5. Do not unpark mobile until this package closes.
- * Wake runtime: planning only. Do not build until Tagia authorizes that pass.
+ * Wake runtime: local implementation authorized 2026-08-24. Not deployed. Live C-rows remain NOT RUN.
  * L15: never-ran-on-hydrate is EVENTUAL; independent scheduler-death detection is unproven.
  */
 

@@ -9,6 +9,7 @@ import {
 } from "./repository";
 import type { IncidentEvent, MachineIncident, ProviderPortStatus, WorkLease } from "./types";
 import { SUPERVISION_POSTGRES_PROVIDER } from "./provider-class";
+import { createWakeIdempotencyMemoryStore } from "./wake-idempotency";
 
 type LeaseRow = {
   leaseId: string;
@@ -45,6 +46,7 @@ export class SupervisionPostgresEngine {
   coverage: ProviderPortStatus[] = cloneJson([...UNCONNECTED_PROVIDER_PORTS]);
   readonly evaluations: SweepEvaluationRecord[] = [];
   sweepClaim: SweepClaim | null = null;
+  wake = createWakeIdempotencyMemoryStore();
   meta: SupervisionStoreMeta = {
     schemaVersion: 1,
     provider: SUPERVISION_POSTGRES_PROVIDER,

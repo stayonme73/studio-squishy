@@ -83,9 +83,9 @@ Least privilege: `anon` / `authenticated` revoked. Postgres `GRANT EXECUTE` rema
 
 Retention and deletion are documented separately in `SUPERVISION-RECORD-RETENTION-AND-DELETION.md`.
 
-## Planned additive wake-runtime objects (not migrated)
+## Additive wake-runtime objects (migration written, not applied)
 
-**Not applied. Do not treat as shipped.** Required in the **same** Supabase project before a wake runtime can certify 24-hour HTTP idempotency. This is not a second database.
+**SQL exists at `supabase/migrations/20260825_supervision_wake_idempotency.sql`. Do not apply it to live Supabase until Tagia authorizes that pass.** Schema version remains 2. This is not a second database.
 
 Existing `supervision_idempotency` + `supervision_accept_heartbeat` remains **heartbeat-only**. It must not be reused for wake HTTP replay.
 

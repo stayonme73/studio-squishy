@@ -15,7 +15,9 @@ export type SupervisionRpcName =
   | "supervision_record_sweep_evaluation"
   | "supervision_save_coverage"
   | "supervision_mark_restored"
-  | "supervision_apply_ops";
+  | "supervision_apply_ops"
+  | "supervision_claim_wake_idempotency"
+  | "supervision_complete_wake_idempotency";
 
 export type SupervisionQueuedOp =
   | { op: "upsert_lease"; lease: WorkLease }
@@ -154,6 +156,15 @@ export function applySupervisionRpc(
       }
       return { ok: true, results };
     }
+    case "supervision_claim_wake_idempotency":
+      return engine.wake.claim(String(args.p_key ?? ""), String(args.p_now ?? ""));
+    case "supervision_complete_wake_idempotency":
+      return engine.wake.complete(
+        String(args.p_key ?? ""),
+        Number(args.p_status),
+        args.p_body,
+        String(args.p_now ?? ""),
+      );
     default:
       throw new Error(`Unknown supervision RPC ${name}`);
   }

@@ -1,0 +1,19 @@
+# Isolated machine-only wake runtime.
+# Not the Studio site. Do not set this as the Studio publish directory.
+# A later Owner pass may create a separate Netlify site from this folder.
+
+[build]
+  command = "node scripts/build.mjs"
+  publish = "dist/public"
+
+[functions]
+  directory = "dist/functions"
+  node_bundler = "esbuild"
+
+[functions.wake]
+  included_files = []
+
+# C13: provider rate limit before the function. Available as code-based
+# function rateLimit on all Netlify plans (Free allows 2 rules/project).
+# This file documents the intended site wiring. The enforceable rule is
+# exported from src/netlify-entry.ts as config.rateLimit.
