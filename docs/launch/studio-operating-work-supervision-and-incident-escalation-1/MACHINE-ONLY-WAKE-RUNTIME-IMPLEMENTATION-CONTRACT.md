@@ -1,12 +1,12 @@
 # Machine-only wake runtime — implementation contract
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Status:** PLANNING ONLY. Conditionally approved. **Not implemented. Not deployed. Not certified.**  
-**Owner decision:** 2026-08-24 architecture conditionally approved  
+**Status:** **IMPLEMENTED AND DEPLOYED** on a separate wake Netlify site. Package remains **OPEN / IN PROGRESS**. **Not** live-production certified. **Not** closed.  
+**Owner decision:** 2026-08-24 architecture conditionally approved; wake runtime later built and deployed.  
 **Ledger:** L14 · L15  
 **Authority:** this contract + `MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md`
 
-Do not build or deploy from this document until Tagia authorizes an implementation pass.
+Binding conditions below remain in force. Do not close this package. Do not claim live-production certification. Do not contact the wake origin for C13 retries. Do not run authenticated wake until C13.
 
 ---
 
@@ -108,7 +108,7 @@ The private Studio may keep its in-process timer for human sessions. That is not
 
 ## 3. Exact deployed routes
 
-**Wake origin only** (hostname TBD at implementation; not the private Studio host).
+**Wake origin only** (separate Netlify site; not the private Studio host).
 
 | Method | Path | Result |
 |--------|------|--------|
@@ -331,51 +331,54 @@ If a second site is not allowed without paid upgrade, **stop and ask Tagia** bef
 
 ## 11. Complete certification matrix
 
-No row is passed until evidence exists. Implementation is not started; all rows are **NOT RUN**.
+No row is a live-production certification. Package remains OPEN. Do not treat any PASS as package close.
 
-| Id | Proof | Pass condition | Fail / blocked |
-|----|--------|----------------|----------------|
-| C1 | Private Studio stays Team-Login protected | Human still gets login wall on Studio host | Site made public |
-| C2 | Wake origin has no Team Login | `POST` without secret → **401 JSON**, not HTML | 401 HTML (L14 recreated) |
-| C3 | Not a proxy | Function source / logs show **zero** HTTP to private Studio host | Any `fetch` to Studio host |
-| C4 | Auth before Machine init | Missing/wrong secret: no Supabase writes, no `sweep()` | Hydrate/sweep before auth |
-| C5 | Same store | Wake write visible from private Incident Command live read | Divergent DB or JSON file |
-| C6 | Schema 2 | `supervision_verify_schema` → version 2, provider `supabase-postgres` | Version ≠ 2 |
-| C7 | Direct Machine logic | Sweep evaluations match existing `machine.sweep()` fields | Reimplemented health rules |
-| C8 | No pages | `GET /` and `GET /file-room/incident-command` on wake host → 404 JSON | HTML app or sign-in |
-| C9 | POST only | Non-POST on wake path → 405 JSON | GET sweep succeeds |
-| C10 | No query string | POST with `?secret=` rejected; secret not parsed from URL | Secret accepted from query |
-| C11 | Sanitized JSON | Response has no sweep secret, no `sb_secret_`, no stack | Leak |
-| C12 | Wrong secret writes nothing | Pre/post hydrate: evaluation count unchanged | Row created |
-| C13 | Provider cap before handler | Burst of unauthenticated POSTs is 429 at the **provider** with no function/Supabase write | Unlimited function hits on bad secrets |
-| C14 | App 401 still writes nothing | After provider allows one request, wrong secret → 401 JSON, no store write | 401 HTML or a store row |
-| C15 | Unique-success cap 18/hour | 19th **distinct** successful key in 60 minutes → 429; no extra evaluation | Cap 12 or replays counted |
-| C16 | Replay does not consume cap | Repeat same `idempotency-key` does not increase unique-success count | Replay counted as new wake |
-| C17 | Durable wake idempotency | Replay served from table `supervision_wake_idempotency` via RPCs `supervision_claim_wake_idempotency` and `supervision_complete_wake_idempotency`; process memory unused | Memory-only replay or heartbeat table `supervision_idempotency` reused |
-| C18 | Ran | One good POST → 200 Machine JSON + new evaluation in Supabase | 200 with no store write |
-| C19 | Store down after auth | Sanitized 503; **no claim** of a durable failed-to-run write | 200, HTML, or fake store receipt |
-| C20 | Never-ran is EVENTUAL | No POST in due window → later hydrate shows overdue; **not** certified as real-time | Called “independent alarm” |
-| C21 | Scheduler-death observer | Must remain **NOT RUN / unproven** this pass (L15) | Observer claimed without cert |
-| C22 | No duplicate incident/recovery | Second distinct good POST does not clone incidents/recoveries beyond Machine rules | Duplicate incident ids |
-| C23 | Incident Command | After wake, Command still initializes at schema 2 from live store | Schema mismatch / mix fixtures |
-| C24 | No scheduler connected | No cron/Build-A-Bot/Make | Scheduler added |
-| C25 | No extra vendors/DB | Only Netlify wake site + existing Supabase | Redis/new DB/Resend/etc. |
-| C26 | Rollback | Wake site removed; Studio private; schema 2 intact | Studio opened or schema dropped |
-| C27 | Bundle isolation | Wake artifact listing has no Studio page modules | Full Next app shipped |
+**Current blocker:** C13 WAITING ON NETLIFY SUPPORT. Authenticated wake (C18) is **NOT RUN** and blocked on C13. Scheduler (C24) is **NOT CONNECTED** and forbidden until C1–C20 pass. L15 / C21 remains unproven.
+
+| Id | Status | Proof | Pass condition | Fail / blocked |
+|----|--------|--------|----------------|----------------|
+| C1 | **PASS** | Private Studio stays Team-Login protected | Human still gets login wall on Studio host | Site made public |
+| C2 | **PASS** (unauthenticated boundary) | Wake origin has no Team Login | `POST` without secret → **401 JSON**, not HTML | 401 HTML (L14 recreated) |
+| C3 | NOT RUN | Not a proxy | Function source / logs show **zero** HTTP to private Studio host | Any `fetch` to Studio host |
+| C4 | NOT RUN | Auth before Machine init | Missing/wrong secret: no Supabase writes, no `sweep()` | Hydrate/sweep before auth |
+| C5 | NOT RUN | Same store | Wake write visible from private Incident Command live read | Divergent DB or JSON file |
+| C6 | NOT RUN | Schema 2 | `supervision_verify_schema` → version 2, provider `supabase-postgres` | Version ≠ 2 |
+| C7 | NOT RUN | Direct Machine logic | Sweep evaluations match existing `machine.sweep()` fields | Reimplemented health rules |
+| C8 | **PASS** (unauthenticated boundary: `GET /` → 404 JSON) | No pages | `GET /` and `GET /file-room/incident-command` on wake host → 404 JSON | HTML app or sign-in |
+| C9 | **PASS** (unauthenticated boundary) | POST only | Non-POST on wake path → 405 JSON | GET sweep succeeds |
+| C10 | NOT RUN | No query string | POST with `?secret=` rejected; secret not parsed from URL | Secret accepted from query |
+| C11 | **PASS** (unauthenticated boundary) | Sanitized JSON | Response has no sweep secret, no `sb_secret_`, no stack | Leak |
+| C12 | **PASS** (unauthenticated boundary) | Wrong secret writes nothing | Pre/post hydrate: evaluation count unchanged | Row created |
+| C13 | **WAITING ON NETLIFY SUPPORT** | Provider cap before handler | Burst of unauthenticated POSTs is 429 at the **provider** with no function/Supabase write | Unlimited function hits on bad secrets; 429 unproven |
+| C14 | **PASS** (unauthenticated boundary) | App 401 still writes nothing | After provider allows one request, wrong secret → 401 JSON, no store write | 401 HTML or a store row |
+| C15 | NOT RUN (blocked on C13) | Unique-success cap 18/hour | 19th **distinct** successful key in 60 minutes → 429; no extra evaluation | Cap 12 or replays counted |
+| C16 | NOT RUN (blocked on C13) | Replay does not consume cap | Repeat same `idempotency-key` does not increase unique-success count | Replay counted as new wake |
+| C17 | NOT RUN (blocked on C13) | Durable wake idempotency | Replay served from table `supervision_wake_idempotency` via RPCs `supervision_claim_wake_idempotency` and `supervision_complete_wake_idempotency`; process memory unused | Memory-only replay or heartbeat table `supervision_idempotency` reused |
+| C18 | **NOT RUN** (blocked on C13) | Ran | One good POST → 200 Machine JSON + new evaluation in Supabase | 200 with no store write |
+| C19 | NOT RUN (blocked on C13) | Store down after auth | Sanitized 503; **no claim** of a durable failed-to-run write | 200, HTML, or fake store receipt |
+| C20 | NOT RUN | Never-ran is EVENTUAL | No POST in due window → later hydrate shows overdue; **not** certified as real-time | Called “independent alarm” |
+| C21 | **NOT RUN / unproven** (L15) | Scheduler-death observer | Must remain **NOT RUN / unproven** this pass (L15) | Observer claimed without cert |
+| C22 | NOT RUN (blocked on C18) | No duplicate incident/recovery | Second distinct good POST does not clone incidents/recoveries beyond Machine rules | Duplicate incident ids |
+| C23 | NOT RUN (blocked on C18) | Incident Command | After wake, Command still initializes at schema 2 from live store | Schema mismatch / mix fixtures |
+| C24 | **NOT CONNECTED** | No scheduler connected | No cron/Build-A-Bot/Make. Forbidden until C1–C20 pass. | Scheduler added |
+| C25 | NOT RUN | No extra vendors/DB | Only Netlify wake site + existing Supabase | Redis/new DB/Resend/etc. |
+| C26 | NOT RUN | Rollback | Wake site removed; Studio private; schema 2 intact | Studio opened or schema dropped |
+| C27 | NOT RUN | Bundle isolation | Wake artifact listing has no Studio page modules | Full Next app shipped |
 
 **Stop rules**
 
 - Any 401 HTML on the **wake** origin → BLOCKED (L14 class). Do not rotate the sweep secret.  
 - Any proxy to the private host → FAIL. Remove the proxy. Do not “just add a token.”  
-- No provider request cap → do not ship.  
+- C13 provider 429 remains **unproven**. Do not retry the wake origin for C13 while Netlify Support is investigating.  
 - Do not connect a scheduler until C1–C20 pass. C21 stays unproven.
 
 ---
 
 ## Explicit non-goals
 
-- Do not implement or deploy in this recording.  
-- Do not merge, close the package, start L13, Board persistence, or mobile.  
+- Do not close the package or claim live-production certification.  
+- Do not contact either origin for C13 retries. Do not run authenticated wake until C13.  
+- Do not merge, start L13, Board persistence, or mobile.  
 - Do not open a new package.  
 - Do not rotate `STUDIO_OPERATING_SWEEP_SECRET` for L14.  
 - Do not claim an authenticated sweep pass or fail at the private Studio layer.

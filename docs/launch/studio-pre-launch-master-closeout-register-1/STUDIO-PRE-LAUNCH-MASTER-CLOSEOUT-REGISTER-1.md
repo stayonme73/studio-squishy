@@ -343,7 +343,7 @@ Exactly one per area:
 
 1. This register (ACTIVE — not execution)
 2. External Customer Content Intake and Rights Certification — COMPLETE_WITH_EXPLICIT_LIMITS
-3. Full mobile customer-journey certification — OPEN (opening only; live phone cert not stamped)
+3. Full mobile customer-journey certification — **PARKED** until Work Supervision closes (live phone cert not stamped). Current Room 4 execution is Work Supervision **OPEN / IN PROGRESS** (not a close stamp).
 
 ### B — Required before Owner-as-Customer Real Studio Campaign
 
@@ -402,7 +402,7 @@ Exactly one per area:
 
 **`STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`**
 
-Status: **OPEN / IN PROGRESS** (opening artifacts only; not implemented; not certified). Base: mobile park tip `bc458931`. Contract: `docs/launch/studio-operating-work-supervision-and-incident-escalation-1/STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-PACKAGE-CONTRACT.md`.
+Status: **OPEN / IN PROGRESS**. Wake runtime is implemented and deployed on a separate Netlify site. **C1 PASS** (private Studio still returns the Netlify human login wall). **C13 WAITING ON NETLIFY SUPPORT** (provider 429 unproven). Authenticated wake **NOT RUN** and blocked on C13. Scheduler **NOT CONNECTED** and forbidden until C1–C20 pass. L15 independent scheduler-death detection remains **unproven**. L13 Board durable repository is a later separate package. Main Studio Netlify builds are Owner-stated **STOPPED**. **Not** closed. **Not** live-production certified. Base: mobile park tip `bc458931`. Tip of record for this truth-sync: `7129b44c`. Contract: `docs/launch/studio-operating-work-supervision-and-incident-escalation-1/STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-PACKAGE-CONTRACT.md`.
 
 **`STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`** is **PARKED** (not closed). Readiness tip `b35c8aa2`. Park tip `bc458931`. Resume after supervision closes. Do **not** start the real-phone walk.
 

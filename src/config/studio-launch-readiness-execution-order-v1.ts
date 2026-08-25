@@ -15,7 +15,9 @@
  * CLOSED WITH EXPLICIT LIMITS at 15ee699c.
  * Tagia 2026-08-22 (later): Mobile Customer Journey Certification OPEN.
  * Tagia 2026-08-23: Mobile Customer Journey Certification PARKED. Work
- * Supervision and Incident Escalation OPEN (Foundation Pass 1 in progress).
+ * Supervision and Incident Escalation OPEN / IN PROGRESS (not opening-only).
+ * 2026-08-25: wake runtime implemented and deployed. C1 PASS. C13 WAITING
+ * ON NETLIFY SUPPORT. Authenticated wake NOT RUN. Scheduler NOT CONNECTED.
  * Room 4 remains OPEN. Do not start Room 5. Do not assign Room 4D / 4E.
  */
 
@@ -271,7 +273,7 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     configModule:
       "src/config/studio-pre-launch-master-closeout-register-v1.ts" as const,
     recommendedNextPackageId:
-      "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
+      "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
     recommendedNextPackageStatus: "OPEN" as const,
     doNotStartRecommendedNextInThisPackage: false as const,
     doNotOpenNextPackage: true as const,
@@ -358,6 +360,9 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     sectionClosed: false as const,
     openingArtifactsOnly: false as const,
     implementationAuthorized: true as const,
+    currentBlocker: "C13_WAITING_ON_NETLIFY_SUPPORT" as const,
+    wakeRuntimeImplementedAndDeployed: true as const,
+    launchProductionCertified: false as const,
     foundationPass: 1 as const,
     baseCommit: "bc458931c46ed845b982f62a4c70f8a312c169c8" as const,
     openedAt: "2026-08-23" as const,

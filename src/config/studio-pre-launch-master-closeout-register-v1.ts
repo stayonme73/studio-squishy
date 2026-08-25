@@ -234,11 +234,14 @@ export const studioPreLaunchMasterCloseoutRegisterV1 = {
     packageId:
       "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
     status: "OPEN" as const,
-    openingArtifactsOnly: true as const,
+    progress: "IN_PROGRESS" as const,
+    openingArtifactsOnly: false as const,
     doNotStartInThisPackage: false as const,
     doNotOpenNextPackage: true as const,
+    currentBlocker: "C13_WAITING_ON_NETLIFY_SUPPORT" as const,
+    mobilePackageStatus: "PARKED" as const,
     reason:
-      "Owner authorized parking mobile certification and opening one Room 4 supervision package. Opening artifacts only. Do not implement in this pass. Do not assign Room 4D/4E. Do not start Room 5. Mobile resumes after this package closes." as const,
+      "Current execution package is Work Supervision OPEN / IN PROGRESS. Wake runtime is implemented and deployed. C1 PASS. C13 WAITING ON NETLIFY SUPPORT. Authenticated wake NOT RUN. Scheduler NOT CONNECTED. Not closed. Not live-production certified. Do not assign Room 4D/4E. Do not start Room 5. Mobile stays PARKED until this package closes." as const,
   },
 
   sequenceGates: {

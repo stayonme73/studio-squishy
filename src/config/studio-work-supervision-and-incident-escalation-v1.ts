@@ -8,8 +8,14 @@
  * Do not connect Claude, Build-A-Bot, Make, or Resend.
  * Base: mobile park tip bc458931. Room 4 only. Do not assign Room 4D / 4E.
  * Do not merge. Do not start Room 5. Do not unpark mobile until this package closes.
- * Wake runtime: local implementation authorized 2026-08-24. Not deployed. Live C-rows remain NOT RUN.
- * L15: never-ran-on-hydrate is EVENTUAL; independent scheduler-death detection is unproven.
+ * Wake runtime: implemented and deployed on a separate Netlify site (not the private Studio host).
+ * C1 PASS: private Studio still returns the Netlify human login wall.
+ * C13 WAITING ON NETLIFY SUPPORT; provider 429 remains unproven.
+ * Authenticated wake NOT RUN and blocked on C13. Scheduler NOT CONNECTED
+ * and forbidden until C1–C20 pass. L15 independent scheduler-death detection unproven.
+ * L13 Board durable repository is a later separate package. Main Studio Netlify
+ * builds are Owner-stated STOPPED. Room 4 OPEN. Room 5 NOT_STARTED.
+ * No package close. No live-production certification claim.
  */
 
 export const studioWorkSupervisionAndIncidentEscalationV1 = {
@@ -38,6 +44,15 @@ export const studioWorkSupervisionAndIncidentEscalationV1 = {
   liveConnectorReady: true as const,
   liveTwoProcessProofPassed: true as const,
   launchProductionCertified: false as const,
+  currentBlocker: "C13_WAITING_ON_NETLIFY_SUPPORT" as const,
+  wakeRuntimeImplementedAndDeployed: true as const,
+  c1PrivateStudioTeamLogin: "PASS" as const,
+  c13Provider429: "WAITING_ON_NETLIFY_SUPPORT" as const,
+  authenticatedWake: "NOT_RUN" as const,
+  schedulerConnected: false as const,
+  l15IndependentSchedulerDeathDetection: "UNPROVEN" as const,
+  l13BoardDurableRepository: "LATER_SEPARATE_PACKAGE" as const,
+  mainStudioNetlifyBuild: "OWNER_STATED_STOPPED" as const,
   pass3LocalAccepted: true as const,
   pass3LocalAcceptedAt: "05509c9bc7d87d388002e11048ba416b80e80199" as const,
   persistenceProvider: "studio-data-json" as const,

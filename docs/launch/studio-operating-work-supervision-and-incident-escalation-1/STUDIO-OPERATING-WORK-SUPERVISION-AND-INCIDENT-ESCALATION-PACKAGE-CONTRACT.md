@@ -1,7 +1,7 @@
 # STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION — PACKAGE CONTRACT
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 accepted at `0dc76903`. Runtime Pass 2 accepted at `1f8e2600`. Durable Pass 3 accepted at `05509c9b` for local/controlled proof only. Pass 3B accepted at `7d0d4323` as the production guardrail. Pass 3C completes the live Supabase REST/RPC connector. **Not** live-certified. **Not** closed.  
+**Status:** **OPEN / IN PROGRESS** — Foundation Pass 1 accepted at `0dc76903`. Runtime Pass 2 accepted at `1f8e2600`. Durable Pass 3 accepted at `05509c9b` for local/controlled proof only. Pass 3B accepted at `7d0d4323` as the production guardrail. Pass 3C completes the live Supabase REST/RPC connector. Wake runtime is implemented and deployed. **C1 PASS.** **C13 WAITING ON NETLIFY SUPPORT.** Authenticated wake **NOT RUN.** Scheduler **NOT CONNECTED.** **Not** live-certified. **Not** closed.  
 **Opened:** 2026-08-23  
 **Base:** mobile park tip `bc458931c46ed845b982f62a4c70f8a312c169c8`  
 **Branch:** `operating/work-supervision-and-incident-escalation-1`  
@@ -44,7 +44,7 @@ Classify providers (memory = tests, JSON = local/controlled, Postgres = launch p
 
 ## What Pass 3C authorizes
 
-A real server-side Supabase Postgres connector on `SupervisionRepository`: schema verification, hydrate, transactional RPCs, and fail-closed launch selection. Current Secret Keys (`sb_secret_`) are sent only as `apikey`. The JWT `service_role` key is a documented compatibility fallback. A live two-process proof against the real database has passed with fictional Maple/Harbor records. This does **not** close the package. Do **not** connect Build-A-Bot. An external scheduler is still not authorized. **L14:** the private certification host’s Netlify Team Login blocked a noninteractive sweep POST (401 HTML) before Studio authentication. Keep the site private. Stop sweep tests on that host. Architecture for a non-proxy machine-only wake runtime is **conditionally approved**; do not build it until Tagia authorizes the implementation pass. Provider cap before handler auth; authenticated cap 18 unique successful wakes per rolling hour; durable table `supervision_wake_idempotency` plus claim/complete RPCs (no process memory). Store-down after auth: sanitized 503, no claimed durable failed-to-run write. See `MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md` and `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md`. **L15:** never-ran-on-hydrate is EVENTUAL detection; independent scheduler-death detection is unproven.
+A real server-side Supabase Postgres connector on `SupervisionRepository`: schema verification, hydrate, transactional RPCs, and fail-closed launch selection. Current Secret Keys (`sb_secret_`) are sent only as `apikey`. The JWT `service_role` key is a documented compatibility fallback. A live two-process proof against the real database has passed with fictional Maple/Harbor records. This does **not** close the package. Do **not** connect Build-A-Bot. An external scheduler is still not authorized. **L14:** the private certification host’s Netlify Team Login blocked a noninteractive sweep POST (401 HTML) before Studio authentication. Keep the site private. Stop sweep tests on that host. The non-proxy machine-only wake runtime is **implemented and deployed**. **C1 PASS.** **C13 WAITING ON NETLIFY SUPPORT**; provider 429 remains unproven. Authenticated wake **NOT RUN** and blocked on C13. Scheduler **NOT CONNECTED** and forbidden until C1–C20 pass. **L15:** never-ran-on-hydrate is EVENTUAL detection; independent scheduler-death detection is unproven. See `MACHINE-ONLY-WAKE-INGRESS-DECISION-NOTE.md` and `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md`.
 
 ## What this package still does **not** authorize
 
@@ -56,9 +56,10 @@ A real server-side Supabase Postgres connector on `SupervisionRepository`: schem
 - Rotating `STUDIO_OPERATING_SWEEP_SECRET` again because of L14  
 - Using a Netlify management API token as visitor authentication  
 - Claiming the authenticated sweep passed or failed at the Studio layer  
-- Connecting an external scheduler before a machine-only wake runtime exists and is certified  
+- Connecting an external scheduler before C1–C20 pass  
 - Proxying a second URL to the private Studio host  
-- Implementing the wake runtime before Tagia authorizes the build pass  
+- Claiming the wake runtime is live-production certified  
+- Running authenticated wake while C13 is WAITING ON NETLIFY SUPPORT  
 - Claiming never-ran-on-hydrate as independent real-time scheduler-death detection (L15)  
 - L13 / Board persistence work  
 - Merging  
@@ -90,6 +91,14 @@ A real server-side Supabase Postgres connector on `SupervisionRepository`: schem
 | Room 4 | OPEN |
 | Room 5 | NOT STARTED |
 | Mobile cert | PARKED at readiness `b35c8aa2`; park tip `bc458931` |
+| Wake runtime | Implemented and deployed; not live-production certified |
+| C1 | PASS — private Studio still returns the Netlify human login wall |
+| C13 | WAITING ON NETLIFY SUPPORT — provider 429 unproven |
+| Authenticated wake | NOT RUN — blocked on C13 |
+| Scheduler | NOT CONNECTED — forbidden until C1–C20 pass |
+| L15 | Unproven |
+| L13 Board durable repository | Later separate package |
+| Main Studio Netlify Build | Owner-stated STOPPED |
 | Gate X | CLOSED WITH EXPLICIT LIMITS |
 | Room 4B | CLOSED |
 | Room 4C | CLOSED WITH EXPLICIT LIMITS |

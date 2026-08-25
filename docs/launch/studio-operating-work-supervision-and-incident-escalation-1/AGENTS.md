@@ -11,7 +11,7 @@
 - Do not delete Pass 3 local evidence. Do not claim the JSON file store is launch-certified.  
 - Current Secret Keys (`sb_secret_`) go only in the `apikey` header. Do not send them as `Authorization: Bearer`. Do not expose secret keys to the browser. Object/file storage is not the incident database.  
 - Do not connect or claim Claude, Build-A-Bot, Make, or Resend.  
-- Do not add a scheduler connector until Tagia separately authorizes it **and** L14 is solved by the machine-only wake **runtime** in `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md`. That runtime must execute existing sweep logic against the same Supabase store and must not proxy to the private Studio host. Keep the Studio site private. Stop sweep tests on that host. Architecture is conditionally approved; **do not implement until Tagia authorizes the build pass.** Never-ran-on-hydrate is eventual only; independent scheduler-death detection is L15 and unproven.  
+- Do not add a scheduler connector until C1–C20 pass. The machine-only wake **runtime** in `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md` is implemented and deployed. It must execute existing sweep logic against the same Supabase store and must not proxy to the private Studio host. Keep the Studio site private. Stop sweep tests on that host. **C1 PASS.** **C13 WAITING ON NETLIFY SUPPORT.** Authenticated wake **NOT RUN**. Never-ran-on-hydrate is eventual only; independent scheduler-death detection is L15 and unproven.  
 - Do not start L13 / Board persistence from this recording.  
 - Mobile certification is PARKED; do not start the phone walk.  
 - Squishy Watchkeeper: `public/squishy/squishy-studio-guide-v1.png` only; CSS rings only; never on security incidents.  

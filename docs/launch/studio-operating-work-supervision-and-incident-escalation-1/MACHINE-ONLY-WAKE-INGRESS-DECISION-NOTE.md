@@ -1,12 +1,12 @@
 # Machine-only wake ingress — decision note
 
 **Package:** `STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1`  
-**Status:** PLANNING ONLY. **Architecture conditionally approved 2026-08-24. Not implemented. Not certified.**  
+**Status:** Wake runtime **implemented and deployed**. This note records the original L14 private-host proof. **Not** live-production certified. Package remains OPEN.  
 **Ledger:** L14 · L15  
-**Date:** 2026-08-24  
-**Verdict of the authenticated sweep proof:** **BLOCKED BY NETLIFY TEAM PROTECTION** — not a Studio-layer pass, not a Studio-layer fail.
+**Date:** 2026-08-24 (proof); truth-sync 2026-08-25  
+**Verdict of the authenticated sweep proof on the private Studio host:** **BLOCKED BY NETLIFY TEAM PROTECTION** — not a Studio-layer pass, not a Studio-layer fail. **C1 PASS** on 2026-08-25: cookie-free GET still returns the human login wall.
 
-**Owner decision:** a separate machine-only **wake runtime** is approved only if it executes existing Machine sweep logic against the same Supabase store and **never proxies** to the private Studio host. Implementation contract: `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md`. Do not build until Tagia authorizes that pass.
+**Owner decision:** a separate machine-only **wake runtime** must execute existing Machine sweep logic against the same Supabase store and **never proxy** to the private Studio host. That runtime is now implemented and deployed. Implementation contract: `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md`. **C13 WAITING ON NETLIFY SUPPORT.** Authenticated wake **NOT RUN**. Scheduler **NOT CONNECTED**.
 
 A second URL that forwards to the private host is rejected: it recreates L14.
 
@@ -37,9 +37,9 @@ This is **not** evidence that `STUDIO_OPERATING_SWEEP_SECRET` is wrong. Do not r
 1. The certification site must remain **private**. Do not make it public.
 2. An external watchdog must reach the sweep path **without a human login**.
 3. The current private-host configuration cannot satisfy both.
-4. Stop testing the sweep against this host until a separate machine-only wake ingress exists.
+4. Stop testing the sweep against the private Studio host. Wake runtime is implemented and deployed on a separate origin. **C13 WAITING ON NETLIFY SUPPORT.** Authenticated wake **NOT RUN**.
 
-The existing Machine sweep **logic** and the **Supabase** supervision store remain the system of record. The missing piece is a **thin wake runtime** on a dedicated origin that runs that logic itself. It is not a second Machine, not a second database, and not a proxy in front of Team Login.
+The existing Machine sweep **logic** and the **Supabase** supervision store remain the system of record. The wake runtime is a **thin HTTP entrance** on a dedicated origin that runs that logic itself. It is not a second Machine, not a second database, and not a proxy in front of Team Login.
 
 ---
 

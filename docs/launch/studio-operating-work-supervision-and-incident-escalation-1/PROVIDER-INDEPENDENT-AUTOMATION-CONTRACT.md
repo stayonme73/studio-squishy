@@ -14,24 +14,25 @@ The Machine remains the system of record. The automation provider is a wake mech
 6. Carry incident id, campaign id, and severity when waking an alert path.  
 7. Fail closed: a dead scheduler must itself become an incident.
 
-## Current blocker (L14)
+## Current blocker (C13 / L14)
 
-The private certification host requires human Netlify Team Login. An external watchdog needs noninteractive access. Those two requirements conflict on the current host.
+The private certification host requires human Netlify Team Login. **C1 PASS:** that wall still holds. An external watchdog must not use that host.
 
-Recorded 2026-08-24: `POST /api/operating/supervision/sweep` with `x-studio-operating-secret` and no query string received **401 HTML**. The Studio returned no Machine JSON. Studio service authentication never ran. This is **not** a mismatched sweep secret.
+Recorded 2026-08-24: `POST /api/operating/supervision/sweep` on the private Studio host with `x-studio-operating-secret` and no query string received **401 HTML**. The Studio returned no Machine JSON. Studio service authentication never ran. This is **not** a mismatched sweep secret.
 
-Until a separate machine-only wake **runtime** exists (see `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md`):
+The separate machine-only wake **runtime** now exists (see `MACHINE-ONLY-WAKE-RUNTIME-IMPLEMENTATION-CONTRACT.md`):
 
 - Keep the certification site private.
-- Stop sweep tests against that host.
+- Stop sweep tests against the private Studio host.
 - Do not rotate `STUDIO_OPERATING_SWEEP_SECRET` again for this failure.
 - Do not proxy to the private host from a second URL.
 - Do not use a Netlify management API token as visitor authentication.
 - Do not claim the authenticated sweep passed or failed at the Studio layer.
-- Do not connect a scheduler.
-- Do not implement the wake runtime until Tagia authorizes the build pass.
+- **C13 WAITING ON NETLIFY SUPPORT.** Provider 429 remains unproven. Do not retry the wake origin for C13.
+- Authenticated wake **NOT RUN** and blocked on C13.
+- Do not connect a scheduler until C1–C20 pass. L15 remains unproven.
 
-Wake-runtime contract corrections (planning only; not built):
+Wake-runtime contract (implemented and deployed; not live-production certified):
 
 - Provider request cap **before** handler authentication. Wrong-secret traffic is bounded with no Supabase write. Application still returns 401 JSON and writes nothing when the Studio secret is wrong.
 - Authenticated store-backed cap: **18 unique successful wakes per rolling hour**. Repeated idempotency keys do not consume additional capacity.
