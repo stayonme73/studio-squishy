@@ -11,9 +11,10 @@
   node_bundler = "esbuild"
 
 [functions.wake]
-  included_files = []
+  included_files = ["dist/lib/wake-runtime.mjs"]
 
 # C13: provider rate limit before the function. Available as code-based
 # function rateLimit on all Netlify plans (Free allows 2 rules/project).
-# This file documents the intended site wiring. The enforceable rule is
-# exported from src/netlify-entry.ts as config.rateLimit.
+# dist/functions/wake.mjs stays unbundled so Netlify can parse
+# export const config.rateLimit. The Machine handler is imported from
+# dist/lib/wake-runtime.mjs and is not a second function.

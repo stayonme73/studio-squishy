@@ -5,10 +5,12 @@ import { spawnSync } from "node:child_process";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repo = path.join(root, "..");
-const entry = path.join(root, "src", "netlify-entry.ts");
-const outfile = path.join(root, "dist", "functions", "wake.mjs");
+const handlerEntry = path.join(repo, "src", "lib", "studio-work-supervision", "wake-http.ts");
+const handlerOut = path.join(root, "dist", "lib", "wake-runtime.mjs");
+const functionOut = path.join(root, "dist", "functions", "wake.mjs");
 
-mkdirSync(path.dirname(outfile), { recursive: true });
+mkdirSync(path.dirname(handlerOut), { recursive: true });
+mkdirSync(path.dirname(functionOut), { recursive: true });
 mkdirSync(path.join(root, "dist", "public"), { recursive: true });
 writeFileSync(path.join(root, "dist", "public", ".gitkeep"), "");
 
@@ -17,11 +19,11 @@ const result = spawnSync(
   [
     "--yes",
     "esbuild",
-    entry,
+    handlerEntry,
     "--bundle",
     "--platform=node",
     "--format=esm",
-    `--outfile=${outfile}`,
+    `--outfile=${handlerOut}`,
     `--alias:@=${path.join(repo, "src")}`,
     "--packages=bundle",
   ],
@@ -34,4 +36,25 @@ if (result.status !== 0) {
   process.exit(result.status ?? 1);
 }
 
-process.stdout.write(`wake bundle written to ${path.relative(repo, outfile)}\n`);
+writeFileSync(
+  functionOut,
+  `import { handleWakeRequest } from "../lib/wake-runtime.mjs";
+
+export default async function wake(request) {
+  return handleWakeRequest(request);
+}
+
+export const config = {
+  path: "/*",
+  rateLimit: {
+    windowLimit: 60,
+    windowSize: 60,
+    aggregateBy: ["ip", "domain"],
+  },
+};
+`,
+);
+
+process.stdout.write(
+  `wake handler written to ${path.relative(repo, handlerOut)}\nwake entry written to ${path.relative(repo, functionOut)}\n`,
+);

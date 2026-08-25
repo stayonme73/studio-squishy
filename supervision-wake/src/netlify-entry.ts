@@ -1,7 +1,4 @@
-import {
-  handleWakeRequest,
-  SUPERVISION_WAKE_PROVIDER_RATE_LIMIT,
-} from "../../src/lib/studio-work-supervision/wake-http";
+import { handleWakeRequest } from "../../src/lib/studio-work-supervision/wake-http";
 
 export default async function wake(request: Request): Promise<Response> {
   return handleWakeRequest(request);
@@ -9,5 +6,9 @@ export default async function wake(request: Request): Promise<Response> {
 
 export const config = {
   path: "/*",
-  rateLimit: { ...SUPERVISION_WAKE_PROVIDER_RATE_LIMIT },
+  rateLimit: {
+    windowLimit: 60,
+    windowSize: 60,
+    aggregateBy: ["ip", "domain"],
+  },
 };

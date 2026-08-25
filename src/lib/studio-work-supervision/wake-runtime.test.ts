@@ -90,6 +90,18 @@ describe("machine-only wake runtime", () => {
     expect([...SUPERVISION_WAKE_PROVIDER_RATE_LIMIT.aggregateBy]).toEqual(["ip", "domain"]);
   });
 
+  it("keeps a literal Netlify config on the unbundled wake entry", () => {
+    const parseable =
+      /export\s+const\s+config\s*=\s*\{\s*path:\s*["']\/\*["']\s*,\s*rateLimit:\s*\{\s*windowLimit:\s*60\s*,\s*windowSize:\s*60\s*,\s*aggregateBy:\s*\[\s*["']ip["']\s*,\s*["']domain["']\s*\]/;
+    const source = readFileSync(
+      path.join(process.cwd(), "supervision-wake/src/netlify-entry.ts"),
+      "utf8",
+    );
+    expect(source).toMatch(parseable);
+    expect(source).not.toMatch(/rateLimit:\s*\{\s*\.\.\./);
+    expect(source).toContain("handleWakeRequest");
+  });
+
   it("returns 404 JSON for GET /", async () => {
     const response = await handleWakeRequest(sweepRequest({ method: "GET", path: "/" }));
     expect(response.status).toBe(404);
