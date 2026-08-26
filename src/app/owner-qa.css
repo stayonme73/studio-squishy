@@ -4,6 +4,8 @@
   bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   z-index: 120;
   font-family: var(--font-geist-sans), "Segoe UI", system-ui, sans-serif;
+  /* Wrapper must not steal taps from customer controls under the pill. */
+  pointer-events: none;
 }
 
 /*
@@ -45,6 +47,7 @@ body:has(.welcome-hall-phase1) .owner-qa__toggle:hover {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
   cursor: pointer;
   opacity: 0.82;
+  pointer-events: auto;
   /* Dev tool — keep quiet look; still accept finger / S Pen taps. */
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -58,16 +61,14 @@ body:has(.welcome-hall-phase1) .owner-qa__toggle:hover {
   background: color-mix(in srgb, var(--board-family-field) 94%, #fff 6%);
 }
 
-/* Conversation Room — keep Studio Review as a corner dev control
-   (not inside the customer Studio Controls strip). */
-body:has([data-layout="one-tablet"]) .owner-qa {
-  left: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  z-index: 140;
+/* Conversation Room — Studio Review is an in-flow Studio Controls item.
+   Never float a pill over Voice, Session, or customer content. */
+body:has([data-layout="one-tablet"]) .owner-qa:not(.owner-qa--open) {
+  display: none !important;
 }
 
 body:has([data-layout="one-tablet"]) .owner-qa__toggle {
-  display: inline-flex;
+  display: none !important;
 }
 
 .owner-qa--open .owner-qa__toggle {
@@ -78,6 +79,7 @@ body:has([data-layout="one-tablet"]) .owner-qa__toggle {
 
 .owner-qa__panel {
   position: absolute;
+  pointer-events: auto;
   left: 0;
   bottom: 100%;
   width: min(22rem, calc(100vw - 24px));
@@ -325,6 +327,15 @@ body:has([data-layout="one-tablet"]) .owner-qa__toggle {
     top: calc(0.65rem + env(safe-area-inset-top, 0px));
     bottom: auto;
     z-index: 10050;
+  }
+
+  /*
+   * Conversation Room phone — hide the floating host entirely.
+   * Studio Review is the last in-flow Studio Controls item. The open sheet
+   * still portals to body. Do not cover Voice, Session, or customer content.
+   */
+  body:has([data-layout="one-tablet"]) .owner-qa {
+    display: none !important;
   }
 
   .owner-qa__toggle {

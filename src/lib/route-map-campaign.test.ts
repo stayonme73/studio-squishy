@@ -130,6 +130,22 @@ describe("route-map-v1 config", () => {
     expect(i20Ids).toContain("v2-rtu-sms-kit");
   });
 
+  it("Promote Something Now offers Launch Now social posts and does not offer carousel", () => {
+    const jobs = getJobsForRoad("i20");
+    expect(jobs.some((job) => job.id === "v2-rtu-social-posts")).toBe(true);
+    expect(jobs.some((job) => job.name === "Make My Social Media Posts")).toBe(
+      true,
+    );
+    expect(
+      jobs.some(
+        (job) =>
+          /carousel/i.test(job.id) ||
+          /carousel/i.test(job.name) ||
+          job.deliverables.some((item) => /carousel/i.test(item)),
+      ),
+    ).toBe(false);
+  });
+
   it("redirects retired rm-j003/004/006 shelf IDs to V2 replacements", () => {
     expect(resolveRouteMapShelfJobId("rm-j003")).toBe("v2-rtu-social-posts");
     expect(resolveRouteMapShelfJobId("rm-j004")).toBe("v2-rtu-short-video");

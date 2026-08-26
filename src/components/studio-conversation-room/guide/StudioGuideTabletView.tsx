@@ -300,7 +300,9 @@ export default function StudioGuideTabletView({
                   );
                 })}
               </div>
-            ) : null}
+            ) : (
+              <p className={styles.hint}>{v.typedAnswerDockHint}</p>
+            )}
 
             {shouldShowDeadlineFormatHint(selectedBubbles) ? (
               <p className={styles.hint}>{v.deadlineFormatHint}</p>
@@ -308,24 +310,27 @@ export default function StudioGuideTabletView({
 
             {error ? <p className={styles.error}>{error}</p> : null}
 
-            <div className={styles.actions}>
-              {question.canSkip ? (
+            {question.bubbles.length > 0 ? (
+              <div className={styles.actions}>
+                {question.canSkip ? (
+                  <button
+                    type="button"
+                    className={styles.btnSecondary}
+                    onClick={onSkip}
+                  >
+                    {v.skipLabel}
+                  </button>
+                ) : null}
                 <button
                   type="button"
-                  className={styles.btnSecondary}
-                  onClick={onSkip}
+                  className={styles.btnPrimary}
+                  data-tablet-continue="true"
+                  onClick={onContinue}
                 >
-                  {v.skipLabel}
+                  {v.continueLabel}
                 </button>
-              ) : null}
-              <button
-                type="button"
-                className={styles.btnPrimary}
-                onClick={onContinue}
-              >
-                {v.continueLabel}
-              </button>
-            </div>
+              </div>
+            ) : null}
           </>
         ) : null}
 

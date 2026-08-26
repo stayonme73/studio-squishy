@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import ConversationNavPanel from "@/components/studio-conversation-room/ConversationNavPanel";
@@ -46,10 +45,8 @@ import {
 import {
   bootConversationProjectDraft,
   bridgeConversationPlanToCampaign,
-  clearCompletedConversationLocalState,
   clearConversationGuideLocals,
   guideDraftFromOpening,
-  isConversationJourneyComplete,
   openingFromGuideDraft,
   clearRouteRecommendation,
   persistAddService,
@@ -94,6 +91,8 @@ import {
   reconcileCheckoutClient,
   startHostedCheckout,
 } from "@/lib/studio-payment/client";
+import { revealConversationTablet } from "@/lib/studio-conversation-tablet-anchor";
+import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
 import { studioPaymentV1 } from "@/config/studio-payment-v1";
 import {
   assertPreAcceptanceAllowsPayment,
@@ -114,6 +113,7 @@ import {
 import {
   confirmGuideCaptureDraft,
   createEmptyGuideCaptureDraft,
+  guideHasReviewableAnswers,
   isAcceptableGuideDeadlineInput,
   startNewGuideCaptureConversation,
   type GuideCaptureDraftV1,
@@ -257,7 +257,6 @@ export default function ConversationRoomRuntime({
   inspectHardware = false,
   className,
 }: ConversationRoomRuntimeProps) {
-  const router = useRouter();
   const [state, dispatch] = useReducer(
     reduceConversationRoomState,
     initialState,
@@ -397,25 +396,14 @@ export default function ConversationRoomRuntime({
           : restored.flowStep,
     });
 
-    const forceFreshStart = isConversationJourneyComplete();
-    if (forceFreshStart) {
-      clearCompletedConversationLocalState();
-    }
-
-    const loadedGuide = forceFreshStart
-      ? createEmptyGuideCaptureDraft()
-      : (loadGuideDraft() ?? createEmptyGuideCaptureDraft());
+    const loadedGuide = loadGuideDraft() ?? createEmptyGuideCaptureDraft();
     const project = bootConversationProjectDraft(loadedGuide);
     const openingSlice = readOpeningAnswers(project);
     const guideFromProject = guideDraftFromOpening(openingSlice);
-    const hydratedGuide = forceFreshStart
-      ? loadedGuide
-      : guideFromProject.projectNeed.trim()
-        ? guideFromProject
-        : loadedGuide;
-    const restoredStage = forceFreshStart
-      ? ("opening" as ConversationRoomStage)
-      : resolveBootStage(project, initialStage);
+    const hydratedGuide = guideFromProject.projectNeed.trim()
+      ? guideFromProject
+      : loadedGuide;
+    const restoredStage = resolveBootStage(project, initialStage);
     const bootProject =
       restoredStage === readConversationStage(project)
         ? project
@@ -468,9 +456,6 @@ export default function ConversationRoomRuntime({
      * Voice is On — never before the preference choice, never when Off.
      */
     let invite = consumeStudioVoiceInvite();
-    if (forceFreshStart && invite === "resume") {
-      invite = "start";
-    }
     let inviteLine: string | null = null;
     if (invite === "start" && restoredStage === "opening") {
       inviteLine = spokenLineForGuideStep(openStep, false);
@@ -541,10 +526,14 @@ export default function ConversationRoomRuntime({
     window.setTimeout(() => setSavedPulse(false), 1600);
   }
 
-  function goToStep(next: GuideConversationStep, nextDraft = draft) {
+  function goToStep(
+    next: GuideConversationStep,
+    nextDraft = draft,
+    options?: { correcting?: boolean },
+  ) {
     setStep(next);
     writeGuideUiStep(next);
-    setCorrecting(false);
+    setCorrecting(options?.correcting ?? false);
     setAskMode(false);
     setShowDateField(false);
     setSelectedBubbles([]);
@@ -572,8 +561,11 @@ export default function ConversationRoomRuntime({
     pulseSaved();
   }
 
-  function setStageAndPersist(nextStage: ConversationRoomStage) {
-    const base = projectDraft ?? bootConversationProjectDraft(draft);
+  function setStageAndPersist(
+    nextStage: ConversationRoomStage,
+    guide = draft,
+  ) {
+    const base = projectDraft ?? bootConversationProjectDraft(guide);
     const nextProject = persistConversationStage(base, nextStage);
     setProjectDraft(nextProject);
     setStage(nextStage);
@@ -1388,8 +1380,7 @@ export default function ConversationRoomRuntime({
   function handleCorrect() {
     closeActivityPanel();
     setStageAndPersist("opening");
-    goToStep("summary", draft);
-    setCorrecting(true);
+    goToStep("summary", draft, { correcting: true });
     speakStudioLine(conversationRoomGuideV1.correctionPrompt);
   }
 
@@ -1398,20 +1389,40 @@ export default function ConversationRoomRuntime({
     speakGuideStep(target);
   }
 
-  function handleChangeAnswer() {
-    closeActivityPanel();
-    setStageAndPersist("opening");
-    goToStep("summary", draft);
-    setCorrecting(true);
-    speakStudioLine(conversationRoomGuideV1.correctionPrompt);
+  function latestGuideDraft(): GuideCaptureDraftV1 {
+    const stored = loadGuideDraft();
+    if (guideHasReviewableAnswers(stored)) return stored;
+    return draft;
   }
 
-  /** Control strip — show the tablet summary (not a second Activity Panel). */
-  function handleReviewAnswers() {
+  function handleChangeAnswer() {
+    const latest = latestGuideDraft();
+    if (!guideHasReviewableAnswers(latest)) {
+      setError("I don’t have a saved answer to change yet.");
+      return;
+    }
     closeActivityPanel();
-    setStageAndPersist("opening");
-    goToStep("summary", draft);
-    setCorrecting(false);
+    persistGuideDraft(latest);
+    setDraft(latest);
+    setStageAndPersist("opening", latest);
+    goToStep("summary", latest, { correcting: true });
+    speakStudioLine(conversationRoomGuideV1.correctionPrompt);
+    revealConversationTablet();
+  }
+
+  /** Control strip — show the tablet summary from stored answers, not a second panel. */
+  function handleReviewAnswers() {
+    const latest = latestGuideDraft();
+    if (!guideHasReviewableAnswers(latest)) {
+      setError("I don’t have saved answers to review yet.");
+      return;
+    }
+    closeActivityPanel();
+    persistGuideDraft(latest);
+    setDraft(latest);
+    setStageAndPersist("opening", latest);
+    goToStep("summary", latest);
+    revealConversationTablet();
   }
 
   function handleStartNew() {
@@ -1433,7 +1444,10 @@ export default function ConversationRoomRuntime({
   function handleReturnToLobby() {
     const result = returnToLobby(state);
     dispatch({ type: "return-to-lobby" });
-    router.push(result.lobbyRoute);
+    /* Full navigation — router.push races on Samsung and leaves Close conversation dead. */
+    window.location.assign(
+      withStudioPaymentSandboxQuery(result.lobbyRoute, window.location.search),
+    );
   }
 
   function stopStudioSpeech() {
@@ -1648,7 +1662,7 @@ export default function ConversationRoomRuntime({
     (question.canSkip === false || question.step === "ask_business_name");
 
   const canChangeAnswer =
-    Boolean(draft.projectNeed.trim()) ||
+    guideHasReviewableAnswers(draft) ||
     step === "summary" ||
     step === "confirmed" ||
     stage !== "opening";
@@ -1718,9 +1732,7 @@ export default function ConversationRoomRuntime({
         <ConversationNavPanel
           canChangeAnswer={canChangeAnswer}
           summaryOpen={
-            stage === "opening" &&
-            (step === "summary" || step === "confirmed") &&
-            !correcting
+            stage === "opening" && step === "summary" && !correcting
           }
           onAskQuestion={() => {
             setAskMode(true);

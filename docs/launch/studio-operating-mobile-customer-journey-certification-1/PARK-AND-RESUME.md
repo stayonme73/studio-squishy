@@ -1,9 +1,18 @@
 # Mobile Customer Journey Certification — PARK AND RESUME
 
-**Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`  
-**Classification:** **PARKED — BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION**  
+**Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`
+
+**Current (2026-08-25):** Tagia unparked this package. The live Samsung run is **OPEN / IN PROGRESS**, **not closed**, **not certified**. Stopping point: `2026-08-25-STOPPING-POINT-CHECKPOINT.md`. Next phone action: Close and reopen Choose your services → scroll → Add to Project on Make My Social Media Posts.
+
+The 2026-08-23 park below is historical. Do not treat it as the current execution state.
+
+---
+
+**Historical park record**
+
+**Classification (2026-08-23):** **PARKED — BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION**  
 **Parked:** 2026-08-23  
-**Not closed.** Real-phone certification remains **NOT STARTED**.
+**Unparked:** 2026-08-25 (Owner). Real-phone certification remains **not stamped**.
 
 ---
 
@@ -60,6 +69,6 @@ See `SUPERVISION-DEPENDENCY-AUDIT.md` in this folder. Short form:
 
 ---
 
-## What Tagia does **not** do now
+## What Tagia did **not** do at the 2026-08-23 park
 
-Do not begin the real-phone walk. Do not reopen this package until the supervision package is closed or the Owner separately unparks it.
+Do not treat the 2026-08-23 park as current. Owner unparked on 2026-08-25. Current next phone action is in `2026-08-25-STOPPING-POINT-CHECKPOINT.md`.

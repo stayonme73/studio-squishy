@@ -3,8 +3,12 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { STUDIO_GUIDE_CAPTURE_STORAGE_KEY } from "@/config/studio-guide-conversation-v1";
 import {
   GUIDE_STEP_STORAGE_KEY,
+  applyGuideAnswerToDraft,
+  clearGuideUiStep,
   nextGuideStep,
   processGuideHardNavSearchParams,
+  resolveGuideOpenStep,
+  writeGuideUiStep,
 } from "@/lib/studio-guide-hard-nav";
 
 function mockStorage() {
@@ -125,5 +129,42 @@ describe("studio-guide-hard-nav", () => {
     if (confirm.kind !== "advanced") return;
     expect(confirm.step).toBe("confirmed");
     expect(confirm.draft.confirmedAt).toBeTruthy();
+  });
+
+  it("does not rewind confirmed answers to the first name question", () => {
+    clearGuideUiStep();
+    writeGuideUiStep("ask_preferred_name");
+    const draft = {
+      schemaVersion: 1 as const,
+      preferredName: "Mira",
+      projectNeed: "Campaign graphics for Pine & Petal Market",
+      businessName: "Pine & Petal Market",
+      requestedDeadline: "Within 1 month",
+      deadlineStatus: "unconfirmed" as const,
+      existingMaterialsNote: "",
+      confirmedAt: "2026-08-25T22:00:00.000Z",
+      source: "lobby-guide-conversation" as const,
+    };
+    expect(resolveGuideOpenStep(new URLSearchParams(), draft)).toBe("confirmed");
+  });
+
+  it("changing one answer keeps the rest of the captured draft", () => {
+    const draft = {
+      schemaVersion: 1 as const,
+      preferredName: "Maya",
+      projectNeed: "Campaign graphics for Maya’s Mobile Boutique",
+      businessName: "Maya’s Mobile Boutique",
+      requestedDeadline: "Within 1 month",
+      deadlineStatus: "unconfirmed" as const,
+      existingMaterialsNote: "Logo files",
+      confirmedAt: "2026-08-25T23:00:00.000Z",
+      source: "lobby-guide-conversation" as const,
+    };
+    const next = applyGuideAnswerToDraft(draft, "ask_preferred_name", "Maya Chen", false);
+    expect(next.preferredName).toBe("Maya Chen");
+    expect(next.projectNeed).toBe(draft.projectNeed);
+    expect(next.businessName).toBe(draft.businessName);
+    expect(next.requestedDeadline).toBe(draft.requestedDeadline);
+    expect(next.existingMaterialsNote).toBe(draft.existingMaterialsNote);
   });
 });

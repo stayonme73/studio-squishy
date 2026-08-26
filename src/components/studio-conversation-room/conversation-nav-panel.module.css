@@ -85,6 +85,8 @@
   text-align: left;
   text-decoration: none;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .navBtn:hover:not(:disabled) {

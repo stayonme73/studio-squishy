@@ -1,7 +1,8 @@
 /**
  * Mobile Customer Journey Certification.
- * PARKED 2026-08-23 — blocked by missing independent supervision and incident
- * escalation. Not closed. Real-phone certification NOT STARTED.
+ * Unparked 2026-08-25 for a live Samsung run. OPEN / IN PROGRESS.
+ * Not closed. Real-phone certification not stamped.
+ * Stopping point: 2026-08-25-STOPPING-POINT-CHECKPOINT.md.
  * Readiness tip b35c8aa2. Room 4 only. Do not assign Room 4D / 4E.
  * Do not merge. Do not start Room 5.
  */
@@ -14,12 +15,13 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   roomId: "full-business-rehearsal" as const,
   sectionId: "mobile-customer-journey-certification" as const,
   title: "Mobile Customer Journey Certification" as const,
-  status: "PARKED" as const,
+  status: "OPEN" as const,
   parkClassification:
     "BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION" as const,
   sectionClosed: false as const,
   parkedAt: "2026-08-23" as const,
-  livePhoneCertification: "NOT_STARTED" as const,
+  unparkedAt: "2026-08-25" as const,
+  livePhoneCertification: "IN_PROGRESS_NOT_CERTIFIED" as const,
   readinessTip: "b35c8aa2c2fdc7b1f1f5161d38479fdded0e5361" as const,
   resumeAfterPackageId:
     "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
@@ -123,7 +125,11 @@ export const studioMobileCustomerJourneyCertificationV1 = {
 
   openingArtifactsOnly: false as const,
   readinessPassComplete: true as const,
-  readinessStatus: "PARKED_BEFORE_OWNER_PHONE_RUN" as const,
+  readinessStatus: "LIVE_PHONE_RUN_STOPPED_AT_CHECKPOINT" as const,
+  stoppingPointCheckpointDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-25-STOPPING-POINT-CHECKPOINT.md" as const,
+  nextPhoneAction:
+    "Close and reopen Choose your services → scroll → Add to Project on Make My Social Media Posts" as const,
   parkAndResumeDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/PARK-AND-RESUME.md" as const,
   supervisionDependencyAuditDoc:
@@ -136,5 +142,5 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   journeyRouteMapDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/JOURNEY-ROUTE-AND-CONTROL-MAP.md" as const,
   recommendedFirstExecutionStep:
-    "Do not begin the real-phone walk. Resume this package from readiness tip b35c8aa2 only after STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1 closes." as const,
+    "Close and reopen Choose your services → scroll → Add to Project on Make My Social Media Posts. Do not restart the hire. Package is not closed." as const,
 } as const;

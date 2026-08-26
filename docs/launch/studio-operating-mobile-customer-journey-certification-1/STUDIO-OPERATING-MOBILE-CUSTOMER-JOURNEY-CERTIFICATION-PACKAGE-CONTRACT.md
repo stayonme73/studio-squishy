@@ -1,7 +1,7 @@
 # STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION — PACKAGE CONTRACT
 
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`  
-**Status:** **PARKED — BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION** (not closed; real-phone certification **not** stamped)  
+**Status:** **OPEN / IN PROGRESS** (unparked 2026-08-25; not closed; real-phone certification **not** stamped). Stopping point: `2026-08-25-STOPPING-POINT-CHECKPOINT.md`.  
 **Base commit:** `15ee699c7d16331b3f410871f02555841fddd4d6` (Gate X close)  
 **Base branch:** `operating/external-customer-content-intake-and-rights-certification-1`  
 **Opened:** 2026-08-22  
@@ -115,6 +115,7 @@ Authorized after opening. Prepares the live journey so Tagia can test on her act
 | Park and resume | `PARK-AND-RESUME.md` |
 | Supervision audit | `SUPERVISION-DEPENDENCY-AUDIT.md` |
 | Temporary HTTPS stop | `TEMPORARY-HTTPS-STOP-RECORD.md` |
+| 2026-08-25 stopping point | `2026-08-25-STOPPING-POINT-CHECKPOINT.md` |
 | Phone access | `PHONE-ACCESS-METHOD.md` |
 | Route / control map | `JOURNEY-ROUTE-AND-CONTROL-MAP.md` |
 | Defect ledger | `DEFECT-LEDGER.md` |

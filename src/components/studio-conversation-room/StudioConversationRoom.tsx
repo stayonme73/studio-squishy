@@ -236,6 +236,7 @@ export default function StudioConversationRoom({
 
           <div
             className={styles.surfaceStack}
+            id="conversation-room-tablet"
             data-studio-surface="tablet"
             data-halo={tabletHalo}
           >

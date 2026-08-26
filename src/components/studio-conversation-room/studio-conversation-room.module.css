@@ -160,6 +160,10 @@
   min-width: 0;
 }
 
+.surfaceStack {
+  scroll-margin-top: 0.75rem;
+}
+
 .surfaceStack > :first-child {
   width: 100%;
   min-width: 100%;
@@ -295,6 +299,8 @@
 }
 
 .slideHost > :not(.srOnly) {
+  display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
@@ -351,12 +357,24 @@
     /*
      * Leave the upper Presentation tablet band clear so Checkout / Intake
      * tablet CTAs stay reachable. Panel sits between that band and the
-     * Session reserve (CR-4R4). Content scrolls inside the host.
+     * Session reserve (CR-4R4). Use an explicit height so the inner list
+     * can scroll — height:auto + overflow:hidden clipped service cards
+     * on Samsung (MJ-D7).
      */
     top: min(38dvh, 20rem);
     bottom: max(14rem, 34dvh);
-    height: auto;
-    max-height: calc(100dvh - min(38dvh, 20rem) - max(14rem, 34dvh));
+    height: calc(100dvh - min(38dvh, 20rem) - max(14rem, 34dvh));
+    max-height: none;
+  }
+
+  /*
+   * Choose-your-services / route peek need a visible job list. The 38dvh
+   * tablet band is already used (Open service list). Keep Session clear.
+   */
+  .slideHost[data-panel="builder"],
+  .slideHost[data-panel="route"] {
+    top: min(10dvh, 4.5rem);
+    height: calc(100dvh - min(10dvh, 4.5rem) - max(14rem, 34dvh));
   }
 
   /*
@@ -389,5 +407,10 @@
     right: 0;
     top: min(38dvh, 20rem);
     bottom: max(14rem, 34dvh);
+  }
+
+  .room[data-slide-open="true"][data-active-panel="builder"] .slideScrim,
+  .room[data-slide-open="true"][data-active-panel="route"] .slideScrim {
+    top: min(10dvh, 4.5rem);
   }
 }

@@ -9,6 +9,7 @@ import {
   confirmGuideCaptureDraft,
   createEmptyGuideCaptureDraft,
   getGuideConversationResumeStep,
+  guideHasReviewableAnswers,
   isAcceptableGuideDeadlineInput,
   normalizeGuideCaptureDraft,
   readGuideCaptureDraft,
@@ -116,6 +117,18 @@ describe("studio-guide-capture Phase 1A", () => {
     expect(isAcceptableGuideDeadlineInput("September 15, 2026")).toBe(true);
     expect(isAcceptableGuideDeadlineInput("09/15/2026")).toBe(true);
     expect(isAcceptableGuideDeadlineInput("2026-09-15")).toBe(true);
+  });
+
+  it("treats confirmed opening answers as reviewable", () => {
+    expect(guideHasReviewableAnswers(createEmptyGuideCaptureDraft())).toBe(false);
+    expect(
+      guideHasReviewableAnswers({
+        ...createEmptyGuideCaptureDraft(),
+        preferredName: "Mira",
+        projectNeed: "Campaign graphics",
+        confirmedAt: "2026-08-25T22:00:00.000Z",
+      }),
+    ).toBe(true);
   });
 });
 

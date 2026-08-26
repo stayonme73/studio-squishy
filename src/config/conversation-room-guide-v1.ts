@@ -266,6 +266,9 @@ export const conversationRoomGuideV1 = {
   /** Shown on required guide answers (preferred name cannot be skipped). */
   answerRequiredLabel: "Required",
   typeRequiredEmptyHint: "This answer is required.",
+  /** Typed-only questions — tablet shows the question; Speak/Type owns Continue. */
+  typedAnswerDockHint:
+    "Type or speak your answer in the field below, then tap Continue there.",
   /** Always-on strip — customer can ask or speak even after guide questions end. */
   communicationLabel: "Talk with the Studio",
   askAnythingPlaceholder: "Ask a question or tell the Studio something",

@@ -126,6 +126,19 @@ export function startNewGuideCaptureConversation(): GuideCaptureDraftV1 {
   return createEmptyGuideCaptureDraft();
 }
 
+/** True when Review Answers / Change an answer have something to show. */
+export function guideHasReviewableAnswers(
+  draft: GuideCaptureDraftV1 | null | undefined,
+): draft is GuideCaptureDraftV1 {
+  if (!draft) return false;
+  return Boolean(
+    draft.confirmedAt ||
+      draft.projectNeed.trim() ||
+      draft.preferredName.trim() ||
+      draft.businessName.trim(),
+  );
+}
+
 /** Resume step when the Guide panel opens against stored draft state. */
 export function getGuideConversationResumeStep(
   draft: GuideCaptureDraftV1 | null,

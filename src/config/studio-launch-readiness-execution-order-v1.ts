@@ -16,6 +16,8 @@
  * Tagia 2026-08-22 (later): Mobile Customer Journey Certification OPEN.
  * Tagia 2026-08-23: Mobile Customer Journey Certification PARKED — blocked by
  * missing independent supervision and incident escalation. Not closed.
+ * Tagia 2026-08-25: Mobile unparked. Live Samsung run OPEN / IN PROGRESS,
+ * not closed, not certified. Stopping point 2026-08-25-STOPPING-POINT-CHECKPOINT.md.
  * Room 4 remains OPEN. Do not start Room 5. Do not assign Room 4D / 4E.
  */
 
@@ -42,7 +44,7 @@ export const studioLaunchReadinessExecutionOrderV1 = {
   currentActiveRoomClosed: false as const,
   currentActiveSectionId:
     "mobile-customer-journey-certification" as const,
-  currentActiveSectionStatus: "PARKED" as const,
+  currentActiveSectionStatus: "OPEN" as const,
 
   lastCustomerLifePackage: {
     id: "STUDIO-OPERATING-FULL-CUSTOMER-LIFE-AND-COMMUNICATION-1",
@@ -311,15 +313,16 @@ export const studioLaunchReadinessExecutionOrderV1 = {
     packageId:
       "STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1" as const,
     title: "Mobile Customer Journey Certification" as const,
-    status: "PARKED" as const,
+    status: "OPEN" as const,
     parkClassification:
       "BLOCKED BY MISSING INDEPENDENT SUPERVISION AND INCIDENT ESCALATION" as const,
     sectionClosed: false as const,
     baseCommit: "15ee699c7d16331b3f410871f02555841fddd4d6" as const,
     openedAt: "2026-08-22" as const,
     parkedAt: "2026-08-23" as const,
+    unparkedAt: "2026-08-25" as const,
     readinessTip: "b35c8aa2c2fdc7b1f1f5161d38479fdded0e5361" as const,
-    livePhoneCertification: "NOT_STARTED" as const,
+    livePhoneCertification: "IN_PROGRESS_NOT_CERTIFIED" as const,
     resumeAfterPackageId:
       "STUDIO-OPERATING-WORK-SUPERVISION-AND-INCIDENT-ESCALATION-1" as const,
     registerRequirement: "FULL_MOBILE_CUSTOMER_JOURNEY_CERTIFICATION" as const,

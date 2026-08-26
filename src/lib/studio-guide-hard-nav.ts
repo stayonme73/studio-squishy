@@ -9,6 +9,7 @@ import { isGuideRelativeDeadlineChoice } from "@/config/conversation-room-guide-
 import {
   confirmGuideCaptureDraft,
   createEmptyGuideCaptureDraft,
+  getGuideConversationResumeStep,
   isAcceptableGuideDeadlineInput,
   normalizeGuideCaptureDraft,
   readGuideCaptureDraft,
@@ -385,12 +386,19 @@ export function resolveGuideOpenStep(
   if (isGuideConversationStep(urlStep)) return urlStep;
 
   const stored = readGuideUiStep();
+  const resume = getGuideConversationResumeStep(draft);
+  /*
+   * Remount / HMR / Lobby round-trip can leave ui-step on the first name
+   * question while confirmed answers are still stored. Do not rewind.
+   */
+  if (
+    stored === "ask_preferred_name" &&
+    (resume === "summary" || resume === "confirmed")
+  ) {
+    return resume;
+  }
   if (stored) return stored;
-
-  if (draft?.confirmedAt) return "confirmed";
-  if (draft?.projectNeed.trim()) return "summary";
-  if (draft?.preferredName.trim()) return "ask_project_need";
-  return "ask_preferred_name";
+  return resume;
 }
 
 export function toServerHardNav(result: GuideHardNavResult): GuideServerHardNav {

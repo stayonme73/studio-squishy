@@ -463,10 +463,13 @@
   flex-direction: column;
   gap: 0.55rem;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0.35rem;
   overflow: auto;
   min-height: 0;
   flex: 1 1 auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .routeCard {
@@ -678,6 +681,36 @@
 
 .sheet[data-panel="builder"] .jobList {
   gap: 0.75rem;
+}
+
+@media (max-width: 960px) {
+  .sheet[data-panel="builder"] {
+    gap: 0.5rem;
+  }
+
+  .sheet[data-panel="builder"] .header,
+  .sheet[data-panel="builder"] .intro,
+  .sheet[data-panel="builder"] .builderToolbar {
+    flex: 0 0 auto;
+  }
+
+  .sheet[data-panel="builder"] .title {
+    font-size: 1.28rem;
+  }
+
+  .sheet[data-panel="builder"] .intro {
+    font-size: 0.98rem;
+  }
+
+  .sheet[data-panel="builder"] .jobList {
+    min-height: 12rem;
+  }
+
+  .sheet[data-panel="route-peek"] .routeJobPeekList {
+    min-height: 10rem;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 .sheet[data-panel="builder"] .jobCard {
