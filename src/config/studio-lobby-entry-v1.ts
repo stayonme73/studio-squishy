@@ -59,10 +59,61 @@ export const studioLobbyEntryV1 = {
     helpCenter: "/help-center?from=studio-lobby",
     /** Full navigation fallback when Lobby client handlers do not attach. */
     beginNew: "/lobby-entry/begin-new",
+    /**
+     * Customer front door. Close conversation / Return to Lobby / Studio Review
+     * Lobby must use this so visit state cannot skip the Entry Film.
+     */
+    frontDoor: "/studio-lobby?lobbyEntry=reset",
   },
 } as const;
 
 export type LobbyEntryChoice = "new-to-studio";
+
+/** Matches Lobby film phone CSS (`max-width: 1024px`). */
+export const LOBBY_ENTRY_PHONE_MAX_WIDTH_PX = 1024;
+
+/**
+ * MJ-D11: on phone the Entry Film is the only Lobby landing.
+ * A stored New-to-the-Studio visit must not unlock the cropped lounge.
+ */
+export function shouldForceLobbyEntryFilmOnPhone(input: {
+  transitioning: boolean;
+  viewportWidth: number;
+}): boolean {
+  void input.transitioning;
+  if (input.viewportWidth > LOBBY_ENTRY_PHONE_MAX_WIDTH_PX) return false;
+  return true;
+}
+
+/**
+ * Phone surface after any Lobby route/state combination.
+ * `choseNew`, `filmDismissed`, and in-flight Let’s Get Started must not
+ * present the cropped clock landing — keep the Entry Film until the next
+ * route actually paints.
+ */
+export function resolvePhoneLobbySurface(input: {
+  viewportWidth: number;
+  transitioning: boolean;
+  choseNew: boolean;
+  filmDismissed: boolean;
+}): "entry-film" {
+  void input.choseNew;
+  void input.filmDismissed;
+  void input.transitioning;
+  void input.viewportWidth;
+  return "entry-film";
+}
+
+/** Desktop-only leftover control. Never a phone landing state. */
+export function shouldShowLobbyEntryReopen(input: {
+  filmVisible: boolean;
+  transitioning: boolean;
+  viewportWidth: number;
+}): boolean {
+  if (input.filmVisible || input.transitioning) return false;
+  if (input.viewportWidth <= LOBBY_ENTRY_PHONE_MAX_WIDTH_PX) return false;
+  return true;
+}
 
 /** Session only — a leftover cookie must not unlock the Lobby by itself. */
 export function readLobbyEntryChoice(): LobbyEntryChoice | null {

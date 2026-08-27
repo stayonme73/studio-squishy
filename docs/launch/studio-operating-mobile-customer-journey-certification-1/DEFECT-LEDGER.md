@@ -87,6 +87,164 @@
 
 ---
 
+## MJ-D8 — Bubble choices on “What are you working on?” do not respond on Samsung
+
+**Status:** OPEN — first pointerup patch failed real-phone retest 2026-08-26.
+
+**Found:** Live HTTPS phone run. After Maya’s name, the tablet showed `ask_project_need` (“What are you working on?”) with bubble choices. Taps on Tagia’s real Samsung did not select a chip.
+
+**First patch (failed):** Native `pointerup` on the chip, skipping `pointerType === "mouse"`. Real Samsung still no-op after refresh. Session Review Answers had looked like the same class of fix, but those controls are `<a href="#conversation-room-tablet">` outside the tablet glass — native hash navigation can succeed even when JS click never fires.
+
+**Revised cause (evidence in source):**
+1. Overlay intercept: when Voice preference shares the glass (`voiceNarration === null` on first paint, and whenever the customer typed via Speak/Type without tapping Use Voice / Fill it out myself), `.hostSurface > *:not(:only-child):last-child` and `… last-child *` set `pointer-events: none`. The question + chips are that last child. The tapped node never receives pointerdown/pointerup/click. Session still works because it is not inside this glass.
+2. Unstable listener: `useLayoutEffect` with no dependency array rebound `pointerup` on every Conversation Room render (presence/speech). Mid-gesture rebind can drop the event.
+3. `pointerType === "mouse"` skip: Samsung often reports a finger as mouse, so the remaining handler returned without activating. Buttons have no href fallback.
+
+**Fix:** Remove last-child `pointer-events: none`. Keep Voice preference on top with `z-index: 5` only. Stable callback-ref `pointerdown` (do not skip mouse; de-dupe the later click).
+
+**Retest:** Folded into MJ-D9 real-phone walkthrough. Do not isolate this as a single-chip tap test.
+
+---
+
+## MJ-D9 — Mobile Conversation Room coherence (Voice late, split question, invisible selected bubble, stale onboarding)
+
+**Status:** OPEN — correction ready for a materially different real-phone walkthrough. Not certified. Not closed.
+
+**Found:** 2026-08-26 full Samsung walkthrough. Pieces worked separately; they did not read as one question. Tagia stopped the hire here.
+
+**Causes:**
+1. Voice first-entry (`Welcome — how would you like to continue?`) was a sibling of the active question, so onboarding stayed on screen after the customer had already typed a name via Speak/Type. Voice On/Off then moved to the side rail, which phones stack *under* the tablet — Voice appeared late.
+2. Speak/Type, Required, the type field, and Continue lived in that same side rail. The tablet held the heading/chips. One answer required scrolling between two rooms.
+3. Continue was on the tablet only when chips existed (MJ-D6) and always on the dock — two locations.
+4. Selected chip CSS was a faint gold tint, and `.chip:hover` (same specificity, later in the file) overrode the selected border. Samsung sticky-hover made a selected bubble look unselected even though `writeTextDraft` filled the lower field.
+5. “This answer is required” keyed off an empty type field, not off an accepted bubble.
+
+**Fix (smallest structural move, not a Conversation Room rebuild):** Voice-first gate — no question until Voice On / Voice Off, with the microphone privacy note on that gate. After that, opening questions keep Voice toggle + Speak/Type + one Continue *inside* the tablet with the question and chips. Selected chips use a solid gold fill that wins over hover. Required hides once a bubble or typed value is accepted. Privacy is not repeated as a third zone under the tablet.
+
+**Retest:** `mobile-conversation-coherence.test.ts`, `sandbox-query.test.ts`, `studio-samsung-activate.test.ts`. Real-phone starting point in Scout’s report. Do not continue the previous hire until this walkthrough.
+
+**Follow-up 2026-08-26 (copy/validation):** Removed the redundant Speak/Type **OR** divider. Idle mic copy is one sentence: “Tap the mic to speak or start typing below.” “This answer is required” and the error field treatment appear only after Continue fails (`showValidationError={Boolean(error)}`).
+
+**Follow-up 2026-08-26 (question wrap + Required placement):** Required no longer sits in a flex row beside the headline (`flex: 1 1 12rem` was squeezing the question to ~four lines on Samsung). Order is Voice On/Off → highlighted Required metadata → full-width question → Speak/Type → Continue. Phone question type is `clamp(1.18rem, 4.9vw, 1.45rem)` so the preferred-name question wraps in one or two lines at 360px. Question wording is unchanged.
+
+---
+
+## MJ-D10 — Mobile question advance / scroll position
+
+**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+
+**Found:** 2026-08-26 Samsung review after MJ-D9. Tagia answers near the lower part of the Conversation Room and taps Continue. The next question loads higher on the page, but the phone stays scrolled near the old answer / Continue controls. She has to hunt upward after every question.
+
+**Cause:** On phone (`max-width: 960px`) `.room` is `height: auto; overflow-y: auto` and the tablet grows with the question cluster. Continue sits at the bottom of that cluster. A valid Continue only updates React `step`. The new cluster paints at the top of the tablet, but `document.scrollingElement` / room scroll stays at the previous Continue offset. No scroll/focus follows the new question. Review Answers / Change an answer already call `revealConversationTablet()`; Continue did not.
+
+**Fix:** Wrap the opening question cluster in `#conversation-room-active-question`. After `step` actually changes while an opening question is showing, `revealActiveQuestionCluster()` resets the inner tablet scroller and brings that cluster to the start of the visible scrollport (`behavior: "auto"`). It does not focus the type field, does not `scrollTo(0, 0)` the whole page, and does not run on first paint. Question sequence, wording, and stored answers are unchanged.
+
+**Retest:** `studio-conversation-tablet-anchor.test.ts`, `mobile-conversation-coherence.test.ts`. Real-phone: answer the current question → Continue → next active question is visible without manual scrolling. Stay on this hire; do not skip Review Answers / Change an answer checks later.
+
+---
+
+## MJ-D11 — Mobile Lobby after-film leftover landing
+
+**Status:** OPEN — route correction ready. Not certified. Not closed. Waiting on one Samsung verification of Studio Review → Studio Lobby.
+
+**Found:** 2026-08-26 Samsung. Close Conversation, Let’s Get Started, Start New, and Return to Lobby already reached the Welcome / Entry Film. **Studio Review → Studio Lobby** still opened the cropped lounge/clock scene, black empty field, and another Studio Review control.
+
+**Exact Studio Review route (before this correction):** `ownerQa.journeyPresets` id `studio-lobby` used `studioBoard.routes.studioLobby` → **`/studio-lobby`** with no `lobbyEntry=reset`. `OwnerQaPanel.handleJourney` then `window.location.assign(href)` and did not copy `?studioPaymentSandbox=1`.
+
+**Why it bypassed the Entry Film:** Let’s Get Started writes visit state `studioLobbyEntryChoice=new-to-studio`. Close conversation / Return to Lobby clear that via `lobbyEntry=reset`. Studio Review did not. `applyOwnerQaJourneySeed("lobby")` only cleared `studio-squishy:*` keys, not the Lobby visit gate. WelcomeHall then treated `choice === "new-to-studio"` as an unlocked lounge. The first MJ-D11 patch hid the reopen pill and ignored *dismissed* film on phone, but still allowed **choseNew** to skip the film — so the cropped clock landing stayed reachable on this one path.
+
+**Fix:** Studio Review Lobby href is `studioLobbyEntryV1.routes.frontDoor` (`/studio-lobby?lobbyEntry=reset`). Lobby seed also `clearLobbyEntryVisitState()`. Review navigation keeps the sandbox query. On phone, a stored New visit no longer unlocks the cropped lounge — the Entry Film is the only landing until a journey CTA leaves.
+
+**Retest:** `studio-lobby-entry-choice.test.ts`, `owner-qa.test.ts`, `studio-review-voice-tablet-migration-v1.test.ts`. One Samsung pass: Conversation Room → Studio Review → Studio Lobby → full Welcome / Let’s Get Started film.
+
+---
+
+## MJ-D12 — Mobile Studio Controls collapsible drawer
+
+**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+
+**Found:** 2026-08-26 Samsung. Studio Controls stayed permanently expanded and consumed a large band of the phone screen, including on Choose-your-services. The customer’s current task did not own the screen. Service cards had to share the viewport with a 34dvh Session slab.
+
+**Cause:** Phone Conversation Room treated Studio Controls as in-flow hallway furniture. When the activity panel was open, `.sideNav` was `position: fixed; bottom: 0; max-height: max(14rem, 34dvh)`, and builder/route sheets reserved that same band. There was no collapsed tab.
+
+**Fix:** Phone-only bottom tab / drawer. Default `useState(false)` collapsed into a labeled **Studio Controls** tab (`--studio-controls-tab-h: 3.25rem`). Tap expands a scrollable control body; tap again collapses. Open state is not keyed to the question or route and is not persisted, so Continue does not auto-reopen it. Using a control (Help Center, Studio Review, Review Answers, and the other existing actions) collapses the drawer so the customer surface is not covered. Desktop rail stays expanded. All existing control actions remain.
+
+**Retest:** `mobile-conversation-coherence.test.ts`, `sandbox-query.test.ts`. Real-phone: collapsed tab leaves service cards browseable; expand/collapse; Help Center and Studio Review still work.
+
+---
+
+## MJ-D13 — Mobile Conversation Room scroll / touch interference
+
+**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+
+**Found:** 2026-08-26 Samsung. On the main Conversation Room (project-so-far / voice controls / tablet), the first vertical swipe often did nothing. A second swipe was needed. The page could move, stop, then jump back down. Scrolling felt sticky and over-sensitive.
+
+**Cause:** Nested scrollports fighting for the same one-finger pan. Phone `.room` used `overflow-y: auto` on `height: auto` — that still creates a scroll container, so Samsung intercepts the first gesture even when the room itself has nothing to scroll, then rubber-bands. The opening tablet `.main` (`overflow: auto` + `min-height: 0` inside `overflow: hidden`) sat on top of that area and claimed the same swipe. Document/body also scrolled. MJ-D10 reveal only runs after Continue (`previous === step` guard) and was not the retrigger. No `preventDefault` on the pan.
+
+**Fix:** Phone-only, one page scroller. `.room` `overflow: visible` (not `overflow-x: hidden`, which would compute `overflow-y` back to `auto`). Opening tablet `.root` / `.main` `overflow: visible` so the first swipe on project-so-far / voice / questions scrolls the document. Route/plan inner `overflow: hidden` was left more specific here and is corrected in MJ-D14. Activity-panel job list still scrolls inside the sheet. MJ-D10 Continue reveal and MJ-D12 Studio Controls drawer unchanged.
+
+**Retest:** `mobile-conversation-coherence.test.ts`. Real-phone: one-finger flick on Conversation Room scrolls on the first gesture and does not snap back.
+
+---
+
+## MJ-D14 — Mobile Review Together / Route two-layer scroll
+
+**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+
+**Found:** 2026-08-26 Samsung. Let’s Review Together and Choose Your Route felt like two pages stitched together. The top customer surface and the lower Studio Tablet / Voice Off dock scrolled or caught independently. Reverse flicks jumped. Connected: route left letterbox, Open Service List jump, Studio Controls firing on a swipe.
+
+**Cause:** Shared phone shell, not isolated buttons. The Presentation frame was locked to `min-height: 72dvh` (upper page). Speak/Type + Voice On/Off sat below it as a second page. Choose Your Route still used desktop `.root[data-stage="route"] .main { overflow: hidden; height: 100% }` with a flex-grown map (`object-fit: contain`) that letterboxed. Studio Controls used immediate `pointerdown` on the bottom tab, so a vertical swipe from the dock toggled the drawer. Stage reveal was not run for Review/Route; services overlay plus inner scroll felt like a jump.
+
+**Fix:** One document scroller for both stages. Phone tablet hugs content. Route/plan inner overflow visible + height auto. Map no longer flex-grows. `--tablet-width: 100%`. `overflow-anchor: none`. Drawer uses tap-with-slop + `touch-action: pan-y`. Reveal the new stage once (auto), and do not reveal when opening the service sheet.
+
+**360px proof (Cursor, ~360×640, 2026-08-26):** Let’s Review Together (`?stage=opening`) and Choose Your Route (`?stage=route`) both have one page scroller (`body` `overflow-y: auto`). `.room`, tablet `.main`, and `.sideSpeak` are `overflow: visible` with inner `scrollTop` 0. Document scroll to 180px held on both stages; reverse to 0 held; no inner snap-back. Route map `object-fit: cover`, figure `flex: 0 0 auto`, image left equals figure left (no charcoal letterbox). Remaining ~32px tablet inset is workspace bezel, not a second scroll layer. Type field `textarea` overflow is the only nested auto scroller (form field, not a page). Studio Controls stays a fixed bottom tab by design.
+
+**Retest:** `mobile-conversation-coherence.test.ts`, `studio-samsung-activate.test.ts`, `studio-conversation-tablet-anchor.test.ts`. Combined Samsung pass below — not certified until Tagia runs it.
+
+---
+
+## MJ-D15 — Materials bubble vs optional details field
+
+**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+
+**Found:** 2026-08-26 Samsung. On “Do you already have any files or materials we should know about?”, tapping **Nothing yet** or **Reference examples** did not fill **Add any details about your materials**. The customer had no visible confirmation of what the Studio recorded.
+
+**Cause:** Intended data model, then a confirmation gap. Materials is the only `bubbleMode: "multi"` question. Bubbles are the recorded choice (`resolveGuideAnswerFromUi` joins them). Typed text is optional extra detail appended as `bubbles — details`. `handleToggleBubble` correctly does **not** call `writeTextDraft` for multi-select, so it will not overwrite custom notes. Single-select questions (need / business / deadline) still copy the chip into the type field. MJ-D9 moved Speak/Type into the same cluster, so an empty details field now looks like the answer was not recorded. Selected-chip gold already existed; the empty optional field was the missing confirmation.
+
+**Fix:** Do not copy bubble labels into the details field. Show `The Studio recorded {choice}.` when materials bubbles are selected. Placeholder and hint state that extra details are optional.
+
+**Retest:** `studio-guide-answer-resolve.test.ts`, `mobile-conversation-coherence.test.ts`. Samsung: tap Nothing yet / Reference examples → gold chip + recorded sentence; details field stays empty unless Tagia types extra notes; Continue still saves the bubble.
+
+---
+
+## MJ-D16 — Voice Off still starts the microphone
+
+**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+
+**Found:** 2026-08-26 Samsung. Tagia tapped **Fill it out myself**. UI showed Voice Off. The browser still asked **Allow access to your microphone**, then **Listening — tap to finish**.
+
+**Cause:** First-entry gate uses immediate `pointerdown`. Choosing Fill it out myself unmounts the gate and mounts Speak/Type under the same finger. The leftover `click` / `pointerup` hits the new mic and calls `startConversationDictation()`, which requests permission. Not a persisted Voice On auto-start. Persistent Voice On/Off toggles are ordinary `onClick` and were not this path.
+
+**Fix:** Gate buttons consume the pointer gesture. After the gate, listening stays disarmed until that same gesture settles. `handleStartListening` no-ops while disarmed and stops any recognition that slipped through. Voice Off also aborts dictation. Later explicit mic taps still work.
+
+**Retest:** `mobile-conversation-coherence.test.ts`, `studio-samsung-activate.test.ts`. Samsung: Fill it out myself on a clean visit and after a prior Voice On session — no permission prompt, no Listening.
+
+---
+
+## MJ-D17 — Cropped Lobby still flashes during Let’s Get Started
+
+**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+
+**Found:** 2026-08-26 Samsung. Going Let’s Get Started → Conversation Room still briefly showed the cropped clock-Studio / black-space Lobby.
+
+**Cause:** `shouldForceLobbyEntryFilmOnPhone` returned false while `transitioning`. A stored New visit already had `filmOpen === false`, so the Entry Film unmounted before Conversation Room painted. The plate zoom (`transform-origin: 38% 42%`) then flashed the cropped clock. Not a final landing; a navigation-order leak.
+
+**Fix:** Keep the Entry Film mounted until the next route paints. Phone front door stays true during transitioning. `showEntryFilm` includes `transitioning`. No delay overlay.
+
+**Retest:** `studio-lobby-entry-choice.test.ts`. Samsung: Let’s Get Started from the Welcome film — no cropped-clock flicker before Conversation Room.
+
+---
+
 ## MJ-L1 — Review / approval / delivery need an honest production seed
 
 **Not a silent product fake.** Payment and intake do not invent `ready_for_review`. Customer-One E2E used an honest seed. The owner guide stops after Board communication so Scout can seed review state before Tagia continues steps 18–20.

@@ -260,7 +260,7 @@ export const conversationRoomGuideV1 = {
     "I couldn't open checkout yet. Please try again, or edit your plan and review once more.",
   /** Quiet confirmation — not a spoken “Got it.” every turn. */
   savedCue: "Saved",
-  speakHint: "Tap the mic to speak",
+  speakHint: "Tap the mic to speak or start typing below.",
   speakSubhint: "or start typing below",
   typeLabel: "Type your answer",
   /** Shown on required guide answers (preferred name cannot be skipped). */
@@ -269,6 +269,12 @@ export const conversationRoomGuideV1 = {
   /** Typed-only questions — tablet shows the question; Speak/Type owns Continue. */
   typedAnswerDockHint:
     "Type or speak your answer in the field below, then tap Continue there.",
+  /**
+   * Materials bubbles record the choice. The type field is optional extra detail —
+   * do not treat it as a duplicate of the selected bubble.
+   */
+  materialsDetailsHint:
+    "You can add extra details about your materials here. This is optional.",
   /** Always-on strip — customer can ask or speak even after guide questions end. */
   communicationLabel: "Talk with the Studio",
   askAnythingPlaceholder: "Ask a question or tell the Studio something",
@@ -367,7 +373,8 @@ export const conversationRoomGuideV1 = {
         "Nothing yet",
         "Something else",
       ],
-      placeholder: "Add any details about your materials",
+      placeholder:
+        "Add any extra details about your materials. This is optional.",
     },
   ] as const satisfies readonly ConversationRoomGuideQuestion[],
 } as const;
@@ -444,6 +451,15 @@ export function getConversationRoomGuideQuestion(
   return (
     conversationRoomGuideV1.questions.find((q) => q.step === step) ?? null
   );
+}
+
+/** Visible confirmation of multi-select materials bubbles — not copied into the details field. */
+export function recordedMaterialsSelection(
+  selectedBubbles: readonly string[],
+): string | null {
+  const recorded = selectedBubbles.filter((item) => item !== "Skip for now");
+  if (recorded.length === 0) return null;
+  return `The Studio recorded ${recorded.join(", ")}.`;
 }
 
 /** Date-format hint only when the customer actually chose a specific date. */

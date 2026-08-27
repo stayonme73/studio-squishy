@@ -84,7 +84,7 @@ export const studioReviewVoiceTabletMigrationLedger: readonly StudioReviewMigrat
     id: "studio-lobby",
     source: "Studio Lobby",
     ownerQaPresetId: "studio-lobby",
-    sourceHref: "/studio-lobby",
+    sourceHref: "/studio-lobby?lobbyEntry=reset",
     tabletReplacement:
       "Customer Lobby remains the entrance; Voice resumes Conversation Room from Lobby return (session + working draft).",
     presentationView: "Studio Lobby customer surface (locked)",

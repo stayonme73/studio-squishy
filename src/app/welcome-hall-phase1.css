@@ -1312,12 +1312,13 @@
     z-index: 50;
   }
 
+  /* MJ-D11: never leave the wrapped reopen pill as a phone landing control. */
   .lobby-entry-reopen {
-    position: fixed;
-    z-index: 45;
-    min-height: 3.25rem;
-    padding: 1.05rem 1.85rem;
-    font-size: 1.12rem;
+    display: none !important;
+  }
+
+  .lobby-entry-film__close {
+    display: none !important;
   }
 }
 

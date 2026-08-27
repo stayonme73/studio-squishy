@@ -7,6 +7,7 @@ import {
   type CampaignRecord,
   type CampaignStatus,
 } from "@/config/studio-board";
+import { clearLobbyEntryVisitState } from "@/config/studio-lobby-entry-v1";
 import { ensureCampaignConceptsOnRecord } from "@/lib/campaign-concepts";
 import {
   saveDiscoveryAnswers,
@@ -273,6 +274,7 @@ export function applyOwnerQaJourneySeed(kind: OwnerQaJourneySeedKind): void {
   switch (kind) {
     case "lobby": {
       clearAllOwnerQaBrowserState();
+      clearLobbyEntryVisitState();
       return;
     }
     case "route-map": {

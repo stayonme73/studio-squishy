@@ -10,6 +10,7 @@ import { productionWorkspaceRoute } from "@/config/production-workspace";
 import { ROUTE_MAP_INTAKE_STEP_HREF } from "@/config/legacy-route-quarantine-v1";
 import { projectBuilderHref } from "@/config/project-builder-v1";
 import { studioBoard } from "@/config/studio-board";
+import { studioLobbyEntryV1 } from "@/config/studio-lobby-entry-v1";
 import { teamOfficePath } from "@/config/team-offices";
 import type { OwnerQaJourneySeedKind } from "@/lib/owner-qa-campaign";
 
@@ -39,7 +40,7 @@ export const ownerQa = {
       id: "studio-lobby",
       label: "Studio Lobby",
       description: "Customer entry experience",
-      href: studioBoard.routes.studioLobby,
+      href: studioLobbyEntryV1.routes.frontDoor,
       seed: "lobby",
     },
     {

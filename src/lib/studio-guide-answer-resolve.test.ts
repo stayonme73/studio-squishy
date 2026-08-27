@@ -6,6 +6,7 @@ import {
   resolveComposerSendAction,
   resolveGuideAnswerFromUi,
 } from "@/lib/studio-guide-answer-resolve";
+import { recordedMaterialsSelection } from "@/config/conversation-room-guide-v1";
 
 describe("studio-guide-answer-resolve — Send / Continue parity", () => {
   it("typed Send is active (submit_guide_answer) during guide questions", () => {
@@ -94,5 +95,46 @@ describe("studio-guide-answer-resolve — Send / Continue parity", () => {
     expect(draftTyped.deadlineStatus).toBe(draftBubble.deadlineStatus);
     expect(draftTyped.requestedDeadline).toBe("Within 2 weeks");
     expect(draftTyped.deadlineStatus).toBe("unconfirmed");
+  });
+
+  it("materials bubbles are the recorded answer; typed text is optional extra detail", () => {
+    expect(
+      resolveGuideAnswerFromUi({
+        step: "ask_materials",
+        typed: "",
+        selectedBubbles: ["Nothing yet"],
+      }),
+    ).toEqual({ answer: "Nothing yet", skipped: false });
+    expect(
+      resolveGuideAnswerFromUi({
+        step: "ask_materials",
+        typed: "",
+        selectedBubbles: ["Reference examples"],
+      }),
+    ).toEqual({ answer: "Reference examples", skipped: false });
+    expect(
+      resolveGuideAnswerFromUi({
+        step: "ask_materials",
+        typed: "Files are in Dropbox",
+        selectedBubbles: ["Logo", "Photos"],
+      }),
+    ).toEqual({
+      answer: "Logo, Photos — Files are in Dropbox",
+      skipped: false,
+    });
+    expect(
+      resolveGuideAnswerFromUi({
+        step: "ask_materials",
+        typed: "Just a sketch",
+        selectedBubbles: [],
+      }),
+    ).toEqual({ answer: "Just a sketch", skipped: false });
+    expect(recordedMaterialsSelection(["Nothing yet"])).toBe(
+      "The Studio recorded Nothing yet.",
+    );
+    expect(recordedMaterialsSelection(["Logo", "Photos"])).toBe(
+      "The Studio recorded Logo, Photos.",
+    );
+    expect(recordedMaterialsSelection([])).toBeNull();
   });
 });

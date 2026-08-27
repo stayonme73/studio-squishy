@@ -15,8 +15,11 @@ import StudioLobbyEntryFilm, {
 } from "@/components/entrance/StudioLobbyEntryFilm";
 import {
   clearLobbyEntryVisitState,
+  LOBBY_ENTRY_PHONE_MAX_WIDTH_PX,
   readLobbyEntryChoice,
   readLobbyEntryFilmDismissed,
+  shouldForceLobbyEntryFilmOnPhone,
+  shouldShowLobbyEntryReopen,
   studioLobbyEntryV1,
   writeLobbyEntryChoice,
   writeLobbyEntryFilmDismissed,
@@ -89,10 +92,19 @@ export default function WelcomeHallWelcomeScene({
    */
   const [sessionState, setSessionState] =
     useState<LobbyEntrySessionState>("signed-out");
+  const [viewportWidth, setViewportWidth] = useState(0);
 
-  const showEntryFilm = filmOpen;
-  /** After film close/dismiss, keep Choose how to begin until journey transition starts. */
-  const showReopenFilm = !filmOpen && !transitioning;
+  const phoneFrontDoor = shouldForceLobbyEntryFilmOnPhone({
+    transitioning,
+    viewportWidth,
+  });
+  const showEntryFilm = filmOpen || phoneFrontDoor || transitioning;
+  /** Desktop only — phone never lands on the dismissed-film reopen pill. */
+  const showReopenFilm = shouldShowLobbyEntryReopen({
+    filmVisible: showEntryFilm,
+    transitioning,
+    viewportWidth,
+  });
 
   const isDesktopKiosk = plateSize.width >= DESKTOP_KIOSK_MIN_WIDTH;
 
@@ -145,8 +157,13 @@ export default function WelcomeHallWelcomeScene({
       if (choice === "new-to-studio") {
         setChoseNew(true);
         setFilmOpen(false);
-      } else if (dismissed) {
+      } else if (
+        dismissed &&
+        window.innerWidth > LOBBY_ENTRY_PHONE_MAX_WIDTH_PX
+      ) {
         setFilmOpen(false);
+      } else if (dismissed) {
+        setFilmOpen(true);
       }
     }
   }, [initialChoseNew]);
@@ -179,6 +196,13 @@ export default function WelcomeHallWelcomeScene({
   }, []);
 
   useLayoutEffect(() => {
+    const syncViewport = () => setViewportWidth(window.innerWidth);
+    syncViewport();
+    window.addEventListener("resize", syncViewport);
+    return () => window.removeEventListener("resize", syncViewport);
+  }, []);
+
+  useLayoutEffect(() => {
     const plate = plateRef.current;
     if (!plate) return;
 
@@ -198,6 +222,10 @@ export default function WelcomeHallWelcomeScene({
   }, []);
 
   const handleCloseFilm = useCallback(() => {
+    if (window.innerWidth <= LOBBY_ENTRY_PHONE_MAX_WIDTH_PX) {
+      setFilmOpen(true);
+      return;
+    }
     writeLobbyEntryFilmDismissed(true);
     setFilmOpen(false);
   }, []);
@@ -282,6 +310,7 @@ export default function WelcomeHallWelcomeScene({
           <StudioLobbyEntryFilm
             sessionState={sessionState}
             onClose={handleCloseFilm}
+            allowDismiss={viewportWidth > LOBBY_ENTRY_PHONE_MAX_WIDTH_PX}
             onBeginNew={handleBeginNew}
             beginNewHref={withStudioPaymentSandboxQuery(
               studioLobbyEntryV1.routes.beginNew,

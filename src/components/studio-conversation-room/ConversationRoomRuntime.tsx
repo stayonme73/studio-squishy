@@ -146,6 +146,7 @@ import {
   readVoiceNarrationPreference,
   writeVoiceNarrationPreference,
 } from "@/lib/studio-voice-preference";
+import { suppressSameGestureFollowUp } from "@/lib/studio-samsung-activate";
 import VoicePreferenceControls from "@/components/studio-conversation-room/VoicePreferenceControls";
 
 function spokenLineForGuideStep(
@@ -305,6 +306,9 @@ export default function ConversationRoomRuntime({
   /** Conversation Room narration only — Lobby Voice is never gated here. */
   const [voiceNarration, setVoiceNarration] =
     useState<StudioVoiceNarrationPreference | null>(null);
+  const voiceNarrationRef = useRef<StudioVoiceNarrationPreference | null>(null);
+  const listenArmedRef = useRef(true);
+  const [listenArmed, setListenArmed] = useState(true);
   const activityReturnFocusRef = useRef<HTMLElement | null>(null);
   /** Suppress stacked “added” lines when the customer taps services quickly. */
   const lastServiceAddSpokenAtRef = useRef(0);
@@ -445,6 +449,7 @@ export default function ConversationRoomRuntime({
 
     const savedPreference = readVoiceNarrationPreference();
     setVoiceNarration(savedPreference);
+    voiceNarrationRef.current = savedPreference;
 
     /* Kill any Lobby TTS that continued across navigation — CR is silent until Voice On. */
     if (savedPreference !== "on") {
@@ -1458,13 +1463,26 @@ export default function ConversationRoomRuntime({
   function handleVoiceNarrationPreference(
     value: StudioVoiceNarrationPreference,
   ) {
+    const fromGate = voiceNarrationRef.current === null;
     writeVoiceNarrationPreference(value);
+    voiceNarrationRef.current = value;
     setVoiceNarration(value);
+    if (fromGate) {
+      listenArmedRef.current = false;
+      setListenArmed(false);
+      suppressSameGestureFollowUp(() => {
+        listenArmedRef.current = true;
+        setListenArmed(true);
+      });
+    }
     if (value === "off") {
       pendingVoiceInviteRef.current = null;
       inviteCleanupRef.current?.();
       inviteCleanupRef.current = null;
       stopStudioSpeech();
+      stopConversationDictation();
+      setListening(false);
+      setInterimTranscript("");
       return;
     }
     /* Voice On — always speak something from this click (gesture unlocks TTS). */
@@ -1496,6 +1514,11 @@ export default function ConversationRoomRuntime({
   }
 
   function handleStartListening() {
+    if (!listenArmedRef.current) {
+      stopConversationDictation();
+      setListening(false);
+      return;
+    }
     stopStudioSpeech();
     setError(null);
     setInterimTranscript("");
@@ -1660,6 +1683,10 @@ export default function ConversationRoomRuntime({
     isAnsweringQuestion &&
     question != null &&
     (question.canSkip === false || question.step === "ask_business_name");
+  const hasAcceptedAnswer =
+    selectedBubbles.length > 0 || textDraft.trim().length > 0;
+  const openingAsk = isAnsweringQuestion;
+  const voiceUnset = voiceNarration === null;
 
   const canChangeAnswer =
     guideHasReviewableAnswers(draft) ||
@@ -1674,7 +1701,6 @@ export default function ConversationRoomRuntime({
       activePanel={activePanel}
       onCloseActivityPanel={closeActivityPanel}
       activityPanelReturnFocusRef={activityReturnFocusRef}
-      micPrivacyNote={STUDIO_GUIDE_MIC_PRIVACY_NOTE}
       slideOut={
         slidePanel ? (
           <ConversationActivityPanel
@@ -1752,13 +1778,13 @@ export default function ConversationRoomRuntime({
         />
       }
       workspace={
-        <>
-          {voiceNarration === null ? (
-            <VoicePreferenceControls
-              preference={null}
-              onChoose={handleVoiceNarrationPreference}
-            />
-          ) : null}
+        voiceUnset ? (
+          <VoicePreferenceControls
+            preference={null}
+            onChoose={handleVoiceNarrationPreference}
+            privacyNote={STUDIO_GUIDE_MIC_PRIVACY_NOTE}
+          />
+        ) : (
           <StudioGuideTabletView
           step={step}
           stage={stage}
@@ -1772,6 +1798,44 @@ export default function ConversationRoomRuntime({
           onConfirm={handleConfirm}
           onCorrect={handleCorrect}
           onCorrectTarget={handleCorrectTarget}
+          answerAccepted={hasAcceptedAnswer}
+          answerDock={
+            openingAsk ? (
+                <StudioGuideCommPanel
+                  textDraft={textDraft}
+                  fieldResetKey={`${stage}:${step}:${askMode ? "ask" : "guide"}:${fieldEpoch}`}
+                  typePlaceholder={
+                    isAnsweringQuestion && question
+                      ? question.placeholder
+                      : conversationRoomGuideV1.askAnythingPlaceholder
+                  }
+                  listening={listening}
+                  speechSupported={speechSupported}
+                  interimTranscript={interimTranscript}
+                  savedPulse={savedPulse}
+                  isAnsweringQuestion={isAnsweringQuestion}
+                  answerRequired={answerRequired}
+                  hasAcceptedAnswer={hasAcceptedAnswer}
+                  showValidationError={Boolean(error)}
+                  onTextDraftLive={handleTextDraftLive}
+                  onTextDraftFlush={handleTextDraftFlush}
+                  onStartListening={handleStartListening}
+                  onStopListening={handleStopListening}
+                  onSubmitGuideAnswer={handleContinue}
+                  onSendMessage={handleSendMessage}
+                  studioVoiceReply={studioVoiceReply}
+                  allowMicrophone={listenArmed}
+                />
+            ) : null
+          }
+          modeControls={
+            openingAsk ? (
+              <VoicePreferenceControls
+                preference={voiceNarration}
+                onChoose={handleVoiceNarrationPreference}
+              />
+            ) : null
+          }
           onOpenStagePanel={() => {
             if (stage === "route" || stage === "plan") return;
             if (stage === "services") {
@@ -1808,16 +1872,15 @@ export default function ConversationRoomRuntime({
           planBridgeError={planBridgeError}
           intakeTabletStatus={intakeTabletStatus}
         />
-        </>
+        )
       }
       communication={
-        <>
-          {voiceNarration !== null ? (
-            <VoicePreferenceControls
-              preference={voiceNarration}
-              onChoose={handleVoiceNarrationPreference}
-            />
-          ) : null}
+        voiceUnset || openingAsk ? null : (
+          <>
+          <VoicePreferenceControls
+            preference={voiceNarration}
+            onChoose={handleVoiceNarrationPreference}
+          />
           <StudioGuideCommPanel
           textDraft={textDraft}
           fieldResetKey={`${stage}:${step}:${askMode ? "ask" : "guide"}:${fieldEpoch}`}
@@ -1832,6 +1895,8 @@ export default function ConversationRoomRuntime({
           savedPulse={savedPulse}
           isAnsweringQuestion={isAnsweringQuestion}
           answerRequired={answerRequired}
+          hasAcceptedAnswer={hasAcceptedAnswer}
+          showValidationError={Boolean(error)}
           onTextDraftLive={handleTextDraftLive}
           onTextDraftFlush={handleTextDraftFlush}
           onStartListening={handleStartListening}
@@ -1839,8 +1904,10 @@ export default function ConversationRoomRuntime({
           onSubmitGuideAnswer={handleContinue}
           onSendMessage={handleSendMessage}
           studioVoiceReply={studioVoiceReply}
+          allowMicrophone={listenArmed}
         />
-        </>
+          </>
+        )
       }
     />
   );

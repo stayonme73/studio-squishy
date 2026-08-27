@@ -46,6 +46,7 @@
   font: inherit;
   cursor: pointer;
   text-align: center;
+  touch-action: pan-y;
 }
 
 .speakZone:disabled {
@@ -253,6 +254,7 @@
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .sendBtn:disabled {

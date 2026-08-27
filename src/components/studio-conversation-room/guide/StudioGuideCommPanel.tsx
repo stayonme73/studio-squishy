@@ -9,6 +9,7 @@ import {
   conversationRoomGuideV1,
 } from "@/config/conversation-room-guide-v1";
 import { resolveComposerSendAction } from "@/lib/studio-guide-answer-resolve";
+import { useSamsungActivate } from "@/lib/studio-samsung-activate";
 
 export type StudioGuideCommPanelProps = {
   textDraft: string;
@@ -27,6 +28,10 @@ export type StudioGuideCommPanelProps = {
   isAnsweringQuestion: boolean;
   /** Preferred name / business name and other emphasized answers. */
   answerRequired?: boolean;
+  /** True once a bubble or typed value is already accepted for this question. */
+  hasAcceptedAnswer?: boolean;
+  /** Show required validation only after a failed Continue, not on load. */
+  showValidationError?: boolean;
   /** Live typing — must only update a ref, never React state. */
   onTextDraftLive: (value: string) => void;
   /** Commit typed text before Send / Continue. */
@@ -39,6 +44,8 @@ export type StudioGuideCommPanelProps = {
   onSendMessage: () => void;
   /** Latest truthful Voice reply from the Machine record. */
   studioVoiceReply?: string | null;
+  /** When false, leftover gate taps cannot start the microphone. */
+  allowMicrophone?: boolean;
 };
 
 /**
@@ -55,6 +62,8 @@ function StudioGuideCommPanel({
   savedPulse,
   isAnsweringQuestion,
   answerRequired = false,
+  hasAcceptedAnswer = false,
+  showValidationError = false,
   onTextDraftLive,
   onTextDraftFlush,
   onStartListening,
@@ -62,6 +71,7 @@ function StudioGuideCommPanel({
   onSubmitGuideAnswer,
   onSendMessage,
   studioVoiceReply = null,
+  allowMicrophone = true,
 }: StudioGuideCommPanelProps) {
   const v = conversationRoomGuideV1;
   const textRef = useRef<HTMLTextAreaElement | null>(null);
@@ -70,7 +80,6 @@ function StudioGuideCommPanel({
   const resetKeyRef = useRef(fieldResetKey);
   const emptyRef = useRef(!textDraft.trim());
 
-  const showRequired = Boolean(answerRequired && isAnsweringQuestion);
   const placeholder = isAnsweringQuestion
     ? typePlaceholder
     : v.askAnythingPlaceholder;
@@ -101,6 +110,8 @@ function StudioGuideCommPanel({
     onSendMessage();
   }
 
+  const sendActivate = useSamsungActivate(runSend);
+
   useEffect(() => {
     const node = textRef.current;
     if (!node) return;
@@ -112,7 +123,7 @@ function StudioGuideCommPanel({
     syncSendDisabled(node.value);
     if (wrapRef.current) {
       wrapRef.current.dataset.required =
-        showRequired && emptyRef.current ? "true" : "false";
+        showValidationError && emptyRef.current ? "true" : "false";
       wrapRef.current.dataset.answering = isAnsweringQuestion
         ? "true"
         : "false";
@@ -120,7 +131,7 @@ function StudioGuideCommPanel({
   }, [
     fieldResetKey,
     textDraft,
-    showRequired,
+    showValidationError,
     isAnsweringQuestion,
     v.sendMessageLabel,
     v.continueLabel,
@@ -137,8 +148,14 @@ function StudioGuideCommPanel({
         className={styles.speakZone}
         data-active={listening ? "true" : "false"}
         tabIndex={-1}
-        onClick={listening ? onStopListening : onStartListening}
-        disabled={!speechSupported && !listening}
+        onClick={
+          listening
+            ? onStopListening
+            : allowMicrophone
+              ? onStartListening
+              : undefined
+        }
+        disabled={(!speechSupported && !listening) || (!allowMicrophone && !listening)}
         aria-label={listening ? "Stop listening" : v.speakHint}
       >
         <span className={styles.micRing} aria-hidden="true">
@@ -158,30 +175,25 @@ function StudioGuideCommPanel({
         <span className={styles.speakTitle}>
           {listening ? "Listening..." : v.speakHint}
         </span>
-        <span className={styles.speakHint}>
-          {listening
-            ? interimTranscript || "Tap to finish"
-            : v.speakSubhint}
-        </span>
+        {listening ? (
+          <span className={styles.speakHint}>
+            {interimTranscript || "Tap to finish"}
+          </span>
+        ) : null}
       </button>
 
-      <div className={styles.answerOr} aria-hidden="true">
-        <span className={styles.answerOrRule} />
-        <span className={styles.answerOrLabel}>OR</span>
-        <span className={styles.answerOrRule} />
-      </div>
-
       <div className={styles.typeBlock}>
-        {showRequired ? (
-          <div className={styles.requiredRow}>
-            <span className={styles.requiredBadge}>{v.answerRequiredLabel}</span>
-            <span className={styles.requiredHint}>{v.typeRequiredEmptyHint}</span>
-          </div>
+        {showValidationError && answerRequired && !hasAcceptedAnswer ? (
+          <p className={styles.requiredHint} role="alert">
+            {v.typeRequiredEmptyHint}
+          </p>
         ) : null}
         <div
           ref={wrapRef}
           className={styles.typeField}
-          data-required={showRequired ? "true" : "false"}
+          data-required={
+            showValidationError && !hasAcceptedAnswer ? "true" : "false"
+          }
           data-answering={isAnsweringQuestion ? "true" : "false"}
         >
           <textarea
@@ -203,7 +215,7 @@ function StudioGuideCommPanel({
               if (empty !== emptyRef.current) {
                 emptyRef.current = empty;
                 syncSendDisabled(next);
-                if (wrapRef.current && showRequired) {
+                if (wrapRef.current && showValidationError) {
                   wrapRef.current.dataset.required = empty ? "true" : "false";
                 }
               } else {
@@ -225,7 +237,7 @@ function StudioGuideCommPanel({
               event.preventDefault();
               runSend();
             }}
-            aria-required={showRequired ? true : undefined}
+            aria-required={answerRequired && isAnsweringQuestion ? true : undefined}
             aria-label={placeholder}
           ></textarea>
         </div>
@@ -245,14 +257,17 @@ function StudioGuideCommPanel({
       ) : null}
 
       <button
-        ref={sendRef}
+        ref={(node) => {
+          sendRef.current = node;
+          sendActivate.ref(node);
+        }}
         type="button"
         className={styles.sendBtn}
         data-send-action={resolveComposerSendAction({
           isAnsweringQuestion,
           typedText: textDraft,
         })}
-        onClick={runSend}
+        onClick={sendActivate.onClick}
       >
         {composerSubmitLabel(isAnsweringQuestion)}
       </button>
@@ -270,6 +285,9 @@ export default memo(StudioGuideCommPanel, (prev, next) => {
     prev.savedPulse === next.savedPulse &&
     prev.isAnsweringQuestion === next.isAnsweringQuestion &&
     prev.answerRequired === next.answerRequired &&
-    prev.studioVoiceReply === next.studioVoiceReply
+    prev.hasAcceptedAnswer === next.hasAcceptedAnswer &&
+    prev.showValidationError === next.showValidationError &&
+    prev.studioVoiceReply === next.studioVoiceReply &&
+    prev.allowMicrophone === next.allowMicrophone
   );
 });

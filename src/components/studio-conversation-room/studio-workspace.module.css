@@ -153,15 +153,18 @@
   min-height: 0;
 }
 
+/*
+ * MJ-D8: do not disable the question layer. Voice preference only needs
+ * stacking (z-index 5) for its own hit targets. pointer-events:none on
+ * the last child (and every descendant) ate Samsung taps on bubble chips
+ * while Session — outside this glass — still worked.
+ */
 .hostSurface > *:not(:only-child):last-child {
   flex: 1 1 auto;
   min-height: 0;
-  /* Prefer preference hit-targets while both are mounted. */
-  pointer-events: none;
-}
-
-.hostSurface > *:not(:only-child):last-child * {
-  pointer-events: none;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
 }
 
 /*
@@ -248,8 +251,17 @@
   .frame {
     width: 100%;
     height: auto;
-    min-height: min(72dvh, 36rem);
+    min-height: 0;
     max-height: none;
-    aspect-ratio: var(--portrait-ratio, 0.84);
+    /* Hug the current stage. A 72dvh lock made Review/Route a separate page
+       above the Voice dock (MJ-D14). */
+    aspect-ratio: auto;
+  }
+
+  .screen,
+  .hostSurface {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
   }
 }

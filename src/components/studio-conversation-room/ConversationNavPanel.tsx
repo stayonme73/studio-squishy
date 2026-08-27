@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useLayoutEffect, useRef } from "react";
+import { Suspense, useState } from "react";
 
 import styles from "@/components/studio-conversation-room/conversation-nav-panel.module.css";
 import {
@@ -10,6 +10,10 @@ import {
   conversationRoomGuideV1,
 } from "@/config/conversation-room-guide-v1";
 import { CONVERSATION_ROOM_TABLET_HREF } from "@/lib/studio-conversation-tablet-anchor";
+import {
+  useSamsungActivate,
+  useSamsungTapActivate,
+} from "@/lib/studio-samsung-activate";
 
 export type ConversationNavPanelProps = {
   canChangeAnswer: boolean;
@@ -41,10 +45,26 @@ export default function ConversationNavPanel({
   onToggleSummary,
 }: ConversationNavPanelProps) {
   const v = conversationRoomGuideV1;
-  const reviewActivate = useSamsungActivate(onToggleSummary);
-  const changeActivate = useSamsungActivate(onChangeAnswer);
+  const [controlsOpen, setControlsOpen] = useState(false);
+  const drawerActivate = useSamsungTapActivate(() => {
+    setControlsOpen((open) => !open);
+  });
+
+  function closeDrawer() {
+    setControlsOpen(false);
+  }
+
+  const reviewActivate = useSamsungActivate<HTMLAnchorElement>(() => {
+    closeDrawer();
+    onToggleSummary();
+  });
+  const changeActivate = useSamsungActivate<HTMLAnchorElement>(() => {
+    closeDrawer();
+    onChangeAnswer();
+  });
 
   function handleAsk() {
+    closeDrawer();
     onAskQuestion();
     window.setTimeout(() => {
       document.getElementById(STUDIO_GUIDE_TYPE_FIELD_ID)?.focus();
@@ -52,7 +72,26 @@ export default function ConversationNavPanel({
   }
 
   return (
-    <nav className={styles.panel} aria-label="Studio control strip">
+    <nav
+      className={styles.panel}
+      aria-label="Studio control strip"
+      data-studio-controls={controlsOpen ? "expanded" : "collapsed"}
+    >
+      <button
+        type="button"
+        className={styles.drawerTab}
+        aria-expanded={controlsOpen}
+        aria-controls="studio-controls-body"
+        data-studio-controls-tab="true"
+        ref={drawerActivate.ref}
+        onClick={drawerActivate.onClick}
+      >
+        Studio Controls
+        <span className={styles.drawerChevron} aria-hidden="true">
+          {controlsOpen ? "▾" : "▴"}
+        </span>
+      </button>
+      <div id="studio-controls-body" className={styles.drawerBody}>
       <p className={styles.eyebrow}>Studio controls</p>
 
       <section className={styles.section} aria-label="Conversation">
@@ -75,7 +114,14 @@ export default function ConversationNavPanel({
       <section className={styles.section} aria-label="Session">
         <p className={styles.sectionLabel}>Session</p>
         <div className={styles.group}>
-          <button type="button" className={styles.navBtn} onClick={onSaveForNow}>
+          <button
+            type="button"
+            className={styles.navBtn}
+            onClick={() => {
+              closeDrawer();
+              onSaveForNow();
+            }}
+          >
             <span className={styles.icon} aria-hidden="true">
               💾
             </span>
@@ -102,7 +148,14 @@ export default function ConversationNavPanel({
               {v.changeAnswerLabel}
             </button>
           )}
-          <button type="button" className={styles.navBtn} onClick={onStartNew}>
+          <button
+            type="button"
+            className={styles.navBtn}
+            onClick={() => {
+              closeDrawer();
+              onStartNew();
+            }}
+          >
             <span className={styles.icon} aria-hidden="true">
               ➕
             </span>
@@ -111,7 +164,10 @@ export default function ConversationNavPanel({
           <button
             type="button"
             className={styles.navBtn}
-            onClick={onCloseConversation}
+            onClick={() => {
+              closeDrawer();
+              onCloseConversation();
+            }}
           >
             <span className={styles.icon} aria-hidden="true">
               🚪
@@ -141,7 +197,14 @@ export default function ConversationNavPanel({
       <section className={styles.section} aria-label="Studio">
         <p className={styles.sectionLabel}>Studio</p>
         <div className={styles.group}>
-          <button type="button" className={styles.navBtn} onClick={onReturnToLobby}>
+          <button
+            type="button"
+            className={styles.navBtn}
+            onClick={() => {
+              closeDrawer();
+              onReturnToLobby();
+            }}
+          >
             <span className={styles.icon} aria-hidden="true">
               🏠
             </span>
@@ -151,7 +214,10 @@ export default function ConversationNavPanel({
             type="button"
             id="studio-control-help"
             className={styles.navBtn}
-            onClick={onOpenHelp}
+            onClick={() => {
+              closeDrawer();
+              onOpenHelp();
+            }}
           >
             <span className={styles.icon} aria-hidden="true">
               📚
@@ -159,60 +225,28 @@ export default function ConversationNavPanel({
             Help Center
             <span className={styles.btnHint}>Policies &amp; FAQ</span>
           </button>
-          <StudioReviewControl />
+          <StudioReviewControl onOpen={closeDrawer} />
         </div>
       </section>
+      </div>
     </nav>
   );
-}
-
-/**
- * Samsung often skips React synthetic click on Session controls. Bind native
- * pointerup on the real node; the hash href still scrolls the tablet if JS is late.
- */
-function useSamsungActivate(handler: () => void) {
-  const ref = useRef<HTMLAnchorElement>(null);
-  const handlerRef = useRef(handler);
-  handlerRef.current = handler;
-  const lastTouchAt = useRef(0);
-
-  useLayoutEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    const onPointerUp = (event: PointerEvent) => {
-      if (event.pointerType === "mouse") return;
-      lastTouchAt.current = Date.now();
-      handlerRef.current();
-    };
-
-    node.addEventListener("pointerup", onPointerUp);
-    return () => node.removeEventListener("pointerup", onPointerUp);
-  });
-
-  return {
-    ref,
-    onClick() {
-      if (Date.now() - lastTouchAt.current < 450) return;
-      handlerRef.current();
-    },
-  };
 }
 
 /**
  * Dev-only. Lives in Studio Controls so it scrolls with the page and never
  * covers Voice, Session, or customer content.
  */
-function StudioReviewControl() {
+function StudioReviewControl({ onOpen }: { onOpen: () => void }) {
   if (process.env.NODE_ENV !== "development") return null;
   return (
     <Suspense fallback={null}>
-      <StudioReviewControlLink />
+      <StudioReviewControlLink onOpen={onOpen} />
     </Suspense>
   );
 }
 
-function StudioReviewControlLink() {
+function StudioReviewControlLink({ onOpen }: { onOpen: () => void }) {
   const pathname = usePathname() || "/studio-conversation-room";
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
@@ -229,6 +263,7 @@ function StudioReviewControlLink() {
       data-studio-review-placement="studio-controls"
       data-active={open ? "true" : "false"}
       aria-expanded={open}
+      onClick={onOpen}
     >
       <span className={styles.icon} aria-hidden="true">
         🔧

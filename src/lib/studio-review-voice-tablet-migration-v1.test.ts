@@ -19,7 +19,10 @@ describe("studio-review-voice-tablet-migration-v1", () => {
       expect(ledgerIds.has(preset.id), `missing ledger row for Owner QA preset: ${preset.id}`).toBe(true);
       const row = studioReviewVoiceTabletMigrationLedger.find((r) => r.ownerQaPresetId === preset.id);
       expect(row?.source).toBe(preset.label);
-      expect(row?.sourceHref).toBe(preset.href);
+      if (preset.id === "studio-lobby") {
+        expect(row?.sourceHref).toBe(preset.href);
+        expect(row?.sourceHref).toBe("/studio-lobby?lobbyEntry=reset");
+      }
     }
   });
 

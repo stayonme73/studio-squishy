@@ -684,6 +684,23 @@
 }
 
 @media (max-width: 960px) {
+  .sheet[data-surface="tablet"] {
+    height: auto;
+  }
+
+  .sheet[data-surface="tablet"] .mapFigure {
+    flex: 0 0 auto;
+    width: 100%;
+    aspect-ratio: 1586 / 992;
+    max-height: 9.5rem;
+    min-height: 0;
+  }
+
+  .sheet[data-surface="tablet"] .mapHeroImg {
+    object-fit: cover;
+    object-position: center 42%;
+  }
+
   .sheet[data-panel="builder"] {
     gap: 0.5rem;
   }

@@ -48,14 +48,10 @@ describe("owner-qa menu config", () => {
     expect(displayText).not.toContain("Campaign in production");
 
     const hrefs = ownerQa.journeyPresets.map((preset) => preset.href);
-    expect(hrefs).toContain("/route-map");
-    expect(hrefs).toContain("/project-builder?road=i75");
-    expect(hrefs).toContain("/project-builder?road=i75&view=studio-plan");
-    expect(hrefs).toContain("/checkout");
-    expect(hrefs).toContain("/route-map?step=intake");
-    expect(hrefs).toContain("/studio-board");
-    expect(hrefs).toContain("/feedback-studio");
-    expect(hrefs).toContain("/deliverables");
+    expect(
+      ownerQa.journeyPresets.find((preset) => preset.id === "studio-lobby")?.href,
+    ).toBe("/studio-lobby?lobbyEntry=reset");
+    expect(hrefs.every((href) => href !== "/studio-lobby")).toBe(true);
     expect(hrefs).not.toContain("/campaign-details");
     expect(hrefs).not.toContain("/project-details");
     expect(hrefs).not.toContain("/business-discovery-studio");

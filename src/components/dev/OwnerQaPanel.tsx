@@ -7,8 +7,9 @@ import { createPortal } from "react-dom";
 
 import { performDevClientTestReset } from "@/lib/dev-reset-client-test-state";
 import { ownerQa } from "@/config/owner-qa";
-import { studioBoard } from "@/config/studio-board";
+import { studioLobbyEntryV1 } from "@/config/studio-lobby-entry-v1";
 import { applyOwnerQaJourneySeed } from "@/lib/owner-qa-campaign";
+import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
 
 type DevicePreview = {
   pageLabel: string;
@@ -171,11 +172,15 @@ export default function OwnerQaPanel() {
   function handleJourney(href: string, seed: (typeof ownerQa.journeyPresets)[number]["seed"]) {
     applyOwnerQaJourneySeed(seed);
     /* Full navigation — router.replace(close) + router.push races on Samsung. */
-    window.location.assign(href);
+    window.location.assign(
+      withStudioPaymentSandboxQuery(href, window.location.search),
+    );
   }
 
   function handleShortcutLink(href: string) {
-    window.location.assign(href);
+    window.location.assign(
+      withStudioPaymentSandboxQuery(href, window.location.search),
+    );
   }
 
   function handleResetRequest() {
@@ -188,7 +193,12 @@ export default function OwnerQaPanel() {
 
   async function handleResetConfirm() {
     await performDevClientTestReset();
-    window.location.assign(studioBoard.routes.studioLobby);
+    window.location.assign(
+      withStudioPaymentSandboxQuery(
+        studioLobbyEntryV1.routes.frontDoor,
+        window.location.search,
+      ),
+    );
   }
 
   const panelBody = (

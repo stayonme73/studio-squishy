@@ -36,6 +36,14 @@
   color: rgba(247, 244, 238, 0.98);
 }
 
+.privacyNote {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: rgba(236, 232, 224, 0.78);
+}
+
 .choiceActions {
   display: flex;
   flex-direction: column;
@@ -116,6 +124,7 @@
   border: 1px solid transparent;
   background: transparent;
   color: rgba(236, 232, 224, 0.72);
+  touch-action: pan-y;
 }
 
 .toggleOn[data-active="true"],

@@ -105,19 +105,19 @@ describe("studio payment sandbox query", () => {
     );
     expect(nav).toContain('data-studio-review-placement="studio-controls"');
     expect(nav).toContain("Studio Review");
-    expect(nav).toContain("<StudioReviewControl />");
-    expect(nav.indexOf("<StudioReviewControl />")).toBeGreaterThan(
+    expect(nav).toContain("<StudioReviewControl onOpen={closeDrawer} />");
+    expect(nav.indexOf("<StudioReviewControl onOpen={closeDrawer} />")).toBeGreaterThan(
       nav.indexOf("Help Center"),
     );
     expect(nav).toContain("CONVERSATION_ROOM_TABLET_HREF");
     expect(nav).toContain('data-session-action="review-answers"');
     expect(nav).toContain('data-session-action="change-answer"');
-    expect(nav).toContain("addEventListener(\"pointerup\"");
+    expect(nav).toContain('from "@/lib/studio-samsung-activate"');
     expect(nav).toContain("reviewActivate.ref");
     expect(nav).toContain("onClick={reviewActivate.onClick}");
   });
 
-  it("typed-only tablet questions do not duplicate Continue on the tablet", () => {
+  it("opening questions use one in-tablet Continue instead of a second hunt-below Continue", () => {
     const source = readFileSync(
       join(
         process.cwd(),
@@ -125,9 +125,38 @@ describe("studio payment sandbox query", () => {
       ),
       "utf8",
     );
-    expect(source).toContain("typedAnswerDockHint");
-    expect(source).toContain("question.bubbles.length > 0");
-    expect(source).toContain('data-tablet-continue="true"');
+    expect(source).toContain("answerDock");
+    expect(source).toContain("!answerDock && question.bubbles.length > 0");
+    expect(source).toContain('data-tablet-continue={tabletContinue ? "true" : undefined}');
+  });
+
+  it("tablet bubble chips use native pointerdown so Samsung taps register", () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/StudioGuideTabletView.tsx",
+      ),
+      "utf8",
+    );
+    expect(source).toContain("SamsungChipButton");
+    expect(source).toContain("useSamsungActivate");
+    expect(source).toContain("onToggleBubble(bubble)");
+    const css = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/studio-guide-tablet.module.css",
+      ),
+      "utf8",
+    );
+    expect(css).toContain("touch-action: manipulation");
+    const glass = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/studio-workspace.module.css",
+      ),
+      "utf8",
+    );
+    expect(glass).not.toContain(".hostSurface > *:not(:only-child):last-child *");
   });
 
   it("phone Choose-your-services sheet uses an explicit height so job cards can scroll", () => {
@@ -139,12 +168,14 @@ describe("studio payment sandbox query", () => {
       "utf8",
     );
     expect(css).toContain(
-      "height: calc(100dvh - min(38dvh, 20rem) - max(14rem, 34dvh))",
+      "height: calc(100dvh - min(38dvh, 20rem) - var(--studio-controls-tab-h))",
     );
     expect(css).toContain(
-      "height: calc(100dvh - min(10dvh, 4.5rem) - max(14rem, 34dvh))",
+      "height: calc(100dvh - min(10dvh, 4.5rem) - var(--studio-controls-tab-h))",
     );
     expect(css).toContain('.slideHost[data-panel="builder"]');
+    expect(css).toContain("--studio-controls-tab-h: 3.25rem");
+    expect(css).not.toContain("max(14rem, 34dvh)");
     expect(css).not.toContain(
       "max-height: calc(100dvh - min(38dvh, 20rem) - max(14rem, 34dvh))",
     );

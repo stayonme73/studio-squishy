@@ -11,6 +11,8 @@ export type LobbyEntrySessionState = "checking" | "signed-in" | "signed-out";
 type Props = {
   sessionState: LobbyEntrySessionState;
   onClose: () => void;
+  /** Desktop may close the film; phone must keep the real front door. */
+  allowDismiss?: boolean;
   /** Instant unlock when JS attaches — storage + cookie still written for reload. */
   onBeginNew?: () => void;
   /** No-JS fallback; may carry `?studioPaymentSandbox=1` for local cert. */
@@ -28,6 +30,7 @@ type Props = {
 export default function StudioLobbyEntryFilm({
   sessionState,
   onClose,
+  allowDismiss = true,
   onBeginNew,
   beginNewHref,
 }: Props) {
@@ -38,17 +41,19 @@ export default function StudioLobbyEntryFilm({
     sessionState === "signed-in" ? routes.studioBoard : routes.signInFromBoard;
 
   return (
-    <div className="lobby-entry-film" role="dialog" aria-modal="true" aria-labelledby="lobby-entry-brand">
+    <div className="lobby-entry-film" role="dialog" aria-modal="true" aria-labelledby="lobby-entry-brand" data-phone-front-door={allowDismiss ? undefined : "true"}>
       <div className="lobby-entry-film__scrim" aria-hidden />
       <div className="lobby-entry-film__panel">
-        <button
-          type="button"
-          className="lobby-entry-film__close"
-          onClick={onClose}
-          aria-label={copy.closeFilmAria}
-        >
-          <span aria-hidden>×</span>
-        </button>
+        {allowDismiss ? (
+          <button
+            type="button"
+            className="lobby-entry-film__close"
+            onClick={onClose}
+            aria-label={copy.closeFilmAria}
+          >
+            <span aria-hidden>×</span>
+          </button>
+        ) : null}
 
         <header className="lobby-entry-film__header">
           <p className="lobby-entry-film__welcome">{copy.welcomeScript}</p>

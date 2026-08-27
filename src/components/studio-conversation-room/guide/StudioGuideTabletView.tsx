@@ -1,11 +1,19 @@
 "use client";
 
+import { useLayoutEffect, useRef, type ReactNode } from "react";
+
 import ConversationRouteChoose from "@/components/studio-conversation-room/guide/ConversationRouteChoose";
 import ConversationStudioPlanTablet from "@/components/studio-conversation-room/guide/ConversationStudioPlanTablet";
 import styles from "@/components/studio-conversation-room/guide/studio-guide-tablet.module.css";
 import {
+  CONVERSATION_ROOM_ACTIVE_QUESTION_ID,
+  revealActiveQuestionCluster,
+  revealConversationStage,
+} from "@/lib/studio-conversation-tablet-anchor";
+import {
   conversationRoomGuideV1,
   getConversationRoomGuideQuestion,
+  recordedMaterialsSelection,
   shouldShowDeadlineFormatHint,
 } from "@/config/conversation-room-guide-v1";
 import type { ConversationRoomStage } from "@/config/conversation-room-stage-v1";
@@ -17,6 +25,7 @@ import {
   type GuideCaptureDraftV1,
 } from "@/lib/studio-guide-capture";
 import type { ProjectBuilderStudioPlanSummaryModel } from "@/lib/project-builder-studio-plan-summary";
+import { useSamsungActivate } from "@/lib/studio-samsung-activate";
 
 export type StudioGuideTabletViewProps = {
   step: GuideConversationStep;
@@ -61,6 +70,12 @@ export type StudioGuideTabletViewProps = {
     stillNeeded: readonly string[];
     nextLine: string;
   } | null;
+  /** Speak / type / Continue for the active opening question. */
+  answerDock?: ReactNode;
+  /** Compact Voice On / Off — already chosen, shown with the question. */
+  modeControls?: ReactNode;
+  /** Hide “Required” once a bubble or typed value is already captured. */
+  answerAccepted?: boolean;
 };
 
 /** Mic privacy copy — rendered below the hardware, not inside the tablet. */
@@ -99,11 +114,18 @@ export default function StudioGuideTabletView({
   onOpenPlanExtraDetails,
   planBridgeError = null,
   intakeTabletStatus = null,
+  answerDock = null,
+  modeControls = null,
+  answerAccepted = false,
 }: StudioGuideTabletViewProps) {
   const v = conversationRoomGuideV1;
   const question = getConversationRoomGuideQuestion(step);
   const openingOwns = stage === "opening";
   const isAsk = openingOwns && Boolean(question) && !correcting;
+  const recordedChoice =
+    question?.bubbleMode === "multi"
+      ? recordedMaterialsSelection(selectedBubbles)
+      : null;
   const isSummary = openingOwns && step === "summary";
   const isConfirmed = openingOwns && step === "confirmed";
   const isRouteStage = stage === "route";
@@ -112,6 +134,33 @@ export default function StudioGuideTabletView({
   const isCheckoutStage = stage === "checkout";
   const isIntakeStage = stage === "intake";
   const tabletOwnsChrome = isRouteStage || isPlanStage;
+  const previousStepRef = useRef(step);
+  const previousSurfaceRef = useRef(`${stage}:${step}`);
+
+  useLayoutEffect(() => {
+    const previous = previousStepRef.current;
+    previousStepRef.current = step;
+    if (!isAsk) return;
+    if (previous === step) return;
+    revealActiveQuestionCluster();
+  }, [step, isAsk]);
+
+  useLayoutEffect(() => {
+    const key = `${stage}:${step}`;
+    const previous = previousSurfaceRef.current;
+    previousSurfaceRef.current = key;
+    if (previous === key) return;
+    if (isAsk) return;
+    if (
+      stage === "services" ||
+      stage === "plan" ||
+      stage === "checkout" ||
+      stage === "intake"
+    ) {
+      return;
+    }
+    revealConversationStage();
+  }, [stage, step, isAsk]);
 
   return (
     <section
@@ -120,7 +169,7 @@ export default function StudioGuideTabletView({
       data-stage={stage}
       aria-label={v.eyebrow}
     >
-      <div className={styles.main}>
+      <div className={styles.main} data-question-scroll-root="true">
         {isRouteStage && onPreviewRoad && onConfirmRoad ? (
           <ConversationRouteChoose
             onPreviewRoad={onPreviewRoad}
@@ -271,38 +320,50 @@ export default function StudioGuideTabletView({
 
 
         {isAsk && question ? (
-          <>
-            <div className={styles.questionHeader}>
-              <h1 className={styles.question}>{question.question}</h1>
-              {!question.canSkip || question.step === "ask_business_name" ? (
-                <p className={styles.requiredBadge} aria-label="Required">
-                  {v.answerRequiredLabel}
-                </p>
-              ) : null}
-            </div>
+          <div
+            id={CONVERSATION_ROOM_ACTIVE_QUESTION_ID}
+            className={styles.askCluster}
+            data-active-question-cluster="true"
+          >
+            {modeControls}
+
+            {(!question.canSkip || question.step === "ask_business_name") &&
+            !answerAccepted ? (
+              <p className={styles.requiredMeta} data-required-meta="true">
+                {v.answerRequiredLabel}
+              </p>
+            ) : null}
+
+            <h1 className={styles.question}>{question.question}</h1>
 
             {question.bubbles.length > 0 ? (
               <div className={styles.chipRow} role="list">
-                {question.bubbles.map((bubble) => {
-                  const selected = selectedBubbles.includes(bubble);
-                  return (
-                    <button
-                      key={bubble}
-                      type="button"
-                      role="listitem"
-                      className={styles.chip}
-                      data-selected={selected ? "true" : "false"}
-                      aria-pressed={selected}
-                      onClick={() => onToggleBubble(bubble)}
-                    >
-                      {bubble}
-                    </button>
-                  );
-                })}
+                {question.bubbles.map((bubble) => (
+                  <SamsungChipButton
+                    key={bubble}
+                    label={bubble}
+                    selected={selectedBubbles.includes(bubble)}
+                    onActivate={() => onToggleBubble(bubble)}
+                  />
+                ))}
               </div>
-            ) : (
+            ) : answerDock ? null : (
               <p className={styles.hint}>{v.typedAnswerDockHint}</p>
             )}
+
+            {question.bubbleMode === "multi" && recordedChoice ? (
+              <p
+                className={styles.body}
+                data-recorded-choice="true"
+                aria-live="polite"
+              >
+                {recordedChoice}
+              </p>
+            ) : null}
+
+            {question.bubbleMode === "multi" ? (
+              <p className={styles.navHint}>{v.materialsDetailsHint}</p>
+            ) : null}
 
             {shouldShowDeadlineFormatHint(selectedBubbles) ? (
               <p className={styles.hint}>{v.deadlineFormatHint}</p>
@@ -310,28 +371,33 @@ export default function StudioGuideTabletView({
 
             {error ? <p className={styles.error}>{error}</p> : null}
 
-            {question.bubbles.length > 0 ? (
+            {question.canSkip ? (
               <div className={styles.actions}>
-                {question.canSkip ? (
-                  <button
-                    type="button"
-                    className={styles.btnSecondary}
-                    onClick={onSkip}
-                  >
-                    {v.skipLabel}
-                  </button>
-                ) : null}
-                <button
-                  type="button"
-                  className={styles.btnPrimary}
-                  data-tablet-continue="true"
-                  onClick={onContinue}
+                <SamsungActionButton
+                  className={styles.btnSecondary}
+                  onActivate={onSkip}
                 >
-                  {v.continueLabel}
-                </button>
+                  {v.skipLabel}
+                </SamsungActionButton>
               </div>
             ) : null}
-          </>
+
+            {answerDock ? (
+              <div className={styles.answerDock}>{answerDock}</div>
+            ) : null}
+
+            {!answerDock && question.bubbles.length > 0 ? (
+              <div className={styles.actions}>
+                <SamsungActionButton
+                  className={styles.btnPrimary}
+                  tabletContinue
+                  onActivate={onContinue}
+                >
+                  {v.continueLabel}
+                </SamsungActionButton>
+              </div>
+            ) : null}
+          </div>
         ) : null}
 
         {isSummary && !correcting ? (
@@ -366,15 +432,11 @@ export default function StudioGuideTabletView({
             <h1 className={styles.question}>{v.correctionPrompt}</h1>
             <div className={styles.chipRow} role="list">
               {v.correctionTargets.map((target) => (
-                <button
+                <SamsungChipButton
                   key={target.step}
-                  type="button"
-                  role="listitem"
-                  className={styles.chip}
-                  onClick={() => onCorrectTarget(target.step)}
-                >
-                  {target.label}
-                </button>
+                  label={target.label}
+                  onActivate={() => onCorrectTarget(target.step)}
+                />
               ))}
             </div>
           </>
@@ -450,5 +512,55 @@ function SummaryCards({ draft }: { draft: GuideCaptureDraftV1 }) {
         </div>
       ))}
     </dl>
+  );
+}
+
+function SamsungChipButton({
+  label,
+  selected,
+  onActivate,
+}: {
+  label: string;
+  selected?: boolean;
+  onActivate: () => void;
+}) {
+  const activate = useSamsungActivate<HTMLButtonElement>(onActivate);
+  return (
+    <button
+      ref={activate.ref}
+      type="button"
+      role="listitem"
+      className={styles.chip}
+      data-selected={selected === undefined ? undefined : selected ? "true" : "false"}
+      aria-pressed={selected === undefined ? undefined : selected}
+      onClick={activate.onClick}
+    >
+      {label}
+    </button>
+  );
+}
+
+function SamsungActionButton({
+  className,
+  children,
+  onActivate,
+  tabletContinue,
+}: {
+  className: string;
+  children: ReactNode;
+  onActivate: () => void;
+  tabletContinue?: boolean;
+}) {
+  const activate = useSamsungActivate<HTMLButtonElement>(onActivate);
+  return (
+    <button
+      ref={activate.ref}
+      type="button"
+      className={className}
+      data-tablet-continue={tabletContinue ? "true" : undefined}
+      onClick={activate.onClick}
+    >
+      {children}
+    </button>
   );
 }

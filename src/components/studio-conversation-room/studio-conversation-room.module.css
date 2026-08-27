@@ -46,6 +46,8 @@
     )
   );
   --stage-width: calc(var(--tablet-width) + var(--room-gap) + var(--side-width));
+  /* Phone Studio Controls tab. Desktop ignores this; the rail stays expanded. */
+  --studio-controls-tab-h: 3.25rem;
 
   position: relative;
   box-sizing: border-box;
@@ -308,14 +310,24 @@
 
 @media (max-width: 960px) {
   .room {
-    --tablet-width: min(100%, 28rem);
-    --side-width: min(100%, 28rem);
+    --tablet-width: 100%;
+    --side-width: 100%;
     --stage-width: 100%;
     --activity-reserve: 0px;
     --max-tablet-height: none;
     justify-content: flex-start;
     padding-right: var(--room-pad-x);
-    overflow-y: auto;
+    padding-bottom: var(--studio-controls-tab-h);
+    /*
+     * MJ-D13: do not make .room a scrollport. overflow-y:auto on height:auto
+     * still intercepts the first Samsung pan, then rubber-bands / jumps back
+     * while document/body also scroll. overflow-x:hidden here would compute
+     * overflow-y back to auto — leave both visible; body already clips X.
+     * overflow-anchor: none stops reverse-scroll jumps between the tablet
+     * glass and the Voice dock (MJ-D14).
+     */
+    overflow: visible;
+    overflow-anchor: none;
     height: auto;
     min-height: 100dvh;
   }
@@ -344,7 +356,7 @@
   }
 
   .sideSpeak {
-    min-height: 12rem;
+    min-height: 0;
   }
 
   .roomStage {
@@ -356,57 +368,76 @@
     width: min(100vw, 48rem);
     /*
      * Leave the upper Presentation tablet band clear so Checkout / Intake
-     * tablet CTAs stay reachable. Panel sits between that band and the
-     * Session reserve (CR-4R4). Use an explicit height so the inner list
-     * can scroll — height:auto + overflow:hidden clipped service cards
-     * on Samsung (MJ-D7).
+     * tablet CTAs stay reachable. Bottom reserve is the collapsed Studio
+     * Controls tab only (MJ-D12) — not a 34dvh Session slab.
+     * Use an explicit height so the inner list can scroll — height:auto
+     * + overflow:hidden clipped service cards on Samsung (MJ-D7).
      */
     top: min(38dvh, 20rem);
-    bottom: max(14rem, 34dvh);
-    height: calc(100dvh - min(38dvh, 20rem) - max(14rem, 34dvh));
+    bottom: var(--studio-controls-tab-h);
+    height: calc(100dvh - min(38dvh, 20rem) - var(--studio-controls-tab-h));
     max-height: none;
   }
 
   /*
-   * Choose-your-services / route peek need a visible job list. The 38dvh
-   * tablet band is already used (Open service list). Keep Session clear.
+   * Choose-your-services / route peek need a visible job list. Sheet
+   * height stays based on the collapsed tab even while the drawer is
+   * expanded (drawer overlays; customer collapses to uncover cards).
    */
   .slideHost[data-panel="builder"],
   .slideHost[data-panel="route"] {
     top: min(10dvh, 4.5rem);
-    height: calc(100dvh - min(10dvh, 4.5rem) - max(14rem, 34dvh));
+    bottom: var(--studio-controls-tab-h);
+    height: calc(100dvh - min(10dvh, 4.5rem) - var(--studio-controls-tab-h));
   }
 
   /*
-   * Phone stack puts Session under the tablet. When the activity panel is open,
-   * pin Session (not Speak) into the reserved band so Help / Lobby stay clickable.
-   * Speak stays in the stack; burying Session under Speak in a short fixed rail
-   * was the prior failure mode.
+   * Phone: Studio Controls is a bottom utility tab, not hallway furniture.
+   * Always pin the tab. Expanded drawer overlays from the bottom and
+   * scrolls; it does not steal the service-list height.
+   * roomStage z-index is auto so this fixed tab can sit above the activity
+   * sheet (slideHost is a sibling at z-index 120).
    */
-  .room[data-slide-open="true"] .sideNav {
+  .roomStage {
+    z-index: auto;
+  }
+
+  .surfaceStack,
+  .presenceBelow,
+  .sideSpeak {
+    position: relative;
+    z-index: 2;
+    overflow-anchor: none;
+  }
+
+  .sideNav {
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 121;
+    z-index: 122;
     width: 100%;
-    max-height: max(14rem, 34dvh);
-    overflow: auto;
-    padding: 0.35rem var(--room-pad-x) 0.5rem;
+    flex: none;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
     box-sizing: border-box;
-    background: rgba(14, 17, 22, 0.96);
+  }
+
+  .sideCaption {
+    display: none;
   }
 
   /*
    * Phone stack is full-width — left-edge geometry cannot clear the tablet.
-   * Match the panel band: dim only between the tablet reserve and Session.
+   * Match the panel band: dim only between the tablet reserve and the tab.
    * Do not elevate the whole stage (avoids indiscriminate click-through).
    */
   .slideScrim {
     left: 0;
     right: 0;
     top: min(38dvh, 20rem);
-    bottom: max(14rem, 34dvh);
+    bottom: var(--studio-controls-tab-h);
   }
 
   .room[data-slide-open="true"][data-active-panel="builder"] .slideScrim,
