@@ -110,7 +110,7 @@ function StudioGuideCommPanel({
     onSendMessage();
   }
 
-  const sendActivate = useSamsungActivate(runSend);
+  const sendActivate = useSamsungActivate(runSend, { consumeGesture: true });
 
   useEffect(() => {
     const node = textRef.current;

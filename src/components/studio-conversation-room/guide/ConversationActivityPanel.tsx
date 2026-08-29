@@ -215,7 +215,7 @@ function ServiceList({
 
   return (
     <div className={styles.sheet} data-panel="builder">
-      <header className={styles.header}>
+      <header className={styles.header} data-builder-chrome="header">
         <div>
           <p className={styles.eyebrow}>
             {road
@@ -223,6 +223,12 @@ function ServiceList({
               : "Your route"}
           </p>
           <h2 className={styles.title}>{v.servicesPanelTitle}</h2>
+          <p
+            className={styles.builderRouteContext}
+            data-builder-route-context="true"
+          >
+            {road ? road.customerLabel : "Your route"}
+          </p>
         </div>
         <button
           type="button"
@@ -236,21 +242,25 @@ function ServiceList({
 
       <p className={styles.intro}>{v.servicesPanelLead}</p>
 
-      <div className={styles.builderToolbar}>
+      <div className={styles.builderToolbar} data-builder-chrome="toolbar">
         <button type="button" className={styles.backLink} onClick={onBackToRoutes}>
           ← {v.servicesBackToRoutesLabel}
         </button>
         <div className={styles.builderSummaryStack}>
-          <p className={styles.builderSummary}>
+          <p className={styles.builderCount}>
             {PROJECT_BUILDER_V1.selectedCountLabel}: {selectedCount}
           </p>
-          <p className={styles.builderSummary}>
+          <p
+            className={styles.builderSummary}
+            aria-live="polite"
+            aria-label={`${PROJECT_BUILDER_V1.totalLabel} ${formatEstimate(estimateCents)}. ${selectedCount} ${PROJECT_BUILDER_V1.selectedCountLabel.toLowerCase()} selected.`}
+          >
             {PROJECT_BUILDER_V1.totalLabel}: {formatEstimate(estimateCents)}
           </p>
         </div>
       </div>
 
-      <div className={styles.jobList}>
+      <div className={styles.jobList} data-service-list="true">
         {jobs.map((job) => {
           const inProject = selectedJobIds.has(job.id);
           const expanded = expandedIds.has(job.id);

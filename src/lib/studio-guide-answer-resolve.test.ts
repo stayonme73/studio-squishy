@@ -5,6 +5,7 @@ import { createEmptyGuideCaptureDraft } from "@/lib/studio-guide-capture";
 import {
   resolveComposerSendAction,
   resolveGuideAnswerFromUi,
+  visibleBubblesForStoredAnswer,
 } from "@/lib/studio-guide-answer-resolve";
 import { recordedMaterialsSelection } from "@/config/conversation-room-guide-v1";
 
@@ -136,5 +137,48 @@ describe("studio-guide-answer-resolve — Send / Continue parity", () => {
       "The Studio recorded Logo, Photos.",
     );
     expect(recordedMaterialsSelection([])).toBeNull();
+  });
+
+  it("does not treat another question’s stored wording as a selected bubble", () => {
+    expect(
+      visibleBubblesForStoredAnswer({
+        stored: "",
+        bubbles: [
+          "Branding or logo",
+          "Presentation or document",
+          "Not sure yet",
+        ],
+        bubbleMode: "single",
+      }),
+    ).toEqual([]);
+    expect(
+      visibleBubblesForStoredAnswer({
+        stored: "Maya",
+        bubbles: [
+          "Branding or logo",
+          "Presentation or document",
+          "Not sure yet",
+        ],
+        bubbleMode: "single",
+      }),
+    ).toEqual([]);
+    expect(
+      visibleBubblesForStoredAnswer({
+        stored: "Presentation or document",
+        bubbles: [
+          "Branding or logo",
+          "Presentation or document",
+          "Not sure yet",
+        ],
+        bubbleMode: "single",
+      }),
+    ).toEqual(["Presentation or document"]);
+    expect(
+      visibleBubblesForStoredAnswer({
+        stored: "Logo, Photos — Files are in Dropbox",
+        bubbles: ["Logo", "Photos", "Nothing yet"],
+        bubbleMode: "multi",
+      }),
+    ).toEqual(["Logo", "Photos"]);
   });
 });

@@ -2,6 +2,11 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
+import {
+  getJobsForRoad,
+  getSelectableRouteMapRoads,
+} from "@/config/route-map-v1";
+
 describe("Mobile Conversation Room coherence (MJ-D9)", () => {
   it("does not render questions until Voice On / Voice Off is chosen", () => {
     const runtime = readFileSync(
@@ -238,8 +243,10 @@ describe("MJ-D13 Mobile Conversation Room page scroll", () => {
       "utf8",
     );
     const roomPhone = roomCss.slice(roomCss.indexOf("@media (max-width: 960px)"));
-    expect(roomPhone).toContain("overflow: visible");
+    expect(roomPhone).toContain("overflow-x: clip");
+    expect(roomPhone).toContain("overflow-y: visible");
     expect(roomPhone).not.toContain("overflow-y: auto");
+    expect(roomPhone).not.toContain("overflow-x: hidden");
     expect(roomPhone).toContain("MJ-D13");
     const tabletCss = readFileSync(
       join(
@@ -324,6 +331,27 @@ describe("MJ-D14 Mobile Review Together / Route page coherence", () => {
     );
     expect(panelCss).toContain('.sheet[data-surface="tablet"] .mapFigure');
     expect(panelCss).toContain("flex: 0 0 auto");
+  });
+
+  it("clips Let’s Review Together sideways overflow without a room Y scrollport", () => {
+    const roomCss = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/studio-conversation-room.module.css",
+      ),
+      "utf8",
+    );
+    const roomPhone = roomCss.slice(roomCss.indexOf("@media (max-width: 960px)"));
+    expect(roomPhone).toContain("overflow-x: clip");
+    expect(roomPhone).toContain("overflow-y: visible");
+    expect(roomPhone).toContain("overscroll-behavior-x: none");
+    expect(roomCss).toContain("transform: scale(1.04)");
+    const mobile = readFileSync(
+      join(process.cwd(), "src/app/mobile-journey.css"),
+      "utf8",
+    );
+    expect(mobile).toContain('html:has([data-layout="one-tablet"])');
+    expect(mobile).toContain("overflow-x: clip");
   });
 
   it("reveals the new stage once and does not open the service sheet from scroll", () => {
@@ -430,5 +458,147 @@ describe("MJ-D16 — Voice Off must not start the microphone", () => {
     );
     expect(comm).toContain("allowMicrophone");
     expect(comm).toContain("!allowMicrophone && !listening");
+  });
+});
+
+describe("MJ-D18 — stale bubble selection must not carry forward", () => {
+  it("clears chips on Continue and ignores leftover gesture taps", () => {
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    expect(runtime).toContain("disarmBubblesForSameGesture");
+    expect(runtime).toContain("if (!bubbleArmedRef.current) return");
+    expect(runtime).toContain("restoreSelection");
+    expect(runtime).toContain("visibleBubblesForStoredAnswer");
+    expect(runtime).toContain("writeTextDraft(restore ? fieldValueForStep(nextDraft, next) : \"\")");
+    expect(runtime).toContain("BUBBLE_REARM_MS");
+  });
+
+  it("keys chips to the current question and consumes Continue’s leftover click", () => {
+    const tablet = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/StudioGuideTabletView.tsx",
+      ),
+      "utf8",
+    );
+    expect(tablet).toContain("key={`${question.step}:${bubble}`}");
+    expect(tablet).toContain("tabletContinue ? { consumeGesture: true }");
+    const comm = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/StudioGuideCommPanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(comm).toContain("consumeGesture: true");
+    const activate = readFileSync(
+      join(process.cwd(), "src/lib/studio-samsung-activate.ts"),
+      "utf8",
+    );
+    expect(activate).toContain("if (!lastAt.current) return");
+  });
+});
+
+describe("MJ-D19 Mobile Choose Your Services hierarchy", () => {
+  it("compacts phone chrome without changing the job-list scroller or Studio Controls", () => {
+    const panel = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationActivityPanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(panel).toContain("data-builder-route-context");
+    expect(panel).toContain("data-service-list");
+    expect(panel).toContain("servicesBackToRoutesLabel");
+    expect(panel).toContain("Close activity panel");
+    expect(panel).toContain("PROJECT_BUILDER_V1.totalLabel");
+    expect(panel).toContain("PROJECT_BUILDER_V1.selectedCountLabel");
+    const css = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/conversation-activity-panel.module.css",
+      ),
+      "utf8",
+    );
+    const phone = css.slice(css.indexOf("@media (max-width: 960px)"));
+    expect(phone).toContain("MJ-D19");
+    expect(phone).toContain(".builderRouteContext");
+    expect(phone).toContain(".builderCount");
+    expect(phone).toContain("min-height: 12rem");
+    expect(phone).toContain("-webkit-overflow-scrolling: touch");
+    const room = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/studio-conversation-room.module.css",
+      ),
+      "utf8",
+    );
+    const roomPhone = room.slice(room.indexOf("@media (max-width: 960px)"));
+    expect(roomPhone).toContain('.slideHost[data-panel="builder"]');
+    expect(roomPhone).toContain("width: 100%");
+    expect(roomPhone).toContain("max-width: 100%");
+    const nav = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationNavPanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(nav).toContain("Studio Controls");
+  });
+
+  it("uses one ServiceList + the same phone CSS for every selectable Launch Now route", () => {
+    const roads = getSelectableRouteMapRoads();
+    expect(roads.map((road) => road.id)).toEqual([
+      "i75",
+      "i20",
+      "update",
+      "random-exit",
+    ]);
+    expect(roads.map((road) => road.customerLabel)).toEqual([
+      "Get My Business Started",
+      "Promote Something Now",
+      "Update What I Already Have",
+      "I Know What I Need",
+    ]);
+    expect(roads.every((road) => road.selectable)).toBe(true);
+    for (const road of roads) {
+      expect(getJobsForRoad(road.id).length).toBeGreaterThan(0);
+    }
+    const panel = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationActivityPanel.tsx",
+      ),
+      "utf8",
+    );
+    const serviceList = panel.slice(
+      panel.indexOf("function ServiceList"),
+      panel.indexOf("function LearnMoreView"),
+    );
+    expect(serviceList).toContain("road.customerLabel");
+    expect(serviceList).toContain("getJobsForRoad(roadId)");
+    expect(serviceList).not.toContain("if (roadId");
+    expect(serviceList).not.toContain("roadId ===");
+    expect(panel).toContain("if (panel === \"builder\" && selectedRoadId)");
+    expect(panel).toContain("<ServiceList");
+    const css = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/conversation-activity-panel.module.css",
+      ),
+      "utf8",
+    );
+    const phone = css.slice(css.indexOf("@media (max-width: 960px)"));
+    expect(phone).not.toContain("i75");
+    expect(phone).not.toContain("i20");
+    expect(phone).not.toContain("random-exit");
+    expect(phone).not.toContain("[data-road]");
   });
 });

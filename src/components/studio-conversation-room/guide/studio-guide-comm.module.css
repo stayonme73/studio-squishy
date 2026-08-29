@@ -255,6 +255,7 @@
   font-weight: 700;
   cursor: pointer;
   touch-action: manipulation;
+  overflow-anchor: none;
 }
 
 .sendBtn:disabled {

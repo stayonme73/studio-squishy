@@ -118,7 +118,10 @@ import {
   startNewGuideCaptureConversation,
   type GuideCaptureDraftV1,
 } from "@/lib/studio-guide-capture";
-import { resolveGuideAnswerFromUi } from "@/lib/studio-guide-answer-resolve";
+import {
+  resolveGuideAnswerFromUi,
+  visibleBubblesForStoredAnswer,
+} from "@/lib/studio-guide-answer-resolve";
 import {
   applyGuideAnswerToDraft,
   clearGuideUiStep,
@@ -309,6 +312,8 @@ export default function ConversationRoomRuntime({
   const voiceNarrationRef = useRef<StudioVoiceNarrationPreference | null>(null);
   const listenArmedRef = useRef(true);
   const [listenArmed, setListenArmed] = useState(true);
+  /** MJ-D18: leftover Continue click must not gold a chip on the next question. */
+  const bubbleArmedRef = useRef(true);
   const activityReturnFocusRef = useRef<HTMLElement | null>(null);
   /** Suppress stacked “added” lines when the customer taps services quickly. */
   const lastServiceAddSpokenAtRef = useRef(0);
@@ -428,6 +433,16 @@ export default function ConversationRoomRuntime({
     setStep(openStep);
     const openField = fieldValueForStep(hydratedGuide, openStep);
     writeTextDraft(openField);
+    const bootQuestion = getConversationRoomGuideQuestion(openStep);
+    setSelectedBubbles(
+      bootQuestion
+        ? visibleBubblesForStoredAnswer({
+            stored: openField,
+            bubbles: bootQuestion.bubbles,
+            bubbleMode: bootQuestion.bubbleMode,
+          })
+        : [],
+    );
     setActivePanel(
       restoredStage === "opening" ? "none" : STAGE_DEFAULT_PANEL[restoredStage],
     );
@@ -531,18 +546,39 @@ export default function ConversationRoomRuntime({
     window.setTimeout(() => setSavedPulse(false), 1600);
   }
 
+  const BUBBLE_REARM_MS = 400;
+
+  function disarmBubblesForSameGesture() {
+    bubbleArmedRef.current = false;
+    suppressSameGestureFollowUp(() => {
+      window.setTimeout(() => {
+        bubbleArmedRef.current = true;
+      }, BUBBLE_REARM_MS);
+    });
+  }
+
   function goToStep(
     next: GuideConversationStep,
     nextDraft = draft,
-    options?: { correcting?: boolean },
+    options?: { correcting?: boolean; restoreSelection?: boolean },
   ) {
+    const question = getConversationRoomGuideQuestion(next);
+    const restore = options?.restoreSelection === true;
     setStep(next);
     writeGuideUiStep(next);
     setCorrecting(options?.correcting ?? false);
     setAskMode(false);
     setShowDateField(false);
-    setSelectedBubbles([]);
-    writeTextDraft(fieldValueForStep(nextDraft, next));
+    setSelectedBubbles(
+      restore && question
+        ? visibleBubblesForStoredAnswer({
+            stored: fieldValueForStep(nextDraft, next),
+            bubbles: question.bubbles,
+            bubbleMode: question.bubbleMode,
+          })
+        : [],
+    );
+    writeTextDraft(restore ? fieldValueForStep(nextDraft, next) : "");
     setError(null);
     setInterimTranscript("");
     stopConversationDictation();
@@ -652,6 +688,7 @@ export default function ConversationRoomRuntime({
     const nextDraft = applyGuideAnswerToDraft(draft, step, answer, skipped);
     const nextStep = nextGuideStep(step);
     commitDraft(nextDraft);
+    disarmBubblesForSameGesture();
     goToStep(nextStep, nextDraft);
 
     /* Preferred name: warm one-time ack, then next question — do not spam the name. */
@@ -671,11 +708,13 @@ export default function ConversationRoomRuntime({
     const nextDraft = applyGuideAnswerToDraft(draft, step, "", true);
     const nextStep = nextGuideStep(step);
     commitDraft(nextDraft);
+    disarmBubblesForSameGesture();
     goToStep(nextStep, nextDraft);
     speakGuideStep(nextStep, { thanks: true });
   }
 
   function handleToggleBubble(bubble: string) {
+    if (!bubbleArmedRef.current) return;
     const question = getConversationRoomGuideQuestion(step);
     if (!question) return;
     setError(null);
@@ -1390,7 +1429,7 @@ export default function ConversationRoomRuntime({
   }
 
   function handleCorrectTarget(target: GuideConversationStep) {
-    goToStep(target, draft);
+    goToStep(target, draft, { restoreSelection: true });
     speakGuideStep(target);
   }
 

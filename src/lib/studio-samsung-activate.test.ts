@@ -12,7 +12,8 @@ describe("useSamsungActivate", () => {
     expect(source).toContain("useSamsungTapActivate");
     expect(source).toContain("TAP_SLOP_PX");
     expect(source).toContain("consumeGesture");
-    expect(source).toContain("suppressSameGestureFollowUp");
+    expect(source).toContain("if (!lastAt.current) return");
+    expect(source).toContain("event?.detail === 0");
     expect(source).toContain("RefCallback");
     expect(source).not.toContain('pointerType === "mouse"');
     expect(source).not.toContain("useLayoutEffect");

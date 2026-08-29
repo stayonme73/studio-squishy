@@ -75,6 +75,30 @@ export function resolveGuideAnswerFromUi(
 }
 
 /**
+ * Gold chips for a stored answer on THIS question only.
+ * Empty when the stored field is blank or does not match a bubble.
+ */
+export function visibleBubblesForStoredAnswer(input: {
+  stored: string;
+  bubbles: readonly string[];
+  bubbleMode: "single" | "multi";
+}): string[] {
+  const stored = input.stored.trim();
+  if (!stored || input.bubbles.length === 0) return [];
+  if (input.bubbleMode === "multi") {
+    const choicePart = stored.split(" — ")[0]?.trim() ?? "";
+    const chosen = new Set(
+      choicePart
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean),
+    );
+    return input.bubbles.filter((bubble) => chosen.has(bubble));
+  }
+  return input.bubbles.includes(stored) ? [stored] : [];
+}
+
+/**
  * Permanent-dock Send semantics.
  * Guide questions: always submit via the same path as tablet Continue.
  * Free ask: send only when there is typed text (otherwise the control is inactive).

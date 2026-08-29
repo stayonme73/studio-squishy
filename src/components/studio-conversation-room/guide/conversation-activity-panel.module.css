@@ -563,6 +563,11 @@
   gap: 0.15rem;
 }
 
+.builderRouteContext {
+  display: none;
+}
+
+.builderCount,
 .builderSummary {
   margin: 0;
   font-size: 1.05rem;
@@ -702,21 +707,69 @@
   }
 
   .sheet[data-panel="builder"] {
-    gap: 0.5rem;
+    gap: 0.35rem;
   }
 
   .sheet[data-panel="builder"] .header,
-  .sheet[data-panel="builder"] .intro,
   .sheet[data-panel="builder"] .builderToolbar {
     flex: 0 0 auto;
   }
 
   .sheet[data-panel="builder"] .title {
+    margin-top: 0;
     font-size: 1.28rem;
+    line-height: 1.2;
   }
 
-  .sheet[data-panel="builder"] .intro {
-    font-size: 0.98rem;
+  /*
+   * MJ-D19: Choose Your Route is the clarity reference. Phone service
+   * chrome was stacking highway + title + intro + Services + investment
+   * + Back + Close before the first card. Compact to title, route, total,
+   * and a secondary Back link. Do not change the job-list scroller.
+   */
+  .sheet[data-panel="builder"] .eyebrow,
+  .sheet[data-panel="builder"] .intro,
+  .sheet[data-panel="builder"] .builderCount {
+    display: none;
+  }
+
+  .sheet[data-panel="builder"] .builderRouteContext {
+    display: block;
+    margin: 0.15rem 0 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+    color: rgba(210, 175, 95, 0.88);
+  }
+
+  .sheet[data-panel="builder"] .closeBtn {
+    font-size: 0.78rem;
+    font-weight: 600;
+    min-height: 2.5rem;
+    padding: 0.45rem 0.65rem;
+    color: rgba(236, 232, 224, 0.82);
+  }
+
+  .sheet[data-panel="builder"] .builderToolbar {
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sheet[data-panel="builder"] .backLink {
+    font-size: 0.88rem;
+    min-height: 2.5rem;
+    padding: 0.35rem 0;
+  }
+
+  .sheet[data-panel="builder"] .builderSummaryStack {
+    flex-direction: row;
+    align-items: baseline;
+  }
+
+  .sheet[data-panel="builder"] .builderSummary {
+    font-size: 0.88rem;
+    font-weight: 650;
   }
 
   .sheet[data-panel="builder"] .jobList {

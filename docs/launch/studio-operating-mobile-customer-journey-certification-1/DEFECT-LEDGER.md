@@ -131,15 +131,31 @@
 
 ## MJ-D10 — Mobile question advance / scroll position
 
-**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+**Status:** OPEN — opening-page height / top-landing PASS on real Samsung 2026-08-28. Not certified. Not closed. Package remains OPEN.
 
 **Found:** 2026-08-26 Samsung review after MJ-D9. Tagia answers near the lower part of the Conversation Room and taps Continue. The next question loads higher on the page, but the phone stays scrolled near the old answer / Continue controls. She has to hunt upward after every question.
 
-**Cause:** On phone (`max-width: 960px`) `.room` is `height: auto; overflow-y: auto` and the tablet grows with the question cluster. Continue sits at the bottom of that cluster. A valid Continue only updates React `step`. The new cluster paints at the top of the tablet, but `document.scrollingElement` / room scroll stays at the previous Continue offset. No scroll/focus follows the new question. Review Answers / Change an answer already call `revealConversationTablet()`; Continue did not.
+**Samsung 2026-08-28:** Short typed question (**What is the name of your business?**) lands with the next question already visible. Tall bubble question (**What are you working on?**) still requires manual scrolling. Inconsistency is the remaining bug.
 
-**Fix:** Wrap the opening question cluster in `#conversation-room-active-question`. After `step` actually changes while an opening question is showing, `revealActiveQuestionCluster()` resets the inner tablet scroller and brings that cluster to the start of the visible scrollport (`behavior: "auto"`). It does not focus the type field, does not `scrollTo(0, 0)` the whole page, and does not run on first paint. Question sequence, wording, and stored answers are unchanged.
+**Samsung 2026-08-28 follow-up:** Name → **What are you working on?** now lands correctly. **What are you working on?** → business name leaves the new heading only a sliver — not a pass.
 
-**Retest:** `studio-conversation-tablet-anchor.test.ts`, `mobile-conversation-coherence.test.ts`. Real-phone: answer the current question → Continue → next active question is visible without manual scrolling. Stay on this hire; do not skip Review Answers / Change an answer checks later.
+**Samsung 2026-08-28 top-anchor:** Name → **What are you working on?** shows the question, but Voice On / Off stays above the viewport. Owner rule: land on Voice, then Required, then question, then answers. Question-visible is not a pass.
+
+**Samsung 2026-08-28 page-height / top-anchor audit:** Remaining issue is structural page sizing, not another tap bug. Some screens still do not land high enough to show Conversation Room header / top context. Some screens have a “bottomless” empty band below real content.
+
+**Cause:** Reveal targeted the whole `#conversation-room-active-question` cluster, which includes Speak/Type Continue at the bottom. On a tall bubble question that cluster is taller than the phone. Continue stays focused after `pointerdown`, so the browser keeps the dock in view and the heading sits above the fold. A short next question still fits both heading and Continue, so it looked passed.
+
+**Follow-up cause:** Heading-anchor math was correct, but after a tall question the page *shrinks*. There is not enough document below the new heading to scroll it to the top of the usable view, so it stays clipped at the bottom edge. 12px top margin also sat on the viewport edge.
+
+**Follow-up cause (top rule):** Reveal then targeted the **heading**. Voice On / Off and Required sit *above* that heading, so a “correct” heading land still leaves the Voice row off-screen.
+
+**Follow-up cause (blank page):** Phone `.questionRevealPad` used `height: calc(100dvh - tab - 2.75rem)` (~540px at 360×640) on every opening question so the Voice row could be scrolled to y=32. That hid the Conversation Room eyebrow and created unused vertical reserve. `.room { min-height: 100dvh }` is one-screen canvas, not the extra scroll. Service-sheet `slideHost` heights are overlay reserves, not document pad. Route/review wrappers already hug content on phone (MJ-D14).
+
+**Fix:** Reveal `#conversation-room-tablet` (header / eyebrow in the first screen), with Voice row as fallback. 16px inset. Ask-stage pad is `2.5rem` breathing room only — stage-aware (opening questions), not a universal viewport pad. Blur Continue. Measure in layout and after paint. Do not `scrollIntoView` the tall cluster. Do not scroll the page to 0 as a hard reset.
+
+**Retest:** `studio-conversation-tablet-anchor.test.ts`, `mobile-conversation-coherence.test.ts`. Cursor 360px layout measure in Scout’s page-height report.
+
+**Samsung 2026-08-28 opening-page height / top-landing combined pass:** Owner result **normal**. Real device, not Cursor. Screens: Name, What are you working on?, Business name, Deadline, Materials. Each opened with the expected Conversation Room / Voice area in view. Excessive bottomless blank space is gone. This is PASS evidence for opening-page height and top-landing only. Not a Mobile close. Not a Review Together / Route / Services pass. Keep Mobile OPEN.
 
 ---
 
@@ -189,7 +205,7 @@
 
 ## MJ-D14 — Mobile Review Together / Route two-layer scroll
 
-**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+**Status:** OPEN — horizontal overflow fix ready. Not a one-page Mobile PASS. Not certified. Not closed.
 
 **Found:** 2026-08-26 Samsung. Let’s Review Together and Choose Your Route felt like two pages stitched together. The top customer surface and the lower Studio Tablet / Voice Off dock scrolled or caught independently. Reverse flicks jumped. Connected: route left letterbox, Open Service List jump, Studio Controls firing on a swipe.
 
@@ -198,6 +214,14 @@
 **Fix:** One document scroller for both stages. Phone tablet hugs content. Route/plan inner overflow visible + height auto. Map no longer flex-grows. `--tablet-width: 100%`. `overflow-anchor: none`. Drawer uses tap-with-slop + `touch-action: pan-y`. Reveal the new stage once (auto), and do not reveal when opening the service sheet.
 
 **360px proof (Cursor, ~360×640, 2026-08-26):** Let’s Review Together (`?stage=opening`) and Choose Your Route (`?stage=route`) both have one page scroller (`body` `overflow-y: auto`). `.room`, tablet `.main`, and `.sideSpeak` are `overflow: visible` with inner `scrollTop` 0. Document scroll to 180px held on both stages; reverse to 0 held; no inner snap-back. Route map `object-fit: cover`, figure `flex: 0 0 auto`, image left equals figure left (no charcoal letterbox). Remaining ~32px tablet inset is workspace bezel, not a second scroll layer. Type field `textarea` overflow is the only nested auto scroller (form field, not a page). Studio Controls stays a fixed bottom tab by design.
+
+**Samsung 2026-08-28:** Opening-page height / top-landing PASS (Name through Materials). Let’s Review Together still **fails**: vertical scroll improved, but the page can shift **sideways** and expose a slight edge band. Not a one-page Mobile PASS. Do not continue to Choose Your Route until this is gone.
+
+**Cause (horizontal):** Phone `.room { overflow: visible }` (MJ-D13) let `.room::before { transform: scale(1.04) }` expand document width. At 360px the plate is 360×1.04; **scrollWidth 367** vs **clientWidth 360** (7px). `html` overflow-x was `visible`; body `overflow-x: hidden` hides the scrollbar but does not stop Samsung from panning that 7px band. Closed activity `slideHost` is `position: fixed` off-screen (right 717) and did not add to scrollWidth.
+
+**Fix:** Phone `.room` uses `overflow-x: clip` + `overflow-y: visible` (not `overflow-x: hidden`, which would compute Y to auto). `overscroll-behavior-x: none`. `html:has([data-layout="one-tablet"])` also `overflow-x: clip`. Lobby plate scale kept.
+
+**360px measure (Cursor, after fix):** Let’s Review Together `scrollWidth` **360** = `clientWidth` **360** (was 367). `html` overflow-x `clip`. `.room` overflow-x `clip` / overflow-y `visible`. Closed `slideHost` stays `position: fixed` off-screen and does not add document width. One Samsung retest: Let’s Review Together — vertical flick only; no sideways drift; no edge band.
 
 **Retest:** `mobile-conversation-coherence.test.ts`, `studio-samsung-activate.test.ts`, `studio-conversation-tablet-anchor.test.ts`. Combined Samsung pass below — not certified until Tagia runs it.
 
@@ -242,6 +266,42 @@
 **Fix:** Keep the Entry Film mounted until the next route paints. Phone front door stays true during transitioning. `showEntryFilm` includes `transitioning`. No delay overlay.
 
 **Retest:** `studio-lobby-entry-choice.test.ts`. Samsung: Let’s Get Started from the Welcome film — no cropped-clock flicker before Conversation Room.
+
+---
+
+## MJ-D18 — Stale bubble selection on the next opening question
+
+**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+
+**Found:** 2026-08-28 Samsung. After entering Maya and tapping Continue, **What are you working on today?** opened with **Presentation or document** already gold. The customer had not selected a need.
+
+**Cause:** Continue uses immediate `pointerdown`. `revealActiveQuestionCluster()` then moves the new chip row under the still-settling finger. The leftover `click` hits a newly mounted chip (`useSamsungActivate` `onClick` is not debounced on a new node) and runs `handleToggleBubble`. `goToStep` already cleared `selectedBubbles`; the leftover tap wrote them again. Not a stored-answer restore.
+
+**Samsung 2026-08-28 follow-up:** After **Social media graphics** → Continue, **What is the name of your business?** opened with **I’m still deciding** already gold. Same class as the need-question leftover click: a newly mounted chip’s `onClick` fires when that node never received `pointerdown` (`lastAt === 0`), after the first disarm had already re-armed. Not a stored-answer restore. Not a separate business-name hydration bug.
+
+**Fix:** Disarm bubble toggles until that Continue/Skip gesture settles. Continue consumes the gesture. Chips are keyed to the current question. Forward Continue opens with no chips and an empty composer. Change an answer still restores gold from the stored answer for *that* question only. Follow-up: ignore leftover `click` unless this node saw `pointerdown`; re-arm bubbles 400ms after the gesture settles so MJ-D10 reveal cannot retarget the same finger.
+
+**Retest:** On **What is the name of your business?**, no bubble is gold until an explicit tap. Do not continue past that question yet.
+
+---
+
+## MJ-D19 — Choose Your Services mobile hierarchy
+
+**Status:** OPEN — phone chrome compact ready. Not certified. Not closed.
+
+**Found:** 2026-08-28 Samsung. Choose Your Route is clean. Choose Your Services is overloaded: Choose Your Services, Back to Routes, Services, Estimated Investment, Promote Something Now / route label, Close, then the cards. Owner likes the Studio Controls drawer and service-list scrolling. Do not change those.
+
+**Cause:** The builder sheet treated every metadata line as a heading. Highway eyebrow + title + long intro + `Services: N` + Estimated Investment + Back to Routes + Close all sat above the job list. Phone sheet also used `max-width: calc(100vw - 1.25rem)` so it was not full practical width.
+
+**Fix (phone only):** Title = Choose Your Services. Compact route context = customer label (Promote Something Now). Compact Estimated Investment. Back to Routes secondary. Close quieter, still present. Hide redundant `Services` count and the long intro in the sheet (Voice still has the lead). Job-list scroller, Studio Controls, route logic, investment math, Back, Close, social-posts SKU, and carousel exclusion unchanged. Desktop builder layout unchanged.
+
+**360px (Cursor, after compact):** Sheet width **360**. Header+toolbar chrome **91px**. First service card top **171px** (`Make Me a Business Card`). Intro and `Services` count `display: none`. Route context visible. Before (prior CSS): intro + dual totals + highway eyebrow put the first card near **~268px**; sheet max-width was **340**.
+
+**Samsung 2026-08-28:** Owner likes the corrected sheet on **Promote Something Now**. That is not a full MJ-D19 PASS.
+
+**Cross-route share (not a Samsung pass):** All four selectable Launch Now lanes open the same `ServiceList` (`data-panel="builder"`) with the same phone CSS. No per-road chrome branch. I-285 Perimeter Loop is not selectable and has no job shelf. Cursor 360px: all four customer labels stay **1 line**; chrome **91px**; first card top **171px**; sheet width **360**. Locked Random Exit label is **I Know What I Need** (not “I Know What I Want”). Job lists still differ by route. Not certified. Not closed.
+
+**Retest:** `mobile-conversation-coherence.test.ts`. MJ-D19 is not fully passed. Do not ask Tagia to walk every route.
 
 ---
 

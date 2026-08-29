@@ -40,7 +40,14 @@ export function useSamsungActivate<T extends HTMLElement>(
 
   return {
     ref,
-    onClick() {
+    onClick(event?: { detail?: number }) {
+      /* Keyboard Enter: detail 0, no pointerdown on this node. */
+      if (event?.detail === 0) {
+        handlerRef.current();
+        return;
+      }
+      /* Leftover click on a newly mounted chip never saw pointerdown here. */
+      if (!lastAt.current) return;
       if (Date.now() - lastAt.current < 450) return;
       handlerRef.current();
     },

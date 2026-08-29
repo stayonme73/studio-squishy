@@ -319,15 +319,17 @@
     padding-right: var(--room-pad-x);
     padding-bottom: var(--studio-controls-tab-h);
     /*
-     * MJ-D13: do not make .room a scrollport. overflow-y:auto on height:auto
-     * still intercepts the first Samsung pan, then rubber-bands / jumps back
-     * while document/body also scroll. overflow-x:hidden here would compute
-     * overflow-y back to auto — leave both visible; body already clips X.
+     * MJ-D13: do not make .room a vertical scrollport. overflow-y:auto on
+     * height:auto still intercepts the first Samsung pan, then rubber-bands.
+     * overflow-x:hidden would compute overflow-y back to auto — use clip
+     * on X so Let’s Review Together cannot pan sideways (MJ-D14).
      * overflow-anchor: none stops reverse-scroll jumps between the tablet
      * glass and the Voice dock (MJ-D14).
      */
-    overflow: visible;
+    overflow-x: clip;
+    overflow-y: visible;
     overflow-anchor: none;
+    overscroll-behavior-x: none;
     height: auto;
     min-height: 100dvh;
   }
@@ -389,6 +391,13 @@
     top: min(10dvh, 4.5rem);
     bottom: var(--studio-controls-tab-h);
     height: calc(100dvh - min(10dvh, 4.5rem) - var(--studio-controls-tab-h));
+  }
+
+  .slideHost[data-panel="builder"] {
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.65rem 0.75rem 0.5rem;
   }
 
   /*

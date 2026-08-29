@@ -6,7 +6,9 @@ import ConversationRouteChoose from "@/components/studio-conversation-room/guide
 import ConversationStudioPlanTablet from "@/components/studio-conversation-room/guide/ConversationStudioPlanTablet";
 import styles from "@/components/studio-conversation-room/guide/studio-guide-tablet.module.css";
 import {
+  CONVERSATION_ROOM_ACTIVE_QUESTION_HEADING_ID,
   CONVERSATION_ROOM_ACTIVE_QUESTION_ID,
+  CONVERSATION_ROOM_ACTIVE_QUESTION_TOP_ID,
   revealActiveQuestionCluster,
   revealConversationStage,
 } from "@/lib/studio-conversation-tablet-anchor";
@@ -320,12 +322,18 @@ export default function StudioGuideTabletView({
 
 
         {isAsk && question ? (
+          <>
           <div
             id={CONVERSATION_ROOM_ACTIVE_QUESTION_ID}
             className={styles.askCluster}
             data-active-question-cluster="true"
           >
-            {modeControls}
+            <div
+              id={CONVERSATION_ROOM_ACTIVE_QUESTION_TOP_ID}
+              data-question-reveal-top="true"
+            >
+              {modeControls}
+            </div>
 
             {(!question.canSkip || question.step === "ask_business_name") &&
             !answerAccepted ? (
@@ -334,13 +342,18 @@ export default function StudioGuideTabletView({
               </p>
             ) : null}
 
-            <h1 className={styles.question}>{question.question}</h1>
+            <h1
+              id={CONVERSATION_ROOM_ACTIVE_QUESTION_HEADING_ID}
+              className={styles.question}
+            >
+              {question.question}
+            </h1>
 
             {question.bubbles.length > 0 ? (
               <div className={styles.chipRow} role="list">
                 {question.bubbles.map((bubble) => (
                   <SamsungChipButton
-                    key={bubble}
+                    key={`${question.step}:${bubble}`}
                     label={bubble}
                     selected={selectedBubbles.includes(bubble)}
                     onActivate={() => onToggleBubble(bubble)}
@@ -398,6 +411,12 @@ export default function StudioGuideTabletView({
               </div>
             ) : null}
           </div>
+          <div
+            className={styles.questionRevealPad}
+            data-question-reveal-pad="true"
+            aria-hidden="true"
+          />
+          </>
         ) : null}
 
         {isSummary && !correcting ? (
@@ -551,7 +570,10 @@ function SamsungActionButton({
   onActivate: () => void;
   tabletContinue?: boolean;
 }) {
-  const activate = useSamsungActivate<HTMLButtonElement>(onActivate);
+  const activate = useSamsungActivate<HTMLButtonElement>(
+    onActivate,
+    tabletContinue ? { consumeGesture: true } : undefined,
+  );
   return (
     <button
       ref={activate.ref}
