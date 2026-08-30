@@ -1,0 +1,89 @@
+{
+  "allPass": true,
+  "results": [
+    {
+      "tapped": "Promote Something Now",
+      "expectedCta": "Continue with Promote Something Now",
+      "pass": true,
+      "state": {
+        "stillOnRoute": true,
+        "studioTablet": false,
+        "continueLabel": "Continue with Promote Something Now",
+        "continueCount": 1,
+        "selectedId": "i20",
+        "selectedLabel": "Promote Something Now",
+        "selectedBoxShadow": "rgb(84, 124, 146) 0px 0px 0px 2px inset",
+        "recommendedIds": [
+          "i20"
+        ],
+        "recommendedLabels": [
+          "Promote Something Now"
+        ],
+        "badgeOnPromote": true
+      }
+    },
+    {
+      "tapped": "Get My Business Started",
+      "expectedCta": "Continue with Get My Business Started",
+      "pass": true,
+      "state": {
+        "stillOnRoute": true,
+        "studioTablet": false,
+        "continueLabel": "Continue with Get My Business Started",
+        "continueCount": 1,
+        "selectedId": "i75",
+        "selectedLabel": "Get My Business Started",
+        "selectedBoxShadow": "rgb(84, 124, 146) 0px 0px 0px 2px inset",
+        "recommendedIds": [
+          "i20"
+        ],
+        "recommendedLabels": [
+          "Promote Something Now"
+        ],
+        "badgeOnPromote": true
+      }
+    },
+    {
+      "tapped": "Update What I Already Have",
+      "expectedCta": "Continue with Update What I Already Have",
+      "pass": true,
+      "state": {
+        "stillOnRoute": true,
+        "studioTablet": false,
+        "continueLabel": "Continue with Update What I Already Have",
+        "continueCount": 1,
+        "selectedId": "update",
+        "selectedLabel": "Update What I Already Have",
+        "selectedBoxShadow": "rgb(84, 124, 146) 0px 0px 0px 2px inset",
+        "recommendedIds": [
+          "i20"
+        ],
+        "recommendedLabels": [
+          "Promote Something Now"
+        ],
+        "badgeOnPromote": true
+      }
+    },
+    {
+      "tapped": "I Know What I Need",
+      "expectedCta": "Continue with I Know What I Need",
+      "pass": true,
+      "state": {
+        "stillOnRoute": true,
+        "studioTablet": false,
+        "continueLabel": "Continue with I Know What I Need",
+        "continueCount": 1,
+        "selectedId": "random-exit",
+        "selectedLabel": "I Know What I Need",
+        "selectedBoxShadow": "rgb(84, 124, 146) 0px 0px 0px 2px inset",
+        "recommendedIds": [
+          "i20"
+        ],
+        "recommendedLabels": [
+          "Promote Something Now"
+        ],
+        "badgeOnPromote": true
+      }
+    }
+  ]
+}

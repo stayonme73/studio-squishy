@@ -460,7 +460,9 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
       "utf8",
     );
     expect(runtime).toContain("const summaryConfirm =");
-    expect(runtime).toContain("hidePhoneScaffolding={summaryConfirm}");
+    expect(runtime).toContain(
+      "hidePhoneScaffolding={summaryConfirm || routeChoose}",
+    );
     const questionGlassBlock = runtime.slice(
       runtime.indexOf("const questionGlass ="),
       runtime.indexOf("const summaryConfirm ="),
@@ -512,6 +514,55 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     );
     expect(room).toContain("hidePhoneScaffolding");
     expect(room).toContain("data-phone-quiet-chrome");
+  });
+
+  it("keeps Choose Your Route as select-then-continue without tablet scaffolding", () => {
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    const preview = runtime.slice(
+      runtime.indexOf("function handlePreviewRoad"),
+      runtime.indexOf("function handleConfirmRoad"),
+    );
+    expect(preview).toContain("setPreviewRoadId(roadId)");
+    expect(preview).not.toContain('openPanel("route")');
+    expect(runtime).toContain('const routeChoose = stage === "route"');
+    expect(runtime).toContain("openingAsk || routeChoose");
+    const chooser = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationRouteChoose.tsx",
+      ),
+      "utf8",
+    );
+    expect(chooser).toContain("topControls");
+    expect(chooser).toContain('className="lobby-entry-film__cta"');
+    expect(chooser).toContain("data-route-continue");
+    expect(chooser).toContain("Select this route.");
+    expect(chooser).not.toContain("Open route details.");
+    expect(chooser).not.toContain("{compact ? confirmRow : null}");
+    expect(chooser).toContain("{confirmRow}");
+    expect(chooser).toContain("recommendedRoadId === road.id");
+    const panelCss = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/conversation-activity-panel.module.css",
+      ),
+      "utf8",
+    );
+    expect(panelCss).toContain(
+      '.sheet[data-surface="tablet"] .routeExpand[data-expanded="true"]',
+    );
+    expect(panelCss).toContain("box-shadow: inset 0 0 0 2px #547c92");
+    expect(panelCss).toContain(
+      '.sheet[data-surface="tablet"] .routeExpand[data-recommended="true"]',
+    );
+    expect(panelCss).toContain(".sheet[data-surface=\"tablet\"] .routeArrow");
+    expect(panelCss).toContain("display: none");
   });
 });
 

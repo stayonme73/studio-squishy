@@ -10,6 +10,7 @@ import {
   MOBILE_BUSINESS_NAME_OWNER_ACCEPTED,
   MOBILE_VISUAL_SYSTEM_CHECKPOINT,
   MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT,
+  MOBILE_CHOOSE_YOUR_ROUTE_OWNER_ACCEPTED,
   mobileCustomerSpinePaletteV1,
 } from "@/config/mobile-customer-spine-palette-v1";
 import { studioDesignSystem } from "@/config/studio-design-system";
@@ -293,7 +294,8 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(runtime).toContain("step === \"ask_deadline\"");
     expect(runtime).toContain("step === \"ask_materials\"");
     expect(runtime).toContain("step === \"summary\"");
-    expect(runtime).toContain("hidePhoneScaffolding={summaryConfirm}");
+    expect(runtime).toContain('stage === "route"');
+    expect(runtime).toContain("hidePhoneScaffolding={summaryConfirm || routeChoose}");
     expect(runtime).toContain(
       'stage === "opening" && step === "summary" && !correcting',
     );
@@ -412,7 +414,7 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.nameQuestion).toBe("OWNER_ACCEPTED");
     expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.projectNeed).toBe("OWNER_ACCEPTED");
     expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.businessName).toBe("OWNER_ACCEPTED");
-    expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.nextScreen).toBe("route");
+    expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.nextScreen).toBe("services");
     expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.reuseLockedComponents).toBe(true);
     expect(MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT.materialsQuestion).toBe(
       "OWNER_ACCEPTED",
@@ -429,6 +431,16 @@ describe("Mobile customer-spine palette (scoped)", () => {
     );
     expect(
       existsSync(join(root, MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT.checkpointDoc)),
+    ).toBe(true);
+    expect(MOBILE_CHOOSE_YOUR_ROUTE_OWNER_ACCEPTED.status).toBe("OWNER_ACCEPTED");
+    expect(MOBILE_CHOOSE_YOUR_ROUTE_OWNER_ACCEPTED.stage).toBe("route");
+    expect(MOBILE_CHOOSE_YOUR_ROUTE_OWNER_ACCEPTED.cardsSelectOnly).toBe(true);
+    expect(MOBILE_CHOOSE_YOUR_ROUTE_OWNER_ACCEPTED.nextScreen).toBe("services");
+    expect(
+      existsSync(join(root, MOBILE_CHOOSE_YOUR_ROUTE_OWNER_ACCEPTED.proofPng)),
+    ).toBe(true);
+    expect(
+      existsSync(join(root, MOBILE_CHOOSE_YOUR_ROUTE_OWNER_ACCEPTED.checkpointDoc)),
     ).toBe(true);
     expect(MOBILE_PROJECT_NEED_OWNER_ACCEPTED.step).toBe("ask_project_need");
     expect(MOBILE_BUSINESS_NAME_OWNER_ACCEPTED.step).toBe("ask_business_name");

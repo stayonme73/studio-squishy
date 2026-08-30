@@ -1,0 +1,24 @@
+{
+  "metrics": {
+    "studioTablet": false,
+    "chooseHeading": true,
+    "voiceOn": true,
+    "voiceOff": true,
+    "continueLabel": "Continue with Promote Something Now",
+    "continueTag": "A",
+    "continueBg": "rgb(84, 124, 146)",
+    "promoteRecommended": "false",
+    "promoteSelected": "false",
+    "startedSelected": "true",
+    "startedRecommended": "true",
+    "topCtaCount": 1
+  },
+  "afterSelect": {
+    "continueLabel": "Continue with Get My Business Started",
+    "promoteRecommended": "false",
+    "promoteSelected": "true",
+    "startedSelected": "false",
+    "startedRecommended": "true",
+    "stillOnRoute": true
+  }
+}

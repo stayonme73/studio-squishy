@@ -648,9 +648,8 @@ export default function ConversationRoomRuntime({
   }
 
   function handlePreviewRoad(roadId: RouteMapRoadId) {
-    /* Highlight on the tablet and open Route details in the Activity Panel. */
+    /* Select the lane. Continue commits. Do not navigate on card tap. */
     setPreviewRoadId(roadId);
-    openPanel("route");
   }
 
   function handleConfirmRoad(roadId: RouteMapRoadId) {
@@ -1752,15 +1751,17 @@ export default function ConversationRoomRuntime({
   const openingAsk = isAnsweringQuestion;
   const voiceUnset = voiceNarration === null;
   const questionGlass =
-    stage === "opening" &&
-    (step === "ask_preferred_name" ||
-      step === "ask_project_need" ||
-      step === "ask_business_name" ||
-      step === "ask_deadline" ||
-      step === "ask_materials" ||
-      step === "summary");
+    (stage === "opening" &&
+      (step === "ask_preferred_name" ||
+        step === "ask_project_need" ||
+        step === "ask_business_name" ||
+        step === "ask_deadline" ||
+        step === "ask_materials" ||
+        step === "summary")) ||
+    stage === "route";
   const summaryConfirm =
     stage === "opening" && step === "summary" && !correcting;
+  const routeChoose = stage === "route";
 
   const canChangeAnswer =
     guideHasReviewableAnswers(draft) ||
@@ -1774,7 +1775,7 @@ export default function ConversationRoomRuntime({
       presence={voice.presence}
       loungeLight
       nameQuestion={questionGlass}
-      hidePhoneScaffolding={summaryConfirm}
+      hidePhoneScaffolding={summaryConfirm || routeChoose}
       activePanel={activePanel}
       onCloseActivityPanel={closeActivityPanel}
       activityPanelReturnFocusRef={activityReturnFocusRef}
@@ -1901,7 +1902,7 @@ export default function ConversationRoomRuntime({
             ) : null
           }
           modeControls={
-            openingAsk ? (
+            openingAsk || routeChoose ? (
               <VoicePreferenceControls
                 preference={voiceNarration ?? "off"}
                 onChoose={handleVoiceNarrationPreference}

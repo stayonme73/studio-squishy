@@ -111,7 +111,7 @@ export const MOBILE_VISUAL_SYSTEM_CHECKPOINT = {
   projectNeed: "OWNER_ACCEPTED" as const,
   businessName: "OWNER_ACCEPTED" as const,
   visualMaster: "MOBILE_VISUAL_MASTER" as const,
-  nextScreen: "route" as const,
+  nextScreen: "services" as const,
   reuseLockedComponents: true as const,
   identity: [
     "lounge-background-crop",
@@ -142,4 +142,32 @@ export const MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT = {
   nextScreen: "route" as const,
   checkpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-30-MATERIALS-CONFIRMATION-CHECKPOINT.md" as const,
+} as const;
+
+/**
+ * Owner-accepted Choose Your Route (Samsung 2026-08-30).
+ * Reuses MOBILE_VISUAL_MASTER. Do not redesign.
+ * Suggested Starting Point is the recommendation. Denim is the selection.
+ * Cards select only. One Continue CTA advances.
+ */
+export const MOBILE_CHOOSE_YOUR_ROUTE_OWNER_ACCEPTED = {
+  status: "OWNER_ACCEPTED" as const,
+  acceptedAt: "2026-08-30" as const,
+  visualMaster: "MOBILE_VISUAL_MASTER" as const,
+  stage: "route" as const,
+  suggestionStaysOnRecommendation: true as const,
+  denimSelectionFollowsTap: true as const,
+  cardsSelectOnly: true as const,
+  continueAdvances: true as const,
+  nextScreen: "services" as const,
+  proofPng:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/lounge-glass-proofs/46-route-top-360.png" as const,
+  fourCardProofPng:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/lounge-glass-proofs/47-route-select-direct-360.png" as const,
+  checkpointDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-30-CHOOSE-YOUR-ROUTE-CHECKPOINT.md" as const,
+  freezeFiles: [
+    "src/components/studio-conversation-room/guide/ConversationRouteChoose.tsx",
+    "src/components/studio-conversation-room/guide/conversation-activity-panel.module.css",
+  ],
 } as const;

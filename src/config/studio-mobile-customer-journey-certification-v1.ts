@@ -158,7 +158,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   businessNameAcceptedAt: "2026-08-29" as const,
   visualSystemCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/MOBILE-VISUAL-SYSTEM-CHECKPOINT.md" as const,
-  nextMobileScreen: "route" as const,
+  nextMobileScreen: "services" as const,
   reuseLockedMobileVisualSystem: true as const,
   tonightMobileVisualCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-29-TONIGHT-MOBILE-VISUAL-CHECKPOINT.md" as const,
@@ -166,4 +166,8 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   materialsConfirmationCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-30-MATERIALS-CONFIRMATION-CHECKPOINT.md" as const,
   materialsConfirmationCheckpointAt: "2026-08-30" as const,
+  chooseYourRouteStatus: "OWNER_ACCEPTED" as const,
+  chooseYourRouteAcceptedAt: "2026-08-30" as const,
+  chooseYourRouteCheckpointDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-30-CHOOSE-YOUR-ROUTE-CHECKPOINT.md" as const,
 } as const;

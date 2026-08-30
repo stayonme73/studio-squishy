@@ -3,7 +3,7 @@
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`  
 **Status:** **OPEN / IN PROGRESS** (unparked 2026-08-25; not closed; real-phone certification **not** stamped). Stopping point: `2026-08-25-STOPPING-POINT-CHECKPOINT.md`.  
 
-**Visual locks (Mobile OPEN):** Welcome = `MOBILE_VISUAL_MASTER`. Voice Choice = **OWNER ACCEPTED** 2026-08-29 (`VOICE-CHOICE-OWNER-ACCEPTED-LOCK.md`). Name question = **OWNER ACCEPTED** 2026-08-29 (`NAME-QUESTION-OWNER-ACCEPTED-LOCK.md`). System checkpoint: `MOBILE-VISUAL-SYSTEM-CHECKPOINT.md`. Materials + confirmation: `2026-08-30-MATERIALS-CONFIRMATION-CHECKPOINT.md`. Do not redesign those locked screens. No Supervision. No merge.  
+**Visual locks (Mobile OPEN):** Welcome = `MOBILE_VISUAL_MASTER`. Voice Choice = **OWNER ACCEPTED** 2026-08-29 (`VOICE-CHOICE-OWNER-ACCEPTED-LOCK.md`). Name question = **OWNER ACCEPTED** 2026-08-29 (`NAME-QUESTION-OWNER-ACCEPTED-LOCK.md`). System checkpoint: `MOBILE-VISUAL-SYSTEM-CHECKPOINT.md`. Materials + confirmation: `2026-08-30-MATERIALS-CONFIRMATION-CHECKPOINT.md`. Choose Your Route: `2026-08-30-CHOOSE-YOUR-ROUTE-CHECKPOINT.md`. Do not redesign those locked screens. No Supervision. No merge.  
 **Base commit:** `15ee699c7d16331b3f410871f02555841fddd4d6` (Gate X close)  
 **Base branch:** `operating/external-customer-content-intake-and-rights-certification-1`  
 **Opened:** 2026-08-22  

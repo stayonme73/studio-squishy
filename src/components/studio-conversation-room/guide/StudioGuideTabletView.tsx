@@ -174,6 +174,7 @@ export default function StudioGuideTabletView({
             previewRoadId={previewRoadId}
             recommendedRoadId={recommendedRoadId}
             compact
+            topControls={modeControls}
           />
         ) : null}
 
