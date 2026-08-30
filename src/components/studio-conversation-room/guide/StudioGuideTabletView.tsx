@@ -15,7 +15,6 @@ import {
 import {
   conversationRoomGuideV1,
   getConversationRoomGuideQuestion,
-  recordedMaterialsSelection,
   shouldShowDeadlineFormatHint,
 } from "@/config/conversation-room-guide-v1";
 import type { ConversationRoomStage } from "@/config/conversation-room-stage-v1";
@@ -124,10 +123,6 @@ export default function StudioGuideTabletView({
   const question = getConversationRoomGuideQuestion(step);
   const openingOwns = stage === "opening";
   const isAsk = openingOwns && Boolean(question) && !correcting;
-  const recordedChoice =
-    question?.bubbleMode === "multi"
-      ? recordedMaterialsSelection(selectedBubbles)
-      : null;
   const isSummary = openingOwns && step === "summary";
   const isConfirmed = openingOwns && step === "confirmed";
   const isRouteStage = stage === "route";
@@ -364,16 +359,6 @@ export default function StudioGuideTabletView({
               <p className={styles.hint}>{v.typedAnswerDockHint}</p>
             )}
 
-            {question.bubbleMode === "multi" && recordedChoice ? (
-              <p
-                className={styles.body}
-                data-recorded-choice="true"
-                aria-live="polite"
-              >
-                {recordedChoice}
-              </p>
-            ) : null}
-
             {question.bubbleMode === "multi" ? (
               <p className={styles.navHint}>{v.materialsDetailsHint}</p>
             ) : null}
@@ -428,20 +413,15 @@ export default function StudioGuideTabletView({
             ) : null}
             {error ? <p className={styles.error}>{error}</p> : null}
             <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.btnSecondary}
-                onClick={onCorrect}
+              <SamsungActionButton
+                className={styles.btnCorrect}
+                onActivate={onCorrect}
               >
                 {v.correctLabel}
-              </button>
-              <button
-                type="button"
-                className={styles.btnPrimary}
-                onClick={onConfirm}
-              >
+              </SamsungActionButton>
+              <SamsungDenimCta onActivate={onConfirm}>
                 {v.confirmLabel}
-              </button>
+              </SamsungDenimCta>
             </div>
           </>
         ) : null}
@@ -470,13 +450,12 @@ export default function StudioGuideTabletView({
               <p className={styles.deadlineNote}>{v.deadlineUnconfirmedNote}</p>
             ) : null}
             <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.btnSecondary}
-                onClick={onCorrect}
+              <SamsungActionButton
+                className={styles.btnCorrect}
+                onActivate={onCorrect}
               >
                 {v.correctLabel}
-              </button>
+              </SamsungActionButton>
               <button
                 type="button"
                 className={styles.btnPrimary}
@@ -556,6 +535,32 @@ function SamsungChipButton({
     >
       {label}
     </button>
+  );
+}
+
+function SamsungDenimCta({
+  children,
+  onActivate,
+}: {
+  children: ReactNode;
+  onActivate: () => void;
+}) {
+  const activate = useSamsungActivate<HTMLAnchorElement>(onActivate);
+  return (
+    <a
+      ref={activate.ref}
+      role="button"
+      tabIndex={0}
+      className="lobby-entry-film__cta"
+      onClick={activate.onClick}
+      onKeyDown={(event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        onActivate();
+      }}
+    >
+      {children}
+    </a>
   );
 }
 

@@ -400,32 +400,47 @@
 }
 
 .root[data-step="ask_preferred_name"],
-.root[data-step="ask_project_need"] {
+.root[data-step="ask_project_need"],
+.root[data-step="ask_deadline"],
+.root[data-step="ask_materials"],
+.root[data-step="summary"] {
   height: auto;
   flex: 0 0 auto;
 }
 
 .root[data-step="ask_preferred_name"] .main,
-.root[data-step="ask_project_need"] .main {
+.root[data-step="ask_project_need"] .main,
+.root[data-step="ask_deadline"] .main,
+.root[data-step="ask_materials"] .main,
+.root[data-step="summary"] .main {
   flex: 0 0 auto;
   overflow: visible;
 }
 
 .root[data-step="ask_preferred_name"] .questionRevealPad,
-.root[data-step="ask_project_need"] .questionRevealPad {
+.root[data-step="ask_project_need"] .questionRevealPad,
+.root[data-step="ask_deadline"] .questionRevealPad,
+.root[data-step="ask_materials"] .questionRevealPad,
+.root[data-step="summary"] .questionRevealPad {
   display: none;
   height: 0;
 }
 
 .root[data-step="ask_preferred_name"] .eyebrow,
 .root[data-step="ask_project_need"] .eyebrow,
-.root[data-step="ask_business_name"] .eyebrow {
+.root[data-step="ask_business_name"] .eyebrow,
+.root[data-step="ask_deadline"] .eyebrow,
+.root[data-step="ask_materials"] .eyebrow,
+.root[data-step="summary"] .eyebrow {
   display: none;
 }
 
 .root[data-step="ask_preferred_name"] .question,
 .root[data-step="ask_project_need"] .question,
-.root[data-step="ask_business_name"] .question {
+.root[data-step="ask_business_name"] .question,
+.root[data-step="ask_deadline"] .question,
+.root[data-step="ask_materials"] .question,
+.root[data-step="summary"] .question {
   color: #f7f4ee;
   font-size: clamp(1.15rem, 3.2vw, 1.45rem);
   letter-spacing: 0;
@@ -488,7 +503,9 @@
 }
 
 .root[data-step="ask_project_need"] .chip,
-.root[data-step="ask_business_name"] .chip {
+.root[data-step="ask_business_name"] .chip,
+.root[data-step="ask_deadline"] .chip,
+.root[data-step="ask_materials"] .chip {
   border: 2px solid #547c92;
   background: transparent;
   color: #2e2b28;
@@ -496,7 +513,9 @@
 }
 
 .root[data-step="ask_project_need"] .chip:hover,
-.root[data-step="ask_business_name"] .chip:hover {
+.root[data-step="ask_business_name"] .chip:hover,
+.root[data-step="ask_deadline"] .chip:hover,
+.root[data-step="ask_materials"] .chip:hover {
   border-color: #547c92;
   background: transparent;
   color: #2e2b28;
@@ -507,10 +526,17 @@
 .root[data-step="ask_project_need"] .chip[data-selected="true"]:focus,
 .root[data-step="ask_business_name"] .chip[data-selected="true"],
 .root[data-step="ask_business_name"] .chip[data-selected="true"]:hover,
-.root[data-step="ask_business_name"] .chip[data-selected="true"]:focus {
-  border-color: #547c92;
-  background: #547c92;
-  color: #f7f4ee;
+.root[data-step="ask_business_name"] .chip[data-selected="true"]:focus,
+.root[data-step="ask_deadline"] .chip[data-selected="true"],
+.root[data-step="ask_deadline"] .chip[data-selected="true"]:hover,
+.root[data-step="ask_deadline"] .chip[data-selected="true"]:focus,
+.root[data-step="ask_materials"] .chip[data-selected="true"],
+.root[data-step="ask_materials"] .chip[data-selected="true"]:hover,
+.root[data-step="ask_materials"] .chip[data-selected="true"]:focus {
+  border-color: #f7c900;
+  background: #f7c900;
+  color: #2e2b28;
+  box-shadow: none;
 }
 
 .answerDock {
@@ -604,6 +630,23 @@
   color: var(--mc-eucalyptus, #456b5a);
 }
 
+/* Summary “Correct something” — Coral, not eucalyptus/Denim. Yellow is the deadline note. */
+.btnCorrect {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  padding: 0.7rem 1.15rem;
+  border-radius: 0.65rem;
+  border: 1.5px solid var(--mc-coral, #d94e2b);
+  background: transparent;
+  color: var(--mc-coral, #d94e2b);
+  font: inherit;
+  font-size: 1.12rem;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
 .linkBtn {
   appearance: none;
   align-self: flex-start;
@@ -630,8 +673,63 @@
   margin: 0;
   padding: 0.85rem 1rem;
   border-radius: 0.7rem;
-  background: var(--mc-card, color-mix(in srgb, #f7f4ee 55%, transparent));
-  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  background: transparent;
+  border: 1px solid color-mix(in srgb, #547c92 32%, #f7f4ee);
+}
+
+.root[data-step="summary"] .btnCorrect {
+  background: transparent;
+}
+
+.root[data-step="summary"] .actions .lobby-entry-film__cta {
+  margin-top: 0;
+}
+
+/*
+ * Summary type: one family. Answers stay the readable size; labels
+ * step up so they are not a third tiny scale. Deadline note matches
+ * the button size. Heading stays with the question family.
+ */
+.root[data-step="summary"] .summaryList {
+  gap: 0.35rem;
+}
+
+.root[data-step="summary"] .summaryRow {
+  padding: 0.65rem 0.9rem;
+}
+
+.root[data-step="summary"] .summaryRow dt {
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+}
+
+.root[data-step="summary"] .summaryRow dd {
+  font-size: 1.15rem;
+}
+
+.root[data-step="summary"] .deadlineNote {
+  font-size: 1.12rem;
+}
+
+.root[data-step="summary"] .main {
+  padding-bottom: 0.55rem;
+}
+
+.root[data-step="summary"] .actions {
+  gap: 0.7rem;
+  margin-top: 0.35rem;
+}
+
+.deadlineNote {
+  margin: 0;
+  padding: 0.85rem 1.05rem;
+  border-radius: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--mc-yellow, #f7c900) 55%, var(--mc-denim, #547c92));
+  background: color-mix(in srgb, var(--mc-yellow, #f7c900) 16%, transparent);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  text-wrap: pretty;
+  color: var(--mc-ink, #2e2b28);
 }
 
 .summaryRow dt {
@@ -648,18 +746,6 @@
   font-size: 1.28rem;
   font-weight: 650;
   line-height: 1.35;
-  color: var(--mc-ink, #2e2b28);
-}
-
-.deadlineNote {
-  margin: 0;
-  padding: 0.85rem 1.05rem;
-  border-radius: 0.65rem;
-  border: 1px solid color-mix(in srgb, var(--mc-yellow, #f7c900) 55%, var(--mc-denim, #547c92));
-  background: color-mix(in srgb, var(--mc-yellow, #f7c900) 16%, var(--mc-ivory, #f7f4ee));
-  font-size: 1.05rem;
-  line-height: 1.4;
-  text-wrap: pretty;
   color: var(--mc-ink, #2e2b28);
 }
 
@@ -744,7 +830,10 @@
   }
 
   .root[data-step="ask_preferred_name"] .questionRevealPad,
-  .root[data-step="ask_project_need"] .questionRevealPad {
+  .root[data-step="ask_project_need"] .questionRevealPad,
+  .root[data-step="ask_deadline"] .questionRevealPad,
+  .root[data-step="ask_materials"] .questionRevealPad,
+  .root[data-step="summary"] .questionRevealPad {
     display: none;
     height: 0;
   }

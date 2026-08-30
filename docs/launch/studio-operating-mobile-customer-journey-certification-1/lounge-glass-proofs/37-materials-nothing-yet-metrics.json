@@ -1,0 +1,12 @@
+{
+  "proof": {
+    "hasRecordedSentence": false,
+    "hasNothingYetNarration": false,
+    "helperVisible": true,
+    "skipVisible": true,
+    "placeholder": "Add extra details",
+    "nothingYetSelected": true,
+    "recordedChoiceNode": false
+  },
+  "fails": []
+}

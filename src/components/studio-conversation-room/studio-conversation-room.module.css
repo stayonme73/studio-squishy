@@ -441,7 +441,10 @@
    * rail. Presence stays off this screen. Review is the bottom utility.
    */
   .room[data-name-question="true"] .sideRail,
-  .room[data-name-question="true"] .presenceBelow {
+  .room[data-name-question="true"] .presenceBelow,
+  .room[data-phone-quiet-chrome="true"] .sideRail,
+  .room[data-phone-quiet-chrome="true"] .presenceBelow,
+  .room[data-phone-quiet-chrome="true"] .surfaceCaption {
     display: none;
     pointer-events: none;
   }

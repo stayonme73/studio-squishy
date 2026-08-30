@@ -1,0 +1,61 @@
+{
+  "capturedAt": "2026-08-30T20:03:11.948Z",
+  "viewport": "360x780",
+  "welcome": {
+    "ctaBg": "rgb(84, 124, 146)",
+    "panelBg": "color(srgb 0.953569 0.934274 0.900706 / 0.46)",
+    "reviewText": "Studio Review",
+    "reviewColor": "rgb(247, 244, 238)",
+    "scaffolding": false
+  },
+  "voiceChoice": {
+    "heading": true,
+    "offTag": "A",
+    "offClass": "lobby-entry-film__cta voice-choice-film-module___pRQQa__cta",
+    "panelBg": "rgba(243, 238, 230, 0.46)",
+    "reviewPresent": true
+  },
+  "name": {
+    "heading": false,
+    "studioTablet": false,
+    "recordedLine": false,
+    "reviewPresent": true
+  },
+  "projectNeed": {
+    "heading": true,
+    "studioTablet": false,
+    "reviewPresent": true
+  },
+  "businessName": {
+    "heading": true,
+    "studioTablet": false,
+    "reviewPresent": true
+  },
+  "deadline": {
+    "heading": true,
+    "studioTablet": false,
+    "reviewPresent": true
+  },
+  "materials": {
+    "heading": true,
+    "studioTablet": false,
+    "recordedLine": false,
+    "reviewPresent": true,
+    "helper": true
+  },
+  "summary": {
+    "heading": true,
+    "studioTablet": false,
+    "recordedLine": false,
+    "unconfirmed": true,
+    "deadlineNote": true,
+    "yesTag": "A",
+    "yesBg": "rgb(84, 124, 146)",
+    "yesClass": "lobby-entry-film__cta",
+    "correctColor": "rgb(217, 78, 43)",
+    "correctBorder": "rgb(217, 78, 43)",
+    "cardBg": "rgba(0, 0, 0, 0)",
+    "reviewPresent": true,
+    "reviewGapPx": 34
+  }
+}

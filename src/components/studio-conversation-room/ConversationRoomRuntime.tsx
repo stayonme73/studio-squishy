@@ -1755,7 +1755,12 @@ export default function ConversationRoomRuntime({
     stage === "opening" &&
     (step === "ask_preferred_name" ||
       step === "ask_project_need" ||
-      step === "ask_business_name");
+      step === "ask_business_name" ||
+      step === "ask_deadline" ||
+      step === "ask_materials" ||
+      step === "summary");
+  const summaryConfirm =
+    stage === "opening" && step === "summary" && !correcting;
 
   const canChangeAnswer =
     guideHasReviewableAnswers(draft) ||
@@ -1769,6 +1774,7 @@ export default function ConversationRoomRuntime({
       presence={voice.presence}
       loungeLight
       nameQuestion={questionGlass}
+      hidePhoneScaffolding={summaryConfirm}
       activePanel={activePanel}
       onCloseActivityPanel={closeActivityPanel}
       activityPanelReturnFocusRef={activityReturnFocusRef}

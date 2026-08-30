@@ -422,16 +422,21 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     expect(multiBlock).not.toContain("writeTextDraft");
   });
 
-  it("shows the recorded materials choice and keeps details optional", () => {
+  it("keeps materials details optional and does not narrate chip selection", () => {
     const config = readFileSync(
       join(process.cwd(), "src/config/conversation-room-guide-v1.ts"),
       "utf8",
     );
-    expect(config).toContain("recordedMaterialsSelection");
     expect(config).toContain("materialsDetailsHint");
     expect(config).toContain(
+      "You can add extra details about your materials here. This is optional.",
+    );
+    expect(config).toContain('placeholder: "Add extra details"');
+    expect(config).not.toContain(
       "Add any extra details about your materials. This is optional.",
     );
+    expect(config).not.toContain("The Studio recorded");
+    expect(config).not.toContain("recordedMaterialsSelection");
     const tablet = readFileSync(
       join(
         process.cwd(),
@@ -439,9 +444,74 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
       ),
       "utf8",
     );
-    expect(tablet).toContain('data-recorded-choice="true"');
+    expect(tablet).not.toContain("data-recorded-choice");
+    expect(tablet).not.toContain("The Studio recorded");
+    expect(tablet).not.toContain("recordedMaterialsSelection");
     expect(tablet).toContain("materialsDetailsHint");
     expect(tablet).not.toContain("writeTextDraft");
+  });
+
+  it("puts the summary confirmation on locked Lounge glass without tablet scaffolding", () => {
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    expect(runtime).toContain("const summaryConfirm =");
+    expect(runtime).toContain("hidePhoneScaffolding={summaryConfirm}");
+    const questionGlassBlock = runtime.slice(
+      runtime.indexOf("const questionGlass ="),
+      runtime.indexOf("const summaryConfirm ="),
+    );
+    expect(questionGlassBlock).toContain('step === "summary"');
+    const tabletView = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/StudioGuideTabletView.tsx",
+      ),
+      "utf8",
+    );
+    expect(tabletView).toContain('className="lobby-entry-film__cta"');
+    expect(tabletView).toContain("{v.confirmLabel}");
+    expect(tabletView).toContain("{v.correctLabel}");
+    expect(tabletView).toContain("SamsungDenimCta");
+    expect(tabletView).toContain("styles.btnCorrect");
+    const tabletCss = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/studio-guide-tablet.module.css",
+      ),
+      "utf8",
+    );
+    expect(tabletCss).toContain('.root[data-step="summary"] .question');
+    expect(tabletCss).toContain('.root[data-step="summary"] .summaryRow dt');
+    expect(tabletCss).toContain(".btnCorrect");
+    expect(tabletCss).toContain("var(--mc-coral, #d94e2b)");
+    const workspaceCss = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/studio-workspace.module.css",
+      ),
+      "utf8",
+    );
+    expect(workspaceCss).toContain(
+      '.frame[data-name-question="true"]:has([data-step="summary"])',
+    );
+    expect(workspaceCss).toContain("margin-bottom: 2.15rem");
+    expect(workspaceCss).toContain("--studio-review-mobile-bottom");
+    expect(tabletCss).not.toContain("#355C7D");
+    expect(tabletCss).not.toContain("#2C3E50");
+    const room = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/StudioConversationRoom.tsx",
+      ),
+      "utf8",
+    );
+    expect(room).toContain("hidePhoneScaffolding");
+    expect(room).toContain("data-phone-quiet-chrome");
   });
 });
 

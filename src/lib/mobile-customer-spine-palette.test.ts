@@ -9,6 +9,7 @@ import {
   MOBILE_PROJECT_NEED_OWNER_ACCEPTED,
   MOBILE_BUSINESS_NAME_OWNER_ACCEPTED,
   MOBILE_VISUAL_SYSTEM_CHECKPOINT,
+  MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT,
   mobileCustomerSpinePaletteV1,
 } from "@/config/mobile-customer-spine-palette-v1";
 import { studioDesignSystem } from "@/config/studio-design-system";
@@ -289,6 +290,13 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(runtime).toContain('step === "ask_preferred_name"');
     expect(runtime).toContain("step === \"ask_project_need\"");
     expect(runtime).toContain("step === \"ask_business_name\"");
+    expect(runtime).toContain("step === \"ask_deadline\"");
+    expect(runtime).toContain("step === \"ask_materials\"");
+    expect(runtime).toContain("step === \"summary\"");
+    expect(runtime).toContain("hidePhoneScaffolding={summaryConfirm}");
+    expect(runtime).toContain(
+      'stage === "opening" && step === "summary" && !correcting',
+    );
     expect(runtime).toContain("filmFamily={questionGlass}");
     expect(runtime).toContain("nameQuestion={questionGlass}");
     const film = read(
@@ -312,6 +320,10 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(tablet).toContain('.root[data-step="ask_preferred_name"] .eyebrow');
     expect(tablet).toContain('.root[data-step="ask_project_need"] .eyebrow');
     expect(tablet).toContain('.root[data-step="ask_business_name"] .eyebrow');
+    expect(tablet).toContain('.root[data-step="ask_deadline"] .eyebrow');
+    expect(tablet).toContain('.root[data-step="ask_materials"] .eyebrow');
+    expect(tablet).toContain('.root[data-step="summary"] .eyebrow');
+    expect(tablet).toContain("lobby-entry-film__cta");
     expect(tablet).toContain(
       '.root[data-step="ask_preferred_name"] .questionRevealPad',
     );
@@ -349,12 +361,32 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(roomCss).toContain(
       '.room[data-name-question="true"] .presenceBelow',
     );
+    expect(roomCss).toContain(
+      '.room[data-phone-quiet-chrome="true"] .sideRail',
+    );
+    expect(roomCss).toContain(
+      '.room[data-phone-quiet-chrome="true"] .presenceBelow',
+    );
+    expect(roomCss).toContain(
+      '.room[data-phone-quiet-chrome="true"] .surfaceCaption',
+    );
+    expect(read("src/components/studio-conversation-room/StudioConversationRoom.tsx")).toContain(
+      "data-phone-quiet-chrome",
+    );
+    expect(read("src/app/studio-review-mobile-tab.css")).toContain(
+      ".studio-review-mobile-tab.owner-qa::before",
+    );
+    expect(read("src/components/studio-conversation-room/StudioConversationRoom.tsx")).toContain(
+      "{nameQuestion ? null : (",
+    );
     expect(tablet).toContain('.root[data-step="ask_project_need"] .chip');
     expect(tablet).toContain('.root[data-step="ask_business_name"] .chip');
+    expect(tablet).toContain('.root[data-step="ask_deadline"] .chip');
+    expect(tablet).toContain('.root[data-step="ask_materials"] .chip');
     expect(tablet).toContain("background: transparent");
+    expect(tablet).toContain("background: #f7c900");
     expect(tablet).toContain("color: #2e2b28");
     expect(tablet).toContain("border: 2px solid #547c92");
-    expect(tablet).toContain("background: #547c92");
     expect(navCss).toContain("background: transparent");
     expect(navCss).not.toMatch(
       /\.drawerTab \{[^}]*background: var\(--mc-glass/,
@@ -380,8 +412,24 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.nameQuestion).toBe("OWNER_ACCEPTED");
     expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.projectNeed).toBe("OWNER_ACCEPTED");
     expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.businessName).toBe("OWNER_ACCEPTED");
-    expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.nextScreen).toBe("ask_deadline");
+    expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.nextScreen).toBe("route");
     expect(MOBILE_VISUAL_SYSTEM_CHECKPOINT.reuseLockedComponents).toBe(true);
+    expect(MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT.materialsQuestion).toBe(
+      "OWNER_ACCEPTED",
+    );
+    expect(MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT.summaryConfirmation).toBe(
+      "OWNER_ACCEPTED",
+    );
+    expect(MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT.denimCta).toBe("#547C92");
+    expect(MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT.coralCorrectCta).toBe(
+      "#D94E2B",
+    );
+    expect(MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT.nextAction).toBe(
+      "tap-yes-this-is-correct",
+    );
+    expect(
+      existsSync(join(root, MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT.checkpointDoc)),
+    ).toBe(true);
     expect(MOBILE_PROJECT_NEED_OWNER_ACCEPTED.step).toBe("ask_project_need");
     expect(MOBILE_BUSINESS_NAME_OWNER_ACCEPTED.step).toBe("ask_business_name");
     expect(

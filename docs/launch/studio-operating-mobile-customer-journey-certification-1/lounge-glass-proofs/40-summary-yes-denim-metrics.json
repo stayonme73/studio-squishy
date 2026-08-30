@@ -1,0 +1,10 @@
+{
+  "proof": {
+    "tag": "A",
+    "role": "button",
+    "className": "lobby-entry-film__cta",
+    "bg": "rgb(84, 124, 146)",
+    "border": "rgb(84, 124, 146)"
+  },
+  "fails": []
+}

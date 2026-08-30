@@ -12,8 +12,9 @@ export type VoicePreferenceControlsProps = {
   preference: StudioVoiceNarrationPreference;
   onChoose: (value: StudioVoiceNarrationPreference) => void;
   /**
-   * Preferred-name, project-need, and business-name questions. Selected side
-   * uses the accepted Welcome / Voice Choice CTA (`lobby-entry-film__cta`).
+   * Opening-question film family (name through materials).
+   * Selected side uses the accepted Welcome / Voice Choice CTA
+   * (`lobby-entry-film__cta`).
    */
   filmFamily?: boolean;
 };

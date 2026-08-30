@@ -36,6 +36,8 @@ Do not individually beautify each later screen. Inherit this language, one scree
 
 **Safe-area (applied, layout-only):** the unified Studio Review tab in `src/app/studio-review-mobile-tab.css` uses `env(safe-area-inset-bottom)` so the same component stays clear of Samsung/browser chrome on long Conversation Room screens. Color, glass, typography, and function are unchanged. Studio Controls stays inside this drawer. Tonight’s tap/scroll/safe-area verification: `2026-08-29-TONIGHT-MOBILE-VISUAL-CHECKPOINT.md`.
 
-**Next screen:** `ask_deadline`. Reuse the locked components. Do not reinvent the Studio.
+**Next screen:** `route` (after owner taps **Yes, this is correct** on the accepted summary). Reuse the locked components. Do not reinvent the Studio.
+
+Materials question + confirmation summary accepted 2026-08-30: `2026-08-30-MATERIALS-CONFIRMATION-CHECKPOINT.md`.
 
 Mobile remains OPEN. No Supervision. No merge.

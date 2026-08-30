@@ -65,10 +65,17 @@ export type StudioConversationRoomProps = {
    */
   loungeLight?: boolean;
   /**
-   * Before We Begin (preferred name) only — Lounge + Voice Choice glass,
-   * no tablet/device chrome. Do not use on later questions yet.
+   * Opening-question family — Lounge + Voice Choice glass, no tablet/device
+   * chrome. Review is the bottom utility and must not cover question content.
    */
   nameQuestion?: boolean;
+  /**
+   * Phone-only: hide the under-tablet scaffolding (STUDIO TABLET caption,
+   * presence rail, Speak/Type rail). Does not wrap content in question glass.
+   * Used on the opening summary confirmation so the accepted summary cards
+   * are not restyled.
+   */
+  hidePhoneScaffolding?: boolean;
   /**
    * @deprecated Dual-surface inspection retired.
    */
@@ -122,6 +129,7 @@ export default function StudioConversationRoom({
   voiceChoice = false,
   loungeLight = false,
   nameQuestion = false,
+  hidePhoneScaffolding = false,
   micPrivacyNote,
   className,
 }: StudioConversationRoomProps) {
@@ -204,6 +212,7 @@ export default function StudioConversationRoom({
   }, [panelOpen, activityPanelReturnFocusRef]);
 
   const lightGlass = voiceChoice || loungeLight;
+  const quietPhoneChrome = nameQuestion || hidePhoneScaffolding;
   const roomClassName = [styles.room, className ?? ""].filter(Boolean).join(" ");
   const panelLabel =
     activePanel === "route"
@@ -228,6 +237,7 @@ export default function StudioConversationRoom({
       data-voice-choice={voiceChoice ? "true" : undefined}
       data-lounge-light={lightGlass ? "true" : undefined}
       data-name-question={nameQuestion ? "true" : undefined}
+      data-phone-quiet-chrome={quietPhoneChrome ? "true" : undefined}
       data-active-panel={activePanel}
       data-slide-open={slideOpen ? "true" : "false"}
     >

@@ -158,9 +158,12 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   businessNameAcceptedAt: "2026-08-29" as const,
   visualSystemCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/MOBILE-VISUAL-SYSTEM-CHECKPOINT.md" as const,
-  nextMobileScreen: "ask_deadline" as const,
+  nextMobileScreen: "route" as const,
   reuseLockedMobileVisualSystem: true as const,
   tonightMobileVisualCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-29-TONIGHT-MOBILE-VISUAL-CHECKPOINT.md" as const,
   tonightMobileVisualCheckpointAt: "2026-08-29" as const,
+  materialsConfirmationCheckpointDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-30-MATERIALS-CONFIRMATION-CHECKPOINT.md" as const,
+  materialsConfirmationCheckpointAt: "2026-08-30" as const,
 } as const;

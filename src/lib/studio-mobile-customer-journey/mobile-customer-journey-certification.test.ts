@@ -51,13 +51,17 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.voiceChoiceStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.visualMaster).toBe("MOBILE_VISUAL_MASTER");
     expect(cfg.nameQuestionStatus).toBe("OWNER_ACCEPTED");
-    expect(cfg.nextMobileScreen).toBe("ask_deadline");
+    expect(cfg.nextMobileScreen).toBe("route");
     expect(cfg.reuseLockedMobileVisualSystem).toBe(true);
     expect(cfg.projectNeedStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.businessNameStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.tonightMobileVisualCheckpointAt).toBe("2026-08-29");
     expect(cfg.tonightMobileVisualCheckpointDoc).toContain(
       "2026-08-29-TONIGHT-MOBILE-VISUAL-CHECKPOINT.md",
+    );
+    expect(cfg.materialsConfirmationCheckpointAt).toBe("2026-08-30");
+    expect(cfg.materialsConfirmationCheckpointDoc).toContain(
+      "2026-08-30-MATERIALS-CONFIRMATION-CHECKPOINT.md",
     );
     expect(cfg.proofMustInclude).toHaveLength(8);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(4);

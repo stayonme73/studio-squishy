@@ -34,12 +34,37 @@
     z-index: 10050;
   }
 
+  /*
+   * The tab glass is translucent. Without an opaque plate, scrolling
+   * page content shows through it. Paint Lounge in the tab box so the
+   * glass still sits on the mural — not on the question. Same crop as
+   * the phone Lounge plate. Not a restyle of color, type, or function.
+   */
+  .studio-review-mobile-tab.owner-qa::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-color: #ebe2d4;
+    background-image: var(
+      --lounge-plate,
+      url("/welcome-hall/studio-lobby-lounge.png")
+    );
+    background-position: var(--lounge-crop-phone, 16% 42%);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    border-radius: 1.05rem 1.05rem 0 0;
+  }
+
   .studio-review-mobile-tab.owner-qa--open {
     z-index: 10070;
   }
 
   .studio-review-mobile-tab .owner-qa__toggle {
     position: relative;
+    z-index: 1;
     width: 100%;
     max-width: none;
     min-width: 0;

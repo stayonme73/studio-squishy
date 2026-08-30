@@ -434,6 +434,26 @@
   height: auto;
 }
 
+/*
+ * Summary only: keep the glass a card above Studio Review.
+ * Review stays the locked tab — this only stops the tall frost
+ * running underneath it. Lounge shows in the gap.
+ */
+@media (max-width: 960px) {
+  .frame[data-name-question="true"]:has([data-step="summary"]) {
+    margin-bottom: 2.15rem;
+  }
+
+  .frame[data-name-question="true"]:has([data-step="summary"]) .nameQuestionPanel {
+    max-height: calc(
+      100dvh - clamp(1.15rem, 7vh, 2.35rem) - env(safe-area-inset-top, 0px) -
+        var(--studio-review-mobile-bottom, 3.25rem) - 2.15rem
+    );
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+
 .nameQuestionPanel .hostSurface {
   display: block;
   height: auto;

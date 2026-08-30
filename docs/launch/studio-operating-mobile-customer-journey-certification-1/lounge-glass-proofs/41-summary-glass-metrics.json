@@ -1,0 +1,20 @@
+{
+  "proof": {
+    "nameQuestionPanel": true,
+    "yesTag": "A",
+    "yesClass": "lobby-entry-film__cta",
+    "yesBg": "rgb(84, 124, 146)",
+    "cardBg": "rgba(0, 0, 0, 0)",
+    "panelBg": "rgba(243, 238, 230, 0.46)",
+    "correctBg": "rgba(0, 0, 0, 0)",
+    "bodyHasStudioTabletLine": false,
+    "hasMaya": true,
+    "hasSocial": true,
+    "hasBoutique": true,
+    "hasTwoWeeks": true,
+    "hasUnconfirmed": true,
+    "hasNothingYet": true,
+    "hasWarning": true
+  },
+  "fails": []
+}

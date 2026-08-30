@@ -25,7 +25,7 @@ export type StudioWorkspaceProps = {
    */
   loungeLight?: boolean;
   /**
-   * Preferred-name and project-need questions reuse Voice Choice `.panel`.
+   * Opening-question family reuses Voice Choice `.panel`.
    * Do not invent a second glass. Hides tablet/device chrome.
    */
   nameQuestion?: boolean;

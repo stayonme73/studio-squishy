@@ -1,0 +1,18 @@
+{
+  "top": {
+    "nameQuestionPanel": true,
+    "yesClass": "lobby-entry-film__cta",
+    "yesBg": "rgb(84, 124, 146)",
+    "correctBg": "color(srgb 0.968627 0.956863 0.933333 / 0.5)",
+    "cardBg": "rgba(243, 238, 230, 0.46)",
+    "bodyHasStudioTabletLine": false,
+    "hasMaya": true,
+    "hasSocial": true,
+    "hasBoutique": true,
+    "hasTwoWeeks": true,
+    "hasUnconfirmed": true,
+    "hasNothingYet": true,
+    "hasWarning": true
+  },
+  "fails": []
+}

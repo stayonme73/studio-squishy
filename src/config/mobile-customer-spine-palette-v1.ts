@@ -111,7 +111,7 @@ export const MOBILE_VISUAL_SYSTEM_CHECKPOINT = {
   projectNeed: "OWNER_ACCEPTED" as const,
   businessName: "OWNER_ACCEPTED" as const,
   visualMaster: "MOBILE_VISUAL_MASTER" as const,
-  nextScreen: "ask_deadline" as const,
+  nextScreen: "route" as const,
   reuseLockedComponents: true as const,
   identity: [
     "lounge-background-crop",
@@ -124,4 +124,22 @@ export const MOBILE_VISUAL_SYSTEM_CHECKPOINT = {
     "unselected-chip-treatment",
     "studio-review-bottom-utility-tab",
   ] as const,
+} as const;
+
+/**
+ * Owner-accepted materials question + confirmation summary (Samsung 2026-08-30).
+ * Reuses MOBILE_VISUAL_MASTER. Do not restyle. Next customer action is
+ * tapping Yes, this is correct, then the route stage.
+ */
+export const MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT = {
+  acceptedAt: "2026-08-30" as const,
+  visualMaster: "MOBILE_VISUAL_MASTER" as const,
+  materialsQuestion: "OWNER_ACCEPTED" as const,
+  summaryConfirmation: "OWNER_ACCEPTED" as const,
+  denimCta: "#547C92" as const,
+  coralCorrectCta: "#D94E2B" as const,
+  nextAction: "tap-yes-this-is-correct" as const,
+  nextScreen: "route" as const,
+  checkpointDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-30-MATERIALS-CONFIRMATION-CHECKPOINT.md" as const,
 } as const;

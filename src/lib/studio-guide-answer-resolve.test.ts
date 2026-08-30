@@ -7,7 +7,6 @@ import {
   resolveGuideAnswerFromUi,
   visibleBubblesForStoredAnswer,
 } from "@/lib/studio-guide-answer-resolve";
-import { recordedMaterialsSelection } from "@/config/conversation-room-guide-v1";
 
 describe("studio-guide-answer-resolve — Send / Continue parity", () => {
   it("typed Send is active (submit_guide_answer) during guide questions", () => {
@@ -130,13 +129,6 @@ describe("studio-guide-answer-resolve — Send / Continue parity", () => {
         selectedBubbles: [],
       }),
     ).toEqual({ answer: "Just a sketch", skipped: false });
-    expect(recordedMaterialsSelection(["Nothing yet"])).toBe(
-      "The Studio recorded Nothing yet.",
-    );
-    expect(recordedMaterialsSelection(["Logo", "Photos"])).toBe(
-      "The Studio recorded Logo, Photos.",
-    );
-    expect(recordedMaterialsSelection([])).toBeNull();
   });
 
   it("does not treat another question’s stored wording as a selected bubble", () => {

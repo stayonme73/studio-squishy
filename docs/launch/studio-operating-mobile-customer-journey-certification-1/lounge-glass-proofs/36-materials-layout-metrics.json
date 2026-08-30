@@ -1,0 +1,169 @@
+{
+  "top": {
+    "step": "top",
+    "scrollY": 22,
+    "scrollMax": 298,
+    "innerHeight": 780,
+    "review": {
+      "top": 728,
+      "bottom": 780,
+      "height": 52,
+      "width": 360
+    },
+    "continue": {
+      "top": 927.421875,
+      "bottom": 971.421875,
+      "left": 37.78125,
+      "right": 322.21875,
+      "height": 44
+    },
+    "mic": {
+      "top": 701.1875,
+      "bottom": 815.296875,
+      "left": 37.78125,
+      "right": 322.21875,
+      "height": 114.109375
+    },
+    "field": {
+      "top": 827.484375,
+      "bottom": 908.234375,
+      "left": 38.78125,
+      "right": 321.21875,
+      "height": 80.75
+    },
+    "chipsInView": 10,
+    "reviewCoversContinue": false,
+    "reviewCoversMic": true,
+    "reviewCoversField": false,
+    "reviewCoversVisibleChip": false,
+    "visibleStudioTabletCaption": false,
+    "visiblePresenceRail": false,
+    "visibleNotch": false,
+    "bodyHasStudioTabletLine": false,
+    "placeholder": "Add extra details",
+    "helperVisible": true,
+    "skipVisible": true,
+    "nameQuestion": true,
+    "platePresent": true,
+    "plate": {
+      "content": "\"\"",
+      "width": "360px",
+      "height": "52px",
+      "bg": "url(\"https://localhost:3000/welcome-hall/studio-lobby-lounge.png\")",
+      "zIndex": "0",
+      "position": "absolute"
+    }
+  },
+  "mid": {
+    "step": "mid",
+    "scrollY": 134,
+    "scrollMax": 298,
+    "innerHeight": 780,
+    "review": {
+      "top": 728,
+      "bottom": 780,
+      "height": 52,
+      "width": 360
+    },
+    "continue": {
+      "top": 815.421875,
+      "bottom": 859.421875,
+      "left": 37.78125,
+      "right": 322.21875,
+      "height": 44
+    },
+    "mic": {
+      "top": 589.1875,
+      "bottom": 703.296875,
+      "left": 37.78125,
+      "right": 322.21875,
+      "height": 114.109375
+    },
+    "field": {
+      "top": 715.484375,
+      "bottom": 796.234375,
+      "left": 38.78125,
+      "right": 321.21875,
+      "height": 80.75
+    },
+    "chipsInView": 10,
+    "reviewCoversContinue": false,
+    "reviewCoversMic": false,
+    "reviewCoversField": true,
+    "reviewCoversVisibleChip": false,
+    "visibleStudioTabletCaption": false,
+    "visiblePresenceRail": false,
+    "visibleNotch": false,
+    "bodyHasStudioTabletLine": false,
+    "placeholder": "Add extra details",
+    "helperVisible": true,
+    "skipVisible": true,
+    "nameQuestion": true,
+    "platePresent": true,
+    "plate": {
+      "content": "\"\"",
+      "width": "360px",
+      "height": "52px",
+      "bg": "url(\"https://localhost:3000/welcome-hall/studio-lobby-lounge.png\")",
+      "zIndex": "0",
+      "position": "absolute"
+    }
+  },
+  "bottom": {
+    "step": "bottom",
+    "scrollY": 298,
+    "scrollMax": 298,
+    "innerHeight": 780,
+    "review": {
+      "top": 728,
+      "bottom": 780,
+      "height": 52,
+      "width": 360
+    },
+    "continue": {
+      "top": 651.421875,
+      "bottom": 695.421875,
+      "left": 37.78125,
+      "right": 322.21875,
+      "height": 44
+    },
+    "mic": {
+      "top": 425.1875,
+      "bottom": 539.296875,
+      "left": 37.78125,
+      "right": 322.21875,
+      "height": 114.109375
+    },
+    "field": {
+      "top": 551.484375,
+      "bottom": 632.234375,
+      "left": 38.78125,
+      "right": 321.21875,
+      "height": 80.75
+    },
+    "chipsInView": 6,
+    "reviewCoversContinue": false,
+    "reviewCoversMic": false,
+    "reviewCoversField": false,
+    "reviewCoversVisibleChip": false,
+    "visibleStudioTabletCaption": false,
+    "visiblePresenceRail": false,
+    "visibleNotch": false,
+    "bodyHasStudioTabletLine": false,
+    "placeholder": "Add extra details",
+    "helperVisible": true,
+    "skipVisible": true,
+    "nameQuestion": true,
+    "platePresent": true,
+    "plate": {
+      "content": "\"\"",
+      "width": "360px",
+      "height": "52px",
+      "bg": "url(\"https://localhost:3000/welcome-hall/studio-lobby-lounge.png\")",
+      "zIndex": "0",
+      "position": "absolute"
+    }
+  },
+  "fails": [],
+  "continuedTo": "Studio Conversation Room\nVoice: On\nVoice: Off\nTap the mic to speak or start typing below.\n\n✓ Saved\n\nSend\n\nCONVERSATION ROOM\n\nHere’s what I understood. Is this correct?\nWHAT TO CALL"
+}

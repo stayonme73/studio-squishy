@@ -373,8 +373,7 @@ export const conversationRoomGuideV1 = {
         "Nothing yet",
         "Something else",
       ],
-      placeholder:
-        "Add any extra details about your materials. This is optional.",
+      placeholder: "Add extra details",
     },
   ] as const satisfies readonly ConversationRoomGuideQuestion[],
 } as const;
@@ -451,15 +450,6 @@ export function getConversationRoomGuideQuestion(
   return (
     conversationRoomGuideV1.questions.find((q) => q.step === step) ?? null
   );
-}
-
-/** Visible confirmation of multi-select materials bubbles — not copied into the details field. */
-export function recordedMaterialsSelection(
-  selectedBubbles: readonly string[],
-): string | null {
-  const recorded = selectedBubbles.filter((item) => item !== "Skip for now");
-  if (recorded.length === 0) return null;
-  return `The Studio recorded ${recorded.join(", ")}.`;
 }
 
 /** Date-format hint only when the customer actually chose a specific date. */
