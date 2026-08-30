@@ -22,7 +22,7 @@
   margin: 0;
   padding: 0;
   max-width: none;
-  background: #2e2d2b;
+  background: #ebe2d4;
 }
 
 .welcome-hall-phase1 .welcome-hall-plate-crop {
@@ -601,7 +601,7 @@
 }
 
 .hall-hesitation-prompt:focus-visible {
-  outline: 2px solid #355c7d;
+  outline: 2px solid #547c92;
   outline-offset: 4px;
 }
 
@@ -855,7 +855,8 @@
     flex: 0 0 auto;
     width: 100%;
     min-height: 0;
-    height: calc(100vw * 1080 / 1920 * 1.12);
+    /* Lounge native 1024×488 — not leftover 1920×1080 podium-plate math. */
+    height: calc(100vw * 488 / 1024 * 1.12);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -881,7 +882,8 @@
     max-height: none;
     aspect-ratio: auto;
     object-fit: cover !important;
-    object-position: 48% 50% !important;
+    /* Silhouetted-man mural wall — not the center window crop. */
+    object-position: 16% 42% !important;
     transform: none;
   }
 
@@ -950,76 +952,32 @@
     animation: none;
   }
 }
+/* Podium-era zoom / black radial retired. Film stays mounted until CR paints (MJ-D17). */
 .welcome-hall-plate--transitioning .welcome-hall-plate-art {
-  animation: hall-phase1-view-ahead-zoom 1.4s ease-in forwards;
-  transform-origin: 38% 42%;
+  animation: none;
+  transform-origin: center center;
 }
 
 .welcome-hall-plate--transitioning .hall-kiosk-stack > .hall-kiosk-hotspot {
   pointer-events: none;
 }
 
-.welcome-hall-plate--transitioning .hall-view-ahead-transition {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-}
-
+.welcome-hall-plate--transitioning .hall-view-ahead-transition,
 .welcome-hall-plate--transitioning .hall-view-ahead-transition-glow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at 38% 42%,
-    rgba(255, 210, 140, 0.55) 0%,
-    rgba(10, 10, 10, 0.95) 58%
-  );
-  animation: hall-phase1-view-ahead-fade 1.4s ease-in forwards;
+  display: none;
 }
 
-@keyframes hall-phase1-view-ahead-zoom {
-  0% {
-    transform: scale(1);
-    filter: none;
-  }
-  70% {
-    transform: scale(2.8);
-    filter: saturate(1.05) contrast(1.04) brightness(1.04);
-  }
-  100% {
-    transform: scale(3.4);
-    opacity: 0;
-    filter: brightness(1.12);
-  }
-}
-
-@keyframes hall-phase1-view-ahead-fade {
-  0% {
-    opacity: 0;
-  }
-  40% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .welcome-hall-plate--transitioning .welcome-hall-plate-art,
-  .welcome-hall-plate--transitioning .hall-view-ahead-transition-glow {
-    animation: none;
-  }
-
-  .welcome-hall-plate--transitioning .welcome-hall-plate-art {
-    opacity: 0;
-  }
+/* Approved Samsung Welcome frost — first Mobile glass pass, not the later 70% slab. */
+body:has(.welcome-hall-phase1) {
+  --welcome-frost: var(--mc-glass, color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent));
+  --welcome-frost-filter: blur(14px) saturate(1.04) brightness(1.1);
+  --welcome-veil: var(--mc-veil, color-mix(in srgb, #2e2b28 18%, transparent));
 }
 
 /* —— Lobby Entry Film v1 (runtime chrome over locked Lobby) —— */
 .lobby-entry-film {
-  --lobby-entry-gold: #d4b56a;
-  --lobby-entry-gold-soft: rgba(212, 181, 106, 0.88);
+  --lobby-entry-gold: var(--mc-denim, #547c92);
+  --lobby-entry-gold-soft: var(--mc-eucalyptus, #456b5a);
   --lobby-entry-ink: #f7f4ee;
   position: absolute;
   inset: 0;
@@ -1030,12 +988,13 @@
   justify-content: center;
   padding: clamp(0.75rem, 3vw, 2rem);
   pointer-events: auto;
+  overflow: hidden;
 }
 
 .lobby-entry-film__scrim {
   position: absolute;
   inset: 0;
-  background: rgba(8, 10, 14, 0.28);
+  background: var(--welcome-veil, color-mix(in srgb, #2e2b28 18%, transparent));
   backdrop-filter: blur(2px);
 }
 
@@ -1044,19 +1003,16 @@
   z-index: 1;
   width: min(62rem, 100%);
   max-height: min(92dvh, 44rem);
-  overflow: auto;
+  overflow: hidden;
   padding: clamp(1.35rem, 3.5vw, 2.4rem) clamp(1.35rem, 3.2vw, 2.5rem) clamp(1.1rem, 2.5vw, 1.65rem);
   border-radius: 1.35rem;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: linear-gradient(
-    165deg,
-    rgba(28, 32, 40, 0.72) 0%,
-    rgba(18, 22, 30, 0.78) 100%
-  );
-  backdrop-filter: blur(18px) saturate(1.15);
+  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  background: var(--mc-glass, color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent));
+  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
   box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    0 24px 64px color-mix(in srgb, #547c92 12%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
   color: var(--lobby-entry-ink);
 }
 
@@ -1069,9 +1025,9 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
   background: transparent;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--mc-denim, #547c92);
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
@@ -1094,7 +1050,7 @@
   font-family: "Georgia", "Times New Roman", serif;
   font-style: italic;
   font-size: clamp(1.25rem, 2.8vw, 1.6rem);
-  color: var(--lobby-entry-gold);
+  color: var(--mc-eucalyptus, #456b5a);
 }
 
 .lobby-entry-film__brand {
@@ -1103,12 +1059,14 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   line-height: 1.05;
+  color: var(--mc-denim, #547c92);
+  -webkit-text-fill-color: var(--mc-denim, #547c92);
 }
 
 .lobby-entry-film__support {
   margin: 0;
   font-size: clamp(1.08rem, 2.4vw, 1.3rem);
-  color: rgba(247, 244, 238, 0.9);
+  color: var(--lobby-entry-ink);
   line-height: 1.35;
 }
 
@@ -1134,8 +1092,9 @@
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 999px;
-  border: 1px solid rgba(212, 181, 106, 0.55);
-  color: var(--lobby-entry-gold);
+  border: 1px solid color-mix(in srgb, #f7f4ee 45%, transparent);
+  color: var(--lobby-entry-ink, #f7f4ee);
+  background: transparent;
   margin-bottom: 0.3rem;
 }
 
@@ -1145,13 +1104,14 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1.25;
+  color: var(--lobby-entry-ink, #f7f4ee);
 }
 
 .lobby-entry-film__choice-desc {
   margin: 0;
   max-width: none;
   font-size: clamp(1rem, 2.1vw, 1.15rem);
-  color: var(--lobby-entry-gold-soft);
+  color: var(--mc-eucalyptus, #456b5a);
   line-height: 1.4;
   white-space: nowrap;
 }
@@ -1163,9 +1123,9 @@
   margin-top: 0.65rem;
   padding: 0.8rem 1.3rem;
   border-radius: 0.55rem;
-  border: 1px solid var(--lobby-entry-gold);
-  background: transparent;
-  color: var(--lobby-entry-gold);
+  border: 1px solid var(--mc-denim, #547c92);
+  background: var(--mc-denim, #547c92);
+  color: var(--mc-ivory, #f7f4ee);
   font: inherit;
   font-size: clamp(0.9rem, 1.9vw, 1.02rem);
   font-weight: 700;
@@ -1178,13 +1138,13 @@
 
 .lobby-entry-film__cta:hover,
 .lobby-entry-film__cta:focus-visible {
-  background: rgba(212, 181, 106, 0.12);
+  background: var(--mc-denim, #547c92);
 }
 
 .lobby-entry-film__cta:disabled {
   opacity: 0.55;
   cursor: wait;
-  background: transparent;
+  background: var(--mc-denim, #547c92);
 }
 
 .lobby-entry-film__divider {
@@ -1194,7 +1154,7 @@
   background: linear-gradient(
     to bottom,
     transparent,
-    rgba(212, 181, 106, 0.55),
+    color-mix(in srgb, var(--mc-yellow, #f7c900) 55%, transparent),
     transparent
   );
   min-height: 100%;
@@ -1210,9 +1170,9 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  border: 1px solid rgba(212, 181, 106, 0.65);
-  background: rgba(22, 26, 34, 0.95);
-  color: var(--lobby-entry-gold);
+  border: 1px solid color-mix(in srgb, #f7f4ee 55%, transparent);
+  background: var(--mc-glass, color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent));
+  color: var(--lobby-entry-ink, #f7f4ee);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -1221,7 +1181,7 @@
 .lobby-entry-film__help {
   margin-top: clamp(1.1rem, 2.5vw, 1.6rem);
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid color-mix(in srgb, #f7f4ee 18%, transparent);
   text-align: center;
 }
 
@@ -1239,7 +1199,8 @@
   height: 1.35rem;
   margin-right: 0.4rem;
   border-radius: 999px;
-  border: 1px solid var(--lobby-entry-gold);
+  border: 1px solid var(--mc-eucalyptus, #456b5a);
+  color: var(--mc-eucalyptus, #456b5a);
   font-size: 0.82rem;
   font-weight: 700;
   vertical-align: -0.15em;
@@ -1249,7 +1210,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: var(--lobby-entry-gold);
+  color: var(--mc-eucalyptus, #456b5a);
   font-size: clamp(0.92rem, 1.9vw, 1.05rem);
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -1267,8 +1228,8 @@
   margin: 0.95rem 0 0;
   text-align: center;
   font-size: clamp(0.95rem, 2vw, 1.1rem);
-  color: rgba(255, 255, 255, 0.86);
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
+  color: var(--mc-ivory, #f7f4ee);
+  text-shadow: 0 1px 8px color-mix(in srgb, #2e2b28 45%, transparent);
   line-height: 1.4;
   max-width: 36rem;
   padding-inline: 0.75rem;
@@ -1283,10 +1244,11 @@
   min-height: 3rem;
   padding: 1rem 1.75rem;
   border-radius: 999px;
-  border: 1px solid rgba(212, 181, 106, 0.7);
-  background: rgba(18, 22, 30, 0.82);
-  backdrop-filter: blur(10px);
-  color: #d4b56a;
+  border: 1px solid var(--mc-denim, #547c92);
+  background: var(--mc-glass, color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent));
+  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  color: var(--mc-denim, #547c92);
   font: inherit;
   font-size: clamp(1.05rem, 1.6vw, 1.2rem);
   font-weight: 650;
@@ -1296,20 +1258,50 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 10px 28px color-mix(in srgb, #547c92 16%, transparent);
 }
 
 .lobby-entry-reopen:hover,
 .lobby-entry-reopen:focus-visible {
-  background: rgba(28, 34, 44, 0.92);
+  background: var(--mc-chip-selected, color-mix(in srgb, #547c92 22%, #f7f4ee));
 }
 
-/* Phone: pin film to the viewport so cream dock cannot out-scroll it. */
+/* Phone: pin film to the usable viewport so the front door does not scroll. */
 @media (max-width: 1024px) {
+  html:has(.lobby-entry-film),
+  body:has(.lobby-entry-film),
+  main:has(.lobby-entry-film) {
+    overflow: hidden;
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .welcome-hall-phase1:has(.lobby-entry-film) .welcome-hall-plate {
+    overflow: hidden;
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .welcome-hall-phase1:has(.lobby-entry-film) .welcome-hall-plate-crop--mobile {
+    height: 100dvh;
+  }
+
+  .welcome-hall-phase1:has(.lobby-entry-film) .hall-mobile-dock {
+    display: none;
+  }
+
   .lobby-entry-film {
     position: fixed;
     inset: 0;
     z-index: 50;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: max(0.45rem, env(safe-area-inset-top, 0px)) 0.7rem
+      calc(3.4rem + env(safe-area-inset-bottom, 0px));
+    gap: 0.3rem;
+    justify-content: center;
   }
 
   /* MJ-D11: never leave the wrapped reopen pill as a phone landing control. */
@@ -1335,22 +1327,90 @@
     background: linear-gradient(
       to right,
       transparent,
-      rgba(212, 181, 106, 0.55),
+      color-mix(in srgb, var(--mc-yellow, #f7c900) 55%, transparent),
       transparent
     );
   }
 
   .lobby-entry-film__or {
     top: 50%;
+    width: 1.85rem;
+    height: 1.85rem;
+    font-size: 0.7rem;
   }
 
   .lobby-entry-film__panel {
-    max-height: min(94dvh, 48rem);
+    max-height: none;
+    overflow: hidden;
+    padding: 0.7rem 0.85rem 0.5rem;
+  }
+
+  .lobby-entry-film__header {
+    margin-bottom: 0.4rem;
+    padding-inline: 0.25rem;
+  }
+
+  .lobby-entry-film__welcome {
+    font-size: 1.1rem;
+  }
+
+  .lobby-entry-film__brand {
+    margin: 0.1rem 0 0.35rem;
+    font-size: clamp(1.55rem, 7vw, 1.9rem);
+  }
+
+  .lobby-entry-film__support {
+    font-size: 1rem;
+  }
+
+  .lobby-entry-film__choice {
+    gap: 0.45rem;
+    padding: 0.35rem 0.5rem 0.15rem;
+  }
+
+  .lobby-entry-film__icon {
+    width: 2.35rem;
+    height: 2.35rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .lobby-entry-film__choice-title {
+    font-size: 0.95rem;
   }
 
   .lobby-entry-film__choice-desc {
     white-space: normal;
     max-width: 24rem;
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+
+  .lobby-entry-film__cta {
+    margin-top: 0.3rem;
+    min-height: 2.75rem;
+    padding: 0.55rem 1.05rem;
+    font-size: 0.92rem;
+  }
+
+  .lobby-entry-film__help {
+    margin-top: 0.45rem;
+    padding-top: 0.45rem;
+  }
+
+  .lobby-entry-film__help-prompt {
+    margin: 0 0 0.3rem;
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  .lobby-entry-film__help-link {
+    font-size: 0.88rem;
+  }
+
+  .lobby-entry-film__footer {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    line-height: 1.3;
   }
 
   /* Keep dock from competing with the film when journey is gated */
@@ -1358,5 +1418,16 @@
   .welcome-hall-phase1:has(.lobby-entry-reopen) .hall-mobile-dock-panel__cta {
     pointer-events: none;
     opacity: 0.35;
+  }
+}
+
+/* Extra-short phones (360×640 class): tighten further, still no clip. */
+@media (max-width: 720px) and (max-height: 680px) {
+  .lobby-entry-film__panel {
+    padding: 0.5rem 0.75rem 0.4rem;
+  }
+
+  .lobby-entry-film__help-prompt {
+    font-size: 0.85rem;
   }
 }

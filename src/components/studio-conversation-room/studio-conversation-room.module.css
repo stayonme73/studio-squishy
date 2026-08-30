@@ -2,7 +2,7 @@
  * Speak/type + Studio controls + tablet pinned hard left.
  * Entire right side stays clear for the Activity Panel.
  * Halo: gold = Studio speaking · teal = customer turn.
- * Backdrop: faded Studio Lobby plate.
+ * Backdrop: approved Studio Lounge (silhouetted-man mural).
  */
 
 .srOnly {
@@ -46,8 +46,8 @@
     )
   );
   --stage-width: calc(var(--tablet-width) + var(--room-gap) + var(--side-width));
-  /* Phone Studio Controls tab. Desktop ignores this; the rail stays expanded. */
-  --studio-controls-tab-h: 3.25rem;
+  /* Phone Studio Controls chip + gap above Review. Desktop ignores this. */
+  --studio-controls-tab-h: 2.9rem;
 
   position: relative;
   box-sizing: border-box;
@@ -64,7 +64,7 @@
   padding-right: 0;
   overflow: hidden;
   isolation: isolate;
-  background-color: #12161c;
+  background-color: #ebe2d4;
 }
 
 .room::before {
@@ -73,9 +73,7 @@
   inset: 0;
   z-index: 0;
   background:
-    url("/welcome-hall/studio-lobby-scene.png") center / cover no-repeat;
-  transform: scale(1.04);
-  filter: saturate(0.72) brightness(0.78);
+    var(--lounge-plate, url("/welcome-hall/studio-lobby-lounge.png")) center / cover no-repeat;
   pointer-events: none;
 }
 
@@ -85,48 +83,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 70% 60% at 42% 45%,
-      rgba(14, 17, 22, 0.42) 0%,
-      rgba(14, 17, 22, 0.72) 70%,
-      rgba(10, 12, 16, 0.88) 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(18, 22, 28, 0.35) 0%,
-      rgba(18, 22, 28, 0.55) 100%
-    );
-}
-
-.room[data-presence-bias="studio"]::after {
-  background:
-    radial-gradient(
-      ellipse 65% 55% at 38% 42%,
-      rgba(210, 175, 95, 0.14) 0%,
-      transparent 55%
-    ),
-    radial-gradient(
-      ellipse 70% 60% at 42% 45%,
-      rgba(14, 17, 22, 0.4) 0%,
-      rgba(14, 17, 22, 0.7) 70%,
-      rgba(10, 12, 16, 0.86) 100%
-    );
-}
-
-.room[data-presence-bias="customer"]::after {
-  background:
-    radial-gradient(
-      ellipse 65% 55% at 48% 42%,
-      rgba(90, 160, 200, 0.16) 0%,
-      transparent 55%
-    ),
-    radial-gradient(
-      ellipse 70% 60% at 42% 45%,
-      rgba(14, 17, 22, 0.4) 0%,
-      rgba(14, 17, 22, 0.7) 70%,
-      rgba(10, 12, 16, 0.86) 100%
-    );
+  background: var(--mc-veil, color-mix(in srgb, #2e2b28 18%, transparent));
 }
 
 .roomStage {
@@ -214,7 +171,7 @@
 }
 
 .surfaceCaption {
-  color: rgba(210, 175, 95, 0.78);
+  color: #456b5a;
 }
 
 .room[data-presence-floor="customer"] .surfaceCaption {
@@ -222,7 +179,7 @@
 }
 
 .sideCaption {
-  color: rgba(160, 200, 220, 0.72);
+  color: color-mix(in srgb, var(--mc-eucalyptus, #456b5a) 78%, transparent);
 }
 
 /* Centered under the tablet column only — not under the side rail. */
@@ -232,13 +189,13 @@
   margin: 0.15rem 0 0;
   padding: 0.5rem 0.85rem;
   border-radius: 0.55rem;
-  background: rgba(14, 17, 22, 0.35);
+  background: color-mix(in srgb, #f7f4ee 88%, #fff);
   font-family: var(--font-geist-sans, system-ui, sans-serif);
   font-size: 0.88rem;
   font-weight: 500;
   line-height: 1.45;
   text-align: center;
-  color: rgba(236, 232, 224, 0.72);
+  color: color-mix(in srgb, #2e2b28 72%, transparent);
 }
 
 .presenceBelow {
@@ -264,7 +221,7 @@
   margin: 0;
   padding: 0;
   border: none;
-  background: rgba(8, 10, 14, 0.45);
+  background: color-mix(in srgb, #2e2b28 28%, transparent);
   cursor: pointer;
 }
 
@@ -281,14 +238,12 @@
   height: 100dvh;
   max-width: calc(100vw - 1.25rem);
   padding: clamp(1rem, 2.4vh, 1.5rem);
-  border-left: 1px solid rgba(180, 195, 210, 0.28);
-  background:
-    linear-gradient(
-      165deg,
-      rgba(42, 48, 58, 0.98) 0%,
-      rgba(18, 22, 28, 0.99) 100%
-    );
-  box-shadow: -22px 0 56px rgba(0, 0, 0, 0.42);
+  border-left: 1px solid var(--lounge-glass-border, color-mix(in srgb, #f7f4ee 55%, #547c92 12%));
+  background: var(--mc-glass, color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent));
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  color: var(--lounge-ink, #2e2b28);
+  box-shadow: -22px 0 56px color-mix(in srgb, #547c92 12%, transparent);
   transform: translateX(105%);
   transition: transform 280ms ease, width 220ms ease;
   pointer-events: none;
@@ -308,6 +263,40 @@
   overflow: hidden;
 }
 
+.room[data-voice-choice="true"] {
+  /* Welcome film is not inside an isolated box. Isolate made Voice Choice
+   * frost a black layer instead of the Lounge — Samsung showed no change. */
+  isolation: auto;
+}
+
+.room[data-voice-choice="true"]::after,
+.room[data-voice-choice="true"][data-presence-bias="studio"]::after,
+.room[data-voice-choice="true"][data-presence-bias="customer"]::after,
+.room[data-lounge-light="true"]::after,
+.room[data-lounge-light="true"][data-presence-bias="studio"]::after,
+.room[data-lounge-light="true"][data-presence-bias="customer"]::after {
+  background: var(--mc-veil, color-mix(in srgb, #2e2b28 18%, transparent));
+}
+
+@media (max-width: 1024px) {
+  /* Match Welcome phone crop — silhouetted-man mural, not the center window. */
+  .room::before {
+    background-position: var(--lounge-crop-phone, 16% 42%);
+  }
+
+  /*
+   * Name question only — Voice Choice film placement: panel high, Lounge
+   * breathes. Studio Review stays. Not a full-viewport device.
+   */
+  .room[data-name-question="true"] {
+    justify-content: flex-start;
+    padding-top: calc(
+      clamp(1.15rem, 7vh, 2.35rem) + env(safe-area-inset-top, 0px)
+    );
+    padding-inline: 0.7rem;
+  }
+}
+
 @media (max-width: 960px) {
   .room {
     --tablet-width: 100%;
@@ -317,7 +306,7 @@
     --max-tablet-height: none;
     justify-content: flex-start;
     padding-right: var(--room-pad-x);
-    padding-bottom: var(--studio-controls-tab-h);
+    padding-bottom: var(--studio-review-mobile-bottom, 3.25rem);
     /*
      * MJ-D13: do not make .room a vertical scrollport. overflow-y:auto on
      * height:auto still intercepts the first Samsung pan, then rubber-bands.
@@ -370,14 +359,16 @@
     width: min(100vw, 48rem);
     /*
      * Leave the upper Presentation tablet band clear so Checkout / Intake
-     * tablet CTAs stay reachable. Bottom reserve is the collapsed Studio
-     * Controls tab only (MJ-D12) — not a 34dvh Session slab.
+     * tablet CTAs stay reachable. Bottom reserve is the shared Studio Review
+     * tab — Studio Controls live inside that drawer on phone.
      * Use an explicit height so the inner list can scroll — height:auto
      * + overflow:hidden clipped service cards on Samsung (MJ-D7).
      */
     top: min(38dvh, 20rem);
-    bottom: var(--studio-controls-tab-h);
-    height: calc(100dvh - min(38dvh, 20rem) - var(--studio-controls-tab-h));
+    bottom: var(--studio-review-mobile-bottom, 3.25rem);
+    height: calc(
+      100dvh - min(38dvh, 20rem) - var(--studio-review-mobile-bottom, 3.25rem)
+    );
     max-height: none;
   }
 
@@ -389,8 +380,10 @@
   .slideHost[data-panel="builder"],
   .slideHost[data-panel="route"] {
     top: min(10dvh, 4.5rem);
-    bottom: var(--studio-controls-tab-h);
-    height: calc(100dvh - min(10dvh, 4.5rem) - var(--studio-controls-tab-h));
+    bottom: var(--studio-review-mobile-bottom, 3.25rem);
+    height: calc(
+      100dvh - min(10dvh, 4.5rem) - var(--studio-review-mobile-bottom, 3.25rem)
+    );
   }
 
   .slideHost[data-panel="builder"] {
@@ -401,11 +394,9 @@
   }
 
   /*
-   * Phone: Studio Controls is a bottom utility tab, not hallway furniture.
-   * Always pin the tab. Expanded drawer overlays from the bottom and
-   * scrolls; it does not steal the service-list height.
-   * roomStage z-index is auto so this fixed tab can sit above the activity
-   * sheet (slideHost is a sibling at z-index 120).
+   * Phone: Studio Controls is not a second bottom tab. The shared Welcome
+   * Studio Review tab is the only bottom utility. Controls portal into
+   * that drawer. Hide the Conversation Room rail control on phone.
    */
   .roomStage {
     z-index: auto;
@@ -420,17 +411,8 @@
   }
 
   .sideNav {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 122;
-    width: 100%;
-    flex: none;
-    max-height: none;
-    overflow: visible;
-    padding: 0;
-    box-sizing: border-box;
+    display: none;
+    pointer-events: none;
   }
 
   .sideCaption {
@@ -446,11 +428,21 @@
     left: 0;
     right: 0;
     top: min(38dvh, 20rem);
-    bottom: var(--studio-controls-tab-h);
+    bottom: var(--studio-review-mobile-bottom, 3.25rem);
   }
 
   .room[data-slide-open="true"][data-active-panel="builder"] .slideScrim,
   .room[data-slide-open="true"][data-active-panel="route"] .slideScrim {
     top: min(10dvh, 4.5rem);
+  }
+
+  /*
+   * Opening-question phone: Speak/Type live in the glass. Hide the empty
+   * rail. Presence stays off this screen. Review is the bottom utility.
+   */
+  .room[data-name-question="true"] .sideRail,
+  .room[data-name-question="true"] .presenceBelow {
+    display: none;
+    pointer-events: none;
   }
 }

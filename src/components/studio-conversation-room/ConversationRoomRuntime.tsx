@@ -145,11 +145,15 @@ import {
 } from "@/lib/studio-voice-invite";
 import type { StudioVoiceNarrationPreference } from "@/config/studio-voice-preference-v1";
 import {
+  clearVoiceFirstEntryChoiceRequired,
+  isVoiceFirstEntryChoiceRequired,
   isVoiceNarrationEnabled,
-  readVoiceNarrationPreference,
+  resolveBootVoiceNarrationPreference,
+  shouldHoldVoiceFirstEntryGate,
   writeVoiceNarrationPreference,
 } from "@/lib/studio-voice-preference";
 import { suppressSameGestureFollowUp } from "@/lib/studio-samsung-activate";
+import VoiceChoiceFilm from "@/components/studio-conversation-room/VoiceChoiceFilm";
 import VoicePreferenceControls from "@/components/studio-conversation-room/VoicePreferenceControls";
 
 function spokenLineForGuideStep(
@@ -462,7 +466,17 @@ export default function ConversationRoomRuntime({
     setSpeechSupported(getConversationSpeechAvailability().canListen);
     setReady(true);
 
-    const savedPreference = readVoiceNarrationPreference();
+    const holdVoiceGate = shouldHoldVoiceFirstEntryGate({
+      firstEntryRequired: isVoiceFirstEntryChoiceRequired(),
+      hasConversationProgress: Boolean(
+        hydratedGuide.preferredName.trim() ||
+          hydratedGuide.projectNeed.trim() ||
+          hydratedGuide.confirmedAt,
+      ),
+    });
+    const savedPreference = resolveBootVoiceNarrationPreference({
+      requireFirstEntryChoice: holdVoiceGate,
+    });
     setVoiceNarration(savedPreference);
     voiceNarrationRef.current = savedPreference;
 
@@ -1470,6 +1484,7 @@ export default function ConversationRoomRuntime({
   }
 
   function handleStartNew() {
+    /* New conversation content — keep the already-chosen Voice On/Off. */
     stopStudioSpeech();
     clearGuideUiStep();
     clearWorkingDraft();
@@ -1503,6 +1518,7 @@ export default function ConversationRoomRuntime({
     value: StudioVoiceNarrationPreference,
   ) {
     const fromGate = voiceNarrationRef.current === null;
+    clearVoiceFirstEntryChoiceRequired();
     writeVoiceNarrationPreference(value);
     voiceNarrationRef.current = value;
     setVoiceNarration(value);
@@ -1685,11 +1701,20 @@ export default function ConversationRoomRuntime({
     });
   }, [stage, intakeLiveAnswers, serviceIdsForIntake, intakeHandoffPlan]);
 
-  if (!ready || !projectDraft) {
+  if (!ready || !projectDraft || voiceNarration === null) {
+    /*
+     * OWNER ACCEPTED 2026-08-29 — Voice Choice film lock.
+     * First-entry Voice Choice is its own Welcome-master film.
+     * Do not mount Studio Workspace / Conversation Room tablet chrome here —
+     * that shell contaminated the glass. Logic stays in this runtime.
+     * Never return a blank page: boot and Voice Choice must stay reachable.
+     * Do not alter the film, or remount CR chrome onto this gate, in later
+     * Mobile work.
+     */
     return (
-      <StudioConversationRoom
-        className={className}
-        presence={voice.presence}
+      <VoiceChoiceFilm
+        onChoose={handleVoiceNarrationPreference}
+        privacyNote={STUDIO_GUIDE_MIC_PRIVACY_NOTE}
       />
     );
   }
@@ -1726,6 +1751,11 @@ export default function ConversationRoomRuntime({
     selectedBubbles.length > 0 || textDraft.trim().length > 0;
   const openingAsk = isAnsweringQuestion;
   const voiceUnset = voiceNarration === null;
+  const questionGlass =
+    stage === "opening" &&
+    (step === "ask_preferred_name" ||
+      step === "ask_project_need" ||
+      step === "ask_business_name");
 
   const canChangeAnswer =
     guideHasReviewableAnswers(draft) ||
@@ -1737,6 +1767,8 @@ export default function ConversationRoomRuntime({
     <StudioConversationRoom
       className={className}
       presence={voice.presence}
+      loungeLight
+      nameQuestion={questionGlass}
       activePanel={activePanel}
       onCloseActivityPanel={closeActivityPanel}
       activityPanelReturnFocusRef={activityReturnFocusRef}
@@ -1817,13 +1849,6 @@ export default function ConversationRoomRuntime({
         />
       }
       workspace={
-        voiceUnset ? (
-          <VoicePreferenceControls
-            preference={null}
-            onChoose={handleVoiceNarrationPreference}
-            privacyNote={STUDIO_GUIDE_MIC_PRIVACY_NOTE}
-          />
-        ) : (
           <StudioGuideTabletView
           step={step}
           stage={stage}
@@ -1864,14 +1889,17 @@ export default function ConversationRoomRuntime({
                   onSendMessage={handleSendMessage}
                   studioVoiceReply={studioVoiceReply}
                   allowMicrophone={listenArmed}
+                  embedded
+                  nameQuestion={questionGlass}
                 />
             ) : null
           }
           modeControls={
             openingAsk ? (
               <VoicePreferenceControls
-                preference={voiceNarration}
+                preference={voiceNarration ?? "off"}
                 onChoose={handleVoiceNarrationPreference}
+                filmFamily={questionGlass}
               />
             ) : null
           }
@@ -1911,7 +1939,6 @@ export default function ConversationRoomRuntime({
           planBridgeError={planBridgeError}
           intakeTabletStatus={intakeTabletStatus}
         />
-        )
       }
       communication={
         voiceUnset || openingAsk ? null : (

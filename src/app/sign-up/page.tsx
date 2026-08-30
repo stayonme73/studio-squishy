@@ -1,4 +1,5 @@
 import SignUpScene from "@/components/auth/SignUpScene";
+import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import { safeReturnPath } from "@/lib/auth/safe-return-path";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
@@ -27,10 +28,10 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   const returnTo = safeReturnPath(fromParam);
 
   return (
-    <main
+    <StudioMobileLoungeShell
       className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
       <SignUpScene returnTo={returnTo} />
-    </main>
+    </StudioMobileLoungeShell>
   );
 }

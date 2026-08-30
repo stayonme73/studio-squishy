@@ -9,25 +9,10 @@
 }
 
 /*
- * Studio Lobby — dark wood / kiosk corner hides the quiet pill, and Next.js
- * error toasts also claim bottom-left. Lift + brighten so Studio Review stays findable.
+ * Phone Studio Review tab: `src/app/studio-review-mobile-tab.css`
+ * (Welcome master, class `.studio-review-mobile-tab` on OwnerQaPanel).
+ * Do not add per-page Studio Review selectors here.
  */
-body:has(.welcome-hall-phase1) .owner-qa {
-  bottom: calc(3.25rem + env(safe-area-inset-bottom, 0px));
-  z-index: 10050;
-}
-
-body:has(.welcome-hall-phase1) .owner-qa__toggle {
-  opacity: 0.88;
-  color: #1a1a1a;
-  background: color-mix(in srgb, var(--board-family-field, #f3ede3) 92%, #fff 8%);
-  border-color: color-mix(in srgb, var(--sb-walnut, #3d2c1e) 28%, transparent);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
-}
-
-body:has(.welcome-hall-phase1) .owner-qa__toggle:hover {
-  opacity: 1;
-}
 
 .owner-qa__toggle {
   display: inline-flex;
@@ -61,14 +46,16 @@ body:has(.welcome-hall-phase1) .owner-qa__toggle:hover {
   background: color-mix(in srgb, var(--board-family-field) 94%, #fff 6%);
 }
 
-/* Conversation Room — Studio Review is an in-flow Studio Controls item.
-   Never float a pill over Voice, Session, or customer content. */
-body:has([data-layout="one-tablet"]) .owner-qa:not(.owner-qa--open) {
-  display: none !important;
-}
+/* Conversation Room desktop — Studio Review stays in Studio Controls.
+   Phone uses the shared Welcome tab (studio-review-mobile-tab.css). */
+@media (min-width: 961px) {
+  body:has([data-layout="one-tablet"]) .owner-qa:not(.owner-qa--open) {
+    display: none !important;
+  }
 
-body:has([data-layout="one-tablet"]) .owner-qa__toggle {
-  display: none !important;
+  body:has([data-layout="one-tablet"]) .owner-qa__toggle {
+    display: none !important;
+  }
 }
 
 .owner-qa--open .owner-qa__toggle {
@@ -310,32 +297,12 @@ body:has([data-layout="one-tablet"]) .owner-qa__toggle {
 @media (max-width: 900px) {
   /*
    * Low corner — clear of “Contact The Studio”, still above the home gesture.
+   * Full-width tab is `.studio-review-mobile-tab` (studio-review-mobile-tab.css).
    */
   .owner-qa {
     left: 12px;
     bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
     z-index: 10020;
-  }
-
-  /*
-   * Studio Lobby phone — Studio Review must not sit on LET’S GET STARTED.
-   * Bottom-left overlaps the cream dock CTA and steals Samsung taps.
-   */
-  body:has(.welcome-hall-phase1) .owner-qa {
-    left: auto;
-    right: 12px;
-    top: calc(0.65rem + env(safe-area-inset-top, 0px));
-    bottom: auto;
-    z-index: 10050;
-  }
-
-  /*
-   * Conversation Room phone — hide the floating host entirely.
-   * Studio Review is the last in-flow Studio Controls item. The open sheet
-   * still portals to body. Do not cover Voice, Session, or customer content.
-   */
-  body:has([data-layout="one-tablet"]) .owner-qa {
-    display: none !important;
   }
 
   .owner-qa__toggle {
@@ -348,17 +315,10 @@ body:has([data-layout="one-tablet"]) .owner-qa__toggle {
   /*
    * Pill stands alone when closed. While the sheet is open, hide the pill
    * so it cannot cover journey buttons (Close lives inside the sheet).
+   * The shared mobile tab overrides this when `.studio-review-mobile-tab` is on.
    */
   .owner-qa--open .owner-qa__toggle {
     display: none;
-  }
-
-  /*
-   * Studio Lobby phone — keep the Review pill visible while open.
-   * Hiding it left owners stuck when the sheet failed to paint.
-   */
-  body:has(.welcome-hall-phase1) .owner-qa--open .owner-qa__toggle {
-    display: inline-flex !important;
   }
 }
 
@@ -387,11 +347,21 @@ body:has([data-layout="one-tablet"]) .owner-qa__toggle {
   left: 12px;
   right: 12px;
   top: max(12px, env(safe-area-inset-top, 0px));
-  bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  bottom: var(--studio-review-mobile-bottom, 3.25rem);
   width: auto;
   max-height: none;
   margin: 0;
   z-index: 2;
   pointer-events: auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+[data-studio-controls-in-review] {
+  margin: 0 0 0.85rem;
+}
+
+[data-studio-controls-in-review]:empty {
+  display: none;
+  margin: 0;
 }

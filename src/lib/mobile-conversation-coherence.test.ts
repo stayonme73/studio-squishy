@@ -17,17 +17,20 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
       "utf8",
     );
     expect(runtime).toContain("const voiceUnset = voiceNarration === null");
-    expect(runtime).toContain("voiceUnset ? (");
-    expect(runtime).toContain("privacyNote={STUDIO_GUIDE_MIC_PRIVACY_NOTE}");
     expect(runtime).toContain("voiceUnset || openingAsk ? null");
+    expect(runtime).toContain("privacyNote={STUDIO_GUIDE_MIC_PRIVACY_NOTE}");
+    expect(runtime).toContain("<VoiceChoiceFilm");
+    expect(runtime).not.toContain("voiceChoice");
     const gate = readFileSync(
       join(
         process.cwd(),
-        "src/components/studio-conversation-room/VoicePreferenceControls.tsx",
+        "src/components/studio-conversation-room/VoiceChoiceFilm.tsx",
       ),
       "utf8",
     );
     expect(gate).toContain('data-voice-gate="true"');
+    expect(gate).not.toContain("StudioWorkspace");
+    expect(gate).not.toContain("studio-workspace");
   });
 
   it("keeps Voice toggle, Speak/Type, and Continue in the opening question cluster", () => {
@@ -62,8 +65,8 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
       "utf8",
     );
     expect(css).toContain(".chip[data-selected=\"true\"]:hover");
-    expect(css).toContain("background: rgba(210, 175, 95, 0.92)");
-    expect(css).toContain("color: #1a1510");
+    expect(css).toContain("background: var(--mc-denim, #547c92)");
+    expect(css).toContain("color: var(--mc-ivory, #f7f4ee)");
   });
 
   it("hides required messaging once a bubble or typed answer is accepted", () => {
@@ -142,7 +145,7 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
       "utf8",
     );
     expect(css).toContain(".requiredMeta");
-    expect(css).toContain("color: rgba(210, 175, 95, 0.95)");
+    expect(css).toContain("color: var(--mc-eucalyptus, #456b5a)");
     expect(css).not.toContain("flex: 1 1 12rem");
     expect(css).toContain("clamp(1.18rem, 4.9vw, 1.45rem)");
   });
@@ -177,7 +180,7 @@ describe("MJ-D10 Mobile question advance / scroll position", () => {
 });
 
 describe("MJ-D12 Mobile Studio Controls collapsible drawer", () => {
-  it("defaults collapsed, keeps every control, and does not key open state to the question", () => {
+  it("keeps every control and does not key open state to the question", () => {
     const nav = readFileSync(
       join(
         process.cwd(),
@@ -189,9 +192,10 @@ describe("MJ-D12 Mobile Studio Controls collapsible drawer", () => {
     expect(nav).not.toContain("sessionStorage");
     expect(nav).toContain('data-studio-controls={controlsOpen ? "expanded" : "collapsed"}');
     expect(nav).toContain('data-studio-controls-tab="true"');
+    expect(nav).toContain('data-studio-controls="in-review"');
     expect(nav).toContain("Studio Controls");
-    expect(nav).toContain("drawerActivate.ref");
-    expect(nav).toContain("onClick={drawerActivate.onClick}");
+    expect(nav).toContain("createPortal");
+    expect(nav).toContain("useStudioMobileUtility");
     expect(nav).toContain("Help Center");
     expect(nav).toContain("Studio Review");
     expect(nav).toContain('data-studio-review-placement="studio-controls"');
@@ -203,7 +207,16 @@ describe("MJ-D12 Mobile Studio Controls collapsible drawer", () => {
     expect(nav).not.toContain("setControlsOpen(true)");
   });
 
-  it("shows a compact phone tab and leaves the service list on the collapsed tab height", () => {
+  it("uses Studio Review as the only phone bottom tab and leaves the service list on that height", () => {
+    const nav = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationNavPanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(nav).toContain('data-studio-controls="in-review"');
+    expect(nav).toContain("if (isPhone && mobileUtility)");
     const navCss = readFileSync(
       join(
         process.cwd(),
@@ -216,7 +229,9 @@ describe("MJ-D12 Mobile Studio Controls collapsible drawer", () => {
     expect(navCss).toContain("@media (max-width: 960px)");
     expect(navCss).toContain('data-studio-controls="collapsed"');
     expect(navCss).toContain('data-studio-controls="expanded"');
+    expect(navCss).toContain('data-studio-controls="in-review"');
     expect(navCss).toContain("flex-direction: column-reverse");
+    expect(navCss).toContain("border-radius: 999px");
     expect(navCss).toContain("-webkit-overflow-scrolling: touch");
     const roomCss = readFileSync(
       join(
@@ -225,11 +240,14 @@ describe("MJ-D12 Mobile Studio Controls collapsible drawer", () => {
       ),
       "utf8",
     );
-    expect(roomCss).toContain("z-index: 122");
-    expect(roomCss).toContain(
-      "height: calc(100dvh - min(10dvh, 4.5rem) - var(--studio-controls-tab-h))",
+    const roomPhone = roomCss.slice(roomCss.indexOf("@media (max-width: 960px)"));
+    expect(roomPhone).toContain(".sideNav {");
+    expect(roomPhone).toContain("display: none");
+    expect(roomPhone).toContain("var(--studio-review-mobile-bottom, 3.25rem)");
+    expect(roomPhone).not.toContain("max(14rem, 34dvh)");
+    expect(roomPhone).not.toContain(
+      "var(--studio-controls-tab-h) + var(--studio-review-mobile-tab-h",
     );
-    expect(roomCss).not.toContain("max(14rem, 34dvh)");
   });
 });
 
@@ -345,7 +363,7 @@ describe("MJ-D14 Mobile Review Together / Route page coherence", () => {
     expect(roomPhone).toContain("overflow-x: clip");
     expect(roomPhone).toContain("overflow-y: visible");
     expect(roomPhone).toContain("overscroll-behavior-x: none");
-    expect(roomCss).toContain("transform: scale(1.04)");
+    expect(roomCss).not.toContain("transform: scale(1.04)");
     const mobile = readFileSync(
       join(process.cwd(), "src/app/mobile-journey.css"),
       "utf8",
@@ -444,11 +462,12 @@ describe("MJ-D16 — Voice Off must not start the microphone", () => {
     const gate = readFileSync(
       join(
         process.cwd(),
-        "src/components/studio-conversation-room/VoicePreferenceControls.tsx",
+        "src/components/studio-conversation-room/VoiceChoiceFilm.tsx",
       ),
       "utf8",
     );
-    expect(gate).toContain("consumeGesture: true");
+    expect(gate).toContain('addEventListener("pointerdown"');
+    expect(gate).toContain('addEventListener("click"');
     const comm = readFileSync(
       join(
         process.cwd(),

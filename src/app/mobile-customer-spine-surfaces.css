@@ -1,0 +1,49 @@
+/**
+ * Mobile-only spine surface remaps.
+ * Desktop Board / Final Delivery / global roots are not rewritten.
+ * Phone breakpoint matches Conversation Room / Welcome crop media.
+ */
+@media (max-width: 1024px) {
+  [data-mobile-customer-spine] {
+    --studio-denim: #547c92;
+    --studio-denim-deep: color-mix(in srgb, #547c92 88%, #456b5a 12%);
+    --studio-eucalyptus: #456b5a;
+    --studio-ivory: #f7f4ee;
+    --pay-denim: #547c92;
+    --pay-denim-deep: color-mix(in srgb, #547c92 88%, #456b5a 12%);
+    --pay-herb-gold: #547c92;
+    --sb-denim: #547c92;
+    --utility-primary: #547c92;
+    --utility-primary-deep: color-mix(in srgb, #547c92 88%, #456b5a 12%);
+    --studio-utility-backdrop-image: url("/welcome-hall/studio-lobby-lounge.png");
+    --studio-utility-backdrop-position: 16% 42%;
+    --studio-utility-backdrop-blur: blur(14px) saturate(1.04) brightness(1.1);
+    --studio-utility-backdrop-tint: color-mix(in srgb, #2e2b28 18%, transparent);
+    --studio-utility-backdrop-fallback: #ebe2d4;
+    --fs-accent: #547c92;
+  }
+
+  /* Beat Feedback Studio's local charcoal-identity / center-crop lounge override. */
+  [data-mobile-customer-spine] .studio-utility-scene:has(.fs-room),
+  [data-mobile-customer-spine].studio-utility-scene:has(.fs-room) {
+    --studio-utility-backdrop-image: url("/welcome-hall/studio-lobby-lounge.png");
+    --studio-utility-backdrop-position: 16% 42%;
+    --studio-utility-backdrop-blur: blur(14px) saturate(1.04) brightness(1.1);
+    --studio-utility-backdrop-tint: color-mix(in srgb, #2e2b28 18%, transparent);
+    --studio-utility-backdrop-fallback: #ebe2d4;
+  }
+
+  /* Dense forms: Help, Auth, Project Record cards. Not session chrome. */
+  [data-mobile-customer-spine] .utility-card {
+    background: var(--mc-glass-strong, color-mix(in srgb, color-mix(in srgb, #f7f4ee 70%, #ebe2d4 30%) 58%, transparent));
+    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+    border-color: var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  [data-mobile-customer-spine] .utility-btn--primary:hover,
+  [data-mobile-customer-spine] .utility-page--help-center .utility-header .utility-topbar__help:hover {
+    background: var(--utility-primary-deep);
+    border-color: var(--utility-primary-deep);
+  }
+}

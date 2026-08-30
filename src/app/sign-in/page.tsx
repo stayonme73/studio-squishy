@@ -1,4 +1,5 @@
 import SignInScene from "@/components/auth/SignInScene";
+import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import {
   isExplicitStudioBoardFrom,
   safeReturnPath,
@@ -23,7 +24,7 @@ function firstQueryValue(value: string | string[] | undefined): string | null {
 
 /**
  * Server resolves and allowlists `from` so first markup never depends on
- * useSearchParams. Dirty utility-backdrop shell is intentionally not used here.
+ * useSearchParams. Mobile lounge backdrop is spine-scoped; desktop tokens stay.
  */
 export default async function SignInPage({ searchParams }: SignInPageProps) {
   const params = await searchParams;
@@ -32,13 +33,13 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   const showProjectCreatedLead = isExplicitStudioBoardFrom(fromParam);
 
   return (
-    <main
+    <StudioMobileLoungeShell
       className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
       <SignInScene
         returnTo={returnTo}
         showProjectCreatedLead={showProjectCreatedLead}
       />
-    </main>
+    </StudioMobileLoungeShell>
   );
 }

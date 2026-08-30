@@ -162,7 +162,8 @@
     flex: 0 0 auto !important;
     width: 100% !important;
     min-height: 0 !important;
-    height: calc(100vw * 1080 / 1920 * 1.12) !important;
+    /* Lounge native 1024×488 — not leftover 1920×1080 podium-plate math. */
+    height: calc(100vw * 488 / 1024 * 1.12) !important;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -183,7 +184,8 @@
     max-height: none !important;
     aspect-ratio: auto;
     object-fit: cover !important;
-    object-position: 48% 50% !important;
+    /* Silhouetted-man mural wall — not the center window crop. */
+    object-position: 16% 42% !important;
     transform: none !important;
   }
 
@@ -237,6 +239,28 @@
   body:has(.welcome-hall-phase1) {
     min-height: 0 !important;
     background: #3a3835;
+  }
+
+  html:has(.lobby-entry-film),
+  body:has(.lobby-entry-film),
+  main:has(.lobby-entry-film) {
+    overflow: hidden !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+  }
+
+  .welcome-hall-phase1:has(.lobby-entry-film) .welcome-hall-plate {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  .welcome-hall-phase1:has(.lobby-entry-film) .welcome-hall-plate-crop--mobile {
+    height: 100dvh !important;
+  }
+
+  .welcome-hall-phase1:has(.lobby-entry-film) .hall-mobile-dock {
+    display: none !important;
   }
 
   /* —— Studio Guide —— */

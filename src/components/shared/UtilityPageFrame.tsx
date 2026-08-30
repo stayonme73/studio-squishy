@@ -16,7 +16,7 @@ export default function UtilityPageFrame({ navId, children }: Props) {
   }
 
   return (
-    <div className="studio-utility-scene">
+    <div className="studio-utility-scene" data-mobile-customer-spine="">
       <StudioUtilityBackdrop placement="viewport" />
       <div className="studio-utility-scene__content">{children}</div>
     </div>

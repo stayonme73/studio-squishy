@@ -18,8 +18,11 @@
 @import "./review-room.css";
 @import "./deliverables.css";
 @import "./feedback-studio.css";
+@import "./mobile-customer-spine-palette.css";
+@import "./mobile-customer-spine-surfaces.css";
 @import "./mobile-journey.css";
 @import "./owner-qa.css";
+@import "./studio-review-mobile-tab.css";
 @import "./studio-kitchen.css";
 
 :root {
@@ -373,6 +376,14 @@ body {
   nextjs-portal > *,
   #nextjs-dev-tools-menu {
     inset: auto 12px 12px auto !important;
+  }
+}
+
+@media (max-width: 960px) {
+  [data-nextjs-dev-tools-button],
+  nextjs-portal > *,
+  #nextjs-dev-tools-menu {
+    bottom: calc(var(--studio-review-mobile-bottom, 3.25rem) + 0.55rem) !important;
   }
 }
 

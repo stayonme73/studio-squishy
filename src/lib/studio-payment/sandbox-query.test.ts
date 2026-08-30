@@ -94,6 +94,7 @@ describe("studio payment sandbox query", () => {
   it("places Studio Review in Studio Controls instead of a floating Conversation Room pill", () => {
     const css = readFileSync(join(process.cwd(), "src/app/owner-qa.css"), "utf8");
     expect(css).toContain("body:has([data-layout=\"one-tablet\"]) .owner-qa");
+    expect(css).toContain("@media (min-width: 961px)");
     expect(css).toContain("display: none !important");
     expect(css).not.toContain("top: 42vh");
     const nav = readFileSync(
@@ -167,14 +168,11 @@ describe("studio payment sandbox query", () => {
       ),
       "utf8",
     );
-    expect(css).toContain(
-      "height: calc(100dvh - min(38dvh, 20rem) - var(--studio-controls-tab-h))",
-    );
-    expect(css).toContain(
-      "height: calc(100dvh - min(10dvh, 4.5rem) - var(--studio-controls-tab-h))",
-    );
+    expect(css).toContain("min(38dvh, 20rem)");
+    expect(css).toContain("min(10dvh, 4.5rem)");
+    expect(css).toContain("var(--studio-review-mobile-bottom, 3.25rem)");
     expect(css).toContain('.slideHost[data-panel="builder"]');
-    expect(css).toContain("--studio-controls-tab-h: 3.25rem");
+    expect(css).toContain("--studio-controls-tab-h: 2.9rem");
     expect(css).not.toContain("max(14rem, 34dvh)");
     expect(css).not.toContain(
       "max-height: calc(100dvh - min(38dvh, 20rem) - max(14rem, 34dvh))",

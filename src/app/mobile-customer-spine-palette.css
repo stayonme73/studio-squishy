@@ -1,0 +1,45 @@
+/**
+ * Mobile customer-spine palette — scoped.
+ * Does not mutate :root, board-family, or studio-design-system.
+ * Apply with data-mobile-customer-spine. Phone remaps live in
+ * mobile-customer-spine-surfaces.css so desktop tokens stay put.
+ *
+ * VISUAL_MASTER (do not drift):
+ * glass Ivory 68% / Cream 32% @ 46%; strong 58% dense forms only;
+ * filter literal blur(14px) saturate(1.04) brightness(1.1);
+ * veil Ink 18%; crop 16% / 42%; Denim #547C92.
+ */
+[data-mobile-customer-spine] {
+  --mc-cream: #ebe2d4;
+  --mc-ivory: #f7f4ee;
+  --mc-denim: #547c92;
+  --mc-eucalyptus: #456b5a;
+  --mc-coral: #d94e2b;
+  --mc-yellow: #f7c900;
+  --mc-terracotta: #b96d40;
+  --mc-ink: #2e2b28;
+  --mc-ink-muted: color-mix(in srgb, var(--mc-ink) 64%, transparent);
+  --mc-glass: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--mc-ivory) 68%, var(--mc-cream) 32%) 46%,
+    transparent
+  );
+  --mc-glass-strong: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--mc-ivory) 70%, var(--mc-cream) 30%) 58%,
+    transparent
+  );
+  --mc-glass-border: color-mix(in srgb, var(--mc-denim) 32%, var(--mc-ivory));
+  --mc-veil: color-mix(in srgb, var(--mc-ink) 18%, transparent);
+  --mc-primary: var(--mc-denim);
+  --mc-primary-text: var(--mc-ivory);
+  --mc-card: color-mix(in srgb, var(--mc-ivory) 55%, transparent);
+  --mc-chip: color-mix(in srgb, var(--mc-ivory) 50%, transparent);
+  --mc-chip-selected: color-mix(in srgb, var(--mc-denim) 22%, var(--mc-ivory));
+  --lounge-plate: url("/welcome-hall/studio-lobby-lounge.png");
+  --lounge-crop-phone: 16% 42%;
+  /* Session / ambient frost uses the 46% master, not the old 78% strip. */
+  --lounge-frost-strong: var(--mc-glass);
+  --lounge-glass-border: var(--mc-glass-border);
+  --lounge-ink: var(--mc-ink);
+}

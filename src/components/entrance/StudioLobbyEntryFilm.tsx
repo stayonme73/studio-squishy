@@ -41,7 +41,7 @@ export default function StudioLobbyEntryFilm({
     sessionState === "signed-in" ? routes.studioBoard : routes.signInFromBoard;
 
   return (
-    <div className="lobby-entry-film" role="dialog" aria-modal="true" aria-labelledby="lobby-entry-brand" data-phone-front-door={allowDismiss ? undefined : "true"}>
+    <div className="lobby-entry-film" role="dialog" aria-modal="true" aria-labelledby="lobby-entry-brand" data-mobile-customer-spine="" data-phone-front-door={allowDismiss ? undefined : "true"}>
       <div className="lobby-entry-film__scrim" aria-hidden />
       <div className="lobby-entry-film__panel">
         {allowDismiss ? (

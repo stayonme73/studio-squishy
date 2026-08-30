@@ -1,0 +1,86 @@
+{
+  "nameMetrics": {
+    "step": "ask_preferred_name",
+    "innerHeight": 780,
+    "scrollY": 0,
+    "scrollMax": 0,
+    "separateControlsTab": false,
+    "inReviewControls": false,
+    "tab": {
+      "position": "fixed",
+      "left": 0,
+      "width": 360,
+      "bottom": 780,
+      "top": 728,
+      "height": 52
+    },
+    "toggle": {
+      "color": "rgb(247, 244, 238)",
+      "background": "rgba(46, 43, 40, 0.32)",
+      "filter": "none",
+      "paddingBottom": "8.8px",
+      "minHeight": "52px",
+      "borderRadius": "16.8px 16.8px 0px 0px"
+    },
+    "continueBtn": null,
+    "continueClearsTab": null,
+    "roomPaddingBottom": "52px",
+    "cssBottomVar": "calc(3.25rem + 0px)"
+  },
+  "businessMetrics": {
+    "step": "ask_business_name",
+    "innerHeight": 780,
+    "scrollY": 50,
+    "scrollMax": 50,
+    "separateControlsTab": false,
+    "inReviewControls": false,
+    "tab": {
+      "position": "fixed",
+      "left": 0,
+      "width": 360,
+      "bottom": 780,
+      "top": 728,
+      "height": 52
+    },
+    "toggle": {
+      "color": "rgb(247, 244, 238)",
+      "background": "rgba(46, 43, 40, 0.32)",
+      "filter": "none",
+      "paddingBottom": "8.8px",
+      "minHeight": "52px",
+      "borderRadius": "16.8px 16.8px 0px 0px"
+    },
+    "continueBtn": null,
+    "continueClearsTab": null,
+    "roomPaddingBottom": "52px",
+    "cssBottomVar": "calc(3.25rem + 0px)"
+  },
+  "simMetrics": {
+    "step": "ask_business_name+34px-sim",
+    "innerHeight": 780,
+    "scrollY": 84,
+    "scrollMax": 84,
+    "separateControlsTab": false,
+    "inReviewControls": false,
+    "tab": {
+      "position": "fixed",
+      "left": 0,
+      "width": 360,
+      "bottom": 780,
+      "top": 694,
+      "height": 86
+    },
+    "toggle": {
+      "color": "rgb(247, 244, 238)",
+      "background": "rgba(46, 43, 40, 0.32)",
+      "filter": "none",
+      "paddingBottom": "42.8px",
+      "minHeight": "86px",
+      "borderRadius": "16.8px 16.8px 0px 0px"
+    },
+    "continueBtn": null,
+    "continueClearsTab": null,
+    "roomPaddingBottom": "86px",
+    "cssBottomVar": "calc(\n        3.25rem + 34px\n      )"
+  }
+}

@@ -55,6 +55,21 @@ export type StudioConversationRoomProps = {
   lightState?: StudioCommunicationLightState;
   presence?: StudioPresenceSnapshot;
   /**
+   * First-entry Voice / Fill it out myself — keep Lounge crop + frost,
+   * not a separate black-identity shell.
+   */
+  voiceChoice?: boolean;
+  /**
+   * Opening questions share Voice-choice light Lounge glass.
+   * Voice choice already implies this.
+   */
+  loungeLight?: boolean;
+  /**
+   * Before We Begin (preferred name) only — Lounge + Voice Choice glass,
+   * no tablet/device chrome. Do not use on later questions yet.
+   */
+  nameQuestion?: boolean;
+  /**
    * @deprecated Dual-surface inspection retired.
    */
   inspectHardware?: boolean;
@@ -104,6 +119,9 @@ export default function StudioConversationRoom({
   activityPanelReturnFocusRef,
   lightState = "idle",
   presence,
+  voiceChoice = false,
+  loungeLight = false,
+  nameQuestion = false,
   micPrivacyNote,
   className,
 }: StudioConversationRoomProps) {
@@ -185,6 +203,7 @@ export default function StudioConversationRoom({
     restore?.focus?.();
   }, [panelOpen, activityPanelReturnFocusRef]);
 
+  const lightGlass = voiceChoice || loungeLight;
   const roomClassName = [styles.room, className ?? ""].filter(Boolean).join(" ");
   const panelLabel =
     activePanel === "route"
@@ -205,6 +224,10 @@ export default function StudioConversationRoom({
       data-presence-bias={bias}
       data-presence-floor={floor}
       data-layout="one-tablet"
+      data-mobile-customer-spine=""
+      data-voice-choice={voiceChoice ? "true" : undefined}
+      data-lounge-light={lightGlass ? "true" : undefined}
+      data-name-question={nameQuestion ? "true" : undefined}
       data-active-panel={activePanel}
       data-slide-open={slideOpen ? "true" : "false"}
     >
@@ -242,21 +265,27 @@ export default function StudioConversationRoom({
           >
             <StudioWorkspace
               presenceBias={bias}
-              haloStrength={tabletHalo}
-              floor={floor}
+              haloStrength={nameQuestion ? "neutral" : tabletHalo}
+              floor={nameQuestion ? "neutral" : floor}
               capturedPulse={resolvedPresence.activity === "captured"}
+              voiceChoice={voiceChoice}
+              loungeLight={lightGlass}
+              nameQuestion={nameQuestion}
             >
               {workspace}
             </StudioWorkspace>
+            {nameQuestion ? null : (
             <p className={styles.surfaceCaption} data-caption="tablet">
               {surfaceCaptions.tablet}
             </p>
+            )}
             {micPrivacyNote ? (
               <p className={styles.micPrivacyBelow}>{micPrivacyNote}</p>
             ) : null}
           </div>
         </div>
 
+        {nameQuestion ? null : (
         <div
           className={styles.presenceBelow}
           data-studio-surface="presence-rail"
@@ -264,6 +293,7 @@ export default function StudioConversationRoom({
         >
           <StudioPresenceRail presence={resolvedPresence} />
         </div>
+        )}
       </div>
 
       {slideOpen ? (

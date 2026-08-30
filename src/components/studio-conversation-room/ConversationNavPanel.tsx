@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import styles from "@/components/studio-conversation-room/conversation-nav-panel.module.css";
+import { useStudioMobileUtility } from "@/components/dev/studio-mobile-utility";
 import {
   STUDIO_GUIDE_TYPE_FIELD_ID,
   conversationRoomGuideV1,
@@ -31,6 +33,8 @@ export type ConversationNavPanelProps = {
 /**
  * Studio control strip — Conversation · Session · Studio.
  * Speak and type live only on the permanent communication dock above this strip.
+ * Phone: body portals into the shared Studio Review drawer (no separate tab).
+ * Desktop: side rail, including the Studio Review link.
  */
 export default function ConversationNavPanel({
   canChangeAnswer,
@@ -46,12 +50,29 @@ export default function ConversationNavPanel({
 }: ConversationNavPanelProps) {
   const v = conversationRoomGuideV1;
   const [controlsOpen, setControlsOpen] = useState(false);
+  const [isPhone, setIsPhone] = useState(false);
+  const mobileUtility = useStudioMobileUtility();
   const drawerActivate = useSamsungTapActivate(() => {
     setControlsOpen((open) => !open);
   });
 
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 960px)");
+    const sync = () => setIsPhone(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+
+  const registerControls = mobileUtility?.registerControls;
+  useEffect(() => {
+    if (!registerControls || !isPhone) return undefined;
+    return registerControls();
+  }, [registerControls, isPhone]);
+
   function closeDrawer() {
     setControlsOpen(false);
+    if (isPhone) mobileUtility?.closeUtility();
   }
 
   const reviewActivate = useSamsungActivate<HTMLAnchorElement>(() => {
@@ -71,27 +92,8 @@ export default function ConversationNavPanel({
     }, 0);
   }
 
-  return (
-    <nav
-      className={styles.panel}
-      aria-label="Studio control strip"
-      data-studio-controls={controlsOpen ? "expanded" : "collapsed"}
-    >
-      <button
-        type="button"
-        className={styles.drawerTab}
-        aria-expanded={controlsOpen}
-        aria-controls="studio-controls-body"
-        data-studio-controls-tab="true"
-        ref={drawerActivate.ref}
-        onClick={drawerActivate.onClick}
-      >
-        Studio Controls
-        <span className={styles.drawerChevron} aria-hidden="true">
-          {controlsOpen ? "▾" : "▴"}
-        </span>
-      </button>
-      <div id="studio-controls-body" className={styles.drawerBody}>
+  const body = (
+    <div id="studio-controls-body" className={styles.drawerBody}>
       <p className={styles.eyebrow}>Studio controls</p>
 
       <section className={styles.section} aria-label="Conversation">
@@ -225,17 +227,54 @@ export default function ConversationNavPanel({
             Help Center
             <span className={styles.btnHint}>Policies &amp; FAQ</span>
           </button>
-          <StudioReviewControl onOpen={closeDrawer} />
+          {isPhone ? null : <StudioReviewControl onOpen={closeDrawer} />}
         </div>
       </section>
-      </div>
+    </div>
+  );
+
+  if (isPhone && mobileUtility) {
+    if (!mobileUtility.slotEl) return null;
+    return createPortal(
+      <nav
+        className={styles.panel}
+        aria-label="Studio control strip"
+        data-studio-controls="in-review"
+      >
+        {body}
+      </nav>,
+      mobileUtility.slotEl,
+    );
+  }
+
+  return (
+    <nav
+      className={styles.panel}
+      aria-label="Studio control strip"
+      data-studio-controls={controlsOpen ? "expanded" : "collapsed"}
+    >
+      <button
+        type="button"
+        className={styles.drawerTab}
+        aria-expanded={controlsOpen}
+        aria-controls="studio-controls-body"
+        data-studio-controls-tab="true"
+        ref={drawerActivate.ref}
+        onClick={drawerActivate.onClick}
+      >
+        Studio Controls
+        <span className={styles.drawerChevron} aria-hidden="true">
+          {controlsOpen ? "▾" : "▴"}
+        </span>
+      </button>
+      {body}
     </nav>
   );
 }
 
 /**
- * Dev-only. Lives in Studio Controls so it scrolls with the page and never
- * covers Voice, Session, or customer content.
+ * Dev-only. Desktop Conversation Room rail only — phone uses the shared
+ * Studio Review tab instead of a second Review control.
  */
 function StudioReviewControl({ onOpen }: { onOpen: () => void }) {
   if (process.env.NODE_ENV !== "development") return null;

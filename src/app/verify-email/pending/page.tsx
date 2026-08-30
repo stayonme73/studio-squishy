@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import VerifyEmailPendingScene from "@/components/auth/VerifyEmailPendingScene";
+import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 import "../../mobile-route-fixes.css";
@@ -13,7 +14,7 @@ export const metadata = {
 
 export default function VerifyEmailPendingPage() {
   return (
-    <main
+    <StudioMobileLoungeShell
       className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
       <Suspense
@@ -26,6 +27,6 @@ export default function VerifyEmailPendingPage() {
       >
         <VerifyEmailPendingScene />
       </Suspense>
-    </main>
+    </StudioMobileLoungeShell>
   );
 }

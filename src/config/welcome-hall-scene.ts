@@ -59,11 +59,12 @@ export const welcomeHallScene = {
 
   /**
    * Desktop: cover — full-bleed lounge (no side bars).
-   * Portrait mobile uses cover with a slight horizontal bias.
+   * Phone Welcome / Entry Film: left mural with the silhouetted man —
+   * not the generic center window crop.
    */
   framing: {
     default: { x: 0.5, y: 0.5, fit: "cover" as const },
-    portrait: { x: 0.48, y: 0.5, fit: "cover" as const },
+    portrait: { x: 0.16, y: 0.42, fit: "cover" as const },
   },
 } as const;
 

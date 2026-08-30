@@ -4,6 +4,7 @@ import { type CSSProperties, type ReactNode } from "react";
 
 import { studioConversationRoomV1 } from "@/config/studio-conversation-room-v1";
 import styles from "@/components/studio-conversation-room/studio-workspace.module.css";
+import voiceFilm from "@/components/studio-conversation-room/voice-choice-film.module.css";
 
 export type StudioWorkspaceProps = {
   /** Runtime content only — never baked into hardware. */
@@ -16,6 +17,18 @@ export type StudioWorkspaceProps = {
   floor?: "studio" | "customer" | "neutral";
   /** Brief pulse when an answer is captured. */
   capturedPulse?: boolean;
+  /** First-entry Voice choice — Welcome glass over Lounge, not a dark tablet cave. */
+  voiceChoice?: boolean;
+  /**
+   * Opening-question family (Before We Begin through Materials) shares the
+   * same light Lounge glass as Voice choice. Do not leave this off after the gate.
+   */
+  loungeLight?: boolean;
+  /**
+   * Preferred-name and project-need questions reuse Voice Choice `.panel`.
+   * Do not invent a second glass. Hides tablet/device chrome.
+   */
+  nameQuestion?: boolean;
 };
 
 /**
@@ -29,6 +42,9 @@ export default function StudioWorkspace({
   haloStrength = "neutral",
   floor = "neutral",
   capturedPulse = false,
+  voiceChoice = false,
+  loungeLight = false,
+  nameQuestion = false,
 }: StudioWorkspaceProps) {
   const { workspaceViewport, workspaceBezelOutsideMin } =
     studioConversationRoomV1;
@@ -48,6 +64,9 @@ export default function StudioWorkspace({
           data-halo={haloStrength}
           data-presence-floor={floor}
           data-captured-pulse={capturedPulse ? "true" : undefined}
+          data-voice-choice={voiceChoice ? "true" : undefined}
+          data-lounge-light={loungeLight || voiceChoice ? "true" : undefined}
+          data-name-question={nameQuestion ? "true" : undefined}
           style={
             {
               ["--ws-frame-w" as string]: `${outerWidth}px`,
@@ -56,6 +75,17 @@ export default function StudioWorkspace({
             } as CSSProperties
           }
         >
+          {nameQuestion ? (
+            <div
+              className={`${voiceFilm.panel} ${styles.nameQuestionPanel}`}
+              role="region"
+              aria-label="Studio conversation question"
+              data-name-question-panel="true"
+            >
+              <div className={styles.hostSurface}>{children}</div>
+            </div>
+          ) : (
+            <>
           <div className={styles.aluminumEdge} aria-hidden />
           <div className={styles.notch} aria-hidden />
           <div className={styles.glassChrome} aria-hidden />
@@ -66,6 +96,8 @@ export default function StudioWorkspace({
           >
             <div className={styles.hostSurface}>{children}</div>
           </div>
+            </>
+          )}
         </div>
       </div>
     </div>

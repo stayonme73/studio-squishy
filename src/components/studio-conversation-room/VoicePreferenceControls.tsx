@@ -1,81 +1,88 @@
 "use client";
 
+import { useSamsungActivate } from "@/lib/studio-samsung-activate";
 import {
   studioVoicePreferenceV1,
   type StudioVoiceNarrationPreference,
 } from "@/config/studio-voice-preference-v1";
-import { useSamsungActivate } from "@/lib/studio-samsung-activate";
 
 import styles from "./voice-preference-controls.module.css";
 
 export type VoicePreferenceControlsProps = {
-  preference: StudioVoiceNarrationPreference | null;
+  preference: StudioVoiceNarrationPreference;
   onChoose: (value: StudioVoiceNarrationPreference) => void;
-  /** Shown only on the first-entry gate — not repeated under an active question. */
-  privacyNote?: string;
+  /**
+   * Preferred-name, project-need, and business-name questions. Selected side
+   * uses the accepted Welcome / Voice Choice CTA (`lobby-entry-film__cta`).
+   */
+  filmFamily?: boolean;
 };
 
-function SamsungChoiceButton({
-  className,
-  children,
-  onActivate,
-}: {
-  className: string;
-  children: string;
-  onActivate: () => void;
-}) {
-  const activate = useSamsungActivate<HTMLButtonElement>(onActivate, {
-    consumeGesture: true,
-  });
-  return (
-    <button
-      ref={activate.ref}
-      type="button"
-      className={className}
-      onClick={activate.onClick}
-    >
-      {children}
-    </button>
-  );
-}
-
 /**
- * Conversation Room only — first-entry choice + persistent Voice On/Off.
- * Does not touch Lobby Voice.
+ * Persistent Voice On/Off after the first-entry film.
+ * First-entry presentation lives in VoiceChoiceFilm — not this toggle.
  */
 export default function VoicePreferenceControls({
   preference,
   onChoose,
-  privacyNote,
+  filmFamily = false,
 }: VoicePreferenceControlsProps) {
   const { copy } = studioVoicePreferenceV1;
+  const activateOn = useSamsungActivate(() => onChoose("on"), {
+    consumeGesture: true,
+  });
+  const activateOff = useSamsungActivate(() => onChoose("off"), {
+    consumeGesture: true,
+  });
 
-  if (preference === null) {
+  if (filmFamily) {
     return (
-      <div className={styles.root} data-voice-gate="true">
+      <div className={styles.root} data-film-family="true">
         <div
-          className={styles.choice}
+          className={styles.filmToggle}
           role="group"
-          aria-label={copy.howToContinue}
+          aria-label={copy.persistentGroupAria}
         >
-          <p className={styles.choicePrompt}>{copy.howToContinue}</p>
-          {privacyNote ? (
-            <p className={styles.privacyNote}>{privacyNote}</p>
-          ) : null}
-          <div className={styles.choiceActions}>
-            <SamsungChoiceButton
-              className={styles.choiceOption}
-              onActivate={() => onChoose("on")}
-            >
-              {copy.useVoiceGuidance}
-            </SamsungChoiceButton>
-            <SamsungChoiceButton
-              className={styles.choiceOption}
-              onActivate={() => onChoose("off")}
-            >
-              {copy.fillItOutMyself}
-            </SamsungChoiceButton>
-          </div>
+          <a
+            ref={activateOn.ref}
+            role="button"
+            tabIndex={0}
+            className={
+              preference === "on"
+                ? `lobby-entry-film__cta ${styles.cta}`
+                : styles.filmIdle
+            }
+            aria-pressed={preference === "on"}
+            data-voice-pref="on"
+            onClick={activateOn.onClick}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              onChoose("on");
+            }}
+          >
+            {copy.voiceOn}
+          </a>
+          <a
+            ref={activateOff.ref}
+            role="button"
+            tabIndex={0}
+            className={
+              preference === "off"
+                ? `lobby-entry-film__cta ${styles.cta}`
+                : styles.filmIdle
+            }
+            aria-pressed={preference === "off"}
+            data-voice-pref="off"
+            onClick={activateOff.onClick}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              onChoose("off");
+            }}
+          >
+            {copy.voiceOff}
+          </a>
         </div>
       </div>
     );

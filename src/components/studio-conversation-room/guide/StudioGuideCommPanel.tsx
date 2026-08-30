@@ -46,6 +46,14 @@ export type StudioGuideCommPanelProps = {
   studioVoiceReply?: string | null;
   /** When false, leftover gate taps cannot start the microphone. */
   allowMicrophone?: boolean;
+  /** Opening-question dock — sit on tablet light glass, no second frost layer. */
+  embedded?: boolean;
+  /**
+   * Preferred-name question only. Continue uses the accepted Welcome /
+   * Voice Choice CTA (`lobby-entry-film__cta` on an `<a>`). Mic/type sit
+   * on the same glass — not gray slabs.
+   */
+  nameQuestion?: boolean;
 };
 
 /**
@@ -72,11 +80,13 @@ function StudioGuideCommPanel({
   onSendMessage,
   studioVoiceReply = null,
   allowMicrophone = true,
+  embedded = false,
+  nameQuestion = false,
 }: StudioGuideCommPanelProps) {
   const v = conversationRoomGuideV1;
   const textRef = useRef<HTMLTextAreaElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
-  const sendRef = useRef<HTMLButtonElement | null>(null);
+  const sendRef = useRef<HTMLButtonElement | HTMLAnchorElement | null>(null);
   const resetKeyRef = useRef(fieldResetKey);
   const emptyRef = useRef(!textDraft.trim());
 
@@ -90,7 +100,13 @@ function StudioGuideCommPanel({
       isAnsweringQuestion,
       typedText: typed,
     });
-    sendRef.current.disabled = action === "disabled";
+    if ("disabled" in sendRef.current) {
+      sendRef.current.disabled = action === "disabled";
+    }
+    sendRef.current.setAttribute(
+      "aria-disabled",
+      action === "disabled" ? "true" : "false",
+    );
     sendRef.current.textContent = composerSubmitLabel(isAnsweringQuestion);
     sendRef.current.dataset.sendAction = action;
   }
@@ -141,8 +157,68 @@ function StudioGuideCommPanel({
     <aside
       className={styles.panel}
       data-permanent-communication="true"
+      data-embedded={embedded ? "true" : undefined}
+      data-name-question={nameQuestion ? "true" : undefined}
       aria-label={v.speakHint}
     >
+      {nameQuestion ? (
+        <a
+          role="button"
+          tabIndex={
+            (!speechSupported && !listening) || (!allowMicrophone && !listening)
+              ? -1
+              : 0
+          }
+          className={styles.speakZone}
+          data-active={listening ? "true" : "false"}
+          aria-disabled={
+            (!speechSupported && !listening) || (!allowMicrophone && !listening)
+              ? "true"
+              : undefined
+          }
+          aria-label={listening ? "Stop listening" : v.speakHint}
+          onClick={
+            (!speechSupported && !listening) || (!allowMicrophone && !listening)
+              ? undefined
+              : listening
+                ? onStopListening
+                : allowMicrophone
+                  ? onStartListening
+                  : undefined
+          }
+          onKeyDown={(event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            if ((!speechSupported && !listening) || (!allowMicrophone && !listening))
+              return;
+            event.preventDefault();
+            if (listening) onStopListening();
+            else if (allowMicrophone) onStartListening();
+          }}
+        >
+          <span className={styles.micRing} aria-hidden="true">
+            <svg
+              className={styles.micIcon}
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              focusable="false"
+            >
+              <path
+                fill="currentColor"
+                d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V20H9v2h6v-2h-2v-2.08A7 7 0 0 0 19 11h-2z"
+              />
+            </svg>
+          </span>
+          <span className={styles.speakTitle}>
+            {listening ? "Listening..." : v.speakHint}
+          </span>
+          {listening ? (
+            <span className={styles.speakHint}>
+              {interimTranscript || "Tap to finish"}
+            </span>
+          ) : null}
+        </a>
+      ) : (
       <button
         type="button"
         className={styles.speakZone}
@@ -181,6 +257,7 @@ function StudioGuideCommPanel({
           </span>
         ) : null}
       </button>
+      )}
 
       <div className={styles.typeBlock}>
         {showValidationError && answerRequired && !hasAcceptedAnswer ? (
@@ -256,6 +333,37 @@ function StudioGuideCommPanel({
         </p>
       ) : null}
 
+      {nameQuestion ? (
+        <a
+          ref={(node) => {
+            sendRef.current = node;
+            sendActivate.ref(node);
+          }}
+          role="button"
+          tabIndex={0}
+          className={`lobby-entry-film__cta ${styles.cta}`}
+          data-send-action={resolveComposerSendAction({
+            isAnsweringQuestion,
+            typedText: textDraft,
+          })}
+          aria-disabled={
+            resolveComposerSendAction({
+              isAnsweringQuestion,
+              typedText: textDraft,
+            }) === "disabled"
+              ? "true"
+              : undefined
+          }
+          onClick={sendActivate.onClick}
+          onKeyDown={(event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            event.preventDefault();
+            runSend();
+          }}
+        >
+          {composerSubmitLabel(isAnsweringQuestion)}
+        </a>
+      ) : (
       <button
         ref={(node) => {
           sendRef.current = node;
@@ -271,6 +379,7 @@ function StudioGuideCommPanel({
       >
         {composerSubmitLabel(isAnsweringQuestion)}
       </button>
+      )}
     </aside>
   );
 }
@@ -288,6 +397,8 @@ export default memo(StudioGuideCommPanel, (prev, next) => {
     prev.hasAcceptedAnswer === next.hasAcceptedAnswer &&
     prev.showValidationError === next.showValidationError &&
     prev.studioVoiceReply === next.studioVoiceReply &&
-    prev.allowMicrophone === next.allowMicrophone
+    prev.allowMicrophone === next.allowMicrophone &&
+    prev.embedded === next.embedded &&
+    prev.nameQuestion === next.nameQuestion
   );
 });

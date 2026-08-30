@@ -38,17 +38,15 @@
   max-width: 100%;
   height: 100%;
   min-height: 0;
-  /* Room grid sets the tablet box; fill it — do not shrink beside the mic rail. */
   aspect-ratio: auto;
-  padding: clamp(10px, 2.1%, var(--ws-bezel-pad, 18px));
-  border-radius: 28px;
-  background: linear-gradient(145deg, #1c1f24 0%, var(--ws-bezel) 42%, #0a0b0d 100%);
+  /* Thin hardware chrome only — Lounge + glass is the customer interior. */
+  padding: 7px;
+  border-radius: 1.35rem;
+  background: transparent;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 0 0 2px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-    0 28px 60px rgba(10, 14, 18, 0.35);
+    0 0 0 2px var(--ws-bezel),
+    0 0 0 3px color-mix(in srgb, #f7f4ee 45%, transparent),
+    0 16px 40px color-mix(in srgb, #547c92 8%, transparent);
   pointer-events: auto;
 }
 
@@ -111,32 +109,44 @@
   height: 100%;
   border-radius: 18px;
   overflow: hidden;
-  /* Slate / frosted charcoal — ties into Lobby + control strip. */
-  background:
-    linear-gradient(
-      165deg,
-      rgba(48, 54, 64, 0.98) 0%,
-      rgba(32, 36, 44, 0.98) 48%,
-      rgba(24, 28, 34, 0.99) 100%
-    );
+  background: transparent;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 0 1px 0 rgba(210, 175, 95, 0.12);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+/* Frost is decorative. Putting backdrop-filter on the interactive .screen
+ * made Samsung hit-test the glass instead of Fill it out myself. */
+.screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: var(--mc-glass);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
 }
 
 .hostSurface {
+  position: relative;
+  z-index: 1;
   box-sizing: border-box;
   width: 100%;
   height: 100%;
   padding: clamp(0.85rem, 3.2%, 1.35rem) clamp(0.8rem, 3%, 1.2rem);
   overflow: hidden;
-  color: rgba(236, 232, 224, 0.96);
+  color: var(--mc-ink, #2e2b28);
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-/* Single child (normal tablet) fills the glass. */
+.hostSurface:has([data-voice-gate="true"]) {
+  overflow: auto;
+  min-height: 14rem;
+}
 .hostSurface > *:only-child {
   flex: 1 1 auto;
   min-height: 0;
@@ -173,32 +183,25 @@
  */
 .frame[data-halo="primary"][data-presence-floor="studio"] {
   box-shadow:
-    0 0 0 1px rgba(240, 215, 140, 0.35),
-    0 0 0 2px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 28px 64px rgba(0, 0, 0, 0.42),
-    0 0 0 2px rgba(199, 166, 74, 0.55),
-    0 0 56px 12px rgba(210, 175, 95, 0.48),
-    0 0 96px 28px rgba(210, 175, 95, 0.2);
+    0 0 0 2px var(--ws-bezel),
+    0 0 0 3px color-mix(in srgb, #f7f4ee 45%, transparent),
+    0 0 0 5px rgba(199, 166, 74, 0.45),
+    0 0 40px 8px rgba(210, 175, 95, 0.28);
   transition: box-shadow 320ms ease;
 }
 
 .frame[data-halo="primary"][data-presence-floor="studio"] .screen {
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    inset -22px 0 48px rgba(210, 175, 95, 0.16),
-    inset 0 0 40px rgba(210, 175, 95, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 0 0 1px var(--lounge-glass-border, color-mix(in srgb, #f7f4ee 55%, #547c92 12%));
 }
 
 .frame[data-halo="primary"][data-presence-floor="customer"] {
   box-shadow:
-    0 0 0 1px rgba(140, 200, 225, 0.35),
-    0 0 0 2px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 28px 64px rgba(0, 0, 0, 0.42),
-    0 0 0 2px rgba(100, 175, 215, 0.6),
-    0 0 58px 14px rgba(100, 175, 215, 0.45),
-    0 0 100px 30px rgba(90, 160, 200, 0.18);
+    0 0 0 2px var(--ws-bezel),
+    0 0 0 3px color-mix(in srgb, #f7f4ee 45%, transparent),
+    0 0 0 5px rgba(100, 175, 215, 0.5),
+    0 0 40px 8px rgba(100, 175, 215, 0.22);
   transition: box-shadow 320ms ease;
 }
 
@@ -212,10 +215,9 @@
 .frame[data-halo="dim"],
 .frame[data-halo="neutral"] {
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 0 0 2px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 28px 64px rgba(0, 0, 0, 0.42);
+    0 0 0 2px var(--ws-bezel),
+    0 0 0 3px color-mix(in srgb, #f7f4ee 45%, transparent),
+    0 16px 40px color-mix(in srgb, #547c92 8%, transparent);
   transition: box-shadow 320ms ease;
 }
 
@@ -264,4 +266,185 @@
     min-height: 0;
     overflow: visible;
   }
+
+  .frame[data-voice-choice="true"] .screen {
+    overflow: hidden;
+  }
 }
+
+/*
+ * Welcome / Voice-choice / opening-question family.
+ * Light Lounge glass on the tablet — not charcoal bezel fill.
+ * Voice-choice keeps overflow:hidden (two buttons). Opening questions
+ * keep overflow:visible from the phone rules above (scroll/tap).
+ */
+.frame[data-lounge-light="true"],
+.frame[data-halo="neutral"][data-lounge-light="true"],
+.frame[data-halo="soft"][data-lounge-light="true"],
+.frame[data-halo="dim"][data-lounge-light="true"] {
+  isolation: auto;
+  background: transparent;
+  padding: 7px;
+  border-radius: 1.35rem;
+  box-shadow:
+    0 24px 64px color-mix(in srgb, #547c92 12%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.frame[data-lounge-light="true"][data-halo="primary"][data-presence-floor="studio"] {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.28),
+    0 0 0 5px rgba(199, 166, 74, 0.45),
+    0 0 40px 8px rgba(210, 175, 95, 0.28);
+}
+
+.frame[data-lounge-light="true"][data-halo="primary"][data-presence-floor="customer"] {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.28),
+    0 0 0 5px rgba(100, 175, 215, 0.5),
+    0 0 40px 8px rgba(100, 175, 215, 0.22);
+}
+
+.frame[data-lounge-light="true"] .aluminumEdge {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #f7f4ee 28%, transparent),
+    inset 0 0 0 2px color-mix(in srgb, #547c92 22%, transparent);
+}
+
+.frame[data-lounge-light="true"] .glassChrome {
+  opacity: 0.45;
+  background: linear-gradient(
+    155deg,
+    rgba(255, 255, 255, 0.32) 0%,
+    transparent 38%,
+    transparent 70%,
+    rgba(247, 244, 238, 0.1) 100%
+  );
+}
+
+.frame[data-lounge-light="true"] .screen,
+.frame[data-lounge-light="true"][data-halo="primary"][data-presence-floor="studio"] .screen,
+.frame[data-lounge-light="true"][data-halo="primary"][data-presence-floor="customer"] .screen {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+.frame[data-lounge-light="true"] .screen::before {
+  background: var(--mc-glass);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  pointer-events: none;
+}
+
+/*
+ * Voice Choice film = Welcome transparency.
+ * Do not frost `.screen::before` — overflow:hidden on `.screen` makes
+ * backdrop-filter sample a dark empty box, which is why Picture 2 looked
+ * like a charcoal slab. Put the Welcome glass on the frame so it can
+ * see the Lounge, same as `.lobby-entry-film__panel`.
+ */
+.frame[data-voice-choice="true"][data-lounge-light="true"],
+.frame[data-voice-choice="true"][data-halo="neutral"][data-lounge-light="true"],
+.frame[data-voice-choice="true"][data-halo="soft"][data-lounge-light="true"],
+.frame[data-voice-choice="true"][data-halo="dim"][data-lounge-light="true"] {
+  box-shadow:
+    0 24px 64px color-mix(in srgb, #547c92 12%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.frame[data-voice-choice="true"] .aluminumEdge {
+  box-shadow: none;
+}
+
+.frame[data-voice-choice="true"] .glassChrome {
+  opacity: 0;
+  background: none;
+}
+
+.frame[data-voice-choice="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  z-index: 0;
+  border-radius: 18px;
+  pointer-events: none;
+  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  background: var(
+    --mc-glass,
+    color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent)
+  );
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.frame[data-voice-choice="true"] .screen,
+.frame[data-voice-choice="true"][data-halo="primary"][data-presence-floor="studio"] .screen,
+.frame[data-voice-choice="true"][data-halo="primary"][data-presence-floor="customer"] .screen {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.frame[data-voice-choice="true"] .screen::before {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/*
+ * Preferred-name question only. Device chrome off. Glass comes from the
+ * locked Voice Choice `.panel` class — do not add a second recipe here.
+ */
+.stage:has([data-name-question="true"]),
+.deviceColumn:has([data-name-question="true"]) {
+  flex: 0 0 auto;
+  height: auto;
+}
+
+.frame[data-name-question="true"],
+.frame[data-lounge-light="true"][data-name-question="true"],
+.frame[data-halo="neutral"][data-lounge-light="true"][data-name-question="true"],
+.frame[data-halo="soft"][data-lounge-light="true"][data-name-question="true"],
+.frame[data-halo="dim"][data-lounge-light="true"][data-name-question="true"],
+.frame[data-halo="primary"][data-lounge-light="true"][data-name-question="true"] {
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  flex: 0 0 auto;
+  height: auto;
+}
+
+.nameQuestionPanel {
+  display: block;
+  height: auto;
+  max-height: none;
+  width: 100%;
+  overflow: visible;
+}
+
+.frame[data-name-question="true"] .nameQuestionPanel {
+  max-height: none;
+  overflow: visible;
+  height: auto;
+}
+
+.nameQuestionPanel .hostSurface {
+  display: block;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.nameQuestionPanel .hostSurface > * {
+  flex: none;
+  height: auto;
+  min-height: 0;
+}
+

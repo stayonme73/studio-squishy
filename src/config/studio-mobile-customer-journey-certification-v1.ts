@@ -143,4 +143,24 @@ export const studioMobileCustomerJourneyCertificationV1 = {
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/JOURNEY-ROUTE-AND-CONTROL-MAP.md" as const,
   recommendedFirstExecutionStep:
     "Close and reopen Choose your services → scroll → Add to Project on Make My Social Media Posts. Do not restart the hire. Package is not closed." as const,
+  visualMaster: "MOBILE_VISUAL_MASTER" as const,
+  voiceChoiceStatus: "OWNER_ACCEPTED" as const,
+  voiceChoiceAcceptedAt: "2026-08-29" as const,
+  voiceChoiceLockDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/VOICE-CHOICE-OWNER-ACCEPTED-LOCK.md" as const,
+  nameQuestionStatus: "OWNER_ACCEPTED" as const,
+  nameQuestionAcceptedAt: "2026-08-29" as const,
+  nameQuestionLockDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/NAME-QUESTION-OWNER-ACCEPTED-LOCK.md" as const,
+  projectNeedStatus: "OWNER_ACCEPTED" as const,
+  projectNeedAcceptedAt: "2026-08-29" as const,
+  businessNameStatus: "OWNER_ACCEPTED" as const,
+  businessNameAcceptedAt: "2026-08-29" as const,
+  visualSystemCheckpointDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/MOBILE-VISUAL-SYSTEM-CHECKPOINT.md" as const,
+  nextMobileScreen: "ask_deadline" as const,
+  reuseLockedMobileVisualSystem: true as const,
+  tonightMobileVisualCheckpointDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-29-TONIGHT-MOBILE-VISUAL-CHECKPOINT.md" as const,
+  tonightMobileVisualCheckpointAt: "2026-08-29" as const,
 } as const;

@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import AccountHandoffScene from "@/components/auth/AccountHandoffScene";
+import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import { safeReturnPath } from "@/lib/auth/safe-return-path";
 import { readSessionFromCookieHeader } from "@/lib/auth/session";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
@@ -43,10 +44,10 @@ export default async function AccountHandoffPage({ searchParams }: AccountHandof
   }
 
   return (
-    <main
+    <StudioMobileLoungeShell
       className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
       <AccountHandoffScene fromParam={fromParam} />
-    </main>
+    </StudioMobileLoungeShell>
   );
 }

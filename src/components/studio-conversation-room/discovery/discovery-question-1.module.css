@@ -374,7 +374,7 @@
 
 .root[data-surface="tablet"] .transcript {
   background: #f7f4ee;
-  border: 1px solid rgba(53, 92, 125, 0.22);
+  border: 1px solid color-mix(in srgb, var(--mc-denim, #547c92) 22%, transparent);
   border-left: 3px solid #d56b4d;
   max-width: none;
 }

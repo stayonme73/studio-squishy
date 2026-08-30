@@ -5,8 +5,11 @@ import CampaignDetailsScene from "@/components/campaign-details/CampaignDetailsS
 /** Project Record — the customer's post-purchase home for managing a paid project. */
 export default function CampaignDetailsPage() {
   return (
-    <Suspense>
-      <CampaignDetailsScene />
-    </Suspense>
+    <div data-mobile-customer-spine="" className="flex min-h-[100dvh] flex-1 flex-col">
+      <Suspense>
+        <CampaignDetailsScene />
+      </Suspense>
+    </div>
   );
 }
+

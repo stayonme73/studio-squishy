@@ -48,6 +48,17 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.gateXRemainsClosed).toBe(true);
     expect(cfg.gateXCloseTip).toBe("15ee699c7d16331b3f410871f02555841fddd4d6");
     expect(cfg.frozenLaunchNowServices.carousel).toBe("NOT ON LAUNCH MENU");
+    expect(cfg.voiceChoiceStatus).toBe("OWNER_ACCEPTED");
+    expect(cfg.visualMaster).toBe("MOBILE_VISUAL_MASTER");
+    expect(cfg.nameQuestionStatus).toBe("OWNER_ACCEPTED");
+    expect(cfg.nextMobileScreen).toBe("ask_deadline");
+    expect(cfg.reuseLockedMobileVisualSystem).toBe(true);
+    expect(cfg.projectNeedStatus).toBe("OWNER_ACCEPTED");
+    expect(cfg.businessNameStatus).toBe("OWNER_ACCEPTED");
+    expect(cfg.tonightMobileVisualCheckpointAt).toBe("2026-08-29");
+    expect(cfg.tonightMobileVisualCheckpointDoc).toContain(
+      "2026-08-29-TONIGHT-MOBILE-VISUAL-CHECKPOINT.md",
+    );
     expect(cfg.proofMustInclude).toHaveLength(8);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(4);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomClosed).toBe(false);

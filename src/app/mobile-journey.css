@@ -10,9 +10,8 @@
   }
 
   /*
-   * Conversation Room: html overflow-x:visible let a 7px lobby-plate scale
-   * bleed become a sideways pan on Let’s Review Together (MJ-D14). clip on
-   * the scrolling element, not only body overflow-x:hidden.
+   * Conversation Room: keep html overflow-x clip so Let’s Review Together
+   * cannot pan sideways (MJ-D14). Podium-plate scale(1.04) is retired.
    */
   html:has([data-layout="one-tablet"]) {
     overflow-x: clip;

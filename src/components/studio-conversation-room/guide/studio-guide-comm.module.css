@@ -12,19 +12,22 @@
   min-height: 0;
   padding: 1rem 1rem;
   border-radius: 1.15rem;
-  border: 1px solid rgba(180, 195, 210, 0.28);
-  background:
-    linear-gradient(
-      165deg,
-      rgba(36, 42, 52, 0.92) 0%,
-      rgba(22, 26, 32, 0.94) 55%,
-      rgba(18, 22, 28, 0.96) 100%
-    );
+  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  background: var(--mc-glass, color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent));
+  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 24px 48px rgba(0, 0, 0, 0.35);
+    0 0 0 1px color-mix(in srgb, #f7f4ee 35%, transparent),
+    0 24px 48px color-mix(in srgb, #547c92 12%, transparent);
   font-family: var(--font-geist-sans, system-ui, sans-serif);
-  color: rgba(247, 244, 238, 0.96);
+  color: var(--mc-ink, #2e2b28);
+}
+
+.panel[data-embedded="true"] {
+  padding: 0.15rem 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 .speakZone {
@@ -40,9 +43,9 @@
   min-height: 0;
   padding: 0.85rem 0.8rem 0.8rem;
   border-radius: 0.85rem;
-  border: 1px solid rgba(180, 195, 210, 0.42);
-  background: rgba(14, 17, 22, 0.45);
-  color: rgba(247, 244, 238, 0.96);
+  border: 1px solid var(--mc-denim, #547c92);
+  background: var(--mc-chip, color-mix(in srgb, #f7f4ee 50%, transparent));
+  color: var(--mc-denim, #547c92);
   font: inherit;
   cursor: pointer;
   text-align: center;
@@ -55,9 +58,9 @@
 }
 
 .speakZone[data-active="true"] {
-  border-color: rgba(160, 210, 190, 0.75);
-  background: rgba(30, 42, 40, 0.65);
-  box-shadow: inset 0 0 0 1px rgba(160, 210, 190, 0.18);
+  border-color: var(--mc-eucalyptus, #456b5a);
+  background: color-mix(in srgb, var(--mc-eucalyptus, #456b5a) 16%, var(--mc-ivory, #f7f4ee));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mc-eucalyptus, #456b5a) 22%, transparent);
 }
 
 .micRing {
@@ -66,8 +69,8 @@
   width: 2.35rem;
   height: 2.35rem;
   border-radius: 50%;
-  border: 1.5px solid rgba(170, 210, 195, 0.78);
-  color: rgba(220, 235, 228, 0.95);
+  border: 1.5px solid var(--mc-denim, #547c92);
+  color: var(--mc-denim, #547c92);
 }
 
 .speakZone[data-active="true"] .micRing {
@@ -88,7 +91,7 @@
 .speakHint {
   font-size: 0.85rem;
   font-weight: 500;
-  color: rgba(247, 244, 238, 0.52);
+  color: var(--mc-ink-muted, color-mix(in srgb, #2e2b28 64%, transparent));
   line-height: 1.35;
 }
 
@@ -110,7 +113,7 @@
   font-weight: 650;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(247, 244, 238, 0.42);
+  color: var(--mc-ink-muted, color-mix(in srgb, #2e2b28 64%, transparent));
 }
 
 .typeBlock {
@@ -153,8 +156,8 @@
   box-sizing: border-box;
   width: 100%;
   border-radius: 0.75rem;
-  border: 1px solid rgba(180, 195, 210, 0.42);
-  background: rgba(14, 17, 22, 0.45);
+  border: 1px solid var(--mc-denim, #547c92);
+  background: var(--mc-chip, color-mix(in srgb, #f7f4ee 50%, transparent));
 }
 
 .typeHost {
@@ -163,15 +166,15 @@
 }
 
 .typeField[data-answering="true"] {
-  border-color: rgba(210, 175, 95, 0.55);
+  border-color: var(--mc-denim, #547c92);
 }
 
 .typeField[data-required="true"] {
-  border: 2px solid #e85d04;
+  border: 2px solid var(--mc-coral, #d94e2b);
   box-shadow:
-    inset 0 0 0 1px rgba(232, 93, 4, 0.45),
-    0 0 0 2px rgba(255, 183, 3, 0.35);
-  background: rgba(80, 28, 8, 0.65);
+    inset 0 0 0 1px color-mix(in srgb, var(--mc-coral, #d94e2b) 35%, transparent),
+    0 0 0 2px color-mix(in srgb, var(--mc-yellow, #f7c900) 35%, transparent);
+  background: color-mix(in srgb, var(--mc-coral, #d94e2b) 10%, var(--mc-ivory, #f7f4ee));
 }
 
 .typePlaceholder {
@@ -184,7 +187,7 @@
   justify-content: flex-start;
   gap: 0.45rem;
   padding: 0 1rem;
-  color: rgba(247, 244, 238, 0.48);
+  color: var(--mc-ink-muted, color-mix(in srgb, #2e2b28 64%, transparent));
   font-size: 1.02rem;
   font-weight: 500;
 }
@@ -205,8 +208,8 @@
   border: none;
   border-radius: inherit;
   background: transparent;
-  color: #fff8ec;
-  caret-color: #ffb703;
+  color: var(--mc-ink, #2e2b28);
+  caret-color: var(--mc-denim, #547c92);
   font: inherit;
   font-size: 1.12rem;
   font-weight: 700;
@@ -218,7 +221,7 @@
 }
 
 .typeLine::placeholder {
-  color: rgba(247, 244, 238, 0.48);
+  color: var(--mc-ink-muted, color-mix(in srgb, #2e2b28 64%, transparent));
   font-weight: 500;
   opacity: 1;
   white-space: normal;
@@ -248,8 +251,8 @@
   padding: 0.7rem 1rem;
   border: none;
   border-radius: 0.65rem;
-  background: rgba(100, 175, 215, 0.28);
-  color: rgba(247, 244, 238, 0.96);
+  background: var(--mc-denim, #547c92);
+  color: var(--mc-ivory, #f7f4ee);
   font: inherit;
   font-size: 1rem;
   font-weight: 700;
@@ -261,6 +264,54 @@
 .sendBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.cta {
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cta[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.panel[data-name-question="true"] .speakZone {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, #547c92 32%, #f7f4ee);
+  color: #f7f4ee;
+  text-decoration: none;
+  padding: 0.65rem 0.75rem 0.6rem;
+}
+
+.panel[data-name-question="true"] .micRing {
+  border-color: color-mix(in srgb, #547c92 32%, #f7f4ee);
+  color: #f7f4ee;
+}
+
+.panel[data-name-question="true"] .speakHint {
+  color: #456b5a;
+}
+
+.panel[data-name-question="true"] .typeField {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, #547c92 32%, #f7f4ee);
+}
+
+.panel[data-name-question="true"] .typeLine {
+  color: #f7f4ee;
+}
+
+.panel[data-name-question="true"] .typeLine::placeholder {
+  color: color-mix(in srgb, #f7f4ee 32%, #2e2b28);
+  font-weight: 600;
+  opacity: 1;
 }
 
 .savedCue {
@@ -292,11 +343,11 @@
   margin: 0;
   padding: 0.65rem 0.75rem;
   border-radius: 0.55rem;
-  border: 1px solid rgba(212, 175, 55, 0.35);
-  background: rgba(40, 36, 24, 0.55);
+  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  background: var(--mc-card, color-mix(in srgb, #f7f4ee 55%, transparent));
   font-size: 0.95rem;
   line-height: 1.45;
-  color: rgba(247, 244, 238, 0.96);
+  color: var(--mc-ink, #2e2b28);
 }
 
 .voiceReplyLabel {
@@ -306,5 +357,5 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.95);
+  color: var(--mc-eucalyptus, #456b5a);
 }

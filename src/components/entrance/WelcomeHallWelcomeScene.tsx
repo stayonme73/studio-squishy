@@ -32,6 +32,7 @@ import {
 import { cancelLobbyPodiumGuidanceSpeech } from "@/lib/studio-lobby-podium-guidance";
 import { loadGuideDraft } from "@/lib/studio-guide-hard-nav";
 import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
+import { markVoiceFirstEntryChoiceRequired } from "@/lib/studio-voice-preference";
 import { setStudioVoiceInvite } from "@/lib/studio-voice-invite";
 
 const DESKTOP_KIOSK_MIN_WIDTH = 1025;
@@ -234,8 +235,10 @@ export default function WelcomeHallWelcomeScene({
     writeLobbyEntryChoice("new-to-studio");
     writeLobbyEntryFilmDismissed(false);
     /* Lounge front door: do not speak on Let’s Get Started.
-       CR stays silent until the customer picks Voice guidance. */
+       CR stays silent until the customer picks Voice guidance.
+       A leftover Voice On/Off from an earlier visit must not skip that choice. */
     cancelLobbyPodiumGuidanceSpeech();
+    markVoiceFirstEntryChoiceRequired();
     const draft = loadGuideDraft();
     const hasProgress = Boolean(draft?.projectNeed?.trim() || draft?.confirmedAt);
     setStudioVoiceInvite(hasProgress ? "resume" : "start");
@@ -279,7 +282,11 @@ export default function WelcomeHallWelcomeScene({
   const rootClassName = ["welcome-hall-static", "welcome-hall-phase1"].join(" ");
 
   return (
-    <div className={rootClassName} aria-label="Studio Lobby">
+    <div
+      className={rootClassName}
+      aria-label="Studio Lobby"
+      data-mobile-customer-spine=""
+    >
       <h1 className="sr-only">The Studio Lobby</h1>
       <div ref={plateRef} className={plateClassName}>
         {isDesktopKiosk ? (

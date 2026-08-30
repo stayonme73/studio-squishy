@@ -10,6 +10,10 @@ import { ownerQa } from "@/config/owner-qa";
 import { studioLobbyEntryV1 } from "@/config/studio-lobby-entry-v1";
 import { applyOwnerQaJourneySeed } from "@/lib/owner-qa-campaign";
 import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
+import {
+  StudioMobileControlsSlot,
+  useStudioMobileUtility,
+} from "@/components/dev/studio-mobile-utility";
 
 type DevicePreview = {
   pageLabel: string;
@@ -29,7 +33,7 @@ function detectPhoneSheet() {
   );
 }
 
-/** Development-only owner nav — journey presets + utility shortcuts. */
+/** Shared Mobile bottom utility — Welcome Studio Review tab is the visual master. */
 export default function OwnerQaPanel() {
   const router = useRouter();
   const pathname = usePathname() || "/";
@@ -46,6 +50,9 @@ export default function OwnerQaPanel() {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const [usePhoneSheet, setUsePhoneSheet] = useState(false);
   const [portalReady, setPortalReady] = useState(false);
+  const mobileUtility = useStudioMobileUtility();
+  const ownerTools = process.env.NODE_ENV === "development";
+  const showTab = ownerTools || Boolean(mobileUtility?.controlsRegistered);
 
   const openHref = useMemo(() => {
     const params = new URLSearchParams(searchParams.toString());
@@ -62,6 +69,14 @@ export default function OwnerQaPanel() {
     setCopyState("idle");
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   }
+
+  useEffect(() => {
+    if (!mobileUtility) return;
+    mobileUtility.setCloseUtility(closeReview);
+    return () => mobileUtility.setCloseUtility(null);
+    // closeReview reads the current path/query via replace.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobileUtility, pathname, searchParams]);
 
   useEffect(() => {
     setPortalReady(true);
@@ -121,7 +136,7 @@ export default function OwnerQaPanel() {
   }, [open, confirmResetOpen, usePhoneSheet, pathname, searchParams]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !ownerTools) return;
 
     const controller = new AbortController();
     setDevicePreviewLoading(true);
@@ -157,7 +172,7 @@ export default function OwnerQaPanel() {
       });
 
     return () => controller.abort();
-  }, [open, pathname]);
+  }, [open, pathname, ownerTools]);
 
   async function handleCopyPreviewUrl() {
     if (!devicePreview?.url) return;
@@ -201,8 +216,13 @@ export default function OwnerQaPanel() {
     );
   }
 
+  if (!showTab) return null;
+
   const panelBody = (
     <>
+      {usePhoneSheet ? <StudioMobileControlsSlot /> : null}
+      {ownerTools ? (
+        <>
       <p className="owner-qa__title">Studio Review</p>
       <p className="owner-qa__hint">{ownerQa.panelHint}</p>
 
@@ -346,6 +366,12 @@ export default function OwnerQaPanel() {
           </div>
         </div>
       ) : null}
+        </>
+      ) : (
+        <button type="button" className="owner-qa__action" onClick={closeReview}>
+          Close
+        </button>
+      )}
     </>
   );
 
@@ -377,7 +403,11 @@ export default function OwnerQaPanel() {
 
   return (
     <>
-      <div ref={rootRef} className={`owner-qa${open ? " owner-qa--open" : ""}`}>
+      <div
+        ref={rootRef}
+        className={`owner-qa studio-review-mobile-tab${open ? " owner-qa--open" : ""}`}
+        data-studio-review-mobile-tab=""
+      >
         {open && !usePhoneSheet ? (
           <div id={panelId} className="owner-qa__panel" role="dialog" aria-label="Studio Review">
             {panelBody}

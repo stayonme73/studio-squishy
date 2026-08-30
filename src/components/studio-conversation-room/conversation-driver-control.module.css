@@ -8,7 +8,7 @@
 .root[data-variant="tablet"] {
   margin-bottom: 0.35rem;
   padding-bottom: 0.55rem;
-  border-bottom: 1px solid rgba(53, 92, 125, 0.18);
+  border-bottom: 1px solid color-mix(in srgb, var(--mc-denim, #547c92) 18%, transparent);
 }
 
 .eyebrow {
@@ -49,7 +49,7 @@
 }
 
 .root[data-variant="tablet"] .active[data-active="true"] {
-  color: #355c7d;
+  color: var(--mc-denim, #547c92);
 }
 
 .dot {
@@ -83,9 +83,9 @@
 }
 
 .root[data-variant="tablet"] .cta {
-  border-color: rgba(53, 92, 125, 0.35);
+  border-color: color-mix(in srgb, var(--mc-denim, #547c92) 35%, transparent);
   background: #f7f4ee;
-  color: #355c7d;
+  color: var(--mc-denim, #547c92);
   font-size: 0.72rem;
   padding: 0.35rem 0.6rem;
 }

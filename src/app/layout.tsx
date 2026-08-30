@@ -4,6 +4,7 @@ import { Comic_Neue, Geist, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
 
 import OwnerQaRoot from "@/components/dev/OwnerQaRoot";
+import { StudioMobileUtilityProvider } from "@/components/dev/studio-mobile-utility";
 import ClientSessionTimeoutGuard from "@/components/auth/ClientSessionTimeoutGuard";
 import StudioPresenceRoot from "@/components/studio-presence/StudioPresenceRoot";
 
@@ -51,11 +52,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${comicNeue.variable} h-full antialiased`}
     >
       <body className="flex min-h-[100dvh] flex-col overflow-x-hidden">
-        <StudioPresenceRoot>
-          {children}
-          <ClientSessionTimeoutGuard />
-        </StudioPresenceRoot>
-        <OwnerQaRoot />
+        <StudioMobileUtilityProvider>
+          <StudioPresenceRoot>
+            {children}
+            <ClientSessionTimeoutGuard />
+          </StudioPresenceRoot>
+          <OwnerQaRoot />
+        </StudioMobileUtilityProvider>
       </body>
     </html>
   );

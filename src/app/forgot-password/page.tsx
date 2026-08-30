@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import ForgotPasswordScene from "@/components/auth/ForgotPasswordScene";
+import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 import "../mobile-route-fixes.css";
@@ -12,7 +13,7 @@ export const metadata = {
 
 export default function ForgotPasswordPage() {
   return (
-    <main
+    <StudioMobileLoungeShell
       className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
       <Suspense
@@ -25,6 +26,6 @@ export default function ForgotPasswordPage() {
       >
         <ForgotPasswordScene />
       </Suspense>
-    </main>
+    </StudioMobileLoungeShell>
   );
 }

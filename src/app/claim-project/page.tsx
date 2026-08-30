@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import ClaimProjectScene from "@/components/auth/ClaimProjectScene";
+import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
 import "../mobile-route-fixes.css";
@@ -12,7 +13,7 @@ export const metadata = {
 
 export default function ClaimProjectPage() {
   return (
-    <main
+    <StudioMobileLoungeShell
       className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col`}
     >
       <Suspense
@@ -25,6 +26,6 @@ export default function ClaimProjectPage() {
       >
         <ClaimProjectScene />
       </Suspense>
-    </main>
+    </StudioMobileLoungeShell>
   );
 }

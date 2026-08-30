@@ -10,6 +10,7 @@ export default function HelpCenterPage() {
   return (
     <main
       className={`${utilityPageFontClassName} journey-shell flex min-h-[100dvh] flex-1 flex-col overflow-hidden`}
+      data-mobile-customer-spine=""
     >
       <Suspense fallback={<div className="utility-page utility-shell utility-shell--loading" aria-busy="true" />}>
         <HelpCenterScene />

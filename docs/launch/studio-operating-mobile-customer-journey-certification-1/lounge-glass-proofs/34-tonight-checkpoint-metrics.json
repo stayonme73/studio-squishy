@@ -1,0 +1,595 @@
+{
+  "viewport": {
+    "width": 360,
+    "height": 780
+  },
+  "checks": {
+    "welcome": {
+      "welcomePaint": {
+        "denim": "#547c92",
+        "ctaBg": "rgb(84, 124, 146)",
+        "loungeSrc": "none",
+        "reviewColor": "rgb(247, 244, 238)",
+        "reviewBg": "rgba(46, 43, 40, 0.32)",
+        "separateControls": false
+      },
+      "welcomeCtaBox": {
+        "x": 73.4375,
+        "y": 284.453125,
+        "width": 213.125,
+        "height": 44,
+        "left": 73.4375,
+        "right": 286.5625,
+        "top": 284.453125,
+        "bottom": 328.453125
+      },
+      "welcomeReviewBox": {
+        "x": 0,
+        "y": 728,
+        "width": 360,
+        "height": 52,
+        "left": 0,
+        "right": 360,
+        "top": 728,
+        "bottom": 780
+      },
+      "hit": {
+        "tag": "A",
+        "id": null,
+        "className": "owner-qa__toggle",
+        "text": "Studio Review",
+        "attr": null,
+        "isReview": true
+      }
+    },
+    "voiceChoice": {
+      "onBox": {
+        "x": 73.59375,
+        "y": 257.84375,
+        "width": 212.796875,
+        "height": 52,
+        "left": 73.59375,
+        "right": 286.390625,
+        "top": 257.84375,
+        "bottom": 309.84375
+      },
+      "offBox": {
+        "x": 73.59375,
+        "y": 329.03125,
+        "width": 212.796875,
+        "height": 52,
+        "left": 73.59375,
+        "right": 286.390625,
+        "top": 329.03125,
+        "bottom": 381.03125
+      },
+      "onHit": {
+        "tag": "A",
+        "id": null,
+        "className": "lobby-entry-film__cta voice-choice-film-module___pRQQa__cta",
+        "text": "Use Voice guidance",
+        "attr": "on",
+        "isReview": false
+      },
+      "offHit": {
+        "tag": "A",
+        "id": null,
+        "className": "lobby-entry-film__cta voice-choice-film-module___pRQQa__cta",
+        "text": "Fill it out myself",
+        "attr": "off",
+        "isReview": false
+      }
+    },
+    "business": {
+      "beforeScroll": {
+        "label": "business-top",
+        "boxes": {
+          "voiceOn": {
+            "x": 37.78125,
+            "y": 40.578125,
+            "width": 138.21875,
+            "height": 41.59375,
+            "left": 37.78125,
+            "right": 176,
+            "top": 40.578125,
+            "bottom": 82.171875
+          },
+          "voiceOff": {
+            "x": 184,
+            "y": 40.578125,
+            "width": 138.21875,
+            "height": 41.59375,
+            "left": 184,
+            "right": 322.21875,
+            "top": 40.578125,
+            "bottom": 82.171875
+          },
+          "skip": {
+            "x": 37.78125,
+            "y": 335.671875,
+            "width": 148.8125,
+            "height": 51.25,
+            "left": 37.78125,
+            "right": 186.59375,
+            "top": 335.671875,
+            "bottom": 386.921875
+          },
+          "continue": {
+            "x": 37.78125,
+            "y": 628.328125,
+            "width": 284.4375,
+            "height": 44,
+            "left": 37.78125,
+            "right": 322.21875,
+            "top": 628.328125,
+            "bottom": 672.328125
+          },
+          "review": {
+            "x": 0,
+            "y": 728,
+            "width": 360,
+            "height": 52,
+            "left": 0,
+            "right": 360,
+            "top": 728,
+            "bottom": 780
+          },
+          "chips": [
+            {
+              "x": 37.78125,
+              "y": 180.78125,
+              "width": 190.421875,
+              "height": 42.578125,
+              "left": 37.78125,
+              "right": 228.203125,
+              "top": 180.78125,
+              "bottom": 223.359375
+            },
+            {
+              "x": 37.78125,
+              "y": 230.546875,
+              "width": 166.203125,
+              "height": 42.578125,
+              "left": 37.78125,
+              "right": 203.984375,
+              "top": 230.546875,
+              "bottom": 273.125
+            },
+            {
+              "x": 37.78125,
+              "y": 280.3125,
+              "width": 165.328125,
+              "height": 42.578125,
+              "left": 37.78125,
+              "right": 203.109375,
+              "top": 280.3125,
+              "bottom": 322.890625
+            }
+          ]
+        },
+        "hits": {
+          "voiceOn": {
+            "tag": "A",
+            "id": null,
+            "className": "voice-preference-controls-module__1wHyOW__filmIdle",
+            "text": "Voice: On",
+            "attr": "on",
+            "isReview": false
+          },
+          "voiceOff": {
+            "tag": "A",
+            "id": null,
+            "className": "lobby-entry-film__cta voice-preference-controls-module__1wHyOW__cta",
+            "text": "Voice: Off",
+            "attr": "off",
+            "isReview": false
+          },
+          "skip": {
+            "tag": "BUTTON",
+            "id": null,
+            "className": "studio-guide-tablet-module__kTQe5q__btnSecondary",
+            "text": "Skip for now",
+            "attr": null,
+            "isReview": false
+          },
+          "continue": {
+            "tag": "A",
+            "id": null,
+            "className": "lobby-entry-film__cta studio-guide-comm-module__sqap6a__cta",
+            "text": "Continue",
+            "attr": "submit_guide_answer",
+            "isReview": false
+          },
+          "review": {
+            "tag": "A",
+            "id": null,
+            "className": "owner-qa__toggle",
+            "text": "Studio Review",
+            "attr": null,
+            "isReview": true
+          },
+          "chips": [
+            {
+              "tag": "BUTTON",
+              "id": null,
+              "className": "studio-guide-tablet-module__kTQe5q__chip",
+              "text": "I don’t have one yet",
+              "attr": null,
+              "isReview": false
+            },
+            {
+              "tag": "BUTTON",
+              "id": null,
+              "className": "studio-guide-tablet-module__kTQe5q__chip",
+              "text": "Personal project",
+              "attr": null,
+              "isReview": false
+            },
+            {
+              "tag": "BUTTON",
+              "id": null,
+              "className": "studio-guide-tablet-module__kTQe5q__chip",
+              "text": "I’m still deciding",
+              "attr": null,
+              "isReview": false
+            }
+          ]
+        },
+        "paint": {
+          "reviewColor": "rgb(247, 244, 238)",
+          "reviewBg": "rgba(46, 43, 40, 0.32)",
+          "reviewRadius": "16.8px 16.8px 0px 0px",
+          "reviewMinHeight": "52px",
+          "reviewPadBottom": "8.8px",
+          "cssBottomVar": "calc(3.25rem + 0px)",
+          "roomPad": "52px",
+          "idleColor": "rgb(46, 43, 40)",
+          "idleBorder": "rgb(84, 124, 146)",
+          "selectedBg": "rgb(84, 124, 146)",
+          "chipColor": "rgb(46, 43, 40)",
+          "chipBorder": "rgb(84, 124, 146)",
+          "continueBg": "rgb(84, 124, 146)",
+          "separateControls": false,
+          "innerHeight": 780,
+          "scrollY": 22,
+          "scrollMax": 50
+        }
+      },
+      "afterScroll": {
+        "label": "business-scrolled",
+        "boxes": {
+          "voiceOn": {
+            "x": 37.78125,
+            "y": 12.578125,
+            "width": 138.21875,
+            "height": 41.59375,
+            "left": 37.78125,
+            "right": 176,
+            "top": 12.578125,
+            "bottom": 54.171875
+          },
+          "voiceOff": {
+            "x": 184,
+            "y": 12.578125,
+            "width": 138.21875,
+            "height": 41.59375,
+            "left": 184,
+            "right": 322.21875,
+            "top": 12.578125,
+            "bottom": 54.171875
+          },
+          "skip": {
+            "x": 37.78125,
+            "y": 307.671875,
+            "width": 148.8125,
+            "height": 51.25,
+            "left": 37.78125,
+            "right": 186.59375,
+            "top": 307.671875,
+            "bottom": 358.921875
+          },
+          "continue": {
+            "x": 37.78125,
+            "y": 600.328125,
+            "width": 284.4375,
+            "height": 44,
+            "left": 37.78125,
+            "right": 322.21875,
+            "top": 600.328125,
+            "bottom": 644.328125
+          },
+          "review": {
+            "x": 0,
+            "y": 728,
+            "width": 360,
+            "height": 52,
+            "left": 0,
+            "right": 360,
+            "top": 728,
+            "bottom": 780
+          },
+          "chips": [
+            {
+              "x": 37.78125,
+              "y": 152.78125,
+              "width": 190.421875,
+              "height": 42.578125,
+              "left": 37.78125,
+              "right": 228.203125,
+              "top": 152.78125,
+              "bottom": 195.359375
+            },
+            {
+              "x": 37.78125,
+              "y": 202.546875,
+              "width": 166.203125,
+              "height": 42.578125,
+              "left": 37.78125,
+              "right": 203.984375,
+              "top": 202.546875,
+              "bottom": 245.125
+            },
+            {
+              "x": 37.78125,
+              "y": 252.3125,
+              "width": 165.328125,
+              "height": 42.578125,
+              "left": 37.78125,
+              "right": 203.109375,
+              "top": 252.3125,
+              "bottom": 294.890625
+            }
+          ]
+        },
+        "hits": {
+          "voiceOn": {
+            "tag": "A",
+            "id": null,
+            "className": "voice-preference-controls-module__1wHyOW__filmIdle",
+            "text": "Voice: On",
+            "attr": "on",
+            "isReview": false
+          },
+          "voiceOff": {
+            "tag": "A",
+            "id": null,
+            "className": "lobby-entry-film__cta voice-preference-controls-module__1wHyOW__cta",
+            "text": "Voice: Off",
+            "attr": "off",
+            "isReview": false
+          },
+          "skip": {
+            "tag": "BUTTON",
+            "id": null,
+            "className": "studio-guide-tablet-module__kTQe5q__btnSecondary",
+            "text": "Skip for now",
+            "attr": null,
+            "isReview": false
+          },
+          "continue": {
+            "tag": "A",
+            "id": null,
+            "className": "lobby-entry-film__cta studio-guide-comm-module__sqap6a__cta",
+            "text": "Continue",
+            "attr": "submit_guide_answer",
+            "isReview": false
+          },
+          "review": {
+            "tag": "A",
+            "id": null,
+            "className": "owner-qa__toggle",
+            "text": "Studio Review",
+            "attr": null,
+            "isReview": true
+          },
+          "chips": [
+            {
+              "tag": "BUTTON",
+              "id": null,
+              "className": "studio-guide-tablet-module__kTQe5q__chip",
+              "text": "I don’t have one yet",
+              "attr": null,
+              "isReview": false
+            },
+            {
+              "tag": "BUTTON",
+              "id": null,
+              "className": "studio-guide-tablet-module__kTQe5q__chip",
+              "text": "Personal project",
+              "attr": null,
+              "isReview": false
+            },
+            {
+              "tag": "BUTTON",
+              "id": null,
+              "className": "studio-guide-tablet-module__kTQe5q__chip",
+              "text": "I’m still deciding",
+              "attr": null,
+              "isReview": false
+            }
+          ]
+        },
+        "paint": {
+          "reviewColor": "rgb(247, 244, 238)",
+          "reviewBg": "rgba(46, 43, 40, 0.32)",
+          "reviewRadius": "16.8px 16.8px 0px 0px",
+          "reviewMinHeight": "52px",
+          "reviewPadBottom": "8.8px",
+          "cssBottomVar": "calc(3.25rem + 0px)",
+          "roomPad": "52px",
+          "idleColor": "rgb(46, 43, 40)",
+          "idleBorder": "rgb(84, 124, 146)",
+          "selectedBg": "rgb(84, 124, 146)",
+          "chipColor": "rgb(46, 43, 40)",
+          "chipBorder": "rgb(84, 124, 146)",
+          "continueBg": "rgb(84, 124, 146)",
+          "separateControls": false,
+          "innerHeight": 780,
+          "scrollY": 50,
+          "scrollMax": 50
+        }
+      },
+      "insetSim": {
+        "label": "business-inset-sim",
+        "boxes": {
+          "voiceOn": {
+            "x": 37.78125,
+            "y": -35.421875,
+            "width": 138.21875,
+            "height": 41.59375,
+            "left": 37.78125,
+            "right": 176,
+            "top": -35.421875,
+            "bottom": 6.171875
+          },
+          "voiceOff": {
+            "x": 184,
+            "y": -35.421875,
+            "width": 138.21875,
+            "height": 41.59375,
+            "left": 184,
+            "right": 322.21875,
+            "top": -35.421875,
+            "bottom": 6.171875
+          },
+          "skip": {
+            "x": 37.78125,
+            "y": 259.671875,
+            "width": 148.8125,
+            "height": 51.25,
+            "left": 37.78125,
+            "right": 186.59375,
+            "top": 259.671875,
+            "bottom": 310.921875
+          },
+          "continue": {
+            "x": 37.78125,
+            "y": 552.328125,
+            "width": 284.4375,
+            "height": 44,
+            "left": 37.78125,
+            "right": 322.21875,
+            "top": 552.328125,
+            "bottom": 596.328125
+          },
+          "review": {
+            "x": 0,
+            "y": 680,
+            "width": 360,
+            "height": 100,
+            "left": 0,
+            "right": 360,
+            "top": 680,
+            "bottom": 780
+          },
+          "chips": [
+            {
+              "x": 37.78125,
+              "y": 104.78125,
+              "width": 190.421875,
+              "height": 42.578125,
+              "left": 37.78125,
+              "right": 228.203125,
+              "top": 104.78125,
+              "bottom": 147.359375
+            },
+            {
+              "x": 37.78125,
+              "y": 154.546875,
+              "width": 166.203125,
+              "height": 42.578125,
+              "left": 37.78125,
+              "right": 203.984375,
+              "top": 154.546875,
+              "bottom": 197.125
+            },
+            {
+              "x": 37.78125,
+              "y": 204.3125,
+              "width": 165.328125,
+              "height": 42.578125,
+              "left": 37.78125,
+              "right": 203.109375,
+              "top": 204.3125,
+              "bottom": 246.890625
+            }
+          ]
+        },
+        "hits": {
+          "voiceOn": null,
+          "voiceOff": null,
+          "skip": {
+            "tag": "BUTTON",
+            "id": null,
+            "className": "studio-guide-tablet-module__kTQe5q__btnSecondary",
+            "text": "Skip for now",
+            "attr": null,
+            "isReview": false
+          },
+          "continue": {
+            "tag": "A",
+            "id": null,
+            "className": "lobby-entry-film__cta studio-guide-comm-module__sqap6a__cta",
+            "text": "Continue",
+            "attr": "submit_guide_answer",
+            "isReview": false
+          },
+          "review": {
+            "tag": "A",
+            "id": null,
+            "className": "owner-qa__toggle",
+            "text": "Studio Review",
+            "attr": null,
+            "isReview": true
+          },
+          "chips": [
+            {
+              "tag": "BUTTON",
+              "id": null,
+              "className": "studio-guide-tablet-module__kTQe5q__chip",
+              "text": "I don’t have one yet",
+              "attr": null,
+              "isReview": false
+            },
+            {
+              "tag": "BUTTON",
+              "id": null,
+              "className": "studio-guide-tablet-module__kTQe5q__chip",
+              "text": "Personal project",
+              "attr": null,
+              "isReview": false
+            },
+            {
+              "tag": "BUTTON",
+              "id": null,
+              "className": "studio-guide-tablet-module__kTQe5q__chip",
+              "text": "I’m still deciding",
+              "attr": null,
+              "isReview": false
+            }
+          ]
+        },
+        "paint": {
+          "reviewColor": "rgb(247, 244, 238)",
+          "reviewBg": "rgba(46, 43, 40, 0.32)",
+          "reviewRadius": "16.8px 16.8px 0px 0px",
+          "reviewMinHeight": "100px",
+          "reviewPadBottom": "56.8px",
+          "cssBottomVar": "calc(\n        3.25rem + 48px\n      )",
+          "roomPad": "100px",
+          "idleColor": "rgb(46, 43, 40)",
+          "idleBorder": "rgb(84, 124, 146)",
+          "selectedBg": "rgb(84, 124, 146)",
+          "chipColor": "rgb(46, 43, 40)",
+          "chipBorder": "rgb(84, 124, 146)",
+          "continueBg": "rgb(84, 124, 146)",
+          "separateControls": false,
+          "innerHeight": 780,
+          "scrollY": 98,
+          "scrollMax": 98
+        }
+      }
+    }
+  },
+  "fails": []
+}

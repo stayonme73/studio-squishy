@@ -1,4 +1,4 @@
-/* Conversation Room Voice narration preference — customer-facing only. */
+/* Persistent Voice On/Off after the first-entry film. */
 
 .root {
   box-sizing: border-box;
@@ -6,102 +6,9 @@
   font-family: var(--font-geist-sans, system-ui, sans-serif);
 }
 
-.choice {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin: 0 0 0.85rem;
-  padding: 0.95rem 1rem;
-  border-radius: 0.85rem;
-  border: 1px solid rgba(210, 175, 95, 0.4);
-  background: rgba(28, 34, 44, 0.96);
-  position: relative;
-  z-index: 5;
-  pointer-events: auto;
-}
-
-.choiceOption,
-.choicePrimary,
-.choiceSecondary {
-  pointer-events: auto;
-  position: relative;
-  z-index: 1;
-}
-
-.choicePrompt {
-  margin: 0;
-  font-size: clamp(1.05rem, 3.2cqi, 1.2rem);
-  font-weight: 700;
-  line-height: 1.3;
-  color: rgba(247, 244, 238, 0.98);
-}
-
-.privacyNote {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 500;
-  line-height: 1.45;
-  color: rgba(236, 232, 224, 0.78);
-}
-
-.choiceActions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-}
-
-.choicePrimary,
-.choiceSecondary,
-.choiceOption,
-.toggleOn,
-.toggleOff {
-  appearance: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 2.75rem;
-  margin: 0;
-  padding: 0.7rem 1rem;
-  border-radius: 0.65rem;
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 650;
-  line-height: 1.25;
-  text-align: center;
-  cursor: pointer;
-}
-
-/* First-entry choice — equal weight; nothing looks pre-selected. */
-.choiceOption {
-  border: 1px solid rgba(180, 195, 210, 0.4);
-  background: rgba(14, 17, 22, 0.45);
-  color: rgba(247, 244, 238, 0.96);
-}
-
-.choiceOption:hover {
-  border-color: rgba(210, 175, 95, 0.45);
-  background: rgba(40, 48, 58, 0.72);
-}
-
-.choicePrimary {
-  border: 1px solid rgba(210, 175, 95, 0.55);
-  background: rgba(210, 175, 95, 0.22);
-  color: rgba(247, 244, 238, 0.98);
-}
-
-.choiceSecondary {
-  border: 1px solid rgba(180, 195, 210, 0.35);
-  background: rgba(14, 17, 22, 0.45);
-  color: rgba(247, 244, 238, 0.94);
-}
-
-.choiceOption:focus-visible,
-.choicePrimary:focus-visible,
-.choiceSecondary:focus-visible,
 .toggleOn:focus-visible,
 .toggleOff:focus-visible {
-  outline: 2px solid rgba(210, 175, 95, 0.85);
+  outline: 2px solid #f7c900;
   outline-offset: 2px;
 }
 
@@ -112,24 +19,105 @@
   margin: 0 0 0.55rem;
   padding: 0.35rem;
   border-radius: 0.7rem;
-  border: 1px solid rgba(180, 195, 210, 0.28);
-  background: rgba(18, 22, 28, 0.88);
+  border: 1px solid color-mix(in srgb, #547c92 32%, #f7f4ee);
+  background: color-mix(in srgb, #f7f4ee 50%, transparent);
 }
 
 .toggleOn,
 .toggleOff {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   min-height: 2.45rem;
+  margin: 0;
   padding: 0.55rem 0.65rem;
-  font-size: 0.95rem;
+  border-radius: 0.65rem;
   border: 1px solid transparent;
   background: transparent;
-  color: rgba(236, 232, 224, 0.72);
+  color: color-mix(in srgb, #2e2b28 64%, transparent);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
   touch-action: pan-y;
 }
 
 .toggleOn[data-active="true"],
 .toggleOff[data-active="true"] {
-  border-color: rgba(210, 175, 95, 0.5);
-  background: rgba(210, 175, 95, 0.2);
-  color: rgba(247, 244, 238, 0.98);
+  border-color: #547c92;
+  background: color-mix(in srgb, #547c92 22%, #f7f4ee);
+  color: #547c92;
+}
+
+/* Name-question film family — layout only. Paint on the selected side is
+ * Welcome `.lobby-entry-film__cta`. Do not restyle that fill. */
+.filmToggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin: 0 0 0.25rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.cta {
+  box-sizing: border-box;
+}
+
+.filmToggle .cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.6rem;
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.88rem;
+  line-height: 1.2;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.filmIdle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.6rem;
+  margin: 0;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.55rem;
+  border: 2px solid #547c92;
+  background: transparent;
+  color: #2e2b28;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 720px) {
+  .filmToggle .cta {
+    min-height: 2.6rem;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.88rem;
+  }
+
+  .filmIdle {
+    min-height: 2.6rem;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.86rem;
+  }
 }
