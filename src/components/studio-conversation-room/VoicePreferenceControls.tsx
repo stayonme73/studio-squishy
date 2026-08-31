@@ -12,7 +12,7 @@ export type VoicePreferenceControlsProps = {
   preference: StudioVoiceNarrationPreference;
   onChoose: (value: StudioVoiceNarrationPreference) => void;
   /**
-   * Opening-question film family and Choose Your Route.
+   * Opening-question film family, Choose Your Route, and Your project so far.
    * Selected side uses the accepted Welcome / Voice Choice CTA
    * (`lobby-entry-film__cta`).
    */

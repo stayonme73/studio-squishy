@@ -460,9 +460,8 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
       "utf8",
     );
     expect(runtime).toContain("const summaryConfirm =");
-    expect(runtime).toContain(
-      "hidePhoneScaffolding={summaryConfirm || routeChoose}",
-    );
+    expect(runtime).toContain("phonePlanStage");
+    expect(runtime).toContain("phoneCheckoutStage");
     const questionGlassBlock = runtime.slice(
       runtime.indexOf("const questionGlass ="),
       runtime.indexOf("const summaryConfirm ="),
@@ -475,7 +474,7 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
       ),
       "utf8",
     );
-    expect(tabletView).toContain('className="lobby-entry-film__cta"');
+    expect(tabletView).toContain("SamsungDenimCta");
     expect(tabletView).toContain("{v.confirmLabel}");
     expect(tabletView).toContain("{v.correctLabel}");
     expect(tabletView).toContain("SamsungDenimCta");
@@ -531,7 +530,8 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     expect(preview).toContain("setPreviewRoadId(roadId)");
     expect(preview).not.toContain('openPanel("route")');
     expect(runtime).toContain('const routeChoose = stage === "route"');
-    expect(runtime).toContain("openingAsk || routeChoose");
+    expect(runtime).toContain("(servicesStage && !isPhone)");
+    expect(runtime).toContain("phonePlanStage");
     const chooser = readFileSync(
       join(
         process.cwd(),
@@ -653,12 +653,31 @@ describe("MJ-D19 Mobile Choose Your Services hierarchy", () => {
       ),
       "utf8",
     );
-    expect(panel).toContain("data-builder-route-context");
-    expect(panel).toContain("data-service-list");
-    expect(panel).toContain("servicesBackToRoutesLabel");
-    expect(panel).toContain("Close activity panel");
-    expect(panel).toContain("PROJECT_BUILDER_V1.totalLabel");
-    expect(panel).toContain("PROJECT_BUILDER_V1.selectedCountLabel");
+    expect(panel).toContain("<ConversationServiceList");
+    expect(panel).toContain("onClose={onClose}");
+    expect(panel).toContain("onBackToRoutes={onBackToRoutes}");
+    const serviceList = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationServiceList.tsx",
+      ),
+      "utf8",
+    );
+    expect(serviceList).toContain("data-builder-route-context");
+    expect(serviceList).toContain("data-service-list");
+    expect(serviceList).toContain("servicesBackToRoutesLabel");
+    expect(serviceList).toContain("Close activity panel");
+    expect(serviceList).toContain("PROJECT_BUILDER_V1.totalLabel");
+    expect(serviceList).toContain("PROJECT_BUILDER_V1.selectedCountLabel");
+    expect(serviceList).toContain('dataAttr="review-plan"');
+    const denim = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/SamsungDenimCta.tsx",
+      ),
+      "utf8",
+    );
+    expect(denim).toContain("data-review-studio-plan");
     const css = readFileSync(
       join(
         process.cwd(),
@@ -666,12 +685,54 @@ describe("MJ-D19 Mobile Choose Your Services hierarchy", () => {
       ),
       "utf8",
     );
+    expect(css).toContain("/* Light mint trim");
+    expect(css).toContain("2.5px solid");
+    expect(css).toContain("var(--mc-eucalyptus, #456b5a) 42%");
+    expect(css).toContain(
+      '.sheet[data-panel="builder"][data-surface="page"] .jobCard:not([data-selected="true"])',
+    );
+    expect(css).toContain("var(--mc-ivory, #f7f4ee) 32%, transparent");
+    expect(css).toContain(
+      '.sheet[data-panel="builder"][data-surface="page"] .builderFooter',
+    );
+    const phoneFooter = css.slice(
+      css.indexOf(
+        '.sheet[data-panel="builder"][data-surface="page"] .builderFooter',
+      ),
+    );
+    expect(phoneFooter).toContain("background: transparent");
+    expect(phoneFooter).toContain("border-top: none");
+    expect(phoneFooter).toContain("position: static");
+    expect(phoneFooter).toContain("align-self: flex-end");
+    expect(phoneFooter).toContain("width: auto");
+    const workspaceGlass = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/studio-workspace.module.css",
+      ),
+      "utf8",
+    );
+    const phoneWsGlass = workspaceGlass.slice(
+      workspaceGlass.lastIndexOf("@media (max-width: 960px)"),
+    );
+    expect(phoneWsGlass).toContain(':has([data-stage="services"]) .nameQuestionFrost');
+    expect(phoneWsGlass).toContain("var(--mc-ivory, #f7f4ee) 36%, transparent");
+    expect(phoneWsGlass).toContain("blur(28px)");
+    const workspaceTsx = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/StudioWorkspace.tsx",
+      ),
+      "utf8",
+    );
+    expect(workspaceTsx).toContain("nameQuestionFrost");
     const phone = css.slice(css.indexOf("@media (max-width: 960px)"));
     expect(phone).toContain("MJ-D19");
     expect(phone).toContain(".builderRouteContext");
     expect(phone).toContain(".builderCount");
     expect(phone).toContain("min-height: 12rem");
     expect(phone).toContain("-webkit-overflow-scrolling: touch");
+    expect(phone).toContain("padding-bottom: 5.75rem");
     const room = readFileSync(
       join(
         process.cwd(),
@@ -718,16 +779,19 @@ describe("MJ-D19 Mobile Choose Your Services hierarchy", () => {
       ),
       "utf8",
     );
-    const serviceList = panel.slice(
-      panel.indexOf("function ServiceList"),
-      panel.indexOf("function LearnMoreView"),
+    const serviceList = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationServiceList.tsx",
+      ),
+      "utf8",
     );
     expect(serviceList).toContain("road.customerLabel");
     expect(serviceList).toContain("getJobsForRoad(roadId)");
     expect(serviceList).not.toContain("if (roadId");
     expect(serviceList).not.toContain("roadId ===");
     expect(panel).toContain("if (panel === \"builder\" && selectedRoadId)");
-    expect(panel).toContain("<ServiceList");
+    expect(panel).toContain("<ConversationServiceList");
     const css = readFileSync(
       join(
         process.cwd(),
@@ -740,5 +804,155 @@ describe("MJ-D19 Mobile Choose Your Services hierarchy", () => {
     expect(phone).not.toContain("i20");
     expect(phone).not.toContain("random-exit");
     expect(phone).not.toContain("[data-road]");
+  });
+});
+
+describe("Mobile Your project so far + Choose Your Services shell", () => {
+  it("keeps desktop Your-project-so-far overlay and skips the phone confirmation stop", () => {
+    const tablet = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/StudioGuideTabletView.tsx",
+      ),
+      "utf8",
+    );
+    expect(tablet).toContain("phoneCheckoutPage");
+    const desktopServices = tablet.slice(
+      tablet.indexOf("{isServicesStage && !phoneLayout ? ("),
+      tablet.indexOf("{isCheckoutStage && !phoneLayout ? ("),
+    );
+    expect(desktopServices).toContain("{modeControls}");
+    expect(desktopServices).toContain("SamsungDenimCta");
+    expect(desktopServices).toContain("{v.servicesTabletOpenPanelCta}");
+    expect(desktopServices).toContain("{v.servicesChangeRouteCta}");
+    expect(tablet).toContain("phonePage");
+    expect(tablet).not.toContain("data-surface=\"route-confirm\"");
+    expect(tablet).not.toContain("{v.routeConfirmContinueCta}");
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    expect(runtime).toContain("const servicesStage = stage === \"services\"");
+    expect(runtime).toContain("phoneCheckoutStage");
+    expect(runtime).not.toContain("setMobileRouteConfirm");
+    const changeRoute = runtime.slice(
+      runtime.indexOf("function handleChangeRoute"),
+      runtime.indexOf("function handleLooksGoodPlan"),
+    );
+    expect(changeRoute).toContain('setStageAndPersist("route")');
+    expect(changeRoute).toContain("closeActivityPanel()");
+    const closePanel = runtime.slice(
+      runtime.indexOf("function closeActivityPanel"),
+      runtime.indexOf("function handlePreviewRoad"),
+    );
+    expect(closePanel).toContain('setActivePanel("none")');
+    expect(closePanel).not.toContain("setStageAndPersist");
+    const selectRoad = runtime.slice(
+      runtime.indexOf("function handleSelectRoad"),
+      runtime.indexOf("const previousStageRef"),
+    );
+    expect(selectRoad).toContain("readPhoneLayout()");
+    expect(selectRoad).toContain("closeActivityPanel()");
+    expect(selectRoad).not.toContain("setMobileRouteConfirm");
+    expect(selectRoad).toContain('openPanel("builder")');
+    const editPlan = runtime.slice(
+      runtime.indexOf("function handleEditPlan"),
+      runtime.indexOf("function handleChangeRoute"),
+    );
+    expect(editPlan).toContain('setStageAndPersist("services")');
+  });
+});
+
+describe("Mobile route → services → plan navigation simplification", () => {
+  it("restores single-tap Denim without changing chip leftover-click guards", () => {
+    const denim = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/SamsungDenimCta.tsx",
+      ),
+      "utf8",
+    );
+    expect(denim).toContain("useSamsungTapActivate");
+    expect(denim).toContain('href="#studio-action"');
+    expect(denim).toContain("event.preventDefault()");
+    const activate = readFileSync(
+      join(process.cwd(), "src/lib/studio-samsung-activate.ts"),
+      "utf8",
+    );
+    expect(activate).toContain("if (!lastAt.current) return");
+    expect(activate).toContain("if (!sawPointerDown.current) return");
+    const route = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationRouteChoose.tsx",
+      ),
+      "utf8",
+    );
+    expect(route).toContain("useSamsungActivate");
+    expect(route).not.toContain("useSamsungTapActivate");
+  });
+
+  it("does not auto-open the builder overlay on phone and keeps desktop overlay", () => {
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    expect(runtime).toContain("if (readPhoneLayout()) return");
+    expect(runtime).toContain('openPanel("builder")');
+    expect(runtime).toContain("phoneHidesBuilderOverlay");
+    expect(runtime).toContain("phoneHidesCheckoutOverlay");
+    expect(runtime).toContain("presentCheckoutSurface");
+    expect(runtime).not.toContain("onContinueToServices");
+    const reviewPlan = runtime.slice(
+      runtime.indexOf("function handleReviewStudioPlan"),
+      runtime.indexOf("function handleEditPlan"),
+    );
+    expect(reviewPlan).toContain('setStageAndPersist("plan")');
+    expect(reviewPlan).toContain("disarmCheckoutAdvanceForSameGesture");
+    const looksGood = runtime.slice(
+      runtime.indexOf("function handleLooksGoodPlan"),
+      runtime.indexOf("function authorizeCheckoutPayment"),
+    );
+    expect(looksGood).toContain("if (!checkoutAdvanceArmedRef.current) return");
+    expect(looksGood).toContain('setStageAndPersist("checkout")');
+    const tablet = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/StudioGuideTabletView.tsx",
+      ),
+      "utf8",
+    );
+    expect(tablet).toContain("extrasInPlace={phoneLayout}");
+    const plan = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationStudioPlanTablet.tsx",
+      ),
+      "utf8",
+    );
+    expect(plan).toContain("studioPlanDetailsToggle");
+    expect(plan).toContain("studioPlanEditServicesLabel");
+    expect(plan).toContain("data-plan-actions");
+    expect(plan).toContain("extrasInPlace");
+    expect(plan).toContain("topControls");
+    const checkout = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationCheckoutPanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(checkout).toContain("phonePage");
+    expect(checkout).toContain("compactPaymentHonesty={phonePage}");
+    expect(checkout).toContain("if (phonePage) return");
+    expect(checkout).toContain("v.checkoutLead");
+    expect(checkout).toContain("phonePage ? null : (");
+    expect(checkout).toContain("v.checkoutScopeDisclosure");
   });
 });

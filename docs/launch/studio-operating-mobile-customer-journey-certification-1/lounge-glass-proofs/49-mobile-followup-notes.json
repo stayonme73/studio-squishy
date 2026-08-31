@@ -1,0 +1,92 @@
+[
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-step1-route-before-continue-360.png"
+    }
+  },
+  {
+    "msg": "after-route-continue",
+    "extra": {
+      "wentToServices": true,
+      "stillConfirm": false
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-step1-to-step2-direct-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-step2-top-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-step2-bottom-empty-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-step2-added-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-step2-removed-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-step3-top-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-step3-bottom-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-step3-details-open-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-step2-after-edit-360.png"
+    }
+  },
+  {
+    "msg": "checkout-state",
+    "extra": {
+      "overlayTitle": false,
+      "hasStudioTablet": false,
+      "closeCount": 0,
+      "voiceUnder": false,
+      "yellowRepeat": false,
+      "snippet": "Studio Conversation Room\nCheckout\n\nROUTE\nPromote Something Now\n\nConfirm your services and total below. After payment, the purchased scope is fixed and later changes follow the Project Change process.\n\n← Back to Studio Plan\nYour Studio Plan\nSELECTED SERVICES\n\nMake Me a Flyer\n\n$69\n\nESTIMATED INVESTMENT\n\n$69\n\nEstimated Investment reflects your selected services. The amount charged is confirmed with Stripe.\n\nConfirm and continue\nI reviewed my Studio Plan and understand that confirming checkout and completing Project Intake are required before work can move forward.\n\nYou will complete payment on Stripe’s secure checkout page. The Studio marks your project paid only after Stripe confirms the payment.\n\nCONTINUE TO SECURE CHECKOUT\n\nContinue opens Stripe Checkout. Your project stays unpaid until Stripe confirms payment.\n\nWhat Happens Next\n1\nCheckout confirmed\n2\nProject Intake opens\n3\nYou provide your materials\n4\nRequired information is reviewed\n5\nYou'll review the work\n6\nFinal delivery\n\nYou can follow project status on your Studio Board after Project Intake. Email notices are a courtesy. Your Studio Board is the source of truth.\n\nSTUDIO REVIEW"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-checkout-top-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "49-checkout-bottom-360.png"
+    }
+  }
+]

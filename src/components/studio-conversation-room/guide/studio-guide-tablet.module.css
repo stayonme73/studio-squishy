@@ -76,6 +76,45 @@
   height: 100%;
 }
 
+/* Choose Your Services owns the tablet glass on phone; desktop overlay unchanged. */
+.root[data-stage="services"],
+.root[data-stage="checkout"] {
+  padding: 0;
+  gap: 0;
+}
+
+.root[data-stage="services"] .main,
+.root[data-stage="checkout"] .main {
+  overflow: hidden;
+  gap: 0;
+  padding: 0;
+}
+
+.root[data-stage="services"] .main > :first-child,
+.root[data-stage="checkout"] .main > :first-child {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.root[data-route-confirm="true"] .main {
+  overflow: auto;
+}
+
+.root[data-route-confirm="true"] .main > :first-child {
+  flex: 0 1 auto;
+  height: auto;
+}
+
+.routeConfirmCard {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.35rem 0.2rem 0.45rem;
+}
+
 .planTablet {
   box-sizing: border-box;
   display: flex;
@@ -273,6 +312,41 @@
   font-size: 1.15rem;
   font-weight: 700;
   cursor: pointer;
+}
+
+.planDetailsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.15rem 0 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  background: var(--mc-chip, color-mix(in srgb, #f7f4ee 50%, transparent));
+}
+
+.planDetailsToggle {
+  appearance: none;
+  align-self: stretch;
+  margin: 0;
+  padding: 0.55rem 0.15rem;
+  border: none;
+  background: none;
+  color: var(--mc-denim, #547c92);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.planDetailsBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.15rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 28%, #f7f4ee));
 }
 
 .planTabletError {
@@ -798,16 +872,31 @@
   }
 
   .root[data-stage="route"] .main,
-  .root[data-stage="plan"] .main {
+  .root[data-stage="plan"] .main,
+  .root[data-stage="services"] .main,
+  .root[data-stage="checkout"] .main {
     overflow: visible;
     height: auto;
   }
 
   .root[data-stage="route"] .main > :first-child,
-  .root[data-stage="plan"] .main > :first-child {
+  .root[data-stage="plan"] .main > :first-child,
+  .root[data-stage="services"] .main > :first-child,
+  .root[data-stage="checkout"] .main > :first-child {
     flex: 0 1 auto;
     height: auto;
     min-height: 0;
+  }
+
+  .planTablet[data-phone-plan="true"] .planTabletActions[data-plan-actions="group"] {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
+  .planTablet[data-phone-plan="true"] .planTabletBtnSecondary {
+    width: 100%;
+    justify-content: center;
   }
 
   .question {

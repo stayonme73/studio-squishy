@@ -33,6 +33,8 @@ export type ConversationCheckoutPanelProps = {
   onAuthorizePayment?: () => boolean;
   /** Cancelled / failed / pending payment copy from durable processor state. */
   paymentHonestyMessage?: string | null;
+  /** Mobile dedicated page — not an overlay on Conversation Room. */
+  phonePage?: boolean;
 };
 
 /**
@@ -48,6 +50,7 @@ export default function ConversationCheckoutPanel({
   onSandboxConfirm,
   onAuthorizePayment,
   paymentHonestyMessage = null,
+  phonePage = false,
 }: ConversationCheckoutPanelProps) {
   const v = conversationRoomGuideV1;
   const serviceIds = useMemo(
@@ -66,26 +69,37 @@ export default function ConversationCheckoutPanel({
   );
 
   useEffect(() => {
+    if (phonePage) return;
     const confirm = document.getElementById("checkout-pay-continue");
     confirm?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  }, []);
+  }, [phonePage]);
 
   if (serviceIds.length === 0 || !planSummary) {
     return (
-      <div className={styles.sheet} data-panel="checkout">
+      <div
+        className={styles.sheet}
+        data-panel="checkout"
+        data-surface={phonePage ? "page" : "overlay"}
+      >
         <header className={styles.header}>
           <div>
-            <p className={styles.eyebrow}>Conversation Room</p>
-            <h2 className={styles.title}>{v.checkoutTitle}</h2>
+            {phonePage ? null : (
+              <p className={styles.eyebrow}>Conversation Room</p>
+            )}
+            <h2 className={styles.title}>
+              {phonePage ? v.checkoutTabletTitle : v.checkoutTitle}
+            </h2>
           </div>
-          <button
-            type="button"
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label="Close activity panel"
-          >
-            Close
-          </button>
+          {phonePage ? null : (
+            <button
+              type="button"
+              className={styles.closeBtn}
+              onClick={onClose}
+              aria-label="Close activity panel"
+            >
+              Close
+            </button>
+          )}
         </header>
         <p className={styles.intro} role="status">
           {v.studioPlanBridgeError}
@@ -102,20 +116,30 @@ export default function ConversationCheckoutPanel({
   }
 
   return (
-    <div className={styles.sheet} data-panel="checkout">
+    <div
+      className={styles.sheet}
+      data-panel="checkout"
+      data-surface={phonePage ? "page" : "overlay"}
+    >
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Conversation Room</p>
-          <h2 className={styles.title}>{v.checkoutTitle}</h2>
+          {phonePage ? null : (
+            <p className={styles.eyebrow}>Conversation Room</p>
+          )}
+          <h2 className={styles.title}>
+            {phonePage ? v.checkoutTabletTitle : v.checkoutTitle}
+          </h2>
         </div>
-        <button
-          type="button"
-          className={styles.closeBtn}
-          onClick={onClose}
-          aria-label="Close activity panel"
-        >
-          Close
-        </button>
+        {phonePage ? null : (
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label="Close activity panel"
+          >
+            Close
+          </button>
+        )}
       </header>
 
       {routeCustomerLabel ? (
@@ -128,9 +152,11 @@ export default function ConversationCheckoutPanel({
       ) : null}
 
       <p className={styles.intro}>{v.checkoutLead}</p>
-      <p className={styles.checkoutScopeDisclosure} role="note">
-        {v.checkoutScopeDisclosure}
-      </p>
+      {phonePage ? null : (
+        <p className={styles.checkoutScopeDisclosure} role="note">
+          {v.checkoutScopeDisclosure}
+        </p>
+      )}
       {paymentHonestyMessage ? (
         <p className={styles.checkoutScopeDisclosure} role="alert">
           {paymentHonestyMessage}
@@ -161,10 +187,13 @@ export default function ConversationCheckoutPanel({
           }}
           onPaymentComplete={onPaymentComplete}
           onSandboxConfirm={onSandboxConfirm}
+          compactPaymentHonesty={phonePage}
         />
-        <p className={styles.checkoutHonestyNote}>
-          {payment.form.paymentSecurityNote}
-        </p>
+        {phonePage ? null : (
+          <p className={styles.checkoutHonestyNote}>
+            {payment.form.paymentSecurityNote}
+          </p>
+        )}
       </div>
     </div>
   );

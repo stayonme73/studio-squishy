@@ -2,8 +2,11 @@
 
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 
+import ConversationCheckoutPanel from "@/components/studio-conversation-room/guide/ConversationCheckoutPanel";
 import ConversationRouteChoose from "@/components/studio-conversation-room/guide/ConversationRouteChoose";
+import ConversationServiceList from "@/components/studio-conversation-room/guide/ConversationServiceList";
 import ConversationStudioPlanTablet from "@/components/studio-conversation-room/guide/ConversationStudioPlanTablet";
+import SamsungDenimCta from "@/components/studio-conversation-room/guide/SamsungDenimCta";
 import styles from "@/components/studio-conversation-room/guide/studio-guide-tablet.module.css";
 import {
   CONVERSATION_ROOM_ACTIVE_QUESTION_HEADING_ID,
@@ -54,6 +57,19 @@ export type StudioGuideTabletViewProps = {
   /** Services stage — tablet shows status, not a duplicate service chooser heading. */
   selectedServiceCount?: number;
   selectedRouteLabel?: string | null;
+  selectedRoadId?: RouteMapRoadId | null;
+  selectedJobIds?: ReadonlySet<RouteMapJobId>;
+  routeGuidance?: string | null;
+  /** Phone: dedicated Choose Your Services page, not a Conversation Room overlay. */
+  phoneLayout?: boolean;
+  onAddJob?: (jobId: RouteMapJobId) => void;
+  onRemoveJob?: (jobId: RouteMapJobId) => void;
+  onReviewStudioPlan?: () => void;
+  onViewPlanScope?: (jobId: RouteMapJobId) => void;
+  onBackToStudioPlanFromCheckout?: () => void;
+  onCheckoutPaymentComplete?: () => void | Promise<void>;
+  onSandboxCheckoutConfirm?: () => void | Promise<void>;
+  onAuthorizeCheckoutPayment?: () => boolean;
   /** Plan stage — Studio Plan summary on the tablet. */
   planModel?: ProjectBuilderStudioPlanSummaryModel | null;
   /**
@@ -108,6 +124,17 @@ export default function StudioGuideTabletView({
   recommendedRoadId = null,
   selectedServiceCount = 0,
   selectedRouteLabel = null,
+  selectedRoadId = null,
+  selectedJobIds,
+  phoneLayout = false,
+  onAddJob,
+  onRemoveJob,
+  onReviewStudioPlan,
+  onViewPlanScope,
+  onBackToStudioPlanFromCheckout,
+  onCheckoutPaymentComplete,
+  onSandboxCheckoutConfirm,
+  onAuthorizeCheckoutPayment,
   planModel = null,
   ma001CompositionMemberLabels = null,
   onEditPlan,
@@ -130,7 +157,25 @@ export default function StudioGuideTabletView({
   const isPlanStage = stage === "plan";
   const isCheckoutStage = stage === "checkout";
   const isIntakeStage = stage === "intake";
-  const tabletOwnsChrome = isRouteStage || isPlanStage;
+  const phoneServicesPage =
+    phoneLayout &&
+    isServicesStage &&
+    selectedRoadId != null &&
+    onAddJob != null &&
+    onRemoveJob != null &&
+    onReviewStudioPlan != null &&
+    onChangeRoute != null;
+  const phoneCheckoutPage =
+    phoneLayout &&
+    isCheckoutStage &&
+    selectedRoadId != null &&
+    onBackToStudioPlanFromCheckout != null &&
+    onCheckoutPaymentComplete != null;
+  const tabletOwnsChrome =
+    isRouteStage ||
+    isPlanStage ||
+    isServicesStage ||
+    phoneCheckoutPage;
   const previousStepRef = useRef(step);
   const previousSurfaceRef = useRef(`${stage}:${step}`);
 
@@ -191,6 +236,9 @@ export default function StudioGuideTabletView({
             onChangeRoute={onChangeRoute}
             onLooksGood={onLooksGoodPlan}
             onOpenExtraDetails={onOpenPlanExtraDetails}
+            onViewScope={onViewPlanScope}
+            extrasInPlace={phoneLayout}
+            topControls={phoneLayout ? modeControls : null}
             bridgeError={planBridgeError}
           />
         ) : null}
@@ -199,8 +247,23 @@ export default function StudioGuideTabletView({
           <p className={styles.eyebrow}>{v.eyebrow}</p>
         ) : null}
 
-        {isServicesStage ? (
+        {phoneServicesPage && selectedRoadId && onAddJob && onRemoveJob && onReviewStudioPlan && onChangeRoute ? (
+          <ConversationServiceList
+            phonePage
+            roadId={selectedRoadId}
+            selectedJobIds={selectedJobIds ?? new Set()}
+            onClose={() => undefined}
+            onBackToRoutes={onChangeRoute}
+            onAddJob={onAddJob}
+            onRemoveJob={onRemoveJob}
+            onReviewStudioPlan={onReviewStudioPlan}
+          />
+        ) : null}
+
+        {isServicesStage && !phoneLayout ? (
           <>
+            {modeControls}
+            <p className={styles.eyebrow}>{v.eyebrow}</p>
             <h1 className={styles.question}>{v.servicesTabletTitle}</h1>
             <p className={styles.body}>{v.servicesPanelLead}</p>
             {selectedRouteLabel ? (
@@ -211,28 +274,40 @@ export default function StudioGuideTabletView({
             ) : null}
             <div className={styles.actions}>
               {onOpenStagePanel ? (
-                <button
-                  type="button"
-                  className={styles.btnPrimary}
-                  onClick={onOpenStagePanel}
-                >
+                <SamsungDenimCta onActivate={onOpenStagePanel}>
                   {v.servicesTabletOpenPanelCta}
-                </button>
+                </SamsungDenimCta>
               ) : null}
               {onChangeRoute ? (
-                <button
-                  type="button"
+                <SamsungActionButton
                   className={styles.btnSecondary}
-                  onClick={onChangeRoute}
+                  onActivate={onChangeRoute}
                 >
                   {v.servicesChangeRouteCta}
-                </button>
+                </SamsungActionButton>
               ) : null}
             </div>
           </>
         ) : null}
 
-        {isCheckoutStage ? (
+        {phoneCheckoutPage &&
+        selectedRoadId &&
+        onBackToStudioPlanFromCheckout &&
+        onCheckoutPaymentComplete ? (
+          <ConversationCheckoutPanel
+            phonePage
+            roadId={selectedRoadId}
+            selectedJobIds={selectedJobIds ?? new Set()}
+            onClose={() => undefined}
+            onBackToStudioPlan={onBackToStudioPlanFromCheckout}
+            onPaymentComplete={onCheckoutPaymentComplete}
+            onSandboxConfirm={onSandboxCheckoutConfirm}
+            onAuthorizePayment={onAuthorizeCheckoutPayment}
+            paymentHonestyMessage={planBridgeError}
+          />
+        ) : null}
+
+        {isCheckoutStage && !phoneLayout ? (
           <>
             <h1 className={styles.question}>{v.checkoutTabletTitle}</h1>
             <p className={styles.body}>{v.checkoutTabletLead}</p>
@@ -536,32 +611,6 @@ function SamsungChipButton({
     >
       {label}
     </button>
-  );
-}
-
-function SamsungDenimCta({
-  children,
-  onActivate,
-}: {
-  children: ReactNode;
-  onActivate: () => void;
-}) {
-  const activate = useSamsungActivate<HTMLAnchorElement>(onActivate);
-  return (
-    <a
-      ref={activate.ref}
-      role="button"
-      tabIndex={0}
-      className="lobby-entry-film__cta"
-      onClick={activate.onClick}
-      onKeyDown={(event) => {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        onActivate();
-      }}
-    >
-      {children}
-    </a>
   );
 }
 

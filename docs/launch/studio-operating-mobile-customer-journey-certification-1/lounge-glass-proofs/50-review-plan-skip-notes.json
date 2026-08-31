@@ -1,0 +1,68 @@
+[
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "50-services-before-review-360.png"
+    }
+  },
+  {
+    "msg": "after-review-plus-leftover-click",
+    "extra": {
+      "stage": "plan"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "50-review-lands-on-step3-360.png"
+    }
+  },
+  {
+    "msg": "after-intentional-checkout",
+    "extra": {
+      "stage": "checkout"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "50-checkout-after-continue-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "50-back-to-step3-360.png"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "50-edit-services-360.png"
+    }
+  },
+  {
+    "msg": "after-second-review-no-refresh",
+    "extra": {
+      "stage": "plan"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "50-review-again-step3-360.png"
+    }
+  },
+  {
+    "msg": "after-third-review-no-refresh",
+    "extra": {
+      "stage": "plan"
+    }
+  },
+  {
+    "msg": "wrote",
+    "extra": {
+      "name": "50-review-third-step3-360.png"
+    }
+  }
+]

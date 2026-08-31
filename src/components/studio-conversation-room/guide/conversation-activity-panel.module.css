@@ -645,6 +645,7 @@
   justify-content: space-between;
   gap: 0.65rem;
   margin-top: 0.2rem;
+  padding: 0.2rem 0.1rem;
 }
 
 .learnLink {
@@ -679,6 +680,7 @@
   gap: 0.85rem;
   height: 100%;
   min-height: 0;
+  overflow: hidden;
 }
 
 .sheet[data-panel="builder"] .title {
@@ -722,6 +724,8 @@
 
   .sheet[data-panel="builder"] {
     gap: 0.35rem;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sheet[data-panel="builder"] .header,
@@ -745,6 +749,10 @@
   .sheet[data-panel="builder"] .intro,
   .sheet[data-panel="builder"] .builderCount {
     display: none;
+  }
+
+  .sheet[data-panel="builder"][data-surface="page"] .eyebrow {
+    display: block;
   }
 
   .sheet[data-panel="builder"] .builderRouteContext {
@@ -787,7 +795,58 @@
   }
 
   .sheet[data-panel="builder"] .jobList {
+    flex: 1 1 auto;
     min-height: 12rem;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 5.75rem;
+  }
+
+  .sheet[data-panel="builder"] .builderFooter {
+    flex: 0 0 auto;
+    z-index: 2;
+  }
+
+  .sheet[data-panel="builder"][data-surface="page"] {
+    overflow: visible;
+    height: auto;
+  }
+
+  .sheet[data-panel="builder"][data-surface="page"] .jobList {
+    overflow: visible;
+    min-height: 0;
+    padding-bottom: 0.75rem;
+  }
+
+  /*
+   * Step 2 CTA sits on the approved ivory frost — no leftover
+   * full-width footer slab. Footer shrinks to the Denim button.
+   * Do not restyle the button.
+   */
+  .sheet[data-panel="builder"][data-surface="page"] .builderFooter {
+    position: static;
+    align-self: flex-end;
+    width: auto;
+    padding-top: 0.35rem;
+    padding-bottom: 0.15rem;
+    background: transparent;
+    border-top: none;
+  }
+
+  /*
+   * Step 2 unselected cards: lighter frosted glass, not --mc-card slabs.
+   * Ivory veil on the already-frosted panel — not a second cream coat.
+   * Selected cards stay on --mc-chip-selected. Keep 1px glass borders.
+   */
+  .sheet[data-panel="builder"][data-surface="page"] .jobCard:not([data-selected="true"]) {
+    border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+    background: color-mix(in srgb, var(--mc-ivory, #f7f4ee) 32%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+
+  .sheet[data-panel="checkout"][data-surface="page"] {
+    overflow: visible;
+    height: auto;
   }
 
   .sheet[data-panel="route-peek"] .routeJobPeekList {
@@ -1040,6 +1099,7 @@
   border-top: 1px solid rgba(180, 195, 210, 0.22);
 }
 
+.builderFooter .lobby-entry-film__cta,
 .builderFooter .primary {
   padding: 0.75rem 1.25rem;
   font-size: 1.05rem;
@@ -1533,6 +1593,11 @@
   border: 1px solid var(--mc-denim, #547c92);
   background: var(--mc-denim, #547c92);
   color: var(--mc-ivory, #f7f4ee);
+}
+
+/* Light mint trim so + Add to Project reads as a control, not a filled slab. */
+.addBtn {
+  border: 2.5px solid color-mix(in srgb, var(--mc-eucalyptus, #456b5a) 42%, var(--mc-ivory, #f7f4ee));
 }
 
 .removeBtn,

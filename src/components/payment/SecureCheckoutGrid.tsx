@@ -49,6 +49,11 @@ type Props = {
   onViewPlanDetails?: () => void;
   /** Override submit button label (Conversation Room panel may use “Complete Checkout”). */
   submitLabel?: string;
+  /**
+   * Phone Conversation Room: say Stripe/payment honesty once.
+   * Desktop /payment keeps the security note plus the under-button reassurance.
+   */
+  compactPaymentHonesty?: boolean;
 };
 
 function SummaryCheckIcon() {
@@ -147,6 +152,7 @@ export default function SecureCheckoutGrid({
   onOpenServiceGuide,
   onViewPlanDetails,
   submitLabel,
+  compactPaymentHonesty = false,
 }: Props) {
   const checkoutPackageId = resolveCheckoutPackageId(packageIdProp);
   const storedPlanSummary = useMemo(() => buildPaymentPlanSummary(), []);
@@ -386,7 +392,7 @@ export default function SecureCheckoutGrid({
                 <p className="pay-summary-disclosure-note" role="alert">
                   {checkoutError}
                 </p>
-              ) : (
+              ) : compactPaymentHonesty ? null : (
                 <p className="pay-summary-disclosure-note">
                   {payment.form.paymentReassurance}
                 </p>
@@ -494,7 +500,7 @@ export default function SecureCheckoutGrid({
               <p className="co-payment-reassurance" role="alert">
                 {checkoutError}
               </p>
-            ) : (
+            ) : compactPaymentHonesty ? null : (
               <p className="co-payment-reassurance">{payment.form.paymentReassurance}</p>
             )}
             {sandboxPanel}

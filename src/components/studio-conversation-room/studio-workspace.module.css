@@ -428,6 +428,10 @@
   overflow: visible;
 }
 
+.nameQuestionFrost {
+  display: none;
+}
+
 .frame[data-name-question="true"] .nameQuestionPanel {
   max-height: none;
   overflow: visible;
@@ -440,17 +444,56 @@
  * running underneath it. Lounge shows in the gap.
  */
 @media (max-width: 960px) {
-  .frame[data-name-question="true"]:has([data-step="summary"]) {
+  .frame[data-name-question="true"]:has([data-step="summary"]),
+  .frame[data-name-question="true"]:has([data-stage="services"]),
+  .frame[data-name-question="true"]:has([data-stage="plan"]),
+  .frame[data-name-question="true"]:has([data-stage="checkout"]) {
     margin-bottom: 2.15rem;
   }
 
-  .frame[data-name-question="true"]:has([data-step="summary"]) .nameQuestionPanel {
+  .frame[data-name-question="true"]:has([data-step="summary"]) .nameQuestionPanel,
+  .frame[data-name-question="true"]:has([data-stage="plan"]) .nameQuestionPanel,
+  .frame[data-name-question="true"]:has([data-stage="checkout"]) .nameQuestionPanel {
     max-height: calc(
       100dvh - clamp(1.15rem, 7vh, 2.35rem) - env(safe-area-inset-top, 0px) -
         var(--studio-review-mobile-bottom, 3.25rem) - 2.15rem
     );
     overflow-x: hidden;
     overflow-y: auto;
+  }
+
+  .frame[data-name-question="true"]:has([data-route-confirm="true"]) .nameQuestionPanel {
+    max-height: none;
+    overflow: visible;
+  }
+
+  /*
+   * Step 2 only — lighter frosted glass over Lounge.
+   * overflow: visible on this panel disables backdrop-filter, so frost
+   * lives on a clipped plate. Ivory fill, no cream. Stronger blur so
+   * this stays frost, not a window. Do not change Voice Choice,
+   * name-question, plan, checkout, or Studio Review.
+   */
+  .frame[data-name-question="true"]:has([data-stage="services"]) .nameQuestionPanel {
+    background: transparent;
+  }
+
+  .frame[data-name-question="true"]:has([data-stage="services"]) .nameQuestionFrost {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+    background: color-mix(in srgb, var(--mc-ivory, #f7f4ee) 36%, transparent);
+    backdrop-filter: blur(28px) saturate(1.06) brightness(1.18);
+    -webkit-backdrop-filter: blur(28px) saturate(1.06) brightness(1.18);
+  }
+
+  .frame[data-name-question="true"]:has([data-stage="services"]) .nameQuestionPanel .hostSurface {
+    position: relative;
+    z-index: 1;
   }
 }
 

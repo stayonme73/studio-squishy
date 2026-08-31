@@ -96,6 +96,11 @@ export const conversationRoomGuideV1 = {
   /** Always available on the services tablet — do not bury route change in the panel only. */
   servicesChangeRouteCta: "Change route",
   servicesBackToRoutesLabel: "Back to routes",
+  /** Mobile dedicated services page — one step back, not overlay Close. */
+  servicesBackToRouteLabel: "Back to Route",
+  servicesStepLabel: "Step 2 — Choose Your Services",
+  routeConfirmTitle: "Your project so far",
+  routeConfirmContinueCta: "Continue to Services",
   servicesShowFullDetails: "Show full details",
   servicesHideFullDetails: "Hide details",
   servicesReviewPlanCta: "Review Studio Plan",
@@ -126,6 +131,12 @@ export const conversationRoomGuideV1 = {
   studioPlanHideDetailsLabel: "Hide Details",
   /** Opens Activity Panel — Revision Policy, We'll Need, View Scope (readable size). */
   studioPlanMoreDetailsCta: "Revisions, materials & scope",
+  studioPlanStepLabel: "Step 3 — Review Studio Plan",
+  studioPlanDetailsToggle: "Plan details: Revisions, Materials & Scope",
+  studioPlanDetailsOpenHint:
+    "Optional information. Open or close this without leaving Studio Plan.",
+  studioPlanDetailsHideLabel: "Hide plan details",
+  studioPlanEditServicesLabel: "Edit Services",
   studioPlanExtrasHint:
     "Revisions and materials details open beside you when you need them.",
   studioPlanExtraDetailsTitle: "Plan details",

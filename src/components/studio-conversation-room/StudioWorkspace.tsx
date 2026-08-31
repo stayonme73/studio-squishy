@@ -82,6 +82,11 @@ export default function StudioWorkspace({
               aria-label="Studio conversation question"
               data-name-question-panel="true"
             >
+              <div
+                className={styles.nameQuestionFrost}
+                aria-hidden="true"
+                data-name-question-frost="true"
+              />
               <div className={styles.hostSurface}>{children}</div>
             </div>
           ) : (

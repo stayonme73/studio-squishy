@@ -153,6 +153,7 @@ import {
   writeVoiceNarrationPreference,
 } from "@/lib/studio-voice-preference";
 import { suppressSameGestureFollowUp } from "@/lib/studio-samsung-activate";
+import { readPhoneLayout, usePhoneLayout } from "@/lib/studio-phone-layout";
 import VoiceChoiceFilm from "@/components/studio-conversation-room/VoiceChoiceFilm";
 import VoicePreferenceControls from "@/components/studio-conversation-room/VoicePreferenceControls";
 
@@ -291,6 +292,7 @@ export default function ConversationRoomRuntime({
   const [error, setError] = useState<string | null>(null);
   /** Single Activity Panel controller — not parallel open booleans. */
   const [activePanel, setActivePanel] = useState<ActivityPanelId>("none");
+  const isPhone = usePhoneLayout();
   const [stage, setStage] = useState<ConversationRoomStage>("opening");
   const [projectDraft, setProjectDraft] = useState<WorkingDraftRecord | null>(
     null,
@@ -318,6 +320,11 @@ export default function ConversationRoomRuntime({
   const [listenArmed, setListenArmed] = useState(true);
   /** MJ-D18: leftover Continue click must not gold a chip on the next question. */
   const bubbleArmedRef = useRef(true);
+  /**
+   * Review Studio Plan unmounts the services Denim CTA and mounts Continue to
+   * Checkout under the same finger. Ignore that leftover gesture.
+   */
+  const checkoutAdvanceArmedRef = useRef(true);
   const activityReturnFocusRef = useRef<HTMLElement | null>(null);
   /** Suppress stacked “added” lines when the customer taps services quickly. */
   const lastServiceAddSpokenAtRef = useRef(0);
@@ -448,7 +455,11 @@ export default function ConversationRoomRuntime({
         : [],
     );
     setActivePanel(
-      restoredStage === "opening" ? "none" : STAGE_DEFAULT_PANEL[restoredStage],
+      restoredStage === "opening" ||
+        (readPhoneLayout() &&
+          (restoredStage === "services" || restoredStage === "checkout"))
+        ? "none"
+        : STAGE_DEFAULT_PANEL[restoredStage],
     );
     if (restoredStage === "route") {
       const savedRec = readActiveRouteRecommendation(
@@ -571,6 +582,15 @@ export default function ConversationRoomRuntime({
     });
   }
 
+  function disarmCheckoutAdvanceForSameGesture() {
+    checkoutAdvanceArmedRef.current = false;
+    suppressSameGestureFollowUp(() => {
+      window.setTimeout(() => {
+        checkoutAdvanceArmedRef.current = true;
+      }, BUBBLE_REARM_MS);
+    });
+  }
+
   function goToStep(
     next: GuideConversationStep,
     nextDraft = draft,
@@ -645,6 +665,15 @@ export default function ConversationRoomRuntime({
     setActivePanel("none");
     setDetailJobId(null);
     dispatch({ type: "close-help" });
+  }
+
+  /** Desktop: Activity Panel overlay. Phone: dedicated Checkout page. */
+  function presentCheckoutSurface() {
+    if (readPhoneLayout()) {
+      closeActivityPanel();
+    } else {
+      openPanel("checkout");
+    }
   }
 
   function handlePreviewRoad(roadId: RouteMapRoadId) {
@@ -774,7 +803,11 @@ export default function ConversationRoomRuntime({
     setStage("services");
     setDetailJobId(null);
     setPreviewRoadId(roadId);
-    openPanel("builder");
+    if (readPhoneLayout()) {
+      closeActivityPanel();
+    } else {
+      openPanel("builder");
+    }
     const road = getRouteMapRoad(roadId);
     speakStudioLine(
       servicesVoiceIntro(road?.customerLabel ?? "your route"),
@@ -788,8 +821,19 @@ export default function ConversationRoomRuntime({
     previousStageRef.current = stage;
     if (stage !== "services") return;
     if (previous === "services") return;
+    if (readPhoneLayout()) return;
     openPanel("builder");
   }, [stage]);
+
+  useEffect(() => {
+    if (!isPhone) return;
+    if (stage === "services" && activePanel === "builder") {
+      closeActivityPanel();
+    }
+    if (stage === "checkout" && activePanel === "checkout") {
+      closeActivityPanel();
+    }
+  }, [isPhone, stage, activePanel]);
 
   function handleOpenLearnMore(jobId: RouteMapJobId) {
     setDetailJobId(jobId);
@@ -797,14 +841,14 @@ export default function ConversationRoomRuntime({
   }
 
   function handleAddJob(jobId: RouteMapJobId) {
-    const road = readSelectedRoute(
-      projectDraft ?? bootConversationProjectDraft(draft),
-    );
-    if (!road) return;
     const base = projectDraft ?? bootConversationProjectDraft(draft);
-    const next = persistAddService(base, jobId, road.roadId);
+    const existing = readSelectedRoute(base);
+    const roadId = existing?.roadId ?? previewRoadId;
+    if (!roadId) return;
+    const withRoute = existing ? base : persistSelectedRoute(base, roadId);
+    const next = persistAddService(withRoute, jobId, roadId);
     setProjectDraft(next);
-    const job = getJobsForRoad(road.roadId).find((item) => item.id === jobId);
+    const job = getJobsForRoad(roadId).find((item) => item.id === jobId);
     const alreadyHad = readSelectedServices(base).some((s) => s.jobId === jobId);
     if (alreadyHad || !job) return;
 
@@ -822,18 +866,20 @@ export default function ConversationRoomRuntime({
   }
 
   function handleReviewStudioPlan() {
-    const route = readSelectedRoute(
-      projectDraft ?? bootConversationProjectDraft(draft),
-    );
-    const services = readSelectedServices(
-      projectDraft ?? bootConversationProjectDraft(draft),
-    );
+    const project = projectDraft ?? bootConversationProjectDraft(draft);
+    const route =
+      readSelectedRoute(project) ??
+      (previewRoadId
+        ? { roadId: previewRoadId, selectedAt: new Date().toISOString() }
+        : null);
+    const services = readSelectedServices(project);
     if (!route || services.length === 0) return;
     setPlanBridgeError(null);
     setDetailJobId(null);
     setStageAndPersist("plan");
     /* Studio Plan reviews on the tablet — keep the Activity Panel closed. */
     closeActivityPanel();
+    disarmCheckoutAdvanceForSameGesture();
 
     const model = buildProjectBuilderStudioPlanSummary(
       services.map((s) => s.jobId as ServiceId),
@@ -858,7 +904,11 @@ export default function ConversationRoomRuntime({
     setPlanBridgeError(null);
     setDetailJobId(null);
     setStageAndPersist("services");
-    openPanel("builder");
+    if (readPhoneLayout()) {
+      closeActivityPanel();
+    } else {
+      openPanel("builder");
+    }
   }
 
   function handleChangeRoute() {
@@ -874,6 +924,7 @@ export default function ConversationRoomRuntime({
   }
 
   function handleLooksGoodPlan() {
+    if (!checkoutAdvanceArmedRef.current) return;
     const project = projectDraft ?? bootConversationProjectDraft(draft);
     const route = readSelectedRoute(project);
     const services = readSelectedServices(project);
@@ -965,7 +1016,7 @@ export default function ConversationRoomRuntime({
     setDetailJobId(null);
     paymentCompleteGuardRef.current = false;
     setStageAndPersist("checkout");
-    openPanel("checkout");
+    presentCheckoutSurface();
     speakStudioLine(conversationRoomGuideV1.checkoutVoiceBridge);
   }
 
@@ -1311,7 +1362,7 @@ export default function ConversationRoomRuntime({
     if (payment === "cancel") {
       setPlanBridgeError(studioPaymentV1.customerCopy.paymentCancelled);
       setStageAndPersist("checkout");
-      openPanel("checkout");
+      presentCheckoutSurface();
       return;
     }
     if (payment !== "return" || !sessionId) return;
@@ -1321,7 +1372,7 @@ export default function ConversationRoomRuntime({
     void (async () => {
       setPlanBridgeError(studioPaymentV1.customerCopy.paymentPending);
       setStageAndPersist("checkout");
-      openPanel("checkout");
+      presentCheckoutSurface();
       for (let attempt = 0; attempt < 8; attempt += 1) {
         const result = await reconcileCheckoutClient(sessionId);
         if (cancelled) return;
@@ -1719,6 +1770,7 @@ export default function ConversationRoomRuntime({
   }
 
   const selectedRoute = readSelectedRoute(projectDraft);
+  const displayRoadId = selectedRoute?.roadId ?? previewRoadId;
   const selectedServices = readSelectedServices(projectDraft);
   const selectedJobIds = selectedJobIdSet(selectedServices);
   const planModel =
@@ -1758,10 +1810,22 @@ export default function ConversationRoomRuntime({
         step === "ask_deadline" ||
         step === "ask_materials" ||
         step === "summary")) ||
-    stage === "route";
+    stage === "route" ||
+    stage === "services" ||
+    (isPhone && stage === "plan") ||
+    (isPhone && stage === "checkout");
   const summaryConfirm =
     stage === "opening" && step === "summary" && !correcting;
   const routeChoose = stage === "route";
+  const servicesStage = stage === "services";
+  const phonePlanStage = isPhone && stage === "plan";
+  const phoneCheckoutStage = isPhone && stage === "checkout";
+  const phoneHidesBuilderOverlay =
+    isPhone && stage === "services" && slidePanel === "builder";
+  const phoneHidesCheckoutOverlay =
+    isPhone && stage === "checkout" && slidePanel === "checkout";
+  const phoneHidesSlideOverlay =
+    phoneHidesBuilderOverlay || phoneHidesCheckoutOverlay;
 
   const canChangeAnswer =
     guideHasReviewableAnswers(draft) ||
@@ -1775,12 +1839,18 @@ export default function ConversationRoomRuntime({
       presence={voice.presence}
       loungeLight
       nameQuestion={questionGlass}
-      hidePhoneScaffolding={summaryConfirm || routeChoose}
-      activePanel={activePanel}
+      hidePhoneScaffolding={
+        summaryConfirm ||
+        routeChoose ||
+        servicesStage ||
+        phonePlanStage ||
+        phoneCheckoutStage
+      }
+      activePanel={phoneHidesSlideOverlay ? "none" : activePanel}
       onCloseActivityPanel={closeActivityPanel}
       activityPanelReturnFocusRef={activityReturnFocusRef}
       slideOut={
-        slidePanel ? (
+        slidePanel && !phoneHidesSlideOverlay ? (
           <ConversationActivityPanel
             panel={slidePanel}
             selectedRoadId={
@@ -1801,7 +1871,15 @@ export default function ConversationRoomRuntime({
                 return;
               }
               if (stage === "plan") {
+                if (readPhoneLayout()) {
+                  closeActivityPanel();
+                  return;
+                }
                 openPanel("plan");
+                return;
+              }
+              if (readPhoneLayout() && stage === "services") {
+                closeActivityPanel();
                 return;
               }
               openPanel("builder");
@@ -1818,7 +1896,7 @@ export default function ConversationRoomRuntime({
             onRecoverIntakePayment={() => {
               setDetailJobId(null);
               setStageAndPersist("checkout");
-              openPanel("checkout");
+              presentCheckoutSurface();
             }}
             intakePrefillBusinessName={draft.businessName}
             onIntakeAnswersChange={setIntakeLiveAnswers}
@@ -1902,7 +1980,10 @@ export default function ConversationRoomRuntime({
             ) : null
           }
           modeControls={
-            openingAsk || routeChoose ? (
+            openingAsk ||
+            routeChoose ||
+            (servicesStage && !isPhone) ||
+            phonePlanStage ? (
               <VoicePreferenceControls
                 preference={voiceNarration ?? "off"}
                 onChoose={handleVoiceNarrationPreference}
@@ -1912,9 +1993,12 @@ export default function ConversationRoomRuntime({
           }
           onOpenStagePanel={() => {
             if (stage === "route" || stage === "plan") return;
-            if (stage === "services") {
-              openPanel("builder");
-              return;
+            if (stage === "services" || stage === "checkout") {
+              if (readPhoneLayout()) return;
+              if (stage === "services") {
+                openPanel("builder");
+                return;
+              }
             }
             const panel = STAGE_DEFAULT_PANEL[stage];
             if (panel !== "none") openPanel(panel);
@@ -1931,10 +2015,28 @@ export default function ConversationRoomRuntime({
           }
           selectedServiceCount={selectedJobIds.size}
           selectedRouteLabel={
-            selectedRoute
-              ? getRouteMapRoad(selectedRoute.roadId)?.customerLabel ?? null
+            displayRoadId
+              ? getRouteMapRoad(displayRoadId)?.customerLabel ?? null
               : null
           }
+          selectedRoadId={displayRoadId}
+          selectedJobIds={selectedJobIds}
+          routeGuidance={
+            displayRoadId
+              ? displayRoadId === "random-exit"
+                ? conversationRoomGuideV1.routeDirectTagline
+                : getRouteMapRoad(displayRoadId)?.tagline ?? null
+              : null
+          }
+          phoneLayout={isPhone}
+          onAddJob={handleAddJob}
+          onRemoveJob={handleRemoveJob}
+          onReviewStudioPlan={handleReviewStudioPlan}
+          onViewPlanScope={handleOpenLearnMore}
+          onBackToStudioPlanFromCheckout={handleBackToStudioPlanFromCheckout}
+          onCheckoutPaymentComplete={handleCheckoutPaymentComplete}
+          onSandboxCheckoutConfirm={handleSandboxCheckoutConfirm}
+          onAuthorizeCheckoutPayment={authorizeCheckoutPayment}
           planModel={planModel}
           ma001CompositionMemberLabels={ma001CompositionMemberLabels}
           onEditPlan={handleEditPlan}

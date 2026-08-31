@@ -67,14 +67,17 @@ export function useSamsungTapActivate<T extends HTMLElement>(handler: () => void
   const lastAt = useRef(0);
   const startX = useRef(0);
   const startY = useRef(0);
+  const sawPointerDown = useRef(false);
   const nodeRef = useRef<T | null>(null);
 
   const onPointerDown = useRef((event: PointerEvent) => {
+    sawPointerDown.current = true;
     startX.current = event.clientX;
     startY.current = event.clientY;
   });
 
   const onPointerUp = useRef((event: PointerEvent) => {
+    if (!sawPointerDown.current) return;
     const dx = event.clientX - startX.current;
     const dy = event.clientY - startY.current;
     if (dx * dx + dy * dy > TAP_SLOP_PX * TAP_SLOP_PX) return;
@@ -98,7 +101,15 @@ export function useSamsungTapActivate<T extends HTMLElement>(handler: () => void
   return {
     ref,
     onClick() {
-      if (Date.now() - lastAt.current < 450) return;
+      /* Already handled by pointerup on this node. */
+      if (lastAt.current && Date.now() - lastAt.current < 450) return;
+      /*
+       * Leftover click after Review Studio Plan unmounts. Continue to Checkout
+       * mounts under the same finger and must not inherit that click.
+       * Click-only fallback still works when THIS node saw pointerdown.
+       */
+      if (!sawPointerDown.current) return;
+      lastAt.current = Date.now();
       handlerRef.current();
     },
   };

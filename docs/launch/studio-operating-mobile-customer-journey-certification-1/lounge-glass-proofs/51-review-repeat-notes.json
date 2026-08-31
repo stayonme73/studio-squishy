@@ -1,0 +1,37 @@
+{
+  "sameSession": true,
+  "hardRefresh": false,
+  "notes": [
+    {
+      "msg": "pass-1",
+      "extra": {
+        "stage": "plan"
+      }
+    },
+    {
+      "msg": "wrote",
+      "extra": {
+        "name": "51-review-pass-1-step3-360.png"
+      }
+    },
+    {
+      "msg": "wrote",
+      "extra": {
+        "name": "51-between-passes-step2-360.png"
+      }
+    },
+    {
+      "msg": "pass-2",
+      "extra": {
+        "stage": "plan",
+        "reloaded": false
+      }
+    },
+    {
+      "msg": "wrote",
+      "extra": {
+        "name": "51-review-pass-2-step3-360.png"
+      }
+    }
+  ]
+}

@@ -295,7 +295,11 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(runtime).toContain("step === \"ask_materials\"");
     expect(runtime).toContain("step === \"summary\"");
     expect(runtime).toContain('stage === "route"');
-    expect(runtime).toContain("hidePhoneScaffolding={summaryConfirm || routeChoose}");
+    expect(runtime).toContain("phonePlanStage");
+    expect(runtime).toContain("phoneCheckoutStage");
+    expect(runtime).toContain('stage === "services"');
+    expect(runtime).toContain("(servicesStage && !isPhone)");
+    expect(runtime).toContain("phonePlanStage");
     expect(runtime).toContain(
       'stage === "opening" && step === "summary" && !correcting',
     );
