@@ -371,16 +371,32 @@
 
 ## MJ-D22 — After paid, mobile shows Intake tablet plus a second Project Intake sheet
 
-**Status:** OPEN. Not a payment failure. Not patched in the sandbox-payment checkpoint. Do not fix during Samsung payment testing.
+**Status:** OPEN / PARKED. Not a payment failure. Do **not** fix during Checkout presentation simplification. Do not ask the owner to fill Intake.
 
 **Found:** 2026-09-06 builder sandbox-payment QA after confirmed Maya $69 sandbox pay. Payment truth passed. Studio advanced to Intake. The phone then showed both:
 
 - the Intake tablet (“Preparing your project for production” / **Payment received**)
 - a second **Project Intake** sheet with **Close**
 
-**Do not:** treat this as unpaid; restyle Intake in the payment checkpoint; start Samsung payment testing to debug this overlay.
+**Samsung 2026-09-06:** Reproduced after owner-accepted sandbox payment. Same double surface.
 
-**Later:** Intake UX pass in this same Mobile package, after payment is accepted.
+**Do not:** treat this as unpaid; restyle Intake during Checkout presentation; start Intake testing; ask the owner to complete Intake.
+
+**Later:** Intake UX pass in this same Mobile package, **after** Checkout presentation receives owner visual acceptance.
+
+---
+
+## MJ-D23 — Samsung Checkout has the sandbox query but owner did not see Test pay
+
+**Status:** CLOSED as a serving/viewport miss. Not a missing query. Not a payment-authority defect.
+
+**Found:** 2026-09-06 real Samsung, before the HTTPS process replacement. Address bar confirmed `studio-conversation-room?studioPaymentSandbox=1`. Plan was Promote Something Now / Make Me a Flyer / $69. Terms were checked. Owner did not see **Test pay with sandbox confirm**. Continue to Secure Checkout correctly showed “Card payment is not ready yet.”
+
+**Cause:** The HTTPS `next dev` process serving `:3000` started **2026-09-06 10:48 AM**, before checkpoint `1285728` (16:56). A long-lived Samsung tab could keep pre-checkpoint modules. The fixture also sat below the fold under Continue.
+
+**Resolution:** Replacement HTTPS process from `1285728`. Owner then saw **Test pay with sandbox confirm**, completed sandbox payment, and refresh showed **Payment received** / **Services confirmed**. See `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`.
+
+**Do not:** restyle the entire customer Checkout around the Developer Sandbox fixture; weaken payment guards; treat this as MJ-D22.
 
 ---
 

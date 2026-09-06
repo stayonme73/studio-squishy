@@ -1062,11 +1062,30 @@ describe("Mobile route → services → plan navigation simplification", () => {
     expect(checkout).toContain("phonePage");
     expect(checkout).toContain("studioTileClass.standardLight");
     expect(checkout).toContain("studioTileClass.standardDense");
+    expect(checkout).toContain("styles.checkoutPageSurface");
+    expect(checkout).toContain('data-checkout-surface={phonePage ? "page-content" : "host"}');
     expect(checkout).toContain("compactPaymentHonesty={phonePage}");
     expect(checkout).toContain("if (phonePage)");
     expect(checkout).toContain("resetConversationStageScroll()");
     expect(checkout).toContain("v.checkoutLead");
     expect(checkout).toContain("phonePage ? null : (");
     expect(checkout).toContain("v.checkoutScopeDisclosure");
+    const activityCss = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/conversation-activity-panel.module.css",
+      ),
+      "utf8",
+    );
+    const pageSurface = activityCss.slice(
+      activityCss.indexOf(".checkoutPageSurface {"),
+      activityCss.indexOf(".checkoutPageSurface :global(.pay-shell)"),
+    );
+    expect(pageSurface).toContain("overflow: visible");
+    expect(pageSurface).not.toContain("overflow: auto");
+    expect(activityCss).toContain(
+      ".checkoutPageSurface :global(.co-card) {",
+    );
+    expect(activityCss).toContain("background: transparent");
   });
 });

@@ -178,7 +178,12 @@ export default function ConversationCheckoutPanel({
       </button>
 
       <div
-        className={`${styles.checkoutHostSurface} ${studioTileClass.standardDense} ${utilityPageFontClassName}`}
+        className={
+          phonePage
+            ? `${styles.checkoutPageSurface} ${utilityPageFontClassName}`
+            : `${styles.checkoutHostSurface} ${studioTileClass.standardDense} ${utilityPageFontClassName}`
+        }
+        data-checkout-surface={phonePage ? "page-content" : "host"}
       >
         <SecureCheckoutGrid
           layout="full"

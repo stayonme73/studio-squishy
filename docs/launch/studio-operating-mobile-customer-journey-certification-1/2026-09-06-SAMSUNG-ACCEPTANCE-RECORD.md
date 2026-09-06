@@ -98,7 +98,35 @@ OWNER ACCEPTED evidence for Step 3 → Checkout stage-entry scroll reset.
 
 Checkout → Back to Studio Plan returned to the **top** of Step 3. Route, Make Me a Flyer, $69, and Voice Off remained. Checkout scroll was not inherited.
 
-Sandbox payment was **not** completed on this run.
+Sandbox payment was **not** completed on this first Checkout-return run.
+
+## Sandbox payment (later the same day)
+
+After replacement of the stale pre-checkpoint HTTPS server process, the real Samsung correctly displayed the Developer Sandbox fixture with `studioPaymentSandbox=1`.
+
+Owner confirmed on Samsung:
+
+- Route: Promote Something Now
+- Service: Make Me a Flyer
+- Amount: $69
+- required confirmation checkbox worked
+- sandbox confirmation remained disabled until confirmation was checked
+- **Test pay with sandbox confirm** appeared separately from **Continue to Secure Checkout**
+- owner tapped **Test pay with sandbox confirm** once
+- Studio advanced to Project Intake
+- owner refreshed the real Samsung browser
+- after refresh the Studio explicitly displayed **Payment received** and **Services confirmed**
+- paid state survived refresh
+
+No real card was used. Stripe hosted Checkout was **not** certified because Stripe is not configured on this certification server.
+
+**OWNER ACCEPTED:** Local Developer Sandbox confirmation through the server-authoritative `sandbox-confirm` path.
+
+**NOT CERTIFIED:** Real Stripe hosted Checkout / real processor payment.
+
+Do not overstate this as processor certification. Do not run another owner Samsung payment merely to prove Checkout CSS.
+
+**MJ-D22:** Reproduced on this paid Samsung path (underlying “Preparing your project for production” plus foreground Project Intake with Close). Remains **OPEN / PARKED**. Do not fill Intake. Do not fix MJ-D22 until Checkout presentation receives owner visual acceptance.
 
 ## Persistent shell
 
@@ -109,9 +137,10 @@ This does **not** close every remaining visual issue.
 ## Explicitly not proven
 
 - Use Voice guidance
-- Sandbox payment complete
-- Intake, upload, rights, Board, review, approval, delivery
+- Real Stripe hosted Checkout / real processor payment
+- Intake (MJ-D22 OPEN / PARKED), upload, rights, Board, review, approval, delivery
 - Studio Review controls (MJ-D21 Studio Review remains recorded, not fixed)
 - Step 3 Standard Light tile appearance
 - Studio Review → Lobby (MJ-D11)
+- Simplified Checkout presentation (pending owner visual acceptance)
 - Package certification

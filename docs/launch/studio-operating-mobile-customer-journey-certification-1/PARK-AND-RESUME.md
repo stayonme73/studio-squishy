@@ -2,7 +2,7 @@
 
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`
 
-**Current (2026-09-06):** Package remains **OPEN / IN PROGRESS**, **not closed**, **not certified**. Owner Samsung acceptance through Checkout return is recorded in `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`. Next live surface: complete sandbox payment on Checkout. Do not begin Supervision. Do not merge.
+**Current (2026-09-06):** Package remains **OPEN / IN PROGRESS**, **not closed**, **not certified**. Owner Samsung acceptance through Checkout return plus later **sandbox-confirm payment** is recorded in `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`. Stripe hosted Checkout is **not** certified. Next live surface: owner visual acceptance of simplified mobile Checkout. Do not begin MJ-D22. Do not begin Supervision. Do not merge.
 
 The 2026-08-23 park below is historical. Do not treat it as the current execution state.
 

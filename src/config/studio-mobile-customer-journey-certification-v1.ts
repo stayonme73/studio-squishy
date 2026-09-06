@@ -129,7 +129,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   stoppingPointCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-25-STOPPING-POINT-CHECKPOINT.md" as const,
   nextPhoneAction:
-    "Complete sandbox payment on Checkout for the current Maya / Promote Something Now / Make Me a Flyer plan. Do not restart unless the owner chooses a fresh hire. Package is not closed." as const,
+    "Owner visual acceptance of simplified mobile Checkout. Do not run another payment. Do not begin MJ-D22 Intake. Package is not closed." as const,
   parkAndResumeDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/PARK-AND-RESUME.md" as const,
   supervisionDependencyAuditDoc:
@@ -142,7 +142,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   journeyRouteMapDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/JOURNEY-ROUTE-AND-CONTROL-MAP.md" as const,
   recommendedFirstExecutionStep:
-    "Complete sandbox payment on Checkout for the current Maya / Promote Something Now / Make Me a Flyer plan. Do not restart unless the owner chooses a fresh hire. Package is not closed." as const,
+    "Owner visual acceptance of simplified mobile Checkout. Do not run another payment. Do not begin MJ-D22 Intake. Package is not closed." as const,
   visualMaster: "MOBILE_VISUAL_MASTER" as const,
   voiceChoiceStatus: "OWNER_ACCEPTED" as const,
   voiceChoiceAcceptedAt: "2026-08-29" as const,
@@ -164,7 +164,10 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   mjd16ManualEntryStatus: "OWNER_ACCEPTED" as const,
   mjd16ManualEntryAcceptedAt: "2026-09-06" as const,
   checkoutStageEntryScrollStatus: "OWNER_ACCEPTED" as const,
-  checkoutPaymentStatus: "NOT_COMPLETED" as const,
+  checkoutPaymentStatus: "SANDBOX_OWNER_ACCEPTED_STRIPE_NOT_CERTIFIED" as const,
+  checkoutSandboxPaymentAcceptedAt: "2026-09-06" as const,
+  checkoutPresentationStatus: "PENDING_OWNER_VISUAL_ACCEPTANCE" as const,
+  mjd22Status: "OPEN_PARKED_UNTIL_CHECKOUT_VISUAL_ACCEPTANCE" as const,
   reuseLockedMobileVisualSystem: true as const,
   tonightMobileVisualCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-29-TONIGHT-MOBILE-VISUAL-CHECKPOINT.md" as const,

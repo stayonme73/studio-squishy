@@ -30,7 +30,7 @@ Readiness and preflight tests do not stamp certification. Prior phone-390 / resp
 
 | # | Requirement | Current | Evidence | Close condition |
 |---|-------------|---------|----------|-----------------|
-| J1 | Hire and complete sandbox payment | ⚠️ | 2026-09-06 Samsung: hire through Checkout open/return; payment not completed | Re-proven sandbox pay complete on real phone |
+| J1 | Hire and complete sandbox payment | ⚠️ | 2026-09-06 Samsung: hire through Checkout; later **sandbox-confirm OWNER ACCEPTED** (Maya $69). Stripe hosted Checkout **not** certified | Full hire + pay seal still requires processor path when Stripe is configured |
 | J2 | Finish intake and upload files | ⚠️ | Phone 390 intake exists; Gate X uploads were not this phone cert | Live phone intake + multipart upload |
 | J3 | Complete rights certification | ⚠️ | Gate X desktop live path | Same live rights path completed on the phone |
 | J4 | Communicate and track status | ⚠️ | Board composer / in-product notification phone notes | Live phone communicate + track |

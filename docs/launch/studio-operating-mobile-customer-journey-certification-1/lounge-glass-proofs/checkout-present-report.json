@@ -1,0 +1,101 @@
+{
+  "ok": true,
+  "checks": {
+    "opensAtTop": true,
+    "planCorrect": true,
+    "threeLayerShell": true,
+    "noNestedHostSurface": true,
+    "pageSurfaceDoesNotOwnScroll": true,
+    "cardsFlattened": true,
+    "continueIsDenimCta": true,
+    "sandboxVisibleAuthorized": true,
+    "sandboxDisabledUntilTerms": true,
+    "continueWithoutTermsBlocked": true,
+    "checkboxWorks": true,
+    "sandboxEnabledAfterTerms": true,
+    "continueNotSandbox": true,
+    "continueNeedsProcessor": true,
+    "continueDidNotMarkPaid": true,
+    "sandboxRemainsSeparate": true,
+    "backToPlan": true,
+    "sandboxHiddenWithoutQuery": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\checkout-present-01-top.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\checkout-present-02-actions.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\checkout-present-03-continue-unconfigured.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\checkout-present-04-back-to-plan.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\checkout-present-05-no-sandbox-query.png"
+  ],
+  "steps": [
+    "voice-choice",
+    "fill-it-out-myself",
+    "name",
+    "need",
+    "business",
+    "deadline",
+    "materials",
+    "summary",
+    "route",
+    "add-flyer",
+    "plan",
+    "checkout"
+  ],
+  "api": {
+    "checkoutSession": [
+      {
+        "preferSandbox": false,
+        "status": 503,
+        "error": "processor_not_configured",
+        "mode": null
+      }
+    ]
+  },
+  "pageErrors": [],
+  "opened": {
+    "headingCheckout": true,
+    "promote": true,
+    "flyer": true,
+    "sixtyNine": true,
+    "lounge": true,
+    "frost": true,
+    "pageSurface": true,
+    "hostSurface": false,
+    "pageOverflow": "visible",
+    "pageOverflowY": "visible",
+    "panelOverflowY": "auto",
+    "panelScrollTop": 0,
+    "docScrollTop": 0,
+    "cards": [
+      {
+        "background": "rgba(0, 0, 0, 0)",
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "borderTopWidth": "0px"
+      },
+      {
+        "background": "rgba(0, 0, 0, 0)",
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "borderTopWidth": "1px"
+      },
+      {
+        "background": "rgba(0, 0, 0, 0)",
+        "backdropFilter": "none",
+        "boxShadow": "none",
+        "borderTopWidth": "0px"
+      }
+    ],
+    "continueClass": "lobby-entry-film__cta co-submit",
+    "continueText": "Continue to secure checkout",
+    "continueBackground": "rgb(84, 124, 146)",
+    "termsChecked": false,
+    "sandboxVisible": true,
+    "sandboxLabel": true,
+    "sandboxDisabled": true,
+    "sandboxQuery": true,
+    "error": null
+  },
+  "stripeAttemptError": "Card payment is not ready yet. Please try again later or contact The Studio.",
+  "failed": []
+}

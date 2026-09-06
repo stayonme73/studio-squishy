@@ -1299,6 +1299,41 @@
   width: 100%;
 }
 
+/*
+ * Phone Checkout lives inside the persistent workspace glass.
+ * Do not paint a second dense tile / nested scroller around payment.
+ * Desktop overlay Checkout keeps .checkoutHostSurface unchanged.
+ */
+.checkoutPageSurface {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+.checkoutPageSurface :global(.pay-shell) {
+  width: 100%;
+}
+
+.checkoutPageSurface :global(.co-card) {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.checkoutPageSurface :global(.co-card--confirm) {
+  border-top: 1px solid
+    var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  padding-top: 1rem;
+}
+
 .checkoutHonestyNote {
   margin: 0.85rem 0 0;
   font-size: 0.95rem;
