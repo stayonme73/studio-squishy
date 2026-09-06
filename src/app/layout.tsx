@@ -6,6 +6,7 @@ import { siteConfig } from "@/config/site";
 import OwnerQaRoot from "@/components/dev/OwnerQaRoot";
 import { StudioMobileUtilityProvider } from "@/components/dev/studio-mobile-utility";
 import ClientSessionTimeoutGuard from "@/components/auth/ClientSessionTimeoutGuard";
+import StudioEnvironmentShell from "@/components/studio-environment/StudioEnvironmentShell";
 import StudioPresenceRoot from "@/components/studio-presence/StudioPresenceRoot";
 
 import "./globals.css";
@@ -52,13 +53,16 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${comicNeue.variable} h-full antialiased`}
     >
       <body className="flex min-h-[100dvh] flex-col overflow-x-hidden">
-        <StudioMobileUtilityProvider>
-          <StudioPresenceRoot>
-            {children}
-            <ClientSessionTimeoutGuard />
-          </StudioPresenceRoot>
-          <OwnerQaRoot />
-        </StudioMobileUtilityProvider>
+        <StudioEnvironmentShell />
+        <div className="studio-environment-app">
+          <StudioMobileUtilityProvider>
+            <StudioPresenceRoot>
+              {children}
+              <ClientSessionTimeoutGuard />
+            </StudioPresenceRoot>
+            <OwnerQaRoot />
+          </StudioMobileUtilityProvider>
+        </div>
       </body>
     </html>
   );

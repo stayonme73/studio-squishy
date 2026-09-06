@@ -66,6 +66,28 @@ export function nextGuideStep(step: GuideConversationStep): GuideConversationSte
   }
 }
 
+/** Reverse of nextGuideStep. First question returns null — Voice Choice is previous. */
+export function previousGuideStep(
+  step: GuideConversationStep,
+): GuideConversationStep | null {
+  switch (step) {
+    case "ask_project_need":
+      return "ask_preferred_name";
+    case "ask_business_name":
+      return "ask_project_need";
+    case "ask_deadline":
+      return "ask_business_name";
+    case "ask_materials":
+      return "ask_deadline";
+    case "summary":
+      return "ask_materials";
+    case "confirmed":
+      return "summary";
+    default:
+      return null;
+  }
+}
+
 export function writeGuideUiStep(step: GuideConversationStep): void {
   memoryStep = step;
   if (typeof window === "undefined") return;

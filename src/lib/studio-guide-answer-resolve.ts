@@ -99,6 +99,24 @@ export function visibleBubblesForStoredAnswer(input: {
 }
 
 /**
+ * Business name: a typed name and the shortcut chips are mutually exclusive.
+ * Typing a real name clears incompatible shortcuts. A shortcut that matches
+ * the typed value stays selected.
+ */
+export function exclusiveBusinessNameBubbles(input: {
+  typed: string;
+  selectedBubbles: readonly string[];
+  shortcutBubbles: readonly string[];
+}): string[] {
+  const typed = input.typed.trim();
+  if (!typed) return [...input.selectedBubbles];
+  if (input.shortcutBubbles.includes(typed)) {
+    return input.shortcutBubbles.filter((bubble) => bubble === typed);
+  }
+  return [];
+}
+
+/**
  * Permanent-dock Send semantics.
  * Guide questions: always submit via the same path as tablet Continue.
  * Free ask: send only when there is typed text (otherwise the control is inactive).

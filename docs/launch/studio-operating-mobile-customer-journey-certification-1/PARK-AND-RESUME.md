@@ -2,7 +2,7 @@
 
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`
 
-**Current (2026-08-25):** Tagia unparked this package. The live Samsung run is **OPEN / IN PROGRESS**, **not closed**, **not certified**. Stopping point: `2026-08-25-STOPPING-POINT-CHECKPOINT.md`. Next phone action: Close and reopen Choose your services → scroll → Add to Project on Make My Social Media Posts.
+**Current (2026-09-06):** Package remains **OPEN / IN PROGRESS**, **not closed**, **not certified**. Owner Samsung acceptance through Checkout return is recorded in `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`. Next live surface: complete sandbox payment on Checkout. Do not begin Supervision. Do not merge.
 
 The 2026-08-23 park below is historical. Do not treat it as the current execution state.
 
@@ -71,4 +71,4 @@ See `SUPERVISION-DEPENDENCY-AUDIT.md` in this folder. Short form:
 
 ## What Tagia did **not** do at the 2026-08-23 park
 
-Do not treat the 2026-08-23 park as current. Owner unparked on 2026-08-25. Current next phone action is in `2026-08-25-STOPPING-POINT-CHECKPOINT.md`.
+Do not treat the 2026-08-23 park as current. Owner unparked on 2026-08-25. Current Samsung acceptance record: `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`.

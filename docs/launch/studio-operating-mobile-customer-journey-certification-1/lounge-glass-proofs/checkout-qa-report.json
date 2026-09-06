@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "pathUsed": "live-customer-walk",
+  "steps": [
+    "voice-choice",
+    "fill-it-out-myself",
+    "name",
+    "need",
+    "business",
+    "deadline",
+    "materials",
+    "summary",
+    "route",
+    "add-flyer",
+    "plan",
+    "checkout"
+  ],
+  "continueButton": {
+    "tag": "A",
+    "className": "lobby-entry-film__cta co-submit",
+    "text": "Continue to secure checkout",
+    "background": "rgb(84, 124, 146)",
+    "color": "rgb(247, 244, 238)",
+    "minHeight": "52px",
+    "fontWeight": "700",
+    "disabled": null
+  },
+  "backLink": {
+    "className": "conversation-activity-panel-module__Jiv-Ya__backLink",
+    "text": "← Back to Studio Plan",
+    "background": "rgba(0, 0, 0, 0)",
+    "color": "rgb(69, 107, 90)",
+    "fontWeight": "650"
+  },
+  "confirmGuard": {
+    "termsChecked": false,
+    "alertText": "I reviewed my Studio Plan and understand that confirming checkout and completing Project Intake are required before work can move forward.",
+    "stillOnCheckout": true,
+    "url": "https://localhost:3000/studio-conversation-room?studioPaymentSandbox=1"
+  },
+  "primaryOk": true,
+  "secondaryOk": true,
+  "guardOk": true
+}

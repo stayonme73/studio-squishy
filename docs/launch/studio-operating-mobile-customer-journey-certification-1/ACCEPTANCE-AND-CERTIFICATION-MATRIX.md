@@ -2,7 +2,10 @@
 
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`  
 **Status:** OPEN — readiness prepared; **no real-phone results stamped**  
-**Date:** 2026-08-22
+**Date:** 2026-08-22  
+**Owner Samsung 2026-09-06:** Partial live-phone evidence recorded in `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`. That run is **not** a package certification stamp.
+
+Legend: ✅ proven · ⚠️ partial · ❌ missing · 🚫 not in scope
 
 Legend: ✅ proven · ⚠️ partial · ❌ missing · 🚫 not in scope
 
@@ -14,7 +17,7 @@ Readiness and preflight tests do not stamp certification. Prior phone-390 / resp
 
 | # | Requirement | Current | Evidence | Close condition |
 |---|-------------|---------|----------|-----------------|
-| D1 | Real phone, not viewport-shrink only | ❌ | 4C notes / phone-390 are not this cert | Live real-phone run sealed |
+| D1 | Real phone, not viewport-shrink only | ⚠️ | 2026-09-06 Samsung run through Checkout return | Full eight-proof live-phone seal |
 | D2 | Touch controls usable | ❌ | | Buttons, uploads, payment, review tools work by touch |
 | D3 | Readable text | ❌ | | No required browser zoom |
 | D4 | Usable forms | ❌ | | Intake, rights, feedback, approval complete on the phone |
@@ -27,7 +30,7 @@ Readiness and preflight tests do not stamp certification. Prior phone-390 / resp
 
 | # | Requirement | Current | Evidence | Close condition |
 |---|-------------|---------|----------|-----------------|
-| J1 | Hire and complete sandbox payment | ⚠️ | Customer-One E2E phone 390 hire/pay | Re-proven on real phone for this package |
+| J1 | Hire and complete sandbox payment | ⚠️ | 2026-09-06 Samsung: hire through Checkout open/return; payment not completed | Re-proven sandbox pay complete on real phone |
 | J2 | Finish intake and upload files | ⚠️ | Phone 390 intake exists; Gate X uploads were not this phone cert | Live phone intake + multipart upload |
 | J3 | Complete rights certification | ⚠️ | Gate X desktop live path | Same live rights path completed on the phone |
 | J4 | Communicate and track status | ⚠️ | Board composer / in-product notification phone notes | Live phone communicate + track |

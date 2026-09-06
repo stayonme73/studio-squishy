@@ -1,0 +1,159 @@
+{
+  "ok": true,
+  "steps": [
+    "lets-get-started",
+    "voice-choice",
+    "name",
+    "services",
+    "plan",
+    "checkout",
+    "sign-in",
+    "board",
+    "review"
+  ],
+  "samples": {
+    "letsGetStarted": {
+      "present": true,
+      "src": "/welcome-hall/studio-lobby-lounge.png?v=1",
+      "objectPosition": "16% 42%",
+      "objectFit": "cover",
+      "veilBackground": "rgba(46, 43, 40, 0.18)",
+      "plateFilter": "blur(2px)",
+      "veilFilter": "none",
+      "utilityDisplay": "absent",
+      "pixels": {
+        "topLeft": "rgb(72, 56, 41)",
+        "topCenter": "rgb(213, 178, 124)"
+      }
+    },
+    "voiceChoice": {
+      "present": true,
+      "src": "/welcome-hall/studio-lobby-lounge.png?v=1",
+      "objectPosition": "16% 42%",
+      "objectFit": "cover",
+      "veilBackground": "rgba(46, 43, 40, 0.18)",
+      "plateFilter": "blur(2px)",
+      "veilFilter": "none",
+      "utilityDisplay": "absent",
+      "pixels": {
+        "topLeft": "rgb(71, 55, 40)",
+        "topCenter": "rgb(226, 205, 173)"
+      }
+    },
+    "name": {
+      "present": true,
+      "src": "/welcome-hall/studio-lobby-lounge.png?v=1",
+      "objectPosition": "16% 42%",
+      "objectFit": "cover",
+      "veilBackground": "rgba(46, 43, 40, 0.18)",
+      "plateFilter": "blur(2px)",
+      "veilFilter": "none",
+      "utilityDisplay": "absent",
+      "pixels": {
+        "topLeft": "rgb(71, 55, 40)",
+        "topCenter": "rgb(226, 205, 173)"
+      }
+    },
+    "services": {
+      "present": true,
+      "src": "/welcome-hall/studio-lobby-lounge.png?v=1",
+      "objectPosition": "16% 42%",
+      "objectFit": "cover",
+      "veilBackground": "rgba(46, 43, 40, 0.18)",
+      "plateFilter": "blur(2px)",
+      "veilFilter": "none",
+      "utilityDisplay": "absent",
+      "pixels": {
+        "topLeft": "rgb(71, 55, 40)",
+        "topCenter": "rgb(226, 205, 173)"
+      }
+    },
+    "plan": {
+      "present": true,
+      "src": "/welcome-hall/studio-lobby-lounge.png?v=1",
+      "objectPosition": "16% 42%",
+      "objectFit": "cover",
+      "veilBackground": "rgba(46, 43, 40, 0.18)",
+      "plateFilter": "blur(2px)",
+      "veilFilter": "none",
+      "utilityDisplay": "absent",
+      "pixels": {
+        "topLeft": "rgb(71, 55, 40)",
+        "topCenter": "rgb(213, 178, 124)"
+      }
+    },
+    "checkout": {
+      "present": true,
+      "src": "/welcome-hall/studio-lobby-lounge.png?v=1",
+      "objectPosition": "16% 42%",
+      "objectFit": "cover",
+      "veilBackground": "rgba(46, 43, 40, 0.18)",
+      "plateFilter": "blur(2px)",
+      "veilFilter": "none",
+      "utilityDisplay": "absent",
+      "pixels": {
+        "topLeft": "rgb(71, 55, 40)",
+        "topCenter": "rgb(236, 225, 205)"
+      }
+    },
+    "signIn": {
+      "present": true,
+      "src": "/welcome-hall/studio-lobby-lounge.png?v=1",
+      "objectPosition": "16% 42%",
+      "objectFit": "cover",
+      "veilBackground": "rgba(46, 43, 40, 0.18)",
+      "plateFilter": "blur(2px)",
+      "veilFilter": "none",
+      "utilityDisplay": "none",
+      "pixels": {
+        "topLeft": "rgb(72, 56, 41)",
+        "topCenter": "rgb(230, 214, 185)"
+      }
+    },
+    "board": {
+      "present": true,
+      "src": "/welcome-hall/studio-lobby-lounge.png?v=1",
+      "objectPosition": "16% 42%",
+      "objectFit": "cover",
+      "veilBackground": "rgba(46, 43, 40, 0.18)",
+      "plateFilter": "blur(2px)",
+      "veilFilter": "none",
+      "utilityDisplay": "none",
+      "pixels": {
+        "topLeft": "rgb(72, 56, 41)",
+        "topCenter": "rgb(230, 214, 185)"
+      }
+    },
+    "review": {
+      "present": true,
+      "src": "/welcome-hall/studio-lobby-lounge.png?v=1",
+      "objectPosition": "16% 42%",
+      "objectFit": "cover",
+      "veilBackground": "rgba(46, 43, 40, 0.18)",
+      "plateFilter": "blur(2px)",
+      "veilFilter": "none",
+      "utilityDisplay": "none",
+      "pixels": {
+        "topLeft": "rgb(72, 56, 41)",
+        "topCenter": "rgb(230, 214, 185)"
+      }
+    },
+    "desktopLobby": {
+      "present": true,
+      "src": "/welcome-hall/studio-lobby-lounge.png?v=1",
+      "objectPosition": "50% 50%",
+      "objectFit": "cover",
+      "veilBackground": "rgba(46, 43, 40, 0.18)",
+      "plateFilter": "blur(2px)",
+      "veilFilter": "none",
+      "utilityDisplay": "absent",
+      "pixels": {
+        "topLeft": "rgb(54, 46, 37)",
+        "topCenter": "rgb(81, 57, 38)"
+      }
+    }
+  },
+  "shellOk": true,
+  "cornersMatch": true,
+  "desktopCropOk": true
+}

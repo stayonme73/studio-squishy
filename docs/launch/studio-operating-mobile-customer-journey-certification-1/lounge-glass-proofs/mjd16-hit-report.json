@@ -1,0 +1,300 @@
+{
+  "ok": true,
+  "attempts": [
+    {
+      "viewport": {
+        "name": "phone-780",
+        "width": 360,
+        "height": 780
+      },
+      "before": {
+        "viewport": {
+          "w": 360,
+          "h": 780,
+          "dvh": 780
+        },
+        "fillBox": {
+          "top": 365.703125,
+          "bottom": 417.703125,
+          "left": 73.59375,
+          "right": 286.390625,
+          "width": 212.796875,
+          "height": 52,
+          "z": "auto",
+          "pe": "auto",
+          "display": "flex"
+        },
+        "voiceBox": {
+          "top": 294.515625,
+          "bottom": 346.515625,
+          "left": 73.59375,
+          "right": 286.390625,
+          "width": 212.796875,
+          "height": 52,
+          "z": "auto",
+          "pe": "auto",
+          "display": "flex"
+        },
+        "reviewBox": {
+          "top": 728,
+          "bottom": 780,
+          "left": 0,
+          "right": 360,
+          "width": 360,
+          "height": 52,
+          "z": "10050",
+          "pe": "none",
+          "display": "flex"
+        },
+        "frostBox": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "width": 0,
+          "height": 0,
+          "z": "auto",
+          "pe": "none",
+          "display": "none"
+        },
+        "filmBox": {
+          "top": 0,
+          "bottom": 780,
+          "left": 0,
+          "right": 360,
+          "width": 360,
+          "height": 780,
+          "z": "40",
+          "pe": "auto",
+          "display": "flex"
+        },
+        "backBox": {
+          "top": 61.1875,
+          "bottom": 83.265625,
+          "left": 36.1875,
+          "right": 235.328125,
+          "width": 199.140625,
+          "height": 22.078125,
+          "z": "1",
+          "pe": "auto",
+          "display": "inline-block"
+        },
+        "fillCenter": {
+          "x": 179.9921875,
+          "y": 391.703125,
+          "tag": "SPAN",
+          "id": "",
+          "className": "",
+          "action": null,
+          "review": false,
+          "film": true,
+          "frost": false,
+          "text": "Fill it out myself"
+        },
+        "fillBottom": {
+          "x": 179.9921875,
+          "y": 413.703125,
+          "tag": "A",
+          "id": "",
+          "className": "voice-choice-film-module___pRQQa__cta lobby-entry-film__cta",
+          "action": "off",
+          "review": false,
+          "film": true,
+          "frost": false,
+          "text": "Fill it out myself"
+        },
+        "voiceCenter": {
+          "x": 179.9921875,
+          "y": 320.515625,
+          "tag": "SPAN",
+          "id": "",
+          "className": "",
+          "action": null,
+          "review": false,
+          "film": true,
+          "frost": false,
+          "text": "Use Voice guidance"
+        },
+        "overlapReview": false,
+        "fillHittable": false,
+        "voiceHittable": false
+      },
+      "events": [
+        {
+          "action": "off",
+          "type": "pointerdown",
+          "pe": false,
+          "cancelable": true
+        },
+        {
+          "action": "off",
+          "type": "pointerup",
+          "pe": false,
+          "cancelable": true
+        },
+        {
+          "action": "off",
+          "type": "touchend",
+          "pe": false,
+          "cancelable": true
+        }
+      ],
+      "afterTap": {
+        "gate": false,
+        "name": true,
+        "listening": false,
+        "voiceOff": true
+      }
+    },
+    {
+      "viewport": {
+        "name": "phone-urlbar",
+        "width": 360,
+        "height": 640
+      },
+      "before": {
+        "viewport": {
+          "w": 360,
+          "h": 640,
+          "dvh": 640
+        },
+        "fillBox": {
+          "top": 365.703125,
+          "bottom": 417.703125,
+          "left": 73.59375,
+          "right": 286.390625,
+          "width": 212.796875,
+          "height": 52,
+          "z": "auto",
+          "pe": "auto",
+          "display": "flex"
+        },
+        "voiceBox": {
+          "top": 294.515625,
+          "bottom": 346.515625,
+          "left": 73.59375,
+          "right": 286.390625,
+          "width": 212.796875,
+          "height": 52,
+          "z": "auto",
+          "pe": "auto",
+          "display": "flex"
+        },
+        "reviewBox": {
+          "top": 588,
+          "bottom": 640,
+          "left": 0,
+          "right": 360,
+          "width": 360,
+          "height": 52,
+          "z": "10050",
+          "pe": "none",
+          "display": "flex"
+        },
+        "frostBox": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "width": 0,
+          "height": 0,
+          "z": "auto",
+          "pe": "none",
+          "display": "none"
+        },
+        "filmBox": {
+          "top": 0,
+          "bottom": 640,
+          "left": 0,
+          "right": 360,
+          "width": 360,
+          "height": 640,
+          "z": "40",
+          "pe": "auto",
+          "display": "flex"
+        },
+        "backBox": {
+          "top": 61.1875,
+          "bottom": 83.265625,
+          "left": 36.1875,
+          "right": 235.328125,
+          "width": 199.140625,
+          "height": 22.078125,
+          "z": "1",
+          "pe": "auto",
+          "display": "inline-block"
+        },
+        "fillCenter": {
+          "x": 179.9921875,
+          "y": 391.703125,
+          "tag": "SPAN",
+          "id": "",
+          "className": "",
+          "action": null,
+          "review": false,
+          "film": true,
+          "frost": false,
+          "text": "Fill it out myself"
+        },
+        "fillBottom": {
+          "x": 179.9921875,
+          "y": 413.703125,
+          "tag": "A",
+          "id": "",
+          "className": "voice-choice-film-module___pRQQa__cta lobby-entry-film__cta",
+          "action": "off",
+          "review": false,
+          "film": true,
+          "frost": false,
+          "text": "Fill it out myself"
+        },
+        "voiceCenter": {
+          "x": 179.9921875,
+          "y": 320.515625,
+          "tag": "SPAN",
+          "id": "",
+          "className": "",
+          "action": null,
+          "review": false,
+          "film": true,
+          "frost": false,
+          "text": "Use Voice guidance"
+        },
+        "overlapReview": false,
+        "fillHittable": false,
+        "voiceHittable": false
+      },
+      "events": [
+        {
+          "action": "off",
+          "type": "pointerdown",
+          "pe": false,
+          "cancelable": true
+        },
+        {
+          "action": "off",
+          "type": "pointerup",
+          "pe": false,
+          "cancelable": true
+        },
+        {
+          "action": "off",
+          "type": "touchend",
+          "pe": false,
+          "cancelable": true
+        }
+      ],
+      "afterTap": {
+        "gate": false,
+        "name": true,
+        "listening": false,
+        "voiceOff": true
+      }
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+  ]
+}

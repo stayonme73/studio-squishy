@@ -1,3 +1,6 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { studioLaunchReadinessExecutionOrderV1 } from "@/config/studio-launch-readiness-execution-order-v1";
@@ -16,7 +19,11 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     );
     expect(cfg.unparkedAt).toBe("2026-08-25");
     expect(cfg.livePhoneCertification).toBe("IN_PROGRESS_NOT_CERTIFIED");
-    expect(cfg.nextPhoneAction).toContain("Make My Social Media Posts");
+    expect(cfg.nextPhoneAction).toContain("Complete sandbox payment on Checkout");
+    expect(cfg.nextMobileScreen).toBe("checkout");
+    expect(cfg.mjd16ManualEntryStatus).toBe("OWNER_ACCEPTED");
+    expect(cfg.checkoutStageEntryScrollStatus).toBe("OWNER_ACCEPTED");
+    expect(cfg.checkoutPaymentStatus).toBe("NOT_COMPLETED");
     expect(cfg.stoppingPointCheckpointDoc).toContain(
       "2026-08-25-STOPPING-POINT-CHECKPOINT.md",
     );
@@ -51,7 +58,7 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.voiceChoiceStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.visualMaster).toBe("MOBILE_VISUAL_MASTER");
     expect(cfg.nameQuestionStatus).toBe("OWNER_ACCEPTED");
-    expect(cfg.nextMobileScreen).toBe("services");
+    expect(cfg.nextMobileScreen).toBe("checkout");
     expect(cfg.reuseLockedMobileVisualSystem).toBe(true);
     expect(cfg.projectNeedStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.businessNameStatus).toBe("OWNER_ACCEPTED");
@@ -68,6 +75,34 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.chooseYourRouteCheckpointDoc).toContain(
       "2026-08-30-CHOOSE-YOUR-ROUTE-CHECKPOINT.md",
     );
+    expect(cfg.step3StandardLightVisualStatus).toBe(
+      "OPEN_FOLLOW_UP_NOT_OWNER_APPROVED",
+    );
+    expect(cfg.step3StandardLightVisualFollowUpAt).toBe("2026-09-05");
+    expect(cfg.step3StandardLightVisualFollowUpDoc).toContain(
+      "2026-09-05-STEP-3-STANDARD-LIGHT-VISUAL-FOLLOW-UP.md",
+    );
+    expect(cfg.selfCheckBeforeOwnerHandoff.status).toBe("LOCKED");
+    expect(cfg.selfCheckBeforeOwnerHandoff.lockedAt).toBe("2026-09-05");
+    expect(cfg.selfCheckBeforeOwnerHandoff.appliesForRemainderOfPackage).toBe(
+      true,
+    );
+    expect(cfg.selfCheckBeforeOwnerHandoff.sequence).toBe(
+      "builder-qa-proof-then-owner-acceptance",
+    );
+    expect(cfg.selfCheckBeforeOwnerHandoff.ownerSamsungRole).toBe(
+      "FINAL_ACCEPTANCE_NOT_FIRST_QA",
+    );
+    expect(cfg.selfCheckBeforeOwnerHandoff.doNotReturnUnverifiedWork).toBe(true);
+    expect(
+      cfg.selfCheckBeforeOwnerHandoff.doNotChangeProductionToInspectFastStates,
+    ).toBe(true);
+    expect(existsSync(join(process.cwd(), cfg.samsungAcceptance20260906Doc))).toBe(
+      true,
+    );
+    expect(
+      existsSync(join(process.cwd(), cfg.selfCheckBeforeOwnerHandoff.cursorRule)),
+    ).toBe(true);
     expect(cfg.proofMustInclude).toHaveLength(8);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoom).toBe(4);
     expect(studioLaunchReadinessExecutionOrderV1.currentActiveRoomClosed).toBe(false);

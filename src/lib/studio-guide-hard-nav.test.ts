@@ -6,6 +6,7 @@ import {
   applyGuideAnswerToDraft,
   clearGuideUiStep,
   nextGuideStep,
+  previousGuideStep,
   processGuideHardNavSearchParams,
   resolveGuideOpenStep,
   writeGuideUiStep,
@@ -94,6 +95,11 @@ describe("studio-guide-hard-nav", () => {
     expect(nextGuideStep("ask_business_name")).toBe("ask_deadline");
     expect(nextGuideStep("ask_deadline")).toBe("ask_materials");
     expect(nextGuideStep("ask_materials")).toBe("summary");
+    expect(previousGuideStep("ask_preferred_name")).toBeNull();
+    expect(previousGuideStep("ask_project_need")).toBe("ask_preferred_name");
+    expect(previousGuideStep("ask_business_name")).toBe("ask_project_need");
+    expect(previousGuideStep("summary")).toBe("ask_materials");
+    expect(previousGuideStep("confirmed")).toBe("summary");
   });
 
   it("carries prior answers across Continue so summary Confirm can succeed", () => {

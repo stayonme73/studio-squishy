@@ -3,7 +3,9 @@
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`  
 **Status:** **OPEN / IN PROGRESS** (unparked 2026-08-25; not closed; real-phone certification **not** stamped). Stopping point: `2026-08-25-STOPPING-POINT-CHECKPOINT.md`.  
 
-**Visual locks (Mobile OPEN):** Welcome = `MOBILE_VISUAL_MASTER`. Voice Choice = **OWNER ACCEPTED** 2026-08-29 (`VOICE-CHOICE-OWNER-ACCEPTED-LOCK.md`). Name question = **OWNER ACCEPTED** 2026-08-29 (`NAME-QUESTION-OWNER-ACCEPTED-LOCK.md`). System checkpoint: `MOBILE-VISUAL-SYSTEM-CHECKPOINT.md`. Materials + confirmation: `2026-08-30-MATERIALS-CONFIRMATION-CHECKPOINT.md`. Choose Your Route: `2026-08-30-CHOOSE-YOUR-ROUTE-CHECKPOINT.md`. Do not redesign those locked screens. No Supervision. No merge.  
+**Visual locks (Mobile OPEN):** Welcome = `MOBILE_VISUAL_MASTER`. Voice Choice = **OWNER ACCEPTED** 2026-08-29 (`VOICE-CHOICE-OWNER-ACCEPTED-LOCK.md`). Name question = **OWNER ACCEPTED** 2026-08-29 (`NAME-QUESTION-OWNER-ACCEPTED-LOCK.md`). System checkpoint: `MOBILE-VISUAL-SYSTEM-CHECKPOINT.md`. Materials + confirmation: `2026-08-30-MATERIALS-CONFIRMATION-CHECKPOINT.md`. Choose Your Route: `2026-08-30-CHOOSE-YOUR-ROUTE-CHECKPOINT.md`. **Samsung acceptance 2026-09-06** (`2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`): MJ-D16 Fill it out myself / Voice Off OWNER ACCEPTED on this manual-entry run through Checkout return. Step 2 remains frozen. Step 3 typography hierarchy recorded (`2026-09-05-STEP-3-TYPOGRAPHY-HIERARCHY.md`). **Step 3 Standard Light tiles = OPEN visual follow-up** (`2026-09-05-STEP-3-STANDARD-LIGHT-VISUAL-FOLLOW-UP.md`; MJ-D21) — **not** owner-approved, **not** frozen. Functional Step 3 intact. Next live surface: **sandbox payment on Checkout** (Checkout opened and returned; payment not completed). Do not redesign locked screens. No Supervision. No merge.
+
+**Execution (LOCKED 2026-09-05):** builder QA → proof → owner acceptance. Owner Samsung is final acceptance, not first QA. `SELF-CHECK-BEFORE-OWNER-HANDOFF.md`.  
 **Base commit:** `15ee699c7d16331b3f410871f02555841fddd4d6` (Gate X close)  
 **Base branch:** `operating/external-customer-content-intake-and-rights-certification-1`  
 **Opened:** 2026-08-22  
@@ -95,6 +97,14 @@ Room 4C scenario mobile notes are **responsive coverage only**. Customer-One E2E
 Package closes only when the eight proofs pass on a **real phone**, along the actual customer spine, with sealed evidence in `certification-runs/`.
 
 Do not close on tests green alone. Requires BUILD → BREAK → USE LIKE A CUSTOMER → FIX → RETEST.
+
+---
+
+## Self-check before owner handoff (LOCKED 2026-09-05)
+
+Do not return a change for Samsung debugging. Complete builder QA and proof first. Owner Samsung is **final acceptance**.
+
+Authority: `SELF-CHECK-BEFORE-OWNER-HANDOFF.md`. Config: `selfCheckBeforeOwnerHandoff`. Cursor rule: `.cursor/rules/mobile-self-check-before-owner-handoff.mdc`.
 
 ---
 

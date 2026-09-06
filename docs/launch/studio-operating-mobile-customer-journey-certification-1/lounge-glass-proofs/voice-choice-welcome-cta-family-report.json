@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "welcome": {
+    "className": "lobby-entry-film__cta",
+    "ariaPressed": null,
+    "background": "rgb(84, 124, 146)",
+    "borderColor": "rgb(84, 124, 146)",
+    "color": "rgb(247, 244, 238)",
+    "radius": "8.8px"
+  },
+  "voiceRest": {
+    "className": "voice-choice-film-module___pRQQa__cta lobby-entry-film__cta",
+    "ariaPressed": "false",
+    "background": "rgb(84, 124, 146)",
+    "borderColor": "rgb(84, 124, 146)",
+    "color": "rgb(247, 244, 238)",
+    "radius": "8.8px"
+  },
+  "fillRest": {
+    "className": "voice-choice-film-module___pRQQa__cta lobby-entry-film__cta",
+    "ariaPressed": "false",
+    "background": "rgb(84, 124, 146)",
+    "borderColor": "rgb(84, 124, 146)",
+    "color": "rgb(247, 244, 238)",
+    "radius": "8.8px"
+  },
+  "press": {
+    "className": "voice-choice-film-module___pRQQa__cta lobby-entry-film__cta",
+    "ariaPressed": "true",
+    "background": "rgb(84, 124, 146)",
+    "borderColor": "rgb(84, 124, 146)",
+    "color": "rgb(247, 244, 238)",
+    "radius": "8.8px"
+  },
+  "after": {
+    "listening": false,
+    "tapToFinish": false,
+    "nameQuestion": true,
+    "voiceOff": true,
+    "fillGone": true
+  },
+  "sameFamily": true,
+  "pressedMatchesWelcome": true
+}

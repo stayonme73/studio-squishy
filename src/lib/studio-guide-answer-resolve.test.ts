@@ -5,6 +5,7 @@ import { createEmptyGuideCaptureDraft } from "@/lib/studio-guide-capture";
 import {
   resolveComposerSendAction,
   resolveGuideAnswerFromUi,
+  exclusiveBusinessNameBubbles,
   visibleBubblesForStoredAnswer,
 } from "@/lib/studio-guide-answer-resolve";
 
@@ -172,5 +173,34 @@ describe("studio-guide-answer-resolve — Send / Continue parity", () => {
         bubbleMode: "multi",
       }),
     ).toEqual(["Logo", "Photos"]);
+  });
+
+  it("clears business-name shortcuts when a real name is typed", () => {
+    const shortcuts = [
+      "I don’t have one yet",
+      "Personal project",
+      "I’m still deciding",
+    ];
+    expect(
+      exclusiveBusinessNameBubbles({
+        typed: "Maya’s Mobile Boutique",
+        selectedBubbles: ["I don’t have one yet"],
+        shortcutBubbles: shortcuts,
+      }),
+    ).toEqual([]);
+    expect(
+      exclusiveBusinessNameBubbles({
+        typed: "I don’t have one yet",
+        selectedBubbles: ["I don’t have one yet"],
+        shortcutBubbles: shortcuts,
+      }),
+    ).toEqual(["I don’t have one yet"]);
+    expect(
+      exclusiveBusinessNameBubbles({
+        typed: "",
+        selectedBubbles: ["Personal project"],
+        shortcutBubbles: shortcuts,
+      }),
+    ).toEqual(["Personal project"]);
   });
 });

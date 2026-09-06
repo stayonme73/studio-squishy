@@ -122,6 +122,9 @@ describe("Mobile customer-spine palette (scoped)", () => {
       'import "./mobile-customer-spine-palette.css"',
     );
     expect(read("src/app/globals.css")).toContain(
+      'import "./studio-customer-tile-system.css"',
+    );
+    expect(read("src/app/globals.css")).toContain(
       'import "./mobile-customer-spine-surfaces.css"',
     );
   });
@@ -196,10 +199,8 @@ describe("Mobile customer-spine palette (scoped)", () => {
     const film = read(
       "src/components/studio-conversation-room/voice-choice-film.module.css",
     );
-    expect(film).toContain('url("/welcome-hall/studio-lobby-lounge.png")');
-    expect(film).toContain("16% 42%");
-    expect(film).toContain("color-mix(in srgb, #2e2b28 18%, transparent)");
-    expect(film).toContain("backdrop-filter: blur(2px)");
+    expect(film).not.toContain('url("/welcome-hall/studio-lobby-lounge.png")');
+    expect(film).not.toContain("background-image:");
     expect(film).toContain("background: transparent");
     expect(film).toContain("#f7f4ee 68%, #ebe2d4 32%) 46%");
     expect(film).toContain("blur(14px) saturate(1.04) brightness(1.1)");
@@ -220,7 +221,7 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(runtime).not.toContain("voiceChoice={");
     const gateReturn = runtime.slice(
       runtime.indexOf(
-        "if (!ready || !projectDraft || voiceNarration === null)",
+        "if (!ready || !projectDraft || voiceNarration === null || reviewingVoiceChoice)",
       ),
       runtime.indexOf("const selectedRoute"),
     );
@@ -231,6 +232,7 @@ describe("Mobile customer-spine palette (scoped)", () => {
       "src/components/studio-conversation-room/VoiceChoiceFilm.tsx",
     );
     expect(component).toContain('data-voice-choice-film="true"');
+    expect(component).toContain("voiceChoiceButtonClass(selected)");
     expect(component).toContain("lobby-entry-film__cta");
     expect(component).not.toContain("StudioWorkspace");
     expect(MOBILE_VISUAL_MASTER.denim).toBe("#547C92");
@@ -239,15 +241,38 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.heading).toBe(
       "How would you like to continue?",
     );
-    expect(MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.ctaClass).toBe(
+    expect(MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.unselectedChoiceClass).toBe(
       "lobby-entry-film__cta",
+    );
+    expect(MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.selectedChoiceClass).toBe(
+      "lobby-entry-film__cta",
+    );
+    expect(MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.buttonHierarchyCorrectedAt).toBe(
+      "2026-09-06",
+    );
+    expect(MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.buttonSystemStatus).toBe(
+      "FUNCTION_PASS",
+    );
+    expect(MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.samsungFillItOutMyselfStatus).toBe(
+      "PASS",
+    );
+    expect(
+      MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.samsungFillItOutMyselfOwnerAcceptedAt,
+    ).toBe("2026-09-06");
+    expect(MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.selectedColorVisualStatus).toBe(
+      "WELCOME_CTA_FAMILY",
+    );
+    expect(MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.doNotAddInspectionDelay).toBe(
+      true,
     );
     expect(read("src/config/studio-voice-preference-v1.ts")).toContain(
       'howToContinue: "How would you like to continue?"',
     );
     expect(film).toContain("gap: 1.2rem");
     expect(film).toContain("min-height: 3.25rem");
-    expect(component).not.toContain("href=");
+    expect(component).toContain("<a");
+    expect(component).toContain("useSamsungGateActivate");
+    expect(component).toContain('href="#studio-voice-choice"');
     expect(component).toContain("OWNER ACCEPTED 2026-08-29");
     expect(film).toContain("OWNER ACCEPTED 2026-08-29");
     expect(MOBILE_VOICE_CHOICE_OWNER_ACCEPTED.visualMaster).toBe(
@@ -273,6 +298,34 @@ describe("Mobile customer-spine palette (scoped)", () => {
       "0 24px 64px color-mix(in srgb, #547c92 12%, transparent)",
     );
     expect(loungeLight.slice(0, 500)).not.toContain("rgba(0, 0, 0, 0.45)");
+  });
+
+  it("keeps one Lounge plate across the phone customer path", () => {
+    const shell = read("src/app/studio-environment-shell.css");
+    expect(shell).toContain("object-position: 16% 42%");
+    expect(shell).toContain("object-position: 50% 50%");
+    expect(shell).toContain("color-mix(in srgb, #2e2b28 18%, transparent)");
+    expect(shell).toContain("filter: blur(2px)");
+    expect(read("src/app/layout.tsx")).toContain("<StudioEnvironmentShell");
+    const room = read(
+      "src/components/studio-conversation-room/studio-conversation-room.module.css",
+    );
+    expect(room).not.toContain('url("/welcome-hall/studio-lobby-lounge.png")');
+    expect(room).toContain("isolation: auto");
+    expect(room).toContain("background-color: transparent");
+    const workspace = read(
+      "src/components/studio-conversation-room/studio-workspace.module.css",
+    );
+    expect(workspace).not.toContain("blur(28px)");
+    expect(workspace).not.toContain(
+      ':has([data-stage="services"]) .nameQuestionFrost',
+    );
+    expect(workspace).toContain(
+      ':has([data-stage="services"]) .nameQuestionPanel::before',
+    );
+    expect(workspace).toContain(
+      ':has([data-stage="services"]) .nameQuestionPanel {',
+    );
   });
 
   it("scopes the name question to Voice Choice glass without tablet chrome", () => {

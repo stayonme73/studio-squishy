@@ -34,6 +34,10 @@ import { loadGuideDraft } from "@/lib/studio-guide-hard-nav";
 import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
 import { markVoiceFirstEntryChoiceRequired } from "@/lib/studio-voice-preference";
 import { setStudioVoiceInvite } from "@/lib/studio-voice-invite";
+import {
+  consumePreCheckoutDeckResume,
+  markPreCheckoutDeckVoiceChoice,
+} from "@/config/studio-pre-checkout-deck-v1";
 
 const DESKTOP_KIOSK_MIN_WIDTH = 1025;
 
@@ -234,11 +238,17 @@ export default function WelcomeHallWelcomeScene({
   const handleBeginNew = useCallback(() => {
     writeLobbyEntryChoice("new-to-studio");
     writeLobbyEntryFilmDismissed(false);
+    const deckResume = consumePreCheckoutDeckResume();
     /* Lounge front door: do not speak on Let’s Get Started.
        CR stays silent until the customer picks Voice guidance.
-       A leftover Voice On/Off from an earlier visit must not skip that choice. */
+       A leftover Voice On/Off from an earlier visit must not skip that choice
+       unless this is a reversible deck return. */
     cancelLobbyPodiumGuidanceSpeech();
-    markVoiceFirstEntryChoiceRequired();
+    if (deckResume) {
+      markPreCheckoutDeckVoiceChoice();
+    } else {
+      markVoiceFirstEntryChoiceRequired();
+    }
     const draft = loadGuideDraft();
     const hasProgress = Boolean(draft?.projectNeed?.trim() || draft?.confirmedAt);
     setStudioVoiceInvite(hasProgress ? "resume" : "start");

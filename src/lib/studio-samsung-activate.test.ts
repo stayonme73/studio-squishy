@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 describe("useSamsungActivate", () => {
@@ -10,6 +10,8 @@ describe("useSamsungActivate", () => {
     );
     expect(source).toContain('addEventListener("pointerdown"');
     expect(source).toContain("useSamsungTapActivate");
+    expect(source).toContain("useSamsungGateActivate");
+    expect(source).toContain('addEventListener("touchend"');
     expect(source).toContain("TAP_SLOP_PX");
     expect(source).toContain("consumeGesture");
     expect(source).toContain("if (!lastAt.current) return");
@@ -38,5 +40,103 @@ describe("tablet glass hit targets (MJ-D8)", () => {
     expect(lastChildBlock).not.toMatch(
       /\.hostSurface > \*:not\(:only-child\):last-child \{[^}]*pointer-events:\s*none/,
     );
+  });
+});
+
+describe("Voice Choice Fill it out myself (Samsung tap)", () => {
+  it("uses the Let’s Get Started <a> CTA and activates on pointerup/touchend/click without requiring pointerdown", () => {
+    const gate = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/VoiceChoiceFilm.tsx",
+      ),
+      "utf8",
+    );
+    expect(gate).toContain("<a");
+    expect(gate).toContain("useSamsungGateActivate");
+    expect(gate).toContain("data-voice-choice-action={action}");
+    expect(gate).toContain('action="off"');
+    expect(gate).toContain("voiceChoiceButtonClass(selected)");
+    expect(gate).toContain('href="#studio-voice-choice"');
+    const activate = readFileSync(
+      join(process.cwd(), "src/lib/studio-samsung-activate.ts"),
+      "utf8",
+    );
+    expect(activate).toContain("useSamsungGateActivate");
+    expect(activate).toContain('addEventListener("pointerdown"');
+    expect(activate).toContain('addEventListener("pointerup"');
+    expect(activate).toContain('addEventListener("touchend"');
+    expect(activate).toContain("Do not require pointerdown");
+    expect(activate).toContain("onPressRef");
+    expect(activate).toContain("if (nodeRef.current === node) return");
+    expect(activate).toContain("Do not React-setState on pointerdown");
+    expect(activate).toContain('addEventListener("pointercancel"');
+    expect(activate).toContain("dataset.gatePressed");
+    expect(activate).toContain("swallowClick");
+    expect(activate).toContain("stopImmediatePropagation");
+    expect(activate).not.toContain('addEventListener("pointerup", finish, true)');
+    const gateActivate = activate.slice(activate.indexOf("useSamsungGateActivate"));
+    expect(gateActivate).not.toContain("if (!sawPointerDown.current) return");
+    const css = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/voice-choice-film.module.css",
+      ),
+      "utf8",
+    );
+    expect(css).toContain(".panel::before");
+    expect(css).toContain("pointer-events: none");
+    expect(css).toContain("pointer-events: auto");
+  });
+});
+
+describe("Samsung LAN origin and tap-debug removal", () => {
+  it("keeps the current private-network origins and no longer ships the tap-debug HUD", () => {
+    const nextConfig = readFileSync(join(process.cwd(), "next.config.ts"), "utf8");
+    expect(nextConfig).toContain(
+      'allowedDevOrigins: ["10.1.10.208", "10.179.174.254", "10.126.244.254"]',
+    );
+    const layout = readFileSync(join(process.cwd(), "src/app/layout.tsx"), "utf8");
+    expect(layout).not.toContain("SamsungTapDebugHud");
+    expect(layout).not.toContain("studioTapDebug");
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    expect(runtime).not.toContain("SamsungTapDebugHud");
+    const gate = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/VoiceChoiceFilm.tsx",
+      ),
+      "utf8",
+    );
+    expect(gate).not.toContain("noteStudioTapChoose");
+    expect(gate).not.toContain("studio-samsung-tap-debug");
+    const activate = readFileSync(
+      join(process.cwd(), "src/lib/studio-samsung-activate.ts"),
+      "utf8",
+    );
+    expect(activate).not.toContain("emitStudioTapDebug");
+    expect(activate).not.toContain("studio-samsung-tap-debug");
+    const beginNew = readFileSync(
+      join(process.cwd(), "src/app/lobby-entry/begin-new/route.ts"),
+      "utf8",
+    );
+    expect(beginNew).not.toContain("withStudioTapDebugQuery");
+    expect(existsSync(join(process.cwd(), "src/lib/studio-samsung-tap-debug.ts"))).toBe(
+      false,
+    );
+    expect(
+      existsSync(
+        join(
+          process.cwd(),
+          "src/components/studio-conversation-room/SamsungTapDebugHud.tsx",
+        ),
+      ),
+    ).toBe(false);
   });
 });

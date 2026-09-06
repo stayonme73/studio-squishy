@@ -116,9 +116,84 @@ export function useSamsungTapActivate<T extends HTMLElement>(handler: () => void
 }
 
 /**
- * After a first-entry Voice gate tap, the Speak/Type mic mounts under the
- * same finger. Ignore leftover pointerup/click so Voice Off cannot start
- * listening. The next explicit mic tap is allowed after this gesture ends.
+ * Voice Choice gate. Samsung may skip pointerdown, skip click if pointerdown
+ * was preventDefault'd, or miss pointerup. Do not require pointerdown.
+ * Do not preventDefault on pointerdown.
+ *
+ * pointerdown paints the pressed/selected state on the node only.
+ * Do not React-setState on pointerdown — a re-render can rebind listeners
+ * and drop the finger-up on Samsung.
+ * Commit on pointerup / touchend / click so the next screen does not mount
+ * under the same finger. Click without pointerdown still commits (Samsung skip).
+ */
+export function useSamsungGateActivate<T extends HTMLElement>(
+  handler: () => void,
+  options?: { onPress?: () => void },
+) {
+  const handlerRef = useRef(handler);
+  handlerRef.current = handler;
+  const onPressRef = useRef(options?.onPress);
+  onPressRef.current = options?.onPress;
+  const committedAt = useRef(0);
+  const nodeRef = useRef<T | null>(null);
+
+  const onEvent = useRef((event: Event) => {
+    if (event.type === "pointerdown") {
+      const node = event.currentTarget;
+      if (node instanceof HTMLElement) {
+        node.dataset.gatePressed = "true";
+      }
+      onPressRef.current?.();
+      return;
+    }
+    if (event.type === "pointercancel") {
+      const node = event.currentTarget;
+      if (node instanceof HTMLElement) {
+        delete node.dataset.gatePressed;
+      }
+      return;
+    }
+    const now = Date.now();
+    if (committedAt.current && now - committedAt.current < 400) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    committedAt.current = now;
+    if (event.cancelable) {
+      event.preventDefault();
+    }
+    event.stopPropagation();
+    handlerRef.current();
+  });
+
+  const ref: RefCallback<T> = useCallback((node) => {
+    if (nodeRef.current === node) return;
+    const prev = nodeRef.current;
+    if (prev) {
+      prev.removeEventListener("pointerdown", onEvent.current, true);
+      prev.removeEventListener("pointerup", onEvent.current, true);
+      prev.removeEventListener("pointercancel", onEvent.current, true);
+      prev.removeEventListener("touchend", onEvent.current);
+      prev.removeEventListener("click", onEvent.current, true);
+    }
+    nodeRef.current = node;
+    if (node) {
+      node.addEventListener("pointerdown", onEvent.current, true);
+      node.addEventListener("pointerup", onEvent.current, true);
+      node.addEventListener("pointercancel", onEvent.current, true);
+      node.addEventListener("touchend", onEvent.current, { passive: false });
+      node.addEventListener("click", onEvent.current, true);
+    }
+  }, []);
+
+  return { ref };
+}
+
+/**
+ * After a first-entry Voice gate tap, the Speak/Type mic can mount under the
+ * same finger. Do not re-arm on pointerup/touchend — leftover click comes next
+ * and would start listening. Swallow that leftover click, then re-arm.
  */
 export function suppressSameGestureFollowUp(onSettled: () => void): void {
   if (typeof window === "undefined") {
@@ -129,12 +204,18 @@ export function suppressSameGestureFollowUp(onSettled: () => void): void {
   const finish = () => {
     if (settled) return;
     settled = true;
-    window.removeEventListener("pointerup", finish, true);
+    window.removeEventListener("click", swallowClick, true);
     window.removeEventListener("pointercancel", finish, true);
-    window.removeEventListener("click", finish, true);
+    window.clearTimeout(timeout);
     window.setTimeout(onSettled, 0);
   };
-  window.addEventListener("pointerup", finish, true);
+  const swallowClick = (event: Event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    finish();
+  };
+  const timeout = window.setTimeout(finish, 500);
+  window.addEventListener("click", swallowClick, true);
   window.addEventListener("pointercancel", finish, true);
-  window.addEventListener("click", finish, true);
 }

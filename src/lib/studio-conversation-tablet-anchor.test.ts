@@ -53,7 +53,6 @@ describe("MJ-D10 active question reveal", () => {
     );
     expect(helper).not.toContain(".focus(");
     expect(helper).not.toContain("studio-guide-type-field");
-    expect(helper).not.toContain("scrollTo(0, 0)");
     expect(helper).not.toContain("scrollIntoView");
   });
 
@@ -70,8 +69,8 @@ describe("MJ-D10 active question reveal", () => {
       "utf8",
     );
     const apply = source.slice(source.indexOf("function applyActiveQuestionReveal"));
-    expect(apply).toContain("CONVERSATION_ROOM_TABLET_ID");
-    expect(apply).toContain("CONVERSATION_ROOM_ACTIVE_QUESTION_TOP_ID");
+    expect(apply).toContain("resetConversationStageScroll");
+    expect(apply).toContain("blurContinueIfFocused");
     expect(apply).not.toContain("CONVERSATION_ROOM_ACTIVE_QUESTION_HEADING_ID");
     const tablet = readFileSync(
       join(

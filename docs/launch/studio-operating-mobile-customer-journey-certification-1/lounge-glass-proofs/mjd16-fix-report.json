@@ -1,0 +1,123 @@
+{
+  "ok": true,
+  "attempts": [
+    {
+      "n": 1,
+      "after": {
+        "gate": false,
+        "nameQuestion": true,
+        "listening": false,
+        "tapToFinish": false,
+        "voiceOff": true
+      },
+      "hold": {
+        "during": {
+          "pressed": "true",
+          "gate": true
+        },
+        "events": [
+          {
+            "type": "pointerdown",
+            "cancelable": true,
+            "defaultPrevented": false,
+            "pressed": "true"
+          },
+          {
+            "type": "pointerup",
+            "cancelable": true,
+            "defaultPrevented": true,
+            "pressed": "true"
+          }
+        ]
+      }
+    },
+    {
+      "n": 2,
+      "after": {
+        "gate": false,
+        "nameQuestion": true,
+        "listening": false,
+        "tapToFinish": false,
+        "voiceOff": true
+      },
+      "hold": {
+        "during": {
+          "pressed": "true",
+          "gate": true
+        },
+        "events": [
+          {
+            "type": "pointerdown",
+            "cancelable": true,
+            "defaultPrevented": false,
+            "pressed": "true"
+          },
+          {
+            "type": "pointerup",
+            "cancelable": true,
+            "defaultPrevented": true,
+            "pressed": "true"
+          }
+        ]
+      }
+    },
+    {
+      "n": 3,
+      "after": {
+        "gate": false,
+        "nameQuestion": true,
+        "listening": false,
+        "tapToFinish": false,
+        "voiceOff": true
+      },
+      "hold": {
+        "during": {
+          "pressed": "true",
+          "gate": true
+        },
+        "events": [
+          {
+            "type": "pointerdown",
+            "cancelable": true,
+            "defaultPrevented": false,
+            "pressed": "true"
+          },
+          {
+            "type": "pointerup",
+            "cancelable": true,
+            "defaultPrevented": true,
+            "pressed": "true"
+          }
+        ]
+      }
+    }
+  ],
+  "paths": {
+    "fill": {
+      "action": "off",
+      "href": "#studio-voice-choice",
+      "pe": "auto",
+      "spanPe": "none",
+      "top": 365.703125,
+      "bottom": 417.703125,
+      "z": "auto",
+      "tag": "A"
+    },
+    "voice": {
+      "action": "on",
+      "href": "#studio-voice-choice",
+      "pe": "auto",
+      "spanPe": "none",
+      "top": 294.515625,
+      "bottom": 346.515625,
+      "z": "auto",
+      "tag": "A"
+    },
+    "samePath": true,
+    "frostDisplay": "none",
+    "frostPe": "none",
+    "hitTag": "A",
+    "hitAction": "off"
+  },
+  "pageErrors": []
+}

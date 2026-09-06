@@ -157,6 +157,8 @@
 
 **Samsung 2026-08-28 opening-page height / top-landing combined pass:** Owner result **normal**. Real device, not Cursor. Screens: Name, What are you working on?, Business name, Deadline, Materials. Each opened with the expected Conversation Room / Voice area in view. Excessive bottomless blank space is gone. This is PASS evidence for opening-page height and top-landing only. Not a Mobile close. Not a Review Together / Route / Services pass. Keep Mobile OPEN.
 
+**Samsung 2026-09-06 OWNER ACCEPTED — Checkout stage-entry scroll only:** Step 3 → Continue to Checkout opened at the top (did not inherit Step 3 scroll). Checkout → Back to Studio Plan returned to the top of Step 3. Code: `resetConversationStageScroll()` on stage change and on the phone Checkout panel. This does **not** close MJ-D10 as a whole. Package remains OPEN.
+
 ---
 
 ## MJ-D11 — Mobile Lobby after-film leftover landing
@@ -243,7 +245,7 @@
 
 ## MJ-D16 — Voice Off still starts the microphone
 
-**Status:** OPEN — correction ready for real-phone retest. Not certified. Not closed.
+**Status:** OWNER ACCEPTED 2026-09-06 — Fill it out myself / Voice Off / leftover-mic on this Samsung manual-entry run through Checkout return. Package remains OPEN. Not certified. Use Voice guidance was not part of this run.
 
 **Found:** 2026-08-26 Samsung. Tagia tapped **Fill it out myself**. UI showed Voice Off. The browser still asked **Allow access to your microphone**, then **Listening — tap to finish**.
 
@@ -251,7 +253,13 @@
 
 **Fix:** Gate buttons consume the pointer gesture. After the gate, listening stays disarmed until that same gesture settles. `handleStartListening` no-ops while disarmed and stops any recognition that slipped through. Voice Off also aborts dictation. Later explicit mic taps still work.
 
-**Retest:** `mobile-conversation-coherence.test.ts`, `studio-samsung-activate.test.ts`. Samsung: Fill it out myself on a clean visit and after a prior Voice On session — no permission prompt, no Listening.
+**Samsung 2026-09-06 REOPENED — Fill it out myself dead on fresh acceptance.** After the three-layer shell / reversible-deck pass, Welcome and Voice Choice opened, but a real Samsung tap on **Fill it out myself** did not advance to the first question. Builder QA had used keyboard Enter, which bypasses the Samsung finger path. Use Voice guidance was not tapped; both buttons share `useSamsungGateActivate`.
+
+**Cause (2026-09-06):** Pointerdown called React `setChosen`, which can rebind native listeners mid-gesture. Samsung then misses `pointerup`/`click`. The new stage-entry `window.scrollTo(0, 0)` could also `pointercancel` a finger still on the gate. Not a three-layer frost intercept (frost is `display: none` on Voice Choice; `pointer-events: none`).
+
+**Fix (2026-09-06):** Paint press on the node without React setState. Keep the same listeners for the whole finger. Capture-phase commit. Do not scroll-reset while the Voice Choice gate is showing. Inner label `pointer-events: none` so the `<a>` is the hit target. `pointercancel` clears press paint and does not commit.
+
+**Samsung 2026-09-06 OWNER ACCEPTED (manual-entry path):** After the pointer-path correction, a fresh Samsung run used Fill it out myself, kept Voice Off selected, completed Maya / Social media graphics / Maya’s Mobile Boutique / Within 2 weeks / Nothing yet through Review Together, Route, Step 2, Step 3, Checkout open, and Checkout return. No unexpected microphone / Listening state was observed. Record: `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`. This closes the MJ-D16 acceptance item for this path only.
 
 ---
 
@@ -305,11 +313,57 @@
 
 ---
 
+## MJ-D20 — Stale `allowedDevOrigins` served HTML without current Samsung JS
+
+**Status:** ROOT CAUSE RECORDED — origin allowlist corrected for the current LAN. Temporary tap-debug HUD removed 2026-09-05. Not a Mobile close.
+
+**Found:** 2026-09-05 live Samsung. Voice Choice painted, but **Fill it out myself** and Studio Review appeared dead. The owner-accepted denim treatment was missing. After adding `?studioTapDebug=1` and a hard refresh, the `SAMSUNG TAP DEBUG — temporary` strip did **not** appear on the real phone.
+
+**Cause:** Next.js 16 blocked `/_next` (including `/_next/static/chunks/src_app_layout_tsx_007e4b2._.js` and HMR) from host `10.179.174.254` because `allowedDevOrigins` still listed only the old Studio LAN IP `10.1.10.208`. HTML still returned 200, so the page could paint. Client JS that hydrates Voice Choice and mounts the HUD was 403. Apparent tap failures were a stale/blocked client, not a Fill-button miss.
+
+**Fix:** Add the current private-network IP `10.179.174.254` to `allowedDevOrigins` in `next.config.ts`. Keep the recorded home LAN `10.1.10.208`. Do not use wildcards. If DHCP changes, add the new IP and restart the Mobile HTTPS server. Temporary Samsung tap-debug HUD / `studioTapDebug` instrumentation was used only to prove the served client, then removed.
+
+**Samsung 2026-09-05:** After the origin correction, today’s instrumented client loaded. **Fill it out myself** PASSES (see MJ-D16 Samsung pass). Debug HUD has been removed. Resume on the normal sandbox URL with no debug query.
+
+**Samsung 2026-09-06:** Current LAN origin `10.126.244.254` is in `allowedDevOrigins`. JavaScript loaded and controls operated normally on this run. DHCP changes can still recreate MJ-D20. Not a Mobile close.
+
+**Retest:** `studio-samsung-activate.test.ts` (origin allowlist + HUD absence). Real-phone: normal URL `https://10.179.174.254:3000/?studioPaymentSandbox=1` — no debug strip.
+
+---
+
+## MJ-D21 — Step 3 Standard Light tiles still read brown on Samsung
+
+**Status:** OPEN visual follow-up. Not owner-approved. Not frozen. Stopped for tonight. Not a Mobile close.
+
+**Found:** Real Samsung 2026-09-05 7:08 PM. Step 3 Review Studio Plan functional content is intact (Promote Something Now, Make Me a Flyer, $69, timeline, Change route, Edit Services, Continue to Checkout). The five Standard Light tiles (Route, Services, Estimated Investment, Estimated Timeline, Plan Details) still read darker/browner than the approved Voice Choice light-glass family.
+
+**Do not:** mark tile appearance approved; invent another percentage; restyle Step 3 tonight; unwind frozen Step 2.
+
+**Preserve:** current shared `studio-tile--standard` implementation and this owner Samsung result. Full stop record: `2026-09-05-STEP-3-STANDARD-LIGHT-VISUAL-FOLLOW-UP.md`.
+
+**Later:** consolidated customer-journey visual cleanup in this same Mobile package.
+
+**Tonight next:** Checkout on the real Samsung sandbox URL.
+
+---
+
 ## MJ-L1 — Review / approval / delivery need an honest production seed
 
 **Not a silent product fake.** Payment and intake do not invent `ready_for_review`. Customer-One E2E used an honest seed. The owner guide stops after Board communication so Scout can seed review state before Tagia continues steps 18–20.
 
 **Not fixed as auto-advance.** Recorded as a readiness limit, not a Room 4C/4B reopen.
+
+---
+
+## MJ-D21 — Studio Review controls inconsistent on real Samsung (recorded, not patched)
+
+**Found:** Owner Samsung 2026-09-06 during Mobile Customer Journey Certification. **Start a new conversation** was tapped. Nothing visibly happened. A refresh then revealed the fresh Conversation state. Owner reports other Studio Review controls may also be inconsistent.
+
+**Scope:** Do not redesign or scatter-patch Studio Review during the three-layer shell / pre-checkout deck architecture pass.
+
+**Follow-up:** Dedicated Studio Review button/action audit. `handleStartNew` exists in `ConversationRoomRuntime.tsx` but the owner-visible result was delayed until refresh.
+
+**Status:** RECORDED · NOT FIXED. The 2026-09-06 architecture / journey run does **not** supersede this. Owner did not retest Studio Review controls on the accepted hire. Do not patch during this closeout.
 
 ---
 

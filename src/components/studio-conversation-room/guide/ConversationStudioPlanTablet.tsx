@@ -6,6 +6,7 @@ import ProjectBuilderStudioPlanSummary from "@/components/project-builder/Projec
 import SamsungDenimCta from "@/components/studio-conversation-room/guide/SamsungDenimCta";
 import styles from "@/components/studio-conversation-room/guide/studio-guide-tablet.module.css";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import { studioTileClass } from "@/config/studio-customer-tile-system-v1";
 import { PROJECT_BUILDER_V1 } from "@/config/project-builder-v1";
 import type { RouteMapJobId } from "@/config/route-map-v1";
 import type { ProjectBuilderStudioPlanSummaryModel } from "@/lib/project-builder-studio-plan-summary";
@@ -25,6 +26,8 @@ export type ConversationStudioPlanTabletProps = {
   extrasInPlace?: boolean;
   topControls?: ReactNode;
   bridgeError: string | null;
+  onDeckBack?: () => void;
+  deckBackLabel?: string | null;
 };
 
 function routeCustomerLabel(routeLabel: string): string {
@@ -48,6 +51,8 @@ export default function ConversationStudioPlanTablet({
   extrasInPlace = false,
   topControls = null,
   bridgeError,
+  onDeckBack,
+  deckBackLabel = null,
 }: ConversationStudioPlanTabletProps) {
   const v = conversationRoomGuideV1;
   const routeLabel = routeCustomerLabel(model.routeLabel);
@@ -77,6 +82,17 @@ export default function ConversationStudioPlanTablet({
     >
       {topControls}
 
+      {onDeckBack && deckBackLabel ? (
+        <button
+          type="button"
+          className={styles.deckBack}
+          data-pre-checkout-deck-back=""
+          onClick={onDeckBack}
+        >
+          ← {deckBackLabel}
+        </button>
+      ) : null}
+
       <header className={styles.planTabletHeader}>
         <p className={styles.eyebrow}>
           {extrasInPlace ? v.studioPlanStepLabel : v.eyebrow}
@@ -95,7 +111,7 @@ export default function ConversationStudioPlanTablet({
         )}
 
         <section
-          className={styles.beforeCheckout}
+          className={`${styles.beforeCheckout} ${studioTileClass.supportingQuiet}`}
           aria-labelledby="studio-plan-before-checkout"
         >
           <h2
@@ -118,12 +134,12 @@ export default function ConversationStudioPlanTablet({
       </header>
 
       <div className={styles.planVoiceFacts} aria-label="Studio Plan key facts">
-        <section className={styles.planFactCard}>
+        <section className={`${styles.planFactCard} ${studioTileClass.standardLight}`}>
           <p className={styles.planFactLabel}>{v.studioPlanRouteLabel}</p>
           <p className={styles.planFactValue}>{routeLabel}</p>
         </section>
 
-        <section className={styles.planFactCard}>
+        <section className={`${styles.planFactCard} ${studioTileClass.standardLight}`}>
           <p className={styles.planFactLabel}>{v.studioPlanServicesLabel}</p>
           <ul className={styles.planServiceList}>
             {model.deliverables.map((item) => (
@@ -138,7 +154,7 @@ export default function ConversationStudioPlanTablet({
         {ma001CompositionMemberLabels &&
         ma001CompositionMemberLabels.length > 0 ? (
           <section
-            className={styles.planFactCard}
+            className={`${styles.planFactCard} ${studioTileClass.standardLight}`}
             aria-label="Promotion Pack contents"
           >
             <p className={styles.planFactLabel}>Promotion Pack includes</p>
@@ -152,13 +168,13 @@ export default function ConversationStudioPlanTablet({
           </section>
         ) : null}
 
-        <section className={styles.planFactCard}>
+        <section className={`${styles.planFactCard} ${studioTileClass.standardLight}`}>
           <p className={styles.planFactLabel}>{PROJECT_BUILDER_V1.totalLabel}</p>
           <p className={styles.planFactValueLarge}>{model.totalDisplay}</p>
         </section>
 
         {model.overallTimelineDisplay ? (
-          <section className={styles.planFactCard}>
+          <section className={`${styles.planFactCard} ${studioTileClass.standardLight}`}>
             <p className={styles.planFactLabel}>{v.studioPlanTimelineLabel}</p>
             <p className={styles.planFactValue}>{model.overallTimelineDisplay}</p>
             <p className={styles.planFactNote}>{v.studioPlanTimelineAsteriskNote}</p>
@@ -168,7 +184,7 @@ export default function ConversationStudioPlanTablet({
         {extrasInPlace ? (
           <section
             ref={extrasRef}
-            className={styles.planDetailsCard}
+            className={`${styles.planDetailsCard} ${studioTileClass.standardLight}`}
             data-plan-details="true"
             data-open={extrasOpen ? "true" : "false"}
           >
@@ -224,14 +240,14 @@ export default function ConversationStudioPlanTablet({
       >
         <button
           type="button"
-          className={styles.planTabletBtnSecondary}
+          className={`${styles.planTabletBtnSecondary} ${studioTileClass.secondaryAction}`}
           onClick={onChangeRoute}
         >
           {v.studioPlanChangeRouteLabel}
         </button>
         <button
           type="button"
-          className={styles.planTabletBtnSecondary}
+          className={`${styles.planTabletBtnSecondary} ${studioTileClass.secondaryAction}`}
           onClick={onEditPlan}
         >
           {extrasInPlace ? v.studioPlanEditServicesLabel : v.studioPlanEditLabel}

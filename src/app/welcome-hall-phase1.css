@@ -1141,6 +1141,10 @@ body:has(.welcome-hall-phase1) {
   background: var(--mc-denim, #547c92);
 }
 
+.lobby-entry-film__cta[data-gate-pressed="true"] {
+  filter: brightness(0.86);
+}
+
 .lobby-entry-film__cta:disabled {
   opacity: 0.55;
   cursor: wait;

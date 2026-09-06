@@ -1,0 +1,114 @@
+/**
+ * Studio Customer Tile System V1 — APPROVED.
+ * Source: docs/studio-customer-tile-system-v1.md
+ * Paint: MOBILE_VISUAL_MASTER / Voice Choice Samsung light glass.
+ * Do not invent page-local glass recipes. Consume these tokens and classes.
+ *
+ * Selectors are scoped under [data-mobile-customer-spine] so this family
+ * beats hashed CSS-module painters. Recipe values are not a second glass.
+ *
+ * Samsung compositing (same as Voice Choice frame::before / .screen bug):
+ * overflow:hidden on the frosted box makes backdrop-filter sample a dark
+ * empty region, so 46% ivory reads espresso. Put the approved fill + frost
+ * together on ::before, and do not clip that plate with overflow:hidden.
+ */
+
+[data-mobile-customer-spine] {
+  --studio-tile-standard-fill: color-mix(
+    in srgb,
+    color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%,
+    transparent
+  );
+  --studio-tile-standard-dense-fill: color-mix(
+    in srgb,
+    color-mix(in srgb, #f7f4ee 70%, #ebe2d4 30%) 58%,
+    transparent
+  );
+  --studio-tile-quiet-fill: color-mix(in srgb, #f7f4ee 40%, transparent);
+  --studio-tile-selected-fill: color-mix(in srgb, #547c92 22%, #f7f4ee);
+  --studio-tile-border: color-mix(in srgb, #547c92 32%, #f7f4ee);
+  --studio-tile-quiet-border: color-mix(in srgb, #547c92 18%, #f7f4ee);
+  --studio-tile-inset: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  --studio-tile-radius: 0.85rem;
+  --studio-action-secondary-fill: color-mix(in srgb, #f7f4ee 50%, transparent);
+}
+
+[data-mobile-customer-spine] .studio-tile--standard,
+[data-mobile-customer-spine] .studio-tile--standard-dense {
+  position: relative;
+  overflow: visible;
+  background: transparent;
+  box-shadow: var(--studio-tile-inset, inset 0 1px 0 rgba(255, 255, 255, 0.35));
+  color: #2e2b28;
+}
+
+[data-mobile-customer-spine] .studio-tile--standard {
+  border: 1px solid var(--studio-tile-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+}
+
+[data-mobile-customer-spine] .studio-tile--standard-dense {
+  border: 1px solid var(--studio-tile-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+}
+
+[data-mobile-customer-spine] .studio-tile--standard::before,
+[data-mobile-customer-spine] .studio-tile--standard-dense::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+[data-mobile-customer-spine] .studio-tile--standard::before {
+  background: var(
+    --studio-tile-standard-fill,
+    color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent)
+  );
+  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+}
+
+[data-mobile-customer-spine] .studio-tile--standard-dense::before {
+  background: var(
+    --studio-tile-standard-dense-fill,
+    color-mix(in srgb, color-mix(in srgb, #f7f4ee 70%, #ebe2d4 30%) 58%, transparent)
+  );
+  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+}
+
+[data-mobile-customer-spine] .studio-tile--standard > *,
+[data-mobile-customer-spine] .studio-tile--standard-dense > * {
+  position: relative;
+  z-index: 1;
+}
+
+[data-mobile-customer-spine] .studio-tile--selected {
+  background: var(
+    --studio-tile-selected-fill,
+    color-mix(in srgb, #547c92 22%, #f7f4ee)
+  );
+  border: 1px solid #547c92;
+  color: #2e2b28;
+}
+
+/* Voice Choice layout only — paint lives with Welcome CTA on the film buttons. */
+[data-voice-choice-film] .lobby-entry-film__cta {
+  margin-top: 0;
+  width: 100%;
+}
+
+[data-mobile-customer-spine] .studio-tile--quiet {
+  background: var(--studio-tile-quiet-fill, color-mix(in srgb, #f7f4ee 40%, transparent));
+  border: 1px solid var(--studio-tile-quiet-border, color-mix(in srgb, #547c92 18%, #f7f4ee));
+}
+
+[data-mobile-customer-spine] .studio-action--secondary {
+  border: 1.5px solid #547c92;
+  background: var(
+    --studio-action-secondary-fill,
+    color-mix(in srgb, #f7f4ee 50%, transparent)
+  );
+  color: #547c92;
+}

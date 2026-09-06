@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import { studioTileClass } from "@/config/studio-customer-tile-system-v1";
 import {
   getRouteMapRoad,
   getSelectableRouteMapRoads,
@@ -25,6 +26,8 @@ export type ConversationRouteChooseProps = {
   recommendedRoadId?: RouteMapRoadId | null;
   /** Voice On / Off — rendered at the top of the Mobile order. */
   topControls?: ReactNode;
+  onDeckBack?: () => void;
+  deckBackLabel?: string | null;
 };
 
 function roadTagline(roadId: RouteMapRoadId, fallback: string): string {
@@ -47,6 +50,8 @@ export default function ConversationRouteChoose({
   previewRoadId = null,
   recommendedRoadId = null,
   topControls = null,
+  onDeckBack,
+  deckBackLabel = null,
 }: ConversationRouteChooseProps) {
   const v = conversationRoomGuideV1;
   const roads = getSelectableRouteMapRoads();
@@ -91,7 +96,9 @@ export default function ConversationRouteChoose({
         return (
           <div
             key={road.id}
-            className={styles.routeExpand}
+            className={`${styles.routeExpand} ${
+              active ? studioTileClass.selectedActive : studioTileClass.standardLight
+            }`}
             data-expanded={active ? "true" : "false"}
             data-recommended={recommended ? "true" : "false"}
             data-road={road.id}
@@ -129,6 +136,16 @@ export default function ConversationRouteChoose({
       data-surface={compact ? "tablet" : "panel"}
     >
       {topControls}
+      {onDeckBack && deckBackLabel ? (
+        <button
+          type="button"
+          className={styles.backLink}
+          data-pre-checkout-deck-back=""
+          onClick={onDeckBack}
+        >
+          ← {deckBackLabel}
+        </button>
+      ) : null}
       <header className={styles.header}>
         <div>
           <p className={styles.eyebrow}>Conversation Room</p>

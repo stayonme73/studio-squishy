@@ -98,6 +98,11 @@ export const conversationRoomGuideV1 = {
   servicesBackToRoutesLabel: "Back to routes",
   /** Mobile dedicated services page — one step back, not overlay Close. */
   servicesBackToRouteLabel: "Back to Route",
+  deckBackToLetsGetStarted: "Back to Let’s Get Started",
+  deckBackToVoiceChoice: "Back to Voice Choice",
+  deckBackToPreviousQuestion: "Back to the previous question",
+  deckBackToReviewTogether: "Back to Review Together",
+  deckBackToChooseYourServices: "Back to Choose Your Services",
   servicesStepLabel: "Step 2 — Choose Your Services",
   routeConfirmTitle: "Your project so far",
   routeConfirmContinueCta: "Continue to Services",

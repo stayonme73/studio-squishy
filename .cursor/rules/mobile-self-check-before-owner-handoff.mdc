@@ -1,0 +1,22 @@
+---
+description: Mobile package — builder QA and proof before owner Samsung handoff.
+alwaysApply: true
+---
+
+# Self-check before owner handoff (LOCKED 2026-09-05)
+
+Authority: `docs/launch/studio-operating-mobile-customer-journey-certification-1/SELF-CHECK-BEFORE-OWNER-HANDOFF.md` · `studioMobileCustomerJourneyCertificationV1.selfCheckBeforeOwnerHandoff`
+
+Applies for the remainder of `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`. Mobile remains OPEN. Do not merge until the package is certified.
+
+Do **not** return work after a code change. Order: implement → inspect the **rendered** result → test the exact customer path + regressions → capture proof → compare to written Studio standards → keep fixing until your QA passes → then owner handoff.
+
+Owner Samsung is **final acceptance**, not first QA. Do not ask the owner to “see if it works.”
+
+Handoff must report: what changed, what you tested, regression result, screenshots/proof of the claimed state, what remains open.
+
+Fast-changing states (e.g. selected button before navigation): prove with a local/test method. Do **not** add delay, animation, or a stop to the customer flow.
+
+If HTTPS is dead, hung, unhydrated, or serving stale assets, fix that before handoff.
+
+Standards check: tile system, button hierarchy, typography, selected/unselected, mobile layout, frozen screens, functional behavior.

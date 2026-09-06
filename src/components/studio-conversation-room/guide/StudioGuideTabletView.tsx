@@ -20,6 +20,7 @@ import {
   getConversationRoomGuideQuestion,
   shouldShowDeadlineFormatHint,
 } from "@/config/conversation-room-guide-v1";
+import { studioTileClass } from "@/config/studio-customer-tile-system-v1";
 import type { ConversationRoomStage } from "@/config/conversation-room-stage-v1";
 import { PROJECT_BUILDER_V1 } from "@/config/project-builder-v1";
 import type { GuideConversationStep } from "@/config/studio-guide-conversation-v1";
@@ -93,6 +94,9 @@ export type StudioGuideTabletViewProps = {
   modeControls?: ReactNode;
   /** Hide “Required” once a bubble or typed value is already captured. */
   answerAccepted?: boolean;
+  /** Journey back through the reversible pre-checkout deck. */
+  onDeckBack?: () => void;
+  deckBackLabel?: string | null;
 };
 
 /** Mic privacy copy — rendered below the hardware, not inside the tablet. */
@@ -145,6 +149,8 @@ export default function StudioGuideTabletView({
   answerDock = null,
   modeControls = null,
   answerAccepted = false,
+  onDeckBack,
+  deckBackLabel = null,
 }: StudioGuideTabletViewProps) {
   const v = conversationRoomGuideV1;
   const question = getConversationRoomGuideQuestion(step);
@@ -220,6 +226,8 @@ export default function StudioGuideTabletView({
             recommendedRoadId={recommendedRoadId}
             compact
             topControls={modeControls}
+            onDeckBack={onDeckBack}
+            deckBackLabel={deckBackLabel}
           />
         ) : null}
 
@@ -240,6 +248,8 @@ export default function StudioGuideTabletView({
             extrasInPlace={phoneLayout}
             topControls={phoneLayout ? modeControls : null}
             bridgeError={planBridgeError}
+            onDeckBack={onDeckBack}
+            deckBackLabel={deckBackLabel}
           />
         ) : null}
 
@@ -339,7 +349,10 @@ export default function StudioGuideTabletView({
             <h1 className={styles.question}>{v.intakeTabletTitle}</h1>
             <p className={styles.body}>{v.intakeTabletLead}</p>
 
-            <section className={styles.intakeStatus} aria-label="Project status">
+            <section
+              className={`${styles.intakeStatus} ${studioTileClass.standardDense}`}
+              aria-label="Project status"
+            >
               <h2 className={styles.intakeStatusHeading}>
                 {v.intakeTabletCompletedHeading}
               </h2>
@@ -394,6 +407,16 @@ export default function StudioGuideTabletView({
 
         {isAsk && question ? (
           <>
+          {onDeckBack && deckBackLabel ? (
+            <button
+              type="button"
+              className={styles.deckBack}
+              data-pre-checkout-deck-back=""
+              onClick={onDeckBack}
+            >
+              ← {deckBackLabel}
+            </button>
+          ) : null}
           <div
             id={CONVERSATION_ROOM_ACTIVE_QUESTION_ID}
             className={styles.askCluster}
@@ -482,6 +505,16 @@ export default function StudioGuideTabletView({
 
         {isSummary && !correcting ? (
           <>
+            {onDeckBack && deckBackLabel ? (
+              <button
+                type="button"
+                className={styles.deckBack}
+                data-pre-checkout-deck-back=""
+                onClick={onDeckBack}
+              >
+                ← {deckBackLabel}
+              </button>
+            ) : null}
             <h1 className={styles.question}>{v.summaryIntro}</h1>
             <SummaryCards draft={draft} />
             {draft.deadlineStatus === "unconfirmed" ? (
@@ -580,7 +613,7 @@ function SummaryCards({ draft }: { draft: GuideCaptureDraftV1 }) {
   return (
     <dl className={styles.summaryList}>
       {rows.map((row) => (
-        <div key={row.label} className={styles.summaryRow}>
+        <div key={row.label} className={`${styles.summaryRow} ${studioTileClass.standardLight}`}>
           <dt>{row.label}</dt>
           <dd>{row.value}</dd>
         </div>

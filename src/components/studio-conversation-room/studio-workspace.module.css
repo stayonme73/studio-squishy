@@ -438,6 +438,13 @@
   height: auto;
 }
 
+.frame[data-name-question="true"] .screen::before,
+.frame[data-lounge-light="true"][data-name-question="true"] .screen::before {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
 /*
  * Summary only: keep the glass a card above Studio Review.
  * Review stays the locked tab — this only stops the tall frost
@@ -451,9 +458,12 @@
     margin-bottom: 2.15rem;
   }
 
-  .frame[data-name-question="true"]:has([data-step="summary"]) .nameQuestionPanel,
-  .frame[data-name-question="true"]:has([data-stage="plan"]) .nameQuestionPanel,
-  .frame[data-name-question="true"]:has([data-stage="checkout"]) .nameQuestionPanel {
+  /*
+   * Stage-entry scroll ownership: every name-question card uses the same
+   * stationary panel. Content scrolls inside. Do not document-scroll Step 3
+   * and then hand leftover scroll to Checkout.
+   */
+  .frame[data-name-question="true"] .nameQuestionPanel {
     max-height: calc(
       100dvh - clamp(1.15rem, 7vh, 2.35rem) - env(safe-area-inset-top, 0px) -
         var(--studio-review-mobile-bottom, 3.25rem) - 2.15rem
@@ -462,38 +472,35 @@
     overflow-y: auto;
   }
 
-  .frame[data-name-question="true"]:has([data-route-confirm="true"]) .nameQuestionPanel {
-    max-height: none;
-    overflow: visible;
+  .frame[data-name-question="true"]:has([data-stage="checkout"]) .nameQuestionPanel,
+  .frame[data-name-question="true"]:has([data-stage="services"]) .nameQuestionPanel {
+    max-height: calc(
+      100dvh - clamp(1.15rem, 7vh, 2.35rem) - env(safe-area-inset-top, 0px) -
+        var(--studio-review-mobile-bottom, 3.25rem) - 2.15rem
+    );
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   /*
-   * Step 2 only — lighter frosted glass over Lounge.
-   * overflow: visible on this panel disables backdrop-filter, so frost
-   * lives on a clipped plate. Ivory fill, no cream. Stronger blur so
-   * this stays frost, not a window. Do not change Voice Choice,
-   * name-question, plan, checkout, or Studio Review.
+   * Step 2 stays the Voice Choice 46% card on Lounge — same crop as
+   * name / checkout. Cap height so the list cannot cover the mural.
+   * Do not restore the 28px ivory frost plate. Tiles keep their paint.
    */
-  .frame[data-name-question="true"]:has([data-stage="services"]) .nameQuestionPanel {
+  .frame[data-name-question="true"]:has([data-stage="services"]) .nameQuestionPanel::before {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .frame[data-name-question="true"]:has([data-stage="plan"]) .nameQuestionPanel {
     background: transparent;
   }
 
-  .frame[data-name-question="true"]:has([data-stage="services"]) .nameQuestionFrost {
-    display: block;
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    border-radius: inherit;
-    overflow: hidden;
-    pointer-events: none;
-    background: color-mix(in srgb, var(--mc-ivory, #f7f4ee) 36%, transparent);
-    backdrop-filter: blur(28px) saturate(1.06) brightness(1.18);
-    -webkit-backdrop-filter: blur(28px) saturate(1.06) brightness(1.18);
-  }
-
-  .frame[data-name-question="true"]:has([data-stage="services"]) .nameQuestionPanel .hostSurface {
-    position: relative;
-    z-index: 1;
+  .frame[data-name-question="true"]:has([data-stage="plan"]) .nameQuestionPanel::before {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }
 

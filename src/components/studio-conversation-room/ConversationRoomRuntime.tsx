@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import ConversationNavPanel from "@/components/studio-conversation-room/ConversationNavPanel";
 import ConversationActivityPanel from "@/components/studio-conversation-room/guide/ConversationActivityPanel";
@@ -92,6 +92,12 @@ import {
   startHostedCheckout,
 } from "@/lib/studio-payment/client";
 import { revealConversationTablet } from "@/lib/studio-conversation-tablet-anchor";
+import { resetConversationStageScroll } from "@/lib/studio-conversation-stage-scroll";
+import {
+  consumePreCheckoutDeckVoiceChoice,
+  markPreCheckoutDeckResume,
+  studioPreCheckoutDeckV1,
+} from "@/config/studio-pre-checkout-deck-v1";
 import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
 import { studioPaymentV1 } from "@/config/studio-payment-v1";
 import {
@@ -120,6 +126,7 @@ import {
 } from "@/lib/studio-guide-capture";
 import {
   resolveGuideAnswerFromUi,
+  exclusiveBusinessNameBubbles,
   visibleBubblesForStoredAnswer,
 } from "@/lib/studio-guide-answer-resolve";
 import {
@@ -128,6 +135,7 @@ import {
   loadGuideDraft,
   nextGuideStep,
   persistGuideDraft,
+  previousGuideStep,
   resolveGuideOpenStep,
   writeGuideUiStep,
 } from "@/lib/studio-guide-hard-nav";
@@ -316,6 +324,8 @@ export default function ConversationRoomRuntime({
   const [voiceNarration, setVoiceNarration] =
     useState<StudioVoiceNarrationPreference | null>(null);
   const voiceNarrationRef = useRef<StudioVoiceNarrationPreference | null>(null);
+  /** Deck back to Voice Choice without clearing the saved preference. */
+  const [reviewingVoiceChoice, setReviewingVoiceChoice] = useState(false);
   const listenArmedRef = useRef(true);
   const [listenArmed, setListenArmed] = useState(true);
   /** MJ-D18: leftover Continue click must not gold a chip on the next question. */
@@ -490,6 +500,9 @@ export default function ConversationRoomRuntime({
     });
     setVoiceNarration(savedPreference);
     voiceNarrationRef.current = savedPreference;
+    if (consumePreCheckoutDeckVoiceChoice()) {
+      setReviewingVoiceChoice(true);
+    }
 
     /* Kill any Lobby TTS that continued across navigation — CR is silent until Voice On. */
     if (savedPreference !== "on") {
@@ -540,6 +553,12 @@ export default function ConversationRoomRuntime({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- mount boot only
   }, []);
+
+  useLayoutEffect(() => {
+    if (!ready) return;
+    if (reviewingVoiceChoice || voiceNarration === null) return;
+    resetConversationStageScroll();
+  }, [ready, stage, step, reviewingVoiceChoice, voiceNarration]);
 
   const typing = textDraft.trim().length > 0;
   const effectiveIntent: VoiceIntent =
@@ -921,6 +940,37 @@ export default function ConversationRoomRuntime({
     setStageAndPersist("route");
     closeActivityPanel();
     setPreviewRoadId(recommended);
+  }
+
+  function handleDeckBack() {
+    if (reviewingVoiceChoice || voiceNarration === null) {
+      markPreCheckoutDeckResume();
+      window.location.assign(
+        withStudioPaymentSandboxQuery("/", window.location.search),
+      );
+      return;
+    }
+    if (stage === "plan") {
+      handleEditPlan();
+      return;
+    }
+    if (stage === "services") {
+      handleChangeRoute();
+      return;
+    }
+    if (stage === "route") {
+      setStageAndPersist("opening");
+      goToStep("summary", draft, { restoreSelection: true });
+      return;
+    }
+    if (stage !== "opening") return;
+    if (step === "ask_preferred_name") {
+      setReviewingVoiceChoice(true);
+      return;
+    }
+    const previous = previousGuideStep(step);
+    if (!previous) return;
+    goToStep(previous, draft, { restoreSelection: true });
   }
 
   function handleLooksGoodPlan() {
@@ -1568,6 +1618,7 @@ export default function ConversationRoomRuntime({
     value: StudioVoiceNarrationPreference,
   ) {
     const fromGate = voiceNarrationRef.current === null;
+    setReviewingVoiceChoice(false);
     clearVoiceFirstEntryChoiceRequired();
     writeVoiceNarrationPreference(value);
     voiceNarrationRef.current = value;
@@ -1601,15 +1652,36 @@ export default function ConversationRoomRuntime({
     }, 80);
   }
 
+  function syncBusinessNameBubbles(typed: string) {
+    const question = getConversationRoomGuideQuestion("ask_business_name");
+    if (!question) return;
+    setSelectedBubbles((prev) => {
+      const next = exclusiveBusinessNameBubbles({
+        typed,
+        selectedBubbles: prev,
+        shortcutBubbles: question.bubbles,
+      });
+      if (
+        next.length === prev.length &&
+        next.every((bubble, index) => bubble === prev[index])
+      ) {
+        return prev;
+      }
+      return next;
+    });
+  }
+
   function handleTextDraftLive(value: string) {
-    /* Ref only — no speech cancel, no setState (both were stealing the caret). */
+    /* Ref only for the field — no speech cancel, no text setState (caret). */
     textDraftRef.current = value;
+    if (step === "ask_business_name") syncBusinessNameBubbles(value);
   }
 
   function handleTextDraftFlush(value: string) {
     textDraftRef.current = value;
     if (error) setError(null);
     setTextDraft(value);
+    if (step === "ask_business_name") syncBusinessNameBubbles(value);
   }
 
   function writeTextDraft(value: string) {
@@ -1751,19 +1823,20 @@ export default function ConversationRoomRuntime({
     });
   }, [stage, intakeLiveAnswers, serviceIdsForIntake, intakeHandoffPlan]);
 
-  if (!ready || !projectDraft || voiceNarration === null) {
+  if (!ready || !projectDraft || voiceNarration === null || reviewingVoiceChoice) {
     /*
      * OWNER ACCEPTED 2026-08-29 — Voice Choice film lock.
      * First-entry Voice Choice is its own Welcome-master film.
      * Do not mount Studio Workspace / Conversation Room tablet chrome here —
      * that shell contaminated the glass. Logic stays in this runtime.
      * Never return a blank page: boot and Voice Choice must stay reachable.
-     * Do not alter the film, or remount CR chrome onto this gate, in later
-     * Mobile work.
+     * Deck back remounts this film without clearing the saved preference.
      */
     return (
       <VoiceChoiceFilm
         onChoose={handleVoiceNarrationPreference}
+        onBack={handleDeckBack}
+        selected={voiceNarration}
         privacyNote={STUDIO_GUIDE_MIC_PRIVACY_NOTE}
       />
     );
@@ -1834,7 +1907,7 @@ export default function ConversationRoomRuntime({
     stage !== "opening";
 
   return (
-    <StudioConversationRoom
+      <StudioConversationRoom
       className={className}
       presence={voice.presence}
       loungeLight
@@ -1947,6 +2020,18 @@ export default function ConversationRoomRuntime({
           onConfirm={handleConfirm}
           onCorrect={handleCorrect}
           onCorrectTarget={handleCorrectTarget}
+          onDeckBack={handleDeckBack}
+          deckBackLabel={
+            stage === "opening" && step === "ask_preferred_name"
+              ? studioPreCheckoutDeckV1.backToVoiceChoice
+              : stage === "opening"
+                ? studioPreCheckoutDeckV1.backToPreviousQuestion
+                : stage === "route"
+                  ? studioPreCheckoutDeckV1.backToReviewTogether
+                  : stage === "plan"
+                    ? studioPreCheckoutDeckV1.backToChooseYourServices
+                    : null
+          }
           answerAccepted={hasAcceptedAnswer}
           answerDock={
             openingAsk ? (

@@ -1,16 +1,20 @@
 "use client";
 
-import { useCallback, useRef, type RefCallback } from "react";
+import { useState } from "react";
 
+import { voiceChoiceButtonClass } from "@/config/studio-customer-tile-system-v1";
 import {
   studioVoicePreferenceV1,
   type StudioVoiceNarrationPreference,
 } from "@/config/studio-voice-preference-v1";
+import { useSamsungGateActivate } from "@/lib/studio-samsung-activate";
 
 import styles from "./voice-choice-film.module.css";
 
 export type VoiceChoiceFilmProps = {
   onChoose: (value: StudioVoiceNarrationPreference) => void;
+  onBack?: () => void;
+  selected?: StudioVoiceNarrationPreference | null;
   privacyNote?: string;
 };
 
@@ -30,71 +34,58 @@ function renderPrivacyNote(note: string) {
 function SamsungChoiceButton({
   children,
   onActivate,
+  onPress,
   action,
+  selected,
 }: {
   children: string;
   onActivate: () => void;
+  onPress: () => void;
   action: "on" | "off";
+  selected: boolean;
 }) {
-  const onActivateRef = useRef(onActivate);
-  onActivateRef.current = onActivate;
-  const lastAt = useRef(0);
-  const nodeRef = useRef<HTMLAnchorElement | null>(null);
-  const onEvent = useRef((event: Event) => {
-    const now = Date.now();
-    if (now - lastAt.current < 400) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-    lastAt.current = now;
-    event.preventDefault();
-    event.stopPropagation();
-    onActivateRef.current();
-  }).current;
-  const ref: RefCallback<HTMLAnchorElement> = useCallback(
-    (node) => {
-      const prev = nodeRef.current;
-      if (prev) {
-        prev.removeEventListener("pointerdown", onEvent);
-        prev.removeEventListener("click", onEvent);
-      }
-      nodeRef.current = node;
-      if (node) {
-        node.addEventListener("pointerdown", onEvent);
-        node.addEventListener("click", onEvent);
-      }
-    },
-    [onEvent],
-  );
+  const activate = useSamsungGateActivate<HTMLAnchorElement>(onActivate, {
+    onPress,
+  });
   return (
     <a
-      ref={ref}
-      role="button"
-      tabIndex={0}
-      className={`lobby-entry-film__cta ${styles.cta}`}
+      ref={activate.ref}
+      href="#studio-voice-choice"
+      className={`${styles.cta} ${voiceChoiceButtonClass(selected)}`}
       data-voice-choice-action={action}
+      aria-pressed={selected}
       onKeyDown={(event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         onActivate();
       }}
     >
-      {children}
+      <span>{children}</span>
     </a>
   );
 }
 
 /**
- * First-entry Voice Choice — OWNER ACCEPTED 2026-08-29 (Samsung).
- * Welcome-master film. Do not alter layout, glass, Lounge crop, typography,
- * colors, buttons, spacing, or Studio Review in subsequent Mobile work.
+ * First-entry Voice Choice — OWNER ACCEPTED 2026-08-29 (Samsung) for
+ * Lounge glass / panel. Buttons are the same Welcome `<a>` CTA as
+ * Let’s Get Started / Sign In (`lobby-entry-film__cta`). Fill it out
+ * myself still commits on finger-up and must not start the microphone.
  */
 export default function VoiceChoiceFilm({
   onChoose,
+  onBack,
+  selected = null,
   privacyNote,
 }: VoiceChoiceFilmProps) {
   const { copy } = studioVoicePreferenceV1;
+  const [chosen, setChosen] = useState<StudioVoiceNarrationPreference | null>(
+    selected,
+  );
+
+  function choose(value: StudioVoiceNarrationPreference) {
+    setChosen(value);
+    onChoose(value);
+  }
 
   return (
     <div
@@ -104,18 +95,44 @@ export default function VoiceChoiceFilm({
       data-voice-choice-film="true"
       aria-label="Studio Voice choice"
     >
-      <div className={styles.plate} aria-hidden />
-      <div className={styles.veil} aria-hidden />
       <div className={styles.panel} role="group" aria-label={copy.howToContinue}>
+        {onBack ? (
+          <button
+            type="button"
+            className={styles.deckBack}
+            data-pre-checkout-deck-back=""
+            onClick={onBack}
+          >
+            ← Back to Let’s Get Started
+          </button>
+        ) : null}
         <p className={styles.prompt}>{copy.howToContinue}</p>
         {privacyNote ? (
           <p className={styles.privacy}>{renderPrivacyNote(privacyNote)}</p>
         ) : null}
         <div className={styles.actions}>
-          <SamsungChoiceButton action="on" onActivate={() => onChoose("on")}>
+          <SamsungChoiceButton
+            action="on"
+            selected={chosen === "on"}
+            onPress={() => {
+              /* Paint only. React setState here rebinds Samsung pointerup. */
+            }}
+            onActivate={() => {
+              choose("on");
+            }}
+          >
             {copy.useVoiceGuidance}
           </SamsungChoiceButton>
-          <SamsungChoiceButton action="off" onActivate={() => onChoose("off")}>
+          <SamsungChoiceButton
+            action="off"
+            selected={chosen === "off"}
+            onPress={() => {
+              /* Paint only. React setState here rebinds Samsung pointerup. */
+            }}
+            onActivate={() => {
+              choose("off");
+            }}
+          >
             {copy.fillItOutMyself}
           </SamsungChoiceButton>
         </div>

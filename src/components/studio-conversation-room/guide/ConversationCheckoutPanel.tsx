@@ -6,6 +6,7 @@ import SecureCheckoutGrid from "@/components/payment/SecureCheckoutGrid";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 import type { ServiceId } from "@/catalog/types";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import { studioTileClass } from "@/config/studio-customer-tile-system-v1";
 import { payment } from "@/config/payment";
 import {
   getRouteMapRoad,
@@ -17,6 +18,8 @@ import {
   buildRouteMapPaymentSummaryFromServices,
   saveApprovedRouteMapPlan,
 } from "@/lib/route-map-campaign";
+
+import { resetConversationStageScroll } from "@/lib/studio-conversation-stage-scroll";
 
 import "@/app/payment.css";
 import "@/app/checkout/checkout.css";
@@ -69,7 +72,10 @@ export default function ConversationCheckoutPanel({
   );
 
   useEffect(() => {
-    if (phonePage) return;
+    if (phonePage) {
+      resetConversationStageScroll();
+      return;
+    }
     const confirm = document.getElementById("checkout-pay-continue");
     confirm?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [phonePage]);
@@ -143,7 +149,7 @@ export default function ConversationCheckoutPanel({
       </header>
 
       {routeCustomerLabel ? (
-        <p className={styles.checkoutRouteLabel}>
+        <p className={`${styles.checkoutRouteLabel} ${studioTileClass.standardLight}`}>
           <span className={styles.checkoutRouteEyebrow}>
             {v.studioPlanRouteLabel}
           </span>
@@ -172,7 +178,7 @@ export default function ConversationCheckoutPanel({
       </button>
 
       <div
-        className={`${styles.checkoutHostSurface} ${utilityPageFontClassName}`}
+        className={`${styles.checkoutHostSurface} ${studioTileClass.standardDense} ${utilityPageFontClassName}`}
       >
         <SecureCheckoutGrid
           layout="full"

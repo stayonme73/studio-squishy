@@ -23,17 +23,19 @@ A Vercel preview is not the safest path here: previews often have Stripe keys, w
 
 `npm run dev:https` already binds `0.0.0.0:3000` with Next’s experimental HTTPS. The phone must open the **LAN IP**, never `0.0.0.0`. `browserSafeRedirectUrl` already rewrites `0.0.0.0` to localhost for computer browsers and keeps a real LAN Host for the phone.
 
-Recorded LAN address on 2026-08-22: **10.1.10.208** (Wi-Fi). If DHCP changes overnight, Scout must update the owner guide before Tagia starts. Do not ask Tagia to discover the IP.
+Recorded LAN address on 2026-08-22: **10.1.10.208** (Wi-Fi). Prior live-phone LAN on 2026-09-05: **10.179.174.254**. Current live-phone LAN on 2026-09-06: **10.126.244.254**. If DHCP changes, Scout must update `allowedDevOrigins` in `next.config.ts`, restart the Mobile HTTPS server, and update this guide before Tagia starts. Do not ask Tagia to discover the IP.
+
+Next.js 16 blocks `/_next` from unlisted hosts. HTML can still paint, so Samsung will show a page whose buttons do nothing. `allowedDevOrigins` must include the **current** LAN IP. Recorded allowlist: `10.1.10.208` (usual Studio LAN), `10.179.174.254` (prior hotspot), and `10.126.244.254` (current private-network test). Do not use wildcards.
 
 ---
 
 ## Owner link (exact)
 
-`https://10.1.10.208:3000/?studioPaymentSandbox=1`
+`https://10.126.244.254:3000/?studioPaymentSandbox=1`
 
 Test pictures (same host, not a second product):
 
-`https://10.1.10.208:3000/mobile-customer-journey-cert-1/`
+`https://10.126.244.254:3000/mobile-customer-journey-cert-1/`
 
 ---
 
@@ -53,7 +55,7 @@ If the phone cannot connect:
 
 1. Confirm the phone is on the same Wi-Fi.  
 2. Confirm Windows Firewall allows TCP 3000 inbound on the private network.  
-3. Confirm the IPv4 address is still `10.1.10.208`.  
+3. Confirm the IPv4 address is still `10.126.244.254`, and that `next.config.ts` `allowedDevOrigins` includes that IP.  
 4. Do not invent a public URL.
 
 The Next HTTPS certificate is self-signed. Tagia may need to continue past a browser warning. That is expected. It is not a request that she install developer tools.

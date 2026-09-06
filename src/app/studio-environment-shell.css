@@ -1,0 +1,142 @@
+/**
+ * Studio Environment Shell — three layers.
+ * BACK: Lounge plate (lvh/lvw so the URL bar does not recrop).
+ * FROST: stationary Gold Master ivory, behind content. No 14px sheet.
+ * CONTENT: .studio-environment-app.
+ * Loaded after page painters so retired environment rules lose.
+ */
+
+.studio-environment-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: #ebe2d4;
+}
+
+.studio-environment-shell__plate {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 100lvw;
+  height: 100lvh;
+  min-width: 100%;
+  min-height: 100%;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  object-position: 50% 50%;
+  /* Permanent 2px frost on the photo. Veil is the 18% ink mix only. */
+  filter: blur(2px);
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+  .studio-environment-shell__plate {
+    object-position: 16% 42%;
+  }
+}
+
+.studio-environment-shell__veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, #2e2b28 18%, transparent);
+}
+
+.studio-environment-shell__frost {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Gold Master ivory, light enough the Lounge remains visible. Not 14px. */
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 22%,
+    transparent
+  );
+}
+
+html:has(.lobby-entry-film) .studio-environment-shell__frost,
+html:has([data-voice-choice-film]) .studio-environment-shell__frost {
+  display: none;
+}
+
+html:has(.studio-environment-shell),
+html:has(.studio-environment-shell) body {
+  background: #ebe2d4 !important;
+}
+
+.studio-environment-app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: transparent;
+}
+
+/*
+ * Retired full-viewport environment painters.
+ * Content glass / tiles / CTAs stay. The building is the shell.
+ */
+html:has(.studio-environment-shell) .welcome-hall-phase1 .welcome-hall-plate-art,
+html:has(.studio-environment-shell) .welcome-hall-phase1 .welcome-hall-plate-crop--mobile .welcome-hall-plate-art,
+html:has(.studio-environment-shell) .welcome-hall-phase1 .welcome-hall-plate-backdrop,
+html:has(.studio-environment-shell) .welcome-hall-phase1 .welcome-hall-plate-backdrop-art,
+html:has(.studio-environment-shell) .lobby-entry-film__scrim {
+  display: none !important;
+}
+
+html:has(.studio-environment-shell) main:has(.welcome-hall-phase1),
+html:has(.studio-environment-shell) main:has(.lobby-entry-film),
+html:has(.studio-environment-shell) .welcome-hall-phase1,
+html:has(.studio-environment-shell) .welcome-hall-phase1 .welcome-hall-plate,
+html:has(.studio-environment-shell) .welcome-hall-phase1.welcome-hall-static,
+html:has(.studio-environment-shell) .welcome-hall-phase1 .welcome-hall-plate-crop,
+html:has(.studio-environment-shell) .welcome-hall-phase1 .welcome-hall-plate-crop--mobile,
+html:has(.studio-environment-shell) .welcome-hall-phase1 .hall-mobile-dock {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+html:has(.studio-environment-shell) .studio-utility-backdrop,
+html:has(.studio-environment-shell) .studio-utility-backdrop::before,
+html:has(.studio-environment-shell) .studio-utility-backdrop::after {
+  display: none !important;
+  background: none !important;
+  filter: none !important;
+}
+
+html:has(.studio-environment-shell) .studio-utility-scene,
+html:has(.studio-environment-shell) .journey-shell:has(.studio-utility-scene),
+html:has(.studio-environment-shell) body:has(.studio-utility-scene),
+html:has(.studio-environment-shell) .co-scene,
+html:has(.studio-environment-shell) .business-discovery-studio,
+html:has(.studio-environment-shell) body:has(.business-discovery-studio) {
+  background: transparent !important;
+}
+
+html:has(.studio-environment-shell) .business-discovery-studio .bds-scene__backdrop,
+html:has(.studio-environment-shell) .business-discovery-studio .bds-scene__backdrop::before,
+html:has(.studio-environment-shell) .business-discovery-studio .bds-scene__backdrop::after {
+  display: none !important;
+  background: none !important;
+  filter: none !important;
+}
+
+/*
+ * Retired moving environmental frost on scrolling Conversation tiles.
+ * Keep fills / borders / selected states. Gold Master cards keep 14px.
+ */
+html:has(.studio-environment-shell)
+  [data-mobile-customer-spine]:not([data-voice-choice-film]):not(.lobby-entry-film)
+  .studio-tile--standard::before,
+html:has(.studio-environment-shell)
+  [data-mobile-customer-spine]:not([data-voice-choice-film]):not(.lobby-entry-film)
+  .studio-tile--standard-dense::before {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}

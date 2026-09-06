@@ -1,0 +1,193 @@
+{
+  "ok": true,
+  "steps": [
+    "voice-choice",
+    "name",
+    "summary",
+    "route",
+    "services",
+    "plan",
+    "checkout"
+  ],
+  "samples": {
+    "voiceChoice": {
+      "heading": "Studio Conversation Room",
+      "film": {
+        "image": "url(\"https://localhost:3000/welcome-hall/studio-lobby-lounge.png\")",
+        "position": "16% 42%"
+      },
+      "room": null,
+      "panel": null,
+      "pixels": {
+        "topLeft": "rgb(69, 52, 33)",
+        "topCenter": "rgb(225, 202, 167)",
+        "midRight": "rgb(135, 117, 109)",
+        "aboveReview": "rgb(136, 88, 53)"
+      }
+    },
+    "name": {
+      "heading": "Studio Conversation Room",
+      "film": null,
+      "room": {
+        "image": "url(\"https://localhost:3000/welcome-hall/studio-lobby-lounge.png\")",
+        "position": "16% 42%"
+      },
+      "panel": {
+        "background": "rgba(243, 238, 230, 0.46)",
+        "backdropFilter": "none",
+        "beforeBackground": "rgba(0, 0, 0, 0)",
+        "beforeFilter": "none",
+        "overflow": "visible",
+        "box": {
+          "x": 11.1875,
+          "y": 37.59375,
+          "w": 337.625,
+          "h": 473.171875
+        }
+      },
+      "pixels": {
+        "topLeft": "rgb(69, 52, 33)",
+        "topCenter": "rgb(225, 202, 167)",
+        "midRight": "rgb(133, 116, 110)",
+        "aboveReview": "rgb(136, 88, 53)"
+      }
+    },
+    "summary": {
+      "heading": "Studio Conversation Room",
+      "film": null,
+      "room": {
+        "image": "url(\"https://localhost:3000/welcome-hall/studio-lobby-lounge.png\")",
+        "position": "16% 42%"
+      },
+      "panel": {
+        "background": "rgba(243, 238, 230, 0.46)",
+        "backdropFilter": "none",
+        "beforeBackground": "rgba(0, 0, 0, 0)",
+        "beforeFilter": "none",
+        "overflow": "visible",
+        "box": {
+          "x": 11.1875,
+          "y": 11.59375,
+          "w": 337.625,
+          "h": 864.109375
+        }
+      },
+      "pixels": {
+        "topLeft": "rgb(88, 80, 71)",
+        "topCenter": "rgb(226, 197, 159)",
+        "midRight": "rgb(189, 169, 151)",
+        "aboveReview": "rgb(177, 147, 130)"
+      }
+    },
+    "route": {
+      "heading": "Studio Conversation Room",
+      "film": null,
+      "room": {
+        "image": "url(\"https://localhost:3000/welcome-hall/studio-lobby-lounge.png\")",
+        "position": "16% 42%"
+      },
+      "panel": {
+        "background": "rgba(243, 238, 230, 0.46)",
+        "backdropFilter": "none",
+        "beforeBackground": "rgba(0, 0, 0, 0)",
+        "beforeFilter": "none",
+        "overflow": "visible",
+        "box": {
+          "x": 11.1875,
+          "y": 11.59375,
+          "w": 337.625,
+          "h": 748.171875
+        }
+      },
+      "pixels": {
+        "topLeft": "rgb(35, 28, 20)",
+        "topCenter": "rgb(227, 207, 176)",
+        "midRight": "rgb(141, 127, 112)",
+        "aboveReview": "rgb(81, 119, 140)"
+      }
+    },
+    "services": {
+      "heading": "Studio Conversation Room",
+      "film": null,
+      "room": {
+        "image": "url(\"https://localhost:3000/welcome-hall/studio-lobby-lounge.png\")",
+        "position": "16% 42%"
+      },
+      "panel": {
+        "background": "rgba(243, 238, 230, 0.46)",
+        "backdropFilter": "none",
+        "beforeBackground": "rgba(0, 0, 0, 0)",
+        "beforeFilter": "none",
+        "overflow": "hidden auto",
+        "box": {
+          "x": 11.1875,
+          "y": 37.59375,
+          "w": 337.625,
+          "h": 656
+        }
+      },
+      "pixels": {
+        "topLeft": "rgb(69, 52, 33)",
+        "topCenter": "rgb(225, 202, 167)",
+        "midRight": "rgb(133, 116, 110)",
+        "aboveReview": "rgb(132, 89, 57)"
+      }
+    },
+    "plan": {
+      "heading": "Studio Conversation Room",
+      "film": null,
+      "room": {
+        "image": "url(\"https://localhost:3000/welcome-hall/studio-lobby-lounge.png\")",
+        "position": "16% 42%"
+      },
+      "panel": {
+        "background": "rgba(0, 0, 0, 0)",
+        "backdropFilter": "none",
+        "beforeBackground": "rgba(0, 0, 0, 0)",
+        "beforeFilter": "none",
+        "overflow": "visible",
+        "box": {
+          "x": 11.1875,
+          "y": 37.59375,
+          "w": 337.625,
+          "h": 1169.734375
+        }
+      },
+      "pixels": {
+        "topLeft": "rgb(132, 101, 69)",
+        "topCenter": "rgb(185, 133, 73)",
+        "midRight": "rgb(190, 145, 108)",
+        "aboveReview": "rgb(197, 153, 129)"
+      }
+    },
+    "checkout": {
+      "heading": "Studio Conversation Room",
+      "film": null,
+      "room": {
+        "image": "url(\"https://localhost:3000/welcome-hall/studio-lobby-lounge.png\")",
+        "position": "16% 42%"
+      },
+      "panel": {
+        "background": "rgba(243, 238, 230, 0.46)",
+        "backdropFilter": "none",
+        "beforeBackground": "rgba(0, 0, 0, 0)",
+        "beforeFilter": "none",
+        "overflow": "hidden auto",
+        "box": {
+          "x": 11.1875,
+          "y": 37.59375,
+          "w": 337.625,
+          "h": 656
+        }
+      },
+      "pixels": {
+        "topLeft": "rgb(69, 52, 33)",
+        "topCenter": "rgb(235, 224, 203)",
+        "midRight": "rgb(133, 116, 110)",
+        "aboveReview": "rgb(132, 89, 57)"
+      }
+    }
+  },
+  "cornersMatch": true,
+  "servicesIsCard": true
+}

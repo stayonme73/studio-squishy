@@ -17,7 +17,7 @@
     --utility-primary-deep: color-mix(in srgb, #547c92 88%, #456b5a 12%);
     --studio-utility-backdrop-image: url("/welcome-hall/studio-lobby-lounge.png");
     --studio-utility-backdrop-position: 16% 42%;
-    --studio-utility-backdrop-blur: blur(14px) saturate(1.04) brightness(1.1);
+    --studio-utility-backdrop-blur: blur(2px);
     --studio-utility-backdrop-tint: color-mix(in srgb, #2e2b28 18%, transparent);
     --studio-utility-backdrop-fallback: #ebe2d4;
     --fs-accent: #547c92;
@@ -28,7 +28,7 @@
   [data-mobile-customer-spine].studio-utility-scene:has(.fs-room) {
     --studio-utility-backdrop-image: url("/welcome-hall/studio-lobby-lounge.png");
     --studio-utility-backdrop-position: 16% 42%;
-    --studio-utility-backdrop-blur: blur(14px) saturate(1.04) brightness(1.1);
+    --studio-utility-backdrop-blur: blur(2px);
     --studio-utility-backdrop-tint: color-mix(in srgb, #2e2b28 18%, transparent);
     --studio-utility-backdrop-fallback: #ebe2d4;
   }

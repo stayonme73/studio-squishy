@@ -25,6 +25,11 @@ describe("hosted Checkout single-entry UI contract", () => {
     expect(source).toContain('data-collects-card="false"');
     expect(source).toContain('data-hosted-checkout="stripe"');
     expect(source).toContain("useEffect");
+    expect(source).toContain("lobby-entry-film__cta co-submit");
+    expect(source).toContain('href="#checkout-continue"');
+    expect(source).not.toContain("utility-btn--primary");
+    expect(source).toContain("if (!termsAccepted)");
+    expect(source).toContain('data-checkout-pay="continue"');
     expect(source).toContain("setShowSandboxFixture");
     expect(source).not.toContain(
       'typeof window !== "undefined" ? window.location.search',

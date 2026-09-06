@@ -40,16 +40,23 @@ export const MOBILE_VISUAL_MASTER = {
 
 /**
  * Owner-accepted Voice Choice (Samsung 2026-08-29). Implementation of
- * MOBILE_VISUAL_MASTER — not a second master. Do not alter layout, glass,
- * Lounge crop, typography, colors, buttons, spacing, or Studio Review
- * treatment in subsequent Mobile work.
+ * MOBILE_VISUAL_MASTER — not a second master. Panel / glass / Lounge crop
+ * stay frozen. Buttons reuse Let’s Get Started `.lobby-entry-film__cta`.
+ * Fill it out myself commits on finger-up and must not start the microphone.
  */
 export const MOBILE_VOICE_CHOICE_OWNER_ACCEPTED = {
   status: "OWNER_ACCEPTED" as const,
   acceptedAt: "2026-08-29" as const,
+  buttonHierarchyCorrectedAt: "2026-09-06" as const,
+  buttonSystemStatus: "FUNCTION_PASS" as const,
+  samsungFillItOutMyselfStatus: "PASS" as const,
+  samsungFillItOutMyselfOwnerAcceptedAt: "2026-09-06" as const,
+  selectedColorVisualStatus: "WELCOME_CTA_FAMILY" as const,
+  doNotAddInspectionDelay: true as const,
   visualMaster: "MOBILE_VISUAL_MASTER" as const,
   heading: "How would you like to continue?",
-  ctaClass: "lobby-entry-film__cta",
+  unselectedChoiceClass: "lobby-entry-film__cta" as const,
+  selectedChoiceClass: "lobby-entry-film__cta" as const,
   proofPng:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/lounge-glass-proofs/26-voice-choice-owner-accepted-360.png",
   freezeFiles: [

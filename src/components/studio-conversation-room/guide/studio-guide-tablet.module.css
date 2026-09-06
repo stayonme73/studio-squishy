@@ -26,6 +26,20 @@
   padding-bottom: 0.35rem;
 }
 
+.deckBack {
+  appearance: none;
+  align-self: flex-start;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--mc-eucalyptus, #456b5a);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
 .askCluster {
   display: flex;
   flex-direction: column;
@@ -123,7 +137,7 @@
   height: 100%;
   min-height: 0;
   padding: 0.35rem 0.2rem 0.45rem;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .planTabletHeader {
@@ -132,6 +146,42 @@
   flex-direction: column;
   gap: 0.35rem;
   padding: 0 0.15rem;
+}
+
+/*
+ * Step 3 Review Studio Plan — five type roles only.
+ * Scoped to .planTablet so Step 2, Voice Choice, and opening questions stay.
+ *
+ * 1. Label (STEP 3, BEFORE CHECKOUT, ROUTE, SERVICES, INVESTMENT, TIMELINE)
+ *    0.78rem / 700 / uppercase / eucalyptus
+ * 2. Page title (Studio Plan) 1.2rem / 700 / ink
+ * 3. Plan value 1.12rem / 700 / ink; investment 1.22rem / denim
+ * 4. Secondary 0.92rem / 500 / ink 88%; Before Checkout quieter than plan cards
+ * 5. Actions 1.02rem / 700
+ */
+.planTablet .eyebrow,
+.planTablet .planFactLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mc-eucalyptus, #456b5a);
+}
+
+.planTablet .beforeCheckoutHeading {
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--mc-eucalyptus, #456b5a) 70%, #f7f4ee);
+}
+
+.planTablet .question {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.28;
+  color: var(--mc-ink, #2e2b28);
 }
 
 .voiceSays {
@@ -166,17 +216,11 @@
   margin: 0.2rem 0 0;
   padding: 0.75rem 0.85rem;
   border-radius: 0.75rem;
-  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
-  background: var(--mc-card, color-mix(in srgb, #f7f4ee 55%, transparent));
+  border: 1px solid var(--studio-tile-quiet-border, color-mix(in srgb, #547c92 18%, #f7f4ee));
 }
 
 .beforeCheckoutHeading {
   margin: 0;
-  font-size: 0.85rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--mc-eucalyptus, #456b5a);
 }
 
 .beforeCheckoutList {
@@ -193,21 +237,22 @@
   grid-template-columns: auto 1fr;
   gap: 0.5rem;
   align-items: start;
-  font-size: 1.02rem;
-  line-height: 1.35;
-  color: var(--mc-ink, #2e2b28);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--mc-ink, #2e2b28) 68%, transparent);
 }
 
 .beforeCheckoutMark {
-  font-weight: 750;
-  color: var(--mc-eucalyptus, #456b5a);
+  font-weight: 650;
+  color: color-mix(in srgb, var(--mc-eucalyptus, #456b5a) 62%, transparent);
 }
 
 /* Voice-key facts only — large enough to read before checkout. */
 .planVoiceFacts {
   flex: 1 1 auto;
   min-height: 0;
-  overflow: auto;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -220,40 +265,35 @@
   gap: 0.35rem;
   padding: 0.9rem 1rem;
   border-radius: 0.85rem;
-  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
-  background: var(--mc-card, color-mix(in srgb, #f7f4ee 55%, transparent));
+  border: 1px solid var(--studio-tile-border, var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee)));
 }
 
 .planFactLabel {
   margin: 0;
-  font-size: 0.95rem;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--mc-eucalyptus, #456b5a);
 }
 
 .planFactValue {
   margin: 0;
-  font-size: clamp(1.35rem, 4.2cqi, 1.7rem);
+  font-size: 1.12rem;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.35;
   color: var(--mc-ink, #2e2b28);
 }
 
 .planFactValueLarge {
   margin: 0;
-  font-size: clamp(1.75rem, 5.5cqi, 2.25rem);
-  font-weight: 750;
-  line-height: 1.2;
+  font-size: 1.22rem;
+  font-weight: 700;
+  line-height: 1.3;
   color: var(--mc-denim, #547c92);
 }
 
 .planFactNote {
   margin: 0.25rem 0 0;
-  font-size: 1.12rem;
+  font-size: 0.92rem;
+  font-weight: 500;
   line-height: 1.4;
-  color: rgba(220, 216, 208, 0.9);
+  color: color-mix(in srgb, var(--mc-ink, #2e2b28) 88%, transparent);
 }
 
 .planServiceList {
@@ -287,16 +327,16 @@
 }
 
 .planServiceName {
-  font-size: clamp(1.25rem, 3.8cqi, 1.55rem);
+  font-size: 1.12rem;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.35;
   color: var(--mc-ink, #2e2b28);
 }
 
 .planServicePrice {
   flex: 0 0 auto;
-  font-size: clamp(1.25rem, 3.8cqi, 1.55rem);
-  font-weight: 750;
+  font-size: 1.12rem;
+  font-weight: 700;
   color: var(--mc-denim, #547c92);
 }
 
@@ -319,10 +359,9 @@
   flex-direction: column;
   gap: 0.4rem;
   margin: 0.15rem 0 0;
-  padding: 0.75rem 0.85rem;
+  padding: 0.9rem 1rem;
   border-radius: 0.85rem;
-  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
-  background: var(--mc-chip, color-mix(in srgb, #f7f4ee 50%, transparent));
+  border: 1px solid var(--studio-tile-border, var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee)));
 }
 
 .planDetailsToggle {
@@ -334,7 +373,7 @@
   background: none;
   color: var(--mc-denim, #547c92);
   font: inherit;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 700;
   text-align: left;
   cursor: pointer;
@@ -375,6 +414,7 @@
   font: inherit;
   font-size: 1.02rem;
   font-weight: 700;
+  letter-spacing: 0.05em;
   cursor: pointer;
 }
 
@@ -390,9 +430,9 @@
 }
 
 .planTabletBtnSecondary {
-  border: 1px solid var(--mc-eucalyptus, #456b5a);
-  background: var(--mc-chip, color-mix(in srgb, #f7f4ee 50%, transparent));
-  color: var(--mc-eucalyptus, #456b5a);
+  border: 1.5px solid var(--mc-denim, #547c92);
+  background: var(--studio-action-secondary-fill, color-mix(in srgb, #f7f4ee 50%, transparent));
+  color: var(--mc-denim, #547c92);
 }
 
 /* Project Intake — Social Posts–style cards on the tablet glass. */
@@ -458,6 +498,9 @@
 
 .intakeTabletCards :global(.route-map-social-intake__card) {
   min-height: 0;
+  background: var(--studio-tile-standard-dense-fill);
+  border: 1px solid var(--studio-tile-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  box-shadow: var(--studio-tile-inset, inset 0 1px 0 rgba(255, 255, 255, 0.35));
 }
 
 .intakeTabletCards :global(.route-map-social-intake__actions) {
@@ -747,8 +790,7 @@
   margin: 0;
   padding: 0.85rem 1rem;
   border-radius: 0.7rem;
-  background: transparent;
-  border: 1px solid color-mix(in srgb, #547c92 32%, #f7f4ee);
+  border: 1px solid var(--studio-tile-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
 }
 
 .root[data-step="summary"] .btnCorrect {
@@ -787,6 +829,7 @@
 
 .root[data-step="summary"] .main {
   padding-bottom: 0.55rem;
+  overflow: visible;
 }
 
 .root[data-step="summary"] .actions {
@@ -830,8 +873,7 @@
   margin: 0.15rem 0;
   padding: 0.75rem 0.85rem;
   border-radius: 0.65rem;
-  border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
-  background: var(--mc-card, color-mix(in srgb, #f7f4ee 55%, transparent));
+  border: 1px solid var(--studio-tile-border, var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee)));
 }
 
 .intakeStatusHeading {
@@ -897,11 +939,28 @@
   .planTablet[data-phone-plan="true"] .planTabletBtnSecondary {
     width: 100%;
     justify-content: center;
+    font-size: clamp(0.9rem, 1.9vw, 1.02rem);
+    letter-spacing: 0.05em;
+  }
+
+  .planTablet[data-phone-plan="true"] {
+    color: #2e2b28;
+    overflow: visible;
+  }
+
+  .planTablet[data-phone-plan="true"] .planFactCard,
+  .planTablet[data-phone-plan="true"] .planDetailsCard {
+    color: #2e2b28;
   }
 
   .question {
     font-size: clamp(1.18rem, 4.9vw, 1.45rem);
     line-height: 1.32;
+  }
+
+  .root[data-stage="plan"] .planTablet .question {
+    font-size: 1.2rem;
+    color: var(--mc-ink, #2e2b28);
   }
 
   /*

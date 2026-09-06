@@ -20,7 +20,7 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
     expect(runtime).toContain("voiceUnset || openingAsk ? null");
     expect(runtime).toContain("privacyNote={STUDIO_GUIDE_MIC_PRIVACY_NOTE}");
     expect(runtime).toContain("<VoiceChoiceFilm");
-    expect(runtime).not.toContain("voiceChoice");
+    expect(runtime).not.toContain("voiceChoice={");
     const gate = readFileSync(
       join(
         process.cwd(),
@@ -543,6 +543,8 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     expect(chooser).toContain('className="lobby-entry-film__cta"');
     expect(chooser).toContain("data-route-continue");
     expect(chooser).toContain("Select this route.");
+    expect(chooser).toContain("studioTileClass.standardLight");
+    expect(chooser).toContain("studioTileClass.selectedActive");
     expect(chooser).not.toContain("Open route details.");
     expect(chooser).not.toContain("{compact ? confirmRow : null}");
     expect(chooser).toContain("{confirmRow}");
@@ -563,6 +565,13 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     );
     expect(panelCss).toContain(".sheet[data-surface=\"tablet\"] .routeArrow");
     expect(panelCss).toContain("display: none");
+    const tabletRoute = panelCss.slice(
+      panelCss.indexOf('.sheet[data-surface="tablet"] .routeExpand {'),
+      panelCss.indexOf(".sheet[data-surface=\"tablet\"] .routeLabel"),
+    );
+    expect(tabletRoute).not.toContain("--mc-card");
+    expect(tabletRoute).not.toContain("#547c92 10%");
+    expect(tabletRoute).not.toContain("--mc-chip-selected");
   });
 });
 
@@ -587,8 +596,26 @@ describe("MJ-D16 — Voice Off must not start the microphone", () => {
       ),
       "utf8",
     );
-    expect(gate).toContain('addEventListener("pointerdown"');
-    expect(gate).toContain('addEventListener("click"');
+    expect(gate).toContain("useSamsungGateActivate");
+    expect(gate).toContain("<a");
+    expect(gate).toContain('action="off"');
+    expect(gate).toContain("voiceChoiceButtonClass(selected)");
+    expect(gate).toContain("lobby-entry-film__cta");
+    expect(gate).toContain('href="#studio-voice-choice"');
+    const activate = readFileSync(
+      join(process.cwd(), "src/lib/studio-samsung-activate.ts"),
+      "utf8",
+    );
+    expect(activate).toContain("useSamsungGateActivate");
+    expect(activate).toContain('addEventListener("pointerdown"');
+    expect(activate).toContain('addEventListener("pointerup"');
+    expect(activate).toContain('addEventListener("touchend"');
+    expect(activate).toContain('addEventListener("click"');
+    expect(activate).toContain("if (nodeRef.current === node) return");
+    expect(activate).toContain("Do not React-setState on pointerdown");
+    expect(activate).toContain("swallowClick");
+    expect(activate).toContain("stopImmediatePropagation");
+    expect(activate).not.toContain('addEventListener("pointerup", finish, true)');
     const comm = readFileSync(
       join(
         process.cwd(),
@@ -715,9 +742,47 @@ describe("MJ-D19 Mobile Choose Your Services hierarchy", () => {
     const phoneWsGlass = workspaceGlass.slice(
       workspaceGlass.lastIndexOf("@media (max-width: 960px)"),
     );
-    expect(phoneWsGlass).toContain(':has([data-stage="services"]) .nameQuestionFrost');
-    expect(phoneWsGlass).toContain("var(--mc-ivory, #f7f4ee) 36%, transparent");
-    expect(phoneWsGlass).toContain("blur(28px)");
+    expect(phoneWsGlass).not.toContain(':has([data-stage="services"]) .nameQuestionFrost');
+    expect(phoneWsGlass).not.toContain(':has([data-stage="plan"]) .nameQuestionFrost');
+    expect(phoneWsGlass).toContain(':has([data-stage="services"]) .nameQuestionPanel::before');
+    expect(phoneWsGlass).toContain(':has([data-stage="plan"]) .nameQuestionPanel::before');
+    expect(phoneWsGlass).not.toContain("var(--mc-ivory, #f7f4ee) 36%, transparent");
+    expect(phoneWsGlass).not.toContain("blur(28px)");
+    expect(phoneWsGlass).toContain(':has([data-stage="checkout"]) .nameQuestionPanel,');
+    expect(phoneWsGlass).toContain(':has([data-stage="services"]) .nameQuestionPanel {');
+    const servicesCard = phoneWsGlass.slice(
+      phoneWsGlass.indexOf(':has([data-stage="checkout"]) .nameQuestionPanel,'),
+      phoneWsGlass.indexOf(
+        ':has([data-stage="services"]) .nameQuestionPanel::before',
+      ),
+    );
+    expect(servicesCard).toContain("overflow-y: auto");
+    expect(servicesCard).toContain("max-height: calc(");
+    expect(servicesCard).toContain('[data-stage="services"]');
+    expect(phoneWsGlass).toContain(
+      '.frame[data-name-question="true"] .nameQuestionPanel {',
+    );
+    const allStagePanel = phoneWsGlass.slice(
+      phoneWsGlass.indexOf(
+        '.frame[data-name-question="true"] .nameQuestionPanel {',
+      ),
+      phoneWsGlass.indexOf(':has([data-stage="checkout"]) .nameQuestionPanel,'),
+    );
+    expect(allStagePanel).toContain("overflow-y: auto");
+    expect(allStagePanel).toContain("max-height: calc(");
+    expect(phoneWsGlass).not.toContain(
+      ':has([data-route-confirm="true"]) .nameQuestionPanel',
+    );
+    const planFrostPanel = phoneWsGlass.slice(
+      phoneWsGlass.indexOf(
+        ':has([data-stage="plan"]) .nameQuestionPanel {',
+      ),
+      phoneWsGlass.indexOf(
+        ':has([data-stage="plan"]) .nameQuestionPanel::before',
+      ),
+    );
+    expect(planFrostPanel).toContain("background: transparent");
+    expect(planFrostPanel).not.toContain("overflow: visible");
     const workspaceTsx = readFileSync(
       join(
         process.cwd(),
@@ -941,6 +1006,52 @@ describe("Mobile route → services → plan navigation simplification", () => {
     expect(plan).toContain("data-plan-actions");
     expect(plan).toContain("extrasInPlace");
     expect(plan).toContain("topControls");
+    expect(plan).toContain("studioTileClass.standardLight");
+    expect(plan).toContain("studioTileClass.supportingQuiet");
+    expect(plan).toContain("studioTileClass.secondaryAction");
+    const planCss = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/studio-guide-tablet.module.css",
+      ),
+      "utf8",
+    );
+    expect(planCss).toContain(".planTablet .eyebrow");
+    expect(planCss).toContain(".planTablet .question");
+    expect(planCss).toContain("font-size: 1.2rem");
+    expect(planCss).toContain("font-size: 1.12rem");
+    expect(planCss).toContain("font-size: 1.22rem");
+    expect(planCss).toContain(
+      "color-mix(in srgb, var(--mc-ink, #2e2b28) 88%, transparent)",
+    );
+    expect(planCss).toContain("--studio-tile-quiet-border");
+    expect(planCss).toContain("--studio-action-secondary-fill");
+    expect(planCss).toContain("color: var(--mc-denim, #547c92)");
+    const planShell = planCss.slice(
+      planCss.indexOf(".planTablet {"),
+      planCss.indexOf(".planTabletHeader {"),
+    );
+    expect(planShell).toContain("overflow: visible");
+    expect(planShell).not.toContain("overflow: hidden");
+    const planFacts = planCss.slice(
+      planCss.indexOf(".planVoiceFacts {"),
+      planCss.indexOf(".planFactCard {"),
+    );
+    expect(planFacts).toContain("overflow: visible");
+    expect(planFacts).not.toContain("overflow: auto");
+    const tileCss = readFileSync(
+      join(process.cwd(), "src/app/studio-customer-tile-system.css"),
+      "utf8",
+    );
+    expect(tileCss).toContain(
+      "color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent)",
+    );
+    expect(tileCss).toContain("blur(14px) saturate(1.04) brightness(1.1)");
+    expect(tileCss).toContain("inset 0 1px 0 rgba(255, 255, 255, 0.35)");
+    expect(tileCss).toContain(".studio-tile--quiet");
+    expect(tileCss).toContain("color-mix(in srgb, #f7f4ee 40%, transparent)");
+    expect(planCss).not.toContain("clamp(1.75rem, 5.5cqi, 2.25rem)");
+    expect(planCss).not.toContain("rgba(220, 216, 208, 0.9)");
     const checkout = readFileSync(
       join(
         process.cwd(),
@@ -949,8 +1060,11 @@ describe("Mobile route → services → plan navigation simplification", () => {
       "utf8",
     );
     expect(checkout).toContain("phonePage");
+    expect(checkout).toContain("studioTileClass.standardLight");
+    expect(checkout).toContain("studioTileClass.standardDense");
     expect(checkout).toContain("compactPaymentHonesty={phonePage}");
-    expect(checkout).toContain("if (phonePage) return");
+    expect(checkout).toContain("if (phonePage)");
+    expect(checkout).toContain("resetConversationStageScroll()");
     expect(checkout).toContain("v.checkoutLead");
     expect(checkout).toContain("phonePage ? null : (");
     expect(checkout).toContain("v.checkoutScopeDisclosure");

@@ -1,6 +1,8 @@
 /**
- * OWNER ACCEPTED 2026-08-29 — Samsung lock. Do not alter layout, glass,
- * Lounge crop, typography, colors, buttons, spacing, or Studio Review.
+ * OWNER ACCEPTED 2026-08-29 — Samsung lock for layout, glass, Lounge crop,
+ * typography, panel, spacing, and Studio Review. 2026-09-06: the two
+ * buttons reuse Let’s Get Started `.lobby-entry-film__cta`. Do not invent
+ * a third button family here.
  */
 
 .film {
@@ -23,28 +25,6 @@
   font-family: var(--font-geist-sans, system-ui, sans-serif);
 }
 
-.plate {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-color: #ebe2d4;
-  background-image: url("/welcome-hall/studio-lobby-lounge.png");
-  background-position: 16% 42%;
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
-.veil {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: color-mix(in srgb, #2e2b28 18%, transparent);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-
 .panel {
   position: relative;
   z-index: 2;
@@ -61,12 +41,24 @@
     color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%,
     transparent
   );
-  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
-  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
   box-shadow:
     0 24px 64px color-mix(in srgb, #547c92 12%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
   color: #f7f4ee;
+}
+
+/* Frost is decorative. Filter on this interactive panel made Samsung
+ * hit-test the glass instead of Fill it out myself — same defect as
+ * studio-workspace .screen. */
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
 }
 
 .prompt {
@@ -86,6 +78,28 @@
   color: #456b5a;
 }
 
+.prompt,
+.privacy,
+.actions,
+.deckBack {
+  position: relative;
+  z-index: 1;
+}
+
+.deckBack {
+  appearance: none;
+  align-self: flex-start;
+  margin: 0 0 0.85rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #456b5a;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
 .actions {
   display: flex;
   flex-direction: column;
@@ -95,22 +109,29 @@
   min-width: 13.3rem;
   max-width: 100%;
   margin-inline: auto;
+  pointer-events: auto;
 }
 
 /*
- * Paint comes from Welcome .lobby-entry-film__cta (Let’s Get Started / Sign In).
- * Do not restyle fill here — Samsung was painting <button> as a different blue.
- * Authorized 2026-08-29: larger phone touch targets + gap so Fill it out myself
- * is not hit by a thumb aiming past Use Voice guidance.
+ * Layout only. Paint comes only from Welcome `.lobby-entry-film__cta`
+ * on the same `<a>` used by Let’s Get Started / Sign In.
  */
 .cta {
   display: inline-flex;
+  align-items: center;
   justify-content: center;
   width: 100%;
   margin: 0;
+  margin-top: 0;
   box-sizing: border-box;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  pointer-events: auto;
+  text-align: center;
+}
+
+.cta > span {
+  pointer-events: none;
 }
 
 @media (max-width: 1024px) {
@@ -118,10 +139,6 @@
     justify-content: flex-start;
     padding: calc(clamp(1.15rem, 7vh, 2.35rem) + env(safe-area-inset-top, 0px))
       0.7rem calc(3.4rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  .plate {
-    background-position: 16% 42%;
   }
 
   .cta {

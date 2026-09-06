@@ -488,14 +488,25 @@ export default function SecureCheckoutGrid({
             <p className="co-payment-security" role="note">
               {payment.form.paymentSecurityNote}
             </p>
-            <button
-              type="submit"
-              className="utility-btn utility-btn--primary co-submit"
+            <a
+              href="#checkout-continue"
+              className="lobby-entry-film__cta co-submit"
               data-checkout-pay="continue"
-              disabled={completing}
+              aria-disabled={completing ? "true" : undefined}
+              onClick={(event) => {
+                event.preventDefault();
+                if (completing) return;
+                event.currentTarget.closest("form")?.requestSubmit();
+              }}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter" && event.key !== " ") return;
+                event.preventDefault();
+                if (completing) return;
+                event.currentTarget.closest("form")?.requestSubmit();
+              }}
             >
-              {confirmLabel}
-            </button>
+              <span>{confirmLabel}</span>
+            </a>
             {checkoutError ? (
               <p className="co-payment-reassurance" role="alert">
                 {checkoutError}

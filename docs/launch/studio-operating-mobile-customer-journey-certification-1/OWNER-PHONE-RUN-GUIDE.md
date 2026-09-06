@@ -23,7 +23,7 @@ Do not change any code, passwords on the computer, or technical settings. If som
 
 Open this exact address in your phone browser (Safari or Chrome):
 
-**https://10.1.10.208:3000/?studioPaymentSandbox=1**
+**https://10.126.244.254:3000/?studioPaymentSandbox=1**
 
 If the phone warns that the connection is not trusted, that is expected for this local Studio. Choose the option that lets you continue to the site. If you cannot open that exact address, stop. Do not try a different address.
 
@@ -126,7 +126,7 @@ Refresh the browser page on your phone.
 
 Open this second address **only** to save the test files, then return to Studio Board:
 
-**https://10.1.10.208:3000/mobile-customer-journey-cert-1/**
+**https://10.126.244.254:3000/mobile-customer-journey-cert-1/**
 
 Download these four files. Do not open the broken file to “fix” it.
 

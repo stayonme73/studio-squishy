@@ -129,7 +129,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   stoppingPointCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-25-STOPPING-POINT-CHECKPOINT.md" as const,
   nextPhoneAction:
-    "Close and reopen Choose your services → scroll → Add to Project on Make My Social Media Posts" as const,
+    "Complete sandbox payment on Checkout for the current Maya / Promote Something Now / Make Me a Flyer plan. Do not restart unless the owner chooses a fresh hire. Package is not closed." as const,
   parkAndResumeDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/PARK-AND-RESUME.md" as const,
   supervisionDependencyAuditDoc:
@@ -142,7 +142,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   journeyRouteMapDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/JOURNEY-ROUTE-AND-CONTROL-MAP.md" as const,
   recommendedFirstExecutionStep:
-    "Close and reopen Choose your services → scroll → Add to Project on Make My Social Media Posts. Do not restart the hire. Package is not closed." as const,
+    "Complete sandbox payment on Checkout for the current Maya / Promote Something Now / Make Me a Flyer plan. Do not restart unless the owner chooses a fresh hire. Package is not closed." as const,
   visualMaster: "MOBILE_VISUAL_MASTER" as const,
   voiceChoiceStatus: "OWNER_ACCEPTED" as const,
   voiceChoiceAcceptedAt: "2026-08-29" as const,
@@ -158,7 +158,13 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   businessNameAcceptedAt: "2026-08-29" as const,
   visualSystemCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/MOBILE-VISUAL-SYSTEM-CHECKPOINT.md" as const,
-  nextMobileScreen: "services" as const,
+  nextMobileScreen: "checkout" as const,
+  samsungAcceptance20260906Doc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md" as const,
+  mjd16ManualEntryStatus: "OWNER_ACCEPTED" as const,
+  mjd16ManualEntryAcceptedAt: "2026-09-06" as const,
+  checkoutStageEntryScrollStatus: "OWNER_ACCEPTED" as const,
+  checkoutPaymentStatus: "NOT_COMPLETED" as const,
   reuseLockedMobileVisualSystem: true as const,
   tonightMobileVisualCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-29-TONIGHT-MOBILE-VISUAL-CHECKPOINT.md" as const,
@@ -170,4 +176,21 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   chooseYourRouteAcceptedAt: "2026-08-30" as const,
   chooseYourRouteCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-30-CHOOSE-YOUR-ROUTE-CHECKPOINT.md" as const,
+  step3StandardLightVisualStatus:
+    "OPEN_FOLLOW_UP_NOT_OWNER_APPROVED" as const,
+  step3StandardLightVisualFollowUpAt: "2026-09-05" as const,
+  step3StandardLightVisualFollowUpDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-09-05-STEP-3-STANDARD-LIGHT-VISUAL-FOLLOW-UP.md" as const,
+
+  selfCheckBeforeOwnerHandoff: {
+    status: "LOCKED" as const,
+    lockedAt: "2026-09-05" as const,
+    appliesForRemainderOfPackage: true as const,
+    sequence: "builder-qa-proof-then-owner-acceptance" as const,
+    ownerSamsungRole: "FINAL_ACCEPTANCE_NOT_FIRST_QA" as const,
+    doNotReturnUnverifiedWork: true as const,
+    doNotChangeProductionToInspectFastStates: true as const,
+    doc: "docs/launch/studio-operating-mobile-customer-journey-certification-1/SELF-CHECK-BEFORE-OWNER-HANDOFF.md" as const,
+    cursorRule: ".cursor/rules/mobile-self-check-before-owner-handoff.mdc" as const,
+  },
 } as const;

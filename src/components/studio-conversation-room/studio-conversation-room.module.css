@@ -63,27 +63,14 @@
   padding: var(--room-pad-y) var(--room-pad-x);
   padding-right: 0;
   overflow: hidden;
-  isolation: isolate;
-  background-color: #ebe2d4;
+  /* Auto so content glass can sample StudioEnvironmentShell. */
+  isolation: auto;
+  background-color: transparent;
 }
 
-.room::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background:
-    var(--lounge-plate, url("/welcome-hall/studio-lobby-lounge.png")) center / cover no-repeat;
-  pointer-events: none;
-}
-
+.room::before,
 .room::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: var(--mc-veil, color-mix(in srgb, #2e2b28 18%, transparent));
+  content: none;
 }
 
 .roomStage {
@@ -264,26 +251,10 @@
 }
 
 .room[data-voice-choice="true"] {
-  /* Welcome film is not inside an isolated box. Isolate made Voice Choice
-   * frost a black layer instead of the Lounge — Samsung showed no change. */
   isolation: auto;
 }
 
-.room[data-voice-choice="true"]::after,
-.room[data-voice-choice="true"][data-presence-bias="studio"]::after,
-.room[data-voice-choice="true"][data-presence-bias="customer"]::after,
-.room[data-lounge-light="true"]::after,
-.room[data-lounge-light="true"][data-presence-bias="studio"]::after,
-.room[data-lounge-light="true"][data-presence-bias="customer"]::after {
-  background: var(--mc-veil, color-mix(in srgb, #2e2b28 18%, transparent));
-}
-
 @media (max-width: 1024px) {
-  /* Match Welcome phone crop — silhouetted-man mural, not the center window. */
-  .room::before {
-    background-position: var(--lounge-crop-phone, 16% 42%);
-  }
-
   /*
    * Name question only — Voice Choice film placement: panel high, Lounge
    * breathes. Studio Review stays. Not a full-viewport device.

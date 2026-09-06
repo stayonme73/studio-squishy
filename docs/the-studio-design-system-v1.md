@@ -4,7 +4,7 @@
 
 **Scope:** Customer-facing pages across the journey — Project Summary, Secure Checkout, Help Center, Studio Board, Review Room, Final Delivery, Account (future), and utility surfaces that share the proposal/operational aesthetic.
 
-**Related:** [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md) (Project Summary proposal tokens) · [studio-utility-design-system.md](studio-utility-design-system.md) (legacy utility-page guide — superseded for new work by this doc where they differ on color roles)
+**Related:** [decision-page-visual-language-v1.md](decision-page-visual-language-v1.md) (Project Summary proposal tokens) · [studio-utility-design-system.md](studio-utility-design-system.md) (legacy utility-page guide — superseded for new work by this doc where they differ on color roles) · [studio-customer-tile-system-v1.md](studio-customer-tile-system-v1.md) (proposed reusable Lounge-glass tile family for the customer journey — owner review before apply)
 
 ---
 

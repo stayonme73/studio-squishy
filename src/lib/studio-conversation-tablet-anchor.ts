@@ -1,3 +1,5 @@
+import { resetConversationStageScroll } from "@/lib/studio-conversation-stage-scroll";
+
 /** Shared tablet target so Samsung Session links can native-scroll even if React click is late. */
 export const CONVERSATION_ROOM_TABLET_ID = "conversation-room-tablet" as const;
 export const CONVERSATION_ROOM_TABLET_HREF = `#${CONVERSATION_ROOM_TABLET_ID}` as const;
@@ -30,19 +32,17 @@ export function revealConversationTablet(): void {
 }
 
 /**
- * MJ-D14: after a stage change (Review Together / Route), bring the new
- * customer surface into view without a smooth animation that fights a flick.
+ * After a stage change, open the new card at its intended top.
  * Do not use this on ordinary scrolling. Do not open overlays from here.
  */
 export function revealConversationStage(): void {
   if (typeof document === "undefined") return;
-  const node = document.getElementById(CONVERSATION_ROOM_TABLET_ID);
   window.requestAnimationFrame(() => {
-    node?.scrollIntoView({ behavior: "auto", block: "start", inline: "nearest" });
+    resetConversationStageScroll();
   });
 }
 
-/** Keep the heading near the top of the scrollport; never force page-top 0. */
+/** Keep the heading near the top of the scrollport. */
 export function questionClusterDocumentScrollTop(
   currentScrollTop: number,
   clusterTopInViewport: number,
@@ -72,31 +72,8 @@ function blurContinueIfFocused(cluster: HTMLElement | null): void {
 
 function applyActiveQuestionReveal(): void {
   const cluster = document.getElementById(CONVERSATION_ROOM_ACTIVE_QUESTION_ID);
-  const top =
-    document.getElementById(CONVERSATION_ROOM_TABLET_ID) ??
-    document.getElementById(CONVERSATION_ROOM_ACTIVE_QUESTION_TOP_ID) ??
-    cluster;
-  if (!(top instanceof HTMLElement)) return;
-
-  const inner = (
-    cluster instanceof HTMLElement ? cluster : top
-  ).closest("[data-question-scroll-root]");
-  if (inner instanceof HTMLElement) {
-    inner.scrollTop = 0;
-  }
-
   blurContinueIfFocused(cluster instanceof HTMLElement ? cluster : null);
-
-  const doc = document.scrollingElement;
-  if (!(doc instanceof HTMLElement)) return;
-  const maxScrollTop = doc.scrollHeight - doc.clientHeight;
-  doc.scrollTop = clampDocumentScrollTop(
-    questionClusterDocumentScrollTop(
-      doc.scrollTop,
-      top.getBoundingClientRect().top,
-    ),
-    maxScrollTop,
-  );
+  resetConversationStageScroll();
 }
 
 let revealFrame = 0;
@@ -105,7 +82,7 @@ let revealFrame = 0;
  * MJ-D10: after Continue, land on the Conversation Room tablet / header so
  * eyebrow, Voice, Required, and the question share the first screen.
  * Do not target the Voice row alone. Do not focus the type field.
- * Do not scroll the page to 0 as a hard reset.
+ * Stage-entry ownership now opens every card at scrollTop 0.
  */
 export function revealActiveQuestionCluster(): void {
   if (typeof document === "undefined") return;
