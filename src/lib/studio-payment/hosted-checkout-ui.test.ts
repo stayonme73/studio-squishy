@@ -69,6 +69,62 @@ describe("hosted Checkout single-entry UI contract", () => {
     ).toBe(true);
   });
 
+  it("uses inlinable process.env members when env is omitted", () => {
+    expect(
+      isDeveloperCheckoutSandboxVisible({
+        search: "?studioPaymentSandbox=1",
+      }),
+    ).toBe(process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test");
+    expect(
+      isDeveloperCheckoutSandboxVisible({
+        env: {} as NodeJS.ProcessEnv,
+        search: "?studioPaymentSandbox=1",
+      }),
+    ).toBe(false);
+  });
+
+  it("Continue to Secure Checkout does not silently fall back to sandbox", () => {
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    const continueFn = runtime.slice(
+      runtime.indexOf("async function handleCheckoutPaymentComplete()"),
+      runtime.indexOf("async function handleSandboxCheckoutConfirm()"),
+    );
+    const sandboxFn = runtime.slice(
+      runtime.indexOf("async function handleSandboxCheckoutConfirm()"),
+      runtime.indexOf("/** Return from Stripe Checkout"),
+    );
+    expect(continueFn).toContain("startHostedCheckout(");
+    expect(continueFn).not.toContain("preferSandbox");
+    expect(continueFn).toContain('started.mode !== "stripe"');
+    expect(sandboxFn).toContain("preferSandbox: true");
+    expect(sandboxFn).toContain("confirmSandboxCheckoutClient");
+  });
+
+  it("payment=return reconciles and never writes paid locally", () => {
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    const returnEffect = runtime.slice(
+      runtime.indexOf("/** Return from Stripe Checkout"),
+      runtime.indexOf("function handleIntakeSubmitSuccess()"),
+    );
+    expect(returnEffect).toContain('payment !== "return"');
+    expect(returnEffect).toContain("reconcileCheckoutClient(sessionId)");
+    expect(returnEffect).toContain("result.paid && result.campaign");
+    expect(returnEffect).not.toContain("markPaymentReceived");
+    expect(returnEffect).not.toContain("preferSandbox");
+  });
+
   it("marks forbidden card markup when present", () => {
     expect(
       markupContainsForbiddenCardFields(

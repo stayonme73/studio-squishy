@@ -18,19 +18,30 @@ export const HOSTED_CHECKOUT_FORBIDDEN_FIELD_NAMES = [
 /**
  * Developer sandbox fixture visibility — never the normal customer journey.
  * Requires sandbox availability plus an explicit developer opt-in.
+ *
+ * Next.js inlines `process.env.NODE_ENV` and `process.env.NEXT_PUBLIC_*`
+ * only as those exact member expressions. Do not read them from a copied
+ * `process.env` bag on the client — that hides the cert sandbox fixture.
  */
 export function isDeveloperCheckoutSandboxVisible(options?: {
   env?: NodeJS.ProcessEnv;
   search?: string | null;
 }): boolean {
-  const env = options?.env ?? process.env;
+  const nodeEnv = options?.env ? options.env.NODE_ENV : process.env.NODE_ENV;
+  const sandboxFlag = options?.env
+    ? options.env.NEXT_PUBLIC_PAYMENT_SANDBOX
+    : process.env.NEXT_PUBLIC_PAYMENT_SANDBOX;
+  const devTools = options?.env
+    ? options.env.NEXT_PUBLIC_DEV_TOOLS
+    : process.env.NEXT_PUBLIC_DEV_TOOLS;
+
   const sandboxAvailable =
-    env.NODE_ENV === "development" ||
-    env.NODE_ENV === "test" ||
-    env.NEXT_PUBLIC_PAYMENT_SANDBOX === "1";
+    nodeEnv === "development" ||
+    nodeEnv === "test" ||
+    sandboxFlag === "1";
   if (!sandboxAvailable) return false;
 
-  if (env.NEXT_PUBLIC_DEV_TOOLS === "1") return true;
+  if (devTools === "1") return true;
 
   const search = options?.search ?? null;
   if (search == null) return false;

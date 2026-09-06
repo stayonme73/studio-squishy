@@ -11,7 +11,9 @@
 
 **Fix:** Client `useEffect` after mount sets visibility from `window.location.search`. Production without sandbox availability still hides the fixture. Tests in `hosted-checkout-ui.test.ts` guard the source pattern.
 
-**Retest:** Unit/source preflight. Real-phone proof is Tagia step 6 tomorrow.
+**2026-09-06 follow-up (builder sandbox-payment QA):** The fixture was still hidden on live Checkout even with `?studioPaymentSandbox=1` in `next dev`. Next.js inlines `process.env.NODE_ENV` only as that exact member expression. Reading `NODE_ENV` from a copied `process.env` bag made sandbox availability false in the browser, so the cert query could not show **Test pay with sandbox confirm**. `isDeveloperCheckoutSandboxVisible` now reads inlinable members when `env` is omitted. Production still hides the fixture unless `NEXT_PUBLIC_PAYMENT_SANDBOX=1`. Continue to Secure Checkout still does not pass `preferSandbox` and still does not invent paid truth.
+
+**Retest:** `hosted-checkout-ui.test.ts`, `payment-truth.test.ts`. Builder proof: `lounge-glass-proofs/pay-qa-*`. Real-phone payment is not started.
 
 ---
 
@@ -364,6 +366,21 @@
 **Follow-up:** Dedicated Studio Review button/action audit. `handleStartNew` exists in `ConversationRoomRuntime.tsx` but the owner-visible result was delayed until refresh.
 
 **Status:** RECORDED · NOT FIXED. The 2026-09-06 architecture / journey run does **not** supersede this. Owner did not retest Studio Review controls on the accepted hire. Do not patch during this closeout.
+
+---
+
+## MJ-D22 — After paid, mobile shows Intake tablet plus a second Project Intake sheet
+
+**Status:** OPEN. Not a payment failure. Not patched in the sandbox-payment checkpoint. Do not fix during Samsung payment testing.
+
+**Found:** 2026-09-06 builder sandbox-payment QA after confirmed Maya $69 sandbox pay. Payment truth passed. Studio advanced to Intake. The phone then showed both:
+
+- the Intake tablet (“Preparing your project for production” / **Payment received**)
+- a second **Project Intake** sheet with **Close**
+
+**Do not:** treat this as unpaid; restyle Intake in the payment checkpoint; start Samsung payment testing to debug this overlay.
+
+**Later:** Intake UX pass in this same Mobile package, after payment is accepted.
 
 ---
 

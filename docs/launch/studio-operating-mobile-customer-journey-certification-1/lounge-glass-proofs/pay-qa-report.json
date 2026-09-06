@@ -1,0 +1,77 @@
+{
+  "ok": true,
+  "audit": {
+    "provider": "stripe_hosted_checkout_plus_local_sandbox_fixture",
+    "stripeKeysInEnv": false,
+    "sandboxParam": "Shows Developer Sandbox fixture; Continue still tries Stripe hosted Checkout"
+  },
+  "checks": {
+    "opensAtTop": true,
+    "planCorrect": true,
+    "sandboxFixtureVisible": true,
+    "unpaidOnOpen": true,
+    "continueWithoutTermsBlocked": true,
+    "sandboxDisabledWithoutTerms": true,
+    "backBeforePayKeepsPlan": true,
+    "refreshBeforePayStillUnpaid": true,
+    "continueStripeDoesNotMarkPaid": true,
+    "continueStripeNeedsProcessor": true,
+    "sandboxOpensIntake": true,
+    "paidCopyAfterSuccess": true,
+    "paidOnlyAfterSandboxConfirm": true,
+    "stateSurvivesPay": true,
+    "refreshAfterPayStaysPaid": true,
+    "sandboxSessionWasSandbox": true,
+    "sandboxConfirmWrotePaid": true,
+    "duplicateConfirmIdempotent": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\pay-qa-01-checkout-top.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\pay-qa-02-continue-without-terms.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\pay-qa-03-back-to-plan.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\pay-qa-04-refresh-before-pay.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\pay-qa-05-continue-stripe-unconfigured.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\pay-qa-06-after-sandbox-intake.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\pay-qa-07-refresh-after-pay.png"
+  ],
+  "steps": [
+    "voice-choice",
+    "fill-it-out-myself",
+    "name",
+    "need",
+    "business",
+    "deadline",
+    "materials",
+    "summary",
+    "route",
+    "add-flyer",
+    "plan",
+    "checkout"
+  ],
+  "api": {
+    "checkoutSession": [
+      {
+        "status": 503,
+        "mode": null,
+        "error": "processor_not_configured",
+        "sandboxConfirmRequired": null
+      },
+      {
+        "status": 200,
+        "mode": "sandbox",
+        "error": null,
+        "sandboxConfirmRequired": true
+      }
+    ],
+    "sandboxConfirm": [
+      {
+        "status": 200,
+        "ok": true,
+        "alreadyPaid": false,
+        "paidAt": true
+      }
+    ]
+  },
+  "pageErrors": [],
+  "liveWalkAt": null
+}
