@@ -324,7 +324,7 @@ describe("Mobile customer-spine palette (scoped)", () => {
       ':has([data-stage="services"]) .nameQuestionPanel::before',
     );
     expect(workspace).toContain(
-      ':has([data-stage="services"]) .nameQuestionPanel {',
+      ':has([data-stage="services"]) .nameQuestionPanel,',
     );
   });
 

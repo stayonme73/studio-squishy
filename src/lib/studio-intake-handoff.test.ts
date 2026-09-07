@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
@@ -198,5 +200,40 @@ describe("completeIntakeHandoff — Conversation Room + Host Route Map contract"
     expect(JSON.parse(sessionStorage.getItem(STUDIO_VOICE_BOARD_HANDOFF_KEY)!).phase).toBe(
       "awaiting-board-welcome",
     );
+  });
+});
+
+describe("Conversation Room Intake → Account Handoff navigation", () => {
+  it("navigates immediately with an origin-absolute href (no session wait, no stage unmount first)", () => {
+    const handoff = readFileSync(
+      join(process.cwd(), "src/lib/studio-intake-handoff.ts"),
+      "utf8",
+    );
+    expect(handoff).toContain("INTAKE_HANDOFF_SESSION_PROBE_TIMEOUT_MS = 2500");
+    expect(handoff).toContain("new URL(destination, window.location.origin).href");
+    expect(handoff).toContain("window.location.href = url");
+    expect(handoff).not.toMatch(
+      /export function navigateIntakeHandoff[\s\S]*window\.location\.assign/,
+    );
+
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    const success = runtime.slice(
+      runtime.indexOf("function handleIntakeSubmitSuccess()"),
+      runtime.indexOf("function handleConfirm()"),
+    );
+    expect(success).toContain("resolveIntakeHandoffPlan(intakeHandoffSignedIn)");
+    expect(success).toContain("applyIntakeHandoffPassport(intakeHandoffSignedIn)");
+    expect(success).toContain("navigateIntakeHandoff(plan.destination)");
+    expect(success).toContain('persistConversationStage(base, "complete")');
+    expect(success).not.toContain("completeIntakeHandoff");
+    expect(success).not.toContain("setStageAndPersist");
+    expect(success).not.toContain("closeActivityPanel");
+    expect(success).not.toContain("await ");
   });
 });

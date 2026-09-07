@@ -371,18 +371,13 @@
 
 ## MJ-D22 — After paid, mobile shows Intake tablet plus a second Project Intake sheet
 
-**Status:** OPEN / PARKED. Not a payment failure. Do **not** fix during Checkout presentation simplification. Do not ask the owner to fill Intake.
+**Status:** FIXED in builder — pending owner Samsung visual acceptance.
 
-**Found:** 2026-09-06 builder sandbox-payment QA after confirmed Maya $69 sandbox pay. Payment truth passed. Studio advanced to Intake. The phone then showed both:
+**Cause:** After payment, stage became `intake` (tablet: “Preparing your project for production”) **and** the Activity Panel opened `ConversationIntakePanel` (overlay: “Project Intake” + Close). Phone Checkout already hid its overlay; Intake did not.
 
-- the Intake tablet (“Preparing your project for production” / **Payment received**)
-- a second **Project Intake** sheet with **Close**
+**Fix:** Phone Intake uses the same one-surface pattern as phone Checkout. Overlay is hidden. Existing Project Intake form lives in the persistent Lounge + Studio shell, with Payment received / Services confirmed acknowledged once. Close is not shown on the phone page. Desktop overlay Intake is unchanged. Intake requirements and payment guards are unchanged.
 
-**Samsung 2026-09-06:** Reproduced after owner-accepted sandbox payment. Same double surface.
-
-**Do not:** treat this as unpaid; restyle Intake during Checkout presentation; start Intake testing; ask the owner to complete Intake.
-
-**Later:** Intake UX pass in this same Mobile package, **after** Checkout presentation receives owner visual acceptance.
+**Do not:** treat this as unpaid; rebuild Maya; run another payment; redesign the Intake form in this pass.
 
 ---
 

@@ -7,6 +7,7 @@ import {
 import { normalizeEmail } from "@/lib/auth/email-normalize";
 import {
   createSessionToken,
+  isSessionConfigured,
   sessionCookieOptions,
   SESSION_COOKIE_NAME,
 } from "@/lib/auth/session";
@@ -24,8 +25,18 @@ const SAFE_LOGIN_FAILURE = "Invalid credentials";
 const SAFE_RATE_LIMIT =
   "Too many sign-in attempts. Please wait a bit and try again.";
 
+const ACCOUNT_SESSION_UNAVAILABLE =
+  "Sign-in is temporarily unavailable. Please try again shortly.";
+
 export async function POST(request: Request) {
   try {
+    if (!isSessionConfigured()) {
+      return NextResponse.json(
+        { error: ACCOUNT_SESSION_UNAVAILABLE },
+        { status: 503 },
+      );
+    }
+
     const body = (await request.json()) as { email?: string; password?: string };
     if (!body.email?.trim() || !body.password) {
       return NextResponse.json(

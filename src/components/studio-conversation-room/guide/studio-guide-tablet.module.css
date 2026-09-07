@@ -916,7 +916,8 @@
   .root[data-stage="route"] .main,
   .root[data-stage="plan"] .main,
   .root[data-stage="services"] .main,
-  .root[data-stage="checkout"] .main {
+  .root[data-stage="checkout"] .main,
+  .root[data-stage="intake"] .main {
     overflow: visible;
     height: auto;
   }
@@ -924,7 +925,8 @@
   .root[data-stage="route"] .main > :first-child,
   .root[data-stage="plan"] .main > :first-child,
   .root[data-stage="services"] .main > :first-child,
-  .root[data-stage="checkout"] .main > :first-child {
+  .root[data-stage="checkout"] .main > :first-child,
+  .root[data-stage="intake"] .main > :first-child {
     flex: 0 1 auto;
     height: auto;
     min-height: 0;

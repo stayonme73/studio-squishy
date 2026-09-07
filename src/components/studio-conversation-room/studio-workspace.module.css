@@ -454,7 +454,8 @@
   .frame[data-name-question="true"]:has([data-step="summary"]),
   .frame[data-name-question="true"]:has([data-stage="services"]),
   .frame[data-name-question="true"]:has([data-stage="plan"]),
-  .frame[data-name-question="true"]:has([data-stage="checkout"]) {
+  .frame[data-name-question="true"]:has([data-stage="checkout"]),
+  .frame[data-name-question="true"]:has([data-stage="intake"]) {
     margin-bottom: 2.15rem;
   }
 
@@ -473,7 +474,8 @@
   }
 
   .frame[data-name-question="true"]:has([data-stage="checkout"]) .nameQuestionPanel,
-  .frame[data-name-question="true"]:has([data-stage="services"]) .nameQuestionPanel {
+  .frame[data-name-question="true"]:has([data-stage="services"]) .nameQuestionPanel,
+  .frame[data-name-question="true"]:has([data-stage="intake"]) .nameQuestionPanel {
     max-height: calc(
       100dvh - clamp(1.15rem, 7vh, 2.35rem) - env(safe-area-inset-top, 0px) -
         var(--studio-review-mobile-bottom, 3.25rem) - 2.15rem

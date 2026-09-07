@@ -749,7 +749,8 @@ describe("MJ-D19 Mobile Choose Your Services hierarchy", () => {
     expect(phoneWsGlass).not.toContain("var(--mc-ivory, #f7f4ee) 36%, transparent");
     expect(phoneWsGlass).not.toContain("blur(28px)");
     expect(phoneWsGlass).toContain(':has([data-stage="checkout"]) .nameQuestionPanel,');
-    expect(phoneWsGlass).toContain(':has([data-stage="services"]) .nameQuestionPanel {');
+    expect(phoneWsGlass).toContain(':has([data-stage="intake"]) .nameQuestionPanel {');
+    expect(phoneWsGlass).toContain(':has([data-stage="services"]) .nameQuestionPanel,');
     const servicesCard = phoneWsGlass.slice(
       phoneWsGlass.indexOf(':has([data-stage="checkout"]) .nameQuestionPanel,'),
       phoneWsGlass.indexOf(
@@ -882,6 +883,7 @@ describe("Mobile Your project so far + Choose Your Services shell", () => {
       "utf8",
     );
     expect(tablet).toContain("phoneCheckoutPage");
+    expect(tablet).toContain("phoneIntakePage");
     const desktopServices = tablet.slice(
       tablet.indexOf("{isServicesStage && !phoneLayout ? ("),
       tablet.indexOf("{isCheckoutStage && !phoneLayout ? ("),
@@ -902,6 +904,7 @@ describe("Mobile Your project so far + Choose Your Services shell", () => {
     );
     expect(runtime).toContain("const servicesStage = stage === \"services\"");
     expect(runtime).toContain("phoneCheckoutStage");
+    expect(runtime).toContain("phoneIntakeStage");
     expect(runtime).not.toContain("setMobileRouteConfirm");
     const changeRoute = runtime.slice(
       runtime.indexOf("function handleChangeRoute"),
@@ -972,6 +975,7 @@ describe("Mobile route → services → plan navigation simplification", () => {
     expect(runtime).toContain('openPanel("builder")');
     expect(runtime).toContain("phoneHidesBuilderOverlay");
     expect(runtime).toContain("phoneHidesCheckoutOverlay");
+    expect(runtime).toContain("phoneHidesIntakeOverlay");
     expect(runtime).toContain("presentCheckoutSurface");
     expect(runtime).not.toContain("onContinueToServices");
     const reviewPlan = runtime.slice(
@@ -1087,5 +1091,53 @@ describe("Mobile route → services → plan navigation simplification", () => {
       ".checkoutPageSurface :global(.co-card) {",
     );
     expect(activityCss).toContain("background: transparent");
+    const intakePanel = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationIntakePanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(intakePanel).toContain("phonePage = false");
+    expect(intakePanel).toContain("phonePage ? null : (");
+    expect(intakePanel).toContain("paidAcknowledgment");
+    expect(intakePanel).toContain('data-surface={phonePage ? "page" : "overlay"}');
+    expect(intakePanel).toContain("phoneLayout={phonePage}");
+    const intakeForm = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ProjectIntakeMultiServiceForm.tsx",
+      ),
+      "utf8",
+    );
+    expect(intakeForm).toContain('data-intake-layout={phoneLayout ? "phone" : "desktop"}');
+    expect(intakeForm).toContain("route-map-social-intake__card-head");
+    expect(intakeForm).toContain("questions answered");
+    expect(intakeForm).toContain("Complete the required questions to continue.");
+    expect(intakeForm).toContain("PHONE_MATERIALS_HINT");
+    expect(intakeForm).toContain('data-intake-action="draft"');
+    const phoneIntakeCss = activityCss.slice(
+      activityCss.indexOf(
+        '.sheet[data-panel="intake"][data-surface="page"]',
+      ),
+    );
+    expect(phoneIntakeCss).toContain(
+      ":global(.route-map-social-intake__card-head)",
+    );
+    expect(phoneIntakeCss).toContain("flex-direction: column");
+    expect(phoneIntakeCss).toContain("grid-template-columns: none");
+    expect(phoneIntakeCss).toContain(
+      "background: color-mix(in srgb, var(--mc-ivory, #f7f4ee) 72%, transparent)",
+    );
+    expect(phoneIntakeCss).toContain(
+      ":global(.route-map-social-intake__chip--selected)",
+    );
+    expect(phoneIntakeCss).toContain("background: var(--mc-yellow, #f7c900)");
+    expect(phoneIntakeCss).toContain(
+      ":global(.route-map-secondary-btn):not(:disabled)",
+    );
+    expect(phoneIntakeCss).toContain(
+      ":global(.route-map-primary-btn):disabled",
+    );
   });
 });

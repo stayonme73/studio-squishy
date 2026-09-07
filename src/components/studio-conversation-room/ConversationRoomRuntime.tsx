@@ -37,7 +37,7 @@ import {
   type RouteMapRoadId,
 } from "@/config/route-map-v1";
 import {
-  completeIntakeHandoff,
+  applyIntakeHandoffPassport,
   navigateIntakeHandoff,
   probeCustomerSessionSignedIn,
   resolveIntakeHandoffPlan,
@@ -467,7 +467,9 @@ export default function ConversationRoomRuntime({
     setActivePanel(
       restoredStage === "opening" ||
         (readPhoneLayout() &&
-          (restoredStage === "services" || restoredStage === "checkout"))
+          (restoredStage === "services" ||
+            restoredStage === "checkout" ||
+            restoredStage === "intake"))
         ? "none"
         : STAGE_DEFAULT_PANEL[restoredStage],
     );
@@ -1452,31 +1454,30 @@ export default function ConversationRoomRuntime({
   }, []);
 
   function handleIntakeSubmitSuccess() {
-    setStageAndPersist("complete");
-    closeActivityPanel();
-    void (async () => {
-      const plan = await completeIntakeHandoff();
-      setIntakeHandoffSignedIn(plan.auth === "signed-in");
-      const campaign = readCurrentCampaignHydrated();
-      const submittedAt =
-        campaign?.routeMapIntakeSubmittedAt ??
-        campaign?.routeMapIntake?.submittedAt ??
-        new Date().toISOString();
-      const submittedAnswers = campaign?.routeMapIntake?.answers ?? {};
-      /* Distinct submission event — only after campaign submit already succeeded in the panel. */
-      recordIntakeSubmission({
-        campaignId: campaign?.campaignId,
-        auth: plan.auth,
-        destination: plan.destination,
-        requiredSatisfied: true,
-        answers: submittedAnswers,
-        submittedAt,
-      });
-      /* Keep attributed working-draft history; clear Guide locals only so Board handoff is clean. */
-      clearConversationGuideLocals();
-      speakStudioLine(plan.voiceLine);
-      navigateIntakeHandoff(plan.destination);
-    })();
+    /* Do not setStage/closePanel first — that unmounts phone Intake and races
+     * Samsung away from a full document load. Persist complete in storage, then
+     * leave immediately with the already-resolved signed-in/out plan. Account
+     * Handoff still redirects signed-in customers to Board. */
+    const plan = resolveIntakeHandoffPlan(intakeHandoffSignedIn);
+    applyIntakeHandoffPassport(intakeHandoffSignedIn);
+    const campaign = readCurrentCampaignHydrated();
+    const submittedAt =
+      campaign?.routeMapIntakeSubmittedAt ??
+      campaign?.routeMapIntake?.submittedAt ??
+      new Date().toISOString();
+    const submittedAnswers = campaign?.routeMapIntake?.answers ?? {};
+    recordIntakeSubmission({
+      campaignId: campaign?.campaignId,
+      auth: plan.auth,
+      destination: plan.destination,
+      requiredSatisfied: true,
+      answers: submittedAnswers,
+      submittedAt,
+    });
+    const base = projectDraft ?? bootConversationProjectDraft(draft);
+    persistConversationStage(base, "complete");
+    clearConversationGuideLocals();
+    navigateIntakeHandoff(plan.destination);
   }
 
   function handleConfirm() {
@@ -1886,19 +1887,25 @@ export default function ConversationRoomRuntime({
     stage === "route" ||
     stage === "services" ||
     (isPhone && stage === "plan") ||
-    (isPhone && stage === "checkout");
+    (isPhone && stage === "checkout") ||
+    (isPhone && stage === "intake");
   const summaryConfirm =
     stage === "opening" && step === "summary" && !correcting;
   const routeChoose = stage === "route";
   const servicesStage = stage === "services";
   const phonePlanStage = isPhone && stage === "plan";
   const phoneCheckoutStage = isPhone && stage === "checkout";
+  const phoneIntakeStage = isPhone && stage === "intake";
   const phoneHidesBuilderOverlay =
     isPhone && stage === "services" && slidePanel === "builder";
   const phoneHidesCheckoutOverlay =
     isPhone && stage === "checkout" && slidePanel === "checkout";
+  const phoneHidesIntakeOverlay =
+    isPhone && stage === "intake" && slidePanel === "intake";
   const phoneHidesSlideOverlay =
-    phoneHidesBuilderOverlay || phoneHidesCheckoutOverlay;
+    phoneHidesBuilderOverlay ||
+    phoneHidesCheckoutOverlay ||
+    phoneHidesIntakeOverlay;
 
   const canChangeAnswer =
     guideHasReviewableAnswers(draft) ||
@@ -1917,7 +1924,8 @@ export default function ConversationRoomRuntime({
         routeChoose ||
         servicesStage ||
         phonePlanStage ||
-        phoneCheckoutStage
+        phoneCheckoutStage ||
+        phoneIntakeStage
       }
       activePanel={phoneHidesSlideOverlay ? "none" : activePanel}
       onCloseActivityPanel={closeActivityPanel}
@@ -2132,6 +2140,16 @@ export default function ConversationRoomRuntime({
           }}
           planBridgeError={planBridgeError}
           intakeTabletStatus={intakeTabletStatus}
+          onIntakeSubmitSuccess={handleIntakeSubmitSuccess}
+          onRecoverIntakePayment={() => {
+            setDetailJobId(null);
+            setStageAndPersist("checkout");
+            presentCheckoutSurface();
+          }}
+          intakePrefillBusinessName={draft.businessName}
+          onIntakeAnswersChange={setIntakeLiveAnswers}
+          intakeSubmitCtaLabel={intakeHandoffPlan.submitCtaLabel}
+          intakeNextStepBlurb={intakeHandoffPlan.nextStepBlurb}
         />
       }
       communication={

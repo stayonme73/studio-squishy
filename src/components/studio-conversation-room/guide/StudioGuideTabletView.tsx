@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 
 import ConversationCheckoutPanel from "@/components/studio-conversation-room/guide/ConversationCheckoutPanel";
+import ConversationIntakePanel from "@/components/studio-conversation-room/guide/ConversationIntakePanel";
 import ConversationRouteChoose from "@/components/studio-conversation-room/guide/ConversationRouteChoose";
 import ConversationServiceList from "@/components/studio-conversation-room/guide/ConversationServiceList";
 import ConversationStudioPlanTablet from "@/components/studio-conversation-room/guide/ConversationStudioPlanTablet";
@@ -24,6 +25,7 @@ import { studioTileClass } from "@/config/studio-customer-tile-system-v1";
 import type { ConversationRoomStage } from "@/config/conversation-room-stage-v1";
 import { PROJECT_BUILDER_V1 } from "@/config/project-builder-v1";
 import type { GuideConversationStep } from "@/config/studio-guide-conversation-v1";
+import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
 import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
 import {
   deadlineStatusLabel,
@@ -71,6 +73,13 @@ export type StudioGuideTabletViewProps = {
   onCheckoutPaymentComplete?: () => void | Promise<void>;
   onSandboxCheckoutConfirm?: () => void | Promise<void>;
   onAuthorizeCheckoutPayment?: () => boolean;
+  /** Phone: dedicated Project Intake page, not a Conversation Room overlay. */
+  onIntakeSubmitSuccess?: () => void | Promise<void>;
+  onRecoverIntakePayment?: () => void;
+  intakePrefillBusinessName?: string | null;
+  onIntakeAnswersChange?: (answers: RouteMapIntakeAnswers) => void;
+  intakeSubmitCtaLabel?: string;
+  intakeNextStepBlurb?: string;
   /** Plan stage — Studio Plan summary on the tablet. */
   planModel?: ProjectBuilderStudioPlanSummaryModel | null;
   /**
@@ -139,6 +148,12 @@ export default function StudioGuideTabletView({
   onCheckoutPaymentComplete,
   onSandboxCheckoutConfirm,
   onAuthorizeCheckoutPayment,
+  onIntakeSubmitSuccess,
+  onRecoverIntakePayment,
+  intakePrefillBusinessName = null,
+  onIntakeAnswersChange,
+  intakeSubmitCtaLabel,
+  intakeNextStepBlurb,
   planModel = null,
   ma001CompositionMemberLabels = null,
   onEditPlan,
@@ -177,11 +192,18 @@ export default function StudioGuideTabletView({
     selectedRoadId != null &&
     onBackToStudioPlanFromCheckout != null &&
     onCheckoutPaymentComplete != null;
+  const phoneIntakePage =
+    phoneLayout &&
+    isIntakeStage &&
+    onIntakeSubmitSuccess != null &&
+    intakeSubmitCtaLabel != null &&
+    intakeNextStepBlurb != null;
   const tabletOwnsChrome =
     isRouteStage ||
     isPlanStage ||
     isServicesStage ||
-    phoneCheckoutPage;
+    phoneCheckoutPage ||
+    phoneIntakePage;
   const previousStepRef = useRef(step);
   const previousSurfaceRef = useRef(`${stage}:${step}`);
 
@@ -344,7 +366,29 @@ export default function StudioGuideTabletView({
           </>
         ) : null}
 
-        {isIntakeStage ? (
+        {phoneIntakePage &&
+        onIntakeSubmitSuccess &&
+        intakeSubmitCtaLabel &&
+        intakeNextStepBlurb ? (
+          <ConversationIntakePanel
+            phonePage
+            onClose={() => undefined}
+            onSubmitSuccess={onIntakeSubmitSuccess}
+            onRecoverPayment={onRecoverIntakePayment}
+            prefillBusinessName={intakePrefillBusinessName}
+            onAnswersChange={onIntakeAnswersChange}
+            submitCtaLabel={intakeSubmitCtaLabel}
+            nextStepBlurb={intakeNextStepBlurb}
+            paidAcknowledgment={
+              intakeTabletStatus?.completed ?? [
+                v.intakeTabletPaymentReceivedLabel,
+                v.intakeTabletServicesConfirmedLabel,
+              ]
+            }
+          />
+        ) : null}
+
+        {isIntakeStage && !phoneIntakePage ? (
           <>
             <h1 className={styles.question}>{v.intakeTabletTitle}</h1>
             <p className={styles.body}>{v.intakeTabletLead}</p>

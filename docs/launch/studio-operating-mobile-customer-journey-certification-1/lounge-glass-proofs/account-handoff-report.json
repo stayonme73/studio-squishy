@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "checks": {
+    "leftIntakeWithoutRefresh": true,
+    "didNotStayOnConversationRoom": true,
+    "urlChangedFromIntake": true,
+    "handoffHeading": true,
+    "oneCreateAccount": true,
+    "oneSignIn": true,
+    "paidPreserved": true,
+    "flyerPreserved": true,
+    "intakeSubmitted": true,
+    "refreshStillHandoff": true,
+    "refreshStillPaid": true,
+    "refreshStillFlyer": true,
+    "refreshStillSubmitted": true,
+    "stillOneCreateAccount": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\account-handoff-01-immediate.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\account-handoff-02-refresh.png"
+  ],
+  "pageErrors": [],
+  "arrived": {
+    "url": "https://localhost:3000/account-handoff?from=%2Fstudio-board",
+    "onAccountHandoff": true,
+    "onConversationRoom": false,
+    "headingHandoff": true,
+    "createAccountCount": 1,
+    "signInCount": 1,
+    "paidAt": true,
+    "amountDue": 6900,
+    "flyer": true,
+    "intakeSubmitted": true
+  },
+  "afterReload": {
+    "url": "https://localhost:3000/account-handoff?from=%2Fstudio-board",
+    "onAccountHandoff": true,
+    "onConversationRoom": false,
+    "headingHandoff": true,
+    "createAccountCount": 1,
+    "signInCount": 1,
+    "paidAt": true,
+    "amountDue": 6900,
+    "flyer": true,
+    "intakeSubmitted": true
+  },
+  "failed": []
+}

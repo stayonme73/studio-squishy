@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import {
   createSessionToken,
+  isSessionConfigured,
   sessionCookieOptions,
   SESSION_COOKIE_NAME,
 } from "@/lib/auth/session";
@@ -11,8 +12,18 @@ import {
 } from "@/lib/auth/email-verification";
 import { createClientAccount } from "@/lib/auth/users";
 
+const ACCOUNT_CREATE_UNAVAILABLE =
+  "Account creation is temporarily unavailable. Please try again shortly.";
+
 export async function POST(request: Request) {
   try {
+    if (!isSessionConfigured()) {
+      return NextResponse.json(
+        { error: ACCOUNT_CREATE_UNAVAILABLE },
+        { status: 503 },
+      );
+    }
+
     const body = (await request.json()) as {
       email?: string;
       password?: string;
@@ -63,9 +74,10 @@ export async function POST(request: Request) {
     });
     response.cookies.set(SESSION_COOKIE_NAME, token, sessionCookieOptions());
     return response;
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Account creation failed";
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch {
+    return NextResponse.json(
+      { error: ACCOUNT_CREATE_UNAVAILABLE },
+      { status: 500 },
+    );
   }
 }

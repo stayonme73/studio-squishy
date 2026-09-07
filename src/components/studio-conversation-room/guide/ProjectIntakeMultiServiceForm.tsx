@@ -32,7 +32,9 @@ import type { ServiceId } from "@/catalog/types";
 import "@/app/route-map/route-map.css";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 
-/** Tablet status updates — delayed so typing does not re-render the whole room each key. */
+/** Same materials requirement, shorter on a phone. */
+const PHONE_MATERIALS_HINT =
+  "A logo is not required. Name a logo or photo you have, or say to use the business name as a wordmark. You can send files later from the Studio Board.";
 const INTAKE_LIVE_STATUS_DEBOUNCE_MS = 280;
 
 export type ProjectIntakeMultiServiceFormProps = {
@@ -44,6 +46,8 @@ export type ProjectIntakeMultiServiceFormProps = {
   onDraftStatusChange?: (status: "unsaved" | "saved" | "error") => void;
   /** Live answer stream for tablet status (every change, including mount). */
   onAnswersChange?: (answers: RouteMapIntakeAnswers) => void;
+  /** Phone Conversation Room: stack questions, lighter glass. Desktop overlay unchanged. */
+  phoneLayout?: boolean;
   submitError?: string | null;
   /** Truthful handoff — must match real next destination. */
   submitCtaLabel: string;
@@ -172,6 +176,7 @@ function FieldCard({
   onChange,
   onMaterialsAvailability,
   onMaterialsDetail,
+  compactCopy = false,
 }: {
   step: number;
   field: RouteMapIntakeField;
@@ -179,24 +184,31 @@ function FieldCard({
   onChange: (next: string) => void;
   onMaterialsAvailability?: (availability: string) => void;
   onMaterialsDetail?: (detail: string) => void;
+  compactCopy?: boolean;
 }) {
   const requiredMark = field.required ? (
     <span className="route-map-intake__req">Required</span>
   ) : (
     <span className="route-map-intake__opt">Optional</span>
   );
+  const hint =
+    compactCopy && field.role === "materials"
+      ? PHONE_MATERIALS_HINT
+      : field.hint;
 
   if (field.role === "materials" && onMaterialsAvailability && onMaterialsDetail) {
     const parsed = parseMaterialsPathAnswer(value);
     const describeOpen = parsed.availability === INTAKE_MATERIALS_HAVE_NOW;
     return (
       <article className="route-map-social-intake__card route-map-social-intake__card--materials">
-        <p className="route-map-social-intake__step">{step}</p>
-        <div className="route-map-social-intake__card-copy">
-          <h3>
-            {field.label} {requiredMark}
-          </h3>
-          {field.hint ? <p>{field.hint}</p> : null}
+        <div className="route-map-social-intake__card-head">
+          <p className="route-map-social-intake__step">{step}</p>
+          <div className="route-map-social-intake__card-copy">
+            <h3>
+              {field.label} {requiredMark}
+            </h3>
+            {hint ? <p>{hint}</p> : null}
+          </div>
         </div>
         <ChoiceChips
           options={[...INTAKE_MATERIALS_AVAILABILITY_OPTIONS]}
@@ -225,12 +237,14 @@ function FieldCard({
   if (field.type === "select") {
     return (
       <article className="route-map-social-intake__card">
-        <p className="route-map-social-intake__step">{step}</p>
-        <div className="route-map-social-intake__card-copy">
-          <h3>
-            {field.label} {requiredMark}
-          </h3>
-          {field.hint ? <p>{field.hint}</p> : null}
+        <div className="route-map-social-intake__card-head">
+          <p className="route-map-social-intake__step">{step}</p>
+          <div className="route-map-social-intake__card-copy">
+            <h3>
+              {field.label} {requiredMark}
+            </h3>
+            {hint ? <p>{hint}</p> : null}
+          </div>
         </div>
         <ChoiceChips
           options={[...(field.options ?? [])]}
@@ -243,19 +257,21 @@ function FieldCard({
 
   return (
     <article className="route-map-social-intake__card">
-      <p className="route-map-social-intake__step">{step}</p>
-      <div className="route-map-social-intake__card-copy">
-        <h3>
-          {field.label} {requiredMark}
-        </h3>
-        {field.hint ? <p>{field.hint}</p> : null}
+      <div className="route-map-social-intake__card-head">
+        <p className="route-map-social-intake__step">{step}</p>
+        <div className="route-map-social-intake__card-copy">
+          <h3>
+            {field.label} {requiredMark}
+          </h3>
+          {hint ? <p>{hint}</p> : null}
+        </div>
       </div>
       <label className="route-map-social-intake__compact-field">
         <span className="sr-only">{field.label}</span>
         <IntakePlainTextField
           multiline={field.type === "textarea"}
           required={field.required}
-          rows={4}
+          rows={compactCopy ? 3 : 4}
           placeholder={field.placeholder}
           value={value}
           onChange={onChange}
@@ -279,6 +295,7 @@ export default function ProjectIntakeMultiServiceForm({
   submitError = null,
   submitCtaLabel,
   nextStepBlurb,
+  phoneLayout = false,
 }: ProjectIntakeMultiServiceFormProps) {
   const plan: ProjectIntakePlan = useMemo(
     () => buildProjectIntakePlan(selectedServiceIds),
@@ -326,6 +343,9 @@ export default function ProjectIntakeMultiServiceForm({
 
   const progress = projectIntakeProgressLabel(plan, answers);
   const ready = isProjectIntakePlanReady(plan, answers);
+  const nextStepCopy = phoneLayout
+    ? nextStepBlurb.replaceAll("section", "question")
+    : nextStepBlurb;
 
   function setAnswer(key: string, value: string) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -355,30 +375,44 @@ export default function ProjectIntakeMultiServiceForm({
   }
 
   return (
-    <section className="route-map-social-intake" aria-labelledby="project-intake-title">
+    <section
+      className="route-map-social-intake"
+      aria-labelledby="project-intake-title"
+      data-intake-layout={phoneLayout ? "phone" : "desktop"}
+    >
       <div className="route-map-social-intake__header">
-        <div>
-          <p className="route-map-social-intake__eyebrow">Project Intake</p>
-          <h2 id="project-intake-title" className="route-map-social-intake__title">
-            Project materials
-          </h2>
-          <p className="route-map-social-intake__lead">
-            Shared brand and contact details are asked once. Each purchased service
-            then asks only what is unique to that deliverable. Submitting Project
-            Intake does not start production.
-          </p>
-        </div>
+        {phoneLayout ? (
+            <h2 id="project-intake-title" className={styles.intakeVisuallyHidden}>
+              Project materials
+            </h2>
+        ) : (
+          <div>
+            <p className="route-map-social-intake__eyebrow">Project Intake</p>
+            <h2 id="project-intake-title" className="route-map-social-intake__title">
+              Project materials
+            </h2>
+            <p className="route-map-social-intake__lead">
+              Shared brand and contact details are asked once. Each purchased service
+              then asks only what is unique to that deliverable. Submitting Project
+              Intake does not start production.
+            </p>
+          </div>
+        )}
         <div className="route-map-social-intake__progress" aria-live="polite">
           <strong>
             {progress.completed} of {progress.total}
           </strong>
-          <span>sections ready to submit</span>
+          <span>
+            {phoneLayout ? "questions answered" : "sections ready to submit"}
+          </span>
         </div>
       </div>
 
-      <p className={styles.intakeMaterialsNote} role="note">
-        {conversationRoomGuideV1.intakeMaterialsDeadlineNote}
-      </p>
+      {phoneLayout ? null : (
+        <p className={styles.intakeMaterialsNote} role="note">
+          {conversationRoomGuideV1.intakeMaterialsDeadlineNote}
+        </p>
+      )}
 
       <form className="route-map-social-intake__form" onSubmit={handleSubmit}>
         {plan.sharedFields.length > 0 ? (
@@ -392,6 +426,7 @@ export default function ProjectIntakeMultiServiceForm({
                   key={shared.answerKey}
                   step={currentStep}
                   field={shared.field}
+                  compactCopy={phoneLayout}
                   value={answers[shared.answerKey] ?? ""}
                   onChange={(next) => setAnswer(shared.answerKey, next)}
                   onMaterialsAvailability={
@@ -435,7 +470,9 @@ export default function ProjectIntakeMultiServiceForm({
         {plan.services.map((section) => (
           <div key={section.serviceId} className={styles.intakeSectionBlock}>
             <h3 className={styles.intakeSectionHeading}>{section.title}</h3>
-            <p className={styles.intakeSectionLead}>{section.jobName}</p>
+            {phoneLayout ? null : (
+              <p className={styles.intakeSectionLead}>{section.jobName}</p>
+            )}
             {section.fields.map((field) => {
               step += 1;
               const key = projectIntakeServiceFieldKey(section.serviceId, field.id);
@@ -445,6 +482,7 @@ export default function ProjectIntakeMultiServiceForm({
                   key={key}
                   step={currentStep}
                   field={field}
+                  compactCopy={phoneLayout}
                   value={answers[key] ?? ""}
                   onChange={(next) => setAnswer(key, next)}
                 />
@@ -456,11 +494,12 @@ export default function ProjectIntakeMultiServiceForm({
         <div className="route-map-social-intake__actions">
           <div className="route-map-social-intake__next-step">
             <strong>Next Step</strong>
-            <span>{nextStepBlurb}</span>
+            <span>{nextStepCopy}</span>
           </div>
           <button
             type="button"
             className="route-map-secondary-btn"
+            data-intake-action="draft"
             onClick={handleSaveDraft}
             disabled={submitting}
           >
@@ -469,10 +508,21 @@ export default function ProjectIntakeMultiServiceForm({
           <button
             type="submit"
             className="route-map-primary-btn"
+            data-intake-action="continue"
             disabled={submitting || !ready}
+            aria-describedby={!ready ? "intake-continue-hint" : undefined}
           >
             {submitCtaLabel}
           </button>
+          {!ready ? (
+            <p
+              id="intake-continue-hint"
+              className={styles.intakeContinueHint}
+              role="status"
+            >
+              Complete the required questions to continue.
+            </p>
+          ) : null}
         </div>
         {submitError ? (
           <p className="route-map-social-intake__submit-error" role="alert">

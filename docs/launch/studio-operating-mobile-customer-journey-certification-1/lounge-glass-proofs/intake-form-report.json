@@ -1,0 +1,132 @@
+{
+  "ok": true,
+  "checks": {
+    "onePageSurface": true,
+    "sixQuestions": true,
+    "noSectionsCopy": true,
+    "questionsAnsweredCopy": true,
+    "noSectionInNextStep": true,
+    "continueHint": true,
+    "saveDraftEnabled": true,
+    "saveContinueGuarded": true,
+    "noSqueezedQuestions": true,
+    "controlsStackUnderQuestions": true,
+    "q1SelectedYellow": true,
+    "q4SelectedYellow": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\intake-form-01-top.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\intake-form-02-q1.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\intake-form-03-q2-q3.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\intake-form-04-q4-q6.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\intake-form-05-actions.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\intake-form-06-q1-selected.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\intake-form-07-q4-selected.png"
+  ],
+  "pageErrors": [],
+  "layout": {
+    "cardCount": 6,
+    "cardGeometry": [
+      {
+        "label": "Brand references you already have — or say you are using wordmark only Required",
+        "cardWidth": 284,
+        "h3Width": 284,
+        "h3WidthRatio": 1,
+        "controlWidthRatio": 1,
+        "controlBelowQuestion": true,
+        "squeezed": false
+      },
+      {
+        "label": "What is this flyer for? Required",
+        "cardWidth": 284,
+        "h3Width": 284,
+        "h3WidthRatio": 1,
+        "controlWidthRatio": 1,
+        "controlBelowQuestion": true,
+        "squeezed": false
+      },
+      {
+        "label": "Exact text, offer details, dates, prices, location, phone, website, or QR destination Requ",
+        "cardWidth": 284,
+        "h3Width": 284,
+        "h3WidthRatio": 1,
+        "controlWidthRatio": 1,
+        "controlBelowQuestion": true,
+        "squeezed": false
+      },
+      {
+        "label": "Intended use Required",
+        "cardWidth": 284,
+        "h3Width": 284,
+        "h3WidthRatio": 1,
+        "controlWidthRatio": 1,
+        "controlBelowQuestion": true,
+        "squeezed": false
+      },
+      {
+        "label": "Required flyer size, if known Optional",
+        "cardWidth": 284,
+        "h3Width": 284,
+        "h3WidthRatio": 1,
+        "controlWidthRatio": 1,
+        "controlBelowQuestion": true,
+        "squeezed": false
+      },
+      {
+        "label": "Any required wording or disclosures (you supply and verify) Optional",
+        "cardWidth": 284,
+        "h3Width": 284,
+        "h3WidthRatio": 1,
+        "controlWidthRatio": 1,
+        "controlBelowQuestion": true,
+        "squeezed": false
+      }
+    ],
+    "hasSectionsCopy": false,
+    "hasQuestionsCopy": true,
+    "hasSectionInNextStep": false,
+    "hasContinueHint": true,
+    "draftDisabled": false,
+    "continueDisabled": true,
+    "chipLabels": [
+      "I can describe what I have",
+      "I do not have this yet",
+      "I will provide this later"
+    ],
+    "chipUnselectedLooksTappable": [
+      {
+        "cursor": "pointer",
+        "opacity": "1",
+        "background": "color(srgb 0.968627 0.956863 0.933333 / 0.72)",
+        "color": "rgb(84, 124, 146)"
+      },
+      {
+        "cursor": "pointer",
+        "opacity": "1",
+        "background": "color(srgb 0.968627 0.956863 0.933333 / 0.72)",
+        "color": "rgb(84, 124, 146)"
+      },
+      {
+        "cursor": "pointer",
+        "opacity": "1",
+        "background": "color(srgb 0.968627 0.956863 0.933333 / 0.72)",
+        "color": "rgb(84, 124, 146)"
+      }
+    ]
+  },
+  "selected": [
+    {
+      "label": "I will provide this later",
+      "background": "rgb(247, 201, 0)",
+      "color": "rgb(46, 43, 40)",
+      "border": "rgb(247, 201, 0)"
+    },
+    {
+      "label": "Print",
+      "background": "rgb(247, 201, 0)",
+      "color": "rgb(46, 43, 40)",
+      "border": "rgb(247, 201, 0)"
+    }
+  ],
+  "failed": []
+}

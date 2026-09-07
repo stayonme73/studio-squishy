@@ -20,9 +20,9 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.unparkedAt).toBe("2026-08-25");
     expect(cfg.livePhoneCertification).toBe("IN_PROGRESS_NOT_CERTIFIED");
     expect(cfg.nextPhoneAction).toContain(
-      "Owner visual acceptance of simplified mobile Checkout",
+      "Owner visual acceptance of the single mobile Project Intake surface",
     );
-    expect(cfg.nextPhoneAction).toContain("Do not begin MJ-D22");
+    expect(cfg.nextPhoneAction).toContain("Do not rebuild Maya");
     expect(cfg.nextMobileScreen).toBe("checkout");
     expect(cfg.mjd16ManualEntryStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.checkoutStageEntryScrollStatus).toBe("OWNER_ACCEPTED");
@@ -33,7 +33,7 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.checkoutPresentationStatus).toBe(
       "PENDING_OWNER_VISUAL_ACCEPTANCE",
     );
-    expect(cfg.mjd22Status).toBe("OPEN_PARKED_UNTIL_CHECKOUT_VISUAL_ACCEPTANCE");
+    expect(cfg.mjd22Status).toBe("FIXED_PENDING_OWNER_VISUAL_ACCEPTANCE");
     expect(cfg.stoppingPointCheckpointDoc).toContain(
       "2026-08-25-STOPPING-POINT-CHECKPOINT.md",
     );

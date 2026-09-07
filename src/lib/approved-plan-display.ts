@@ -151,7 +151,8 @@ export function resolveCampaignBillingTypeLabel(campaign: CampaignRecord): strin
   return campaign.packageId === "spark" ? copy.billingOneTime : copy.billingMonthly;
 }
 
-function parseRevisionRoundsFromRule(rule: string): number {
+function parseRevisionRoundsFromRule(rule: string | undefined): number {
+  if (!rule) return 1;
   const match = rule.match(/(\d+)/);
   return match ? Number.parseInt(match[1], 10) : 1;
 }

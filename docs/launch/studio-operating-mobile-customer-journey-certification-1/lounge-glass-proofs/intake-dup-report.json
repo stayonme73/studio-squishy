@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "checks": {
+    "oneIntakePanel": true,
+    "pageNotOverlay": true,
+    "noPreparingTablet": true,
+    "noClose": true,
+    "ackAndIntake": true,
+    "paidStatePreserved": true,
+    "lounge": true,
+    "refreshStillOneSurface": true,
+    "refreshStaysPaid": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\intake-dup-01-one-surface.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\intake-dup-02-refresh.png"
+  ],
+  "pageErrors": [],
+  "state": {
+    "panelCount": 1,
+    "pageSurface": true,
+    "overlaySurface": false,
+    "preparingCount": 0,
+    "closeCount": 0,
+    "headingIntake": true,
+    "paymentReceived": true,
+    "servicesConfirmed": true,
+    "flyer": true,
+    "lounge": true,
+    "paidAt": true,
+    "amountDue": 6900
+  },
+  "afterReload": {
+    "panelCount": 1,
+    "preparingCount": 0,
+    "closeCount": 0,
+    "paidAt": true,
+    "amountDue": 6900
+  },
+  "failed": []
+}

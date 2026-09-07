@@ -70,13 +70,22 @@ export function applyIntakeHandoffPassport(signedIn: boolean): void {
 
 /**
  * Probe customer session. Fail-closed to signed-out so we never skip Sign In by accident.
+ * Timeboxed so a hung session call cannot strand Intake on Samsung.
  */
+export const INTAKE_HANDOFF_SESSION_PROBE_TIMEOUT_MS = 2500;
+
 export async function probeCustomerSessionSignedIn(
   fetchImpl: typeof fetch = fetch,
 ): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(),
+    INTAKE_HANDOFF_SESSION_PROBE_TIMEOUT_MS,
+  );
   try {
     const response = await fetchImpl("/api/auth/session", {
       credentials: "include",
+      signal: controller.signal,
     });
     if (!response.ok) return false;
     const body = (await response.json().catch(() => ({}))) as {
@@ -85,13 +94,18 @@ export async function probeCustomerSessionSignedIn(
     return Boolean(body.user?.id);
   } catch {
     return false;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
-/** Hard navigation — soft router can leave customers on the wrong screen. */
 export function navigateIntakeHandoff(destination: string): void {
   if (typeof window === "undefined") return;
-  window.location.assign(destination);
+  const url = new URL(destination, window.location.origin).href;
+  /* Origin-absolute href forces a full document load. Same-origin relative
+   * navigation can be intercepted as a Next client transition and leave
+   * Conversation Room painted until a manual refresh. */
+  window.location.href = url;
 }
 
 /**

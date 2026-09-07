@@ -204,7 +204,7 @@ export async function readSessionFromRequest(request: Request): Promise<StudioUs
   return readSessionFromCookieHeader(request.headers.get("cookie"));
 }
 
-/** Test helper — bypass cookie when SESSION_SECRET unavailable in unit tests. */
+/** True when the local/runtime session signing key is present. */
 export function isSessionConfigured(): boolean {
   return Boolean(process.env.SESSION_SECRET);
 }

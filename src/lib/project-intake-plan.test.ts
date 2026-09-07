@@ -98,4 +98,17 @@ describe("project intake multi-service plan", () => {
     expect(both.services.length).toBe(2);
     expect(both.services.length).toBeGreaterThan(flyerOnly.services.length);
   });
+
+  it("counts flyer-only intake as six questions (shared materials + unique fields)", () => {
+    const plan = buildProjectIntakePlan(["v2-rtu-flyer"]);
+    expect(plan.sharedFields.map((f) => f.field.id)).toEqual(["materials"]);
+    expect(plan.services[0]?.fields.map((f) => f.id)).toEqual([
+      "flyerPurpose",
+      "mustInclude",
+      "intendedUse",
+      "sizeNotes",
+      "disclaimers",
+    ]);
+    expect(countProjectIntakeSections(plan)).toBe(6);
+  });
 });

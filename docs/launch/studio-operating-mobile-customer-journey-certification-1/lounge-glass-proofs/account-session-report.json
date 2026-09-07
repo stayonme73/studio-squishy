@@ -1,0 +1,47 @@
+{
+  "ok": true,
+  "checks": {
+    "signupOk": true,
+    "noSecretLeak": true,
+    "sessionCookie": true,
+    "boardOpened": true,
+    "paidAttached": true,
+    "flyerAttached": true,
+    "intakeAttached": true,
+    "sameCampaign": true,
+    "authenticatedSession": true,
+    "refreshStillBoard": true,
+    "refreshStillSession": true,
+    "refreshStillPaid": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\account-session-00-form.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\account-session-01-board.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\account-session-02-refresh.png"
+  ],
+  "pageErrors": [],
+  "filled": {
+    "name": "Maya QA",
+    "emailMatches": true,
+    "passwordLength": 14
+  },
+  "signupStatus": 200,
+  "afterSignup": {
+    "paidAt": true,
+    "amountDue": 6900,
+    "flyer": true,
+    "intakeSubmitted": true,
+    "campaignId": "session-qa-1788744792104"
+  },
+  "session": {
+    "ok": true,
+    "hasUser": true
+  },
+  "afterReload": {
+    "url": "https://localhost:3000/studio-board",
+    "hasUser": true,
+    "paidAt": true,
+    "flyer": true
+  },
+  "failed": []
+}

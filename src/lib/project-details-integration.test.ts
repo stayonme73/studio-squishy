@@ -243,4 +243,18 @@ describe("Project Details + Studio Board integration", () => {
       false,
     );
   });
+
+  it("keeps revision display working when a frozen line item omits revisionRule", () => {
+    const approved = buildGreenApprovedPlan();
+    const campaign = mockPaidCampaign({
+      revisionRoundsIncluded: undefined,
+      approvedStudioPlan: {
+        ...approved,
+        lineItems: approved.lineItems.map(({ revisionRule: _revisionRule, ...line }) => line),
+      },
+    });
+
+    expect(resolveCampaignRevisionRounds(campaign)).toBe(1);
+    expect(() => resolveStudioBoardView(campaign)).not.toThrow();
+  });
 });

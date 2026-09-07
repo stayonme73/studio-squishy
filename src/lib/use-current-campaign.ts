@@ -221,6 +221,13 @@ export function useCurrentCampaign() {
           }
         }
         if (claimResult === "denied") {
+          /* Keep paid local work. Unverified email blocks server claim, not the device copy. */
+          if (localCampaign.paymentReceivedAt) {
+            setCampaign(localCampaign);
+            setAccessState("ready");
+            setError(null);
+            return;
+          }
           clearCampaignState();
           setCampaign(null);
           setAccessState("no-active-project");

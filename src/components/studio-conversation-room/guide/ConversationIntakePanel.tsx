@@ -28,6 +28,8 @@ import {
 } from "@/lib/studio-board-campaign";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 
+import { resetConversationStageScroll } from "@/lib/studio-conversation-stage-scroll";
+
 import "@/app/route-map/route-map.css";
 
 export type ConversationIntakePanelProps = {
@@ -38,6 +40,10 @@ export type ConversationIntakePanelProps = {
   onAnswersChange?: (answers: RouteMapIntakeAnswers) => void;
   submitCtaLabel: string;
   nextStepBlurb: string;
+  /** Mobile dedicated page — not an overlay on Conversation Room. */
+  phonePage?: boolean;
+  /** Payment received / services confirmed — shown once on the phone page. */
+  paidAcknowledgment?: readonly string[];
 };
 
 type IntakeGate = Exclude<IntakeEntrySurface, { kind: "form" }>;
@@ -80,6 +86,8 @@ export default function ConversationIntakePanel({
   onAnswersChange,
   submitCtaLabel,
   nextStepBlurb,
+  phonePage = false,
+  paidAcknowledgment = [],
 }: ConversationIntakePanelProps) {
   const v = conversationRoomGuideV1;
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -99,6 +107,12 @@ export default function ConversationIntakePanel({
     }
     setFormSurface(resolveIntakeEntrySurface(readCurrentCampaignHydrated(), "intake"));
   }, [gateOverride]);
+
+  useEffect(() => {
+    if (phonePage) {
+      resetConversationStageScroll();
+    }
+  }, [phonePage]);
 
   const surface = formSurface;
 
@@ -180,23 +194,45 @@ export default function ConversationIntakePanel({
         ? "Progress saved"
         : null;
 
+  const intakeHeader = (
+    <header className={styles.header}>
+      <div>
+        {phonePage ? null : (
+          <p className={styles.eyebrow}>Conversation Room</p>
+        )}
+        <h2 className={styles.title}>{v.intakeTitle}</h2>
+      </div>
+      {phonePage ? null : (
+        <button
+          type="button"
+          className={styles.closeBtn}
+          onClick={onClose}
+          aria-label="Close activity panel"
+        >
+          Close
+        </button>
+      )}
+    </header>
+  );
+
+  const paidAck =
+    phonePage && paidAcknowledgment.length > 0 ? (
+      <ul className={styles.intakePaidAck} aria-label="Payment confirmation">
+        {paidAcknowledgment.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    ) : null;
+
   if (!surface) {
     return (
-      <div className={styles.sheet} data-panel="intake">
-        <header className={styles.header}>
-          <div>
-            <p className={styles.eyebrow}>Conversation Room</p>
-            <h2 className={styles.title}>{v.intakeTitle}</h2>
-          </div>
-          <button
-            type="button"
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label="Close activity panel"
-          >
-            Close
-          </button>
-        </header>
+      <div
+        className={styles.sheet}
+        data-panel="intake"
+        data-surface={phonePage ? "page" : "overlay"}
+      >
+        {intakeHeader}
+        {paidAck}
         <p className={styles.intro}>{INTAKE_CONTINUITY_COPY.missingContextLead}</p>
         <Link className={styles.backLink} href={ROUTE_MAP_INTAKE_STEP_HREF}>
           {v.intakeHostFallbackCta} →
@@ -207,21 +243,13 @@ export default function ConversationIntakePanel({
 
   if (surface.kind !== "form") {
     return (
-      <div className={styles.sheet} data-panel="intake">
-        <header className={styles.header}>
-          <div>
-            <p className={styles.eyebrow}>Conversation Room</p>
-            <h2 className={styles.title}>{v.intakeTitle}</h2>
-          </div>
-          <button
-            type="button"
-            className={styles.closeBtn}
-            onClick={onClose}
-            aria-label="Close activity panel"
-          >
-            Close
-          </button>
-        </header>
+      <div
+        className={styles.sheet}
+        data-panel="intake"
+        data-surface={phonePage ? "page" : "overlay"}
+      >
+        {intakeHeader}
+        {paidAck}
         <p className={styles.intro}>{gateTitle(surface)}</p>
         <p className={styles.intakeGateLead}>{gateLead(surface)}</p>
         {surface.kind === "missing-payment" && onRecoverPayment ? (
@@ -248,21 +276,13 @@ export default function ConversationIntakePanel({
   }
 
   return (
-    <div className={styles.sheet} data-panel="intake">
-      <header className={styles.header}>
-        <div>
-          <p className={styles.eyebrow}>Conversation Room</p>
-          <h2 className={styles.title}>{v.intakeTitle}</h2>
-        </div>
-        <button
-          type="button"
-          className={styles.closeBtn}
-          onClick={onClose}
-          aria-label="Close activity panel"
-        >
-          Close
-        </button>
-      </header>
+    <div
+      className={styles.sheet}
+      data-panel="intake"
+      data-surface={phonePage ? "page" : "overlay"}
+    >
+      {intakeHeader}
+      {paidAck}
 
       <p className={styles.intro}>{v.intakeLead}</p>
       <p className={styles.checkoutScopeDisclosure} role="note">
@@ -289,6 +309,7 @@ export default function ConversationIntakePanel({
           submitError={submitError}
           submitCtaLabel={submitCtaLabel}
           nextStepBlurb={nextStepBlurb}
+          phoneLayout={phonePage}
         />
       </div>
     </div>
