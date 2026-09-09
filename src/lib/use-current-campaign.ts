@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import type { CampaignRecord } from "@/config/studio-board";
+import { shouldKeepLocalCampaignOverServer } from "@/lib/campaign-store/customer-current-campaign-progress";
 import {
   hasProtectedLocalIntakeDraft,
   mergeCampaignPreferLocalIntakeDraft,
@@ -152,7 +153,8 @@ export function useCurrentCampaign() {
         if (
           localCampaign &&
           localCampaign.campaignId !== nextCampaign.campaignId &&
-          hasProtectedLocalIntakeDraft(localCampaign)
+          (hasProtectedLocalIntakeDraft(localCampaign) ||
+            shouldKeepLocalCampaignOverServer(localCampaign, nextCampaign))
         ) {
           saveCurrentCampaign(localCampaign);
           setCampaign(localCampaign);

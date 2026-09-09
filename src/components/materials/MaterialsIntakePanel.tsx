@@ -22,6 +22,7 @@ import type { MaterialCategory, MaterialContentKind } from "@/lib/materials/type
 import { categoryRequiresUseClearance } from "@/lib/studio-material-use";
 
 import FileRightsCertificationFields from "./FileRightsCertificationFields";
+import { isCeremonialMaterialsRoutingState } from "@/lib/materials/materials-mobile-presentation";
 
 type MaterialsClientResponse = {
   blockingRequiredCount: number;
@@ -532,12 +533,17 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
 
   return (
     <article
-      className="sb-card sb-card--materials bf-material bf-material-paper"
+      className={`sb-card sb-card--materials bf-material bf-material-paper${
+        blockingCount === 0 ? " sb-card--materials-complete" : ""
+      }`}
       aria-labelledby="sb-materials-intake-title"
     >
       <p className="sb-card__tab">{panelTitle}</p>
       <div className="sb-materials-intake">
-        <h2 id="sb-materials-intake-title" className="sr-only">
+        <h2
+          id="sb-materials-intake-title"
+          className={`sr-only${blockingCount === 0 ? " sb-materials-copy-repeat" : ""}`}
+        >
           {panelTitle}
         </h2>
 
@@ -554,7 +560,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
         ) : null}
 
         {!loading && consolidated.length === 0 && blockingCount === 0 ? (
-          <p className="sb-materials-intake__meta">
+          <p className="sb-materials-intake__meta sb-materials-copy-repeat">
             <strong>{materialsConfig.intakePanelCompleteTitle}</strong>{" "}
             {materialsConfig.intakePanelCompleteBody}
           </p>
@@ -568,7 +574,13 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
 
         {!loading && consolidated.length > 0 ? (
           <>
-            <p className="sb-materials-intake__lead">{materialsConfig.intakePanelBody}</p>
+            <p
+              className={`sb-materials-intake__lead${
+                blockingCount === 0 ? " sb-materials-copy-repeat" : ""
+              }`}
+            >
+              {materialsConfig.intakePanelBody}
+            </p>
             <ul className="sb-materials-intake__list">
               {consolidated.map((request) => {
                 return (
@@ -581,7 +593,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                             <span className="sb-materials-intake__status sb-materials-intake__status--pending">
                               {formatReceivedStatus(request.submittedAt)}
                             </span>
-                            <p className="sb-materials-intake__pending" role="status">
+                            <p className="sb-materials-intake__pending sb-materials-copy-repeat" role="status">
                               {materialsConfig.clientUnderReviewBody}
                             </p>
                           </div>
@@ -614,7 +626,14 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                         </p>
                       ) : null}
                       {request.contentRoutingExplanation ? (
-                        <p className="sb-materials-intake__routing-explanation" role="status">
+                        <p
+                          className={`sb-materials-intake__routing-explanation${
+                            isCeremonialMaterialsRoutingState(request.contentRoutingState)
+                              ? " sb-materials-copy-repeat"
+                              : ""
+                          }`}
+                          role="status"
+                        >
                           {request.contentRoutingExplanation}
                         </p>
                       ) : null}
@@ -692,7 +711,7 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                             <span className="sb-materials-intake__status sb-materials-intake__status--pending">
                               {formatReceivedStatus(request.submittedAt)}
                             </span>
-                            <p className="sb-materials-intake__pending" role="status">
+                            <p className="sb-materials-intake__pending sb-materials-copy-repeat" role="status">
                               {materialsConfig.clientUnderReviewBody}
                             </p>
                           </div>
@@ -708,7 +727,9 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                           </span>
                         )}
                       </div>
-                      <p className="sb-materials-intake__reason">Needed for {request.reason}</p>
+                      <p className="sb-materials-intake__reason sb-materials-copy-repeat">
+                        Needed for {request.reason}
+                      </p>
                       {request.reviewStatus === "needs_clarification" ? (
                         <p className="sb-materials-intake__clarify" role="status">
                           {materialsConfig.clientNeedsClarificationBody}
@@ -725,7 +746,14 @@ export default function MaterialsIntakePanel({ campaign, onSubmitted }: Material
                         </p>
                       ) : null}
                       {request.contentRoutingExplanation ? (
-                        <p className="sb-materials-intake__routing-explanation" role="status">
+                        <p
+                          className={`sb-materials-intake__routing-explanation${
+                            isCeremonialMaterialsRoutingState(request.contentRoutingState)
+                              ? " sb-materials-copy-repeat"
+                              : ""
+                          }`}
+                          role="status"
+                        >
                           {request.contentRoutingExplanation}
                         </p>
                       ) : null}

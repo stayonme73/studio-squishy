@@ -20,10 +20,11 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.unparkedAt).toBe("2026-08-25");
     expect(cfg.livePhoneCertification).toBe("IN_PROGRESS_NOT_CERTIFIED");
     expect(cfg.nextPhoneAction).toContain(
-      "Owner visual acceptance of the single mobile Project Intake surface",
+      "Materials Board presentation is OWNER ACCEPTED",
     );
+    expect(cfg.nextPhoneAction).toContain("Do not start the next journey stage");
     expect(cfg.nextPhoneAction).toContain("Do not rebuild Maya");
-    expect(cfg.nextMobileScreen).toBe("checkout");
+    expect(cfg.nextMobileScreen).toBe("stopped-after-materials-board");
     expect(cfg.mjd16ManualEntryStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.checkoutStageEntryScrollStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.checkoutPaymentStatus).toBe(
@@ -68,7 +69,7 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.voiceChoiceStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.visualMaster).toBe("MOBILE_VISUAL_MASTER");
     expect(cfg.nameQuestionStatus).toBe("OWNER_ACCEPTED");
-    expect(cfg.nextMobileScreen).toBe("checkout");
+    expect(cfg.nextMobileScreen).toBe("stopped-after-materials-board");
     expect(cfg.reuseLockedMobileVisualSystem).toBe(true);
     expect(cfg.projectNeedStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.businessNameStatus).toBe("OWNER_ACCEPTED");
@@ -85,6 +86,12 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.chooseYourRouteCheckpointDoc).toContain(
       "2026-08-30-CHOOSE-YOUR-ROUTE-CHECKPOINT.md",
     );
+    expect(cfg.materialsBoardPresentationStatus).toBe("OWNER_ACCEPTED");
+    expect(cfg.materialsBoardPresentationAcceptedAt).toBe("2026-09-08");
+    expect(existsSync(join(process.cwd(), cfg.materialsBoardPresentationDoc))).toBe(
+      true,
+    );
+    expect(cfg.samsungFixtureDownloadStatus).toBe("PROVEN");
     expect(cfg.step3StandardLightVisualStatus).toBe(
       "OPEN_FOLLOW_UP_NOT_OWNER_APPROVED",
     );

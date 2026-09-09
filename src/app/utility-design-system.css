@@ -480,6 +480,40 @@
   font-weight: 700;
 }
 
+.utility-local-fixture {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  padding-bottom: 0.35rem;
+  border-top: 1px solid color-mix(in srgb, var(--utility-text) 18%, transparent);
+  scroll-margin-bottom: 4.75rem;
+}
+
+.utility-local-fixture .utility-eyebrow {
+  margin: 0;
+}
+
+.utility-local-fixture .utility-note {
+  margin-top: 0.45rem;
+}
+
+.utility-local-fixture .utility-btn {
+  width: 100%;
+  margin-top: 0.85rem;
+  scroll-margin-bottom: 4.75rem;
+  white-space: normal;
+  line-height: 1.25;
+  height: auto;
+}
+
+.local-test-fixture__preview {
+  display: block;
+  width: min(100%, 12rem);
+  height: auto;
+  margin: 1rem auto;
+  background: #fff;
+  border-radius: 0.75rem;
+}
+
 /* —— Client session inactivity warning —— */
 
 .utility-session-timeout {

@@ -187,4 +187,20 @@ describe("route-map-intake-continuity", () => {
       "Promote an offer",
     );
   });
+
+  it("keeps a locally submitted Intake when the server record has not stored it yet", () => {
+    const server = paidSocialCampaign();
+    const local = paidSocialCampaign({
+      routeMapIntakeSubmittedAt: now,
+      routeMapIntake: {
+        answers: { "shared:materials": "I do not have this yet" },
+        submittedAt: now,
+      },
+    });
+    const merged = mergeCampaignPreferLocalIntakeDraft(server, local);
+    expect(merged.routeMapIntakeSubmittedAt).toBe(now);
+    expect(merged.routeMapIntake?.answers["shared:materials"]).toBe(
+      "I do not have this yet",
+    );
+  });
 });

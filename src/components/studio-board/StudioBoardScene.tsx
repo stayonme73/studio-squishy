@@ -33,6 +33,7 @@ import {
 import { speakConversationLine } from "@/lib/studio-conversation-speech";
 import { consumeStudioVoiceBoardWelcome } from "@/lib/studio-voice-board-handoff";
 import { resolveBoardHeaderGreeting } from "@/lib/studio-board-customer-greeting";
+import LocalTestFixtureBoardControl from "@/components/studio-board/LocalTestFixtureBoardControl";
 import { useCurrentCampaign } from "@/lib/use-current-campaign";
 import { useProjectJobStatus } from "@/lib/use-project-job-status";
 
@@ -176,8 +177,15 @@ function CampaignMetric({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
+type StudioBoardSceneProps = {
+  /** Server-gated local/test fixture pickup. Never true in production. */
+  showLocalTestFixture?: boolean;
+};
+
 /** Studio Board V4 — six-panel dashboard; only panel content changes by status. */
-export default function StudioBoardScene() {
+export default function StudioBoardScene({
+  showLocalTestFixture = false,
+}: StudioBoardSceneProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { campaign, ready, accessState, refresh } = useCurrentCampaign();
@@ -406,6 +414,7 @@ export default function StudioBoardScene() {
 
       <div className="sb-main">
         <header className="sb-header-v3">
+          {showLocalTestFixture ? <LocalTestFixtureBoardControl /> : null}
           <div className="sb-header-v3__row">
             <div className="sb-header-v3__copy">
               <h1 className="sb-header-v3__title">Studio Board</h1>

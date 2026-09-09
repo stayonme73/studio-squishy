@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "checks": {
+    "staticPng200": true,
+    "download200": true,
+    "downloadAttachment": true,
+    "boardControlVisible": true,
+    "sameTabFixturePage": true,
+    "previewRendered": true,
+    "loungeShell": true,
+    "lightGlassTile": true,
+    "pageNotOpaqueCream": true,
+    "denimPrimary": true,
+    "inkTitle": true,
+    "saveHrefIsBlob": true,
+    "saveHrefNotHttpsApi": true,
+    "downloadSaved": true,
+    "downloadPngMagic": true,
+    "saveDidNotHitHttpsApi": true,
+    "returnToBoard": true,
+    "returnKeptMaya": true,
+    "returnKeptPaid": true,
+    "returnKeptIntake": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\fixture-access-01-board-control.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\fixture-access-02-page.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\fixture-page-lounge-glass-360.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\fixture-download-saved-pine-petal-ordinary-mark.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\fixture-access-03-return.png"
+  ],
+  "pageErrors": [],
+  "interaction": "touchscreen.tap",
+  "staticLocal": {
+    "url": "https://localhost:3000/mobile-customer-journey-cert-1/pine-petal-ordinary-mark.png",
+    "status": 200,
+    "contentType": "image/png"
+  },
+  "staticLan": {
+    "url": "https://10.1.10.208:3000/mobile-customer-journey-cert-1/pine-petal-ordinary-mark.png",
+    "status": 200,
+    "contentType": "image/png"
+  },
+  "downloadLocal": {
+    "url": "https://localhost:3000/api/local-test-fixtures/pine-petal-ordinary-mark",
+    "status": 200,
+    "contentType": "image/png",
+    "disposition": "attachment; filename=\"pine-petal-ordinary-mark.png\""
+  },
+  "downloadLan": {
+    "url": "https://10.1.10.208:3000/api/local-test-fixtures/pine-petal-ordinary-mark",
+    "status": 200,
+    "contentType": "image/png",
+    "disposition": "attachment; filename=\"pine-petal-ordinary-mark.png\""
+  },
+  "beforeTap": {
+    "url": "https://10.1.10.208:3000/studio-board",
+    "campaignId": "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+    "paidAt": "2026-09-06T22:28:33.080Z",
+    "intakeAt": "2026-09-09T00:19:37.586Z",
+    "hasPaidInFull": true,
+    "hasMaya": true
+  },
+  "visual": {
+    "hasSpine": true,
+    "hasLoungePlate": true,
+    "hasGlassTile": true,
+    "hasDenimCta": true,
+    "pageBackground": "rgba(0, 0, 0, 0)",
+    "cardBackground": "rgba(0, 0, 0, 0)",
+    "cardBackdrop": "none",
+    "ctaBackground": "rgb(84, 124, 146)",
+    "titleColor": "rgb(46, 43, 40)",
+    "pageIsTransparent": true,
+    "denimCta": true,
+    "inkTitle": true
+  },
+  "saveHref": "blob:https://10.1.10.208:3000/dd257df9-5cbc-4bea-8824-b77cd8b4c777",
+  "downloadFilename": "pine-petal-ordinary-mark.png",
+  "savedBytes": 6861,
+  "afterReturn": {
+    "url": "https://10.1.10.208:3000/studio-board",
+    "campaignId": "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+    "paidAt": "2026-09-06T22:28:33.080Z",
+    "intakeAt": "2026-09-09T00:19:37.586Z",
+    "hasPaidInFull": true,
+    "hasMaya": true
+  },
+  "failed": []
+}

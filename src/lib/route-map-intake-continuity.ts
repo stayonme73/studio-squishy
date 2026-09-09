@@ -147,6 +147,19 @@ export function mergeCampaignPreferLocalIntakeDraft(
   local: CampaignRecord,
 ): CampaignRecord {
   if (server.campaignId !== local.campaignId) return server;
+  if (isIntakeComplete(local) && !isIntakeComplete(server)) {
+    return {
+      ...server,
+      routeMapIntake: local.routeMapIntake ?? server.routeMapIntake,
+      routeMapIntakeDraft: local.routeMapIntakeDraft ?? server.routeMapIntakeDraft,
+      routeMapIntakeSubmittedAt:
+        local.routeMapIntakeSubmittedAt ?? server.routeMapIntakeSubmittedAt,
+      projectDetailsSubmittedAt:
+        local.projectDetailsSubmittedAt ?? server.projectDetailsSubmittedAt,
+      visionSubmittedAt: local.visionSubmittedAt ?? server.visionSubmittedAt,
+      intake: local.intake ?? server.intake,
+    };
+  }
   if (isIntakeComplete(server) || isIntakeComplete(local)) {
     return server.routeMapIntakeDraft ? server : { ...server, routeMapIntakeDraft: local.routeMapIntakeDraft };
   }

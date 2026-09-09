@@ -65,6 +65,7 @@ export default function FileRightsCertificationFields({
 
   return (
     <div className="sb-materials-intake__rights">
+      <p className="sb-materials-intake__rights-title">Rights for this file</p>
       <p className="sb-materials-intake__rights-disclaimer">{copy.disclaimer}</p>
 
       <label className="sb-materials-intake__attest">

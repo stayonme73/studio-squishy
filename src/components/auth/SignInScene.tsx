@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import { localCustomerOneAuthFixtureCopy } from "@/lib/auth/local-customer-one-fixture-copy";
 import { promoteStudioVoiceBoardHandoffToWelcome } from "@/lib/studio-voice-board-handoff";
 import UtilityPasswordField from "@/components/auth/UtilityPasswordField";
 
@@ -22,9 +23,15 @@ type Props = {
   returnTo: string;
   /** True only when the requested allowlisted `from` was explicitly `/studio-board`. */
   showProjectCreatedLead: boolean;
+  /** Server-gated local/test Customer-One fixture. Never true in production. */
+  showLocalAuthFixture?: boolean;
 };
 
-export default function SignInScene({ returnTo, showProjectCreatedLead }: Props) {
+export default function SignInScene({
+  returnTo,
+  showProjectCreatedLead,
+  showLocalAuthFixture = false,
+}: Props) {
   const lead = showProjectCreatedLead
     ? conversationRoomGuideV1.boardHandoffSignInLead
     : SIGN_IN_LEAD;
@@ -94,6 +101,25 @@ export default function SignInScene({ returnTo, showProjectCreatedLead }: Props)
     goToReturnPath(returnTo);
   }
 
+  async function handleLocalCustomerOneFixture() {
+    setSubmitting(true);
+    setError(null);
+
+    const response = await fetch("/api/auth/local-customer-one", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      setError("Local test sign-in is unavailable.");
+      setSubmitting(false);
+      return;
+    }
+
+    promoteStudioVoiceBoardHandoffToWelcome();
+    goToReturnPath(returnTo);
+  }
+
   return (
     <div className="utility-page">
       <div className="utility-shell utility-shell--narrow">
@@ -136,6 +162,23 @@ export default function SignInScene({ returnTo, showProjectCreatedLead }: Props)
               {submitting ? "Signing in..." : "Sign in"}
             </button>
           </form>
+
+          {showLocalAuthFixture ? (
+            <div className="utility-local-fixture" data-local-auth-fixture="customer-one">
+              <p className="utility-eyebrow">
+                {localCustomerOneAuthFixtureCopy.eyebrow}
+              </p>
+              <p className="utility-note">{localCustomerOneAuthFixtureCopy.note}</p>
+              <button
+                className="utility-btn utility-btn--secondary"
+                type="button"
+                onClick={() => void handleLocalCustomerOneFixture()}
+                disabled={submitting}
+              >
+                {localCustomerOneAuthFixtureCopy.button}
+              </button>
+            </div>
+          ) : null}
 
           <p className="utility-note">
             New here?{" "}

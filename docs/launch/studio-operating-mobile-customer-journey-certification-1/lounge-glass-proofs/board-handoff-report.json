@@ -1,0 +1,99 @@
+{
+  "ok": false,
+  "checks": {
+    "prepAccountCreated": true,
+    "signInOk": true,
+    "sessionCookie": true,
+    "boardOpened": true,
+    "paidAttached": true,
+    "flyerAttached": true,
+    "routeI20": true,
+    "intakeAttached": true,
+    "sameCampaign": true,
+    "visibleBoutique": true,
+    "visibleFlyer": true,
+    "visiblePrice": true,
+    "visibleIntake": true,
+    "visibleRoute": false,
+    "reviewSecondary": true,
+    "noReviewOverlapSignOut": true,
+    "noHorizontalOverflow": true,
+    "noNestedScrollTrap": true,
+    "authenticatedSession": true,
+    "refreshStillBoard": true,
+    "refreshStillPaid": true,
+    "refreshStillFlyer": true,
+    "refreshStillIntake": true,
+    "noExtraMayaAccount": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\board-handoff-01-top.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\board-handoff-02-snapshot.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\board-handoff-03-bottom.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\board-handoff-04-refresh.png"
+  ],
+  "pageErrors": [],
+  "beforeMaya": {
+    "total": 6,
+    "maya": 2,
+    "mayaEmails": 2
+  },
+  "signupStatus": 200,
+  "loginStatus": 200,
+  "afterSignIn": {
+    "url": "https://localhost:3000/studio-board",
+    "paidAt": true,
+    "amountDue": 6900,
+    "flyer": true,
+    "intakeSubmitted": true,
+    "roadId": "i20",
+    "campaignId": "board-handoff-qa-1788905510832",
+    "title": "Maya’S Mobile Boutique",
+    "visibleFlyer": true,
+    "visiblePrice": true,
+    "visibleRoute": false,
+    "visibleIntake": true,
+    "visibleBoutique": true
+  },
+  "layout": {
+    "viewport": {
+      "width": 360,
+      "height": 780
+    },
+    "reviewHeight": 52,
+    "reviewSecondary": true,
+    "overlapReviewSignOut": false,
+    "snapshotCoveredByReview": false,
+    "nestedScroll": false,
+    "bodyOverflowY": "auto",
+    "mainOverflowY": "auto",
+    "horizontalOverflow": false
+  },
+  "session": {
+    "ok": true,
+    "hasUser": true
+  },
+  "afterReload": {
+    "url": "https://localhost:3000/studio-board",
+    "paidAt": true,
+    "amountDue": 6900,
+    "flyer": true,
+    "intakeSubmitted": true,
+    "roadId": "i20",
+    "campaignId": "board-handoff-qa-1788905510832",
+    "title": "Maya’S Mobile Boutique",
+    "visibleFlyer": true,
+    "visiblePrice": true,
+    "visibleRoute": false,
+    "visibleIntake": true,
+    "visibleBoutique": true
+  },
+  "afterMaya": {
+    "total": 7,
+    "maya": 2,
+    "mayaEmails": 2
+  },
+  "failed": [
+    "visibleRoute"
+  ]
+}

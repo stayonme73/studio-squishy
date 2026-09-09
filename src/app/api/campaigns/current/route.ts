@@ -22,6 +22,7 @@ import {
 import { linkClientCampaign, updateUserCurrentCampaign } from "@/lib/auth/users";
 import type { CampaignRecord } from "@/config/studio-board";
 import { logAccessEvent } from "@/lib/security/access-log";
+import { resolveCustomerCurrentCampaign } from "@/lib/campaign-store/customer-current-campaign";
 import {
   recoverPaidOperatingChain,
   wakePaidCampaignEnvelope,
@@ -31,20 +32,17 @@ export async function GET(request: Request) {
   const user = await requireSession(request);
   if (isNextResponse(user)) return user;
 
-  if (!user.currentCampaignId) {
-    return NextResponse.json({ campaign: null });
-  }
-
-  const envelope = await readCampaignEnvelope(user.currentCampaignId);
+  const resolved = await resolveCustomerCurrentCampaign(user);
+  const envelope = resolved.envelope;
   if (!envelope) {
     return NextResponse.json({ campaign: null });
   }
 
-  if (!canReadCampaign(user, envelope.campaignId, envelope)) {
+  if (!canReadCampaign(resolved.user, envelope.campaignId, envelope)) {
     logAccessEvent({
       kind: "access_denied",
       route: "/api/campaigns/current",
-      user,
+      user: resolved.user,
       campaignId: envelope.campaignId,
       reason: "current_campaign_read_denied",
     });
@@ -52,7 +50,20 @@ export async function GET(request: Request) {
   }
 
   const woken = await wakePaidCampaignEnvelope(envelope);
-  return NextResponse.json({ campaign: woken });
+  const response = NextResponse.json({ campaign: woken });
+  response.headers.set("Cache-Control", "no-store");
+  const currentChanged = resolved.user.currentCampaignId !== user.currentCampaignId;
+  const idsChanged =
+    JSON.stringify(resolved.user.clientCampaignIds ?? []) !==
+    JSON.stringify(user.clientCampaignIds ?? []);
+  if (currentChanged || idsChanged) {
+    response.cookies.set(
+      SESSION_COOKIE_NAME,
+      await createSessionToken(resolved.user),
+      sessionCookieOptions(),
+    );
+  }
+  return response;
 }
 
 export async function PATCH(request: Request) {

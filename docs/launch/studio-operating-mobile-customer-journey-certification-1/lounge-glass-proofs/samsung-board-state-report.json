@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "checks": {
+    "fixtureLogin": true,
+    "sameServerCampaign": true,
+    "apiPaid": true,
+    "apiIntake": true,
+    "notUnpaidCurrent": true,
+    "diskPaid": true,
+    "diskPayTruthConfirmed": true,
+    "diskIntake": true,
+    "diskMaterialsNoneYet": true,
+    "boardPaidInFull": true,
+    "boardNotPaymentPending": true,
+    "boardFixtureVisible": true,
+    "boardHydratedPaidId": true,
+    "boardHydratedPaidAt": true,
+    "boardHydratedIntake": true,
+    "boardMaterialsOptional": true,
+    "boardNotIntakeGate": true,
+    "refreshStillPaid": true,
+    "refreshStillPaidId": true,
+    "refreshStillIntake": true,
+    "refreshFixtureVisible": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\samsung-board-state-01-lan.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\samsung-board-state-02-refresh.png"
+  ],
+  "pageErrors": [],
+  "localhostCurrent": {
+    "origin": "https://localhost:3000",
+    "status": 200,
+    "campaignId": "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+    "paidAt": "2026-09-06T22:28:33.080Z",
+    "intakeAt": "2026-09-09T00:19:37.586Z",
+    "statusLabel": "BUILDING_CONCEPTS",
+    "name": "Maya’s Mobile Boutique"
+  },
+  "lanCurrent": {
+    "origin": "https://10.1.10.208:3000",
+    "status": 200,
+    "campaignId": "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+    "paidAt": "2026-09-06T22:28:33.080Z",
+    "intakeAt": "2026-09-09T00:19:37.586Z",
+    "statusLabel": "BUILDING_CONCEPTS",
+    "name": "Maya’s Mobile Boutique"
+  },
+  "diskAfterGet": {
+    "campaignId": "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+    "clientUserId": null,
+    "paidAt": "2026-09-06T22:28:33.080Z",
+    "payTruth": "confirmed",
+    "intakeAt": "2026-09-09T00:19:37.586Z",
+    "materialsAnswer": "I do not have this yet",
+    "status": "BUILDING_CONCEPTS",
+    "name": "Maya’s Mobile Boutique"
+  },
+  "board": {
+    "url": "https://10.1.10.208:3000/studio-board",
+    "campaignId": "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+    "paidAt": "2026-09-06T22:28:33.080Z",
+    "intakeAt": "2026-09-09T00:19:37.586Z",
+    "hasPaidInFull": true,
+    "hasPaymentPending": false,
+    "hasFixtureEyebrow": true,
+    "hasFixtureButton": true,
+    "hasMaterialsCaughtUp": true,
+    "hasAddMore": true,
+    "hasIntakeGateCopy": false,
+    "paymentReceivedComplete": false,
+    "intakeComplete": false
+  },
+  "boardRefresh": {
+    "url": "https://10.1.10.208:3000/studio-board",
+    "campaignId": "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+    "paidAt": "2026-09-06T22:28:33.080Z",
+    "intakeAt": "2026-09-09T00:19:37.586Z",
+    "hasPaidInFull": true,
+    "hasPaymentPending": false,
+    "hasFixtureEyebrow": true,
+    "hasFixtureButton": true,
+    "hasMaterialsCaughtUp": true,
+    "hasAddMore": true,
+    "hasIntakeGateCopy": false,
+    "paymentReceivedComplete": false,
+    "intakeComplete": false
+  },
+  "failed": []
+}

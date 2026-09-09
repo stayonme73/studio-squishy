@@ -3,6 +3,7 @@ import { Caveat, Inter } from "next/font/google";
 
 import StudioUtilityBackdrop from "@/components/shared/StudioUtilityBackdrop";
 import StudioBoardScene from "@/components/studio-board/StudioBoardScene";
+import { isLocalAuthFixtureAvailable } from "@/lib/auth/local-auth-fixture-gate";
 
 import "../../studio-board.css";
 import "../../mobile-route-fixes.css";
@@ -20,6 +21,8 @@ const inter = Inter({
   variable: "--font-studio-board-sans",
 });
 
+export const dynamic = "force-dynamic";
+
 /** Studio Board — campaign status check-in. */
 export default function StudioBoardPage() {
   return (
@@ -31,7 +34,7 @@ export default function StudioBoardPage() {
         <StudioUtilityBackdrop />
         <div className="studio-utility-scene__content">
           <Suspense>
-            <StudioBoardScene />
+            <StudioBoardScene showLocalTestFixture={isLocalAuthFixtureAvailable()} />
           </Suspense>
         </div>
       </div>

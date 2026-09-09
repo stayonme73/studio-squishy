@@ -46,4 +46,237 @@
     background: var(--utility-primary-deep);
     border-color: var(--utility-primary-deep);
   }
+
+  /* Local/test fixture page — Lounge + locked glass/Ink/Denim. Not utility cream. */
+  [data-mobile-customer-spine] .local-test-fixture-page {
+    background: transparent;
+  }
+
+  [data-mobile-customer-spine] .local-test-fixture-card {
+    padding: var(--utility-card-pad, 1.25rem);
+    border-radius: var(--studio-tile-radius, 0.85rem);
+  }
+
+  [data-mobile-customer-spine] .local-test-fixture-page .utility-eyebrow {
+    color: var(--mc-eucalyptus, #456b5a);
+  }
+
+  [data-mobile-customer-spine] .local-test-fixture-page .utility-title,
+  [data-mobile-customer-spine] .local-test-fixture-page .utility-lead,
+  [data-mobile-customer-spine] .local-test-fixture-page .utility-note,
+  [data-mobile-customer-spine] .local-test-fixture-page .utility-note a {
+    color: var(--mc-ink, #2e2b28);
+  }
+
+  [data-mobile-customer-spine] .local-test-fixture-page .lobby-entry-film__cta {
+    width: 100%;
+    margin-top: 0.85rem;
+    justify-content: center;
+  }
+
+  [data-mobile-customer-spine] .local-test-fixture__preview {
+    background: var(--mc-ivory, #f7f4ee);
+    border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  /*
+   * Materials — phone only. Desktop Board keeps paper tiles.
+   * Beat .sb--v4 .sb-card.bf-material-paper (opaque field mix + denim inset).
+   * Glance uses locked 46% glass; the intake form is a dense working surface
+   * and uses --mc-glass-strong (58%) like Help / Auth.
+   */
+  [data-mobile-customer-spine] .sb--v4 .sb-main {
+    padding-bottom: calc(var(--studio-review-mobile-bottom, 3.25rem) + 1.25rem);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    position: relative;
+    isolation: auto;
+    overflow: visible;
+    padding: 0.95rem 0.9rem 1rem;
+    border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+    border-radius: var(--studio-tile-radius, 0.85rem);
+    background: transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    color: var(--mc-ink, #2e2b28);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: var(
+      --mc-glass,
+      color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent)
+    );
+    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card.bf-material-paper,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--materials.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--materials.bf-material-paper {
+    isolation: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    color: var(--mc-ink, #2e2b28);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card {
+    padding: 0;
+    border: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card.bf-material::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card.bf-material-paper::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card.bf-material-paper::after {
+    content: none;
+    display: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--materials {
+    position: relative;
+    overflow: visible !important;
+    isolation: auto !important;
+    padding: 0.95rem 0.9rem calc(1.25rem + 4.75rem + env(safe-area-inset-bottom, 0px));
+    border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+    border-radius: var(--studio-tile-radius, 0.85rem);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--materials.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--materials.bf-material-paper::before {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    mix-blend-mode: normal;
+    background: var(--mc-glass-strong) !important;
+    background-image: none !important;
+    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+    box-shadow: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--materials.bf-material::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--materials.bf-material-paper::after {
+    content: none;
+    display: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--materials > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-board-list,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--materials-needed .sb-materials-board-tile {
+    overflow: visible;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-board-list__item,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-action-card {
+    background: transparent !important;
+    border-color: var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__item {
+    background: transparent !important;
+    background-image: none !important;
+    border: none;
+    border-radius: 0;
+    box-shadow: none !important;
+    padding: 0.85rem 0;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__item + .sb-materials-intake__item {
+    border-top: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card--materials .sb-card__tab,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance .sb-card__tab {
+    color: var(--mc-eucalyptus, #456b5a);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-board-tile__lead,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-board-tile__meta,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-board-next p,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__lead,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__meta,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__reason,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__prompt,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights-legend,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights-disclaimer,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__attest {
+    color: var(--mc-ink, #2e2b28);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-copy-repeat {
+    display: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card--materials-complete .sb-card__tab {
+    display: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights {
+    gap: 0.35rem;
+    padding: 0.85rem 0 0.15rem;
+    border-top: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights-disclaimer {
+    margin-bottom: 0.35rem;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__attest,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights-group {
+    padding: 0.55rem 0 0.45rem;
+    border-bottom: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights-group:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0.15rem;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights-title {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mc-eucalyptus, #456b5a);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__submit {
+    width: 100%;
+    min-height: 2.85rem;
+    margin-top: 0.35rem;
+    justify-content: center;
+    scroll-margin-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+    background: var(--mc-denim, #547c92);
+    border: 1px solid var(--mc-denim, #547c92);
+    color: var(--mc-ivory, #f7f4ee);
+  }
 }

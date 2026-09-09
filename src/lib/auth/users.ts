@@ -89,6 +89,25 @@ async function writeStudioUsers(users: StudioUserRecord[]): Promise<void> {
   await fs.writeFile(USERS_PATH, JSON.stringify(users, null, 2), "utf8");
 }
 
+/**
+ * Insert by id if missing. If the email is already present, return that
+ * record instead of creating a duplicate. Local/test fixture callers only.
+ */
+export async function insertStudioUserRecordIfMissing(
+  record: StudioUserRecord,
+): Promise<StudioUser> {
+  const users = await listStudioUsers();
+  const byId = users.find((user) => user.id === record.id);
+  if (byId) return toPublicUser(byId);
+  const byEmail = users.find(
+    (user) => normalizeEmail(user.email) === normalizeEmail(record.email),
+  );
+  if (byEmail) return toPublicUser(byEmail);
+  users.push(record);
+  await writeStudioUsers(users);
+  return toPublicUser(record);
+}
+
 export async function findUserByEmail(
   email: string,
 ): Promise<StudioUserRecord | null> {

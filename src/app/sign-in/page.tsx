@@ -1,5 +1,6 @@
 import SignInScene from "@/components/auth/SignInScene";
 import StudioMobileLoungeShell from "@/components/shared/StudioMobileLoungeShell";
+import { isLocalAuthFixtureAvailable } from "@/lib/auth/local-auth-fixture-gate";
 import {
   isExplicitStudioBoardFrom,
   safeReturnPath,
@@ -39,6 +40,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
       <SignInScene
         returnTo={returnTo}
         showProjectCreatedLead={showProjectCreatedLead}
+        showLocalAuthFixture={isLocalAuthFixtureAvailable()}
       />
     </StudioMobileLoungeShell>
   );

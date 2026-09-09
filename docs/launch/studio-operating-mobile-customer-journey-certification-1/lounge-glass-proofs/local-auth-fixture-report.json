@@ -1,0 +1,104 @@
+{
+  "ok": true,
+  "checks": {
+    "fixtureVisibleOnLocalSignIn": true,
+    "fixtureAuthOk": true,
+    "sessionCookie": true,
+    "boardOpened": true,
+    "paidAttached": true,
+    "flyerAttached": true,
+    "routeI20": true,
+    "intakeAttached": true,
+    "sameCampaign": true,
+    "visibleBoutique": true,
+    "visibleFlyer": true,
+    "visiblePrice": true,
+    "visibleIntake": true,
+    "reviewSecondary": true,
+    "noReviewOverlapSignOut": true,
+    "noHorizontalOverflow": true,
+    "noNestedScrollTrap": true,
+    "authenticatedSession": true,
+    "sessionIsMaya": true,
+    "refreshStillBoard": true,
+    "refreshStillPaid": true,
+    "refreshStillFlyer": true,
+    "refreshStillIntake": true,
+    "refreshStillAuthenticated": true,
+    "noExtraMayaAccount": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\local-auth-fixture-01-signin.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\local-auth-fixture-02-board-top.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\local-auth-fixture-03-snapshot.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\local-auth-fixture-04-board-bottom.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\local-auth-fixture-05-refresh.png"
+  ],
+  "pageErrors": [],
+  "beforeMaya": {
+    "total": 6,
+    "maya": 2,
+    "mayaEmails": 2
+  },
+  "fixtureStatus": 200,
+  "afterSignIn": {
+    "url": "https://localhost:3000/studio-board",
+    "paidAt": true,
+    "amountDue": 6900,
+    "flyer": true,
+    "intakeSubmitted": true,
+    "roadId": "i20",
+    "campaignId": "board-handoff-qa-1788906894784",
+    "title": "Maya’S Mobile Boutique",
+    "visibleFlyer": true,
+    "visiblePrice": true,
+    "visibleRoute": false,
+    "visibleIntake": true,
+    "visibleBoutique": true
+  },
+  "layout": {
+    "viewport": {
+      "width": 360,
+      "height": 780
+    },
+    "reviewHeight": 52,
+    "reviewSecondary": true,
+    "overlapReviewSignOut": false,
+    "snapshotCoveredByReview": false,
+    "nestedScroll": false,
+    "bodyOverflowY": "auto",
+    "mainOverflowY": "auto",
+    "horizontalOverflow": false
+  },
+  "routeLabelOnBoard": false,
+  "session": {
+    "ok": true,
+    "hasUser": true,
+    "displayName": "Maya"
+  },
+  "afterReload": {
+    "url": "https://localhost:3000/studio-board",
+    "paidAt": true,
+    "amountDue": 6900,
+    "flyer": true,
+    "intakeSubmitted": true,
+    "roadId": "i20",
+    "campaignId": "board-handoff-qa-1788906894784",
+    "title": "Maya’S Mobile Boutique",
+    "visibleFlyer": true,
+    "visiblePrice": true,
+    "visibleRoute": false,
+    "visibleIntake": true,
+    "visibleBoutique": true
+  },
+  "sessionAfterReload": {
+    "ok": true,
+    "hasUser": true
+  },
+  "afterMaya": {
+    "total": 6,
+    "maya": 2,
+    "mayaEmails": 2
+  },
+  "failed": []
+}

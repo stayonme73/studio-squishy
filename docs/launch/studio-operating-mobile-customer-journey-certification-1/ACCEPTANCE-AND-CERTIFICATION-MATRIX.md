@@ -3,7 +3,8 @@
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`  
 **Status:** OPEN — readiness prepared; **no real-phone results stamped**  
 **Date:** 2026-08-22  
-**Owner Samsung 2026-09-06:** Partial live-phone evidence recorded in `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`. That run is **not** a package certification stamp.
+**Owner Samsung 2026-09-06:** Partial live-phone evidence recorded in `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`. That run is **not** a package certification stamp.  
+**Owner Samsung 2026-09-08:** Materials Board presentation **OWNER ACCEPTED** (`2026-09-08-MATERIALS-MOBILE-PRESENTATION-OWNER-ACCEPTED.md`). Package remains OPEN.
 
 Legend: ✅ proven · ⚠️ partial · ❌ missing · 🚫 not in scope
 
@@ -21,7 +22,7 @@ Readiness and preflight tests do not stamp certification. Prior phone-390 / resp
 | D2 | Touch controls usable | ❌ | | Buttons, uploads, payment, review tools work by touch |
 | D3 | Readable text | ❌ | | No required browser zoom |
 | D4 | Usable forms | ❌ | | Intake, rights, feedback, approval complete on the phone |
-| D5 | Clear status messages | ❌ | | Customer can tell what happened and what to do next |
+| D5 | Clear status messages | ⚠️ | 2026-09-08 Materials glance Have / Need / Next OWNER ACCEPTED | Remaining stages still need live-phone status proof |
 | D6 | No desktop-only dependency | ❌ | | Journey does not require a desktop surface to finish |
 
 ---
@@ -31,7 +32,7 @@ Readiness and preflight tests do not stamp certification. Prior phone-390 / resp
 | # | Requirement | Current | Evidence | Close condition |
 |---|-------------|---------|----------|-----------------|
 | J1 | Hire and complete sandbox payment | ⚠️ | 2026-09-06 Samsung: hire through Checkout; later **sandbox-confirm OWNER ACCEPTED** (Maya $69). Stripe hosted Checkout **not** certified | Full hire + pay seal still requires processor path when Stripe is configured |
-| J2 | Finish intake and upload files | ⚠️ | Phone 390 intake exists; Gate X uploads were not this phone cert | Live phone intake + multipart upload |
+| J2 | Finish intake and upload files | ⚠️ | Samsung: Intake submitted on paid Maya; `pine-petal-ordinary-mark.png` downloaded and selectable; Materials presentation OWNER ACCEPTED 2026-09-08. Owner Send not required tonight | Live phone multipart Send remains for a later stage |
 | J3 | Complete rights certification | ⚠️ | Gate X desktop live path | Same live rights path completed on the phone |
 | J4 | Communicate and track status | ⚠️ | Board composer / in-product notification phone notes | Live phone communicate + track |
 | J5 | Review work and submit usable feedback | ⚠️ | Unified Review phone 390 tools | Live phone review + usable feedback |

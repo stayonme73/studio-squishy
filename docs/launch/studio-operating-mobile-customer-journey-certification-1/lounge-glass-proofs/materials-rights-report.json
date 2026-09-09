@@ -1,0 +1,149 @@
+{
+  "ok": true,
+  "checks": {
+    "authenticatedMaya": true,
+    "fixtureAttachedPaidProject": true,
+    "serverCampaignLoaded": true,
+    "serverPaidFlyer": true,
+    "materialsReadable": true,
+    "noRequiredMaterials": true,
+    "optionalUploadsExist": true,
+    "optionalLogoSlot": true,
+    "filenameOnlyRejected": true,
+    "documentReferencePathRejected": true,
+    "documentReferenceNotInvented": true,
+    "honestOptionalEntry": true,
+    "noIntakeContradiction": true,
+    "rightsRequiredBeforeSend": true,
+    "missingFileBlocked": true,
+    "mismatchedTypeBlocked": true,
+    "corruptRejected": true,
+    "uploadAccepted": true,
+    "stillMayaProject": true,
+    "noHorizontalOverflow": true,
+    "addMoreTouchTarget": true,
+    "noReviewOverlap": true,
+    "refreshStillAuthenticated": true,
+    "refreshStillMayaProject": true,
+    "refreshStillIntake": true,
+    "storedFileSurvivesRefresh": true,
+    "honestNothingRequired": true,
+    "noExtraMayaAccount": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\materials-rights-01-board-entry.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\materials-rights-02-add-more.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\materials-rights-03-rights-bypass.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\materials-rights-03b-missing-file.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\materials-rights-04-mismatch.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\materials-rights-05-corrupt.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\materials-rights-07-success.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\materials-rights-08-refresh.png"
+  ],
+  "pageErrors": [],
+  "beforeMaya": {
+    "total": 5,
+    "maya": 1
+  },
+  "session": {
+    "ok": true,
+    "displayName": "Maya",
+    "hasCurrentCampaign": true
+  },
+  "currentCampaignStatus": 200,
+  "materialsGet": {
+    "status": 200,
+    "blocking": 0,
+    "optionalCount": 2,
+    "optionalCategories": [
+      "logo-brand",
+      "photo-video"
+    ],
+    "consolidated": 0
+  },
+  "filenameOnly": {
+    "status": 400,
+    "error": "Please send the actual file. A file name by itself is not enough for the Studio to keep and use it."
+  },
+  "textOnlyBypass": {
+    "status": 400,
+    "error": "Please send the actual file. A file name by itself is not enough for the Studio to keep and use it."
+  },
+  "boardEntry": {
+    "url": "https://localhost:3000/studio-board",
+    "campaignId": "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+    "paidAt": true,
+    "amountDue": 6900,
+    "flyer": true,
+    "intakeSubmitted": true,
+    "title": "Maya’S Mobile Boutique",
+    "nothingRequired": true,
+    "materialsCaughtUp": false,
+    "finishIntakeCopy": false,
+    "materialRequestsAfterIntake": false,
+    "addMoreVisible": true,
+    "chooseFileVisible": false,
+    "sendVisible": false,
+    "rightsVisible": false,
+    "horizontalOverflow": false,
+    "overlapAddMoreReview": false,
+    "addMoreHeight": 44,
+    "chooseFileHeight": 0
+  },
+  "firstSendError": "Please confirm you own this file or have permission to provide it before sending.",
+  "missingFileError": "A file upload is required. Please choose a file and send it to the Studio.",
+  "corruptStatus": 400,
+  "corruptError": "The Studio could not read this file. Please check the file and send it again.",
+  "successStatus": 200,
+  "afterUpload": {
+    "url": "https://localhost:3000/studio-board",
+    "campaignId": "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+    "paidAt": true,
+    "amountDue": 6900,
+    "flyer": true,
+    "intakeSubmitted": true,
+    "title": "Maya’S Mobile Boutique",
+    "nothingRequired": true,
+    "materialsCaughtUp": false,
+    "finishIntakeCopy": false,
+    "materialRequestsAfterIntake": false,
+    "addMoreVisible": true,
+    "chooseFileVisible": true,
+    "sendVisible": true,
+    "rightsVisible": true,
+    "horizontalOverflow": false,
+    "overlapAddMoreReview": false,
+    "addMoreHeight": 44,
+    "chooseFileHeight": 53
+  },
+  "afterReload": {
+    "url": "https://localhost:3000/studio-board",
+    "campaignId": "716a15b6-d8d6-436c-8f84-9e8b40d2f959",
+    "paidAt": true,
+    "amountDue": 6900,
+    "flyer": true,
+    "intakeSubmitted": true,
+    "title": "Maya’S Mobile Boutique",
+    "nothingRequired": true,
+    "materialsCaughtUp": false,
+    "finishIntakeCopy": false,
+    "materialRequestsAfterIntake": false,
+    "addMoreVisible": true,
+    "chooseFileVisible": true,
+    "sendVisible": true,
+    "rightsVisible": true,
+    "horizontalOverflow": false,
+    "overlapAddMoreReview": false,
+    "addMoreHeight": 44,
+    "chooseFileHeight": 53
+  },
+  "sessionAfterReload": {
+    "hasUser": true,
+    "displayName": "Maya"
+  },
+  "afterMaya": {
+    "total": 5,
+    "maya": 1
+  },
+  "failed": []
+}

@@ -109,6 +109,9 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(read("src/app/help-center/page.tsx")).toContain("data-mobile-customer-spine");
     expect(read("src/app/sign-in/page.tsx")).toContain("StudioMobileLoungeShell");
     expect(read("src/app/sign-up/page.tsx")).toContain("StudioMobileLoungeShell");
+    expect(read("src/app/local-test-fixtures/page.tsx")).toContain(
+      "StudioMobileLoungeShell",
+    );
     expect(read("src/app/account-handoff/page.tsx")).toContain(
       "StudioMobileLoungeShell",
     );

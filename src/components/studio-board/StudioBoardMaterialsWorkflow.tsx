@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import StudioBoardSlideOutPanel from "@/components/studio-board/StudioBoardSlideOutPanel";
 import { materialsConfig } from "@/config/materials";
@@ -344,11 +344,15 @@ function buildSubmittedRequestItems(requests: BoardRequest[]): ReceivedMaterial[
     }));
 }
 
+function MaterialsGlance({ children }: { children: ReactNode }) {
+  return <div className="sb-materials-glance">{children}</div>;
+}
+
 function StudioBoardMaterialsEmptyRow() {
   const emptyMaterials = studioBoard.empty.board.materials;
 
   return (
-    <>
+    <MaterialsGlance>
       <article className="sb-card sb-card--materials-received sb-materials-tile bf-material bf-material-paper">
         <p className="sb-card__tab">Materials Received</p>
         <div className="sb-materials-board-tile">
@@ -370,7 +374,7 @@ function StudioBoardMaterialsEmptyRow() {
           <p>{emptyMaterials.nextStep}</p>
         </div>
       </article>
-    </>
+    </MaterialsGlance>
   );
 }
 
@@ -665,6 +669,7 @@ function StudioBoardMaterialsWorkflowActive({
 
   return (
     <>
+      <MaterialsGlance>
       <article className="sb-card sb-card--materials-received sb-materials-tile bf-material bf-material-paper">
         <p className="sb-card__tab">Materials Received</p>
         <div className="sb-materials-board-tile">
@@ -725,7 +730,13 @@ function StudioBoardMaterialsWorkflowActive({
                         {card.status}
                       </span>
                     </span>
-                    <span className="sb-materials-action-card__detail">{card.detail}</span>
+                    <span
+                      className={`sb-materials-action-card__detail${
+                        card.status === "Received" ? " sb-materials-copy-repeat" : ""
+                      }`}
+                    >
+                      {card.detail}
+                    </span>
                   </>
                 );
                 if (clickable) {
@@ -757,6 +768,7 @@ function StudioBoardMaterialsWorkflowActive({
           <p>{nextStepMessage}</p>
         </div>
       </article>
+      </MaterialsGlance>
 
       {showWorkflow && activeCard && activeRequest && activeRequestId ? (
         <StudioBoardSlideOutPanel
@@ -849,7 +861,7 @@ function StudioBoardMaterialsLookupPendingRow() {
   const loadingCopy = studioBoard.empty.loading;
 
   return (
-    <>
+    <MaterialsGlance>
       <article className="sb-card sb-card--materials-received sb-materials-tile bf-material bf-material-paper">
         <p className="sb-card__tab">Materials Received</p>
         <div className="sb-materials-board-tile">
@@ -870,7 +882,7 @@ function StudioBoardMaterialsLookupPendingRow() {
           <p>{loadingCopy.materialsNextStep}</p>
         </div>
       </article>
-    </>
+    </MaterialsGlance>
   );
 }
 

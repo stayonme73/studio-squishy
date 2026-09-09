@@ -2,7 +2,7 @@
 
 **Package:** `STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1`
 
-**Current (2026-09-06):** Package remains **OPEN / IN PROGRESS**, **not closed**, **not certified**. Owner Samsung acceptance through Checkout return plus later **sandbox-confirm payment** is recorded in `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`. Stripe hosted Checkout is **not** certified. Next live surface: owner visual acceptance of simplified mobile Checkout. Do not begin MJ-D22. Do not begin Supervision. Do not merge.
+**Current (2026-09-08):** Package remains **OPEN / IN PROGRESS**, **not closed**, **not certified**. Materials Board presentation is **OWNER ACCEPTED** (`2026-09-08-MATERIALS-MOBILE-PRESENTATION-OWNER-ACCEPTED.md`). Samsung download/select of `pine-petal-ordinary-mark.png` is proven. Paid Maya and submitted Intake remained intact. **STOP.** Do not start the next journey stage. Do not begin Supervision. Do not merge. Stripe hosted Checkout is **not** certified.
 
 The 2026-08-23 park below is historical. Do not treat it as the current execution state.
 

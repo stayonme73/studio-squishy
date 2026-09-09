@@ -1,0 +1,62 @@
+{
+  "ok": true,
+  "checks": {
+    "loungeVisible": true,
+    "glancePresent": true,
+    "glanceNotOpaqueBrown": true,
+    "intakeNotOpaqueBrown": true,
+    "itemNotOpaqueBrown": true,
+    "intakeItemNotOpaqueBrown": true,
+    "caughtUpNotRepeated": true,
+    "underReviewNotRepeated": true,
+    "clearedParagraphHidden": true,
+    "glanceHasHaveNeedNext": true,
+    "addMoreVisible": true,
+    "noHorizontalOverflow": true,
+    "nextNotObstructed": true,
+    "optionalReasonNotRepeated": true,
+    "rightsComplete": true,
+    "sendReachable": true,
+    "sendNotObstructed": true,
+    "chooseFileVisible": true
+  },
+  "proofs": [
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\materials-presentation-01-glance-360.png",
+    "C:\\Users\\tagia\\studio-squishy-mobile-customer-journey-certification-1\\docs\\launch\\studio-operating-mobile-customer-journey-certification-1\\lounge-glass-proofs\\materials-presentation-02-rights-360.png"
+  ],
+  "pageErrors": [],
+  "visual": {
+    "hasLounge": true,
+    "hasGlance": true,
+    "glanceBg": "rgba(0, 0, 0, 0)",
+    "glanceBefore": "color(srgb 0.953569 0.934274 0.900706 / 0.46)",
+    "intakeBg": "rgba(0, 0, 0, 0)",
+    "intakeBefore": "color(srgb 0.95451 0.935686 0.902745 / 0.58)",
+    "itemBg": null,
+    "intakeItemBg": null,
+    "caughtUpVisible": false,
+    "underReviewRepeat": false,
+    "passedChecksRepeat": false,
+    "hasReceived": true,
+    "hasStillNeed": true,
+    "hasNext": true,
+    "addMore": true,
+    "horizontalOverflow": false,
+    "reviewHeight": 52,
+    "nextObstructed": false,
+    "sendVisible": false
+  },
+  "form": {
+    "hasRightsTitle": true,
+    "hasAuthority": true,
+    "hasCommercial": true,
+    "hasCrop": true,
+    "hasPeople": true,
+    "hasThirdParty": true,
+    "sendVisible": true,
+    "sendObstructed": false,
+    "chooseFile": true,
+    "neededForRepeat": false
+  },
+  "failed": []
+}
