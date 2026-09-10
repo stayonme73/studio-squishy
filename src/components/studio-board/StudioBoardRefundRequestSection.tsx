@@ -212,7 +212,7 @@ export default function StudioBoardRefundRequestSection({
         {copy.sectionTitle}
       </p>
       <p className="sb-refund-request__lead">{copy.sectionLead}</p>
-      <p className="sb-refund-request__policy">{copy.policyNote}</p>
+      <p className="sb-refund-request__policy sb-status-copy-repeat">{copy.policyNote}</p>
       <p className="sb-refund-request__help">
         <Link href={copy.helpCenterHref} className="sb-refund-request__help-link">
           {copy.helpCenterHint}
@@ -254,15 +254,15 @@ export default function StudioBoardRefundRequestSection({
               >
                 <option value="">{copy.jobSelectPlaceholder}</option>
                 {selectableJobs.map((job) => (
-                  <option key={job.jobId} value={job.jobId}>
-                    {job.serviceName} — {job.statusLabel}
-                  </option>
-                ))}
+                    <option key={job.jobId} value={job.jobId}>
+                      {job.serviceName}
+                    </option>
+                  ))}
               </select>
             </>
           ) : (
             <p className="sb-refund-request__meta">
-              {selectableJobs[0]!.serviceName} — {selectableJobs[0]!.statusLabel}
+              {selectableJobs[0]!.serviceName}
             </p>
           )}
 
@@ -330,7 +330,8 @@ export default function StudioBoardRefundRequestSection({
               />
 
               <label className="sb-refund-request__label" htmlFor={detailsId}>
-                {copy.detailsLabel}
+                {copy.detailsLabel.replace(/\s*\(optional\)$/i, "")}{" "}
+                <span className="sb-refund-request__optional">(optional)</span>
               </label>
               <textarea
                 id={detailsId}
@@ -346,7 +347,7 @@ export default function StudioBoardRefundRequestSection({
               <div className="sb-refund-request__footer">
                 <button
                   type="submit"
-                  className="utility-btn utility-btn--primary sb-refund-request__submit"
+                  className="sb-refund-request__submit"
                   disabled={!canSubmit}
                 >
                   {busy ? copy.submitBusyLabel : copy.submitLabel}

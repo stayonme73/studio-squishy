@@ -41,6 +41,9 @@ describe("local test fixture surfaces", () => {
     expect(control).toContain("window.location.assign(LOCAL_TEST_FIXTURE_PATH)");
     expect(control).toContain(LOCAL_TEST_FIXTURE_PATH);
     expect(control).toContain("localTestFixturesCopy.boardButton");
+    expect(control).toContain('className="sb-local-test-fixture__button"');
+    expect(control).not.toContain("lobby-entry-film__cta");
+    expect(control).not.toContain("sb-local-test-fixture__button-fill");
     expect(control).not.toContain("from \"next/link\"");
     expect(control).not.toContain("NEXT_PUBLIC_");
   });

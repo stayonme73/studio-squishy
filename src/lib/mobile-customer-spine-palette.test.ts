@@ -11,6 +11,7 @@ import {
   MOBILE_VISUAL_SYSTEM_CHECKPOINT,
   MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT,
   MOBILE_CHOOSE_YOUR_ROUTE_OWNER_ACCEPTED,
+  MOBILE_BOARD_TYPOGRAPHY_ROLES,
   mobileCustomerSpinePaletteV1,
 } from "@/config/mobile-customer-spine-palette-v1";
 import { studioDesignSystem } from "@/config/studio-design-system";
@@ -85,6 +86,119 @@ describe("Mobile customer-spine palette (scoped)", () => {
     expect(surfaces).toContain("--pay-herb-gold: #547c92");
     expect(surfaces).toContain(".utility-card");
     expect(surfaces).toContain(":has(.fs-room)");
+    expect(surfaces).toContain(".studio-utility-scene--studio-board .sb-sidebar");
+    expect(surfaces).toContain("32%) 46%");
+    expect(surfaces).toContain("blur(14px) saturate(1.04) brightness(1.1)");
+    expect(surfaces).toContain("background: #547c92 !important");
+    expect(surfaces).toContain("color: #f7f4ee !important");
+    expect(surfaces).toContain(".sb-project-communication__submit:not(:disabled)");
+    expect(surfaces).toContain(".sb-refund-request__submit:not(:disabled)");
+    expect(surfaces).toContain("background: #f7c900 !important");
+    expect(surfaces).toContain("var(--mc-ink, #2e2b28)");
+    expect(surfaces).toContain(".utility-btn--primary:disabled");
+    expect(surfaces).toContain("opacity: 1 !important");
+    expect(surfaces).toContain("mix-blend-mode: normal");
+    expect(surfaces).toContain(".sb-local-test-fixture__eyebrow");
+    expect(surfaces).toContain(".sb-header-v3__title");
+    expect(surfaces).toContain(
+      ".sb-local-test-fixture__button[data-gate-pressed=\"true\"]",
+    );
+    expect(surfaces).not.toContain(".sb-local-test-fixture__button-fill");
+    expect(surfaces).not.toContain("inset 0 0 0 100vmax #547c92");
+    expect(surfaces).not.toContain("88%, #456b5a 12%");
+    const routeFixes = read("src/app/mobile-route-fixes.css");
+    expect(routeFixes).toContain("background-color: #547c92 !important");
+    expect(routeFixes).toContain("background-color: #f7c900 !important");
+    expect(routeFixes).not.toContain("linear-gradient(#f7c900, #f7c900)");
+    expect(routeFixes).not.toContain("inset 0 0 0 100vmax #f7c900");
+    expect(routeFixes).not.toContain("inset 0 0 0 100vmax #547c92");
+    expect(routeFixes).toContain(".sb-local-test-fixture__button");
+    expect(routeFixes).toContain(".sb-header-v3__title");
+    expect(routeFixes).toContain('[data-gate-pressed="true"]');
+    expect(routeFixes).toContain("color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%");
+    expect(routeFixes).toContain("blur(14px) saturate(1.04) brightness(1.1) !important");
+    expect(routeFixes).toContain("color-mix(in srgb, #547c92 40%, #f7f4ee)");
+    expect(routeFixes).not.toContain("rgba(247, 244, 238, 0.9)");
+    const shell = read("src/app/studio-environment-shell.css");
+    expect(shell).not.toContain(
+      "html:has(.studio-utility-scene--studio-board) .studio-environment-shell__frost",
+    );
+    expect(read("src/components/studio-board/StudioBoardProjectCommunicationSection.tsx")).toContain(
+      'className="sb-project-communication__submit"',
+    );
+    expect(read("src/components/studio-board/StudioBoardProjectCommunicationSection.tsx")).not.toContain(
+      "lobby-entry-film__cta sb-project-communication__submit",
+    );
+    expect(read("src/components/studio-board/StudioBoardRefundRequestSection.tsx")).toContain(
+      'className="sb-refund-request__submit"',
+    );
+    expect(read("src/components/studio-board/StudioBoardRefundRequestSection.tsx")).not.toContain(
+      "lobby-entry-film__cta sb-refund-request__submit",
+    );
+    expect(read("src/app/(studio)/studio-board/page.tsx")).toContain(
+      'import "../../mobile-route-fixes.css"',
+    );
+    expect(surfaces).toContain(".sb-refund-request__optional");
+    expect(read("src/components/studio-board/StudioBoardRefundRequestSection.tsx")).toContain(
+      "sb-refund-request__optional",
+    );
+    expect(read("src/config/refund-request-customer-v1.ts")).toContain(
+      'detailsLabel: "Supporting details (optional)"',
+    );
+  });
+
+  it("locks one mobile Studio Board typography hierarchy", () => {
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.doNotUndoGlass).toBe(true);
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.doNotBeginReviewRoom).toBe(true);
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.doNotBeginAnotherBoardStylingPass).toBe(true);
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.status).toBe("OWNER_ACCEPTED");
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.ownerAcceptedAt).toBe("2026-09-10");
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.page.role).toBe("A");
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.card.color).toBe("eucalyptus");
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.sub.color).toBe("denim");
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.field.size).toBe("0.875rem");
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.field.color).toBe("eucalyptus");
+    expect(MOBILE_BOARD_TYPOGRAPHY_ROLES.value.size).toBe("1rem");
+    const palette = read("src/app/mobile-customer-spine-palette.css");
+    expect(palette).toContain("--mc-board-type-page: 1.5rem");
+    expect(palette).toContain("--mc-board-type-field: 0.875rem");
+    expect(palette).toContain("--mc-board-color-field: var(--mc-eucalyptus)");
+    expect(palette).toContain("--mc-board-color-sub: var(--mc-denim)");
+    const routeFixes = read("src/app/mobile-route-fixes.css");
+    expect(routeFixes).toContain("LAST PAINT — mobile Studio Board typography roles (A–G)");
+    expect(routeFixes).toContain(".sb-visibility-continuity__row dt");
+    expect(routeFixes).toContain(".sb-project-snapshot__heading");
+    expect(routeFixes).toContain(".sb-journey__step--current .sb-journey__detail");
+    expect(routeFixes).toContain(".sb-progress-panel__update-date");
+    expect(routeFixes).toContain(".sb-journey__marker--current");
+    expect(routeFixes).toContain("visibility: hidden");
+    expect(routeFixes).toContain("background: #f7f4ee !important");
+    expect(routeFixes).toContain(".sb-nav .sb-sign-out");
+    expect(routeFixes).toContain("background-color: #b6c4c9 !important");
+    expect(routeFixes).toContain("justify-self: start");
+    expect(routeFixes).toContain("--sb-help-nav-width");
+    expect(routeFixes).toContain("min-height: 2.5rem");
+    expect(routeFixes).toContain(".sb-sign-out__control");
+    expect(routeFixes).toContain("height: 100lvh");
+    expect(routeFixes).toContain("transform: none");
+    expect(read("src/components/studio-board/StudioBoardScene.tsx")).toContain(
+      "--sb-help-nav-width",
+    );
+    expect(routeFixes).toContain("position: absolute");
+    expect(routeFixes).toContain("opacity: 0");
+    expect(read("src/components/auth/CustomerSignOutButton.tsx")).toContain(
+      'className="sb-sign-out__control"',
+    );
+    expect(read("src/components/auth/CustomerSignOutButton.tsx")).toContain(
+      'className="sb-nav__icon"',
+    );
+    expect(read("src/components/auth/CustomerSignOutButton.tsx")).toContain("aria-label");
+    expect(routeFixes).toContain("var(--mc-coral, #d94e2b)");
+    expect(routeFixes).toContain(".sb-visibility-continuity__notes");
+    expect(routeFixes).toContain("text-transform: none");
+    expect(routeFixes.indexOf(".sb-visibility-continuity__row dt")).toBeGreaterThan(
+      routeFixes.indexOf("LAST PAINT — mobile Studio Board typography roles (A–G)"),
+    );
   });
 
   it("scopes the palette across the Mobile customer spine", () => {

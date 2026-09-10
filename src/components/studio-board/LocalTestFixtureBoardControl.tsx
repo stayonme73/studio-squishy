@@ -7,25 +7,21 @@ import {
 } from "@/lib/local-test-fixtures-copy";
 
 /**
- * Next.js <Link> intercepts click for client navigation. Samsung Chrome
- * often never fires that click, so the control paints and prefetch may
- * hit the server while the tap is a no-op. Native href + same-tab assign.
+ * Samsung Chrome often never fires Next <Link> click. Native button +
+ * same-tab assign. Do not reuse Let’s Get Started — that Denim fill reads
+ * brown through Lounge glass, with only the yellow trim showing.
  */
 export default function LocalTestFixtureBoardControl() {
-  const activate = useSamsungGateActivate<HTMLAnchorElement>(() => {
+  const activate = useSamsungGateActivate<HTMLButtonElement>(() => {
     window.location.assign(LOCAL_TEST_FIXTURE_PATH);
   });
 
   return (
     <div className="sb-local-test-fixture" data-local-test-fixture="materials">
       <p className="sb-local-test-fixture__eyebrow">{localTestFixturesCopy.eyebrow}</p>
-      <a
-        ref={activate.ref}
-        className="utility-btn utility-btn--secondary sb-local-test-fixture__button"
-        href={LOCAL_TEST_FIXTURE_PATH}
-      >
+      <button type="button" ref={activate.ref} className="sb-local-test-fixture__button">
         {localTestFixturesCopy.boardButton}
-      </a>
+      </button>
     </div>
   );
 }

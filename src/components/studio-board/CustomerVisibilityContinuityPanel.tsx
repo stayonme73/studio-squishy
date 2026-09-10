@@ -1,5 +1,9 @@
 import { customerVisibilityContinuityV1 as copy } from "@/config/customer-visibility-continuity-v1";
 import type { CustomerVisibilityContinuityView } from "@/lib/customer-visibility-continuity";
+import {
+  isDuplicateStatusNextStep,
+  isEmptyStatusRisk,
+} from "@/lib/studio-board/board-status-mobile-presentation";
 
 type Props = {
   view: CustomerVisibilityContinuityView;
@@ -40,7 +44,13 @@ export default function CustomerVisibilityContinuityPanel({ view }: Props) {
           <dt>{copy.sections.studioWorking}</dt>
           <dd data-testid="cvc-studio">{view.whatStudioIsDoing}</dd>
         </div>
-        <div className="sb-visibility-continuity__row">
+        <div
+          className={`sb-visibility-continuity__row${
+            isDuplicateStatusNextStep(view.nextStep, view.whatStudioIsDoing)
+              ? " sb-status-copy-repeat"
+              : ""
+          }`}
+        >
           <dt>{copy.sections.nextStep}</dt>
           <dd data-testid="cvc-next">{view.nextStep}</dd>
         </div>
@@ -48,11 +58,19 @@ export default function CustomerVisibilityContinuityPanel({ view }: Props) {
           <dt>{copy.sections.whoActs}</dt>
           <dd data-testid="cvc-who">{view.whoActsNextLabel}</dd>
         </div>
-        <div className="sb-visibility-continuity__row">
+        <div
+          className={`sb-visibility-continuity__row${
+            view.hasAuthoritativeTargetDate ? "" : " sb-status-copy-repeat"
+          }`}
+        >
           <dt>{copy.sections.target}</dt>
           <dd data-testid="cvc-target">{view.targetOrCheckpoint}</dd>
         </div>
-        <div className="sb-visibility-continuity__row">
+        <div
+          className={`sb-visibility-continuity__row${
+            isEmptyStatusRisk(view.riskOrBlocker) ? " sb-status-copy-repeat" : ""
+          }`}
+        >
           <dt>{copy.sections.risk}</dt>
           <dd data-testid="cvc-risk">{view.riskOrBlocker}</dd>
         </div>

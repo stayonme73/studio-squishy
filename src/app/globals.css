@@ -20,8 +20,10 @@
 @import "./feedback-studio.css";
 @import "./mobile-customer-spine-palette.css";
 @import "./studio-customer-tile-system.css";
+/* Phone glass + Board surface remaps */
 @import "./mobile-customer-spine-surfaces.css";
 @import "./studio-environment-shell.css";
+
 @import "./mobile-journey.css";
 @import "./owner-qa.css";
 @import "./studio-review-mobile-tab.css";

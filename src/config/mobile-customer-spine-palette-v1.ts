@@ -152,6 +152,110 @@ export const MOBILE_MATERIALS_CONFIRMATION_CHECKPOINT = {
 } as const;
 
 /**
+ * One mobile Studio Board typography hierarchy.
+ * Map existing Board copy into these roles. Do not invent per-section fonts.
+ * Do not undo glass. Do not begin Review Room from this lock.
+ * Owner Samsung 2026-09-10 closed this Board presentation pass. Do not start another.
+ */
+export const MOBILE_BOARD_TYPOGRAPHY_ROLES = {
+  lockedAt: "2026-09-09" as const,
+  ownerAcceptedAt: "2026-09-10" as const,
+  status: "OWNER_ACCEPTED" as const,
+  visualMaster: "MOBILE_VISUAL_MASTER" as const,
+  doNotUndoGlass: true as const,
+  doNotBeginReviewRoom: true as const,
+  doNotBeginAnotherBoardStylingPass: true as const,
+  page: {
+    role: "A" as const,
+    size: "1.5rem",
+    weight: "700",
+    color: "denim",
+    examples: ["Studio Board"],
+  },
+  card: {
+    role: "B" as const,
+    size: "0.875rem",
+    weight: "700",
+    color: "eucalyptus",
+    examples: [
+      "CURRENT PROJECT",
+      "PROJECT SNAPSHOT",
+      "YOUR PROJECT JOURNEY",
+      "PROJECT COMMUNICATION",
+      "REFUND REQUEST",
+      "MATERIALS RECEIVED",
+      "LOCAL DEVELOPER TEST",
+    ],
+  },
+  sub: {
+    role: "C" as const,
+    size: "0.875rem",
+    weight: "800",
+    color: "denim",
+    examples: [
+      "DELIVERABLES",
+      "YOUR STUDIO PLAN",
+      "ACCOUNT",
+      "RECENT UPDATES",
+      "PROJECT STATUS",
+      "PRODUCTION STATUS",
+    ],
+  },
+  field: {
+    role: "D" as const,
+    size: "0.875rem",
+    weight: "700",
+    color: "eucalyptus",
+    examples: [
+      "WHAT WE NEED FROM YOU",
+      "RECORDED OR COMPLETE",
+      "WHAT THE STUDIO IS WORKING ON",
+      "WHO ACTS NEXT",
+      "CURRENT STATUS",
+      "REVISIONS REMAINING",
+    ],
+  },
+  value: {
+    role: "E" as const,
+    size: "1rem",
+    weight: "650",
+    color: "ink",
+    examples: [
+      "Nothing is required from you right now.",
+      "Recorded: Project Intake submitted",
+      "The Studio",
+      "Make Me a Flyer",
+      "Paid in Full · $69",
+      "Project Intake Received",
+    ],
+  },
+  support: {
+    role: "F" as const,
+    size: "0.875rem",
+    weight: "500",
+    color: "ink-muted-64",
+    examples: [
+      "Your Project Intake is submitted and locked for reference...",
+      "TODAY / date metadata",
+      "helper explanations",
+    ],
+  },
+  action: {
+    role: "G" as const,
+    size: "0.94rem",
+    weight: "700",
+    color: "role-specific",
+    examples: [
+      "View submitted project details",
+      "Send message",
+      "Submit refund request",
+      "Save Studio fixture file",
+      "Add more (optional)",
+    ],
+  },
+} as const;
+
+/**
  * Owner-accepted Choose Your Route (Samsung 2026-08-30).
  * Reuses MOBILE_VISUAL_MASTER. Do not redesign.
  * Suggested Starting Point is the recommendation. Denim is the selection.

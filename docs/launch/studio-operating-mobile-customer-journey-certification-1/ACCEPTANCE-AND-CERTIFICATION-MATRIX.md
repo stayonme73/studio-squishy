@@ -4,7 +4,8 @@
 **Status:** OPEN — readiness prepared; **no real-phone results stamped**  
 **Date:** 2026-08-22  
 **Owner Samsung 2026-09-06:** Partial live-phone evidence recorded in `2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md`. That run is **not** a package certification stamp.  
-**Owner Samsung 2026-09-08:** Materials Board presentation **OWNER ACCEPTED** (`2026-09-08-MATERIALS-MOBILE-PRESENTATION-OWNER-ACCEPTED.md`). Package remains OPEN.
+**Owner Samsung 2026-09-08:** Materials Board presentation **OWNER ACCEPTED** (`2026-09-08-MATERIALS-MOBILE-PRESENTATION-OWNER-ACCEPTED.md`). Package remains OPEN.  
+**Owner Samsung 2026-09-10:** Studio Board typography / color-hierarchy pass **OWNER ACCEPTED** (`2026-09-10-BOARD-TYPOGRAPHY-COLOR-HIERARCHY-OWNER-ACCEPTED.md`). Do not start Review Room. Do not begin another Board styling pass. Package remains OPEN.
 
 Legend: ✅ proven · ⚠️ partial · ❌ missing · 🚫 not in scope
 

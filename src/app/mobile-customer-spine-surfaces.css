@@ -6,21 +6,52 @@
 @media (max-width: 1024px) {
   [data-mobile-customer-spine] {
     --studio-denim: #547c92;
-    --studio-denim-deep: color-mix(in srgb, #547c92 88%, #456b5a 12%);
+    --studio-denim-deep: #547c92;
     --studio-eucalyptus: #456b5a;
     --studio-ivory: #f7f4ee;
     --pay-denim: #547c92;
-    --pay-denim-deep: color-mix(in srgb, #547c92 88%, #456b5a 12%);
+    --pay-denim-deep: #547c92;
     --pay-herb-gold: #547c92;
     --sb-denim: #547c92;
     --utility-primary: #547c92;
-    --utility-primary-deep: color-mix(in srgb, #547c92 88%, #456b5a 12%);
+    --utility-primary-deep: #547c92;
     --studio-utility-backdrop-image: url("/welcome-hall/studio-lobby-lounge.png");
     --studio-utility-backdrop-position: 16% 42%;
     --studio-utility-backdrop-blur: blur(2px);
     --studio-utility-backdrop-tint: color-mix(in srgb, #2e2b28 18%, transparent);
     --studio-utility-backdrop-fallback: #ebe2d4;
     --fs-accent: #547c92;
+  }
+
+  /*
+   * .sb resets --sb-denim to inherited --board-family-primary, which computes
+   * on :root as charcoal Studio Denim. Re-pin the phone Board to the
+   * mobile Denim family without rewriting desktop Board tokens.
+   */
+  [data-mobile-customer-spine] .sb.sb--v4 {
+    --studio-denim: #547c92;
+    --sb-denim: #547c92;
+    --sb-denim-deep: #547c92;
+    --board-family-primary: #547c92;
+    --board-family-primary-deep: #547c92;
+    --utility-primary: #547c92;
+    --utility-primary-deep: #547c92;
+    /* Shared Board glass = Let’s Get Started / MOBILE_VISUAL_MASTER. */
+    --mc-glass: color-mix(
+      in srgb,
+      color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%,
+      transparent
+    );
+    --mc-glass-strong: color-mix(
+      in srgb,
+      color-mix(in srgb, #f7f4ee 70%, #ebe2d4 30%) 58%,
+      transparent
+    );
+  }
+
+  [data-mobile-customer-spine] .studio-utility-scene--studio-board,
+  [data-mobile-customer-spine] .studio-utility-scene--studio-board .studio-utility-scene__content {
+    overflow: visible !important;
   }
 
   /* Beat Feedback Studio's local charcoal-identity / center-crop lounge override. */
@@ -43,8 +74,8 @@
 
   [data-mobile-customer-spine] .utility-btn--primary:hover,
   [data-mobile-customer-spine] .utility-page--help-center .utility-header .utility-topbar__help:hover {
-    background: var(--utility-primary-deep);
-    border-color: var(--utility-primary-deep);
+    background: #547c92;
+    border-color: #547c92;
   }
 
   /* Local/test fixture page — Lounge + locked glass/Ink/Denim. Not utility cream. */
@@ -87,6 +118,73 @@
    */
   [data-mobile-customer-spine] .sb--v4 .sb-main {
     padding-bottom: calc(var(--studio-review-mobile-bottom, 3.25rem) + 1.25rem);
+  }
+
+  /*
+   * Phone Board top/nav — Lounge + light glass, not the opaque Board Family
+   * brown field. Navigation structure, routing, and behavior stay as-is.
+   */
+  [data-mobile-customer-spine] .studio-utility-scene--studio-board .sb-sidebar,
+  [data-mobile-customer-spine] .sb--v4 .sb-sidebar {
+    position: relative;
+    isolation: auto;
+    overflow: visible;
+    background: transparent !important;
+    background-image: none !important;
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-sidebar > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__icon,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__label {
+    color: var(--mc-ink, #2e2b28);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-brand__the,
+  [data-mobile-customer-spine] .sb--v4 .sb-brand__name {
+    color: var(--mc-denim, #547c92);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-header-v3__title {
+    color: var(--mc-denim, #547c92);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out {
+    background: color-mix(in srgb, #547c92 40%, #f7f4ee);
+    background-color: #b6c4c9;
+    background-image: none;
+    border: 1px solid #f7c900;
+    color: #f7c900;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active .sb-nav__icon,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active .sb-nav__label {
+    color: #f7c900 !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-sign-out,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out {
+    background: color-mix(in srgb, #547c92 40%, #f7f4ee);
+    background-color: #b6c4c9;
+    background-image: none;
+    border: 1px solid #f7c900;
+    color: #f7c900;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    width: auto;
+    margin: 0;
   }
 
   [data-mobile-customer-spine] .sb--v4 .sb-materials-glance {
@@ -171,10 +269,10 @@
     border-radius: inherit;
     pointer-events: none;
     mix-blend-mode: normal;
-    background: var(--mc-glass-strong) !important;
+    background: transparent !important;
     background-image: none !important;
-    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
-    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     box-shadow: none;
   }
 
@@ -278,5 +376,424 @@
     background: var(--mc-denim, #547c92);
     border: 1px solid var(--mc-denim, #547c92);
     color: var(--mc-ivory, #f7f4ee);
+  }
+
+  /*
+   * Board Communication / Status — phone only. Do not restyle Materials.
+   * Beat .sb--v4 .sb-card.bf-material-paper on current, progress, and messages.
+   */
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--current.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--current.bf-material-paper,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--progress.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--progress.bf-material-paper,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-snapshot.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-snapshot.bf-material-paper,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material-paper,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material-paper {
+    isolation: auto !important;
+    overflow: visible !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+    color: var(--mc-ink, #2e2b28);
+    position: relative;
+    border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+    border-radius: var(--studio-tile-radius, 0.85rem);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--current.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--current.bf-material-paper::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--progress.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--progress.bf-material-paper::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-snapshot.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-snapshot.bf-material-paper::before {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    mix-blend-mode: normal;
+    background: transparent !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material-paper::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material-paper::before {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    mix-blend-mode: normal;
+    background: transparent !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--current.bf-material::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--current.bf-material-paper::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--progress.bf-material::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--progress.bf-material-paper::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-snapshot.bf-material::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-snapshot.bf-material-paper::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material-paper::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material::after,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material-paper::after {
+    content: none;
+    display: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--current > *,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--progress > *,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-snapshot > *,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication > *,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity,
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action,
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action--waiting,
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__metrics,
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__metric,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__machine-answer,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__intent-option {
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border-color: var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity {
+    padding: 0.35rem 0 0.15rem;
+    border: none;
+    border-radius: 0;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action {
+    padding: 0.55rem 0 0.15rem;
+    border: none;
+    border-top: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+    border-radius: 0;
+  }
+
+  /* B — card / major section identity. C/D denim lives in Board type last-paint. */
+  [data-mobile-customer-spine] .sb--v4 .sb-card--current .sb-card__tab,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--progress .sb-card__tab,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--project-snapshot .sb-card__tab,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--project-communication .sb-card__tab,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--refund-request .sb-card__tab,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__eyebrow {
+    color: var(--mc-board-color-card, var(--mc-eucalyptus, #456b5a));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__row dd,
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__lead,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__text,
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__name {
+    color: var(--mc-board-color-value, var(--mc-ink, #2e2b28));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__hint,
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__eta,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__lead,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__meta {
+    color: var(--mc-board-color-support, color-mix(in srgb, #2e2b28 82%, transparent));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-status-copy-repeat {
+    display: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__item,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__notice {
+    background: transparent !important;
+    border-color: var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material-paper {
+    padding-bottom: calc(1.15rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__success {
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    color: var(--mc-eucalyptus, #456b5a);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit {
+    min-height: 2.85rem;
+    scroll-margin-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__optional {
+    color: var(--mc-ink-muted, color-mix(in srgb, #2e2b28 64%, transparent));
+    font-weight: 600;
+  }
+
+  /*
+   * Board primaries must paint like Welcome `.lobby-entry-film__cta`.
+   * Do not mix Denim with Eucalyptus or black — that reads teal/navy on Samsung.
+   * Kill utility-btn shadow, multiply, and disabled-as-dark-slab.
+   */
+  [data-mobile-customer-spine] .sb--v4 .utility-btn--primary:not(:disabled),
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__cta:not(:disabled),
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__record:not(:disabled),
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__submit:not(:disabled) {
+    isolation: isolate;
+    mix-blend-mode: normal;
+    filter: none;
+    background: #547c92 !important;
+    border: 1px solid #547c92 !important;
+    color: #f7f4ee !important;
+    box-shadow: none !important;
+    opacity: 1;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .utility-btn--primary:not(:disabled):hover,
+  [data-mobile-customer-spine] .sb--v4 .utility-btn--primary:not(:disabled):focus-visible,
+  [data-mobile-customer-spine] .sb--v4 .utility-btn--primary:not(:disabled):active,
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__cta:not(:disabled):hover {
+    background: #547c92 !important;
+    border-color: #547c92 !important;
+    color: #f7f4ee !important;
+    filter: none !important;
+    box-shadow: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .utility-btn--primary:disabled {
+    isolation: isolate;
+    mix-blend-mode: normal;
+    filter: none;
+    background: #547c92 !important;
+    border: 1px solid #547c92 !important;
+    color: #f7f4ee !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    cursor: not-allowed;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-snapshot {
+    border-left-color: var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__lead,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__help,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__meta,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__warning,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__status-body,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__primary,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__meta {
+    color: var(--mc-ink, #2e2b28);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__warning,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__persistent-status {
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border-color: var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit.utility-btn--primary {
+    width: 100%;
+    min-height: 2.85rem;
+    justify-content: center;
+    scroll-margin-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture {
+    isolation: auto;
+    overflow: visible;
+    position: relative;
+    padding: var(--sb-tile-padding-y, 1rem) var(--sb-tile-padding-x, 1rem);
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    border: 1px solid var(--mc-glass-border, color-mix(in srgb, #547c92 32%, #f7f4ee));
+    color: var(--mc-ink, #2e2b28);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture::before {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: var(
+      --mc-glass,
+      color-mix(in srgb, color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%, transparent)
+    );
+    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button.lobby-entry-film__cta,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button:hover,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button:focus-visible,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button:active,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button[data-fixture-pressed="true"],
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button[data-gate-pressed="true"],
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:not(:disabled),
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:not(:disabled),
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:hover,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:hover,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:focus-visible,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:focus-visible,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:active,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:active,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:disabled,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:disabled {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 0;
+    width: 100%;
+    justify-content: center;
+    padding: 0 1.15rem;
+    border-radius: 0.55rem;
+    font: inherit;
+    font-size: 0.94rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    isolation: isolate;
+    mix-blend-mode: normal;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: none;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #f7c900 !important;
+    background-color: #f7c900 !important;
+    background-image: none !important;
+    border: 1px solid #f7c900 !important;
+    color: var(--mc-ink, #2e2b28) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:disabled,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:disabled {
+    cursor: not-allowed;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button.lobby-entry-film__cta,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    height: 2.85rem;
+    min-height: 2.85rem;
+    max-height: 2.85rem;
+    padding: 0 1.15rem;
+    border-radius: 0.55rem;
+    font: inherit;
+    font-size: 0.94rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  [data-mobile-customer-spine] .studio-utility-scene--studio-board .sb-sidebar,
+  [data-mobile-customer-spine] .sb--v4 .sb-sidebar,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance,
+  [data-mobile-customer-spine] .sb--v4 .sb-card {
+    overflow: visible !important;
+    background: color-mix(
+      in srgb,
+      color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%,
+      transparent
+    ) !important;
+    background-image: none !important;
+    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1) !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-sidebar::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card::before {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material-paper,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material-paper {
+    background: transparent !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material-paper::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material-paper::before {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    mix-blend-mode: normal;
+    background: color-mix(
+      in srgb,
+      color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%,
+      transparent
+    ) !important;
+    background-image: none !important;
+    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1) !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card--project-communication > *,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--refund-request > * {
+    position: relative;
+    z-index: 1;
   }
 }

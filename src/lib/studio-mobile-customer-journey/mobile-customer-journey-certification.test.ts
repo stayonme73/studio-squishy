@@ -20,11 +20,12 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.unparkedAt).toBe("2026-08-25");
     expect(cfg.livePhoneCertification).toBe("IN_PROGRESS_NOT_CERTIFIED");
     expect(cfg.nextPhoneAction).toContain(
-      "Materials Board presentation is OWNER ACCEPTED",
+      "Studio Board presentation / typography-color-hierarchy pass is OWNER ACCEPTED",
     );
-    expect(cfg.nextPhoneAction).toContain("Do not start the next journey stage");
+    expect(cfg.nextPhoneAction).toContain("Do not start Review Room");
+    expect(cfg.nextPhoneAction).toContain("Do not begin another Board styling pass");
     expect(cfg.nextPhoneAction).toContain("Do not rebuild Maya");
-    expect(cfg.nextMobileScreen).toBe("stopped-after-materials-board");
+    expect(cfg.nextMobileScreen).toBe("stopped-after-board-presentation-pass");
     expect(cfg.mjd16ManualEntryStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.checkoutStageEntryScrollStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.checkoutPaymentStatus).toBe(
@@ -69,7 +70,7 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.voiceChoiceStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.visualMaster).toBe("MOBILE_VISUAL_MASTER");
     expect(cfg.nameQuestionStatus).toBe("OWNER_ACCEPTED");
-    expect(cfg.nextMobileScreen).toBe("stopped-after-materials-board");
+    expect(cfg.nextMobileScreen).toBe("stopped-after-board-presentation-pass");
     expect(cfg.reuseLockedMobileVisualSystem).toBe(true);
     expect(cfg.projectNeedStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.businessNameStatus).toBe("OWNER_ACCEPTED");
@@ -89,6 +90,11 @@ describe("STUDIO-OPERATING-MOBILE-CUSTOMER-JOURNEY-CERTIFICATION-1", () => {
     expect(cfg.materialsBoardPresentationStatus).toBe("OWNER_ACCEPTED");
     expect(cfg.materialsBoardPresentationAcceptedAt).toBe("2026-09-08");
     expect(existsSync(join(process.cwd(), cfg.materialsBoardPresentationDoc))).toBe(
+      true,
+    );
+    expect(cfg.boardTypographyColorHierarchyStatus).toBe("OWNER_ACCEPTED");
+    expect(cfg.boardTypographyColorHierarchyAcceptedAt).toBe("2026-09-10");
+    expect(existsSync(join(process.cwd(), cfg.boardTypographyColorHierarchyDoc))).toBe(
       true,
     );
     expect(cfg.samsungFixtureDownloadStatus).toBe("PROVEN");

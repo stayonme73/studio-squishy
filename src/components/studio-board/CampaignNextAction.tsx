@@ -12,6 +12,10 @@ import {
   resolveBoardNextActionPresentation,
   type BoardNextActionPresentation,
 } from "@/lib/studio-board-next-action";
+import {
+  isCeremonialNextActionLead,
+  isCeremonialNextUpdate,
+} from "@/lib/studio-board/board-status-mobile-presentation";
 
 const { campaignActions: copy } = studioBoard;
 
@@ -82,9 +86,21 @@ function NextActionChrome({
   return (
     <div className={`sb-next-action${toneClass}`} role="status" aria-live="polite">
       {presentation.statusLabel ? (
-        <p className="sb-next-action__status">{presentation.statusLabel}</p>
+        <p
+          className={`sb-next-action__status${
+            isCeremonialNextActionLead(presentation.lead) ? " sb-status-copy-repeat" : ""
+          }`}
+        >
+          {presentation.statusLabel}
+        </p>
       ) : null}
-      <p className="sb-next-action__lead">{presentation.lead}</p>
+      <p
+        className={`sb-next-action__lead${
+          isCeremonialNextActionLead(presentation.lead) ? " sb-status-copy-repeat" : ""
+        }`}
+      >
+        {presentation.lead}
+      </p>
       {presentation.action?.type === "navigate" ? (
         <Link
           href={presentation.action.href}
@@ -107,7 +123,11 @@ function NextActionChrome({
       nextUpdateLabel &&
       presentation.action === null &&
       !presentation.hint?.includes(copy.nextUpdatePrefix) ? (
-        <p className="sb-next-action__eta">
+        <p
+          className={`sb-next-action__eta${
+            isCeremonialNextUpdate(nextUpdateLabel) ? " sb-status-copy-repeat" : ""
+          }`}
+        >
           {copy.nextUpdatePrefix} {nextUpdateLabel}
         </p>
       ) : null}

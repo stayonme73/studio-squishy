@@ -647,9 +647,85 @@
     height: auto !important;
     overflow: visible;
     border-right: none;
-    border-bottom: 1px solid color-mix(in srgb, var(--sb-denim) 18%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, #547c92 32%, #f7f4ee);
     padding: 0.65rem 0.75rem 0.55rem;
     gap: 0.35rem;
+    background: transparent !important;
+    background-image: none !important;
+    background-color: transparent !important;
+    position: relative;
+  }
+
+  [data-mobile-customer-spine] .studio-utility-scene--studio-board,
+  [data-mobile-customer-spine] .studio-utility-scene--studio-board .studio-utility-scene__content {
+    overflow: visible !important;
+  }
+
+  [data-mobile-customer-spine] .studio-utility-scene--studio-board .sb-sidebar,
+  [data-mobile-customer-spine] .sb--v4 .sb-sidebar {
+    background: transparent !important;
+    background-image: none !important;
+    background-color: transparent !important;
+  }
+
+  [data-mobile-customer-spine] .studio-utility-scene--studio-board .sb-sidebar,
+  [data-mobile-customer-spine] .sb--v4 .sb-sidebar,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance,
+  [data-mobile-customer-spine] .sb--v4 .sb-card {
+    overflow: visible !important;
+    background: color-mix(
+      in srgb,
+      color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%,
+      transparent
+    ) !important;
+    background-image: none !important;
+    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1) !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-sidebar::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--project-communication::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--refund-request::before {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card::after {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out {
+    background: color-mix(in srgb, #547c92 40%, #f7f4ee) !important;
+    background-color: #b6c4c9 !important;
+    background-image: none !important;
+    border: 1px solid #f7c900 !important;
+    border-left: 1px solid #f7c900 !important;
+    color: #f7c900 !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active .sb-nav__icon,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active .sb-nav__label {
+    color: #f7c900 !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance > .sb-card::after {
+    content: none !important;
+    display: none !important;
   }
 
   .sb--v4 .sb-brand {
@@ -657,17 +733,23 @@
   }
 
   .sb--v4 .sb-nav {
-    flex: 1 1 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 0.25rem;
     width: 100%;
+    flex: 1 1 100%;
   }
 
   .sb--v4 .sb-nav__item {
-    flex: 1 1 calc(50% - 0.25rem);
-    min-height: 2.75rem;
+    width: auto;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    padding: 0.36rem 0.5rem;
     font-size: 0.8125rem;
+    justify-self: start;
   }
 
   /*
@@ -680,15 +762,33 @@
 
   .sb--v4 .sb-nav .sb-sign-out {
     display: inline-flex !important;
-    flex: 1 1 calc(50% - 0.25rem);
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    align-self: start;
+    justify-self: start;
     width: auto;
-    min-height: 2.75rem;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    max-height: none;
     margin: 0;
-    padding: 0.5rem 0.55rem;
+    padding: 0.36rem 0.5rem;
+    appearance: none;
+    -webkit-appearance: none;
     font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     white-space: nowrap;
+    border-radius: 8px;
+    background: color-mix(in srgb, #547c92 40%, #f7f4ee) !important;
+    background-color: #b6c4c9 !important;
+    background-image: none !important;
+    border: 1px solid #f7c900 !important;
+    border-left: 1px solid #f7c900 !important;
+    color: #f7c900 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
   }
 
   .sb--v4 .sb-main {
@@ -771,6 +871,187 @@
     min-height: 2.85rem;
   }
 
+  [data-mobile-customer-spine] .sb--v4 button.utility-btn--primary:not(:disabled),
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__cta:not(:disabled),
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__record:not(:disabled),
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__submit:not(:disabled) {
+    isolation: isolate;
+    mix-blend-mode: normal;
+    appearance: none;
+    -webkit-appearance: none;
+    filter: none !important;
+    background-color: #547c92 !important;
+    background-image: none !important;
+    border: 1px solid #547c92 !important;
+    color: #f7f4ee !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 button.utility-btn--primary:not(:disabled):hover,
+  [data-mobile-customer-spine] .sb--v4 button.utility-btn--primary:not(:disabled):focus-visible,
+  [data-mobile-customer-spine] .sb--v4 button.utility-btn--primary:not(:disabled):active {
+    background-color: #547c92 !important;
+    background-image: none !important;
+    border-color: #547c92 !important;
+    color: #f7f4ee !important;
+    filter: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 button.utility-btn--primary:disabled {
+    isolation: isolate;
+    mix-blend-mode: normal;
+    appearance: none;
+    -webkit-appearance: none;
+    filter: none !important;
+    background-color: #547c92 !important;
+    background-image: none !important;
+    border: 1px solid #547c92 !important;
+    color: #f7f4ee !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button.lobby-entry-film__cta,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button:hover,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button:focus-visible,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button:active,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button[data-fixture-pressed="true"],
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button[data-gate-pressed="true"],
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:not(:disabled),
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:not(:disabled),
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:hover,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:hover,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:focus-visible,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:focus-visible,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:active,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:active,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:disabled,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:disabled {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 0;
+    width: 100%;
+    justify-content: center;
+    padding: 0 1.15rem;
+    border-radius: 0.55rem;
+    font: inherit;
+    font-size: 0.94rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    text-decoration: none;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    isolation: isolate;
+    mix-blend-mode: normal;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: none;
+    filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #f7c900 !important;
+    background-color: #f7c900 !important;
+    background-image: none !important;
+    border: 1px solid #f7c900 !important;
+    color: var(--mc-ink, #2e2b28) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit:disabled,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit:disabled {
+    cursor: not-allowed;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-brand__the,
+  [data-mobile-customer-spine] .sb--v4 .sb-brand__name {
+    color: var(--mc-denim, #547c92);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-header-v3__title {
+    color: var(--mc-denim, #547c92);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active {
+    border: 1px solid #f7c900 !important;
+    border-left: 1px solid #f7c900 !important;
+    color: #f7c900 !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active .sb-nav__icon,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active .sb-nav__label {
+    color: #f7c900 !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture {
+    padding: var(--sb-tile-padding-y, 1rem) var(--sb-tile-padding-x, 1rem);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button.lobby-entry-film__cta,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    height: 2.85rem;
+    min-height: 2.85rem;
+    max-height: 2.85rem;
+    padding: 0 1.15rem;
+    border-radius: 0.55rem;
+    font: inherit;
+    font-size: 0.94rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material-paper,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material-paper {
+    background: transparent !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--project-communication.bf-material-paper::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material::before,
+  [data-mobile-customer-spine] .sb--v4 .sb-card.sb-card--refund-request.bf-material-paper::before {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    mix-blend-mode: normal;
+    background: color-mix(
+      in srgb,
+      color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 46%,
+      transparent
+    ) !important;
+    background-image: none !important;
+    backdrop-filter: blur(14px) saturate(1.04) brightness(1.1) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.04) brightness(1.1) !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-card--project-communication > *,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--refund-request > * {
+    position: relative;
+    z-index: 1;
+  }
+
   /* —— Campaign Record drawer —— */
   .sb-record-drawer {
     justify-content: stretch;
@@ -819,5 +1100,478 @@
   .hc-faq__answer {
     font-size: 0.9375rem;
     line-height: 1.55;
+  }
+
+  /*
+   * LAST PAINT — mobile Studio Board typography roles (A–G).
+   * One hierarchy for the entire Board. Do not restyle glass.
+   * Scoped to phone Board only — not Review Room.
+   *
+   * A page · B card · C subsection · D field · E value · F support · G action
+   */
+  [data-mobile-customer-spine] .sb.sb--v4 {
+    --mc-board-type-page: 1.5rem;
+    --mc-board-type-card: 0.875rem;
+    --mc-board-type-sub: 0.875rem;
+    --mc-board-type-field: 0.875rem;
+    --mc-board-type-value: 1rem;
+    --mc-board-type-support: 0.875rem;
+    --mc-board-type-action: 0.94rem;
+  }
+
+  /* A — PAGE TITLE */
+  [data-mobile-customer-spine] .sb--v4 .sb-header-v3__title {
+    font-size: var(--mc-board-type-page, 1.5rem);
+    font-weight: 700;
+    letter-spacing: var(--mc-board-track-page, 0.12em);
+    line-height: 1.15;
+    text-transform: uppercase;
+    color: var(--mc-board-color-page, var(--mc-denim, #547c92));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-header-v3__greeting,
+  [data-mobile-customer-spine] .sb--v4 .sb-header-v3__name {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--mc-coral, #d94e2b);
+    background: none !important;
+    background-color: transparent !important;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  /* B — CARD / MAJOR SECTION TITLE */
+  [data-mobile-customer-spine] .sb--v4 .sb-card__tab,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__eyebrow,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-glance .sb-card__tab,
+  [data-mobile-customer-spine] .sb--v4 .sb-card--materials .sb-card__tab {
+    font-size: var(--mc-board-type-card, 0.875rem);
+    font-weight: 700;
+    letter-spacing: var(--mc-board-track-card, 0.1em);
+    line-height: 1.3;
+    text-transform: uppercase;
+    color: var(--mc-board-color-card, var(--mc-eucalyptus, #456b5a));
+  }
+
+  /* C — SUBSECTION LABEL (DELIVERABLES model) */
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__heading,
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__heading,
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__status,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-panel__timeline-heading,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-panel__pipeline-summary,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights-title {
+    font-size: var(--mc-board-type-sub, 0.875rem);
+    font-weight: 800;
+    letter-spacing: var(--mc-board-track-sub, 0.1em);
+    line-height: 1.3;
+    text-transform: uppercase;
+    color: var(--mc-board-color-sub, var(--mc-denim, #547c92));
+  }
+
+  /* D — INFORMATION LABEL. Eucalyptus, not Denim — must not look like C. */
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__row dt,
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__intent-legend,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__field-label,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__status,
+  [data-mobile-customer-spine] .sb--v4 .sb-account__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__status-heading {
+    font-size: var(--mc-board-type-field, 0.875rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.35;
+    color: var(--mc-board-color-field, var(--mc-eucalyptus, #456b5a));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__row dt,
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__label {
+    text-transform: uppercase;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__row,
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__metric {
+    gap: 0.28rem;
+  }
+
+  /* E — PRIMARY VALUE / CUSTOMER INFORMATION */
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__row dd,
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__notes li,
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__lead,
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__value,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__primary,
+  [data-mobile-customer-spine] .sb--v4 .sb-package-summary__package,
+  [data-mobile-customer-spine] .sb--v4 .sb-package-summary__item,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-panel__update-message,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-timeline__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__step--current .sb-journey__detail,
+  [data-mobile-customer-spine] .sb--v4 .sb-deliverables-progress__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-account__value,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-board-tile__lead,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__lead,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__prompt,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__meta,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__status-body,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__text,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__notice-text {
+    font-size: var(--mc-board-type-value, 1rem);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--mc-board-color-value, var(--mc-ink, #2e2b28));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__primary {
+    font-weight: 700;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--mc-board-color-value, var(--mc-ink, #2e2b28));
+  }
+
+  /* F — SUPPORTING / MUTED COPY */
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__hint,
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__eta,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__meta,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__empty,
+  [data-mobile-customer-spine] .sb--v4 .sb-campaign-brief-actions__hint,
+  [data-mobile-customer-spine] .sb--v4 .campaign-brief-actions__hint,
+  [data-mobile-customer-spine] .sb--v4 .campaign-brief-actions__locked,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-panel__update-date,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-panel__timeline-empty,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-timeline__detail,
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__detail,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__lead,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__meta,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__count,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__lead,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__policy,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__optional,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__warning,
+  [data-mobile-customer-spine] .sb--v4 .sb-deliverables-progress__count,
+  [data-mobile-customer-spine] .sb--v4 .sb-package-summary__empty,
+  [data-mobile-customer-spine] .sb--v4 .sb-account__empty,
+  [data-mobile-customer-spine] .sb--v4 .sb-account__usage-label,
+  [data-mobile-customer-spine] .sb--v4 .sb-account__renewal-date,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-board-tile__meta,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-board-next p,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__meta,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__reason,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights-legend,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__rights-disclaimer,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__attest,
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__empty {
+    font-size: var(--mc-board-type-support, 0.875rem);
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--mc-board-color-support, color-mix(in srgb, #2e2b28 64%, transparent));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__checks li {
+    font-size: var(--mc-board-type-support, 0.875rem);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--mc-board-color-support, color-mix(in srgb, #2e2b28 64%, transparent));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__checks span {
+    color: var(--mc-eucalyptus, #456b5a);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-panel__update-date {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mc-board-color-support, color-mix(in srgb, #2e2b28 64%, transparent));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-panel__update {
+    grid-template-columns: 1fr;
+    gap: 0.12rem;
+  }
+
+  /* Journey: COMPLETED / CURRENT / UPCOMING — same family, status by color/weight */
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__step--complete .sb-journey__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-timeline__step--complete .sb-progress-timeline__label {
+    font-weight: 600;
+    color: var(--mc-board-color-complete, var(--mc-ink, #2e2b28));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__step--current .sb-journey__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-timeline__step--current .sb-progress-timeline__label {
+    font-weight: 700;
+    color: var(--mc-board-color-current, var(--mc-denim, #547c92));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__step--upcoming .sb-journey__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-timeline__step--upcoming .sb-progress-timeline__label {
+    font-weight: 500;
+    color: var(--mc-board-color-upcoming, color-mix(in srgb, #2e2b28 58%, transparent));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__step--current .sb-journey__detail,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-timeline__step--current .sb-progress-timeline__detail {
+    font-size: var(--mc-board-type-value, 1rem);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--mc-board-color-value, var(--mc-ink, #2e2b28));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__marker--current {
+    visibility: hidden;
+    border: none;
+    background: transparent;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__marker--complete {
+    background: color-mix(in srgb, #456b5a 18%, #f7f4ee);
+    color: var(--mc-eucalyptus, #456b5a);
+  }
+
+  /* G — ACTION TEXT. Color stays semantic (yellow primary / denim secondary / link). */
+  [data-mobile-customer-spine] .sb--v4 .campaign-brief-actions__view,
+  [data-mobile-customer-spine] .sb--v4 .campaign-brief-actions--prominent .campaign-brief-actions__view,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__link,
+  [data-mobile-customer-spine] .sb--v4 .sb-package-summary__link,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__help-link,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__toggle,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__notice-action,
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__cta,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-timeline__cta,
+  [data-mobile-customer-spine] .sb--v4 .sb-next-action__cta,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__submit,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__intent-option {
+    font-size: var(--mc-board-type-action, 0.94rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    text-transform: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .campaign-brief-actions__view,
+  [data-mobile-customer-spine] .sb--v4 .campaign-brief-actions--prominent .campaign-brief-actions__view,
+  [data-mobile-customer-spine] .sb--v4 .campaign-brief-actions__view.utility-btn--secondary,
+  [data-mobile-customer-spine] .sb--v4 .campaign-brief-actions__view.utility-btn--primary {
+    isolation: isolate;
+    mix-blend-mode: normal;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    min-height: 2.85rem;
+    justify-content: center;
+    background: #f7f4ee !important;
+    background-image: none !important;
+    border: 1px solid #547c92 !important;
+    color: #547c92 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    opacity: 1;
+    text-transform: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__link,
+  [data-mobile-customer-spine] .sb--v4 .sb-package-summary__link,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__help-link,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__toggle {
+    color: var(--mc-board-color-action-link, var(--mc-denim, #547c92));
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__submit,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__submit,
+  [data-mobile-customer-spine] .sb--v4 .sb-local-test-fixture__button {
+    font-size: var(--mc-board-type-action, 0.94rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-communication__textarea,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__textarea,
+  [data-mobile-customer-spine] .sb--v4 .sb-refund-request__select,
+  [data-mobile-customer-spine] .sb--v4 .sb-materials-intake__input {
+    font-size: var(--mc-board-type-value, 1rem);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--mc-board-color-value, var(--mc-ink, #2e2b28));
+  }
+
+  /*
+   * Samsung owner pass — Sign out, greeting, Current Project rhythm,
+   * supporting coral (not Denim/Eucalyptus/yellow).
+   */
+  [data-mobile-customer-spine] .sb--v4 .sb-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: start;
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.48rem;
+    width: auto;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    padding: 0.36rem 0.5rem !important;
+    font-size: 0.8125rem !important;
+    line-height: 1.2;
+    box-sizing: border-box;
+    justify-self: start !important;
+    align-self: start !important;
+    margin: 0 !important;
+    flex: none !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__icon {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out {
+    background: color-mix(in srgb, #547c92 40%, #f7f4ee) !important;
+    background-color: #b6c4c9 !important;
+    background-image: none !important;
+    border: 1px solid #f7c900 !important;
+    border-left: 1px solid #f7c900 !important;
+    color: #f7c900 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out {
+    position: relative;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: flex-start !important;
+    place-self: start !important;
+    width: var(--sb-help-nav-width, max-content) !important;
+    min-width: var(--sb-help-nav-width, max-content) !important;
+    min-height: 2.5rem !important;
+    padding: 0.36rem 0.5rem !important;
+    border-radius: 8px;
+    opacity: 1;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out .sb-nav__icon,
+  [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out .sb-nav__label {
+    color: #f7c900 !important;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out__control {
+    appearance: none;
+    -webkit-appearance: none;
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 8px;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    opacity: 0 !important;
+    cursor: pointer;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__list {
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__row {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__row dt,
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__label {
+    padding-bottom: 0.28rem;
+    border-bottom: 2px solid color-mix(in srgb, #f7c900 72%, transparent);
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__notes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-visibility-continuity__notes li {
+    margin: 0;
+    padding: 0;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__metrics {
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-current-campaign__metric {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-left: none;
+    border-radius: 0;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__meta,
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__checks li,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-panel__update-date,
+  [data-mobile-customer-spine] .sb--v4 .sb-journey__step--upcoming .sb-journey__label,
+  [data-mobile-customer-spine] .sb--v4 .sb-progress-timeline__step--upcoming .sb-progress-timeline__label {
+    color: var(--mc-coral, #d94e2b);
+    opacity: 1;
+  }
+
+  [data-mobile-customer-spine] .sb--v4 .sb-project-snapshot__checks span {
+    color: var(--mc-coral, #d94e2b);
+  }
+
+  /*
+   * Last paint — keep the Lounge still while the Board document scrolls.
+   * URL-bar show/hide must not recrop the plate.
+   */
+  .studio-environment-shell {
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: auto;
+    width: 100lvw;
+    height: 100lvh;
+    flex: none;
+  }
+
+  .studio-environment-shell__plate {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    transform: none;
   }
 }

@@ -42,4 +42,31 @@
   --lounge-frost-strong: var(--mc-glass);
   --lounge-glass-border: var(--mc-glass-border);
   --lounge-ink: var(--mc-ink);
+
+  /*
+   * Mobile Studio Board typography roles (A–G).
+   * Phone mapping is last-paint in mobile-route-fixes.css.
+   * Do not invent per-section fonts. Do not use these to restyle glass.
+   */
+  --mc-board-type-page: 1.5rem;
+  --mc-board-type-card: 0.875rem;
+  --mc-board-type-sub: 0.875rem;
+  --mc-board-type-field: 0.875rem;
+  --mc-board-type-value: 1rem;
+  --mc-board-type-support: 0.9375rem;
+  --mc-board-type-action: 0.94rem;
+  --mc-board-track-page: 0.12em;
+  --mc-board-track-card: 0.1em;
+  --mc-board-track-sub: 0.1em;
+  --mc-board-track-field: 0.08em;
+  --mc-board-color-page: var(--mc-denim);
+  --mc-board-color-card: var(--mc-eucalyptus);
+  --mc-board-color-sub: var(--mc-denim);
+  --mc-board-color-field: var(--mc-eucalyptus);
+  --mc-board-color-value: var(--mc-ink);
+  --mc-board-color-support: color-mix(in srgb, var(--mc-ink) 64%, transparent);
+  --mc-board-color-current: var(--mc-denim);
+  --mc-board-color-complete: var(--mc-ink);
+  --mc-board-color-upcoming: color-mix(in srgb, var(--mc-ink) 58%, transparent);
+  --mc-board-color-action-link: var(--mc-denim);
 }

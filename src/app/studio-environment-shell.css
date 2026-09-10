@@ -34,7 +34,28 @@
 }
 
 @media (max-width: 1024px) {
+  /*
+   * Pin the Lounge to the large viewport. inset:0 follows the URL bar
+   * and recenters the plate on scroll. Stationary means lvh/lvw at top-left.
+   */
+  .studio-environment-shell {
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: auto;
+    width: 100lvw;
+    height: 100lvh;
+    flex: none;
+  }
+
   .studio-environment-shell__plate {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    transform: none;
     object-position: 16% 42%;
   }
 }
@@ -66,6 +87,13 @@ html:has([data-voice-choice-film]) .studio-environment-shell__frost {
 html:has(.studio-environment-shell),
 html:has(.studio-environment-shell) body {
   background: #ebe2d4 !important;
+}
+
+@media (max-width: 1024px) {
+  html:has(.studio-environment-shell),
+  html:has(.studio-environment-shell) body {
+    overscroll-behavior-y: none;
+  }
 }
 
 .studio-environment-app {

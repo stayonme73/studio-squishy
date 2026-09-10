@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState, useCallback, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, type ReactNode } from "react";
 
 import CampaignBriefActions from "@/components/campaign-details/CampaignBriefActions";
 import CampaignNextAction from "@/components/studio-board/CampaignNextAction";
@@ -23,6 +23,7 @@ import { helpCenter } from "@/config/help-center";
 import { studioBoard, studioBoardDraftRoomHref, studioBoardStudioGuideHref } from "@/config/studio-board";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import { resolveCustomerVisibilityContinuityView } from "@/lib/customer-visibility-continuity";
+import { isDuplicateStatusAndStage } from "@/lib/studio-board/board-status-mobile-presentation";
 import {
   greetingPeriodFromDate,
   resolveAccountPackageView,
@@ -168,9 +169,17 @@ function NavItem({
   return <span className={className}>{content}</span>;
 }
 
-function CampaignMetric({ label, value }: { label: string; value: ReactNode }) {
+function CampaignMetric({
+  label,
+  value,
+  repeat = false,
+}: {
+  label: string;
+  value: ReactNode;
+  repeat?: boolean;
+}) {
   return (
-    <div className="sb-current-campaign__metric">
+    <div className={`sb-current-campaign__metric${repeat ? " sb-status-copy-repeat" : ""}`}>
       <span className="sb-current-campaign__label">{label}</span>
       <span className="sb-current-campaign__value">{value}</span>
     </div>
@@ -335,6 +344,28 @@ export default function StudioBoardScene({
     speakConversationLine(conversationRoomGuideV1.boardArrivalWelcomeVoice);
   }, [ready, accessState]);
 
+  const navRef = useRef<HTMLElement>(null);
+
+  useLayoutEffect(() => {
+    if (!ready) return;
+    if (accessState === "auth-required" || accessState === "denied" || accessState === "error") {
+      return;
+    }
+    const nav = navRef.current;
+    if (!nav) return;
+    const help = nav.querySelector<HTMLElement>(".sb-nav__item--accent-help");
+    if (!help) return;
+    const apply = () => {
+      const width = Math.ceil(help.getBoundingClientRect().width);
+      if (width < 1) return;
+      nav.style.setProperty("--sb-help-nav-width", `${width}px`);
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(help);
+    return () => observer.disconnect();
+  }, [ready, accessState]);
+
   if (ready && accessState === "auth-required") {
     return <ClientAccessStatePanel state={accessState} />;
   }
@@ -377,7 +408,7 @@ export default function StudioBoardScene({
           </div>
         </div>
 
-        <nav className="sb-nav" aria-label="Studio navigation">
+        <nav ref={navRef} className="sb-nav" aria-label="Studio navigation">
           <NavItem active accent="board" icon="board">
             {sidebar.studioBoard}
           </NavItem>
@@ -404,7 +435,7 @@ export default function StudioBoardScene({
             {sidebar.newCampaign}
           </NavItem>
           {/* Phone: fills the open slot under Help Center; desktop: last sidebar action. */}
-          <CustomerSignOutButton className="sb-sign-out" />
+          <CustomerSignOutButton className="sb-nav__item sb-nav__item--active sb-sign-out" />
         </nav>
 
         <div className="sb-sidebar-lower">
@@ -507,6 +538,10 @@ export default function StudioBoardScene({
                         <CampaignMetric
                           label={currentCampaignCopy.campaignStage}
                           value={view.campaignProgressLabel}
+                          repeat={isDuplicateStatusAndStage(
+                            view.statusLabel,
+                            view.campaignProgressLabel,
+                          )}
                         />
                       ) : null}
                       {!boardCampaign?.approvedStudioPlan ? (

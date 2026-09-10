@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { studioVoiceMachineCustomerCommunicationV1 as comm } from "@/config/studio-voice-machine-customer-communication-v1";
 import { PROJECT_COMMUNICATION_CUSTOMER_V1 as copy } from "@/config/project-communication-customer-v1";
@@ -8,6 +8,13 @@ import { PROJECT_COMMUNICATION_PROBLEM_REPORT_V1 as problemCopy } from "@/config
 import type { CampaignRecord } from "@/config/studio-board";
 import { PROJECT_COMMUNICATION_BODY_MAX_LENGTH } from "@/lib/project-communication/types";
 import { customerCommunicationSenderLabel } from "@/lib/project-communication/customer-ui";
+import { isLocalAuthFixtureAvailable } from "@/lib/auth/local-auth-fixture-gate";
+import {
+  awaitingReplyPresentation,
+  lastUnansweredCustomerMessageId,
+  messagesForOwnerPresentation,
+  shouldShowMachineAskState,
+} from "@/lib/studio-board/board-communication-thread-presentation";
 import type { ProblemReportCustomerView } from "@/lib/campaign-tasks/problem-report-status-view";
 
 type MachineAnswerView = {
@@ -253,6 +260,12 @@ export default function StudioBoardProjectCommunicationSection({
   const canSubmit =
     Boolean(campaignId) && !busy && trimmedLength > 0 && !overLimit && !campaignLookupPending;
 
+  const presentationMessages = useMemo(
+    () => messagesForOwnerPresentation(messages, isLocalAuthFixtureAvailable()),
+    [messages],
+  );
+  const lastUnansweredId = lastUnansweredCustomerMessageId(presentationMessages);
+
   const submitQuestion = async () => {
     if (!campaignId) return;
     const res = await fetch(
@@ -275,9 +288,6 @@ export default function StudioBoardProjectCommunicationSection({
       throw new Error(json.error ?? copy.sendFailedFallback);
     }
     setSuccess(json.confirmation ?? copy.successCopy);
-    if (json.machineConfirmation) {
-      setSuccess(`${json.confirmation ?? copy.successCopy} ${json.machineConfirmation}`);
-    }
     setMessages(json.messages ?? []);
     setStudioRequests(json.studioRequests ?? []);
     await loadNotification(campaignId);
@@ -432,11 +442,18 @@ export default function StudioBoardProjectCommunicationSection({
         >
           {loading ? (
             <p className="sb-project-communication__meta">Loading project messages…</p>
-          ) : messages.length === 0 ? (
+          ) : presentationMessages.length === 0 ? (
             <p className="sb-project-communication__meta">{copy.emptyState}</p>
           ) : (
             <ul className="sb-project-communication__list">
-              {messages.map((message) => (
+              {presentationMessages.map((message) => {
+                const awaiting = awaitingReplyPresentation({
+                  senderRole: message.senderRole,
+                  studioHasReplied: message.studioHasReplied,
+                  hasMachineAnswer: Boolean(message.machineAnswer),
+                  isLastCustomerWithoutStaffReply: message.id === lastUnansweredId,
+                });
+                return (
                 <li key={message.id} className="sb-project-communication__item">
                   <div className="sb-project-communication__item-meta">
                     <span className="sb-project-communication__sender">
@@ -458,25 +475,21 @@ export default function StudioBoardProjectCommunicationSection({
                       <p className="sb-project-communication__machine-answer-text">
                         {message.machineAnswer.text}
                       </p>
-                      <p className="sb-project-communication__ask-state">
-                        {message.machineAnswer.askState === "answered"
-                          ? comm.customerCopy.askStateAnswered
-                          : message.machineAnswer.askState === "waiting_for_customer"
+                      {shouldShowMachineAskState(message.machineAnswer.askState) ? (
+                        <p className="sb-project-communication__ask-state">
+                          {message.machineAnswer.askState === "waiting_for_customer"
                             ? comm.customerCopy.askStateWaitingCustomer
                             : message.machineAnswer.askState === "stalled"
                               ? comm.customerCopy.askStateStalled
                               : comm.customerCopy.askStateWaitingStudio}
-                      </p>
+                        </p>
+                      ) : null}
                     </div>
                   ) : null}
-                  {message.senderRole === "customer" &&
-                  message.studioHasReplied === false &&
-                  !message.machineAnswer ? (
+                  {awaiting === "studio" ? (
                     <p className="sb-project-communication__awaiting">{copy.awaitingReplyLabel}</p>
                   ) : null}
-                  {message.senderRole === "customer" &&
-                  message.studioHasReplied === false &&
-                  message.machineAnswer ? (
+                  {awaiting === "staff" ? (
                     <p className="sb-project-communication__awaiting">
                       {comm.customerCopy.awaitingStaffReply}
                     </p>
@@ -485,7 +498,8 @@ export default function StudioBoardProjectCommunicationSection({
                     <p className="sb-project-communication__replied">{copy.repliedLabel}</p>
                   ) : null}
                 </li>
-              ))}
+                );
+              })}
             </ul>
           )}
         </div>
@@ -574,7 +588,7 @@ export default function StudioBoardProjectCommunicationSection({
             </p>
             <button
               type="submit"
-              className="utility-btn utility-btn--primary sb-project-communication__submit"
+              className="sb-project-communication__submit"
               disabled={!canSubmit}
             >
               {intent === "problem"

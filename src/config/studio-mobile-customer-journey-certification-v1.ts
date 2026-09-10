@@ -129,7 +129,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   stoppingPointCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-08-25-STOPPING-POINT-CHECKPOINT.md" as const,
   nextPhoneAction:
-    "STOP. Materials Board presentation is OWNER ACCEPTED. Do not start the next journey stage. Do not rebuild Maya. Do not pay again. Package is not closed." as const,
+    "STOP. Studio Board presentation / typography-color-hierarchy pass is OWNER ACCEPTED. Do not start Review Room. Do not begin another Board styling pass. Do not rebuild Maya. Package is not closed." as const,
   parkAndResumeDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/PARK-AND-RESUME.md" as const,
   supervisionDependencyAuditDoc:
@@ -142,7 +142,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   journeyRouteMapDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/JOURNEY-ROUTE-AND-CONTROL-MAP.md" as const,
   recommendedFirstExecutionStep:
-    "STOP. Materials Board presentation is OWNER ACCEPTED. Do not start the next journey stage. Do not rebuild Maya. Do not pay again. Package is not closed." as const,
+    "STOP. Studio Board presentation / typography-color-hierarchy pass is OWNER ACCEPTED. Do not start Review Room. Do not begin another Board styling pass. Do not rebuild Maya. Package is not closed." as const,
   visualMaster: "MOBILE_VISUAL_MASTER" as const,
   voiceChoiceStatus: "OWNER_ACCEPTED" as const,
   voiceChoiceAcceptedAt: "2026-08-29" as const,
@@ -158,7 +158,7 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   businessNameAcceptedAt: "2026-08-29" as const,
   visualSystemCheckpointDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/MOBILE-VISUAL-SYSTEM-CHECKPOINT.md" as const,
-  nextMobileScreen: "stopped-after-materials-board" as const,
+  nextMobileScreen: "stopped-after-board-presentation-pass" as const,
   samsungAcceptance20260906Doc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-09-06-SAMSUNG-ACCEPTANCE-RECORD.md" as const,
   mjd16ManualEntryStatus: "OWNER_ACCEPTED" as const,
@@ -183,6 +183,10 @@ export const studioMobileCustomerJourneyCertificationV1 = {
   materialsBoardPresentationAcceptedAt: "2026-09-08" as const,
   materialsBoardPresentationDoc:
     "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-09-08-MATERIALS-MOBILE-PRESENTATION-OWNER-ACCEPTED.md" as const,
+  boardTypographyColorHierarchyStatus: "OWNER_ACCEPTED" as const,
+  boardTypographyColorHierarchyAcceptedAt: "2026-09-10" as const,
+  boardTypographyColorHierarchyDoc:
+    "docs/launch/studio-operating-mobile-customer-journey-certification-1/2026-09-10-BOARD-TYPOGRAPHY-COLOR-HIERARCHY-OWNER-ACCEPTED.md" as const,
   samsungFixtureDownloadStatus: "PROVEN" as const,
   step3StandardLightVisualStatus:
     "OPEN_FOLLOW_UP_NOT_OWNER_APPROVED" as const,
