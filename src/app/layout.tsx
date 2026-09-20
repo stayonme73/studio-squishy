@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Comic_Neue, Geist, Geist_Mono } from "next/font/google";
+import { Comic_Neue, Geist, Geist_Mono, Inter } from "next/font/google";
 
 import { siteConfig } from "@/config/site";
 
@@ -10,6 +10,12 @@ import StudioEnvironmentShell from "@/components/studio-environment/StudioEnviro
 import StudioPresenceRoot from "@/components/studio-presence/StudioPresenceRoot";
 
 import "./globals.css";
+
+const inter = Inter({
+  variable: "--font-studio-board-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,7 +56,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${comicNeue.variable} h-full antialiased`}
+      className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} ${comicNeue.variable} h-full antialiased`}
     >
       <body className="flex min-h-[100dvh] flex-col overflow-x-hidden">
         <StudioEnvironmentShell />

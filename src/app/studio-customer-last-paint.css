@@ -1,0 +1,6 @@
+/**
+ * Final customer CSS. Journey pages import this last.
+ * Phone route fixes first, then Visual System V2 last paint.
+ */
+@import "./mobile-route-fixes.css";
+@import "./studio-visual-system-v2.css";

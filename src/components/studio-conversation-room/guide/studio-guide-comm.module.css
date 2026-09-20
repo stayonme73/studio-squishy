@@ -8,6 +8,8 @@
   justify-content: flex-start;
   gap: 0.7rem;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   height: auto;
   min-height: 0;
   padding: 1rem 1rem;
@@ -28,6 +30,20 @@
   border: none;
   background: transparent;
   box-shadow: none;
+}
+
+.panel[data-embedded="true"] .speakZone {
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.55rem;
+  width: auto;
+  max-width: 100%;
+  min-height: 2.4rem;
+  margin: 0 0 0.35rem;
+  padding: 0.3rem 0.15rem;
+  border-color: #c8b59b;
+  background: transparent;
 }
 
 .speakZone {
@@ -83,9 +99,13 @@
 }
 
 .speakTitle {
+  max-width: 100%;
+  min-width: 0;
   font-size: 1.02rem;
   font-weight: 650;
   letter-spacing: -0.01em;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .speakHint {
@@ -119,6 +139,19 @@
 .typeBlock {
   display: block;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.typeHintOff {
+  margin: 0 0 0.4rem;
+  max-width: 100%;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .requiredRow {
@@ -155,6 +188,8 @@
   display: block;
   box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   border-radius: 0.75rem;
   border: 1px solid var(--mc-denim, #547c92);
   background: var(--mc-chip, color-mix(in srgb, #f7f4ee 50%, transparent));
@@ -202,6 +237,8 @@
   z-index: 2;
   box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 3.25rem;
   margin: 0;
   padding: 0.9rem 1rem;
@@ -267,9 +304,11 @@
 }
 
 .cta {
-  display: inline-flex;
+  display: flex;
   justify-content: center;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin: 0;
   box-sizing: border-box;
   cursor: pointer;

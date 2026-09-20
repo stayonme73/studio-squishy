@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 
 import SecureCheckoutGrid from "@/components/payment/SecureCheckoutGrid";
+import SamsungDeckBack from "@/components/studio-conversation-room/guide/SamsungDeckBack";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 import type { ServiceId } from "@/catalog/types";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
@@ -14,6 +15,7 @@ import {
   type RouteMapRoadId,
 } from "@/config/route-map-v1";
 import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
+import { bridgeConversationPlanToCampaign } from "@/lib/conversation-room-draft/bridge-campaign";
 import {
   buildRouteMapPaymentSummaryFromServices,
   saveApprovedRouteMapPlan,
@@ -23,6 +25,7 @@ import { resetConversationStageScroll } from "@/lib/studio-conversation-stage-sc
 
 import "@/app/payment.css";
 import "@/app/checkout/checkout.css";
+import "@/app/studio-visual-system-v2.css";
 
 export type ConversationCheckoutPanelProps = {
   roadId: RouteMapRoadId;
@@ -38,6 +41,7 @@ export type ConversationCheckoutPanelProps = {
   paymentHonestyMessage?: string | null;
   /** Mobile dedicated page — not an overlay on Conversation Room. */
   phonePage?: boolean;
+  topControls?: ReactNode;
 };
 
 /**
@@ -54,6 +58,7 @@ export default function ConversationCheckoutPanel({
   onAuthorizePayment,
   paymentHonestyMessage = null,
   phonePage = false,
+  topControls = null,
 }: ConversationCheckoutPanelProps) {
   const v = conversationRoomGuideV1;
   const serviceIds = useMemo(
@@ -80,6 +85,18 @@ export default function ConversationCheckoutPanel({
     confirm?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [phonePage]);
 
+  const journeyChrome = phonePage ? (
+    <div data-tablet-journey-chrome="true">
+      <SamsungDeckBack
+        className={styles.backLink}
+        onActivate={onBackToStudioPlan}
+      >
+        ← {v.checkoutBackToPlanLabel}
+      </SamsungDeckBack>
+      {topControls}
+    </div>
+  ) : null;
+
   if (serviceIds.length === 0 || !planSummary) {
     return (
       <div
@@ -87,6 +104,7 @@ export default function ConversationCheckoutPanel({
         data-panel="checkout"
         data-surface={phonePage ? "page" : "overlay"}
       >
+        {journeyChrome}
         <header className={styles.header}>
           <div>
             {phonePage ? null : (
@@ -110,13 +128,14 @@ export default function ConversationCheckoutPanel({
         <p className={styles.intro} role="status">
           {v.studioPlanBridgeError}
         </p>
-        <button
-          type="button"
-          className={styles.backLink}
-          onClick={onBackToStudioPlan}
-        >
-          ← {v.checkoutBackToPlanLabel}
-        </button>
+        {phonePage ? null : (
+          <SamsungDeckBack
+            className={styles.backLink}
+            onActivate={onBackToStudioPlan}
+          >
+            ← {v.checkoutBackToPlanLabel}
+          </SamsungDeckBack>
+        )}
       </div>
     );
   }
@@ -127,6 +146,7 @@ export default function ConversationCheckoutPanel({
       data-panel="checkout"
       data-surface={phonePage ? "page" : "overlay"}
     >
+      {journeyChrome}
       <header className={styles.header}>
         <div>
           {phonePage ? null : (
@@ -148,8 +168,17 @@ export default function ConversationCheckoutPanel({
         )}
       </header>
 
+      {phonePage ? null : (
+        <SamsungDeckBack
+          className={styles.backLink}
+          onActivate={onBackToStudioPlan}
+        >
+          ← {v.checkoutBackToPlanLabel}
+        </SamsungDeckBack>
+      )}
+
       {routeCustomerLabel ? (
-        <p className={`${styles.checkoutRouteLabel} ${studioTileClass.standardLight}`}>
+        <p className={`${styles.checkoutRouteLabel}${phonePage ? "" : ` ${studioTileClass.standardLight}`}`}>
           <span className={styles.checkoutRouteEyebrow}>
             {v.studioPlanRouteLabel}
           </span>
@@ -169,14 +198,6 @@ export default function ConversationCheckoutPanel({
         </p>
       ) : null}
 
-      <button
-        type="button"
-        className={styles.backLink}
-        onClick={onBackToStudioPlan}
-      >
-        ← {v.checkoutBackToPlanLabel}
-      </button>
-
       <div
         className={
           phonePage
@@ -192,9 +213,17 @@ export default function ConversationCheckoutPanel({
           onBeforePayment={(acknowledgment) => {
             if (serviceIds.length === 0) return false;
             if (onAuthorizePayment && !onAuthorizePayment()) return false;
-            return Boolean(
-              saveApprovedRouteMapPlan(serviceIds, acknowledgment),
-            );
+            let saved = saveApprovedRouteMapPlan(serviceIds, acknowledgment);
+            if (!saved) {
+              const bridged = bridgeConversationPlanToCampaign(
+                roadId,
+                serviceIds,
+              );
+              saved = bridged
+                ? saveApprovedRouteMapPlan(serviceIds, acknowledgment)
+                : null;
+            }
+            return Boolean(saved);
           }}
           onPaymentComplete={onPaymentComplete}
           onSandboxConfirm={onSandboxConfirm}

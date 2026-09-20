@@ -9,7 +9,10 @@ import {
   conversationRoomGuideV1,
 } from "@/config/conversation-room-guide-v1";
 import { resolveComposerSendAction } from "@/lib/studio-guide-answer-resolve";
-import { useSamsungActivate } from "@/lib/studio-samsung-activate";
+import {
+  useSamsungActivate,
+  useSamsungTapActivate,
+} from "@/lib/studio-samsung-activate";
 
 export type StudioGuideCommPanelProps = {
   textDraft: string;
@@ -46,6 +49,8 @@ export type StudioGuideCommPanelProps = {
   studioVoiceReply?: string | null;
   /** When false, leftover gate taps cannot start the microphone. */
   allowMicrophone?: boolean;
+  /** Voice On shows mic only. Voice Off shows typing only. */
+  voiceMode?: "on" | "off";
   /** Opening-question dock — sit on tablet light glass, no second frost layer. */
   embedded?: boolean;
   /**
@@ -80,6 +85,7 @@ function StudioGuideCommPanel({
   onSendMessage,
   studioVoiceReply = null,
   allowMicrophone = true,
+  voiceMode = "off",
   embedded = false,
   nameQuestion = false,
 }: StudioGuideCommPanelProps) {
@@ -127,12 +133,24 @@ function StudioGuideCommPanel({
   }
 
   const sendActivate = useSamsungActivate(runSend, { consumeGesture: true });
+  const toggleMic = () => {
+    if ((!speechSupported && !listening) || (!allowMicrophone && !listening)) {
+      return;
+    }
+    if (listening) onStopListening();
+    else if (allowMicrophone) onStartListening();
+  };
+  const micActivate = useSamsungTapActivate<HTMLAnchorElement | HTMLButtonElement>(
+    toggleMic,
+  );
 
   useEffect(() => {
     const node = textRef.current;
     if (!node) return;
     if (resetKeyRef.current !== fieldResetKey) {
       resetKeyRef.current = fieldResetKey;
+    }
+    if (node.value !== textDraft) {
       node.value = textDraft;
       emptyRef.current = !textDraft.trim();
     }
@@ -159,10 +177,13 @@ function StudioGuideCommPanel({
       data-permanent-communication="true"
       data-embedded={embedded ? "true" : undefined}
       data-name-question={nameQuestion ? "true" : undefined}
-      aria-label={v.speakHint}
+      data-voice-mode={voiceMode}
+      aria-label={voiceMode === "on" ? v.speakHint : v.typeHintOff}
     >
-      {nameQuestion ? (
+      {voiceMode === "on" ? (nameQuestion ? (
         <a
+          ref={micActivate.ref}
+          href="#studio-mic"
           role="button"
           tabIndex={
             (!speechSupported && !listening) || (!allowMicrophone && !listening)
@@ -177,15 +198,16 @@ function StudioGuideCommPanel({
               : undefined
           }
           aria-label={listening ? "Stop listening" : v.speakHint}
-          onClick={
-            (!speechSupported && !listening) || (!allowMicrophone && !listening)
-              ? undefined
-              : listening
-                ? onStopListening
-                : allowMicrophone
-                  ? onStartListening
-                  : undefined
-          }
+          onClick={(event) => {
+            event.preventDefault();
+            if (
+              (!speechSupported && !listening) ||
+              (!allowMicrophone && !listening)
+            ) {
+              return;
+            }
+            micActivate.onClick(event);
+          }}
           onKeyDown={(event) => {
             if (event.key !== "Enter" && event.key !== " ") return;
             if ((!speechSupported && !listening) || (!allowMicrophone && !listening))
@@ -221,16 +243,11 @@ function StudioGuideCommPanel({
       ) : (
       <button
         type="button"
+        ref={micActivate.ref}
         className={styles.speakZone}
         data-active={listening ? "true" : "false"}
-        tabIndex={-1}
-        onClick={
-          listening
-            ? onStopListening
-            : allowMicrophone
-              ? onStartListening
-              : undefined
-        }
+        tabIndex={0}
+        onClick={micActivate.onClick}
         disabled={(!speechSupported && !listening) || (!allowMicrophone && !listening)}
         aria-label={listening ? "Stop listening" : v.speakHint}
       >
@@ -256,10 +273,13 @@ function StudioGuideCommPanel({
             {interimTranscript || "Tap to finish"}
           </span>
         ) : null}
-      </button>
-      )}
+        </button>
+        )
+      ) : null}
 
+      {voiceMode === "off" ? (
       <div className={styles.typeBlock}>
+        <p className={styles.typeHintOff}>{v.typeHintOff}</p>
         {showValidationError && answerRequired && !hasAcceptedAnswer ? (
           <p className={styles.requiredHint} role="alert">
             {v.typeRequiredEmptyHint}
@@ -277,7 +297,8 @@ function StudioGuideCommPanel({
             id={STUDIO_GUIDE_TYPE_FIELD_ID}
             ref={textRef}
             className={styles.typeLine}
-            rows={2}
+            rows={embedded ? 1 : 2}
+            cols={1}
             defaultValue={textDraft}
             placeholder={placeholder}
             autoComplete="off"
@@ -319,6 +340,7 @@ function StudioGuideCommPanel({
           ></textarea>
         </div>
       </div>
+      ) : null}
 
       {savedPulse ? (
         <p className={styles.savedCue} aria-live="polite">
@@ -339,6 +361,7 @@ function StudioGuideCommPanel({
             sendRef.current = node;
             sendActivate.ref(node);
           }}
+          href="#studio-action"
           role="button"
           tabIndex={0}
           className={`lobby-entry-film__cta ${styles.cta}`}
@@ -354,7 +377,10 @@ function StudioGuideCommPanel({
               ? "true"
               : undefined
           }
-          onClick={sendActivate.onClick}
+          onClick={(event) => {
+            event.preventDefault();
+            sendActivate.onClick(event);
+          }}
           onKeyDown={(event) => {
             if (event.key !== "Enter" && event.key !== " ") return;
             event.preventDefault();
@@ -387,6 +413,7 @@ function StudioGuideCommPanel({
 export default memo(StudioGuideCommPanel, (prev, next) => {
   return (
     prev.fieldResetKey === next.fieldResetKey &&
+    prev.textDraft === next.textDraft &&
     prev.typePlaceholder === next.typePlaceholder &&
     prev.listening === next.listening &&
     prev.speechSupported === next.speechSupported &&
@@ -398,6 +425,7 @@ export default memo(StudioGuideCommPanel, (prev, next) => {
     prev.showValidationError === next.showValidationError &&
     prev.studioVoiceReply === next.studioVoiceReply &&
     prev.allowMicrophone === next.allowMicrophone &&
+    prev.voiceMode === next.voiceMode &&
     prev.embedded === next.embedded &&
     prev.nameQuestion === next.nameQuestion
   );

@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import ProjectBuilderJobDetailBlocks from "@/components/project-builder/ProjectBuilderJobDetailBlocks";
 import "@/components/project-builder/project-builder-job-details.css";
+import "@/app/studio-visual-system-v2.css";
 import ConversationCheckoutPanel from "@/components/studio-conversation-room/guide/ConversationCheckoutPanel";
 import ConversationIntakePanel from "@/components/studio-conversation-room/guide/ConversationIntakePanel";
 import ConversationServiceList from "@/components/studio-conversation-room/guide/ConversationServiceList";

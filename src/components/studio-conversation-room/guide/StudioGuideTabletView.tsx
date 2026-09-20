@@ -6,7 +6,10 @@ import ConversationCheckoutPanel from "@/components/studio-conversation-room/gui
 import ConversationIntakePanel from "@/components/studio-conversation-room/guide/ConversationIntakePanel";
 import ConversationRouteChoose from "@/components/studio-conversation-room/guide/ConversationRouteChoose";
 import ConversationServiceList from "@/components/studio-conversation-room/guide/ConversationServiceList";
-import ConversationStudioPlanTablet from "@/components/studio-conversation-room/guide/ConversationStudioPlanTablet";
+import ConversationStudioPlanTablet, {
+  ConversationStudioPlanActions,
+} from "@/components/studio-conversation-room/guide/ConversationStudioPlanTablet";
+import SamsungDeckBack from "@/components/studio-conversation-room/guide/SamsungDeckBack";
 import SamsungDenimCta from "@/components/studio-conversation-room/guide/SamsungDenimCta";
 import styles from "@/components/studio-conversation-room/guide/studio-guide-tablet.module.css";
 import {
@@ -96,11 +99,15 @@ export type StudioGuideTabletViewProps = {
     completed: readonly string[];
     stillNeeded: readonly string[];
     nextLine: string;
+    paymentReceived: boolean;
+    servicesConfirmed: boolean;
   } | null;
   /** Speak / type / Continue for the active opening question. */
   answerDock?: ReactNode;
   /** Compact Voice On / Off — already chosen, shown with the question. */
   modeControls?: ReactNode;
+  /** Voice On parks the mic under the toggle. Voice Off parks typing in the dock. */
+  voiceMode?: "on" | "off";
   /** Hide “Required” once a bubble or typed value is already captured. */
   answerAccepted?: boolean;
   /** Journey back through the reversible pre-checkout deck. */
@@ -163,7 +170,8 @@ export default function StudioGuideTabletView({
   intakeTabletStatus = null,
   answerDock = null,
   modeControls = null,
-  answerAccepted = false,
+  voiceMode = "off",
+  answerAccepted: _answerAccepted = false,
   onDeckBack,
   deckBackLabel = null,
 }: StudioGuideTabletViewProps) {
@@ -171,8 +179,7 @@ export default function StudioGuideTabletView({
   const question = getConversationRoomGuideQuestion(step);
   const openingOwns = stage === "opening";
   const isAsk = openingOwns && Boolean(question) && !correcting;
-  const isSummary = openingOwns && step === "summary";
-  const isConfirmed = openingOwns && step === "confirmed";
+  const isSummary = openingOwns && (step === "summary" || step === "confirmed");
   const isRouteStage = stage === "route";
   const isServicesStage = stage === "services";
   const isPlanStage = stage === "plan";
@@ -232,11 +239,31 @@ export default function StudioGuideTabletView({
     revealConversationStage();
   }, [stage, step, isAsk]);
 
+  const summaryActions =
+    isSummary && !correcting ? (
+      <div
+        className={styles.summaryOuterActions}
+        data-summary-outer-actions="true"
+      >
+        <SamsungActionButton
+          className={styles.btnCorrect}
+          onActivate={onCorrect}
+        >
+          {v.correctLabel}
+        </SamsungActionButton>
+        <SamsungDenimCta onActivate={onConfirm}>
+          {v.confirmLabel}
+        </SamsungDenimCta>
+      </div>
+    ) : null;
+
   return (
+    <>
     <section
       className={styles.root}
       data-step={step}
       data-stage={stage}
+      data-surface="tablet"
       aria-label={v.eyebrow}
     >
       <div className={styles.main} data-question-scroll-root="true">
@@ -268,6 +295,7 @@ export default function StudioGuideTabletView({
             onOpenExtraDetails={onOpenPlanExtraDetails}
             onViewScope={onViewPlanScope}
             extrasInPlace={phoneLayout}
+            hideActions={phoneLayout}
             topControls={phoneLayout ? modeControls : null}
             bridgeError={planBridgeError}
             onDeckBack={onDeckBack}
@@ -289,11 +317,20 @@ export default function StudioGuideTabletView({
             onAddJob={onAddJob}
             onRemoveJob={onRemoveJob}
             onReviewStudioPlan={onReviewStudioPlan}
+            topControls={modeControls}
           />
         ) : null}
 
         {isServicesStage && !phoneLayout ? (
           <>
+            {onDeckBack && deckBackLabel ? (
+              <SamsungDeckBack
+                className={styles.deckBack}
+                onActivate={onDeckBack}
+              >
+                ← {deckBackLabel}
+              </SamsungDeckBack>
+            ) : null}
             {modeControls}
             <p className={styles.eyebrow}>{v.eyebrow}</p>
             <h1 className={styles.question}>{v.servicesTabletTitle}</h1>
@@ -336,11 +373,21 @@ export default function StudioGuideTabletView({
             onSandboxConfirm={onSandboxCheckoutConfirm}
             onAuthorizePayment={onAuthorizeCheckoutPayment}
             paymentHonestyMessage={planBridgeError}
+            topControls={modeControls}
           />
         ) : null}
 
         {isCheckoutStage && !phoneLayout ? (
           <>
+            {onDeckBack && deckBackLabel ? (
+              <SamsungDeckBack
+                className={styles.deckBack}
+                onActivate={onDeckBack}
+              >
+                ← {deckBackLabel}
+              </SamsungDeckBack>
+            ) : null}
+            {modeControls}
             <h1 className={styles.question}>{v.checkoutTabletTitle}</h1>
             <p className={styles.body}>{v.checkoutTabletLead}</p>
             {planModel ? (
@@ -379,17 +426,33 @@ export default function StudioGuideTabletView({
             onAnswersChange={onIntakeAnswersChange}
             submitCtaLabel={intakeSubmitCtaLabel}
             nextStepBlurb={intakeNextStepBlurb}
-            paidAcknowledgment={
-              intakeTabletStatus?.completed ?? [
-                v.intakeTabletPaymentReceivedLabel,
-                v.intakeTabletServicesConfirmedLabel,
-              ]
-            }
+            topControls={modeControls}
+            onDeckBack={onDeckBack}
+            deckBackLabel={deckBackLabel}
+            paidAcknowledgment={[
+              {
+                label: v.intakeTabletPaymentReceivedLabel,
+                confirmed: intakeTabletStatus?.paymentReceived ?? false,
+              },
+              {
+                label: v.intakeTabletServicesConfirmedLabel,
+                confirmed: intakeTabletStatus?.servicesConfirmed ?? false,
+              },
+            ]}
           />
         ) : null}
 
         {isIntakeStage && !phoneIntakePage ? (
           <>
+            {onDeckBack && deckBackLabel ? (
+              <SamsungDeckBack
+                className={styles.deckBack}
+                onActivate={onDeckBack}
+              >
+                ← {deckBackLabel}
+              </SamsungDeckBack>
+            ) : null}
+            {modeControls}
             <h1 className={styles.question}>{v.intakeTabletTitle}</h1>
             <p className={styles.body}>{v.intakeTabletLead}</p>
 
@@ -452,14 +515,12 @@ export default function StudioGuideTabletView({
         {isAsk && question ? (
           <>
           {onDeckBack && deckBackLabel ? (
-            <button
-              type="button"
+            <SamsungDeckBack
               className={styles.deckBack}
-              data-pre-checkout-deck-back=""
-              onClick={onDeckBack}
+              onActivate={onDeckBack}
             >
               ← {deckBackLabel}
-            </button>
+            </SamsungDeckBack>
           ) : null}
           <div
             id={CONVERSATION_ROOM_ACTIVE_QUESTION_ID}
@@ -471,20 +532,18 @@ export default function StudioGuideTabletView({
               data-question-reveal-top="true"
             >
               {modeControls}
+              {voiceMode === "on" ? answerDock : null}
             </div>
 
-            {(!question.canSkip || question.step === "ask_business_name") &&
-            !answerAccepted ? (
-              <p className={styles.requiredMeta} data-required-meta="true">
-                {v.answerRequiredLabel}
-              </p>
-            ) : null}
+            <p className={styles.requiredMeta} data-required-meta="true">
+              {v.answerRequiredLabel}
+            </p>
 
             <h1
               id={CONVERSATION_ROOM_ACTIVE_QUESTION_HEADING_ID}
               className={styles.question}
             >
-              {question.question}
+              {renderGuideQuestionTitle(question)}
             </h1>
 
             {question.bubbles.length > 0 ? (
@@ -502,10 +561,6 @@ export default function StudioGuideTabletView({
               <p className={styles.hint}>{v.typedAnswerDockHint}</p>
             )}
 
-            {question.bubbleMode === "multi" ? (
-              <p className={styles.navHint}>{v.materialsDetailsHint}</p>
-            ) : null}
-
             {shouldShowDeadlineFormatHint(selectedBubbles) ? (
               <p className={styles.hint}>{v.deadlineFormatHint}</p>
             ) : null}
@@ -513,18 +568,15 @@ export default function StudioGuideTabletView({
             {error ? <p className={styles.error}>{error}</p> : null}
 
             {question.canSkip ? (
-              <div className={styles.actions}>
+              <div className={styles.actions} data-skip-action="true">
                 <SamsungActionButton
-                  className={styles.btnSecondary}
+                  className={`${styles.btnSecondary} ${styles.btnSkipNow}`}
+                  skipAction
                   onActivate={onSkip}
                 >
                   {v.skipLabel}
                 </SamsungActionButton>
               </div>
-            ) : null}
-
-            {answerDock ? (
-              <div className={styles.answerDock}>{answerDock}</div>
             ) : null}
 
             {!answerDock && question.bubbles.length > 0 ? (
@@ -550,32 +602,23 @@ export default function StudioGuideTabletView({
         {isSummary && !correcting ? (
           <>
             {onDeckBack && deckBackLabel ? (
-              <button
-                type="button"
+              <SamsungDeckBack
                 className={styles.deckBack}
-                data-pre-checkout-deck-back=""
-                onClick={onDeckBack}
+                onActivate={onDeckBack}
               >
                 ← {deckBackLabel}
-              </button>
+              </SamsungDeckBack>
             ) : null}
-            <h1 className={styles.question}>{v.summaryIntro}</h1>
+            {modeControls}
+            <h1 className={styles.question}>
+              <span className={styles.summaryLine}>{v.summaryIntroLead}</span>
+              <span className={styles.summaryLine}>{v.summaryIntroAsk}</span>
+            </h1>
             <SummaryCards draft={draft} />
             {draft.deadlineStatus === "unconfirmed" ? (
               <p className={styles.deadlineNote}>{v.deadlineUnconfirmedNote}</p>
             ) : null}
             {error ? <p className={styles.error}>{error}</p> : null}
-            <div className={styles.actions}>
-              <SamsungActionButton
-                className={styles.btnCorrect}
-                onActivate={onCorrect}
-              >
-                {v.correctLabel}
-              </SamsungActionButton>
-              <SamsungDenimCta onActivate={onConfirm}>
-                {v.confirmLabel}
-              </SamsungDenimCta>
-            </div>
           </>
         ) : null}
 
@@ -594,33 +637,47 @@ export default function StudioGuideTabletView({
           </>
         ) : null}
 
-        {isConfirmed ? (
-          <>
-            <h1 className={styles.question}>{v.confirmedTitle}</h1>
-            <p className={styles.savedBadge}>{v.confirmedSavedBadge}</p>
-            <p className={styles.body}>{v.confirmedBody}</p>
-            {draft.deadlineStatus === "unconfirmed" ? (
-              <p className={styles.deadlineNote}>{v.deadlineUnconfirmedNote}</p>
-            ) : null}
-            <div className={styles.actions}>
-              <SamsungActionButton
-                className={styles.btnCorrect}
-                onActivate={onCorrect}
-              >
-                {v.correctLabel}
-              </SamsungActionButton>
-              <button
-                type="button"
-                className={styles.btnPrimary}
-                onClick={onConfirm}
-              >
-                {v.confirmLabel}
-              </button>
-            </div>
-          </>
-        ) : null}
       </div>
+      {answerDock && voiceMode !== "on" ? (
+        <div className={styles.answerDock} data-answer-dock="pinned">
+          {answerDock}
+        </div>
+      ) : null}
     </section>
+    {summaryActions}
+    {isPlanStage &&
+    phoneLayout &&
+    planModel &&
+    onEditPlan &&
+    onChangeRoute &&
+    onLooksGoodPlan ? (
+      <ConversationStudioPlanActions
+        extrasInPlace
+        canContinue={planModel.canContinue}
+        onEditPlan={onEditPlan}
+        onChangeRoute={onChangeRoute}
+        onLooksGood={onLooksGoodPlan}
+      />
+    ) : null}
+    </>
+  );
+}
+
+function renderGuideQuestionTitle(question: {
+  step: GuideConversationStep;
+  question: string;
+}) {
+  if (question.step !== "ask_business_name") return question.question;
+  const pivot = "your ";
+  const at = question.question.toLowerCase().lastIndexOf(pivot);
+  if (at < 0) return question.question;
+  const lead = question.question.slice(0, at + pivot.length).trimEnd();
+  return (
+    <>
+      <span className={styles.titleLead}>{lead}</span>
+      <br />
+      {question.question.slice(at + pivot.length)}
+    </>
   );
 }
 
@@ -657,7 +714,7 @@ function SummaryCards({ draft }: { draft: GuideCaptureDraftV1 }) {
   return (
     <dl className={styles.summaryList}>
       {rows.map((row) => (
-        <div key={row.label} className={`${styles.summaryRow} ${studioTileClass.standardLight}`}>
+        <div key={row.label} className={styles.summaryRow}>
           <dt>{row.label}</dt>
           <dd>{row.value}</dd>
         </div>
@@ -696,11 +753,13 @@ function SamsungActionButton({
   children,
   onActivate,
   tabletContinue,
+  skipAction,
 }: {
   className: string;
   children: ReactNode;
   onActivate: () => void;
   tabletContinue?: boolean;
+  skipAction?: boolean;
 }) {
   const activate = useSamsungActivate<HTMLButtonElement>(
     onActivate,
@@ -712,6 +771,7 @@ function SamsungActionButton({
       type="button"
       className={className}
       data-tablet-continue={tabletContinue ? "true" : undefined}
+      data-skip-action={skipAction ? "true" : undefined}
       onClick={activate.onClick}
     >
       {children}

@@ -1,0 +1,26 @@
+---
+description: Standing Customer-Readiness Operating Guide. Read the locked doc. Do not duplicate it here.
+alwaysApply: true
+---
+
+# Customer-Ready Operating Guide (LOCKED)
+
+**Read and follow** `docs/studio-customer-ready-operating-guide-v1-locked.md` · `src/config/studio-customer-ready-operating-guide-v1.ts`.
+
+That document is Scout’s standing operating doctrine: quality bar, nothing half-done, whole-menu truth, four launch gates, ask-questions, checkpoints, one package at a time, static-creative as one lane, Voice and team communication as launch requirements, and the customer-ready finish line.
+
+Do not treat this Cursor rule as the guide. Do not rewrite the guide in chat. Do not start the next package without authorization. Do not merge or push without Owner approval. Do not call something ready because the machinery runs.
+
+Daily Operating Bridge (Tagia’s traveling truth): `docs/launch/PROJECT-ALPHA-DAILY-OPERATING-BRIDGE.md`. **WORKING ≠ AVAILABLE.** Work-state changes are event-driven: `docs/launch/studio-operating-daily-operating-bridge-1/PROJECT-ALPHA-WORK-STATE-NOTIFICATION-PROTOCOL.md`. Glance page: `docs/launch/PROJECT-ALPHA-WORK-HEARTBEAT.html`. Do not silently leave ACTIVE. Do not mark IDLE while safe authorized work remains. Ten minutes without a pulse is **STALLED / HUNG**.
+
+Owner attention: GREEN continue (silent) · YELLOW watch (silent) · RED — OWNER ACTION REQUIRED NOW (crimson + audible + exact next action + acknowledge). Waiting on Tagia is never silent YELLOW. RED uses `docs/launch/PROJECT-ALPHA-OWNER-ATTENTION.html` — not the customer site, not the Owner Console.
+
+Three-menu surfaces are **CLOSED**: Launch Now `v2-rtu-*` is launch-readiness authority; Route Map is a separate discovery surface; leftover live-catalog greens are not automatically launch-authorized.
+
+Do not default to surgical fixes. Classify first (local / shared-lane / cross-system / launch-wide) and fix at the highest reusable level.
+
+Menu inventory is a report, not a fix package: `docs/launch/studio-operating-customer-ready-operating-guide-1/CURRENT-MENU-INVENTORY-CHECKPOINT.md`.
+
+Room 3 Owner Console stays CLOSED. Step 5 certifies the existing desk. Do not reopen Room 3 without a demonstrated regression.
+
+Current priority: **Mobile Customer Journey Certification resumed at Final Delivery.** Shared visual system is **ACCEPTED AND FROZEN**. Do not redesign accepted surfaces. **Contrast revision locked 2026-09-20:** readability over perfectly clear — one shared veil 40% + light smoke 28%; bright mint labels #8FF5C6; paper type 20/18/16/14. Do not restyle accepted surfaces. Do not stamp Mobile. Do not start Step 4.

@@ -1,9 +1,14 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import ProjectBuilderStudioPlanSummary from "@/components/project-builder/ProjectBuilderStudioPlanSummary";
+import SamsungDeckBack from "@/components/studio-conversation-room/guide/SamsungDeckBack";
 import SamsungDenimCta from "@/components/studio-conversation-room/guide/SamsungDenimCta";
+import {
+  useSamsungActivate,
+  useSamsungTapActivate,
+} from "@/lib/studio-samsung-activate";
 import styles from "@/components/studio-conversation-room/guide/studio-guide-tablet.module.css";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import { studioTileClass } from "@/config/studio-customer-tile-system-v1";
@@ -12,6 +17,7 @@ import type { RouteMapJobId } from "@/config/route-map-v1";
 import type { ProjectBuilderStudioPlanSummaryModel } from "@/lib/project-builder-studio-plan-summary";
 
 import "@/app/project-builder/project-builder.css";
+import "@/app/studio-visual-system-v2.css";
 
 export type ConversationStudioPlanTabletProps = {
   model: ProjectBuilderStudioPlanSummaryModel;
@@ -24,6 +30,8 @@ export type ConversationStudioPlanTabletProps = {
   onViewScope?: (jobId: RouteMapJobId) => void;
   /** Phone: expand details on this screen instead of an Activity Panel overlay. */
   extrasInPlace?: boolean;
+  /** Phone: actions sit in the outer Conversation shell, not inside this card. */
+  hideActions?: boolean;
   topControls?: ReactNode;
   bridgeError: string | null;
   onDeckBack?: () => void;
@@ -33,6 +41,71 @@ export type ConversationStudioPlanTabletProps = {
 function routeCustomerLabel(routeLabel: string): string {
   const parts = routeLabel.split("·");
   return (parts[parts.length - 1] ?? routeLabel).trim();
+}
+
+export function ConversationStudioPlanActions({
+  extrasInPlace = false,
+  canContinue,
+  onEditPlan,
+  onChangeRoute,
+  onLooksGood,
+}: {
+  extrasInPlace?: boolean;
+  canContinue: boolean;
+  onEditPlan: () => void;
+  onChangeRoute: () => void;
+  onLooksGood: () => void;
+}) {
+  const v = conversationRoomGuideV1;
+  const changeRouteActivate = useSamsungActivate(onChangeRoute, {
+    consumeGesture: true,
+  });
+  const editPlanActivate = useSamsungActivate(onEditPlan, {
+    consumeGesture: true,
+  });
+
+  return (
+    <div
+      className={styles.planTabletActions}
+      data-plan-actions={extrasInPlace ? "group" : undefined}
+    >
+      <button
+        type="button"
+        ref={changeRouteActivate.ref}
+        className={`${styles.planTabletBtnSecondary} ${studioTileClass.secondaryAction}`}
+        onClick={changeRouteActivate.onClick}
+      >
+        {v.studioPlanChangeRouteLabel}
+      </button>
+      <button
+        type="button"
+        ref={editPlanActivate.ref}
+        className={`${styles.planTabletBtnSecondary} ${studioTileClass.secondaryAction}`}
+        onClick={editPlanActivate.onClick}
+      >
+        {extrasInPlace ? v.studioPlanEditServicesLabel : v.studioPlanEditLabel}
+      </button>
+      {extrasInPlace ? (
+        <SamsungDenimCta
+          onActivate={() => {
+            if (!canContinue) return;
+            onLooksGood();
+          }}
+        >
+          {v.studioPlanConfirmCta}
+        </SamsungDenimCta>
+      ) : (
+        <button
+          type="button"
+          className={styles.planTabletBtnPrimary}
+          disabled={!canContinue}
+          onClick={onLooksGood}
+        >
+          {v.studioPlanConfirmCta}
+        </button>
+      )}
+    </div>
+  );
 }
 
 /**
@@ -49,6 +122,7 @@ export default function ConversationStudioPlanTablet({
   onOpenExtraDetails,
   onViewScope,
   extrasInPlace = false,
+  hideActions = false,
   topControls = null,
   bridgeError,
   onDeckBack,
@@ -57,21 +131,13 @@ export default function ConversationStudioPlanTablet({
   const v = conversationRoomGuideV1;
   const routeLabel = routeCustomerLabel(model.routeLabel);
   const [extrasOpen, setExtrasOpen] = useState(false);
-  const extrasRef = useRef<HTMLDivElement | null>(null);
+  const extrasActivate = useSamsungTapActivate(toggleExtrasInPlace);
+  const extraDetailsActivate = useSamsungActivate(onOpenExtraDetails, {
+    consumeGesture: true,
+  });
 
   function toggleExtrasInPlace() {
-    setExtrasOpen((open) => {
-      const next = !open;
-      if (next) {
-        window.setTimeout(() => {
-          extrasRef.current?.scrollIntoView({
-            block: "nearest",
-            behavior: "smooth",
-          });
-        }, 0);
-      }
-      return next;
-    });
+    setExtrasOpen((open) => !open);
   }
 
   return (
@@ -80,23 +146,22 @@ export default function ConversationStudioPlanTablet({
       data-surface="studio-plan"
       data-phone-plan={extrasInPlace ? "true" : undefined}
     >
-      {topControls}
-
-      {onDeckBack && deckBackLabel ? (
-        <button
-          type="button"
-          className={styles.deckBack}
-          data-pre-checkout-deck-back=""
-          onClick={onDeckBack}
-        >
-          ← {deckBackLabel}
-        </button>
-      ) : null}
+      <div data-tablet-journey-chrome="true">
+        {onDeckBack && deckBackLabel ? (
+          <SamsungDeckBack
+            className={styles.deckBack}
+            onActivate={onDeckBack}
+          >
+            ← {deckBackLabel}
+          </SamsungDeckBack>
+        ) : null}
+        {topControls}
+      </div>
 
       <header className={styles.planTabletHeader}>
-        <p className={styles.eyebrow}>
-          {extrasInPlace ? v.studioPlanStepLabel : v.eyebrow}
-        </p>
+        {extrasInPlace ? null : (
+          <p className={styles.eyebrow}>{v.eyebrow}</p>
+        )}
         <h1 className={styles.question}>{v.studioPlanTitle}</h1>
         {extrasInPlace ? null : (
           <aside
@@ -183,21 +248,21 @@ export default function ConversationStudioPlanTablet({
 
         {extrasInPlace ? (
           <section
-            ref={extrasRef}
-            className={`${styles.planDetailsCard} ${studioTileClass.standardLight}`}
+            className={styles.planDetailsCard}
             data-plan-details="true"
             data-open={extrasOpen ? "true" : "false"}
           >
             <button
               type="button"
+              ref={extrasActivate.ref}
               className={styles.planDetailsToggle}
+              data-plan-details-toggle="true"
               aria-expanded={extrasOpen}
               aria-controls="studio-plan-mobile-details"
-              onClick={toggleExtrasInPlace}
+              onClick={extrasActivate.onClick}
             >
               {extrasOpen ? v.studioPlanDetailsHideLabel : v.studioPlanDetailsToggle}
             </button>
-            <p className={styles.planFactNote}>{v.studioPlanDetailsOpenHint}</p>
             {extrasOpen ? (
               <div
                 id="studio-plan-mobile-details"
@@ -219,8 +284,9 @@ export default function ConversationStudioPlanTablet({
             <p className={styles.planFactNote}>{v.studioPlanExtrasHint}</p>
             <button
               type="button"
+              ref={extraDetailsActivate.ref}
               className={styles.planMoreDetailsLink}
-              onClick={onOpenExtraDetails}
+              onClick={extraDetailsActivate.onClick}
             >
               {v.studioPlanMoreDetailsCta} →
             </button>
@@ -234,44 +300,15 @@ export default function ConversationStudioPlanTablet({
         </p>
       ) : null}
 
-      <div
-        className={styles.planTabletActions}
-        data-plan-actions={extrasInPlace ? "group" : undefined}
-      >
-        <button
-          type="button"
-          className={`${styles.planTabletBtnSecondary} ${studioTileClass.secondaryAction}`}
-          onClick={onChangeRoute}
-        >
-          {v.studioPlanChangeRouteLabel}
-        </button>
-        <button
-          type="button"
-          className={`${styles.planTabletBtnSecondary} ${studioTileClass.secondaryAction}`}
-          onClick={onEditPlan}
-        >
-          {extrasInPlace ? v.studioPlanEditServicesLabel : v.studioPlanEditLabel}
-        </button>
-        {extrasInPlace ? (
-          <SamsungDenimCta
-            onActivate={() => {
-              if (!model.canContinue) return;
-              onLooksGood();
-            }}
-          >
-            {v.studioPlanConfirmCta}
-          </SamsungDenimCta>
-        ) : (
-          <button
-            type="button"
-            className={styles.planTabletBtnPrimary}
-            disabled={!model.canContinue}
-            onClick={onLooksGood}
-          >
-            {v.studioPlanConfirmCta}
-          </button>
-        )}
-      </div>
+      {hideActions ? null : (
+        <ConversationStudioPlanActions
+          extrasInPlace={extrasInPlace}
+          canContinue={model.canContinue}
+          onEditPlan={onEditPlan}
+          onChangeRoute={onChangeRoute}
+          onLooksGood={onLooksGood}
+        />
+      )}
     </div>
   );
 }

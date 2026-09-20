@@ -1,0 +1,2465 @@
+/**
+ * Studio Visual System V2 — global last paint.
+ * One product from Lobby through Final Delivery.
+ * Must load after room CSS. Does not paint .owner-qa or telemetry pages.
+ * 2026-09-19 contrast revision: readability over perfectly clear.
+ * Stack: Lounge → shared veil → one light smoke on readable surfaces.
+ * No frost. No blur. No opaque cards. Opacity locked 2026-09-20: veil 40, smoke 28.
+ */
+
+:root {
+  --studio-text: #ffffff;
+  --studio-text-muted: color-mix(in srgb, #ffffff 78%, transparent);
+  --studio-highlight: #bfd8f2;
+  --studio-pressed-fill: color-mix(in srgb, #bfd8f2 22%, transparent);
+  --studio-pressed-border: #bfd8f2;
+  --studio-trim: #c8b59b;
+  --studio-ink: #20262d;
+  --studio-veil-fill: color-mix(in srgb, #20262d 40%, transparent);
+  --studio-glass-fill: color-mix(in srgb, #20262d 28%, transparent);
+  --studio-glass-fill-strong: color-mix(in srgb, #20262d 28%, transparent);
+  --studio-glass-border: #c8b59b;
+  --studio-glass-shadow: none;
+  --studio-radius: 0.85rem;
+  --studio-border-width: 2px;
+  --studio-space-xs: 0.5rem;
+  --studio-space-sm: 0.75rem;
+  --studio-space-md: 1rem;
+  --studio-space-lg: 1.5rem;
+  --studio-type-title: 1.25rem;
+  --studio-type-subtitle: 1.125rem;
+  --studio-type-copy: 1rem;
+  --studio-type-small: 0.875rem;
+  --studio-type-page: var(--studio-type-title);
+  --studio-type-question: var(--studio-type-subtitle);
+  --studio-type-section: var(--studio-type-subtitle);
+  --studio-type-card: var(--studio-type-copy);
+  --studio-type-body: var(--studio-type-copy);
+  --studio-type-helper: var(--studio-type-copy);
+  --studio-type-back: var(--studio-type-small);
+  --studio-type-label: var(--studio-type-small);
+  --studio-label: #8ff5c6;
+  --sb-eucalyptus: var(--studio-label);
+  --studio-type-button: var(--studio-type-copy);
+  --studio-type-status: var(--studio-type-small);
+  --studio-text-support: 0 1px 3px rgba(32, 38, 45, 0.82), 0 0 10px rgba(32, 38, 45, 0.28);
+
+  --background: transparent;
+  --foreground: #ffffff;
+  --board-family-cream: transparent;
+  --utility-paper-cream: transparent;
+  --utility-cream: transparent;
+  --studio-paper: transparent;
+
+  --studio-charcoal: #20262d;
+  --studio-charcoal-muted: var(--studio-text-muted);
+  --studio-denim: #20262d;
+  --studio-denim-deep: #20262d;
+  --studio-eucalyptus: #bfd8f2;
+  --studio-eucalyptus-deep: #bfd8f2;
+  --studio-coral: #bfd8f2;
+  --studio-herb-gold: #bfd8f2;
+  --studio-golden-yellow: #bfd8f2;
+  --studio-teal: #bfd8f2;
+  --studio-walnut: #c8b59b;
+
+  --studio-utility-backdrop-blur: none;
+  --studio-utility-backdrop-tint: transparent;
+  --utility-card: var(--studio-glass-fill);
+  --studio-utility-card-surface: var(--studio-glass-fill);
+  --studio-utility-card-surface-bright: var(--studio-glass-fill-strong);
+
+  --utility-primary: #20262d;
+  --utility-primary-deep: #20262d;
+  --utility-text: #ffffff;
+  --utility-text-muted: var(--studio-text-muted);
+  --utility-nav-accent-active: #bfd8f2;
+  --type-section-title-weight: 600;
+  --utility-font: var(--font-studio-board-sans), "Inter", system-ui, sans-serif;
+  --utility-shadow: var(--studio-glass-shadow);
+  --utility-border: var(--studio-glass-border);
+
+  --rm-frost-blur: none;
+  --rm-overlay-scrim-blur: none;
+}
+
+[data-mobile-customer-spine] {
+  --sb-eucalyptus: var(--studio-label);
+  --mc-ink: #ffffff;
+  --mc-denim: #20262d;
+  --mc-eucalyptus: #bfd8f2;
+  --mc-coral: #bfd8f2;
+  --mc-yellow: #bfd8f2;
+  --mc-ivory: var(--studio-glass-fill-strong);
+  --mc-glass: var(--studio-glass-fill);
+  --mc-glass-strong: var(--studio-glass-fill-strong);
+  --mc-glass-border: var(--studio-glass-border);
+  --mc-veil: transparent;
+  --mc-primary: #20262d;
+  --mc-primary-text: #ffffff;
+  --mc-chip-selected: color-mix(in srgb, #bfd8f2 22%, transparent);
+  --mc-board-color-page: #ffffff;
+  --mc-board-color-card: #ffffff;
+  --mc-board-color-sub: var(--studio-text-muted);
+  --mc-board-color-field: #ffffff;
+  --mc-board-color-value: #ffffff;
+  --mc-board-color-current: #ffffff;
+  --mc-board-color-action-link: #ffffff;
+  --studio-tile-standard-fill: var(--studio-glass-fill);
+  --studio-tile-standard-dense-fill: var(--studio-glass-fill-strong);
+  --studio-tile-selected-fill: color-mix(in srgb, #bfd8f2 22%, transparent);
+  --studio-tile-border: var(--studio-glass-border);
+  --studio-tile-quiet-border: color-mix(in srgb, #c8b59b 22%, transparent);
+}
+
+html:has(.studio-environment-app),
+html:has(.studio-environment-app) body {
+  background: transparent !important;
+}
+
+.studio-environment-app {
+  font-family: var(--font-studio-board-sans), "Inter", system-ui, sans-serif;
+  color: #ffffff;
+  font-weight: 400;
+  font-size: var(--studio-type-body);
+  line-height: 1.5;
+  --studio-ink: #20262d;
+  --studio-golden-yellow: #bfd8f2;
+  --mc-yellow: #bfd8f2;
+}
+
+.studio-environment-shell,
+.studio-environment-shell__plate {
+  filter: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.studio-environment-shell__veil {
+  background: var(--studio-veil-fill) !important;
+  background-color: var(--studio-veil-fill) !important;
+}
+
+.studio-environment-shell__frost {
+  display: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.lobby-entry-film__scrim,
+.welcome-hall-plate-backdrop-art {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+.studio-utility-backdrop::before {
+  filter: none !important;
+}
+
+/* Typography — paper scale: title 20, subtitle 18, communication 16, small 14. */
+.studio-environment-app :is(h1, .utility-title, .utility-topbar__title, .sb-header-v3__title) {
+  color: #ffffff !important;
+  font-family: inherit !important;
+  font-size: var(--studio-type-page) !important;
+  font-weight: 600 !important;
+  line-height: 1.2;
+  text-shadow: var(--studio-text-support);
+}
+
+.studio-environment-app h2 {
+  color: #ffffff !important;
+  font-family: inherit !important;
+  font-size: var(--studio-type-section) !important;
+  font-weight: 600 !important;
+  line-height: 1.25;
+  text-shadow: var(--studio-text-support);
+}
+
+.studio-environment-app h3,
+.studio-environment-app h4 {
+  color: #ffffff !important;
+  font-family: inherit !important;
+  font-size: var(--studio-type-subtitle) !important;
+  font-weight: 600 !important;
+  line-height: 1.3;
+  text-shadow: var(--studio-text-support);
+}
+
+.studio-environment-app :is(p, li, dt, dd, label, td, th) {
+  color: #ffffff !important;
+  font-size: var(--studio-type-body) !important;
+  font-weight: 400;
+  text-shadow: var(--studio-text-support);
+}
+
+.studio-environment-app :is(
+  span,
+  small,
+  strong,
+  em,
+  time,
+  figcaption,
+  legend,
+  output,
+  cite,
+  b,
+  i,
+  svg
+):not(.owner-qa *):not(.studio-tile--selected):not(.studio-tile--selected *) {
+  color: #ffffff !important;
+}
+
+.studio-environment-app :is(dt, label, .sb-card__tab, .fd-hero__badge, [class*="eyebrow"], [class*="__label"]) {
+  color: var(--studio-label) !important;
+  font-size: var(--studio-type-label) !important;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.studio-environment-app :is(
+  .utility-subnav__label,
+  .utility-subnav__icon,
+  .fs-status-card__label,
+  .utility-card__title,
+  .studio-section-title,
+  .utility-eyebrow,
+  .utility-lead
+) {
+  color: #ffffff !important;
+}
+
+.studio-environment-app a:not(.owner-qa a) {
+  color: #ffffff !important;
+  text-shadow: var(--studio-text-support);
+}
+
+/* Surfaces — one glass, one radius, one border */
+.studio-environment-app :is(
+  .bf-material,
+  .bf-material-paper,
+  .sb-card,
+  .utility-card,
+  .utility-access-card-shell .utility-card,
+  .fd-hero,
+  .fd-summary__status,
+  .fd-block,
+  .fd-item,
+  .fd-block__download,
+  .fd-campaign-strip,
+  .studio-tile--standard,
+  .studio-tile--standard-dense,
+  table,
+  th,
+  td,
+  .help-center article,
+  .hc-card,
+  .hc-qpg-table,
+  .hc-qpg-card,
+  .pkg-compare__table,
+  .pkg-compare__scroll,
+  .pkg-compare__feature-head,
+  .pkg-compare__pkg-head,
+  .pkg-compare__feature,
+  .pkg-compare__cell,
+  .sb-project-communication__item,
+  .sb-project-communication__machine-answer,
+  .sb-project-communication__studio-request,
+  .sb-project-communication__notice,
+  .fs-proof-refs,
+  .fs-version-compare,
+  .fs-version-compare__pane,
+  .co-card,
+  .co-panel,
+  .pay-paper-card,
+  .pay-acknowledgment,
+  .pay-sandbox,
+  .route-map-social-intake,
+  .route-map-social-intake__card,
+  .route-map-social-intake__progress,
+  [class*="intake-card"],
+  [class*="checkout-card"],
+  .fs-review-proof,
+  .fs-review-proof__image,
+  .fs-review-proof__copy,
+  .fs-mock,
+  .fs-feedback-panel,
+  .rd-stage-card,
+  .rd-job-list__item,
+  .fs-status-card,
+  .fs-project-communication,
+  .sb-sidebar,
+  .cd-vision,
+  .cd-card--journey,
+  .cd-card--updates,
+  .cd-card--activity
+):not(.owner-qa):not(.owner-qa *) {
+  background: var(--studio-glass-fill-strong) !important;
+  border: var(--studio-border-width) solid var(--studio-glass-border) !important;
+  border-radius: var(--studio-radius) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.studio-environment-app :is(.bf-material, .bf-material-paper, .sb-card, .utility-card)::before,
+.studio-environment-app :is(.bf-material, .bf-material-paper, .sb-card, .utility-card)::after {
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.studio-environment-app .fd-summary__status,
+.studio-environment-app [aria-current="page"],
+.studio-environment-app [data-active="true"],
+.studio-environment-app .is-active,
+.studio-environment-app .studio-tile--selected {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+}
+
+.studio-environment-app .studio-tile--selected {
+  color: #ffffff !important;
+}
+
+/* Navigation — one treatment */
+.studio-environment-app :is(nav a, nav button, .sb-nav a, [class*="nav"] a):not(.owner-qa *):not([aria-current="page"]):not(.utility-subnav__link--active):not(.sb-nav__item--active):not(.is-active):not(:active):not(.is-pressed):not([data-pressed="true"]):not([class*="routeCard"]):not(.hc-toc__link) {
+  background: var(--studio-glass-fill) !important;
+  border: var(--studio-border-width) solid var(--studio-glass-border) !important;
+  border-radius: var(--studio-radius) !important;
+  color: #ffffff !important;
+  font-family: inherit;
+  font-size: var(--studio-type-button);
+  font-weight: 500;
+  text-shadow: var(--studio-text-support);
+}
+
+.studio-environment-app :is(nav a, nav button, .sb-nav a)[aria-current="page"],
+.studio-environment-app :is(nav a, nav button, .sb-nav a).is-active,
+.studio-environment-app :is(nav a, nav button, .sb-nav a)[data-active="true"],
+.studio-environment-app .utility-subnav__link--active {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border-color: #bfd8f2 !important;
+  color: #ffffff !important;
+  text-shadow: var(--studio-text-support);
+}
+
+.studio-environment-app :is(
+  nav a,
+  nav button,
+  .sb-nav a,
+  .utility-subnav__link--active
+)[aria-current="page"] :is(span, svg),
+.studio-environment-app :is(nav a, nav button, .sb-nav a, .utility-subnav__link--active).is-active :is(span, svg),
+.studio-environment-app :is(nav a, nav button, .sb-nav a, .utility-subnav__link--active) :is(
+  .utility-subnav__label,
+  .utility-subnav__icon
+) {
+  color: #ffffff !important;
+}
+
+/* Buttons — primary ink, secondary glass, danger only when destructive */
+.studio-environment-app :is(button, .utility-btn, .fd-btn, .lobby-entry-film__cta, [type="submit"], [type="button"]):not(.owner-qa *) {
+  font-family: inherit;
+  font-size: var(--studio-type-button);
+  font-weight: 500;
+  border-radius: var(--studio-radius);
+  border: var(--studio-border-width) solid var(--studio-glass-border);
+  text-shadow: var(--studio-text-support);
+}
+
+.studio-environment-app :is(
+  .utility-btn--primary,
+  .fd-btn--start,
+  .fd-block__download,
+  .lobby-entry-film__cta,
+  [class*="btn--primary"],
+  [class*="primary-btn"]
+):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-voice-pref]):not([data-voice-choice-action]) {
+  background: #20262d !important;
+  color: #ffffff !important;
+  border: var(--studio-border-width) solid var(--studio-glass-border) !important;
+}
+
+.studio-environment-app :is(button, .utility-btn, .fd-btn):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]):not([data-skip-action]):not([class*="btnSkip"]) {
+  background: var(--studio-glass-fill) !important;
+  color: #ffffff !important;
+}
+
+.studio-environment-app :is([class*="danger"], [class*="destructive"], [class*="refund"] button):not(.owner-qa *) {
+  background: var(--studio-glass-fill) !important;
+  border-color: #c0392b !important;
+  color: #ffffff !important;
+}
+
+/* Inputs */
+.studio-environment-app :is(input, textarea, select):not(.owner-qa *) {
+  background: var(--studio-glass-fill-strong) !important;
+  border: var(--studio-border-width) solid var(--studio-glass-border) !important;
+  border-radius: var(--studio-radius) !important;
+  color: #ffffff !important;
+  font-family: inherit;
+  font-size: var(--studio-type-body);
+}
+
+.studio-environment-app :is(input, textarea, select)::placeholder {
+  color: var(--studio-text-muted);
+}
+
+/* Chips / selected */
+.studio-environment-app [data-mobile-customer-spine] .studio-tile--standard::before,
+.studio-environment-app [data-mobile-customer-spine] .studio-tile--standard-dense::before {
+  background: var(--studio-glass-fill);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* No frost anywhere in customer chrome */
+html:has(.studio-environment-app) *:not(.owner-qa):not(.owner-qa *),
+.studio-environment-app *:not(.owner-qa):not(.owner-qa *) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Late-room local palettes — remap to the four-color system */
+.studio-environment-app :is(.payment-page, .co-scene) {
+  --pay-denim: #20262d;
+  --pay-eucalyptus: #ffffff;
+  --pay-eucalyptus-deep: #ffffff;
+  --pay-ivory: var(--studio-glass-fill-strong);
+  --pay-mushroom: var(--studio-glass-fill);
+  --co-frost-card: var(--studio-glass-fill);
+}
+
+.studio-environment-app :is(.route-map-page, .rm-page, [class*="route-map"]) {
+  --rm-wood: #c8b59b;
+  --rm-wood-dark: #c8b59b;
+  --rm-wood-light: #c8b59b;
+  --rm-i75: #bfd8f2;
+  --rm-i20: #bfd8f2;
+  --rm-i285: #c8b59b;
+  --rm-terracotta: #bfd8f2;
+  --rm-update: #ffffff;
+  --rm-paper: var(--studio-glass-fill-strong);
+  --rm-paper-warm: var(--studio-glass-fill);
+}
+
+.studio-environment-app :is(.pb-scene, .pb-job-details-surface) {
+  --pb-cream: var(--studio-glass-fill-strong);
+  --pb-paper-warm: var(--studio-glass-fill);
+  --studio-ivory: var(--studio-glass-fill-strong);
+  --studio-denim: #20262d;
+}
+
+.studio-environment-app .sb {
+  --sb-cat-sign-yellow: #c8b59b;
+  --sb-cat-sign-yellow-edge: #c8b59b;
+  --sb-mushroom-green: #bfd8f2;
+  --sb-nav-active: #bfd8f2;
+  --sb-mushroom-orange: #bfd8f2;
+  --sb-walnut: #c8b59b;
+  --sb-gold: #c8b59b;
+  --sb-warm: #c8b59b;
+  --sb-text: #ffffff;
+  --sb-text-muted: var(--studio-text-muted);
+  --sb-cream: var(--studio-glass-fill);
+  --sb-card: var(--studio-glass-fill-strong);
+}
+
+.studio-environment-app .sb-header-v3__name {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.studio-environment-app .fs-proof-refs,
+.studio-environment-app .fs-proof-refs li,
+.studio-environment-app .fs-proof-refs__label,
+.studio-environment-app .fs-proof-refs__summary {
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(32, 38, 45, 0.85);
+}
+
+.studio-environment-app :is(
+  .pay-paper-card__texture,
+  .pay-paper-card__pin,
+  .pay-paper-card__spine
+) {
+  display: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Pressed / selected — clear baby blue, never a solid fill.
+   Only the tapped leaf control. CSS :active also matches ancestors;
+   :not(:has(:active)) keeps the page/card/chip-row from depressing. */
+html:has(.studio-environment-app) :is(
+  button,
+  a,
+  [role="button"],
+  [role="tab"],
+  [role="radio"],
+  [role="checkbox"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  .utility-btn,
+  .fd-btn,
+  .sb-nav__item,
+  .utility-subnav__link,
+  .studio-tile,
+  [class*="chip"]:not([class*="chipRow"]):not([class*="chipBlock"]):not([class*="chipGroup"]):not([class*="chips"]),
+  [class*="primary-btn"],
+  label:has(input[type="radio"]),
+  label:has(input[type="checkbox"])
+):not(.owner-qa):not(.owner-qa *):not(:has(:is(button, a, [role="button"], [role="tab"], [type="button"], [type="submit"], .studio-tile, [class*="chip"]:not([class*="chipRow"]), label):active)):is(:active, .is-pressed, [data-pressed="true"]) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border-color: #bfd8f2 !important;
+  color: #ffffff !important;
+  transform: scale(0.985) !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) :is(
+  [aria-current="page"],
+  [aria-pressed="true"],
+  [aria-checked="true"],
+  [data-active="true"],
+  .is-active,
+  .is-selected,
+  .studio-tile--selected,
+  .sb-nav__item--active,
+  .utility-subnav__link--active
+):not(.owner-qa):not(.owner-qa *):not([class*="routeCard"]) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border-color: #bfd8f2 !important;
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) :is(
+  nav a,
+  nav button,
+  .sb-nav a,
+  .sb-nav__item,
+  .utility-subnav__link,
+  button,
+  .utility-btn,
+  [type="button"],
+  [type="submit"],
+  a
+):not(.owner-qa *):not([aria-current="page"]):not(.sb-nav__item--active):not(.utility-subnav__link--active):not(.is-active):not(:has(:is(button, a, [role="button"], [role="tab"], [type="button"], [type="submit"], .studio-tile, [class*="chip"]:not([class*="chipRow"]), label):active)):is(:active, .is-pressed, [data-pressed="true"]) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border-color: #bfd8f2 !important;
+  color: #ffffff !important;
+  transform: scale(0.985) !important;
+  box-shadow: none !important;
+}
+
+/* Locked character voice — do not restyle Squishy greeting face */
+.studio-environment-app [class*="squishy-greeting"],
+.studio-environment-app [data-squishy-greeting] {
+  font-family: var(--font-squishy-greeting), "Comic Neue", sans-serif;
+}
+
+/* FAIL / CONTINUE — shared leftovers: Project Record, Review Room, gold actives */
+html:has(.studio-environment-app),
+html:has(.studio-environment-app) body,
+html:has(.studio-environment-app) .studio-environment-app,
+html:has(.studio-environment-app) [data-mobile-customer-spine],
+html:has(.studio-environment-app) .studio-utility-scene:has(.fs-room),
+html:has(.studio-environment-app) .cd-grid {
+  --fs-gold: #bfd8f2;
+  --fs-denim: #20262d;
+  --fs-eucalyptus: #bfd8f2;
+  --fs-ivory: var(--studio-glass-fill);
+  --fs-ink: #ffffff;
+  --fs-support: color-mix(in srgb, #ffffff 78%, transparent);
+  --cd-gold: #bfd8f2;
+  --cd-teal: #20262d;
+  --cd-teal-deep: #20262d;
+  --cd-text: #ffffff;
+  --cd-text-muted: color-mix(in srgb, #ffffff 78%, transparent);
+  --board-family-mustard: #c8b59b;
+  --board-family-text: #ffffff;
+  --board-family-tile: var(--studio-glass-fill);
+  --board-family-field: var(--studio-glass-fill);
+  --sb-gold: #c8b59b;
+  --sb-cat-sign-yellow: #c8b59b;
+  --sb-cat-sign-yellow-edge: #c8b59b;
+}
+
+html:has(.studio-environment-app) .utility-page {
+  background: transparent !important;
+}
+
+html:has(.studio-environment-app) .fs-page,
+html:has(.studio-environment-app) .rd-shell,
+html:has(.studio-environment-app) .cd-grid,
+html:has(.studio-environment-app) .sb,
+html:has(.studio-environment-app) .sb-main {
+  background: transparent !important;
+}
+
+html:has(.studio-environment-app) .studio-utility-scene:has(.fs-room) :is(
+  .fs-review-proof,
+  .fs-review-proof__image,
+  .fs-review-proof__copy,
+  .fs-mock,
+  .fs-mock--deliverable
+),
+html:has(.studio-environment-app) :is(
+  .fs-review-proof,
+  .fs-review-proof__image,
+  .fs-review-proof__copy,
+  .fs-mock,
+  .fs-preview,
+  .fs-feedback-panel,
+  .rd-stage-card,
+  .rd-job-list__item,
+  .fs-status-card,
+  .fs-project-communication,
+  .fs-feedback-panel__btn,
+  .fs-review__action--revision,
+  .sb-sidebar,
+  .pay-paper-card,
+  .pay-acknowledgment,
+  .cd-quote
+):not(.owner-qa):not(.owner-qa *) {
+  background: var(--studio-glass-fill) !important;
+  border-color: #c8b59b !important;
+  color: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) .sb-sidebar {
+  background: var(--studio-glass-fill) !important;
+  border-right: var(--studio-border-width) solid #c8b59b !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) .sb-main,
+html:has(.studio-environment-app) .sb-project-communication,
+html:has(.studio-environment-app) .rd-shell,
+html:has(.studio-environment-app) .fs-page--review {
+  min-height: 0;
+  overflow: auto;
+}
+
+html:has(.studio-environment-app) :is(
+  .cd-journey__step--current .cd-journey__dot,
+  .rd-job-list__item--selected,
+  .fs-handoff-chain__step--current,
+  .fs-feedback-panel__btn--active,
+  .fs-status-card__value,
+  .rd-job-list__stage,
+  .rd-stage-card__service
+):not(.owner-qa):not(.owner-qa *) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border-color: #bfd8f2 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .studio-utility-scene:has(.fs-room) .fs-review-proof,
+html:has(.studio-environment-app) .studio-utility-scene:has(.fs-room) .fs-review-proof__image,
+html:has(.studio-environment-app) .studio-utility-scene:has(.fs-room) .fs-review-proof__copy {
+  background: var(--studio-glass-fill) !important;
+  background-color: var(--studio-glass-fill) !important;
+  background-image: none !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  color: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) .studio-utility-scene--studio-board .sb-sidebar,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .sb--v4 .sb-sidebar {
+  background: var(--studio-glass-fill) !important;
+  background-image: none !important;
+  border-right: var(--studio-border-width) solid #c8b59b !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .sb--v4 .sb-nav .sb-sign-out {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  background-color: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  background-image: none !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  border-left: 1px solid #bfd8f2 !important;
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active .sb-nav__icon,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .sb--v4 .sb-nav__item--active .sb-nav__label {
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .cd-squishy,
+  .payment-header-band,
+  .pay-field input,
+  .pay-field textarea,
+  .co-card,
+  .pay-paper-card,
+  .pay-acknowledgment,
+  .pay-sandbox
+):not(.owner-qa):not(.owner-qa *) {
+  background: var(--studio-glass-fill) !important;
+  background-image: none !important;
+  border-color: #c8b59b !important;
+  color: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) .fs-review__action--approve,
+html:has(.studio-environment-app) .cd-deliverables__cta,
+html:has(.studio-environment-app) .fs-phone-dock__btn--approve {
+  background: #20262d !important;
+  color: #ffffff !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+}
+
+@media (max-width: 720px) {
+  html:has(.studio-environment-app) :is(button, .utility-btn, .utility-subnav__link, .sb-nav__item, nav a) {
+    min-height: 2.75rem;
+  }
+}
+
+/* FINAL CLEANUP — same glass. Contain Board cards. Kill leftover gold. */
+@media (min-width: 1025px) {
+  html:has(.studio-environment-app) .sb--v4 .sb-main {
+    overflow: auto !important;
+    min-height: 0;
+  }
+
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: min-content !important;
+    grid-template-rows: auto auto !important;
+    align-items: start !important;
+    overflow: visible !important;
+  }
+
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout > .sb-card,
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout > .sb-materials-tile,
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout .sb-card--materials-next {
+    height: auto !important;
+    min-height: min-content !important;
+    overflow: visible !important;
+    align-self: start;
+  }
+
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout .sb-card--current .sb-current-campaign,
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout .sb-card--progress .sb-progress-panel,
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout .sb-card--project-snapshot .sb-project-snapshot,
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout .sb-card--materials-received .sb-materials-board-tile,
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout .sb-card--materials-needed .sb-materials-board-tile,
+  html:has(.studio-environment-app) .sb--v4 .sb-board-layout .sb-card--materials-next .sb-materials-board-next,
+  html:has(.studio-environment-app) .sb--v4 .sb-progress-panel,
+  html:has(.studio-environment-app) .sb--v4 .sb-progress-panel__body,
+  html:has(.studio-environment-app) .sb--v4 .sb-project-snapshot,
+  html:has(.studio-environment-app) .sb--v4 .sb-project-snapshot__stack {
+    flex: 0 0 auto !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: min-content !important;
+  }
+}
+
+html:has(.studio-environment-app) .sb,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .sb--v4 {
+  --sb-gold: #c8b59b;
+  --studio-rule: #c8b59b;
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+html:has(.studio-environment-app) .sb-sidebar {
+  display: none !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .sb-card__tab,
+  .sb--v3 .sb-card__tab,
+  .sb--v4 .sb-card__tab,
+  .sb-local-test-fixture__eyebrow,
+  .sb-current-campaign__label,
+  .sb-account__label,
+  .sb-next-action__status,
+  .sb-project-snapshot__heading
+):not(.owner-qa):not(.owner-qa *) {
+  border-bottom: 1px solid #c8b59b !important;
+  border-bottom-color: #c8b59b !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Materials glance was a second champagne box around the cards. Current Project is one thin trim. */
+html:has(.studio-environment-app) .sb-materials-glance,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .sb--v4 .sb-materials-glance {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+html:has(.studio-environment-app) .sb-materials-glance::before,
+html:has(.studio-environment-app) .sb-materials-glance::after,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .sb--v4 .sb-materials-glance::before,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .sb--v4 .sb-materials-glance::after {
+  content: none !important;
+  display: none !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .sb-card--materials-received,
+  .sb-card--materials-needed,
+  .sb-card--materials-next,
+  .sb-materials-tile
+):not(.owner-qa):not(.owner-qa *) {
+  border: var(--studio-border-width) solid #c8b59b !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: var(--sb-tile-padding-y, 1rem) var(--sb-tile-padding-x, 1.05rem) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+
+html:has(.studio-environment-app) [data-mobile-customer-spine] .fs-page--review .utility-subnav__link--active,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .fs-page--review .utility-subnav__link[aria-current="page"] {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  background-color: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  color: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) [data-mobile-customer-spine] .fs-page--review .utility-subnav__link--active .utility-subnav__icon,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .fs-page--review .utility-subnav__link--active .utility-subnav__label,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .fs-page--review .utility-subnav__link[aria-current="page"] .utility-subnav__icon,
+html:has(.studio-environment-app) [data-mobile-customer-spine] .fs-page--review .utility-subnav__link[aria-current="page"] .utility-subnav__label {
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) [data-mobile-customer-spine] .fs-page--review .utility-subnav__link--active::after {
+  background: #bfd8f2 !important;
+}
+
+html:has(.studio-environment-app) [data-mobile-customer-spine] .fs-page--review .utility-subnav__link[href="/studio-board"]:not(.utility-subnav__link--active):not([aria-current="page"]) {
+  background: var(--studio-glass-fill) !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) [data-mobile-customer-spine] .fs-page--review .utility-subnav__link[href="/studio-board"]:not(.utility-subnav__link--active):not([aria-current="page"]) :is(.utility-subnav__icon, .utility-subnav__label) {
+  color: #ffffff !important;
+}
+
+/* MOBILE FINAL CLEANUP — Conversation glass + breathing room. Not a redesign. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="screen"]::before,
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="frame"]::before,
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="room"]::before,
+html:has(.studio-environment-app) [data-voice-choice-film] [class*="panel"]::before,
+html:has(.studio-environment-app) [data-voice-gate] [class*="panel"]::before {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  pointer-events: none !important;
+}
+
+html:has(.studio-environment-app) [data-voice-choice-film] [class*="panel"],
+html:has(.studio-environment-app) [data-voice-gate="true"] [class*="panel"],
+html:has(.studio-environment-app) section[data-surface="tablet"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="hostSurface"],
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="screen"] {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) [data-surface="studio-plan"],
+html:has(.studio-environment-app) [data-surface="tablet"] [data-surface="tablet"],
+html:has(.studio-environment-app) [data-surface="studio-plan"] [class*="planFactCard"],
+html:has(.studio-environment-app) [data-surface="studio-plan"] section[class*="beforeCheckout"],
+html:has(.studio-environment-app) [data-phone-plan] [class*="planDetailsCard"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="tablet"] [data-surface="tablet"]:not(.owner-qa):not(.owner-qa *) {
+  border: none !important;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) [data-film-family="true"] [data-voice-pref][aria-pressed="true"],
+html:has(.studio-environment-app) [data-voice-choice-action][aria-pressed="true"],
+html:has(.studio-environment-app) [data-surface="tablet"] [class*="chip"][data-selected="true"],
+html:has(.studio-environment-app) [data-surface="tablet"] [class*="chip"][aria-pressed="true"] {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  background-color: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) [data-permanent-communication="true"][data-embedded="true"] {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) [data-permanent-communication="true"][data-embedded="true"] [class*="speakZone"] {
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  width: auto !important;
+  max-width: 100% !important;
+  min-height: 2.4rem !important;
+  padding: 0.3rem 0.15rem !important;
+  margin: 0 0 0.85rem !important;
+}
+
+html:has(.studio-environment-app) [data-answer-dock="pinned"] {
+  flex: 0 0 auto !important;
+  margin-top: 0.25rem !important;
+  gap: 0.4rem !important;
+  padding-bottom: 3.25rem !important;
+}
+
+html:has(.studio-environment-app) [data-answer-dock="pinned"] [data-permanent-communication="true"] {
+  margin-top: 0 !important;
+  gap: 0.4rem !important;
+}
+
+@media (max-width: 960px) {
+  html:has(.studio-environment-app) [data-surface="tablet"]:has([data-answer-dock="pinned"]) {
+    height: calc(100dvh - 5.25rem) !important;
+    max-height: calc(100dvh - 5.25rem) !important;
+    overflow: hidden !important;
+  }
+
+  html:has(.studio-environment-app) [data-surface="tablet"]:has([data-answer-dock="pinned"]) [data-question-scroll-root="true"] {
+    overflow: auto !important;
+    min-height: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  html:has(.studio-environment-app) [data-answer-dock="pinned"] {
+    flex-shrink: 0 !important;
+  }
+
+  /* Opening questions: one long page. No inner second scroller. */
+  html:has(.studio-environment-app) [data-stage="opening"][data-surface="tablet"],
+  html:has(.studio-environment-app) [data-stage="opening"][data-surface="tablet"]:has([data-answer-dock="pinned"]) {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  html:has(.studio-environment-app) [data-stage="opening"][data-surface="tablet"] [data-question-scroll-root="true"],
+  html:has(.studio-environment-app) [data-stage="opening"][data-surface="tablet"] [class*="askCluster"] {
+    overflow: visible !important;
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+}
+
+html:has(.studio-environment-app) [data-answer-dock="pinned"] [class*="speakZone"] {
+  margin: 0 0 0.25rem !important;
+}
+
+html:has(.studio-environment-app) [data-answer-dock="pinned"] [class*="typeLine"] {
+  min-height: 2.4rem !important;
+}
+
+@media (max-width: 720px) {
+  html:has(.studio-environment-app) [data-voice-choice-film] [class*="panel"],
+  html:has(.studio-environment-app) [data-voice-gate="true"] [class*="panel"],
+  html:has(.studio-environment-app) [data-surface="tablet"],
+  html:has(.studio-environment-app) [data-surface="studio-plan"] {
+    gap: 0.9rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-pre-checkout-deck-back] {
+    margin: 0 0 1.2rem !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    min-height: 0 !important;
+  }
+
+  html:has(.studio-environment-app) [data-voice-choice-film] [class*="prompt"] {
+    margin: 0.95rem 0 0.95rem !important;
+    font-size: var(--studio-type-page) !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+  }
+
+  html:has(.studio-environment-app) [data-film-family="true"] {
+    margin: 0 0 1rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-active-question-cluster="true"] {
+    gap: 0.95rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-surface="tablet"] [class*="answerDock"]:not([data-answer-dock="pinned"]),
+  html:has(.studio-environment-app) [data-permanent-communication="true"][data-embedded="true"] {
+    margin-top: 0.35rem !important;
+    gap: 0.9rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-surface="tablet"] [class*="actions"] {
+    margin-top: 0.55rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-surface="tablet"] [data-skip-action] {
+    margin-top: 1.05rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-surface="studio-plan"] [class*="planVoiceFacts"] {
+    gap: 0.9rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-surface="studio-plan"] [class*="planFactCard"],
+  html:has(.studio-environment-app) [data-surface="studio-plan"] section[class*="beforeCheckout"] {
+    margin-top: 0.55rem !important;
+    padding: 1.05rem 1.1rem !important;
+  }
+}
+
+html:has(.studio-environment-app) [data-skip-action] :is(button, a, [role="button"]):not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]),
+html:has(.studio-environment-app) button[data-skip-action]:not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]),
+html:has(.studio-environment-app) [class*="btnSkipNow"]:not(.owner-qa):not(.owner-qa *) {
+  border: 2px solid #d94e2b !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.studio-environment-app :is(button, a)[data-selected="true"]:not([class*="routeCard"]),
+.studio-environment-app :is(button, a)[aria-pressed="true"]:not([class*="routeCard"]),
+.studio-environment-app [data-voice-pref][aria-pressed="true"] {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  background-color: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  color: #ffffff !important;
+}
+
+/* CHECKOUT leftover wrappers stay open so smoke does not stack. Do not fill these with ink. */
+html:has(.studio-environment-app) [data-stage="checkout"][data-surface="tablet"],
+html:has(.studio-environment-app) [data-panel="checkout"],
+html:has(.studio-environment-app) [data-panel="checkout"] :is(
+  .co-card,
+  .co-panel,
+  .pay-paper-card,
+  .pay-acknowledgment,
+  .pay-sandbox,
+  [class*="checkoutHostSurface"],
+  [class*="checkoutPageSurface"]
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app):not(:has([data-layout="one-tablet"])) [data-panel="checkout"]:not([data-surface="page"]) :is(.co-card, .pay-paper-card) {
+  border: var(--studio-border-width) solid #c8b59b !important;
+}
+
+html:has(.studio-environment-app) [data-panel="checkout"] :is(
+  .pay-paper-card__pin,
+  .pay-paper-card__texture,
+  .pay-paper-card__spine
+) {
+  display: none !important;
+}
+
+@media (max-width: 720px) {
+  html:has(.studio-environment-app) [data-panel="checkout"] {
+    gap: 1.15rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-panel="checkout"] [class*="backLink"] {
+    margin: 0.25rem 0 1.15rem !important;
+    padding: 0.5rem 0 !important;
+  }
+
+  html:has(.studio-environment-app) [data-panel="checkout"]:not([data-surface="page"]) .co-card {
+    padding: 1.15rem 0.35rem 1.25rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-panel="checkout"][data-surface="page"] .co-card,
+  html:has(.studio-environment-app) [data-panel="checkout"][data-surface="page"] .pay-paper-card {
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-panel="checkout"] .co-card__heading {
+    margin: 0 0 0.95rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-panel="checkout"] .co-next-steps {
+    gap: 0.95rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-panel="checkout"] .co-next-steps__item {
+    padding: 0.15rem 0 !important;
+  }
+
+  html:has(.studio-environment-app) [data-panel="checkout"] .co-submit {
+    margin-top: 0.85rem !important;
+  }
+}
+
+/* Voice On/Off are selection controls, not primary-action buttons. */
+html:has(.studio-environment-app) :is(
+  [data-voice-pref],
+  [data-voice-choice-action]
+):not([aria-pressed="true"]) {
+  background: var(--studio-glass-fill) !important;
+  background-color: var(--studio-glass-fill) !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  color: #ffffff !important;
+}
+
+/* Conversation Room — title or subtitle. Body is communication. */
+html:has(.studio-environment-app) :is(
+  [data-surface="tablet"],
+  [data-surface="studio-plan"]
+) :is(h1[class*="question"], h2[class*="title"]) {
+  font-size: var(--studio-type-page) !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html:has(.studio-environment-app) [data-surface="tablet"] h2:not([class*="title"]):not([class*="beforeCheckout"]) {
+  font-size: var(--studio-type-section) !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+}
+
+html:has(.studio-environment-app) [data-stage="intake"] h3:not([class*="intakeSectionHeading"]) {
+  font-size: var(--studio-type-question) !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html:has(.studio-environment-app) :is(
+  dt,
+  label,
+  [class*="eyebrow"]:not(.utility-subnav *),
+  [class*="__label"]:not(.utility-subnav__label):not(.sb-nav__label),
+  [class*="beforeCheckoutHeading"],
+  [class*="planFactLabel"],
+  [class*="bestForLabel"],
+  [class*="requiredMeta"],
+  .fd-hero__badge,
+  .sb-card__tab,
+  .utility-eyebrow,
+  .fs-status-card__label
+) {
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+}
+
+html:has(.studio-environment-app) :is(
+  [class*="beforeCheckoutHeading"],
+  [class*="planFactLabel"],
+  [class*="bestForLabel"],
+  [class*="requiredMeta"]
+) {
+  font-size: var(--studio-type-label) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  line-height: 1.3 !important;
+}
+
+html:has(.studio-environment-app) :is(
+  [class*="planFactValue"],
+  [class*="planFactValueLarge"]
+) {
+  font-size: var(--studio-type-card) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.3 !important;
+}
+
+html:has(.studio-environment-app) :is(
+  [data-voice-pref][aria-pressed="true"],
+  [data-voice-choice-action][aria-pressed="true"]
+) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  background-color: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  color: #ffffff !important;
+}
+
+/* Parent surfaces stay still while a child control is pressed.
+   Reset wash + scale. Do not let :active on ancestors paint the page. */
+html:has(.studio-environment-app) :is(
+  html,
+  body,
+  .studio-environment-app,
+  [data-layout],
+  [data-surface="tablet"],
+  [data-panel],
+  [data-active-question-cluster],
+  [data-answer-dock],
+  [data-permanent-communication],
+  [data-film-family],
+  [data-question-scroll-root],
+  [role="group"],
+  [class*="chipRow"],
+  [class*="chipBlock"],
+  [class*="chipGroup"],
+  [class*="askCluster"],
+  [class*="answerDock"],
+  [class*="hostSurface"],
+  [class*="PageSurface"],
+  [class*="filmToggle"],
+  [class*="actions"],
+  section[data-surface],
+  .co-card,
+  .pay-paper-card,
+  .sb-card,
+  .utility-card
+):is(:active, :has(:active), .is-pressed, [data-pressed="true"]) {
+  transform: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* Conversation Room — one readable surface. Nested wrappers are not extra glass.
+   Lounge + one shared veil + one light smoke on real controls. No frost, no blur. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: clip !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+  [data-surface="tablet"],
+  [class*="deviceColumn"],
+  [class*="hostSurface"],
+  [class*="nameQuestionPanel"],
+  [class*="askCluster"],
+  [data-question-scroll-root],
+  [data-answer-dock],
+  [data-permanent-communication],
+  [data-active-question-cluster],
+  [class*="summaryList"],
+  [class*="summaryRow"],
+  [class*="chipRow"],
+  [class*="typeBlock"],
+  [class*="typeField"],
+  [class*="actions"],
+  [class*="filmToggle"]
+) {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="tablet"][data-stage]:not([data-stage="plan"]):not([data-stage="checkout"]):not([data-stage="route"]):not([data-stage="services"]):not([data-stage="opening"]):not([data-stage="intake"]) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: var(--studio-radius) !important;
+  box-shadow: none !important;
+  overflow-x: clip !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+  [class*="hostSurface"],
+  [class*="nameQuestionPanel"],
+  [class*="askCluster"],
+  [class*="answerDock"],
+  [data-question-scroll-root],
+  [data-permanent-communication],
+  [class*="summaryList"],
+  [class*="summaryRow"],
+  [class*="deadlineNote"],
+  [data-surface="tablet"] .studio-tile--standard,
+  [data-surface="tablet"] .studio-tile--standard-dense
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Route tiles are the cards. One frame on the wrapper — not a second
+   window on the inner button. Champagne idle. Baby-blue selected. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="routeExpand"].studio-tile--standard,
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="routeExpand"].studio-tile--standard-dense {
+  border: var(--studio-border-width) solid #c8b59b !important;
+  background: var(--studio-glass-fill) !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="routeExpand"].studio-tile--selected {
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="routeCard"] {
+  border: none !important;
+  border-width: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* You can choose a different path — own sentence, sage, no bubble. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="routeChoiceNote"] {
+  display: block !important;
+  margin-top: 0.35rem !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  text-align: left !important;
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+  font-weight: 600 !important;
+}
+
+/* Suggested starting point is a label, not a second button. Sage text only. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="routeRecommendedBadge"] {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  text-align: left !important;
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+  font-size: var(--studio-type-label) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+/* Review list separators — champagne hairlines only. Not a second card. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-step="summary"] [class*="summaryRow"] + [class*="summaryRow"] {
+  border: none !important;
+  border-top: 1px solid #c8b59b !important;
+  padding-top: 0.75rem !important;
+  background: transparent !important;
+}
+
+/* Intake nested page: the champagne tablet window is the same leftover
+   double page Owner circled on Samsung. Lounge + controls. No second card. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-stage="intake"][data-surface="tablet"],
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"][data-surface="page"],
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-studio-surface="tablet"],
+html:has(.studio-environment-app) [data-layout="one-tablet"] #conversation-room-tablet,
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="surfaceStack"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Review nested windows: Voice-film panel leftover radius/padding is not a
+   second surface. Deadline note is copy, not a card. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="nameQuestionPanel"],
+html:has(.studio-environment-app) [data-name-question-panel="true"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="deadlineNote"] {
+  border-radius: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Conversation Plan extras and action row stand alone — same rule as review.
+   Do not invent a third window around Plan details. */
+html:has(.studio-environment-app) [data-plan-actions],
+html:has(.studio-environment-app) [data-surface="studio-plan"] [class*="planDetailsCard"],
+html:has(.studio-environment-app) [data-surface="studio-plan"] .pb-plan-summary__card,
+html:has(.studio-environment-app) [data-phone-plan] [class*="planDetailsCard"],
+html:has(.studio-environment-app) [data-phone-plan] .pb-plan-summary__card {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Plan details is a real control. Outline hugs the words — not a hairline across the mural. */
+html:has(.studio-environment-app) [data-plan-details-toggle="true"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: auto !important;
+  max-width: 100% !important;
+  min-height: 2.75rem !important;
+  padding: 0.55rem 0.85rem !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: 0.85rem !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+  [data-surface="tablet"] .studio-tile--standard,
+  [data-surface="tablet"] .studio-tile--standard-dense,
+  [class*="nameQuestionPanel"]
+)::before,
+html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+  [data-surface="tablet"] .studio-tile--standard,
+  [data-surface="tablet"] .studio-tile--standard-dense,
+  [class*="nameQuestionPanel"]
+)::after {
+  display: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Phone hardware chrome only. The leftover frost sheet must not survive on laptop. */
+@media (max-width: 960px) {
+  html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+    [class*="aluminumEdge"],
+    [class*="glassChrome"],
+    [class*="notch"]
+  ) {
+    display: none !important;
+  }
+}
+
+html:has(.studio-environment-app) [class*="slideHost"],
+html:has(.studio-environment-app) [class*="slideScrim"],
+html:has(.studio-environment-app) [data-studio-surface="activity-panel"],
+html:has(.studio-environment-app) [data-surface="overlay"],
+html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+  [class*="frame"]:not([data-voice-choice="true"]),
+  [class*="screen"]
+) {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) [class*="slideHost"]::before,
+html:has(.studio-environment-app) [class*="slideHost"]::after,
+html:has(.studio-environment-app) [data-studio-surface="activity-panel"]::before,
+html:has(.studio-environment-app) [data-studio-surface="activity-panel"]::after,
+html:has(.studio-environment-app) [data-surface="overlay"]::before,
+html:has(.studio-environment-app) [data-surface="overlay"]::after {
+  display: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="frame"]:not([data-voice-choice="true"]),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="screen"] {
+  border: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="screen"]::before,
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="frame"]:not([data-voice-choice="true"])::before {
+  display: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+  [class*="chip"]:not([class*="chipRow"]):not([class*="chipBlock"]):not([class*="chipGroup"]):not([class*="chips"]),
+  [class*="typeField"],
+  [class*="speakZone"],
+  [data-voice-pref],
+  [data-voice-choice-action]
+):not([aria-pressed="true"]):not([data-selected="true"]) {
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-width: 2px !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+  h1,
+  h2,
+  p,
+  dt,
+  dd,
+  button,
+  a,
+  textarea,
+  [class*="question"],
+  [class*="typeHintOff"],
+  [class*="speakTitle"],
+  [class*="hint"]
+) {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="tablet"] :is(
+  h1[class*="question"],
+  h2[class*="question"]
+) {
+  font-size: var(--studio-type-page) !important;
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+}
+
+html:has(.studio-environment-app) [data-step="ask_business_name"] [class*="titleLead"] {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+}
+
+/* Phone containment: padding + border stay inside 100%. No 100vw. No desktop min-widths. */
+@media (max-width: 960px) {
+  html:has(.studio-environment-app) [data-stage="plan"][data-surface="tablet"],
+  html:has(.studio-environment-app) [data-surface="studio-plan"],
+  html:has(.studio-environment-app) [data-phone-plan],
+  html:has(.studio-environment-app) [data-plan-actions],
+  html:has(.studio-environment-app) [data-stage="plan"] [class*="planVoiceFacts"],
+  html:has(.studio-environment-app) [data-stage="plan"] [class*="planFactCard"],
+  html:has(.studio-environment-app) [data-stage="plan"] [class*="planDetailsCard"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="tablet"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel][data-surface="page"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="studio-plan"] {
+    padding-left: 0.7rem !important;
+    padding-right: 0.7rem !important;
+    box-sizing: border-box !important;
+  }
+
+  html:has(.studio-environment-app) [data-stage="plan"][data-surface="tablet"],
+  html:has(.studio-environment-app) [data-stage="checkout"][data-surface="tablet"],
+  html:has(.studio-environment-app) [data-stage="route"][data-surface="tablet"],
+  html:has(.studio-environment-app) [data-stage="services"][data-surface="tablet"],
+  html:has(.studio-environment-app) [data-stage="opening"][data-surface="tablet"],
+  html:has(.studio-environment-app) [data-stage="intake"][data-surface="tablet"],
+  html:has(.studio-environment-app) [data-panel="checkout"][data-surface="page"],
+  html:has(.studio-environment-app) [data-panel="intake"][data-surface="page"],
+  html:has(.studio-environment-app) [data-surface="studio-plan"] {
+    height: auto !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] :is(
+    .co-card,
+    .co-panel,
+    .pay-paper-card,
+    [class*="checkoutPageSurface"],
+    [class*="checkoutHostSurface"]
+  ):not(.owner-qa):not(.owner-qa *) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-color: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  html:has(.studio-environment-app):has([data-layout="one-tablet"]),
+  html:has(.studio-environment-app):has([data-layout="one-tablet"]) body {
+    overflow-x: clip !important;
+    max-width: 100% !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="roomStage"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="surfaceStack"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="deviceColumn"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="frame"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="screen"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-surface="tablet"],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-answer-dock],
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [data-permanent-communication] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+    [class*="typeField"],
+    [class*="typeLine"],
+    [class*="typeBlock"],
+    [class*="typeHintOff"],
+    [class*="cta"],
+    [class*="sendBtn"],
+    .lobby-entry-film__cta
+  ) {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  html:has(.studio-environment-app) [data-summary-outer-actions] .lobby-entry-film__cta,
+  html:has(.studio-environment-app) [class*="routeConfirmRow"] .lobby-entry-film__cta,
+  html:has(.studio-environment-app) [data-plan-actions] .lobby-entry-film__cta {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  html:has(.studio-environment-app) [class*="expandToggle"] {
+    padding-left: 1.1rem !important;
+    padding-right: 1.1rem !important;
+  }
+
+  html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="typeLine"]::placeholder {
+    white-space: pre-wrap !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+  }
+}
+
+/* One type bubble: wrapper keeps champagne trim. Inner textarea does not. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="typeLine"] {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+
+html:has(.studio-environment-app) [data-name-question-panel="true"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Checkout cards sit on Lounge. Beat the general surface :is() + :not() last-paint. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] .co-card:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] .co-panel:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] .pay-paper-card:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] [class*="checkoutPageSurface"]:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] [class*="checkoutHostSurface"]:not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Intake field cards sit on Lounge. Beat the general surface :is() + :not() last-paint. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__card:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__chips:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__progress:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__actions:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeHostSurface"]:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeSectionBlock"]:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeMaterialsNote"]:not(.owner-qa):not(.owner-qa *),
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="checkoutScopeDisclosure"]:not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [data-confirmed="true"]:not(.owner-qa):not(.owner-qa *) {
+  color: #2f6b54 !important;
+  background: #ffffff !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: 0.55rem !important;
+}
+
+/* Intake fields match opening type: one smoke + champagne trim. White letter. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] :is(
+  input,
+  textarea,
+  select
+):not(.owner-qa) {
+  background: var(--studio-glass-fill) !important;
+  background-color: var(--studio-glass-fill) !important;
+  background-image: none !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  box-shadow: none !important;
+}
+
+/* Ivory cards stay flat. New type-in well is a new node, not compact-field. */
+.studio-environment-app [data-panel="intake"] .route-map-social-intake__card,
+html:has(.studio-environment-app) [data-panel="intake"] .route-map-social-intake__card {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.studio-environment-app [data-panel="intake"] [data-intake-type-well],
+html:has(.studio-environment-app) [data-panel="intake"] [data-intake-type-well] {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.studio-environment-app [data-panel="intake"] [data-intake-type-line],
+html:has(.studio-environment-app) [data-panel="intake"] [data-intake-type-line] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--studio-glass-fill) !important;
+  background-color: var(--studio-glass-fill) !important;
+  background-image: none !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] :is(
+  input,
+  textarea
+):-webkit-autofill,
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] :is(
+  input,
+  textarea
+):-webkit-autofill:hover,
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] :is(
+  input,
+  textarea
+):-webkit-autofill:focus,
+html:has(.studio-environment-app) [data-panel="intake"] [data-intake-type-line]:-webkit-autofill {
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  background-image: none !important;
+  -webkit-box-shadow: 0 0 0 1000px #20262d inset !important;
+  box-shadow: 0 0 0 1000px #20262d inset !important;
+  transition: background-color 99999s ease-out;
+}
+
+/* Shared selection — persistent baby blue on the chosen control only. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+  [class*="chip"]:not([class*="chipRow"]):not([class*="chipBlock"]):not([class*="chipGroup"]):not([class*="chips"]),
+  .route-map-social-intake__chip,
+  [data-voice-pref],
+  [data-voice-choice-action]
+):is([aria-pressed="true"], [data-selected="true"], .route-map-social-intake__chip--selected):not(.owner-qa):not(.owner-qa *) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  background-color: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  color: #ffffff !important;
+}
+
+/* Materials / intended-use groups sit on Lounge. Last-paint used to treat __chips like a chip. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__chips:not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  outline: none !important;
+}
+
+/* Letter jobs + one Board-family top. Do not scream titles. Do not box the header. */
+/* Back, then Voice — same air as the opening questions. */
+html:has(.studio-environment-app) [data-tablet-journey-chrome] {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0.75rem !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+html:has(.studio-environment-app) [data-tablet-journey-chrome] [class*="filmToggle"] {
+  margin: 0 !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .utility-topbar__back,
+  .utility-topbar__back--link,
+  [class*="deckBack"],
+  [class*="backLink"],
+  .lobby-entry-film__back
+) {
+  font-size: var(--studio-type-back) !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.2rem 0 0 !important;
+}
+
+/* Board page actions sit with Back, not the old selected sidebar chip. */
+html:has(.studio-environment-app) .sb-page-actions .sb-sign-out,
+html:has(.studio-environment-app) .sb-page-actions .sb-sign-out .sb-nav__icon,
+html:has(.studio-environment-app) .sb-page-actions .sb-sign-out .sb-nav__label {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+html:has(.studio-environment-app) .sb-page-actions .sb-sign-out__control {
+  background: transparent !important;
+  border: none !important;
+}
+
+html:has(.studio-environment-app) [data-voice-choice-film] [class*="deckBack"] {
+  margin: 0 !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .utility-topbar__title,
+  .sb-header-v3__title
+) {
+  font-size: var(--studio-type-page) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  text-align: left !important;
+  line-height: 1.25 !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .utility-lead,
+  .sb-header-v3__greeting,
+  .sb-project-communication__lead,
+  [class*="privacy"]
+) {
+  font-size: var(--studio-type-helper) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.45 !important;
+}
+
+html:has(.studio-environment-app) .utility-header,
+html:has(.studio-environment-app) .utility-topbar,
+html:has(.studio-environment-app) .utility-subnav,
+html:has(.studio-environment-app) .utility-header__meta,
+html:has(.studio-environment-app) .sb-header-v3 {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) .utility-topbar {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 0.4rem !important;
+}
+
+html:has(.studio-environment-app) .utility-subnav__list {
+  justify-content: flex-start !important;
+  gap: 0.45rem !important;
+}
+
+html:has(.studio-environment-app) .utility-subnav__item {
+  flex: 0 0 7.85rem !important;
+  width: 7.85rem !important;
+}
+
+html:has(.studio-environment-app) .utility-subnav__link {
+  width: 100% !important;
+  height: 4.55rem !important;
+  min-height: 4.55rem !important;
+  padding: 0.4rem 0.3rem !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  font-size: var(--studio-type-small) !important;
+}
+
+html:has(.studio-environment-app) .utility-subnav__label {
+  font-size: var(--studio-type-small) !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+/* Communication and journey stay inside the phone. No exploded type. */
+html:has(.studio-environment-app) :is(
+  .sb-project-communication,
+  .fs-project-communication,
+  .sb-progress-panel,
+  .sb-campaign__col--journey
+) {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-wrap: break-word !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .sb-project-communication,
+  .fs-project-communication
+) :is(h1, h2, h3, p, li, label, legend, span, textarea, button, a) {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  white-space: normal !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .sb-project-communication__label,
+  .sb-project-communication__intent-legend
+) {
+  color: var(--studio-label, #8ff5c6) !important;
+  font-size: var(--studio-type-label) !important;
+  letter-spacing: 0.04em !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .sb-project-communication__item,
+  .sb-project-communication__notice,
+  .sb-project-communication__studio-request,
+  .sb-project-communication__machine-answer,
+  .sb-progress-panel,
+  .sb-progress-panel__body,
+  .campaign-journey,
+  .utility-header__aside
+) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) [class*="addMore"],
+html:has(.studio-environment-app) [data-add-more],
+html:has(.studio-environment-app) .sb-materials-intake__more,
+html:has(.studio-environment-app) textarea,
+html:has(.studio-environment-app) select {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .sb-project-communication__intent-option[data-selected="true"],
+  .sb-project-communication__intent-option:has(input:checked)
+) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border-color: #bfd8f2 !important;
+}
+
+/* Skip for now: coral trim, white word. Beat stacked secondary last-paint. */
+html:has(.studio-environment-app) [data-skip-action] :is(button, a, [role="button"]):not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]),
+html:has(.studio-environment-app) button[data-skip-action]:not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]),
+html:has(.studio-environment-app) [class*="btnSkipNow"]:not(.owner-qa):not(.owner-qa *) {
+  border: 2px solid #d94e2b !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Intake page stays communication white. Only Payment received / Services confirmed
+   are the opposite: white well + sage writing. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [data-confirmed="true"]:not(.owner-qa):not(.owner-qa *) {
+  color: #2f6b54 !important;
+  -webkit-text-fill-color: #2f6b54 !important;
+  background: #ffffff !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: 0.55rem !important;
+}
+
+/* Choose Your Services — selected card needs a stronger baby-blue than 22%. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] [class*="jobCard"][data-selected="true"] {
+  background: color-mix(in srgb, #bfd8f2 48%, transparent) !important;
+  background-color: color-mix(in srgb, #bfd8f2 48%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+}
+
+/* Prices stay one number. Last-paint wrap was splitting $69 and $349. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] :is(
+  [class*="jobPrice"],
+  [class*="builderSummary"]
+) {
+  white-space: nowrap !important;
+  overflow-wrap: normal !important;
+  word-break: keep-all !important;
+  flex-shrink: 0 !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="builder"] [class*="builderSummary"] {
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+}
+
+/* Studio Plan amount is the number customers pay. White, not sage. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [class*="planFactValueLarge"] {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Plan Details: View Scope + revision policy are links, not bubbles. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] :is(
+  .pb-plan-summary__view-scope,
+  .pb-plan-summary__policy-toggle
+):not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not([class*="danger"]):not([class*="destructive"]):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-selected="true"]):not([aria-pressed="true"]) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em !important;
+}
+
+/* Intake older-eyes pass. Next Step size is the helper size. Give the stack air. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeSectionHeading"] {
+  display: block !important;
+  margin-top: 1.15rem !important;
+  margin-bottom: 0.55rem !important;
+  font-size: var(--studio-type-section) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  line-height: 1.3 !important;
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] :is(
+  [class*="intro"],
+  [class*="checkoutScopeDisclosure"],
+  [class*="intakeDraftStatus"],
+  [class*="intakeContinueHint"],
+  .route-map-social-intake__progress strong,
+  .route-map-social-intake__progress span,
+  .route-map-social-intake__card-copy p,
+  .route-map-social-intake__next-step strong,
+  .route-map-social-intake__next-step span
+) {
+  font-size: var(--studio-type-copy) !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intro"] {
+  margin-bottom: 0.85rem !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="checkoutScopeDisclosure"] {
+  margin-top: 0.35rem !important;
+  margin-bottom: 1rem !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeDraftStatus"] {
+  display: block !important;
+  margin-top: 0.35rem !important;
+  margin-bottom: 1rem !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__progress {
+  display: grid !important;
+  gap: 0.45rem !important;
+  margin: 0.85rem 0 1.2rem !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__next-step {
+  display: grid !important;
+  gap: 0.35rem !important;
+  margin: 0 0 1rem !important;
+  padding: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Actions dock is not a second container around Next Step. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__actions {
+  display: grid !important;
+  grid-template-columns: none !important;
+  gap: 0.65rem !important;
+  margin: 0.35rem 0 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  position: static !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Required = coral. Optional = sage. Two signals, not one wash. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-intake__req {
+  font-size: var(--studio-type-copy) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.03em !important;
+  color: #d94e2b !important;
+  -webkit-text-fill-color: #d94e2b !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-intake__opt {
+  font-size: var(--studio-type-copy) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.03em !important;
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] [class*="intakeContinueHint"] {
+  margin-top: 0.65rem !important;
+  font-size: var(--studio-type-copy) !important;
+  line-height: 1.5 !important;
+}
+
+/* Required sits on the title. Leave air before the helper under it. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__card-copy {
+  display: grid !important;
+  gap: 0.85rem !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="intake"] .route-map-social-intake__card-copy p {
+  margin-top: 0 !important;
+}
+
+/* Checkout review checkbox: white, bigger, readable. Not sage. */
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] .pay-acknowledgment__checkbox {
+  align-items: flex-start !important;
+  gap: 0.85rem !important;
+  margin-top: 0.35rem !important;
+  padding: 0.95rem 1rem !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: var(--studio-radius) !important;
+  background: var(--studio-glass-fill) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-copy) !important;
+  font-weight: 650 !important;
+  line-height: 1.5 !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] .pay-acknowledgment__checkbox span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-size: var(--studio-type-copy) !important;
+  font-weight: 650 !important;
+  line-height: 1.5 !important;
+}
+
+html:has(.studio-environment-app) [data-layout="one-tablet"] [data-panel="checkout"] .pay-acknowledgment__checkbox input {
+  width: 1.35rem !important;
+  height: 1.35rem !important;
+  margin-top: 0.15rem !important;
+  flex-shrink: 0 !important;
+}
+
+/* Best For is the "this is for" label on every service. Sage, readable, not smashed. */
+html:has(.studio-environment-app) :is(
+  [class*="bestForLabel"],
+  [class*="jobBestForLabel"],
+  .pb-drawer__best-for-label
+) {
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+  font-size: var(--studio-type-subtitle) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.03em !important;
+  text-transform: none !important;
+  line-height: 1.35 !important;
+}
+
+/* Paper scale last paint. Four sizes only: title 20, subtitle 18, copy 16, small 14. */
+html:has(.studio-environment-app) .studio-environment-app,
+html:has(.studio-environment-app) .studio-environment-app :is(
+  p,
+  li,
+  dd,
+  span,
+  small,
+  strong,
+  em,
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  td,
+  th,
+  legend,
+  cite,
+  time,
+  figcaption,
+  output
+):not(.owner-qa):not(.owner-qa *) {
+  font-size: var(--studio-type-copy) !important;
+}
+
+html:has(.studio-environment-app) :is(
+  dt,
+  dt *,
+  label,
+  label *,
+  .utility-subnav__link,
+  .utility-subnav__link *,
+  .utility-subnav__label,
+  .utility-subnav__label *,
+  .sb-card__tab,
+  .sb-card__tab *,
+  .fd-hero__badge,
+  .fd-hero__badge *,
+  [class*="eyebrow"],
+  [class*="eyebrow"] *,
+  [class*="__label"],
+  [class*="__label"] *,
+  [class*="planFactLabel"],
+  [class*="planFactLabel"] *,
+  [class*="beforeCheckoutHeading"],
+  [class*="beforeCheckoutHeading"] *,
+  [class*="requiredMeta"],
+  [class*="requiredMeta"] *,
+  .utility-topbar__back,
+  .utility-topbar__back *,
+  .utility-topbar__back--link,
+  [class*="deckBack"],
+  [class*="deckBack"] *,
+  [class*="backLink"],
+  [class*="backLink"] *,
+  .lobby-entry-film__back,
+  .lobby-entry-film__back *
+):not(.owner-qa):not(.owner-qa *) {
+  font-size: var(--studio-type-small) !important;
+}
+
+html:has(.studio-environment-app) :is(
+  h2,
+  h2 *,
+  h3,
+  h3 *,
+  h4,
+  h4 *,
+  [class*="intakeSectionHeading"],
+  [class*="intakeSectionHeading"] *,
+  [class*="bestForLabel"],
+  [class*="bestForLabel"] *,
+  [class*="jobBestForLabel"],
+  [class*="jobBestForLabel"] *,
+  .pb-drawer__best-for-label,
+  .pb-drawer__best-for-label *,
+  [class*="planFactValueLarge"],
+  [class*="planFactValueLarge"] *
+):not(.owner-qa):not(.owner-qa *) {
+  font-size: var(--studio-type-subtitle) !important;
+}
+
+html:has(.studio-environment-app) :is(
+  h1,
+  h1 *,
+  .utility-title,
+  .utility-title *,
+  .utility-topbar__title,
+  .utility-topbar__title *,
+  .sb-header-v3__title,
+  .sb-header-v3__title *,
+  h1[class*="question"],
+  h1[class*="question"] *,
+  h2[class*="title"],
+  h2[class*="title"] *
+):not(.owner-qa):not(.owner-qa *) {
+  font-size: var(--studio-type-title) !important;
+}
+
+/* Help Center on-this-page links are words, not bubbles. */
+html:has(.studio-environment-app) .hc-toc__link:not(.owner-qa):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  min-height: 0 !important;
+  padding: 0.15rem 0 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em !important;
+  font-size: var(--studio-type-copy) !important;
+  font-weight: 600 !important;
+}
+
+/* Project Record: facts sit on the page, not a second bubble. */
+html:has(.studio-environment-app) :is(
+  .cd-overview,
+  .cd-overview__row,
+  .cd-timeline,
+  .cd-timeline__item
+):not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+html:has(.studio-environment-app) :is(
+  .cd-overview__row,
+  .cd-timeline__item
+) {
+  grid-template-columns: auto 1fr !important;
+}
+
+html:has(.studio-environment-app) .cd-timeline__date {
+  white-space: nowrap !important;
+}
+
+/* Information update type must be a usable field, not a tiny bubble. */
+html:has(.studio-environment-app) .cd-information-update__select {
+  display: block !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  min-height: 3.25rem !important;
+  padding: 0.85rem 1rem !important;
+  font-size: var(--studio-type-copy) !important;
+  font-weight: 600 !important;
+}
+
+/* Add more is a text control, not a bubble. */
+html:has(.studio-environment-app) .sb-materials-intake__toggle:not(.owner-qa):not(.owner-qa *):not([class*="primary"]):not(:active):not(.is-pressed):not([data-pressed="true"]) {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  min-height: 0 !important;
+  padding: 0.2rem 0 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em !important;
+  font-size: var(--studio-type-copy) !important;
+  font-weight: 600 !important;
+}
+
+/* Billing leftover green joins the one brighter sage. */
+html:has(.studio-environment-app) :is(
+  .sb-refund-request__summary,
+  .sb-refund-request__label
+) {
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+}

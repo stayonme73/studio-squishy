@@ -23,11 +23,11 @@
 /* Phone glass + Board surface remaps */
 @import "./mobile-customer-spine-surfaces.css";
 @import "./studio-environment-shell.css";
-
 @import "./mobile-journey.css";
-@import "./owner-qa.css";
 @import "./studio-review-mobile-tab.css";
 @import "./studio-kitchen.css";
+@import "./studio-visual-system-v2.css";
+@import "./owner-qa.css";
 
 :root {
   --background: var(--board-family-cream);
@@ -63,8 +63,9 @@
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  color: var(--studio-ink, #20262d);
+  font-family: var(--font-studio-board-sans), "Inter", system-ui, sans-serif;
+  font-weight: 400;
 }
 
 /* --- Entrance environment (Step 1) --- */

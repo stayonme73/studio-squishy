@@ -1,0 +1,32 @@
+---
+description: Project Alpha work-state telemetry. No silent ACTIVE→IDLE. Glance page is source of truth.
+alwaysApply: true
+---
+
+# Work State Notification Protocol (LOCKED 2026-09-17)
+
+Authority: `docs/launch/studio-operating-daily-operating-bridge-1/PROJECT-ALPHA-WORK-STATE-NOTIFICATION-PROTOCOL.md` · `src/config/studio-work-state-notification-v1.ts`
+
+Glance page: `docs/launch/PROJECT-ALPHA-WORK-HEARTBEAT.html`. Pulse: `npm run work-heartbeat:pulse`.
+
+States: ACTIVE WORK · WAITING ON OWNER · WAITING ON SYSTEM · IDLE · STALLED / HUNG · STOPPED.
+
+- ACTIVE WORK means authorized package progress only. Heartbeat, watchdog, alerts, status pages, and documentation do **not** keep ACTIVE green.
+- Current authorized work: **CLOSE MOBILE CUSTOMER JOURNEY CERTIFICATION**. Visual system is **ACCEPTED AND FROZEN**. Do not redesign accepted surfaces. Contrast revision locked 2026-09-20: one shared veil 40% + light smoke 28%; bright mint labels #8FF5C6; paper type 20/18/16/14. Do not restyle accepted surfaces.
+- ACTIVE → ACTIVE progress = heartbeat only. No sound.
+- Slice complete = `npm run work-heartbeat:pulse -- --slice-done`. Audible + glance page. Tagia must hear it.
+- Any leave of ACTIVE = notify immediately. No silent change.
+- Stop, stall, hung, idle = RED + audible + open attention. Never a quiet label.
+- Resume = visible + glance page. Not a siren.
+- WAITING ON OWNER = RED + audible + exact action.
+- Keep `npm run work-heartbeat:watchdog` running so a dead ACTIVE pulse cannot stay silent.
+- Finishing a slice does **not** permit IDLE if the package is open and safe authorized work remains. Continue the next slice.
+- `--idle` is refused unless `--no-authorized-work`.
+- 10 minutes with no ACTIVE pulse = **STALLED / HUNG**, not a quiet IDLE.
+- Do not display ACTIVE on a dead heartbeat.
+- Attention (GREEN / YELLOW / RED) and work state are independent. YELLOW is a badge, not a replacement screen.
+- ACTIVE + YELLOW keeps the heartbeat moving. After YELLOW ack, return to the live heartbeat.
+- ACTIVE + RED interrupts until acknowledged, then returns to the heartbeat if work resumes.
+- Do not require Tagia to inspect Cursor to learn the state.
+
+No merge. No push unless Tagia authorizes.

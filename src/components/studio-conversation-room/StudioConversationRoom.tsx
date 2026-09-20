@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import HelpCenterPanel from "@/components/studio-conversation-room/HelpCenterPanel";
+import StudioPointerSettleShield from "@/components/studio-conversation-room/StudioPointerSettleShield";
 import StudioPresenceRail from "@/components/studio-conversation-room/StudioPresenceRail";
 import StudioWorkspace from "@/components/studio-conversation-room/StudioWorkspace";
 import styles from "@/components/studio-conversation-room/studio-conversation-room.module.css";
@@ -241,6 +242,7 @@ export default function StudioConversationRoom({
       data-active-panel={activePanel}
       data-slide-open={slideOpen ? "true" : "false"}
     >
+      <StudioPointerSettleShield />
       <div className={styles.roomStage}>
         <div className={styles.workRow}>
           {hasSideRail ? (
@@ -284,7 +286,7 @@ export default function StudioConversationRoom({
             >
               {workspace}
             </StudioWorkspace>
-            {nameQuestion ? null : (
+            {nameQuestion || hidePhoneScaffolding ? null : (
             <p className={styles.surfaceCaption} data-caption="tablet">
               {surfaceCaptions.tablet}
             </p>

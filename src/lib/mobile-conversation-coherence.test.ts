@@ -53,7 +53,11 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
     expect(tablet).toContain("answerDock");
     expect(tablet).toContain("modeControls");
     expect(tablet).toContain("styles.answerDock");
+    expect(tablet).toContain('data-answer-dock="pinned"');
+    expect(tablet).toContain('voiceMode === "on" ? answerDock');
+    expect(tablet).toContain("voiceMode !== \"on\"");
     expect(tablet).toContain("answerAccepted");
+    expect(tablet).toContain("!answerDock && question.bubbles.length > 0");
   });
 
   it("makes selected chips visibly distinct even under sticky Samsung hover", () => {
@@ -67,6 +71,32 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
     expect(css).toContain(".chip[data-selected=\"true\"]:hover");
     expect(css).toContain("background: var(--mc-denim, #547c92)");
     expect(css).toContain("color: var(--mc-ivory, #f7f4ee)");
+    expect(css).toContain(
+      '.root[data-step="ask_project_need"] .chipRow',
+    );
+    expect(css).toContain(
+      '.root[data-step="ask_business_name"] .chipRow',
+    );
+    expect(css).toContain(
+      '.root[data-step="ask_deadline"] .chipRow',
+    );
+    expect(css).toContain(
+      '.root[data-step="ask_materials"] .chipRow',
+    );
+    expect(css).toContain("grid-template-columns: repeat(2, minmax(0, 1fr))");
+    expect(css).toContain("[data-skip-action]");
+    expect(css).toContain(".btnSkipNow");
+    expect(css).toContain('[data-stage="opening"]:has([data-answer-dock="pinned"])');
+    const tabletView = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/StudioGuideTabletView.tsx",
+      ),
+      "utf8",
+    );
+    expect(tabletView).toContain('data-skip-action="true"');
+    expect(tabletView).toContain("skipAction");
+    expect(tabletView).toContain("btnSkipNow");
   });
 
   it("hides required messaging once a bubble or typed answer is accepted", () => {
@@ -79,6 +109,7 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
     );
     expect(comm).toContain("hasAcceptedAnswer");
     expect(comm).toContain("showValidationError");
+    expect(comm).toContain("prev.textDraft === next.textDraft");
   });
 
   it("does not use a redundant OR divider in the Speak/Type question cluster", () => {
@@ -96,9 +127,24 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
       join(process.cwd(), "src/config/conversation-room-guide-v1.ts"),
       "utf8",
     );
+    expect(copy).toContain('speakHint: "Tap the mic to speak."');
+    expect(copy).toContain('typeHintOff: "Start typing below."');
     expect(copy).toContain(
-      'speakHint: "Tap the mic to speak or start typing below."',
+      'speakHintWithType: "Tap the mic to speak or start typing below."',
     );
+    const commPanel = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/StudioGuideCommPanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(commPanel).toContain('data-voice-mode={voiceMode}');
+    expect(commPanel).toContain('voiceMode === "on"');
+    expect(commPanel).toContain('voiceMode === "off"');
+    expect(commPanel).toContain("typeHintOff");
+    expect(commPanel).toContain("cols={1}");
+    expect(commPanel).not.toContain("or start typing below");
   });
 
   it("does not show This answer is required until Continue validation fails", () => {
@@ -136,6 +182,8 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
     expect(askBlock.indexOf("requiredMeta")).toBeLessThan(
       askBlock.indexOf("<h1 className={styles.question}>"),
     );
+    expect(askBlock).not.toContain("!answerAccepted");
+    expect(askBlock).toContain('data-required-meta="true"');
     expect(tablet).not.toContain("questionHeader");
     const css = readFileSync(
       join(
@@ -147,7 +195,8 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
     expect(css).toContain(".requiredMeta");
     expect(css).toContain("color: var(--mc-eucalyptus, #456b5a)");
     expect(css).not.toContain("flex: 1 1 12rem");
-    expect(css).toContain("clamp(1.18rem, 4.9vw, 1.45rem)");
+    expect(css).toContain("font-size: var(--studio-type-page)");
+    expect(css).not.toContain("clamp(1.18rem, 4.9vw, 1.45rem)");
   });
 });
 
@@ -404,7 +453,7 @@ describe("MJ-D14 Mobile Review Together / Route page coherence", () => {
 });
 
 describe("MJ-D15 — materials bubble vs optional details", () => {
-  it("does not copy multi-select bubbles into the details field", () => {
+  it("writes every selected materials chip into the extras field", () => {
     const runtime = readFileSync(
       join(
         process.cwd(),
@@ -419,7 +468,7 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
       runtime.indexOf("setSelectedBubbles([bubble])", multiStart),
     );
     expect(multiBlock).toContain("return;");
-    expect(multiBlock).not.toContain("writeTextDraft");
+    expect(multiBlock).toContain("writeTextDraft(next.join(\", \"))");
   });
 
   it("keeps materials details optional and does not narrate chip selection", () => {
@@ -447,7 +496,7 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     expect(tablet).not.toContain("data-recorded-choice");
     expect(tablet).not.toContain("The Studio recorded");
     expect(tablet).not.toContain("recordedMaterialsSelection");
-    expect(tablet).toContain("materialsDetailsHint");
+    expect(tablet).not.toContain("materialsDetailsHint");
     expect(tablet).not.toContain("writeTextDraft");
   });
 
@@ -467,6 +516,7 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
       runtime.indexOf("const summaryConfirm ="),
     );
     expect(questionGlassBlock).toContain('step === "summary"');
+    expect(questionGlassBlock).toContain('step === "confirmed"');
     const tabletView = readFileSync(
       join(
         process.cwd(),
@@ -477,6 +527,10 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     expect(tabletView).toContain("SamsungDenimCta");
     expect(tabletView).toContain("{v.confirmLabel}");
     expect(tabletView).toContain("{v.correctLabel}");
+    expect(tabletView).toContain("styles.summaryOuterActions");
+    expect(tabletView).toContain("styles.summaryLine");
+    expect(tabletView).toContain("{v.summaryIntroLead}");
+    expect(tabletView).toContain("{v.summaryIntroAsk}");
     expect(tabletView).toContain("SamsungDenimCta");
     expect(tabletView).toContain("styles.btnCorrect");
     const tabletCss = readFileSync(
@@ -487,7 +541,12 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
       "utf8",
     );
     expect(tabletCss).toContain('.root[data-step="summary"] .question');
+    expect(tabletCss).toContain(".summaryLine");
+    expect(tabletCss).toContain(".summaryOuterActions");
+    expect(tabletCss).toContain("white-space: nowrap");
     expect(tabletCss).toContain('.root[data-step="summary"] .summaryRow dt');
+    expect(tabletCss).toContain(".root[data-step=\"summary\"] .summaryRow + .summaryRow");
+    expect(tabletCss).toContain("border-top: 1px solid #c8b59b");
     expect(tabletCss).toContain(".btnCorrect");
     expect(tabletCss).toContain("var(--mc-coral, #d94e2b)");
     const workspaceCss = readFileSync(
@@ -500,8 +559,27 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     expect(workspaceCss).toContain(
       '.frame[data-name-question="true"]:has([data-step="summary"])',
     );
+    expect(workspaceCss).toContain(
+      '.frame[data-name-question="true"]:has([data-stage="opening"]) .nameQuestionPanel',
+    );
+    expect(workspaceCss).toContain(
+      '.frame[data-name-question="true"]:has([data-step="summary"]) .nameQuestionPanel',
+    );
+    expect(workspaceCss).toContain(
+      '.frame[data-name-question="true"]:has([data-stage="plan"]) .nameQuestionPanel',
+    );
     expect(workspaceCss).toContain("margin-bottom: 2.15rem");
     expect(workspaceCss).toContain("--studio-review-mobile-bottom");
+    expect(tabletCss).toContain("\n.deadlineNote {");
+    expect(tabletCss).toContain("overflow-x: clip");
+    const deadlineNoteBlock = tabletCss.slice(
+      tabletCss.indexOf("\n.deadlineNote {"),
+      tabletCss.indexOf("\n.summaryRow dt {"),
+    );
+    expect(deadlineNoteBlock).toContain("border: none");
+    expect(deadlineNoteBlock).toContain("border-radius: 0");
+    expect(deadlineNoteBlock).toContain("background: transparent");
+    expect(deadlineNoteBlock).not.toContain("border-radius: 0.65rem");
     expect(tabletCss).not.toContain("#355C7D");
     expect(tabletCss).not.toContain("#2C3E50");
     const room = readFileSync(
@@ -513,6 +591,11 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     );
     expect(room).toContain("hidePhoneScaffolding");
     expect(room).toContain("data-phone-quiet-chrome");
+    expect(room).toContain("nameQuestion || hidePhoneScaffolding");
+    expect(runtime).toContain("openingAlreadySaved");
+    expect(runtime).toContain('step === "confirmed"');
+    expect(tabletView).toContain('step === "summary" || step === "confirmed"');
+    expect(tabletView).not.toContain("confirmedSavedBadge");
   });
 
   it("keeps Choose Your Route as select-then-continue without tablet scaffolding", () => {
@@ -530,7 +613,7 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     expect(preview).toContain("setPreviewRoadId(roadId)");
     expect(preview).not.toContain('openPanel("route")');
     expect(runtime).toContain('const routeChoose = stage === "route"');
-    expect(runtime).toContain("(servicesStage && !isPhone)");
+    expect(runtime).toContain("voiceNarration != null");
     expect(runtime).toContain("phonePlanStage");
     const chooser = readFileSync(
       join(
@@ -559,7 +642,8 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     expect(panelCss).toContain(
       '.sheet[data-surface="tablet"] .routeExpand[data-expanded="true"]',
     );
-    expect(panelCss).toContain("box-shadow: inset 0 0 0 2px #547c92");
+    expect(panelCss).toContain("Selected state is the tile border");
+    expect(panelCss).not.toContain("box-shadow: inset 0 0 0 2px #547c92");
     expect(panelCss).toContain(
       '.sheet[data-surface="tablet"] .routeExpand[data-recommended="true"]',
     );
@@ -637,7 +721,10 @@ describe("MJ-D18 — stale bubble selection must not carry forward", () => {
       ),
       "utf8",
     );
+    expect(runtime).toContain("beginStudioPointerSettle");
     expect(runtime).toContain("disarmBubblesForSameGesture");
+    expect(runtime).toContain("disarmContinueForSameGesture");
+    expect(runtime).toContain("if (!continueArmedRef.current) return");
     expect(runtime).toContain("if (!bubbleArmedRef.current) return");
     expect(runtime).toContain("restoreSelection");
     expect(runtime).toContain("visibleBubblesForStoredAnswer");
@@ -692,6 +779,8 @@ describe("MJ-D19 Mobile Choose Your Services hierarchy", () => {
     );
     expect(serviceList).toContain("data-builder-route-context");
     expect(serviceList).toContain("data-service-list");
+    expect(serviceList).toContain('data-tablet-journey-chrome="true"');
+    expect(serviceList).toContain("topControls");
     expect(serviceList).toContain("servicesBackToRoutesLabel");
     expect(serviceList).toContain("Close activity panel");
     expect(serviceList).toContain("PROJECT_BUILDER_V1.totalLabel");
@@ -998,6 +1087,8 @@ describe("Mobile route → services → plan navigation simplification", () => {
       "utf8",
     );
     expect(tablet).toContain("extrasInPlace={phoneLayout}");
+    expect(tablet).toContain("hideActions={phoneLayout}");
+    expect(tablet).toContain("ConversationStudioPlanActions");
     const plan = readFileSync(
       join(
         process.cwd(),
@@ -1006,6 +1097,11 @@ describe("Mobile route → services → plan navigation simplification", () => {
       "utf8",
     );
     expect(plan).toContain("studioPlanDetailsToggle");
+    expect(plan).not.toContain("studioPlanDetailsOpenHint");
+    expect(plan).not.toContain("planDetailsMark");
+    expect(plan).toContain('data-plan-details-toggle="true"');
+    expect(plan).toContain("useSamsungTapActivate");
+    expect(plan).not.toContain("scrollIntoView");
     expect(plan).toContain("studioPlanEditServicesLabel");
     expect(plan).toContain("data-plan-actions");
     expect(plan).toContain("extrasInPlace");
@@ -1022,7 +1118,7 @@ describe("Mobile route → services → plan navigation simplification", () => {
     );
     expect(planCss).toContain(".planTablet .eyebrow");
     expect(planCss).toContain(".planTablet .question");
-    expect(planCss).toContain("font-size: 1.2rem");
+    expect(planCss).toContain("font-size: var(--studio-type-page)");
     expect(planCss).toContain("font-size: 1.12rem");
     expect(planCss).toContain("font-size: 1.22rem");
     expect(planCss).toContain(
@@ -1074,6 +1170,10 @@ describe("Mobile route → services → plan navigation simplification", () => {
     expect(checkout).toContain("v.checkoutLead");
     expect(checkout).toContain("phonePage ? null : (");
     expect(checkout).toContain("v.checkoutScopeDisclosure");
+    expect(checkout).toContain("SamsungDeckBack");
+    expect(checkout).toContain("v.checkoutBackToPlanLabel");
+    expect(planCss).toContain(".summaryOuterActions .lobby-entry-film__cta");
+    expect(planCss).toContain("justify-content: center");
     const activityCss = readFileSync(
       join(
         process.cwd(),
@@ -1081,6 +1181,26 @@ describe("Mobile route → services → plan navigation simplification", () => {
       ),
       "utf8",
     );
+    expect(activityCss).toContain("object-fit: contain");
+    expect(activityCss).toContain("padding: 0.85rem 0.7rem 0.9rem");
+    expect(activityCss).toContain(".sheet[data-panel=\"builder\"][data-surface=\"page\"] .eyebrow");
+    expect(readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationServiceList.tsx",
+      ),
+      "utf8",
+    )).not.toContain("servicesStepLabel");
+    expect(readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationStudioPlanTablet.tsx",
+      ),
+      "utf8",
+    )).not.toContain("studioPlanStepLabel");
+    expect(activityCss).toContain(".expandToggle");
+    expect(activityCss).toContain("padding: 0.65rem 1.1rem");
+    expect(activityCss).toContain(".routeConfirmRow .lobby-entry-film__cta");
     const pageSurface = activityCss.slice(
       activityCss.indexOf(".checkoutPageSurface {"),
       activityCss.indexOf(".checkoutPageSurface :global(.pay-shell)"),
@@ -1101,6 +1221,32 @@ describe("Mobile route → services → plan navigation simplification", () => {
     expect(intakePanel).toContain("phonePage = false");
     expect(intakePanel).toContain("phonePage ? null : (");
     expect(intakePanel).toContain("paidAcknowledgment");
+    expect(intakePanel).toContain("intakePaidAckItem");
+    expect(intakePanel).toContain('data-confirmed={item.confirmed ? "true" : "false"}');
+    expect(intakePanel).not.toContain("data-intake-well");
+    const intakeTablet = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/StudioGuideTabletView.tsx",
+      ),
+      "utf8",
+    );
+    expect(intakeTablet).toContain("intakeTabletStatus?.paymentReceived");
+    expect(intakeTablet).toContain("intakeTabletStatus?.servicesConfirmed");
+    expect(readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    )).toContain("readCurrentCampaignHydrated()?.paymentReceivedAt");
+    expect(readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    )).toContain('writeTextDraft(next.join(", "))');
     expect(intakePanel).toContain('data-surface={phonePage ? "page" : "overlay"}');
     expect(intakePanel).toContain("phoneLayout={phonePage}");
     const intakeForm = readFileSync(
@@ -1112,10 +1258,23 @@ describe("Mobile route → services → plan navigation simplification", () => {
     );
     expect(intakeForm).toContain('data-intake-layout={phoneLayout ? "phone" : "desktop"}');
     expect(intakeForm).toContain("route-map-social-intake__card-head");
+    expect(intakeForm).toContain('data-selected={selected ? "true" : "false"}');
     expect(intakeForm).toContain("questions answered");
-    expect(intakeForm).toContain("Complete the required questions to continue.");
+    expect(intakeForm).toContain("route-map-social-intake__next-step");
+    expect(intakeForm).not.toContain(
+      "Complete the required questions to continue.",
+    );
     expect(intakeForm).toContain("PHONE_MATERIALS_HINT");
     expect(intakeForm).toContain('data-intake-action="draft"');
+    expect(intakeForm).toContain('autoComplete="off"');
+    expect(intakeForm).toContain("paintKey");
+    expect(intakeForm).toContain("unlockBrowserPaint");
+    expect(intakeForm).toContain("siw-");
+    expect(intakeForm).toContain("data-intake-type-line");
+    expect(intakeForm).toContain("intakeTypeWell");
+    expect(intakeForm).not.toContain("route-map-social-intake__compact-field");
+    expect(activityCss).toContain(".intakeTypeWell");
+    expect(activityCss).toContain(".intakeTypeLine");
     const phoneIntakeCss = activityCss.slice(
       activityCss.indexOf(
         '.sheet[data-panel="intake"][data-surface="page"]',
@@ -1132,12 +1291,102 @@ describe("Mobile route → services → plan navigation simplification", () => {
     expect(phoneIntakeCss).toContain(
       ":global(.route-map-social-intake__chip--selected)",
     );
-    expect(phoneIntakeCss).toContain("background: var(--mc-yellow, #f7c900)");
+    expect(phoneIntakeCss).toContain("background: color-mix(in srgb, #bfd8f2 22%, transparent)");
+    expect(phoneIntakeCss).toContain('aria-pressed="true"');
     expect(phoneIntakeCss).toContain(
       ":global(.route-map-secondary-btn):not(:disabled)",
     );
     expect(phoneIntakeCss).toContain(
       ":global(.route-map-primary-btn):disabled",
+    );
+    expect(phoneIntakeCss).toContain("gap: 0.85rem");
+    expect(phoneIntakeCss).toContain(":global(.route-map-social-intake__chips)");
+    expect(phoneIntakeCss).toContain("background: transparent");
+    expect(phoneIntakeCss).toContain("padding: 0.75rem 0.85rem");
+    expect(phoneIntakeCss).toContain(".checkoutScopeDisclosure");
+    expect(activityCss).toContain("[data-tablet-journey-chrome]");
+    expect(activityCss).toContain("gap: 0.75rem");
+    expect(activityCss).toContain(".intakePaidAck");
+    expect(activityCss).toContain("gap: 0.85rem");
+    expect(activityCss).toContain(".intakePaidAckItem[data-confirmed=\"true\"]");
+    expect(activityCss).toContain("rgba(46, 120, 80, 0.28)");
+    expect(activityCss).toContain("color: #ffffff");
+  });
+});
+
+describe("Conversation journey chrome — Back then Voice through Intake", () => {
+  it("keeps Back above Voice On/Off on route, plan, services, checkout, and intake", () => {
+    const route = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationRouteChoose.tsx",
+      ),
+      "utf8",
+    );
+    expect(route.indexOf("onDeckBack && deckBackLabel")).toBeLessThan(
+      route.indexOf("{topControls}"),
+    );
+    const plan = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationStudioPlanTablet.tsx",
+      ),
+      "utf8",
+    );
+    expect(plan.indexOf("onDeckBack && deckBackLabel")).toBeLessThan(
+      plan.indexOf("{topControls}"),
+    );
+    const services = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationServiceList.tsx",
+      ),
+      "utf8",
+    );
+    expect(services.indexOf("servicesBackToRouteLabel")).toBeLessThan(
+      services.indexOf("{topControls}"),
+    );
+    const checkout = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationCheckoutPanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(checkout).toContain("topControls");
+    expect(checkout.indexOf("checkoutBackToPlanLabel")).toBeLessThan(
+      checkout.indexOf("{topControls}"),
+    );
+    const intake = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationIntakePanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(intake).toContain("deckBackLabel");
+    expect(intake).toContain("onDeckBack");
+    const runtime = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/ConversationRoomRuntime.tsx",
+      ),
+      "utf8",
+    );
+    expect(runtime).toContain("intakeBackToCheckoutLabel");
+    expect(runtime).toContain('stage === "checkout"');
+    expect(runtime).toContain('stage === "intake"');
+    const tablet = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/StudioGuideTabletView.tsx",
+      ),
+      "utf8",
+    );
+    expect(tablet).toContain("renderGuideQuestionTitle");
+    const summary = tablet.slice(tablet.indexOf("{isSummary && !correcting"));
+    expect(summary.indexOf("{modeControls}")).toBeLessThan(
+      summary.indexOf("summaryIntroLead"),
     );
   });
 });

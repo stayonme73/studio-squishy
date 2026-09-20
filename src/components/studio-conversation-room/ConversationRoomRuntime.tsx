@@ -46,6 +46,8 @@ import {
   bootConversationProjectDraft,
   bridgeConversationPlanToCampaign,
   clearConversationGuideLocals,
+  detachCurrentCustomerBrowserSession,
+  resolveLobbyConversationBeginInvite,
   guideDraftFromOpening,
   openingFromGuideDraft,
   clearRouteRecommendation,
@@ -82,10 +84,16 @@ import {
 } from "@/lib/project-intake-tablet-status";
 import { saveRouteMapJourneyStep } from "@/lib/route-map-campaign";
 import { readUsableIntakeDraftAnswers } from "@/lib/route-map-intake-continuity";
+import { needsFlyerProductionIntakeCorrection } from "@/lib/project-intake-flyer-production";
 import {
   applyServerPaymentTruthToLocalCampaign,
   readCurrentCampaignHydrated,
 } from "@/lib/studio-board-campaign";
+import {
+  bindPaidIntakeCampaignForResume,
+  canOpenIntakeForCampaign,
+  hydrateWorkingDraftFromPaidIntakeCampaign,
+} from "@/lib/studio-intake-resume";
 import {
   confirmSandboxCheckoutClient,
   reconcileCheckoutClient,
@@ -98,7 +106,11 @@ import {
   markPreCheckoutDeckResume,
   studioPreCheckoutDeckV1,
 } from "@/config/studio-pre-checkout-deck-v1";
-import { withStudioPaymentSandboxQuery } from "@/lib/studio-payment/sandbox-query";
+import {
+  rememberStudioPaymentSandbox,
+  restoreStudioPaymentSandboxQuery,
+  withStudioPaymentSandboxQuery,
+} from "@/lib/studio-payment/sandbox-query";
 import { studioPaymentV1 } from "@/config/studio-payment-v1";
 import {
   assertPreAcceptanceAllowsPayment,
@@ -131,7 +143,6 @@ import {
 } from "@/lib/studio-guide-answer-resolve";
 import {
   applyGuideAnswerToDraft,
-  clearGuideUiStep,
   loadGuideDraft,
   nextGuideStep,
   persistGuideDraft,
@@ -146,7 +157,7 @@ import {
   startConversationDictation,
   stopConversationDictation,
 } from "@/lib/studio-conversation-speech";
-import { clearWorkingDraft, type WorkingDraftRecord } from "@/lib/studio-working-draft";
+import type { WorkingDraftRecord } from "@/lib/studio-working-draft";
 import {
   consumeStudioVoiceInvite,
   type StudioVoiceInviteReason,
@@ -160,7 +171,10 @@ import {
   shouldHoldVoiceFirstEntryGate,
   writeVoiceNarrationPreference,
 } from "@/lib/studio-voice-preference";
-import { suppressSameGestureFollowUp } from "@/lib/studio-samsung-activate";
+import {
+  beginStudioPointerSettle,
+  suppressSameGestureFollowUp,
+} from "@/lib/studio-samsung-activate";
 import { readPhoneLayout, usePhoneLayout } from "@/lib/studio-phone-layout";
 import VoiceChoiceFilm from "@/components/studio-conversation-room/VoiceChoiceFilm";
 import VoicePreferenceControls from "@/components/studio-conversation-room/VoicePreferenceControls";
@@ -217,6 +231,13 @@ function resolveBootStage(
   requestedStage: ConversationRoomStage | undefined,
 ): ConversationRoomStage {
   const savedStage = readConversationStage(project);
+  const campaign = readCurrentCampaignHydrated();
+  const paidIntakeOpen =
+    needsFlyerProductionIntakeCorrection(campaign) ||
+    canOpenIntakeForCampaign(campaign);
+  if (paidIntakeOpen && (!requestedStage || requestedStage === "intake")) {
+    return "intake";
+  }
   if (!requestedStage) return savedStage;
   if (requestedStage === "checkout" || requestedStage === "intake") {
     const hasSelectedRoute = readSelectedRoute(project) !== null;
@@ -289,7 +310,6 @@ export default function ConversationRoomRuntime({
   /** Always the latest typed value — Continue must not read a stale render. */
   const textDraftRef = useRef("");
   /** Bumps the type-field reset key even when step stays the same (Start New). */
-  const [fieldEpoch, setFieldEpoch] = useState(0);
   const [selectedBubbles, setSelectedBubbles] = useState<string[]>([]);
   const [showDateField, setShowDateField] = useState(false);
   const [correcting, setCorrecting] = useState(false);
@@ -330,6 +350,8 @@ export default function ConversationRoomRuntime({
   const [listenArmed, setListenArmed] = useState(true);
   /** MJ-D18: leftover Continue click must not gold a chip on the next question. */
   const bubbleArmedRef = useRef(true);
+  /** Chip tap must not also fire Continue on the same finger. */
+  const continueArmedRef = useRef(true);
   /**
    * Review Studio Plan unmounts the services Denim CTA and mounts Continue to
    * Checkout under the same finger. Ignore that leftover gesture.
@@ -416,6 +438,21 @@ export default function ConversationRoomRuntime({
   }
 
   useEffect(() => {
+    rememberStudioPaymentSandbox(window.location.search);
+    restoreStudioPaymentSandboxQuery();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    let inviteTimer: number | undefined;
+
+    void (async () => {
+    if (initialStage === "intake" || canOpenIntakeForCampaign(readCurrentCampaignHydrated())) {
+      await bindPaidIntakeCampaignForResume(window.location.search);
+    }
+    if (cancelled) return;
+
+    resolveLobbyConversationBeginInvite();
     const restored = bootConversationRoomState(undefined, initialState);
     dispatch({ type: "set-journey", phase: restored.journeyPhase });
     dispatch({
@@ -427,13 +464,20 @@ export default function ConversationRoomRuntime({
     });
 
     const loadedGuide = loadGuideDraft() ?? createEmptyGuideCaptureDraft();
-    const project = bootConversationProjectDraft(loadedGuide);
+    let project = bootConversationProjectDraft(loadedGuide);
+    if (initialStage === "intake" || canOpenIntakeForCampaign(readCurrentCampaignHydrated())) {
+      project = hydrateWorkingDraftFromPaidIntakeCampaign(
+        project,
+        readCurrentCampaignHydrated(),
+      );
+    }
     const openingSlice = readOpeningAnswers(project);
     const guideFromProject = guideDraftFromOpening(openingSlice);
     const hydratedGuide = guideFromProject.projectNeed.trim()
       ? guideFromProject
       : loadedGuide;
     const restoredStage = resolveBootStage(project, initialStage);
+    if (cancelled) return;
     const bootProject =
       restoredStage === readConversationStage(project)
         ? project
@@ -447,11 +491,19 @@ export default function ConversationRoomRuntime({
             hydratedGuide,
           )
         : ("confirmed" as GuideConversationStep);
+    const openingAlreadySaved =
+      restoredStage === "opening" &&
+      (openStep === "confirmed" || Boolean(hydratedGuide.confirmedAt));
+    const bootStage = openingAlreadySaved ? "route" : restoredStage;
+    const bootProjectForStage =
+      bootStage === readConversationStage(bootProject)
+        ? bootProject
+        : persistConversationStage(bootProject, bootStage);
 
-    setProjectDraft(bootProject);
-    setStage(restoredStage);
+    setProjectDraft(bootProjectForStage);
+    setStage(bootStage);
     setDraft(hydratedGuide);
-    setStep(openStep);
+    setStep(openingAlreadySaved ? "confirmed" : openStep);
     const openField = fieldValueForStep(hydratedGuide, openStep);
     writeTextDraft(openField);
     const bootQuestion = getConversationRoomGuideQuestion(openStep);
@@ -473,7 +525,7 @@ export default function ConversationRoomRuntime({
         ? "none"
         : STAGE_DEFAULT_PANEL[restoredStage],
     );
-    if (restoredStage === "route") {
+    if (bootStage === "route") {
       const savedRec = readActiveRouteRecommendation(
         project,
         hydratedGuide.projectNeed,
@@ -483,28 +535,34 @@ export default function ConversationRoomRuntime({
       );
       const selected = readSelectedRoute(project)?.roadId;
       setPreviewRoadId(selected ?? savedRec ?? fromNeed ?? null);
-    } else if (restoredStage === "services" || restoredStage === "plan") {
+    } else if (bootStage === "services" || bootStage === "plan") {
       setPreviewRoadId(readSelectedRoute(project)?.roadId ?? null);
     }
     setSpeechSupported(getConversationSpeechAvailability().canListen);
-    setReady(true);
 
-    const holdVoiceGate = shouldHoldVoiceFirstEntryGate({
-      firstEntryRequired: isVoiceFirstEntryChoiceRequired(),
-      hasConversationProgress: Boolean(
-        hydratedGuide.preferredName.trim() ||
-          hydratedGuide.projectNeed.trim() ||
-          hydratedGuide.confirmedAt,
-      ),
-    });
-    const savedPreference = resolveBootVoiceNarrationPreference({
-      requireFirstEntryChoice: holdVoiceGate,
-    });
+    const resumePaidIntake =
+      restoredStage === "intake" &&
+      canOpenIntakeForCampaign(readCurrentCampaignHydrated());
+    const holdVoiceGate = resumePaidIntake
+      ? false
+      : shouldHoldVoiceFirstEntryGate({
+          firstEntryRequired: isVoiceFirstEntryChoiceRequired(),
+          hasConversationProgress: Boolean(
+            hydratedGuide.preferredName.trim() ||
+              hydratedGuide.projectNeed.trim() ||
+              hydratedGuide.confirmedAt,
+          ),
+        });
+    const savedPreference =
+      resolveBootVoiceNarrationPreference({
+        requireFirstEntryChoice: holdVoiceGate,
+      }) ?? (resumePaidIntake ? "off" : null);
     setVoiceNarration(savedPreference);
     voiceNarrationRef.current = savedPreference;
-    if (consumePreCheckoutDeckVoiceChoice()) {
+    if (consumePreCheckoutDeckVoiceChoice() && !resumePaidIntake) {
       setReviewingVoiceChoice(true);
     }
+    setReady(true);
 
     /* Kill any Lobby TTS that continued across navigation — CR is silent until Voice On. */
     if (savedPreference !== "on") {
@@ -530,24 +588,19 @@ export default function ConversationRoomRuntime({
 
     if (invite && inviteLine) {
       if (savedPreference === "on") {
-        const timer = window.setTimeout(() => {
+        inviteTimer = window.setTimeout(() => {
           playConversationInviteLine(inviteLine!);
         }, 220);
-        return () => {
-          window.clearTimeout(timer);
-          inviteCleanupRef.current?.();
-          inviteCleanupRef.current = null;
-          stopConversationDictation();
-          cancelConversationSpeech();
-        };
-      }
-      if (savedPreference === null) {
+      } else if (savedPreference === null) {
         pendingVoiceInviteRef.current = { reason: invite, line: inviteLine };
       }
       /* savedPreference === "off": discard invite silently */
     }
+    })();
 
     return () => {
+      cancelled = true;
+      if (inviteTimer) window.clearTimeout(inviteTimer);
       inviteCleanupRef.current?.();
       inviteCleanupRef.current = null;
       stopConversationDictation();
@@ -603,6 +656,15 @@ export default function ConversationRoomRuntime({
     });
   }
 
+  function disarmContinueForSameGesture() {
+    continueArmedRef.current = false;
+    suppressSameGestureFollowUp(() => {
+      window.setTimeout(() => {
+        continueArmedRef.current = true;
+      }, BUBBLE_REARM_MS);
+    });
+  }
+
   function disarmCheckoutAdvanceForSameGesture() {
     checkoutAdvanceArmedRef.current = false;
     suppressSameGestureFollowUp(() => {
@@ -617,6 +679,7 @@ export default function ConversationRoomRuntime({
     nextDraft = draft,
     options?: { correcting?: boolean; restoreSelection?: boolean },
   ) {
+    beginStudioPointerSettle();
     const question = getConversationRoomGuideQuestion(next);
     const restore = options?.restoreSelection === true;
     setStep(next);
@@ -707,6 +770,7 @@ export default function ConversationRoomRuntime({
   }
 
   function handleContinue() {
+    if (!continueArmedRef.current) return;
     const question = getConversationRoomGuideQuestion(step);
     if (!question) return;
 
@@ -781,6 +845,7 @@ export default function ConversationRoomRuntime({
     const question = getConversationRoomGuideQuestion(step);
     if (!question) return;
     setError(null);
+    disarmContinueForSameGesture();
 
     if (bubble === "Skip for now") {
       handleSkip();
@@ -795,16 +860,18 @@ export default function ConversationRoomRuntime({
     }
 
     if (question.bubbleMode === "multi") {
-      setSelectedBubbles((prev) => {
-        const exclusive = ["Nothing yet", "Something else"];
-        if (bubble === "Nothing yet") return ["Nothing yet"];
-        const withoutSkip = prev.filter((item) => item !== "Skip for now");
-        if (withoutSkip.includes(bubble)) {
-          return withoutSkip.filter((item) => item !== bubble);
-        }
-        const cleared = withoutSkip.filter((item) => !exclusive.includes(item));
-        return [...cleared, bubble];
-      });
+      const exclusive = ["Nothing yet", "Something else"];
+      const withoutSkip = selectedBubbles.filter((item) => item !== "Skip for now");
+      let next: string[];
+      if (bubble === "Nothing yet") {
+        next = ["Nothing yet"];
+      } else if (withoutSkip.includes(bubble)) {
+        next = withoutSkip.filter((item) => item !== bubble);
+      } else {
+        next = [...withoutSkip.filter((item) => !exclusive.includes(item)), bubble];
+      }
+      setSelectedBubbles(next);
+      writeTextDraft(next.join(", "));
       return;
     }
 
@@ -963,6 +1030,16 @@ export default function ConversationRoomRuntime({
     if (stage === "route") {
       setStageAndPersist("opening");
       goToStep("summary", draft, { restoreSelection: true });
+      return;
+    }
+    if (stage === "checkout") {
+      handleBackToStudioPlanFromCheckout();
+      return;
+    }
+    if (stage === "intake") {
+      setDetailJobId(null);
+      setStageAndPersist("checkout");
+      presentCheckoutSurface();
       return;
     }
     if (stage !== "opening") return;
@@ -1587,8 +1664,7 @@ export default function ConversationRoomRuntime({
   function handleStartNew() {
     /* New conversation content — keep the already-chosen Voice On/Off. */
     stopStudioSpeech();
-    clearGuideUiStep();
-    clearWorkingDraft();
+    detachCurrentCustomerBrowserSession();
     const empty = startNewGuideCaptureConversation();
     const project = bootConversationProjectDraft(empty);
     setProjectDraft(persistConversationStage(project, "opening"));
@@ -1618,6 +1694,7 @@ export default function ConversationRoomRuntime({
   function handleVoiceNarrationPreference(
     value: StudioVoiceNarrationPreference,
   ) {
+    beginStudioPointerSettle();
     const fromGate = voiceNarrationRef.current === null;
     setReviewingVoiceChoice(false);
     clearVoiceFirstEntryChoiceRequired();
@@ -1688,7 +1765,6 @@ export default function ConversationRoomRuntime({
   function writeTextDraft(value: string) {
     textDraftRef.current = value;
     setTextDraft(value);
-    setFieldEpoch((n) => n + 1);
   }
 
   function handleStartListening() {
@@ -1787,7 +1863,11 @@ export default function ConversationRoomRuntime({
     }
     setIntakeLiveAnswers((prev) => {
       if (prev) return prev;
-      return readUsableIntakeDraftAnswers(readCurrentCampaignHydrated()) ?? {};
+      const campaign = readCurrentCampaignHydrated();
+      return {
+        ...(campaign?.routeMapIntake?.answers ?? {}),
+        ...(readUsableIntakeDraftAnswers(campaign) ?? {}),
+      };
     });
     let cancelled = false;
     void probeCustomerSessionSignedIn().then((signedIn) => {
@@ -1810,8 +1890,9 @@ export default function ConversationRoomRuntime({
     return buildProjectIntakeTabletStatus({
       plan,
       answers: intakeLiveAnswers,
-      // Intake stage is only reachable after payment; services come from the draft.
-      paymentReceived: true,
+      paymentReceived: Boolean(
+        readCurrentCampaignHydrated()?.paymentReceivedAt,
+      ),
       servicesConfirmed: serviceIdsForIntake.length > 0,
       copy: {
         paymentReceivedLabel: v.intakeTabletPaymentReceivedLabel,
@@ -1883,14 +1964,17 @@ export default function ConversationRoomRuntime({
         step === "ask_business_name" ||
         step === "ask_deadline" ||
         step === "ask_materials" ||
-        step === "summary")) ||
+        step === "summary" ||
+        step === "confirmed")) ||
     stage === "route" ||
     stage === "services" ||
     (isPhone && stage === "plan") ||
     (isPhone && stage === "checkout") ||
     (isPhone && stage === "intake");
   const summaryConfirm =
-    stage === "opening" && step === "summary" && !correcting;
+    stage === "opening" &&
+    (step === "summary" || step === "confirmed") &&
+    !correcting;
   const routeChoose = stage === "route";
   const servicesStage = stage === "services";
   const phonePlanStage = isPhone && stage === "plan";
@@ -2036,16 +2120,22 @@ export default function ConversationRoomRuntime({
                 ? studioPreCheckoutDeckV1.backToPreviousQuestion
                 : stage === "route"
                   ? studioPreCheckoutDeckV1.backToReviewTogether
-                  : stage === "plan"
-                    ? studioPreCheckoutDeckV1.backToChooseYourServices
-                    : null
+                  : stage === "services"
+                    ? conversationRoomGuideV1.servicesBackToRouteLabel
+                    : stage === "plan"
+                      ? studioPreCheckoutDeckV1.backToChooseYourServices
+                      : stage === "checkout"
+                        ? conversationRoomGuideV1.checkoutBackToPlanLabel
+                        : stage === "intake"
+                          ? conversationRoomGuideV1.intakeBackToCheckoutLabel
+                          : null
           }
           answerAccepted={hasAcceptedAnswer}
           answerDock={
             openingAsk ? (
                 <StudioGuideCommPanel
                   textDraft={textDraft}
-                  fieldResetKey={`${stage}:${step}:${askMode ? "ask" : "guide"}:${fieldEpoch}`}
+                  fieldResetKey={`${stage}:${step}:${askMode ? "ask" : "guide"}`}
                   typePlaceholder={
                     isAnsweringQuestion && question
                       ? question.placeholder
@@ -2067,23 +2157,22 @@ export default function ConversationRoomRuntime({
                   onSendMessage={handleSendMessage}
                   studioVoiceReply={studioVoiceReply}
                   allowMicrophone={listenArmed}
+                  voiceMode={voiceNarration ?? "off"}
                   embedded
                   nameQuestion={questionGlass}
                 />
             ) : null
           }
           modeControls={
-            openingAsk ||
-            routeChoose ||
-            (servicesStage && !isPhone) ||
-            phonePlanStage ? (
+            voiceNarration != null ? (
               <VoicePreferenceControls
-                preference={voiceNarration ?? "off"}
+                preference={voiceNarration}
                 onChoose={handleVoiceNarrationPreference}
                 filmFamily={questionGlass}
               />
             ) : null
           }
+          voiceMode={voiceNarration ?? "off"}
           onOpenStagePanel={() => {
             if (stage === "route" || stage === "plan") return;
             if (stage === "services" || stage === "checkout") {
@@ -2154,14 +2243,9 @@ export default function ConversationRoomRuntime({
       }
       communication={
         voiceUnset || openingAsk ? null : (
-          <>
-          <VoicePreferenceControls
-            preference={voiceNarration}
-            onChoose={handleVoiceNarrationPreference}
-          />
           <StudioGuideCommPanel
           textDraft={textDraft}
-          fieldResetKey={`${stage}:${step}:${askMode ? "ask" : "guide"}:${fieldEpoch}`}
+          fieldResetKey={`${stage}:${step}:${askMode ? "ask" : "guide"}`}
           typePlaceholder={
             isAnsweringQuestion && question
               ? question.placeholder
@@ -2183,8 +2267,8 @@ export default function ConversationRoomRuntime({
           onSendMessage={handleSendMessage}
           studioVoiceReply={studioVoiceReply}
           allowMicrophone={listenArmed}
+          voiceMode={voiceNarration}
         />
-          </>
         )
       }
     />

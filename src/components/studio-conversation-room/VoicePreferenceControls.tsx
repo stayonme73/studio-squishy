@@ -13,8 +13,7 @@ export type VoicePreferenceControlsProps = {
   onChoose: (value: StudioVoiceNarrationPreference) => void;
   /**
    * Opening-question film family, Choose Your Route, and Your project so far.
-   * Selected side uses the accepted Welcome / Voice Choice CTA
-   * (`lobby-entry-film__cta`).
+   * Voice On/Off are selection controls, not primary-action buttons.
    */
   filmFamily?: boolean;
 };
@@ -46,16 +45,18 @@ export default function VoicePreferenceControls({
         >
           <a
             ref={activateOn.ref}
+            href="#studio-voice-pref"
             role="button"
             tabIndex={0}
             className={
-              preference === "on"
-                ? `lobby-entry-film__cta ${styles.cta}`
-                : styles.filmIdle
+              preference === "on" ? styles.cta : styles.filmIdle
             }
             aria-pressed={preference === "on"}
             data-voice-pref="on"
-            onClick={activateOn.onClick}
+            onClick={(event) => {
+              event.preventDefault();
+              activateOn.onClick(event);
+            }}
             onKeyDown={(event) => {
               if (event.key !== "Enter" && event.key !== " ") return;
               event.preventDefault();
@@ -66,16 +67,18 @@ export default function VoicePreferenceControls({
           </a>
           <a
             ref={activateOff.ref}
+            href="#studio-voice-pref"
             role="button"
             tabIndex={0}
             className={
-              preference === "off"
-                ? `lobby-entry-film__cta ${styles.cta}`
-                : styles.filmIdle
+              preference === "off" ? styles.cta : styles.filmIdle
             }
             aria-pressed={preference === "off"}
             data-voice-pref="off"
-            onClick={activateOff.onClick}
+            onClick={(event) => {
+              event.preventDefault();
+              activateOff.onClick(event);
+            }}
             onKeyDown={(event) => {
               if (event.key !== "Enter" && event.key !== " ") return;
               event.preventDefault();
@@ -98,19 +101,21 @@ export default function VoicePreferenceControls({
       >
         <button
           type="button"
+          ref={activateOn.ref}
           className={styles.toggleOn}
           data-active={preference === "on" ? "true" : "false"}
           aria-pressed={preference === "on"}
-          onClick={() => onChoose("on")}
+          onClick={activateOn.onClick}
         >
           {copy.voiceOn}
         </button>
         <button
           type="button"
+          ref={activateOff.ref}
           className={styles.toggleOff}
           data-active={preference === "off" ? "true" : "false"}
           aria-pressed={preference === "off"}
-          onClick={() => onChoose("off")}
+          onClick={activateOff.onClick}
         >
           {copy.voiceOff}
         </button>

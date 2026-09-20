@@ -14,25 +14,35 @@ export default function SamsungDenimCta({
   children,
   onActivate,
   dataAttr,
+  className,
+  disabled,
 }: {
   children: ReactNode;
   onActivate: () => void;
   dataAttr?: string;
+  className?: string;
+  disabled?: boolean;
 }) {
-  const activate = useSamsungTapActivate<HTMLAnchorElement>(onActivate);
+  const activate = useSamsungTapActivate<HTMLAnchorElement>(() => {
+    if (disabled) return;
+    onActivate();
+  });
   return (
     <a
       ref={activate.ref}
       href="#studio-action"
       role="button"
-      tabIndex={0}
-      className="lobby-entry-film__cta"
+      tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled || undefined}
+      className={["lobby-entry-film__cta", className].filter(Boolean).join(" ")}
       data-review-studio-plan={dataAttr === "review-plan" ? "" : undefined}
       onClick={(event) => {
         event.preventDefault();
+        if (disabled) return;
         activate.onClick();
       }}
       onKeyDown={(event) => {
+        if (disabled) return;
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         onActivate();

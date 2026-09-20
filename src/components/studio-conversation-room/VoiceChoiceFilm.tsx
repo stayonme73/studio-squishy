@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { voiceChoiceButtonClass } from "@/config/studio-customer-tile-system-v1";
 import {
   studioVoicePreferenceV1,
   type StudioVoiceNarrationPreference,
 } from "@/config/studio-voice-preference-v1";
-import { useSamsungGateActivate } from "@/lib/studio-samsung-activate";
+import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
+import {
+  beginStudioPointerSettle,
+  suppressSameGestureFollowUp,
+  useSamsungActivate,
+  useSamsungGateActivate,
+} from "@/lib/studio-samsung-activate";
+import SamsungDeckBack from "@/components/studio-conversation-room/guide/SamsungDeckBack";
+import StudioPointerSettleShield from "@/components/studio-conversation-room/StudioPointerSettleShield";
 
 import styles from "./voice-choice-film.module.css";
 
@@ -54,6 +62,9 @@ function SamsungChoiceButton({
       className={`${styles.cta} ${voiceChoiceButtonClass(selected)}`}
       data-voice-choice-action={action}
       aria-pressed={selected}
+      onClick={(event) => {
+        event.preventDefault();
+      }}
       onKeyDown={(event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
@@ -69,7 +80,7 @@ function SamsungChoiceButton({
  * First-entry Voice Choice — OWNER ACCEPTED 2026-08-29 (Samsung) for
  * Lounge glass / panel. Buttons are the same Welcome `<a>` CTA as
  * Let’s Get Started / Sign In (`lobby-entry-film__cta`). Fill it out
- * myself still commits on finger-up and must not start the microphone.
+ * myself selects first. Continue commits. Do not start the microphone.
  */
 export default function VoiceChoiceFilm({
   onChoose,
@@ -81,10 +92,31 @@ export default function VoiceChoiceFilm({
   const [chosen, setChosen] = useState<StudioVoiceNarrationPreference | null>(
     selected,
   );
+  const chosenRef = useRef(chosen);
+  chosenRef.current = chosen;
+  const continueArmedRef = useRef(selected != null);
+  const [continueArmed, setContinueArmed] = useState(selected != null);
+  const continueActivate = useSamsungActivate<HTMLAnchorElement>(
+    () => {
+      const next = chosenRef.current;
+      if (!next || !continueArmedRef.current) return;
+      beginStudioPointerSettle();
+      onChoose(next);
+    },
+    { consumeGesture: true },
+  );
 
-  function choose(value: StudioVoiceNarrationPreference) {
+  function select(value: StudioVoiceNarrationPreference) {
+    continueArmedRef.current = false;
+    setContinueArmed(false);
     setChosen(value);
-    onChoose(value);
+    beginStudioPointerSettle();
+    suppressSameGestureFollowUp(() => {
+      window.setTimeout(() => {
+        continueArmedRef.current = true;
+        setContinueArmed(true);
+      }, 400);
+    });
   }
 
   return (
@@ -95,18 +127,14 @@ export default function VoiceChoiceFilm({
       data-voice-choice-film="true"
       aria-label="Studio Voice choice"
     >
+      <StudioPointerSettleShield />
       <div className={styles.panel} role="group" aria-label={copy.howToContinue}>
         {onBack ? (
-          <button
-            type="button"
-            className={styles.deckBack}
-            data-pre-checkout-deck-back=""
-            onClick={onBack}
-          >
+          <SamsungDeckBack className={styles.deckBack} onActivate={onBack}>
             ← Back to Let’s Get Started
-          </button>
+          </SamsungDeckBack>
         ) : null}
-        <p className={styles.prompt}>{copy.howToContinue}</p>
+        <h1 className={styles.prompt}>{copy.howToContinue}</h1>
         {privacyNote ? (
           <p className={styles.privacy}>{renderPrivacyNote(privacyNote)}</p>
         ) : null}
@@ -118,7 +146,7 @@ export default function VoiceChoiceFilm({
               /* Paint only. React setState here rebinds Samsung pointerup. */
             }}
             onActivate={() => {
-              choose("on");
+              select("on");
             }}
           >
             {copy.useVoiceGuidance}
@@ -130,11 +158,31 @@ export default function VoiceChoiceFilm({
               /* Paint only. React setState here rebinds Samsung pointerup. */
             }}
             onActivate={() => {
-              choose("off");
+              select("off");
             }}
           >
             {copy.fillItOutMyself}
           </SamsungChoiceButton>
+          <a
+            ref={continueActivate.ref}
+            href="#studio-voice-continue"
+            className={`${styles.cta} lobby-entry-film__cta`}
+            data-voice-choice-continue="true"
+            aria-disabled={chosen && continueArmed ? undefined : "true"}
+            style={chosen && continueArmed ? undefined : { pointerEvents: "none" }}
+            onClick={(event) => {
+              event.preventDefault();
+              continueActivate.onClick(event);
+            }}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              if (!chosen) return;
+              onChoose(chosen);
+            }}
+          >
+            <span>{conversationRoomGuideV1.continueLabel}</span>
+          </a>
         </div>
       </div>
     </div>

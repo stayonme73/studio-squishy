@@ -10,6 +10,7 @@ import {
   getSelectableRouteMapRoads,
   type RouteMapRoadId,
 } from "@/config/route-map-v1";
+import SamsungDeckBack from "@/components/studio-conversation-room/guide/SamsungDeckBack";
 import { useSamsungActivate } from "@/lib/studio-samsung-activate";
 
 export type ConversationRouteChooseProps = {
@@ -39,7 +40,7 @@ function roadTagline(roadId: RouteMapRoadId, fallback: string): string {
 
 /**
  * Choose Your Route — map + lane cards on the tablet.
- * All four routes stay in one grid; "Suggested starting point" is a badge on the card.
+ * All four routes stay in one grid; "Suggested starting point" is sage text on the card.
  * Keyword routing may suggest a start; the customer confirms before the service chooser opens.
  */
 export default function ConversationRouteChoose({
@@ -68,6 +69,7 @@ export default function ConversationRouteChoose({
     <div className={styles.routeConfirmRow}>
       <a
         ref={confirmActivate.ref}
+        href="#studio-route-continue"
         role="button"
         tabIndex={pendingId ? 0 : -1}
         aria-disabled={!pendingId}
@@ -75,7 +77,7 @@ export default function ConversationRouteChoose({
         data-route-continue=""
         onClick={(event) => {
           event.preventDefault();
-          if (pendingId) onConfirmRoad(pendingId);
+          confirmActivate.onClick(event);
         }}
         onKeyDown={(event) => {
           if (event.key !== "Enter" && event.key !== " ") return;
@@ -135,22 +137,22 @@ export default function ConversationRouteChoose({
       className={styles.sheet}
       data-surface={compact ? "tablet" : "panel"}
     >
-      {topControls}
-      {onDeckBack && deckBackLabel ? (
-        <button
-          type="button"
-          className={styles.backLink}
-          data-pre-checkout-deck-back=""
-          onClick={onDeckBack}
-        >
-          ← {deckBackLabel}
-        </button>
-      ) : null}
+      <div data-tablet-journey-chrome="true">
+        {onDeckBack && deckBackLabel ? (
+          <SamsungDeckBack className={styles.backLink} onActivate={onDeckBack}>
+            ← {deckBackLabel}
+          </SamsungDeckBack>
+        ) : null}
+        {topControls}
+      </div>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Conversation Room</p>
+          {compact ? null : (
+            <p className={styles.eyebrow}>Conversation Room</p>
+          )}
           <h2 className={styles.title}>{v.routePanelTitle}</h2>
           <p className={styles.intro}>{v.routePanelLead}</p>
+          <p className={styles.routeChoiceNote}>{v.routePanelChoice}</p>
         </div>
         {onClose ? (
           <button

@@ -1,0 +1,465 @@
+/**
+ * Three-screen visual proof only — Studio Board, Help Center,
+ * live Route Map (Conversation Room). Do not import on other rooms.
+ * Recipe: #FFFFFF text · #BFD8F2 selected only · #C8B59B trim only ·
+ * #20262D primary fill · light shared smoke · zero frost · zero blur.
+ */
+
+html:has([data-visual-proof]),
+html:has([data-visual-proof]) [data-mobile-customer-spine],
+html:has([data-visual-proof]) .sb,
+html:has([data-visual-proof]) .utility-page,
+html:has([data-visual-proof]) .studio-utility-scene {
+  --studio-text: #ffffff;
+  --studio-text-muted: color-mix(in srgb, #ffffff 78%, transparent);
+  --studio-highlight: #bfd8f2;
+  --studio-trim: #c8b59b;
+  --studio-ink: #20262d;
+  --studio-veil-fill: color-mix(in srgb, #20262d 40%, transparent);
+  --studio-glass-fill: color-mix(in srgb, #20262d 28%, transparent);
+  --studio-glass-fill-strong: color-mix(in srgb, #20262d 28%, transparent);
+  --studio-glass-border: #c8b59b;
+  --studio-border-width: 2px;
+  --foreground: #ffffff;
+  --studio-eucalyptus: #bfd8f2;
+  --studio-eucalyptus-deep: #bfd8f2;
+  --studio-denim: #20262d;
+  --studio-denim-deep: #20262d;
+  --studio-herb-gold: #c8b59b;
+  --studio-golden-yellow: #c8b59b;
+  --studio-coral: #bfd8f2;
+  --studio-teal: #bfd8f2;
+  --studio-walnut: #c8b59b;
+  --studio-charcoal: #ffffff;
+  --studio-charcoal-muted: color-mix(in srgb, #ffffff 78%, transparent);
+  --studio-utility-backdrop-blur: none;
+  --studio-utility-backdrop-tint: transparent;
+  --studio-utility-card-surface: var(--studio-glass-fill);
+  --studio-utility-card-surface-bright: var(--studio-glass-fill-strong);
+  --utility-text: #ffffff;
+  --utility-text-muted: color-mix(in srgb, #ffffff 78%, transparent);
+  --utility-primary: #20262d;
+  --utility-nav-accent-active: #bfd8f2;
+  --utility-border: #c8b59b;
+  --mc-ink: #ffffff;
+  --mc-denim: #20262d;
+  --mc-eucalyptus: #bfd8f2;
+  --mc-coral: #bfd8f2;
+  --mc-yellow: #c8b59b;
+  --mc-ivory: var(--studio-glass-fill);
+  --mc-glass: var(--studio-glass-fill);
+  --mc-glass-strong: var(--studio-glass-fill-strong);
+  --mc-glass-border: #c8b59b;
+  --mc-primary: #20262d;
+  --mc-primary-text: #ffffff;
+  --mc-board-color-page: #ffffff;
+  --mc-board-color-card: #ffffff;
+  --mc-board-color-sub: color-mix(in srgb, #ffffff 78%, transparent);
+  --mc-board-color-field: #ffffff;
+  --mc-board-color-value: #ffffff;
+  --mc-board-color-current: #ffffff;
+  --mc-board-color-action-link: #ffffff;
+  --sb-gold: #c8b59b;
+  --sb-warm: #c8b59b;
+  --sb-walnut: #c8b59b;
+  --sb-cat-sign-yellow: #c8b59b;
+  --sb-cat-sign-yellow-edge: #c8b59b;
+  --sb-mushroom-green: #bfd8f2;
+  --sb-mushroom-orange: #bfd8f2;
+  --sb-nav-active: #bfd8f2;
+  --sb-text: #ffffff;
+  --sb-text-muted: color-mix(in srgb, #ffffff 78%, transparent);
+  --sb-cream: var(--studio-glass-fill);
+  --sb-card: var(--studio-glass-fill-strong);
+  --sb-denim: #20262d;
+  --sb-denim-deep: #20262d;
+  --sb-teal: #bfd8f2;
+  --board-family-mustard: #c8b59b;
+  --board-family-terracotta: #c8b59b;
+  --board-family-text: #ffffff;
+  --board-family-text-muted: color-mix(in srgb, #ffffff 78%, transparent);
+  --board-family-primary: #20262d;
+  --board-family-tile: var(--studio-glass-fill);
+  --board-family-cream: transparent;
+  --board-family-field: var(--studio-glass-fill);
+  --board-family-tile-border: #c8b59b;
+}
+
+html:has([data-visual-proof]) *:not(.owner-qa):not(.owner-qa *) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has([data-visual-proof]) :is(
+  .studio-environment-shell__plate,
+  .studio-utility-backdrop::before,
+  .welcome-hall-plate-backdrop-art
+) {
+  filter: none !important;
+}
+
+html:has([data-visual-proof]) .studio-environment-shell__frost {
+  display: none !important;
+}
+
+html:has([data-visual-proof]) :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  p,
+  li,
+  dt,
+  dd,
+  label,
+  td,
+  th,
+  a,
+  span,
+  small,
+  strong,
+  em,
+  time,
+  legend,
+  figcaption,
+  cite,
+  b,
+  i,
+  svg
+):not(.owner-qa):not(.owner-qa *) {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(32, 38, 45, 0.55);
+}
+
+html:has([data-visual-proof]) :is(
+  .sb-card,
+  .sb-sidebar,
+  .sb-project-communication__item,
+  .sb-project-communication__machine-answer,
+  .sb-project-communication__studio-request,
+  .sb-project-communication__notice,
+  .utility-card,
+  .hc-card,
+  .hc-toc,
+  .hc-qpg-table,
+  .hc-qpg-card,
+  table,
+  th,
+  td,
+  .studio-tile--standard,
+  .studio-tile--standard-dense,
+  [class*="intake-card"],
+  [class*="voice-choice"][class*="panel"],
+  [data-voice-choice] [class*="panel"],
+  [data-studio-surface="tablet"],
+  [data-studio-surface="activity-panel"]
+):not(.owner-qa):not(.owner-qa *):not([data-name-question-panel="true"]) {
+  background: var(--studio-glass-fill) !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: 0.85rem !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:has([data-visual-proof]) :is(
+  .sb-card,
+  .utility-card,
+  .hc-card,
+  [class*="voice-choice"][class*="panel"]
+)::before,
+html:has([data-visual-proof]) :is(
+  .sb-card,
+  .utility-card,
+  .hc-card,
+  [class*="voice-choice"][class*="panel"]
+)::after {
+  background: transparent !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+html:has([data-visual-proof]) :is(
+  .sb-card__tab,
+  .utility-card__title,
+  .hc-toc__title,
+  .sb-header-v3__title
+) {
+  color: #ffffff !important;
+  border-bottom: 1px solid #c8b59b !important;
+  padding-bottom: 0.35rem;
+}
+
+html:has([data-visual-proof]) :is(
+  nav a,
+  nav button,
+  .sb-nav a,
+  .sb-nav__item,
+  .utility-subnav__link
+):not(.owner-qa *):not([aria-current="page"]):not(.sb-nav__item--active):not(.utility-subnav__link--active):not(.is-active):not(:active):not(.is-pressed):not([data-pressed="true"]):not([class*="routeCard"]):not(.hc-toc__link) {
+  background: var(--studio-glass-fill) !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: 0.85rem !important;
+  color: #ffffff !important;
+}
+
+html:has([data-visual-proof]) nav a.sb-nav__item--active,
+html:has([data-visual-proof]) a.sb-nav__item--active,
+html:has([data-visual-proof]) .sb-nav__item.sb-nav__item--active,
+html:has([data-visual-proof]) .utility-subnav__link.utility-subnav__link--active,
+html:has([data-visual-proof]) :is(nav a, nav button, .sb-nav a)[aria-current="page"] {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  color: #ffffff !important;
+}
+
+html:has([data-visual-proof]) :is(
+  .sb-nav__item--active,
+  .utility-subnav__link--active,
+  [aria-current="page"]
+) :is(span, svg, .sb-nav__label, .sb-nav__icon, .utility-subnav__label, .utility-subnav__icon) {
+  color: #ffffff !important;
+}
+
+html:has([data-visual-proof]) :is(
+  button,
+  .utility-btn,
+  [type="button"],
+  [type="submit"]
+):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]):not([class*="routeCard"]) {
+  color: #ffffff !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: 0.85rem !important;
+  background: var(--studio-glass-fill) !important;
+}
+
+html:has([data-visual-proof]) :is(
+  .utility-btn--primary,
+  [class*="btn--primary"],
+  [class*="primary-btn"],
+  .route-map-primary-btn,
+  .lobby-entry-film__cta
+):not(.owner-qa *):not(:active):not(.is-pressed):not([data-pressed="true"]):not([data-voice-pref]):not([data-voice-choice-action]) {
+  background: #20262d !important;
+  color: #ffffff !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+}
+
+html:has([data-visual-proof]) :is(input, textarea, select):not(.owner-qa *) {
+  background: var(--studio-glass-fill) !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: 0.85rem !important;
+  color: #ffffff !important;
+}
+
+html:has([data-visual-proof]) .sb-header-v3__name {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  color: #ffffff !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  box-shadow: none !important;
+}
+
+html:has([data-visual-proof]) .sb-sidebar {
+  background: var(--studio-glass-fill) !important;
+  border-right: var(--studio-border-width) solid #c8b59b !important;
+}
+
+html:has([data-visual-proof]) .sb-main {
+  background: transparent !important;
+}
+
+html:has([data-visual-proof]) :is(
+  button,
+  a,
+  [role="button"],
+  [role="tab"],
+  [role="radio"],
+  [role="checkbox"],
+  [type="button"],
+  [type="submit"],
+  .utility-btn,
+  .sb-nav__item,
+  .utility-subnav__link,
+  .studio-tile,
+  [class*="chip"],
+  [class*="primary-btn"],
+  .lobby-entry-film__cta,
+  .route-map-primary-btn,
+  label:has(input[type="radio"]),
+  label:has(input[type="checkbox"])
+):not(.owner-qa):not(.owner-qa *):not(:has(:is(button, a, [role="button"], [role="tab"], [type="button"], [type="submit"], .studio-tile, [class*="chip"], label):active)):is(:active, .is-pressed, [data-pressed="true"]) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  color: #ffffff !important;
+  transform: scale(0.985) !important;
+  box-shadow: none !important;
+}
+
+html:has([data-visual-proof]) :is(
+  [aria-current="page"],
+  [aria-pressed="true"],
+  [aria-checked="true"],
+  [data-active="true"],
+  .is-active,
+  .is-selected,
+  .studio-tile--selected,
+  .sb-nav__item--active,
+  .utility-subnav__link--active
+):not(.owner-qa):not(.owner-qa *):not([class*="routeCard"]) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  color: #ffffff !important;
+}
+
+/* Same specificity as rest nav/button rules so a tap cannot stay invisible. */
+html:has([data-visual-proof]) :is(
+  nav a,
+  nav button,
+  .sb-nav a,
+  .sb-nav__item,
+  .utility-subnav__link,
+  button,
+  .utility-btn,
+  [type="button"],
+  [type="submit"],
+  a
+):not(.owner-qa *):not([aria-current="page"]):not(.sb-nav__item--active):not(.utility-subnav__link--active):not(.is-active):not(:has(:is(button, a, [role="button"], [role="tab"], [type="button"], [type="submit"], .studio-tile, [class*="chip"], label):active)):is(:active, .is-pressed, [data-pressed="true"]) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  color: #ffffff !important;
+  transform: scale(0.985) !important;
+  box-shadow: none !important;
+}
+
+/* Checkout Back is a text control, like the other deck backs. */
+html:has([data-visual-proof]) [data-pre-checkout-deck-back] {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Phone Studio Plan / Checkout / Route / Services / Intake: Lounge + controls. No champagne tablet frame. */
+html:has([data-visual-proof]) [data-stage="plan"][data-surface="tablet"],
+html:has([data-visual-proof]) [data-stage="checkout"][data-surface="tablet"],
+html:has([data-visual-proof]) [data-stage="route"][data-surface="tablet"],
+html:has([data-visual-proof]) [data-stage="services"][data-surface="tablet"],
+html:has([data-visual-proof]) [data-stage="opening"][data-surface="tablet"],
+html:has([data-visual-proof]) [data-stage="intake"][data-surface="tablet"],
+html:has([data-visual-proof]) [data-panel="checkout"][data-surface="page"],
+html:has([data-visual-proof]) [data-panel="intake"][data-surface="page"],
+html:has([data-visual-proof]) [data-layout="one-tablet"] [data-studio-surface="tablet"],
+html:has([data-visual-proof]) [data-layout="one-tablet"] #conversation-room-tablet,
+html:has([data-visual-proof]) [data-layout="one-tablet"] [class*="slideHost"],
+html:has([data-visual-proof]) [data-layout="one-tablet"] [class*="slideScrim"] {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html:has([data-visual-proof]) [data-layout="one-tablet"] [data-panel="checkout"] :is(
+  .co-card,
+  .co-panel,
+  .pay-paper-card,
+  [class*="checkoutPageSurface"],
+  [class*="checkoutHostSurface"]
+):not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+html:has([data-visual-proof]) [data-layout="one-tablet"] [data-panel="intake"] :is(
+  .route-map-social-intake,
+  .route-map-social-intake__card,
+  .route-map-social-intake__chips,
+  .route-map-social-intake__progress,
+  .route-map-social-intake__actions,
+  [class*="intakeHostSurface"],
+  [class*="intakeSectionBlock"],
+  [class*="checkoutScopeDisclosure"]
+):not(.owner-qa):not(.owner-qa *) {
+  background: transparent !important;
+  border: none !important;
+  border-width: 0 !important;
+  border-style: none !important;
+  border-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html:has([data-visual-proof]) [data-layout="one-tablet"] [data-panel="intake"] [data-confirmed="true"]:not(.owner-qa):not(.owner-qa *) {
+  color: #2f6b54 !important;
+  background: #ffffff !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: 0.55rem !important;
+}
+
+html:has([data-visual-proof]) [data-layout="one-tablet"] :is(
+  [class*="chip"]:not([class*="chipRow"]):not([class*="chipBlock"]):not([class*="chipGroup"]):not([class*="chips"]),
+  .route-map-social-intake__chip,
+  [data-voice-pref],
+  [data-voice-choice-action]
+):is([aria-pressed="true"], [data-selected="true"], .route-map-social-intake__chip--selected):not(.owner-qa):not(.owner-qa *) {
+  background: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  background-color: color-mix(in srgb, #bfd8f2 22%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+  color: #ffffff !important;
+}
+
+html:has([data-visual-proof]) :is(
+  [class*="bestForLabel"],
+  [class*="jobBestForLabel"],
+  .pb-drawer__best-for-label
+) {
+  color: var(--studio-label, #8ff5c6) !important;
+  -webkit-text-fill-color: var(--studio-label, #8ff5c6) !important;
+}
+
+html:has([data-visual-proof]) [data-layout="one-tablet"] [data-panel="builder"] [class*="jobCard"][data-selected="true"] {
+  background: color-mix(in srgb, #bfd8f2 48%, transparent) !important;
+  background-color: color-mix(in srgb, #bfd8f2 48%, transparent) !important;
+  border: var(--studio-border-width) solid #bfd8f2 !important;
+}
+
+html:has([data-visual-proof]) [data-layout="one-tablet"] :is(
+  .pb-plan-summary__view-scope,
+  .pb-plan-summary__policy-toggle
+) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--studio-label, #8ff5c6) !important;
+}
+
+/* Action row is controls, not a second Studio Plan surface. */
+html:has([data-visual-proof]) [data-plan-actions] {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Plan details stays an outlined control. Do not flatten it into a hairline. */
+html:has([data-visual-proof]) [data-plan-details-toggle="true"] {
+  display: inline-flex !important;
+  width: auto !important;
+  max-width: 100% !important;
+  border: var(--studio-border-width) solid #c8b59b !important;
+  border-radius: 0.85rem !important;
+  background: transparent !important;
+  box-sizing: border-box !important;
+}

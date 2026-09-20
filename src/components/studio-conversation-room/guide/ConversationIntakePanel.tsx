@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 
 import ProjectIntakeMultiServiceForm from "@/components/studio-conversation-room/guide/ProjectIntakeMultiServiceForm";
+import SamsungDeckBack from "@/components/studio-conversation-room/guide/SamsungDeckBack";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
 import type { RouteMapIntakeAnswers } from "@/config/route-map-intake-v1";
@@ -14,6 +15,7 @@ import {
   resolveIntakeEntrySurface,
   type IntakeEntrySurface,
 } from "@/lib/route-map-intake-continuity";
+import { FLYER_PRODUCTION_INTAKE_ANSWER_KEYS } from "@/lib/project-intake-flyer-production";
 import {
   intakeBusinessNameCarryForward,
   recordIntakeAnswerChanges,
@@ -21,6 +23,8 @@ import {
 import {
   saveRouteMapIntakeDraft,
   submitRouteMapIntake,
+  mergeSubmittedFlyerIntakeCorrection,
+  saveSubmittedFlyerIntakeCorrectionDraft,
 } from "@/lib/route-map-campaign";
 import {
   isIntakeComplete,
@@ -31,6 +35,7 @@ import { utilityPageFontClassName } from "@/lib/utility-page-fonts";
 import { resetConversationStageScroll } from "@/lib/studio-conversation-stage-scroll";
 
 import "@/app/route-map/route-map.css";
+import "@/app/studio-visual-system-v2.css";
 
 export type ConversationIntakePanelProps = {
   onClose: () => void;
@@ -43,7 +48,13 @@ export type ConversationIntakePanelProps = {
   /** Mobile dedicated page — not an overlay on Conversation Room. */
   phonePage?: boolean;
   /** Payment received / services confirmed — shown once on the phone page. */
-  paidAcknowledgment?: readonly string[];
+  paidAcknowledgment?: readonly {
+    label: string;
+    confirmed: boolean;
+  }[];
+  topControls?: ReactNode;
+  onDeckBack?: () => void;
+  deckBackLabel?: string | null;
 };
 
 type IntakeGate = Exclude<IntakeEntrySurface, { kind: "form" }>;
@@ -88,6 +99,9 @@ export default function ConversationIntakePanel({
   nextStepBlurb,
   phonePage = false,
   paidAcknowledgment = [],
+  topControls = null,
+  onDeckBack,
+  deckBackLabel = null,
 }: ConversationIntakePanelProps) {
   const v = conversationRoomGuideV1;
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -119,12 +133,15 @@ export default function ConversationIntakePanel({
   const handleSaveDraft = useCallback(
     (answers: RouteMapIntakeAnswers) => {
       const current = readCurrentCampaignHydrated();
-      if (isIntakeComplete(current) || !current?.paymentReceivedAt) {
+      const correction = surface?.kind === "form" && surface.flyerProductionCorrection;
+      if (!correction && (isIntakeComplete(current) || !current?.paymentReceivedAt)) {
         setDraftStatus("error");
         return false;
       }
-      const previous = current.routeMapIntakeDraft?.answers ?? null;
-      const updated = saveRouteMapIntakeDraft(answers);
+      const previous = current?.routeMapIntakeDraft?.answers ?? null;
+      const updated = correction
+        ? saveSubmittedFlyerIntakeCorrectionDraft(answers)
+        : saveRouteMapIntakeDraft(answers);
       if (!updated) {
         setDraftStatus("error");
         return false;
@@ -138,14 +155,15 @@ export default function ConversationIntakePanel({
       setDraftStatus("saved");
       return true;
     },
-    [prefillBusinessName],
+    [prefillBusinessName, surface],
   );
 
   const handleSubmit = useCallback(
-    (answers: RouteMapIntakeAnswers): boolean => {
+    async (answers: RouteMapIntakeAnswers): Promise<boolean> => {
       setSubmitError(null);
       const current = readCurrentCampaignHydrated();
-      if (isIntakeComplete(current)) {
+      const correction = surface?.kind === "form" && surface.flyerProductionCorrection;
+      if (!correction && isIntakeComplete(current)) {
         setGateOverride({ kind: "already-submitted" });
         return false;
       }
@@ -167,24 +185,72 @@ export default function ConversationIntakePanel({
         return false;
       }
 
-      const previous = current.routeMapIntakeDraft?.answers ?? null;
+      const previous =
+        (correction ? current.routeMapIntake?.answers : current.routeMapIntakeDraft?.answers) ??
+        null;
 
-      const updated = submitRouteMapIntake(answers);
+      if (correction) {
+        mergeSubmittedFlyerIntakeCorrection(answers);
+        const response = await fetch(
+          `/api/campaigns/${current.campaignId}/flyer-intake-correction`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ answers }),
+          },
+        );
+        if (!response.ok) {
+          setDraftStatus("error");
+          setSubmitError(INTAKE_CONTINUITY_COPY.submitFailed);
+          return false;
+        }
+        recordIntakeAnswerChanges({
+          previous,
+          next: answers,
+          carryForward: intakeBusinessNameCarryForward(prefillBusinessName),
+        });
+        await onSubmitSuccess();
+        return true;
+      }
+
+      const submittedAt = new Date().toISOString();
+      const checkoutSessionId = current.paymentTruth?.checkoutSessionId;
+      if (!checkoutSessionId) {
+        setDraftStatus("error");
+        setSubmitError(INTAKE_CONTINUITY_COPY.submitFailed);
+        return false;
+      }
+      const persist = await fetch("/api/payments/intake-submit", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          checkoutSessionId,
+          answers,
+          submittedAt,
+        }),
+      });
+      if (!persist.ok) {
+        setDraftStatus("error");
+        setSubmitError(INTAKE_CONTINUITY_COPY.submitFailed);
+        return false;
+      }
+      const updated = submitRouteMapIntake(answers, submittedAt);
       if (!updated) {
         setDraftStatus("error");
         setSubmitError(INTAKE_CONTINUITY_COPY.submitFailed);
         return false;
       }
-      /* Only attribute after the campaign write succeeds — no false completion history. */
       recordIntakeAnswerChanges({
         previous,
         next: answers,
         carryForward: intakeBusinessNameCarryForward(prefillBusinessName),
       });
-      onSubmitSuccess();
+      await onSubmitSuccess();
       return true;
     },
-    [onSubmitSuccess, prefillBusinessName],
+    [onSubmitSuccess, prefillBusinessName, surface],
   );
 
   const draftLabel =
@@ -194,13 +260,31 @@ export default function ConversationIntakePanel({
         ? "Progress saved"
         : null;
 
+  const journeyChrome =
+    phonePage && (topControls || (onDeckBack && deckBackLabel)) ? (
+      <div data-tablet-journey-chrome="true">
+        {onDeckBack && deckBackLabel ? (
+          <SamsungDeckBack className={styles.backLink} onActivate={onDeckBack}>
+            ← {deckBackLabel}
+          </SamsungDeckBack>
+        ) : null}
+        {topControls}
+      </div>
+    ) : null;
+
   const intakeHeader = (
+    <>
+    {journeyChrome}
     <header className={styles.header}>
       <div>
         {phonePage ? null : (
           <p className={styles.eyebrow}>Conversation Room</p>
         )}
-        <h2 className={styles.title}>{v.intakeTitle}</h2>
+        <h2 className={styles.title}>
+          {surface?.kind === "form" && surface.flyerProductionCorrection
+            ? INTAKE_CONTINUITY_COPY.flyerCorrectionTitle
+            : v.intakeTitle}
+        </h2>
       </div>
       {phonePage ? null : (
         <button
@@ -213,13 +297,20 @@ export default function ConversationIntakePanel({
         </button>
       )}
     </header>
+    </>
   );
 
   const paidAck =
     phonePage && paidAcknowledgment.length > 0 ? (
       <ul className={styles.intakePaidAck} aria-label="Payment confirmation">
         {paidAcknowledgment.map((item) => (
-          <li key={item}>{item}</li>
+          <li
+            key={item.label}
+            className={styles.intakePaidAckItem}
+            data-confirmed={item.confirmed ? "true" : "false"}
+          >
+            {item.label}
+          </li>
         ))}
       </ul>
     ) : null;
@@ -284,10 +375,16 @@ export default function ConversationIntakePanel({
       {intakeHeader}
       {paidAck}
 
-      <p className={styles.intro}>{v.intakeLead}</p>
-      <p className={styles.checkoutScopeDisclosure} role="note">
-        {v.intakeLaterMaterialsTip}
+      <p className={styles.intro}>
+        {surface.flyerProductionCorrection
+          ? INTAKE_CONTINUITY_COPY.flyerCorrectionLead
+          : v.intakeLead}
       </p>
+      {surface.flyerProductionCorrection ? null : (
+        <p className={styles.checkoutScopeDisclosure} role="note">
+          {v.intakeLaterMaterialsTip}
+        </p>
+      )}
       {draftLabel ? (
         <p className={styles.intakeDraftStatus} role="status" aria-live="polite">
           {draftLabel}
@@ -298,7 +395,7 @@ export default function ConversationIntakePanel({
         className={`${styles.intakeHostSurface} ${utilityPageFontClassName}`}
       >
         <ProjectIntakeMultiServiceForm
-          key={surface.selectedServiceIds.join("|")}
+          key={`${surface.selectedServiceIds.join("|")}:${surface.flyerProductionCorrection ? "flyer-fix" : "full"}`}
           selectedServiceIds={surface.selectedServiceIds}
           initialDraftAnswers={surface.draftAnswers}
           prefillBusinessName={prefillBusinessName}
@@ -310,6 +407,11 @@ export default function ConversationIntakePanel({
           submitCtaLabel={submitCtaLabel}
           nextStepBlurb={nextStepBlurb}
           phoneLayout={phonePage}
+          visibleAnswerKeys={
+            surface.flyerProductionCorrection
+              ? FLYER_PRODUCTION_INTAKE_ANSWER_KEYS
+              : null
+          }
         />
       </div>
     </div>

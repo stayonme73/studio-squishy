@@ -1,0 +1,20 @@
+---
+description: Throughout means the whole customer site, end to end, mobile and laptop.
+alwaysApply: true
+---
+
+# Throughout = whole site
+
+When Tagia says **throughout**, **site-wide**, **the Studio**, or **the visual system**, that means the **entire customer-facing journey**, not the screen that happens to be open.
+
+Scope: Lobby → Conversation Room → Payment → Intake → Auth / Account → Studio Board → Project Record → Materials / Rights → Communication → Review Room → Help Center → Final Delivery → New Project → Back / Return / navigation → drawers, modals, sheets, chips, fields, notices, cards, status blocks.
+
+Both **mobile and laptop**. One design system. Do not patch one page and call it done.
+
+Normalize at shared tokens, shared CSS, and shared components first. Then audit every customer route for leftovers.
+
+Shared visual system is accepted and frozen. Do not redesign accepted surfaces.
+
+2026-09-19 contrast revision (owner): readability takes priority over perfectly clear. Use one shared veil plus one light transparent smoke on readable surfaces. Lounge must stay visible. No frost, no blur, no opaque dark cards, no page-to-page strength changes. White text and baby-blue selected stay. Champagne trim stays and may be strengthened. Opacity locked 2026-09-20 on Samsung: one shared veil 40% + light smoke 28%. Bright mint labels #8FF5C6. Paper type is title 20 / subtitle 18 / communication 16 / small 14. Do not restyle accepted surfaces.
+
+Mobile Certification resumes from Final Delivery. No merge. No push.

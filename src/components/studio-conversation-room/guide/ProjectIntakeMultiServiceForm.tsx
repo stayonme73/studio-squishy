@@ -22,6 +22,11 @@ import {
   setSharedMaterialsAnswer,
 } from "@/lib/project-intake-completeness";
 import {
+  flyerMustIncludeHasProductionFacts,
+  flyerIntakeAnswerKey,
+  FLYER_MUST_INCLUDE_PRODUCTION_HINT,
+} from "@/lib/project-intake-flyer-production";
+import {
   buildProjectIntakePlan,
   projectIntakeServiceFieldKey,
   type ProjectIntakePlan,
@@ -30,6 +35,7 @@ import { PROJECT_INTAKE_AUTOSAVE_DEBOUNCE_MS } from "@/lib/project-intake-tablet
 import type { ServiceId } from "@/catalog/types";
 
 import "@/app/route-map/route-map.css";
+import "@/app/studio-visual-system-v2.css";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 
 /** Same materials requirement, shorter on a phone. */
@@ -42,12 +48,14 @@ export type ProjectIntakeMultiServiceFormProps = {
   initialDraftAnswers?: RouteMapIntakeAnswers | null;
   prefillBusinessName?: string | null;
   onSaveDraft?: (answers: RouteMapIntakeAnswers) => boolean;
-  onSubmit: (answers: RouteMapIntakeAnswers) => boolean;
+  onSubmit: (answers: RouteMapIntakeAnswers) => boolean | Promise<boolean>;
   onDraftStatusChange?: (status: "unsaved" | "saved" | "error") => void;
   /** Live answer stream for tablet status (every change, including mount). */
   onAnswersChange?: (answers: RouteMapIntakeAnswers) => void;
   /** Phone Conversation Room: stack questions, lighter glass. Desktop overlay unchanged. */
   phoneLayout?: boolean;
+  /** Show only these answer keys — used for flyer production correction. */
+  visibleAnswerKeys?: readonly string[] | null;
   submitError?: string | null;
   /** Truthful handoff — must match real next destination. */
   submitCtaLabel: string;
@@ -66,6 +74,7 @@ function IntakePlainTextField({
   rows = 3,
   placeholder,
   autoFocus = false,
+  paintKey,
 }: {
   value: string;
   onChange: (next: string) => void;
@@ -74,12 +83,21 @@ function IntakePlainTextField({
   rows?: number;
   placeholder?: string;
   autoFocus?: boolean;
+  paintKey: string;
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
   const focusedRef = useRef(false);
   const valueRef = useRef(value);
   valueRef.current = value;
+  const [browserPaintLocked, setBrowserPaintLocked] = useState(true);
+
+  function unlockBrowserPaint(
+    node: HTMLInputElement | HTMLTextAreaElement | null,
+  ) {
+    if (node) node.readOnly = false;
+    setBrowserPaintLocked(false);
+  }
 
   useEffect(() => {
     if (focusedRef.current) return;
@@ -90,12 +108,30 @@ function IntakePlainTextField({
   useEffect(() => {
     if (!autoFocus) return;
     const node = multiline ? areaRef.current : inputRef.current;
+    unlockBrowserPaint(node);
     node?.focus();
   }, [autoFocus, multiline]);
 
   function handleChange(next: string) {
     onChange(next);
   }
+
+  const fieldName = `siw-${paintKey}`;
+  const shared = {
+    name: fieldName,
+    className: styles.intakeTypeLine,
+    "data-intake-type-line": "true",
+    autoComplete: "off" as const,
+    autoCorrect: "off",
+    autoCapitalize: "none" as const,
+    spellCheck: false,
+    "data-lpignore": "true",
+    "data-1p-ignore": "true",
+    "data-form-type": "other",
+    readOnly: browserPaintLocked,
+    onPointerDown: () =>
+      unlockBrowserPaint(multiline ? areaRef.current : inputRef.current),
+  };
 
   if (multiline) {
     return (
@@ -105,7 +141,9 @@ function IntakePlainTextField({
         rows={rows}
         placeholder={placeholder}
         defaultValue={value}
+        {...shared}
         onFocus={() => {
+          unlockBrowserPaint(areaRef.current);
           focusedRef.current = true;
         }}
         onBlur={() => {
@@ -125,7 +163,10 @@ function IntakePlainTextField({
       required={required}
       placeholder={placeholder}
       defaultValue={value}
+      inputMode="text"
+      {...shared}
       onFocus={() => {
+        unlockBrowserPaint(inputRef.current);
         focusedRef.current = true;
       }}
       onBlur={() => {
@@ -158,6 +199,7 @@ function ChoiceChips({
             className={`route-map-social-intake__chip${
               selected ? " route-map-social-intake__chip--selected" : ""
             }`}
+            data-selected={selected ? "true" : "false"}
             aria-pressed={selected}
             onClick={() => onSelect(option)}
           >
@@ -216,10 +258,11 @@ function FieldCard({
           onSelect={onMaterialsAvailability}
         />
         {describeOpen ? (
-          <label className="route-map-social-intake__compact-field">
+          <label className={styles.intakeTypeWell} data-intake-type-well="true">
             <span>Describe filenames, links, colors, or references</span>
             <IntakePlainTextField
               key={`${field.id}-describe`}
+              paintKey={`${step}d`}
               multiline
               required={Boolean(field.required)}
               rows={3}
@@ -266,9 +309,10 @@ function FieldCard({
           {hint ? <p>{hint}</p> : null}
         </div>
       </div>
-      <label className="route-map-social-intake__compact-field">
+      <label className={styles.intakeTypeWell} data-intake-type-well="true">
         <span className="sr-only">{field.label}</span>
         <IntakePlainTextField
+          paintKey={`${step}`}
           multiline={field.type === "textarea"}
           required={field.required}
           rows={compactCopy ? 3 : 4}
@@ -296,6 +340,7 @@ export default function ProjectIntakeMultiServiceForm({
   submitCtaLabel,
   nextStepBlurb,
   phoneLayout = false,
+  visibleAnswerKeys = null,
 }: ProjectIntakeMultiServiceFormProps) {
   const plan: ProjectIntakePlan = useMemo(
     () => buildProjectIntakePlan(selectedServiceIds),
@@ -341,8 +386,25 @@ export default function ProjectIntakeMultiServiceForm({
     };
   }, [answers]);
 
-  const progress = projectIntakeProgressLabel(plan, answers);
-  const ready = isProjectIntakePlanReady(plan, answers);
+  const correctionKeys = visibleAnswerKeys;
+  const isCorrection = Boolean(correctionKeys?.length);
+  const isVisibleKey = (key: string) =>
+    !correctionKeys || correctionKeys.includes(key);
+
+  const progress = isCorrection
+    ? {
+        completed: (correctionKeys ?? []).filter((key) =>
+          String(answers[key] ?? "").trim(),
+        ).length,
+        total: correctionKeys?.length ?? 0,
+      }
+    : projectIntakeProgressLabel(plan, answers);
+  const mustIncludeValue = answers[flyerIntakeAnswerKey("mustInclude")] ?? "";
+  const mustIncludeFactsOk = flyerMustIncludeHasProductionFacts(mustIncludeValue);
+  const ready = isCorrection
+    ? (correctionKeys ?? []).every((key) => String(answers[key] ?? "").trim()) &&
+      mustIncludeFactsOk
+    : isProjectIntakePlanReady(plan, answers);
   const nextStepCopy = phoneLayout
     ? nextStepBlurb.replaceAll("section", "question")
     : nextStepBlurb;
@@ -360,8 +422,9 @@ export default function ProjectIntakeMultiServiceForm({
     event.preventDefault();
     if (!ready) return;
     setSubmitting(true);
-    const ok = onSubmit(answers);
-    if (!ok) setSubmitting(false);
+    void Promise.resolve(onSubmit(answers)).then((ok) => {
+      if (!ok) setSubmitting(false);
+    });
   }
 
   let step = 0;
@@ -414,11 +477,18 @@ export default function ProjectIntakeMultiServiceForm({
         </p>
       )}
 
-      <form className="route-map-social-intake__form" onSubmit={handleSubmit}>
-        {plan.sharedFields.length > 0 ? (
+      <form
+        className="route-map-social-intake__form"
+        autoComplete="off"
+        onSubmit={handleSubmit}
+      >
+            {plan.sharedFields.some((shared) => isVisibleKey(shared.answerKey)) ? (
           <div className={styles.intakeSectionBlock}>
-            <h3 className={styles.intakeSectionHeading}>Shared for this project</h3>
+            {isCorrection ? null : (
+              <h3 className={styles.intakeSectionHeading}>Shared for this project</h3>
+            )}
             {plan.sharedFields.map((shared) => {
+              if (!isVisibleKey(shared.answerKey)) return null;
               step += 1;
               const currentStep = step;
               return (
@@ -467,32 +537,53 @@ export default function ProjectIntakeMultiServiceForm({
           </div>
         ) : null}
 
-        {plan.services.map((section) => (
+        {plan.services.map((section) => {
+          const visibleFields = section.fields.filter((field) =>
+            isVisibleKey(projectIntakeServiceFieldKey(section.serviceId, field.id)),
+          );
+          if (visibleFields.length === 0) return null;
+          return (
           <div key={section.serviceId} className={styles.intakeSectionBlock}>
             <h3 className={styles.intakeSectionHeading}>{section.title}</h3>
-            {phoneLayout ? null : (
+            {phoneLayout || isCorrection ? null : (
               <p className={styles.intakeSectionLead}>{section.jobName}</p>
             )}
-            {section.fields.map((field) => {
+            {visibleFields.map((field) => {
               step += 1;
               const key = projectIntakeServiceFieldKey(section.serviceId, field.id);
               const currentStep = step;
+              const correctionField =
+                isCorrection && field.id === "mustInclude"
+                  ? {
+                      ...field,
+                      hint: FLYER_MUST_INCLUDE_PRODUCTION_HINT,
+                    }
+                  : field;
               return (
                 <FieldCard
                   key={key}
                   step={currentStep}
-                  field={field}
+                  field={correctionField}
                   compactCopy={phoneLayout}
                   value={answers[key] ?? ""}
                   onChange={(next) => setAnswer(key, next)}
                 />
               );
             })}
+            {isCorrection && !mustIncludeFactsOk && mustIncludeValue.trim() ? (
+              <p className={styles.intakeContinueHint} role="status">
+                {FLYER_MUST_INCLUDE_PRODUCTION_HINT}
+              </p>
+            ) : null}
           </div>
-        ))}
+          );
+        })}
 
         <div className="route-map-social-intake__actions">
-          <div className="route-map-social-intake__next-step">
+          <div
+            id="intake-continue-hint"
+            className="route-map-social-intake__next-step"
+          >
             <strong>Next Step</strong>
             <span>{nextStepCopy}</span>
           </div>
@@ -514,15 +605,6 @@ export default function ProjectIntakeMultiServiceForm({
           >
             {submitCtaLabel}
           </button>
-          {!ready ? (
-            <p
-              id="intake-continue-hint"
-              className={styles.intakeContinueHint}
-              role="status"
-            >
-              Complete the required questions to continue.
-            </p>
-          ) : null}
         </div>
         {submitError ? (
           <p className="route-map-social-intake__submit-error" role="alert">

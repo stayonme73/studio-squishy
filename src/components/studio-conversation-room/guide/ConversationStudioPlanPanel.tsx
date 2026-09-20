@@ -7,6 +7,7 @@ import type { RouteMapJobId } from "@/config/route-map-v1";
 import type { ProjectBuilderStudioPlanSummaryModel } from "@/lib/project-builder-studio-plan-summary";
 
 import "@/app/project-builder/project-builder.css";
+import "@/app/studio-visual-system-v2.css";
 
 export type ConversationStudioPlanPanelProps = {
   model: ProjectBuilderStudioPlanSummaryModel;

@@ -64,19 +64,14 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: color-mix(in srgb, #2e2b28 18%, transparent);
+  background: var(--studio-veil-fill, color-mix(in srgb, #20262d 40%, transparent));
 }
 
 .studio-environment-shell__frost {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Gold Master ivory, light enough the Lounge remains visible. Not 14px. */
-  background: color-mix(
-    in srgb,
-    color-mix(in srgb, #f7f4ee 68%, #ebe2d4 32%) 22%,
-    transparent
-  );
+  background: transparent;
 }
 
 html:has(.lobby-entry-film) .studio-environment-shell__frost,

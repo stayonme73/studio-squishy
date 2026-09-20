@@ -4,7 +4,6 @@ import { type CSSProperties, type ReactNode } from "react";
 
 import { studioConversationRoomV1 } from "@/config/studio-conversation-room-v1";
 import styles from "@/components/studio-conversation-room/studio-workspace.module.css";
-import voiceFilm from "@/components/studio-conversation-room/voice-choice-film.module.css";
 
 export type StudioWorkspaceProps = {
   /** Runtime content only — never baked into hardware. */
@@ -25,8 +24,8 @@ export type StudioWorkspaceProps = {
    */
   loungeLight?: boolean;
   /**
-   * Opening-question family reuses Voice Choice `.panel`.
-   * Do not invent a second glass. Hides tablet/device chrome.
+   * Opening-question family hides tablet/device chrome.
+   * The Conversation tablet is the one surface — not a second film panel.
    */
   nameQuestion?: boolean;
 };
@@ -77,7 +76,7 @@ export default function StudioWorkspace({
         >
           {nameQuestion ? (
             <div
-              className={`${voiceFilm.panel} ${styles.nameQuestionPanel}`}
+              className={styles.nameQuestionPanel}
               role="region"
               aria-label="Studio conversation question"
               data-name-question-panel="true"

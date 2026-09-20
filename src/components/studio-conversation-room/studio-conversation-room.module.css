@@ -112,7 +112,7 @@
 
 .surfaceStack > :first-child {
   width: 100%;
-  min-width: 100%;
+  min-width: 0;
   max-width: 100%;
   height: var(--max-tablet-height);
   max-height: var(--max-tablet-height);
@@ -288,6 +288,8 @@
      */
     overflow-x: clip;
     overflow-y: visible;
+    width: 100%;
+    max-width: 100%;
     overflow-anchor: none;
     overscroll-behavior-x: none;
     height: auto;
@@ -324,6 +326,7 @@
   .roomStage {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
   }
 
   .slideHost {

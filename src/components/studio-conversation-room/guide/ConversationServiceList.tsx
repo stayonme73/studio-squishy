@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import ProjectBuilderJobDetailBlocks from "@/components/project-builder/ProjectBuilderJobDetailBlocks";
 import "@/components/project-builder/project-builder-job-details.css";
+import "@/app/studio-visual-system-v2.css";
+import SamsungDeckBack from "@/components/studio-conversation-room/guide/SamsungDeckBack";
 import SamsungDenimCta from "@/components/studio-conversation-room/guide/SamsungDenimCta";
 import styles from "@/components/studio-conversation-room/guide/conversation-activity-panel.module.css";
 import { conversationRoomGuideV1 } from "@/config/conversation-room-guide-v1";
@@ -40,6 +42,7 @@ export type ConversationServiceListProps = {
   onReviewStudioPlan: () => void;
   /** Mobile dedicated page — not an overlay on Conversation Room. */
   phonePage?: boolean;
+  topControls?: ReactNode;
 };
 
 export default function ConversationServiceList({
@@ -51,6 +54,7 @@ export default function ConversationServiceList({
   onRemoveJob,
   onReviewStudioPlan,
   phonePage = false,
+  topControls = null,
 }: ConversationServiceListProps) {
   const v = conversationRoomGuideV1;
   const road = getRouteMapRoad(roadId);
@@ -78,11 +82,17 @@ export default function ConversationServiceList({
       data-panel="builder"
       data-surface={phonePage ? "page" : "overlay"}
     >
+      {phonePage ? (
+        <div data-tablet-journey-chrome="true">
+          <SamsungDeckBack className={styles.backLink} onActivate={onBackToRoutes}>
+            ← {v.servicesBackToRouteLabel}
+          </SamsungDeckBack>
+          {topControls}
+        </div>
+      ) : null}
       <header className={styles.header} data-builder-chrome="header">
         <div>
-          {phonePage ? (
-            <p className={styles.eyebrow}>{v.servicesStepLabel}</p>
-          ) : (
+          {phonePage ? null : (
             <p className={styles.eyebrow}>
               {road
                 ? `${road.highwayLabel} — ${road.customerLabel}`
@@ -112,9 +122,11 @@ export default function ConversationServiceList({
       {phonePage ? null : <p className={styles.intro}>{v.servicesPanelLead}</p>}
 
       <div className={styles.builderToolbar} data-builder-chrome="toolbar">
-        <button type="button" className={styles.backLink} onClick={onBackToRoutes}>
-          ← {phonePage ? v.servicesBackToRouteLabel : v.servicesBackToRoutesLabel}
-        </button>
+        {phonePage ? null : (
+          <SamsungDeckBack className={styles.backLink} onActivate={onBackToRoutes}>
+            ← {v.servicesBackToRoutesLabel}
+          </SamsungDeckBack>
+        )}
         <div className={styles.builderSummaryStack}>
           <p className={styles.builderCount}>
             {PROJECT_BUILDER_V1.selectedCountLabel}: {selectedCount}
