@@ -1,0 +1,101 @@
+# STUDIO CANONICAL LAUNCH TRUTH
+
+**Record:** `STUDIO-CANONICAL-LAUNCH-TRUTH-1`  
+**Owner ruling:** Tagia · 2026-10-10  
+**Config:** `src/config/studio-canonical-launch-truth-v1.ts`  
+**Status:** **CURRENT LAUNCH AUTHORITY**  
+**Publish:** none · **Deploy:** none · **Merge:** none · **Push:** none
+
+This is the one current authority for:
+
+- the canonical customer-facing launch menu
+- current launch prices
+- publish state
+- certification and freeze state
+- which older records are superseded
+
+Other records may point here. They must not independently contradict it. This record and its config import nothing, so there is no circular authority.
+
+Price rule: the three prices below must equal the owner price lock in `docs/launch/studio-customer-journey-condense-1/THREE-PACKAGE-REVISION-TRUTH-V1-LOCKED.md` (2026-10-04). A test checks this (`src/lib/studio-canonical-launch-truth/canonical-launch-truth.test.ts`).
+
+---
+
+## Canonical launch menu
+
+The Studio launches through the **three-package door only**. Customer-facing launch package count: **3**.
+
+| Package | Launch price | Paid after 20% Studio Thank-You | Revision rounds | Launch publish state | Certification / freeze | Record |
+|---|---|---|---|---|---|---|
+| Clip Repurposing | **$399** | $319.20 | 3 | **UNPUBLISHED** | Proven end to end in Stripe test mode, with explicit limits. Owner frozen 2026-10-09. | `THREE-PACKAGE-CLIP-REPURPOSING-399-RECORD.md` |
+| Short-Form Video Editing | **$249** | $199.20 | 3 | **UNPUBLISHED** | Proven end to end in Stripe test mode, with explicit limits. Owner frozen 2026-10-09. | `THREE-PACKAGE-SHORT-FORM-VIDEO-EDITING-249-RECORD.md` |
+| Social & Promo Graphics | **$199** | $159.20 | 3 | **UNPUBLISHED** | Certified and frozen with explicit limits, 2026-10-10. | `../studio-social-promo-signed-in-delivery-proof-1/STUDIO-SOCIAL-PROMO-GRAPHICS-CERTIFICATION-FREEZE.md` |
+
+**Nothing is deployed publicly.** The Studio runs on localhost only. No publication is authorized by this record.
+
+---
+
+## The old 11-service shelf
+
+The old Launch Now shelf (the original nine, Short-Form Video Editing at $349, Clip Repurposing at $549) is **not** part of the customer-facing launch menu.
+
+It stays as history and internal reference. It must not:
+
+- drive the public launch menu
+- drive customer checkout
+- override current package prices
+- leak old prices through Studio Voice
+- create a second customer purchase path
+
+Historical service and catalog rows were not deleted or rewritten.
+
+## Clip publish state
+
+For launch truth, Clip Repurposing is **UNPUBLISHED**. The 26 September $549 publish record is preserved as superseded history. It does not define the launch state. The launch offer for Clip is the three-package $399 offer.
+
+## Short-Form launch truth
+
+The three-package Short-Form offer is **$249**. The historical $349 Short-Form service and its 2026-09-25 freeze remain historical evidence. They are not rewritten. Their local evidence files are quarantined; see `../studio-operating-short-form-video-editing-build-1/STUDIO-OPERATING-SHORT-FORM-EVIDENCE-QUARANTINE-2026-10-10.md`.
+
+---
+
+## Code still behaves the old way (not fixed here)
+
+This was a records-only pass. These gaps are launch-blocker engineering items:
+
+1. `listPublicLaunchNowServices()` still returns the 11-service shelf. It is driven by the flags in `src/config/studio-internal-sell-now-register-v1.ts`.
+2. Studio Voice answers from the three-package script first. Its fallback (`answerServiceFitFromShelf` in `src/lib/studio-customer-life/answer-question.ts`) uses the 11-service shelf and can quote $349 or $549.
+3. The legacy per-service checkout path (`deriveCheckoutAmountCents` in `src/lib/studio-payment/create-session.ts`) still exists beside the three-package `condensed_offer` path.
+
+The homepage `/` already shows the three-package door. `/route-map` already redirects to the Conversation Room.
+
+---
+
+## Superseded historical records
+
+Preserved unchanged except for a SUPERSEDED notice pointing here:
+
+| Record | What it said | Status now |
+|---|---|---|
+| `studio-operating-short-form-video-editing-build-1/STUDIO-OPERATING-SHORT-FORM-VIDEO-EDITING-CERTIFICATION-FREEZE.md` | $349 Short-Form certified and frozen, 2026-09-25 | Historical. Evidence quarantined. |
+| `studio-operating-short-form-video-editing-public-publish-1/…PUBLIC-PUBLISH.md` | $349 Short-Form published, public 10, 2026-09-25 | Superseded for launch |
+| `studio-operating-clip-repurposing-build-1/STUDIO-OPERATING-CLIP-REPURPOSING-CERTIFICATION-FREEZE.md` | $549 Clip certified and frozen, 2026-09-25 | Historical |
+| `studio-operating-clip-repurposing-price-correction-1/…PRICE-CORRECTION.md` | Clip $599 → $549, 2026-09-25 | Historical |
+| `studio-operating-clip-repurposing-public-publish-1/…PUBLIC-PUBLISH.md` | $549 Clip published, public 11, 2026-09-26 | Superseded for launch |
+| `studio-operating-public-shelf-honesty-1/…PUBLIC-SHELF-HONESTY.md` | Customer-visible choices = 11 | Superseded for launch |
+| `studio-operating-menu-readiness-and-demand-freeze-1/…MENU-READINESS-AND-DEMAND-FREEZE.md` | Public launch menu frozen at 11 / 11, 2026-09-27 | Superseded for launch |
+| `src/config/studio-internal-sell-now-register-v1.ts` | Public 11 / internal 11 | Legacy shelf state. Not launch authority. Values unchanged because code still reads them. |
+| `src/config/studio-public-shelf-honesty-v1.ts` | Customer-visible 11 | Same |
+| `src/config/studio-menu-readiness-and-demand-freeze-v1.ts` | Menu 11 | Same |
+| `src/config/studio-short-form-video-editing-public-publish-v1.ts` | Public 10 | Same |
+| `src/config/studio-clip-repurposing-public-publish-v1.ts` | Public 11 | Same |
+| `src/config/studio-clip-repurposing-price-correction-v1.ts` | Public 10 | Same |
+
+Already consistent, left as is: the 2026-10-02 Clip wiring closeout (“Clip remains unpublished”) and the 2026-10-04 owner price lock.
+
+---
+
+## Carried forward unchanged
+
+Open shared launch blocker: **laptop approval** (Review Room approval controls hidden on laptop). Not fixed.
+
+Unchanged findings: lifecycle email contradiction, live Stripe, tax, legal / privacy, hosting / publish, recovery scheduling, emergency stop.
