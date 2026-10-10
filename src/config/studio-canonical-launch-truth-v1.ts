@@ -92,7 +92,7 @@ export const studioCanonicalLaunchTruthV1 = {
   },
 
   knownCodeGapsAgainstThisTruth: [
-    "/final-delivery-room (owner Clip proof page, not a menu or purchase path) still says $549 in its page meta description.",
+    "Final Delivery Room Studio Pathway sheet (closed Clip package; uncommitted working tree) lists old-shelf services as services The Studio already sells. /final-delivery-room shows their old prices ($349, $99, $79, $129, $69); the live Clip delivery shows the same services without prices. Waiting on owner decision.",
   ],
 
   supersededHistoricalRecords: [

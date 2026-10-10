@@ -49,6 +49,7 @@ export async function POST(request: Request) {
         authorization: body.authorization,
         preferSandbox: body.preferSandbox === true,
         purchaseKind: body.purchaseKind,
+        condensedOffer: body.condensedOffer,
         ma001PackComposition: body.ma001PackComposition ?? null,
         rmj002KitLock: body.rmj002KitLock ?? null,
         rmj008KitLock: body.rmj008KitLock ?? null,

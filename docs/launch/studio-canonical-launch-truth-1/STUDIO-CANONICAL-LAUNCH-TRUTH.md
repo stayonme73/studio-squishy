@@ -68,7 +68,9 @@ The records-only pass listed three code gaps. Canonical menu enforcement closed 
 
 The three old-shelf configs (`studio-internal-sell-now-register-v1.ts`, `studio-public-shelf-honesty-v1.ts`, `studio-menu-readiness-and-demand-freeze-v1.ts`) keep their historical values and carry an explicit non-authority stamp pointing here.
 
-Remaining, not a menu or purchase path: `/final-delivery-room` (owner Clip proof page) still says $549 in its page meta description.
+The `/final-delivery-room` page meta no longer names $549 (working tree; that page belongs to the closed Clip package and is not committed).
+
+Remaining, waiting on owner decision: the Final Delivery Room Studio Pathway sheet lists old-shelf services as services The Studio already sells. On `/final-delivery-room` it shows their old prices ($349, $99, $79, $129, $69). The live Clip delivery shows the same services without prices.
 
 Gates: `src/lib/studio-canonical-menu-enforcement/enforcement.ts`.
 
