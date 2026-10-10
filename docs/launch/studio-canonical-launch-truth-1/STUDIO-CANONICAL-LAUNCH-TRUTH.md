@@ -70,7 +70,7 @@ The three old-shelf configs (`studio-internal-sell-now-register-v1.ts`, `studio-
 
 The `/final-delivery-room` page meta no longer names $549 (working tree; that page belongs to the closed Clip package and is not committed).
 
-Remaining, waiting on owner decision: the Final Delivery Room Studio Pathway sheet lists old-shelf services as services The Studio already sells. On `/final-delivery-room` it shows their old prices ($349, $99, $79, $129, $69). The live Clip delivery shows the same services without prices.
+The Final Delivery Room Studio Pathway sheet (proof page and live Clip delivery) lists the other canonical launch packages from `src/lib/studio-canonical-menu-enforcement/final-delivery-pathway.ts`, without prices. The room's own files belong to the closed Clip package and stay uncommitted in the working tree.
 
 Gates: `src/lib/studio-canonical-menu-enforcement/enforcement.ts`.
 

@@ -91,9 +91,7 @@ export const studioCanonicalLaunchTruthV1 = {
     conversationRoomOldShelfStepsLeadTo: "/" as const,
   },
 
-  knownCodeGapsAgainstThisTruth: [
-    "Final Delivery Room Studio Pathway sheet (closed Clip package; uncommitted working tree) lists old-shelf services as services The Studio already sells. /final-delivery-room shows their old prices ($349, $99, $79, $129, $69); the live Clip delivery shows the same services without prices. Waiting on owner decision.",
-  ],
+  knownCodeGapsAgainstThisTruth: [],
 
   supersededHistoricalRecords: [
     "docs/launch/studio-operating-short-form-video-editing-build-1/STUDIO-OPERATING-SHORT-FORM-VIDEO-EDITING-CERTIFICATION-FREEZE.md",
