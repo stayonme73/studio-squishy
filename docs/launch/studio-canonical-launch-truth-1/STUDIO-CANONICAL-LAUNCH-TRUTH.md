@@ -98,6 +98,43 @@ Evidence limit: the signed-in live Clip Final Delivery pathway was verified by s
 
 ---
 
+## Laptop Review Room approval (2026-10-10)
+
+### Owner classification: FUNCTIONAL PASS — CLOSED · Durability: OPEN EXPLICIT LIMIT
+
+The laptop Review Room now matches the certified phone model. One Approve press marks every visible review item approved. A shared confirmation names the package and lists every item being approved. The customer confirms, one final approval is recorded, and the Review Room closes read-only. Per-section approval controls were not reintroduced on laptop.
+
+Accepted proof, real browser, disposable test project `laptop-approval-social-1791643000000` (laptop 1440px, phone 412px):
+
+- Approve marks all 8 visible review items approved in draft state.
+- The shared confirmation shows **Package: Social & Promo Graphics** and all 8 items being approved. It fits laptop and phone.
+- One final approval submission succeeds. Exactly one approval record exists. `submittedAt` is set once.
+- The revision ledger remains 0 of 3 used.
+- The Review Room closes after approval and reopens read-only.
+- Laptop approval and review tools are disabled after approval. Phone Request a Change is absent.
+- Duplicate approval, revision request, and feedback save after approval are each rejected with 422.
+- All 8 review files remain visible. No blank tiles or raw errors.
+- No frozen or real customer data was used.
+
+Durability limit (accepted, **not resolved**): the implementation and the confirmation fix live in Review Room files that contain substantial mixed earlier uncommitted work:
+
+- `src/app/studio-visual-system-v2.css`
+- `src/components/feedback-studio/JobReviewWorkspace.tsx`
+- `src/components/feedback-studio/FeedbackStudioSubmitConfirm.tsx`
+- `src/config/c8b-review-handoff-receipts-v1.ts`
+- `src/lib/studio-review-revision/phone-revision-composer.ts` and its test
+- `src/lib/studio-visual-system-v2.test.ts`
+
+**Launch-rehearsal gate — before Launch / No-Launch certification. If any check fails, launch stops.**
+
+1. Confirm the laptop approval implementation is still present.
+2. Confirm the shared confirmation still shows the package name and the full item list.
+3. Run the Review Room approval tests.
+4. If the working tree has materially changed, run one controlled laptop open-review approval proof on a disposable test project.
+5. Stop launch if behavior no longer matches the accepted proof.
+
+---
+
 ## Superseded historical records
 
 Preserved unchanged except for a SUPERSEDED notice pointing here:
@@ -124,6 +161,6 @@ Already consistent, left as is: the 2026-10-02 Clip wiring closeout (“Clip rem
 
 ## Carried forward unchanged
 
-Open shared launch blocker: **laptop approval** (Review Room approval controls hidden on laptop). Not fixed.
+Laptop approval blocker: **CLOSED (functional)** 2026-10-10 — see Laptop Review Room approval above. Durability limit open.
 
 Unchanged findings: lifecycle email contradiction, live Stripe, tax, legal / privacy, hosting / publish, recovery scheduling, emergency stop.

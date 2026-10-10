@@ -127,7 +127,54 @@ export const studioCanonicalLaunchTruthV1 = {
         ],
       },
     },
+    {
+      id: "REVIEW-ROOM-LAPTOP-APPROVAL-UNCOMMITTED",
+      uncommittedIntegrationFiles: [
+        "src/app/studio-visual-system-v2.css",
+        "src/components/feedback-studio/JobReviewWorkspace.tsx",
+        "src/components/feedback-studio/FeedbackStudioSubmitConfirm.tsx",
+        "src/config/c8b-review-handoff-receipts-v1.ts",
+        "src/lib/studio-review-revision/phone-revision-composer.ts",
+        "src/lib/studio-review-revision/phone-revision-composer.test.ts",
+        "src/lib/studio-visual-system-v2.test.ts",
+      ],
+      evidenceLimit:
+        "The laptop approval implementation and the shared approval confirmation fix live in Review Room files that contain substantial mixed earlier uncommitted work. Customer behavior is proven in a real browser; repository durability is not.",
+      resolved: false,
+      launchRehearsalGate: {
+        requiredBefore: "Launch / No-Launch certification",
+        failureMeans: "LAUNCH_STOPS",
+        checks: [
+          "The laptop approval implementation is still present: the laptop Approve marks every visible review item approved, then opens the shared confirmation.",
+          "The shared approval confirmation still shows the package name and the full list of items being approved.",
+          "The Review Room approval tests pass.",
+          "If the working tree has materially changed, one controlled laptop open-review approval proof is run on a disposable test project.",
+          "Behavior still matches the accepted 2026-10-10 proof.",
+        ],
+      },
+    },
   ],
+
+  /** Owner decision 2026-10-10. Customer behavior proven; durability tracked above. */
+  laptopReviewRoomApproval: {
+    classification: "FUNCTIONAL_PASS_CLOSED" as const,
+    durability: "OPEN_EXPLICIT_LIMIT" as const,
+    durabilityLimitId: "REVIEW-ROOM-LAPTOP-APPROVAL-UNCOMMITTED" as const,
+    classifiedAt: "2026-10-10" as const,
+    disposableProofProjectId: "laptop-approval-social-1791643000000" as const,
+    proofWidths: { laptopPx: 1440, phonePx: 412 },
+    proven: [
+      "Approve marks all 8 visible review items approved in draft state.",
+      "The shared confirmation shows Package: Social & Promo Graphics and all 8 items being approved, and fits laptop and phone.",
+      "One final approval submission succeeds; exactly one approval record exists; submittedAt is set once.",
+      "Revision ledger remains 0 of 3 used.",
+      "The Review Room closes after approval and reopens read-only.",
+      "Laptop approval and review tools are disabled after approval; phone Request a Change is absent.",
+      "Duplicate approval, revision request, and feedback save after approval are rejected with 422.",
+      "All 8 review files remain visible with no blank tiles or raw errors.",
+      "No frozen or real customer data was used.",
+    ],
+  },
 
   supersededHistoricalRecords: [
     "docs/launch/studio-operating-short-form-video-editing-build-1/STUDIO-OPERATING-SHORT-FORM-VIDEO-EDITING-CERTIFICATION-FREEZE.md",
