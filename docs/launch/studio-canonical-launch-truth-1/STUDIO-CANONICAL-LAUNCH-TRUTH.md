@@ -74,6 +74,28 @@ The Final Delivery Room Studio Pathway sheet (proof page and live Clip delivery)
 
 Gates: `src/lib/studio-canonical-menu-enforcement/enforcement.ts`.
 
+### Owner classification: PASS WITH EXPLICIT DURABILITY LIMIT (2026-10-10)
+
+Functionally proven: the three-package menu is enforced; Studio Voice no longer presents $549 or $349 as current pricing; legacy checkout entry is blocked; the Conversation Room no longer enters the old shelf as a current purchase path; the Final Delivery proof page and live Clip delivery use the same canonical pathway builder; phone-size and laptop-size pathway rendering passed; affected working-tree tests passed; historical records are preserved.
+
+Durability limit (accepted, **not resolved**): the Final Delivery integration files stay uncommitted because they belong to older uncommitted closed-package architecture and cannot be committed without absorbing unrelated dependency chains:
+
+- `src/lib/studio-final-delivery-room/content.ts`
+- `src/lib/studio-clip-repurposing-live-delivery/resolve.ts`
+- `src/lib/studio-final-delivery-room/final-delivery-room.test.ts`
+- `src/app/final-delivery-room/page.tsx`
+
+Evidence limit: the signed-in live Clip Final Delivery pathway was verified by shared-code tests, not by a fresh browser session, because no suitable signed-in delivered Clip browser session was available. This is not a package regression.
+
+**Launch-rehearsal gate — before Launch / No-Launch certification. If any check fails, launch stops.**
+
+1. Confirm `content.ts` still uses the canonical Final Delivery pathway builder.
+2. Confirm `resolve.ts` still uses the same canonical builder.
+3. Confirm `/final-delivery-room` contains no historical service list or historical pricing presented as current.
+4. Run the Final Delivery pathway tests.
+5. Exercise the signed-in live Clip Final Delivery pathway in a real browser session.
+6. Confirm phone and laptop customer views contain no old-shelf services and no $549 or $349 current pricing.
+
 ---
 
 ## Superseded historical records

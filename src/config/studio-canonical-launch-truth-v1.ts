@@ -89,9 +89,45 @@ export const studioCanonicalLaunchTruthV1 = {
     newCustomerCheckoutPurchaseKind: "condensed_offer" as const,
     legacyCheckoutPurchaseKindsRefused: ["studio_plan", "paid_cycle"] as const,
     conversationRoomOldShelfStepsLeadTo: "/" as const,
+    ownerClassification: "PASS_WITH_EXPLICIT_DURABILITY_LIMIT" as const,
+    classifiedAt: "2026-10-10" as const,
   },
 
   knownCodeGapsAgainstThisTruth: [],
+
+  /**
+   * Owner decision 2026-10-10: accepted, not resolved. These Final Delivery
+   * integration files stay in the working tree because they belong to older
+   * uncommitted closed-package architecture and cannot be committed without
+   * absorbing unrelated dependency chains.
+   */
+  durabilityLimits: [
+    {
+      id: "FINAL-DELIVERY-PATHWAY-INTEGRATION-UNCOMMITTED",
+      uncommittedIntegrationFiles: [
+        "src/lib/studio-final-delivery-room/content.ts",
+        "src/lib/studio-clip-repurposing-live-delivery/resolve.ts",
+        "src/lib/studio-final-delivery-room/final-delivery-room.test.ts",
+        "src/app/final-delivery-room/page.tsx",
+      ],
+      committedBuilder: "src/lib/studio-canonical-menu-enforcement/final-delivery-pathway.ts",
+      evidenceLimit:
+        "The signed-in live Clip Final Delivery pathway was verified by shared-code tests, not by a fresh browser session, because no suitable signed-in delivered Clip browser session was available.",
+      resolved: false,
+      launchRehearsalGate: {
+        requiredBefore: "Launch / No-Launch certification",
+        failureMeans: "LAUNCH_STOPS",
+        checks: [
+          "content.ts still uses the canonical Final Delivery pathway builder.",
+          "resolve.ts still uses the same canonical builder.",
+          "/final-delivery-room contains no historical service list or historical pricing presented as current.",
+          "The Final Delivery pathway tests pass.",
+          "The signed-in live Clip Final Delivery pathway is exercised in a real browser session.",
+          "Phone and laptop customer views contain no old-shelf services and no $549 or $349 current pricing.",
+        ],
+      },
+    },
+  ],
 
   supersededHistoricalRecords: [
     "docs/launch/studio-operating-short-form-video-editing-build-1/STUDIO-OPERATING-SHORT-FORM-VIDEO-EDITING-CERTIFICATION-FREEZE.md",
