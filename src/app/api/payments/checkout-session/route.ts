@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 
 import { isClientUser } from "@/lib/campaign-store/access";
 import { readSessionFromRequest } from "@/lib/auth/session";
+import {
+  isCanonicalCheckoutPurchaseKind,
+  SUPERSEDED_OFFER_CHECKOUT_RESPONSE,
+} from "@/lib/studio-canonical-menu-enforcement/enforcement";
 import { createCheckoutSession } from "@/lib/studio-payment/create-session";
 import type { CheckoutSessionCreateRequest } from "@/lib/studio-payment/types";
 
@@ -25,6 +29,10 @@ export async function POST(request: Request) {
       },
       { status: 400 },
     );
+  }
+
+  if (!isCanonicalCheckoutPurchaseKind(body.purchaseKind)) {
+    return NextResponse.json(SUPERSEDED_OFFER_CHECKOUT_RESPONSE, { status: 410 });
   }
 
   const sessionUser = await readSessionFromRequest(request);

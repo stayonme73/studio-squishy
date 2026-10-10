@@ -178,6 +178,10 @@ import {
 import { readPhoneLayout, usePhoneLayout } from "@/lib/studio-phone-layout";
 import VoiceChoiceFilm from "@/components/studio-conversation-room/VoiceChoiceFilm";
 import VoicePreferenceControls from "@/components/studio-conversation-room/VoicePreferenceControls";
+import {
+  CANONICAL_LAUNCH_DOOR_HREF,
+  shouldLeaveSupersededRoomStage,
+} from "@/lib/studio-canonical-menu-enforcement/enforcement";
 
 function spokenLineForGuideStep(
   step: GuideConversationStep,
@@ -322,6 +326,12 @@ export default function ConversationRoomRuntime({
   const [activePanel, setActivePanel] = useState<ActivityPanelId>("none");
   const isPhone = usePhoneLayout();
   const [stage, setStage] = useState<ConversationRoomStage>("opening");
+  useLayoutEffect(() => {
+    if (!shouldLeaveSupersededRoomStage(stage, window.location.search)) return;
+    /* Hidden before paint so the older shelf never shows while the door loads. */
+    document.documentElement.style.visibility = "hidden";
+    window.location.replace(CANONICAL_LAUNCH_DOOR_HREF);
+  }, [stage]);
   const [projectDraft, setProjectDraft] = useState<WorkingDraftRecord | null>(
     null,
   );
@@ -476,7 +486,13 @@ export default function ConversationRoomRuntime({
     const hydratedGuide = guideFromProject.projectNeed.trim()
       ? guideFromProject
       : loadedGuide;
-    const restoredStage = resolveBootStage(project, initialStage);
+    const resolvedStage = resolveBootStage(project, initialStage);
+    const restoredStage = shouldLeaveSupersededRoomStage(
+      resolvedStage,
+      window.location.search,
+    )
+      ? "opening"
+      : resolvedStage;
     if (cancelled) return;
     const bootProject =
       restoredStage === readConversationStage(project)
@@ -494,7 +510,7 @@ export default function ConversationRoomRuntime({
     const openingAlreadySaved =
       restoredStage === "opening" &&
       (openStep === "confirmed" || Boolean(hydratedGuide.confirmedAt));
-    const bootStage = openingAlreadySaved ? "route" : restoredStage;
+    const bootStage = restoredStage;
     const bootProjectForStage =
       bootStage === readConversationStage(bootProject)
         ? bootProject

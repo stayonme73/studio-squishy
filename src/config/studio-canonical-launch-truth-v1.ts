@@ -82,14 +82,17 @@ export const studioCanonicalLaunchTruthV1 = {
     mayCreateSecondPurchasePath: false as const,
   },
 
-  /**
-   * Code still behaves the old way. Recorded here, not fixed (records-only pass).
-   * These are launch-blocker engineering items.
-   */
+  /** Runtime gates: src/lib/studio-canonical-menu-enforcement/enforcement.ts. */
+  menuEnforcement: {
+    enforcedAt: "2026-10-10" as const,
+    studioVoiceQuotesOnlyCanonicalPackages: true as const,
+    newCustomerCheckoutPurchaseKind: "condensed_offer" as const,
+    legacyCheckoutPurchaseKindsRefused: ["studio_plan", "paid_cycle"] as const,
+    conversationRoomOldShelfStepsLeadTo: "/" as const,
+  },
+
   knownCodeGapsAgainstThisTruth: [
-    "listPublicLaunchNowServices() still returns the 11-service shelf, driven by the internal SELL NOW register flags.",
-    "Studio Voice answers from the three-package script first, then falls back to the 11-service shelf (answerServiceFitFromShelf), which can quote $349 or $549.",
-    "The legacy per-SKU checkout path (deriveCheckoutAmountCents) still exists beside the condensed_offer path.",
+    "/final-delivery-room (owner Clip proof page, not a menu or purchase path) still says $549 in its page meta description.",
   ],
 
   supersededHistoricalRecords: [
