@@ -8,8 +8,8 @@ function read(rel: string) {
   return readFileSync(join(root, rel), "utf8");
 }
 
-describe("Mobile Studio Review is the one bottom utility tab", () => {
-  it("keeps the Welcome Studio Review tab as the shared visual master", () => {
+describe("Mobile Studio Controls utility tab", () => {
+  it("keeps the shared mobile tab styling for Studio Controls", () => {
     const tab = read("src/app/studio-review-mobile-tab.css");
     expect(tab).toContain(".studio-review-mobile-tab.owner-qa");
     expect(tab).toContain("color-mix(in srgb, #2e2b28 32%, transparent)");
@@ -19,13 +19,14 @@ describe("Mobile Studio Review is the one bottom utility tab", () => {
     expect(tab).toContain("backdrop-filter: blur(14px) saturate(1.04) brightness(1.1)");
     expect(tab).toContain("z-index: 10070");
     expect(tab).toContain("data-studio-controls-in-review");
-    const panel = read("src/components/dev/OwnerQaPanel.tsx");
-    expect(panel).toContain("studio-review-mobile-tab");
-    expect(panel).toContain("StudioMobileControlsSlot");
-    expect(panel).toContain("scroll: false");
+    const host = read("src/components/dev/StudioMobileUtilityHost.tsx");
+    expect(host).toContain("studio-review-mobile-tab");
+    expect(host).toContain("StudioMobileControlsSlot");
+    expect(host).toContain("Studio Controls");
+    expect(host).not.toContain("studioReview");
   });
 
-  it("moves Conversation Room Studio Controls into the Review drawer on phone", () => {
+  it("moves Conversation Room Studio Controls into the mobile utility drawer on phone", () => {
     const nav = read(
       "src/components/studio-conversation-room/ConversationNavPanel.tsx",
     );
@@ -42,11 +43,11 @@ describe("Mobile Studio Review is the one bottom utility tab", () => {
     expect(nav).toContain("onSaveForNow");
     expect(nav).toContain("onOpenHelp");
     expect(nav).toContain("onReturnToLobby");
-    expect(nav).toContain("{isPhone ? null : <StudioReviewControl onOpen={closeDrawer} />}");
+    expect(nav).not.toContain("StudioReviewControl");
     expect(nav).toContain("mobileUtility?.closeUtility()");
     const layout = read("src/app/layout.tsx");
     expect(layout).toContain("StudioMobileUtilityProvider");
-    expect(layout).toContain("OwnerQaRoot");
+    expect(layout).toContain("StudioMobileUtilityHost");
     const utility = read("src/components/dev/studio-mobile-utility.tsx");
     expect(utility).toContain("data-studio-controls-in-review");
     expect(utility).toContain("registerControls");

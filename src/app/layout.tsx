@@ -3,7 +3,7 @@ import { Comic_Neue, Geist, Geist_Mono, Inter } from "next/font/google";
 
 import { siteConfig } from "@/config/site";
 
-import OwnerQaRoot from "@/components/dev/OwnerQaRoot";
+import StudioMobileUtilityHost from "@/components/dev/StudioMobileUtilityHost";
 import { StudioMobileUtilityProvider } from "@/components/dev/studio-mobile-utility";
 import ClientSessionTimeoutGuard from "@/components/auth/ClientSessionTimeoutGuard";
 import StudioEnvironmentShell from "@/components/studio-environment/StudioEnvironmentShell";
@@ -66,7 +66,7 @@ export default function RootLayout({
               {children}
               <ClientSessionTimeoutGuard />
             </StudioPresenceRoot>
-            <OwnerQaRoot />
+            <StudioMobileUtilityHost />
           </StudioMobileUtilityProvider>
         </div>
       </body>

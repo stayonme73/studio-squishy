@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import QRCode from "qrcode";
 
+import { isOwnerUser } from "@/lib/campaign-store/access";
+import { requireSession, isNextResponse } from "@/lib/auth/require-session";
 import {
   buildDevDevicePreviewUrl,
   ownerQaPageLabelForPath,
@@ -11,10 +13,16 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Development-only: LAN URL + QR for Samsung / real-device Studio Review. */
+/** Development-only: LAN URL + QR for Owner mobile inspection (Owner Console). */
 export async function GET(request: Request) {
   if (process.env.NODE_ENV !== "development") {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  const user = await requireSession(request);
+  if (isNextResponse(user)) return user;
+  if (!isOwnerUser(user)) {
+    return NextResponse.json({ error: "Owner access required" }, { status: 403 });
   }
 
   const { searchParams } = new URL(request.url);

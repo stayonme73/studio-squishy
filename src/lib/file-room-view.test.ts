@@ -129,6 +129,34 @@ describe("file-room-view", () => {
     expect(view.health.missing).toContain("Approved Studio Plan");
   });
 
+  it("surfaces missing campaign status without throwing", () => {
+    const view = resolveFileRoomListItemView(
+      buildEnvelope({ campaignStatus: undefined as unknown as "BUILDING_CONCEPTS" }),
+    );
+    expect(view.statusLabel).toBe("Campaign status missing");
+    const detail = resolveFileRoomCampaignView(
+      buildEnvelope({ campaignStatus: undefined as unknown as "BUILDING_CONCEPTS" }),
+      emptyMaterials,
+      emptyProductionTasks,
+      emptyExceptions,
+    );
+    expect(detail.health.missing).toContain("Campaign status");
+  });
+
+  it("surfaces unmapped campaign status without throwing", () => {
+    const view = resolveFileRoomListItemView(
+      buildEnvelope({ campaignStatus: "MACHINE_ONLY_STATUS" as "BUILDING_CONCEPTS" }),
+    );
+    expect(view.statusLabel).toBe("Unmapped campaign status: MACHINE_ONLY_STATUS");
+    const detail = resolveFileRoomCampaignView(
+      buildEnvelope({ campaignStatus: "MACHINE_ONLY_STATUS" as "BUILDING_CONCEPTS" }),
+      emptyMaterials,
+      emptyProductionTasks,
+      emptyExceptions,
+    );
+    expect(detail.health.missing).toContain("Campaign status mapping");
+  });
+
   it("does not depend on localStorage-backed intake fallback", () => {
     const view = resolveFileRoomCampaignView(
       buildEnvelope({

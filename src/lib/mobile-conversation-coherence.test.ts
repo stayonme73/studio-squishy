@@ -7,6 +7,14 @@ import {
   getSelectableRouteMapRoads,
 } from "@/config/route-map-v1";
 
+function compactBetween(source: string, startMarker: string, endMarker: string): string {
+  const start = source.indexOf(startMarker);
+  const end = source.indexOf(endMarker, start + startMarker.length);
+  expect(start).toBeGreaterThan(-1);
+  expect(end).toBeGreaterThan(start);
+  return source.slice(start, end).replace(/\s+/g, " ");
+}
+
 describe("Mobile Conversation Room coherence (MJ-D9)", () => {
   it("does not render questions until Voice On / Voice Off is chosen", () => {
     const runtime = readFileSync(
@@ -17,7 +25,10 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
       "utf8",
     );
     expect(runtime).toContain("const voiceUnset = voiceNarration === null");
-    expect(runtime).toContain("voiceUnset || openingAsk ? null");
+    const communication = compactBetween(runtime, "communication={", "/>");
+    expect(communication.indexOf("voiceUnset")).toBeLessThan(communication.indexOf("openingAsk"));
+    expect(communication.indexOf("openingAsk")).toBeLessThan(communication.indexOf("askMode"));
+    expect(communication.indexOf("askMode")).toBeLessThan(communication.indexOf("null"));
     expect(runtime).toContain("privacyNote={STUDIO_GUIDE_MIC_PRIVACY_NOTE}");
     expect(runtime).toContain("<VoiceChoiceFilm");
     expect(runtime).not.toContain("voiceChoice={");
@@ -42,7 +53,9 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
       "utf8",
     );
     expect(source).toContain("answerDock={");
-    expect(source).toContain("openingAsk ? (");
+    const dock = compactBetween(source, "answerDock={", "modeControls={");
+    expect(dock).toContain("StudioGuideCommPanel");
+    expect(dock.indexOf("openingAsk")).toBeLessThan(dock.indexOf("askMode"));
     const tablet = readFileSync(
       join(
         process.cwd(),
@@ -175,7 +188,9 @@ describe("Mobile Conversation Room coherence (MJ-D9)", () => {
       ),
       "utf8",
     );
-    const askBlock = tablet.slice(tablet.indexOf("{isAsk && question"));
+    const askAt = tablet.indexOf("isAsk && question");
+    expect(askAt).toBeGreaterThan(-1);
+    const askBlock = tablet.slice(askAt);
     expect(askBlock.indexOf("{modeControls}")).toBeLessThan(
       askBlock.indexOf("requiredMeta"),
     );
@@ -246,8 +261,8 @@ describe("MJ-D12 Mobile Studio Controls collapsible drawer", () => {
     expect(nav).toContain("createPortal");
     expect(nav).toContain("useStudioMobileUtility");
     expect(nav).toContain("Help Center");
-    expect(nav).toContain("Studio Review");
-    expect(nav).toContain('data-studio-review-placement="studio-controls"');
+    expect(nav).not.toContain("Studio Review");
+    expect(nav).not.toContain("studioReview");
     expect(nav).toContain("id=\"studio-controls-body\"");
     expect(nav.indexOf("useState(false)")).toBeLessThan(
       nav.indexOf("data-studio-controls"),
@@ -256,7 +271,7 @@ describe("MJ-D12 Mobile Studio Controls collapsible drawer", () => {
     expect(nav).not.toContain("setControlsOpen(true)");
   });
 
-  it("uses Studio Review as the only phone bottom tab and leaves the service list on that height", () => {
+  it("uses the mobile utility drawer for phone Studio Controls and leaves the service list on that height", () => {
     const nav = readFileSync(
       join(
         process.cwd(),
@@ -629,6 +644,9 @@ describe("MJ-D15 — materials bubble vs optional details", () => {
     expect(chooser).toContain("studioTileClass.standardLight");
     expect(chooser).toContain("studioTileClass.selectedActive");
     expect(chooser).not.toContain("Open route details.");
+    expect(chooser).toContain("routePeekJobsHeading");
+    expect(chooser).toContain("data-route-includes-cta");
+    expect(chooser).toContain("styles.routeLane");
     expect(chooser).not.toContain("{compact ? confirmRow : null}");
     expect(chooser).toContain("{confirmRow}");
     expect(chooser).toContain("recommendedRoadId === road.id");
@@ -1160,7 +1178,7 @@ describe("Mobile route → services → plan navigation simplification", () => {
       "utf8",
     );
     expect(checkout).toContain("phonePage");
-    expect(checkout).toContain("studioTileClass.standardLight");
+    expect(checkout).not.toContain("studioTileClass.standardLight");
     expect(checkout).toContain("studioTileClass.standardDense");
     expect(checkout).toContain("styles.checkoutPageSurface");
     expect(checkout).toContain('data-checkout-surface={phonePage ? "page-content" : "host"}');
@@ -1221,8 +1239,7 @@ describe("Mobile route → services → plan navigation simplification", () => {
     expect(intakePanel).toContain("phonePage = false");
     expect(intakePanel).toContain("phonePage ? null : (");
     expect(intakePanel).toContain("paidAcknowledgment");
-    expect(intakePanel).toContain("intakePaidAckItem");
-    expect(intakePanel).toContain('data-confirmed={item.confirmed ? "true" : "false"}');
+    expect(intakePanel).toContain("const paidAck = null");
     expect(intakePanel).not.toContain("data-intake-well");
     const intakeTablet = readFileSync(
       join(
@@ -1249,6 +1266,7 @@ describe("Mobile route → services → plan navigation simplification", () => {
     )).toContain('writeTextDraft(next.join(", "))');
     expect(intakePanel).toContain('data-surface={phonePage ? "page" : "overlay"}');
     expect(intakePanel).toContain("phoneLayout={phonePage}");
+    expect(intakePanel).toContain('data-intake-buried="legacy-catalog"');
     const intakeForm = readFileSync(
       join(
         process.cwd(),
@@ -1259,12 +1277,14 @@ describe("Mobile route → services → plan navigation simplification", () => {
     expect(intakeForm).toContain('data-intake-layout={phoneLayout ? "phone" : "desktop"}');
     expect(intakeForm).toContain("route-map-social-intake__card-head");
     expect(intakeForm).toContain('data-selected={selected ? "true" : "false"}');
-    expect(intakeForm).toContain("questions answered");
+    expect(intakeForm).not.toContain("questions answered");
+    expect(intakeForm).not.toContain('data-intake-progress="bar"');
     expect(intakeForm).toContain("route-map-social-intake__next-step");
     expect(intakeForm).not.toContain(
       "Complete the required questions to continue.",
     );
-    expect(intakeForm).toContain("PHONE_MATERIALS_HINT");
+    expect(intakeForm).not.toContain("PHONE_MATERIALS_HINT");
+    expect(intakeForm).toContain("const hint = field.hint;");
     expect(intakeForm).toContain('data-intake-action="draft"');
     expect(intakeForm).toContain('autoComplete="off"');
     expect(intakeForm).toContain("paintKey");
@@ -1302,7 +1322,7 @@ describe("Mobile route → services → plan navigation simplification", () => {
     expect(phoneIntakeCss).toContain("gap: 0.85rem");
     expect(phoneIntakeCss).toContain(":global(.route-map-social-intake__chips)");
     expect(phoneIntakeCss).toContain("background: transparent");
-    expect(phoneIntakeCss).toContain("padding: 0.75rem 0.85rem");
+    expect(phoneIntakeCss).toContain("padding: 1rem 1.15rem");
     expect(phoneIntakeCss).toContain(".checkoutScopeDisclosure");
     expect(activityCss).toContain("[data-tablet-journey-chrome]");
     expect(activityCss).toContain("gap: 0.75rem");
@@ -1388,5 +1408,18 @@ describe("Conversation journey chrome — Back then Voice through Intake", () =>
     expect(summary.indexOf("{modeControls}")).toBeLessThan(
       summary.indexOf("summaryIntroLead"),
     );
+    expect(tablet).not.toContain("phoneLayout ? modeControls : null");
+    expect(tablet).toContain("topControls={modeControls}");
+    const activity = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/studio-conversation-room/guide/ConversationActivityPanel.tsx",
+      ),
+      "utf8",
+    );
+    expect(activity).toContain("topControls={topControls}");
+    expect(runtime).toContain("topControls={");
+    expect(plan).toContain("renderStudioPlanVoiceOrient(v.studioPlanVoiceOrient)");
+    expect(checkout).toContain("renderWithCoralProjectChange");
   });
 });

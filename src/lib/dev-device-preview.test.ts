@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import { ownerConsoleWebsiteInspectionV1 } from "@/config/owner-console-website-inspection-v1";
 import {
   buildDevDevicePreviewUrl,
   ownerQaPageLabelForPath,
+  parseDevDevicePreviewHref,
   pickLanIPv4,
   resolveDevPreviewPort,
 } from "@/lib/dev-device-preview";
@@ -96,6 +98,35 @@ describe("dev-device-preview", () => {
   it("labels known journey paths", () => {
     expect(ownerQaPageLabelForPath("/")).toBe("Studio Lobby");
     expect(ownerQaPageLabelForPath("/studio-lobby")).toBe("Studio Lobby");
-    expect(ownerQaPageLabelForPath("/route-map")).toBe("Studio Guide");
+    expect(ownerQaPageLabelForPath("/route-map")).toBe("Studio Conversation Room");
+  });
+
+  it("parses inspection hrefs without dropping query strings", () => {
+    expect(parseDevDevicePreviewHref("/route-map")).toEqual({
+      pathname: "/route-map",
+      search: "",
+    });
+    expect(parseDevDevicePreviewHref("/studio-conversation-room?road=i75&view=studio-plan")).toEqual({
+      pathname: "/studio-conversation-room",
+      search: "?road=i75&view=studio-plan",
+    });
+    expect(parseDevDevicePreviewHref("/studio-conversation-room?stage=intake")).toEqual({
+      pathname: "/studio-conversation-room",
+      search: "?stage=intake",
+    });
+  });
+
+  it("builds preview URLs that match each Owner Console journey shortcut href", () => {
+    for (const item of ownerConsoleWebsiteInspectionV1.shortcuts.journey) {
+      const { pathname, search } = parseDevDevicePreviewHref(item.href);
+      const built = buildDevDevicePreviewUrl({
+        lanAddress: "192.168.1.10",
+        port: "3475",
+        pathname,
+        search,
+      });
+      const url = new URL(built.url);
+      expect(`${url.pathname}${url.search}`).toBe(item.href);
+    }
   });
 });

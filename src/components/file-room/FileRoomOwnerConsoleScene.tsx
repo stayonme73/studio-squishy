@@ -14,6 +14,7 @@ import type {
 import type { OwnerControlRoomView } from "@/lib/job-control/control-room-view";
 
 import FileRoomOwnerConsoleSequentialDesk from "./FileRoomOwnerConsoleSequentialDesk";
+import FileRoomOwnerConsoleWebsiteInspection from "./FileRoomOwnerConsoleWebsiteInspection";
 import { useOwnerConsoleActions } from "./useOwnerConsoleActions";
 
 type FileRoomOwnerConsoleSceneProps = {
@@ -53,6 +54,7 @@ export default function FileRoomOwnerConsoleScene({
 
   return (
     <div className="fr-owner-console-shell">
+      <FileRoomOwnerConsoleWebsiteInspection />
       <FileRoomOwnerConsoleSequentialDesk
         desk={desk}
         scan={scan}

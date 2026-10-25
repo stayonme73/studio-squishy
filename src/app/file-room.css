@@ -1385,6 +1385,85 @@
   --fr-owner-dock-height: calc(4.85rem + env(safe-area-inset-bottom, 0px));
 }
 
+.fr-owner-console-inspection {
+  flex-shrink: 0;
+  margin: 0 0 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  background: var(--fr-owner-desk-frost-read);
+  border: 1px solid color-mix(in srgb, var(--fr-owner-desk-charcoal) 10%, transparent);
+}
+
+.fr-owner-console-inspection__header h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.fr-owner-console-inspection__header p {
+  margin: 0;
+  font-size: 0.92rem;
+  opacity: 0.88;
+}
+
+.fr-owner-console-inspection__group h3,
+.fr-owner-console-inspection__fold summary {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.fr-owner-console-inspection__links {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+@media (min-width: 768px) {
+  .fr-owner-console-inspection__links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.fr-owner-console-inspection__links a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  background: color-mix(in srgb, var(--studio-ivory, #f7f4ee) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--fr-owner-desk-charcoal) 8%, transparent);
+}
+
+.fr-owner-console-inspection__links a:hover {
+  border-color: color-mix(in srgb, var(--fr-owner-desk-denim) 35%, transparent);
+}
+
+.fr-owner-console-inspection__fold {
+  margin-top: 0.65rem;
+}
+
+.fr-owner-console-inspection__preview-body {
+  margin-top: 0.5rem;
+}
+
+.fr-owner-console-inspection__hint,
+.fr-owner-console-inspection__warn,
+.fr-owner-console-inspection__url {
+  font-size: 0.88rem;
+}
+
+.fr-owner-console-inspection__warn {
+  color: var(--fr-owner-desk-coral);
+}
+
+.fr-owner-console-inspection__qr {
+  display: block;
+  margin: 0.5rem 0;
+}
+
 /* Owner Console headers — inherit global file-room reading bands */
 .fr-owner-console-shell .fr-owner-console-header,
 .fr-owner-console-shell .fr-control-room__header {
@@ -2237,6 +2316,38 @@
 .fr-owner-sequential__squishy-says-label {
   font-weight: 700;
   color: var(--fr-owner-desk-denim-deep, #2a4a66);
+}
+
+.fr-owner-sequential__squishy-ask {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.fr-owner-sequential__squishy-ask-label,
+.fr-owner-sequential__squishy-ask-note {
+  margin: 0;
+  font-size: var(--fr-owner-seq-type-label);
+  color: var(--fr-owner-desk-denim-deep, #2a4a66);
+}
+
+.fr-owner-sequential__squishy-ask-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.fr-owner-sequential__squishy-ask-input {
+  flex: 1 1 12rem;
+  min-width: 0;
+  font: inherit;
+  color: var(--fr-owner-desk-charcoal, #2f3437);
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--fr-owner-desk-denim, #355c7d) 35%, transparent);
+  border-radius: 4px;
+  padding: 0.4rem 0.55rem;
 }
 
 .fr-owner-sequential__owner-name {

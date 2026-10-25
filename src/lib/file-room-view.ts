@@ -2,7 +2,7 @@ import type { DraftIntakeSummarySection } from "@/config/draft-room";
 import { draftRoomIntakeAnswerSummary } from "@/config/draft-room";
 import { discoveryTileConfig } from "@/config/business-discovery-studio";
 import { resolveApprovedGreenServiceIds } from "@/config/project-details";
-import type { CampaignRecord } from "@/config/studio-board";
+import type { CampaignRecord, CampaignStatus } from "@/config/studio-board";
 import { studioBoard } from "@/config/studio-board";
 import type { ServerCampaignEnvelope } from "@/lib/campaign-store/types";
 import {
@@ -122,11 +122,25 @@ function resolveBusinessLabel(campaign: CampaignRecord): string {
 
 function resolveRecordHealth(campaign: CampaignRecord): FileRoomRecordHealth {
   const missing: string[] = [];
+  if (!campaign.campaignStatus?.trim()) {
+    missing.push("Campaign status");
+  } else if (!statusContent[campaign.campaignStatus as CampaignStatus]) {
+    missing.push("Campaign status mapping");
+  }
   if (!campaign.discoverySubmittedAt) missing.push("Discovery");
   if (!campaign.approvedStudioPlan) missing.push("Approved Studio Plan");
   if (!campaign.paymentReceivedAt) missing.push("Payment");
   if (!campaign.projectDetailsSubmittedAt) missing.push("Project Details");
   return { isPartial: missing.length > 0, missing };
+}
+
+/** File Room must load even when persisted status is missing or ahead of statusContent. */
+function resolveFileRoomStatusLabel(status: CampaignRecord["campaignStatus"]): string {
+  const raw = status?.trim();
+  if (!raw) return "Campaign status missing";
+  const content = statusContent[raw as CampaignStatus];
+  if (content) return content.statusLabel;
+  return `Unmapped campaign status: ${raw}`;
 }
 
 function resolveDeliverableScopeGroups(
@@ -143,11 +157,10 @@ export function resolveFileRoomListItemView(
   envelope: ServerCampaignEnvelope,
 ): FileRoomListItemView {
   const { record } = envelope;
-  const content = statusContent[record.campaignStatus];
   return {
     campaignId: envelope.campaignId,
     campaignName: resolveCampaignDisplayName(record),
-    statusLabel: content.statusLabel,
+    statusLabel: resolveFileRoomStatusLabel(record.campaignStatus),
     businessLabel: resolveBusinessLabel(record),
     syncVersion: envelope.syncVersion,
     syncedAt: envelope.syncedAt,
@@ -165,7 +178,6 @@ export function resolveFileRoomCampaignView(
   exceptions: FileRoomExceptionsView,
 ): FileRoomCampaignView {
   const { record } = envelope;
-  const content = statusContent[record.campaignStatus];
   const visionData = resolveVisionData(record);
   const visionSummary = visionData ? draftRoomIntakeAnswerSummary(visionData) : [];
   const greenServiceIds = resolveApprovedGreenServiceIds(record.approvedStudioPlan);
@@ -173,7 +185,7 @@ export function resolveFileRoomCampaignView(
   return {
     campaignId: envelope.campaignId,
     campaignName: resolveCampaignDisplayName(record),
-    statusLabel: content.statusLabel,
+    statusLabel: resolveFileRoomStatusLabel(record.campaignStatus),
     businessLabel: resolveBusinessLabel(record),
     planLabel: resolveCampaignPlanLabel(record),
     planIncludes: resolveCampaignPlanIncludes(record),

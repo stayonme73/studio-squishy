@@ -41,6 +41,22 @@ export function resolveDevPreviewPort(hostHeader: string | null): string {
   return match?.[1] ?? "3000";
 }
 
+/** Split a relative Owner Console inspection href for the device-preview API. */
+export function parseDevDevicePreviewHref(href: string): { pathname: string; search: string } {
+  const trimmed = href.trim();
+  if (!trimmed || trimmed === "/") {
+    return { pathname: "/", search: "" };
+  }
+  const qIndex = trimmed.indexOf("?");
+  if (qIndex === -1) {
+    const pathname = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+    return { pathname, search: "" };
+  }
+  const pathname = trimmed.slice(0, qIndex) || "/";
+  const search = trimmed.slice(qIndex);
+  return { pathname, search };
+}
+
 /** QR must open the real page — never the Studio Review sheet overlay. */
 export function stripStudioReviewSearch(search: string): string {
   if (!search || search === "?") return "";

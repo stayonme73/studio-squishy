@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 import styles from "@/components/studio-conversation-room/conversation-nav-panel.module.css";
@@ -33,8 +31,8 @@ export type ConversationNavPanelProps = {
 /**
  * Studio control strip — Conversation · Session · Studio.
  * Speak and type live only on the permanent communication dock above this strip.
- * Phone: body portals into the shared Studio Review drawer (no separate tab).
- * Desktop: side rail, including the Studio Review link.
+ * Phone: body portals into the shared mobile utility drawer (Studio Controls tab).
+ * Desktop: side rail only — Owner shortcuts live in Owner Console.
  */
 export default function ConversationNavPanel({
   canChangeAnswer,
@@ -227,7 +225,6 @@ export default function ConversationNavPanel({
             Help Center
             <span className={styles.btnHint}>Policies &amp; FAQ</span>
           </button>
-          {isPhone ? null : <StudioReviewControl onOpen={closeDrawer} />}
         </div>
       </section>
     </div>
@@ -269,48 +266,5 @@ export default function ConversationNavPanel({
       </button>
       {body}
     </nav>
-  );
-}
-
-/**
- * Dev-only. Desktop Conversation Room rail only — phone uses the shared
- * Studio Review tab instead of a second Review control.
- */
-function StudioReviewControl({ onOpen }: { onOpen: () => void }) {
-  if (process.env.NODE_ENV !== "development") return null;
-  return (
-    <Suspense fallback={null}>
-      <StudioReviewControlLink onOpen={onOpen} />
-    </Suspense>
-  );
-}
-
-function StudioReviewControlLink({ onOpen }: { onOpen: () => void }) {
-  const pathname = usePathname() || "/studio-conversation-room";
-  const searchParams = useSearchParams();
-  const params = new URLSearchParams(searchParams.toString());
-  const open = params.get("studioReview") === "1";
-  params.set("studioReview", "1");
-  const href = `${pathname}?${params.toString()}`;
-
-  return (
-    <Link
-      href={href}
-      scroll={false}
-      id="studio-control-studio-review"
-      className={styles.navBtn}
-      data-studio-review-placement="studio-controls"
-      data-active={open ? "true" : "false"}
-      aria-expanded={open}
-      onClick={onOpen}
-    >
-      <span className={styles.icon} aria-hidden="true">
-        🔧
-      </span>
-      Studio Review
-      <span className={styles.btnHint}>
-        Owner tools. Scrolls with Studio Controls and does not cover the room.
-      </span>
-    </Link>
   );
 }
