@@ -13,7 +13,8 @@
 | Test Storage preflight | **PASS** 2026-10-26 AM (`studio-files-test`, ref `tzyglhypseyokhbeozjw`) — **not rerun** |
 | Production Supabase (Owner 2026-10-26) | **VERIFIED** — `txgzguzlojlhndkbncc` HEALTHY; **`studio-files`** private; **8** scheduled DB backups; latest **2026-10-26 12:59:38 UTC**; **PITR off**; **migrations none** |
 | Vercel (Owner 2026-10-26) | Project **`the-studio-company`**; Prod **`fc56426`** OLD; Git **disconnected**; reconciliation + **Preview §7** |
-| NEW Preview @ `ed36ba5c` | **STOPPED 2026-10-26** — Preview env **set** (Test infra); deploy **blocked** Vercel Hobby **12-function** limit; report updated. Prod **`fc56426` untouched** |
+| Preview build fixes | **`18574344`** 2026-10-26 PM — TS + NFT trace + `.vercelignore`; `tsc` PASS · `npm run build` PASS · `activate.test.ts` 12/12 (package evidence) |
+| NEW Preview deploy | **IN PROGRESS** — Owner **Vercel Pro** activated; resume **`STUDIO-NEW-SITE-PREVIEW-DEPLOY-1`** from **`18574344`**; Prod **`fc56426` untouched** |
 | Production migration / deploy | **NOT RUN** |
 
 **Execute approvals:** §10 plan — migration GO, **`R-04` limits acceptance**, Vercel env + deploy `ed36ba5c`.
