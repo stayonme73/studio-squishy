@@ -5,6 +5,7 @@ import {
   type CampaignRecord,
 } from "@/config/studio-board";
 import type { RouteMapJobId, RouteMapRoadId } from "@/config/route-map-v1";
+import type { TestPaymentIsolation } from "./disposable-test-isolation-types";
 import {
   listCampaignEnvelopes,
   readCampaignEnvelope,
@@ -21,6 +22,15 @@ export const DISPOSABLE_KIT_TEST_CLIENT_USER_ID = "local-disposable-kit-pay-inta
 
 const DISPOSABLE_KIT_TEST_ID =
   /^disposable-kit-[a-z0-9-]{6,60}$/;
+
+function isDisposableKitTestIsolation(
+  marker: TestPaymentIsolation,
+): marker is DisposableKitTestIsolation {
+  return (
+    marker.schemaVersion === DISPOSABLE_KIT_TEST_ISOLATION_SCHEMA &&
+    marker.purpose === "campaign_launch_kit_pay_intake"
+  );
+}
 
 export type DisposableKitTestIsolation = {
   schemaVersion: typeof DISPOSABLE_KIT_TEST_ISOLATION_SCHEMA;
@@ -112,8 +122,8 @@ export function sealDisposableKitStripeTestProof(input: {
     return null;
   }
   if (
-    campaign.testPaymentIsolation.checkoutSessionId &&
-    campaign.testPaymentIsolation.checkoutSessionId !== checkoutSessionId
+    isolation.checkoutSessionId &&
+    isolation.checkoutSessionId !== checkoutSessionId
   ) {
     return null;
   }
@@ -151,9 +161,12 @@ function verifiedStripeTestProof(
   if (proof.campaignId !== campaign.campaignId) return false;
   if (!proof.checkoutSessionId) return false;
   if (campaign.paymentTruth?.checkoutSessionId !== proof.checkoutSessionId) return false;
+  const paymentIsolation = campaign.testPaymentIsolation;
   if (
-    campaign.testPaymentIsolation?.checkoutSessionId &&
-    campaign.testPaymentIsolation.checkoutSessionId !== proof.checkoutSessionId
+    paymentIsolation &&
+    isDisposableKitTestIsolation(paymentIsolation) &&
+    paymentIsolation.checkoutSessionId &&
+    paymentIsolation.checkoutSessionId !== proof.checkoutSessionId
   ) {
     return false;
   }
@@ -242,7 +255,7 @@ export function bindDisposableKitTestCheckoutSession(
     };
   }
   const marker = campaign.testPaymentIsolation;
-  if (!marker) return { ok: true, campaign };
+  if (!marker || !isDisposableKitTestIsolation(marker)) return { ok: true, campaign };
   if (marker.checkoutSessionId && marker.checkoutSessionId !== sessionId) {
     return {
       ok: false,

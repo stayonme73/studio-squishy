@@ -13,7 +13,8 @@ export const PROMO_SQUARE_CANVAS_HEIGHT_PX = 1024;
 export const PROMO_PORTRAIT_CANVAS_HEIGHT_PX = 1536;
 export const PROMO_STACK_BOTTOM_MARGIN_PX = 20;
 
-export type PromoStackTextSpec = Omit<PromoTextLayer, "type"> & {
+export type PromoStackTextSpec = Omit<PromoTextLayer, "type" | "y"> & {
+  y?: PromoTextLayer["y"];
   skipWhenEmpty?: boolean;
   /** Collision estimate cap (default follows body/disclaimer rules in validate). */
   maxLines?: number;

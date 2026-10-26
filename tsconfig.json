@@ -32,6 +32,9 @@
   ],
   "exclude": [
     "node_modules",
+    "src/archive",
+    "data",
+    "test-artifacts",
     "tmp",
     "tmp-*",
     "tmp-tile-crops",

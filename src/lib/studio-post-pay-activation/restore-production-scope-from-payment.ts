@@ -51,7 +51,7 @@ function buildCondensedDoorLineItem(
   campaign: CampaignRecord,
   skuId: ServiceId,
 ): ApprovedStudioPlanLineItem | null {
-  if (skuId !== SOCIAL_PROMO_CURRENT_DOOR_PACKAGE_ID) return null;
+  if (String(skuId) !== SOCIAL_PROMO_CURRENT_DOOR_PACKAGE_ID) return null;
   const priceCents =
     campaign.condensedOffer?.listPriceCents ??
     campaign.condensedOffer?.priceCents ??

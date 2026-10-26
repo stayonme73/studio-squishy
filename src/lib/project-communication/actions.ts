@@ -177,6 +177,7 @@ export async function createCustomerProjectMessage(
   if ("ok" in outcome && outcome.ok === false) return outcome;
   if ("ok" in outcome) return outcome;
   const written = await writeProjectCommunicationEnvelope(outcome.envelope);
+  if (!outcome.result.ok) return outcome.result;
   return { ...outcome.result, envelope: written };
 }
 

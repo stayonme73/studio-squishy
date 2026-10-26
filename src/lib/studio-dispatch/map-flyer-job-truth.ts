@@ -264,7 +264,11 @@ function relativePathForLogoBrandItem(item: CampaignMaterialItem): string {
   ) {
     return staged.replace(/\\/g, "/");
   }
-  const objectPath = item.storageRef?.objectPath?.trim();
+  const storageRef = item.storageRef;
+  const objectPath =
+    storageRef?.provider === "supabase_storage"
+      ? storageRef.objectPath?.trim()
+      : undefined;
   if (objectPath) {
     return ["data/file-room-objects", ...objectPath.split("/").filter(Boolean)].join("/");
   }

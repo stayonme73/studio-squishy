@@ -156,7 +156,7 @@ export async function submitInformationUpdateRequest(params: {
     | { ok: true; request: InformationUpdateRequest; envelope: ProjectActivityEnvelope }
     | { ok: false; error: string; status: number };
 
-  return mutateProjectActivityEnvelope(campaignId, (envelope) => {
+  return mutateProjectActivityEnvelope<SubmitResult>(campaignId, (envelope) => {
     const existing = findRequestByIdempotency(envelope, idempotencyKey);
     if (existing) {
       if (!idempotencyPayloadMatches(existing, targetKey, requestedValue, note)) {

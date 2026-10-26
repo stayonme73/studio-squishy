@@ -104,7 +104,10 @@ export function verifyDownloadMatchesStorageRef(
   bytes: Buffer,
   storageRef: ClientDeliveryDownloadSource["storageRef"],
 ): VerifyExactByteMatchResult {
-  const expected = storageRef?.checksumSha256;
+  if (!storageRef || storageRef.provider !== "supabase_storage") {
+    return { ok: false, reason: "missing storageRef.checksumSha256" };
+  }
+  const expected = storageRef.checksumSha256;
   if (!expected?.trim()) {
     return { ok: false, reason: "missing storageRef.checksumSha256" };
   }

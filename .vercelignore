@@ -1,0 +1,9 @@
+.next
+data
+docs
+test-artifacts
+tmp
+.playwright-browsers
+assets
+*.md
+.git

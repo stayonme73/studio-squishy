@@ -129,6 +129,7 @@ export type DispatchExecutionResult =
         | "payment_not_confirmed"
         | "routing_incomplete"
         | "dispatch_failed"
-        | "customer_context_mismatch";
+        | "customer_context_mismatch"
+        | "disposable_test_isolation";
       message: string;
     };

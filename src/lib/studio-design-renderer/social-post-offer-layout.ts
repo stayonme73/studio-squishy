@@ -12,7 +12,9 @@ export const SOCIAL_POST_CANVAS_HEIGHT_PX = 1024;
 export const SOCIAL_POST_STACK_GAP_PX = 20;
 export const SOCIAL_POST_BOTTOM_MARGIN_PX = 24;
 
-export type StackTextSpec = Omit<SocialPostTextLayer, "type"> & {
+/** Vertical stack assigns `y`; callers supply layout fields only. */
+export type StackTextSpec = Omit<SocialPostTextLayer, "type" | "y"> & {
+  y?: SocialPostTextLayer["y"];
   skipWhenEmpty?: boolean;
 };
 

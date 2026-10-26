@@ -313,7 +313,7 @@ export async function askCustomerLifeFromStore(input: {
           campaignId: facts.campaignId,
           campaign: facts.campaign,
           user: input.user,
-          readLife: () => readCustomerLifeEnvelope(facts.campaignId),
+          readLife: () => readCustomerLifeEnvelope(facts.campaignId!),
           writeLife: writeCustomerLifeEnvelope,
         });
       }

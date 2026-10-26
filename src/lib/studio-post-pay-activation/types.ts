@@ -38,6 +38,6 @@ export type PostPayActivationResult =
       ok: false;
       campaign: CampaignRecord;
       activation: PostPayActivationRecord | null;
-      error: "payment_not_confirmed" | "activation_failed";
+      error: "payment_not_confirmed" | "activation_failed" | "production_scope_ambiguous";
       message: string;
     };

@@ -1,6 +1,37 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Local FS campaign/task stores use path.join(process.cwd(), "data/..."). NFT tracing
+  // otherwise pulls multi-GB trees into every Serverless Function on Vercel.
+  outputFileTracingExcludes: {
+    "/*": [
+      "./data/**/*",
+      "./docs/**/*",
+      "./test-artifacts/**/*",
+      "./tmp/**/*",
+      "./tmp-*/**/*",
+      "./assets/**/*",
+      "./.playwright-browsers/**/*",
+      "./src/archive/**/*",
+    ],
+    "/api/**": [
+      "./public/studio-demo/**/*",
+      "./public/final-delivery-room/**/*",
+      "./public/studio-board/**/*",
+      "./public/welcome-hall/**/*",
+      "./public/route-map/**/*",
+      "./public/studio-guide/**/*",
+      "./public/business-discovery-studio/**/*",
+      "./public/**/*.mp4",
+      "./public/**/*.webm",
+      "./public/**/*@2x.png",
+      "./tsconfig.tsbuildinfo",
+      "./node_modules/playwright-core/**/*",
+      "./node_modules/@playwright/**/*",
+      "./node_modules/@img/sharp-wasm32/**/*",
+    ],
+  },
+  serverExternalPackages: ["sharp", "@napi-rs/canvas", "canvas"],
   devIndicators: false,
   // Phone LAN cert. Next.js 16 blocks /_next from unlisted hosts while HTML still paints.
   // Keep only recorded private-network IPs. If DHCP changes, add the new IP and restart.

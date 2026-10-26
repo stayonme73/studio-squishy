@@ -43,7 +43,7 @@ function resolvedPromoEditorialHeadline(
 /** Paint headline only when intake supplied distinct editorial copy (not a repeat of offerName). */
 function promoEditorialHeadlineLayer(
   truth: Pick<PromoProjectTruth, "headline" | "offerName">,
-  partial: Omit<PromoTextLayer, "type" | "role" | "content"> & { assetId: string },
+  partial: Omit<PromoTextLayer, "type" | "role" | "content" | "id"> & { assetId: string },
 ): PromoTextLayer[] {
   const headline = resolvedPromoEditorialHeadline(truth);
   if (!headline) return [];

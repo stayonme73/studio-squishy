@@ -1,6 +1,17 @@
 import { createHash } from "crypto";
 
-import type { FileRoomStorageAdapter } from "./types";
+import type { FileRoomStorageAdapter, FileRoomStorageDownloadResult } from "./types";
+
+async function downloadBodyToUint8Array(
+  body: FileRoomStorageDownloadResult["body"],
+): Promise<Uint8Array> {
+  if (body instanceof Uint8Array) return body;
+  if (body instanceof ArrayBuffer) return new Uint8Array(body);
+  if (typeof Blob !== "undefined" && body instanceof Blob) {
+    return new Uint8Array(await body.arrayBuffer());
+  }
+  throw new Error("Unsupported download body for backup.");
+}
 
 export type StorageBackupSnapshot = {
   bucket: string;
@@ -24,11 +35,11 @@ export async function backupPrivateObject(input: {
   >;
 }): Promise<StorageBackupSnapshot> {
   const downloaded = await input.adapter.downloadObject({ storageRef: input.storageRef });
-  const body = new Uint8Array(downloaded.body);
+  const body = await downloadBodyToUint8Array(downloaded.body);
   return {
     bucket: input.storageRef.bucket,
     objectPath: input.storageRef.objectPath,
-    contentType: downloaded.contentType,
+    contentType: downloaded.contentType ?? "application/octet-stream",
     sizeBytes: body.byteLength,
     checksumSha256: checksumSha256(body),
     body,
