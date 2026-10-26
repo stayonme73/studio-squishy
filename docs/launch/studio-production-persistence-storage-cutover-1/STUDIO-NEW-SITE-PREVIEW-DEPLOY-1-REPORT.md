@@ -2,8 +2,9 @@
 
 **Release base:** `ed36ba5c817c7c5c78c78bfd53eb4be5d9b7257b`  
 **Resumed:** 2026-10-26 (America/New_York)  
-**Verdict:** **STOPPED — BLOCKED** (Vercel Hobby plan serverless function limit). Follow-up: **`STUDIO-NEW-SITE-PREVIEW-BUILD-BLOCKERS-1-REPORT.md`** (TS + bundle fixes local; Hobby cap remains).  
-**Production OLD site:** **PROTECTED** — `studio-squishy.vercel.app` still Draft Room / welcome-hall @ **`fc56426`**
+**Verdict (2026-10-26 PM):** **Preview DEPLOY PASS** · **Smokes PARTIAL** (T1 PASS; T2–T5 blocked/fail — see below).  
+**Build-fix commits (local):** **`18574344`** · **`d92faf83`** · merge **`481bc268`** — **GitHub push HTTP 500** (remote tip still **`ee8afb0d`** at last check).  
+**Production OLD site:** **PROTECTED** — Production deployment unchanged @ **`fc56426`** / `studio-squishy.vercel.app`.
 
 ---
 
@@ -15,7 +16,10 @@
 | `vercel link` → **`the-studio-company`** | **PASS** |
 | Preview-only env (Test Supabase, new `SESSION_SECRET`, Stripe test, email `none`) | **PASS** — Preview scope only |
 | Preview deploy @ `ed36ba5c` | **FAIL** — see blockers |
-| Smokes T1–T5 | **NOT RUN** (no healthy Preview URL) |
+| Vercel Pro on `stayonme73s-projects` | **VERIFIED** (CLI `teams ls` → **pro**; project **`the-studio-company`**) |
+| Preview deploy @ **`481bc268`** (local tree) | **PASS** — **`dpl_4i9n7k4PJ8fj6Hca9Nf9UKAHKnqz`** |
+| Preview URL | **`https://the-studio-company-ooxt99n28-stayonme73s-projects.vercel.app`** |
+| Smokes T1–T5 | **PARTIAL** — table §7.4 results below |
 
 ---
 
@@ -68,11 +72,19 @@ Revert or commit separately — **not** merged to GitHub release ref.
 
 ---
 
-## Smoke tests T1–T5
+## Smoke tests T1–T5 (2026-10-26 PM, `vercel curl` + deployment protection bypass)
 
-| Tier | Result |
-|------|--------|
-| T1–T5 | **NOT RUN** |
+| Tier | Result | Evidence |
+|------|--------|----------|
+| **T1 — Shell** | **PASS** | `/` **200** — NEW homepage (`studio-homepage`, lounge plate); `/help-center` **200**; `/route-map` **307** → `/studio-conversation-room` (locked redirect); not Draft Room |
+| **T2 — Auth** | **FAIL** | `POST /api/auth/signup` → **500** `Account creation is temporarily unavailable` (exception in handler — likely Postgres/auth persistence on Preview) |
+| **T3 — Pay** | **NOT RUN** | Blocked on T2 session/account |
+| **T4 — Persistence** | **NOT RUN** | Blocked on T2 |
+| **T5 — File Room** | **NOT RUN** | Blocked on T2 |
+
+**Preview env (unchanged):** Test Supabase ref **`tzyglhypseyokhbeozjw`**, **`studio-files-test`**, Stripe **test**, **`TRANSACTIONAL_EMAIL_PROVIDER=none`**, Preview **`SESSION_SECRET`** present (names verified via `vercel env ls preview`).
+
+**Remaining:** Set **`NEXT_PUBLIC_SITE_URL`** to Preview host after Owner confirms URL; diagnose signup **500** against Test **`DATABASE_URL`** / auth postgres path.
 
 ---
 

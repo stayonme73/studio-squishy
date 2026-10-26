@@ -13,8 +13,10 @@
 | Test Storage preflight | **PASS** 2026-10-26 AM (`studio-files-test`, ref `tzyglhypseyokhbeozjw`) — **not rerun** |
 | Production Supabase (Owner 2026-10-26) | **VERIFIED** — `txgzguzlojlhndkbncc` HEALTHY; **`studio-files`** private; **8** scheduled DB backups; latest **2026-10-26 12:59:38 UTC**; **PITR off**; **migrations none** |
 | Vercel (Owner 2026-10-26) | Project **`the-studio-company`**; Prod **`fc56426`** OLD; Git **disconnected**; reconciliation + **Preview §7** |
-| Preview build fixes | **`18574344`** 2026-10-26 PM — TS + NFT trace + `.vercelignore`; `tsc` PASS · `npm run build` PASS · `activate.test.ts` 12/12 (package evidence) |
-| NEW Preview deploy | **IN PROGRESS** — Owner **Vercel Pro** activated; resume **`STUDIO-NEW-SITE-PREVIEW-DEPLOY-1`** from **`18574344`**; Prod **`fc56426` untouched** |
+| Preview build fixes | **`18574344`** (+ **`d92faf83`** register, merge **`481bc268`** local) — TS + NFT trace; **GitHub push failed HTTP 500** (remote **`ee8afb0d`**) |
+| Vercel Pro | **ACTIVE** — team **`stayonme73s-projects`** · project **`the-studio-company`** |
+| NEW Preview deploy | **PASS WITH LIMITS** — **`dpl_4i9n7k4PJ8fj6Hca9Nf9UKAHKnqz`** · **`https://the-studio-company-ooxt99n28-stayonme73s-projects.vercel.app`** · T1 PASS · T2–T5 not complete |
+| Production | **`fc56426`** / Welcome Hall **unchanged** on **`studio-squishy.vercel.app`** |
 | Production migration / deploy | **NOT RUN** |
 
 **Execute approvals:** §10 plan — migration GO, **`R-04` limits acceptance**, Vercel env + deploy `ed36ba5c`.
