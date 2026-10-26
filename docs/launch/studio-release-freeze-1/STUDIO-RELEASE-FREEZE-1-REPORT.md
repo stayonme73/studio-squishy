@@ -17,7 +17,7 @@
 | 0 | `8eaf70d707d20221240a6e2a903bb0f432aa891f` | 2026-10-25 10:41:20 -0400 | yes | Owner Console: migrate Studio Review to website inspection |
 | 1 | `ed36ba5c817c7c5c78c78bfd53eb4be5d9b7257b` | 2026-10-26 07:29:56 -0400 | **yes** | feat(launch): freeze four-package site, persistence, and customer rooms code |
 | 2 | `20a5e00e7e0088bf6b99fdfab8cbeab2e6c65bde` | 2026-10-26 07:39:10 -0400 | **no** | docs(launch): freeze certification evidence and operating records |
-| 3 | *(report-only tip after push)* | 2026-10-26 | **yes** (this file) | docs(launch): STUDIO-RELEASE-FREEZE-1 report |
+| 3 | `22004fd3a6d3bf39474c983b5d50971c203738a7` | 2026-10-26 | **yes** | docs(launch): STUDIO-RELEASE-FREEZE-1 report and register |
 
 **Laptop branch tip (local only, not required on GitHub):** `e9edfb42347f4e765d9866ecc4dd25d88a8147b8` — earlier draft of this report atop commit 2.
 
@@ -63,8 +63,8 @@
 |-------|--------|
 | Pre-commit hook (commit 1) | **PASS** (exit 0, ~351s) |
 | Remote push (incremental) | **PARTIAL** |
-| `origin/operating/mobile-customer-journey-certification-1` | **`ed36ba5c817c7c5c78c78bfd53eb4be5d9b7257b`** (verified via `git ls-remote`) |
-| Local ↔ remote for **code** | **MATCH** at `ed36ba5c` |
+| `origin/operating/mobile-customer-journey-certification-1` | **`22004fd3a6d3bf39474c983b5d50971c203738a7`** (verified via `git ls-remote`) |
+| Local ↔ remote HEAD | **MATCH** at `22004fd3` (`ed36ba5c` + report register) |
 | Docs commit `20a5e00e` on GitHub | **NO** — HTTP 500 / pack disconnect during push |
 
 ### Push detail (2026-10-26)
@@ -73,7 +73,8 @@
 2. `8eaf70d7..ed36ba5c` — **OK** (~14s)  
 3. `ed36ba5c..20a5e00e` — **FAILED** (large pack; GitHub HTTP 500)  
 
-**Authoritative GitHub release ref for deploy/cutover:** **`ed36ba5c817c7c5c78c78bfd53eb4be5d9b7257b`**.  
+**Authoritative GitHub branch tip:** **`22004fd3a6d3bf39474c983b5d50971c203738a7`**.  
+**Authoritative GitHub ref for application deploy/cutover (code + migrations):** **`ed36ba5c817c7c5c78c78bfd53eb4be5d9b7257b`**.  
 
 **Do not rerun:** persistence 42/42, prelaunch 4/4, shared-truth 33/33, mobile cert, two-drive backup (`STUDIO-TWO-DRIVE-PRESERVATION-2` @ Oct 25).
 
